@@ -29,6 +29,7 @@ import (
 // TaskFunc is the task function.
 type TaskFunc func(context.Context) error
 
+// Execute executes the task function.
 func (f TaskFunc) Execute(ctx context.Context, logger log.Interface) (err error) {
 	defer func() {
 		if p := recover(); p != nil {
@@ -57,11 +58,6 @@ const (
 	TaskRestartOnFailure
 )
 
-const (
-	DefaultTaskBackoffResetDuration = time.Minute
-	DefaultTaskBackoffJitter        = 0.1
-)
-
 // TaskBackoffIntervalFunc is a function that decides the backoff interval based on the attempt history.
 // invocation is a counter, which starts at 1 and is incremented after each task function invocation.
 type TaskBackoffIntervalFunc func(ctx context.Context, executionDuration time.Duration, invocation uint, err error) time.Duration
@@ -87,6 +83,12 @@ func MakeTaskBackoffIntervalFunc(onFailure bool, resetDuration time.Duration, in
 		}
 	}
 }
+
+// Values for DefaultTaskBackoffConfig.
+const (
+	DefaultTaskBackoffResetDuration = time.Minute
+	DefaultTaskBackoffJitter        = 0.1
+)
 
 var (
 	// DefaultTaskBackoffIntervals are the default task backoff intervals.
@@ -119,6 +121,7 @@ var (
 	}
 )
 
+// TaskConfig represents task configuration.
 type TaskConfig struct {
 	Context context.Context
 	ID      string
@@ -133,19 +136,23 @@ func (c *Component) RegisterTask(conf *TaskConfig) {
 	c.taskConfigs = append(c.taskConfigs, conf)
 }
 
+// TaskStarter starts tasks with a TaskConfig.
 type TaskStarter interface {
 	// StartTask starts the specified task function, optionally with restart policy and backoff.
 	StartTask(*TaskConfig)
 }
 
+// StartTaskFunc is a function that implements the TaskStarter interface.
 type StartTaskFunc func(*TaskConfig)
 
+// StartTask implements the TaskStarter interface.
 func (f StartTaskFunc) StartTask(conf *TaskConfig) {
 	f(conf)
 }
 
 var errTaskRecovered = errors.DefineInternal("task_recovered", "task recovered")
 
+// DefaultStartTask is the default TaskStarter.
 func DefaultStartTask(conf *TaskConfig) {
 	logger := log.FromContext(conf.Context).WithField("task_id", conf.ID)
 	go func() {
@@ -201,6 +208,7 @@ func DefaultStartTask(conf *TaskConfig) {
 	}()
 }
 
+// StartTask implements the TaskStarter interface.
 func (c *Component) StartTask(conf *TaskConfig) {
 	c.taskStarter.StartTask(conf)
 }
