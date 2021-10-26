@@ -311,7 +311,9 @@ func TestApplicationServer(t *testing.T) {
 			Fetcher: &noopEndDeviceFetcher{},
 		},
 		Distribution: applicationserver.DistributionConfig{
-			PubSub: distribPubSub,
+			Global: applicationserver.GlobalDistributorConfig{
+				PubSub: distribPubSub,
+			},
 		},
 	}
 	as, err := applicationserver.New(c, config)
@@ -2351,7 +2353,9 @@ func TestSkipPayloadCrypto(t *testing.T) {
 			Fetcher: &noopEndDeviceFetcher{},
 		},
 		Distribution: applicationserver.DistributionConfig{
-			PubSub: distribPubSub,
+			Global: applicationserver.GlobalDistributorConfig{
+				PubSub: distribPubSub,
+			},
 		},
 	}
 	as, err := applicationserver.New(c, config)
@@ -2841,7 +2845,9 @@ func TestLocationFromPayload(t *testing.T) {
 			Fetcher: &noopEndDeviceFetcher{},
 		},
 		Distribution: applicationserver.DistributionConfig{
-			PubSub: distribPubSub,
+			Global: applicationserver.GlobalDistributorConfig{
+				PubSub: distribPubSub,
+			},
 		},
 	}
 	as, err := applicationserver.New(c, config)

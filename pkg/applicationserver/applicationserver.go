@@ -132,11 +132,23 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 			ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
 			ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
 		},
-		clusterDistributor: distribution.NewPubSubDistributor(ctx, c, conf.Distribution.Timeout, conf.Distribution.PubSub),
-		localDistributor:   distribution.NewLocalDistributor(ctx, c, conf.Distribution.Timeout),
-		interopClient:      interopCl,
-		interopID:          conf.Interop.ID,
-		endDeviceFetcher:   conf.EndDeviceFetcher.Fetcher,
+		clusterDistributor: distribution.NewPubSubDistributor(
+			ctx,
+			c,
+			conf.Distribution.Timeout,
+			conf.Distribution.Global.PubSub,
+			conf.Distribution.Global.Individual.SubscriptionOptions(),
+		),
+		localDistributor: distribution.NewLocalDistributor(
+			ctx,
+			c,
+			conf.Distribution.Timeout,
+			conf.Distribution.Local.Broadcast.SubscriptionOptions(),
+			conf.Distribution.Local.Individual.SubscriptionOptions(),
+		),
+		interopClient:    interopCl,
+		interopID:        conf.Interop.ID,
+		endDeviceFetcher: conf.EndDeviceFetcher.Fetcher,
 	}
 	as.formatters[ttnpb.PayloadFormatter_FORMATTER_REPOSITORY] = devicerepository.New(as.formatters, as)
 

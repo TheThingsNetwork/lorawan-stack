@@ -311,7 +311,7 @@ var startCommand = &cobra.Command{
 				Redis: redis.New(config.Redis.WithNamespace("as", "applicationups")),
 				Limit: config.AS.UplinkStorage.Limit,
 			}
-			config.AS.Distribution.PubSub = &asdistribredis.PubSub{
+			config.AS.Distribution.Global.PubSub = &asdistribredis.PubSub{
 				Redis: redis.New(config.Cache.Redis.WithNamespace("as", "traffic")),
 			}
 			pubsubRegistry := &asiopsredis.PubSubRegistry{
