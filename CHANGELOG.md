@@ -11,7 +11,19 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- `ttn_lw_as_subscription_sets_publish_success_total` and `ttn_lw_as_subscription_sets_publish_failed_total` metrics to track the number of subscription set publish attempts.
+- Application Server advanced distribution settings:
+  - `as.distribution.global.individual.subscription-blocks` controls if the Application Server should block while publishing traffic to individual global subscribers (such as MQTT clients).
+  - `as.distribution.global.individual.subscription-queue-size` controls how many uplinks the Application Server should buffer for an individual global subscriber. Note that when the buffer is full, the Application Server will drop the uplinks if `--as.distribution.global.individual.subscription-blocks` is not enabled. Use a negative value in order to disable the queue.
+  - `as.distribution.local.broadcast.subscription-blocks` controls if the Application Server should block while publishing traffic to broadcast local subscribers (such as webhooks and application packages matching).
+  - `as.distribution.local.broadcast.subscription-queue-size` controls how many uplinks the Application Server should buffer for an broadcast local subscriber. Has the same semantics as `--as.distribution.global.individual.subscription-queue-size`.
+  - `as.distribution.local.individual.subscription-blocks` controls if the Application Server should block while publishing traffic to individual local subscribers (such as PubSub integrations).
+  - `as.distribution.local.individual.subscription-queue-size` controls how many uplinks the Application Server should buffer for an individual local subscriber. Has the same semantics as `--as.distribution.global.individual.subscription-queue-size`.
+
 ### Changed
+
+- Gateway Server default UDP worker count has been increased to 1024, from 16.
+- Application Server webhooks and application packages default worker count has been increased to 1024, from 16.
 
 ### Deprecated
 
