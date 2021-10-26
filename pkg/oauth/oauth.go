@@ -213,8 +213,8 @@ func (req *tokenRequest) ValidateContext(ctx context.Context) error {
 	return nil
 }
 
-func (r tokenRequest) Values() (values url.Values) {
-	values = make(url.Values)
+func (r tokenRequest) Values() url.Values {
+	values := make(url.Values)
 	if r.GrantType != "" {
 		values.Set("grant_type", r.GrantType)
 	}
@@ -229,7 +229,7 @@ func (r tokenRequest) Values() (values url.Values) {
 	}
 	values.Set("client_id", r.ClientID)
 	values.Set("client_secret", r.ClientSecret)
-	return
+	return values
 }
 
 func (s *server) Token(c echo.Context) error {

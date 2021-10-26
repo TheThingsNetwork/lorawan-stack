@@ -72,15 +72,16 @@ func RegisterAllowedFieldMaskPaths(rpcFullMethod string, set bool, allPaths []st
 
 var errForbiddenFieldMaskPaths = errors.DefineInvalidArgument("field_mask_paths", "forbidden path(s) in field mask", "forbidden_paths")
 
-func forbiddenPaths(requestedPaths []string, allowedPaths map[string]struct{}) (invalidPaths []string) {
+func forbiddenPaths(requestedPaths []string, allowedPaths map[string]struct{}) []string {
+	var forbiddenPaths []string
 nextRequestedPath:
 	for _, requestedPath := range requestedPaths {
 		if _, ok := allowedPaths[requestedPath]; ok {
 			continue nextRequestedPath
 		}
-		invalidPaths = append(invalidPaths, requestedPath)
+		forbiddenPaths = append(forbiddenPaths, requestedPath)
 	}
-	return
+	return forbiddenPaths
 }
 
 func convertError(err error) error {

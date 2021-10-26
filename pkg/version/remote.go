@@ -45,7 +45,7 @@ func (t *timestamp) UnmarshalJSON(data []byte) (err error) {
 	} else {
 		t.Time, err = time.Parse(`"`+time.RFC3339+`"`, str)
 	}
-	return
+	return err
 }
 
 type release struct {
