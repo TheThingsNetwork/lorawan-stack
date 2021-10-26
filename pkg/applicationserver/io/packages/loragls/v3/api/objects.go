@@ -112,7 +112,7 @@ func parseRxMetadata(ctx context.Context, m *ttnpb.RxMetadata) (Gateway, Uplink)
 		}
 }
 
-// BuildSingelFrameRequest builds a SingleFrameRequest from the provided metadata.
+// BuildSingleFrameRequest builds a SingleFrameRequest from the provided metadata.
 func BuildSingleFrameRequest(ctx context.Context, metadata []*ttnpb.RxMetadata) *SingleFrameRequest {
 	r := &SingleFrameRequest{
 		Gateways: []Gateway{},
@@ -161,6 +161,7 @@ func BuildMultiFrameRequest(ctx context.Context, mds [][]*ttnpb.RxMetadata) *Mul
 	return r
 }
 
+// Algorithms supported by the location solver.
 const (
 	Algorithm_TDOA     = "Tdoa"
 	Algorithm_RSSI     = "Rssi"
@@ -235,7 +236,7 @@ func (h Hex) String() string {
 func (h *Hex) UnmarshalJSON(b []byte) (err error) {
 	s := strings.TrimSuffix(strings.TrimPrefix(string(b), "\""), "\"")
 	*h, err = hex.DecodeString(s)
-	return
+	return err
 }
 
 // GNSSRequest contains the location query request based on a GNSS payload.
@@ -251,7 +252,7 @@ type GNSSLocationSolverResult struct {
 	Accuracy float64   `json:"accuracy"`
 }
 
-// LocationSolverResponse contains the GNSS location query response.
+// GNSSLocationSolverResponse contains the GNSS location query response.
 // https://www.loracloud.com/documentation/geolocation?url=gnss.html#single-capture-http-request
 type GNSSLocationSolverResponse struct {
 	Result   *GNSSLocationSolverResult `json:"result"`

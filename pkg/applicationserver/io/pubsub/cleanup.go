@@ -40,7 +40,7 @@ func (cleaner *RegistryCleaner) RangeToLocalSet(ctx context.Context) error {
 	return err
 }
 
-// DeleteComplement deletes registry application data of all applications in the application set.
+// DeleteApplicationData deletes registry application data of all applications in the application list.
 func (cleaner *RegistryCleaner) DeleteApplicationData(ctx context.Context, applicationList []string) error {
 	for _, ids := range applicationList {
 		appIds, err := unique.ToApplicationID(ids)

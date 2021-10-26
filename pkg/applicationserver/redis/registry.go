@@ -249,6 +249,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 	return pb, nil
 }
 
+// Range ranges over the end devices and calls the callback function, until false is returned.
 func (r *DeviceRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
 	deviceEntityRegex, err := deviceRegex(r.uidKey(unique.GenericID(ctx, "*")))
 	if err != nil {

@@ -287,9 +287,8 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 	}
 	if cluster {
 		return as.clusterDistributor.Subscribe(ctx, protocol, ids)
-	} else {
-		return as.localDistributor.Subscribe(ctx, protocol, ids)
 	}
+	return as.localDistributor.Subscribe(ctx, protocol, ids)
 }
 
 // Publish processes the given upstream message and then publishes it to the application frontends.
@@ -1103,7 +1102,7 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 			return dev, mask, nil
 		},
 	)
-	return
+	return pass, err
 }
 
 func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, link *ttnpb.ApplicationLink) error {

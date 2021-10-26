@@ -310,9 +310,7 @@ func (c *connection) Subscribe(info *auth.Info, requestedTopic string, requested
 	if !ok {
 		return "", 0, errNotAuthorized.New()
 	}
-	acceptedTopic = topic.Join(accepted)
-	acceptedQoS = requestedQoS
-	return
+	return topic.Join(accepted), requestedQoS, nil
 }
 
 func (c *connection) CanRead(info *auth.Info, topicParts ...string) bool {

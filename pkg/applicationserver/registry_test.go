@@ -271,11 +271,14 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 	}
 
 	seen := make(map[string]*ttnpb.ApplicationLink)
-	reg.Range(ctx, ttnpb.ApplicationLinkFieldPathsTopLevel, func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, pb *ttnpb.ApplicationLink) bool {
+	err := reg.Range(ctx, ttnpb.ApplicationLinkFieldPathsTopLevel, func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, pb *ttnpb.ApplicationLink) bool {
 		uid := unique.ID(ctx, ids)
 		seen[uid] = pb
 		return true
 	})
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	if !a.So(len(seen), should.Equal, 2) ||
 		!a.So(seen[unique.ID(ctx, app1IDs)], should.Resemble, app1) ||
 		!a.So(seen[unique.ID(ctx, app2IDs)], should.Resemble, app2) {

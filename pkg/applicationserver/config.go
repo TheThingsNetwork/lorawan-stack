@@ -58,12 +58,14 @@ type EndDeviceFetcherCacheConfig struct {
 	Size   int           `name:"size" description:"Cache size"`
 }
 
+// EndDeviceFetcherCircuitBreakerConfig represents the configuration for the circuit breaker of the end device fetcher.
 type EndDeviceFetcherCircuitBreakerConfig struct {
 	Enable    bool          `name:"enable" description:"Enable circuit breaker behavior on burst errors"`
 	Timeout   time.Duration `name:"timeout" description:"Timeout after which the circuit breaker closes"`
 	Threshold int           `name:"threshold" description:"Number of failed fetching attempts after which the circuit breaker opens"`
 }
 
+// FormattersConfig represents the configuration for payload formatters.
 type FormattersConfig struct {
 	MaxParameterLength int `name:"max-parameter-length" description:"Maximum allowed size for length of formatter parameters (payload formatter scripts)"`
 }
