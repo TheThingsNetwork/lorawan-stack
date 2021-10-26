@@ -143,5 +143,5 @@ func (cli *Client) fromPB(pb *ttnpb.Client, fieldMask *pbtypes.FieldMask) (colum
 			continue
 		}
 	}
-	return
+	return columns
 }

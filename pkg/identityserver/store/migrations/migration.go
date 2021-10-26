@@ -32,6 +32,7 @@ type Migration interface {
 	Rollback(context.Context, *gorm.DB) error
 }
 
+// Apply applies the list of migrations on the database connection.
 func Apply(ctx context.Context, db *gorm.DB, migrations ...Migration) error {
 	migrationStore := store.GetMigrationStore(db)
 	for _, migration := range migrations {
@@ -55,4 +56,5 @@ func Apply(ctx context.Context, db *gorm.DB, migrations ...Migration) error {
 	return nil
 }
 
+// All is a list of all database migrations.
 var All []Migration

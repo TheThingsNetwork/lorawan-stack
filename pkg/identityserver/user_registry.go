@@ -312,11 +312,10 @@ func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest
 		if err := is.RequireAuthenticated(ctx); err != nil {
 			return nil, err
 		}
-		if ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicUserFields...) {
-			defer func() { usr = usr.PublicSafe() }()
-		} else {
+		if !ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicUserFields...) {
 			return nil, err
 		}
+		defer func() { usr = usr.PublicSafe() }()
 	}
 
 	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.GetPaths()), "profile_picture") {

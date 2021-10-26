@@ -101,12 +101,11 @@ func (s *invitationStore) SetInvitationAcceptedBy(ctx context.Context, token str
 	if err != nil {
 		return err
 	}
-	if invitationModel.AcceptedByID == nil {
-		id := user.PrimaryKey()
-		invitationModel.AcceptedByID = &id
-	} else {
+	if invitationModel.AcceptedByID != nil {
 		return errInvitationAlreadyAccepted.New()
 	}
+	id := user.PrimaryKey()
+	invitationModel.AcceptedByID = &id
 
 	acceptedAt := cleanTime(time.Now())
 	invitationModel.AcceptedAt = &acceptedAt

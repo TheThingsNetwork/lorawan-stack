@@ -104,7 +104,7 @@ func (org *Organization) fromPB(pb *ttnpb.Organization, fieldMask *pbtypes.Field
 			continue
 		}
 	}
-	return
+	return columns
 }
 
 type organizationWithUID struct {

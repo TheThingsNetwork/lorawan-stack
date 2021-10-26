@@ -198,7 +198,7 @@ func (usr *User) fromPB(pb *ttnpb.User, fieldMask *pbtypes.FieldMask) (columns [
 			continue
 		}
 	}
-	return
+	return columns
 }
 
 type userWithUID struct {

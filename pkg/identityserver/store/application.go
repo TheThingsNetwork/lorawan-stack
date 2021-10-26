@@ -106,5 +106,5 @@ func (app *Application) fromPB(pb *ttnpb.Application, fieldMask *pbtypes.FieldMa
 			continue
 		}
 	}
-	return
+	return columns
 }

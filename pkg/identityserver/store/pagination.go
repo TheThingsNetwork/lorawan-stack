@@ -65,7 +65,7 @@ func limitAndOffsetFromContext(ctx context.Context) (limit, offset uint32) {
 	if opts, ok := ctx.Value(paginationOptionsKey).(paginationOptions); ok {
 		return opts.limit, opts.offset
 	}
-	return
+	return 0, 0
 }
 
 // WithOrder instructs the store to sort the results by the given field.
