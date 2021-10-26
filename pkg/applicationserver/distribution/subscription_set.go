@@ -155,6 +155,9 @@ func (s *subscriptionSet) run() {
 				))
 				if err := sub.Publish(ctx, up.ApplicationUp); err != nil {
 					log.FromContext(ctx).WithError(err).Warn("Failed to publish message")
+					registerPublishFailed(ctx, sub, err)
+				} else {
+					registerPublishSuccess(ctx, sub)
 				}
 			}
 		case <-tickCh:
