@@ -44,7 +44,7 @@ func requireAuthInfo(ctx context.Context) (res struct {
 		wg.Done()
 	}()
 	wg.Wait()
-	return
+	return res
 }
 
 func requireRights(ctx context.Context, id string) (res struct {
@@ -77,7 +77,7 @@ func requireRights(ctx context.Context, id string) (res struct {
 		wg.Done()
 	}()
 	wg.Wait()
-	return
+	return res
 }
 
 func TestRequire(t *testing.T) {

@@ -45,5 +45,5 @@ func AuthInfo(ctx context.Context) (authInfo *ttnpb.AuthInfoResponse, err error)
 		}
 		return nil, err
 	}
-	return
+	return authInfo, nil
 }
