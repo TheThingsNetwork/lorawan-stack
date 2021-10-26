@@ -16,6 +16,7 @@ package band
 
 import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
+// CN_779_787_RP1_V1_1_RevB is the band definition for CN779-787 in the RP1 v1.1 rev. B specification.
 var CN_779_787_RP1_V1_1_RevB = Band{
 	ID: CN_779_787,
 

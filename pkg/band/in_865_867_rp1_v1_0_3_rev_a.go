@@ -16,6 +16,7 @@ package band
 
 import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
+// IN_865_867_RP1_V1_0_3_Rev_A is the band definition for IN865-867 in the RP1 v1.0.3 rev. A specification.
 var IN_865_867_RP1_V1_0_3_Rev_A = Band{
 	ID: IN_865_867,
 

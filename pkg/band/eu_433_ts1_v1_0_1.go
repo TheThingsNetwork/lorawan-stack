@@ -16,6 +16,7 @@ package band
 
 import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
+// EU_433_TS1_V1_0_1 is the band definition for EU433 in the TS1 v1.0.1 specification.
 var EU_433_TS1_V1_0_1 = Band{
 	ID: EU_433,
 

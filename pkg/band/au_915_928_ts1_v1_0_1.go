@@ -16,6 +16,7 @@ package band
 
 import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
+// AU_915_928_TS1_v1_0_1 is the band definition for AU915-928 in the TS1 v1.0.1 specification.
 var AU_915_928_TS1_v1_0_1 = Band{
 	ID: AU_915_928,
 

@@ -16,6 +16,7 @@ package band
 
 import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
+// ISM_2400_Universal is the band definition for universal LoRa 2.4 GHz.
 var ISM_2400_Universal = Band{
 	ID: ISM_2400,
 
