@@ -547,14 +547,7 @@ func (gs *GatewayServer) GetConnection(ctx context.Context, ids ttnpb.GatewayIde
 }
 
 func requireDisconnect(connected, current *ttnpb.Gateway) bool {
-	fromPtrArray := func(in []*ttnpb.GatewayAntenna) []ttnpb.GatewayAntenna {
-		ret := make([]ttnpb.GatewayAntenna, len(in))
-		for _, a := range in {
-			ret = append(ret, *a)
-		}
-		return ret
-	}
-	if !sameAntennaLocations(fromPtrArray(connected.GetAntennas()), fromPtrArray(current.GetAntennas())) {
+	if !sameAntennaLocations(connected.GetAntennas(), current.GetAntennas()) {
 		// Gateway Server may update the location from status messages. If the locations aren't the same, but if the new
 		// location is a GPS location, do not disconnect the gateway. This is to avoid that updating the location from a
 		// gateway status message results in disconnecting the gateway.
@@ -857,28 +850,29 @@ func sameLocation(a, b ttnpb.Location) bool {
 		math.Abs(a.Longitude-b.Longitude) <= allowedLocationDelta
 }
 
-func sameAntennaLocations(a, b []ttnpb.GatewayAntenna) bool {
+func sameAntennaLocations(a, b []*ttnpb.GatewayAntenna) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	for _, a := range a {
-		for _, b := range b {
-			if a.Location != nil && b.Location != nil && !sameLocation(*a.Location, *b.Location) {
-				return false
-			}
-			if (a.Location == nil) != (b.Location == nil) {
-				return false
-			}
+	for i := range a {
+		a, b := a[i], b[i]
+		if a.Location != nil && b.Location != nil && !sameLocation(*a.Location, *b.Location) {
+			return false
+		}
+		if (a.Location == nil) != (b.Location == nil) {
+			return false
 		}
 	}
 	return true
 }
 
+var statusLocationFields = ttnpb.ExcludeFields(ttnpb.LocationFieldPathsNested, "source")
+
 func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 	var (
 		ctx          = conn.Context()
 		gtw          = conn.Gateway()
-		lastAntennas []ttnpb.GatewayAntenna
+		lastAntennas []*ttnpb.GatewayAntenna
 	)
 
 	for {
@@ -895,15 +889,29 @@ func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 				if cs := len(status.AntennaLocations); cs > c {
 					c = cs
 				}
-				antennas := make([]ttnpb.GatewayAntenna, c)
-				for i, ant := range gtwAntennas {
-					antennas[i].Gain = ant.Gain
-				}
+				antennas := make([]*ttnpb.GatewayAntenna, c)
 				for i := range antennas {
+					antennas[i] = &ttnpb.GatewayAntenna{}
+
+					if i < len(gtwAntennas) {
+						if err := antennas[i].SetFields(
+							gtwAntennas[i],
+							ttnpb.GatewayAntennaFieldPathsNested...,
+						); err != nil {
+							log.FromContext(ctx).WithError(err).Warn("Failed to clone antenna")
+						}
+					}
+
 					if i < len(status.AntennaLocations) && status.AntennaLocations[i] != nil {
-						loc := *status.AntennaLocations[i]
-						loc.Source = ttnpb.SOURCE_GPS
-						antennas[i].Location = &loc
+						antennas[i].Location = &ttnpb.Location{
+							Source: ttnpb.SOURCE_GPS,
+						}
+						if err := antennas[i].Location.SetFields(
+							status.AntennaLocations[i],
+							statusLocationFields...,
+						); err != nil {
+							log.FromContext(ctx).WithError(err).Warn("Failed to clone antenna location")
+						}
 					}
 				}
 				if lastAntennas != nil && sameAntennaLocations(lastAntennas, antennas) {

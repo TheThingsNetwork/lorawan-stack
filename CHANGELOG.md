@@ -21,6 +21,12 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
+## [3.15.3] - 2021-10-26
+
+### Fixed
+
+- Gateway disconnection when location updates from status messages are enabled.
+
 ## [3.15.2] - 2021-10-22
 
 ### Added
@@ -1832,7 +1838,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.2...v3.15
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.3...v3.15
+[3.15.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.2...v3.15.3
 [3.15.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.1...v3.15.2
 [3.15.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.0...v3.15.1
 [3.15.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.2...v3.15.0
