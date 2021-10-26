@@ -17,7 +17,6 @@ package redis
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -46,8 +45,6 @@ func (ps PubSub) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
 	return nil
 }
 
-var errChannelClosed = errors.DefineResourceExhausted("channel_closed", "channel closed")
-
 // Subscribe subscribes to the traffic of the provided application and processes it using the handler.
 func (ps PubSub) Subscribe(ctx context.Context, ids ttnpb.ApplicationIdentifiers, handler func(context.Context, *ttnpb.ApplicationUp) error) error {
 	uid := unique.ID(ctx, ids)
@@ -55,25 +52,20 @@ func (ps PubSub) Subscribe(ctx context.Context, ids ttnpb.ApplicationIdentifiers
 
 	sub := ps.Redis.Subscribe(ctx, ch)
 	defer sub.Close()
-	msgs := sub.Channel()
 
 	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		case msg, ok := <-msgs:
-			if !ok {
-				return errChannelClosed.New()
-			}
+		msg, err := sub.ReceiveMessage(ctx)
+		if err != nil {
+			return ttnredis.ConvertError(err)
+		}
 
-			up := &ttnpb.ApplicationUp{}
-			if err := ttnredis.UnmarshalProto(msg.Payload, up); err != nil {
-				return err
-			}
+		up := &ttnpb.ApplicationUp{}
+		if err := ttnredis.UnmarshalProto(msg.Payload, up); err != nil {
+			return err
+		}
 
-			if err := handler(ctx, up); err != nil {
-				return err
-			}
+		if err := handler(ctx, up); err != nil {
+			return err
 		}
 	}
 }
