@@ -167,15 +167,12 @@ export class SafeInspector extends Component {
     if (!this.state.hidden) {
       selectText(this.displayElem.current)
     }
-    e.stopPropagation()
   }
 
   @bind
   handleCopyClick(e) {
     const { noCopyPopup } = this.props
     const { copied } = this.state
-
-    e.stopPropagation()
 
     if (copied) {
       return
@@ -234,6 +231,11 @@ export class SafeInspector extends Component {
     } else if (netContainerWidth > displayWidth && this.state.truncated) {
       this.setState({ truncated: false })
     }
+  }
+
+  handleContainerClick(e) {
+    // Prevent from opening links that the component might be wrapped in.
+    e.preventDefault()
   }
 
   render() {
@@ -299,7 +301,7 @@ export class SafeInspector extends Component {
     const renderButtonContainer = hideable || !noCopy || !noTransform
 
     return (
-      <div ref={this.containerElem} className={containerStyle}>
+      <div ref={this.containerElem} className={containerStyle} onClick={this.handleContainerClick}>
         <div
           ref={this.displayElem}
           onClick={this.handleDataClick}
