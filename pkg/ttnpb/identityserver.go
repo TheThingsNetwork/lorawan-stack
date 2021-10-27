@@ -37,9 +37,9 @@ func (m *AuthInfoResponse) GetRights() []Right {
 	}
 	switch accessMethod := m.GetAccessMethod().(type) {
 	case *AuthInfoResponse_ApiKey:
-		return accessMethod.ApiKey.Rights
+		return accessMethod.ApiKey.GetApiKey().GetRights()
 	case *AuthInfoResponse_OauthAccessToken:
-		return accessMethod.OauthAccessToken.Rights
+		return accessMethod.OauthAccessToken.GetRights()
 	case *AuthInfoResponse_UserSession:
 		return RightsFrom(RIGHT_ALL).Implied().GetRights()
 	}
