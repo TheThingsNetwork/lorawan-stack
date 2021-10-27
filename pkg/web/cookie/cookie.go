@@ -16,6 +16,8 @@ package cookie
 
 import (
 	"net/http"
+	"net/url"
+	"regexp"
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
@@ -44,6 +46,12 @@ type Cookie struct {
 	SameSite http.SameSite
 }
 
+var secureHostRegexp = regexp.MustCompile("^(.+\\.localhost|localhost)$")
+
+func isSecureContext(u *url.URL) bool {
+	return u.Scheme == "https" || secureHostRegexp.MatchString(u.Host)
+}
+
 func (d *Cookie) new(r *http.Request) http.Cookie {
 	sameSite := d.SameSite
 	if sameSite == 0 {
@@ -52,8 +60,8 @@ func (d *Cookie) new(r *http.Request) http.Cookie {
 	return http.Cookie{
 		Name:     d.Name,
 		Path:     d.Path,
-		MaxAge:   int(d.MaxAge.Nanoseconds() / 1000),
-		Secure:   r.URL.Scheme == "https",
+		MaxAge:   int(d.MaxAge.Seconds()),
+		Secure:   isSecureContext(r.URL),
 		HttpOnly: d.HTTPOnly,
 		SameSite: sameSite,
 	}
