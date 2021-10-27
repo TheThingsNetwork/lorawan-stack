@@ -46,6 +46,7 @@ var (
 	errRegistryOperation              = errors.Define("registry_operation", "registry operation failed")
 	errReuseDevNonce                  = errors.DefineInvalidArgument("reuse_dev_nonce", "DevNonce has already been used")
 	errUnauthenticated                = errors.DefineUnauthenticated("unauthenticated", "unauthenticated")
+	errPermissionDenied               = errors.DefinePermissionDenied("permission_denied", "permission denied")
 	errUnknownJoinEUI                 = errors.DefineInvalidArgument("unknown_join_eui", "JoinEUI specified is not known")
 	errUnsupportedLoRaWANMajorVersion = errors.DefineInvalidArgument("lorawan_major_version", "unsupported LoRaWAN major version: `{major}`")
 	errUnsupportedMACVersion          = errors.DefineInvalidArgument("mac_version", "unsupported MAC version: `{version}`")

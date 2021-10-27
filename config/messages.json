@@ -6353,6 +6353,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/joinserver:permission_denied": {
+    "translations": {
+      "en": "permission denied"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/joinserver:provisioner_not_found": {
     "translations": {
       "en": "provisioner `{id}` not found"

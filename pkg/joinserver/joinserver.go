@@ -265,6 +265,12 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			"used_dev_nonces",
 		},
 		func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			if entityAuth, ok := authorizer.(EntityAuthorizer); ok {
+				if err := entityAuth.RequireEntityContext(ctx); err != nil {
+					return nil, nil, err
+				}
+			}
+
 			getAppSettings := func(ids ttnpb.ApplicationIdentifiers) func() (*ttnpb.ApplicationActivationSettings, error) {
 				var (
 					res *ttnpb.ApplicationActivationSettings
@@ -580,6 +586,11 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 			return nil, errRegistryOperation.WithCause(err)
 		}
 		ctx = dev.Context
+		if entityAuth, ok := authorizer.(EntityAuthorizer); ok {
+			if err := entityAuth.RequireEntityContext(ctx); err != nil {
+				return nil, err
+			}
+		}
 		netID := dev.NetId
 		if netID == nil {
 			appSettings, err := js.applicationActivationSettings.GetByID(ctx, dev.ApplicationIdentifiers, []string{
@@ -651,6 +662,11 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 			return nil, errRegistryOperation.WithCause(err)
 		}
 		ctx = dev.Context
+		if entityAuth, ok := authorizer.(EntityAuthorizer); ok {
+			if err := entityAuth.RequireEntityContext(ctx); err != nil {
+				return nil, err
+			}
+		}
 		if dev.ApplicationServerId != "" {
 			if err := externalAuth.RequireASID(ctx, dev.ApplicationServerId); err != nil {
 				return nil, err
@@ -728,6 +744,11 @@ func (js *JoinServer) GetHomeNetwork(ctx context.Context, joinEUI, devEUI types.
 		return nil, errRegistryOperation.WithCause(err)
 	}
 	ctx = dev.Context
+	if entityAuth, ok := authorizer.(EntityAuthorizer); ok {
+		if err := entityAuth.RequireEntityContext(ctx); err != nil {
+			return nil, err
+		}
+	}
 	netID := dev.NetId
 
 	if netID == nil {
