@@ -663,7 +663,7 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 				logger = logger.WithField("dev_addr", *ids.DevAddr)
 			}
 			logger.Debug("Drop message")
-			registerDropUplink(ctx, gtw, msg.UplinkMessage, host.name, err)
+			registerDropUplink(ctx, gtw, msg, host.name, err)
 		}
 		ids, err := lorawan.GetUplinkMessageIdentifiers(msg.RawPayload)
 		if err != nil {
@@ -793,11 +793,11 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 			logger.WithField("name", host.name).WithError(err).Warn("Upstream handler publish failed")
 			switch msg := val.(type) {
 			case *ttnpb.GatewayUplinkMessage:
-				registerFailUplink(ctx, gtw, msg, host.name, err)
+				registerDropUplink(ctx, gtw, msg, host.name, err)
 			case *ttnpb.GatewayStatus:
-				registerFailStatus(ctx, gtw, msg, host.name, err)
+				registerDropStatus(ctx, gtw, msg, host.name, err)
 			case *ttnpb.TxAcknowledgment:
-				registerFailTxAck(ctx, gtw, msg, host.name, err)
+				registerDropTxAck(ctx, gtw, msg, host.name, err)
 			default:
 				panic("unreachable")
 			}
