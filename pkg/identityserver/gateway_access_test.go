@@ -142,8 +142,8 @@ func TestGatewayAccessRightsPermissionDenied(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
+				Ids:    collaboratorID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
 			},
 		}, creds)
 
@@ -228,8 +228,8 @@ func TestGatewayAccessPermissionDenied(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
+				Ids:    collaboratorID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
 			},
 		})
 
@@ -349,8 +349,8 @@ func TestGatewayAccessCRUD(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
+				Ids:    collaboratorID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
 			},
 		}, creds)
 
@@ -369,7 +369,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
+				Ids: collaboratorID,
 			},
 		}, creds)
 
@@ -402,7 +402,7 @@ func TestGatewayAccessRights(t *testing.T) {
 		_, err := reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
+				Ids: collaboratorID,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_GATEWAY_LINK,
 					ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS,
@@ -416,7 +416,7 @@ func TestGatewayAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
+				Ids: removedCollaboratorID,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_GATEWAY_ALL,
 				},
@@ -439,7 +439,7 @@ func TestGatewayAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
+				Ids: removedCollaboratorID,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_GATEWAY_LINK,
 					ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS,
@@ -475,8 +475,8 @@ func TestGatewayAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
-				Rights:                        newRights.Rights,
+				Ids:    removedCollaboratorID,
+				Rights: newRights.Rights,
 			},
 		}, usrCreds)
 
@@ -515,8 +515,8 @@ func TestGatewayAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
-				Rights:                        newRights.Rights,
+				Ids:    removedCollaboratorID,
+				Rights: newRights.Rights,
 			},
 		}, collaboratorCreds)
 
@@ -526,8 +526,8 @@ func TestGatewayAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
-				Rights:                        newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_DELETE)).Rights,
+				Ids:    removedCollaboratorID,
+				Rights: newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_DELETE)).Rights,
 			},
 		}, collaboratorCreds)
 
@@ -562,8 +562,8 @@ func TestGatewayAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 			GatewayIds: gatewayID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
-				Rights:                        []ttnpb.Right{},
+				Ids:    removedCollaboratorID,
+				Rights: []ttnpb.Right{},
 			},
 		}, collaboratorCreds)
 

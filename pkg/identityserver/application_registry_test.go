@@ -45,8 +45,8 @@ func init() {
 	for i := 0; i < 3; i++ {
 		applicationID := population.Applications[i].GetEntityIdentifiers()
 		population.Memberships[applicationID] = append(population.Memberships[applicationID], &ttnpb.Collaborator{
-			OrganizationOrUserIdentifiers: *paginationUser.OrganizationOrUserIdentifiers(),
-			Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
+			Ids:    paginationUser.OrganizationOrUserIdentifiers(),
+			Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 		})
 	}
 }

@@ -133,8 +133,8 @@ func NewPopulator(size int, seed int64) *Populator {
 		for i := 0; i < userCollaborators; i++ {
 			ouID := p.Users[userIndex%len(p.Users)].OrganizationOrUserIdentifiers()
 			p.Memberships[applicationID] = append(p.Memberships[applicationID], &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *ouID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
+				Ids:    ouID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 			})
 			userIndex++
 		}
@@ -142,8 +142,8 @@ func NewPopulator(size int, seed int64) *Populator {
 		for i := 0; i < organizationCollaborators; i++ {
 			ouID := p.Organizations[organizationIndex%len(p.Organizations)].OrganizationOrUserIdentifiers()
 			p.Memberships[applicationID] = append(p.Memberships[applicationID], &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *ouID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
+				Ids:    ouID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 			})
 			organizationIndex++
 		}
@@ -154,8 +154,8 @@ func NewPopulator(size int, seed int64) *Populator {
 		for i := 0; i < userCollaborators; i++ {
 			ouID := p.Users[userIndex%len(p.Users)].OrganizationOrUserIdentifiers()
 			p.Memberships[clientID] = append(p.Memberships[clientID], &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *ouID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
+				Ids:    ouID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
 			})
 			userIndex++
 		}
@@ -163,8 +163,8 @@ func NewPopulator(size int, seed int64) *Populator {
 		for i := 0; i < organizationCollaborators; i++ {
 			ouID := p.Organizations[organizationIndex%len(p.Organizations)].OrganizationOrUserIdentifiers()
 			p.Memberships[clientID] = append(p.Memberships[clientID], &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *ouID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
+				Ids:    ouID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
 			})
 			organizationIndex++
 		}
@@ -175,8 +175,8 @@ func NewPopulator(size int, seed int64) *Populator {
 		for i := 0; i < userCollaborators; i++ {
 			ouID := p.Users[userIndex%len(p.Users)].OrganizationOrUserIdentifiers()
 			p.Memberships[gatewayID] = append(p.Memberships[gatewayID], &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *ouID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
+				Ids:    ouID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
 			})
 			userIndex++
 		}
@@ -184,8 +184,8 @@ func NewPopulator(size int, seed int64) *Populator {
 		for i := 0; i < organizationCollaborators; i++ {
 			ouID := p.Organizations[organizationIndex%len(p.Organizations)].OrganizationOrUserIdentifiers()
 			p.Memberships[gatewayID] = append(p.Memberships[gatewayID], &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *ouID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
+				Ids:    ouID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
 			})
 			organizationIndex++
 		}
@@ -196,8 +196,8 @@ func NewPopulator(size int, seed int64) *Populator {
 		for i := 0; i < userCollaborators; i++ {
 			ouID := p.Users[userIndex%len(p.Users)].OrganizationOrUserIdentifiers()
 			p.Memberships[organizationID] = append(p.Memberships[organizationID], &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *ouID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL, ttnpb.RIGHT_CLIENT_ALL, ttnpb.RIGHT_GATEWAY_ALL, ttnpb.RIGHT_ORGANIZATION_ALL},
+				Ids:    ouID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL, ttnpb.RIGHT_CLIENT_ALL, ttnpb.RIGHT_GATEWAY_ALL, ttnpb.RIGHT_ORGANIZATION_ALL},
 			})
 			userIndex++
 		}
@@ -357,7 +357,7 @@ func (p *Populator) populateMemberships(ctx context.Context, db *gorm.DB) (err e
 		for _, member := range members {
 			if err = GetMembershipStore(db).SetMember(
 				ctx,
-				&member.OrganizationOrUserIdentifiers,
+				member.Ids,
 				entityID,
 				ttnpb.RightsFrom(member.Rights...),
 			); err != nil {

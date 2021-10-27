@@ -209,7 +209,7 @@ func (is *IdentityServer) getGatewayCollaborator(ctx context.Context, req *ttnpb
 		return nil, err
 	}
 	res := &ttnpb.GetCollaboratorResponse{
-		OrganizationOrUserIdentifiers: *req.GetCollaborator(),
+		Ids: req.GetCollaborator(),
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		rights, err := is.getMembershipStore(ctx, db).GetMember(
@@ -241,7 +241,7 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 
 		existingRights, err := store.GetMember(
 			ctx,
-			&req.GetCollaborator().OrganizationOrUserIdentifiers,
+			req.GetCollaborator().GetIds(),
 			req.GetGatewayIds().GetEntityIdentifiers(),
 		)
 		if err != nil && !errors.IsNotFound(err) {
@@ -273,7 +273,7 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 			}
 			var hasOtherOwner bool
 			for member, rights := range memberRights {
-				if unique.ID(ctx, member) == unique.ID(ctx, &req.GetCollaborator().OrganizationOrUserIdentifiers) {
+				if unique.ID(ctx, member) == unique.ID(ctx, req.GetCollaborator().GetIds()) {
 					continue
 				}
 				if rights.Implied().IncludesAll(ttnpb.RIGHT_GATEWAY_ALL) {
@@ -288,7 +288,7 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 
 		return store.SetMember(
 			ctx,
-			&req.GetCollaborator().OrganizationOrUserIdentifiers,
+			req.GetCollaborator().GetIds(),
 			req.GetGatewayIds().GetEntityIdentifiers(),
 			ttnpb.RightsFrom(req.GetCollaborator().GetRights()...),
 		)
@@ -297,7 +297,7 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 		return nil, err
 	}
 	if len(req.GetCollaborator().GetRights()) > 0 {
-		events.Publish(evtUpdateGatewayCollaborator.New(ctx, events.WithIdentifiers(req.GetGatewayIds(), &req.GetCollaborator().OrganizationOrUserIdentifiers)))
+		events.Publish(evtUpdateGatewayCollaborator.New(ctx, events.WithIdentifiers(req.GetGatewayIds(), req.GetCollaborator().GetIds())))
 		err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
 			data.SetEntity(req)
 			return &emails.CollaboratorChanged{Data: data, Collaborator: *req.GetCollaborator()}
@@ -306,7 +306,7 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 			log.FromContext(ctx).WithError(err).Error("Could not send collaborator updated notification email")
 		}
 	} else {
-		events.Publish(evtDeleteGatewayCollaborator.New(ctx, events.WithIdentifiers(req.GetGatewayIds(), &req.GetCollaborator().OrganizationOrUserIdentifiers)))
+		events.Publish(evtDeleteGatewayCollaborator.New(ctx, events.WithIdentifiers(req.GetGatewayIds(), req.GetCollaborator().GetIds())))
 	}
 	return ttnpb.Empty, nil
 }
@@ -333,8 +333,8 @@ func (is *IdentityServer) listGatewayCollaborators(ctx context.Context, req *ttn
 		collaborators = &ttnpb.Collaborators{}
 		for member, rights := range memberRights {
 			collaborators.Collaborators = append(collaborators.Collaborators, &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *member,
-				Rights:                        rights.GetRights(),
+				Ids:    member,
+				Rights: rights.GetRights(),
 			})
 		}
 		return nil

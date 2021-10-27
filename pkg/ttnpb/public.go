@@ -168,6 +168,6 @@ func (c *Collaborator) PublicSafe() *Collaborator {
 		return nil
 	}
 	return &Collaborator{
-		OrganizationOrUserIdentifiers: c.OrganizationOrUserIdentifiers,
+		Ids: c.Ids,
 	}
 }

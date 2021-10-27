@@ -47,8 +47,8 @@ func init() {
 	for i := 0; i < 3; i++ {
 		gatewayID := population.Gateways[i].GetEntityIdentifiers()
 		population.Memberships[gatewayID] = append(population.Memberships[gatewayID], &ttnpb.Collaborator{
-			OrganizationOrUserIdentifiers: *paginationUser.OrganizationOrUserIdentifiers(),
-			Rights:                        []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
+			Ids:    paginationUser.OrganizationOrUserIdentifiers(),
+			Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
 		})
 	}
 }

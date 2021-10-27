@@ -47,8 +47,8 @@ func init() {
 		organizationID := population.Organizations[i].GetEntityIdentifiers()
 		ouID := paginationUser.OrganizationOrUserIdentifiers()
 		population.Memberships[organizationID] = append(population.Memberships[organizationID], &ttnpb.Collaborator{
-			OrganizationOrUserIdentifiers: *ouID,
-			Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL, ttnpb.RIGHT_CLIENT_ALL, ttnpb.RIGHT_GATEWAY_ALL, ttnpb.RIGHT_ORGANIZATION_ALL},
+			Ids:    ouID,
+			Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL, ttnpb.RIGHT_CLIENT_ALL, ttnpb.RIGHT_GATEWAY_ALL, ttnpb.RIGHT_ORGANIZATION_ALL},
 		})
 	}
 }

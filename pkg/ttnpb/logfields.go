@@ -109,7 +109,7 @@ func (req *SetApplicationCollaboratorRequest) ExtractRequestFields(m map[string]
 		return
 	}
 	req.ApplicationIds.ExtractRequestFields(m)
-	extractCollaboratorFields(m, &req.GetCollaborator().OrganizationOrUserIdentifiers)
+	extractCollaboratorFields(m, req.GetCollaborator().GetIds())
 }
 
 func (req *SetClientCollaboratorRequest) ExtractRequestFields(m map[string]interface{}) {
@@ -117,7 +117,7 @@ func (req *SetClientCollaboratorRequest) ExtractRequestFields(m map[string]inter
 		return
 	}
 	req.GetClientIds().ExtractRequestFields(m)
-	extractCollaboratorFields(m, &req.Collaborator.OrganizationOrUserIdentifiers)
+	extractCollaboratorFields(m, req.GetCollaborator().GetIds())
 }
 
 func (req *SetGatewayCollaboratorRequest) ExtractRequestFields(m map[string]interface{}) {
@@ -125,7 +125,7 @@ func (req *SetGatewayCollaboratorRequest) ExtractRequestFields(m map[string]inte
 		return
 	}
 	req.GetGatewayIds().ExtractRequestFields(m)
-	extractCollaboratorFields(m, &req.Collaborator.OrganizationOrUserIdentifiers)
+	extractCollaboratorFields(m, req.GetCollaborator().GetIds())
 }
 
 func (req *SetOrganizationCollaboratorRequest) ExtractRequestFields(m map[string]interface{}) {
@@ -133,5 +133,5 @@ func (req *SetOrganizationCollaboratorRequest) ExtractRequestFields(m map[string
 		return
 	}
 	req.GetOrganizationIds().ExtractRequestFields(m)
-	extractCollaboratorFields(m, &req.GetCollaborator().OrganizationOrUserIdentifiers)
+	extractCollaboratorFields(m, req.GetCollaborator().GetIds())
 }

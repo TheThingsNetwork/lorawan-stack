@@ -128,8 +128,8 @@ func TestApplicationAccessRightsPermissionDenied(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
-				Rights:                        []ttnpb.Right{right},
+				Ids:    collaboratorID,
+				Rights: []ttnpb.Right{right},
 			},
 		}, creds)
 
@@ -214,8 +214,8 @@ func TestApplicationAccessPermissionDenied(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
+				Ids:    collaboratorID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 			},
 		})
 
@@ -335,8 +335,8 @@ func TestApplicationAccessCRUD(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
+				Ids:    collaboratorID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 			},
 		}, creds)
 
@@ -355,7 +355,7 @@ func TestApplicationAccessCRUD(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
+				Ids: collaboratorID,
 			},
 		}, creds)
 
@@ -388,7 +388,7 @@ func TestApplicationAccessRights(t *testing.T) {
 		_, err := reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
+				Ids: collaboratorID,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_LINK,
 					ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS,
@@ -402,7 +402,7 @@ func TestApplicationAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
+				Ids: removedCollaboratorID,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_ALL,
 				},
@@ -425,7 +425,7 @@ func TestApplicationAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
+				Ids: removedCollaboratorID,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_LINK,
 					ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS,
@@ -461,8 +461,8 @@ func TestApplicationAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
-				Rights:                        newRights.Rights,
+				Ids:    removedCollaboratorID,
+				Rights: newRights.Rights,
 			},
 		}, usrCreds)
 
@@ -501,8 +501,8 @@ func TestApplicationAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
-				Rights:                        newRights.Rights,
+				Ids:    removedCollaboratorID,
+				Rights: newRights.Rights,
 			},
 		}, collaboratorCreds)
 
@@ -512,8 +512,8 @@ func TestApplicationAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
-				Rights:                        newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_DELETE)).Rights,
+				Ids:    removedCollaboratorID,
+				Rights: newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_DELETE)).Rights,
 			},
 		}, collaboratorCreds)
 
@@ -548,8 +548,8 @@ func TestApplicationAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
-				Rights:                        []ttnpb.Right{},
+				Ids:    removedCollaboratorID,
+				Rights: []ttnpb.Right{},
 			},
 		}, collaboratorCreds)
 

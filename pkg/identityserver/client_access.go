@@ -64,7 +64,7 @@ func (is *IdentityServer) getClientCollaborator(ctx context.Context, req *ttnpb.
 		return nil, err
 	}
 	res := &ttnpb.GetCollaboratorResponse{
-		OrganizationOrUserIdentifiers: *req.GetCollaborator(),
+		Ids: req.GetCollaborator(),
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		rights, err := is.getMembershipStore(ctx, db).GetMember(
@@ -97,7 +97,7 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 
 		existingRights, err := store.GetMember(
 			ctx,
-			&req.Collaborator.OrganizationOrUserIdentifiers,
+			req.GetCollaborator().GetIds(),
 			req.GetClientIds().GetEntityIdentifiers(),
 		)
 		if err != nil && !errors.IsNotFound(err) {
@@ -129,7 +129,7 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 			}
 			var hasOtherOwner bool
 			for member, rights := range memberRights {
-				if unique.ID(ctx, member) == unique.ID(ctx, &req.Collaborator.OrganizationOrUserIdentifiers) {
+				if unique.ID(ctx, member) == unique.ID(ctx, req.GetCollaborator().GetIds()) {
 					continue
 				}
 				if rights.Implied().IncludesAll(ttnpb.RIGHT_CLIENT_ALL) {
@@ -144,7 +144,7 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 
 		return store.SetMember(
 			ctx,
-			&req.Collaborator.OrganizationOrUserIdentifiers,
+			req.GetCollaborator().GetIds(),
 			req.GetClientIds().GetEntityIdentifiers(),
 			ttnpb.RightsFrom(req.Collaborator.Rights...),
 		)
@@ -153,7 +153,7 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 		return nil, err
 	}
 	if len(req.Collaborator.Rights) > 0 {
-		events.Publish(evtUpdateClientCollaborator.New(ctx, events.WithIdentifiers(req.GetClientIds(), &req.Collaborator.OrganizationOrUserIdentifiers)))
+		events.Publish(evtUpdateClientCollaborator.New(ctx, events.WithIdentifiers(req.GetClientIds(), req.GetCollaborator().GetIds())))
 		err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
 			data.SetEntity(req)
 			return &emails.CollaboratorChanged{Data: data, Collaborator: *req.GetCollaborator()}
@@ -162,7 +162,7 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 			log.FromContext(ctx).WithError(err).Error("Could not send collaborator updated notification email")
 		}
 	} else {
-		events.Publish(evtDeleteClientCollaborator.New(ctx, events.WithIdentifiers(req.GetClientIds(), &req.Collaborator.OrganizationOrUserIdentifiers)))
+		events.Publish(evtDeleteClientCollaborator.New(ctx, events.WithIdentifiers(req.GetClientIds(), req.GetCollaborator().GetIds())))
 	}
 	return ttnpb.Empty, nil
 }
@@ -189,8 +189,8 @@ func (is *IdentityServer) listClientCollaborators(ctx context.Context, req *ttnp
 		collaborators = &ttnpb.Collaborators{}
 		for member, rights := range memberRights {
 			collaborators.Collaborators = append(collaborators.Collaborators, &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *member,
-				Rights:                        rights.GetRights(),
+				Ids:    member,
+				Rights: rights.GetRights(),
 			})
 		}
 		return nil
