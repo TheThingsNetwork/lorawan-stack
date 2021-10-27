@@ -967,7 +967,6 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 0,
-								StartedAt:     dev.PendingSession.StartedAt,
 							})
 							a.So(queue, should.BeEmpty)
 						},
@@ -1014,7 +1013,6 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 0,
-								StartedAt:     dev.PendingSession.StartedAt,
 							})
 							a.So(queue, should.BeEmpty)
 						},
@@ -1133,7 +1131,6 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 0,
-								StartedAt:     dev.Session.StartedAt,
 							})
 							a.So(dev.PendingSession, should.Resemble, &ttnpb.Session{
 								DevAddr: types.DevAddr{0x33, 0x33, 0x33, 0x33},
@@ -1145,7 +1142,6 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 2,
-								StartedAt:     dev.PendingSession.StartedAt,
 							})
 							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{
 								{
@@ -1567,7 +1563,6 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 44,
-								StartedAt:     dev.Session.StartedAt,
 							})
 							a.So(dev.PendingSession, should.Resemble, &ttnpb.Session{
 								DevAddr: types.DevAddr{0x44, 0x44, 0x44, 0x44},
@@ -1579,7 +1574,6 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 2,
-								StartedAt:     dev.PendingSession.StartedAt,
 							})
 							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{
 								{
@@ -1671,7 +1665,6 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 2,
-								StartedAt:     dev.Session.StartedAt,
 							})
 							a.So(dev.PendingSession, should.BeNil)
 							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{
@@ -1917,7 +1910,6 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 0,
-								StartedAt:     dev.Session.StartedAt,
 							})
 							a.So(dev.PendingSession, should.BeNil)
 							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{})
@@ -2517,7 +2509,6 @@ func TestSkipPayloadCrypto(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 0,
-								StartedAt:     dev.PendingSession.StartedAt,
 							})
 						},
 					},

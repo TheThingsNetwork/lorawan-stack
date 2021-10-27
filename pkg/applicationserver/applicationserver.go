@@ -400,7 +400,6 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 				AppSKey:      &appSKey,
 			},
 			LastAFCntDown: lastAFCntDownFromMinFCnt(minFCntDown),
-			StartedAt:     time.Now().UTC(),
 		}, nil
 	}
 
@@ -781,7 +780,6 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 					SessionKeyId: joinAccept.SessionKeyId,
 					AppSKey:      joinAccept.AppSKey,
 				},
-				StartedAt: time.Now().UTC(),
 			}
 			mask = ttnpb.AddFields(mask, "pending_session")
 			if as.skipPayloadCrypto(ctx, link, dev, dev.PendingSession) {
@@ -862,7 +860,6 @@ func (as *ApplicationServer) matchSession(ctx context.Context, ids ttnpb.EndDevi
 				SessionKeyId: sessionKeyID,
 				AppSKey:      &appSKey,
 			},
-			StartedAt: time.Now().UTC(),
 		}
 		dev.PendingSession = nil
 		dev.DevAddr = ids.DevAddr
