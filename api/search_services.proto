@@ -281,7 +281,7 @@ service EntityRegistrySearch {
 }
 
 message SearchEndDevicesRequest {
-  ApplicationIdentifiers application_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
 
   // Find end devices where the ID contains this substring.
   string id_contains = 2 [
