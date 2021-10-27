@@ -105,6 +105,11 @@ func (r *DeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.EUI
 
 	pb := &ttnpb.EndDevice{}
 	if err := ttnredis.FindProto(ctx, r.Redis, r.euiKey(joinEUI, devEUI), func(uid string) (string, error) {
+		var err error
+		ctx, err = unique.WithContext(ctx, uid)
+		if err != nil {
+			return "", err
+		}
 		return r.uidKey(uid), nil
 	}).ScanProto(pb); err != nil {
 		return nil, err
