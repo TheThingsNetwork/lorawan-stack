@@ -140,6 +140,7 @@ func generateChMask16(currentChs, desiredChs []bool) ([]ChMaskCntlPair, error) {
 	}, nil
 }
 
+// EqualChMasks returns true if both channel masks are equal.
 func EqualChMasks(a, b []bool) bool {
 	if len(a) != len(b) {
 		return false

@@ -315,7 +315,7 @@ func (h Hex) String() string {
 func (h *Hex) UnmarshalJSON(b []byte) (err error) {
 	s := strings.TrimSuffix(strings.TrimPrefix(string(b), "\""), "\"")
 	*h, err = hex.DecodeString(s)
-	return
+	return err
 }
 
 // EUI represents a dash-separated EUI64.
@@ -343,5 +343,5 @@ func (e EUI) String() string {
 
 func toEUI(s string) (e EUI, err error) {
 	_, err = fmt.Sscanf(s, euiPattern, &e[0], &e[1], &e[2], &e[3], &e[4], &e[5], &e[6], &e[7])
-	return
+	return e, err
 }

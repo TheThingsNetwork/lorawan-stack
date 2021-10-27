@@ -16,7 +16,9 @@ package band
 
 import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
-type MaxMACPayloadSizeFunc func(bool) uint16
+// MaxMACPayloadSizeFunc is a function that returns the maximum payload size
+// depending on whether dwell time restrictions apply or not.
+type MaxMACPayloadSizeFunc func(dwellTime bool) uint16
 
 func makeConstMaxMACPayloadSizeFunc(v uint16) MaxMACPayloadSizeFunc {
 	return func(_ bool) uint16 {

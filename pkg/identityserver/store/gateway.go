@@ -421,5 +421,5 @@ func (gtw *Gateway) fromPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) (col
 			continue
 		}
 	}
-	return
+	return columns
 }

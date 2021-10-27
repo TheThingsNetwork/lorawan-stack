@@ -53,7 +53,14 @@ const (
 	basePath         = "/api/v1"
 )
 
-var DefaultServerURL *url.URL
+// DefaultServerURL is the default server URL for LoRa Cloud Device Management v1.
+var DefaultServerURL = func() *url.URL {
+	parsed, err := url.Parse(defaultServerURL)
+	if err != nil {
+		panic(fmt.Sprintf("loradms: failed to parse base URL: %v", err))
+	}
+	return parsed
+}()
 
 func (c *Client) newRequest(ctx context.Context, method, category, entity, operation string, body io.Reader) (*http.Request, error) {
 	u := urlutil.CloneURL(c.baseURL)
@@ -115,12 +122,4 @@ func New(cl *http.Client, opts ...Option) (*Client, error) {
 		opt.apply(client)
 	}
 	return client, nil
-}
-
-func init() {
-	var err error
-	DefaultServerURL, err = url.Parse(defaultServerURL)
-	if err != nil {
-		panic(fmt.Sprintf("loradms: failed to parse base URL: %v", err))
-	}
 }

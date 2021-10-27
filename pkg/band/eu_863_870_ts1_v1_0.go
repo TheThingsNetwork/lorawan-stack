@@ -16,6 +16,7 @@ package band
 
 import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
+// EU_863_870_TS1_V1_0 is the band definition for EU863-870 in the TS1 v1.0 specification.
 var EU_863_870_TS1_V1_0 = Band{
 	ID: EU_863_870,
 

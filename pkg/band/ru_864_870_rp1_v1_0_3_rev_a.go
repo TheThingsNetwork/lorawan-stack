@@ -16,6 +16,7 @@ package band
 
 import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
+// RU_864_870_RP1_V1_0_3_Rev_A is the band definition for RU864-870 in the RP1 v1.0.3 rev. A specification.
 var RU_864_870_RP1_V1_0_3_Rev_A = Band{
 	ID: RU_864_870,
 

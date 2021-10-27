@@ -166,11 +166,10 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.ClientFieldPathsNested, req.FieldMask, getPaths, nil)
 	if err = rights.RequireClient(ctx, *req.GetClientIds(), ttnpb.RIGHT_CLIENT_ALL); err != nil {
-		if ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicClientFields...) {
-			defer func() { cli = cli.PublicSafe() }()
-		} else {
+		if !ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicClientFields...) {
 			return nil, err
 		}
+		defer func() { cli = cli.PublicSafe() }()
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		cli, err = store.GetClientStore(db).GetClient(ctx, req.GetClientIds(), req.FieldMask)

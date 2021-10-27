@@ -27,7 +27,7 @@ import (
 
 var jsonpluginFeatureFlag = experimental.DefineFeature("jsonpb.jsonplugin", false)
 
-// TTN returns the default TTN JSONPb marshaler.
+// TTN returns the default JSONPb marshaler of The Things Stack.
 func TTN() *TTNMarshaler {
 	return &TTNMarshaler{
 		GoGoJSONPb: &GoGoJSONPb{
@@ -37,12 +37,15 @@ func TTN() *TTNMarshaler {
 	}
 }
 
+// TTNMarshaler is the JSON marshaler/unmarshaler that is used in grpc-gateway.
 type TTNMarshaler struct {
 	*GoGoJSONPb
 }
 
+// ContentType returns the content-type of the marshaler.
 func (*TTNMarshaler) ContentType() string { return "application/json" }
 
+// Marshal marshals v to JSON.
 func (m *TTNMarshaler) Marshal(v interface{}) ([]byte, error) {
 	if jsonpluginFeatureFlag.GetValue(context.Background()) {
 		if marshaler, ok := v.(jsonplugin.Marshaler); ok {
@@ -54,25 +57,29 @@ func (m *TTNMarshaler) Marshal(v interface{}) ([]byte, error) {
 			}
 			if m.GoGoJSONPb.Indent == "" {
 				return b, nil
-			} else {
-				var buf bytes.Buffer
-				json.Indent(&buf, b, "", m.GoGoJSONPb.Indent)
-				return buf.Bytes(), nil
 			}
+			var buf bytes.Buffer
+			if err = json.Indent(&buf, b, "", m.GoGoJSONPb.Indent); err != nil {
+				return nil, err
+			}
+			return buf.Bytes(), nil
 		}
 	}
 	return m.GoGoJSONPb.Marshal(v)
 }
 
+// NewEncoder returns a new JSON encoder that writes values to w.
 func (m *TTNMarshaler) NewEncoder(w io.Writer) runtime.Encoder {
 	return &TTNEncoder{w: w, gogo: m.GoGoJSONPb}
 }
 
+// TTNEncoder marshals values to JSON and writes them to an io.Writer.
 type TTNEncoder struct {
 	w    io.Writer
 	gogo *GoGoJSONPb
 }
 
+// Encode marshals v to JSON and writes it to the writer.
 func (e *TTNEncoder) Encode(v interface{}) error {
 	if jsonpluginFeatureFlag.GetValue(context.Background()) {
 		if marshaler, ok := v.(jsonplugin.Marshaler); ok {
@@ -86,7 +93,9 @@ func (e *TTNEncoder) Encode(v interface{}) error {
 				_, err = e.w.Write(b)
 			} else {
 				var buf bytes.Buffer
-				json.Indent(&buf, b, "", e.gogo.Indent)
+				if err = json.Indent(&buf, b, "", e.gogo.Indent); err != nil {
+					return err
+				}
 				io.Copy(e.w, &buf)
 			}
 			return err
@@ -95,6 +104,7 @@ func (e *TTNEncoder) Encode(v interface{}) error {
 	return e.gogo.NewEncoder(e.w).Encode(v)
 }
 
+// Unmarshal unmarshals v from JSON data.
 func (m *TTNMarshaler) Unmarshal(data []byte, v interface{}) error {
 	if jsonpluginFeatureFlag.GetValue(context.Background()) {
 		if unmarshaler, ok := v.(jsonplugin.Unmarshaler); ok {
@@ -104,16 +114,19 @@ func (m *TTNMarshaler) Unmarshal(data []byte, v interface{}) error {
 	return m.GoGoJSONPb.Unmarshal(data, v)
 }
 
+// NewDecoder returns a new JSON decoder that reads data from r.
 func (m *TTNMarshaler) NewDecoder(r io.Reader) runtime.Decoder {
-	return &NewDecoder{r: r, gogo: m.GoGoJSONPb}
+	return &TTNDecoder{r: r, gogo: m.GoGoJSONPb}
 }
 
-type NewDecoder struct {
+// TTNDecoder reads JSON data from an io.Reader and unmarshals that into values.
+type TTNDecoder struct {
 	r    io.Reader
 	gogo *GoGoJSONPb
 }
 
-func (d *NewDecoder) Decode(v interface{}) error {
+// Decode reads a value from the reader and unmarshals v from JSON.
+func (d *TTNDecoder) Decode(v interface{}) error {
 	if jsonpluginFeatureFlag.GetValue(context.Background()) {
 		if unmarshaler, ok := v.(jsonplugin.Unmarshaler); ok {
 			var data json.RawMessage

@@ -232,11 +232,11 @@ func (s *impl) SimulateUplink(ctx context.Context, up *ttnpb.ApplicationUp) (*pb
 	return ttnpb.Empty, nil
 }
 
-func (as *impl) EncodeDownlink(ctx context.Context, req *ttnpb.EncodeDownlinkRequest) (*ttnpb.EncodeDownlinkResponse, error) {
+func (s *impl) EncodeDownlink(ctx context.Context, req *ttnpb.EncodeDownlinkRequest) (*ttnpb.EncodeDownlinkResponse, error) {
 	if err := rights.RequireApplication(ctx, req.EndDeviceIds.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	if err := as.processor.EncodeDownlink(ctx, *req.EndDeviceIds, req.VersionIds, req.Downlink, req.Formatter, req.Parameter); err != nil {
+	if err := s.processor.EncodeDownlink(ctx, *req.EndDeviceIds, req.VersionIds, req.Downlink, req.Formatter, req.Parameter); err != nil {
 		return nil, err
 	}
 	return &ttnpb.EncodeDownlinkResponse{
@@ -244,11 +244,11 @@ func (as *impl) EncodeDownlink(ctx context.Context, req *ttnpb.EncodeDownlinkReq
 	}, nil
 }
 
-func (as *impl) DecodeUplink(ctx context.Context, req *ttnpb.DecodeUplinkRequest) (*ttnpb.DecodeUplinkResponse, error) {
+func (s *impl) DecodeUplink(ctx context.Context, req *ttnpb.DecodeUplinkRequest) (*ttnpb.DecodeUplinkResponse, error) {
 	if err := rights.RequireApplication(ctx, req.EndDeviceIds.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	if err := as.processor.DecodeUplink(ctx, *req.EndDeviceIds, req.VersionIds, req.Uplink, req.Formatter, req.Parameter); err != nil {
+	if err := s.processor.DecodeUplink(ctx, *req.EndDeviceIds, req.VersionIds, req.Uplink, req.Formatter, req.Parameter); err != nil {
 		return nil, err
 	}
 	return &ttnpb.DecodeUplinkResponse{
@@ -256,11 +256,11 @@ func (as *impl) DecodeUplink(ctx context.Context, req *ttnpb.DecodeUplinkRequest
 	}, nil
 }
 
-func (as *impl) DecodeDownlink(ctx context.Context, req *ttnpb.DecodeDownlinkRequest) (*ttnpb.DecodeDownlinkResponse, error) {
+func (s *impl) DecodeDownlink(ctx context.Context, req *ttnpb.DecodeDownlinkRequest) (*ttnpb.DecodeDownlinkResponse, error) {
 	if err := rights.RequireApplication(ctx, req.EndDeviceIds.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	if err := as.processor.DecodeDownlink(ctx, *req.EndDeviceIds, req.VersionIds, req.Downlink, req.Formatter, req.Parameter); err != nil {
+	if err := s.processor.DecodeDownlink(ctx, *req.EndDeviceIds, req.VersionIds, req.Downlink, req.Formatter, req.Parameter); err != nil {
 		return nil, err
 	}
 	return &ttnpb.DecodeDownlinkResponse{

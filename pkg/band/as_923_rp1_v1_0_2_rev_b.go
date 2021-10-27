@@ -18,6 +18,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
+// AS_923_RP1_v1_0_2_RevB is the band definition for AS923 in the RP1 v1.0.2 rev. B specification.
 var AS_923_RP1_v1_0_2_RevB = Band{
 	ID: AS_923,
 

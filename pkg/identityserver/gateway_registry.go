@@ -123,22 +123,20 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 	}
 
 	if reqGtw.ClaimAuthenticationCode != nil {
-		if err := validateClaimAuthenticationCode(*reqGtw.ClaimAuthenticationCode); err == nil {
-			value := reqGtw.ClaimAuthenticationCode.Secret.Value
-			if is.config.Gateways.EncryptionKeyID != "" {
-				value, err = is.KeyVault.Encrypt(ctx, value, is.config.Gateways.EncryptionKeyID)
-				if err != nil {
-					return nil, err
-				}
-			} else {
-				log.FromContext(ctx).Warn("No encryption key defined, store Claim Authentication Code in plaintext")
-			}
-			reqGtw.ClaimAuthenticationCode.Secret.Value = value
-			reqGtw.ClaimAuthenticationCode.Secret.KeyId = is.config.Gateways.EncryptionKeyID
-
-		} else {
+		if err = validateClaimAuthenticationCode(*reqGtw.ClaimAuthenticationCode); err != nil {
 			return nil, err
 		}
+		value := reqGtw.ClaimAuthenticationCode.Secret.Value
+		if is.config.Gateways.EncryptionKeyID != "" {
+			value, err = is.KeyVault.Encrypt(ctx, value, is.config.Gateways.EncryptionKeyID)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			log.FromContext(ctx).Warn("No encryption key defined, store Claim Authentication Code in plaintext")
+		}
+		reqGtw.ClaimAuthenticationCode.Secret.Value = value
+		reqGtw.ClaimAuthenticationCode.Secret.KeyId = is.config.Gateways.EncryptionKeyID
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		gtw, err = store.GetGatewayStore(db).CreateGateway(ctx, reqGtw)
@@ -194,11 +192,10 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask, getPaths, []string{"frequency_plan_id"})
 
 	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.RIGHT_GATEWAY_INFO); err != nil {
-		if ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicGatewayFields...) {
-			defer func() { gtw = gtw.PublicSafe() }()
-		} else {
+		if !ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicGatewayFields...) {
 			return nil, err
 		}
+		defer func() { gtw = gtw.PublicSafe() }()
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "lbs_lns_secret", "claim_authentication_code", "target_cups_key") {
@@ -521,23 +518,22 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 		if err := rights.RequireGateway(ctx, *reqGtw.GetIds(), ttnpb.RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
 			return nil, err
 		} else if reqGtw.ClaimAuthenticationCode != nil {
-			if err := validateClaimAuthenticationCode(*reqGtw.ClaimAuthenticationCode); err == nil {
-				value := reqGtw.ClaimAuthenticationCode.Secret.Value
-				ptCACSecret = reqGtw.ClaimAuthenticationCode.Secret.Value
-				if is.config.Gateways.EncryptionKeyID != "" {
-					value, err = is.KeyVault.Encrypt(ctx, value, is.config.Gateways.EncryptionKeyID)
-					if err != nil {
-						return nil, err
-					}
-				} else {
-					logger := log.FromContext(ctx)
-					logger.Warn("No encryption key defined, store Claim Authentication Code in plaintext")
-				}
-				reqGtw.ClaimAuthenticationCode.Secret.Value = value
-				reqGtw.ClaimAuthenticationCode.Secret.KeyId = is.config.Gateways.EncryptionKeyID
-			} else {
+			if err := validateClaimAuthenticationCode(*reqGtw.ClaimAuthenticationCode); err != nil {
 				return nil, err
 			}
+			value := reqGtw.ClaimAuthenticationCode.Secret.Value
+			ptCACSecret = reqGtw.ClaimAuthenticationCode.Secret.Value
+			if is.config.Gateways.EncryptionKeyID != "" {
+				value, err = is.KeyVault.Encrypt(ctx, value, is.config.Gateways.EncryptionKeyID)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				logger := log.FromContext(ctx)
+				logger.Warn("No encryption key defined, store Claim Authentication Code in plaintext")
+			}
+			reqGtw.ClaimAuthenticationCode.Secret.Value = value
+			reqGtw.ClaimAuthenticationCode.Secret.KeyId = is.config.Gateways.EncryptionKeyID
 		}
 	}
 

@@ -16,6 +16,7 @@ package band
 
 import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
+// CN_470_510_RP1_v1_0_3_RevA is the band definition for CN470-510 in the RP1 v1.0.3 rev. A specification.
 var CN_470_510_RP1_v1_0_3_RevA = Band{
 	ID: CN_470_510,
 

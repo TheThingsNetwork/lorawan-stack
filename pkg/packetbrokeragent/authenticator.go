@@ -60,20 +60,23 @@ func (a *oauth2Authenticator) AuthInfo(ctx context.Context) (ttnpb.PacketBrokerN
 	return packetbroker.UnverifiedNetworkIdentifier(token.AccessToken)
 }
 
-func (a *oauth2Authenticator) DialOptions(ctx context.Context) (res []grpc.DialOption, err error) {
-	var tlsConfig *tls.Config
+func (a *oauth2Authenticator) DialOptions(ctx context.Context) ([]grpc.DialOption, error) {
+	var (
+		tlsConfig *tls.Config
+		err       error
+	)
 	if a.tlsConfig != nil {
 		tlsConfig, err = a.tlsConfig.GetTLSClientConfig(ctx)
 		if err != nil {
 			return nil, err
 		}
 	}
-	res = make([]grpc.DialOption, 2)
+	res := make([]grpc.DialOption, 2)
 	res[0] = grpc.WithPerRPCCredentials(rpcclient.OAuth2(a.tokenSource, tlsConfig == nil))
 	if tlsConfig == nil {
 		res[1] = grpc.WithInsecure()
 	} else {
 		res[1] = grpc.WithTransportCredentials(credentials.NewTLS(tlsConfig))
 	}
-	return
+	return res, nil
 }

@@ -267,7 +267,8 @@ type gatewayIdentifier interface {
 	GetEui() *types.EUI64
 }
 
-func toPBGatewayIdentifier(ids gatewayIdentifier, config ForwarderConfig) (res *packetbroker.GatewayIdentifier) {
+func toPBGatewayIdentifier(ids gatewayIdentifier, config ForwarderConfig) *packetbroker.GatewayIdentifier {
+	var res *packetbroker.GatewayIdentifier
 	if config.IncludeGatewayEUI && ids.GetEui() != nil {
 		res = &packetbroker.GatewayIdentifier{
 			Eui: &pbtypes.UInt64Value{
@@ -290,7 +291,7 @@ func toPBGatewayIdentifier(ids gatewayIdentifier, config ForwarderConfig) (res *
 			}
 		}
 	}
-	return
+	return res
 }
 
 var (
@@ -900,7 +901,7 @@ func toPBContactInfo(info []*ttnpb.ContactInfo) (admin, technical *packetbroker.
 			}
 		}
 	}
-	return
+	return admin, technical
 }
 
 func fromPBUplinkRoutingPolicy(policy *packetbroker.RoutingPolicy_Uplink) *ttnpb.PacketBrokerRoutingPolicyUplink {

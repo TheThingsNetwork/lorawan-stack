@@ -110,7 +110,7 @@ func (s *deviceStore) findEndDevices(ctx context.Context, query *gorm.DB, fieldM
 func (s *deviceStore) CountEndDevices(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (total uint64, err error) {
 	defer trace.StartRegion(ctx, "count end devices").End()
 	err = s.query(ctx, EndDevice{}, withApplicationID(ids.GetApplicationId())).Count(&total).Error
-	return
+	return total, err
 }
 
 func (s *deviceStore) ListEndDevices(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, fieldMask *pbtypes.FieldMask) ([]*ttnpb.EndDevice, error) {
@@ -192,7 +192,9 @@ func (s *deviceStore) UpdateEndDevice(ctx context.Context, dev *ttnpb.EndDevice,
 			columns = append(columns, "picture_id")
 		}
 	}
-	s.updateEntity(ctx, &devModel, columns...)
+	if err = s.updateEntity(ctx, &devModel, columns...); err != nil {
+		return nil, err
+	}
 	if !reflect.DeepEqual(oldAttributes, devModel.Attributes) {
 		if err = s.replaceAttributes(ctx, "device", devModel.ID, oldAttributes, devModel.Attributes); err != nil {
 			return nil, err

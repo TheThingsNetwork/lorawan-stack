@@ -29,18 +29,18 @@ func (s *server) GenerateAccessToken(_ *osin.AccessData, generateRefresh bool) (
 	if generateRefresh {
 		id, err = auth.GenerateID(ctx)
 		if err != nil {
-			return
+			return "", "", err
 		}
 	}
 	accessToken, err = auth.AccessToken.Generate(ctx, id)
 	if err != nil {
-		return
+		return "", "", err
 	}
 	if generateRefresh {
 		refreshToken, err = auth.RefreshToken.Generate(ctx, id)
 		if err != nil {
-			return
+			return "", "", err
 		}
 	}
-	return
+	return accessToken, refreshToken, nil
 }

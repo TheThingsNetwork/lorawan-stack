@@ -40,6 +40,7 @@ type Config struct {
 	HomeNetwork          HomeNetworkConfig  `name:"home-network" description:"Home Network configuration for subscribing to uplink and publishing downlink messages"`
 }
 
+// RegistrationConfig defines the registration configuration for Packet Broker.
 type RegistrationConfig struct {
 	Name                  string            `name:"name" description:"Friendly name to register with Packet Broker"`
 	AdministrativeContact ContactInfoConfig `name:"administrative-contact" description:"Administrative contact to register with Packet Broker"`
@@ -47,10 +48,12 @@ type RegistrationConfig struct {
 	Listed                bool              `name:"listed" description:"List the Home Network in the Packet Broker catalog"`
 }
 
+// ContactInfoConfig defines contact info for Packet Broker.
 type ContactInfoConfig struct {
 	Email string `name:"email" description:"Email address"`
 }
 
+// ContactInfo returns a ContactInfo proto for the configuration.
 func (c ContactInfoConfig) ContactInfo(contactType ttnpb.ContactType) *ttnpb.ContactInfo {
 	if c.Email == "" {
 		return nil

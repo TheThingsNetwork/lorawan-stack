@@ -522,6 +522,7 @@ func (r *ApplicationPackagesRegistry) EndDeviceTransaction(ctx context.Context, 
 	return fn(ctx)
 }
 
+// Range ranges over the application packages and calls the appropriate callback function, until false is returned.
 func (r ApplicationPackagesRegistry) Range(
 	ctx context.Context, paths []string,
 	devFunc func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.ApplicationPackageAssociation) bool,

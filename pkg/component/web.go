@@ -156,11 +156,6 @@ func (c *Component) webEndpoints() []Endpoint {
 }
 
 // listenWeb starts the web listeners on the addresses and endpoints configured in the HTTP section.
-func (c *Component) listenWeb() (err error) {
-	err = c.serveOnEndpoints(c.webEndpoints(), (*Component).serveWeb, "web")
-	if err != nil {
-		return
-	}
-
-	return nil
+func (c *Component) listenWeb() error {
+	return c.serveOnEndpoints(c.webEndpoints(), (*Component).serveWeb, "web")
 }

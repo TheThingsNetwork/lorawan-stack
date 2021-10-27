@@ -129,11 +129,10 @@ func (is *IdentityServer) getApplication(ctx context.Context, req *ttnpb.GetAppl
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask, getPaths, nil)
 	if err = rights.RequireApplication(ctx, *req.GetApplicationIds(), ttnpb.RIGHT_APPLICATION_INFO); err != nil {
-		if ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicApplicationFields...) {
-			defer func() { app = app.PublicSafe() }()
-		} else {
+		if !ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicApplicationFields...) {
 			return nil, err
 		}
+		defer func() { app = app.PublicSafe() }()
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		app, err = store.GetApplicationStore(db).GetApplication(ctx, req.GetApplicationIds(), req.FieldMask)

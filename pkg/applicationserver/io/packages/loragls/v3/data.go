@@ -32,6 +32,7 @@ var (
 // QueryType enum defines the location query types of the package.
 type QueryType uint8
 
+// Value returns the protobuf value for the query type.
 func (t QueryType) Value() *types.Value {
 	var s string
 	switch t {
@@ -51,6 +52,7 @@ func (t QueryType) Value() *types.Value {
 	}
 }
 
+// FromValue sets the query type from a protobuf value.
 func (t *QueryType) FromValue(v *types.Value) error {
 	sv, ok := v.Kind.(*types.Value_StringValue)
 	if !ok {
@@ -242,7 +244,6 @@ func (d *Data) FromStruct(st *types.Struct) error {
 			}
 			d.ServerURL = u
 		}
-
 	}
 	return nil
 }

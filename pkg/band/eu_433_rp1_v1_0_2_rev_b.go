@@ -16,6 +16,7 @@ package band
 
 import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
+// EU_433_RP1_V1_0_2_Rev_B is the band definition for EU433 in the RP1 v1.0.2 rev. B specification.
 var EU_433_RP1_V1_0_2_Rev_B = Band{
 	ID: EU_433,
 

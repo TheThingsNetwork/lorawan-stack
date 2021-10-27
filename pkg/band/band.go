@@ -101,6 +101,7 @@ type Band struct {
 	DefaultRx2Parameters Rx2Parameters
 }
 
+// MaxTxPowerIndex returns the maximum TxPower index for the band.
 func (b Band) MaxTxPowerIndex() uint8 {
 	n := len(b.TxOffset)
 	if n > math.MaxUint8 {

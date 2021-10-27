@@ -19,6 +19,7 @@ import (
 	"time"
 )
 
+// Default values for Packet Broker IAM.
 const (
 	DefaultTokenIssuer       = "https://iam.packetbroker.net"
 	DefaultTokenURL          = DefaultTokenIssuer + "/token"

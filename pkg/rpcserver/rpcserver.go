@@ -113,6 +113,7 @@ func WithLogIgnoreMethods(methods []string) Option {
 	}
 }
 
+// WithRateLimiter configures a rate limiter on the server.
 func WithRateLimiter(limiter ratelimit.Interface) Option {
 	return func(o *options) {
 		o.limiter = limiter

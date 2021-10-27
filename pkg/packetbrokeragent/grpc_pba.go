@@ -123,11 +123,10 @@ func (s *pbaServer) Register(ctx context.Context, req *ttnpb.PacketBrokerRegiste
 	})
 	var create bool
 	if err != nil {
-		if errors.IsNotFound(err) {
-			create = true
-		} else {
+		if !errors.IsNotFound(err) {
 			return nil, err
 		}
+		create = true
 	}
 
 	registration, err := s.registrationInfoExtractor(ctx, s.homeNetworkClusterID)
@@ -308,11 +307,11 @@ func (s *pbaServer) ListHomeNetworkRoutingPolicies(ctx context.Context, req *ttn
 			break
 		}
 		policies = append(policies, res.GetPolicies()...)
-		if t, err := pbtypes.TimestampFromProto(res.Policies[len(res.Policies)-1].GetUpdatedAt()); err == nil {
-			updatedSince = &t
-		} else {
+		t, err := pbtypes.TimestampFromProto(res.Policies[len(res.Policies)-1].GetUpdatedAt())
+		if err != nil {
 			return nil, err
 		}
+		updatedSince = &t
 		total = int64(res.Total)
 	}
 

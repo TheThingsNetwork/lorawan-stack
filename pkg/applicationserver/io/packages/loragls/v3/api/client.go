@@ -38,7 +38,7 @@ type OptionFunc func(*Client)
 
 func (f OptionFunc) apply(c *Client) { f(c) }
 
-// Client is an API client for the LoRa Cloud Device Management v1 service.
+// Client is an API client for the LoRa Cloud Geolocation service.
 type Client struct {
 	token   string
 	baseURL *url.URL
@@ -51,7 +51,14 @@ const (
 	basePath         = "/api"
 )
 
-var DefaultServerURL *url.URL
+// DefaultServerURL is the default server URL for LoRa Cloud Geolocation.
+var DefaultServerURL = func() *url.URL {
+	parsed, err := url.Parse(defaultServerURL)
+	if err != nil {
+		panic(fmt.Sprintf("loragls: failed to parse base URL: %v", err))
+	}
+	return parsed
+}()
 
 func (c *Client) newRequest(ctx context.Context, method, version, category, operation string, body io.Reader) (*http.Request, error) {
 	u := urlutil.CloneURL(c.baseURL)
@@ -167,12 +174,4 @@ func New(cl *http.Client, opts ...Option) (*Client, error) {
 		opt.apply(client)
 	}
 	return client, nil
-}
-
-func init() {
-	var err error
-	DefaultServerURL, err = url.Parse(defaultServerURL)
-	if err != nil {
-		panic(fmt.Sprintf("loragls: failed to parse base URL: %v", err))
-	}
 }
