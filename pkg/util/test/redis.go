@@ -126,7 +126,7 @@ func NewRedis(ctx context.Context, namespace ...string) (*ttnredis.Client, func(
 		q := cl.Key("*")
 		keys, err := cl.Client.Keys(ctx, q).Result()
 		if err != nil {
-			logger.WithField("query", q).Fatal("Failed to query Redis for keys")
+			logger.WithError(err).WithField("query", q).Fatal("Failed to query Redis for keys")
 			return
 		}
 

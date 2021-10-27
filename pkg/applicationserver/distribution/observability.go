@@ -19,6 +19,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -38,6 +39,7 @@ var (
 const (
 	subsystem = "as"
 	protocol  = "protocol"
+	unknown   = "unknown"
 )
 
 var subMetrics = &subscriptionMetrics{
@@ -56,6 +58,22 @@ var subMetrics = &subscriptionMetrics{
 			Help:      "Number of subscription sets stopped",
 		},
 		[]string{},
+	),
+	subscriptionSetsPublishSuccess: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "subscription_sets_publish_success_total",
+			Help:      "Number of successful publish attempts",
+		},
+		[]string{protocol},
+	),
+	subscriptionSetsPublishFailed: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "subscription_sets_publish_failed_total",
+			Help:      "Number of failed publish attempts",
+		},
+		[]string{protocol, "error"},
 	),
 	subscriptionsStarted: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
@@ -80,15 +98,19 @@ func init() {
 }
 
 type subscriptionMetrics struct {
-	subscriptionSetsStarted *metrics.ContextualCounterVec
-	subscriptionSetsStopped *metrics.ContextualCounterVec
-	subscriptionsStarted    *metrics.ContextualCounterVec
-	subscriptionsStopped    *metrics.ContextualCounterVec
+	subscriptionSetsStarted        *metrics.ContextualCounterVec
+	subscriptionSetsStopped        *metrics.ContextualCounterVec
+	subscriptionSetsPublishSuccess *metrics.ContextualCounterVec
+	subscriptionSetsPublishFailed  *metrics.ContextualCounterVec
+	subscriptionsStarted           *metrics.ContextualCounterVec
+	subscriptionsStopped           *metrics.ContextualCounterVec
 }
 
 func (m subscriptionMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.subscriptionSetsStarted.Describe(ch)
 	m.subscriptionSetsStopped.Describe(ch)
+	m.subscriptionSetsPublishSuccess.Describe(ch)
+	m.subscriptionSetsPublishFailed.Describe(ch)
 	m.subscriptionsStarted.Describe(ch)
 	m.subscriptionsStopped.Describe(ch)
 }
@@ -96,6 +118,8 @@ func (m subscriptionMetrics) Describe(ch chan<- *prometheus.Desc) {
 func (m subscriptionMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.subscriptionSetsStarted.Collect(ch)
 	m.subscriptionSetsStopped.Collect(ch)
+	m.subscriptionSetsPublishSuccess.Collect(ch)
+	m.subscriptionSetsPublishFailed.Collect(ch)
 	m.subscriptionsStarted.Collect(ch)
 	m.subscriptionsStopped.Collect(ch)
 }
@@ -126,4 +150,16 @@ func registerUnsubscribe(ctx context.Context, sub *io.Subscription) {
 	}
 	events.Publish(evtApplicationUnsubscribe.NewWithIdentifiersAndData(ctx, ids, nil))
 	subMetrics.subscriptionsStopped.WithLabelValues(ctx, sub.Protocol()).Inc()
+}
+
+func registerPublishSuccess(ctx context.Context, sub *io.Subscription) {
+	subMetrics.subscriptionSetsPublishSuccess.WithLabelValues(ctx, sub.Protocol()).Inc()
+}
+
+func registerPublishFailed(ctx context.Context, sub *io.Subscription, err error) {
+	errorLabel := unknown
+	if ttnErr, ok := errors.From(err); ok {
+		errorLabel = ttnErr.FullName()
+	}
+	subMetrics.subscriptionSetsPublishFailed.WithLabelValues(ctx, sub.Protocol(), errorLabel).Inc()
 }

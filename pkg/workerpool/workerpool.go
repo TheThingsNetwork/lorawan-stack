@@ -32,7 +32,7 @@ const (
 	// defaultMinWorkers is the default number of minimum workers kept in the pool.
 	defaultMinWorkers = 4
 	// defaultMaxWorkers is the default number of maximum workers kept in the pool.
-	defaultMaxWorkers = 64
+	defaultMaxWorkers = 1024
 )
 
 // Component contains a minimal component.Component definition.

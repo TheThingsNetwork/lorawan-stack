@@ -311,7 +311,9 @@ func TestApplicationServer(t *testing.T) {
 			Fetcher: &noopEndDeviceFetcher{},
 		},
 		Distribution: applicationserver.DistributionConfig{
-			PubSub: distribPubSub,
+			Global: applicationserver.GlobalDistributorConfig{
+				PubSub: distribPubSub,
+			},
 		},
 	}
 	as, err := applicationserver.New(c, config)
@@ -1980,7 +1982,7 @@ func TestApplicationServer(t *testing.T) {
 									t.Fatalf("Expected no upstream message but got %v", msg)
 								}
 							}
-						case <-time.After(Timeout * 2):
+						case <-time.After(Timeout):
 							if !tc.ExpectTimeout && tc.AssertUp != nil {
 								t.Fatal("Expected upstream timeout")
 							}
@@ -2351,7 +2353,9 @@ func TestSkipPayloadCrypto(t *testing.T) {
 			Fetcher: &noopEndDeviceFetcher{},
 		},
 		Distribution: applicationserver.DistributionConfig{
-			PubSub: distribPubSub,
+			Global: applicationserver.GlobalDistributorConfig{
+				PubSub: distribPubSub,
+			},
 		},
 	}
 	as, err := applicationserver.New(c, config)
@@ -2397,6 +2401,8 @@ func TestSkipPayloadCrypto(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to subscribe: %v", err)
 	}
+	// Wait for connection to establish.
+	time.Sleep(2 * Timeout)
 	// Read upstream.
 	go func() {
 		for {
@@ -2627,7 +2633,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 							} else {
 								t.Fatalf("Expected no upstream message but got %v", msg)
 							}
-						case <-time.After(Timeout * 8):
+						case <-time.After(Timeout):
 							if step.AssertUp != nil {
 								step.AssertUp(t, nil)
 							} else {
@@ -2839,7 +2845,9 @@ func TestLocationFromPayload(t *testing.T) {
 			Fetcher: &noopEndDeviceFetcher{},
 		},
 		Distribution: applicationserver.DistributionConfig{
-			PubSub: distribPubSub,
+			Global: applicationserver.GlobalDistributorConfig{
+				PubSub: distribPubSub,
+			},
 		},
 	}
 	as, err := applicationserver.New(c, config)

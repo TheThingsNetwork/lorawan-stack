@@ -1952,15 +1952,6 @@
       "file": "middleware.go"
     }
   },
-  "error:pkg/applicationserver/distribution/redis:channel_closed": {
-    "translations": {
-      "en": "channel closed"
-    },
-    "description": {
-      "package": "pkg/applicationserver/distribution/redis",
-      "file": "redis.go"
-    }
-  },
   "error:pkg/applicationserver/distribution:empty_set": {
     "translations": {
       "en": "empty set"

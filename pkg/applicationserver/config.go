@@ -117,8 +117,41 @@ type WebhooksConfig struct {
 
 // DistributionConfig contains the upstream traffic distribution configuration of the Application Server.
 type DistributionConfig struct {
-	PubSub  distribution.PubSub `name:"-"`
-	Timeout time.Duration       `name:"timeout" description:"Wait timeout of an empty subscription set"`
+	Timeout time.Duration           `name:"timeout" description:"Wait timeout of an empty subscription set"`
+	Local   LocalDistributorConfig  `name:"local" description:"Local distributor configuration"`
+	Global  GlobalDistributorConfig `name:"global" description:"Global distributor configuration"`
+}
+
+// DistributorConfig contains the configuration of a traffic distributor of the Application Server.
+type DistributorConfig struct {
+	SubscriptionQueueSize int  `name:"subscription-queue-size" description:"Number of uplinks to queue for each subscriber"`
+	SubscriptionBlocks    bool `name:"subscription-blocks" description:"Controls if traffic should be dropped if the queue of a subscriber is full"`
+}
+
+// SubscriptionOptions generates the subscription options based on the configuration.
+func (c DistributorConfig) SubscriptionOptions() []io.SubscriptionOption {
+	if c.SubscriptionQueueSize == 0 {
+		c.SubscriptionQueueSize = io.DefaultBufferSize
+	}
+	if c.SubscriptionQueueSize < 0 {
+		c.SubscriptionQueueSize = 0
+	}
+	return []io.SubscriptionOption{
+		io.WithBlocking(c.SubscriptionBlocks),
+		io.WithBufferSize(c.SubscriptionQueueSize),
+	}
+}
+
+// LocalDistributorConfig contains the configuration of the local traffic distributor of the Application Server.
+type LocalDistributorConfig struct {
+	Broadcast  DistributorConfig `name:"broadcast" description:"Broadcast distributor configuration"`
+	Individual DistributorConfig `name:"individual" description:"Individual distributor configuration"`
+}
+
+// GlobalDistributorConfig contains the configuration of the global traffic distributor of the Application Server.
+type GlobalDistributorConfig struct {
+	PubSub     distribution.PubSub `name:"-"`
+	Individual DistributorConfig   `name:"individual" description:"Individual distributor configuration"`
 }
 
 // PubSubConfig contains go-cloud pub/sub configuration of the Application Server.
