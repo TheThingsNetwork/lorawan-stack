@@ -323,15 +323,19 @@ TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL="http://localhost:8080/oauth.js"
 TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
 ```
 
+> Note: It is important to **source these environment variables in all terminal sessions** that run The Things Stack or the `tools/bin/mage` commands. Failing to do so will result in erros such as blank page renders. See also [troubleshooting](#troubleshooting).
+
 #### Optional Configuration
 
 ##### Disable [Hot Module Replacement](https://webpack.js.org/concepts/hot-module-replacement/)
 
-> Note: Webpack-related configuration can be loaded from environment variables only. It cannot be sourced from a config file.
+If you experience trouble seeing the WebUIs updated after a code change, you can also disable hot module replacement and enforce a hard reload on code changes instead. This method is a bit slower but more robust. To do so apply the following variable:
 
 ```bash
 WEBPACK_DEV_SERVER_DISABLE_HMR="true"
 ```
+
+> Note: Webpack-related configuration can be loaded from environment variables only. It cannot be sourced from a config file.
 
 ##### Enable TLS in `webpack-dev-server`
 
@@ -1154,6 +1158,14 @@ Uncaught ReferenceError: libs_472226f4872c9448fc26 is not defined
 ```
 
 #### Possible causes
+
+##### Using incorrect or no configs
+
+If you plan to run the Console / Account App in development mode, it is important to ensure that the right configuration is loaded both for running The Things Stack itself, as well as the development tooling (e.g. `tools/bin/mage serve`).
+
+##### Possible solution
+
+Make sure that you source the environment variables as [described above](#development-configuration) **in all terminal sessions** that run The Things Stack or the `tools/bin/mage` commands.
 
 ##### Missing restart
 
