@@ -26,7 +26,7 @@ import (
 )
 
 func (is *IdentityServer) listOAuthClientAuthorizations(ctx context.Context, req *ttnpb.ListOAuthClientAuthorizationsRequest) (authorizations *ttnpb.OAuthClientAuthorizations, err error) {
-	if err := rights.RequireUser(ctx, req.UserIdentifiers, ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
+	if err := rights.RequireUser(ctx, *req.UserIds, ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
 		return nil, err
 	}
 	ctx = store.WithOrder(ctx, req.Order)
@@ -39,7 +39,7 @@ func (is *IdentityServer) listOAuthClientAuthorizations(ctx context.Context, req
 	}()
 	authorizations = &ttnpb.OAuthClientAuthorizations{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		authorizations.Authorizations, err = store.GetOAuthStore(db).ListAuthorizations(ctx, &req.UserIdentifiers)
+		authorizations.Authorizations, err = store.GetOAuthStore(db).ListAuthorizations(ctx, req.UserIds)
 		return err
 	})
 	if err != nil {

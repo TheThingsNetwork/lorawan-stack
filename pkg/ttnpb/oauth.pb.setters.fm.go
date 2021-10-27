@@ -156,19 +156,26 @@ func (dst *ListOAuthClientAuthorizationsRequest) SetFields(src *ListOAuthClientA
 		case "user_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *UserIdentifiers
-				if src != nil {
-					newSrc = &src.UserIdentifiers
+				if (src == nil || src.UserIds == nil) && dst.UserIds == nil {
+					continue
 				}
-				newDst = &dst.UserIdentifiers
+				if src != nil {
+					newSrc = src.UserIds
+				}
+				if dst.UserIds != nil {
+					newDst = dst.UserIds
+				} else {
+					newDst = &UserIdentifiers{}
+					dst.UserIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UserIdentifiers = src.UserIdentifiers
+					dst.UserIds = src.UserIds
 				} else {
-					var zero UserIdentifiers
-					dst.UserIdentifiers = zero
+					dst.UserIds = nil
 				}
 			}
 		case "order":
