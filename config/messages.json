@@ -9296,6 +9296,42 @@
       "file": "observability.go"
     }
   },
+  "event:gs.txack.drop": {
+    "translations": {
+      "en": "drop transmission acknowledgement"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.txack.fail": {
+    "translations": {
+      "en": "fail to handle transmission acknowledgement"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.txack.forward": {
+    "translations": {
+      "en": "forward transmission acknowledgement"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.txack.receive": {
+    "translations": {
+      "en": "receive transmission acknowledgement"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
   "event:gs.up.drop": {
     "translations": {
       "en": "drop uplink message"
