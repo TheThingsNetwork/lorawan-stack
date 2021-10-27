@@ -30,6 +30,12 @@ type Authorizer interface {
 	RequireAuthorized(ctx context.Context) error
 }
 
+// EntityAuthorizer authorizes the request context with the entity context.
+type EntityAuthorizer interface {
+	// RequireEntityContext returns an error if the given entity context is not authorized.
+	RequireEntityContext(ctx context.Context) error
+}
+
 // ExternalAuthorizer authorizes the request context by the identity that the origin presents.
 type ExternalAuthorizer interface {
 	Authorizer
@@ -50,15 +56,17 @@ type ApplicationAccessAuthorizer interface {
 var (
 	// InteropAuthorizer authorizes the caller by proof of identity used with LoRaWAN Backend Interfaces.
 	InteropAuthorizer ExternalAuthorizer = new(interop.Authorizer)
-
-	// ClusterAuthorizes authorizes clusters.
-	ClusterAuthorizer Authorizer = new(clusterAuthorizer)
-
-	// ApplicationRightsAuthorizes authorizes the caller by application rights.
-	ApplicationRightsAuthorizer ApplicationAccessAuthorizer = new(applicationRightsAuthorizer)
 )
 
 type clusterAuthorizer struct {
+	reqCtx context.Context
+}
+
+var _ EntityAuthorizer = (*clusterAuthorizer)(nil)
+
+// ClusterAuthorizer returns an Authorizer that authenticates clusters.
+func ClusterAuthorizer(reqCtx context.Context) Authorizer {
+	return clusterAuthorizer{reqCtx}
 }
 
 // RequireAuthorized implements Authorizer.
@@ -66,7 +74,25 @@ func (a clusterAuthorizer) RequireAuthorized(ctx context.Context) error {
 	return clusterauth.Authorized(ctx)
 }
 
+// RequireEntityContext returns nil.
+func (a clusterAuthorizer) RequireEntityContext(ctx context.Context) error {
+	return nil
+}
+
 type applicationRightsAuthorizer struct {
+	reqCtx context.Context
+}
+
+var _ EntityAuthorizer = (*applicationRightsAuthorizer)(nil)
+
+// ApplicationRightsAuthorizer returns an Authorizer that authenticates the caller by application rights.
+func ApplicationRightsAuthorizer(reqCtx context.Context) Authorizer {
+	return &applicationRightsAuthorizer{reqCtx}
+}
+
+// RequireEntityContext returns nil.
+func (a applicationRightsAuthorizer) RequireEntityContext(ctx context.Context) error {
+	return nil
 }
 
 // RequireAuthorized implements Authorizer.
