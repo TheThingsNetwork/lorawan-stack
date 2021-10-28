@@ -915,7 +915,7 @@ func (m *ApplicationWebhook) ValidateFields(paths ...string) error {
 
 		case "template_ids":
 
-			if v, ok := interface{}(m.ApplicationWebhookTemplateIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetTemplateIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationWebhookValidationError{
 						field:  "template_ids",
