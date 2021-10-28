@@ -527,7 +527,11 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 		refTime := getTimeFromFloat64(txConf.RefTime)
 		delta := receivedAt.Sub(refTime)
 		if delta > f.maxRoundTripDelay {
-			logger.WithField("delta", delta).Warn("Gateway reported reftime greater than the valid maximum. Skip RTT measurement")
+			logger.WithFields(log.Fields(
+				"delta", delta,
+				"ref_time", refTime,
+				"received_at", receivedAt,
+			)).Warn("Gateway reported reftime greater than the valid maximum. Skip RTT measurement")
 			recordRTT = false
 		}
 		recordTime(recordRTT, txConf.RefTime, txConf.XTime, receivedAt)
