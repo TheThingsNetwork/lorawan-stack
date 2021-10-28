@@ -23,65 +23,65 @@ func (ids ApplicationWebhookIdentifiers) IsZero() bool {
 // All EntityType methods implement the IDStringer interface.
 
 func (m *ApplicationWebhookIdentifiers) EntityType() string {
-	return m.ApplicationIds.EntityType()
+	return m.GetApplicationIds().EntityType()
 }
 
 func (m *ApplicationWebhook) EntityType() string {
-	return m.Ids.EntityType()
+	return m.GetIds().EntityType()
 }
 
 func (m *GetApplicationWebhookRequest) EntityType() string {
-	return m.Ids.EntityType()
+	return m.GetIds().EntityType()
 }
 
 func (m *ListApplicationWebhooksRequest) EntityType() string {
-	return m.ApplicationIds.EntityType()
+	return m.GetApplicationIds().EntityType()
 }
 
 func (m *SetApplicationWebhookRequest) EntityType() string {
-	return m.Webhook.EntityType()
+	return m.GetWebhook().EntityType()
 }
 
 // All IDString methods implement the IDStringer interface.
 
 func (m *ApplicationWebhookIdentifiers) IDString() string {
-	return m.ApplicationIds.IDString()
+	return m.GetApplicationIds().IDString()
 }
 
 func (m *ApplicationWebhook) IDString() string {
-	return m.Ids.IDString()
+	return m.GetIds().IDString()
 }
 
 func (m *GetApplicationWebhookRequest) IDString() string {
-	return m.Ids.IDString()
+	return m.GetIds().IDString()
 }
 
 func (m *ListApplicationWebhooksRequest) IDString() string {
-	return m.ApplicationIds.IDString()
+	return m.GetApplicationIds().IDString()
 }
 
 func (m *SetApplicationWebhookRequest) IDString() string {
-	return m.Webhook.IDString()
+	return m.GetWebhook().IDString()
 }
 
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
 func (m *ApplicationWebhookIdentifiers) ExtractRequestFields(dst map[string]interface{}) {
-	m.ApplicationIds.ExtractRequestFields(dst)
+	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
 func (m *ApplicationWebhook) ExtractRequestFields(dst map[string]interface{}) {
-	m.Ids.ExtractRequestFields(dst)
+	m.GetIds().ExtractRequestFields(dst)
 }
 
 func (m *GetApplicationWebhookRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.Ids.ExtractRequestFields(dst)
+	m.GetIds().ExtractRequestFields(dst)
 }
 
 func (m *ListApplicationWebhooksRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.ApplicationIds.ExtractRequestFields(dst)
+	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
 func (m *SetApplicationWebhookRequest) ExtractRequestFields(dst map[string]interface{}) {
-	m.Webhook.ExtractRequestFields(dst)
+	m.GetWebhook().ExtractRequestFields(dst)
 }
