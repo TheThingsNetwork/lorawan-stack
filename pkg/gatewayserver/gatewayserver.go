@@ -512,13 +512,9 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	logger.Info("Connected")
 
 	gs.startDisconnectOnChangeTask(connEntry)
-	go gs.handleUpstream(connEntry)
-	if gs.statsRegistry != nil {
-		go gs.updateConnStats(connEntry)
-	}
-	if gtw.UpdateLocationFromStatus {
-		go gs.handleLocationUpdates(connEntry)
-	}
+	gs.startHandleUpstreamTask(connEntry)
+	gs.startUpdateConnStatsTask(connEntry)
+	gs.startHandleLocationUpdatesTask(connEntry)
 
 	for name, handler := range gs.upstreamHandlers {
 		connCtx := log.NewContextWithField(conn.Context(), "upstream_handler", name)
@@ -628,6 +624,57 @@ func (gs *GatewayServer) startDisconnectOnChangeTask(conn connectionEntry) {
 	})
 }
 
+func (gs *GatewayServer) startHandleUpstreamTask(conn connectionEntry) {
+	conn.tasksDone.Add(1)
+	gs.StartTask(&component.TaskConfig{
+		Context: conn.Context(),
+		ID:      fmt.Sprintf("handle_upstream_%s", unique.ID(conn.Context(), conn.Gateway().GetIds())),
+		Func: func(ctx context.Context) error {
+			gs.handleUpstream(ctx, conn)
+			return nil
+		},
+		Done:    conn.tasksDone.Done,
+		Restart: component.TaskRestartNever,
+		Backoff: component.DialTaskBackoffConfig,
+	})
+}
+
+func (gs *GatewayServer) startUpdateConnStatsTask(conn connectionEntry) {
+	if gs.statsRegistry == nil {
+		return
+	}
+	conn.tasksDone.Add(1)
+	gs.StartTask(&component.TaskConfig{
+		Context: conn.Context(),
+		ID:      fmt.Sprintf("update_connection_stats_%s", unique.ID(conn.Context(), conn.Gateway().GetIds())),
+		Func: func(ctx context.Context) error {
+			gs.updateConnStats(ctx, conn)
+			return nil
+		},
+		Done:    conn.tasksDone.Done,
+		Restart: component.TaskRestartNever,
+		Backoff: component.DialTaskBackoffConfig,
+	})
+}
+
+func (gs *GatewayServer) startHandleLocationUpdatesTask(conn connectionEntry) {
+	if !conn.Gateway().GetUpdateLocationFromStatus() {
+		return
+	}
+	conn.tasksDone.Add(1)
+	gs.StartTask(&component.TaskConfig{
+		Context: conn.Context(),
+		ID:      fmt.Sprintf("handle_location_updates_%s", unique.ID(conn.Context(), conn.Gateway().GetIds())),
+		Func: func(ctx context.Context) error {
+			gs.handleLocationUpdates(ctx, conn)
+			return nil
+		},
+		Done:    conn.tasksDone.Done,
+		Restart: component.TaskRestartNever,
+		Backoff: component.DialTaskBackoffConfig,
+	})
+}
+
 var errHostHandle = errors.Define("host_handle", "host `{host}` failed to handle message")
 
 type upstreamHost struct {
@@ -704,9 +751,8 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 	}
 }
 
-func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
+func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntry) {
 	var (
-		ctx      = conn.Context()
 		gtw      = conn.Gateway()
 		protocol = conn.Frontend().Protocol()
 		logger   = log.FromContext(ctx)
@@ -800,8 +846,7 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 	}
 }
 
-func (gs *GatewayServer) updateConnStats(conn connectionEntry) {
-	ctx := conn.Context()
+func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEntry) {
 	decoupledCtx := gs.FromRequestContext(ctx)
 	logger := log.FromContext(ctx)
 
@@ -870,9 +915,8 @@ func sameAntennaLocations(a, b []*ttnpb.GatewayAntenna) bool {
 
 var statusLocationFields = ttnpb.ExcludeFields(ttnpb.LocationFieldPathsNested, "source")
 
-func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
+func (gs *GatewayServer) handleLocationUpdates(ctx context.Context, conn connectionEntry) {
 	var (
-		ctx          = conn.Context()
 		gtw          = conn.Gateway()
 		lastAntennas []*ttnpb.GatewayAntenna
 	)
