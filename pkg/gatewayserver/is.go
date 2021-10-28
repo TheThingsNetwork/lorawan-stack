@@ -52,7 +52,7 @@ func (is IS) AssertGatewayRights(ctx context.Context, ids ttnpb.GatewayIdentifie
 
 // GetIdentifiersForEUI implements EntityRegistry.
 func (is IS) GetIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewayIdentifiersForEUIRequest) (*ttnpb.GatewayIdentifiers, error) {
-	registry, err := is.newRegistryClient(ctx, &ttnpb.GatewayIdentifiers{Eui: &req.Eui})
+	registry, err := is.newRegistryClient(ctx, &ttnpb.GatewayIdentifiers{Eui: req.Eui})
 	if err != nil {
 		return nil, err
 	}

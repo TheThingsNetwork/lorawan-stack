@@ -112,7 +112,7 @@ func (is *mockIS) Update(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (
 }
 
 func (is *mockIS) GetIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewayIdentifiersForEUIRequest) (*ttnpb.GatewayIdentifiers, error) {
-	if req.Eui == registeredGatewayEUI {
+	if req.Eui.Equal(registeredGatewayEUI) {
 		return &ttnpb.GatewayIdentifiers{
 			GatewayId: registeredGatewayID,
 			Eui:       &registeredGatewayEUI,
