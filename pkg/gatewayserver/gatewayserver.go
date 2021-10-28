@@ -651,7 +651,7 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 		}
 		msg.CorrelationIds = append(make([]string, 0, len(msg.CorrelationIds)+1), msg.CorrelationIds...)
 		msg.CorrelationIds = append(msg.CorrelationIds, host.correlationID)
-		drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
+		drop := func(ids *ttnpb.EndDeviceIdentifiers, err error) {
 			logger := logger.WithError(err)
 			if ids.JoinEui != nil {
 				logger = logger.WithField("join_eui", *ids.JoinEui)
@@ -665,11 +665,7 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 			logger.Debug("Drop message")
 			registerDropUplink(ctx, gtw, msg, host.name, err)
 		}
-		ids, err := lorawan.GetUplinkMessageIdentifiers(msg.RawPayload)
-		if err != nil {
-			drop(ttnpb.EndDeviceIdentifiers{}, err)
-			break
-		}
+		ids := msg.Payload.EndDeviceIdentifiers()
 		var pass bool
 		switch {
 		case ids.DevAddr != nil:
@@ -759,11 +755,10 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
 			msg.CorrelationIds = append(msg.CorrelationIds, events.CorrelationIDsFromContext(ctx)...)
 			if msg.Payload == nil {
-				pld := &ttnpb.Message{}
-				if err := lorawan.UnmarshalMessage(msg.RawPayload, pld); err != nil {
-					log.FromContext(ctx).WithError(err).Debug("Failed to decode message payload")
-				} else {
-					msg.Payload = pld
+				msg.Payload = &ttnpb.Message{}
+				if err := lorawan.UnmarshalMessage(msg.RawPayload, msg.Payload); err != nil {
+					registerDropUplink(ctx, gtw, msg, "validation", err)
+					continue
 				}
 			}
 			val = msg

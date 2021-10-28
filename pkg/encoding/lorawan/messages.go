@@ -581,7 +581,7 @@ func UnmarshalMessage(b []byte, msg *ttnpb.Message) error {
 	return nil
 }
 
-// GetUplinkMessageIdentifiers parses the PHYPayload and retrieves the EndDeviceIdentifers (except DeviceID).
+// GetUplinkMessageIdentifiers parses the PHYPayload and retrieves the EndDeviceIdentifiers (except DeviceID).
 func GetUplinkMessageIdentifiers(phyPayload []byte) (ttnpb.EndDeviceIdentifiers, error) {
 	n := len(phyPayload)
 	if n == 0 {
