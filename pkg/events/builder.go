@@ -40,12 +40,13 @@ func (b *builder) With(options ...Option) Builder {
 }
 
 func (b *builder) New(ctx context.Context, opts ...Option) Event {
+	now := time.Now().UTC()
 	evt := &event{
 		ctx: ctx,
 		innerEvent: ttnpb.Event{
 			UniqueId:       NewCorrelationID(),
 			Name:           b.definition.name,
-			Time:           time.Now().UTC(),
+			Time:           &now,
 			Origin:         hostname,
 			CorrelationIds: CorrelationIDsFromContext(ctx),
 		},

@@ -174,8 +174,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 		return func(x, y events.Event) bool {
 			xProto := test.Must(events.Proto(x)).(*ttnpb.Event)
 			yProto := test.Must(events.Proto(y)).(*ttnpb.Event)
-			xProto.Time = time.Time{}
-			yProto.Time = time.Time{}
+			xProto.Time = nil
+			yProto.Time = nil
 			xProto.Data = nil
 			yProto.Data = nil
 			xProto.UniqueId = ""

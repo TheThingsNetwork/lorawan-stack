@@ -24,10 +24,14 @@ func (x *Event) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("name")
 		s.WriteString(x.Name)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.Time != nil || s.HasField("time") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("time")
-		s.WriteTime(x.Time)
+		if x.Time == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.Time)
+		}
 	}
 	if len(x.Identifiers) > 0 || s.HasField("identifiers") {
 		s.WriteMoreIf(&wroteField)
@@ -119,7 +123,7 @@ func (x *Event) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			if s.Err() != nil {
 				return
 			}
-			x.Time = *v
+			x.Time = v
 		case "identifiers":
 			s.AddField("identifiers")
 			s.ReadArray(func() {

@@ -55,12 +55,13 @@ type Event interface {
 func local(evt Event) *event {
 	localEvent, ok := evt.(*event)
 	if !ok {
+		t := evt.Time()
 		localEvent = &event{
 			ctx: evt.Context(),
 			innerEvent: ttnpb.Event{
 				UniqueId:       evt.UniqueID(),
 				Name:           evt.Name(),
-				Time:           evt.Time(),
+				Time:           &t,
 				Identifiers:    evt.Identifiers(),
 				CorrelationIds: evt.CorrelationIDs(),
 				Origin:         evt.Origin(),
@@ -140,7 +141,7 @@ func (e *event) UnmarshalJSON(data []byte) error {
 func (e event) UniqueID() string                        { return e.innerEvent.UniqueId }
 func (e event) Context() context.Context                { return e.ctx }
 func (e event) Name() string                            { return e.innerEvent.Name }
-func (e event) Time() time.Time                         { return e.innerEvent.Time }
+func (e event) Time() time.Time                         { return *e.innerEvent.Time }
 func (e event) Identifiers() []*ttnpb.EntityIdentifiers { return e.innerEvent.Identifiers }
 func (e event) Data() interface{}                       { return e.data }
 func (e event) CorrelationIDs() []string                { return e.innerEvent.CorrelationIds }
