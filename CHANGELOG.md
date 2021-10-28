@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
   - `as.distribution.local.broadcast.subscription-queue-size` controls how many uplinks the Application Server should buffer for an broadcast local subscriber. Has the same semantics as `--as.distribution.global.individual.subscription-queue-size`.
   - `as.distribution.local.individual.subscription-blocks` controls if the Application Server should block while publishing traffic to individual local subscribers (such as PubSub integrations).
   - `as.distribution.local.individual.subscription-queue-size` controls how many uplinks the Application Server should buffer for an individual local subscriber. Has the same semantics as `--as.distribution.global.individual.subscription-queue-size`.
+- `ttn_lw_gs_txack_received_total`, `ttn_lw_gs_txack_forwarded_total` and `ttn_lw_gs_txack_dropped_total` metrics, which track the transmission acknowledgements from gateways.
+- `gs.txack.receive`, `gs.txack.drop` and `gs.txack.forward` events, which track the transmission acknowledgements from gateways.
 
 ### Changed
 
@@ -28,6 +30,9 @@ For details about compatibility between different releases, see the **Commitment
 ### Deprecated
 
 ### Removed
+
+- The `ttn_lw_gs_status_failed_total`, `ttn_lw_gs_uplink_failed_total` metrics. `ttn_lw_gs_status_dropped_total` and `ttn_lw_gs_uplink_dropped_total` should be used instead, as they contain the failure cause.
+- The `gs.status.fail` and `gs.up.fail` events. `gs.status.drop` and `gs.up.drop` should be used instead, as they contain the failure cause.
 
 ### Fixed
 

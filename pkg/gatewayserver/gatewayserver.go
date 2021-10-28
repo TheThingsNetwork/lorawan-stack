@@ -663,7 +663,7 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 				logger = logger.WithField("dev_addr", *ids.DevAddr)
 			}
 			logger.Debug("Drop message")
-			registerDropUplink(ctx, gtw, msg.UplinkMessage, host.name, err)
+			registerDropUplink(ctx, gtw, msg, host.name, err)
 		}
 		ids, err := lorawan.GetUplinkMessageIdentifiers(msg.RawPayload)
 		if err != nil {
@@ -701,7 +701,9 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 		}
 	case *ttnpb.TxAcknowledgment:
 		if err := host.handler.HandleTxAck(ctx, *gtw.Ids, msg); err != nil {
-			logger.WithField("host", host.name).WithError(err).Debug("Drop Tx acknowledgment")
+			registerDropTxAck(ctx, gtw, msg, host.name, err)
+		} else {
+			registerForwardTxAck(ctx, gtw, msg, host.name)
 		}
 	}
 }
@@ -781,6 +783,7 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 				registerFailDownlink(ctx, gtw, msg, protocol)
 			}
 			val = msg
+			registerReceiveTxAck(ctx, gtw, msg, protocol)
 		}
 		for _, host := range hosts {
 			err := host.pool.Publish(ctx, val)
@@ -789,10 +792,14 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 			}
 			logger.WithField("name", host.name).WithError(err).Warn("Upstream handler publish failed")
 			switch msg := val.(type) {
-			case *ttnpb.UplinkMessage:
-				registerFailUplink(ctx, gtw, msg, host.name)
+			case *ttnpb.GatewayUplinkMessage:
+				registerDropUplink(ctx, gtw, msg, host.name, err)
 			case *ttnpb.GatewayStatus:
-				registerFailStatus(ctx, gtw, msg, host.name)
+				registerDropStatus(ctx, gtw, msg, host.name, err)
+			case *ttnpb.TxAcknowledgment:
+				registerDropTxAck(ctx, gtw, msg, host.name, err)
+			default:
+				panic("unreachable")
 			}
 		}
 	}

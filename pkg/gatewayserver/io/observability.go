@@ -101,11 +101,11 @@ func registerDropMessage(ctx context.Context, gtw *ttnpb.Gateway, typ string, er
 	case "txack":
 		events.Publish(evtDropTxAck.NewWithIdentifiersAndData(ctx, gtw, err))
 	}
+	errorLabel := "unknown"
 	if ttnErr, ok := errors.From(err); ok {
-		ioMetrics.droppedMessages.WithLabelValues(ctx, typ, ttnErr.FullName()).Inc()
-	} else {
-		ioMetrics.droppedMessages.WithLabelValues(ctx, typ, "unknown").Inc()
+		errorLabel = ttnErr.FullName()
 	}
+	ioMetrics.droppedMessages.WithLabelValues(ctx, typ, errorLabel).Inc()
 }
 
 func init() {
