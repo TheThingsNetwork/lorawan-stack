@@ -624,26 +624,26 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 		case "template_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationWebhookTemplateIdentifiers
-				if (src == nil || src.ApplicationWebhookTemplateIdentifiers == nil) && dst.ApplicationWebhookTemplateIdentifiers == nil {
+				if (src == nil || src.TemplateIds == nil) && dst.TemplateIds == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.ApplicationWebhookTemplateIdentifiers
+					newSrc = src.TemplateIds
 				}
-				if dst.ApplicationWebhookTemplateIdentifiers != nil {
-					newDst = dst.ApplicationWebhookTemplateIdentifiers
+				if dst.TemplateIds != nil {
+					newDst = dst.TemplateIds
 				} else {
 					newDst = &ApplicationWebhookTemplateIdentifiers{}
-					dst.ApplicationWebhookTemplateIdentifiers = newDst
+					dst.TemplateIds = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationWebhookTemplateIdentifiers = src.ApplicationWebhookTemplateIdentifiers
+					dst.TemplateIds = src.TemplateIds
 				} else {
-					dst.ApplicationWebhookTemplateIdentifiers = nil
+					dst.TemplateIds = nil
 				}
 			}
 		case "template_fields":
