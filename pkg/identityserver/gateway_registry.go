@@ -163,7 +163,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 	if err != nil {
 		if errors.IsAlreadyExists(err) && errors.Resemble(err, store.ErrEUITaken) {
 			if ids, err := is.getGatewayIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-				Eui: *reqGtw.GetIds().GetEui(),
+				Eui: reqGtw.GetIds().GetEui(),
 			}); err == nil {
 				return nil, errGatewayEUITaken.WithAttributes(
 					"gateway_eui", reqGtw.GetIds().GetEui().String(),
@@ -277,7 +277,7 @@ func (is *IdentityServer) getGatewayIdentifiersForEUI(ctx context.Context, req *
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		gtw, err := store.GetGatewayStore(db).GetGateway(ctx, &ttnpb.GatewayIdentifiers{
-			Eui: &req.Eui,
+			Eui: req.Eui,
 		}, &pbtypes.FieldMask{Paths: []string{"ids.gateway_id", "ids.eui"}})
 		if err != nil {
 			return err

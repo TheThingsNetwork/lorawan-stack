@@ -39,7 +39,7 @@ message Event {
   // Name of the event. This can be used to find the (localized) event description.
   string name = 1;
   // Time at which the event was triggered.
-  google.protobuf.Timestamp time = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).timestamp.required = true];
+  google.protobuf.Timestamp time = 2 [(gogoproto.stdtime) = true, (validate.rules).timestamp.required = true];
   // Identifiers of the entity (or entities) involved.
   repeated EntityIdentifiers identifiers = 3;
   // Optional data attached to the event.

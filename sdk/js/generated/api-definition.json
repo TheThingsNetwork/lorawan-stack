@@ -3194,20 +3194,6 @@
       "http": []
     }
   },
-  "MessageProcessor": {
-    "EncodeDownlink": {
-      "file": "lorawan-stack/api/message_services.proto",
-      "http": []
-    },
-    "DecodeUplink": {
-      "file": "lorawan-stack/api/message_services.proto",
-      "http": []
-    },
-    "DecodeDownlink": {
-      "file": "lorawan-stack/api/message_services.proto",
-      "http": []
-    }
-  },
   "AsNs": {
     "DownlinkQueueReplace": {
       "file": "lorawan-stack/api/networkserver.proto",

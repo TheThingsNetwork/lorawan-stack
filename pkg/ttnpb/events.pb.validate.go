@@ -54,6 +54,13 @@ func (m *Event) ValidateFields(paths ...string) error {
 			// no validation rules for Name
 		case "time":
 
+			if m.GetTime() == nil {
+				return EventValidationError{
+					field:  "time",
+					reason: "value is required",
+				}
+			}
+
 		case "identifiers":
 
 			for idx, item := range m.GetIdentifiers() {
