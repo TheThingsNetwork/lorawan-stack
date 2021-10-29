@@ -325,8 +325,7 @@ var (
 	errRxEmpty          = errors.DefineFailedPrecondition("rx_empty", "settings empty")
 	errRxWindowSchedule = errors.Define("rx_window_schedule", "schedule in Rx window `{window}` failed")
 	errDataRateRxWindow = errors.DefineInvalidArgument("data_rate_rx_window", "invalid data rate in Rx window `{window}`")
-	errDataRateIndex    = errors.DefineInvalidArgument("data_rate_index", "no data rate with index `{index}`")
-	errTooLong          = errors.DefineInvalidArgument("too_long", "the payload length `{payload_length}` exceeds maximum `{maximum_length}` at data rate index `{data_rate_index}`")
+	errTooLong          = errors.DefineInvalidArgument("too_long", "the payload length `{payload_length}` exceeds maximum `{maximum_length}` at data rate `{data_rate}`")
 	errTxSchedule       = errors.DefineAborted("tx_schedule", "failed to schedule")
 )
 
@@ -421,64 +420,50 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		}
 	}
 
-	lwPhyVersion := request.GetLorawanPhyVersion()
-	// Backwards compatibility. If there's no PHY version defined, assume that the band is already versioned.
-	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-	if lwPhyVersion == ttnpb.PHY_UNKNOWN {
-		lwPhyVersion = ttnpb.RP001_V1_1_REV_B
-	}
-
-	phy, err := band.Get(fp.BandID, lwPhyVersion)
+	// Gateway Server does not take the LoRaWAN Regional Parameters version into account as it is a transparent forwarder
+	// between the Network Server and the end device. However, Gateway Server does enforce spectrum regulations that are
+	// defined in Regional Parameters. These include maximum EIRP and maximum payload length. These are taken from the
+	// last known LoRaWAN Regional Parameters version.
+	phy, err := band.GetLatest(fp.BandID)
 	if err != nil {
 		return false, false, 0, err
 	}
 
 	var rxErrs []errors.ErrorDetails
 	for i, rx := range []struct {
-		dataRate      *ttnpb.DataRate
-		dataRateIndex ttnpb.DataRateIndex
-		frequency     uint64
-		delay         time.Duration
+		dataRate  *ttnpb.DataRate
+		frequency uint64
+		delay     time.Duration
 	}{
 		{
-			dataRate: request.Rx1DataRate,
-			// TODO: Remove; request.Rx{1,2}DataRate must now be set (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-			dataRateIndex: request.Rx1DataRateIndex,
-			frequency:     request.Rx1Frequency,
-			delay:         0,
+			dataRate:  request.Rx1DataRate,
+			frequency: request.Rx1Frequency,
+			delay:     0,
 		},
 		{
-			dataRate: request.Rx2DataRate,
-			// TODO: Remove; request.Rx{1,2}DataRate must now be set (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-			dataRateIndex: request.Rx2DataRateIndex,
-			frequency:     request.Rx2Frequency,
-			delay:         time.Second,
+			dataRate:  request.Rx2DataRate,
+			frequency: request.Rx2Frequency,
+			delay:     time.Second,
 		},
 	} {
 		if rx.frequency == 0 {
-			rxErrs = append(rxErrs, errRxEmpty)
+			rxErrs = append(rxErrs, errRxEmpty.New())
 			continue
 		}
 		if rx.dataRate == nil {
-			dr, ok := phy.DataRates[rx.dataRateIndex]
-			if !ok {
-				return false, false, 0, errDataRateIndex.WithAttributes("index", rx.dataRateIndex)
-			}
-			rx.dataRate = &dr.Rate
+			rxErrs = append(rxErrs, errDataRateRxWindow.WithAttributes("window", i+1))
+			continue
 		}
-		var (
-			ok     bool
-			bandDR band.DataRate
-		)
-		rx.dataRateIndex, bandDR, ok = phy.FindDownlinkDataRate(*rx.dataRate)
+		_, bandDR, ok := phy.FindDownlinkDataRate(*rx.dataRate)
 		if !ok {
-			return false, false, 0, errDataRateRxWindow.WithAttributes("window", i+1)
+			rxErrs = append(rxErrs, errDataRateRxWindow.WithAttributes("window", i+1))
+			continue
 		}
 
 		logger := logger.WithFields(log.Fields(
 			"rx_window", i+1,
 			"frequency", rx.frequency,
-			"data_rate_index", rx.dataRateIndex,
+			"data_rate", rx.dataRate,
 		))
 		logger.Debug("Attempt to schedule downlink in receive window")
 		// The maximum payload size is MACPayload only; for PHYPayload take MHDR (1 byte) and MIC (4 bytes) into account.
@@ -487,7 +472,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			return false, false, 0, errTooLong.WithAttributes(
 				"payload_length", len(msg.RawPayload),
 				"maximum_length", maxPHYLength,
-				"data_rate_index", rx.dataRateIndex,
+				"data_rate", rx.dataRate,
 			)
 		}
 		eirp := phy.DefaultMaxEIRP
@@ -501,10 +486,8 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			eirp = *sb.MaxEIRP
 		}
 		settings := ttnpb.TxSettings{
-			DataRate: *rx.dataRate,
-			// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-			DataRateIndex: rx.dataRateIndex,
-			Frequency:     rx.frequency,
+			DataRate:  *rx.dataRate,
+			Frequency: rx.frequency,
 			Downlink: &ttnpb.TxSettings_Downlink{
 				TxPower:      eirp,
 				AntennaIndex: ids.AntennaIndex,
@@ -534,7 +517,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 				return false, false, 0, errNoAbsoluteTime.New()
 			}
 			if !c.scheduler.IsGatewayTimeSynced() {
-				rxErrs = append(rxErrs, errNoGPSSync)
+				rxErrs = append(rxErrs, errNoGPSSync.New())
 				continue
 			}
 			f = c.scheduler.ScheduleAt
