@@ -35,6 +35,7 @@ For details about compatibility between different releases, see the **Commitment
 - The `gs.status.fail` and `gs.up.fail` events. `gs.status.drop` and `gs.up.drop` should be used instead, as they contain the failure cause.
 - The `data_rate_index` field in uplink message metadata. Observe the fully described data rate in the `data_rate` field instead.
 - LoRaWAN data rate index reported to LoRa Cloud DMS.
+- Dockerfile doesn't define environmental variables `TTN_LW_BLOB_LOCAL_DIRECTORY`, `TTN_LW_IS_DATABASE_URI` and `TTN_LW_REDIS_ADDRESS` anymore. They need to be set when running the container: please refer to `docker-compose.yml` for example values.
 
 ### Fixed
 

@@ -37,10 +37,7 @@ RUN mkdir /srv/ttn-lorawan/public/blob
 
 VOLUME ["/srv/ttn-lorawan/public/blob"]
 
-ENV TTN_LW_BLOB_LOCAL_DIRECTORY=/srv/ttn-lorawan/public/blob \
-    TTN_LW_IS_DATABASE_URI=postgres://root@cockroach:26257/ttn_lorawan?sslmode=disable \
-    TTN_LW_REDIS_ADDRESS=redis:6379 \
-    TTN_LW_HEALTHCHECK_URL=http://localhost:1885/healthz/live
+ENV TTN_LW_HEALTHCHECK_URL=http://localhost:1885/healthz/live
 
 HEALTHCHECK --interval=1m --timeout=5s CMD curl -f $TTN_LW_HEALTHCHECK_URL || exit 1
 
