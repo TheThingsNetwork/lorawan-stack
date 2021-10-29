@@ -48,9 +48,8 @@ func TestProtobufV2Downlink(t *testing.T) {
 						},
 					},
 				},
-				CodingRate:    "4/5",
-				DataRateIndex: 0,
-				Frequency:     863000000,
+				CodingRate: "4/5",
+				Frequency:  863000000,
 				Downlink: &ttnpb.TxSettings_Downlink{
 					TxPower: 16.15,
 				},
@@ -111,8 +110,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 				},
 			},
 		},
-		CodingRate:    "4/5",
-		DataRateIndex: 5,
+		CodingRate: "4/5",
 	}
 	validV2Metadata := ttnpbv2.GatewayRxMetadata{
 		GatewayId: "gateway-id",
@@ -184,21 +182,6 @@ func TestProtobufV2Uplinks(t *testing.T) {
 				Settings:   validV3Settings,
 				RxMetadata: validV3Metadata,
 			},
-		},
-		{
-			Name: "incorrect data rate",
-			Input: &ttnpbv2.UplinkMessage{
-				GatewayMetadata: &validV2Metadata,
-				ProtocolMetadata: &ttnpbv2.ProtocolRxMetadata{
-					Lorawan: &ttnpbv2.LoRaWANMetadata{
-						CodingRate:    validV2Settings.Lorawan.CodingRate,
-						DataRate:      "SF3BW000",
-						FrequencyPlan: validV2Settings.Lorawan.FrequencyPlan,
-						Modulation:    validV2Settings.Lorawan.Modulation,
-					},
-				},
-			},
-			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
 			Name: "incorrect modulation",

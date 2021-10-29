@@ -210,12 +210,10 @@ func (c *connection) setup(ctx context.Context) (err error) {
 
 	// Close connection on context closure
 	go func() {
-		select {
-		case <-ctx.Done():
-			logger.WithError(ctx.Err()).Info("Disconnected")
-			c.session.Close()
-			c.mqtt.Close()
-		}
+		<-ctx.Done()
+		logger.WithError(ctx.Err()).Info("Disconnected")
+		c.session.Close()
+		c.mqtt.Close()
 	}()
 
 	logger.Info("Connected")
