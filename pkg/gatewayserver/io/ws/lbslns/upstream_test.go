@@ -623,8 +623,7 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 func TestTxAck(t *testing.T) {
 	a := assertions.New(t)
 	txConf := TxConfirmation{
-		Diid:    1,
-		RefTime: 0,
+		Diid: 1,
 	}
 	msg := &ttnpb.DownlinkMessage{
 		RawPayload:     []byte{0x00, 0x00},

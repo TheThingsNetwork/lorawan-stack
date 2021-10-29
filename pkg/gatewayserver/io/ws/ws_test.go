@@ -1194,7 +1194,7 @@ func TestRTT(t *testing.T) {
 					},
 				},
 			},
-			ExpectedRTTStatsCount: 0,
+			ExpectedRTTStatsCount: 1,
 		},
 		{
 			Name: "Downlink",
@@ -1241,7 +1241,6 @@ func TestRTT(t *testing.T) {
 				Diid:  1,
 				XTime: 1548059982,
 			},
-			ExpectedRTTStatsCount: 1,
 		},
 		{
 			Name: "RepeatedTxAck",
@@ -1249,7 +1248,6 @@ func TestRTT(t *testing.T) {
 				Diid:  1,
 				XTime: 1548059982,
 			},
-			ExpectedRTTStatsCount: 2,
 		},
 		{
 			Name: "UplinkFrame",
@@ -1273,7 +1271,7 @@ func TestRTT(t *testing.T) {
 					},
 				},
 			},
-			ExpectedRTTStatsCount: 2,
+			ExpectedRTTStatsCount: 1,
 		},
 		{
 			Name: "TxAckWithSmallClockDrift",
@@ -1281,7 +1279,7 @@ func TestRTT(t *testing.T) {
 				Diid:  1,
 				XTime: 1548059982,
 			},
-			ExpectedRTTStatsCount: 3,
+			ExpectedRTTStatsCount: 1,
 		},
 		{
 			Name: "TxAckWithClockDriftAboveThreshold",
@@ -1289,7 +1287,7 @@ func TestRTT(t *testing.T) {
 				Diid:  1,
 				XTime: 1548059982,
 			},
-			ExpectedRTTStatsCount: 3,
+			ExpectedRTTStatsCount: 1,
 			GatewayClockDrift:     (1 << 5 * test.Delay),
 		},
 	} {
@@ -1298,9 +1296,7 @@ func TestRTT(t *testing.T) {
 			if tc.InputBSUpstream != nil {
 				switch v := tc.InputBSUpstream.(type) {
 				case lbslns.TxConfirmation:
-					if testTime.Mux != nil {
-						v.RefTime = testTime.getRefTime(tc.GatewayClockDrift)
-					}
+					// TxAck does not contain a RefTime.
 					req, err := json.Marshal(v)
 					if err != nil {
 						panic(err)
@@ -1371,15 +1367,17 @@ func TestRTT(t *testing.T) {
 					if !a.So(count, should.Equal, tc.ExpectedRTTStatsCount) {
 						t.Fatalf("Incorrect Stats entries recorded: %d", count)
 					}
-					if !a.So(min, should.BeGreaterThan, 0) {
-						t.Fatalf("Incorrect min: %s", min)
-					}
-					if tc.ExpectedRTTStatsCount > 1 {
-						if !a.So(max, should.BeGreaterThan, min) {
-							t.Fatalf("Incorrect max: %s", max)
+					if count > 0 {
+						if !a.So(min, should.BeGreaterThan, 0) {
+							t.Fatalf("Incorrect min: %s", min)
 						}
-						if !a.So(median, should.BeBetween, min, max) {
-							t.Fatalf("Incorrect median: %s", median)
+						if tc.ExpectedRTTStatsCount > 1 {
+							if !a.So(max, should.BeGreaterThan, min) {
+								t.Fatalf("Incorrect max: %s", max)
+							}
+							if !a.So(median, should.BeBetween, min, max) {
+								t.Fatalf("Incorrect median: %s", median)
+							}
 						}
 					}
 				}
