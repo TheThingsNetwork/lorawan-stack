@@ -1024,7 +1024,11 @@ func rx1Parameters(phy *band.Band, macState *ttnpb.MACState, up *ttnpb.UplinkMes
 			).
 			WithCause(ErrUplinkChannel)
 	}
-	drIdx, err := phy.Rx1DataRate(up.Settings.DataRateIndex, macState.CurrentParameters.Rx1DataRateOffset, macState.CurrentParameters.DownlinkDwellTime.GetValue())
+	drIdx, _, ok := phy.FindUplinkDataRate(up.Settings.DataRate)
+	if !ok {
+		return 0, 0, band.DataRate{}, errDataRateNotFound.New()
+	}
+	drIdx, err = phy.Rx1DataRate(drIdx, macState.CurrentParameters.Rx1DataRateOffset, macState.CurrentParameters.DownlinkDwellTime.GetValue())
 	if err != nil {
 		return 0, 0, band.DataRate{}, err
 	}
@@ -1046,7 +1050,11 @@ loop:
 			break loop
 		case ttnpb.MType_UNCONFIRMED_UP, ttnpb.MType_CONFIRMED_UP:
 			if ups[i].Payload.GetMacPayload().FHDR.FCtrl.Adr {
-				maxUpDRIdx = ups[i].Settings.DataRateIndex
+				drIdx, _, ok := phy.FindUplinkDataRate(ups[i].Settings.DataRate)
+				if !ok {
+					continue
+				}
+				maxUpDRIdx = drIdx
 			}
 			break loop
 		}

@@ -1059,9 +1059,10 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 										LorawanPhyVersion: conf.PHYVersion,
 									}
 									if conf.SetRX1 {
+										drIdx, _, _ := phy.FindUplinkDataRate(conf.Uplink.Settings.DataRate)
 										txReq.Rx1Delay = conf.RX1Delay
 										rx1DRIdx := test.Must(phy.Rx1DataRate(
-											conf.Uplink.Settings.DataRateIndex,
+											drIdx,
 											conf.MACState.CurrentParameters.Rx1DataRateOffset,
 											conf.MACState.CurrentParameters.DownlinkDwellTime.GetValue()),
 										).(ttnpb.DataRateIndex)
