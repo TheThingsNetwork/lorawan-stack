@@ -40,6 +40,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
 	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/lbslns"
+	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	pfconfig "go.thethings.network/lorawan-stack/v3/pkg/pfconfig/lbslns"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/shared"
@@ -888,6 +889,15 @@ func TestTraffic(t *testing.T) {
 			},
 		},
 		{
+			Name: "TimeSyncRequest",
+			InputBSUpstream: lbslns.TimeSyncRequest{
+				TxTime: 123.456,
+			},
+			ExpectedBSDownstream: lbslns.TimeSyncResponse{
+				TxTime: 123.456,
+			},
+		},
+		{
 			Name: "Downlink",
 			InputNetworkDownstream: &ttnpb.DownlinkMessage{
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
@@ -1048,6 +1058,47 @@ func TestTraffic(t *testing.T) {
 						a.So(up.UplinkMessage, should.Resemble, &expectedUp)
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")
+					}
+
+				case lbslns.TimeSyncRequest:
+					req, err := json.Marshal(v)
+					if err != nil {
+						panic(err)
+					}
+					if err := wsConn.WriteMessage(websocket.TextMessage, req); err != nil {
+						t.Fatalf("Failed to write message: %v", err)
+					}
+
+					var readErr error
+					var wg sync.WaitGroup
+					resCh := make(chan []byte, 1)
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						_, data, err := wsConn.ReadMessage()
+						if err != nil {
+							readErr = err
+							return
+						}
+						resCh <- data
+					}()
+					select {
+					case res := <-resCh:
+						expected := tc.ExpectedBSDownstream.(lbslns.TimeSyncResponse)
+						var msg lbslns.TimeSyncResponse
+						if err := json.Unmarshal(res, &msg); err != nil {
+							t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
+						}
+
+						now := time.Now().UTC()
+						a.So(msg.TxTime, should.Equal, expected.TxTime)
+						a.So(gpstime.Parse(time.Duration(msg.GPSTime)*time.Microsecond), should.HappenBetween, now.Add(-time.Second), now.Add(time.Second))
+					case <-time.After(timeout):
+						t.Fatalf("Read message timeout")
+					}
+					wg.Wait()
+					if readErr != nil {
+						t.Fatalf("Failed to read message: %v", readErr)
 					}
 				}
 			}

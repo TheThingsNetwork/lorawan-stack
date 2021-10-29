@@ -140,6 +140,50 @@ func getInt32AsByteSlice(value int32) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
+// TimeSyncRequest is the time synchronization request from the BasicStation.
+type TimeSyncRequest struct {
+	TxTime float64 `json:"txtime"`
+}
+
+// MarshalJSON implements json.Marshaler.
+func (tsr TimeSyncRequest) MarshalJSON() ([]byte, error) {
+	type Alias TimeSyncRequest
+	return json.Marshal(struct {
+		Type string `json:"msgtype"`
+		Alias
+	}{
+		Type:  TypeUpstreamTimeSync,
+		Alias: Alias(tsr),
+	})
+}
+
+// Response generates a TimeSyncResponse for this request.
+func (tsr TimeSyncRequest) Response(t time.Time) TimeSyncResponse {
+	return TimeSyncResponse{
+		TxTime:  tsr.TxTime,
+		GPSTime: TimeToGPSTime(t),
+	}
+}
+
+// TimeSyncResponse is the time synchronization response to the BasicStation.
+type TimeSyncResponse struct {
+	TxTime  float64 `json:"txtime,omitempty"`
+	XTime   int64   `json:"xtime,omitempty"`
+	GPSTime int64   `json:"gpstime"`
+}
+
+// MarshalJSON implements json.Marshaler.
+func (tsr TimeSyncResponse) MarshalJSON() ([]byte, error) {
+	type Alias TimeSyncResponse
+	return json.Marshal(struct {
+		Type string `json:"msgtype"`
+		Alias
+	}{
+		Type:  TypeUpstreamTimeSync,
+		Alias: Alias(tsr),
+	})
+}
+
 // toUplinkMessage extracts fields from the Basics Station Join Request "jreq" message and converts them into an UplinkMessage for the network server.
 func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
 	var up ttnpb.UplinkMessage
@@ -482,7 +526,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 
 	recordTime := func(refTimeUnix float64, xTime int64) {
 		if refTimeUnix != 0.0 {
-			refTime := getTimeFromFloat64(refTimeUnix)
+			refTime := TimeFromUnixSeconds(refTimeUnix)
 			if delta := receivedAt.Sub(refTime); delta > f.maxRoundTripDelay {
 				logger.WithFields(log.Fields(
 					"delta", delta,
@@ -592,7 +636,14 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 		session.DataMu.Unlock()
 		recordTime(0.0, txConf.XTime)
 
-	case TypeUpstreamProprietaryDataFrame, TypeUpstreamRemoteShell, TypeUpstreamTimeSync:
+	case TypeUpstreamTimeSync:
+		var req TimeSyncRequest
+		if err := json.Unmarshal(raw, &req); err != nil {
+			return nil, err
+		}
+		return req.Response(receivedAt).MarshalJSON()
+
+	case TypeUpstreamProprietaryDataFrame, TypeUpstreamRemoteShell:
 		logger.WithField("message_type", typ).Debug("Message type not implemented")
 
 	default:
@@ -600,9 +651,4 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 
 	}
 	return nil, nil
-}
-
-func getTimeFromFloat64(timeInFloat float64) time.Time {
-	sec, nsec := math.Modf(timeInFloat)
-	return time.Unix(int64(sec), int64(nsec*1e9))
 }

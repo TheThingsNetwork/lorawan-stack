@@ -95,6 +95,13 @@ func TestMarshalJSON(t *testing.T) {
 			},
 			Expected: []byte(`{"msgtype":"dntxed","diid":35,"DevEui":"1111:1111:1111:1111","rctx":0,"xtime":1552906698,"txtime":1552906698,"gpstime":1552906698}`),
 		},
+		{
+			Name: "TimeSyncRequest",
+			Message: TimeSyncRequest{
+				TxTime: 123.456,
+			},
+			Expected: []byte(`{"msgtype":"timesync","txtime":123.456}`),
+		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
