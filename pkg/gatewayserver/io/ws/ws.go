@@ -293,7 +293,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					logger.Warn("No clock synchronization")
 					continue
 				}
-				dnmsg, err := s.formatter.FromDownlink(ctx, uid, *down, conn.BandID(), concentratorTime, time.Now())
+				dnmsg, err := s.formatter.FromDownlink(ctx, *down, conn.BandID(), concentratorTime, time.Now())
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal downlink message")
 					continue

@@ -25,18 +25,14 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
-	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestFromDownlinkMessage(t *testing.T) {
 	var lbsLNS lbsLNS
-	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	uid := unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"})
 	session := ws.Session{
 		Data: State{
 			ID: 0x11,
@@ -132,7 +128,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 			a := assertions.New(t)
 			ctx := context.Background()
 			sessionCtx := ws.NewContextWithSession(ctx, &session)
-			raw, err := lbsLNS.FromDownlink(sessionCtx, uid, tc.DownlinkMessage, tc.BandID, 1554300787, time.Unix(1554300787, 123456000))
+			raw, err := lbsLNS.FromDownlink(sessionCtx, tc.DownlinkMessage, tc.BandID, 1554300787, time.Unix(1554300787, 123456000))
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
@@ -300,5 +296,6 @@ func TestTransferTime(t *testing.T) {
 		a.So(res.XTime>>48, should.Equal, 42)
 		a.So(res.XTime&0xFFFFFFFFFF, should.Equal, int64(xTime)+timeNow.Sub(timeAtSync).Microseconds())
 		a.So(res.GPSTime, should.Equal, TimeToGPSTime(timeNow))
+		a.So(res.MuxTime, should.Equal, TimeToUnixSeconds(timeNow))
 	}
 }

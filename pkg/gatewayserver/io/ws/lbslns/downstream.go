@@ -61,7 +61,7 @@ func (dnmsg *DownlinkMessage) unmarshalJSON(data []byte) error {
 }
 
 // FromDownlink implements Formatter.
-func (f *lbsLNS) FromDownlink(ctx context.Context, uid string, down ttnpb.DownlinkMessage, bandID string, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error) {
+func (f *lbsLNS) FromDownlink(ctx context.Context, down ttnpb.DownlinkMessage, bandID string, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error) {
 	var dnmsg DownlinkMessage
 	settings := down.GetScheduled()
 	dnmsg.Pdu = hex.EncodeToString(down.GetRawPayload())
@@ -109,7 +109,7 @@ func (f *lbsLNS) FromDownlink(ctx context.Context, uid string, down ttnpb.Downli
 	dnmsg.Rx1Freq = int(settings.Frequency)
 
 	// Add the MuxTime for RTT measurement
-	dnmsg.MuxTime = float64(dlTime.UnixNano()) / float64(time.Second)
+	dnmsg.MuxTime = TimeToUnixSeconds(dlTime)
 
 	// The GS controls the scheduling and hence for the gateway, its always Class A.
 	dnmsg.DeviceClass = uint(ttnpb.CLASS_A)
@@ -160,5 +160,6 @@ func (*lbsLNS) TransferTime(ctx context.Context, t time.Time, conn *io.Connectio
 	return TimeSyncResponse{
 		XTime:   ConcentratorTimeToXTime(state.ID, concentratorTime),
 		GPSTime: TimeToGPSTime(t),
+		MuxTime: TimeToUnixSeconds(t),
 	}.MarshalJSON()
 }

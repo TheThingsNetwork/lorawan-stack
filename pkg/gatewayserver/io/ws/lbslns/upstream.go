@@ -162,6 +162,7 @@ func (tsr TimeSyncRequest) Response(t time.Time) TimeSyncResponse {
 	return TimeSyncResponse{
 		TxTime:  tsr.TxTime,
 		GPSTime: TimeToGPSTime(t),
+		MuxTime: TimeToUnixSeconds(t),
 	}
 }
 
@@ -170,6 +171,7 @@ type TimeSyncResponse struct {
 	TxTime  float64 `json:"txtime,omitempty"`
 	XTime   int64   `json:"xtime,omitempty"`
 	GPSTime int64   `json:"gpstime"`
+	MuxTime float64 `json:"MuxTime,omitempty"`
 }
 
 // MarshalJSON implements json.Marshaler.
