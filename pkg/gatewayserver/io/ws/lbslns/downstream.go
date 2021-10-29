@@ -78,8 +78,8 @@ func (f *lbsLNS) FromDownlink(ctx context.Context, uid string, down ttnpb.Downli
 		ok    bool
 	)
 	session := ws.SessionFromContext(ctx)
-	session.DataMu.Lock()
-	defer session.DataMu.Unlock()
+	session.DataMu.RLock()
+	defer session.DataMu.RUnlock()
 	if state, ok = session.Data.(State); !ok {
 		return nil, errSessionStateNotFound.New()
 	}
