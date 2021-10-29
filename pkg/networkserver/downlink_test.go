@@ -863,9 +863,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx1DataRateIndex: lastUp.Settings.DataRateIndex,
-							Rx2DataRateIndex: dev.MacState.CurrentParameters.Rx2DataRateIndex,
 						}
 					},
 					testErrScheduleResponse,
@@ -1018,9 +1015,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx1DataRateIndex: lastUp.Settings.DataRateIndex,
-							Rx2DataRateIndex: dev.MacState.CurrentParameters.Rx2DataRateIndex,
 						}
 					},
 					testErrScheduleResponse,
@@ -1177,9 +1171,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx1DataRateIndex: lastUp.Settings.DataRateIndex,
-							Rx2DataRateIndex: dev.MacState.CurrentParameters.Rx2DataRateIndex,
 						}
 					},
 					testErrScheduleResponse,
@@ -1340,8 +1331,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx1Frequency:      dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx1DataRateIndex: lastUp.Settings.DataRateIndex,
 						}
 					},
 					testErrScheduleResponse,
@@ -1492,11 +1481,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 									},
 								},
 							},
-							Rx2Frequency:    DefaultEU868RX2Frequency,
-							AbsoluteTime:    TimePtr(pingAt),
-							FrequencyPlanId: dev.FrequencyPlanId,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx2DataRateIndex:  dev.MacState.CurrentParameters.Rx2DataRateIndex,
+							Rx2Frequency:      DefaultEU868RX2Frequency,
+							AbsoluteTime:      TimePtr(pingAt),
+							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
@@ -1654,9 +1641,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx1DataRateIndex: lastUp.Settings.DataRateIndex,
-							Rx2DataRateIndex: dev.MacState.CurrentParameters.Rx2DataRateIndex,
 						}
 					},
 					testErrScheduleResponse,
@@ -1801,8 +1785,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx2DataRateIndex: dev.MacState.CurrentParameters.Rx2DataRateIndex,
 						}
 					},
 					testErrScheduleResponse,
@@ -1944,8 +1926,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							AbsoluteTime:      TimePtr(now.Add(InfrastructureDelay)),
 							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx2DataRateIndex: dev.MacState.CurrentParameters.Rx2DataRateIndex,
 						}
 					},
 					testErrScheduleResponse,
@@ -2077,8 +2057,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx2DataRateIndex: dev.MacState.CurrentParameters.Rx2DataRateIndex,
 						}
 					},
 					NsGsScheduleDownlinkResponse{
@@ -2239,8 +2217,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx2DataRateIndex: dev.MacState.CurrentParameters.Rx2DataRateIndex,
 						}
 					},
 					NsGsScheduleDownlinkResponse{
@@ -2495,9 +2471,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx2Frequency:      dev.PendingMacState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanId:   dev.FrequencyPlanId,
 							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx1DataRateIndex: lastUp.Settings.DataRateIndex,
-							Rx2DataRateIndex: dev.MacState.CurrentParameters.Rx2DataRateIndex,
 						}
 					},
 					testErrScheduleResponse,

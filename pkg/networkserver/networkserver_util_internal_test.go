@@ -1068,16 +1068,12 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 										rx1DR := phy.DataRates[rx1DRIdx]
 										txReq.Rx1DataRate = &rx1DR.Rate
 										txReq.Rx1Frequency = conf.MACState.CurrentParameters.Channels[test.Must(phy.Rx1Channel(uint8(conf.Uplink.DeviceChannelIndex))).(uint8)].DownlinkFrequency
-										// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-										txReq.Rx1DataRateIndex = rx1DRIdx
 									}
 									if conf.SetRX2 {
 										rx2DRIdx := conf.MACState.CurrentParameters.Rx2DataRateIndex
 										rx2DR := phy.DataRates[rx2DRIdx]
 										txReq.Rx2DataRate = &rx2DR.Rate
 										txReq.Rx2Frequency = conf.MACState.CurrentParameters.Rx2Frequency
-										// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-										txReq.Rx2DataRateIndex = rx2DRIdx
 									}
 									return txReq
 								}(),

@@ -965,15 +965,13 @@ func loggerWithTxRequestFields(logger log.Interface, req *ttnpb.TxRequest, rx1, 
 	}
 	if rx1 {
 		pairs = append(pairs,
-			// TODO: Build log fields from Rx1DataRate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-			"rx1_data_rate", req.Rx1DataRateIndex,
+			"rx1_data_rate", req.Rx1DataRate,
 			"rx1_frequency", req.Rx1Frequency,
 		)
 	}
 	if rx2 {
 		pairs = append(pairs,
-			// TODO: Build log fields from Rx2DataRate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-			"rx2_data_rate", req.Rx2DataRateIndex,
+			"rx2_data_rate", req.Rx2DataRate,
 			"rx2_frequency", req.Rx2Frequency,
 		)
 	}
@@ -1252,14 +1250,10 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	}
 	if attemptRX1 {
 		req.Rx1Frequency = rx1Freq
-		// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-		req.Rx1DataRateIndex = rx1DRIdx
 		req.Rx1DataRate = &rx1DR.Rate
 	}
 	if attemptRX2 {
 		req.Rx2Frequency = dev.MacState.CurrentParameters.Rx2Frequency
-		// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-		req.Rx2DataRateIndex = dev.MacState.CurrentParameters.Rx2DataRateIndex
 		req.Rx2DataRate = &rx2DR.Rate
 	}
 	down, queuedEvents, err := ns.scheduleDownlinkByPaths(
@@ -1629,19 +1623,17 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 					var (
 						attemptRX1 bool
 						rx1Freq    uint64
-						rx1DRIdx   ttnpb.DataRateIndex
 						rx1DR      band.DataRate
 
 						attemptRX2 bool
 					)
 					if !rx1.Before(now) {
-						freq, drIdx, dr, err := rx1Parameters(phy, dev.PendingMacState, up)
+						freq, _, dr, err := rx1Parameters(phy, dev.PendingMacState, up)
 						if err != nil {
 							log.FromContext(ctx).WithError(err).Error("Failed to compute RX1 parameters")
 						} else {
 							attemptRX1 = true
 							rx1Freq = freq
-							rx1DRIdx = drIdx
 							rx1DR = dr
 						}
 					}
@@ -1668,14 +1660,10 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 					}
 					if attemptRX1 {
 						req.Rx1Frequency = rx1Freq
-						// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478)
-						req.Rx1DataRateIndex = rx1DRIdx
 						req.Rx1DataRate = &rx1DR.Rate
 					}
 					if attemptRX2 {
 						req.Rx2Frequency = dev.PendingMacState.CurrentParameters.Rx2Frequency
-						// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478)
-						req.Rx2DataRateIndex = dev.PendingMacState.CurrentParameters.Rx2DataRateIndex
 						req.Rx2DataRate = &rx2DR.Rate
 					}
 					down, downEvs, err := ns.scheduleDownlinkByPaths(
