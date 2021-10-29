@@ -204,7 +204,7 @@ message APIKeys {
 }
 
 message Collaborator {
-  OrganizationOrUserIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  OrganizationOrUserIdentifiers ids = 1 [(validate.rules).message.required = true];
   repeated Right rights = 2 [(validate.rules).repeated.items.enum.defined_only = true];
   reserved 3; // reserved for future EntityIdentifiers entity = 3;
   reserved 4; // reserved for future State state = 4;
@@ -214,7 +214,7 @@ message Collaborator {
 }
 
 message GetCollaboratorResponse {
-  OrganizationOrUserIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  OrganizationOrUserIdentifiers ids = 1;
   repeated Right rights = 2;
   reserved 3; // reserved for future EntityIdentifiers entity = 3;
   reserved 4; // reserved for future State state = 4;

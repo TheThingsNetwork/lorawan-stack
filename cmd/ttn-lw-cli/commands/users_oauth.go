@@ -78,7 +78,7 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewOAuthAuthorizationRegistryClient(is).List(ctx, &ttnpb.ListOAuthClientAuthorizationsRequest{
-				UserIdentifiers: *usrID, Limit: limit, Page: page, Order: getOrder(cmd.Flags()),
+				UserIds: usrID, Limit: limit, Page: page, Order: getOrder(cmd.Flags()),
 			}, opt)
 			if err != nil {
 				return err

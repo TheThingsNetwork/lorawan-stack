@@ -51,7 +51,7 @@ message OAuthClientAuthorizations {
 }
 
 message ListOAuthClientAuthorizationsRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(validate.rules).message.required = true];
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
   string order = 2 [

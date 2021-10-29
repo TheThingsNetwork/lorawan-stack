@@ -253,7 +253,7 @@ var (
 				getTotal func() uint64
 			)
 			req.Limit, req.Page, opt, getTotal = withPagination(cmd.Flags())
-			req.ApplicationIdentifiers = *appID
+			req.ApplicationIds = appID
 			req.FieldMask = &pbtypes.FieldMask{Paths: paths}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)

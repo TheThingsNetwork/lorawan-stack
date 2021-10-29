@@ -132,8 +132,8 @@ var (
 			_, err = ttnpb.NewGatewayAccessClient(is).SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 				GatewayIds: gtwID,
 				Collaborator: &ttnpb.Collaborator{
-					OrganizationOrUserIdentifiers: *collaborator,
-					Rights:                        rights,
+					Ids:    collaborator,
+					Rights: rights,
 				},
 			})
 			if err != nil {
@@ -164,8 +164,8 @@ var (
 			_, err = ttnpb.NewGatewayAccessClient(is).SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
 				GatewayIds: gtwID,
 				Collaborator: &ttnpb.Collaborator{
-					OrganizationOrUserIdentifiers: *collaborator,
-					Rights:                        nil,
+					Ids:    collaborator,
+					Rights: nil,
 				},
 			})
 			if err != nil {

@@ -389,7 +389,14 @@ func (m *ListOAuthClientAuthorizationsRequest) ValidateFields(paths ...string) e
 		switch name {
 		case "user_ids":
 
-			if v, ok := interface{}(&m.UserIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetUserIds() == nil {
+				return ListOAuthClientAuthorizationsRequestValidationError{
+					field:  "user_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetUserIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ListOAuthClientAuthorizationsRequestValidationError{
 						field:  "user_ids",
