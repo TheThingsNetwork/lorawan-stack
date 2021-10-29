@@ -90,6 +90,9 @@ func (s *applicationStore) FindApplications(ctx context.Context, ids []*ttnpb.Ap
 		countTotal(ctx, query.Model(&Application{}))
 		query = query.Limit(limit).Offset(offset)
 	}
+	if onlyExpired, expireThreshold := expiredFromContext(ctx); onlyExpired {
+		query = query.Scopes(withExpiredEntities(expireThreshold))
+	}
 	var appModels []Application
 	query = query.Find(&appModels)
 	setTotal(ctx, uint64(len(appModels)))
@@ -173,7 +176,7 @@ func (s *applicationStore) PurgeApplication(ctx context.Context, id *ttnpb.Appli
 	}
 	// delete application attributes before purging
 	if len(appModel.Attributes) > 0 {
-		if err := s.replaceAttributes(ctx, "gateway", appModel.ID, appModel.Attributes, nil); err != nil {
+		if err := s.replaceAttributes(ctx, "application", appModel.ID, appModel.Attributes, nil); err != nil {
 			return err
 		}
 	}
