@@ -1051,12 +1051,11 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 							Settings: &ttnpb.DownlinkMessage_Request{
 								Request: func() *ttnpb.TxRequest {
 									txReq := &ttnpb.TxRequest{
-										Class:             conf.Class,
-										DownlinkPaths:     expectedAttempt.RequestPaths,
-										Priority:          conf.Priority,
-										FrequencyPlanId:   conf.FrequencyPlanID,
-										AbsoluteTime:      conf.AbsoluteTime,
-										LorawanPhyVersion: conf.PHYVersion,
+										Class:           conf.Class,
+										DownlinkPaths:   expectedAttempt.RequestPaths,
+										Priority:        conf.Priority,
+										FrequencyPlanId: conf.FrequencyPlanID,
+										AbsoluteTime:    conf.AbsoluteTime,
 									}
 									if conf.SetRX1 {
 										drIdx, _, _ := phy.FindUplinkDataRate(conf.Uplink.Settings.DataRate)
@@ -2171,8 +2170,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 									},
 								},
 							},
-							Rx2Frequency:      x.PendingMacState.CurrentParameters.Rx2Frequency,
-							LorawanPhyVersion: x.LorawanPhyVersion,
+							Rx2Frequency: x.PendingMacState.CurrentParameters.Rx2Frequency,
 							// TODO: Generate RX1 transmission parameters if necessary.
 							// https://github.com/TheThingsNetwork/lorawan-stack/issues/3142
 						},

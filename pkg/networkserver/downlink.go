@@ -1250,11 +1250,10 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	logger := log.FromContext(ctx)
 
 	req := &ttnpb.TxRequest{
-		Class:             ttnpb.CLASS_A,
-		Priority:          genDown.Priority,
-		FrequencyPlanId:   dev.FrequencyPlanId,
-		Rx1Delay:          ttnpb.RxDelay(slot.RxDelay / time.Second),
-		LorawanPhyVersion: dev.LorawanPhyVersion,
+		Class:           ttnpb.CLASS_A,
+		Priority:        genDown.Priority,
+		FrequencyPlanId: dev.FrequencyPlanId,
+		Rx1Delay:        ttnpb.RxDelay(slot.RxDelay / time.Second),
 	}
 	if attemptRX1 {
 		req.Rx1Frequency = rx1Freq
@@ -1424,13 +1423,12 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 	}
 
 	req := &ttnpb.TxRequest{
-		Class:             slot.Class,
-		Priority:          genDown.Priority,
-		FrequencyPlanId:   dev.FrequencyPlanId,
-		Rx2DataRate:       &dr.Rate,
-		Rx2Frequency:      freq,
-		AbsoluteTime:      absTime,
-		LorawanPhyVersion: dev.LorawanPhyVersion,
+		Class:           slot.Class,
+		Priority:        genDown.Priority,
+		FrequencyPlanId: dev.FrequencyPlanId,
+		Rx2DataRate:     &dr.Rate,
+		Rx2Frequency:    freq,
+		AbsoluteTime:    absTime,
 	}
 	down, queuedEvents, err := ns.scheduleDownlinkByPaths(
 		log.NewContext(ctx, loggerWithTxRequestFields(log.FromContext(ctx), req, false, true)),
@@ -1660,11 +1658,10 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 					}
 
 					req := &ttnpb.TxRequest{
-						Class:             ttnpb.CLASS_A,
-						Priority:          ns.downlinkPriorities.JoinAccept,
-						FrequencyPlanId:   dev.FrequencyPlanId,
-						Rx1Delay:          ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second),
-						LorawanPhyVersion: dev.LorawanPhyVersion,
+						Class:           ttnpb.CLASS_A,
+						Priority:        ns.downlinkPriorities.JoinAccept,
+						FrequencyPlanId: dev.FrequencyPlanId,
+						Rx1Delay:        ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second),
 					}
 					if attemptRX1 {
 						req.Rx1Frequency = rx1Freq
