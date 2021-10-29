@@ -264,11 +264,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 				fallbackFreqPlanID: conf.BasicStation.FallbackFrequencyPlanID,
 				listen:             conf.BasicStation.Listen,
 				listenTLS:          conf.BasicStation.ListenTLS,
-				frontend: ws.Config{
-					UseTrafficTLSAddress: conf.BasicStation.UseTrafficTLSAddress,
-					WSPingInterval:       conf.BasicStation.WSPingInterval,
-					AllowUnauthenticated: conf.BasicStation.AllowUnauthenticated,
-				},
+				frontend:           conf.BasicStation.Config,
 			},
 		},
 	} {

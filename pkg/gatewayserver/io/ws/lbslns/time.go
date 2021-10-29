@@ -18,6 +18,7 @@ import (
 	"math"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
 )
 
@@ -35,4 +36,10 @@ func TimeToUnixSeconds(t time.Time) float64 {
 // TimeToGPSTime contructs a GPS timestamp from the provided time.Time.
 func TimeToGPSTime(t time.Time) int64 {
 	return int64(gpstime.ToGPS(t) / time.Microsecond)
+}
+
+// ConcentratorTimeToXTime contructs the XTime associated with the provided
+// session ID and concentrator timestamp.
+func ConcentratorTimeToXTime(id int32, t scheduling.ConcentratorTime) int64 {
+	return int64(id)<<48 | (int64(t) / int64(time.Microsecond) & 0xFFFFFFFFFF)
 }

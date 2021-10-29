@@ -47,4 +47,6 @@ type Formatter interface {
 	HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIdentifiers, conn *io.Connection, receivedAt time.Time) ([]byte, error)
 	// FromDownlink generates a downlink byte stream that can be sent over the WS connection.
 	FromDownlink(ctx context.Context, uid string, down ttnpb.DownlinkMessage, bandID string, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error)
+	// TransferTime generates a spurious time transfer message for a particular server time.
+	TransferTime(ctx context.Context, t time.Time, conn *io.Connection) ([]byte, error)
 }

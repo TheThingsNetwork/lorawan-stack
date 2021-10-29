@@ -246,11 +246,18 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 		return nil
 	})
 
+	var timeSyncTickerC <-chan time.Time
+	if s.cfg.TimeSyncInterval > 0 {
+		ticker := time.NewTicker(s.cfg.TimeSyncInterval)
+		timeSyncTickerC = ticker.C
+		defer ticker.Stop()
+	}
+
 	go func() {
+		defer ws.Close()
 		for {
 			select {
 			case <-conn.Context().Done():
-				ws.Close()
 				return
 			case <-pingTicker.C:
 				wsWriteMu.Lock()
@@ -259,7 +266,25 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				if err != nil {
 					logger.WithError(err).Warn("Failed to send ping message")
 					conn.Disconnect(err)
-					ws.Close()
+					return
+				}
+			case <-timeSyncTickerC:
+				b, err := s.formatter.TransferTime(ctx, time.Now(), conn)
+				if err != nil {
+					logger.WithError(err).Warn("Failed to generate time transfer")
+					conn.Disconnect(err)
+					return
+				}
+				if b == nil {
+					continue
+				}
+
+				wsWriteMu.Lock()
+				err = ws.WriteMessage(websocket.TextMessage, b)
+				wsWriteMu.Unlock()
+				if err != nil {
+					logger.WithError(err).Warn("Failed to transfer time")
+					conn.Disconnect(err)
 					return
 				}
 			case down := <-conn.Down():
