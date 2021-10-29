@@ -1088,11 +1088,6 @@ func (x *TxRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("frequency_plan_id")
 		s.WriteString(x.FrequencyPlanId)
 	}
-	if x.LorawanPhyVersion != 0 || s.HasField("lorawan_phy_version") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("lorawan_phy_version")
-		x.LorawanPhyVersion.MarshalProtoJSON(s)
-	}
 	if x.Advanced != nil || s.HasField("advanced") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("advanced")
@@ -1159,9 +1154,6 @@ func (x *TxRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		case "frequency_plan_id", "frequencyPlanId":
 			s.AddField("frequency_plan_id")
 			x.FrequencyPlanId = s.ReadString()
-		case "lorawan_phy_version", "lorawanPhyVersion":
-			s.AddField("lorawan_phy_version")
-			x.LorawanPhyVersion.UnmarshalProtoJSON(s)
 		case "advanced":
 			s.AddField("advanced")
 			v := gogo.UnmarshalStruct(s)
