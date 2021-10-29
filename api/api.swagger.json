@@ -17483,10 +17483,6 @@
           "$ref": "#/definitions/v3DataRate",
           "description": "LoRaWAN data rate for Rx1."
         },
-        "rx1_data_rate_index": {
-          "$ref": "#/definitions/v3DataRateIndex",
-          "description": "LoRaWAN data rate index for Rx1.\nDEPRECATED: Use rx1_data_rate instead."
-        },
         "rx1_frequency": {
           "type": "string",
           "format": "uint64",
@@ -17495,10 +17491,6 @@
         "rx2_data_rate": {
           "$ref": "#/definitions/v3DataRate",
           "description": "LoRaWAN data rate for Rx2."
-        },
-        "rx2_data_rate_index": {
-          "$ref": "#/definitions/v3DataRateIndex",
-          "description": "LoRaWAN data rate index for Rx2.\nDEPRECATED: Use rx2_data_rate instead."
         },
         "rx2_frequency": {
           "type": "string",
@@ -17548,10 +17540,6 @@
         "data_rate": {
           "$ref": "#/definitions/v3DataRate",
           "description": "Data rate."
-        },
-        "data_rate_index": {
-          "$ref": "#/definitions/v3DataRateIndex",
-          "description": "LoRaWAN data rate index."
         },
         "coding_rate": {
           "type": "string",

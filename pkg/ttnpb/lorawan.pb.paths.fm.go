@@ -249,7 +249,6 @@ var TxSettingsFieldPathsNested = []string{
 	"data_rate.modulation.lrfhss.coding_rate",
 	"data_rate.modulation.lrfhss.modulation_type",
 	"data_rate.modulation.lrfhss.operating_channel_width",
-	"data_rate_index",
 	"downlink",
 	"downlink.antenna_index",
 	"downlink.invert_polarization",
@@ -263,7 +262,6 @@ var TxSettingsFieldPathsNested = []string{
 var TxSettingsFieldPathsTopLevel = []string{
 	"coding_rate",
 	"data_rate",
-	"data_rate_index",
 	"downlink",
 	"enable_crc",
 	"frequency",
@@ -330,7 +328,6 @@ var TxRequestFieldPathsNested = []string{
 	"rx1_data_rate.modulation.lrfhss.coding_rate",
 	"rx1_data_rate.modulation.lrfhss.modulation_type",
 	"rx1_data_rate.modulation.lrfhss.operating_channel_width",
-	"rx1_data_rate_index",
 	"rx1_delay",
 	"rx1_frequency",
 	"rx2_data_rate",
@@ -344,7 +341,6 @@ var TxRequestFieldPathsNested = []string{
 	"rx2_data_rate.modulation.lrfhss.coding_rate",
 	"rx2_data_rate.modulation.lrfhss.modulation_type",
 	"rx2_data_rate.modulation.lrfhss.operating_channel_width",
-	"rx2_data_rate_index",
 	"rx2_frequency",
 }
 
@@ -357,11 +353,9 @@ var TxRequestFieldPathsTopLevel = []string{
 	"lorawan_phy_version",
 	"priority",
 	"rx1_data_rate",
-	"rx1_data_rate_index",
 	"rx1_delay",
 	"rx1_frequency",
 	"rx2_data_rate",
-	"rx2_data_rate_index",
 	"rx2_frequency",
 }
 var MACCommandFieldPathsNested = []string{

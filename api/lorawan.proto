@@ -305,8 +305,7 @@ message TxSettings {
 
   // Data rate.
   DataRate data_rate = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
-  // LoRaWAN data rate index.
-  DataRateIndex data_rate_index = 2 [(validate.rules).enum.defined_only = true];
+  reserved 2; // data_rate_index
   // LoRa coding rate.
   string coding_rate = 3;
   // Frequency (Hz).
@@ -363,16 +362,12 @@ message TxRequest {
   RxDelay rx1_delay = 3 [(validate.rules).enum.defined_only = true];
   // LoRaWAN data rate for Rx1.
   DataRate rx1_data_rate = 12;
-  // LoRaWAN data rate index for Rx1.
-  // DEPRECATED: Use rx1_data_rate instead.
-  DataRateIndex rx1_data_rate_index = 4 [(validate.rules).enum.defined_only = true];
+  reserved 4; // rx1_data_rate_index
   // Frequency (Hz) for Rx1.
   uint64 rx1_frequency = 5;
   // LoRaWAN data rate for Rx2.
   DataRate rx2_data_rate = 13;
-  // LoRaWAN data rate index for Rx2.
-  // DEPRECATED: Use rx2_data_rate instead.
-  DataRateIndex rx2_data_rate_index = 6 [(validate.rules).enum.defined_only = true];
+  reserved 6; // rx2_data_rate_index
   // Frequency (Hz) for Rx2.
   uint64 rx2_frequency = 7;
   // Priority for scheduling.

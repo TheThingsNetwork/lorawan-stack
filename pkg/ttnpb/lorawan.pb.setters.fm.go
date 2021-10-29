@@ -946,16 +946,6 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 					dst.DataRate = zero
 				}
 			}
-		case "data_rate_index":
-			if len(subs) > 0 {
-				return fmt.Errorf("'data_rate_index' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.DataRateIndex = src.DataRateIndex
-			} else {
-				var zero DataRateIndex
-				dst.DataRateIndex = zero
-			}
 		case "coding_rate":
 			if len(subs) > 0 {
 				return fmt.Errorf("'coding_rate' has no subfields, but %s were specified", subs)
@@ -1275,16 +1265,6 @@ func (dst *TxRequest) SetFields(src *TxRequest, paths ...string) error {
 					dst.Rx1DataRate = nil
 				}
 			}
-		case "rx1_data_rate_index":
-			if len(subs) > 0 {
-				return fmt.Errorf("'rx1_data_rate_index' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Rx1DataRateIndex = src.Rx1DataRateIndex
-			} else {
-				var zero DataRateIndex
-				dst.Rx1DataRateIndex = zero
-			}
 		case "rx1_frequency":
 			if len(subs) > 0 {
 				return fmt.Errorf("'rx1_frequency' has no subfields, but %s were specified", subs)
@@ -1319,16 +1299,6 @@ func (dst *TxRequest) SetFields(src *TxRequest, paths ...string) error {
 				} else {
 					dst.Rx2DataRate = nil
 				}
-			}
-		case "rx2_data_rate_index":
-			if len(subs) > 0 {
-				return fmt.Errorf("'rx2_data_rate_index' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Rx2DataRateIndex = src.Rx2DataRateIndex
-			} else {
-				var zero DataRateIndex
-				dst.Rx2DataRateIndex = zero
 			}
 		case "rx2_frequency":
 			if len(subs) > 0 {

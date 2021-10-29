@@ -27164,26 +27164,6 @@
               "defaultValue": ""
             },
             {
-              "name": "rx1_data_rate_index",
-              "description": "LoRaWAN data rate index for Rx1.\nDEPRECATED: Use rx1_data_rate instead.",
-              "label": "",
-              "type": "DataRateIndex",
-              "longType": "DataRateIndex",
-              "fullType": "ttn.lorawan.v3.DataRateIndex",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
               "name": "rx1_frequency",
               "description": "Frequency (Hz) for Rx1.",
               "label": "",
@@ -27206,26 +27186,6 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
-            },
-            {
-              "name": "rx2_data_rate_index",
-              "description": "LoRaWAN data rate index for Rx2.\nDEPRECATED: Use rx2_data_rate instead.",
-              "label": "",
-              "type": "DataRateIndex",
-              "longType": "DataRateIndex",
-              "fullType": "ttn.lorawan.v3.DataRateIndex",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
-                    "value": true
-                  }
-                ]
-              }
             },
             {
               "name": "rx2_frequency",
@@ -27350,26 +27310,6 @@
                 "validate.rules": [
                   {
                     "name": "message.required",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
-              "name": "data_rate_index",
-              "description": "LoRaWAN data rate index.",
-              "label": "",
-              "type": "DataRateIndex",
-              "longType": "DataRateIndex",
-              "fullType": "ttn.lorawan.v3.DataRateIndex",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
                     "value": true
                   }
                 ]

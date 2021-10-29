@@ -1017,110 +1017,6 @@ func (x *CFList) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
-// MarshalProtoJSON marshals the TxSettings message to JSON.
-func (x *TxSettings) MarshalProtoJSON(s *jsonplugin.MarshalState) {
-	if x == nil {
-		s.WriteNil()
-		return
-	}
-	s.WriteObjectStart()
-	var wroteField bool
-	if true { // (gogoproto.nullable) = false
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("data_rate")
-		// NOTE: DataRate does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.DataRate)
-	}
-	if x.DataRateIndex != 0 || s.HasField("data_rate_index") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("data_rate_index")
-		x.DataRateIndex.MarshalProtoJSON(s)
-	}
-	if x.CodingRate != "" || s.HasField("coding_rate") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("coding_rate")
-		s.WriteString(x.CodingRate)
-	}
-	if x.Frequency != 0 || s.HasField("frequency") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("frequency")
-		s.WriteUint64(x.Frequency)
-	}
-	if x.EnableCrc || s.HasField("enable_crc") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("enable_crc")
-		s.WriteBool(x.EnableCrc)
-	}
-	if x.Timestamp != 0 || s.HasField("timestamp") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("timestamp")
-		s.WriteUint32(x.Timestamp)
-	}
-	if x.Time != nil || s.HasField("time") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("time")
-		if x.Time == nil {
-			s.WriteNil()
-		} else {
-			s.WriteTime(*x.Time)
-		}
-	}
-	if x.Downlink != nil || s.HasField("downlink") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("downlink")
-		// NOTE: TxSettings_Downlink does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, x.Downlink)
-	}
-	s.WriteObjectEnd()
-}
-
-// UnmarshalProtoJSON unmarshals the TxSettings message from JSON.
-func (x *TxSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
-	if s.ReadNil() {
-		return
-	}
-	s.ReadObject(func(key string) {
-		switch key {
-		default:
-			s.ReadAny() // ignore unknown field
-		case "data_rate", "dataRate":
-			s.AddField("data_rate")
-			// NOTE: DataRate does not seem to implement UnmarshalProtoJSON.
-			var v DataRate
-			gogo.UnmarshalMessage(s, &v)
-			x.DataRate = v
-		case "data_rate_index", "dataRateIndex":
-			s.AddField("data_rate_index")
-			x.DataRateIndex.UnmarshalProtoJSON(s)
-		case "coding_rate", "codingRate":
-			s.AddField("coding_rate")
-			x.CodingRate = s.ReadString()
-		case "frequency":
-			s.AddField("frequency")
-			x.Frequency = s.ReadUint64()
-		case "enable_crc", "enableCrc":
-			s.AddField("enable_crc")
-			x.EnableCrc = s.ReadBool()
-		case "timestamp":
-			s.AddField("timestamp")
-			x.Timestamp = s.ReadUint32()
-		case "time":
-			s.AddField("time")
-			v := s.ReadTime()
-			if s.Err() != nil {
-				return
-			}
-			x.Time = v
-		case "downlink":
-			s.AddField("downlink")
-			// NOTE: TxSettings_Downlink does not seem to implement UnmarshalProtoJSON.
-			var v TxSettings_Downlink
-			gogo.UnmarshalMessage(s, &v)
-			x.Downlink = &v
-		}
-	})
-}
-
 // MarshalProtoJSON marshals the TxRequest message to JSON.
 func (x *TxRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -1157,11 +1053,6 @@ func (x *TxRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		// NOTE: DataRate does not seem to implement MarshalProtoJSON.
 		gogo.MarshalMessage(s, x.Rx1DataRate)
 	}
-	if x.Rx1DataRateIndex != 0 || s.HasField("rx1_data_rate_index") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("rx1_data_rate_index")
-		x.Rx1DataRateIndex.MarshalProtoJSON(s)
-	}
 	if x.Rx1Frequency != 0 || s.HasField("rx1_frequency") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("rx1_frequency")
@@ -1172,11 +1063,6 @@ func (x *TxRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("rx2_data_rate")
 		// NOTE: DataRate does not seem to implement MarshalProtoJSON.
 		gogo.MarshalMessage(s, x.Rx2DataRate)
-	}
-	if x.Rx2DataRateIndex != 0 || s.HasField("rx2_data_rate_index") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("rx2_data_rate_index")
-		x.Rx2DataRateIndex.MarshalProtoJSON(s)
 	}
 	if x.Rx2Frequency != 0 || s.HasField("rx2_frequency") {
 		s.WriteMoreIf(&wroteField)
@@ -1248,9 +1134,6 @@ func (x *TxRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			var v DataRate
 			gogo.UnmarshalMessage(s, &v)
 			x.Rx1DataRate = &v
-		case "rx1_data_rate_index", "rx1DataRateIndex":
-			s.AddField("rx1_data_rate_index")
-			x.Rx1DataRateIndex.UnmarshalProtoJSON(s)
 		case "rx1_frequency", "rx1Frequency":
 			s.AddField("rx1_frequency")
 			x.Rx1Frequency = s.ReadUint64()
@@ -1260,9 +1143,6 @@ func (x *TxRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			var v DataRate
 			gogo.UnmarshalMessage(s, &v)
 			x.Rx2DataRate = &v
-		case "rx2_data_rate_index", "rx2DataRateIndex":
-			s.AddField("rx2_data_rate_index")
-			x.Rx2DataRateIndex.UnmarshalProtoJSON(s)
 		case "rx2_frequency", "rx2Frequency":
 			s.AddField("rx2_frequency")
 			x.Rx2Frequency = s.ReadUint64()
