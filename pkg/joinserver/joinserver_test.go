@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
+	"go.thethings.network/lorawan-stack/v3/pkg/joinserver"
 	. "go.thethings.network/lorawan-stack/v3/pkg/joinserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/joinserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -2930,4 +2931,137 @@ func TestGetHomeNetID(t *testing.T) {
 			},
 		})
 	}
+}
+
+func TestJoinServerCleanup(t *testing.T) {
+	a, ctx := test.New(t)
+
+	appList := []ttnpb.ApplicationIdentifiers{
+		{ApplicationId: "app-1"},
+		{ApplicationId: "app-2"},
+		{ApplicationId: "app-3"},
+		{ApplicationId: "app-4"},
+	}
+
+	deviceList := []*ttnpb.EndDevice{
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appList[0],
+				DeviceId:               "dev-1",
+				JoinEui:                eui64Ptr(types.EUI64{0x41, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x41, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appList[0],
+				DeviceId:               "dev-2",
+				JoinEui:                eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appList[1],
+				DeviceId:               "dev-3",
+				JoinEui:                eui64Ptr(types.EUI64{0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appList[3],
+				DeviceId:               "dev-4",
+				JoinEui:                eui64Ptr(types.EUI64{0x44, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x44, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appList[3],
+				DeviceId:               "dev-5",
+				JoinEui:                eui64Ptr(types.EUI64{0x45, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x45, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appList[3],
+				DeviceId:               "dev-6",
+				JoinEui:                eui64Ptr(types.EUI64{0x46, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x46, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+	}
+
+	deviceRedisClient, devsFlush := test.NewRedis(ctx, "joinserver_test", "devices")
+	defer devsFlush()
+	defer deviceRedisClient.Close()
+	deviceRegistry := &redis.DeviceRegistry{Redis: deviceRedisClient, LockTTL: test.Delay << 10}
+	if err := deviceRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	appAsRedisClient, appAsFlush := test.NewRedis(ctx, "joinserver_test", "application-activation-settings")
+	defer appAsFlush()
+	defer appAsRedisClient.Close()
+	appAsRegistry := &redis.ApplicationActivationSettingRegistry{Redis: appAsRedisClient, LockTTL: test.Delay << 10}
+	if err := appAsRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	for _, dev := range deviceList {
+		ret, err := deviceRegistry.SetByID(ctx, dev.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceId, []string{
+			"ids.application_ids",
+			"ids.dev_eui",
+			"ids.device_id",
+			"ids.join_eui"}, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			return dev, []string{
+				"ids.application_ids",
+				"ids.dev_eui",
+				"ids.device_id",
+				"ids.join_eui"}, nil
+		})
+		if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
+			t.Fatalf("Failed to create device: %s", err)
+		}
+	}
+	for _, app := range appList {
+		ret, err := appAsRegistry.SetByID(ctx, app, []string{"application_server_id"}, func(stored *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
+			return &ttnpb.ApplicationActivationSettings{
+				ApplicationServerId: "test",
+			}, []string{"application_server_id"}, nil
+		})
+		if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
+			t.Fatalf("Failed to create application activation settings entry: %s", err)
+		}
+	}
+	// Mock IS application and device sets
+	isApplicationSet := map[string]struct{}{
+		unique.ID(ctx, appList[2]): {},
+		unique.ID(ctx, appList[3]): {},
+	}
+	isDeviceSet := map[string]struct{}{
+		unique.ID(ctx, deviceList[4].EndDeviceIdentifiers): {},
+		unique.ID(ctx, deviceList[5].EndDeviceIdentifiers): {},
+	}
+	joinServerCleaner := &joinserver.RegistryCleaner{
+		DevRegistry:   deviceRegistry,
+		AppAsRegistry: appAsRegistry,
+	}
+	err := joinServerCleaner.RangeToLocalSet(ctx)
+	a.So(err, should.BeNil)
+	a.So(joinServerCleaner.LocalDeviceSet, should.HaveLength, 6)
+	a.So(joinServerCleaner.LocalApplicationSet, should.HaveLength, 4)
+
+	err = joinServerCleaner.CleanData(ctx, isDeviceSet, isApplicationSet)
+	a.So(err, should.BeNil)
+	joinServerCleaner.RangeToLocalSet(ctx)
+	a.So(joinServerCleaner.LocalApplicationSet, should.HaveLength, 2)
+	a.So(joinServerCleaner.LocalApplicationSet, should.ContainKey, unique.ID(ctx, appList[2]))
+	a.So(joinServerCleaner.LocalApplicationSet, should.ContainKey, unique.ID(ctx, appList[3]))
+
+	a.So(joinServerCleaner.LocalDeviceSet, should.HaveLength, 2)
+	a.So(joinServerCleaner.LocalDeviceSet, should.ContainKey, unique.ID(ctx, deviceList[4].EndDeviceIdentifiers))
+	a.So(joinServerCleaner.LocalDeviceSet, should.ContainKey, unique.ID(ctx, deviceList[5].EndDeviceIdentifiers))
 }

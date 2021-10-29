@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"regexp"
 	"runtime/trace"
 	"time"
 
@@ -386,6 +387,30 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	return pb.EndDevice, nil
 }
 
+func (r *DeviceRegistry) RangeByID(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
+	deviceEntityRegex, err := ttnredis.EntityRegex((r.uidKey(unique.GenericID(ctx, "*"))))
+	if err != nil {
+		return err
+	}
+	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.uidKey(unique.GenericID(ctx, "*")), 1, func(key string) (bool, error) {
+		if !deviceEntityRegex.MatchString(key) {
+			return true, nil
+		}
+		dev := &ttnpb.EndDevice{}
+		if err := ttnredis.GetProto(ctx, r.Redis, key).ScanProto(dev); err != nil {
+			return false, err
+		}
+		dev, err := ttnpb.FilterGetEndDevice(dev, paths...)
+		if err != nil {
+			return false, err
+		}
+		if !f(ctx, dev.EndDeviceIdentifiers, dev) {
+			return false, nil
+		}
+		return true, nil
+	})
+}
+
 // KeyRegistry is an implementation of joinserver.KeyRegistry.
 type KeyRegistry struct {
 	Redis   *ttnredis.Client
@@ -683,4 +708,40 @@ func (r *ApplicationActivationSettingRegistry) SetByID(ctx context.Context, appI
 		return nil, ttnredis.ConvertError(err)
 	}
 	return pb, nil
+}
+
+var uniqueIDPattern = regexp.MustCompile("(.*)\\:(.*)")
+
+func (r *ApplicationActivationSettingRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationActivationSettings) bool) error {
+	appKeyRegex, err := ttnredis.EntityRegex((r.uidKey(unique.GenericID(ctx, "*"))))
+	if err != nil {
+		return err
+	}
+	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.uidKey(unique.GenericID(ctx, "*")), 1, func(key string) (bool, error) {
+		if !appKeyRegex.MatchString(key) {
+			return true, nil
+		}
+		matches := uniqueIDPattern.FindStringSubmatch(key)
+		appUID := matches[len(matches)-1]
+		applicationId, err := unique.ToApplicationID(appUID)
+		if err != nil {
+			return false, err
+		}
+		ctx, err := unique.WithContext(ctx, appUID)
+		if err != nil {
+			return false, err
+		}
+		appAs := &ttnpb.ApplicationActivationSettings{}
+		if err := ttnredis.GetProto(ctx, r.Redis, key).ScanProto(appAs); err != nil {
+			return false, err
+		}
+		appAs, err = applyApplicationActivationSettingsFieldMask(nil, appAs, paths...)
+		if err != nil {
+			return false, err
+		}
+		if !f(ctx, applicationId, appAs) {
+			return false, nil
+		}
+		return true, nil
+	})
 }

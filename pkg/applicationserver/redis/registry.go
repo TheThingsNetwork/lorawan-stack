@@ -16,9 +16,7 @@ package redis
 
 import (
 	"context"
-	"regexp"
 	"runtime/trace"
-	"strings"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -56,13 +54,6 @@ func (r *DeviceRegistry) uidKey(uid string) string {
 
 func (r *DeviceRegistry) euiKey(joinEUI, devEUI types.EUI64) string {
 	return r.Redis.Key("eui", devEUI.String(), joinEUI.String())
-}
-
-func deviceRegex(key string) (*regexp.Regexp, error) {
-	keyRegex := strings.ReplaceAll(key, ":", "\\:")
-	keyRegex = strings.ReplaceAll(keyRegex, "*", ".[^\\:]*")
-	keyRegex = keyRegex + "$"
-	return regexp.Compile(keyRegex)
 }
 
 // Get returns the end device by its identifiers.
@@ -251,7 +242,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 
 // Range ranges over the end devices and calls the callback function, until false is returned.
 func (r *DeviceRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
-	deviceEntityRegex, err := deviceRegex(r.uidKey(unique.GenericID(ctx, "*")))
+	deviceEntityRegex, err := ttnredis.EntityRegex((r.uidKey(unique.GenericID(ctx, "*"))))
 	if err != nil {
 		return err
 	}

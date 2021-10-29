@@ -2426,3 +2426,8 @@ func (m MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.Application
 func (m MockDeviceRegistry) RangeByUplinkMatches(context.Context, *ttnpb.UplinkMessage, time.Duration, func(context.Context, *UplinkMatch) (bool, error)) error {
 	panic("RangeByUplinkMatches must not be called")
 }
+
+// Range panics.
+func (m MockDeviceRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
+	panic("Range must not be called")
+}
