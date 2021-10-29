@@ -4121,36 +4121,9 @@
       "file": "grpc.go"
     }
   },
-  "error:pkg/gatewayserver/io/mqtt:data_rate": {
-    "translations": {
-      "en": "unknown data rate `{data_rate}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/mqtt",
-      "file": "format_protobufv2.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/mqtt:frequency_plan": {
-    "translations": {
-      "en": "unknown frequency plan `{frequency_plan}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/mqtt",
-      "file": "format_protobufv2.go"
-    }
-  },
   "error:pkg/gatewayserver/io/mqtt:lorawan_metadata": {
     "translations": {
       "en": "missing LoRaWAN metadata"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/mqtt",
-      "file": "format_protobufv2.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/mqtt:lorawan_payload": {
-    "translations": {
-      "en": "invalid LoRaWAN payload"
     },
     "description": {
       "package": "pkg/gatewayserver/io/mqtt",
@@ -4274,6 +4247,15 @@
       "file": "firewall_ratelimit.go"
     }
   },
+  "error:pkg/gatewayserver/io/ws/lbslns:data_rate": {
+    "translations": {
+      "en": "invalid data rate"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ws/lbslns",
+      "file": "upstream.go"
+    }
+  },
   "error:pkg/gatewayserver/io/ws/lbslns:empty_gateway_eui": {
     "translations": {
       "en": "empty gateway EUI"
@@ -4310,7 +4292,7 @@
       "file": "format.go"
     }
   },
-  "error:pkg/gatewayserver/io/ws/lbslns:uplink_data_Frame": {
+  "error:pkg/gatewayserver/io/ws/lbslns:uplink_data_frame": {
     "translations": {
       "en": "invalid uplink data frame received"
     },
@@ -4326,33 +4308,6 @@
     "description": {
       "package": "pkg/gatewayserver/io/ws/lbslns",
       "file": "upstream.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/ws/util:data_rate": {
-    "translations": {
-      "en": "data rate not found"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/ws/util",
-      "file": "util.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/ws/util:data_rate_index": {
-    "translations": {
-      "en": "data rate index is out of range"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/ws/util",
-      "file": "util.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/ws/util:uid": {
-    "translations": {
-      "en": "invalid uid `{uid}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/ws/util",
-      "file": "util.go"
     }
   },
   "error:pkg/gatewayserver/io/ws:invalid_gateway_id": {
@@ -4376,15 +4331,6 @@
   "error:pkg/gatewayserver/io:buffer_full": {
     "translations": {
       "en": "buffer is full"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io",
-      "file": "io.go"
-    }
-  },
-  "error:pkg/gatewayserver/io:data_rate_index": {
-    "translations": {
-      "en": "no data rate with index `{index}`"
     },
     "description": {
       "package": "pkg/gatewayserver/io",
@@ -4519,7 +4465,7 @@
   },
   "error:pkg/gatewayserver/io:too_long": {
     "translations": {
-      "en": "the payload length `{payload_length}` exceeds maximum `{maximum_length}` at data rate index `{data_rate_index}`"
+      "en": "the payload length `{payload_length}` exceeds maximum `{maximum_length}` at data rate `{data_rate}`"
     },
     "description": {
       "package": "pkg/gatewayserver/io",
@@ -7424,15 +7370,6 @@
       "file": "agent.go"
     }
   },
-  "error:pkg/packetbrokeragent:data_rate_not_found": {
-    "translations": {
-      "en": "no data rate with index `{index}`"
-    },
-    "description": {
-      "package": "pkg/packetbrokeragent",
-      "file": "translation.go"
-    }
-  },
   "error:pkg/packetbrokeragent:decode_payload": {
     "translations": {
       "en": "decode LoRaWAN payload"
@@ -7613,27 +7550,9 @@
       "file": "translation.go"
     }
   },
-  "error:pkg/packetbrokeragent:unknown_phy_version": {
-    "translations": {
-      "en": "unknown LoRaWAN Regional Parameters version `{version}`"
-    },
-    "description": {
-      "package": "pkg/packetbrokeragent",
-      "file": "translation.go"
-    }
-  },
   "error:pkg/packetbrokeragent:unknown_priority": {
     "translations": {
       "en": "unknown priority `{priority}`"
-    },
-    "description": {
-      "package": "pkg/packetbrokeragent",
-      "file": "translation.go"
-    }
-  },
-  "error:pkg/packetbrokeragent:unknown_region": {
-    "translations": {
-      "en": "unknown region `{region}`"
     },
     "description": {
       "package": "pkg/packetbrokeragent",
