@@ -35,31 +35,6 @@ const (
 	useTLVEncodingField = "use_tlv_encoding"
 )
 
-func (d *packageData) toStruct() *types.Struct {
-	var st types.Struct
-	st.Fields = make(map[string]*types.Value)
-	st.Fields[tokenField] = &types.Value{
-		Kind: &types.Value_StringValue{
-			StringValue: d.token,
-		},
-	}
-	if d.serverURL != nil {
-		st.Fields[serverURLField] = &types.Value{
-			Kind: &types.Value_StringValue{
-				StringValue: d.serverURL.String(),
-			},
-		}
-	}
-	if d.useTLVEncoding != nil {
-		st.Fields[useTLVEncodingField] = &types.Value{
-			Kind: &types.Value_BoolValue{
-				BoolValue: *d.useTLVEncoding,
-			},
-		}
-	}
-	return &st
-}
-
 func (d *packageData) GetUseTLVEncoding() bool {
 	if d == nil || d.useTLVEncoding == nil {
 		return false
