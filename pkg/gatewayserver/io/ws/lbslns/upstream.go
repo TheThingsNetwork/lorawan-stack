@@ -15,6 +15,7 @@
 package lbslns
 
 import (
+	"bytes"
 	"context"
 	"encoding/binary"
 	"encoding/hex"
@@ -22,12 +23,12 @@ import (
 	"math"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -36,9 +37,10 @@ import (
 
 var (
 	errJoinRequestMessage = errors.Define("join_request_message", "invalid join-request message received")
-	errUplinkDataFrame    = errors.Define("uplink_data_Frame", "invalid uplink data frame received")
+	errUplinkDataFrame    = errors.Define("uplink_data_frame", "invalid uplink data frame received")
 	errUplinkMessage      = errors.Define("uplink_message", "invalid uplink message received")
 	errMDHR               = errors.Define("mhdr", "invalid MHDR `{mhdr}` received")
+	errDataRate           = errors.Define("data_rate", "invalid data rate")
 )
 
 // UpInfo provides additional metadata on each upstream message.
@@ -130,6 +132,15 @@ func (conf TxConfirmation) MarshalJSON() ([]byte, error) {
 	})
 }
 
+func getInt32AsByteSlice(value int32) ([]byte, error) {
+	b := &bytes.Buffer{}
+	err := binary.Write(b, binary.LittleEndian, value)
+	if err != nil {
+		return nil, err
+	}
+	return b.Bytes(), nil
+}
+
 // toUplinkMessage extracts fields from the Basics Station Join Request "jreq" message and converts them into an UplinkMessage for the network server.
 func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
 	var up ttnpb.UplinkMessage
@@ -140,7 +151,7 @@ func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 		return nil, errMDHR.WithAttributes(`mhdr`, parsedMHDR)
 	}
 
-	micBytes, err := util.GetInt32AsByteSlice(req.MIC)
+	micBytes, err := getInt32AsByteSlice(req.MIC)
 	if err != nil {
 		return nil, errJoinRequestMessage.WithCause(err)
 	}
@@ -179,14 +190,25 @@ func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 	}
 	up.RxMetadata = append(up.RxMetadata, rxMetadata)
 
-	dataRate, codingRate, err := util.GetDataRateFromIndex(bandID, req.RadioMetaData.DataRate)
+	phy, err := band.GetLatest(bandID)
 	if err != nil {
-		return nil, errJoinRequestMessage.WithCause(err)
+		return nil, err
 	}
-
+	bandDR, ok := phy.DataRates[ttnpb.DataRateIndex(req.RadioMetaData.DataRate)]
+	if !ok {
+		return nil, errDataRate.New()
+	}
+	var codingRate string
+	switch mod := bandDR.Rate.Modulation.(type) {
+	case *ttnpb.DataRate_Lora:
+		// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466).
+		codingRate = phy.LoRaCodingRate
+	case *ttnpb.DataRate_Lrfhss:
+		codingRate = mod.Lrfhss.CodingRate
+	}
 	up.Settings = ttnpb.TxSettings{
 		Frequency:  req.RadioMetaData.Frequency,
-		DataRate:   dataRate,
+		DataRate:   bandDR.Rate,
 		CodingRate: codingRate,
 		Timestamp:  timestamp,
 		Time:       rxTime,
@@ -223,9 +245,13 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 	}
 	req.DevNonce = uint(binary.BigEndian.Uint16(devNonce[:]))
 
-	dr, err := util.GetDataRateIndexFromDataRate(bandID, up.Settings.GetDataRate())
+	phy, err := band.GetLatest(bandID)
 	if err != nil {
 		return err
+	}
+	drIdx, _, ok := phy.FindUplinkDataRate(up.Settings.GetDataRate())
+	if !ok {
+		return errDataRate.New()
 	}
 
 	rxMetadata := up.RxMetadata[0]
@@ -236,7 +262,7 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 	}
 
 	req.RadioMetaData = RadioMetaData{
-		DataRate:  dr,
+		DataRate:  int(drIdx),
 		Frequency: up.Settings.GetFrequency(),
 		UpInfo: UpInfo{
 			RCtx:   int64(rxMetadata.AntennaIndex),
@@ -262,7 +288,7 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 		return nil, errMDHR.WithAttributes(`mhdr`, parsedMHDR)
 	}
 
-	micBytes, err := util.GetInt32AsByteSlice(updf.MIC)
+	micBytes, err := getInt32AsByteSlice(updf.MIC)
 	if err != nil {
 		return nil, errUplinkDataFrame.WithCause(err)
 	}
@@ -332,19 +358,47 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 	}
 	up.RxMetadata = append(up.RxMetadata, rxMetadata)
 
-	dataRate, codingRate, err := util.GetDataRateFromIndex(bandID, updf.RadioMetaData.DataRate)
+	phy, err := band.GetLatest(bandID)
 	if err != nil {
-		return nil, errUplinkDataFrame.WithCause(err)
+		return nil, err
 	}
-
+	bandDR, ok := phy.DataRates[ttnpb.DataRateIndex(updf.RadioMetaData.DataRate)]
+	if !ok {
+		return nil, errDataRate.New()
+	}
+	var codingRate string
+	switch mod := bandDR.Rate.Modulation.(type) {
+	case *ttnpb.DataRate_Lora:
+		// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466).
+		codingRate = phy.LoRaCodingRate
+	case *ttnpb.DataRate_Lrfhss:
+		codingRate = mod.Lrfhss.CodingRate
+	}
 	up.Settings = ttnpb.TxSettings{
 		Frequency:  updf.RadioMetaData.Frequency,
-		DataRate:   dataRate,
+		DataRate:   bandDR.Rate,
 		CodingRate: codingRate,
 		Timestamp:  timestamp,
 		Time:       rxTime,
 	}
 	return &up, nil
+}
+
+func getFCtrlAsUint(fCtrl ttnpb.FCtrl) uint {
+	var ret uint
+	if fCtrl.GetAdr() {
+		ret = ret | 0x80
+	}
+	if fCtrl.GetAdrAckReq() {
+		ret = ret | 0x40
+	}
+	if fCtrl.GetAck() {
+		ret = ret | 0x20
+	}
+	if fCtrl.GetFPending() || fCtrl.GetClassB() {
+		ret = ret | 0x10
+	}
+	return ret
 }
 
 // FromUplinkMessage extracts fields from ttnpb.UplinkMessage and creates the LoRa Basics Station UplinkDataFrame.
@@ -366,14 +420,18 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 	updf.DevAddr = int32(macPayload.DevAddr.MarshalNumber())
 	updf.FOpts = hex.EncodeToString(macPayload.GetFOpts())
 
-	updf.FCtrl = util.GetFCtrlAsUint(macPayload.FCtrl)
+	updf.FCtrl = getFCtrlAsUint(macPayload.FCtrl)
 	updf.FCnt = uint(macPayload.GetFCnt())
 	updf.FRMPayload = hex.EncodeToString(macPayload.GetFrmPayload())
 	updf.MIC = int32(binary.LittleEndian.Uint32(payload.Mic[:]))
 
-	dr, err := util.GetDataRateIndexFromDataRate(bandID, up.Settings.GetDataRate())
+	phy, err := band.GetLatest(bandID)
 	if err != nil {
 		return err
+	}
+	drIdx, _, ok := phy.FindUplinkDataRate(up.Settings.GetDataRate())
+	if !ok {
+		return errDataRate.New()
 	}
 
 	rxMetadata := up.RxMetadata[0]
@@ -384,7 +442,7 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 	}
 
 	updf.RadioMetaData = RadioMetaData{
-		DataRate:  dr,
+		DataRate:  int(drIdx),
 		Frequency: up.Settings.GetFrequency(),
 		UpInfo: UpInfo{
 			RCtx:   int64(rxMetadata.AntennaIndex),

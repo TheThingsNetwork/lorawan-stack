@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -143,36 +144,13 @@ func TestJoinRequest(t *testing.T) {
 			},
 			GatewayIds:     gtwID,
 			BandID:         "EU_86_870",
-			ErrorAssertion: errors.IsInvalidArgument,
-		},
-		{
-			Name: "InvalidMhdr",
-			JoinRequest: JoinRequest{
-				MHdr:     25,
-				DevEUI:   basicstation.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
-				JoinEUI:  basicstation.EUI{EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
-				DevNonce: 18000,
-				MIC:      12345678,
-				RadioMetaData: RadioMetaData{
-					DataRate:  1,
-					Frequency: 868300000,
-					UpInfo: UpInfo{
-						RxTime: 1548059982,
-						XTime:  12666373963464220,
-						RSSI:   89,
-						SNR:    9.25,
-					},
-				},
-			},
-			GatewayIds:     gtwID,
-			BandID:         "EU_868_870",
-			ErrorAssertion: errors.IsInvalidArgument,
+			ErrorAssertion: errors.IsNotFound,
 		},
 		{
 			Name:        "EmptyJoinRequest",
 			JoinRequest: JoinRequest{},
 			GatewayIds:  gtwID,
-			BandID:      "EU_863_870",
+			BandID:      band.EU_863_870,
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					Mic:  []byte{0, 0, 0, 0},
@@ -215,7 +193,7 @@ func TestJoinRequest(t *testing.T) {
 				},
 			},
 			GatewayIds: gtwID,
-			BandID:     "EU_863_870",
+			BandID:     band.EU_863_870,
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
@@ -291,7 +269,7 @@ func TestUplinkDataFrame(t *testing.T) {
 			Name:                  "Empty",
 			UplinkDataFrame:       UplinkDataFrame{},
 			GatewayIds:            gtwID,
-			FrequencyPlanID:       "EU_863_870",
+			FrequencyPlanID:       band.EU_863_870,
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{},
 			ErrorAssertion: func(err error) bool {
 				return errors.Resemble(err, errMDHR)
@@ -320,7 +298,7 @@ func TestUplinkDataFrame(t *testing.T) {
 				},
 			},
 			GatewayIds:      gtwID,
-			FrequencyPlanID: "EU_863_870",
+			FrequencyPlanID: band.EU_863_870,
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
@@ -384,7 +362,7 @@ func TestUplinkDataFrame(t *testing.T) {
 				},
 			},
 			GatewayIds:      gtwID,
-			FrequencyPlanID: "EU_863_870",
+			FrequencyPlanID: band.EU_863_870,
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
@@ -462,7 +440,7 @@ func TestFromUplinkDataFrame(t *testing.T) {
 		{
 			Name:                    "Empty",
 			ExpectedUplinkDataFrame: UplinkDataFrame{},
-			FrequencyPlanID:         "EU_863_870",
+			FrequencyPlanID:         band.EU_863_870,
 			UplinkMessage:           ttnpb.UplinkMessage{},
 			ErrorAssertion: func(err error) bool {
 				return errors.Resemble(err, errUplinkMessage)
@@ -509,7 +487,7 @@ func TestFromUplinkDataFrame(t *testing.T) {
 					}}},
 				},
 			},
-			FrequencyPlanID: "EU_863_870",
+			FrequencyPlanID: band.EU_863_870,
 			ExpectedUplinkDataFrame: UplinkDataFrame{
 				MHdr:       0x40,
 				DevAddr:    0x42ffffff,
@@ -567,7 +545,7 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 		{
 			Name:                "Empty",
 			ExpectedJoinRequest: JoinRequest{},
-			FrequencyPlanID:     "EU_863_870",
+			FrequencyPlanID:     band.EU_863_870,
 			UplinkMessage:       ttnpb.UplinkMessage{},
 			ErrorAssertion: func(err error) bool {
 				return errors.Resemble(err, errUplinkMessage)
@@ -603,7 +581,7 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 					}}},
 				},
 			},
-			FrequencyPlanID: "EU_863_870",
+			FrequencyPlanID: band.EU_863_870,
 			ExpectedJoinRequest: JoinRequest{
 				MHdr:     0,
 				DevEUI:   basicstation.EUI{EUI64: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}},

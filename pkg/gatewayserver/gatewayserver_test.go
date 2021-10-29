@@ -30,6 +30,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
@@ -515,7 +516,7 @@ func TestGatewayServer(t *testing.T) {
 										var bsUpstream []byte
 										if payload.GetMType() == ttnpb.MType_JOIN_REQUEST {
 											var jreq lbslns.JoinRequest
-											err := jreq.FromUplinkMessage(uplink, test.EUFrequencyPlanID)
+											err := jreq.FromUplinkMessage(uplink, band.EU_863_870)
 											if err != nil {
 												cancel(err)
 												return
@@ -528,7 +529,7 @@ func TestGatewayServer(t *testing.T) {
 										}
 										if payload.GetMType() == ttnpb.MType_UNCONFIRMED_UP || payload.GetMType() == ttnpb.MType_CONFIRMED_UP {
 											var updf lbslns.UplinkDataFrame
-											err := updf.FromUplinkMessage(uplink, test.EUFrequencyPlanID)
+											err := updf.FromUplinkMessage(uplink, band.EU_863_870)
 											if err != nil {
 												cancel(err)
 												return
@@ -575,9 +576,13 @@ func TestGatewayServer(t *testing.T) {
 									cancel(err)
 									return
 								}
-								dlmesg := msg.ToDownlinkMessage()
+								dlmesg, err := msg.ToDownlinkMessage(band.EU_863_870)
+								if err != nil {
+									cancel(err)
+									return
+								}
 								downCh <- &ttnpb.GatewayDown{
-									DownlinkMessage: &dlmesg,
+									DownlinkMessage: dlmesg,
 								}
 							}
 						}()

@@ -46,5 +46,5 @@ type Formatter interface {
 	// This function optionally returns a byte stream to be sent as response to the upstream message.
 	HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIdentifiers, conn *io.Connection, receivedAt time.Time) ([]byte, error)
 	// FromDownlink generates a downlink byte stream that can be sent over the WS connection.
-	FromDownlink(ctx context.Context, uid string, down ttnpb.DownlinkMessage, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error)
+	FromDownlink(ctx context.Context, uid string, down ttnpb.DownlinkMessage, bandID string, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error)
 }
