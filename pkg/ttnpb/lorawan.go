@@ -2409,3 +2409,31 @@ func (v *DeviceEIRPValue) FieldIsZero(p string) bool {
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
+
+// EndDeviceIdentifiers returns the end device identifiers (DevEUI/JoinEUI/DevAddr) available for the message payload.
+// Note that if the payload is nil, the end device identifiers will be nil.
+func (m *Message) EndDeviceIdentifiers() *EndDeviceIdentifiers {
+	if p := m.GetMacPayload(); p != nil {
+		return &EndDeviceIdentifiers{
+			DevAddr: &p.DevAddr,
+		}
+	}
+	if p := m.GetJoinRequestPayload(); p != nil {
+		return &EndDeviceIdentifiers{
+			DevEui:  &p.DevEui,
+			JoinEui: &p.JoinEui,
+		}
+	}
+	if p := m.GetJoinAcceptPayload(); p != nil {
+		return &EndDeviceIdentifiers{
+			DevAddr: &p.DevAddr,
+		}
+	}
+	if p := m.GetRejoinRequestPayload(); p != nil {
+		return &EndDeviceIdentifiers{
+			DevEui:  &p.DevEui,
+			JoinEui: &p.JoinEui,
+		}
+	}
+	return nil
+}

@@ -60,7 +60,7 @@ func TestNSHandler(t *testing.T) {
 	for _, tc := range []struct {
 		Name                 string
 		Message              *ttnpb.GatewayUplinkMessage
-		EndDeviceIdentifiers ttnpb.EndDeviceIdentifiers
+		EndDeviceIdentifiers *ttnpb.EndDeviceIdentifiers
 	}{
 		{
 			Name: "OneUplink",
@@ -92,7 +92,7 @@ func TestNSHandler(t *testing.T) {
 					},
 				},
 			},
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			EndDeviceIdentifiers: &ttnpb.EndDeviceIdentifiers{
 				DeviceId: "test-device",
 			},
 		},
