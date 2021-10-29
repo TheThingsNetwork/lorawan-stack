@@ -37,20 +37,6 @@ import (
 )
 
 var (
-	fromPBRegion = map[packetbroker.Region]string{
-		packetbroker.Region_EU_863_870: band.EU_863_870,
-		packetbroker.Region_US_902_928: band.US_902_928,
-		packetbroker.Region_CN_779_787: band.CN_779_787,
-		packetbroker.Region_EU_433:     band.EU_433,
-		packetbroker.Region_AU_915_928: band.AU_915_928,
-		packetbroker.Region_CN_470_510: band.CN_470_510,
-		packetbroker.Region_AS_923:     band.AS_923,
-		packetbroker.Region_AS_923_1:   band.AS_923,
-		packetbroker.Region_KR_920_923: band.KR_920_923,
-		packetbroker.Region_IN_865_867: band.IN_865_867,
-		packetbroker.Region_RU_864_870: band.RU_864_870,
-		packetbroker.Region_WW_2G4:     band.ISM_2400,
-	}
 	toPBRegion = map[string]packetbroker.Region{
 		band.EU_863_870: packetbroker.Region_EU_863_870,
 		band.US_902_928: packetbroker.Region_US_902_928,
@@ -63,35 +49,6 @@ var (
 		band.IN_865_867: packetbroker.Region_IN_865_867,
 		band.RU_864_870: packetbroker.Region_RU_864_870,
 		band.ISM_2400:   packetbroker.Region_WW_2G4,
-	}
-)
-
-var (
-	fromPBRegionalParameters = map[packetbroker.RegionalParametersVersion]ttnpb.PHYVersion{
-		packetbroker.RegionalParametersVersion_TS001_V1_0:     ttnpb.TS001_V1_0,
-		packetbroker.RegionalParametersVersion_TS001_V1_0_1:   ttnpb.TS001_V1_0_1,
-		packetbroker.RegionalParametersVersion_RP001_V1_0_2_A: ttnpb.RP001_V1_0_2,
-		packetbroker.RegionalParametersVersion_RP001_V1_0_2_B: ttnpb.RP001_V1_0_2_REV_B,
-		packetbroker.RegionalParametersVersion_RP001_V1_0_3_A: ttnpb.RP001_V1_0_3_REV_A,
-		packetbroker.RegionalParametersVersion_RP001_V1_1_A:   ttnpb.RP001_V1_1_REV_A,
-		packetbroker.RegionalParametersVersion_RP001_V1_1_B:   ttnpb.RP001_V1_1_REV_B,
-		packetbroker.RegionalParametersVersion_RP002_V1_0_0:   ttnpb.RP002_V1_0_0,
-		packetbroker.RegionalParametersVersion_RP002_V1_0_1:   ttnpb.RP002_V1_0_1,
-		packetbroker.RegionalParametersVersion_RP002_V1_0_2:   ttnpb.RP002_V1_0_2,
-		packetbroker.RegionalParametersVersion_RP002_V1_0_3:   ttnpb.RP002_V1_0_3,
-	}
-	toPBRegionalParameters = map[ttnpb.PHYVersion]packetbroker.RegionalParametersVersion{
-		ttnpb.TS001_V1_0:         packetbroker.RegionalParametersVersion_TS001_V1_0,
-		ttnpb.TS001_V1_0_1:       packetbroker.RegionalParametersVersion_TS001_V1_0_1,
-		ttnpb.RP001_V1_0_2:       packetbroker.RegionalParametersVersion_RP001_V1_0_2_A,
-		ttnpb.RP001_V1_0_2_REV_B: packetbroker.RegionalParametersVersion_RP001_V1_0_2_B,
-		ttnpb.RP001_V1_0_3_REV_A: packetbroker.RegionalParametersVersion_RP001_V1_0_3_A,
-		ttnpb.RP001_V1_1_REV_A:   packetbroker.RegionalParametersVersion_RP001_V1_1_A,
-		ttnpb.RP001_V1_1_REV_B:   packetbroker.RegionalParametersVersion_RP001_V1_1_B,
-		ttnpb.RP002_V1_0_0:       packetbroker.RegionalParametersVersion_RP002_V1_0_0,
-		ttnpb.RP002_V1_0_1:       packetbroker.RegionalParametersVersion_RP002_V1_0_1,
-		ttnpb.RP002_V1_0_2:       packetbroker.RegionalParametersVersion_RP002_V1_0_2,
-		ttnpb.RP002_V1_0_3:       packetbroker.RegionalParametersVersion_RP002_V1_0_3,
 	}
 )
 
@@ -634,13 +591,11 @@ var (
 
 var (
 	errNoRequest                  = errors.DefineFailedPrecondition("no_request", "downlink message is not a transmission request")
-	errUnknownPHYVersion          = errors.DefineInvalidArgument("unknown_phy_version", "unknown LoRaWAN Regional Parameters version `{version}`")
 	errUnknownClass               = errors.DefineInvalidArgument("unknown_class", "unknown class `{class}`")
 	errUnknownPriority            = errors.DefineInvalidArgument("unknown_priority", "unknown priority `{priority}`")
 	errNoDownlinkPaths            = errors.DefineFailedPrecondition("no_downlink_paths", "no downlink paths")
 	errInvalidDownlinkPath        = errors.DefineFailedPrecondition("downlink_path", "invalid uplink token downlink path")
 	errFrequencyPlanNotConfigured = errors.DefineInvalidArgument("frequency_plan_not_configured", "frequency plan `{id}` is not configured")
-	errDataRateNotFound           = errors.DefineInvalidArgument("data_rate_not_found", "no data rate with index `{index}`")
 	errIncompatibleDataRate       = errors.DefineInvalidArgument("incompatible_data_rate", "incompatible data rate in Rx{rx_window}")
 )
 
@@ -650,14 +605,13 @@ func toPBDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage, fps frequency
 		return nil, nil, errNoRequest.New()
 	}
 
-	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
 	fp, err := fps.GetByID(req.FrequencyPlanId)
 	if err != nil {
 		return nil, nil, errFrequencyPlanNotConfigured.WithAttributes("id", req.FrequencyPlanId)
 	}
-	phy, err := band.Get(fp.BandID, req.LorawanPhyVersion)
+	phy, err := band.GetLatest(fp.BandID)
 	if err != nil {
-		return nil, nil, errUnknownBand.WithAttributes("band_id", fp.BandID)
+		return nil, nil, errUnknownBand.WithCause(err).WithAttributes("band_id", fp.BandID)
 	}
 
 	down := &packetbroker.DownlinkMessage{
@@ -665,42 +619,27 @@ func toPBDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage, fps frequency
 		Rx1Delay:   pbtypes.DurationProto(req.Rx1Delay.Duration()),
 	}
 	var ok bool
-	if down.Region, ok = toPBRegion[phy.ID]; !ok {
-		return nil, nil, errUnknownBand.WithAttributes("band_id", phy.ID)
-	}
-	rpVersion, ok := toPBRegionalParameters[req.LorawanPhyVersion]
-	if !ok {
-		return nil, nil, errUnknownPHYVersion.WithAttributes("version", req.LorawanPhyVersion)
-	}
-	down.RegionalParametersVersion = &packetbroker.RegionalParametersVersionValue{
-		Value: rpVersion,
+	if down.Region, ok = toPBRegion[fp.BandID]; !ok {
+		return nil, nil, errUnknownBand.WithAttributes("band_id", fp.BandID)
 	}
 	for i, rx := range []struct {
-		dataRate *ttnpb.DataRate
-		// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-		dataRateIndex ttnpb.DataRateIndex
-		frequency     uint64
-		dst           **packetbroker.DownlinkMessage_RXSettings
+		dataRate  *ttnpb.DataRate
+		frequency uint64
+		dst       **packetbroker.DownlinkMessage_RXSettings
 	}{
-		{req.Rx1DataRate, req.Rx1DataRateIndex, req.Rx1Frequency, &down.Rx1},
-		{req.Rx2DataRate, req.Rx2DataRateIndex, req.Rx2Frequency, &down.Rx2},
+		{req.Rx1DataRate, req.Rx1Frequency, &down.Rx1},
+		{req.Rx2DataRate, req.Rx2Frequency, &down.Rx2},
 	} {
-		if rx.frequency == 0 {
+		if rx.frequency == 0 || rx.dataRate == nil {
 			continue
-		}
-		// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-		if rx.dataRate == nil {
-			dr, ok := phy.DataRates[rx.dataRateIndex]
-			if !ok {
-				return nil, nil, errDataRateNotFound.WithAttributes("index", rx.dataRateIndex)
-			}
-			rx.dataRate = &dr.Rate
 		}
 		// TODO: Get coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466)
 		var codingRate string
-		switch rx.dataRate.Modulation.(type) {
+		switch mod := rx.dataRate.Modulation.(type) {
 		case *ttnpb.DataRate_Lora:
 			codingRate = phy.LoRaCodingRate
+		case *ttnpb.DataRate_Lrfhss:
+			codingRate = mod.Lrfhss.CodingRate
 		}
 		pbDR, ok := toPBDataRate(*rx.dataRate, codingRate)
 		if !ok {
@@ -735,7 +674,6 @@ func toPBDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage, fps frequency
 
 var (
 	errUnwrapGatewayUplinkToken = errors.DefineAborted("unwrap_gateway_uplink_token", "unwrap gateway uplink token")
-	errUnknownRegion            = errors.DefineFailedPrecondition("unknown_region", "unknown region `{region}`")
 	errInvalidRx1Delay          = errors.DefineInvalidArgument("invalid_rx1_delay", "invalid Rx1 delay")
 )
 
@@ -754,41 +692,12 @@ func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, rece
 			},
 		},
 	}
-	var (
-		ok  bool
-		phy *band.Band
-	)
-	// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478)
-	if msg.Region != packetbroker.Region_UNKNOWN_REGION {
-		var bandID string
-		if bandID, ok = fromPBRegion[msg.Region]; !ok {
-			return "", nil, errUnknownRegion.WithAttributes("region", msg.Region)
-		}
-		p, err := band.GetLatest(bandID)
-		if err != nil {
-			return "", nil, errUnknownRegion.WithCause(err).WithAttributes("region", msg.Region)
-		}
-		phy = &p
-		// NOTE: The Things Stack expects the frequency plan ID; not the band ID. Since the frequency plan ID cannot be
-		// inferred from the downlink message from Packet Broker, it is intentionally left blank. This makes the Gateway
-		// Server fallback to a single frequency plan configured for the gateway. This does not work if there are multiple
-		// frequency plans. (https://github.com/TheThingsNetwork/lorawan-stack/issues/1394)
-	}
-	if msg.RegionalParametersVersion != nil {
-		var phyVersion ttnpb.PHYVersion
-		if phyVersion, ok = fromPBRegionalParameters[msg.RegionalParametersVersion.Value]; !ok {
-			return "", nil, errUnknownPHYVersion.WithAttributes("version", msg.RegionalParametersVersion.Value)
-		}
-		req.LorawanPhyVersion = phyVersion
-		// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478)
-		if phy != nil {
-			p, err := band.Get(phy.ID, phyVersion)
-			if err != nil {
-				return "", nil, err
-			}
-			phy = &p
-		}
-	}
+	// NOTE: The Things Stack expects the frequency plan ID; not the band ID. Since the frequency plan ID cannot be
+	// inferred from the downlink message from Packet Broker, it is intentionally left blank. This makes the Gateway
+	// Server fallback to a single frequency plan configured for the gateway. This does not work if there are multiple
+	// frequency plans. (https://github.com/TheThingsNetwork/lorawan-stack/issues/1394)
+
+	var ok bool
 	if req.Class, ok = fromPBClass[msg.Class]; !ok {
 		return "", nil, errUnknownClass.WithAttributes("class", msg.Class)
 	}
@@ -801,14 +710,12 @@ func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, rece
 	}
 	req.Rx1Delay = ttnpb.RxDelay(rx1Delay / time.Second)
 	for i, rx := range []struct {
-		settings *packetbroker.DownlinkMessage_RXSettings
-		dataRate **ttnpb.DataRate
-		// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-		dataRateIndex *ttnpb.DataRateIndex
-		frequency     *uint64
+		settings  *packetbroker.DownlinkMessage_RXSettings
+		dataRate  **ttnpb.DataRate
+		frequency *uint64
 	}{
-		{msg.Rx1, &req.Rx1DataRate, &req.Rx1DataRateIndex, &req.Rx1Frequency},
-		{msg.Rx2, &req.Rx2DataRate, &req.Rx2DataRateIndex, &req.Rx2Frequency},
+		{msg.Rx1, &req.Rx1DataRate, &req.Rx1Frequency},
+		{msg.Rx2, &req.Rx2DataRate, &req.Rx2Frequency},
 	} {
 		if rx.settings == nil {
 			continue
@@ -818,12 +725,6 @@ func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, rece
 			return "", nil, errIncompatibleDataRate.WithAttributes("rx_window", i+1)
 		}
 		*rx.dataRate = &dr
-		// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478)
-		if phy != nil {
-			if *rx.dataRateIndex, _, ok = phy.FindDownlinkDataRate(dr); !ok {
-				return "", nil, errIncompatibleDataRate.WithAttributes("rx_window", i+1)
-			}
-		}
 		*rx.frequency = rx.settings.Frequency
 	}
 
