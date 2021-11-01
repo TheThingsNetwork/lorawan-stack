@@ -148,9 +148,8 @@ func TestForwarder(t *testing.T) {
 									},
 								},
 							},
-							CodingRate:    "4/5",
-							DataRateIndex: 5,
-							Frequency:     869525000,
+							CodingRate: "4/5",
+							Frequency:  869525000,
 						},
 					},
 					BandId: "EU_863_870",
@@ -269,9 +268,8 @@ func TestForwarder(t *testing.T) {
 									},
 								},
 							},
-							CodingRate:    "4/5",
-							DataRateIndex: 3,
-							Frequency:     868300000,
+							CodingRate: "4/5",
+							Frequency:  868300000,
 						},
 					},
 					BandId: "EU_863_870",
@@ -377,11 +375,8 @@ func TestForwarder(t *testing.T) {
 			Message: &packetbroker.DownlinkMessage{
 				PhyPayload: []byte{0x60, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 				Region:     packetbroker.Region_EU_863_870,
-				RegionalParametersVersion: &packetbroker.RegionalParametersVersionValue{
-					Value: packetbroker.RegionalParametersVersion_RP001_V1_0_2_B,
-				},
-				Class:    packetbroker.DownlinkMessageClass_CLASS_A,
-				Priority: packetbroker.DownlinkMessagePriority_NORMAL,
+				Class:      packetbroker.DownlinkMessageClass_CLASS_A,
+				Priority:   packetbroker.DownlinkMessagePriority_NORMAL,
 				Rx1: &packetbroker.DownlinkMessage_RXSettings{
 					Frequency: 868100000,
 					DataRate:  packetbroker.NewLoRaDataRate(7, 125000, ""),
@@ -406,8 +401,7 @@ func TestForwarder(t *testing.T) {
 			CorrelationIds: gtwMsg.CorrelationIds,
 			Settings: &ttnpb.DownlinkMessage_Request{
 				Request: &ttnpb.TxRequest{
-					LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
-					Class:             ttnpb.CLASS_A,
+					Class: ttnpb.CLASS_A,
 					DownlinkPaths: []*ttnpb.DownlinkPath{
 						{
 							Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -415,8 +409,7 @@ func TestForwarder(t *testing.T) {
 							},
 						},
 					},
-					Priority:         ttnpb.TxSchedulePriority_NORMAL,
-					Rx1DataRateIndex: 5,
+					Priority: ttnpb.TxSchedulePriority_NORMAL,
 					Rx1DataRate: &ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{
@@ -425,9 +418,8 @@ func TestForwarder(t *testing.T) {
 							},
 						},
 					},
-					Rx1Frequency:     868100000,
-					Rx1Delay:         ttnpb.RX_DELAY_5,
-					Rx2DataRateIndex: 0,
+					Rx1Frequency: 868100000,
+					Rx1Delay:     ttnpb.RX_DELAY_5,
 					Rx2DataRate: &ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{
@@ -841,9 +833,8 @@ func TestHomeNetwork(t *testing.T) {
 			RawPayload: []byte{0x60, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 			Settings: &ttnpb.DownlinkMessage_Request{
 				Request: &ttnpb.TxRequest{
-					FrequencyPlanId:   test.EUFrequencyPlanID,
-					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-					Class:             ttnpb.CLASS_A,
+					FrequencyPlanId: test.EUFrequencyPlanID,
+					Class:           ttnpb.CLASS_A,
 					DownlinkPaths: []*ttnpb.DownlinkPath{
 						{
 							Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -898,10 +889,7 @@ func TestHomeNetwork(t *testing.T) {
 			HomeNetworkTenantId:  "foo-tenant",
 			HomeNetworkClusterId: "test",
 			Message: &packetbroker.DownlinkMessage{
-				Region: packetbroker.Region_EU_863_870,
-				RegionalParametersVersion: &packetbroker.RegionalParametersVersionValue{
-					Value: packetbroker.RegionalParametersVersion_RP001_V1_1_B,
-				},
+				Region:     packetbroker.Region_EU_863_870,
 				PhyPayload: []byte{0x60, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 				Class:      packetbroker.DownlinkMessageClass_CLASS_A,
 				Priority:   packetbroker.DownlinkMessagePriority_NORMAL,

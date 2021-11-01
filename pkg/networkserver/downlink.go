@@ -965,15 +965,13 @@ func loggerWithTxRequestFields(logger log.Interface, req *ttnpb.TxRequest, rx1, 
 	}
 	if rx1 {
 		pairs = append(pairs,
-			// TODO: Build log fields from Rx1DataRate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-			"rx1_data_rate", req.Rx1DataRateIndex,
+			"rx1_data_rate", req.Rx1DataRate,
 			"rx1_frequency", req.Rx1Frequency,
 		)
 	}
 	if rx2 {
 		pairs = append(pairs,
-			// TODO: Build log fields from Rx2DataRate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-			"rx2_data_rate", req.Rx2DataRateIndex,
+			"rx2_data_rate", req.Rx2DataRate,
 			"rx2_frequency", req.Rx2Frequency,
 		)
 	}
@@ -1026,7 +1024,11 @@ func rx1Parameters(phy *band.Band, macState *ttnpb.MACState, up *ttnpb.UplinkMes
 			).
 			WithCause(ErrUplinkChannel)
 	}
-	drIdx, err := phy.Rx1DataRate(up.Settings.DataRateIndex, macState.CurrentParameters.Rx1DataRateOffset, macState.CurrentParameters.DownlinkDwellTime.GetValue())
+	drIdx, _, ok := phy.FindUplinkDataRate(up.Settings.DataRate)
+	if !ok {
+		return 0, 0, band.DataRate{}, errDataRateNotFound.New()
+	}
+	drIdx, err = phy.Rx1DataRate(drIdx, macState.CurrentParameters.Rx1DataRateOffset, macState.CurrentParameters.DownlinkDwellTime.GetValue())
 	if err != nil {
 		return 0, 0, band.DataRate{}, err
 	}
@@ -1048,7 +1050,11 @@ loop:
 			break loop
 		case ttnpb.MType_UNCONFIRMED_UP, ttnpb.MType_CONFIRMED_UP:
 			if ups[i].Payload.GetMacPayload().FHDR.FCtrl.Adr {
-				maxUpDRIdx = ups[i].Settings.DataRateIndex
+				drIdx, _, ok := phy.FindUplinkDataRate(ups[i].Settings.DataRate)
+				if !ok {
+					continue
+				}
+				maxUpDRIdx = drIdx
 			}
 			break loop
 		}
@@ -1244,22 +1250,17 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	logger := log.FromContext(ctx)
 
 	req := &ttnpb.TxRequest{
-		Class:             ttnpb.CLASS_A,
-		Priority:          genDown.Priority,
-		FrequencyPlanId:   dev.FrequencyPlanId,
-		Rx1Delay:          ttnpb.RxDelay(slot.RxDelay / time.Second),
-		LorawanPhyVersion: dev.LorawanPhyVersion,
+		Class:           ttnpb.CLASS_A,
+		Priority:        genDown.Priority,
+		FrequencyPlanId: dev.FrequencyPlanId,
+		Rx1Delay:        ttnpb.RxDelay(slot.RxDelay / time.Second),
 	}
 	if attemptRX1 {
 		req.Rx1Frequency = rx1Freq
-		// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-		req.Rx1DataRateIndex = rx1DRIdx
 		req.Rx1DataRate = &rx1DR.Rate
 	}
 	if attemptRX2 {
 		req.Rx2Frequency = dev.MacState.CurrentParameters.Rx2Frequency
-		// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-		req.Rx2DataRateIndex = dev.MacState.CurrentParameters.Rx2DataRateIndex
 		req.Rx2DataRate = &rx2DR.Rate
 	}
 	down, queuedEvents, err := ns.scheduleDownlinkByPaths(
@@ -1422,13 +1423,12 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 	}
 
 	req := &ttnpb.TxRequest{
-		Class:             slot.Class,
-		Priority:          genDown.Priority,
-		FrequencyPlanId:   dev.FrequencyPlanId,
-		Rx2DataRate:       &dr.Rate,
-		Rx2Frequency:      freq,
-		AbsoluteTime:      absTime,
-		LorawanPhyVersion: dev.LorawanPhyVersion,
+		Class:           slot.Class,
+		Priority:        genDown.Priority,
+		FrequencyPlanId: dev.FrequencyPlanId,
+		Rx2DataRate:     &dr.Rate,
+		Rx2Frequency:    freq,
+		AbsoluteTime:    absTime,
 	}
 	down, queuedEvents, err := ns.scheduleDownlinkByPaths(
 		log.NewContext(ctx, loggerWithTxRequestFields(log.FromContext(ctx), req, false, true)),
@@ -1629,19 +1629,17 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 					var (
 						attemptRX1 bool
 						rx1Freq    uint64
-						rx1DRIdx   ttnpb.DataRateIndex
 						rx1DR      band.DataRate
 
 						attemptRX2 bool
 					)
 					if !rx1.Before(now) {
-						freq, drIdx, dr, err := rx1Parameters(phy, dev.PendingMacState, up)
+						freq, _, dr, err := rx1Parameters(phy, dev.PendingMacState, up)
 						if err != nil {
 							log.FromContext(ctx).WithError(err).Error("Failed to compute RX1 parameters")
 						} else {
 							attemptRX1 = true
 							rx1Freq = freq
-							rx1DRIdx = drIdx
 							rx1DR = dr
 						}
 					}
@@ -1660,22 +1658,17 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 					}
 
 					req := &ttnpb.TxRequest{
-						Class:             ttnpb.CLASS_A,
-						Priority:          ns.downlinkPriorities.JoinAccept,
-						FrequencyPlanId:   dev.FrequencyPlanId,
-						Rx1Delay:          ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second),
-						LorawanPhyVersion: dev.LorawanPhyVersion,
+						Class:           ttnpb.CLASS_A,
+						Priority:        ns.downlinkPriorities.JoinAccept,
+						FrequencyPlanId: dev.FrequencyPlanId,
+						Rx1Delay:        ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second),
 					}
 					if attemptRX1 {
 						req.Rx1Frequency = rx1Freq
-						// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478)
-						req.Rx1DataRateIndex = rx1DRIdx
 						req.Rx1DataRate = &rx1DR.Rate
 					}
 					if attemptRX2 {
 						req.Rx2Frequency = dev.PendingMacState.CurrentParameters.Rx2Frequency
-						// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478)
-						req.Rx2DataRateIndex = dev.PendingMacState.CurrentParameters.Rx2DataRateIndex
 						req.Rx2DataRate = &rx2DR.Rate
 					}
 					down, downEvs, err := ns.scheduleDownlinkByPaths(

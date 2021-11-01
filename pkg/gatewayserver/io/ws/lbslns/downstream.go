@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -59,7 +60,7 @@ func (dnmsg *DownlinkMessage) unmarshalJSON(data []byte) error {
 }
 
 // FromDownlink implements Formatter.
-func (f *lbsLNS) FromDownlink(ctx context.Context, uid string, down ttnpb.DownlinkMessage, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error) {
+func (f *lbsLNS) FromDownlink(ctx context.Context, uid string, down ttnpb.DownlinkMessage, bandID string, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error) {
 	var dnmsg DownlinkMessage
 	settings := down.GetScheduled()
 	dnmsg.Pdu = hex.EncodeToString(down.GetRawPayload())
@@ -95,7 +96,15 @@ func (f *lbsLNS) FromDownlink(ctx context.Context, uid string, down ttnpb.Downli
 	dnmsg.DevEUI = "00-00-00-00-00-00-00-01"
 
 	// Fix the Tx Parameters since we don't use the gateway scheduler.
-	dnmsg.Rx1DR = int(settings.DataRateIndex)
+	phy, err := band.GetLatest(bandID)
+	if err != nil {
+		return nil, err
+	}
+	drIdx, _, ok := phy.FindDownlinkDataRate(settings.DataRate)
+	if !ok {
+		return nil, errDataRate.New()
+	}
+	dnmsg.Rx1DR = int(drIdx)
 	dnmsg.Rx1Freq = int(settings.Frequency)
 
 	// Add the MuxTime for RTT measurement
@@ -108,18 +117,26 @@ func (f *lbsLNS) FromDownlink(ctx context.Context, uid string, down ttnpb.Downli
 }
 
 // ToDownlinkMessage translates the LNS DownlinkMessage "dnmsg" to ttnpb.DownlinkMessage.
-func (dnmsg *DownlinkMessage) ToDownlinkMessage() ttnpb.DownlinkMessage {
-	return ttnpb.DownlinkMessage{
+func (dnmsg *DownlinkMessage) ToDownlinkMessage(bandID string) (*ttnpb.DownlinkMessage, error) {
+	phy, err := band.GetLatest(bandID)
+	if err != nil {
+		return nil, err
+	}
+	bandDR, ok := phy.DataRates[ttnpb.DataRateIndex(dnmsg.Rx1DR)]
+	if !ok {
+		return nil, errDataRate.New()
+	}
+	return &ttnpb.DownlinkMessage{
 		RawPayload: []byte(dnmsg.Pdu),
 		Settings: &ttnpb.DownlinkMessage_Scheduled{
 			Scheduled: &ttnpb.TxSettings{
-				DataRateIndex: ttnpb.DataRateIndex(dnmsg.Rx1DR),
-				Frequency:     uint64(dnmsg.Rx1Freq),
+				DataRate:  bandDR.Rate,
+				Frequency: uint64(dnmsg.Rx1Freq),
 				Downlink: &ttnpb.TxSettings_Downlink{
 					AntennaIndex: uint32(dnmsg.RCtx),
 				},
 				Timestamp: uint32(dnmsg.XTime),
 			},
 		},
-	}
+	}, nil
 }

@@ -1545,15 +1545,6 @@ func (m *TxSettings) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "data_rate_index":
-
-			if _, ok := DataRateIndex_name[int32(m.GetDataRateIndex())]; !ok {
-				return TxSettingsValidationError{
-					field:  "data_rate_index",
-					reason: "value must be one of the defined enum values",
-				}
-			}
-
 		case "coding_rate":
 			// no validation rules for CodingRate
 		case "frequency":
@@ -2026,15 +2017,6 @@ func (m *TxRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "rx1_data_rate_index":
-
-			if _, ok := DataRateIndex_name[int32(m.GetRx1DataRateIndex())]; !ok {
-				return TxRequestValidationError{
-					field:  "rx1_data_rate_index",
-					reason: "value must be one of the defined enum values",
-				}
-			}
-
 		case "rx1_frequency":
 			// no validation rules for Rx1Frequency
 		case "rx2_data_rate":
@@ -2046,15 +2028,6 @@ func (m *TxRequest) ValidateFields(paths ...string) error {
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
-				}
-			}
-
-		case "rx2_data_rate_index":
-
-			if _, ok := DataRateIndex_name[int32(m.GetRx2DataRateIndex())]; !ok {
-				return TxRequestValidationError{
-					field:  "rx2_data_rate_index",
-					reason: "value must be one of the defined enum values",
 				}
 			}
 
@@ -2087,15 +2060,6 @@ func (m *TxRequest) ValidateFields(paths ...string) error {
 				return TxRequestValidationError{
 					field:  "frequency_plan_id",
 					reason: "value length must be at most 64 runes",
-				}
-			}
-
-		case "lorawan_phy_version":
-
-			if _, ok := PHYVersion_name[int32(m.GetLorawanPhyVersion())]; !ok {
-				return TxRequestValidationError{
-					field:  "lorawan_phy_version",
-					reason: "value must be one of the defined enum values",
 				}
 			}
 

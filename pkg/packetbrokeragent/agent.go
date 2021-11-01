@@ -639,13 +639,13 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 	if req.Rx1Frequency != 0 {
 		pairs = append(pairs,
 			"rx1_delay", req.Rx1Delay,
-			"rx1_data_rate", req.Rx1DataRateIndex,
+			"rx1_data_rate", req.Rx1DataRate,
 			"rx1_frequency", req.Rx1Frequency,
 		)
 	}
 	if req.Rx2Frequency != 0 {
 		pairs = append(pairs,
-			"rx2_data_rate", req.Rx2DataRateIndex,
+			"rx2_data_rate", req.Rx2DataRate,
 			"rx2_frequency", req.Rx2Frequency,
 		)
 	}

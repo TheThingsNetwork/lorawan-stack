@@ -33,6 +33,8 @@ For details about compatibility between different releases, see the **Commitment
 
 - The `ttn_lw_gs_status_failed_total`, `ttn_lw_gs_uplink_failed_total` metrics. `ttn_lw_gs_status_dropped_total` and `ttn_lw_gs_uplink_dropped_total` should be used instead, as they contain the failure cause.
 - The `gs.status.fail` and `gs.up.fail` events. `gs.status.drop` and `gs.up.drop` should be used instead, as they contain the failure cause.
+- The `data_rate_index` field in uplink message metadata. Observe the fully described data rate in the `data_rate` field instead.
+- LoRaWAN data rate index reported to LoRa Cloud DMS.
 
 ### Fixed
 

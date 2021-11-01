@@ -47,14 +47,12 @@ var (
 )
 
 type srv struct {
-	ctx                  context.Context
-	server               io.Server
-	webServer            *echo.Echo
-	upgrader             *websocket.Upgrader
-	useTrafficTLSAddress bool
-	wsPingInterval       time.Duration
-	cfg                  Config
-	formatter            Formatter
+	ctx       context.Context
+	server    io.Server
+	webServer *echo.Echo
+	upgrader  *websocket.Upgrader
+	cfg       Config
+	formatter Formatter
 }
 
 func (s *srv) Protocol() string            { return "ws" }
@@ -272,7 +270,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					continue
 				}
 				sessionCtx := NewContextWithSession(ctx, &session)
-				dnmsg, err := s.formatter.FromDownlink(sessionCtx, uid, *down, concentratorTime, dlTime)
+				dnmsg, err := s.formatter.FromDownlink(sessionCtx, uid, *down, conn.BandID(), concentratorTime, dlTime)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal downlink message")
 					continue

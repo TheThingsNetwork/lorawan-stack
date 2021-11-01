@@ -170,40 +170,6 @@ func TestFlow(t *testing.T) {
 			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
-			Name: "ClassAWithInvalidLWPhyVersion",
-			Path: &ttnpb.DownlinkPath{
-				Path: &ttnpb.DownlinkPath_UplinkToken{
-					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
-						100,
-						100000,
-						time.Unix(0, 100*1000),
-					),
-				},
-			},
-			Message: &ttnpb.DownlinkMessage{
-				RawPayload: []byte{0x01},
-				Settings: &ttnpb.DownlinkMessage_Request{
-					Request: &ttnpb.TxRequest{
-						Class:    ttnpb.CLASS_A,
-						Priority: ttnpb.TxSchedulePriority_NORMAL,
-						Rx1Delay: ttnpb.RX_DELAY_1,
-						Rx1DataRate: &ttnpb.DataRate{
-							Modulation: &ttnpb.DataRate_Lora{
-								Lora: &ttnpb.LoRaDataRate{
-									SpreadingFactor: 7,
-									Bandwidth:       125000,
-								},
-							},
-						},
-						Rx1Frequency:      868100000,
-						LorawanPhyVersion: ttnpb.RP002_V1_0_3,
-					},
-				},
-			},
-			ErrorAssertion: errors.IsNotFound,
-		},
-		{
 			Name: "ValidClassA",
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -456,39 +422,6 @@ func TestFlow(t *testing.T) {
 						},
 						Rx2Frequency:    869525000,
 						AbsoluteTime:    timePtr(time.Unix(100, 0)), // The mock front-end uses Unix epoch as start time.
-						FrequencyPlanId: test.EUFrequencyPlanID,
-					},
-				},
-			},
-			ErrorAssertion: errors.IsInvalidArgument,
-		},
-		{
-			Name: "InvalidDataRate",
-			Path: &ttnpb.DownlinkPath{
-				Path: &ttnpb.DownlinkPath_UplinkToken{
-					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
-						100,
-						100000,
-						time.Unix(0, 100*1000),
-					),
-				},
-			},
-			Message: &ttnpb.DownlinkMessage{
-				RawPayload: []byte{0x01},
-				Settings: &ttnpb.DownlinkMessage_Request{
-					Request: &ttnpb.TxRequest{
-						Class:    ttnpb.CLASS_C,
-						Priority: ttnpb.TxSchedulePriority_NORMAL,
-						Rx2DataRate: &ttnpb.DataRate{
-							Modulation: &ttnpb.DataRate_Lora{
-								Lora: &ttnpb.LoRaDataRate{
-									Bandwidth:       125000,
-									SpreadingFactor: 4, // This one doesn't exist in the band.
-								},
-							},
-						},
-						Rx2Frequency:    869525000,
 						FrequencyPlanId: test.EUFrequencyPlanID,
 					},
 				},

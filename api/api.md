@@ -5709,15 +5709,12 @@ Otherwise, the Gateway Server attempts to schedule the request and creates the T
 | `downlink_paths` | [`DownlinkPath`](#ttn.lorawan.v3.DownlinkPath) | repeated | Downlink paths used to select a gateway for downlink. In class A, the downlink paths are required to only contain uplink tokens. In class B and C, the downlink paths may contain uplink tokens and fixed gateways antenna identifiers. |
 | `rx1_delay` | [`RxDelay`](#ttn.lorawan.v3.RxDelay) |  | Rx1 delay (Rx2 delay is Rx1 delay + 1 second). |
 | `rx1_data_rate` | [`DataRate`](#ttn.lorawan.v3.DataRate) |  | LoRaWAN data rate for Rx1. |
-| `rx1_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  | LoRaWAN data rate index for Rx1. DEPRECATED: Use rx1_data_rate instead. |
 | `rx1_frequency` | [`uint64`](#uint64) |  | Frequency (Hz) for Rx1. |
 | `rx2_data_rate` | [`DataRate`](#ttn.lorawan.v3.DataRate) |  | LoRaWAN data rate for Rx2. |
-| `rx2_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  | LoRaWAN data rate index for Rx2. DEPRECATED: Use rx2_data_rate instead. |
 | `rx2_frequency` | [`uint64`](#uint64) |  | Frequency (Hz) for Rx2. |
 | `priority` | [`TxSchedulePriority`](#ttn.lorawan.v3.TxSchedulePriority) |  | Priority for scheduling. Requests with a higher priority are allocated more channel time than messages with a lower priority, in duty-cycle limited regions. A priority of HIGH or higher sets the HiPriorityFlag in the DLMetadata Object. |
 | `absolute_time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Time when the downlink message should be transmitted. This value is only valid for class C downlink; class A downlink uses uplink tokens and class B downlink is scheduled on ping slots. This requires the gateway to have GPS time sychronization. If the absolute time is not set, the first available time will be used that does not conflict or violate regional limitations. |
 | `frequency_plan_id` | [`string`](#string) |  | Frequency plan ID from which the frequencies in this message are retrieved. |
-| `lorawan_phy_version` | [`PHYVersion`](#ttn.lorawan.v3.PHYVersion) |  | The regional parameters version used to interpret the data rate indices in this message. |
 | `advanced` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | Advanced metadata fields - can be used for advanced information or experimental features that are not yet formally defined in the API - field names are written in snake_case |
 
 #### Field Rules
@@ -5725,11 +5722,8 @@ Otherwise, the Gateway Server attempts to schedule the request and creates the T
 | Field | Validations |
 | ----- | ----------- |
 | `rx1_delay` | <p>`enum.defined_only`: `true`</p> |
-| `rx1_data_rate_index` | <p>`enum.defined_only`: `true`</p> |
-| `rx2_data_rate_index` | <p>`enum.defined_only`: `true`</p> |
 | `priority` | <p>`enum.defined_only`: `true`</p> |
 | `frequency_plan_id` | <p>`string.max_len`: `64`</p> |
-| `lorawan_phy_version` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.TxSettings">Message `TxSettings`</a>
 
@@ -5740,7 +5734,6 @@ On downlink, this is a scheduled transmission.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `data_rate` | [`DataRate`](#ttn.lorawan.v3.DataRate) |  | Data rate. |
-| `data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  | LoRaWAN data rate index. |
 | `coding_rate` | [`string`](#string) |  | LoRa coding rate. |
 | `frequency` | [`uint64`](#uint64) |  | Frequency (Hz). |
 | `enable_crc` | [`bool`](#bool) |  | Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled. |
@@ -5753,7 +5746,6 @@ On downlink, this is a scheduled transmission.
 | Field | Validations |
 | ----- | ----------- |
 | `data_rate` | <p>`message.required`: `true`</p> |
-| `data_rate_index` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.TxSettings.Downlink">Message `TxSettings.Downlink`</a>
 

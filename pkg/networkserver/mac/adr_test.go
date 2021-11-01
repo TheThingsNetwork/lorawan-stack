@@ -60,7 +60,6 @@ func TestAdaptDataRate(t *testing.T) {
 						},
 					},
 				},
-				DataRateIndex: 0,
 			},
 		},
 	})
@@ -297,7 +296,6 @@ func TestIssue458(t *testing.T) {
 						},
 					},
 				},
-				DataRateIndex: 0,
 			},
 		},
 		{FCnt: 8, MaxSNR: -3, GtwDiversity: 2},

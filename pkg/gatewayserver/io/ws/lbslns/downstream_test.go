@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -32,17 +33,20 @@ func TestFromDownlinkMessage(t *testing.T) {
 	var lbsLNS lbsLNS
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	uid := unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"})
-	var session ws.Session
-	session.Data = State{
-		ID: 0x11,
+	session := ws.Session{
+		Data: State{
+			ID: 0x11,
+		},
 	}
 	for _, tc := range []struct {
-		Name                    string
+		BandID,
+		Name string
 		DownlinkMessage         ttnpb.DownlinkMessage
 		ExpectedDownlinkMessage DownlinkMessage
 	}{
 		{
-			Name: "SampleDownlink",
+			BandID: band.EU_863_870,
+			Name:   "SampleDownlink",
 			DownlinkMessage: ttnpb.DownlinkMessage{
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
@@ -50,8 +54,15 @@ func TestFromDownlinkMessage(t *testing.T) {
 				},
 				Settings: &ttnpb.DownlinkMessage_Scheduled{
 					Scheduled: &ttnpb.TxSettings{
-						DataRateIndex: 2,
-						Frequency:     868500000,
+						DataRate: ttnpb.DataRate{
+							Modulation: &ttnpb.DataRate_Lora{
+								Lora: &ttnpb.LoRaDataRate{
+									SpreadingFactor: 10,
+									Bandwidth:       125000,
+								},
+							},
+						},
+						Frequency: 868500000,
 						Downlink: &ttnpb.TxSettings_Downlink{
 							AntennaIndex: 2,
 						},
@@ -74,7 +85,8 @@ func TestFromDownlinkMessage(t *testing.T) {
 			},
 		},
 		{
-			Name: "WithAbsoluteTime",
+			BandID: band.EU_863_870,
+			Name:   "WithAbsoluteTime",
 			DownlinkMessage: ttnpb.DownlinkMessage{
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
@@ -82,8 +94,15 @@ func TestFromDownlinkMessage(t *testing.T) {
 				},
 				Settings: &ttnpb.DownlinkMessage_Scheduled{
 					Scheduled: &ttnpb.TxSettings{
-						DataRateIndex: 2,
-						Frequency:     869525000,
+						DataRate: ttnpb.DataRate{
+							Modulation: &ttnpb.DataRate_Lora{
+								Lora: &ttnpb.LoRaDataRate{
+									SpreadingFactor: 10,
+									Bandwidth:       125000,
+								},
+							},
+						},
+						Frequency: 869525000,
 						Downlink: &ttnpb.TxSettings_Downlink{
 							AntennaIndex: 2,
 						},
@@ -109,11 +128,15 @@ func TestFromDownlinkMessage(t *testing.T) {
 			a := assertions.New(t)
 			ctx := context.Background()
 			sessionCtx := ws.NewContextWithSession(ctx, &session)
-			raw, err := lbsLNS.FromDownlink(sessionCtx, uid, tc.DownlinkMessage, 1554300787, time.Unix(1554300787, 123456000))
-			a.So(err, should.BeNil)
+			raw, err := lbsLNS.FromDownlink(sessionCtx, uid, tc.DownlinkMessage, tc.BandID, 1554300787, time.Unix(1554300787, 123456000))
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
 			var dnmsg DownlinkMessage
 			err = dnmsg.unmarshalJSON(raw)
-			a.So(err, should.BeNil)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
 			dnmsg.XTime = tc.ExpectedDownlinkMessage.XTime
 			if !a.So(dnmsg, should.Resemble, tc.ExpectedDownlinkMessage) {
 				t.Fatalf("Invalid DownlinkMessage: %v", dnmsg)
@@ -124,12 +147,14 @@ func TestFromDownlinkMessage(t *testing.T) {
 
 func TestToDownlinkMessage(t *testing.T) {
 	for _, tc := range []struct {
-		Name                    string
+		BandID,
+		Name string
 		DownlinkMessage         DownlinkMessage
-		ExpectedDownlinkMessage ttnpb.DownlinkMessage
+		ExpectedDownlinkMessage *ttnpb.DownlinkMessage
 	}{
 		{
-			Name: "SampleDownlink",
+			BandID: band.EU_863_870,
+			Name:   "SampleDownlink",
 			DownlinkMessage: DownlinkMessage{
 				DeviceClass: 0,
 				Pdu:         "Ymxhamthc25kJ3M==",
@@ -140,12 +165,19 @@ func TestToDownlinkMessage(t *testing.T) {
 				Priority:    25,
 				XTime:       1554300785,
 			},
-			ExpectedDownlinkMessage: ttnpb.DownlinkMessage{
+			ExpectedDownlinkMessage: &ttnpb.DownlinkMessage{
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
 				Settings: &ttnpb.DownlinkMessage_Scheduled{
 					Scheduled: &ttnpb.TxSettings{
-						DataRateIndex: 2,
-						Frequency:     868500000,
+						DataRate: ttnpb.DataRate{
+							Modulation: &ttnpb.DataRate_Lora{
+								Lora: &ttnpb.LoRaDataRate{
+									SpreadingFactor: 10,
+									Bandwidth:       125000,
+								},
+							},
+						},
+						Frequency: 868500000,
 						Downlink: &ttnpb.TxSettings_Downlink{
 							AntennaIndex: 2,
 						},
@@ -155,7 +187,8 @@ func TestToDownlinkMessage(t *testing.T) {
 			},
 		},
 		{
-			Name: "WithAbsoluteTime",
+			BandID: band.EU_863_870,
+			Name:   "WithAbsoluteTime",
 			DownlinkMessage: DownlinkMessage{
 				DeviceClass: 1,
 				Pdu:         "Ymxhamthc25kJ3M==",
@@ -165,12 +198,19 @@ func TestToDownlinkMessage(t *testing.T) {
 				RCtx:        2,
 				Priority:    25,
 			},
-			ExpectedDownlinkMessage: ttnpb.DownlinkMessage{
+			ExpectedDownlinkMessage: &ttnpb.DownlinkMessage{
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
 				Settings: &ttnpb.DownlinkMessage_Scheduled{
 					Scheduled: &ttnpb.TxSettings{
-						DataRateIndex: 2,
-						Frequency:     869525000,
+						DataRate: ttnpb.DataRate{
+							Modulation: &ttnpb.DataRate_Lora{
+								Lora: &ttnpb.LoRaDataRate{
+									SpreadingFactor: 10,
+									Bandwidth:       125000,
+								},
+							},
+						},
+						Frequency: 869525000,
 						Downlink: &ttnpb.TxSettings_Downlink{
 							AntennaIndex: 2,
 						},
@@ -181,7 +221,10 @@ func TestToDownlinkMessage(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			dlMesg := tc.DownlinkMessage.ToDownlinkMessage()
+			dlMesg, err := tc.DownlinkMessage.ToDownlinkMessage(tc.BandID)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
 			if !a.So(dlMesg, should.Resemble, tc.ExpectedDownlinkMessage) {
 				t.Fatalf("Invalid DownlinkMessage: %v", dlMesg)
 			}

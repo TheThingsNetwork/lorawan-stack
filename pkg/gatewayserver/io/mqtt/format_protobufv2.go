@@ -21,7 +21,6 @@ import (
 	"time"
 
 	ttnpbv2 "go.thethings.network/lorawan-stack-legacy/v2/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mqtt/topics"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -39,27 +38,9 @@ var (
 		ttnpbv2.LocationMetadata_IP_GEOLOCATION: ttnpb.SOURCE_IP_GEOLOCATION,
 	}
 
-	frequencyPlanToBand = map[ttnpbv2.FrequencyPlan]string{
-		ttnpbv2.FrequencyPlan_EU_863_870: "EU_863_870",
-		ttnpbv2.FrequencyPlan_US_902_928: "US_902_928",
-		ttnpbv2.FrequencyPlan_CN_779_787: "CN_779_787",
-		ttnpbv2.FrequencyPlan_EU_433:     "EU_433",
-		ttnpbv2.FrequencyPlan_AU_915_928: "AU_915_928",
-		ttnpbv2.FrequencyPlan_CN_470_510: "CN_470_510",
-		ttnpbv2.FrequencyPlan_AS_923:     "AS_923",
-		ttnpbv2.FrequencyPlan_AS_920_923: "AS_923",
-		ttnpbv2.FrequencyPlan_AS_923_925: "AS_923",
-		ttnpbv2.FrequencyPlan_KR_920_923: "KR_920_923",
-		ttnpbv2.FrequencyPlan_IN_865_867: "IN_865_867",
-		ttnpbv2.FrequencyPlan_RU_864_870: "RU_864_870",
-	}
-
 	errNotScheduled    = errors.DefineInvalidArgument("not_scheduled", "not scheduled")
-	errLoRaWANPayload  = errors.DefineInvalidArgument("lorawan_payload", "invalid LoRaWAN payload")
 	errLoRaWANMetadata = errors.DefineInvalidArgument("lorawan_metadata", "missing LoRaWAN metadata")
-	errDataRate        = errors.DefineInvalidArgument("data_rate", "unknown data rate `{data_rate}`")
 	errModulation      = errors.DefineInvalidArgument("modulation", "unknown modulation `{modulation}`")
-	errFrequencyPlan   = errors.DefineNotFound("frequency_plan", "unknown frequency plan `{frequency_plan}`")
 )
 
 type protobufv2 struct {
@@ -130,33 +111,12 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 	}
 	switch lorawanMetadata.Modulation {
 	case ttnpbv2.Modulation_LORA:
-		bandID, ok := frequencyPlanToBand[lorawanMetadata.FrequencyPlan]
-		if !ok {
-			return nil, errFrequencyPlan.WithAttributes("frequency_plan", lorawanMetadata.FrequencyPlan)
-		}
-		phy, err := band.GetLatest(bandID)
-		if err != nil {
-			return nil, err
-		}
-		var drIndex ttnpb.DataRateIndex
-		var found bool
 		loraDr, err := datarate.ParseLoRa(lorawanMetadata.DataRate)
 		if err != nil {
 			return nil, err
 		}
-		for bandDRIndex, bandDR := range phy.DataRates {
-			if bandDR.Rate.Equal(loraDr.DataRate) {
-				found = true
-				drIndex = bandDRIndex
-				break
-			}
-		}
-		if !found {
-			return nil, errDataRate.WithAttributes("data_rate", lorawanMetadata.DataRate)
-		}
 		settings.DataRate = loraDr.DataRate
 		settings.CodingRate = lorawanMetadata.CodingRate
-		settings.DataRateIndex = drIndex
 	case ttnpbv2.Modulation_FSK:
 		settings.DataRate = ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Fsk{

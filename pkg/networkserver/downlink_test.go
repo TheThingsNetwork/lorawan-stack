@@ -853,19 +853,15 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:             ttnpb.CLASS_A,
-							DownlinkPaths:     paths,
-							Priority:          ttnpb.TxSchedulePriority_HIGHEST,
-							Rx1DataRate:       &lastUp.Settings.DataRate,
-							Rx1Delay:          dev.MacState.CurrentParameters.Rx1Delay,
-							Rx1Frequency:      dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
-							Rx2DataRate:       rx2DataRateFromIndex(dev, a, t),
-							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanId:   dev.FrequencyPlanId,
-							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx1DataRateIndex: lastUp.Settings.DataRateIndex,
-							Rx2DataRateIndex: dev.MacState.CurrentParameters.Rx2DataRateIndex,
+							Class:           ttnpb.CLASS_A,
+							DownlinkPaths:   paths,
+							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
+							Rx1DataRate:     &lastUp.Settings.DataRate,
+							Rx1Delay:        dev.MacState.CurrentParameters.Rx1Delay,
+							Rx1Frequency:    dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
+							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
+							Rx2Frequency:    dev.MacState.CurrentParameters.Rx2Frequency,
+							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
 					testErrScheduleResponse,
@@ -1008,19 +1004,15 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:             ttnpb.CLASS_A,
-							DownlinkPaths:     paths,
-							Priority:          ttnpb.TxSchedulePriority_HIGHEST,
-							Rx1DataRate:       &lastUp.Settings.DataRate,
-							Rx1Delay:          dev.MacState.CurrentParameters.Rx1Delay,
-							Rx1Frequency:      dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
-							Rx2DataRate:       rx2DataRateFromIndex(dev, a, t),
-							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanId:   dev.FrequencyPlanId,
-							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx1DataRateIndex: lastUp.Settings.DataRateIndex,
-							Rx2DataRateIndex: dev.MacState.CurrentParameters.Rx2DataRateIndex,
+							Class:           ttnpb.CLASS_A,
+							DownlinkPaths:   paths,
+							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
+							Rx1DataRate:     &lastUp.Settings.DataRate,
+							Rx1Delay:        dev.MacState.CurrentParameters.Rx1Delay,
+							Rx1Frequency:    dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
+							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
+							Rx2Frequency:    dev.MacState.CurrentParameters.Rx2Frequency,
+							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
 					testErrScheduleResponse,
@@ -1167,19 +1159,15 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:             ttnpb.CLASS_A,
-							DownlinkPaths:     paths,
-							Priority:          ttnpb.TxSchedulePriority_HIGHEST,
-							Rx1DataRate:       &lastUp.Settings.DataRate,
-							Rx1Delay:          dev.MacState.CurrentParameters.Rx1Delay,
-							Rx1Frequency:      dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
-							Rx2DataRate:       rx2DataRateFromIndex(dev, a, t),
-							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanId:   dev.FrequencyPlanId,
-							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx1DataRateIndex: lastUp.Settings.DataRateIndex,
-							Rx2DataRateIndex: dev.MacState.CurrentParameters.Rx2DataRateIndex,
+							Class:           ttnpb.CLASS_A,
+							DownlinkPaths:   paths,
+							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
+							Rx1DataRate:     &lastUp.Settings.DataRate,
+							Rx1Delay:        dev.MacState.CurrentParameters.Rx1Delay,
+							Rx1Frequency:    dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
+							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
+							Rx2Frequency:    dev.MacState.CurrentParameters.Rx2Frequency,
+							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
 					testErrScheduleResponse,
@@ -1332,16 +1320,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:             ttnpb.CLASS_A,
-							DownlinkPaths:     paths,
-							Priority:          ttnpb.TxSchedulePriority_HIGHEST,
-							Rx1DataRate:       &lastUp.Settings.DataRate,
-							Rx1Delay:          dev.MacState.CurrentParameters.Rx1Delay,
-							Rx1Frequency:      dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
-							FrequencyPlanId:   dev.FrequencyPlanId,
-							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx1DataRateIndex: lastUp.Settings.DataRateIndex,
+							Class:           ttnpb.CLASS_A,
+							DownlinkPaths:   paths,
+							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
+							Rx1DataRate:     &lastUp.Settings.DataRate,
+							Rx1Delay:        dev.MacState.CurrentParameters.Rx1Delay,
+							Rx1Frequency:    dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
+							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
 					testErrScheduleResponse,
@@ -1495,9 +1480,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Rx2Frequency:    DefaultEU868RX2Frequency,
 							AbsoluteTime:    TimePtr(pingAt),
 							FrequencyPlanId: dev.FrequencyPlanId,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx2DataRateIndex:  dev.MacState.CurrentParameters.Rx2DataRateIndex,
-							LorawanPhyVersion: dev.LorawanPhyVersion,
 						}
 					},
 					oneSecondScheduleResponse,
@@ -1644,19 +1626,15 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:             ttnpb.CLASS_A,
-							DownlinkPaths:     paths,
-							Priority:          ttnpb.TxSchedulePriority_HIGHEST,
-							Rx1DataRate:       &lastUp.Settings.DataRate,
-							Rx1Delay:          dev.MacState.CurrentParameters.Rx1Delay,
-							Rx1Frequency:      dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
-							Rx2DataRate:       rx2DataRateFromIndex(dev, a, t),
-							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanId:   dev.FrequencyPlanId,
-							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx1DataRateIndex: lastUp.Settings.DataRateIndex,
-							Rx2DataRateIndex: dev.MacState.CurrentParameters.Rx2DataRateIndex,
+							Class:           ttnpb.CLASS_A,
+							DownlinkPaths:   paths,
+							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
+							Rx1DataRate:     &lastUp.Settings.DataRate,
+							Rx1Delay:        dev.MacState.CurrentParameters.Rx1Delay,
+							Rx1Frequency:    dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
+							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
+							Rx2Frequency:    dev.MacState.CurrentParameters.Rx2Frequency,
+							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
 					testErrScheduleResponse,
@@ -1794,15 +1772,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:             ttnpb.CLASS_C,
-							DownlinkPaths:     paths,
-							Priority:          ttnpb.TxSchedulePriority_HIGH,
-							Rx2DataRate:       rx2DataRateFromIndex(dev, a, t),
-							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanId:   dev.FrequencyPlanId,
-							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx2DataRateIndex: dev.MacState.CurrentParameters.Rx2DataRateIndex,
+							Class:           ttnpb.CLASS_C,
+							DownlinkPaths:   paths,
+							Priority:        ttnpb.TxSchedulePriority_HIGH,
+							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
+							Rx2Frequency:    dev.MacState.CurrentParameters.Rx2Frequency,
+							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
 					testErrScheduleResponse,
@@ -1940,12 +1915,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 									},
 								},
 							},
-							Rx2Frequency:      DefaultEU868RX2Frequency,
-							AbsoluteTime:      TimePtr(now.Add(InfrastructureDelay)),
-							FrequencyPlanId:   dev.FrequencyPlanId,
-							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx2DataRateIndex: dev.MacState.CurrentParameters.Rx2DataRateIndex,
+							Rx2Frequency:    DefaultEU868RX2Frequency,
+							AbsoluteTime:    TimePtr(now.Add(InfrastructureDelay)),
+							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
 					testErrScheduleResponse,
@@ -2069,16 +2041,13 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:             ttnpb.CLASS_C,
-							DownlinkPaths:     paths,
-							Priority:          ttnpb.TxSchedulePriority_HIGH,
-							AbsoluteTime:      TimePtr(now.Add(DefaultEU868RX1Delay.Duration())),
-							Rx2DataRate:       rx2DataRateFromIndex(dev, a, t),
-							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanId:   dev.FrequencyPlanId,
-							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx2DataRateIndex: dev.MacState.CurrentParameters.Rx2DataRateIndex,
+							Class:           ttnpb.CLASS_C,
+							DownlinkPaths:   paths,
+							Priority:        ttnpb.TxSchedulePriority_HIGH,
+							AbsoluteTime:    TimePtr(now.Add(DefaultEU868RX1Delay.Duration())),
+							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
+							Rx2Frequency:    dev.MacState.CurrentParameters.Rx2Frequency,
+							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
 					NsGsScheduleDownlinkResponse{
@@ -2232,15 +2201,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:             ttnpb.CLASS_C,
-							DownlinkPaths:     paths,
-							Priority:          ttnpb.TxSchedulePriority_HIGH,
-							Rx2DataRate:       rx2DataRateFromIndex(dev, a, t),
-							Rx2Frequency:      dev.MacState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanId:   dev.FrequencyPlanId,
-							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx2DataRateIndex: dev.MacState.CurrentParameters.Rx2DataRateIndex,
+							Class:           ttnpb.CLASS_C,
+							DownlinkPaths:   paths,
+							Priority:        ttnpb.TxSchedulePriority_HIGH,
+							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
+							Rx2Frequency:    dev.MacState.CurrentParameters.Rx2Frequency,
+							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
 					NsGsScheduleDownlinkResponse{
@@ -2485,19 +2451,15 @@ func TestProcessDownlinkTask(t *testing.T) {
 					joinAcceptBytes,
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:             ttnpb.CLASS_A,
-							DownlinkPaths:     paths,
-							Priority:          ttnpb.TxSchedulePriority_HIGHEST,
-							Rx1DataRate:       &lastUp.Settings.DataRate,
-							Rx1Delay:          DefaultEU868JoinAcceptDelay,
-							Rx1Frequency:      dev.PendingMacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
-							Rx2DataRate:       rx2DataRateFromIndex(dev, a, t),
-							Rx2Frequency:      dev.PendingMacState.CurrentParameters.Rx2Frequency,
-							FrequencyPlanId:   dev.FrequencyPlanId,
-							LorawanPhyVersion: dev.LorawanPhyVersion,
-							// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-							Rx1DataRateIndex: lastUp.Settings.DataRateIndex,
-							Rx2DataRateIndex: dev.MacState.CurrentParameters.Rx2DataRateIndex,
+							Class:           ttnpb.CLASS_A,
+							DownlinkPaths:   paths,
+							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
+							Rx1DataRate:     &lastUp.Settings.DataRate,
+							Rx1Delay:        DefaultEU868JoinAcceptDelay,
+							Rx1Frequency:    dev.PendingMacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
+							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
+							Rx2Frequency:    dev.PendingMacState.CurrentParameters.Rx2Frequency,
+							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
 					testErrScheduleResponse,

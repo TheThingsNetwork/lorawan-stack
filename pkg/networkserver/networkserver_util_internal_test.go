@@ -1051,33 +1051,29 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 							Settings: &ttnpb.DownlinkMessage_Request{
 								Request: func() *ttnpb.TxRequest {
 									txReq := &ttnpb.TxRequest{
-										Class:             conf.Class,
-										DownlinkPaths:     expectedAttempt.RequestPaths,
-										Priority:          conf.Priority,
-										FrequencyPlanId:   conf.FrequencyPlanID,
-										AbsoluteTime:      conf.AbsoluteTime,
-										LorawanPhyVersion: conf.PHYVersion,
+										Class:           conf.Class,
+										DownlinkPaths:   expectedAttempt.RequestPaths,
+										Priority:        conf.Priority,
+										FrequencyPlanId: conf.FrequencyPlanID,
+										AbsoluteTime:    conf.AbsoluteTime,
 									}
 									if conf.SetRX1 {
+										drIdx, _, _ := phy.FindUplinkDataRate(conf.Uplink.Settings.DataRate)
 										txReq.Rx1Delay = conf.RX1Delay
 										rx1DRIdx := test.Must(phy.Rx1DataRate(
-											conf.Uplink.Settings.DataRateIndex,
+											drIdx,
 											conf.MACState.CurrentParameters.Rx1DataRateOffset,
 											conf.MACState.CurrentParameters.DownlinkDwellTime.GetValue()),
 										).(ttnpb.DataRateIndex)
 										rx1DR := phy.DataRates[rx1DRIdx]
 										txReq.Rx1DataRate = &rx1DR.Rate
 										txReq.Rx1Frequency = conf.MACState.CurrentParameters.Channels[test.Must(phy.Rx1Channel(uint8(conf.Uplink.DeviceChannelIndex))).(uint8)].DownlinkFrequency
-										// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-										txReq.Rx1DataRateIndex = rx1DRIdx
 									}
 									if conf.SetRX2 {
 										rx2DRIdx := conf.MACState.CurrentParameters.Rx2DataRateIndex
 										rx2DR := phy.DataRates[rx2DRIdx]
 										txReq.Rx2DataRate = &rx2DR.Rate
 										txReq.Rx2Frequency = conf.MACState.CurrentParameters.Rx2Frequency
-										// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-										txReq.Rx2DataRateIndex = rx2DRIdx
 									}
 									return txReq
 								}(),
@@ -2174,8 +2170,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 									},
 								},
 							},
-							Rx2Frequency:      x.PendingMacState.CurrentParameters.Rx2Frequency,
-							LorawanPhyVersion: x.LorawanPhyVersion,
+							Rx2Frequency: x.PendingMacState.CurrentParameters.Rx2Frequency,
 							// TODO: Generate RX1 transmission parameters if necessary.
 							// https://github.com/TheThingsNetwork/lorawan-stack/issues/3142
 						},
