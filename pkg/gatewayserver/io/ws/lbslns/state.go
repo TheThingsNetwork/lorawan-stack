@@ -22,7 +22,8 @@ import (
 
 // state represents the LBS session state.
 type state struct {
-	ID *int32
+	ID       *int32
+	TimeSync *bool
 }
 
 func updateState(ctx context.Context, f func(*state)) {
@@ -40,6 +41,12 @@ func updateState(ctx context.Context, f func(*state)) {
 func updateSessionID(ctx context.Context, id int32) {
 	updateState(ctx, func(st *state) {
 		st.ID = &id
+	})
+}
+
+func updateSessionTimeSync(ctx context.Context, b bool) {
+	updateState(ctx, func(st *state) {
+		st.TimeSync = &b
 	})
 }
 
@@ -62,4 +69,14 @@ func getSessionID(ctx context.Context) (int32, bool) {
 		return nil
 	}).(int32)
 	return i, ok
+}
+
+func getSessionTimeSync(ctx context.Context) (bool, bool) {
+	d, ok := getState(ctx, func(st *state) interface{} {
+		if st.TimeSync != nil {
+			return *st.TimeSync
+		}
+		return nil
+	}).(bool)
+	return d, ok
 }

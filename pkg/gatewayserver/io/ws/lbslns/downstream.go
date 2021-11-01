@@ -137,6 +137,10 @@ func (dnmsg *DownlinkMessage) ToDownlinkMessage(bandID string) (*ttnpb.DownlinkM
 
 // TransferTime implements Formatter.
 func (*lbsLNS) TransferTime(ctx context.Context, t time.Time, conn *io.Connection) ([]byte, error) {
+	if enabled, ok := getSessionTimeSync(ctx); !ok || !enabled {
+		return nil, nil
+	}
+
 	concentratorTime, ok := conn.TimeFromServerTime(t)
 	if !ok {
 		return nil, nil

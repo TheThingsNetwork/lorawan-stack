@@ -230,8 +230,7 @@ func TestToDownlinkMessage(t *testing.T) {
 func TestTransferTime(t *testing.T) {
 	a, ctx := test.New(t)
 
-	session := &ws.Session{}
-	ctx = ws.NewContextWithSession(ctx, session)
+	ctx = ws.NewContextWithSession(ctx, &ws.Session{})
 
 	gtw := &ttnpb.Gateway{
 		Ids: &ttnpb.GatewayIdentifiers{
@@ -248,8 +247,18 @@ func TestTransferTime(t *testing.T) {
 
 	f := (*lbsLNS)(nil)
 
-	// No time sync available.
+	// No timesync settings available in the session.
 	b, err := f.TransferTime(ctx, time.Now(), conn)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(b, should.BeNil)
+
+	// Enable timesync for the session.
+	updateSessionTimeSync(ctx, true)
+
+	// No time sync available.
+	b, err = f.TransferTime(ctx, time.Now(), conn)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
