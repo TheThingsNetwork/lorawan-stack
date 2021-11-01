@@ -163,7 +163,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			if !valid {
 				return errInvalidAuthorization.New()
 			}
-			if accessToken.ExpiresAt.Before(time.Now()) {
+			if accessToken.ExpiresAt != nil && accessToken.ExpiresAt.Before(time.Now()) {
 				return errTokenExpired.New()
 			}
 			accessToken.AccessToken, accessToken.RefreshToken = "", ""

@@ -70,7 +70,7 @@ func (m *User) ValidateFields(paths ...string) error {
 
 		case "created_at":
 
-			if v, ok := interface{}(&m.CreatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCreatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UserValidationError{
 						field:  "created_at",
@@ -82,7 +82,7 @@ func (m *User) ValidateFields(paths ...string) error {
 
 		case "updated_at":
 
-			if v, ok := interface{}(&m.UpdatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetUpdatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UserValidationError{
 						field:  "updated_at",
@@ -1707,7 +1707,7 @@ func (m *Invitation) ValidateFields(paths ...string) error {
 			// no validation rules for Token
 		case "expires_at":
 
-			if v, ok := interface{}(&m.ExpiresAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetExpiresAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return InvitationValidationError{
 						field:  "expires_at",
@@ -1719,7 +1719,7 @@ func (m *Invitation) ValidateFields(paths ...string) error {
 
 		case "created_at":
 
-			if v, ok := interface{}(&m.CreatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCreatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return InvitationValidationError{
 						field:  "created_at",
@@ -1731,7 +1731,7 @@ func (m *Invitation) ValidateFields(paths ...string) error {
 
 		case "updated_at":
 
-			if v, ok := interface{}(&m.UpdatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetUpdatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return InvitationValidationError{
 						field:  "updated_at",
@@ -2503,7 +2503,7 @@ func (m *UserSession) ValidateFields(paths ...string) error {
 
 		case "created_at":
 
-			if v, ok := interface{}(&m.CreatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCreatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UserSessionValidationError{
 						field:  "created_at",
@@ -2515,7 +2515,7 @@ func (m *UserSession) ValidateFields(paths ...string) error {
 
 		case "updated_at":
 
-			if v, ok := interface{}(&m.UpdatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetUpdatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UserSessionValidationError{
 						field:  "updated_at",
@@ -2861,7 +2861,7 @@ func (m *LoginToken) ValidateFields(paths ...string) error {
 
 		case "created_at":
 
-			if v, ok := interface{}(&m.CreatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCreatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return LoginTokenValidationError{
 						field:  "created_at",
@@ -2873,7 +2873,7 @@ func (m *LoginToken) ValidateFields(paths ...string) error {
 
 		case "updated_at":
 
-			if v, ok := interface{}(&m.UpdatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetUpdatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return LoginTokenValidationError{
 						field:  "updated_at",
@@ -2885,7 +2885,7 @@ func (m *LoginToken) ValidateFields(paths ...string) error {
 
 		case "expires_at":
 
-			if v, ok := interface{}(&m.ExpiresAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetExpiresAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return LoginTokenValidationError{
 						field:  "expires_at",

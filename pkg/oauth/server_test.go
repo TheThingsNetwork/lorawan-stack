@@ -55,10 +55,15 @@ type authorizeFormData struct {
 }
 
 var (
+	now           = time.Now().Truncate(time.Second)
+	anHourFromNow = now.Add(time.Hour)
+)
+
+var (
 	mockSession = &ttnpb.UserSession{
 		UserIds:       &ttnpb.UserIdentifiers{UserId: "user"},
 		SessionId:     "session_id",
-		CreatedAt:     time.Now().Truncate(time.Second),
+		CreatedAt:     &now,
 		SessionSecret: "secret-1234",
 	}
 	mockUser = &ttnpb.User{
@@ -672,8 +677,8 @@ func TestTokenExchange(t *testing.T) {
 					Code:          "the code",
 					RedirectUri:   "http://uri/callback",
 					State:         "foo",
-					CreatedAt:     time.Now().Truncate(time.Second),
-					ExpiresAt:     time.Now().Truncate(time.Second).Add(time.Hour),
+					CreatedAt:     &now,
+					ExpiresAt:     &anHourFromNow,
 				}
 			},
 			Method: "POST",
@@ -714,8 +719,8 @@ func TestTokenExchange(t *testing.T) {
 					Code:          "the code",
 					RedirectUri:   "http://uri/callback",
 					State:         "foo",
-					CreatedAt:     time.Now().Truncate(time.Second),
-					ExpiresAt:     time.Now().Truncate(time.Second).Add(time.Hour),
+					CreatedAt:     &now,
+					ExpiresAt:     &anHourFromNow,
 				}
 			},
 			Method: "POST",
@@ -754,8 +759,8 @@ func TestTokenExchange(t *testing.T) {
 					Id:            "SFUBFRKYTGULGPAXXM4SHIBYMKCPTIMQBM63ZGQ",
 					RefreshToken:  "PBKDF2$sha256$20000$IGAiKs46xX_M64E5$4xpyqnQT8SOa_Vf4xhEPk6WOZnhmAjG2mqGQiYBhm2s",
 					Rights:        mockClient.Rights,
-					CreatedAt:     time.Now().Truncate(time.Second),
-					ExpiresAt:     time.Now().Truncate(time.Second).Add(time.Hour),
+					CreatedAt:     &now,
+					ExpiresAt:     &anHourFromNow,
 				}
 			},
 			Method: "POST",

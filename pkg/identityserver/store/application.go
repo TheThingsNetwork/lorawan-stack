@@ -80,8 +80,8 @@ var applicationColumnNames = map[string][]string{
 
 func (app Application) toPB(pb *ttnpb.Application, fieldMask *pbtypes.FieldMask) {
 	pb.Ids = &ttnpb.ApplicationIdentifiers{ApplicationId: app.ApplicationID}
-	pb.CreatedAt = cleanTime(app.CreatedAt)
-	pb.UpdatedAt = cleanTime(app.UpdatedAt)
+	pb.CreatedAt = cleanTimePtr(&app.CreatedAt)
+	pb.UpdatedAt = cleanTimePtr(&app.UpdatedAt)
 	pb.DeletedAt = cleanTimePtr(app.DeletedAt)
 	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultApplicationFieldMask

@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	time "time"
-)
+import fmt "fmt"
 
 func (dst *OAuthClientAuthorizationIdentifiers) SetFields(src *OAuthClientAuthorizationIdentifiers, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -109,8 +106,7 @@ func (dst *OAuthClientAuthorization) SetFields(src *OAuthClientAuthorization, pa
 			if src != nil {
 				dst.CreatedAt = src.CreatedAt
 			} else {
-				var zero time.Time
-				dst.CreatedAt = zero
+				dst.CreatedAt = nil
 			}
 		case "updated_at":
 			if len(subs) > 0 {
@@ -119,8 +115,7 @@ func (dst *OAuthClientAuthorization) SetFields(src *OAuthClientAuthorization, pa
 			if src != nil {
 				dst.UpdatedAt = src.UpdatedAt
 			} else {
-				var zero time.Time
-				dst.UpdatedAt = zero
+				dst.UpdatedAt = nil
 			}
 
 		default:
@@ -311,8 +306,7 @@ func (dst *OAuthAuthorizationCode) SetFields(src *OAuthAuthorizationCode, paths 
 			if src != nil {
 				dst.CreatedAt = src.CreatedAt
 			} else {
-				var zero time.Time
-				dst.CreatedAt = zero
+				dst.CreatedAt = nil
 			}
 		case "expires_at":
 			if len(subs) > 0 {
@@ -321,8 +315,7 @@ func (dst *OAuthAuthorizationCode) SetFields(src *OAuthAuthorizationCode, paths 
 			if src != nil {
 				dst.ExpiresAt = src.ExpiresAt
 			} else {
-				var zero time.Time
-				dst.ExpiresAt = zero
+				dst.ExpiresAt = nil
 			}
 
 		default:
@@ -484,8 +477,7 @@ func (dst *OAuthAccessToken) SetFields(src *OAuthAccessToken, paths ...string) e
 			if src != nil {
 				dst.CreatedAt = src.CreatedAt
 			} else {
-				var zero time.Time
-				dst.CreatedAt = zero
+				dst.CreatedAt = nil
 			}
 		case "expires_at":
 			if len(subs) > 0 {
@@ -494,8 +486,7 @@ func (dst *OAuthAccessToken) SetFields(src *OAuthAccessToken, paths ...string) e
 			if src != nil {
 				dst.ExpiresAt = src.ExpiresAt
 			} else {
-				var zero time.Time
-				dst.ExpiresAt = zero
+				dst.ExpiresAt = nil
 			}
 
 		default:

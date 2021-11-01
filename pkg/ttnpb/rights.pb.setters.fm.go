@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	time "time"
-)
+import fmt "fmt"
 
 func (dst *Rights) SetFields(src *Rights, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -76,8 +73,7 @@ func (dst *APIKey) SetFields(src *APIKey, paths ...string) error {
 			if src != nil {
 				dst.CreatedAt = src.CreatedAt
 			} else {
-				var zero time.Time
-				dst.CreatedAt = zero
+				dst.CreatedAt = nil
 			}
 		case "updated_at":
 			if len(subs) > 0 {
@@ -86,8 +82,7 @@ func (dst *APIKey) SetFields(src *APIKey, paths ...string) error {
 			if src != nil {
 				dst.UpdatedAt = src.UpdatedAt
 			} else {
-				var zero time.Time
-				dst.UpdatedAt = zero
+				dst.UpdatedAt = nil
 			}
 		case "expires_at":
 			if len(subs) > 0 {

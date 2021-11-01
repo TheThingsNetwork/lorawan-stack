@@ -53,8 +53,8 @@ func TestClientStore(t *testing.T) {
 			a.So(created.Name, should.Equal, "Foo Client")
 			a.So(created.Description, should.Equal, "The Amazing Foo Client")
 			a.So(created.Attributes, should.HaveLength, 3)
-			a.So(created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
-			a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(*created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(*created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 		}
 
 		got, err := store.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes"}})
@@ -65,8 +65,8 @@ func TestClientStore(t *testing.T) {
 			a.So(got.Name, should.Equal, "Foo Client")
 			a.So(got.Description, should.BeEmpty)
 			a.So(got.Attributes, should.HaveLength, 3)
-			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
-			a.So(got.UpdatedAt, should.Equal, created.UpdatedAt)
+			a.So(got.CreatedAt, should.Resemble, created.CreatedAt)
+			a.So(got.UpdatedAt, should.Resemble, created.UpdatedAt)
 		}
 
 		_, err = store.UpdateClient(ctx, &ttnpb.Client{
@@ -92,8 +92,8 @@ func TestClientStore(t *testing.T) {
 		if a.So(updated, should.NotBeNil) {
 			a.So(updated.Description, should.Equal, "The Amazing Foobar Client")
 			a.So(updated.Attributes, should.HaveLength, 3)
-			a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
-			a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
+			a.So(updated.CreatedAt, should.Resemble, created.CreatedAt)
+			a.So(*updated.UpdatedAt, should.HappenAfter, *created.CreatedAt)
 		}
 
 		got, err = store.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, nil)
@@ -104,8 +104,8 @@ func TestClientStore(t *testing.T) {
 			a.So(got.Name, should.Equal, created.Name)
 			a.So(got.Description, should.Equal, updated.Description)
 			a.So(got.Attributes, should.Resemble, updated.Attributes)
-			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
-			a.So(got.UpdatedAt, should.Equal, updated.UpdatedAt)
+			a.So(got.CreatedAt, should.Resemble, created.CreatedAt)
+			a.So(got.UpdatedAt, should.Resemble, updated.UpdatedAt)
 		}
 
 		list, err := store.FindClients(ctx, nil, &pbtypes.FieldMask{Paths: []string{"name"}})

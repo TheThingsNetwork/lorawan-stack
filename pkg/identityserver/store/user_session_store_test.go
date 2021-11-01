@@ -64,8 +64,8 @@ func TestUserSessionStore(t *testing.T) {
 		if a.So(created, should.NotBeNil) {
 			a.So(created.SessionId, should.NotBeEmpty)
 			a.So(created.SessionSecret, should.Equal, "123412341234123412341234")
-			a.So(created.CreatedAt, should.NotBeZeroValue)
-			a.So(created.UpdatedAt, should.NotBeZeroValue)
+			a.So(*created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(*created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 			a.So(created.ExpiresAt, should.BeNil)
 		}
 
@@ -79,8 +79,8 @@ func TestUserSessionStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
-			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
-			a.So(got.UpdatedAt, should.Equal, created.UpdatedAt)
+			a.So(got.CreatedAt, should.Resemble, created.CreatedAt)
+			a.So(got.UpdatedAt, should.Resemble, created.UpdatedAt)
 			a.So(got.ExpiresAt, should.BeNil)
 		}
 
@@ -88,8 +88,8 @@ func TestUserSessionStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
-			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
-			a.So(got.UpdatedAt, should.Equal, created.UpdatedAt)
+			a.So(got.CreatedAt, should.Resemble, created.CreatedAt)
+			a.So(got.UpdatedAt, should.Resemble, created.UpdatedAt)
 			a.So(got.ExpiresAt, should.BeNil)
 		}
 
@@ -102,8 +102,8 @@ func TestUserSessionStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(updated, should.NotBeNil) {
-			a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
-			a.So(updated.UpdatedAt, should.NotEqual, created.UpdatedAt)
+			a.So(updated.CreatedAt, should.Resemble, created.CreatedAt)
+			a.So(updated.UpdatedAt, should.NotResemble, created.UpdatedAt)
 			a.So(updated.ExpiresAt, should.NotBeNil)
 		}
 
@@ -131,8 +131,8 @@ func TestUserSessionStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(list, should.HaveLength, 1) {
-			a.So(list[0].CreatedAt, should.Equal, created.CreatedAt)
-			a.So(list[0].UpdatedAt, should.Equal, updated.UpdatedAt)
+			a.So(list[0].CreatedAt, should.Resemble, created.CreatedAt)
+			a.So(list[0].UpdatedAt, should.Resemble, updated.UpdatedAt)
 			a.So(list[0].ExpiresAt, should.Resemble, updated.ExpiresAt)
 		}
 

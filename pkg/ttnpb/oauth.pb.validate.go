@@ -184,7 +184,7 @@ func (m *OAuthClientAuthorization) ValidateFields(paths ...string) error {
 
 		case "created_at":
 
-			if v, ok := interface{}(&m.CreatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCreatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return OAuthClientAuthorizationValidationError{
 						field:  "created_at",
@@ -196,7 +196,7 @@ func (m *OAuthClientAuthorization) ValidateFields(paths ...string) error {
 
 		case "updated_at":
 
-			if v, ok := interface{}(&m.UpdatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetUpdatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return OAuthClientAuthorizationValidationError{
 						field:  "updated_at",
@@ -565,7 +565,7 @@ func (m *OAuthAuthorizationCode) ValidateFields(paths ...string) error {
 			// no validation rules for State
 		case "created_at":
 
-			if v, ok := interface{}(&m.CreatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCreatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return OAuthAuthorizationCodeValidationError{
 						field:  "created_at",
@@ -577,7 +577,7 @@ func (m *OAuthAuthorizationCode) ValidateFields(paths ...string) error {
 
 		case "expires_at":
 
-			if v, ok := interface{}(&m.ExpiresAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetExpiresAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return OAuthAuthorizationCodeValidationError{
 						field:  "expires_at",
@@ -819,7 +819,7 @@ func (m *OAuthAccessToken) ValidateFields(paths ...string) error {
 
 		case "created_at":
 
-			if v, ok := interface{}(&m.CreatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCreatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return OAuthAccessTokenValidationError{
 						field:  "created_at",
@@ -831,7 +831,7 @@ func (m *OAuthAccessToken) ValidateFields(paths ...string) error {
 
 		case "expires_at":
 
-			if v, ok := interface{}(&m.ExpiresAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetExpiresAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return OAuthAccessTokenValidationError{
 						field:  "expires_at",

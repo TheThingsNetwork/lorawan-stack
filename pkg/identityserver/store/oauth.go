@@ -36,8 +36,8 @@ type ClientAuthorization struct {
 func (a ClientAuthorization) toPB() *ttnpb.OAuthClientAuthorization {
 	pb := &ttnpb.OAuthClientAuthorization{
 		Rights:    a.Rights.Rights,
-		CreatedAt: cleanTime(a.CreatedAt),
-		UpdatedAt: cleanTime(a.UpdatedAt),
+		CreatedAt: cleanTimePtr(&a.CreatedAt),
+		UpdatedAt: cleanTimePtr(&a.UpdatedAt),
 	}
 	if a.Client != nil {
 		pb.ClientIds.ClientId = a.Client.ClientID
@@ -65,7 +65,7 @@ type AuthorizationCode struct {
 	Code        string `gorm:"type:VARCHAR;unique_index:authorization_code_code_index;not null"`
 	RedirectURI string `gorm:"type:VARCHAR;column:redirect_uri"`
 	State       string `gorm:"type:VARCHAR"`
-	ExpiresAt   time.Time
+	ExpiresAt   *time.Time
 }
 
 func (a AuthorizationCode) toPB() *ttnpb.OAuthAuthorizationCode {
@@ -74,8 +74,8 @@ func (a AuthorizationCode) toPB() *ttnpb.OAuthAuthorizationCode {
 		Code:        a.Code,
 		RedirectUri: a.RedirectURI,
 		State:       a.State,
-		CreatedAt:   cleanTime(a.CreatedAt),
-		ExpiresAt:   cleanTime(a.ExpiresAt),
+		CreatedAt:   cleanTimePtr(&a.CreatedAt),
+		ExpiresAt:   cleanTimePtr(a.ExpiresAt),
 	}
 	if a.Client != nil {
 		pb.ClientIds.ClientId = a.Client.ClientID
@@ -111,7 +111,7 @@ type AccessToken struct {
 	AccessToken  string `gorm:"type:VARCHAR;not null"`
 	RefreshToken string `gorm:"type:VARCHAR;not null"`
 
-	ExpiresAt time.Time
+	ExpiresAt *time.Time
 }
 
 func (a AccessToken) toPB() *ttnpb.OAuthAccessToken {
@@ -120,8 +120,8 @@ func (a AccessToken) toPB() *ttnpb.OAuthAccessToken {
 		Id:           a.TokenID,
 		AccessToken:  a.AccessToken,
 		RefreshToken: a.RefreshToken,
-		CreatedAt:    cleanTime(a.CreatedAt),
-		ExpiresAt:    cleanTime(a.ExpiresAt),
+		CreatedAt:    cleanTimePtr(&a.CreatedAt),
+		ExpiresAt:    cleanTimePtr(a.ExpiresAt),
 	}
 	if a.Client != nil {
 		pb.ClientIds.ClientId = a.Client.ClientID

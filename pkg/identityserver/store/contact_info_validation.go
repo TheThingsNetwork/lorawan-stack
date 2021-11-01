@@ -34,7 +34,7 @@ type ContactInfoValidation struct {
 	Value         string `gorm:"type:VARCHAR"`
 
 	Used      bool
-	ExpiresAt time.Time
+	ExpiresAt *time.Time
 }
 
 func init() {
@@ -46,7 +46,7 @@ func (c ContactInfoValidation) toPB() *ttnpb.ContactInfoValidation {
 		Id:        c.Reference,
 		Token:     c.Token,
 		CreatedAt: &c.CreatedAt,
-		ExpiresAt: &c.ExpiresAt,
+		ExpiresAt: c.ExpiresAt,
 	}
 }
 
@@ -57,6 +57,6 @@ func (c *ContactInfoValidation) fromPB(pb *ttnpb.ContactInfoValidation) {
 		c.CreatedAt = cleanTime(*pb.CreatedAt)
 	}
 	if pb.ExpiresAt != nil {
-		c.ExpiresAt = cleanTime(*pb.ExpiresAt)
+		c.ExpiresAt = cleanTimePtr(pb.ExpiresAt)
 	}
 }
