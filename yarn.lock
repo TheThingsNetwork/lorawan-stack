@@ -2897,10 +2897,10 @@
     lz-string "^1.4.4"
     pretty-format "^26.6.2"
 
-"@tippyjs/react@^4.2.5":
-  version "4.2.5"
-  resolved "https://registry.yarnpkg.com/@tippyjs/react/-/react-4.2.5.tgz#9b5837db93a1cac953962404df906aef1a18e80d"
-  integrity sha512-YBLgy+1zznBNbx4JOoOdFXWMLXjBh9hLPwRtq3s8RRdrez2l3tPBRt2m2909wZd9S1KUeKjOOYYsnitccI9I3A==
+"@tippyjs/react@^4.2.6":
+  version "4.2.6"
+  resolved "https://registry.yarnpkg.com/@tippyjs/react/-/react-4.2.6.tgz#971677a599bf663f20bb1c60a62b9555b749cc71"
+  integrity sha512-91RicDR+H7oDSyPycI13q3b7o4O60wa2oRbjlz2fyRLmHImc4vyDwuUP8NtZaN0VARJY5hybvDYrFzhY9+Lbyw==
   dependencies:
     tippy.js "^6.3.1"
 
@@ -14817,7 +14817,7 @@ tsutils@^3.17.1:
     tslib "^1.8.1"
 
 "ttn-lw@file:sdk/js":
-  version "3.15.2"
+  version "3.15.3"
   dependencies:
     arraybuffer-to-string "^1.0.2"
     axios "^0.22.0"
