@@ -15,7 +15,6 @@
 package lbslns
 
 import (
-	"context"
 	"encoding/json"
 	"testing"
 	"time"
@@ -32,12 +31,10 @@ import (
 )
 
 func TestFromDownlinkMessage(t *testing.T) {
+	_, ctx := test.New(t)
+	ctx = ws.NewContextWithSession(ctx, &ws.Session{})
+	updateSessionID(ctx, 0x11)
 	var lbsLNS lbsLNS
-	session := ws.Session{
-		Data: State{
-			ID: 0x11,
-		},
-	}
 	for _, tc := range []struct {
 		BandID,
 		Name string
@@ -126,9 +123,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			ctx := context.Background()
-			sessionCtx := ws.NewContextWithSession(ctx, &session)
-			raw, err := lbsLNS.FromDownlink(sessionCtx, tc.DownlinkMessage, tc.BandID, 1554300787, time.Unix(1554300787, 123456000))
+			raw, err := lbsLNS.FromDownlink(ctx, tc.DownlinkMessage, tc.BandID, 1554300787, time.Unix(1554300787, 123456000))
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
@@ -277,9 +272,7 @@ func TestTransferTime(t *testing.T) {
 	a.So(b, should.BeNil)
 
 	// Add fictional session ID.
-	session.Data = State{
-		ID: 42,
-	}
+	updateSessionID(ctx, 0x42)
 
 	// Attempt to transfer time.
 	timeNow := time.Now()
@@ -293,7 +286,7 @@ func TestTransferTime(t *testing.T) {
 			t.FailNow()
 		}
 		a.So(res.TxTime, should.Equal, 0.0)
-		a.So(res.XTime>>48, should.Equal, 42)
+		a.So(res.XTime>>48, should.Equal, 0x42)
 		a.So(res.XTime&0xFFFFFFFFFF, should.Equal, int64(xTime)+timeNow.Sub(timeAtSync).Microseconds())
 		a.So(res.GPSTime, should.Equal, TimeToGPSTime(timeNow))
 		a.So(res.MuxTime, should.Equal, TimeToUnixSeconds(timeNow))

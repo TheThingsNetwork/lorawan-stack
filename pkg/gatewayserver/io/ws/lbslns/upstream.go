@@ -28,7 +28,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -582,12 +581,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			logger.WithError(err).Warn("Failed to handle upstream message")
 			return nil, err
 		}
-		session := ws.SessionFromContext(ctx)
-		session.DataMu.Lock()
-		session.Data = State{
-			ID: int32(jreq.UpInfo.XTime >> 48),
-		}
-		session.DataMu.Unlock()
+		updateSessionID(ctx, int32(jreq.UpInfo.XTime>>48))
 		recordTime(jreq.RefTime, jreq.UpInfo.XTime)
 
 	case TypeUpstreamUplinkDataFrame:
@@ -609,12 +603,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			logger.WithError(err).Warn("Failed to handle upstream message")
 			return nil, err
 		}
-		session := ws.SessionFromContext(ctx)
-		session.DataMu.Lock()
-		session.Data = State{
-			ID: int32(updf.UpInfo.XTime >> 48),
-		}
-		session.DataMu.Unlock()
+		updateSessionID(ctx, int32(updf.UpInfo.XTime>>48))
 		recordTime(updf.RefTime, updf.UpInfo.XTime)
 
 	case TypeUpstreamTxConfirmation:
@@ -630,12 +619,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			logger.WithError(err).Warn("Failed to handle tx ack message")
 			return nil, err
 		}
-		session := ws.SessionFromContext(ctx)
-		session.DataMu.Lock()
-		session.Data = State{
-			ID: int32(txConf.XTime >> 48),
-		}
-		session.DataMu.Unlock()
+		updateSessionID(ctx, int32(txConf.XTime>>48))
 		recordTime(0.0, txConf.XTime)
 
 	case TypeUpstreamTimeSync:

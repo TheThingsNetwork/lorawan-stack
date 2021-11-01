@@ -22,7 +22,6 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -73,17 +72,11 @@ func (f *lbsLNS) FromDownlink(ctx context.Context, down ttnpb.DownlinkMessage, b
 	dnmsg.RxDelay = 1
 
 	// The first 16 bits of XTime gets the session ID from the upstream latestXTime and the other 48 bits are concentrator timestamp accounted for rollover.
-	var (
-		state State
-		ok    bool
-	)
-	session := ws.SessionFromContext(ctx)
-	session.DataMu.RLock()
-	defer session.DataMu.RUnlock()
-	if state, ok = session.Data.(State); !ok {
+	sessionID, found := getSessionID(ctx)
+	if !found {
 		return nil, errSessionStateNotFound.New()
 	}
-	xTime := ConcentratorTimeToXTime(state.ID, concentratorTime)
+	xTime := ConcentratorTimeToXTime(sessionID, concentratorTime)
 
 	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay). The calculated offset is in microseconds.
 	dnmsg.XTime = xTime - int64(dnmsg.RxDelay*int(time.Second/time.Microsecond))
@@ -149,16 +142,13 @@ func (*lbsLNS) TransferTime(ctx context.Context, t time.Time, conn *io.Connectio
 		return nil, nil
 	}
 
-	var state State
-	session := ws.SessionFromContext(ctx)
-	session.DataMu.Lock()
-	defer session.DataMu.Unlock()
-	if state, ok = session.Data.(State); !ok {
+	sessionID, found := getSessionID(ctx)
+	if !found {
 		return nil, nil
 	}
 
 	return TimeSyncResponse{
-		XTime:   ConcentratorTimeToXTime(state.ID, concentratorTime),
+		XTime:   ConcentratorTimeToXTime(sessionID, concentratorTime),
 		GPSTime: TimeToGPSTime(t),
 		MuxTime: TimeToUnixSeconds(t),
 	}.MarshalJSON()
