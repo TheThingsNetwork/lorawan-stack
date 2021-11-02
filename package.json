@@ -62,7 +62,7 @@
     "mkdirp": "^1.0.4",
     "nib": "^1.1.2",
     "pg": "^8.5.1",
-    "prettier": "^2.2.1",
+    "prettier": "^2.4.1",
     "stylint": "^2.0.0",
     "stylus": "^0.55.0",
     "stylus-loader": "^4.3.3",
