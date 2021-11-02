@@ -15,6 +15,8 @@
 package commands
 
 import (
+	"context"
+
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/cobra"
@@ -79,10 +81,10 @@ var (
 			if err != nil {
 				return err
 			}
-			err = store.Transact(ctx, db, func(db *gorm.DB) error {
-				logger.Info("Migrating table contents...")
-				return migrations.Apply(ctx, db, migrations.All...)
-			})
+			logger.Info("Migrating table contents...")
+			err = migrations.Apply(ctx, func(ctx context.Context, f func(db *gorm.DB) error) error {
+				return store.Transact(ctx, db, f)
+			}, migrations.All...)
 			if err != nil {
 				return err
 			}
