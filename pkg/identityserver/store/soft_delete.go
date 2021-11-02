@@ -70,3 +70,38 @@ func WithSoftDeleted(ctx context.Context, onlyDeleted bool) context.Context {
 func WithoutSoftDeleted(ctx context.Context) context.Context {
 	return context.WithValue(ctx, deletedOptionsKey, &deletedOptions{})
 }
+
+type expiredOptionsKeyType struct{}
+
+var expiredOptionsKey expiredOptionsKeyType
+
+type expiredOptions struct {
+	OnlyExpired      bool
+	RestoreThreshold time.Duration
+}
+
+// WithExpired returns a context that tells the store to only query expired entities.
+func WithExpired(ctx context.Context, threshold time.Duration) context.Context {
+	return context.WithValue(ctx, expiredOptionsKey, expiredOptions{
+		OnlyExpired:      true,
+		RestoreThreshold: threshold,
+	})
+}
+
+func expiredFromContext(ctx context.Context) (onlyExpired bool, restoreThreshold time.Duration) {
+	if opts, ok := ctx.Value(expiredOptionsKey).(expiredOptions); ok {
+		return opts.OnlyExpired, opts.RestoreThreshold
+	}
+	return
+}
+
+func withExpiredEntities(expireThreshold time.Duration) func(*gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		scope := db.NewScope(db.Value)
+		if scope.HasColumn("deleted_at") {
+			db = db.Where(fmt.Sprintf("%s.deleted_at IS NOT NULL", scope.TableName())).
+				Where(fmt.Sprintf("%s.deleted_at < ?", scope.TableName()), time.Now().UTC().Add(-expireThreshold))
+		}
+		return db
+	}
+}
