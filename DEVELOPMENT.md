@@ -12,7 +12,7 @@ The Things Stack components are primarily built in Go, we use React for web fron
   - [Steps](#steps)
 - [Using the CLI with the Development Environment](#using-the-cli-with-the-development-environment)
 - [Managing the Development Databases](#managing-the-development-databases)
-  - [CockroachDB](#cockroachdb)
+  - [PostgreSQL](#PostgreSQL)
   - [Redis](#redis)
 - [Building the Frontend](#building-the-frontend)
 - [Starting The Things Stack](#starting-the-things-stack)
@@ -109,7 +109,7 @@ This will build the frontend assets and place it in the `public` folder.
 $ tools/bin/mage dev:dbStart # This requires Docker to be running.
 ```
 
-This will start one instance each of `CockroachDB` and `Redis` as Docker containers. To verify this, you can run
+This will start one instance each of `postgres` and `Redis` as Docker containers. To verify this, you can run
 
 ```bash
 $ docker ps
@@ -167,9 +167,9 @@ $ tools/bin/mage dev:dbStop  # Stops all databases.
 $ tools/bin/mage dev:dbErase # Stops all databases and erase storage.
 ```
 
-### CockroachDB
+### PostgreSQL
 
-CockroachDB is a distributed SQL database that we use in the Identity Server.
+PostgreSQL is a SQL database that we use in the Identity Server.
 
 You can use `tools/bin/mage dev:dbSQL` to enter an SQL shell.
 
