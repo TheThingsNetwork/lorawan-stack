@@ -61,11 +61,10 @@ func NewClusterComponentConnection(ctx context.Context, config Config, delay tim
 	return nil, nil, err
 }
 
-// FetchIdentityServerApplicationSet returns the set of all non-expired applications in the Identity Server.
+// FetchIdentityServerApplications returns the list of all non-expired applications in the Identity Server.
 func FetchIdentityServerApplications(ctx context.Context, client ttnpb.ApplicationRegistryClient, clusterAuth grpc.CallOption, paginationDelay time.Duration) ([]*ttnpb.Application, error) {
 	pageCounter := uint32(1)
 	applicationList := make([]*ttnpb.Application, 0)
-	// Iterate over application list paginated requests and add them to the IS app map.
 	for {
 		res, err := client.List(ctx, &ttnpb.ListApplicationsRequest{
 			Collaborator: nil,
@@ -87,11 +86,10 @@ func FetchIdentityServerApplications(ctx context.Context, client ttnpb.Applicati
 	return applicationList, nil
 }
 
-// FetchIdentityServerEndDeviceSet returns the set of all devices in the Identity Server.
+// FetchIdentityServerEndDevices returns the list of all devices in the Identity Server.
 func FetchIdentityServerEndDevices(ctx context.Context, client ttnpb.EndDeviceRegistryClient, clusterAuth grpc.CallOption, paginationDelay time.Duration) ([]*ttnpb.EndDevice, error) {
 	pageCounter := uint32(1)
 	deviceList := make([]*ttnpb.EndDevice, 0)
-	// Iterate over application list paginated requests and add them to the IS app map.
 	for {
 		res, err := client.List(ctx, &ttnpb.ListEndDevicesRequest{
 			ApplicationIds: nil,

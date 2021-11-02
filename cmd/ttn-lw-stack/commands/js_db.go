@@ -28,8 +28,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
-// NewJSDeviceRegistryCleaner returns a new instance of Join Server RegistryCleaner with a local set
-// of devices.
+// NewJSRegistryCleaner returns a new instance of Join Server RegistryCleaner with a local set
+// of devices and applications.
 func NewJSRegistryCleaner(ctx context.Context, config *redis.Config) (*js.RegistryCleaner, error) {
 	deviceRegistry := &jsredis.DeviceRegistry{
 		Redis:   redis.New(config.WithNamespace("js", "devices")),
