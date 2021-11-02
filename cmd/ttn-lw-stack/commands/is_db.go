@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -101,6 +101,11 @@ var (
 				return err
 			}
 			defer db.Close()
+			appStore := store.GetApplicationStore(db)
+			userStore := store.GetUserStore(db)
+			organizationStore := store.GetOrganizationStore(db)
+			gatewayStore := store.GetGatewayStore(db)
+			clientStore := store.GetClientStore(db)
 			ctx := store.WithSoftDeleted(ctx, true)
 			ctx = store.WithExpired(ctx, config.IS.Delete.Restore)
 			dryRun, err := cmd.Flags().GetBool("dry-run")
@@ -108,31 +113,26 @@ var (
 				return err
 			}
 			// Find expired applications.
-			appStore := store.GetApplicationStore(db)
 			expiredApplications, err := appStore.FindApplications(ctx, []*ttnpb.ApplicationIdentifiers{}, &types.FieldMask{Paths: []string{"ids", "deleted_at"}})
 			if err != nil {
 				return err
 			}
 			// Find expired users.
-			userStore := store.GetUserStore(db)
 			expiredUsers, err := userStore.FindUsers(ctx, []*ttnpb.UserIdentifiers{}, &types.FieldMask{Paths: []string{"ids", "deleted_at"}})
 			if err != nil {
 				return err
 			}
 			// Find expired organizations.
-			organizationStore := store.GetOrganizationStore(db)
 			expiredOrganizations, err := organizationStore.FindOrganizations(ctx, []*ttnpb.OrganizationIdentifiers{}, &types.FieldMask{Paths: []string{"ids", "deleted_at"}})
 			if err != nil {
 				return err
 			}
 			// Find expired gateways.
-			gatewayStore := store.GetGatewayStore(db)
 			expiredGateways, err := gatewayStore.FindGateways(ctx, []*ttnpb.GatewayIdentifiers{}, &types.FieldMask{Paths: []string{"ids", "deleted_at"}})
 			if err != nil {
 				return err
 			}
 			// Find expired clients.
-			clientStore := store.GetClientStore(db)
 			expiredClients, err := clientStore.FindClients(ctx, []*ttnpb.ClientIdentifiers{}, &types.FieldMask{Paths: []string{"ids", "deleted_at"}})
 			if err != nil {
 				return err
@@ -212,7 +212,7 @@ var (
 				if err != nil {
 					return err
 				}
-				err = store.GetUserStore(db).PurgeUser(ctx, ids.GetIds())
+				err = userStore.PurgeUser(ctx, ids.GetIds())
 				if err != nil {
 					return err
 				}
@@ -232,7 +232,7 @@ var (
 				if err != nil {
 					return err
 				}
-				err = store.GetOrganizationStore(db).PurgeOrganization(ctx, ids.GetIds())
+				err = organizationStore.PurgeOrganization(ctx, ids.GetIds())
 				if err != nil {
 					return err
 				}
@@ -254,7 +254,7 @@ var (
 				if err != nil {
 					return err
 				}
-				err = store.GetGatewayStore(db).PurgeGateway(ctx, ids.GetIds())
+				err = gatewayStore.PurgeGateway(ctx, ids.GetIds())
 				if err != nil {
 					return err
 				}
@@ -276,7 +276,7 @@ var (
 				if err != nil {
 					return err
 				}
-				err = store.GetClientStore(db).PurgeClient(ctx, ids.GetIds())
+				err = clientStore.PurgeClient(ctx, ids.GetIds())
 				if err != nil {
 					return err
 				}
