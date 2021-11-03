@@ -84,7 +84,7 @@
     "@formatjs/intl-relativetimeformat": "^8.0.6",
     "@sentry/browser": "^6.13.3",
     "@sentry/integrations": "^6.13.0",
-    "@tippyjs/react": "^4.2.5",
+    "@tippyjs/react": "^4.2.6",
     "autobind-decorator": "^2.4.0",
     "axios": "^0.21.1",
     "brace": "^0.11.1",
