@@ -69,6 +69,7 @@ func (f *lbsLNS) GetRouterConfig(ctx context.Context, msg []byte, bandID string,
 	if err := json.Unmarshal(msg, &version); err != nil {
 		return nil, nil, nil, err
 	}
+	updateSessionTimeSync(ctx, true)
 	cfg, err := pfconfig.GetRouterConfig(bandID, fps, version.IsProduction(), time.Now())
 	if err != nil {
 		return nil, nil, nil, err

@@ -136,7 +136,6 @@ func (s *srv) handleConnectionInfo(c echo.Context) error {
 var euiHexPattern = regexp.MustCompile("^eui-([a-f0-9A-F]{16})$")
 
 func (s *srv) handleTraffic(c echo.Context) (err error) {
-	var session Session
 	id := c.Param("id")
 	auth := c.Request().Header.Get(echo.HeaderAuthorization)
 	ctx := c.Request().Context()
@@ -146,7 +145,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 		"endpoint", eps.Traffic,
 		"remote_addr", c.Request().RemoteAddr,
 	))
-	logger := log.FromContext(ctx)
+	ctx = NewContextWithSession(ctx, &Session{})
 
 	// Convert the ID to EUI.
 	str := euiHexPattern.FindStringSubmatch(id)
@@ -205,6 +204,8 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 		}
 	}
 
+	logger := log.FromContext(ctx)
+
 	conn, err := s.server.Connect(ctx, s, ids)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to connect")
@@ -245,11 +246,18 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 		return nil
 	})
 
+	var timeSyncTickerC <-chan time.Time
+	if s.cfg.TimeSyncInterval > 0 {
+		ticker := time.NewTicker(s.cfg.TimeSyncInterval)
+		timeSyncTickerC = ticker.C
+		defer ticker.Stop()
+	}
+
 	go func() {
+		defer ws.Close()
 		for {
 			select {
 			case <-conn.Context().Done():
-				ws.Close()
 				return
 			case <-pingTicker.C:
 				wsWriteMu.Lock()
@@ -258,19 +266,34 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				if err != nil {
 					logger.WithError(err).Warn("Failed to send ping message")
 					conn.Disconnect(err)
-					ws.Close()
+					return
+				}
+			case <-timeSyncTickerC:
+				b, err := s.formatter.TransferTime(ctx, time.Now(), conn)
+				if err != nil {
+					logger.WithError(err).Warn("Failed to generate time transfer")
+					conn.Disconnect(err)
+					return
+				}
+				if b == nil {
+					continue
+				}
+
+				wsWriteMu.Lock()
+				err = ws.WriteMessage(websocket.TextMessage, b)
+				wsWriteMu.Unlock()
+				if err != nil {
+					logger.WithError(err).Warn("Failed to transfer time")
+					conn.Disconnect(err)
 					return
 				}
 			case down := <-conn.Down():
-				dlTime := time.Now()
-
 				concentratorTime, ok := conn.TimeFromTimestampTime(down.GetScheduled().Timestamp)
 				if !ok {
 					logger.Warn("No clock synchronization")
 					continue
 				}
-				sessionCtx := NewContextWithSession(ctx, &session)
-				dnmsg, err := s.formatter.FromDownlink(sessionCtx, uid, *down, conn.BandID(), concentratorTime, dlTime)
+				dnmsg, err := s.formatter.FromDownlink(ctx, *down, conn.BandID(), concentratorTime, time.Now())
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal downlink message")
 					continue
@@ -300,8 +323,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 			logger.WithError(err).Debug("Failed to read message")
 			return err
 		}
-		sessionCtx := NewContextWithSession(ctx, &session)
-		downstream, err := s.formatter.HandleUp(sessionCtx, data, ids, conn, time.Now())
+		downstream, err := s.formatter.HandleUp(ctx, data, ids, conn, time.Now())
 		if err != nil {
 			return err
 		}

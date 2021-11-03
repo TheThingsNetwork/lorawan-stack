@@ -488,6 +488,17 @@ func (s *Scheduler) TimeFromTimestampTime(t uint32) (ConcentratorTime, bool) {
 	return s.clock.FromTimestampTime(t), true
 }
 
+// TimeFromServerTime returns an indication of the provided timestamp in concentrator time.
+// This method returns false if the clock is not synced with the server.
+func (s *Scheduler) TimeFromServerTime(t time.Time) (ConcentratorTime, bool) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	if !s.clock.IsSynced() {
+		return 0, false
+	}
+	return s.clock.FromServerTime(t)
+}
+
 // SubBandStats returns a map with the usage stats of each sub band.
 func (s *Scheduler) SubBandStats() []*ttnpb.GatewayConnectionStats_SubBand {
 	var res []*ttnpb.GatewayConnectionStats_SubBand

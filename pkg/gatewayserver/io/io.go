@@ -711,6 +711,12 @@ func (c *Connection) TimeFromTimestampTime(timestamp uint32) (scheduling.Concent
 	return c.scheduler.TimeFromTimestampTime(timestamp)
 }
 
+// TimeFromServerTime returns the concentrator time by the given server time.
+// This method returns false if the clock is not synced with the server.
+func (c *Connection) TimeFromServerTime(t time.Time) (scheduling.ConcentratorTime, bool) {
+	return c.scheduler.TimeFromServerTime(t)
+}
+
 func (c *Connection) notifyStatsChanged() {
 	select {
 	case c.statsChangedCh <- struct{}{}:

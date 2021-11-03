@@ -28,7 +28,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -117,7 +116,6 @@ type TxConfirmation struct {
 	XTime   int64            `json:"xtime"`
 	TxTime  float64          `json:"txtime"`
 	GpsTime int64            `json:"gpstime"`
-	RefTime float64          `json:"RefTime,omitempty"`
 }
 
 // MarshalJSON implements json.Marshaler.
@@ -139,6 +137,52 @@ func getInt32AsByteSlice(value int32) ([]byte, error) {
 		return nil, err
 	}
 	return b.Bytes(), nil
+}
+
+// TimeSyncRequest is the time synchronization request from the BasicStation.
+type TimeSyncRequest struct {
+	TxTime float64 `json:"txtime"`
+}
+
+// MarshalJSON implements json.Marshaler.
+func (tsr TimeSyncRequest) MarshalJSON() ([]byte, error) {
+	type Alias TimeSyncRequest
+	return json.Marshal(struct {
+		Type string `json:"msgtype"`
+		Alias
+	}{
+		Type:  TypeUpstreamTimeSync,
+		Alias: Alias(tsr),
+	})
+}
+
+// Response generates a TimeSyncResponse for this request.
+func (tsr TimeSyncRequest) Response(t time.Time) TimeSyncResponse {
+	return TimeSyncResponse{
+		TxTime:  tsr.TxTime,
+		GPSTime: TimeToGPSTime(t),
+		MuxTime: TimeToUnixSeconds(t),
+	}
+}
+
+// TimeSyncResponse is the time synchronization response to the BasicStation.
+type TimeSyncResponse struct {
+	TxTime  float64 `json:"txtime,omitempty"`
+	XTime   int64   `json:"xtime,omitempty"`
+	GPSTime int64   `json:"gpstime"`
+	MuxTime float64 `json:"MuxTime,omitempty"`
+}
+
+// MarshalJSON implements json.Marshaler.
+func (tsr TimeSyncResponse) MarshalJSON() ([]byte, error) {
+	type Alias TimeSyncResponse
+	return json.Marshal(struct {
+		Type string `json:"msgtype"`
+		Alias
+	}{
+		Type:  TypeUpstreamTimeSync,
+		Alias: Alias(tsr),
+	})
 }
 
 // toUplinkMessage extracts fields from the Basics Station Join Request "jreq" message and converts them into an UplinkMessage for the network server.
@@ -481,14 +525,24 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 		"upstream_type", typ,
 	))
 
-	recordTime := func(recordRTT bool, refTime float64, xTime int64, server time.Time) {
-		if recordRTT {
-			conn.RecordRTT(server.Sub(getTimeFromFloat64(refTime)), server)
+	recordTime := func(refTimeUnix float64, xTime int64) {
+		if refTimeUnix != 0.0 {
+			refTime := TimeFromUnixSeconds(refTimeUnix)
+			if delta := receivedAt.Sub(refTime); delta > f.maxRoundTripDelay {
+				logger.WithFields(log.Fields(
+					"delta", delta,
+					"ref_time_unix", refTimeUnix,
+					"ref_time", refTime,
+					"received_at", receivedAt,
+				)).Warn("Gateway reported RefTime greater than the valid maximum. Skip RTT measurement")
+			} else {
+				conn.RecordRTT(delta, receivedAt)
+			}
 		}
 		conn.SyncWithGatewayConcentrator(
 			// The concentrator timestamp is the 32 LSB.
 			uint32(xTime&0xFFFFFFFF),
-			server,
+			receivedAt,
 			// The Basic Station epoch is the 48 LSB.
 			scheduling.ConcentratorTime(time.Duration(xTime&0xFFFFFFFFFF)*time.Microsecond),
 		)
@@ -527,13 +581,8 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			logger.WithError(err).Warn("Failed to handle upstream message")
 			return nil, err
 		}
-		session := ws.SessionFromContext(ctx)
-		session.DataMu.Lock()
-		session.Data = State{
-			ID: int32(jreq.UpInfo.XTime >> 48),
-		}
-		session.DataMu.Unlock()
-		recordTime(false, jreq.RefTime, jreq.UpInfo.XTime, receivedAt)
+		updateSessionID(ctx, int32(jreq.UpInfo.XTime>>48))
+		recordTime(jreq.RefTime, jreq.UpInfo.XTime)
 
 	case TypeUpstreamUplinkDataFrame:
 		var updf UplinkDataFrame
@@ -554,13 +603,8 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			logger.WithError(err).Warn("Failed to handle upstream message")
 			return nil, err
 		}
-		session := ws.SessionFromContext(ctx)
-		session.DataMu.Lock()
-		session.Data = State{
-			ID: int32(updf.UpInfo.XTime >> 48),
-		}
-		session.DataMu.Unlock()
-		recordTime(false, updf.RefTime, updf.UpInfo.XTime, receivedAt)
+		updateSessionID(ctx, int32(updf.UpInfo.XTime>>48))
+		recordTime(updf.RefTime, updf.UpInfo.XTime)
 
 	case TypeUpstreamTxConfirmation:
 		var txConf TxConfirmation
@@ -575,26 +619,17 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			logger.WithError(err).Warn("Failed to handle tx ack message")
 			return nil, err
 		}
-		session := ws.SessionFromContext(ctx)
-		session.DataMu.Lock()
-		session.Data = State{
-			ID: int32(txConf.XTime >> 48),
-		}
-		session.DataMu.Unlock()
-		recordRTT := true
-		refTime := getTimeFromFloat64(txConf.RefTime)
-		delta := receivedAt.Sub(refTime)
-		if delta > f.maxRoundTripDelay {
-			logger.WithFields(log.Fields(
-				"delta", delta,
-				"ref_time", refTime,
-				"received_at", receivedAt,
-			)).Warn("Gateway reported reftime greater than the valid maximum. Skip RTT measurement")
-			recordRTT = false
-		}
-		recordTime(recordRTT, txConf.RefTime, txConf.XTime, receivedAt)
+		updateSessionID(ctx, int32(txConf.XTime>>48))
+		recordTime(0.0, txConf.XTime)
 
-	case TypeUpstreamProprietaryDataFrame, TypeUpstreamRemoteShell, TypeUpstreamTimeSync:
+	case TypeUpstreamTimeSync:
+		var req TimeSyncRequest
+		if err := json.Unmarshal(raw, &req); err != nil {
+			return nil, err
+		}
+		return req.Response(receivedAt).MarshalJSON()
+
+	case TypeUpstreamProprietaryDataFrame, TypeUpstreamRemoteShell:
 		logger.WithField("message_type", typ).Debug("Message type not implemented")
 
 	default:
@@ -602,9 +637,4 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 
 	}
 	return nil, nil
-}
-
-func getTimeFromFloat64(timeInFloat float64) time.Time {
-	sec, nsec := math.Modf(timeInFloat)
-	return time.Unix(int64(sec), int64(nsec*1e9))
 }

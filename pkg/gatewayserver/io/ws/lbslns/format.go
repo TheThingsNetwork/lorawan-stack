@@ -28,11 +28,6 @@ var (
 	trafficEndPointPrefix   = "/traffic"
 )
 
-// State represents the LBS Session state.
-type State struct {
-	ID int32
-}
-
 type lbsLNS struct {
 	maxRoundTripDelay time.Duration
 	tokens            io.DownlinkTokens

@@ -15,29 +15,26 @@
 package lbslns
 
 import (
-	"context"
+	"encoding/json"
 	"testing"
 	"time"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
 func TestFromDownlinkMessage(t *testing.T) {
+	_, ctx := test.New(t)
+	ctx = ws.NewContextWithSession(ctx, &ws.Session{})
+	updateSessionID(ctx, 0x11)
 	var lbsLNS lbsLNS
-	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	uid := unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"})
-	session := ws.Session{
-		Data: State{
-			ID: 0x11,
-		},
-	}
 	for _, tc := range []struct {
 		BandID,
 		Name string
@@ -126,9 +123,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			ctx := context.Background()
-			sessionCtx := ws.NewContextWithSession(ctx, &session)
-			raw, err := lbsLNS.FromDownlink(sessionCtx, uid, tc.DownlinkMessage, tc.BandID, 1554300787, time.Unix(1554300787, 123456000))
+			raw, err := lbsLNS.FromDownlink(ctx, tc.DownlinkMessage, tc.BandID, 1554300787, time.Unix(1554300787, 123456000))
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
@@ -229,5 +224,80 @@ func TestToDownlinkMessage(t *testing.T) {
 				t.Fatalf("Invalid DownlinkMessage: %v", dlMesg)
 			}
 		})
+	}
+}
+
+func TestTransferTime(t *testing.T) {
+	a, ctx := test.New(t)
+
+	ctx = ws.NewContextWithSession(ctx, &ws.Session{})
+
+	gtw := &ttnpb.Gateway{
+		Ids: &ttnpb.GatewayIdentifiers{
+			GatewayId: "eui-1122334455667788",
+			Eui:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
+		},
+		FrequencyPlanId: test.EUFrequencyPlanID,
+	}
+
+	conn, err := io.NewConnection(ctx, nil, gtw, test.FrequencyPlanStore, true, nil)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	f := (*lbsLNS)(nil)
+
+	// No timesync settings available in the session.
+	b, err := f.TransferTime(ctx, time.Now(), conn)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(b, should.BeNil)
+
+	// Enable timesync for the session.
+	updateSessionTimeSync(ctx, true)
+
+	// No time sync available.
+	b, err = f.TransferTime(ctx, time.Now(), conn)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(b, should.BeNil)
+
+	// Add fictional concentrator sync.
+	xTime := 123456
+	timeAtSync := time.Now()
+	conn.SyncWithGatewayConcentrator(
+		uint32(xTime&0xFFFFFFFF),
+		timeAtSync,
+		scheduling.ConcentratorTime(time.Duration(xTime&0xFFFFFFFFFF)*time.Microsecond),
+	)
+
+	// No session ID available.
+	b, err = f.TransferTime(ctx, time.Now(), conn)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(b, should.BeNil)
+
+	// Add fictional session ID.
+	updateSessionID(ctx, 0x42)
+
+	// Attempt to transfer time.
+	timeNow := time.Now()
+	b, err = f.TransferTime(ctx, timeNow, conn)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	if a.So(b, should.NotBeNil) {
+		var res TimeSyncResponse
+		if err := json.Unmarshal(b, &res); !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		a.So(res.TxTime, should.Equal, 0.0)
+		a.So(res.XTime>>48, should.Equal, 0x42)
+		a.So(res.XTime&0xFFFFFFFFFF, should.Equal, int64(xTime)+timeNow.Sub(timeAtSync).Microseconds())
+		a.So(res.GPSTime, should.Equal, TimeToGPSTime(timeNow))
+		a.So(res.MuxTime, should.Equal, TimeToUnixSeconds(timeNow))
 	}
 }

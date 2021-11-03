@@ -20,6 +20,7 @@ import "time"
 type Config struct {
 	UseTrafficTLSAddress bool          `name:"use-traffic-tls-address" description:"Use WSS for the traffic address regardless of the TLS setting"`
 	WSPingInterval       time.Duration `name:"ws-ping-interval" description:"Interval to send WS ping messages"`
+	TimeSyncInterval     time.Duration `name:"time-sync-interval" description:"Interval to send time transfer messages"`
 	AllowUnauthenticated bool          `name:"allow-unauthenticated" description:"Allow unauthenticated connections"`
 }
 
@@ -27,5 +28,6 @@ type Config struct {
 var DefaultConfig = Config{
 	UseTrafficTLSAddress: false,
 	WSPingInterval:       30 * time.Second,
+	TimeSyncInterval:     30 * time.Minute,
 	AllowUnauthenticated: false,
 }
