@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
@@ -637,12 +638,55 @@ type downlinkPath struct {
 	*ttnpb.DownlinkPath
 }
 
-func downlinkPathsFromMetadata(mds ...*ttnpb.RxMetadata) []downlinkPath {
+func computeWantedRSSI(snr float32, channelRSSI float32) float32 {
+	wantedRSSI := channelRSSI
+	if snr <= -5.0 {
+		wantedRSSI += snr
+	} else if snr < 10.0 {
+		wantedRSSI += snr/3.0 - 10.0/3.0
+	}
+	return wantedRSSI
+}
+
+func snrMetadataComparator(mds []*ttnpb.RxMetadata) func(int, int) bool {
+	return func(i, j int) bool {
+		return mds[i].Snr >= mds[j].Snr
+	}
+}
+
+func wantedRSSIMetadataComparator(mds []*ttnpb.RxMetadata) func(int, int) bool {
+	wantedRSSI := func(k int) float32 { return computeWantedRSSI(mds[k].Snr, mds[k].ChannelRssi) }
+	return func(i, j int) bool {
+		return wantedRSSI(i) >= wantedRSSI(j)
+	}
+}
+
+var (
+	ignoreInvalidMDFeatureFlag = experimental.DefineFeature("ns.down.path.ignore_invalid_metadata", false)
+	useWantedRSSIFeatureFlag   = experimental.DefineFeature("ns.down.path.use_wanted_rssi", false)
+)
+
+func buildMetadataComparator(ctx context.Context, mds []*ttnpb.RxMetadata) func(int, int) bool {
+	comparator := snrMetadataComparator(mds)
+	if useWantedRSSIFeatureFlag.GetValue(ctx) {
+		comparator = wantedRSSIMetadataComparator(mds)
+	}
+	if ignoreInvalidMDFeatureFlag.GetValue(ctx) {
+		invalidMD := func(k int) bool { return mds[k].Snr == 0.0 || mds[k].ChannelRssi == 0.0 }
+		return func(i, j int) bool {
+			lhsInvalid, rhsInvalid := invalidMD(i), invalidMD(j)
+			if lhsInvalid {
+				return lhsInvalid == rhsInvalid
+			}
+			return comparator(i, j)
+		}
+	}
+	return comparator
+}
+
+func downlinkPathsFromMetadata(ctx context.Context, mds ...*ttnpb.RxMetadata) []downlinkPath {
 	mds = append(mds[:0:0], mds...)
-	sort.SliceStable(mds, func(i, j int) bool {
-		// TODO: Improve the sorting algorithm (https://github.com/TheThingsNetwork/lorawan-stack/issues/13)
-		return mds[i].Snr > mds[j].Snr
-	})
+	sort.SliceStable(mds, buildMetadataComparator(ctx, mds))
 	head := make([]downlinkPath, 0, len(mds))
 	body := make([]downlinkPath, 0, len(mds))
 	tail := make([]downlinkPath, 0, len(mds))
@@ -674,9 +718,9 @@ func downlinkPathsFromMetadata(mds ...*ttnpb.RxMetadata) []downlinkPath {
 	return res
 }
 
-func downlinkPathsFromRecentUplinks(ups ...*ttnpb.UplinkMessage) []downlinkPath {
+func downlinkPathsFromRecentUplinks(ctx context.Context, ups ...*ttnpb.UplinkMessage) []downlinkPath {
 	for i := len(ups) - 1; i >= 0; i-- {
-		if paths := downlinkPathsFromMetadata(ups[i].RxMetadata...); len(paths) > 0 {
+		if paths := downlinkPathsFromMetadata(ctx, ups[i].RxMetadata...); len(paths) > 0 {
 			return paths
 		}
 	}
@@ -1127,7 +1171,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		}
 	}
 
-	paths := downlinkPathsFromRecentUplinks(dev.MacState.RecentUplinks...)
+	paths := downlinkPathsFromRecentUplinks(ctx, dev.MacState.RecentUplinks...)
 	if len(paths) == 0 {
 		log.FromContext(ctx).Error("No downlink path available, skip class A downlink slot")
 		return downlinkAttemptResult{
@@ -1408,7 +1452,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 			})
 		}
 	} else {
-		paths = downlinkPathsFromRecentUplinks(dev.MacState.RecentUplinks...)
+		paths = downlinkPathsFromRecentUplinks(ctx, dev.MacState.RecentUplinks...)
 		if len(paths) == 0 {
 			log.FromContext(ctx).Error("No downlink path available, skip class B/C downlink slot")
 			if genState.ApplicationDownlink != nil && ttnpb.HasAnyField(sets, "session.queued_application_downlinks") {
@@ -1605,7 +1649,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 					ctx := events.ContextWithCorrelationID(ctx, up.CorrelationIds...)
 					ctx = events.ContextWithCorrelationID(ctx, dev.PendingMacState.QueuedJoinAccept.CorrelationIds...)
 
-					paths := downlinkPathsFromRecentUplinks(up)
+					paths := downlinkPathsFromRecentUplinks(ctx, up)
 					if len(paths) == 0 {
 						logger.Warn("No downlink path available, skip join-accept downlink slot")
 						dev.PendingMacState.RxWindowsAvailable = false

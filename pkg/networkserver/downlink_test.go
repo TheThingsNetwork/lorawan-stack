@@ -103,7 +103,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 		var downlinkPaths []DownlinkPath
 		if !fixedPaths {
-			downlinkPaths = DownlinkPathsFromMetadata(DefaultRxMetadata[:]...)
+			downlinkPaths = DownlinkPathsFromMetadata(ctx, DefaultRxMetadata[:]...)
 		} else {
 			for i, ids := range DefaultGatewayAntennaIdentifiers {
 				ids := ids
