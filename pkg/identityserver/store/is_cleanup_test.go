@@ -75,7 +75,6 @@ func TestCleanupExpiredEntities(t *testing.T) {
 
 		expiredCtx := WithExpired(ctx, time.Second)
 		expiredCtx = WithSoftDeleted(expiredCtx, true)
-		// application test
 		appStore.DeleteApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: app1.ApplicationID})
 		time.Sleep(time.Second)
 		appStore.DeleteApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: app2.ApplicationID})
@@ -95,7 +94,7 @@ func TestCleanupExpiredEntities(t *testing.T) {
 				a.So(expiredGateways[0].GetIds().GetGatewayId(), should.Equal, gtw1.GatewayID)
 			}
 		}
-		// user test
+
 		usrStore.DeleteUser(ctx, &ttnpb.UserIdentifiers{UserId: usr1.Account.UID})
 		time.Sleep(time.Second)
 		usrStore.DeleteUser(ctx, &ttnpb.UserIdentifiers{UserId: usr2.Account.UID})
@@ -105,7 +104,7 @@ func TestCleanupExpiredEntities(t *testing.T) {
 				a.So(expiredUsers[0].GetIds().GetUserId(), should.Equal, usr1.Account.UID)
 			}
 		}
-		// organization test
+
 		orgStore.DeleteOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: org1.Account.UID})
 		time.Sleep(time.Second)
 		orgStore.DeleteOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: org2.Account.UID})
@@ -115,7 +114,7 @@ func TestCleanupExpiredEntities(t *testing.T) {
 				a.So(expiredOrganizations[0].GetIds().GetOrganizationId(), should.Equal, org1.Account.UID)
 			}
 		}
-		// client test
+
 		cliStore.DeleteClient(ctx, &ttnpb.ClientIdentifiers{ClientId: cli1.ClientID})
 		time.Sleep(time.Second)
 		cliStore.DeleteClient(ctx, &ttnpb.ClientIdentifiers{ClientId: cli2.ClientID})
