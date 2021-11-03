@@ -33,7 +33,7 @@ const gatewayDelete = defineSmokeTest('succeeds deleting a gateway', () => {
   cy.get('header').within(() => {
     cy.findByRole('link', { name: /Gateways/ }).click()
   })
-  cy.get('tbody').within(() => {
+  cy.findByRole('rowgroup').within(() => {
     cy.findByRole('cell', { name: gateway.ids.gateway_id }).click()
   })
   cy.findByRole('link', { name: /General settings/ }).click()
@@ -45,7 +45,7 @@ const gatewayDelete = defineSmokeTest('succeeds deleting a gateway', () => {
   cy.findByTestId('full-error-view').should('not.exist')
 
   cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/gateways`)
-  cy.get('tbody').within(() => {
+  cy.findByRole('table').within(() => {
     cy.findByRole('cell', { name: gateway.ids.gateway_id }).should('not.exist')
   })
 })

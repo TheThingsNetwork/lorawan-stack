@@ -59,6 +59,7 @@ const Link = props => {
     secondary,
     primary,
     tabIndex,
+    role,
   } = props
 
   const { formatMessage } = useIntl()
@@ -70,7 +71,11 @@ const Link = props => {
   })
 
   if (disabled) {
-    return <span className={classnames(classNames, style.disabled)}>{children}</span>
+    return (
+      <span className={classnames(classNames, style.disabled)} role={role}>
+        {children}
+      </span>
+    )
   }
 
   return (
@@ -83,6 +88,7 @@ const Link = props => {
       target={target}
       onClick={onClick}
       tabIndex={tabIndex}
+      role={role}
     >
       {children}
     </RouterLink>
@@ -97,6 +103,7 @@ Link.propTypes = {
   onClick: PropTypes.func,
   primary: PropTypes.bool,
   replace: PropTypes.bool,
+  role: PropTypes.string,
   secondary: PropTypes.bool,
   showVisited: PropTypes.bool,
   tabIndex: PropTypes.string,
@@ -123,6 +130,7 @@ Link.defaultProps = {
   primary: false,
   showVisited: false,
   replace: false,
+  role: undefined,
   secondary: false,
   tabIndex: undefined,
   target: undefined,

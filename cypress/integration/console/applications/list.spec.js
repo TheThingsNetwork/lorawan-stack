@@ -36,7 +36,7 @@ describe('Applications list', () => {
   })
 
   it('succeeds searching by application id', () => {
-    cy.get('tbody').within(() => {
+    cy.findByRole('rowgroup').within(() => {
       cy.findAllByRole('row').should('have.length', 3)
     })
     cy.findByRole('cell', { name: appIds[0] }).should('be.visible')
@@ -46,7 +46,7 @@ describe('Applications list', () => {
     cy.findByTestId('search-input').as('searchInput')
     cy.get('@searchInput').type('xyz')
 
-    cy.get('tbody').within(() => {
+    cy.findByRole('rowgroup').within(() => {
       cy.findAllByRole('row').should('have.length', 1)
     })
     cy.findByRole('cell', { name: appIds[0] }).should('be.visible')
@@ -56,7 +56,7 @@ describe('Applications list', () => {
     cy.get('@searchInput').clear()
     cy.get('@searchInput').type('some')
 
-    cy.get('tbody').within(() => {
+    cy.findByRole('rowgroup').within(() => {
       cy.findByRole('row').should('have.length', 1)
     })
     cy.findByRole('cell', { name: appIds[0] }).should('not.exist')
@@ -66,7 +66,7 @@ describe('Applications list', () => {
     cy.get('@searchInput').clear()
     cy.get('@searchInput').type('test-app')
 
-    cy.get('tbody').within(() => {
+    cy.findByRole('rowgroup').within(() => {
       cy.findAllByRole('row').should('have.length', 3)
     })
     cy.findByRole('cell', { name: appIds[0] }).should('be.visible')

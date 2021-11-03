@@ -13,11 +13,17 @@
 // limitations under the License.
 
 .row
+  display: table-row
+  color: unset
+
   &-head
     border-dark('bottom')
 
   &-body
     border-normal('bottom')
+
+  &-footer
+    display: flex
 
 .clickable
   cursor: pointer

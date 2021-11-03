@@ -48,7 +48,7 @@ describe('Packet Broker networks', () => {
     const networksFiltered = networks.filter(
       n => !(n.id.net_id === 19 && n.id.tenant_id === 'packet-broker-test'),
     )
-    cy.get('tbody').within(() => {
+    cy.findByRole('rowgroup').within(() => {
       cy.findAllByRole('row').should('have.length', networksFiltered.length)
       networksFiltered.forEach(n => {
         cy.findAllByText(n.id.net_id.toString(16).padStart(6, '0'))
