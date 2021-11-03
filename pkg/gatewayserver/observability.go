@@ -64,6 +64,7 @@ var (
 	evtForwardUp = events.Define(
 		"gs.up.forward", "forward uplink message",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.UplinkMessage{}),
 	)
 	evtSendDown = events.Define(
 		"gs.down.send", "send downlink message",
@@ -92,6 +93,7 @@ var (
 	evtForwardTxAck = events.Define(
 		"gs.txack.forward", "forward transmission acknowledgement",
 		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.TxAcknowledgment{}),
 	)
 )
 
@@ -296,7 +298,7 @@ func registerReceiveUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.U
 }
 
 func registerForwardUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, host string) {
-	events.Publish(evtForwardUp.NewWithIdentifiersAndData(ctx, gtw, host))
+	events.Publish(evtForwardUp.NewWithIdentifiersAndData(ctx, gtw, msg))
 	gsMetrics.uplinkForwarded.WithLabelValues(ctx, host).Inc()
 }
 
@@ -330,7 +332,7 @@ func registerReceiveTxAck(ctx context.Context, gtw *ttnpb.Gateway, txAck *ttnpb.
 }
 
 func registerForwardTxAck(ctx context.Context, gtw *ttnpb.Gateway, txAck *ttnpb.TxAcknowledgment, host string) {
-	events.Publish(evtForwardTxAck.NewWithIdentifiersAndData(ctx, gtw, host))
+	events.Publish(evtForwardTxAck.NewWithIdentifiersAndData(ctx, gtw, txAck))
 	gsMetrics.txAckForwarded.WithLabelValues(ctx, host).Inc()
 }
 
