@@ -193,8 +193,14 @@ func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error
 		}
 	}
 
-	if rx.Time != nil {
-		goTime := time.Time(*rx.Time)
+	var goTime time.Time
+	switch {
+	case rx.Tmms != nil:
+		goTime = gpstime.Parse(time.Duration(*rx.Tmms) * time.Millisecond)
+	case rx.Time != nil:
+		goTime = time.Time(*rx.Time)
+	}
+	if !goTime.IsZero() {
 		for _, md := range up.RxMetadata {
 			md.Time = &goTime
 		}
