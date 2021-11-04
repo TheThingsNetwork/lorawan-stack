@@ -254,10 +254,13 @@ func (s *Scheduler) syncWithUplinkToken(token *ttnpb.UplinkToken) bool {
 	if token.GetServerTime().IsZero() || token.GetConcentratorTime() == 0 {
 		return false
 	}
-	if lastSync, ok := s.clock.SyncTime(); ok && lastSync.After(token.ServerTime) {
+	if token.ServerTime == nil {
 		return false
 	}
-	s.clock.SyncWithGatewayConcentrator(token.Timestamp, token.ServerTime, ConcentratorTime(token.ConcentratorTime))
+	if lastSync, ok := s.clock.SyncTime(); ok && lastSync.After(*token.ServerTime) {
+		return false
+	}
+	s.clock.SyncWithGatewayConcentrator(token.Timestamp, *token.ServerTime, ConcentratorTime(token.ConcentratorTime))
 	return true
 }
 

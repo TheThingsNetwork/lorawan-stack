@@ -51,23 +51,23 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 	var pathErrs []errors.ErrorDetails
 	logger := log.FromContext(ctx)
 	for _, path := range request.DownlinkPaths {
-		var ids ttnpb.GatewayIdentifiers
+		var ids *ttnpb.GatewayIdentifiers
 		switch p := path.Path.(type) {
 		case *ttnpb.DownlinkPath_Fixed:
-			ids = p.Fixed.GatewayIdentifiers
+			ids = p.Fixed.GatewayIds
 		case *ttnpb.DownlinkPath_UplinkToken:
 			token, err := io.ParseUplinkToken(p.UplinkToken)
 			if err != nil {
 				pathErrs = append(pathErrs, errUplinkToken.New()) // Hide the cause as uplink tokens are opaque to the Network Server.
 				continue
 			}
-			ids = token.GatewayIdentifiers
+			ids = token.Ids.GatewayIds
 		default:
 			panic(fmt.Sprintf("proto: unexpected type %T in oneof", path.Path))
 		}
 
 		uid := unique.ID(ctx, ids)
-		conn, ok := gs.GetConnection(ctx, ids)
+		conn, ok := gs.GetConnection(ctx, *ids)
 		if !ok {
 			pathErrs = append(pathErrs, errNotConnected.WithAttributes("gateway_uid", uid))
 			continue

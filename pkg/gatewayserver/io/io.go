@@ -229,9 +229,9 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 			md.DownlinkPathConstraint = ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER
 			continue
 		}
-		buf, err := UplinkToken(ttnpb.GatewayAntennaIdentifiers{
-			GatewayIdentifiers: *c.gateway.GetIds(),
-			AntennaIndex:       md.AntennaIndex,
+		buf, err := UplinkToken(&ttnpb.GatewayAntennaIdentifiers{
+			GatewayIds:   c.gateway.GetIds(),
+			AntennaIndex: md.AntennaIndex,
 		}, md.Timestamp, ct, up.ReceivedAt)
 		if err != nil {
 			return err
@@ -343,7 +343,7 @@ func getDownlinkPath(path *ttnpb.DownlinkPath, class ttnpb.Class) (ttnpb.Gateway
 		if err != nil {
 			return ttnpb.GatewayAntennaIdentifiers{}, nil, err
 		}
-		return token.GatewayAntennaIdentifiers, token, err
+		return *token.Ids, token, err
 	}
 	fixed := path.GetFixed()
 	if fixed == nil {

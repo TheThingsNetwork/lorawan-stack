@@ -928,7 +928,7 @@ func TestTraffic(t *testing.T) {
 			InputDownlinkPath: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
+						&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &registeredGatewayID},
 						1553759666,
 						1553759666000,
 						time.Unix(0, 1553759666*1000),
@@ -1278,7 +1278,7 @@ func TestRTT(t *testing.T) {
 			InputDownlinkPath: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
+						&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &registeredGatewayID},
 						1553759666,
 						1553759666000,
 						time.Unix(0, 1553759666*1000),

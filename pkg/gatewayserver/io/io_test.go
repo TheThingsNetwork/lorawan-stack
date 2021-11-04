@@ -100,8 +100,8 @@ func TestFlow(t *testing.T) {
 		case up := <-conn.Up():
 			token, err := io.ParseUplinkToken(up.RxMetadata[0].UplinkToken)
 			a.So(err, should.BeNil)
-			a.So(token.GatewayIdentifiers, should.Resemble, ids)
-			a.So(token.AntennaIndex, should.Equal, 0)
+			a.So(token.Ids.GatewayIds, should.Resemble, &ids)
+			a.So(token.Ids.AntennaIndex, should.Equal, 0)
 			a.So(token.Timestamp, should.Equal, 100)
 		case <-time.After(timeout):
 			t.Fatalf("Expected uplink message time-out")
@@ -152,7 +152,7 @@ func TestFlow(t *testing.T) {
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
+						&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
 						100,
 						100000,
 						time.Unix(0, 100*1000),
@@ -174,7 +174,7 @@ func TestFlow(t *testing.T) {
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
+						&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
 						100,
 						100000,
 						time.Unix(0, 100*1000),
@@ -207,7 +207,7 @@ func TestFlow(t *testing.T) {
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
+						&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
 						100,
 						100000,
 						time.Unix(0, 100*1000),
@@ -244,7 +244,7 @@ func TestFlow(t *testing.T) {
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_Fixed{
 					Fixed: &ttnpb.GatewayAntennaIdentifiers{
-						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayIds: &ttnpb.GatewayIdentifiers{
 							GatewayId: "foo-gateway",
 						},
 					},
@@ -277,7 +277,7 @@ func TestFlow(t *testing.T) {
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
+						&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
 						100,
 						100000,
 						time.Unix(0, 100*1000),
@@ -310,7 +310,7 @@ func TestFlow(t *testing.T) {
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
+						&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
 						100,
 						100000,
 						time.Unix(0, 100*1000),
@@ -343,7 +343,7 @@ func TestFlow(t *testing.T) {
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_Fixed{
 					Fixed: &ttnpb.GatewayAntennaIdentifiers{
-						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayIds: &ttnpb.GatewayIdentifiers{
 							GatewayId: "foo-gateway",
 						},
 					},
@@ -375,7 +375,7 @@ func TestFlow(t *testing.T) {
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_Fixed{
 					Fixed: &ttnpb.GatewayAntennaIdentifiers{
-						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayIds: &ttnpb.GatewayIdentifiers{
 							GatewayId: "foo-gateway",
 						},
 					},
@@ -433,7 +433,7 @@ func TestFlow(t *testing.T) {
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
+						&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}},
 						100,
 						100000,
 						time.Unix(0, 100*1000),
@@ -559,8 +559,8 @@ func TestSubBandEIRPOverride(t *testing.T) {
 		case up := <-conn.Up():
 			token, err := io.ParseUplinkToken(up.RxMetadata[0].UplinkToken)
 			a.So(err, should.BeNil)
-			a.So(token.GatewayIdentifiers, should.Resemble, ids)
-			a.So(token.AntennaIndex, should.Equal, 0)
+			a.So(token.Ids.GatewayIds, should.Resemble, &ids)
+			a.So(token.Ids.AntennaIndex, should.Equal, 0)
 			a.So(token.Timestamp, should.Equal, 100)
 		case <-time.After(timeout):
 			t.Fatalf("Expected uplink message time-out")
@@ -583,7 +583,7 @@ func TestSubBandEIRPOverride(t *testing.T) {
 			Path: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "bar-gateway"}},
+						&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "bar-gateway"}},
 						100,
 						100000,
 						time.Unix(0, 100*1000),

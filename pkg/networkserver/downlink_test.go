@@ -54,17 +54,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 
 	joinAcceptBytes := append([]byte{0b001_000_00}, bytes.Repeat([]byte{0x42}, 32)...)
 
-	toSlicePtr := func(ids []ttnpb.GatewayAntennaIdentifiers) []*ttnpb.GatewayAntennaIdentifiers {
-		ret := make([]*ttnpb.GatewayAntennaIdentifiers, 0, len(ids))
-		for i := 0; i < len(ids); i++ {
-			ret = append(ret, &ttnpb.GatewayAntennaIdentifiers{
-				GatewayIdentifiers: ids[i].GatewayIdentifiers,
-				AntennaIndex:       ids[i].AntennaIndex,
-			})
-		}
-		return ret
-	}
-
 	sessionKeys := &ttnpb.SessionKeys{
 		FNwkSIntKey: &ttnpb.KeyEnvelope{
 			Key: &test.DefaultFNwkSIntKey,
@@ -108,10 +97,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 			for i, ids := range DefaultGatewayAntennaIdentifiers {
 				ids := ids
 				downlinkPaths = append(downlinkPaths, DownlinkPath{
-					GatewayIdentifiers: &ids.GatewayIdentifiers,
+					GatewayIdentifiers: ids.GatewayIds,
 					DownlinkPath: &ttnpb.DownlinkPath{
 						Path: &ttnpb.DownlinkPath_Fixed{
-							Fixed: &DefaultGatewayAntennaIdentifiers[i],
+							Fixed: DefaultGatewayAntennaIdentifiers[i],
 						},
 					},
 				})
@@ -2156,7 +2145,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								Gateways: toSlicePtr(DefaultGatewayAntennaIdentifiers[:]),
+								Gateways: DefaultGatewayAntennaIdentifiers[:],
 							},
 						},
 					},

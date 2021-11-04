@@ -1443,7 +1443,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 		paths = make([]downlinkPath, 0, len(fixedPaths))
 		for i := range fixedPaths {
 			paths = append(paths, downlinkPath{
-				GatewayIdentifiers: &fixedPaths[i].GatewayIdentifiers,
+				GatewayIdentifiers: fixedPaths[i].GatewayIds,
 				DownlinkPath: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_Fixed{
 						Fixed: fixedPaths[i],

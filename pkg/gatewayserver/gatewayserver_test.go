@@ -1469,7 +1469,7 @@ func TestGatewayServer(t *testing.T) {
 												{
 													Path: &ttnpb.DownlinkPath_Fixed{
 														Fixed: &ttnpb.GatewayAntennaIdentifiers{
-															GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+															GatewayIds: &ttnpb.GatewayIdentifiers{
 																GatewayId: "not-connected",
 															},
 														},
@@ -1493,8 +1493,8 @@ func TestGatewayServer(t *testing.T) {
 												{
 													Path: &ttnpb.DownlinkPath_UplinkToken{
 														UplinkToken: io.MustUplinkToken(
-															ttnpb.GatewayAntennaIdentifiers{
-																GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+															&ttnpb.GatewayAntennaIdentifiers{
+																GatewayIds: &ttnpb.GatewayIdentifiers{
 																	GatewayId: registeredGatewayID,
 																},
 															},
@@ -1532,8 +1532,8 @@ func TestGatewayServer(t *testing.T) {
 												{
 													Path: &ttnpb.DownlinkPath_UplinkToken{
 														UplinkToken: io.MustUplinkToken(
-															ttnpb.GatewayAntennaIdentifiers{
-																GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+															&ttnpb.GatewayAntennaIdentifiers{
+																GatewayIds: &ttnpb.GatewayIdentifiers{
 																	GatewayId: registeredGatewayID,
 																},
 															},
@@ -1570,8 +1570,8 @@ func TestGatewayServer(t *testing.T) {
 												{
 													Path: &ttnpb.DownlinkPath_UplinkToken{
 														UplinkToken: io.MustUplinkToken(
-															ttnpb.GatewayAntennaIdentifiers{
-																GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+															&ttnpb.GatewayAntennaIdentifiers{
+																GatewayIds: &ttnpb.GatewayIdentifiers{
 																	GatewayId: registeredGatewayID,
 																},
 															},
@@ -1614,7 +1614,7 @@ func TestGatewayServer(t *testing.T) {
 												{
 													Path: &ttnpb.DownlinkPath_Fixed{
 														Fixed: &ttnpb.GatewayAntennaIdentifiers{
-															GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+															GatewayIds: &ttnpb.GatewayIdentifiers{
 																GatewayId: registeredGatewayID,
 															},
 														},
@@ -1648,7 +1648,7 @@ func TestGatewayServer(t *testing.T) {
 												{
 													Path: &ttnpb.DownlinkPath_Fixed{
 														Fixed: &ttnpb.GatewayAntennaIdentifiers{
-															GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+															GatewayIds: &ttnpb.GatewayIdentifiers{
 																GatewayId: registeredGatewayID,
 															},
 														},
