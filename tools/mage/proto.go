@@ -172,7 +172,7 @@ func (p Proto) GoClean(context.Context) error {
 		if err != nil {
 			return err
 		}
-		for _, ext := range []string{".pb.go", ".pb.gw.go", ".pb.fm.go", ".pb.util.go"} {
+		for _, ext := range []string{".pb.go", ".pb.gw.go", ".pb.paths.fm.go", ".pb.setters.fm.go", ".pb.validate.go", ".pb.util.fm.go"} {
 			if strings.HasSuffix(path, ext) {
 				if err := sh.Rm(path); err != nil {
 					return err
