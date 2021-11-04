@@ -334,6 +334,8 @@ message UplinkToken {
   google.protobuf.Timestamp server_time = 3 [(gogoproto.stdtime) = true];
   // Absolute concentrator time as observed by the Gateway Server, accounting for rollovers.
   int64 concentrator_time = 4;
+  // Absolute time observed by the gateway when the uplink has been received.
+  google.protobuf.Timestamp gateway_time = 5 [(gogoproto.stdtime) = true];
 }
 
 message DownlinkPath {

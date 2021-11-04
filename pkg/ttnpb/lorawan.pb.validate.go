@@ -1794,6 +1794,18 @@ func (m *UplinkToken) ValidateFields(paths ...string) error {
 
 		case "concentrator_time":
 			// no validation rules for ConcentratorTime
+		case "gateway_time":
+
+			if v, ok := interface{}(m.GetGatewayTime()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UplinkTokenValidationError{
+						field:  "gateway_time",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return UplinkTokenValidationError{
 				field:  name,

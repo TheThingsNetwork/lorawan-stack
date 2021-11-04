@@ -5765,6 +5765,7 @@ Transmission settings for downlink.
 | `timestamp` | [`uint32`](#uint32) |  |  |
 | `server_time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Absolute time observed by the server when the uplink message has been received. |
 | `concentrator_time` | [`int64`](#int64) |  | Absolute concentrator time as observed by the Gateway Server, accounting for rollovers. |
+| `gateway_time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Absolute time observed by the gateway when the uplink has been received. |
 
 #### Field Rules
 
