@@ -43,7 +43,7 @@ import (
 
 const (
 	// subscribeStreamCount is the number of subscription streams that are used by the Forwarder and Home Network roles.
-	subscribeStreamCount = 8
+	subscribeStreamCount = 4
 
 	// publishMessageTimeout defines the timeout for publishing messages.
 	publishMessageTimeout = 3 * time.Second
