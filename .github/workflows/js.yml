@@ -138,6 +138,9 @@ jobs:
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: tools/bin/mage js:deps
         timeout-minutes: 5
+      - name: Build DLLs
+        if: steps.dll-cache.outputs.cache-hit != 'true'
+        run: tools/bin/mage js:buildDll
       - name: Build frontend
         if: steps.public-cache.outputs.cache-hit != 'true'
         run: tools/bin/mage js:build
