@@ -39,7 +39,7 @@ option (gogoproto.stringer_all) = true;
 // Contains metadata for a received message. Each antenna that receives
 // a message corresponds to one RxMetadata.
 message RxMetadata {
-  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  GatewayIdentifiers gateway_ids = 1 [(validate.rules).message.required = true];
   PacketBrokerMetadata packet_broker = 18;
 
   uint32 antenna_index = 2;
