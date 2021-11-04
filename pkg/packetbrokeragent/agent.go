@@ -89,7 +89,8 @@ type Agent struct {
 	netID            types.NetID
 	subscriptionTenantID,
 	clusterID,
-	homeNetworkClusterID string
+	homeNetworkClusterID,
+	subscriptionGroup string
 	authenticator     authenticator
 	forwarderConfig   ForwarderConfig
 	homeNetworkConfig HomeNetworkConfig
@@ -180,6 +181,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	if homeNetworkClusterID == "" {
 		homeNetworkClusterID = conf.ClusterID
 	}
+	subscriptionGroup := conf.ClusterID
+	if subscriptionGroup == "" {
+		subscriptionGroup = "default"
+	}
 	a := &Agent{
 		Component:            c,
 		ctx:                  ctx,
@@ -188,6 +193,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		subscriptionTenantID: conf.TenantID,
 		clusterID:            conf.ClusterID,
 		homeNetworkClusterID: homeNetworkClusterID,
+		subscriptionGroup:    subscriptionGroup,
 		authenticator:        authenticator,
 		forwarderConfig:      conf.Forwarder,
 		homeNetworkConfig:    conf.HomeNetwork,
@@ -506,7 +512,7 @@ func (a *Agent) subscribeDownlinkStream(client routingpb.ForwarderDataClient, do
 			ForwarderNetId:     a.netID.MarshalNumber(),
 			ForwarderTenantId:  a.subscriptionTenantID,
 			ForwarderClusterId: a.clusterID,
-			Group:              a.clusterID,
+			Group:              a.subscriptionGroup,
 		})
 		if err != nil {
 			return err
@@ -820,7 +826,7 @@ func (a *Agent) subscribeUplinkStream(client routingpb.HomeNetworkDataClient, up
 			HomeNetworkTenantId:  a.subscriptionTenantID,
 			HomeNetworkClusterId: a.homeNetworkClusterID,
 			Filters:              filters,
-			Group:                a.clusterID,
+			Group:                a.subscriptionGroup,
 		})
 		if err != nil {
 			return err
