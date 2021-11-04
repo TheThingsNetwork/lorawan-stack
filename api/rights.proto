@@ -194,8 +194,8 @@ message APIKey {
   // Rights that are granted to this API key.
   repeated Right rights = 4 [(validate.rules).repeated.items.enum.defined_only = true];
 
-  google.protobuf.Timestamp created_at = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-  google.protobuf.Timestamp updated_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 5 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 6 [(gogoproto.stdtime) = true];
   google.protobuf.Timestamp expires_at = 7 [(gogoproto.nullable) = true, (gogoproto.stdtime) = true, (validate.rules).timestamp.gt_now = true];
 }
 

@@ -55,9 +55,9 @@ message Client {
   // The identifiers of the OAuth client. These are public and can be seen by any authenticated user in the network.
   ClientIdentifiers ids = 1 [(validate.rules).message.required = true];
   // When the OAuth client was created. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 2 [(gogoproto.stdtime) = true];
   // When the OAuth client was last updated. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 3 [(gogoproto.stdtime) = true];
   // When the OAuth client was deleted. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp deleted_at = 16 [(gogoproto.stdtime) = true];
 

@@ -5,7 +5,6 @@ package ttnpb
 import (
 	fmt "fmt"
 	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
-	time "time"
 )
 
 func (dst *Application) SetFields(src *Application, paths ...string) error {
@@ -43,8 +42,7 @@ func (dst *Application) SetFields(src *Application, paths ...string) error {
 			if src != nil {
 				dst.CreatedAt = src.CreatedAt
 			} else {
-				var zero time.Time
-				dst.CreatedAt = zero
+				dst.CreatedAt = nil
 			}
 		case "updated_at":
 			if len(subs) > 0 {
@@ -53,8 +51,7 @@ func (dst *Application) SetFields(src *Application, paths ...string) error {
 			if src != nil {
 				dst.UpdatedAt = src.UpdatedAt
 			} else {
-				var zero time.Time
-				dst.UpdatedAt = zero
+				dst.UpdatedAt = nil
 			}
 		case "deleted_at":
 			if len(subs) > 0 {

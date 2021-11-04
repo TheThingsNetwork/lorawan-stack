@@ -78,8 +78,8 @@ var organizationColumnNames = map[string][]string{
 
 func (org Organization) toPB(pb *ttnpb.Organization, fieldMask *pbtypes.FieldMask) {
 	pb.Ids = &ttnpb.OrganizationIdentifiers{OrganizationId: org.Account.UID}
-	pb.CreatedAt = cleanTime(org.CreatedAt)
-	pb.UpdatedAt = cleanTime(org.UpdatedAt)
+	pb.CreatedAt = cleanTimePtr(&org.CreatedAt)
+	pb.UpdatedAt = cleanTimePtr(&org.UpdatedAt)
 	pb.DeletedAt = cleanTimePtr(org.DeletedAt)
 	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultOrganizationFieldMask

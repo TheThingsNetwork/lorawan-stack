@@ -97,6 +97,7 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 	if data.CreatedAt.IsZero() {
 		data.CreatedAt = time.Now()
 	}
+	createdAt, expiresAt := data.CreatedAt, data.CreatedAt.Add(time.Duration(data.ExpiresIn)*time.Second)
 	err = s.oauth.CreateAuthorizationCode(s.ctx, &ttnpb.OAuthAuthorizationCode{
 		ClientIds:     *client.GetIds(),
 		UserIds:       *userSessionIDs.GetUserIds(),
@@ -105,8 +106,8 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 		Code:          data.Code,
 		RedirectUri:   data.RedirectUri,
 		State:         data.State,
-		CreatedAt:     data.CreatedAt,
-		ExpiresAt:     data.CreatedAt.Add(time.Duration(data.ExpiresIn) * time.Second),
+		CreatedAt:     &createdAt,
+		ExpiresAt:     &expiresAt,
 	})
 	if err != nil {
 		return err
@@ -123,14 +124,18 @@ func (s *storage) LoadAuthorize(code string) (data *osin.AuthorizeData, err erro
 	if err != nil {
 		return nil, err
 	}
+	var expiresIn int32
+	if authorizationCode.ExpiresAt != nil {
+		expiresIn = int32(authorizationCode.ExpiresAt.Sub(*authorizationCode.CreatedAt).Seconds())
+	}
 	return &osin.AuthorizeData{
 		Client:      client,
 		Code:        code,
-		ExpiresIn:   int32(authorizationCode.ExpiresAt.Sub(authorizationCode.CreatedAt).Seconds()),
+		ExpiresIn:   expiresIn,
 		Scope:       rightsToScope(authorizationCode.Rights...),
 		RedirectUri: authorizationCode.RedirectUri,
 		State:       authorizationCode.State,
-		CreatedAt:   authorizationCode.CreatedAt,
+		CreatedAt:   *authorizationCode.CreatedAt,
 		UserData: userData{
 			UserSessionIdentifiers: &ttnpb.UserSessionIdentifiers{
 				UserIds:   &authorizationCode.UserIds,
@@ -206,6 +211,7 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 			data.AccessData.RefreshToken = previousID // Used for deleting the old access token
 		}
 	}
+	createdAt, expiresAt := data.CreatedAt, data.CreatedAt.Add(time.Duration(data.ExpiresIn)*time.Second)
 	return s.oauth.CreateAccessToken(s.ctx, &ttnpb.OAuthAccessToken{
 		ClientIds:     *client.GetIds(),
 		UserIds:       *userSessionIDs.GetUserIds(),
@@ -214,8 +220,8 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 		Id:            accessID,
 		AccessToken:   accessHash,
 		RefreshToken:  refreshHash,
-		CreatedAt:     data.CreatedAt,
-		ExpiresAt:     data.CreatedAt.Add(time.Duration(data.ExpiresIn) * time.Second),
+		CreatedAt:     &createdAt,
+		ExpiresAt:     &expiresAt,
 	}, previousID)
 }
 
@@ -228,13 +234,17 @@ func (s *storage) loadAccess(id string) (*osin.AccessData, error) {
 	if err != nil {
 		return nil, err
 	}
+	var expiresIn int32
+	if accessToken.ExpiresAt != nil {
+		expiresIn = int32(accessToken.ExpiresAt.Sub(*accessToken.CreatedAt).Seconds())
+	}
 	return &osin.AccessData{
 		Client:       client,
 		AccessToken:  accessToken.AccessToken,
 		RefreshToken: accessToken.RefreshToken,
-		ExpiresIn:    int32(accessToken.ExpiresAt.Sub(accessToken.CreatedAt).Seconds()),
+		ExpiresIn:    expiresIn,
 		Scope:        rightsToScope(accessToken.Rights...),
-		CreatedAt:    accessToken.CreatedAt,
+		CreatedAt:    *accessToken.CreatedAt,
 		UserData: userData{
 			UserSessionIdentifiers: &ttnpb.UserSessionIdentifiers{
 				UserIds:   &accessToken.UserIds,

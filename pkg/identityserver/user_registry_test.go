@@ -284,7 +284,7 @@ func TestUsersCRUD(t *testing.T) {
 		if a.So(got, should.NotBeNil) {
 			a.So(got.Name, should.Equal, user.Name)
 			a.So(got.Admin, should.Equal, user.Admin)
-			a.So(got.CreatedAt, should.Equal, user.CreatedAt)
+			a.So(got.CreatedAt, should.Resemble, user.CreatedAt)
 		}
 
 		got, err = reg.Get(ctx, &ttnpb.GetUserRequest{

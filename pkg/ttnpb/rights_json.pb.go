@@ -164,15 +164,23 @@ func (x *APIKey) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		}
 		s.WriteArrayEnd()
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.CreatedAt != nil || s.HasField("created_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("created_at")
-		s.WriteTime(x.CreatedAt)
+		if x.CreatedAt == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.CreatedAt)
+		}
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.UpdatedAt != nil || s.HasField("updated_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("updated_at")
-		s.WriteTime(x.UpdatedAt)
+		if x.UpdatedAt == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.UpdatedAt)
+		}
 	}
 	if x.ExpiresAt != nil || s.HasField("expires_at") {
 		s.WriteMoreIf(&wroteField)
@@ -217,14 +225,14 @@ func (x *APIKey) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			if s.Err() != nil {
 				return
 			}
-			x.CreatedAt = *v
+			x.CreatedAt = v
 		case "updated_at", "updatedAt":
 			s.AddField("updated_at")
 			v := s.ReadTime()
 			if s.Err() != nil {
 				return
 			}
-			x.UpdatedAt = *v
+			x.UpdatedAt = v
 		case "expires_at", "expiresAt":
 			s.AddField("expires_at")
 			v := s.ReadTime()

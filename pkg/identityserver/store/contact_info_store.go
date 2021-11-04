@@ -224,7 +224,7 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 		return errValidationTokenUsed.New()
 	}
 
-	if model.ExpiresAt.Before(time.Now()) {
+	if model.ExpiresAt != nil && model.ExpiresAt.Before(time.Now()) {
 		return errValidationTokenExpired.New()
 	}
 
@@ -257,7 +257,7 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 		Reference: validation.Id,
 		Token:     validation.Token,
 	}).Update(ContactInfoValidation{
-		ExpiresAt: now,
+		ExpiresAt: &now,
 		Used:      true,
 	}).Error
 	if err != nil {

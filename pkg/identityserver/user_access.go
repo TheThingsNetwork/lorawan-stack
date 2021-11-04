@@ -234,10 +234,11 @@ func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.Creat
 	if err != nil {
 		return nil, err
 	}
+	expiresAt := time.Now().Add(loginTokenConfig.TokenTTL)
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		_, err := store.GetLoginTokenStore(db).CreateLoginToken(ctx, &ttnpb.LoginToken{
 			UserIds:   req.GetUserIds(),
-			ExpiresAt: time.Now().Add(loginTokenConfig.TokenTTL),
+			ExpiresAt: &expiresAt,
 			Token:     token,
 		})
 		return err

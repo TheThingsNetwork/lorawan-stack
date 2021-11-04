@@ -38,8 +38,8 @@ func init() {
 func (sess UserSession) toPB(pb *ttnpb.UserSession) {
 	pb.SessionId = sess.ID
 	pb.SessionSecret = sess.SessionSecret
-	pb.CreatedAt = cleanTime(sess.CreatedAt)
-	pb.UpdatedAt = cleanTime(sess.UpdatedAt)
+	pb.CreatedAt = cleanTimePtr(&sess.CreatedAt)
+	pb.UpdatedAt = cleanTimePtr(&sess.UpdatedAt)
 	pb.ExpiresAt = cleanTimePtr(sess.ExpiresAt)
 	if sess.User != nil {
 		pb.UserIds = &ttnpb.UserIdentifiers{UserId: sess.User.Account.UID}

@@ -31,6 +31,7 @@ func TestInvitationStore(t *testing.T) {
 	ctx := test.Context()
 
 	now := cleanTime(time.Now())
+	aWeekFromNow := cleanTime(now.Add(time.Hour * 24 * 7))
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
 		prepareTest(db, &Account{}, &User{}, &Invitation{})
@@ -40,7 +41,7 @@ func TestInvitationStore(t *testing.T) {
 		invitation, err := store.CreateInvitation(ctx, &ttnpb.Invitation{
 			Email:     "john.doe@example.com",
 			Token:     "invitation-token",
-			ExpiresAt: cleanTime(now.Add(time.Hour * 24 * 7)),
+			ExpiresAt: &aWeekFromNow,
 		})
 
 		a.So(err, should.BeNil)
@@ -99,7 +100,7 @@ func TestInvitationStore(t *testing.T) {
 		_, err = store.CreateInvitation(ctx, &ttnpb.Invitation{
 			Email:     "jane.doe@example.com",
 			Token:     "other-invitation-token",
-			ExpiresAt: cleanTime(now.Add(time.Hour * 24 * 7)),
+			ExpiresAt: &aWeekFromNow,
 		})
 
 		a.So(err, should.BeNil)

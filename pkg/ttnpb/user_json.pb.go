@@ -25,15 +25,23 @@ func (x *User) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		// NOTE: UserIdentifiers does not seem to implement MarshalProtoJSON.
 		gogo.MarshalMessage(s, x.Ids)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.CreatedAt != nil || s.HasField("created_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("created_at")
-		s.WriteTime(x.CreatedAt)
+		if x.CreatedAt == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.CreatedAt)
+		}
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.UpdatedAt != nil || s.HasField("updated_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("updated_at")
-		s.WriteTime(x.UpdatedAt)
+		if x.UpdatedAt == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.UpdatedAt)
+		}
 	}
 	if x.DeletedAt != nil || s.HasField("deleted_at") {
 		s.WriteMoreIf(&wroteField)
@@ -178,14 +186,14 @@ func (x *User) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			if s.Err() != nil {
 				return
 			}
-			x.CreatedAt = *v
+			x.CreatedAt = v
 		case "updated_at", "updatedAt":
 			s.AddField("updated_at")
 			v := s.ReadTime()
 			if s.Err() != nil {
 				return
 			}
-			x.UpdatedAt = *v
+			x.UpdatedAt = v
 		case "deleted_at", "deletedAt":
 			s.AddField("deleted_at")
 			v := s.ReadTime()

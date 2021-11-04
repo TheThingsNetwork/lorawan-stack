@@ -67,8 +67,8 @@ func TestUserStore(t *testing.T) {
 			if a.So(created.ProfilePicture, should.NotBeNil) {
 				a.So(created.ProfilePicture.Embedded, should.NotBeNil)
 			}
-			a.So(created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
-			a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(*created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(*created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 		}
 
 		got, err := store.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes"}})
@@ -79,8 +79,8 @@ func TestUserStore(t *testing.T) {
 			a.So(got.Name, should.Equal, "Foo User")
 			a.So(got.Description, should.BeEmpty)
 			a.So(got.Attributes, should.HaveLength, 3)
-			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
-			a.So(got.UpdatedAt, should.Equal, created.UpdatedAt)
+			a.So(got.CreatedAt, should.Resemble, created.CreatedAt)
+			a.So(got.UpdatedAt, should.Resemble, created.UpdatedAt)
 		}
 
 		_, err = store.UpdateUser(ctx, &ttnpb.User{
@@ -113,8 +113,8 @@ func TestUserStore(t *testing.T) {
 			if a.So(updated.ProfilePicture, should.NotBeNil) && a.So(updated.ProfilePicture.Sizes, should.HaveLength, 1) {
 				a.So(updated.ProfilePicture.Sizes[0], should.Equal, "https://example.com/profile_picture.jpg")
 			}
-			a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
-			a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
+			a.So(updated.CreatedAt, should.Resemble, created.CreatedAt)
+			a.So(*updated.UpdatedAt, should.HappenAfter, *created.CreatedAt)
 		}
 
 		got, err = store.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"}, nil)
@@ -125,8 +125,8 @@ func TestUserStore(t *testing.T) {
 			a.So(got.Name, should.Equal, created.Name)
 			a.So(got.Description, should.Equal, updated.Description)
 			a.So(got.Attributes, should.Resemble, updated.Attributes)
-			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
-			a.So(got.UpdatedAt, should.Equal, updated.UpdatedAt)
+			a.So(got.CreatedAt, should.Resemble, created.CreatedAt)
+			a.So(got.UpdatedAt, should.Resemble, updated.UpdatedAt)
 		}
 
 		list, err = store.FindUsers(ctx, nil, &pbtypes.FieldMask{Paths: []string{"name"}})

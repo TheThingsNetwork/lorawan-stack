@@ -26,7 +26,7 @@ type Invitation struct {
 
 	Email     string `gorm:"type:VARCHAR;unique_index:invitation_email_index;not null"`
 	Token     string `gorm:"type:VARCHAR;unique_index:invitation_token_index;not null"`
-	ExpiresAt time.Time
+	ExpiresAt *time.Time
 
 	AcceptedBy   *User
 	AcceptedByID *string `gorm:"type:UUID"`
@@ -41,9 +41,9 @@ func (i Invitation) toPB() *ttnpb.Invitation {
 	pb := &ttnpb.Invitation{
 		Email:     i.Email,
 		Token:     i.Token,
-		ExpiresAt: cleanTime(i.ExpiresAt),
-		CreatedAt: cleanTime(i.CreatedAt),
-		UpdatedAt: cleanTime(i.UpdatedAt),
+		ExpiresAt: cleanTimePtr(i.ExpiresAt),
+		CreatedAt: cleanTimePtr(&i.CreatedAt),
+		UpdatedAt: cleanTimePtr(&i.UpdatedAt),
 	}
 	return pb
 }

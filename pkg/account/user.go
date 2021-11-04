@@ -51,7 +51,7 @@ func (s *server) CurrentUser(c echo.Context) error {
 	userJSON, _ := jsonpb.TTN().Marshal(safeUser)
 	return c.JSON(http.StatusOK, struct {
 		User       json.RawMessage `json:"user"`
-		LoggedInAt time.Time       `json:"logged_in_at"`
+		LoggedInAt *time.Time      `json:"logged_in_at"`
 	}{
 		User:       userJSON,
 		LoggedInAt: session.CreatedAt,
