@@ -5,7 +5,6 @@ package ttnpb
 import (
 	fmt "fmt"
 	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
-	time "time"
 )
 
 func (dst *RxMetadata) SetFields(src *RxMetadata, paths ...string) error {
@@ -441,8 +440,7 @@ func (dst *PacketBrokerRouteHop) SetFields(src *PacketBrokerRouteHop, paths ...s
 			if src != nil {
 				dst.ReceivedAt = src.ReceivedAt
 			} else {
-				var zero time.Time
-				dst.ReceivedAt = zero
+				dst.ReceivedAt = nil
 			}
 		case "sender_name":
 			if len(subs) > 0 {

@@ -510,7 +510,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 					continue
 				}
 				pbMD.Hops = append(pbMD.Hops, &ttnpb.PacketBrokerRouteHop{
-					ReceivedAt:    receivedAt,
+					ReceivedAt:    &receivedAt,
 					SenderName:    h.SenderName,
 					SenderAddress: h.SenderAddress,
 					ReceiverName:  h.ReceiverName,

@@ -147,7 +147,7 @@ message PacketBrokerMetadata {
 
 message PacketBrokerRouteHop {
   // Time when the service received the message.
-  google.protobuf.Timestamp received_at = 1 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp received_at = 1 [ (gogoproto.stdtime) = true];
   // Sender of the message, typically the authorized client identifier.
   string sender_name = 2;
   // Sender IP address or host name.

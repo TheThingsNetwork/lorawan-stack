@@ -483,7 +483,7 @@ func (m *PacketBrokerRouteHop) ValidateFields(paths ...string) error {
 		switch name {
 		case "received_at":
 
-			if v, ok := interface{}(&m.ReceivedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetReceivedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return PacketBrokerRouteHopValidationError{
 						field:  "received_at",
