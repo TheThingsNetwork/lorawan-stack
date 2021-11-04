@@ -883,16 +883,18 @@ func (as *ApplicationServer) storeUplink(ctx context.Context, ids ttnpb.EndDevic
 		ReceivedAt: uplink.ReceivedAt,
 	}
 	for _, md := range uplink.RxMetadata {
-		cleanUplink.RxMetadata = append(cleanUplink.RxMetadata, &ttnpb.RxMetadata{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-				GatewayId: md.GatewayId,
-			},
-			AntennaIndex:  md.AntennaIndex,
-			FineTimestamp: md.FineTimestamp,
-			Location:      md.Location,
-			Rssi:          md.Rssi,
-			Snr:           md.Snr,
-		})
+		if md.GetGatewayIds() != nil {
+			cleanUplink.RxMetadata = append(cleanUplink.RxMetadata, &ttnpb.RxMetadata{
+				GatewayIds: &ttnpb.GatewayIdentifiers{
+					GatewayId: md.GetGatewayIds().GatewayId,
+				},
+				AntennaIndex:  md.AntennaIndex,
+				FineTimestamp: md.FineTimestamp,
+				Location:      md.Location,
+				Rssi:          md.Rssi,
+				Snr:           md.Snr,
+			})
+		}
 	}
 	return as.appUpsRegistry.Push(ctx, ids, cleanUplink)
 }

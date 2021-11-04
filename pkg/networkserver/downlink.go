@@ -704,7 +704,7 @@ func downlinkPathsFromMetadata(ctx context.Context, mds ...*ttnpb.RxMetadata) []
 		if md.PacketBroker != nil {
 			tail = append(tail, path)
 		} else {
-			path.GatewayIdentifiers = &md.GatewayIdentifiers
+			path.GatewayIdentifiers = md.GetGatewayIds()
 			switch md.DownlinkPathConstraint {
 			case ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE:
 				head = append(head, path)

@@ -134,12 +134,12 @@ func TestProtobufV2Uplinks(t *testing.T) {
 	}
 	validV3Metadata := []*ttnpb.RxMetadata{
 		{
-			GatewayIdentifiers: ids,
-			ChannelRssi:        -2,
-			Rssi:               -2,
-			Snr:                -75,
-			Time:               &nilTime,
-			Timestamp:          1000,
+			GatewayIds:  &ids,
+			ChannelRssi: -2,
+			Rssi:        -2,
+			Snr:         -75,
+			Time:        &nilTime,
+			Timestamp:   1000,
 		},
 	}
 	validRawPayload := []byte{

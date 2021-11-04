@@ -65,7 +65,7 @@ func BuildWiFiRequest(ctx context.Context, metadata []*ttnpb.RxMetadata, payload
 		WiFiAccessPoints: parseWiFiStruct(payload),
 	}
 	for _, m := range metadata {
-		if m.Location == nil {
+		if m.Location == nil || m.GetGatewayIds() == nil {
 			continue
 		}
 		gtw, up := parseRxMetadata(ctx, m)

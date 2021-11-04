@@ -320,9 +320,9 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 
 	var gatewayReceiveTime *time.Time
 	var gatewayUplinkToken []byte
-	if len(msg.RxMetadata) > 0 {
+	if len(msg.RxMetadata) > 0 && msg.RxMetadata[0].GetGatewayIds() != nil {
 		md := msg.RxMetadata[0]
-		up.GatewayId = toPBGatewayIdentifier(&md.GatewayIdentifiers, config)
+		up.GatewayId = toPBGatewayIdentifier(md.GetGatewayIds(), config)
 
 		var teaser packetbroker.GatewayMetadataTeaser_Terrestrial
 		var signalQuality packetbroker.GatewayMetadataSignalQuality_Terrestrial
@@ -383,7 +383,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 
 			if len(gatewayUplinkToken) == 0 {
 				var err error
-				gatewayUplinkToken, err = wrapGatewayUplinkToken(ctx, md.GatewayIdentifiers, md.UplinkToken, config.TokenEncrypter)
+				gatewayUplinkToken, err = wrapGatewayUplinkToken(ctx, *md.GetGatewayIds(), md.UplinkToken, config.TokenEncrypter)
 				if err != nil {
 					return nil, errWrapGatewayUplinkToken.WithCause(err)
 				}
@@ -521,7 +521,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 		if md := gtwMd.GetPlainLocalization().GetTerrestrial(); md != nil {
 			for _, ant := range md.Antennas {
 				up.RxMetadata = append(up.RxMetadata, &ttnpb.RxMetadata{
-					GatewayIdentifiers:     cluster.PacketBrokerGatewayID,
+					GatewayIds:             &cluster.PacketBrokerGatewayID,
 					PacketBroker:           pbMD,
 					AntennaIndex:           ant.Index,
 					Time:                   receiveTime,
@@ -540,7 +540,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 		} else if md := gtwMd.GetPlainSignalQuality().GetTerrestrial(); md != nil {
 			for _, ant := range md.Antennas {
 				up.RxMetadata = append(up.RxMetadata, &ttnpb.RxMetadata{
-					GatewayIdentifiers:     cluster.PacketBrokerGatewayID,
+					GatewayIds:             &cluster.PacketBrokerGatewayID,
 					PacketBroker:           pbMD,
 					AntennaIndex:           ant.Index,
 					Time:                   receiveTime,

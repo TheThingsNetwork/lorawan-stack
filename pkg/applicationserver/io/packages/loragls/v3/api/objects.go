@@ -91,7 +91,7 @@ type SingleFrameRequest struct {
 }
 
 func parseRxMetadata(ctx context.Context, m *ttnpb.RxMetadata) (Gateway, Uplink) {
-	gtwUID := unique.ID(ctx, m.GatewayIdentifiers)
+	gtwUID := unique.ID(ctx, m.GetGatewayIds())
 	hashed := sha256.Sum256([]byte(gtwUID))
 	hashedUID := hex.EncodeToString(hashed[:])
 	var tdoa *uint64
@@ -119,7 +119,7 @@ func BuildSingleFrameRequest(ctx context.Context, metadata []*ttnpb.RxMetadata) 
 		Frame:    Frame{},
 	}
 	for _, m := range metadata {
-		if m.Location == nil {
+		if m.Location == nil || m.GetGatewayIds() == nil {
 			continue
 		}
 		gtw, up := parseRxMetadata(ctx, m)
@@ -146,7 +146,7 @@ func BuildMultiFrameRequest(ctx context.Context, mds [][]*ttnpb.RxMetadata) *Mul
 	for _, metadata := range mds {
 		frame := Frame{}
 		for _, m := range metadata {
-			if m.Location == nil {
+			if m.Location == nil || m.GetGatewayIds() == nil {
 				continue
 			}
 			gtw, up := parseRxMetadata(ctx, m)
