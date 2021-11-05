@@ -40,7 +40,7 @@ func (c *clientCredentials) GetRequestMetadata(ctx context.Context, uri ...strin
 		return nil, errFetchOAuth2Token.WithCause(err)
 	}
 	if !token.Valid() {
-		return nil, errInvalidOAuth2Token.WithCause(err)
+		return nil, errInvalidOAuth2Token.New()
 	}
 	return map[string]string{
 		"authorization": fmt.Sprintf("%s %s", token.Type(), token.AccessToken),
