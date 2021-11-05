@@ -42,7 +42,6 @@ export const GATEWAY_EVENTS_VERBOSE_FILTERS = [
   '*.warning',
   '*.fail',
   'gateway.*',
-  'application.*',
 ]
 
 export const EVENT_END_DEVICE_HEARTBEAT_FILTERS = [
