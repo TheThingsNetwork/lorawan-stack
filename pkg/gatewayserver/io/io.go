@@ -232,7 +232,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 		buf, err := UplinkToken(&ttnpb.GatewayAntennaIdentifiers{
 			GatewayIds:   c.gateway.GetIds(),
 			AntennaIndex: md.AntennaIndex,
-		}, md.Timestamp, ct, up.ReceivedAt)
+		}, md.Timestamp, ct, up.ReceivedAt, up.Settings.Time)
 		if err != nil {
 			return err
 		}
@@ -701,8 +701,8 @@ func (c *Connection) BandID() string { return c.bandID }
 
 // SyncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
 // relative gateway time that corresponds to the given timestamp.
-func (c *Connection) SyncWithGatewayConcentrator(timestamp uint32, server time.Time, concentrator scheduling.ConcentratorTime) {
-	c.scheduler.SyncWithGatewayConcentrator(timestamp, server, concentrator)
+func (c *Connection) SyncWithGatewayConcentrator(timestamp uint32, server time.Time, gateway *time.Time, concentrator scheduling.ConcentratorTime) {
+	c.scheduler.SyncWithGatewayConcentrator(timestamp, server, gateway, concentrator)
 }
 
 // TimeFromTimestampTime returns the concentrator time by the given timestamp.

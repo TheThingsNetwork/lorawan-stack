@@ -251,16 +251,13 @@ func (s *Scheduler) SubBandCount() int {
 // If the given token does not provide enough information or if the latest clock sync is more recent, this method returns false.
 // This method assumes that the mutex is held.
 func (s *Scheduler) syncWithUplinkToken(token *ttnpb.UplinkToken) bool {
-	if token.GetServerTime().IsZero() || token.GetConcentratorTime() == 0 {
-		return false
-	}
-	if token.ServerTime == nil {
+	if token.GetServerTime() == nil || token.GetConcentratorTime() == 0 {
 		return false
 	}
 	if lastSync, ok := s.clock.SyncTime(); ok && lastSync.After(*token.ServerTime) {
 		return false
 	}
-	s.clock.SyncWithGatewayConcentrator(token.Timestamp, *token.ServerTime, ConcentratorTime(token.ConcentratorTime))
+	s.clock.SyncWithGatewayConcentrator(token.Timestamp, *token.ServerTime, token.GatewayTime, ConcentratorTime(token.ConcentratorTime))
 	return true
 }
 
@@ -455,10 +452,10 @@ func (s *Scheduler) SyncWithGatewayAbsolute(timestamp uint32, server, gateway ti
 
 // SyncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
 // relative gateway time that corresponds to the given timestamp.
-func (s *Scheduler) SyncWithGatewayConcentrator(timestamp uint32, server time.Time, concentrator ConcentratorTime) ConcentratorTime {
+func (s *Scheduler) SyncWithGatewayConcentrator(timestamp uint32, server time.Time, gateway *time.Time, concentrator ConcentratorTime) ConcentratorTime {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	return s.clock.SyncWithGatewayConcentrator(timestamp, server, concentrator)
+	return s.clock.SyncWithGatewayConcentrator(timestamp, server, gateway, concentrator)
 }
 
 // IsGatewayTimeSynced reports whether scheduler clock is synchronized with gateway time.

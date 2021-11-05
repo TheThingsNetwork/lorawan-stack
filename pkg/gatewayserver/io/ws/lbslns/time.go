@@ -33,6 +33,21 @@ func TimeToUnixSeconds(t time.Time) float64 {
 	return float64(t.UnixNano()) / float64(1e9)
 }
 
+// TimeFromGPSTime constructs a time.Time from the provided GPS time in microseconds.
+func TimeFromGPSTime(t int64) time.Time {
+	return gpstime.Parse(time.Duration(t) * time.Microsecond)
+}
+
+// TimePtrFromGPSTime constructs a *time.Time from the provided GPS time in microseconds.
+// If the timestamp is 0, this function returns nil.
+func TimePtrFromGPSTime(t int64) *time.Time {
+	if t == 0 {
+		return nil
+	}
+	tm := TimeFromGPSTime(t)
+	return &tm
+}
+
 // TimeToGPSTime contructs a GPS timestamp from the provided time.Time.
 func TimeToGPSTime(t time.Time) int64 {
 	return int64(gpstime.ToGPS(t) / time.Microsecond)
@@ -42,4 +57,18 @@ func TimeToGPSTime(t time.Time) int64 {
 // session ID and concentrator timestamp.
 func ConcentratorTimeToXTime(id int32, t scheduling.ConcentratorTime) int64 {
 	return int64(id)<<48 | (int64(t) / int64(time.Microsecond) & 0xFFFFFFFFFF)
+}
+
+// ConcentratorTimeFromXTime constructs the scheduling.ConcentratorTime associated
+// with the provided XTime.
+func ConcentratorTimeFromXTime(xTime int64) scheduling.ConcentratorTime {
+	// The Basic Station epoch is the 48 LSB.
+	return scheduling.ConcentratorTime(time.Duration(xTime&0xFFFFFFFFFF) * time.Microsecond)
+}
+
+// TimestampFromXTime constructs the concentrator timestamp associated with the
+// provided XTime.
+func TimestampFromXTime(xTime int64) uint32 {
+	// The concentrator timestamp is the 32 LSB.
+	return uint32(xTime & 0xFFFFFFFF)
 }

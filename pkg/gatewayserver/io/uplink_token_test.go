@@ -36,15 +36,19 @@ func TestUplinkToken(t *testing.T) {
 	}
 	timestamp := uint32(12345678)
 	concentratorTime := scheduling.ConcentratorTime(12345678000)
-	serverTime := time.Now()
+	serverTime := time.Now().UTC()
+	gatewayTime := serverTime.Truncate(time.Millisecond)
 
-	uplinkToken, err := io.UplinkToken(ids, timestamp, concentratorTime, serverTime)
+	uplinkToken, err := io.UplinkToken(ids, timestamp, concentratorTime, serverTime, &gatewayTime)
 	a.So(err, should.BeNil)
 
 	token, err := io.ParseUplinkToken(uplinkToken)
 	a.So(err, should.BeNil)
 	a.So(token.Ids, should.Resemble, ids)
 	a.So(token.Timestamp, should.Equal, timestamp)
+	a.So(token.ConcentratorTime, should.Equal, int64(concentratorTime))
+	a.So(token.ServerTime, should.Resemble, &serverTime)
+	a.So(token.GatewayTime, should.Resemble, &gatewayTime)
 
 	_, err = io.ParseUplinkToken(nil)
 	a.So(err, should.NotBeNil)

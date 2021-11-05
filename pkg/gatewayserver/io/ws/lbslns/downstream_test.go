@@ -270,6 +270,7 @@ func TestTransferTime(t *testing.T) {
 	conn.SyncWithGatewayConcentrator(
 		uint32(xTime&0xFFFFFFFF),
 		timeAtSync,
+		nil,
 		scheduling.ConcentratorTime(time.Duration(xTime&0xFFFFFFFFFF)*time.Microsecond),
 	)
 

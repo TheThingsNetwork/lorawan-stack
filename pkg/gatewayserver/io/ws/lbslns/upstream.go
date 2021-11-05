@@ -28,7 +28,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -115,7 +114,7 @@ type TxConfirmation struct {
 	RCtx    int64            `json:"rctx"`
 	XTime   int64            `json:"xtime"`
 	TxTime  float64          `json:"txtime"`
-	GpsTime int64            `json:"gpstime"`
+	GPSTime int64            `json:"gpstime"`
 }
 
 // MarshalJSON implements json.Marshaler.
@@ -525,7 +524,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 		"upstream_type", typ,
 	))
 
-	recordTime := func(refTimeUnix float64, xTime int64) {
+	recordTime := func(refTimeUnix float64, xTime int64, gpsTimeUs int64) {
 		if refTimeUnix != 0.0 {
 			refTime := TimeFromUnixSeconds(refTimeUnix)
 			if delta := receivedAt.Sub(refTime); delta > f.maxRoundTripDelay {
@@ -540,11 +539,10 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			}
 		}
 		conn.SyncWithGatewayConcentrator(
-			// The concentrator timestamp is the 32 LSB.
-			uint32(xTime&0xFFFFFFFF),
+			TimestampFromXTime(xTime),
 			receivedAt,
-			// The Basic Station epoch is the 48 LSB.
-			scheduling.ConcentratorTime(time.Duration(xTime&0xFFFFFFFFFF)*time.Microsecond),
+			TimePtrFromGPSTime(gpsTimeUs),
+			ConcentratorTimeFromXTime(xTime),
 		)
 	}
 
@@ -582,7 +580,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			return nil, err
 		}
 		updateSessionID(ctx, int32(jreq.UpInfo.XTime>>48))
-		recordTime(jreq.RefTime, jreq.UpInfo.XTime)
+		recordTime(jreq.RefTime, jreq.UpInfo.XTime, jreq.UpInfo.GPSTime)
 
 	case TypeUpstreamUplinkDataFrame:
 		var updf UplinkDataFrame
@@ -604,7 +602,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			return nil, err
 		}
 		updateSessionID(ctx, int32(updf.UpInfo.XTime>>48))
-		recordTime(updf.RefTime, updf.UpInfo.XTime)
+		recordTime(updf.RefTime, updf.UpInfo.XTime, updf.UpInfo.GPSTime)
 
 	case TypeUpstreamTxConfirmation:
 		var txConf TxConfirmation
@@ -620,7 +618,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			return nil, err
 		}
 		updateSessionID(ctx, int32(txConf.XTime>>48))
-		recordTime(0.0, txConf.XTime)
+		recordTime(0.0, txConf.XTime, txConf.GPSTime)
 
 	case TypeUpstreamTimeSync:
 		var req TimeSyncRequest

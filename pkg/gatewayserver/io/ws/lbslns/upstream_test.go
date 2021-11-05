@@ -91,7 +91,7 @@ func TestMarshalJSON(t *testing.T) {
 				DevEUI:  basicstation.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
 				XTime:   1552906698,
 				TxTime:  1552906698,
-				GpsTime: 1552906698,
+				GPSTime: 1552906698,
 			},
 			Expected: []byte(`{"msgtype":"dntxed","diid":35,"DevEui":"1111:1111:1111:1111","rctx":0,"xtime":1552906698,"txtime":1552906698,"gpstime":1552906698}`),
 		},

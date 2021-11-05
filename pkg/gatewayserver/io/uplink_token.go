@@ -23,20 +23,21 @@ import (
 )
 
 // UplinkToken returns an uplink token from the given downlink path.
-func UplinkToken(ids *ttnpb.GatewayAntennaIdentifiers, timestamp uint32, concentratorTime scheduling.ConcentratorTime, serverTime time.Time) ([]byte, error) {
+func UplinkToken(ids *ttnpb.GatewayAntennaIdentifiers, timestamp uint32, concentratorTime scheduling.ConcentratorTime, serverTime time.Time, gatewayTime *time.Time) ([]byte, error) {
 	token := ttnpb.UplinkToken{
 		Ids:              ids,
 		Timestamp:        timestamp,
 		ServerTime:       &serverTime,
 		ConcentratorTime: int64(concentratorTime),
+		GatewayTime:      gatewayTime,
 	}
 	return proto.Marshal(&token)
 }
 
 // MustUplinkToken returns an uplink token from the given downlink path.
 // This function panics if an error occurs. Use UplinkToken to handle errors.
-func MustUplinkToken(ids *ttnpb.GatewayAntennaIdentifiers, timestamp uint32, concentratorTime scheduling.ConcentratorTime, serverTime time.Time) []byte {
-	token, err := UplinkToken(ids, timestamp, concentratorTime, serverTime)
+func MustUplinkToken(ids *ttnpb.GatewayAntennaIdentifiers, timestamp uint32, concentratorTime scheduling.ConcentratorTime, serverTime time.Time, gatewayTime *time.Time) []byte {
+	token, err := UplinkToken(ids, timestamp, concentratorTime, serverTime, gatewayTime)
 	if err != nil {
 		panic(err)
 	}

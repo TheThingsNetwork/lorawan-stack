@@ -87,11 +87,11 @@ func (c *RolloverClock) SyncWithGatewayAbsolute(timestamp uint32, server, gatewa
 
 // SyncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
 // relative gateway time that corresponds to the given timestamp.
-func (c *RolloverClock) SyncWithGatewayConcentrator(timestamp uint32, server time.Time, concentrator ConcentratorTime) ConcentratorTime {
+func (c *RolloverClock) SyncWithGatewayConcentrator(timestamp uint32, server time.Time, gateway *time.Time, concentrator ConcentratorTime) ConcentratorTime {
 	c.absolute = concentrator
 	c.relative = timestamp
 	c.server = &server
-	c.gateway = nil
+	c.gateway = gateway
 	c.synced = true
 	return c.absolute
 }
