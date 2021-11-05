@@ -20,7 +20,6 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
-	"math"
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
@@ -213,25 +212,19 @@ func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 		return nil, errJoinRequestMessage.WithCause(err)
 	}
 
-	timestamp := uint32(req.RadioMetaData.UpInfo.XTime & 0xFFFFFFFF)
-
-	var rxTime *time.Time
-	sec, nsec := math.Modf(req.RadioMetaData.UpInfo.RxTime)
-	if sec != 0 {
-		val := time.Unix(int64(sec), int64(nsec*(1e9)))
-		rxTime = &val
+	timestamp := TimestampFromXTime(req.RadioMetaData.UpInfo.XTime)
+	tm := TimePtrFromUpInfo(req.UpInfo.GPSTime, req.UpInfo.RxTime)
+	up.RxMetadata = []*ttnpb.RxMetadata{
+		{
+			GatewayIdentifiers: ids,
+			Time:               tm,
+			Timestamp:          timestamp,
+			Rssi:               req.RadioMetaData.UpInfo.RSSI,
+			ChannelRssi:        req.RadioMetaData.UpInfo.RSSI,
+			Snr:                req.RadioMetaData.UpInfo.SNR,
+			AntennaIndex:       uint32(req.RadioMetaData.UpInfo.RCtx),
+		},
 	}
-
-	rxMetadata := &ttnpb.RxMetadata{
-		GatewayIdentifiers: ids,
-		Time:               rxTime,
-		Timestamp:          timestamp,
-		Rssi:               req.RadioMetaData.UpInfo.RSSI,
-		ChannelRssi:        req.RadioMetaData.UpInfo.RSSI,
-		Snr:                req.RadioMetaData.UpInfo.SNR,
-		AntennaIndex:       uint32(req.RadioMetaData.UpInfo.RCtx),
-	}
-	up.RxMetadata = append(up.RxMetadata, rxMetadata)
 
 	phy, err := band.GetLatest(bandID)
 	if err != nil {
@@ -254,7 +247,7 @@ func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 		DataRate:   bandDR.Rate,
 		CodingRate: codingRate,
 		Timestamp:  timestamp,
-		Time:       rxTime,
+		Time:       tm,
 	}
 
 	return &up, nil
@@ -298,21 +291,17 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 	}
 
 	rxMetadata := up.RxMetadata[0]
-
-	var rxTime float64
-	if rxMetadata.Time != nil {
-		rxTime = float64(rxMetadata.Time.Unix()) + float64(rxMetadata.Time.Nanosecond())/(1e9)
-	}
-
+	rxTime, gpsTime := TimePtrToUpInfoTime(rxMetadata.Time)
 	req.RadioMetaData = RadioMetaData{
 		DataRate:  int(drIdx),
 		Frequency: up.Settings.GetFrequency(),
 		UpInfo: UpInfo{
-			RCtx:   int64(rxMetadata.AntennaIndex),
-			XTime:  int64(rxMetadata.Timestamp),
-			RSSI:   rxMetadata.Rssi,
-			SNR:    rxMetadata.Snr,
-			RxTime: rxTime,
+			RCtx:    int64(rxMetadata.AntennaIndex),
+			XTime:   int64(rxMetadata.Timestamp),
+			RSSI:    rxMetadata.Rssi,
+			SNR:     rxMetadata.Snr,
+			RxTime:  rxTime,
+			GPSTime: gpsTime,
 		},
 	}
 	return nil
@@ -381,25 +370,19 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 		return nil, errUplinkDataFrame.WithCause(err)
 	}
 
-	timestamp := uint32(updf.RadioMetaData.UpInfo.XTime & 0xFFFFFFFF)
-
-	var rxTime *time.Time
-	sec, nsec := math.Modf(updf.RadioMetaData.UpInfo.RxTime)
-	if sec != 0 {
-		val := time.Unix(int64(sec), int64(nsec*(1e9)))
-		rxTime = &val
+	timestamp := TimestampFromXTime(updf.RadioMetaData.UpInfo.XTime)
+	tm := TimePtrFromUpInfo(updf.UpInfo.GPSTime, updf.UpInfo.RxTime)
+	up.RxMetadata = []*ttnpb.RxMetadata{
+		{
+			GatewayIdentifiers: ids,
+			Time:               tm,
+			Timestamp:          timestamp,
+			Rssi:               updf.RadioMetaData.UpInfo.RSSI,
+			ChannelRssi:        updf.RadioMetaData.UpInfo.RSSI,
+			Snr:                updf.RadioMetaData.UpInfo.SNR,
+			AntennaIndex:       uint32(updf.RadioMetaData.UpInfo.RCtx),
+		},
 	}
-
-	rxMetadata := &ttnpb.RxMetadata{
-		GatewayIdentifiers: ids,
-		Time:               rxTime,
-		Timestamp:          timestamp,
-		Rssi:               updf.RadioMetaData.UpInfo.RSSI,
-		ChannelRssi:        updf.RadioMetaData.UpInfo.RSSI,
-		Snr:                updf.RadioMetaData.UpInfo.SNR,
-		AntennaIndex:       uint32(updf.RadioMetaData.UpInfo.RCtx),
-	}
-	up.RxMetadata = append(up.RxMetadata, rxMetadata)
 
 	phy, err := band.GetLatest(bandID)
 	if err != nil {
@@ -422,7 +405,7 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 		DataRate:   bandDR.Rate,
 		CodingRate: codingRate,
 		Timestamp:  timestamp,
-		Time:       rxTime,
+		Time:       tm,
 	}
 	return &up, nil
 }
@@ -478,21 +461,18 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 	}
 
 	rxMetadata := up.RxMetadata[0]
-
-	var rxTime float64
-	if rxMetadata.Time != nil {
-		rxTime = float64(rxMetadata.Time.Unix()) + float64(rxMetadata.Time.Nanosecond())/(1e9)
-	}
+	rxTime, gpsTime := TimePtrToUpInfoTime(rxMetadata.Time)
 
 	updf.RadioMetaData = RadioMetaData{
 		DataRate:  int(drIdx),
 		Frequency: up.Settings.GetFrequency(),
 		UpInfo: UpInfo{
-			RCtx:   int64(rxMetadata.AntennaIndex),
-			XTime:  int64(rxMetadata.Timestamp),
-			RSSI:   rxMetadata.Rssi,
-			SNR:    rxMetadata.Snr,
-			RxTime: rxTime,
+			RCtx:    int64(rxMetadata.AntennaIndex),
+			XTime:   int64(rxMetadata.Timestamp),
+			RSSI:    rxMetadata.Rssi,
+			SNR:     rxMetadata.Snr,
+			RxTime:  rxTime,
+			GPSTime: gpsTime,
 		},
 	}
 	return nil

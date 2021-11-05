@@ -23,7 +23,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -265,13 +264,13 @@ func TestTransferTime(t *testing.T) {
 	a.So(b, should.BeNil)
 
 	// Add fictional concentrator sync.
-	xTime := 123456
+	xTime := int64(123456)
 	timeAtSync := time.Now()
 	conn.SyncWithGatewayConcentrator(
-		uint32(xTime&0xFFFFFFFF),
+		TimestampFromXTime(xTime),
 		timeAtSync,
 		nil,
-		scheduling.ConcentratorTime(time.Duration(xTime&0xFFFFFFFFFF)*time.Microsecond),
+		ConcentratorTimeFromXTime(xTime),
 	)
 
 	// No session ID available.

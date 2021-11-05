@@ -28,6 +28,16 @@ func TimeFromUnixSeconds(tf float64) time.Time {
 	return time.Unix(int64(sec), int64(nsec*1e9))
 }
 
+// TimeFromUnixSeconds constructs a *time.Time from the provided UNIX fractional timestamp.
+// If the timestamp is 0, this function returns nil.
+func TimePtrFromUnixSeconds(tf float64) *time.Time {
+	if tf == 0.0 {
+		return nil
+	}
+	tm := TimeFromUnixSeconds(tf)
+	return &tm
+}
+
 // TimeToUnixSeconds constructs a UNIX fractional timestamp from the provided time.Time.
 func TimeToUnixSeconds(t time.Time) float64 {
 	return float64(t.UnixNano()) / float64(1e9)
@@ -51,6 +61,29 @@ func TimePtrFromGPSTime(t int64) *time.Time {
 // TimeToGPSTime contructs a GPS timestamp from the provided time.Time.
 func TimeToGPSTime(t time.Time) int64 {
 	return int64(gpstime.ToGPS(t) / time.Microsecond)
+}
+
+// TimePtrFromUpInfo contructs a *time.Time from the provided uplink metadata information.
+// The GPS timestamp is used if present, then the RxTime. The function returns nil if both
+// timestamps are unavailable.
+func TimePtrFromUpInfo(gpsTime int64, rxTime float64) *time.Time {
+	switch {
+	case gpsTime != 0:
+		return TimePtrFromGPSTime(gpsTime)
+	case rxTime != 0.0:
+		return TimePtrFromUnixSeconds(rxTime)
+	default:
+		return nil
+	}
+}
+
+// TimePtrToUpInfoTime constructs the RxTime and GPSTime from the provided *time.Time.
+// If the time is nil, this function returns (0.0, 0).
+func TimePtrToUpInfoTime(t *time.Time) (float64, int64) {
+	if t == nil {
+		return 0.0, 0
+	}
+	return TimeToUnixSeconds(*t), TimeToGPSTime(*t)
 }
 
 // ConcentratorTimeToXTime contructs the XTime associated with the provided

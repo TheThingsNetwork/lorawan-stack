@@ -461,9 +461,8 @@ func (s *Scheduler) SyncWithGatewayConcentrator(timestamp uint32, server time.Ti
 // IsGatewayTimeSynced reports whether scheduler clock is synchronized with gateway time.
 func (s *Scheduler) IsGatewayTimeSynced() bool {
 	s.mu.RLock()
-	ret := s.clock.IsSynced() && s.clock.gateway != nil
-	s.mu.RUnlock()
-	return ret
+	defer s.mu.RUnlock()
+	return s.clock.IsSynced() && s.clock.gateway != nil
 }
 
 // Now returns an indication of the current concentrator time.
