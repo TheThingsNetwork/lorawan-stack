@@ -85,8 +85,8 @@ github.com/TheThingsIndustries/grpc-gateway v1.15.2-gogo h1:rWB4sbEKoL7xUC9ixUkJ
 github.com/TheThingsIndustries/grpc-gateway v1.15.2-gogo/go.mod h1:fU1VeKM8T+38FAMQNH0zO2BT6grnMyphff4CD9w1DTM=
 github.com/TheThingsIndustries/mystique v0.0.0-20200127144137-4aa959111fe7 h1:Vb+sqm8nZUi+3N10QB8g2Gio2luOgfQnLlO6eLTuYDY=
 github.com/TheThingsIndustries/mystique v0.0.0-20200127144137-4aa959111fe7/go.mod h1:SdYf+XGL8wHUUJHd6LedTIWQRGfJqBqXEYFxwlCdLc8=
-github.com/TheThingsIndustries/protoc-gen-go-json v1.1.0 h1:WHFYOkhLiOTC5sLZbKsMbg23MltP/qWgX2u9PBztU6Y=
-github.com/TheThingsIndustries/protoc-gen-go-json v1.1.0/go.mod h1:VIHEQGRAJAgKjokCNKDc5EZhPUR1ODbLr+MZAfPMK+A=
+github.com/TheThingsIndustries/protoc-gen-go-json v1.1.1 h1:RTWFtCEdgz48HZi9vD/ra+zgoaLLY+xx+XQiozpd2eo=
+github.com/TheThingsIndustries/protoc-gen-go-json v1.1.1/go.mod h1:VIHEQGRAJAgKjokCNKDc5EZhPUR1ODbLr+MZAfPMK+A=
 github.com/TheThingsIndustries/throttled/v2 v2.7.1-noredis h1:uashKgjy7XCNZNb00+3GheWtJXnS9DnAkYQ1X89cAIg=
 github.com/TheThingsIndustries/throttled/v2 v2.7.1-noredis/go.mod h1:XC/YhKcHsxRy8shbYICwf+oWeYTCC2kpL5/clSJbt+U=
 github.com/TheThingsNetwork/go-cayenne-lib v1.1.0 h1:uw+WnTMSSwTo58/ob3ktWNBiCY2psIof8p3lKdxreAE=

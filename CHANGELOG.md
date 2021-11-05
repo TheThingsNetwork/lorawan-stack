@@ -39,6 +39,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Handling of NaN values in our JSON API.
+
 ### Security
 
 ## [3.15.3] - 2021-10-26
