@@ -16,7 +16,6 @@ import React, { useState, useCallback } from 'react'
 import classnames from 'classnames'
 
 import EVENT_STORE_LIMIT from '@console/constants/event-store-limit'
-import { EVENT_VERBOSE_FILTERS_REGEXP } from '@console/constants/event-filters'
 import hamburgerMenuClose from '@assets/misc/hamburger-menu-close.svg'
 
 import Button from '@ttn-lw/components/button'
@@ -63,7 +62,7 @@ const Events = React.memo(
     )
 
     const handleVerboseFilterChange = useCallback(() => {
-      onFilterChange(Boolean(filter) ? undefined : EVENT_VERBOSE_FILTERS_REGEXP)
+      onFilterChange(Boolean(filter) ? undefined : 'default')
     }, [onFilterChange, filter])
 
     const handleEventInfoCloseClick = useCallback(() => {
@@ -151,7 +150,7 @@ Events.propTypes = {
   disableFiltering: PropTypes.bool,
   entityId: PropTypes.string.isRequired,
   events: PropTypes.events.isRequired,
-  filter: PropTypes.string,
+  filter: PropTypes.eventFilter,
   onClear: PropTypes.func,
   onFilterChange: PropTypes.func,
   onPauseToggle: PropTypes.func,
