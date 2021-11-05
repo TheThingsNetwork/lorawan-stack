@@ -579,11 +579,12 @@ class Devices {
 
   // Events Stream
 
-  async openStream(identifiers, tail, after) {
+  async openStream(identifiers, names, tail, after) {
     const payload = {
       identifiers: identifiers.map(ids => ({
         device_ids: ids,
       })),
+      names,
       tail,
       after,
     }
