@@ -12,36 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Utility function to convert filter arrays to Regular Expressions.
-const filterListToRegExpString = array =>
-  array.reduce(
-    (acc, cur, i) => `${acc}${i !== 0 ? '|' : ''}${cur.replace('.', '\\.').replace('*', '.*')}`,
-    '',
-  )
+import { APPLICATION, END_DEVICE, GATEWAY } from '@console/constants/entities'
 
-export const EVENT_VERBOSE_FILTERS = [
+export const END_DEVICE_EVENTS_VERBOSE_FILTERS = [
   'as.*.drop',
   'as.down.data.forward',
   'as.up.location.forward',
   'as.up.data.forward',
   'as.up.service.forward',
-  'gs.down.send',
-  'gs.gateway.connect',
-  'gs.gateway.disconnect',
-  'gs.status.receive',
-  'gs.up.receive',
   'js.join.accept',
   'js.join.reject',
   'ns.mac.*.answer.reject',
   '*.warning',
   '*.fail',
-  'organization.*',
-  'user.*',
+  'end_device.*',
+]
+
+export const APPLICATION_EVENTS_VERBOSE_FILTERS = [
+  ...END_DEVICE_EVENTS_VERBOSE_FILTERS,
+  'application.*',
+]
+
+export const GATEWAY_EVENTS_VERBOSE_FILTERS = [
+  'gs.down.send',
+  'gs.gateway.connect',
+  'gs.gateway.disconnect',
+  'gs.status.receive',
+  'gs.up.receive',
+  '*.warning',
+  '*.fail',
   'gateway.*',
   'application.*',
-  'end_device.*',
-  'client.*',
-  'oauth.*',
 ]
 
 export const EVENT_END_DEVICE_HEARTBEAT_FILTERS = [
@@ -50,16 +51,35 @@ export const EVENT_END_DEVICE_HEARTBEAT_FILTERS = [
   'ns.up.rejoin.receive',
 ]
 
-// Converted RegExps.
-export const EVENT_VERBOSE_FILTERS_REGEXP = filterListToRegExpString(EVENT_VERBOSE_FILTERS)
-export const EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP = filterListToRegExpString(
+// Utility function to convert filter arrays to Regular Expressions strings
+// that the backend accepts for applying filters.
+const filterListToRegExpList = array =>
+  array.map(f => `/^${f.replace(/\./g, '\\.').replace(/\*/g, '.*')}$/`)
+
+export const EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP = filterListToRegExpList(
   EVENT_END_DEVICE_HEARTBEAT_FILTERS,
 )
 
-// A map that allows to translate back the filter list from the converted
-// RegExp string. Useful to show a human readable filter list in the event
-// stream, which only uses the RegExp string internally.
-export const EVENT_FILTER_MAP = Object.freeze({
-  [EVENT_VERBOSE_FILTERS_REGEXP]: EVENT_VERBOSE_FILTERS,
-  [EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP]: EVENT_END_DEVICE_HEARTBEAT_FILTERS,
-})
+export const EVENT_FILTERS = {
+  [APPLICATION]: [
+    {
+      id: 'default',
+      filter: APPLICATION_EVENTS_VERBOSE_FILTERS,
+      filterRegExp: filterListToRegExpList(APPLICATION_EVENTS_VERBOSE_FILTERS),
+    },
+  ],
+  [END_DEVICE]: [
+    {
+      id: 'default',
+      filter: END_DEVICE_EVENTS_VERBOSE_FILTERS,
+      filterRegExp: filterListToRegExpList(END_DEVICE_EVENTS_VERBOSE_FILTERS),
+    },
+  ],
+  [GATEWAY]: [
+    {
+      id: 'default',
+      filter: GATEWAY_EVENTS_VERBOSE_FILTERS,
+      filterRegExp: filterListToRegExpList(GATEWAY_EVENTS_VERBOSE_FILTERS),
+    },
+  ],
+}
