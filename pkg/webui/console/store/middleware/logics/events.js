@@ -31,6 +31,7 @@ import {
   createEventStreamClosedActionType,
   createGetEventMessageFailureActionType,
   createGetEventMessageSuccessActionType,
+  createSetEventsFilterActionType,
   getEventMessageSuccess,
   getEventMessageFailure,
   startEventsStreamFailure,
@@ -44,6 +45,7 @@ import {
   createEventsInterruptedSelector,
   createInterruptedStreamsSelector,
   createLatestEventSelector,
+  createEventsFilterSelector,
 } from '@console/store/selectors/events'
 import { selectDeviceById } from '@console/store/selectors/devices'
 
@@ -64,6 +66,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
   const EVENT_STREAM_CLOSED = createEventStreamClosedActionType(reducerName)
   const GET_EVENT_MESSAGE_FAILURE = createGetEventMessageFailureActionType(reducerName)
   const GET_EVENT_MESSAGE_SUCCESS = createGetEventMessageSuccessActionType(reducerName)
+  const SET_EVENT_FILTER = createSetEventsFilterActionType(reducerName)
   const startEventsSuccess = startEventsStreamSuccess(reducerName)
   const startEventsFailure = startEventsStreamFailure(reducerName)
   const closeEvents = eventStreamClosed(reducerName)
@@ -74,6 +77,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
   const selectEntityEventsInterrupted = createEventsInterruptedSelector(entityName)
   const selectInterruptedStreams = createInterruptedStreamsSelector(entityName)
   const selectLatestEvent = createLatestEventSelector(entityName)
+  const selectEventFilter = createEventsFilterSelector(entityName)
 
   let channel = null
 
@@ -107,20 +111,27 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
         allow(action)
       },
       process: async ({ getState, action }, dispatch) => {
-        const { id } = action
+        const { id, silent } = action
 
         // Only get historical events emitted after the latest event in the
         // store to avoid duplicate historical events.
-        const latestEvent = selectLatestEvent(getState(), id)
+        const state = getState()
+        const latestEvent = selectLatestEvent(state, id)
         const after = Boolean(latestEvent) ? latestEvent.time : undefined
 
-        try {
-          channel = await onEventsStart([id], EVENT_TAIL, after)
+        const idString = typeof action.id === 'object' ? getCombinedDeviceId(action.id) : action.id
+        const filter = selectEventFilter(state, idString)
+        const filterRegExp = Boolean(filter) ? filter.filterRegExp : undefined
 
-          channel.on('start', () => dispatch(startEventsSuccess(id)))
+        try {
+          channel = await onEventsStart([id], filterRegExp, EVENT_TAIL, after)
+
+          channel.on('start', () => dispatch(startEventsSuccess(id, { silent })))
           channel.on('chunk', message => dispatch(getEventSuccess(id, message)))
           channel.on('error', error => dispatch(getEventFailure(id, error)))
-          channel.on('close', () => dispatch(closeEvents(id)))
+          channel.on('close', wasClientRequest =>
+            dispatch(closeEvents(id, { silent: wasClientRequest })),
+          )
 
           channel.open()
         } catch (error) {
@@ -252,6 +263,25 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
           }
         }
 
+        done()
+      },
+    }),
+    createLogic({
+      type: SET_EVENT_FILTER,
+      process: async ({ getState, action }, dispatch, done) => {
+        if (channel) {
+          try {
+            await channel.close()
+          } catch (error) {
+            if (isNetworkError(error) || isTimeoutError(action.payload)) {
+              dispatch(setStatusChecking())
+            } else {
+              throw error
+            }
+          } finally {
+            dispatch(startEvents(action.id, { silent: true }))
+          }
+        }
         done()
       },
     }),
