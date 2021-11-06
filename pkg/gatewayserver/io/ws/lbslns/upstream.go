@@ -569,7 +569,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			logger.WithError(err).Warn("Failed to handle upstream message")
 			return nil, err
 		}
-		updateSessionID(ctx, int32(jreq.UpInfo.XTime>>48))
+		updateSessionID(ctx, SessionIDFromXTime(jreq.UpInfo.XTime))
 		recordTime(jreq.RefTime, jreq.UpInfo.XTime, jreq.UpInfo.GPSTime)
 
 	case TypeUpstreamUplinkDataFrame:
@@ -591,7 +591,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			logger.WithError(err).Warn("Failed to handle upstream message")
 			return nil, err
 		}
-		updateSessionID(ctx, int32(updf.UpInfo.XTime>>48))
+		updateSessionID(ctx, SessionIDFromXTime(updf.UpInfo.XTime))
 		recordTime(updf.RefTime, updf.UpInfo.XTime, updf.UpInfo.GPSTime)
 
 	case TypeUpstreamTxConfirmation:
@@ -607,7 +607,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			logger.WithError(err).Warn("Failed to handle tx ack message")
 			return nil, err
 		}
-		updateSessionID(ctx, int32(txConf.XTime>>48))
+		updateSessionID(ctx, SessionIDFromXTime(txConf.XTime))
 		// Transmission confirmation messages do not contain a RefTime, and cannot be used for
 		// RTT computations. The GPS timestamp is present only if the downlink is a class
 		// B downlink. We allow clock synchronization to occur only if GPSTime is present.

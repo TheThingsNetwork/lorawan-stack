@@ -245,9 +245,10 @@ func TestTransferTime(t *testing.T) {
 	}
 
 	f := (*lbsLNS)(nil)
+	now := time.Unix(123, 456)
 
 	// No timesync settings available in the session.
-	b, err := f.TransferTime(ctx, time.Now(), conn)
+	b, err := f.TransferTime(ctx, now, conn)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -256,25 +257,8 @@ func TestTransferTime(t *testing.T) {
 	// Enable timesync for the session.
 	updateSessionTimeSync(ctx, true)
 
-	// No time sync available.
-	b, err = f.TransferTime(ctx, time.Now(), conn)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	a.So(b, should.BeNil)
-
-	// Add fictional concentrator sync.
-	xTime := int64(123456)
-	timeAtSync := time.Now()
-	conn.SyncWithGatewayConcentrator(
-		TimestampFromXTime(xTime),
-		timeAtSync,
-		nil,
-		ConcentratorTimeFromXTime(xTime),
-	)
-
 	// No session ID available.
-	b, err = f.TransferTime(ctx, time.Now(), conn)
+	b, err = f.TransferTime(ctx, now, conn)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -283,9 +267,41 @@ func TestTransferTime(t *testing.T) {
 	// Add fictional session ID.
 	updateSessionID(ctx, 0x42)
 
+	// Not enough RTTs.
+	b, err = f.TransferTime(ctx, now, conn)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(b, should.BeNil)
+
+	// Add fictional RTTs.
+	const rtt = 50 * time.Millisecond
+	for i := 0; i < transferTimeMinRTTCount; i++ {
+		conn.RecordRTT(rtt, now)
+	}
+
+	// No clock sync available.
+	b, err = f.TransferTime(ctx, now, conn)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(b, should.BeNil)
+
+	// Add fictional concentrator sync.
+	xTime := int64(123456)
+	timeAtSync := now
+	conn.SyncWithGatewayConcentrator(
+		TimestampFromXTime(xTime),
+		timeAtSync,
+		nil,
+		ConcentratorTimeFromXTime(xTime),
+	)
+
+	// Pass time.
+	now = now.Add(10 * time.Millisecond)
+
 	// Attempt to transfer time.
-	timeNow := time.Now()
-	b, err = f.TransferTime(ctx, timeNow, conn)
+	b, err = f.TransferTime(ctx, now, conn)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -295,9 +311,9 @@ func TestTransferTime(t *testing.T) {
 			t.FailNow()
 		}
 		a.So(res.TxTime, should.Equal, 0.0)
-		a.So(res.XTime>>48, should.Equal, 0x42)
-		a.So(res.XTime&0xFFFFFFFFFF, should.Equal, int64(xTime)+timeNow.Sub(timeAtSync).Microseconds())
-		a.So(res.GPSTime, should.Equal, TimeToGPSTime(timeNow))
-		a.So(res.MuxTime, should.Equal, TimeToUnixSeconds(timeNow))
+		a.So(SessionIDFromXTime(res.XTime), should.Equal, 0x42)
+		a.So(TimestampFromXTime(res.XTime), should.Equal, int64(xTime)+now.Add(rtt/2).Sub(timeAtSync).Microseconds())
+		a.So(res.GPSTime, should.Equal, TimeToGPSTime(now))
+		a.So(res.MuxTime, should.Equal, TimeToUnixSeconds(now))
 	}
 }

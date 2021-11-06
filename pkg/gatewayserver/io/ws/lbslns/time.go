@@ -105,3 +105,8 @@ func TimestampFromXTime(xTime int64) uint32 {
 	// The concentrator timestamp is the 32 LSB.
 	return uint32(xTime & 0xFFFFFFFF)
 }
+
+// SessionIDFromXTime constructs the session ID associated with the provided XTime.
+func SessionIDFromXTime(xTime int64) int32 {
+	return int32(xTime >> 48)
+}
