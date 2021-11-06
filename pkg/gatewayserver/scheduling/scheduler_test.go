@@ -730,7 +730,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 		})
 		a.So(err, should.BeNil)
-		a.So(time.Duration(em.Starts()), should.Equal, 40*time.Millisecond+scheduling.QueueDelay)
+		a.So(time.Duration(em.Starts()), should.Equal, 20*time.Millisecond+scheduling.QueueDelay)
 	}
 }
 

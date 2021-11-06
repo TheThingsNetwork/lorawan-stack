@@ -371,7 +371,7 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, opts Options) (Emission
 	minScheduleTime := ScheduleTimeShort
 	if opts.RTTs != nil {
 		if _, _, _, np, n := opts.RTTs.Stats(scheduleLateRTTPercentile, s.timeSource.Now()); n >= scheduleMinRTTCount {
-			minScheduleTime = np + QueueDelay
+			minScheduleTime = np/2 + QueueDelay
 		}
 	}
 	var starts ConcentratorTime
