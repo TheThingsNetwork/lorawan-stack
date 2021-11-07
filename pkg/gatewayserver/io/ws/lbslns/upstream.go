@@ -504,26 +504,36 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 		"upstream_type", typ,
 	))
 
-	recordTime := func(refTimeUnix float64, xTime int64, gpsTimeUs int64) {
-		if refTimeUnix != 0.0 {
-			refTime := TimeFromUnixSeconds(refTimeUnix)
-			if delta := receivedAt.Sub(refTime); delta > f.maxRoundTripDelay {
-				logger.WithFields(log.Fields(
-					"delta", delta,
-					"ref_time_unix", refTimeUnix,
-					"ref_time", refTime,
-					"received_at", receivedAt,
-				)).Warn("Gateway reported RefTime greater than the valid maximum. Skip RTT measurement")
-			} else {
-				conn.RecordRTT(delta, receivedAt)
-			}
+	recordRTT := func(refTimeUnix float64) {
+		if refTimeUnix == 0.0 {
+			return
+		}
+		refTime := TimeFromUnixSeconds(refTimeUnix)
+		if delta := receivedAt.Sub(refTime); delta > f.maxRoundTripDelay {
+			logger.WithFields(log.Fields(
+				"delta", delta,
+				"ref_time_unix", refTimeUnix,
+				"ref_time", refTime,
+				"received_at", receivedAt,
+			)).Warn("Gateway reported RefTime greater than the valid maximum. Skip RTT measurement")
+		} else {
+			conn.RecordRTT(delta, receivedAt)
+		}
+	}
+	syncClock := func(xTime int64, gpsTime int64, onlyWithGPS bool) {
+		if onlyWithGPS && gpsTime == 0 {
+			return
 		}
 		conn.SyncWithGatewayConcentrator(
 			TimestampFromXTime(xTime),
 			receivedAt,
-			TimePtrFromGPSTime(gpsTimeUs),
+			TimePtrFromGPSTime(gpsTime),
 			ConcentratorTimeFromXTime(xTime),
 		)
+	}
+	recordTime := func(refTimeUnix float64, xTime int64, gpsTime int64) {
+		recordRTT(refTimeUnix)
+		syncClock(xTime, gpsTime, false)
 	}
 
 	switch typ {
@@ -598,7 +608,10 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			return nil, err
 		}
 		updateSessionID(ctx, int32(txConf.XTime>>48))
-		recordTime(0.0, txConf.XTime, txConf.GPSTime)
+		// Transmission confirmation messages do not contain a RefTime, and cannot be used for
+		// RTT computations. The GPS timestamp is present only if the downlink is a class
+		// B downlink. We allow clock synchronization to occur only if GPSTime is present.
+		syncClock(txConf.XTime, txConf.GPSTime, true)
 
 	case TypeUpstreamTimeSync:
 		var req TimeSyncRequest
