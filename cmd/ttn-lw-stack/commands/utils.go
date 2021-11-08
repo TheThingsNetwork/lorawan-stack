@@ -17,10 +17,13 @@ package commands
 import (
 	"context"
 	"crypto/tls"
+	"strconv"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
 )
@@ -118,4 +121,29 @@ func setToArray(set map[string]struct{}) []string {
 		i++
 	}
 	return keys
+}
+
+func schemaVersionKey(cl *ttnredis.Client) string {
+	return cl.Key("schema-version")
+}
+
+func recordSchemaVersion(cl *ttnredis.Client, version int) error {
+	logger.WithField("version", version).Info("Setting schema version")
+	return cl.Set(ctx, schemaVersionKey(cl), version, 0).Err()
+}
+
+func checkLatestSchemaVersion(cl *ttnredis.Client, latestVersion int) (bool, error) {
+	schemaVersionString, err := cl.Get(ctx, schemaVersionKey(cl)).Result()
+	if err != nil {
+		if errors.IsNotFound(ttnredis.ConvertError(err)) {
+			return true, nil
+		}
+		return true, err
+	}
+	schemaVersion, err := strconv.ParseInt(schemaVersionString, 10, 32)
+	if err != nil {
+		return true, err
+	}
+	logger.WithField("version", schemaVersion).Info("Existing database schema version")
+	return int(schemaVersion) < latestVersion, nil
 }

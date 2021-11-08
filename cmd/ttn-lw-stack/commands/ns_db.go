@@ -16,14 +16,12 @@ package commands
 
 import (
 	"regexp"
-	"strconv"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/spf13/cobra"
 	"github.com/vmihailenco/msgpack/v5"
 	"go.thethings.network/lorawan-stack/v3/pkg/cleanup"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	nsredis "go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -98,7 +96,7 @@ var (
 			cl := NewNetworkServerDeviceRegistryRedis(*config)
 
 			if force, _ := cmd.Flags().GetBool("force"); !force {
-				needMigration, err := checkLatestSchemaVersion(cl)
+				needMigration, err := checkLatestSchemaVersion(cl, nsredis.SchemaVersion)
 				if err != nil {
 					return err
 				}
@@ -462,7 +460,7 @@ var (
 				return err
 			}
 
-			return recordSchemaVersion(cl)
+			return recordSchemaVersion(cl, nsredis.SchemaVersion)
 		},
 	}
 	nsDBCleanupCommand = &cobra.Command{
@@ -522,31 +520,6 @@ var (
 		},
 	}
 )
-
-func schemaVersionKey(cl *ttnredis.Client) string {
-	return cl.Key("schema-version")
-}
-
-func recordSchemaVersion(cl *ttnredis.Client) error {
-	logger.WithField("version", nsredis.SchemaVersion).Info("Setting schema version")
-	return cl.Set(ctx, schemaVersionKey(cl), nsredis.SchemaVersion, 0).Err()
-}
-
-func checkLatestSchemaVersion(cl *ttnredis.Client) (bool, error) {
-	schemaVersionString, err := cl.Get(ctx, schemaVersionKey(cl)).Result()
-	if err != nil {
-		if errors.IsNotFound(ttnredis.ConvertError(err)) {
-			return true, nil
-		}
-		return true, err
-	}
-	schemaVersion, err := strconv.ParseInt(schemaVersionString, 10, 32)
-	if err != nil {
-		return true, err
-	}
-	logger.WithField("version", schemaVersion).Info("Existing database schema version")
-	return schemaVersion < nsredis.SchemaVersion, nil
-}
 
 func init() {
 	Root.AddCommand(nsDBCommand)
