@@ -42,7 +42,7 @@ var (
 			}
 
 			logger.Info("Connecting to Redis database...")
-			cl := NewApplicationServerDeviceRegistryRedis(*config)
+			cl := ttnredis.New(config.Redis.WithNamespace("as"))
 
 			if force, _ := cmd.Flags().GetBool("force"); !force {
 				needMigration, err := checkLatestSchemaVersion(cl, asredis.SchemaVersion)
@@ -63,7 +63,7 @@ var (
 				uidRegexpStr = idRegexpStr + `\.` + idRegexpStr
 			)
 
-			uidRegexp := regexp.MustCompile(cl.Key("uid", uidRegexpStr+"$"))
+			uidRegexp := regexp.MustCompile(cl.Key("devices", "uid", uidRegexpStr+"$"))
 
 			lockerID, err := ttnredis.GenerateLockerID()
 			if err != nil {
