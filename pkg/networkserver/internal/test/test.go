@@ -135,37 +135,37 @@ var (
 
 	DefaultRxMetadata = [...]*ttnpb.RxMetadata{
 		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-1"},
+			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-1"},
 			Snr:                    -9,
 			UplinkToken:            []byte("token-gtw-1"),
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
 		},
 		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-3"},
+			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-3"},
 			Snr:                    -5.3,
 			UplinkToken:            []byte("token-gtw-3"),
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
 		},
 		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-5"},
+			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-5"},
 			Snr:                    12,
 			UplinkToken:            []byte("token-gtw-5"),
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER,
 		},
 		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-0"},
+			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-0"},
 			Snr:                    5.2,
 			UplinkToken:            []byte("token-gtw-0"),
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
 		},
 		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-2"},
+			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-2"},
 			Snr:                    6.3,
 			UplinkToken:            []byte("token-gtw-2"),
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
 		},
 		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-4"},
+			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-4"},
 			Snr:                    -7,
 			UplinkToken:            []byte("token-gtw-4"),
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
@@ -173,9 +173,9 @@ var (
 	}
 	PacketBrokerRxMetadata = [...]*ttnpb.RxMetadata{
 		{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: cluster.PacketBrokerGatewayID.GatewayId},
-			Snr:                4.2,
-			UplinkToken:        []byte("token-pb-1"),
+			GatewayIds:  &ttnpb.GatewayIdentifiers{GatewayId: cluster.PacketBrokerGatewayID.GatewayId},
+			Snr:         4.2,
+			UplinkToken: []byte("token-pb-1"),
 			PacketBroker: &ttnpb.PacketBrokerMetadata{
 				ForwarderNetId:     test.DefaultNetID,
 				ForwarderClusterId: "test-cluster",
@@ -183,9 +183,9 @@ var (
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER,
 		},
 		{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: cluster.PacketBrokerGatewayID.GatewayId},
-			Snr:                1.8,
-			UplinkToken:        []byte("token-pb-2"),
+			GatewayIds:  &ttnpb.GatewayIdentifiers{GatewayId: cluster.PacketBrokerGatewayID.GatewayId},
+			Snr:         1.8,
+			UplinkToken: []byte("token-pb-2"),
 			PacketBroker: &ttnpb.PacketBrokerMetadata{
 				ForwarderNetId:     test.DefaultNetID,
 				ForwarderClusterId: "other-cluster",

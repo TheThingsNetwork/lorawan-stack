@@ -232,7 +232,7 @@ func TestTraffic(t *testing.T) {
 						RawPayload: []byte{0x01},
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
-								GatewayIdentifiers: registeredGatewayID,
+								GatewayIds: &registeredGatewayID,
 							},
 						},
 						Settings: ttnpb.TxSettings{
@@ -255,7 +255,7 @@ func TestTraffic(t *testing.T) {
 						RawPayload: []byte{0x02},
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
-								GatewayIdentifiers: registeredGatewayID,
+								GatewayIds: &registeredGatewayID,
 							},
 						},
 						Settings: ttnpb.TxSettings{
@@ -282,7 +282,7 @@ func TestTraffic(t *testing.T) {
 						RawPayload: []byte{0x03},
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
-								GatewayIdentifiers: registeredGatewayID,
+								GatewayIds: &registeredGatewayID,
 							},
 						},
 						Settings: ttnpb.TxSettings{
@@ -301,7 +301,7 @@ func TestTraffic(t *testing.T) {
 						RawPayload: []byte{0x04},
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
-								GatewayIdentifiers: registeredGatewayID,
+								GatewayIds: &registeredGatewayID,
 							},
 						},
 						Settings: ttnpb.TxSettings{
@@ -320,7 +320,7 @@ func TestTraffic(t *testing.T) {
 						RawPayload: []byte{0x05},
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
-								GatewayIdentifiers: registeredGatewayID,
+								GatewayIds: &registeredGatewayID,
 							},
 						},
 						Settings: ttnpb.TxSettings{
@@ -383,7 +383,7 @@ func TestTraffic(t *testing.T) {
 				UplinkMessages: []*ttnpb.UplinkMessage{
 					{
 						RawPayload: []byte{0x06},
-						RxMetadata: []*ttnpb.RxMetadata{{GatewayIdentifiers: registeredGatewayID, Rssi: -100}},
+						RxMetadata: []*ttnpb.RxMetadata{{GatewayIds: &registeredGatewayID, Rssi: -100}},
 						Settings: ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
@@ -398,7 +398,7 @@ func TestTraffic(t *testing.T) {
 					},
 					{
 						RawPayload: []byte{0x06},
-						RxMetadata: []*ttnpb.RxMetadata{{GatewayIdentifiers: registeredGatewayID, Rssi: -10}},
+						RxMetadata: []*ttnpb.RxMetadata{{GatewayIds: &registeredGatewayID, Rssi: -10}},
 						Settings: ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{

@@ -216,13 +216,13 @@ func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 	tm := TimePtrFromUpInfo(req.UpInfo.GPSTime, req.UpInfo.RxTime)
 	up.RxMetadata = []*ttnpb.RxMetadata{
 		{
-			GatewayIdentifiers: ids,
-			Time:               tm,
-			Timestamp:          timestamp,
-			Rssi:               req.RadioMetaData.UpInfo.RSSI,
-			ChannelRssi:        req.RadioMetaData.UpInfo.RSSI,
-			Snr:                req.RadioMetaData.UpInfo.SNR,
-			AntennaIndex:       uint32(req.RadioMetaData.UpInfo.RCtx),
+			GatewayIds:   &ids,
+			Time:         tm,
+			Timestamp:    timestamp,
+			Rssi:         req.RadioMetaData.UpInfo.RSSI,
+			ChannelRssi:  req.RadioMetaData.UpInfo.RSSI,
+			Snr:          req.RadioMetaData.UpInfo.SNR,
+			AntennaIndex: uint32(req.RadioMetaData.UpInfo.RCtx),
 		},
 	}
 
@@ -374,13 +374,13 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 	tm := TimePtrFromUpInfo(updf.UpInfo.GPSTime, updf.UpInfo.RxTime)
 	up.RxMetadata = []*ttnpb.RxMetadata{
 		{
-			GatewayIdentifiers: ids,
-			Time:               tm,
-			Timestamp:          timestamp,
-			Rssi:               updf.RadioMetaData.UpInfo.RSSI,
-			ChannelRssi:        updf.RadioMetaData.UpInfo.RSSI,
-			Snr:                updf.RadioMetaData.UpInfo.SNR,
-			AntennaIndex:       uint32(updf.RadioMetaData.UpInfo.RCtx),
+			GatewayIds:   &ids,
+			Time:         tm,
+			Timestamp:    timestamp,
+			Rssi:         updf.RadioMetaData.UpInfo.RSSI,
+			ChannelRssi:  updf.RadioMetaData.UpInfo.RSSI,
+			Snr:          updf.RadioMetaData.UpInfo.SNR,
+			AntennaIndex: uint32(updf.RadioMetaData.UpInfo.RCtx),
 		},
 	}
 

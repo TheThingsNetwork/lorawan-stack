@@ -883,9 +883,12 @@ func (as *ApplicationServer) storeUplink(ctx context.Context, ids ttnpb.EndDevic
 		ReceivedAt: uplink.ReceivedAt,
 	}
 	for _, md := range uplink.RxMetadata {
+		if md.GatewayIds == nil {
+			continue
+		}
 		cleanUplink.RxMetadata = append(cleanUplink.RxMetadata, &ttnpb.RxMetadata{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-				GatewayId: md.GatewayId,
+			GatewayIds: &ttnpb.GatewayIdentifiers{
+				GatewayId: md.GatewayIds.GatewayId,
 			},
 			AntennaIndex:  md.AntennaIndex,
 			FineTimestamp: md.FineTimestamp,

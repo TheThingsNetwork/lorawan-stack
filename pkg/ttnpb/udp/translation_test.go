@@ -366,7 +366,7 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayIds: &ttnpb.GatewayIdentifiers{
 							GatewayId: "test-gateway",
 						},
 						AntennaIndex:                0,
@@ -384,7 +384,7 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 						FrequencyOffset:             -8898,
 					},
 					{
-						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayIds: &ttnpb.GatewayIdentifiers{
 							GatewayId: "test-gateway",
 						},
 						AntennaIndex:                1,

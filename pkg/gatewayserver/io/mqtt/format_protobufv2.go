@@ -137,7 +137,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 				rssi = antenna.Rssi
 			}
 			uplink.RxMetadata = append(uplink.RxMetadata, &ttnpb.RxMetadata{
-				GatewayIdentifiers:    ids,
+				GatewayIds:            &ids,
 				AntennaIndex:          antenna.Antenna,
 				ChannelRssi:           rssi,
 				FrequencyOffset:       antenna.FrequencyOffset,
@@ -150,13 +150,13 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 		}
 	} else {
 		uplink.RxMetadata = append(uplink.RxMetadata, &ttnpb.RxMetadata{
-			GatewayIdentifiers: ids,
-			AntennaIndex:       0,
-			ChannelRssi:        gwMetadata.Rssi,
-			Rssi:               gwMetadata.Rssi,
-			Snr:                gwMetadata.Snr,
-			Time:               &mdTime,
-			Timestamp:          gwMetadata.Timestamp,
+			GatewayIds:   &ids,
+			AntennaIndex: 0,
+			ChannelRssi:  gwMetadata.Rssi,
+			Rssi:         gwMetadata.Rssi,
+			Snr:          gwMetadata.Snr,
+			Time:         &mdTime,
+			Timestamp:    gwMetadata.Timestamp,
 		})
 	}
 	uplink.Settings = settings

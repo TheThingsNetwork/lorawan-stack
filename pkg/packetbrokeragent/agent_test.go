@@ -123,7 +123,7 @@ func TestForwarder(t *testing.T) {
 						ReceivedAt: time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC),
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
-								GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+								GatewayIds: &ttnpb.GatewayIdentifiers{
 									GatewayId: "foo-gateway",
 									Eui:       eui64Ptr(types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}),
 								},
@@ -248,7 +248,7 @@ func TestForwarder(t *testing.T) {
 						ReceivedAt: time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC),
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
-								GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+								GatewayIds: &ttnpb.GatewayIdentifiers{
 									GatewayId: "foo-gateway",
 									Eui:       eui64Ptr(types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}),
 								},
@@ -642,7 +642,7 @@ func TestHomeNetwork(t *testing.T) {
 					RawPayload: []byte{0x40, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 					RxMetadata: []*ttnpb.RxMetadata{
 						{
-							GatewayIdentifiers: cluster.PacketBrokerGatewayID,
+							GatewayIds: &cluster.PacketBrokerGatewayID,
 							PacketBroker: &ttnpb.PacketBrokerMetadata{
 								MessageId:           "test",
 								ForwarderNetId:      [3]byte{0x0, 0x0, 0x42},
@@ -758,7 +758,7 @@ func TestHomeNetwork(t *testing.T) {
 					RawPayload: []byte{0x40, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 					RxMetadata: []*ttnpb.RxMetadata{
 						{
-							GatewayIdentifiers: cluster.PacketBrokerGatewayID,
+							GatewayIds: &cluster.PacketBrokerGatewayID,
 							PacketBroker: &ttnpb.PacketBrokerMetadata{
 								MessageId:           "test",
 								ForwarderNetId:      [3]byte{0x0, 0x0, 0x42},
