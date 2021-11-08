@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const { execSync } = require('child_process')
+const { execSync, spawn } = require('child_process')
 const fs = require('fs')
 const readline = require('readline')
 
@@ -21,14 +21,28 @@ const yaml = require('js-yaml')
 const codeCoverageTask = require('@cypress/code-coverage/task')
 
 const isCI = process.env.CI === 'true' || process.env.CI === '1'
+const devDatabase = 'ttn_lorawan_dev'
+const seedDatabase = 'tts_seed'
 
-const client = new Client({
+const pgConfig = {
   user: 'root',
+  password: 'root',
   host: 'localhost',
   database: 'ttn_lorawan_dev',
-  port: 26257,
-})
-client.connect()
+  port: 5432,
+}
+let client
+
+// Spawn a bash session within the postgres container, so we can
+// reset the database repeatedly without the overhead of `docker-compose exec`.
+const postgresContainer = spawn('docker-compose', [
+  '-p',
+  'lorawan-stack-dev',
+  'exec',
+  '-T',
+  'postgres',
+  '/bin/bash',
+])
 
 // `stackConfigTask` sources stack configuration entires to `Cypress` configuration while preserving
 // all entries from `cypress.json`.
@@ -73,14 +87,25 @@ const stackConfigTask = (_, config) => {
 
 const sqlTask = (on, _) => {
   on('task', {
-    execSql: sql => {
-      return client.query(sql)
+    execSql: async sql => {
+      client = new Client(pgConfig)
+      await client.connect()
+      const res = await client.query(sql)
+      client.end()
+
+      return res
     },
     dropAndSeedDatabase: () => {
-      const sqlDump = fs.readFileSync('.cache/sqldump.sql')
-      return client.query(
-        `DROP DATABASE ttn_lorawan_dev; CREATE DATABASE ttn_lorawan_dev; ${sqlDump}`,
+      postgresContainer.stdin.write(
+        `dropdb --if-exists --force ${devDatabase}; psql template1 -c "CREATE DATABASE ${devDatabase} TEMPLATE ${seedDatabase};"\n`,
       )
+      return new Promise(resolve => {
+        postgresContainer.stdout.on('data', resolve)
+        postgresContainer.stderr.on('data', data => {
+          throw new Error(data)
+        })
+        postgresContainer.on('close', resolve)
+      })
     },
   })
 }

@@ -36,6 +36,8 @@ For details about compatibility between different releases, see the **Commitment
 - The `data_rate_index` field in uplink message metadata. Observe the fully described data rate in the `data_rate` field instead.
 - LoRaWAN data rate index reported to LoRa Cloud DMS.
 - Dockerfile doesn't define environmental variables `TTN_LW_BLOB_LOCAL_DIRECTORY`, `TTN_LW_IS_DATABASE_URI` and `TTN_LW_REDIS_ADDRESS` anymore. They need to be set when running the container: please refer to `docker-compose.yml` for example values.
+- `CockroachDB` from development tooling as well as config option within `docker-compose.yml`.
+  - This also changes the default value of the `--is.database-uri` option, so it can connect to the development Postgres database by default.
 
 ### Fixed
 

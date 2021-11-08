@@ -89,7 +89,7 @@ nfpms:
       - rpm
     recommends:
       - redis
-      - cockroach
+      - postgresql
     contents:
       - src: 'public/**'
         dst: '/srv/ttn-lorawan/public'

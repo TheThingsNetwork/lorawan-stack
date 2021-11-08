@@ -56,9 +56,6 @@ jobs:
     if: needs.determine-if-required.outputs.needs-to-run == 'true'
     env:
       TTN_LW_LOG_LEVEL: debug
-      # TODO: Remove this after we no longer depend on cockroach dump command
-      # (https://github.com/TheThingsNetwork/lorawan-stack/issues/4184)
-      COCKROACHDB_COCKROACH_TAG: v19.2.12
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Check out code
@@ -169,9 +166,6 @@ jobs:
     runs-on: ubuntu-18.04
     env:
       TTN_LW_LOG_LEVEL: debug
-      # TODO: Remove this after we no longer depend on cockroach dump command
-      # (https://github.com/TheThingsNetwork/lorawan-stack/issues/4184)
-      COCKROACHDB_COCKROACH_TAG: v19.2.12
       CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     strategy:
@@ -202,7 +196,7 @@ jobs:
       - name: Generate certs
         run: tools/bin/mage dev:certificates
       - name: Restore initialized sql db
-        run: tools/bin/mage dev:dbStart dev:sqlRestore
+        run: tools/bin/mage dev:dbStart dev:sqlRestore dev:sqlCreateSeedDb
       - name: Run stack
         run: tools/bin/mage dev:startDevStack &
       - name: Run frontend end-to-end tests
@@ -230,8 +224,6 @@ jobs:
     runs-on: ubuntu-18.04
     env:
       TTN_LW_LOG_LEVEL: debug
-      # TODO: Remove this after we no longer depend on cockroach dump command
-      # (https://github.com/TheThingsNetwork/lorawan-stack/issues/4184)
       COCKROACHDB_COCKROACH_TAG: v19.2.12
       CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -266,7 +258,7 @@ jobs:
       - name: Generate certs
         run: tools/bin/mage dev:certificates
       - name: Restore initialized sql db
-        run: tools/bin/mage dev:dbStart dev:sqlRestore
+        run: tools/bin/mage dev:dbStart dev:SQLRestore dev:SQLCreateSeedDB
       - name: Run stack
         run: tools/bin/mage dev:startDevStack &
       - name: Run end-to-end smoke tests (Firefox)
