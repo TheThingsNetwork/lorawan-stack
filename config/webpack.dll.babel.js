@@ -46,7 +46,7 @@ export default {
   recordsPath: path.resolve(context, CACHE_DIR, '_libs_records'),
   entry: { libs },
   output: {
-    filename: '[name].[hash].bundle.js',
+    filename: mode === 'production' ? '[name].[hash].bundle.js' : '[name].bundle.js',
     path: path.resolve(context, PUBLIC_DIR),
     library,
   },
