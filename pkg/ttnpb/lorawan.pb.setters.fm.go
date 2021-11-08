@@ -1034,19 +1034,26 @@ func (dst *GatewayAntennaIdentifiers) SetFields(src *GatewayAntennaIdentifiers, 
 		case "gateway_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *GatewayIdentifiers
-				if src != nil {
-					newSrc = &src.GatewayIdentifiers
+				if (src == nil || src.GatewayIds == nil) && dst.GatewayIds == nil {
+					continue
 				}
-				newDst = &dst.GatewayIdentifiers
+				if src != nil {
+					newSrc = src.GatewayIds
+				}
+				if dst.GatewayIds != nil {
+					newDst = dst.GatewayIds
+				} else {
+					newDst = &GatewayIdentifiers{}
+					dst.GatewayIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.GatewayIdentifiers = src.GatewayIdentifiers
+					dst.GatewayIds = src.GatewayIds
 				} else {
-					var zero GatewayIdentifiers
-					dst.GatewayIdentifiers = zero
+					dst.GatewayIds = nil
 				}
 			}
 		case "antenna_index":
@@ -1073,19 +1080,26 @@ func (dst *UplinkToken) SetFields(src *UplinkToken, paths ...string) error {
 		case "ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *GatewayAntennaIdentifiers
-				if src != nil {
-					newSrc = &src.GatewayAntennaIdentifiers
+				if (src == nil || src.Ids == nil) && dst.Ids == nil {
+					continue
 				}
-				newDst = &dst.GatewayAntennaIdentifiers
+				if src != nil {
+					newSrc = src.Ids
+				}
+				if dst.Ids != nil {
+					newDst = dst.Ids
+				} else {
+					newDst = &GatewayAntennaIdentifiers{}
+					dst.Ids = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.GatewayAntennaIdentifiers = src.GatewayAntennaIdentifiers
+					dst.Ids = src.Ids
 				} else {
-					var zero GatewayAntennaIdentifiers
-					dst.GatewayAntennaIdentifiers = zero
+					dst.Ids = nil
 				}
 			}
 		case "timestamp":
@@ -1105,8 +1119,7 @@ func (dst *UplinkToken) SetFields(src *UplinkToken, paths ...string) error {
 			if src != nil {
 				dst.ServerTime = src.ServerTime
 			} else {
-				var zero time.Time
-				dst.ServerTime = zero
+				dst.ServerTime = nil
 			}
 		case "concentrator_time":
 			if len(subs) > 0 {
@@ -1117,6 +1130,15 @@ func (dst *UplinkToken) SetFields(src *UplinkToken, paths ...string) error {
 			} else {
 				var zero int64
 				dst.ConcentratorTime = zero
+			}
+		case "gateway_time":
+			if len(subs) > 0 {
+				return fmt.Errorf("'gateway_time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.GatewayTime = src.GatewayTime
+			} else {
+				dst.GatewayTime = nil
 			}
 
 		default:

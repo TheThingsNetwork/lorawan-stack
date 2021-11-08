@@ -112,24 +112,24 @@ func Band(fpID string, phyVer ttnpb.PHYVersion) band.Band {
 }
 
 var (
-	DefaultGatewayAntennaIdentifiers = [...]ttnpb.GatewayAntennaIdentifiers{
+	DefaultGatewayAntennaIdentifiers = [...]*ttnpb.GatewayAntennaIdentifiers{
 		{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-0"},
-			AntennaIndex:       3,
+			GatewayIds:   &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-0"},
+			AntennaIndex: 3,
 		},
 		{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-1"},
-			AntennaIndex:       1,
+			GatewayIds:   &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-1"},
+			AntennaIndex: 1,
 		},
 		{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-2"},
+			GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-2"},
 		},
 		{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-3"},
-			AntennaIndex:       2,
+			GatewayIds:   &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-3"},
+			AntennaIndex: 2,
 		},
 		{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-4"},
+			GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-4"},
 		},
 	}
 

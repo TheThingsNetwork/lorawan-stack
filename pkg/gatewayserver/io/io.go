@@ -229,10 +229,10 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 			md.DownlinkPathConstraint = ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER
 			continue
 		}
-		buf, err := UplinkToken(ttnpb.GatewayAntennaIdentifiers{
-			GatewayIdentifiers: *c.gateway.GetIds(),
-			AntennaIndex:       md.AntennaIndex,
-		}, md.Timestamp, ct, up.ReceivedAt)
+		buf, err := UplinkToken(&ttnpb.GatewayAntennaIdentifiers{
+			GatewayIds:   c.gateway.GetIds(),
+			AntennaIndex: md.AntennaIndex,
+		}, md.Timestamp, ct, up.ReceivedAt, up.Settings.Time)
 		if err != nil {
 			return err
 		}
@@ -343,7 +343,7 @@ func getDownlinkPath(path *ttnpb.DownlinkPath, class ttnpb.Class) (ttnpb.Gateway
 		if err != nil {
 			return ttnpb.GatewayAntennaIdentifiers{}, nil, err
 		}
-		return token.GatewayAntennaIdentifiers, token, err
+		return *token.Ids, token, err
 	}
 	fixed := path.GetFixed()
 	if fixed == nil {
@@ -701,8 +701,8 @@ func (c *Connection) BandID() string { return c.bandID }
 
 // SyncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
 // relative gateway time that corresponds to the given timestamp.
-func (c *Connection) SyncWithGatewayConcentrator(timestamp uint32, server time.Time, concentrator scheduling.ConcentratorTime) {
-	c.scheduler.SyncWithGatewayConcentrator(timestamp, server, concentrator)
+func (c *Connection) SyncWithGatewayConcentrator(timestamp uint32, server time.Time, gateway *time.Time, concentrator scheduling.ConcentratorTime) {
+	c.scheduler.SyncWithGatewayConcentrator(timestamp, server, gateway, concentrator)
 }
 
 // TimeFromTimestampTime returns the concentrator time by the given timestamp.

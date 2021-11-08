@@ -1658,7 +1658,14 @@ func (m *GatewayAntennaIdentifiers) ValidateFields(paths ...string) error {
 		switch name {
 		case "gateway_ids":
 
-			if v, ok := interface{}(&m.GatewayIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetGatewayIds() == nil {
+				return GatewayAntennaIdentifiersValidationError{
+					field:  "gateway_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetGatewayIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GatewayAntennaIdentifiersValidationError{
 						field:  "gateway_ids",
@@ -1754,7 +1761,14 @@ func (m *UplinkToken) ValidateFields(paths ...string) error {
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.GatewayAntennaIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetIds() == nil {
+				return UplinkTokenValidationError{
+					field:  "ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UplinkTokenValidationError{
 						field:  "ids",
@@ -1768,7 +1782,7 @@ func (m *UplinkToken) ValidateFields(paths ...string) error {
 			// no validation rules for Timestamp
 		case "server_time":
 
-			if v, ok := interface{}(&m.ServerTime).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetServerTime()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UplinkTokenValidationError{
 						field:  "server_time",
@@ -1780,6 +1794,18 @@ func (m *UplinkToken) ValidateFields(paths ...string) error {
 
 		case "concentrator_time":
 			// no validation rules for ConcentratorTime
+		case "gateway_time":
+
+			if v, ok := interface{}(m.GetGatewayTime()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UplinkTokenValidationError{
+						field:  "gateway_time",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return UplinkTokenValidationError{
 				field:  name,

@@ -28,9 +28,34 @@ func TimeFromUnixSeconds(tf float64) time.Time {
 	return time.Unix(int64(sec), int64(nsec*1e9))
 }
 
+// TimeFromUnixSeconds constructs a *time.Time from the provided UNIX fractional timestamp.
+// If the timestamp is 0, this function returns nil.
+func TimePtrFromUnixSeconds(tf float64) *time.Time {
+	if tf == 0.0 {
+		return nil
+	}
+	tm := TimeFromUnixSeconds(tf)
+	return &tm
+}
+
 // TimeToUnixSeconds constructs a UNIX fractional timestamp from the provided time.Time.
 func TimeToUnixSeconds(t time.Time) float64 {
 	return float64(t.UnixNano()) / float64(1e9)
+}
+
+// TimeFromGPSTime constructs a time.Time from the provided GPS time in microseconds.
+func TimeFromGPSTime(t int64) time.Time {
+	return gpstime.Parse(time.Duration(t) * time.Microsecond)
+}
+
+// TimePtrFromGPSTime constructs a *time.Time from the provided GPS time in microseconds.
+// If the timestamp is 0, this function returns nil.
+func TimePtrFromGPSTime(t int64) *time.Time {
+	if t == 0 {
+		return nil
+	}
+	tm := TimeFromGPSTime(t)
+	return &tm
 }
 
 // TimeToGPSTime contructs a GPS timestamp from the provided time.Time.
@@ -38,8 +63,50 @@ func TimeToGPSTime(t time.Time) int64 {
 	return int64(gpstime.ToGPS(t) / time.Microsecond)
 }
 
+// TimePtrFromUpInfo contructs a *time.Time from the provided uplink metadata information.
+// The GPS timestamp is used if present, then the RxTime. The function returns nil if both
+// timestamps are unavailable.
+func TimePtrFromUpInfo(gpsTime int64, rxTime float64) *time.Time {
+	switch {
+	case gpsTime != 0:
+		return TimePtrFromGPSTime(gpsTime)
+	case rxTime != 0.0:
+		return TimePtrFromUnixSeconds(rxTime)
+	default:
+		return nil
+	}
+}
+
+// TimePtrToUpInfoTime constructs the RxTime and GPSTime from the provided *time.Time.
+// If the time is nil, this function returns (0.0, 0).
+func TimePtrToUpInfoTime(t *time.Time) (float64, int64) {
+	if t == nil {
+		return 0.0, 0
+	}
+	return TimeToUnixSeconds(*t), TimeToGPSTime(*t)
+}
+
 // ConcentratorTimeToXTime contructs the XTime associated with the provided
 // session ID and concentrator timestamp.
 func ConcentratorTimeToXTime(id int32, t scheduling.ConcentratorTime) int64 {
 	return int64(id)<<48 | (int64(t) / int64(time.Microsecond) & 0xFFFFFFFFFF)
+}
+
+// ConcentratorTimeFromXTime constructs the scheduling.ConcentratorTime associated
+// with the provided XTime.
+func ConcentratorTimeFromXTime(xTime int64) scheduling.ConcentratorTime {
+	// The Basic Station epoch is the 48 LSB.
+	return scheduling.ConcentratorTime(time.Duration(xTime&0xFFFFFFFFFF) * time.Microsecond)
+}
+
+// TimestampFromXTime constructs the concentrator timestamp associated with the
+// provided XTime.
+func TimestampFromXTime(xTime int64) uint32 {
+	// The concentrator timestamp is the 32 LSB.
+	return uint32(xTime & 0xFFFFFFFF)
+}
+
+// SessionIDFromXTime constructs the session ID associated with the provided XTime.
+func SessionIDFromXTime(xTime int64) int32 {
+	return int32(xTime >> 48)
 }

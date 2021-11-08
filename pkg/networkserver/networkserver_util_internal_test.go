@@ -804,13 +804,13 @@ func (env TestEnvironment) AssertLegacyScheduleDownlink(ctx context.Context, pat
 				peerByIDs[uid] = peer
 			}
 
-			expectedIDs := func() (ids []ttnpb.GatewayIdentifiers) {
+			expectedIDs := func() (ids []*ttnpb.GatewayIdentifiers) {
 				for _, path := range paths {
-					ids = append(ids, *path.GatewayIdentifiers)
+					ids = append(ids, path.GatewayIdentifiers)
 				}
 				return ids
 			}()
-			var reqIDs []ttnpb.GatewayIdentifiers
+			var reqIDs []*ttnpb.GatewayIdentifiers
 			for range paths {
 				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (test.ClusterGetPeerResponse, bool) {
 					_, a := test.MustNewTFromContext(ctx)
@@ -824,13 +824,19 @@ func (env TestEnvironment) AssertLegacyScheduleDownlink(ctx context.Context, pat
 							Error: errors.New("assertion failed"),
 						}, false
 					}
-					if !a.So(expectedIDs, should.Contain, *gtwIDs) {
+					found := false
+					for _, expectedID := range expectedIDs {
+						if expectedID.Equal(gtwIDs) {
+							found = true
+						}
+					}
+					if !a.So(found, should.BeTrue) {
 						t.Errorf("Gateway Server peer requested for unknown gateway IDs: %v.\nExpected one of %v", gtwIDs, expectedIDs)
 						return test.ClusterGetPeerResponse{
 							Error: errors.New("assertion failed"),
 						}, false
 					}
-					reqIDs = append(reqIDs, *gtwIDs)
+					reqIDs = append(reqIDs, gtwIDs)
 					peer, ok := peerByIDs[unique.ID(ctx, *gtwIDs)]
 					if !ok {
 						return test.ClusterGetPeerResponse{
@@ -845,7 +851,11 @@ func (env TestEnvironment) AssertLegacyScheduleDownlink(ctx context.Context, pat
 					return
 				}
 			}
-			if !a.So(reqIDs, should.HaveSameElementsDeep, expectedIDs) {
+			ok := true
+			for i := range reqIDs {
+				ok = ok && a.So(reqIDs[i], should.Resemble, expectedIDs[i])
+			}
+			if !ok || !a.So(len(reqIDs), should.Equal, len(expectedIDs)) {
 				t.Errorf("Gateway peers by incorrect gateway IDs were requested: %v.\nExpected peers for following gateway IDs to be requested: %v", reqIDs, expectedIDs)
 			}
 
@@ -899,7 +909,7 @@ type DownlinkSchedulingAssertionConfig struct {
 	Uplink          *ttnpb.UplinkMessage
 	Priority        ttnpb.TxSchedulePriority
 	AbsoluteTime    *time.Time
-	FixedPaths      []ttnpb.GatewayAntennaIdentifiers
+	FixedPaths      []*ttnpb.GatewayAntennaIdentifiers
 	Payload         []byte
 	CorrelationIDs  []string
 	PeerIndexes     []uint
@@ -924,10 +934,10 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 			} else {
 				for i := range conf.FixedPaths {
 					downlinkPaths = append(downlinkPaths, DownlinkPath{
-						GatewayIdentifiers: &conf.FixedPaths[i].GatewayIdentifiers,
+						GatewayIdentifiers: conf.FixedPaths[i].GatewayIds,
 						DownlinkPath: &ttnpb.DownlinkPath{
 							Path: &ttnpb.DownlinkPath_Fixed{
-								Fixed: &conf.FixedPaths[i],
+								Fixed: conf.FixedPaths[i],
 							},
 						},
 					})
@@ -975,13 +985,13 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 				}
 			}
 
-			expectedIDs := func() (ids []ttnpb.GatewayIdentifiers) {
+			expectedIDs := func() (ids []*ttnpb.GatewayIdentifiers) {
 				for _, path := range downlinkPaths {
-					ids = append(ids, *path.GatewayIdentifiers)
+					ids = append(ids, path.GatewayIdentifiers)
 				}
 				return ids
 			}()
-			var reqIDs []ttnpb.GatewayIdentifiers
+			var reqIDs []*ttnpb.GatewayIdentifiers
 			for range downlinkPaths {
 				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (test.ClusterGetPeerResponse, bool) {
 					_, a := test.MustNewTFromContext(ctx)
@@ -995,13 +1005,19 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 							Error: errors.New("assertion failed"),
 						}, false
 					}
-					if !a.So(expectedIDs, should.Contain, *gtwIDs) {
+					found := false
+					for _, expectedID := range expectedIDs {
+						if expectedID.Equal(gtwIDs) {
+							found = true
+						}
+					}
+					if !a.So(found, should.BeTrue) {
 						t.Errorf("Gateway Server peer requested for unknown gateway IDs: %v.\nExpected one of %v", gtwIDs, expectedIDs)
 						return test.ClusterGetPeerResponse{
 							Error: errors.New("assertion failed"),
 						}, false
 					}
-					reqIDs = append(reqIDs, *gtwIDs)
+					reqIDs = append(reqIDs, gtwIDs)
 					peer, ok := peerByIDs[*gtwIDs]
 					if !ok {
 						return test.ClusterGetPeerResponse{
@@ -1016,7 +1032,11 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 					return
 				}
 			}
-			if !a.So(reqIDs, should.HaveSameElementsDeep, expectedIDs) {
+			ok := true
+			for i := range reqIDs {
+				ok = ok && a.So(reqIDs[i], should.Resemble, expectedIDs[i])
+			}
+			if !ok || !a.So(len(reqIDs), should.Equal, len(expectedIDs)) {
 				t.Errorf("Gateway peers by incorrect gateway IDs were requested: %v.\nExpected peers for following gateway IDs to be requested: %v", reqIDs, expectedIDs)
 			}
 
@@ -1203,7 +1223,7 @@ type DataDownlinkAssertionConfig struct {
 	Class          ttnpb.Class
 	Priority       ttnpb.TxSchedulePriority
 	AbsoluteTime   *time.Time
-	FixedPaths     []ttnpb.GatewayAntennaIdentifiers
+	FixedPaths     []*ttnpb.GatewayAntennaIdentifiers
 	RawPayload     []byte
 	Payload        *ttnpb.Message
 	CorrelationIDs []string

@@ -323,17 +323,19 @@ message TxSettings {
 }
 
 message GatewayAntennaIdentifiers {
-  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  GatewayIdentifiers gateway_ids = 1 [(validate.rules).message.required = true];
   uint32 antenna_index = 2;
 }
 
 message UplinkToken {
-  GatewayAntennaIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  GatewayAntennaIdentifiers ids = 1 [(validate.rules).message.required = true];
   uint32 timestamp = 2;
   // Absolute time observed by the server when the uplink message has been received.
-  google.protobuf.Timestamp server_time = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp server_time = 3 [(gogoproto.stdtime) = true];
   // Absolute concentrator time as observed by the Gateway Server, accounting for rollovers.
   int64 concentrator_time = 4;
+  // Absolute time observed by the gateway when the uplink has been received.
+  google.protobuf.Timestamp gateway_time = 5 [(gogoproto.stdtime) = true];
 }
 
 message DownlinkPath {

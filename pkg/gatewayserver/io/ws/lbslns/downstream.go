@@ -135,14 +135,17 @@ func (dnmsg *DownlinkMessage) ToDownlinkMessage(bandID string) (*ttnpb.DownlinkM
 	}, nil
 }
 
-// TransferTime implements Formatter.
-func (*lbsLNS) TransferTime(ctx context.Context, t time.Time, conn *io.Connection) ([]byte, error) {
-	if enabled, ok := getSessionTimeSync(ctx); !ok || !enabled {
-		return nil, nil
-	}
+const (
+	// transferTimeRTTPercentile is the percentile of round-trip times that is considered for determining the gateway GPS time.
+	transferTimeRTTPercentile = 90
+	// transferTimeMinRTTCount is the minimum number of observed round-trip times that are taken into account before using
+	// their statistics to determine the gateway GPS time.
+	transferTimeMinRTTCount = 5
+)
 
-	concentratorTime, ok := conn.TimeFromServerTime(t)
-	if !ok {
+// TransferTime implements Formatter.
+func (*lbsLNS) TransferTime(ctx context.Context, serverTime time.Time, conn *io.Connection) ([]byte, error) {
+	if enabled, ok := getSessionTimeSync(ctx); !ok || !enabled {
 		return nil, nil
 	}
 
@@ -151,9 +154,22 @@ func (*lbsLNS) TransferTime(ctx context.Context, t time.Time, conn *io.Connectio
 		return nil, nil
 	}
 
+	_, _, _, np, n := conn.RTTStats(transferTimeRTTPercentile, serverTime)
+	if n < transferTimeMinRTTCount {
+		return nil, nil
+	}
+
+	// The concentrator time is based on the current server time plus
+	// half a round trip. The timestamp is relative to the server
+	// time in order to avoid aggregating gateway time errors.
+	concentratorTime, ok := conn.TimeFromServerTime(serverTime.Add(np / 2))
+	if !ok {
+		return nil, nil
+	}
+
 	return TimeSyncResponse{
 		XTime:   ConcentratorTimeToXTime(sessionID, concentratorTime),
-		GPSTime: TimeToGPSTime(t),
-		MuxTime: TimeToUnixSeconds(t),
+		GPSTime: TimeToGPSTime(serverTime),
+		MuxTime: TimeToUnixSeconds(serverTime),
 	}.MarshalJSON()
 }

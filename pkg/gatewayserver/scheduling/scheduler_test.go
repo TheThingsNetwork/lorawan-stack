@@ -730,7 +730,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 		})
 		a.So(err, should.BeNil)
-		a.So(time.Duration(em.Starts()), should.Equal, 40*time.Millisecond+scheduling.QueueDelay)
+		a.So(time.Duration(em.Starts()), should.Equal, 20*time.Millisecond+scheduling.QueueDelay)
 	}
 }
 
@@ -1167,6 +1167,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 		}
 		scheduler, err := scheduling.NewScheduler(ctx, fps, true, nil, timeSource)
 		a.So(err, should.BeNil)
+		t := time.Unix(10, 0)
 		_, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 			PayloadSize: 10,
 			TxSettings: ttnpb.TxSettings{
@@ -1183,7 +1184,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 				Timestamp:  6000000,
 			},
 			UplinkToken: &ttnpb.UplinkToken{
-				ServerTime:       time.Unix(10, 0),
+				ServerTime:       &t,
 				Timestamp:        5000000,
 				ConcentratorTime: 5000000000,
 			},
@@ -1199,6 +1200,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 		}
 		scheduler, err := scheduling.NewScheduler(ctx, fps, true, nil, timeSource)
 		a.So(err, should.BeNil)
+		t := time.Unix(10, 0)
 		_, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 			PayloadSize: 10,
 			TxSettings: ttnpb.TxSettings{
@@ -1215,7 +1217,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 				Timestamp:  7000000,
 			},
 			UplinkToken: &ttnpb.UplinkToken{
-				ServerTime:       time.Unix(10, 0),
+				ServerTime:       &t,
 				Timestamp:        5000000,
 				ConcentratorTime: 5000000000,
 			},

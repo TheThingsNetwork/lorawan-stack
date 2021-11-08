@@ -741,7 +741,7 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 						fte.Elem().Name() == "GatewayAntennaIdentifiers" && vt.Elem().Kind() == reflect.String:
 						for i := 0; i < v.Len(); i++ {
 							slice.Index(i).Set(reflect.ValueOf(&ttnpb.GatewayAntennaIdentifiers{
-								GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+								GatewayIds: &ttnpb.GatewayIdentifiers{
 									GatewayId: v.Index(i).String(),
 								},
 							}))

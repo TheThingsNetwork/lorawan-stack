@@ -367,7 +367,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
 								Gateways: []*ttnpb.GatewayAntennaIdentifiers{
 									{
-										GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+										GatewayIds: &ttnpb.GatewayIdentifiers{
 											GatewayId: "test-gtw",
 										},
 									},
@@ -401,7 +401,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 								AbsoluteTime: &absTime,
 								Gateways: []*ttnpb.GatewayAntennaIdentifiers{
 									{
-										GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+										GatewayIds: &ttnpb.GatewayIdentifiers{
 											GatewayId: "test-gtw",
 										},
 									},
@@ -437,7 +437,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 								AbsoluteTime: &absTime,
 								Gateways: []*ttnpb.GatewayAntennaIdentifiers{
 									{
-										GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+										GatewayIds: &ttnpb.GatewayIdentifiers{
 											GatewayId: "test-gtw",
 										},
 									},
@@ -513,7 +513,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
 								Gateways: []*ttnpb.GatewayAntennaIdentifiers{
 									{
-										GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+										GatewayIds: &ttnpb.GatewayIdentifiers{
 											GatewayId: "test-gtw",
 										},
 									},
