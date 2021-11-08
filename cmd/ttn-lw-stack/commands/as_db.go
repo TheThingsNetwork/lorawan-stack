@@ -59,11 +59,12 @@ var (
 			defer func() { logger.Debugf("%d keys migrated", migrated) }()
 
 			const (
-				idRegexpStr  = `([a-z0-9](?:[-]?[a-z0-9]){2,}){1,36}?`
-				uidRegexpStr = idRegexpStr + `\.` + idRegexpStr
+				idRegexpStr        = `([a-z0-9](?:[-]?[a-z0-9]){2,}){1,36}?`
+				uidRegexpStr       = idRegexpStr
+				deviceUIDRegexpStr = idRegexpStr + `\.` + uidRegexpStr
 			)
 
-			uidRegexp := regexp.MustCompile(cl.Key("devices", "uid", uidRegexpStr+"$"))
+			deviceUIDRegexp := regexp.MustCompile(cl.Key("devices", "uid", deviceUIDRegexpStr+"$"))
 
 			lockerID, err := ttnredis.GenerateLockerID()
 			if err != nil {
@@ -72,7 +73,7 @@ var (
 			if err := ttnredis.RangeRedisKeys(ctx, cl, cl.Key("*"), 1, func(k string) (bool, error) {
 				logger := logger.WithField("key", k)
 				switch {
-				case uidRegexp.MatchString(k):
+				case deviceUIDRegexp.MatchString(k):
 					if err := ttnredis.LockedWatch(ctx, cl, k, lockerID, defaultLockTTL, func(tx *redis.Tx) error {
 						dev := &ttnpb.EndDevice{}
 						if err := ttnredis.GetProto(ctx, tx, k).ScanProto(dev); err != nil {
@@ -87,11 +88,11 @@ var (
 							sess.StartedAt = time.Time{}
 							any = true
 						}
-						_, err := ttnredis.SetProto(ctx, tx, k, dev, 0)
-						if err != nil {
-							return err
-						}
 						if any {
+							_, err := ttnredis.SetProto(ctx, tx, k, dev, 0)
+							if err != nil {
+								return err
+							}
 							migrated++
 						}
 						return nil
