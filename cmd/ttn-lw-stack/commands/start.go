@@ -68,6 +68,10 @@ func NewNetworkServerDownlinkTaskRedis(conf Config) *redis.Client {
 	return redis.New(conf.Redis.WithNamespace("ns", "tasks"))
 }
 
+func NewApplicationServerDeviceRegistryRedis(conf Config) *redis.Client {
+	return NewComponentDeviceRegistryRedis(conf, "as")
+}
+
 var errUnknownComponent = errors.DefineInvalidArgument("unknown_component", "unknown component `{component}`")
 
 var startCommand = &cobra.Command{
@@ -300,7 +304,7 @@ var startCommand = &cobra.Command{
 			}
 			config.AS.Links = linkRegistry
 			deviceRegistry := &asredis.DeviceRegistry{
-				Redis:   NewComponentDeviceRegistryRedis(*config, "as"),
+				Redis:   NewApplicationServerDeviceRegistryRedis(*config),
 				LockTTL: defaultLockTTL,
 			}
 			if err := deviceRegistry.Init(ctx); err != nil {
