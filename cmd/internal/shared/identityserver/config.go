@@ -38,7 +38,7 @@ var DefaultIdentityServerConfig = identityserver.Config{
 				AssetsBaseURL: shared.DefaultAssetsBaseURL,
 				IconPrefix:    "oauth-",
 				CSSFiles:      []string{"account.css"},
-				JSFiles:       []string{"account.js"},
+				JSFiles:       []string{"libs.bundle.js", "account.js"},
 			},
 			FrontendConfig: oauth.FrontendConfig{
 				DocumentationBaseURL: "https://thethingsindustries.com/docs",

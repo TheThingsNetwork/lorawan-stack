@@ -24,7 +24,6 @@ import AddAssetHtmlPlugin from 'add-asset-html-webpack-plugin'
 import { CleanWebpackPlugin } from 'clean-webpack-plugin'
 import ShellPlugin from 'webpack-shell-plugin'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
-import HashOutput from 'webpack-plugin-hash-output'
 import nib from 'nib'
 
 import pjson from '../package.json'
@@ -42,6 +41,8 @@ const {
 const WEBPACK_IS_DEV_SERVER_BUILD = process.env.WEBPACK_IS_DEV_SERVER_BUILD === 'true'
 const WEBPACK_DEV_SERVER_DISABLE_HMR = process.env.WEBPACK_DEV_SERVER_DISABLE_HMR === 'true'
 const WEBPACK_DEV_SERVER_USE_TLS = process.env.WEBPACK_DEV_SERVER_USE_TLS === 'true'
+const WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS =
+  process.env.WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS === 'true'
 const TTN_LW_TLS_CERTIFICATE = process.env.TTN_LW_TLS_CERTIFICATE || './cert.pem'
 const TTN_LW_TLS_KEY = process.env.TTN_LW_TLS_KEY || './key.pem'
 const TTN_LW_TLS_ROOT_CA = process.env.TTN_LW_TLS_ROOT_CA || './cert.pem'
@@ -250,7 +251,6 @@ export default {
   },
   plugins: env({
     all: [
-      new HashOutput(),
       new webpack.NamedModulesPlugin(),
       new webpack.NamedChunksPlugin(),
       new webpack.EnvironmentPlugin({
@@ -276,34 +276,35 @@ export default {
       new CleanWebpackPlugin({
         dry: WEBPACK_IS_DEV_SERVER_BUILD,
         verbose: false,
-        cleanOnceBeforeBuildPatterns: env({
-          production: ['**/*'],
-          development: ['**/*', '!libs.bundle.js', '!libs.bundle.js.map'],
-        }),
+        cleanOnceBeforeBuildPatterns: ['**/*', '!libs.*.bundle.js', '!libs.*.bundle.js.map'],
       }),
       // Copy static assets to output directory.
       new CopyWebpackPlugin({ patterns: [{ from: `${src}/assets/static` }] }),
-    ],
-    production: [
-      new webpack.SourceMapDevToolPlugin({
-        filename: '[file].map',
-        exclude: /^(?!(console|oauth).*$).*/,
-      }),
-    ],
-    development: [
-      new webpack.HotModuleReplacementPlugin(),
       new webpack.DllReferencePlugin({
         context,
         manifest: path.resolve(context, CACHE_DIR, 'dll.json'),
       }),
+      new AddAssetHtmlPlugin({
+        filepath: path.resolve(context, PUBLIC_DIR, 'libs.*.bundle.js'),
+      }),
+    ],
+    production: [
+      ...(WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS
+        ? [
+            new webpack.SourceMapDevToolPlugin({
+              filename: '[file].map',
+              exclude: /^(?!(console|oauth).*$).*/,
+            }),
+          ]
+        : []),
+    ],
+    development: [
+      new webpack.HotModuleReplacementPlugin(),
       new webpack.WatchIgnorePlugin([
         /node_modules/,
         /locales/,
         new RegExp(path.resolve(context, PUBLIC_DIR)),
       ]),
-      new AddAssetHtmlPlugin({
-        filepath: path.resolve(context, PUBLIC_DIR, 'libs.bundle.js'),
-      }),
       new ShellPlugin({
         onBuildExit: [`${MAGE} js:extractLocaleFiles`],
       }),

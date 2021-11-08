@@ -67,7 +67,6 @@ jobs:
       - name: Build JS SDK
         run: tools/bin/mage jsSDK:clean jsSDK:build
       - name: Install JS dependencies
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: tools/bin/mage js:deps
         timeout-minutes: 5
       - name: Generate JS translations
@@ -132,15 +131,9 @@ jobs:
         if: steps.tools-cache.outputs.cache-hit != 'true'
       - name: Install JS SDK dependencies
         run: tools/bin/mage jsSDK:deps
-      - name: Build JS SDK
-        run: tools/bin/mage jsSDK:clean jsSDK:build
       - name: Install JS dependencies
-        if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: tools/bin/mage js:deps
         timeout-minutes: 5
-      - name: Build frontend
-        if: steps.public-cache.outputs.cache-hit != 'true'
-        run: tools/bin/mage js:build
       - name: Test JS SDK code
         run: tools/bin/mage jsSDK:test
       - name: Test frontend code

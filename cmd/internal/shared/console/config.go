@@ -41,7 +41,7 @@ var DefaultConsoleConfig = console.Config{
 			AssetsBaseURL: shared.DefaultAssetsBaseURL,
 			IconPrefix:    "console-",
 			CSSFiles:      []string{"console.css"},
-			JSFiles:       []string{"console.js"},
+			JSFiles:       []string{"libs.bundle.js", "console.js"},
 		},
 		FrontendConfig: console.FrontendConfig{
 			DocumentationBaseURL: "https://thethingsindustries.com/docs",

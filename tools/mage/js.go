@@ -150,11 +150,6 @@ func (js Js) Deps() error {
 
 // BuildDll runs the webpack command to build the DLL bundle
 func (js Js) BuildDll() error {
-	if js.isProductionMode() {
-		fmt.Println("Skipping DLL building (production mode)")
-		return nil
-	}
-
 	ok, err := target.Path(
 		filepath.Join("public", "libs.bundle.js"),
 		"yarn.lock",
@@ -174,7 +169,11 @@ func (js Js) BuildDll() error {
 
 // Build runs the webpack command with the project config.
 func (js Js) Build() error {
-	mg.Deps(js.Deps, js.Translations, js.BackendTranslations, js.BuildDll)
+	mg.Deps(js.Deps, js.BackendTranslations)
+	ci := os.Getenv("CI")
+	if ci != "true" {
+		mg.Deps(js.BuildDll)
+	}
 	if mg.Verbose() {
 		fmt.Println("Running Webpack")
 	}
