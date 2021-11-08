@@ -65,11 +65,15 @@ var (
 
 			uidRegexp := regexp.MustCompile(cl.Key("uid", uidRegexpStr+"$"))
 
+			lockerID, err := ttnredis.GenerateLockerID()
+			if err != nil {
+				return err
+			}
 			if err := ttnredis.RangeRedisKeys(ctx, cl, cl.Key("*"), 1, func(k string) (bool, error) {
 				logger := logger.WithField("key", k)
 				switch {
 				case uidRegexp.MatchString(k):
-					if err := cl.Watch(ctx, func(tx *redis.Tx) error {
+					if err := ttnredis.LockedWatch(ctx, cl, k, lockerID, defaultLockTTL, func(tx *redis.Tx) error {
 						dev := &ttnpb.EndDevice{}
 						if err := ttnredis.GetProto(ctx, tx, k).ScanProto(dev); err != nil {
 							logger.WithError(err).Error("Failed to get device proto")
@@ -91,7 +95,7 @@ var (
 							migrated++
 						}
 						return nil
-					}, k); err != nil {
+					}); err != nil {
 						logger.WithError(err).Error("Transaction failed")
 					}
 				}
