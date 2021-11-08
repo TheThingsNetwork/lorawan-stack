@@ -15,11 +15,15 @@
 package commands
 
 import (
+	"regexp"
 	"time"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
+	asredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/cleanup"
+	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
@@ -28,6 +32,81 @@ var (
 	asDBCommand = &cobra.Command{
 		Use:   "as-db",
 		Short: "Manage Application Server database",
+	}
+	asDBMigrateCommand = &cobra.Command{
+		Use:   "migrate",
+		Short: "Migrate Application Server data",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if config.Redis.IsZero() {
+				panic("Only Redis is supported by this command")
+			}
+
+			logger.Info("Connecting to Redis database...")
+			cl := ttnredis.New(config.Redis.WithNamespace("as"))
+
+			if force, _ := cmd.Flags().GetBool("force"); !force {
+				needMigration, err := checkLatestSchemaVersion(cl, asredis.SchemaVersion)
+				if err != nil {
+					return err
+				}
+				if !needMigration {
+					logger.Info("Database schema version is already in latest version")
+					return nil
+				}
+			}
+
+			var migrated uint64
+			defer func() { logger.Debugf("%d keys migrated", migrated) }()
+
+			const (
+				idRegexpStr        = `([a-z0-9](?:[-]?[a-z0-9]){2,}){1,36}?`
+				uidRegexpStr       = idRegexpStr
+				deviceUIDRegexpStr = idRegexpStr + `\.` + uidRegexpStr
+			)
+
+			deviceUIDRegexp := regexp.MustCompile(cl.Key("devices", "uid", deviceUIDRegexpStr+"$"))
+
+			lockerID, err := ttnredis.GenerateLockerID()
+			if err != nil {
+				return err
+			}
+			if err := ttnredis.RangeRedisKeys(ctx, cl, cl.Key("*"), 1, func(k string) (bool, error) {
+				logger := logger.WithField("key", k)
+				switch {
+				case deviceUIDRegexp.MatchString(k):
+					if err := ttnredis.LockedWatch(ctx, cl, k, lockerID, defaultLockTTL, func(tx *redis.Tx) error {
+						dev := &ttnpb.EndDevice{}
+						if err := ttnredis.GetProto(ctx, tx, k).ScanProto(dev); err != nil {
+							logger.WithError(err).Error("Failed to get device proto")
+							return err
+						}
+						var any bool
+						for _, sess := range []*ttnpb.Session{dev.Session, dev.PendingSession} {
+							if sess == nil || sess.StartedAt.IsZero() {
+								continue
+							}
+							sess.StartedAt = time.Time{}
+							any = true
+						}
+						if any {
+							_, err := ttnredis.SetProto(ctx, tx, k, dev, 0)
+							if err != nil {
+								return err
+							}
+							migrated++
+						}
+						return nil
+					}); err != nil {
+						logger.WithError(err).Error("Transaction failed")
+					}
+				}
+				return true, nil
+			}); err != nil {
+				return err
+			}
+
+			return recordSchemaVersion(cl, asredis.SchemaVersion)
+		},
 	}
 	asDBCleanupCommand = &cobra.Command{
 		Use:   "cleanup",
@@ -152,6 +231,7 @@ var (
 
 func init() {
 	Root.AddCommand(asDBCommand)
+	asDBCommand.AddCommand(asDBMigrateCommand)
 	asDBCleanupCommand.Flags().Bool("dry-run", false, "Dry run")
 	asDBCleanupCommand.Flags().Duration("pagination-delay", 100, "Delay between batch requests")
 	asDBCommand.AddCommand(asDBCleanupCommand)

@@ -21,11 +21,15 @@ For details about compatibility between different releases, see the **Commitment
   - `as.distribution.local.individual.subscription-queue-size` controls how many uplinks the Application Server should buffer for an individual local subscriber. Has the same semantics as `--as.distribution.global.individual.subscription-queue-size`.
 - `ttn_lw_gs_txack_received_total`, `ttn_lw_gs_txack_forwarded_total` and `ttn_lw_gs_txack_dropped_total` metrics, which track the transmission acknowledgements from gateways.
 - `gs.txack.receive`, `gs.txack.drop` and `gs.txack.forward` events, which track the transmission acknowledgements from gateways.
+- `ttn-lw-stack as-db migrate` command to migrate the Application Server database. This command records the schema version and only performs migrations if on a newer version.
+  - Use the `--force` flag to force perform migrations.
 
 ### Changed
 
 - Gateway Server default UDP worker count has been increased to 1024, from 16.
 - Application Server webhooks and application packages default worker count has been increased to 1024, from 16.
+- Application Server no longer sets the end device's `session.started_at` and `pending_session.started_at`. The session start time should be retrieved from the Network Server, per API specification.
+  - This requires an Application Server database migration (`ttn-lw-stack as-db migrate`) to clear the `started_at` field in existing (pending) sessions.
 
 ### Deprecated
 

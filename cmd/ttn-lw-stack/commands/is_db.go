@@ -189,6 +189,9 @@ var (
 					return err
 				}
 				err = appStore.PurgeApplication(ctx, ids.GetIds())
+				if err != nil {
+					return err
+				}
 			}
 
 			logger.Info("Purging expired users")

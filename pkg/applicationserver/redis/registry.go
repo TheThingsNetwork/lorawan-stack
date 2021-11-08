@@ -34,6 +34,9 @@ var (
 	errReadOnlyField        = errors.DefineInvalidArgument("read_only_field", "read-only field `{field}`")
 )
 
+// SchemaVersion is the Application Server database schema version. Bump when a migration is required.
+const SchemaVersion = 1
+
 // DeviceRegistry is a Redis device registry.
 type DeviceRegistry struct {
 	Redis   *ttnredis.Client
