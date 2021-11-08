@@ -320,9 +320,9 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 
 	var gatewayReceiveTime *time.Time
 	var gatewayUplinkToken []byte
-	if len(msg.RxMetadata) > 0 && msg.RxMetadata[0].GetGatewayIds() != nil {
+	if len(msg.RxMetadata) > 0 && msg.RxMetadata[0].GatewayIds != nil {
 		md := msg.RxMetadata[0]
-		up.GatewayId = toPBGatewayIdentifier(md.GetGatewayIds(), config)
+		up.GatewayId = toPBGatewayIdentifier(md.GatewayIds, config)
 
 		var teaser packetbroker.GatewayMetadataTeaser_Terrestrial
 		var signalQuality packetbroker.GatewayMetadataSignalQuality_Terrestrial
@@ -383,7 +383,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 
 			if len(gatewayUplinkToken) == 0 {
 				var err error
-				gatewayUplinkToken, err = wrapGatewayUplinkToken(ctx, *md.GetGatewayIds(), md.UplinkToken, config.TokenEncrypter)
+				gatewayUplinkToken, err = wrapGatewayUplinkToken(ctx, *md.GatewayIds, md.UplinkToken, config.TokenEncrypter)
 				if err != nil {
 					return nil, errWrapGatewayUplinkToken.WithCause(err)
 				}
