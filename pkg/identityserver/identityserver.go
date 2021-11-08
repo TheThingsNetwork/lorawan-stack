@@ -23,6 +23,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // Postgres database driver.
 	"go.thethings.network/lorawan-stack/v3/pkg/account"
+	account_store "go.thethings.network/lorawan-stack/v3/pkg/account/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -110,6 +111,36 @@ func GenerateCSPString(config *oauth.Config, nonce string) string {
 	return webui.GenerateCSPString(cspMap)
 }
 
+type accountAppStore struct {
+	db *gorm.DB
+
+	store.UserStore
+	store.LoginTokenStore
+	store.UserSessionStore
+}
+
+// WithSoftDeleted implements account_store.Interface.
+func (as *accountAppStore) WithSoftDeleted(ctx context.Context, onlyDeleted bool) context.Context {
+	return store.WithSoftDeleted(ctx, onlyDeleted)
+}
+
+// Transact implements account_store.Interface.
+func (as *accountAppStore) Transact(ctx context.Context, f func(context.Context, account_store.Interface) error) error {
+	return store.Transact(ctx, as.db, func(db *gorm.DB) error {
+		return f(ctx, createAccountAppStore(db))
+	})
+}
+
+func createAccountAppStore(db *gorm.DB) account_store.Interface {
+	return &accountAppStore{
+		db: db,
+
+		UserStore:        store.GetUserStore(db),
+		LoginTokenStore:  store.GetLoginTokenStore(db),
+		UserSessionStore: store.GetUserSessionStore(db),
+	}
+}
+
 var errDBNeedsMigration = errors.Define("db_needs_migration", "the database needs to be migrated")
 
 // New returns new *IdentityServer.
@@ -166,15 +197,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		OAuthStore:       store.GetOAuthStore(is.db),
 	}, is.config.OAuth, GenerateCSPString)
 
-	is.account = account.NewServer(c, struct {
-		store.UserStore
-		store.LoginTokenStore
-		store.UserSessionStore
-	}{
-		UserStore:        store.GetUserStore(is.db),
-		LoginTokenStore:  store.GetLoginTokenStore(is.db),
-		UserSessionStore: store.GetUserSessionStore(is.db),
-	}, is.config.OAuth, GenerateCSPString)
+	is.account, err = account.NewServer(c, createAccountAppStore(is.db), is.config.OAuth, GenerateCSPString)
 	if err != nil {
 		return nil, err
 	}

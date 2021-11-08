@@ -100,7 +100,7 @@ func TestAuthentication(t *testing.T) {
 			},
 		},
 	})
-	s := account.NewServer(c, store, oauth.Config{
+	s, err := account.NewServer(c, store, oauth.Config{
 		Mount:       "/oauth",
 		CSRFAuthKey: []byte("12345678123456781234567812345678"),
 		UI: oauth.UIConfig{
@@ -111,6 +111,9 @@ func TestAuthentication(t *testing.T) {
 			},
 		},
 	}, identityserver.GenerateCSPString)
+	if err != nil {
+		panic(err)
+	}
 	c.RegisterWeb(s)
 	componenttest.StartComponent(t, c)
 

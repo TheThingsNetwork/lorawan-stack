@@ -30,6 +30,7 @@ import (
 func TestUserStore(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
+	now := time.Now()
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
 		prepareTest(db, &Account{}, &User{}, &Attribute{}, &Picture{})
@@ -50,6 +51,8 @@ func TestUserStore(t *testing.T) {
 				"bar": "baz",
 				"baz": "qux",
 			},
+			PrimaryEmailAddress:            "foo@bar.org",
+			PrimaryEmailAddressValidatedAt: &now,
 			ProfilePicture: &ttnpb.Picture{
 				Embedded: &ttnpb.Picture_Embedded{
 					MimeType: "image/png",
@@ -73,6 +76,17 @@ func TestUserStore(t *testing.T) {
 
 		got, err := store.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes"}})
 
+		a.So(err, should.BeNil)
+		if a.So(got, should.NotBeNil) {
+			a.So(got.GetIds().UserId, should.Equal, "foo")
+			a.So(got.Name, should.Equal, "Foo User")
+			a.So(got.Description, should.BeEmpty)
+			a.So(got.Attributes, should.HaveLength, 3)
+			a.So(got.CreatedAt, should.Resemble, created.CreatedAt)
+			a.So(got.UpdatedAt, should.Resemble, created.UpdatedAt)
+		}
+
+		got, err = store.GetUserByPrimaryEmailAddress(ctx, "foo@bar.org", &pbtypes.FieldMask{Paths: []string{"name", "attributes"}})
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
 			a.So(got.GetIds().UserId, should.Equal, "foo")
