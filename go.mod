@@ -126,7 +126,7 @@ require (
 	go.packetbroker.org/api/mapping/v2 v2.1.14-tts
 	go.packetbroker.org/api/routing v1.8.7-tts
 	go.packetbroker.org/api/v3 v3.10.7-tts
-	go.thethings.network/lorawan-application-payload v0.0.0-20210625082552-27377194bcca
+	go.thethings.network/lorawan-application-payload v0.0.0-20211109090704-a9a0a6022856
 	go.thethings.network/lorawan-stack-legacy/v2 v2.0.2
 	go.uber.org/zap v1.13.0
 	gocloud.dev v0.20.0

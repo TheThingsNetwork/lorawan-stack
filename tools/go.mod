@@ -186,7 +186,7 @@ require (
 	go.packetbroker.org/api/mapping/v2 v2.1.14-tts // indirect
 	go.packetbroker.org/api/routing v1.8.7-tts // indirect
 	go.packetbroker.org/api/v3 v3.10.7-tts // indirect
-	go.thethings.network/lorawan-application-payload v0.0.0-20210625082552-27377194bcca // indirect
+	go.thethings.network/lorawan-application-payload v0.0.0-20211109090704-a9a0a6022856 // indirect
 	go.thethings.network/lorawan-stack-legacy/v2 v2.0.2 // indirect
 	go.uber.org/atomic v1.5.0 // indirect
 	go.uber.org/multierr v1.3.0 // indirect

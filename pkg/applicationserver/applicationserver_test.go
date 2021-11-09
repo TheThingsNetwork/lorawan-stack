@@ -2760,7 +2760,7 @@ func TestLocationFromPayload(t *testing.T) {
 						lat: 4.85564,
 						lng: 52.3456341,
 						alt: 16,
-						hdop: 14
+						acc: 14
 					}
 				};
 			}`,
