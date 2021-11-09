@@ -23,6 +23,7 @@ For details about compatibility between different releases, see the **Commitment
 - `gs.txack.receive`, `gs.txack.drop` and `gs.txack.forward` events, which track the transmission acknowledgements from gateways.
 - `ttn-lw-stack as-db migrate` command to migrate the Application Server database. This command records the schema version and only performs migrations if on a newer version.
   - Use the `--force` flag to force perform migrations.
+- Server-side event filtering with the `names` field.
 
 ### Changed
 
@@ -30,6 +31,7 @@ For details about compatibility between different releases, see the **Commitment
 - Application Server webhooks and application packages default worker count has been increased to 1024, from 16.
 - Application Server no longer sets the end device's `session.started_at` and `pending_session.started_at`. The session start time should be retrieved from the Network Server, per API specification.
   - This requires an Application Server database migration (`ttn-lw-stack as-db migrate`) to clear the `started_at` field in existing (pending) sessions.
+- Console changing to server-side event filtering (used to be client-side).
 
 ### Deprecated
 
@@ -79,7 +81,6 @@ For details about compatibility between different releases, see the **Commitment
 - Packet broker page crashing when networks with a NetID of `0` are present.
 - Allowing to toggle visibility of sensitive values in text inputs in the Console.
 - Webhook failed event.
-- Server-side event filtering with the `names` field.
 
 ### Changed
 
