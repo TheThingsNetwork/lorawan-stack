@@ -136,8 +136,6 @@ func (dnmsg *DownlinkMessage) ToDownlinkMessage(bandID string) (*ttnpb.DownlinkM
 }
 
 const (
-	// transferTimeRTTPercentile is the percentile of round-trip times that is considered for determining the gateway GPS time.
-	transferTimeRTTPercentile = 90
 	// transferTimeMinRTTCount is the minimum number of observed round-trip times that are taken into account before using
 	// their statistics to determine the gateway GPS time.
 	transferTimeMinRTTCount = 5
@@ -154,7 +152,7 @@ func (*lbsLNS) TransferTime(ctx context.Context, serverTime time.Time, conn *io.
 		return nil, nil
 	}
 
-	_, _, _, np, n := conn.RTTStats(transferTimeRTTPercentile, serverTime)
+	_, _, median, _, n := conn.RTTStats(100, serverTime)
 	if n < transferTimeMinRTTCount {
 		return nil, nil
 	}
@@ -162,7 +160,7 @@ func (*lbsLNS) TransferTime(ctx context.Context, serverTime time.Time, conn *io.
 	// The concentrator time is based on the current server time plus
 	// half a round trip. The timestamp is relative to the server
 	// time in order to avoid aggregating gateway time errors.
-	concentratorTime, ok := conn.TimeFromServerTime(serverTime.Add(np / 2))
+	concentratorTime, ok := conn.TimeFromServerTime(serverTime.Add(median / 2))
 	if !ok {
 		return nil, nil
 	}
