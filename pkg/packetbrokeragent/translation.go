@@ -537,22 +537,33 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 					UplinkToken:            uplinkToken,
 				})
 			}
-		} else if md := gtwMd.GetPlainSignalQuality().GetTerrestrial(); md != nil {
+		}
+		if md := gtwMd.GetPlainSignalQuality().GetTerrestrial(); md != nil {
 			for _, ant := range md.Antennas {
-				up.RxMetadata = append(up.RxMetadata, &ttnpb.RxMetadata{
-					GatewayIds:             &cluster.PacketBrokerGatewayID,
-					PacketBroker:           pbMD,
-					AntennaIndex:           ant.Index,
-					Time:                   receiveTime,
-					Rssi:                   ant.Value.GetChannelRssi(),
-					ChannelRssi:            ant.Value.GetChannelRssi(),
-					SignalRssi:             ant.Value.GetSignalRssi(),
-					RssiStandardDeviation:  ant.Value.GetRssiStandardDeviation().GetValue(),
-					Snr:                    ant.Value.GetSnr(),
-					FrequencyOffset:        ant.Value.GetFrequencyOffset(),
-					DownlinkPathConstraint: downlinkPathConstraint,
-					UplinkToken:            uplinkToken,
-				})
+				var md *ttnpb.RxMetadata
+				for _, locMd := range up.RxMetadata {
+					if locMd.AntennaIndex == ant.Index {
+						md = locMd
+						break
+					}
+				}
+				if md == nil {
+					md = &ttnpb.RxMetadata{
+						GatewayIds:             &cluster.PacketBrokerGatewayID,
+						PacketBroker:           pbMD,
+						AntennaIndex:           ant.Index,
+						Time:                   receiveTime,
+						DownlinkPathConstraint: downlinkPathConstraint,
+						UplinkToken:            uplinkToken,
+					}
+					up.RxMetadata = append(up.RxMetadata, md)
+				}
+				md.Rssi = ant.Value.GetChannelRssi()
+				md.ChannelRssi = ant.Value.GetChannelRssi()
+				md.SignalRssi = ant.Value.GetSignalRssi()
+				md.RssiStandardDeviation = ant.Value.GetRssiStandardDeviation().GetValue()
+				md.Snr = ant.Value.GetSnr()
+				md.FrequencyOffset = ant.Value.GetFrequencyOffset()
 			}
 		}
 	}
