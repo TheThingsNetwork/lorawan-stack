@@ -31,6 +31,7 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import toast from '@ttn-lw/components/toast'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
+import Checkbox from '@ttn-lw/components/checkbox'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
@@ -126,6 +127,7 @@ const validationSchema = Yup.object().shape({
       sharedMessages.attributeValueValidateTooLong,
       attributeValueTooLongCheck,
     ),
+    skip_payload_crypto: Yup.boolean().default(false),
 })
 
 @connect(
@@ -327,6 +329,13 @@ export default class ApplicationGeneralSettings extends React.Component {
                 addMessage={sharedMessages.addAttributes}
                 component={KeyValueMap}
                 description={sharedMessages.attributeDescription}
+              />
+              <Form.Field
+                autoFocus
+                title={sharedMessages.skipCryptoTitle}
+                name="skip_payload_crypto"
+                description={sharedMessages.skipCryptoDescription}
+                component={Checkbox}
               />
               <SubmitBar>
                 <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />

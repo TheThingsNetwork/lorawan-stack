@@ -19,7 +19,7 @@ import SubmitBar from '@ttn-lw/components/submit-bar'
 import Input from '@ttn-lw/components/input'
 import Form from '@ttn-lw/components/form'
 import Notification from '@ttn-lw/components/notification'
-import Checkbox from '@ttn-lw/components/checkbox'
+import RadioButton from '@ttn-lw/components/radio-button'
 
 import Yup from '@ttn-lw/lib/yup'
 import diff from '@ttn-lw/lib/diff'
@@ -31,11 +31,21 @@ import { generate16BytesKey, isNonZeroSessionKey } from '@console/lib/device-uti
 
 import messages from '../messages'
 
+const m = defineMessages({
+  skip: 'Skip payload crypto',
+  include: 'Do not skip payload crypto',
+  default: 'Use default',
+})
+
 const validationSchema = Yup.object()
   .shape({
-    skip_payload_crypto: Yup.boolean().default(false),
+    skip_payload_crypto_value: Yup.string()
+      .oneOf(['skip', 'include', 'default'])
+      .required(sharedMessages.validateRequired)
+      .default('default'),
+    skip_payload_crypto_overrride: Yup.boolean().nullable().default(null),
     session: Yup.object().when(
-      ['skip_payload_crypto', '$mayEditKeys'],
+      ['skip_payload_crypto_overrride', '$mayEditKeys'],
       (skipPayloadCrypto, mayEditKeys, schema) => {
         if (skipPayloadCrypto || !mayEditKeys) {
           return schema.strip()
@@ -63,7 +73,7 @@ const ApplicationServerForm = React.memo(props => {
 
   const validationContext = React.useMemo(() => ({ mayEditKeys }), [mayEditKeys])
   const initialValues = React.useMemo(() => {
-    const { session = {}, skip_payload_crypto } = device
+    const { session = {}, skip_payload_crypto_override } = device
     const {
       keys = {
         app_s_key: {
@@ -74,7 +84,7 @@ const ApplicationServerForm = React.memo(props => {
 
     return validationSchema.cast(
       {
-        skip_payload_crypto,
+        skip_payload_crypto_override,
         session: {
           keys: {
             app_s_key: keys.app_s_key,
@@ -88,19 +98,23 @@ const ApplicationServerForm = React.memo(props => {
   const formRef = React.useRef(null)
   const sessionRef = React.useRef(device.session)
 
-  const [skipCrypto, setSkipCrypto] = React.useState(device.skip_payload_crypto || false)
+  const [skipCrypto, setSkipCrypto] = React.useState(device.skip_payload_crypto_override || false)
   const handleSkipCryptoChange = React.useCallback(
     evt => {
-      const { checked } = evt.target
+      const checked = evt
       const { setValues, values } = formRef.current
 
-      setSkipCrypto(checked)
-      if (checked) {
+      if (checked === 'default') {
+        setSkipCrypto(null)
+      } else {
+        setSkipCrypto(checked === 'skip')
+      }
+      if (checked === 'skip') {
         setValues(
           validationSchema.cast(
             {
               ...values,
-              skip_payload_crypto: checked,
+              skip_payload_crypto_override: checked === 'skip',
               session: {
                 keys: {
                   app_s_key: {
@@ -117,7 +131,7 @@ const ApplicationServerForm = React.memo(props => {
           validationSchema.cast(
             {
               ...values,
-              skip_payload_crypto: checked,
+              skip_payload_crypto_override: checked === 'include' || null,
               // Reset initial app_s_key value.
               session: sessionRef.current || '',
             },
@@ -163,13 +177,17 @@ const ApplicationServerForm = React.memo(props => {
     >
       {showResetNotification && <Notification content={messages.keysResetWarning} info small />}
       <Form.Field
-        autoFocus
+        required
         title={sharedMessages.skipCryptoTitle}
-        name="skip_payload_crypto"
+        name="skip_payload_crypto_value"
         description={sharedMessages.skipCryptoDescription}
-        component={Checkbox}
+        component={RadioButton.Group}
         onChange={handleSkipCryptoChange}
-      />
+      >
+        <RadioButton label={m.skip} value="skip" />
+        <RadioButton label={m.include} value="include" />
+        <RadioButton label={m.default} value="default" />
+      </Form.Field>
       <Form.Field
         required
         title={sharedMessages.appSKey}

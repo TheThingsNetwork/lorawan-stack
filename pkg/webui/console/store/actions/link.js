@@ -28,12 +28,20 @@ export const [
   (id, selector) => ({ selector }),
 )
 
-export const UPDATE_APP_LINK_SUCCESS = 'UPDATE_APPLICATION_LINK_SUCCESS'
-export const DELETE_APP_LINK_SUCCESS = 'DELETE_APPLICATION_LINK_SUCCESS'
+export const UPDATE_APP_LINK_BASE = 'UPDATE_APPLICATION_LINK'
+export const [
+  { request: UPDATE_APP_LINK, success: UPDATE_APP_LINK_SUCCESS, failure: UPDATE_APP_LINK_FAILURE },
+  {
+    request: updateApplicationLink,
+    success: updateApplicationLinkSuccess,
+    failure: updateApplicationLinkFailure,
+  },
+] = createRequestActions(
+  UPDATE_APP_LINK_BASE,
+  (id, patch) => ({ id, patch }),
+  (id, patch, selector) => ({ selector }),
+)
 
-export const updateApplicationLinkSuccess = link => ({
-  type: UPDATE_APP_LINK_SUCCESS,
-  link,
-})
+export const DELETE_APP_LINK_SUCCESS = 'DELETE_APPLICATION_LINK_SUCCESS'
 
 export const deleteApplicationLinkSuccess = () => ({ type: DELETE_APP_LINK_SUCCESS })
