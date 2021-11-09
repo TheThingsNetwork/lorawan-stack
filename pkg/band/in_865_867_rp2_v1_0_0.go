@@ -85,8 +85,8 @@ var IN_865_867_RP2_V1_0_0 = Band{
 		switch {
 		case si <= 0:
 			return ttnpb.DATA_RATE_0, nil
-		case si >= 5:
-			return ttnpb.DATA_RATE_5, nil
+		case si >= 7:
+			return ttnpb.DATA_RATE_7, nil
 		}
 		return ttnpb.DataRateIndex(si), nil
 	},
