@@ -46,6 +46,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Handling of NaN values in our JSON API.
+- Receiver metadata from more than one antenna is now available in messages received from Packet Broker.
 
 ### Security
 
