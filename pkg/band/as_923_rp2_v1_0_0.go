@@ -94,8 +94,8 @@ var AS_923_RP2_v1_0_0 = Band{
 		switch {
 		case si <= int8(minDR):
 			return minDR, nil
-		case si >= 5:
-			return ttnpb.DATA_RATE_5, nil
+		case si >= 7:
+			return ttnpb.DATA_RATE_7, nil
 		}
 		return ttnpb.DataRateIndex(si), nil
 	},
