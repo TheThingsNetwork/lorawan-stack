@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -226,7 +227,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 		err = nil // Errors are sent over the websocket connection that is established by this point.
 	}()
 
-	pingTicker := time.NewTicker(s.cfg.WSPingInterval)
+	pingTicker := time.NewTicker(random.Jitter(s.cfg.WSPingInterval, 0.1))
 	defer pingTicker.Stop()
 
 	ws.SetPingHandler(func(data string) error {
@@ -248,7 +249,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 
 	var timeSyncTickerC <-chan time.Time
 	if s.cfg.TimeSyncInterval > 0 {
-		ticker := time.NewTicker(s.cfg.TimeSyncInterval)
+		ticker := time.NewTicker(random.Jitter(s.cfg.TimeSyncInterval, 0.1))
 		timeSyncTickerC = ticker.C
 		defer ticker.Stop()
 	}
