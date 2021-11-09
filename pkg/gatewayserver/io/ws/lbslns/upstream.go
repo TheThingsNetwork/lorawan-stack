@@ -611,9 +611,14 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 		// Transmission confirmation messages do not contain a RefTime, and cannot be used for
 		// RTT computations. The GPS timestamp is present only if the downlink is a class
 		// B downlink. We allow clock synchronization to occur only if GPSTime is present.
+		// References https://github.com/lorabasics/basicstation/issues/134.
 		syncClock(txConf.XTime, txConf.GPSTime, true)
 
 	case TypeUpstreamTimeSync:
+		// If the gateway sends a `timesync` request, it means that it has access to a PPS
+		// source. As such, there is no point in doing time transfers with this particular
+		// gateway.
+		updateSessionTimeSync(ctx, false)
 		var req TimeSyncRequest
 		if err := json.Unmarshal(raw, &req); err != nil {
 			return nil, err

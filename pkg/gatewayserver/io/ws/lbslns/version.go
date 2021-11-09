@@ -69,6 +69,10 @@ func (f *lbsLNS) GetRouterConfig(ctx context.Context, msg []byte, bandID string,
 	if err := json.Unmarshal(msg, &version); err != nil {
 		return nil, nil, nil, err
 	}
+	// We attempt to transfer time to all gateways by default.
+	// In the future, we should disable time transfers permanently
+	// to gateways that signal the presence of a PPS.
+	// References https://github.com/lorabasics/basicstation/issues/135.
 	updateSessionTimeSync(ctx, true)
 	cfg, err := pfconfig.GetRouterConfig(bandID, fps, version.IsProduction(), time.Now())
 	if err != nil {
