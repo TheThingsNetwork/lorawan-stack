@@ -34,6 +34,7 @@ import {
   isBackend as isBackendError,
   getCorrelationId,
   getBackendErrorId,
+  isOAuthClientRefusedError,
 } from '@ttn-lw/lib/errors/utils'
 import statusCodeMessages from '@ttn-lw/lib/errors/status-code-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -77,7 +78,7 @@ const FullViewErrorInner = ({ error, safe }) => {
   const isNotFound = isNotFoundError(error)
   const isFrontend = isFrontendError(error)
   const isBackend = isBackendError(error)
-  const isOAuthCallback = window.location.pathname.endsWith('/oauth/callback')
+  const isOAuthCallback = /oauth.*\/callback$/.test(window.location.pathname)
 
   const errorId = getBackendErrorId(error) || 'n/a'
   const correlationId = getCorrelationId(error) || 'n/a'
@@ -91,7 +92,11 @@ const FullViewErrorInner = ({ error, safe }) => {
     errorMessage = errorMessages.genericNotFound
   } else if (isOAuthCallback) {
     errorTitle = errorMessages.loginFailed
-    errorMessage = errorMessages.loginFailedDescription
+    if (isOAuthClientRefusedError(error)) {
+      errorMessage = errorMessages.loginFailedDescription
+    } else {
+      errorMessage = errorMessages.loginFailedAbortDescription
+    }
   } else if (isFrontend) {
     errorMessage = error.errorMessage
     if (Boolean(error.errorTitle)) {

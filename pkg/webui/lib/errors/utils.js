@@ -239,6 +239,14 @@ export const isTimeoutError = error =>
   Boolean(error) && typeof error === 'object' && error.code === 'ECONNABORTED'
 
 /**
+ * Returns whether `error` is a backend error with ID: 'pkg/web/oauthclient:refused'.
+ *
+ * @param {object} error - The error to be tested.
+ * @returns {boolean} `true` if `error` is a such error, `false` otherwise.
+ */
+export const isOAuthClientRefusedError = error =>
+  isBackend(error) && getBackendErrorId(error) === 'error:pkg/web/oauthclient:refused'
+/**
  * Returns whether the error is worth being sent to Sentry.
  *
  * @param {object} error - The error to be tested.
