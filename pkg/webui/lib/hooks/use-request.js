@@ -25,9 +25,10 @@ const useRequest = requestAction => {
   const [result, setResult] = useState()
 
   useEffect(() => {
-    const promise = (requestAction instanceof Array
-      ? CancelablePromise.all(requestAction.map(req => dispatch(attachPromise(req))))
-      : dispatch(attachPromise(requestAction))
+    const promise = (
+      requestAction instanceof Array
+        ? CancelablePromise.all(requestAction.map(req => dispatch(attachPromise(req))))
+        : dispatch(attachPromise(requestAction))
     )
       .then(() => {
         setResult(result)

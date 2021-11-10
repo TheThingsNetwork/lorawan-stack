@@ -24,16 +24,8 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import style from './step.styl'
 
 const Step = props => {
-  const {
-    className,
-    title,
-    description,
-    status,
-    stepNumber,
-    active,
-    transitionFailed,
-    vertical,
-  } = props
+  const { className, title, description, status, stepNumber, active, transitionFailed, vertical } =
+    props
 
   const isSuccess = status === 'success'
   const isFailure = status === 'failure'

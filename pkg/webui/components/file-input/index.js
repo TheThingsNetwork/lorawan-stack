@@ -164,17 +164,8 @@ export default class FileInput extends Component {
   }
 
   render() {
-    const {
-      message,
-      changeMessage,
-      name,
-      id,
-      accept,
-      value,
-      disabled,
-      image,
-      imageClassName,
-    } = this.props
+    const { message, changeMessage, name, id, accept, value, disabled, image, imageClassName } =
+      this.props
 
     return (
       <div className={style.container}>

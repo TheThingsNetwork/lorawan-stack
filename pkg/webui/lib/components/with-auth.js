@@ -68,16 +68,8 @@ class Auth extends React.PureComponent {
   }
 
   render() {
-    const {
-      user,
-      fetching,
-      userError,
-      errorComponent,
-      children,
-      location,
-      rights,
-      isAdmin,
-    } = this.props
+    const { user, fetching, userError, errorComponent, children, location, rights, isAdmin } =
+      this.props
 
     if (fetching) {
       return (

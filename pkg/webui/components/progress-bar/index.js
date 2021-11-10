@@ -88,15 +88,8 @@ export default class ProgressBar extends PureComponent {
   }
 
   render() {
-    const {
-      current,
-      target,
-      showStatus,
-      percentageDecimals,
-      showEstimation,
-      className,
-      children,
-    } = this.props
+    const { current, target, showStatus, percentageDecimals, showEstimation, className, children } =
+      this.props
     const { percentage = (current / target) * 100 } = this.props
     const { estimatedDuration, startTime, estimations } = this.state
     const displayPercentage = (Math.max(0, Math.min(100, percentage)) || 0).toFixed(

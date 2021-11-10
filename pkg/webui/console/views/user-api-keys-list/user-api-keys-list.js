@@ -50,9 +50,10 @@ const UserApiKeysList = props => {
     [userId],
   )
 
-  const getApiKeys = React.useCallback(filters => getApiKeysList('users', userId, filters), [
-    userId,
-  ])
+  const getApiKeys = React.useCallback(
+    filters => getApiKeysList('users', userId, filters),
+    [userId],
+  )
 
   return (
     <Container>

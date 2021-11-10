@@ -70,12 +70,10 @@ export const [
 ] = createPaginationByIdRequestActions(SHARED_NAME)
 
 export const START_DEVICE_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
-export const START_DEVICE_EVENT_STREAM_SUCCESS = createStartEventsStreamSuccessActionType(
-  SHARED_NAME,
-)
-export const START_DEVICE_EVENT_STREAM_FAILURE = createStartEventsStreamFailureActionType(
-  SHARED_NAME,
-)
+export const START_DEVICE_EVENT_STREAM_SUCCESS =
+  createStartEventsStreamSuccessActionType(SHARED_NAME)
+export const START_DEVICE_EVENT_STREAM_FAILURE =
+  createStartEventsStreamFailureActionType(SHARED_NAME)
 export const STOP_DEVICE_EVENT_STREAM = createStopEventsStreamActionType(SHARED_NAME)
 
 export const PAUSE_DEVICE_EVENT_STREAM = createPauseEventsStreamActionType(SHARED_NAME)
