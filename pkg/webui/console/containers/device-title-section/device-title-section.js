@@ -44,15 +44,8 @@ const m = defineMessages({
 const { Content } = EntityTitleSection
 
 const DeviceTitleSection = props => {
-  const {
-    devId,
-    fetching,
-    device,
-    uplinkFrameCount,
-    downlinkFrameCount,
-    lastSeen,
-    children,
-  } = props
+  const { devId, fetching, device, uplinkFrameCount, downlinkFrameCount, lastSeen, children } =
+    props
 
   const showLastSeen = Boolean(lastSeen)
   const showUplinkCount = typeof uplinkFrameCount === 'number'

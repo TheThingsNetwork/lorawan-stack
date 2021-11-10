@@ -271,15 +271,12 @@ export default {
     getInfo: tts.PacketBrokerAgent.getInfo.bind(tts.PacketBrokerAgent),
     register: tts.PacketBrokerAgent.register.bind(tts.PacketBrokerAgent),
     deregister: tts.PacketBrokerAgent.deregister.bind(tts.PacketBrokerAgent),
-    getHomeNetworkDefaultRoutingPolicy: tts.PacketBrokerAgent.getHomeNetworkDefaultRoutingPolicy.bind(
-      tts.PacketBrokerAgent,
-    ),
-    setHomeNetworkDefaultRoutingPolicy: tts.PacketBrokerAgent.setHomeNetworkDefaultRoutingPolicy.bind(
-      tts.PacketBrokerAgent,
-    ),
-    deleteHomeNetworkDefaultRoutingPolicy: tts.PacketBrokerAgent.deleteHomeNetworkDefaultRoutingPolicy.bind(
-      tts.PacketBrokerAgent,
-    ),
+    getHomeNetworkDefaultRoutingPolicy:
+      tts.PacketBrokerAgent.getHomeNetworkDefaultRoutingPolicy.bind(tts.PacketBrokerAgent),
+    setHomeNetworkDefaultRoutingPolicy:
+      tts.PacketBrokerAgent.setHomeNetworkDefaultRoutingPolicy.bind(tts.PacketBrokerAgent),
+    deleteHomeNetworkDefaultRoutingPolicy:
+      tts.PacketBrokerAgent.deleteHomeNetworkDefaultRoutingPolicy.bind(tts.PacketBrokerAgent),
     getHomeNetworkRoutingPolicy: tts.PacketBrokerAgent.getHomeNetworkRoutingPolicy.bind(
       tts.PacketBrokerAgent,
     ),

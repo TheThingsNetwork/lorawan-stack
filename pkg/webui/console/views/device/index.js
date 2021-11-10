@@ -185,13 +185,8 @@ export default class Device extends React.Component {
       mayScheduleDownlinks,
       maySendUplink,
     } = this.props
-    const {
-      name,
-      join_server_address,
-      supports_join,
-      root_keys,
-      application_server_address,
-    } = device
+    const { name, join_server_address, supports_join, root_keys, application_server_address } =
+      device
 
     const jsConfig = selectJsConfig()
     const hasJs =

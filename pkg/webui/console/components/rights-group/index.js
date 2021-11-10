@@ -213,8 +213,9 @@ class RightsGroup extends React.Component {
     } = this.props
     const { individualRightValue } = this.state
 
-    const selectedCheckboxesCount = individualRightValue.filter(right => !right.endsWith('_ALL'))
-      .length
+    const selectedCheckboxesCount = individualRightValue.filter(
+      right => !right.endsWith('_ALL'),
+    ).length
     const totalCheckboxesCount = derivedRights.length
     const allSelected = selectedCheckboxesCount === totalCheckboxesCount
     const indeterminate =
