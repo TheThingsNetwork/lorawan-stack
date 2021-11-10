@@ -60,7 +60,7 @@ The Things Network's development tooling uses [Mage](https://magefile.org/). Und
 - Follow [Go's installation guide](https://golang.org/doc/install) to install Go.
 - Download Node.js [from their website](https://nodejs.org) and install it.
 - Follow [Yarn's installation guide](https://yarnpkg.com/en/docs/install) to install Yarn.
-- Follow the guides to [install Docker](https://docs.docker.com/install/#supported-platforms) and to [install Docker Compose](https://docs.docker.com/compose/install/#install-compose)(only v1.x is supported for now).
+- Follow the guides to [install Docker](https://docs.docker.com/install/#supported-platforms) and to [install Docker Compose](https://docs.docker.com/compose/install/#install-compose).
 
 ## Cloning the Repository
 
