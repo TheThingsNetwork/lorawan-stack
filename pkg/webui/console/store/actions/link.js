@@ -36,11 +36,7 @@ export const [
     success: updateApplicationLinkSuccess,
     failure: updateApplicationLinkFailure,
   },
-] = createRequestActions(
-  UPDATE_APP_LINK_BASE,
-  (id, patch) => ({ id, patch }),
-  (id, patch, selector) => ({ selector }),
-)
+] = createRequestActions(UPDATE_APP_LINK_BASE, (id, link) => ({ id, link }))
 
 export const DELETE_APP_LINK_SUCCESS = 'DELETE_APPLICATION_LINK_SUCCESS'
 

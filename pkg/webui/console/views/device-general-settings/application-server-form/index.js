@@ -39,11 +39,7 @@ const m = defineMessages({
 
 const validationSchema = Yup.object()
   .shape({
-    skip_payload_crypto_value: Yup.string()
-      .oneOf(['skip', 'include', 'default'])
-      .required(sharedMessages.validateRequired)
-      .default('default'),
-    skip_payload_crypto_overrride: Yup.boolean().nullable().default(null),
+    skip_payload_crypto_override: Yup.boolean().nullable().default(null),
     session: Yup.object().when(
       ['skip_payload_crypto_overrride', '$mayEditKeys'],
       (skipPayloadCrypto, mayEditKeys, schema) => {
@@ -65,6 +61,17 @@ const validationSchema = Yup.object()
     ),
   })
   .noUnknown()
+
+const encodeSkipPayloadCrypto = value => (value === 'default' ? null : value === 'skip')
+const decodeSkipPayloadCrypto = value => {
+  if (value === null || value === undefined) {
+    return 'default'
+  } else if (value === false) {
+    return 'include'
+  }
+
+  return 'skip'
+}
 
 const ApplicationServerForm = React.memo(props => {
   const { device, onSubmit, onSubmitSuccess, mayEditKeys, mayReadKeys } = props
@@ -98,23 +105,19 @@ const ApplicationServerForm = React.memo(props => {
   const formRef = React.useRef(null)
   const sessionRef = React.useRef(device.session)
 
-  const [skipCrypto, setSkipCrypto] = React.useState(device.skip_payload_crypto_override || false)
+  const [skipCrypto, setSkipCrypto] = React.useState(device.skip_payload_crypto_override || null)
   const handleSkipCryptoChange = React.useCallback(
     evt => {
       const checked = evt
       const { setValues, values } = formRef.current
 
-      if (checked === 'default') {
-        setSkipCrypto(null)
-      } else {
-        setSkipCrypto(checked === 'skip')
-      }
-      if (checked === 'skip') {
+      setSkipCrypto(checked)
+      if (checked) {
         setValues(
           validationSchema.cast(
             {
               ...values,
-              skip_payload_crypto_override: checked === 'skip',
+              skip_payload_crypto_override: checked,
               session: {
                 keys: {
                   app_s_key: {
@@ -131,7 +134,7 @@ const ApplicationServerForm = React.memo(props => {
           validationSchema.cast(
             {
               ...values,
-              skip_payload_crypto_override: checked === 'include' || null,
+              skip_payload_crypto_override: checked,
               // Reset initial app_s_key value.
               session: sessionRef.current || '',
             },
@@ -179,9 +182,11 @@ const ApplicationServerForm = React.memo(props => {
       <Form.Field
         required
         title={sharedMessages.skipCryptoTitle}
-        name="skip_payload_crypto_value"
+        name="skip_payload_crypto_override"
         description={sharedMessages.skipCryptoDescription}
         component={RadioButton.Group}
+        decode={decodeSkipPayloadCrypto}
+        encode={encodeSkipPayloadCrypto}
         onChange={handleSkipCryptoChange}
       >
         <RadioButton label={m.skip} value="skip" />

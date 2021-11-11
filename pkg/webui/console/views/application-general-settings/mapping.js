@@ -18,7 +18,7 @@ export const mapFormValuesToApplication = values => ({
   name: values.name,
   description: values.description,
   attributes: mapFormValueToAttributes(values.attributes),
-  skip_payload_crypto: false,
+  skip_payload_crypto: values.skip_payload_crypto,
 })
 
 export const mapApplicationToFormValues = application => ({
@@ -28,5 +28,5 @@ export const mapApplicationToFormValues = application => ({
   name: application.name,
   description: application.description,
   attributes: mapAttributesToFormValue(application.attributes),
-  skip_payload_crypto: false,
+  skip_payload_crypto: application.skip_payload_crypto,
 })

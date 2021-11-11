@@ -60,6 +60,7 @@ import {
 } from '@console/lib/attributes'
 
 import { updateApplication, deleteApplication } from '@console/store/actions/applications'
+import { updateApplicationLink } from '@console/store/actions/link'
 import { getCollaboratorsList } from '@console/store/actions/collaborators'
 import { getApiKeysList } from '@console/store/actions/api-keys'
 import { getPubsubsList } from '@console/store/actions/pubsubs'
@@ -127,7 +128,7 @@ const validationSchema = Yup.object().shape({
       sharedMessages.attributeValueValidateTooLong,
       attributeValueTooLongCheck,
     ),
-    skip_payload_crypto: Yup.boolean().default(false),
+    skip_payload_crypto: Yup.boolean(),
 })
 
 @connect(
@@ -178,6 +179,7 @@ const validationSchema = Yup.object().shape({
   dispatch => ({
     ...bindActionCreators(
       {
+        updateApplicationLink: attachPromise(updateApplicationLink),
         updateApplication: attachPromise(updateApplication),
         deleteApplication: attachPromise(deleteApplication),
         getApiKeysList,
@@ -234,6 +236,7 @@ export default class ApplicationGeneralSettings extends React.Component {
     onDeleteSuccess: PropTypes.func.isRequired,
     shouldConfirmDelete: PropTypes.bool.isRequired,
     updateApplication: PropTypes.func.isRequired,
+    updateApplicationLink: PropTypes.func.isRequired,
   }
 
   state = {
@@ -264,6 +267,7 @@ export default class ApplicationGeneralSettings extends React.Component {
 
     try {
       await updateApplication(application_id, update)
+      await updateApplicationLink(application_id, update)
       resetForm({ values })
       toast({
         title: application_id,
