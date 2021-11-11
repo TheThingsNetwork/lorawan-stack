@@ -50,19 +50,13 @@ func (s *entitySearch) queryMetaFields(ctx context.Context, query *gorm.DB, enti
 			query = query.Where(fmt.Sprintf(`"%[1]ss"."%[1]s_id" ILIKE ?`, entityType), "%"+v+"%")
 		}
 	}
-	if dbKind, ok := query.Get("db:kind"); ok && dbKind == "PostgreSQL" {
-		language := "english"
-		if v := req.GetNameContains(); v != "" {
-			query = query.Where(fmt.Sprintf("to_tsvector('%[1]s', name) @@ to_tsquery('%[1]s', ?)", language), v)
-		}
-		if v := req.GetDescriptionContains(); v != "" {
-			query = query.Where(fmt.Sprintf("to_tsvector('%[1]s', description) @@ to_tsquery('%[1]s', ?)", language), v)
-		}
-	} else {
-		if v := req.GetNameContains(); v != "" {
-			query = query.Where("name ILIKE ?", fmt.Sprintf("%%%s%%", v))
-		}
-		if v := req.GetDescriptionContains(); v != "" {
+	if v := req.GetNameContains(); v != "" {
+		query = query.Where("name ILIKE ?", fmt.Sprintf("%%%s%%", v))
+	}
+	if v := req.GetDescriptionContains(); v != "" {
+		if dbKind, ok := query.Get("db:kind"); ok && dbKind == "PostgreSQL" {
+			query = query.Where("to_tsvector('english', description) @@ websearch_to_tsquery('english', ?)", v)
+		} else {
 			query = query.Where("description ILIKE ?", fmt.Sprintf("%%%s%%", v))
 		}
 	}
