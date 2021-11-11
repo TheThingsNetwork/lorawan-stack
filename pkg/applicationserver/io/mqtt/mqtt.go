@@ -237,6 +237,7 @@ type topicAccess struct {
 }
 
 func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Context, error) {
+	var err error
 	ids := ttnpb.ApplicationIdentifiers{
 		ApplicationId: info.Username,
 	}
@@ -257,11 +258,22 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 	uid := unique.ID(ctx, ids)
 	ctx = log.NewContextWithField(ctx, "application_uid", uid)
 
-	if err := rights.RequireApplication(ctx, ids); err != nil {
+	defer func() {
+		if err != nil {
+			registerConnectFail(ctx, ids, err)
+		}
+		switch {
+		case errors.IsPermissionDenied(err):
+			err = packet.ConnectNotAuthorized
+		case errors.IsResourceExhausted(err):
+			err = packet.ConnectServerUnavailable
+		}
+	}()
+
+	if err = rights.RequireApplication(ctx, ids); err != nil {
 		return nil, err
 	}
 
-	var err error
 	c.io, err = c.server.Subscribe(ctx, "mqtt", &ids, true)
 	if err != nil {
 		return nil, err

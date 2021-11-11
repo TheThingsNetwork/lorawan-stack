@@ -8675,6 +8675,15 @@
       "file": "grpc_deviceregistry.go"
     }
   },
+  "event:as.mqtt.connect.fail": {
+    "translations": {
+      "en": "fail to connect to MQTT"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/mqtt",
+      "file": "observability.go"
+    }
+  },
   "event:as.packages.loraclouddmsv1.fail": {
     "translations": {
       "en": "fail to process upstream message"
