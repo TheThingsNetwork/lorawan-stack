@@ -16288,6 +16288,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "names",
+              "description": "If provided, this will filter events, so that only events with the given names are returned.\nNames can be provided as either exact event names (e.g. 'gs.up.receive'),\nor as regular expressions (e.g. '/^gs\\..+/').",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         }

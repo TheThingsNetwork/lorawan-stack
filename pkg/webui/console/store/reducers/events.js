@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { memoize } from 'lodash'
-
 import EVENT_STORE_LIMIT from '@console/constants/event-store-limit'
-import { EVENT_VERBOSE_FILTERS_REGEXP, EVENT_FILTER_MAP } from '@console/constants/event-filters'
+import { EVENT_FILTERS } from '@console/constants/event-filters'
 import CONNECTION_STATUS from '@console/constants/connection-status'
 
 import { getCombinedDeviceId } from '@ttn-lw/lib/selectors/id'
@@ -26,8 +24,8 @@ import {
   createStatusClosedEvent,
   createStatusPausedEvent,
   createStatusResumedEvent,
-  createStatusVerboseEnabled,
-  createStatusVerboseDisabled,
+  createStatusFilterEnabled,
+  createStatusFilterDisabled,
   EVENT_STATUS_RESUMED,
 } from '@console/lib/events/definitions'
 import { createSyntheticEventFromError } from '@console/lib/events/utils'
@@ -46,12 +44,8 @@ import {
   createSetEventsFilterActionType,
 } from '@console/store/actions/events'
 
-// Use memoized RegExp constructor to prevent costly instantiations since
-// filters are stored as strings and need to be converted for each event.
-const MemoizedRegExp = memoize(RegExp)
-
 const addEvent = (state, event) => {
-  const { events, filter } = state
+  const { events } = state
   const { paused } = state
 
   if (paused && !event.name.startsWith('synthetic')) {
@@ -59,12 +53,16 @@ const addEvent = (state, event) => {
   }
 
   // See https://github.com/TheThingsNetwork/lorawan-stack/pull/2989
-  if (event.name === 'events.stream.start' || event.name === 'events.stream.stop') {
+  if (event.name === 'events.stream.start') {
+    if (event.data && event.data.value) {
+      return { confirmedFilter: event.data.value }
+    }
+
     return {}
   }
 
-  // Apply filter, if exists.
-  if (!event.name.startsWith('synthetic') && filter && !MemoizedRegExp(filter).test(event.name)) {
+  // See https://github.com/TheThingsNetwork/lorawan-stack/pull/2989
+  if (event.name === 'events.stream.stop') {
     return {}
   }
 
@@ -96,16 +94,6 @@ const addEvent = (state, event) => {
   return { events: newEvents, truncated: events.length + 1 > EVENT_STORE_LIMIT }
 }
 
-const defaultState = {
-  events: [],
-  truncated: false,
-  error: undefined,
-  interrupted: false,
-  paused: false,
-  status: CONNECTION_STATUS.DISCONNECTED,
-  filter: EVENT_VERBOSE_FILTERS_REGEXP,
-}
-
 const createNamedEventReducer = (reducerName = '') => {
   const START_EVENTS = createStartEventsStreamActionType(reducerName)
   const START_EVENTS_SUCCESS = createStartEventsStreamSuccessActionType(reducerName)
@@ -119,6 +107,19 @@ const createNamedEventReducer = (reducerName = '') => {
   const EVENT_STREAM_CLOSED = createEventStreamClosedActionType(reducerName)
   const SET_EVENTS_FILTER = createSetEventsFilterActionType(reducerName)
 
+  const defaultState = {
+    events: [],
+    truncated: false,
+    error: undefined,
+    interrupted: false,
+    paused: false,
+    status: CONNECTION_STATUS.DISCONNECTED,
+    filter: EVENT_FILTERS[reducerName]
+      ? EVENT_FILTERS[reducerName].find(f => f.id === 'default')
+      : undefined,
+    confirmedFilter: undefined,
+  }
+
   return (state = defaultState, action) => {
     switch (action.type) {
       case START_EVENTS:
@@ -129,7 +130,9 @@ const createNamedEventReducer = (reducerName = '') => {
       case START_EVENTS_SUCCESS:
         return {
           ...state,
-          ...(state.interrupted ? addEvent(state, createStatusReconnectedEvent()) : state.events),
+          ...(state.interrupted && !action.silent
+            ? addEvent(state, createStatusReconnectedEvent())
+            : state.events),
           status: CONNECTION_STATUS.CONNECTED,
           interrupted: false,
           error: undefined,
@@ -176,7 +179,7 @@ const createNamedEventReducer = (reducerName = '') => {
       case EVENT_STREAM_CLOSED:
         return {
           ...state,
-          ...addEvent(state, createStatusClosedEvent()),
+          ...(!action.silent ? addEvent(state, createStatusClosedEvent()) : state.events),
           status: CONNECTION_STATUS.DISCONNECTED,
           interrupted: true,
         }
@@ -187,20 +190,18 @@ const createNamedEventReducer = (reducerName = '') => {
           truncated: false,
         }
       case SET_EVENTS_FILTER:
+        const filter = action.filterId
+          ? EVENT_FILTERS[reducerName].find(f => f.id === action.filterId)
+          : undefined
         return {
           ...state,
           ...addEvent(
             state,
-            Boolean(action.filter)
-              ? createStatusVerboseDisabled({
-                  filter: EVENT_FILTER_MAP[action.filter],
-                  applied_converted_regexp: action.filter,
-                })
-              : createStatusVerboseEnabled({
-                  filter: [],
-                }),
+            Boolean(action.filterId)
+              ? createStatusFilterEnabled({ ...filter, confirmedFilter: state.confirmedFilter })
+              : createStatusFilterDisabled(),
           ),
-          filter: action.filter,
+          filter,
         }
       default:
         return state

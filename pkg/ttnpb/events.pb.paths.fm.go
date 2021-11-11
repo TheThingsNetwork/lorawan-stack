@@ -38,12 +38,14 @@ var EventFieldPathsTopLevel = []string{
 var StreamEventsRequestFieldPathsNested = []string{
 	"after",
 	"identifiers",
+	"names",
 	"tail",
 }
 
 var StreamEventsRequestFieldPathsTopLevel = []string{
 	"after",
 	"identifiers",
+	"names",
 	"tail",
 }
 var FindRelatedEventsRequestFieldPathsNested = []string{

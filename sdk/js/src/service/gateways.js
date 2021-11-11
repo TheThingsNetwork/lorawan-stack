@@ -221,11 +221,12 @@ class Gateways {
 
   // Events Stream
 
-  async openStream(identifiers, tail, after) {
+  async openStream(identifiers, names, tail, after) {
     const payload = {
       identifiers: identifiers.map(id => ({
         gateway_ids: { gateway_id: id },
       })),
+      names,
       tail,
       after,
     }

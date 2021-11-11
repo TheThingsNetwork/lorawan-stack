@@ -19,13 +19,18 @@ package grpc
 import (
 	"context"
 	"os"
+	"regexp"
+	"sort"
+	"strings"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	grpc_runtime "github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights/rightsutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -41,16 +46,74 @@ func NewEventsServer(ctx context.Context, pubsub events.PubSub) *EventsServer {
 	if _, ok := pubsub.(events.Store); ok {
 		log.FromContext(ctx).Infof("Events PubSub: %T is also a Store!", pubsub)
 	}
+	definedNames := make(map[string]struct{})
+	for _, def := range events.All().Definitions() {
+		definedNames[def.Name()] = struct{}{}
+	}
 	return &EventsServer{
-		ctx:    ctx,
-		pubsub: pubsub,
+		ctx:          ctx,
+		pubsub:       pubsub,
+		definedNames: definedNames,
 	}
 }
 
 // EventsServer streams events from a PubSub over gRPC.
 type EventsServer struct {
-	ctx    context.Context
-	pubsub events.PubSub
+	ctx          context.Context
+	pubsub       events.PubSub
+	definedNames map[string]struct{}
+}
+
+var (
+	errInvalidRegexp    = errors.DefineInvalidArgument("invalid_regexp", "invalid regexp")
+	errNoMatchingEvents = errors.DefineInvalidArgument("no_matching_events", "no matching events for regexp `{regexp}`")
+	errUnknownEventName = errors.DefineInvalidArgument("unknown_event_name", "unknown event `{name}`")
+)
+
+func (srv *EventsServer) processNames(names ...string) ([]string, error) {
+	if len(names) == 0 {
+		return nil, nil
+	}
+	nameMap := make(map[string]struct{})
+	for _, name := range names {
+		if strings.HasPrefix(name, "/") && strings.HasSuffix(name, "/") {
+			re, err := regexp.Compile(strings.Trim(name, "/"))
+			if err != nil {
+				return nil, errInvalidRegexp.WithCause(err)
+			}
+			var found bool
+			for defined := range srv.definedNames {
+				if re.MatchString(defined) {
+					nameMap[defined] = struct{}{}
+					found = true
+				}
+			}
+			if !found {
+				return nil, errNoMatchingEvents.WithAttributes("regexp", re.String())
+			}
+		} else {
+			var found bool
+			for defined := range srv.definedNames {
+				if name == defined {
+					nameMap[name] = struct{}{}
+					found = true
+					break
+				}
+			}
+			if !found {
+				return nil, errUnknownEventName.WithAttributes("name", name)
+			}
+		}
+	}
+	if len(nameMap) == 0 {
+		return nil, nil
+	}
+	out := make([]string, 0, len(nameMap))
+	for name := range nameMap {
+		out = append(out, name)
+	}
+	sort.Strings(out)
+	return out, nil
 }
 
 var errNoIdentifiers = errors.DefineInvalidArgument("no_identifiers", "no identifiers")
@@ -60,6 +123,12 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 	if len(req.Identifiers) == 0 {
 		return errNoIdentifiers.New()
 	}
+
+	names, err := srv.processNames(req.Names...)
+	if err != nil {
+		return err
+	}
+
 	ctx := stream.Context()
 
 	if err := rights.RequireAny(ctx, req.Identifiers...); err != nil {
@@ -71,16 +140,20 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 
 	store, hasStore := srv.pubsub.(events.Store)
 	var group *errgroup.Group
-	if hasStore && (req.Tail > 0 || req.After != nil) {
+	if hasStore {
+		if req.After == nil {
+			now := time.Now()
+			req.After = &now
+		}
 		group, ctx = errgroup.WithContext(ctx)
 		group.Go(func() error {
-			return store.SubscribeWithHistory(ctx, nil, req.Identifiers, req.After, int(req.Tail), handler)
+			return store.SubscribeWithHistory(ctx, names, req.Identifiers, req.After, int(req.Tail), handler)
 		})
 	} else {
 		if req.Tail > 0 || req.After != nil {
 			warning.Add(ctx, "Events storage is not enabled")
 		}
-		if err := srv.pubsub.Subscribe(ctx, nil, req.Identifiers, handler); err != nil {
+		if err := srv.pubsub.Subscribe(ctx, names, req.Identifiers, handler); err != nil {
 			return err
 		}
 	}
@@ -94,14 +167,27 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 		return err
 	}
 	now := time.Now().UTC()
-	if err := stream.Send(&ttnpb.Event{
+	startEvent := &ttnpb.Event{
 		UniqueId:       events.NewCorrelationID(),
 		Name:           "events.stream.start",
 		Time:           &now,
 		Identifiers:    req.Identifiers,
 		Origin:         hostname,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
-	}); err != nil {
+	}
+
+	if len(names) > 0 {
+		value, err := gogoproto.Value(names)
+		if err != nil {
+			return err
+		}
+		startEvent.Data, err = pbtypes.MarshalAny(value)
+		if err != nil {
+			return err
+		}
+	}
+
+	if err := stream.Send(startEvent); err != nil {
 		return err
 	}
 

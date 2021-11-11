@@ -3896,6 +3896,15 @@
       "file": "conversion.go"
     }
   },
+  "error:pkg/events/grpc:invalid_regexp": {
+    "translations": {
+      "en": "invalid regexp"
+    },
+    "description": {
+      "package": "pkg/events/grpc",
+      "file": "grpc.go"
+    }
+  },
   "error:pkg/events/grpc:no_identifiers": {
     "translations": {
       "en": "no identifiers"
@@ -3905,9 +3914,27 @@
       "file": "grpc.go"
     }
   },
+  "error:pkg/events/grpc:no_matching_events": {
+    "translations": {
+      "en": "no matching events for regexp `{regexp}`"
+    },
+    "description": {
+      "package": "pkg/events/grpc",
+      "file": "grpc.go"
+    }
+  },
   "error:pkg/events/grpc:storage_disabled": {
     "translations": {
       "en": "events storage is not not enabled"
+    },
+    "description": {
+      "package": "pkg/events/grpc",
+      "file": "grpc.go"
+    }
+  },
+  "error:pkg/events/grpc:unknown_event_name": {
+    "translations": {
+      "en": "unknown event `{name}`"
     },
     "description": {
       "package": "pkg/events/grpc",

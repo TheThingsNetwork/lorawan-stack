@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { GATEWAY } from '@console/constants/entities'
+
 import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
 import {
   createPaginationRequestActions,
@@ -44,7 +46,7 @@ import {
   setEventsFilter,
 } from './events'
 
-export const SHARED_NAME = 'GATEWAY'
+export const SHARED_NAME = GATEWAY
 
 export const GET_GTW_BASE = 'GET_GATEWAY'
 export const [

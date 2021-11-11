@@ -85,7 +85,7 @@ DeviceEvents.propTypes = {
     }),
   }).isRequired,
   events: PropTypes.events,
-  filter: PropTypes.string,
+  filter: PropTypes.eventFilter,
   onClear: PropTypes.func.isRequired,
   onFilterChange: PropTypes.func.isRequired,
   onPauseToggle: PropTypes.func.isRequired,
@@ -126,7 +126,7 @@ export default connect(
         paused
           ? dispatch(resumeDeviceEventsStream(devIds))
           : dispatch(pauseDeviceEventsStream(devIds)),
-      onFilterChange: filter => dispatch(setDeviceEventsFilter(devIds, filter)),
+      onFilterChange: filterId => dispatch(setDeviceEventsFilter(devIds, filterId)),
     }
   },
 )(DeviceEvents)

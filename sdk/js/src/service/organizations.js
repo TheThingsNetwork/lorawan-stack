@@ -141,11 +141,12 @@ class Organizations {
 
   // Events stream.
 
-  async openStream(identifiers, tail, after) {
+  async openStream(identifiers, names, tail, after) {
     const payload = {
       identifiers: identifiers.map(id => ({
         organization_ids: { organization_id: id },
       })),
+      names,
       tail,
       after,
     }
