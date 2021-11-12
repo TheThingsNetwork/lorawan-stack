@@ -244,7 +244,7 @@ func TestTraffic(t *testing.T) {
 		// Push: unauthorized.
 		{
 			_, err := client.DownlinkQueuePush(ctx, &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ids,
+				EndDeviceIds: &ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      1,
@@ -258,7 +258,7 @@ func TestTraffic(t *testing.T) {
 		// Push and assert content: happy flow.
 		{
 			_, err := client.DownlinkQueuePush(ctx, &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ids,
+				EndDeviceIds: &ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
 						SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
@@ -277,7 +277,7 @@ func TestTraffic(t *testing.T) {
 		}
 		{
 			_, err := client.DownlinkQueuePush(ctx, &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ids,
+				EndDeviceIds: &ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      3,
@@ -313,7 +313,7 @@ func TestTraffic(t *testing.T) {
 		// Replace: unauthorized.
 		{
 			_, err := client.DownlinkQueueReplace(ctx, &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ids,
+				EndDeviceIds: &ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      4,
@@ -327,7 +327,7 @@ func TestTraffic(t *testing.T) {
 		// Replace and assert content: happy flow.
 		{
 			_, err := client.DownlinkQueueReplace(ctx, &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ids,
+				EndDeviceIds: &ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      4,

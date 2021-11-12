@@ -118,14 +118,14 @@ func (ns *mockNS) reset() {
 
 func (ns *mockNS) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
 	ns.downlinkQueueMu.Lock()
-	ns.downlinkQueue[unique.ID(ctx, req.EndDeviceIdentifiers)] = req.Downlinks
+	ns.downlinkQueue[unique.ID(ctx, req.EndDeviceIds)] = req.Downlinks
 	ns.downlinkQueueMu.Unlock()
 	return ttnpb.Empty, nil
 }
 
 func (ns *mockNS) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
 	ns.downlinkQueueMu.Lock()
-	uid := unique.ID(ctx, req.EndDeviceIdentifiers)
+	uid := unique.ID(ctx, req.EndDeviceIds)
 	ns.downlinkQueue[uid] = append(ns.downlinkQueue[uid], req.Downlinks...)
 	ns.downlinkQueueMu.Unlock()
 	return ttnpb.Empty, nil

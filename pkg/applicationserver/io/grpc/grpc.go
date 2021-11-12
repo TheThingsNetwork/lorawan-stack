@@ -155,20 +155,20 @@ func (s *impl) Subscribe(ids *ttnpb.ApplicationIdentifiers, stream ttnpb.AppAs_S
 }
 
 func (s *impl) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
-	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE); err != nil {
+	if err := rights.RequireApplication(ctx, req.EndDeviceIds.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE); err != nil {
 		return nil, err
 	}
-	if err := s.server.DownlinkQueuePush(ctx, req.EndDeviceIdentifiers, req.Downlinks); err != nil {
+	if err := s.server.DownlinkQueuePush(ctx, *req.EndDeviceIds, req.Downlinks); err != nil {
 		return nil, err
 	}
 	return ttnpb.Empty, nil
 }
 
 func (s *impl) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*pbtypes.Empty, error) {
-	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE); err != nil {
+	if err := rights.RequireApplication(ctx, req.EndDeviceIds.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE); err != nil {
 		return nil, err
 	}
-	if err := s.server.DownlinkQueueReplace(ctx, req.EndDeviceIdentifiers, req.Downlinks); err != nil {
+	if err := s.server.DownlinkQueueReplace(ctx, *req.EndDeviceIds, req.Downlinks); err != nil {
 		return nil, err
 	}
 	return ttnpb.Empty, nil

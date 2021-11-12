@@ -156,7 +156,7 @@ func TestProtobufDownstream(t *testing.T) {
 			},
 			{
 				Request: &ttnpb.DownlinkQueueRequest{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationId: "foo-app",
 						},

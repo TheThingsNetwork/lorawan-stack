@@ -1299,11 +1299,11 @@ func (x *DownlinkQueueRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.EndDeviceIds != nil || s.HasField("end_device_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("end_device_ids")
 		// NOTE: EndDeviceIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.EndDeviceIdentifiers)
+		gogo.MarshalMessage(s, x.EndDeviceIds)
 	}
 	if len(x.Downlinks) > 0 || s.HasField("downlinks") {
 		s.WriteMoreIf(&wroteField)
@@ -1333,7 +1333,7 @@ func (x *DownlinkQueueRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 			// NOTE: EndDeviceIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v EndDeviceIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.EndDeviceIdentifiers = v
+			x.EndDeviceIds = &v
 		case "downlinks":
 			s.AddField("downlinks")
 			s.ReadArray(func() {

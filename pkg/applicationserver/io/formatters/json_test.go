@@ -148,7 +148,7 @@ func TestJSONDownstream(t *testing.T) {
 			{
 				Input: []byte(`{"end_device_ids":{"application_ids":{"application_id":"foo-app"},"device_id":"foo-device"},"downlinks":[{"f_port":42,"frm_payload":"AQEB","confirmed":true},{"f_port":42,"frm_payload":"AgIC","confirmed":true}]}}`),
 				Request: &ttnpb.DownlinkQueueRequest{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 							ApplicationId: "foo-app",
 						},

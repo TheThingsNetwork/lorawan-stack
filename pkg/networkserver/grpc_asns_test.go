@@ -88,7 +88,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				return nil, ctx, err
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
@@ -156,7 +156,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				return nil, ctx, err
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
@@ -242,7 +242,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
@@ -337,7 +337,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
@@ -424,7 +424,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
@@ -502,7 +502,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
@@ -580,7 +580,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
@@ -658,7 +658,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
@@ -784,7 +784,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				return nil, ctx, err
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
@@ -852,7 +852,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				return nil, ctx, err
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
@@ -938,7 +938,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
@@ -1029,7 +1029,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				return dev, ctx, nil
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
@@ -1093,7 +1093,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				return nil, ctx, err
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
@@ -1158,7 +1158,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				return nil, ctx, err
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
@@ -1217,7 +1217,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				return nil, ctx, err
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:               "test-dev-id",
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},

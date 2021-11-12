@@ -2348,7 +2348,14 @@ func (m *DownlinkQueueRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "end_device_ids":
 
-			if v, ok := interface{}(&m.EndDeviceIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetEndDeviceIds() == nil {
+				return DownlinkQueueRequestValidationError{
+					field:  "end_device_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetEndDeviceIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return DownlinkQueueRequestValidationError{
 						field:  "end_device_ids",

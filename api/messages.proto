@@ -396,6 +396,6 @@ message MessagePayloadFormatters {
 }
 
 message DownlinkQueueRequest {
-  EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  EndDeviceIdentifiers end_device_ids = 1 [(validate.rules).message.required = true];
   repeated ApplicationDownlink downlinks = 2 [(validate.rules).repeated.max_items = 100000];
 }

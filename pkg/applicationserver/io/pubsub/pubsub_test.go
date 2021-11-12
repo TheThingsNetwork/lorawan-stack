@@ -381,7 +381,7 @@ func TestPubSub(t *testing.T) {
 				Name:  "ValidPush",
 				Topic: conn.Push,
 				Message: &ttnpb.DownlinkQueueRequest{
-					EndDeviceIdentifiers: registeredDeviceID,
+					EndDeviceIds: &registeredDeviceID,
 					Downlinks: []*ttnpb.ApplicationDownlink{
 						{
 							FPort:      42,
@@ -400,7 +400,7 @@ func TestPubSub(t *testing.T) {
 				Name:  "ValidReplace",
 				Topic: conn.Replace,
 				Message: &ttnpb.DownlinkQueueRequest{
-					EndDeviceIdentifiers: registeredDeviceID,
+					EndDeviceIds: &registeredDeviceID,
 					Downlinks: []*ttnpb.ApplicationDownlink{
 						{
 							FPort:      42,
@@ -419,7 +419,7 @@ func TestPubSub(t *testing.T) {
 				Name:  "InvalidPush",
 				Topic: conn.Push,
 				Message: &ttnpb.DownlinkQueueRequest{
-					EndDeviceIdentifiers: unregisteredDeviceID,
+					EndDeviceIds: &unregisteredDeviceID,
 					Downlinks: []*ttnpb.ApplicationDownlink{
 						{
 							FPort:      42,
@@ -438,7 +438,7 @@ func TestPubSub(t *testing.T) {
 				Name:  "InvalidReplace",
 				Topic: conn.Replace,
 				Message: &ttnpb.DownlinkQueueRequest{
-					EndDeviceIdentifiers: unregisteredDeviceID,
+					EndDeviceIds: &unregisteredDeviceID,
 					Downlinks: []*ttnpb.ApplicationDownlink{
 						{
 							FPort:      42,

@@ -519,8 +519,8 @@ func (as *ApplicationServer) attemptDownlinkQueueOp(ctx context.Context, dev *tt
 			return nil, err
 		}
 		_, err = op.Operation(ttnpb.NewAsNsClient(pc), ctx, &ttnpb.DownlinkQueueRequest{
-			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-			Downlinks:            encryptedItems,
+			EndDeviceIds: &dev.EndDeviceIdentifiers,
+			Downlinks:    encryptedItems,
 		}, as.WithClusterAuth())
 		if err == nil {
 			return mask, nil

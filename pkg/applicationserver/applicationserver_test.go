@@ -437,7 +437,7 @@ func TestApplicationServer(t *testing.T) {
 							chs.downErr <- err
 							continue
 						}
-						token := client.Publish(fmt.Sprintf(topicFmt, unique.ID(ctx, req.ApplicationIdentifiers), req.DeviceId), 1, false, buf)
+						token := client.Publish(fmt.Sprintf(topicFmt, unique.ID(ctx, req.EndDeviceIds.ApplicationIdentifiers), req.EndDeviceIds.DeviceId), 1, false, buf)
 						token.Wait()
 						chs.downErr <- token.Error()
 					}
@@ -829,7 +829,7 @@ func TestApplicationServer(t *testing.T) {
 							continue
 						}
 						url := fmt.Sprintf("http://127.0.0.1:8099/api/v3/as/applications/%s/webhooks/%s/devices/%s/down/%s",
-							data.ApplicationId, registeredApplicationWebhookID.WebhookId, data.DeviceId, action,
+							data.EndDeviceIds.ApplicationId, registeredApplicationWebhookID.WebhookId, data.EndDeviceIds.DeviceId, action,
 						)
 						req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(buf))
 						if err != nil {
@@ -1955,8 +1955,8 @@ func TestApplicationServer(t *testing.T) {
 					tcok := t.Run(tc.Name, func(t *testing.T) {
 						if tc.ResetQueue != nil {
 							_, err := ns.DownlinkQueueReplace(ctx, &ttnpb.DownlinkQueueRequest{
-								EndDeviceIdentifiers: tc.IDs,
-								Downlinks:            tc.ResetQueue,
+								EndDeviceIds: &tc.IDs,
+								Downlinks:    tc.ResetQueue,
 							})
 							if err != nil {
 								t.Fatalf("Unexpected error when resetting queue: %v", err)
@@ -2017,7 +2017,7 @@ func TestApplicationServer(t *testing.T) {
 				t.Run("UnregisteredDevice/Push", func(t *testing.T) {
 					a := assertions.New(t)
 					chs.downPush <- &ttnpb.DownlinkQueueRequest{
-						EndDeviceIdentifiers: unregisteredDeviceID,
+						EndDeviceIds: &unregisteredDeviceID,
 						Downlinks: []*ttnpb.ApplicationDownlink{
 							{
 								FPort:      11,
@@ -2070,8 +2070,8 @@ func TestApplicationServer(t *testing.T) {
 						},
 					} {
 						chs.downPush <- &ttnpb.DownlinkQueueRequest{
-							EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-							Downlinks:            items,
+							EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
+							Downlinks:    items,
 						}
 						time.Sleep(Timeout)
 						select {
@@ -2148,7 +2148,7 @@ func TestApplicationServer(t *testing.T) {
 				t.Run("RegisteredDevice/Replace", func(t *testing.T) {
 					a := assertions.New(t)
 					chs.downReplace <- &ttnpb.DownlinkQueueRequest{
-						EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+						EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
 						Downlinks: []*ttnpb.ApplicationDownlink{
 							{
 								FPort:      11,
@@ -2684,8 +2684,8 @@ func TestSkipPayloadCrypto(t *testing.T) {
 						},
 					} {
 						chs.downPush <- &ttnpb.DownlinkQueueRequest{
-							EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-							Downlinks:            items,
+							EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
+							Downlinks:    items,
 						}
 						time.Sleep(Timeout)
 						select {
