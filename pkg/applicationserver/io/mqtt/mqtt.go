@@ -236,8 +236,7 @@ type topicAccess struct {
 	writes [][]string
 }
 
-func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Context, error) {
-	var err error
+func (c *connection) Connect(ctx context.Context, info *auth.Info) (_ context.Context, err error) {
 	ids := ttnpb.ApplicationIdentifiers{
 		ApplicationId: info.Username,
 	}
@@ -270,7 +269,7 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Cont
 		}
 	}()
 
-	if err = rights.RequireApplication(ctx, ids); err != nil {
+	if err := rights.RequireApplication(ctx, ids); err != nil {
 		return nil, err
 	}
 
