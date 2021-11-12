@@ -96,6 +96,8 @@ jobs:
     - name: Install JS dependencies
       run: tools/bin/mage js:deps
       timeout-minutes: 5
+    - name: Build DLLs
+      run: tools/bin/mage js:buildDll
     - name: Build frontend
       run: tools/bin/mage js:clean js:build
     - name: File versioning
