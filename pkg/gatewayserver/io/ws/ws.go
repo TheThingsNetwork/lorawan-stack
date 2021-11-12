@@ -283,12 +283,12 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				if gatewayCanSendPong {
 					missedPongsMu.Lock()
 					missedPongs++
+					missedPongsMu.Unlock()
 					if missedPongs == s.cfg.MissedPongThreshold {
 						logger.WithError(errMissedTooManyPongs).Warn("Disconnect gateway")
-						conn.Disconnect(errMissedTooManyPongs)
+						conn.Disconnect(errMissedTooManyPongs.New())
 						return
 					}
-					missedPongsMu.Unlock()
 				}
 			case <-timeSyncTickerC:
 				b, err := s.formatter.TransferTime(ctx, time.Now(), conn)
