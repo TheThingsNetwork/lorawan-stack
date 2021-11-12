@@ -43,8 +43,9 @@ import (
 )
 
 var (
-	errGatewayID      = errors.DefineInvalidArgument("invalid_gateway_id", "invalid gateway ID `{id}`")
-	errNoAuthProvided = errors.DefineUnauthenticated("no_auth_provided", "no auth provided `{uid}`")
+	errGatewayID          = errors.DefineInvalidArgument("invalid_gateway_id", "invalid gateway ID `{id}`")
+	errNoAuthProvided     = errors.DefineUnauthenticated("no_auth_provided", "no auth provided `{uid}`")
+	errMissedTooManyPongs = errors.Define("missed_too_many_pongs", "gateway missed too many pongs")
 )
 
 type srv struct {
@@ -137,10 +138,16 @@ func (s *srv) handleConnectionInfo(c echo.Context) error {
 var euiHexPattern = regexp.MustCompile("^eui-([a-f0-9A-F]{16})$")
 
 func (s *srv) handleTraffic(c echo.Context) (err error) {
-	id := c.Param("id")
-	auth := c.Request().Header.Get(echo.HeaderAuthorization)
-	ctx := c.Request().Context()
-	eps := s.formatter.Endpoints()
+	var (
+		id                 = c.Param("id")
+		auth               = c.Request().Header.Get(echo.HeaderAuthorization)
+		ctx                = c.Request().Context()
+		eps                = s.formatter.Endpoints()
+		gatewayCanSendPong bool
+		missedPongs        int
+		// Ping-pong is expected to be sychronous. However, it's theoretically possible for a pong to arrive when we're about to send a ping.
+		missedPongsMu sync.RWMutex
+	)
 
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"endpoint", eps.Traffic,
@@ -243,6 +250,10 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 
 	// Not all gateways support pongs to the server's pings.
 	ws.SetPongHandler(func(data string) error {
+		gatewayCanSendPong = true
+		missedPongsMu.Lock()
+		missedPongs = 0
+		missedPongsMu.Unlock()
 		logger.Debug("Received pong from gateway")
 		return nil
 	})
@@ -268,6 +279,16 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					logger.WithError(err).Warn("Failed to send ping message")
 					conn.Disconnect(err)
 					return
+				}
+				if gatewayCanSendPong {
+					missedPongsMu.Lock()
+					missedPongs++
+					if missedPongs == s.cfg.MissedPongThreshold {
+						logger.WithError(errMissedTooManyPongs).Warn("Disconnect gateway")
+						conn.Disconnect(errMissedTooManyPongs)
+						return
+					}
+					missedPongsMu.Unlock()
 				}
 			case <-timeSyncTickerC:
 				b, err := s.formatter.TransferTime(ctx, time.Now(), conn)
