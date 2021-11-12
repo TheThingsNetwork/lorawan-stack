@@ -35,6 +35,8 @@ import (
 var ids = ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}
 
 func timePtr(t time.Time) *time.Time { return &t }
+func uint32Ptr(v uint32) *uint32     { return &v }
+func int32Ptr(v int32) *int32        { return &v }
 
 func TestStatusRaw(t *testing.T) {
 	a := assertions.New(t)
@@ -100,15 +102,17 @@ func TestToGatewayUp(t *testing.T) {
 		Data: &udp.Data{
 			RxPacket: []*udp.RxPacket{
 				{
-					Freq: 868.0,
-					Chan: 2,
-					Modu: "LORA",
-					DatR: datarate.DR{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 125000}}}},
-					CodR: "4/7",
-					Data: "QCkuASaAAAAByFaF53Iu+vzmwQ==",
-					Size: 19,
-					Tmst: 1000,
-					Tmms: &gpsTime,
+					Freq:  868.0,
+					Chan:  2,
+					Modu:  "LORA",
+					DatR:  datarate.DR{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 125000}}}},
+					CodR:  "4/7",
+					Data:  "QCkuASaAAAAByFaF53Iu+vzmwQ==",
+					Size:  19,
+					Tmst:  1000,
+					Tmms:  &gpsTime,
+					FTime: uint32Ptr(12345678),
+					FOff:  int32Ptr(-42),
 				},
 			},
 		},
@@ -129,6 +133,8 @@ func TestToGatewayUp(t *testing.T) {
 	a.So(msg.Settings.Time, should.Resemble, &absoluteTime)
 	a.So(msg.RxMetadata[0].Timestamp, should.Equal, 1000)
 	a.So(msg.RxMetadata[0].Time, should.Resemble, &absoluteTime)
+	a.So(msg.RxMetadata[0].FineTimestamp, should.Equal, 12345678)
+	a.So(msg.RxMetadata[0].FrequencyOffset, should.Equal, -42)
 	a.So(msg.RawPayload, should.Resemble, []byte{0x40, 0x29, 0x2e, 0x01, 0x26, 0x80, 0x00, 0x00, 0x01, 0xc8, 0x56, 0x85, 0xe7, 0x72, 0x2e, 0xfa, 0xfc, 0xe6, 0xc1})
 }
 
@@ -198,14 +204,16 @@ func TestToGatewayUpRoundtrip(t *testing.T) {
 			Data: &udp.Data{
 				RxPacket: []*udp.RxPacket{
 					{
-						Freq: 868.0,
-						Chan: 2,
-						Modu: "LORA",
-						DatR: datarate.DR{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 125000}}}},
-						CodR: "4/7",
-						Data: "QCkuASaAAAAByFaF53Iu+vzmwQ==",
-						Size: 19,
-						Tmst: 1000,
+						Freq:  868.0,
+						Chan:  2,
+						Modu:  "LORA",
+						DatR:  datarate.DR{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 125000}}}},
+						CodR:  "4/7",
+						Data:  "QCkuASaAAAAByFaF53Iu+vzmwQ==",
+						Size:  19,
+						Tmst:  1000,
+						FTime: uint32Ptr(12345678),
+						FOff:  int32Ptr(-42),
 					},
 				},
 			},

@@ -31,24 +31,26 @@ type Data struct {
 
 // RxPacket contains a Rx message
 type RxPacket struct {
-	Time *CompactTime `json:"time,omitempty"` // UTC time of pkt Rx, us precision, ISO 8601 'compact' format
-	Tmms *uint64      `json:"tmms,omitempty"` // GPS time of pkt Rx, number of milliseconds since 06.Jan.1980
-	Tmst uint32       `json:"tmst"`           // Internal timestamp of "Rx finished" event (32b unsigned)
-	Freq float64      `json:"freq"`           // Rx central frequency in MHz (unsigned float, Hz precision)
-	Chan uint8        `json:"chan"`           // Concentrator "IF" channel used for Rx (unsigned integer)
-	RFCh uint8        `json:"rfch"`           // Concentrator "RF chain" used for Rx (unsigned integer)
-	Stat int8         `json:"stat"`           // CRC status: 1 = OK, -1 = fail, 0 = no CRC
-	Modu string       `json:"modu"`           // Modulation identifier "LORA", "FSK" or "LR-FHSS"
-	DatR datarate.DR  `json:"datr"`           // LoRa datarate, FSK datarate or LR-FHSS datarate
-	CodR string       `json:"codr"`           // LoRa or LR-FHSS ECC coding rate identifier
-	Hpw  uint32       `json:"hpw,omitempty"`  // Hopping width; a number describing the number of steps of the LR-FHSS grid
-	RSSI int16        `json:"rssi"`           // RSSI in dBm (signed integer, 1 dB precision)
-	LSNR float64      `json:"lsnr"`           // Lora SNR ratio in dB (signed float, 0.1 dB precision)
-	Size uint16       `json:"size"`           // RF packet payload size in bytes (unsigned integer)
-	Data string       `json:"data"`           // Base64 encoded RF packet payload, padded
-	RSig []RSig       `json:"rsig"`           // Received signal information, per antenna (Optional)
-	Brd  uint         `json:"brd"`            // Concentrator board used for Rx (unsigned integer)
-	Aesk uint         `json:"aesk"`           // AES key index used for encrypting fine timestamps (unsigned integer)
+	Time  *CompactTime `json:"time,omitempty"`  // UTC time of pkt Rx, us precision, ISO 8601 'compact' format
+	Tmms  *uint64      `json:"tmms,omitempty"`  // GPS time of pkt Rx, number of milliseconds since 06.Jan.1980
+	Tmst  uint32       `json:"tmst"`            // Internal timestamp of "Rx finished" event (32b unsigned)
+	FTime *uint32      `json:"ftime,omitempty"` // Fine timestamp, ns precision [0..999999999] (Optional)
+	Freq  float64      `json:"freq"`            // Rx central frequency in MHz (unsigned float, Hz precision)
+	Chan  uint8        `json:"chan"`            // Concentrator "IF" channel used for Rx (unsigned integer)
+	RFCh  uint8        `json:"rfch"`            // Concentrator "RF chain" used for Rx (unsigned integer)
+	Stat  int8         `json:"stat"`            // CRC status: 1 = OK, -1 = fail, 0 = no CRC
+	Modu  string       `json:"modu"`            // Modulation identifier "LORA", "FSK" or "LR-FHSS"
+	DatR  datarate.DR  `json:"datr"`            // LoRa datarate, FSK datarate or LR-FHSS datarate
+	CodR  string       `json:"codr"`            // LoRa or LR-FHSS ECC coding rate identifier
+	Hpw   uint32       `json:"hpw,omitempty"`   // Hopping width; a number describing the number of steps of the LR-FHSS grid
+	RSSI  int16        `json:"rssi"`            // RSSI in dBm (signed integer, 1 dB precision)
+	LSNR  float64      `json:"lsnr"`            // Lora SNR ratio in dB (signed float, 0.1 dB precision)
+	FOff  *int32       `json:"foff,omitempty"`  // Frequency offset in Hz [-125kHz..+125Khz] (Optional)
+	Size  uint16       `json:"size"`            // RF packet payload size in bytes (unsigned integer)
+	Data  string       `json:"data"`            // Base64 encoded RF packet payload, padded
+	RSig  []RSig       `json:"rsig"`            // Received signal information, per antenna (Optional)
+	Brd   uint         `json:"brd"`             // Concentrator board used for Rx (unsigned integer)
+	Aesk  uint         `json:"aesk"`            // AES key index used for encrypting fine timestamps (unsigned integer)
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
