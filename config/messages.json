@@ -4346,6 +4346,15 @@
       "file": "ws.go"
     }
   },
+  "error:pkg/gatewayserver/io/ws:missed_too_many_pongs": {
+    "translations": {
+      "en": "gateway missed too many pongs"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ws",
+      "file": "ws.go"
+    }
+  },
   "error:pkg/gatewayserver/io/ws:no_auth_provided": {
     "translations": {
       "en": "no auth provided `{uid}`"
