@@ -152,3 +152,21 @@ func (m *Application) GetEntityIdentifiers() *EntityIdentifiers {
 	}
 	return m.GetIds().GetEntityIdentifiers()
 }
+
+// EntityType implements IDStringer.
+func (up *ApplicationUp) EntityType() string {
+	ids := up.EndDeviceIds
+	if ids == nil { //EndDeviceIds are validated in the request but this is just to be sure.
+		return ""
+	}
+	return ids.EntityType()
+}
+
+// IDString implements IDStringer.
+func (up *ApplicationUp) IDString() string {
+	ids := up.EndDeviceIds
+	if ids == nil { //EndDeviceIds are validated in the request but this is just to be sure.
+		return ""
+	}
+	return ids.IDString()
+}
