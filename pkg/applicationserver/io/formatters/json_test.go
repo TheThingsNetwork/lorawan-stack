@@ -34,7 +34,7 @@ func TestJSONUpstream(t *testing.T) {
 	}{
 		{
 			Message: &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 						ApplicationId: "foo-app",
 					},
@@ -62,7 +62,7 @@ func TestJSONUpstream(t *testing.T) {
 		},
 		{
 			Message: &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
 						ApplicationId: "foo-app",
 					},

@@ -1058,11 +1058,11 @@ func (x *ApplicationUp) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.EndDeviceIds != nil || s.HasField("end_device_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("end_device_ids")
 		// NOTE: EndDeviceIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.EndDeviceIdentifiers)
+		gogo.MarshalMessage(s, x.EndDeviceIds)
 	}
 	if len(x.CorrelationIds) > 0 || s.HasField("correlation_ids") {
 		s.WriteMoreIf(&wroteField)
@@ -1145,7 +1145,7 @@ func (x *ApplicationUp) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: EndDeviceIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v EndDeviceIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.EndDeviceIdentifiers = v
+			x.EndDeviceIds = &v
 		case "correlation_ids", "correlationIds":
 			s.AddField("correlation_ids")
 			x.CorrelationIds = s.ReadStringArray()

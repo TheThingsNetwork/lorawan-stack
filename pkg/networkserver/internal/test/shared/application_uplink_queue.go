@@ -90,7 +90,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 			case req := <-reqCh:
 				if !test.AllTrue(
 					a.So(req.Context, should.HaveParentContextOrEqual, ctx),
-					a.So(req.ApplicationIdentifiers, should.Resemble, expected[0].ApplicationIdentifiers),
+					a.So(req.ApplicationIdentifiers, should.Resemble, expected[0].EndDeviceIds.ApplicationIdentifiers),
 				) {
 					t.Error("Pop callback assertion failed")
 					return false
@@ -180,7 +180,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 
 	invalidations := [...]*ttnpb.ApplicationUp{
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
 				DeviceId:               "test-dev2",
 			},
@@ -190,7 +190,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 			},
 		},
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
 				DeviceId:               "test-dev2",
 			},
@@ -202,7 +202,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 	}
 	joinAccepts := [...]*ttnpb.ApplicationUp{
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
 				DeviceId:               "test-dev",
 			},
@@ -212,7 +212,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 			},
 		},
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
 				DeviceId:               "test-dev2",
 			},
@@ -224,7 +224,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 	}
 	genericApp1Ups := [...]*ttnpb.ApplicationUp{
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
 				DeviceId:               "test-dev",
 			},
@@ -234,7 +234,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 			},
 		},
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
 				DeviceId:               "test-dev",
 			},
@@ -244,7 +244,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 			},
 		},
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
 				DeviceId:               "test-dev2",
 			},
@@ -254,7 +254,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 			},
 		},
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
 				DeviceId:               "test-dev",
 			},
@@ -264,7 +264,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 			},
 		},
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID1,
 				DeviceId:               "test-dev2",
 			},
@@ -277,7 +277,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 
 	genericApp2Ups := [...]*ttnpb.ApplicationUp{
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID2,
 				DeviceId:               "test-dev2",
 			},
@@ -287,7 +287,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 			},
 		},
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: appID2,
 				DeviceId:               "test-dev",
 			},

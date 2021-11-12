@@ -198,7 +198,7 @@ func TestTraffic(t *testing.T) {
 		a := assertions.New(t)
 
 		up := &ttnpb.ApplicationUp{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: registeredApplicationID,
 				DeviceId:               "foo-device",
 			},
@@ -475,7 +475,7 @@ func TestSimulateUplink(t *testing.T) {
 		{
 			name: "Fetch",
 			up: &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:               registeredDeviceID.DeviceId,
 					ApplicationIdentifiers: registeredApplicationID,
 				},
@@ -494,7 +494,7 @@ func TestSimulateUplink(t *testing.T) {
 		{
 			name: "FetchError",
 			up: &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:               registeredDeviceID.DeviceId,
 					ApplicationIdentifiers: registeredApplicationID,
 				},
@@ -524,9 +524,9 @@ func TestSimulateUplink(t *testing.T) {
 				if err := up.error; err != nil {
 					t.Fatalf("Received unexpected error: %s\n", err)
 				}
-				a.So(f.calledWithIdentifers, should.Resemble, tc.up.EndDeviceIdentifiers)
+				a.So(f.calledWithIdentifers, should.Resemble, tc.up.EndDeviceIds)
 				a.So(f.calledWithPaths, should.Resemble, []string{"ids"})
-				a.So(up.EndDeviceIdentifiers, should.Resemble, tc.expectIdentifiers)
+				a.So(up.EndDeviceIds, should.Resemble, tc.expectIdentifiers)
 			case <-time.After(timeout):
 				t.Fatal("Timed out waiting for simulated uplink")
 			}

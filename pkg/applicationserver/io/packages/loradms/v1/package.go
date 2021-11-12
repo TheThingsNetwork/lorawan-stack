@@ -64,14 +64,14 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 		return errNoAssociation.New()
 	}
 
-	if up.DevEui == nil || up.DevEui.IsZero() {
+	if up.EndDeviceIds.DevEui == nil || up.EndDeviceIds.DevEui.IsZero() {
 		logger.Debug("Package configured for end device with no device EUI")
 		return nil
 	}
 
 	defer func() {
 		if err != nil {
-			registerPackageFail(ctx, up.EndDeviceIdentifiers, err)
+			registerPackageFail(ctx, *up.EndDeviceIds, err)
 		}
 	}()
 
@@ -112,7 +112,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.ApplicationUp, loraUp *objects.LoRaUplink, data *packageData) error {
 	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIds, fmt.Sprintf("as:packages:loraclouddmsv1:%s", events.NewCorrelationID()))...)
 	logger := log.FromContext(ctx)
-	eui := objects.EUI(*up.DevEui)
+	eui := objects.EUI(*up.EndDeviceIds.DevEui)
 
 	httpClient, err := p.server.HTTPClient(ctx)
 	if err != nil {
@@ -135,7 +135,7 @@ func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.Appl
 
 	response, ok := resp[eui]
 	if !ok {
-		return errDeviceEUIMissing.WithAttributes("dev_eui", up.DevEui)
+		return errDeviceEUIMissing.WithAttributes("dev_eui", up.EndDeviceIds.DevEui)
 	}
 	if response.Error != "" {
 		return errUplinkRequestFailed.WithCause(errors.New(response.Error))
@@ -147,15 +147,15 @@ func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.Appl
 		return err
 	}
 
-	if err := p.sendDownlink(ctx, up.EndDeviceIdentifiers, result.Downlink, data); err != nil {
+	if err := p.sendDownlink(ctx, *up.EndDeviceIds, result.Downlink, data); err != nil {
 		return err
 	}
 
-	if err := p.sendServiceData(ctx, up.EndDeviceIdentifiers, resultStruct); err != nil {
+	if err := p.sendServiceData(ctx, *up.EndDeviceIds, resultStruct); err != nil {
 		return err
 	}
 
-	if err := p.sendLocationSolved(ctx, up.EndDeviceIdentifiers, result.Position); err != nil {
+	if err := p.sendLocationSolved(ctx, *up.EndDeviceIds, result.Position); err != nil {
 		return err
 	}
 
@@ -184,9 +184,9 @@ func (p *DeviceManagementPackage) sendDownlink(ctx context.Context, ids ttnpb.En
 
 func (p *DeviceManagementPackage) sendServiceData(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, data *types.Struct) error {
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
-		EndDeviceIdentifiers: ids,
-		CorrelationIds:       events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:           timePtr(time.Now().UTC()),
+		EndDeviceIds:   &ids,
+		CorrelationIds: events.CorrelationIDsFromContext(ctx),
+		ReceivedAt:     timePtr(time.Now().UTC()),
 		Up: &ttnpb.ApplicationUp_ServiceData{
 			ServiceData: &ttnpb.ApplicationServiceData{
 				Data:    data,
@@ -212,9 +212,9 @@ func (p *DeviceManagementPackage) sendLocationSolved(ctx context.Context, ids tt
 		source = ttnpb.SOURCE_WIFI_RSSI_GEOLOCATION
 	}
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
-		EndDeviceIdentifiers: ids,
-		CorrelationIds:       events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:           timePtr(time.Now().UTC()),
+		EndDeviceIds:   &ids,
+		CorrelationIds: events.CorrelationIDsFromContext(ctx),
+		ReceivedAt:     timePtr(time.Now().UTC()),
 		Up: &ttnpb.ApplicationUp_LocationSolved{
 			LocationSolved: &ttnpb.ApplicationLocation{
 				Service: fmt.Sprintf("%v-%s", PackageName, position.Algorithm),

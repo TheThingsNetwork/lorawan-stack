@@ -190,7 +190,7 @@ func TestTraffic(t *testing.T) {
 			{
 				Topic: "#",
 				Message: &ttnpb.ApplicationUp{
-					EndDeviceIdentifiers: registeredDeviceID,
+					EndDeviceIds: &registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
 						UplinkMessage: &ttnpb.ApplicationUplink{FrmPayload: []byte{0x1, 0x1, 0x1}},
 					},
@@ -200,7 +200,7 @@ func TestTraffic(t *testing.T) {
 			{
 				Topic: fmt.Sprintf("v3/%v/devices/%v/up", unique.ID(ctx, registeredDeviceID.ApplicationIdentifiers), registeredDeviceID.DeviceId),
 				Message: &ttnpb.ApplicationUp{
-					EndDeviceIdentifiers: registeredDeviceID,
+					EndDeviceIds: &registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
 						UplinkMessage: &ttnpb.ApplicationUplink{FrmPayload: []byte{0x2, 0x2, 0x2}},
 					},
@@ -210,7 +210,7 @@ func TestTraffic(t *testing.T) {
 			{
 				Topic: fmt.Sprintf("v3/%v/devices/%v/join", unique.ID(ctx, registeredDeviceID.ApplicationIdentifiers), registeredDeviceID.DeviceId),
 				Message: &ttnpb.ApplicationUp{
-					EndDeviceIdentifiers: registeredDeviceID,
+					EndDeviceIds: &registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_JoinAccept{
 						JoinAccept: &ttnpb.ApplicationJoinAccept{SessionKeyId: []byte{0x1, 0x1, 0x1}},
 					},
@@ -220,7 +220,7 @@ func TestTraffic(t *testing.T) {
 			{
 				Topic: fmt.Sprintf("v3/%v/devices/%v/join", unique.ID(ctx, registeredDeviceID.ApplicationIdentifiers), registeredDeviceID.DeviceId),
 				Message: &ttnpb.ApplicationUp{
-					EndDeviceIdentifiers: registeredDeviceID,
+					EndDeviceIds: &registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
 						UplinkMessage: &ttnpb.ApplicationUplink{FrmPayload: []byte{0x3, 0x3, 0x3}},
 					},
@@ -230,7 +230,7 @@ func TestTraffic(t *testing.T) {
 			{
 				Topic: fmt.Sprintf("v3/%v/devices/%v/up", "invalid-application", "invalid-device"),
 				Message: &ttnpb.ApplicationUp{
-					EndDeviceIdentifiers: registeredDeviceID,
+					EndDeviceIds: &registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
 						UplinkMessage: &ttnpb.ApplicationUplink{FrmPayload: []byte{0x4, 0x4, 0x4}},
 					},

@@ -46,9 +46,9 @@ func eui64Ptr(eui types.EUI64) *types.EUI64 {
 	return &eui
 }
 
-func withDevAddr(ids ttnpb.EndDeviceIdentifiers, devAddr types.DevAddr) ttnpb.EndDeviceIdentifiers {
+func withDevAddr(ids ttnpb.EndDeviceIdentifiers, devAddr types.DevAddr) *ttnpb.EndDeviceIdentifiers {
 	ids.DevAddr = &devAddr
-	return ids
+	return &ids
 }
 
 func aes128KeyPtr(key types.AES128Key) *types.AES128Key {

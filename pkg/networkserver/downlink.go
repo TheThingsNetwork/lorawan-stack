@@ -356,8 +356,8 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				} else {
 					logger.Debug("Drop application downlink for unknown session")
 					genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-						CorrelationIds:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIds...),
+						EndDeviceIds:   &dev.EndDeviceIdentifiers,
+						CorrelationIds: append(events.CorrelationIDsFromContext(ctx), down.CorrelationIds...),
 						Up: &ttnpb.ApplicationUp_DownlinkFailed{
 							DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 								Downlink: down,
@@ -370,8 +370,8 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			case down.FCnt <= dev.Session.LastNFCntDown && dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0:
 				logger.WithField("last_f_cnt_down", dev.Session.LastNFCntDown).Debug("Drop application downlink with too low FCnt")
 				genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
-					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-					CorrelationIds:       events.CorrelationIDsFromContext(ctx),
+					EndDeviceIds:   &dev.EndDeviceIdentifiers,
+					CorrelationIds: events.CorrelationIDsFromContext(ctx),
 					Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 						DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 							Downlinks:    dev.Session.QueuedApplicationDownlinks[i:],
@@ -385,8 +385,8 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			case down.Confirmed && dev.Multicast:
 				logger.Debug("Drop confirmed application downlink for multicast device")
 				genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
-					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-					CorrelationIds:       events.CorrelationIDsFromContext(ctx),
+					EndDeviceIds:   &dev.EndDeviceIdentifiers,
+					CorrelationIds: events.CorrelationIDsFromContext(ctx),
 					Up: &ttnpb.ApplicationUp_DownlinkFailed{
 						DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 							Downlink: down,
@@ -399,8 +399,8 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			case down.ClassBC.GetAbsoluteTime() != nil && down.ClassBC.AbsoluteTime.Before(transmitAt):
 				logger.Debug("Drop expired downlink")
 				genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
-					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-					CorrelationIds:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIds...),
+					EndDeviceIds:   &dev.EndDeviceIdentifiers,
+					CorrelationIds: append(events.CorrelationIDsFromContext(ctx), down.CorrelationIds...),
 					Up: &ttnpb.ApplicationUp_DownlinkFailed{
 						DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 							Downlink: down,
@@ -423,8 +423,8 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				} else {
 					logger.Debug("Drop application downlink with payload length exceeding band regulations")
 					genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-						CorrelationIds:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIds...),
+						EndDeviceIds:   &dev.EndDeviceIdentifiers,
+						CorrelationIds: append(events.CorrelationIDsFromContext(ctx), down.CorrelationIds...),
 						Up: &ttnpb.ApplicationUp_DownlinkFailed{
 							DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 								Downlink: down,
@@ -526,8 +526,8 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	}
 	if pld.FPort == 0 && dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 		genState.ifScheduledApplicationUps = append(genState.ifScheduledApplicationUps, &ttnpb.ApplicationUp{
-			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-			CorrelationIds:       events.CorrelationIDsFromContext(ctx),
+			EndDeviceIds:   &dev.EndDeviceIdentifiers,
+			CorrelationIds: events.CorrelationIDsFromContext(ctx),
 			Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 				DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 					Downlinks:    dev.Session.QueuedApplicationDownlinks,
@@ -1503,8 +1503,8 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 					return downlinkAttemptResult{
 						SetPaths: ttnpb.AddFields(sets, "session.queued_application_downlinks"),
 						QueuedApplicationUplinks: append(genState.appendApplicationUplinks(nil, false), &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-							CorrelationIds:       events.CorrelationIDsFromContext(ctx),
+							EndDeviceIds:   &dev.EndDeviceIdentifiers,
+							CorrelationIds: events.CorrelationIDsFromContext(ctx),
 							Up: &ttnpb.ApplicationUp_DownlinkFailed{
 								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 									Downlink: genState.ApplicationDownlink,
@@ -1521,8 +1521,8 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 					return downlinkAttemptResult{
 						SetPaths: ttnpb.AddFields(sets, "session.queued_application_downlinks"),
 						QueuedApplicationUplinks: append(genState.appendApplicationUplinks(nil, false), &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-							CorrelationIds:       events.CorrelationIDsFromContext(ctx),
+							EndDeviceIds:   &dev.EndDeviceIdentifiers,
+							CorrelationIds: events.CorrelationIDsFromContext(ctx),
 							Up: &ttnpb.ApplicationUp_DownlinkFailed{
 								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
 									Downlink: genState.ApplicationDownlink,
@@ -1761,7 +1761,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 						invalidatedQueue = dev.GetPendingSession().GetQueuedApplicationDownlinks()
 					}
 					queuedApplicationUplinks = append(queuedApplicationUplinks, &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 							ApplicationIdentifiers: dev.ApplicationIdentifiers,
 							DeviceId:               dev.DeviceId,
 							DevEui:                 dev.DevEui,

@@ -681,7 +681,7 @@ var (
 			}
 			uplinkMessage := &ttnpb.ApplicationUplink{}
 			up := &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: *devID,
+				EndDeviceIds: devID,
 				Up: &ttnpb.ApplicationUp_UplinkMessage{
 					UplinkMessage: uplinkMessage,
 				},

@@ -305,7 +305,7 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 
 // Publish processes the given upstream message and then publishes it to the application frontends.
 func (as *ApplicationServer) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
-	link, err := as.getLink(ctx, &up.ApplicationIdentifiers, []string{
+	link, err := as.getLink(ctx, &up.EndDeviceIds.ApplicationIdentifiers, []string{
 		"default_formatters",
 		"skip_payload_crypto",
 	})
@@ -316,7 +316,7 @@ func (as *ApplicationServer) Publish(ctx context.Context, up *ttnpb.ApplicationU
 }
 
 func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) error {
-	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, up.EndDeviceIdentifiers))
+	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, up.EndDeviceIds))
 	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIds, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))...)
 	up.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 	registerReceiveUp(ctx, up)
@@ -701,23 +701,23 @@ func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.Application
 	}
 	switch p := up.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
-		return true, as.handleJoinAccept(ctx, up.EndDeviceIdentifiers, p.JoinAccept, link)
+		return true, as.handleJoinAccept(ctx, *up.EndDeviceIds, p.JoinAccept, link)
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		return true, as.handleUplink(ctx, up.EndDeviceIdentifiers, p.UplinkMessage, link)
+		return true, as.handleUplink(ctx, *up.EndDeviceIds, p.UplinkMessage, link)
 	case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
-		return as.handleDownlinkQueueInvalidated(ctx, up.EndDeviceIdentifiers, p.DownlinkQueueInvalidated, link)
+		return as.handleDownlinkQueueInvalidated(ctx, *up.EndDeviceIds, p.DownlinkQueueInvalidated, link)
 	case *ttnpb.ApplicationUp_DownlinkQueued:
-		return true, as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkQueued, link)
+		return true, as.decryptDownlinkMessage(ctx, *up.EndDeviceIds, p.DownlinkQueued, link)
 	case *ttnpb.ApplicationUp_DownlinkSent:
-		return true, as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkSent, link)
+		return true, as.decryptDownlinkMessage(ctx, *up.EndDeviceIds, p.DownlinkSent, link)
 	case *ttnpb.ApplicationUp_DownlinkFailed:
-		return true, as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkFailed.Downlink, link)
+		return true, as.decryptDownlinkMessage(ctx, *up.EndDeviceIds, p.DownlinkFailed.Downlink, link)
 	case *ttnpb.ApplicationUp_DownlinkAck:
-		return true, as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkAck, link)
+		return true, as.decryptDownlinkMessage(ctx, *up.EndDeviceIds, p.DownlinkAck, link)
 	case *ttnpb.ApplicationUp_DownlinkNack:
-		return true, as.handleDownlinkNack(ctx, up.EndDeviceIdentifiers, p.DownlinkNack, link)
+		return true, as.handleDownlinkNack(ctx, *up.EndDeviceIds, p.DownlinkNack, link)
 	case *ttnpb.ApplicationUp_LocationSolved:
-		return true, as.handleLocationSolved(ctx, up.EndDeviceIdentifiers, p.LocationSolved, link)
+		return true, as.handleLocationSolved(ctx, *up.EndDeviceIds, p.LocationSolved, link)
 	case *ttnpb.ApplicationUp_ServiceData:
 		return true, nil
 	default:
@@ -728,7 +728,7 @@ func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.Application
 func (as *ApplicationServer) handleSimulatedUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) error {
 	switch p := up.Up.(type) {
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		return as.handleSimulatedUplink(ctx, up.EndDeviceIdentifiers, p.UplinkMessage, link)
+		return as.handleSimulatedUplink(ctx, *up.EndDeviceIds, p.UplinkMessage, link)
 	default:
 		return nil
 	}
@@ -1009,9 +1009,9 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		}
 		uplink.Locations["frm-payload"] = loc
 		err := as.processUp(ctx, &ttnpb.ApplicationUp{
-			EndDeviceIdentifiers: ids,
-			CorrelationIds:       events.CorrelationIDsFromContext(ctx),
-			ReceivedAt:           &uplink.ReceivedAt,
+			EndDeviceIds:   &ids,
+			CorrelationIds: events.CorrelationIDsFromContext(ctx),
+			ReceivedAt:     &uplink.ReceivedAt,
 			Up: &ttnpb.ApplicationUp_LocationSolved{
 				LocationSolved: &ttnpb.ApplicationLocation{
 					Service:  "frm-payload",

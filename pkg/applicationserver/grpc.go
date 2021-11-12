@@ -130,7 +130,7 @@ func (as *ApplicationServer) HandleUplink(ctx context.Context, req *ttnpb.NsAsHa
 	if err := clusterauth.Authorized(ctx); err != nil {
 		return nil, err
 	}
-	link, err := as.getLink(ctx, &req.ApplicationUps[0].ApplicationIdentifiers, []string{
+	link, err := as.getLink(ctx, &req.ApplicationUps[0].EndDeviceIds.ApplicationIdentifiers, []string{
 		"default_formatters",
 		"skip_payload_crypto",
 	})

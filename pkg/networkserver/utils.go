@@ -410,7 +410,7 @@ func (ns *NetworkServer) enqueueApplicationUplinks(ctx context.Context, ups ...*
 
 		m := make(map[string][]*ttnpb.ApplicationUp)
 		for _, up := range ups {
-			appID := up.ApplicationIdentifiers.ApplicationId
+			appID := up.EndDeviceIds.ApplicationId
 			m[appID] = append(m[appID], up)
 		}
 		for id, ups := range m {

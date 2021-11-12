@@ -210,21 +210,21 @@ func (s *impl) GetMQTTConnectionInfo(ctx context.Context, ids *ttnpb.Application
 var errPayloadCryptoSkipped = errors.DefineFailedPrecondition("payload_crypto_skipped", "payload crypto skipped")
 
 func (s *impl) SimulateUplink(ctx context.Context, up *ttnpb.ApplicationUp) (*pbtypes.Empty, error) {
-	if err := rights.RequireApplication(ctx, up.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_UP_WRITE); err != nil {
+	if err := rights.RequireApplication(ctx, up.EndDeviceIds.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_TRAFFIC_UP_WRITE); err != nil {
 		return nil, err
 	}
-	skip, err := s.skipPayloadCrypto(ctx, up.EndDeviceIdentifiers)
+	skip, err := s.skipPayloadCrypto(ctx, *up.EndDeviceIds)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Debug("Failed to determine if the payload crypto should be skipped")
 	} else if skip {
 		return nil, errPayloadCryptoSkipped.New()
 	}
 	up.Simulated = true
-	dev, err := s.fetcher.Get(ctx, up.EndDeviceIdentifiers, "ids")
+	dev, err := s.fetcher.Get(ctx, *up.EndDeviceIds, "ids")
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Debug("Failed to fetch end device identifiers")
 	} else {
-		up.EndDeviceIdentifiers = dev.EndDeviceIdentifiers
+		up.EndDeviceIds = &dev.EndDeviceIdentifiers
 	}
 	if err := s.server.Publish(ctx, up); err != nil {
 		return nil, err

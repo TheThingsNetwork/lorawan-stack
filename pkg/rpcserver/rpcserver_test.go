@@ -45,7 +45,7 @@ var (
 		EndDeviceIdentifiers: deviceID,
 	}
 	applicationUp = &ttnpb.ApplicationUp{
-		EndDeviceIdentifiers: deviceID,
+		EndDeviceIds: &deviceID,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{
 			UplinkMessage: &ttnpb.ApplicationUplink{
 				SessionKeyId: []byte{0x11},

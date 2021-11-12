@@ -636,7 +636,7 @@ macLoop:
 		if pld.Ack {
 			queuedApplicationUplinks = []*ttnpb.ApplicationUp{
 				{
-					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+					EndDeviceIds: &dev.EndDeviceIdentifiers,
 					Up: &ttnpb.ApplicationUp_DownlinkAck{
 						DownlinkAck: pendingAppDown,
 					},
@@ -646,7 +646,7 @@ macLoop:
 		} else {
 			queuedApplicationUplinks = []*ttnpb.ApplicationUp{
 				{
-					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+					EndDeviceIds: &dev.EndDeviceIdentifiers,
 					Up: &ttnpb.ApplicationUp_DownlinkNack{
 						DownlinkNack: pendingAppDown,
 					},
@@ -953,8 +953,8 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			frmPayload = pld.FrmPayload
 		}
 		queuedApplicationUplinks = append(queuedApplicationUplinks, &ttnpb.ApplicationUp{
-			EndDeviceIdentifiers: stored.EndDeviceIdentifiers,
-			CorrelationIds:       up.CorrelationIds,
+			EndDeviceIds:   &stored.EndDeviceIdentifiers,
+			CorrelationIds: up.CorrelationIds,
 			Up: &ttnpb.ApplicationUp_UplinkMessage{
 				UplinkMessage: &ttnpb.ApplicationUplink{
 					Confirmed:       up.Payload.MType == ttnpb.MType_CONFIRMED_UP,
@@ -1328,7 +1328,7 @@ func (ns *NetworkServer) ReportTxAcknowledgment(ctx context.Context, up *ttnpb.G
 		return ttnpb.Empty, nil
 	}
 	ns.enqueueApplicationUplinks(ctx, &ttnpb.ApplicationUp{
-		EndDeviceIdentifiers: *ids,
+		EndDeviceIds: ids,
 		Up: &ttnpb.ApplicationUp_DownlinkSent{
 			DownlinkSent: &ttnpb.ApplicationDownlink{
 				SessionKeyId:   down.GetSessionKeyId(),

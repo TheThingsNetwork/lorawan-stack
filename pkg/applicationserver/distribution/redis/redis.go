@@ -38,7 +38,7 @@ func (ps PubSub) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
 	if err != nil {
 		return err
 	}
-	uid := unique.ID(ctx, up.ApplicationIdentifiers)
+	uid := unique.ID(ctx, up.EndDeviceIds.ApplicationIdentifiers)
 	if err = ps.Redis.Publish(ctx, ps.uidUplinkKey(uid), msg).Err(); err != nil {
 		return ttnredis.ConvertError(err)
 	}

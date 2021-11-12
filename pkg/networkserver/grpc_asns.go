@@ -71,11 +71,11 @@ func (ns *NetworkServer) sendApplicationUplinks(ctx context.Context, cl ttnpb.Ns
 		switch pld := up.Up.(type) {
 		case *ttnpb.ApplicationUp_UplinkMessage:
 			registerForwardDataUplink(ctx, pld.UplinkMessage)
-			events.Publish(evtForwardDataUplink.NewWithIdentifiersAndData(ctx, &up.EndDeviceIdentifiers, up))
+			events.Publish(evtForwardDataUplink.NewWithIdentifiersAndData(ctx, up.EndDeviceIds, up))
 		case *ttnpb.ApplicationUp_JoinAccept:
-			events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, &up.EndDeviceIdentifiers, &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: up.EndDeviceIdentifiers,
-				CorrelationIds:       up.CorrelationIds,
+			events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, up.EndDeviceIds, &ttnpb.ApplicationUp{
+				EndDeviceIds:   up.EndDeviceIds,
+				CorrelationIds: up.CorrelationIds,
 				Up: &ttnpb.ApplicationUp_JoinAccept{
 					JoinAccept: applicationJoinAcceptWithoutAppSKey(pld.JoinAccept),
 				},
