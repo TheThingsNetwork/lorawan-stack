@@ -7982,15 +7982,6 @@
       "file": "toa.go"
     }
   },
-  "error:pkg/ttnpb/udp:bandwidth": {
-    "translations": {
-      "en": "failed to parse bandwidth"
-    },
-    "description": {
-      "package": "pkg/ttnpb/udp",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/ttnpb/udp:eui": {
     "translations": {
       "en": "failed to parse EUI"
@@ -8039,15 +8030,6 @@
   "error:pkg/ttnpb/udp:payload": {
     "translations": {
       "en": "failed to parse binary payload"
-    },
-    "description": {
-      "package": "pkg/ttnpb/udp",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/ttnpb/udp:spreading_factor": {
-    "translations": {
-      "en": "failed to parse spreading factor"
     },
     "description": {
       "package": "pkg/ttnpb/udp",
