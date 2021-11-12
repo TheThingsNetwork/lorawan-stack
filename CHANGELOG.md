@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.16.0] - 2021-11-12
+
+### Added
+
 - `ttn_lw_as_subscription_sets_publish_success_total` and `ttn_lw_as_subscription_sets_publish_failed_total` metrics to track the number of subscription set publish attempts.
 - Application Server advanced distribution settings:
   - `as.distribution.global.individual.subscription-blocks` controls if the Application Server should block while publishing traffic to individual global subscribers (such as MQTT clients).
@@ -33,8 +47,6 @@ For details about compatibility between different releases, see the **Commitment
   - This requires an Application Server database migration (`ttn-lw-stack as-db migrate`) to clear the `started_at` field in existing (pending) sessions.
 - Console changing to server-side event filtering (used to be client-side).
 
-### Deprecated
-
 ### Removed
 
 - The `ttn_lw_gs_status_failed_total`, `ttn_lw_gs_uplink_failed_total` metrics. `ttn_lw_gs_status_dropped_total` and `ttn_lw_gs_uplink_dropped_total` should be used instead, as they contain the failure cause.
@@ -51,8 +63,6 @@ For details about compatibility between different releases, see the **Commitment
 - Receiver metadata from more than one antenna is now available in messages received from Packet Broker.
 - Unhelpful error message when aborting the OIDC Login in the Console.
 - Parsing of multi-word description search queries.
-
-### Security
 
 ## [3.15.3] - 2021-10-26
 
@@ -1873,7 +1883,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.3...v3.15
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.0...v3.16
+[3.16.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.3...v3.16.0
 [3.15.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.2...v3.15.3
 [3.15.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.1...v3.15.2
 [3.15.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.0...v3.15.1
