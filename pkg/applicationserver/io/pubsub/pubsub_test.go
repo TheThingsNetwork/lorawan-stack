@@ -281,13 +281,13 @@ func TestPubSub(t *testing.T) {
 					EndDeviceIdentifiers: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_DownlinkFailed{
 						DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-							ApplicationDownlink: ttnpb.ApplicationDownlink{
+							Downlink: &ttnpb.ApplicationDownlink{
 								SessionKeyId: []byte{0x22},
 								FCnt:         42,
 								FPort:        42,
 								FrmPayload:   []byte{0x1, 0x2, 0x3},
 							},
-							Error: ttnpb.ErrorDetails{
+							Error: &ttnpb.ErrorDetails{
 								Name: "test",
 							},
 						},

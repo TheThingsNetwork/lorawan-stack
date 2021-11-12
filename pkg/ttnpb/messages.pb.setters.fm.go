@@ -940,28 +940,43 @@ func (dst *ApplicationDownlinkFailed) SetFields(src *ApplicationDownlinkFailed, 
 		case "downlink":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationDownlink
-				if src != nil {
-					newSrc = &src.ApplicationDownlink
+				if (src == nil || src.Downlink == nil) && dst.Downlink == nil {
+					continue
 				}
-				newDst = &dst.ApplicationDownlink
+				if src != nil {
+					newSrc = src.Downlink
+				}
+				if dst.Downlink != nil {
+					newDst = dst.Downlink
+				} else {
+					newDst = &ApplicationDownlink{}
+					dst.Downlink = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationDownlink = src.ApplicationDownlink
+					dst.Downlink = src.Downlink
 				} else {
-					var zero ApplicationDownlink
-					dst.ApplicationDownlink = zero
+					dst.Downlink = nil
 				}
 			}
 		case "error":
 			if len(subs) > 0 {
 				var newDst, newSrc *ErrorDetails
-				if src != nil {
-					newSrc = &src.Error
+				if (src == nil || src.Error == nil) && dst.Error == nil {
+					continue
 				}
-				newDst = &dst.Error
+				if src != nil {
+					newSrc = src.Error
+				}
+				if dst.Error != nil {
+					newDst = dst.Error
+				} else {
+					newDst = &ErrorDetails{}
+					dst.Error = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -969,8 +984,7 @@ func (dst *ApplicationDownlinkFailed) SetFields(src *ApplicationDownlinkFailed, 
 				if src != nil {
 					dst.Error = src.Error
 				} else {
-					var zero ErrorDetails
-					dst.Error = zero
+					dst.Error = nil
 				}
 			}
 

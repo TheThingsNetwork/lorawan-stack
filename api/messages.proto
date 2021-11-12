@@ -317,8 +317,8 @@ message ApplicationDownlinks {
 }
 
 message ApplicationDownlinkFailed {
-  ApplicationDownlink downlink = 1  [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  ErrorDetails error = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ApplicationDownlink downlink = 1 [(validate.rules).message.required = true];
+  ErrorDetails error = 2 [(validate.rules).message.required = true];
 }
 
 message ApplicationInvalidatedDownlinks {

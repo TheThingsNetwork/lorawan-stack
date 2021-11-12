@@ -360,8 +360,8 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 						CorrelationIds:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIds...),
 						Up: &ttnpb.ApplicationUp_DownlinkFailed{
 							DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-								ApplicationDownlink: *down,
-								Error:               *ttnpb.ErrorDetailsToProto(errUnknownSession),
+								Downlink: down,
+								Error:    ttnpb.ErrorDetailsToProto(errUnknownSession),
 							},
 						},
 					})
@@ -389,8 +389,8 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 					CorrelationIds:       events.CorrelationIDsFromContext(ctx),
 					Up: &ttnpb.ApplicationUp_DownlinkFailed{
 						DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-							ApplicationDownlink: *down,
-							Error:               *ttnpb.ErrorDetailsToProto(errConfirmedMulticastDownlink),
+							Downlink: down,
+							Error:    ttnpb.ErrorDetailsToProto(errConfirmedMulticastDownlink),
 						},
 					},
 				})
@@ -403,8 +403,8 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 					CorrelationIds:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIds...),
 					Up: &ttnpb.ApplicationUp_DownlinkFailed{
 						DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-							ApplicationDownlink: *down,
-							Error:               *ttnpb.ErrorDetailsToProto(errExpiredDownlink),
+							Downlink: down,
+							Error:    ttnpb.ErrorDetailsToProto(errExpiredDownlink),
 						},
 					},
 				})
@@ -427,8 +427,8 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 						CorrelationIds:       append(events.CorrelationIDsFromContext(ctx), down.CorrelationIds...),
 						Up: &ttnpb.ApplicationUp_DownlinkFailed{
 							DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-								ApplicationDownlink: *down,
-								Error:               *ttnpb.ErrorDetailsToProto(errApplicationDownlinkTooLong.WithAttributes("length", len(down.FrmPayload), "max", maxDownLen)),
+								Downlink: down,
+								Error:    ttnpb.ErrorDetailsToProto(errApplicationDownlinkTooLong.WithAttributes("length", len(down.FrmPayload), "max", maxDownLen)),
 							},
 						},
 					})
@@ -1507,8 +1507,8 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 							CorrelationIds:       events.CorrelationIDsFromContext(ctx),
 							Up: &ttnpb.ApplicationUp_DownlinkFailed{
 								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-									ApplicationDownlink: *genState.ApplicationDownlink,
-									Error:               *ttnpb.ErrorDetailsToProto(errInvalidAbsoluteTime),
+									Downlink: genState.ApplicationDownlink,
+									Error:    ttnpb.ErrorDetailsToProto(errInvalidAbsoluteTime),
 								},
 							},
 						}),
@@ -1525,8 +1525,8 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 							CorrelationIds:       events.CorrelationIDsFromContext(ctx),
 							Up: &ttnpb.ApplicationUp_DownlinkFailed{
 								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-									ApplicationDownlink: *genState.ApplicationDownlink,
-									Error:               *ttnpb.ErrorDetailsToProto(errInvalidFixedPaths),
+									Downlink: genState.ApplicationDownlink,
+									Error:    ttnpb.ErrorDetailsToProto(errInvalidFixedPaths),
 								},
 							},
 						}),

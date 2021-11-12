@@ -716,8 +716,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						CorrelationIds:       append(LastUplink(dev.MacState.RecentUplinks...).CorrelationIds, dev.Session.QueuedApplicationDownlinks[0].CorrelationIds...),
 						Up: &ttnpb.ApplicationUp_DownlinkFailed{
 							DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-								ApplicationDownlink: *dev.Session.QueuedApplicationDownlinks[0],
-								Error:               *ttnpb.ErrorDetailsToProto(ErrApplicationDownlinkTooLong.WithAttributes("length", 250, "max", uint16(51))),
+								Downlink: dev.Session.QueuedApplicationDownlinks[0],
+								Error:    ttnpb.ErrorDetailsToProto(ErrApplicationDownlinkTooLong.WithAttributes("length", 250, "max", uint16(51))),
 							},
 						},
 					})
@@ -2086,8 +2086,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 						CorrelationIds:       dev.Session.QueuedApplicationDownlinks[0].CorrelationIds,
 						Up: &ttnpb.ApplicationUp_DownlinkFailed{
 							DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-								ApplicationDownlink: *dev.Session.QueuedApplicationDownlinks[0],
-								Error:               *ttnpb.ErrorDetailsToProto(ErrInvalidAbsoluteTime),
+								Downlink: dev.Session.QueuedApplicationDownlinks[0],
+								Error:    ttnpb.ErrorDetailsToProto(ErrInvalidAbsoluteTime),
 							},
 						},
 					})

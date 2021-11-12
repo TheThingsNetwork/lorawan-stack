@@ -1340,13 +1340,13 @@ func TestApplicationServer(t *testing.T) {
 							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 							Up: &ttnpb.ApplicationUp_DownlinkFailed{
 								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-									ApplicationDownlink: ttnpb.ApplicationDownlink{
+									Downlink: &ttnpb.ApplicationDownlink{
 										SessionKeyId: []byte{0x33},
 										FPort:        42,
 										FCnt:         42,
 										FrmPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
 									},
-									Error: ttnpb.ErrorDetails{
+									Error: &ttnpb.ErrorDetails{
 										Name: "test",
 									},
 								},
@@ -1358,7 +1358,7 @@ func TestApplicationServer(t *testing.T) {
 								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 								Up: &ttnpb.ApplicationUp_DownlinkFailed{
 									DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-										ApplicationDownlink: ttnpb.ApplicationDownlink{
+										Downlink: &ttnpb.ApplicationDownlink{
 											SessionKeyId: []byte{0x33},
 											FPort:        42,
 											FCnt:         42,
@@ -1373,7 +1373,7 @@ func TestApplicationServer(t *testing.T) {
 												},
 											},
 										},
-										Error: ttnpb.ErrorDetails{
+										Error: &ttnpb.ErrorDetails{
 											Name: "test",
 										},
 									},

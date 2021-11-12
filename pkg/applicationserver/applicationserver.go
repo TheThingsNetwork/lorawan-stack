@@ -711,7 +711,7 @@ func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.Application
 	case *ttnpb.ApplicationUp_DownlinkSent:
 		return true, as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkSent, link)
 	case *ttnpb.ApplicationUp_DownlinkFailed:
-		return true, as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, &p.DownlinkFailed.ApplicationDownlink, link)
+		return true, as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkFailed.Downlink, link)
 	case *ttnpb.ApplicationUp_DownlinkAck:
 		return true, as.decryptDownlinkMessage(ctx, up.EndDeviceIdentifiers, p.DownlinkAck, link)
 	case *ttnpb.ApplicationUp_DownlinkNack:

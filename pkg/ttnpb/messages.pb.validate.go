@@ -1487,7 +1487,14 @@ func (m *ApplicationDownlinkFailed) ValidateFields(paths ...string) error {
 		switch name {
 		case "downlink":
 
-			if v, ok := interface{}(&m.ApplicationDownlink).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetDownlink() == nil {
+				return ApplicationDownlinkFailedValidationError{
+					field:  "downlink",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetDownlink()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationDownlinkFailedValidationError{
 						field:  "downlink",
@@ -1499,7 +1506,14 @@ func (m *ApplicationDownlinkFailed) ValidateFields(paths ...string) error {
 
 		case "error":
 
-			if v, ok := interface{}(&m.Error).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetError() == nil {
+				return ApplicationDownlinkFailedValidationError{
+					field:  "error",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetError()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationDownlinkFailedValidationError{
 						field:  "error",

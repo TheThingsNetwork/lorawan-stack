@@ -324,8 +324,8 @@ func (as *ApplicationServer) registerDropDownlinks(ctx context.Context, ids ttnp
 			CorrelationIds:       item.CorrelationIds,
 			Up: &ttnpb.ApplicationUp_DownlinkFailed{
 				DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-					ApplicationDownlink: *item,
-					Error:               errorDetails,
+					Downlink: item,
+					Error:    &errorDetails,
 				},
 			},
 		}); err != nil {

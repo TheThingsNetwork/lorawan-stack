@@ -947,16 +947,16 @@ func (x *ApplicationDownlinkFailed) MarshalProtoJSON(s *jsonplugin.MarshalState)
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Downlink != nil || s.HasField("downlink") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("downlink")
-		x.ApplicationDownlink.MarshalProtoJSON(s.WithField("downlink"))
+		x.Downlink.MarshalProtoJSON(s.WithField("downlink"))
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.Error != nil || s.HasField("error") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("error")
 		// NOTE: ErrorDetails does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.Error)
+		gogo.MarshalMessage(s, x.Error)
 	}
 	s.WriteObjectEnd()
 }
@@ -972,14 +972,15 @@ func (x *ApplicationDownlinkFailed) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSt
 			s.ReadAny() // ignore unknown field
 		case "downlink":
 			if !s.ReadNil() {
-				x.ApplicationDownlink.UnmarshalProtoJSON(s.WithField("downlink", true))
+				x.Downlink = &ApplicationDownlink{}
+				x.Downlink.UnmarshalProtoJSON(s.WithField("downlink", true))
 			}
 		case "error":
 			s.AddField("error")
 			// NOTE: ErrorDetails does not seem to implement UnmarshalProtoJSON.
 			var v ErrorDetails
 			gogo.UnmarshalMessage(s, &v)
-			x.Error = v
+			x.Error = &v
 		}
 	})
 }
