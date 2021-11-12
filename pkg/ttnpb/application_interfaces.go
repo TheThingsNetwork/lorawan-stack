@@ -156,7 +156,7 @@ func (m *Application) GetEntityIdentifiers() *EntityIdentifiers {
 // EntityType implements IDStringer.
 func (up *ApplicationUp) EntityType() string {
 	ids := up.EndDeviceIds
-	if ids == nil { //EndDeviceIds are validated in the request but this is just to be sure.
+	if ids == nil {
 		return ""
 	}
 	return ids.EntityType()
@@ -165,7 +165,25 @@ func (up *ApplicationUp) EntityType() string {
 // IDString implements IDStringer.
 func (up *ApplicationUp) IDString() string {
 	ids := up.EndDeviceIds
-	if ids == nil { //EndDeviceIds are validated in the request but this is just to be sure.
+	if ids == nil {
+		return ""
+	}
+	return ids.IDString()
+}
+
+// EntityType implements IDStringer.
+func (req *DownlinkQueueRequest) EntityType() string {
+	ids := req.EndDeviceIds
+	if ids == nil {
+		return ""
+	}
+	return ids.EntityType()
+}
+
+// IDString implements IDStringer.
+func (req *DownlinkQueueRequest) IDString() string {
+	ids := req.EndDeviceIds
+	if ids == nil {
 		return ""
 	}
 	return ids.IDString()
