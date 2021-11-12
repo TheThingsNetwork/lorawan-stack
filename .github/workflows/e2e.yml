@@ -20,7 +20,7 @@ on:
 jobs:
   determine-if-required:
     name: Determine if run is required
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     outputs:
       needs-to-run: ${{ steps.check-result.outputs.passed != 'true' }}
       hash: ${{ steps.get-hash.outputs.hash }}
@@ -51,7 +51,7 @@ jobs:
         run: echo "::set-output name=dir::$(npx yarn cache dir)"
   preparation:
     name: Run preparations
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     needs: determine-if-required
     if: needs.determine-if-required.outputs.needs-to-run == 'true'
     env:
@@ -163,7 +163,7 @@ jobs:
           path: build.zip
   end-to-end:
     name: Main frontend end-to-end tests (Chrome)
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     env:
       TTN_LW_LOG_LEVEL: debug
       CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
@@ -221,7 +221,7 @@ jobs:
           path: cypress/screenshots
   cross-browser-smoke:
     name: Cross-browser smoke tests (Firefox 78 ESR)
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     env:
       TTN_LW_LOG_LEVEL: debug
       COCKROACHDB_COCKROACH_TAG: v19.2.12
@@ -283,7 +283,7 @@ jobs:
           path: cypress/screenshots
   cache-result:
     name: Write result cache
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     needs: [preparation, end-to-end, cross-browser-smoke, determine-if-required]
     steps:
       - name: Setup result cache to skip redundant runs
