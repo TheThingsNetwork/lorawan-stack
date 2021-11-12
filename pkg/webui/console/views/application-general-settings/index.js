@@ -51,6 +51,7 @@ import {
   mayViewOrEditApplicationApiKeys,
   mayViewOrEditApplicationCollaborators,
   mayPurgeEntities,
+  mayViewApplicationLink,
 } from '@console/lib/feature-checks'
 import {
   attributeValidCheck,
@@ -60,7 +61,7 @@ import {
 } from '@console/lib/attributes'
 
 import { updateApplication, deleteApplication } from '@console/store/actions/applications'
-import { updateApplicationLink } from '@console/store/actions/link'
+import { updateApplicationLink, getApplicationLink } from '@console/store/actions/link'
 import { getCollaboratorsList } from '@console/store/actions/collaborators'
 import { getApiKeysList } from '@console/store/actions/api-keys'
 import { getPubsubsList } from '@console/store/actions/pubsubs'
@@ -87,6 +88,7 @@ import {
   selectApiKeysError,
 } from '@console/store/selectors/api-keys'
 import {
+  selectApplicationLink,
   selectSelectedApplication,
   selectSelectedApplicationId,
 } from '@console/store/selectors/applications'
@@ -136,11 +138,13 @@ const validationSchema = Yup.object().shape({
     const mayViewApiKeys = checkFromState(mayViewOrEditApplicationApiKeys, state)
     const mayViewCollaborators = checkFromState(mayViewOrEditApplicationCollaborators, state)
     const apiKeysCount = selectApiKeysTotalCount(state)
+    const applicationLink = selectApplicationLink(state)
     const collaboratorsCount = selectCollaboratorsTotalCount(state)
     const webhooksCount = selectWebhooksTotalCount(state)
     const pubsubsCount = selectPubsubsTotalCount(state)
     const mayPurgeApp = checkFromState(mayPurgeEntities, state)
     const mayDeleteApp = checkFromState(mayDeleteApplication, state)
+    const mayViewLink = checkFromState(mayViewApplicationLink, state)
 
     const entitiesFetching =
       selectApiKeysFetching(state) ||
@@ -169,11 +173,13 @@ const validationSchema = Yup.object().shape({
       application: selectSelectedApplication(state),
       mayViewApiKeys,
       mayViewCollaborators,
+      mayViewLink,
       fetching,
       mayPurge: mayPurgeApp,
       shouldConfirmDelete:
         !isPristine || !mayViewCollaborators || !mayViewApiKeys || Boolean(error),
       mayDeleteApplication: mayDeleteApp,
+      link: applicationLink,
     }
   },
   dispatch => ({
@@ -186,9 +192,11 @@ const validationSchema = Yup.object().shape({
         getCollaboratorsList,
         getWebhooksList,
         getPubsubsList,
+        getApplicationLink,
       },
       dispatch,
     ),
+    getLink: (id, selector) => dispatch(getApplicationLink(id, selector)),
     onDeleteSuccess: () => dispatch(replace(`/applications`)),
   }),
   (stateProps, dispatchProps, ownProps) => ({
@@ -200,6 +208,10 @@ const validationSchema = Yup.object().shape({
       if (stateProps.mayDeleteApplication) {
         if (stateProps.mayViewApiKeys) {
           dispatchProps.getApiKeysList('application', stateProps.appId)
+        }
+
+        if (stateProps.mayViewLink) {
+          dispatchProps.getApplicationLink(stateProps.appId, 'skip_payload_crypto')
         }
 
         if (stateProps.mayViewCollaborators) {
@@ -231,12 +243,18 @@ export default class ApplicationGeneralSettings extends React.Component {
     appId: PropTypes.string.isRequired,
     application: PropTypes.application.isRequired,
     deleteApplication: PropTypes.func.isRequired,
+    link: PropTypes.shape({ skip_payload_crypto: PropTypes.bool }),
     match: PropTypes.match.isRequired,
     mayPurge: PropTypes.bool.isRequired,
+    mayViewLink: PropTypes.bool.isRequired,
     onDeleteSuccess: PropTypes.func.isRequired,
     shouldConfirmDelete: PropTypes.bool.isRequired,
     updateApplication: PropTypes.func.isRequired,
     updateApplicationLink: PropTypes.func.isRequired,
+  }
+
+  static defaultProps = {
+    link: {},
   }
 
   state = {
@@ -245,7 +263,7 @@ export default class ApplicationGeneralSettings extends React.Component {
 
   @bind
   async handleSubmit(values, { resetForm, setSubmitting }) {
-    const { application, updateApplication } = this.props
+    const { application, updateApplication, updateApplicationLink } = this.props
 
     await this.setState({ error: '' })
 
@@ -259,7 +277,13 @@ export default class ApplicationGeneralSettings extends React.Component {
     // If there is a change in attributes, copy all attributes so they don't get
     // overwritten.
     const update =
-      'attributes' in changed ? { ...changed, attributes: appValues.attributes } : changed
+      'attributes' in changed
+        ? {
+            ...changed,
+            attributes: appValues.attributes,
+            skip_payload_crypto: appValues.skip_payload_crypto,
+          }
+        : changed
 
     const {
       ids: { application_id },
@@ -296,9 +320,9 @@ export default class ApplicationGeneralSettings extends React.Component {
   }
 
   render() {
-    const { appId, application, shouldConfirmDelete, mayPurge } = this.props
+    const { appId, application, shouldConfirmDelete, mayPurge, link, mayViewLink } = this.props
     const { error } = this.state
-    const initialValues = mapApplicationToFormValues(application)
+    const initialValues = mapApplicationToFormValues({ ...application, ...link })
 
     return (
       <Container>
@@ -334,13 +358,15 @@ export default class ApplicationGeneralSettings extends React.Component {
                 component={KeyValueMap}
                 description={sharedMessages.attributeDescription}
               />
-              <Form.Field
-                autoFocus
-                title={sharedMessages.skipCryptoTitle}
-                name="skip_payload_crypto"
-                description={sharedMessages.skipCryptoDescription}
-                component={Checkbox}
-              />
+              {mayViewLink && (
+                <Form.Field
+                  autoFocus
+                  title={sharedMessages.skipCryptoTitle}
+                  name="skip_payload_crypto"
+                  description={sharedMessages.skipCryptoDescription}
+                  component={Checkbox}
+                />
+              )}
               <SubmitBar>
                 <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
                 <Require featureCheck={mayDeleteApplication}>

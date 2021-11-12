@@ -71,6 +71,14 @@ describe('End device messaging', () => {
 
     it('succeeds sending uplink message', () => {
       cy.visit(
+        `${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`,
+      )
+
+      cy.findByRole('checkbox').uncheck()
+
+      cy.findByRole('button', { name: 'Save changes' }).click()
+
+      cy.visit(
         `${Cypress.config(
           'consoleRootPath',
         )}/applications/${applicationId}/devices/${endDeviceId}/messaging/uplink`,
@@ -116,6 +124,107 @@ describe('End device messaging', () => {
 
       cy.findByRole('button', { name: 'Simulate uplink' }).should('be.disabled')
     })
+
+    it('combination skip payload crypto enabled on application level and default on device level', () => {
+      cy.visit(
+        `${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`,
+      )
+
+      cy.findByRole('checkbox').check()
+
+      cy.findByRole('button', { name: 'Save changes' }).click()
+
+      cy.visit(
+        `${Cypress.config(
+          'consoleRootPath',
+        )}/applications/${applicationId}/devices/${endDeviceId}/messaging/uplink`,
+      )
+
+      const response = {
+        skip_payload_crypto_override: null,
+        session: {},
+      }
+
+      cy.intercept(
+        'GET',
+        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
+        response,
+      )
+
+      cy.findByTestId('notification')
+        .should('be.visible')
+        .findByText(`Simulation is disabled for devices that skip payload crypto`)
+        .should('be.visible')
+
+      cy.findByLabelText('FPort').should('be.disabled')
+      cy.findByLabelText('Payload').should('be.disabled')
+
+      cy.findByRole('button', { name: 'Simulate uplink' }).should('be.disabled')
+    })
+
+    it('combination skip payload crypto disabled on application level and default on device level', () => {
+      cy.visit(
+        `${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`,
+      )
+
+      cy.findByRole('checkbox').uncheck()
+
+      cy.findByRole('button', { name: 'Save changes' }).click()
+
+      cy.visit(
+        `${Cypress.config(
+          'consoleRootPath',
+        )}/applications/${applicationId}/devices/${endDeviceId}/messaging/uplink`,
+      )
+
+      const response = {
+        skip_payload_crypto_override: null,
+        session: {},
+      }
+
+      cy.intercept(
+        'GET',
+        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
+        response,
+      )
+
+      cy.findByLabelText('FPort').should('be.enabled')
+      cy.findByLabelText('Payload').should('be.enabled')
+
+      cy.findByRole('button', { name: 'Simulate uplink' }).should('be.enabled')
+    })
+
+    it('combination skip payload crypto enabled on application level and disabled on device level', () => {
+      cy.visit(
+        `${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`,
+      )
+
+      cy.findByRole('checkbox').check()
+
+      cy.findByRole('button', { name: 'Save changes' }).click()
+
+      cy.visit(
+        `${Cypress.config(
+          'consoleRootPath',
+        )}/applications/${applicationId}/devices/${endDeviceId}/messaging/uplink`,
+      )
+
+      const response = {
+        skip_payload_crypto_override: false,
+        session: {},
+      }
+
+      cy.intercept(
+        'GET',
+        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
+        response,
+      )
+
+      cy.findByLabelText('FPort').should('be.enabled')
+      cy.findByLabelText('Payload').should('be.enabled')
+
+      cy.findByRole('button', { name: 'Simulate uplink' }).should('be.enabled')
+    })
   })
 
   describe('Downlink', () => {
@@ -124,6 +233,14 @@ describe('End device messaging', () => {
     })
 
     it('fails sending downlink message without valid session', () => {
+      cy.visit(
+        `${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`,
+      )
+
+      cy.findByRole('checkbox').uncheck()
+
+      cy.findByRole('button', { name: 'Save changes' }).click()
+
       cy.visit(
         `${Cypress.config(
           'consoleRootPath',

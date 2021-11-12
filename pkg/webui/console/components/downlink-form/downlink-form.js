@@ -88,7 +88,7 @@ const DownlinkForm = ({ appId, devId, device, downlinkQueue, skipPayloadCrypto }
   }
 
   const validSession = device.session || device.pending_session
-  const payloadCryptoSkipped = device.skip_payload_crypto_override || skipPayloadCrypto
+  const payloadCryptoSkipped = device.skip_payload_crypto_override ?? skipPayloadCrypto
   const deviceSimulationDisabled = !validSession || payloadCryptoSkipped
 
   return (
