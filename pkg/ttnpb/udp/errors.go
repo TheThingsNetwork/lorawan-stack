@@ -19,12 +19,10 @@ import (
 )
 
 var (
-	errNoEUI           = errors.DefineInvalidArgument("no_eui", "packet is not long enough to contain the EUI")
-	errPayload         = errors.DefineInvalidArgument("payload", "failed to parse binary payload")
-	errBandwidth       = errors.DefineInvalidArgument("bandwidth", "failed to parse bandwidth")
-	errSpreadingFactor = errors.DefineInvalidArgument("spreading_factor", "failed to parse spreading factor")
-	errEUI             = errors.DefineInvalidArgument("eui", "failed to parse EUI")
-	errTimestamp       = errors.DefineInvalidArgument("timestamp", "failed to parse timestamp")
-	errModulation      = errors.DefineInvalidArgument("modulation", "invalid modulation `{modulation}`")
-	errNotScheduled    = errors.DefineInvalidArgument("not_scheduled", "downlink message not scheduled")
+	errNoEUI        = errors.DefineInvalidArgument("no_eui", "packet is not long enough to contain the EUI")
+	errPayload      = errors.DefineInvalidArgument("payload", "failed to parse binary payload")
+	errEUI          = errors.DefineInvalidArgument("eui", "failed to parse EUI")
+	errTimestamp    = errors.DefineInvalidArgument("timestamp", "failed to parse timestamp")
+	errModulation   = errors.DefineInvalidArgument("modulation", "invalid modulation `{modulation}`")
+	errNotScheduled = errors.DefineInvalidArgument("not_scheduled", "downlink message not scheduled")
 )

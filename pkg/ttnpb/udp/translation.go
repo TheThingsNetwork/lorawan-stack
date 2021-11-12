@@ -116,22 +116,27 @@ var (
 	}
 )
 
-func metadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMetadata {
-	return []*ttnpb.RxMetadata{
-		{
-			GatewayIds:   &gatewayID,
-			AntennaIndex: 0,
-			ChannelIndex: uint32(rx.Chan),
-			Timestamp:    rx.Tmst,
-			Rssi:         float32(rx.RSSI),
-			ChannelRssi:  float32(rx.RSSI),
-			Snr:          float32(rx.LSNR),
-			HoppingWidth: rx.Hpw,
-		},
+func v1Metadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMetadata {
+	md := &ttnpb.RxMetadata{
+		GatewayIds:   &gatewayID,
+		AntennaIndex: 0,
+		ChannelIndex: uint32(rx.Chan),
+		Timestamp:    rx.Tmst,
+		Rssi:         float32(rx.RSSI),
+		ChannelRssi:  float32(rx.RSSI),
+		Snr:          float32(rx.LSNR),
+		HoppingWidth: rx.Hpw,
 	}
+	if rx.FTime != nil {
+		md.FineTimestamp = uint64(*rx.FTime)
+	}
+	if rx.FOff != nil {
+		md.FrequencyOffset = int64(*rx.FOff)
+	}
+	return []*ttnpb.RxMetadata{md}
 }
 
-func fineTimestampMetadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMetadata {
+func v2Metadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMetadata {
 	md := make([]*ttnpb.RxMetadata, 0)
 	for _, signal := range rx.RSig {
 		signalMetadata := &ttnpb.RxMetadata{
@@ -183,9 +188,9 @@ func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error
 	up.RawPayload = rawPayload
 
 	if len(rx.RSig) > 0 {
-		up.RxMetadata = fineTimestampMetadata(rx, md.ID)
+		up.RxMetadata = v2Metadata(rx, md.ID)
 	} else {
-		up.RxMetadata = metadata(rx, md.ID)
+		up.RxMetadata = v1Metadata(rx, md.ID)
 	}
 	for _, md := range up.RxMetadata {
 		if up.Settings.Timestamp == 0 || up.Settings.Timestamp > md.Timestamp {
@@ -286,9 +291,9 @@ func convertStatus(stat Stat, md UpstreamMetadata) *ttnpb.GatewayStatus {
 // FromGatewayUp converts the upstream message to the UDP format.
 func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat, ack *TxPacketAck) {
 	rxs = make([]*RxPacket, 0, len(up.UplinkMessages))
-	var modulation, codr string
 	for _, msg := range up.UplinkMessages {
-		switch msg.Settings.DataRate.Modulation.(type) {
+		var modulation, codr string
+		switch mod := msg.Settings.DataRate.Modulation.(type) {
 		case *ttnpb.DataRate_Lora:
 			modulation = lora
 			codr = msg.Settings.CodingRate
@@ -296,18 +301,29 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat, ack *TxPac
 			modulation = fsk
 		case *ttnpb.DataRate_Lrfhss:
 			modulation = lrfhss
+			codr = mod.Lrfhss.CodingRate
+		}
+		var ftime *uint32
+		if i := uint32(msg.RxMetadata[0].FineTimestamp); i != 0 {
+			ftime = &i
+		}
+		var foff *int32
+		if i := int32(msg.RxMetadata[0].FrequencyOffset); i != 0 {
+			foff = &i
 		}
 		rxs = append(rxs, &RxPacket{
-			Freq: float64(msg.Settings.Frequency) / 1000000,
-			Chan: uint8(msg.RxMetadata[0].ChannelIndex),
-			Modu: modulation,
-			DatR: datarate.DR{DataRate: msg.Settings.DataRate},
-			CodR: codr,
-			Size: uint16(len(msg.RawPayload)),
-			Data: base64.StdEncoding.EncodeToString(msg.RawPayload),
-			Tmst: msg.RxMetadata[0].Timestamp,
-			RSSI: int16(msg.RxMetadata[0].Rssi),
-			LSNR: float64(msg.RxMetadata[0].Snr),
+			Freq:  float64(msg.Settings.Frequency) / 1000000,
+			Chan:  uint8(msg.RxMetadata[0].ChannelIndex),
+			Modu:  modulation,
+			DatR:  datarate.DR{DataRate: msg.Settings.DataRate},
+			CodR:  codr,
+			Size:  uint16(len(msg.RawPayload)),
+			Data:  base64.StdEncoding.EncodeToString(msg.RawPayload),
+			Tmst:  msg.RxMetadata[0].Timestamp,
+			RSSI:  int16(msg.RxMetadata[0].Rssi),
+			LSNR:  float64(msg.RxMetadata[0].Snr),
+			FTime: ftime,
+			FOff:  foff,
 		})
 	}
 	if up.GatewayStatus != nil {
