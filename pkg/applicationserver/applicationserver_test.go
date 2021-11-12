@@ -2882,7 +2882,7 @@ func TestLocationFromPayload(t *testing.T) {
 
 	assertApplicationlocation := func(loc *ttnpb.ApplicationLocation) {
 		a.So(loc.Service, should.Equal, "frm-payload")
-		assertLocation(&loc.Location)
+		assertLocation(loc.Location)
 	}
 
 	// The uplink message and the location solved message may come out of order.

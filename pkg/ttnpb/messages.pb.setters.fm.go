@@ -687,10 +687,18 @@ func (dst *ApplicationLocation) SetFields(src *ApplicationLocation, paths ...str
 		case "location":
 			if len(subs) > 0 {
 				var newDst, newSrc *Location
-				if src != nil {
-					newSrc = &src.Location
+				if (src == nil || src.Location == nil) && dst.Location == nil {
+					continue
 				}
-				newDst = &dst.Location
+				if src != nil {
+					newSrc = src.Location
+				}
+				if dst.Location != nil {
+					newDst = dst.Location
+				} else {
+					newDst = &Location{}
+					dst.Location = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -698,8 +706,7 @@ func (dst *ApplicationLocation) SetFields(src *ApplicationLocation, paths ...str
 				if src != nil {
 					dst.Location = src.Location
 				} else {
-					var zero Location
-					dst.Location = zero
+					dst.Location = nil
 				}
 			}
 		case "attributes":

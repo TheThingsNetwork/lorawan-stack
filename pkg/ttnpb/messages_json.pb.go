@@ -639,7 +639,7 @@ func (x *ApplicationLocation) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("service")
 		s.WriteString(x.Service)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.Location != nil || s.HasField("location") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("location")
 		x.Location.MarshalProtoJSON(s.WithField("location"))
@@ -673,6 +673,7 @@ func (x *ApplicationLocation) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Service = s.ReadString()
 		case "location":
 			if !s.ReadNil() {
+				x.Location = &Location{}
 				x.Location.UnmarshalProtoJSON(s.WithField("location", true))
 			}
 		case "attributes":

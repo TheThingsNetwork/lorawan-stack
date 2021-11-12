@@ -1015,7 +1015,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 			Up: &ttnpb.ApplicationUp_LocationSolved{
 				LocationSolved: &ttnpb.ApplicationLocation{
 					Service:  "frm-payload",
-					Location: *loc,
+					Location: loc,
 				},
 			},
 		}, link)
@@ -1195,7 +1195,7 @@ func (as *ApplicationServer) handleLocationSolved(ctx context.Context, ids ttnpb
 	if dev.Locations == nil {
 		dev.Locations = make(map[string]*ttnpb.Location)
 	}
-	dev.Locations[msg.Service] = &msg.Location
+	dev.Locations[msg.Service] = msg.Location
 
 	_, err = cl.Update(ctx, &ttnpb.UpdateEndDeviceRequest{
 		EndDevice: *dev,

@@ -342,7 +342,7 @@ func TestWebhooks(t *testing.T) {
 									EndDeviceIds: &registeredDeviceID,
 									Up: &ttnpb.ApplicationUp_LocationSolved{
 										LocationSolved: &ttnpb.ApplicationLocation{
-											Location: ttnpb.Location{
+											Location: &ttnpb.Location{
 												Latitude:  10,
 												Longitude: 20,
 												Altitude:  30,

@@ -218,7 +218,7 @@ func (p *DeviceManagementPackage) sendLocationSolved(ctx context.Context, ids tt
 		Up: &ttnpb.ApplicationUp_LocationSolved{
 			LocationSolved: &ttnpb.ApplicationLocation{
 				Service: fmt.Sprintf("%v-%s", PackageName, position.Algorithm),
-				Location: ttnpb.Location{
+				Location: &ttnpb.Location{
 					Latitude:  position.LLH[0],
 					Longitude: position.LLH[1],
 					Altitude:  int32(position.LLH[2]),

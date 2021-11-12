@@ -257,6 +257,7 @@ func (p *GeolocationPackage) sendServiceData(ctx context.Context, ids ttnpb.EndD
 }
 
 func (p *GeolocationPackage) sendLocationSolved(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, result api.AbstractLocationSolverResult) error {
+	loc := result.Location()
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIds:   &ids,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
@@ -264,7 +265,7 @@ func (p *GeolocationPackage) sendLocationSolved(ctx context.Context, ids ttnpb.E
 		Up: &ttnpb.ApplicationUp_LocationSolved{
 			LocationSolved: &ttnpb.ApplicationLocation{
 				Service:  fmt.Sprintf("%v-%s", PackageName, result.Algorithm()),
-				Location: result.Location(),
+				Location: &loc,
 			},
 		},
 	})
