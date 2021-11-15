@@ -96,7 +96,7 @@ var errNetworkServerNotFound = errors.DefineNotFound("network_server_not_found",
 
 // HandleUplink implements upstream.Handler.
 func (h *Handler) HandleUplink(ctx context.Context, _ ttnpb.GatewayIdentifiers, ids *ttnpb.EndDeviceIdentifiers, msg *ttnpb.GatewayUplinkMessage) error {
-	nsConn, err := h.cluster.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, ids)
+	nsConn, err := h.cluster.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, nil)
 	if err != nil {
 		return errNetworkServerNotFound.WithCause(err)
 	}
@@ -111,7 +111,7 @@ func (h *Handler) HandleStatus(context.Context, ttnpb.GatewayIdentifiers, *ttnpb
 
 // HandleTxAck implements upstream.Handler.
 func (h *Handler) HandleTxAck(ctx context.Context, ids ttnpb.GatewayIdentifiers, msg *ttnpb.TxAcknowledgment) error {
-	nsConn, err := h.cluster.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
+	nsConn, err := h.cluster.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, nil)
 	if err != nil {
 		return errNetworkServerNotFound.WithCause(err)
 	}

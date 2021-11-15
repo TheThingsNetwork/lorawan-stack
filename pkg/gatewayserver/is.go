@@ -105,16 +105,7 @@ func (is IS) ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers
 }
 
 func (is IS) newRegistryClient(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (ttnpb.GatewayRegistryClient, error) {
-	var (
-		cc  *grpc.ClientConn
-		err error
-	)
-	if ids != nil {
-		cc, err = is.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids)
-	} else {
-		// Don't pass a (*ttnpb.GatewayIdentifiers)(nil) to GetPeerConn.
-		cc, err = is.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
-	}
+	cc, err := is.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
 	if err != nil {
 		return nil, err
 	}
