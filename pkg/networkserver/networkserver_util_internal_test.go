@@ -714,7 +714,7 @@ func (env TestEnvironment) AssertNsAsHandleUplink(ctx context.Context, appID ttn
 							}),
 						}, test.AllTrue(
 							a.So(role, should.Equal, ttnpb.ClusterRole_APPLICATION_SERVER),
-							a.So(ids.GetEntityIdentifiers().GetApplicationIds(), should.Resemble, &appID),
+							a.So(ids, should.BeNil),
 						)
 				},
 			), should.BeTrue) {
@@ -1531,7 +1531,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					func(ctx, reqCtx context.Context, peerIDs cluster.EntityIdentifiers) bool {
 						return test.AllTrue(
 							a.So(events.CorrelationIDsFromContext(reqCtx), should.BeProperSupersetOfElementsFunc, test.StringEqual, ups[0].CorrelationIds),
-							a.So(peerIDs.GetEntityIdentifiers().GetDeviceIds(), should.Resemble, &conf.Device.EndDeviceIdentifiers),
+							a.So(peerIDs, should.BeNil),
 						)
 					},
 					func(ctx, reqCtx context.Context, req *ttnpb.JoinRequest) bool {

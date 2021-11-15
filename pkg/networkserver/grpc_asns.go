@@ -93,7 +93,7 @@ func (ns *NetworkServer) createProcessApplicationUplinkTask(consumerID string) f
 
 func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context, consumerID string) error {
 	return ns.applicationUplinks.Pop(ctx, consumerID, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, drain ApplicationUplinkQueueDrainFunc) (time.Time, error) {
-		conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, &appID)
+		conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, nil)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to get Application Server peer")
 			return time.Now().Add(applicationUplinkTaskRetryInterval), nil
