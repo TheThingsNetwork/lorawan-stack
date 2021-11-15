@@ -70,6 +70,9 @@ func rangeStringsBindFunc(f func(string) (bool, error)) func(ss ...string) (bool
 	}
 }
 
+// DefaultRangeCount is the default number of elements to be returned by a SCAN-family operation.
+const DefaultRangeCount = 1024
+
 func RangeRedisKeys(ctx context.Context, r redis.Cmdable, match string, count int64, f func(k string) (bool, error)) error {
 	return rangeScan(func(cursor uint64) *redis.ScanCmd {
 		return r.Scan(ctx, cursor, match, count)

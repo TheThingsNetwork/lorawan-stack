@@ -249,7 +249,7 @@ func (r WebhookRegistry) Range(ctx context.Context, paths []string, f func(conte
 	if err != nil {
 		return err
 	}
-	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.idKey(unique.GenericID(ctx, "*"), "*"), 1, func(key string) (bool, error) {
+	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.idKey(unique.GenericID(ctx, "*"), "*"), ttnredis.DefaultRangeCount, func(key string) (bool, error) {
 		if !webhookEntityRegex.MatchString(key) {
 			return true, nil
 		}

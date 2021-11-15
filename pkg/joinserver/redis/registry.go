@@ -392,7 +392,7 @@ func (r *DeviceRegistry) RangeByID(ctx context.Context, paths []string, f func(c
 	if err != nil {
 		return err
 	}
-	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.uidKey(unique.GenericID(ctx, "*")), 1, func(key string) (bool, error) {
+	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.uidKey(unique.GenericID(ctx, "*")), ttnredis.DefaultRangeCount, func(key string) (bool, error) {
 		if !deviceEntityRegex.MatchString(key) {
 			return true, nil
 		}
@@ -717,7 +717,7 @@ func (r *ApplicationActivationSettingRegistry) Range(ctx context.Context, paths 
 	if err != nil {
 		return err
 	}
-	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.uidKey(unique.GenericID(ctx, "*")), 1, func(key string) (bool, error) {
+	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.uidKey(unique.GenericID(ctx, "*")), ttnredis.DefaultRangeCount, func(key string) (bool, error) {
 		if !appKeyRegex.MatchString(key) {
 			return true, nil
 		}
