@@ -973,7 +973,7 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.Routed
 		homeNetworkNetID.String(), up.HomeNetworkTenantId, up.HomeNetworkClusterId,
 	).Inc()
 
-	conn, err := a.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
+	conn, err := a.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, nil)
 	if err != nil {
 		return err
 	}
