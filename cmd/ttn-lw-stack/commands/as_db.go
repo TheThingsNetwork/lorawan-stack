@@ -70,7 +70,7 @@ var (
 			if err != nil {
 				return err
 			}
-			if err := ttnredis.RangeRedisKeys(ctx, cl, cl.Key("*"), 1, func(k string) (bool, error) {
+			if err := ttnredis.RangeRedisKeys(ctx, cl, cl.Key("*"), ttnredis.DefaultRangeCount, func(k string) (bool, error) {
 				logger := logger.WithField("key", k)
 				switch {
 				case deviceUIDRegexp.MatchString(k):

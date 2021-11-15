@@ -249,7 +249,7 @@ func (r *DeviceRegistry) Range(ctx context.Context, paths []string, f func(conte
 	if err != nil {
 		return err
 	}
-	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.uidKey(unique.GenericID(ctx, "*")), 1, func(key string) (bool, error) {
+	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.uidKey(unique.GenericID(ctx, "*")), ttnredis.DefaultRangeCount, func(key string) (bool, error) {
 		if !deviceEntityRegex.MatchString(key) {
 			return true, nil
 		}

@@ -46,7 +46,7 @@ var (
 			cl := NewNetworkServerApplicationUplinkQueueRedis(*config)
 			var deleted uint64
 			defer func() { logger.Debugf("%d processed stream entries deleted", deleted) }()
-			return ttnredis.RangeRedisKeys(ctx, cl, nsredis.ApplicationUplinkQueueUIDGenericUplinkKey(cl, "*"), 1, func(k string) (bool, error) {
+			return ttnredis.RangeRedisKeys(ctx, cl, nsredis.ApplicationUplinkQueueUIDGenericUplinkKey(cl, "*"), ttnredis.DefaultRangeCount, func(k string) (bool, error) {
 				gs, err := cl.XInfoGroups(ctx, k).Result()
 				if err != nil {
 					logger.WithError(err).Errorf("Failed to query groups of stream %q", k)
@@ -134,7 +134,7 @@ var (
 			addrRegexp3_11_Current := regexp.MustCompile(cl.Key("addr", devAddrRegexpStr, "current$"))
 			addrRegexp3_11_CurrentFields := regexp.MustCompile(cl.Key("addr", devAddrRegexpStr, "current", "fields$"))
 			addrRegexp3_11_PendingFields := regexp.MustCompile(cl.Key("addr", devAddrRegexpStr, "pending", "fields$"))
-			err := ttnredis.RangeRedisKeys(ctx, cl, cl.Key("*"), 1, func(k string) (bool, error) {
+			err := ttnredis.RangeRedisKeys(ctx, cl, cl.Key("*"), ttnredis.DefaultRangeCount, func(k string) (bool, error) {
 				logger := logger.WithField("key", k)
 				switch {
 				case uidRegexp3_10_Fields.MatchString(k):
@@ -154,7 +154,7 @@ var (
 					pendingKey := nsredis.PendingAddrKey(k)
 					pendingFieldKey := nsredis.FieldKey(pendingKey)
 					pendingScore := float64(time.Now().UnixNano())
-					if err := ttnredis.RangeRedisSet(ctx, cl, k, "*", 1, func(uid string) (bool, error) {
+					if err := ttnredis.RangeRedisSet(ctx, cl, k, "*", ttnredis.DefaultRangeCount, func(uid string) (bool, error) {
 						logger := logger.WithField("uid", uid)
 						uk := nsredis.UIDKey(cl, uid)
 						if err := cl.Watch(ctx, func(tx *redis.Tx) error {
@@ -213,7 +213,7 @@ var (
 				case addrRegexp3_10_16Bit.MatchString(k), addrRegexp3_10_32Bit.MatchString(k):
 					currentKey := nsredis.CurrentAddrKey(k[:len(k)-6])
 					fieldKey := nsredis.FieldKey(currentKey)
-					if err := ttnredis.RangeRedisZSet(ctx, cl, k, "*", 1, func(uid string, v float64) (bool, error) {
+					if err := ttnredis.RangeRedisZSet(ctx, cl, k, "*", ttnredis.DefaultRangeCount, func(uid string, v float64) (bool, error) {
 						logger := logger.WithField("uid", uid)
 						uk := nsredis.UIDKey(cl, uid)
 						if err := cl.Watch(ctx, func(tx *redis.Tx) error {
@@ -267,7 +267,7 @@ var (
 					score := float64(time.Now().UnixNano())
 					if err := cl.Watch(ctx, func(tx *redis.Tx) error {
 						p := tx.TxPipeline()
-						if err := ttnredis.RangeRedisSet(ctx, tx, k, "*", 1, func(uid string) (bool, error) {
+						if err := ttnredis.RangeRedisSet(ctx, tx, k, "*", ttnredis.DefaultRangeCount, func(uid string) (bool, error) {
 							logger := logger.WithField("uid", uid)
 							uk := nsredis.UIDKey(cl, uid)
 							if err := tx.Watch(ctx, uk).Err(); err != nil {

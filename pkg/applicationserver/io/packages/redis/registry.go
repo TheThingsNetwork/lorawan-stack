@@ -532,7 +532,7 @@ func (r ApplicationPackagesRegistry) Range(
 	if err != nil {
 		return err
 	}
-	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.associationKey(unique.GenericID(ctx, "*"), "*"), 1, func(key string) (bool, error) {
+	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.associationKey(unique.GenericID(ctx, "*"), "*"), ttnredis.DefaultRangeCount, func(key string) (bool, error) {
 		if !associationEntityRegex.MatchString(key) {
 			return true, nil
 		}
