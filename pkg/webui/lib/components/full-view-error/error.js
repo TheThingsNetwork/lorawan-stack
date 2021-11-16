@@ -93,9 +93,9 @@ const FullViewErrorInner = ({ error, safe }) => {
   } else if (isOAuthCallback) {
     errorTitle = errorMessages.loginFailed
     if (isOAuthClientRefusedError(error)) {
-      errorMessage = errorMessages.loginFailedDescription
-    } else {
       errorMessage = errorMessages.loginFailedAbortDescription
+    } else {
+      errorMessage = errorMessages.loginFailedDescription
     }
   } else if (isFrontend) {
     errorMessage = error.errorMessage
