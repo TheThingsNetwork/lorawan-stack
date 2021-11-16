@@ -17,9 +17,7 @@ import { APPLICATION, END_DEVICE, GATEWAY } from '@console/constants/entities'
 export const END_DEVICE_EVENTS_VERBOSE_FILTERS = [
   'as.*.drop',
   'as.down.data.forward',
-  'as.up.location.forward',
-  'as.up.data.forward',
-  'as.up.service.forward',
+  'as.up.*.forward',
   'js.join.accept',
   'js.join.reject',
   'ns.mac.*.answer.reject',
@@ -44,20 +42,14 @@ export const GATEWAY_EVENTS_VERBOSE_FILTERS = [
   'gateway.*',
 ]
 
-export const EVENT_END_DEVICE_HEARTBEAT_FILTERS = [
-  'ns.up.data.receive',
-  'ns.up.join.receive',
-  'ns.up.rejoin.receive',
-]
+// Regex for matching heartbeat events that trigger an update of the
+// last activity display.
+export const EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP = /^as.up\..*\.forward$/
 
 // Utility function to convert filter arrays to Regular Expressions strings
 // that the backend accepts for applying filters.
 const filterListToRegExpList = array =>
   array.map(f => `/^${f.replace(/\./g, '\\.').replace(/\*/g, '.*')}$/`)
-
-export const EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP = filterListToRegExpList(
-  EVENT_END_DEVICE_HEARTBEAT_FILTERS,
-)
 
 export const EVENT_FILTERS = {
   [APPLICATION]: [
