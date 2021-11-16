@@ -415,6 +415,17 @@ class Devices {
     )
   }
 
+  async resetById(applicationId, deviceId) {
+    const result = await this._api.NsEndDeviceRegistry.ResetFactoryDefaults({
+      routeParams: {
+        'end_device_ids.application_ids.application_id': applicationId,
+        'end_device_ids.device_id': deviceId,
+      },
+    })
+
+    return Marshaler.payloadSingleResponse(result)
+  }
+
   /**
    * Creates an end device under the `applicationId` application.
    * This method will cause creating the end device in all available stack
