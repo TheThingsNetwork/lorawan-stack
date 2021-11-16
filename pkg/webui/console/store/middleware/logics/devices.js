@@ -108,6 +108,15 @@ const getDevicesListLogic = createRequestLogic({
   },
 })
 
+const resetDeviceLogic = createRequestLogic({
+  type: devices.RESET_DEV,
+  process: async ({ action }) => {
+    const { appId, deviceId } = action.payload
+
+    return api.device.reset(appId, deviceId)
+  },
+})
+
 const getDeviceTemplateFormatsLogic = createRequestLogic({
   type: deviceTemplateFormats.GET_DEVICE_TEMPLATE_FORMATS,
   process: async () => {
@@ -120,6 +129,7 @@ export default [
   getDevicesListLogic,
   getDeviceTemplateFormatsLogic,
   getDeviceLogic,
+  resetDeviceLogic,
   updateDeviceLogic,
   ...createEventsConnectLogics(devices.SHARED_NAME, 'devices', api.device.eventsSubscribe),
 ]
