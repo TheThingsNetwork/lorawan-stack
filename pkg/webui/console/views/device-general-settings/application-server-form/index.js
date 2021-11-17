@@ -186,6 +186,7 @@ const ApplicationServerForm = React.memo(props => {
         description={sharedMessages.skipCryptoDescription}
         component={RadioButton.Group}
         decode={decodeSkipPayloadCrypto}
+        horizontal
         encode={encodeSkipPayloadCrypto}
         onChange={handleSkipCryptoChange}
       >
