@@ -30,7 +30,7 @@ import {
 } from '@ttn-lw/lib/store/actions/status'
 import { promisifyDispatch } from '@ttn-lw/lib/store/middleware/request-promise-middleware'
 import attachPromise, { getResultActionFromType } from '@ttn-lw/lib/store/actions/attach-promise'
-import { selectIsCheckingStatus } from '@ttn-lw/lib/store/selectors/status'
+import { selectIsCheckingStatus, selectStatusStore } from '@ttn-lw/lib/store/selectors/status'
 
 let connectionChecking = null
 
@@ -138,7 +138,8 @@ const createRequestLogic = (
           // valid and we can delete it. Reloading will then initiate the auth flow.
           if (isUnauthenticatedError(e)) {
             clearAccessToken()
-            window.location.reload()
+            status.isLoginRequired = true
+            // Window.location.reload()
             break
             // If there was a network error, it could mean that the network
             // connection is currently interrupted. Setting the online state to

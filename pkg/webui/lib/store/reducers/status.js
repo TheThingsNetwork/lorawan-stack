@@ -18,6 +18,7 @@ import { SET_CONNECTION_STATUS } from '@ttn-lw/lib/store/actions/status'
 
 const defaultState = {
   onlineStatus: ONLINE_STATUS.ONLINE,
+  isLoginRequired: false,
 }
 
 const status = (state = defaultState, { type, payload }) => {
@@ -26,6 +27,7 @@ const status = (state = defaultState, { type, payload }) => {
       return {
         ...state,
         onlineStatus: payload.onlineStatus,
+        isLoginRequired: status.isLoginRequired,
       }
     default:
       return state
