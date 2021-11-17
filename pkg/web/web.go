@@ -177,6 +177,7 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 		mux.MiddlewareFunc(webmiddleware.SecurityHeaders()),
 		mux.MiddlewareFunc(webmiddleware.Log(logger, options.logIgnorePaths)),
 		mux.MiddlewareFunc(webmiddleware.Cookies(hashKey, blockKey)),
+		mux.MiddlewareFunc(webmiddleware.NoCache),
 	)
 
 	var redirectConfig webmiddleware.RedirectConfiguration

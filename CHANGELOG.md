@@ -14,6 +14,7 @@ For details about compatibility between different releases, see the **Commitment
 - Support for fine timestamps and frequency offsets sent by gateways with SX1303 concentrator using the legacy UDP protocol.
 - Support for resetting end device session context and MAC state in the Console.
 - The Content-Security-Policy header (that was previously behind the `webui.csp` feature flag) is now enabled by default.
+- Default `Cache-Control: no-store` headers.
 
 ### Changed
 
