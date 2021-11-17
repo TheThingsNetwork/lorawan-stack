@@ -25,7 +25,7 @@ describe('End device messaging', () => {
   const application = {
     ids: { application_id: applicationId },
     name: 'Application End Devices Test Name',
-    description: `Application End Devices Test Description`,
+    description: 'Application End Devices Test Description',
   }
 
   const endDeviceId = 'end-device-overview-test'
@@ -71,14 +71,6 @@ describe('End device messaging', () => {
 
     it('succeeds sending uplink message', () => {
       cy.visit(
-        `${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`,
-      )
-
-      cy.findByRole('checkbox').uncheck()
-
-      cy.findByRole('button', { name: 'Save changes' }).click()
-
-      cy.visit(
         `${Cypress.config(
           'consoleRootPath',
         )}/applications/${applicationId}/devices/${endDeviceId}/messaging/uplink`,
@@ -89,136 +81,9 @@ describe('End device messaging', () => {
 
       cy.findByRole('button', { name: 'Simulate uplink' }).click()
 
-      cy.findByTestId('toast-notification')
-        .should('be.visible')
-        .and('contain', 'Uplink sent')
+      cy.findByTestId('toast-notification').should('be.visible').and('contain', 'Uplink sent')
 
       cy.findByTestId('error-notification').should('not.exist')
-    })
-
-    it('combination skip payload crypto enabled/disabled on application level and default on device level', () => {
-      cy.visit(
-        `${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`,
-      )
-
-      cy.findByRole('checkbox').check()
-
-      cy.findByRole('button', { name: 'Save changes' }).click()
-
-      cy.visit(
-        `${Cypress.config(
-          'consoleRootPath',
-        )}/applications/${applicationId}/devices/${endDeviceId}/messaging/uplink`,
-      )
-
-      const response = {
-        skip_payload_crypto_override: null,
-        session: {},
-      }
-
-      cy.intercept(
-        'GET',
-        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
-        response,
-      )
-
-      cy.findByTestId('notification')
-        .should('be.visible')
-        .findByText(`Simulation is disabled for devices that skip payload crypto`)
-        .should('be.visible')
-
-      cy.findByLabelText('FPort').should('be.disabled')
-      cy.findByLabelText('Payload').should('be.disabled')
-
-      cy.findByRole('button', { name: 'Simulate uplink' }).should('be.disabled')
-
-      cy.visit(
-        `${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`,
-      )
-
-      cy.findByRole('checkbox').uncheck()
-
-      cy.findByRole('button', { name: 'Save changes' }).click()
-
-      cy.visit(
-        `${Cypress.config(
-          'consoleRootPath',
-        )}/applications/${applicationId}/devices/${endDeviceId}/messaging/uplink`,
-      )
-
-      cy.findByLabelText('FPort').should('be.enabled')
-      cy.findByLabelText('Payload').should('be.enabled')
-
-      cy.findByRole('button', { name: 'Simulate uplink' }).should('be.enabled')
-    })
-
-    it('combination skip payload crypto enabled on application level and disabled on device level', () => {
-      cy.visit(
-        `${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`,
-      )
-
-      cy.findByRole('checkbox').check()
-
-      cy.findByRole('button', { name: 'Save changes' }).click()
-
-      cy.visit(
-        `${Cypress.config(
-          'consoleRootPath',
-        )}/applications/${applicationId}/devices/${endDeviceId}/messaging/uplink`,
-      )
-
-      const response = {
-        skip_payload_crypto_override: false,
-        session: {},
-      }
-
-      cy.intercept(
-        'GET',
-        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
-        response,
-      )
-
-      cy.findByLabelText('FPort').should('be.enabled')
-      cy.findByLabelText('Payload').should('be.enabled')
-
-      cy.findByRole('button', { name: 'Simulate uplink' }).should('be.enabled')
-    })
-
-    it('combination skip payload crypto disabled on application level and enabled on device level', () => {
-      cy.visit(
-        `${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`,
-      )
-
-      cy.findByRole('checkbox').uncheck()
-
-      cy.findByRole('button', { name: 'Save changes' }).click()
-
-      cy.visit(
-        `${Cypress.config(
-          'consoleRootPath',
-        )}/applications/${applicationId}/devices/${endDeviceId}/messaging/uplink`,
-      )
-
-      const response = {
-        skip_payload_crypto_override: true,
-        session: {},
-      }
-
-      cy.intercept(
-        'GET',
-        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
-        response,
-      )
-
-      cy.findByTestId('notification')
-        .should('be.visible')
-        .findByText(`Simulation is disabled for devices that skip payload crypto`)
-        .should('be.visible')
-
-      cy.findByLabelText('FPort').should('be.disabled')
-      cy.findByLabelText('Payload').should('be.disabled')
-
-      cy.findByRole('button', { name: 'Simulate uplink' }).should('be.disabled')
     })
 
     it('disables uplink simulation when skip payload crypto is enabled', () => {
@@ -235,13 +100,13 @@ describe('End device messaging', () => {
 
       cy.intercept(
         'GET',
-        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto,skip_payload_crypto_override,session,pending_session`,
+        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
         response,
       )
 
       cy.findByTestId('notification')
         .should('be.visible')
-        .findByText(`Simulation is disabled for devices that skip payload crypto`)
+        .findByText('Simulation is disabled for devices that skip payload crypto')
         .should('be.visible')
 
       cy.findByLabelText('FPort').should('be.disabled')
@@ -257,14 +122,6 @@ describe('End device messaging', () => {
     })
 
     it('fails sending downlink message without valid session', () => {
-      cy.visit(
-        `${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`,
-      )
-
-      cy.findByRole('checkbox').uncheck()
-
-      cy.findByRole('button', { name: 'Save changes' }).click()
-
       cy.visit(
         `${Cypress.config(
           'consoleRootPath',
@@ -301,13 +158,13 @@ describe('End device messaging', () => {
 
       cy.intercept(
         'GET',
-        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto,skip_payload_crypto_override,session,pending_session`,
+        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
         response,
       )
 
       cy.findByTestId('notification')
         .should('be.visible')
-        .findByText(`Simulation is disabled for devices that skip payload crypto`)
+        .findByText('Simulation is disabled for devices that skip payload crypto')
         .should('be.visible')
 
       cy.findByLabelText('Replace downlink queue').should('be.disabled')
