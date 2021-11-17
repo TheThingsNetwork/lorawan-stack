@@ -17,6 +17,7 @@ package mqtt
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -158,6 +159,8 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 	return uplink, nil
 }
 
+var ttkgPlatformRegex = regexp.MustCompile(`The Things Gateway v1 - BL (r[0-9]+\-[0-9a-f]+) \(([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)\) - Firmware (v[0-9]+.[0-9]+.[0-9]+\-[0-9a-f]+) \(([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)\)`)
+
 func (protobufv2) ToStatus(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.GatewayStatus, error) {
 	v2status := &ttnpbv2.StatusMessage{}
 	err := v2status.Unmarshal(message)
@@ -196,6 +199,10 @@ func (protobufv2) ToStatus(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.G
 		versions["hal"] = v2status.Hal
 	}
 	if v2status.Platform != "" {
+		if matches := ttkgPlatformRegex.FindStringSubmatch(v2status.Platform); len(matches) == 5 {
+			versions["model"] = "The Things Kickstarter Gateway v1"
+			versions["firmware"] = matches[3]
+		}
 		versions["platform"] = v2status.Platform
 	}
 	var antennasLocation []*ttnpb.Location
