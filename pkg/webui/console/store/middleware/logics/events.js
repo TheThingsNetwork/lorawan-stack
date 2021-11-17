@@ -45,6 +45,7 @@ import {
   createEventsInterruptedSelector,
   createInterruptedStreamsSelector,
   createLatestEventSelector,
+  createLatestClearedEventSelector,
   createEventsFilterSelector,
 } from '@console/store/selectors/events'
 import { selectDeviceById } from '@console/store/selectors/devices'
@@ -77,6 +78,7 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
   const selectEntityEventsInterrupted = createEventsInterruptedSelector(entityName)
   const selectInterruptedStreams = createInterruptedStreamsSelector(entityName)
   const selectLatestEvent = createLatestEventSelector(entityName)
+  const selectLatestClearedEvent = createLatestClearedEventSelector(entityName)
   const selectEventFilter = createEventsFilterSelector(entityName)
 
   let channel = null
@@ -113,13 +115,18 @@ const createEventsConnectLogics = (reducerName, entityName, onEventsStart) => {
       process: async ({ getState, action }, dispatch) => {
         const { id, silent } = action
 
-        // Only get historical events emitted after the latest event in the
-        // store to avoid duplicate historical events.
-        const state = getState()
-        const latestEvent = selectLatestEvent(state, id)
-        const after = Boolean(latestEvent) ? latestEvent.time : undefined
-
         const idString = typeof action.id === 'object' ? getCombinedDeviceId(action.id) : action.id
+
+        // Only get historical events emitted after the latest event or latest
+        // cleared event in the store to avoid duplicate historical events.
+        const state = getState()
+        const latestEvent = selectLatestEvent(state, idString)
+        const latestClearedEvent = selectLatestClearedEvent(state, idString)
+        const latestEventTime = Boolean(latestEvent) ? latestEvent.time : ''
+        const latestClearedEventTime = Boolean(latestClearedEvent) ? latestClearedEvent.time : ''
+        const after =
+          (latestEventTime > latestClearedEventTime ? latestEventTime : latestClearedEventTime) ||
+          undefined
         const filter = selectEventFilter(state, idString)
         const filterRegExp = Boolean(filter) ? filter.filterRegExp : undefined
 
