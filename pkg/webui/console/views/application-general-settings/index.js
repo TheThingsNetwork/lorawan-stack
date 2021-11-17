@@ -281,7 +281,6 @@ export default class ApplicationGeneralSettings extends React.Component {
         ? {
             ...changed,
             attributes: appValues.attributes,
-            skip_payload_crypto: appValues.skip_payload_crypto,
           }
         : changed
 
