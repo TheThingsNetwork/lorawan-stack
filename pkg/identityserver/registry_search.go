@@ -30,25 +30,17 @@ type registrySearch struct {
 
 var errSearchForbidden = errors.DefinePermissionDenied("search_forbidden", "search is forbidden")
 
-func (rs *registrySearch) memberForSearch(ctx context.Context) (*ttnpb.OrganizationOrUserIdentifiers, error) {
+func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.SearchApplicationsRequest) (*ttnpb.Applications, error) {
 	authInfo, err := rs.authInfo(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if authInfo.IsAdmin {
-		return nil, nil
-	}
 	member := authInfo.GetOrganizationOrUserIdentifiers()
-	if member != nil {
-		return member, nil
+	if member == nil {
+		return nil, errSearchForbidden.New()
 	}
-	return nil, errSearchForbidden.New()
-}
-
-func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.SearchApplicationsRequest) (*ttnpb.Applications, error) {
-	member, err := rs.memberForSearch(ctx)
-	if err != nil {
-		return nil, err
+	if authInfo.IsAdmin {
+		member = nil
 	}
 
 	var searchFields []string
@@ -110,12 +102,10 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 		return nil, err
 	}
 
-	if member != nil {
-		for i, app := range res.Applications {
-			entityRights := callerMemberships.GetRights(member, app.GetIds())
-			if !entityRights.IncludesAll(ttnpb.RIGHT_APPLICATION_INFO) {
-				res.Applications[i] = app.PublicSafe()
-			}
+	for i, app := range res.Applications {
+		entityRights := callerMemberships.GetRights(member, app.GetIds()).Union(authInfo.GetUniversalRights())
+		if !entityRights.IncludesAll(ttnpb.RIGHT_APPLICATION_INFO) {
+			res.Applications[i] = app.PublicSafe()
 		}
 	}
 
@@ -123,9 +113,16 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 }
 
 func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchClientsRequest) (*ttnpb.Clients, error) {
-	member, err := rs.memberForSearch(ctx)
+	authInfo, err := rs.authInfo(ctx)
 	if err != nil {
 		return nil, err
+	}
+	member := authInfo.GetOrganizationOrUserIdentifiers()
+	if member == nil {
+		return nil, errSearchForbidden.New()
+	}
+	if authInfo.IsAdmin {
+		member = nil
 	}
 
 	var searchFields []string
@@ -190,12 +187,10 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchCl
 		return nil, err
 	}
 
-	if member != nil {
-		for i, cli := range res.Clients {
-			entityRights := callerMemberships.GetRights(member, cli.GetIds())
-			if !entityRights.IncludesAll(ttnpb.RIGHT_CLIENT_ALL) {
-				res.Clients[i] = cli.PublicSafe()
-			}
+	for i, cli := range res.Clients {
+		entityRights := callerMemberships.GetRights(member, cli.GetIds()).Union(authInfo.GetUniversalRights())
+		if !entityRights.IncludesAll(ttnpb.RIGHT_CLIENT_ALL) {
+			res.Clients[i] = cli.PublicSafe()
 		}
 	}
 
@@ -203,9 +198,16 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchCl
 }
 
 func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchGatewaysRequest) (*ttnpb.Gateways, error) {
-	member, err := rs.memberForSearch(ctx)
+	authInfo, err := rs.authInfo(ctx)
 	if err != nil {
 		return nil, err
+	}
+	member := authInfo.GetOrganizationOrUserIdentifiers()
+	if member == nil {
+		return nil, errSearchForbidden.New()
+	}
+	if authInfo.IsAdmin {
+		member = nil
 	}
 
 	// Backwards compatibility for frequency_plan_id field.
@@ -275,7 +277,7 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchG
 
 	if member != nil {
 		for i, gtw := range res.Gateways {
-			entityRights := callerMemberships.GetRights(member, gtw.GetIds())
+			entityRights := callerMemberships.GetRights(member, gtw.GetIds()).Union(authInfo.GetUniversalRights())
 			if !entityRights.IncludesAll(ttnpb.RIGHT_GATEWAY_INFO) {
 				res.Gateways[i] = gtw.PublicSafe()
 			}
@@ -293,9 +295,16 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchG
 }
 
 func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.SearchOrganizationsRequest) (*ttnpb.Organizations, error) {
-	member, err := rs.memberForSearch(ctx)
+	authInfo, err := rs.authInfo(ctx)
 	if err != nil {
 		return nil, err
+	}
+	member := authInfo.GetOrganizationOrUserIdentifiers()
+	if member == nil {
+		return nil, errSearchForbidden.New()
+	}
+	if authInfo.IsAdmin {
+		member = nil
 	}
 
 	var searchFields []string
@@ -359,7 +368,7 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 
 	if member != nil {
 		for i, org := range res.Organizations {
-			entityRights := callerMemberships.GetRights(member, org.GetIds())
+			entityRights := callerMemberships.GetRights(member, org.GetIds()).Union(authInfo.GetUniversalRights())
 			if !entityRights.IncludesAll(ttnpb.RIGHT_CLIENT_ALL) {
 				res.Organizations[i] = org.PublicSafe()
 			}
@@ -370,14 +379,14 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 }
 
 func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUsersRequest) (*ttnpb.Users, error) {
-	member, err := rs.memberForSearch(ctx)
+	authInfo, err := rs.authInfo(ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	if member != nil {
+	if !authInfo.IsAdmin {
 		return nil, errSearchForbidden.New()
 	}
+
 	var searchFields []string
 	if req.IdContains != "" {
 		searchFields = append(searchFields, "ids")

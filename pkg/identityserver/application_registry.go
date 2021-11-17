@@ -240,12 +240,10 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 		return nil, err
 	}
 
-	if !clusterAuth {
-		for i, app := range apps.Applications {
-			entityRights := callerMemberships.GetRights(callerAccountID, app.GetIds())
-			if !entityRights.IncludesAll(ttnpb.RIGHT_APPLICATION_INFO) {
-				apps.Applications[i] = app.PublicSafe()
-			}
+	for i, app := range apps.Applications {
+		entityRights := callerMemberships.GetRights(callerAccountID, app.GetIds()).Union(authInfo.GetUniversalRights())
+		if !entityRights.IncludesAll(ttnpb.RIGHT_APPLICATION_INFO) {
+			apps.Applications[i] = app.PublicSafe()
 		}
 	}
 
