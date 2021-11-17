@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Error - The Things Stack Open Source</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+    <meta name="theme-color" content="#0D83D0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+    <meta name="description" content="The Things Stack Error Page">
+    <meta property="og:image" content="/assets/console-og-image.png">
+    <meta property="og:image:secure_url" content="/assets/console-og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <link rel="alternate icon" href="/assets/console-favicon.ico">
+    <link rel="alternate icon" type="image/png" href="/assets/console-favicon.png">
+    <link rel="icon" type="image/svg+xml" href="/assets/console-favicon.svg">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/console-touch-icon.png">
+    <link href="/assets/error/error.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="ttn-header">
+        <div class="ttn-container__full">
+          <div class="img-container">
+            <img class="ttn-header__logo" src="/assets/error/logo.svg" alt="The Things Stack Logo">
+          </div>
+        </div>
+      </header>
+      <div class="flex-wrapper">
+        <div class="full-view-error">
+          <div class="container">
+            <div class="row">
+              <h1>
+                <span class="icon logo">error_outline</span>
+                {{.ErrorTitle}}
+              </h1>
+              <div class="full-view-error-sub">
+                <span>
+                  {{.ErrorMessage}}
+                </span>
+                {{ if not .IsGenericNotFound }}
+                <span>
+                  If the error persists please contact support or administrator.
+                </span>
+                <br/>
+                <span>
+                  We're sorry for the inconvenience.
+                </span>
+                {{ end }}
+              </div>
+              <div class="error-actions">
+                <a href="https://www.thethingsindustries.com/docs" target="_blank" class="button">
+                <span class="logo">contact_support</span>
+                Documentation
+                </a>
+                {{ if not .IsGenericNotFound }}
+                <span class="error-actions-message">
+                  Please attach technical details below to support inquiries.
+                </span>
+                {{ end }}
+              </div>
+              {{ if not .IsGenericNotFound }}
+              <hr/>
+              <div class="detail-colophon">
+                <span>
+                  Error ID: <code>{{.ErrorID}}</code>
+                </span>
+                <span>
+                  Correlation ID: <code>{{.CorrelationID}}</code>
+                </span>
+              </div>
+              <hr/>
+              <details>
+                <summary>
+                  Technical details
+                </summary>
+                <pre>{{.BackendErrorDetails}}</pre>
+                <button id="copy-button" class="button action-button" data-clipboard-text="{{.BackendErrorDetails}}">
+                  <span class="logo">file_copy</span>
+                  Copy to clipboard
+                </button>
+              </details>
+              {{ end }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer class="ttn-footer">
+        <div class="left">
+          <div>
+            © {{.Year}}
+            <a class="link" href="https://www.thethingsindustries.com/docs">The Things Stack</a>
+            <span>
+              by
+              <a class="link" href="https://www.thethingsnetwork.org">The Things Network</a>
+              and
+              <a class="link" href="https://www.thethingsindustries.com">The Things Industries</a>
+            </span>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </body>
+  <script>
+    var button = document.getElementById('copy-button');
+    if (button !== null) {
+      var text = button.getAttribute('data-clipboard-text');
+      var icon = button.firstChild;
+      button.addEventListener("click", function(e) {
+        e.preventDefault();
+        navigator.clipboard.writeText(text).then(function() {
+          button.innerHTML = '<span class="logo">done</span>Copied to clipboard!';
+          setTimeout(() => {
+            button.innerHTML = '<span class="logo">file_copy</span>Copy to clipboard!';
+          }, 3000);
+        }, function(err) {
+          console.error('Could not copy text: ', err);
+        });
+      });
+    }
+  </script>
+</html>
