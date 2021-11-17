@@ -89,6 +89,7 @@ func (f *lbsLNS) GetRouterConfig(ctx context.Context, msg []byte, bandID string,
 			"station":  version.Station,
 			"firmware": version.Firmware,
 			"package":  version.Package,
+			"model":    version.Model,
 			"platform": fmt.Sprintf("%s - Firmware %s - Protocol %d", version.Model, version.Firmware, version.Protocol),
 		},
 		Advanced: &pbtypes.Struct{
