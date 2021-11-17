@@ -44,7 +44,18 @@ var All = map[string]map[ttnpb.PHYVersion]Band{
 		ttnpb.RP001_V1_0_3_REV_A: CN_470_510_RP1_v1_0_3_RevA,
 		ttnpb.RP001_V1_1_REV_A:   CN_470_510_RP1_v1_1_RevA,
 		ttnpb.RP001_V1_1_REV_B:   CN_470_510_RP1_v1_1_RevB,
-		ttnpb.RP002_V1_0_0:       CN_470_510_RP2_v1_0_0,
+	},
+	CN_470_510_20_A: {
+		ttnpb.RP002_V1_0_0: CN_470_510_20_A_RP2_v1_0_0,
+	},
+	CN_470_510_20_B: {
+		ttnpb.RP002_V1_0_0: CN_470_510_20_B_RP2_v1_0_0,
+	},
+	CN_470_510_26_A: {
+		ttnpb.RP002_V1_0_0: CN_470_510_26_A_RP2_v1_0_0,
+	},
+	CN_470_510_26_B: {
+		ttnpb.RP002_V1_0_0: CN_470_510_26_B_RP2_v1_0_0,
 	},
 	CN_779_787: {
 		ttnpb.TS001_V1_0:         CN_779_787_RP1_V1_0,

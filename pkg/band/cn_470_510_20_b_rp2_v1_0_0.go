@@ -16,17 +16,17 @@ package band
 
 import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
-// CN_470_510_RP2_v1_0_0 is the band definition for CN470-510 in the RP002-1.0.0 specification.
-var CN_470_510_RP2_v1_0_0 = Band{
-	ID: CN_470_510,
+// CN_470_510_20_B_RP2_v1_0_0 is the band definition for CN470-510 20MHz antenna, type B in the RP002-1.0.0 specification.
+var CN_470_510_20_B_RP2_v1_0_0 = Band{
+	ID: CN_470_510_20_B,
 
 	EnableADR: true,
 
-	MaxUplinkChannels: 96,
-	UplinkChannels:    cn470510UplinkChannels,
+	MaxUplinkChannels: 64,
+	UplinkChannels:    cn47051020BUplinkChannels,
 
-	MaxDownlinkChannels: 48,
-	DownlinkChannels:    cn470510DownlinkChannels,
+	MaxDownlinkChannels: 64,
+	DownlinkChannels:    cn47051020BDownlinkChannels,
 
 	// See IEEE 11-11/0972r0
 	SubBands: []SubBandParameters{
@@ -70,7 +70,7 @@ var CN_470_510_RP2_v1_0_0 = Band{
 		-14,
 	},
 
-	Rx1Channel: channelIndexModulo(48),
+	Rx1Channel: channelIndexIdentity,
 	Rx1DataRate: func(idx ttnpb.DataRateIndex, offset ttnpb.DataRateOffset, _ bool) (ttnpb.DataRateIndex, error) {
 		if idx > ttnpb.DATA_RATE_5 {
 			return 0, errDataRateIndexTooHigh.WithAttributes("max", 5)
@@ -78,18 +78,21 @@ var CN_470_510_RP2_v1_0_0 = Band{
 		if offset > 5 {
 			return 0, errDataRateOffsetTooHigh.WithAttributes("max", 5)
 		}
+		// Unchanged from the pre-RP2 CN470-510 band definition.
 		return cn470510DownlinkDRTable[idx][offset], nil
 	},
 
-	GenerateChMasks: generateChMask96,
-	ParseChMask:     parseChMask96,
+	GenerateChMasks: generateChMask64,
+	ParseChMask:     parseChMask64,
 
-	DefaultRx2Parameters: Rx2Parameters{ttnpb.DATA_RATE_0, 505300000},
+	DefaultRx2Parameters: Rx2Parameters{ttnpb.DATA_RATE_0, 498300000},
 
 	Beacon: Beacon{
-		DataRateIndex:    ttnpb.DATA_RATE_2,
-		CodingRate:       "4/5",
-		ComputeFrequency: makeBeaconFrequencyFunc(cn470510BeaconFrequencies),
+		DataRateIndex: ttnpb.DATA_RATE_2,
+		CodingRate:    "4/5",
+		// The frequency of the beacon depends on the Common Join Channel Index,
+		// which is not available at band level.
+		ComputeFrequency: nil,
 	},
 
 	LoRaCodingRate: "4/5",
