@@ -21,6 +21,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -379,10 +380,19 @@ func (s *Server) DELETE(path string, h echo.HandlerFunc, m ...echo.MiddlewareFun
 	return s.echo.DELETE(replaceEchoVars(path), h, m...)
 }
 
+var hashRegex = regexp.MustCompile(`\.([a-f0-9]{20}|[a-f0-9]{32})(\.bundle)?\.(js|css|woff|woff2|ttf|eot|jpg|jpeg|png|svg)$`)
+
 // Static adds the http.FileSystem under the defined prefix.
 func (s *Server) Static(prefix string, fs http.FileSystem) {
 	prefix = "/" + strings.Trim(prefix, "/") + "/"
-	s.router.PathPrefix(prefix).Handler(http.StripPrefix(prefix, http.FileServer(fs)))
+	fileServer := http.StripPrefix(prefix, http.FileServer(fs))
+	s.router.PathPrefix(prefix).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if hashRegex.MatchString(path.Base(r.URL.String())) {
+			w.Header().Set("Cache-Control", "public, max-age=604800, immutable")
+			w.Header().Del("Pragma")
+		}
+		fileServer.ServeHTTP(w, r)
+	})
 }
 
 // Prefix returns a route for the given path prefix.
