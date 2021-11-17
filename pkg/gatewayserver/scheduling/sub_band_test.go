@@ -113,7 +113,7 @@ func TestSubBandScheduleRestricted(t *testing.T) {
 			Starts:            scheduling.ConcentratorTime(6 * time.Second),
 			Duration:          1 * time.Second,
 			Priority:          ttnpb.TxSchedulePriority_NORMAL,
-			ExpectUtilization: 0.1 / 0.5,
+			ExpectUtilization: float32(1*time.Second) / float32(scheduling.DutyCycleWindow),
 			// [     1              ]
 			//  ^^^^^^
 		},
@@ -121,7 +121,7 @@ func TestSubBandScheduleRestricted(t *testing.T) {
 			Starts:            scheduling.ConcentratorTime(14 * time.Second),
 			Duration:          1 * time.Second,
 			Priority:          ttnpb.TxSchedulePriority_NORMAL,
-			ExpectUtilization: 0.2 / 0.5,
+			ExpectUtilization: float32(2*time.Second) / float32(scheduling.DutyCycleWindow),
 			// [     1       2      ]
 			//      ^^^^^^^^^^
 		},
@@ -129,7 +129,7 @@ func TestSubBandScheduleRestricted(t *testing.T) {
 			Starts:            scheduling.ConcentratorTime(18 * time.Second),
 			Duration:          1 * time.Second,
 			Priority:          ttnpb.TxSchedulePriority_NORMAL,
-			ExpectUtilization: 0.2 / 0.5,
+			ExpectUtilization: float32(2*time.Second) / float32(scheduling.DutyCycleWindow),
 			// [     1       2   3  ]
 			//          ^^^^^^^^^^
 		},
@@ -138,7 +138,7 @@ func TestSubBandScheduleRestricted(t *testing.T) {
 			Duration:          1 * time.Second,
 			Priority:          ttnpb.TxSchedulePriority_NORMAL,
 			ExpectError:       errors.IsResourceExhausted,
-			ExpectUtilization: 0.1 / 0.5,
+			ExpectUtilization: float32(1*time.Second) / float32(scheduling.DutyCycleWindow),
 			// [     1    X  2   3  ]
 			//   ^^^^^^^^^^
 			//            ^^^^^^^^^^
@@ -147,7 +147,7 @@ func TestSubBandScheduleRestricted(t *testing.T) {
 			Starts:            scheduling.ConcentratorTime(11 * time.Second),
 			Duration:          1 * time.Second,
 			Priority:          ttnpb.TxSchedulePriority_HIGHEST,
-			ExpectUtilization: 0.2 / 0.5,
+			ExpectUtilization: float32(2*time.Second) / float32(scheduling.DutyCycleWindow),
 			// [     1    4  2   3  ]
 			//   ^^^^^^^^^^
 			//            ^^^^^^^^^^

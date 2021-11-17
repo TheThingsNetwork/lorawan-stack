@@ -104,7 +104,7 @@ func (sb *SubBand) DutyCycleUtilization() float32 {
 	sb.mu.RLock()
 	val := sb.sum(now-ConcentratorTime(DutyCycleWindow), now)
 	sb.mu.RUnlock()
-	return float32(val) / float32(DutyCycleWindow) / sb.DutyCycle
+	return float32(val) / float32(DutyCycleWindow)
 }
 
 // prioritizedDutyCycle returns the duty-cycle given the scheduling priority.
