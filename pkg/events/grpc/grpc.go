@@ -141,7 +141,7 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 	store, hasStore := srv.pubsub.(events.Store)
 	var group *errgroup.Group
 	if hasStore {
-		if req.After == nil {
+		if req.After == nil && req.Tail == 0 {
 			now := time.Now()
 			req.After = &now
 		}
