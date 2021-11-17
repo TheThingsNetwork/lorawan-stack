@@ -3890,8 +3890,8 @@ Connection stats as monitored by the Gateway Server.
 | ----- | ---- | ----- | ----------- |
 | `min_frequency` | [`uint64`](#uint64) |  |  |
 | `max_frequency` | [`uint64`](#uint64) |  |  |
-| `downlink_utilization_limit` | [`float`](#float) |  |  |
-| `downlink_utilization` | [`float`](#float) |  |  |
+| `downlink_utilization_limit` | [`float`](#float) |  | Duty-cycle limit of the sub-band as a fraction of time. |
+| `downlink_utilization` | [`float`](#float) |  | Utilization rate of the available duty-cycle. This value should not exceed downlink_utilization_limit. |
 
 ### <a name="ttn.lorawan.v3.GatewayModel">Message `GatewayModel`</a>
 

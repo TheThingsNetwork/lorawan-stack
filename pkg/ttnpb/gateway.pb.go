@@ -1727,12 +1727,14 @@ func (m *GatewayConnectionStats_RoundTripTimes) GetCount() uint32 {
 }
 
 type GatewayConnectionStats_SubBand struct {
-	MinFrequency             uint64   `protobuf:"varint,1,opt,name=min_frequency,json=minFrequency,proto3" json:"min_frequency,omitempty"`
-	MaxFrequency             uint64   `protobuf:"varint,2,opt,name=max_frequency,json=maxFrequency,proto3" json:"max_frequency,omitempty"`
-	DownlinkUtilizationLimit float32  `protobuf:"fixed32,3,opt,name=downlink_utilization_limit,json=downlinkUtilizationLimit,proto3" json:"downlink_utilization_limit,omitempty"`
-	DownlinkUtilization      float32  `protobuf:"fixed32,4,opt,name=downlink_utilization,json=downlinkUtilization,proto3" json:"downlink_utilization,omitempty"`
-	XXX_NoUnkeyedLiteral     struct{} `json:"-"`
-	XXX_sizecache            int32    `json:"-"`
+	MinFrequency uint64 `protobuf:"varint,1,opt,name=min_frequency,json=minFrequency,proto3" json:"min_frequency,omitempty"`
+	MaxFrequency uint64 `protobuf:"varint,2,opt,name=max_frequency,json=maxFrequency,proto3" json:"max_frequency,omitempty"`
+	// Duty-cycle limit of the sub-band as a fraction of time.
+	DownlinkUtilizationLimit float32 `protobuf:"fixed32,3,opt,name=downlink_utilization_limit,json=downlinkUtilizationLimit,proto3" json:"downlink_utilization_limit,omitempty"`
+	// Utilization rate of the available duty-cycle. This value should not exceed downlink_utilization_limit.
+	DownlinkUtilization  float32  `protobuf:"fixed32,4,opt,name=downlink_utilization,json=downlinkUtilization,proto3" json:"downlink_utilization,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *GatewayConnectionStats_SubBand) Reset()      { *m = GatewayConnectionStats_SubBand{} }

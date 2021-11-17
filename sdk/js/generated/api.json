@@ -17555,7 +17555,7 @@
             },
             {
               "name": "downlink_utilization_limit",
-              "description": "",
+              "description": "Duty-cycle limit of the sub-band as a fraction of time.",
               "label": "",
               "type": "float",
               "longType": "float",
@@ -17567,7 +17567,7 @@
             },
             {
               "name": "downlink_utilization",
-              "description": "",
+              "description": "Utilization rate of the available duty-cycle. This value should not exceed downlink_utilization_limit.",
               "label": "",
               "type": "float",
               "longType": "float",
