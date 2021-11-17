@@ -22,6 +22,8 @@ import from from '@ttn-lw/lib/from'
 
 import FormContext from '../context'
 
+import Tooltip from './tooltip'
+
 import style from './field.styl'
 
 class InfoField extends React.Component {
@@ -32,25 +34,28 @@ class InfoField extends React.Component {
     className: PropTypes.string,
     disabled: PropTypes.bool,
     title: PropTypes.message,
+    tooltipId: PropTypes.string,
   }
 
   static defaultProps = {
     className: undefined,
     title: undefined,
     disabled: false,
+    tooltipId: undefined,
   }
 
   render() {
-    const { children, className, title, disabled: fieldDisabled } = this.props
+    const { children, className, title, disabled: fieldDisabled, tooltipId } = this.props
     const { disabled: formDisabled } = this.context
     const disabled = formDisabled || fieldDisabled
     const cls = classnames(className, style.field, from(style, { disabled }))
 
     return (
       <div className={cls}>
-        <label className={style.label}>
+        <div className={style.label}>
           <Message content={title} className={style.title} />
-        </label>
+          {tooltipId && <Tooltip id={tooltipId} glossaryTerm={title} />}
+        </div>
         <div className={classnames(style.componentArea, style.infoArea)}>{children}</div>
       </div>
     )
