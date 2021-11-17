@@ -370,7 +370,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 	}
 
 	for i, gtw := range gtws.Gateways {
-		entityRights := callerMemberships.GetRights(callerAccountID, gtw.GetIds())
+		entityRights := callerMemberships.GetRights(callerAccountID, gtw.GetIds()).Union(authInfo.GetUniversalRights())
 
 		// Backwards compatibility for frequency_plan_id field.
 		if len(gtw.FrequencyPlanIds) > 0 {

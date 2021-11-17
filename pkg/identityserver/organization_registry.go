@@ -213,7 +213,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 	}
 
 	for i, org := range orgs.Organizations {
-		entityRights := callerMemberships.GetRights(callerAccountID, org.GetIds())
+		entityRights := callerMemberships.GetRights(callerAccountID, org.GetIds()).Union(authInfo.GetUniversalRights())
 		if !entityRights.IncludesAll(ttnpb.RIGHT_ORGANIZATION_INFO) {
 			orgs.Organizations[i] = org.PublicSafe()
 		}

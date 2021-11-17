@@ -263,7 +263,7 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 	}
 
 	for i, cli := range clis.Clients {
-		entityRights := callerMemberships.GetRights(callerAccountID, cli.GetIds())
+		entityRights := callerMemberships.GetRights(callerAccountID, cli.GetIds()).Union(authInfo.GetUniversalRights())
 		if !entityRights.IncludesAll(ttnpb.RIGHT_CLIENT_ALL) {
 			clis.Clients[i] = cli.PublicSafe()
 		}
