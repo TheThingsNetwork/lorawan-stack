@@ -1696,7 +1696,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 		appUp = up
 		return test.AllTrue(
 			a.So(up.CorrelationIds, should.HaveSameElementsDeep, append(joinReq.CorrelationIds, joinResp.CorrelationIds...)),
-			a.So([]time.Time{start, recvAt, time.Now()}, should.BeChronological),
+			a.So([]time.Time{start, *recvAt, time.Now()}, should.BeChronological),
 			a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 				EndDeviceIds:   &idsWithDevAddr,
 				CorrelationIds: up.CorrelationIds,

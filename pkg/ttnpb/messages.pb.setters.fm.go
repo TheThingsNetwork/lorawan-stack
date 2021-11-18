@@ -789,8 +789,7 @@ func (dst *ApplicationJoinAccept) SetFields(src *ApplicationJoinAccept, paths ..
 			if src != nil {
 				dst.ReceivedAt = src.ReceivedAt
 			} else {
-				var zero time.Time
-				dst.ReceivedAt = zero
+				dst.ReceivedAt = nil
 			}
 
 		default:

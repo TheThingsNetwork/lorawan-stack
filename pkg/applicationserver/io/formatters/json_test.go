@@ -75,7 +75,7 @@ func TestJSONUpstream(t *testing.T) {
 					},
 				},
 			},
-			Result: `{"end_device_ids":{"device_id":"foo-device","application_ids":{"application_id":"foo-app"}},"join_accept":{"session_key_id":"ESIzRA==","received_at":"0001-01-01T00:00:00Z"}}`,
+			Result: `{"end_device_ids":{"device_id":"foo-device","application_ids":{"application_id":"foo-app"}},"join_accept":{"session_key_id":"ESIzRA=="}}`,
 		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {

@@ -1774,7 +1774,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 								AppSKey:              dev.PendingMacState.QueuedJoinAccept.Keys.AppSKey,
 								InvalidatedDownlinks: invalidatedQueue,
 								SessionKeyId:         dev.PendingMacState.QueuedJoinAccept.Keys.SessionKeyId,
-								ReceivedAt:           up.ReceivedAt,
+								ReceivedAt:           &up.ReceivedAt,
 							},
 						},
 					})

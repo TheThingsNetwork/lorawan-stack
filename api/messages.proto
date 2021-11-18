@@ -264,7 +264,7 @@ message ApplicationJoinAccept {
   // rejoin-request.
   bool pending_session = 4;
   // Server time when the Network Server received the message.
-  google.protobuf.Timestamp received_at = 8 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+  google.protobuf.Timestamp received_at = 8 [(gogoproto.stdtime) = true];
 }
 
 message ApplicationDownlink {

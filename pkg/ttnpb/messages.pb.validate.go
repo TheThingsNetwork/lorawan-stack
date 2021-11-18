@@ -1138,7 +1138,7 @@ func (m *ApplicationJoinAccept) ValidateFields(paths ...string) error {
 			// no validation rules for PendingSession
 		case "received_at":
 
-			if v, ok := interface{}(&m.ReceivedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetReceivedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationJoinAcceptValidationError{
 						field:  "received_at",

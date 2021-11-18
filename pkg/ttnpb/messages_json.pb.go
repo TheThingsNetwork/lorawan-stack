@@ -721,10 +721,14 @@ func (x *ApplicationJoinAccept) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("pending_session")
 		s.WriteBool(x.PendingSession)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.ReceivedAt != nil || s.HasField("received_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("received_at")
-		s.WriteTime(x.ReceivedAt)
+		if x.ReceivedAt == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.ReceivedAt)
+		}
 	}
 	s.WriteObjectEnd()
 }
@@ -770,7 +774,7 @@ func (x *ApplicationJoinAccept) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState)
 			if s.Err() != nil {
 				return
 			}
-			x.ReceivedAt = *v
+			x.ReceivedAt = v
 		}
 	})
 }
