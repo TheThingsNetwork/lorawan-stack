@@ -101,7 +101,7 @@ message ApplicationPubSub {
     message AssumeRole {
       string arn = 1 [(validate.rules).string = {pattern: "^arn:aws:iam::[0-9]{12}:role\\/[A-Za-z0-9_+=,.@-]+$"}];
       string external_id = 2 [(validate.rules).string = {pattern: "^[\\w+=,.@:\\/-]*$", max_len: 1224}];
-      google.protobuf.Duration session_duration = 3 [(gogoproto.stdduration) = true];
+      google.protobuf.Duration session_duration = 3;
     }
 
     // If set, the integration will assume the given role during operation.

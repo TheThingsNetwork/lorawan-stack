@@ -158,7 +158,7 @@ message Gateway {
   bool enforce_duty_cycle = 17;
   DownlinkPathConstraint downlink_path_constraint = 18 [(validate.rules).enum.defined_only = true];
   // Adjust the time that GS schedules class C messages in advance. This is useful for gateways that have a known high latency backhaul, like 3G and satellite.
-  google.protobuf.Duration schedule_anytime_delay = 19 [(gogoproto.stdduration) = true];
+  google.protobuf.Duration schedule_anytime_delay = 19;
   // Update the location of this gateway from status messages. This only works for gateways connecting with authentication; gateways connected over UDP are not supported.
   bool update_location_from_status = 21;
   // The LoRa Basics Station LNS secret.
@@ -374,9 +374,9 @@ message GatewayConnectionStats {
   uint64 downlink_count = 8;
 
   message RoundTripTimes {
-    google.protobuf.Duration min = 1 [(gogoproto.stdduration) = true, (validate.rules).duration.required = true];
-    google.protobuf.Duration max = 2 [(gogoproto.stdduration) = true, (validate.rules).duration.required = true];
-    google.protobuf.Duration median = 3 [(gogoproto.stdduration) = true, (validate.rules).duration.required = true];
+    google.protobuf.Duration min = 1 [(validate.rules).duration.required = true];
+    google.protobuf.Duration max = 2 [(validate.rules).duration.required = true];
+    google.protobuf.Duration median = 3 [(validate.rules).duration.required = true];
     uint32 count = 4;
   }
   RoundTripTimes round_trip_times = 9;

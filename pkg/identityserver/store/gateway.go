@@ -151,8 +151,7 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 	locationPublicField:       func(pb *ttnpb.Gateway, gtw *Gateway) { pb.LocationPublic = gtw.LocationPublic },
 	scheduleDownlinkLateField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.ScheduleDownlinkLate = gtw.ScheduleDownlinkLate },
 	scheduleAnytimeDelayField: func(pb *ttnpb.Gateway, gtw *Gateway) {
-		d := time.Duration(gtw.ScheduleAnytimeDelay)
-		pb.ScheduleAnytimeDelay = &d
+		pb.ScheduleAnytimeDelay = ttnpb.ProtoDurationPtr(time.Duration(gtw.ScheduleAnytimeDelay))
 	},
 	updateLocationFromStatusField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.UpdateLocationFromStatus = gtw.UpdateLocationFromStatus },
 	enforceDutyCycleField:         func(pb *ttnpb.Gateway, gtw *Gateway) { pb.EnforceDutyCycle = gtw.EnforceDutyCycle },
@@ -267,10 +266,9 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 	locationPublicField:       func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.LocationPublic = pb.LocationPublic },
 	scheduleDownlinkLateField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.ScheduleDownlinkLate = pb.ScheduleDownlinkLate },
 	scheduleAnytimeDelayField: func(gtw *Gateway, pb *ttnpb.Gateway) {
-		if pb.ScheduleAnytimeDelay == nil {
-			gtw.ScheduleAnytimeDelay = 0
-		} else {
-			gtw.ScheduleAnytimeDelay = int64(*pb.ScheduleAnytimeDelay)
+		gtw.ScheduleAnytimeDelay = 0
+		if delay := ttnpb.StdDuration(pb.ScheduleAnytimeDelay); delay != nil {
+			gtw.ScheduleAnytimeDelay = int64(*delay)
 		}
 	},
 	updateLocationFromStatusField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.UpdateLocationFromStatus = pb.UpdateLocationFromStatus },

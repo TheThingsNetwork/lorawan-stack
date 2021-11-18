@@ -701,9 +701,9 @@ func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
 	}
 	if min, max, median, _, count := c.RTTStats(100, time.Now()); count > 0 {
 		stats.RoundTripTimes = &ttnpb.GatewayConnectionStats_RoundTripTimes{
-			Min:    &min,
-			Max:    &max,
-			Median: &median,
+			Min:    ttnpb.ProtoDurationPtr(min),
+			Max:    ttnpb.ProtoDurationPtr(max),
+			Median: ttnpb.ProtoDurationPtr(median),
 			Count:  uint32(count),
 		}
 		paths = append(paths, "round_trip_times")

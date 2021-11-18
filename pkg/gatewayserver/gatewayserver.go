@@ -478,7 +478,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 
 	ids = *gtw.GetIds()
 
-	conn, err := io.NewConnection(ctx, frontend, gtw, gs.FrequencyPlans, gtw.EnforceDutyCycle, gtw.ScheduleAnytimeDelay)
+	conn, err := io.NewConnection(ctx, frontend, gtw, gs.FrequencyPlans, gtw.EnforceDutyCycle, ttnpb.StdDuration(gtw.ScheduleAnytimeDelay))
 	if err != nil {
 		return nil, err
 	}
@@ -552,8 +552,7 @@ func requireDisconnect(connected, current *ttnpb.Gateway) bool {
 		connected.EnforceDutyCycle != current.EnforceDutyCycle ||
 		connected.LocationPublic != current.LocationPublic ||
 		connected.RequireAuthenticatedConnection != current.RequireAuthenticatedConnection ||
-		(connected.ScheduleAnytimeDelay != nil) != (current.ScheduleAnytimeDelay != nil) ||
-		connected.ScheduleAnytimeDelay != nil && *connected.ScheduleAnytimeDelay != *current.ScheduleAnytimeDelay ||
+		ttnpb.StdDurationOrZero(connected.ScheduleAnytimeDelay) != ttnpb.StdDurationOrZero(current.ScheduleAnytimeDelay) ||
 		connected.ScheduleDownlinkLate != current.ScheduleDownlinkLate ||
 		connected.StatusPublic != current.StatusPublic ||
 		connected.UpdateLocationFromStatus != current.UpdateLocationFromStatus ||

@@ -88,7 +88,7 @@ func TestGatewayStore(t *testing.T) {
 					Placement: ttnpb.GatewayAntennaPlacement_OUTDOOR,
 				},
 			},
-			ScheduleAnytimeDelay:          &scheduleAnytimeDelay,
+			ScheduleAnytimeDelay:          ttnpb.ProtoDurationPtr(scheduleAnytimeDelay),
 			UpdateLocationFromStatus:      true,
 			LbsLnsSecret:                  secret,
 			ClaimAuthenticationCode:       &gtwClaimAuthCode,
@@ -109,7 +109,7 @@ func TestGatewayStore(t *testing.T) {
 			}
 			a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
 			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
-			a.So(*created.ScheduleAnytimeDelay, should.Equal, time.Second)
+			a.So(*ttnpb.StdDuration(created.ScheduleAnytimeDelay), should.Equal, time.Second)
 			a.So(created.UpdateLocationFromStatus, should.BeTrue)
 			a.So(created.LbsLnsSecret, should.NotBeNil)
 			a.So(created.LbsLnsSecret, should.Resemble, secret)
@@ -202,7 +202,7 @@ func TestGatewayStore(t *testing.T) {
 			}
 			a.So(updated.CreatedAt, should.Resemble, created.CreatedAt)
 			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenAfter, *ttnpb.StdTime(created.CreatedAt))
-			a.So(*updated.ScheduleAnytimeDelay, should.Equal, time.Duration(0))
+			a.So(*ttnpb.StdDuration(updated.ScheduleAnytimeDelay), should.Equal, time.Duration(0))
 			a.So(updated.UpdateLocationFromStatus, should.BeFalse)
 			a.So(updated.LbsLnsSecret, should.Resemble, otherSecret)
 			a.So(updated.ClaimAuthenticationCode.Secret, should.Resemble, otherGtwClaimAuthCode.Secret)

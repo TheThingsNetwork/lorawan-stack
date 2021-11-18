@@ -178,7 +178,7 @@ func (x *Gateway) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ScheduleAnytimeDelay == nil {
 			s.WriteNil()
 		} else {
-			s.WriteDuration(*x.ScheduleAnytimeDelay)
+			gogo.MarshalDuration(s, x.ScheduleAnytimeDelay)
 		}
 	}
 	if x.UpdateLocationFromStatus || s.HasField("update_location_from_status") {
@@ -342,7 +342,7 @@ func (x *Gateway) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.DownlinkPathConstraint.UnmarshalProtoJSON(s)
 		case "schedule_anytime_delay", "scheduleAnytimeDelay":
 			s.AddField("schedule_anytime_delay")
-			v := s.ReadDuration()
+			v := gogo.UnmarshalDuration(s)
 			if s.Err() != nil {
 				return
 			}
