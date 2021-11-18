@@ -30,7 +30,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	ttsauth "go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
-	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/mqtt"
@@ -110,10 +109,11 @@ type connection struct {
 
 func (c *connection) setup(ctx context.Context) error {
 	ctx = auth.NewContextWithInterface(ctx, c)
-	ctx, cancel := errorcontext.New(ctx)
 	c.session = session.New(ctx, c.mqtt, c.deliver)
 	if err := c.session.ReadConnect(); err != nil {
-		cancel(err)
+		if c.io != nil {
+			c.io.Disconnect(err)
+		}
 		return err
 	}
 	ctx = c.io.Context()
@@ -129,7 +129,7 @@ func (c *connection) setup(ctx context.Context) error {
 				if err != stdio.EOF {
 					logger.WithError(err).Warn("Error when reading packet")
 				}
-				cancel(err)
+				c.io.Disconnect(err)
 				return
 			}
 			if pkt != nil {
@@ -210,7 +210,7 @@ func (c *connection) setup(ctx context.Context) error {
 				err = c.mqtt.Send(pkt)
 			}
 			if err != nil {
-				cancel(err)
+				c.io.Disconnect(err)
 				return
 			}
 		}
