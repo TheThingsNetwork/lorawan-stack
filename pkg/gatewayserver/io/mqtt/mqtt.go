@@ -29,7 +29,6 @@ import (
 	"github.com/TheThingsIndustries/mystique/pkg/packet"
 	"github.com/TheThingsIndustries/mystique/pkg/session"
 	"github.com/TheThingsIndustries/mystique/pkg/topic"
-	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -116,7 +115,6 @@ func (*connection) SupportsDownlinkClaim() bool { return false }
 
 func (c *connection) setup(ctx context.Context) (err error) {
 	ctx = auth.NewContextWithInterface(ctx, c)
-	ctx, cancel := errorcontext.New(ctx)
 	defer func() {
 		retrievedErr := recoverMQTTFrontend(ctx)
 		if retrievedErr != nil {
@@ -125,7 +123,9 @@ func (c *connection) setup(ctx context.Context) (err error) {
 	}()
 	c.session = session.New(ctx, c.mqtt, c.deliver)
 	if err := c.session.ReadConnect(); err != nil {
-		cancel(err)
+		if c.io != nil {
+			c.io.Disconnect(err)
+		}
 		return err
 	}
 	ctx = c.io.Context()
@@ -142,7 +142,7 @@ func (c *connection) setup(ctx context.Context) (err error) {
 				if err != stdio.EOF {
 					logger.WithError(err).Warn("Error when reading packet")
 				}
-				cancel(err)
+				c.io.Disconnect(err)
 				return
 			}
 			if pkt != nil {
@@ -202,7 +202,7 @@ func (c *connection) setup(ctx context.Context) (err error) {
 				err = c.mqtt.Send(pkt)
 			}
 			if err != nil {
-				cancel(err)
+				c.io.Disconnect(err)
 				return
 			}
 		}
