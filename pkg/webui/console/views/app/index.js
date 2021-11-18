@@ -16,10 +16,12 @@ import { hot } from 'react-hot-loader/root'
 import React from 'react'
 import { connect } from 'react-redux'
 import { ConnectedRouter } from 'connected-react-router'
+import { defineMessages } from 'react-intl'
 import { Route, Switch } from 'react-router-dom'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
 
+import Modal from '@ttn-lw/components/modal'
 import { ToastContainer } from '@ttn-lw/components/toast'
 import sidebarStyle from '@ttn-lw/components/navigation/side/side.styl'
 
@@ -44,6 +46,7 @@ import User from '@console/views/user'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import dev from '@ttn-lw/lib/dev'
 import { setStatusOnline } from '@ttn-lw/lib/store/actions/status'
+import { selectStatusStore } from '@ttn-lw/lib/store/selectors/status'
 
 import {
   selectUser,
@@ -58,6 +61,16 @@ import style from './app.styl'
 const GenericNotFound = () => <FullViewErrorInner error={{ statusCode: 404 }} />
 const errorRender = error => <FullViewError error={error} header={<Header />} />
 
+const m = defineMessages({
+  modalTitle: 'Please sign in again',
+  modalMessage: `You were signed out of your account. Please press 'Reload' to log back in the console again.`,
+  buttonMessage: 'Reload',
+})
+
+const reload = () => {
+  window.location.reload()
+}
+
 @withEnv
 @connect(
   state => ({
@@ -66,6 +79,7 @@ const errorRender = error => <FullViewError error={error} header={<Header />} />
     error: selectUserError(state),
     rights: selectUserRights(state),
     isAdmin: selectUserIsAdmin(state),
+    status: selectStatusStore(state),
   }),
   {
     setStatusOnline,
@@ -84,6 +98,7 @@ class ConsoleApp extends React.PureComponent {
     isAdmin: PropTypes.bool,
     rights: PropTypes.rights,
     setStatusOnline: PropTypes.func.isRequired,
+    status: PropTypes.shape({ onlineStatus: PropTypes.string, isLoginRequired: PropTypes.bool }),
     user: PropTypes.user,
   }
   static defaultProps = {
@@ -91,6 +106,7 @@ class ConsoleApp extends React.PureComponent {
     error: undefined,
     isAdmin: undefined,
     rights: undefined,
+    status: {},
   }
 
   @bind
@@ -124,6 +140,7 @@ class ConsoleApp extends React.PureComponent {
         siteName,
         config: { supportLink, documentationBaseUrl },
       },
+      status,
     } = this.props
 
     if (pageData && pageData.error) {
@@ -136,6 +153,15 @@ class ConsoleApp extends React.PureComponent {
 
     return (
       <React.Fragment>
+        {status.isLoginRequired && (
+          <Modal
+            approval={false}
+            buttonMessage={m.buttonMessage}
+            message={m.modalMessage}
+            title={m.modalTitle}
+            onComplete={reload}
+          />
+        )}
         <ToastContainer />
         <ConnectedRouter history={history}>
           <ScrollToTop />

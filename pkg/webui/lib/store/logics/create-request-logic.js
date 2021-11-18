@@ -138,8 +138,7 @@ const createRequestLogic = (
           // valid and we can delete it. Reloading will then initiate the auth flow.
           if (isUnauthenticatedError(e)) {
             clearAccessToken()
-            status.isLoginRequired = true
-            // Window.location.reload()
+            selectStatusStore(getState()).isLoginRequired = true
             break
             // If there was a network error, it could mean that the network
             // connection is currently interrupted. Setting the online state to
