@@ -20,12 +20,12 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"net"
+	"net/http"
 	"net/url"
 	"strings"
 	"sync"
 	"time"
 
-	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
@@ -179,13 +179,15 @@ func NewServer(c *component.Component, options ...Option) *Server {
 
 // RegisterRoutes implements web.Registerer
 func (s *Server) RegisterRoutes(web *web.Server) {
-	web.POST("/update-info", s.UpdateInfo, ratelimit.EchoMiddleware(s.component.RateLimiter(), "http:gcs:cups"))
+	router := web.Router().NewRoute().Subrouter()
+	router.Use(ratelimit.HTTPMiddleware(s.component.RateLimiter(), "http:gcs:cups"))
+	router.Path("/update-info").HandlerFunc(s.UpdateInfo).Methods(http.MethodPost)
 }
 
-func getContext(c echo.Context) context.Context {
-	ctx := c.Request().Context()
+func getContext(r *http.Request) context.Context {
+	ctx := r.Context()
 	md := metadata.New(map[string]string{
-		"authorization": c.Request().Header.Get(echo.HeaderAuthorization),
+		"authorization": r.Header.Get("Authorization"),
 	})
 	if ctxMd, ok := metadata.FromIncomingContext(ctx); ok {
 		md = metadata.Join(ctxMd, md)

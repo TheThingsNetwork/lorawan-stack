@@ -212,8 +212,6 @@ func TestServer(t *testing.T) {
 		return &gtw
 	}
 
-	e := echo.New()
-
 	for _, tt := range []struct {
 		Name           string
 		StoreSetup     func(*mockGatewayClient)
@@ -580,8 +578,7 @@ func TestServer(t *testing.T) {
 				tt.RequestSetup(req)
 			}
 			rec := httptest.NewRecorder()
-			c := e.NewContext(req, rec)
-			err := s.UpdateInfo(c)
+			err := s.updateInfo(rec, req)
 			if tt.AssertError != nil && !a.So(tt.AssertError(err), should.BeTrue) {
 				t.Fatalf("Unexpected error :%v", err)
 			}
