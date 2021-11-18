@@ -201,26 +201,48 @@ var errBufferFull = errors.DefineInternal("buffer_full", "buffer is full")
 // Interval between emitting consecutive gs.up.repeat events for the same gateway connection.
 const consecutiveRepeatUpEventsInterval = time.Minute
 
+// ManualClockSynchronization contains the clock synchronization
+// timestamps provided by a frontend for manual synchronization.
+type ManualClockSynchronization struct {
+	Timestamp        uint32
+	ServerTime       time.Time
+	GatewayTime      *time.Time
+	ConcentratorTime scheduling.ConcentratorTime
+}
+
 // HandleUp updates the uplink stats and sends the message to the upstream channel.
-func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
+func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, manualSync *ManualClockSynchronization) error {
 	if c.discardRepeatedUplink(up) {
 		return nil
 	}
 
 	var ct scheduling.ConcentratorTime
-	if up.Settings.Time != nil {
+	switch {
+	case manualSync != nil:
+		ct = c.scheduler.SyncWithGatewayConcentrator(manualSync.Timestamp, manualSync.ServerTime, manualSync.GatewayTime, manualSync.ConcentratorTime)
+		log.FromContext(c.ctx).WithFields(log.Fields(
+			"timestamp", manualSync.Timestamp,
+			"concentrator_time", manualSync.ConcentratorTime,
+			"server_time", manualSync.ServerTime,
+			"gateway_time", manualSync.GatewayTime,
+		)).Info("Gateway clocks have been synchronized by the frontend")
+	case up.Settings.Time != nil:
 		ct = c.scheduler.SyncWithGatewayAbsolute(up.Settings.Timestamp, up.ReceivedAt, *up.Settings.Time)
 		log.FromContext(c.ctx).WithFields(log.Fields(
 			"timestamp", up.Settings.Timestamp,
+			"concentrator_time", ct,
 			"server_time", up.ReceivedAt,
 			"gateway_time", *up.Settings.Time,
-		)).Debug("Synchronized server and gateway absolute time")
-	} else {
+		)).Info("Synchronized server and gateway absolute time")
+	case up.Settings.Time == nil:
 		ct = c.scheduler.Sync(up.Settings.Timestamp, up.ReceivedAt)
 		log.FromContext(c.ctx).WithFields(log.Fields(
 			"timestamp", up.Settings.Timestamp,
+			"concentrator_time", ct,
 			"server_time", up.ReceivedAt,
-		)).Debug("Synchronized server absolute time only")
+		)).Info("Synchronized server absolute time only")
+	default:
+		panic("unreachable")
 	}
 
 	for _, md := range up.RxMetadata {
@@ -701,8 +723,8 @@ func (c *Connection) BandID() string { return c.bandID }
 
 // SyncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
 // relative gateway time that corresponds to the given timestamp.
-func (c *Connection) SyncWithGatewayConcentrator(timestamp uint32, server time.Time, gateway *time.Time, concentrator scheduling.ConcentratorTime) {
-	c.scheduler.SyncWithGatewayConcentrator(timestamp, server, gateway, concentrator)
+func (c *Connection) SyncWithGatewayConcentrator(timestamp uint32, server time.Time, gateway *time.Time, concentrator scheduling.ConcentratorTime) scheduling.ConcentratorTime {
+	return c.scheduler.SyncWithGatewayConcentrator(timestamp, server, gateway, concentrator)
 }
 
 // TimeFromTimestampTime returns the concentrator time by the given timestamp.
