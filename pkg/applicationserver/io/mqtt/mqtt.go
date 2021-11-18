@@ -18,11 +18,9 @@ package mqtt
 import (
 	"context"
 	"fmt"
-	stdio "io"
 	"net"
 
 	"github.com/TheThingsIndustries/mystique/pkg/auth"
-	mqttlog "github.com/TheThingsIndustries/mystique/pkg/log"
 	mqttnet "github.com/TheThingsIndustries/mystique/pkg/net"
 	"github.com/TheThingsIndustries/mystique/pkg/packet"
 	"github.com/TheThingsIndustries/mystique/pkg/session"
@@ -41,107 +39,45 @@ import (
 
 const qosUpstream byte = 0
 
-type srv struct {
-	ctx    context.Context
-	server io.Server
-	format Format
-	lis    mqttnet.Listener
-}
-
 // Serve serves the MQTT frontend.
 func Serve(ctx context.Context, server io.Server, listener net.Listener, format Format, protocol string) error {
 	ctx = log.NewContextWithField(ctx, "namespace", "applicationserver/io/mqtt")
-	ctx = mqttlog.NewContext(ctx, mqtt.Logger(log.FromContext(ctx)))
-	s := &srv{ctx, server, format, mqttnet.NewListener(listener, protocol)}
+	lis := mqttnet.NewListener(listener, protocol)
 	go func() {
 		<-ctx.Done()
-		s.lis.Close()
+		lis.Close()
 	}()
-	return s.accept()
-}
-
-func (s *srv) accept() error {
-	for {
-		mqttConn, err := s.lis.Accept()
-		if err != nil {
-			if s.ctx.Err() == nil {
-				log.FromContext(s.ctx).WithError(err).Warn("Accept failed")
-			}
-			return err
-		}
-
-		remoteAddr := mqttConn.RemoteAddr().String()
-		ctx := log.NewContextWithFields(s.ctx, log.Fields("remote_addr", remoteAddr))
-
-		resource := ratelimit.ApplicationAcceptMQTTConnectionResource(remoteAddr)
-		if err := ratelimit.Require(s.server.RateLimiter(), resource); err != nil {
-			if err := mqttConn.Close(); err != nil {
-				log.FromContext(ctx).WithError(err).Warn("Close connection failed")
-			}
-			log.FromContext(ctx).WithError(err).Debug("Drop connection")
-			continue
-		}
-
-		go func() {
-			conn := &connection{server: s.server, mqtt: mqttConn, format: s.format}
-			if err := conn.setup(ctx); err != nil {
-				switch err {
-				case stdio.EOF, stdio.ErrUnexpectedEOF:
-				default:
-					log.FromContext(ctx).WithError(err).Warn("Failed to setup connection")
-				}
-				mqttConn.Close()
-				return
-			}
-		}()
-	}
+	return mqtt.RunListener(
+		ctx, lis, server,
+		ratelimit.ApplicationAcceptMQTTConnectionResource, server.RateLimiter(),
+		func(ctx context.Context, mqttConn mqttnet.Conn) error {
+			conn := &connection{server: server, format: format}
+			return conn.setup(ctx, mqttConn)
+		},
+	)
 }
 
 type connection struct {
-	format  Format
-	server  io.Server
-	mqtt    mqttnet.Conn
-	session session.Session
-	io      *io.Subscription
-
+	format   Format
+	server   io.Server
+	io       *io.Subscription
 	resource ratelimit.Resource
 }
 
-func (c *connection) setup(ctx context.Context) error {
+func (c *connection) setup(ctx context.Context, mqttConn mqttnet.Conn) error {
 	ctx = auth.NewContextWithInterface(ctx, c)
-	c.session = session.New(ctx, c.mqtt, c.deliver)
-	if err := c.session.ReadConnect(); err != nil {
+	session := session.New(ctx, mqttConn, c.deliver)
+	if err := session.ReadConnect(); err != nil {
 		if c.io != nil {
 			c.io.Disconnect(err)
 		}
 		return err
 	}
+
 	ctx = c.io.Context()
-
 	logger := log.FromContext(ctx)
-	controlCh := make(chan packet.ControlPacket)
 
-	// Read control packets
-	go func() {
-		for {
-			pkt, err := c.session.ReadPacket()
-			if err != nil {
-				if err != stdio.EOF {
-					logger.WithError(err).Warn("Error when reading packet")
-				}
-				c.io.Disconnect(err)
-				return
-			}
-			if pkt != nil {
-				logger.Debugf("Schedule %s packet", packet.Name[pkt.PacketType()])
-				select {
-				case <-ctx.Done():
-					return
-				case controlCh <- pkt:
-				}
-			}
-		}
-	}()
+	mqtt.RunSession(ctx, c.io.Disconnect, c.server, session, mqttConn)
 
 	// Publish upstream
 	go func() {
@@ -183,7 +119,7 @@ func (c *connection) setup(ctx context.Context) error {
 					continue
 				}
 				logger.Debug("Publish upstream message")
-				c.session.Publish(&packet.PublishPacket{
+				session.Publish(&packet.PublishPacket{
 					TopicName:  topic.Join(topicParts),
 					TopicParts: topicParts,
 					QoS:        qosUpstream,
@@ -193,40 +129,6 @@ func (c *connection) setup(ctx context.Context) error {
 		}
 	}()
 
-	// Write packets
-	go func() {
-		for {
-			var err error
-			select {
-			case <-ctx.Done():
-				return
-			case pkt := <-controlCh:
-				err = c.mqtt.Send(pkt)
-			case pkt, ok := <-c.session.PublishChan():
-				if !ok {
-					return
-				}
-				logger.Debug("Write publish packet")
-				err = c.mqtt.Send(pkt)
-			}
-			if err != nil {
-				c.io.Disconnect(err)
-				return
-			}
-		}
-	}()
-
-	// Close connection on context closure
-	go func() {
-		select {
-		case <-ctx.Done():
-			logger.WithError(ctx.Err()).Info("Disconnected")
-			c.session.Close()
-			c.mqtt.Close()
-		}
-	}()
-
-	logger.Info("Connected")
 	return nil
 }
 
