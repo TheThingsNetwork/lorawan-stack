@@ -17,6 +17,7 @@ package mqtt
 
 import (
 	"context"
+	"sync"
 
 	mqttlog "github.com/TheThingsIndustries/mystique/pkg/log"
 	mqttnet "github.com/TheThingsIndustries/mystique/pkg/net"
@@ -81,11 +82,12 @@ func RunSession(
 	ts component.TaskStarter,
 	session session.Session,
 	mqttConn mqttnet.Conn,
+	wg *sync.WaitGroup,
 ) {
-	logger := log.FromContext(ctx)
-
+	wg.Add(2)
 	controlCh := make(chan packet.ControlPacket)
 	controlFunc := func(ctx context.Context) error {
+		defer wg.Done()
 		for {
 			pkt, err := session.ReadPacket()
 			if err != nil {
@@ -103,6 +105,7 @@ func RunSession(
 		}
 	}
 	writeFunc := func(ctx context.Context) error {
+		defer wg.Done()
 		for {
 			var pkt packet.ControlPacket
 			select {
@@ -118,11 +121,15 @@ func RunSession(
 		}
 	}
 	closeFunc := func(ctx context.Context) error {
-		logger.Info("Connected")
+		log.FromContext(ctx).Info("Connected")
 		<-ctx.Done()
-		logger.WithError(ctx.Err()).Info("Disconnected")
+		log.FromContext(ctx).WithError(ctx.Err()).Info("Disconnected")
+
 		session.Close()
 		mqttConn.Close()
+
+		wg.Wait()
+
 		return ctx.Err()
 	}
 

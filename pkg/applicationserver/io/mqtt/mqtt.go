@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"sync"
 
 	"github.com/TheThingsIndustries/mystique/pkg/auth"
 	mqttnet "github.com/TheThingsIndustries/mystique/pkg/net"
@@ -28,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	ttsauth "go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/mqtt"
@@ -51,8 +53,7 @@ func Serve(ctx context.Context, server io.Server, listener net.Listener, format 
 		ctx, lis, server,
 		ratelimit.ApplicationAcceptMQTTConnectionResource, server.RateLimiter(),
 		func(ctx context.Context, mqttConn mqttnet.Conn) error {
-			conn := &connection{server: server, format: format}
-			return conn.setup(ctx, mqttConn)
+			return setupConnection(ctx, mqttConn, format, server)
 		},
 	)
 }
@@ -64,7 +65,12 @@ type connection struct {
 	resource ratelimit.Resource
 }
 
-func (c *connection) setup(ctx context.Context, mqttConn mqttnet.Conn) error {
+func setupConnection(ctx context.Context, mqttConn mqttnet.Conn, format Format, server io.Server) error {
+	c := &connection{
+		format: format,
+		server: server,
+	}
+
 	ctx = auth.NewContextWithInterface(ctx, c)
 	session := session.New(ctx, mqttConn, c.deliver)
 	if err := session.ReadConnect(); err != nil {
@@ -73,47 +79,22 @@ func (c *connection) setup(ctx context.Context, mqttConn mqttnet.Conn) error {
 		}
 		return err
 	}
-
 	ctx = c.io.Context()
-	logger := log.FromContext(ctx)
 
-	mqtt.RunSession(ctx, c.io.Disconnect, c.server, session, mqttConn)
-
-	// Publish upstream
-	go func() {
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	f := func(ctx context.Context) error {
 		for {
 			select {
 			case <-ctx.Done():
-				return
+				return ctx.Err()
 			case up := <-c.io.Up():
-				logger := logger.WithField("device_uid", unique.ID(up.Context, up.EndDeviceIdentifiers))
-				var topicParts []string
-				switch up.Up.(type) {
-				case *ttnpb.ApplicationUp_UplinkMessage:
-					topicParts = c.format.UplinkTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
-				case *ttnpb.ApplicationUp_JoinAccept:
-					topicParts = c.format.JoinAcceptTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
-				case *ttnpb.ApplicationUp_DownlinkAck:
-					topicParts = c.format.DownlinkAckTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
-				case *ttnpb.ApplicationUp_DownlinkNack:
-					topicParts = c.format.DownlinkNackTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
-				case *ttnpb.ApplicationUp_DownlinkSent:
-					topicParts = c.format.DownlinkSentTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
-				case *ttnpb.ApplicationUp_DownlinkFailed:
-					topicParts = c.format.DownlinkFailedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
-				case *ttnpb.ApplicationUp_DownlinkQueued:
-					topicParts = c.format.DownlinkQueuedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
-				case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
-					topicParts = c.format.DownlinkQueueInvalidatedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
-				case *ttnpb.ApplicationUp_LocationSolved:
-					topicParts = c.format.LocationSolvedTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
-				case *ttnpb.ApplicationUp_ServiceData:
-					topicParts = c.format.ServiceDataTopic(unique.ID(up.Context, c.io.ApplicationIDs()), up.DeviceId)
-				}
+				logger := log.FromContext(ctx).WithField("device_uid", unique.ID(up.Context, up.EndDeviceIdentifiers))
+				topicParts := TopicParts(up, format)
 				if topicParts == nil {
 					continue
 				}
-				buf, err := c.format.FromUp(up.ApplicationUp)
+				buf, err := format.FromUp(up.ApplicationUp)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal upstream message")
 					continue
@@ -127,7 +108,17 @@ func (c *connection) setup(ctx context.Context, mqttConn mqttnet.Conn) error {
 				})
 			}
 		}
-	}()
+	}
+	server.StartTask(&component.TaskConfig{
+		Context: ctx,
+		ID:      "mqtt_publish_uplinks",
+		Func:    f,
+		Done:    wg.Done,
+		Restart: component.TaskRestartNever,
+		Backoff: component.DefaultTaskBackoffConfig,
+	})
+
+	mqtt.RunSession(ctx, c.io.Disconnect, server, session, mqttConn, wg)
 
 	return nil
 }

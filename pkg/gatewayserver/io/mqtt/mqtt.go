@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"sync"
 	"time"
 
 	"github.com/TheThingsIndustries/mystique/pkg/auth"
@@ -25,6 +26,7 @@ import (
 	"github.com/TheThingsIndustries/mystique/pkg/packet"
 	"github.com/TheThingsIndustries/mystique/pkg/session"
 	"github.com/TheThingsIndustries/mystique/pkg/topic"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -49,8 +51,7 @@ func Serve(ctx context.Context, server io.Server, listener net.Listener, format 
 		ctx, lis, server,
 		ratelimit.GatewayAcceptMQTTConnectionResource, server.RateLimiter(),
 		func(ctx context.Context, mqttConn mqttnet.Conn) error {
-			conn := &connection{server: server, format: format}
-			return conn.setup(ctx, mqttConn)
+			return setupConnection(ctx, mqttConn, format, server)
 		},
 	)
 }
@@ -66,7 +67,12 @@ type connection struct {
 func (*connection) Protocol() string            { return "mqtt" }
 func (*connection) SupportsDownlinkClaim() bool { return false }
 
-func (c *connection) setup(ctx context.Context, mqttConn mqttnet.Conn) error {
+func setupConnection(ctx context.Context, mqttConn mqttnet.Conn, format Format, server io.Server) error {
+	c := &connection{
+		format: format,
+		server: server,
+	}
+
 	ctx = auth.NewContextWithInterface(ctx, c)
 	session := session.New(ctx, mqttConn, c.deliver)
 	if err := session.ReadConnect(); err != nil {
@@ -75,29 +81,27 @@ func (c *connection) setup(ctx context.Context, mqttConn mqttnet.Conn) error {
 		}
 		return err
 	}
-
 	ctx = c.io.Context()
-	logger := log.FromContext(ctx)
 
-	mqtt.RunSession(ctx, c.io.Disconnect, c.server, session, mqttConn)
-
-	// Publish downlinks
-	go func() {
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+	f := func(ctx context.Context) error {
+		logger := log.FromContext(ctx)
 		for {
 			select {
 			case <-ctx.Done():
-				return
+				return ctx.Err()
 			case down := <-c.io.Down():
 				token := c.tokens.Next(down, time.Now())
 				down.CorrelationIds = append(down.CorrelationIds, c.tokens.FormatCorrelationID(token))
 
-				buf, err := c.format.FromDownlink(down, *c.io.Gateway().GetIds())
+				buf, err := format.FromDownlink(down, *c.io.Gateway().GetIds())
 				if err != nil {
 					logger.WithError(err).Warn("Failed to marshal downlink message")
 					continue
 				}
 				logger.Info("Publish downlink message")
-				topicParts := c.format.DownlinkTopic(unique.ID(c.io.Context(), c.io.Gateway().GetIds()))
+				topicParts := format.DownlinkTopic(unique.ID(c.io.Context(), c.io.Gateway().GetIds()))
 				session.Publish(&packet.PublishPacket{
 					TopicName:  topic.Join(topicParts),
 					TopicParts: topicParts,
@@ -106,7 +110,17 @@ func (c *connection) setup(ctx context.Context, mqttConn mqttnet.Conn) error {
 				})
 			}
 		}
-	}()
+	}
+	server.StartTask(&component.TaskConfig{
+		Context: ctx,
+		ID:      "mqtt_publish_downlinks",
+		Func:    f,
+		Done:    wg.Done,
+		Restart: component.TaskRestartNever,
+		Backoff: component.DefaultTaskBackoffConfig,
+	})
+
+	mqtt.RunSession(ctx, c.io.Disconnect, server, session, mqttConn, wg)
 
 	return nil
 }
