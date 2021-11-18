@@ -848,8 +848,8 @@ func TestHomeNetwork(t *testing.T) {
 				}
 				a.So(nsMsg.CorrelationIds, should.HaveLength, 2)
 				nsMsg.CorrelationIds = nil
-				a.So(nsMsg.ReceivedAt, should.HappenBetween, before, time.Now()) // Packet Broker Agent sets local time on receive.
-				nsMsg.ReceivedAt = &time.Time{}
+				a.So(*nsMsg.ReceivedAt, should.HappenBetween, before, time.Now()) // Packet Broker Agent sets local time on receive.
+				nsMsg.ReceivedAt = nil
 				a.So(nsMsg, should.Resemble, tc.UplinkMessage)
 
 				var stateChange *packetbroker.UplinkMessageDeliveryStateChange
