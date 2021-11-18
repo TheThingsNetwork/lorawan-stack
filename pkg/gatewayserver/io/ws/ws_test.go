@@ -114,7 +114,10 @@ func TestClientTokenAuth(t *testing.T) {
 	} {
 		cfg := defaultConfig
 		cfg.AllowUnauthenticated = ttc.AllowUnauthenticated
-		bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), cfg)
+		web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), cfg)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
 		lis, err := net.Listen("tcp", serverAddress)
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
@@ -122,7 +125,7 @@ func TestClientTokenAuth(t *testing.T) {
 		defer lis.Close()
 		go func() error {
 			return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				bsWebServer.ServeHTTP(w, r)
+				web.ServeHTTP(w, r)
 			}))
 		}()
 		servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
@@ -229,7 +232,10 @@ func TestDiscover(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -237,7 +243,7 @@ func TestDiscover(t *testing.T) {
 	defer lis.Close()
 	go func() error {
 		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			bsWebServer.ServeHTTP(w, r)
+			web.ServeHTTP(w, r)
 		}))
 	}()
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
@@ -486,7 +492,10 @@ func TestVersion(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -494,7 +503,7 @@ func TestVersion(t *testing.T) {
 	defer lis.Close()
 	go func() error {
 		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			bsWebServer.ServeHTTP(w, r)
+			web.ServeHTTP(w, r)
 		}))
 	}()
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
@@ -737,7 +746,10 @@ func TestTraffic(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -745,7 +757,7 @@ func TestTraffic(t *testing.T) {
 	defer lis.Close()
 	go func() error {
 		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			bsWebServer.ServeHTTP(w, r)
+			web.ServeHTTP(w, r)
 		}))
 	}()
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
@@ -1185,7 +1197,10 @@ func TestRTT(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -1193,7 +1208,7 @@ func TestRTT(t *testing.T) {
 	defer lis.Close()
 	go func() error {
 		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			bsWebServer.ServeHTTP(w, r)
+			web.ServeHTTP(w, r)
 		}))
 	}()
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
@@ -1502,7 +1517,10 @@ func TestPingPong(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -1510,7 +1528,7 @@ func TestPingPong(t *testing.T) {
 	defer lis.Close()
 	go func() error {
 		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			bsWebServer.ServeHTTP(w, r)
+			web.ServeHTTP(w, r)
 		}))
 	}()
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
@@ -1588,12 +1606,15 @@ func TestPingPong(t *testing.T) {
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
-			bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), Config{
+			web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), Config{
 				WSPingInterval:       (1 << 2) * test.Delay,
 				AllowUnauthenticated: true,
 				UseTrafficTLSAddress: false,
 				MissedPongThreshold:  2,
 			})
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
 			lis, err := net.Listen("tcp", serverAddress)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
@@ -1601,7 +1622,7 @@ func TestPingPong(t *testing.T) {
 			defer lis.Close()
 			go func() error {
 				return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-					bsWebServer.ServeHTTP(w, r)
+					web.ServeHTTP(w, r)
 				}))
 			}()
 			servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())

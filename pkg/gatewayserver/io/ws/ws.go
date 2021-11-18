@@ -24,9 +24,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
-	echo "github.com/labstack/echo/v4"
-	echomiddleware "github.com/labstack/echo/v4/middleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
@@ -38,7 +37,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
-	"go.thethings.network/lorawan-stack/v3/pkg/web/middleware"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -51,7 +50,6 @@ var (
 type srv struct {
 	ctx       context.Context
 	server    io.Server
-	webServer *echo.Echo
 	upgrader  *websocket.Upgrader
 	cfg       Config
 	formatter Formatter
@@ -61,87 +59,90 @@ func (s *srv) Protocol() string            { return "ws" }
 func (s *srv) SupportsDownlinkClaim() bool { return false }
 
 // New creates a new WebSocket frontend.
-func New(ctx context.Context, server io.Server, formatter Formatter, cfg Config) *echo.Echo {
+func New(ctx context.Context, server io.Server, formatter Formatter, cfg Config) (*web.Server, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/ws")
 
-	webServer := echo.New()
-	webServer.Logger = web.NewNoopLogger()
-	webServer.HTTPErrorHandler = errorHandler
-	webServer.Use(
-		middleware.ID(""),
-		echomiddleware.BodyLimit("16M"),
-		middleware.Log(log.FromContext(ctx)),
-		ratelimit.EchoMiddleware(server.RateLimiter(), "gs:accept:ws"),
-		middleware.Recover(),
-	)
-
 	s := &srv{
-		ctx:       ctx,
-		server:    server,
-		upgrader:  &websocket.Upgrader{},
-		webServer: webServer,
+		ctx:    ctx,
+		server: server,
+		upgrader: &websocket.Upgrader{
+			HandshakeTimeout: 120 * time.Second,
+			WriteBufferPool:  &sync.Pool{},
+			Error: func(w http.ResponseWriter, r *http.Request, _ int, err error) {
+				webhandlers.Error(w, r, err)
+			},
+		},
 		formatter: formatter,
 		cfg:       cfg,
 	}
 
+	web, err := web.New(ctx, web.WithDisableWarnings(true))
+	if err != nil {
+		return nil, err
+	}
+
+	router := web.RootRouter()
+	router.Use(
+		ratelimit.HTTPMiddleware(server.RateLimiter(), "gs:accept:ws"),
+	)
+
 	eps := s.formatter.Endpoints()
-	webServer.GET(eps.ConnectionInfo, s.handleConnectionInfo)
-	webServer.GET(eps.Traffic, s.handleTraffic)
+	router.HandleFunc(eps.ConnectionInfo, s.handleConnectionInfo).Methods(http.MethodGet)
+	router.HandleFunc(eps.Traffic, func(w http.ResponseWriter, r *http.Request) {
+		if err := s.handleTraffic(w, r); err != nil {
+			webhandlers.Error(w, r, err)
+		}
+	}).Methods(http.MethodGet)
 
-	go func() {
-		<-ctx.Done()
-		webServer.Close()
-	}()
-
-	return webServer
+	return web, nil
 }
 
-func (s *srv) handleConnectionInfo(c echo.Context) error {
-	ctx := c.Request().Context()
+func (s *srv) handleConnectionInfo(w http.ResponseWriter, r *http.Request) {
 	eps := s.formatter.Endpoints()
-	logger := log.FromContext(ctx).WithFields(log.Fields(
+	ctx := log.NewContextWithFields(r.Context(), log.Fields(
 		"endpoint", eps.ConnectionInfo,
-		"remote_addr", c.Request().RemoteAddr,
+		"remote_addr", r.RemoteAddr,
 	))
-	ws, err := s.upgrader.Upgrade(c.Response(), c.Request(), nil)
+	logger := log.FromContext(ctx)
+	ws, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		logger.WithError(err).Debug("Failed to upgrade request to websocket connection")
-		return err
+		return
 	}
 	defer ws.Close()
 
 	_, data, err := ws.ReadMessage()
 	if err != nil {
 		logger.WithError(err).Debug("Failed to read message")
-		return err
+		return
 	}
 
 	scheme := "ws"
-	if c.IsTLS() || s.cfg.UseTrafficTLSAddress {
+	if s.cfg.UseTrafficTLSAddress {
 		scheme = "wss"
 	}
 
 	info := ServerInfo{
 		Scheme:  scheme,
-		Address: c.Request().Host,
+		Address: r.Host,
 	}
 
 	resp := s.formatter.HandleConnectionInfo(ctx, data, s.server, info, time.Now())
 	if err := ws.WriteMessage(websocket.TextMessage, resp); err != nil {
 		logger.WithError(err).Warn("Failed to write connection info response message")
-		return err
+		return
 	}
 	logger.Debug("Sent connection info response message")
-	return nil
+	return
 }
 
 var euiHexPattern = regexp.MustCompile("^eui-([a-f0-9A-F]{16})$")
 
-func (s *srv) handleTraffic(c echo.Context) (err error) {
+func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) {
 	var (
-		id                 = c.Param("id")
-		auth               = c.Request().Header.Get(echo.HeaderAuthorization)
-		ctx                = c.Request().Context()
+		id                 = mux.Vars(r)["id"]
+		auth               = r.Header.Get("Authorization")
+		ctx                = r.Context()
 		eps                = s.formatter.Endpoints()
 		gatewayCanSendPong bool
 		missedPongs        int
@@ -151,7 +152,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"endpoint", eps.Traffic,
-		"remote_addr", c.Request().RemoteAddr,
+		"remote_addr", r.RemoteAddr,
 	))
 	ctx = NewContextWithSession(ctx, &Session{})
 
@@ -220,19 +221,18 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 		return err
 	}
 
-	ws, err := s.upgrader.Upgrade(c.Response(), c.Request(), nil)
-	if err != nil {
-		logger.WithError(err).Debug("Failed to upgrade request to websocket connection")
-		conn.Disconnect(err)
-		return err
-	}
-	defer ws.Close()
-	wsWriteMu := &sync.Mutex{}
-
 	defer func() {
 		conn.Disconnect(err)
 		err = nil // Errors are sent over the websocket connection that is established by this point.
 	}()
+
+	ws, err := s.upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		logger.WithError(err).Debug("Failed to upgrade request to websocket connection")
+		return err
+	}
+	defer ws.Close()
+	wsWriteMu := &sync.Mutex{}
 
 	pingTicker := time.NewTicker(random.Jitter(s.cfg.WSPingInterval, 0.1))
 	defer pingTicker.Stop()
@@ -265,8 +265,13 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 		defer ticker.Stop()
 	}
 
-	go func() {
+	go func() (err error) {
 		defer ws.Close()
+		defer func() {
+			if err != nil {
+				conn.Disconnect(err)
+			}
+		}()
 		for {
 			select {
 			case <-conn.Context().Done():
@@ -277,18 +282,18 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				wsWriteMu.Unlock()
 				if err != nil {
 					logger.WithError(err).Warn("Failed to send ping message")
-					conn.Disconnect(err)
-					return
+					return err
 				}
-				if gatewayCanSendPong {
-					missedPongsMu.Lock()
-					missedPongs++
-					missedPongsMu.Unlock()
-					if missedPongs == s.cfg.MissedPongThreshold {
-						logger.WithError(errMissedTooManyPongs).Warn("Disconnect gateway")
-						conn.Disconnect(errMissedTooManyPongs.New())
-						return
-					}
+				if !gatewayCanSendPong {
+					continue
+				}
+				missedPongsMu.Lock()
+				missedPongs++
+				missedPongsMu.Unlock()
+				if missedPongs == s.cfg.MissedPongThreshold {
+					err := errMissedTooManyPongs.New()
+					logger.WithError(err).Warn("Disconnect gateway")
+					return err
 				}
 			case <-timeSyncTickerC:
 				// TODO: Use GPS timestamp from a overlapping frames.
@@ -296,8 +301,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				b, err := s.formatter.TransferTime(ctx, time.Now(), nil, nil)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to generate time transfer")
-					conn.Disconnect(err)
-					return
+					return err
 				}
 				if b == nil {
 					continue
@@ -308,8 +312,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				wsWriteMu.Unlock()
 				if err != nil {
 					logger.WithError(err).Warn("Failed to transfer time")
-					conn.Disconnect(err)
-					return
+					return err
 				}
 			case down := <-conn.Down():
 				concentratorTime, ok := conn.TimeFromTimestampTime(down.GetScheduled().Timestamp)
@@ -328,8 +331,7 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 				wsWriteMu.Unlock()
 				if err != nil {
 					logger.WithError(err).Warn("Failed to send downlink message")
-					conn.Disconnect(err)
-					return
+					return err
 				}
 			}
 		}
@@ -339,7 +341,6 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 	for {
 		if err := ratelimit.Require(s.server.RateLimiter(), resource); err != nil {
 			logger.WithError(err).Warn("Terminate connection")
-			conn.Disconnect(err)
 			return err
 		}
 		_, data, err := ws.ReadMessage()
@@ -358,34 +359,8 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 			wsWriteMu.Unlock()
 			if err != nil {
 				logger.WithError(err).Warn("Failed to send message downstream")
-				conn.Disconnect(err)
 				return err
 			}
 		}
-	}
-}
-
-type errorMessage struct {
-	Message string `json:"message"`
-}
-
-// errorHandler is an echo.HTTPErrorHandler.
-func errorHandler(err error, c echo.Context) {
-	if httpErr, ok := err.(*echo.HTTPError); ok {
-		c.JSON(httpErr.Code, httpErr.Message)
-		return
-	}
-
-	statusCode, description := http.StatusInternalServerError, ""
-	if ttnErr, ok := errors.From(err); ok {
-		if !errors.IsInternal(ttnErr) {
-			description = ttnErr.Error()
-		}
-		statusCode = errors.ToHTTPStatusCode(ttnErr)
-	}
-	if description != "" {
-		c.JSON(statusCode, errorMessage{description})
-	} else {
-		c.NoContent(statusCode)
 	}
 }
