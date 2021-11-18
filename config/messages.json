@@ -4175,15 +4175,6 @@
       "file": "format_protobufv2.go"
     }
   },
-  "error:pkg/gatewayserver/io/mqtt:mqtt_frontend_recovered": {
-    "translations": {
-      "en": "internal server error"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/mqtt",
-      "file": "mqtt.go"
-    }
-  },
   "error:pkg/gatewayserver/io/mqtt:not_authorized": {
     "translations": {
       "en": "not authorized"
