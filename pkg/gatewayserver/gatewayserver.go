@@ -849,7 +849,7 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 	ids := conn.Connection.Gateway().GetIds()
 	connectTime := conn.Connection.ConnectTime()
 	stats := &ttnpb.GatewayConnectionStats{
-		ConnectedAt: &connectTime,
+		ConnectedAt: ttnpb.ProtoTimePtr(connectTime),
 		Protocol:    conn.Connection.Frontend().Protocol(),
 	}
 

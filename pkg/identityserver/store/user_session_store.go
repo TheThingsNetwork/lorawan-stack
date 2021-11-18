@@ -40,7 +40,7 @@ func (s *userSessionStore) CreateSession(ctx context.Context, sess *ttnpb.UserSe
 	sessionModel := UserSession{
 		UserID:        user.PrimaryKey(),
 		SessionSecret: sess.SessionSecret,
-		ExpiresAt:     cleanTimePtr(sess.ExpiresAt),
+		ExpiresAt:     cleanTimePtr(ttnpb.StdTime(sess.ExpiresAt)),
 	}
 	if err = s.createEntity(ctx, &sessionModel); err != nil {
 		return nil, err

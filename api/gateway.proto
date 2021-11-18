@@ -80,8 +80,8 @@ message GatewayRadio {
 // Authentication code for claiming gateways.
 message GatewayClaimAuthenticationCode {
   Secret secret = 1;
-  google.protobuf.Timestamp valid_from = 2 [(gogoproto.stdtime) = true];
-  google.protobuf.Timestamp valid_to = 3 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp valid_from = 2;
+  google.protobuf.Timestamp valid_to = 3;
 }
 
 // Gateway is the message that defines a gateway on the network.
@@ -89,11 +89,11 @@ message Gateway {
   // The identifiers of the gateway. These are public and can be seen by any authenticated user in the network.
   GatewayIdentifiers ids = 1 [(validate.rules).message.required = true];
   // When the gateway was created. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp created_at = 2 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 2;
   // When the gateway was last updated. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp updated_at = 3 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 3;
   // When the gateway was deleted. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp deleted_at = 26 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp deleted_at = 26;
 
   // The name of the gateway. This information is public and can be seen by any authenticated user in the network.
   string name = 4 [(validate.rules).string.max_len = 50];
@@ -263,7 +263,7 @@ message CreateGatewayAPIKeyRequest {
       items: { enum: { defined_only: true } }
     }
   ];
-  google.protobuf.Timestamp expires_at = 4 [(gogoproto.stdtime) = true, (validate.rules).timestamp.gt_now = true];
+  google.protobuf.Timestamp expires_at = 4 [(validate.rules).timestamp.gt_now = true];
 }
 
 message UpdateGatewayAPIKeyRequest {
@@ -316,10 +316,10 @@ message GatewayAntenna {
 
 message GatewayStatus {
   // Current time of the gateway
-  google.protobuf.Timestamp time = 1 [(gogoproto.stdtime) = true, (validate.rules).timestamp.required = true];
+  google.protobuf.Timestamp time = 1;
   // Boot time of the gateway
   // - can be left out to save bandwidth; old value will be kept
-  google.protobuf.Timestamp boot_time = 2 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp boot_time = 2;
   // Versions of gateway subsystems
   // - each field can be left out to save bandwidth; old value will be kept
   // - map keys are written in snake_case
@@ -364,13 +364,13 @@ message GatewayStatus {
 
 // Connection stats as monitored by the Gateway Server.
 message GatewayConnectionStats {
-  google.protobuf.Timestamp connected_at = 1 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp connected_at = 1;
   string protocol = 2; // Protocol used to connect (for example, udp, mqtt, grpc)
-  google.protobuf.Timestamp last_status_received_at = 3 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp last_status_received_at = 3;
   GatewayStatus last_status = 4;
-  google.protobuf.Timestamp last_uplink_received_at = 5 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp last_uplink_received_at = 5;
   uint64 uplink_count = 6;
-  google.protobuf.Timestamp last_downlink_received_at = 7 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp last_downlink_received_at = 7;
   uint64 downlink_count = 8;
 
   message RoundTripTimes {

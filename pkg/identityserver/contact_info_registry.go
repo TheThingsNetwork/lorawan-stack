@@ -65,8 +65,8 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 					Id:        id,
 					Token:     key,
 					Entity:    ids,
-					CreatedAt: &now,
-					ExpiresAt: &expires,
+					CreatedAt: ttnpb.ProtoTimePtr(now),
+					ExpiresAt: ttnpb.ProtoTimePtr(expires),
 				}
 				emailValidations[info.Value] = validation
 			}
@@ -125,7 +125,7 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 		Id:          id,
 		Entity:      ids,
 		ContactInfo: pendingContactInfo,
-		CreatedAt:   &now,
+		CreatedAt:   ttnpb.ProtoTimePtr(now),
 	}, nil
 }
 

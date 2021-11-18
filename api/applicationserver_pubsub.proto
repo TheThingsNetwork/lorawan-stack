@@ -44,8 +44,8 @@ message ApplicationPubSubIdentifiers {
 
 message ApplicationPubSub {
   ApplicationPubSubIdentifiers ids = 1 [(validate.rules).message.required = true];
-  google.protobuf.Timestamp created_at = 2 [(gogoproto.stdtime) = true];
-  google.protobuf.Timestamp updated_at = 3 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
 
   // The format to use for the body.
   // Supported values depend on the Application Server configuration.

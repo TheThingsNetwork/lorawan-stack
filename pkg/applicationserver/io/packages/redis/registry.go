@@ -230,8 +230,7 @@ func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids *tt
 				pb = &ttnpb.ApplicationPackageAssociation{}
 			}
 
-			now := time.Now().UTC()
-			pb.UpdatedAt = &now
+			pb.UpdatedAt = ttnpb.ProtoTimePtr(time.Now())
 			sets = append(append(sets[:0:0], sets...),
 				"updated_at",
 			)
@@ -426,8 +425,7 @@ func (r ApplicationPackagesRegistry) SetDefaultAssociation(ctx context.Context, 
 				pb = &ttnpb.ApplicationPackageDefaultAssociation{}
 			}
 
-			now := time.Now().UTC()
-			pb.UpdatedAt = &now
+			pb.UpdatedAt = ttnpb.ProtoTimePtr(time.Now())
 			sets = append(append(sets[:0:0], sets...),
 				"updated_at",
 			)

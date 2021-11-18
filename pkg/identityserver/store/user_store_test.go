@@ -52,7 +52,7 @@ func TestUserStore(t *testing.T) {
 				"baz": "qux",
 			},
 			PrimaryEmailAddress:            "foo@bar.org",
-			PrimaryEmailAddressValidatedAt: &now,
+			PrimaryEmailAddressValidatedAt: ttnpb.ProtoTimePtr(now),
 			ProfilePicture: &ttnpb.Picture{
 				Embedded: &ttnpb.Picture_Embedded{
 					MimeType: "image/png",
@@ -70,8 +70,8 @@ func TestUserStore(t *testing.T) {
 			if a.So(created.ProfilePicture, should.NotBeNil) {
 				a.So(created.ProfilePicture.Embedded, should.NotBeNil)
 			}
-			a.So(*created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
-			a.So(*created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
 		}
 
 		got, err := store.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes"}})
@@ -128,7 +128,7 @@ func TestUserStore(t *testing.T) {
 				a.So(updated.ProfilePicture.Sizes[0], should.Equal, "https://example.com/profile_picture.jpg")
 			}
 			a.So(updated.CreatedAt, should.Resemble, created.CreatedAt)
-			a.So(*updated.UpdatedAt, should.HappenAfter, *created.CreatedAt)
+			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenAfter, *ttnpb.StdTime(created.CreatedAt))
 		}
 
 		got, err = store.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"}, nil)

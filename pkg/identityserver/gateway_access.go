@@ -86,7 +86,7 @@ func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.Cr
 	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), req.Rights...); err != nil {
 		return nil, err
 	}
-	key, token, err := GenerateAPIKey(ctx, req.Name, req.ExpiresAt, req.Rights...)
+	key, token, err := GenerateAPIKey(ctx, req.Name, ttnpb.StdTime(req.ExpiresAt), req.Rights...)
 	if err != nil {
 		return nil, err
 	}

@@ -59,7 +59,7 @@ key is provided, a new API key will be created.`,
 						ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
 						ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 					},
-					ExpiresAt: expiryDate,
+					ExpiresAt: ttnpb.ProtoTime(expiryDate),
 				})
 				if err != nil {
 					return err

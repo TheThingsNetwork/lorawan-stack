@@ -63,7 +63,7 @@ var (
 	mockSession = &ttnpb.UserSession{
 		UserIds:       &ttnpb.UserIdentifiers{UserId: "user"},
 		SessionId:     "session_id",
-		CreatedAt:     &now,
+		CreatedAt:     ttnpb.ProtoTimePtr(now),
 		SessionSecret: "secret-1234",
 	}
 	mockUser = &ttnpb.User{
@@ -677,8 +677,8 @@ func TestTokenExchange(t *testing.T) {
 					Code:          "the code",
 					RedirectUri:   "http://uri/callback",
 					State:         "foo",
-					CreatedAt:     &now,
-					ExpiresAt:     &anHourFromNow,
+					CreatedAt:     ttnpb.ProtoTimePtr(now),
+					ExpiresAt:     ttnpb.ProtoTimePtr(anHourFromNow),
 				}
 			},
 			Method: "POST",
@@ -719,8 +719,8 @@ func TestTokenExchange(t *testing.T) {
 					Code:          "the code",
 					RedirectUri:   "http://uri/callback",
 					State:         "foo",
-					CreatedAt:     &now,
-					ExpiresAt:     &anHourFromNow,
+					CreatedAt:     ttnpb.ProtoTimePtr(now),
+					ExpiresAt:     ttnpb.ProtoTimePtr(anHourFromNow),
 				}
 			},
 			Method: "POST",
@@ -759,8 +759,8 @@ func TestTokenExchange(t *testing.T) {
 					Id:            "SFUBFRKYTGULGPAXXM4SHIBYMKCPTIMQBM63ZGQ",
 					RefreshToken:  "PBKDF2$sha256$20000$IGAiKs46xX_M64E5$4xpyqnQT8SOa_Vf4xhEPk6WOZnhmAjG2mqGQiYBhm2s",
 					Rights:        mockClient.Rights,
-					CreatedAt:     &now,
-					ExpiresAt:     &anHourFromNow,
+					CreatedAt:     ttnpb.ProtoTimePtr(now),
+					ExpiresAt:     ttnpb.ProtoTimePtr(anHourFromNow),
 				}
 			},
 			Method: "POST",

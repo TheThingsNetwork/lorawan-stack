@@ -168,7 +168,7 @@ func (x *ApplicationPubSub) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.CreatedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.CreatedAt)
+			gogo.MarshalTimestamp(s, x.CreatedAt)
 		}
 	}
 	if x.UpdatedAt != nil || s.HasField("updated_at") {
@@ -177,7 +177,7 @@ func (x *ApplicationPubSub) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.UpdatedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.UpdatedAt)
+			gogo.MarshalTimestamp(s, x.UpdatedAt)
 		}
 	}
 	if x.Format != "" || s.HasField("format") {
@@ -300,14 +300,14 @@ func (x *ApplicationPubSub) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Ids = &v
 		case "created_at", "createdAt":
 			s.AddField("created_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
 			x.CreatedAt = v
 		case "updated_at", "updatedAt":
 			s.AddField("updated_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}

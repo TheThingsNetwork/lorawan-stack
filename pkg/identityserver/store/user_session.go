@@ -38,15 +38,15 @@ func init() {
 func (sess UserSession) toPB(pb *ttnpb.UserSession) {
 	pb.SessionId = sess.ID
 	pb.SessionSecret = sess.SessionSecret
-	pb.CreatedAt = cleanTimePtr(&sess.CreatedAt)
-	pb.UpdatedAt = cleanTimePtr(&sess.UpdatedAt)
-	pb.ExpiresAt = cleanTimePtr(sess.ExpiresAt)
+	pb.CreatedAt = ttnpb.ProtoTimePtr(cleanTime(sess.CreatedAt))
+	pb.UpdatedAt = ttnpb.ProtoTimePtr(cleanTime(sess.UpdatedAt))
+	pb.ExpiresAt = ttnpb.ProtoTime(cleanTimePtr(sess.ExpiresAt))
 	if sess.User != nil {
 		pb.UserIds = &ttnpb.UserIdentifiers{UserId: sess.User.Account.UID}
 	}
 }
 
 func (sess *UserSession) fromPB(pb *ttnpb.UserSession) []string {
-	sess.ExpiresAt = cleanTimePtr(pb.ExpiresAt)
+	sess.ExpiresAt = cleanTimePtr(ttnpb.StdTime(pb.ExpiresAt))
 	return []string{"expires_at"}
 }

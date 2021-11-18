@@ -69,7 +69,7 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 	if err = rights.RequireUser(ctx, *req.GetUserIds(), req.Rights...); err != nil {
 		return nil, err
 	}
-	key, token, err := GenerateAPIKey(ctx, req.Name, req.ExpiresAt, req.Rights...)
+	key, token, err := GenerateAPIKey(ctx, req.Name, ttnpb.StdTime(req.ExpiresAt), req.Rights...)
 	if err != nil {
 		return nil, err
 	}
@@ -238,7 +238,7 @@ func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.Creat
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
 		_, err := store.GetLoginTokenStore(db).CreateLoginToken(ctx, &ttnpb.LoginToken{
 			UserIds:   req.GetUserIds(),
-			ExpiresAt: &expiresAt,
+			ExpiresAt: ttnpb.ProtoTimePtr(expiresAt),
 			Token:     token,
 		})
 		return err

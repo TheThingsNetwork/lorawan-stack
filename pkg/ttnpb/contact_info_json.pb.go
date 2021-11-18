@@ -90,7 +90,7 @@ func (x *ContactInfo) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ValidatedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.ValidatedAt)
+			gogo.MarshalTimestamp(s, x.ValidatedAt)
 		}
 	}
 	s.WriteObjectEnd()
@@ -119,7 +119,7 @@ func (x *ContactInfo) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Public = s.ReadBool()
 		case "validated_at", "validatedAt":
 			s.AddField("validated_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -169,7 +169,7 @@ func (x *ContactInfoValidation) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.CreatedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.CreatedAt)
+			gogo.MarshalTimestamp(s, x.CreatedAt)
 		}
 	}
 	if x.ExpiresAt != nil || s.HasField("expires_at") {
@@ -178,7 +178,7 @@ func (x *ContactInfoValidation) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ExpiresAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.ExpiresAt)
+			gogo.MarshalTimestamp(s, x.ExpiresAt)
 		}
 	}
 	s.WriteObjectEnd()
@@ -221,14 +221,14 @@ func (x *ContactInfoValidation) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState)
 			})
 		case "created_at", "createdAt":
 			s.AddField("created_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
 			x.CreatedAt = v
 		case "expires_at", "expiresAt":
 			s.AddField("expires_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}

@@ -64,8 +64,8 @@ func TestUserSessionStore(t *testing.T) {
 		if a.So(created, should.NotBeNil) {
 			a.So(created.SessionId, should.NotBeEmpty)
 			a.So(created.SessionSecret, should.Equal, "123412341234123412341234")
-			a.So(*created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
-			a.So(*created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
 			a.So(created.ExpiresAt, should.BeNil)
 		}
 
@@ -97,7 +97,7 @@ func TestUserSessionStore(t *testing.T) {
 		updated, err := store.UpdateSession(ctx, &ttnpb.UserSession{
 			UserIds:   userIDs,
 			SessionId: created.SessionId,
-			ExpiresAt: &later,
+			ExpiresAt: ttnpb.ProtoTimePtr(later),
 		})
 
 		a.So(err, should.BeNil)

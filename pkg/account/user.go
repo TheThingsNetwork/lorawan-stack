@@ -54,7 +54,7 @@ func (s *server) CurrentUser(c echo.Context) error {
 		LoggedInAt *time.Time      `json:"logged_in_at"`
 	}{
 		User:       userJSON,
-		LoggedInAt: session.CreatedAt,
+		LoggedInAt: ttnpb.StdTime(session.CreatedAt),
 	})
 }
 

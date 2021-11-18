@@ -1964,7 +1964,15 @@ func (m *CreateGatewayAPIKeyRequest) ValidateFields(paths ...string) error {
 
 		case "expires_at":
 
-			if ts := m.GetExpiresAt(); ts != nil {
+			if t := m.GetExpiresAt(); t != nil {
+				ts, err := types.TimestampFromProto(t)
+				if err != nil {
+					return CreateGatewayAPIKeyRequestValidationError{
+						field:  "expires_at",
+						reason: "value is not a valid timestamp",
+						cause:  err,
+					}
+				}
 
 				now := time.Now()
 
@@ -2677,10 +2685,13 @@ func (m *GatewayStatus) ValidateFields(paths ...string) error {
 		switch name {
 		case "time":
 
-			if m.GetTime() == nil {
-				return GatewayStatusValidationError{
-					field:  "time",
-					reason: "value is required",
+			if v, ok := interface{}(m.GetTime()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GatewayStatusValidationError{
+						field:  "time",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
 				}
 			}
 

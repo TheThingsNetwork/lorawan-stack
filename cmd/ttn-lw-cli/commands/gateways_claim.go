@@ -161,7 +161,7 @@ If no API key is provided, a new one will be created.`,
 					GatewayIds: gtwID,
 					Name:       "Gateway Claim Authorization Key", // This field can only have 50 chars.
 					Rights:     requiredRights,
-					ExpiresAt:  expiryDate,
+					ExpiresAt:  ttnpb.ProtoTime(expiryDate),
 				})
 				if err != nil {
 					return err

@@ -63,7 +63,7 @@ var (
 	mockSession = &ttnpb.UserSession{
 		UserIds:   &ttnpb.UserIdentifiers{UserId: "user"},
 		SessionId: "session_id",
-		CreatedAt: &now,
+		CreatedAt: ttnpb.ProtoTimePtr(now),
 	}
 	mockUser = &ttnpb.User{
 		Ids: &ttnpb.UserIdentifiers{UserId: "user"},

@@ -188,8 +188,8 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 		}
 		pb.ClaimAuthenticationCode = &ttnpb.GatewayClaimAuthenticationCode{
 			Secret:    secret,
-			ValidFrom: gtw.ClaimAuthenticationCodeValidFrom,
-			ValidTo:   gtw.ClaimAuthenticationCodeValidTo,
+			ValidFrom: ttnpb.ProtoTime(gtw.ClaimAuthenticationCodeValidFrom),
+			ValidTo:   ttnpb.ProtoTime(gtw.ClaimAuthenticationCodeValidTo),
 		}
 	},
 	targetCUPSURIField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.TargetCupsUri = gtw.TargetCUPSURI },
@@ -310,10 +310,10 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 				gtw.ClaimAuthenticationCodeSecret = secretBuffer.Bytes()
 			}
 			if pb.ClaimAuthenticationCode.ValidFrom != nil {
-				gtw.ClaimAuthenticationCodeValidFrom = pb.ClaimAuthenticationCode.ValidFrom
+				gtw.ClaimAuthenticationCodeValidFrom = ttnpb.StdTime(pb.ClaimAuthenticationCode.ValidFrom)
 			}
 			if pb.ClaimAuthenticationCode.ValidTo != nil {
-				gtw.ClaimAuthenticationCodeValidTo = pb.ClaimAuthenticationCode.ValidTo
+				gtw.ClaimAuthenticationCodeValidTo = ttnpb.StdTime(pb.ClaimAuthenticationCode.ValidTo)
 			}
 		}
 	},
@@ -393,9 +393,9 @@ var gatewayColumnNames = map[string][]string{
 func (gtw Gateway) toPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) {
 	pb.Ids = &ttnpb.GatewayIdentifiers{GatewayId: gtw.GatewayID}
 	pb.Ids.Eui = gtw.GatewayEUI.toPB() // Always present.
-	pb.CreatedAt = cleanTimePtr(&gtw.CreatedAt)
-	pb.UpdatedAt = cleanTimePtr(&gtw.UpdatedAt)
-	pb.DeletedAt = cleanTimePtr(gtw.DeletedAt)
+	pb.CreatedAt = ttnpb.ProtoTimePtr(cleanTime(gtw.CreatedAt))
+	pb.UpdatedAt = ttnpb.ProtoTimePtr(cleanTime(gtw.UpdatedAt))
+	pb.DeletedAt = ttnpb.ProtoTime(cleanTimePtr(gtw.DeletedAt))
 	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultGatewayFieldMask
 	}

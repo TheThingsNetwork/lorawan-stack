@@ -73,8 +73,8 @@ func TestOAuthStore(t *testing.T) {
 			if a.So(created, should.NotBeNil) {
 				a.So(created.UserIds.UserId, should.Equal, "test-user")
 				a.So(created.ClientIds.ClientId, should.Equal, "test-client")
-				a.So(*created.CreatedAt, should.HappenOnOrAfter, start)
-				a.So(*created.UpdatedAt, should.HappenOnOrAfter, start)
+				a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenOnOrAfter, start)
+				a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenOnOrAfter, start)
 			}
 
 			got, err := store.GetAuthorization(ctx, userIDs, clientIDs)
@@ -84,8 +84,8 @@ func TestOAuthStore(t *testing.T) {
 			if a.So(got, should.NotBeNil) {
 				a.So(created.UserIds.UserId, should.Equal, "test-user")
 				a.So(created.ClientIds.ClientId, should.Equal, "test-client")
-				a.So(*got.CreatedAt, should.HappenOnOrAfter, start)
-				a.So(*got.UpdatedAt, should.HappenOnOrAfter, start)
+				a.So(*ttnpb.StdTime(got.CreatedAt), should.HappenOnOrAfter, start)
+				a.So(*ttnpb.StdTime(got.UpdatedAt), should.HappenOnOrAfter, start)
 			}
 
 			list, err := store.ListAuthorizations(ctx, userIDs)
@@ -156,7 +156,7 @@ func TestOAuthStore(t *testing.T) {
 				a.So(got.Code, should.Equal, code)
 				a.So(got.RedirectUri, should.Equal, redirectURI)
 				a.So(got.State, should.Equal, state)
-				a.So(*got.CreatedAt, should.HappenOnOrAfter, start)
+				a.So(*ttnpb.StdTime(got.CreatedAt), should.HappenOnOrAfter, start)
 				if a.So(got.Rights, should.HaveLength, len(rights)) {
 					for _, right := range rights {
 						a.So(got.Rights, should.Contain, right)
@@ -226,7 +226,7 @@ func TestOAuthStore(t *testing.T) {
 				a.So(got.Id, should.Equal, tokenID)
 				a.So(got.AccessToken, should.Equal, access)
 				a.So(got.RefreshToken, should.Equal, refresh)
-				a.So(*got.CreatedAt, should.HappenOnOrAfter, start)
+				a.So(*ttnpb.StdTime(got.CreatedAt), should.HappenOnOrAfter, start)
 				if a.So(got.Rights, should.HaveLength, len(rights)) {
 					for _, right := range rights {
 						a.So(got.Rights, should.Contain, right)

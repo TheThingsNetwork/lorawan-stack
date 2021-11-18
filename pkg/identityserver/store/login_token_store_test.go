@@ -44,7 +44,7 @@ func TestLoginTokenStore(t *testing.T) {
 		aMinuteAgo := now.Add(-1 * time.Minute)
 		loginToken, err := store.CreateLoginToken(ctx, &ttnpb.LoginToken{
 			UserIds:   &ttnpb.UserIdentifiers{UserId: usr.Account.UID},
-			ExpiresAt: cleanTimePtr(&aMinuteAgo),
+			ExpiresAt: ttnpb.ProtoTimePtr(cleanTime(aMinuteAgo)),
 			Token:     "test-expired-login-token",
 		})
 		a.So(err, should.BeNil)
@@ -57,7 +57,7 @@ func TestLoginTokenStore(t *testing.T) {
 		anHourFromNow := now.Add(time.Hour)
 		loginToken, err = store.CreateLoginToken(ctx, &ttnpb.LoginToken{
 			UserIds:   &ttnpb.UserIdentifiers{UserId: usr.Account.UID},
-			ExpiresAt: cleanTimePtr(&anHourFromNow),
+			ExpiresAt: ttnpb.ProtoTimePtr(cleanTime(anHourFromNow)),
 			Token:     "test-login-token",
 		})
 		a.So(err, should.BeNil)
