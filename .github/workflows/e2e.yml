@@ -57,6 +57,7 @@ jobs:
     env:
       TTN_LW_LOG_LEVEL: debug
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NODE_ENV: production
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -140,7 +141,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-babel-cache-
       - name: Build DLLs
-        if: steps.dll-cache.outputs.cache-hit != 'true'
+        if: |
+          steps.dll-cache.outputs.cache-hit != 'true' ||
+          steps.public-cache.outputs.cache-hit != 'true'
         run: tools/bin/mage js:buildDll
       - name: Build frontend
         if: steps.public-cache.outputs.cache-hit != 'true'
@@ -168,6 +171,7 @@ jobs:
       TTN_LW_LOG_LEVEL: debug
       CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NODE_ENV: development
     strategy:
       matrix:
         machines: [1, 2, 3, 4]
@@ -227,6 +231,7 @@ jobs:
       COCKROACHDB_COCKROACH_TAG: v19.2.12
       CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NODE_ENV: development
     needs: [determine-if-required, preparation]
     if: needs.determine-if-required.outputs.needs-to-run == 'true'
     steps:

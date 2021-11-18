@@ -18,7 +18,7 @@ import path from 'path'
 import webpack from 'webpack'
 
 const { CONTEXT = '.', CACHE_DIR = '.cache', PUBLIC_DIR = 'public' } = process.env
-const mode = process.env.NODE_ENV === 'production' ? 'production' : 'development'
+const mode = process.env.NODE_ENV === 'development' ? 'development' : 'production'
 const WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS =
   process.env.WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS === 'true'
 
