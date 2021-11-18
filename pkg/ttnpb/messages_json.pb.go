@@ -462,16 +462,20 @@ func (x *ApplicationUplink) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		}
 		s.WriteArrayEnd()
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.Settings != nil || s.HasField("settings") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("settings")
 		// NOTE: TxSettings does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.Settings)
+		gogo.MarshalMessage(s, x.Settings)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.ReceivedAt != nil || s.HasField("received_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("received_at")
-		s.WriteTime(x.ReceivedAt)
+		if x.ReceivedAt == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.ReceivedAt)
+		}
 	}
 	if x.AppSKey != nil || s.HasField("app_s_key") {
 		s.WriteMoreIf(&wroteField)
@@ -575,14 +579,14 @@ func (x *ApplicationUplink) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: TxSettings does not seem to implement UnmarshalProtoJSON.
 			var v TxSettings
 			gogo.UnmarshalMessage(s, &v)
-			x.Settings = v
+			x.Settings = &v
 		case "received_at", "receivedAt":
 			s.AddField("received_at")
 			v := s.ReadTime()
 			if s.Err() != nil {
 				return
 			}
-			x.ReceivedAt = *v
+			x.ReceivedAt = v
 		case "app_s_key", "appSKey":
 			s.AddField("app_s_key")
 			// NOTE: KeyEnvelope does not seem to implement UnmarshalProtoJSON.

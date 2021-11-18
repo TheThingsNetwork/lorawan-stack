@@ -1842,7 +1842,7 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 				return test.AllTrue(
 					a.So(up.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual, deduplicatedUp.CorrelationIds),
 					a.So(up.GetUplinkMessage().GetRxMetadata(), should.HaveSameElementsDeep, deduplicatedUp.RxMetadata),
-					a.So([]time.Time{start, recvAt, time.Now()}, should.BeChronological),
+					a.So([]time.Time{start, *recvAt, time.Now()}, should.BeChronological),
 					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIds:   &dev.EndDeviceIdentifiers,
 						CorrelationIds: up.CorrelationIds,
@@ -1853,7 +1853,7 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 								FrmPayload:   deduplicatedUp.Payload.GetMacPayload().FrmPayload,
 								ReceivedAt:   up.GetUplinkMessage().GetReceivedAt(),
 								RxMetadata:   up.GetUplinkMessage().GetRxMetadata(),
-								Settings:     deduplicatedUp.Settings,
+								Settings:     &deduplicatedUp.Settings,
 								SessionKeyId: upConf.SessionKeys.SessionKeyId,
 								NetworkIds:   up.GetUplinkMessage().GetNetworkIds(),
 							},

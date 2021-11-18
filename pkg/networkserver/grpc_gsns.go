@@ -963,8 +963,8 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 					FrmPayload:      frmPayload,
 					RxMetadata:      up.RxMetadata,
 					SessionKeyId:    stored.Session.SessionKeyId,
-					Settings:        up.Settings,
-					ReceivedAt:      up.ReceivedAt,
+					Settings:        &up.Settings,
+					ReceivedAt:      &up.ReceivedAt,
 					ConsumedAirtime: up.ConsumedAirtime,
 					NetworkIds: &ttnpb.NetworkIdentifiers{
 						NetId:     &ns.netID,

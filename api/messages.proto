@@ -210,10 +210,12 @@ message ApplicationUplink {
   repeated RxMetadata rx_metadata = 6;
 
   // Settings for the transmission.
-  TxSettings settings = 7 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  TxSettings settings = 7 [(validate.rules).message.required = true];
 
   // Server time when the Network Server received the message.
-  google.protobuf.Timestamp received_at = 8 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+  // This field is not validated in the API since ApplicationUplink is used also in AS packages.
+  // Validate this separately in the RPCs that processes messages from the NS.
+  google.protobuf.Timestamp received_at = 8 [(gogoproto.stdtime) = true];
 
   // The AppSKey of the current session.
   // This field is only present if the skip_payload_crypto field of the EndDevice
@@ -229,7 +231,7 @@ message ApplicationUplink {
   bool confirmed = 11;
 
   // Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings.
-  google.protobuf.Duration consumed_airtime = 13 [(gogoproto.stdduration) = true, (gogoproto.nullable) = true];
+  google.protobuf.Duration consumed_airtime = 13 [(gogoproto.stdduration) = true];
 
   // End device location metadata, set by the Application Server while handling the message.
   map<string,Location> locations = 14;

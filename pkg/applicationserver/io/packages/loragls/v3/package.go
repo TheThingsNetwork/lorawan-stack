@@ -144,7 +144,7 @@ func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids ttnpb.EndD
 	var mds [][]*ttnpb.RxMetadata
 	if err := p.server.RangeUplinks(ctx, ids, []string{"rx_metadata", "received_at"},
 		func(ctx context.Context, up *ttnpb.ApplicationUplink) bool {
-			if now.Sub(up.ReceivedAt) > data.MultiFrameWindowAge {
+			if now.Sub(*up.ReceivedAt) > data.MultiFrameWindowAge {
 				return true
 			}
 			mds = append(mds, up.RxMetadata)

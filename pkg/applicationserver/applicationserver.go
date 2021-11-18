@@ -949,8 +949,13 @@ func (as *ApplicationServer) markEndDeviceAsActivated(ctx context.Context, ids t
 	})
 }
 
+var errNoNSTimeStamp = errors.DefineFailedPrecondition("no_ns_timestamp", "no network server timestamp in message")
+
 func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) error {
 	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyId)
+	if uplink.ReceivedAt == nil {
+		return errNoNSTimeStamp.New()
+	}
 	dev, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"activated_at",
@@ -1011,7 +1016,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		err := as.processUp(ctx, &ttnpb.ApplicationUp{
 			EndDeviceIds:   &ids,
 			CorrelationIds: events.CorrelationIDsFromContext(ctx),
-			ReceivedAt:     &uplink.ReceivedAt,
+			ReceivedAt:     uplink.ReceivedAt,
 			Up: &ttnpb.ApplicationUp_LocationSolved{
 				LocationSolved: &ttnpb.ApplicationLocation{
 					Service:  "frm-payload",

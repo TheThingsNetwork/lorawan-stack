@@ -525,10 +525,18 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 		case "settings":
 			if len(subs) > 0 {
 				var newDst, newSrc *TxSettings
-				if src != nil {
-					newSrc = &src.Settings
+				if (src == nil || src.Settings == nil) && dst.Settings == nil {
+					continue
 				}
-				newDst = &dst.Settings
+				if src != nil {
+					newSrc = src.Settings
+				}
+				if dst.Settings != nil {
+					newDst = dst.Settings
+				} else {
+					newDst = &TxSettings{}
+					dst.Settings = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -536,8 +544,7 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 				if src != nil {
 					dst.Settings = src.Settings
 				} else {
-					var zero TxSettings
-					dst.Settings = zero
+					dst.Settings = nil
 				}
 			}
 		case "received_at":
@@ -547,8 +554,7 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 			if src != nil {
 				dst.ReceivedAt = src.ReceivedAt
 			} else {
-				var zero time.Time
-				dst.ReceivedAt = zero
+				dst.ReceivedAt = nil
 			}
 		case "app_s_key":
 			if len(subs) > 0 {
