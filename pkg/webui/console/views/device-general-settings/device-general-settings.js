@@ -58,6 +58,7 @@ export default class DeviceGeneralSettings extends React.Component {
     nsConfig: PropTypes.stackComponent.isRequired,
     onDelete: PropTypes.func.isRequired,
     onDeleteSuccess: PropTypes.func.isRequired,
+    resetDevice: PropTypes.func.isRequired,
     updateDevice: PropTypes.func.isRequired,
   }
 
@@ -127,7 +128,16 @@ export default class DeviceGeneralSettings extends React.Component {
   }
 
   render() {
-    const { device, isConfig, asConfig, jsConfig, nsConfig, mayEditKeys, mayReadKeys } = this.props
+    const {
+      device,
+      isConfig,
+      asConfig,
+      jsConfig,
+      nsConfig,
+      mayEditKeys,
+      mayReadKeys,
+      resetDevice,
+    } = this.props
 
     const isOTAA = isDeviceOTAA(device)
     const { enabled: isEnabled } = isConfig
@@ -214,6 +224,7 @@ export default class DeviceGeneralSettings extends React.Component {
                 device={device}
                 onSubmit={this.handleSubmit}
                 onSubmitSuccess={this.handleSubmitSuccess}
+                onMacReset={resetDevice}
                 mayEditKeys={mayEditKeys}
                 mayReadKeys={mayReadKeys}
               />

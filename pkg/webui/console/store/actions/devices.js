@@ -71,6 +71,12 @@ export const [
   { request: getDevicesList, success: getDevicesListSuccess, failure: getDevicesListFailure },
 ] = createPaginationByIdRequestActions(SHARED_NAME)
 
+export const RESET_DEV_BASE = 'RESET_END_DEVICE'
+export const [
+  { request: RESET_DEV, success: RESET_DEV_SUCCESS, failure: RESET_DEV_FAILURE },
+  { request: resetDevice, success: resetDeviceSuccess, failure: resetDeviceFailure },
+] = createRequestActions(RESET_DEV_BASE, (appId, deviceId) => ({ appId, deviceId }))
+
 export const START_DEVICE_EVENT_STREAM = createStartEventsStreamActionType(SHARED_NAME)
 export const START_DEVICE_EVENT_STREAM_SUCCESS =
   createStartEventsStreamSuccessActionType(SHARED_NAME)

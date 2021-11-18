@@ -26,6 +26,7 @@ import {
   GET_DEVICES_LIST_SUCCESS,
   GET_DEV_SUCCESS,
   UPDATE_DEV_SUCCESS,
+  RESET_DEV_SUCCESS,
 } from '@console/store/actions/devices'
 import { GET_APP_EVENT_MESSAGE_SUCCESS } from '@console/store/actions/applications'
 
@@ -33,6 +34,11 @@ const defaultState = {
   entities: {},
   derived: {},
   selectedDevice: undefined,
+}
+const defaultDerived = {
+  lastSeen: undefined,
+  uplinkFrameCount: undefined,
+  downlinkFrameCount: undefined,
 }
 
 const heartbeatFilterRegExp = new RegExp(EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP)
@@ -104,6 +110,37 @@ const devices = (state = defaultState, { type, payload, event }) => {
       }
 
       return mergeDerived(updatedState, id, derived)
+    case RESET_DEV_SUCCESS:
+      const combinedId = getCombinedDeviceId(payload)
+      const device = state.entities[combinedId]
+      const isOTAA = Boolean(device.supports_join)
+
+      if (isOTAA && device.session && device.session.keys) {
+        const { session } = device
+        // Reset NS session keys and last seen information for joined OTAA end devices.
+        const resetDevice = {
+          ...device,
+          session: {
+            ...session,
+            dev_addr: session.dev_addr,
+            keys: { app_s_key: session.keys.app_s_key },
+          },
+        }
+
+        return mergeDerived(
+          {
+            ...state,
+            entities: {
+              ...state.entities,
+              [combinedId]: resetDevice,
+            },
+          },
+          combinedId,
+          defaultDerived,
+        )
+      }
+
+      return mergeDerived(state, combinedId, defaultDerived)
     case GET_DEVICES_LIST_SUCCESS:
       return payload.entities.reduce(
         (acc, dev) => {

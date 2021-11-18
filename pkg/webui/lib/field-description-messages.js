@@ -229,6 +229,9 @@ const m = defineMessages({
 
   resetsFCntDescription:
     'Enable this to allow end devices to reset their frame counter (FCnt). This is not LoRaWAN compliant and this is not secure. This is to support ABP end devices that reset their frame counter on a power cycle. Do not use this setting in production.',
+
+  resetMacDescription:
+    'Resetting the session context and MAC state will reset the end device to its initial (factory) state. This includes resetting the frame counters and any other persisted MAC setting on the end device. Over The Air Activation (OTAA) end devices will also lose their session context. This means that such devices must rejoin the network to continue operation. Activation-by-personalization (ABP) end devices will only reset the MAC state, while preserving up/downlink queues.',
 })
 
 const descriptions = Object.freeze({
@@ -441,6 +444,9 @@ const descriptions = Object.freeze({
   },
   [TOOLTIP_IDS.RESETS_F_CNT]: {
     description: m.resetsFCntDescription,
+  },
+  [TOOLTIP_IDS.RESET_MAC]: {
+    description: m.resetMacDescription,
   },
 })
 

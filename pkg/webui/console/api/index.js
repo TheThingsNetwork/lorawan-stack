@@ -203,6 +203,7 @@ export default {
     create: tts.Applications.Devices.create.bind(tts.Applications.Devices),
     bulkCreate: tts.Applications.Devices.bulkCreate.bind(tts.Applications.Devices),
     update: tts.Applications.Devices.updateById.bind(tts.Applications.Devices),
+    reset: tts.Applications.Devices.resetById.bind(tts.Applications.Devices),
     eventsSubscribe: tts.Applications.Devices.openStream.bind(tts.Applications.Devices),
     delete: tts.Applications.Devices.deleteById.bind(tts.Applications.Devices),
     simulateUplink: tts.Applications.Devices.simulateUplink.bind(tts.Applications.Devices),

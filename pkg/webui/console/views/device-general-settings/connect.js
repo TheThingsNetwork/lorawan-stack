@@ -31,7 +31,7 @@ import {
   mayReadApplicationDeviceKeys,
 } from '@console/lib/feature-checks'
 
-import { updateDevice } from '@console/store/actions/devices'
+import { updateDevice, resetDevice } from '@console/store/actions/devices'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/selectors/devices'
@@ -52,7 +52,10 @@ const mapStateToProps = state => ({
   ),
 })
 const mapDispatchToProps = dispatch => ({
-  ...bindActionCreators({ updateDevice: attachPromise(updateDevice) }, dispatch),
+  ...bindActionCreators(
+    { updateDevice: attachPromise(updateDevice), resetDevice: attachPromise(resetDevice) },
+    dispatch,
+  ),
   onDeleteSuccess: appId => dispatch(replace(`/applications/${appId}/devices`)),
   onDelete: api.device.delete,
 })
@@ -62,6 +65,7 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   ...dispatchProps,
   ...ownProps,
   onDeleteSuccess: () => dispatchProps.onDeleteSuccess(stateProps.appId),
+  resetDevice: () => dispatchProps.resetDevice(stateProps.appId, stateProps.devId),
 })
 
 export default DeviceGeneralSettings =>
