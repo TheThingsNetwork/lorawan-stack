@@ -14,6 +14,8 @@
 
 import CONNECTION_STATUS from '@console/constants/connection-status'
 
+import { EVENT_STATUS_CLEARED } from '@console/lib/events/definitions'
+
 const selectEventsStore = (state, entityId) => state[entityId] || {}
 
 export const createEventsSelector = entity => (state, entityId) => {
@@ -62,6 +64,18 @@ export const createLatestEventSelector = entity => {
   }
 
   return selectLatestEvent
+}
+
+export const createLatestClearedEventSelector = entity => {
+  const eventsSelector = createEventsSelector(entity)
+
+  const selectLatestClearedEvent = (state, entityId) => {
+    const events = eventsSelector(state, entityId)
+
+    return events.find(e => e.name === EVENT_STATUS_CLEARED)
+  }
+
+  return selectLatestClearedEvent
 }
 
 export const createInterruptedStreamsSelector = entity => state => {
