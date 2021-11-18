@@ -582,7 +582,6 @@ func TestVersion(t *testing.T) {
 				Versions: map[string]string{
 					"station":  "test-station",
 					"firmware": "1.0.0",
-					"model":    "test-model",
 					"package":  "test-package",
 					"platform": "test-model - Firmware 1.0.0 - Protocol 2",
 				},
@@ -656,7 +655,6 @@ func TestVersion(t *testing.T) {
 				Versions: map[string]string{
 					"station":  "test-station-rc1",
 					"firmware": "1.0.0",
-					"model":    "test-model",
 					"package":  "test-package",
 					"platform": "test-model - Firmware 1.0.0 - Protocol 2",
 				},

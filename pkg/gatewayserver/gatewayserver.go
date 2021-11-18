@@ -990,7 +990,7 @@ func (gs *GatewayServer) handleLocationUpdates(ctx context.Context, conn connect
 }
 
 // handleVersionInfoUpdates updates gateway attributes with version info.
-// This function runs exactly once; only for the first status message, since version information does (should) not change within the same connection.
+// This function runs exactly once; only for the first status message of each connection, since version information does (should) not change within the same connection.
 func (gs *GatewayServer) handleVersionInfoUpdates(ctx context.Context, conn connectionEntry) {
 	select {
 	case <-ctx.Done():
@@ -1002,9 +1002,9 @@ func (gs *GatewayServer) handleVersionInfoUpdates(ctx context.Context, conn conn
 				"model":    status.Versions["model"],
 				"firmware": status.Versions["firmware"],
 			}
-			err := gs.entityRegistry.UpdateAttributes(ctx, *conn.Gateway().Ids, attributes)
+			err := gs.entityRegistry.UpdateAttributes(conn.Context(), *conn.Gateway().Ids, attributes)
 			if err != nil {
-				log.FromContext(ctx).WithError(err).Warn("Failed to update version information")
+				log.FromContext(ctx).WithError(err).Debug("Failed to update version information")
 			}
 		}
 	}
