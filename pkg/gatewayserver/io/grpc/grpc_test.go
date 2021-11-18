@@ -233,7 +233,7 @@ func TestTraffic(t *testing.T) {
 								GatewayIds: &registeredGatewayID,
 							},
 						},
-						Settings: ttnpb.TxSettings{
+						Settings: &ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
@@ -256,7 +256,7 @@ func TestTraffic(t *testing.T) {
 								GatewayIds: &registeredGatewayID,
 							},
 						},
-						Settings: ttnpb.TxSettings{
+						Settings: &ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
@@ -283,7 +283,7 @@ func TestTraffic(t *testing.T) {
 								GatewayIds: &registeredGatewayID,
 							},
 						},
-						Settings: ttnpb.TxSettings{
+						Settings: &ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
@@ -302,7 +302,7 @@ func TestTraffic(t *testing.T) {
 								GatewayIds: &registeredGatewayID,
 							},
 						},
-						Settings: ttnpb.TxSettings{
+						Settings: &ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
@@ -321,7 +321,7 @@ func TestTraffic(t *testing.T) {
 								GatewayIds: &registeredGatewayID,
 							},
 						},
-						Settings: ttnpb.TxSettings{
+						Settings: &ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
@@ -382,7 +382,7 @@ func TestTraffic(t *testing.T) {
 					{
 						RawPayload: []byte{0x06},
 						RxMetadata: []*ttnpb.RxMetadata{{GatewayIds: &registeredGatewayID, Rssi: -100}},
-						Settings: ttnpb.TxSettings{
+						Settings: &ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
@@ -397,7 +397,7 @@ func TestTraffic(t *testing.T) {
 					{
 						RawPayload: []byte{0x06},
 						RxMetadata: []*ttnpb.RxMetadata{{GatewayIds: &registeredGatewayID, Rssi: -10}},
-						Settings: ttnpb.TxSettings{
+						Settings: &ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,

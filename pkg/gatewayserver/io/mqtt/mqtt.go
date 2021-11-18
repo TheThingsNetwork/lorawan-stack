@@ -212,6 +212,8 @@ func (c *connection) CanWrite(info *auth.Info, topicParts ...string) bool {
 	return false
 }
 
+var errNoTxSettings = errors.DefineInvalidArgument("no_tx_settings", "no tx settings in uplink")
+
 func (c *connection) deliver(pkt *packet.PublishPacket) {
 	logger := log.FromContext(c.io.Context()).WithField("topic", pkt.TopicName)
 
@@ -230,7 +232,11 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 			logger.WithError(err).Warn("Failed to unmarshal uplink message")
 			return
 		}
-		up.ReceivedAt = pkt.Received
+		up.ReceivedAt = &pkt.Received
+		if up.Settings == nil {
+			logger.WithError(errNoTxSettings.New()).Warn("Failed to handle uplink message")
+			return
+		}
 		if err := c.io.HandleUp(up, nil); err != nil {
 			logger.WithError(err).Warn("Failed to handle uplink message")
 		}

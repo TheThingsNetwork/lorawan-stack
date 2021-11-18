@@ -175,7 +175,7 @@ func v2Metadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMeta
 
 func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error) {
 	up := ttnpb.UplinkMessage{
-		Settings: ttnpb.TxSettings{
+		Settings: &ttnpb.TxSettings{
 			Frequency: uint64(rx.Freq * 1000000),
 			DataRate:  rx.DatR.DataRate,
 		},

@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	time "time"
-)
+import fmt "fmt"
 
 func (dst *UplinkMessage) SetFields(src *UplinkMessage, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -47,10 +44,18 @@ func (dst *UplinkMessage) SetFields(src *UplinkMessage, paths ...string) error {
 		case "settings":
 			if len(subs) > 0 {
 				var newDst, newSrc *TxSettings
-				if src != nil {
-					newSrc = &src.Settings
+				if (src == nil || src.Settings == nil) && dst.Settings == nil {
+					continue
 				}
-				newDst = &dst.Settings
+				if src != nil {
+					newSrc = src.Settings
+				}
+				if dst.Settings != nil {
+					newDst = dst.Settings
+				} else {
+					newDst = &TxSettings{}
+					dst.Settings = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -58,8 +63,7 @@ func (dst *UplinkMessage) SetFields(src *UplinkMessage, paths ...string) error {
 				if src != nil {
 					dst.Settings = src.Settings
 				} else {
-					var zero TxSettings
-					dst.Settings = zero
+					dst.Settings = nil
 				}
 			}
 		case "rx_metadata":
@@ -78,8 +82,7 @@ func (dst *UplinkMessage) SetFields(src *UplinkMessage, paths ...string) error {
 			if src != nil {
 				dst.ReceivedAt = src.ReceivedAt
 			} else {
-				var zero time.Time
-				dst.ReceivedAt = zero
+				dst.ReceivedAt = nil
 			}
 		case "correlation_ids":
 			if len(subs) > 0 {

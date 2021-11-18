@@ -154,8 +154,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 			Timestamp:    gwMetadata.Timestamp,
 		})
 	}
-	uplink.Settings = settings
-
+	uplink.Settings = &settings
 	return uplink, nil
 }
 

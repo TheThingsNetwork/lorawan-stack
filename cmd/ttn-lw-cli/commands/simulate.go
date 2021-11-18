@@ -191,7 +191,7 @@ func simulate(cmd *cobra.Command, forUp func(*ttnpb.UplinkMessage) error, forDow
 	}
 
 	upMsg := &ttnpb.UplinkMessage{
-		Settings: ttnpb.TxSettings{
+		Settings: &ttnpb.TxSettings{
 			DataRate: ttnpb.DataRate{
 				Modulation: &ttnpb.DataRate_Lora{
 					Lora: &ttnpb.LoRaDataRate{

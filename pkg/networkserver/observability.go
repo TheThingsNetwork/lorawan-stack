@@ -334,7 +334,7 @@ func registerDropUplink(ctx context.Context, msg *ttnpb.UplinkMessage, err error
 }
 
 func registerUplinkLatency(ctx context.Context, msg *ttnpb.UplinkMessage) {
-	nsMetrics.gsNsUplinkLatency.WithLabelValues(ctx).Observe(time.Since(msg.ReceivedAt).Seconds())
+	nsMetrics.gsNsUplinkLatency.WithLabelValues(ctx).Observe(time.Since(*msg.ReceivedAt).Seconds())
 }
 
 func registerMergeMetadata(ctx context.Context, msg *ttnpb.UplinkMessage) {

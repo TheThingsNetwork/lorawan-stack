@@ -2502,7 +2502,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								AppSKey:              dev.PendingMacState.QueuedJoinAccept.Keys.AppSKey,
 								InvalidatedDownlinks: dev.Session.QueuedApplicationDownlinks,
 								SessionKeyId:         dev.PendingMacState.QueuedJoinAccept.Keys.SessionKeyId,
-								ReceivedAt:           &recvAt,
+								ReceivedAt:           recvAt,
 							},
 						},
 					})
@@ -2520,7 +2520,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								JoinAccept: &ttnpb.ApplicationJoinAccept{
 									InvalidatedDownlinks: dev.Session.QueuedApplicationDownlinks,
 									SessionKeyId:         dev.PendingMacState.QueuedJoinAccept.Keys.SessionKeyId,
-									ReceivedAt:           &recvAt,
+									ReceivedAt:           recvAt,
 								},
 							},
 						}),

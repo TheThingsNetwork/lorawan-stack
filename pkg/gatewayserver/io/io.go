@@ -227,7 +227,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 			"gateway_time", frontendSync.GatewayTime,
 		)).Info("Gateway clocks have been synchronized by the frontend")
 	case up.Settings.Time != nil:
-		ct = c.scheduler.SyncWithGatewayAbsolute(up.Settings.Timestamp, up.ReceivedAt, *up.Settings.Time)
+		ct = c.scheduler.SyncWithGatewayAbsolute(up.Settings.Timestamp, *up.ReceivedAt, *up.Settings.Time)
 		log.FromContext(c.ctx).WithFields(log.Fields(
 			"timestamp", up.Settings.Timestamp,
 			"concentrator_time", ct,
@@ -235,7 +235,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 			"gateway_time", *up.Settings.Time,
 		)).Info("Synchronized server and gateway absolute time")
 	case up.Settings.Time == nil:
-		ct = c.scheduler.Sync(up.Settings.Timestamp, up.ReceivedAt)
+		ct = c.scheduler.Sync(up.Settings.Timestamp, *up.ReceivedAt)
 		log.FromContext(c.ctx).WithFields(log.Fields(
 			"timestamp", up.Settings.Timestamp,
 			"concentrator_time", ct,
@@ -254,7 +254,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 		buf, err := UplinkToken(&ttnpb.GatewayAntennaIdentifiers{
 			GatewayIds:   c.gateway.GetIds(),
 			AntennaIndex: md.AntennaIndex,
-		}, md.Timestamp, ct, up.ReceivedAt, up.Settings.Time)
+		}, md.Timestamp, ct, *up.ReceivedAt, up.Settings.Time)
 		if err != nil {
 			return err
 		}

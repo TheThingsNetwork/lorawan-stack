@@ -66,7 +66,14 @@ func (m *UplinkMessage) ValidateFields(paths ...string) error {
 
 		case "settings":
 
-			if v, ok := interface{}(&m.Settings).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetSettings() == nil {
+				return UplinkMessageValidationError{
+					field:  "settings",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetSettings()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UplinkMessageValidationError{
 						field:  "settings",
@@ -95,7 +102,7 @@ func (m *UplinkMessage) ValidateFields(paths ...string) error {
 
 		case "received_at":
 
-			if v, ok := interface{}(&m.ReceivedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetReceivedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UplinkMessageValidationError{
 						field:  "received_at",

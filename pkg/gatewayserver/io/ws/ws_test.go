@@ -825,7 +825,7 @@ func TestTraffic(t *testing.T) {
 					ChannelRssi: 89,
 					Snr:         9.25,
 				}},
-				Settings: ttnpb.TxSettings{
+				Settings: &ttnpb.TxSettings{
 					Frequency:  868300000,
 					CodingRate: "4/5",
 					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
@@ -890,7 +890,7 @@ func TestTraffic(t *testing.T) {
 						Snr:         9.25,
 					},
 				},
-				Settings: ttnpb.TxSettings{
+				Settings: &ttnpb.TxSettings{
 					Frequency:  868300000,
 					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
 					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
@@ -1060,8 +1060,8 @@ func TestTraffic(t *testing.T) {
 					}
 					select {
 					case up := <-gsConn.Up():
-						a.So(time.Since(up.UplinkMessage.ReceivedAt), should.BeLessThan, timeout)
-						up.UplinkMessage.ReceivedAt = time.Time{}
+						a.So(time.Since(*up.UplinkMessage.ReceivedAt), should.BeLessThan, timeout)
+						up.UplinkMessage.ReceivedAt = nil
 						var payload ttnpb.Message
 						a.So(lorawan.UnmarshalMessage(up.UplinkMessage.RawPayload, &payload), should.BeNil)
 						if !a.So(&payload, should.Resemble, up.UplinkMessage.Payload) {

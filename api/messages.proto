@@ -83,11 +83,11 @@ message UplinkMessage {
 
   bytes raw_payload = 1;
   Message payload = 2;
-  TxSettings settings = 4 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  TxSettings settings = 4 [(validate.rules).message.required = true];
   repeated RxMetadata rx_metadata = 5;
   // Server time when a component received the message.
   // The Gateway Server and Network Server set this value to their local server time of reception.
-  google.protobuf.Timestamp received_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp received_at = 6 [(gogoproto.stdtime) = true];
   repeated string correlation_ids = 7 [(validate.rules).repeated.items.string.max_len = 100];
   reserved 8; // gateway_channel_index (obsolete).
   // Index of the device channel that received the message.
@@ -95,7 +95,7 @@ message UplinkMessage {
   uint32 device_channel_index = 9 [(validate.rules).uint32 = {lte: 255}];
 
   // Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings.
-  google.protobuf.Duration consumed_airtime = 10 [(gogoproto.stdduration) = true, (gogoproto.nullable) = true];
+  google.protobuf.Duration consumed_airtime = 10 [(gogoproto.stdduration) = true];
 }
 
 // Downlink message from the network to the end device

@@ -1853,7 +1853,7 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 								FrmPayload:   deduplicatedUp.Payload.GetMacPayload().FrmPayload,
 								ReceivedAt:   up.GetUplinkMessage().GetReceivedAt(),
 								RxMetadata:   up.GetUplinkMessage().GetRxMetadata(),
-								Settings:     &deduplicatedUp.Settings,
+								Settings:     deduplicatedUp.Settings,
 								SessionKeyId: upConf.SessionKeys.SessionKeyId,
 								NetworkIds:   up.GetUplinkMessage().GetNetworkIds(),
 							},

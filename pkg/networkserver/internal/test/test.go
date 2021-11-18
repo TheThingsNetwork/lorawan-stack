@@ -422,12 +422,13 @@ type UplinkMessageConfig struct {
 }
 
 func MakeUplinkMessage(conf UplinkMessageConfig) *ttnpb.UplinkMessage {
+	settings := MakeUplinkSettings(conf.DataRate, conf.DataRateIndex, conf.Frequency)
 	return &ttnpb.UplinkMessage{
 		RawPayload:         conf.RawPayload,
 		Payload:            conf.Payload,
-		Settings:           MakeUplinkSettings(conf.DataRate, conf.DataRateIndex, conf.Frequency),
+		Settings:           &settings,
 		RxMetadata:         deepcopy.Copy(conf.RxMetadata).([]*ttnpb.RxMetadata),
-		ReceivedAt:         conf.ReceivedAt,
+		ReceivedAt:         &conf.ReceivedAt,
 		CorrelationIds:     CopyStrings(conf.CorrelationIDs),
 		DeviceChannelIndex: uint32(conf.ChannelIndex),
 	}
