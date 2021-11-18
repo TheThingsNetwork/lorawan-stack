@@ -49,6 +49,66 @@ func parseChMask16(mask [16]bool, cntl uint8) (map[uint8]bool, error) {
 	return nil, errUnsupportedChMaskCntl.WithAttributes("chmaskcntl", cntl)
 }
 
+func parseChMask48(mask [16]bool, cntl uint8) (map[uint8]bool, error) {
+	switch cntl {
+	case 0, 1, 2:
+		return parseChMask(cntl*16, mask[:]...), nil
+	case 3:
+		return parseChMask(0,
+			true, true, true, true, true, true, true, true,
+			true, true, true, true, true, true, true, true,
+			true, true, true, true, true, true, true, true,
+			true, true, true, true, true, true, true, true,
+			true, true, true, true, true, true, true, true,
+			true, true, true, true, true, true, true, true,
+			true, true, true, true, true, true, true, true,
+		), nil
+	case 4:
+		return parseChMask(0,
+			false, false, false, false, false, false, false, false,
+			false, false, false, false, false, false, false, false,
+			false, false, false, false, false, false, false, false,
+			false, false, false, false, false, false, false, false,
+			false, false, false, false, false, false, false, false,
+			false, false, false, false, false, false, false, false,
+			false, false, false, false, false, false, false, false,
+		), nil
+	}
+	return nil, errUnsupportedChMaskCntl.WithAttributes("chmaskcntl", cntl)
+}
+
+func parseChMask64(mask [16]bool, cntl uint8) (map[uint8]bool, error) {
+	switch cntl {
+	case 0, 1, 2, 3:
+		return parseChMask(cntl*16, mask[:]...), nil
+	case 6:
+		return parseChMask(0,
+			true, true, true, true, true, true, true, true,
+			true, true, true, true, true, true, true, true,
+			true, true, true, true, true, true, true, true,
+			true, true, true, true, true, true, true, true,
+			true, true, true, true, true, true, true, true,
+			true, true, true, true, true, true, true, true,
+			true, true, true, true, true, true, true, true,
+			true, true, true, true, true, true, true, true,
+			true, true, true, true, true, true, true, true,
+		), nil
+	case 7:
+		return parseChMask(0,
+			false, false, false, false, false, false, false, false,
+			false, false, false, false, false, false, false, false,
+			false, false, false, false, false, false, false, false,
+			false, false, false, false, false, false, false, false,
+			false, false, false, false, false, false, false, false,
+			false, false, false, false, false, false, false, false,
+			false, false, false, false, false, false, false, false,
+			false, false, false, false, false, false, false, false,
+			false, false, false, false, false, false, false, false,
+		), nil
+	}
+	return nil, errUnsupportedChMaskCntl.WithAttributes("chmaskcntl", cntl)
+}
+
 func parseChMask72(mask [16]bool, cntl uint8) (map[uint8]bool, error) {
 	switch cntl {
 	case 0, 1, 2, 3:
@@ -181,6 +241,114 @@ func trueCount(vs ...bool) int {
 		}
 	}
 	return n
+}
+
+func generateChMask48(currentChs, desiredChs []bool) ([]ChMaskCntlPair, error) {
+	if len(currentChs) != 48 || len(desiredChs) != 48 {
+		return nil, errInvalidChannelCount.New()
+	}
+	pairs, err := generateChMaskMatrix(make([]ChMaskCntlPair, 0, 3), currentChs[0:48], desiredChs[0:48])
+	if err != nil {
+		return nil, err
+	}
+	if len(pairs) <= 2 {
+		return pairs, nil
+	}
+	// Count amount of pairs required assuming either ChMaskCntl==3 or ChMaskCntl==4 is sent first.
+	// The minimum amount of pairs required in such case will be 2, hence only attempt this if amount
+	// of generated pairs so far is higher than 2.
+	cntl3Pairs, err := generateChMaskMatrix(make([]ChMaskCntlPair, 0, 4), []bool{
+		true, true, true, true, true, true, true, true,
+		true, true, true, true, true, true, true, true,
+		true, true, true, true, true, true, true, true,
+		true, true, true, true, true, true, true, true,
+		true, true, true, true, true, true, true, true,
+		true, true, true, true, true, true, true, true,
+	}, desiredChs[0:48])
+	if err != nil {
+		return nil, err
+	}
+	cntl4Pairs, err := generateChMaskMatrix(make([]ChMaskCntlPair, 0, 4), []bool{
+		false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false,
+	}, desiredChs[0:48])
+	if err != nil {
+		return nil, err
+	}
+	switch {
+	case len(pairs) <= 1+len(cntl3Pairs) && len(pairs) <= 1+len(cntl4Pairs):
+		return pairs, nil
+
+	case len(cntl3Pairs) < len(cntl4Pairs):
+		return append(append(make([]ChMaskCntlPair, 0, 1+len(cntl3Pairs)), ChMaskCntlPair{
+			Cntl: 3,
+		}), cntl3Pairs...), nil
+
+	default:
+		return append(append(make([]ChMaskCntlPair, 0, 1+len(cntl4Pairs)), ChMaskCntlPair{
+			Cntl: 4,
+		}), cntl4Pairs...), nil
+	}
+}
+
+func generateChMask64(currentChs, desiredChs []bool) ([]ChMaskCntlPair, error) {
+	if len(currentChs) != 64 || len(desiredChs) != 64 {
+		return nil, errInvalidChannelCount.New()
+	}
+	pairs, err := generateChMaskMatrix(make([]ChMaskCntlPair, 0, 5), currentChs[0:64], desiredChs[0:64])
+	if err != nil {
+		return nil, err
+	}
+	if len(pairs) <= 2 {
+		return pairs, nil
+	}
+	// Count amount of pairs required assuming either ChMaskCntl==6 or ChMaskCntl==7 is sent first.
+	// The minimum amount of pairs required in such case will be 2, hence only attempt this if amount
+	// of generated pairs so far is higher than 2.
+	cntl6Pairs, err := generateChMaskMatrix(make([]ChMaskCntlPair, 0, 4), []bool{
+		true, true, true, true, true, true, true, true,
+		true, true, true, true, true, true, true, true,
+		true, true, true, true, true, true, true, true,
+		true, true, true, true, true, true, true, true,
+		true, true, true, true, true, true, true, true,
+		true, true, true, true, true, true, true, true,
+		true, true, true, true, true, true, true, true,
+		true, true, true, true, true, true, true, true,
+	}, desiredChs[0:64])
+	if err != nil {
+		return nil, err
+	}
+	cntl7Pairs, err := generateChMaskMatrix(make([]ChMaskCntlPair, 0, 4), []bool{
+		false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false,
+		false, false, false, false, false, false, false, false,
+	}, desiredChs[0:64])
+	if err != nil {
+		return nil, err
+	}
+	switch {
+	case len(pairs) <= 1+len(cntl6Pairs) && len(pairs) <= 1+len(cntl7Pairs):
+		return pairs, nil
+
+	case len(cntl6Pairs) < len(cntl7Pairs):
+		return append(append(make([]ChMaskCntlPair, 0, 1+len(cntl6Pairs)), ChMaskCntlPair{
+			Cntl: 6,
+		}), cntl6Pairs...), nil
+
+	default:
+		return append(append(make([]ChMaskCntlPair, 0, 1+len(cntl7Pairs)), ChMaskCntlPair{
+			Cntl: 7,
+		}), cntl7Pairs...), nil
+	}
 }
 
 func generateChMask72Generic(currentChs, desiredChs []bool) ([]ChMaskCntlPair, error) {

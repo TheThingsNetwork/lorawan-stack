@@ -27,6 +27,8 @@ var regionToBandID = map[string]string{
 	"EU433":     band.EU_433,
 	"AU915-928": band.AU_915_928,
 	"CN470-510": band.CN_470_510,
+	// TODO: Add CN_470_510_* regions.
+	// https://github.com/TheThingsNetwork/lorawan-stack/issues/3513
 	"AS923":     band.AS_923,
 	"KR920-923": band.KR_920_923,
 	"IN865-867": band.IN_865_867,

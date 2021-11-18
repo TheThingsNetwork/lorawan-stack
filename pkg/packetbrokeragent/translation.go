@@ -44,6 +44,8 @@ var (
 		band.EU_433:     packetbroker.Region_EU_433,
 		band.AU_915_928: packetbroker.Region_AU_915_928,
 		band.CN_470_510: packetbroker.Region_CN_470_510,
+		// TODO: Add CN_470_510_* regions.
+		// https://github.com/TheThingsNetwork/lorawan-stack/issues/3513
 		band.AS_923:     packetbroker.Region_AS_923,
 		band.KR_920_923: packetbroker.Region_KR_920_923,
 		band.IN_865_867: packetbroker.Region_IN_865_867,
