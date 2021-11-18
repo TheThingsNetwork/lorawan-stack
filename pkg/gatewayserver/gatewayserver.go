@@ -507,6 +507,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	gs.startHandleUpstreamTask(connEntry)
 	gs.startUpdateConnStatsTask(connEntry)
 	gs.startHandleLocationUpdatesTask(connEntry)
+	gs.startHandleVersionUpdatesTask(connEntry)
 
 	for name, handler := range gs.upstreamHandlers {
 		connCtx := log.NewContextWithField(conn.Context(), "upstream_handler", name)
@@ -666,6 +667,21 @@ func (gs *GatewayServer) startHandleLocationUpdatesTask(conn connectionEntry) {
 	})
 }
 
+func (gs *GatewayServer) startHandleVersionUpdatesTask(conn connectionEntry) {
+	conn.tasksDone.Add(1)
+	gs.StartTask(&component.TaskConfig{
+		Context: conn.Context(),
+		ID:      fmt.Sprintf("handle_version_updates_%s", unique.ID(conn.Context(), conn.Gateway().GetIds())),
+		Func: func(ctx context.Context) error {
+			gs.handleVersionInfoUpdates(ctx, conn)
+			return nil
+		},
+		Done:    conn.tasksDone.Done,
+		Restart: component.TaskRestartNever,
+		Backoff: component.DialTaskBackoffConfig,
+	})
+}
+
 var errHostHandle = errors.Define("host_handle", "host `{host}` failed to handle message")
 
 type upstreamHost struct {
@@ -802,6 +818,7 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 		case msg := <-conn.Status():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:status:%s", events.NewCorrelationID()))
 			val = msg
+
 			registerReceiveStatus(ctx, gtw, msg, protocol)
 		case msg := <-conn.TxAck():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:tx_ack:%s", events.NewCorrelationID()))
@@ -967,6 +984,27 @@ func (gs *GatewayServer) handleLocationUpdates(ctx context.Context, conn connect
 			case <-ctx.Done():
 				return
 			case <-timeout:
+			}
+		}
+	}
+}
+
+// handleVersionInfoUpdates updates gateway attributes with version info.
+// This function runs exactly once; only for the first status message, since version information does (should) not change within the same connection.
+func (gs *GatewayServer) handleVersionInfoUpdates(ctx context.Context, conn connectionEntry) {
+	select {
+	case <-ctx.Done():
+		return
+	case <-conn.VersionInfoChanged():
+		status, _, ok := conn.StatusStats()
+		if ok && status.Versions["model"] != "" && status.Versions["firmware"] != "" {
+			attributes := map[string]string{
+				"model":    status.Versions["model"],
+				"firmware": status.Versions["firmware"],
+			}
+			err := gs.entityRegistry.UpdateAttributes(ctx, *conn.Gateway().Ids, attributes)
+			if err != nil {
+				log.FromContext(ctx).WithError(err).Warn("Failed to update version information")
 			}
 		}
 	}
