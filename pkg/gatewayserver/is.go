@@ -99,6 +99,49 @@ func (is IS) UpdateAntennas(ctx context.Context, ids ttnpb.GatewayIdentifiers, a
 	return err
 }
 
+// UpdateAttributes implements EntityRegistry.
+func (is IS) UpdateAttributes(ctx context.Context, ids ttnpb.GatewayIdentifiers, attributes map[string]string) error {
+	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, is.AllowInsecureForCredentials())
+	if err != nil {
+		return err
+	}
+
+	registry, err := is.newRegistryClient(ctx, &ids)
+	if err != nil {
+		return err
+	}
+
+	// First get existing attributes and take the union.
+	getGtwReq := &ttnpb.GetGatewayRequest{
+		GatewayIds: &ids,
+		FieldMask: &pbtypes.FieldMask{
+			Paths: []string{"attributes"},
+		},
+	}
+	gtw, err := registry.Get(ctx, getGtwReq, callOpt)
+	if err != nil {
+		return err
+	}
+	if gtw.Attributes == nil {
+		gtw.Attributes = make(map[string]string)
+	}
+	for k, v := range attributes {
+		gtw.Attributes[k] = v
+	}
+
+	req := &ttnpb.UpdateGatewayRequest{
+		Gateway: &ttnpb.Gateway{
+			Ids:        &ids,
+			Attributes: gtw.Attributes,
+		},
+		FieldMask: &pbtypes.FieldMask{
+			Paths: []string{"attributes"},
+		},
+	}
+	_, err = registry.Update(ctx, req, callOpt)
+	return err
+}
+
 // ValidateGatewayID implements EntityRegistry.
 func (is IS) ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
 	return ids.ValidateContext(ctx)
