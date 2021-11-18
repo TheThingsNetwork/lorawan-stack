@@ -21,7 +21,6 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -142,32 +141,24 @@ const (
 )
 
 // TransferTime implements Formatter.
-func (*lbsLNS) TransferTime(ctx context.Context, serverTime time.Time, conn *io.Connection) ([]byte, error) {
+func (*lbsLNS) TransferTime(ctx context.Context, serverTime time.Time, gpsTime *time.Time, concentratorTime *scheduling.ConcentratorTime) ([]byte, error) {
 	if enabled, ok := getSessionTimeSync(ctx); !ok || !enabled {
 		return nil, nil
 	}
 
-	sessionID, found := getSessionID(ctx)
-	if !found {
-		return nil, nil
-	}
-
-	_, _, median, _, n := conn.RTTStats(100, serverTime)
-	if n < transferTimeMinRTTCount {
-		return nil, nil
-	}
-
-	// The concentrator time is based on the current server time plus
-	// half a round trip. The timestamp is relative to the server
-	// time in order to avoid aggregating gateway time errors.
-	concentratorTime, ok := conn.TimeFromServerTime(serverTime.Add(median / 2))
-	if !ok {
-		return nil, nil
-	}
-
-	return TimeSyncResponse{
-		XTime:   ConcentratorTimeToXTime(sessionID, concentratorTime),
-		GPSTime: TimeToGPSTime(serverTime),
+	response := TimeSyncResponse{
 		MuxTime: TimeToUnixSeconds(serverTime),
-	}.MarshalJSON()
+	}
+
+	sessionID, found := getSessionID(ctx)
+	if !found || gpsTime == nil || concentratorTime == nil {
+		// Update only the MuxTime.
+		// https://github.com/lorabasics/basicstation/blob/bd17e53ab1137de6abb5ae48d6f3d52f6c268299/src/s2e.c#L1616-L1619
+		return response.MarshalJSON()
+	}
+
+	response.XTime = ConcentratorTimeToXTime(sessionID, *concentratorTime)
+	response.GPSTime = TimeToGPSTime(*gpsTime)
+
+	return response.MarshalJSON()
 }
