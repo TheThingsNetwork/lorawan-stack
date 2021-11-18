@@ -89,12 +89,6 @@ jobs:
       if: steps.dr-index-cache.outputs.cache-hit != 'true'
     - name: Auto-completion scripts
       run: tools/bin/mage cli:autocomplete
-    - name: Install JS SDK dependencies
-      run: tools/bin/mage jsSDK:deps
-    - name: Build JS SDK
-      run: tools/bin/mage jsSDK:clean jsSDK:build
-    - name: Install JS dependencies
-      run: tools/bin/mage js:deps
       timeout-minutes: 5
     - name: Build frontend
       run: tools/bin/mage js:clean js:buildDll js:build
