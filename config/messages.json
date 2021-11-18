@@ -2663,6 +2663,15 @@
       "file": "applicationserver.go"
     }
   },
+  "error:pkg/applicationserver:no_ns_timestamp": {
+    "translations": {
+      "en": "no network server timestamp in message"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "applicationserver.go"
+    }
+  },
   "error:pkg/applicationserver:no_payload": {
     "translations": {
       "en": "no payload"
@@ -4173,6 +4182,15 @@
     "description": {
       "package": "pkg/gatewayserver/io/mqtt",
       "file": "format_protobufv2.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/mqtt:no_tx_settings": {
+    "translations": {
+      "en": "no tx settings in uplink"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/mqtt",
+      "file": "mqtt.go"
     }
   },
   "error:pkg/gatewayserver/io/mqtt:not_authorized": {
