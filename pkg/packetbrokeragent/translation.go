@@ -263,40 +263,40 @@ var (
 )
 
 func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config ForwarderConfig) (*packetbroker.UplinkMessage, error) {
-	msg.Payload = &ttnpb.Message{}
-	if err := lorawan.UnmarshalMessage(msg.RawPayload, msg.Payload); err != nil {
+	msg.UplinkMessage.Payload = &ttnpb.Message{}
+	if err := lorawan.UnmarshalMessage(msg.UplinkMessage.RawPayload, msg.UplinkMessage.Payload); err != nil {
 		return nil, errDecodePayload.WithCause(err)
 	}
-	if msg.Payload.Major != ttnpb.Major_LORAWAN_R1 {
+	if msg.UplinkMessage.Payload.Major != ttnpb.Major_LORAWAN_R1 {
 		return nil, errUnsupportedLoRaWANVersion.WithAttributes(
-			"version", msg.Payload.Major,
+			"version", msg.UplinkMessage.Payload.Major,
 		)
 	}
 
-	hash := sha256.Sum256(msg.RawPayload[:len(msg.RawPayload)-4]) // The hash is without MIC to detect retransmissions.
+	hash := sha256.Sum256(msg.UplinkMessage.RawPayload[:len(msg.UplinkMessage.RawPayload)-4]) // The hash is without MIC to detect retransmissions.
 	up := &packetbroker.UplinkMessage{
 		PhyPayload: &packetbroker.UplinkMessage_PHYPayload{
 			Teaser: &packetbroker.PHYPayloadTeaser{
 				Hash:   hash[:],
-				Length: uint32(len(msg.RawPayload)),
+				Length: uint32(len(msg.UplinkMessage.RawPayload)),
 			},
 			Value: &packetbroker.UplinkMessage_PHYPayload_Plain{
-				Plain: msg.RawPayload,
+				Plain: msg.UplinkMessage.RawPayload,
 			},
 		},
-		Frequency:  msg.Settings.Frequency,
-		CodingRate: msg.Settings.CodingRate,
+		Frequency:  msg.UplinkMessage.Settings.Frequency,
+		CodingRate: msg.UplinkMessage.Settings.CodingRate,
 	}
 
 	var ok bool
 	if up.GatewayRegion, ok = toPBRegion[msg.BandId]; !ok {
 		return nil, errUnknownBand.WithAttributes("band_id", msg.BandId)
 	}
-	if up.DataRate, ok = toPBDataRate(msg.Settings.DataRate, msg.Settings.CodingRate); !ok {
+	if up.DataRate, ok = toPBDataRate(msg.UplinkMessage.Settings.DataRate, msg.UplinkMessage.Settings.CodingRate); !ok {
 		return nil, errUnknownDataRate.New()
 	}
 
-	switch pld := msg.Payload.Payload.(type) {
+	switch pld := msg.UplinkMessage.Payload.Payload.(type) {
 	case *ttnpb.Message_JoinRequestPayload:
 		up.PhyPayload.Teaser.Payload = &packetbroker.PHYPayloadTeaser_JoinRequest{
 			JoinRequest: &packetbroker.PHYPayloadTeaser_JoinRequestTeaser{
@@ -317,19 +317,19 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 			},
 		}
 	default:
-		return nil, errUnsupportedMType.WithAttributes("m_type", msg.Payload.MType)
+		return nil, errUnsupportedMType.WithAttributes("m_type", msg.UplinkMessage.Payload.MType)
 	}
 
 	var gatewayReceiveTime *time.Time
 	var gatewayUplinkToken []byte
-	if len(msg.RxMetadata) > 0 && msg.RxMetadata[0].GatewayIds != nil {
-		md := msg.RxMetadata[0]
+	if len(msg.UplinkMessage.RxMetadata) > 0 && msg.UplinkMessage.RxMetadata[0].GatewayIds != nil {
+		md := msg.UplinkMessage.RxMetadata[0]
 		up.GatewayId = toPBGatewayIdentifier(md.GatewayIds, config)
 
 		var teaser packetbroker.GatewayMetadataTeaser_Terrestrial
 		var signalQuality packetbroker.GatewayMetadataSignalQuality_Terrestrial
 		var localization *packetbroker.GatewayMetadataLocalization_Terrestrial
-		for _, md := range msg.RxMetadata {
+		for _, md := range msg.UplinkMessage.RxMetadata {
 			var rssiStandardDeviation *pbtypes.FloatValue
 			if md.RssiStandardDeviation > 0 {
 				rssiStandardDeviation = &pbtypes.FloatValue{
@@ -417,7 +417,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 		}
 	}
 
-	if t, err := pbtypes.TimestampProto(msg.ReceivedAt); err == nil {
+	if t, err := pbtypes.TimestampProto(msg.UplinkMessage.ReceivedAt); err == nil {
 		up.ForwarderReceiveTime = t
 	}
 	if gatewayReceiveTime != nil {

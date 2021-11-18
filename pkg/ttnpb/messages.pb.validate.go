@@ -615,19 +615,19 @@ func (m *GatewayUplinkMessage) ValidateFields(paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "message":
+		case "uplink_message":
 
-			if m.UplinkMessage == nil {
+			if m.GetUplinkMessage() == nil {
 				return GatewayUplinkMessageValidationError{
-					field:  "message",
+					field:  "uplink_message",
 					reason: "value is required",
 				}
 			}
 
-			if v, ok := interface{}(m.UplinkMessage).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetUplinkMessage()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GatewayUplinkMessageValidationError{
-						field:  "message",
+						field:  "uplink_message",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}

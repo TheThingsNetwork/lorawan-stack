@@ -689,13 +689,9 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 	gtw := host.gtw
 	switch msg := item.(type) {
 	case *ttnpb.GatewayUplinkMessage:
-		up := *msg.UplinkMessage
-		msg = &ttnpb.GatewayUplinkMessage{
-			BandId:        msg.BandId,
-			UplinkMessage: &up,
-		}
-		msg.CorrelationIds = append(make([]string, 0, len(msg.CorrelationIds)+1), msg.CorrelationIds...)
-		msg.CorrelationIds = append(msg.CorrelationIds, host.correlationID)
+		up := msg.UplinkMessage
+		up.CorrelationIds = append(make([]string, 0, len(up.CorrelationIds)+1), up.CorrelationIds...)
+		up.CorrelationIds = append(up.CorrelationIds, host.correlationID)
 		drop := func(ids *ttnpb.EndDeviceIdentifiers, err error) {
 			logger := logger.WithError(err)
 			if ids.JoinEui != nil {
@@ -710,7 +706,11 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 			logger.Debug("Drop message")
 			registerDropUplink(ctx, gtw, msg, host.name, err)
 		}
-		ids := msg.Payload.EndDeviceIdentifiers()
+		ids := up.Payload.EndDeviceIdentifiers()
+		msg = &ttnpb.GatewayUplinkMessage{
+			BandId:        msg.BandId,
+			UplinkMessage: up,
+		}
 		var pass bool
 		switch {
 		case ids.DevAddr != nil:
@@ -797,10 +797,10 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 			return
 		case msg := <-conn.Up():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
-			msg.CorrelationIds = append(msg.CorrelationIds, events.CorrelationIDsFromContext(ctx)...)
-			if msg.Payload == nil {
-				msg.Payload = &ttnpb.Message{}
-				if err := lorawan.UnmarshalMessage(msg.RawPayload, msg.Payload); err != nil {
+			msg.UplinkMessage.CorrelationIds = append(msg.UplinkMessage.CorrelationIds, events.CorrelationIDsFromContext(ctx)...)
+			if msg.UplinkMessage.Payload == nil {
+				msg.UplinkMessage.Payload = &ttnpb.Message{}
+				if err := lorawan.UnmarshalMessage(msg.UplinkMessage.RawPayload, msg.UplinkMessage.Payload); err != nil {
 					registerDropUplink(ctx, gtw, msg, "validation", err)
 					continue
 				}

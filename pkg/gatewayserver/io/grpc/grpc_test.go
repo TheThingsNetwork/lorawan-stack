@@ -357,8 +357,8 @@ func TestTraffic(t *testing.T) {
 					select {
 					case up := <-conn.Up():
 						expected := tc.UplinkMessages[ups]
-						up.ReceivedAt = expected.ReceivedAt
-						up.RxMetadata[0].UplinkToken = expected.RxMetadata[0].UplinkToken
+						up.UplinkMessage.ReceivedAt = expected.ReceivedAt
+						up.UplinkMessage.RxMetadata[0].UplinkToken = expected.RxMetadata[0].UplinkToken
 						a.So(up.UplinkMessage, should.Resemble, expected)
 						ups++
 					case status := <-conn.Status():
@@ -413,9 +413,9 @@ func TestTraffic(t *testing.T) {
 			}
 			select {
 			case up := <-conn.Up():
-				a.So(up.RxMetadata[0].Rssi, should.Equal, -10)
-				a.So(up.RawPayload, should.Resemble, []byte{0x06})
-				a.So(up.Settings.Frequency, should.Equal, 868700000)
+				a.So(up.UplinkMessage.RxMetadata[0].Rssi, should.Equal, -10)
+				a.So(up.UplinkMessage.RawPayload, should.Resemble, []byte{0x06})
+				a.So(up.UplinkMessage.Settings.Frequency, should.Equal, 868700000)
 			case <-time.After(timeout):
 				t.Fatalf("Receive unexpected upstream timeout")
 			}

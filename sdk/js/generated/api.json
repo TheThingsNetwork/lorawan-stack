@@ -28949,7 +28949,7 @@
           "extensions": [],
           "fields": [
             {
-              "name": "message",
+              "name": "uplink_message",
               "description": "",
               "label": "",
               "type": "UplinkMessage",

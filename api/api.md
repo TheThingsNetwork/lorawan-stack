@@ -6359,14 +6359,14 @@ Downlink message from the network to the end device
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `message` | [`UplinkMessage`](#ttn.lorawan.v3.UplinkMessage) |  |  |
+| `uplink_message` | [`UplinkMessage`](#ttn.lorawan.v3.UplinkMessage) |  |  |
 | `band_id` | [`string`](#string) |  | LoRaWAN band ID of the gateway. |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
-| `message` | <p>`message.required`: `true`</p> |
+| `uplink_message` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.MessagePayloadFormatters">Message `MessagePayloadFormatters`</a>
 

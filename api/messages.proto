@@ -184,7 +184,7 @@ message GatewayTxAcknowledgment {
 }
 
 message GatewayUplinkMessage {
-  UplinkMessage message = 1 [(gogoproto.embed) = true, (validate.rules).message.required = true];
+  UplinkMessage uplink_message = 1 [(validate.rules).message.required = true];
   // LoRaWAN band ID of the gateway.
   string band_id = 2;
 }
