@@ -144,6 +144,22 @@ func (m *GetApplicationCollaboratorRequest) ExtractRequestFields(dst map[string]
 	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
+func (up *ApplicationUp) ExtractRequestFields(dst map[string]interface{}) {
+	ids := up.EndDeviceIds
+	if ids == nil {
+		return
+	}
+	ids.ApplicationIdentifiers.ExtractRequestFields(dst)
+}
+
+func (req *DownlinkQueueRequest) ExtractRequestFields(dst map[string]interface{}) {
+	ids := req.EndDeviceIds
+	if ids == nil {
+		return
+	}
+	ids.ApplicationIdentifiers.ExtractRequestFields(dst)
+}
+
 // Wrap methods of m.ApplicationIdentifiers.
 
 func (m *Application) GetEntityIdentifiers() *EntityIdentifiers {
