@@ -492,7 +492,14 @@ func (m *AuthInfoResponse_APIKeyAccess) ValidateFields(paths ...string) error {
 		switch name {
 		case "api_key":
 
-			if v, ok := interface{}(&m.APIKey).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetApiKey() == nil {
+				return AuthInfoResponse_APIKeyAccessValidationError{
+					field:  "api_key",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApiKey()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return AuthInfoResponse_APIKeyAccessValidationError{
 						field:  "api_key",

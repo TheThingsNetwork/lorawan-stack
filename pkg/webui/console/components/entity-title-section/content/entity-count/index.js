@@ -36,7 +36,7 @@ const EntityCount = props => {
       to={toAllUrl}
       disabled={errored}
     >
-      <Icon className={style.icon} icon={icon} />
+      <Icon className={style.icon} icon={icon} textPaddedRight />
       {!errored && <span className={style.value}>{value} </span>}
       <Message
         className={style.message}

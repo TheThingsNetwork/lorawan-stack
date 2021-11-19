@@ -21,6 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/packetbroker"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"golang.org/x/crypto/acme"
 )
@@ -73,6 +74,10 @@ var DefaultHTTPConfig = config.HTTP{
 // DefaultInteropServerConfig is the default interop server config.
 var DefaultInteropServerConfig = config.InteropServer{
 	ListenTLS: ":8886",
+	PacketBroker: config.PacketBrokerInteropAuth{
+		Enabled:     false,
+		TokenIssuer: packetbroker.DefaultTokenIssuer,
+	},
 }
 
 // DefaultGRPCConfig is the default config for GRPC.
@@ -95,7 +100,7 @@ var DefaultEventsConfig = func() config.Events {
 		Backend: "internal",
 	}
 	c.Redis.Store.TTL = 10 * time.Minute
-	c.Redis.Store.EntityTTL = time.Hour
+	c.Redis.Store.EntityTTL = 24 * time.Hour
 	c.Redis.Store.EntityCount = 100
 	c.Redis.Store.CorrelationIDCount = 100
 	c.Redis.Workers = 16

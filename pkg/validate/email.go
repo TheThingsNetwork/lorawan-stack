@@ -15,7 +15,6 @@
 package validate
 
 import (
-	"fmt"
 	"regexp"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -28,15 +27,9 @@ var (
 )
 
 // Email checks whether the input value is a valid email or not.
-func Email(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return errNotString.WithAttributes("type", fmt.Sprintf("%T", v))
-	}
-
+func Email(str string) error {
 	if !emailRegex.MatchString(str) {
 		return errEmail.WithAttributes("email", str)
 	}
-
 	return nil
 }

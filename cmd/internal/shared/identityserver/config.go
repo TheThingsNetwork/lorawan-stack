@@ -26,7 +26,7 @@ import (
 
 // DefaultIdentityServerConfig is the default configuration for the Identity Server.
 var DefaultIdentityServerConfig = identityserver.Config{
-	DatabaseURI: "postgresql://root@localhost:26257/ttn_lorawan_dev?sslmode=disable",
+	DatabaseURI: "postgresql://root:root@localhost:5432/ttn_lorawan_dev?sslmode=disable",
 	OAuth: oauth.Config{
 		Mount: "/oauth",
 		UI: oauth.UIConfig{
@@ -38,7 +38,7 @@ var DefaultIdentityServerConfig = identityserver.Config{
 				AssetsBaseURL: shared.DefaultAssetsBaseURL,
 				IconPrefix:    "oauth-",
 				CSSFiles:      []string{"account.css"},
-				JSFiles:       []string{"account.js"},
+				JSFiles:       []string{"libs.bundle.js", "account.js"},
 			},
 			FrontendConfig: oauth.FrontendConfig{
 				DocumentationBaseURL: "https://thethingsindustries.com/docs",

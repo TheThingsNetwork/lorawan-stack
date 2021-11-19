@@ -368,10 +368,11 @@ func TestTraffic(t *testing.T) {
 				Path: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_UplinkToken{
 						UplinkToken: io.MustUplinkToken(
-							ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
+							&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &registeredGatewayID},
 							uint32(300*test.Delay/time.Microsecond),
 							scheduling.ConcentratorTime(300*test.Delay),
 							time.Unix(0, int64(300*test.Delay)),
+							nil,
 						),
 					},
 				},
@@ -409,10 +410,11 @@ func TestTraffic(t *testing.T) {
 				Path: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_UplinkToken{
 						UplinkToken: io.MustUplinkToken(
-							ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
+							&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &registeredGatewayID},
 							uint32(600*test.Delay/time.Microsecond),
 							scheduling.ConcentratorTime(600*test.Delay),
 							time.Unix(0, int64(600*test.Delay)),
+							nil,
 						),
 					},
 				},
@@ -450,10 +452,11 @@ func TestTraffic(t *testing.T) {
 				Path: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_UplinkToken{
 						UplinkToken: io.MustUplinkToken(
-							ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
+							&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &registeredGatewayID},
 							uint32((15*time.Second+300*test.Delay)/time.Microsecond),
 							scheduling.ConcentratorTime(15*time.Second+300*test.Delay),
 							time.Unix(0, int64((15*time.Second+300*test.Delay))),
+							nil,
 						),
 					},
 				},

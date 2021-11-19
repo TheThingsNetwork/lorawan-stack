@@ -104,8 +104,10 @@ func RXMetadataStats(ctx context.Context, mds []*ttnpb.RxMetadata) (gateways int
 	for _, md := range mds {
 		if md.PacketBroker != nil {
 			gtws[fmt.Sprintf("%s@%s/%s", md.PacketBroker.ForwarderClusterId, md.PacketBroker.ForwarderNetId, md.PacketBroker.ForwarderTenantId)] = struct{}{}
+		} else if md.GatewayIds != nil {
+			gtws[unique.ID(ctx, md.GatewayIds)] = struct{}{}
 		} else {
-			gtws[unique.ID(ctx, md.GatewayIdentifiers)] = struct{}{}
+			continue // Metadata without PB or Gateway IDs should be invalid so skipping.
 		}
 		if md.Snr > maxSNR {
 			maxSNR = md.Snr

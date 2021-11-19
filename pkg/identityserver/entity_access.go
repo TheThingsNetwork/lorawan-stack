@@ -129,7 +129,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			apiKey.Rights = ttnpb.RightsFrom(apiKey.Rights...).Implied().GetRights()
 			res.AccessMethod = &ttnpb.AuthInfoResponse_ApiKey{
 				ApiKey: &ttnpb.AuthInfoResponse_APIKeyAccess{
-					APIKey:    *apiKey,
+					ApiKey:    apiKey,
 					EntityIds: *ids.GetEntityIdentifiers(),
 				},
 			}
@@ -163,7 +163,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			if !valid {
 				return errInvalidAuthorization.New()
 			}
-			if accessToken.ExpiresAt.Before(time.Now()) {
+			if accessToken.ExpiresAt != nil && accessToken.ExpiresAt.Before(time.Now()) {
 				return errTokenExpired.New()
 			}
 			accessToken.AccessToken, accessToken.RefreshToken = "", ""
@@ -399,7 +399,7 @@ func (is *IdentityServer) RequireAdmin(ctx context.Context) error {
 }
 
 func restrictRights(info *ttnpb.AuthInfoResponse, rights *ttnpb.Rights) {
-	if apiKey := info.GetApiKey(); apiKey != nil {
+	if apiKey := info.GetApiKey().GetApiKey(); apiKey != nil {
 		apiKey.Rights = ttnpb.RightsFrom(apiKey.Rights...).Intersect(rights).GetRights()
 	} else if token := info.GetOauthAccessToken(); token != nil {
 		token.Rights = ttnpb.RightsFrom(token.Rights...).Intersect(rights).GetRights()

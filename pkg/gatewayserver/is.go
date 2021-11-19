@@ -52,7 +52,7 @@ func (is IS) AssertGatewayRights(ctx context.Context, ids ttnpb.GatewayIdentifie
 
 // GetIdentifiersForEUI implements EntityRegistry.
 func (is IS) GetIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewayIdentifiersForEUIRequest) (*ttnpb.GatewayIdentifiers, error) {
-	registry, err := is.newRegistryClient(ctx, &ttnpb.GatewayIdentifiers{Eui: &req.Eui})
+	registry, err := is.newRegistryClient(ctx, &ttnpb.GatewayIdentifiers{Eui: req.Eui})
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func (is IS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gate
 }
 
 // UpdateAntennas updates the gateway antennas.
-func (is IS) UpdateAntennas(ctx context.Context, ids ttnpb.GatewayIdentifiers, antennas []ttnpb.GatewayAntenna) error {
+func (is IS) UpdateAntennas(ctx context.Context, ids ttnpb.GatewayIdentifiers, antennas []*ttnpb.GatewayAntenna) error {
 	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, is.AllowInsecureForCredentials())
 	if err != nil {
 		return err
@@ -86,15 +86,10 @@ func (is IS) UpdateAntennas(ctx context.Context, ids ttnpb.GatewayIdentifiers, a
 		return err
 	}
 
-	a := make([]*ttnpb.GatewayAntenna, 0)
-	for _, antenna := range antennas {
-		a = append(a, &antenna)
-	}
-
 	req := &ttnpb.UpdateGatewayRequest{
 		Gateway: &ttnpb.Gateway{
 			Ids:      &ids,
-			Antennas: a,
+			Antennas: antennas,
 		},
 		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{"antennas"},
@@ -110,16 +105,7 @@ func (is IS) ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers
 }
 
 func (is IS) newRegistryClient(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (ttnpb.GatewayRegistryClient, error) {
-	var (
-		cc  *grpc.ClientConn
-		err error
-	)
-	if ids != nil {
-		cc, err = is.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids)
-	} else {
-		// Don't pass a (*ttnpb.GatewayIdentifiers)(nil) to GetPeerConn.
-		cc, err = is.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
-	}
+	cc, err := is.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
 	if err != nil {
 		return nil, err
 	}

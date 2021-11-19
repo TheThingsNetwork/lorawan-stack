@@ -98,7 +98,8 @@ func (m MD) ToIncomingContext(ctx context.Context) context.Context {
 }
 
 // FromMetadata returns The Things Stack metadata from metadata.MD
-func FromMetadata(md metadata.MD) (m MD) {
+func FromMetadata(md metadata.MD) MD {
+	var m MD
 	if id, ok := md["id"]; ok && len(id) > 0 {
 		m.ID = id[len(id)-1]
 	}
@@ -130,7 +131,7 @@ func FromMetadata(md metadata.MD) (m MD) {
 	} else if userAgent, ok := md["user-agent"]; ok && len(userAgent) > 0 {
 		m.UserAgent = userAgent[len(userAgent)-1]
 	}
-	return
+	return m
 }
 
 // FromOutgoingContext returns The Things Stack metadata from the outgoing context ctx.

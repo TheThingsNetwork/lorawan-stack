@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	time "time"
-)
+import fmt "fmt"
 
 func (dst *Organization) SetFields(src *Organization, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -42,8 +39,7 @@ func (dst *Organization) SetFields(src *Organization, paths ...string) error {
 			if src != nil {
 				dst.CreatedAt = src.CreatedAt
 			} else {
-				var zero time.Time
-				dst.CreatedAt = zero
+				dst.CreatedAt = nil
 			}
 		case "updated_at":
 			if len(subs) > 0 {
@@ -52,8 +48,7 @@ func (dst *Organization) SetFields(src *Organization, paths ...string) error {
 			if src != nil {
 				dst.UpdatedAt = src.UpdatedAt
 			} else {
-				var zero time.Time
-				dst.UpdatedAt = zero
+				dst.UpdatedAt = nil
 			}
 		case "deleted_at":
 			if len(subs) > 0 {
@@ -266,10 +261,18 @@ func (dst *CreateOrganizationRequest) SetFields(src *CreateOrganizationRequest, 
 		case "organization":
 			if len(subs) > 0 {
 				var newDst, newSrc *Organization
-				if src != nil {
-					newSrc = &src.Organization
+				if (src == nil || src.Organization == nil) && dst.Organization == nil {
+					continue
 				}
-				newDst = &dst.Organization
+				if src != nil {
+					newSrc = src.Organization
+				}
+				if dst.Organization != nil {
+					newDst = dst.Organization
+				} else {
+					newDst = &Organization{}
+					dst.Organization = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -277,8 +280,7 @@ func (dst *CreateOrganizationRequest) SetFields(src *CreateOrganizationRequest, 
 				if src != nil {
 					dst.Organization = src.Organization
 				} else {
-					var zero Organization
-					dst.Organization = zero
+					dst.Organization = nil
 				}
 			}
 		case "collaborator":
@@ -320,10 +322,18 @@ func (dst *UpdateOrganizationRequest) SetFields(src *UpdateOrganizationRequest, 
 		case "organization":
 			if len(subs) > 0 {
 				var newDst, newSrc *Organization
-				if src != nil {
-					newSrc = &src.Organization
+				if (src == nil || src.Organization == nil) && dst.Organization == nil {
+					continue
 				}
-				newDst = &dst.Organization
+				if src != nil {
+					newSrc = src.Organization
+				}
+				if dst.Organization != nil {
+					newDst = dst.Organization
+				} else {
+					newDst = &Organization{}
+					dst.Organization = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -331,8 +341,7 @@ func (dst *UpdateOrganizationRequest) SetFields(src *UpdateOrganizationRequest, 
 				if src != nil {
 					dst.Organization = src.Organization
 				} else {
-					var zero Organization
-					dst.Organization = zero
+					dst.Organization = nil
 				}
 			}
 		case "field_mask":
@@ -549,19 +558,26 @@ func (dst *UpdateOrganizationAPIKeyRequest) SetFields(src *UpdateOrganizationAPI
 		case "api_key":
 			if len(subs) > 0 {
 				var newDst, newSrc *APIKey
-				if src != nil {
-					newSrc = &src.APIKey
+				if (src == nil || src.ApiKey == nil) && dst.ApiKey == nil {
+					continue
 				}
-				newDst = &dst.APIKey
+				if src != nil {
+					newSrc = src.ApiKey
+				}
+				if dst.ApiKey != nil {
+					newDst = dst.ApiKey
+				} else {
+					newDst = &APIKey{}
+					dst.ApiKey = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.APIKey = src.APIKey
+					dst.ApiKey = src.ApiKey
 				} else {
-					var zero APIKey
-					dst.APIKey = zero
+					dst.ApiKey = nil
 				}
 			}
 		case "field_mask":

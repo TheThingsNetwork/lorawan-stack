@@ -14,6 +14,7 @@
 
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { id as gatewayIdRegexp } from '@ttn-lw/lib/regexp'
 
 import {
   attributeValidCheck,
@@ -21,10 +22,7 @@ import {
   attributeKeyTooLongCheck,
   attributeValueTooLongCheck,
 } from '@console/lib/attributes'
-import {
-  id as gatewayIdRegexp,
-  addressWithOptionalScheme as addressWithOptionalSchemeRegexp,
-} from '@console/lib/regexp'
+import { addressWithOptionalScheme as addressWithOptionalSchemeRegexp } from '@console/lib/regexp'
 
 const validationSchema = Yup.object().shape({
   ids: Yup.object().shape({

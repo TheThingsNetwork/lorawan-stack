@@ -42,6 +42,7 @@ type DeviceRegistry interface {
 	GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error)
 	RangeByUplinkMatches(ctx context.Context, up *ttnpb.UplinkMessage, cacheTTL time.Duration, f func(context.Context, *UplinkMatch) (bool, error)) error
 	SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
+	Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error
 }
 
 var errDeviceExists = errors.DefineAlreadyExists("device_exists", "device already exists")
@@ -132,6 +133,18 @@ func (w replacedEndDeviceFieldRegistryWrapper) SetByID(ctx context.Context, appI
 		d.GetTransform(dev)
 	}
 	return dev, ctx, nil
+}
+
+func (w replacedEndDeviceFieldRegistryWrapper) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
+	paths, replaced := registry.MatchReplacedEndDeviceFields(paths, w.fields)
+	return w.DeviceRegistry.Range(ctx, paths, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, dev *ttnpb.EndDevice) bool {
+		if dev != nil {
+			for _, d := range replaced {
+				d.GetTransform(dev)
+			}
+		}
+		return f(ctx, ids, dev)
+	})
 }
 
 func wrapEndDeviceRegistryWithReplacedFields(r DeviceRegistry, fields ...registry.ReplacedEndDeviceField) DeviceRegistry {

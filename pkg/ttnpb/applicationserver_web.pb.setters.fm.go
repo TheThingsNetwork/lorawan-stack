@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	time "time"
-)
+import fmt "fmt"
 
 func (dst *ApplicationWebhookIdentifiers) SetFields(src *ApplicationWebhookIdentifiers, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -13,19 +10,26 @@ func (dst *ApplicationWebhookIdentifiers) SetFields(src *ApplicationWebhookIdent
 		case "application_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
-				if src != nil {
-					newSrc = &src.ApplicationIdentifiers
+				if (src == nil || src.ApplicationIds == nil) && dst.ApplicationIds == nil {
+					continue
 				}
-				newDst = &dst.ApplicationIdentifiers
+				if src != nil {
+					newSrc = src.ApplicationIds
+				}
+				if dst.ApplicationIds != nil {
+					newDst = dst.ApplicationIds
+				} else {
+					newDst = &ApplicationIdentifiers{}
+					dst.ApplicationIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
-					var zero ApplicationIdentifiers
-					dst.ApplicationIdentifiers = zero
+					dst.ApplicationIds = nil
 				}
 			}
 		case "webhook_id":
@@ -144,19 +148,26 @@ func (dst *ApplicationWebhookTemplate) SetFields(src *ApplicationWebhookTemplate
 		case "ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationWebhookTemplateIdentifiers
-				if src != nil {
-					newSrc = &src.ApplicationWebhookTemplateIdentifiers
+				if (src == nil || src.Ids == nil) && dst.Ids == nil {
+					continue
 				}
-				newDst = &dst.ApplicationWebhookTemplateIdentifiers
+				if src != nil {
+					newSrc = src.Ids
+				}
+				if dst.Ids != nil {
+					newDst = dst.Ids
+				} else {
+					newDst = &ApplicationWebhookTemplateIdentifiers{}
+					dst.Ids = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationWebhookTemplateIdentifiers = src.ApplicationWebhookTemplateIdentifiers
+					dst.Ids = src.Ids
 				} else {
-					var zero ApplicationWebhookTemplateIdentifiers
-					dst.ApplicationWebhookTemplateIdentifiers = zero
+					dst.Ids = nil
 				}
 			}
 		case "name":
@@ -541,19 +552,26 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 		case "ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationWebhookIdentifiers
-				if src != nil {
-					newSrc = &src.ApplicationWebhookIdentifiers
+				if (src == nil || src.Ids == nil) && dst.Ids == nil {
+					continue
 				}
-				newDst = &dst.ApplicationWebhookIdentifiers
+				if src != nil {
+					newSrc = src.Ids
+				}
+				if dst.Ids != nil {
+					newDst = dst.Ids
+				} else {
+					newDst = &ApplicationWebhookIdentifiers{}
+					dst.Ids = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationWebhookIdentifiers = src.ApplicationWebhookIdentifiers
+					dst.Ids = src.Ids
 				} else {
-					var zero ApplicationWebhookIdentifiers
-					dst.ApplicationWebhookIdentifiers = zero
+					dst.Ids = nil
 				}
 			}
 		case "created_at":
@@ -563,8 +581,7 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 			if src != nil {
 				dst.CreatedAt = src.CreatedAt
 			} else {
-				var zero time.Time
-				dst.CreatedAt = zero
+				dst.CreatedAt = nil
 			}
 		case "updated_at":
 			if len(subs) > 0 {
@@ -573,8 +590,7 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 			if src != nil {
 				dst.UpdatedAt = src.UpdatedAt
 			} else {
-				var zero time.Time
-				dst.UpdatedAt = zero
+				dst.UpdatedAt = nil
 			}
 		case "base_url":
 			if len(subs) > 0 {
@@ -608,26 +624,26 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 		case "template_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationWebhookTemplateIdentifiers
-				if (src == nil || src.ApplicationWebhookTemplateIdentifiers == nil) && dst.ApplicationWebhookTemplateIdentifiers == nil {
+				if (src == nil || src.TemplateIds == nil) && dst.TemplateIds == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.ApplicationWebhookTemplateIdentifiers
+					newSrc = src.TemplateIds
 				}
-				if dst.ApplicationWebhookTemplateIdentifiers != nil {
-					newDst = dst.ApplicationWebhookTemplateIdentifiers
+				if dst.TemplateIds != nil {
+					newDst = dst.TemplateIds
 				} else {
 					newDst = &ApplicationWebhookTemplateIdentifiers{}
-					dst.ApplicationWebhookTemplateIdentifiers = newDst
+					dst.TemplateIds = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationWebhookTemplateIdentifiers = src.ApplicationWebhookTemplateIdentifiers
+					dst.TemplateIds = src.TemplateIds
 				} else {
-					dst.ApplicationWebhookTemplateIdentifiers = nil
+					dst.TemplateIds = nil
 				}
 			}
 		case "template_fields":
@@ -953,19 +969,26 @@ func (dst *GetApplicationWebhookRequest) SetFields(src *GetApplicationWebhookReq
 		case "ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationWebhookIdentifiers
-				if src != nil {
-					newSrc = &src.ApplicationWebhookIdentifiers
+				if (src == nil || src.Ids == nil) && dst.Ids == nil {
+					continue
 				}
-				newDst = &dst.ApplicationWebhookIdentifiers
+				if src != nil {
+					newSrc = src.Ids
+				}
+				if dst.Ids != nil {
+					newDst = dst.Ids
+				} else {
+					newDst = &ApplicationWebhookIdentifiers{}
+					dst.Ids = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationWebhookIdentifiers = src.ApplicationWebhookIdentifiers
+					dst.Ids = src.Ids
 				} else {
-					var zero ApplicationWebhookIdentifiers
-					dst.ApplicationWebhookIdentifiers = zero
+					dst.Ids = nil
 				}
 			}
 		case "field_mask":
@@ -991,19 +1014,26 @@ func (dst *ListApplicationWebhooksRequest) SetFields(src *ListApplicationWebhook
 		case "application_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
-				if src != nil {
-					newSrc = &src.ApplicationIdentifiers
+				if (src == nil || src.ApplicationIds == nil) && dst.ApplicationIds == nil {
+					continue
 				}
-				newDst = &dst.ApplicationIdentifiers
+				if src != nil {
+					newSrc = src.ApplicationIds
+				}
+				if dst.ApplicationIds != nil {
+					newDst = dst.ApplicationIds
+				} else {
+					newDst = &ApplicationIdentifiers{}
+					dst.ApplicationIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
-					var zero ApplicationIdentifiers
-					dst.ApplicationIdentifiers = zero
+					dst.ApplicationIds = nil
 				}
 			}
 		case "field_mask":
@@ -1029,19 +1059,26 @@ func (dst *SetApplicationWebhookRequest) SetFields(src *SetApplicationWebhookReq
 		case "webhook":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationWebhook
-				if src != nil {
-					newSrc = &src.ApplicationWebhook
+				if (src == nil || src.Webhook == nil) && dst.Webhook == nil {
+					continue
 				}
-				newDst = &dst.ApplicationWebhook
+				if src != nil {
+					newSrc = src.Webhook
+				}
+				if dst.Webhook != nil {
+					newDst = dst.Webhook
+				} else {
+					newDst = &ApplicationWebhook{}
+					dst.Webhook = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationWebhook = src.ApplicationWebhook
+					dst.Webhook = src.Webhook
 				} else {
-					var zero ApplicationWebhook
-					dst.ApplicationWebhook = zero
+					dst.Webhook = nil
 				}
 			}
 		case "field_mask":
@@ -1067,19 +1104,26 @@ func (dst *GetApplicationWebhookTemplateRequest) SetFields(src *GetApplicationWe
 		case "ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationWebhookTemplateIdentifiers
-				if src != nil {
-					newSrc = &src.ApplicationWebhookTemplateIdentifiers
+				if (src == nil || src.Ids == nil) && dst.Ids == nil {
+					continue
 				}
-				newDst = &dst.ApplicationWebhookTemplateIdentifiers
+				if src != nil {
+					newSrc = src.Ids
+				}
+				if dst.Ids != nil {
+					newDst = dst.Ids
+				} else {
+					newDst = &ApplicationWebhookTemplateIdentifiers{}
+					dst.Ids = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationWebhookTemplateIdentifiers = src.ApplicationWebhookTemplateIdentifiers
+					dst.Ids = src.Ids
 				} else {
-					var zero ApplicationWebhookTemplateIdentifiers
-					dst.ApplicationWebhookTemplateIdentifiers = zero
+					dst.Ids = nil
 				}
 			}
 		case "field_mask":

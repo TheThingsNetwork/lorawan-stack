@@ -11,13 +11,10 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Support for enhanced security policies of Packet Broker services.
-- Backend Interfaces middleware to extract proxy headers from trusted proxies. This adds a configuration `interop.trusted-proxies` that is similar to the existing `http.trusted-proxies` option.
-- Handling of MAC and PHY versions in end device forms based on selected frequency plan in the Console.
+- Support for fine timestamps and frequency offsets sent by gateways with SX1303 concentrator using the legacy UDP protocol.
+- Support for resetting end device session context and MAC state in the Console.
 
 ### Changed
-
-- The NSID field of LoRaWAN Backend Interfaces 1.1 is now interpreted as Network Server address. Clients authenticating with `SenderNSID` must be authenticated as a Network Server with that address (see Security below).
 
 ### Deprecated
 
@@ -25,7 +22,108 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- The reported sub-band's `downlink_utilization` in gateway connection stats now represents the utilization of the available duty-cycle time.
+- Missing fields when admins list non-owned entities.
+- Events reappearing in the end device data view after clearing them when navigating back and forth.
+
+### Security
+
+## [3.16.0] - 2021-11-12
+
+### Added
+
+- `ttn_lw_as_subscription_sets_publish_success_total` and `ttn_lw_as_subscription_sets_publish_failed_total` metrics to track the number of subscription set publish attempts.
+- Application Server advanced distribution settings:
+  - `as.distribution.global.individual.subscription-blocks` controls if the Application Server should block while publishing traffic to individual global subscribers (such as MQTT clients).
+  - `as.distribution.global.individual.subscription-queue-size` controls how many uplinks the Application Server should buffer for an individual global subscriber. Note that when the buffer is full, the Application Server will drop the uplinks if `--as.distribution.global.individual.subscription-blocks` is not enabled. Use a negative value in order to disable the queue.
+  - `as.distribution.local.broadcast.subscription-blocks` controls if the Application Server should block while publishing traffic to broadcast local subscribers (such as webhooks and application packages matching).
+  - `as.distribution.local.broadcast.subscription-queue-size` controls how many uplinks the Application Server should buffer for an broadcast local subscriber. Has the same semantics as `--as.distribution.global.individual.subscription-queue-size`.
+  - `as.distribution.local.individual.subscription-blocks` controls if the Application Server should block while publishing traffic to individual local subscribers (such as PubSub integrations).
+  - `as.distribution.local.individual.subscription-queue-size` controls how many uplinks the Application Server should buffer for an individual local subscriber. Has the same semantics as `--as.distribution.global.individual.subscription-queue-size`.
+- `ttn_lw_gs_txack_received_total`, `ttn_lw_gs_txack_forwarded_total` and `ttn_lw_gs_txack_dropped_total` metrics, which track the transmission acknowledgements from gateways.
+- `gs.txack.receive`, `gs.txack.drop` and `gs.txack.forward` events, which track the transmission acknowledgements from gateways.
+- `ttn-lw-stack as-db migrate` command to migrate the Application Server database. This command records the schema version and only performs migrations if on a newer version.
+  - Use the `--force` flag to force perform migrations.
+- Server-side event filtering with the `names` field.
+
+### Changed
+
+- Gateway Server default UDP worker count has been increased to 1024, from 16.
+- Application Server webhooks and application packages default worker count has been increased to 1024, from 16.
+- Application Server no longer sets the end device's `session.started_at` and `pending_session.started_at`. The session start time should be retrieved from the Network Server, per API specification.
+  - This requires an Application Server database migration (`ttn-lw-stack as-db migrate`) to clear the `started_at` field in existing (pending) sessions.
+- Console changing to server-side event filtering (used to be client-side).
+
+### Removed
+
+- The `ttn_lw_gs_status_failed_total`, `ttn_lw_gs_uplink_failed_total` metrics. `ttn_lw_gs_status_dropped_total` and `ttn_lw_gs_uplink_dropped_total` should be used instead, as they contain the failure cause.
+- The `gs.status.fail` and `gs.up.fail` events. `gs.status.drop` and `gs.up.drop` should be used instead, as they contain the failure cause.
+- The `data_rate_index` field in uplink message metadata. Observe the fully described data rate in the `data_rate` field instead.
+- LoRaWAN data rate index reported to LoRa Cloud DMS.
+- Dockerfile doesn't define environmental variables `TTN_LW_BLOB_LOCAL_DIRECTORY`, `TTN_LW_IS_DATABASE_URI` and `TTN_LW_REDIS_ADDRESS` anymore. They need to be set when running the container: please refer to `docker-compose.yml` for example values.
+- `CockroachDB` from development tooling as well as config option within `docker-compose.yml`.
+  - This also changes the default value of the `--is.database-uri` option, so it can connect to the development Postgres database by default.
+
+### Fixed
+
+- Handling of NaN values in our JSON API.
+- Receiver metadata from more than one antenna is now available in messages received from Packet Broker.
+- Unhelpful error message when aborting the OIDC Login in the Console.
+- Parsing of multi-word description search queries.
+
+## [3.15.3] - 2021-10-26
+
+### Fixed
+
+- Gateway disconnection when location updates from status messages are enabled.
+- Table entries not allowing to be opened in new tabs in the Console.
+- Right clicking on table entries navigating to respective entity in the Console.
+
+## [3.15.2] - 2021-10-22
+
+### Added
+
+- `tls.cipher-suites` config option to specify used cipher suites.
+- Support for enhanced security policies of Packet Broker services.
+- Handling of MAC and PHY versions in end device forms based on selected frequency plan in the Console.
+- Support for scheduling downlink messages as JSON in the Console.
+- Support for Packet Broker authentication through LoRaWAN Backend Interfaces. This adds the following configuration options:
+  - `interop.public-tls-address`: public address of the interop server. The audience in the incoming OAuth 2.0 token from Packet Broker is verified against this address to ensure that other networks cannot impersonate as Packet Broker;
+  - `interop.packet-broker.enabled`: enable Packet Broker to authenticate;
+  - `interop.packet-broker.token-issuer`: the issuer of the incoming OAuth 2.0 token from Packet Broker is verified against this value.
+- Support for LoRaWAN Backend Interfaces in Identity Server to obtain an end device's NetID, tenant ID and Network Server address with the use of a vendor-specifc extension (`VSExtension`). This adds the following configuration options:
+  - `is.network.net-id`: the NetID of the network. When running a Network Server, make sure that this is the same value as `ns.net-id`.
+  - `is.network.tenant-id`: the Tenant ID in the host NetID. Leave blank if the NetID that you use is dedicated for this Identity Server.
+- Configuration option `experimental.features` to enable experimental features.
+- Tooltip descriptions for "Last activity" values (formerly "Last seen") and uplink/downlink counts in the Console.
+- Status pulses being triggered by incoming data in the Console.
+- Packet broker page crashing when networks with a NetID of `0` are present.
+- Allowing to toggle visibility of sensitive values in text inputs in the Console.
+- Webhook failed event.
+
+### Changed
+
+- Searching for entity IDs is now case insensitive.
+- Renamed entitie's "Last seen" to "Last activity" in the Console.
+- The database queries for determining the rights of users on entities have been rewritten to reduce the number of round-trips to the database.
+- The default downlink path expiration timeout for UDP gateway connections has been increased to 90 seconds, and the default connection timeout has been increased to 3 minutes.
+  - The original downlink path expiration timeout was based on the fact that the default `PULL_DATA` interval is 5 seconds. In practice we have observed that most gateways actually send a `PULL_DATA` message every 30 seconds instead in order to preserve data transfer costs.
+- The default duration for storing (sparse) entity events has been increased to 24 hours.
+
+### Removed
+
+- Option to select targeted stack components during end device import in the Console.
+
+### Fixed
+
 - LoRaWAN Backend Interfaces 1.1 fields that were used in 1.0 (most notably `SenderNSID` and `ReceiverNSID`). Usage of `NSID` is now only supported with LoRaWAN Backend Interfaces 1.1 as specified.
+- Connection status not being shown as toast notification.
+- Registering and logging in users with 2 character user IDs in the Account App.
+- Frequency plan display for the gateway overview page in the Console.
+- Profile settings link not being present in the mobile menu in the Console.
+- Calculation of "Last activity" values not using all available data in the Console.
+- Layout jumps due to length of "Last activity" text.
+- Invalid `session` handling in Network Layer settings form in the Console.
 
 ### Security
 
@@ -1792,8 +1890,11 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.1...v3.15
-[3.15.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.0...v3.15.1
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.0...v3.16
+[3.16.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.3...v3.16.0
+[3.15.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.2...v3.15.3
+[3.15.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.1...v3.15.2
+[3.15.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.0...v3.15.1
 [3.15.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.2...v3.15.0
 [3.14.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.1...v3.14.2
 [3.14.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.14.0...v3.14.1

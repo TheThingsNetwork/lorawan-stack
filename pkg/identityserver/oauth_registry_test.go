@@ -59,7 +59,7 @@ func TestOAuthRegistry(t *testing.T) {
 		reg := ttnpb.NewOAuthAuthorizationRegistryClient(cc)
 
 		authorizations, err := reg.List(ctx, &ttnpb.ListOAuthClientAuthorizationsRequest{
-			UserIdentifiers: *user.GetIds(),
+			UserIds: user.GetIds(),
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -104,7 +104,7 @@ func TestOAuthRegistry(t *testing.T) {
 		a.So(err, should.BeNil)
 
 		authorizations, err = reg.List(ctx, &ttnpb.ListOAuthClientAuthorizationsRequest{
-			UserIdentifiers: *user.GetIds(),
+			UserIds: user.GetIds(),
 		}, creds)
 
 		a.So(err, should.BeNil)

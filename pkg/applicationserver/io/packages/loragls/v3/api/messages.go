@@ -17,27 +17,30 @@ package api
 import (
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 )
 
-const maxResponseSize = (1 << 24)
+const maxResponseSize = (1 << 24) // 16 MiB
 
-var errRequest = errors.Define("request", "LoRa Cloud GLS request")
+var errRequest = errors.DefineUnavailable("request", "LoRa Cloud GLS request")
 
 func parse(result interface{}, res *http.Response) error {
 	defer res.Body.Close()
-	defer io.Copy(ioutil.Discard, res.Body)
+	defer io.Copy(io.Discard, res.Body)
 	reader := io.LimitReader(res.Body, maxResponseSize)
 	if res.StatusCode < 200 || res.StatusCode > 299 {
-		body, _ := ioutil.ReadAll(reader)
-		return errRequest.WithDetails(&ttnpb.ErrorDetails{
-			Code:          uint32(res.StatusCode),
-			MessageFormat: string(body),
+		body, _ := io.ReadAll(reader)
+		detail, err := gogoproto.Struct(map[string]interface{}{
+			"status_code": res.StatusCode,
+			"body":        string(body),
 		})
+		if err != nil {
+			return err
+		}
+		return errRequest.WithDetails(detail)
 	}
 	return json.NewDecoder(reader).Decode(result)
 }

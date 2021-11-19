@@ -16,10 +16,6 @@ import React from 'react'
 
 import gatewayIcon from '@assets/misc/gateway.svg'
 
-import Spinner from '@ttn-lw/components/spinner'
-
-import Message from '@ttn-lw/lib/components/message'
-
 import EntityTitleSection from '@console/components/entity-title-section'
 
 import GatewayConnection from '@console/containers/gateway-connection'
@@ -42,6 +38,30 @@ const GatewayTitleSection = props => {
     mayViewApiKeys,
   } = props
 
+  const bottomBarLeft = <GatewayConnection gtwId={gtwId} />
+  const bottomBarRight = (
+    <>
+      {mayViewCollaborators && (
+        <Content.EntityCount
+          icon="collaborators"
+          value={collaboratorsTotalCount}
+          keyMessage={sharedMessages.collaboratorCounted}
+          errored={collaboratorsErrored}
+          toAllUrl={`/gateways/${gtwId}/collaborators`}
+        />
+      )}
+      {mayViewApiKeys && (
+        <Content.EntityCount
+          icon="api_keys"
+          value={apiKeysTotalCount}
+          keyMessage={sharedMessages.apiKeyCounted}
+          errored={apiKeysErrored}
+          toAllUrl={`/gateways/${gtwId}/api-keys`}
+        />
+      )}
+    </>
+  )
+
   return (
     <EntityTitleSection
       id={gtwId}
@@ -49,35 +69,12 @@ const GatewayTitleSection = props => {
       icon={gatewayIcon}
       iconAlt={sharedMessages.gateway}
     >
-      <Content creationDate={gateway.created_at}>
-        <GatewayConnection gtwId={gtwId} />
-        {fetching ? (
-          <Spinner after={0} faded micro inline>
-            <Message content={sharedMessages.fetching} />
-          </Spinner>
-        ) : (
-          <>
-            {mayViewCollaborators && (
-              <Content.EntityCount
-                icon="collaborators"
-                value={collaboratorsTotalCount}
-                keyMessage={sharedMessages.collaboratorCounted}
-                errored={collaboratorsErrored}
-                toAllUrl={`/gateways/${gtwId}/collaborators`}
-              />
-            )}
-            {mayViewApiKeys && (
-              <Content.EntityCount
-                icon="api_keys"
-                value={apiKeysTotalCount}
-                keyMessage={sharedMessages.apiKeyCounted}
-                errored={apiKeysErrored}
-                toAllUrl={`/gateways/${gtwId}/api-keys`}
-              />
-            )}
-          </>
-        )}
-      </Content>
+      <Content
+        creationDate={gateway.created_at}
+        fetching={fetching}
+        bottomBarLeft={bottomBarLeft}
+        bottomBarRight={bottomBarRight}
+      />
     </EntityTitleSection>
   )
 }

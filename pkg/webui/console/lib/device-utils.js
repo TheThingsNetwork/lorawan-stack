@@ -149,19 +149,40 @@ export const getLastSeen = device => {
   if (!device) {
     return
   }
-
-  const { mac_state } = device
-  if (mac_state) {
-    const { recent_uplinks } = mac_state
+  let lastUplinkReceivedAt
+  let relevantSessionStart
+  const supportsJoin = Boolean(device.supports_join)
+  const relevantSession = device.session || device.pending_session
+  const relevantMacState = device.mac_state || device.pending_mac_state
+  if (relevantMacState) {
+    const { recent_uplinks } = relevantMacState
     if (recent_uplinks) {
       const last_uplink = Boolean(recent_uplinks)
         ? recent_uplinks[recent_uplinks.length - 1]
         : undefined
       if (last_uplink) {
-        return last_uplink.received_at
+        lastUplinkReceivedAt = last_uplink.received_at
       }
     }
   }
+  if (supportsJoin && relevantSession) {
+    // TODO: Remove this once https://github.com/TheThingsNetwork/lorawan-stack/issues/4766 is resolved.
+    relevantSessionStart =
+      relevantSession.started_at !== '0001-01-01T00:00:00Z' ? relevantSession.started_at : undefined
+  }
+
+  // Return the whichever timestamp is available.
+  if (!relevantSessionStart) {
+    return lastUplinkReceivedAt
+  } else if (!lastUplinkReceivedAt) {
+    return relevantSessionStart
+  }
+
+  // Return whichever timestamp is more recent.
+  if (relevantSessionStart > lastUplinkReceivedAt) {
+    return relevantSessionStart
+  }
+  return lastUplinkReceivedAt
 }
 
 /**

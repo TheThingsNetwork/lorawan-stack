@@ -17,7 +17,7 @@ insert_final_newline = unset
 [{*.enc,*.gpg,*.svg}]
 end_of_line = unset
 
-[{*.enc,*.go,*.gpg,*.svg,*.html,LICENSE}]
+[{*.enc,*.gpg,*.svg,*.html,LICENSE}]
 indent_size = unset
 indent_style = unset
 
@@ -30,7 +30,7 @@ block_comment_start = /*
 block_comment = *
 block_comment_end = */
 
-[{*.make,go.mod,go.sum,Makefile}]
+[{*.make,*.go,go.mod,go.sum,Makefile}]
 indent_style = tab
 
 [doc/themes/the-things-stack/layouts/shortcodes/*.html]

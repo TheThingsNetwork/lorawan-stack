@@ -19,6 +19,7 @@ import (
 )
 
 var (
+	errNoPublicTLSAddress  = errors.DefineFailedPrecondition("no_public_tls_address", "no public TLS address configured for interop")
 	errUnknownMACVersion   = errors.DefineInvalidArgument("unknown_mac_version", "unknown MAC version")
 	errInvalidLength       = errors.DefineInvalidArgument("invalid_length", "invalid length")
 	errInvalidRequestType  = errors.DefineInvalidArgument("invalid_request_type", "invalid request type `{type}`")
@@ -26,6 +27,7 @@ var (
 	errUnexpectedResult    = errors.Define("unexpected_result", "unexpected result code {code}", "code")
 	errCallerNotAuthorized = errors.DefinePermissionDenied("caller_not_authorized", "caller is not authorized for `{target}`")
 	errUnauthenticated     = errors.DefineUnauthenticated("unauthenticated", "unauthenticated")
+	errInvalidVendorID     = errors.DefineInvalidArgument("invalid_vendor_id", "invalid vendor ID")
 
 	ErrNoAction           = errors.DefineAborted("no_action", "no action")
 	ErrMIC                = errors.DefineCorruption("mic", "MIC failed")

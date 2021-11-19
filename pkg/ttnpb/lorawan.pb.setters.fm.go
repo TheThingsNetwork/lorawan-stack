@@ -946,16 +946,6 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 					dst.DataRate = zero
 				}
 			}
-		case "data_rate_index":
-			if len(subs) > 0 {
-				return fmt.Errorf("'data_rate_index' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.DataRateIndex = src.DataRateIndex
-			} else {
-				var zero DataRateIndex
-				dst.DataRateIndex = zero
-			}
 		case "coding_rate":
 			if len(subs) > 0 {
 				return fmt.Errorf("'coding_rate' has no subfields, but %s were specified", subs)
@@ -1044,19 +1034,26 @@ func (dst *GatewayAntennaIdentifiers) SetFields(src *GatewayAntennaIdentifiers, 
 		case "gateway_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *GatewayIdentifiers
-				if src != nil {
-					newSrc = &src.GatewayIdentifiers
+				if (src == nil || src.GatewayIds == nil) && dst.GatewayIds == nil {
+					continue
 				}
-				newDst = &dst.GatewayIdentifiers
+				if src != nil {
+					newSrc = src.GatewayIds
+				}
+				if dst.GatewayIds != nil {
+					newDst = dst.GatewayIds
+				} else {
+					newDst = &GatewayIdentifiers{}
+					dst.GatewayIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.GatewayIdentifiers = src.GatewayIdentifiers
+					dst.GatewayIds = src.GatewayIds
 				} else {
-					var zero GatewayIdentifiers
-					dst.GatewayIdentifiers = zero
+					dst.GatewayIds = nil
 				}
 			}
 		case "antenna_index":
@@ -1083,19 +1080,26 @@ func (dst *UplinkToken) SetFields(src *UplinkToken, paths ...string) error {
 		case "ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *GatewayAntennaIdentifiers
-				if src != nil {
-					newSrc = &src.GatewayAntennaIdentifiers
+				if (src == nil || src.Ids == nil) && dst.Ids == nil {
+					continue
 				}
-				newDst = &dst.GatewayAntennaIdentifiers
+				if src != nil {
+					newSrc = src.Ids
+				}
+				if dst.Ids != nil {
+					newDst = dst.Ids
+				} else {
+					newDst = &GatewayAntennaIdentifiers{}
+					dst.Ids = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.GatewayAntennaIdentifiers = src.GatewayAntennaIdentifiers
+					dst.Ids = src.Ids
 				} else {
-					var zero GatewayAntennaIdentifiers
-					dst.GatewayAntennaIdentifiers = zero
+					dst.Ids = nil
 				}
 			}
 		case "timestamp":
@@ -1115,8 +1119,7 @@ func (dst *UplinkToken) SetFields(src *UplinkToken, paths ...string) error {
 			if src != nil {
 				dst.ServerTime = src.ServerTime
 			} else {
-				var zero time.Time
-				dst.ServerTime = zero
+				dst.ServerTime = nil
 			}
 		case "concentrator_time":
 			if len(subs) > 0 {
@@ -1127,6 +1130,15 @@ func (dst *UplinkToken) SetFields(src *UplinkToken, paths ...string) error {
 			} else {
 				var zero int64
 				dst.ConcentratorTime = zero
+			}
+		case "gateway_time":
+			if len(subs) > 0 {
+				return fmt.Errorf("'gateway_time' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.GatewayTime = src.GatewayTime
+			} else {
+				dst.GatewayTime = nil
 			}
 
 		default:
@@ -1275,16 +1287,6 @@ func (dst *TxRequest) SetFields(src *TxRequest, paths ...string) error {
 					dst.Rx1DataRate = nil
 				}
 			}
-		case "rx1_data_rate_index":
-			if len(subs) > 0 {
-				return fmt.Errorf("'rx1_data_rate_index' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Rx1DataRateIndex = src.Rx1DataRateIndex
-			} else {
-				var zero DataRateIndex
-				dst.Rx1DataRateIndex = zero
-			}
 		case "rx1_frequency":
 			if len(subs) > 0 {
 				return fmt.Errorf("'rx1_frequency' has no subfields, but %s were specified", subs)
@@ -1319,16 +1321,6 @@ func (dst *TxRequest) SetFields(src *TxRequest, paths ...string) error {
 				} else {
 					dst.Rx2DataRate = nil
 				}
-			}
-		case "rx2_data_rate_index":
-			if len(subs) > 0 {
-				return fmt.Errorf("'rx2_data_rate_index' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Rx2DataRateIndex = src.Rx2DataRateIndex
-			} else {
-				var zero DataRateIndex
-				dst.Rx2DataRateIndex = zero
 			}
 		case "rx2_frequency":
 			if len(subs) > 0 {
@@ -1368,16 +1360,6 @@ func (dst *TxRequest) SetFields(src *TxRequest, paths ...string) error {
 			} else {
 				var zero string
 				dst.FrequencyPlanId = zero
-			}
-		case "lorawan_phy_version":
-			if len(subs) > 0 {
-				return fmt.Errorf("'lorawan_phy_version' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.LorawanPhyVersion = src.LorawanPhyVersion
-			} else {
-				var zero PHYVersion
-				dst.LorawanPhyVersion = zero
 			}
 		case "advanced":
 			if len(subs) > 0 {

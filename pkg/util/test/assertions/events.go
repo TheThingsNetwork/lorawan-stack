@@ -54,8 +54,8 @@ func ShouldResembleEvent(actual interface{}, expected ...interface{}) string {
 	}
 	ap.UniqueId = ""
 	ep.UniqueId = ""
-	ap.Time = time.Time{}
-	ep.Time = time.Time{}
+	ap.Time = nil
+	ep.Time = nil
 	ap.Authentication = nil
 	ep.Authentication = nil
 	ap.UserAgent = ""

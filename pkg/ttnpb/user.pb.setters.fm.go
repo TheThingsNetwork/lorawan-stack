@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	time "time"
-)
+import fmt "fmt"
 
 func (dst *User) SetFields(src *User, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -42,8 +39,7 @@ func (dst *User) SetFields(src *User, paths ...string) error {
 			if src != nil {
 				dst.CreatedAt = src.CreatedAt
 			} else {
-				var zero time.Time
-				dst.CreatedAt = zero
+				dst.CreatedAt = nil
 			}
 		case "updated_at":
 			if len(subs) > 0 {
@@ -52,8 +48,7 @@ func (dst *User) SetFields(src *User, paths ...string) error {
 			if src != nil {
 				dst.UpdatedAt = src.UpdatedAt
 			} else {
-				var zero time.Time
-				dst.UpdatedAt = zero
+				dst.UpdatedAt = nil
 			}
 		case "deleted_at":
 			if len(subs) > 0 {
@@ -372,10 +367,18 @@ func (dst *CreateUserRequest) SetFields(src *CreateUserRequest, paths ...string)
 		case "user":
 			if len(subs) > 0 {
 				var newDst, newSrc *User
-				if src != nil {
-					newSrc = &src.User
+				if (src == nil || src.User == nil) && dst.User == nil {
+					continue
 				}
-				newDst = &dst.User
+				if src != nil {
+					newSrc = src.User
+				}
+				if dst.User != nil {
+					newDst = dst.User
+				} else {
+					newDst = &User{}
+					dst.User = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -383,8 +386,7 @@ func (dst *CreateUserRequest) SetFields(src *CreateUserRequest, paths ...string)
 				if src != nil {
 					dst.User = src.User
 				} else {
-					var zero User
-					dst.User = zero
+					dst.User = nil
 				}
 			}
 		case "invitation_token":
@@ -411,10 +413,18 @@ func (dst *UpdateUserRequest) SetFields(src *UpdateUserRequest, paths ...string)
 		case "user":
 			if len(subs) > 0 {
 				var newDst, newSrc *User
-				if src != nil {
-					newSrc = &src.User
+				if (src == nil || src.User == nil) && dst.User == nil {
+					continue
 				}
-				newDst = &dst.User
+				if src != nil {
+					newSrc = src.User
+				}
+				if dst.User != nil {
+					newDst = dst.User
+				} else {
+					newDst = &User{}
+					dst.User = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -422,8 +432,7 @@ func (dst *UpdateUserRequest) SetFields(src *UpdateUserRequest, paths ...string)
 				if src != nil {
 					dst.User = src.User
 				} else {
-					var zero User
-					dst.User = zero
+					dst.User = nil
 				}
 			}
 		case "field_mask":
@@ -742,19 +751,26 @@ func (dst *UpdateUserAPIKeyRequest) SetFields(src *UpdateUserAPIKeyRequest, path
 		case "api_key":
 			if len(subs) > 0 {
 				var newDst, newSrc *APIKey
-				if src != nil {
-					newSrc = &src.APIKey
+				if (src == nil || src.ApiKey == nil) && dst.ApiKey == nil {
+					continue
 				}
-				newDst = &dst.APIKey
+				if src != nil {
+					newSrc = src.ApiKey
+				}
+				if dst.ApiKey != nil {
+					newDst = dst.ApiKey
+				} else {
+					newDst = &APIKey{}
+					dst.ApiKey = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.APIKey = src.APIKey
+					dst.ApiKey = src.ApiKey
 				} else {
-					var zero APIKey
-					dst.APIKey = zero
+					dst.ApiKey = nil
 				}
 			}
 		case "field_mask":
@@ -804,8 +820,7 @@ func (dst *Invitation) SetFields(src *Invitation, paths ...string) error {
 			if src != nil {
 				dst.ExpiresAt = src.ExpiresAt
 			} else {
-				var zero time.Time
-				dst.ExpiresAt = zero
+				dst.ExpiresAt = nil
 			}
 		case "created_at":
 			if len(subs) > 0 {
@@ -814,8 +829,7 @@ func (dst *Invitation) SetFields(src *Invitation, paths ...string) error {
 			if src != nil {
 				dst.CreatedAt = src.CreatedAt
 			} else {
-				var zero time.Time
-				dst.CreatedAt = zero
+				dst.CreatedAt = nil
 			}
 		case "updated_at":
 			if len(subs) > 0 {
@@ -824,8 +838,7 @@ func (dst *Invitation) SetFields(src *Invitation, paths ...string) error {
 			if src != nil {
 				dst.UpdatedAt = src.UpdatedAt
 			} else {
-				var zero time.Time
-				dst.UpdatedAt = zero
+				dst.UpdatedAt = nil
 			}
 		case "accepted_at":
 			if len(subs) > 0 {
@@ -1053,8 +1066,7 @@ func (dst *UserSession) SetFields(src *UserSession, paths ...string) error {
 			if src != nil {
 				dst.CreatedAt = src.CreatedAt
 			} else {
-				var zero time.Time
-				dst.CreatedAt = zero
+				dst.CreatedAt = nil
 			}
 		case "updated_at":
 			if len(subs) > 0 {
@@ -1063,8 +1075,7 @@ func (dst *UserSession) SetFields(src *UserSession, paths ...string) error {
 			if src != nil {
 				dst.UpdatedAt = src.UpdatedAt
 			} else {
-				var zero time.Time
-				dst.UpdatedAt = zero
+				dst.UpdatedAt = nil
 			}
 		case "expires_at":
 			if len(subs) > 0 {
@@ -1214,8 +1225,7 @@ func (dst *LoginToken) SetFields(src *LoginToken, paths ...string) error {
 			if src != nil {
 				dst.CreatedAt = src.CreatedAt
 			} else {
-				var zero time.Time
-				dst.CreatedAt = zero
+				dst.CreatedAt = nil
 			}
 		case "updated_at":
 			if len(subs) > 0 {
@@ -1224,8 +1234,7 @@ func (dst *LoginToken) SetFields(src *LoginToken, paths ...string) error {
 			if src != nil {
 				dst.UpdatedAt = src.UpdatedAt
 			} else {
-				var zero time.Time
-				dst.UpdatedAt = zero
+				dst.UpdatedAt = nil
 			}
 		case "expires_at":
 			if len(subs) > 0 {
@@ -1234,8 +1243,7 @@ func (dst *LoginToken) SetFields(src *LoginToken, paths ...string) error {
 			if src != nil {
 				dst.ExpiresAt = src.ExpiresAt
 			} else {
-				var zero time.Time
-				dst.ExpiresAt = zero
+				dst.ExpiresAt = nil
 			}
 		case "token":
 			if len(subs) > 0 {

@@ -14,6 +14,7 @@
 
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { id as deviceIdRegexp } from '@ttn-lw/lib/regexp'
 
 import {
   attributeValidCheck,
@@ -21,7 +22,7 @@ import {
   attributeKeyTooLongCheck,
   attributeValueTooLongCheck,
 } from '@console/lib/attributes'
-import { id as deviceIdRegexp, address as addressRegexp } from '@console/lib/regexp'
+import { address as addressRegexp } from '@console/lib/regexp'
 import { parseLorawanMacVersion, generate16BytesKey } from '@console/lib/device-utils'
 
 const toUndefined = value => (!Boolean(value) ? undefined : value)

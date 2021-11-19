@@ -98,7 +98,7 @@ func getApplicationPackageAssociationID(flagSet *pflag.FlagSet, args []string) (
 		return nil, errNoFPort.New()
 	}
 	return &ttnpb.ApplicationPackageAssociationIdentifiers{
-		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+		EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
 			DeviceId:               deviceID,
 		},
@@ -136,8 +136,8 @@ func getApplicationPackageDefaultAssociationID(flagSet *pflag.FlagSet, args []st
 		return nil, errNoFPort.New()
 	}
 	return &ttnpb.ApplicationPackageDefaultAssociationIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
-		FPort:                  uint32(fport),
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
+		FPort:          uint32(fport),
 	}, nil
 }
 
@@ -196,8 +196,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationPackageRegistryClient(as).GetAssociation(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
-				ApplicationPackageAssociationIdentifiers: *assocID,
-				FieldMask:                                &pbtypes.FieldMask{Paths: paths},
+				Ids:       assocID,
+				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -230,10 +230,10 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewApplicationPackageRegistryClient(as).ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
-				EndDeviceIdentifiers: *devID,
-				Limit:                limit,
-				Page:                 page,
-				FieldMask:            &pbtypes.FieldMask{Paths: paths},
+				Ids:       devID,
+				Limit:     limit,
+				Page:      page,
+				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			}, opt)
 			if err != nil {
 				return err
@@ -254,11 +254,11 @@ var (
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationPackageAssociationsFlags)
 
-			var association ttnpb.ApplicationPackageAssociation
-			if err = util.SetFields(&association, setApplicationPackageAssociationsFlags); err != nil {
+			association := &ttnpb.ApplicationPackageAssociation{}
+			if err = util.SetFields(association, setApplicationPackageAssociationsFlags); err != nil {
 				return err
 			}
-			association.ApplicationPackageAssociationIdentifiers = *assocID
+			association.Ids = assocID
 
 			reader, err := getDataReader("data", cmd.Flags())
 			if err != nil {
@@ -281,8 +281,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationPackageRegistryClient(as).SetAssociation(ctx, &ttnpb.SetApplicationPackageAssociationRequest{
-				ApplicationPackageAssociation: association,
-				FieldMask:                     &pbtypes.FieldMask{Paths: paths},
+				Association: association,
+				FieldMask:   &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err
@@ -341,7 +341,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationPackageRegistryClient(as).GetDefaultAssociation(ctx, &ttnpb.GetApplicationPackageDefaultAssociationRequest{
-				ApplicationPackageDefaultAssociationIdentifiers: *assocID,
+				Ids:       assocID,
 				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
@@ -375,10 +375,10 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewApplicationPackageRegistryClient(as).ListDefaultAssociations(ctx, &ttnpb.ListApplicationPackageDefaultAssociationRequest{
-				ApplicationIdentifiers: *appID,
-				Limit:                  limit,
-				Page:                   page,
-				FieldMask:              &pbtypes.FieldMask{Paths: paths},
+				Ids:       appID,
+				Limit:     limit,
+				Page:      page,
+				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			}, opt)
 			if err != nil {
 				return err
@@ -399,11 +399,11 @@ var (
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationPackageDefaultAssociationsFlags)
 
-			var association ttnpb.ApplicationPackageDefaultAssociation
-			if err = util.SetFields(&association, setApplicationPackageDefaultAssociationsFlags); err != nil {
+			association := &ttnpb.ApplicationPackageDefaultAssociation{}
+			if err = util.SetFields(association, setApplicationPackageDefaultAssociationsFlags); err != nil {
 				return err
 			}
-			association.ApplicationPackageDefaultAssociationIdentifiers = *assocID
+			association.Ids = assocID
 
 			reader, err := getDataReader("data", cmd.Flags())
 			if err != nil {
@@ -426,8 +426,8 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewApplicationPackageRegistryClient(as).SetDefaultAssociation(ctx, &ttnpb.SetApplicationPackageDefaultAssociationRequest{
-				ApplicationPackageDefaultAssociation: association,
-				FieldMask:                            &pbtypes.FieldMask{Paths: paths},
+				Default:   association,
+				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {
 				return err

@@ -29,6 +29,8 @@ type DeviceRegistry interface {
 	Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error)
 	// Set creates, updates or deletes the end device by its identifiers.
 	Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+	// Range ranges over the end devices and calls the callback function, until false is returned.
+	Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error
 }
 
 type replacedEndDeviceFieldRegistryWrapper struct {
@@ -77,6 +79,18 @@ func (w replacedEndDeviceFieldRegistryWrapper) Set(ctx context.Context, ids ttnp
 	return dev, nil
 }
 
+func (w replacedEndDeviceFieldRegistryWrapper) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
+	paths, replaced := registry.MatchReplacedEndDeviceFields(paths, w.fields)
+	return w.registry.Range(ctx, paths, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, dev *ttnpb.EndDevice) bool {
+		if dev != nil {
+			for _, d := range replaced {
+				d.GetTransform(dev)
+			}
+		}
+		return f(ctx, ids, dev)
+	})
+}
+
 func wrapEndDeviceRegistryWithReplacedFields(r DeviceRegistry, fields ...registry.ReplacedEndDeviceField) DeviceRegistry {
 	return replacedEndDeviceFieldRegistryWrapper{
 		fields:   fields,
@@ -116,11 +130,11 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 // LinkRegistry is a store for application links.
 type LinkRegistry interface {
 	// Get returns the link by the application identifiers.
-	Get(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error)
+	Get(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error)
 	// Range ranges the links and calls the callback function, until false is returned.
 	Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error
 	// Set creates, updates or deletes the link by the application identifiers.
-	Set(ctx context.Context, ids ttnpb.ApplicationIdentifiers, paths []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error)
+	Set(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error)
 }
 
 // ApplicationUplinkRegistry is a store for uplink messages.

@@ -40,9 +40,9 @@ message Application {
   // The identifiers of the application. These are public and can be seen by any authenticated user in the network.
   ApplicationIdentifiers ids = 1 [(validate.rules).message.required = true];
   // When the application was created. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 2 [(gogoproto.stdtime) = true];
   // When the application was last updated. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 3 [(gogoproto.stdtime) = true];
   // When the application was deleted. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp deleted_at = 8 [(gogoproto.stdtime) = true];
 
@@ -103,13 +103,13 @@ message ListApplicationsRequest {
 }
 
 message CreateApplicationRequest {
-  Application application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  Application application = 1 [(validate.rules).message.required = true];
   // Collaborator to grant all rights on the newly created application.
   OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
 }
 
 message UpdateApplicationRequest {
-  Application application = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  Application application = 1 [(validate.rules).message.required = true];
   // The names of the application fields that should be updated.
   google.protobuf.FieldMask field_mask = 2;
 }
@@ -143,7 +143,7 @@ message CreateApplicationAPIKeyRequest {
 
 message UpdateApplicationAPIKeyRequest {
   ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
-  APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  APIKey api_key = 2 [(validate.rules).message.required = true];
   // The names of the api key fields that should be updated.
   google.protobuf.FieldMask field_mask = 3;
 }

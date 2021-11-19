@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -90,9 +91,16 @@ func TestMarshalJSON(t *testing.T) {
 				DevEUI:  basicstation.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
 				XTime:   1552906698,
 				TxTime:  1552906698,
-				GpsTime: 1552906698,
+				GPSTime: 1552906698,
 			},
 			Expected: []byte(`{"msgtype":"dntxed","diid":35,"DevEui":"1111:1111:1111:1111","rctx":0,"xtime":1552906698,"txtime":1552906698,"gpstime":1552906698}`),
+		},
+		{
+			Name: "TimeSyncRequest",
+			Message: TimeSyncRequest{
+				TxTime: 123.456,
+			},
+			Expected: []byte(`{"msgtype":"timesync","txtime":123.456}`),
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
@@ -143,36 +151,13 @@ func TestJoinRequest(t *testing.T) {
 			},
 			GatewayIds:     gtwID,
 			BandID:         "EU_86_870",
-			ErrorAssertion: errors.IsInvalidArgument,
-		},
-		{
-			Name: "InvalidMhdr",
-			JoinRequest: JoinRequest{
-				MHdr:     25,
-				DevEUI:   basicstation.EUI{EUI64: types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}},
-				JoinEUI:  basicstation.EUI{EUI64: types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}},
-				DevNonce: 18000,
-				MIC:      12345678,
-				RadioMetaData: RadioMetaData{
-					DataRate:  1,
-					Frequency: 868300000,
-					UpInfo: UpInfo{
-						RxTime: 1548059982,
-						XTime:  12666373963464220,
-						RSSI:   89,
-						SNR:    9.25,
-					},
-				},
-			},
-			GatewayIds:     gtwID,
-			BandID:         "EU_868_870",
-			ErrorAssertion: errors.IsInvalidArgument,
+			ErrorAssertion: errors.IsNotFound,
 		},
 		{
 			Name:        "EmptyJoinRequest",
 			JoinRequest: JoinRequest{},
 			GatewayIds:  gtwID,
-			BandID:      "EU_863_870",
+			BandID:      band.EU_863_870,
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					Mic:  []byte{0, 0, 0, 0},
@@ -184,7 +169,7 @@ func TestJoinRequest(t *testing.T) {
 					}},
 				},
 				RxMetadata: []*ttnpb.RxMetadata{{
-					GatewayIdentifiers: gtwID,
+					GatewayIds: &gtwID,
 				}},
 				Settings: ttnpb.TxSettings{
 					CodingRate: "4/5",
@@ -215,7 +200,7 @@ func TestJoinRequest(t *testing.T) {
 				},
 			},
 			GatewayIds: gtwID,
-			BandID:     "EU_863_870",
+			BandID:     band.EU_863_870,
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
@@ -228,12 +213,12 @@ func TestJoinRequest(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GatewayIdentifiers: gtwID,
-						Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
-						Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
-						Rssi:               89,
-						ChannelRssi:        89,
-						Snr:                9.25,
+						GatewayIds:  &gtwID,
+						Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
+						Rssi:        89,
+						ChannelRssi: 89,
+						Snr:         9.25,
 					},
 				},
 				Settings: ttnpb.TxSettings{
@@ -291,7 +276,7 @@ func TestUplinkDataFrame(t *testing.T) {
 			Name:                  "Empty",
 			UplinkDataFrame:       UplinkDataFrame{},
 			GatewayIds:            gtwID,
-			FrequencyPlanID:       "EU_863_870",
+			FrequencyPlanID:       band.EU_863_870,
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{},
 			ErrorAssertion: func(err error) bool {
 				return errors.Resemble(err, errMDHR)
@@ -320,7 +305,7 @@ func TestUplinkDataFrame(t *testing.T) {
 				},
 			},
 			GatewayIds:      gtwID,
-			FrequencyPlanID: "EU_863_870",
+			FrequencyPlanID: band.EU_863_870,
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
@@ -341,12 +326,12 @@ func TestUplinkDataFrame(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GatewayIdentifiers: gtwID,
-						Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
-						Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
-						Rssi:               89,
-						ChannelRssi:        89,
-						Snr:                9.25,
+						GatewayIds:  &gtwID,
+						Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
+						Rssi:        89,
+						ChannelRssi: 89,
+						Snr:         9.25,
 					},
 				},
 				Settings: ttnpb.TxSettings{
@@ -384,7 +369,7 @@ func TestUplinkDataFrame(t *testing.T) {
 				},
 			},
 			GatewayIds:      gtwID,
-			FrequencyPlanID: "EU_863_870",
+			FrequencyPlanID: band.EU_863_870,
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
@@ -405,12 +390,12 @@ func TestUplinkDataFrame(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GatewayIdentifiers: gtwID,
-						Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
-						Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
-						Rssi:               89,
-						ChannelRssi:        89,
-						Snr:                9.25,
+						GatewayIds:  &gtwID,
+						Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
+						Rssi:        89,
+						ChannelRssi: 89,
+						Snr:         9.25,
 					},
 				},
 				Settings: ttnpb.TxSettings{
@@ -462,7 +447,7 @@ func TestFromUplinkDataFrame(t *testing.T) {
 		{
 			Name:                    "Empty",
 			ExpectedUplinkDataFrame: UplinkDataFrame{},
-			FrequencyPlanID:         "EU_863_870",
+			FrequencyPlanID:         band.EU_863_870,
 			UplinkMessage:           ttnpb.UplinkMessage{},
 			ErrorAssertion: func(err error) bool {
 				return errors.Resemble(err, errUplinkMessage)
@@ -494,11 +479,11 @@ func TestFromUplinkDataFrame(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GatewayIdentifiers: gtwID,
-						Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
-						Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
-						Rssi:               89,
-						Snr:                9.25,
+						GatewayIds: &gtwID,
+						Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
+						Rssi:       89,
+						Snr:        9.25,
 					},
 				},
 				Settings: ttnpb.TxSettings{
@@ -509,7 +494,7 @@ func TestFromUplinkDataFrame(t *testing.T) {
 					}}},
 				},
 			},
-			FrequencyPlanID: "EU_863_870",
+			FrequencyPlanID: band.EU_863_870,
 			ExpectedUplinkDataFrame: UplinkDataFrame{
 				MHdr:       0x40,
 				DevAddr:    0x42ffffff,
@@ -523,10 +508,11 @@ func TestFromUplinkDataFrame(t *testing.T) {
 					DataRate:  1,
 					Frequency: 868300000,
 					UpInfo: UpInfo{
-						RxTime: 1548059982,
-						XTime:  (12666373963464220 & 0xFFFFFFFF),
-						RSSI:   89,
-						SNR:    9.25,
+						RxTime:  1548059982,
+						GPSTime: 1232095200000000,
+						XTime:   (12666373963464220 & 0xFFFFFFFF),
+						RSSI:    89,
+						SNR:     9.25,
 					},
 				},
 			},
@@ -567,7 +553,7 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 		{
 			Name:                "Empty",
 			ExpectedJoinRequest: JoinRequest{},
-			FrequencyPlanID:     "EU_863_870",
+			FrequencyPlanID:     band.EU_863_870,
 			UplinkMessage:       ttnpb.UplinkMessage{},
 			ErrorAssertion: func(err error) bool {
 				return errors.Resemble(err, errUplinkMessage)
@@ -588,11 +574,11 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GatewayIdentifiers: gtwID,
-						Time:               &[]time.Time{time.Unix(1548059982, 0)}[0],
-						Timestamp:          (uint32)(12666373963464220 & 0xFFFFFFFF),
-						Rssi:               89,
-						Snr:                9.25,
+						GatewayIds: &gtwID,
+						Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
+						Rssi:       89,
+						Snr:        9.25,
 					},
 				},
 				Settings: ttnpb.TxSettings{
@@ -603,7 +589,7 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 					}}},
 				},
 			},
-			FrequencyPlanID: "EU_863_870",
+			FrequencyPlanID: band.EU_863_870,
 			ExpectedJoinRequest: JoinRequest{
 				MHdr:     0,
 				DevEUI:   basicstation.EUI{EUI64: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}},
@@ -614,10 +600,11 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 					DataRate:  1,
 					Frequency: 868300000,
 					UpInfo: UpInfo{
-						RxTime: 1548059982,
-						XTime:  (12666373963464220 & 0xFFFFFFFF),
-						RSSI:   89,
-						SNR:    9.25,
+						RxTime:  1548059982,
+						GPSTime: 1232095200000000,
+						XTime:   (12666373963464220 & 0xFFFFFFFF),
+						RSSI:    89,
+						SNR:     9.25,
 					},
 				},
 			},
@@ -645,8 +632,7 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 func TestTxAck(t *testing.T) {
 	a := assertions.New(t)
 	txConf := TxConfirmation{
-		Diid:    1,
-		RefTime: 0,
+		Diid: 1,
 	}
 	msg := &ttnpb.DownlinkMessage{
 		RawPayload:     []byte{0x00, 0x00},

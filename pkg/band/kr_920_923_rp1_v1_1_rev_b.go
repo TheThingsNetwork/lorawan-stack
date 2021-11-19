@@ -16,6 +16,7 @@ package band
 
 import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
+// KR_920_923_RP1_V1_1_Rev_B is the band definition for KR920-923 in the RP1 v1.1 rev. B specification.
 var KR_920_923_RP1_V1_1_Rev_B = Band{
 	ID: KR_920_923,
 

@@ -28,8 +28,6 @@ import {
   GET_APP_EVENT_MESSAGE_SUCCESS,
 } from '@console/store/actions/applications'
 
-const heartbeatFilterRegExp = new RegExp(EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP)
-
 const application = (state = {}, application) => ({
   ...state,
   ...application,
@@ -99,7 +97,7 @@ const applications = (state = defaultState, { type, payload, event }) => {
         entities: rest,
       }
     case GET_APP_EVENT_MESSAGE_SUCCESS:
-      if (heartbeatFilterRegExp.test(event.name)) {
+      if (EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP.test(event.name)) {
         const lastSeen = getByPath(event, 'data.received_at') || event.time
         const id = getApplicationId(event.identifiers[0].device_ids)
 

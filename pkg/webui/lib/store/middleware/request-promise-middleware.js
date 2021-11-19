@@ -15,14 +15,14 @@
 import { CancelablePromise } from 'cancelable-promise'
 
 /**
- * `promisifiedDispatch` is a decorator for the dispatch function that attaches
+ * `promisifyDispatch` is a decorator for the dispatch function that attaches
  * a cancelable promise to the action that it will use as return value.
  * You should usually use the middleware instead.
  *
  * @param {object} dispatch - The to be decorated dispatch function.
  * @returns {Function} - The decorated dispatch function.
  */
-export const promisifiedDispatch = dispatch => action => {
+export const promisifyDispatch = dispatch => action => {
   if (action.meta && action.meta._attachPromise && !action.meta._resolve && !action.meta._reject) {
     return new CancelablePromise((resolve, reject) => {
       action.meta = {
@@ -43,6 +43,6 @@ export const promisifiedDispatch = dispatch => action => {
  * @param {object} store - The store to apply the middleware to.
  * @returns {object} The middleware.
  */
-const requestPromiseMiddleware = store => promisifiedDispatch
+const requestPromiseMiddleware = store => promisifyDispatch
 
 export default requestPromiseMiddleware

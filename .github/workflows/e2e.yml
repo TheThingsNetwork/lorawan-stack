@@ -20,7 +20,7 @@ on:
 jobs:
   determine-if-required:
     name: Determine if run is required
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     outputs:
       needs-to-run: ${{ steps.check-result.outputs.passed != 'true' }}
       hash: ${{ steps.get-hash.outputs.hash }}
@@ -51,14 +51,11 @@ jobs:
         run: echo "::set-output name=dir::$(npx yarn cache dir)"
   preparation:
     name: Run preparations
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     needs: determine-if-required
     if: needs.determine-if-required.outputs.needs-to-run == 'true'
     env:
       TTN_LW_LOG_LEVEL: debug
-      # TODO: Remove this after we no longer depend on cockroach dump command
-      # (https://github.com/TheThingsNetwork/lorawan-stack/issues/4184)
-      COCKROACHDB_COCKROACH_TAG: v19.2.12
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Check out code
@@ -124,6 +121,15 @@ jobs:
         with:
           path: public
           key: public-cache-${{ hashFiles('pkg/webui/**', 'sdk/js/**/*.js', 'sdk/js/generated/*.json', 'config/webpack.config.babel.js', 'yarn.lock', 'sdk/js/yarn.lock')}}
+      - name: Initialize dll cache
+        if: steps.public-cache.outputs.cache-hit != 'true'
+        id: dll-cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            public/libs.*.bundle.js
+            .cache/dll.json
+          key: dll-cache-${{ hashFiles('yarn.lock', 'sdk/js/yarn.lock')}}
       - name: Initialize babel cache
         id: babel-cache
         uses: actions/cache@v2
@@ -133,6 +139,9 @@ jobs:
           key: ${{ runner.os }}-babel-cache-${{ hashFiles('config/babel.config.json', 'config/webpack.config.babel.js') }}
           restore-keys: |
             ${{ runner.os }}-babel-cache-
+      - name: Build DLLs
+        if: steps.dll-cache.outputs.cache-hit != 'true'
+        run: tools/bin/mage js:buildDll
       - name: Build frontend
         if: steps.public-cache.outputs.cache-hit != 'true'
         run: tools/bin/mage js:build
@@ -154,12 +163,9 @@ jobs:
           path: build.zip
   end-to-end:
     name: Main frontend end-to-end tests (Chrome)
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     env:
       TTN_LW_LOG_LEVEL: debug
-      # TODO: Remove this after we no longer depend on cockroach dump command
-      # (https://github.com/TheThingsNetwork/lorawan-stack/issues/4184)
-      COCKROACHDB_COCKROACH_TAG: v19.2.12
       CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     strategy:
@@ -190,7 +196,7 @@ jobs:
       - name: Generate certs
         run: tools/bin/mage dev:certificates
       - name: Restore initialized sql db
-        run: tools/bin/mage dev:dbStart dev:sqlRestore
+        run: tools/bin/mage dev:dbStart dev:sqlRestore dev:sqlCreateSeedDb
       - name: Run stack
         run: tools/bin/mage dev:startDevStack &
       - name: Run frontend end-to-end tests
@@ -215,11 +221,9 @@ jobs:
           path: cypress/screenshots
   cross-browser-smoke:
     name: Cross-browser smoke tests (Firefox 78 ESR)
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     env:
       TTN_LW_LOG_LEVEL: debug
-      # TODO: Remove this after we no longer depend on cockroach dump command
-      # (https://github.com/TheThingsNetwork/lorawan-stack/issues/4184)
       COCKROACHDB_COCKROACH_TAG: v19.2.12
       CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -254,7 +258,7 @@ jobs:
       - name: Generate certs
         run: tools/bin/mage dev:certificates
       - name: Restore initialized sql db
-        run: tools/bin/mage dev:dbStart dev:sqlRestore
+        run: tools/bin/mage dev:dbStart dev:SQLRestore dev:SQLCreateSeedDB
       - name: Run stack
         run: tools/bin/mage dev:startDevStack &
       - name: Run end-to-end smoke tests (Firefox)
@@ -279,7 +283,7 @@ jobs:
           path: cypress/screenshots
   cache-result:
     name: Write result cache
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     needs: [preparation, end-to-end, cross-browser-smoke, determine-if-required]
     steps:
       - name: Setup result cache to skip redundant runs

@@ -56,7 +56,8 @@ func (x *UplinkMessage) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if true { // (gogoproto.nullable) = false
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("settings")
-		x.Settings.MarshalProtoJSON(s.WithField("settings"))
+		// NOTE: TxSettings does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, &x.Settings)
 	}
 	if len(x.RxMetadata) > 0 || s.HasField("rx_metadata") {
 		s.WriteMoreIf(&wroteField)
@@ -114,9 +115,11 @@ func (x *UplinkMessage) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				x.Payload.UnmarshalProtoJSON(s.WithField("payload", true))
 			}
 		case "settings":
-			if !s.ReadNil() {
-				x.Settings.UnmarshalProtoJSON(s.WithField("settings", true))
-			}
+			s.AddField("settings")
+			// NOTE: TxSettings does not seem to implement UnmarshalProtoJSON.
+			var v TxSettings
+			gogo.UnmarshalMessage(s, &v)
+			x.Settings = v
 		case "rx_metadata", "rxMetadata":
 			s.AddField("rx_metadata")
 			s.ReadArray(func() {
@@ -188,7 +191,8 @@ func (x *DownlinkMessage) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		case *DownlinkMessage_Scheduled:
 			s.WriteMoreIf(&wroteField)
 			s.WriteObjectField("scheduled")
-			ov.Scheduled.MarshalProtoJSON(s.WithField("scheduled"))
+			// NOTE: TxSettings does not seem to implement MarshalProtoJSON.
+			gogo.MarshalMessage(s, ov.Scheduled)
 		}
 	}
 	if len(x.CorrelationIds) > 0 || s.HasField("correlation_ids") {
@@ -235,11 +239,12 @@ func (x *DownlinkMessage) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 			x.Settings = ov
 		case "scheduled":
+			s.AddField("scheduled")
 			ov := &DownlinkMessage_Scheduled{}
-			if !s.ReadNil() {
-				ov.Scheduled = &TxSettings{}
-				ov.Scheduled.UnmarshalProtoJSON(s.WithField("scheduled", true))
-			}
+			// NOTE: TxSettings does not seem to implement UnmarshalProtoJSON.
+			var v TxSettings
+			gogo.UnmarshalMessage(s, &v)
+			ov.Scheduled = &v
 			x.Settings = ov
 		case "correlation_ids", "correlationIds":
 			s.AddField("correlation_ids")
@@ -460,7 +465,8 @@ func (x *ApplicationUplink) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if true { // (gogoproto.nullable) = false
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("settings")
-		x.Settings.MarshalProtoJSON(s.WithField("settings"))
+		// NOTE: TxSettings does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, &x.Settings)
 	}
 	if true { // (gogoproto.nullable) = false
 		s.WriteMoreIf(&wroteField)
@@ -565,9 +571,11 @@ func (x *ApplicationUplink) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				x.RxMetadata = append(x.RxMetadata, v)
 			})
 		case "settings":
-			if !s.ReadNil() {
-				x.Settings.UnmarshalProtoJSON(s.WithField("settings", true))
-			}
+			s.AddField("settings")
+			// NOTE: TxSettings does not seem to implement UnmarshalProtoJSON.
+			var v TxSettings
+			gogo.UnmarshalMessage(s, &v)
+			x.Settings = v
 		case "received_at", "receivedAt":
 			s.AddField("received_at")
 			v := s.ReadTime()

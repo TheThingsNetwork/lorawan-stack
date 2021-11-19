@@ -24,6 +24,14 @@ func (m *GetClientRequest) EntityType() string {
 	return m.GetClientIds().EntityType()
 }
 
+func (m *CreateClientRequest) EntityType() string {
+	return m.GetClient().EntityType()
+}
+
+func (m *UpdateClientRequest) EntityType() string {
+	return m.GetClient().EntityType()
+}
+
 func (m *ListClientCollaboratorsRequest) EntityType() string {
 	return m.GetClientIds().EntityType()
 }
@@ -46,6 +54,14 @@ func (m *GetClientRequest) IDString() string {
 	return m.GetClientIds().IDString()
 }
 
+func (m *CreateClientRequest) IDString() string {
+	return m.GetClient().IDString()
+}
+
+func (m *UpdateClientRequest) IDString() string {
+	return m.GetClient().IDString()
+}
+
 func (m *ListClientCollaboratorsRequest) IDString() string {
 	return m.GetClientIds().IDString()
 }
@@ -66,6 +82,10 @@ func (m *Client) ExtractRequestFields(dst map[string]interface{}) {
 
 func (m *GetClientRequest) ExtractRequestFields(dst map[string]interface{}) {
 	m.GetClientIds().ExtractRequestFields(dst)
+}
+
+func (m *UpdateClientRequest) ExtractRequestFields(dst map[string]interface{}) {
+	m.GetClient().ExtractRequestFields(dst)
 }
 
 func (m *ListClientCollaboratorsRequest) ExtractRequestFields(dst map[string]interface{}) {

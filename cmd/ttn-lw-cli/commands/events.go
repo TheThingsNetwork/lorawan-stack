@@ -58,9 +58,11 @@ var eventsCommand = &cobra.Command{
 			return errNoIDs.New()
 		}
 		tail, _ := cmd.Flags().GetUint32("tail")
+		names, _ := cmd.Flags().GetStringSlice("names")
 		req := &ttnpb.StreamEventsRequest{
 			Identifiers: ids,
 			Tail:        tail,
+			Names:       names,
 		}
 
 		g, gCtx := errgroup.WithContext(ctx)
@@ -104,7 +106,7 @@ var eventsCommand = &cobra.Command{
 			io.Write(os.Stdout, config.OutputFormat, evt)
 		}
 
-		return ctx.Err()
+		return g.Wait()
 	},
 }
 
@@ -167,6 +169,7 @@ var eventsFindRelatedCommand = &cobra.Command{
 func init() {
 	eventsCommand.Flags().AddFlagSet(entityIdentifiersSliceFlags())
 	eventsCommand.Flags().Uint32("tail", 0, "")
+	eventsCommand.Flags().StringSlice("names", nil, "")
 	Root.AddCommand(eventsCommand)
 	eventsFindRelatedCommand.Flags().String("correlation-id", "", "")
 	eventsCommand.AddCommand(eventsFindRelatedCommand)

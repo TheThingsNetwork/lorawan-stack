@@ -18,11 +18,9 @@ package joinserver
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
 	"encoding/binary"
-	"io"
-	"math/rand"
 	"sort"
-	"sync"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -56,9 +54,6 @@ type JoinServer struct {
 
 	euiPrefixes []types.EUI64Prefix
 
-	entropyMu *sync.Mutex
-	entropy   io.Reader
-
 	grpc struct {
 		nsJs                          nsJsServer
 		asJs                          asJsServer
@@ -86,9 +81,6 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 		applicationActivationSettings: conf.ApplicationActivationSettings,
 
 		euiPrefixes: conf.JoinEUIPrefixes,
-
-		entropyMu: &sync.Mutex{},
-		entropy:   ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 0),
 	}
 
 	js.grpc.applicationActivationSettings = applicationActivationSettingsRegistryServer{
@@ -273,6 +265,12 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			"used_dev_nonces",
 		},
 		func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			if entityAuth, ok := authorizer.(EntityAuthorizer); ok {
+				if err := entityAuth.RequireEntityContext(ctx); err != nil {
+					return nil, nil, err
+				}
+			}
+
 			getAppSettings := func(ids ttnpb.ApplicationIdentifiers) func() (*ttnpb.ApplicationActivationSettings, error) {
 				var (
 					res *ttnpb.ApplicationActivationSettings
@@ -376,14 +374,12 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				return nil, nil, errEncodePayload.WithCause(err)
 			}
 
-			js.entropyMu.Lock()
-			skID, err := ulid.New(ulid.Timestamp(time.Now()), js.entropy)
-			js.entropyMu.Unlock()
+			skID, err := ulid.New(ulid.Timestamp(time.Now()), rand.Reader)
 			if err != nil {
 				return nil, nil, errGenerateSessionKeyID.New()
 			}
 
-			cc, err := js.GetPeerConn(ctx, ttnpb.ClusterRole_CRYPTO_SERVER, &dev.EndDeviceIdentifiers)
+			cc, err := js.GetPeerConn(ctx, ttnpb.ClusterRole_CRYPTO_SERVER, nil)
 			if err != nil {
 				if !errors.IsNotFound(err) {
 					logger.WithError(err).Debug("Crypto Server connection is not available")
@@ -589,6 +585,12 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 		if err != nil {
 			return nil, errRegistryOperation.WithCause(err)
 		}
+		ctx = dev.Context
+		if entityAuth, ok := authorizer.(EntityAuthorizer); ok {
+			if err := entityAuth.RequireEntityContext(ctx); err != nil {
+				return nil, err
+			}
+		}
 		netID := dev.NetId
 		if netID == nil {
 			appSettings, err := js.applicationActivationSettings.GetByID(ctx, dev.ApplicationIdentifiers, []string{
@@ -659,6 +661,12 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 		if err != nil {
 			return nil, errRegistryOperation.WithCause(err)
 		}
+		ctx = dev.Context
+		if entityAuth, ok := authorizer.(EntityAuthorizer); ok {
+			if err := entityAuth.RequireEntityContext(ctx); err != nil {
+				return nil, err
+			}
+		}
 		if dev.ApplicationServerId != "" {
 			if err := externalAuth.RequireASID(ctx, dev.ApplicationServerId); err != nil {
 				return nil, err
@@ -690,6 +698,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 		if err != nil {
 			return nil, errRegistryOperation.WithCause(err)
 		}
+		ctx = dev.Context
 		if err := appAuth.RequireApplication(ctx, dev.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 			return nil, err
 		}
@@ -711,10 +720,18 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 	}, nil
 }
 
-// GetHomeNetID returns the requested NetID.
-func (js *JoinServer) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EUI64, authorizer Authorizer) (netID *types.NetID, nsID string, err error) {
+// EndDeviceHomeNetwork contains information about the end device's home network.
+type EndDeviceHomeNetwork struct {
+	NetID                *types.NetID
+	TenantID             string
+	NSID                 *types.EUI64
+	NetworkServerAddress string
+}
+
+// GetHomeNetwork returns the home network of an end device.
+func (js *JoinServer) GetHomeNetwork(ctx context.Context, joinEUI, devEUI types.EUI64, authorizer Authorizer) (*EndDeviceHomeNetwork, error) {
 	if err := authorizer.RequireAuthorized(ctx); err != nil {
-		return nil, "", err
+		return nil, err
 	}
 
 	dev, err := js.devices.GetByEUI(ctx, joinEUI, devEUI,
@@ -724,19 +741,31 @@ func (js *JoinServer) GetHomeNetID(ctx context.Context, joinEUI, devEUI types.EU
 		},
 	)
 	if err != nil {
-		return nil, "", errRegistryOperation.WithCause(err)
+		return nil, errRegistryOperation.WithCause(err)
 	}
-	if dev.NetId != nil {
-		return dev.NetId, dev.NetworkServerAddress, nil
-	}
-	sets, err := js.applicationActivationSettings.GetByID(ctx, dev.ApplicationIdentifiers, []string{
-		"home_net_id",
-	})
-	if err != nil {
-		if !errors.IsNotFound(err) {
-			return nil, "", errGetApplicationActivationSettings.WithCause(err)
+	ctx = dev.Context
+	if entityAuth, ok := authorizer.(EntityAuthorizer); ok {
+		if err := entityAuth.RequireEntityContext(ctx); err != nil {
+			return nil, err
 		}
-		return nil, "", nil
 	}
-	return sets.HomeNetId, dev.NetworkServerAddress, nil
+	netID := dev.NetId
+
+	if netID == nil {
+		sets, err := js.applicationActivationSettings.GetByID(ctx, dev.ApplicationIdentifiers, []string{
+			"home_net_id",
+		})
+		if err != nil {
+			if !errors.IsNotFound(err) {
+				return nil, errGetApplicationActivationSettings.WithCause(err)
+			}
+			return nil, nil
+		}
+		netID = sets.HomeNetId
+	}
+	// TODO: Return NSID (https://github.com/TheThingsNetwork/lorawan-stack/issues/4741).
+	return &EndDeviceHomeNetwork{
+		NetID:                netID,
+		NetworkServerAddress: dev.NetworkServerAddress,
+	}, nil
 }

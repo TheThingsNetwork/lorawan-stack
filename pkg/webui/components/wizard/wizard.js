@@ -107,10 +107,10 @@ const Wizard = React.forwardRef((props, ref) => {
     dispatch({ type: SET_ERROR, step, error })
   }, [])
 
-  const snapshot = React.useMemo(() => merge({}, initialValues, ...snapshots), [
-    initialValues,
-    snapshots,
-  ])
+  const snapshot = React.useMemo(
+    () => merge({}, initialValues, ...snapshots),
+    [initialValues, snapshots],
+  )
 
   const context = {
     currentStepId,

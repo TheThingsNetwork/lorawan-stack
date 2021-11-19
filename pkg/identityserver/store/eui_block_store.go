@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
+// GetEUIStore returns an EUIStore on the given db (or transaction).
 func GetEUIStore(db *gorm.DB) EUIStore {
 	return &euiStore{store: newStore(db)}
 }
@@ -126,8 +127,8 @@ func (s *euiStore) CreateEUIBlock(ctx context.Context, euiType string, block typ
 				CurrentCounter: initCounterValue,
 			},
 		).Error
-		// If no block found, create a new block in the database.
 	} else if gorm.IsRecordNotFoundError(err) {
+		// If no block found, create a new block in the database.
 		return s.query(ctx, EUIBlock{}).Save(
 			&EUIBlock{
 				Type:           euiType,

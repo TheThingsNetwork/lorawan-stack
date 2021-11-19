@@ -204,7 +204,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 	}
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"band_id", phy.ID,
-		"data_rate_index", up.Settings.DataRateIndex,
+		"data_rate", up.Settings.DataRate,
 	))
 
 	pld := up.Payload.GetMacPayload()
@@ -823,7 +823,6 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 
 	pld.FullFCnt = matched.FullFCnt
 	up.DeviceChannelIndex = uint32(matched.ChannelIndex)
-	up.Settings.DataRateIndex = matched.DataRateIndex
 	ctx = matched.Context
 
 	queuedEvents := []events.Event{
@@ -886,7 +885,6 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				}
 				pld.FullFCnt = matched.FullFCnt
 				up.DeviceChannelIndex = uint32(matched.ChannelIndex)
-				up.Settings.DataRateIndex = matched.DataRateIndex
 				ctx = matched.Context
 			}
 
@@ -907,14 +905,14 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				ConsumedAirtime:    up.ConsumedAirtime,
 			}, recentUplinkCount)
 
-			if up.Settings.DataRateIndex < stored.MacState.CurrentParameters.AdrDataRateIndex {
+			if matched.DataRateIndex < stored.MacState.CurrentParameters.AdrDataRateIndex {
 				// Device lowers TX power index before lowering data rate index according to the spec.
 				stored.MacState.CurrentParameters.AdrTxPowerIndex = 0
 				paths = ttnpb.AddFields(paths,
 					"mac_state.current_parameters.adr_tx_power_index",
 				)
 			}
-			stored.MacState.CurrentParameters.AdrDataRateIndex = up.Settings.DataRateIndex
+			stored.MacState.CurrentParameters.AdrDataRateIndex = matched.DataRateIndex
 			paths = ttnpb.AddFields(paths,
 				"mac_state.current_parameters.adr_data_rate_index",
 			)
@@ -995,7 +993,7 @@ func joinResponseWithoutKeys(resp *ttnpb.JoinResponse) *ttnpb.JoinResponse {
 func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, []events.Event, error) {
 	var queuedEvents []events.Event
 	logger := log.FromContext(ctx)
-	cc, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_JOIN_SERVER, &ids)
+	cc, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_JOIN_SERVER, nil)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			logger.WithError(err).Debug("Join Server peer not found")
@@ -1083,13 +1081,8 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	if err != nil {
 		return err
 	}
-	drIdx, _, ok := phy.FindUplinkDataRate(up.Settings.DataRate)
-	if !ok {
-		return errDataRateNotFound.New()
-	}
-	up.Settings.DataRateIndex = drIdx
 	ctx = log.NewContextWithField(ctx,
-		"data_rate_index", drIdx,
+		"data_rate", up.Settings.DataRate,
 	)
 
 	macState, err := mac.NewState(matched, ns.FrequencyPlans, ns.defaultMACSettings)
@@ -1104,10 +1097,10 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	}
 	up.DeviceChannelIndex = uint32(chIdx)
 	ctx = log.NewContextWithField(ctx,
-		"device_channel_index", drIdx,
+		"device_channel_index", chIdx,
 	)
 
-	ok, err = ns.deduplicateUplink(ctx, up)
+	ok, err := ns.deduplicateUplink(ctx, up)
 	if err != nil {
 		return err
 	}

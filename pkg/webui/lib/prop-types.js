@@ -80,6 +80,13 @@ PropTypes.event = PropTypes.shape({
 })
 PropTypes.events = PropTypes.arrayOf(PropTypes.event)
 
+PropTypes.eventFilter = PropTypes.shape({
+  id: PropTypes.string,
+  filter: PropTypes.arrayOf(PropTypes.string),
+  filterRegExp: PropTypes.arrayOf(PropTypes.string),
+})
+PropTypes.eventFilters = PropTypes.arrayOf(PropTypes.eventFilter)
+
 PropTypes.gateway = PropTypes.shape({
   antennas: PropTypes.Array,
   ids: PropTypes.shape({

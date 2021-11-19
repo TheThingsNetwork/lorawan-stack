@@ -132,8 +132,8 @@ var (
 			_, err = ttnpb.NewApplicationAccessClient(is).SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 				ApplicationIds: appID,
 				Collaborator: &ttnpb.Collaborator{
-					OrganizationOrUserIdentifiers: *collaborator,
-					Rights:                        rights,
+					Ids:    collaborator,
+					Rights: rights,
 				},
 			})
 			if err != nil {
@@ -164,8 +164,8 @@ var (
 			_, err = ttnpb.NewApplicationAccessClient(is).SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 				ApplicationIds: appID,
 				Collaborator: &ttnpb.Collaborator{
-					OrganizationOrUserIdentifiers: *collaborator,
-					Rights:                        nil,
+					Ids:    collaborator,
+					Rights: nil,
 				},
 			})
 			if err != nil {
@@ -307,7 +307,7 @@ var (
 			}
 			_, err = ttnpb.NewApplicationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 				ApplicationIds: appID,
-				APIKey: ttnpb.APIKey{
+				ApiKey: &ttnpb.APIKey{
 					Id:        id,
 					Name:      name,
 					Rights:    rights,
@@ -342,7 +342,7 @@ var (
 			}
 			_, err = ttnpb.NewApplicationAccessClient(is).UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 				ApplicationIds: appID,
-				APIKey: ttnpb.APIKey{
+				ApiKey: &ttnpb.APIKey{
 					Id:     id,
 					Rights: nil,
 				},

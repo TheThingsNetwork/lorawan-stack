@@ -23,13 +23,16 @@ import (
 	"strings"
 
 	echo "github.com/labstack/echo/v4"
+	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 )
 
 // Data contains data to render templates.
 type Data struct {
 	TemplateData
-	AppConfig interface{}
-	PageData  interface{}
+	AppConfig            interface{}
+	ExperimentalFeatures map[string]bool
+	PageData             interface{}
+	CSPNonce             string
 }
 
 // TemplateData contains data to use in the App template.
@@ -64,6 +67,7 @@ func (t TemplateData) MountPath() string {
 const appHTML = `
 {{- $assetsBaseURL := .AssetsBaseURL -}}
 {{- $brandingBaseURL := or .BrandingBaseURL .AssetsBaseURL -}}
+{{- $cspNonce := .CSPNonce -}}
 <!doctype html>
 <html lang="{{with .Language}}{{.}}{{else}}en{{end}}">
   <head>
@@ -89,13 +93,14 @@ const appHTML = `
   </head>
   <body>
     <div id="app"></div>
-		<script>
+		<script nonce="{{$cspNonce}}">
 		(function (win) {
 			var config = {
 				APP_ROOT:{{.MountPath}},
 				ASSETS_ROOT:{{$assetsBaseURL}},
 				BRANDING_ROOT:{{$brandingBaseURL}},
 				APP_CONFIG:{{.AppConfig}},
+				EXPERIMENTAL_FEATURES:{{.ExperimentalFeatures}},
 				SITE_NAME:{{.SiteName}},
 				SITE_TITLE:{{.Title}},
 				SITE_SUB_TITLE:{{.SubTitle}},
@@ -109,7 +114,7 @@ const appHTML = `
 			}
 		})(window);
     </script>
-    {{range .JSFiles}}<script type="text/javascript" src="{{$assetsBaseURL}}/{{.}}"></script>{{end}}
+    {{range .JSFiles}}<script nonce="{{$cspNonce}}" type="text/javascript" src="{{$assetsBaseURL}}/{{.}}"></script>{{end}}
   </body>
 </html>
 `
@@ -148,6 +153,12 @@ func RegisterHashedFile(original, hashed string) {
 // Render is the echo.Renderer that renders the web UI.
 func (t *AppTemplate) Render(w io.Writer, _ string, pageData interface{}, c echo.Context) error {
 	templateData := c.Get("template_data").(TemplateData)
+	var cspNonce string
+	if CSPFeatureFlag.GetValue(c.Request().Context()) {
+		if v, ok := c.Get("csp_nonce").(string); ok {
+			cspNonce = v
+		}
+	}
 	cssFiles := make([]string, len(templateData.CSSFiles))
 	for i, cssFile := range templateData.CSSFiles {
 		if hashedFile, ok := hashedFiles[cssFile]; ok {
@@ -167,9 +178,11 @@ func (t *AppTemplate) Render(w io.Writer, _ string, pageData interface{}, c echo
 	}
 	templateData.JSFiles = jsFiles
 	return t.template.Execute(w, Data{
-		TemplateData: templateData,
-		AppConfig:    c.Get("app_config"),
-		PageData:     pageData,
+		TemplateData:         templateData,
+		AppConfig:            c.Get("app_config"),
+		ExperimentalFeatures: experimental.AllFeatures(c.Request().Context()),
+		PageData:             pageData,
+		CSPNonce:             cspNonce,
 	})
 }
 

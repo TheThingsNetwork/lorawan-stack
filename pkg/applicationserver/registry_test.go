@@ -174,19 +174,24 @@ func TestDeviceRegistry(t *testing.T) {
 	}
 	for _, tc := range []struct {
 		Name string
-		New  func(ctx context.Context) (reg DeviceRegistry, closeFn func() error)
+		New  func(ctx context.Context) (reg DeviceRegistry, closeFn func() error, err error)
 		N    uint16
 	}{
 		{
 			Name: "Redis",
-			New: func(ctx context.Context) (DeviceRegistry, func() error) {
+			New: func(ctx context.Context) (DeviceRegistry, func() error, error) {
 				cl, flush := test.NewRedis(ctx, namespace[:]...)
-				return &redis.DeviceRegistry{
-						Redis: cl,
-					}, func() error {
-						flush()
-						return cl.Close()
-					}
+				registry := &redis.DeviceRegistry{
+					Redis:   cl,
+					LockTTL: test.Delay << 10,
+				}
+				if err := registry.Init(ctx); err != nil {
+					return nil, nil, err
+				}
+				return registry, func() error {
+					flush()
+					return cl.Close()
+				}, nil
 			},
 			N: 8,
 		},
@@ -195,8 +200,11 @@ func TestDeviceRegistry(t *testing.T) {
 			test.RunSubtest(t, test.SubtestConfig{
 				Name:     fmt.Sprintf("%s/%d", tc.Name, i),
 				Parallel: true,
-				Func: func(ctx context.Context, t *testing.T, _ *assertions.Assertion) {
-					reg, closeFn := tc.New(ctx)
+				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+					reg, closeFn, err := tc.New(ctx)
+					if !a.So(err, should.BeNil) {
+						t.FailNow()
+					}
 					reg = wrapEndDeviceRegistryWithReplacedFields(reg, replacedEndDeviceFields...)
 					if closeFn != nil {
 						defer func() {
@@ -236,9 +244,9 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 		},
 	}
 
-	for ids, link := range map[ttnpb.ApplicationIdentifiers]*ttnpb.ApplicationLink{
-		app1IDs: app1,
-		app2IDs: app2,
+	for ids, link := range map[*ttnpb.ApplicationIdentifiers]*ttnpb.ApplicationLink{
+		&app1IDs: app1,
+		&app2IDs: app2,
 	} {
 		_, err := reg.Get(ctx, ids, ttnpb.ApplicationLinkFieldPathsTopLevel)
 		if !a.So(errors.IsNotFound(err), should.BeTrue) {
@@ -263,18 +271,21 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 	}
 
 	seen := make(map[string]*ttnpb.ApplicationLink)
-	reg.Range(ctx, ttnpb.ApplicationLinkFieldPathsTopLevel, func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, pb *ttnpb.ApplicationLink) bool {
+	err := reg.Range(ctx, ttnpb.ApplicationLinkFieldPathsTopLevel, func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, pb *ttnpb.ApplicationLink) bool {
 		uid := unique.ID(ctx, ids)
 		seen[uid] = pb
 		return true
 	})
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	if !a.So(len(seen), should.Equal, 2) ||
 		!a.So(seen[unique.ID(ctx, app1IDs)], should.Resemble, app1) ||
 		!a.So(seen[unique.ID(ctx, app2IDs)], should.Resemble, app2) {
 		t.FailNow()
 	}
 
-	for _, ids := range []ttnpb.ApplicationIdentifiers{app1IDs, app2IDs} {
+	for _, ids := range []*ttnpb.ApplicationIdentifiers{&app1IDs, &app2IDs} {
 		_, err := reg.Set(ctx, ids, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 			return nil, nil, nil
 		})
@@ -295,19 +306,24 @@ func TestLinkRegistry(t *testing.T) {
 	}
 	for _, tc := range []struct {
 		Name string
-		New  func(ctx context.Context) (reg LinkRegistry, closeFn func() error)
+		New  func(ctx context.Context) (reg LinkRegistry, closeFn func() error, err error)
 		N    uint16
 	}{
 		{
 			Name: "Redis",
-			New: func(ctx context.Context) (LinkRegistry, func() error) {
+			New: func(ctx context.Context) (LinkRegistry, func() error, error) {
 				cl, flush := test.NewRedis(ctx, namespace[:]...)
-				return &redis.LinkRegistry{
-						Redis: cl,
-					}, func() error {
-						flush()
-						return cl.Close()
-					}
+				registry := &redis.LinkRegistry{
+					Redis:   cl,
+					LockTTL: test.Delay << 10,
+				}
+				if err := registry.Init(ctx); err != nil {
+					return nil, nil, err
+				}
+				return registry, func() error {
+					flush()
+					return cl.Close()
+				}, nil
 			},
 			N: 8,
 		},
@@ -316,8 +332,11 @@ func TestLinkRegistry(t *testing.T) {
 			test.RunSubtest(t, test.SubtestConfig{
 				Name:     fmt.Sprintf("%s/%d", tc.Name, i),
 				Parallel: true,
-				Func: func(ctx context.Context, t *testing.T, _ *assertions.Assertion) {
-					reg, closeFn := tc.New(ctx)
+				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+					reg, closeFn, err := tc.New(ctx)
+					if !a.So(err, should.BeNil) {
+						t.FailNow()
+					}
 					if closeFn != nil {
 						defer func() {
 							if err := closeFn(); err != nil {

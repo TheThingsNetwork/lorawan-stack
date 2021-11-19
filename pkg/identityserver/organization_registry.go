@@ -69,7 +69,7 @@ var (
 )
 
 func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.CreateOrganizationRequest) (org *ttnpb.Organization, err error) {
-	if err = blacklist.Check(ctx, req.GetIds().GetOrganizationId()); err != nil {
+	if err = blacklist.Check(ctx, req.Organization.GetIds().GetOrganizationId()); err != nil {
 		return nil, err
 	}
 	if usrIDs := req.GetCollaborator().GetUserIds(); usrIDs != nil {
@@ -86,7 +86,7 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		org, err = store.GetOrganizationStore(db).CreateOrganization(ctx, &req.Organization)
+		org, err = store.GetOrganizationStore(db).CreateOrganization(ctx, req.Organization)
 		if err != nil {
 			return err
 		}
@@ -98,9 +98,9 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 		); err != nil {
 			return err
 		}
-		if len(req.ContactInfo) > 0 {
-			cleanContactInfo(req.ContactInfo)
-			org.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, org.GetIds(), req.ContactInfo)
+		if len(req.Organization.ContactInfo) > 0 {
+			cleanContactInfo(req.Organization.ContactInfo)
+			org.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, org.GetIds(), req.Organization.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -110,7 +110,7 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtCreateOrganization.NewWithIdentifiersAndData(ctx, req.GetIds(), nil))
+	events.Publish(evtCreateOrganization.NewWithIdentifiersAndData(ctx, req.Organization.GetIds(), nil))
 	return org, nil
 }
 
@@ -120,11 +120,10 @@ func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrg
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask, getPaths, nil)
 	if err = rights.RequireOrganization(ctx, *req.GetOrganizationIds(), ttnpb.RIGHT_ORGANIZATION_INFO); err != nil {
-		if ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicOrganizationFields...) {
-			defer func() { org = org.PublicSafe() }()
-		} else {
+		if !ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicOrganizationFields...) {
 			return nil, err
 		}
+		defer func() { org = org.PublicSafe() }()
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		org, err = store.GetOrganizationStore(db).GetOrganization(ctx, req.GetOrganizationIds(), req.FieldMask)
@@ -147,19 +146,19 @@ func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrg
 
 func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.ListOrganizationsRequest) (orgs *ttnpb.Organizations, err error) {
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask, getPaths, nil)
-	var includeIndirect bool
-	if req.Collaborator == nil {
-		authInfo, err := is.authInfo(ctx)
-		if err != nil {
-			return nil, err
-		}
-		collaborator := authInfo.GetOrganizationOrUserIdentifiers()
-		if collaborator == nil {
-			return &ttnpb.Organizations{}, nil
-		}
-		req.Collaborator = collaborator
-		includeIndirect = true
+
+	authInfo, err := is.authInfo(ctx)
+	if err != nil {
+		return nil, err
 	}
+	callerAccountID := authInfo.GetOrganizationOrUserIdentifiers()
+	if req.Collaborator == nil {
+		req.Collaborator = callerAccountID
+	}
+	if req.Collaborator == nil {
+		return &ttnpb.Organizations{}, nil
+	}
+
 	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_ORGANIZATIONS_LIST); err != nil {
 			return nil, err
@@ -167,9 +166,11 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 	} else if orgIDs := req.Collaborator.GetOrganizationIds(); orgIDs != nil {
 		return nil, errNestedOrganizations.New()
 	}
+
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
 	}
+
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	paginateCtx := store.WithPagination(ctx, req.Limit, req.Page, &total)
@@ -178,14 +179,22 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 			setTotalHeader(ctx, total)
 		}
 	}()
+
 	orgs = &ttnpb.Organizations{}
+	var callerMemberships store.MembershipChains
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		ids, err := is.getMembershipStore(ctx, db).FindMemberships(paginateCtx, req.Collaborator, "organization", includeIndirect)
+		membershipStore := is.getMembershipStore(ctx, db)
+		ids, err := membershipStore.FindMemberships(paginateCtx, req.Collaborator, "organization", false)
 		if err != nil {
 			return err
 		}
 		if len(ids) == 0 {
 			return nil
+		}
+		callerMemberships, err = membershipStore.FindAccountMembershipChains(ctx, callerAccountID, "organization", idStrings(ids...)...)
+		if err != nil {
+			return err
 		}
 		orgIDs := make([]*ttnpb.OrganizationIdentifiers, 0, len(ids))
 		for _, id := range ids {
@@ -204,7 +213,8 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 	}
 
 	for i, org := range orgs.Organizations {
-		if rights.RequireOrganization(ctx, *org.GetIds(), ttnpb.RIGHT_ORGANIZATION_INFO) != nil {
+		entityRights := callerMemberships.GetRights(callerAccountID, org.GetIds()).Union(authInfo.GetUniversalRights())
+		if !entityRights.IncludesAll(ttnpb.RIGHT_ORGANIZATION_INFO) {
 			orgs.Organizations[i] = org.PublicSafe()
 		}
 	}
@@ -213,7 +223,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 }
 
 func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.UpdateOrganizationRequest) (org *ttnpb.Organization, err error) {
-	if err = rights.RequireOrganization(ctx, *req.GetIds(), ttnpb.RIGHT_ORGANIZATION_SETTINGS_BASIC); err != nil {
+	if err = rights.RequireOrganization(ctx, *req.Organization.GetIds(), ttnpb.RIGHT_ORGANIZATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask, nil, getPaths)
@@ -226,13 +236,13 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 		}
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		org, err = store.GetOrganizationStore(db).UpdateOrganization(ctx, &req.Organization, req.FieldMask)
+		org, err = store.GetOrganizationStore(db).UpdateOrganization(ctx, req.Organization, req.FieldMask)
 		if err != nil {
 			return err
 		}
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-			cleanContactInfo(req.ContactInfo)
-			org.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, org.Ids, req.ContactInfo)
+			cleanContactInfo(req.Organization.ContactInfo)
+			org.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, org.Ids, req.Organization.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -242,7 +252,7 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateOrganization.NewWithIdentifiersAndData(ctx, req.GetIds(), req.FieldMask.GetPaths()))
+	events.Publish(evtUpdateOrganization.NewWithIdentifiersAndData(ctx, req.Organization.GetIds(), req.FieldMask.GetPaths()))
 	return org, nil
 }
 

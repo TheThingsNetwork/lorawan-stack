@@ -50,21 +50,38 @@
     background-color: $c-icon-fill
 
 .good-pulse:after
-  animation: goodPulse 2s infinite
+  animation: goodPulse 4s infinite
 
 .bad-pulse:after
-  animation: badPulse 2s infinite
+  animation: badPulse 4s infinite
 
 .mediocre-pulse:after
-  animation: mediocrePulse 2s infinite
+  animation: mediocrePulse 4s infinite
+
+.triggered-good-pulse:after
+  animation: triggeredGoodPulse 1.5s ease-out
 
 pulse-animation($color, $name)
   @keyframes $name
     0%
       box-shadow: 0 0 0 0 alpha($color, .4)
 
+    50%
+      box-shadow: 0 0 0 6px alpha($color, 0)
+
     70%
-      box-shadow: 0 0 0 5px alpha($color, 0)
+      box-shadow: 0 0 0 0 alpha($color, 0)
+
+    100%
+      box-shadow: 0 0 0 0 alpha($color, 0)
+
+triggered-pulse-animation($color, $name)
+  @keyframes $name
+    0%
+      box-shadow: 0 0 0 0 alpha($color, 1)
+
+    70%
+      box-shadow: 0 0 4px 10px alpha($color, 0)
 
     100%
       box-shadow: 0 0 0 0 alpha($color, 0)
@@ -72,3 +89,7 @@ pulse-animation($color, $name)
 pulse-animation($c-active-blue, 'goodPulse')
 pulse-animation($c-error, 'badPulse')
 pulse-animation($c-error, 'mediocrePulse')
+
+triggered-pulse-animation($c-active-blue, 'triggeredGoodPulse')
+triggered-pulse-animation($c-error, 'triggeredBadPulse')
+triggered-pulse-animation($c-error, 'triggeredMediocrePulse')

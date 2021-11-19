@@ -286,6 +286,27 @@ func (b *Buffer) UnmarshalText(data []byte) error {
 	return nil
 }
 
+// VendorID is an IEEE MAC-L (OUI) assignment to indicate the vendor.
+type VendorID [3]byte
+
+// MarshalText implements encoding.TextMarshaler.
+func (v VendorID) MarshalText() ([]byte, error) {
+	return Buffer(v[:]).MarshalText()
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (v *VendorID) UnmarshalText(data []byte) error {
+	var buf Buffer
+	if err := buf.UnmarshalText(data); err != nil {
+		return errInvalidVendorID.WithCause(err)
+	}
+	if len(buf) != 3 {
+		return errInvalidVendorID.WithCause(errInvalidLength.New())
+	}
+	copy(v[:], buf)
+	return nil
+}
+
 // KeyEnvelope contains a (encrypted) key.
 type KeyEnvelope ttnpb.KeyEnvelope
 
@@ -336,8 +357,7 @@ type NetID types.NetID
 
 // MarshalJSON marshals the NetID to text.
 func (n NetID) MarshalText() ([]byte, error) {
-	buf := Buffer(n[:])
-	return buf.MarshalText()
+	return Buffer(n[:]).MarshalText()
 }
 
 // UnmarshalText unmarshals the NetID from text.
@@ -358,8 +378,7 @@ type EUI64 types.EUI64
 
 // MarshalText implements encoding.TextMarshaler.
 func (n EUI64) MarshalText() ([]byte, error) {
-	buf := Buffer(n[:])
-	return buf.MarshalText()
+	return Buffer(n[:]).MarshalText()
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
@@ -380,8 +399,7 @@ type DevAddr types.DevAddr
 
 // MarshalText implements encoding.TextMarshaler.
 func (n DevAddr) MarshalText() ([]byte, error) {
-	buf := Buffer(n[:])
-	return buf.MarshalText()
+	return Buffer(n[:]).MarshalText()
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.

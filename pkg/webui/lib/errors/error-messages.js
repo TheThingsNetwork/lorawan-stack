@@ -33,4 +33,6 @@ export default defineMessages({
   loginFailed: 'Login failed',
   loginFailedDescription:
     'There was an error causing the login to fail. This might be due to server-side misconfiguration or a browser-cookie problem. Please try logging in again.',
+  loginFailedAbortDescription:
+    'The login process was aborted during the authentication with the login provider. You can use the button below to retry logging in.',
 })

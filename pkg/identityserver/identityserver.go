@@ -16,24 +16,28 @@ package identityserver
 
 import (
 	"context"
+	"fmt"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" // Postgres database driver.
 	"go.thethings.network/lorawan-stack/v3/pkg/account"
+	account_store "go.thethings.network/lorawan-stack/v3/pkg/account/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 	"google.golang.org/grpc"
 )
 
@@ -71,6 +75,70 @@ func (is *IdentityServer) configFromContext(ctx context.Context) *Config {
 		return config
 	}
 	return is.config
+}
+
+// GenerateCSPString returns a Content-Security-Policy header value
+// for OAuth and Account app template.
+func GenerateCSPString(config *oauth.Config, nonce string) string {
+	cspMap := webui.CleanCSP(map[string][]string{
+		"connect-src": {
+			"'self'",
+			config.UI.StackConfig.IS.BaseURL,
+			config.UI.SentryDSN,
+			"gravatar.com",
+			"www.gravatar.com",
+		},
+		"style-src": {
+			"'self'",
+			config.UI.AssetsBaseURL,
+			config.UI.BrandingBaseURL,
+		},
+		"script-src": {
+			"'self'",
+			config.UI.AssetsBaseURL,
+			config.UI.BrandingBaseURL,
+			"'unsafe-eval'",
+			"'strict-dynamic'",
+			fmt.Sprintf("'nonce-%s'", nonce),
+		},
+		"base-uri": {
+			"'self'",
+		},
+		"frame-ancestors": {
+			"'none'",
+		},
+	})
+	return webui.GenerateCSPString(cspMap)
+}
+
+type accountAppStore struct {
+	db *gorm.DB
+
+	store.UserStore
+	store.LoginTokenStore
+	store.UserSessionStore
+}
+
+// WithSoftDeleted implements account_store.Interface.
+func (as *accountAppStore) WithSoftDeleted(ctx context.Context, onlyDeleted bool) context.Context {
+	return store.WithSoftDeleted(ctx, onlyDeleted)
+}
+
+// Transact implements account_store.Interface.
+func (as *accountAppStore) Transact(ctx context.Context, f func(context.Context, account_store.Interface) error) error {
+	return store.Transact(ctx, as.db, func(db *gorm.DB) error {
+		return f(ctx, createAccountAppStore(db))
+	})
+}
+
+func createAccountAppStore(db *gorm.DB) account_store.Interface {
+	return &accountAppStore{
+		db: db,
+
+		UserStore:        store.GetUserStore(db),
+		LoginTokenStore:  store.GetLoginTokenStore(db),
+		UserSessionStore: store.GetUserSessionStore(db),
+	}
 }
 
 var errDBNeedsMigration = errors.Define("db_needs_migration", "the database needs to be migrated")
@@ -127,17 +195,9 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		UserSessionStore: store.GetUserSessionStore(is.db),
 		ClientStore:      store.GetClientStore(is.db),
 		OAuthStore:       store.GetOAuthStore(is.db),
-	}, is.config.OAuth)
+	}, is.config.OAuth, GenerateCSPString)
 
-	is.account = account.NewServer(c, struct {
-		store.UserStore
-		store.LoginTokenStore
-		store.UserSessionStore
-	}{
-		UserStore:        store.GetUserStore(is.db),
-		LoginTokenStore:  store.GetLoginTokenStore(is.db),
-		UserSessionStore: store.GetUserSessionStore(is.db),
-	}, is.config.OAuth)
+	is.account, err = account.NewServer(c, createAccountAppStore(is.db), is.config.OAuth, GenerateCSPString)
 	if err != nil {
 		return nil, err
 	}
@@ -177,6 +237,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 	c.RegisterGRPC(is)
 	c.RegisterWeb(is.oauth)
 	c.RegisterWeb(is.account)
+	c.RegisterInterop(is)
 
 	return is, nil
 }
@@ -229,6 +290,11 @@ func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Clien
 	ttnpb.RegisterEndDeviceRegistrySearchHandler(is.Context(), s, conn)
 	ttnpb.RegisterOAuthAuthorizationRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterContactInfoRegistryHandler(is.Context(), s, conn)
+}
+
+// RegisterInterop registers the LoRaWAN Backend Interfaces interoperability services.
+func (is *IdentityServer) RegisterInterop(srv *interop.Server) {
+	srv.RegisterIS(&interopServer{IdentityServer: is})
 }
 
 // Roles returns the roles that the Identity Server fulfills.

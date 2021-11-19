@@ -2035,7 +2035,7 @@
   },
   "error:pkg/applicationserver/io/packages/loradms/v1/api:request": {
     "translations": {
-      "en": "LoRaCloud DMS request failed"
+      "en": "LoRaCloud DMS request"
     },
     "description": {
       "package": "pkg/applicationserver/io/packages/loradms/v1/api",
@@ -2449,7 +2449,7 @@
   },
   "error:pkg/applicationserver/io/web:request": {
     "translations": {
-      "en": "request failed with status `{code}`"
+      "en": "request"
     },
     "description": {
       "package": "pkg/applicationserver/io/web",
@@ -3194,6 +3194,15 @@
       "file": "config.go"
     }
   },
+  "error:pkg/config/tlsconfig:tls_cipher_suite_invalid": {
+    "translations": {
+      "en": "invalid TLS cipher suite {cipher}"
+    },
+    "description": {
+      "package": "pkg/config/tlsconfig",
+      "file": "config.go"
+    }
+  },
   "error:pkg/config/tlsconfig:tls_config_source_invalid": {
     "translations": {
       "en": "invalid TLS configuration source `{source}`"
@@ -3896,6 +3905,15 @@
       "file": "conversion.go"
     }
   },
+  "error:pkg/events/grpc:invalid_regexp": {
+    "translations": {
+      "en": "invalid regexp"
+    },
+    "description": {
+      "package": "pkg/events/grpc",
+      "file": "grpc.go"
+    }
+  },
   "error:pkg/events/grpc:no_identifiers": {
     "translations": {
       "en": "no identifiers"
@@ -3905,9 +3923,27 @@
       "file": "grpc.go"
     }
   },
+  "error:pkg/events/grpc:no_matching_events": {
+    "translations": {
+      "en": "no matching events for regexp `{regexp}`"
+    },
+    "description": {
+      "package": "pkg/events/grpc",
+      "file": "grpc.go"
+    }
+  },
   "error:pkg/events/grpc:storage_disabled": {
     "translations": {
       "en": "events storage is not not enabled"
+    },
+    "description": {
+      "package": "pkg/events/grpc",
+      "file": "grpc.go"
+    }
+  },
+  "error:pkg/events/grpc:unknown_event_name": {
+    "translations": {
+      "en": "unknown event `{name}`"
     },
     "description": {
       "package": "pkg/events/grpc",
@@ -4121,36 +4157,9 @@
       "file": "grpc.go"
     }
   },
-  "error:pkg/gatewayserver/io/mqtt:data_rate": {
-    "translations": {
-      "en": "unknown data rate `{data_rate}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/mqtt",
-      "file": "format_protobufv2.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/mqtt:frequency_plan": {
-    "translations": {
-      "en": "unknown frequency plan `{frequency_plan}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/mqtt",
-      "file": "format_protobufv2.go"
-    }
-  },
   "error:pkg/gatewayserver/io/mqtt:lorawan_metadata": {
     "translations": {
       "en": "missing LoRaWAN metadata"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/mqtt",
-      "file": "format_protobufv2.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/mqtt:lorawan_payload": {
-    "translations": {
-      "en": "invalid LoRaWAN payload"
     },
     "description": {
       "package": "pkg/gatewayserver/io/mqtt",
@@ -4164,15 +4173,6 @@
     "description": {
       "package": "pkg/gatewayserver/io/mqtt",
       "file": "format_protobufv2.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/mqtt:mqtt_frontend_recovered": {
-    "translations": {
-      "en": "internal server error"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/mqtt",
-      "file": "mqtt.go"
     }
   },
   "error:pkg/gatewayserver/io/mqtt:not_authorized": {
@@ -4274,6 +4274,15 @@
       "file": "firewall_ratelimit.go"
     }
   },
+  "error:pkg/gatewayserver/io/ws/lbslns:data_rate": {
+    "translations": {
+      "en": "invalid data rate"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ws/lbslns",
+      "file": "upstream.go"
+    }
+  },
   "error:pkg/gatewayserver/io/ws/lbslns:empty_gateway_eui": {
     "translations": {
       "en": "empty gateway EUI"
@@ -4310,7 +4319,7 @@
       "file": "format.go"
     }
   },
-  "error:pkg/gatewayserver/io/ws/lbslns:uplink_data_Frame": {
+  "error:pkg/gatewayserver/io/ws/lbslns:uplink_data_frame": {
     "translations": {
       "en": "invalid uplink data frame received"
     },
@@ -4326,33 +4335,6 @@
     "description": {
       "package": "pkg/gatewayserver/io/ws/lbslns",
       "file": "upstream.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/ws/util:data_rate": {
-    "translations": {
-      "en": "data rate not found"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/ws/util",
-      "file": "util.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/ws/util:data_rate_index": {
-    "translations": {
-      "en": "data rate index is out of range"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/ws/util",
-      "file": "util.go"
-    }
-  },
-  "error:pkg/gatewayserver/io/ws/util:uid": {
-    "translations": {
-      "en": "invalid uid `{uid}`"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/ws/util",
-      "file": "util.go"
     }
   },
   "error:pkg/gatewayserver/io/ws:invalid_gateway_id": {
@@ -4376,15 +4358,6 @@
   "error:pkg/gatewayserver/io:buffer_full": {
     "translations": {
       "en": "buffer is full"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io",
-      "file": "io.go"
-    }
-  },
-  "error:pkg/gatewayserver/io:data_rate_index": {
-    "translations": {
-      "en": "no data rate with index `{index}`"
     },
     "description": {
       "package": "pkg/gatewayserver/io",
@@ -4519,7 +4492,7 @@
   },
   "error:pkg/gatewayserver/io:too_long": {
     "translations": {
-      "en": "the payload length `{payload_length}` exceeds maximum `{maximum_length}` at data rate index `{data_rate_index}`"
+      "en": "the payload length `{payload_length}` exceeds maximum `{maximum_length}` at data rate `{data_rate}`"
     },
     "description": {
       "package": "pkg/gatewayserver/io",
@@ -5768,6 +5741,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/interop:invalid_vendor_id": {
+    "translations": {
+      "en": "invalid vendor ID"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/interop:join_req": {
     "translations": {
       "en": "join-request failed"
@@ -5813,6 +5795,15 @@
       "file": "client.go"
     }
   },
+  "error:pkg/interop:no_public_tls_address": {
+    "translations": {
+      "en": "no public TLS address configured for interop"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/interop:no_roaming_agreement": {
     "translations": {
       "en": "no roaming agreement"
@@ -5820,6 +5811,15 @@
     "description": {
       "package": "pkg/interop",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/interop:not_packet_broker_cluster": {
+    "translations": {
+      "en": "caller not authenticated as Packet Broker cluster"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "server_authn_token.go"
     }
   },
   "error:pkg/interop:not_registered": {
@@ -6311,6 +6311,15 @@
   "error:pkg/joinserver:payload_type": {
     "translations": {
       "en": "wrong payload type: {type}"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/joinserver:permission_denied": {
+    "translations": {
+      "en": "permission denied"
     },
     "description": {
       "package": "pkg/joinserver",
@@ -7352,6 +7361,33 @@
       "file": "server.go"
     }
   },
+  "error:pkg/packetbroker:fetch_token": {
+    "translations": {
+      "en": "fetch token"
+    },
+    "description": {
+      "package": "pkg/packetbroker",
+      "file": "token.go"
+    }
+  },
+  "error:pkg/packetbroker:not_authorized": {
+    "translations": {
+      "en": "not authorized"
+    },
+    "description": {
+      "package": "pkg/packetbroker",
+      "file": "token.go"
+    }
+  },
+  "error:pkg/packetbroker:oauth2_token": {
+    "translations": {
+      "en": "invalid OAuth 2.0 token"
+    },
+    "description": {
+      "package": "pkg/packetbroker",
+      "file": "token.go"
+    }
+  },
   "error:pkg/packetbrokeragent:authentication_mode": {
     "translations": {
       "en": "invalid authentication mode `{mode}`"
@@ -7359,15 +7395,6 @@
     "description": {
       "package": "pkg/packetbrokeragent",
       "file": "agent.go"
-    }
-  },
-  "error:pkg/packetbrokeragent:data_rate_not_found": {
-    "translations": {
-      "en": "no data rate with index `{index}`"
-    },
-    "description": {
-      "package": "pkg/packetbrokeragent",
-      "file": "translation.go"
     }
   },
   "error:pkg/packetbrokeragent:decode_payload": {
@@ -7496,15 +7523,6 @@
       "file": "grpc_disabled.go"
     }
   },
-  "error:pkg/packetbrokeragent:oauth2_token": {
-    "translations": {
-      "en": "invalid OAuth 2.0 token for network authentication"
-    },
-    "description": {
-      "package": "pkg/packetbrokeragent",
-      "file": "authenticator.go"
-    }
-  },
   "error:pkg/packetbrokeragent:packet_broker_internal": {
     "translations": {
       "en": "internal Packet Broker error"
@@ -7559,27 +7577,9 @@
       "file": "translation.go"
     }
   },
-  "error:pkg/packetbrokeragent:unknown_phy_version": {
-    "translations": {
-      "en": "unknown LoRaWAN Regional Parameters version `{version}`"
-    },
-    "description": {
-      "package": "pkg/packetbrokeragent",
-      "file": "translation.go"
-    }
-  },
   "error:pkg/packetbrokeragent:unknown_priority": {
     "translations": {
       "en": "unknown priority `{priority}`"
-    },
-    "description": {
-      "package": "pkg/packetbrokeragent",
-      "file": "translation.go"
-    }
-  },
-  "error:pkg/packetbrokeragent:unknown_region": {
-    "translations": {
-      "en": "unknown region `{region}`"
     },
     "description": {
       "package": "pkg/packetbrokeragent",
@@ -7982,15 +7982,6 @@
       "file": "toa.go"
     }
   },
-  "error:pkg/ttnpb/udp:bandwidth": {
-    "translations": {
-      "en": "failed to parse bandwidth"
-    },
-    "description": {
-      "package": "pkg/ttnpb/udp",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/ttnpb/udp:eui": {
     "translations": {
       "en": "failed to parse EUI"
@@ -8039,15 +8030,6 @@
   "error:pkg/ttnpb/udp:payload": {
     "translations": {
       "en": "failed to parse binary payload"
-    },
-    "description": {
-      "package": "pkg/ttnpb/udp",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/ttnpb/udp:spreading_factor": {
-    "translations": {
-      "en": "failed to parse spreading factor"
     },
     "description": {
       "package": "pkg/ttnpb/udp",
@@ -8313,123 +8295,6 @@
     "description": {
       "package": "pkg/validate",
       "file": "email.go"
-    }
-  },
-  "error:pkg/validate:field": {
-    "translations": {
-      "en": "invalid field `{name}`"
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "validate.go"
-    }
-  },
-  "error:pkg/validate:field_set": {
-    "translations": {
-      "en": "field is set"
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "required.go"
-    }
-  },
-  "error:pkg/validate:fieldmaskpath": {
-    "translations": {
-      "en": "`{fieldmaskpath}` may consist of only lowercase letters, numbers, underscores and dots. It may not start or end with a dot or underscore, or have two or more consecutive dots or underscores. Also, it must be between 2 and 256 characters in length."
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "fieldmask.go"
-    }
-  },
-  "error:pkg/validate:min_slice_length": {
-    "translations": {
-      "en": "must be non-empty and have at least a length of value `{expected}`"
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "min_length.go"
-    }
-  },
-  "error:pkg/validate:min_string_length": {
-    "translations": {
-      "en": "must have at least a length of value `{expected}`"
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "min_length.go"
-    }
-  },
-  "error:pkg/validate:nil": {
-    "translations": {
-      "en": "must be non-nil"
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "min_length.go"
-    }
-  },
-  "error:pkg/validate:no_slice_or_array": {
-    "translations": {
-      "en": "must be slice or array, is `{type}`"
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "in.go"
-    }
-  },
-  "error:pkg/validate:not_present": {
-    "translations": {
-      "en": "`{value}` is not present in `{allowed_values}`"
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "in.go"
-    }
-  },
-  "error:pkg/validate:not_string": {
-    "translations": {
-      "en": "got `{type}` instead of string"
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "validate.go"
-    }
-  },
-  "error:pkg/validate:not_string_or_slice": {
-    "translations": {
-      "en": "must be string or slice, is `{type}`"
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "min_length.go"
-    }
-  },
-  "error:pkg/validate:not_subset": {
-    "translations": {
-      "en": "`{value}` is not a subset of `{reference}`"
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "in.go"
-    }
-  },
-  "error:pkg/validate:password_length": {
-    "translations": {
-      "en": "password must be at least 8 characters long"
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "password.go"
-    }
-  },
-  "error:pkg/validate:required": {
-    "translations": {
-      "en": "a value is required"
-    },
-    "description": {
-      "package": "pkg/validate",
-      "file": "validate.go"
     }
   },
   "error:pkg/version:no_remote": {
@@ -8792,6 +8657,15 @@
       "file": "grpc_deviceregistry.go"
     }
   },
+  "event:as.mqtt.connect.fail": {
+    "translations": {
+      "en": "fail to connect to MQTT"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/mqtt",
+      "file": "observability.go"
+    }
+  },
   "event:as.packages.loraclouddmsv1.fail": {
     "translations": {
       "en": "fail to process upstream message"
@@ -8942,6 +8816,15 @@
     },
     "description": {
       "package": "pkg/applicationserver",
+      "file": "observability.go"
+    }
+  },
+  "event:as.webhook.fail": {
+    "translations": {
+      "en": "fail to send webhook"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web",
       "file": "observability.go"
     }
   },
@@ -9215,15 +9098,6 @@
       "file": "observability.go"
     }
   },
-  "event:gs.status.fail": {
-    "translations": {
-      "en": "fail to handle gateway status"
-    },
-    "description": {
-      "package": "pkg/gatewayserver",
-      "file": "observability.go"
-    }
-  },
   "event:gs.status.receive": {
     "translations": {
       "en": "receive gateway status"
@@ -9233,18 +9107,36 @@
       "file": "observability.go"
     }
   },
-  "event:gs.up.drop": {
+  "event:gs.txack.drop": {
     "translations": {
-      "en": "drop uplink message"
+      "en": "drop transmission acknowledgement"
     },
     "description": {
       "package": "pkg/gatewayserver",
       "file": "observability.go"
     }
   },
-  "event:gs.up.fail": {
+  "event:gs.txack.forward": {
     "translations": {
-      "en": "fail to handle uplink message"
+      "en": "forward transmission acknowledgement"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.txack.receive": {
+    "translations": {
+      "en": "receive transmission acknowledgement"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.up.drop": {
+    "translations": {
+      "en": "drop uplink message"
     },
     "description": {
       "package": "pkg/gatewayserver",

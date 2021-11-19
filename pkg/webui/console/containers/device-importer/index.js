@@ -213,12 +213,7 @@ export default class DeviceImporter extends Component {
   @bind
   async handleSubmit(values) {
     const { appId, jsConfig, nsConfig, asConfig } = this.props
-    const {
-      format_id,
-      data,
-      set_claim_auth_code,
-      components: { js: jsSelected, as: asSelected, ns: nsSelected },
-    } = values
+    const { format_id, data, set_claim_auth_code } = values
 
     let devices = []
 
@@ -249,19 +244,19 @@ export default class DeviceImporter extends Component {
       // Apply default values.
       for (const deviceAndFieldMask of devices) {
         const { end_device: device, field_mask } = deviceAndFieldMask
-        if (set_claim_auth_code && jsSelected) {
+        if (set_claim_auth_code && jsConfig.enabled) {
           device.claim_authentication_code = { value: randomByteString(4 * 2) }
           field_mask.paths.push('claim_authentication_code')
         }
-        if (device.supports_join && !device.join_server_address && jsConfig.enabled && jsSelected) {
+        if (device.supports_join && !device.join_server_address && jsConfig.enabled) {
           device.join_server_address = new URL(jsConfig.base_url).hostname
           field_mask.paths.push('join_server_address')
         }
-        if (!device.application_server_address && asConfig.enabled && asSelected) {
+        if (!device.application_server_address && asConfig.enabled) {
           device.application_server_address = new URL(asConfig.base_url).hostname
           field_mask.paths.push('application_server_address')
         }
-        if (!device.network_server_address && nsConfig.enabled && nsSelected) {
+        if (!device.network_server_address && nsConfig.enabled) {
           device.network_server_address = new URL(nsConfig.base_url).hostname
           field_mask.paths.push('network_server_address')
         }
@@ -464,14 +459,13 @@ export default class DeviceImporter extends Component {
     const initialValues = {
       format_id: '',
       data: '',
-      set_claim_auth_code: false,
-      components: availableComponents.reduce((o, c) => ({ ...o, [c]: true }), {}),
+      set_claim_auth_code: true,
     }
     return (
       <Row>
         <Col md={8}>
           <DeviceImportForm
-            components={availableComponents}
+            jsEnabled={availableComponents.includes('js')}
             initialValues={initialValues}
             onSubmit={this.handleSubmit}
           />

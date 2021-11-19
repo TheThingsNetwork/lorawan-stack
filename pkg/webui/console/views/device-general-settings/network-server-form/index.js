@@ -13,7 +13,10 @@
 // limitations under the License.
 
 import React from 'react'
+import { defineMessages } from 'react-intl'
 
+import Link from '@ttn-lw/components/link'
+import ModalButton from '@ttn-lw/components/button/modal-button'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import Input from '@ttn-lw/components/input'
@@ -21,6 +24,9 @@ import Radio from '@ttn-lw/components/radio-button'
 import Form from '@ttn-lw/components/form'
 import Notification from '@ttn-lw/components/notification'
 import Checkbox from '@ttn-lw/components/checkbox'
+import toast from '@ttn-lw/components/toast'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import PhyVersionInput from '@console/components/phy-version-input'
 import LorawanVersionInput from '@console/components/lorawan-version-input'
@@ -29,7 +35,7 @@ import MacSettingsSection from '@console/components/mac-settings-section'
 import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 import DevAddrInput from '@console/containers/dev-addr-input'
 
-import tooltipIds from '@ttn-lw/lib/constants/glossary-ids'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import diff from '@ttn-lw/lib/diff'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -51,6 +57,15 @@ import {
 
 import validationSchema from './validation-schema'
 
+const m = defineMessages({
+  resetTitle: 'Session and MAC state reset',
+  resetButtonTitle: 'Reset session and MAC state',
+  resetSuccess: 'End device reset',
+  resetFailure: 'There was an error and the end device session and MAC state could not be reset',
+  modalMessage:
+    'Are you sure you want to reset the session context and MAC state of this end device?{break}{break}This will have the following consequences:<ul><li>For <OTAADocLink>OTAA</OTAADocLink>-activated end devices <b>all session and MAC data is wiped and the end device MUST rejoin</b></li><li>For <ABPDocLink>ABP</ABPDocLink>-activated end devices, session keys, device address and downlink queue are preserved, while <b>the MAC state is reset</b></li></ul>',
+})
+
 const defaultValues = {
   mac_settings: {
     ping_slot_periodicity: '',
@@ -58,7 +73,7 @@ const defaultValues = {
 }
 
 const NetworkServerForm = React.memo(props => {
-  const { device, onSubmit, onSubmitSuccess, mayEditKeys, mayReadKeys } = props
+  const { device, onSubmit, onSubmitSuccess, mayEditKeys, mayReadKeys, onMacReset } = props
   const { multicast = false, supports_join = false, supports_class_b = false } = device
 
   const isABP = isDeviceABP(device)
@@ -118,6 +133,21 @@ const NetworkServerForm = React.memo(props => {
     [device, initialActivationMode, validationContext],
   )
 
+  const handleMacReset = React.useCallback(async () => {
+    try {
+      await onMacReset()
+      toast({
+        message: m.resetSuccess,
+        type: toast.types.SUCCESS,
+      })
+    } catch (err) {
+      toast({
+        message: m.resetFailure,
+        type: toast.types.ERROR,
+      })
+    }
+  }, [onMacReset])
+
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
       const castedValues = validationSchema.cast(values, { context: validationContext })
@@ -132,12 +162,15 @@ const NetworkServerForm = React.memo(props => {
         'app_s_key',
       ])
 
+      const patch = updatedValues
+      // Always submit current `mac_settings` values to avoid overwriting nested entries.
+      patch.mac_settings = castedValues.mac_settings
+
       const isOTAA = values._activation_mode === ACTIVATION_MODES.OTAA
-      const mac_settings = castedValues.mac_settings
-      let session
+      // Do not update session for joined OTAA end devices.
       if (!isOTAA && castedValues.session && castedValues.session.keys) {
         const { app_s_key, ...keys } = castedValues.session.keys
-        session = {
+        patch.session = {
           ...updatedValues.session,
           keys,
         }
@@ -145,12 +178,7 @@ const NetworkServerForm = React.memo(props => {
 
       setError('')
       try {
-        // Always submit current `mac_settings` values to avoid overwriting nested entries.
-        await onSubmit({
-          ...updatedValues,
-          mac_settings,
-          session,
-        })
+        await onSubmit(patch)
         resetForm({ values: castedValues })
         onSubmitSuccess()
       } catch (err) {
@@ -311,6 +339,7 @@ const NetworkServerForm = React.memo(props => {
             mayGenerateValue={mayEditKeys}
             onGenerateValue={generate16BytesKey}
             tooltipId={lwVersion >= 110 ? undefined : tooltipIds.NETWORK_SESSION_KEY}
+            sensitive
           />
           {lwVersion >= 110 && (
             <Form.Field
@@ -325,6 +354,7 @@ const NetworkServerForm = React.memo(props => {
               component={Input.Generate}
               mayGenerateValue={mayEditKeys}
               onGenerateValue={generate16BytesKey}
+              sensitive
             />
           )}
           {lwVersion >= 110 && (
@@ -340,10 +370,45 @@ const NetworkServerForm = React.memo(props => {
               component={Input.Generate}
               mayGenerateValue={mayEditKeys}
               onGenerateValue={generate16BytesKey}
+              sensitive
             />
           )}
         </>
       )}
+      <Form.InfoField title={m.resetTitle} tooltipId={tooltipIds.RESET_MAC}>
+        <ModalButton
+          type="button"
+          warning
+          naked
+          message={m.resetButtonTitle}
+          modalData={{
+            children: (
+              <div>
+                <Message
+                  content={m.modalMessage}
+                  values={{
+                    b: msg => <b>{msg}</b>,
+                    ul: msg => <ul>{msg}</ul>,
+                    li: msg => <li>{msg}</li>,
+                    break: <br />,
+                    OTAADocLink: msg => (
+                      <Link.DocLink secondary path="/devices/abp-vs-otaa#otaa">
+                        {msg}
+                      </Link.DocLink>
+                    ),
+                    ABPDocLink: msg => (
+                      <Link.DocLink secondary path="/devices/abp-vs-otaa#abp">
+                        {msg}
+                      </Link.DocLink>
+                    ),
+                  }}
+                />
+              </div>
+            ),
+          }}
+          onApprove={handleMacReset}
+        />
+      </Form.InfoField>
       <MacSettingsSection activationMode={initialActivationMode} isClassB={isClassB} />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
@@ -356,6 +421,7 @@ NetworkServerForm.propTypes = {
   device: PropTypes.device.isRequired,
   mayEditKeys: PropTypes.bool.isRequired,
   mayReadKeys: PropTypes.bool.isRequired,
+  onMacReset: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onSubmitSuccess: PropTypes.func.isRequired,
 }

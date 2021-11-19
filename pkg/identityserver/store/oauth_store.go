@@ -203,12 +203,14 @@ func (s *oauthStore) CreateAuthorizationCode(ctx context.Context, code *ttnpb.OA
 		Code:        code.Code,
 		RedirectURI: code.RedirectUri,
 		State:       code.State,
-		ExpiresAt:   code.ExpiresAt,
+		ExpiresAt:   cleanTimePtr(code.ExpiresAt),
+	}
+	if code.CreatedAt != nil {
+		codeModel.CreatedAt = cleanTime(*code.CreatedAt)
 	}
 	if code.UserSessionId != "" {
 		codeModel.UserSessionID = &code.UserSessionId
 	}
-	codeModel.CreatedAt = cleanTime(code.CreatedAt)
 	return s.createEntity(ctx, &codeModel)
 }
 
@@ -264,12 +266,14 @@ func (s *oauthStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAc
 		PreviousID:   previousID,
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
-		ExpiresAt:    token.ExpiresAt,
+		ExpiresAt:    cleanTimePtr(token.ExpiresAt),
+	}
+	if token.CreatedAt != nil {
+		tokenModel.CreatedAt = cleanTime(*token.CreatedAt)
 	}
 	if token.UserSessionId != "" {
 		tokenModel.UserSessionID = &token.UserSessionId
 	}
-	tokenModel.CreatedAt = cleanTime(token.CreatedAt)
 	return s.createEntity(ctx, &tokenModel)
 }
 

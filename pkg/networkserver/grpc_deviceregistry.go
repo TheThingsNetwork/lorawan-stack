@@ -706,6 +706,9 @@ var (
 					if dev, ok := m["ids.dev_eui"]; ok && dev.DevEui != nil && !dev.DevEui.IsZero() {
 						return true, ""
 					}
+					if m["lorawan_version"].GetLorawanVersion() == ttnpb.MAC_UNKNOWN {
+						return false, "lorawan_version"
+					}
 					if m["lorawan_version"].LorawanVersion.RequireDevEUIForABP() && !m["multicast"].GetMulticast() {
 						return false, "ids.dev_eui"
 					}
@@ -1013,7 +1016,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	if st.HasSetField("ids.dev_addr") {
 		if err := st.ValidateField(func(dev *ttnpb.EndDevice) bool {
 			if st.Device.DevAddr == nil {
-				return dev.Session == nil
+				return dev.GetSession() == nil
 			}
 			return dev.GetSession() != nil && dev.Session.DevAddr.Equal(*st.Device.DevAddr)
 		}, "session.dev_addr"); err != nil {
@@ -1202,8 +1205,8 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 		if err := st.WithFields(func(m map[string]*ttnpb.EndDevice) error {
 			fp, phy, err := DeviceFrequencyPlanAndBand(&ttnpb.EndDevice{
-				FrequencyPlanId:   m["frequency_plan_id"].FrequencyPlanId,
-				LorawanPhyVersion: m["lorawan_phy_version"].LorawanPhyVersion,
+				FrequencyPlanId:   m["frequency_plan_id"].GetFrequencyPlanId(),
+				LorawanPhyVersion: m["lorawan_phy_version"].GetLorawanPhyVersion(),
 			}, ns.FrequencyPlans)
 			if err != nil {
 				return err

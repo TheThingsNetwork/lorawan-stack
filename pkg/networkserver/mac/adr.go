@@ -152,10 +152,14 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 	adrUplinks := func() []*ttnpb.UplinkMessage {
 		for i := len(dev.MacState.RecentUplinks) - 1; i >= 0; i-- {
 			up := dev.MacState.RecentUplinks[i]
+			drIdx, _, ok := phy.FindUplinkDataRate(up.Settings.DataRate)
+			if !ok {
+				continue
+			}
 			switch {
 			case up.Payload.MType != ttnpb.MType_UNCONFIRMED_UP && up.Payload.MType != ttnpb.MType_CONFIRMED_UP,
 				dev.MacState.LastAdrChangeFCntUp != 0 && up.Payload.GetMacPayload().FullFCnt <= dev.MacState.LastAdrChangeFCntUp,
-				up.Settings.DataRateIndex != dev.MacState.CurrentParameters.AdrDataRateIndex:
+				drIdx != dev.MacState.CurrentParameters.AdrDataRateIndex:
 				return dev.MacState.RecentUplinks[i+1:]
 			}
 		}

@@ -98,6 +98,9 @@ func (s *userStore) FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers,
 		countTotal(ctx, query.Model(User{}))
 		query = query.Limit(limit).Offset(offset)
 	}
+	if onlyExpired, expireThreshold := expiredFromContext(ctx); onlyExpired {
+		query = query.Scopes(withExpiredEntities(expireThreshold))
+	}
 	var userModels []userWithUID
 	query = query.Find(&userModels)
 	setTotal(ctx, uint64(len(userModels)))
@@ -146,6 +149,23 @@ func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fiel
 	if err := query.First(&userModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errNotFoundForID(id)
+		}
+		return nil, err
+	}
+	userProto := &ttnpb.User{}
+	userModel.toPB(userProto, fieldMask)
+	return userProto, nil
+}
+
+func (s *userStore) GetUserByPrimaryEmailAddress(ctx context.Context, email string, fieldMask *pbtypes.FieldMask) (*ttnpb.User, error) {
+	defer trace.StartRegion(ctx, "get user by primary email address").End()
+	query := s.query(ctx, User{}, withPrimaryEmailAddress(email))
+	query = query.Joins("LEFT JOIN accounts ON accounts.account_type = ? AND accounts.account_id = users.id", "user")
+	query = selectUserFields(ctx, query, fieldMask)
+	var userModel userWithUID
+	if err := query.First(&userModel).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return nil, errUserNotFound.WithAttributes("user_id", email)
 		}
 		return nil, err
 	}

@@ -96,7 +96,6 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 			FCnt:      uint32Ptr(msg.GetFCnt()),
 			Port:      uint8Ptr(uint8(msg.GetFPort())),
 			Payload:   hexPtr(objects.Hex(msg.FrmPayload)),
-			DR:        uint8Ptr(uint8(settings.DataRateIndex)),
 			Freq:      uint32Ptr(uint32(settings.Frequency)),
 			Timestamp: float64Ptr(float64(msg.ReceivedAt.UTC().Unix())),
 		}
@@ -277,13 +276,13 @@ func (p *DeviceManagementPackage) mergePackageData(def *ttnpb.ApplicationPackage
 		if err := defaultData.fromStruct(def.Data); err != nil {
 			return nil, 0, err
 		}
-		fPort = def.FPort
+		fPort = def.Ids.FPort
 	}
 	if assoc != nil {
 		if err := associationData.fromStruct(assoc.Data); err != nil {
 			return nil, 0, err
 		}
-		fPort = assoc.FPort
+		fPort = assoc.Ids.FPort
 	}
 	var merged packageData
 	for _, data := range []*packageData{

@@ -28,7 +28,7 @@ import (
 
 type interopHandler interface {
 	HandleJoin(context.Context, *ttnpb.JoinRequest, Authorizer) (*ttnpb.JoinResponse, error)
-	GetHomeNetID(context.Context, types.EUI64, types.EUI64, Authorizer) (netID *types.NetID, nsID string, err error)
+	GetHomeNetwork(context.Context, types.EUI64, types.EUI64, Authorizer) (*EndDeviceHomeNetwork, error)
 	GetAppSKey(context.Context, *ttnpb.SessionKeyRequest, Authorizer) (*ttnpb.AppSKeyResponse, error)
 }
 
@@ -84,10 +84,8 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 			return nil, interop.ErrActivation.WithCause(err)
 		case errors.Resemble(err, errMICMismatch):
 			return nil, interop.ErrMIC.WithCause(err)
-		case errors.Resemble(err, errRegistryOperation):
-			if errors.IsNotFound(errors.Cause(err)) {
-				return nil, interop.ErrUnknownDevEUI.WithCause(err)
-			}
+		case errors.IsNotFound(err):
+			return nil, interop.ErrUnknownDevEUI.WithCause(err)
 		}
 		return nil, interop.ErrJoinReq.WithCause(err)
 	}
@@ -121,20 +119,17 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 	return ans, nil
 }
 
-func (srv interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSReq) (*interop.HomeNSAns, error) {
+func (srv interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSReq) (*interop.TTIHomeNSAns, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "joinserver/interop")
 
-	netID, nsID, err := srv.JS.GetHomeNetID(ctx, types.EUI64(in.ReceiverID), types.EUI64(in.DevEUI), InteropAuthorizer)
+	homeNetwork, err := srv.JS.GetHomeNetwork(ctx, types.EUI64(in.ReceiverID), types.EUI64(in.DevEUI), InteropAuthorizer)
 	if err != nil {
-		switch {
-		case errors.Resemble(err, errRegistryOperation):
-			if errors.IsNotFound(errors.Cause(err)) {
-				return nil, interop.ErrUnknownDevEUI.WithCause(err)
-			}
+		if errors.IsNotFound(err) {
+			return nil, interop.ErrUnknownDevEUI.WithCause(err)
 		}
 		return nil, err
 	}
-	if netID == nil {
+	if homeNetwork.NetID == nil {
 		return nil, interop.ErrActivation.New()
 	}
 
@@ -142,20 +137,24 @@ func (srv interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSRe
 	if err != nil {
 		return nil, interop.ErrMalformedMessage.WithCause(err)
 	}
-	ans := &interop.HomeNSAns{
-		JsNsMessageHeader: interop.JsNsMessageHeader{
-			MessageHeader: header,
-			SenderID:      in.ReceiverID,
-			ReceiverID:    in.SenderID,
-			ReceiverNSID:  in.SenderNSID,
+	ans := &interop.TTIHomeNSAns{
+		HomeNSAns: interop.HomeNSAns{
+			JsNsMessageHeader: interop.JsNsMessageHeader{
+				MessageHeader: header,
+				SenderID:      in.ReceiverID,
+				ReceiverID:    in.SenderID,
+				ReceiverNSID:  in.SenderNSID,
+			},
+			Result: interop.Result{
+				ResultCode: interop.ResultSuccess,
+			},
+			HNetID: interop.NetID(*homeNetwork.NetID),
 		},
-		Result: interop.Result{
-			ResultCode: interop.ResultSuccess,
-		},
-		HNetID: interop.NetID(*netID),
+		HTenantID:  homeNetwork.TenantID,
+		HNSAddress: homeNetwork.NetworkServerAddress,
 	}
-	if nsID != "" && in.ProtocolVersion.SupportsNSID() {
-		ans.HNSID = &nsID
+	if homeNetwork.NSID != nil && in.ProtocolVersion.SupportsNSID() {
+		ans.HNSID = (*interop.EUI64)(homeNetwork.NSID)
 	}
 	return ans, nil
 }
@@ -181,10 +180,8 @@ func (srv interopServer) AppSKeyRequest(ctx context.Context, in *interop.AppSKey
 		switch {
 		case errors.IsPermissionDenied(err):
 			return nil, interop.ErrActivation.WithCause(err)
-		case errors.Resemble(err, errRegistryOperation):
-			if errors.IsNotFound(errors.Cause(err)) {
-				return nil, interop.ErrUnknownDevEUI.WithCause(err)
-			}
+		case errors.IsNotFound(err):
+			return nil, interop.ErrUnknownDevEUI.WithCause(err)
 		}
 		return nil, err
 	}

@@ -16,6 +16,7 @@ package band
 
 import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
+// AU_915_928_RP1_v1_1_RevA is the band definition for AU915-928 in the RP1 v1.1 rev. A specification.
 var AU_915_928_RP1_v1_1_RevA = Band{
 	ID: AU_915_928,
 

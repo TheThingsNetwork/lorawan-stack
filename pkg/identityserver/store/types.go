@@ -50,8 +50,11 @@ func (eui *EUI64) toPB() *types.EUI64 {
 }
 
 // Scan reads the value from the database into the EUI.
-func (eui *EUI64) Scan(src interface{}) (err error) {
-	var dto types.EUI64
+func (eui *EUI64) Scan(src interface{}) error {
+	var (
+		dto types.EUI64
+		err error
+	)
 	switch src := src.(type) {
 	case []byte:
 		err = dto.UnmarshalText(src)
@@ -63,7 +66,7 @@ func (eui *EUI64) Scan(src interface{}) (err error) {
 		err = fmt.Errorf("cannot convert %T to EUI64", src)
 	}
 	if err != nil {
-		return
+		return err
 	}
 	*eui = EUI64(dto)
 	return nil

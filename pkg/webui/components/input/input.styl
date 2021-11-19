@@ -61,7 +61,7 @@
     background-color: $c-backdrop
 
   &.actionable
-    margin-right: $cs.m
+    margin-right: $cs.s
 
 ::placeholder
   font-family: $font-family
@@ -88,6 +88,11 @@
     font-variant: small-caption
     font-size: 16px
 
+.hidden
+  font-family: text-security-disc
+  &:not(.byte)
+    -webkit-text-security: disc
+
 .spinner
   padding: 0 $cs.xs
   nudge('down', 3px)
@@ -97,10 +102,12 @@
   display: inline-block
   flex-grow: 0
   flex-shrink: 0
-  padding-right: $cs.s
 
   transition: opacity $ad.m
   opacity: 0
+
+  &:last-child
+    padding-right: $cs.s
 
   &.show
     opacity: 1
@@ -109,10 +116,12 @@
     fill: $c-active-blue
 
 .byte, .code, .placeholder
-  font-family: 'IBM Plex Mono', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace
+  &:not(.hidden)
+    font-family: 'IBM Plex Mono', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace
 
 .byte
   font-weight: $fw.bold
+  width: 0
 
 .code
   font-size: $fs.s
@@ -141,4 +150,6 @@ textarea.input
     max-height: $default-input-height
     border-radius: $br.s
     height: 100%
-    margin-left: $cs.m
+
+  .hide-toggle
+    margin-left: -2.5rem

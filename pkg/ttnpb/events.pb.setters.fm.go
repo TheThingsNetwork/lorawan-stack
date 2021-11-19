@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	time "time"
-)
+import fmt "fmt"
 
 func (dst *Event) SetFields(src *Event, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -27,8 +24,7 @@ func (dst *Event) SetFields(src *Event, paths ...string) error {
 			if src != nil {
 				dst.Time = src.Time
 			} else {
-				var zero time.Time
-				dst.Time = zero
+				dst.Time = nil
 			}
 		case "identifiers":
 			if len(subs) > 0 {
@@ -194,6 +190,15 @@ func (dst *StreamEventsRequest) SetFields(src *StreamEventsRequest, paths ...str
 				dst.After = src.After
 			} else {
 				dst.After = nil
+			}
+		case "names":
+			if len(subs) > 0 {
+				return fmt.Errorf("'names' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Names = src.Names
+			} else {
+				dst.Names = nil
 			}
 
 		default:

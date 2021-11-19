@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/randutil"
 )
 
@@ -113,6 +114,17 @@ func NewPopulator(size int, seed int64) *Populator {
 				Rights: []ttnpb.Right{ttnpb.RIGHT_ALL},
 			},
 		)
+		eui := &types.EUI64{}
+		eui.UnmarshalNumber(uint64(i + 1))
+		endDevice := &ttnpb.EndDevice{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: *application.Ids,
+				JoinEui:                eui,
+				DevEui:                 eui,
+				DeviceId:               fmt.Sprintf("random-device-%d", i+1),
+			},
+		}
+		p.EndDevices = append(p.EndDevices, endDevice)
 	}
 	var userIndex, organizationIndex int
 	for _, application := range p.Applications {
@@ -121,8 +133,8 @@ func NewPopulator(size int, seed int64) *Populator {
 		for i := 0; i < userCollaborators; i++ {
 			ouID := p.Users[userIndex%len(p.Users)].OrganizationOrUserIdentifiers()
 			p.Memberships[applicationID] = append(p.Memberships[applicationID], &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *ouID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
+				Ids:    ouID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 			})
 			userIndex++
 		}
@@ -130,8 +142,8 @@ func NewPopulator(size int, seed int64) *Populator {
 		for i := 0; i < organizationCollaborators; i++ {
 			ouID := p.Organizations[organizationIndex%len(p.Organizations)].OrganizationOrUserIdentifiers()
 			p.Memberships[applicationID] = append(p.Memberships[applicationID], &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *ouID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
+				Ids:    ouID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 			})
 			organizationIndex++
 		}
@@ -142,8 +154,8 @@ func NewPopulator(size int, seed int64) *Populator {
 		for i := 0; i < userCollaborators; i++ {
 			ouID := p.Users[userIndex%len(p.Users)].OrganizationOrUserIdentifiers()
 			p.Memberships[clientID] = append(p.Memberships[clientID], &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *ouID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
+				Ids:    ouID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
 			})
 			userIndex++
 		}
@@ -151,8 +163,8 @@ func NewPopulator(size int, seed int64) *Populator {
 		for i := 0; i < organizationCollaborators; i++ {
 			ouID := p.Organizations[organizationIndex%len(p.Organizations)].OrganizationOrUserIdentifiers()
 			p.Memberships[clientID] = append(p.Memberships[clientID], &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *ouID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
+				Ids:    ouID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
 			})
 			organizationIndex++
 		}
@@ -163,8 +175,8 @@ func NewPopulator(size int, seed int64) *Populator {
 		for i := 0; i < userCollaborators; i++ {
 			ouID := p.Users[userIndex%len(p.Users)].OrganizationOrUserIdentifiers()
 			p.Memberships[gatewayID] = append(p.Memberships[gatewayID], &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *ouID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
+				Ids:    ouID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
 			})
 			userIndex++
 		}
@@ -172,8 +184,8 @@ func NewPopulator(size int, seed int64) *Populator {
 		for i := 0; i < organizationCollaborators; i++ {
 			ouID := p.Organizations[organizationIndex%len(p.Organizations)].OrganizationOrUserIdentifiers()
 			p.Memberships[gatewayID] = append(p.Memberships[gatewayID], &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *ouID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
+				Ids:    ouID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
 			})
 			organizationIndex++
 		}
@@ -184,8 +196,8 @@ func NewPopulator(size int, seed int64) *Populator {
 		for i := 0; i < userCollaborators; i++ {
 			ouID := p.Users[userIndex%len(p.Users)].OrganizationOrUserIdentifiers()
 			p.Memberships[organizationID] = append(p.Memberships[organizationID], &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *ouID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL, ttnpb.RIGHT_CLIENT_ALL, ttnpb.RIGHT_GATEWAY_ALL, ttnpb.RIGHT_ORGANIZATION_ALL},
+				Ids:    ouID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL, ttnpb.RIGHT_CLIENT_ALL, ttnpb.RIGHT_GATEWAY_ALL, ttnpb.RIGHT_ORGANIZATION_ALL},
 			})
 			userIndex++
 		}
@@ -200,6 +212,7 @@ type Populator struct {
 	Gateways      []*ttnpb.Gateway
 	Organizations []*ttnpb.Organization
 	Users         []*ttnpb.User
+	EndDevices    []*ttnpb.EndDevice
 
 	APIKeys     map[*ttnpb.EntityIdentifiers][]*ttnpb.APIKey
 	Memberships map[*ttnpb.EntityIdentifiers][]*ttnpb.Collaborator
@@ -237,6 +250,9 @@ func (p *Populator) Populate(ctx context.Context, db *gorm.DB) (err error) {
 	}
 	if err = p.populateMemberships(ctx, tx); err != nil {
 		return fmt.Errorf("failed to populate memberships: %w", err)
+	}
+	if err = p.populateEndDevices(ctx, tx); err != nil {
+		return fmt.Errorf("failed to populate end devices: %w", err)
 	}
 	return nil
 }
@@ -341,12 +357,22 @@ func (p *Populator) populateMemberships(ctx context.Context, db *gorm.DB) (err e
 		for _, member := range members {
 			if err = GetMembershipStore(db).SetMember(
 				ctx,
-				&member.OrganizationOrUserIdentifiers,
+				member.Ids,
 				entityID,
 				ttnpb.RightsFrom(member.Rights...),
 			); err != nil {
 				return err
 			}
+		}
+	}
+	return nil
+}
+
+func (p *Populator) populateEndDevices(ctx context.Context, db *gorm.DB) (err error) {
+	for i, endDevice := range p.EndDevices {
+		p.EndDevices[i], err = GetEndDeviceStore(db).CreateEndDevice(ctx, endDevice)
+		if err != nil {
+			return err
 		}
 	}
 	return nil

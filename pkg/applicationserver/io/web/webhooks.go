@@ -26,10 +26,12 @@ import (
 
 	stdio "io"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/mux"
 	"github.com/jtacoma/uritemplates"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	ttnweb "go.thethings.network/lorawan-stack/v3/pkg/web"
@@ -38,7 +40,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 )
 
-const namespace = "applicationserver/io/web"
+const (
+	namespace = "applicationserver/io/web"
+
+	maxResponseSize = (1 << 10) // 1 KiB
+)
 
 // Sink processes HTTP requests.
 type Sink interface {
@@ -50,22 +56,39 @@ type HTTPClientSink struct {
 	*http.Client
 }
 
-var errRequest = errors.DefineUnavailable("request", "request failed with status `{code}`")
+var errRequest = errors.DefineUnavailable("request", "request")
+
+func createRequestErrorDetails(req *http.Request, res *http.Response) []proto.Message {
+	ctx := req.Context()
+	m := map[string]interface{}{
+		"webhook_id": webhookIDFromContext(ctx).WebhookId,
+		"url":        req.URL.String(),
+	}
+	if res != nil {
+		body, _ := stdio.ReadAll(stdio.LimitReader(res.Body, maxResponseSize))
+		m["status_code"] = res.StatusCode
+		m["body"] = string(body)
+	}
+	detail, err := gogoproto.Struct(m)
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Error("Failed to marshal request error details")
+		return nil
+	}
+	return []proto.Message{detail}
+}
 
 // Process uses the HTTP client to perform the request.
 func (s *HTTPClientSink) Process(req *http.Request) error {
 	res, err := s.Do(req)
 	if err != nil {
-		return err
+		return errRequest.WithCause(err).WithDetails(createRequestErrorDetails(req, res)...)
 	}
-	defer func() {
-		stdio.Copy(ioutil.Discard, res.Body)
-		res.Body.Close()
-	}()
+	defer res.Body.Close()
+	defer stdio.Copy(stdio.Discard, res.Body)
 	if res.StatusCode >= 200 && res.StatusCode <= 299 {
 		return nil
 	}
-	return errRequest.WithAttributes("code", res.StatusCode)
+	return errRequest.WithDetails(createRequestErrorDetails(req, res)...)
 }
 
 // pooledSink is a Sink with worker pool.
@@ -176,7 +199,7 @@ const (
 	domainHeader = "X-Tts-Domain"
 )
 
-func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID ttnpb.ApplicationWebhookIdentifiers, devID ttnpb.EndDeviceIdentifiers, op string) string {
+func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID *ttnpb.ApplicationWebhookIdentifiers, devID ttnpb.EndDeviceIdentifiers, op string) string {
 	downlinks := w.downlinks
 	baseURL := downlinks.PublicTLSAddress
 	if baseURL == "" {
@@ -184,7 +207,7 @@ func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID ttnpb.Applic
 	}
 	return fmt.Sprintf(downlinkOperationURLFormat,
 		baseURL,
-		webhookID.ApplicationId,
+		webhookID.ApplicationIds.ApplicationId,
 		webhookID.WebhookId,
 		devID.DeviceId,
 		op,
@@ -206,7 +229,7 @@ func (w *webhooks) createDomain(ctx context.Context) string {
 
 func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
 	ctx = log.NewContextWithField(ctx, "namespace", namespace)
-	hooks, err := w.registry.List(ctx, msg.ApplicationIdentifiers,
+	hooks, err := w.registry.List(ctx, &msg.ApplicationIdentifiers,
 		[]string{
 			"base_url",
 			"downlink_ack",
@@ -227,10 +250,12 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 	if err != nil {
 		return err
 	}
+	ctx = withDeviceID(ctx, msg.EndDeviceIdentifiers)
 	wg := sync.WaitGroup{}
 	for i := range hooks {
 		hook := hooks[i]
-		logger := log.FromContext(ctx).WithField("hook", hook.WebhookId)
+		ctx := withWebhookID(ctx, hook.Ids)
+		logger := log.FromContext(ctx).WithField("hook", hook.Ids.WebhookId)
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -321,8 +346,8 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	}
 	if hook.DownlinkApiKey != "" {
 		req.Header.Set(downlinkKeyHeader, hook.DownlinkApiKey)
-		req.Header.Set(downlinkPushHeader, w.createDownlinkURL(ctx, hook.ApplicationWebhookIdentifiers, msg.EndDeviceIdentifiers, "push"))
-		req.Header.Set(downlinkReplaceHeader, w.createDownlinkURL(ctx, hook.ApplicationWebhookIdentifiers, msg.EndDeviceIdentifiers, "replace"))
+		req.Header.Set(downlinkPushHeader, w.createDownlinkURL(ctx, hook.Ids, msg.EndDeviceIdentifiers, "push"))
+		req.Header.Set(downlinkReplaceHeader, w.createDownlinkURL(ctx, hook.Ids, msg.EndDeviceIdentifiers, "replace"))
 	}
 	if domain := w.createDomain(ctx); domain != "" {
 		req.Header.Set(domainHeader, domain)

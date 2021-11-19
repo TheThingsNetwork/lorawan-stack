@@ -19,7 +19,15 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+)
+
+var evtWebhookFail = events.Define(
+	"as.webhook.fail", "fail to send webhook",
+	events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+	events.WithErrorDataType(),
 )
 
 const (
@@ -75,4 +83,6 @@ func registerWebhookFailed(ctx context.Context, err error) {
 		errorLabel = ttnErr.FullName()
 	}
 	webhookMetrics.webhooksFailed.WithLabelValues(ctx, errorLabel).Inc()
+	ids := deviceIDFromContext(ctx)
+	events.Publish(evtWebhookFail.NewWithIdentifiersAndData(ctx, &ids, err))
 }

@@ -179,7 +179,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	createdByAdmin := is.IsAdmin(ctx)
 	config := is.configFromContext(ctx)
 
-	if err = blacklist.Check(ctx, req.GetIds().GetUserId()); err != nil {
+	if err = blacklist.Check(ctx, req.User.GetIds().GetUserId()); err != nil {
 		return nil, err
 	}
 	if req.InvitationToken == "" && config.UserRegistration.Invitation.Required && !createdByAdmin {
@@ -230,7 +230,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		})
 	}
 
-	if err := is.validatePasswordStrength(ctx, req.GetIds().GetUserId(), req.User.Password); err != nil {
+	if err := is.validatePasswordStrength(ctx, req.User.GetIds().GetUserId(), req.User.Password); err != nil {
 		return nil, err
 	}
 	hashedPassword, err := auth.Hash(ctx, req.User.Password)
@@ -242,7 +242,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	req.User.PasswordUpdatedAt = &now
 
 	if req.User.ProfilePicture != nil {
-		if err = is.processUserProfilePicture(ctx, &req.User); err != nil {
+		if err = is.processUserProfilePicture(ctx, req.User); err != nil {
 			return nil, err
 		}
 	}
@@ -259,13 +259,13 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 			}
 		}
 
-		usr, err = store.GetUserStore(db).CreateUser(ctx, &req.User)
+		usr, err = store.GetUserStore(db).CreateUser(ctx, req.User)
 		if err != nil {
 			return err
 		}
 
-		if len(req.ContactInfo) > 0 {
-			usr.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, usr.GetIds(), req.ContactInfo)
+		if len(req.User.ContactInfo) > 0 {
+			usr.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, usr.GetIds(), req.User.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -297,12 +297,12 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 
 	// TODO: Send welcome email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
 
-	if _, err := is.requestContactInfoValidation(ctx, req.GetIds().GetEntityIdentifiers()); err != nil {
+	if _, err := is.requestContactInfoValidation(ctx, req.User.GetIds().GetEntityIdentifiers()); err != nil {
 		log.FromContext(ctx).WithError(err).Error("Could not send contact info validations")
 	}
 
 	usr.Password = "" // Create doesn't have a FieldMask, so we need to manually remove the password.
-	events.Publish(evtCreateUser.NewWithIdentifiersAndData(ctx, req.GetIds(), nil))
+	events.Publish(evtCreateUser.NewWithIdentifiersAndData(ctx, req.User.GetIds(), nil))
 	return usr, nil
 }
 
@@ -312,11 +312,10 @@ func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest
 		if err := is.RequireAuthenticated(ctx); err != nil {
 			return nil, err
 		}
-		if ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicUserFields...) {
-			defer func() { usr = usr.PublicSafe() }()
-		} else {
+		if !ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicUserFields...) {
 			return nil, err
 		}
+		defer func() { usr = usr.PublicSafe() }()
 	}
 
 	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.GetPaths()), "profile_picture") {
@@ -404,7 +403,7 @@ func (is *IdentityServer) setFullProfilePictureURL(ctx context.Context, usr *ttn
 }
 
 func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserRequest) (usr *ttnpb.User, err error) {
-	if err = rights.RequireUser(ctx, *req.GetIds(), ttnpb.RIGHT_USER_SETTINGS_BASIC); err != nil {
+	if err = rights.RequireUser(ctx, *req.User.GetIds(), ttnpb.RIGHT_USER_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask, nil, getPaths)
@@ -432,14 +431,14 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 				return nil, errUpdateUserAdminField.WithAttributes("field", path)
 			}
 		}
-		req.PrimaryEmailAddressValidatedAt = nil
+		req.User.PrimaryEmailAddressValidatedAt = nil
 		cleanContactInfo(req.User.ContactInfo)
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "state") {
 		if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "state_description") {
 			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "state_description")
-			req.StateDescription = ""
+			req.User.StateDescription = ""
 		}
 	}
 
@@ -466,7 +465,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "profile_picture")
 		}
 		if req.User.ProfilePicture != nil {
-			if err = is.processUserProfilePicture(ctx, &req.User); err != nil {
+			if err = is.processUserProfilePicture(ctx, req.User); err != nil {
 				return nil, err
 			}
 		}
@@ -479,7 +478,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 		updatingPrimaryEmailAddress := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "primary_email_address")
 		if updatingContactInfo || updatingPrimaryEmailAddress {
 			if updatingContactInfo {
-				contactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, req.User.GetIds(), req.ContactInfo)
+				contactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, req.User.GetIds(), req.User.ContactInfo)
 				if err != nil {
 					return err
 				}
@@ -494,7 +493,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 				if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "primary_email_address_validated_at") {
 					for _, contactInfo := range contactInfo {
 						if contactInfo.ContactMethod == ttnpb.CONTACT_METHOD_EMAIL && contactInfo.Value == req.User.PrimaryEmailAddress {
-							req.PrimaryEmailAddressValidatedAt = contactInfo.ValidatedAt
+							req.User.PrimaryEmailAddressValidatedAt = contactInfo.ValidatedAt
 							req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "primary_email_address_validated_at")
 							break
 						}
@@ -502,7 +501,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 				}
 			}
 		}
-		usr, err = store.GetUserStore(db).UpdateUser(ctx, &req.User, req.FieldMask)
+		usr, err = store.GetUserStore(db).UpdateUser(ctx, req.User, req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -514,12 +513,12 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, req.GetIds(), req.FieldMask.GetPaths()))
+	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, req.User.GetIds(), req.FieldMask.GetPaths()))
 
 	// TODO: Send emails (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
 	// - If primary email address changed
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "state") {
-		err = is.SendUserEmail(ctx, req.GetIds(), func(data emails.Data) email.MessageData {
+		err = is.SendUserEmail(ctx, req.User.GetIds(), func(data emails.Data) email.MessageData {
 			data.SetEntity(req)
 			return &emails.EntityStateChanged{
 				Data:             data,

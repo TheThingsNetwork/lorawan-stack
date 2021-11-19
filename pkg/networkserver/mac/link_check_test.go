@@ -114,7 +114,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayIds: &ttnpb.GatewayIdentifiers{
 							GatewayId: "test",
 						},
 						Snr: 25,
@@ -166,7 +166,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayIds: &ttnpb.GatewayIdentifiers{
 							GatewayId: "test",
 						},
 						Snr: 25,
@@ -218,19 +218,19 @@ func TestHandleLinkCheckReq(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayIds: &ttnpb.GatewayIdentifiers{
 							GatewayId: "test",
 						},
 						Snr: 24,
 					},
 					{
-						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayIds: &ttnpb.GatewayIdentifiers{
 							GatewayId: "test2",
 						},
 						Snr: 25,
 					},
 					{
-						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayIds: &ttnpb.GatewayIdentifiers{
 							GatewayId: "test3",
 						},
 						Snr: 2,
@@ -282,19 +282,19 @@ func TestHandleLinkCheckReq(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayIds: &ttnpb.GatewayIdentifiers{
 							GatewayId: "test",
 						},
 						Snr: 24,
 					},
 					{
-						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayIds: &ttnpb.GatewayIdentifiers{
 							GatewayId: "test2",
 						},
 						Snr: 25,
 					},
 					{
-						GatewayIdentifiers: cluster.PacketBrokerGatewayID,
+						GatewayIds: &cluster.PacketBrokerGatewayID,
 						PacketBroker: &ttnpb.PacketBrokerMetadata{
 							ForwarderNetId:     types.NetID{0x0, 0x0, 0x42},
 							ForwarderTenantId:  "test",
@@ -303,7 +303,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 						Snr: 26,
 					},
 					{
-						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayIds: &ttnpb.GatewayIdentifiers{
 							GatewayId: "test3",
 						},
 						Snr: 2,

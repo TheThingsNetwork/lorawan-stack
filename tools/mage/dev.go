@@ -17,6 +17,7 @@ package ttnmage
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -25,7 +26,6 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -62,14 +62,15 @@ func (Dev) Misspell() error {
 }
 
 var (
-	sqlDatabase           = "cockroach"
+	sqlDatabase           = "postgres"
 	redisDatabase         = "redis"
 	devDatabases          = []string{sqlDatabase, redisDatabase}
 	devDataDir            = ".env/data"
 	devDir                = ".env"
 	devDatabaseName       = "ttn_lorawan_dev"
+	devSeedDatabaseName   = "tts_seed"
 	devDockerComposeFlags = []string{"-p", "lorawan-stack-dev"}
-	databaseURI           = fmt.Sprintf("postgresql://root@localhost:26257/%s?sslmode=disable", devDatabaseName)
+	databaseURI           = fmt.Sprintf("postgresql://root:root@localhost:5432/%s?sslmode=disable", devDatabaseName)
 )
 
 func dockerComposeFlags(args ...string) []string {
@@ -100,24 +101,6 @@ func (Dev) SQLStop() error {
 	return execDockerCompose(append([]string{"stop"}, sqlDatabase)...)
 }
 
-// SQLRestoreSnapshot restores the previously taken snapshot, thus restoring all previously
-// snapshoted databases.
-func (d Dev) SQLRestoreSnapshot() error {
-	mg.Deps(Dev.SQLStop)
-	if mg.Verbose() {
-		fmt.Println("Restoring DB snapshot")
-	}
-	to := filepath.Join(devDataDir, "cockroach")
-	from := filepath.Join(devDataDir, "cockroach-snap")
-	if err := os.RemoveAll(to); err != nil {
-		return err
-	}
-	if err := sh.Copy(from, to); err != nil {
-		return err
-	}
-	return d.SQLStart()
-}
-
 // SQLDump performs an SQL database dump of the dev database to the .cache folder.
 func (Dev) SQLDump() error {
 	if mg.Verbose() {
@@ -126,11 +109,23 @@ func (Dev) SQLDump() error {
 	if err := os.MkdirAll(".cache", 0755); err != nil {
 		return err
 	}
-	output, err := sh.Output("docker-compose", dockerComposeFlags("exec", "-T", "cockroach", "./cockroach", "dump", devDatabaseName, "--insecure")...)
+	output, err := sh.Output("docker-compose", dockerComposeFlags("exec", "-T", "postgres", "pg_dump", devDatabaseName)...)
 	if err != nil {
 		return err
 	}
 	return ioutil.WriteFile(filepath.Join(".cache", "sqldump.sql"), []byte(output), 0644)
+}
+
+// SQLCreateSeedDB creates a database template from the current dump.
+func (Dev) SQLCreateSeedDB() error {
+	if mg.Verbose() {
+		fmt.Println("Creating seed DB from dump")
+	}
+	d := filepath.Join(".cache", "sqldump.sql")
+	if _, err := os.Stat(d); errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("Dumpfile does not exist: %w", d)
+	}
+	return sh.Run(filepath.Join("tools", "mage", "scripts", "recreate-db-from-dump.sh"), devSeedDatabaseName, d)
 }
 
 // SQLRestore restores the dev database using a previously generated dump.
@@ -138,21 +133,12 @@ func (Dev) SQLRestore(ctx context.Context) error {
 	if mg.Verbose() {
 		fmt.Println("Restoring database from dump")
 	}
-	db, err := store.Open(ctx, databaseURI)
-	if err != nil {
-		return err
+	d := filepath.Join(".cache", "sqldump.sql")
+	if _, err := os.Stat(d); errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("Dumpfile does not exist: %w", d)
 	}
-	defer db.Close()
+	return sh.Run(filepath.Join("tools", "mage", "scripts", "recreate-db-from-dump.sh"), devDatabaseName, d)
 
-	b, err := ioutil.ReadFile(filepath.Join(".cache", "sqldump.sql"))
-	if err != nil {
-		return err
-	}
-	return db.Exec(fmt.Sprintf(`DROP DATABASE IF EXISTS %s;
-		CREATE DATABASE %s;
-		%s`,
-		devDatabaseName, devDatabaseName, string(b)),
-	).Error
 }
 
 // RedisFlush deletes all keys from redis.
@@ -208,10 +194,7 @@ func (Dev) DBSQL() error {
 	if mg.Verbose() {
 		fmt.Println("Starting SQL shell")
 	}
-	return execDockerCompose("exec", "cockroach", "./cockroach", "sql",
-		"--insecure",
-		"-d", devDatabaseName,
-	)
+	return execDockerCompose("exec", "postgres", "psql", devDatabaseName)
 }
 
 // DBRedisCli starts a Redis-CLI shell.

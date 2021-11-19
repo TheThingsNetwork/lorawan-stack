@@ -25,15 +25,23 @@ func (x *Organization) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		// NOTE: OrganizationIdentifiers does not seem to implement MarshalProtoJSON.
 		gogo.MarshalMessage(s, x.Ids)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.CreatedAt != nil || s.HasField("created_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("created_at")
-		s.WriteTime(x.CreatedAt)
+		if x.CreatedAt == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.CreatedAt)
+		}
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.UpdatedAt != nil || s.HasField("updated_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("updated_at")
-		s.WriteTime(x.UpdatedAt)
+		if x.UpdatedAt == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.UpdatedAt)
+		}
 	}
 	if x.DeletedAt != nil || s.HasField("deleted_at") {
 		s.WriteMoreIf(&wroteField)
@@ -101,14 +109,14 @@ func (x *Organization) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			if s.Err() != nil {
 				return
 			}
-			x.CreatedAt = *v
+			x.CreatedAt = v
 		case "updated_at", "updatedAt":
 			s.AddField("updated_at")
 			v := s.ReadTime()
 			if s.Err() != nil {
 				return
 			}
-			x.UpdatedAt = *v
+			x.UpdatedAt = v
 		case "deleted_at", "deletedAt":
 			s.AddField("deleted_at")
 			v := s.ReadTime()
@@ -203,7 +211,7 @@ func (x *CreateOrganizationRequest) MarshalProtoJSON(s *jsonplugin.MarshalState)
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Organization != nil || s.HasField("organization") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("organization")
 		x.Organization.MarshalProtoJSON(s.WithField("organization"))
@@ -228,6 +236,7 @@ func (x *CreateOrganizationRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSt
 			s.ReadAny() // ignore unknown field
 		case "organization":
 			if !s.ReadNil() {
+				x.Organization = &Organization{}
 				x.Organization.UnmarshalProtoJSON(s.WithField("organization", true))
 			}
 		case "collaborator":
@@ -248,7 +257,7 @@ func (x *UpdateOrganizationRequest) MarshalProtoJSON(s *jsonplugin.MarshalState)
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Organization != nil || s.HasField("organization") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("organization")
 		x.Organization.MarshalProtoJSON(s.WithField("organization"))
@@ -276,6 +285,7 @@ func (x *UpdateOrganizationRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSt
 			s.ReadAny() // ignore unknown field
 		case "organization":
 			if !s.ReadNil() {
+				x.Organization = &Organization{}
 				x.Organization.UnmarshalProtoJSON(s.WithField("organization", true))
 			}
 		case "field_mask", "fieldMask":
@@ -381,10 +391,10 @@ func (x *UpdateOrganizationAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.Marshal
 		// NOTE: OrganizationIdentifiers does not seem to implement MarshalProtoJSON.
 		gogo.MarshalMessage(s, x.OrganizationIds)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.ApiKey != nil || s.HasField("api_key") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("api_key")
-		x.APIKey.MarshalProtoJSON(s.WithField("api_key"))
+		x.ApiKey.MarshalProtoJSON(s.WithField("api_key"))
 	}
 	if x.FieldMask != nil || s.HasField("field_mask") {
 		s.WriteMoreIf(&wroteField)
@@ -415,7 +425,8 @@ func (x *UpdateOrganizationAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.Unmar
 			x.OrganizationIds = &v
 		case "api_key", "apiKey":
 			if !s.ReadNil() {
-				x.APIKey.UnmarshalProtoJSON(s.WithField("api_key", true))
+				x.ApiKey = &APIKey{}
+				x.ApiKey.UnmarshalProtoJSON(s.WithField("api_key", true))
 			}
 		case "field_mask", "fieldMask":
 			s.AddField("field_mask")

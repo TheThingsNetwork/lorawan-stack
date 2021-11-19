@@ -161,13 +161,13 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		if len(req.APIKey.Rights) > 0 {
-			_, key, err := store.GetAPIKeyStore(db).GetAPIKey(ctx, req.APIKey.Id)
+		if len(req.ApiKey.Rights) > 0 {
+			_, key, err := store.GetAPIKeyStore(db).GetAPIKey(ctx, req.ApiKey.Id)
 			if err != nil {
 				return err
 			}
 
-			newRights := ttnpb.RightsFrom(req.APIKey.Rights...)
+			newRights := ttnpb.RightsFrom(req.ApiKey.Rights...)
 			existingRights := ttnpb.RightsFrom(key.Rights...)
 
 			// Require the caller to have all added rights.
@@ -180,7 +180,7 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 			}
 		}
 
-		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.ApplicationIds.GetEntityIdentifiers(), &req.APIKey, req.FieldMask)
+		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.ApplicationIds.GetEntityIdentifiers(), req.ApiKey, req.FieldMask)
 		return err
 	})
 	if err != nil {
@@ -208,7 +208,7 @@ func (is *IdentityServer) getApplicationCollaborator(ctx context.Context, req *t
 		return nil, err
 	}
 	res := &ttnpb.GetCollaboratorResponse{
-		OrganizationOrUserIdentifiers: *req.GetCollaborator(),
+		Ids: req.GetCollaborator(),
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		rights, err := is.getMembershipStore(ctx, db).GetMember(
@@ -240,7 +240,7 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 		store := is.getMembershipStore(ctx, db)
 		existingRights, err := store.GetMember(
 			ctx,
-			&req.GetCollaborator().OrganizationOrUserIdentifiers,
+			req.GetCollaborator().GetIds(),
 			req.GetApplicationIds().GetEntityIdentifiers(),
 		)
 		if err != nil && !errors.IsNotFound(err) {
@@ -272,7 +272,7 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 			}
 			var hasOtherOwner bool
 			for member, rights := range memberRights {
-				if unique.ID(ctx, member) == unique.ID(ctx, &req.GetCollaborator().OrganizationOrUserIdentifiers) {
+				if unique.ID(ctx, member) == unique.ID(ctx, req.GetCollaborator().GetIds()) {
 					continue
 				}
 				if rights.Implied().IncludesAll(ttnpb.RIGHT_APPLICATION_ALL) {
@@ -287,7 +287,7 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 
 		return store.SetMember(
 			ctx,
-			&req.GetCollaborator().OrganizationOrUserIdentifiers,
+			req.GetCollaborator().GetIds(),
 			req.GetApplicationIds().GetEntityIdentifiers(),
 			ttnpb.RightsFrom(req.Collaborator.Rights...),
 		)
@@ -296,7 +296,7 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 		return nil, err
 	}
 	if len(req.GetCollaborator().GetRights()) > 0 {
-		events.Publish(evtUpdateApplicationCollaborator.New(ctx, events.WithIdentifiers(req.GetApplicationIds(), req.GetCollaborator())))
+		events.Publish(evtUpdateApplicationCollaborator.New(ctx, events.WithIdentifiers(req.GetApplicationIds(), req.GetCollaborator().GetIds())))
 		err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
 			data.SetEntity(req)
 			return &emails.CollaboratorChanged{Data: data, Collaborator: *req.GetCollaborator()}
@@ -305,7 +305,7 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 			log.FromContext(ctx).WithError(err).Error("Could not send collaborator updated notification email")
 		}
 	} else {
-		events.Publish(evtDeleteApplicationCollaborator.New(ctx, events.WithIdentifiers(req.GetApplicationIds(), req.GetCollaborator())))
+		events.Publish(evtDeleteApplicationCollaborator.New(ctx, events.WithIdentifiers(req.GetApplicationIds(), req.GetCollaborator().GetIds())))
 	}
 	return ttnpb.Empty, nil
 }
@@ -333,8 +333,8 @@ func (is *IdentityServer) listApplicationCollaborators(ctx context.Context, req 
 		collaborators = &ttnpb.Collaborators{}
 		for member, rights := range memberRights {
 			collaborators.Collaborators = append(collaborators.Collaborators, &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *member,
-				Rights:                        rights.GetRights(),
+				Ids:    member,
+				Rights: rights.GetRights(),
 			})
 		}
 		return nil

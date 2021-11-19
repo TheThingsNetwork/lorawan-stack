@@ -90,6 +90,9 @@ func (s *clientStore) FindClients(ctx context.Context, ids []*ttnpb.ClientIdenti
 		countTotal(ctx, query.Model(Client{}))
 		query = query.Limit(limit).Offset(offset)
 	}
+	if onlyExpired, expireThreshold := expiredFromContext(ctx); onlyExpired {
+		query = query.Scopes(withExpiredEntities(expireThreshold))
+	}
 	var cliModels []Client
 	query = query.Find(&cliModels)
 	setTotal(ctx, uint64(len(cliModels)))

@@ -203,6 +203,7 @@ export default {
     create: tts.Applications.Devices.create.bind(tts.Applications.Devices),
     bulkCreate: tts.Applications.Devices.bulkCreate.bind(tts.Applications.Devices),
     update: tts.Applications.Devices.updateById.bind(tts.Applications.Devices),
+    reset: tts.Applications.Devices.resetById.bind(tts.Applications.Devices),
     eventsSubscribe: tts.Applications.Devices.openStream.bind(tts.Applications.Devices),
     delete: tts.Applications.Devices.deleteById.bind(tts.Applications.Devices),
     simulateUplink: tts.Applications.Devices.simulateUplink.bind(tts.Applications.Devices),
@@ -271,15 +272,12 @@ export default {
     getInfo: tts.PacketBrokerAgent.getInfo.bind(tts.PacketBrokerAgent),
     register: tts.PacketBrokerAgent.register.bind(tts.PacketBrokerAgent),
     deregister: tts.PacketBrokerAgent.deregister.bind(tts.PacketBrokerAgent),
-    getHomeNetworkDefaultRoutingPolicy: tts.PacketBrokerAgent.getHomeNetworkDefaultRoutingPolicy.bind(
-      tts.PacketBrokerAgent,
-    ),
-    setHomeNetworkDefaultRoutingPolicy: tts.PacketBrokerAgent.setHomeNetworkDefaultRoutingPolicy.bind(
-      tts.PacketBrokerAgent,
-    ),
-    deleteHomeNetworkDefaultRoutingPolicy: tts.PacketBrokerAgent.deleteHomeNetworkDefaultRoutingPolicy.bind(
-      tts.PacketBrokerAgent,
-    ),
+    getHomeNetworkDefaultRoutingPolicy:
+      tts.PacketBrokerAgent.getHomeNetworkDefaultRoutingPolicy.bind(tts.PacketBrokerAgent),
+    setHomeNetworkDefaultRoutingPolicy:
+      tts.PacketBrokerAgent.setHomeNetworkDefaultRoutingPolicy.bind(tts.PacketBrokerAgent),
+    deleteHomeNetworkDefaultRoutingPolicy:
+      tts.PacketBrokerAgent.deleteHomeNetworkDefaultRoutingPolicy.bind(tts.PacketBrokerAgent),
     getHomeNetworkRoutingPolicy: tts.PacketBrokerAgent.getHomeNetworkRoutingPolicy.bind(
       tts.PacketBrokerAgent,
     ),

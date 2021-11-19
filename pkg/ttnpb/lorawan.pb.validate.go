@@ -1545,15 +1545,6 @@ func (m *TxSettings) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "data_rate_index":
-
-			if _, ok := DataRateIndex_name[int32(m.GetDataRateIndex())]; !ok {
-				return TxSettingsValidationError{
-					field:  "data_rate_index",
-					reason: "value must be one of the defined enum values",
-				}
-			}
-
 		case "coding_rate":
 			// no validation rules for CodingRate
 		case "frequency":
@@ -1667,7 +1658,14 @@ func (m *GatewayAntennaIdentifiers) ValidateFields(paths ...string) error {
 		switch name {
 		case "gateway_ids":
 
-			if v, ok := interface{}(&m.GatewayIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetGatewayIds() == nil {
+				return GatewayAntennaIdentifiersValidationError{
+					field:  "gateway_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetGatewayIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GatewayAntennaIdentifiersValidationError{
 						field:  "gateway_ids",
@@ -1763,7 +1761,14 @@ func (m *UplinkToken) ValidateFields(paths ...string) error {
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.GatewayAntennaIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetIds() == nil {
+				return UplinkTokenValidationError{
+					field:  "ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UplinkTokenValidationError{
 						field:  "ids",
@@ -1777,7 +1782,7 @@ func (m *UplinkToken) ValidateFields(paths ...string) error {
 			// no validation rules for Timestamp
 		case "server_time":
 
-			if v, ok := interface{}(&m.ServerTime).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetServerTime()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UplinkTokenValidationError{
 						field:  "server_time",
@@ -1789,6 +1794,18 @@ func (m *UplinkToken) ValidateFields(paths ...string) error {
 
 		case "concentrator_time":
 			// no validation rules for ConcentratorTime
+		case "gateway_time":
+
+			if v, ok := interface{}(m.GetGatewayTime()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UplinkTokenValidationError{
+						field:  "gateway_time",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return UplinkTokenValidationError{
 				field:  name,
@@ -2026,15 +2043,6 @@ func (m *TxRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "rx1_data_rate_index":
-
-			if _, ok := DataRateIndex_name[int32(m.GetRx1DataRateIndex())]; !ok {
-				return TxRequestValidationError{
-					field:  "rx1_data_rate_index",
-					reason: "value must be one of the defined enum values",
-				}
-			}
-
 		case "rx1_frequency":
 			// no validation rules for Rx1Frequency
 		case "rx2_data_rate":
@@ -2046,15 +2054,6 @@ func (m *TxRequest) ValidateFields(paths ...string) error {
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
-				}
-			}
-
-		case "rx2_data_rate_index":
-
-			if _, ok := DataRateIndex_name[int32(m.GetRx2DataRateIndex())]; !ok {
-				return TxRequestValidationError{
-					field:  "rx2_data_rate_index",
-					reason: "value must be one of the defined enum values",
 				}
 			}
 
@@ -2087,15 +2086,6 @@ func (m *TxRequest) ValidateFields(paths ...string) error {
 				return TxRequestValidationError{
 					field:  "frequency_plan_id",
 					reason: "value length must be at most 64 runes",
-				}
-			}
-
-		case "lorawan_phy_version":
-
-			if _, ok := PHYVersion_name[int32(m.GetLorawanPhyVersion())]; !ok {
-				return TxRequestValidationError{
-					field:  "lorawan_phy_version",
-					reason: "value must be one of the defined enum values",
 				}
 			}
 

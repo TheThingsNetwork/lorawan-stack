@@ -1437,18 +1437,6 @@
               "defaultValue": ""
             },
             {
-              "name": "tls",
-              "description": "Enable TLS for linking to the external Network Server.\nFor cluster-local Network Servers, the cluster's TLS setting is used.",
-              "label": "",
-              "type": "bool",
-              "longType": "bool",
-              "fullType": "bool",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
               "name": "skip_payload_crypto",
               "description": "Skip decryption of uplink payloads and encryption of downlink payloads.\nLeave empty for the using the Application Server's default setting.",
               "label": "",
@@ -13605,15 +13593,7 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
-              }
+              "defaultValue": ""
             },
             {
               "name": "field_mask",
@@ -16308,6 +16288,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "names",
+              "description": "If provided, this will filter events, so that only events with the given names are returned.\nNames can be provided as either exact event names (e.g. 'gs.up.receive'),\nor as regular expressions (e.g. '/^gs\\..+/').",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         }
@@ -17563,7 +17555,7 @@
             },
             {
               "name": "downlink_utilization_limit",
-              "description": "",
+              "description": "Duty-cycle limit of the sub-band as a fraction of time.",
               "label": "",
               "type": "float",
               "longType": "float",
@@ -17575,7 +17567,7 @@
             },
             {
               "name": "downlink_utilization",
-              "description": "",
+              "description": "Utilization rate of the available duty-cycle. This value should not exceed downlink_utilization_limit.",
               "label": "",
               "type": "float",
               "longType": "float",
@@ -27184,26 +27176,6 @@
               "defaultValue": ""
             },
             {
-              "name": "rx1_data_rate_index",
-              "description": "LoRaWAN data rate index for Rx1.\nDEPRECATED: Use rx1_data_rate instead.",
-              "label": "",
-              "type": "DataRateIndex",
-              "longType": "DataRateIndex",
-              "fullType": "ttn.lorawan.v3.DataRateIndex",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
               "name": "rx1_frequency",
               "description": "Frequency (Hz) for Rx1.",
               "label": "",
@@ -27226,26 +27198,6 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
-            },
-            {
-              "name": "rx2_data_rate_index",
-              "description": "LoRaWAN data rate index for Rx2.\nDEPRECATED: Use rx2_data_rate instead.",
-              "label": "",
-              "type": "DataRateIndex",
-              "longType": "DataRateIndex",
-              "fullType": "ttn.lorawan.v3.DataRateIndex",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
-                    "value": true
-                  }
-                ]
-              }
             },
             {
               "name": "rx2_frequency",
@@ -27312,26 +27264,6 @@
               }
             },
             {
-              "name": "lorawan_phy_version",
-              "description": "The regional parameters version used to interpret the data rate indices in this message.",
-              "label": "",
-              "type": "PHYVersion",
-              "longType": "PHYVersion",
-              "fullType": "ttn.lorawan.v3.PHYVersion",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
               "name": "advanced",
               "description": "Advanced metadata fields\n- can be used for advanced information or experimental features that are not yet formally defined in the API\n- field names are written in snake_case",
               "label": "",
@@ -27370,26 +27302,6 @@
                 "validate.rules": [
                   {
                     "name": "message.required",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
-              "name": "data_rate_index",
-              "description": "LoRaWAN data rate index.",
-              "label": "",
-              "type": "DataRateIndex",
-              "longType": "DataRateIndex",
-              "fullType": "ttn.lorawan.v3.DataRateIndex",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "enum.defined_only",
                     "value": true
                   }
                 ]
@@ -27582,358 +27494,23 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "gateway_time",
+              "description": "Absolute time observed by the gateway when the uplink has been received.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         }
       ],
       "services": []
-    },
-    {
-      "name": "lorawan-stack/api/message_services.proto",
-      "description": "",
-      "package": "ttn.lorawan.v3",
-      "hasEnums": false,
-      "hasExtensions": false,
-      "hasMessages": true,
-      "hasServices": true,
-      "enums": [],
-      "extensions": [],
-      "messages": [
-        {
-          "name": "DecodeDownlinkMessageRequest",
-          "longName": "DecodeDownlinkMessageRequest",
-          "fullName": "ttn.lorawan.v3.DecodeDownlinkMessageRequest",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "ids",
-              "description": "",
-              "label": "",
-              "type": "EndDeviceIdentifiers",
-              "longType": "EndDeviceIdentifiers",
-              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
-              "name": "end_device_version_ids",
-              "description": "",
-              "label": "",
-              "type": "EndDeviceVersionIdentifiers",
-              "longType": "EndDeviceVersionIdentifiers",
-              "fullType": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
-              "name": "message",
-              "description": "",
-              "label": "",
-              "type": "ApplicationDownlink",
-              "longType": "ApplicationDownlink",
-              "fullType": "ttn.lorawan.v3.ApplicationDownlink",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
-              "name": "formatter",
-              "description": "",
-              "label": "",
-              "type": "PayloadFormatter",
-              "longType": "PayloadFormatter",
-              "fullType": "ttn.lorawan.v3.PayloadFormatter",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "parameter",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "DecodeUplinkMessageRequest",
-          "longName": "DecodeUplinkMessageRequest",
-          "fullName": "ttn.lorawan.v3.DecodeUplinkMessageRequest",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "ids",
-              "description": "",
-              "label": "",
-              "type": "EndDeviceIdentifiers",
-              "longType": "EndDeviceIdentifiers",
-              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
-              "name": "end_device_version_ids",
-              "description": "",
-              "label": "",
-              "type": "EndDeviceVersionIdentifiers",
-              "longType": "EndDeviceVersionIdentifiers",
-              "fullType": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
-              "name": "message",
-              "description": "",
-              "label": "",
-              "type": "ApplicationUplink",
-              "longType": "ApplicationUplink",
-              "fullType": "ttn.lorawan.v3.ApplicationUplink",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
-              "name": "formatter",
-              "description": "",
-              "label": "",
-              "type": "PayloadFormatter",
-              "longType": "PayloadFormatter",
-              "fullType": "ttn.lorawan.v3.PayloadFormatter",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "parameter",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "EncodeDownlinkMessageRequest",
-          "longName": "EncodeDownlinkMessageRequest",
-          "fullName": "ttn.lorawan.v3.EncodeDownlinkMessageRequest",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "ids",
-              "description": "",
-              "label": "",
-              "type": "EndDeviceIdentifiers",
-              "longType": "EndDeviceIdentifiers",
-              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
-              "name": "end_device_version_ids",
-              "description": "",
-              "label": "",
-              "type": "EndDeviceVersionIdentifiers",
-              "longType": "EndDeviceVersionIdentifiers",
-              "fullType": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
-              "name": "message",
-              "description": "",
-              "label": "",
-              "type": "ApplicationDownlink",
-              "longType": "ApplicationDownlink",
-              "fullType": "ttn.lorawan.v3.ApplicationDownlink",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "message.required",
-                    "value": true
-                  }
-                ]
-              }
-            },
-            {
-              "name": "formatter",
-              "description": "",
-              "label": "",
-              "type": "PayloadFormatter",
-              "longType": "PayloadFormatter",
-              "fullType": "ttn.lorawan.v3.PayloadFormatter",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "parameter",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        }
-      ],
-      "services": [
-        {
-          "name": "MessageProcessor",
-          "longName": "MessageProcessor",
-          "fullName": "ttn.lorawan.v3.MessageProcessor",
-          "description": "Encodes and decodes uplink messages.",
-          "methods": [
-            {
-              "name": "EncodeDownlink",
-              "description": "",
-              "requestType": "EncodeDownlinkMessageRequest",
-              "requestLongType": "EncodeDownlinkMessageRequest",
-              "requestFullType": "ttn.lorawan.v3.EncodeDownlinkMessageRequest",
-              "requestStreaming": false,
-              "responseType": "ApplicationDownlink",
-              "responseLongType": "ApplicationDownlink",
-              "responseFullType": "ttn.lorawan.v3.ApplicationDownlink",
-              "responseStreaming": false
-            },
-            {
-              "name": "DecodeUplink",
-              "description": "",
-              "requestType": "DecodeUplinkMessageRequest",
-              "requestLongType": "DecodeUplinkMessageRequest",
-              "requestFullType": "ttn.lorawan.v3.DecodeUplinkMessageRequest",
-              "requestStreaming": false,
-              "responseType": "ApplicationUplink",
-              "responseLongType": "ApplicationUplink",
-              "responseFullType": "ttn.lorawan.v3.ApplicationUplink",
-              "responseStreaming": false
-            },
-            {
-              "name": "DecodeDownlink",
-              "description": "",
-              "requestType": "DecodeDownlinkMessageRequest",
-              "requestLongType": "DecodeDownlinkMessageRequest",
-              "requestFullType": "ttn.lorawan.v3.DecodeDownlinkMessageRequest",
-              "requestStreaming": false,
-              "responseType": "ApplicationDownlink",
-              "responseLongType": "ApplicationDownlink",
-              "responseFullType": "ttn.lorawan.v3.ApplicationDownlink",
-              "responseStreaming": false
-            }
-          ]
-        }
-      ]
     },
     {
       "name": "lorawan-stack/api/messages.proto",

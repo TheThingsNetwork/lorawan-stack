@@ -264,11 +264,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 				fallbackFreqPlanID: conf.BasicStation.FallbackFrequencyPlanID,
 				listen:             conf.BasicStation.Listen,
 				listenTLS:          conf.BasicStation.ListenTLS,
-				frontend: ws.Config{
-					UseTrafficTLSAddress: conf.BasicStation.UseTrafficTLSAddress,
-					WSPingInterval:       conf.BasicStation.WSPingInterval,
-					AllowUnauthenticated: conf.BasicStation.AllowUnauthenticated,
-				},
+				frontend:           conf.BasicStation.Config,
 			},
 		},
 	} {
@@ -377,7 +373,7 @@ func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.Gatew
 	}
 	if ids.GatewayId == "" {
 		extIDs, err := gs.entityRegistry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-			Eui: *ids.Eui,
+			Eui: ids.Eui,
 		})
 		if err == nil {
 			ids = *extIDs
@@ -512,13 +508,9 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	logger.Info("Connected")
 
 	gs.startDisconnectOnChangeTask(connEntry)
-	go gs.handleUpstream(connEntry)
-	if gs.statsRegistry != nil {
-		go gs.updateConnStats(connEntry)
-	}
-	if gtw.UpdateLocationFromStatus {
-		go gs.handleLocationUpdates(connEntry)
-	}
+	gs.startHandleUpstreamTask(connEntry)
+	gs.startUpdateConnStatsTask(connEntry)
+	gs.startHandleLocationUpdatesTask(connEntry)
 
 	for name, handler := range gs.upstreamHandlers {
 		connCtx := log.NewContextWithField(conn.Context(), "upstream_handler", name)
@@ -547,14 +539,7 @@ func (gs *GatewayServer) GetConnection(ctx context.Context, ids ttnpb.GatewayIde
 }
 
 func requireDisconnect(connected, current *ttnpb.Gateway) bool {
-	fromPtrArray := func(in []*ttnpb.GatewayAntenna) []ttnpb.GatewayAntenna {
-		ret := make([]ttnpb.GatewayAntenna, len(in))
-		for _, a := range in {
-			ret = append(ret, *a)
-		}
-		return ret
-	}
-	if !sameAntennaLocations(fromPtrArray(connected.GetAntennas()), fromPtrArray(current.GetAntennas())) {
+	if !sameAntennaLocations(connected.GetAntennas(), current.GetAntennas()) {
 		// Gateway Server may update the location from status messages. If the locations aren't the same, but if the new
 		// location is a GPS location, do not disconnect the gateway. This is to avoid that updating the location from a
 		// gateway status message results in disconnecting the gateway.
@@ -635,6 +620,57 @@ func (gs *GatewayServer) startDisconnectOnChangeTask(conn connectionEntry) {
 	})
 }
 
+func (gs *GatewayServer) startHandleUpstreamTask(conn connectionEntry) {
+	conn.tasksDone.Add(1)
+	gs.StartTask(&component.TaskConfig{
+		Context: conn.Context(),
+		ID:      fmt.Sprintf("handle_upstream_%s", unique.ID(conn.Context(), conn.Gateway().GetIds())),
+		Func: func(ctx context.Context) error {
+			gs.handleUpstream(ctx, conn)
+			return nil
+		},
+		Done:    conn.tasksDone.Done,
+		Restart: component.TaskRestartNever,
+		Backoff: component.DialTaskBackoffConfig,
+	})
+}
+
+func (gs *GatewayServer) startUpdateConnStatsTask(conn connectionEntry) {
+	if gs.statsRegistry == nil {
+		return
+	}
+	conn.tasksDone.Add(1)
+	gs.StartTask(&component.TaskConfig{
+		Context: conn.Context(),
+		ID:      fmt.Sprintf("update_connection_stats_%s", unique.ID(conn.Context(), conn.Gateway().GetIds())),
+		Func: func(ctx context.Context) error {
+			gs.updateConnStats(ctx, conn)
+			return nil
+		},
+		Done:    conn.tasksDone.Done,
+		Restart: component.TaskRestartNever,
+		Backoff: component.DialTaskBackoffConfig,
+	})
+}
+
+func (gs *GatewayServer) startHandleLocationUpdatesTask(conn connectionEntry) {
+	if !conn.Gateway().GetUpdateLocationFromStatus() {
+		return
+	}
+	conn.tasksDone.Add(1)
+	gs.StartTask(&component.TaskConfig{
+		Context: conn.Context(),
+		ID:      fmt.Sprintf("handle_location_updates_%s", unique.ID(conn.Context(), conn.Gateway().GetIds())),
+		Func: func(ctx context.Context) error {
+			gs.handleLocationUpdates(ctx, conn)
+			return nil
+		},
+		Done:    conn.tasksDone.Done,
+		Restart: component.TaskRestartNever,
+		Backoff: component.DialTaskBackoffConfig,
+	})
+}
+
 var errHostHandle = errors.Define("host_handle", "host `{host}` failed to handle message")
 
 type upstreamHost struct {
@@ -658,7 +694,7 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 		}
 		msg.CorrelationIds = append(make([]string, 0, len(msg.CorrelationIds)+1), msg.CorrelationIds...)
 		msg.CorrelationIds = append(msg.CorrelationIds, host.correlationID)
-		drop := func(ids ttnpb.EndDeviceIdentifiers, err error) {
+		drop := func(ids *ttnpb.EndDeviceIdentifiers, err error) {
 			logger := logger.WithError(err)
 			if ids.JoinEui != nil {
 				logger = logger.WithField("join_eui", *ids.JoinEui)
@@ -670,13 +706,9 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 				logger = logger.WithField("dev_addr", *ids.DevAddr)
 			}
 			logger.Debug("Drop message")
-			registerDropUplink(ctx, gtw, msg.UplinkMessage, host.name, err)
+			registerDropUplink(ctx, gtw, msg, host.name, err)
 		}
-		ids, err := lorawan.GetUplinkMessageIdentifiers(msg.RawPayload)
-		if err != nil {
-			drop(ttnpb.EndDeviceIdentifiers{}, err)
-			break
-		}
+		ids := msg.Payload.EndDeviceIdentifiers()
 		var pass bool
 		switch {
 		case ids.DevAddr != nil:
@@ -708,14 +740,15 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 		}
 	case *ttnpb.TxAcknowledgment:
 		if err := host.handler.HandleTxAck(ctx, *gtw.Ids, msg); err != nil {
-			logger.WithField("host", host.name).WithError(err).Debug("Drop Tx acknowledgment")
+			registerDropTxAck(ctx, gtw, msg, host.name, err)
+		} else {
+			registerForwardTxAck(ctx, gtw, msg, host.name)
 		}
 	}
 }
 
-func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
+func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntry) {
 	var (
-		ctx      = conn.Context()
 		gtw      = conn.Gateway()
 		protocol = conn.Frontend().Protocol()
 		logger   = log.FromContext(ctx)
@@ -764,11 +797,10 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
 			msg.CorrelationIds = append(msg.CorrelationIds, events.CorrelationIDsFromContext(ctx)...)
 			if msg.Payload == nil {
-				pld := &ttnpb.Message{}
-				if err := lorawan.UnmarshalMessage(msg.RawPayload, pld); err != nil {
-					log.FromContext(ctx).WithError(err).Debug("Failed to decode message payload")
-				} else {
-					msg.Payload = pld
+				msg.Payload = &ttnpb.Message{}
+				if err := lorawan.UnmarshalMessage(msg.RawPayload, msg.Payload); err != nil {
+					registerDropUplink(ctx, gtw, msg, "validation", err)
+					continue
 				}
 			}
 			val = msg
@@ -788,6 +820,7 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 				registerFailDownlink(ctx, gtw, msg, protocol)
 			}
 			val = msg
+			registerReceiveTxAck(ctx, gtw, msg, protocol)
 		}
 		for _, host := range hosts {
 			err := host.pool.Publish(ctx, val)
@@ -796,17 +829,20 @@ func (gs *GatewayServer) handleUpstream(conn connectionEntry) {
 			}
 			logger.WithField("name", host.name).WithError(err).Warn("Upstream handler publish failed")
 			switch msg := val.(type) {
-			case *ttnpb.UplinkMessage:
-				registerFailUplink(ctx, gtw, msg, host.name)
+			case *ttnpb.GatewayUplinkMessage:
+				registerDropUplink(ctx, gtw, msg, host.name, err)
 			case *ttnpb.GatewayStatus:
-				registerFailStatus(ctx, gtw, msg, host.name)
+				registerDropStatus(ctx, gtw, msg, host.name, err)
+			case *ttnpb.TxAcknowledgment:
+				registerDropTxAck(ctx, gtw, msg, host.name, err)
+			default:
+				panic("unreachable")
 			}
 		}
 	}
 }
 
-func (gs *GatewayServer) updateConnStats(conn connectionEntry) {
-	ctx := conn.Context()
+func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEntry) {
 	decoupledCtx := gs.FromRequestContext(ctx)
 	logger := log.FromContext(ctx)
 
@@ -857,28 +893,28 @@ func sameLocation(a, b ttnpb.Location) bool {
 		math.Abs(a.Longitude-b.Longitude) <= allowedLocationDelta
 }
 
-func sameAntennaLocations(a, b []ttnpb.GatewayAntenna) bool {
+func sameAntennaLocations(a, b []*ttnpb.GatewayAntenna) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	for _, a := range a {
-		for _, b := range b {
-			if a.Location != nil && b.Location != nil && !sameLocation(*a.Location, *b.Location) {
-				return false
-			}
-			if (a.Location == nil) != (b.Location == nil) {
-				return false
-			}
+	for i := range a {
+		a, b := a[i], b[i]
+		if a.Location != nil && b.Location != nil && !sameLocation(*a.Location, *b.Location) {
+			return false
+		}
+		if (a.Location == nil) != (b.Location == nil) {
+			return false
 		}
 	}
 	return true
 }
 
-func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
+var statusLocationFields = ttnpb.ExcludeFields(ttnpb.LocationFieldPathsNested, "source")
+
+func (gs *GatewayServer) handleLocationUpdates(ctx context.Context, conn connectionEntry) {
 	var (
-		ctx          = conn.Context()
 		gtw          = conn.Gateway()
-		lastAntennas []ttnpb.GatewayAntenna
+		lastAntennas []*ttnpb.GatewayAntenna
 	)
 
 	for {
@@ -895,15 +931,29 @@ func (gs *GatewayServer) handleLocationUpdates(conn connectionEntry) {
 				if cs := len(status.AntennaLocations); cs > c {
 					c = cs
 				}
-				antennas := make([]ttnpb.GatewayAntenna, c)
-				for i, ant := range gtwAntennas {
-					antennas[i].Gain = ant.Gain
-				}
+				antennas := make([]*ttnpb.GatewayAntenna, c)
 				for i := range antennas {
+					antennas[i] = &ttnpb.GatewayAntenna{}
+
+					if i < len(gtwAntennas) {
+						if err := antennas[i].SetFields(
+							gtwAntennas[i],
+							ttnpb.GatewayAntennaFieldPathsNested...,
+						); err != nil {
+							log.FromContext(ctx).WithError(err).Warn("Failed to clone antenna")
+						}
+					}
+
 					if i < len(status.AntennaLocations) && status.AntennaLocations[i] != nil {
-						loc := *status.AntennaLocations[i]
-						loc.Source = ttnpb.SOURCE_GPS
-						antennas[i].Location = &loc
+						antennas[i].Location = &ttnpb.Location{
+							Source: ttnpb.SOURCE_GPS,
+						}
+						if err := antennas[i].Location.SetFields(
+							status.AntennaLocations[i],
+							statusLocationFields...,
+						); err != nil {
+							log.FromContext(ctx).WithError(err).Warn("Failed to clone antenna location")
+						}
 					}
 				}
 				if lastAntennas != nil && sameAntennaLocations(lastAntennas, antennas) {

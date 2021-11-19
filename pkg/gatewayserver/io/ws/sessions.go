@@ -25,7 +25,7 @@ var sessionKey sessionKeyType
 
 // Session contains the session state for a single gateway.
 type Session struct {
-	DataMu sync.Mutex
+	DataMu sync.RWMutex
 	Data   interface{}
 }
 

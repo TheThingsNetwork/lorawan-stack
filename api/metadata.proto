@@ -39,7 +39,7 @@ option (gogoproto.stringer_all) = true;
 // Contains metadata for a received message. Each antenna that receives
 // a message corresponds to one RxMetadata.
 message RxMetadata {
-  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  GatewayIdentifiers gateway_ids = 1 [(validate.rules).message.required = true];
   PacketBrokerMetadata packet_broker = 18;
 
   uint32 antenna_index = 2;
@@ -147,7 +147,7 @@ message PacketBrokerMetadata {
 
 message PacketBrokerRouteHop {
   // Time when the service received the message.
-  google.protobuf.Timestamp received_at = 1 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp received_at = 1 [ (gogoproto.stdtime) = true];
   // Sender of the message, typically the authorized client identifier.
   string sender_name = 2;
   // Sender IP address or host name.

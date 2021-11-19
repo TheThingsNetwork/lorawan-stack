@@ -305,8 +305,7 @@ message TxSettings {
 
   // Data rate.
   DataRate data_rate = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
-  // LoRaWAN data rate index.
-  DataRateIndex data_rate_index = 2 [(validate.rules).enum.defined_only = true];
+  reserved 2; // data_rate_index
   // LoRa coding rate.
   string coding_rate = 3;
   // Frequency (Hz).
@@ -324,17 +323,19 @@ message TxSettings {
 }
 
 message GatewayAntennaIdentifiers {
-  GatewayIdentifiers gateway_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  GatewayIdentifiers gateway_ids = 1 [(validate.rules).message.required = true];
   uint32 antenna_index = 2;
 }
 
 message UplinkToken {
-  GatewayAntennaIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  GatewayAntennaIdentifiers ids = 1 [(validate.rules).message.required = true];
   uint32 timestamp = 2;
   // Absolute time observed by the server when the uplink message has been received.
-  google.protobuf.Timestamp server_time = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp server_time = 3 [(gogoproto.stdtime) = true];
   // Absolute concentrator time as observed by the Gateway Server, accounting for rollovers.
   int64 concentrator_time = 4;
+  // Absolute time observed by the gateway when the uplink has been received.
+  google.protobuf.Timestamp gateway_time = 5 [(gogoproto.stdtime) = true];
 }
 
 message DownlinkPath {
@@ -363,16 +364,12 @@ message TxRequest {
   RxDelay rx1_delay = 3 [(validate.rules).enum.defined_only = true];
   // LoRaWAN data rate for Rx1.
   DataRate rx1_data_rate = 12;
-  // LoRaWAN data rate index for Rx1.
-  // DEPRECATED: Use rx1_data_rate instead.
-  DataRateIndex rx1_data_rate_index = 4 [(validate.rules).enum.defined_only = true];
+  reserved 4; // rx1_data_rate_index
   // Frequency (Hz) for Rx1.
   uint64 rx1_frequency = 5;
   // LoRaWAN data rate for Rx2.
   DataRate rx2_data_rate = 13;
-  // LoRaWAN data rate index for Rx2.
-  // DEPRECATED: Use rx2_data_rate instead.
-  DataRateIndex rx2_data_rate_index = 6 [(validate.rules).enum.defined_only = true];
+  reserved 6; // rx2_data_rate_index
   // Frequency (Hz) for Rx2.
   uint64 rx2_frequency = 7;
   // Priority for scheduling.
@@ -388,9 +385,7 @@ message TxRequest {
 
   // Frequency plan ID from which the frequencies in this message are retrieved.
   string frequency_plan_id = 10 [(validate.rules).string.max_len = 64];
-
-  // The regional parameters version used to interpret the data rate indices in this message.
-  PHYVersion lorawan_phy_version = 11 [(validate.rules).enum.defined_only = true];
+  reserved 11; // lorawan_phy_version
 
   // Advanced metadata fields
   // - can be used for advanced information or experimental features that are not yet formally defined in the API

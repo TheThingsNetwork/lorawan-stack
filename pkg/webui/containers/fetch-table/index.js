@@ -15,7 +15,6 @@
 import React, { Component } from 'react'
 import { defineMessages } from 'react-intl'
 import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
 
@@ -110,6 +109,7 @@ class FetchTable extends Component {
     mayAdd: PropTypes.bool,
     pageSize: PropTypes.number,
     pathname: PropTypes.string.isRequired,
+    rowKeySelector: PropTypes.func,
     searchItemsAction: PropTypes.func,
     searchPlaceholderMessage: PropTypes.message,
     searchQueryMaxLength: PropTypes.number,
@@ -141,6 +141,7 @@ class FetchTable extends Component {
     totalCount: 0,
     items: [],
     headers: [],
+    rowKeySelector: undefined,
     fetchingSearch: false,
     addMessage: undefined,
     tableTitle: undefined,
@@ -261,35 +262,19 @@ class FetchTable extends Component {
   }
 
   @bind
-  onItemClick(index) {
-    const {
-      dispatch,
-      pathname,
-      items,
-      entity,
-      itemPathPrefix,
-      getItemPathPrefix,
-      handlesPagination,
-      pageSize,
-    } = this.props
-    const { page } = this.state
-
-    let itemIndex = index
-    if (handlesPagination) {
-      const pageNr = page - 1 // Switch to 0-based pagination.
-      itemIndex += pageSize * pageNr
-    }
+  rowHrefSelector(item) {
+    const { pathname, entity, itemPathPrefix, getItemPathPrefix } = this.props
 
     const entitySingle = entity.substr(0, entity.length - 1)
     let entityPath
     if (Boolean(getItemPathPrefix)) {
-      entityPath = getItemPathPrefix(items[itemIndex])
+      entityPath = getItemPathPrefix(item)
     } else {
-      const item_id = items[itemIndex].id || items[itemIndex].ids[`${entitySingle}_id`]
+      const item_id = item.id || item.ids[`${entitySingle}_id`]
       entityPath = `${itemPathPrefix}/${item_id}`
     }
 
-    dispatch(push(`${pathname}${entityPath}`))
+    return `${pathname}${entityPath}`
   }
 
   render() {
@@ -303,6 +288,7 @@ class FetchTable extends Component {
       addMessage,
       tableTitle,
       headers,
+      rowKeySelector,
       tabs,
       searchable,
       handlesPagination,
@@ -389,10 +375,11 @@ class FetchTable extends Component {
             page={page}
             totalCount={totalCount}
             pageSize={pageSize}
-            onRowClick={this.onItemClick}
             onPageChange={this.onPageChange}
             loading={fetching}
             headers={headers}
+            rowKeySelector={rowKeySelector}
+            rowHrefSelector={this.rowHrefSelector}
             data={initialFetch ? [] : items}
             emptyMessage={sharedMessages.noMatch}
             handlesPagination={handlesPagination}

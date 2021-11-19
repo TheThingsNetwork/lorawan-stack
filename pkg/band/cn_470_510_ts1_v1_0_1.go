@@ -16,6 +16,7 @@ package band
 
 import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
+// CN_470_510_TS1_v1_0_1 is the band definition for CN470-510 in the TS1 v1.0.1 specification.
 var CN_470_510_TS1_v1_0_1 = Band{
 	ID: CN_470_510,
 

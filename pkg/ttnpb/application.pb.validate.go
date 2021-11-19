@@ -71,7 +71,7 @@ func (m *Application) ValidateFields(paths ...string) error {
 
 		case "created_at":
 
-			if v, ok := interface{}(&m.CreatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCreatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationValidationError{
 						field:  "created_at",
@@ -83,7 +83,7 @@ func (m *Application) ValidateFields(paths ...string) error {
 
 		case "updated_at":
 
-			if v, ok := interface{}(&m.UpdatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetUpdatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationValidationError{
 						field:  "updated_at",
@@ -695,7 +695,14 @@ func (m *CreateApplicationRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application":
 
-			if v, ok := interface{}(&m.Application).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetApplication() == nil {
+				return CreateApplicationRequestValidationError{
+					field:  "application",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApplication()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return CreateApplicationRequestValidationError{
 						field:  "application",
@@ -801,7 +808,14 @@ func (m *UpdateApplicationRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application":
 
-			if v, ok := interface{}(&m.Application).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetApplication() == nil {
+				return UpdateApplicationRequestValidationError{
+					field:  "application",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApplication()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UpdateApplicationRequestValidationError{
 						field:  "application",
@@ -1298,7 +1312,14 @@ func (m *UpdateApplicationAPIKeyRequest) ValidateFields(paths ...string) error {
 
 		case "api_key":
 
-			if v, ok := interface{}(&m.APIKey).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetApiKey() == nil {
+				return UpdateApplicationAPIKeyRequestValidationError{
+					field:  "api_key",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApiKey()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UpdateApplicationAPIKeyRequestValidationError{
 						field:  "api_key",

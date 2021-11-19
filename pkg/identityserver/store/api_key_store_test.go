@@ -100,8 +100,8 @@ func TestAPIKeyStore(t *testing.T) {
 					a.So(created.Key, should.Equal, key.Key)
 					a.So(created.Name, should.Equal, key.Name)
 					a.So(created.Rights, should.Resemble, key.Rights)
-					a.So(created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
-					a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+					a.So(*created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+					a.So(*created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
 				}
 
 				keys, err := store.FindAPIKeys(ctx, tt.Identifiers)

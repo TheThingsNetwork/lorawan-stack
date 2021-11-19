@@ -55,22 +55,26 @@ func TestIntegrate(t *testing.T) {
 	}
 
 	// ps1 is added to the pubsub registry, app2 will be integrated at runtime.
-	ps1 := ttnpb.ApplicationPubSubIdentifiers{
-		ApplicationIdentifiers: registeredApplicationID,
-		PubSubId:               "ps1",
+	ps1 := &ttnpb.ApplicationPubSubIdentifiers{
+		ApplicationIds: &registeredApplicationID,
+		PubSubId:       "ps1",
 	}
-	ps2 := ttnpb.ApplicationPubSubIdentifiers{
-		ApplicationIdentifiers: registeredApplicationID,
-		PubSubId:               "ps2",
+	ps2 := &ttnpb.ApplicationPubSubIdentifiers{
+		ApplicationIds: &registeredApplicationID,
+		PubSubId:       "ps2",
 	}
 	redisClient, flush := test.NewRedis(ctx, "applicationserver_test")
 	defer flush()
 	defer redisClient.Close()
-	pubsubRegistry := &redis.PubSubRegistry{Redis: redisClient}
+	pubsubRegistry := &redis.PubSubRegistry{Redis: redisClient, LockTTL: test.Delay << 10}
+	if err := pubsubRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
 	_, err = pubsubRegistry.Set(ctx, ps1, paths, func(_ *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
 		return &ttnpb.ApplicationPubSub{
-			ApplicationPubSubIdentifiers: ps1,
-			Format:                       "json",
+			Ids:    ps1,
+			Format: "json",
 			Provider: &ttnpb.ApplicationPubSub_Nats{
 				Nats: &ttnpb.ApplicationPubSub_NATSProvider{
 					ServerUrl: "nats://localhost",
@@ -113,7 +117,7 @@ func TestIntegrate(t *testing.T) {
 	t.Run("AlreadyExisting", func(t *testing.T) {
 		select {
 		case conn := <-mockImpl.OpenConnectionCh:
-			a.So(conn.ApplicationPubSubIdentifiers(), should.Resemble, &ps1)
+			a.So(conn.ApplicationPubSubIdentifiers(), should.Resemble, ps1)
 		case <-time.After(timeout):
 			t.Fatal("Expect integration timeout")
 		}
@@ -127,9 +131,9 @@ func TestIntegrate(t *testing.T) {
 
 	// ps2: expect no integration, set integration, expect integration, delete integration and expect integration to be gone.
 	t.Run("RuntimeCreation", func(t *testing.T) {
-		integration := ttnpb.ApplicationPubSub{
-			ApplicationPubSubIdentifiers: ps2,
-			Format:                       "json",
+		integration := &ttnpb.ApplicationPubSub{
+			Ids:    ps2,
+			Format: "json",
 			Provider: &ttnpb.ApplicationPubSub_Nats{
 				Nats: &ttnpb.ApplicationPubSub_NATSProvider{
 					ServerUrl: "nats://localhost",
@@ -139,7 +143,7 @@ func TestIntegrate(t *testing.T) {
 
 		// Expect no integration.
 		_, err := ps.Get(ctx, &ttnpb.GetApplicationPubSubRequest{
-			ApplicationPubSubIdentifiers: ps2,
+			Ids: ps2,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: paths,
 			},
@@ -150,7 +154,7 @@ func TestIntegrate(t *testing.T) {
 
 		// Set integration, expect integration to establish.
 		_, err = ps.Set(ctx, &ttnpb.SetApplicationPubSubRequest{
-			ApplicationPubSub: integration,
+			Pubsub: integration,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: paths,
 			},
@@ -160,12 +164,12 @@ func TestIntegrate(t *testing.T) {
 		}
 		select {
 		case conn := <-mockImpl.OpenConnectionCh:
-			a.So(conn.ApplicationPubSubIdentifiers(), should.Resemble, &ps2)
+			a.So(conn.ApplicationPubSubIdentifiers(), should.Resemble, ps2)
 		case <-time.After(timeout):
 			t.Fatal("Expect integration timeout")
 		}
 		actual, err := ps.Get(ctx, &ttnpb.GetApplicationPubSubRequest{
-			ApplicationPubSubIdentifiers: ps2,
+			Ids: ps2,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: paths,
 			},
@@ -173,23 +177,23 @@ func TestIntegrate(t *testing.T) {
 		if !a.So(err, should.BeNil) {
 			t.Fatalf("Unexpected error: %v", err)
 		}
-		actual.CreatedAt = time.Time{}
-		actual.UpdatedAt = time.Time{}
-		a.So(*actual, should.Resemble, integration)
+		actual.CreatedAt = nil
+		actual.UpdatedAt = nil
+		a.So(actual, should.Resemble, integration)
 
 		// Delete integration.
-		_, err = ps.Delete(ctx, &ps2, creds)
+		_, err = ps.Delete(ctx, ps2, creds)
 		if !a.So(err, should.BeNil) {
 			t.Fatalf("Unexpected error: %v", err)
 		}
 		select {
 		case conn := <-mockImpl.ShutdownCh:
-			a.So(conn.ApplicationPubSubIdentifiers(), should.Resemble, &ps2)
+			a.So(conn.ApplicationPubSubIdentifiers(), should.Resemble, ps2)
 		case <-time.After(timeout):
 			t.Fatal("Expect integration timeout")
 		}
 		_, err = ps.Get(ctx, &ttnpb.GetApplicationPubSubRequest{
-			ApplicationPubSubIdentifiers: ps2,
+			Ids: ps2,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: paths,
 			},

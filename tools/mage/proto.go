@@ -32,7 +32,7 @@ const (
 	protocOut             = "/out"
 	gogoProtoImage        = "ghcr.io/thethingsindustries/protoc:gen-gogo-1.3.1"
 	jsonProtoImage        = "ghcr.io/thethingsindustries/protoc:3.9.1-gen-go-json-1.1.0"
-	fieldMaskProtoImage   = "thethingsindustries/protoc:3.1.28-dev-tts"
+	fieldMaskProtoImage   = "ghcr.io/thethingsindustries/protoc:3.9.1-gen-fieldmask-0.5.0"
 	grpcGatewayProtoImage = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-1.16.0"
 	swaggerProtoImage     = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-1.16.0"
 	docProtoImage         = "ghcr.io/thethingsindustries/protoc:gen-doc-1.4.1"
@@ -172,7 +172,7 @@ func (p Proto) GoClean(context.Context) error {
 		if err != nil {
 			return err
 		}
-		for _, ext := range []string{".pb.go", ".pb.gw.go", ".pb.fm.go", ".pb.util.go"} {
+		for _, ext := range []string{".pb.go", ".pb.gw.go", ".pb.paths.fm.go", ".pb.setters.fm.go", ".pb.validate.go", ".pb.util.fm.go"} {
 			if strings.HasSuffix(path, ext) {
 				if err := sh.Rm(path); err != nil {
 					return err

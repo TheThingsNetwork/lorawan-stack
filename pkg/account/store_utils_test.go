@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"github.com/gogo/protobuf/types"
+	account_store "go.thethings.network/lorawan-stack/v3/pkg/account/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
@@ -93,4 +94,12 @@ func (s *mockStore) ConsumeLoginToken(ctx context.Context, token string) (*ttnpb
 	s.req.ctx, s.req.token = ctx, token
 	s.calls = append(s.calls, "ConsumeLoginToken")
 	return s.res.loginToken, s.err.loginToken
+}
+
+func (s *mockStore) WithSoftDeleted(ctx context.Context, b bool) context.Context {
+	return ctx
+}
+
+func (s *mockStore) Transact(ctx context.Context, f func(context.Context, account_store.Interface) error) error {
+	return f(ctx, s)
 }

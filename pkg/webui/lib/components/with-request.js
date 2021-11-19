@@ -37,53 +37,55 @@ import Message from './message'
  * wrapped component props.
  * @returns {Function} - An instance of the `withRequest` HOC.
  */
-const withRequest = (
-  mapPropsToRequest,
-  mapPropsToFetching = ({ fetching } = {}) => fetching,
-  mapPropsToError = ({ error } = {}) => error,
-) => Component =>
-  class WithRequest extends React.Component {
-    constructor(props) {
-      super(props)
-      // Avoid render of old content by setting an initial fetching state if
-      // the component is mounted with fetching prop evaluating to false.
-      // This way we can close the "fetching gap" between the initial render
-      // and the next render after the request action has been dispatched.
-      this.state = {
-        initialFetching: mapPropsToFetching(props) === false,
+const withRequest =
+  (
+    mapPropsToRequest,
+    mapPropsToFetching = ({ fetching } = {}) => fetching,
+    mapPropsToError = ({ error } = {}) => error,
+  ) =>
+  Component =>
+    class WithRequest extends React.Component {
+      constructor(props) {
+        super(props)
+        // Avoid render of old content by setting an initial fetching state if
+        // the component is mounted with fetching prop evaluating to false.
+        // This way we can close the "fetching gap" between the initial render
+        // and the next render after the request action has been dispatched.
+        this.state = {
+          initialFetching: mapPropsToFetching(props) === false,
+        }
       }
-    }
-    componentDidMount() {
-      const { initialFetching } = this.state
-      mapPropsToRequest(this.props)
+      componentDidMount() {
+        const { initialFetching } = this.state
+        mapPropsToRequest(this.props)
 
-      if (initialFetching) {
-        this.setState({ initialFetching: false })
-      }
-    }
-
-    componentDidUpdate(prevProps) {
-      const error = mapPropsToError(this.props)
-      const prevError = mapPropsToError(prevProps)
-
-      // Check for errors only after component mounts and makes the request.
-      if (Boolean(error) && prevError !== error) {
-        throw error
-      }
-    }
-
-    render() {
-      const { initialFetching } = this.state
-      if (initialFetching || mapPropsToFetching(this.props)) {
-        return (
-          <Spinner center>
-            <Message content={sharedMessages.fetching} />
-          </Spinner>
-        )
+        if (initialFetching) {
+          this.setState({ initialFetching: false })
+        }
       }
 
-      return <Component {...this.props} />
+      componentDidUpdate(prevProps) {
+        const error = mapPropsToError(this.props)
+        const prevError = mapPropsToError(prevProps)
+
+        // Check for errors only after component mounts and makes the request.
+        if (Boolean(error) && prevError !== error) {
+          throw error
+        }
+      }
+
+      render() {
+        const { initialFetching } = this.state
+        if (initialFetching || mapPropsToFetching(this.props)) {
+          return (
+            <Spinner center>
+              <Message content={sharedMessages.fetching} />
+            </Spinner>
+          )
+        }
+
+        return <Component {...this.props} />
+      }
     }
-  }
 
 export default withRequest

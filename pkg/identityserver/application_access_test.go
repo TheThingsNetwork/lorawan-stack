@@ -72,7 +72,7 @@ func TestApplicationAccessNotFound(t *testing.T) {
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIds: applicationID,
-			APIKey:         apiKey,
+			ApiKey:         &apiKey,
 			FieldMask:      &pbtypes.FieldMask{Paths: []string{"rights", "name"}},
 		}, creds)
 
@@ -94,27 +94,27 @@ func TestApplicationAccessRightsPermissionDenied(t *testing.T) {
 
 		reg := ttnpb.NewApplicationAccessClient(cc)
 
-		APIKeyName := "test-application-api-key-name"
-		APIKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
+		apiKeyName := "test-application-api-key-name"
+		apiKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
 			ApplicationIds: applicationID,
-			Name:           APIKeyName,
+			Name:           apiKeyName,
 			Rights:         []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-		a.So(APIKey, should.BeNil)
+		a.So(apiKey, should.BeNil)
 
 		// Choose right that the user does not have and hence cannot add
 		right := ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC
-		APIKey = applicationAPIKeys(applicationID).ApiKeys[0]
+		apiKey = applicationAPIKeys(applicationID).ApiKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIds: applicationID,
-			APIKey: ttnpb.APIKey{
-				Id:     APIKey.Id,
-				Name:   APIKey.Name,
+			ApiKey: &ttnpb.APIKey{
+				Id:     apiKey.Id,
+				Name:   apiKey.Name,
 				Rights: []ttnpb.Right{right},
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights", "name"}},
@@ -128,8 +128,8 @@ func TestApplicationAccessRightsPermissionDenied(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
-				Rights:                        []ttnpb.Right{right},
+				Ids:    collaboratorID,
+				Rights: []ttnpb.Right{right},
 			},
 		}, creds)
 
@@ -147,7 +147,7 @@ func TestApplicationAccessPermissionDenied(t *testing.T) {
 		userID := defaultUser.GetIds()
 		applicationID := userApplications(userID).Applications[0].GetIds()
 		collaboratorID := collaboratorUser.GetIds().OrganizationOrUserIdentifiers()
-		APIKeyID := applicationAPIKeys(applicationID).ApiKeys[0].Id
+		apiKeyID := applicationAPIKeys(applicationID).ApiKeys[0].Id
 
 		reg := ttnpb.NewApplicationAccessClient(cc)
 
@@ -158,24 +158,24 @@ func TestApplicationAccessPermissionDenied(t *testing.T) {
 			a.So(rights.Rights, should.BeEmpty)
 		}
 
-		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
+		apiKey, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
 			ApplicationIds: applicationID,
-			KeyId:          APIKeyID,
+			KeyId:          apiKeyID,
 		})
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-		a.So(APIKey, should.BeNil)
+		a.So(apiKey, should.BeNil)
 
-		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListApplicationAPIKeysRequest{
+		apiKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListApplicationAPIKeysRequest{
 			ApplicationIds: applicationID,
 		})
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-		a.So(APIKeys, should.BeNil)
+		a.So(apiKeys, should.BeNil)
 
 		collaborators, err := reg.ListCollaborators(ctx, &ttnpb.ListApplicationCollaboratorsRequest{
 			ApplicationIds: applicationID,
@@ -186,23 +186,23 @@ func TestApplicationAccessPermissionDenied(t *testing.T) {
 		}
 		a.So(collaborators, should.BeNil)
 
-		APIKeyName := "test-application-api-key-name"
-		APIKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
+		apiKeyName := "test-application-api-key-name"
+		apiKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
 			ApplicationIds: applicationID,
-			Name:           APIKeyName,
+			Name:           apiKeyName,
 			Rights:         []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 		})
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-		a.So(APIKey, should.BeNil)
+		a.So(apiKey, should.BeNil)
 
-		APIKey = applicationAPIKeys(applicationID).ApiKeys[0]
+		apiKey = applicationAPIKeys(applicationID).ApiKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIds: applicationID,
-			APIKey:         *APIKey,
+			ApiKey:         apiKey,
 			FieldMask:      &pbtypes.FieldMask{Paths: []string{"name", "rights"}},
 		})
 
@@ -214,8 +214,8 @@ func TestApplicationAccessPermissionDenied(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
+				Ids:    collaboratorID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 			},
 		})
 
@@ -274,25 +274,25 @@ func TestApplicationAccessCRUD(t *testing.T) {
 		applicationAPIKeys := applicationAPIKeys(applicationID)
 		applicationKey := applicationAPIKeys.ApiKeys[0]
 
-		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
+		apiKey, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
 			ApplicationIds: applicationID,
 			KeyId:          applicationKey.Id,
 		}, creds)
 
 		a.So(err, should.BeNil)
-		if a.So(APIKey, should.NotBeNil) {
-			a.So(APIKey.Id, should.Equal, applicationKey.Id)
-			a.So(APIKey.Key, should.BeEmpty)
+		if a.So(apiKey, should.NotBeNil) {
+			a.So(apiKey.Id, should.Equal, applicationKey.Id)
+			a.So(apiKey.Key, should.BeEmpty)
 		}
 
-		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListApplicationAPIKeysRequest{
+		apiKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListApplicationAPIKeysRequest{
 			ApplicationIds: applicationID,
 		}, creds)
 
 		a.So(err, should.BeNil)
-		if a.So(APIKeys, should.NotBeNil) {
-			a.So(len(APIKeys.ApiKeys), should.Equal, len(applicationAPIKeys.ApiKeys))
-			for i, APIkey := range APIKeys.ApiKeys {
+		if a.So(apiKeys, should.NotBeNil) {
+			a.So(len(apiKeys.ApiKeys), should.Equal, len(applicationAPIKeys.ApiKeys))
+			for i, APIkey := range apiKeys.ApiKeys {
 				a.So(APIkey.Name, should.Equal, applicationAPIKeys.ApiKeys[i].Name)
 				a.So(APIkey.Id, should.Equal, applicationAPIKeys.ApiKeys[i].Id)
 			}
@@ -307,23 +307,23 @@ func TestApplicationAccessCRUD(t *testing.T) {
 			a.So(collaborators.Collaborators, should.NotBeEmpty)
 		}
 
-		APIKeyName := "test-application-api-key-name"
-		APIKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
+		apiKeyName := "test-application-api-key-name"
+		apiKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
 			ApplicationIds: applicationID,
-			Name:           APIKeyName,
+			Name:           apiKeyName,
 			Rights:         []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 		}, creds)
 
 		a.So(err, should.BeNil)
-		if a.So(APIKey, should.NotBeNil) {
-			a.So(APIKey.Name, should.Equal, APIKeyName)
+		if a.So(apiKey, should.NotBeNil) {
+			a.So(apiKey.Name, should.Equal, apiKeyName)
 		}
 
 		newAPIKeyName := "test-new-api-key"
-		APIKey.Name = newAPIKeyName
+		apiKey.Name = newAPIKeyName
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIds: applicationID,
-			APIKey:         *APIKey,
+			ApiKey:         apiKey,
 			FieldMask:      &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
@@ -335,8 +335,8 @@ func TestApplicationAccessCRUD(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
+				Ids:    collaboratorID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 			},
 		}, creds)
 
@@ -355,7 +355,7 @@ func TestApplicationAccessCRUD(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
+				Ids: collaboratorID,
 			},
 		}, creds)
 
@@ -388,7 +388,7 @@ func TestApplicationAccessRights(t *testing.T) {
 		_, err := reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
+				Ids: collaboratorID,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_LINK,
 					ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS,
@@ -402,7 +402,7 @@ func TestApplicationAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
+				Ids: removedCollaboratorID,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_ALL,
 				},
@@ -411,21 +411,21 @@ func TestApplicationAccessRights(t *testing.T) {
 
 		a.So(err, should.BeNil)
 
-		APIKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
+		apiKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
 			ApplicationIds: applicationID,
 			Rights:         []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 		}, usrCreds)
 
 		a.So(err, should.BeNil)
-		if a.So(APIKey, should.NotBeNil) && a.So(APIKey.Rights, should.NotBeNil) {
-			a.So(APIKey.Rights, should.Resemble, []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL})
+		if a.So(apiKey, should.NotBeNil) && a.So(apiKey.Rights, should.NotBeNil) {
+			a.So(apiKey.Rights, should.Resemble, []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL})
 		}
 
 		// Try revoking rights for the collaborator with RIGHT_APPLICATION_ALL without having it
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
+				Ids: removedCollaboratorID,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_LINK,
 					ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS,
@@ -441,8 +441,8 @@ func TestApplicationAccessRights(t *testing.T) {
 		// Try revoking rights for the api key with RIGHT_APPLICATION_ALL without having it
 		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIds: applicationID,
-			APIKey: ttnpb.APIKey{
-				Id: APIKey.Id,
+			ApiKey: &ttnpb.APIKey{
+				Id: apiKey.Id,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_LINK,
 					ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS,
@@ -461,8 +461,8 @@ func TestApplicationAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
-				Rights:                        newRights.Rights,
+				Ids:    removedCollaboratorID,
+				Rights: newRights.Rights,
 			},
 		}, usrCreds)
 
@@ -471,8 +471,8 @@ func TestApplicationAccessRights(t *testing.T) {
 		// Remove RIGHT_APPLICATION_ALL from api key to be removed
 		key, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIds: applicationID,
-			APIKey: ttnpb.APIKey{
-				Id:     APIKey.Id,
+			ApiKey: &ttnpb.APIKey{
+				Id:     apiKey.Id,
 				Rights: newRights.Rights,
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -486,8 +486,8 @@ func TestApplicationAccessRights(t *testing.T) {
 		newRights = newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_LINK))
 		key, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIds: applicationID,
-			APIKey: ttnpb.APIKey{
-				Id:     APIKey.Id,
+			ApiKey: &ttnpb.APIKey{
+				Id:     apiKey.Id,
 				Rights: newRights.Rights,
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -501,8 +501,8 @@ func TestApplicationAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
-				Rights:                        newRights.Rights,
+				Ids:    removedCollaboratorID,
+				Rights: newRights.Rights,
 			},
 		}, collaboratorCreds)
 
@@ -512,8 +512,8 @@ func TestApplicationAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
-				Rights:                        newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_DELETE)).Rights,
+				Ids:    removedCollaboratorID,
+				Rights: newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_DELETE)).Rights,
 			},
 		}, collaboratorCreds)
 
@@ -524,8 +524,8 @@ func TestApplicationAccessRights(t *testing.T) {
 		// Try revoking RIGHT_APPLICATION_DELETE from api key without having it
 		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIds: applicationID,
-			APIKey: ttnpb.APIKey{
-				Id:     APIKey.Id,
+			ApiKey: &ttnpb.APIKey{
+				Id:     apiKey.Id,
 				Rights: newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_DELETE)).Rights,
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -548,8 +548,8 @@ func TestApplicationAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
 			ApplicationIds: applicationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
-				Rights:                        []ttnpb.Right{},
+				Ids:    removedCollaboratorID,
+				Rights: []ttnpb.Right{},
 			},
 		}, collaboratorCreds)
 
@@ -567,8 +567,8 @@ func TestApplicationAccessRights(t *testing.T) {
 		// Delete api key with more rights
 		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
 			ApplicationIds: applicationID,
-			APIKey: ttnpb.APIKey{
-				Id:     APIKey.Id,
+			ApiKey: &ttnpb.APIKey{
+				Id:     apiKey.Id,
 				Rights: []ttnpb.Right{},
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -578,7 +578,7 @@ func TestApplicationAccessRights(t *testing.T) {
 
 		_, err = reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
 			ApplicationIds: applicationID,
-			KeyId:          APIKey.Id,
+			KeyId:          apiKey.Id,
 		}, collaboratorCreds)
 
 		if a.So(err, should.NotBeNil) {

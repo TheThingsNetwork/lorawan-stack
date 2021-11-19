@@ -256,7 +256,7 @@ var (
 			invitationToken, _ := cmd.Flags().GetString("invitation-token")
 
 			res, err := ttnpb.NewUserRegistryClient(is).Create(ctx, &ttnpb.CreateUserRequest{
-				User:            user,
+				User:            &user,
 				InvitationToken: invitationToken,
 			})
 			if err != nil {
@@ -317,7 +317,7 @@ var (
 				return err
 			}
 			res, err := ttnpb.NewUserRegistryClient(is).Update(ctx, &ttnpb.UpdateUserRequest{
-				User:      user,
+				User:      &user,
 				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})
 			if err != nil {

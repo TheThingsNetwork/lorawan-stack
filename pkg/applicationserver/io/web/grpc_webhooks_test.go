@@ -55,7 +55,10 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	redisClient, flush := test.NewRedis(ctx, "applicationserver_test")
 	defer flush()
 	defer redisClient.Close()
-	webhookReg := &redis.WebhookRegistry{Redis: redisClient}
+	webhookReg := &redis.WebhookRegistry{Redis: redisClient, LockTTL: test.Delay << 10}
+	if err := webhookReg.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	srv := web.NewWebhookRegistryRPC(webhookReg, nil)
 	c.RegisterGRPC(&mockRegisterer{ctx, srv})
 	componenttest.StartComponent(t, c)
@@ -83,7 +86,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	// Check empty.
 	{
 		res, err := client.List(ctx, &ttnpb.ListApplicationWebhooksRequest{
-			ApplicationIdentifiers: registeredApplicationID,
+			ApplicationIds: &registeredApplicationID,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{"base_url"},
 			},
@@ -95,10 +98,10 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	// Add.
 	{
 		_, err := client.Set(ctx, &ttnpb.SetApplicationWebhookRequest{
-			ApplicationWebhook: ttnpb.ApplicationWebhook{
-				ApplicationWebhookIdentifiers: ttnpb.ApplicationWebhookIdentifiers{
-					ApplicationIdentifiers: registeredApplicationID,
-					WebhookId:              registeredWebhookID,
+			Webhook: &ttnpb.ApplicationWebhook{
+				Ids: &ttnpb.ApplicationWebhookIdentifiers{
+					ApplicationIds: &registeredApplicationID,
+					WebhookId:      registeredWebhookID,
 				},
 				BaseUrl: "http://localhost/test",
 			},
@@ -112,7 +115,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	// List; assert one.
 	{
 		res, err := client.List(ctx, &ttnpb.ListApplicationWebhooksRequest{
-			ApplicationIdentifiers: registeredApplicationID,
+			ApplicationIds: &registeredApplicationID,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{"base_url"},
 			},
@@ -125,9 +128,9 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	// Get.
 	{
 		res, err := client.Get(ctx, &ttnpb.GetApplicationWebhookRequest{
-			ApplicationWebhookIdentifiers: ttnpb.ApplicationWebhookIdentifiers{
-				ApplicationIdentifiers: registeredApplicationID,
-				WebhookId:              registeredWebhookID,
+			Ids: &ttnpb.ApplicationWebhookIdentifiers{
+				ApplicationIds: &registeredApplicationID,
+				WebhookId:      registeredWebhookID,
 			},
 			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{"base_url"},
@@ -140,8 +143,8 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	// Delete.
 	{
 		_, err := client.Delete(ctx, &ttnpb.ApplicationWebhookIdentifiers{
-			ApplicationIdentifiers: registeredApplicationID,
-			WebhookId:              registeredWebhookID,
+			ApplicationIds: &registeredApplicationID,
+			WebhookId:      registeredWebhookID,
 		}, creds)
 		a.So(err, should.BeNil)
 	}
@@ -149,7 +152,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	// Check empty.
 	{
 		res, err := client.List(ctx, &ttnpb.ListApplicationWebhooksRequest{
-			ApplicationIdentifiers: registeredApplicationID,
+			ApplicationIds: &registeredApplicationID,
 			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{"base_url"},
 			},
@@ -243,7 +246,7 @@ description: Bar`),
 			client := ttnpb.NewApplicationWebhookRegistryClient(c.LoopbackConn())
 
 			getRes, err := client.GetTemplate(ctx, &ttnpb.GetApplicationWebhookTemplateRequest{
-				ApplicationWebhookTemplateIdentifiers: ttnpb.ApplicationWebhookTemplateIdentifiers{
+				Ids: &ttnpb.ApplicationWebhookTemplateIdentifiers{
 					TemplateId: "foo",
 				},
 			})

@@ -20,7 +20,8 @@ import (
 	"encoding/json"
 	"time"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -59,7 +60,7 @@ func (dnmsg *DownlinkMessage) unmarshalJSON(data []byte) error {
 }
 
 // FromDownlink implements Formatter.
-func (f *lbsLNS) FromDownlink(ctx context.Context, uid string, down ttnpb.DownlinkMessage, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error) {
+func (f *lbsLNS) FromDownlink(ctx context.Context, down ttnpb.DownlinkMessage, bandID string, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error) {
 	var dnmsg DownlinkMessage
 	settings := down.GetScheduled()
 	dnmsg.Pdu = hex.EncodeToString(down.GetRawPayload())
@@ -71,32 +72,37 @@ func (f *lbsLNS) FromDownlink(ctx context.Context, uid string, down ttnpb.Downli
 	dnmsg.RxDelay = 1
 
 	// The first 16 bits of XTime gets the session ID from the upstream latestXTime and the other 48 bits are concentrator timestamp accounted for rollover.
-	var (
-		state State
-		ok    bool
-	)
-	session := ws.SessionFromContext(ctx)
-	session.DataMu.Lock()
-	defer session.DataMu.Unlock()
-	if state, ok = session.Data.(State); !ok {
+	sessionID, found := getSessionID(ctx)
+	if !found {
 		return nil, errSessionStateNotFound.New()
 	}
-	xTime := int64(state.ID)<<48 | (int64(concentratorTime) / int64(time.Microsecond) & 0xFFFFFFFFFF)
+	xTime := ConcentratorTimeToXTime(sessionID, concentratorTime)
 
 	// Estimate the xtime based on the timestamp; xtime = timestamp - (rxdelay). The calculated offset is in microseconds.
 	dnmsg.XTime = xTime - int64(dnmsg.RxDelay*int(time.Second/time.Microsecond))
 
-	log.FromContext(ctx).WithField("xtime", dnmsg.XTime).Info("Prepare downlink message")
+	log.FromContext(ctx).WithFields(log.Fields(
+		"xtime", dnmsg.XTime,
+		"mux_time", dlTime,
+	)).Info("Prepare downlink message")
 
 	// This field is not used but needs to be defined for the station to parse the json and should be non-zero for the station to return tx confirmations.
 	dnmsg.DevEUI = "00-00-00-00-00-00-00-01"
 
 	// Fix the Tx Parameters since we don't use the gateway scheduler.
-	dnmsg.Rx1DR = int(settings.DataRateIndex)
+	phy, err := band.GetLatest(bandID)
+	if err != nil {
+		return nil, err
+	}
+	drIdx, _, ok := phy.FindDownlinkDataRate(settings.DataRate)
+	if !ok {
+		return nil, errDataRate.New()
+	}
+	dnmsg.Rx1DR = int(drIdx)
 	dnmsg.Rx1Freq = int(settings.Frequency)
 
 	// Add the MuxTime for RTT measurement
-	dnmsg.MuxTime = float64(dlTime.UnixNano()) / float64(time.Second)
+	dnmsg.MuxTime = TimeToUnixSeconds(dlTime)
 
 	// The GS controls the scheduling and hence for the gateway, its always Class A.
 	dnmsg.DeviceClass = uint(ttnpb.CLASS_A)
@@ -105,18 +111,63 @@ func (f *lbsLNS) FromDownlink(ctx context.Context, uid string, down ttnpb.Downli
 }
 
 // ToDownlinkMessage translates the LNS DownlinkMessage "dnmsg" to ttnpb.DownlinkMessage.
-func (dnmsg *DownlinkMessage) ToDownlinkMessage() ttnpb.DownlinkMessage {
-	return ttnpb.DownlinkMessage{
+func (dnmsg *DownlinkMessage) ToDownlinkMessage(bandID string) (*ttnpb.DownlinkMessage, error) {
+	phy, err := band.GetLatest(bandID)
+	if err != nil {
+		return nil, err
+	}
+	bandDR, ok := phy.DataRates[ttnpb.DataRateIndex(dnmsg.Rx1DR)]
+	if !ok {
+		return nil, errDataRate.New()
+	}
+	return &ttnpb.DownlinkMessage{
 		RawPayload: []byte(dnmsg.Pdu),
 		Settings: &ttnpb.DownlinkMessage_Scheduled{
 			Scheduled: &ttnpb.TxSettings{
-				DataRateIndex: ttnpb.DataRateIndex(dnmsg.Rx1DR),
-				Frequency:     uint64(dnmsg.Rx1Freq),
+				DataRate:  bandDR.Rate,
+				Frequency: uint64(dnmsg.Rx1Freq),
 				Downlink: &ttnpb.TxSettings_Downlink{
 					AntennaIndex: uint32(dnmsg.RCtx),
 				},
 				Timestamp: uint32(dnmsg.XTime),
 			},
 		},
+	}, nil
+}
+
+const (
+	// transferTimeMinRTTCount is the minimum number of observed round-trip times that are taken into account before using
+	// their statistics to determine the gateway GPS time.
+	transferTimeMinRTTCount = 5
+)
+
+// TransferTime implements Formatter.
+func (*lbsLNS) TransferTime(ctx context.Context, serverTime time.Time, conn *io.Connection) ([]byte, error) {
+	if enabled, ok := getSessionTimeSync(ctx); !ok || !enabled {
+		return nil, nil
 	}
+
+	sessionID, found := getSessionID(ctx)
+	if !found {
+		return nil, nil
+	}
+
+	_, _, median, _, n := conn.RTTStats(100, serverTime)
+	if n < transferTimeMinRTTCount {
+		return nil, nil
+	}
+
+	// The concentrator time is based on the current server time plus
+	// half a round trip. The timestamp is relative to the server
+	// time in order to avoid aggregating gateway time errors.
+	concentratorTime, ok := conn.TimeFromServerTime(serverTime.Add(median / 2))
+	if !ok {
+		return nil, nil
+	}
+
+	return TimeSyncResponse{
+		XTime:   ConcentratorTimeToXTime(sessionID, concentratorTime),
+		GPSTime: TimeToGPSTime(serverTime),
+		MuxTime: TimeToUnixSeconds(serverTime),
+	}.MarshalJSON()
 }

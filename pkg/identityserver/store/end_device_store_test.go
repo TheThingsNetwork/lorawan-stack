@@ -225,7 +225,7 @@ func TestEndDeviceStore(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(devices, should.HaveLength, 2) {
-			a.So(list, should.Contain, got)
+			a.So(devices, should.Contain, got)
 			a.So(devices, should.Contain, createdNew)
 		}
 

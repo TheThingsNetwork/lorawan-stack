@@ -207,19 +207,24 @@ func TestDeviceRegistries(t *testing.T) {
 
 	for _, tc := range []struct {
 		Name string
-		New  func(ctx context.Context) (reg DeviceRegistry, closeFn func() error)
+		New  func(ctx context.Context) (DeviceRegistry, func() error, error)
 		N    uint16
 	}{
 		{
 			Name: "Redis",
-			New: func(ctx context.Context) (DeviceRegistry, func() error) {
+			New: func(ctx context.Context) (DeviceRegistry, func() error, error) {
 				cl, flush := test.NewRedis(ctx, namespace[:]...)
-				return &redis.DeviceRegistry{
-						Redis: cl,
-					}, func() error {
-						flush()
-						return cl.Close()
-					}
+				devReg := &redis.DeviceRegistry{
+					Redis:   cl,
+					LockTTL: test.Delay << 10,
+				}
+				if err := devReg.Init(ctx); err != nil {
+					return nil, nil, err
+				}
+				return devReg, func() error {
+					flush()
+					return cl.Close()
+				}, nil
 			},
 			N: 8,
 		},
@@ -229,8 +234,11 @@ func TestDeviceRegistries(t *testing.T) {
 			test.RunSubtest(t, test.SubtestConfig{
 				Name:     fmt.Sprintf("%s/%d", tc.Name, i),
 				Parallel: true,
-				Func: func(ctx context.Context, t *testing.T, _ *assertions.Assertion) {
-					reg, closeFn := tc.New(ctx)
+				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+					reg, closeFn, err := tc.New(ctx)
+					if !a.So(err, should.BeNil) {
+						t.FailNow()
+					}
 					if closeFn != nil {
 						defer func() {
 							if err := closeFn(); err != nil {
@@ -371,19 +379,24 @@ func TestSessionKeyRegistries(t *testing.T) {
 
 	for _, tc := range []struct {
 		Name string
-		New  func(ctx context.Context) (reg KeyRegistry, closeFn func() error)
+		New  func(ctx context.Context) (KeyRegistry, func() error, error)
 		N    uint16
 	}{
 		{
 			Name: "Redis",
-			New: func(ctx context.Context) (KeyRegistry, func() error) {
+			New: func(ctx context.Context) (KeyRegistry, func() error, error) {
 				cl, flush := test.NewRedis(ctx, namespace[:]...)
-				return &redis.KeyRegistry{
-						Redis: cl,
-					}, func() error {
-						flush()
-						return cl.Close()
-					}
+				keyReg := &redis.KeyRegistry{
+					Redis:   cl,
+					LockTTL: test.Delay << 10,
+				}
+				if err := keyReg.Init(ctx); err != nil {
+					return nil, nil, err
+				}
+				return keyReg, func() error {
+					flush()
+					return cl.Close()
+				}, nil
 			},
 			N: 8,
 		},
@@ -393,8 +406,11 @@ func TestSessionKeyRegistries(t *testing.T) {
 			test.RunSubtest(t, test.SubtestConfig{
 				Name:     fmt.Sprintf("%s/%d", tc.Name, i),
 				Parallel: true,
-				Func: func(ctx context.Context, t *testing.T, _ *assertions.Assertion) {
-					reg, closeFn := tc.New(ctx)
+				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+					reg, closeFn, err := tc.New(ctx)
+					if !a.So(err, should.BeNil) {
+						t.FailNow()
+					}
 					if closeFn != nil {
 						defer func() {
 							if err := closeFn(); err != nil {

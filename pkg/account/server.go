@@ -19,8 +19,9 @@ import (
 
 	echo "github.com/labstack/echo/v4"
 	sess "go.thethings.network/lorawan-stack/v3/pkg/account/session"
+	account_store "go.thethings.network/lorawan-stack/v3/pkg/account/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	web_errors "go.thethings.network/lorawan-stack/v3/pkg/errors/web"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
@@ -45,34 +46,28 @@ type Component interface {
 }
 
 type server struct {
-	c       Component
-	config  oauth.Config
-	store   Store
-	session sess.Session
-}
-
-// Store used by the account app.
-type Store interface {
-	// UserStore, LoginTokenStore and UserSessionStore are needed for user login/logout.
-	store.UserStore
-	store.LoginTokenStore
-	store.UserSessionStore
+	c           Component
+	config      oauth.Config
+	store       account_store.Interface
+	session     sess.Session
+	generateCSP func(config *oauth.Config, nonce string) string
 }
 
 // NewServer returns a new account app on top of the given store.
-func NewServer(c Component, store Store, config oauth.Config) Server {
+func NewServer(c *component.Component, store account_store.Interface, config oauth.Config, cspFunc func(config *oauth.Config, nonce string) string) (Server, error) {
 	s := &server{
-		c:       c,
-		config:  config,
-		store:   store,
-		session: sess.Session{Store: store},
+		c:           c,
+		config:      config,
+		store:       store,
+		session:     sess.Session{Store: store},
+		generateCSP: cspFunc,
 	}
 
 	if s.config.Mount == "" {
 		s.config.Mount = s.config.UI.MountPath()
 	}
 
-	return s
+	return s, nil
 }
 
 type ctxKeyType struct{}
@@ -94,6 +89,17 @@ func (s *server) RegisterRoutes(server *web.Server) {
 	csrfMiddleware := middleware.CSRF("_csrf", "/", s.config.CSRFAuthKey)
 	root := server.Group(
 		s.config.Mount,
+		func(next echo.HandlerFunc) echo.HandlerFunc {
+			return func(c echo.Context) error {
+				if webui.CSPFeatureFlag.GetValue(c.Request().Context()) {
+					nonce := webui.GenerateNonce()
+					c.Set("csp_nonce", nonce)
+					cspString := s.generateCSP(s.configFromContext(c.Request().Context()), nonce)
+					c.Response().Header().Set("Content-Security-Policy", cspString)
+				}
+				return next(c)
+			}
+		},
 		ratelimit.EchoMiddleware(s.c.RateLimiter(), "http:account"),
 		func(next echo.HandlerFunc) echo.HandlerFunc {
 			return func(c echo.Context) error {

@@ -75,12 +75,14 @@ class Tabular extends React.Component {
       paginated,
       data,
       headers,
+      rowKeySelector,
+      rowHrefSelector,
       emptyMessage,
       clickable,
     } = this.props
 
     const columns = (
-      <Table.Row>
+      <Table.Row head>
         {headers.map((header, key) => (
           <Table.HeadCell
             key={key}
@@ -104,31 +106,38 @@ class Tabular extends React.Component {
     )
 
     const minWidth = `${headers.length * 10}rem`
+    const defaultRowKeySelector = row => {
+      const key = headers[0].getValue ? headers[0].getValue(row) : getByPath(row, headers[0].name)
+      return typeof key === 'string' || typeof key === 'number' ? key : JSON.stringify(key)
+    }
+    const appliedRowKeySelector = rowKeySelector ? rowKeySelector : defaultRowKeySelector
 
     const paginatedData = this.handlePagination(data)
-    const rows =
-      paginatedData.length > 0 ? (
-        paginatedData.map((row, rowKey) => (
-          <Table.Row key={rowKey} id={rowKey} onClick={onRowClick} clickable={clickable}>
-            {headers.map((header, index) => {
-              const value = headers[index].getValue
-                ? headers[index].getValue(row)
-                : getByPath(row, headers[index].name)
-              return (
-                <Table.DataCell key={index} align={header.align} small={small}>
-                  {headers[index].render ? headers[index].render(value) : value}
-                </Table.DataCell>
-              )
-            })}
-          </Table.Row>
-        ))
-      ) : (
-        <Table.Empty colSpan={headers.length} message={!loading ? emptyMessage : undefined} />
-      )
+    const rows = paginatedData.map((row, rowIndex) => (
+      <Table.Row
+        key={appliedRowKeySelector(row)}
+        id={rowIndex}
+        onClick={onRowClick}
+        clickable={clickable}
+        linkTo={rowHrefSelector ? rowHrefSelector(row) : undefined}
+        body
+      >
+        {headers.map((header, index) => {
+          const value = headers[index].getValue
+            ? headers[index].getValue(row)
+            : getByPath(row, headers[index].name)
+          return (
+            <Table.DataCell key={index} align={header.align} small={small}>
+              {headers[index].render ? headers[index].render(value) : value}
+            </Table.DataCell>
+          )
+        })}
+      </Table.Row>
+    ))
 
     const pagination = paginated ? (
-      <Table.Row>
-        <Table.DataCell className={style.paginationCell} colSpan={headers.length} small={small}>
+      <Table.Row footer>
+        <Table.DataCell className={style.paginationCell} small={small}>
           <Pagination
             className={style.pagination}
             pageCount={Math.ceil(totalCount / pageSize) || 1}
@@ -147,9 +156,11 @@ class Tabular extends React.Component {
         <Overlay visible={loading} loading={loading}>
           <Table minWidth={minWidth}>
             <Table.Head>{columns}</Table.Head>
-            <Table.Body>{rows}</Table.Body>
-            <Table.Footer>{pagination}</Table.Footer>
+            <Table.Body empty={rows.length === 0} emptyMessage={emptyMessage}>
+              {rows}
+            </Table.Body>
           </Table>
+          <Table.Footer>{pagination}</Table.Footer>
         </Overlay>
       </div>
     )
@@ -162,7 +173,7 @@ Tabular.propTypes = {
   /** A list of data entries to display within the table body. */
   data: PropTypes.arrayOf(PropTypes.shape({})),
   /** The empty message to be displayed when no data provided. */
-  emptyMessage: PropTypes.oneOfType([PropTypes.message, PropTypes.string]).isRequired,
+  emptyMessage: PropTypes.message.isRequired,
   /**
    * A flag specifying whether the table should paginate entries.
    * If true the component makes sure that the items are paginated, otherwise
@@ -208,6 +219,10 @@ Tabular.propTypes = {
   pageSize: PropTypes.number,
   /** A flag identifying whether the table should have pagination. */
   paginated: PropTypes.bool,
+  /** A selector to determine the `href`/`to` prop of the rendered rows. */
+  rowHrefSelector: PropTypes.func,
+  /** A selector to determine the `key` prop of the rendered rows. */
+  rowKeySelector: PropTypes.func,
   /** A flag specifying the height of data cells. */
   small: PropTypes.bool,
   /** The total number of available entries. */
@@ -231,6 +246,8 @@ Tabular.defaultProps = {
   page: 0,
   pageSize: undefined,
   clickable: true,
+  rowKeySelector: undefined,
+  rowHrefSelector: undefined,
 }
 
 export { Tabular as default, Table }

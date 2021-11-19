@@ -34,12 +34,11 @@ func New() log.Middleware {
 
 // Wrap an existing log handler with Sentry.
 func (s *Sentry) Wrap(next log.Handler) log.Handler {
-	return log.HandlerFunc(func(entry log.Entry) (err error) {
+	return log.HandlerFunc(func(entry log.Entry) error {
 		if entry.Level() == log.ErrorLevel {
 			s.forward(entry)
 		}
-		err = next.HandleLog(entry)
-		return
+		return next.HandleLog(entry)
 	})
 }
 

@@ -11,7 +11,7 @@ env:
 jobs:
   release:
     name: Tag release
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
     - name: Check out code
       uses: actions/checkout@v2
@@ -97,7 +97,7 @@ jobs:
       run: tools/bin/mage js:deps
       timeout-minutes: 5
     - name: Build frontend
-      run: tools/bin/mage js:clean js:build
+      run: tools/bin/mage js:clean js:buildDll js:build
     - name: File versioning
       run: tools/bin/mage version:files
     - name: Check for diff
@@ -128,7 +128,7 @@ jobs:
     - name: Run Goreleaser
       uses: goreleaser/goreleaser-action@v2
       with:
-        version: 'v0.161.1'
+        version: 'v0.184.0'
         args: release --config .goreleaser.release.yml --release-notes /tmp/release-notes.md --timeout 120m
       env:
         AWS_REGION: ${{ secrets.AWS_REGION }}

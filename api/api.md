@@ -422,11 +422,6 @@
   - [Enum `RejoinTimeExponent`](#ttn.lorawan.v3.RejoinTimeExponent)
   - [Enum `RxDelay`](#ttn.lorawan.v3.RxDelay)
   - [Enum `TxSchedulePriority`](#ttn.lorawan.v3.TxSchedulePriority)
-- [File `lorawan-stack/api/message_services.proto`](#lorawan-stack/api/message_services.proto)
-  - [Message `DecodeDownlinkMessageRequest`](#ttn.lorawan.v3.DecodeDownlinkMessageRequest)
-  - [Message `DecodeUplinkMessageRequest`](#ttn.lorawan.v3.DecodeUplinkMessageRequest)
-  - [Message `EncodeDownlinkMessageRequest`](#ttn.lorawan.v3.EncodeDownlinkMessageRequest)
-  - [Service `MessageProcessor`](#ttn.lorawan.v3.MessageProcessor)
 - [File `lorawan-stack/api/messages.proto`](#lorawan-stack/api/messages.proto)
   - [Message `ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink)
   - [Message `ApplicationDownlink.ClassBC`](#ttn.lorawan.v3.ApplicationDownlink.ClassBC)
@@ -885,7 +880,6 @@ Deployment configuration may specify if, and for how long after deletion, entiti
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `default_formatters` | [`MessagePayloadFormatters`](#ttn.lorawan.v3.MessagePayloadFormatters) |  | Default message payload formatters to use when there are no formatters defined on the end device level. |
-| `tls` | [`bool`](#bool) |  | Enable TLS for linking to the external Network Server. For cluster-local Network Servers, the cluster's TLS setting is used. |
 | `skip_payload_crypto` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Skip decryption of uplink payloads and encryption of downlink payloads. Leave empty for the using the Application Server's default setting. |
 
 ### <a name="ttn.lorawan.v3.ApplicationLinkStats">Message `ApplicationLinkStats`</a>
@@ -3227,7 +3221,6 @@ Template for creating end devices.
 
 | Field | Validations |
 | ----- | ----------- |
-| `application_ids` | <p>`message.required`: `true`</p> |
 | `order` | <p>`string.in`: `[ device_id -device_id join_eui -join_eui dev_eui -dev_eui name -name description -description created_at -created_at]`</p> |
 | `limit` | <p>`uint32.lte`: `1000`</p> |
 
@@ -3694,6 +3687,7 @@ The messages (for translation) are stored as "error:<namespace>:<name>".
 | `identifiers` | [`EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers) | repeated |  |
 | `tail` | [`uint32`](#uint32) |  | If greater than zero, this will return historical events, up to this maximum when the stream starts. If used in combination with "after", the limit that is reached first, is used. The availability of historical events depends on server support and retention policy. |
 | `after` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | If not empty, this will return historical events after the given time when the stream starts. If used in combination with "tail", the limit that is reached first, is used. The availability of historical events depends on server support and retention policy. |
+| `names` | [`string`](#string) | repeated | If provided, this will filter events, so that only events with the given names are returned. Names can be provided as either exact event names (e.g. 'gs.up.receive'), or as regular expressions (e.g. '/^gs\..+/'). |
 
 ### <a name="ttn.lorawan.v3.Events">Service `Events`</a>
 
@@ -3896,8 +3890,8 @@ Connection stats as monitored by the Gateway Server.
 | ----- | ---- | ----- | ----------- |
 | `min_frequency` | [`uint64`](#uint64) |  |  |
 | `max_frequency` | [`uint64`](#uint64) |  |  |
-| `downlink_utilization_limit` | [`float`](#float) |  |  |
-| `downlink_utilization` | [`float`](#float) |  |  |
+| `downlink_utilization_limit` | [`float`](#float) |  | Duty-cycle limit of the sub-band as a fraction of time. |
+| `downlink_utilization` | [`float`](#float) |  | Utilization rate of the available duty-cycle. This value should not exceed downlink_utilization_limit. |
 
 ### <a name="ttn.lorawan.v3.GatewayModel">Message `GatewayModel`</a>
 
@@ -5716,15 +5710,12 @@ Otherwise, the Gateway Server attempts to schedule the request and creates the T
 | `downlink_paths` | [`DownlinkPath`](#ttn.lorawan.v3.DownlinkPath) | repeated | Downlink paths used to select a gateway for downlink. In class A, the downlink paths are required to only contain uplink tokens. In class B and C, the downlink paths may contain uplink tokens and fixed gateways antenna identifiers. |
 | `rx1_delay` | [`RxDelay`](#ttn.lorawan.v3.RxDelay) |  | Rx1 delay (Rx2 delay is Rx1 delay + 1 second). |
 | `rx1_data_rate` | [`DataRate`](#ttn.lorawan.v3.DataRate) |  | LoRaWAN data rate for Rx1. |
-| `rx1_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  | LoRaWAN data rate index for Rx1. DEPRECATED: Use rx1_data_rate instead. |
 | `rx1_frequency` | [`uint64`](#uint64) |  | Frequency (Hz) for Rx1. |
 | `rx2_data_rate` | [`DataRate`](#ttn.lorawan.v3.DataRate) |  | LoRaWAN data rate for Rx2. |
-| `rx2_data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  | LoRaWAN data rate index for Rx2. DEPRECATED: Use rx2_data_rate instead. |
 | `rx2_frequency` | [`uint64`](#uint64) |  | Frequency (Hz) for Rx2. |
 | `priority` | [`TxSchedulePriority`](#ttn.lorawan.v3.TxSchedulePriority) |  | Priority for scheduling. Requests with a higher priority are allocated more channel time than messages with a lower priority, in duty-cycle limited regions. A priority of HIGH or higher sets the HiPriorityFlag in the DLMetadata Object. |
 | `absolute_time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Time when the downlink message should be transmitted. This value is only valid for class C downlink; class A downlink uses uplink tokens and class B downlink is scheduled on ping slots. This requires the gateway to have GPS time sychronization. If the absolute time is not set, the first available time will be used that does not conflict or violate regional limitations. |
 | `frequency_plan_id` | [`string`](#string) |  | Frequency plan ID from which the frequencies in this message are retrieved. |
-| `lorawan_phy_version` | [`PHYVersion`](#ttn.lorawan.v3.PHYVersion) |  | The regional parameters version used to interpret the data rate indices in this message. |
 | `advanced` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | Advanced metadata fields - can be used for advanced information or experimental features that are not yet formally defined in the API - field names are written in snake_case |
 
 #### Field Rules
@@ -5732,11 +5723,8 @@ Otherwise, the Gateway Server attempts to schedule the request and creates the T
 | Field | Validations |
 | ----- | ----------- |
 | `rx1_delay` | <p>`enum.defined_only`: `true`</p> |
-| `rx1_data_rate_index` | <p>`enum.defined_only`: `true`</p> |
-| `rx2_data_rate_index` | <p>`enum.defined_only`: `true`</p> |
 | `priority` | <p>`enum.defined_only`: `true`</p> |
 | `frequency_plan_id` | <p>`string.max_len`: `64`</p> |
-| `lorawan_phy_version` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.TxSettings">Message `TxSettings`</a>
 
@@ -5747,7 +5735,6 @@ On downlink, this is a scheduled transmission.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `data_rate` | [`DataRate`](#ttn.lorawan.v3.DataRate) |  | Data rate. |
-| `data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  | LoRaWAN data rate index. |
 | `coding_rate` | [`string`](#string) |  | LoRa coding rate. |
 | `frequency` | [`uint64`](#uint64) |  | Frequency (Hz). |
 | `enable_crc` | [`bool`](#bool) |  | Send a CRC in the packet; only on uplink; on downlink, CRC should not be enabled. |
@@ -5760,7 +5747,6 @@ On downlink, this is a scheduled transmission.
 | Field | Validations |
 | ----- | ----------- |
 | `data_rate` | <p>`message.required`: `true`</p> |
-| `data_rate_index` | <p>`enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.TxSettings.Downlink">Message `TxSettings.Downlink`</a>
 
@@ -5780,6 +5766,7 @@ Transmission settings for downlink.
 | `timestamp` | [`uint32`](#uint32) |  |  |
 | `server_time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Absolute time observed by the server when the uplink message has been received. |
 | `concentrator_time` | [`int64`](#int64) |  | Absolute concentrator time as observed by the Gateway Server, accounting for rollovers. |
+| `gateway_time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Absolute time observed by the gateway when the uplink has been received. |
 
 #### Field Rules
 
@@ -6132,72 +6119,6 @@ Transmission settings for downlink.
 | `ABOVE_NORMAL` | 4 |  |
 | `HIGH` | 5 |  |
 | `HIGHEST` | 6 |  |
-
-## <a name="lorawan-stack/api/message_services.proto">File `lorawan-stack/api/message_services.proto`</a>
-
-### <a name="ttn.lorawan.v3.DecodeDownlinkMessageRequest">Message `DecodeDownlinkMessageRequest`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
-| `end_device_version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  |  |
-| `message` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
-| `formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  |  |
-| `parameter` | [`string`](#string) |  |  |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `ids` | <p>`message.required`: `true`</p> |
-| `end_device_version_ids` | <p>`message.required`: `true`</p> |
-| `message` | <p>`message.required`: `true`</p> |
-
-### <a name="ttn.lorawan.v3.DecodeUplinkMessageRequest">Message `DecodeUplinkMessageRequest`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
-| `end_device_version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  |  |
-| `message` | [`ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink) |  |  |
-| `formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  |  |
-| `parameter` | [`string`](#string) |  |  |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `ids` | <p>`message.required`: `true`</p> |
-| `end_device_version_ids` | <p>`message.required`: `true`</p> |
-| `message` | <p>`message.required`: `true`</p> |
-
-### <a name="ttn.lorawan.v3.EncodeDownlinkMessageRequest">Message `EncodeDownlinkMessageRequest`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
-| `end_device_version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  |  |
-| `message` | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |  |
-| `formatter` | [`PayloadFormatter`](#ttn.lorawan.v3.PayloadFormatter) |  |  |
-| `parameter` | [`string`](#string) |  |  |
-
-#### Field Rules
-
-| Field | Validations |
-| ----- | ----------- |
-| `ids` | <p>`message.required`: `true`</p> |
-| `end_device_version_ids` | <p>`message.required`: `true`</p> |
-| `message` | <p>`message.required`: `true`</p> |
-
-### <a name="ttn.lorawan.v3.MessageProcessor">Service `MessageProcessor`</a>
-
-Encodes and decodes uplink messages.
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-| `EncodeDownlink` | [`EncodeDownlinkMessageRequest`](#ttn.lorawan.v3.EncodeDownlinkMessageRequest) | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |
-| `DecodeUplink` | [`DecodeUplinkMessageRequest`](#ttn.lorawan.v3.DecodeUplinkMessageRequest) | [`ApplicationUplink`](#ttn.lorawan.v3.ApplicationUplink) |  |
-| `DecodeDownlink` | [`DecodeDownlinkMessageRequest`](#ttn.lorawan.v3.DecodeDownlinkMessageRequest) | [`ApplicationDownlink`](#ttn.lorawan.v3.ApplicationDownlink) |  |
 
 ## <a name="lorawan-stack/api/messages.proto">File `lorawan-stack/api/messages.proto`</a>
 

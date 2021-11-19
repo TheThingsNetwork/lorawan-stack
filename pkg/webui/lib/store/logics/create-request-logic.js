@@ -28,7 +28,7 @@ import {
   attemptReconnect,
   ATTEMPT_RECONNECT,
 } from '@ttn-lw/lib/store/actions/status'
-import { promisifiedDispatch } from '@ttn-lw/lib/store/middleware/request-promise-middleware'
+import { promisifyDispatch } from '@ttn-lw/lib/store/middleware/request-promise-middleware'
 import attachPromise, { getResultActionFromType } from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectIsCheckingStatus } from '@ttn-lw/lib/store/selectors/status'
 
@@ -76,6 +76,7 @@ const createRequestLogic = (
     process: async (deps, dispatch, done) => {
       const { action, getState, cancelled$, action$ } = deps
       const promiseAttached = action.meta && action.meta._attachPromise
+      const promisifiedDispatch = promisifyDispatch(dispatch)
       let actionSubscription
 
       if (!noCancelOnRouteChange) {
@@ -113,7 +114,7 @@ const createRequestLogic = (
           }
 
           // Run the logic process.
-          const res = await options.process(deps, dispatch)
+          const res = await options.process(deps, promisifiedDispatch)
           success = true
 
           // After successful request, dispatch success action.
@@ -149,7 +150,7 @@ const createRequestLogic = (
               // It is necessary to promisify the dispatch function explicitly again
               // even though we already have a middleware to do that since`redux-logic`
               // modifies the dispatch function to return the original input action.
-              connectionChecking = promisifiedDispatch(dispatch)(attachPromise(setStatusChecking()))
+              connectionChecking = promisifiedDispatch(attachPromise(setStatusChecking()))
             }
 
             // Trigger a retry once the app is back online.

@@ -59,9 +59,10 @@ type Connection struct {
 	ServiceData              *pubsub.Subscription
 }
 
+// ApplicationPubSubIdentifiers returns the identifiers of the connection.
 func (c *Connection) ApplicationPubSubIdentifiers() *ttnpb.ApplicationPubSubIdentifiers {
 	if pb, ok := c.Target.(*ttnpb.ApplicationPubSub); ok {
-		return &pb.ApplicationPubSubIdentifiers
+		return pb.Ids
 	}
 	return nil
 }

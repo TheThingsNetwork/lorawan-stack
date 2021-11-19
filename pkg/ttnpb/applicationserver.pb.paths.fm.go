@@ -9,13 +9,11 @@ var ApplicationLinkFieldPathsNested = []string{
 	"default_formatters.up_formatter",
 	"default_formatters.up_formatter_parameter",
 	"skip_payload_crypto",
-	"tls",
 }
 
 var ApplicationLinkFieldPathsTopLevel = []string{
 	"default_formatters",
 	"skip_payload_crypto",
-	"tls",
 }
 var GetApplicationLinkRequestFieldPathsNested = []string{
 	"application_ids",
@@ -38,7 +36,6 @@ var SetApplicationLinkRequestFieldPathsNested = []string{
 	"link.default_formatters.up_formatter",
 	"link.default_formatters.up_formatter_parameter",
 	"link.skip_payload_crypto",
-	"link.tls",
 }
 
 var SetApplicationLinkRequestFieldPathsTopLevel = []string{
@@ -194,7 +191,6 @@ var DecodeUplinkRequestFieldPathsNested = []string{
 	"uplink.settings.data_rate.modulation.lrfhss.coding_rate",
 	"uplink.settings.data_rate.modulation.lrfhss.modulation_type",
 	"uplink.settings.data_rate.modulation.lrfhss.operating_channel_width",
-	"uplink.settings.data_rate_index",
 	"uplink.settings.downlink",
 	"uplink.settings.downlink.antenna_index",
 	"uplink.settings.downlink.invert_polarization",
@@ -259,7 +255,6 @@ var DecodeUplinkResponseFieldPathsNested = []string{
 	"uplink.settings.data_rate.modulation.lrfhss.coding_rate",
 	"uplink.settings.data_rate.modulation.lrfhss.modulation_type",
 	"uplink.settings.data_rate.modulation.lrfhss.operating_channel_width",
-	"uplink.settings.data_rate_index",
 	"uplink.settings.downlink",
 	"uplink.settings.downlink.antenna_index",
 	"uplink.settings.downlink.invert_polarization",

@@ -98,7 +98,7 @@ func TestAuth(t *testing.T) {
 var (
 	singleFrameRequest = api.BuildSingleFrameRequest(test.Context(), []*ttnpb.RxMetadata{
 		{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+			GatewayIds: &ttnpb.GatewayIdentifiers{
 				GatewayId: "gtw1",
 			},
 			Location: &ttnpb.Location{
@@ -110,7 +110,7 @@ var (
 			Snr:  678.9,
 		},
 		{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+			GatewayIds: &ttnpb.GatewayIdentifiers{
 				GatewayId: "gtw2",
 			},
 			Location: &ttnpb.Location{
@@ -139,7 +139,7 @@ var (
 	multiFrameRequest = api.BuildMultiFrameRequest(test.Context(), [][]*ttnpb.RxMetadata{
 		{
 			{
-				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+				GatewayIds: &ttnpb.GatewayIdentifiers{
 					GatewayId: "gtw1",
 				},
 				Location: &ttnpb.Location{
@@ -151,7 +151,7 @@ var (
 				Snr:  678.9,
 			},
 			{
-				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+				GatewayIds: &ttnpb.GatewayIdentifiers{
 					GatewayId: "gtw2",
 				},
 				Location: &ttnpb.Location{
@@ -166,7 +166,7 @@ var (
 		},
 		{
 			{
-				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+				GatewayIds: &ttnpb.GatewayIdentifiers{
 					GatewayId: "gtw1",
 				},
 				Location: &ttnpb.Location{
@@ -178,7 +178,7 @@ var (
 				Snr:  910.1,
 			},
 			{
-				GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+				GatewayIds: &ttnpb.GatewayIdentifiers{
 					GatewayId: "gtw2",
 				},
 				Location: &ttnpb.Location{

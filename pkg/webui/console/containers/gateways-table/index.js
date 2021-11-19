@@ -21,6 +21,7 @@ import Status from '@ttn-lw/components/status'
 import toast from '@ttn-lw/components/toast'
 import Button from '@ttn-lw/components/button'
 import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
+import SafeInspector from '@ttn-lw/components/safe-inspector'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
@@ -128,9 +129,20 @@ const GatewaysTable = props => {
       {
         name: 'ids.eui',
         displayName: sharedMessages.gatewayEUI,
-        width: 20,
+        width: 15,
         sortable: true,
         sortKey: 'gateway_eui',
+        render: gatewayEui =>
+          !Boolean(gatewayEui) ? (
+            <Message
+              className="tc-subtle-gray"
+              component="i"
+              content={sharedMessages.none}
+              firstToLower
+            />
+          ) : (
+            <SafeInspector data={gatewayEui} noTransform noCopyPopup small hideable={false} />
+          ),
       },
     ]
 

@@ -89,7 +89,7 @@ func updateContactInfo(entityID *ttnpb.EntityIdentifiers, updater func([]*ttnpb.
 			return nil, err
 		}
 		contactInfoer, err = ttnpb.NewApplicationRegistryClient(is).Update(ctx, &ttnpb.UpdateApplicationRequest{
-			Application: *res,
+			Application: res,
 			FieldMask:   fieldMask,
 		})
 	case *ttnpb.Client:
@@ -98,7 +98,7 @@ func updateContactInfo(entityID *ttnpb.EntityIdentifiers, updater func([]*ttnpb.
 			return nil, err
 		}
 		contactInfoer, err = ttnpb.NewClientRegistryClient(is).Update(ctx, &ttnpb.UpdateClientRequest{
-			Client:    *res,
+			Client:    res,
 			FieldMask: fieldMask,
 		})
 	case *ttnpb.Gateway:
@@ -116,7 +116,7 @@ func updateContactInfo(entityID *ttnpb.EntityIdentifiers, updater func([]*ttnpb.
 			return nil, err
 		}
 		contactInfoer, err = ttnpb.NewOrganizationRegistryClient(is).Update(ctx, &ttnpb.UpdateOrganizationRequest{
-			Organization: *res,
+			Organization: res,
 			FieldMask:    fieldMask,
 		})
 	case *ttnpb.User:
@@ -125,7 +125,7 @@ func updateContactInfo(entityID *ttnpb.EntityIdentifiers, updater func([]*ttnpb.
 			return nil, err
 		}
 		contactInfoer, err = ttnpb.NewUserRegistryClient(is).Update(ctx, &ttnpb.UpdateUserRequest{
-			User:      *res,
+			User:      res,
 			FieldMask: fieldMask,
 		})
 	}

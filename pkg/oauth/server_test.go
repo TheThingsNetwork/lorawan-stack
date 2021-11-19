@@ -35,6 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -54,10 +55,15 @@ type authorizeFormData struct {
 }
 
 var (
+	now           = time.Now().Truncate(time.Second)
+	anHourFromNow = now.Add(time.Hour)
+)
+
+var (
 	mockSession = &ttnpb.UserSession{
 		UserIds:       &ttnpb.UserIdentifiers{UserId: "user"},
 		SessionId:     "session_id",
-		CreatedAt:     time.Now().Truncate(time.Second),
+		CreatedAt:     &now,
 		SessionSecret: "secret-1234",
 	}
 	mockUser = &ttnpb.User{
@@ -144,7 +150,7 @@ func TestOAuthFlow(t *testing.T) {
 				CanonicalURL: "https://example.com/oauth",
 			},
 		},
-	})
+	}, identityserver.GenerateCSPString)
 	if err != nil {
 		panic(err)
 	}
@@ -557,7 +563,7 @@ func TestTokenExchange(t *testing.T) {
 				Title:    "OAuth",
 			},
 		},
-	})
+	}, identityserver.GenerateCSPString)
 	if err != nil {
 		panic(err)
 	}
@@ -671,8 +677,8 @@ func TestTokenExchange(t *testing.T) {
 					Code:          "the code",
 					RedirectUri:   "http://uri/callback",
 					State:         "foo",
-					CreatedAt:     time.Now().Truncate(time.Second),
-					ExpiresAt:     time.Now().Truncate(time.Second).Add(time.Hour),
+					CreatedAt:     &now,
+					ExpiresAt:     &anHourFromNow,
 				}
 			},
 			Method: "POST",
@@ -713,8 +719,8 @@ func TestTokenExchange(t *testing.T) {
 					Code:          "the code",
 					RedirectUri:   "http://uri/callback",
 					State:         "foo",
-					CreatedAt:     time.Now().Truncate(time.Second),
-					ExpiresAt:     time.Now().Truncate(time.Second).Add(time.Hour),
+					CreatedAt:     &now,
+					ExpiresAt:     &anHourFromNow,
 				}
 			},
 			Method: "POST",
@@ -753,8 +759,8 @@ func TestTokenExchange(t *testing.T) {
 					Id:            "SFUBFRKYTGULGPAXXM4SHIBYMKCPTIMQBM63ZGQ",
 					RefreshToken:  "PBKDF2$sha256$20000$IGAiKs46xX_M64E5$4xpyqnQT8SOa_Vf4xhEPk6WOZnhmAjG2mqGQiYBhm2s",
 					Rights:        mockClient.Rights,
-					CreatedAt:     time.Now().Truncate(time.Second),
-					ExpiresAt:     time.Now().Truncate(time.Second).Add(time.Hour),
+					CreatedAt:     &now,
+					ExpiresAt:     &anHourFromNow,
 				}
 			},
 			Method: "POST",

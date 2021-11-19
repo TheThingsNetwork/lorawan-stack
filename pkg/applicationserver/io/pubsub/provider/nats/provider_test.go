@@ -58,8 +58,8 @@ func TestOpenConnection(t *testing.T) {
 	defer natsClient.Close()
 
 	pb := &ttnpb.ApplicationPubSub{
-		ApplicationPubSubIdentifiers: ttnpb.ApplicationPubSubIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+		Ids: &ttnpb.ApplicationPubSubIdentifiers{
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{
 				ApplicationId: "app1",
 			},
 			PubSubId: "ps1",

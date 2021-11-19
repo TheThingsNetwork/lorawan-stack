@@ -15,8 +15,9 @@
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import Yup from '@ttn-lw/lib/yup'
 import getHostFromUrl from '@ttn-lw/lib/host-from-url'
+import { id as deviceIdRegexp } from '@ttn-lw/lib/regexp'
 
-import { id as deviceIdRegexp, address as addressRegexp } from '@console/lib/regexp'
+import { address as addressRegexp } from '@console/lib/regexp'
 import { ACTIVATION_MODES, parseLorawanMacVersion } from '@console/lib/device-utils'
 
 import { REGISTRATION_TYPES } from '../../utils'
@@ -192,6 +193,7 @@ const macSettingsSchema = Yup.object({
       '$hasClassBTimeout',
       '$hasClassCTimeout',
       '$hasPingSlotFrequency',
+      '$hasRxFrequency',
     ],
     (
       nsEnabled,
@@ -206,6 +208,7 @@ const macSettingsSchema = Yup.object({
       hasClassBTimeout,
       hasClassCTimeout,
       hasPingSlotFrequency,
+      hasRxFrequency,
       schema,
     ) => {
       if (!nsEnabled) {
@@ -238,8 +241,7 @@ const macSettingsSchema = Yup.object({
         rx1_delay: Yup.lazy(delay => {
           if (
             mode !== ACTIVATION_MODES.ABP ||
-            delay === undefined ||
-            (delay === '' && !hasRxDelay)
+            ((delay === undefined || delay === '') && !hasRxDelay)
           ) {
             return Yup.number().strip()
           }
@@ -273,10 +275,17 @@ const macSettingsSchema = Yup.object({
             )
         }),
         rx2_frequency: Yup.lazy(frequency => {
-          if (frequency === undefined || frequency === '') {
+          if ((frequency === undefined || frequency === '') && !hasRxFrequency) {
             return Yup.number().strip()
           }
-          return Yup.number().min(100000, Yup.passValues(sharedMessages.validateNumberGte))
+
+          const schema = Yup.number().min(100000, Yup.passValues(sharedMessages.validateNumberGte))
+
+          if (hasRxFrequency) {
+            return schema.required(sharedMessages.validateRequired)
+          }
+
+          return schema
         }),
         beacon_frequency: Yup.lazy(frequency => {
           if (!isClassB || ((frequency === undefined || frequency === '') && !hasBeaconFrequency)) {

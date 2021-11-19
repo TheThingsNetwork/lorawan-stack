@@ -714,7 +714,7 @@ func (env TestEnvironment) AssertNsAsHandleUplink(ctx context.Context, appID ttn
 							}),
 						}, test.AllTrue(
 							a.So(role, should.Equal, ttnpb.ClusterRole_APPLICATION_SERVER),
-							a.So(ids.GetEntityIdentifiers().GetApplicationIds(), should.Resemble, &appID),
+							a.So(ids, should.BeNil),
 						)
 				},
 			), should.BeTrue) {
@@ -804,13 +804,13 @@ func (env TestEnvironment) AssertLegacyScheduleDownlink(ctx context.Context, pat
 				peerByIDs[uid] = peer
 			}
 
-			expectedIDs := func() (ids []ttnpb.GatewayIdentifiers) {
+			expectedIDs := func() (ids []*ttnpb.GatewayIdentifiers) {
 				for _, path := range paths {
-					ids = append(ids, *path.GatewayIdentifiers)
+					ids = append(ids, path.GatewayIdentifiers)
 				}
 				return ids
 			}()
-			var reqIDs []ttnpb.GatewayIdentifiers
+			var reqIDs []*ttnpb.GatewayIdentifiers
 			for range paths {
 				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (test.ClusterGetPeerResponse, bool) {
 					_, a := test.MustNewTFromContext(ctx)
@@ -824,13 +824,19 @@ func (env TestEnvironment) AssertLegacyScheduleDownlink(ctx context.Context, pat
 							Error: errors.New("assertion failed"),
 						}, false
 					}
-					if !a.So(expectedIDs, should.Contain, *gtwIDs) {
+					found := false
+					for _, expectedID := range expectedIDs {
+						if expectedID.Equal(gtwIDs) {
+							found = true
+						}
+					}
+					if !a.So(found, should.BeTrue) {
 						t.Errorf("Gateway Server peer requested for unknown gateway IDs: %v.\nExpected one of %v", gtwIDs, expectedIDs)
 						return test.ClusterGetPeerResponse{
 							Error: errors.New("assertion failed"),
 						}, false
 					}
-					reqIDs = append(reqIDs, *gtwIDs)
+					reqIDs = append(reqIDs, gtwIDs)
 					peer, ok := peerByIDs[unique.ID(ctx, *gtwIDs)]
 					if !ok {
 						return test.ClusterGetPeerResponse{
@@ -845,7 +851,11 @@ func (env TestEnvironment) AssertLegacyScheduleDownlink(ctx context.Context, pat
 					return
 				}
 			}
-			if !a.So(reqIDs, should.HaveSameElementsDeep, expectedIDs) {
+			ok := true
+			for i := range reqIDs {
+				ok = ok && a.So(reqIDs[i], should.Resemble, expectedIDs[i])
+			}
+			if !ok || !a.So(len(reqIDs), should.Equal, len(expectedIDs)) {
 				t.Errorf("Gateway peers by incorrect gateway IDs were requested: %v.\nExpected peers for following gateway IDs to be requested: %v", reqIDs, expectedIDs)
 			}
 
@@ -899,7 +909,7 @@ type DownlinkSchedulingAssertionConfig struct {
 	Uplink          *ttnpb.UplinkMessage
 	Priority        ttnpb.TxSchedulePriority
 	AbsoluteTime    *time.Time
-	FixedPaths      []ttnpb.GatewayAntennaIdentifiers
+	FixedPaths      []*ttnpb.GatewayAntennaIdentifiers
 	Payload         []byte
 	CorrelationIDs  []string
 	PeerIndexes     []uint
@@ -920,14 +930,14 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 
 			var downlinkPaths []DownlinkPath
 			if conf.Uplink != nil {
-				downlinkPaths = DownlinkPathsFromMetadata(conf.Uplink.RxMetadata...)
+				downlinkPaths = DownlinkPathsFromMetadata(ctx, conf.Uplink.RxMetadata...)
 			} else {
 				for i := range conf.FixedPaths {
 					downlinkPaths = append(downlinkPaths, DownlinkPath{
-						GatewayIdentifiers: &conf.FixedPaths[i].GatewayIdentifiers,
+						GatewayIdentifiers: conf.FixedPaths[i].GatewayIds,
 						DownlinkPath: &ttnpb.DownlinkPath{
 							Path: &ttnpb.DownlinkPath_Fixed{
-								Fixed: &conf.FixedPaths[i],
+								Fixed: conf.FixedPaths[i],
 							},
 						},
 					})
@@ -975,13 +985,13 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 				}
 			}
 
-			expectedIDs := func() (ids []ttnpb.GatewayIdentifiers) {
+			expectedIDs := func() (ids []*ttnpb.GatewayIdentifiers) {
 				for _, path := range downlinkPaths {
-					ids = append(ids, *path.GatewayIdentifiers)
+					ids = append(ids, path.GatewayIdentifiers)
 				}
 				return ids
 			}()
-			var reqIDs []ttnpb.GatewayIdentifiers
+			var reqIDs []*ttnpb.GatewayIdentifiers
 			for range downlinkPaths {
 				if !a.So(test.AssertClusterGetPeerRequest(ctx, env.Cluster.GetPeer, func(ctx, reqCtx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (test.ClusterGetPeerResponse, bool) {
 					_, a := test.MustNewTFromContext(ctx)
@@ -995,13 +1005,19 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 							Error: errors.New("assertion failed"),
 						}, false
 					}
-					if !a.So(expectedIDs, should.Contain, *gtwIDs) {
+					found := false
+					for _, expectedID := range expectedIDs {
+						if expectedID.Equal(gtwIDs) {
+							found = true
+						}
+					}
+					if !a.So(found, should.BeTrue) {
 						t.Errorf("Gateway Server peer requested for unknown gateway IDs: %v.\nExpected one of %v", gtwIDs, expectedIDs)
 						return test.ClusterGetPeerResponse{
 							Error: errors.New("assertion failed"),
 						}, false
 					}
-					reqIDs = append(reqIDs, *gtwIDs)
+					reqIDs = append(reqIDs, gtwIDs)
 					peer, ok := peerByIDs[*gtwIDs]
 					if !ok {
 						return test.ClusterGetPeerResponse{
@@ -1016,7 +1032,11 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 					return
 				}
 			}
-			if !a.So(reqIDs, should.HaveSameElementsDeep, expectedIDs) {
+			ok := true
+			for i := range reqIDs {
+				ok = ok && a.So(reqIDs[i], should.Resemble, expectedIDs[i])
+			}
+			if !ok || !a.So(len(reqIDs), should.Equal, len(expectedIDs)) {
 				t.Errorf("Gateway peers by incorrect gateway IDs were requested: %v.\nExpected peers for following gateway IDs to be requested: %v", reqIDs, expectedIDs)
 			}
 
@@ -1051,33 +1071,29 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 							Settings: &ttnpb.DownlinkMessage_Request{
 								Request: func() *ttnpb.TxRequest {
 									txReq := &ttnpb.TxRequest{
-										Class:             conf.Class,
-										DownlinkPaths:     expectedAttempt.RequestPaths,
-										Priority:          conf.Priority,
-										FrequencyPlanId:   conf.FrequencyPlanID,
-										AbsoluteTime:      conf.AbsoluteTime,
-										LorawanPhyVersion: conf.PHYVersion,
+										Class:           conf.Class,
+										DownlinkPaths:   expectedAttempt.RequestPaths,
+										Priority:        conf.Priority,
+										FrequencyPlanId: conf.FrequencyPlanID,
+										AbsoluteTime:    conf.AbsoluteTime,
 									}
 									if conf.SetRX1 {
+										drIdx, _, _ := phy.FindUplinkDataRate(conf.Uplink.Settings.DataRate)
 										txReq.Rx1Delay = conf.RX1Delay
 										rx1DRIdx := test.Must(phy.Rx1DataRate(
-											conf.Uplink.Settings.DataRateIndex,
+											drIdx,
 											conf.MACState.CurrentParameters.Rx1DataRateOffset,
 											conf.MACState.CurrentParameters.DownlinkDwellTime.GetValue()),
 										).(ttnpb.DataRateIndex)
 										rx1DR := phy.DataRates[rx1DRIdx]
 										txReq.Rx1DataRate = &rx1DR.Rate
 										txReq.Rx1Frequency = conf.MACState.CurrentParameters.Channels[test.Must(phy.Rx1Channel(uint8(conf.Uplink.DeviceChannelIndex))).(uint8)].DownlinkFrequency
-										// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-										txReq.Rx1DataRateIndex = rx1DRIdx
 									}
 									if conf.SetRX2 {
 										rx2DRIdx := conf.MACState.CurrentParameters.Rx2DataRateIndex
 										rx2DR := phy.DataRates[rx2DRIdx]
 										txReq.Rx2DataRate = &rx2DR.Rate
 										txReq.Rx2Frequency = conf.MACState.CurrentParameters.Rx2Frequency
-										// TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/4478).
-										txReq.Rx2DataRateIndex = rx2DRIdx
 									}
 									return txReq
 								}(),
@@ -1207,7 +1223,7 @@ type DataDownlinkAssertionConfig struct {
 	Class          ttnpb.Class
 	Priority       ttnpb.TxSchedulePriority
 	AbsoluteTime   *time.Time
-	FixedPaths     []ttnpb.GatewayAntennaIdentifiers
+	FixedPaths     []*ttnpb.GatewayAntennaIdentifiers
 	RawPayload     []byte
 	Payload        *ttnpb.Message
 	CorrelationIDs []string
@@ -1515,7 +1531,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					func(ctx, reqCtx context.Context, peerIDs cluster.EntityIdentifiers) bool {
 						return test.AllTrue(
 							a.So(events.CorrelationIDsFromContext(reqCtx), should.BeProperSupersetOfElementsFunc, test.StringEqual, ups[0].CorrelationIds),
-							a.So(peerIDs.GetEntityIdentifiers().GetDeviceIds(), should.Resemble, &conf.Device.EndDeviceIdentifiers),
+							a.So(peerIDs, should.BeNil),
 						)
 					},
 					func(ctx, reqCtx context.Context, req *ttnpb.JoinRequest) bool {
@@ -2174,8 +2190,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 									},
 								},
 							},
-							Rx2Frequency:      x.PendingMacState.CurrentParameters.Rx2Frequency,
-							LorawanPhyVersion: x.LorawanPhyVersion,
+							Rx2Frequency: x.PendingMacState.CurrentParameters.Rx2Frequency,
 							// TODO: Generate RX1 transmission parameters if necessary.
 							// https://github.com/TheThingsNetwork/lorawan-stack/issues/3142
 						},
@@ -2425,4 +2440,9 @@ func (m MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.Application
 // RangeByUplinkMatches panics.
 func (m MockDeviceRegistry) RangeByUplinkMatches(context.Context, *ttnpb.UplinkMessage, time.Duration, func(context.Context, *UplinkMatch) (bool, error)) error {
 	panic("RangeByUplinkMatches must not be called")
+}
+
+// Range panics.
+func (m MockDeviceRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
+	panic("Range must not be called")
 }

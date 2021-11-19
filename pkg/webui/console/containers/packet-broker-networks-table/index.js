@@ -156,6 +156,10 @@ class PacketBrokerNetworksTable extends Component {
     return `/${netId}`
   }
 
+  rowKeySelector({ id }) {
+    return `${id.net_id}${'tenant_id' in id ? `/${id.tenant_id}` : ''}`
+  }
+
   render() {
     const { pageSize } = this.props
 
@@ -165,6 +169,7 @@ class PacketBrokerNetworksTable extends Component {
         headers={headers}
         getItemsAction={this.getPacketBrokerNetworksList}
         getItemPathPrefix={this.getItemPathPrefix}
+        rowKeySelector={this.rowKeySelector}
         baseDataSelector={this.baseDataSelector}
         pageSize={pageSize}
         tabs={tabs}

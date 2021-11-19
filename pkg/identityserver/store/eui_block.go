@@ -14,6 +14,7 @@
 
 package store
 
+// EUIBlock is the model for a block of EUIs.
 type EUIBlock struct {
 	Model
 
@@ -27,6 +28,7 @@ func init() {
 	registerModel(&EUIBlock{})
 }
 
+// TableName returns the table name for the EUIBlock model.
 func (EUIBlock) TableName() string {
 	return "eui_blocks"
 }

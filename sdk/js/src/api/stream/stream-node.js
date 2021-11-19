@@ -37,7 +37,7 @@ import { notify, EVENTS } from './shared'
  *      .on('start', () => console.log('conn opened'))
  *      .on('chunk', chunk => console.log('received chunk', chunk))
  *      .on('error', error => console.log(error))
- *      .on('close', () => console.log('conn closed'))
+ *      .on('close', wasClientRequest => console.log(wasClientRequest ? 'conn closed by client' : 'conn closed by server'))
  *
  *    // Start the stream after attaching the listeners.
  *    stream.open()
@@ -52,6 +52,7 @@ import { notify, EVENTS } from './shared'
 export default async (payload, url) => {
   let listeners = Object.values(EVENTS).reduce((acc, curr) => ({ ...acc, [curr]: null }), {})
   let reader = null
+  let closeRequested = false
 
   const token = new Token().get()
 
@@ -92,7 +93,7 @@ export default async (payload, url) => {
         }
       })
       reader.on('end', () => {
-        notify(listeners[EVENTS.CLOSE])
+        notify(listeners[EVENTS.CLOSE], closeRequested)
         listeners = {}
       })
       reader.on('error', error => {
@@ -113,6 +114,7 @@ export default async (payload, url) => {
     },
     close: () => {
       if (reader) {
+        closeRequested = true
         reader.cancel()
       }
     },

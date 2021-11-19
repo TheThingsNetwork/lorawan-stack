@@ -47,6 +47,7 @@ const handleMessage = (message, type) => {
   toast({
     messageGroup: 'offline-status',
     message: { ...message, values: { applicationName: siteTitle } },
+    preventConsecutive: true,
     type,
   })
 }

@@ -34,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -58,10 +59,11 @@ type authorizeFormData struct {
 }
 
 var (
+	now         = time.Now().Truncate(time.Second)
 	mockSession = &ttnpb.UserSession{
 		UserIds:   &ttnpb.UserIdentifiers{UserId: "user"},
 		SessionId: "session_id",
-		CreatedAt: time.Now().Truncate(time.Second),
+		CreatedAt: &now,
 	}
 	mockUser = &ttnpb.User{
 		Ids: &ttnpb.UserIdentifiers{UserId: "user"},
@@ -98,7 +100,7 @@ func TestAuthentication(t *testing.T) {
 			},
 		},
 	})
-	s := account.NewServer(c, store, oauth.Config{
+	s, err := account.NewServer(c, store, oauth.Config{
 		Mount:       "/oauth",
 		CSRFAuthKey: []byte("12345678123456781234567812345678"),
 		UI: oauth.UIConfig{
@@ -108,7 +110,10 @@ func TestAuthentication(t *testing.T) {
 				CanonicalURL: "https://example.com/oauth",
 			},
 		},
-	})
+	}, identityserver.GenerateCSPString)
+	if err != nil {
+		panic(err)
+	}
 	c.RegisterWeb(s)
 	componenttest.StartComponent(t, c)
 

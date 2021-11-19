@@ -44,9 +44,9 @@ var (
 
 var pictureRand = randutil.NewLockedRand(rand.NewSource(time.Now().UnixNano()))
 
-func fillGravatar(ctx context.Context, usr *ttnpb.User) (err error) {
+func fillGravatar(ctx context.Context, usr *ttnpb.User) {
 	if usr == nil || usr.ProfilePicture != nil || usr.PrimaryEmailAddress == "" {
-		return nil
+		return
 	}
 	hash := md5.Sum([]byte(strings.ToLower(strings.TrimSpace(usr.PrimaryEmailAddress))))
 	usr.ProfilePicture = &ttnpb.Picture{
@@ -55,7 +55,6 @@ func fillGravatar(ctx context.Context, usr *ttnpb.User) (err error) {
 	for _, size := range profilePictureDimensions {
 		usr.ProfilePicture.Sizes[uint32(size)] = fmt.Sprintf("https://www.gravatar.com/avatar/%x?s=%d&d=404", hash, size)
 	}
-	return nil
 }
 
 var errProfilePictureUploadDisabled = errors.DefineFailedPrecondition(
@@ -107,11 +106,8 @@ func (is *IdentityServer) processUserProfilePicture(ctx context.Context, usr *tt
 	region := trace.StartRegion(ctx, "store profile picture")
 	usr.ProfilePicture, err = picture.Store(ctx, bucket, id, usr.ProfilePicture, profilePictureDimensions...)
 	region.End()
-	if err != nil {
-		return err
-	}
 
-	return
+	return err
 }
 
 var errEndDevicePictureUploadDisabled = errors.DefineFailedPrecondition(
@@ -163,9 +159,6 @@ func (is *IdentityServer) processEndDevicePicture(ctx context.Context, dev *ttnp
 	region := trace.StartRegion(ctx, "store end device picture")
 	dev.Picture, err = picture.Store(ctx, bucket, id, dev.Picture, endDevicePictureDimensions...)
 	region.End()
-	if err != nil {
-		return err
-	}
 
-	return
+	return err
 }

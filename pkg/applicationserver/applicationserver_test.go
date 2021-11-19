@@ -35,7 +35,11 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
 	distribredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/distribution/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
+	asioapredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
 	iopubsubredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
 	iowebredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
@@ -69,13 +73,13 @@ func TestApplicationServer(t *testing.T) {
 	registeredApplicationID := ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"}
 	registeredApplicationKey := "secret"
 	registeredApplicationFormatter := ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP
-	registeredApplicationWebhookID := ttnpb.ApplicationWebhookIdentifiers{
-		ApplicationIdentifiers: registeredApplicationID,
-		WebhookId:              "test",
+	registeredApplicationWebhookID := &ttnpb.ApplicationWebhookIdentifiers{
+		ApplicationIds: &registeredApplicationID,
+		WebhookId:      "test",
 	}
-	registeredApplicationPubSubID := ttnpb.ApplicationPubSubIdentifiers{
-		ApplicationIdentifiers: registeredApplicationID,
-		PubSubId:               "test",
+	registeredApplicationPubSubID := &ttnpb.ApplicationPubSubIdentifiers{
+		ApplicationIds: &registeredApplicationID,
+		PubSubId:       "test",
 	}
 
 	// This device gets registered in the device registry of the Application Server.
@@ -182,13 +186,19 @@ func TestApplicationServer(t *testing.T) {
 	devsRedisClient, devsFlush := test.NewRedis(ctx, "applicationserver_test", "devices")
 	defer devsFlush()
 	defer devsRedisClient.Close()
-	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient}
+	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient, LockTTL: test.Delay << 10}
+	if err := deviceRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 
 	linksRedisClient, linksFlush := test.NewRedis(ctx, "applicationserver_test", "links")
 	defer linksFlush()
 	defer linksRedisClient.Close()
-	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient}
-	_, err := linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
+	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient, LockTTL: test.Delay << 10}
+	if err := linkRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	_, err := linkRegistry.Set(ctx, &registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
 			DefaultFormatters: &ttnpb.MessagePayloadFormatters{
 				UpFormatter:   registeredApplicationFormatter,
@@ -211,12 +221,18 @@ func TestApplicationServer(t *testing.T) {
 	webhooksRedisClient, webhooksFlush := test.NewRedis(ctx, "applicationserver_test", "webhooks")
 	defer webhooksFlush()
 	defer webhooksRedisClient.Close()
-	webhookRegistry := iowebredis.WebhookRegistry{Redis: webhooksRedisClient}
+	webhookRegistry := iowebredis.WebhookRegistry{Redis: webhooksRedisClient, LockTTL: test.Delay << 10}
+	if err := webhookRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 
 	pubsubRedisClient, pubsubFlush := test.NewRedis(ctx, "applicationserver_test", "pubsub")
 	defer pubsubFlush()
 	defer pubsubRedisClient.Close()
-	pubsubRegistry := iopubsubredis.PubSubRegistry{Redis: pubsubRedisClient}
+	pubsubRegistry := iopubsubredis.PubSubRegistry{Redis: pubsubRedisClient, LockTTL: test.Delay << 10}
+	if err := pubsubRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 
 	distribRedisClient, distribFlush := test.NewRedis(ctx, "applicationserver_test", "traffic")
 	defer distribFlush()
@@ -295,7 +311,9 @@ func TestApplicationServer(t *testing.T) {
 			Fetcher: &noopEndDeviceFetcher{},
 		},
 		Distribution: applicationserver.DistributionConfig{
-			PubSub: distribPubSub,
+			Global: applicationserver.GlobalDistributorConfig{
+				PubSub: distribPubSub,
+			},
 		},
 	}
 	as, err := applicationserver.New(c, config)
@@ -332,7 +350,7 @@ func TestApplicationServer(t *testing.T) {
 		{
 			Protocol: "grpc",
 			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
-				return ids == registeredApplicationID && key == registeredApplicationKey
+				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				creds := grpc.PerRPCCredentials(rpcmetadata.MD{
@@ -383,7 +401,7 @@ func TestApplicationServer(t *testing.T) {
 		{
 			Protocol: "mqtt",
 			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
-				return ids == registeredApplicationID && key == registeredApplicationKey
+				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				clientOpts := mqtt.NewClientOptions()
@@ -448,7 +466,7 @@ func TestApplicationServer(t *testing.T) {
 		{
 			Protocol: "pubsub/nats",
 			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
-				return ids == registeredApplicationID && key == registeredApplicationKey
+				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				evCh := make(chan events.Event, EventsBufferSize)
@@ -461,8 +479,8 @@ func TestApplicationServer(t *testing.T) {
 				})
 				client := ttnpb.NewApplicationPubSubRegistryClient(as.LoopbackConn())
 				req := &ttnpb.SetApplicationPubSubRequest{
-					ApplicationPubSub: ttnpb.ApplicationPubSub{
-						ApplicationPubSubIdentifiers: registeredApplicationPubSubID,
+					Pubsub: &ttnpb.ApplicationPubSub{
+						Ids: registeredApplicationPubSubID,
 						Provider: &ttnpb.ApplicationPubSub_Nats{
 							Nats: &ttnpb.ApplicationPubSub_NATSProvider{
 								ServerUrl: "nats://localhost:4124",
@@ -590,7 +608,7 @@ func TestApplicationServer(t *testing.T) {
 		{
 			Protocol: "pubsub/mqtt",
 			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
-				return ids == registeredApplicationID && key == registeredApplicationKey
+				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				evCh := make(chan events.Event, EventsBufferSize)
@@ -603,8 +621,8 @@ func TestApplicationServer(t *testing.T) {
 				})
 				client := ttnpb.NewApplicationPubSubRegistryClient(as.LoopbackConn())
 				req := &ttnpb.SetApplicationPubSubRequest{
-					ApplicationPubSub: ttnpb.ApplicationPubSub{
-						ApplicationPubSubIdentifiers: registeredApplicationPubSubID,
+					Pubsub: &ttnpb.ApplicationPubSub{
+						Ids: registeredApplicationPubSubID,
 						Provider: &ttnpb.ApplicationPubSub_Mqtt{
 							Mqtt: &ttnpb.ApplicationPubSub_MQTTProvider{
 								ServerUrl:    fmt.Sprintf("tcp://%v", mqttLis.Addr()),
@@ -736,7 +754,7 @@ func TestApplicationServer(t *testing.T) {
 		{
 			Protocol: "webhooks",
 			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
-				return ids == registeredApplicationID && key == registeredApplicationKey
+				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				// Start web server to read upstream.
@@ -761,19 +779,19 @@ func TestApplicationServer(t *testing.T) {
 				})
 				client := ttnpb.NewApplicationWebhookRegistryClient(as.LoopbackConn())
 				req := &ttnpb.SetApplicationWebhookRequest{
-					ApplicationWebhook: ttnpb.ApplicationWebhook{
-						ApplicationWebhookIdentifiers: registeredApplicationWebhookID,
-						BaseUrl:                       webhookTarget.URL,
-						Format:                        "json",
-						UplinkMessage:                 &ttnpb.ApplicationWebhook_Message{Path: ""},
-						JoinAccept:                    &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkAck:                   &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkNack:                  &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkQueued:                &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkSent:                  &ttnpb.ApplicationWebhook_Message{Path: ""},
-						DownlinkFailed:                &ttnpb.ApplicationWebhook_Message{Path: ""},
-						LocationSolved:                &ttnpb.ApplicationWebhook_Message{Path: ""},
-						ServiceData:                   &ttnpb.ApplicationWebhook_Message{Path: ""},
+					Webhook: &ttnpb.ApplicationWebhook{
+						Ids:            registeredApplicationWebhookID,
+						BaseUrl:        webhookTarget.URL,
+						Format:         "json",
+						UplinkMessage:  &ttnpb.ApplicationWebhook_Message{Path: ""},
+						JoinAccept:     &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkAck:    &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkNack:   &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkQueued: &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkSent:   &ttnpb.ApplicationWebhook_Message{Path: ""},
+						DownlinkFailed: &ttnpb.ApplicationWebhook_Message{Path: ""},
+						LocationSolved: &ttnpb.ApplicationWebhook_Message{Path: ""},
+						ServiceData:    &ttnpb.ApplicationWebhook_Message{Path: ""},
 					},
 					FieldMask: &pbtypes.FieldMask{
 						Paths: []string{
@@ -949,7 +967,6 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 0,
-								StartedAt:     dev.PendingSession.StartedAt,
 							})
 							a.So(queue, should.BeEmpty)
 						},
@@ -996,7 +1013,6 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 0,
-								StartedAt:     dev.PendingSession.StartedAt,
 							})
 							a.So(queue, should.BeEmpty)
 						},
@@ -1008,7 +1024,7 @@ func TestApplicationServer(t *testing.T) {
 							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
-									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
+									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
 									Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyId: []byte{0x22},
 									FPort:        22,
@@ -1023,7 +1039,7 @@ func TestApplicationServer(t *testing.T) {
 								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 								Up: &ttnpb.ApplicationUp_UplinkMessage{
 									UplinkMessage: &ttnpb.ApplicationUplink{
-										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
+										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
 										Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 										SessionKeyId: []byte{0x22},
 										FPort:        22,
@@ -1115,7 +1131,6 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 0,
-								StartedAt:     dev.Session.StartedAt,
 							})
 							a.So(dev.PendingSession, should.Resemble, &ttnpb.Session{
 								DevAddr: types.DevAddr{0x33, 0x33, 0x33, 0x33},
@@ -1127,7 +1142,6 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 2,
-								StartedAt:     dev.PendingSession.StartedAt,
 							})
 							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{
 								{
@@ -1170,7 +1184,7 @@ func TestApplicationServer(t *testing.T) {
 							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
-									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
+									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
 									Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyId: []byte{0x33},
 									FPort:        42,
@@ -1185,7 +1199,7 @@ func TestApplicationServer(t *testing.T) {
 								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 								Up: &ttnpb.ApplicationUp_UplinkMessage{
 									UplinkMessage: &ttnpb.ApplicationUplink{
-										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
+										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
 										Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 										SessionKeyId: []byte{0x33},
 										FPort:        42,
@@ -1549,7 +1563,6 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 44,
-								StartedAt:     dev.Session.StartedAt,
 							})
 							a.So(dev.PendingSession, should.Resemble, &ttnpb.Session{
 								DevAddr: types.DevAddr{0x44, 0x44, 0x44, 0x44},
@@ -1561,7 +1574,6 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 2,
-								StartedAt:     dev.PendingSession.StartedAt,
 							})
 							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{
 								{
@@ -1604,7 +1616,7 @@ func TestApplicationServer(t *testing.T) {
 							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
-									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
+									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
 									Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyId: []byte{0x44},
 									FPort:        24,
@@ -1619,7 +1631,7 @@ func TestApplicationServer(t *testing.T) {
 								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
 								Up: &ttnpb.ApplicationUp_UplinkMessage{
 									UplinkMessage: &ttnpb.ApplicationUplink{
-										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
+										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
 										Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 										SessionKeyId: []byte{0x44},
 										FPort:        24,
@@ -1653,7 +1665,6 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 2,
-								StartedAt:     dev.Session.StartedAt,
 							})
 							a.So(dev.PendingSession, should.BeNil)
 							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{
@@ -1850,7 +1861,7 @@ func TestApplicationServer(t *testing.T) {
 							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
-									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
+									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
 									Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyId: []byte{0x55},
 									FPort:        42,
@@ -1865,7 +1876,7 @@ func TestApplicationServer(t *testing.T) {
 								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
 								Up: &ttnpb.ApplicationUp_UplinkMessage{
 									UplinkMessage: &ttnpb.ApplicationUplink{
-										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
+										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
 										Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 										SessionKeyId: []byte{0x55},
 										FPort:        42,
@@ -1899,7 +1910,6 @@ func TestApplicationServer(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 0,
-								StartedAt:     dev.Session.StartedAt,
 							})
 							a.So(dev.PendingSession, should.BeNil)
 							a.So(queue, should.Resemble, []*ttnpb.ApplicationDownlink{})
@@ -1931,7 +1941,7 @@ func TestApplicationServer(t *testing.T) {
 							EndDeviceIdentifiers: withDevAddr(unregisteredDeviceID, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
-									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
+									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
 									Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyId: []byte{0x55},
 									FPort:        11,
@@ -1964,7 +1974,7 @@ func TestApplicationServer(t *testing.T) {
 									t.Fatalf("Expected no upstream message but got %v", msg)
 								}
 							}
-						case <-time.After(Timeout * 2):
+						case <-time.After(Timeout):
 							if !tc.ExpectTimeout && tc.AssertUp != nil {
 								t.Fatal("Expected upstream timeout")
 							}
@@ -2271,13 +2281,19 @@ func TestSkipPayloadCrypto(t *testing.T) {
 	devsRedisClient, devsFlush := test.NewRedis(ctx, "applicationserver_test", "devices")
 	defer devsFlush()
 	defer devsRedisClient.Close()
-	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient}
+	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient, LockTTL: test.Delay << 10}
+	if err := deviceRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 
 	linksRedisClient, linksFlush := test.NewRedis(ctx, "applicationserver_test", "links")
 	defer linksFlush()
 	defer linksRedisClient.Close()
-	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient}
-	_, err := linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
+	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient, LockTTL: test.Delay << 10}
+	if err := linkRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	_, err := linkRegistry.Set(ctx, &registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
 			SkipPayloadCrypto: &pbtypes.BoolValue{Value: true},
 		}, []string{"skip_payload_crypto"}, nil
@@ -2329,7 +2345,9 @@ func TestSkipPayloadCrypto(t *testing.T) {
 			Fetcher: &noopEndDeviceFetcher{},
 		},
 		Distribution: applicationserver.DistributionConfig{
-			PubSub: distribPubSub,
+			Global: applicationserver.GlobalDistributorConfig{
+				PubSub: distribPubSub,
+			},
 		},
 	}
 	as, err := applicationserver.New(c, config)
@@ -2375,6 +2393,8 @@ func TestSkipPayloadCrypto(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to subscribe: %v", err)
 	}
+	// Wait for connection to establish.
+	time.Sleep(2 * Timeout)
 	// Read upstream.
 	go func() {
 		for {
@@ -2489,7 +2509,6 @@ func TestSkipPayloadCrypto(t *testing.T) {
 									},
 								},
 								LastAFCntDown: 0,
-								StartedAt:     dev.PendingSession.StartedAt,
 							})
 						},
 					},
@@ -2499,7 +2518,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
-									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
+									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
 									Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyId: []byte{0x22},
 									FPort:        22,
@@ -2516,7 +2535,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 									EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 									Up: &ttnpb.ApplicationUp_UplinkMessage{
 										UplinkMessage: &ttnpb.ApplicationUplink{
-											RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
+											RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
 											Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 											SessionKeyId: []byte{0x22},
 											FPort:        22,
@@ -2537,7 +2556,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 									EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 									Up: &ttnpb.ApplicationUp_UplinkMessage{
 										UplinkMessage: &ttnpb.ApplicationUplink{
-											RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
+											RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
 											Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 											SessionKeyId: []byte{0x22},
 											FPort:        22,
@@ -2605,7 +2624,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 							} else {
 								t.Fatalf("Expected no upstream message but got %v", msg)
 							}
-						case <-time.After(Timeout * 8):
+						case <-time.After(Timeout):
 							if step.AssertUp != nil {
 								step.AssertUp(t, nil)
 							} else {
@@ -2741,7 +2760,7 @@ func TestLocationFromPayload(t *testing.T) {
 						lat: 4.85564,
 						lng: 52.3456341,
 						alt: 16,
-						hdop: 14
+						acc: 14
 					}
 				};
 			}`,
@@ -2754,7 +2773,10 @@ func TestLocationFromPayload(t *testing.T) {
 	devsRedisClient, devsFlush := test.NewRedis(ctx, "applicationserver_test", "devices")
 	defer devsFlush()
 	defer devsRedisClient.Close()
-	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient}
+	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient, LockTTL: test.Delay << 10}
+	if err := deviceRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	_, err := deviceRegistry.Set(ctx, registeredDevice.EndDeviceIdentifiers, nil, func(ed *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		return registeredDevice, []string{"ids", "session", "formatters"}, nil
 	})
@@ -2765,8 +2787,11 @@ func TestLocationFromPayload(t *testing.T) {
 	linksRedisClient, linksFlush := test.NewRedis(ctx, "applicationserver_test", "links")
 	defer linksFlush()
 	defer linksRedisClient.Close()
-	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient}
-	_, err = linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
+	linkRegistry := &redis.LinkRegistry{Redis: linksRedisClient, LockTTL: test.Delay << 10}
+	if err := linkRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	_, err = linkRegistry.Set(ctx, &registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{}, nil, nil
 	})
 	if err != nil {
@@ -2811,7 +2836,9 @@ func TestLocationFromPayload(t *testing.T) {
 			Fetcher: &noopEndDeviceFetcher{},
 		},
 		Distribution: applicationserver.DistributionConfig{
-			PubSub: distribPubSub,
+			Global: applicationserver.GlobalDistributorConfig{
+				PubSub: distribPubSub,
+			},
 		},
 	}
 	as, err := applicationserver.New(c, config)
@@ -2835,7 +2862,7 @@ func TestLocationFromPayload(t *testing.T) {
 		EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{
 			UplinkMessage: &ttnpb.ApplicationUplink{
-				RxMetadata:   []*ttnpb.RxMetadata{{GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
+				RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
 				Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 				SessionKeyId: []byte{0x11},
 				FPort:        11,
@@ -2886,4 +2913,331 @@ func TestLocationFromPayload(t *testing.T) {
 	if loc, ok := dev.Locations["frm-payload"]; a.So(ok, should.BeTrue) {
 		assertLocation(loc)
 	}
+}
+
+func TestApplicationServerCleanup(t *testing.T) {
+	a, ctx := test.New(t)
+
+	app1 := ttnpb.ApplicationIdentifiers{ApplicationId: "app-1"}
+	app2 := ttnpb.ApplicationIdentifiers{ApplicationId: "app-2"}
+	app3 := ttnpb.ApplicationIdentifiers{ApplicationId: "app-3"}
+	app4 := ttnpb.ApplicationIdentifiers{ApplicationId: "app-4"}
+
+	webhookList := []ttnpb.ApplicationWebhookIdentifiers{
+		{
+			ApplicationIds: &app1,
+			WebhookId:      "test-1",
+		},
+		{
+			ApplicationIds: &app3,
+			WebhookId:      "test-2",
+		},
+		{
+			ApplicationIds: &app4,
+			WebhookId:      "test-3",
+		},
+	}
+
+	pubsubList := []ttnpb.ApplicationPubSubIdentifiers{
+		{
+			ApplicationIds: &app2,
+			PubSubId:       "test-1",
+		},
+		{
+			ApplicationIds: &app3,
+			PubSubId:       "test-2",
+		},
+		{
+			ApplicationIds: &app1,
+			PubSubId:       "test-3",
+		},
+	}
+	deviceList := []*ttnpb.EndDevice{
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: app1,
+				DeviceId:               "dev-1",
+				JoinEui:                eui64Ptr(types.EUI64{0x41, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x41, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: app1,
+				DeviceId:               "dev-2",
+				JoinEui:                eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: app2,
+				DeviceId:               "dev-3",
+				JoinEui:                eui64Ptr(types.EUI64{0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: app2,
+				DeviceId:               "dev-4",
+				JoinEui:                eui64Ptr(types.EUI64{0x44, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x44, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: app4,
+				DeviceId:               "dev-5",
+				JoinEui:                eui64Ptr(types.EUI64{0x45, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x45, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: app4,
+				DeviceId:               "dev-6",
+				JoinEui:                eui64Ptr(types.EUI64{0x46, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x46, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+	}
+
+	associationList := []ttnpb.ApplicationPackageAssociationIdentifiers{
+		{
+			EndDeviceIds: &deviceList[0].EndDeviceIdentifiers,
+			FPort:        1,
+		},
+		{
+			EndDeviceIds: &deviceList[0].EndDeviceIdentifiers,
+			FPort:        1,
+		},
+		{
+			EndDeviceIds: &deviceList[2].EndDeviceIdentifiers,
+			FPort:        1,
+		},
+		{
+			EndDeviceIds: &deviceList[5].EndDeviceIdentifiers,
+			FPort:        1,
+		},
+	}
+	defaultAssociationList := []ttnpb.ApplicationPackageDefaultAssociationIdentifiers{
+		{
+			ApplicationIds: &app1,
+			FPort:          1,
+		},
+		{
+			ApplicationIds: &app1,
+			FPort:          2,
+		},
+		{
+			ApplicationIds: &app2,
+			FPort:          3,
+		},
+		{
+			ApplicationIds: &app4,
+			FPort:          4,
+		},
+	}
+
+	devsRedisClient, devsFlush := test.NewRedis(ctx, "applicationserver_test", "devices")
+	defer devsFlush()
+	defer devsRedisClient.Close()
+	deviceRegistry := &redis.DeviceRegistry{Redis: devsRedisClient, LockTTL: test.Delay << 10}
+	if err := deviceRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	webhooksRedisClient, webhooksFlush := test.NewRedis(ctx, "applicationserver_test", "webhooks")
+	defer webhooksFlush()
+	defer webhooksRedisClient.Close()
+	webhookRegistry := iowebredis.WebhookRegistry{Redis: webhooksRedisClient, LockTTL: test.Delay << 10}
+	if err := webhookRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	pubsubRedisClient, pubsubFlush := test.NewRedis(ctx, "applicationserver_test", "pubsub")
+	defer pubsubFlush()
+	defer pubsubRedisClient.Close()
+	pubsubRegistry := iopubsubredis.PubSubRegistry{Redis: pubsubRedisClient, LockTTL: test.Delay << 10}
+	if err := pubsubRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	applicationUpsRedisClient, applicationUpsFlush := test.NewRedis(ctx, "applicationserver_test", "applicationups")
+	defer applicationUpsFlush()
+	defer applicationUpsRedisClient.Close()
+	applicationUpsRegistry := &redis.ApplicationUplinkRegistry{
+		Redis: applicationUpsRedisClient,
+		Limit: 16,
+	}
+
+	applicationPackagesRedisClient, applicationPackagesFlush := test.NewRedis(ctx, "applicationserver_test", "applicationpackages")
+	defer applicationPackagesFlush()
+	defer applicationPackagesRedisClient.Close()
+	applicationPackagesRegistry := &asioapredis.ApplicationPackagesRegistry{
+		Redis:   applicationPackagesRedisClient,
+		LockTTL: test.Delay << 10,
+	}
+	if err := applicationPackagesRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	for _, dev := range deviceList {
+		ret, err := deviceRegistry.Set(ctx, dev.EndDeviceIdentifiers, []string{
+			"ids.application_ids",
+			"ids.dev_eui",
+			"ids.device_id",
+			"ids.join_eui"}, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			return dev, []string{
+				"ids.application_ids",
+				"ids.dev_eui",
+				"ids.device_id",
+				"ids.join_eui"}, nil
+		})
+		if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
+			t.Fatalf("Failed to create device: %s", err)
+		}
+	}
+
+	for _, webID := range webhookList {
+		_, err := webhookRegistry.Set(ctx,
+			&webID,
+			[]string{
+				"ids.application_ids",
+				"ids.webhook_id",
+			},
+			func(web *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
+				return &ttnpb.ApplicationWebhook{
+						Ids: &webID,
+					},
+					[]string{
+						"ids.application_ids",
+						"ids.webhook_id",
+					}, nil
+			})
+		a.So(err, should.BeNil)
+	}
+
+	for _, pubsubID := range pubsubList {
+		_, err := pubsubRegistry.Set(ctx, &pubsubID,
+			[]string{
+				"ids.application_ids",
+				"ids.pub_sub_id",
+			},
+			func(ps *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
+				return &ttnpb.ApplicationPubSub{
+						Ids: &pubsubID,
+					},
+					[]string{
+						"ids.application_ids",
+						"ids.pub_sub_id",
+					},
+					nil
+			})
+		a.So(err, should.BeNil)
+	}
+
+	for _, associationID := range associationList {
+		_, err := applicationPackagesRegistry.SetAssociation(ctx, &associationID,
+			[]string{
+				"ids.end_device_ids.application_ids",
+				"ids.end_device_ids.device_id",
+				"ids.f_port",
+			},
+			func(as *ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error) {
+				return &ttnpb.ApplicationPackageAssociation{
+						Ids: &associationID,
+					},
+					[]string{
+						"ids.end_device_ids.application_ids",
+						"ids.end_device_ids.device_id",
+						"ids.f_port",
+					},
+					nil
+			})
+		a.So(err, should.BeNil)
+	}
+
+	for _, defaultAssociationID := range defaultAssociationList {
+		_, err := applicationPackagesRegistry.SetDefaultAssociation(ctx, &defaultAssociationID,
+			[]string{
+				"ids.application_ids",
+				"ids.f_port",
+			},
+			func(as *ttnpb.ApplicationPackageDefaultAssociation) (*ttnpb.ApplicationPackageDefaultAssociation, []string, error) {
+				return &ttnpb.ApplicationPackageDefaultAssociation{
+						Ids: &defaultAssociationID,
+					},
+					[]string{
+						"ids.application_ids",
+						"ids.f_port",
+					},
+					nil
+			})
+		a.So(err, should.BeNil)
+	}
+
+	// Mock IS application and device sets
+	isApplicationSet := map[string]struct{}{
+		unique.ID(ctx, app3): {},
+		unique.ID(ctx, app4): {},
+	}
+	isDeviceSet := map[string]struct{}{
+		unique.ID(ctx, deviceList[4].EndDeviceIdentifiers): {},
+		unique.ID(ctx, deviceList[5].EndDeviceIdentifiers): {},
+	}
+
+	// Test cleaner initialization (or just range to local set)
+	pubsubCleaner := &pubsub.RegistryCleaner{
+		PubSubRegistry: pubsubRegistry,
+	}
+	err := pubsubCleaner.RangeToLocalSet(ctx)
+	a.So(err, should.BeNil)
+	a.So(pubsubCleaner.LocalSet, should.HaveLength, 3)
+
+	webhookCleaner := &web.RegistryCleaner{
+		WebRegistry: webhookRegistry,
+	}
+	err = webhookCleaner.RangeToLocalSet(ctx)
+	a.So(err, should.BeNil)
+	a.So(webhookCleaner.LocalSet, should.HaveLength, 3)
+
+	devCleaner := &applicationserver.RegistryCleaner{
+		DevRegistry:    deviceRegistry,
+		AppUpsRegistry: applicationUpsRegistry,
+	}
+	err = devCleaner.RangeToLocalSet(ctx)
+	a.So(err, should.BeNil)
+	a.So(devCleaner.LocalSet, should.HaveLength, 6)
+
+	packagesCleaner := &packages.RegistryCleaner{
+		ApplicationPackagesRegistry: applicationPackagesRegistry,
+	}
+	err = packagesCleaner.RangeToLocalSet(ctx)
+	a.So(err, should.BeNil)
+	a.So(packagesCleaner.LocalApplicationSet, should.HaveLength, 3)
+	a.So(packagesCleaner.LocalDeviceSet, should.HaveLength, 3)
+
+	// Test cleaning data
+	err = pubsubCleaner.CleanData(ctx, isApplicationSet)
+	a.So(err, should.BeNil)
+	pubsubCleaner.RangeToLocalSet(ctx)
+	a.So(pubsubCleaner.LocalSet, should.HaveLength, 1)
+
+	err = webhookCleaner.CleanData(ctx, isApplicationSet)
+	a.So(err, should.BeNil)
+	webhookCleaner.RangeToLocalSet(ctx)
+	a.So(webhookCleaner.LocalSet, should.HaveLength, 2)
+
+	err = devCleaner.CleanData(ctx, isDeviceSet)
+	a.So(err, should.BeNil)
+	devCleaner.RangeToLocalSet(ctx)
+	a.So(devCleaner.LocalSet, should.HaveLength, 2)
+
+	err = packagesCleaner.CleanData(ctx, isDeviceSet, isApplicationSet)
+	a.So(err, should.BeNil)
+	packagesCleaner.RangeToLocalSet(ctx)
+	a.So(packagesCleaner.LocalApplicationSet, should.HaveLength, 1)
+	a.So(packagesCleaner.LocalDeviceSet, should.HaveLength, 1)
 }

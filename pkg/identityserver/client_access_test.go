@@ -49,8 +49,8 @@ func TestClientAccessRightsPermissionDenied(t *testing.T) {
 		_, err := reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
 			ClientIds: clientID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_ALL},
+				Ids:    collaboratorID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_ALL},
 			},
 		}, creds)
 
@@ -90,8 +90,8 @@ func TestClientAccessPermissionDenied(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
 			ClientIds: clientID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
+				Ids:    collaboratorID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
 			},
 		})
 
@@ -159,8 +159,8 @@ func TestClientAccessCRUD(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
 			ClientIds: clientID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
+				Ids:    collaboratorID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
 			},
 		}, creds)
 
@@ -179,7 +179,7 @@ func TestClientAccessCRUD(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
 			ClientIds: clientID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
+				Ids: collaboratorID,
 			},
 		}, creds)
 

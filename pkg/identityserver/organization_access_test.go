@@ -73,7 +73,7 @@ func TestOrganizationAccessNotFound(t *testing.T) {
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIds: organizationID,
-			APIKey:          apiKey,
+			ApiKey:          &apiKey,
 			FieldMask:       &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
@@ -95,27 +95,27 @@ func TestOrganizationAccessRightsPermissionDenied(t *testing.T) {
 
 		reg := ttnpb.NewOrganizationAccessClient(cc)
 
-		APIKeyName := "test-organization-api-key-name"
-		APIKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateOrganizationAPIKeyRequest{
+		apiKeyName := "test-organization-api-key-name"
+		apiKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateOrganizationAPIKeyRequest{
 			OrganizationIds: organizationID,
-			Name:            APIKeyName,
+			Name:            apiKeyName,
 			Rights:          []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL},
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-		a.So(APIKey, should.BeNil)
+		a.So(apiKey, should.BeNil)
 
 		// Choose right that the user does not have and hence cannot add
 		right := ttnpb.RIGHT_ORGANIZATION_SETTINGS_BASIC
-		APIKey = organizationAPIKeys(organizationID).ApiKeys[0]
+		apiKey = organizationAPIKeys(organizationID).ApiKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIds: organizationID,
-			APIKey: ttnpb.APIKey{
-				Id:     APIKey.Id,
-				Name:   APIKey.Name,
+			ApiKey: &ttnpb.APIKey{
+				Id:     apiKey.Id,
+				Name:   apiKey.Name,
 				Rights: []ttnpb.Right{right},
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights", "name"}},
@@ -129,8 +129,8 @@ func TestOrganizationAccessRightsPermissionDenied(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL},
+				Ids:    collaboratorID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL},
 			},
 		}, creds)
 
@@ -148,7 +148,7 @@ func TestOrganizationAccessPermissionDenied(t *testing.T) {
 		userID := defaultUser.GetIds()
 		organizationID := userOrganizations(userID).Organizations[0].GetIds()
 		collaboratorID := collaboratorUser.GetIds().OrganizationOrUserIdentifiers()
-		APIKeyID := organizationAPIKeys(organizationID).ApiKeys[0].Id
+		apiKeyID := organizationAPIKeys(organizationID).ApiKeys[0].Id
 
 		reg := ttnpb.NewOrganizationAccessClient(cc)
 
@@ -159,24 +159,24 @@ func TestOrganizationAccessPermissionDenied(t *testing.T) {
 			a.So(rights.Rights, should.BeEmpty)
 		}
 
-		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
+		apiKey, err := reg.GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
 			OrganizationIds: organizationID,
-			KeyId:           APIKeyID,
+			KeyId:           apiKeyID,
 		})
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-		a.So(APIKey, should.BeNil)
+		a.So(apiKey, should.BeNil)
 
-		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListOrganizationAPIKeysRequest{
+		apiKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListOrganizationAPIKeysRequest{
 			OrganizationIds: organizationID,
 		})
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-		a.So(APIKeys, should.BeNil)
+		a.So(apiKeys, should.BeNil)
 
 		collaborators, err := reg.ListCollaborators(ctx, &ttnpb.ListOrganizationCollaboratorsRequest{
 			OrganizationIds: organizationID,
@@ -187,23 +187,23 @@ func TestOrganizationAccessPermissionDenied(t *testing.T) {
 		}
 		a.So(collaborators, should.BeNil)
 
-		APIKeyName := "test-organization-api-key-name"
-		APIKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateOrganizationAPIKeyRequest{
+		apiKeyName := "test-organization-api-key-name"
+		apiKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateOrganizationAPIKeyRequest{
 			OrganizationIds: organizationID,
-			Name:            APIKeyName,
+			Name:            apiKeyName,
 			Rights:          []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL},
 		})
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-		a.So(APIKey, should.BeNil)
+		a.So(apiKey, should.BeNil)
 
-		APIKey = organizationAPIKeys(organizationID).ApiKeys[0]
+		apiKey = organizationAPIKeys(organizationID).ApiKeys[0]
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIds: organizationID,
-			APIKey:          *APIKey,
+			ApiKey:          apiKey,
 			FieldMask:       &pbtypes.FieldMask{Paths: []string{"rights", "name"}},
 		})
 
@@ -215,8 +215,8 @@ func TestOrganizationAccessPermissionDenied(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL},
+				Ids:    collaboratorID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL},
 			},
 		})
 
@@ -275,25 +275,25 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 		organizationAPIKeys := organizationAPIKeys(organizationID)
 		organizationKey := organizationAPIKeys.ApiKeys[0]
 
-		APIKey, err := reg.GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
+		apiKey, err := reg.GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
 			OrganizationIds: organizationID,
 			KeyId:           organizationKey.Id,
 		}, creds)
 
 		a.So(err, should.BeNil)
-		if a.So(APIKey, should.NotBeNil) {
-			a.So(APIKey.Id, should.Equal, organizationKey.Id)
-			a.So(APIKey.Key, should.BeEmpty)
+		if a.So(apiKey, should.NotBeNil) {
+			a.So(apiKey.Id, should.Equal, organizationKey.Id)
+			a.So(apiKey.Key, should.BeEmpty)
 		}
 
-		APIKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListOrganizationAPIKeysRequest{
+		apiKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListOrganizationAPIKeysRequest{
 			OrganizationIds: organizationID,
 		}, creds)
 
 		a.So(err, should.BeNil)
-		if a.So(APIKeys, should.NotBeNil) {
-			a.So(len(APIKeys.ApiKeys), should.Equal, len(organizationAPIKeys.ApiKeys))
-			for i, APIkey := range APIKeys.ApiKeys {
+		if a.So(apiKeys, should.NotBeNil) {
+			a.So(len(apiKeys.ApiKeys), should.Equal, len(organizationAPIKeys.ApiKeys))
+			for i, APIkey := range apiKeys.ApiKeys {
 				a.So(APIkey.Name, should.Equal, organizationAPIKeys.ApiKeys[i].Name)
 				a.So(APIkey.Id, should.Equal, organizationAPIKeys.ApiKeys[i].Id)
 			}
@@ -308,23 +308,23 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 			a.So(collaborators.Collaborators, should.NotBeEmpty)
 		}
 
-		APIKeyName := "test-organization-api-key-name"
-		APIKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateOrganizationAPIKeyRequest{
+		apiKeyName := "test-organization-api-key-name"
+		apiKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateOrganizationAPIKeyRequest{
 			OrganizationIds: organizationID,
-			Name:            APIKeyName,
+			Name:            apiKeyName,
 			Rights:          []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL},
 		}, creds)
 
 		a.So(err, should.BeNil)
-		if a.So(APIKey, should.NotBeNil) {
-			a.So(APIKey.Name, should.Equal, APIKeyName)
+		if a.So(apiKey, should.NotBeNil) {
+			a.So(apiKey.Name, should.Equal, apiKeyName)
 		}
 
 		newAPIKeyName := "test-new-organization-api-key"
-		APIKey.Name = newAPIKeyName
+		apiKey.Name = newAPIKeyName
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIds: organizationID,
-			APIKey:          *APIKey,
+			ApiKey:          apiKey,
 			FieldMask:       &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
 
@@ -336,8 +336,8 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
-				Rights:                        []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL},
+				Ids:    collaboratorID,
+				Rights: []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL},
 			},
 		}, creds)
 
@@ -356,7 +356,7 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
+				Ids: collaboratorID,
 			},
 		}, creds)
 
@@ -389,7 +389,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 		_, err := reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *collaboratorID,
+				Ids: collaboratorID,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_LINK,
 					ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS,
@@ -403,7 +403,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
+				Ids: removedCollaboratorID,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_ORGANIZATION_ALL,
 				},
@@ -412,21 +412,21 @@ func TestOrganizationAccessRights(t *testing.T) {
 
 		a.So(err, should.BeNil)
 
-		APIKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateOrganizationAPIKeyRequest{
+		apiKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateOrganizationAPIKeyRequest{
 			OrganizationIds: organizationID,
 			Rights:          []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL},
 		}, usrCreds)
 
 		a.So(err, should.BeNil)
-		if a.So(APIKey, should.NotBeNil) && a.So(APIKey.Rights, should.NotBeNil) {
-			a.So(APIKey.Rights, should.Resemble, []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL})
+		if a.So(apiKey, should.NotBeNil) && a.So(apiKey.Rights, should.NotBeNil) {
+			a.So(apiKey.Rights, should.Resemble, []ttnpb.Right{ttnpb.RIGHT_ORGANIZATION_ALL})
 		}
 
 		// Try revoking rights for the collaborator with RIGHT_ORGANIZATION_ALL without having it
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
+				Ids: removedCollaboratorID,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_LINK,
 					ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS,
@@ -442,8 +442,8 @@ func TestOrganizationAccessRights(t *testing.T) {
 		// Try revoking rights for the api key with RIGHT_ORGANIZATION_ALL without having it
 		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIds: organizationID,
-			APIKey: ttnpb.APIKey{
-				Id: APIKey.Id,
+			ApiKey: &ttnpb.APIKey{
+				Id: apiKey.Id,
 				Rights: []ttnpb.Right{
 					ttnpb.RIGHT_APPLICATION_LINK,
 					ttnpb.RIGHT_ORGANIZATION_SETTINGS_API_KEYS,
@@ -462,8 +462,8 @@ func TestOrganizationAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
-				Rights:                        newRights.Rights,
+				Ids:    removedCollaboratorID,
+				Rights: newRights.Rights,
 			},
 		}, usrCreds)
 
@@ -472,8 +472,8 @@ func TestOrganizationAccessRights(t *testing.T) {
 		// Remove RIGHT_ORGANIZATION_ALL from api key to be removed
 		key, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIds: organizationID,
-			APIKey: ttnpb.APIKey{
-				Id:     APIKey.Id,
+			ApiKey: &ttnpb.APIKey{
+				Id:     apiKey.Id,
 				Rights: newRights.Rights,
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -487,8 +487,8 @@ func TestOrganizationAccessRights(t *testing.T) {
 		newRights = newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_LINK))
 		key, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIds: organizationID,
-			APIKey: ttnpb.APIKey{
-				Id:     APIKey.Id,
+			ApiKey: &ttnpb.APIKey{
+				Id:     apiKey.Id,
 				Rights: newRights.Rights,
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -502,8 +502,8 @@ func TestOrganizationAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
-				Rights:                        newRights.Rights,
+				Ids:    removedCollaboratorID,
+				Rights: newRights.Rights,
 			},
 		}, collaboratorCreds)
 
@@ -513,8 +513,8 @@ func TestOrganizationAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
-				Rights:                        newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_DELETE)).Rights,
+				Ids:    removedCollaboratorID,
+				Rights: newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_DELETE)).Rights,
 			},
 		}, collaboratorCreds)
 
@@ -525,8 +525,8 @@ func TestOrganizationAccessRights(t *testing.T) {
 		// Try revoking RIGHT_ORGANIZATION_DELETE from api key without having it
 		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIds: organizationID,
-			APIKey: ttnpb.APIKey{
-				Id:     APIKey.Id,
+			ApiKey: &ttnpb.APIKey{
+				Id:     apiKey.Id,
 				Rights: newRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_DELETE)).Rights,
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -549,8 +549,8 @@ func TestOrganizationAccessRights(t *testing.T) {
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
 			OrganizationIds: organizationID,
 			Collaborator: &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *removedCollaboratorID,
-				Rights:                        []ttnpb.Right{},
+				Ids:    removedCollaboratorID,
+				Rights: []ttnpb.Right{},
 			},
 		}, collaboratorCreds)
 
@@ -568,8 +568,8 @@ func TestOrganizationAccessRights(t *testing.T) {
 		// Delete api key with more rights
 		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
 			OrganizationIds: organizationID,
-			APIKey: ttnpb.APIKey{
-				Id:     APIKey.Id,
+			ApiKey: &ttnpb.APIKey{
+				Id:     apiKey.Id,
 				Rights: []ttnpb.Right{},
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
@@ -579,7 +579,7 @@ func TestOrganizationAccessRights(t *testing.T) {
 
 		_, err = reg.GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
 			OrganizationIds: organizationID,
-			KeyId:           APIKey.Id,
+			KeyId:           apiKey.Id,
 		}, collaboratorCreds)
 
 		if a.So(err, should.NotBeNil) {

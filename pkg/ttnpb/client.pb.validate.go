@@ -71,7 +71,7 @@ func (m *Client) ValidateFields(paths ...string) error {
 
 		case "created_at":
 
-			if v, ok := interface{}(&m.CreatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCreatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ClientValidationError{
 						field:  "created_at",
@@ -83,7 +83,7 @@ func (m *Client) ValidateFields(paths ...string) error {
 
 		case "updated_at":
 
-			if v, ok := interface{}(&m.UpdatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetUpdatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ClientValidationError{
 						field:  "updated_at",
@@ -709,7 +709,14 @@ func (m *CreateClientRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "client":
 
-			if v, ok := interface{}(&m.Client).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetClient() == nil {
+				return CreateClientRequestValidationError{
+					field:  "client",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetClient()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return CreateClientRequestValidationError{
 						field:  "client",
@@ -821,7 +828,14 @@ func (m *UpdateClientRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "client":
 
-			if v, ok := interface{}(&m.Client).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetClient() == nil {
+				return UpdateClientRequestValidationError{
+					field:  "client",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetClient()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UpdateClientRequestValidationError{
 						field:  "client",

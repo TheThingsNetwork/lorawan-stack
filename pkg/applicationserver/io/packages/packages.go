@@ -108,7 +108,7 @@ type associatedApplicationUp struct {
 
 type associationsMap map[string]*associationsPair
 
-func (s *server) findAssociations(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (associationsMap, error) {
+func (s *server) findAssociations(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (associationsMap, error) {
 	paths := []string{
 		"data",
 		"ids",
@@ -118,7 +118,7 @@ func (s *server) findAssociations(ctx context.Context, ids ttnpb.EndDeviceIdenti
 	if err != nil {
 		return nil, err
 	}
-	defaults, err := s.registry.ListDefaultAssociations(ctx, ids.ApplicationIdentifiers, paths)
+	defaults, err := s.registry.ListDefaultAssociations(ctx, &ids.ApplicationIdentifiers, paths)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +142,7 @@ func (s *server) findAssociations(ctx context.Context, ids ttnpb.EndDeviceIdenti
 
 func (s *server) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
 	ctx = log.NewContextWithField(ctx, "namespace", namespace)
-	associations, err := s.findAssociations(ctx, msg.EndDeviceIdentifiers)
+	associations, err := s.findAssociations(ctx, &msg.EndDeviceIdentifiers)
 	if err != nil {
 		return err
 	}

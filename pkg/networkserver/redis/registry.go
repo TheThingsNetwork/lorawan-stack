@@ -17,13 +17,9 @@ package redis
 import (
 	"context"
 	"fmt"
-	"io"
-	"math/rand"
 	"runtime/trace"
-	"sync"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/oklog/ulid/v2"
 	"github.com/vmihailenco/msgpack/v5"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -49,17 +45,12 @@ const SchemaVersion = 1
 type DeviceRegistry struct {
 	Redis   *ttnredis.Client
 	LockTTL time.Duration
-
-	entropyMu *sync.Mutex
-	entropy   io.Reader
 }
 
 func (r *DeviceRegistry) Init(ctx context.Context) error {
 	if err := ttnredis.InitMutex(ctx, r.Redis); err != nil {
 		return err
 	}
-	r.entropyMu = &sync.Mutex{}
-	r.entropy = ulid.Monotonic(rand.New(rand.NewSource(time.Now().UnixNano())), 1000)
 	return nil
 }
 
@@ -824,17 +815,15 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	uid := unique.ID(ctx, ids)
 	uk := r.uidKey(uid)
 
-	defer trace.StartRegion(ctx, "set end device by id").End()
-
-	var pb *ttnpb.EndDevice
-	r.entropyMu.Lock()
-	lockID, err := ulid.New(ulid.Timestamp(time.Now()), r.entropy)
-	r.entropyMu.Unlock()
+	lockerID, err := ttnredis.GenerateLockerID()
 	if err != nil {
 		return nil, ctx, err
 	}
-	lockIDStr := lockID.String()
-	if err = ttnredis.LockedWatch(ctx, r.Redis, uk, lockIDStr, r.LockTTL, func(tx *redis.Tx) error {
+
+	defer trace.StartRegion(ctx, "set end device by id").End()
+
+	var pb *ttnpb.EndDevice
+	if err = ttnredis.LockedWatch(ctx, r.Redis, uk, lockerID, r.LockTTL, func(tx *redis.Tx) error {
 		cmd := ttnredis.GetProto(ctx, tx, uk)
 		stored := &ttnpb.EndDevice{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
@@ -905,10 +894,6 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				}
 				if pb.JoinEui != nil && pb.DevEui != nil {
 					ek := r.euiKey(*pb.JoinEui, *pb.DevEui)
-
-					if err := ttnredis.LockMutex(ctx, tx, ek, lockIDStr, r.LockTTL); err != nil {
-						return err
-					}
 					if err := tx.Watch(ctx, ek).Err(); err != nil {
 						return err
 					}
@@ -920,7 +905,6 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 						return errDuplicateIdentifiers.New()
 					}
 					p.Set(ctx, ek, uid, 0)
-					ttnredis.UnlockMutex(ctx, p, ek, lockIDStr, r.LockTTL)
 				}
 			} else {
 				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.ApplicationId != stored.ApplicationId {
@@ -1042,4 +1026,29 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 		return nil, ctx, ttnredis.ConvertError(err)
 	}
 	return pb, ctx, nil
+}
+
+// Range ranges over device uid keys in DeviceRegistry.
+func (r *DeviceRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
+	deviceEntityRegex, err := ttnredis.EntityRegex((r.uidKey(unique.GenericID(ctx, "*"))))
+	if err != nil {
+		return err
+	}
+	return ttnredis.RangeRedisKeys(ctx, r.Redis, r.uidKey(unique.GenericID(ctx, "*")), ttnredis.DefaultRangeCount, func(key string) (bool, error) {
+		if !deviceEntityRegex.MatchString(key) {
+			return true, nil
+		}
+		dev := &ttnpb.EndDevice{}
+		if err := ttnredis.GetProto(ctx, r.Redis, key).ScanProto(dev); err != nil {
+			return false, err
+		}
+		dev, err := ttnpb.FilterGetEndDevice(dev, paths...)
+		if err != nil {
+			return false, err
+		}
+		if !f(ctx, dev.EndDeviceIdentifiers, dev) {
+			return false, nil
+		}
+		return true, nil
+	})
 }

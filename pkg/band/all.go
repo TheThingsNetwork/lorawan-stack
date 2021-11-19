@@ -26,6 +26,7 @@ var All = map[string]map[ttnpb.PHYVersion]Band{
 		ttnpb.RP001_V1_0_3_REV_A: AS_923_RP1_v1_0_3_RevA,
 		ttnpb.RP001_V1_1_REV_A:   AS_923_RP1_v1_1_RevA,
 		ttnpb.RP001_V1_1_REV_B:   AS_923_RP1_v1_1_RevB,
+		ttnpb.RP002_V1_0_0:       AS_923_RP2_v1_0_0,
 	},
 	AU_915_928: {
 		ttnpb.TS001_V1_0_1:       AU_915_928_TS1_v1_0_1,
@@ -34,6 +35,7 @@ var All = map[string]map[ttnpb.PHYVersion]Band{
 		ttnpb.RP001_V1_0_3_REV_A: AU_915_928_RP1_v1_0_3_RevA,
 		ttnpb.RP001_V1_1_REV_A:   AU_915_928_RP1_v1_1_RevA,
 		ttnpb.RP001_V1_1_REV_B:   AU_915_928_RP1_v1_1_RevB,
+		ttnpb.RP002_V1_0_0:       AU_915_928_RP2_v1_0_0,
 	},
 	CN_470_510: {
 		ttnpb.TS001_V1_0_1:       CN_470_510_TS1_v1_0_1,
@@ -43,6 +45,18 @@ var All = map[string]map[ttnpb.PHYVersion]Band{
 		ttnpb.RP001_V1_1_REV_A:   CN_470_510_RP1_v1_1_RevA,
 		ttnpb.RP001_V1_1_REV_B:   CN_470_510_RP1_v1_1_RevB,
 	},
+	CN_470_510_20_A: {
+		ttnpb.RP002_V1_0_0: CN_470_510_20_A_RP2_v1_0_0,
+	},
+	CN_470_510_20_B: {
+		ttnpb.RP002_V1_0_0: CN_470_510_20_B_RP2_v1_0_0,
+	},
+	CN_470_510_26_A: {
+		ttnpb.RP002_V1_0_0: CN_470_510_26_A_RP2_v1_0_0,
+	},
+	CN_470_510_26_B: {
+		ttnpb.RP002_V1_0_0: CN_470_510_26_B_RP2_v1_0_0,
+	},
 	CN_779_787: {
 		ttnpb.TS001_V1_0:         CN_779_787_RP1_V1_0,
 		ttnpb.TS001_V1_0_1:       CN_779_787_RP1_V1_0_1,
@@ -51,6 +65,7 @@ var All = map[string]map[ttnpb.PHYVersion]Band{
 		ttnpb.RP001_V1_0_3_REV_A: CN_779_787_RP1_V1_0_3_RevA,
 		ttnpb.RP001_V1_1_REV_A:   CN_779_787_RP1_V1_1_RevA,
 		ttnpb.RP001_V1_1_REV_B:   CN_779_787_RP1_V1_1_RevB,
+		ttnpb.RP002_V1_0_0:       CN_779_787_RP2_V1_0_0,
 	},
 	EU_433: {
 		ttnpb.TS001_V1_0:         EU_433_TS1_V1_0,
@@ -60,6 +75,7 @@ var All = map[string]map[ttnpb.PHYVersion]Band{
 		ttnpb.RP001_V1_0_3_REV_A: EU_433_RP1_V1_0_3_Rev_A,
 		ttnpb.RP001_V1_1_REV_A:   EU_433_RP1_V1_1_Rev_A,
 		ttnpb.RP001_V1_1_REV_B:   EU_433_RP1_V1_1_Rev_B,
+		ttnpb.RP002_V1_0_0:       EU_433_RP2_V1_0_0,
 	},
 	EU_863_870: {
 		ttnpb.TS001_V1_0:         EU_863_870_TS1_V1_0,
@@ -69,12 +85,14 @@ var All = map[string]map[ttnpb.PHYVersion]Band{
 		ttnpb.RP001_V1_0_3_REV_A: EU_863_870_RP1_V1_0_3_Rev_A,
 		ttnpb.RP001_V1_1_REV_A:   EU_863_870_RP1_V1_1_Rev_A,
 		ttnpb.RP001_V1_1_REV_B:   EU_863_870_RP1_V1_1_Rev_B,
+		ttnpb.RP002_V1_0_0:       EU_863_870_RP2_V1_0_0,
 	},
 	IN_865_867: {
 		ttnpb.RP001_V1_0_2_REV_B: IN_865_867_RP1_V1_0_2_Rev_B,
 		ttnpb.RP001_V1_0_3_REV_A: IN_865_867_RP1_V1_0_3_Rev_A,
 		ttnpb.RP001_V1_1_REV_A:   IN_865_867_RP1_V1_1_Rev_A,
 		ttnpb.RP001_V1_1_REV_B:   IN_865_867_RP1_V1_1_Rev_B,
+		ttnpb.RP002_V1_0_0:       IN_865_867_RP2_V1_0_0,
 	},
 	ISM_2400: {
 		ttnpb.TS001_V1_0:         ISM_2400_Universal,
@@ -84,6 +102,7 @@ var All = map[string]map[ttnpb.PHYVersion]Band{
 		ttnpb.RP001_V1_0_3_REV_A: ISM_2400_Universal,
 		ttnpb.RP001_V1_1_REV_A:   ISM_2400_Universal,
 		ttnpb.RP001_V1_1_REV_B:   ISM_2400_Universal,
+		ttnpb.RP002_V1_0_0:       ISM_2400_Universal,
 	},
 	KR_920_923: {
 		ttnpb.RP001_V1_0_2:       KR_920_923_RP1_V1_0_2,
@@ -91,11 +110,13 @@ var All = map[string]map[ttnpb.PHYVersion]Band{
 		ttnpb.RP001_V1_0_3_REV_A: KR_920_923_RP1_V1_0_3_Rev_A,
 		ttnpb.RP001_V1_1_REV_A:   KR_920_923_RP1_V1_1_Rev_A,
 		ttnpb.RP001_V1_1_REV_B:   KR_920_923_RP1_V1_1_Rev_B,
+		ttnpb.RP002_V1_0_0:       KR_920_923_RP2_V1_0_0,
 	},
 	RU_864_870: {
 		ttnpb.RP001_V1_0_3_REV_A: RU_864_870_RP1_V1_0_3_Rev_A,
 		ttnpb.RP001_V1_1_REV_A:   RU_864_870_RP1_V1_1_Rev_A,
 		ttnpb.RP001_V1_1_REV_B:   RU_864_870_RP1_V1_1_Rev_B,
+		ttnpb.RP002_V1_0_0:       RU_864_870_RP2_V1_0_0,
 	},
 	US_902_928: {
 		ttnpb.TS001_V1_0:         US_902_928_TS1_V1_0,
@@ -105,6 +126,7 @@ var All = map[string]map[ttnpb.PHYVersion]Band{
 		ttnpb.RP001_V1_0_3_REV_A: US_902_928_RP1_V1_0_3_Rev_A,
 		ttnpb.RP001_V1_1_REV_A:   US_902_928_RP1_V1_1_Rev_A,
 		ttnpb.RP001_V1_1_REV_B:   US_902_928_RP1_V1_1_Rev_B,
+		ttnpb.RP002_V1_0_0:       US_902_928_RP2_V1_0_0,
 	},
 }
 

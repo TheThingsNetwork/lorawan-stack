@@ -41,7 +41,7 @@ const validationSchema = Yup.object()
   .shape({
     skip_payload_crypto_override: Yup.boolean().nullable().default(null),
     session: Yup.object().when(
-      ['skip_payload_crypto_overrride', '$mayEditKeys'],
+      ['skip_payload_crypto_override', '$mayEditKeys'],
       (skipPayloadCrypto, mayEditKeys, schema) => {
         if (skipPayloadCrypto || !mayEditKeys) {
           return schema.strip()
@@ -207,6 +207,7 @@ const ApplicationServerForm = React.memo(props => {
         mayGenerateValue={mayEditKeys && !skipCrypto}
         onGenerateValue={generate16BytesKey}
         tooltipId={tooltipIds.APP_SESSION_KEY}
+        sensitive
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />

@@ -25,11 +25,6 @@ func (x *ApplicationLink) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("default_formatters")
 		x.DefaultFormatters.MarshalProtoJSON(s.WithField("default_formatters"))
 	}
-	if x.Tls || s.HasField("tls") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("tls")
-		s.WriteBool(x.Tls)
-	}
 	if x.SkipPayloadCrypto != nil || s.HasField("skip_payload_crypto") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("skip_payload_crypto")
@@ -56,9 +51,6 @@ func (x *ApplicationLink) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				x.DefaultFormatters = &MessagePayloadFormatters{}
 				x.DefaultFormatters.UnmarshalProtoJSON(s.WithField("default_formatters", true))
 			}
-		case "tls":
-			s.AddField("tls")
-			x.Tls = s.ReadBool()
 		case "skip_payload_crypto", "skipPayloadCrypto":
 			s.AddField("skip_payload_crypto")
 			if !s.ReadNil() {
@@ -80,16 +72,16 @@ func (x *SetApplicationLinkRequest) MarshalProtoJSON(s *jsonplugin.MarshalState)
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.ApplicationIds != nil || s.HasField("application_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("application_ids")
 		// NOTE: ApplicationIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.ApplicationIdentifiers)
+		gogo.MarshalMessage(s, x.ApplicationIds)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.Link != nil || s.HasField("link") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("link")
-		x.ApplicationLink.MarshalProtoJSON(s.WithField("link"))
+		x.Link.MarshalProtoJSON(s.WithField("link"))
 	}
 	if x.FieldMask != nil || s.HasField("field_mask") {
 		s.WriteMoreIf(&wroteField)
@@ -117,10 +109,11 @@ func (x *SetApplicationLinkRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSt
 			// NOTE: ApplicationIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v ApplicationIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.ApplicationIdentifiers = v
+			x.ApplicationIds = &v
 		case "link":
 			if !s.ReadNil() {
-				x.ApplicationLink.UnmarshalProtoJSON(s.WithField("link", true))
+				x.Link = &ApplicationLink{}
+				x.Link.UnmarshalProtoJSON(s.WithField("link", true))
 			}
 		case "field_mask", "fieldMask":
 			s.AddField("field_mask")

@@ -170,6 +170,7 @@ func authInfoFromContext(ctx context.Context) (*ttnpb.AuthInfoResponse, bool) {
 	return nil, false
 }
 
+// NewContextWithAuthInfo returns a derived context with the authInfo.
 func NewContextWithAuthInfo(ctx context.Context, authInfo *ttnpb.AuthInfoResponse) context.Context {
 	return context.WithValue(ctx, authInfoKey, authInfo)
 }
@@ -178,7 +179,7 @@ type authInfoCacheKeyType struct{}
 
 var authInfoCacheKey authInfoCacheKeyType
 
-// NewContextWithCache returns a derived context with an authentication info cache.
+// NewContextWithAuthInfoCache returns a derived context with an authentication info cache.
 // This should only be used for request contexts.
 func NewContextWithAuthInfoCache(ctx context.Context) context.Context {
 	return context.WithValue(ctx, authInfoCacheKey, &ttnpb.AuthInfoResponse{})

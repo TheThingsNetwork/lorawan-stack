@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
@@ -38,8 +39,9 @@ import (
 
 // Base represents base component configuration.
 type Base struct {
-	Config []string `name:"config" shorthand:"c" description:"Location of the config files"`
-	Log    Log      `name:"log"`
+	Config       []string            `name:"config" shorthand:"c" description:"Location of the config files"`
+	Log          Log                 `name:"log"`
+	Experimental experimental.Config `name:"experimental"`
 }
 
 // Log represents configuration for the logger.
@@ -411,12 +413,21 @@ func (c SenderClientCA) Fetcher(ctx context.Context) (fetch.Interface, error) {
 	}
 }
 
+// PacketBrokerInteropAuth respresents authen
+type PacketBrokerInteropAuth struct {
+	Enabled     bool   `name:"enabled" description:"Enable Packet Broker to authenticate"`
+	TokenIssuer string `name:"token-issuer" description:"Required issuer of Packet Broker tokens"`
+}
+
 // InteropServer represents the server-side interoperability through LoRaWAN Backend Interfaces configuration.
 type InteropServer struct {
-	ListenTLS                string            `name:"listen-tls" description:"Address for the interop server to listen on"`
-	TrustedProxies           []string          `name:"trusted-proxies" description:"CIDRs of trusted reverse proxies"`
+	ListenTLS        string `name:"listen-tls" description:"Address for the interop server for LoRaWAN Backend Interfaces to listen on"`
+	PublicTLSAddress string `name:"public-tls-address" description:"Public address of the interop server for LoRaWAN Backend Interfaces"`
+
 	SenderClientCA           SenderClientCA    `name:"sender-client-ca"`
 	SenderClientCADeprecated map[string]string `name:"sender-client-cas" description:"Path to PEM encoded file with client CAs of sender IDs to trust; deprecated - use sender-client-ca instead"`
+
+	PacketBroker PacketBrokerInteropAuth `name:"packet-broker"`
 }
 
 // ServiceBase represents base service configuration.

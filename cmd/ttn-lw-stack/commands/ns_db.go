@@ -16,17 +16,17 @@ package commands
 
 import (
 	"regexp"
-	"strconv"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/spf13/cobra"
 	"github.com/vmihailenco/msgpack/v5"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/cleanup"
 	nsredis "go.thethings.network/lorawan-stack/v3/pkg/networkserver/redis"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
 var (
@@ -46,7 +46,7 @@ var (
 			cl := NewNetworkServerApplicationUplinkQueueRedis(*config)
 			var deleted uint64
 			defer func() { logger.Debugf("%d processed stream entries deleted", deleted) }()
-			return rangeRedisKeys(ctx, cl, nsredis.ApplicationUplinkQueueUIDGenericUplinkKey(cl, "*"), 1, func(k string) (bool, error) {
+			return ttnredis.RangeRedisKeys(ctx, cl, nsredis.ApplicationUplinkQueueUIDGenericUplinkKey(cl, "*"), ttnredis.DefaultRangeCount, func(k string) (bool, error) {
 				gs, err := cl.XInfoGroups(ctx, k).Result()
 				if err != nil {
 					logger.WithError(err).Errorf("Failed to query groups of stream %q", k)
@@ -96,7 +96,7 @@ var (
 			cl := NewNetworkServerDeviceRegistryRedis(*config)
 
 			if force, _ := cmd.Flags().GetBool("force"); !force {
-				needMigration, err := checkLatestSchemaVersion(cl)
+				needMigration, err := checkLatestSchemaVersion(cl, nsredis.SchemaVersion)
 				if err != nil {
 					return err
 				}
@@ -134,7 +134,7 @@ var (
 			addrRegexp3_11_Current := regexp.MustCompile(cl.Key("addr", devAddrRegexpStr, "current$"))
 			addrRegexp3_11_CurrentFields := regexp.MustCompile(cl.Key("addr", devAddrRegexpStr, "current", "fields$"))
 			addrRegexp3_11_PendingFields := regexp.MustCompile(cl.Key("addr", devAddrRegexpStr, "pending", "fields$"))
-			err := rangeRedisKeys(ctx, cl, cl.Key("*"), 1, func(k string) (bool, error) {
+			err := ttnredis.RangeRedisKeys(ctx, cl, cl.Key("*"), ttnredis.DefaultRangeCount, func(k string) (bool, error) {
 				logger := logger.WithField("key", k)
 				switch {
 				case uidRegexp3_10_Fields.MatchString(k):
@@ -154,7 +154,7 @@ var (
 					pendingKey := nsredis.PendingAddrKey(k)
 					pendingFieldKey := nsredis.FieldKey(pendingKey)
 					pendingScore := float64(time.Now().UnixNano())
-					if err := rangeRedisSet(ctx, cl, k, "*", 1, func(uid string) (bool, error) {
+					if err := ttnredis.RangeRedisSet(ctx, cl, k, "*", ttnredis.DefaultRangeCount, func(uid string) (bool, error) {
 						logger := logger.WithField("uid", uid)
 						uk := nsredis.UIDKey(cl, uid)
 						if err := cl.Watch(ctx, func(tx *redis.Tx) error {
@@ -213,7 +213,7 @@ var (
 				case addrRegexp3_10_16Bit.MatchString(k), addrRegexp3_10_32Bit.MatchString(k):
 					currentKey := nsredis.CurrentAddrKey(k[:len(k)-6])
 					fieldKey := nsredis.FieldKey(currentKey)
-					if err := rangeRedisZSet(ctx, cl, k, "*", 1, func(uid string, v float64) (bool, error) {
+					if err := ttnredis.RangeRedisZSet(ctx, cl, k, "*", ttnredis.DefaultRangeCount, func(uid string, v float64) (bool, error) {
 						logger := logger.WithField("uid", uid)
 						uk := nsredis.UIDKey(cl, uid)
 						if err := cl.Watch(ctx, func(tx *redis.Tx) error {
@@ -267,7 +267,7 @@ var (
 					score := float64(time.Now().UnixNano())
 					if err := cl.Watch(ctx, func(tx *redis.Tx) error {
 						p := tx.TxPipeline()
-						if err := rangeRedisSet(ctx, tx, k, "*", 1, func(uid string) (bool, error) {
+						if err := ttnredis.RangeRedisSet(ctx, tx, k, "*", ttnredis.DefaultRangeCount, func(uid string) (bool, error) {
 							logger := logger.WithField("uid", uid)
 							uk := nsredis.UIDKey(cl, uid)
 							if err := tx.Watch(ctx, uk).Err(); err != nil {
@@ -312,7 +312,7 @@ var (
 
 				case addrRegexp3_11_CurrentFields.MatchString(k):
 					var migratedSubkeys uint64
-					if err := rangeRedisHMap(ctx, cl, k, "*", 1, func(uid string, s string) (bool, error) {
+					if err := ttnredis.RangeRedisHMap(ctx, cl, k, "*", 1, func(uid string, s string) (bool, error) {
 						logger := logger.WithField("uid", uid)
 						if err := cl.Watch(ctx, func(tx *redis.Tx) error {
 							if err := msgpack.Unmarshal([]byte(s), &nsredis.UplinkMatchSession{}); err == nil {
@@ -384,7 +384,7 @@ var (
 
 				case addrRegexp3_11_PendingFields.MatchString(k):
 					var migratedSubkeys uint64
-					if err := rangeRedisHMap(ctx, cl, k, "*", 1, func(uid string, s string) (bool, error) {
+					if err := ttnredis.RangeRedisHMap(ctx, cl, k, "*", 1, func(uid string, s string) (bool, error) {
 						logger := logger.WithField("uid", uid)
 						if err := cl.Watch(ctx, func(tx *redis.Tx) error {
 							if err := msgpack.Unmarshal([]byte(s), &nsredis.UplinkMatchPendingSession{}); err == nil {
@@ -460,40 +460,73 @@ var (
 				return err
 			}
 
-			return recordSchemaVersion(cl)
+			return recordSchemaVersion(cl, nsredis.SchemaVersion)
+		},
+	}
+	nsDBCleanupCommand = &cobra.Command{
+		Use:   "cleanup",
+		Short: "Clean stale Network Server application data",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			logger.Info("Initiating device registry")
+			deviceCleaner, err := NewNSDeviceRegistryCleaner(ctx, &config.Redis)
+			if err != nil {
+				return err
+			}
+			// Define retry delay for obtaining cluster peer connection.
+			retryDelay := time.Duration(500) * time.Millisecond
+			// Create cluster and grpc connection with identity server.
+			conn, cl, err := NewClusterComponentConnection(ctx, *config, retryDelay, 5, ttnpb.ClusterRole_ENTITY_REGISTRY)
+			if err != nil {
+				return err
+			}
+			defer func() {
+				logger.Debug("Leaving cluster...")
+				if err := cl.Leave(); err != nil {
+					logger.WithError(err).Error("Could not leave cluster")
+					return
+				}
+				logger.Debug("Left cluster")
+			}()
+			paginationDelay, err := cmd.Flags().GetDuration("pagination-delay")
+			if err != nil {
+				return err
+			}
+			devClient := ttnpb.NewEndDeviceRegistryClient(conn)
+			endDeviceList, err := FetchIdentityServerEndDevices(ctx, devClient, cl.Auth(), paginationDelay)
+			if err != nil {
+				return err
+			}
+			deviceIdentityServerSet := make(map[string]struct{})
+			for _, dev := range endDeviceList {
+				deviceIdentityServerSet[unique.ID(ctx, dev.EndDeviceIdentifiers)] = struct{}{}
+			}
+			dryRun, err := cmd.Flags().GetBool("dry-run")
+			if err != nil {
+				return err
+			}
+			// If dry run flag set, print the app data to be deleted.
+			if dryRun {
+				deviceSet := cleanup.ComputeSetComplement(deviceIdentityServerSet, deviceCleaner.LocalSet)
+				logger.Info("Deleting device registry data for devices: ", setToArray(deviceSet))
+				logger.Warn("Dry run finished. No data deleted.")
+				return nil
+			}
+			logger.Info("Cleaning device registry")
+			err = deviceCleaner.CleanData(ctx, deviceIdentityServerSet)
+			if err != nil {
+				return err
+			}
+			return nil
 		},
 	}
 )
-
-func schemaVersionKey(cl *ttnredis.Client) string {
-	return cl.Key("schema-version")
-}
-
-func recordSchemaVersion(cl *ttnredis.Client) error {
-	logger.WithField("version", nsredis.SchemaVersion).Info("Setting schema version")
-	return cl.Set(ctx, schemaVersionKey(cl), nsredis.SchemaVersion, 0).Err()
-}
-
-func checkLatestSchemaVersion(cl *ttnredis.Client) (bool, error) {
-	schemaVersionString, err := cl.Get(ctx, schemaVersionKey(cl)).Result()
-	if err != nil {
-		if errors.IsNotFound(ttnredis.ConvertError(err)) {
-			return true, nil
-		}
-		return true, err
-	}
-	schemaVersion, err := strconv.ParseInt(schemaVersionString, 10, 32)
-	if err != nil {
-		return true, err
-	}
-	logger.WithField("version", schemaVersion).Info("Existing database schema version")
-	return schemaVersion < nsredis.SchemaVersion, nil
-}
 
 func init() {
 	Root.AddCommand(nsDBCommand)
 	nsDBCommand.AddCommand(nsDBPruneCommand)
 	nsDBCommand.AddCommand(nsDBMigrateCommand)
-
+	nsDBCleanupCommand.Flags().Bool("dry-run", false, "Dry run")
+	nsDBCleanupCommand.Flags().Duration("pagination-delay", 100, "Delay between batch requests")
+	nsDBCommand.AddCommand(nsDBCleanupCommand)
 	nsDBMigrateCommand.Flags().Bool("force", false, "Force perform database migrations")
 }

@@ -73,7 +73,7 @@ const GatewayEvents = props => {
 
 GatewayEvents.propTypes = {
   events: PropTypes.events,
-  filter: PropTypes.string,
+  filter: PropTypes.eventFilter,
   gtwId: PropTypes.string.isRequired,
   onClear: PropTypes.func.isRequired,
   onFilterChange: PropTypes.func.isRequired,
@@ -107,7 +107,7 @@ export default withFeatureRequirement(mayViewGatewayEvents)(
         paused
           ? dispatch(resumeGatewayEventsStream(ownProps.gtwId))
           : dispatch(pauseGatewayEventsStream(ownProps.gtwId)),
-      onFilterChange: filter => dispatch(setGatewayEventsFilter(ownProps.gtwId, filter)),
+      onFilterChange: filterId => dispatch(setGatewayEventsFilter(ownProps.gtwId, filterId)),
     }),
   )(GatewayEvents),
 )

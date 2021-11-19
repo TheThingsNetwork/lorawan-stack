@@ -21,16 +21,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './cell.styl'
 
-const Cell = ({
-  className,
-  component: Component,
-  align,
-  small,
-  colSpan,
-  width,
-  children,
-  ...rest
-}) => {
+const Cell = ({ className, align, small, width, children, ...rest }) => {
   const cellClassNames = classnames(className, style.cell, {
     [style.cellCentered]: align === 'center',
     [style.cellLeft]: align === 'left',
@@ -41,9 +32,9 @@ const Cell = ({
   const widthStyle = width ? { width: `${width}%` } : undefined
 
   return (
-    <Component {...rest} style={widthStyle} className={cellClassNames} colSpan={colSpan}>
+    <div {...rest} style={widthStyle} className={cellClassNames} role="cell">
       {children}
-    </Component>
+    </div>
   )
 }
 
@@ -54,8 +45,6 @@ Cell.propTypes = {
   className: PropTypes.string,
   /** The number of columns that the cell should occupy. */
   colSpan: PropTypes.number,
-  /** The html name of the wrapping component. */
-  component: PropTypes.string.isRequired,
   /** A flag indicating whether the row take less height. */
   small: PropTypes.bool,
   /** The width of the cell in percentages. */
@@ -72,7 +61,7 @@ Cell.defaultProps = {
 }
 
 const HeadCell = ({ className, content, children, ...rest }) => (
-  <Cell className={classnames(className, style.cellHead)} component="th" {...rest}>
+  <Cell className={classnames(className, style.cellHead)} {...rest}>
     {Boolean(content) && <Message content={content} />}
     {!Boolean(content) && children}
   </Cell>
@@ -92,7 +81,7 @@ HeadCell.defaultProps = {
 }
 
 const DataCell = ({ className, children, ...rest }) => (
-  <Cell className={classnames(className, style.cellData)} component="td" {...rest}>
+  <Cell className={classnames(className, style.cellData)} {...rest}>
     {children}
   </Cell>
 )

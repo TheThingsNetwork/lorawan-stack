@@ -211,11 +211,12 @@ class Applications {
 
   // Events Stream
 
-  async openStream(identifiers, tail, after) {
+  async openStream(identifiers, names, tail, after) {
     const payload = {
       identifiers: identifiers.map(id => ({
         application_ids: { application_id: id },
       })),
+      names,
       tail,
       after,
     }

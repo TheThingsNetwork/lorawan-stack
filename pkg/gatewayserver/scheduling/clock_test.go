@@ -66,7 +66,7 @@ func TestRolloverClock(t *testing.T) {
 					if i == 0 {
 						clock.Sync(stc.Relative, serverTime)
 					} else {
-						clock.SyncWithGatewayConcentrator(stc.Relative, serverTime, stc.Absolute)
+						clock.SyncWithGatewayConcentrator(stc.Relative, serverTime, nil, stc.Absolute)
 					}
 
 					for _, tc := range []struct {
@@ -142,7 +142,7 @@ func TestRolloverClock(t *testing.T) {
 		if i == 0 {
 			t.Log("Synchronizing gateway concentrator")
 			sessionID = xtimeIn >> 48
-			clock.SyncWithGatewayConcentrator(timestamp, serverTime, ConcentratorTime(time.Duration(xtimeIn&0xFFFFFFFFFFFF)*time.Microsecond))
+			clock.SyncWithGatewayConcentrator(timestamp, serverTime, nil, ConcentratorTime(time.Duration(xtimeIn&0xFFFFFFFFFFFF)*time.Microsecond))
 		}
 		rx := clock.Sync(timestamp, serverTime)
 		tx := clock.FromTimestampTime(timestamp)
@@ -160,7 +160,7 @@ func TestSyncWithGatewayConcentrator(t *testing.T) {
 	a := assertions.New(t)
 
 	clock := &RolloverClock{}
-	clock.SyncWithGatewayConcentrator(0x496054D6, time.Now(), ConcentratorTime(0xAA496054D6)*ConcentratorTime(time.Microsecond))
+	clock.SyncWithGatewayConcentrator(0x496054D6, time.Now(), nil, ConcentratorTime(0xAA496054D6)*ConcentratorTime(time.Microsecond))
 	v := int64(clock.FromTimestampTime(0x499D5DD6)) / int64(time.Microsecond)
 	a.So(v, should.Equal, int64(0xAA499D5DD6))
 }
@@ -209,7 +209,7 @@ func TestIssue2581(t *testing.T) {
 		if i == 0 {
 			t.Log("Synchronizing gateway concentrator")
 			sessionID = xtimeIn >> 48
-			clock.SyncWithGatewayConcentrator(timestamp, serverTime, ConcentratorTime(time.Duration(xtimeIn&0xFFFFFFFFFFFF)*time.Microsecond))
+			clock.SyncWithGatewayConcentrator(timestamp, serverTime, nil, ConcentratorTime(time.Duration(xtimeIn&0xFFFFFFFFFFFF)*time.Microsecond))
 		}
 		rx := clock.Sync(timestamp, serverTime)
 		tx := clock.FromTimestampTime(timestamp)

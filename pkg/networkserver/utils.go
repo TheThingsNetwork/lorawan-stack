@@ -202,9 +202,9 @@ func deviceHasPathForDownlink(ctx context.Context, dev *ttnpb.EndDevice, down *t
 	}
 	switch dev.MacState.DeviceClass {
 	case ttnpb.CLASS_A:
-		return down.GetClassBC() == nil && len(downlinkPathsFromRecentUplinks(dev.GetMacState().GetRecentUplinks()...)) > 0
+		return down.GetClassBC() == nil && len(downlinkPathsFromRecentUplinks(ctx, dev.GetMacState().GetRecentUplinks()...)) > 0
 	case ttnpb.CLASS_B, ttnpb.CLASS_C:
-		return len(downlinkPathsFromRecentUplinks(dev.GetMacState().GetRecentUplinks()...)) > 0 || len(down.GetClassBC().GetGateways()) > 0
+		return len(downlinkPathsFromRecentUplinks(ctx, dev.GetMacState().GetRecentUplinks()...)) > 0 || len(down.GetClassBC().GetGateways()) > 0
 	default:
 		panic(fmt.Errorf("unmatched class: %v", dev.MacState.DeviceClass))
 	}
@@ -393,7 +393,7 @@ func (ns *NetworkServer) enqueueApplicationUplinks(ctx context.Context, ups ...*
 	}
 
 	send := func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, ups ...*ttnpb.ApplicationUp) error {
-		conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, &appID)
+		conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, nil)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to get Application Server peer")
 			return err

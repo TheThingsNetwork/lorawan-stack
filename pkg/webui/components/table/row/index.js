@@ -16,24 +16,33 @@ import React from 'react'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
 
+import Link from '@ttn-lw/components/link'
+
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './row.styl'
 
 class Row extends React.Component {
   @bind
-  onClick() {
+  onClick(evt) {
     const { id, onClick } = this.props
 
-    onClick(id)
+    onClick(id, evt)
   }
 
   @bind
   onKeyDown(evt) {
     const { id, onClick } = this.props
     if (evt.key === 'Enter') {
-      onClick(id)
+      onClick(id, evt)
     }
+  }
+
+  @bind
+  onMouseDown(evt) {
+    const { id, onMouseDown } = this.props
+
+    onMouseDown(id, evt)
   }
 
   get clickListener() {
@@ -51,24 +60,29 @@ class Row extends React.Component {
   }
 
   render() {
-    const { className, children, clickable, head, body, footer } = this.props
+    const { className, children, clickable, head, body, footer, linkTo } = this.props
 
-    const rowClassNames = classnames(className, {
+    const rowClassNames = classnames(className, style.row, {
       [style.clickable]: body && clickable,
       [style.rowHead]: head,
       [style.rowBody]: body,
       [style.rowFooter]: footer,
     })
 
+    const Row = linkTo && clickable ? Link : 'div'
+
     return (
-      <tr
+      <Row
         className={rowClassNames}
         onKeyDown={this.onKeyDown}
         onClick={this.clickListener}
-        tabIndex={this.tabIndex}
+        onMouseDown={this.onMouseDown}
+        tabIndex={this.tabIndex.toString()}
+        to={linkTo}
+        role="row"
       >
         {children}
-      </tr>
+      </Row>
     )
   }
 }
@@ -86,11 +100,14 @@ Row.propTypes = {
   head: PropTypes.bool,
   /** The identifier of the row. */
   id: PropTypes.number,
+  /** The href to be passed as `to` prop to the `<Link />` component that wraps the row. */
+  linkTo: PropTypes.string,
   /**
    * Function to be called when the row gets clicked. The identifier of the row
    * is passed as an argument.
    */
   onClick: PropTypes.func,
+  onMouseDown: PropTypes.func,
 }
 
 Row.defaultProps = {
@@ -98,10 +115,12 @@ Row.defaultProps = {
   className: undefined,
   clickable: true,
   head: false,
-  body: true,
+  body: false,
   footer: false,
   onClick: () => null,
+  onMouseDown: () => null,
   id: undefined,
+  linkTo: undefined,
 }
 
 export default Row

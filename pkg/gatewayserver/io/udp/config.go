@@ -52,11 +52,13 @@ type Config struct {
 }
 
 // DefaultConfig contains the default configuration.
+// We assume that the gateway sends a PULL_DATA message every 30 seconds, instead of the default of 5 seconds.
+// This behavior has been observed in the wild, and is often used by gateways which use metered connections.
 var DefaultConfig = Config{
-	PacketHandlers:         1 << 4,
+	PacketHandlers:         1024,
 	PacketBuffer:           50,
-	DownlinkPathExpires:    15 * time.Second, // Expire downlink after missing typically 3 PULL_DATA messages.
-	ConnectionExpires:      1 * time.Minute,  // Expire connection after missing typically 2 status messages.
+	DownlinkPathExpires:    90 * time.Second, // Expire downlink after missing typically 3 PULL_DATA messages.
+	ConnectionExpires:      3 * time.Minute,  // Expire connection after missing typically 2 status messages.
 	ConnectionErrorExpires: 5 * time.Minute,
 	ScheduleLateTime:       800 * time.Millisecond,
 	AddrChangeBlock:        0, // Release address when the connection expires.

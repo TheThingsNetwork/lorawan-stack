@@ -38,7 +38,7 @@ import 'web-streams-polyfill/dist/polyfill'
  *      .on('start', () => console.log('conn opened'))
  *      .on('chunk', chunk => console.log('received chunk', chunk))
  *      .on('error', error => console.log(error))
- *      .on('close', () => console.log('conn closed'))
+ *      .on('close', wasClientRequest => console.log(wasClientRequest ? 'conn closed by client' : 'conn closed by server'))
  *
  *    // Start the stream after attaching listerners.
  *    stream.open()
@@ -56,6 +56,7 @@ export default async (payload, url) => {
     {},
   )
   let listeners = initialListeners
+  let closeRequested = false
   const token = new Token().get()
 
   let Authorization = null
@@ -86,7 +87,7 @@ export default async (payload, url) => {
   const reader = response.body.getReader()
   const onChunk = ({ done, value }) => {
     if (done) {
-      notify(listeners[EVENTS.CLOSE])
+      notify(listeners[EVENTS.CLOSE], closeRequested)
       listeners = initialListeners
       return
     }
@@ -129,6 +130,8 @@ export default async (payload, url) => {
       return this
     },
     close: () => {
+      closeRequested = true
+
       reader
         .cancel()
         .then(() => {

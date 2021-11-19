@@ -19,10 +19,10 @@ func (x *AuthInfoResponse_APIKeyAccess) MarshalProtoJSON(s *jsonplugin.MarshalSt
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.ApiKey != nil || s.HasField("api_key") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("api_key")
-		x.APIKey.MarshalProtoJSON(s.WithField("api_key"))
+		x.ApiKey.MarshalProtoJSON(s.WithField("api_key"))
 	}
 	if true { // (gogoproto.nullable) = false
 		s.WriteMoreIf(&wroteField)
@@ -44,7 +44,8 @@ func (x *AuthInfoResponse_APIKeyAccess) UnmarshalProtoJSON(s *jsonplugin.Unmarsh
 			s.ReadAny() // ignore unknown field
 		case "api_key", "apiKey":
 			if !s.ReadNil() {
-				x.APIKey.UnmarshalProtoJSON(s.WithField("api_key", true))
+				x.ApiKey = &APIKey{}
+				x.ApiKey.UnmarshalProtoJSON(s.WithField("api_key", true))
 			}
 		case "entity_ids", "entityIds":
 			s.AddField("entity_ids")

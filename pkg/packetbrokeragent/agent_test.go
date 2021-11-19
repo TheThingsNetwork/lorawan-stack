@@ -123,7 +123,7 @@ func TestForwarder(t *testing.T) {
 						ReceivedAt: time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC),
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
-								GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+								GatewayIds: &ttnpb.GatewayIdentifiers{
 									GatewayId: "foo-gateway",
 									Eui:       eui64Ptr(types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}),
 								},
@@ -148,9 +148,8 @@ func TestForwarder(t *testing.T) {
 									},
 								},
 							},
-							CodingRate:    "4/5",
-							DataRateIndex: 5,
-							Frequency:     869525000,
+							CodingRate: "4/5",
+							Frequency:  869525000,
 						},
 					},
 					BandId: "EU_863_870",
@@ -249,7 +248,7 @@ func TestForwarder(t *testing.T) {
 						ReceivedAt: time.Date(2020, time.March, 24, 12, 0, 0, 0, time.UTC),
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
-								GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+								GatewayIds: &ttnpb.GatewayIdentifiers{
 									GatewayId: "foo-gateway",
 									Eui:       eui64Ptr(types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}),
 								},
@@ -269,9 +268,8 @@ func TestForwarder(t *testing.T) {
 									},
 								},
 							},
-							CodingRate:    "4/5",
-							DataRateIndex: 3,
-							Frequency:     868300000,
+							CodingRate: "4/5",
+							Frequency:  868300000,
 						},
 					},
 					BandId: "EU_863_870",
@@ -377,11 +375,8 @@ func TestForwarder(t *testing.T) {
 			Message: &packetbroker.DownlinkMessage{
 				PhyPayload: []byte{0x60, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 				Region:     packetbroker.Region_EU_863_870,
-				RegionalParametersVersion: &packetbroker.RegionalParametersVersionValue{
-					Value: packetbroker.RegionalParametersVersion_RP001_V1_0_2_B,
-				},
-				Class:    packetbroker.DownlinkMessageClass_CLASS_A,
-				Priority: packetbroker.DownlinkMessagePriority_NORMAL,
+				Class:      packetbroker.DownlinkMessageClass_CLASS_A,
+				Priority:   packetbroker.DownlinkMessagePriority_NORMAL,
 				Rx1: &packetbroker.DownlinkMessage_RXSettings{
 					Frequency: 868100000,
 					DataRate:  packetbroker.NewLoRaDataRate(7, 125000, ""),
@@ -406,8 +401,7 @@ func TestForwarder(t *testing.T) {
 			CorrelationIds: gtwMsg.CorrelationIds,
 			Settings: &ttnpb.DownlinkMessage_Request{
 				Request: &ttnpb.TxRequest{
-					LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
-					Class:             ttnpb.CLASS_A,
+					Class: ttnpb.CLASS_A,
 					DownlinkPaths: []*ttnpb.DownlinkPath{
 						{
 							Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -415,8 +409,7 @@ func TestForwarder(t *testing.T) {
 							},
 						},
 					},
-					Priority:         ttnpb.TxSchedulePriority_NORMAL,
-					Rx1DataRateIndex: 5,
+					Priority: ttnpb.TxSchedulePriority_NORMAL,
 					Rx1DataRate: &ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{
@@ -425,9 +418,8 @@ func TestForwarder(t *testing.T) {
 							},
 						},
 					},
-					Rx1Frequency:     868100000,
-					Rx1Delay:         ttnpb.RX_DELAY_5,
-					Rx2DataRateIndex: 0,
+					Rx1Frequency: 868100000,
+					Rx1Delay:     ttnpb.RX_DELAY_5,
 					Rx2DataRate: &ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{
@@ -596,6 +588,14 @@ func TestHomeNetwork(t *testing.T) {
 														FrequencyOffset: 0,
 													},
 												},
+												{
+													Index: 1,
+													Value: &packetbroker.TerrestrialGatewayAntennaSignalQuality{
+														ChannelRssi:     -43,
+														Snr:             10.6,
+														FrequencyOffset: 1,
+													},
+												},
 											},
 										},
 									},
@@ -650,7 +650,8 @@ func TestHomeNetwork(t *testing.T) {
 					RawPayload: []byte{0x40, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 					RxMetadata: []*ttnpb.RxMetadata{
 						{
-							GatewayIdentifiers: cluster.PacketBrokerGatewayID,
+							GatewayIds:   &cluster.PacketBrokerGatewayID,
+							AntennaIndex: 0,
 							PacketBroker: &ttnpb.PacketBrokerMetadata{
 								MessageId:           "test",
 								ForwarderNetId:      [3]byte{0x0, 0x0, 0x42},
@@ -672,6 +673,32 @@ func TestHomeNetwork(t *testing.T) {
 								Longitude: 4.8,
 								Altitude:  2,
 							},
+							UplinkToken: test.Must(WrapUplinkTokens([]byte("test-token"), nil, &AgentUplinkToken{
+								ForwarderNetID:     [3]byte{0x0, 0x0, 0x42},
+								ForwarderTenantID:  "foo-tenant",
+								ForwarderClusterID: "test",
+							})).([]byte),
+						},
+						{
+							GatewayIds:   &cluster.PacketBrokerGatewayID,
+							AntennaIndex: 1,
+							PacketBroker: &ttnpb.PacketBrokerMetadata{
+								MessageId:           "test",
+								ForwarderNetId:      [3]byte{0x0, 0x0, 0x42},
+								ForwarderTenantId:   "foo-tenant",
+								ForwarderClusterId:  "test",
+								ForwarderGatewayEui: eui64Ptr(types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}),
+								ForwarderGatewayId: &pbtypes.StringValue{
+									Value: "foo-gateway",
+								},
+								HomeNetworkNetId:     [3]byte{0x0, 0x0, 0x13},
+								HomeNetworkTenantId:  "foo-tenant",
+								HomeNetworkClusterId: "test",
+							},
+							ChannelRssi:     -43,
+							Rssi:            -43,
+							Snr:             10.6,
+							FrequencyOffset: 1,
 							UplinkToken: test.Must(WrapUplinkTokens([]byte("test-token"), nil, &AgentUplinkToken{
 								ForwarderNetID:     [3]byte{0x0, 0x0, 0x42},
 								ForwarderTenantID:  "foo-tenant",
@@ -766,7 +793,7 @@ func TestHomeNetwork(t *testing.T) {
 					RawPayload: []byte{0x40, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 					RxMetadata: []*ttnpb.RxMetadata{
 						{
-							GatewayIdentifiers: cluster.PacketBrokerGatewayID,
+							GatewayIds: &cluster.PacketBrokerGatewayID,
 							PacketBroker: &ttnpb.PacketBrokerMetadata{
 								MessageId:           "test",
 								ForwarderNetId:      [3]byte{0x0, 0x0, 0x42},
@@ -841,9 +868,8 @@ func TestHomeNetwork(t *testing.T) {
 			RawPayload: []byte{0x60, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 			Settings: &ttnpb.DownlinkMessage_Request{
 				Request: &ttnpb.TxRequest{
-					FrequencyPlanId:   test.EUFrequencyPlanID,
-					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-					Class:             ttnpb.CLASS_A,
+					FrequencyPlanId: test.EUFrequencyPlanID,
+					Class:           ttnpb.CLASS_A,
 					DownlinkPaths: []*ttnpb.DownlinkPath{
 						{
 							Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -898,10 +924,7 @@ func TestHomeNetwork(t *testing.T) {
 			HomeNetworkTenantId:  "foo-tenant",
 			HomeNetworkClusterId: "test",
 			Message: &packetbroker.DownlinkMessage{
-				Region: packetbroker.Region_EU_863_870,
-				RegionalParametersVersion: &packetbroker.RegionalParametersVersionValue{
-					Value: packetbroker.RegionalParametersVersion_RP001_V1_1_B,
-				},
+				Region:     packetbroker.Region_EU_863_870,
 				PhyPayload: []byte{0x60, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 				Class:      packetbroker.DownlinkMessageClass_CLASS_A,
 				Priority:   packetbroker.DownlinkMessagePriority_NORMAL,

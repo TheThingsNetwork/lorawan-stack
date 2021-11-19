@@ -131,8 +131,8 @@ import style from './device.styl'
     'network_server_kek_label',
     'claim_authentication_code',
     'mac_state.recent_uplinks',
+    'pending_mac_state.recent_uplinks',
     'attributes',
-    'skip_payload_crypto',
     'skip_payload_crypto_override',
   ]
 
@@ -185,13 +185,8 @@ export default class Device extends React.Component {
       mayScheduleDownlinks,
       maySendUplink,
     } = this.props
-    const {
-      name,
-      join_server_address,
-      supports_join,
-      root_keys,
-      application_server_address,
-    } = device
+    const { name, join_server_address, supports_join, root_keys, application_server_address } =
+      device
 
     const jsConfig = selectJsConfig()
     const hasJs =

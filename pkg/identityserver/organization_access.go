@@ -161,13 +161,13 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		if len(req.APIKey.Rights) > 0 {
-			_, key, err := store.GetAPIKeyStore(db).GetAPIKey(ctx, req.APIKey.Id)
+		if len(req.ApiKey.Rights) > 0 {
+			_, key, err := store.GetAPIKeyStore(db).GetAPIKey(ctx, req.ApiKey.Id)
 			if err != nil {
 				return err
 			}
 
-			newRights := ttnpb.RightsFrom(req.APIKey.Rights...)
+			newRights := ttnpb.RightsFrom(req.ApiKey.Rights...)
 			existingRights := ttnpb.RightsFrom(key.Rights...)
 
 			// Require the caller to have all added rights.
@@ -180,7 +180,7 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 			}
 		}
 
-		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), &req.APIKey, req.FieldMask)
+		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), req.ApiKey, req.FieldMask)
 		return err
 	})
 	if err != nil {
@@ -208,7 +208,7 @@ func (is *IdentityServer) getOrganizationCollaborator(ctx context.Context, req *
 		return nil, err
 	}
 	res := &ttnpb.GetCollaboratorResponse{
-		OrganizationOrUserIdentifiers: *req.GetCollaborator(),
+		Ids: req.GetCollaborator(),
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		rights, err := is.getMembershipStore(ctx, db).GetMember(
@@ -241,7 +241,7 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 
 		existingRights, err := store.GetMember(
 			ctx,
-			&req.GetCollaborator().OrganizationOrUserIdentifiers,
+			req.GetCollaborator().GetIds(),
 			req.GetOrganizationIds().GetEntityIdentifiers(),
 		)
 		if err != nil && !errors.IsNotFound(err) {
@@ -273,7 +273,7 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 			}
 			var hasOtherOwner bool
 			for member, rights := range memberRights {
-				if unique.ID(ctx, member) == unique.ID(ctx, &req.GetCollaborator().OrganizationOrUserIdentifiers) {
+				if unique.ID(ctx, member) == unique.ID(ctx, req.GetCollaborator().GetIds()) {
 					continue
 				}
 				if rights.Implied().IncludesAll(ttnpb.RIGHT_ORGANIZATION_ALL) {
@@ -288,7 +288,7 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 
 		return store.SetMember(
 			ctx,
-			&req.GetCollaborator().OrganizationOrUserIdentifiers,
+			req.GetCollaborator().GetIds(),
 			req.GetOrganizationIds().GetEntityIdentifiers(),
 			ttnpb.RightsFrom(req.GetCollaborator().GetRights()...),
 		)
@@ -297,7 +297,7 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 		return nil, err
 	}
 	if len(req.GetCollaborator().GetRights()) > 0 {
-		events.Publish(evtUpdateOrganizationCollaborator.New(ctx, events.WithIdentifiers(req.GetOrganizationIds(), &req.GetCollaborator().OrganizationOrUserIdentifiers)))
+		events.Publish(evtUpdateOrganizationCollaborator.New(ctx, events.WithIdentifiers(req.GetOrganizationIds(), req.GetCollaborator().GetIds())))
 		err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
 			data.SetEntity(req)
 			return &emails.CollaboratorChanged{Data: data, Collaborator: *req.GetCollaborator()}
@@ -306,7 +306,7 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 			log.FromContext(ctx).WithError(err).Error("Could not send collaborator updated notification email")
 		}
 	} else {
-		events.Publish(evtDeleteOrganizationCollaborator.New(ctx, events.WithIdentifiers(req.GetOrganizationIds(), &req.GetCollaborator().OrganizationOrUserIdentifiers)))
+		events.Publish(evtDeleteOrganizationCollaborator.New(ctx, events.WithIdentifiers(req.GetOrganizationIds(), req.GetCollaborator().GetIds())))
 	}
 	return ttnpb.Empty, nil
 }
@@ -333,8 +333,8 @@ func (is *IdentityServer) listOrganizationCollaborators(ctx context.Context, req
 		collaborators = &ttnpb.Collaborators{}
 		for member, rights := range memberRights {
 			collaborators.Collaborators = append(collaborators.Collaborators, &ttnpb.Collaborator{
-				OrganizationOrUserIdentifiers: *member,
-				Rights:                        rights.GetRights(),
+				Ids:    member,
+				Rights: rights.GetRights(),
 			})
 		}
 		return nil

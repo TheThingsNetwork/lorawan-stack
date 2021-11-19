@@ -47,7 +47,7 @@ require (
 	github.com/PuerkitoBio/purell v1.1.1
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/TheThingsIndustries/mystique v0.0.0-20200127144137-4aa959111fe7
-	github.com/TheThingsIndustries/protoc-gen-go-json v1.1.0
+	github.com/TheThingsIndustries/protoc-gen-go-json v1.1.1
 	github.com/TheThingsNetwork/go-cayenne-lib v1.1.0
 	github.com/aws/aws-sdk-go v1.38.31
 	github.com/blang/semver v3.5.1+incompatible
@@ -126,7 +126,7 @@ require (
 	go.packetbroker.org/api/mapping/v2 v2.1.14-tts
 	go.packetbroker.org/api/routing v1.8.7-tts
 	go.packetbroker.org/api/v3 v3.10.7-tts
-	go.thethings.network/lorawan-application-payload v0.0.0-20210625082552-27377194bcca
+	go.thethings.network/lorawan-application-payload v0.0.0-20211109090704-a9a0a6022856
 	go.thethings.network/lorawan-stack-legacy/v2 v2.0.2
 	go.uber.org/zap v1.13.0
 	gocloud.dev v0.20.0

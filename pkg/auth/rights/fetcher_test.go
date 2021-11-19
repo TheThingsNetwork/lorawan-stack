@@ -65,7 +65,7 @@ func fetchEntityRights(ctx context.Context, id string, f EntityFetcher) (res str
 		wg.Done()
 	}()
 	wg.Wait()
-	return
+	return res
 }
 
 func fetchAuthInfo(ctx context.Context, f AuthInfoFetcher) (*ttnpb.AuthInfoResponse, error) {
@@ -108,16 +108,16 @@ type mockAccessServer struct {
 
 func (as *mockAccessServer) Server() *grpc.Server {
 	srv := grpc.NewServer()
-	ttnpb.RegisterEntityAccessServer(srv, mockEntityAccessServer{mockFetcher: &as.mockFetcher})
-	ttnpb.RegisterApplicationAccessServer(srv, mockApplicationAccessServer{mockFetcher: &as.mockFetcher})
-	ttnpb.RegisterClientAccessServer(srv, mockClientAccessServer{mockFetcher: &as.mockFetcher})
-	ttnpb.RegisterGatewayAccessServer(srv, mockGatewayAccessServer{mockFetcher: &as.mockFetcher})
-	ttnpb.RegisterOrganizationAccessServer(srv, mockOrganizationAccessServer{mockFetcher: &as.mockFetcher})
-	ttnpb.RegisterUserAccessServer(srv, mockUserAccessServer{mockFetcher: &as.mockFetcher})
+	ttnpb.RegisterEntityAccessServer(srv, &mockEntityAccessServer{mockFetcher: &as.mockFetcher})
+	ttnpb.RegisterApplicationAccessServer(srv, &mockApplicationAccessServer{mockFetcher: &as.mockFetcher})
+	ttnpb.RegisterClientAccessServer(srv, &mockClientAccessServer{mockFetcher: &as.mockFetcher})
+	ttnpb.RegisterGatewayAccessServer(srv, &mockGatewayAccessServer{mockFetcher: &as.mockFetcher})
+	ttnpb.RegisterOrganizationAccessServer(srv, &mockOrganizationAccessServer{mockFetcher: &as.mockFetcher})
+	ttnpb.RegisterUserAccessServer(srv, &mockUserAccessServer{mockFetcher: &as.mockFetcher})
 	return srv
 }
 
-func (as mockEntityAccessServer) AuthInfo(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.AuthInfoResponse, error) {
+func (as *mockEntityAccessServer) AuthInfo(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.AuthInfoResponse, error) {
 	as.authInfoCtx = ctx
 	if as.authInfoError != nil {
 		return nil, as.authInfoError
@@ -125,7 +125,7 @@ func (as mockEntityAccessServer) AuthInfo(ctx context.Context, _ *pbtypes.Empty)
 	return as.authInfoResponse, nil
 }
 
-func (as mockApplicationAccessServer) ListRights(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
+func (as *mockApplicationAccessServer) ListRights(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
 	as.applicationCtx, as.applicationIDs = ctx, *ids
 	if as.applicationError != nil {
 		return nil, as.applicationError
@@ -133,7 +133,7 @@ func (as mockApplicationAccessServer) ListRights(ctx context.Context, ids *ttnpb
 	return as.applicationRights, nil
 }
 
-func (as mockClientAccessServer) ListRights(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
+func (as *mockClientAccessServer) ListRights(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
 	as.clientCtx, as.clientIDs = ctx, *ids
 	if as.clientError != nil {
 		return nil, as.clientError
@@ -141,7 +141,7 @@ func (as mockClientAccessServer) ListRights(ctx context.Context, ids *ttnpb.Clie
 	return as.clientRights, nil
 }
 
-func (as mockGatewayAccessServer) ListRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
+func (as *mockGatewayAccessServer) ListRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
 	as.gatewayCtx, as.gatewayIDs = ctx, *ids
 	if as.gatewayError != nil {
 		return nil, as.gatewayError
@@ -149,7 +149,7 @@ func (as mockGatewayAccessServer) ListRights(ctx context.Context, ids *ttnpb.Gat
 	return as.gatewayRights, nil
 }
 
-func (as mockOrganizationAccessServer) ListRights(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
+func (as *mockOrganizationAccessServer) ListRights(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
 	as.organizationCtx, as.organizationIDs = ctx, *ids
 	if as.organizationError != nil {
 		return nil, as.organizationError
@@ -157,7 +157,7 @@ func (as mockOrganizationAccessServer) ListRights(ctx context.Context, ids *ttnp
 	return as.organizationRights, nil
 }
 
-func (as mockUserAccessServer) ListRights(ctx context.Context, ids *ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {
+func (as *mockUserAccessServer) ListRights(ctx context.Context, ids *ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {
 	as.userCtx, as.userIDs = ctx, *ids
 	if as.userError != nil {
 		return nil, as.userError

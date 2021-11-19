@@ -164,15 +164,23 @@ func (x *APIKey) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		}
 		s.WriteArrayEnd()
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.CreatedAt != nil || s.HasField("created_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("created_at")
-		s.WriteTime(x.CreatedAt)
+		if x.CreatedAt == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.CreatedAt)
+		}
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.UpdatedAt != nil || s.HasField("updated_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("updated_at")
-		s.WriteTime(x.UpdatedAt)
+		if x.UpdatedAt == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.UpdatedAt)
+		}
 	}
 	if x.ExpiresAt != nil || s.HasField("expires_at") {
 		s.WriteMoreIf(&wroteField)
@@ -217,14 +225,14 @@ func (x *APIKey) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			if s.Err() != nil {
 				return
 			}
-			x.CreatedAt = *v
+			x.CreatedAt = v
 		case "updated_at", "updatedAt":
 			s.AddField("updated_at")
 			v := s.ReadTime()
 			if s.Err() != nil {
 				return
 			}
-			x.UpdatedAt = *v
+			x.UpdatedAt = v
 		case "expires_at", "expiresAt":
 			s.AddField("expires_at")
 			v := s.ReadTime()
@@ -293,11 +301,11 @@ func (x *Collaborator) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Ids != nil || s.HasField("ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("ids")
 		// NOTE: OrganizationOrUserIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.OrganizationOrUserIdentifiers)
+		gogo.MarshalMessage(s, x.Ids)
 	}
 	if len(x.Rights) > 0 || s.HasField("rights") {
 		s.WriteMoreIf(&wroteField)
@@ -327,7 +335,7 @@ func (x *Collaborator) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: OrganizationOrUserIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v OrganizationOrUserIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.OrganizationOrUserIdentifiers = v
+			x.Ids = &v
 		case "rights":
 			s.AddField("rights")
 			s.ReadArray(func() {
@@ -347,11 +355,11 @@ func (x *GetCollaboratorResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Ids != nil || s.HasField("ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("ids")
 		// NOTE: OrganizationOrUserIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.OrganizationOrUserIdentifiers)
+		gogo.MarshalMessage(s, x.Ids)
 	}
 	if len(x.Rights) > 0 || s.HasField("rights") {
 		s.WriteMoreIf(&wroteField)
@@ -381,7 +389,7 @@ func (x *GetCollaboratorResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 			// NOTE: OrganizationOrUserIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v OrganizationOrUserIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.OrganizationOrUserIdentifiers = v
+			x.Ids = &v
 		case "rights":
 			s.AddField("rights")
 			s.ReadArray(func() {

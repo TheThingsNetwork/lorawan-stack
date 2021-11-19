@@ -20,6 +20,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
+	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -75,7 +76,7 @@ var (
 )
 
 func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.CreateApplicationRequest) (app *ttnpb.Application, err error) {
-	if err = blacklist.Check(ctx, req.GetIds().GetApplicationId()); err != nil {
+	if err = blacklist.Check(ctx, req.Application.GetIds().GetApplicationId()); err != nil {
 		return nil, err
 	}
 	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
@@ -94,7 +95,7 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		app, err = store.GetApplicationStore(db).CreateApplication(ctx, &req.Application)
+		app, err = store.GetApplicationStore(db).CreateApplication(ctx, req.Application)
 		if err != nil {
 			return err
 		}
@@ -106,9 +107,9 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 		); err != nil {
 			return err
 		}
-		if len(req.ContactInfo) > 0 {
-			cleanContactInfo(req.ContactInfo)
-			app.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, app.GetIds(), req.ContactInfo)
+		if len(req.Application.ContactInfo) > 0 {
+			cleanContactInfo(req.Application.ContactInfo)
+			app.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, app.GetIds(), req.Application.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -118,7 +119,7 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtCreateApplication.NewWithIdentifiersAndData(ctx, req.GetIds(), nil))
+	events.Publish(evtCreateApplication.NewWithIdentifiersAndData(ctx, req.Application.GetIds(), nil))
 	return app, nil
 }
 
@@ -128,11 +129,10 @@ func (is *IdentityServer) getApplication(ctx context.Context, req *ttnpb.GetAppl
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask, getPaths, nil)
 	if err = rights.RequireApplication(ctx, *req.GetApplicationIds(), ttnpb.RIGHT_APPLICATION_INFO); err != nil {
-		if ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicApplicationFields...) {
-			defer func() { app = app.PublicSafe() }()
-		} else {
+		if !ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicApplicationFields...) {
 			return nil, err
 		}
+		defer func() { app = app.PublicSafe() }()
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		app, err = store.GetApplicationStore(db).GetApplication(ctx, req.GetApplicationIds(), req.FieldMask)
@@ -155,30 +155,43 @@ func (is *IdentityServer) getApplication(ctx context.Context, req *ttnpb.GetAppl
 
 func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListApplicationsRequest) (apps *ttnpb.Applications, err error) {
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask, getPaths, nil)
+
+	authInfo, err := is.authInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+	callerAccountID := authInfo.GetOrganizationOrUserIdentifiers()
 	var includeIndirect bool
-	if req.Collaborator == nil {
-		authInfo, err := is.authInfo(ctx)
-		if err != nil {
-			return nil, err
+	var clusterAuth bool
+	// If request comes from cluster (list all applications), skip caller rights check.
+	if clusterauth.Authorized(ctx) == nil && req.Collaborator == nil {
+		clusterAuth = true
+		req.FieldMask = cleanFieldMaskPaths([]string{"ids"}, req.FieldMask, nil, []string{"created_at", "updated_at"})
+		if req.Deleted {
+			ctx = store.WithSoftDeleted(ctx, false)
 		}
-		collaborator := authInfo.GetOrganizationOrUserIdentifiers()
-		if collaborator == nil {
+	} else {
+		if req.Collaborator == nil {
+			req.Collaborator = callerAccountID
+			includeIndirect = true
+		}
+		if req.Collaborator == nil {
 			return &ttnpb.Applications{}, nil
 		}
-		req.Collaborator = collaborator
-		includeIndirect = true
-	}
-	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
-		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_APPLICATIONS_LIST); err != nil {
-			return nil, err
+
+		if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
+			if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_APPLICATIONS_LIST); err != nil {
+				return nil, err
+			}
+		} else if orgIDs := req.Collaborator.GetOrganizationIds(); orgIDs != nil {
+			if err = rights.RequireOrganization(ctx, *orgIDs, ttnpb.RIGHT_ORGANIZATION_APPLICATIONS_LIST); err != nil {
+				return nil, err
+			}
 		}
-	} else if orgIDs := req.Collaborator.GetOrganizationIds(); orgIDs != nil {
-		if err = rights.RequireOrganization(ctx, *orgIDs, ttnpb.RIGHT_ORGANIZATION_APPLICATIONS_LIST); err != nil {
-			return nil, err
+
+		if req.Deleted {
+			ctx = store.WithSoftDeleted(ctx, true)
 		}
-	}
-	if req.Deleted {
-		ctx = store.WithSoftDeleted(ctx, true)
 	}
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
@@ -188,14 +201,28 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 			setTotalHeader(ctx, total)
 		}
 	}()
+
 	apps = &ttnpb.Applications{}
+	var callerMemberships store.MembershipChains
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		ids, err := is.getMembershipStore(ctx, db).FindMemberships(paginateCtx, req.Collaborator, "application", includeIndirect)
-		if err != nil {
-			return err
-		}
-		if len(ids) == 0 {
-			return nil
+		var ids []*ttnpb.EntityIdentifiers
+		// If request comes from cluster, skip membership checks.
+		if !clusterAuth {
+			membershipStore := is.getMembershipStore(ctx, db)
+			ids, err = membershipStore.FindMemberships(paginateCtx, req.Collaborator, "application", includeIndirect)
+			if err != nil {
+				return err
+			}
+			if len(ids) == 0 {
+				return nil
+			}
+			callerMemberships, err = membershipStore.FindAccountMembershipChains(ctx, callerAccountID, "application", idStrings(ids...)...)
+			if err != nil {
+				return err
+			}
+		} else {
+			ctx = paginateCtx
 		}
 		appIDs := make([]*ttnpb.ApplicationIdentifiers, 0, len(ids))
 		for _, id := range ids {
@@ -214,7 +241,8 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 	}
 
 	for i, app := range apps.Applications {
-		if rights.RequireApplication(ctx, *app.GetIds(), ttnpb.RIGHT_APPLICATION_INFO) != nil {
+		entityRights := callerMemberships.GetRights(callerAccountID, app.GetIds()).Union(authInfo.GetUniversalRights())
+		if !entityRights.IncludesAll(ttnpb.RIGHT_APPLICATION_INFO) {
 			apps.Applications[i] = app.PublicSafe()
 		}
 	}
@@ -223,7 +251,7 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 }
 
 func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.UpdateApplicationRequest) (app *ttnpb.Application, err error) {
-	if err = rights.RequireApplication(ctx, *req.GetIds(), ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
+	if err = rights.RequireApplication(ctx, *req.Application.GetIds(), ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask, nil, getPaths)
@@ -236,13 +264,13 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 		}
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		app, err = store.GetApplicationStore(db).UpdateApplication(ctx, &req.Application, req.FieldMask)
+		app, err = store.GetApplicationStore(db).UpdateApplication(ctx, req.Application, req.FieldMask)
 		if err != nil {
 			return err
 		}
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-			cleanContactInfo(req.ContactInfo)
-			app.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, app.GetIds(), req.ContactInfo)
+			cleanContactInfo(req.Application.ContactInfo)
+			app.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, app.GetIds(), req.Application.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -252,7 +280,7 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateApplication.NewWithIdentifiersAndData(ctx, req.GetIds(), req.FieldMask.GetPaths()))
+	events.Publish(evtUpdateApplication.NewWithIdentifiersAndData(ctx, req.Application.GetIds(), req.FieldMask.GetPaths()))
 	return app, nil
 }
 

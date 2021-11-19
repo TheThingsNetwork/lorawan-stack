@@ -24,6 +24,14 @@ func (m *GetApplicationRequest) EntityType() string {
 	return m.GetApplicationIds().EntityType()
 }
 
+func (m *CreateApplicationRequest) EntityType() string {
+	return m.GetApplication().EntityType()
+}
+
+func (m *UpdateApplicationRequest) EntityType() string {
+	return m.GetApplication().EntityType()
+}
+
 func (m *ListApplicationAPIKeysRequest) EntityType() string {
 	return m.GetApplicationIds().EntityType()
 }
@@ -62,6 +70,14 @@ func (m *GetApplicationRequest) IDString() string {
 	return m.GetApplicationIds().IDString()
 }
 
+func (m *CreateApplicationRequest) IDString() string {
+	return m.GetApplication().IDString()
+}
+
+func (m *UpdateApplicationRequest) IDString() string {
+	return m.GetApplication().IDString()
+}
+
 func (m *ListApplicationAPIKeysRequest) IDString() string {
 	return m.GetApplicationIds().IDString()
 }
@@ -98,6 +114,10 @@ func (m *Application) ExtractRequestFields(dst map[string]interface{}) {
 
 func (m *GetApplicationRequest) ExtractRequestFields(dst map[string]interface{}) {
 	m.GetApplicationIds().ExtractRequestFields(dst)
+}
+
+func (m *UpdateApplicationRequest) ExtractRequestFields(dst map[string]interface{}) {
+	m.GetApplication().ExtractRequestFields(dst)
 }
 
 func (m *ListApplicationAPIKeysRequest) ExtractRequestFields(dst map[string]interface{}) {

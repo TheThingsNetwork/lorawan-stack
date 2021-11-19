@@ -74,7 +74,7 @@ var (
 
 func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateClientRequest) (cli *ttnpb.Client, err error) {
 	createdByAdmin := is.IsAdmin(ctx)
-	if err = blacklist.Check(ctx, req.GetIds().GetClientId()); err != nil {
+	if err = blacklist.Check(ctx, req.Client.GetIds().GetClientId()); err != nil {
 		return nil, err
 	}
 	if usrIDs := req.GetCollaborator().GetUserIds(); usrIDs != nil {
@@ -115,7 +115,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		cli, err = store.GetClientStore(db).CreateClient(ctx, &req.Client)
+		cli, err = store.GetClientStore(db).CreateClient(ctx, req.Client)
 		if err != nil {
 			return err
 		}
@@ -127,9 +127,9 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 		); err != nil {
 			return err
 		}
-		if len(req.ContactInfo) > 0 {
-			cleanContactInfo(req.ContactInfo)
-			cli.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, cli.GetIds(), req.ContactInfo)
+		if len(req.Client.ContactInfo) > 0 {
+			cleanContactInfo(req.Client.ContactInfo)
+			cli.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, cli.GetIds(), req.Client.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -156,7 +156,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 
 	cli.Secret = secret // Return the unhashed secret, in case it was generated.
 
-	events.Publish(evtCreateClient.NewWithIdentifiersAndData(ctx, req.GetIds(), nil))
+	events.Publish(evtCreateClient.NewWithIdentifiersAndData(ctx, req.Client.GetIds(), nil))
 	return cli, nil
 }
 
@@ -166,11 +166,10 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.ClientFieldPathsNested, req.FieldMask, getPaths, nil)
 	if err = rights.RequireClient(ctx, *req.GetClientIds(), ttnpb.RIGHT_CLIENT_ALL); err != nil {
-		if ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicClientFields...) {
-			defer func() { cli = cli.PublicSafe() }()
-		} else {
+		if !ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicClientFields...) {
 			return nil, err
 		}
+		defer func() { cli = cli.PublicSafe() }()
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		cli, err = store.GetClientStore(db).GetClient(ctx, req.GetClientIds(), req.FieldMask)
@@ -193,19 +192,21 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 
 func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClientsRequest) (clis *ttnpb.Clients, err error) {
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.ClientFieldPathsNested, req.FieldMask, getPaths, nil)
+
+	authInfo, err := is.authInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+	callerAccountID := authInfo.GetOrganizationOrUserIdentifiers()
 	var includeIndirect bool
 	if req.Collaborator == nil {
-		authInfo, err := is.authInfo(ctx)
-		if err != nil {
-			return nil, err
-		}
-		collaborator := authInfo.GetOrganizationOrUserIdentifiers()
-		if collaborator == nil {
-			return &ttnpb.Clients{}, nil
-		}
-		req.Collaborator = collaborator
+		req.Collaborator = callerAccountID
 		includeIndirect = true
 	}
+	if req.Collaborator == nil {
+		return &ttnpb.Clients{}, nil
+	}
+
 	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
 		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_CLIENTS_LIST); err != nil {
 			return nil, err
@@ -215,9 +216,11 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 			return nil, err
 		}
 	}
+
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
 	}
+
 	ctx = store.WithOrder(ctx, req.Order)
 	var total uint64
 	paginateCtx := store.WithPagination(ctx, req.Limit, req.Page, &total)
@@ -226,14 +229,22 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 			setTotalHeader(ctx, total)
 		}
 	}()
+
 	clis = &ttnpb.Clients{}
+	var callerMemberships store.MembershipChains
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		ids, err := is.getMembershipStore(ctx, db).FindMemberships(paginateCtx, req.Collaborator, "client", includeIndirect)
+		membershipStore := is.getMembershipStore(ctx, db)
+		ids, err := membershipStore.FindMemberships(paginateCtx, req.Collaborator, "client", includeIndirect)
 		if err != nil {
 			return err
 		}
 		if len(ids) == 0 {
 			return nil
+		}
+		callerMemberships, err = membershipStore.FindAccountMembershipChains(ctx, callerAccountID, "client", idStrings(ids...)...)
+		if err != nil {
+			return err
 		}
 		cliIDs := make([]*ttnpb.ClientIdentifiers, 0, len(ids))
 		for _, id := range ids {
@@ -252,7 +263,8 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 	}
 
 	for i, cli := range clis.Clients {
-		if rights.RequireClient(ctx, *cli.GetIds(), ttnpb.RIGHT_CLIENT_ALL) != nil {
+		entityRights := callerMemberships.GetRights(callerAccountID, cli.GetIds()).Union(authInfo.GetUniversalRights())
+		if !entityRights.IncludesAll(ttnpb.RIGHT_CLIENT_ALL) {
 			clis.Clients[i] = cli.PublicSafe()
 		}
 	}
@@ -263,7 +275,7 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 var errUpdateClientAdminField = errors.DefinePermissionDenied("client_update_admin_field", "only admins can update the `{field}` field")
 
 func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateClientRequest) (cli *ttnpb.Client, err error) {
-	if err = rights.RequireClient(ctx, *req.GetIds(), ttnpb.RIGHT_CLIENT_ALL); err != nil {
+	if err = rights.RequireClient(ctx, *req.Client.GetIds(), ttnpb.RIGHT_CLIENT_ALL); err != nil {
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.ClientFieldPathsNested, req.FieldMask, nil, getPaths)
@@ -289,18 +301,18 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "state") {
 		if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "state_description") {
 			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "state_description")
-			req.StateDescription = ""
+			req.Client.StateDescription = ""
 		}
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		cli, err = store.GetClientStore(db).UpdateClient(ctx, &req.Client, req.FieldMask)
+		cli, err = store.GetClientStore(db).UpdateClient(ctx, req.Client, req.FieldMask)
 		if err != nil {
 			return err
 		}
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-			cleanContactInfo(req.ContactInfo)
-			cli.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, cli.Ids, req.ContactInfo)
+			cleanContactInfo(req.Client.ContactInfo)
+			cli.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, cli.Ids, req.Client.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -310,7 +322,7 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateClient.NewWithIdentifiersAndData(ctx, req.GetIds(), req.FieldMask.GetPaths()))
+	events.Publish(evtUpdateClient.NewWithIdentifiersAndData(ctx, req.Client.GetIds(), req.FieldMask.GetPaths()))
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "state") {
 		err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
 			data.SetEntity(req)

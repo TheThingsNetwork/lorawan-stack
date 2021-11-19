@@ -197,7 +197,9 @@ const ManualForm = props => {
         application_server_address: asHost,
         supports_join: jsEnabled,
         _device_class:
-          initialActivationMode === ACTIVATION_MODES.MULTICAST ? '' : DEVICE_CLASS_MAP.CLASS_A,
+          initialActivationMode === ACTIVATION_MODES.MULTICAST
+            ? defaultValues._device_class
+            : DEVICE_CLASS_MAP.CLASS_A,
         _activation_mode: initialActivationMode,
       }),
       { context: validationContext },
@@ -269,7 +271,10 @@ const ManualForm = props => {
             ...defaultValues,
             ...values,
             _activation_mode: mode,
-            _device_class: mode === ACTIVATION_MODES.MULTICAST ? '' : DEVICE_CLASS_MAP.CLASS_A,
+            _device_class:
+              mode === ACTIVATION_MODES.MULTICAST
+                ? defaultValues._device_class
+                : DEVICE_CLASS_MAP.CLASS_A,
             mac_settings: defaultNsSettings
               ? merge({}, defaultValues.mac_settings, values.mac_settings, macSettings)
               : merge({}, defaultValues.mac_settings, values.mac_settings),
@@ -284,7 +289,9 @@ const ManualForm = props => {
   )
 
   const [deviceClass, setDeviceClass] = React.useState(
-    initialValues._activation_mode === ACTIVATION_MODES.MULTICAST ? '' : DEVICE_CLASS_MAP.CLASS_A,
+    initialValues._activation_mode === ACTIVATION_MODES.MULTICAST
+      ? defaultValues._device_class
+      : DEVICE_CLASS_MAP.CLASS_A,
   )
   const handleDeviceClassChange = React.useCallback(
     deviceClass => {

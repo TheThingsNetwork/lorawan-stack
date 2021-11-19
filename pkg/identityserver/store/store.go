@@ -335,12 +335,12 @@ func (l logger) Print(v ...interface{}) {
 		return
 	}
 	logger := l.Interface
-	if source, ok := v[1].(string); ok {
-		logger = logger.WithField("source", filepath.Base(source))
-	} else {
+	source, ok := v[1].(string)
+	if !ok {
 		l.Error(fmt.Sprint(v...))
 		return
 	}
+	logger = logger.WithField("source", filepath.Base(source))
 	switch v[0] {
 	case "log", "error":
 		if err, ok := v[2].(error); ok {

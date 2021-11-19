@@ -50,6 +50,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 )
 
+const defaultLockTTL = 10 * time.Second
+
 func NewComponentDeviceRegistryRedis(conf Config, name string) *redis.Client {
 	return redis.New(conf.Redis.WithNamespace(name, "devices"))
 }
@@ -64,6 +66,10 @@ func NewNetworkServerApplicationUplinkQueueRedis(conf Config) *redis.Client {
 
 func NewNetworkServerDownlinkTaskRedis(conf Config) *redis.Client {
 	return redis.New(conf.Redis.WithNamespace("ns", "tasks"))
+}
+
+func NewApplicationServerDeviceRegistryRedis(conf Config) *redis.Client {
+	return NewComponentDeviceRegistryRedis(conf, "as")
 }
 
 var errUnknownComponent = errors.DefineInvalidArgument("unknown_component", "unknown component `{component}`")
@@ -223,9 +229,14 @@ var startCommand = &cobra.Command{
 			logger.Info("Setting up Gateway Server")
 			switch config.Cache.Service {
 			case "redis":
-				config.GS.Stats = &gsredis.GatewayConnectionStatsRegistry{
-					Redis: redis.New(config.Cache.Redis.WithNamespace("gs", "cache", "connstats")),
+				gatewayConnectionStatsRegistry := &gsredis.GatewayConnectionStatsRegistry{
+					Redis:   redis.New(config.Cache.Redis.WithNamespace("gs", "cache", "connstats")),
+					LockTTL: defaultLockTTL,
 				}
+				if err := gatewayConnectionStatsRegistry.Init(ctx); err != nil {
+					return shared.ErrInitializeGatewayServer.WithCause(err)
+				}
+				config.GS.Stats = gatewayConnectionStatsRegistry
 			}
 			gs, err := gatewayserver.New(c, &config.GS)
 			if err != nil {
@@ -254,7 +265,7 @@ var startCommand = &cobra.Command{
 			config.NS.ApplicationUplinkQueue.Queue = applicationUplinkQueue
 			devices := &nsredis.DeviceRegistry{
 				Redis:   NewNetworkServerDeviceRegistryRedis(*config),
-				LockTTL: time.Second,
+				LockTTL: defaultLockTTL,
 			}
 			if err := devices.Init(ctx); err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)
@@ -284,34 +295,54 @@ var startCommand = &cobra.Command{
 
 		if start.ApplicationServer {
 			logger.Info("Setting up Application Server")
-			config.AS.Links = &asredis.LinkRegistry{
-				Redis: redis.New(config.Redis.WithNamespace("as", "links")),
+			linkRegistry := &asredis.LinkRegistry{
+				Redis:   redis.New(config.Redis.WithNamespace("as", "links")),
+				LockTTL: defaultLockTTL,
 			}
-			config.AS.Devices = &asredis.DeviceRegistry{
-				Redis: NewComponentDeviceRegistryRedis(*config, "as"),
+			if err := linkRegistry.Init(ctx); err != nil {
+				return shared.ErrInitializeApplicationServer.WithCause(err)
 			}
+			config.AS.Links = linkRegistry
+			deviceRegistry := &asredis.DeviceRegistry{
+				Redis:   NewApplicationServerDeviceRegistryRedis(*config),
+				LockTTL: defaultLockTTL,
+			}
+			if err := deviceRegistry.Init(ctx); err != nil {
+				return shared.ErrInitializeApplicationServer.WithCause(err)
+			}
+			config.AS.Devices = deviceRegistry
 			config.AS.UplinkStorage.Registry = &asredis.ApplicationUplinkRegistry{
 				Redis: redis.New(config.Redis.WithNamespace("as", "applicationups")),
 				Limit: config.AS.UplinkStorage.Limit,
 			}
-			config.AS.Distribution.PubSub = &asdistribredis.PubSub{
+			config.AS.Distribution.Global.PubSub = &asdistribredis.PubSub{
 				Redis: redis.New(config.Cache.Redis.WithNamespace("as", "traffic")),
 			}
-			config.AS.PubSub.Registry = &asiopsredis.PubSubRegistry{
-				Redis: redis.New(config.Redis.WithNamespace("as", "io", "pubsub")),
+			pubsubRegistry := &asiopsredis.PubSubRegistry{
+				Redis:   redis.New(config.Redis.WithNamespace("as", "io", "pubsub")),
+				LockTTL: defaultLockTTL,
 			}
+			if err := pubsubRegistry.Init(ctx); err != nil {
+				return shared.ErrInitializeApplicationServer.WithCause(err)
+			}
+			config.AS.PubSub.Registry = pubsubRegistry
 			applicationPackagesRegistry := &asioapredis.ApplicationPackagesRegistry{
 				Redis:   redis.New(config.Redis.WithNamespace("as", "io", "applicationpackages")),
-				LockTTL: 10 * time.Second,
+				LockTTL: defaultLockTTL,
 			}
 			if err := applicationPackagesRegistry.Init(ctx); err != nil {
 				return shared.ErrInitializeApplicationServer.WithCause(err)
 			}
 			config.AS.Packages.Registry = applicationPackagesRegistry
 			if config.AS.Webhooks.Target != "" {
-				config.AS.Webhooks.Registry = &asiowebredis.WebhookRegistry{
-					Redis: redis.New(config.Redis.WithNamespace("as", "io", "webhooks")),
+				webhookRegistry := &asiowebredis.WebhookRegistry{
+					Redis:   redis.New(config.Redis.WithNamespace("as", "io", "webhooks")),
+					LockTTL: defaultLockTTL,
 				}
+				if err := webhookRegistry.Init(ctx); err != nil {
+					return shared.ErrInitializeApplicationServer.WithCause(err)
+				}
+				config.AS.Webhooks.Registry = webhookRegistry
 			}
 			fetcher, err := config.AS.EndDeviceFetcher.NewFetcher(c)
 			if err != nil {
@@ -327,15 +358,30 @@ var startCommand = &cobra.Command{
 
 		if start.JoinServer {
 			logger.Info("Setting up Join Server")
-			config.JS.Devices = &jsredis.DeviceRegistry{
-				Redis: NewComponentDeviceRegistryRedis(*config, "js"),
+			deviceRegistry := &jsredis.DeviceRegistry{
+				Redis:   NewComponentDeviceRegistryRedis(*config, "js"),
+				LockTTL: defaultLockTTL,
 			}
-			config.JS.Keys = &jsredis.KeyRegistry{
-				Redis: redis.New(config.Redis.WithNamespace("js", "keys")),
+			if err := deviceRegistry.Init(ctx); err != nil {
+				return shared.ErrInitializeJoinServer.WithCause(err)
 			}
-			config.JS.ApplicationActivationSettings = &jsredis.ApplicationActivationSettingRegistry{
-				Redis: redis.New(config.Redis.WithNamespace("js", "application-activation-settings")),
+			config.JS.Devices = deviceRegistry
+			keyRegistry := &jsredis.KeyRegistry{
+				Redis:   redis.New(config.Redis.WithNamespace("js", "keys")),
+				LockTTL: defaultLockTTL,
 			}
+			if err := keyRegistry.Init(ctx); err != nil {
+				return shared.ErrInitializeJoinServer.WithCause(err)
+			}
+			config.JS.Keys = keyRegistry
+			applicationActivationSettingRegistry := &jsredis.ApplicationActivationSettingRegistry{
+				Redis:   redis.New(config.Redis.WithNamespace("js", "application-activation-settings")),
+				LockTTL: defaultLockTTL,
+			}
+			if err := applicationActivationSettingRegistry.Init(ctx); err != nil {
+				return shared.ErrInitializeJoinServer.WithCause(err)
+			}
+			config.JS.ApplicationActivationSettings = applicationActivationSettingRegistry
 			js, err := joinserver.New(c, &config.JS)
 			if err != nil {
 				return shared.ErrInitializeJoinServer.WithCause(err)

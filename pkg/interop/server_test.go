@@ -19,13 +19,13 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"testing"
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -45,10 +45,14 @@ func (c *mockComponent) RateLimiter() ratelimit.Interface {
 	return &ratelimit.NoopRateLimiter{}
 }
 
+func (c *mockComponent) HTTPClient(context.Context) (*http.Client, error) {
+	return http.DefaultClient, nil
+}
+
 type mockTarget struct {
 	JoinRequestFunc    func(context.Context, *interop.JoinReq) (*interop.JoinAns, error)
 	AppSKeyRequestFunc func(context.Context, *interop.AppSKeyReq) (*interop.AppSKeyAns, error)
-	HomeNSRequestFunc  func(context.Context, *interop.HomeNSReq) (*interop.HomeNSAns, error)
+	HomeNSRequestFunc  func(context.Context, *interop.HomeNSReq) (*interop.TTIHomeNSAns, error)
 }
 
 func (m mockTarget) JoinRequest(ctx context.Context, req *interop.JoinReq) (*interop.JoinAns, error) {
@@ -65,7 +69,7 @@ func (m mockTarget) AppSKeyRequest(ctx context.Context, req *interop.AppSKeyReq)
 	panic("AppSKeyRequest called but not registered")
 }
 
-func (m mockTarget) HomeNSRequest(ctx context.Context, req *interop.HomeNSReq) (*interop.HomeNSAns, error) {
+func (m mockTarget) HomeNSRequest(ctx context.Context, req *interop.HomeNSReq) (*interop.TTIHomeNSAns, error) {
 	if m.HomeNSRequestFunc != nil {
 		return m.HomeNSRequestFunc(ctx, req)
 	}
@@ -79,11 +83,12 @@ func TestServer(t *testing.T) {
 		Name              string
 		JS                interop.JoinServer
 		ClientTLSConfig   *tls.Config
+		PacketBrokerToken bool
 		RequestBody       interface{}
 		ResponseAssertion func(*testing.T, *http.Response) bool
 	}{
 		{
-			Name:            "Empty",
+			Name:            "ClientTLS/Empty",
 			ClientTLSConfig: makeClientTLSConfig(),
 			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
 				a := assertions.New(t)
@@ -91,7 +96,7 @@ func TestServer(t *testing.T) {
 			},
 		},
 		{
-			Name:            "JoinReq/InvalidSenderID",
+			Name:            "ClientTLS/JoinReq/InvalidSenderID",
 			ClientTLSConfig: makeClientTLSConfig(),
 			RequestBody: &interop.JoinReq{
 				NsJsMessageHeader: interop.NsJsMessageHeader{
@@ -118,7 +123,7 @@ func TestServer(t *testing.T) {
 			},
 		},
 		{
-			Name:            "JoinReq/NotRegistered",
+			Name:            "ClientTLS/JoinReq/NotRegistered",
 			ClientTLSConfig: makeClientTLSConfig(),
 			RequestBody: &interop.JoinReq{
 				NsJsMessageHeader: interop.NsJsMessageHeader{
@@ -145,7 +150,7 @@ func TestServer(t *testing.T) {
 			},
 		},
 		{
-			Name: "JoinReq/UnknownDevEUI",
+			Name: "ClientTLS/JoinReq/UnknownDevEUI",
 			JS: mockTarget{
 				JoinRequestFunc: func(ctx context.Context, req *interop.JoinReq) (*interop.JoinAns, error) {
 					if err := authorizer.RequireAuthorized(ctx); err != nil {
@@ -180,43 +185,7 @@ func TestServer(t *testing.T) {
 			},
 		},
 		{
-			Name: "JoinReq/Unauthenticated NSID",
-			JS: mockTarget{
-				JoinRequestFunc: func(ctx context.Context, req *interop.JoinReq) (*interop.JoinAns, error) {
-					if err := authorizer.RequireAuthorized(ctx); err != nil {
-						return nil, err
-					}
-					return nil, interop.ErrUnknownDevEUI.New()
-				},
-			},
-			ClientTLSConfig: makeClientTLSConfig(),
-			RequestBody: &interop.JoinReq{
-				NsJsMessageHeader: interop.NsJsMessageHeader{
-					MessageHeader: interop.MessageHeader{
-						MessageType:     interop.MessageTypeJoinReq,
-						ProtocolVersion: interop.ProtocolV1_1,
-					},
-					SenderID:   interop.NetID{0x0, 0x0, 0x01},
-					SenderNSID: stringPtr("example.com"), // The client is authenticated with NSID localhost and *.localhost only
-					ReceiverID: interop.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
-				},
-				MACVersion: interop.MACVersion(ttnpb.MAC_V1_0_3),
-			},
-			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
-				a := assertions.New(t)
-				if !a.So(res.StatusCode, should.Equal, http.StatusOK) {
-					return false
-				}
-				var msg interop.ErrorMessage
-				err := json.NewDecoder(res.Body).Decode(&msg)
-				if !a.So(err, should.BeNil) {
-					return false
-				}
-				return a.So(msg.Result.ResultCode, should.Equal, interop.ResultUnknownSender)
-			},
-		},
-		{
-			Name: "JoinReq/UnknownDevEUI",
+			Name: "ClientTLS/JoinReq/Success",
 			JS: mockTarget{
 				JoinRequestFunc: func(ctx context.Context, req *interop.JoinReq) (*interop.JoinAns, error) {
 					if err := authorizer.RequireAuthorized(ctx); err != nil {
@@ -238,8 +207,8 @@ func TestServer(t *testing.T) {
 								MessageType:     interop.MessageTypeJoinAns,
 								TransactionID:   req.TransactionID,
 							},
-							SenderID:   interop.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
-							ReceiverID: interop.NetID{0x0, 0x0, 0x01},
+							SenderID:   req.ReceiverID,
+							ReceiverID: req.SenderID,
 						},
 						PHYPayload:   bytes.Repeat([]byte{0x42}, 42),
 						FNwkSIntKey:  (*interop.KeyEnvelope)(test.DefaultFNwkSIntKeyEnvelopeWrapped),
@@ -277,43 +246,122 @@ func TestServer(t *testing.T) {
 					a.So(msg.ReceiverID, should.Resemble, interop.NetID{0x0, 0x0, 0x01})
 			},
 		},
-	} {
-		t.Run(tc.Name, func(t *testing.T) {
-			a, ctx := test.New(t)
-			ctx = log.NewContext(ctx, test.GetLogger(t))
-
-			s, err := interop.NewServer(&mockComponent{ctx}, nil, config.InteropServer{
-				SenderClientCA: config.SenderClientCA{
-					Source:    "directory",
-					Directory: "testdata",
+		{
+			Name: "PacketBroker/HomeNSReq/Success",
+			JS: mockTarget{
+				HomeNSRequestFunc: func(ctx context.Context, req *interop.HomeNSReq) (*interop.TTIHomeNSAns, error) {
+					if err := authorizer.RequireAuthorized(ctx); err != nil {
+						return nil, err
+					}
+					if err := authorizer.RequireNetID(ctx, types.NetID{0x0, 0x0, 0x0}); err != nil {
+						return nil, err
+					}
+					if err := authorizer.RequireAddress(ctx, "test.packetbroker.io"); err != nil {
+						return nil, err
+					}
+					return &interop.TTIHomeNSAns{
+						HomeNSAns: interop.HomeNSAns{
+							JsNsMessageHeader: interop.JsNsMessageHeader{
+								MessageHeader: interop.MessageHeader{
+									ProtocolVersion: req.ProtocolVersion,
+									MessageType:     interop.MessageTypeHomeNSAns,
+									TransactionID:   req.TransactionID,
+								},
+								SenderID:     req.ReceiverID,
+								ReceiverID:   req.SenderID,
+								ReceiverNSID: req.SenderNSID,
+							},
+							Result: interop.Result{
+								ResultCode: interop.ResultSuccess,
+							},
+							HNetID: interop.NetID{0x0, 0x0, 0x1},
+							HNSID:  &interop.EUI64{0x42, 0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0},
+						},
+					}, nil
 				},
-			})
-			if !a.So(err, should.BeNil) {
-				t.Fatal("Failed to instantiate interop server")
-			}
-			if tc.JS != nil {
-				s.RegisterJS(tc.JS)
-			}
+			},
+			PacketBrokerToken: true,
+			RequestBody: &interop.HomeNSReq{
+				NsJsMessageHeader: interop.NsJsMessageHeader{
+					MessageHeader: interop.MessageHeader{
+						MessageType:     interop.MessageTypeHomeNSReq,
+						ProtocolVersion: interop.ProtocolV1_1,
+					},
+					SenderID:   interop.NetID{0x0, 0x0, 0x0},
+					ReceiverID: interop.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+				},
+				DevEUI: interop.EUI64{0x42, 0xff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
+			},
+			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
+				a := assertions.New(t)
+				if !a.So(res.StatusCode, should.Equal, http.StatusOK) {
+					return false
+				}
+				var msg interop.HomeNSAns
+				err := json.NewDecoder(res.Body).Decode(&msg)
+				return a.So(err, should.BeNil) &&
+					a.So(msg.Result.ResultCode, should.Equal, interop.ResultSuccess) &&
+					a.So(msg.SenderID, should.Resemble, interop.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}) &&
+					a.So(msg.ReceiverID, should.Resemble, interop.NetID{0x0, 0x0, 0x0}) &&
+					a.So(msg.HNetID, should.Resemble, interop.NetID{0x0, 0x0, 0x1}) &&
+					a.So(msg.HNSID, should.Resemble, &interop.EUI64{0x42, 0x42, 0x42, 0x0, 0x0, 0x0, 0x0, 0x0})
+			},
+		},
+	} {
+		tc := tc
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				ctx, cancel := context.WithCancel(ctx)
+				defer cancel()
 
-			srv := newTLSServer(s)
-			defer srv.Close()
+				pbIssuer, pbToken := makePacketBrokerTokenIssuer(ctx, "test.packetbroker.io")
 
-			client := srv.Client()
-			if tc.ClientTLSConfig != nil {
-				client.Transport.(*http.Transport).TLSClientConfig = tc.ClientTLSConfig
-			}
+				s, err := interop.NewServer(&mockComponent{ctx}, nil, config.InteropServer{
+					SenderClientCA: config.SenderClientCA{
+						Source:    "directory",
+						Directory: "testdata",
+					},
+					PacketBroker: config.PacketBrokerInteropAuth{
+						Enabled:     true,
+						TokenIssuer: pbIssuer, // Subject is the NSID and is used as authorized address.
+					},
+					PublicTLSAddress: "https://localhost", // Used as Packet Broker token audience.
+				})
+				if !a.So(err, should.BeNil) {
+					t.Fatal("Failed to instantiate interop server")
+				}
+				if tc.JS != nil {
+					s.RegisterJS(tc.JS)
+				}
 
-			buf, err := json.Marshal(tc.RequestBody)
-			if !a.So(err, should.BeNil) {
-				t.Fatal("Failed to marshal request body")
-			}
-			res, err := client.Post(srv.URL, "application/json", bytes.NewReader(buf))
-			if !a.So(err, should.BeNil) {
-				t.Fatal("Request failed")
-			}
-			if !tc.ResponseAssertion(t, res) {
-				t.FailNow()
-			}
+				srv := newTLSServer(s)
+				defer srv.Close()
+
+				buf, err := json.Marshal(tc.RequestBody)
+				if !a.So(err, should.BeNil) {
+					t.Fatal("Failed to marshal request body")
+				}
+				req := test.Must(http.NewRequest(http.MethodPost, srv.URL, bytes.NewReader(buf))).(*http.Request)
+				req.Header.Set("Content-Type", "application/json")
+
+				client := srv.Client()
+				if tc.ClientTLSConfig != nil {
+					client.Transport.(*http.Transport).TLSClientConfig = tc.ClientTLSConfig
+				}
+				if tc.PacketBrokerToken {
+					req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", pbToken("https://localhost")))
+				}
+
+				res, err := client.Do(req)
+				if !a.So(err, should.BeNil) {
+					t.Fatal("Request failed")
+				}
+				if !tc.ResponseAssertion(t, res) {
+					t.FailNow()
+				}
+			},
 		})
 	}
 }

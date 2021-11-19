@@ -53,9 +53,8 @@ export const selectOrganizationCollaborator = state => {
 
 // Collaborators.
 const createSelectCollaboratorsIdsSelector = createPaginationIdsSelectorByEntity(ENTITY)
-const createSelectCollaboratorsTotalCountSelector = createPaginationTotalCountSelectorByEntity(
-  ENTITY,
-)
+const createSelectCollaboratorsTotalCountSelector =
+  createPaginationTotalCountSelectorByEntity(ENTITY)
 const createSelectCollaboratorsFetchingSelector = createFetchingSelector(
   GET_COLLABORATORS_LIST_BASE,
 )

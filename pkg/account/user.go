@@ -51,7 +51,7 @@ func (s *server) CurrentUser(c echo.Context) error {
 	userJSON, _ := jsonpb.TTN().Marshal(safeUser)
 	return c.JSON(http.StatusOK, struct {
 		User       json.RawMessage `json:"user"`
-		LoggedInAt time.Time       `json:"logged_in_at"`
+		LoggedInAt *time.Time      `json:"logged_in_at"`
 	}{
 		User:       userJSON,
 		LoggedInAt: session.CreatedAt,
@@ -77,12 +77,9 @@ func (req *loginRequest) ValidateContext(ctx context.Context) error {
 	if strings.TrimSpace(req.Password) == "" {
 		return errMissingPassword.New()
 	}
-	if err := (&ttnpb.UserIdentifiers{
+	return (&ttnpb.UserIdentifiers{
 		UserId: req.UserID,
-	}).ValidateFields("user_id"); err != nil {
-		return err
-	}
-	return nil
+	}).ValidateFields("user_id")
 }
 
 func (s *server) Login(c echo.Context) error {

@@ -28,7 +28,7 @@ type LoginToken struct {
 	UserID string `gorm:"type:UUID"`
 
 	Token     string `gorm:"type:VARCHAR;unique_index:login_token_index;not null"`
-	ExpiresAt time.Time
+	ExpiresAt *time.Time
 	Used      bool
 }
 
@@ -39,9 +39,9 @@ func init() {
 func (t LoginToken) toPB() *ttnpb.LoginToken {
 	pb := &ttnpb.LoginToken{
 		Token:     t.Token,
-		ExpiresAt: cleanTime(t.ExpiresAt),
-		CreatedAt: cleanTime(t.CreatedAt),
-		UpdatedAt: cleanTime(t.UpdatedAt),
+		CreatedAt: cleanTimePtr(&t.CreatedAt),
+		UpdatedAt: cleanTimePtr(&t.UpdatedAt),
+		ExpiresAt: cleanTimePtr(t.ExpiresAt),
 	}
 	if t.User != nil {
 		pb.UserIds = &ttnpb.UserIdentifiers{UserId: t.User.Account.UID}

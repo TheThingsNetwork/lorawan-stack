@@ -16,6 +16,7 @@ package band
 
 import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 
+// US_902_928_TS1_V1_0_1 is the band definition for US902-928 in the TS1 v1.0.1 specification.
 var US_902_928_TS1_V1_0_1 = Band{
 	ID: US_902_928,
 

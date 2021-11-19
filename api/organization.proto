@@ -39,9 +39,9 @@ message Organization {
   // The identifiers of the organization. These are public and can be seen by any authenticated user in the network.
   OrganizationIdentifiers ids = 1 [(validate.rules).message.required = true];
   // When the organization was created. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 2 [(gogoproto.stdtime) = true];
   // When the organization was last updated. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 3 [(gogoproto.stdtime) = true];
   // When the organization was deleted. This information is public and can be seen by any authenticated user in the network.
   google.protobuf.Timestamp deleted_at = 8 [(gogoproto.stdtime) = true];
 
@@ -98,7 +98,7 @@ message ListOrganizationsRequest {
 }
 
 message CreateOrganizationRequest {
-  Organization organization = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  Organization organization = 1 [(validate.rules).message.required = true];
   // Collaborator to grant all rights on the newly created application.
   // NOTE: It is currently not possible to have organizations collaborating on
   // other organizations.
@@ -106,7 +106,7 @@ message CreateOrganizationRequest {
 }
 
 message UpdateOrganizationRequest {
-  Organization organization = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  Organization organization = 1 [(validate.rules).message.required = true];
   // The names of the organization fields that should be updated.
   google.protobuf.FieldMask field_mask = 2;
 }
@@ -140,7 +140,7 @@ message CreateOrganizationAPIKeyRequest {
 
 message UpdateOrganizationAPIKeyRequest {
   OrganizationIdentifiers organization_ids = 1 [(validate.rules).message.required = true];
-  APIKey api_key = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  APIKey api_key = 2 [(validate.rules).message.required = true];
   // The names of the api key fields that should be updated.
   google.protobuf.FieldMask field_mask = 3;
 }

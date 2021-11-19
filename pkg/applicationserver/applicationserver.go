@@ -132,11 +132,23 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 			ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
 			ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
 		},
-		clusterDistributor: distribution.NewPubSubDistributor(ctx, c, conf.Distribution.Timeout, conf.Distribution.PubSub),
-		localDistributor:   distribution.NewLocalDistributor(ctx, c, conf.Distribution.Timeout),
-		interopClient:      interopCl,
-		interopID:          conf.Interop.ID,
-		endDeviceFetcher:   conf.EndDeviceFetcher.Fetcher,
+		clusterDistributor: distribution.NewPubSubDistributor(
+			ctx,
+			c,
+			conf.Distribution.Timeout,
+			conf.Distribution.Global.PubSub,
+			conf.Distribution.Global.Individual.SubscriptionOptions(),
+		),
+		localDistributor: distribution.NewLocalDistributor(
+			ctx,
+			c,
+			conf.Distribution.Timeout,
+			conf.Distribution.Local.Broadcast.SubscriptionOptions(),
+			conf.Distribution.Local.Individual.SubscriptionOptions(),
+		),
+		interopClient:    interopCl,
+		interopID:        conf.Interop.ID,
+		endDeviceFetcher: conf.EndDeviceFetcher.Fetcher,
 	}
 	as.formatters[ttnpb.PayloadFormatter_FORMATTER_REPOSITORY] = devicerepository.New(as.formatters, as)
 
@@ -153,7 +165,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		iogrpc.WithEndDeviceFetcher(as.endDeviceFetcher),
 		iogrpc.WithPayloadProcessor(as.formatters),
 		iogrpc.WithSkipPayloadCrypto(func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (bool, error) {
-			link, err := as.getLink(ctx, ids.ApplicationIdentifiers, []string{"skip_payload_crypto"})
+			link, err := as.getLink(ctx, &ids.ApplicationIdentifiers, []string{"skip_payload_crypto"})
 			if err != nil {
 				return false, err
 			}
@@ -287,14 +299,13 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 	}
 	if cluster {
 		return as.clusterDistributor.Subscribe(ctx, protocol, ids)
-	} else {
-		return as.localDistributor.Subscribe(ctx, protocol, ids)
 	}
+	return as.localDistributor.Subscribe(ctx, protocol, ids)
 }
 
 // Publish processes the given upstream message and then publishes it to the application frontends.
 func (as *ApplicationServer) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
-	link, err := as.getLink(ctx, up.ApplicationIdentifiers, []string{
+	link, err := as.getLink(ctx, &up.ApplicationIdentifiers, []string{
 		"default_formatters",
 		"skip_payload_crypto",
 	})
@@ -389,7 +400,6 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 				AppSKey:      &appSKey,
 			},
 			LastAFCntDown: lastAFCntDownFromMinFCnt(minFCntDown),
-			StartedAt:     time.Now().UTC(),
 		}, nil
 	}
 
@@ -528,14 +538,14 @@ func (as *ApplicationServer) attemptDownlinkQueueOp(ctx context.Context, dev *tt
 
 func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, op func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*pbtypes.Empty, error)) error {
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("as:downlink:%s", events.NewCorrelationID()))
-	link, err := as.getLink(ctx, ids.ApplicationIdentifiers, []string{
+	link, err := as.getLink(ctx, &ids.ApplicationIdentifiers, []string{
 		"default_formatters",
 		"skip_payload_crypto",
 	})
 	if err != nil {
 		return err
 	}
-	peer, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
+	peer, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, nil)
 	if err != nil {
 		return err
 	}
@@ -598,14 +608,14 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 	if err != nil {
 		return nil, err
 	}
-	link, err := as.getLink(ctx, ids.ApplicationIdentifiers, []string{
+	link, err := as.getLink(ctx, &ids.ApplicationIdentifiers, []string{
 		"default_formatters",
 		"skip_payload_crypto",
 	})
 	if err != nil {
 		return nil, err
 	}
-	pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
+	pc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -660,7 +670,7 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids ttnpb.EndDevi
 		DevEui:       *ids.DevEui,
 		JoinEui:      *ids.JoinEui,
 	}
-	if js, err := as.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, &ids); err == nil {
+	if js, err := as.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, nil); err == nil {
 		cc, err := js.Conn()
 		if err != nil {
 			return ttnpb.KeyEnvelope{}, err
@@ -735,7 +745,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 		"dev_eui", ids.DevEui,
 		"session_key_id", joinAccept.SessionKeyId,
 	))
-	peer, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
+	peer, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, nil)
 	if err != nil {
 		return err
 	}
@@ -770,7 +780,6 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 					SessionKeyId: joinAccept.SessionKeyId,
 					AppSKey:      joinAccept.AppSKey,
 				},
-				StartedAt: time.Now().UTC(),
 			}
 			mask = ttnpb.AddFields(mask, "pending_session")
 			if as.skipPayloadCrypto(ctx, link, dev, dev.PendingSession) {
@@ -851,7 +860,6 @@ func (as *ApplicationServer) matchSession(ctx context.Context, ids ttnpb.EndDevi
 				SessionKeyId: sessionKeyID,
 				AppSKey:      &appSKey,
 			},
-			StartedAt: time.Now().UTC(),
 		}
 		dev.PendingSession = nil
 		dev.DevAddr = ids.DevAddr
@@ -872,9 +880,12 @@ func (as *ApplicationServer) storeUplink(ctx context.Context, ids ttnpb.EndDevic
 		ReceivedAt: uplink.ReceivedAt,
 	}
 	for _, md := range uplink.RxMetadata {
+		if md.GatewayIds == nil {
+			continue
+		}
 		cleanUplink.RxMetadata = append(cleanUplink.RxMetadata, &ttnpb.RxMetadata{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{
-				GatewayId: md.GatewayId,
+			GatewayIds: &ttnpb.GatewayIdentifiers{
+				GatewayId: md.GatewayIds.GatewayId,
 			},
 			AntennaIndex:  md.AntennaIndex,
 			FineTimestamp: md.FineTimestamp,
@@ -902,7 +913,7 @@ func (as *ApplicationServer) markEndDeviceAsActivated(ctx context.Context, ids t
 	mask := []string{"activated_at"}
 	f := func(ctx context.Context) error {
 		defer as.activationTasks.Delete(devUID)
-		cc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, &ids)
+		cc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
 		if err != nil {
 			return err
 		}
@@ -1043,7 +1054,7 @@ func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, ids ttnp
 }
 
 func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, invalid *ttnpb.ApplicationInvalidatedDownlinks, link *ttnpb.ApplicationLink) (pass bool, err error) {
-	peer, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
+	peer, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, nil)
 	if err != nil {
 		return false, err
 	}
@@ -1103,11 +1114,11 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 			return dev, mask, nil
 		},
 	)
-	return
+	return pass, err
 }
 
 func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, link *ttnpb.ApplicationLink) error {
-	peer, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
+	peer, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, nil)
 	if err != nil {
 		return err
 	}
@@ -1167,7 +1178,7 @@ func (as *ApplicationServer) handleLocationSolved(ctx context.Context, ids ttnpb
 	ctx, cancel := context.WithTimeout(ctx, locationUpdateTimeout)
 	defer cancel()
 
-	cc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, &ids)
+	cc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
 	if err != nil {
 		return err
 	}

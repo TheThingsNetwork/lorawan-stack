@@ -182,15 +182,21 @@ class Header extends Component {
         {navigation.map(
           ({ hidden, ...rest }) => !hidden && <Dropdown.Item {...rest} key={rest.title.id} />,
         )}
+        <React.Fragment>
+          <hr />
+          <Dropdown.Item
+            title={sharedMessages.profileSettings}
+            icon="user"
+            path={`${accountUrl}/profile-settings`}
+            external
+          />
+        </React.Fragment>
         {mayManageUsers && (
-          <React.Fragment>
-            <hr />
-            <Dropdown.Item
-              title={sharedMessages.userManagement}
-              icon="user_management"
-              path="/admin/user-management"
-            />
-          </React.Fragment>
+          <Dropdown.Item
+            title={sharedMessages.userManagement}
+            icon="user_management"
+            path="/admin/user-management"
+          />
         )}
         {mayViewOrEditApiKeys && (
           <Dropdown.Item

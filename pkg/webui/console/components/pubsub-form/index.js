@@ -203,6 +203,7 @@ export default class PubsubForm extends Component {
           component={Input}
           required={natsUseCredentials}
           disabled={!natsUseCredentials}
+          sensitive
         />
         <Form.Field
           name="nats.address"
@@ -301,6 +302,7 @@ export default class PubsubForm extends Component {
           placeholder={m.passwordPlaceholder}
           component={Input}
           disabled={!mqttUseCredentials}
+          sensitive
         />
         <Form.Field
           title={m.subscribeQos}

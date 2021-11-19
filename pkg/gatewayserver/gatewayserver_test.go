@@ -30,6 +30,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
+	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
@@ -177,7 +178,11 @@ func TestGatewayServer(t *testing.T) {
 				defer statsFlush()
 				defer statsRedisClient.Close()
 				statsRegistry := &gsredis.GatewayConnectionStatsRegistry{
-					Redis: statsRedisClient,
+					Redis:   statsRedisClient,
+					LockTTL: test.Delay << 10,
+				}
+				if err := statsRegistry.Init(ctx); !a.So(err, should.BeNil) {
+					t.FailNow()
 				}
 				config.Stats = statsRegistry
 			}
@@ -511,7 +516,7 @@ func TestGatewayServer(t *testing.T) {
 										var bsUpstream []byte
 										if payload.GetMType() == ttnpb.MType_JOIN_REQUEST {
 											var jreq lbslns.JoinRequest
-											err := jreq.FromUplinkMessage(uplink, test.EUFrequencyPlanID)
+											err := jreq.FromUplinkMessage(uplink, band.EU_863_870)
 											if err != nil {
 												cancel(err)
 												return
@@ -524,7 +529,7 @@ func TestGatewayServer(t *testing.T) {
 										}
 										if payload.GetMType() == ttnpb.MType_UNCONFIRMED_UP || payload.GetMType() == ttnpb.MType_CONFIRMED_UP {
 											var updf lbslns.UplinkDataFrame
-											err := updf.FromUplinkMessage(uplink, test.EUFrequencyPlanID)
+											err := updf.FromUplinkMessage(uplink, band.EU_863_870)
 											if err != nil {
 												cancel(err)
 												return
@@ -571,9 +576,13 @@ func TestGatewayServer(t *testing.T) {
 									cancel(err)
 									return
 								}
-								dlmesg := msg.ToDownlinkMessage()
+								dlmesg, err := msg.ToDownlinkMessage(band.EU_863_870)
+								if err != nil {
+									cancel(err)
+									return
+								}
 								downCh <- &ttnpb.GatewayDown{
-									DownlinkMessage: &dlmesg,
+									DownlinkMessage: dlmesg,
 								}
 							}
 						}()
@@ -894,12 +903,12 @@ func TestGatewayServer(t *testing.T) {
 										},
 										RxMetadata: []*ttnpb.RxMetadata{
 											{
-												AntennaIndex:       0,
-												GatewayIdentifiers: ids,
-												Timestamp:          100,
-												Rssi:               -69,
-												ChannelRssi:        -69,
-												Snr:                11,
+												AntennaIndex: 0,
+												GatewayIds:   &ids,
+												Timestamp:    100,
+												Rssi:         -69,
+												ChannelRssi:  -69,
+												Snr:          11,
 											},
 										},
 									},
@@ -1051,12 +1060,12 @@ func TestGatewayServer(t *testing.T) {
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
-													GatewayIdentifiers: ids,
-													Timestamp:          100,
-													Rssi:               -69,
-													ChannelRssi:        -69,
-													Snr:                11,
-													Location:           location,
+													GatewayIds:  &ids,
+													Timestamp:   100,
+													Rssi:        -69,
+													ChannelRssi: -69,
+													Snr:         11,
+													Location:    location,
 												},
 											},
 											RawPayload: randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
@@ -1085,12 +1094,12 @@ func TestGatewayServer(t *testing.T) {
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
-													GatewayIdentifiers: ids,
-													Timestamp:          101,
-													Rssi:               -42,
-													ChannelRssi:        -42,
-													Snr:                11,
-													Location:           location,
+													GatewayIds:  &ids,
+													Timestamp:   101,
+													Rssi:        -42,
+													ChannelRssi: -42,
+													Snr:         11,
+													Location:    location,
 												},
 											},
 											RawPayload: duplicatePayload,
@@ -1111,12 +1120,12 @@ func TestGatewayServer(t *testing.T) {
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
-													GatewayIdentifiers: ids,
-													Timestamp:          100,
-													Rssi:               -69,
-													ChannelRssi:        -69,
-													Snr:                11,
-													Location:           location,
+													GatewayIds:  &ids,
+													Timestamp:   100,
+													Rssi:        -69,
+													ChannelRssi: -69,
+													Snr:         11,
+													Location:    location,
 												},
 											},
 											RawPayload: duplicatePayload,
@@ -1137,12 +1146,12 @@ func TestGatewayServer(t *testing.T) {
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
-													GatewayIdentifiers: ids,
-													Timestamp:          100,
-													Rssi:               -69,
-													ChannelRssi:        -69,
-													Snr:                11,
-													Location:           location,
+													GatewayIds:  &ids,
+													Timestamp:   100,
+													Rssi:        -69,
+													ChannelRssi: -69,
+													Snr:         11,
+													Location:    location,
 												},
 											},
 											RawPayload: duplicatePayload,
@@ -1171,12 +1180,12 @@ func TestGatewayServer(t *testing.T) {
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
-													GatewayIdentifiers: ids,
-													Timestamp:          100,
-													Rssi:               -69,
-													ChannelRssi:        -69,
-													Snr:                11,
-													Location:           location,
+													GatewayIds:  &ids,
+													Timestamp:   100,
+													Rssi:        -69,
+													ChannelRssi: -69,
+													Snr:         11,
+													Location:    location,
 												},
 											},
 											RawPayload: randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
@@ -1205,12 +1214,12 @@ func TestGatewayServer(t *testing.T) {
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
-													GatewayIdentifiers: ids,
-													Timestamp:          100,
-													Rssi:               -112,
-													ChannelRssi:        -112,
-													Snr:                2,
-													Location:           location,
+													GatewayIds:  &ids,
+													Timestamp:   100,
+													Rssi:        -112,
+													ChannelRssi: -112,
+													Snr:         2,
+													Location:    location,
 												},
 											},
 											RawPayload: []byte{0xff, 0x02, 0x03}, // Garbage; doesn't get forwarded.
@@ -1231,12 +1240,12 @@ func TestGatewayServer(t *testing.T) {
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
-													GatewayIdentifiers: ids,
-													Timestamp:          200,
-													Rssi:               -69,
-													ChannelRssi:        -69,
-													Snr:                11,
-													Location:           location,
+													GatewayIds:  &ids,
+													Timestamp:   200,
+													Rssi:        -69,
+													ChannelRssi: -69,
+													Snr:         11,
+													Location:    location,
 												},
 											},
 											RawPayload: randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
@@ -1257,12 +1266,12 @@ func TestGatewayServer(t *testing.T) {
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
-													GatewayIdentifiers: ids,
-													Timestamp:          300,
-													Rssi:               -36,
-													ChannelRssi:        -36,
-													Snr:                5,
-													Location:           location,
+													GatewayIds:  &ids,
+													Timestamp:   300,
+													Rssi:        -36,
+													ChannelRssi: -36,
+													Snr:         5,
+													Location:    location,
 												},
 											},
 											RawPayload: randomJoinRequestPayload(
@@ -1460,7 +1469,7 @@ func TestGatewayServer(t *testing.T) {
 												{
 													Path: &ttnpb.DownlinkPath_Fixed{
 														Fixed: &ttnpb.GatewayAntennaIdentifiers{
-															GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+															GatewayIds: &ttnpb.GatewayIdentifiers{
 																GatewayId: "not-connected",
 															},
 														},
@@ -1484,14 +1493,15 @@ func TestGatewayServer(t *testing.T) {
 												{
 													Path: &ttnpb.DownlinkPath_UplinkToken{
 														UplinkToken: io.MustUplinkToken(
-															ttnpb.GatewayAntennaIdentifiers{
-																GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+															&ttnpb.GatewayAntennaIdentifiers{
+																GatewayIds: &ttnpb.GatewayIdentifiers{
 																	GatewayId: registeredGatewayID,
 																},
 															},
 															10000000,
 															10000000000,
 															time.Unix(0, 10000000*1000),
+															nil,
 														),
 													},
 												},
@@ -1523,14 +1533,15 @@ func TestGatewayServer(t *testing.T) {
 												{
 													Path: &ttnpb.DownlinkPath_UplinkToken{
 														UplinkToken: io.MustUplinkToken(
-															ttnpb.GatewayAntennaIdentifiers{
-																GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+															&ttnpb.GatewayAntennaIdentifiers{
+																GatewayIds: &ttnpb.GatewayIdentifiers{
 																	GatewayId: registeredGatewayID,
 																},
 															},
 															20000000,
 															20000000000,
 															time.Unix(0, 20000000*1000),
+															nil,
 														),
 													},
 												},
@@ -1561,14 +1572,15 @@ func TestGatewayServer(t *testing.T) {
 												{
 													Path: &ttnpb.DownlinkPath_UplinkToken{
 														UplinkToken: io.MustUplinkToken(
-															ttnpb.GatewayAntennaIdentifiers{
-																GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+															&ttnpb.GatewayAntennaIdentifiers{
+																GatewayIds: &ttnpb.GatewayIdentifiers{
 																	GatewayId: registeredGatewayID,
 																},
 															},
 															10000000,
 															10000000000,
 															time.Unix(0, 10000000*1000),
+															nil,
 														),
 													},
 												},
@@ -1605,7 +1617,7 @@ func TestGatewayServer(t *testing.T) {
 												{
 													Path: &ttnpb.DownlinkPath_Fixed{
 														Fixed: &ttnpb.GatewayAntennaIdentifiers{
-															GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+															GatewayIds: &ttnpb.GatewayIdentifiers{
 																GatewayId: registeredGatewayID,
 															},
 														},
@@ -1639,7 +1651,7 @@ func TestGatewayServer(t *testing.T) {
 												{
 													Path: &ttnpb.DownlinkPath_Fixed{
 														Fixed: &ttnpb.GatewayAntennaIdentifiers{
-															GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+															GatewayIds: &ttnpb.GatewayIdentifiers{
 																GatewayId: registeredGatewayID,
 															},
 														},

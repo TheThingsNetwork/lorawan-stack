@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"context"
 	"sync"
-	"time"
 
 	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -138,8 +137,8 @@ func MakeEventEqual(conf EventEqualConfig) func(a, b events.Event) bool {
 			bp.UniqueId = ""
 		}
 		if !conf.Time {
-			ap.Time = time.Time{}
-			bp.Time = time.Time{}
+			ap.Time = nil
+			bp.Time = nil
 		}
 		if !conf.Identifiers {
 			ap.Identifiers = nil

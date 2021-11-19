@@ -14,11 +14,10 @@
 
 import { createLogic } from 'redux-logic'
 
-import store from '@account/store'
-
 import api from '@account/api'
 
 import { isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
+import { promisifyDispatch } from '@ttn-lw/lib/store/middleware/request-promise-middleware'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import * as init from '@account/store/actions/init'
@@ -32,7 +31,7 @@ const accountAppInitLogic = createLogic({
       try {
         // Using `store.dispatch` since redux logic's dispatch won't return
         // the (promisified) action result like regular dispatch does.
-        await store.dispatch(
+        await promisifyDispatch(dispatch)(
           attachPromise(
             user.getUser(meResult.data.user.ids.user_id, [
               'profile_picture',

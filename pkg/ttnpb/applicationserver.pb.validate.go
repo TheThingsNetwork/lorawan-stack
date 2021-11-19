@@ -62,8 +62,6 @@ func (m *ApplicationLink) ValidateFields(paths ...string) error {
 				}
 			}
 
-		case "tls":
-			// no validation rules for Tls
 		case "skip_payload_crypto":
 
 			if v, ok := interface{}(m.GetSkipPayloadCrypto()).(interface{ ValidateFields(...string) error }); ok {
@@ -157,7 +155,14 @@ func (m *GetApplicationLinkRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetApplicationIds() == nil {
+				return GetApplicationLinkRequestValidationError{
+					field:  "application_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetApplicationLinkRequestValidationError{
 						field:  "application_ids",
@@ -263,7 +268,14 @@ func (m *SetApplicationLinkRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "application_ids":
 
-			if v, ok := interface{}(&m.ApplicationIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetApplicationIds() == nil {
+				return SetApplicationLinkRequestValidationError{
+					field:  "application_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationLinkRequestValidationError{
 						field:  "application_ids",
@@ -275,7 +287,14 @@ func (m *SetApplicationLinkRequest) ValidateFields(paths ...string) error {
 
 		case "link":
 
-			if v, ok := interface{}(&m.ApplicationLink).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetLink() == nil {
+				return SetApplicationLinkRequestValidationError{
+					field:  "link",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetLink()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SetApplicationLinkRequestValidationError{
 						field:  "link",

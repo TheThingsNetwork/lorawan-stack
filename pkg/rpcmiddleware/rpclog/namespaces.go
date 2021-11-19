@@ -17,12 +17,13 @@ package rpclog
 import (
 	"context"
 
-	"github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"google.golang.org/grpc"
 )
 
+// NamespaceHook is the name of the namespace hook.
 const NamespaceHook = "namespace"
 
 // UnaryNamespaceHook adds the component namespace to the context of the unary call.

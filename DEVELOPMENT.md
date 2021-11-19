@@ -12,7 +12,7 @@ The Things Stack components are primarily built in Go, we use React for web fron
   - [Steps](#steps)
 - [Using the CLI with the Development Environment](#using-the-cli-with-the-development-environment)
 - [Managing the Development Databases](#managing-the-development-databases)
-  - [CockroachDB](#cockroachdb)
+  - [PostgreSQL](#PostgreSQL)
   - [Redis](#redis)
 - [Building the Frontend](#building-the-frontend)
 - [Starting The Things Stack](#starting-the-things-stack)
@@ -109,7 +109,7 @@ This will build the frontend assets and place it in the `public` folder.
 $ tools/bin/mage dev:dbStart # This requires Docker to be running.
 ```
 
-This will start one instance each of `CockroachDB` and `Redis` as Docker containers. To verify this, you can run
+This will start one instance each of `postgres` and `Redis` as Docker containers. To verify this, you can run
 
 ```bash
 $ docker ps
@@ -167,9 +167,9 @@ $ tools/bin/mage dev:dbStop  # Stops all databases.
 $ tools/bin/mage dev:dbErase # Stops all databases and erase storage.
 ```
 
-### CockroachDB
+### PostgreSQL
 
-CockroachDB is a distributed SQL database that we use in the Identity Server.
+PostgreSQL is a SQL database that we use in the Identity Server.
 
 You can use `tools/bin/mage dev:dbSQL` to enter an SQL shell.
 
@@ -323,15 +323,19 @@ TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL="http://localhost:8080/oauth.js"
 TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
 ```
 
+> Note: It is important to **source these environment variables in all terminal sessions** that run The Things Stack or the `tools/bin/mage` commands. Failing to do so will result in erros such as blank page renders. See also [troubleshooting](#troubleshooting).
+
 #### Optional Configuration
 
 ##### Disable [Hot Module Replacement](https://webpack.js.org/concepts/hot-module-replacement/)
 
-> Note: Webpack-related configuration can be loaded from environment variables only. It cannot be sourced from a config file.
+If you experience trouble seeing the WebUIs updated after a code change, you can also disable hot module replacement and enforce a hard reload on code changes instead. This method is a bit slower but more robust. To do so apply the following variable:
 
 ```bash
 WEBPACK_DEV_SERVER_DISABLE_HMR="true"
 ```
+
+> Note: Webpack-related configuration can be loaded from environment variables only. It cannot be sourced from a config file.
 
 ##### Enable TLS in `webpack-dev-server`
 
@@ -783,7 +787,7 @@ We use [Cypress](https://cypress.io) for running frontend-based end-to-end tests
 
 #### Running frontend end-to-end tests locally
 
-Make sure to [build the frontend assets](#building-the-frontend), [start The Things Stack](#starting-the-things-stack) and run `tools/bin/mage dev:sqlDump` to save database dump before executing end-to-end tests.
+Make sure to [build the frontend assets](#building-the-frontend), [start The Things Stack](#starting-the-things-stack) and run `tools/bin/mage dev:sqlDump` after running `tools/bin/mage dev:initStack` to save database dump used as database seed when running end-to-end tests. To run the stack when working on end-to-end tests, use the `tools/bin/mage dev:startDevStack` command. This will run the stack in proper configuration for the end-to-end tests, note that this is an endless process that essentially runs the The Things Stack process so you don't have to wait for it to finish.
 
 `Cypress` provides two modes for running tests: headless and interactive.
 - Headless mode - will not display any browser GUI and output test progress into your terminal instead. This is helpful when one just needs see the results of the tests.
@@ -1098,7 +1102,7 @@ It is also possible to use `go build`, or release snapshots, as described below.
 The Things Stack uses [GoReleaser](https://goreleaser.com/) for releases. If you want to build a release (snapshot), you first need to install GoReleaser:
 
 ```bash
-$ go install github.com/goreleaser/goreleaser@v0.161.1
+$ go install github.com/goreleaser/goreleaser@v0.184.0
 ```
 
 The command for building a release snapshot is:
@@ -1154,6 +1158,14 @@ Uncaught ReferenceError: libs_472226f4872c9448fc26 is not defined
 ```
 
 #### Possible causes
+
+##### Using incorrect or no configs
+
+If you plan to run the Console / Account App in development mode, it is important to ensure that the right configuration is loaded both for running The Things Stack itself, as well as the development tooling (e.g. `tools/bin/mage serve`).
+
+##### Possible solution
+
+Make sure that you source the environment variables as [described above](#development-configuration) **in all terminal sessions** that run The Things Stack or the `tools/bin/mage` commands.
 
 ##### Missing restart
 

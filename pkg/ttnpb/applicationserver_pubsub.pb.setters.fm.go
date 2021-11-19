@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	time "time"
-)
+import fmt "fmt"
 
 func (dst *ApplicationPubSubIdentifiers) SetFields(src *ApplicationPubSubIdentifiers, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -13,19 +10,26 @@ func (dst *ApplicationPubSubIdentifiers) SetFields(src *ApplicationPubSubIdentif
 		case "application_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
-				if src != nil {
-					newSrc = &src.ApplicationIdentifiers
+				if (src == nil || src.ApplicationIds == nil) && dst.ApplicationIds == nil {
+					continue
 				}
-				newDst = &dst.ApplicationIdentifiers
+				if src != nil {
+					newSrc = src.ApplicationIds
+				}
+				if dst.ApplicationIds != nil {
+					newDst = dst.ApplicationIds
+				} else {
+					newDst = &ApplicationIdentifiers{}
+					dst.ApplicationIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
-					var zero ApplicationIdentifiers
-					dst.ApplicationIdentifiers = zero
+					dst.ApplicationIds = nil
 				}
 			}
 		case "pub_sub_id":
@@ -52,19 +56,26 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 		case "ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationPubSubIdentifiers
-				if src != nil {
-					newSrc = &src.ApplicationPubSubIdentifiers
+				if (src == nil || src.Ids == nil) && dst.Ids == nil {
+					continue
 				}
-				newDst = &dst.ApplicationPubSubIdentifiers
+				if src != nil {
+					newSrc = src.Ids
+				}
+				if dst.Ids != nil {
+					newDst = dst.Ids
+				} else {
+					newDst = &ApplicationPubSubIdentifiers{}
+					dst.Ids = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationPubSubIdentifiers = src.ApplicationPubSubIdentifiers
+					dst.Ids = src.Ids
 				} else {
-					var zero ApplicationPubSubIdentifiers
-					dst.ApplicationPubSubIdentifiers = zero
+					dst.Ids = nil
 				}
 			}
 		case "created_at":
@@ -74,8 +85,7 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 			if src != nil {
 				dst.CreatedAt = src.CreatedAt
 			} else {
-				var zero time.Time
-				dst.CreatedAt = zero
+				dst.CreatedAt = nil
 			}
 		case "updated_at":
 			if len(subs) > 0 {
@@ -84,8 +94,7 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 			if src != nil {
 				dst.UpdatedAt = src.UpdatedAt
 			} else {
-				var zero time.Time
-				dst.UpdatedAt = zero
+				dst.UpdatedAt = nil
 			}
 		case "format":
 			if len(subs) > 0 {
@@ -581,19 +590,26 @@ func (dst *GetApplicationPubSubRequest) SetFields(src *GetApplicationPubSubReque
 		case "ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationPubSubIdentifiers
-				if src != nil {
-					newSrc = &src.ApplicationPubSubIdentifiers
+				if (src == nil || src.Ids == nil) && dst.Ids == nil {
+					continue
 				}
-				newDst = &dst.ApplicationPubSubIdentifiers
+				if src != nil {
+					newSrc = src.Ids
+				}
+				if dst.Ids != nil {
+					newDst = dst.Ids
+				} else {
+					newDst = &ApplicationPubSubIdentifiers{}
+					dst.Ids = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationPubSubIdentifiers = src.ApplicationPubSubIdentifiers
+					dst.Ids = src.Ids
 				} else {
-					var zero ApplicationPubSubIdentifiers
-					dst.ApplicationPubSubIdentifiers = zero
+					dst.Ids = nil
 				}
 			}
 		case "field_mask":
@@ -619,19 +635,26 @@ func (dst *ListApplicationPubSubsRequest) SetFields(src *ListApplicationPubSubsR
 		case "application_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationIdentifiers
-				if src != nil {
-					newSrc = &src.ApplicationIdentifiers
+				if (src == nil || src.ApplicationIds == nil) && dst.ApplicationIds == nil {
+					continue
 				}
-				newDst = &dst.ApplicationIdentifiers
+				if src != nil {
+					newSrc = src.ApplicationIds
+				}
+				if dst.ApplicationIds != nil {
+					newDst = dst.ApplicationIds
+				} else {
+					newDst = &ApplicationIdentifiers{}
+					dst.ApplicationIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationIdentifiers = src.ApplicationIdentifiers
+					dst.ApplicationIds = src.ApplicationIds
 				} else {
-					var zero ApplicationIdentifiers
-					dst.ApplicationIdentifiers = zero
+					dst.ApplicationIds = nil
 				}
 			}
 		case "field_mask":
@@ -657,19 +680,26 @@ func (dst *SetApplicationPubSubRequest) SetFields(src *SetApplicationPubSubReque
 		case "pubsub":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationPubSub
-				if src != nil {
-					newSrc = &src.ApplicationPubSub
+				if (src == nil || src.Pubsub == nil) && dst.Pubsub == nil {
+					continue
 				}
-				newDst = &dst.ApplicationPubSub
+				if src != nil {
+					newSrc = src.Pubsub
+				}
+				if dst.Pubsub != nil {
+					newDst = dst.Pubsub
+				} else {
+					newDst = &ApplicationPubSub{}
+					dst.Pubsub = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationPubSub = src.ApplicationPubSub
+					dst.Pubsub = src.Pubsub
 				} else {
-					var zero ApplicationPubSub
-					dst.ApplicationPubSub = zero
+					dst.Pubsub = nil
 				}
 			}
 		case "field_mask":

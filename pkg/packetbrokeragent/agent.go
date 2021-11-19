@@ -43,7 +43,7 @@ import (
 
 const (
 	// subscribeStreamCount is the number of subscription streams that are used by the Forwarder and Home Network roles.
-	subscribeStreamCount = 8
+	subscribeStreamCount = 4
 
 	// publishMessageTimeout defines the timeout for publishing messages.
 	publishMessageTimeout = 3 * time.Second
@@ -89,7 +89,8 @@ type Agent struct {
 	netID            types.NetID
 	subscriptionTenantID,
 	clusterID,
-	homeNetworkClusterID string
+	homeNetworkClusterID,
+	subscriptionGroup string
 	authenticator     authenticator
 	forwarderConfig   ForwarderConfig
 	homeNetworkConfig HomeNetworkConfig
@@ -180,6 +181,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	if homeNetworkClusterID == "" {
 		homeNetworkClusterID = conf.ClusterID
 	}
+	subscriptionGroup := conf.ClusterID
+	if subscriptionGroup == "" {
+		subscriptionGroup = "default"
+	}
 	a := &Agent{
 		Component:            c,
 		ctx:                  ctx,
@@ -188,6 +193,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		subscriptionTenantID: conf.TenantID,
 		clusterID:            conf.ClusterID,
 		homeNetworkClusterID: homeNetworkClusterID,
+		subscriptionGroup:    subscriptionGroup,
 		authenticator:        authenticator,
 		forwarderConfig:      conf.Forwarder,
 		homeNetworkConfig:    conf.HomeNetwork,
@@ -506,7 +512,7 @@ func (a *Agent) subscribeDownlinkStream(client routingpb.ForwarderDataClient, do
 			ForwarderNetId:     a.netID.MarshalNumber(),
 			ForwarderTenantId:  a.subscriptionTenantID,
 			ForwarderClusterId: a.clusterID,
-			Group:              a.clusterID,
+			Group:              a.subscriptionGroup,
 		})
 		if err != nil {
 			return err
@@ -639,13 +645,13 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 	if req.Rx1Frequency != 0 {
 		pairs = append(pairs,
 			"rx1_delay", req.Rx1Delay,
-			"rx1_data_rate", req.Rx1DataRateIndex,
+			"rx1_data_rate", req.Rx1DataRate,
 			"rx1_frequency", req.Rx1Frequency,
 		)
 	}
 	if req.Rx2Frequency != 0 {
 		pairs = append(pairs,
-			"rx2_data_rate", req.Rx2DataRateIndex,
+			"rx2_data_rate", req.Rx2DataRate,
 			"rx2_frequency", req.Rx2Frequency,
 		)
 	}
@@ -820,7 +826,7 @@ func (a *Agent) subscribeUplinkStream(client routingpb.HomeNetworkDataClient, up
 			HomeNetworkTenantId:  a.subscriptionTenantID,
 			HomeNetworkClusterId: a.homeNetworkClusterID,
 			Filters:              filters,
-			Group:                a.clusterID,
+			Group:                a.subscriptionGroup,
 		})
 		if err != nil {
 			return err
@@ -967,7 +973,7 @@ func (a *Agent) handleUplinkMessage(ctx context.Context, up *packetbroker.Routed
 		homeNetworkNetID.String(), up.HomeNetworkTenantId, up.HomeNetworkClusterId,
 	).Inc()
 
-	conn, err := a.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, &ids)
+	conn, err := a.GetPeerConn(ctx, ttnpb.ClusterRole_NETWORK_SERVER, nil)
 	if err != nil {
 		return err
 	}

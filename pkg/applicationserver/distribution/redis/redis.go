@@ -34,34 +34,37 @@ func (ps PubSub) uidUplinkKey(uid string) string {
 
 // Publish publishes the uplink to Pub/Sub.
 func (ps PubSub) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
-	s, err := ttnredis.MarshalProto(up)
+	msg, err := ttnredis.MarshalProto(up)
 	if err != nil {
 		return err
 	}
 	uid := unique.ID(ctx, up.ApplicationIdentifiers)
-	ch := ps.uidUplinkKey(uid)
-	if err = ps.Redis.Publish(ctx, ch, s).Err(); err != nil {
+	if err = ps.Redis.Publish(ctx, ps.uidUplinkKey(uid), msg).Err(); err != nil {
 		return ttnredis.ConvertError(err)
 	}
 	return nil
 }
 
-var errChannelClosed = errors.DefineResourceExhausted("channel_closed", "channel closed")
+var errChannelClosed = errors.DefineAborted("channel_closed", "channel closed")
 
 // Subscribe subscribes to the traffic of the provided application and processes it using the handler.
 func (ps PubSub) Subscribe(ctx context.Context, ids ttnpb.ApplicationIdentifiers, handler func(context.Context, *ttnpb.ApplicationUp) error) error {
 	uid := unique.ID(ctx, ids)
-	ch := ps.uidUplinkKey(uid)
-
-	sub := ps.Redis.Subscribe(ctx, ch)
+	sub := ps.Redis.Subscribe(ctx, ps.uidUplinkKey(uid))
 	defer sub.Close()
-	msgs := sub.Channel()
 
+	// sub.Receive(.*) will not respect the asynchronous context
+	// cancelation, only a context deadline, if present.
+	// As such, we use the buffered channel instead and do the
+	// asynchronous select here. This allows us to close the
+	// subscription on context cancellation.
+	ch := sub.Channel()
 	for {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case msg, ok := <-msgs:
+
+		case msg, ok := <-ch:
 			if !ok {
 				return errChannelClosed.New()
 			}

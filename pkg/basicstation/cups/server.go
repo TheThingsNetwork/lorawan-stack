@@ -75,7 +75,7 @@ func (s *Server) getRegistry(ctx context.Context, ids *ttnpb.GatewayIdentifiers)
 	if s.registry != nil {
 		return s.registry, nil
 	}
-	cc, err := s.component.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, ids)
+	cc, err := s.component.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (s *Server) getAccess(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (
 	if s.access != nil {
 		return s.access, nil
 	}
-	cc, err := s.component.GetPeerConn(ctx, ttnpb.ClusterRole_ACCESS, ids)
+	cc, err := s.component.GetPeerConn(ctx, ttnpb.ClusterRole_ACCESS, nil)
 	if err != nil {
 		return nil, err
 	}

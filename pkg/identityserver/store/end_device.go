@@ -221,5 +221,5 @@ func (dev *EndDevice) fromPB(pb *ttnpb.EndDevice, fieldMask *pbtypes.FieldMask) 
 			continue
 		}
 	}
-	return
+	return columns
 }

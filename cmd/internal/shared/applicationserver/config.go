@@ -20,6 +20,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -43,8 +44,8 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 		Templates: DefaultWebhookTemplatesConfig,
 		Target:    "direct",
 		Timeout:   5 * time.Second,
-		QueueSize: 16,
-		Workers:   16,
+		QueueSize: 1024,
+		Workers:   1024,
 		Downlinks: web.DownlinksConfig{PublicAddress: shared.DefaultPublicURL + "/api/v3"},
 	},
 	EndDeviceFetcher: applicationserver.EndDeviceFetcherConfig{
@@ -64,6 +65,22 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 	},
 	Distribution: applicationserver.DistributionConfig{
 		Timeout: time.Minute,
+		Local: applicationserver.LocalDistributorConfig{
+			Broadcast: applicationserver.DistributorConfig{
+				SubscriptionBlocks:    true,
+				SubscriptionQueueSize: -1,
+			},
+			Individual: applicationserver.DistributorConfig{
+				SubscriptionBlocks:    false,
+				SubscriptionQueueSize: io.DefaultBufferSize,
+			},
+		},
+		Global: applicationserver.GlobalDistributorConfig{
+			Individual: applicationserver.DistributorConfig{
+				SubscriptionBlocks:    false,
+				SubscriptionQueueSize: io.DefaultBufferSize,
+			},
+		},
 	},
 	PubSub: applicationserver.PubSubConfig{
 		Providers: map[string]string{
@@ -73,7 +90,7 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 	},
 	Packages: applicationserver.ApplicationPackagesConfig{
 		Config: packages.Config{
-			Workers: 16,
+			Workers: 1024,
 			Timeout: 10 * time.Second,
 		},
 	},

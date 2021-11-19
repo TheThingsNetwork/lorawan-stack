@@ -45,8 +45,8 @@ func init() {
 	for i := 0; i < 3; i++ {
 		applicationID := population.Applications[i].GetEntityIdentifiers()
 		population.Memberships[applicationID] = append(population.Memberships[applicationID], &ttnpb.Collaborator{
-			OrganizationOrUserIdentifiers: *paginationUser.OrganizationOrUserIdentifiers(),
-			Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
+			Ids:    paginationUser.OrganizationOrUserIdentifiers(),
+			Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
 		})
 	}
 }
@@ -59,7 +59,7 @@ func TestApplicationsPermissionDenied(t *testing.T) {
 		reg := ttnpb.NewApplicationRegistryClient(cc)
 
 		_, err := reg.Create(ctx, &ttnpb.CreateApplicationRequest{
-			Application: ttnpb.Application{
+			Application: &ttnpb.Application{
 				Ids: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
 			},
 			Collaborator: *ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
@@ -97,7 +97,7 @@ func TestApplicationsPermissionDenied(t *testing.T) {
 		}
 
 		_, err = reg.Update(ctx, &ttnpb.UpdateApplicationRequest{
-			Application: ttnpb.Application{
+			Application: &ttnpb.Application{
 				Ids:  &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
 				Name: "Updated Name",
 			},
@@ -127,9 +127,18 @@ func TestApplicationsCRUD(t *testing.T) {
 		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
 
 		is.config.UserRights.CreateApplications = false
+		// Test batch fetch with cluster authorization
+		list, err := reg.List(ctx, &ttnpb.ListApplicationsRequest{
+			FieldMask:    &pbtypes.FieldMask{Paths: []string{"ids"}},
+			Collaborator: nil,
+			Deleted:      true,
+		}, is.WithClusterAuth())
 
-		_, err := reg.Create(ctx, &ttnpb.CreateApplicationRequest{
-			Application: ttnpb.Application{
+		a.So(err, should.BeNil)
+		a.So(list.Applications, should.HaveLength, 16)
+
+		_, err = reg.Create(ctx, &ttnpb.CreateApplicationRequest{
+			Application: &ttnpb.Application{
 				Ids:  &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 				Name: "Foo Application",
 			},
@@ -143,7 +152,7 @@ func TestApplicationsCRUD(t *testing.T) {
 		is.config.UserRights.CreateApplications = true
 
 		created, err := reg.Create(ctx, &ttnpb.CreateApplicationRequest{
-			Application: ttnpb.Application{
+			Application: &ttnpb.Application{
 				Ids:  &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 				Name: "Foo Application",
 			},
@@ -182,7 +191,7 @@ func TestApplicationsCRUD(t *testing.T) {
 		}
 
 		updated, err := reg.Update(ctx, &ttnpb.UpdateApplicationRequest{
-			Application: ttnpb.Application{
+			Application: &ttnpb.Application{
 				Ids:  created.GetIds(),
 				Name: "Updated Name",
 			},

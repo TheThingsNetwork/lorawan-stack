@@ -17,6 +17,7 @@ package redis
 
 import (
 	"context"
+	"crypto/rand"
 	"crypto/tls"
 	"encoding/base64"
 	"fmt"
@@ -28,6 +29,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gogo/protobuf/proto"
+	"github.com/oklog/ulid/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
@@ -127,29 +129,18 @@ func (c Config) makeDialer() func(ctx context.Context, network, addr string) (ne
 		tlsConfigErr = c.TLS.Client.ApplyTo(tlsConfig)
 	}
 	return func(ctx context.Context, network, addr string) (net.Conn, error) {
-		var timeout time.Duration
-		deadline, ok := ctx.Deadline()
-		if ok {
-			timeout = time.Until(deadline)
-		}
-		var (
-			conn net.Conn
-			err  error
-		)
-		dialer := &net.Dialer{Timeout: timeout}
+		var dialer interface {
+			DialContext(ctx context.Context, network, addr string) (net.Conn, error)
+		} = &net.Dialer{}
 		if c.TLS.Require {
 			if tlsConfigErr != nil {
 				return nil, tlsConfigErr
 			}
-			conn, err = tls.DialWithDialer(dialer, network, addr, tlsConfig)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			conn, err = dialer.Dial(network, addr)
-			if err != nil {
-				return nil, err
-			}
+			dialer = &tls.Dialer{NetDialer: dialer.(*net.Dialer), Config: tlsConfig}
+		}
+		conn, err := dialer.DialContext(ctx, network, addr)
+		if err != nil {
+			return nil, err
 		}
 		return &observableConn{addr: addr, Conn: conn}, nil
 	}
@@ -981,6 +972,15 @@ outer:
 			idsArg = append(idsArg, ">")
 		}
 	}
+}
+
+// GenerateLockerID generates a unique locker ID to be used with a Redis mutex.
+func GenerateLockerID() (string, error) {
+	lockID, err := ulid.New(ulid.Timestamp(time.Now()), rand.Reader)
+	if err != nil {
+		return "", err
+	}
+	return lockID.String(), nil
 }
 
 func init() {

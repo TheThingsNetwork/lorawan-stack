@@ -42,8 +42,8 @@ message OAuthClientAuthorization {
   UserIdentifiers user_ids = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   ClientIdentifiers client_ids = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
   repeated Right rights = 3;
-  google.protobuf.Timestamp created_at = 4 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-  google.protobuf.Timestamp updated_at = 5 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 4 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 5 [(gogoproto.stdtime) = true];
 }
 
 message OAuthClientAuthorizations {
@@ -51,7 +51,7 @@ message OAuthClientAuthorizations {
 }
 
 message ListOAuthClientAuthorizationsRequest {
-  UserIdentifiers user_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  UserIdentifiers user_ids = 1 [(validate.rules).message.required = true];
   // Order the results by this field path (must be present in the field mask).
   // Default ordering is by ID. Prepend with a minus (-) to reverse the order.
   string order = 2 [
@@ -71,8 +71,8 @@ message OAuthAuthorizationCode {
   string code = 4;
   string redirect_uri = 5 [(validate.rules).string.uri_ref = true];
   string state = 6;
-  google.protobuf.Timestamp created_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-  google.protobuf.Timestamp expires_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 7 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp expires_at = 8 [(gogoproto.stdtime) = true];
 }
 
 message OAuthAccessTokenIdentifiers {
@@ -89,8 +89,8 @@ message OAuthAccessToken {
   string access_token = 4;
   string refresh_token = 5;
   repeated Right rights = 6;
-  google.protobuf.Timestamp created_at = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-  google.protobuf.Timestamp expires_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 7 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp expires_at = 8 [(gogoproto.stdtime) = true];
 }
 
 message OAuthAccessTokens {

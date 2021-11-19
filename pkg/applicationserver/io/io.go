@@ -30,7 +30,8 @@ import (
 	"google.golang.org/grpc"
 )
 
-const bufferSize = 32
+// DefaultBufferSize is the default size of a subscription uplink buffer.
+const DefaultBufferSize = 128
 
 // PubSub represents the Application Server Pub/Sub capabilities to application frontends.
 type PubSub interface {
@@ -131,6 +132,13 @@ func WithBlocking(blocking bool) SubscriptionOption {
 	})
 }
 
+// WithBufferSize controls the size of the subscription buffer.
+func WithBufferSize(bufferSize int) SubscriptionOption {
+	return subscriptionOptionFunc(func(s *Subscription) {
+		s.upCh = make(chan *ContextualApplicationUp, bufferSize)
+	})
+}
+
 // NewSubscription instantiates a new application or integration subscription.
 func NewSubscription(ctx context.Context, protocol string, ids *ttnpb.ApplicationIdentifiers, opts ...SubscriptionOption) *Subscription {
 	ctx, cancelCtx := errorcontext.New(ctx)
@@ -139,7 +147,7 @@ func NewSubscription(ctx context.Context, protocol string, ids *ttnpb.Applicatio
 		cancelCtx: cancelCtx,
 		protocol:  protocol,
 		ids:       ids,
-		upCh:      make(chan *ContextualApplicationUp, bufferSize),
+		upCh:      make(chan *ContextualApplicationUp, DefaultBufferSize),
 		publish:   nonBlockingPublish,
 	}
 	for _, opt := range opts {

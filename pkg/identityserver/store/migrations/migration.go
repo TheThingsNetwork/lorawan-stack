@@ -32,27 +32,31 @@ type Migration interface {
 	Rollback(context.Context, *gorm.DB) error
 }
 
-func Apply(ctx context.Context, db *gorm.DB, migrations ...Migration) error {
-	migrationStore := store.GetMigrationStore(db)
-	for _, migration := range migrations {
-		_, err := migrationStore.GetMigration(ctx, migration.Name())
-		if err != nil && !errors.IsNotFound(err) {
+// Apply applies the list of migrations on the database connection.
+func Apply(ctx context.Context, transact func(context.Context, func(*gorm.DB) error) error, migrations ...Migration) error {
+	applyMigration := func(db *gorm.DB, migration Migration) error {
+		migrationStore := store.GetMigrationStore(db)
+		if _, err := migrationStore.GetMigration(ctx, migration.Name()); err != nil && !errors.IsNotFound(err) {
 			return err
 		} else if err == nil {
-			continue
+			return nil
 		}
-		err = migration.Apply(ctx, db)
-		if err != nil {
+		if err := migration.Apply(ctx, db); err != nil {
 			return err
 		}
-		err = migrationStore.CreateMigration(ctx, &store.Migration{
+		return migrationStore.CreateMigration(ctx, &store.Migration{
 			Name: migration.Name(),
 		})
-		if err != nil {
+	}
+	for _, migration := range migrations {
+		if err := transact(ctx, func(db *gorm.DB) error {
+			return applyMigration(db, migration)
+		}); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
+// All is a list of all database migrations.
 var All []Migration

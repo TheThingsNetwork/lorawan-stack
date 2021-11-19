@@ -5,7 +5,6 @@ package ttnpb
 import (
 	fmt "fmt"
 	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
-	time "time"
 )
 
 func (dst *Application) SetFields(src *Application, paths ...string) error {
@@ -43,8 +42,7 @@ func (dst *Application) SetFields(src *Application, paths ...string) error {
 			if src != nil {
 				dst.CreatedAt = src.CreatedAt
 			} else {
-				var zero time.Time
-				dst.CreatedAt = zero
+				dst.CreatedAt = nil
 			}
 		case "updated_at":
 			if len(subs) > 0 {
@@ -53,8 +51,7 @@ func (dst *Application) SetFields(src *Application, paths ...string) error {
 			if src != nil {
 				dst.UpdatedAt = src.UpdatedAt
 			} else {
-				var zero time.Time
-				dst.UpdatedAt = zero
+				dst.UpdatedAt = nil
 			}
 		case "deleted_at":
 			if len(subs) > 0 {
@@ -298,10 +295,18 @@ func (dst *CreateApplicationRequest) SetFields(src *CreateApplicationRequest, pa
 		case "application":
 			if len(subs) > 0 {
 				var newDst, newSrc *Application
-				if src != nil {
-					newSrc = &src.Application
+				if (src == nil || src.Application == nil) && dst.Application == nil {
+					continue
 				}
-				newDst = &dst.Application
+				if src != nil {
+					newSrc = src.Application
+				}
+				if dst.Application != nil {
+					newDst = dst.Application
+				} else {
+					newDst = &Application{}
+					dst.Application = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -309,8 +314,7 @@ func (dst *CreateApplicationRequest) SetFields(src *CreateApplicationRequest, pa
 				if src != nil {
 					dst.Application = src.Application
 				} else {
-					var zero Application
-					dst.Application = zero
+					dst.Application = nil
 				}
 			}
 		case "collaborator":
@@ -345,10 +349,18 @@ func (dst *UpdateApplicationRequest) SetFields(src *UpdateApplicationRequest, pa
 		case "application":
 			if len(subs) > 0 {
 				var newDst, newSrc *Application
-				if src != nil {
-					newSrc = &src.Application
+				if (src == nil || src.Application == nil) && dst.Application == nil {
+					continue
 				}
-				newDst = &dst.Application
+				if src != nil {
+					newSrc = src.Application
+				}
+				if dst.Application != nil {
+					newDst = dst.Application
+				} else {
+					newDst = &Application{}
+					dst.Application = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -356,8 +368,7 @@ func (dst *UpdateApplicationRequest) SetFields(src *UpdateApplicationRequest, pa
 				if src != nil {
 					dst.Application = src.Application
 				} else {
-					var zero Application
-					dst.Application = zero
+					dst.Application = nil
 				}
 			}
 		case "field_mask":
@@ -574,19 +585,26 @@ func (dst *UpdateApplicationAPIKeyRequest) SetFields(src *UpdateApplicationAPIKe
 		case "api_key":
 			if len(subs) > 0 {
 				var newDst, newSrc *APIKey
-				if src != nil {
-					newSrc = &src.APIKey
+				if (src == nil || src.ApiKey == nil) && dst.ApiKey == nil {
+					continue
 				}
-				newDst = &dst.APIKey
+				if src != nil {
+					newSrc = src.ApiKey
+				}
+				if dst.ApiKey != nil {
+					newDst = dst.ApiKey
+				} else {
+					newDst = &APIKey{}
+					dst.ApiKey = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.APIKey = src.APIKey
+					dst.ApiKey = src.ApiKey
 				} else {
-					var zero APIKey
-					dst.APIKey = zero
+					dst.ApiKey = nil
 				}
 			}
 		case "field_mask":

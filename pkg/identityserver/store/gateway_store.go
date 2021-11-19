@@ -92,6 +92,9 @@ func (s *gatewayStore) FindGateways(ctx context.Context, ids []*ttnpb.GatewayIde
 		countTotal(ctx, query.Model(Gateway{}))
 		query = query.Limit(limit).Offset(offset)
 	}
+	if onlyExpired, expireThreshold := expiredFromContext(ctx); onlyExpired {
+		query = query.Scopes(withExpiredEntities(expireThreshold))
+	}
 	var gtwModels []Gateway
 	query = query.Find(&gtwModels)
 	setTotal(ctx, uint64(len(gtwModels)))

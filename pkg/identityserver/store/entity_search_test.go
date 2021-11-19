@@ -462,10 +462,10 @@ func TestEntitySearch(t *testing.T) {
 
 		t.Run("end_device", func(t *testing.T) {
 			ids, err := s.FindEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "the-foo-app"},
-				IdContains:             "baz",
-				NameContains:           "baz",
-				DescriptionContains:    "baz",
+				ApplicationIds:      &ttnpb.ApplicationIdentifiers{ApplicationId: "the-foo-app"},
+				IdContains:          "baz",
+				NameContains:        "baz",
+				DescriptionContains: "baz",
 				AttributesContain: map[string]string{
 					"test": "baz",
 				},
@@ -475,31 +475,31 @@ func TestEntitySearch(t *testing.T) {
 			a.So(ids, should.HaveLength, 1)
 
 			ids, err = s.FindEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "the-foo-app"},
-				IdContains:             "baz",
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "the-foo-app"},
+				IdContains:     "baz",
 			})
 
 			a.So(err, should.BeNil)
 			a.So(ids, should.HaveLength, 1)
 
 			ids, err = s.FindEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "the-foo-app"},
-				NameContains:           "baz",
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "the-foo-app"},
+				NameContains:   "baz",
 			})
 
 			a.So(err, should.BeNil)
 			a.So(ids, should.HaveLength, 1)
 
 			ids, err = s.FindEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "the-foo-app"},
-				DescriptionContains:    "baz",
+				ApplicationIds:      &ttnpb.ApplicationIdentifiers{ApplicationId: "the-foo-app"},
+				DescriptionContains: "baz",
 			})
 
 			a.So(err, should.BeNil)
 			a.So(ids, should.HaveLength, 1)
 
 			ids, err = s.FindEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "the-foo-app"},
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "the-foo-app"},
 				AttributesContain: map[string]string{
 					"test": "baz",
 				},

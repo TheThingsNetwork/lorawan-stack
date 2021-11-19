@@ -25,8 +25,11 @@ type MessageHeader struct {
 	MessageType     MessageType
 	SenderID,
 	ReceiverID string
-	SenderToken   Buffer `json:",omitempty"`
-	ReceiverToken Buffer `json:",omitempty"`
+	SenderNSID    *EUI64       `json:",omitempty"`
+	ReceiverNSID  *EUI64       `json:",omitempty"`
+	SenderToken   Buffer       `json:",omitempty"`
+	ReceiverToken Buffer       `json:",omitempty"`
+	VSExtension   *VSExtension `json:",omitempty"`
 }
 
 // AnswerHeader returns the header of the answer message.
@@ -41,9 +44,16 @@ func (h MessageHeader) AnswerHeader() (MessageHeader, error) {
 		MessageType:     ansType,
 		ReceiverToken:   h.SenderToken,
 		ReceiverID:      h.SenderID,
+		ReceiverNSID:    h.SenderNSID,
 		SenderID:        h.ReceiverID,
 		SenderToken:     h.ReceiverToken,
+		SenderNSID:      h.ReceiverNSID,
 	}, nil
+}
+
+// VSExtension is a vendor-specific extension.
+type VSExtension struct {
+	VendorID VendorID
 }
 
 // Result contains the result of an operation.
@@ -62,7 +72,7 @@ type ErrorMessage struct {
 type NsMessageHeader struct {
 	MessageHeader
 	SenderID   NetID
-	SenderNSID *string `json:",omitempty"`
+	SenderNSID *EUI64 `json:",omitempty"`
 }
 
 // AsMessageHeader contains the message header for AS messages.
@@ -76,7 +86,7 @@ type NsJsMessageHeader struct {
 	SenderID NetID
 	// ReceiverID is a JoinEUI.
 	ReceiverID EUI64
-	SenderNSID *string `json:",omitempty"`
+	SenderNSID *EUI64 `json:",omitempty"`
 }
 
 // JsNsMessageHeader contains the message header for JS to NS messages.
@@ -85,7 +95,7 @@ type JsNsMessageHeader struct {
 	// SenderID is a JoinEUI.
 	SenderID     EUI64
 	ReceiverID   NetID
-	ReceiverNSID *string `json:",omitempty"`
+	ReceiverNSID *EUI64 `json:",omitempty"`
 }
 
 // AsJsMessageHeader contains the message header for AS to JS messages.
@@ -156,6 +166,6 @@ type HomeNSReq struct {
 type HomeNSAns struct {
 	JsNsMessageHeader
 	Result Result
-	HNSID  *string `json:",omitempty"`
+	HNSID  *EUI64 `json:",omitempty"`
 	HNetID NetID
 }

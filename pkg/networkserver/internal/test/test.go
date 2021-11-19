@@ -112,60 +112,60 @@ func Band(fpID string, phyVer ttnpb.PHYVersion) band.Band {
 }
 
 var (
-	DefaultGatewayAntennaIdentifiers = [...]ttnpb.GatewayAntennaIdentifiers{
+	DefaultGatewayAntennaIdentifiers = [...]*ttnpb.GatewayAntennaIdentifiers{
 		{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-0"},
-			AntennaIndex:       3,
+			GatewayIds:   &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-0"},
+			AntennaIndex: 3,
 		},
 		{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-1"},
-			AntennaIndex:       1,
+			GatewayIds:   &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-1"},
+			AntennaIndex: 1,
 		},
 		{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-2"},
+			GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-2"},
 		},
 		{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-3"},
-			AntennaIndex:       2,
+			GatewayIds:   &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-3"},
+			AntennaIndex: 2,
 		},
 		{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-4"},
+			GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-4"},
 		},
 	}
 
 	DefaultRxMetadata = [...]*ttnpb.RxMetadata{
 		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-1"},
+			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-1"},
 			Snr:                    -9,
 			UplinkToken:            []byte("token-gtw-1"),
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
 		},
 		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-3"},
+			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-3"},
 			Snr:                    -5.3,
 			UplinkToken:            []byte("token-gtw-3"),
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
 		},
 		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-5"},
+			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-5"},
 			Snr:                    12,
 			UplinkToken:            []byte("token-gtw-5"),
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER,
 		},
 		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-0"},
+			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-0"},
 			Snr:                    5.2,
 			UplinkToken:            []byte("token-gtw-0"),
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
 		},
 		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-2"},
+			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-2"},
 			Snr:                    6.3,
 			UplinkToken:            []byte("token-gtw-2"),
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
 		},
 		{
-			GatewayIdentifiers:     ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-4"},
+			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-4"},
 			Snr:                    -7,
 			UplinkToken:            []byte("token-gtw-4"),
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
@@ -173,9 +173,9 @@ var (
 	}
 	PacketBrokerRxMetadata = [...]*ttnpb.RxMetadata{
 		{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: cluster.PacketBrokerGatewayID.GatewayId},
-			Snr:                4.2,
-			UplinkToken:        []byte("token-pb-1"),
+			GatewayIds:  &ttnpb.GatewayIdentifiers{GatewayId: cluster.PacketBrokerGatewayID.GatewayId},
+			Snr:         4.2,
+			UplinkToken: []byte("token-pb-1"),
 			PacketBroker: &ttnpb.PacketBrokerMetadata{
 				ForwarderNetId:     test.DefaultNetID,
 				ForwarderClusterId: "test-cluster",
@@ -183,9 +183,9 @@ var (
 			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER,
 		},
 		{
-			GatewayIdentifiers: ttnpb.GatewayIdentifiers{GatewayId: cluster.PacketBrokerGatewayID.GatewayId},
-			Snr:                1.8,
-			UplinkToken:        []byte("token-pb-2"),
+			GatewayIds:  &ttnpb.GatewayIdentifiers{GatewayId: cluster.PacketBrokerGatewayID.GatewayId},
+			Snr:         1.8,
+			UplinkToken: []byte("token-pb-2"),
 			PacketBroker: &ttnpb.PacketBrokerMetadata{
 				ForwarderNetId:     test.DefaultNetID,
 				ForwarderClusterId: "other-cluster",
@@ -402,11 +402,10 @@ func MakeDefaultUS915FSB2MACState(class ttnpb.Class, macVersion ttnpb.MACVersion
 
 func MakeUplinkSettings(dr ttnpb.DataRate, drIdx ttnpb.DataRateIndex, freq uint64) ttnpb.TxSettings {
 	return ttnpb.TxSettings{
-		DataRate:      *deepcopy.Copy(&dr).(*ttnpb.DataRate),
-		DataRateIndex: drIdx,
-		EnableCrc:     true,
-		Frequency:     freq,
-		Timestamp:     42,
+		DataRate:  *deepcopy.Copy(&dr).(*ttnpb.DataRate),
+		EnableCrc: true,
+		Frequency: freq,
+		Timestamp: 42,
 	}
 }
 
@@ -432,13 +431,6 @@ func MakeUplinkMessage(conf UplinkMessageConfig) *ttnpb.UplinkMessage {
 		CorrelationIds:     CopyStrings(conf.CorrelationIDs),
 		DeviceChannelIndex: uint32(conf.ChannelIndex),
 	}
-}
-
-func WithMatchedUplinkSettings(msg *ttnpb.UplinkMessage, chIdx uint8, drIdx ttnpb.DataRateIndex) *ttnpb.UplinkMessage {
-	msg = CopyUplinkMessage(msg)
-	msg.Settings.DataRateIndex = drIdx
-	msg.DeviceChannelIndex = uint32(chIdx)
-	return msg
 }
 
 var DataUplinkCorrelationIDs = [...]string{
@@ -824,7 +816,7 @@ func ForEachClass(tb testing.TB, f func(func(...string) string, ttnpb.Class)) {
 func ForEachFrequencyPlan(tb testing.TB, f func(func(...string) string, string, *frequencyplans.FrequencyPlan)) {
 	fpIDs, err := frequencyplans.NewStore(test.FrequencyPlansFetcher).GetAllIDs()
 	if err != nil {
-		tb.Errorf("failed to get frequency plans: %w", err)
+		tb.Errorf("failed to get frequency plans: %s", err)
 		return
 	}
 	for _, fpID := range fpIDs {

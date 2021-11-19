@@ -348,71 +348,72 @@ type FrequencyPlan struct {
 }
 
 // Extend returns the same frequency plan, with values overridden by the passed frequency plan.
-func (fp FrequencyPlan) Extend(ext FrequencyPlan) FrequencyPlan {
-	if ext.BandID != "" {
-		fp.BandID = ext.BandID
+func (fp FrequencyPlan) Extend(extension FrequencyPlan) FrequencyPlan {
+	extended := fp
+	if extension.BandID != "" {
+		extended.BandID = extension.BandID
 	}
-	if channels := ext.UplinkChannels; len(channels) > 0 {
-		fp.UplinkChannels = make([]Channel, 0, len(channels))
+	if channels := extension.UplinkChannels; len(channels) > 0 {
+		extended.UplinkChannels = make([]Channel, 0, len(channels))
 		for _, ch := range channels {
-			fp.UplinkChannels = append(fp.UplinkChannels, *ch.Clone())
+			extended.UplinkChannels = append(extended.UplinkChannels, *ch.Clone())
 		}
 	}
-	if channels := ext.DownlinkChannels; len(channels) > 0 {
-		fp.DownlinkChannels = make([]Channel, 0, len(channels))
+	if channels := extension.DownlinkChannels; len(channels) > 0 {
+		extended.DownlinkChannels = make([]Channel, 0, len(channels))
 		for _, ch := range channels {
-			fp.DownlinkChannels = append(fp.DownlinkChannels, *ch.Clone())
+			extended.DownlinkChannels = append(extended.DownlinkChannels, *ch.Clone())
 		}
 	}
-	if ext.LoRaStandardChannel != nil {
-		fp.LoRaStandardChannel = ext.LoRaStandardChannel.Clone()
+	if extension.LoRaStandardChannel != nil {
+		extended.LoRaStandardChannel = extension.LoRaStandardChannel.Clone()
 	}
-	if ext.FSKChannel != nil {
-		fp.FSKChannel = ext.FSKChannel.Clone()
+	if extension.FSKChannel != nil {
+		extended.FSKChannel = extension.FSKChannel.Clone()
 	}
-	if ext.TimeOffAir != (TimeOffAir{}) {
-		fp.TimeOffAir = *ext.TimeOffAir.Clone()
+	if extension.TimeOffAir != (TimeOffAir{}) {
+		extended.TimeOffAir = *extension.TimeOffAir.Clone()
 	}
-	if ext.DwellTime != (DwellTime{}) {
-		fp.DwellTime = *ext.DwellTime.Clone()
+	if extension.DwellTime != (DwellTime{}) {
+		extended.DwellTime = *extension.DwellTime.Clone()
 	}
-	if ext.LBT != nil {
-		fp.LBT = ext.LBT.Clone()
+	if extension.LBT != nil {
+		extended.LBT = extension.LBT.Clone()
 	}
-	if radios := ext.Radios; len(radios) > 0 {
-		fp.Radios = make([]Radio, 0, len(radios))
+	if radios := extension.Radios; len(radios) > 0 {
+		extended.Radios = make([]Radio, 0, len(radios))
 		for _, r := range radios {
-			fp.Radios = append(fp.Radios, *r.Clone())
+			extended.Radios = append(extended.Radios, *r.Clone())
 		}
-		fp.ClockSource = ext.ClockSource
+		extended.ClockSource = extension.ClockSource
 	}
-	if ext.PingSlot != nil {
-		fp.PingSlot = ext.PingSlot.Clone()
+	if extension.PingSlot != nil {
+		extended.PingSlot = extension.PingSlot.Clone()
 	}
-	if ext.DefaultPingSlotDataRate != nil {
+	if extension.DefaultPingSlotDataRate != nil {
 		var i uint8
-		i = *ext.DefaultPingSlotDataRate
-		fp.DefaultPingSlotDataRate = &i
+		i = *extension.DefaultPingSlotDataRate
+		extended.DefaultPingSlotDataRate = &i
 	}
-	if ext.Rx2Channel != nil {
-		fp.Rx2Channel = ext.Rx2Channel.Clone()
+	if extension.Rx2Channel != nil {
+		extended.Rx2Channel = extension.Rx2Channel.Clone()
 	}
-	if ext.DefaultRx2DataRate != nil {
+	if extension.DefaultRx2DataRate != nil {
 		var i uint8
-		i = *ext.DefaultRx2DataRate
-		fp.DefaultRx2DataRate = &i
+		i = *extension.DefaultRx2DataRate
+		extended.DefaultRx2DataRate = &i
 	}
-	if subBands := ext.SubBands; len(subBands) > 0 {
-		fp.SubBands = make([]SubBandParameters, 0, len(subBands))
+	if subBands := extension.SubBands; len(subBands) > 0 {
+		extended.SubBands = make([]SubBandParameters, 0, len(subBands))
 		for _, sb := range subBands {
-			fp.SubBands = append(fp.SubBands, *sb.Clone())
+			extended.SubBands = append(extended.SubBands, *sb.Clone())
 		}
 	}
-	if ext.MaxEIRP != nil {
-		val := *ext.MaxEIRP
-		fp.MaxEIRP = &val
+	if extension.MaxEIRP != nil {
+		val := *extension.MaxEIRP
+		extended.MaxEIRP = &val
 	}
-	return fp
+	return extended
 }
 
 var (

@@ -73,7 +73,7 @@ const ApplicationEvents = props => {
 ApplicationEvents.propTypes = {
   appId: PropTypes.string.isRequired,
   events: PropTypes.events,
-  filter: PropTypes.string,
+  filter: PropTypes.eventFilter,
   onClear: PropTypes.func.isRequired,
   onFilterChange: PropTypes.func.isRequired,
   onPauseToggle: PropTypes.func.isRequired,
@@ -106,7 +106,7 @@ export default withFeatureRequirement(mayViewApplicationEvents)(
         paused
           ? dispatch(resumeApplicationEventsStream(ownProps.appId))
           : dispatch(pauseApplicationEventsStream(ownProps.appId)),
-      onFilterChange: filter => dispatch(setApplicationEventsFilter(ownProps.appId, filter)),
+      onFilterChange: filterId => dispatch(setApplicationEventsFilter(ownProps.appId, filterId)),
     }),
   )(ApplicationEvents),
 )

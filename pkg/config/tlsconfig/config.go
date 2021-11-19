@@ -169,19 +169,45 @@ func readCert(fileReader FileReader, certFile, keyFile string) (*tls.Certificate
 
 // ServerAuth is configuration for TLS server authentication.
 type ServerAuth struct {
-	Source      string     `name:"source" description:"Source of the TLS certificate (file, acme, key-vault)"`
-	FileReader  FileReader `json:"-" yaml:"-" name:"-"`
-	Certificate string     `json:"certificate" yaml:"certificate" name:"certificate" description:"Location of TLS certificate"`
-	Key         string     `json:"key" yaml:"key" name:"key" description:"Location of TLS private key"`
-	ACME        ACME       `name:"acme"`
-	KeyVault    KeyVault   `name:"key-vault"`
+	Source       string     `name:"source" description:"Source of the TLS certificate (file, acme, key-vault)"`
+	FileReader   FileReader `json:"-" yaml:"-" name:"-"`
+	Certificate  string     `json:"certificate" yaml:"certificate" name:"certificate" description:"Location of TLS certificate"`
+	Key          string     `json:"key" yaml:"key" name:"key" description:"Location of TLS private key"`
+	ACME         ACME       `name:"acme"`
+	KeyVault     KeyVault   `name:"key-vault"`
+	CipherSuites []string   `name:"cipher-suites" description:"DEPRECATED: List of IANA names of TLS cipher suites to use"`
 }
 
 var (
 	errInvalidTLSConfigSource = errors.DefineFailedPrecondition("tls_config_source_invalid", "invalid TLS configuration source `{source}`")
 	errEmptyTLSSource         = errors.DefineFailedPrecondition("tls_source_empty", "empty TLS source")
 	errTLSKeyVaultID          = errors.DefineFailedPrecondition("tls_key_vault_id", "invalid TLS key vault ID")
+	errInvalidCipherSuite     = errors.DefineFailedPrecondition("tls_cipher_suite_invalid", "invalid TLS cipher suite {cipher}")
 )
+
+// GetCipherSuites returns a list of IDs of cipher suites in configuration.
+// This list can be passed to tls.Config
+func (c *ServerAuth) GetCipherSuites() ([]uint16, error) {
+	var cipherSuites []uint16
+	var cs = make(map[string]uint16)
+	for _, c := range tls.CipherSuites() {
+		cs[c.Name] = c.ID
+	}
+	for _, c := range tls.InsecureCipherSuites() {
+		cs[c.Name] = c.ID
+	}
+	for _, c := range c.CipherSuites {
+		var cipher, got = cs[c]
+		if !got {
+			return nil, errInvalidCipherSuite.WithAttributes("cipher", c)
+		}
+		cipherSuites = append(cipherSuites, cipher)
+	}
+	if len(cipherSuites) == 0 {
+		return nil, nil
+	}
+	return cipherSuites, nil
+}
 
 // ApplyTo applies the TLS authentication configuration options to the given TLS configuration.
 // If tlsConfig is nil, this is a no-op.

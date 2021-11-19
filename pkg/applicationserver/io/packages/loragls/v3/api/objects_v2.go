@@ -52,7 +52,7 @@ func parseWiFiStruct(payload *types.Struct) []AccessPoint {
 	return points
 }
 
-// BuildSingelFrameRequest builds a SingleFrameRequest from the provided metadata and payload.
+// BuildWiFiRequest builds a WiFiRequest from the provided metadata and payload.
 func BuildWiFiRequest(ctx context.Context, metadata []*ttnpb.RxMetadata, payload *types.Struct) *WiFiRequest {
 	removeNil := func(v *uint64) uint64 {
 		if v == nil {
@@ -65,7 +65,7 @@ func BuildWiFiRequest(ctx context.Context, metadata []*ttnpb.RxMetadata, payload
 		WiFiAccessPoints: parseWiFiStruct(payload),
 	}
 	for _, m := range metadata {
-		if m.Location == nil {
+		if m.Location == nil || m.GatewayIds == nil {
 			continue
 		}
 		gtw, up := parseRxMetadata(ctx, m)
@@ -126,6 +126,7 @@ type WiFiLocationSolverResponse struct {
 	Warnings []string                  `json:"warnings"`
 }
 
+// WiFiLocationSolverResult contains the result of a WiFi location query.
 // https://www.loracloud.com/documentation/geolocation?url=v2.html#locationresult
 type WiFiLocationSolverResult struct {
 	Latitude         float64 `json:"latitude"`

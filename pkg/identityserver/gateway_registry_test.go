@@ -47,8 +47,8 @@ func init() {
 	for i := 0; i < 3; i++ {
 		gatewayID := population.Gateways[i].GetEntityIdentifiers()
 		population.Memberships[gatewayID] = append(population.Memberships[gatewayID], &ttnpb.Collaborator{
-			OrganizationOrUserIdentifiers: *paginationUser.OrganizationOrUserIdentifiers(),
-			Rights:                        []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
+			Ids:    paginationUser.OrganizationOrUserIdentifiers(),
+			Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
 		})
 	}
 }
@@ -128,7 +128,7 @@ func TestGatewaysCRUD(t *testing.T) {
 		userID, creds := population.Users[defaultUserIdx].GetIds(), userCreds(defaultUserIdx)
 		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
 
-		eui := types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
+		eui := &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
 
 		is.config.UserRights.CreateGateways = false
 
@@ -136,7 +136,7 @@ func TestGatewaysCRUD(t *testing.T) {
 			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
 					GatewayId: "foo",
-					Eui:       &eui,
+					Eui:       eui,
 				},
 				Name: "Foo Gateway",
 			},
@@ -160,7 +160,7 @@ func TestGatewaysCRUD(t *testing.T) {
 			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
 					GatewayId: "foo",
-					Eui:       &eui,
+					Eui:       eui,
 				},
 				Name: "Foo Gateway",
 			},
@@ -174,7 +174,7 @@ func TestGatewaysCRUD(t *testing.T) {
 			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
 					GatewayId: "foo",
-					Eui:       &eui,
+					Eui:       eui,
 				},
 				Name: "Foo Gateway",
 			},
@@ -188,7 +188,7 @@ func TestGatewaysCRUD(t *testing.T) {
 			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
 					GatewayId: "foo",
-					Eui:       &eui,
+					Eui:       eui,
 				},
 				Name: "Foo Gateway",
 			},
@@ -209,7 +209,7 @@ func TestGatewaysCRUD(t *testing.T) {
 		if a.So(got, should.NotBeNil) {
 			a.So(got.Name, should.Equal, created.Name)
 			if a.So(got.GetIds().GetEui(), should.NotBeNil) {
-				a.So(*got.GetIds().GetEui(), should.Equal, eui)
+				a.So(got.GetIds().GetEui(), should.Resemble, eui)
 			}
 		}
 
@@ -226,7 +226,7 @@ func TestGatewaysCRUD(t *testing.T) {
 			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
 					GatewayId: "bar",
-					Eui:       &eui,
+					Eui:       eui,
 				},
 				Name: "Bar Gateway",
 			},
@@ -364,7 +364,7 @@ func TestGatewaysSecrets(t *testing.T) {
 		userID, creds := population.Users[defaultUserIdx].GetIds(), userCreds(defaultUserIdx)
 		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
 
-		eui := types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}
+		eui := &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}
 
 		targetCUPSURI := "https://thethings.example.com"
 		otherTargetCUPSURI := "https://thenotthings.example.com:1234"
@@ -404,7 +404,7 @@ func TestGatewaysSecrets(t *testing.T) {
 			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
 					GatewayId: gatewayID,
-					Eui:       &eui,
+					Eui:       eui,
 				},
 				Name: gatewayName,
 			},
@@ -468,7 +468,7 @@ func TestGatewaysSecrets(t *testing.T) {
 			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
 					GatewayId: gatewayID,
-					Eui:       &eui,
+					Eui:       eui,
 				},
 				Name:                    gatewayName,
 				LbsLnsSecret:            secret,
@@ -496,7 +496,7 @@ func TestGatewaysSecrets(t *testing.T) {
 		if a.So(got, should.NotBeNil) {
 			a.So(got.Name, should.Equal, created.Name)
 			if a.So(got.GetIds().GetEui(), should.NotBeNil) {
-				a.So(*got.GetIds().GetEui(), should.Equal, eui)
+				a.So(got.GetIds().GetEui(), should.Resemble, eui)
 			}
 			a.So(got.LbsLnsSecret, should.Resemble, secret)
 			a.So(got.ClaimAuthenticationCode, should.NotBeNil)
@@ -574,7 +574,7 @@ func TestGatewaysSecrets(t *testing.T) {
 			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
 					GatewayId: "bar",
-					Eui:       &eui,
+					Eui:       eui,
 				},
 				Name: "Bar Gateway",
 			},
@@ -645,7 +645,7 @@ func TestGatewaysSecrets(t *testing.T) {
 		if a.So(got, should.NotBeNil) {
 			a.So(got.Name, should.Equal, created.Name)
 			if a.So(got.GetIds().GetEui(), should.NotBeNil) {
-				a.So(*got.GetIds().GetEui(), should.Equal, eui)
+				a.So(got.GetIds().GetEui(), should.Resemble, eui)
 			}
 			if a.So(got.LbsLnsSecret, should.NotBeNil) {
 				a.So(got.LbsLnsSecret.Value, should.Resemble, []byte("my new secret value"))

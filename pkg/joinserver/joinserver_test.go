@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
+	"go.thethings.network/lorawan-stack/v3/pkg/joinserver"
 	. "go.thethings.network/lorawan-stack/v3/pkg/joinserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/joinserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -145,8 +146,14 @@ func TestInvalidJoinRequests(t *testing.T) {
 				redisClient, flush := test.NewRedis(ctx, "joinserver_test")
 				defer flush()
 				defer redisClient.Close()
-				devReg := &redis.DeviceRegistry{Redis: redisClient}
-				keyReg := &redis.KeyRegistry{Redis: redisClient}
+				devReg := &redis.DeviceRegistry{Redis: redisClient, LockTTL: test.Delay << 10}
+				if err := devReg.Init(ctx); !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				keyReg := &redis.KeyRegistry{Redis: redisClient, LockTTL: test.Delay << 10}
+				if err := keyReg.Init(ctx); !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
 				aasReg, aasRegCloseFn := NewRedisApplicationActivationSettingRegistry(ctx)
 				defer aasRegCloseFn()
 
@@ -191,7 +198,7 @@ func TestInvalidJoinRequests(t *testing.T) {
 					tc.Invalidate(req)
 				}
 
-				_, err := js.HandleJoin(ctx, req, ClusterAuthorizer)
+				_, err := js.HandleJoin(ctx, req, ClusterAuthorizer(ctx))
 				a.So(tc.Assertion(err), should.BeTrue)
 			},
 		})
@@ -222,7 +229,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.1.0/cluster auth/new device/unwrapped keys",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEui:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -323,7 +330,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.1.0/cluster auth/new device/wrapped keys/addr KEKs",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			KeyVault: map[string][]byte{
 				"ns:ns.test.org": {0x3f, 0x36, 0x7b, 0xa1, 0x16, 0x67, 0xd9, 0x8b, 0x89, 0x00, 0x47, 0x77, 0x84, 0xf6, 0xfe, 0x50, 0x56, 0x67, 0x12, 0xab, 0x71, 0x96, 0x04, 0x6b, 0x9f, 0x2b, 0xc2, 0x50, 0xdf, 0xc8, 0xc1, 0xa2},
 				"as:as.test.org": {0xed, 0x8a, 0x2e, 0x97, 0xf6, 0x8e, 0xbb, 0x79, 0x4d, 0x96, 0x4b, 0xd6, 0x14, 0xbb, 0xbc, 0xf2, 0x25, 0xc3, 0x7d, 0x61, 0xa9, 0xfe, 0xd0, 0x83, 0x7b, 0x07, 0xc0, 0x5f, 0x02, 0x52, 0x3c, 0x8b},
@@ -449,7 +456,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.1.0/cluster auth/new device/wrapped keys/custom device KEKs",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			KeyVault: map[string][]byte{
 				"test-ns-kek": {0x3f, 0x36, 0x7b, 0xa1, 0x16, 0x67, 0xd9, 0x8b, 0x89, 0x00, 0x47, 0x77, 0x84, 0xf6, 0xfe, 0x50, 0x56, 0x67, 0x12, 0xab, 0x71, 0x96, 0x04, 0x6b, 0x9f, 0x2b, 0xc2, 0x50, 0xdf, 0xc8, 0xc1, 0xa2},
 				"test-as-kek": {0xed, 0x8a, 0x2e, 0x97, 0xf6, 0x8e, 0xbb, 0x79, 0x4d, 0x96, 0x4b, 0xd6, 0x14, 0xbb, 0xbc, 0xf2, 0x25, 0xc3, 0x7d, 0x61, 0xa9, 0xfe, 0xd0, 0x83, 0x7b, 0x07, 0xc0, 0x5f, 0x02, 0x52, 0x3c, 0x8b},
@@ -580,7 +587,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.1.0/cluster auth/new device/wrapped keys/custom AAS KEK",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			KeyVault: map[string][]byte{
 				"test-aas-kek-kek": {0x42, 0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				"test-ns-kek":      {0x3f, 0x36, 0x7b, 0xa1, 0x16, 0x67, 0xd9, 0x8b, 0x89, 0x00, 0x47, 0x77, 0x84, 0xf6, 0xfe, 0x50, 0x56, 0x67, 0x12, 0xab, 0x71, 0x96, 0x04, 0x6b, 0x9f, 0x2b, 0xc2, 0x50, 0xdf, 0xc8, 0xc1, 0xa2},
@@ -699,7 +706,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.1.0/existing device/dev nonce reset",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
 				LastDevNonce: 0x2441,
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -803,7 +810,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.1.0/cluster auth/existing device",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
 				LastDevNonce:  0x2441,
 				LastJoinNonce: 0x42fffd,
@@ -908,7 +915,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.1.0/DevNonce too small",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
 				LastDevNonce:  0x2442,
 				LastJoinNonce: 0x42fffd,
@@ -962,7 +969,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.0.3/cluster auth/new device",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEui:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -1048,7 +1055,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.0.2/cluster auth/new device",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEui:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -1134,7 +1141,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.0.1/cluster auth/new device",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEui:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -1220,7 +1227,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.0.0/cluster auth/new device",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DevEui:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -1306,7 +1313,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.0.0/cluster auth/existing device",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2444},
 				LastJoinNonce: 0x42fffd,
@@ -1394,7 +1401,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.0.0/cluster auth/existing device/nonce reuse",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442, 0x2444},
 				LastJoinNonce: 0x42fffd,
@@ -1483,7 +1490,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name: "1.0.0/interop auth/new device",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return interop.NewContextWithNetworkServerAuthInfo(ctx, interop.NetworkServerAuthInfo{
+				return interop.NewContextWithNetworkServerAuthInfo(ctx, &interop.NetworkServerAuthInfo{
 					NetID:     types.NetID{0x42, 0xff, 0xff},
 					Addresses: []string{"*.test.org"},
 				})
@@ -1575,7 +1582,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name: "1.0.0/NetID mismatch",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return interop.NewContextWithNetworkServerAuthInfo(ctx, interop.NetworkServerAuthInfo{
+				return interop.NewContextWithNetworkServerAuthInfo(ctx, &interop.NetworkServerAuthInfo{
 					Addresses: []string{nsAddr},
 				})
 			},
@@ -1629,7 +1636,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name: "1.0.0/no NetID",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return interop.NewContextWithNetworkServerAuthInfo(ctx, interop.NetworkServerAuthInfo{
+				return interop.NewContextWithNetworkServerAuthInfo(ctx, &interop.NetworkServerAuthInfo{
 					Addresses: []string{nsAddr},
 				})
 			},
@@ -1682,7 +1689,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name: "1.0.0/address not authorized",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return interop.NewContextWithNetworkServerAuthInfo(ctx, interop.NetworkServerAuthInfo{
+				return interop.NewContextWithNetworkServerAuthInfo(ctx, &interop.NetworkServerAuthInfo{
 					Addresses: []string{"other.hostname.local"},
 				})
 			},
@@ -1736,7 +1743,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.0.0/repeated DevNonce",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 				LastJoinNonce: 0x42fffe,
@@ -1786,7 +1793,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.0.0/no payload",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 				LastJoinNonce: 0x42fffe,
@@ -1821,7 +1828,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.0.0/not a join request payload",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 				LastJoinNonce: 0x42fffe,
@@ -1862,7 +1869,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.0.0/unsupported LoRaWAN version",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 				LastJoinNonce: 0x42fffe,
@@ -1904,7 +1911,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.0.0/no JoinEUI",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 				LastJoinNonce: 0x42fffe,
@@ -1950,7 +1957,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.0.0/raw payload that can't be unmarshalled",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 				LastJoinNonce: 0x42fffe,
@@ -1988,7 +1995,7 @@ func TestHandleJoin(t *testing.T) {
 		{
 			Name:        "1.0.0/invalid MType",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 				LastJoinNonce: 0x42fffe,
@@ -2042,8 +2049,14 @@ func TestHandleJoin(t *testing.T) {
 				redisClient, flush := test.NewRedis(ctx, "joinserver_test")
 				defer flush()
 				defer redisClient.Close()
-				devReg := &redis.DeviceRegistry{Redis: redisClient}
-				keyReg := &redis.KeyRegistry{Redis: redisClient}
+				devReg := &redis.DeviceRegistry{Redis: redisClient, LockTTL: test.Delay << 10}
+				if err := devReg.Init(ctx); !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				keyReg := &redis.KeyRegistry{Redis: redisClient, LockTTL: test.Delay << 10}
+				if err := keyReg.Init(ctx); !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
 				aasReg, aasRegCloseFn := NewRedisApplicationActivationSettingRegistry(ctx)
 				defer aasRegCloseFn()
 
@@ -2194,6 +2207,7 @@ func TestHandleJoin(t *testing.T) {
 }
 
 func TestGetNwkSKeys(t *testing.T) {
+	_, ctx := test.New(t)
 	errTest := errors.New("test")
 
 	for _, tc := range []struct {
@@ -2210,7 +2224,7 @@ func TestGetNwkSKeys(t *testing.T) {
 		{
 			Name:        "Registry error",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			GetByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -2240,7 +2254,7 @@ func TestGetNwkSKeys(t *testing.T) {
 		{
 			Name:        "No SNwkSIntKey",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			GetByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -2269,7 +2283,7 @@ func TestGetNwkSKeys(t *testing.T) {
 		{
 			Name:        "No NwkSEncKey",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			GetByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -2298,7 +2312,7 @@ func TestGetNwkSKeys(t *testing.T) {
 		{
 			Name:        "No FNwkSIntKey",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			GetByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -2327,7 +2341,7 @@ func TestGetNwkSKeys(t *testing.T) {
 		{
 			Name:        "Matching request",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			GetByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -2407,6 +2421,7 @@ func TestGetNwkSKeys(t *testing.T) {
 }
 
 func TestGetAppSKey(t *testing.T) {
+	_, ctx := test.New(t)
 	errNotFound := errors.DefineNotFound("test_not_found", "not found")
 
 	for _, tc := range []struct {
@@ -2424,7 +2439,7 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name:        "Registry error",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			GetKeyByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -2452,7 +2467,7 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name:        "Missing AppSKey",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			GetKeyByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -2476,7 +2491,7 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name: "Address not authorized",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return interop.NewContextWithApplicationServerAuthInfo(ctx, interop.ApplicationServerAuthInfo{
+				return interop.NewContextWithApplicationServerAuthInfo(ctx, &interop.ApplicationServerAuthInfo{
 					Addresses: []string{"other.hostname.local"},
 				})
 			},
@@ -2534,7 +2549,7 @@ func TestGetAppSKey(t *testing.T) {
 				})
 				return ctx
 			},
-			Authorizer: ApplicationRightsAuthorizer,
+			Authorizer: ApplicationRightsAuthorizer(ctx),
 			GetKeyByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -2580,7 +2595,7 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name:        "Matching request/cluster auth",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			GetKeyByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -2622,7 +2637,7 @@ func TestGetAppSKey(t *testing.T) {
 				})
 				return ctx
 			},
-			Authorizer: ApplicationRightsAuthorizer,
+			Authorizer: ApplicationRightsAuthorizer(ctx),
 			GetKeyByID: func(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -2671,7 +2686,7 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name: "Matching request/interop auth/address ID",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return interop.NewContextWithApplicationServerAuthInfo(ctx, interop.ApplicationServerAuthInfo{
+				return interop.NewContextWithApplicationServerAuthInfo(ctx, &interop.ApplicationServerAuthInfo{
 					Addresses: []string{"as.test.org"},
 				})
 			},
@@ -2728,7 +2743,7 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name: "Matching request/interop auth/custom ID",
 			ContextFunc: func(ctx context.Context) context.Context {
-				return interop.NewContextWithApplicationServerAuthInfo(ctx, interop.ApplicationServerAuthInfo{
+				return interop.NewContextWithApplicationServerAuthInfo(ctx, &interop.ApplicationServerAuthInfo{
 					ASID: "test-as-id",
 				})
 			},
@@ -2818,6 +2833,7 @@ func TestGetAppSKey(t *testing.T) {
 }
 
 func TestGetHomeNetID(t *testing.T) {
+	_, ctx := test.New(t)
 	errTest := errors.New("test")
 
 	for _, tc := range []struct {
@@ -2829,14 +2845,14 @@ func TestGetHomeNetID(t *testing.T) {
 		JoinEUI       types.EUI64
 		DevEUI        types.EUI64
 		ResponseNetID *types.NetID
-		ResponseNSID  string
+		ResponseNSID  *types.EUI64
 
 		ErrorAssertion func(*testing.T, error) bool
 	}{
 		{
 			Name:        "Registry error",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			GetByEUI: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.ContextualEndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -2860,7 +2876,7 @@ func TestGetHomeNetID(t *testing.T) {
 		{
 			Name:        "Matching request",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
-			Authorizer:  ClusterAuthorizer,
+			Authorizer:  ClusterAuthorizer(ctx),
 			GetByEUI: func(ctx context.Context, joinEUI, devEUI types.EUI64, paths []string) (*ttnpb.ContextualEndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(joinEUI, should.Resemble, types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff})
@@ -2880,7 +2896,6 @@ func TestGetHomeNetID(t *testing.T) {
 			JoinEUI:       types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			DevEUI:        types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ResponseNetID: &types.NetID{0x42, 0xff, 0xff},
-			ResponseNSID:  nsAddr,
 		},
 	} {
 		tc := tc
@@ -2898,22 +2913,157 @@ func TestGetHomeNetID(t *testing.T) {
 						},
 					},
 				)).(*JoinServer)
-				netID, nsID, err := js.GetHomeNetID(ctx, tc.JoinEUI, tc.DevEUI, tc.Authorizer)
+				homeNetwork, err := js.GetHomeNetwork(ctx, tc.JoinEUI, tc.DevEUI, tc.Authorizer)
 
 				if tc.ErrorAssertion != nil {
 					if !tc.ErrorAssertion(t, err) {
 						t.Fatalf("Received unexpected error: %s", err)
 					}
-					a.So(netID, should.BeNil)
+					a.So(homeNetwork, should.BeNil)
 					return
 				}
 
 				if !a.So(err, should.BeNil) {
 					t.FailNow()
 				}
-				a.So(netID, should.Resemble, tc.ResponseNetID)
-				a.So(nsID, should.Equal, tc.ResponseNSID)
+				a.So(homeNetwork.NetID, should.Resemble, tc.ResponseNetID)
+				a.So(homeNetwork.NSID, should.Equal, tc.ResponseNSID)
 			},
 		})
 	}
+}
+
+func TestJoinServerCleanup(t *testing.T) {
+	a, ctx := test.New(t)
+
+	appList := []ttnpb.ApplicationIdentifiers{
+		{ApplicationId: "app-1"},
+		{ApplicationId: "app-2"},
+		{ApplicationId: "app-3"},
+		{ApplicationId: "app-4"},
+	}
+
+	deviceList := []*ttnpb.EndDevice{
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appList[0],
+				DeviceId:               "dev-1",
+				JoinEui:                eui64Ptr(types.EUI64{0x41, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x41, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appList[0],
+				DeviceId:               "dev-2",
+				JoinEui:                eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appList[1],
+				DeviceId:               "dev-3",
+				JoinEui:                eui64Ptr(types.EUI64{0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appList[3],
+				DeviceId:               "dev-4",
+				JoinEui:                eui64Ptr(types.EUI64{0x44, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x44, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appList[3],
+				DeviceId:               "dev-5",
+				JoinEui:                eui64Ptr(types.EUI64{0x45, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x45, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+		{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIdentifiers: appList[3],
+				DeviceId:               "dev-6",
+				JoinEui:                eui64Ptr(types.EUI64{0x46, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:                 eui64Ptr(types.EUI64{0x46, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+			},
+		},
+	}
+
+	deviceRedisClient, devsFlush := test.NewRedis(ctx, "joinserver_test", "devices")
+	defer devsFlush()
+	defer deviceRedisClient.Close()
+	deviceRegistry := &redis.DeviceRegistry{Redis: deviceRedisClient, LockTTL: test.Delay << 10}
+	if err := deviceRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	appAsRedisClient, appAsFlush := test.NewRedis(ctx, "joinserver_test", "application-activation-settings")
+	defer appAsFlush()
+	defer appAsRedisClient.Close()
+	appAsRegistry := &redis.ApplicationActivationSettingRegistry{Redis: appAsRedisClient, LockTTL: test.Delay << 10}
+	if err := appAsRegistry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+
+	for _, dev := range deviceList {
+		ret, err := deviceRegistry.SetByID(ctx, dev.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceId, []string{
+			"ids.application_ids",
+			"ids.dev_eui",
+			"ids.device_id",
+			"ids.join_eui",
+		}, func(stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			return dev, []string{
+				"ids.application_ids",
+				"ids.dev_eui",
+				"ids.device_id",
+				"ids.join_eui",
+			}, nil
+		})
+		if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
+			t.Fatalf("Failed to create device: %s", err)
+		}
+	}
+	for _, app := range appList {
+		ret, err := appAsRegistry.SetByID(ctx, app, []string{"application_server_id"}, func(stored *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
+			return &ttnpb.ApplicationActivationSettings{
+				ApplicationServerId: "test",
+			}, []string{"application_server_id"}, nil
+		})
+		if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
+			t.Fatalf("Failed to create application activation settings entry: %s", err)
+		}
+	}
+	// Mock IS application and device sets
+	isApplicationSet := map[string]struct{}{
+		unique.ID(ctx, appList[2]): {},
+		unique.ID(ctx, appList[3]): {},
+	}
+	isDeviceSet := map[string]struct{}{
+		unique.ID(ctx, deviceList[4].EndDeviceIdentifiers): {},
+		unique.ID(ctx, deviceList[5].EndDeviceIdentifiers): {},
+	}
+	joinServerCleaner := &joinserver.RegistryCleaner{
+		DevRegistry:   deviceRegistry,
+		AppAsRegistry: appAsRegistry,
+	}
+	err := joinServerCleaner.RangeToLocalSet(ctx)
+	a.So(err, should.BeNil)
+	a.So(joinServerCleaner.LocalDeviceSet, should.HaveLength, 6)
+	a.So(joinServerCleaner.LocalApplicationSet, should.HaveLength, 4)
+
+	err = joinServerCleaner.CleanData(ctx, isDeviceSet, isApplicationSet)
+	a.So(err, should.BeNil)
+	joinServerCleaner.RangeToLocalSet(ctx)
+	a.So(joinServerCleaner.LocalApplicationSet, should.HaveLength, 2)
+	a.So(joinServerCleaner.LocalApplicationSet, should.ContainKey, unique.ID(ctx, appList[2]))
+	a.So(joinServerCleaner.LocalApplicationSet, should.ContainKey, unique.ID(ctx, appList[3]))
+
+	a.So(joinServerCleaner.LocalDeviceSet, should.HaveLength, 2)
+	a.So(joinServerCleaner.LocalDeviceSet, should.ContainKey, unique.ID(ctx, deviceList[4].EndDeviceIdentifiers))
+	a.So(joinServerCleaner.LocalDeviceSet, should.ContainKey, unique.ID(ctx, deviceList[5].EndDeviceIdentifiers))
 }

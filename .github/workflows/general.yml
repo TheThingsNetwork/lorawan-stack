@@ -5,7 +5,7 @@ on: pull_request
 jobs:
   quality:
     name: Code Quality
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
     - name: Check out code
       uses: actions/checkout@v2
@@ -53,10 +53,6 @@ jobs:
       # TODO: Fix EditorConfig errors and remove
       # https://github.com/TheThingsNetwork/lorawan-stack/issues/2723
       continue-on-error: true
-    - name: Install JS dependencies
-      if: steps.yarn-cache.outputs.cache-hit != 'true'
-      run: tools/bin/mage js:deps
-      timeout-minutes: 5
     - name: Check headers
       run: tools/bin/mage headers:check
     - name: Fix common spelling mistakes

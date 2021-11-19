@@ -34,15 +34,21 @@ export const createClearEventsActionType = name => `CLEAR_${name}_EVENTS`
 
 export const createSetEventsFilterActionType = name => `SET_${name}_EVENTS_FILTER`
 
-export const startEventsStream = name => id => ({
-  type: createStartEventsStreamActionType(name),
-  id,
-})
+export const startEventsStream =
+  name =>
+  (id, { silent } = {}) => ({
+    type: createStartEventsStreamActionType(name),
+    id,
+    silent: silent !== undefined ? silent : false,
+  })
 
-export const startEventsStreamSuccess = name => id => ({
-  type: createStartEventsStreamSuccessActionType(name),
-  id,
-})
+export const startEventsStreamSuccess =
+  name =>
+  (id, { silent } = {}) => ({
+    type: createStartEventsStreamSuccessActionType(name),
+    id,
+    silent: silent !== undefined ? silent : false,
+  })
 
 export const startEventsStreamFailure = name => (id, error) => ({
   type: createStartEventsStreamFailureActionType(name),
@@ -62,10 +68,13 @@ export const resumeEventsStream = name => id => ({
   id,
 })
 
-export const eventStreamClosed = name => id => ({
-  type: createEventStreamClosedActionType(name),
-  id,
-})
+export const eventStreamClosed =
+  name =>
+  (id, { silent } = {}) => ({
+    type: createEventStreamClosedActionType(name),
+    id,
+    silent: silent !== undefined ? silent : false,
+  })
 
 export const getEventMessageSuccess = name => (id, event) => ({
   type: createGetEventMessageSuccessActionType(name),
@@ -81,8 +90,8 @@ export const getEventMessageFailure = name => (id, error) => ({
 
 export const clearEvents = name => id => ({ type: createClearEventsActionType(name), id })
 
-export const setEventsFilter = name => (id, filter) => ({
+export const setEventsFilter = name => (id, filterId) => ({
   type: createSetEventsFilterActionType(name),
   id,
-  filter,
+  filterId,
 })

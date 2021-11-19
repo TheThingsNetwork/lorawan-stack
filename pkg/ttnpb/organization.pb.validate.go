@@ -71,7 +71,7 @@ func (m *Organization) ValidateFields(paths ...string) error {
 
 		case "created_at":
 
-			if v, ok := interface{}(&m.CreatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCreatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return OrganizationValidationError{
 						field:  "created_at",
@@ -83,7 +83,7 @@ func (m *Organization) ValidateFields(paths ...string) error {
 
 		case "updated_at":
 
-			if v, ok := interface{}(&m.UpdatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetUpdatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return OrganizationValidationError{
 						field:  "updated_at",
@@ -611,7 +611,14 @@ func (m *CreateOrganizationRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "organization":
 
-			if v, ok := interface{}(&m.Organization).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetOrganization() == nil {
+				return CreateOrganizationRequestValidationError{
+					field:  "organization",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetOrganization()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return CreateOrganizationRequestValidationError{
 						field:  "organization",
@@ -724,7 +731,14 @@ func (m *UpdateOrganizationRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "organization":
 
-			if v, ok := interface{}(&m.Organization).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetOrganization() == nil {
+				return UpdateOrganizationRequestValidationError{
+					field:  "organization",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetOrganization()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UpdateOrganizationRequestValidationError{
 						field:  "organization",
@@ -1221,7 +1235,14 @@ func (m *UpdateOrganizationAPIKeyRequest) ValidateFields(paths ...string) error 
 
 		case "api_key":
 
-			if v, ok := interface{}(&m.APIKey).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetApiKey() == nil {
+				return UpdateOrganizationAPIKeyRequestValidationError{
+					field:  "api_key",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApiKey()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UpdateOrganizationAPIKeyRequestValidationError{
 						field:  "api_key",

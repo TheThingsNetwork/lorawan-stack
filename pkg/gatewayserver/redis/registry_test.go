@@ -28,7 +28,7 @@ import (
 var Timeout = 10 * test.Delay
 
 func TestRegistry(t *testing.T) {
-	_, ctx := test.New(t)
+	a, ctx := test.New(t)
 	cl, flush := test.NewRedis(ctx, "redis_test")
 	defer flush()
 	defer cl.Close()
@@ -46,7 +46,11 @@ func TestRegistry(t *testing.T) {
 		Eui:       &types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02},
 	}
 	registry := &GatewayConnectionStatsRegistry{
-		Redis: cl,
+		Redis:   cl,
+		LockTTL: test.Delay << 10,
+	}
+	if err := registry.Init(ctx); !a.So(err, should.BeNil) {
+		t.FailNow()
 	}
 
 	now := time.Now().UTC()

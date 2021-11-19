@@ -47,8 +47,8 @@ func init() {
 		organizationID := population.Organizations[i].GetEntityIdentifiers()
 		ouID := paginationUser.OrganizationOrUserIdentifiers()
 		population.Memberships[organizationID] = append(population.Memberships[organizationID], &ttnpb.Collaborator{
-			OrganizationOrUserIdentifiers: *ouID,
-			Rights:                        []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL, ttnpb.RIGHT_CLIENT_ALL, ttnpb.RIGHT_GATEWAY_ALL, ttnpb.RIGHT_ORGANIZATION_ALL},
+			Ids:    ouID,
+			Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL, ttnpb.RIGHT_CLIENT_ALL, ttnpb.RIGHT_GATEWAY_ALL, ttnpb.RIGHT_ORGANIZATION_ALL},
 		})
 	}
 }
@@ -65,7 +65,7 @@ func TestOrganizationsNestedError(t *testing.T) {
 		reg := ttnpb.NewOrganizationRegistryClient(cc)
 
 		_, err := reg.Create(ctx, &ttnpb.CreateOrganizationRequest{
-			Organization: ttnpb.Organization{
+			Organization: &ttnpb.Organization{
 				Ids: &ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
 			},
 			Collaborator: org.OrganizationOrUserIdentifiers(),
@@ -94,7 +94,7 @@ func TestOrganizationsPermissionDenied(t *testing.T) {
 		reg := ttnpb.NewOrganizationRegistryClient(cc)
 
 		_, err := reg.Create(ctx, &ttnpb.CreateOrganizationRequest{
-			Organization: ttnpb.Organization{
+			Organization: &ttnpb.Organization{
 				Ids: &ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
 			},
 			Collaborator: ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
@@ -132,7 +132,7 @@ func TestOrganizationsPermissionDenied(t *testing.T) {
 		}
 
 		_, err = reg.Update(ctx, &ttnpb.UpdateOrganizationRequest{
-			Organization: ttnpb.Organization{
+			Organization: &ttnpb.Organization{
 				Ids:  &ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
 				Name: "Updated Name",
 			},
@@ -164,7 +164,7 @@ func TestOrganizationsCRUD(t *testing.T) {
 		is.config.UserRights.CreateOrganizations = false
 
 		_, err := reg.Create(ctx, &ttnpb.CreateOrganizationRequest{
-			Organization: ttnpb.Organization{
+			Organization: &ttnpb.Organization{
 				Ids:  &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
 				Name: "Foo Organization",
 			},
@@ -174,7 +174,7 @@ func TestOrganizationsCRUD(t *testing.T) {
 		is.config.UserRights.CreateOrganizations = true
 
 		created, err := reg.Create(ctx, &ttnpb.CreateOrganizationRequest{
-			Organization: ttnpb.Organization{
+			Organization: &ttnpb.Organization{
 				Ids:  &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
 				Name: "Foo Organization",
 			},
@@ -213,7 +213,7 @@ func TestOrganizationsCRUD(t *testing.T) {
 		}
 
 		updated, err := reg.Update(ctx, &ttnpb.UpdateOrganizationRequest{
-			Organization: ttnpb.Organization{
+			Organization: &ttnpb.Organization{
 				Ids:  created.GetIds(),
 				Name: "Updated Name",
 			},

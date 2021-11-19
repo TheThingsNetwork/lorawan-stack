@@ -40,6 +40,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
 	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/lbslns"
+	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	pfconfig "go.thethings.network/lorawan-stack/v3/pkg/pfconfig/lbslns"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/shared"
@@ -800,7 +801,7 @@ func TestTraffic(t *testing.T) {
 					}},
 				},
 				RxMetadata: []*ttnpb.RxMetadata{{
-					GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+					GatewayIds: &ttnpb.GatewayIdentifiers{
 						GatewayId: "eui-0101010101010101",
 						Eui:       &types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
 					},
@@ -864,7 +865,7 @@ func TestTraffic(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GatewayIdentifiers: ttnpb.GatewayIdentifiers{
+						GatewayIds: &ttnpb.GatewayIdentifiers{
 							GatewayId: "eui-0101010101010101",
 							Eui:       &types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
 						},
@@ -885,6 +886,15 @@ func TestTraffic(t *testing.T) {
 						Bandwidth:       125000,
 					}}},
 				},
+			},
+		},
+		{
+			Name: "TimeSyncRequest",
+			InputBSUpstream: lbslns.TimeSyncRequest{
+				TxTime: 123.456,
+			},
+			ExpectedBSDownstream: lbslns.TimeSyncResponse{
+				TxTime: 123.456,
 			},
 		},
 		{
@@ -918,10 +928,11 @@ func TestTraffic(t *testing.T) {
 			InputDownlinkPath: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
+						&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &registeredGatewayID},
 						1553759666,
 						1553759666000,
 						time.Unix(0, 1553759666*1000),
+						nil,
 					),
 				},
 			},
@@ -1048,6 +1059,47 @@ func TestTraffic(t *testing.T) {
 						a.So(up.UplinkMessage, should.Resemble, &expectedUp)
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")
+					}
+
+				case lbslns.TimeSyncRequest:
+					req, err := json.Marshal(v)
+					if err != nil {
+						panic(err)
+					}
+					if err := wsConn.WriteMessage(websocket.TextMessage, req); err != nil {
+						t.Fatalf("Failed to write message: %v", err)
+					}
+
+					var readErr error
+					var wg sync.WaitGroup
+					resCh := make(chan []byte, 1)
+					wg.Add(1)
+					go func() {
+						defer wg.Done()
+						_, data, err := wsConn.ReadMessage()
+						if err != nil {
+							readErr = err
+							return
+						}
+						resCh <- data
+					}()
+					select {
+					case res := <-resCh:
+						expected := tc.ExpectedBSDownstream.(lbslns.TimeSyncResponse)
+						var msg lbslns.TimeSyncResponse
+						if err := json.Unmarshal(res, &msg); err != nil {
+							t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
+						}
+
+						now := time.Now().UTC()
+						a.So(msg.TxTime, should.Equal, expected.TxTime)
+						a.So(gpstime.Parse(time.Duration(msg.GPSTime)*time.Microsecond), should.HappenBetween, now.Add(-time.Second), now.Add(time.Second))
+					case <-time.After(timeout):
+						t.Fatalf("Read message timeout")
+					}
+					wg.Wait()
+					if readErr != nil {
+						t.Fatalf("Failed to read message: %v", readErr)
 					}
 				}
 			}
@@ -1194,7 +1246,7 @@ func TestRTT(t *testing.T) {
 					},
 				},
 			},
-			ExpectedRTTStatsCount: 0,
+			ExpectedRTTStatsCount: 1,
 		},
 		{
 			Name: "Downlink",
@@ -1227,10 +1279,11 @@ func TestRTT(t *testing.T) {
 			InputDownlinkPath: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						ttnpb.GatewayAntennaIdentifiers{GatewayIdentifiers: registeredGatewayID},
+						&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &registeredGatewayID},
 						1553759666,
 						1553759666000,
 						time.Unix(0, 1553759666*1000),
+						nil,
 					),
 				},
 			},
@@ -1241,7 +1294,6 @@ func TestRTT(t *testing.T) {
 				Diid:  1,
 				XTime: 1548059982,
 			},
-			ExpectedRTTStatsCount: 1,
 		},
 		{
 			Name: "RepeatedTxAck",
@@ -1249,7 +1301,6 @@ func TestRTT(t *testing.T) {
 				Diid:  1,
 				XTime: 1548059982,
 			},
-			ExpectedRTTStatsCount: 2,
 		},
 		{
 			Name: "UplinkFrame",
@@ -1273,7 +1324,7 @@ func TestRTT(t *testing.T) {
 					},
 				},
 			},
-			ExpectedRTTStatsCount: 2,
+			ExpectedRTTStatsCount: 1,
 		},
 		{
 			Name: "TxAckWithSmallClockDrift",
@@ -1281,7 +1332,7 @@ func TestRTT(t *testing.T) {
 				Diid:  1,
 				XTime: 1548059982,
 			},
-			ExpectedRTTStatsCount: 3,
+			ExpectedRTTStatsCount: 1,
 		},
 		{
 			Name: "TxAckWithClockDriftAboveThreshold",
@@ -1289,7 +1340,7 @@ func TestRTT(t *testing.T) {
 				Diid:  1,
 				XTime: 1548059982,
 			},
-			ExpectedRTTStatsCount: 3,
+			ExpectedRTTStatsCount: 1,
 			GatewayClockDrift:     (1 << 5 * test.Delay),
 		},
 	} {
@@ -1298,9 +1349,7 @@ func TestRTT(t *testing.T) {
 			if tc.InputBSUpstream != nil {
 				switch v := tc.InputBSUpstream.(type) {
 				case lbslns.TxConfirmation:
-					if testTime.Mux != nil {
-						v.RefTime = testTime.getRefTime(tc.GatewayClockDrift)
-					}
+					// TxAck does not contain a RefTime.
 					req, err := json.Marshal(v)
 					if err != nil {
 						panic(err)
@@ -1371,15 +1420,17 @@ func TestRTT(t *testing.T) {
 					if !a.So(count, should.Equal, tc.ExpectedRTTStatsCount) {
 						t.Fatalf("Incorrect Stats entries recorded: %d", count)
 					}
-					if !a.So(min, should.BeGreaterThan, 0) {
-						t.Fatalf("Incorrect min: %s", min)
-					}
-					if tc.ExpectedRTTStatsCount > 1 {
-						if !a.So(max, should.BeGreaterThan, min) {
-							t.Fatalf("Incorrect max: %s", max)
+					if count > 0 {
+						if !a.So(min, should.BeGreaterThan, 0) {
+							t.Fatalf("Incorrect min: %s", min)
 						}
-						if !a.So(median, should.BeBetween, min, max) {
-							t.Fatalf("Incorrect median: %s", median)
+						if tc.ExpectedRTTStatsCount > 1 {
+							if !a.So(max, should.BeGreaterThan, min) {
+								t.Fatalf("Incorrect max: %s", max)
+							}
+							if !a.So(median, should.BeBetween, min, max) {
+								t.Fatalf("Incorrect median: %s", median)
+							}
 						}
 					}
 				}

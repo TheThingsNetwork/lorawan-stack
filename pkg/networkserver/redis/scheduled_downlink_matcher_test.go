@@ -56,7 +56,14 @@ func TestScheduledDownlinkMatcher(t *testing.T) {
 		DownlinkMessage: &ttnpb.DownlinkMessage{
 			Settings: &ttnpb.DownlinkMessage_Scheduled{
 				Scheduled: &ttnpb.TxSettings{
-					DataRateIndex: ttnpb.DATA_RATE_0,
+					DataRate: ttnpb.DataRate{
+						Modulation: &ttnpb.DataRate_Lora{
+							Lora: &ttnpb.LoRaDataRate{
+								SpreadingFactor: 7,
+								Bandwidth:       125000,
+							},
+						},
+					},
 				},
 			},
 			CorrelationIds: []string{"corr1", "corr2", "ns:downlink:CORRELATIONID"},
