@@ -91,11 +91,14 @@ func TestFlow(t *testing.T) {
 		frontend.Up <- &ttnpb.UplinkMessage{
 			RxMetadata: []*ttnpb.RxMetadata{
 				{
+					GatewayIds: &ttnpb.GatewayIdentifiers{
+						GatewayId: "test-gateway",
+					},
 					AntennaIndex: 0,
 					Timestamp:    100,
 				},
 			},
-			Settings: &ttnpb.TxSettings{},
+			Settings: &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 		}
 		select {
 		case up := <-conn.Up():
@@ -115,8 +118,12 @@ func TestFlow(t *testing.T) {
 		assertStatsIncludePaths(a, conn, []string{"last_uplink_received_at", "uplink_count"})
 	}
 
+	now := time.Now().UTC()
+
 	{
-		frontend.Status <- &ttnpb.GatewayStatus{}
+		frontend.Status <- &ttnpb.GatewayStatus{
+			Time: &now,
+		}
 		select {
 		case <-conn.Status():
 		case <-time.After(timeout):
@@ -557,11 +564,14 @@ func TestSubBandEIRPOverride(t *testing.T) {
 		frontend.Up <- &ttnpb.UplinkMessage{
 			RxMetadata: []*ttnpb.RxMetadata{
 				{
+					GatewayIds: &ttnpb.GatewayIdentifiers{
+						GatewayId: "test-gateway",
+					},
 					AntennaIndex: 0,
 					Timestamp:    100,
 				},
 			},
-			Settings: &ttnpb.TxSettings{},
+			Settings: &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 		}
 		select {
 		case up := <-conn.Up():

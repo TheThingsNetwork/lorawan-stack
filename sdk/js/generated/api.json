@@ -17832,7 +17832,7 @@
                   },
                   {
                     "name": "map.values.string.max_len",
-                    "value": 32
+                    "value": 128
                   }
                 ]
               }

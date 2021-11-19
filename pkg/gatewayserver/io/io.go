@@ -211,7 +211,15 @@ type FrontendClockSynchronization struct {
 }
 
 // HandleUp updates the uplink stats and sends the message to the upstream channel.
-func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClockSynchronization) error {
+func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClockSynchronization) (err error) {
+	defer func() {
+		if err != nil {
+			registerDropMessage(c.ctx, c.gateway, "uplink", err)
+		}
+	}()
+	if err := up.ValidateFields(); err != nil {
+		return err
+	}
 	if c.discardRepeatedUplink(up) {
 		return nil
 	}
@@ -284,15 +292,22 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 		atomic.StoreInt64(&c.lastUplinkTime, up.ReceivedAt.UnixNano())
 		c.notifyStatsChanged()
 	default:
-		err := errBufferFull.New()
-		registerDropMessage(c.ctx, c.gateway, "uplink", err)
-		return err
+		return errBufferFull.New()
 	}
 	return nil
 }
 
 // HandleStatus updates the status stats and sends the status to the status channel.
-func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) error {
+func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) (err error) {
+	defer func() {
+		if err != nil {
+			registerDropMessage(c.ctx, c.gateway, "status", err)
+		}
+	}()
+
+	if err := status.ValidateFields(); err != nil {
+		return err
+	}
 	select {
 	case <-c.ctx.Done():
 		return c.ctx.Err()
@@ -308,24 +323,28 @@ func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) error {
 			}
 		}
 	default:
-		err := errBufferFull.New()
-		registerDropMessage(c.ctx, c.gateway, "status", err)
-		return err
+		return errBufferFull.New()
 	}
 	return nil
 }
 
 // HandleTxAck sends the acknowledgment to the status channel.
-func (c *Connection) HandleTxAck(ack *ttnpb.TxAcknowledgment) error {
+func (c *Connection) HandleTxAck(ack *ttnpb.TxAcknowledgment) (err error) {
+	defer func() {
+		if err != nil {
+			registerDropMessage(c.ctx, c.gateway, "txack", err)
+		}
+	}()
+	if err := ack.ValidateFields(); err != nil {
+		return err
+	}
 	select {
 	case <-c.ctx.Done():
 		return c.ctx.Err()
 	case c.txAckCh <- ack:
 		c.notifyStatsChanged()
 	default:
-		err := errBufferFull.New()
-		registerDropMessage(c.ctx, c.gateway, "txack", err)
-		return err
+		return errBufferFull.New()
 	}
 	return nil
 }

@@ -918,6 +918,9 @@ func TestTraffic(t *testing.T) {
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId: "testdevice",
 					DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationId: "testapp",
+					},
 				},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
@@ -975,6 +978,9 @@ func TestTraffic(t *testing.T) {
 					EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 						DeviceId: "testdevice",
 						DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationId: "testapp",
+						},
 					},
 					Settings: &ttnpb.DownlinkMessage_Scheduled{
 						Scheduled: &ttnpb.TxSettings{
@@ -999,6 +1005,9 @@ func TestTraffic(t *testing.T) {
 					EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 						DeviceId: "testdevice",
 						DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationId: "testapp",
+						},
 					},
 					Settings: &ttnpb.DownlinkMessage_Scheduled{
 						Scheduled: &ttnpb.TxSettings{
@@ -1272,6 +1281,9 @@ func TestRTT(t *testing.T) {
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId: "testdevice",
 					DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationId: "testapp",
+					},
 				},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{

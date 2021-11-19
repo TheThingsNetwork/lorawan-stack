@@ -689,9 +689,13 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 	gtw := host.gtw
 	switch msg := item.(type) {
 	case *ttnpb.GatewayUplinkMessage:
-		up := msg.UplinkMessage
-		up.CorrelationIds = append(make([]string, 0, len(up.CorrelationIds)+1), up.CorrelationIds...)
-		up.CorrelationIds = append(up.CorrelationIds, host.correlationID)
+		up := *msg.UplinkMessage
+		msg = &ttnpb.GatewayUplinkMessage{
+			BandId:        msg.BandId,
+			UplinkMessage: &up,
+		}
+		msg.UplinkMessage.CorrelationIds = append(make([]string, 0, len(msg.UplinkMessage.CorrelationIds)+1), msg.UplinkMessage.CorrelationIds...)
+		msg.UplinkMessage.CorrelationIds = append(msg.UplinkMessage.CorrelationIds, host.correlationID)
 		drop := func(ids *ttnpb.EndDeviceIdentifiers, err error) {
 			logger := logger.WithError(err)
 			if ids.JoinEui != nil {
@@ -707,10 +711,6 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 			registerDropUplink(ctx, gtw, msg, host.name, err)
 		}
 		ids := up.Payload.EndDeviceIdentifiers()
-		msg = &ttnpb.GatewayUplinkMessage{
-			BandId:        msg.BandId,
-			UplinkMessage: up,
-		}
 		var pass bool
 		switch {
 		case ids.DevAddr != nil:

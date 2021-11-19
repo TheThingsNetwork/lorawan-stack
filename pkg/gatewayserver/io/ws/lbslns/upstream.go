@@ -482,7 +482,8 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 func (conf TxConfirmation) ToTxAck(ctx context.Context, tokens io.DownlinkTokens, receivedAt time.Time) *ttnpb.TxAcknowledgment {
 	var txAck ttnpb.TxAcknowledgment
 	if msg, _, ok := tokens.Get(uint16(conf.Diid), receivedAt); ok && msg != nil {
-		txAck.DownlinkMessage = msg
+		downMsg := *msg
+		txAck.DownlinkMessage = &downMsg
 		txAck.CorrelationIds = msg.CorrelationIds
 		txAck.Result = ttnpb.TxAcknowledgment_SUCCESS
 	} else {

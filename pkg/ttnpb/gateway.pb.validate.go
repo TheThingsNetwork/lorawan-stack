@@ -2733,10 +2733,10 @@ func (m *GatewayStatus) ValidateFields(paths ...string) error {
 					}
 				}
 
-				if utf8.RuneCountInString(val) > 32 {
+				if utf8.RuneCountInString(val) > 128 {
 					return GatewayStatusValidationError{
 						field:  fmt.Sprintf("versions[%v]", key),
-						reason: "value length must be at most 32 runes",
+						reason: "value length must be at most 128 runes",
 					}
 				}
 

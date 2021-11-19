@@ -180,6 +180,8 @@ func TestTraffic(t *testing.T) {
 	}
 	defer client.Disconnect(100)
 
+	now := time.Now().UTC()
+
 	t.Run("Upstream", func(t *testing.T) {
 		for _, tc := range []struct {
 			Topic   string
@@ -190,7 +192,7 @@ func TestTraffic(t *testing.T) {
 				Topic: fmt.Sprintf("v3/%v/up", registeredGatewayUID),
 				Message: &ttnpb.UplinkMessage{
 					RawPayload: []byte{0x01},
-					Settings:   &ttnpb.TxSettings{},
+					Settings:   &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 				},
 				OK: true,
 			},
@@ -218,7 +220,8 @@ func TestTraffic(t *testing.T) {
 			{
 				Topic: fmt.Sprintf("v3/%v/status", registeredGatewayUID),
 				Message: &ttnpb.GatewayStatus{
-					Ip: []string{"1.1.1.1"},
+					Time: &now,
+					Ip:   []string{"1.1.1.1"},
 				},
 				OK: true,
 			},
