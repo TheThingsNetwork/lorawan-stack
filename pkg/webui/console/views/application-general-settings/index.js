@@ -130,7 +130,7 @@ const validationSchema = Yup.object().shape({
       sharedMessages.attributeValueValidateTooLong,
       attributeValueTooLongCheck,
     ),
-    skip_payload_crypto: Yup.boolean(),
+  skip_payload_crypto: Yup.boolean(),
 })
 
 @connect(

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import { defineMessages } from 'react-intl'
 
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
