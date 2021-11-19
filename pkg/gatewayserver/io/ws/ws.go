@@ -142,11 +142,13 @@ var euiHexPattern = regexp.MustCompile("^eui-([a-f0-9A-F]{16})$")
 func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) {
 	const noPongReceived int64 = -1
 	var (
-		id          = mux.Vars(r)["id"]
-		auth        = r.Header.Get("Authorization")
-		ctx         = r.Context()
-		eps         = s.formatter.Endpoints()
-		missedPongs = noPongReceived
+		id           = mux.Vars(r)["id"]
+		auth         = r.Header.Get("Authorization")
+		ctx          = r.Context()
+		eps          = s.formatter.Endpoints()
+		missedPongs  = noPongReceived
+		pongCh       = make(chan struct{}, 1)
+		downstreamCh = make(chan []byte, 1)
 	)
 
 	ctx = log.NewContextWithFields(ctx, log.Fields(
@@ -231,18 +233,15 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 		return err
 	}
 	defer ws.Close()
-	wsWriteMu := &sync.Mutex{}
-
 	pingTicker := time.NewTicker(random.Jitter(s.cfg.WSPingInterval, 0.1))
 	defer pingTicker.Stop()
 
 	ws.SetPingHandler(func(data string) error {
 		logger.Debug("Received ping from gateway, send pong")
-		wsWriteMu.Lock()
-		defer wsWriteMu.Unlock()
-		if err := ws.WriteMessage(websocket.PongMessage, nil); err != nil {
-			logger.WithError(err).Warn("Failed to send pong")
-			return err
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case pongCh <- struct{}{}:
 		}
 		return nil
 	})
@@ -273,10 +272,7 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 			case <-conn.Context().Done():
 				return
 			case <-pingTicker.C:
-				wsWriteMu.Lock()
-				err := ws.WriteMessage(websocket.PingMessage, nil)
-				wsWriteMu.Unlock()
-				if err != nil {
+				if err := ws.WriteMessage(websocket.PingMessage, nil); err != nil {
 					logger.WithError(err).Warn("Failed to send ping message")
 					return err
 				}
@@ -286,6 +282,11 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 				if atomic.AddInt64(&missedPongs, 1) == int64(s.cfg.MissedPongThreshold) {
 					err := errMissedTooManyPongs.New()
 					logger.WithError(err).Warn("Disconnect gateway")
+					return err
+				}
+			case <-pongCh:
+				if err := ws.WriteMessage(websocket.PongMessage, nil); err != nil {
+					logger.WithError(err).Warn("Failed to send pong")
 					return err
 				}
 			case <-timeSyncTickerC:
@@ -299,11 +300,7 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 				if b == nil {
 					continue
 				}
-
-				wsWriteMu.Lock()
-				err = ws.WriteMessage(websocket.TextMessage, b)
-				wsWriteMu.Unlock()
-				if err != nil {
+				if err := ws.WriteMessage(websocket.TextMessage, b); err != nil {
 					logger.WithError(err).Warn("Failed to transfer time")
 					return err
 				}
@@ -318,12 +315,13 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 					logger.WithError(err).Warn("Failed to marshal downlink message")
 					continue
 				}
-
-				wsWriteMu.Lock()
-				err = ws.WriteMessage(websocket.TextMessage, dnmsg)
-				wsWriteMu.Unlock()
-				if err != nil {
+				if err = ws.WriteMessage(websocket.TextMessage, dnmsg); err != nil {
 					logger.WithError(err).Warn("Failed to send downlink message")
+					return err
+				}
+			case downstream := <-downstreamCh:
+				if err := ws.WriteMessage(websocket.TextMessage, downstream); err != nil {
+					logger.WithError(err).Warn("Failed to send message downstream")
 					return err
 				}
 			}
@@ -345,15 +343,14 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 		if err != nil {
 			return err
 		}
-		if downstream != nil {
-			logger.Info("Send downstream message")
-			wsWriteMu.Lock()
-			err = ws.WriteMessage(websocket.TextMessage, downstream)
-			wsWriteMu.Unlock()
-			if err != nil {
-				logger.WithError(err).Warn("Failed to send message downstream")
-				return err
-			}
+		if downstream == nil {
+			continue
+		}
+		logger.Info("Send downstream message")
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case downstreamCh <- downstream:
 		}
 	}
 }
