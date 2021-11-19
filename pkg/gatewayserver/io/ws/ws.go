@@ -22,6 +22,7 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -139,15 +140,13 @@ func (s *srv) handleConnectionInfo(w http.ResponseWriter, r *http.Request) {
 var euiHexPattern = regexp.MustCompile("^eui-([a-f0-9A-F]{16})$")
 
 func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) {
+	const noPongReceived int64 = -1
 	var (
-		id                 = mux.Vars(r)["id"]
-		auth               = r.Header.Get("Authorization")
-		ctx                = r.Context()
-		eps                = s.formatter.Endpoints()
-		gatewayCanSendPong bool
-		missedPongs        int
-		// Ping-pong is expected to be sychronous. However, it's theoretically possible for a pong to arrive when we're about to send a ping.
-		missedPongsMu sync.RWMutex
+		id          = mux.Vars(r)["id"]
+		auth        = r.Header.Get("Authorization")
+		ctx         = r.Context()
+		eps         = s.formatter.Endpoints()
+		missedPongs = noPongReceived
 	)
 
 	ctx = log.NewContextWithFields(ctx, log.Fields(
@@ -250,10 +249,7 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 
 	// Not all gateways support pongs to the server's pings.
 	ws.SetPongHandler(func(data string) error {
-		gatewayCanSendPong = true
-		missedPongsMu.Lock()
-		missedPongs = 0
-		missedPongsMu.Unlock()
+		atomic.StoreInt64(&missedPongs, 0)
 		logger.Debug("Received pong from gateway")
 		return nil
 	})
@@ -284,13 +280,10 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 					logger.WithError(err).Warn("Failed to send ping message")
 					return err
 				}
-				if !gatewayCanSendPong {
+				if atomic.LoadInt64(&missedPongs) == noPongReceived {
 					continue
 				}
-				missedPongsMu.Lock()
-				missedPongs++
-				missedPongsMu.Unlock()
-				if missedPongs == s.cfg.MissedPongThreshold {
+				if atomic.AddInt64(&missedPongs, 1) == int64(s.cfg.MissedPongThreshold) {
 					err := errMissedTooManyPongs.New()
 					logger.WithError(err).Warn("Disconnect gateway")
 					return err

@@ -1671,7 +1671,7 @@ func TestPingPong(t *testing.T) {
 				t.Fatal("Test time out")
 			case err := <-errCh:
 				if !tc.DisablePongs && tc.NoOfPongs == 1 {
-					if websocket.IsUnexpectedCloseError(err) {
+					if websocket.IsUnexpectedCloseError(err) || websocket.IsCloseError(err) {
 						// This is the error for WebSocket disconnection.
 						break
 					}
