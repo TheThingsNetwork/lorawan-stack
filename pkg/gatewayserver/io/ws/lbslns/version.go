@@ -78,6 +78,13 @@ func (f *lbsLNS) GetRouterConfig(ctx context.Context, msg []byte, bandID string,
 	if err != nil {
 		return nil, nil, nil, err
 	}
+	// The v2 concentrator design considers the FSK channel bandwidth to be an invalid value.
+	// As such, we remove it.
+	for _, sx1301 := range cfg.SX1301Config {
+		if ch := sx1301.FSKChannel; ch != nil {
+			ch.Bandwidth = 0
+		}
+	}
 	routerCfg, err := cfg.MarshalJSON()
 	if err != nil {
 		return nil, nil, nil, err
