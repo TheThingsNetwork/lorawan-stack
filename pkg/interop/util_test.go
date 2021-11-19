@@ -20,9 +20,9 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 
 	"github.com/gorilla/mux"
@@ -34,19 +34,19 @@ import (
 
 var (
 	RootCAPath = filepath.Join("testdata", "rootCA.pem")
-	RootCA     = test.Must(ioutil.ReadFile(RootCAPath)).([]byte)
+	RootCA     = test.Must(os.ReadFile(RootCAPath)).([]byte)
 
 	ClientCertPath = filepath.Join("testdata", "clientcert.pem")
-	ClientCert     = test.Must(ioutil.ReadFile(ClientCertPath)).([]byte)
+	ClientCert     = test.Must(os.ReadFile(ClientCertPath)).([]byte)
 
 	ClientKeyPath = filepath.Join("testdata", "clientkey.pem")
-	ClientKey     = test.Must(ioutil.ReadFile(ClientKeyPath)).([]byte)
+	ClientKey     = test.Must(os.ReadFile(ClientKeyPath)).([]byte)
 
 	ServerCertPath = filepath.Join("testdata", "servercert.pem")
-	ServerCert     = test.Must(ioutil.ReadFile(ServerCertPath)).([]byte)
+	ServerCert     = test.Must(os.ReadFile(ServerCertPath)).([]byte)
 
 	ServerKeyPath = filepath.Join("testdata", "serverkey.pem")
-	ServerKey     = test.Must(ioutil.ReadFile(ServerKeyPath)).([]byte)
+	ServerKey     = test.Must(os.ReadFile(ServerKeyPath)).([]byte)
 )
 
 func makeCertPool() *x509.CertPool {

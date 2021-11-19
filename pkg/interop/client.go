@@ -22,7 +22,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"path/filepath"
 	"sort"
@@ -128,7 +127,7 @@ func httpExchange(ctx context.Context, httpReq *http.Request, res interface{}, d
 	logger = logger.WithField("http_code", httpRes.StatusCode)
 	logger.Debug("Receive interop HTTP response")
 
-	b, err := ioutil.ReadAll(httpRes.Body)
+	b, err := io.ReadAll(httpRes.Body)
 	if err != nil {
 		if err == io.EOF && res == nil {
 			return nil

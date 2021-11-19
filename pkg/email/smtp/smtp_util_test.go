@@ -16,7 +16,6 @@ package smtp
 
 import (
 	"io"
-	"io/ioutil"
 
 	"github.com/emersion/go-smtp"
 )
@@ -65,7 +64,7 @@ func (s *session) Rcpt(to string) error {
 }
 
 func (s *session) Data(r io.Reader) error {
-	b, err := ioutil.ReadAll(r)
+	b, err := io.ReadAll(r)
 	if err != nil {
 		return err
 	}

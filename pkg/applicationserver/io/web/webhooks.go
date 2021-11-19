@@ -18,13 +18,11 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	stdio "io"
 	"net/http"
 	"net/url"
 	"strings"
 	"sync"
-
-	stdio "io"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/mux"
@@ -387,7 +385,7 @@ func (w *webhooks) handleDown(op func(io.Server, context.Context, ttnpb.EndDevic
 			webhandlers.Error(res, req, errFormatNotFound.WithAttributes("format", hook.Format))
 			return
 		}
-		body, err := ioutil.ReadAll(req.Body)
+		body, err := stdio.ReadAll(req.Body)
 		if err != nil {
 			webhandlers.Error(res, req, errReadBody.WithCause(err))
 			return

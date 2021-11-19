@@ -18,7 +18,7 @@ package main
 
 import (
 	"flag"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 
@@ -74,7 +74,7 @@ func main() {
 		}
 		return
 	}
-	b, err := ioutil.ReadAll(os.Stdin)
+	b, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		log.Fatalf("Failed to read from stdin: %v", err)
 	}

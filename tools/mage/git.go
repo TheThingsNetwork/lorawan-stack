@@ -18,7 +18,6 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -36,7 +35,7 @@ func (Git) installHook(name string) (err error) {
 	if mg.Verbose() {
 		fmt.Printf("Installing %s hook\n", name)
 	}
-	return ioutil.WriteFile(
+	return os.WriteFile(
 		filepath.Join(".git", "hooks", name),
 		[]byte(fmt.Sprintf(
 			`STDIN="$(cat /dev/stdin)" ARGS="$@" make git.%s`,

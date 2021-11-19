@@ -17,7 +17,6 @@ package commands
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"strings"
@@ -273,7 +272,7 @@ func getDataBytes(name string, flagSet *pflag.FlagSet) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return ioutil.ReadAll(r)
+	return io.ReadAll(r)
 }
 
 func getDataReader(name string, flagSet *pflag.FlagSet) (io.Reader, error) {

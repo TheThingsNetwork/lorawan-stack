@@ -15,7 +15,6 @@
 package fetch
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"time"
@@ -38,7 +37,7 @@ func (f fsFetcher) File(pathElements ...string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	content, err := ioutil.ReadFile(rp)
+	content, err := os.ReadFile(rp)
 	if err == nil {
 		f.observeLatency(time.Since(start))
 		return content, nil
