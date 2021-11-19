@@ -231,7 +231,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 			return
 		}
 		up.ReceivedAt = pkt.Received
-		if err := c.io.HandleUp(up); err != nil {
+		if err := c.io.HandleUp(up, nil); err != nil {
 			logger.WithError(err).Warn("Failed to handle uplink message")
 		}
 	case c.format.IsStatusTopic(pkt.TopicParts):

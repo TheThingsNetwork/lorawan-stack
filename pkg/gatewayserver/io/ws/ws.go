@@ -270,7 +270,9 @@ func (s *srv) handleTraffic(c echo.Context) (err error) {
 					return
 				}
 			case <-timeSyncTickerC:
-				b, err := s.formatter.TransferTime(ctx, time.Now(), conn)
+				// TODO: Use GPS timestamp from a overlapping frames.
+				// https://github.com/TheThingsNetwork/lorawan-stack/issues/4852
+				b, err := s.formatter.TransferTime(ctx, time.Now(), nil, nil)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to generate time transfer")
 					conn.Disconnect(err)
