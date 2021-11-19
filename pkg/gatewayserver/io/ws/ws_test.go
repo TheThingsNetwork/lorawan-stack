@@ -1567,6 +1567,101 @@ func TestPingPong(t *testing.T) {
 	case <-time.After(timeout):
 		t.Fatalf("Server pong timeout")
 	}
+	conn.Close() // The test below start a new connection per test. So this can be closed.
+
+	// Test disconnection via ping pong
+	for _, tc := range []struct {
+		Name         string
+		DisablePongs bool
+		NoOfPongs    int
+	}{
+		{
+			Name: "Regular ping-pong",
+		},
+		{
+			Name:         "Disable pong",
+			DisablePongs: true,
+		},
+		{
+			Name:      "Stop responding after one pong",
+			NoOfPongs: 1,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), Config{
+				WSPingInterval:       (1 << 2) * test.Delay,
+				AllowUnauthenticated: true,
+				UseTrafficTLSAddress: false,
+				MissedPongThreshold:  2,
+			})
+			lis, err := net.Listen("tcp", serverAddress)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+			defer lis.Close()
+			go func() error {
+				return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					bsWebServer.ServeHTTP(w, r)
+				}))
+			}()
+			servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
+			conn, _, err := websocket.DefaultDialer.Dial(servAddr+testTrafficEndPoint, nil)
+			if !a.So(err, should.BeNil) {
+				t.Fatalf("Connection failed: %v", err)
+			}
+			defer conn.Close()
+
+			handler := NewPingPongHandler(conn, tc.DisablePongs, tc.NoOfPongs)
+
+			errCh := make(chan error)
+
+			// Trigger server downstream.
+			go func() {
+				for {
+					select {
+					case <-ctx.Done():
+						return
+					default:
+						//  The ping/pong handlers are called only after ws.ReadMessage() receives a ping/pong message. The data read here is irrelevant.
+						_, _, err := conn.ReadMessage()
+						if err != nil {
+							errCh <- err
+							return
+						}
+					}
+				}
+			}()
+
+			conn.SetPingHandler(handler.HandlePing)
+
+			// Wait for connection to setup
+			time.After(1 << 7 * test.Delay)
+
+			select {
+			case <-ctx.Done():
+				t.Fatal(ctx.Err())
+			case <-time.After(timeout):
+				if tc.DisablePongs || tc.NoOfPongs == 0 {
+					// The timeout here is valid.
+					// If tc.DisablePongs is true, client and server do ping pong forever.
+					// If tc.NoOfPongs == 0, the server sends pings forever without checking pong.
+					break
+				}
+				t.Fatal("Test time out")
+			case err := <-errCh:
+				if !tc.DisablePongs && tc.NoOfPongs == 1 {
+					if websocket.IsUnexpectedCloseError(err) {
+						// This is the error for WebSocket disconnection.
+						break
+					}
+				}
+				t.Fatalf("Unexpected error :%v", err)
+			case err := <-handler.ErrCh():
+				t.Fatal(err)
+				break
+			}
+		})
+	}
 }
 
 func TestRateLimit(t *testing.T) {

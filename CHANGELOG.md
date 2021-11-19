@@ -16,6 +16,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Gateway server disconnects LoRa Basics Station gateways that stop sending pongs to server pings. This does not apply to gateways that don't support pongs.
+
 ### Deprecated
 
 ### Removed
