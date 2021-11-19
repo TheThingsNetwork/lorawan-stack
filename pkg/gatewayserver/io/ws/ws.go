@@ -118,7 +118,7 @@ func (s *srv) handleConnectionInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	scheme := "ws"
-	if s.cfg.UseTrafficTLSAddress {
+	if r.TLS != nil || s.cfg.UseTrafficTLSAddress {
 		scheme = "wss"
 	}
 
