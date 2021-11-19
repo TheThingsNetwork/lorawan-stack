@@ -78,8 +78,8 @@ func (f *lbsLNS) GetRouterConfig(ctx context.Context, msg []byte, bandID string,
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	// The v2 concentrator design considers the FSK channel bandwidth to be an invalid value.
-	// As such, we remove it.
+	// The SX1301 configuration object should not specify a bandwidth field for the FSK channel.
+	// See https://doc.sm.tc/station/tcproto.html#router-config-message under the SX1301CONF section.
 	for _, sx1301 := range cfg.SX1301Config {
 		if ch := sx1301.FSKChannel; ch != nil {
 			ch.Bandwidth = 0

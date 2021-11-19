@@ -213,9 +213,11 @@ type RouterConfig struct {
 	SX1301Config   []LBSSX1301Config `json:"sx1301_conf"`
 
 	// These are debug options to be unset in production gateways.
-	NoCCA       bool `json:"nocca"`
-	NoDutyCycle bool `json:"nodc"`
-	NoDwellTime bool `json:"nodwell"`
+	// The values are ignored for production gateways, as they produce warnings.
+	// https://github.com/lorabasics/basicstation/blob/bd17e53ab1137de6abb5ae48d6f3d52f6c268299/src-linux/sys_linux.c#L728
+	NoCCA       bool `json:"nocca,omitempty"`
+	NoDutyCycle bool `json:"nodc,omitempty"`
+	NoDwellTime bool `json:"nodwell,omitempty"`
 
 	MuxTime float64 `json:"MuxTime"`
 }
