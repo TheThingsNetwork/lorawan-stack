@@ -201,9 +201,9 @@ var errBufferFull = errors.DefineInternal("buffer_full", "buffer is full")
 // Interval between emitting consecutive gs.up.repeat events for the same gateway connection.
 const consecutiveRepeatUpEventsInterval = time.Minute
 
-// ManualClockSynchronization contains the clock synchronization
+// FrontendClockSynchronization contains the clock synchronization
 // timestamps provided by a frontend for manual synchronization.
-type ManualClockSynchronization struct {
+type FrontendClockSynchronization struct {
 	Timestamp        uint32
 	ServerTime       time.Time
 	GatewayTime      *time.Time
@@ -211,20 +211,20 @@ type ManualClockSynchronization struct {
 }
 
 // HandleUp updates the uplink stats and sends the message to the upstream channel.
-func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, manualSync *ManualClockSynchronization) error {
+func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClockSynchronization) error {
 	if c.discardRepeatedUplink(up) {
 		return nil
 	}
 
 	var ct scheduling.ConcentratorTime
 	switch {
-	case manualSync != nil:
-		ct = c.scheduler.SyncWithGatewayConcentrator(manualSync.Timestamp, manualSync.ServerTime, manualSync.GatewayTime, manualSync.ConcentratorTime)
+	case frontendSync != nil:
+		ct = c.scheduler.SyncWithGatewayConcentrator(frontendSync.Timestamp, frontendSync.ServerTime, frontendSync.GatewayTime, frontendSync.ConcentratorTime)
 		log.FromContext(c.ctx).WithFields(log.Fields(
-			"timestamp", manualSync.Timestamp,
-			"concentrator_time", manualSync.ConcentratorTime,
-			"server_time", manualSync.ServerTime,
-			"gateway_time", manualSync.GatewayTime,
+			"timestamp", frontendSync.Timestamp,
+			"concentrator_time", frontendSync.ConcentratorTime,
+			"server_time", frontendSync.ServerTime,
+			"gateway_time", frontendSync.GatewayTime,
 		)).Info("Gateway clocks have been synchronized by the frontend")
 	case up.Settings.Time != nil:
 		ct = c.scheduler.SyncWithGatewayAbsolute(up.Settings.Timestamp, up.ReceivedAt, *up.Settings.Time)

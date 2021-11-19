@@ -520,18 +520,18 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			conn.RecordRTT(delta, receivedAt)
 		}
 	}
-	syncClock := func(xTime int64, gpsTime int64, rxTime float64, onlyWithGPS bool) *io.ManualClockSynchronization {
+	syncClock := func(xTime int64, gpsTime int64, rxTime float64, onlyWithGPS bool) *io.FrontendClockSynchronization {
 		if onlyWithGPS && gpsTime == 0 {
 			return nil
 		}
-		return &io.ManualClockSynchronization{
+		return &io.FrontendClockSynchronization{
 			Timestamp:        TimestampFromXTime(xTime),
 			ServerTime:       receivedAt,
 			GatewayTime:      TimePtrFromUpInfo(gpsTime, rxTime),
 			ConcentratorTime: ConcentratorTimeFromXTime(xTime),
 		}
 	}
-	recordTime := func(refTimeUnix float64, xTime int64, gpsTime int64, rxTime float64) *io.ManualClockSynchronization {
+	recordTime := func(refTimeUnix float64, xTime int64, gpsTime int64, rxTime float64) *io.FrontendClockSynchronization {
 		recordRTT(refTimeUnix)
 		return syncClock(xTime, gpsTime, rxTime, false)
 	}
