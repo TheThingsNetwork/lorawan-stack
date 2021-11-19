@@ -914,6 +914,8 @@ func TestApplicationServer(t *testing.T) {
 			// Wait for connection to establish.
 			time.Sleep(2 * Timeout)
 
+			now := time.Now().UTC()
+
 			t.Run("Upstream", func(t *testing.T) {
 				ns.reset()
 				devsFlush()
@@ -1030,6 +1032,7 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        22,
 									FCnt:         22,
 									FrmPayload:   []byte{0x01},
+									ReceivedAt:   &now,
 								},
 							},
 						},
@@ -1055,6 +1058,7 @@ func TestApplicationServer(t *testing.T) {
 											},
 										},
 										VersionIds: registeredDevice.VersionIds,
+										ReceivedAt: up.GetUplinkMessage().ReceivedAt,
 									},
 								},
 								CorrelationIds: up.CorrelationIds,
@@ -1190,6 +1194,7 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        42,
 									FCnt:         42,
 									FrmPayload:   []byte{0xca, 0xa9, 0x42},
+									ReceivedAt:   &now,
 								},
 							},
 						},
@@ -1215,6 +1220,7 @@ func TestApplicationServer(t *testing.T) {
 											},
 										},
 										VersionIds: registeredDevice.VersionIds,
+										ReceivedAt: up.GetUplinkMessage().ReceivedAt,
 									},
 								},
 								CorrelationIds: up.CorrelationIds,
@@ -1622,6 +1628,7 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        24,
 									FCnt:         24,
 									FrmPayload:   []byte{0x14, 0x4e, 0x3c},
+									ReceivedAt:   &now,
 								},
 							},
 						},
@@ -1647,6 +1654,7 @@ func TestApplicationServer(t *testing.T) {
 											},
 										},
 										VersionIds: registeredDevice.VersionIds,
+										ReceivedAt: up.GetUplinkMessage().ReceivedAt,
 									},
 								},
 								CorrelationIds: up.CorrelationIds,
@@ -1867,6 +1875,7 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        42,
 									FCnt:         42,
 									FrmPayload:   []byte{0xd1, 0x43, 0x6a},
+									ReceivedAt:   &now,
 								},
 							},
 						},
@@ -1892,6 +1901,7 @@ func TestApplicationServer(t *testing.T) {
 											},
 										},
 										VersionIds: registeredDevice.VersionIds,
+										ReceivedAt: up.GetUplinkMessage().ReceivedAt,
 									},
 								},
 								CorrelationIds: up.CorrelationIds,
@@ -1947,6 +1957,7 @@ func TestApplicationServer(t *testing.T) {
 									FPort:        11,
 									FCnt:         11,
 									FrmPayload:   []byte{0xaa, 0x64, 0xb7, 0x7},
+									ReceivedAt:   &now,
 								},
 							},
 						},
@@ -2443,6 +2454,8 @@ func TestSkipPayloadCrypto(t *testing.T) {
 					}, nil
 				})
 
+				now := time.Now().UTC()
+
 				for _, step := range []struct {
 					Name         string
 					Message      *ttnpb.ApplicationUp
@@ -2524,6 +2537,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 									FPort:        22,
 									FCnt:         22,
 									FrmPayload:   []byte{0x01},
+									ReceivedAt:   &now,
 								},
 							},
 						},
@@ -2546,6 +2560,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 												KekLabel:     kekLabel,
 											},
 											VersionIds: registeredDevice.VersionIds,
+											ReceivedAt: up.GetUplinkMessage().ReceivedAt,
 										},
 									},
 									CorrelationIds: up.CorrelationIds,
@@ -2562,6 +2577,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 											FPort:        22,
 											FCnt:         22,
 											FrmPayload:   []byte{0xc1},
+											ReceivedAt:   up.GetUplinkMessage().ReceivedAt,
 										},
 									},
 									CorrelationIds: up.CorrelationIds,
@@ -2858,6 +2874,7 @@ func TestLocationFromPayload(t *testing.T) {
 	sub, err := as.Subscribe(ctx, "test", nil, false)
 	a.So(err, should.BeNil)
 
+	now := time.Now().UTC()
 	err = as.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{
@@ -2868,6 +2885,7 @@ func TestLocationFromPayload(t *testing.T) {
 				FPort:        11,
 				FCnt:         11,
 				FrmPayload:   []byte{0x11},
+				ReceivedAt:   &now,
 			},
 		},
 	})
