@@ -949,12 +949,10 @@ func (as *ApplicationServer) markEndDeviceAsActivated(ctx context.Context, ids t
 	})
 }
 
-var errNoNSTimeStamp = errors.DefineFailedPrecondition("no_ns_timestamp", "no network server timestamp in message")
-
 func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) error {
 	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyId)
 	if uplink.ReceivedAt == nil {
-		return errNoNSTimeStamp.New()
+		panic("no NS timestamp in ApplicationUplink")
 	}
 	dev, err := as.deviceRegistry.Set(ctx, ids,
 		[]string{

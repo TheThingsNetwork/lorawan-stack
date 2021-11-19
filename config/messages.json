@@ -2663,15 +2663,6 @@
       "file": "applicationserver.go"
     }
   },
-  "error:pkg/applicationserver:no_ns_timestamp": {
-    "translations": {
-      "en": "no network server timestamp in message"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "applicationserver.go"
-    }
-  },
   "error:pkg/applicationserver:no_payload": {
     "translations": {
       "en": "no payload"

@@ -149,7 +149,7 @@ func (up *ApplicationUp) ExtractRequestFields(dst map[string]interface{}) {
 	if ids == nil {
 		return
 	}
-	ids.ApplicationIdentifiers.ExtractRequestFields(dst)
+	ids.ExtractRequestFields(dst)
 }
 
 func (req *DownlinkQueueRequest) ExtractRequestFields(dst map[string]interface{}) {
@@ -157,7 +157,7 @@ func (req *DownlinkQueueRequest) ExtractRequestFields(dst map[string]interface{}
 	if ids == nil {
 		return
 	}
-	ids.ApplicationIdentifiers.ExtractRequestFields(dst)
+	ids.ExtractRequestFields(dst)
 }
 
 // Wrap methods of m.ApplicationIdentifiers.

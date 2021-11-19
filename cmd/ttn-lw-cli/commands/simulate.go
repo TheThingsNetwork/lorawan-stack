@@ -693,7 +693,7 @@ var (
 			if err != nil {
 				return err
 			}
-			t := time.Now()
+			t := time.Now().UTC()
 			if uplinkMessage.ReceivedAt.IsZero() {
 				uplinkMessage.ReceivedAt = &t
 			}
