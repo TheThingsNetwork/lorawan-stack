@@ -135,7 +135,7 @@ const createRequestLogic = (
           )
 
           // If there was an unauthenticated error, the access token is not
-          // valid and we can delete it. Reloading will then initiate the auth flow.
+          // valid and we can delete it. Log back in Modal will then pop up.
           if (isUnauthenticatedError(e)) {
             clearAccessToken()
             selectStatusStore(getState()).isLoginRequired = true
