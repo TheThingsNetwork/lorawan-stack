@@ -18,7 +18,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"sync"
@@ -759,7 +759,7 @@ func TestApplicationServer(t *testing.T) {
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				// Start web server to read upstream.
 				webhookTarget := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-					buf, err := ioutil.ReadAll(req.Body)
+					buf, err := io.ReadAll(req.Body)
 					if !a.So(err, should.BeNil) {
 						t.FailNow()
 					}

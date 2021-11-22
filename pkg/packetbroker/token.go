@@ -17,7 +17,7 @@ package packetbroker
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"net/url"
@@ -237,7 +237,7 @@ func PublicKeyFromURL(client *http.Client, url string) PublicKeyProvider {
 			return nil, errFetchToken.WithCause(err)
 		}
 		defer res.Body.Close()
-		buf, err := ioutil.ReadAll(res.Body)
+		buf, err := io.ReadAll(res.Body)
 		if err != nil {
 			return nil, errFetchToken.WithCause(err)
 		}

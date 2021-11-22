@@ -20,7 +20,6 @@ package main
 import (
 	"bytes"
 	"go/format"
-	"io/ioutil"
 	"log"
 	"os"
 	"reflect"
@@ -170,7 +169,7 @@ func Make{{ $type.Name }}(opts ...{{ $optionType }}) *{{ $typeString }} {
 	if err != nil {
 		log.Fatalf("Failed to format source: %s", err)
 	}
-	if err := ioutil.WriteFile("constructors_generated.go", b, 0o644); err != nil {
+	if err := os.WriteFile("constructors_generated.go", b, 0o644); err != nil {
 		log.Fatalf("Failed to write output: %s", err)
 	}
 }

@@ -17,7 +17,7 @@ package mqtt
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strconv"
 	"testing"
 	"time"
@@ -42,15 +42,15 @@ func TestOpenConnection(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
 
-	ca, err := ioutil.ReadFile("testdata/rootCA.pem")
+	ca, err := os.ReadFile("testdata/rootCA.pem")
 	a.So(err, should.BeNil)
-	clientCert, err := ioutil.ReadFile("testdata/clientcert.pem")
+	clientCert, err := os.ReadFile("testdata/clientcert.pem")
 	a.So(err, should.BeNil)
-	clientKey, err := ioutil.ReadFile("testdata/clientkey.pem")
+	clientKey, err := os.ReadFile("testdata/clientkey.pem")
 	a.So(err, should.BeNil)
-	serverCert, err := ioutil.ReadFile("testdata/servercert.pem")
+	serverCert, err := os.ReadFile("testdata/servercert.pem")
 	a.So(err, should.BeNil)
-	serverKey, err := ioutil.ReadFile("testdata/serverkey.pem")
+	serverKey, err := os.ReadFile("testdata/serverkey.pem")
 	a.So(err, should.BeNil)
 
 	clientTLSConfig, err := createTLSConfig(ca, clientCert, clientKey)

@@ -56,7 +56,7 @@ func ConnectFrontend(ctx context.Context, ids ttnpb.GatewayIdentifiers, server i
 				gatewayTime := time.Unix(0, 0).Add(time.Since(started))
 				up.ReceivedAt = time.Now()
 				up.Settings.Time = &gatewayTime
-				conn.HandleUp(up)
+				conn.HandleUp(up, nil)
 			case status := <-f.Status:
 				conn.HandleStatus(status)
 			case txAck := <-f.TxAck:

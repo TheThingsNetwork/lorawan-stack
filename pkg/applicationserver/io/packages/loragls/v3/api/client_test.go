@@ -18,7 +18,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -63,7 +63,7 @@ func TestNoAuth(t *testing.T) {
 			a := assertions.New(t)
 
 			respChan <- &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}
 			errChan <- nil
 
@@ -81,7 +81,7 @@ func TestAuth(t *testing.T) {
 			a := assertions.New(t)
 
 			respChan <- &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}
 			errChan <- nil
 
@@ -355,7 +355,7 @@ func TestClient(t *testing.T) {
 
 					respChan <- &http.Response{
 						StatusCode: http.StatusOK,
-						Body:       ioutil.NopCloser(b),
+						Body:       io.NopCloser(b),
 					}
 					errChan <- nil
 

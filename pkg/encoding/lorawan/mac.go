@@ -17,7 +17,6 @@ package lorawan
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math"
 	"time"
 
@@ -924,7 +923,7 @@ func (spec MACCommandSpec) read(phy band.Band, r io.Reader, isUplink bool, cmd *
 
 	desc, ok := spec[ret.Cid]
 	if !ok || desc == nil {
-		b, err := ioutil.ReadAll(r)
+		b, err := io.ReadAll(r)
 		if err != nil {
 			return err
 		}

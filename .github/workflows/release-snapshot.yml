@@ -98,7 +98,7 @@ jobs:
           path: |
             public/libs.*.bundle.js
             .cache/dll.json
-          key: dll-cache-${{ hashFiles('yarn.lock', 'sdk/js/yarn.lock')}}
+          key: dll-cache-${{ hashFiles('yarn.lock') }}
       - name: Initialize babel cache
         id: babel-cache
         uses: actions/cache@v2

@@ -15,7 +15,7 @@
 package web_test
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -104,7 +104,7 @@ func TestErrorHandling(t *testing.T) {
 			}
 
 			res := rec.Result()
-			b, err := ioutil.ReadAll(res.Body)
+			b, err := io.ReadAll(res.Body)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}

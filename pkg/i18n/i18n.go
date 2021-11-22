@@ -19,7 +19,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"runtime"
 	"sort"
@@ -130,7 +130,7 @@ var Global = make(MessageDescriptorMap)
 
 // ReadFile reads the descriptors from a file.
 func ReadFile(filename string) (MessageDescriptorMap, error) {
-	bytes, err := ioutil.ReadFile(filename)
+	bytes, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -192,7 +192,7 @@ func (m MessageDescriptorMap) WriteFile(filename string) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(filename, append(bytes, '\n'), 0644)
+	return os.WriteFile(filename, append(bytes, '\n'), 0644)
 }
 
 // Define a message.

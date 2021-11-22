@@ -13,8 +13,13 @@ For details about compatibility between different releases, see the **Commitment
 
 - Support for fine timestamps and frequency offsets sent by gateways with SX1303 concentrator using the legacy UDP protocol.
 - Support for resetting end device session context and MAC state in the Console.
+- The Content-Security-Policy header (that was previously behind the `webui.csp` feature flag) is now enabled by default.
+- Default `Cache-Control: no-store` headers.
+- `Cache-Control: public, max-age=604800, immutable` headers for hashed static files.
 
 ### Changed
+
+- Gateway server disconnects LoRa Basics Station gateways that stop sending pongs to server pings. This does not apply to gateways that don't support pongs.
 
 ### Deprecated
 
@@ -25,6 +30,7 @@ For details about compatibility between different releases, see the **Commitment
 - The reported sub-band's `downlink_utilization` in gateway connection stats now represents the utilization of the available duty-cycle time.
 - Missing fields when admins list non-owned entities.
 - Using the correct timestamp when retreiving the "Last activity" data point for Gateways on initial page loads in the Console.
+- Events reappearing in the end device data view after clearing them when navigating back and forth.
 
 ### Security
 

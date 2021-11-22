@@ -15,7 +15,6 @@
 package fetch_test
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -28,7 +27,7 @@ import (
 type frequencyPlansFileSystem string
 
 func createMockFileSystem() (frequencyPlansFileSystem, error) {
-	dir, err := ioutil.TempDir("", "")
+	dir, err := os.MkdirTemp("", "")
 	if err != nil {
 		return "", err
 	}

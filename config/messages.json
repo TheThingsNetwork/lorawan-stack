@@ -4175,15 +4175,6 @@
       "file": "format_protobufv2.go"
     }
   },
-  "error:pkg/gatewayserver/io/mqtt:mqtt_frontend_recovered": {
-    "translations": {
-      "en": "internal server error"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/mqtt",
-      "file": "mqtt.go"
-    }
-  },
   "error:pkg/gatewayserver/io/mqtt:not_authorized": {
     "translations": {
       "en": "not authorized"
@@ -4349,6 +4340,15 @@
   "error:pkg/gatewayserver/io/ws:invalid_gateway_id": {
     "translations": {
       "en": "invalid gateway ID `{id}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ws",
+      "file": "ws.go"
+    }
+  },
+  "error:pkg/gatewayserver/io/ws:missed_too_many_pongs": {
+    "translations": {
+      "en": "gateway missed too many pongs"
     },
     "description": {
       "package": "pkg/gatewayserver/io/ws",

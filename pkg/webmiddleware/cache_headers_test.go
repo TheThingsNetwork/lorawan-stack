@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 package webmiddleware
 
 import (
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -24,20 +23,16 @@ import (
 	"github.com/smartystreets/assertions/should"
 )
 
-func TestRecover(t *testing.T) {
-	m := Recover()
-
+func TestNoCache(t *testing.T) {
 	a := assertions.New(t)
-	r := httptest.NewRequest(http.MethodGet, "/", nil)
-	rec := httptest.NewRecorder()
-	m(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		panic("this panic is expected")
-	})).ServeHTTP(rec, r)
 
+	r := httptest.NewRequest(http.MethodGet, "/", nil)
+
+	rec := httptest.NewRecorder()
+	NoCache(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	})).ServeHTTP(rec, r)
 	res := rec.Result()
 
-	a.So(res.StatusCode, should.Equal, http.StatusInternalServerError)
-
-	body, _ := io.ReadAll(res.Body)
-	a.So(string(body), should.ContainSubstring, "http_recovered")
+	a.So(res.Header.Get("Cache-Control"), should.Equal, "no-store")
+	a.So(res.Header.Get("Pragma"), should.Equal, "no-cache")
 }

@@ -18,7 +18,7 @@ package gatewayserver
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	stdio "io"
 	stdlog "log"
 	"math"
 	"net"
@@ -272,7 +272,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		if version.listenerConfig.fallbackFreqPlanID != "" {
 			ctx = frequencyplans.WithFallbackID(ctx, version.listenerConfig.fallbackFreqPlanID)
 		}
-		webServer := ws.New(ctx, gs, version.Formatter, version.listenerConfig.frontend)
+		web, err := ws.New(ctx, gs, version.Formatter, version.listenerConfig.frontend)
+		if err != nil {
+			return nil, err
+		}
 		for _, endpoint := range []component.Endpoint{
 			component.NewTCPEndpoint(version.listenerConfig.listen, version.Name),
 			component.NewTLSEndpoint(version.listenerConfig.listenTLS, version.Name, component.WithNextProtos("h2", "http/1.1")),
@@ -302,10 +305,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 					defer lis.Close()
 
 					srv := http.Server{
-						Handler:           webServer,
+						Handler:           web,
 						ReadTimeout:       120 * time.Second,
 						ReadHeaderTimeout: 5 * time.Second,
-						ErrorLog:          stdlog.New(ioutil.Discard, "", 0),
+						ErrorLog:          stdlog.New(stdio.Discard, "", 0),
 					}
 					go func() {
 						<-ctx.Done()

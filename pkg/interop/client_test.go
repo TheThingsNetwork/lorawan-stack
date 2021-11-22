@@ -18,7 +18,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -79,7 +79,7 @@ func TestGetAppSKey(t *testing.T) {
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 
-					b, err := ioutil.ReadAll(r.Body)
+					b, err := io.ReadAll(r.Body)
 					a.So(err, should.BeNil)
 					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.0","TransactionID":0,"MessageType":"AppSKeyReq","SenderID":"test-as","ReceiverID":"70B3D57ED0000000","DevEUI":"0102030405060708","SessionKeyID":"016BFA7BAD4756346A674981E75CDBDC"}
 `)
@@ -94,24 +94,24 @@ func TestGetAppSKey(t *testing.T) {
 				}))
 			},
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
-				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
+				confDir := test.Must(os.MkdirTemp("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
 				js1Path := filepath.Join(confDir, "test-js-1.yml")
 				js2Path := filepath.Join(confDir, "foo", "test-js-2.yml")
 				js3Path := filepath.Join(confDir, "test-js-3.yml")
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
 
 				rel := func(path string) string {
 					return test.Must(filepath.Rel(confDir, path)).(string)
 				}
 
-				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
+				test.MustMultiple(os.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
    - file: %s
      join-euis:
         - 0000000000000000/0
@@ -130,7 +130,7 @@ func TestGetAppSKey(t *testing.T) {
 					rel(js3Path),
 				)), 0644))
 
-				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
+				test.MustMultiple(os.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
 port: 12345
 protocol: BI1.1
 tls:
@@ -146,7 +146,7 @@ headers:
 				)), 0644))
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
-				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
+				test.MustMultiple(os.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
 protocol: BI1.0
 paths:
@@ -166,7 +166,7 @@ headers:
 					filepath.Join("..", ClientKeyPath),
 				)), 0644))
 
-				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
+				test.MustMultiple(os.WriteFile(js3Path, []byte(`dns: invalid.dns
 protocol: BI1.1
 paths:
    join: test-join-path
@@ -198,7 +198,7 @@ paths:
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 
-					b, err := ioutil.ReadAll(r.Body)
+					b, err := io.ReadAll(r.Body)
 					a.So(err, should.BeNil)
 					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"AppSKeyReq","SenderID":"test-as","ReceiverID":"70B3D57ED0000000","DevEUI":"0102030405060708","SessionKeyID":"016BFA7BAD4756346A674981E75CDBDC"}
 `)
@@ -213,24 +213,24 @@ paths:
 				}))
 			},
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
-				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
+				confDir := test.Must(os.MkdirTemp("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
 				js1Path := filepath.Join(confDir, "test-js-1.yml")
 				js2Path := filepath.Join(confDir, "foo", "test-js-2.yml")
 				js3Path := filepath.Join(confDir, "test-js-3.yml")
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
 
 				rel := func(path string) string {
 					return test.Must(filepath.Rel(confDir, path)).(string)
 				}
 
-				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
+				test.MustMultiple(os.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
    - file: %s
      join-euis:
         - 0000000000000000/0
@@ -249,7 +249,7 @@ paths:
 					rel(js3Path),
 				)), 0644))
 
-				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
+				test.MustMultiple(os.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
 port: 12345
 protocol: BI1.0
 tls:
@@ -265,7 +265,7 @@ headers:
 				)), 0644))
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
-				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
+				test.MustMultiple(os.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
 protocol: BI1.1
 paths:
@@ -285,7 +285,7 @@ headers:
 					filepath.Join("..", ClientKeyPath),
 				)), 0644))
 
-				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
+				test.MustMultiple(os.WriteFile(js3Path, []byte(`dns: invalid.dns
 protocol: BI1.0
 paths:
    join: test-join-path
@@ -317,7 +317,7 @@ paths:
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 
-					b, err := ioutil.ReadAll(r.Body)
+					b, err := io.ReadAll(r.Body)
 					a.So(err, should.BeNil)
 					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.0","TransactionID":0,"MessageType":"AppSKeyReq","SenderID":"test-as","ReceiverID":"70B3D57ED0000000","DevEUI":"0102030405060708","SessionKeyID":"016BFA7BAD4756346A674981E75CDBDC"}
 `)
@@ -344,24 +344,24 @@ paths:
 				}))
 			},
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
-				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
+				confDir := test.Must(os.MkdirTemp("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
 				js1Path := filepath.Join(confDir, "test-js-1.yml")
 				js2Path := filepath.Join(confDir, "foo", "test-js-2.yml")
 				js3Path := filepath.Join(confDir, "test-js-3.yml")
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
 
 				rel := func(path string) string {
 					return test.Must(filepath.Rel(confDir, path)).(string)
 				}
 
-				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
+				test.MustMultiple(os.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
    - file: %s
      join-euis:
         - 0000000000000000/0
@@ -380,7 +380,7 @@ paths:
 					rel(js3Path),
 				)), 0644))
 
-				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
+				test.MustMultiple(os.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
 port: 12345
 protocol: BI1.1
 tls:
@@ -396,7 +396,7 @@ headers:
 				)), 0644))
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
-				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
+				test.MustMultiple(os.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
 protocol: BI1.0
 paths:
@@ -416,7 +416,7 @@ headers:
 					filepath.Join("..", ClientKeyPath),
 				)), 0644))
 
-				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
+				test.MustMultiple(os.WriteFile(js3Path, []byte(`dns: invalid.dns
 protocol: BI1.1
 paths:
    join: test-join-path
@@ -453,7 +453,7 @@ paths:
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 
-					b, err := ioutil.ReadAll(r.Body)
+					b, err := io.ReadAll(r.Body)
 					a.So(err, should.BeNil)
 					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"AppSKeyReq","SenderID":"test-as","ReceiverID":"70B3D57ED0000000","DevEUI":"0102030405060708","SessionKeyID":"016BFA7BAD4756346A674981E75CDBDC"}
 `)
@@ -480,24 +480,24 @@ paths:
 				}))
 			},
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
-				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
+				confDir := test.Must(os.MkdirTemp("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
 				js1Path := filepath.Join(confDir, "test-js-1.yml")
 				js2Path := filepath.Join(confDir, "foo", "test-js-2.yml")
 				js3Path := filepath.Join(confDir, "test-js-3.yml")
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
 
 				rel := func(path string) string {
 					return test.Must(filepath.Rel(confDir, path)).(string)
 				}
 
-				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
+				test.MustMultiple(os.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
    - file: %s
      join-euis:
         - 0000000000000000/0
@@ -516,7 +516,7 @@ paths:
 					rel(js3Path),
 				)), 0644))
 
-				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
+				test.MustMultiple(os.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
 port: 12345
 protocol: BI1.0
 tls:
@@ -532,7 +532,7 @@ headers:
 				)), 0644))
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
-				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
+				test.MustMultiple(os.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
 protocol: BI1.1
 paths:
@@ -552,7 +552,7 @@ headers:
 					filepath.Join("..", ClientKeyPath),
 				)), 0644))
 
-				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
+				test.MustMultiple(os.WriteFile(js3Path, []byte(`dns: invalid.dns
 protocol: BI1.0
 paths:
    join: test-join-path
@@ -648,7 +648,7 @@ func TestHandleJoinRequest(t *testing.T) {
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 
-					b, err := ioutil.ReadAll(r.Body)
+					b, err := io.ReadAll(r.Body)
 					a.So(err, should.BeNil)
 					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.0","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
 `)
@@ -663,24 +663,24 @@ func TestHandleJoinRequest(t *testing.T) {
 				}))
 			},
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
-				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
+				confDir := test.Must(os.MkdirTemp("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
 				js1Path := filepath.Join(confDir, "test-js-1.yml")
 				js2Path := filepath.Join(confDir, "foo", "test-js-2.yml")
 				js3Path := filepath.Join(confDir, "test-js-3.yml")
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
 
 				rel := func(path string) string {
 					return test.Must(filepath.Rel(confDir, path)).(string)
 				}
 
-				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
+				test.MustMultiple(os.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
    - file: %s
      join-euis:
         - 0000000000000000/0
@@ -699,7 +699,7 @@ func TestHandleJoinRequest(t *testing.T) {
 					rel(js3Path),
 				)), 0644))
 
-				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
+				test.MustMultiple(os.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
 port: 12345
 protocol: BI1.1
 tls:
@@ -715,7 +715,7 @@ headers:
 				)), 0644))
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
-				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
+				test.MustMultiple(os.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
 protocol: BI1.0
 paths:
@@ -735,7 +735,7 @@ headers:
 					filepath.Join("..", ClientKeyPath),
 				)), 0644))
 
-				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
+				test.MustMultiple(os.WriteFile(js3Path, []byte(`dns: invalid.dns
 protocol: BI1.1
 paths:
    join: test-join-path
@@ -767,7 +767,7 @@ paths:
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 
-					b, err := ioutil.ReadAll(r.Body)
+					b, err := io.ReadAll(r.Body)
 					a.So(err, should.BeNil)
 					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
 `)
@@ -782,24 +782,24 @@ paths:
 				}))
 			},
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
-				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
+				confDir := test.Must(os.MkdirTemp("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
 				js1Path := filepath.Join(confDir, "test-js-1.yml")
 				js2Path := filepath.Join(confDir, "foo", "test-js-2.yml")
 				js3Path := filepath.Join(confDir, "test-js-3.yml")
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
 
 				rel := func(path string) string {
 					return test.Must(filepath.Rel(confDir, path)).(string)
 				}
 
-				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
+				test.MustMultiple(os.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
    - file: %s
      join-euis:
         - 0000000000000000/0
@@ -818,7 +818,7 @@ paths:
 					rel(js3Path),
 				)), 0644))
 
-				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
+				test.MustMultiple(os.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
 port: 12345
 protocol: BI1.0
 tls:
@@ -834,7 +834,7 @@ headers:
 				)), 0644))
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
-				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
+				test.MustMultiple(os.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
 protocol: BI1.1
 paths:
@@ -854,7 +854,7 @@ headers:
 					filepath.Join("..", ClientKeyPath),
 				)), 0644))
 
-				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
+				test.MustMultiple(os.WriteFile(js3Path, []byte(`dns: invalid.dns
 protocol: BI1.0
 paths:
    join: test-join-path
@@ -886,7 +886,7 @@ paths:
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 
-					b, err := ioutil.ReadAll(r.Body)
+					b, err := io.ReadAll(r.Body)
 					a.So(err, should.BeNil)
 					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.0","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
 `)
@@ -918,24 +918,24 @@ paths:
 				}))
 			},
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
-				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
+				confDir := test.Must(os.MkdirTemp("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
 				js1Path := filepath.Join(confDir, "test-js-1.yml")
 				js2Path := filepath.Join(confDir, "foo", "test-js-2.yml")
 				js3Path := filepath.Join(confDir, "test-js-3.yml")
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
 
 				rel := func(path string) string {
 					return test.Must(filepath.Rel(confDir, path)).(string)
 				}
 
-				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
+				test.MustMultiple(os.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
    - file: %s
      join-euis:
         - 0000000000000000/0
@@ -954,7 +954,7 @@ paths:
 					rel(js3Path),
 				)), 0644))
 
-				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
+				test.MustMultiple(os.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
 port: 12345
 protocol: BI1.1
 tls:
@@ -970,7 +970,7 @@ headers:
 				)), 0644))
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
-				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
+				test.MustMultiple(os.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
 protocol: BI1.0
 paths:
@@ -990,7 +990,7 @@ headers:
 					filepath.Join("..", ClientKeyPath),
 				)), 0644))
 
-				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
+				test.MustMultiple(os.WriteFile(js3Path, []byte(`dns: invalid.dns
 protocol: BI1.1
 paths:
    join: test-join-path
@@ -1035,7 +1035,7 @@ paths:
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 
-					b, err := ioutil.ReadAll(r.Body)
+					b, err := io.ReadAll(r.Body)
 					a.So(err, should.BeNil)
 					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
 `)
@@ -1067,24 +1067,24 @@ paths:
 				}))
 			},
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
-				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
+				confDir := test.Must(os.MkdirTemp("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
 				js1Path := filepath.Join(confDir, "test-js-1.yml")
 				js2Path := filepath.Join(confDir, "foo", "test-js-2.yml")
 				js3Path := filepath.Join(confDir, "test-js-3.yml")
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
 
 				rel := func(path string) string {
 					return test.Must(filepath.Rel(confDir, path)).(string)
 				}
 
-				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
+				test.MustMultiple(os.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
    - file: %s
      join-euis:
         - 0000000000000000/0
@@ -1103,7 +1103,7 @@ paths:
 					rel(js3Path),
 				)), 0644))
 
-				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
+				test.MustMultiple(os.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
 port: 12345
 protocol: BI1.0
 tls:
@@ -1119,7 +1119,7 @@ headers:
 				)), 0644))
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
-				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
+				test.MustMultiple(os.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
 protocol: BI1.1
 paths:
@@ -1139,7 +1139,7 @@ headers:
 					filepath.Join("..", ClientKeyPath),
 				)), 0644))
 
-				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
+				test.MustMultiple(os.WriteFile(js3Path, []byte(`dns: invalid.dns
 protocol: BI1.0
 paths:
    join: test-join-path
@@ -1184,7 +1184,7 @@ paths:
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 
-					b, err := ioutil.ReadAll(r.Body)
+					b, err := io.ReadAll(r.Body)
 					a.So(err, should.BeNil)
 					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
 `)
@@ -1215,24 +1215,24 @@ paths:
 				}))
 			},
 			NewClientConfig: func(fqdn string, port uint32) (config.InteropClient, func() error) {
-				confDir := test.Must(ioutil.TempDir("", "lorawan-stack-js-interop-test")).(string)
+				confDir := test.Must(os.MkdirTemp("", "lorawan-stack-js-interop-test")).(string)
 				confPath := filepath.Join(confDir, InteropClientConfigurationName)
 				js1Path := filepath.Join(confDir, "test-js-1.yml")
 				js2Path := filepath.Join(confDir, "foo", "test-js-2.yml")
 				js3Path := filepath.Join(confDir, "test-js-3.yml")
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "testdata"), 0755))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
-				test.MustMultiple(ioutil.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ClientCertPath), ClientCert, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ClientKeyPath), ClientKey, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ServerCertPath), ServerCert, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, ServerKeyPath), ServerKey, 0644))
+				test.MustMultiple(os.WriteFile(filepath.Join(confDir, RootCAPath), RootCA, 0644))
 
 				rel := func(path string) string {
 					return test.Must(filepath.Rel(confDir, path)).(string)
 				}
 
-				test.MustMultiple(ioutil.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
+				test.MustMultiple(os.WriteFile(confPath, []byte(fmt.Sprintf(`join-servers:
    - file: %s
      join-euis:
         - 0000000000000000/0
@@ -1251,7 +1251,7 @@ paths:
 					rel(js3Path),
 				)), 0644))
 
-				test.MustMultiple(ioutil.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
+				test.MustMultiple(os.WriteFile(js1Path, []byte(fmt.Sprintf(`fqdn: test-js.fqdn
 port: 12345
 protocol: BI1.0
 tls:
@@ -1267,7 +1267,7 @@ headers:
 				)), 0644))
 
 				test.MustMultiple(os.Mkdir(filepath.Join(confDir, "foo"), 0755))
-				test.MustMultiple(ioutil.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
+				test.MustMultiple(os.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
 protocol: BI1.1
 paths:
@@ -1287,7 +1287,7 @@ headers:
 					filepath.Join("..", ClientKeyPath),
 				)), 0644))
 
-				test.MustMultiple(ioutil.WriteFile(js3Path, []byte(`dns: invalid.dns
+				test.MustMultiple(os.WriteFile(js3Path, []byte(`dns: invalid.dns
 protocol: BI1.0
 paths:
    join: test-join-path

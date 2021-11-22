@@ -48,5 +48,5 @@ type Formatter interface {
 	// FromDownlink generates a downlink byte stream that can be sent over the WS connection.
 	FromDownlink(ctx context.Context, down ttnpb.DownlinkMessage, bandID string, concentratorTime scheduling.ConcentratorTime, dlTime time.Time) ([]byte, error)
 	// TransferTime generates a spurious time transfer message for a particular server time.
-	TransferTime(ctx context.Context, t time.Time, conn *io.Connection) ([]byte, error)
+	TransferTime(ctx context.Context, serverTime time.Time, gpsTime *time.Time, concentratorTime *scheduling.ConcentratorTime) ([]byte, error)
 }

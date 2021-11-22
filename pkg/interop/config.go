@@ -19,7 +19,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
-	"io/ioutil"
+	"os"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
@@ -104,7 +104,7 @@ func fetchSenderClientCAs(ctx context.Context, conf config.InteropServer) (map[s
 	if len(conf.SenderClientCADeprecated) > 0 {
 		senderClientCAs = make(map[string][]*x509.Certificate, len(conf.SenderClientCA.Static))
 		for id, filename := range conf.SenderClientCADeprecated {
-			b, err := ioutil.ReadFile(filename)
+			b, err := os.ReadFile(filename)
 			if err != nil {
 				return nil, err
 			}
