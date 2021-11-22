@@ -490,8 +490,6 @@ type ApplicationUplink struct {
 	// Settings for the transmission.
 	Settings *TxSettings `protobuf:"bytes,7,opt,name=settings,proto3" json:"settings,omitempty"`
 	// Server time when the Network Server received the message.
-	// This field is not validated in the API since ApplicationUplink is used also in AS packages.
-	// Validate this separately in the RPCs that processes messages from the NS.
 	ReceivedAt *time.Time `protobuf:"bytes,8,opt,name=received_at,json=receivedAt,proto3,stdtime" json:"received_at,omitempty"`
 	// The AppSKey of the current session.
 	// This field is only present if the skip_payload_crypto field of the EndDevice

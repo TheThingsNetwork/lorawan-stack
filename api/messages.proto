@@ -213,8 +213,6 @@ message ApplicationUplink {
   TxSettings settings = 7 [(validate.rules).message.required = true];
 
   // Server time when the Network Server received the message.
-  // This field is not validated in the API since ApplicationUplink is used also in AS packages.
-  // Validate this separately in the RPCs that processes messages from the NS.
   google.protobuf.Timestamp received_at = 8 [(gogoproto.stdtime) = true];
 
   // The AppSKey of the current session.

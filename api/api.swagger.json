@@ -12641,7 +12641,7 @@
         "received_at": {
           "type": "string",
           "format": "date-time",
-          "description": "Server time when the Network Server received the message.\nThis field is not validated in the API since ApplicationUplink is used also in AS packages.\nValidate this separately in the RPCs that processes messages from the NS."
+          "description": "Server time when the Network Server received the message."
         },
         "app_s_key": {
           "$ref": "#/definitions/v3KeyEnvelope",
