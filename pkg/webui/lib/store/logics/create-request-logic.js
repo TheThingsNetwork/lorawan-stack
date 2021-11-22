@@ -24,13 +24,14 @@ import {
 } from '@ttn-lw/lib/errors/utils'
 import { clear as clearAccessToken } from '@ttn-lw/lib/access-token'
 import {
+  setLoginStatus,
   setStatusChecking,
   attemptReconnect,
   ATTEMPT_RECONNECT,
 } from '@ttn-lw/lib/store/actions/status'
 import { promisifyDispatch } from '@ttn-lw/lib/store/middleware/request-promise-middleware'
 import attachPromise, { getResultActionFromType } from '@ttn-lw/lib/store/actions/attach-promise'
-import { selectIsCheckingStatus, selectStatusStore } from '@ttn-lw/lib/store/selectors/status'
+import { selectIsCheckingStatus } from '@ttn-lw/lib/store/selectors/status'
 
 let connectionChecking = null
 
@@ -138,7 +139,7 @@ const createRequestLogic = (
           // valid and we can delete it. Log back in Modal will then pop up.
           if (isUnauthenticatedError(e)) {
             clearAccessToken()
-            selectStatusStore(getState()).isLoginRequired = true
+            dispatch(setLoginStatus())
             break
             // If there was a network error, it could mean that the network
             // connection is currently interrupted. Setting the online state to

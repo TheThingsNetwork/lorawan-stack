@@ -23,22 +23,22 @@ describe('Log back in after the session has expired', () => {
   before(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
-  })
-
-  beforeEach(() => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
   })
 
   it('succeeds showing modal on session expired', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}`)
+    cy.findByText('Welcome to the Console!').should('be.visible')
     cy.clearCookie('_console_auth')
     cy.clearLocalStorage()
+    cy.get('header').within(() => {
+      cy.findByRole('link', { name: /Applications/ }).click()
+    })
 
-    cy.findByLabelText('Please sign in again').should('be.visible')
-    cy.findByLabelText('Reload').click()
-    cy.findByRole('link', { name: 'Create an account' }).should('be.visible')
-    cy.findByRole('link', { name: 'Forgot password?' }).should('be.visible')
-    cy.findByLabelText('User ID').should('be.visible')
-    cy.findByLabelText('Password').should('be.visible')
+    cy.findByText('Please sign in again').should('be.visible')
+    cy.findByText('Reload').click()
+    cy.get('header').within(() => {
+      cy.findByRole('link', { name: /Applications/ }).should('be.visible')
+    })
   })
 })
