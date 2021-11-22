@@ -278,7 +278,11 @@ export default {
       new CleanWebpackPlugin({
         dry: WEBPACK_IS_DEV_SERVER_BUILD,
         verbose: false,
-        cleanOnceBeforeBuildPatterns: ['**/*', '!libs*bundle.js', '!libs*bundle.js.map'],
+        cleanOnceBeforeBuildPatterns: env({
+          all: ['**/*'],
+          development: ['!libs.bundle.js', '!libs.bundle.js.map'],
+          production: ['!libs.*.bundle.js', '!libs.*.bundle.js.map'],
+        }),
       }),
       // Copy static assets to output directory.
       new CopyWebpackPlugin({ patterns: [{ from: `${src}/assets/static` }] }),
