@@ -72,14 +72,17 @@ func withServer(t *testing.T, wsConfig ws.Config, rateLimitConf config.RateLimit
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := ws.New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), wsConfig)
+	web, err := ws.New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), wsConfig)
+	if err != nil {
+		t.FailNow()
+	}
 	lis, err := net.Listen("tcp", serverAddress)
 	if err != nil {
 		t.FailNow()
 	}
 	defer lis.Close()
 	go func() error {
-		return http.Serve(lis, bsWebServer)
+		return http.Serve(lis, web)
 	}()
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
 

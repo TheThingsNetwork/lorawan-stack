@@ -61,6 +61,8 @@ type Server struct {
 }
 
 type options struct {
+	disableWarnings bool
+
 	cookieHashKey  []byte
 	cookieBlockKey []byte
 
@@ -79,6 +81,13 @@ type options struct {
 
 // Option for the web server
 type Option func(*options)
+
+// WithDisableWarnings configures if the webserver should emit misconfiguration warnings.
+func WithDisableWarnings(disable bool) Option {
+	return func(o *options) {
+		o.disableWarnings = disable
+	}
+}
 
 // WithContextFiller sets context fillers that are executed on every request context.
 func WithContextFiller(contextFillers ...fillcontext.Filler) Option {
@@ -145,7 +154,9 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 
 	if len(hashKey) == 0 || isZeros(hashKey) {
 		hashKey = random.Bytes(64)
-		logger.Warn("No cookie hash key configured, generated a random one")
+		if !options.disableWarnings {
+			logger.Warn("No cookie hash key configured, generated a random one")
+		}
 	}
 
 	if len(hashKey) != 32 && len(hashKey) != 64 {
@@ -154,7 +165,9 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 
 	if len(blockKey) == 0 || isZeros(blockKey) {
 		blockKey = random.Bytes(32)
-		logger.Warn("No cookie block key configured, generated a random one")
+		if !options.disableWarnings {
+			logger.Warn("No cookie block key configured, generated a random one")
+		}
 	}
 
 	if len(blockKey) != 32 {
@@ -284,7 +297,7 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 		}
 		logger.Debug("Loaded manifest.yaml")
 		logger.Debug("Serving static assets")
-	} else {
+	} else if !options.disableWarnings {
 		logger.WithField("search_paths", options.staticSearchPaths).Warn("No static assets found in any search path")
 	}
 
