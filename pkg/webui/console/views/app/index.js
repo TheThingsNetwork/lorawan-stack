@@ -16,12 +16,10 @@ import { hot } from 'react-hot-loader/root'
 import React from 'react'
 import { connect } from 'react-redux'
 import { ConnectedRouter } from 'connected-react-router'
-import { defineMessages } from 'react-intl'
 import { Route, Switch } from 'react-router-dom'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
 
-import Modal from '@ttn-lw/components/modal'
 import { ToastContainer } from '@ttn-lw/components/toast'
 import sidebarStyle from '@ttn-lw/components/navigation/side/side.styl'
 
@@ -35,6 +33,7 @@ import WithAuth from '@ttn-lw/lib/components/with-auth'
 import FullViewError, { FullViewErrorInner } from '@ttn-lw/lib/components/full-view-error'
 
 import Header from '@console/containers/header'
+import LogBackInModal from '@console/containers/log-back-in-modal'
 
 import Overview from '@console/views/overview'
 import Applications from '@console/views/applications'
@@ -60,16 +59,6 @@ import style from './app.styl'
 
 const GenericNotFound = () => <FullViewErrorInner error={{ statusCode: 404 }} />
 const errorRender = error => <FullViewError error={error} header={<Header />} />
-
-const m = defineMessages({
-  modalTitle: 'Please sign in again',
-  modalMessage: `You were signed out of your account. Please press 'Reload' to log back in the console again.`,
-  buttonMessage: 'Reload',
-})
-
-const reload = () => {
-  window.location.reload()
-}
 
 @withEnv
 @connect(
@@ -153,15 +142,7 @@ class ConsoleApp extends React.PureComponent {
 
     return (
       <React.Fragment>
-        {status.isLoginRequired && (
-          <Modal
-            approval={false}
-            buttonMessage={m.buttonMessage}
-            message={m.modalMessage}
-            title={m.modalTitle}
-            onComplete={reload}
-          />
-        )}
+        {status.isLoginRequired && <LogBackInModal />}
         <ToastContainer />
         <ConnectedRouter history={history}>
           <ScrollToTop />

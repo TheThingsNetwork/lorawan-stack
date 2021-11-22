@@ -136,7 +136,7 @@ const createRequestLogic = (
           )
 
           // If there was an unauthenticated error, the access token is not
-          // valid and we can delete it. Log back in Modal will then pop up.
+          // valid and we can delete it. A "Log back in"-modal will then pop up.
           if (isUnauthenticatedError(e)) {
             clearAccessToken()
             dispatch(setLoginStatus())

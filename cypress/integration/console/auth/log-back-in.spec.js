@@ -26,7 +26,7 @@ describe('Log back in after the session has expired', () => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
   })
 
-  it('succeeds showing modal on session expired', () => {
+  it('succeeds showing modal on session context is lost', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}`)
     cy.findByText('Welcome to the Console!').should('be.visible')
     cy.clearCookie('_console_auth')
