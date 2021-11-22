@@ -144,16 +144,16 @@ func (m *GetApplicationCollaboratorRequest) ExtractRequestFields(dst map[string]
 	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
-func (up *ApplicationUp) ExtractRequestFields(dst map[string]interface{}) {
-	ids := up.EndDeviceIds
+func (m *ApplicationUp) ExtractRequestFields(dst map[string]interface{}) {
+	ids := m.EndDeviceIds
 	if ids == nil {
 		return
 	}
 	ids.ExtractRequestFields(dst)
 }
 
-func (req *DownlinkQueueRequest) ExtractRequestFields(dst map[string]interface{}) {
-	ids := req.EndDeviceIds
+func (m *DownlinkQueueRequest) ExtractRequestFields(dst map[string]interface{}) {
+	ids := m.EndDeviceIds
 	if ids == nil {
 		return
 	}
@@ -162,6 +162,7 @@ func (req *DownlinkQueueRequest) ExtractRequestFields(dst map[string]interface{}
 
 // Wrap methods of m.ApplicationIdentifiers.
 
+// GetEntityIdentifiers returns entity identifiers.
 func (m *Application) GetEntityIdentifiers() *EntityIdentifiers {
 	if m == nil {
 		return nil
@@ -170,8 +171,8 @@ func (m *Application) GetEntityIdentifiers() *EntityIdentifiers {
 }
 
 // EntityType implements IDStringer.
-func (up *ApplicationUp) EntityType() string {
-	ids := up.EndDeviceIds
+func (m *ApplicationUp) EntityType() string {
+	ids := m.EndDeviceIds
 	if ids == nil {
 		return ""
 	}
@@ -179,8 +180,8 @@ func (up *ApplicationUp) EntityType() string {
 }
 
 // IDString implements IDStringer.
-func (up *ApplicationUp) IDString() string {
-	ids := up.EndDeviceIds
+func (m *ApplicationUp) IDString() string {
+	ids := m.EndDeviceIds
 	if ids == nil {
 		return ""
 	}
@@ -188,8 +189,8 @@ func (up *ApplicationUp) IDString() string {
 }
 
 // EntityType implements IDStringer.
-func (req *DownlinkQueueRequest) EntityType() string {
-	ids := req.EndDeviceIds
+func (m *DownlinkQueueRequest) EntityType() string {
+	ids := m.EndDeviceIds
 	if ids == nil {
 		return ""
 	}
@@ -197,8 +198,8 @@ func (req *DownlinkQueueRequest) EntityType() string {
 }
 
 // IDString implements IDStringer.
-func (req *DownlinkQueueRequest) IDString() string {
-	ids := req.EndDeviceIds
+func (m *DownlinkQueueRequest) IDString() string {
+	ids := m.EndDeviceIds
 	if ids == nil {
 		return ""
 	}
