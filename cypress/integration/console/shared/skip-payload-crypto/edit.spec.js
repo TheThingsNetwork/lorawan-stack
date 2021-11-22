@@ -89,9 +89,12 @@ describe('Skip payload crypto', () => {
         }
 
         cy.request({
-          method: 'POST',
+          method: 'PUT',
           url: `api/v3/as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
           body: response,
+          headers: {
+            Authorization: `Bearer ${adminApiKey}`,
+          },
         })
 
         cy.visit(
@@ -134,9 +137,12 @@ describe('Skip payload crypto', () => {
         }
 
         cy.request({
-          method: 'POST',
+          method: 'PUT',
           url: `api/v3/as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
           body: response,
+          headers: {
+            Authorization: `Bearer ${adminApiKey}`,
+          },
         })
 
         cy.visit(
@@ -176,9 +182,12 @@ describe('Skip payload crypto', () => {
         }
 
         cy.request({
-          method: 'POST',
+          method: 'PUT',
           url: `api/v3/as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
           body: response,
+          headers: {
+            Authorization: `Bearer ${adminApiKey}`,
+          },
         })
 
         cy.visit(
@@ -216,9 +225,12 @@ describe('Skip payload crypto', () => {
         }
 
         cy.request({
-          method: 'POST',
+          method: 'PUT',
           url: `api/v3/as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
           body: response,
+          headers: {
+            Authorization: `Bearer ${adminApiKey}`,
+          },
         })
 
         cy.visit(
