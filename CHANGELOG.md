@@ -29,6 +29,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - The reported sub-band's `downlink_utilization` in gateway connection stats now represents the utilization of the available duty-cycle time.
 - Missing fields when admins list non-owned entities.
+- Using the correct timestamp when retreiving the "Last activity" data point for Gateways on initial page loads in the Console.
 - Events reappearing in the end device data view after clearing them when navigating back and forth.
 
 ### Security

@@ -23,24 +23,25 @@ import {
 } from '@console/store/actions/gateways'
 
 const handleStatsUpdate = (state, { stats = {} }) => {
-  const status = stats && (stats.last_status_received_at || stats.last_uplink_received_at)
-
-  if (status) {
-    let lastSeen = new Date(status)
-
-    if (state.lastSeen) {
-      lastSeen = lastSeen > state.lastSeen ? lastSeen : state.lastSeen
-    }
-
-    return { ...state, lastSeen }
+  if (
+    state.lastSeen &&
+    (!stats.last_status_received_at || state.lastSeen > stats.last_status_received_at) &&
+    (!stats.last_uplink_received_at || state.lastSeen > stats.last_uplink_received_at)
+  ) {
+    return state
   }
 
-  return state
+  const lastSeen =
+    stats.last_status_received_at > stats.last_uplink_received_at
+      ? stats.last_status_received_at
+      : stats.last_uplink_received_at
+
+  return { ...state, lastSeen }
 }
 
 const handleEventUpdate = (state, event) => {
   if (isGsStatusReceiveEvent(event.name) || isGsUplinkReceiveEvent(event.name)) {
-    let lastSeen = new Date(event.time)
+    let lastSeen = event.time
 
     if (state.lastSeen) {
       lastSeen = lastSeen > state.lastSeen ? lastSeen : state.lastSeen
