@@ -16,6 +16,7 @@ package blob
 
 import (
 	"context"
+	"net/url"
 	"os"
 	"path/filepath"
 
@@ -23,6 +24,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"gocloud.dev/blob"
+	"gocloud.dev/blob/azureblob"
 	"gocloud.dev/blob/fileblob"
 	"gocloud.dev/blob/gcsblob"
 	"gocloud.dev/blob/s3blob"
@@ -57,6 +59,19 @@ func AWS(ctx context.Context, bucket string, conf *aws.Config) (*blob.Bucket, er
 		return nil, err
 	}
 	return s3blob.OpenBucket(ctx, s, bucket, nil)
+}
+
+// Azure returns an open bucket that is connected to container containerName in storage account accountName.
+func Azure(ctx context.Context, accountName, containerName string) (*blob.Bucket, error) {
+	o, err := openerFromMSI(azureblob.AccountName(accountName), "", azureblob.Options{})
+	if err != nil {
+		return nil, err
+	}
+	url, err := url.Parse("azblob://" + containerName)
+	if err != nil {
+		return nil, err
+	}
+	return o.OpenBucketURL(ctx, url)
 }
 
 func GCP(ctx context.Context, bucket string, jsonCredentials []byte) (*blob.Bucket, error) {
