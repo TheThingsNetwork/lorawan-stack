@@ -154,10 +154,8 @@ func RegisterHashedFile(original, hashed string) {
 func (t *AppTemplate) Render(w io.Writer, _ string, pageData interface{}, c echo.Context) error {
 	templateData := c.Get("template_data").(TemplateData)
 	var cspNonce string
-	if CSPFeatureFlag.GetValue(c.Request().Context()) {
-		if v, ok := c.Get("csp_nonce").(string); ok {
-			cspNonce = v
-		}
+	if v, ok := c.Get("csp_nonce").(string); ok {
+		cspNonce = v
 	}
 	cssFiles := make([]string, len(templateData.CSSFiles))
 	for i, cssFile := range templateData.CSSFiles {
