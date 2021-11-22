@@ -195,6 +195,11 @@ type BlobConfigLocal struct {
 	Directory string `name:"directory" description:"OS filesystem directory, which contains buckets"`
 }
 
+// BlobConfigAzure is the blob store configuration for the Azure provider.
+type BlobConfigAzure struct {
+	AccountName string `name:"account-name" description:"Azure storage account name"`
+}
+
 // BlobConfigAWS is the blob store configuration for the AWS provider.
 type BlobConfigAWS struct {
 	Endpoint        string `name:"endpoint" description:"S3 endpoint"`
@@ -212,10 +217,11 @@ type BlobConfigGCP struct {
 
 // BlobConfig is the blob store configuration.
 type BlobConfig struct {
-	Provider string          `name:"provider" description:"Blob store provider (local, aws, gcp)"`
+	Provider string          `name:"provider" description:"Blob store provider (local, aws, gcp, azure)"`
 	Local    BlobConfigLocal `name:"local"`
 	AWS      BlobConfigAWS   `name:"aws"`
 	GCP      BlobConfigGCP   `name:"gcp"`
+	Azure    BlobConfigAzure `name:"azure" description:"Azure Storage configuration (EXPERIMENTAL)"`
 
 	HTTPClient *http.Client `name:"-"`
 }
@@ -225,7 +231,8 @@ func (c BlobConfig) IsZero() bool {
 	return c.Provider == "" &&
 		c.Local == BlobConfigLocal{} &&
 		c.AWS == BlobConfigAWS{} &&
-		c.GCP == BlobConfigGCP{}
+		c.GCP == BlobConfigGCP{} &&
+		c.Azure == BlobConfigAzure{}
 }
 
 // Bucket returns the requested blob bucket using the config.
@@ -247,6 +254,11 @@ func (c BlobConfig) Bucket(ctx context.Context, bucket string) (*blob.Bucket, er
 			))
 		}
 		return ttnblob.AWS(ctx, bucket, conf)
+	case "azure":
+		if c.Azure.AccountName == "" {
+			return nil, errMissingBlobConfig.New()
+		}
+		return ttnblob.Azure(ctx, c.Azure.AccountName, bucket)
 	case "gcp":
 		var jsonCreds []byte
 		if c.GCP.Credentials != "" {
