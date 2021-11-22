@@ -289,8 +289,10 @@ export default class ApplicationGeneralSettings extends React.Component {
     } = application
 
     try {
-      await updateApplication(application_id, update)
-      await updateApplicationLink(application_id, update)
+      const { skip_payload_crypto, ...applicationUpdate } = update
+      const linkUpdate = { skip_payload_crypto }
+      await updateApplication(application_id, applicationUpdate)
+      await updateApplicationLink(application_id, linkUpdate)
       resetForm({ values })
       toast({
         title: application_id,

@@ -65,7 +65,7 @@ describe('Skip payload crypto', () => {
         cy.loginConsole({ user_id: userId, password: user.password })
       })
   
-      it('application link skips payload crypto', () => {
+      describe('application link skips payload crypto', () => {
         const adminApiKey = Cypress.config('adminApiKey')
         const linkRequestBody = {
           link: {
@@ -136,7 +136,7 @@ describe('Skip payload crypto', () => {
         })
       })
   
-      it('application link does not skip payload crypto', () => {
+      describe('application link does not skip payload crypto', () => {
         const adminApiKey = Cypress.config('adminApiKey')
         const linkRequestBody = {
           link: {
