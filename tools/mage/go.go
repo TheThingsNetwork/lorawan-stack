@@ -19,7 +19,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
@@ -65,7 +64,7 @@ func runGoFrom(dir string, args ...string) error {
 }
 
 func writeToFile(filename string, value []byte) error {
-	return ioutil.WriteFile(filename, value, 0644)
+	return os.WriteFile(filename, value, 0644)
 }
 
 func outputGo(cmd string, args ...string) (string, error) {

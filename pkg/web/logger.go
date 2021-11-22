@@ -16,7 +16,6 @@ package web
 
 import (
 	"io"
-	"io/ioutil"
 
 	echo "github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
@@ -29,7 +28,7 @@ func NewNoopLogger() echo.Logger {
 
 type noopLogger struct{}
 
-func (n *noopLogger) Output() io.Writer                         { return ioutil.Discard }
+func (n *noopLogger) Output() io.Writer                         { return io.Discard }
 func (n *noopLogger) SetOutput(w io.Writer)                     {}
 func (n *noopLogger) Prefix() string                            { return "" }
 func (n *noopLogger) SetPrefix(p string)                        {}

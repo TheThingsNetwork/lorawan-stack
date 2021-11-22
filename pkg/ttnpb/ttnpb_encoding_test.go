@@ -18,7 +18,6 @@ import (
 	"encoding"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -508,11 +507,11 @@ func TestMarshalers(t *testing.T) {
 	)
 	goldenPath := filepath.Join("testdata", "ttnpb_encoding_golden.md")
 	if os.Getenv("TEST_WRITE_GOLDEN") == "1" {
-		if err := ioutil.WriteFile(goldenPath, []byte(out), 0o644); err != nil {
+		if err := os.WriteFile(goldenPath, []byte(out), 0o644); err != nil {
 			t.Fatalf("Failed to write golden file: %s", err)
 		}
 	} else {
-		prevOut, err := ioutil.ReadFile(goldenPath)
+		prevOut, err := os.ReadFile(goldenPath)
 		if err != nil {
 			t.Fatalf("Failed to read golden file: %s", err)
 		}

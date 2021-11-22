@@ -15,7 +15,7 @@
 package fetch
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"path"
@@ -53,7 +53,7 @@ func (f httpFetcher) File(pathElements ...string) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	result, err := ioutil.ReadAll(resp.Body)
+	result, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, errCouldNotReadFile.WithCause(err).WithAttributes("filename", p)
 	}

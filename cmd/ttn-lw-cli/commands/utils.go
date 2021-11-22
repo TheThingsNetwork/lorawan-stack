@@ -17,7 +17,6 @@ package commands
 import (
 	"fmt"
 	stdio "io"
-	"io/ioutil"
 	"net"
 	"net/url"
 	"strings"
@@ -87,7 +86,7 @@ func parsePayloadFormatterParameterFlags(prefix string, formatters *ttnpb.Messag
 	r, err := getDataReader(prefix+".up-formatter-parameter", flags)
 	switch err {
 	case nil:
-		b, err := ioutil.ReadAll(r)
+		b, err := stdio.ReadAll(r)
 		if err != nil {
 			return nil, err
 		}
@@ -102,7 +101,7 @@ func parsePayloadFormatterParameterFlags(prefix string, formatters *ttnpb.Messag
 	r, err = getDataReader(prefix+".down-formatter-parameter", flags)
 	switch err {
 	case nil:
-		b, err := ioutil.ReadAll(r)
+		b, err := stdio.ReadAll(r)
 		if err != nil {
 			return nil, err
 		}

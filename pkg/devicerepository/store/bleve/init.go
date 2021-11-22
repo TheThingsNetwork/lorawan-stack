@@ -17,7 +17,6 @@ package bleve
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -195,11 +194,11 @@ func prepareWorkingDirectory(ctx context.Context, workingDirectory, lorawanDevic
 		if err := os.MkdirAll(path.Dir(destination), 0755); err != nil {
 			return err
 		}
-		b, err := ioutil.ReadFile(fullPath)
+		b, err := os.ReadFile(fullPath)
 		if err != nil {
 			return err
 		}
 		logger.WithField("filename", destination).Debug("Copying file to working directory")
-		return ioutil.WriteFile(destination, b, info.Mode())
+		return os.WriteFile(destination, b, info.Mode())
 	})
 }

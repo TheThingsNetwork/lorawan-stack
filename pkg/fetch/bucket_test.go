@@ -15,8 +15,6 @@
 package fetch_test
 
 import (
-	"io/ioutil"
-	"os"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -30,14 +28,8 @@ func TestBucket(t *testing.T) {
 	a := assertions.New(t)
 	ctx := test.Context()
 
-	tmpDir, err := ioutil.TempDir("", "FetchTestBucket")
-	if err != nil {
-		t.Fatalf("Failed to create temporary directory: %v", err)
-	}
-	defer os.RemoveAll(tmpDir)
-
 	conf := config.BlobConfig{Provider: "local"}
-	conf.Local.Directory = tmpDir
+	conf.Local.Directory = t.TempDir()
 
 	filename := "file"
 	content := []byte("Hello world")

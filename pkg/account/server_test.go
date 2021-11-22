@@ -18,7 +18,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
@@ -370,7 +370,7 @@ func TestAuthentication(t *testing.T) {
 				req.Header.Set("Content-Type", contentType)
 			}
 			if body != nil {
-				req.Body = ioutil.NopCloser(body)
+				req.Body = io.NopCloser(body)
 				req.ContentLength = int64(body.Len())
 			}
 

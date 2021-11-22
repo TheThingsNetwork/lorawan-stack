@@ -16,7 +16,7 @@ package ttnmage
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 
@@ -67,7 +67,7 @@ func (Version) Files() error {
 	}
 	mg.Deps(Version.getCurrent, Js.Deps)
 	version := strings.TrimPrefix(currentVersion, "v")
-	err := ioutil.WriteFile(goVersionFilePath, []byte(fmt.Sprintf(goVersionFile, version)), 0644)
+	err := os.WriteFile(goVersionFilePath, []byte(fmt.Sprintf(goVersionFile, version)), 0644)
 	if err != nil {
 		return err
 	}

@@ -17,7 +17,6 @@ package web
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
@@ -270,7 +269,7 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 		s.Static(options.staticMount, staticDir)
 
 		// register hashed filenames
-		manifest, err := ioutil.ReadFile(filepath.Join(staticPath, "manifest.yaml"))
+		manifest, err := os.ReadFile(filepath.Join(staticPath, "manifest.yaml"))
 		if err != nil {
 			logger.WithError(err).Warn("Failed to load manifest.yaml")
 			return s, nil

@@ -16,7 +16,7 @@ package webmiddleware_test
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -48,14 +48,14 @@ func TestMaxBody(t *testing.T) {
 		)
 		rec := httptest.NewRecorder()
 		m(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			_, err := ioutil.ReadAll(r.Body)
+			_, err := io.ReadAll(r.Body)
 			a.So(err, should.HaveSameErrorDefinitionAs, ErrRequestBodyTooLarge)
 			webhandlers.Error(w, r, err)
 		})).ServeHTTP(rec, r)
 		res := rec.Result()
 		a.So(res.StatusCode, should.Equal, http.StatusBadRequest)
 
-		body, _ := ioutil.ReadAll(res.Body)
+		body, _ := io.ReadAll(res.Body)
 		a.So(string(body), should.ContainSubstring, "request_body_too_large")
 	})
 }

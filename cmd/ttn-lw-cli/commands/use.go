@@ -22,7 +22,6 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -154,7 +153,7 @@ var (
 						logger.Warnf("Could not retrieve certificate: %s", err)
 					}
 				}
-				if err = ioutil.WriteFile(caFile, buf.Bytes(), 0644); err != nil {
+				if err = os.WriteFile(caFile, buf.Bytes(), 0644); err != nil {
 					return errFailWrite.WithCause(err).WithAttributes("file", caFile)
 				}
 				logger.Infof("CA file for %s written in %s", host, caFile)
@@ -173,7 +172,7 @@ var (
 			if err != nil {
 				return err
 			}
-			if err = ioutil.WriteFile(configFile, b, 0644); err != nil {
+			if err = os.WriteFile(configFile, b, 0644); err != nil {
 				return errFailWrite.WithCause(err).WithAttributes("file", configFile)
 			}
 			logger.Infof("Config file for %s written in %s", host, configFile)

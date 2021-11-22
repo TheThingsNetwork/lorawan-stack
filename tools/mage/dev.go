@@ -19,7 +19,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -113,7 +112,7 @@ func (Dev) SQLDump() error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(filepath.Join(".cache", "sqldump.sql"), []byte(output), 0644)
+	return os.WriteFile(filepath.Join(".cache", "sqldump.sql"), []byte(output), 0644)
 }
 
 // SQLCreateSeedDB creates a database template from the current dump.

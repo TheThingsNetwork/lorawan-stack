@@ -17,7 +17,6 @@ package band_test
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"testing"
@@ -228,11 +227,11 @@ func testBand(t *testing.T, band serializableBand, version ttnpb.PHYVersion) {
 			t.Fatal(err)
 		}
 
-		if err := ioutil.WriteFile(reference, b, 0600); err != nil {
+		if err := os.WriteFile(reference, b, 0600); err != nil {
 			t.Fatal(err)
 		}
 	} else {
-		b, err := ioutil.ReadFile(reference)
+		b, err := os.ReadFile(reference)
 		if err != nil {
 			t.Fatal(err)
 		}

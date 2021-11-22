@@ -20,7 +20,7 @@ import (
 	"encoding"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -171,7 +171,7 @@ func TestWeb(t *testing.T) {
 						if !a.So(res.Header.Get("Content-Type"), should.Equal, "application/json") {
 							t.FailNow()
 						}
-						b, err := ioutil.ReadAll(res.Body)
+						b, err := io.ReadAll(res.Body)
 						if err != nil {
 							t.Fatalf("Failed to read response body: %s", err)
 						}
@@ -197,7 +197,7 @@ func TestWeb(t *testing.T) {
 						if !a.So(res.Header.Get("Content-Type"), should.Equal, "application/json") {
 							t.FailNow()
 						}
-						b, err := ioutil.ReadAll(res.Body)
+						b, err := io.ReadAll(res.Body)
 						if err != nil {
 							t.Fatalf("Failed to read response body: %s", err)
 						}
@@ -223,7 +223,7 @@ func TestWeb(t *testing.T) {
 						if !a.So(res.Header.Get("Content-Type"), should.Equal, "application/toml") {
 							t.FailNow()
 						}
-						b, err := ioutil.ReadAll(res.Body)
+						b, err := io.ReadAll(res.Body)
 						if err != nil {
 							t.Fatalf("Failed to read response body: %s", err)
 						}

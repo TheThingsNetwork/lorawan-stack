@@ -15,7 +15,7 @@
 package web
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -114,7 +114,7 @@ func TestStatic(t *testing.T) {
 		s.ServeHTTP(rec, req)
 
 		resp := rec.Result()
-		body, _ := ioutil.ReadAll(resp.Body)
+		body, _ := io.ReadAll(resp.Body)
 
 		a.So(resp.StatusCode, should.Equal, http.StatusOK)
 		a.So(strings.HasPrefix(string(body), "//"), should.BeTrue)

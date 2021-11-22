@@ -15,7 +15,7 @@
 package remote
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -203,7 +203,7 @@ func TestProfile(t *testing.T) {
 	} {
 		t.Run(tc.profile, func(t *testing.T) {
 			a := assertions.New(t)
-			b, err := ioutil.ReadFile(filepath.Join("testdata", "vendor", "full-vendor", tc.profile+".yaml"))
+			b, err := os.ReadFile(filepath.Join("testdata", "vendor", "full-vendor", tc.profile+".yaml"))
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}

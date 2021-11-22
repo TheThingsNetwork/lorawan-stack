@@ -17,7 +17,7 @@ package api_test
 import (
 	"bytes"
 	"context"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"testing"
 
@@ -61,7 +61,7 @@ func TestNoAuth(t *testing.T) {
 			a := assertions.New(t)
 
 			respChan <- &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}
 			errChan <- nil
 
@@ -79,7 +79,7 @@ func TestAuth(t *testing.T) {
 			a := assertions.New(t)
 
 			respChan <- &http.Response{
-				Body: ioutil.NopCloser(bytes.NewBufferString("")),
+				Body: io.NopCloser(bytes.NewBufferString("")),
 			}
 			errChan <- nil
 

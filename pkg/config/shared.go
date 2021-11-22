@@ -17,7 +17,6 @@ package config
 import (
 	"context"
 	"crypto/tls"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -254,7 +253,7 @@ func (c BlobConfig) Bucket(ctx context.Context, bucket string) (*blob.Bucket, er
 			jsonCreds = []byte(c.GCP.Credentials)
 		} else if c.GCP.CredentialsFile != "" {
 			var err error
-			jsonCreds, err = ioutil.ReadFile(c.GCP.CredentialsFile)
+			jsonCreds, err = os.ReadFile(c.GCP.CredentialsFile)
 			if err != nil {
 				return nil, err
 			}
