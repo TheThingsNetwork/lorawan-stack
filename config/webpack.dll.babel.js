@@ -47,6 +47,8 @@ export default {
   entry: { libs },
   output: {
     filename: mode === 'production' ? '[name].[hash].bundle.js' : '[name].bundle.js',
+    hashDigest: 'hex',
+    hashDigestLength: 20,
     path: path.resolve(context, PUBLIC_DIR),
     library,
   },
@@ -65,7 +67,7 @@ export default {
         test: /\.(woff|woff2|ttf|eot|jpg|jpeg|png|svg)$/i,
         loader: 'file-loader',
         options: {
-          name: '[name].[hash].[ext]',
+          name: '[name].[hash:hex:20].[ext]',
         },
       },
     ],
