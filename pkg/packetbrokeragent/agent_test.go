@@ -120,7 +120,7 @@ func TestForwarder(t *testing.T) {
 		}{
 			{
 				GatewayMessage: &ttnpb.GatewayUplinkMessage{
-					UplinkMessage: &ttnpb.UplinkMessage{
+					Message: &ttnpb.UplinkMessage{
 						RawPayload: []byte{0x40, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
 						ReceivedAt: &receivedAt,
 						RxMetadata: []*ttnpb.RxMetadata{
@@ -245,7 +245,7 @@ func TestForwarder(t *testing.T) {
 			},
 			{
 				GatewayMessage: &ttnpb.GatewayUplinkMessage{
-					UplinkMessage: &ttnpb.UplinkMessage{
+					Message: &ttnpb.UplinkMessage{
 						RawPayload: []byte{0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42, 0x22, 0x11, 0x1, 0x2, 0x3, 0x4},
 						ReceivedAt: &receivedAt,
 						RxMetadata: []*ttnpb.RxMetadata{

@@ -689,13 +689,13 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 	gtw := host.gtw
 	switch msg := item.(type) {
 	case *ttnpb.GatewayUplinkMessage:
-		up := *msg.UplinkMessage
+		up := *msg.Message
 		msg = &ttnpb.GatewayUplinkMessage{
-			BandId:        msg.BandId,
-			UplinkMessage: &up,
+			BandId:  msg.BandId,
+			Message: &up,
 		}
-		msg.UplinkMessage.CorrelationIds = append(make([]string, 0, len(msg.UplinkMessage.CorrelationIds)+1), msg.UplinkMessage.CorrelationIds...)
-		msg.UplinkMessage.CorrelationIds = append(msg.UplinkMessage.CorrelationIds, host.correlationID)
+		msg.Message.CorrelationIds = append(make([]string, 0, len(msg.Message.CorrelationIds)+1), msg.Message.CorrelationIds...)
+		msg.Message.CorrelationIds = append(msg.Message.CorrelationIds, host.correlationID)
 		drop := func(ids *ttnpb.EndDeviceIdentifiers, err error) {
 			logger := logger.WithError(err)
 			if ids.JoinEui != nil {
@@ -732,7 +732,7 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 			codes.Unimplemented, codes.Unavailable:
 			drop(ids, errHostHandle.WithCause(err).WithAttributes("host", host.name))
 		default:
-			registerForwardUplink(ctx, gtw, msg.UplinkMessage, host.name)
+			registerForwardUplink(ctx, gtw, msg.Message, host.name)
 		}
 	case *ttnpb.GatewayStatus:
 		if err := host.handler.HandleStatus(ctx, *gtw.Ids, msg); err != nil {
@@ -797,16 +797,16 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 			return
 		case msg := <-conn.Up():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
-			msg.UplinkMessage.CorrelationIds = append(msg.UplinkMessage.CorrelationIds, events.CorrelationIDsFromContext(ctx)...)
-			if msg.UplinkMessage.Payload == nil {
-				msg.UplinkMessage.Payload = &ttnpb.Message{}
-				if err := lorawan.UnmarshalMessage(msg.UplinkMessage.RawPayload, msg.UplinkMessage.Payload); err != nil {
+			msg.Message.CorrelationIds = append(msg.Message.CorrelationIds, events.CorrelationIDsFromContext(ctx)...)
+			if msg.Message.Payload == nil {
+				msg.Message.Payload = &ttnpb.Message{}
+				if err := lorawan.UnmarshalMessage(msg.Message.RawPayload, msg.Message.Payload); err != nil {
 					registerDropUplink(ctx, gtw, msg, "validation", err)
 					continue
 				}
 			}
 			val = msg
-			registerReceiveUplink(ctx, gtw, msg.UplinkMessage, protocol)
+			registerReceiveUplink(ctx, gtw, msg.Message, protocol)
 		case msg := <-conn.Status():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:status:%s", events.NewCorrelationID()))
 			val = msg

@@ -414,29 +414,29 @@ func (dst *GatewayTxAcknowledgment) SetFields(src *GatewayTxAcknowledgment, path
 func (dst *GatewayUplinkMessage) SetFields(src *GatewayUplinkMessage, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "uplink_message":
+		case "message":
 			if len(subs) > 0 {
 				var newDst, newSrc *UplinkMessage
-				if (src == nil || src.UplinkMessage == nil) && dst.UplinkMessage == nil {
+				if (src == nil || src.Message == nil) && dst.Message == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.UplinkMessage
+					newSrc = src.Message
 				}
-				if dst.UplinkMessage != nil {
-					newDst = dst.UplinkMessage
+				if dst.Message != nil {
+					newDst = dst.Message
 				} else {
 					newDst = &UplinkMessage{}
-					dst.UplinkMessage = newDst
+					dst.Message = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UplinkMessage = src.UplinkMessage
+					dst.Message = src.Message
 				} else {
-					dst.UplinkMessage = nil
+					dst.Message = nil
 				}
 			}
 		case "band_id":

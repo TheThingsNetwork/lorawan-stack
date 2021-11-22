@@ -102,7 +102,7 @@ func TestFlow(t *testing.T) {
 		}
 		select {
 		case up := <-conn.Up():
-			token, err := io.ParseUplinkToken(up.UplinkMessage.RxMetadata[0].UplinkToken)
+			token, err := io.ParseUplinkToken(up.Message.RxMetadata[0].UplinkToken)
 			a.So(err, should.BeNil)
 			a.So(token.Ids.GatewayIds, should.Resemble, &ids)
 			a.So(token.Ids.AntennaIndex, should.Equal, 0)
@@ -575,7 +575,7 @@ func TestSubBandEIRPOverride(t *testing.T) {
 		}
 		select {
 		case up := <-conn.Up():
-			token, err := io.ParseUplinkToken(up.UplinkMessage.RxMetadata[0].UplinkToken)
+			token, err := io.ParseUplinkToken(up.Message.RxMetadata[0].UplinkToken)
 			a.So(err, should.BeNil)
 			a.So(token.Ids.GatewayIds, should.Resemble, &ids)
 			a.So(token.Ids.AntennaIndex, should.Equal, 0)

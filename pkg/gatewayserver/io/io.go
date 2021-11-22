@@ -280,8 +280,8 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 	}
 
 	msg := &ttnpb.GatewayUplinkMessage{
-		UplinkMessage: up,
-		BandId:        c.bandID,
+		Message: up,
+		BandId:  c.bandID,
 	}
 
 	select {

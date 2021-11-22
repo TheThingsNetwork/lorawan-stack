@@ -1069,17 +1069,17 @@ func TestTraffic(t *testing.T) {
 					}
 					select {
 					case up := <-gsConn.Up():
-						a.So(time.Since(*up.UplinkMessage.ReceivedAt), should.BeLessThan, timeout)
-						up.UplinkMessage.ReceivedAt = nil
+						a.So(time.Since(*up.Message.ReceivedAt), should.BeLessThan, timeout)
+						up.Message.ReceivedAt = nil
 						var payload ttnpb.Message
-						a.So(lorawan.UnmarshalMessage(up.UplinkMessage.RawPayload, &payload), should.BeNil)
-						if !a.So(&payload, should.Resemble, up.UplinkMessage.Payload) {
-							t.Fatalf("Invalid RawPayload: %v", up.UplinkMessage.RawPayload)
+						a.So(lorawan.UnmarshalMessage(up.Message.RawPayload, &payload), should.BeNil)
+						if !a.So(&payload, should.Resemble, up.Message.Payload) {
+							t.Fatalf("Invalid RawPayload: %v", up.Message.RawPayload)
 						}
-						up.UplinkMessage.RawPayload = nil
-						up.UplinkMessage.RxMetadata[0].UplinkToken = nil
+						up.Message.RawPayload = nil
+						up.Message.RxMetadata[0].UplinkToken = nil
 						expectedUp := tc.ExpectedNetworkUpstream.(ttnpb.UplinkMessage)
-						a.So(up.UplinkMessage, should.Resemble, &expectedUp)
+						a.So(up.Message, should.Resemble, &expectedUp)
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")
 					}
@@ -1409,9 +1409,9 @@ func TestRTT(t *testing.T) {
 					select {
 					case up := <-gsConn.Up():
 						var payload ttnpb.Message
-						a.So(lorawan.UnmarshalMessage(up.UplinkMessage.RawPayload, &payload), should.BeNil)
-						if !a.So(&payload, should.Resemble, up.UplinkMessage.Payload) {
-							t.Fatalf("Invalid RawPayload: %v", up.UplinkMessage.RawPayload)
+						a.So(lorawan.UnmarshalMessage(up.Message.RawPayload, &payload), should.BeNil)
+						if !a.So(&payload, should.Resemble, up.Message.Payload) {
+							t.Fatalf("Invalid RawPayload: %v", up.Message.RawPayload)
 						}
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")
@@ -1431,9 +1431,9 @@ func TestRTT(t *testing.T) {
 					select {
 					case up := <-gsConn.Up():
 						var payload ttnpb.Message
-						a.So(lorawan.UnmarshalMessage(up.UplinkMessage.RawPayload, &payload), should.BeNil)
-						if !a.So(&payload, should.Resemble, up.UplinkMessage.Payload) {
-							t.Fatalf("Invalid RawPayload: %v", up.UplinkMessage.RawPayload)
+						a.So(lorawan.UnmarshalMessage(up.Message.RawPayload, &payload), should.BeNil)
+						if !a.So(&payload, should.Resemble, up.Message.Payload) {
+							t.Fatalf("Invalid RawPayload: %v", up.Message.RawPayload)
 						}
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")

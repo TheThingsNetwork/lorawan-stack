@@ -100,7 +100,7 @@ func (h *Handler) HandleUplink(ctx context.Context, _ ttnpb.GatewayIdentifiers, 
 	if err != nil {
 		return errNetworkServerNotFound.WithCause(err)
 	}
-	_, err = ttnpb.NewGsNsClient(nsConn).HandleUplink(ctx, msg.UplinkMessage, h.cluster.WithClusterAuth())
+	_, err = ttnpb.NewGsNsClient(nsConn).HandleUplink(ctx, msg.Message, h.cluster.WithClusterAuth())
 	return err
 }
 

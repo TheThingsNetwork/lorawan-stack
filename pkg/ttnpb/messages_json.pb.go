@@ -379,10 +379,10 @@ func (x *GatewayUplinkMessage) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if x.UplinkMessage != nil || s.HasField("uplink_message") {
+	if x.Message != nil || s.HasField("message") {
 		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("uplink_message")
-		x.UplinkMessage.MarshalProtoJSON(s.WithField("uplink_message"))
+		s.WriteObjectField("message")
+		x.Message.MarshalProtoJSON(s.WithField("message"))
 	}
 	if x.BandId != "" || s.HasField("band_id") {
 		s.WriteMoreIf(&wroteField)
@@ -401,10 +401,10 @@ func (x *GatewayUplinkMessage) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 		switch key {
 		default:
 			s.ReadAny() // ignore unknown field
-		case "uplink_message", "uplinkMessage":
+		case "message":
 			if !s.ReadNil() {
-				x.UplinkMessage = &UplinkMessage{}
-				x.UplinkMessage.UnmarshalProtoJSON(s.WithField("uplink_message", true))
+				x.Message = &UplinkMessage{}
+				x.Message.UnmarshalProtoJSON(s.WithField("message", true))
 			}
 		case "band_id", "bandId":
 			s.AddField("band_id")
