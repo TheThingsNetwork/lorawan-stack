@@ -40,6 +40,7 @@ var (
 			ttnpb.RIGHT_GATEWAY_LINK,
 			ttnpb.RIGHT_GATEWAY_STATUS_READ,
 		),
+		events.WithErrorDataType(),
 	)
 	evtReceiveStatus = events.Define(
 		"gs.status.receive", "receive gateway status",
@@ -267,8 +268,8 @@ func registerGatewayConnect(ctx context.Context, ids ttnpb.GatewayIdentifiers, p
 	gsMetrics.gatewaysConnected.WithLabelValues(ctx, protocol).Inc()
 }
 
-func registerGatewayDisconnect(ctx context.Context, ids ttnpb.GatewayIdentifiers, protocol string) {
-	events.Publish(evtGatewayDisconnect.NewWithIdentifiersAndData(ctx, &ids, nil))
+func registerGatewayDisconnect(ctx context.Context, ids ttnpb.GatewayIdentifiers, protocol string, err error) {
+	events.Publish(evtGatewayDisconnect.NewWithIdentifiersAndData(ctx, &ids, err))
 	gsMetrics.gatewaysConnected.WithLabelValues(ctx, protocol).Dec()
 }
 

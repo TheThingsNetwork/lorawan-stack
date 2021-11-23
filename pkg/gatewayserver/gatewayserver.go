@@ -413,8 +413,7 @@ var (
 
 type connectionEntry struct {
 	*io.Connection
-	upstreamDone chan struct{}
-	tasksDone    *sync.WaitGroup
+	tasksDone *sync.WaitGroup
 }
 
 // Connect connects a gateway by its identifiers to the Gateway Server, and returns a io.Connection for traffic and
@@ -491,19 +490,13 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	// all of the upstream tasks to finish.
 	wg.Add(len(gs.upstreamHandlers))
 	connEntry := connectionEntry{
-		Connection:   conn,
-		upstreamDone: make(chan struct{}),
-		tasksDone:    wg,
+		Connection: conn,
+		tasksDone:  wg,
 	}
 	for existing, exists := gs.connections.LoadOrStore(uid, connEntry); exists; existing, exists = gs.connections.LoadOrStore(uid, connEntry) {
 		existingConnEntry := existing.(connectionEntry)
 		logger.Warn("Disconnect existing connection")
-		existingConnEntry.Disconnect(errNewConnection)
-		select {
-		case <-ctx.Done():
-			return nil, ctx.Err()
-		case <-existingConnEntry.upstreamDone:
-		}
+		existingConnEntry.Disconnect(errNewConnection.New())
 		existingConnEntry.tasksDone.Wait()
 	}
 
@@ -757,9 +750,8 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 	)
 	defer func() {
 		gs.connections.Delete(unique.ID(ctx, gtw.GetIds()))
-		registerGatewayDisconnect(ctx, *gtw.GetIds(), protocol)
+		registerGatewayDisconnect(ctx, *gtw.GetIds(), protocol, ctx.Err())
 		logger.Info("Disconnected")
-		close(conn.upstreamDone)
 	}()
 
 	hosts := make([]*upstreamHost, 0, len(gs.upstreamHandlers))
