@@ -819,7 +819,6 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 		case msg := <-conn.Status():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:status:%s", events.NewCorrelationID()))
 			val = msg
-
 			registerReceiveStatus(ctx, gtw, msg, protocol)
 		case msg := <-conn.TxAck():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:tx_ack:%s", events.NewCorrelationID()))
@@ -991,7 +990,7 @@ func (gs *GatewayServer) handleLocationUpdates(ctx context.Context, conn connect
 }
 
 // handleVersionInfoUpdates updates gateway attributes with version info.
-// This function runs exactly once; only for the first status message of each connection, since version information does (should) not change within the same connection.
+// This function runs exactly once; only for the first status message of each connection, since version information should not change within the same connection.
 func (gs *GatewayServer) handleVersionInfoUpdates(ctx context.Context, conn connectionEntry) {
 	select {
 	case <-ctx.Done():
@@ -1012,7 +1011,8 @@ func (gs *GatewayServer) handleVersionInfoUpdates(ctx context.Context, conn conn
 				return
 			case <-time.After(d):
 			}
-			err := gs.entityRegistry.UpdateAttributes(conn.Context(), *conn.Gateway().Ids, *&conn.Gateway().Attributes, attributes)
+			current := conn.Gateway().Attributes
+			err := gs.entityRegistry.UpdateAttributes(conn.Context(), *conn.Gateway().Ids, current, attributes)
 			if err != nil {
 				log.FromContext(ctx).WithError(err).Debug("Failed to update version information")
 			}
@@ -1060,7 +1060,7 @@ func (gs *GatewayServer) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayI
 	return gs.UnclaimIDs(ctx, &ids)
 }
 
-// ValidateGatewayID implements IO.
+// ValidateGatewayID implements io.Server.
 func (gs *GatewayServer) ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
 	return gs.entityRegistry.ValidateGatewayID(ctx, ids)
 }
