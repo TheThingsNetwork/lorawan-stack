@@ -1012,7 +1012,7 @@ func (gs *GatewayServer) handleVersionInfoUpdates(ctx context.Context, conn conn
 				return
 			case <-time.After(d):
 			}
-			err := gs.entityRegistry.UpdateAttributes(conn.Context(), *conn.Gateway().Ids, attributes)
+			err := gs.entityRegistry.UpdateAttributes(conn.Context(), *conn.Gateway().Ids, *&conn.Gateway().Attributes, attributes)
 			if err != nil {
 				log.FromContext(ctx).WithError(err).Debug("Failed to update version information")
 			}

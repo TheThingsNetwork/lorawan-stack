@@ -100,7 +100,7 @@ func (is IS) UpdateAntennas(ctx context.Context, ids ttnpb.GatewayIdentifiers, a
 }
 
 // UpdateAttributes implements EntityRegistry.
-func (is IS) UpdateAttributes(ctx context.Context, ids ttnpb.GatewayIdentifiers, attributes map[string]string) error {
+func (is IS) UpdateAttributes(ctx context.Context, ids ttnpb.GatewayIdentifiers, current, new map[string]string) error {
 	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, is.AllowInsecureForCredentials())
 	if err != nil {
 		return err
@@ -111,28 +111,18 @@ func (is IS) UpdateAttributes(ctx context.Context, ids ttnpb.GatewayIdentifiers,
 		return err
 	}
 
-	// First get existing attributes and take the union.
-	getGtwReq := &ttnpb.GetGatewayRequest{
-		GatewayIds: &ids,
-		FieldMask: &pbtypes.FieldMask{
-			Paths: []string{"attributes"},
-		},
+	// Take the union of keys with new values overwriting existing entries.
+	if current == nil {
+		current = make(map[string]string)
 	}
-	gtw, err := registry.Get(ctx, getGtwReq, callOpt)
-	if err != nil {
-		return err
-	}
-	if gtw.Attributes == nil {
-		gtw.Attributes = make(map[string]string)
-	}
-	for k, v := range attributes {
-		gtw.Attributes[k] = v
+	for k, v := range new {
+		current[k] = v
 	}
 
 	req := &ttnpb.UpdateGatewayRequest{
 		Gateway: &ttnpb.Gateway{
 			Ids:        &ids,
-			Attributes: gtw.Attributes,
+			Attributes: current,
 		},
 		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{"attributes"},
