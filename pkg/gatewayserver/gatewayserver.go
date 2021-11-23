@@ -1002,6 +1002,12 @@ func (gs *GatewayServer) handleVersionInfoUpdates(ctx context.Context, conn conn
 				"model":    status.Versions["model"],
 				"firmware": status.Versions["firmware"],
 			}
+			d := random.Jitter(gs.config.UpdateVersionInfoDelay, 1)
+			select {
+			case <-ctx.Done():
+				return
+			case <-time.After(d):
+			}
 			err := gs.entityRegistry.UpdateAttributes(conn.Context(), *conn.Gateway().Ids, attributes)
 			if err != nil {
 				log.FromContext(ctx).WithError(err).Debug("Failed to update version information")
@@ -1050,6 +1056,7 @@ func (gs *GatewayServer) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayI
 	return gs.UnclaimIDs(ctx, &ids)
 }
 
+// ValidateGatewayID implements IO.
 func (gs *GatewayServer) ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
 	return gs.entityRegistry.ValidateGatewayID(ctx, ids)
 }

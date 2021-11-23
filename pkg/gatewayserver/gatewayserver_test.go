@@ -1783,8 +1783,9 @@ func TestUpdateVersionInfo(t *testing.T) {
 		},
 	})
 	gsConfig := &gatewayserver.Config{
-		FetchGatewayInterval: time.Minute,
-		FetchGatewayJitter:   1,
+		FetchGatewayInterval:   time.Minute,
+		FetchGatewayJitter:     1,
+		UpdateVersionInfoDelay: test.Delay,
 		MQTTV2: config.MQTT{
 			Listen: ":1881",
 		},
