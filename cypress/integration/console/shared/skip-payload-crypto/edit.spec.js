@@ -68,11 +68,6 @@ describe('Skip payload crypto', () => {
     describe('application link skips payload crypto', () => {
       it('disables messaging when not using a SPC overwrite', () => {
         const adminApiKey = Cypress.config('adminApiKey')
-
-        cy.visit(
-          `${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`,
-        )
-
         const linkRequestBody = {
           link: {
             default_formatters: {},
