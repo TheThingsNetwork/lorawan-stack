@@ -118,11 +118,9 @@ func TestFlow(t *testing.T) {
 		assertStatsIncludePaths(a, conn, []string{"last_uplink_received_at", "uplink_count"})
 	}
 
-	now := time.Now().UTC()
-
 	{
 		frontend.Status <- &ttnpb.GatewayStatus{
-			Time: &now,
+			Time: ttnpb.ProtoTimePtr(time.Now()),
 		}
 		select {
 		case <-conn.Status():

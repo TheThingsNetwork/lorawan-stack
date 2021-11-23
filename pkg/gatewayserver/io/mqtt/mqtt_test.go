@@ -180,8 +180,6 @@ func TestTraffic(t *testing.T) {
 	}
 	defer client.Disconnect(100)
 
-	now := time.Now().UTC()
-
 	t.Run("Upstream", func(t *testing.T) {
 		for _, tc := range []struct {
 			Topic   string
@@ -220,7 +218,7 @@ func TestTraffic(t *testing.T) {
 			{
 				Topic: fmt.Sprintf("v3/%v/status", registeredGatewayUID),
 				Message: &ttnpb.GatewayStatus{
-					Time: &now,
+					Time: ttnpb.ProtoTimePtr(time.Now()),
 					Ip:   []string{"1.1.1.1"},
 				},
 				OK: true,

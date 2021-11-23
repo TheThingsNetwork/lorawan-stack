@@ -4175,15 +4175,6 @@
       "file": "format_protobufv2.go"
     }
   },
-  "error:pkg/gatewayserver/io/mqtt:no_tx_settings": {
-    "translations": {
-      "en": "no tx settings in uplink"
-    },
-    "description": {
-      "package": "pkg/gatewayserver/io/mqtt",
-      "file": "mqtt.go"
-    }
-  },
   "error:pkg/gatewayserver/io/mqtt:not_authorized": {
     "translations": {
       "en": "not authorized"
