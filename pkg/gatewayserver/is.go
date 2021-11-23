@@ -112,17 +112,18 @@ func (is IS) UpdateAttributes(ctx context.Context, ids ttnpb.GatewayIdentifiers,
 	}
 
 	// Take the union of keys with new values overwriting existing entries.
-	if current == nil {
-		current = make(map[string]string)
+	merged := make(map[string]string)
+	for k, v := range current {
+		merged[k] = v
 	}
 	for k, v := range new {
-		current[k] = v
+		merged[k] = v
 	}
 
 	req := &ttnpb.UpdateGatewayRequest{
 		Gateway: &ttnpb.Gateway{
 			Ids:        &ids,
-			Attributes: current,
+			Attributes: merged,
 		},
 		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{"attributes"},

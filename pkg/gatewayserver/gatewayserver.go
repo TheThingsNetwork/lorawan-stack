@@ -103,6 +103,9 @@ var (
 	errNotConnected        = errors.DefineNotFound("not_connected", "gateway `{gateway_uid}` not connected")
 	errSetupUpstream       = errors.DefineFailedPrecondition("upstream", "failed to setup upstream `{name}`")
 	errInvalidUpstreamName = errors.DefineInvalidArgument("invalid_upstream_name", "upstream `{name}` is invalid")
+
+	modelAttribute    = "model"
+	firmwareAttribute = "firmware"
 )
 
 // New returns new *GatewayServer.
@@ -997,25 +1000,27 @@ func (gs *GatewayServer) handleVersionInfoUpdates(ctx context.Context, conn conn
 		return
 	case <-conn.VersionInfoChanged():
 		status, _, ok := conn.StatusStats()
-		if ok && status.Versions["model"] != "" && status.Versions["firmware"] != "" {
-			if status.Versions["model"] == conn.Gateway().Attributes["model"] && status.Versions["firmware"] == conn.Gateway().Attributes["firmware"] {
-				return
-			}
-			attributes := map[string]string{
-				"model":    status.Versions["model"],
-				"firmware": status.Versions["firmware"],
-			}
-			d := random.Jitter(gs.config.UpdateVersionInfoDelay, 1)
-			select {
-			case <-ctx.Done():
-				return
-			case <-time.After(d):
-			}
-			current := conn.Gateway().Attributes
-			err := gs.entityRegistry.UpdateAttributes(conn.Context(), *conn.Gateway().Ids, current, attributes)
-			if err != nil {
-				log.FromContext(ctx).WithError(err).Debug("Failed to update version information")
-			}
+		versionsFromStatus := status.Versions
+		if !ok || versionsFromStatus["model"] == "" || versionsFromStatus["firmware"] == "" {
+			return
+		}
+		gtwAttributes := conn.Gateway().Attributes
+		if versionsFromStatus[modelAttribute] == gtwAttributes[modelAttribute] && versionsFromStatus[firmwareAttribute] == gtwAttributes[firmwareAttribute] {
+			return
+		}
+		attributes := map[string]string{
+			modelAttribute:    versionsFromStatus[modelAttribute],
+			firmwareAttribute: versionsFromStatus[firmwareAttribute],
+		}
+		d := random.Jitter(gs.config.UpdateVersionInfoDelay, 0.25)
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(d):
+		}
+		err := gs.entityRegistry.UpdateAttributes(conn.Context(), *conn.Gateway().Ids, gtwAttributes, attributes)
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Debug("Failed to update version information")
 		}
 	}
 }
