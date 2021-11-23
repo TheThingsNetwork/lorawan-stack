@@ -213,7 +213,7 @@ func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 	}
 
 	timestamp := TimestampFromXTime(req.RadioMetaData.UpInfo.XTime)
-	tm := TimePtrFromUpInfo(req.UpInfo.GPSTime, req.UpInfo.RxTime)
+	tm := TimePtrFromUpInfo(req.UpInfo.GPSTime, req.UpInfo.RxTime, receivedAt)
 	up.RxMetadata = []*ttnpb.RxMetadata{
 		{
 			GatewayIds:   &ids,
@@ -371,7 +371,7 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 	}
 
 	timestamp := TimestampFromXTime(updf.RadioMetaData.UpInfo.XTime)
-	tm := TimePtrFromUpInfo(updf.UpInfo.GPSTime, updf.UpInfo.RxTime)
+	tm := TimePtrFromUpInfo(updf.UpInfo.GPSTime, updf.UpInfo.RxTime, receivedAt)
 	up.RxMetadata = []*ttnpb.RxMetadata{
 		{
 			GatewayIds:   &ids,
@@ -527,7 +527,7 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 		return &io.FrontendClockSynchronization{
 			Timestamp:        TimestampFromXTime(xTime),
 			ServerTime:       receivedAt,
-			GatewayTime:      TimePtrFromUpInfo(gpsTime, rxTime),
+			GatewayTime:      TimePtrFromUpInfo(gpsTime, rxTime, receivedAt),
 			ConcentratorTime: ConcentratorTimeFromXTime(xTime),
 		}
 	}
