@@ -61,11 +61,11 @@ describe('Skip payload crypto', () => {
   })
 
   describe('Uplink', () => {
-    beforeEach(() => {
-      cy.loginConsole({ user_id: userId, password: user.password })
-    })
-
     describe('application link skips payload crypto', () => {
+      beforeEach(() => {
+        cy.loginConsole({ user_id: userId, password: user.password })
+      })
+
       it('disables messaging when not using a SPC overwrite', () => {
         const adminApiKey = Cypress.config('adminApiKey')
         const linkRequestBody = {
@@ -153,6 +153,10 @@ describe('Skip payload crypto', () => {
     })
 
     describe('application link does not skip payload crypto', () => {
+      beforeEach(() => {
+        cy.loginConsole({ user_id: userId, password: user.password })
+      })
+
       it('allows messaging when not using a SPC overwrite', () => {
         const adminApiKey = Cypress.config('adminApiKey')
         const linkRequestBody = {
