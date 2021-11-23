@@ -93,6 +93,8 @@ func closestTimestamp(referenceTime time.Time, ds ...time.Time) *time.Time {
 // The implementation will attempt to correct GPS time precision errors caused by faulty
 // implementations. In cases in which such errors occur, the timestamp which is closer to
 // the provided reference time is considered correct.
+// TODO: Remove precision errors accounting (use TimePtrFromGPSTime directly).
+// https://github.com/TheThingsNetwork/lorawan-stack/issues/4907
 func TimePtrFromUpInfo(gpsTime int64, rxTime float64, referenceTime time.Time) *time.Time {
 	switch {
 	case gpsTime != 0:

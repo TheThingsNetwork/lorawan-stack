@@ -16,6 +16,9 @@ For details about compatibility between different releases, see the **Commitment
 - The Content-Security-Policy header (that was previously behind the `webui.csp` feature flag) is now enabled by default.
 - Default `Cache-Control: no-store` headers.
 - `Cache-Control: public, max-age=604800, immutable` headers for hashed static files.
+- Experimental support for BasicStation GPS timestamps which use the wrong precision (milliseconds instead of microseconds).
+  - The Gateway Server will attempt to determine the correct GPS timestamp from the provided `gpstime` based on the time at which the upstream message has been received.
+  - This workaround will be available until the related gateway vendors will release patches for this issue.
 
 ### Changed
 
