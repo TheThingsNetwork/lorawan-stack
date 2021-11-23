@@ -68,6 +68,11 @@ describe('Skip payload crypto', () => {
     describe('application link skips payload crypto', () => {
       it('disables messaging when not using a SPC overwrite', () => {
         const adminApiKey = Cypress.config('adminApiKey')
+
+        cy.visit(
+          `${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`,
+        )
+
         const linkRequestBody = {
           link: {
             default_formatters: {},
@@ -88,14 +93,11 @@ describe('Skip payload crypto', () => {
           session: {},
         }
 
-        cy.request({
-          method: 'PUT',
-          url: `api/v3/as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
-          body: response,
-          headers: {
-            Authorization: `Bearer ${adminApiKey}`,
-          },
-        })
+        cy.intercept(
+          'GET',
+          `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
+          response,
+        )
 
         cy.visit(
           `${Cypress.config(
@@ -136,14 +138,11 @@ describe('Skip payload crypto', () => {
           session: {},
         }
 
-        cy.request({
-          method: 'PUT',
-          url: `api/v3/as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
-          body: response,
-          headers: {
-            Authorization: `Bearer ${adminApiKey}`,
-          },
-        })
+        cy.intercept(
+          'GET',
+          `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
+          response,
+        )
 
         cy.visit(
           `${Cypress.config(
@@ -181,14 +180,11 @@ describe('Skip payload crypto', () => {
           session: {},
         }
 
-        cy.request({
-          method: 'PUT',
-          url: `api/v3/as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
-          body: response,
-          headers: {
-            Authorization: `Bearer ${adminApiKey}`,
-          },
-        })
+        cy.intercept(
+          'GET',
+          `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
+          response,
+        )
 
         cy.visit(
           `${Cypress.config(
@@ -224,14 +220,11 @@ describe('Skip payload crypto', () => {
           session: {},
         }
 
-        cy.request({
-          method: 'PUT',
-          url: `api/v3/as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
-          body: response,
-          headers: {
-            Authorization: `Bearer ${adminApiKey}`,
-          },
-        })
+        cy.intercept(
+          'GET',
+          `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
+          response,
+        )
 
         cy.visit(
           `${Cypress.config(
