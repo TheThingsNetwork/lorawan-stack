@@ -24,7 +24,6 @@ import (
 	"strings"
 	"testing"
 
-	echo "github.com/labstack/echo/v4"
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -228,7 +227,7 @@ func TestServer(t *testing.T) {
 				c.res.GetIdentifiersForEUI = c.res.Get.GetIds()
 			},
 			RequestSetup: func(req *http.Request) {
-				req.Header.Del(echo.HeaderAuthorization)
+				req.Header.Del("Authorization")
 			},
 			AssertError: func(err error) bool {
 				return errors.IsUnauthenticated(err)
@@ -334,7 +333,7 @@ func TestServer(t *testing.T) {
 				WithAllowCUPSURIUpdate(true),
 			},
 			RequestSetup: func(req *http.Request) {
-				req.Header.Set(echo.HeaderAuthorization, "Bearer KEYCONTENTS")
+				req.Header.Set("Authorization", "Bearer KEYCONTENTS")
 			},
 			AssertError: func(err error) bool {
 				return err == nil
@@ -376,7 +375,7 @@ func TestServer(t *testing.T) {
 				WithAllowCUPSURIUpdate(true),
 			},
 			RequestSetup: func(req *http.Request) {
-				req.Header.Set(echo.HeaderAuthorization, "KEYCONTENTS")
+				req.Header.Set("Authorization", "KEYCONTENTS")
 			},
 			AssertError: func(err error) bool {
 				return err == nil
@@ -418,7 +417,7 @@ func TestServer(t *testing.T) {
 				WithAllowCUPSURIUpdate(true),
 			},
 			RequestSetup: func(req *http.Request) {
-				req.Header.Set(echo.HeaderAuthorization, "Bearer KEYCONTENTS")
+				req.Header.Set("Authorization", "Bearer KEYCONTENTS")
 			},
 			AssertError: func(err error) bool {
 				return errors.IsNotFound(err)
@@ -436,7 +435,7 @@ func TestServer(t *testing.T) {
 				WithAllowCUPSURIUpdate(true),
 			},
 			RequestSetup: func(req *http.Request) {
-				req.Header.Set(echo.HeaderAuthorization, "Bearer KEYCONTENTS")
+				req.Header.Set("Authorization", "Bearer KEYCONTENTS")
 			},
 			AssertError: func(err error) bool {
 				return err == nil
@@ -478,7 +477,7 @@ func TestServer(t *testing.T) {
 				WithAllowCUPSURIUpdate(true),
 			},
 			RequestSetup: func(req *http.Request) {
-				req.Header.Set(echo.HeaderAuthorization, "Bearer KEYCONTENTS")
+				req.Header.Set("Authorization", "Bearer KEYCONTENTS")
 			},
 			AssertError: func(err error) bool {
 				return err == nil
@@ -520,7 +519,7 @@ func TestServer(t *testing.T) {
 				WithAllowCUPSURIUpdate(true),
 			},
 			RequestSetup: func(req *http.Request) {
-				req.Header.Set(echo.HeaderAuthorization, "Bearer KEYCONTENTS")
+				req.Header.Set("Authorization", "Bearer KEYCONTENTS")
 			},
 			AssertError: func(err error) bool {
 				return err == nil
@@ -572,8 +571,8 @@ func TestServer(t *testing.T) {
 			ctx = log.NewContext(ctx, test.GetLogger(t))
 			ctx = rights.NewContextWithFetcher(ctx, mockRightsFetcher)
 			req = req.WithContext(ctx)
-			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-			req.Header.Set(echo.HeaderAuthorization, "random string")
+			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("Authorization", "random string")
 			if tt.RequestSetup != nil {
 				tt.RequestSetup(req)
 			}

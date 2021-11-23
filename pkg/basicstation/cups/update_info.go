@@ -28,7 +28,6 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -208,7 +207,7 @@ func (s *Server) updateInfo(w http.ResponseWriter, r *http.Request) (err error) 
 	logger.WithField("gateway_uid", uid).Debug("Found gateway for EUI")
 
 	var md metadata.MD
-	auth := r.Header.Get(echo.HeaderAuthorization)
+	auth := r.Header.Get("Authorization")
 	if auth != "" {
 		if !strings.HasPrefix(auth, "Bearer ") {
 			auth = fmt.Sprintf("Bearer %s", auth)
