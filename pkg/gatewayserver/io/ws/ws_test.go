@@ -1609,7 +1609,7 @@ func TestPingPong(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), Config{
-				WSPingInterval:       (1 << 2) * test.Delay,
+				WSPingInterval:       (1 << 5) * test.Delay,
 				AllowUnauthenticated: true,
 				UseTrafficTLSAddress: false,
 				MissedPongThreshold:  2,
@@ -1635,6 +1635,7 @@ func TestPingPong(t *testing.T) {
 			defer conn.Close()
 
 			handler := NewPingPongHandler(conn, tc.DisablePongs, tc.NoOfPongs)
+			conn.SetPingHandler(handler.HandlePing)
 
 			errCh := make(chan error)
 
@@ -1655,10 +1656,8 @@ func TestPingPong(t *testing.T) {
 				}
 			}()
 
-			conn.SetPingHandler(handler.HandlePing)
-
 			// Wait for connection to setup
-			time.After(1 << 7 * test.Delay)
+			time.After(1 << 8 * test.Delay)
 
 			select {
 			case <-ctx.Done():
@@ -1673,7 +1672,7 @@ func TestPingPong(t *testing.T) {
 				t.Fatal("Test time out")
 			case err := <-errCh:
 				if !tc.DisablePongs && tc.NoOfPongs == 1 {
-					if websocket.IsUnexpectedCloseError(err) || websocket.IsCloseError(err) {
+					if websocket.IsUnexpectedCloseError(err) {
 						// This is the error for WebSocket disconnection.
 						break
 					}
