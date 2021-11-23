@@ -73,7 +73,7 @@ func (s *apiKeyStore) CreateAPIKey(ctx context.Context, entityID *ttnpb.EntityId
 		Name:       key.Name,
 		EntityID:   entity.PrimaryKey(),
 		EntityType: entityTypeForID(entityID),
-		ExpiresAt:  key.ExpiresAt,
+		ExpiresAt:  ttnpb.StdTime(key.ExpiresAt),
 	}
 	if err = s.createEntity(ctx, model); err != nil {
 		return nil, err
@@ -167,7 +167,7 @@ func (s *apiKeyStore) UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityId
 		keyModel.Rights = Rights{Rights: key.Rights}
 	}
 	if ttnpb.HasAnyField(fieldMask.GetPaths(), "expires_at") {
-		keyModel.ExpiresAt = key.ExpiresAt
+		keyModel.ExpiresAt = ttnpb.StdTime(key.ExpiresAt)
 	}
 	if ttnpb.HasAnyField(fieldMask.GetPaths(), "name") {
 		keyModel.Name = key.Name

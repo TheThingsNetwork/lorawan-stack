@@ -45,18 +45,18 @@ func (c ContactInfoValidation) toPB() *ttnpb.ContactInfoValidation {
 	return &ttnpb.ContactInfoValidation{
 		Id:        c.Reference,
 		Token:     c.Token,
-		CreatedAt: &c.CreatedAt,
-		ExpiresAt: c.ExpiresAt,
+		CreatedAt: ttnpb.ProtoTime(&c.CreatedAt),
+		ExpiresAt: ttnpb.ProtoTime(c.ExpiresAt),
 	}
 }
 
 func (c *ContactInfoValidation) fromPB(pb *ttnpb.ContactInfoValidation) {
 	c.Reference = pb.Id
 	c.Token = pb.Token
-	if pb.CreatedAt != nil {
-		c.CreatedAt = cleanTime(*pb.CreatedAt)
+	if createdAt := ttnpb.StdTime(pb.CreatedAt); createdAt != nil {
+		c.CreatedAt = cleanTime(*createdAt)
 	}
-	if pb.ExpiresAt != nil {
-		c.ExpiresAt = cleanTimePtr(pb.ExpiresAt)
+	if expiresAt := ttnpb.StdTime(pb.ExpiresAt); expiresAt != nil {
+		c.ExpiresAt = cleanTimePtr(expiresAt)
 	}
 }

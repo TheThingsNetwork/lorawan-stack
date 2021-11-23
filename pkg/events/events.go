@@ -61,7 +61,7 @@ func local(evt Event) *event {
 			innerEvent: ttnpb.Event{
 				UniqueId:       evt.UniqueID(),
 				Name:           evt.Name(),
-				Time:           &t,
+				Time:           ttnpb.ProtoTimePtr(t),
 				Identifiers:    evt.Identifiers(),
 				CorrelationIds: evt.CorrelationIDs(),
 				Origin:         evt.Origin(),
@@ -138,10 +138,16 @@ func (e *event) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (e event) UniqueID() string                        { return e.innerEvent.UniqueId }
-func (e event) Context() context.Context                { return e.ctx }
-func (e event) Name() string                            { return e.innerEvent.Name }
-func (e event) Time() time.Time                         { return *e.innerEvent.Time }
+func (e event) UniqueID() string         { return e.innerEvent.UniqueId }
+func (e event) Context() context.Context { return e.ctx }
+func (e event) Name() string             { return e.innerEvent.Name }
+func (e event) Time() time.Time {
+	t := ttnpb.StdTime(e.innerEvent.GetTime())
+	if t != nil {
+		return *t
+	}
+	return time.Time{}
+}
 func (e event) Identifiers() []*ttnpb.EntityIdentifiers { return e.innerEvent.Identifiers }
 func (e event) Data() interface{}                       { return e.data }
 func (e event) CorrelationIDs() []string                { return e.innerEvent.CorrelationIds }

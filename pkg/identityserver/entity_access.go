@@ -122,7 +122,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			if !valid {
 				return errInvalidAuthorization.New()
 			}
-			if apiKey.ExpiresAt != nil && apiKey.ExpiresAt.Before(time.Now()) {
+			if expiresAt := ttnpb.StdTime(apiKey.ExpiresAt); expiresAt != nil && expiresAt.Before(time.Now()) {
 				return errAPIKeyExpired.New()
 			}
 			apiKey.Key = ""
@@ -163,7 +163,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			if !valid {
 				return errInvalidAuthorization.New()
 			}
-			if accessToken.ExpiresAt != nil && accessToken.ExpiresAt.Before(time.Now()) {
+			if expiresAt := ttnpb.StdTime(accessToken.ExpiresAt); expiresAt != nil && expiresAt.Before(time.Now()) {
 				return errTokenExpired.New()
 			}
 			accessToken.AccessToken, accessToken.RefreshToken = "", ""
@@ -226,7 +226,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			if !valid {
 				return errInvalidAuthorization.New()
 			}
-			if session.ExpiresAt != nil && session.ExpiresAt.Before(time.Now()) {
+			if expiresAt := ttnpb.StdTime(session.ExpiresAt); expiresAt != nil && expiresAt.Before(time.Now()) {
 				return errTokenExpired.New()
 			}
 			session.SessionSecret = ""

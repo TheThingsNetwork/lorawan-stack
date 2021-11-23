@@ -47,11 +47,6 @@ type protobufv2 struct {
 	topics.Layout
 }
 
-// TimePtr converts time to a pointer.
-func TimePtr(x time.Time) *time.Time {
-	return &x
-}
-
 func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ ttnpb.GatewayIdentifiers) ([]byte, error) {
 	settings := down.GetScheduled()
 	if settings == nil {
@@ -218,10 +213,10 @@ func (protobufv2) ToStatus(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.G
 	}
 	return &ttnpb.GatewayStatus{
 		AntennaLocations: antennasLocation,
-		BootTime:         TimePtr(time.Unix(0, v2status.BootTime)),
+		BootTime:         ttnpb.ProtoTimePtr(time.Unix(0, v2status.BootTime)),
 		Ip:               v2status.Ip,
 		Metrics:          metrics,
-		Time:             TimePtr(time.Unix(0, v2status.Time)),
+		Time:             ttnpb.ProtoTimePtr(time.Unix(0, v2status.Time)),
 		Versions:         versions,
 	}, nil
 }

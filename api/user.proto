@@ -42,11 +42,11 @@ message User {
   // The identifiers of the user. These are public and can be seen by any authenticated user in the network.
   UserIdentifiers ids = 1 [(validate.rules).message.required = true];
   // When the user was created. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp created_at = 2 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 2;
   // When the user was last updated. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp updated_at = 3 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 3;
   // When the user was deleted. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp deleted_at = 19 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp deleted_at = 19;
 
   // The name of the user. This information is public and can be seen by any authenticated user in the network.
   string name = 4 [(validate.rules).string.max_len = 50];
@@ -70,13 +70,13 @@ message User {
   string primary_email_address = 8 [(validate.rules).string.email = true];
 
   // When the primary email address was validated. Note that email address validation is not required on all networks.
-  google.protobuf.Timestamp primary_email_address_validated_at = 9 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp primary_email_address_validated_at = 9;
 
   // The password field is only considered when creating a user.
   // It is not returned on API calls, and can not be updated by updating the User.
   // See the UpdatePassword method of the UserRegistry service for more information.
   string password = 10 [(validate.rules).string.max_len = 1000];
-  google.protobuf.Timestamp password_updated_at = 11 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp password_updated_at = 11;
   bool require_password_update = 12;
 
   // The reviewing state of the user.
@@ -96,8 +96,8 @@ message User {
   // It is not returned on API calls, and can not be updated by updating the User.
   // See the CreateTemporaryPassword method of the UserRegistry service for more information.
   string temporary_password = 15 [(validate.rules).string.max_len = 1000];
-  google.protobuf.Timestamp temporary_password_created_at = 16 [(gogoproto.stdtime) = true];
-  google.protobuf.Timestamp temporary_password_expires_at = 17 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp temporary_password_created_at = 16;
+  google.protobuf.Timestamp temporary_password_expires_at = 17;
 
   // A profile picture for the user.
   // This information is public and can be seen by any authenticated user in the network.
@@ -180,7 +180,7 @@ message CreateUserAPIKeyRequest {
       items: { enum: { defined_only: true } }
     }
   ];
-  google.protobuf.Timestamp expires_at = 4 [(gogoproto.stdtime) = true, (validate.rules).timestamp.gt_now = true];
+  google.protobuf.Timestamp expires_at = 4 [(validate.rules).timestamp.gt_now = true];
 }
 
 message UpdateUserAPIKeyRequest {
@@ -194,11 +194,11 @@ message Invitation {
   string email = 1 [(validate.rules).string.email = true];
   string token = 2;
 
-  google.protobuf.Timestamp expires_at = 3 [(gogoproto.stdtime) = true];
-  google.protobuf.Timestamp created_at = 4 [(gogoproto.stdtime) = true];
-  google.protobuf.Timestamp updated_at = 5 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp expires_at = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
 
-  google.protobuf.Timestamp accepted_at = 6 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp accepted_at = 6;
   UserIdentifiers accepted_by = 7;
 }
 
@@ -229,9 +229,9 @@ message UserSessionIdentifiers {
 message UserSession {
   UserIdentifiers user_ids = 1 [(validate.rules).message.required = true];
   string session_id = 2 [(validate.rules).string.max_len = 64];
-  google.protobuf.Timestamp created_at = 3 [(gogoproto.stdtime) = true];
-  google.protobuf.Timestamp updated_at = 4 [(gogoproto.stdtime) = true];
-  google.protobuf.Timestamp expires_at = 5 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 3;
+  google.protobuf.Timestamp updated_at = 4;
+  google.protobuf.Timestamp expires_at = 5;
   // The session secret is used to compose an authorization key and is never returned.
   string session_secret = 6;
 }
@@ -256,9 +256,9 @@ message ListUserSessionsRequest {
 message LoginToken {
   UserIdentifiers user_ids = 1 [(validate.rules).message.required = true];
 
-  google.protobuf.Timestamp created_at = 2 [(gogoproto.stdtime) = true];
-  google.protobuf.Timestamp updated_at = 3 [(gogoproto.stdtime) = true];
-  google.protobuf.Timestamp expires_at = 4 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.Timestamp expires_at = 4;
 
   string token = 5;
   bool used = 6;

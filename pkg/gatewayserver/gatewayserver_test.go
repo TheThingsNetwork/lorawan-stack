@@ -71,11 +71,6 @@ var (
 	wsPingInterval = (1 << 3) * test.Delay
 )
 
-func timePtrUTC(x time.Time) *time.Time {
-	utc := x.UTC()
-	return &utc
-}
-
 func TestGatewayServer(t *testing.T) {
 	for _, rtc := range []struct {
 		Name                   string
@@ -767,7 +762,7 @@ func TestGatewayServer(t *testing.T) {
 									UpdateLocation: false,
 									Up: &ttnpb.GatewayUp{
 										GatewayStatus: &ttnpb.GatewayStatus{
-											Time: timePtrUTC(time.Unix(424242, 0)),
+											Time: ttnpb.ProtoTimePtr(time.Unix(424242, 0)),
 											AntennaLocations: []*ttnpb.Location{
 												{
 													Source:    ttnpb.SOURCE_GPS,
@@ -787,7 +782,7 @@ func TestGatewayServer(t *testing.T) {
 									UpdateLocation: true,
 									Up: &ttnpb.GatewayUp{
 										GatewayStatus: &ttnpb.GatewayStatus{
-											Time: timePtrUTC(time.Unix(424242, 0)),
+											Time: ttnpb.ProtoTimePtr(time.Unix(424242, 0)),
 										},
 									},
 									ExpectLocation: &ttnpb.Location{
@@ -799,7 +794,7 @@ func TestGatewayServer(t *testing.T) {
 									UpdateLocation: true,
 									Up: &ttnpb.GatewayUp{
 										GatewayStatus: &ttnpb.GatewayStatus{
-											Time: timePtrUTC(time.Unix(42424242, 0)),
+											Time: ttnpb.ProtoTimePtr(time.Unix(42424242, 0)),
 											AntennaLocations: []*ttnpb.Location{
 												{
 													Source:    ttnpb.SOURCE_GPS,
@@ -1028,7 +1023,7 @@ func TestGatewayServer(t *testing.T) {
 								Name: "GatewayStatus",
 								Up: &ttnpb.GatewayUp{
 									GatewayStatus: &ttnpb.GatewayStatus{
-										Time: timePtrUTC(time.Unix(424242, 0)),
+										Time: ttnpb.ProtoTimePtr(time.Unix(424242, 0)),
 									},
 								},
 							},
@@ -1281,7 +1276,7 @@ func TestGatewayServer(t *testing.T) {
 										},
 									},
 									GatewayStatus: &ttnpb.GatewayStatus{
-										Time: timePtrUTC(time.Unix(4242424, 0)),
+										Time: ttnpb.ProtoTimePtr(time.Unix(4242424, 0)),
 									},
 								},
 								Forwards: []uint32{200, 300},

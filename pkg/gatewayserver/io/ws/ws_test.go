@@ -711,8 +711,10 @@ func TestVersion(t *testing.T) {
 			}
 			select {
 			case stat := <-gsConn.Status():
-				a.So(time.Since(*stat.Time), should.BeLessThan, timeout)
-				stat.Time = nil
+				if a.So(stat.Time, should.NotBeNil) {
+					a.So(time.Since(*ttnpb.StdTime(stat.Time)), should.BeLessThan, timeout)
+					stat.Time = nil
+				}
 				a.So(stat, should.Resemble, &tc.ExpectedStatusMessage)
 			case <-time.After(timeout):
 				t.Fatalf("Read message timeout")

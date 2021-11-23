@@ -59,7 +59,7 @@ func (is *IdentityServer) sendInvitation(ctx context.Context, in *ttnpb.SendInvi
 	invitation := &ttnpb.Invitation{
 		Email:     in.Email,
 		Token:     token,
-		ExpiresAt: &expires,
+		ExpiresAt: ttnpb.ProtoTimePtr(expires),
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		invitation, err = store.GetInvitationStore(db).CreateInvitation(ctx, invitation)

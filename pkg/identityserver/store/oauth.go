@@ -36,8 +36,8 @@ type ClientAuthorization struct {
 func (a ClientAuthorization) toPB() *ttnpb.OAuthClientAuthorization {
 	pb := &ttnpb.OAuthClientAuthorization{
 		Rights:    a.Rights.Rights,
-		CreatedAt: cleanTimePtr(&a.CreatedAt),
-		UpdatedAt: cleanTimePtr(&a.UpdatedAt),
+		CreatedAt: ttnpb.ProtoTimePtr(cleanTime(a.CreatedAt)),
+		UpdatedAt: ttnpb.ProtoTimePtr(cleanTime(a.UpdatedAt)),
 	}
 	if a.Client != nil {
 		pb.ClientIds.ClientId = a.Client.ClientID
@@ -74,8 +74,8 @@ func (a AuthorizationCode) toPB() *ttnpb.OAuthAuthorizationCode {
 		Code:        a.Code,
 		RedirectUri: a.RedirectURI,
 		State:       a.State,
-		CreatedAt:   cleanTimePtr(&a.CreatedAt),
-		ExpiresAt:   cleanTimePtr(a.ExpiresAt),
+		CreatedAt:   ttnpb.ProtoTimePtr(cleanTime(a.CreatedAt)),
+		ExpiresAt:   ttnpb.ProtoTime(cleanTimePtr(a.ExpiresAt)),
 	}
 	if a.Client != nil {
 		pb.ClientIds.ClientId = a.Client.ClientID
@@ -120,8 +120,8 @@ func (a AccessToken) toPB() *ttnpb.OAuthAccessToken {
 		Id:           a.TokenID,
 		AccessToken:  a.AccessToken,
 		RefreshToken: a.RefreshToken,
-		CreatedAt:    cleanTimePtr(&a.CreatedAt),
-		ExpiresAt:    cleanTimePtr(a.ExpiresAt),
+		CreatedAt:    ttnpb.ProtoTimePtr(cleanTime(a.CreatedAt)),
+		ExpiresAt:    ttnpb.ProtoTime(cleanTimePtr(a.ExpiresAt)),
 	}
 	if a.Client != nil {
 		pb.ClientIds.ClientId = a.Client.ClientID

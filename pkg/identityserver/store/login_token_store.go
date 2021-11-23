@@ -68,7 +68,7 @@ func (s *loginTokenStore) CreateLoginToken(ctx context.Context, loginToken *ttnp
 	model := LoginToken{
 		UserID:    user.PrimaryKey(),
 		Token:     loginToken.Token,
-		ExpiresAt: loginToken.ExpiresAt,
+		ExpiresAt: ttnpb.StdTime(loginToken.ExpiresAt),
 	}
 	if err := s.createEntity(ctx, &model); err != nil {
 		return nil, convertError(err)

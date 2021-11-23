@@ -49,7 +49,7 @@ func GenerateAPIKey(ctx context.Context, name string, expiresAt *time.Time, righ
 		Key:       hashedKey,
 		Name:      name,
 		Rights:    rights,
-		ExpiresAt: expiresAt,
+		ExpiresAt: ttnpb.ProtoTime(expiresAt),
 	}
 	return key, token, nil
 }

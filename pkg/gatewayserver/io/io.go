@@ -673,24 +673,24 @@ func (c *Connection) RTTStats(percentile int, t time.Time) (min, max, median, np
 func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
 	ct := c.ConnectTime()
 	stats := &ttnpb.GatewayConnectionStats{
-		ConnectedAt: &ct,
+		ConnectedAt: ttnpb.ProtoTimePtr(ct),
 		Protocol:    c.Frontend().Protocol(),
 	}
 	paths := make([]string, 0, len(ttnpb.GatewayConnectionStatsFieldPathsTopLevel))
 	paths = append(paths, "connected_at", "protocol")
 
 	if s, t, ok := c.StatusStats(); ok {
-		stats.LastStatusReceivedAt = &t
+		stats.LastStatusReceivedAt = ttnpb.ProtoTimePtr(t)
 		stats.LastStatus = s
 		paths = append(paths, "last_status_received_at", "last_status")
 	}
 	if count, t, ok := c.UpStats(); ok {
-		stats.LastUplinkReceivedAt = &t
+		stats.LastUplinkReceivedAt = ttnpb.ProtoTimePtr(t)
 		stats.UplinkCount = count
 		paths = append(paths, "last_uplink_received_at", "uplink_count")
 	}
 	if count, t, ok := c.DownStats(); ok {
-		stats.LastDownlinkReceivedAt = &t
+		stats.LastDownlinkReceivedAt = ttnpb.ProtoTimePtr(t)
 		stats.DownlinkCount = count
 		paths = append(paths, "last_downlink_received_at", "downlink_count")
 		if c.scheduler != nil {
@@ -701,9 +701,9 @@ func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
 	}
 	if min, max, median, _, count := c.RTTStats(100, time.Now()); count > 0 {
 		stats.RoundTripTimes = &ttnpb.GatewayConnectionStats_RoundTripTimes{
-			Min:    &min,
-			Max:    &max,
-			Median: &median,
+			Min:    ttnpb.ProtoDurationPtr(min),
+			Max:    ttnpb.ProtoDurationPtr(max),
+			Median: ttnpb.ProtoDurationPtr(median),
 			Count:  uint32(count),
 		}
 		paths = append(paths, "round_trip_times")

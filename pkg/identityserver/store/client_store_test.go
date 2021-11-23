@@ -53,8 +53,8 @@ func TestClientStore(t *testing.T) {
 			a.So(created.Name, should.Equal, "Foo Client")
 			a.So(created.Description, should.Equal, "The Amazing Foo Client")
 			a.So(created.Attributes, should.HaveLength, 3)
-			a.So(*created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
-			a.So(*created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
 		}
 
 		got, err := store.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes"}})
@@ -93,7 +93,7 @@ func TestClientStore(t *testing.T) {
 			a.So(updated.Description, should.Equal, "The Amazing Foobar Client")
 			a.So(updated.Attributes, should.HaveLength, 3)
 			a.So(updated.CreatedAt, should.Resemble, created.CreatedAt)
-			a.So(*updated.UpdatedAt, should.HappenAfter, *created.CreatedAt)
+			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenAfter, *ttnpb.StdTime(created.CreatedAt))
 		}
 
 		got, err = store.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, nil)

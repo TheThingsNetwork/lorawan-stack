@@ -46,7 +46,7 @@ func (c ContactInfo) toPB() *ttnpb.ContactInfo {
 		ContactMethod: ttnpb.ContactMethod(c.ContactMethod),
 		Value:         c.Value,
 		Public:        c.Public,
-		ValidatedAt:   cleanTimePtr(c.ValidatedAt),
+		ValidatedAt:   ttnpb.ProtoTime(cleanTimePtr(c.ValidatedAt)),
 	}
 }
 
@@ -55,7 +55,7 @@ func (c *ContactInfo) fromPB(pb *ttnpb.ContactInfo) {
 	c.ContactMethod = int(pb.ContactMethod)
 	c.Value = pb.Value
 	c.Public = pb.Public
-	if c.ValidatedAt == nil || (pb.ValidatedAt != nil && pb.ValidatedAt.After(*c.ValidatedAt)) {
-		c.ValidatedAt = cleanTimePtr(pb.ValidatedAt) // Keep old ValidatedAt.
+	if validatedAt := ttnpb.StdTime(pb.ValidatedAt); c.ValidatedAt == nil || (validatedAt != nil && validatedAt.After(*c.ValidatedAt)) {
+		c.ValidatedAt = cleanTimePtr(validatedAt)
 	}
 }

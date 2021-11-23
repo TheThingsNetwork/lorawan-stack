@@ -31,7 +31,7 @@ func (x *User) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.CreatedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.CreatedAt)
+			gogo.MarshalTimestamp(s, x.CreatedAt)
 		}
 	}
 	if x.UpdatedAt != nil || s.HasField("updated_at") {
@@ -40,7 +40,7 @@ func (x *User) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.UpdatedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.UpdatedAt)
+			gogo.MarshalTimestamp(s, x.UpdatedAt)
 		}
 	}
 	if x.DeletedAt != nil || s.HasField("deleted_at") {
@@ -49,7 +49,7 @@ func (x *User) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.DeletedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.DeletedAt)
+			gogo.MarshalTimestamp(s, x.DeletedAt)
 		}
 	}
 	if x.Name != "" || s.HasField("name") {
@@ -96,7 +96,7 @@ func (x *User) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.PrimaryEmailAddressValidatedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.PrimaryEmailAddressValidatedAt)
+			gogo.MarshalTimestamp(s, x.PrimaryEmailAddressValidatedAt)
 		}
 	}
 	if x.Password != "" || s.HasField("password") {
@@ -110,7 +110,7 @@ func (x *User) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.PasswordUpdatedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.PasswordUpdatedAt)
+			gogo.MarshalTimestamp(s, x.PasswordUpdatedAt)
 		}
 	}
 	if x.RequirePasswordUpdate || s.HasField("require_password_update") {
@@ -144,7 +144,7 @@ func (x *User) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.TemporaryPasswordCreatedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.TemporaryPasswordCreatedAt)
+			gogo.MarshalTimestamp(s, x.TemporaryPasswordCreatedAt)
 		}
 	}
 	if x.TemporaryPasswordExpiresAt != nil || s.HasField("temporary_password_expires_at") {
@@ -153,7 +153,7 @@ func (x *User) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.TemporaryPasswordExpiresAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.TemporaryPasswordExpiresAt)
+			gogo.MarshalTimestamp(s, x.TemporaryPasswordExpiresAt)
 		}
 	}
 	if x.ProfilePicture != nil || s.HasField("profile_picture") {
@@ -182,21 +182,21 @@ func (x *User) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Ids = &v
 		case "created_at", "createdAt":
 			s.AddField("created_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
 			x.CreatedAt = v
 		case "updated_at", "updatedAt":
 			s.AddField("updated_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
 			x.UpdatedAt = v
 		case "deleted_at", "deletedAt":
 			s.AddField("deleted_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -232,7 +232,7 @@ func (x *User) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.PrimaryEmailAddress = s.ReadString()
 		case "primary_email_address_validated_at", "primaryEmailAddressValidatedAt":
 			s.AddField("primary_email_address_validated_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -242,7 +242,7 @@ func (x *User) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Password = s.ReadString()
 		case "password_updated_at", "passwordUpdatedAt":
 			s.AddField("password_updated_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -264,14 +264,14 @@ func (x *User) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.TemporaryPassword = s.ReadString()
 		case "temporary_password_created_at", "temporaryPasswordCreatedAt":
 			s.AddField("temporary_password_created_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
 			x.TemporaryPasswordCreatedAt = v
 		case "temporary_password_expires_at", "temporaryPasswordExpiresAt":
 			s.AddField("temporary_password_expires_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -463,7 +463,7 @@ func (x *CreateUserAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ExpiresAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.ExpiresAt)
+			gogo.MarshalTimestamp(s, x.ExpiresAt)
 		}
 	}
 	s.WriteObjectEnd()
@@ -496,7 +496,7 @@ func (x *CreateUserAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 			})
 		case "expires_at", "expiresAt":
 			s.AddField("expires_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}

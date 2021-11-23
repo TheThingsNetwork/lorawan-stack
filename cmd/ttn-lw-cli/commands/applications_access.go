@@ -264,7 +264,7 @@ var (
 				ApplicationIds: appID,
 				Name:           name,
 				Rights:         rights,
-				ExpiresAt:      expiryDate,
+				ExpiresAt:      ttnpb.ProtoTime(expiryDate),
 			})
 			if err != nil {
 				return err
@@ -311,7 +311,7 @@ var (
 					Id:        id,
 					Name:      name,
 					Rights:    rights,
-					ExpiresAt: expiryDate,
+					ExpiresAt: ttnpb.ProtoTime(expiryDate),
 				},
 				FieldMask: &pbtypes.FieldMask{Paths: paths},
 			})

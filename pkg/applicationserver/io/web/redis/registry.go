@@ -174,8 +174,7 @@ func (r WebhookRegistry) Set(ctx context.Context, ids *ttnpb.ApplicationWebhookI
 				pb = &ttnpb.ApplicationWebhook{}
 			}
 
-			now := time.Now().UTC()
-			pb.UpdatedAt = &now
+			pb.UpdatedAt = ttnpb.ProtoTimePtr(time.Now())
 			sets = append(append(sets[:0:0], sets...),
 				"updated_at",
 			)

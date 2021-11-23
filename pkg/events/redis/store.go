@@ -213,8 +213,10 @@ func (ps *PubSubStore) FetchHistory(ctx context.Context, names []string, ids []*
 			return nil, err
 		}
 		for _, evtPB := range evtPBs {
-			if after != nil && !evtPB.GetTime().Truncate(time.Millisecond).After(*after) {
-				continue
+			if after != nil {
+				if evtTime := ttnpb.StdTime(evtPB.GetTime()); evtTime != nil && !evtTime.Truncate(time.Millisecond).After(*after) {
+					continue
+				}
 			}
 			evt, err := events.FromProto(evtPB)
 			if err != nil {
@@ -272,8 +274,10 @@ func (ps *PubSubStore) SubscribeWithHistory(ctx context.Context, names []string,
 			return err
 		}
 		for _, evtPB := range evtPBs {
-			if after != nil && !evtPB.GetTime().Truncate(time.Millisecond).After(*after) {
-				continue
+			if after != nil {
+				if evtTime := ttnpb.StdTime(evtPB.GetTime()); evtTime != nil && !evtTime.Truncate(time.Millisecond).After(*after) {
+					continue
+				}
 			}
 			evt, err := events.FromProto(evtPB)
 			if err != nil {

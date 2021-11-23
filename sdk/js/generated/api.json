@@ -17791,15 +17791,7 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "timestamp.required",
-                    "value": true
-                  }
-                ]
-              }
+              "defaultValue": ""
             },
             {
               "name": "boot_time",

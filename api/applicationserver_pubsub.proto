@@ -44,8 +44,8 @@ message ApplicationPubSubIdentifiers {
 
 message ApplicationPubSub {
   ApplicationPubSubIdentifiers ids = 1 [(validate.rules).message.required = true];
-  google.protobuf.Timestamp created_at = 2 [(gogoproto.stdtime) = true];
-  google.protobuf.Timestamp updated_at = 3 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
 
   // The format to use for the body.
   // Supported values depend on the Application Server configuration.
@@ -101,7 +101,7 @@ message ApplicationPubSub {
     message AssumeRole {
       string arn = 1 [(validate.rules).string = {pattern: "^arn:aws:iam::[0-9]{12}:role\\/[A-Za-z0-9_+=,.@-]+$"}];
       string external_id = 2 [(validate.rules).string = {pattern: "^[\\w+=,.@:\\/-]*$", max_len: 1224}];
-      google.protobuf.Duration session_duration = 3 [(gogoproto.stdduration) = true];
+      google.protobuf.Duration session_duration = 3;
     }
 
     // If set, the integration will assume the given role during operation.

@@ -143,11 +143,11 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 	if hasStore {
 		if req.After == nil && req.Tail == 0 {
 			now := time.Now()
-			req.After = &now
+			req.After = ttnpb.ProtoTimePtr(now)
 		}
 		group, ctx = errgroup.WithContext(ctx)
 		group.Go(func() error {
-			return store.SubscribeWithHistory(ctx, names, req.Identifiers, req.After, int(req.Tail), handler)
+			return store.SubscribeWithHistory(ctx, names, req.Identifiers, ttnpb.StdTime(req.After), int(req.Tail), handler)
 		})
 	} else {
 		if req.Tail > 0 || req.After != nil {
@@ -166,11 +166,10 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 	if err != nil {
 		return err
 	}
-	now := time.Now().UTC()
 	startEvent := &ttnpb.Event{
 		UniqueId:       events.NewCorrelationID(),
 		Name:           "events.stream.start",
-		Time:           &now,
+		Time:           ttnpb.ProtoTimePtr(time.Now()),
 		Identifiers:    req.Identifiers,
 		Origin:         hostname,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),

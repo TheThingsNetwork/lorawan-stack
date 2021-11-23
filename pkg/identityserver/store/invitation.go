@@ -41,9 +41,9 @@ func (i Invitation) toPB() *ttnpb.Invitation {
 	pb := &ttnpb.Invitation{
 		Email:     i.Email,
 		Token:     i.Token,
-		ExpiresAt: cleanTimePtr(i.ExpiresAt),
-		CreatedAt: cleanTimePtr(&i.CreatedAt),
-		UpdatedAt: cleanTimePtr(&i.UpdatedAt),
+		CreatedAt: ttnpb.ProtoTimePtr(cleanTime(i.CreatedAt)),
+		UpdatedAt: ttnpb.ProtoTimePtr(cleanTime(i.UpdatedAt)),
+		ExpiresAt: ttnpb.ProtoTime(cleanTimePtr(i.ExpiresAt)),
 	}
 	return pb
 }

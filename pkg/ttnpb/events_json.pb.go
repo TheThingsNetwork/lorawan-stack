@@ -30,7 +30,7 @@ func (x *Event) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.Time == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.Time)
+			gogo.MarshalTimestamp(s, x.Time)
 		}
 	}
 	if len(x.Identifiers) > 0 || s.HasField("identifiers") {
@@ -119,7 +119,7 @@ func (x *Event) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Name = s.ReadString()
 		case "time":
 			s.AddField("time")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}

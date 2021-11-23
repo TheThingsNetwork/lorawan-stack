@@ -73,7 +73,7 @@ message IsConfiguration {
   message UserRegistration {
     message Invitation {
       google.protobuf.BoolValue required = 1;
-      google.protobuf.Duration token_ttl = 2 [(gogoproto.stdduration) = true];
+      google.protobuf.Duration token_ttl = 2;
     }
     Invitation invitation = 1;
 

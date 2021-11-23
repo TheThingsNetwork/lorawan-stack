@@ -109,7 +109,7 @@ func (s *Session) Get(c echo.Context) (*ttnpb.UserSession, error) {
 		}
 		return nil, err
 	}
-	if session.ExpiresAt != nil && session.ExpiresAt.Before(time.Now()) {
+	if expiresAt := ttnpb.StdTime(session.ExpiresAt); expiresAt != nil && expiresAt.Before(time.Now()) {
 		s.RemoveAuthCookie(c)
 		return nil, errSessionExpired.New()
 	}

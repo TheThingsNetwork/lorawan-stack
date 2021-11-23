@@ -593,10 +593,11 @@ func (is *IdentityServer) restoreGateway(ctx context.Context, ids *ttnpb.Gateway
 		if err != nil {
 			return err
 		}
-		if gtw.DeletedAt == nil {
+		deletedAt := ttnpb.StdTime(gtw.DeletedAt)
+		if deletedAt == nil {
 			panic("store.WithSoftDeleted(ctx, true) returned result that is not deleted")
 		}
-		if time.Since(*gtw.DeletedAt) > is.configFromContext(ctx).Delete.Restore {
+		if time.Since(*deletedAt) > is.configFromContext(ctx).Delete.Restore {
 			return errRestoreWindowExpired.New()
 		}
 		return gtwStore.RestoreGateway(ctx, ids)
@@ -641,8 +642,8 @@ func validateClaimAuthenticationCode(authCode ttnpb.GatewayClaimAuthenticationCo
 	if authCode.Secret == nil {
 		return errClaimAuthenticationCode.New()
 	}
-	if authCode.ValidFrom != nil && authCode.ValidTo != nil {
-		if authCode.ValidTo.Before(*authCode.ValidFrom) {
+	if validFrom, validTo := ttnpb.StdTime(authCode.ValidFrom), ttnpb.StdTime(authCode.ValidTo); validFrom != nil && validTo != nil {
+		if validTo.Before(*validFrom) {
 			return errClaimAuthenticationCode.New()
 		}
 	}

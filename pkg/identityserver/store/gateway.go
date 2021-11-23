@@ -151,8 +151,7 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 	locationPublicField:       func(pb *ttnpb.Gateway, gtw *Gateway) { pb.LocationPublic = gtw.LocationPublic },
 	scheduleDownlinkLateField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.ScheduleDownlinkLate = gtw.ScheduleDownlinkLate },
 	scheduleAnytimeDelayField: func(pb *ttnpb.Gateway, gtw *Gateway) {
-		d := time.Duration(gtw.ScheduleAnytimeDelay)
-		pb.ScheduleAnytimeDelay = &d
+		pb.ScheduleAnytimeDelay = ttnpb.ProtoDurationPtr(time.Duration(gtw.ScheduleAnytimeDelay))
 	},
 	updateLocationFromStatusField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.UpdateLocationFromStatus = gtw.UpdateLocationFromStatus },
 	enforceDutyCycleField:         func(pb *ttnpb.Gateway, gtw *Gateway) { pb.EnforceDutyCycle = gtw.EnforceDutyCycle },
@@ -188,8 +187,8 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 		}
 		pb.ClaimAuthenticationCode = &ttnpb.GatewayClaimAuthenticationCode{
 			Secret:    secret,
-			ValidFrom: gtw.ClaimAuthenticationCodeValidFrom,
-			ValidTo:   gtw.ClaimAuthenticationCodeValidTo,
+			ValidFrom: ttnpb.ProtoTime(gtw.ClaimAuthenticationCodeValidFrom),
+			ValidTo:   ttnpb.ProtoTime(gtw.ClaimAuthenticationCodeValidTo),
 		}
 	},
 	targetCUPSURIField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.TargetCupsUri = gtw.TargetCUPSURI },
@@ -267,10 +266,9 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 	locationPublicField:       func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.LocationPublic = pb.LocationPublic },
 	scheduleDownlinkLateField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.ScheduleDownlinkLate = pb.ScheduleDownlinkLate },
 	scheduleAnytimeDelayField: func(gtw *Gateway, pb *ttnpb.Gateway) {
-		if pb.ScheduleAnytimeDelay == nil {
-			gtw.ScheduleAnytimeDelay = 0
-		} else {
-			gtw.ScheduleAnytimeDelay = int64(*pb.ScheduleAnytimeDelay)
+		gtw.ScheduleAnytimeDelay = 0
+		if delay := ttnpb.StdDuration(pb.ScheduleAnytimeDelay); delay != nil {
+			gtw.ScheduleAnytimeDelay = int64(*delay)
 		}
 	},
 	updateLocationFromStatusField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.UpdateLocationFromStatus = pb.UpdateLocationFromStatus },
@@ -310,10 +308,10 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 				gtw.ClaimAuthenticationCodeSecret = secretBuffer.Bytes()
 			}
 			if pb.ClaimAuthenticationCode.ValidFrom != nil {
-				gtw.ClaimAuthenticationCodeValidFrom = pb.ClaimAuthenticationCode.ValidFrom
+				gtw.ClaimAuthenticationCodeValidFrom = ttnpb.StdTime(pb.ClaimAuthenticationCode.ValidFrom)
 			}
 			if pb.ClaimAuthenticationCode.ValidTo != nil {
-				gtw.ClaimAuthenticationCodeValidTo = pb.ClaimAuthenticationCode.ValidTo
+				gtw.ClaimAuthenticationCodeValidTo = ttnpb.StdTime(pb.ClaimAuthenticationCode.ValidTo)
 			}
 		}
 	},
@@ -393,9 +391,9 @@ var gatewayColumnNames = map[string][]string{
 func (gtw Gateway) toPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) {
 	pb.Ids = &ttnpb.GatewayIdentifiers{GatewayId: gtw.GatewayID}
 	pb.Ids.Eui = gtw.GatewayEUI.toPB() // Always present.
-	pb.CreatedAt = cleanTimePtr(&gtw.CreatedAt)
-	pb.UpdatedAt = cleanTimePtr(&gtw.UpdatedAt)
-	pb.DeletedAt = cleanTimePtr(gtw.DeletedAt)
+	pb.CreatedAt = ttnpb.ProtoTimePtr(cleanTime(gtw.CreatedAt))
+	pb.UpdatedAt = ttnpb.ProtoTimePtr(cleanTime(gtw.UpdatedAt))
+	pb.DeletedAt = ttnpb.ProtoTime(cleanTimePtr(gtw.DeletedAt))
 	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultGatewayFieldMask
 	}
