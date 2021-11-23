@@ -142,7 +142,7 @@ func (s *server) findAssociations(ctx context.Context, ids *ttnpb.EndDeviceIdent
 
 func (s *server) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
 	ctx = log.NewContextWithField(ctx, "namespace", namespace)
-	associations, err := s.findAssociations(ctx, &msg.EndDeviceIdentifiers)
+	associations, err := s.findAssociations(ctx, msg.EndDeviceIds)
 	if err != nil {
 		return err
 	}

@@ -263,40 +263,40 @@ var (
 )
 
 func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config ForwarderConfig) (*packetbroker.UplinkMessage, error) {
-	msg.Payload = &ttnpb.Message{}
-	if err := lorawan.UnmarshalMessage(msg.RawPayload, msg.Payload); err != nil {
+	msg.Message.Payload = &ttnpb.Message{}
+	if err := lorawan.UnmarshalMessage(msg.Message.RawPayload, msg.Message.Payload); err != nil {
 		return nil, errDecodePayload.WithCause(err)
 	}
-	if msg.Payload.Major != ttnpb.Major_LORAWAN_R1 {
+	if msg.Message.Payload.Major != ttnpb.Major_LORAWAN_R1 {
 		return nil, errUnsupportedLoRaWANVersion.WithAttributes(
-			"version", msg.Payload.Major,
+			"version", msg.Message.Payload.Major,
 		)
 	}
 
-	hash := sha256.Sum256(msg.RawPayload[:len(msg.RawPayload)-4]) // The hash is without MIC to detect retransmissions.
+	hash := sha256.Sum256(msg.Message.RawPayload[:len(msg.Message.RawPayload)-4]) // The hash is without MIC to detect retransmissions.
 	up := &packetbroker.UplinkMessage{
 		PhyPayload: &packetbroker.UplinkMessage_PHYPayload{
 			Teaser: &packetbroker.PHYPayloadTeaser{
 				Hash:   hash[:],
-				Length: uint32(len(msg.RawPayload)),
+				Length: uint32(len(msg.Message.RawPayload)),
 			},
 			Value: &packetbroker.UplinkMessage_PHYPayload_Plain{
-				Plain: msg.RawPayload,
+				Plain: msg.Message.RawPayload,
 			},
 		},
-		Frequency:  msg.Settings.Frequency,
-		CodingRate: msg.Settings.CodingRate,
+		Frequency:  msg.Message.Settings.Frequency,
+		CodingRate: msg.Message.Settings.CodingRate,
 	}
 
 	var ok bool
 	if up.GatewayRegion, ok = toPBRegion[msg.BandId]; !ok {
 		return nil, errUnknownBand.WithAttributes("band_id", msg.BandId)
 	}
-	if up.DataRate, ok = toPBDataRate(msg.Settings.DataRate, msg.Settings.CodingRate); !ok {
+	if up.DataRate, ok = toPBDataRate(msg.Message.Settings.DataRate, msg.Message.Settings.CodingRate); !ok {
 		return nil, errUnknownDataRate.New()
 	}
 
-	switch pld := msg.Payload.Payload.(type) {
+	switch pld := msg.Message.Payload.Payload.(type) {
 	case *ttnpb.Message_JoinRequestPayload:
 		up.PhyPayload.Teaser.Payload = &packetbroker.PHYPayloadTeaser_JoinRequest{
 			JoinRequest: &packetbroker.PHYPayloadTeaser_JoinRequestTeaser{
@@ -317,19 +317,19 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 			},
 		}
 	default:
-		return nil, errUnsupportedMType.WithAttributes("m_type", msg.Payload.MType)
+		return nil, errUnsupportedMType.WithAttributes("m_type", msg.Message.Payload.MType)
 	}
 
 	var gatewayReceiveTime *time.Time
 	var gatewayUplinkToken []byte
-	if len(msg.RxMetadata) > 0 && msg.RxMetadata[0].GatewayIds != nil {
-		md := msg.RxMetadata[0]
+	if len(msg.Message.RxMetadata) > 0 && msg.Message.RxMetadata[0].GatewayIds != nil {
+		md := msg.Message.RxMetadata[0]
 		up.GatewayId = toPBGatewayIdentifier(md.GatewayIds, config)
 
 		var teaser packetbroker.GatewayMetadataTeaser_Terrestrial
 		var signalQuality packetbroker.GatewayMetadataSignalQuality_Terrestrial
 		var localization *packetbroker.GatewayMetadataLocalization_Terrestrial
-		for _, md := range msg.RxMetadata {
+		for _, md := range msg.Message.RxMetadata {
 			var rssiStandardDeviation *pbtypes.FloatValue
 			if md.RssiStandardDeviation > 0 {
 				rssiStandardDeviation = &pbtypes.FloatValue{
@@ -417,7 +417,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 		}
 	}
 
-	if t, err := pbtypes.TimestampProto(msg.ReceivedAt); err == nil {
+	if t, err := pbtypes.TimestampProto(*msg.Message.ReceivedAt); err == nil {
 		up.ForwarderReceiveTime = t
 	}
 	if gatewayReceiveTime != nil {
@@ -465,12 +465,12 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 
 	up := &ttnpb.UplinkMessage{
 		RawPayload: msg.Message.PhyPayload.GetPlain(),
-		Settings: ttnpb.TxSettings{
+		Settings: &ttnpb.TxSettings{
 			DataRate:   dataRate,
 			Frequency:  msg.Message.Frequency,
 			CodingRate: codingRate,
 		},
-		ReceivedAt:     receivedAt,
+		ReceivedAt:     &receivedAt,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
 	}
 

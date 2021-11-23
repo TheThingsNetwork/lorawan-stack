@@ -17832,7 +17832,7 @@
                   },
                   {
                     "name": "map.values.string.max_len",
-                    "value": 32
+                    "value": 128
                   }
                 ]
               }
@@ -28870,7 +28870,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
             },
             {
               "name": "downlinks",

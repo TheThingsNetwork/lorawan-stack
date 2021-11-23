@@ -229,11 +229,11 @@ func nextDataDownlinkSlot(ctx context.Context, dev *ttnpb.EndDevice, phy *band.B
 		case ttnpb.MType_UNCONFIRMED_UP:
 			if classA.Uplink.Payload.GetMacPayload().FCtrl.AdrAckReq {
 				logger.Debug("Acknowledgment required for ADRAckReq")
-				needsAck = dev.MacState.LastDownlinkAt == nil || dev.MacState.LastDownlinkAt.Before(classA.Uplink.ReceivedAt)
+				needsAck = dev.MacState.LastDownlinkAt == nil || dev.MacState.LastDownlinkAt.Before(*classA.Uplink.ReceivedAt)
 			}
 		case ttnpb.MType_CONFIRMED_UP:
 			logger.Debug("Acknowledgment required for confirmed uplink")
-			needsAck = dev.MacState.LastDownlinkAt == nil || dev.MacState.LastDownlinkAt.Before(classA.Uplink.ReceivedAt)
+			needsAck = dev.MacState.LastDownlinkAt == nil || dev.MacState.LastDownlinkAt.Before(*classA.Uplink.ReceivedAt)
 		}
 		rx2 := classA.RX2()
 		switch hasClassA = dev.MacState.RxWindowsAvailable && !rx2.Before(earliestAt) && deviceHasPathForDownlink(ctx, dev, nil); {
@@ -410,7 +410,7 @@ func (ns *NetworkServer) enqueueApplicationUplinks(ctx context.Context, ups ...*
 
 		m := make(map[string][]*ttnpb.ApplicationUp)
 		for _, up := range ups {
-			appID := up.ApplicationIdentifiers.ApplicationId
+			appID := up.EndDeviceIds.ApplicationId
 			m[appID] = append(m[appID], up)
 		}
 		for id, ups := range m {

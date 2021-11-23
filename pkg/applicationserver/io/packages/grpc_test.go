@@ -48,7 +48,7 @@ var (
 	registeredAssociationID   = &ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIds: &registeredDeviceID, FPort: 123}
 	unregisteredAssociationID = &ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIds: &unregisteredDeviceID, FPort: 123}
 	registeredApplicationUp1  = ttnpb.ApplicationUp{
-		EndDeviceIdentifiers: registeredDeviceID,
+		EndDeviceIds: &registeredDeviceID,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{
 			UplinkMessage: &ttnpb.ApplicationUplink{
 				FPort: 123,
@@ -56,7 +56,7 @@ var (
 		},
 	}
 	registeredApplicationUp2 = ttnpb.ApplicationUp{
-		EndDeviceIdentifiers: registeredDeviceID,
+		EndDeviceIds: &registeredDeviceID,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{
 			UplinkMessage: &ttnpb.ApplicationUplink{
 				FPort: 124,
@@ -64,7 +64,7 @@ var (
 		},
 	}
 	unregisteredApplicationUp = ttnpb.ApplicationUp{
-		EndDeviceIdentifiers: unregisteredDeviceID,
+		EndDeviceIds: &unregisteredDeviceID,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{
 			UplinkMessage: &ttnpb.ApplicationUplink{
 				FPort: 123,

@@ -46,7 +46,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 				MacState: &ttnpb.MACState{},
 			},
 			Message: &ttnpb.UplinkMessage{
-				Settings: ttnpb.TxSettings{
+				Settings: &ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{
@@ -71,7 +71,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 				MacState: &ttnpb.MACState{},
 			},
 			Message: &ttnpb.UplinkMessage{
-				Settings: ttnpb.TxSettings{
+				Settings: &ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{
@@ -102,7 +102,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				Settings: ttnpb.TxSettings{
+				Settings: &ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{
@@ -154,7 +154,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				Settings: ttnpb.TxSettings{
+				Settings: &ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{
@@ -206,7 +206,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				Settings: ttnpb.TxSettings{
+				Settings: &ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{
@@ -270,7 +270,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				Settings: ttnpb.TxSettings{
+				Settings: &ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{

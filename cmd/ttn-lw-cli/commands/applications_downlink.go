@@ -52,8 +52,8 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewAppAsClient(as).DownlinkQueuePush(ctx, &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: *devID,
-				Downlinks:            []*ttnpb.ApplicationDownlink{&downlink},
+				EndDeviceIds: devID,
+				Downlinks:    []*ttnpb.ApplicationDownlink{&downlink},
 			})
 			if err != nil {
 				return err
@@ -81,8 +81,8 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewAppAsClient(as).DownlinkQueueReplace(ctx, &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: *devID,
-				Downlinks:            []*ttnpb.ApplicationDownlink{&downlink},
+				EndDeviceIds: devID,
+				Downlinks:    []*ttnpb.ApplicationDownlink{&downlink},
 			})
 			if err != nil {
 				return err
@@ -105,7 +105,7 @@ var (
 				return err
 			}
 			_, err = ttnpb.NewAppAsClient(as).DownlinkQueueReplace(ctx, &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: *devID,
+				EndDeviceIds: devID,
 			})
 			if err != nil {
 				return err

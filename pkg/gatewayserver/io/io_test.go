@@ -91,14 +91,18 @@ func TestFlow(t *testing.T) {
 		frontend.Up <- &ttnpb.UplinkMessage{
 			RxMetadata: []*ttnpb.RxMetadata{
 				{
+					GatewayIds: &ttnpb.GatewayIdentifiers{
+						GatewayId: "test-gateway",
+					},
 					AntennaIndex: 0,
 					Timestamp:    100,
 				},
 			},
+			Settings: &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 		}
 		select {
 		case up := <-conn.Up():
-			token, err := io.ParseUplinkToken(up.RxMetadata[0].UplinkToken)
+			token, err := io.ParseUplinkToken(up.Message.RxMetadata[0].UplinkToken)
 			a.So(err, should.BeNil)
 			a.So(token.Ids.GatewayIds, should.Resemble, &ids)
 			a.So(token.Ids.AntennaIndex, should.Equal, 0)
@@ -115,7 +119,9 @@ func TestFlow(t *testing.T) {
 	}
 
 	{
-		frontend.Status <- &ttnpb.GatewayStatus{}
+		frontend.Status <- &ttnpb.GatewayStatus{
+			Time: ttnpb.ProtoTimePtr(time.Now()),
+		}
 		select {
 		case <-conn.Status():
 		case <-time.After(timeout):
@@ -556,14 +562,18 @@ func TestSubBandEIRPOverride(t *testing.T) {
 		frontend.Up <- &ttnpb.UplinkMessage{
 			RxMetadata: []*ttnpb.RxMetadata{
 				{
+					GatewayIds: &ttnpb.GatewayIdentifiers{
+						GatewayId: "test-gateway",
+					},
 					AntennaIndex: 0,
 					Timestamp:    100,
 				},
 			},
+			Settings: &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 		}
 		select {
 		case up := <-conn.Up():
-			token, err := io.ParseUplinkToken(up.RxMetadata[0].UplinkToken)
+			token, err := io.ParseUplinkToken(up.Message.RxMetadata[0].UplinkToken)
 			a.So(err, should.BeNil)
 			a.So(token.Ids.GatewayIds, should.Resemble, &ids)
 			a.So(token.Ids.AntennaIndex, should.Equal, 0)
@@ -657,12 +667,12 @@ func TestUniqueUplinkMessagesByRSSI(t *testing.T) {
 			name: "one",
 			in: []*ttnpb.UplinkMessage{{
 				RawPayload: []byte{1, 2, 3, 4, 5},
-				Settings:   ttnpb.TxSettings{Frequency: 1000000},
+				Settings:   &ttnpb.TxSettings{Frequency: 1000000},
 				RxMetadata: []*ttnpb.RxMetadata{{Snr: 10, Rssi: -20, AntennaIndex: 0}},
 			}},
 			out: []*ttnpb.UplinkMessage{{
 				RawPayload: []byte{1, 2, 3, 4, 5},
-				Settings:   ttnpb.TxSettings{Frequency: 1000000},
+				Settings:   &ttnpb.TxSettings{Frequency: 1000000},
 				RxMetadata: []*ttnpb.RxMetadata{{Snr: 10, Rssi: -20, AntennaIndex: 0}},
 			}},
 		},
@@ -671,42 +681,42 @@ func TestUniqueUplinkMessagesByRSSI(t *testing.T) {
 			in: []*ttnpb.UplinkMessage{
 				{
 					RawPayload: []byte{1, 2, 3, 4},
-					Settings:   ttnpb.TxSettings{Frequency: 1200000},
+					Settings:   &ttnpb.TxSettings{Frequency: 1200000},
 				},
 				{
 					RawPayload: []byte{1, 2, 3, 4, 5},
-					Settings:   ttnpb.TxSettings{Frequency: 1200000},
+					Settings:   &ttnpb.TxSettings{Frequency: 1200000},
 					RxMetadata: []*ttnpb.RxMetadata{{Snr: 10, Rssi: -40, AntennaIndex: 0}},
 				},
 				{
 					RawPayload: []byte{1, 2, 3, 4, 5},
-					Settings:   ttnpb.TxSettings{Frequency: 1000000},
+					Settings:   &ttnpb.TxSettings{Frequency: 1000000},
 					RxMetadata: []*ttnpb.RxMetadata{{Snr: 10, Rssi: -20, AntennaIndex: 0}},
 				},
 				{
 					RawPayload: []byte{1, 2, 3, 4, 5},
-					Settings:   ttnpb.TxSettings{Frequency: 1100000},
+					Settings:   &ttnpb.TxSettings{Frequency: 1100000},
 					RxMetadata: []*ttnpb.RxMetadata{{Snr: 10, Rssi: -100, AntennaIndex: 0}},
 				},
 				{
 					RawPayload: []byte{1, 2, 3, 4, 5, 6},
-					Settings:   ttnpb.TxSettings{Frequency: 1000000},
+					Settings:   &ttnpb.TxSettings{Frequency: 1000000},
 					RxMetadata: []*ttnpb.RxMetadata{{Snr: 10, Rssi: -10, AntennaIndex: 0}},
 				},
 			},
 			out: []*ttnpb.UplinkMessage{
 				{
 					RawPayload: []byte{1, 2, 3, 4},
-					Settings:   ttnpb.TxSettings{Frequency: 1200000},
+					Settings:   &ttnpb.TxSettings{Frequency: 1200000},
 				},
 				{
 					RawPayload: []byte{1, 2, 3, 4, 5},
-					Settings:   ttnpb.TxSettings{Frequency: 1000000},
+					Settings:   &ttnpb.TxSettings{Frequency: 1000000},
 					RxMetadata: []*ttnpb.RxMetadata{{Snr: 10, Rssi: -20, AntennaIndex: 0}},
 				},
 				{
 					RawPayload: []byte{1, 2, 3, 4, 5, 6},
-					Settings:   ttnpb.TxSettings{Frequency: 1000000},
+					Settings:   &ttnpb.TxSettings{Frequency: 1000000},
 					RxMetadata: []*ttnpb.RxMetadata{{Snr: 10, Rssi: -10, AntennaIndex: 0}},
 				},
 			},

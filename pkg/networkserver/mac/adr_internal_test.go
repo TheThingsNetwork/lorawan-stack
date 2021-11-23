@@ -63,7 +63,7 @@ func NewADRUplink(fCnt uint32, maxSNR float32, gtwCount uint, confirmed bool, tx
 			},
 		},
 		RxMetadata: mds,
-		Settings:   tx,
+		Settings:   &tx,
 	}
 }
 

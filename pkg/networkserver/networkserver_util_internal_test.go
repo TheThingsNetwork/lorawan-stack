@@ -1696,10 +1696,10 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 		appUp = up
 		return test.AllTrue(
 			a.So(up.CorrelationIds, should.HaveSameElementsDeep, append(joinReq.CorrelationIds, joinResp.CorrelationIds...)),
-			a.So([]time.Time{start, recvAt, time.Now()}, should.BeChronological),
+			a.So([]time.Time{start, *recvAt, time.Now()}, should.BeChronological),
 			a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: idsWithDevAddr,
-				CorrelationIds:       up.CorrelationIds,
+				EndDeviceIds:   &idsWithDevAddr,
+				CorrelationIds: up.CorrelationIds,
 				Up: &ttnpb.ApplicationUp_JoinAccept{
 					JoinAccept: &ttnpb.ApplicationJoinAccept{
 						AppSKey:      joinResp.AppSKey,
@@ -1724,8 +1724,8 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 		UserAgent:      true,
 	}),
 		EvtForwardJoinAccept.NewWithIdentifiersAndData(ctx, &idsWithDevAddr, &ttnpb.ApplicationUp{
-			EndDeviceIdentifiers: idsWithDevAddr,
-			CorrelationIds:       appUp.CorrelationIds,
+			EndDeviceIds:   &idsWithDevAddr,
+			CorrelationIds: appUp.CorrelationIds,
 			Up: &ttnpb.ApplicationUp_JoinAccept{
 				JoinAccept: ApplicationJoinAcceptWithoutAppSKey(appUp.GetJoinAccept()),
 			},
@@ -1842,10 +1842,10 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 				return test.AllTrue(
 					a.So(up.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual, deduplicatedUp.CorrelationIds),
 					a.So(up.GetUplinkMessage().GetRxMetadata(), should.HaveSameElementsDeep, deduplicatedUp.RxMetadata),
-					a.So([]time.Time{start, recvAt, time.Now()}, should.BeChronological),
+					a.So([]time.Time{start, *recvAt, time.Now()}, should.BeChronological),
 					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-						CorrelationIds:       up.CorrelationIds,
+						EndDeviceIds:   &dev.EndDeviceIdentifiers,
+						CorrelationIds: up.CorrelationIds,
 						Up: &ttnpb.ApplicationUp_UplinkMessage{
 							UplinkMessage: &ttnpb.ApplicationUplink{
 								Confirmed:    conf.Confirmed,

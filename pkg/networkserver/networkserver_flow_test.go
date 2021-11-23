@@ -291,8 +291,8 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 					// TODO: Enable this assertion once https://github.com/TheThingsNetwork/lorawan-stack/issues/3416 is done.
 					// a.So(up.CorrelationIDs, should.HaveSameElementsDeep, LastDownlink(dev.RecentDownlinks...).CorrelationIDs),
 					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-						CorrelationIds:       up.CorrelationIds,
+						EndDeviceIds:   &dev.EndDeviceIdentifiers,
+						CorrelationIds: up.CorrelationIds,
 						Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 							DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 								SessionKeyId: dev.Session.SessionKeyId,

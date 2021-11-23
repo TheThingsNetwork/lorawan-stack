@@ -190,6 +190,7 @@ func TestTraffic(t *testing.T) {
 				Topic: fmt.Sprintf("v3/%v/up", registeredGatewayUID),
 				Message: &ttnpb.UplinkMessage{
 					RawPayload: []byte{0x01},
+					Settings:   &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 				},
 				OK: true,
 			},
@@ -217,7 +218,8 @@ func TestTraffic(t *testing.T) {
 			{
 				Topic: fmt.Sprintf("v3/%v/status", registeredGatewayUID),
 				Message: &ttnpb.GatewayStatus{
-					Ip: []string{"1.1.1.1"},
+					Time: ttnpb.ProtoTimePtr(time.Now()),
+					Ip:   []string{"1.1.1.1"},
 				},
 				OK: true,
 			},
@@ -257,9 +259,9 @@ func TestTraffic(t *testing.T) {
 				select {
 				case up := <-conn.Up():
 					if tc.OK {
-						a.So(time.Since(up.ReceivedAt), should.BeLessThan, timeout)
-						up.ReceivedAt = time.Time{}
-						a.So(up.UplinkMessage, should.Resemble, tc.Message)
+						a.So(time.Since(*up.Message.ReceivedAt), should.BeLessThan, timeout)
+						up.Message.ReceivedAt = nil
+						a.So(up.Message, should.Resemble, tc.Message)
 					} else {
 						t.Fatalf("Did not expect uplink message, but have %v", up)
 					}

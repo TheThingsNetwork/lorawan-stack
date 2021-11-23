@@ -120,7 +120,7 @@ func TestUplinkMessageFromProto(t *testing.T) {
 	a := assertions.New(t)
 	a.So(uplinkMessageFromProto(&ttnpb.UplinkMessage{
 		RawPayload: []byte{1, 2, 3},
-		Settings:   ttnpb.TxSettings{Frequency: 100000},
+		Settings:   &ttnpb.TxSettings{Frequency: 100000},
 		RxMetadata: []*ttnpb.RxMetadata{{AntennaIndex: 0}, {AntennaIndex: 3}},
 	}), should.Resemble, &uplinkMessage{
 		payload:   []byte{1, 2, 3},

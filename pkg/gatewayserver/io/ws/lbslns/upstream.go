@@ -186,7 +186,7 @@ func (tsr TimeSyncResponse) MarshalJSON() ([]byte, error) {
 // toUplinkMessage extracts fields from the Basics Station Join Request "jreq" message and converts them into an UplinkMessage for the network server.
 func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
 	var up ttnpb.UplinkMessage
-	up.ReceivedAt = receivedAt
+	up.ReceivedAt = &receivedAt
 
 	var parsedMHDR ttnpb.MHDR
 	if err := lorawan.UnmarshalMHDR([]byte{byte(req.MHdr)}, &parsedMHDR); err != nil {
@@ -242,7 +242,7 @@ func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 	case *ttnpb.DataRate_Lrfhss:
 		codingRate = mod.Lrfhss.CodingRate
 	}
-	up.Settings = ttnpb.TxSettings{
+	up.Settings = &ttnpb.TxSettings{
 		Frequency:  req.RadioMetaData.Frequency,
 		DataRate:   bandDR.Rate,
 		CodingRate: codingRate,
@@ -310,7 +310,7 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 // toUplinkMessage extracts fields from the LoRa Basics Station Uplink Data Frame "updf" message and converts them into an UplinkMessage for the network server.
 func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
 	var up ttnpb.UplinkMessage
-	up.ReceivedAt = receivedAt
+	up.ReceivedAt = &receivedAt
 
 	var parsedMHDR ttnpb.MHDR
 	if err := lorawan.UnmarshalMHDR([]byte{byte(updf.MHdr)}, &parsedMHDR); err != nil {
@@ -400,7 +400,7 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 	case *ttnpb.DataRate_Lrfhss:
 		codingRate = mod.Lrfhss.CodingRate
 	}
-	up.Settings = ttnpb.TxSettings{
+	up.Settings = &ttnpb.TxSettings{
 		Frequency:  updf.RadioMetaData.Frequency,
 		DataRate:   bandDR.Rate,
 		CodingRate: codingRate,

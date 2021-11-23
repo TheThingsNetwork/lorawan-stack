@@ -189,15 +189,15 @@ func (i *integration) handleDown(ctx context.Context, op func(io.Server, context
 			logger.WithError(err).Warn("Failed to decode downlink queue operation")
 			continue
 		}
-		if err := operation.EndDeviceIdentifiers.ValidateContext(ctx); err != nil {
+		if err := operation.EndDeviceIds.ValidateContext(ctx); err != nil {
 			logger.WithError(err).Warn("Failed to validate downlink queue operation")
 			continue
 		}
 		logger.WithFields(log.Fields(
-			"device_uid", unique.ID(ctx, operation.EndDeviceIdentifiers),
+			"device_uid", unique.ID(ctx, operation.EndDeviceIds),
 			"count", len(operation.Downlinks),
 		)).Debug("Handle downlink messages")
-		if err := op(i.server, ctx, operation.EndDeviceIdentifiers, operation.Downlinks); err != nil {
+		if err := op(i.server, ctx, *operation.EndDeviceIds, operation.Downlinks); err != nil {
 			logger.WithError(err).Warn("Failed to handle downlink messages")
 		}
 	}

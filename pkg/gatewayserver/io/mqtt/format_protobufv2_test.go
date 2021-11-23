@@ -167,7 +167,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 			},
 			InputPayload: validRawPayload,
 			Expected: &ttnpb.UplinkMessage{
-				Settings:   validV3Settings,
+				Settings:   &validV3Settings,
 				RxMetadata: validV3Metadata,
 			},
 		},
@@ -179,7 +179,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 			},
 			InputPayload: validRawPayload,
 			Expected: &ttnpb.UplinkMessage{
-				Settings:   validV3Settings,
+				Settings:   &validV3Settings,
 				RxMetadata: validV3Metadata,
 			},
 		},

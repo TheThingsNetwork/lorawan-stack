@@ -635,8 +635,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				_, a := test.MustNewTFromContext(ctx)
 				return nil, a.So(ups, should.HaveLength, 1) &&
 					a.So(ups[0], should.Resemble, &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-						CorrelationIds:       LastUplink(dev.MacState.RecentUplinks...).CorrelationIds,
+						EndDeviceIds:   &dev.EndDeviceIdentifiers,
+						CorrelationIds: LastUplink(dev.MacState.RecentUplinks...).CorrelationIds,
 						Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 							DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 								LastFCntDown: dev.Session.LastNFCntDown,
@@ -712,12 +712,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 				_, a := test.MustNewTFromContext(ctx)
 				return nil, a.So(ups, should.HaveLength, 1) &&
 					a.So(ups[0], should.Resemble, &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-						CorrelationIds:       append(LastUplink(dev.MacState.RecentUplinks...).CorrelationIds, dev.Session.QueuedApplicationDownlinks[0].CorrelationIds...),
+						EndDeviceIds:   &dev.EndDeviceIdentifiers,
+						CorrelationIds: append(LastUplink(dev.MacState.RecentUplinks...).CorrelationIds, dev.Session.QueuedApplicationDownlinks[0].CorrelationIds...),
 						Up: &ttnpb.ApplicationUp_DownlinkFailed{
 							DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-								ApplicationDownlink: *dev.Session.QueuedApplicationDownlinks[0],
-								Error:               *ttnpb.ErrorDetailsToProto(ErrApplicationDownlinkTooLong.WithAttributes("length", 250, "max", uint16(51))),
+								Downlink: dev.Session.QueuedApplicationDownlinks[0],
+								Error:    ttnpb.ErrorDetailsToProto(ErrApplicationDownlinkTooLong.WithAttributes("length", 250, "max", uint16(51))),
 							},
 						},
 					})
@@ -2082,12 +2082,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 				_, a := test.MustNewTFromContext(ctx)
 				return nil, a.So(ups, should.HaveLength, 1) &&
 					a.So(ups[0], should.Resemble, &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
-						CorrelationIds:       dev.Session.QueuedApplicationDownlinks[0].CorrelationIds,
+						EndDeviceIds:   &dev.EndDeviceIdentifiers,
+						CorrelationIds: dev.Session.QueuedApplicationDownlinks[0].CorrelationIds,
 						Up: &ttnpb.ApplicationUp_DownlinkFailed{
 							DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-								ApplicationDownlink: *dev.Session.QueuedApplicationDownlinks[0],
-								Error:               *ttnpb.ErrorDetailsToProto(ErrInvalidAbsoluteTime),
+								Downlink: dev.Session.QueuedApplicationDownlinks[0],
+								Error:    ttnpb.ErrorDetailsToProto(ErrInvalidAbsoluteTime),
 							},
 						},
 					})
@@ -2495,8 +2495,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				ok := false
 				if a.So(ups, should.HaveLength, 1) {
 					ok = a.So(ups[0], should.Resemble, &ttnpb.ApplicationUp{
-						EndDeviceIdentifiers: ids,
-						CorrelationIds:       cids,
+						EndDeviceIds:   &ids,
+						CorrelationIds: cids,
 						Up: &ttnpb.ApplicationUp_JoinAccept{
 							JoinAccept: &ttnpb.ApplicationJoinAccept{
 								AppSKey:              dev.PendingMacState.QueuedJoinAccept.Keys.AppSKey,
@@ -2514,8 +2514,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					EvtForwardJoinAccept.With(
 						events.WithIdentifiers(&ids),
 						events.WithData(&ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: ids,
-							CorrelationIds:       cids,
+							EndDeviceIds:   &ids,
+							CorrelationIds: cids,
 							Up: &ttnpb.ApplicationUp_JoinAccept{
 								JoinAccept: &ttnpb.ApplicationJoinAccept{
 									InvalidatedDownlinks: dev.Session.QueuedApplicationDownlinks,

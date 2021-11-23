@@ -66,7 +66,7 @@ func TestNSHandler(t *testing.T) {
 			Name: "OneUplink",
 			Message: &ttnpb.GatewayUplinkMessage{
 				BandId: band.EU_863_870,
-				UplinkMessage: &ttnpb.UplinkMessage{
+				Message: &ttnpb.UplinkMessage{
 					Payload: &ttnpb.Message{
 						MHDR: ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
 						Mic:  []byte{0x4E, 0x61, 0xBC, 0x00},
@@ -82,7 +82,7 @@ func TestNSHandler(t *testing.T) {
 						ChannelRssi: 89,
 						Snr:         9.25,
 					}},
-					Settings: ttnpb.TxSettings{
+					Settings: &ttnpb.TxSettings{
 						Frequency:  868300000,
 						CodingRate: "4/5",
 						DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
@@ -105,7 +105,7 @@ func TestNSHandler(t *testing.T) {
 			}
 			select {
 			case msg := <-ns.Up():
-				if !a.So(msg, should.Resemble, tc.Message.UplinkMessage) {
+				if !a.So(msg, should.Resemble, tc.Message.Message) {
 					t.Fatalf("Unexpected upstream message: %v", msg)
 				}
 			case <-time.After(timeout):

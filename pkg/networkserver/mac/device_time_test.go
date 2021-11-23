@@ -52,7 +52,7 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				ReceivedAt: recvAt,
+				ReceivedAt: &recvAt,
 			},
 			Events: events.Builders{
 				EvtReceiveDeviceTimeRequest,
@@ -85,7 +85,7 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				ReceivedAt: recvAt,
+				ReceivedAt: &recvAt,
 			},
 			Events: events.Builders{
 				EvtReceiveDeviceTimeRequest,
@@ -118,7 +118,7 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				ReceivedAt: recvAt,
+				ReceivedAt: &recvAt,
 			},
 			Events: events.Builders{
 				EvtReceiveDeviceTimeRequest,

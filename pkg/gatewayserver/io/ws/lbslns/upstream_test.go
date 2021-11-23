@@ -171,7 +171,7 @@ func TestJoinRequest(t *testing.T) {
 				RxMetadata: []*ttnpb.RxMetadata{{
 					GatewayIds: &gtwID,
 				}},
-				Settings: ttnpb.TxSettings{
+				Settings: &ttnpb.TxSettings{
 					CodingRate: "4/5",
 					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 12,
@@ -221,7 +221,7 @@ func TestJoinRequest(t *testing.T) {
 						Snr:         9.25,
 					},
 				},
-				Settings: ttnpb.TxSettings{
+				Settings: &ttnpb.TxSettings{
 					Frequency:  868300000,
 					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
 					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
@@ -250,6 +250,7 @@ func TestJoinRequest(t *testing.T) {
 					t.Fatalf("Invalid RawPayload: %v", msg.RawPayload)
 				}
 				msg.RawPayload = nil
+				msg.ReceivedAt = nil
 				if !a.So(*msg, should.Resemble, tc.ExpectedUplinkMessage) {
 					t.Fatalf("Invalid UplinkMessage: %s", msg.RawPayload)
 				}
@@ -334,7 +335,7 @@ func TestUplinkDataFrame(t *testing.T) {
 						Snr:         9.25,
 					},
 				},
-				Settings: ttnpb.TxSettings{
+				Settings: &ttnpb.TxSettings{
 					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
 					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
 					CodingRate: "4/5",
@@ -398,7 +399,7 @@ func TestUplinkDataFrame(t *testing.T) {
 						Snr:         9.25,
 					},
 				},
-				Settings: ttnpb.TxSettings{
+				Settings: &ttnpb.TxSettings{
 					Frequency:  868300000,
 					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
 					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
@@ -422,6 +423,7 @@ func TestUplinkDataFrame(t *testing.T) {
 				t.Fatalf("Expected error")
 			} else {
 				msg.RawPayload = nil
+				msg.ReceivedAt = nil
 				if !a.So(*msg, should.Resemble, tc.ExpectedUplinkMessage) {
 					t.Fatalf("Invalid UplinkMessage: %s", msg.RawPayload)
 				}
@@ -486,7 +488,7 @@ func TestFromUplinkDataFrame(t *testing.T) {
 						Snr:        9.25,
 					},
 				},
-				Settings: ttnpb.TxSettings{
+				Settings: &ttnpb.TxSettings{
 					Frequency: 868300000,
 					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
@@ -581,7 +583,7 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 						Snr:        9.25,
 					},
 				},
-				Settings: ttnpb.TxSettings{
+				Settings: &ttnpb.TxSettings{
 					Frequency: 868300000,
 					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,

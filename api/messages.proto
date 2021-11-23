@@ -83,11 +83,11 @@ message UplinkMessage {
 
   bytes raw_payload = 1;
   Message payload = 2;
-  TxSettings settings = 4 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  TxSettings settings = 4 [(validate.rules).message.required = true];
   repeated RxMetadata rx_metadata = 5;
   // Server time when a component received the message.
   // The Gateway Server and Network Server set this value to their local server time of reception.
-  google.protobuf.Timestamp received_at = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp received_at = 6 [(gogoproto.stdtime) = true];
   repeated string correlation_ids = 7 [(validate.rules).repeated.items.string.max_len = 100];
   reserved 8; // gateway_channel_index (obsolete).
   // Index of the device channel that received the message.
@@ -95,7 +95,7 @@ message UplinkMessage {
   uint32 device_channel_index = 9 [(validate.rules).uint32 = {lte: 255}];
 
   // Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings.
-  google.protobuf.Duration consumed_airtime = 10 [(gogoproto.stdduration) = true, (gogoproto.nullable) = true];
+  google.protobuf.Duration consumed_airtime = 10 [(gogoproto.stdduration) = true];
 }
 
 // Downlink message from the network to the end device
@@ -184,7 +184,7 @@ message GatewayTxAcknowledgment {
 }
 
 message GatewayUplinkMessage {
-  UplinkMessage message = 1 [(gogoproto.embed) = true, (validate.rules).message.required = true];
+  UplinkMessage message = 1 [(validate.rules).message.required = true];
   // LoRaWAN band ID of the gateway.
   string band_id = 2;
 }
@@ -210,10 +210,10 @@ message ApplicationUplink {
   repeated RxMetadata rx_metadata = 6;
 
   // Settings for the transmission.
-  TxSettings settings = 7 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  TxSettings settings = 7 [(validate.rules).message.required = true];
 
   // Server time when the Network Server received the message.
-  google.protobuf.Timestamp received_at = 8 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+  google.protobuf.Timestamp received_at = 8 [(gogoproto.stdtime) = true];
 
   // The AppSKey of the current session.
   // This field is only present if the skip_payload_crypto field of the EndDevice
@@ -229,7 +229,7 @@ message ApplicationUplink {
   bool confirmed = 11;
 
   // Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings.
-  google.protobuf.Duration consumed_airtime = 13 [(gogoproto.stdduration) = true, (gogoproto.nullable) = true];
+  google.protobuf.Duration consumed_airtime = 13 [(gogoproto.stdduration) = true];
 
   // End device location metadata, set by the Application Server while handling the message.
   map<string,Location> locations = 14;
@@ -243,7 +243,7 @@ message ApplicationUplink {
 
 message ApplicationLocation {
   string service = 1;
-  Location location = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  Location location = 2 [(validate.rules).message.required = true];
   map<string,string> attributes = 3 [
     (validate.rules).map = {
       max_pairs: 10,
@@ -264,7 +264,7 @@ message ApplicationJoinAccept {
   // rejoin-request.
   bool pending_session = 4;
   // Server time when the Network Server received the message.
-  google.protobuf.Timestamp received_at = 8 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
+  google.protobuf.Timestamp received_at = 8 [(gogoproto.stdtime) = true];
 }
 
 message ApplicationDownlink {
@@ -317,8 +317,8 @@ message ApplicationDownlinks {
 }
 
 message ApplicationDownlinkFailed {
-  ApplicationDownlink downlink = 1  [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  ErrorDetails error = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  ApplicationDownlink downlink = 1 [(validate.rules).message.required = true];
+  ErrorDetails error = 2 [(validate.rules).message.required = true];
 }
 
 message ApplicationInvalidatedDownlinks {
@@ -344,7 +344,7 @@ message ApplicationServiceData {
 
 // Application uplink message.
 message ApplicationUp {
-  EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  EndDeviceIdentifiers end_device_ids = 1 [(validate.rules).message.required = true];
   repeated string correlation_ids = 2 [(validate.rules).repeated.items.string.max_len = 100];
   // Server time when the Application Server received the message.
   google.protobuf.Timestamp received_at = 12 [(gogoproto.stdtime) = true];
@@ -396,6 +396,6 @@ message MessagePayloadFormatters {
 }
 
 message DownlinkQueueRequest {
-  EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false];
+  EndDeviceIdentifiers end_device_ids = 1 [(validate.rules).message.required = true];
   repeated ApplicationDownlink downlinks = 2 [(validate.rules).repeated.max_items = 100000];
 }

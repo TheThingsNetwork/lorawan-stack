@@ -54,7 +54,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			},
 		},
 		RxMetadata: DefaultRxMetadata[:],
-		ReceivedAt: beaconTime,
+		ReceivedAt: &beaconTime,
 	}
 	ups := []*ttnpb.UplinkMessage{up}
 

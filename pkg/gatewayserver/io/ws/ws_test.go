@@ -825,7 +825,7 @@ func TestTraffic(t *testing.T) {
 					ChannelRssi: 89,
 					Snr:         9.25,
 				}},
-				Settings: ttnpb.TxSettings{
+				Settings: &ttnpb.TxSettings{
 					Frequency:  868300000,
 					CodingRate: "4/5",
 					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
@@ -890,7 +890,7 @@ func TestTraffic(t *testing.T) {
 						Snr:         9.25,
 					},
 				},
-				Settings: ttnpb.TxSettings{
+				Settings: &ttnpb.TxSettings{
 					Frequency:  868300000,
 					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
 					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
@@ -918,6 +918,9 @@ func TestTraffic(t *testing.T) {
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId: "testdevice",
 					DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationId: "testapp",
+					},
 				},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
@@ -975,6 +978,9 @@ func TestTraffic(t *testing.T) {
 					EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 						DeviceId: "testdevice",
 						DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationId: "testapp",
+						},
 					},
 					Settings: &ttnpb.DownlinkMessage_Scheduled{
 						Scheduled: &ttnpb.TxSettings{
@@ -999,6 +1005,9 @@ func TestTraffic(t *testing.T) {
 					EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 						DeviceId: "testdevice",
 						DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationId: "testapp",
+						},
 					},
 					Settings: &ttnpb.DownlinkMessage_Scheduled{
 						Scheduled: &ttnpb.TxSettings{
@@ -1060,17 +1069,17 @@ func TestTraffic(t *testing.T) {
 					}
 					select {
 					case up := <-gsConn.Up():
-						a.So(time.Since(up.ReceivedAt), should.BeLessThan, timeout)
-						up.ReceivedAt = time.Time{}
+						a.So(time.Since(*up.Message.ReceivedAt), should.BeLessThan, timeout)
+						up.Message.ReceivedAt = nil
 						var payload ttnpb.Message
-						a.So(lorawan.UnmarshalMessage(up.RawPayload, &payload), should.BeNil)
-						if !a.So(&payload, should.Resemble, up.Payload) {
-							t.Fatalf("Invalid RawPayload: %v", up.RawPayload)
+						a.So(lorawan.UnmarshalMessage(up.Message.RawPayload, &payload), should.BeNil)
+						if !a.So(&payload, should.Resemble, up.Message.Payload) {
+							t.Fatalf("Invalid RawPayload: %v", up.Message.RawPayload)
 						}
-						up.RawPayload = nil
-						up.RxMetadata[0].UplinkToken = nil
+						up.Message.RawPayload = nil
+						up.Message.RxMetadata[0].UplinkToken = nil
 						expectedUp := tc.ExpectedNetworkUpstream.(ttnpb.UplinkMessage)
-						a.So(up.UplinkMessage, should.Resemble, &expectedUp)
+						a.So(up.Message, should.Resemble, &expectedUp)
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")
 					}
@@ -1272,6 +1281,9 @@ func TestRTT(t *testing.T) {
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId: "testdevice",
 					DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationId: "testapp",
+					},
 				},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
@@ -1397,9 +1409,9 @@ func TestRTT(t *testing.T) {
 					select {
 					case up := <-gsConn.Up():
 						var payload ttnpb.Message
-						a.So(lorawan.UnmarshalMessage(up.RawPayload, &payload), should.BeNil)
-						if !a.So(&payload, should.Resemble, up.Payload) {
-							t.Fatalf("Invalid RawPayload: %v", up.RawPayload)
+						a.So(lorawan.UnmarshalMessage(up.Message.RawPayload, &payload), should.BeNil)
+						if !a.So(&payload, should.Resemble, up.Message.Payload) {
+							t.Fatalf("Invalid RawPayload: %v", up.Message.RawPayload)
 						}
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")
@@ -1419,9 +1431,9 @@ func TestRTT(t *testing.T) {
 					select {
 					case up := <-gsConn.Up():
 						var payload ttnpb.Message
-						a.So(lorawan.UnmarshalMessage(up.RawPayload, &payload), should.BeNil)
-						if !a.So(&payload, should.Resemble, up.Payload) {
-							t.Fatalf("Invalid RawPayload: %v", up.RawPayload)
+						a.So(lorawan.UnmarshalMessage(up.Message.RawPayload, &payload), should.BeNil)
+						if !a.So(&payload, should.Resemble, up.Message.Payload) {
+							t.Fatalf("Invalid RawPayload: %v", up.Message.RawPayload)
 						}
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")

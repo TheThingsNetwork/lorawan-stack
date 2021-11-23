@@ -883,7 +883,7 @@ func TestGatewayServer(t *testing.T) {
 							up := &ttnpb.GatewayUp{
 								UplinkMessages: []*ttnpb.UplinkMessage{
 									{
-										Settings: ttnpb.TxSettings{
+										Settings: &ttnpb.TxSettings{
 											DataRate: ttnpb.DataRate{
 												Modulation: &ttnpb.DataRate_Lora{
 													Lora: &ttnpb.LoRaDataRate{
@@ -1040,7 +1040,7 @@ func TestGatewayServer(t *testing.T) {
 								Up: &ttnpb.GatewayUp{
 									UplinkMessages: []*ttnpb.UplinkMessage{
 										{
-											Settings: ttnpb.TxSettings{
+											Settings: &ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
@@ -1074,7 +1074,7 @@ func TestGatewayServer(t *testing.T) {
 								Up: &ttnpb.GatewayUp{
 									UplinkMessages: []*ttnpb.UplinkMessage{
 										{
-											Settings: ttnpb.TxSettings{
+											Settings: &ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
@@ -1100,7 +1100,7 @@ func TestGatewayServer(t *testing.T) {
 											RawPayload: duplicatePayload,
 										},
 										{
-											Settings: ttnpb.TxSettings{
+											Settings: &ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
@@ -1126,7 +1126,7 @@ func TestGatewayServer(t *testing.T) {
 											RawPayload: duplicatePayload,
 										},
 										{
-											Settings: ttnpb.TxSettings{
+											Settings: &ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
@@ -1162,7 +1162,7 @@ func TestGatewayServer(t *testing.T) {
 								Up: &ttnpb.GatewayUp{
 									UplinkMessages: []*ttnpb.UplinkMessage{
 										{
-											Settings: ttnpb.TxSettings{
+											Settings: &ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Fsk{
 														Fsk: &ttnpb.FSKDataRate{
@@ -1194,7 +1194,7 @@ func TestGatewayServer(t *testing.T) {
 								Up: &ttnpb.GatewayUp{
 									UplinkMessages: []*ttnpb.UplinkMessage{
 										{
-											Settings: ttnpb.TxSettings{
+											Settings: &ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
@@ -1220,7 +1220,7 @@ func TestGatewayServer(t *testing.T) {
 											RawPayload: []byte{0xff, 0x02, 0x03}, // Garbage; doesn't get forwarded.
 										},
 										{
-											Settings: ttnpb.TxSettings{
+											Settings: &ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
@@ -1246,7 +1246,7 @@ func TestGatewayServer(t *testing.T) {
 											RawPayload: randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
 										},
 										{
-											Settings: ttnpb.TxSettings{
+											Settings: &ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
@@ -1345,7 +1345,7 @@ func TestGatewayServer(t *testing.T) {
 										if expected == nil {
 											t.Fatalf("Received unexpected message")
 										}
-										a.So(time.Since(msg.ReceivedAt), should.BeLessThan, timeout)
+										a.So(time.Since(*msg.ReceivedAt), should.BeLessThan, timeout)
 										a.So(msg.Settings, should.Resemble, expected.Settings)
 										a.So(len(msg.RxMetadata), should.Equal, len(expected.RxMetadata))
 										for i, md := range msg.RxMetadata {

@@ -198,7 +198,7 @@ func TestTraffic(t *testing.T) {
 		a := assertions.New(t)
 
 		up := &ttnpb.ApplicationUp{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIdentifiers: registeredApplicationID,
 				DeviceId:               "foo-device",
 			},
@@ -244,7 +244,7 @@ func TestTraffic(t *testing.T) {
 		// Push: unauthorized.
 		{
 			_, err := client.DownlinkQueuePush(ctx, &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ids,
+				EndDeviceIds: &ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      1,
@@ -258,7 +258,7 @@ func TestTraffic(t *testing.T) {
 		// Push and assert content: happy flow.
 		{
 			_, err := client.DownlinkQueuePush(ctx, &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ids,
+				EndDeviceIds: &ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
 						SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
@@ -277,7 +277,7 @@ func TestTraffic(t *testing.T) {
 		}
 		{
 			_, err := client.DownlinkQueuePush(ctx, &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ids,
+				EndDeviceIds: &ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      3,
@@ -313,7 +313,7 @@ func TestTraffic(t *testing.T) {
 		// Replace: unauthorized.
 		{
 			_, err := client.DownlinkQueueReplace(ctx, &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ids,
+				EndDeviceIds: &ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      4,
@@ -327,7 +327,7 @@ func TestTraffic(t *testing.T) {
 		// Replace and assert content: happy flow.
 		{
 			_, err := client.DownlinkQueueReplace(ctx, &ttnpb.DownlinkQueueRequest{
-				EndDeviceIdentifiers: ids,
+				EndDeviceIds: &ids,
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{
 						FPort:      4,
@@ -475,7 +475,7 @@ func TestSimulateUplink(t *testing.T) {
 		{
 			name: "Fetch",
 			up: &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:               registeredDeviceID.DeviceId,
 					ApplicationIdentifiers: registeredApplicationID,
 				},
@@ -494,7 +494,7 @@ func TestSimulateUplink(t *testing.T) {
 		{
 			name: "FetchError",
 			up: &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:               registeredDeviceID.DeviceId,
 					ApplicationIdentifiers: registeredApplicationID,
 				},
@@ -524,9 +524,9 @@ func TestSimulateUplink(t *testing.T) {
 				if err := up.error; err != nil {
 					t.Fatalf("Received unexpected error: %s\n", err)
 				}
-				a.So(f.calledWithIdentifers, should.Resemble, tc.up.EndDeviceIdentifiers)
+				a.So(f.calledWithIdentifers, should.Resemble, tc.up.EndDeviceIds)
 				a.So(f.calledWithPaths, should.Resemble, []string{"ids"})
-				a.So(up.EndDeviceIdentifiers, should.Resemble, tc.expectIdentifiers)
+				a.So(up.EndDeviceIds, should.Resemble, tc.expectIdentifiers)
 			case <-time.After(timeout):
 				t.Fatal("Timed out waiting for simulated uplink")
 			}
@@ -608,7 +608,7 @@ func TestMessageProcessors(t *testing.T) {
 			Uplink: &ttnpb.ApplicationUplink{
 				FrmPayload: []byte{1, 0, 255},
 				RxMetadata: []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-				Settings:   ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+				Settings:   &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 				FPort:      1,
 			},
 			Formatter: ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP,
