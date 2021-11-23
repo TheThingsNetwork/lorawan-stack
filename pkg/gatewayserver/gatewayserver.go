@@ -440,6 +440,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{
 				"antennas",
+				"attributes",
 				"disable_packet_broker_forwarding",
 				"downlink_path_constraint",
 				"enforce_duty_cycle",
@@ -998,6 +999,9 @@ func (gs *GatewayServer) handleVersionInfoUpdates(ctx context.Context, conn conn
 	case <-conn.VersionInfoChanged():
 		status, _, ok := conn.StatusStats()
 		if ok && status.Versions["model"] != "" && status.Versions["firmware"] != "" {
+			if status.Versions["model"] == conn.Gateway().Attributes["model"] && status.Versions["firmware"] == conn.Gateway().Attributes["firmware"] {
+				return
+			}
 			attributes := map[string]string{
 				"model":    status.Versions["model"],
 				"firmware": status.Versions["firmware"],
