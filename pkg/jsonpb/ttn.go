@@ -106,12 +106,12 @@ func (m *TTNMarshaler) Unmarshal(data []byte, v interface{}) error {
 
 // NewDecoder returns a new JSON decoder that reads data from r.
 func (m *TTNMarshaler) NewDecoder(r io.Reader) runtime.Decoder {
-	return &TTNDecoder{r: r, gogo: m.GoGoJSONPb}
+	return &TTNDecoder{d: json.NewDecoder(r), gogo: m.GoGoJSONPb}
 }
 
 // TTNDecoder reads JSON data from an io.Reader and unmarshals that into values.
 type TTNDecoder struct {
-	r    io.Reader
+	d    *json.Decoder
 	gogo *GoGoJSONPb
 }
 
@@ -119,13 +119,13 @@ type TTNDecoder struct {
 func (d *TTNDecoder) Decode(v interface{}) error {
 	if unmarshaler, ok := v.(jsonplugin.Unmarshaler); ok {
 		var data json.RawMessage
-		err := json.NewDecoder(d.r).Decode(&data)
+		err := d.d.Decode(&data)
 		if err != nil {
 			return err
 		}
 		return jsonplugin.UnmarshalerConfig{}.Unmarshal(data, unmarshaler)
 	}
-	return d.gogo.NewDecoder(d.r).Decode(v)
+	return GoGoDecoderWrapper{Decoder: d.d}.Decode(v)
 }
 
 // TTNEventStream returns a TTN JsonPb marshaler with double newlines for
