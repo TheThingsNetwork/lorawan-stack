@@ -13,7 +13,7 @@
 // limitations under the License.
 
 describe('Skip payload crypto', () => {
-  const applicationId = 'test-application-spc'
+  const applicationId = 'spc-test-application'
   const application = { ids: { application_id: applicationId } }
   const userId = 'edit-app-spc-test-user'
   const user = {
@@ -23,7 +23,7 @@ describe('Skip payload crypto', () => {
     password_confirm: 'ABCDefg123!',
   }
 
-  const endDeviceId = 'end-device-spc-test'
+  const endDeviceId = 'spc-test-end-device'
   const endDevice = {
     application_server_address: 'localhost',
     ids: {
@@ -69,6 +69,7 @@ describe('Skip payload crypto', () => {
       it('disables messaging when not using a SPC overwrite', () => {
         const adminApiKey = Cypress.config('adminApiKey')
         const linkRequestBody = {
+          field_mask: { paths: ['skip_payload_crypto'] },
           link: {
             default_formatters: {},
             skip_payload_crypto: true,
@@ -76,7 +77,7 @@ describe('Skip payload crypto', () => {
         }
         cy.request({
           method: 'PUT',
-          url: `api/v3/as/applications/${applicationId}/link?field_mask=skip_payload_crypto`,
+          url: `api/v3/as/applications/${applicationId}/link`,
           body: linkRequestBody,
           headers: {
             Authorization: `Bearer ${adminApiKey}`,
@@ -114,6 +115,7 @@ describe('Skip payload crypto', () => {
       it('allows messaging when device disabled SPC via overwrite', () => {
         const adminApiKey = Cypress.config('adminApiKey')
         const linkRequestBody = {
+          field_mask: { paths: ['skip_payload_crypto'] },
           link: {
             default_formatters: {},
             skip_payload_crypto: true,
@@ -121,7 +123,7 @@ describe('Skip payload crypto', () => {
         }
         cy.request({
           method: 'PUT',
-          url: `api/v3/as/applications/${applicationId}/link?field_mask=skip_payload_crypto`,
+          url: `api/v3/as/applications/${applicationId}/link`,
           body: linkRequestBody,
           headers: {
             Authorization: `Bearer ${adminApiKey}`,
@@ -160,6 +162,7 @@ describe('Skip payload crypto', () => {
       it('allows messaging when not using a SPC overwrite', () => {
         const adminApiKey = Cypress.config('adminApiKey')
         const linkRequestBody = {
+          field_mask: { paths: ['skip_payload_crypto'] },
           link: {
             default_formatters: {},
             skip_payload_crypto: false,
@@ -167,7 +170,7 @@ describe('Skip payload crypto', () => {
         }
         cy.request({
           method: 'PUT',
-          url: `api/v3/as/applications/${applicationId}/link?field_mask=skip_payload_crypto`,
+          url: `api/v3/as/applications/${applicationId}/link`,
           body: linkRequestBody,
           headers: {
             Authorization: `Bearer ${adminApiKey}`,
@@ -200,6 +203,7 @@ describe('Skip payload crypto', () => {
       it('disables messaging when device disabled SPC via overwrite', () => {
         const adminApiKey = Cypress.config('adminApiKey')
         const linkRequestBody = {
+          field_mask: { paths: ['skip_payload_crypto'] },
           link: {
             default_formatters: {},
             skip_payload_crypto: false,
@@ -207,7 +211,7 @@ describe('Skip payload crypto', () => {
         }
         cy.request({
           method: 'PUT',
-          url: `api/v3/as/applications/${applicationId}/link?field_mask=skip_payload_crypto`,
+          url: `api/v3/as/applications/${applicationId}/link`,
           body: linkRequestBody,
           headers: {
             Authorization: `Bearer ${adminApiKey}`,
