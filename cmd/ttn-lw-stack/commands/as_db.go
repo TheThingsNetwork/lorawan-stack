@@ -231,6 +231,7 @@ var (
 
 func init() {
 	Root.AddCommand(asDBCommand)
+	asDBMigrateCommand.Flags().Bool("force", false, "Force perform database migrations")
 	asDBCommand.AddCommand(asDBMigrateCommand)
 	asDBCleanupCommand.Flags().Bool("dry-run", false, "Dry run")
 	asDBCleanupCommand.Flags().Duration("pagination-delay", 100, "Delay between batch requests")
