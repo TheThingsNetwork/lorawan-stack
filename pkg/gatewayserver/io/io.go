@@ -106,6 +106,8 @@ type Connection struct {
 	statsChangedCh chan struct{}
 	locCh          chan struct{}
 
+	versionInfoCh chan struct{}
+
 	lastUplink            *uplinkMessage
 	lastRepeatUpEventTime time.Time
 }
@@ -176,6 +178,7 @@ func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gatewa
 		statusCh:         make(chan *ttnpb.GatewayStatus, bufferSize),
 		txAckCh:          make(chan *ttnpb.TxAcknowledgment, bufferSize),
 		locCh:            make(chan struct{}, 1),
+		versionInfoCh:    make(chan struct{}, 1),
 		connectTime:      time.Now().UnixNano(),
 
 		statsChangedCh: make(chan struct{}, 1),
@@ -322,6 +325,14 @@ func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) (err error) {
 			default:
 			}
 		}
+
+		// The channel is only written to once, after which there is no longer a recipient.
+		// For all subsequent status messages, the default branch is chosen.
+		select {
+		case c.versionInfoCh <- struct{}{}:
+		default:
+		}
+
 	default:
 		return errBufferFull.New()
 	}
@@ -652,6 +663,11 @@ func (c *Connection) StatsChanged() <-chan struct{} {
 // LocationChanged returns the location updates channel.
 func (c *Connection) LocationChanged() <-chan struct{} {
 	return c.locCh
+}
+
+// VersionInfoChanged returns the version info updates channel.
+func (c *Connection) VersionInfoChanged() <-chan struct{} {
+	return c.versionInfoCh
 }
 
 // ConnectTime returns the time the gateway connected.

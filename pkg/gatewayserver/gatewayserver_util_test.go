@@ -88,8 +88,7 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key str
 }
 
 var (
-	errNotFound     = errors.DefineNotFound("not_found", "not found")
-	errNoGatewayEUI = errors.DefineInvalidArgument("no_gateway_eui", "not gateway EUI")
+	errNotFound = errors.DefineNotFound("not_found", "not found")
 )
 
 func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {

@@ -282,6 +282,8 @@ func TestProtobufV2Status(t *testing.T) {
 					"dsp":      "3",
 					"fpga":     "4",
 					"hal":      "v1.1",
+					"model":    "The Things Kickstarter Gateway v1",
+					"firmware": "v1.2.3-12345678",
 				},
 			},
 		},

@@ -103,6 +103,9 @@ var (
 	errNotConnected        = errors.DefineNotFound("not_connected", "gateway `{gateway_uid}` not connected")
 	errSetupUpstream       = errors.DefineFailedPrecondition("upstream", "failed to setup upstream `{name}`")
 	errInvalidUpstreamName = errors.DefineInvalidArgument("invalid_upstream_name", "upstream `{name}` is invalid")
+
+	modelAttribute    = "model"
+	firmwareAttribute = "firmware"
 )
 
 // New returns new *GatewayServer.
@@ -440,6 +443,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{
 				"antennas",
+				"attributes",
 				"disable_packet_broker_forwarding",
 				"downlink_path_constraint",
 				"enforce_duty_cycle",
@@ -507,6 +511,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	gs.startHandleUpstreamTask(connEntry)
 	gs.startUpdateConnStatsTask(connEntry)
 	gs.startHandleLocationUpdatesTask(connEntry)
+	gs.startHandleVersionUpdatesTask(connEntry)
 
 	for name, handler := range gs.upstreamHandlers {
 		connCtx := log.NewContextWithField(conn.Context(), "upstream_handler", name)
@@ -658,6 +663,21 @@ func (gs *GatewayServer) startHandleLocationUpdatesTask(conn connectionEntry) {
 		ID:      fmt.Sprintf("handle_location_updates_%s", unique.ID(conn.Context(), conn.Gateway().GetIds())),
 		Func: func(ctx context.Context) error {
 			gs.handleLocationUpdates(ctx, conn)
+			return nil
+		},
+		Done:    conn.tasksDone.Done,
+		Restart: component.TaskRestartNever,
+		Backoff: component.DialTaskBackoffConfig,
+	})
+}
+
+func (gs *GatewayServer) startHandleVersionUpdatesTask(conn connectionEntry) {
+	conn.tasksDone.Add(1)
+	gs.StartTask(&component.TaskConfig{
+		Context: conn.Context(),
+		ID:      fmt.Sprintf("handle_version_updates_%s", unique.ID(conn.Context(), conn.Gateway().GetIds())),
+		Func: func(ctx context.Context) error {
+			gs.handleVersionInfoUpdates(ctx, conn)
 			return nil
 		},
 		Done:    conn.tasksDone.Done,
@@ -972,6 +992,39 @@ func (gs *GatewayServer) handleLocationUpdates(ctx context.Context, conn connect
 	}
 }
 
+// handleVersionInfoUpdates updates gateway attributes with version info.
+// This function runs exactly once; only for the first status message of each connection, since version information should not change within the same connection.
+func (gs *GatewayServer) handleVersionInfoUpdates(ctx context.Context, conn connectionEntry) {
+	select {
+	case <-ctx.Done():
+		return
+	case <-conn.VersionInfoChanged():
+		status, _, ok := conn.StatusStats()
+		versionsFromStatus := status.Versions
+		if !ok || versionsFromStatus["model"] == "" || versionsFromStatus["firmware"] == "" {
+			return
+		}
+		gtwAttributes := conn.Gateway().Attributes
+		if versionsFromStatus[modelAttribute] == gtwAttributes[modelAttribute] && versionsFromStatus[firmwareAttribute] == gtwAttributes[firmwareAttribute] {
+			return
+		}
+		attributes := map[string]string{
+			modelAttribute:    versionsFromStatus[modelAttribute],
+			firmwareAttribute: versionsFromStatus[firmwareAttribute],
+		}
+		d := random.Jitter(gs.config.UpdateVersionInfoDelay, 0.25)
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(d):
+		}
+		err := gs.entityRegistry.UpdateAttributes(conn.Context(), *conn.Gateway().Ids, gtwAttributes, attributes)
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Debug("Failed to update version information")
+		}
+	}
+}
+
 // GetFrequencyPlans gets the frequency plans by the gateway identifiers.
 func (gs *GatewayServer) GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error) {
 	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
@@ -1012,6 +1065,7 @@ func (gs *GatewayServer) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayI
 	return gs.UnclaimIDs(ctx, &ids)
 }
 
+// ValidateGatewayID implements io.Server.
 func (gs *GatewayServer) ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
 	return gs.entityRegistry.ValidateGatewayID(ctx, ids)
 }
