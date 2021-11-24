@@ -2465,6 +2465,15 @@
       "file": "templates.go"
     }
   },
+  "error:pkg/applicationserver/io/web:webhook_disabled": {
+    "translations": {
+      "en": "webhook disabled"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web",
+      "file": "sink.go"
+    }
+  },
   "error:pkg/applicationserver/io/web:webhook_not_found": {
     "translations": {
       "en": "webhook not found"
