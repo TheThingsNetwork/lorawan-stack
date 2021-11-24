@@ -94,6 +94,9 @@
   - [Message `ApplicationWebhook.TemplateFieldsEntry`](#ttn.lorawan.v3.ApplicationWebhook.TemplateFieldsEntry)
   - [Message `ApplicationWebhookFormats`](#ttn.lorawan.v3.ApplicationWebhookFormats)
   - [Message `ApplicationWebhookFormats.FormatsEntry`](#ttn.lorawan.v3.ApplicationWebhookFormats.FormatsEntry)
+  - [Message `ApplicationWebhookHealth`](#ttn.lorawan.v3.ApplicationWebhookHealth)
+  - [Message `ApplicationWebhookHealth.WebhookHealthStatusHealthy`](#ttn.lorawan.v3.ApplicationWebhookHealth.WebhookHealthStatusHealthy)
+  - [Message `ApplicationWebhookHealth.WebhookHealthStatusUnhealthy`](#ttn.lorawan.v3.ApplicationWebhookHealth.WebhookHealthStatusUnhealthy)
   - [Message `ApplicationWebhookIdentifiers`](#ttn.lorawan.v3.ApplicationWebhookIdentifiers)
   - [Message `ApplicationWebhookTemplate`](#ttn.lorawan.v3.ApplicationWebhookTemplate)
   - [Message `ApplicationWebhookTemplate.HeadersEntry`](#ttn.lorawan.v3.ApplicationWebhookTemplate.HeadersEntry)
@@ -1695,6 +1698,7 @@ The NATS provider settings.
 | `downlink_queue_invalidated` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 | `location_solved` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 | `service_data` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
+| `health_status` | [`ApplicationWebhookHealth`](#ttn.lorawan.v3.ApplicationWebhookHealth) |  |  |
 
 #### Field Rules
 
@@ -1744,6 +1748,30 @@ The NATS provider settings.
 | ----- | ---- | ----- | ----------- |
 | `key` | [`string`](#string) |  |  |
 | `value` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.ApplicationWebhookHealth">Message `ApplicationWebhookHealth`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `healthy` | [`ApplicationWebhookHealth.WebhookHealthStatusHealthy`](#ttn.lorawan.v3.ApplicationWebhookHealth.WebhookHealthStatusHealthy) |  |  |
+| `unhealthy` | [`ApplicationWebhookHealth.WebhookHealthStatusUnhealthy`](#ttn.lorawan.v3.ApplicationWebhookHealth.WebhookHealthStatusUnhealthy) |  |  |
+
+### <a name="ttn.lorawan.v3.ApplicationWebhookHealth.WebhookHealthStatusHealthy">Message `ApplicationWebhookHealth.WebhookHealthStatusHealthy`</a>
+
+### <a name="ttn.lorawan.v3.ApplicationWebhookHealth.WebhookHealthStatusUnhealthy">Message `ApplicationWebhookHealth.WebhookHealthStatusUnhealthy`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `failed_attempts` | [`uint64`](#uint64) |  |  |
+| `last_failed_attempt_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `last_failed_attempt_details` | [`google.protobuf.Any`](#google.protobuf.Any) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `last_failed_attempt_at` | <p>`timestamp.required`: `true`</p> |
+| `last_failed_attempt_details` | <p>`any.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationWebhookIdentifiers">Message `ApplicationWebhookIdentifiers`</a>
 

@@ -10624,6 +10624,25 @@
       },
       "description": "The NATS provider settings."
     },
+    "ApplicationWebhookHealthWebhookHealthStatusHealthy": {
+      "type": "object"
+    },
+    "ApplicationWebhookHealthWebhookHealthStatusUnhealthy": {
+      "type": "object",
+      "properties": {
+        "failed_attempts": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "last_failed_attempt_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "last_failed_attempt_details": {
+          "$ref": "#/definitions/protobufAny"
+        }
+      }
+    },
     "AsConfigurationPubSub": {
       "type": "object",
       "properties": {
@@ -12749,6 +12768,9 @@
         },
         "service_data": {
           "$ref": "#/definitions/v3ApplicationWebhookMessage"
+        },
+        "health_status": {
+          "$ref": "#/definitions/v3ApplicationWebhookHealth"
         }
       }
     },
@@ -12761,6 +12783,17 @@
             "type": "string"
           },
           "description": "Format and description."
+        }
+      }
+    },
+    "v3ApplicationWebhookHealth": {
+      "type": "object",
+      "properties": {
+        "healthy": {
+          "$ref": "#/definitions/ApplicationWebhookHealthWebhookHealthStatusHealthy"
+        },
+        "unhealthy": {
+          "$ref": "#/definitions/ApplicationWebhookHealthWebhookHealthStatusUnhealthy"
         }
       }
     },

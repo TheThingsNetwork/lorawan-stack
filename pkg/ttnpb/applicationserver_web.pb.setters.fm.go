@@ -546,6 +546,104 @@ func (dst *ApplicationWebhookTemplates) SetFields(src *ApplicationWebhookTemplat
 	return nil
 }
 
+func (dst *ApplicationWebhookHealth) SetFields(src *ApplicationWebhookHealth, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+
+		case "status":
+			if len(subs) == 0 && src == nil {
+				dst.Status = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.Status = src.Status
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "healthy":
+					_, srcOk := src.Status.(*ApplicationWebhookHealth_Healthy)
+					if !srcOk && src.Status != nil {
+						return fmt.Errorf("attempt to set oneof 'healthy', while different oneof is set in source")
+					}
+					_, dstOk := dst.Status.(*ApplicationWebhookHealth_Healthy)
+					if !dstOk && dst.Status != nil {
+						return fmt.Errorf("attempt to set oneof 'healthy', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ApplicationWebhookHealth_WebhookHealthStatusHealthy
+						if !srcOk && !dstOk {
+							continue
+						}
+						if srcOk {
+							newSrc = src.Status.(*ApplicationWebhookHealth_Healthy).Healthy
+						}
+						if dstOk {
+							newDst = dst.Status.(*ApplicationWebhookHealth_Healthy).Healthy
+						} else {
+							newDst = &ApplicationWebhookHealth_WebhookHealthStatusHealthy{}
+							dst.Status = &ApplicationWebhookHealth_Healthy{Healthy: newDst}
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Status = src.Status
+						} else {
+							dst.Status = nil
+						}
+					}
+				case "unhealthy":
+					_, srcOk := src.Status.(*ApplicationWebhookHealth_Unhealthy)
+					if !srcOk && src.Status != nil {
+						return fmt.Errorf("attempt to set oneof 'unhealthy', while different oneof is set in source")
+					}
+					_, dstOk := dst.Status.(*ApplicationWebhookHealth_Unhealthy)
+					if !dstOk && dst.Status != nil {
+						return fmt.Errorf("attempt to set oneof 'unhealthy', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ApplicationWebhookHealth_WebhookHealthStatusUnhealthy
+						if !srcOk && !dstOk {
+							continue
+						}
+						if srcOk {
+							newSrc = src.Status.(*ApplicationWebhookHealth_Unhealthy).Unhealthy
+						}
+						if dstOk {
+							newDst = dst.Status.(*ApplicationWebhookHealth_Unhealthy).Unhealthy
+						} else {
+							newDst = &ApplicationWebhookHealth_WebhookHealthStatusUnhealthy{}
+							dst.Status = &ApplicationWebhookHealth_Unhealthy{Unhealthy: newDst}
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Status = src.Status
+						} else {
+							dst.Status = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -915,6 +1013,31 @@ func (dst *ApplicationWebhook) SetFields(src *ApplicationWebhook, paths ...strin
 					dst.ServiceData = nil
 				}
 			}
+		case "health_status":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationWebhookHealth
+				if (src == nil || src.HealthStatus == nil) && dst.HealthStatus == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.HealthStatus
+				}
+				if dst.HealthStatus != nil {
+					newDst = dst.HealthStatus
+				} else {
+					newDst = &ApplicationWebhookHealth{}
+					dst.HealthStatus = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.HealthStatus = src.HealthStatus
+				} else {
+					dst.HealthStatus = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -1175,6 +1298,55 @@ func (dst *ApplicationWebhookTemplate_Message) SetFields(src *ApplicationWebhook
 			} else {
 				var zero string
 				dst.Path = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ApplicationWebhookHealth_WebhookHealthStatusHealthy) SetFields(src *ApplicationWebhookHealth_WebhookHealthStatusHealthy, paths ...string) error {
+	if len(paths) != 0 {
+		return fmt.Errorf("message ApplicationWebhookHealth_WebhookHealthStatusHealthy has no fields, but paths %s were specified", paths)
+	}
+	if src != nil {
+		*dst = *src
+	}
+	return nil
+}
+
+func (dst *ApplicationWebhookHealth_WebhookHealthStatusUnhealthy) SetFields(src *ApplicationWebhookHealth_WebhookHealthStatusUnhealthy, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "failed_attempts":
+			if len(subs) > 0 {
+				return fmt.Errorf("'failed_attempts' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FailedAttempts = src.FailedAttempts
+			} else {
+				var zero uint64
+				dst.FailedAttempts = zero
+			}
+		case "last_failed_attempt_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_failed_attempt_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastFailedAttemptAt = src.LastFailedAttemptAt
+			} else {
+				dst.LastFailedAttemptAt = nil
+			}
+		case "last_failed_attempt_details":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_failed_attempt_details' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastFailedAttemptDetails = src.LastFailedAttemptDetails
+			} else {
+				dst.LastFailedAttemptDetails = nil
 			}
 
 		default:
