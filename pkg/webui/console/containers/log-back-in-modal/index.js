@@ -36,6 +36,7 @@ class LogBackInModal extends React.Component {
         message={m.modalMessage}
         title={m.modalTitle}
         onComplete={reload}
+        approveButtonProps={{ icon: 'refresh' }}
       />
     )
   }
