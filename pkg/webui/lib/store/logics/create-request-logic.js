@@ -24,6 +24,7 @@ import {
 } from '@ttn-lw/lib/errors/utils'
 import { clear as clearAccessToken } from '@ttn-lw/lib/access-token'
 import {
+  setLoginStatus,
   setStatusChecking,
   attemptReconnect,
   ATTEMPT_RECONNECT,
@@ -135,10 +136,10 @@ const createRequestLogic = (
           )
 
           // If there was an unauthenticated error, the access token is not
-          // valid and we can delete it. Reloading will then initiate the auth flow.
+          // valid and we can delete it. A "Log back in"-modal will then pop up.
           if (isUnauthenticatedError(e)) {
             clearAccessToken()
-            window.location.reload()
+            dispatch(setLoginStatus())
             break
             // If there was a network error, it could mean that the network
             // connection is currently interrupted. Setting the online state to
