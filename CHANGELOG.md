@@ -24,6 +24,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - Gateway server disconnects LoRa Basics Station gateways that stop sending pongs to server pings. This does not apply to gateways that don't support pongs.
+- The new plugin for reading/writing JSON in our API (that was previously behind the `jsonpb.jsonplugin` feature flag) is now enabled by default. All API responses should be equivalent, but in some cases object fields may be in a different order.
 
 ### Deprecated
 

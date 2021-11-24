@@ -16,16 +16,12 @@ package jsonpb
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"io"
 
 	"github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 )
-
-var jsonpluginFeatureFlag = experimental.DefineFeature("jsonpb.jsonplugin", false)
 
 // TTN returns the default JSONPb marshaler of The Things Stack.
 func TTN() *TTNMarshaler {
@@ -47,23 +43,21 @@ func (*TTNMarshaler) ContentType() string { return "application/json" }
 
 // Marshal marshals v to JSON.
 func (m *TTNMarshaler) Marshal(v interface{}) ([]byte, error) {
-	if jsonpluginFeatureFlag.GetValue(context.Background()) {
-		if marshaler, ok := v.(jsonplugin.Marshaler); ok {
-			b, err := jsonplugin.MarshalerConfig{
-				EnumsAsInts: true,
-			}.Marshal(marshaler)
-			if err != nil {
-				return nil, err
-			}
-			if m.GoGoJSONPb.Indent == "" {
-				return b, nil
-			}
-			var buf bytes.Buffer
-			if err = json.Indent(&buf, b, "", m.GoGoJSONPb.Indent); err != nil {
-				return nil, err
-			}
-			return buf.Bytes(), nil
+	if marshaler, ok := v.(jsonplugin.Marshaler); ok {
+		b, err := jsonplugin.MarshalerConfig{
+			EnumsAsInts: true,
+		}.Marshal(marshaler)
+		if err != nil {
+			return nil, err
 		}
+		if m.GoGoJSONPb.Indent == "" {
+			return b, nil
+		}
+		var buf bytes.Buffer
+		if err = json.Indent(&buf, b, "", m.GoGoJSONPb.Indent); err != nil {
+			return nil, err
+		}
+		return buf.Bytes(), nil
 	}
 	return m.GoGoJSONPb.Marshal(v)
 }
@@ -81,63 +75,57 @@ type TTNEncoder struct {
 
 // Encode marshals v to JSON and writes it to the writer.
 func (e *TTNEncoder) Encode(v interface{}) error {
-	if jsonpluginFeatureFlag.GetValue(context.Background()) {
-		if marshaler, ok := v.(jsonplugin.Marshaler); ok {
-			b, err := jsonplugin.MarshalerConfig{
-				EnumsAsInts: true,
-			}.Marshal(marshaler)
-			if err != nil {
-				return err
-			}
-			if e.gogo.Indent == "" {
-				_, err = e.w.Write(b)
-			} else {
-				var buf bytes.Buffer
-				if err = json.Indent(&buf, b, "", e.gogo.Indent); err != nil {
-					return err
-				}
-				io.Copy(e.w, &buf)
-			}
+	if marshaler, ok := v.(jsonplugin.Marshaler); ok {
+		b, err := jsonplugin.MarshalerConfig{
+			EnumsAsInts: true,
+		}.Marshal(marshaler)
+		if err != nil {
 			return err
 		}
+		if e.gogo.Indent == "" {
+			_, err = e.w.Write(b)
+		} else {
+			var buf bytes.Buffer
+			if err = json.Indent(&buf, b, "", e.gogo.Indent); err != nil {
+				return err
+			}
+			io.Copy(e.w, &buf)
+		}
+		return err
 	}
 	return e.gogo.NewEncoder(e.w).Encode(v)
 }
 
 // Unmarshal unmarshals v from JSON data.
 func (m *TTNMarshaler) Unmarshal(data []byte, v interface{}) error {
-	if jsonpluginFeatureFlag.GetValue(context.Background()) {
-		if unmarshaler, ok := v.(jsonplugin.Unmarshaler); ok {
-			return jsonplugin.UnmarshalerConfig{}.Unmarshal(data, unmarshaler)
-		}
+	if unmarshaler, ok := v.(jsonplugin.Unmarshaler); ok {
+		return jsonplugin.UnmarshalerConfig{}.Unmarshal(data, unmarshaler)
 	}
 	return m.GoGoJSONPb.Unmarshal(data, v)
 }
 
 // NewDecoder returns a new JSON decoder that reads data from r.
 func (m *TTNMarshaler) NewDecoder(r io.Reader) runtime.Decoder {
-	return &TTNDecoder{r: r, gogo: m.GoGoJSONPb}
+	return &TTNDecoder{d: json.NewDecoder(r), gogo: m.GoGoJSONPb}
 }
 
 // TTNDecoder reads JSON data from an io.Reader and unmarshals that into values.
 type TTNDecoder struct {
-	r    io.Reader
+	d    *json.Decoder
 	gogo *GoGoJSONPb
 }
 
 // Decode reads a value from the reader and unmarshals v from JSON.
 func (d *TTNDecoder) Decode(v interface{}) error {
-	if jsonpluginFeatureFlag.GetValue(context.Background()) {
-		if unmarshaler, ok := v.(jsonplugin.Unmarshaler); ok {
-			var data json.RawMessage
-			err := json.NewDecoder(d.r).Decode(&data)
-			if err != nil {
-				return err
-			}
-			return jsonplugin.UnmarshalerConfig{}.Unmarshal(data, unmarshaler)
+	if unmarshaler, ok := v.(jsonplugin.Unmarshaler); ok {
+		var data json.RawMessage
+		err := d.d.Decode(&data)
+		if err != nil {
+			return err
 		}
+		return jsonplugin.UnmarshalerConfig{}.Unmarshal(data, unmarshaler)
 	}
-	return d.gogo.NewDecoder(d.r).Decode(v)
+	return GoGoDecoderWrapper{Decoder: d.d}.Decode(v)
 }
 
 // TTNEventStream returns a TTN JsonPb marshaler with double newlines for
