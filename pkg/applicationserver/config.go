@@ -216,17 +216,12 @@ func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.
 	if c.Registry == nil {
 		return nil, errWebhooksRegistry.New()
 	}
-	useQueue := c.QueueSize > 0 || c.Workers > 0
-	useHealthCheck := c.UnhealthyAttemptsThreshold > 0 || c.UnhealthyRetryInterval > 0
-	if useHealthCheck {
+	if c.UnhealthyAttemptsThreshold > 0 || c.UnhealthyRetryInterval > 0 {
 		registry := web.NewHealthStatusRegistry(c.Registry)
 		registry = web.NewCachedHealthStatusRegistry(registry)
-		var opts []web.HealthCheckSinkOption
-		if useQueue {
-			opts = append(opts, web.WithPooledSink(ctx, server, c.Workers, c.QueueSize))
-		}
-		sink = web.NewHealthCheckSink(sink, registry, c.UnhealthyAttemptsThreshold, c.UnhealthyRetryInterval, opts...)
-	} else if useQueue {
+		sink = web.NewHealthCheckSink(sink, registry, c.UnhealthyAttemptsThreshold, c.UnhealthyRetryInterval)
+	}
+	if c.QueueSize > 0 || c.Workers > 0 {
 		sink = web.NewPooledSink(ctx, server, sink, c.Workers, c.QueueSize)
 	}
 	return web.NewWebhooks(ctx, server, c.Registry, sink, c.Downlinks)

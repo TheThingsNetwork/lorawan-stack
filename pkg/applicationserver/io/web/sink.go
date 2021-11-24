@@ -22,7 +22,6 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 )
 
 // HealthStatusRegistry is a registry for webhook health status.
@@ -101,30 +100,9 @@ func NewCachedHealthStatusRegistry(registry HealthStatusRegistry) HealthStatusRe
 	return &cachedHealthStatusRegistry{registry}
 }
 
-type functionalSink func(*http.Request) error
-
-// Process uses the underlying function in order to process the *http.Request.
-func (f functionalSink) Process(r *http.Request) error {
-	return f(r)
-}
-
-// HealthCheckSinkOption encapsulates a configuration option for a healthcheck-enabled sink.
-type HealthCheckSinkOption func(*healthCheckSink)
-
-// WithPooledSink enables worker pooling and queueing of the underlying sink.
-// This option exists in order to avoid enqueuing items that will be rejected on dequeue.
-func WithPooledSink(ctx context.Context, c workerpool.Component, workers int, queueSize int) HealthCheckSinkOption {
-	return func(hcs *healthCheckSink) {
-		hcs.queueSink = NewPooledSink(ctx, c, hcs.queueSink, workers, queueSize)
-	}
-}
-
 type healthCheckSink struct {
-	// executionSink is used to execute the *http.Request.
-	executionSink Sink
-	// queueSink enqueues the provided *http.Request and executes it using executionSink.
-	queueSink Sink
-	registry  HealthStatusRegistry
+	sink     Sink
+	registry HealthStatusRegistry
 
 	unhealthyAttemptsThreshold int
 	unhealthyRetryInterval     time.Duration
@@ -133,27 +111,27 @@ type healthCheckSink struct {
 // Process runs the health checks and sends the request to the underlying sink
 // if they pass.
 func (hcs *healthCheckSink) Process(r *http.Request) error {
-	r, err := hcs.preEnqueueCheck(r)
+	healthy, err := hcs.preRunCheck(r)
 	if err != nil {
 		return err
 	}
-	return hcs.queueSink.Process(r)
+	return hcs.executeAndRecord(r, healthy)
 }
 
 var errWebhookDisabled = errors.DefineAborted("webhook_disabled", "webhook disabled")
 
-// preEnqueueCheck verifies if the webhook should be enqueued.
-func (hcs *healthCheckSink) preEnqueueCheck(r *http.Request) (*http.Request, error) {
+// preRunCheck verifies if the webhook should be executed.
+func (hcs *healthCheckSink) preRunCheck(r *http.Request) (bool, error) {
 	h, err := hcs.registry.Get(r)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
 
 	switch {
 	case h == nil:
 
 	case h.GetHealthy() != nil:
-		return withHealthStatus(r, h), nil
+		return true, nil
 
 	case h.GetUnhealthy() != nil:
 		h := h.GetUnhealthy()
@@ -175,22 +153,22 @@ func (hcs *healthCheckSink) preEnqueueCheck(r *http.Request) (*http.Request, err
 
 		default:
 			// The webhook is above the threshold, and the cooldown period has not passed yet.
-			return nil, errWebhookDisabled.New()
+			return false, errWebhookDisabled.New()
 		}
 
 	default:
 		panic("unreachable")
 	}
 
-	return r, nil
+	return false, nil
 }
 
 // executeAndRecord runs the provided request using the underlying sink and records the health status.
-func (hcs *healthCheckSink) executeAndRecord(r *http.Request) error {
-	sinkErr := hcs.executionSink.Process(r)
+func (hcs *healthCheckSink) executeAndRecord(r *http.Request, healthy bool) error {
+	sinkErr := hcs.sink.Process(r)
 
 	// Fast path: the health status is available, the request did not error, and the webhook is healthy.
-	if h, ok := healthStatusFromRequest(r); ok && sinkErr == nil && h.GetHealthy() != nil {
+	if sinkErr == nil && healthy {
 		return nil
 	}
 
@@ -228,29 +206,11 @@ func (hcs *healthCheckSink) executeAndRecord(r *http.Request) error {
 
 // NewHealthCheckSink creates a Sink that records the health status of the webhooks and stops them from executing if
 // too many fail in a specified interval of time.
-func NewHealthCheckSink(sink Sink, registry HealthStatusRegistry, unhealthyAttemptsThreshold int, unhealthyRetryInterval time.Duration, opts ...HealthCheckSinkOption) Sink {
-	hcs := &healthCheckSink{
-		executionSink:              sink,
+func NewHealthCheckSink(sink Sink, registry HealthStatusRegistry, unhealthyAttemptsThreshold int, unhealthyRetryInterval time.Duration) Sink {
+	return &healthCheckSink{
+		sink:                       sink,
 		registry:                   registry,
 		unhealthyAttemptsThreshold: unhealthyAttemptsThreshold,
 		unhealthyRetryInterval:     unhealthyRetryInterval,
 	}
-	hcs.queueSink = functionalSink(hcs.executeAndRecord)
-	for _, o := range opts {
-		o(hcs)
-	}
-	return hcs
-}
-
-type healthStatusKeyType struct{}
-
-var healthStatusKey healthStatusKeyType
-
-func withHealthStatus(r *http.Request, status *ttnpb.ApplicationWebhookHealth) *http.Request {
-	return r.WithContext(context.WithValue(r.Context(), healthStatusKey, status))
-}
-
-func healthStatusFromRequest(r *http.Request) (*ttnpb.ApplicationWebhookHealth, bool) {
-	status, ok := r.Context().Value(healthStatusKey).(*ttnpb.ApplicationWebhookHealth)
-	return status, ok
 }
