@@ -127,13 +127,15 @@ type UplinkStorageConfig struct {
 
 // WebhooksConfig defines the configuration of the webhooks integration.
 type WebhooksConfig struct {
-	Registry  web.WebhookRegistry `name:"-"`
-	Target    string              `name:"target" description:"Target of the integration (direct)"`
-	Timeout   time.Duration       `name:"timeout" description:"Wait timeout of the target to process the request"`
-	QueueSize int                 `name:"queue-size" description:"Number of requests to queue"`
-	Workers   int                 `name:"workers" description:"Number of workers to process requests"`
-	Templates web.TemplatesConfig `name:"templates" description:"The store of the webhook templates"`
-	Downlinks web.DownlinksConfig `name:"downlink" description:"The downlink queue operations configuration"`
+	Registry                   web.WebhookRegistry `name:"-"`
+	Target                     string              `name:"target" description:"Target of the integration (direct)"`
+	Timeout                    time.Duration       `name:"timeout" description:"Wait timeout of the target to process the request"`
+	QueueSize                  int                 `name:"queue-size" description:"Number of requests to queue"`
+	Workers                    int                 `name:"workers" description:"Number of workers to process requests"`
+	UnhealthyAttemptsThreshold int                 `name:"unhealthy-attempts-threshold" description:"Number of failed webhook attempts before the webhook is disabled"`
+	UnhealthyRetryInterval     time.Duration       `name:"unhealthy-retry-interval" description:"Time interval after which disabled webhooks may execute again"`
+	Templates                  web.TemplatesConfig `name:"templates" description:"The store of the webhook templates"`
+	Downlinks                  web.DownlinksConfig `name:"downlink" description:"The downlink queue operations configuration"`
 }
 
 // DistributionConfig contains the upstream traffic distribution configuration of the Application Server.
@@ -235,7 +237,17 @@ func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.
 	if c.Registry == nil {
 		return nil, errWebhooksRegistry.New()
 	}
-	if c.QueueSize > 0 || c.Workers > 0 {
+	useQueue := c.QueueSize > 0 || c.Workers > 0
+	useHealthCheck := c.UnhealthyAttemptsThreshold > 0 || c.UnhealthyRetryInterval > 0
+	if useHealthCheck {
+		registry := web.NewHealthStatusRegistry(c.Registry)
+		registry = web.NewCachedHealthStatusRegistry(registry)
+		var opts []web.HealthCheckSinkOption
+		if useQueue {
+			opts = append(opts, web.WithPooledSink(ctx, server, c.Workers, c.QueueSize))
+		}
+		sink = web.NewHealthCheckSink(sink, registry, c.UnhealthyAttemptsThreshold, c.UnhealthyRetryInterval, opts...)
+	} else if useQueue {
 		sink = web.NewPooledSink(ctx, server, sink, c.Workers, c.QueueSize)
 	}
 	return web.NewWebhooks(ctx, server, c.Registry, sink, c.Downlinks)
