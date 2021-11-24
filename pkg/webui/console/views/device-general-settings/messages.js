@@ -36,6 +36,10 @@ const messages = defineMessages({
   updateSuccess: 'End device updated',
   keysResetWarning: 'Viewing the end device keys is prohibited; overwriting is allowed',
   validateSessionKey: '{field} must have non-zero value',
+  macSettingsError:
+    'There was an error and the default MAC settings for the <code>{freqPlan}</code> frequency plan could not be loaded',
+  fpNotFoundError:
+    'The LoRaWAN version <code>{lorawanVersion}</code> does not support the <code>{freqPlan}</code> frequency plan. Please choose a different MAC version or frequency plan.',
 })
 
 export default messages

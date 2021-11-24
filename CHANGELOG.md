@@ -20,6 +20,7 @@ For details about compatibility between different releases, see the **Commitment
   - The Gateway Server will attempt to determine the correct GPS timestamp from the provided `gpstime` based on the time at which the upstream message has been received.
   - This workaround will be available until the related gateway vendors will release patches for this issue.
 - Firmware version of The Things Kickstarter Gateway are written to the gateway attributes upon receiving a valid status message.
+- Desired mac settings to end device general settings in the Console.
 
 ### Changed
 

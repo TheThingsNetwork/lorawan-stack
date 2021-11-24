@@ -183,7 +183,6 @@ const AdvancedSettingsSection = props => {
                 <Form.Field
                   title={messages.rx1DelayTitle}
                   type="number"
-                  description={m.rx1DelayDescription}
                   required={!isUndefined(defaultMacSettings.rx1_delay)}
                   name="mac_settings.rx1_delay"
                   tooltipId={tooltipIds.RX1_DELAY}
