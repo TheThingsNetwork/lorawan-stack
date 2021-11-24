@@ -17,6 +17,7 @@ syntax = "proto3";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/any.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
@@ -101,6 +102,19 @@ message ApplicationWebhookTemplates {
   repeated ApplicationWebhookTemplate templates = 1;
 }
 
+message ApplicationWebhookHealth {
+  message WebhookHealthStatusHealthy { }
+  message WebhookHealthStatusUnhealthy {
+    uint64 failed_attempts = 1;
+    google.protobuf.Timestamp last_failed_attempt_at = 2 [(validate.rules).timestamp.required = true];
+    google.protobuf.Any last_failed_attempt_details = 3 [(validate.rules).any.required = true];
+  }
+  oneof status {
+    WebhookHealthStatusHealthy healthy = 1;
+    WebhookHealthStatusUnhealthy unhealthy = 2;
+  }
+}
+
 message ApplicationWebhook {
   ApplicationWebhookIdentifiers ids = 1 [(validate.rules).message.required = true];
   google.protobuf.Timestamp created_at = 2;
@@ -144,7 +158,9 @@ message ApplicationWebhook {
   Message location_solved = 14;
   Message service_data = 18;
 
-  // next: 20
+  ApplicationWebhookHealth health_status = 20;
+
+  // next: 21
 }
 
 message ApplicationWebhooks {

@@ -5592,6 +5592,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "health_status",
+              "description": "",
+              "label": "",
+              "type": "ApplicationWebhookHealth",
+              "longType": "ApplicationWebhookHealth",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookHealth",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -5756,6 +5768,117 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ApplicationWebhookHealth",
+          "longName": "ApplicationWebhookHealth",
+          "fullName": "ttn.lorawan.v3.ApplicationWebhookHealth",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "healthy",
+              "description": "",
+              "label": "",
+              "type": "WebhookHealthStatusHealthy",
+              "longType": "ApplicationWebhookHealth.WebhookHealthStatusHealthy",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookHealth.WebhookHealthStatusHealthy",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "status",
+              "defaultValue": ""
+            },
+            {
+              "name": "unhealthy",
+              "description": "",
+              "label": "",
+              "type": "WebhookHealthStatusUnhealthy",
+              "longType": "ApplicationWebhookHealth.WebhookHealthStatusUnhealthy",
+              "fullType": "ttn.lorawan.v3.ApplicationWebhookHealth.WebhookHealthStatusUnhealthy",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "status",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "WebhookHealthStatusHealthy",
+          "longName": "ApplicationWebhookHealth.WebhookHealthStatusHealthy",
+          "fullName": "ttn.lorawan.v3.ApplicationWebhookHealth.WebhookHealthStatusHealthy",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "WebhookHealthStatusUnhealthy",
+          "longName": "ApplicationWebhookHealth.WebhookHealthStatusUnhealthy",
+          "fullName": "ttn.lorawan.v3.ApplicationWebhookHealth.WebhookHealthStatusUnhealthy",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "failed_attempts",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "last_failed_attempt_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "timestamp.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "last_failed_attempt_details",
+              "description": "",
+              "label": "",
+              "type": "Any",
+              "longType": "google.protobuf.Any",
+              "fullType": "google.protobuf.Any",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "any.required",
+                    "value": true
+                  }
+                ]
+              }
             }
           ]
         },

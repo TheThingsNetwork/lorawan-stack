@@ -101,6 +101,18 @@ var ApplicationWebhookTemplatesFieldPathsNested = []string{
 var ApplicationWebhookTemplatesFieldPathsTopLevel = []string{
 	"templates",
 }
+var ApplicationWebhookHealthFieldPathsNested = []string{
+	"status",
+	"status.healthy",
+	"status.unhealthy",
+	"status.unhealthy.failed_attempts",
+	"status.unhealthy.last_failed_attempt_at",
+	"status.unhealthy.last_failed_attempt_details",
+}
+
+var ApplicationWebhookHealthFieldPathsTopLevel = []string{
+	"status",
+}
 var ApplicationWebhookFieldPathsNested = []string{
 	"base_url",
 	"created_at",
@@ -119,6 +131,13 @@ var ApplicationWebhookFieldPathsNested = []string{
 	"downlink_sent.path",
 	"format",
 	"headers",
+	"health_status",
+	"health_status.status",
+	"health_status.status.healthy",
+	"health_status.status.unhealthy",
+	"health_status.status.unhealthy.failed_attempts",
+	"health_status.status.unhealthy.last_failed_attempt_at",
+	"health_status.status.unhealthy.last_failed_attempt_details",
 	"ids",
 	"ids.application_ids",
 	"ids.application_ids.application_id",
@@ -149,6 +168,7 @@ var ApplicationWebhookFieldPathsTopLevel = []string{
 	"downlink_sent",
 	"format",
 	"headers",
+	"health_status",
 	"ids",
 	"join_accept",
 	"location_solved",
@@ -214,6 +234,13 @@ var SetApplicationWebhookRequestFieldPathsNested = []string{
 	"webhook.downlink_sent.path",
 	"webhook.format",
 	"webhook.headers",
+	"webhook.health_status",
+	"webhook.health_status.status",
+	"webhook.health_status.status.healthy",
+	"webhook.health_status.status.unhealthy",
+	"webhook.health_status.status.unhealthy.failed_attempts",
+	"webhook.health_status.status.unhealthy.last_failed_attempt_at",
+	"webhook.health_status.status.unhealthy.last_failed_attempt_details",
 	"webhook.ids",
 	"webhook.ids.application_ids",
 	"webhook.ids.application_ids.application_id",
@@ -259,6 +286,19 @@ var ApplicationWebhookTemplate_MessageFieldPathsNested = []string{
 
 var ApplicationWebhookTemplate_MessageFieldPathsTopLevel = []string{
 	"path",
+}
+var ApplicationWebhookHealth_WebhookHealthStatusHealthyFieldPathsNested []string
+var ApplicationWebhookHealth_WebhookHealthStatusHealthyFieldPathsTopLevel []string
+var ApplicationWebhookHealth_WebhookHealthStatusUnhealthyFieldPathsNested = []string{
+	"failed_attempts",
+	"last_failed_attempt_at",
+	"last_failed_attempt_details",
+}
+
+var ApplicationWebhookHealth_WebhookHealthStatusUnhealthyFieldPathsTopLevel = []string{
+	"failed_attempts",
+	"last_failed_attempt_at",
+	"last_failed_attempt_details",
 }
 var ApplicationWebhook_MessageFieldPathsNested = []string{
 	"path",
