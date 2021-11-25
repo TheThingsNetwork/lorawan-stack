@@ -1,4 +1,3 @@
-/* eslint-disable jest/no-commented-out-tests */
 // Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");

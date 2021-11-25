@@ -251,7 +251,6 @@ const m = defineMessages({
 
   statusTimePeriodicityDescription:
     'Interval to request the end device status. Set to 0 to disable requesting the end device status on an interval.',
-  
   skipPayloadCryptoOverride:
     'Skip payload crypto disables the application layer encryption of LoRaWAN frames. This causes the Application Server to forward the messages without any processing, such as payload formatters, to the integrations.  When doing so, the integrations are responsible for decryption and processing of the binary format in order to understand the message. This application-wide setting can be overwritten per end device using this overwrite setting.',
 })
@@ -493,6 +492,7 @@ const descriptions = Object.freeze({
   },
   [TOOLTIP_IDS.SKIP_PAYLOAD_CRYPTO_OVERRIDE]: {
     description: m.skipPayloadCryptoOverride,
+  },
 })
 
 const links = Object.freeze({
