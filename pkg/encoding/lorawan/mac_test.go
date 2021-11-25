@@ -399,9 +399,6 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 
 			cmd = &ttnpb.MACCommand{}
 			err = reader(phy, bytes.NewReader(tc.Bytes), cmd)
-			if pld := cmd.GetDeviceTimeAns(); pld != nil {
-				pld.Time = ttnpb.ProtoTimePtr(ttnpb.StdTime(pld.Time))
-			}
 			if a.So(err, should.BeNil) {
 				a.So(cmd, should.Resemble, tc.Payload.MACCommand())
 			}
