@@ -64,7 +64,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		{
 			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
@@ -85,7 +85,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			SyncWithGatewayAbsolute: true,
 			PayloadSize:             51,
 			Settings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
@@ -95,7 +95,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 				},
 				CodingRate: "4/5",
 				Frequency:  869525000,
-				Time:       timePtr(time.Unix(0, int64(100*time.Millisecond))),
+				Time:       ttnpb.ProtoTimePtr(time.Unix(0, int64(100*time.Millisecond))),
 			},
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
 			ExpectedToa: 2465792 * time.Microsecond,
@@ -105,7 +105,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		{
 			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
@@ -127,7 +127,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			SyncWithGatewayAbsolute: true,
 			PayloadSize:             51,
 			Settings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
@@ -137,7 +137,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 				},
 				CodingRate: "4/5",
 				Frequency:  869525000,
-				Time:       timePtr(time.Unix(0, int64(300*time.Millisecond))),
+				Time:       ttnpb.ProtoTimePtr(time.Unix(0, int64(300*time.Millisecond))),
 			},
 			Priority:       ttnpb.TxSchedulePriority_NORMAL,
 			NPercentileRTT: durationPtr(500 * time.Millisecond),
@@ -148,7 +148,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		{
 			PayloadSize: 51,
 			Settings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
@@ -168,7 +168,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		{
 			PayloadSize: 16,
 			Settings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
@@ -178,7 +178,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 				},
 				CodingRate: "4/5",
 				Frequency:  868100000,
-				Time:       timePtr(time.Unix(0, int64(1*time.Second))),
+				Time:       ttnpb.ProtoTimePtr(time.Unix(0, int64(1*time.Second))),
 			},
 			Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 			MedianRTT:      durationPtr(200 * time.Millisecond),
@@ -189,7 +189,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 			SyncWithGatewayAbsolute: true,
 			PayloadSize:             16,
 			Settings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
@@ -199,7 +199,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 				},
 				CodingRate: "4/5",
 				Frequency:  868100000,
-				Time:       timePtr(time.Unix(0, int64(1*time.Minute))),
+				Time:       ttnpb.ProtoTimePtr(time.Unix(0, int64(1*time.Minute))),
 			},
 			Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 			ExpectedToa:    51456 * time.Microsecond,
@@ -208,7 +208,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		{
 			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
@@ -227,7 +227,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		{
 			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
@@ -247,7 +247,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		{
 			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
@@ -267,7 +267,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		{
 			PayloadSize: 10,
 			Settings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
@@ -286,7 +286,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		{
 			PayloadSize: 20,
 			Settings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
@@ -381,7 +381,7 @@ func TestScheduleAtWithFrequencyPlanDutyCycle(t *testing.T) {
 		{
 			PayloadSize: 20,
 			Settings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
@@ -453,7 +453,7 @@ func TestScheduleAnytime(t *testing.T) {
 
 	settingsAt := func(frequency uint64, sf, t uint32) ttnpb.TxSettings {
 		return ttnpb.TxSettings{
-			DataRate: ttnpb.DataRate{
+			DataRate: &ttnpb.DataRate{
 				Modulation: &ttnpb.DataRate_Lora{
 					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
@@ -564,7 +564,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 
 	settingsAt := func(frequency uint64, sf uint32, time *time.Time, timestamp uint32) ttnpb.TxSettings {
 		return ttnpb.TxSettings{
-			DataRate: ttnpb.DataRate{
+			DataRate: &ttnpb.DataRate{
 				Modulation: &ttnpb.DataRate_Lora{
 					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
@@ -574,7 +574,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 			},
 			CodingRate: "4/5",
 			Frequency:  frequency,
-			Time:       time,
+			Time:       ttnpb.ProtoTime(time),
 			Timestamp:  timestamp,
 		}
 	}
@@ -759,7 +759,7 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 	_, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 		PayloadSize: 10,
 		TxSettings: ttnpb.TxSettings{
-			DataRate: ttnpb.DataRate{
+			DataRate: &ttnpb.DataRate{
 				Modulation: &ttnpb.DataRate_Lora{
 					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
@@ -781,7 +781,7 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 	_, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 		PayloadSize: 10,
 		TxSettings: ttnpb.TxSettings{
-			DataRate: ttnpb.DataRate{
+			DataRate: &ttnpb.DataRate{
 				Modulation: &ttnpb.DataRate_Lora{
 					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
@@ -807,7 +807,7 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 	em, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
 		PayloadSize: 10,
 		TxSettings: ttnpb.TxSettings{
-			DataRate: ttnpb.DataRate{
+			DataRate: &ttnpb.DataRate{
 				Modulation: &ttnpb.DataRate_Lora{
 					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
@@ -1055,7 +1055,7 @@ func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
 	_, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 		PayloadSize: 10,
 		TxSettings: ttnpb.TxSettings{
-			DataRate: ttnpb.DataRate{
+			DataRate: &ttnpb.DataRate{
 				Modulation: &ttnpb.DataRate_Lora{
 					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
@@ -1077,7 +1077,7 @@ func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
 	_, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 		PayloadSize: 10,
 		TxSettings: ttnpb.TxSettings{
-			DataRate: ttnpb.DataRate{
+			DataRate: &ttnpb.DataRate{
 				Modulation: &ttnpb.DataRate_Lora{
 					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
@@ -1103,7 +1103,7 @@ func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
 	em, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
 		PayloadSize: 10,
 		TxSettings: ttnpb.TxSettings{
-			DataRate: ttnpb.DataRate{
+			DataRate: &ttnpb.DataRate{
 				Modulation: &ttnpb.DataRate_Lora{
 					Lora: &ttnpb.LoRaDataRate{
 						Bandwidth:       125000,
@@ -1144,7 +1144,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 		_, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 			PayloadSize: 10,
 			TxSettings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
@@ -1171,7 +1171,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 		_, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 			PayloadSize: 10,
 			TxSettings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
@@ -1184,7 +1184,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 				Timestamp:  6000000,
 			},
 			UplinkToken: &ttnpb.UplinkToken{
-				ServerTime:       &t,
+				ServerTime:       ttnpb.ProtoTimePtr(t),
 				Timestamp:        5000000,
 				ConcentratorTime: 5000000000,
 			},
@@ -1204,7 +1204,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 		_, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 			PayloadSize: 10,
 			TxSettings: ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
@@ -1217,7 +1217,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 				Timestamp:  7000000,
 			},
 			UplinkToken: &ttnpb.UplinkToken{
-				ServerTime:       &t,
+				ServerTime:       ttnpb.ProtoTimePtr(t),
 				Timestamp:        5000000,
 				ConcentratorTime: 5000000000,
 			},

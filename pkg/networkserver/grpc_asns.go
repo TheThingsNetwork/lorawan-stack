@@ -126,16 +126,16 @@ func minAFCntDown(session *ttnpb.Session, macState *ttnpb.MACState) (uint32, err
 	outer:
 		for i := len(macState.RecentDownlinks) - 1; i >= 0; i-- {
 			pld := macState.RecentDownlinks[i].Payload
-			switch pld.MType {
+			switch pld.MHdr.MType {
 			case ttnpb.MType_UNCONFIRMED_DOWN, ttnpb.MType_CONFIRMED_DOWN:
 				macPayload := pld.GetMacPayload()
 				if macPayload == nil {
 					return 0, errInvalidPayload.New()
 				}
-				if macPayload.FPort > 0 && macPayload.FCnt >= minFCnt {
+				if macPayload.FPort > 0 && macPayload.FHdr.FCnt >= minFCnt {
 					// NOTE: In an unlikely case all len(recentDowns) downlinks are FPort==0 or something unmatched in the switch (e.g. a proprietary downlink) minFCnt will
 					// not reflect the correct AFCntDown - that is fine, because this is AS's responsibility and FCnt checking here is essentially just a sanity check.
-					minFCnt = macPayload.FCnt + 1
+					minFCnt = macPayload.FHdr.FCnt + 1
 					break outer
 				}
 			case ttnpb.MType_JOIN_ACCEPT:
@@ -144,7 +144,7 @@ func minAFCntDown(session *ttnpb.Session, macState *ttnpb.MACState) (uint32, err
 				break outer
 			case ttnpb.MType_PROPRIETARY:
 			default:
-				panic(fmt.Sprintf("invalid downlink MType: %s", pld.MType))
+				panic(fmt.Sprintf("invalid downlink MType: %s", pld.MHdr.MType))
 			}
 		}
 	} else if session.LastNFCntDown > 0 || session.LastNFCntDown == 0 && len(macState.RecentDownlinks) > 0 {

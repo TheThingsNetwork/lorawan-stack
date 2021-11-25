@@ -68,7 +68,7 @@ func TestNSHandler(t *testing.T) {
 				BandId: band.EU_863_870,
 				Message: &ttnpb.UplinkMessage{
 					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
+						MHdr: &ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
 						Mic:  []byte{0x4E, 0x61, 0xBC, 0x00},
 						Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
 							JoinEui:  types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22},
@@ -85,7 +85,7 @@ func TestNSHandler(t *testing.T) {
 					Settings: &ttnpb.TxSettings{
 						Frequency:  868300000,
 						CodingRate: "4/5",
-						DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
+						DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 							SpreadingFactor: 11,
 							Bandwidth:       125000,
 						}}},

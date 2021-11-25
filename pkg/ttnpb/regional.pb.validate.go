@@ -483,7 +483,7 @@ func (m *ConcentratorConfig_LBTConfiguration) ValidateFields(paths ...string) er
 			// no validation rules for RssiOffset
 		case "scan_time":
 
-			if v, ok := interface{}(&m.ScanTime).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetScanTime()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ConcentratorConfig_LBTConfigurationValidationError{
 						field:  "scan_time",

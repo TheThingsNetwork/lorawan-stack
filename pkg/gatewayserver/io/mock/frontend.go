@@ -56,7 +56,7 @@ func ConnectFrontend(ctx context.Context, ids ttnpb.GatewayIdentifiers, server i
 				gatewayTime := time.Unix(0, 0).Add(time.Since(started))
 				t := time.Now()
 				up.ReceivedAt = &t
-				up.Settings.Time = &gatewayTime
+				up.Settings.Time = ttnpb.ProtoTimePtr(gatewayTime)
 				conn.HandleUp(up, nil)
 			case status := <-f.Status:
 				conn.HandleStatus(status)

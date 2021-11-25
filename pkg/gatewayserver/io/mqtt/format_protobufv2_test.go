@@ -40,7 +40,7 @@ func TestProtobufV2Downlink(t *testing.T) {
 		Payload:    &ttnpb.Message{},
 		Settings: &ttnpb.DownlinkMessage_Scheduled{
 			Scheduled: &ttnpb.TxSettings{
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							Bandwidth:       125000,
@@ -102,7 +102,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 	}
 	validV3Settings := ttnpb.TxSettings{
 		Timestamp: 1000,
-		DataRate: ttnpb.DataRate{
+		DataRate: &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Lora{
 				Lora: &ttnpb.LoRaDataRate{
 					Bandwidth:       125000,

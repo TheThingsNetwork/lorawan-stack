@@ -5,7 +5,6 @@ package ttnpb
 import (
 	fmt "fmt"
 	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
-	time "time"
 )
 
 func (dst *Message) SetFields(src *Message, paths ...string) error {
@@ -14,19 +13,26 @@ func (dst *Message) SetFields(src *Message, paths ...string) error {
 		case "m_hdr":
 			if len(subs) > 0 {
 				var newDst, newSrc *MHDR
-				if src != nil {
-					newSrc = &src.MHDR
+				if (src == nil || src.MHdr == nil) && dst.MHdr == nil {
+					continue
 				}
-				newDst = &dst.MHDR
+				if src != nil {
+					newSrc = src.MHdr
+				}
+				if dst.MHdr != nil {
+					newDst = dst.MHdr
+				} else {
+					newDst = &MHDR{}
+					dst.MHdr = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.MHDR = src.MHDR
+					dst.MHdr = src.MHdr
 				} else {
-					var zero MHDR
-					dst.MHDR = zero
+					dst.MHdr = nil
 				}
 			}
 		case "mic":
@@ -236,19 +242,26 @@ func (dst *MACPayload) SetFields(src *MACPayload, paths ...string) error {
 		case "f_hdr":
 			if len(subs) > 0 {
 				var newDst, newSrc *FHDR
-				if src != nil {
-					newSrc = &src.FHDR
+				if (src == nil || src.FHdr == nil) && dst.FHdr == nil {
+					continue
 				}
-				newDst = &dst.FHDR
+				if src != nil {
+					newSrc = src.FHdr
+				}
+				if dst.FHdr != nil {
+					newDst = dst.FHdr
+				} else {
+					newDst = &FHDR{}
+					dst.FHdr = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.FHDR = src.FHDR
+					dst.FHdr = src.FHdr
 				} else {
-					var zero FHDR
-					dst.FHDR = zero
+					dst.FHdr = nil
 				}
 			}
 		case "f_port":
@@ -313,10 +326,18 @@ func (dst *FHDR) SetFields(src *FHDR, paths ...string) error {
 		case "f_ctrl":
 			if len(subs) > 0 {
 				var newDst, newSrc *FCtrl
-				if src != nil {
-					newSrc = &src.FCtrl
+				if (src == nil || src.FCtrl == nil) && dst.FCtrl == nil {
+					continue
 				}
-				newDst = &dst.FCtrl
+				if src != nil {
+					newSrc = src.FCtrl
+				}
+				if dst.FCtrl != nil {
+					newDst = dst.FCtrl
+				} else {
+					newDst = &FCtrl{}
+					dst.FCtrl = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -324,8 +345,7 @@ func (dst *FHDR) SetFields(src *FHDR, paths ...string) error {
 				if src != nil {
 					dst.FCtrl = src.FCtrl
 				} else {
-					var zero FCtrl
-					dst.FCtrl = zero
+					dst.FCtrl = nil
 				}
 			}
 		case "f_cnt":
@@ -563,19 +583,26 @@ func (dst *JoinAcceptPayload) SetFields(src *JoinAcceptPayload, paths ...string)
 		case "dl_settings":
 			if len(subs) > 0 {
 				var newDst, newSrc *DLSettings
-				if src != nil {
-					newSrc = &src.DLSettings
+				if (src == nil || src.DlSettings == nil) && dst.DlSettings == nil {
+					continue
 				}
-				newDst = &dst.DLSettings
+				if src != nil {
+					newSrc = src.DlSettings
+				}
+				if dst.DlSettings != nil {
+					newDst = dst.DlSettings
+				} else {
+					newDst = &DLSettings{}
+					dst.DlSettings = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.DLSettings = src.DLSettings
+					dst.DlSettings = src.DlSettings
 				} else {
-					var zero DLSettings
-					dst.DLSettings = zero
+					dst.DlSettings = nil
 				}
 			}
 		case "rx_delay":
@@ -931,10 +958,18 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 		case "data_rate":
 			if len(subs) > 0 {
 				var newDst, newSrc *DataRate
-				if src != nil {
-					newSrc = &src.DataRate
+				if (src == nil || src.DataRate == nil) && dst.DataRate == nil {
+					continue
 				}
-				newDst = &dst.DataRate
+				if src != nil {
+					newSrc = src.DataRate
+				}
+				if dst.DataRate != nil {
+					newDst = dst.DataRate
+				} else {
+					newDst = &DataRate{}
+					dst.DataRate = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -942,8 +977,7 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 				if src != nil {
 					dst.DataRate = src.DataRate
 				} else {
-					var zero DataRate
-					dst.DataRate = zero
+					dst.DataRate = nil
 				}
 			}
 		case "coding_rate":
@@ -3254,8 +3288,7 @@ func (dst *MACCommand_DeviceTimeAns) SetFields(src *MACCommand_DeviceTimeAns, pa
 			if src != nil {
 				dst.Time = src.Time
 			} else {
-				var zero time.Time
-				dst.Time = zero
+				dst.Time = nil
 			}
 
 		default:

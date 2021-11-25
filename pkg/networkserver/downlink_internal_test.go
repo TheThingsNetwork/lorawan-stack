@@ -136,7 +136,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 			panic(fmt.Errorf("unknown version %s", ver))
 		}
 
-		mic, err := crypto.ComputeDownlinkMIC(key, pld.DevAddr, confFCnt, pld.FCnt, b)
+		mic, err := crypto.ComputeDownlinkMIC(key, pld.FHdr.DevAddr, confFCnt, pld.FHdr.FCnt, b)
 		if err != nil {
 			t.Fatal("Failed to compute MIC")
 		}
@@ -164,10 +164,14 @@ func TestGenerateDataDownlink(t *testing.T) {
 					LorawanVersion: ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
+							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
 							},
-							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
+							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
+								FHdr: &ttnpb.FHDR{
+									FCtrl: &ttnpb.FCtrl{},
+								},
+							}},
 						},
 					}},
 				},
@@ -193,10 +197,14 @@ func TestGenerateDataDownlink(t *testing.T) {
 					LastDevStatusFCntUp: 2,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
+							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
 							},
-							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
+							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
+								FHdr: &ttnpb.FHDR{
+									FCtrl: &ttnpb.FCtrl{},
+								},
+							}},
 						},
 					}},
 				},
@@ -224,10 +232,14 @@ func TestGenerateDataDownlink(t *testing.T) {
 					LorawanVersion: ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
+							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
 							},
-							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
+							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
+								FHdr: &ttnpb.FHDR{
+									FCtrl: &ttnpb.FCtrl{},
+								},
+							}},
 						},
 					}},
 				},
@@ -250,12 +262,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 					LorawanVersion: ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
+							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_CONFIRMED_UP,
 							},
 							Payload: &ttnpb.Message_MacPayload{
 								MacPayload: &ttnpb.MACPayload{
-									FHDR: ttnpb.FHDR{
+									FHdr: &ttnpb.FHDR{
 										FCnt: 24,
 									},
 									FullFCnt: 24,
@@ -287,15 +299,15 @@ func TestGenerateDataDownlink(t *testing.T) {
 				FrequencyPlanId:   band.EU_863_870,
 			},
 			Payload: &ttnpb.Message{
-				MHDR: ttnpb.MHDR{
+				MHdr: &ttnpb.MHDR{
 					MType: ttnpb.MType_UNCONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
-						FHDR: ttnpb.FHDR{
+						FHdr: &ttnpb.FHDR{
 							DevAddr: devAddr,
-							FCtrl: ttnpb.FCtrl{
+							FCtrl: &ttnpb.FCtrl{
 								Ack: true,
 								Adr: true,
 							},
@@ -317,12 +329,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{{
 							Payload: &ttnpb.Message{
-								MHDR: ttnpb.MHDR{
+								MHdr: &ttnpb.MHDR{
 									MType: ttnpb.MType_CONFIRMED_UP,
 								},
 								Payload: &ttnpb.Message_MacPayload{
 									MacPayload: &ttnpb.MACPayload{
-										FHDR: ttnpb.FHDR{
+										FHdr: &ttnpb.FHDR{
 											FCnt: 24,
 										},
 										FullFCnt: 24,
@@ -367,10 +379,14 @@ func TestGenerateDataDownlink(t *testing.T) {
 					LorawanVersion: ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
+							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
 							},
-							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
+							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
+								FHdr: &ttnpb.FHDR{
+									FCtrl: &ttnpb.FCtrl{},
+								},
+							}},
 						},
 					}},
 					RxWindowsAvailable: true,
@@ -398,15 +414,15 @@ func TestGenerateDataDownlink(t *testing.T) {
 				FrequencyPlanId:   band.EU_863_870,
 			},
 			Payload: &ttnpb.Message{
-				MHDR: ttnpb.MHDR{
+				MHdr: &ttnpb.MHDR{
 					MType: ttnpb.MType_UNCONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
-						FHDR: ttnpb.FHDR{
+						FHdr: &ttnpb.FHDR{
 							DevAddr: devAddr,
-							FCtrl: ttnpb.FCtrl{
+							FCtrl: &ttnpb.FCtrl{
 								Ack: false,
 								Adr: true,
 							},
@@ -437,10 +453,14 @@ func TestGenerateDataDownlink(t *testing.T) {
 						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{{
 							Payload: &ttnpb.Message{
-								MHDR: ttnpb.MHDR{
+								MHdr: &ttnpb.MHDR{
 									MType: ttnpb.MType_UNCONFIRMED_UP,
 								},
-								Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
+								Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
+									FHdr: &ttnpb.FHDR{
+										FCtrl: &ttnpb.FCtrl{},
+									},
+								}},
 							},
 						}},
 						RxWindowsAvailable: true,
@@ -474,12 +494,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 					LorawanVersion: ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
+							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_CONFIRMED_UP,
 							},
 							Payload: &ttnpb.Message_MacPayload{
 								MacPayload: &ttnpb.MACPayload{
-									FHDR: ttnpb.FHDR{
+									FHdr: &ttnpb.FHDR{
 										FCnt: 24,
 									},
 									FullFCnt: 24,
@@ -512,15 +532,15 @@ func TestGenerateDataDownlink(t *testing.T) {
 				FrequencyPlanId:   band.EU_863_870,
 			},
 			Payload: &ttnpb.Message{
-				MHDR: ttnpb.MHDR{
+				MHdr: &ttnpb.MHDR{
 					MType: ttnpb.MType_UNCONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
-						FHDR: ttnpb.FHDR{
+						FHdr: &ttnpb.FHDR{
 							DevAddr: devAddr,
-							FCtrl: ttnpb.FCtrl{
+							FCtrl: &ttnpb.FCtrl{
 								Ack: true,
 								Adr: true,
 							},
@@ -552,12 +572,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{{
 							Payload: &ttnpb.Message{
-								MHDR: ttnpb.MHDR{
+								MHdr: &ttnpb.MHDR{
 									MType: ttnpb.MType_CONFIRMED_UP,
 								},
 								Payload: &ttnpb.Message_MacPayload{
 									MacPayload: &ttnpb.MACPayload{
-										FHDR: ttnpb.FHDR{
+										FHdr: &ttnpb.FHDR{
 											FCnt: 24,
 										},
 										FullFCnt: 24,
@@ -596,10 +616,14 @@ func TestGenerateDataDownlink(t *testing.T) {
 					LorawanVersion: ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
+							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
 							},
-							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
+							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
+								FHdr: &ttnpb.FHDR{
+									FCtrl: &ttnpb.FCtrl{},
+								},
+							}},
 						},
 					}},
 				},
@@ -626,15 +650,15 @@ func TestGenerateDataDownlink(t *testing.T) {
 				FrequencyPlanId:   band.EU_863_870,
 			},
 			Payload: &ttnpb.Message{
-				MHDR: ttnpb.MHDR{
+				MHdr: &ttnpb.MHDR{
 					MType: ttnpb.MType_CONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
-						FHDR: ttnpb.FHDR{
+						FHdr: &ttnpb.FHDR{
 							DevAddr: devAddr,
-							FCtrl: ttnpb.FCtrl{
+							FCtrl: &ttnpb.FCtrl{
 								Ack: false,
 								Adr: true,
 							},
@@ -669,10 +693,14 @@ func TestGenerateDataDownlink(t *testing.T) {
 						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{{
 							Payload: &ttnpb.Message{
-								MHDR: ttnpb.MHDR{
+								MHdr: &ttnpb.MHDR{
 									MType: ttnpb.MType_UNCONFIRMED_UP,
 								},
-								Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
+								Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
+									FHdr: &ttnpb.FHDR{
+										FCtrl: &ttnpb.FCtrl{},
+									},
+								}},
 							},
 						}},
 					},
@@ -705,12 +733,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 					LorawanVersion: ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
+							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_CONFIRMED_UP,
 							},
 							Payload: &ttnpb.Message_MacPayload{
 								MacPayload: &ttnpb.MACPayload{
-									FHDR: ttnpb.FHDR{
+									FHdr: &ttnpb.FHDR{
 										FCnt: 24,
 									},
 									FullFCnt: 24,
@@ -743,15 +771,15 @@ func TestGenerateDataDownlink(t *testing.T) {
 				FrequencyPlanId:   band.EU_863_870,
 			},
 			Payload: &ttnpb.Message{
-				MHDR: ttnpb.MHDR{
+				MHdr: &ttnpb.MHDR{
 					MType: ttnpb.MType_CONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
-						FHDR: ttnpb.FHDR{
+						FHdr: &ttnpb.FHDR{
 							DevAddr: devAddr,
-							FCtrl: ttnpb.FCtrl{
+							FCtrl: &ttnpb.FCtrl{
 								Ack: true,
 								Adr: true,
 							},
@@ -787,12 +815,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 						LorawanVersion: ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{{
 							Payload: &ttnpb.Message{
-								MHDR: ttnpb.MHDR{
+								MHdr: &ttnpb.MHDR{
 									MType: ttnpb.MType_CONFIRMED_UP,
 								},
 								Payload: &ttnpb.Message_MacPayload{
 									MacPayload: &ttnpb.MACPayload{
-										FHDR: ttnpb.FHDR{
+										FHdr: &ttnpb.FHDR{
 											FCnt: 24,
 										},
 										FullFCnt: 24,
@@ -835,10 +863,14 @@ func TestGenerateDataDownlink(t *testing.T) {
 					LastDevStatusFCntUp: 4,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
+							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
 							},
-							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
+							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
+								FHdr: &ttnpb.FHDR{
+									FCtrl: &ttnpb.FCtrl{},
+								},
+							}},
 						},
 					}},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
@@ -865,15 +897,15 @@ func TestGenerateDataDownlink(t *testing.T) {
 				FrequencyPlanId:   band.EU_863_870,
 			},
 			Payload: &ttnpb.Message{
-				MHDR: ttnpb.MHDR{
+				MHdr: &ttnpb.MHDR{
 					MType: ttnpb.MType_UNCONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
-						FHDR: ttnpb.FHDR{
+						FHdr: &ttnpb.FHDR{
 							DevAddr: devAddr,
-							FCtrl: ttnpb.FCtrl{
+							FCtrl: &ttnpb.FCtrl{
 								Ack: false,
 								Adr: true,
 							},
@@ -909,10 +941,14 @@ func TestGenerateDataDownlink(t *testing.T) {
 						},
 						RecentUplinks: []*ttnpb.UplinkMessage{{
 							Payload: &ttnpb.Message{
-								MHDR: ttnpb.MHDR{
+								MHdr: &ttnpb.MHDR{
 									MType: ttnpb.MType_UNCONFIRMED_UP,
 								},
-								Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
+								Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
+									FHdr: &ttnpb.FHDR{
+										FCtrl: &ttnpb.FCtrl{},
+									},
+								}},
 							},
 						}},
 						RecentDownlinks: []*ttnpb.DownlinkMessage{
@@ -955,10 +991,14 @@ func TestGenerateDataDownlink(t *testing.T) {
 					LorawanVersion: ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
+							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_UNCONFIRMED_UP,
 							},
-							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
+							Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
+								FHdr: &ttnpb.FHDR{
+									FCtrl: &ttnpb.FCtrl{},
+								},
+							}},
 						},
 					}},
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
@@ -984,15 +1024,15 @@ func TestGenerateDataDownlink(t *testing.T) {
 				FrequencyPlanId:   band.EU_863_870,
 			},
 			Payload: &ttnpb.Message{
-				MHDR: ttnpb.MHDR{
+				MHdr: &ttnpb.MHDR{
 					MType: ttnpb.MType_UNCONFIRMED_DOWN,
 					Major: ttnpb.Major_LORAWAN_R1,
 				},
 				Payload: &ttnpb.Message_MacPayload{
 					MacPayload: &ttnpb.MACPayload{
-						FHDR: ttnpb.FHDR{
+						FHdr: &ttnpb.FHDR{
 							DevAddr: devAddr,
-							FCtrl: ttnpb.FCtrl{
+							FCtrl: &ttnpb.FCtrl{
 								Ack: false,
 								Adr: true,
 							},
@@ -1027,10 +1067,14 @@ func TestGenerateDataDownlink(t *testing.T) {
 						},
 						RecentUplinks: []*ttnpb.UplinkMessage{{
 							Payload: &ttnpb.Message{
-								MHDR: ttnpb.MHDR{
+								MHdr: &ttnpb.MHDR{
 									MType: ttnpb.MType_UNCONFIRMED_UP,
 								},
-								Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{}},
+								Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
+									FHdr: &ttnpb.FHDR{
+										FCtrl: &ttnpb.FCtrl{},
+									},
+								}},
 							},
 						}},
 						RecentDownlinks: []*ttnpb.DownlinkMessage{

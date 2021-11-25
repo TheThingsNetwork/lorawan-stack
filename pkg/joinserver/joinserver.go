@@ -217,11 +217,11 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 		return nil, errDecodePayload.WithCause(err)
 	}
 
-	if req.Payload.Major != ttnpb.Major_LORAWAN_R1 {
-		return nil, errUnsupportedLoRaWANMajorVersion.WithAttributes("major", req.Payload.Major)
+	if req.Payload.MHdr.Major != ttnpb.Major_LORAWAN_R1 {
+		return nil, errUnsupportedLoRaWANMajorVersion.WithAttributes("major", req.Payload.MHdr.Major)
 	}
-	if req.Payload.MType != ttnpb.MType_JOIN_REQUEST {
-		return nil, errWrongPayloadType.WithAttributes("type", req.Payload.MType)
+	if req.Payload.MHdr.MType != ttnpb.MType_JOIN_REQUEST {
+		return nil, errWrongPayloadType.WithAttributes("type", req.Payload.MHdr.MType)
 	}
 
 	pld := req.Payload.GetJoinRequestPayload()
@@ -343,9 +343,9 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			} else {
 				b = make([]byte, 0, 33)
 			}
-			b, err = lorawan.AppendMHDR(b, ttnpb.MHDR{
+			b, err = lorawan.AppendMHDR(b, &ttnpb.MHDR{
 				MType: ttnpb.MType_JOIN_ACCEPT,
-				Major: req.Payload.Major,
+				Major: req.Payload.MHdr.Major,
 			})
 			if err != nil {
 				return nil, nil, errEncodePayload.WithCause(err)
@@ -367,7 +367,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				JoinNonce:  jn,
 				CfList:     req.CfList,
 				DevAddr:    req.DevAddr,
-				DLSettings: *req.DownlinkSettings,
+				DlSettings: req.DownlinkSettings,
 				RxDelay:    req.RxDelay,
 			})
 			if err != nil {

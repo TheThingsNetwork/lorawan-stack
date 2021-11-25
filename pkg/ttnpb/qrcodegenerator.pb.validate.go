@@ -388,7 +388,14 @@ func (m *GenerateEndDeviceQRCodeRequest) ValidateFields(paths ...string) error {
 
 		case "end_device":
 
-			if v, ok := interface{}(&m.EndDevice).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetEndDevice() == nil {
+				return GenerateEndDeviceQRCodeRequestValidationError{
+					field:  "end_device",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetEndDevice()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GenerateEndDeviceQRCodeRequestValidationError{
 						field:  "end_device",

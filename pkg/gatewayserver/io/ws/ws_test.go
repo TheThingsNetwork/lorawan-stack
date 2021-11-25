@@ -806,7 +806,7 @@ func TestTraffic(t *testing.T) {
 			},
 			ExpectedNetworkUpstream: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
+					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
 					Mic:  []byte{0x4E, 0x61, 0xBC, 0x00},
 					Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
 						JoinEui:  types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22},
@@ -828,9 +828,9 @@ func TestTraffic(t *testing.T) {
 				Settings: &ttnpb.TxSettings{
 					Frequency:  868300000,
 					CodingRate: "4/5",
-					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
+					Time:       ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
 					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
-					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
+					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
 					}}},
@@ -861,14 +861,14 @@ func TestTraffic(t *testing.T) {
 			},
 			ExpectedNetworkUpstream: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
+					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
 					Mic:  []byte{0x4E, 0x61, 0xBC, 0x00},
 					Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 						FPort:      0,
 						FrmPayload: []byte{0x5F, 0xCC},
-						FHDR: ttnpb.FHDR{
+						FHdr: &ttnpb.FHDR{
 							DevAddr: [4]byte{0x11, 0x22, 0x33, 0x44},
-							FCtrl: ttnpb.FCtrl{
+							FCtrl: &ttnpb.FCtrl{
 								Ack:    true,
 								ClassB: true,
 							},
@@ -892,10 +892,10 @@ func TestTraffic(t *testing.T) {
 				},
 				Settings: &ttnpb.TxSettings{
 					Frequency:  868300000,
-					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
+					Time:       ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
 					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
 					CodingRate: "4/5",
-					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
+					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
 					}}},

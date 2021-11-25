@@ -60,7 +60,7 @@ message ConcentratorConfig {
     float rssi_target = 1;
     // Received signal strength offset (dBm).
     float rssi_offset = 2;
-    google.protobuf.Duration scan_time = 3 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
+    google.protobuf.Duration scan_time = 3;
   }
   LBTConfiguration lbt = 4;
 

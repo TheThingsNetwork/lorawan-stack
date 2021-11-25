@@ -19,7 +19,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -133,19 +133,19 @@ func HandleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 		}
 
 		if uint(req.ChannelIndex) >= uint(len(dev.MacState.CurrentParameters.Channels)) {
-			return ErrCorruptedMACState.
+			return internal.ErrCorruptedMACState.
 				WithAttributes(
 					"request_channel_id", req.ChannelIndex,
 					"channels_len", len(dev.MacState.CurrentParameters.Channels),
 				).
-				WithCause(ErrUnknownChannel)
+				WithCause(internal.ErrUnknownChannel)
 		}
 		if dev.MacState.CurrentParameters.Channels[req.ChannelIndex] == nil {
-			return ErrCorruptedMACState.
+			return internal.ErrCorruptedMACState.
 				WithAttributes(
 					"request_channel_id", req.ChannelIndex,
 				).
-				WithCause(ErrUnknownChannel)
+				WithCause(internal.ErrUnknownChannel)
 		}
 		dev.MacState.CurrentParameters.Channels[req.ChannelIndex].DownlinkFrequency = req.Frequency
 		return nil

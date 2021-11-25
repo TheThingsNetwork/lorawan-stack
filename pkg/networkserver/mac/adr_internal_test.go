@@ -47,13 +47,13 @@ func NewADRUplink(fCnt uint32, maxSNR float32, gtwCount uint, confirmed bool, tx
 
 	return &ttnpb.UplinkMessage{
 		Payload: &ttnpb.Message{
-			MHDR: ttnpb.MHDR{
+			MHdr: &ttnpb.MHDR{
 				MType: mType,
 			},
 			Payload: &ttnpb.Message_MacPayload{
 				MacPayload: &ttnpb.MACPayload{
-					FHDR: ttnpb.FHDR{
-						FCtrl: ttnpb.FCtrl{
+					FHdr: &ttnpb.FHDR{
+						FCtrl: &ttnpb.FCtrl{
 							Adr: true,
 						},
 						FCnt: fCnt & 0xffff,
@@ -201,7 +201,7 @@ func TestADRLossRate(t *testing.T) {
 		test.RunSubtest(t, test.SubtestConfig{
 			Name: strings.Join(func() (ss []string) {
 				for _, up := range tc.Uplinks {
-					ss = append(ss, fmt.Sprintf("%d", up.Payload.GetMacPayload().FHDR.FCnt))
+					ss = append(ss, fmt.Sprintf("%d", up.Payload.GetMacPayload().FHdr.FCnt))
 				}
 				return ss
 			}(), ","),

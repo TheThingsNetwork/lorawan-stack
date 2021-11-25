@@ -79,7 +79,7 @@ func (lbt *LBT) ToConcentratorConfig() *ttnpb.ConcentratorConfig_LBTConfiguratio
 	return &ttnpb.ConcentratorConfig_LBTConfiguration{
 		RssiOffset: lbt.RSSIOffset,
 		RssiTarget: lbt.RSSITarget,
-		ScanTime:   lbt.ScanTime,
+		ScanTime:   ttnpb.ProtoDurationPtr(lbt.ScanTime),
 	}
 }
 
@@ -391,16 +391,14 @@ func (fp FrequencyPlan) Extend(extension FrequencyPlan) FrequencyPlan {
 		extended.PingSlot = extension.PingSlot.Clone()
 	}
 	if extension.DefaultPingSlotDataRate != nil {
-		var i uint8
-		i = *extension.DefaultPingSlotDataRate
+		i := *extension.DefaultPingSlotDataRate
 		extended.DefaultPingSlotDataRate = &i
 	}
 	if extension.Rx2Channel != nil {
 		extended.Rx2Channel = extension.Rx2Channel.Clone()
 	}
 	if extension.DefaultRx2DataRate != nil {
-		var i uint8
-		i = *extension.DefaultRx2DataRate
+		i := *extension.DefaultRx2DataRate
 		extended.DefaultRx2DataRate = &i
 	}
 	if subBands := extension.SubBands; len(subBands) > 0 {

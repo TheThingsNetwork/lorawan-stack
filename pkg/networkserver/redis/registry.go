@@ -470,9 +470,9 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 	defer trace.StartRegion(ctx, "range end devices by dev_addr").End()
 
 	pld := up.Payload.GetMacPayload()
-	lsb := uint16(pld.FCnt)
+	lsb := uint16(pld.FHdr.FCnt)
 
-	addrKey := r.addrKey(pld.DevAddr)
+	addrKey := r.addrKey(pld.FHdr.DevAddr)
 	addrKeyCurrent := CurrentAddrKey(addrKey)
 	addrKeyPending := PendingAddrKey(addrKey)
 	fieldKeyCurrent := FieldKey(addrKeyCurrent)
@@ -488,7 +488,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 	matchFieldKeyPending := ttnredis.Key(fieldKeyPending, "up", payloadHash)
 
 	var matchKeys []string
-	if pld.Ack {
+	if pld.FHdr.FCtrl.Ack {
 		matchKeys = []string{
 			matchResultKey,
 
@@ -618,7 +618,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			case idx == currentGTIdx:
 				uid, s, err = func() (string, string, error) {
 					var ackArg uint8
-					if pld.Ack {
+					if pld.FHdr.FCtrl.Ack {
 						ackArg = 1
 					}
 					var args []interface{}

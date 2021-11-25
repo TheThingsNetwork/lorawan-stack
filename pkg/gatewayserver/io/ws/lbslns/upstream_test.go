@@ -161,7 +161,7 @@ func TestJoinRequest(t *testing.T) {
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
 					Mic:  []byte{0, 0, 0, 0},
-					MHDR: ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
+					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
 					Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
 						JoinEui:  types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 						DevEui:   types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
@@ -173,7 +173,7 @@ func TestJoinRequest(t *testing.T) {
 				}},
 				Settings: &ttnpb.TxSettings{
 					CodingRate: "4/5",
-					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
+					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 12,
 						Bandwidth:       125000,
 					}}},
@@ -203,7 +203,7 @@ func TestJoinRequest(t *testing.T) {
 			BandID:     band.EU_863_870,
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
+					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
 					Mic:  []byte{0x4E, 0x61, 0xBC, 0x00},
 					Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
 						JoinEui:  types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22},
@@ -223,10 +223,10 @@ func TestJoinRequest(t *testing.T) {
 				},
 				Settings: &ttnpb.TxSettings{
 					Frequency:  868300000,
-					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
+					Time:       ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
 					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
 					CodingRate: "4/5",
-					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
+					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
 					}}},
@@ -309,14 +309,14 @@ func TestUplinkDataFrame(t *testing.T) {
 			FrequencyPlanID: band.EU_863_870,
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
+					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
 					Mic:  []byte{0x4E, 0x61, 0xBC, 0x00},
 					Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 						FPort:      0,
 						FrmPayload: []byte{0x5F, 0xCC},
-						FHDR: ttnpb.FHDR{
+						FHdr: &ttnpb.FHDR{
 							DevAddr: [4]byte{0x11, 0x22, 0x33, 0x44},
-							FCtrl: ttnpb.FCtrl{
+							FCtrl: &ttnpb.FCtrl{
 								Ack:    true,
 								ClassB: true,
 							},
@@ -337,10 +337,10 @@ func TestUplinkDataFrame(t *testing.T) {
 				},
 				Settings: &ttnpb.TxSettings{
 					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
-					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
+					Time:       ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
 					CodingRate: "4/5",
 					Frequency:  868300000,
-					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
+					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
 					}}},
@@ -373,14 +373,14 @@ func TestUplinkDataFrame(t *testing.T) {
 			FrequencyPlanID: band.EU_863_870,
 			ExpectedUplinkMessage: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
+					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
 					Mic:  []byte{0x4E, 0x61, 0xBC, 0x00},
 					Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 						FPort:      0,
 						FrmPayload: []byte{0x5F, 0xCC},
-						FHDR: ttnpb.FHDR{
+						FHdr: &ttnpb.FHDR{
 							DevAddr: [4]byte{0x11, 0x22, 0x33, 0x44},
-							FCtrl: ttnpb.FCtrl{
+							FCtrl: &ttnpb.FCtrl{
 								Ack:    true,
 								ClassB: true,
 							},
@@ -402,9 +402,9 @@ func TestUplinkDataFrame(t *testing.T) {
 				Settings: &ttnpb.TxSettings{
 					Frequency:  868300000,
 					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
-					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
+					Time:       ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
 					CodingRate: "4/5",
-					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
+					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
 					}}},
@@ -460,11 +460,11 @@ func TestFromUplinkDataFrame(t *testing.T) {
 			UplinkMessage: ttnpb.UplinkMessage{
 				RawPayload: []byte{0x40, 0xff, 0xff, 0xff, 0x42, 0xb2, 0x42, 0xff, 0xfe, 0xff, 0x42, 0xfe, 0xff, 0x42, 0xff, 0xff, 0x0f},
 				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: 0},
+					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: 0},
 					Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
-						FHDR: ttnpb.FHDR{
+						FHdr: &ttnpb.FHDR{
 							DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
-							FCtrl: ttnpb.FCtrl{
+							FCtrl: &ttnpb.FCtrl{
 								Adr:       true,
 								AdrAckReq: false,
 								Ack:       true,
@@ -490,7 +490,7 @@ func TestFromUplinkDataFrame(t *testing.T) {
 				},
 				Settings: &ttnpb.TxSettings{
 					Frequency: 868300000,
-					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
+					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
 					}}},
@@ -566,7 +566,7 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 			UplinkMessage: ttnpb.UplinkMessage{
 				RawPayload: []byte{0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0xff, 0x42, 0x42, 0xff, 0xff, 0x0f},
 				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: 0},
+					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: 0},
 					Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
 						JoinEui:  types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 						DevEui:   types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -585,7 +585,7 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 				},
 				Settings: &ttnpb.TxSettings{
 					Frequency: 868300000,
-					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
+					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
 					}}},

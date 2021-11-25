@@ -238,7 +238,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 			"gateway_time", frontendSync.GatewayTime,
 		)).Info("Gateway clocks have been synchronized by the frontend")
 	case up.Settings.Time != nil:
-		ct = c.scheduler.SyncWithGatewayAbsolute(up.Settings.Timestamp, *up.ReceivedAt, *up.Settings.Time)
+		ct = c.scheduler.SyncWithGatewayAbsolute(up.Settings.Timestamp, *up.ReceivedAt, *ttnpb.StdTime(up.Settings.Time))
 		log.FromContext(c.ctx).WithFields(log.Fields(
 			"timestamp", up.Settings.Timestamp,
 			"concentrator_time", ct,
@@ -265,7 +265,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 		buf, err := UplinkToken(&ttnpb.GatewayAntennaIdentifiers{
 			GatewayIds:   c.gateway.GetIds(),
 			AntennaIndex: md.AntennaIndex,
-		}, md.Timestamp, ct, *up.ReceivedAt, up.Settings.Time)
+		}, md.Timestamp, ct, *up.ReceivedAt, ttnpb.StdTime(up.Settings.Time))
 		if err != nil {
 			return err
 		}
@@ -506,7 +506,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			rxErrs = append(rxErrs, errDataRateRxWindow.WithAttributes("window", i+1))
 			continue
 		}
-		_, bandDR, ok := phy.FindDownlinkDataRate(*rx.dataRate)
+		_, bandDR, ok := phy.FindDownlinkDataRate(rx.dataRate)
 		if !ok {
 			rxErrs = append(rxErrs, errDataRateRxWindow.WithAttributes("window", i+1))
 			continue
@@ -538,7 +538,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			eirp = *sb.MaxEIRP
 		}
 		settings := ttnpb.TxSettings{
-			DataRate:  *rx.dataRate,
+			DataRate:  rx.dataRate,
 			Frequency: rx.frequency,
 			Downlink: &ttnpb.TxSettings_Downlink{
 				TxPower:      eirp,

@@ -649,10 +649,10 @@ func (x *Message) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.MHdr != nil || s.HasField("m_hdr") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("m_hdr")
-		x.MHDR.MarshalProtoJSON(s.WithField("m_hdr"))
+		x.MHdr.MarshalProtoJSON(s.WithField("m_hdr"))
 	}
 	if len(x.Mic) > 0 || s.HasField("mic") {
 		s.WriteMoreIf(&wroteField)
@@ -695,7 +695,8 @@ func (x *Message) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			s.ReadAny() // ignore unknown field
 		case "m_hdr", "mHdr":
 			if !s.ReadNil() {
-				x.MHDR.UnmarshalProtoJSON(s.WithField("m_hdr", true))
+				x.MHdr = &MHDR{}
+				x.MHdr.UnmarshalProtoJSON(s.WithField("m_hdr", true))
 			}
 		case "mic":
 			s.AddField("mic")
@@ -866,10 +867,10 @@ func (x *JoinAcceptPayload) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("dev_addr")
 		x.DevAddr.MarshalProtoJSON(s.WithField("dev_addr"))
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.DlSettings != nil || s.HasField("dl_settings") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("dl_settings")
-		x.DLSettings.MarshalProtoJSON(s.WithField("dl_settings"))
+		x.DlSettings.MarshalProtoJSON(s.WithField("dl_settings"))
 	}
 	if x.RxDelay != 0 || s.HasField("rx_delay") {
 		s.WriteMoreIf(&wroteField)
@@ -907,7 +908,8 @@ func (x *JoinAcceptPayload) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.DevAddr.UnmarshalProtoJSON(s.WithField("dev_addr", false))
 		case "dl_settings", "dlSettings":
 			if !s.ReadNil() {
-				x.DLSettings.UnmarshalProtoJSON(s.WithField("dl_settings", true))
+				x.DlSettings = &DLSettings{}
+				x.DlSettings.UnmarshalProtoJSON(s.WithField("dl_settings", true))
 			}
 		case "rx_delay", "rxDelay":
 			s.AddField("rx_delay")
@@ -1080,7 +1082,7 @@ func (x *TxRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.AbsoluteTime == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.AbsoluteTime)
+			gogo.MarshalTimestamp(s, x.AbsoluteTime)
 		}
 	}
 	if x.FrequencyPlanId != "" || s.HasField("frequency_plan_id") {
@@ -1146,7 +1148,7 @@ func (x *TxRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Priority.UnmarshalProtoJSON(s)
 		case "absolute_time", "absoluteTime":
 			s.AddField("absolute_time")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}

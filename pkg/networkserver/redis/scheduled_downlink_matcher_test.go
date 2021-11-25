@@ -56,7 +56,7 @@ func TestScheduledDownlinkMatcher(t *testing.T) {
 		DownlinkMessage: &ttnpb.DownlinkMessage{
 			Settings: &ttnpb.DownlinkMessage_Scheduled{
 				Scheduled: &ttnpb.TxSettings{
-					DataRate: ttnpb.DataRate{
+					DataRate: &ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 7,

@@ -92,7 +92,7 @@ func lastClassADataDownlinkSlot(dev *ttnpb.EndDevice, phy *band.Band) (*classADo
 	}
 	var rxDelay time.Duration
 	up := LastUplink(dev.MacState.RecentUplinks...)
-	switch up.Payload.MHDR.MType {
+	switch up.Payload.MHdr.MType {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
 		rxDelay = dev.MacState.CurrentParameters.Rx1Delay.Duration()
 
@@ -225,9 +225,9 @@ func nextDataDownlinkSlot(ctx context.Context, dev *ttnpb.EndDevice, phy *band.B
 	var needsAck bool
 	classA, hasClassA := lastClassADataDownlinkSlot(dev, phy)
 	if hasClassA {
-		switch classA.Uplink.Payload.MHDR.MType {
+		switch classA.Uplink.Payload.MHdr.MType {
 		case ttnpb.MType_UNCONFIRMED_UP:
-			if classA.Uplink.Payload.GetMacPayload().FCtrl.AdrAckReq {
+			if classA.Uplink.Payload.GetMacPayload().FHdr.FCtrl.AdrAckReq {
 				logger.Debug("Acknowledgment required for ADRAckReq")
 				needsAck = dev.MacState.LastDownlinkAt == nil || dev.MacState.LastDownlinkAt.Before(*classA.Uplink.ReceivedAt)
 			}

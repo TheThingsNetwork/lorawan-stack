@@ -1108,7 +1108,7 @@ This command may take end device identifiers from stdin.`,
 			size, _ := cmd.Flags().GetUint32("size")
 			res, err := client.Generate(ctx, &ttnpb.GenerateEndDeviceQRCodeRequest{
 				FormatId:  formatID,
-				EndDevice: *device,
+				EndDevice: device,
 				Image: &ttnpb.GenerateEndDeviceQRCodeRequest_Image{
 					ImageSize: size,
 				},

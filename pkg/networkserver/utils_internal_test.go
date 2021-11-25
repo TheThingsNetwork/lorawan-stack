@@ -46,11 +46,15 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 
 	up := &ttnpb.UplinkMessage{
 		Payload: &ttnpb.Message{
-			MHDR: ttnpb.MHDR{
+			MHdr: &ttnpb.MHDR{
 				MType: ttnpb.MType_UNCONFIRMED_UP,
 			},
 			Payload: &ttnpb.Message_MacPayload{
-				MacPayload: &ttnpb.MACPayload{},
+				MacPayload: &ttnpb.MACPayload{
+					FHdr: &ttnpb.FHDR{
+						FCtrl: &ttnpb.FCtrl{},
+					},
+				},
 			},
 		},
 		RxMetadata: DefaultRxMetadata[:],

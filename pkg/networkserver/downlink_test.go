@@ -845,7 +845,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Class:           ttnpb.CLASS_A,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
-							Rx1DataRate:     &lastUp.Settings.DataRate,
+							Rx1DataRate:     lastUp.Settings.DataRate,
 							Rx1Delay:        dev.MacState.CurrentParameters.Rx1Delay,
 							Rx1Frequency:    dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
@@ -996,7 +996,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Class:           ttnpb.CLASS_A,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
-							Rx1DataRate:     &lastUp.Settings.DataRate,
+							Rx1DataRate:     lastUp.Settings.DataRate,
 							Rx1Delay:        dev.MacState.CurrentParameters.Rx1Delay,
 							Rx1Frequency:    dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
@@ -1151,7 +1151,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Class:           ttnpb.CLASS_A,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
-							Rx1DataRate:     &lastUp.Settings.DataRate,
+							Rx1DataRate:     lastUp.Settings.DataRate,
 							Rx1Delay:        dev.MacState.CurrentParameters.Rx1Delay,
 							Rx1Frequency:    dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
@@ -1312,7 +1312,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Class:           ttnpb.CLASS_A,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
-							Rx1DataRate:     &lastUp.Settings.DataRate,
+							Rx1DataRate:     lastUp.Settings.DataRate,
 							Rx1Delay:        dev.MacState.CurrentParameters.Rx1Delay,
 							Rx1Frequency:    dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							FrequencyPlanId: dev.FrequencyPlanId,
@@ -1379,7 +1379,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							ChannelIndex:  customChIdx,
 							RxMetadata:    DefaultRxMetadata[:],
 							ReceivedAt:    now.Add(-DefaultEU868RX1Delay.Duration() - time.Second),
-							FCtrl: ttnpb.FCtrl{
+							FCtrl: &ttnpb.FCtrl{
 								ClassB: true,
 							},
 						}),
@@ -1467,7 +1467,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								},
 							},
 							Rx2Frequency:    DefaultEU868RX2Frequency,
-							AbsoluteTime:    TimePtr(pingAt),
+							AbsoluteTime:    ttnpb.ProtoTimePtr(pingAt),
 							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
@@ -1618,7 +1618,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Class:           ttnpb.CLASS_A,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
-							Rx1DataRate:     &lastUp.Settings.DataRate,
+							Rx1DataRate:     lastUp.Settings.DataRate,
 							Rx1Delay:        dev.MacState.CurrentParameters.Rx1Delay,
 							Rx1Frequency:    dev.MacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
@@ -1905,7 +1905,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								},
 							},
 							Rx2Frequency:    DefaultEU868RX2Frequency,
-							AbsoluteTime:    TimePtr(now.Add(InfrastructureDelay)),
+							AbsoluteTime:    ttnpb.ProtoTimePtr(now.Add(InfrastructureDelay)),
 							FrequencyPlanId: dev.FrequencyPlanId,
 						}
 					},
@@ -2033,7 +2033,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Class:           ttnpb.CLASS_C,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGH,
-							AbsoluteTime:    TimePtr(now.Add(DefaultEU868RX1Delay.Duration())),
+							AbsoluteTime:    ttnpb.ProtoTimePtr(now.Add(DefaultEU868RX1Delay.Duration())),
 							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
 							Rx2Frequency:    dev.MacState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanId: dev.FrequencyPlanId,
@@ -2443,7 +2443,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Class:           ttnpb.CLASS_A,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
-							Rx1DataRate:     &lastUp.Settings.DataRate,
+							Rx1DataRate:     lastUp.Settings.DataRate,
 							Rx1Delay:        DefaultEU868JoinAcceptDelay,
 							Rx1Frequency:    dev.PendingMacState.CurrentParameters.Channels[lastUp.DeviceChannelIndex].DownlinkFrequency,
 							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
@@ -2602,16 +2602,16 @@ func TestProcessDownlinkTask(t *testing.T) {
 					if down != nil {
 						msg := &ttnpb.Message{}
 						test.Must(nil, lorawan.UnmarshalMessage(down.RawPayload, msg))
-						switch msg.MType {
+						switch msg.MHdr.MType {
 						case ttnpb.MType_CONFIRMED_DOWN, ttnpb.MType_UNCONFIRMED_DOWN:
 							pld := msg.GetMacPayload()
-							pld.FullFCnt = created.Session.LastNFCntDown&0xffff0000 | pld.FCnt
+							pld.FullFCnt = created.Session.LastNFCntDown&0xffff0000 | pld.FHdr.FCnt
 						case ttnpb.MType_JOIN_ACCEPT:
 							msg.Payload = &ttnpb.Message_JoinAcceptPayload{
 								JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
 									NetId:      created.PendingMacState.QueuedJoinAccept.NetId,
 									DevAddr:    created.PendingMacState.QueuedJoinAccept.DevAddr,
-									DLSettings: created.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
+									DlSettings: &created.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
 									RxDelay:    created.PendingMacState.QueuedJoinAccept.Request.RxDelay,
 									CfList:     created.PendingMacState.QueuedJoinAccept.Request.CfList,
 								},
@@ -2657,5 +2657,5 @@ func rx2DataRateFromIndex(dev *ttnpb.EndDevice, a *assertions.Assertion, t *test
 	if !a.So(ok, should.BeTrue) {
 		t.FailNow()
 	}
-	return &dr.Rate
+	return dr.Rate
 }

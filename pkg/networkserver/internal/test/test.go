@@ -29,7 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	nstime "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -108,7 +108,7 @@ func MACStatePtr(v ttnpb.MACState) *ttnpb.MACState {
 }
 
 func Band(fpID string, phyVer ttnpb.PHYVersion) band.Band {
-	return *LoRaWANBands[test.FrequencyPlan(fpID).BandID][phyVer]
+	return *internal.LoRaWANBands[test.FrequencyPlan(fpID).BandID][phyVer]
 }
 
 var (
@@ -400,9 +400,9 @@ func MakeDefaultUS915FSB2MACState(class ttnpb.Class, macVersion ttnpb.MACVersion
 	}
 }
 
-func MakeUplinkSettings(dr ttnpb.DataRate, drIdx ttnpb.DataRateIndex, freq uint64) ttnpb.TxSettings {
+func MakeUplinkSettings(dr *ttnpb.DataRate, drIdx ttnpb.DataRateIndex, freq uint64) ttnpb.TxSettings {
 	return ttnpb.TxSettings{
-		DataRate:  *deepcopy.Copy(&dr).(*ttnpb.DataRate),
+		DataRate:  deepcopy.Copy(dr).(*ttnpb.DataRate),
 		EnableCrc: true,
 		Frequency: freq,
 		Timestamp: 42,
@@ -412,7 +412,7 @@ func MakeUplinkSettings(dr ttnpb.DataRate, drIdx ttnpb.DataRateIndex, freq uint6
 type UplinkMessageConfig struct {
 	RawPayload     []byte
 	Payload        *ttnpb.Message
-	DataRate       ttnpb.DataRate
+	DataRate       *ttnpb.DataRate
 	DataRateIndex  ttnpb.DataRateIndex
 	Frequency      uint64
 	ChannelIndex   uint8
@@ -532,13 +532,13 @@ type DataUplinkConfig struct {
 	Confirmed      bool
 	MACVersion     ttnpb.MACVersion
 	DevAddr        types.DevAddr
-	FCtrl          ttnpb.FCtrl
+	FCtrl          *ttnpb.FCtrl
 	FCnt           uint32
 	ConfFCntDown   uint32
 	FPort          uint8
 	FRMPayload     []byte
 	FOpts          []byte
-	DataRate       ttnpb.DataRate
+	DataRate       *ttnpb.DataRate
 	DataRateIndex  ttnpb.DataRateIndex
 	Frequency      uint64
 	ChannelIndex   uint8
@@ -560,7 +560,7 @@ func WithDeviceDataUplinkConfig(dev *ttnpb.EndDevice, pending bool, drIdx ttnpb.
 		conf.MACVersion = macState.LorawanVersion
 		conf.DevAddr = session.DevAddr
 		conf.FCnt = session.LastFCntUp + fCntDelta
-		conf.DataRate = LoRaWANBands[test.FrequencyPlan(dev.FrequencyPlanId).BandID][dev.LorawanPhyVersion].DataRates[drIdx].Rate
+		conf.DataRate = internal.LoRaWANBands[test.FrequencyPlan(dev.FrequencyPlanId).BandID][dev.LorawanPhyVersion].DataRates[drIdx].Rate
 		conf.DataRateIndex = drIdx
 		conf.Frequency = macState.CurrentParameters.Channels[chIdx].UplinkFrequency
 		conf.ChannelIndex = chIdx
@@ -570,6 +570,9 @@ func WithDeviceDataUplinkConfig(dev *ttnpb.EndDevice, pending bool, drIdx ttnpb.
 }
 
 func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
+	if conf.FCtrl == nil {
+		conf.FCtrl = &ttnpb.FCtrl{}
+	}
 	if !conf.FCtrl.Ack && conf.ConfFCntDown > 0 {
 		panic("ConfFCntDown must be zero for uplink frames with ACK bit unset")
 	}
@@ -586,21 +589,21 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 	if conf.Confirmed {
 		mType = ttnpb.MType_CONFIRMED_UP
 	}
-	mhdr := ttnpb.MHDR{
+	mhdr := &ttnpb.MHDR{
 		MType: mType,
 		Major: ttnpb.Major_LORAWAN_R1,
 	}
-	fhdr := ttnpb.FHDR{
+	fhdr := &ttnpb.FHDR{
 		DevAddr: devAddr,
 		FCtrl:   conf.FCtrl,
 		FCnt:    conf.FCnt & 0xffff,
 		FOpts:   CopyBytes(fOpts),
 	}
 	phyPayload := test.Must(lorawan.MarshalMessage(ttnpb.Message{
-		MHDR: mhdr,
+		MHdr: mhdr,
 		Payload: &ttnpb.Message_MacPayload{
 			MacPayload: &ttnpb.MACPayload{
-				FHDR:       fhdr,
+				FHdr:       fhdr,
 				FPort:      uint32(conf.FPort),
 				FrmPayload: frmPayload,
 			},
@@ -620,11 +623,11 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 		Payload: func() *ttnpb.Message {
 			if conf.DecodePayload {
 				return &ttnpb.Message{
-					MHDR: mhdr,
+					MHdr: mhdr,
 					Mic:  phyPayload[len(phyPayload)-4:],
 					Payload: &ttnpb.Message_MacPayload{
 						MacPayload: &ttnpb.MACPayload{
-							FHDR:       fhdr,
+							FHdr:       fhdr,
 							FPort:      uint32(conf.FPort),
 							FrmPayload: CopyBytes(frmPayload),
 							FullFCnt:   conf.FCnt,
@@ -669,7 +672,7 @@ type DataDownlinkConfig struct {
 	Confirmed  bool
 	MACVersion ttnpb.MACVersion
 	DevAddr    types.DevAddr
-	FCtrl      ttnpb.FCtrl
+	FCtrl      *ttnpb.FCtrl
 	FCnt       uint32
 	ConfFCntUp uint32
 	FPort      uint8
@@ -682,6 +685,9 @@ type DataDownlinkConfig struct {
 }
 
 func MakeDataDownlink(conf DataDownlinkConfig) *ttnpb.DownlinkMessage {
+	if conf.FCtrl == nil {
+		conf.FCtrl = &ttnpb.FCtrl{}
+	}
 	if !conf.FCtrl.Ack && conf.ConfFCntUp > 0 {
 		panic("ConfFCntDown must be zero for uplink frames with ACK bit unset")
 	}
@@ -699,13 +705,13 @@ func MakeDataDownlink(conf DataDownlinkConfig) *ttnpb.DownlinkMessage {
 		mType = ttnpb.MType_CONFIRMED_DOWN
 	}
 	msg := &ttnpb.Message{
-		MHDR: ttnpb.MHDR{
+		MHdr: &ttnpb.MHDR{
 			MType: mType,
 			Major: ttnpb.Major_LORAWAN_R1,
 		},
 		Payload: &ttnpb.Message_MacPayload{
 			MacPayload: &ttnpb.MACPayload{
-				FHDR: ttnpb.FHDR{
+				FHdr: &ttnpb.FHDR{
 					DevAddr: devAddr,
 					FCtrl:   conf.FCtrl,
 					FCnt:    conf.FCnt & 0xffff,
@@ -745,7 +751,7 @@ func MakeTestCaseName(parts ...string) string {
 }
 
 func ForEachBand(tb testing.TB, f func(func(...string) string, *band.Band, ttnpb.PHYVersion)) {
-	for phyID, phyVersions := range LoRaWANBands {
+	for phyID, phyVersions := range internal.LoRaWANBands {
 		switch phyID {
 		case band.EU_863_870, band.US_902_928:
 		case band.AS_923:
@@ -839,7 +845,7 @@ func ForEachFrequencyPlan(tb testing.TB, f func(func(...string) string, string, 
 }
 
 func ForEachLoRaWANVersionPair(tb testing.TB, f func(func(...string) string, ttnpb.MACVersion, ttnpb.PHYVersion)) {
-	for macVersion, phyVersions := range LoRaWANVersionPairs {
+	for macVersion, phyVersions := range internal.LoRaWANVersionPairs {
 		switch macVersion {
 		case ttnpb.MAC_V1_0_3, ttnpb.MAC_V1_1:
 		case ttnpb.MAC_V1_0_2:
@@ -882,7 +888,7 @@ func ForEachClassMACVersion(tb testing.TB, f func(func(...string) string, ttnpb.
 func ForEachFrequencyPlanLoRaWANVersionPair(tb testing.TB, f func(func(...string) string, string, *frequencyplans.FrequencyPlan, *band.Band, ttnpb.MACVersion, ttnpb.PHYVersion)) {
 	ForEachFrequencyPlan(tb, func(makeFPName func(...string) string, fpID string, fp *frequencyplans.FrequencyPlan) {
 		ForEachLoRaWANVersionPair(tb, func(makeLoRaWANName func(parts ...string) string, macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion) {
-			b, ok := LoRaWANBands[fp.BandID][phyVersion]
+			b, ok := internal.LoRaWANBands[fp.BandID][phyVersion]
 			if !ok || b == nil {
 				return
 			}
@@ -896,7 +902,7 @@ func ForEachFrequencyPlanLoRaWANVersionPair(tb testing.TB, f func(func(...string
 func ForEachBandMACVersion(tb testing.TB, f func(func(...string) string, *band.Band, ttnpb.PHYVersion, ttnpb.MACVersion)) {
 	ForEachBand(tb, func(makeBandName func(...string) string, phy *band.Band, phyVersion ttnpb.PHYVersion) {
 		ForEachMACVersion(tb, func(makeMACName func(...string) string, macVersion ttnpb.MACVersion) {
-			if _, ok := LoRaWANVersionPairs[macVersion][phyVersion]; !ok {
+			if _, ok := internal.LoRaWANVersionPairs[macVersion][phyVersion]; !ok {
 				return
 			}
 			f(func(parts ...string) string {

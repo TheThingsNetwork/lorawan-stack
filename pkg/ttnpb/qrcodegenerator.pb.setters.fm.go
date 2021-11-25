@@ -101,10 +101,18 @@ func (dst *GenerateEndDeviceQRCodeRequest) SetFields(src *GenerateEndDeviceQRCod
 		case "end_device":
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDevice
-				if src != nil {
-					newSrc = &src.EndDevice
+				if (src == nil || src.EndDevice == nil) && dst.EndDevice == nil {
+					continue
 				}
-				newDst = &dst.EndDevice
+				if src != nil {
+					newSrc = src.EndDevice
+				}
+				if dst.EndDevice != nil {
+					newDst = dst.EndDevice
+				} else {
+					newDst = &EndDevice{}
+					dst.EndDevice = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -112,8 +120,7 @@ func (dst *GenerateEndDeviceQRCodeRequest) SetFields(src *GenerateEndDeviceQRCod
 				if src != nil {
 					dst.EndDevice = src.EndDevice
 				} else {
-					var zero EndDevice
-					dst.EndDevice = zero
+					dst.EndDevice = nil
 				}
 			}
 		case "image":

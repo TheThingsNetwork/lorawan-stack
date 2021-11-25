@@ -49,7 +49,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 				},
 				Settings: &ttnpb.DownlinkMessage_Scheduled{
 					Scheduled: &ttnpb.TxSettings{
-						DataRate: ttnpb.DataRate{
+						DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 10,
@@ -89,7 +89,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 				},
 				Settings: &ttnpb.DownlinkMessage_Scheduled{
 					Scheduled: &ttnpb.TxSettings{
-						DataRate: ttnpb.DataRate{
+						DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 10,
@@ -162,7 +162,7 @@ func TestToDownlinkMessage(t *testing.T) {
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
 				Settings: &ttnpb.DownlinkMessage_Scheduled{
 					Scheduled: &ttnpb.TxSettings{
-						DataRate: ttnpb.DataRate{
+						DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 10,
@@ -195,7 +195,7 @@ func TestToDownlinkMessage(t *testing.T) {
 				RawPayload: []byte("Ymxhamthc25kJ3M=="),
 				Settings: &ttnpb.DownlinkMessage_Scheduled{
 					Scheduled: &ttnpb.TxSettings{
-						DataRate: ttnpb.DataRate{
+						DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 10,
