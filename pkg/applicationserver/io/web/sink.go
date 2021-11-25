@@ -19,7 +19,6 @@ import (
 	"net/http"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -173,16 +172,10 @@ func (hcs *healthCheckSink) executeAndRecord(r *http.Request, healthy bool) erro
 	}
 
 	// Slow path: the request did error, or the webhook is unhealthy.
-	var details *pbtypes.Any
+	var details *ttnpb.ErrorDetails
 	if sinkErr != nil {
-		var err error
 		if ttnErr, ok := errors.From(sinkErr); ok {
-			details, err = pbtypes.MarshalAny(ttnpb.ErrorDetailsToProto(ttnErr))
-		} else {
-			details, err = pbtypes.MarshalAny(&pbtypes.StringValue{Value: sinkErr.Error()})
-		}
-		if err != nil {
-			return err
+			details = ttnpb.ErrorDetailsToProto(ttnErr)
 		}
 	}
 	f := func(h *ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error) {
