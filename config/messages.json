@@ -8288,15 +8288,6 @@
       "file": "remote.go"
     }
   },
-  "error:pkg/web/middleware:http_recovered": {
-    "translations": {
-      "en": "Internal Server Error"
-    },
-    "description": {
-      "package": "pkg/web/middleware",
-      "file": "recover.go"
-    }
-  },
   "error:pkg/web/oauthclient:exchange": {
     "translations": {
       "en": "token exchange refused"
