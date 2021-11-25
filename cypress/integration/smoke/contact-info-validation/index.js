@@ -29,15 +29,11 @@ const contactInfoValidation = defineSmokeTest('succeeds validating contact info'
   cy.task('findEmailInStackLog', validatePasswordLinkRegExp).then(validationUri => {
     cy.log(validationUri)
     cy.visit(validationUri)
-    cy.findByTestId('notification')
-      .should('be.visible')
-      .should('contain', 'Validation successful')
+    cy.findByTestId('notification').should('be.visible').should('contain', 'Validation successful')
   })
 
   cy.reload()
-  cy.findByTestId('error-notification')
-    .should('be.visible')
-    .should('contain', 'token already used')
+  cy.findByTestId('error-notification').should('be.visible').should('contain', 'token already used')
 })
 
 export default [contactInfoValidation]

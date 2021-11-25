@@ -306,9 +306,7 @@ Cypress.Commands.overwrite('click', (originalFn, subject, ...args) => {
 
 // Helper function to quickly seed the database to a fresh state using a
 // previously generated sql dump.
-Cypress.Commands.add('dropAndSeedDatabase', () => {
-  return cy.task('dropAndSeedDatabase')
-})
+Cypress.Commands.add('dropAndSeedDatabase', () => cy.task('dropAndSeedDatabase'))
 
 // Helper function to augment the stack configuration object. See support/utils.js for utility
 // functions to modify the configuration object.
@@ -362,9 +360,7 @@ const getFieldDescriptorByLabel = label => {
   return cy
     .get('@field')
     .invoke('attr', 'aria-describedby')
-    .then(describedBy => {
-      return cy.get(`[id="${describedBy}"]`)
-    })
+    .then(describedBy => cy.get(`[id="${describedBy}"]`))
 }
 
 // Helper function to select field error.
@@ -372,11 +368,7 @@ Cypress.Commands.add('findErrorByLabelText', label => {
   getFieldDescriptorByLabel(label).as('error')
 
   // Check for the error icon.
-  cy.get('@error')
-    .children()
-    .first()
-    .should('contain', 'error')
-    .and('be.visible')
+  cy.get('@error').children().first().should('contain', 'error').and('be.visible')
 
   return cy.get('@error')
 })
@@ -386,16 +378,10 @@ Cypress.Commands.add('findWarningByLabelText', label => {
   getFieldDescriptorByLabel(label).as('warning')
 
   // Check for the warning icon.
-  cy.get('@warning')
-    .children()
-    .first()
-    .should('contain', 'warning')
-    .and('be.visible')
+  cy.get('@warning').children().first().should('contain', 'warning').and('be.visible')
 
   return cy.get('@warning')
 })
 
 // Helper function to select field description.
-Cypress.Commands.add('findDescriptionByLabelText', label => {
-  return getFieldDescriptorByLabel(label)
-})
+Cypress.Commands.add('findDescriptionByLabelText', label => getFieldDescriptorByLabel(label))

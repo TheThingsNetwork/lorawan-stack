@@ -28,9 +28,7 @@ const profileSettingsNavigation = defineSmokeTest('succeeds navigating to Accoun
   cy.visit(Cypress.config('consoleRootPath'))
 
   cy.get('header').within(() => {
-    cy.findByTestId('profile-dropdown')
-      .should('contain', user.name)
-      .as('profileDropdown')
+    cy.findByTestId('profile-dropdown').should('contain', user.name).as('profileDropdown')
 
     cy.get('@profileDropdown').click()
 

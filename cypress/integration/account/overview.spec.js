@@ -58,14 +58,10 @@ describe('Account App overview', () => {
     cy.loginAccountApp({ user_id: user.ids.user_id, password: user.password })
     cy.visit(Cypress.config('accountAppRootPath'))
     cy.get('header').within(() => {
-      cy.findByTestId('profile-dropdown')
-        .should('contain', user.name)
-        .as('profileDropdown')
+      cy.findByTestId('profile-dropdown').should('contain', user.name).as('profileDropdown')
 
       cy.get('@profileDropdown').click()
-      cy.get('@profileDropdown')
-        .findByText('Logout')
-        .click()
+      cy.get('@profileDropdown').findByText('Logout').click()
     })
 
     cy.url().should('include', `${Cypress.config('accountAppRootPath')}/login`)
