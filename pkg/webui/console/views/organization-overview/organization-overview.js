@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,31 +23,19 @@ import DateTime from '@ttn-lw/lib/components/date-time'
 import OrganizationTitleSection from '@console/containers/organization-title-section'
 import OrganizationEvents from '@console/containers/organization-events'
 
-import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
-
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { mayViewOrganizationInformation } from '@console/lib/feature-checks'
-
 import style from './organization-overview.styl'
 
-@withFeatureRequirement(mayViewOrganizationInformation, {
-  redirect: '/',
-})
-class Overview extends React.Component {
-  static propTypes = {
-    orgId: PropTypes.string.isRequired,
-    organization: PropTypes.organization.isRequired,
-  }
+const Overview = props => {
+  const {
+    orgId,
+    organization: { ids, created_at, updated_at },
+  } = props
 
-  render() {
-    const {
-      orgId,
-      organization: { ids, created_at, updated_at },
-    } = this.props
-
-    const sheetData = [
+  const sheetData = React.useMemo(
+    () => [
       {
         header: sharedMessages.generalInformation,
         items: [
@@ -61,33 +49,39 @@ class Overview extends React.Component {
           { key: sharedMessages.updatedAt, value: <DateTime value={updated_at} /> },
         ],
       },
-    ]
+    ],
+    [created_at, ids.organization_id, updated_at],
+  )
 
-    return (
-      <>
-        <div className={style.titleSection}>
-          <Container>
-            <Row>
-              <Col sm={12}>
-                <OrganizationTitleSection orgId={ids.organization_id} />
-              </Col>
-            </Row>
-          </Container>
-        </div>
+  return (
+    <>
+      <div className={style.titleSection}>
         <Container>
-          <IntlHelmet title={sharedMessages.overview} />
           <Row>
-            <Col sm={12} lg={6}>
-              <DataSheet data={sheetData} />
-            </Col>
-            <Col sm={12} lg={6}>
-              <OrganizationEvents orgId={orgId} widget />
+            <Col sm={12}>
+              <OrganizationTitleSection orgId={ids.organization_id} />
             </Col>
           </Row>
         </Container>
-      </>
-    )
-  }
+      </div>
+      <Container>
+        <IntlHelmet title={sharedMessages.overview} />
+        <Row>
+          <Col sm={12} lg={6}>
+            <DataSheet data={sheetData} />
+          </Col>
+          <Col sm={12} lg={6}>
+            <OrganizationEvents orgId={orgId} widget />
+          </Col>
+        </Row>
+      </Container>
+    </>
+  )
+}
+
+Overview.propTypes = {
+  orgId: PropTypes.string.isRequired,
+  organization: PropTypes.organization.isRequired,
 }
 
 export default Overview

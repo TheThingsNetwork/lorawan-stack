@@ -13,13 +13,12 @@
 // limitations under the License.
 
 import React from 'react'
-import bind from 'autobind-decorator'
 import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
 import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 import PageTitle from '@ttn-lw/components/page-title'
-import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
@@ -45,121 +44,113 @@ const m = defineMessages({
   updateSuccess: 'Organization updated',
 })
 
-@withFeatureRequirement(mayEditBasicOrganizationInformation, {
-  redirect: ({ orgId }) => `/organizations/${orgId}`,
-})
-@withBreadcrumb('orgs.single.general-settings', ({ orgId }) => (
-  <Breadcrumb
-    path={`/organizations/${orgId}/general-settings`}
-    content={sharedMessages.generalSettings}
-  />
-))
-class GeneralSettings extends React.PureComponent {
-  static propTypes = {
-    deleteOrganization: PropTypes.func.isRequired,
-    deleteOrganizationSuccess: PropTypes.func.isRequired,
-    mayPurge: PropTypes.bool.isRequired,
-    orgId: PropTypes.string.isRequired,
-    organization: PropTypes.organization.isRequired,
-    shouldConfirmDelete: PropTypes.bool.isRequired,
-    updateOrganization: PropTypes.func.isRequired,
-  }
+const GeneralSettings = props => {
+  const {
+    organization,
+    orgId,
+    shouldConfirmDelete,
+    mayPurge,
+    updateOrganization,
+    deleteOrganization,
+    deleteOrganizationSuccess,
+  } = props
 
-  state = {
-    error: '',
-  }
+  useBreadcrumbs(
+    'orgs.single.general-settings',
+    <Breadcrumb
+      path={`/organizations/${orgId}/general-settings`}
+      content={sharedMessages.generalSettings}
+    />,
+  )
 
-  formRef = React.createRef()
+  const [error, setError] = React.useState('')
+  const formRef = React.useRef()
 
-  @bind
-  async handleUpdate(updated) {
-    await this.setState({ error: '' })
-
-    const { updateOrganization, orgId, organization: original } = this.props
-    const changed = diff(original, updated, ['created_at', 'updated_at'])
-
-    return updateOrganization(orgId, changed)
-  }
-
-  @bind
-  handleUpdateFailure(error) {
-    this.setState({ error })
-  }
-
-  @bind
-  handleUpdateSuccess() {
-    const { orgId, organization } = this.props
-
-    if (this.formRef && this.formRef.current) {
-      this.formRef.current.resetForm({ values: organization })
-    }
-
-    toast({
-      title: orgId,
-      message: m.updateSuccess,
-      type: toast.types.SUCCESS,
-    })
-  }
-
-  @bind
-  async handleDelete(shouldPurge) {
-    const { orgId, deleteOrganization, deleteOrganizationSuccess } = this.props
-
-    await this.setState({ error: '' })
-
-    try {
-      await deleteOrganization(orgId, shouldPurge)
-      deleteOrganizationSuccess()
-    } catch (error) {
-      this.setState({ error })
-    }
-  }
-
-  render() {
-    const { organization, orgId, shouldConfirmDelete, mayPurge } = this.props
-    const { error } = this.state
-
-    const initialValues = {
+  const initialValues = React.useMemo(
+    () => ({
       ids: {
         organization_id: orgId,
       },
       name: organization.name || '',
       description: organization.description || '',
-    }
+    }),
+    [orgId, organization.description, organization.name],
+  )
 
-    return (
-      <Container>
-        <PageTitle title={sharedMessages.generalSettings} />
-        <Row>
-          <Col lg={8} md={12}>
-            <OrganizationForm
-              update
-              formRef={this.formRef}
-              error={error}
-              initialValues={initialValues}
-              onSubmit={this.handleUpdate}
-              onSubmitSuccess={this.handleUpdateSuccess}
-              onSubmitFailure={this.handleUpdateFailure}
-            >
-              <SubmitBar>
-                <Form.Submit message={sharedMessages.saveChanges} component={SubmitButton} />
-                <Require featureCheck={mayDeleteOrganization}>
-                  <DeleteModalButton
-                    entityId={orgId}
-                    entityName={organization.name}
-                    message={m.deleteOrg}
-                    onApprove={this.handleDelete}
-                    shouldConfirm={shouldConfirmDelete}
-                    mayPurge={mayPurge}
-                  />
-                </Require>
-              </SubmitBar>
-            </OrganizationForm>
-          </Col>
-        </Row>
-      </Container>
-    )
-  }
+  const handleUpdate = React.useCallback(
+    updated => {
+      setError('')
+
+      const changed = diff(organization, updated, ['created_at', 'updated_at'])
+
+      return updateOrganization(orgId, changed)
+    },
+    [orgId, organization, updateOrganization],
+  )
+  const handleUpdateFailure = React.useCallback(error => setError(error), [])
+  const handleUpdateSuccess = React.useCallback(() => {
+    toast({
+      title: orgId,
+      message: m.updateSuccess,
+      type: toast.types.SUCCESS,
+    })
+  }, [orgId])
+  const handleDelete = React.useCallback(
+    async shouldPurge => {
+      try {
+        await deleteOrganization(orgId, shouldPurge)
+        deleteOrganizationSuccess()
+      } catch (err) {
+        setError(err)
+      }
+    },
+    [deleteOrganization, deleteOrganizationSuccess, orgId],
+  )
+
+  return (
+    <Container>
+      <PageTitle title={sharedMessages.generalSettings} />
+      <Row>
+        <Col lg={8} md={12}>
+          <OrganizationForm
+            update
+            formRef={formRef}
+            error={error}
+            initialValues={initialValues}
+            onSubmit={handleUpdate}
+            onSubmitSuccess={handleUpdateSuccess}
+            onSubmitFailure={handleUpdateFailure}
+          >
+            <SubmitBar>
+              <Form.Submit message={sharedMessages.saveChanges} component={SubmitButton} />
+              <Require featureCheck={mayDeleteOrganization}>
+                <DeleteModalButton
+                  entityId={orgId}
+                  entityName={organization.name}
+                  message={m.deleteOrg}
+                  onApprove={handleDelete}
+                  shouldConfirm={shouldConfirmDelete}
+                  mayPurge={mayPurge}
+                />
+              </Require>
+            </SubmitBar>
+          </OrganizationForm>
+        </Col>
+      </Row>
+    </Container>
+  )
 }
 
-export default GeneralSettings
+GeneralSettings.propTypes = {
+  deleteOrganization: PropTypes.func.isRequired,
+  deleteOrganizationSuccess: PropTypes.func.isRequired,
+  mayPurge: PropTypes.bool.isRequired,
+  orgId: PropTypes.string.isRequired,
+  organization: PropTypes.organization.isRequired,
+  shouldConfirmDelete: PropTypes.bool.isRequired,
+  updateOrganization: PropTypes.func.isRequired,
+}
+
+export default withFeatureRequirement(mayEditBasicOrganizationInformation, {
+  redirect: ({ orgId }) => `/organizations/${orgId}`,
+})(GeneralSettings)

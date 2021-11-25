@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ import { defineMessages } from 'react-intl'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import WithRootClass from '@ttn-lw/lib/components/with-root-class'
 
@@ -32,22 +32,24 @@ const m = defineMessages({
   orgData: 'Organization data',
 })
 
-@withBreadcrumb('orgs.single.data', props => (
-  <Breadcrumb path={`/organizations/${props.orgId}/data`} content={sharedMessages.liveData} />
-))
-export default class Data extends React.Component {
-  static propTypes = {
-    orgId: PropTypes.string.isRequired,
-  }
+const Data = props => {
+  const { orgId } = props
 
-  render() {
-    const { orgId } = this.props
+  useBreadcrumbs(
+    'orgs.single.data',
+    <Breadcrumb path={`/organizations/${orgId}/data`} content={sharedMessages.liveData} />,
+  )
 
-    return (
-      <WithRootClass className={style.stageFlex} id="stage">
-        <PageTitle hideHeading title={m.orgData} />
-        <OrganizationEvents orgId={orgId} />
-      </WithRootClass>
-    )
-  }
+  return (
+    <WithRootClass className={style.stageFlex} id="stage">
+      <PageTitle hideHeading title={m.orgData} />
+      <OrganizationEvents orgId={orgId} />
+    </WithRootClass>
+  )
 }
+
+Data.propTypes = {
+  orgId: PropTypes.string.isRequired,
+}
+
+export default Data
