@@ -1200,7 +1200,9 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 					events.WithIdentifiers(&dev.EndDeviceIdentifiers),
 				).New(ctx),
 				EvtScheduleJoinAcceptSuccess.With(
-					events.WithData(&ttnpb.ScheduleDownlinkResponse{}),
+					events.WithData(&ttnpb.ScheduleDownlinkResponse{
+						Delay: ttnpb.ProtoDurationPtr(0),
+					}),
 					events.WithIdentifiers(&dev.EndDeviceIdentifiers),
 				).New(events.ContextWithCorrelationID(ctx, scheduledDown.CorrelationIds...)),
 			)
@@ -1267,7 +1269,9 @@ func (env TestEnvironment) AssertScheduleDataDownlink(ctx context.Context, conf 
 					events.WithIdentifiers(&dev.EndDeviceIdentifiers),
 				).New(ctx),
 				EvtScheduleDataDownlinkSuccess.With(
-					events.WithData(&ttnpb.ScheduleDownlinkResponse{}),
+					events.WithData(&ttnpb.ScheduleDownlinkResponse{
+						Delay: ttnpb.ProtoDurationPtr(0),
+					}),
 					events.WithIdentifiers(&dev.EndDeviceIdentifiers),
 				).New(events.ContextWithCorrelationID(ctx, scheduledDown.CorrelationIds...)),
 			)

@@ -1126,7 +1126,8 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		Rx2Dr:       macState.DesiredParameters.Rx2DataRateIndex,
 		OptNeg:      matched.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0,
 	}
-	resp, joinEvents, err := ns.sendJoinRequest(ctx, matched.EndDeviceIdentifiers, &ttnpb.JoinRequest{
+
+	jReq := &ttnpb.JoinRequest{
 		Payload:            up.Payload,
 		CfList:             cfList,
 		CorrelationIds:     events.CorrelationIDsFromContext(ctx),
@@ -1136,8 +1137,12 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		RxDelay:            macState.DesiredParameters.Rx1Delay,
 		SelectedMacVersion: matched.LorawanVersion, // Assume NS version is always higher than the version of the device
 		DownlinkSettings:   dlSettings,
-		ConsumedAirtime:    up.ConsumedAirtime,
-	})
+	}
+	if up.ConsumedAirtime != nil {
+		jReq.ConsumedAirtime = ttnpb.ProtoDuration(up.ConsumedAirtime)
+	}
+	resp, joinEvents, err := ns.sendJoinRequest(ctx, matched.EndDeviceIdentifiers, jReq)
+
 	queuedEvents = append(queuedEvents, joinEvents...)
 	if err != nil {
 		return err

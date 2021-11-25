@@ -7,6 +7,7 @@
 package ttnpb
 
 import (
+	gogo "github.com/TheThingsIndustries/protoc-gen-go-json/gogo"
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
 )
 
@@ -69,7 +70,7 @@ func (x *JoinRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ConsumedAirtime == nil {
 			s.WriteNil()
 		} else {
-			s.WriteDuration(*x.ConsumedAirtime)
+			gogo.MarshalDuration(s, x.ConsumedAirtime)
 		}
 	}
 	s.WriteObjectEnd()
@@ -118,7 +119,7 @@ func (x *JoinRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.CorrelationIds = s.ReadStringArray()
 		case "consumed_airtime", "consumedAirtime":
 			s.AddField("consumed_airtime")
-			v := s.ReadDuration()
+			v := gogo.UnmarshalDuration(s)
 			if s.Err() != nil {
 				return
 			}

@@ -47,7 +47,7 @@ message JoinRequest {
   repeated string correlation_ids = 10 [(validate.rules).repeated.items.string.max_len = 100];
 
   // Consumed airtime for the transmission of the join request. Calculated by Network Server using the RawPayload size and the transmission settings.
-  google.protobuf.Duration consumed_airtime = 11 [(gogoproto.stdduration) = true, (gogoproto.nullable) = true];
+  google.protobuf.Duration consumed_airtime = 11;
 }
 
 message JoinResponse {
