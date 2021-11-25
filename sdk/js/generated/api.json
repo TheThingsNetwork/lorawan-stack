@@ -5864,21 +5864,13 @@
               "name": "last_failed_attempt_details",
               "description": "",
               "label": "",
-              "type": "Any",
-              "longType": "google.protobuf.Any",
-              "fullType": "google.protobuf.Any",
+              "type": "ErrorDetails",
+              "longType": "ErrorDetails",
+              "fullType": "ttn.lorawan.v3.ErrorDetails",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "any.required",
-                    "value": true
-                  }
-                ]
-              }
+              "defaultValue": ""
             }
           ]
         },

@@ -2210,15 +2210,14 @@ func (m *ApplicationWebhookHealth_WebhookHealthStatusUnhealthy) ValidateFields(p
 
 		case "last_failed_attempt_details":
 
-			if m.GetLastFailedAttemptDetails() == nil {
-				return ApplicationWebhookHealth_WebhookHealthStatusUnhealthyValidationError{
-					field:  "last_failed_attempt_details",
-					reason: "value is required",
+			if v, ok := interface{}(m.GetLastFailedAttemptDetails()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ApplicationWebhookHealth_WebhookHealthStatusUnhealthyValidationError{
+						field:  "last_failed_attempt_details",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
 				}
-			}
-
-			if a := m.GetLastFailedAttemptDetails(); a != nil {
-
 			}
 
 		default:

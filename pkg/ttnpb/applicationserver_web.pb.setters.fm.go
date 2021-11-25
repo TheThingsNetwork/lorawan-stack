@@ -1341,12 +1341,28 @@ func (dst *ApplicationWebhookHealth_WebhookHealthStatusUnhealthy) SetFields(src 
 			}
 		case "last_failed_attempt_details":
 			if len(subs) > 0 {
-				return fmt.Errorf("'last_failed_attempt_details' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.LastFailedAttemptDetails = src.LastFailedAttemptDetails
+				var newDst, newSrc *ErrorDetails
+				if (src == nil || src.LastFailedAttemptDetails == nil) && dst.LastFailedAttemptDetails == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.LastFailedAttemptDetails
+				}
+				if dst.LastFailedAttemptDetails != nil {
+					newDst = dst.LastFailedAttemptDetails
+				} else {
+					newDst = &ErrorDetails{}
+					dst.LastFailedAttemptDetails = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
 			} else {
-				dst.LastFailedAttemptDetails = nil
+				if src != nil {
+					dst.LastFailedAttemptDetails = src.LastFailedAttemptDetails
+				} else {
+					dst.LastFailedAttemptDetails = nil
+				}
 			}
 
 		default:
