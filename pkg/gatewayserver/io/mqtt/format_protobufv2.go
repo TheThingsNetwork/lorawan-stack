@@ -17,6 +17,7 @@ package mqtt
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -45,11 +46,6 @@ var (
 
 type protobufv2 struct {
 	topics.Layout
-}
-
-// TimePtr converts time to a pointer.
-func TimePtr(x time.Time) *time.Time {
-	return &x
 }
 
 func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ ttnpb.GatewayIdentifiers) ([]byte, error) {
@@ -159,10 +155,11 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 			Timestamp:    gwMetadata.Timestamp,
 		})
 	}
-	uplink.Settings = settings
-
+	uplink.Settings = &settings
 	return uplink, nil
 }
+
+var ttkgPlatformRegex = regexp.MustCompile(`The Things Gateway v1 - BL (r[0-9]+\-[0-9a-f]+) \(([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)\) - Firmware (v[0-9]+.[0-9]+.[0-9]+\-[0-9a-f]+) \(([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z)\)`)
 
 func (protobufv2) ToStatus(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.GatewayStatus, error) {
 	v2status := &ttnpbv2.StatusMessage{}
@@ -202,6 +199,10 @@ func (protobufv2) ToStatus(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.G
 		versions["hal"] = v2status.Hal
 	}
 	if v2status.Platform != "" {
+		if matches := ttkgPlatformRegex.FindStringSubmatch(v2status.Platform); len(matches) == 5 {
+			versions["model"] = "The Things Kickstarter Gateway v1"
+			versions["firmware"] = matches[3]
+		}
 		versions["platform"] = v2status.Platform
 	}
 	var antennasLocation []*ttnpb.Location
@@ -218,10 +219,10 @@ func (protobufv2) ToStatus(message []byte, _ ttnpb.GatewayIdentifiers) (*ttnpb.G
 	}
 	return &ttnpb.GatewayStatus{
 		AntennaLocations: antennasLocation,
-		BootTime:         TimePtr(time.Unix(0, v2status.BootTime)),
+		BootTime:         ttnpb.ProtoTimePtr(time.Unix(0, v2status.BootTime)),
 		Ip:               v2status.Ip,
 		Metrics:          metrics,
-		Time:             TimePtr(time.Unix(0, v2status.Time)),
+		Time:             ttnpb.ProtoTimePtr(time.Unix(0, v2status.Time)),
 		Versions:         versions,
 	}, nil
 }

@@ -289,8 +289,8 @@ func (s *srv) handleUp(ctx context.Context, state *state, packet encoding.Packet
 			return err
 		}
 		for _, up := range io.UniqueUplinkMessagesByRSSI(msg.UplinkMessages) {
-			up.ReceivedAt = packet.ReceivedAt
-			if err := state.io.HandleUp(up); err != nil {
+			up.ReceivedAt = &packet.ReceivedAt
+			if err := state.io.HandleUp(up, nil); err != nil {
 				logger.WithError(err).Warn("Failed to handle uplink message")
 			}
 		}

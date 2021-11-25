@@ -42,6 +42,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
 
+	ttnpbv2 "go.thethings.network/lorawan-stack-legacy/v2/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
@@ -70,11 +71,6 @@ var (
 	timeout        = (1 << 5) * test.Delay
 	wsPingInterval = (1 << 3) * test.Delay
 )
-
-func timePtrUTC(x time.Time) *time.Time {
-	utc := x.UTC()
-	return &utc
-}
 
 func TestGatewayServer(t *testing.T) {
 	for _, rtc := range []struct {
@@ -767,7 +763,7 @@ func TestGatewayServer(t *testing.T) {
 									UpdateLocation: false,
 									Up: &ttnpb.GatewayUp{
 										GatewayStatus: &ttnpb.GatewayStatus{
-											Time: timePtrUTC(time.Unix(424242, 0)),
+											Time: ttnpb.ProtoTimePtr(time.Unix(424242, 0)),
 											AntennaLocations: []*ttnpb.Location{
 												{
 													Source:    ttnpb.SOURCE_GPS,
@@ -787,7 +783,7 @@ func TestGatewayServer(t *testing.T) {
 									UpdateLocation: true,
 									Up: &ttnpb.GatewayUp{
 										GatewayStatus: &ttnpb.GatewayStatus{
-											Time: timePtrUTC(time.Unix(424242, 0)),
+											Time: ttnpb.ProtoTimePtr(time.Unix(424242, 0)),
 										},
 									},
 									ExpectLocation: &ttnpb.Location{
@@ -799,7 +795,7 @@ func TestGatewayServer(t *testing.T) {
 									UpdateLocation: true,
 									Up: &ttnpb.GatewayUp{
 										GatewayStatus: &ttnpb.GatewayStatus{
-											Time: timePtrUTC(time.Unix(42424242, 0)),
+											Time: ttnpb.ProtoTimePtr(time.Unix(42424242, 0)),
 											AntennaLocations: []*ttnpb.Location{
 												{
 													Source:    ttnpb.SOURCE_GPS,
@@ -888,7 +884,7 @@ func TestGatewayServer(t *testing.T) {
 							up := &ttnpb.GatewayUp{
 								UplinkMessages: []*ttnpb.UplinkMessage{
 									{
-										Settings: ttnpb.TxSettings{
+										Settings: &ttnpb.TxSettings{
 											DataRate: ttnpb.DataRate{
 												Modulation: &ttnpb.DataRate_Lora{
 													Lora: &ttnpb.LoRaDataRate{
@@ -1028,7 +1024,7 @@ func TestGatewayServer(t *testing.T) {
 								Name: "GatewayStatus",
 								Up: &ttnpb.GatewayUp{
 									GatewayStatus: &ttnpb.GatewayStatus{
-										Time: timePtrUTC(time.Unix(424242, 0)),
+										Time: ttnpb.ProtoTimePtr(time.Unix(424242, 0)),
 									},
 								},
 							},
@@ -1045,7 +1041,7 @@ func TestGatewayServer(t *testing.T) {
 								Up: &ttnpb.GatewayUp{
 									UplinkMessages: []*ttnpb.UplinkMessage{
 										{
-											Settings: ttnpb.TxSettings{
+											Settings: &ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
@@ -1079,7 +1075,7 @@ func TestGatewayServer(t *testing.T) {
 								Up: &ttnpb.GatewayUp{
 									UplinkMessages: []*ttnpb.UplinkMessage{
 										{
-											Settings: ttnpb.TxSettings{
+											Settings: &ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
@@ -1105,7 +1101,7 @@ func TestGatewayServer(t *testing.T) {
 											RawPayload: duplicatePayload,
 										},
 										{
-											Settings: ttnpb.TxSettings{
+											Settings: &ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
@@ -1131,7 +1127,7 @@ func TestGatewayServer(t *testing.T) {
 											RawPayload: duplicatePayload,
 										},
 										{
-											Settings: ttnpb.TxSettings{
+											Settings: &ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
@@ -1167,7 +1163,7 @@ func TestGatewayServer(t *testing.T) {
 								Up: &ttnpb.GatewayUp{
 									UplinkMessages: []*ttnpb.UplinkMessage{
 										{
-											Settings: ttnpb.TxSettings{
+											Settings: &ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Fsk{
 														Fsk: &ttnpb.FSKDataRate{
@@ -1199,7 +1195,7 @@ func TestGatewayServer(t *testing.T) {
 								Up: &ttnpb.GatewayUp{
 									UplinkMessages: []*ttnpb.UplinkMessage{
 										{
-											Settings: ttnpb.TxSettings{
+											Settings: &ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
@@ -1225,7 +1221,7 @@ func TestGatewayServer(t *testing.T) {
 											RawPayload: []byte{0xff, 0x02, 0x03}, // Garbage; doesn't get forwarded.
 										},
 										{
-											Settings: ttnpb.TxSettings{
+											Settings: &ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
@@ -1251,7 +1247,7 @@ func TestGatewayServer(t *testing.T) {
 											RawPayload: randomUpDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
 										},
 										{
-											Settings: ttnpb.TxSettings{
+											Settings: &ttnpb.TxSettings{
 												DataRate: ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
@@ -1281,7 +1277,7 @@ func TestGatewayServer(t *testing.T) {
 										},
 									},
 									GatewayStatus: &ttnpb.GatewayStatus{
-										Time: timePtrUTC(time.Unix(4242424, 0)),
+										Time: ttnpb.ProtoTimePtr(time.Unix(4242424, 0)),
 									},
 								},
 								Forwards: []uint32{200, 300},
@@ -1350,7 +1346,7 @@ func TestGatewayServer(t *testing.T) {
 										if expected == nil {
 											t.Fatalf("Received unexpected message")
 										}
-										a.So(time.Since(msg.ReceivedAt), should.BeLessThan, timeout)
+										a.So(time.Since(*msg.ReceivedAt), should.BeLessThan, timeout)
 										a.So(msg.Settings, should.Resemble, expected.Settings)
 										a.So(len(msg.RxMetadata), should.Equal, len(expected.RxMetadata))
 										for i, md := range msg.RxMetadata {
@@ -1763,6 +1759,149 @@ func TestGatewayServer(t *testing.T) {
 				})
 			}
 			c.Close()
+		})
+	}
+}
+
+func TestUpdateVersionInfo(t *testing.T) {
+	a, ctx := test.New(t)
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	is, isAddr := startMockIS(ctx)
+
+	c := componenttest.NewComponent(t, &component.Config{
+		ServiceBase: config.ServiceBase{
+			GRPC: config.GRPC{
+				Listen:                      ":9187",
+				AllowInsecureForCredentials: true,
+			},
+			Cluster: cluster.Config{
+				IdentityServer: isAddr,
+			},
+		},
+	})
+	gsConfig := &gatewayserver.Config{
+		FetchGatewayInterval:   time.Minute,
+		FetchGatewayJitter:     1,
+		UpdateVersionInfoDelay: test.Delay,
+		MQTTV2: config.MQTT{
+			Listen: ":1881",
+		},
+	}
+
+	er := gatewayserver.NewIS(c)
+	gs, err := gatewayserver.New(c, gsConfig,
+		gatewayserver.WithRegistry(er),
+	)
+	if !a.So(err, should.BeNil) {
+		t.Fatalf("Failed to setup server :%v", err)
+	}
+	roles := gs.Roles()
+	a.So(len(roles), should.Equal, 1)
+	a.So(roles[0], should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER)
+
+	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
+	a.So(err, should.BeNil)
+
+	componenttest.StartComponent(t, c)
+	time.Sleep(timeout) // Wait for component to start.
+
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
+	is.add(ctx, ttnpb.GatewayIdentifiers{
+		GatewayId: registeredGatewayID,
+		Eui:       &registeredGatewayEUI,
+	}, registeredGatewayKey, true, true)
+	time.Sleep(timeout) // Wait for setup to be completed.
+
+	linkFn := func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, statCh <-chan *ttnpbv2.StatusMessage) error {
+		ctx, cancel := errorcontext.New(ctx)
+		clientOpts := mqtt.NewClientOptions()
+		clientOpts.AddBroker("tcp://0.0.0.0:1881")
+		clientOpts.SetUsername(unique.ID(ctx, ids))
+		clientOpts.SetPassword(key)
+		clientOpts.SetAutoReconnect(false)
+		clientOpts.SetConnectionLostHandler(func(_ mqtt.Client, err error) {
+			cancel(err)
+		})
+		client := mqtt.NewClient(clientOpts)
+		if token := client.Connect(); !token.WaitTimeout(timeout) {
+			return context.DeadlineExceeded
+		} else if err := token.Error(); err != nil {
+			return err
+		}
+		defer client.Disconnect(uint(timeout / time.Millisecond))
+		go func() {
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				case stat := <-statCh:
+					buf, err := stat.Marshal()
+					if err != nil {
+						cancel(err)
+						return
+					}
+					if token := client.Publish(fmt.Sprintf("%v/status", unique.ID(ctx, ids)), 1, false, buf); token.Wait() && token.Error() != nil {
+						cancel(token.Error())
+						return
+					}
+
+				}
+			}
+		}()
+		<-ctx.Done()
+		return ctx.Err()
+	}
+
+	statCh := make(chan *ttnpbv2.StatusMessage)
+	ids := ttnpb.GatewayIdentifiers{
+		GatewayId: registeredGatewayID,
+		Eui:       &registeredGatewayEUI,
+	}
+	go func() {
+		linkFn(ctx, t, ids, registeredGatewayKey, statCh)
+	}()
+
+	for _, tc := range []struct {
+		Name               string
+		Stat               *ttnpbv2.StatusMessage
+		ExpectedAttributes map[string]string
+	}{
+		{
+			Name: "FirstStat",
+			Stat: &ttnpbv2.StatusMessage{
+				Platform: "The Things Gateway v1 - BL r9-12345678 (2006-01-02T15:04:05Z) - Firmware v1.2.3-12345678 (2006-01-02T15:04:05Z)",
+			},
+			ExpectedAttributes: map[string]string{
+				"model":    "The Things Kickstarter Gateway v1",
+				"firmware": "v1.2.3-12345678",
+			},
+		},
+		{
+			Name: "SubsequentStatNoUpdate",
+			Stat: &ttnpbv2.StatusMessage{
+				Platform: "The Things Gateway v1 - BL r9-12345678 (2006-01-02T15:04:05Z) - Firmware v2.0.0-00000000 (2006-01-02T15:04:05Z)",
+			},
+			ExpectedAttributes: map[string]string{
+				"model":    "The Things Kickstarter Gateway v1",
+				"firmware": "v1.2.3-12345678",
+			},
+		},
+	} {
+		t.Run(fmt.Sprintf("UpdateVersionInfo/%s", tc.Name), func(t *testing.T) {
+			select {
+			case statCh <- tc.Stat:
+			case <-time.After(timeout):
+				t.Fatalf("Failed to send status message to upstream channel")
+			}
+			time.Sleep(timeout)
+			gtw, err := is.Get(ctx, &ttnpb.GetGatewayRequest{
+				GatewayIds: &ids,
+			})
+			a.So(err, should.BeNil)
+			a.So(gtw.Attributes, should.Resemble, tc.ExpectedAttributes)
 		})
 	}
 }

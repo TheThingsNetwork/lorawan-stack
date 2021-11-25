@@ -53,11 +53,11 @@ func (x *UplinkMessage) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("payload")
 		x.Payload.MarshalProtoJSON(s.WithField("payload"))
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.Settings != nil || s.HasField("settings") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("settings")
 		// NOTE: TxSettings does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.Settings)
+		gogo.MarshalMessage(s, x.Settings)
 	}
 	if len(x.RxMetadata) > 0 || s.HasField("rx_metadata") {
 		s.WriteMoreIf(&wroteField)
@@ -70,10 +70,14 @@ func (x *UplinkMessage) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		}
 		s.WriteArrayEnd()
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.ReceivedAt != nil || s.HasField("received_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("received_at")
-		s.WriteTime(x.ReceivedAt)
+		if x.ReceivedAt == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.ReceivedAt)
+		}
 	}
 	if len(x.CorrelationIds) > 0 || s.HasField("correlation_ids") {
 		s.WriteMoreIf(&wroteField)
@@ -119,7 +123,7 @@ func (x *UplinkMessage) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: TxSettings does not seem to implement UnmarshalProtoJSON.
 			var v TxSettings
 			gogo.UnmarshalMessage(s, &v)
-			x.Settings = v
+			x.Settings = &v
 		case "rx_metadata", "rxMetadata":
 			s.AddField("rx_metadata")
 			s.ReadArray(func() {
@@ -140,7 +144,7 @@ func (x *UplinkMessage) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			if s.Err() != nil {
 				return
 			}
-			x.ReceivedAt = *v
+			x.ReceivedAt = v
 		case "correlation_ids", "correlationIds":
 			s.AddField("correlation_ids")
 			x.CorrelationIds = s.ReadStringArray()
@@ -375,10 +379,10 @@ func (x *GatewayUplinkMessage) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if x.UplinkMessage != nil || s.HasField("message") {
+	if x.Message != nil || s.HasField("message") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("message")
-		x.UplinkMessage.MarshalProtoJSON(s.WithField("message"))
+		x.Message.MarshalProtoJSON(s.WithField("message"))
 	}
 	if x.BandId != "" || s.HasField("band_id") {
 		s.WriteMoreIf(&wroteField)
@@ -399,8 +403,8 @@ func (x *GatewayUplinkMessage) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 			s.ReadAny() // ignore unknown field
 		case "message":
 			if !s.ReadNil() {
-				x.UplinkMessage = &UplinkMessage{}
-				x.UplinkMessage.UnmarshalProtoJSON(s.WithField("message", true))
+				x.Message = &UplinkMessage{}
+				x.Message.UnmarshalProtoJSON(s.WithField("message", true))
 			}
 		case "band_id", "bandId":
 			s.AddField("band_id")
@@ -462,16 +466,20 @@ func (x *ApplicationUplink) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		}
 		s.WriteArrayEnd()
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.Settings != nil || s.HasField("settings") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("settings")
 		// NOTE: TxSettings does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.Settings)
+		gogo.MarshalMessage(s, x.Settings)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.ReceivedAt != nil || s.HasField("received_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("received_at")
-		s.WriteTime(x.ReceivedAt)
+		if x.ReceivedAt == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.ReceivedAt)
+		}
 	}
 	if x.AppSKey != nil || s.HasField("app_s_key") {
 		s.WriteMoreIf(&wroteField)
@@ -575,14 +583,14 @@ func (x *ApplicationUplink) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: TxSettings does not seem to implement UnmarshalProtoJSON.
 			var v TxSettings
 			gogo.UnmarshalMessage(s, &v)
-			x.Settings = v
+			x.Settings = &v
 		case "received_at", "receivedAt":
 			s.AddField("received_at")
 			v := s.ReadTime()
 			if s.Err() != nil {
 				return
 			}
-			x.ReceivedAt = *v
+			x.ReceivedAt = v
 		case "app_s_key", "appSKey":
 			s.AddField("app_s_key")
 			// NOTE: KeyEnvelope does not seem to implement UnmarshalProtoJSON.
@@ -639,7 +647,7 @@ func (x *ApplicationLocation) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("service")
 		s.WriteString(x.Service)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.Location != nil || s.HasField("location") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("location")
 		x.Location.MarshalProtoJSON(s.WithField("location"))
@@ -673,6 +681,7 @@ func (x *ApplicationLocation) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Service = s.ReadString()
 		case "location":
 			if !s.ReadNil() {
+				x.Location = &Location{}
 				x.Location.UnmarshalProtoJSON(s.WithField("location", true))
 			}
 		case "attributes":
@@ -720,10 +729,14 @@ func (x *ApplicationJoinAccept) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("pending_session")
 		s.WriteBool(x.PendingSession)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.ReceivedAt != nil || s.HasField("received_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("received_at")
-		s.WriteTime(x.ReceivedAt)
+		if x.ReceivedAt == nil {
+			s.WriteNil()
+		} else {
+			s.WriteTime(*x.ReceivedAt)
+		}
 	}
 	s.WriteObjectEnd()
 }
@@ -769,7 +782,7 @@ func (x *ApplicationJoinAccept) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState)
 			if s.Err() != nil {
 				return
 			}
-			x.ReceivedAt = *v
+			x.ReceivedAt = v
 		}
 	})
 }
@@ -947,16 +960,16 @@ func (x *ApplicationDownlinkFailed) MarshalProtoJSON(s *jsonplugin.MarshalState)
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Downlink != nil || s.HasField("downlink") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("downlink")
-		x.ApplicationDownlink.MarshalProtoJSON(s.WithField("downlink"))
+		x.Downlink.MarshalProtoJSON(s.WithField("downlink"))
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.Error != nil || s.HasField("error") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("error")
 		// NOTE: ErrorDetails does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.Error)
+		gogo.MarshalMessage(s, x.Error)
 	}
 	s.WriteObjectEnd()
 }
@@ -972,14 +985,15 @@ func (x *ApplicationDownlinkFailed) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSt
 			s.ReadAny() // ignore unknown field
 		case "downlink":
 			if !s.ReadNil() {
-				x.ApplicationDownlink.UnmarshalProtoJSON(s.WithField("downlink", true))
+				x.Downlink = &ApplicationDownlink{}
+				x.Downlink.UnmarshalProtoJSON(s.WithField("downlink", true))
 			}
 		case "error":
 			s.AddField("error")
 			// NOTE: ErrorDetails does not seem to implement UnmarshalProtoJSON.
 			var v ErrorDetails
 			gogo.UnmarshalMessage(s, &v)
-			x.Error = v
+			x.Error = &v
 		}
 	})
 }
@@ -1057,11 +1071,11 @@ func (x *ApplicationUp) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.EndDeviceIds != nil || s.HasField("end_device_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("end_device_ids")
 		// NOTE: EndDeviceIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.EndDeviceIdentifiers)
+		gogo.MarshalMessage(s, x.EndDeviceIds)
 	}
 	if len(x.CorrelationIds) > 0 || s.HasField("correlation_ids") {
 		s.WriteMoreIf(&wroteField)
@@ -1144,7 +1158,7 @@ func (x *ApplicationUp) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: EndDeviceIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v EndDeviceIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.EndDeviceIdentifiers = v
+			x.EndDeviceIds = &v
 		case "correlation_ids", "correlationIds":
 			s.AddField("correlation_ids")
 			x.CorrelationIds = s.ReadStringArray()
@@ -1297,11 +1311,11 @@ func (x *DownlinkQueueRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.EndDeviceIds != nil || s.HasField("end_device_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("end_device_ids")
 		// NOTE: EndDeviceIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.EndDeviceIdentifiers)
+		gogo.MarshalMessage(s, x.EndDeviceIds)
 	}
 	if len(x.Downlinks) > 0 || s.HasField("downlinks") {
 		s.WriteMoreIf(&wroteField)
@@ -1331,7 +1345,7 @@ func (x *DownlinkQueueRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 			// NOTE: EndDeviceIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v EndDeviceIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.EndDeviceIdentifiers = v
+			x.EndDeviceIds = &v
 		case "downlinks":
 			s.AddField("downlinks")
 			s.ReadArray(func() {

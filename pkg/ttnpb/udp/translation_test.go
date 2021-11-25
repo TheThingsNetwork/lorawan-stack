@@ -84,9 +84,13 @@ func TestStatusRaw(t *testing.T) {
 	a.So(status.BootTime, should.NotBeNil)
 	a.So(status.Time, should.NotBeNil)
 	currentTime := time.Date(2017, 06, 8, 9, 40, 42, 0, time.UTC)
-	a.So(status.Time.UTC(), should.Equal, currentTime)
+	if a.So(status.Time, should.NotBeNil) {
+		a.So(*ttnpb.StdTime(status.Time), should.Equal, currentTime)
+	}
 	bootTime := time.Date(2017, 06, 7, 9, 40, 42, 0, time.UTC)
-	a.So(status.BootTime.UTC(), should.Equal, bootTime)
+	if a.So(status.BootTime, should.NotBeNil) {
+		a.So(*ttnpb.StdTime(status.BootTime), should.Equal, bootTime)
+	}
 }
 
 func TestToGatewayUp(t *testing.T) {
@@ -358,7 +362,7 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 		UplinkMessages: []*ttnpb.UplinkMessage{
 			{
 				RawPayload: []byte{0x80, 0xcf, 0x80, 0x31, 0x07, 0x00, 0xbe, 0x04, 0x01, 0x96, 0x88, 0x67, 0x94, 0x9a, 0x94, 0x18, 0xe2, 0x4a, 0x4c, 0x3b, 0x93, 0xb1, 0xc4, 0x03},
-				Settings: ttnpb.TxSettings{
+				Settings: &ttnpb.TxSettings{
 					DataRate: ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{

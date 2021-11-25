@@ -38,6 +38,8 @@ type EntityRegistry interface {
 	Get(ctx context.Context, in *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error)
 	// UpdateAntennas updates the gateway antennas.
 	UpdateAntennas(ctx context.Context, ids ttnpb.GatewayIdentifiers, antennas []*ttnpb.GatewayAntenna) error
+	// UpdateAttributes updates the gateway attributes. It takes the union of current and new values.
+	UpdateAttributes(ctx context.Context, ids ttnpb.GatewayIdentifiers, current, new map[string]string) error
 	// ValidateGatewayID validates the ID of the gateway.
 	ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
 }

@@ -53,16 +53,16 @@ func TestGatewayStore(t *testing.T) {
 		from := time.Now().UTC()
 		to := from.Add(5 * time.Minute)
 		gtwClaimAuthCode := ttnpb.GatewayClaimAuthenticationCode{
-			ValidFrom: &from,
-			ValidTo:   &to,
+			ValidFrom: ttnpb.ProtoTimePtr(from),
+			ValidTo:   ttnpb.ProtoTimePtr(to),
 			Secret: &ttnpb.Secret{
 				KeyId: "my-secret-key-id",
 				Value: []byte("my very secret value"),
 			},
 		}
 		otherGtwClaimAuthCode := ttnpb.GatewayClaimAuthenticationCode{
-			ValidFrom: &from,
-			ValidTo:   &to,
+			ValidFrom: ttnpb.ProtoTimePtr(from),
+			ValidTo:   ttnpb.ProtoTimePtr(to),
 			Secret: &ttnpb.Secret{
 				KeyId: "my-secret-key-id",
 				Value: []byte("my other very secret value"),
@@ -88,7 +88,7 @@ func TestGatewayStore(t *testing.T) {
 					Placement: ttnpb.GatewayAntennaPlacement_OUTDOOR,
 				},
 			},
-			ScheduleAnytimeDelay:          &scheduleAnytimeDelay,
+			ScheduleAnytimeDelay:          ttnpb.ProtoDurationPtr(scheduleAnytimeDelay),
 			UpdateLocationFromStatus:      true,
 			LbsLnsSecret:                  secret,
 			ClaimAuthenticationCode:       &gtwClaimAuthCode,
@@ -107,9 +107,9 @@ func TestGatewayStore(t *testing.T) {
 				a.So(created.Antennas[0].Gain, should.Equal, 3)
 				a.So(created.Antennas[0].Placement, should.Equal, ttnpb.GatewayAntennaPlacement_OUTDOOR)
 			}
-			a.So(*created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
-			a.So(*created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
-			a.So(*created.ScheduleAnytimeDelay, should.Equal, time.Second)
+			a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(*ttnpb.StdDuration(created.ScheduleAnytimeDelay), should.Equal, time.Second)
 			a.So(created.UpdateLocationFromStatus, should.BeTrue)
 			a.So(created.LbsLnsSecret, should.NotBeNil)
 			a.So(created.LbsLnsSecret, should.Resemble, secret)
@@ -201,8 +201,8 @@ func TestGatewayStore(t *testing.T) {
 				a.So(updated.Antennas[1].Placement, should.Equal, ttnpb.GatewayAntennaPlacement_OUTDOOR)
 			}
 			a.So(updated.CreatedAt, should.Resemble, created.CreatedAt)
-			a.So(*updated.UpdatedAt, should.HappenAfter, *created.CreatedAt)
-			a.So(*updated.ScheduleAnytimeDelay, should.Equal, time.Duration(0))
+			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenAfter, *ttnpb.StdTime(created.CreatedAt))
+			a.So(*ttnpb.StdDuration(updated.ScheduleAnytimeDelay), should.Equal, time.Duration(0))
 			a.So(updated.UpdateLocationFromStatus, should.BeFalse)
 			a.So(updated.LbsLnsSecret, should.Resemble, otherSecret)
 			a.So(updated.ClaimAuthenticationCode.Secret, should.Resemble, otherGtwClaimAuthCode.Secret)

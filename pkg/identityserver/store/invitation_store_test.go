@@ -41,7 +41,7 @@ func TestInvitationStore(t *testing.T) {
 		invitation, err := store.CreateInvitation(ctx, &ttnpb.Invitation{
 			Email:     "john.doe@example.com",
 			Token:     "invitation-token",
-			ExpiresAt: &aWeekFromNow,
+			ExpiresAt: ttnpb.ProtoTimePtr(aWeekFromNow),
 		})
 
 		a.So(err, should.BeNil)
@@ -100,7 +100,7 @@ func TestInvitationStore(t *testing.T) {
 		_, err = store.CreateInvitation(ctx, &ttnpb.Invitation{
 			Email:     "jane.doe@example.com",
 			Token:     "other-invitation-token",
-			ExpiresAt: &aWeekFromNow,
+			ExpiresAt: ttnpb.ProtoTimePtr(aWeekFromNow),
 		})
 
 		a.So(err, should.BeNil)

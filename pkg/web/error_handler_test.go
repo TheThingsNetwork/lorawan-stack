@@ -15,7 +15,7 @@
 package web
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -47,7 +47,7 @@ func TestErrorHandler(t *testing.T) {
 
 		resp := rec.Result()
 
-		body, _ := ioutil.ReadAll(resp.Body)
+		body, _ := io.ReadAll(resp.Body)
 		a.So(string(body), should.ContainSubstring, "This handler throws an error")
 	}
 
@@ -59,7 +59,7 @@ func TestErrorHandler(t *testing.T) {
 
 		resp := rec.Result()
 
-		body, _ := ioutil.ReadAll(resp.Body)
+		body, _ := io.ReadAll(resp.Body)
 		a.So(resp.StatusCode, should.Equal, http.StatusNotImplemented)
 		a.So(string(body), should.ContainSubstring, "Not Implemented")
 	}
@@ -72,7 +72,7 @@ func TestErrorHandler(t *testing.T) {
 
 		resp := rec.Result()
 
-		body, _ := ioutil.ReadAll(resp.Body)
+		body, _ := io.ReadAll(resp.Body)
 		a.So(resp.StatusCode, should.Equal, http.StatusNotFound)
 		a.So(string(body), should.ContainSubstring, "route `/not_found` not found")
 	}

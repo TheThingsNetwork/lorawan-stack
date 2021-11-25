@@ -51,6 +51,7 @@ export default class DeviceGeneralSettings extends React.Component {
     appId: PropTypes.string.isRequired,
     asConfig: PropTypes.stackComponent.isRequired,
     device: PropTypes.device.isRequired,
+    getDefaultMacSettings: PropTypes.func.isRequired,
     isConfig: PropTypes.stackComponent.isRequired,
     jsConfig: PropTypes.stackComponent.isRequired,
     mayEditKeys: PropTypes.bool.isRequired,
@@ -137,6 +138,7 @@ export default class DeviceGeneralSettings extends React.Component {
       mayEditKeys,
       mayReadKeys,
       resetDevice,
+      getDefaultMacSettings,
     } = this.props
 
     const isOTAA = isDeviceOTAA(device)
@@ -227,6 +229,7 @@ export default class DeviceGeneralSettings extends React.Component {
                 onMacReset={resetDevice}
                 mayEditKeys={mayEditKeys}
                 mayReadKeys={mayReadKeys}
+                getDefaultMacSettings={getDefaultMacSettings}
               />
             </Collapse>
             <Collapse title={m.asTitle} description={asDescription} disabled={asDisabled}>

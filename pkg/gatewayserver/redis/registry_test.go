@@ -55,11 +55,11 @@ func TestRegistry(t *testing.T) {
 
 	now := time.Now().UTC()
 	initialStats := &ttnpb.GatewayConnectionStats{
-		ConnectedAt:            &now,
+		ConnectedAt:            ttnpb.ProtoTimePtr(now),
 		Protocol:               "dummy",
-		LastDownlinkReceivedAt: &now,
+		LastDownlinkReceivedAt: ttnpb.ProtoTimePtr(now),
 		DownlinkCount:          1,
-		LastUplinkReceivedAt:   &now,
+		LastUplinkReceivedAt:   ttnpb.ProtoTimePtr(now),
 		UplinkCount:            1,
 	}
 
@@ -117,7 +117,7 @@ func TestRegistry(t *testing.T) {
 		a, ctx := test.New(t)
 
 		stats := &ttnpb.GatewayConnectionStats{
-			LastUplinkReceivedAt: &now,
+			LastUplinkReceivedAt: ttnpb.ProtoTimePtr(now),
 			UplinkCount:          1,
 			DownlinkCount:        1,
 		}
@@ -130,7 +130,7 @@ func TestRegistry(t *testing.T) {
 		retrieved, err := registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
 		a.So(retrieved, should.Resemble, &ttnpb.GatewayConnectionStats{
-			LastUplinkReceivedAt: &now,
+			LastUplinkReceivedAt: ttnpb.ProtoTimePtr(now),
 			UplinkCount:          1,
 		})
 
@@ -140,7 +140,7 @@ func TestRegistry(t *testing.T) {
 		retrieved, err = registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
 		a.So(retrieved, should.Resemble, &ttnpb.GatewayConnectionStats{
-			LastUplinkReceivedAt: &now,
+			LastUplinkReceivedAt: ttnpb.ProtoTimePtr(now),
 			UplinkCount:          1,
 			DownlinkCount:        1,
 		})

@@ -89,7 +89,7 @@ func setupConnection(ctx context.Context, mqttConn mqttnet.Conn, format Format, 
 			case <-ctx.Done():
 				return ctx.Err()
 			case up := <-c.io.Up():
-				logger := log.FromContext(ctx).WithField("device_uid", unique.ID(up.Context, up.EndDeviceIdentifiers))
+				logger := log.FromContext(ctx).WithField("device_uid", unique.ID(up.Context, up.EndDeviceIds))
 				topicParts := TopicParts(up, format)
 				if topicParts == nil {
 					continue

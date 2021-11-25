@@ -15,7 +15,7 @@
 package ttnmage
 
 import (
-	"io/ioutil"
+	"os"
 
 	"github.com/cloudflare/cfssl/config"
 	"github.com/cloudflare/cfssl/csr"
@@ -36,10 +36,10 @@ func (Dev) Certificates() error {
 	if err != nil {
 		return err
 	}
-	if err = ioutil.WriteFile("ca.pem", caCert, 0644); err != nil {
+	if err = os.WriteFile("ca.pem", caCert, 0644); err != nil {
 		return err
 	}
-	if err = ioutil.WriteFile("ca-key.pem", caKey, 0644); err != nil {
+	if err = os.WriteFile("ca-key.pem", caKey, 0644); err != nil {
 		return err
 	}
 	certReq := csr.CertificateRequest{
@@ -75,10 +75,10 @@ func (Dev) Certificates() error {
 	if err != nil {
 		return err
 	}
-	if err = ioutil.WriteFile("cert.pem", cert, 0644); err != nil {
+	if err = os.WriteFile("cert.pem", cert, 0644); err != nil {
 		return err
 	}
-	if err = ioutil.WriteFile("key.pem", key, 0644); err != nil {
+	if err = os.WriteFile("key.pem", key, 0644); err != nil {
 		return err
 	}
 	return nil

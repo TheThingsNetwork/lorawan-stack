@@ -132,12 +132,10 @@ func (console *Console) RegisterRoutes(server *web.Server) {
 		console.config.Mount,
 		func(next echo.HandlerFunc) echo.HandlerFunc {
 			return func(c echo.Context) error {
-				if webui.CSPFeatureFlag.GetValue(c.Request().Context()) {
-					nonce := webui.GenerateNonce()
-					c.Set("csp_nonce", nonce)
-					cspString := generateConsoleCSPString(console.configFromContext(c.Request().Context()), nonce)
-					c.Response().Header().Set("Content-Security-Policy", cspString)
-				}
+				nonce := webui.GenerateNonce()
+				c.Set("csp_nonce", nonce)
+				cspString := generateConsoleCSPString(console.configFromContext(c.Request().Context()), nonce)
+				c.Response().Header().Set("Content-Security-Policy", cspString)
 				return next(c)
 			}
 		},

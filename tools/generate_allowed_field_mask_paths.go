@@ -19,7 +19,6 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -42,7 +41,7 @@ func main() {
 		panic(err)
 	}
 
-	if err = ioutil.WriteFile(messagesFile, data, 0o644); err != nil {
+	if err = os.WriteFile(messagesFile, data, 0o644); err != nil {
 		panic(err)
 	}
 }

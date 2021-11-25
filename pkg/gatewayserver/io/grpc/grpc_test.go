@@ -50,8 +50,6 @@ var (
 	timeout = (1 << 4) * test.Delay
 )
 
-func timePtr(t time.Time) *time.Time { return &t }
-
 func TestAuthentication(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx, cancelCtx := context.WithCancel(ctx)
@@ -223,7 +221,7 @@ func TestTraffic(t *testing.T) {
 			{
 				GatewayStatus: &ttnpb.GatewayStatus{
 					Ip:   []string{"1.1.1.1"},
-					Time: timePtr(time.Now()),
+					Time: ttnpb.ProtoTimePtr(time.Now()),
 				},
 			},
 			{
@@ -235,7 +233,7 @@ func TestTraffic(t *testing.T) {
 								GatewayIds: &registeredGatewayID,
 							},
 						},
-						Settings: ttnpb.TxSettings{
+						Settings: &ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
@@ -258,7 +256,7 @@ func TestTraffic(t *testing.T) {
 								GatewayIds: &registeredGatewayID,
 							},
 						},
-						Settings: ttnpb.TxSettings{
+						Settings: &ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
@@ -273,7 +271,7 @@ func TestTraffic(t *testing.T) {
 				},
 				GatewayStatus: &ttnpb.GatewayStatus{
 					Ip:   []string{"2.2.2.2"},
-					Time: timePtr(time.Now()),
+					Time: ttnpb.ProtoTimePtr(time.Now()),
 				},
 			},
 			{
@@ -285,7 +283,7 @@ func TestTraffic(t *testing.T) {
 								GatewayIds: &registeredGatewayID,
 							},
 						},
-						Settings: ttnpb.TxSettings{
+						Settings: &ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
@@ -304,7 +302,7 @@ func TestTraffic(t *testing.T) {
 								GatewayIds: &registeredGatewayID,
 							},
 						},
-						Settings: ttnpb.TxSettings{
+						Settings: &ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
@@ -323,7 +321,7 @@ func TestTraffic(t *testing.T) {
 								GatewayIds: &registeredGatewayID,
 							},
 						},
-						Settings: ttnpb.TxSettings{
+						Settings: &ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
@@ -338,7 +336,7 @@ func TestTraffic(t *testing.T) {
 				},
 				GatewayStatus: &ttnpb.GatewayStatus{
 					Ip:   []string{"3.3.3.3"},
-					Time: timePtr(time.Now()),
+					Time: ttnpb.ProtoTimePtr(time.Now()),
 				},
 			},
 			{
@@ -359,9 +357,9 @@ func TestTraffic(t *testing.T) {
 					select {
 					case up := <-conn.Up():
 						expected := tc.UplinkMessages[ups]
-						up.ReceivedAt = expected.ReceivedAt
-						up.RxMetadata[0].UplinkToken = expected.RxMetadata[0].UplinkToken
-						a.So(up.UplinkMessage, should.Resemble, expected)
+						up.Message.ReceivedAt = expected.ReceivedAt
+						up.Message.RxMetadata[0].UplinkToken = expected.RxMetadata[0].UplinkToken
+						a.So(up.Message, should.Resemble, expected)
 						ups++
 					case status := <-conn.Status():
 						a.So(needStatus, should.BeTrue)
@@ -384,7 +382,7 @@ func TestTraffic(t *testing.T) {
 					{
 						RawPayload: []byte{0x06},
 						RxMetadata: []*ttnpb.RxMetadata{{GatewayIds: &registeredGatewayID, Rssi: -100}},
-						Settings: ttnpb.TxSettings{
+						Settings: &ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
@@ -399,7 +397,7 @@ func TestTraffic(t *testing.T) {
 					{
 						RawPayload: []byte{0x06},
 						RxMetadata: []*ttnpb.RxMetadata{{GatewayIds: &registeredGatewayID, Rssi: -10}},
-						Settings: ttnpb.TxSettings{
+						Settings: &ttnpb.TxSettings{
 							DataRate: ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 									Bandwidth:       125000,
@@ -415,9 +413,9 @@ func TestTraffic(t *testing.T) {
 			}
 			select {
 			case up := <-conn.Up():
-				a.So(up.RxMetadata[0].Rssi, should.Equal, -10)
-				a.So(up.RawPayload, should.Resemble, []byte{0x06})
-				a.So(up.Settings.Frequency, should.Equal, 868700000)
+				a.So(up.Message.RxMetadata[0].Rssi, should.Equal, -10)
+				a.So(up.Message.RawPayload, should.Resemble, []byte{0x06})
+				a.So(up.Message.Settings.Frequency, should.Equal, 868700000)
 			case <-time.After(timeout):
 				t.Fatalf("Receive unexpected upstream timeout")
 			}

@@ -13,8 +13,19 @@ For details about compatibility between different releases, see the **Commitment
 
 - Support for fine timestamps and frequency offsets sent by gateways with SX1303 concentrator using the legacy UDP protocol.
 - Support for resetting end device session context and MAC state in the Console.
+- The Content-Security-Policy header (that was previously behind the `webui.csp` feature flag) is now enabled by default.
+- Default `Cache-Control: no-store` headers.
+- `Cache-Control: public, max-age=604800, immutable` headers for hashed static files.
+- Experimental support for BasicStation GPS timestamps which use the wrong precision (milliseconds instead of microseconds).
+  - The Gateway Server will attempt to determine the correct GPS timestamp from the provided `gpstime` based on the time at which the upstream message has been received.
+  - This workaround will be available until the related gateway vendors will release patches for this issue.
+- Firmware version of The Things Kickstarter Gateway are written to the gateway attributes upon receiving a valid status message.
+- Desired mac settings to end device general settings in the Console.
 
 ### Changed
+
+- Gateway server disconnects LoRa Basics Station gateways that stop sending pongs to server pings. This does not apply to gateways that don't support pongs.
+- The new plugin for reading/writing JSON in our API (that was previously behind the `jsonpb.jsonplugin` feature flag) is now enabled by default. All API responses should be equivalent, but in some cases object fields may be in a different order.
 
 ### Deprecated
 
@@ -24,6 +35,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - The reported sub-band's `downlink_utilization` in gateway connection stats now represents the utilization of the available duty-cycle time.
 - Missing fields when admins list non-owned entities.
+- Using the correct timestamp when retreiving the "Last activity" data point for Gateways on initial page loads in the Console.
 - Events reappearing in the end device data view after clearing them when navigating back and forth.
 
 ### Security

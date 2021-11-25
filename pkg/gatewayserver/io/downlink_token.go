@@ -60,7 +60,8 @@ func (t DownlinkTokens) Get(token uint16, time time.Time) (*ttnpb.DownlinkMessag
 	if item.key != token || item.msg == nil || item.time.IsZero() {
 		return nil, 0, false
 	}
-	return item.msg, time.Sub(item.time), true
+	downMsg := *item.msg
+	return &downMsg, time.Sub(item.time), true
 }
 
 var parseTokenRegex = regexp.MustCompile(`^gs:down:token:(\d+)$`)

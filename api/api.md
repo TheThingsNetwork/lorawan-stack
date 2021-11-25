@@ -3942,8 +3942,7 @@ Connection stats as monitored by the Gateway Server.
 
 | Field | Validations |
 | ----- | ----------- |
-| `time` | <p>`timestamp.required`: `true`</p> |
-| `versions` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[_-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `32`</p> |
+| `versions` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[_-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `128`</p> |
 | `antenna_locations` | <p>`repeated.max_items`: `8`</p> |
 | `ip` | <p>`repeated.max_items`: `10`</p><p>`repeated.items.string.ip`: `true`</p> |
 | `metrics` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[_-]?[a-z0-9]){2,}$`</p> |
@@ -6346,6 +6345,7 @@ Downlink message from the network to the end device
 
 | Field | Validations |
 | ----- | ----------- |
+| `end_device_ids` | <p>`message.required`: `true`</p> |
 | `downlinks` | <p>`repeated.max_items`: `100000`</p> |
 
 ### <a name="ttn.lorawan.v3.GatewayTxAcknowledgment">Message `GatewayTxAcknowledgment`</a>

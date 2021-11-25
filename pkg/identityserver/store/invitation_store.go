@@ -40,7 +40,7 @@ func (s *invitationStore) CreateInvitation(ctx context.Context, invitation *ttnp
 	model := Invitation{
 		Email:     invitation.Email,
 		Token:     invitation.Token,
-		ExpiresAt: invitation.ExpiresAt,
+		ExpiresAt: ttnpb.StdTime(invitation.ExpiresAt),
 	}
 	if err := s.createEntity(ctx, &model); err != nil {
 		err = convertError(err)

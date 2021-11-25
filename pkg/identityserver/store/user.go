@@ -68,12 +68,11 @@ var userPBSetters = map[string]func(*ttnpb.User, *User){
 	attributesField:          func(pb *ttnpb.User, usr *User) { pb.Attributes = attributes(usr.Attributes).toMap() },
 	primaryEmailAddressField: func(pb *ttnpb.User, usr *User) { pb.PrimaryEmailAddress = usr.PrimaryEmailAddress },
 	primaryEmailAddressValidatedAtField: func(pb *ttnpb.User, usr *User) {
-		pb.PrimaryEmailAddressValidatedAt = usr.PrimaryEmailAddressValidatedAt
+		pb.PrimaryEmailAddressValidatedAt = ttnpb.ProtoTime(cleanTimePtr(usr.PrimaryEmailAddressValidatedAt))
 	},
 	passwordField: func(pb *ttnpb.User, usr *User) { pb.Password = usr.Password },
 	passwordUpdatedAtField: func(pb *ttnpb.User, usr *User) {
-		t := cleanTime(usr.PasswordUpdatedAt)
-		pb.PasswordUpdatedAt = &t
+		pb.PasswordUpdatedAt = ttnpb.ProtoTimePtr(cleanTime(usr.PasswordUpdatedAt))
 	},
 	requirePasswordUpdateField: func(pb *ttnpb.User, usr *User) { pb.RequirePasswordUpdate = usr.RequirePasswordUpdate },
 	stateField:                 func(pb *ttnpb.User, usr *User) { pb.State = ttnpb.State(usr.State) },
@@ -83,10 +82,10 @@ var userPBSetters = map[string]func(*ttnpb.User, *User){
 		pb.TemporaryPassword = usr.TemporaryPassword
 	},
 	temporaryPasswordCreatedAtField: func(pb *ttnpb.User, usr *User) {
-		pb.TemporaryPasswordCreatedAt = cleanTimePtr(usr.TemporaryPasswordCreatedAt)
+		pb.TemporaryPasswordCreatedAt = ttnpb.ProtoTime(cleanTimePtr(usr.TemporaryPasswordCreatedAt))
 	},
 	temporaryPasswordExpiresAtField: func(pb *ttnpb.User, usr *User) {
-		pb.TemporaryPasswordExpiresAt = cleanTimePtr(usr.TemporaryPasswordExpiresAt)
+		pb.TemporaryPasswordExpiresAt = ttnpb.ProtoTime(cleanTimePtr(usr.TemporaryPasswordExpiresAt))
 	},
 	profilePictureField: func(pb *ttnpb.User, usr *User) {
 		if usr.ProfilePicture == nil {
@@ -106,12 +105,12 @@ var userModelSetters = map[string]func(*User, *ttnpb.User){
 	},
 	primaryEmailAddressField: func(usr *User, pb *ttnpb.User) { usr.PrimaryEmailAddress = pb.PrimaryEmailAddress },
 	primaryEmailAddressValidatedAtField: func(usr *User, pb *ttnpb.User) {
-		usr.PrimaryEmailAddressValidatedAt = pb.PrimaryEmailAddressValidatedAt
+		usr.PrimaryEmailAddressValidatedAt = ttnpb.StdTime(pb.PrimaryEmailAddressValidatedAt)
 	},
 	passwordField: func(usr *User, pb *ttnpb.User) { usr.Password = pb.Password },
 	passwordUpdatedAtField: func(usr *User, pb *ttnpb.User) {
-		if pb.PasswordUpdatedAt != nil {
-			usr.PasswordUpdatedAt = cleanTime(*pb.PasswordUpdatedAt)
+		if passwordUpdatedAt := ttnpb.StdTime(pb.PasswordUpdatedAt); passwordUpdatedAt != nil {
+			usr.PasswordUpdatedAt = cleanTime(*passwordUpdatedAt)
 		} else {
 			usr.PasswordUpdatedAt = cleanTime(time.Now())
 		}
@@ -124,10 +123,10 @@ var userModelSetters = map[string]func(*User, *ttnpb.User){
 		usr.TemporaryPassword = pb.TemporaryPassword
 	},
 	temporaryPasswordCreatedAtField: func(usr *User, pb *ttnpb.User) {
-		usr.TemporaryPasswordCreatedAt = cleanTimePtr(pb.TemporaryPasswordCreatedAt)
+		usr.TemporaryPasswordCreatedAt = cleanTimePtr(ttnpb.StdTime(pb.TemporaryPasswordCreatedAt))
 	},
 	temporaryPasswordExpiresAtField: func(usr *User, pb *ttnpb.User) {
-		usr.TemporaryPasswordExpiresAt = cleanTimePtr(pb.TemporaryPasswordExpiresAt)
+		usr.TemporaryPasswordExpiresAt = cleanTimePtr(ttnpb.StdTime(pb.TemporaryPasswordExpiresAt))
 	},
 	profilePictureField: func(usr *User, pb *ttnpb.User) {
 		usr.ProfilePictureID, usr.ProfilePicture = nil, nil
@@ -172,9 +171,9 @@ var userColumnNames = map[string][]string{
 
 func (usr User) toPB(pb *ttnpb.User, fieldMask *pbtypes.FieldMask) {
 	pb.Ids = &ttnpb.UserIdentifiers{UserId: usr.Account.UID}
-	pb.CreatedAt = cleanTimePtr(&usr.CreatedAt)
-	pb.UpdatedAt = cleanTimePtr(&usr.UpdatedAt)
-	pb.DeletedAt = cleanTimePtr(usr.DeletedAt)
+	pb.CreatedAt = ttnpb.ProtoTimePtr(cleanTime(usr.CreatedAt))
+	pb.UpdatedAt = ttnpb.ProtoTimePtr(cleanTime(usr.UpdatedAt))
+	pb.DeletedAt = ttnpb.ProtoTime(cleanTimePtr(usr.DeletedAt))
 	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultUserFieldMask
 	}

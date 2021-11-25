@@ -238,8 +238,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		return nil, err
 	}
 	req.User.Password = hashedPassword
-	now := time.Now()
-	req.User.PasswordUpdatedAt = &now
+	req.User.PasswordUpdatedAt = ttnpb.ProtoTimePtr(time.Now())
 
 	if req.User.ProfilePicture != nil {
 		if err = is.processUserProfilePicture(ctx, req.User); err != nil {
@@ -254,7 +253,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 			if err != nil {
 				return err
 			}
-			if !invitationToken.ExpiresAt.IsZero() && invitationToken.ExpiresAt.Before(time.Now()) {
+			if expiresAt := ttnpb.StdTime(invitationToken.ExpiresAt); expiresAt != nil && expiresAt.Before(time.Now()) {
 				return errInvitationTokenExpired.New()
 			}
 		}
@@ -450,12 +449,11 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 		req.User.TemporaryPassword = hashedTemporaryPassword
 		now := time.Now()
 		if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "temporary_password_created_at") {
-			req.User.TemporaryPasswordCreatedAt = &now
+			req.User.TemporaryPasswordCreatedAt = ttnpb.ProtoTimePtr(now)
 			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "temporary_password_created_at")
 		}
 		if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "temporary_password_expires_at") {
-			expires := now.Add(36 * time.Hour)
-			req.User.TemporaryPasswordExpiresAt = &expires
+			req.User.TemporaryPasswordExpiresAt = ttnpb.ProtoTimePtr(now.Add(36 * time.Hour))
 			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "temporary_password_expires_at")
 		}
 	}
@@ -585,16 +583,17 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 				events.Publish(evtUpdateUserIncorrectPassword.NewWithIdentifiersAndData(ctx, req.GetUserIds(), nil))
 				return errIncorrectPassword.New()
 			}
-			region := trace.StartRegion(ctx, "validate temporary password")
-			valid, err = auth.Validate(usr.TemporaryPassword, req.Old)
-			region.End()
-			switch {
-			case err != nil:
+			trace.WithRegion(ctx, "validate temporary password", func() {
+				valid, err = auth.Validate(usr.TemporaryPassword, req.Old)
+			})
+			if err != nil {
 				return err
-			case !valid:
+			}
+			if !valid {
 				events.Publish(evtUpdateUserIncorrectPassword.NewWithIdentifiersAndData(ctx, req.GetUserIds(), nil))
 				return errIncorrectPassword.New()
-			case usr.TemporaryPasswordExpiresAt.Before(time.Now()):
+			}
+			if temporaryPasswordExpiresAt := ttnpb.StdTime(usr.TemporaryPasswordExpiresAt); temporaryPasswordExpiresAt != nil && temporaryPasswordExpiresAt.Before(time.Now()) {
 				events.Publish(evtUpdateUserIncorrectPassword.NewWithIdentifiersAndData(ctx, req.GetUserIds(), nil))
 				return errTemporaryPasswordExpired.New()
 			}
@@ -632,7 +631,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 			}
 		}
 		now := time.Now()
-		usr.Password, usr.PasswordUpdatedAt, usr.RequirePasswordUpdate = hashedPassword, &now, false
+		usr.Password, usr.PasswordUpdatedAt, usr.RequirePasswordUpdate = hashedPassword, ttnpb.ProtoTimePtr(now), false
 		usr, err = store.GetUserStore(db).UpdateUser(ctx, usr, updateMask)
 		return err
 	})
@@ -668,11 +667,11 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 		if err != nil {
 			return err
 		}
-		if usr.TemporaryPasswordExpiresAt != nil && usr.TemporaryPasswordExpiresAt.After(time.Now()) {
+		if temporaryPasswordExpiresAt := ttnpb.StdTime(usr.TemporaryPasswordExpiresAt); temporaryPasswordExpiresAt != nil && temporaryPasswordExpiresAt.After(time.Now()) {
 			return errTemporaryPasswordStillValid.New()
 		}
 		usr.TemporaryPassword = hashedTemporaryPassword
-		usr.TemporaryPasswordCreatedAt, usr.TemporaryPasswordExpiresAt = &now, &expires
+		usr.TemporaryPasswordCreatedAt, usr.TemporaryPasswordExpiresAt = ttnpb.ProtoTimePtr(now), ttnpb.ProtoTimePtr(expires)
 		usr, err = store.GetUserStore(db).UpdateUser(ctx, usr, updateTemporaryPasswordFieldMask)
 		return err
 	})
@@ -726,10 +725,11 @@ func (is *IdentityServer) restoreUser(ctx context.Context, ids *ttnpb.UserIdenti
 		if err != nil {
 			return err
 		}
-		if usr.DeletedAt == nil {
+		deletedAt := ttnpb.StdTime(usr.DeletedAt)
+		if deletedAt == nil {
 			panic("store.WithSoftDeleted(ctx, true) returned result that is not deleted")
 		}
-		if time.Since(*usr.DeletedAt) > is.configFromContext(ctx).Delete.Restore {
+		if time.Since(*deletedAt) > is.configFromContext(ctx).Delete.Restore {
 			return errRestoreWindowExpired.New()
 		}
 		return usrStore.RestoreUser(ctx, ids)

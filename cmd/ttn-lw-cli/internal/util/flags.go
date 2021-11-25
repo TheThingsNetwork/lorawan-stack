@@ -167,7 +167,9 @@ func isAtomicType(t reflect.Type, maskOnly bool) bool {
 			"Int64Value",
 			"StringValue",
 			"UInt32Value",
-			"UInt64Value":
+			"UInt64Value",
+			"Timestamp",
+			"Duration":
 			return true
 		}
 	case "go.thethings.network/lorawan-stack/v3/pkg/ttnpb":
@@ -287,6 +289,12 @@ func AddField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 			return
 		case "BytesValue":
 			fs.String(name, "", "(hex)")
+			return
+		case "Timestamp":
+			fs.String(name, "", "(YYYY-MM-DDTHH:MM:SSZ)")
+			return
+		case "Duration":
+			fs.Duration(name, 0, "(1h2m3s)")
 			return
 		}
 
@@ -608,6 +616,22 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 							return err
 						}
 						field.Set(reflect.ValueOf(types.BytesValue{Value: buf}))
+					case "Timestamp":
+						var t time.Time
+						var err error
+						if v.String() != "" {
+							t, err = time.Parse(time.RFC3339Nano, v.String())
+							if err != nil {
+								return err
+							}
+						}
+						field.Set(reflect.ValueOf(*ttnpb.ProtoTimePtr(t)))
+					case "Duration":
+						d, err := time.ParseDuration(v.String())
+						if err != nil {
+							return err
+						}
+						field.Set(reflect.ValueOf(*ttnpb.ProtoDurationPtr(d)))
 					}
 				case ft.PkgPath() == "go.thethings.network/lorawan-stack/v3/pkg/ttnpb":
 					switch typeName := ft.Name(); typeName {

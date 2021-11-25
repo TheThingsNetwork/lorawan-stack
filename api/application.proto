@@ -40,11 +40,11 @@ message Application {
   // The identifiers of the application. These are public and can be seen by any authenticated user in the network.
   ApplicationIdentifiers ids = 1 [(validate.rules).message.required = true];
   // When the application was created. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp created_at = 2 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 2;
   // When the application was last updated. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp updated_at = 3 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp updated_at = 3;
   // When the application was deleted. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp deleted_at = 8 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp deleted_at = 8;
 
   // The name of the application.
   string name = 4 [(validate.rules).string.max_len = 50];
@@ -138,7 +138,7 @@ message CreateApplicationAPIKeyRequest {
       items: { enum: { defined_only: true } }
     }
   ];
-  google.protobuf.Timestamp expires_at = 4 [(gogoproto.stdtime) = true, (validate.rules).timestamp.gt_now = true];
+  google.protobuf.Timestamp expires_at = 4 [(validate.rules).timestamp.gt_now = true];
 }
 
 message UpdateApplicationAPIKeyRequest {

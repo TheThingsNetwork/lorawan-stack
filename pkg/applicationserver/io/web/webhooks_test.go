@@ -18,7 +18,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	stdio "io"
 	"net/http"
 	"testing"
 	"time"
@@ -188,7 +188,7 @@ func TestWebhooks(t *testing.T) {
 							{
 								Name: "UplinkMessage/RegisteredDevice",
 								Message: &ttnpb.ApplicationUp{
-									EndDeviceIdentifiers: registeredDeviceID,
+									EndDeviceIds: &registeredDeviceID,
 									Up: &ttnpb.ApplicationUp_UplinkMessage{
 										UplinkMessage: &ttnpb.ApplicationUplink{
 											SessionKeyId: []byte{0x11},
@@ -204,7 +204,7 @@ func TestWebhooks(t *testing.T) {
 							{
 								Name: "UplinkMessage/UnregisteredDevice",
 								Message: &ttnpb.ApplicationUp{
-									EndDeviceIdentifiers: unregisteredDeviceID,
+									EndDeviceIds: &unregisteredDeviceID,
 									Up: &ttnpb.ApplicationUp_UplinkMessage{
 										UplinkMessage: &ttnpb.ApplicationUplink{
 											SessionKeyId: []byte{0x22},
@@ -219,7 +219,7 @@ func TestWebhooks(t *testing.T) {
 							{
 								Name: "JoinAccept",
 								Message: &ttnpb.ApplicationUp{
-									EndDeviceIdentifiers: registeredDeviceID,
+									EndDeviceIds: &registeredDeviceID,
 									Up: &ttnpb.ApplicationUp_JoinAccept{
 										JoinAccept: &ttnpb.ApplicationJoinAccept{
 											SessionKeyId: []byte{0x22},
@@ -232,7 +232,7 @@ func TestWebhooks(t *testing.T) {
 							{
 								Name: "DownlinkMessage/Ack",
 								Message: &ttnpb.ApplicationUp{
-									EndDeviceIdentifiers: registeredDeviceID,
+									EndDeviceIds: &registeredDeviceID,
 									Up: &ttnpb.ApplicationUp_DownlinkAck{
 										DownlinkAck: &ttnpb.ApplicationDownlink{
 											SessionKeyId: []byte{0x22},
@@ -248,7 +248,7 @@ func TestWebhooks(t *testing.T) {
 							{
 								Name: "DownlinkMessage/Nack",
 								Message: &ttnpb.ApplicationUp{
-									EndDeviceIdentifiers: registeredDeviceID,
+									EndDeviceIds: &registeredDeviceID,
 									Up: &ttnpb.ApplicationUp_DownlinkNack{
 										DownlinkNack: &ttnpb.ApplicationDownlink{
 											SessionKeyId: []byte{0x22},
@@ -264,7 +264,7 @@ func TestWebhooks(t *testing.T) {
 							{
 								Name: "DownlinkMessage/Sent",
 								Message: &ttnpb.ApplicationUp{
-									EndDeviceIdentifiers: registeredDeviceID,
+									EndDeviceIds: &registeredDeviceID,
 									Up: &ttnpb.ApplicationUp_DownlinkSent{
 										DownlinkSent: &ttnpb.ApplicationDownlink{
 											SessionKeyId: []byte{0x22},
@@ -280,7 +280,7 @@ func TestWebhooks(t *testing.T) {
 							{
 								Name: "DownlinkMessage/Queued",
 								Message: &ttnpb.ApplicationUp{
-									EndDeviceIdentifiers: registeredDeviceID,
+									EndDeviceIds: &registeredDeviceID,
 									Up: &ttnpb.ApplicationUp_DownlinkQueued{
 										DownlinkQueued: &ttnpb.ApplicationDownlink{
 											SessionKeyId: []byte{0x22},
@@ -296,7 +296,7 @@ func TestWebhooks(t *testing.T) {
 							{
 								Name: "DownlinkMessage/QueueInvalidated",
 								Message: &ttnpb.ApplicationUp{
-									EndDeviceIdentifiers: registeredDeviceID,
+									EndDeviceIds: &registeredDeviceID,
 									Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 										DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 											Downlinks: []*ttnpb.ApplicationDownlink{
@@ -318,16 +318,16 @@ func TestWebhooks(t *testing.T) {
 							{
 								Name: "DownlinkMessage/Failed",
 								Message: &ttnpb.ApplicationUp{
-									EndDeviceIdentifiers: registeredDeviceID,
+									EndDeviceIds: &registeredDeviceID,
 									Up: &ttnpb.ApplicationUp_DownlinkFailed{
 										DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-											ApplicationDownlink: ttnpb.ApplicationDownlink{
+											Downlink: &ttnpb.ApplicationDownlink{
 												SessionKeyId: []byte{0x22},
 												FCnt:         42,
 												FPort:        42,
 												FrmPayload:   []byte{0x1, 0x2, 0x3},
 											},
-											Error: ttnpb.ErrorDetails{
+											Error: &ttnpb.ErrorDetails{
 												Name: "test",
 											},
 										},
@@ -339,10 +339,10 @@ func TestWebhooks(t *testing.T) {
 							{
 								Name: "LocationSolved",
 								Message: &ttnpb.ApplicationUp{
-									EndDeviceIdentifiers: registeredDeviceID,
+									EndDeviceIds: &registeredDeviceID,
 									Up: &ttnpb.ApplicationUp_LocationSolved{
 										LocationSolved: &ttnpb.ApplicationLocation{
-											Location: ttnpb.Location{
+											Location: &ttnpb.Location{
 												Latitude:  10,
 												Longitude: 20,
 												Altitude:  30,
@@ -357,7 +357,7 @@ func TestWebhooks(t *testing.T) {
 							{
 								Name: "ServiceData",
 								Message: &ttnpb.ApplicationUp{
-									EndDeviceIdentifiers: registeredDeviceID,
+									EndDeviceIds: &registeredDeviceID,
 									Up: &ttnpb.ApplicationUp_ServiceData{
 										ServiceData: &ttnpb.ApplicationServiceData{
 											Data: &types.Struct{
@@ -405,7 +405,7 @@ func TestWebhooks(t *testing.T) {
 								a.So(req.Header.Get("X-Downlink-Replace"), should.Equal,
 									"https://example.com/api/v3/as/applications/foo-app/webhooks/foo-hook/devices/foo-device/down/replace")
 								a.So(req.Header.Get("X-Tts-Domain"), should.Equal, "example.com")
-								actualBody, err := ioutil.ReadAll(req.Body)
+								actualBody, err := stdio.ReadAll(req.Body)
 								if !a.So(err, should.BeNil) {
 									t.FailNow()
 								}

@@ -18,7 +18,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"io/ioutil"
+	"os"
 	"sync"
 	"sync/atomic"
 
@@ -123,7 +123,7 @@ func (c *Client) ApplyTo(tlsConfig *tls.Config) error {
 	}
 	c.loadRootCA.Do(func() {
 		if c.RootCA != "" {
-			readFile := ioutil.ReadFile
+			readFile := os.ReadFile
 			if c.FileReader != nil {
 				readFile = c.FileReader.ReadFile
 			}
@@ -148,7 +148,7 @@ func (c *Client) ApplyTo(tlsConfig *tls.Config) error {
 }
 
 func readCert(fileReader FileReader, certFile, keyFile string) (*tls.Certificate, error) {
-	readFile := ioutil.ReadFile
+	readFile := os.ReadFile
 	if fileReader != nil {
 		readFile = fileReader.ReadFile
 	}

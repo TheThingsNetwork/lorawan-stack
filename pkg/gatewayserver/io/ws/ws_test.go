@@ -114,7 +114,10 @@ func TestClientTokenAuth(t *testing.T) {
 	} {
 		cfg := defaultConfig
 		cfg.AllowUnauthenticated = ttc.AllowUnauthenticated
-		bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), cfg)
+		web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), cfg)
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
 		lis, err := net.Listen("tcp", serverAddress)
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
@@ -122,7 +125,7 @@ func TestClientTokenAuth(t *testing.T) {
 		defer lis.Close()
 		go func() error {
 			return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				bsWebServer.ServeHTTP(w, r)
+				web.ServeHTTP(w, r)
 			}))
 		}()
 		servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
@@ -229,7 +232,10 @@ func TestDiscover(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -237,7 +243,7 @@ func TestDiscover(t *testing.T) {
 	defer lis.Close()
 	go func() error {
 		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			bsWebServer.ServeHTTP(w, r)
+			web.ServeHTTP(w, r)
 		}))
 	}()
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
@@ -486,7 +492,10 @@ func TestVersion(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -494,7 +503,7 @@ func TestVersion(t *testing.T) {
 	defer lis.Close()
 	go func() error {
 		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			bsWebServer.ServeHTTP(w, r)
+			web.ServeHTTP(w, r)
 		}))
 	}()
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
@@ -702,8 +711,10 @@ func TestVersion(t *testing.T) {
 			}
 			select {
 			case stat := <-gsConn.Status():
-				a.So(time.Since(*stat.Time), should.BeLessThan, timeout)
-				stat.Time = nil
+				if a.So(stat.Time, should.NotBeNil) {
+					a.So(time.Since(*ttnpb.StdTime(stat.Time)), should.BeLessThan, timeout)
+					stat.Time = nil
+				}
 				a.So(stat, should.Resemble, &tc.ExpectedStatusMessage)
 			case <-time.After(timeout):
 				t.Fatalf("Read message timeout")
@@ -737,7 +748,10 @@ func TestTraffic(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -745,7 +759,7 @@ func TestTraffic(t *testing.T) {
 	defer lis.Close()
 	go func() error {
 		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			bsWebServer.ServeHTTP(w, r)
+			web.ServeHTTP(w, r)
 		}))
 	}()
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
@@ -811,7 +825,7 @@ func TestTraffic(t *testing.T) {
 					ChannelRssi: 89,
 					Snr:         9.25,
 				}},
-				Settings: ttnpb.TxSettings{
+				Settings: &ttnpb.TxSettings{
 					Frequency:  868300000,
 					CodingRate: "4/5",
 					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
@@ -876,7 +890,7 @@ func TestTraffic(t *testing.T) {
 						Snr:         9.25,
 					},
 				},
-				Settings: ttnpb.TxSettings{
+				Settings: &ttnpb.TxSettings{
 					Frequency:  868300000,
 					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
 					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
@@ -904,6 +918,9 @@ func TestTraffic(t *testing.T) {
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId: "testdevice",
 					DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationId: "testapp",
+					},
 				},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
@@ -961,6 +978,9 @@ func TestTraffic(t *testing.T) {
 					EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 						DeviceId: "testdevice",
 						DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationId: "testapp",
+						},
 					},
 					Settings: &ttnpb.DownlinkMessage_Scheduled{
 						Scheduled: &ttnpb.TxSettings{
@@ -985,6 +1005,9 @@ func TestTraffic(t *testing.T) {
 					EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 						DeviceId: "testdevice",
 						DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+							ApplicationId: "testapp",
+						},
 					},
 					Settings: &ttnpb.DownlinkMessage_Scheduled{
 						Scheduled: &ttnpb.TxSettings{
@@ -1046,17 +1069,17 @@ func TestTraffic(t *testing.T) {
 					}
 					select {
 					case up := <-gsConn.Up():
-						a.So(time.Since(up.ReceivedAt), should.BeLessThan, timeout)
-						up.ReceivedAt = time.Time{}
+						a.So(time.Since(*up.Message.ReceivedAt), should.BeLessThan, timeout)
+						up.Message.ReceivedAt = nil
 						var payload ttnpb.Message
-						a.So(lorawan.UnmarshalMessage(up.RawPayload, &payload), should.BeNil)
-						if !a.So(&payload, should.Resemble, up.Payload) {
-							t.Fatalf("Invalid RawPayload: %v", up.RawPayload)
+						a.So(lorawan.UnmarshalMessage(up.Message.RawPayload, &payload), should.BeNil)
+						if !a.So(&payload, should.Resemble, up.Message.Payload) {
+							t.Fatalf("Invalid RawPayload: %v", up.Message.RawPayload)
 						}
-						up.RawPayload = nil
-						up.RxMetadata[0].UplinkToken = nil
+						up.Message.RawPayload = nil
+						up.Message.RxMetadata[0].UplinkToken = nil
 						expectedUp := tc.ExpectedNetworkUpstream.(ttnpb.UplinkMessage)
-						a.So(up.UplinkMessage, should.Resemble, &expectedUp)
+						a.So(up.Message, should.Resemble, &expectedUp)
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")
 					}
@@ -1185,7 +1208,10 @@ func TestRTT(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -1193,7 +1219,7 @@ func TestRTT(t *testing.T) {
 	defer lis.Close()
 	go func() error {
 		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			bsWebServer.ServeHTTP(w, r)
+			web.ServeHTTP(w, r)
 		}))
 	}()
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
@@ -1255,6 +1281,9 @@ func TestRTT(t *testing.T) {
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId: "testdevice",
 					DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationId: "testapp",
+					},
 				},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
@@ -1380,9 +1409,9 @@ func TestRTT(t *testing.T) {
 					select {
 					case up := <-gsConn.Up():
 						var payload ttnpb.Message
-						a.So(lorawan.UnmarshalMessage(up.RawPayload, &payload), should.BeNil)
-						if !a.So(&payload, should.Resemble, up.Payload) {
-							t.Fatalf("Invalid RawPayload: %v", up.RawPayload)
+						a.So(lorawan.UnmarshalMessage(up.Message.RawPayload, &payload), should.BeNil)
+						if !a.So(&payload, should.Resemble, up.Message.Payload) {
+							t.Fatalf("Invalid RawPayload: %v", up.Message.RawPayload)
 						}
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")
@@ -1402,9 +1431,9 @@ func TestRTT(t *testing.T) {
 					select {
 					case up := <-gsConn.Up():
 						var payload ttnpb.Message
-						a.So(lorawan.UnmarshalMessage(up.RawPayload, &payload), should.BeNil)
-						if !a.So(&payload, should.Resemble, up.Payload) {
-							t.Fatalf("Invalid RawPayload: %v", up.RawPayload)
+						a.So(lorawan.UnmarshalMessage(up.Message.RawPayload, &payload), should.BeNil)
+						if !a.So(&payload, should.Resemble, up.Message.Payload) {
+							t.Fatalf("Invalid RawPayload: %v", up.Message.RawPayload)
 						}
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")
@@ -1502,7 +1531,10 @@ func TestPingPong(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
 	lis, err := net.Listen("tcp", serverAddress)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -1510,7 +1542,7 @@ func TestPingPong(t *testing.T) {
 	defer lis.Close()
 	go func() error {
 		return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			bsWebServer.ServeHTTP(w, r)
+			web.ServeHTTP(w, r)
 		}))
 	}()
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
@@ -1566,6 +1598,103 @@ func TestPingPong(t *testing.T) {
 		break
 	case <-time.After(timeout):
 		t.Fatalf("Server pong timeout")
+	}
+	conn.Close() // The test below start a new connection per test. So this can be closed.
+
+	// Test disconnection via ping pong
+	for _, tc := range []struct {
+		Name         string
+		DisablePongs bool
+		NoOfPongs    int
+	}{
+		{
+			Name: "Regular ping-pong",
+		},
+		{
+			Name:         "Disable pong",
+			DisablePongs: true,
+		},
+		{
+			Name:      "Stop responding after one pong",
+			NoOfPongs: 1,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), Config{
+				WSPingInterval:       (1 << 5) * test.Delay,
+				AllowUnauthenticated: true,
+				UseTrafficTLSAddress: false,
+				MissedPongThreshold:  2,
+			})
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+			lis, err := net.Listen("tcp", serverAddress)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+			defer lis.Close()
+			go func() error {
+				return http.Serve(lis, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					web.ServeHTTP(w, r)
+				}))
+			}()
+			servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
+			conn, _, err := websocket.DefaultDialer.Dial(servAddr+testTrafficEndPoint, nil)
+			if !a.So(err, should.BeNil) {
+				t.Fatalf("Connection failed: %v", err)
+			}
+			defer conn.Close()
+
+			handler := NewPingPongHandler(conn, tc.DisablePongs, tc.NoOfPongs)
+			conn.SetPingHandler(handler.HandlePing)
+
+			errCh := make(chan error)
+
+			// Trigger server downstream.
+			go func() {
+				for {
+					select {
+					case <-ctx.Done():
+						return
+					default:
+						//  The ping/pong handlers are called only after ws.ReadMessage() receives a ping/pong message. The data read here is irrelevant.
+						_, _, err := conn.ReadMessage()
+						if err != nil {
+							errCh <- err
+							return
+						}
+					}
+				}
+			}()
+
+			// Wait for connection to setup
+			time.After(1 << 8 * test.Delay)
+
+			select {
+			case <-ctx.Done():
+				t.Fatal(ctx.Err())
+			case <-time.After(timeout):
+				if tc.DisablePongs || tc.NoOfPongs == 0 {
+					// The timeout here is valid.
+					// If tc.DisablePongs is true, client and server do ping pong forever.
+					// If tc.NoOfPongs == 0, the server sends pings forever without checking pong.
+					break
+				}
+				t.Fatal("Test time out")
+			case err := <-errCh:
+				if !tc.DisablePongs && tc.NoOfPongs == 1 {
+					if websocket.IsUnexpectedCloseError(err) {
+						// This is the error for WebSocket disconnection.
+						break
+					}
+				}
+				t.Fatalf("Unexpected error :%v", err)
+			case err := <-handler.ErrCh():
+				t.Fatal(err)
+				break
+			}
+		})
 	}
 }
 

@@ -18,7 +18,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"testing"
@@ -93,7 +93,7 @@ func TestUplinks(t *testing.T) {
 					a := assertions.New(t)
 
 					respChan <- &http.Response{
-						Body:       ioutil.NopCloser(bytes.NewBufferString(tc.body)),
+						Body:       io.NopCloser(bytes.NewBufferString(tc.body)),
 						StatusCode: http.StatusOK,
 					}
 					errChan <- tc.err

@@ -106,6 +106,8 @@ type Connection struct {
 	statsChangedCh chan struct{}
 	locCh          chan struct{}
 
+	versionInfoCh chan struct{}
+
 	lastUplink            *uplinkMessage
 	lastRepeatUpEventTime time.Time
 }
@@ -176,6 +178,7 @@ func NewConnection(ctx context.Context, frontend Frontend, gateway *ttnpb.Gatewa
 		statusCh:         make(chan *ttnpb.GatewayStatus, bufferSize),
 		txAckCh:          make(chan *ttnpb.TxAcknowledgment, bufferSize),
 		locCh:            make(chan struct{}, 1),
+		versionInfoCh:    make(chan struct{}, 1),
 		connectTime:      time.Now().UnixNano(),
 
 		statsChangedCh: make(chan struct{}, 1),
@@ -201,26 +204,56 @@ var errBufferFull = errors.DefineInternal("buffer_full", "buffer is full")
 // Interval between emitting consecutive gs.up.repeat events for the same gateway connection.
 const consecutiveRepeatUpEventsInterval = time.Minute
 
+// FrontendClockSynchronization contains the clock synchronization
+// timestamps provided by a frontend for manual synchronization.
+type FrontendClockSynchronization struct {
+	Timestamp        uint32
+	ServerTime       time.Time
+	GatewayTime      *time.Time
+	ConcentratorTime scheduling.ConcentratorTime
+}
+
 // HandleUp updates the uplink stats and sends the message to the upstream channel.
-func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
+func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClockSynchronization) (err error) {
+	defer func() {
+		if err != nil {
+			registerDropMessage(c.ctx, c.gateway, "uplink", err)
+		}
+	}()
+	if err := up.ValidateFields(); err != nil {
+		return err
+	}
 	if c.discardRepeatedUplink(up) {
 		return nil
 	}
 
 	var ct scheduling.ConcentratorTime
-	if up.Settings.Time != nil {
-		ct = c.scheduler.SyncWithGatewayAbsolute(up.Settings.Timestamp, up.ReceivedAt, *up.Settings.Time)
+	switch {
+	case frontendSync != nil:
+		ct = c.scheduler.SyncWithGatewayConcentrator(frontendSync.Timestamp, frontendSync.ServerTime, frontendSync.GatewayTime, frontendSync.ConcentratorTime)
+		log.FromContext(c.ctx).WithFields(log.Fields(
+			"timestamp", frontendSync.Timestamp,
+			"concentrator_time", frontendSync.ConcentratorTime,
+			"server_time", frontendSync.ServerTime,
+			"gateway_time", frontendSync.GatewayTime,
+		)).Info("Gateway clocks have been synchronized by the frontend")
+	case up.Settings.Time != nil:
+		ct = c.scheduler.SyncWithGatewayAbsolute(up.Settings.Timestamp, *up.ReceivedAt, *up.Settings.Time)
 		log.FromContext(c.ctx).WithFields(log.Fields(
 			"timestamp", up.Settings.Timestamp,
+			"concentrator_time", ct,
 			"server_time", up.ReceivedAt,
 			"gateway_time", *up.Settings.Time,
-		)).Debug("Synchronized server and gateway absolute time")
-	} else {
-		ct = c.scheduler.Sync(up.Settings.Timestamp, up.ReceivedAt)
+		)).Info("Synchronized server and gateway absolute time")
+	case up.Settings.Time == nil:
+		ct = c.scheduler.Sync(up.Settings.Timestamp, *up.ReceivedAt)
 		log.FromContext(c.ctx).WithFields(log.Fields(
 			"timestamp", up.Settings.Timestamp,
+			"concentrator_time", ct,
 			"server_time", up.ReceivedAt,
-		)).Debug("Synchronized server absolute time only")
+		)).Info("Synchronized server absolute time only")
+	default:
+		panic("unreachable")
 	}
 
 	for _, md := range up.RxMetadata {
@@ -232,7 +265,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 		buf, err := UplinkToken(&ttnpb.GatewayAntennaIdentifiers{
 			GatewayIds:   c.gateway.GetIds(),
 			AntennaIndex: md.AntennaIndex,
-		}, md.Timestamp, ct, up.ReceivedAt, up.Settings.Time)
+		}, md.Timestamp, ct, *up.ReceivedAt, up.Settings.Time)
 		if err != nil {
 			return err
 		}
@@ -250,8 +283,8 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 	}
 
 	msg := &ttnpb.GatewayUplinkMessage{
-		UplinkMessage: up,
-		BandId:        c.bandID,
+		Message: up,
+		BandId:  c.bandID,
 	}
 
 	select {
@@ -262,15 +295,22 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage) error {
 		atomic.StoreInt64(&c.lastUplinkTime, up.ReceivedAt.UnixNano())
 		c.notifyStatsChanged()
 	default:
-		err := errBufferFull.New()
-		registerDropMessage(c.ctx, c.gateway, "uplink", err)
-		return err
+		return errBufferFull.New()
 	}
 	return nil
 }
 
 // HandleStatus updates the status stats and sends the status to the status channel.
-func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) error {
+func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) (err error) {
+	defer func() {
+		if err != nil {
+			registerDropMessage(c.ctx, c.gateway, "status", err)
+		}
+	}()
+
+	if err := status.ValidateFields(); err != nil {
+		return err
+	}
 	select {
 	case <-c.ctx.Done():
 		return c.ctx.Err()
@@ -285,25 +325,37 @@ func (c *Connection) HandleStatus(status *ttnpb.GatewayStatus) error {
 			default:
 			}
 		}
+
+		// The channel is only written to once, after which there is no longer a recipient.
+		// For all subsequent status messages, the default branch is chosen.
+		select {
+		case c.versionInfoCh <- struct{}{}:
+		default:
+		}
+
 	default:
-		err := errBufferFull.New()
-		registerDropMessage(c.ctx, c.gateway, "status", err)
-		return err
+		return errBufferFull.New()
 	}
 	return nil
 }
 
 // HandleTxAck sends the acknowledgment to the status channel.
-func (c *Connection) HandleTxAck(ack *ttnpb.TxAcknowledgment) error {
+func (c *Connection) HandleTxAck(ack *ttnpb.TxAcknowledgment) (err error) {
+	defer func() {
+		if err != nil {
+			registerDropMessage(c.ctx, c.gateway, "txack", err)
+		}
+	}()
+	if err := ack.ValidateFields(); err != nil {
+		return err
+	}
 	select {
 	case <-c.ctx.Done():
 		return c.ctx.Err()
 	case c.txAckCh <- ack:
 		c.notifyStatsChanged()
 	default:
-		err := errBufferFull.New()
-		registerDropMessage(c.ctx, c.gateway, "txack", err)
-		return err
+		return errBufferFull.New()
 	}
 	return nil
 }
@@ -613,6 +665,11 @@ func (c *Connection) LocationChanged() <-chan struct{} {
 	return c.locCh
 }
 
+// VersionInfoChanged returns the version info updates channel.
+func (c *Connection) VersionInfoChanged() <-chan struct{} {
+	return c.versionInfoCh
+}
+
 // ConnectTime returns the time the gateway connected.
 func (c *Connection) ConnectTime() time.Time { return time.Unix(0, c.connectTime) }
 
@@ -651,24 +708,24 @@ func (c *Connection) RTTStats(percentile int, t time.Time) (min, max, median, np
 func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
 	ct := c.ConnectTime()
 	stats := &ttnpb.GatewayConnectionStats{
-		ConnectedAt: &ct,
+		ConnectedAt: ttnpb.ProtoTimePtr(ct),
 		Protocol:    c.Frontend().Protocol(),
 	}
 	paths := make([]string, 0, len(ttnpb.GatewayConnectionStatsFieldPathsTopLevel))
 	paths = append(paths, "connected_at", "protocol")
 
 	if s, t, ok := c.StatusStats(); ok {
-		stats.LastStatusReceivedAt = &t
+		stats.LastStatusReceivedAt = ttnpb.ProtoTimePtr(t)
 		stats.LastStatus = s
 		paths = append(paths, "last_status_received_at", "last_status")
 	}
 	if count, t, ok := c.UpStats(); ok {
-		stats.LastUplinkReceivedAt = &t
+		stats.LastUplinkReceivedAt = ttnpb.ProtoTimePtr(t)
 		stats.UplinkCount = count
 		paths = append(paths, "last_uplink_received_at", "uplink_count")
 	}
 	if count, t, ok := c.DownStats(); ok {
-		stats.LastDownlinkReceivedAt = &t
+		stats.LastDownlinkReceivedAt = ttnpb.ProtoTimePtr(t)
 		stats.DownlinkCount = count
 		paths = append(paths, "last_downlink_received_at", "downlink_count")
 		if c.scheduler != nil {
@@ -679,9 +736,9 @@ func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
 	}
 	if min, max, median, _, count := c.RTTStats(100, time.Now()); count > 0 {
 		stats.RoundTripTimes = &ttnpb.GatewayConnectionStats_RoundTripTimes{
-			Min:    &min,
-			Max:    &max,
-			Median: &median,
+			Min:    ttnpb.ProtoDurationPtr(min),
+			Max:    ttnpb.ProtoDurationPtr(max),
+			Median: ttnpb.ProtoDurationPtr(median),
 			Count:  uint32(count),
 		}
 		paths = append(paths, "round_trip_times")
@@ -701,8 +758,8 @@ func (c *Connection) BandID() string { return c.bandID }
 
 // SyncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
 // relative gateway time that corresponds to the given timestamp.
-func (c *Connection) SyncWithGatewayConcentrator(timestamp uint32, server time.Time, gateway *time.Time, concentrator scheduling.ConcentratorTime) {
-	c.scheduler.SyncWithGatewayConcentrator(timestamp, server, gateway, concentrator)
+func (c *Connection) SyncWithGatewayConcentrator(timestamp uint32, server time.Time, gateway *time.Time, concentrator scheduling.ConcentratorTime) scheduling.ConcentratorTime {
+	return c.scheduler.SyncWithGatewayConcentrator(timestamp, server, gateway, concentrator)
 }
 
 // TimeFromTimestampTime returns the concentrator time by the given timestamp.

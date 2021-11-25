@@ -19,6 +19,7 @@ import (
 	"crypto"
 	"crypto/rand"
 	"crypto/sha512"
+	"encoding/json"
 	"fmt"
 	"hash/crc32"
 	"net"
@@ -27,13 +28,13 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -141,29 +142,29 @@ var getGatewayMask = pbtypes.FieldMask{Paths: []string{
 }}
 
 // UpdateInfo implements the CUPS update-info handler.
-func (s *Server) UpdateInfo(c echo.Context) (err error) {
-	// This is to account for older LBS gateways that don't set this header.
-	c.Request().Header.Set(echo.HeaderContentType, "application/json")
+func (s *Server) UpdateInfo(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	registerUpdateInfoRequestReceived(ctx, updateInfoRequestLabel)
+	if err := s.updateInfo(w, r); err != nil {
+		registerUpdateInfoRequestFailed(ctx, updateInfoRequestLabel, err)
+		webhandlers.Error(w, r, err)
+	} else {
+		registerUpdateInfoRequestSucceeded(ctx, updateInfoRequestLabel)
+	}
+}
 
-	registerUpdateInfoRequestReceived(c.Request().Context(), updateInfoRequestLabel)
-	defer func() {
-		if err != nil {
-			registerUpdateInfoRequestFailed(c.Request().Context(), updateInfoRequestLabel, err)
-		} else {
-			registerUpdateInfoRequestSucceeded(c.Request().Context(), updateInfoRequestLabel)
-		}
-	}()
+func (s *Server) updateInfo(w http.ResponseWriter, r *http.Request) (err error) {
+	ctx := r.Context()
 
 	var req UpdateInfoRequest
-	if err := c.Bind(&req); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return err
 	}
 
-	if err := req.ValidateContext(c.Request().Context()); err != nil {
+	if err := req.ValidateContext(ctx); err != nil {
 		return err
 	}
 
-	ctx := getContext(c)
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"gateway_eui", req.Router.EUI64.String(),
 	))
@@ -206,7 +207,7 @@ func (s *Server) UpdateInfo(c echo.Context) (err error) {
 	logger.WithField("gateway_uid", uid).Debug("Found gateway for EUI")
 
 	var md metadata.MD
-	auth := c.Request().Header.Get(echo.HeaderAuthorization)
+	auth := r.Header.Get("Authorization")
 	if auth != "" {
 		if !strings.HasPrefix(auth, "Bearer ") {
 			auth = fmt.Sprintf("Bearer %s", auth)
@@ -379,5 +380,10 @@ func (s *Server) UpdateInfo(c echo.Context) (err error) {
 	if err != nil {
 		return err
 	}
-	return c.Blob(http.StatusOK, echo.MIMEOctetStream, b)
+
+	w.Header().Add("Content-Type", "application/octet-stream")
+	if _, err := w.Write(b); err != nil {
+		return err
+	}
+	return nil
 }

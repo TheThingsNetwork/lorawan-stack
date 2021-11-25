@@ -19,7 +19,7 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -185,7 +185,7 @@ func (s *Server) handle() http.Handler {
 		ctx := events.ContextWithCorrelationID(r.Context(), cid)
 		logger := log.FromContext(ctx)
 
-		data, err := ioutil.ReadAll(r.Body)
+		data, err := io.ReadAll(r.Body)
 		if err != nil {
 			logger.WithError(err).Debug("Failed to read body")
 			w.WriteHeader(http.StatusBadRequest)

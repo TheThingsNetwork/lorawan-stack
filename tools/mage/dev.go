@@ -16,16 +16,15 @@ package ttnmage
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
+	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -113,7 +112,7 @@ func (Dev) SQLDump() error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(filepath.Join(".cache", "sqldump.sql"), []byte(output), 0644)
+	return os.WriteFile(filepath.Join(".cache", "sqldump.sql"), []byte(output), 0644)
 }
 
 // SQLCreateSeedDB creates a database template from the current dump.
@@ -259,7 +258,7 @@ func (Dev) InitStack() error {
 	); err != nil {
 		return err
 	}
-	if err := json.Unmarshal(jsonVal, &key); err != nil {
+	if err := jsonpb.TTN().Unmarshal(jsonVal, &key); err != nil {
 		return err
 	}
 	if err := writeToFile(filepath.Join(devDir, "admin_api_key.txt"), []byte(key.Key)); err != nil {

@@ -48,7 +48,7 @@ func (x *OAuthClientAuthorization) MarshalProtoJSON(s *jsonplugin.MarshalState) 
 		if x.CreatedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.CreatedAt)
+			gogo.MarshalTimestamp(s, x.CreatedAt)
 		}
 	}
 	if x.UpdatedAt != nil || s.HasField("updated_at") {
@@ -57,7 +57,7 @@ func (x *OAuthClientAuthorization) MarshalProtoJSON(s *jsonplugin.MarshalState) 
 		if x.UpdatedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.UpdatedAt)
+			gogo.MarshalTimestamp(s, x.UpdatedAt)
 		}
 	}
 	s.WriteObjectEnd()
@@ -93,14 +93,14 @@ func (x *OAuthClientAuthorization) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSta
 			})
 		case "created_at", "createdAt":
 			s.AddField("created_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
 			x.CreatedAt = v
 		case "updated_at", "updatedAt":
 			s.AddField("updated_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -215,7 +215,7 @@ func (x *OAuthAuthorizationCode) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.CreatedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.CreatedAt)
+			gogo.MarshalTimestamp(s, x.CreatedAt)
 		}
 	}
 	if x.ExpiresAt != nil || s.HasField("expires_at") {
@@ -224,7 +224,7 @@ func (x *OAuthAuthorizationCode) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ExpiresAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.ExpiresAt)
+			gogo.MarshalTimestamp(s, x.ExpiresAt)
 		}
 	}
 	s.WriteObjectEnd()
@@ -272,14 +272,14 @@ func (x *OAuthAuthorizationCode) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 			x.State = s.ReadString()
 		case "created_at", "createdAt":
 			s.AddField("created_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
 			x.CreatedAt = v
 		case "expires_at", "expiresAt":
 			s.AddField("expires_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -345,7 +345,7 @@ func (x *OAuthAccessToken) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.CreatedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.CreatedAt)
+			gogo.MarshalTimestamp(s, x.CreatedAt)
 		}
 	}
 	if x.ExpiresAt != nil || s.HasField("expires_at") {
@@ -354,7 +354,7 @@ func (x *OAuthAccessToken) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ExpiresAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.ExpiresAt)
+			gogo.MarshalTimestamp(s, x.ExpiresAt)
 		}
 	}
 	s.WriteObjectEnd()
@@ -402,14 +402,14 @@ func (x *OAuthAccessToken) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			})
 		case "created_at", "createdAt":
 			s.AddField("created_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
 			x.CreatedAt = v
 		case "expires_at", "expiresAt":
 			s.AddField("expires_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}

@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	time "time"
-)
+import fmt "fmt"
 
 func (dst *UplinkMessage) SetFields(src *UplinkMessage, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -47,10 +44,18 @@ func (dst *UplinkMessage) SetFields(src *UplinkMessage, paths ...string) error {
 		case "settings":
 			if len(subs) > 0 {
 				var newDst, newSrc *TxSettings
-				if src != nil {
-					newSrc = &src.Settings
+				if (src == nil || src.Settings == nil) && dst.Settings == nil {
+					continue
 				}
-				newDst = &dst.Settings
+				if src != nil {
+					newSrc = src.Settings
+				}
+				if dst.Settings != nil {
+					newDst = dst.Settings
+				} else {
+					newDst = &TxSettings{}
+					dst.Settings = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -58,8 +63,7 @@ func (dst *UplinkMessage) SetFields(src *UplinkMessage, paths ...string) error {
 				if src != nil {
 					dst.Settings = src.Settings
 				} else {
-					var zero TxSettings
-					dst.Settings = zero
+					dst.Settings = nil
 				}
 			}
 		case "rx_metadata":
@@ -78,8 +82,7 @@ func (dst *UplinkMessage) SetFields(src *UplinkMessage, paths ...string) error {
 			if src != nil {
 				dst.ReceivedAt = src.ReceivedAt
 			} else {
-				var zero time.Time
-				dst.ReceivedAt = zero
+				dst.ReceivedAt = nil
 			}
 		case "correlation_ids":
 			if len(subs) > 0 {
@@ -414,26 +417,26 @@ func (dst *GatewayUplinkMessage) SetFields(src *GatewayUplinkMessage, paths ...s
 		case "message":
 			if len(subs) > 0 {
 				var newDst, newSrc *UplinkMessage
-				if (src == nil || src.UplinkMessage == nil) && dst.UplinkMessage == nil {
+				if (src == nil || src.Message == nil) && dst.Message == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.UplinkMessage
+					newSrc = src.Message
 				}
-				if dst.UplinkMessage != nil {
-					newDst = dst.UplinkMessage
+				if dst.Message != nil {
+					newDst = dst.Message
 				} else {
 					newDst = &UplinkMessage{}
-					dst.UplinkMessage = newDst
+					dst.Message = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.UplinkMessage = src.UplinkMessage
+					dst.Message = src.Message
 				} else {
-					dst.UplinkMessage = nil
+					dst.Message = nil
 				}
 			}
 		case "band_id":
@@ -525,10 +528,18 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 		case "settings":
 			if len(subs) > 0 {
 				var newDst, newSrc *TxSettings
-				if src != nil {
-					newSrc = &src.Settings
+				if (src == nil || src.Settings == nil) && dst.Settings == nil {
+					continue
 				}
-				newDst = &dst.Settings
+				if src != nil {
+					newSrc = src.Settings
+				}
+				if dst.Settings != nil {
+					newDst = dst.Settings
+				} else {
+					newDst = &TxSettings{}
+					dst.Settings = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -536,8 +547,7 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 				if src != nil {
 					dst.Settings = src.Settings
 				} else {
-					var zero TxSettings
-					dst.Settings = zero
+					dst.Settings = nil
 				}
 			}
 		case "received_at":
@@ -547,8 +557,7 @@ func (dst *ApplicationUplink) SetFields(src *ApplicationUplink, paths ...string)
 			if src != nil {
 				dst.ReceivedAt = src.ReceivedAt
 			} else {
-				var zero time.Time
-				dst.ReceivedAt = zero
+				dst.ReceivedAt = nil
 			}
 		case "app_s_key":
 			if len(subs) > 0 {
@@ -687,10 +696,18 @@ func (dst *ApplicationLocation) SetFields(src *ApplicationLocation, paths ...str
 		case "location":
 			if len(subs) > 0 {
 				var newDst, newSrc *Location
-				if src != nil {
-					newSrc = &src.Location
+				if (src == nil || src.Location == nil) && dst.Location == nil {
+					continue
 				}
-				newDst = &dst.Location
+				if src != nil {
+					newSrc = src.Location
+				}
+				if dst.Location != nil {
+					newDst = dst.Location
+				} else {
+					newDst = &Location{}
+					dst.Location = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -698,8 +715,7 @@ func (dst *ApplicationLocation) SetFields(src *ApplicationLocation, paths ...str
 				if src != nil {
 					dst.Location = src.Location
 				} else {
-					var zero Location
-					dst.Location = zero
+					dst.Location = nil
 				}
 			}
 		case "attributes":
@@ -782,8 +798,7 @@ func (dst *ApplicationJoinAccept) SetFields(src *ApplicationJoinAccept, paths ..
 			if src != nil {
 				dst.ReceivedAt = src.ReceivedAt
 			} else {
-				var zero time.Time
-				dst.ReceivedAt = zero
+				dst.ReceivedAt = nil
 			}
 
 		default:
@@ -940,28 +955,43 @@ func (dst *ApplicationDownlinkFailed) SetFields(src *ApplicationDownlinkFailed, 
 		case "downlink":
 			if len(subs) > 0 {
 				var newDst, newSrc *ApplicationDownlink
-				if src != nil {
-					newSrc = &src.ApplicationDownlink
+				if (src == nil || src.Downlink == nil) && dst.Downlink == nil {
+					continue
 				}
-				newDst = &dst.ApplicationDownlink
+				if src != nil {
+					newSrc = src.Downlink
+				}
+				if dst.Downlink != nil {
+					newDst = dst.Downlink
+				} else {
+					newDst = &ApplicationDownlink{}
+					dst.Downlink = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.ApplicationDownlink = src.ApplicationDownlink
+					dst.Downlink = src.Downlink
 				} else {
-					var zero ApplicationDownlink
-					dst.ApplicationDownlink = zero
+					dst.Downlink = nil
 				}
 			}
 		case "error":
 			if len(subs) > 0 {
 				var newDst, newSrc *ErrorDetails
-				if src != nil {
-					newSrc = &src.Error
+				if (src == nil || src.Error == nil) && dst.Error == nil {
+					continue
 				}
-				newDst = &dst.Error
+				if src != nil {
+					newSrc = src.Error
+				}
+				if dst.Error != nil {
+					newDst = dst.Error
+				} else {
+					newDst = &ErrorDetails{}
+					dst.Error = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -969,8 +999,7 @@ func (dst *ApplicationDownlinkFailed) SetFields(src *ApplicationDownlinkFailed, 
 				if src != nil {
 					dst.Error = src.Error
 				} else {
-					var zero ErrorDetails
-					dst.Error = zero
+					dst.Error = nil
 				}
 			}
 
@@ -1123,19 +1152,26 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 		case "end_device_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDeviceIdentifiers
-				if src != nil {
-					newSrc = &src.EndDeviceIdentifiers
+				if (src == nil || src.EndDeviceIds == nil) && dst.EndDeviceIds == nil {
+					continue
 				}
-				newDst = &dst.EndDeviceIdentifiers
+				if src != nil {
+					newSrc = src.EndDeviceIds
+				}
+				if dst.EndDeviceIds != nil {
+					newDst = dst.EndDeviceIds
+				} else {
+					newDst = &EndDeviceIdentifiers{}
+					dst.EndDeviceIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
+					dst.EndDeviceIds = src.EndDeviceIds
 				} else {
-					var zero EndDeviceIdentifiers
-					dst.EndDeviceIdentifiers = zero
+					dst.EndDeviceIds = nil
 				}
 			}
 		case "correlation_ids":
@@ -1582,19 +1618,26 @@ func (dst *DownlinkQueueRequest) SetFields(src *DownlinkQueueRequest, paths ...s
 		case "end_device_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDeviceIdentifiers
-				if src != nil {
-					newSrc = &src.EndDeviceIdentifiers
+				if (src == nil || src.EndDeviceIds == nil) && dst.EndDeviceIds == nil {
+					continue
 				}
-				newDst = &dst.EndDeviceIdentifiers
+				if src != nil {
+					newSrc = src.EndDeviceIds
+				}
+				if dst.EndDeviceIds != nil {
+					newDst = dst.EndDeviceIds
+				} else {
+					newDst = &EndDeviceIdentifiers{}
+					dst.EndDeviceIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
+					dst.EndDeviceIds = src.EndDeviceIds
 				} else {
-					var zero EndDeviceIdentifiers
-					dst.EndDeviceIdentifiers = zero
+					dst.EndDeviceIds = nil
 				}
 			}
 		case "downlinks":

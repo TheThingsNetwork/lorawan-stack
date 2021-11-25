@@ -255,7 +255,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			dev.PendingMacState.CurrentParameters.Channels = chs
 
 			dev.MacState = dev.PendingMacState
-			dev.PendingSession.StartedAt = up.ReceivedAt
+			dev.PendingSession.StartedAt = *up.ReceivedAt
 
 			matchType = pendingMatch
 		}
@@ -294,7 +294,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 				}
 
 				dev.MacState = macState
-				dev.Session.StartedAt = up.ReceivedAt
+				dev.Session.StartedAt = *up.ReceivedAt
 
 				matchType = currentResetMatch
 
@@ -348,7 +348,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 					}
 					nbTrans++
 					if recentUp.ReceivedAt.After(lastAt) {
-						lastAt = recentUp.ReceivedAt
+						lastAt = *recentUp.ReceivedAt
 					}
 				}
 				if nbTrans < 2 || lastAt.IsZero() {
@@ -521,7 +521,7 @@ macLoop:
 		case ttnpb.CID_RX_PARAM_SETUP:
 			evs, err = mac.HandleRxParamSetupAns(ctx, dev, cmd.GetRxParamSetupAns())
 		case ttnpb.CID_DEV_STATUS:
-			evs, err = mac.HandleDevStatusAns(ctx, dev, cmd.GetDevStatusAns(), cmacFMatchResult.FullFCnt, up.ReceivedAt)
+			evs, err = mac.HandleDevStatusAns(ctx, dev, cmd.GetDevStatusAns(), cmacFMatchResult.FullFCnt, *up.ReceivedAt)
 			if err == nil {
 				setPaths = append(setPaths,
 					"battery_percentage",
@@ -636,7 +636,7 @@ macLoop:
 		if pld.Ack {
 			queuedApplicationUplinks = []*ttnpb.ApplicationUp{
 				{
-					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+					EndDeviceIds: &dev.EndDeviceIdentifiers,
 					Up: &ttnpb.ApplicationUp_DownlinkAck{
 						DownlinkAck: pendingAppDown,
 					},
@@ -646,7 +646,7 @@ macLoop:
 		} else {
 			queuedApplicationUplinks = []*ttnpb.ApplicationUp{
 				{
-					EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+					EndDeviceIds: &dev.EndDeviceIdentifiers,
 					Up: &ttnpb.ApplicationUp_DownlinkNack{
 						DownlinkNack: pendingAppDown,
 					},
@@ -953,8 +953,8 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			frmPayload = pld.FrmPayload
 		}
 		queuedApplicationUplinks = append(queuedApplicationUplinks, &ttnpb.ApplicationUp{
-			EndDeviceIdentifiers: stored.EndDeviceIdentifiers,
-			CorrelationIds:       up.CorrelationIds,
+			EndDeviceIds:   &stored.EndDeviceIdentifiers,
+			CorrelationIds: up.CorrelationIds,
 			Up: &ttnpb.ApplicationUp_UplinkMessage{
 				UplinkMessage: &ttnpb.ApplicationUplink{
 					Confirmed:       up.Payload.MType == ttnpb.MType_CONFIRMED_UP,
@@ -1244,8 +1244,8 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	up.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 
 	registerUplinkLatency(ctx, up)
-
-	up.ReceivedAt = time.Now().UTC()
+	now := time.Now().UTC()
+	up.ReceivedAt = &now
 
 	up.Payload = &ttnpb.Message{}
 	if err := lorawan.UnmarshalMessage(up.RawPayload, up.Payload); err != nil {
@@ -1285,7 +1285,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	}
 	ctx = log.NewContext(ctx, logger)
 
-	if t, err := toa.Compute(len(up.RawPayload), up.Settings); err != nil {
+	if t, err := toa.Compute(len(up.RawPayload), *up.Settings); err != nil {
 		log.FromContext(ctx).WithError(err).Debug("Failed to compute time-on-air")
 	} else {
 		up.ConsumedAirtime = &t
@@ -1328,7 +1328,7 @@ func (ns *NetworkServer) ReportTxAcknowledgment(ctx context.Context, up *ttnpb.G
 		return ttnpb.Empty, nil
 	}
 	ns.enqueueApplicationUplinks(ctx, &ttnpb.ApplicationUp{
-		EndDeviceIdentifiers: *ids,
+		EndDeviceIds: ids,
 		Up: &ttnpb.ApplicationUp_DownlinkSent{
 			DownlinkSent: &ttnpb.ApplicationDownlink{
 				SessionKeyId:   down.GetSessionKeyId(),

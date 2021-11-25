@@ -65,7 +65,7 @@ func (s *server) FillContext(ctx context.Context) context.Context {
 func (s *server) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
 	s.subscriptionsMu.RLock()
 	defer s.subscriptionsMu.RUnlock()
-	for _, sub := range s.appSubs[unique.ID(ctx, up.ApplicationIdentifiers)] {
+	for _, sub := range s.appSubs[unique.ID(ctx, up.EndDeviceIds.ApplicationIdentifiers)] {
 		if err := sub.Publish(ctx, up); err != nil {
 			return err
 		}

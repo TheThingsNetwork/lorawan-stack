@@ -71,11 +71,11 @@ func (ns *NetworkServer) sendApplicationUplinks(ctx context.Context, cl ttnpb.Ns
 		switch pld := up.Up.(type) {
 		case *ttnpb.ApplicationUp_UplinkMessage:
 			registerForwardDataUplink(ctx, pld.UplinkMessage)
-			events.Publish(evtForwardDataUplink.NewWithIdentifiersAndData(ctx, &up.EndDeviceIdentifiers, up))
+			events.Publish(evtForwardDataUplink.NewWithIdentifiersAndData(ctx, up.EndDeviceIds, up))
 		case *ttnpb.ApplicationUp_JoinAccept:
-			events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, &up.EndDeviceIdentifiers, &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: up.EndDeviceIdentifiers,
-				CorrelationIds:       up.CorrelationIds,
+			events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, up.EndDeviceIds, &ttnpb.ApplicationUp{
+				EndDeviceIds:   up.EndDeviceIds,
+				CorrelationIds: up.CorrelationIds,
 				Up: &ttnpb.ApplicationUp_JoinAccept{
 					JoinAccept: applicationJoinAcceptWithoutAppSKey(pld.JoinAccept),
 				},
@@ -275,7 +275,7 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 		return nil, err
 	}
 
-	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, req.EndDeviceIdentifiers))
+	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, req.EndDeviceIds))
 
 	gets := []string{
 		"mac_state",
@@ -294,7 +294,7 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 	}
 
 	log.FromContext(ctx).WithField("downlink_count", len(req.Downlinks)).Debug("Replace downlink queue")
-	dev, ctx, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceId, gets,
+	dev, ctx, err := ns.devices.SetByID(ctx, req.EndDeviceIds.ApplicationIdentifiers, req.EndDeviceIds.DeviceId, gets,
 		func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
 				return nil, nil, errDeviceNotFound.New()
@@ -346,10 +346,10 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 		return nil, err
 	}
 
-	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, req.EndDeviceIdentifiers))
+	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, req.EndDeviceIds))
 
 	log.FromContext(ctx).WithField("downlink_count", len(req.Downlinks)).Debug("Push application downlink to queue")
-	dev, ctx, err := ns.devices.SetByID(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, req.EndDeviceIdentifiers.DeviceId,
+	dev, ctx, err := ns.devices.SetByID(ctx, req.EndDeviceIds.ApplicationIdentifiers, req.EndDeviceIds.DeviceId,
 		[]string{
 			"frequency_plan_id",
 			"last_dev_status_received_at",

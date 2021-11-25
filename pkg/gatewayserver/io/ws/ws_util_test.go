@@ -17,11 +17,14 @@ package ws_test
 import (
 	"context"
 	"fmt"
+	"math"
 	"net"
 	"net/http"
+	"sync"
 	"testing"
 	"time"
 
+	"github.com/gorilla/websocket"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
@@ -69,16 +72,58 @@ func withServer(t *testing.T, wsConfig ws.Config, rateLimitConf config.RateLimit
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
 
-	bsWebServer := ws.New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), wsConfig)
+	web, err := ws.New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), wsConfig)
+	if err != nil {
+		t.FailNow()
+	}
 	lis, err := net.Listen("tcp", serverAddress)
 	if err != nil {
 		t.FailNow()
 	}
 	defer lis.Close()
 	go func() error {
-		return http.Serve(lis, bsWebServer)
+		return http.Serve(lis, web)
 	}()
 	servAddr := fmt.Sprintf("ws://%s", lis.Addr().String())
 
 	f(t, is, servAddr)
+}
+
+// PingPongHandler handles WS Ping Pong.
+type PingPongHandler struct {
+	errCh         chan error
+	wsConn        *websocket.Conn
+	wsConnMu      sync.RWMutex
+	disablePong   bool
+	numberOfPongs int
+}
+
+// New returns a new PingPongHandler.
+func NewPingPongHandler(wsConn *websocket.Conn, disablePong bool, numberOfPongs int) *PingPongHandler {
+	if !disablePong && numberOfPongs == 0 {
+		numberOfPongs = math.MaxInt // allow unlimited
+	}
+	return &PingPongHandler{
+		wsConn:        wsConn,
+		errCh:         make(chan error),
+		disablePong:   disablePong,
+		numberOfPongs: numberOfPongs,
+	}
+}
+
+func (h *PingPongHandler) HandlePing(data string) error {
+	if h.disablePong || h.numberOfPongs == 0 {
+		return nil
+	}
+	h.wsConnMu.Lock()
+	defer h.wsConnMu.Unlock()
+	if err := h.wsConn.WriteMessage(websocket.PongMessage, nil); err != nil {
+		h.errCh <- err
+	}
+	h.numberOfPongs--
+	return nil
+}
+
+func (h *PingPongHandler) ErrCh() <-chan error {
+	return h.errCh
 }

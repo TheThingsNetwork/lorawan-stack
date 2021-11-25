@@ -175,7 +175,7 @@ func v2Metadata(rx RxPacket, gatewayID ttnpb.GatewayIdentifiers) []*ttnpb.RxMeta
 
 func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error) {
 	up := ttnpb.UplinkMessage{
-		Settings: ttnpb.TxSettings{
+		Settings: &ttnpb.TxSettings{
 			Frequency: uint64(rx.Freq * 1000000),
 			DataRate:  rx.DatR.DataRate,
 		},
@@ -273,11 +273,9 @@ func convertStatus(stat Stat, md UpstreamMetadata) *ttnpb.GatewayStatus {
 		}
 	}
 
-	currentTime := time.Time(stat.Time)
-	status.Time = &currentTime
+	status.Time = ttnpb.ProtoTimePtr(time.Time(stat.Time))
 	if stat.Boot != nil {
-		bootTime := time.Time(*stat.Boot)
-		status.BootTime = &bootTime
+		status.BootTime = ttnpb.ProtoTimePtr(time.Time(*stat.Boot))
 	}
 
 	addVersions(status, stat)
@@ -329,8 +327,8 @@ func FromGatewayUp(up *ttnpb.GatewayUp) (rxs []*RxPacket, stat *Stat, ack *TxPac
 	if up.GatewayStatus != nil {
 		// TODO: Handle multiple antenna locations (https://github.com/TheThingsNetwork/lorawan-stack/issues/2006).
 		var time time.Time
-		if up.GatewayStatus.Time != nil {
-			time = *up.GatewayStatus.Time
+		if sTime := ttnpb.StdTime(up.GatewayStatus.Time); sTime != nil {
+			time = *sTime
 		}
 		stat = &Stat{
 			Time: ExpandedTime(time),

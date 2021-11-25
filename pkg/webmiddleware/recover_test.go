@@ -15,7 +15,7 @@
 package webmiddleware
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -38,6 +38,6 @@ func TestRecover(t *testing.T) {
 
 	a.So(res.StatusCode, should.Equal, http.StatusInternalServerError)
 
-	body, _ := ioutil.ReadAll(res.Body)
+	body, _ := io.ReadAll(res.Body)
 	a.So(string(body), should.ContainSubstring, "http_recovered")
 }

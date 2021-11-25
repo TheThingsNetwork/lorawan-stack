@@ -50,7 +50,11 @@ class GatewayConnection extends React.PureComponent {
     error: PropTypes.oneOfType([PropTypes.error, PropTypes.shape({ message: PropTypes.message })]),
     fetching: PropTypes.bool,
     isOtherCluster: PropTypes.bool.isRequired,
-    lastSeen: PropTypes.instanceOf(Date),
+    lastSeen: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number, // Support timestamps.
+      PropTypes.instanceOf(Date),
+    ]),
     startStatistics: PropTypes.func.isRequired,
     statistics: PropTypes.gatewayStats,
     stopStatistics: PropTypes.func.isRequired,

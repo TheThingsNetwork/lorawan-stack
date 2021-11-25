@@ -39,9 +39,9 @@ func init() {
 func (t LoginToken) toPB() *ttnpb.LoginToken {
 	pb := &ttnpb.LoginToken{
 		Token:     t.Token,
-		CreatedAt: cleanTimePtr(&t.CreatedAt),
-		UpdatedAt: cleanTimePtr(&t.UpdatedAt),
-		ExpiresAt: cleanTimePtr(t.ExpiresAt),
+		CreatedAt: ttnpb.ProtoTimePtr(cleanTime(t.CreatedAt)),
+		UpdatedAt: ttnpb.ProtoTimePtr(cleanTime(t.UpdatedAt)),
+		ExpiresAt: ttnpb.ProtoTime(cleanTimePtr(t.ExpiresAt)),
 	}
 	if t.User != nil {
 		pb.UserIds = &ttnpb.UserIdentifiers{UserId: t.User.Account.UID}

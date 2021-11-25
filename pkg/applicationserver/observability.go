@@ -238,9 +238,9 @@ func registerReceiveUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 	}
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
-		events.Publish(evtReceiveJoinAccept.NewWithIdentifiersAndData(ctx, &msg.EndDeviceIdentifiers, nil))
+		events.Publish(evtReceiveJoinAccept.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, nil))
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		events.Publish(evtReceiveDataUp.NewWithIdentifiersAndData(ctx, &msg.EndDeviceIdentifiers, nil))
+		events.Publish(evtReceiveDataUp.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, nil))
 	default:
 		return
 	}
@@ -250,25 +250,25 @@ func registerReceiveUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 func registerForwardUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
-		events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, &msg.EndDeviceIdentifiers, msg))
+		events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, msg))
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		events.Publish(evtForwardDataUp.NewWithIdentifiersAndData(ctx, &msg.EndDeviceIdentifiers, msg))
+		events.Publish(evtForwardDataUp.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, msg))
 	case *ttnpb.ApplicationUp_LocationSolved:
-		events.Publish(evtForwardLocationSolved.NewWithIdentifiersAndData(ctx, &msg.EndDeviceIdentifiers, msg))
+		events.Publish(evtForwardLocationSolved.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, msg))
 	case *ttnpb.ApplicationUp_ServiceData:
-		events.Publish(evtForwardServiceData.NewWithIdentifiersAndData(ctx, &msg.EndDeviceIdentifiers, msg))
+		events.Publish(evtForwardServiceData.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, msg))
 	default:
 		return
 	}
-	asMetrics.uplinkForwarded.WithLabelValues(ctx, msg.ApplicationId).Inc()
+	asMetrics.uplinkForwarded.WithLabelValues(ctx, msg.EndDeviceIds.ApplicationId).Inc()
 }
 
 func registerDropUp(ctx context.Context, msg *ttnpb.ApplicationUp, err error) {
 	switch msg.Up.(type) {
 	case *ttnpb.ApplicationUp_JoinAccept:
-		events.Publish(evtDropJoinAccept.NewWithIdentifiersAndData(ctx, &msg.EndDeviceIdentifiers, err))
+		events.Publish(evtDropJoinAccept.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, err))
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		events.Publish(evtDropDataUp.NewWithIdentifiersAndData(ctx, &msg.EndDeviceIdentifiers, err))
+		events.Publish(evtDropDataUp.NewWithIdentifiersAndData(ctx, msg.EndDeviceIds, err))
 	default:
 		return
 	}
@@ -280,7 +280,7 @@ func registerDropUp(ctx context.Context, msg *ttnpb.ApplicationUp, err error) {
 }
 
 func registerUplinkLatency(ctx context.Context, msg *ttnpb.ApplicationUplink) {
-	asMetrics.nsAsUplinkLatency.WithLabelValues(ctx).Observe(time.Since(msg.ReceivedAt).Seconds())
+	asMetrics.nsAsUplinkLatency.WithLabelValues(ctx).Observe(time.Since(*msg.ReceivedAt).Seconds())
 	for _, meta := range msg.RxMetadata {
 		if meta.Time != nil && !meta.Time.IsZero() {
 			asMetrics.gtwAsUplinkLatency.WithLabelValues(ctx).Observe(time.Since(*meta.Time).Seconds())
@@ -320,12 +320,12 @@ func (as *ApplicationServer) registerDropDownlinks(ctx context.Context, ids ttnp
 	}
 	for _, item := range items {
 		if err := as.publishUp(ctx, &ttnpb.ApplicationUp{
-			EndDeviceIdentifiers: ids,
-			CorrelationIds:       item.CorrelationIds,
+			EndDeviceIds:   &ids,
+			CorrelationIds: item.CorrelationIds,
 			Up: &ttnpb.ApplicationUp_DownlinkFailed{
 				DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-					ApplicationDownlink: *item,
-					Error:               errorDetails,
+					Downlink: item,
+					Error:    &errorDetails,
 				},
 			},
 		}); err != nil {
@@ -338,8 +338,8 @@ func (as *ApplicationServer) registerDropDownlinks(ctx context.Context, ids ttnp
 func (as *ApplicationServer) registerForwardDownlinks(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, peerName string) {
 	for _, item := range items {
 		if err := as.publishUp(ctx, &ttnpb.ApplicationUp{
-			EndDeviceIdentifiers: ids,
-			CorrelationIds:       item.CorrelationIds,
+			EndDeviceIds:   &ids,
+			CorrelationIds: item.CorrelationIds,
 			Up: &ttnpb.ApplicationUp_DownlinkQueued{
 				DownlinkQueued: item,
 			},

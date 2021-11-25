@@ -18,13 +18,11 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	stdio "io"
 	"net/http"
 	"net/url"
 	"strings"
 	"sync"
-
-	stdio "io"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/mux"
@@ -229,7 +227,7 @@ func (w *webhooks) createDomain(ctx context.Context) string {
 
 func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
 	ctx = log.NewContextWithField(ctx, "namespace", namespace)
-	hooks, err := w.registry.List(ctx, &msg.ApplicationIdentifiers,
+	hooks, err := w.registry.List(ctx, &msg.EndDeviceIds.ApplicationIdentifiers,
 		[]string{
 			"base_url",
 			"downlink_ack",
@@ -250,7 +248,7 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 	if err != nil {
 		return err
 	}
-	ctx = withDeviceID(ctx, msg.EndDeviceIdentifiers)
+	ctx = withDeviceID(ctx, *msg.EndDeviceIds)
 	wg := sync.WaitGroup{}
 	for i := range hooks {
 		hook := hooks[i]
@@ -346,8 +344,8 @@ func (w *webhooks) newRequest(ctx context.Context, msg *ttnpb.ApplicationUp, hoo
 	}
 	if hook.DownlinkApiKey != "" {
 		req.Header.Set(downlinkKeyHeader, hook.DownlinkApiKey)
-		req.Header.Set(downlinkPushHeader, w.createDownlinkURL(ctx, hook.Ids, msg.EndDeviceIdentifiers, "push"))
-		req.Header.Set(downlinkReplaceHeader, w.createDownlinkURL(ctx, hook.Ids, msg.EndDeviceIdentifiers, "replace"))
+		req.Header.Set(downlinkPushHeader, w.createDownlinkURL(ctx, hook.Ids, *msg.EndDeviceIds, "push"))
+		req.Header.Set(downlinkReplaceHeader, w.createDownlinkURL(ctx, hook.Ids, *msg.EndDeviceIds, "replace"))
 	}
 	if domain := w.createDomain(ctx); domain != "" {
 		req.Header.Set(domainHeader, domain)
@@ -387,7 +385,7 @@ func (w *webhooks) handleDown(op func(io.Server, context.Context, ttnpb.EndDevic
 			webhandlers.Error(res, req, errFormatNotFound.WithAttributes("format", hook.Format))
 			return
 		}
-		body, err := ioutil.ReadAll(req.Body)
+		body, err := stdio.ReadAll(req.Body)
 		if err != nil {
 			webhandlers.Error(res, req, errReadBody.WithCause(err))
 			return
@@ -409,26 +407,26 @@ func (w *webhooks) handleDown(op func(io.Server, context.Context, ttnpb.EndDevic
 
 func expandVariables(u string, up *ttnpb.ApplicationUp) (*url.URL, error) {
 	var joinEUI, devEUI, devAddr string
-	if up.JoinEui != nil {
-		joinEUI = up.JoinEui.String()
+	if up.EndDeviceIds.JoinEui != nil {
+		joinEUI = up.EndDeviceIds.JoinEui.String()
 	}
-	if up.DevEui != nil {
-		devEUI = up.DevEui.String()
+	if up.EndDeviceIds.DevEui != nil {
+		devEUI = up.EndDeviceIds.DevEui.String()
 	}
-	if up.DevAddr != nil {
-		devAddr = up.DevAddr.String()
+	if up.EndDeviceIds.DevAddr != nil {
+		devAddr = up.EndDeviceIds.DevAddr.String()
 	}
 	tmpl, err := uritemplates.Parse(u)
 	if err != nil {
 		return nil, err
 	}
 	expanded, err := tmpl.Expand(map[string]interface{}{
-		"appID":         up.ApplicationId,
-		"applicationID": up.ApplicationId,
+		"appID":         up.EndDeviceIds.ApplicationId,
+		"applicationID": up.EndDeviceIds.ApplicationId,
 		"appEUI":        joinEUI,
 		"joinEUI":       joinEUI,
-		"devID":         up.DeviceId,
-		"deviceID":      up.DeviceId,
+		"devID":         up.EndDeviceIds.DeviceId,
+		"deviceID":      up.EndDeviceIds.DeviceId,
 		"devEUI":        devEUI,
 		"devAddr":       devAddr,
 	})

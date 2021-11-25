@@ -99,6 +99,40 @@ func (is IS) UpdateAntennas(ctx context.Context, ids ttnpb.GatewayIdentifiers, a
 	return err
 }
 
+// UpdateAttributes implements EntityRegistry.
+func (is IS) UpdateAttributes(ctx context.Context, ids ttnpb.GatewayIdentifiers, current, new map[string]string) error {
+	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, is.AllowInsecureForCredentials())
+	if err != nil {
+		return err
+	}
+
+	registry, err := is.newRegistryClient(ctx, &ids)
+	if err != nil {
+		return err
+	}
+
+	// Take the union of keys with new values overwriting existing entries.
+	merged := make(map[string]string)
+	for k, v := range current {
+		merged[k] = v
+	}
+	for k, v := range new {
+		merged[k] = v
+	}
+
+	req := &ttnpb.UpdateGatewayRequest{
+		Gateway: &ttnpb.Gateway{
+			Ids:        &ids,
+			Attributes: merged,
+		},
+		FieldMask: &pbtypes.FieldMask{
+			Paths: []string{"attributes"},
+		},
+	}
+	_, err = registry.Update(ctx, req, callOpt)
+	return err
+}
+
 // ValidateGatewayID implements EntityRegistry.
 func (is IS) ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
 	return ids.ValidateContext(ctx)

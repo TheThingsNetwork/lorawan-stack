@@ -86,7 +86,7 @@ func (is *IdentityServer) createApplicationAPIKey(ctx context.Context, req *ttnp
 	if err = rights.RequireApplication(ctx, *req.GetApplicationIds(), req.Rights...); err != nil {
 		return nil, err
 	}
-	key, token, err := GenerateAPIKey(ctx, req.Name, req.ExpiresAt, req.Rights...)
+	key, token, err := GenerateAPIKey(ctx, req.Name, ttnpb.StdTime(req.ExpiresAt), req.Rights...)
 	if err != nil {
 		return nil, err
 	}

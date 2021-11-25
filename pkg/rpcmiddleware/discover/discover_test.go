@@ -19,8 +19,8 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"net"
+	"os"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -186,7 +186,7 @@ func TestDialContext(t *testing.T) {
 			clientTLSConfig := &tls.Config{
 				RootCAs: x509.NewCertPool(),
 			}
-			serverCA := test.Must(ioutil.ReadFile("testdata/serverca.pem")).([]byte)
+			serverCA := test.Must(os.ReadFile("testdata/serverca.pem")).([]byte)
 			clientTLSConfig.RootCAs.AppendCertsFromPEM(serverCA)
 
 			var dialAddresses []string

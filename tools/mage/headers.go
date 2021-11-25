@@ -18,7 +18,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -108,7 +107,7 @@ func init() {
 }
 
 func (Headers) loadFile() error {
-	headerBytes, err := ioutil.ReadFile(headerFile)
+	headerBytes, err := os.ReadFile(headerFile)
 	if err != nil {
 		return err
 	}

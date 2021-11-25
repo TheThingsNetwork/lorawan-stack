@@ -51,7 +51,7 @@ func (x *Gateway) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.CreatedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.CreatedAt)
+			gogo.MarshalTimestamp(s, x.CreatedAt)
 		}
 	}
 	if x.UpdatedAt != nil || s.HasField("updated_at") {
@@ -60,7 +60,7 @@ func (x *Gateway) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.UpdatedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.UpdatedAt)
+			gogo.MarshalTimestamp(s, x.UpdatedAt)
 		}
 	}
 	if x.DeletedAt != nil || s.HasField("deleted_at") {
@@ -69,7 +69,7 @@ func (x *Gateway) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.DeletedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.DeletedAt)
+			gogo.MarshalTimestamp(s, x.DeletedAt)
 		}
 	}
 	if x.Name != "" || s.HasField("name") {
@@ -178,7 +178,7 @@ func (x *Gateway) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ScheduleAnytimeDelay == nil {
 			s.WriteNil()
 		} else {
-			s.WriteDuration(*x.ScheduleAnytimeDelay)
+			gogo.MarshalDuration(s, x.ScheduleAnytimeDelay)
 		}
 	}
 	if x.UpdateLocationFromStatus || s.HasField("update_location_from_status") {
@@ -245,21 +245,21 @@ func (x *Gateway) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Ids = &v
 		case "created_at", "createdAt":
 			s.AddField("created_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
 			x.CreatedAt = v
 		case "updated_at", "updatedAt":
 			s.AddField("updated_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
 			x.UpdatedAt = v
 		case "deleted_at", "deletedAt":
 			s.AddField("deleted_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -342,7 +342,7 @@ func (x *Gateway) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.DownlinkPathConstraint.UnmarshalProtoJSON(s)
 		case "schedule_anytime_delay", "scheduleAnytimeDelay":
 			s.AddField("schedule_anytime_delay")
-			v := s.ReadDuration()
+			v := gogo.UnmarshalDuration(s)
 			if s.Err() != nil {
 				return
 			}
@@ -568,7 +568,7 @@ func (x *CreateGatewayAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState
 		if x.ExpiresAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.ExpiresAt)
+			gogo.MarshalTimestamp(s, x.ExpiresAt)
 		}
 	}
 	s.WriteObjectEnd()
@@ -601,7 +601,7 @@ func (x *CreateGatewayAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalS
 			})
 		case "expires_at", "expiresAt":
 			s.AddField("expires_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -800,7 +800,7 @@ func (x *GatewayStatus) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.Time == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.Time)
+			gogo.MarshalTimestamp(s, x.Time)
 		}
 	}
 	if x.BootTime != nil || s.HasField("boot_time") {
@@ -809,7 +809,7 @@ func (x *GatewayStatus) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.BootTime == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.BootTime)
+			gogo.MarshalTimestamp(s, x.BootTime)
 		}
 	}
 	if x.Versions != nil || s.HasField("versions") {
@@ -875,14 +875,14 @@ func (x *GatewayStatus) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			s.ReadAny() // ignore unknown field
 		case "time":
 			s.AddField("time")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
 			x.Time = v
 		case "boot_time", "bootTime":
 			s.AddField("boot_time")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -941,7 +941,7 @@ func (x *GatewayConnectionStats) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ConnectedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.ConnectedAt)
+			gogo.MarshalTimestamp(s, x.ConnectedAt)
 		}
 	}
 	if x.Protocol != "" || s.HasField("protocol") {
@@ -955,7 +955,7 @@ func (x *GatewayConnectionStats) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.LastStatusReceivedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.LastStatusReceivedAt)
+			gogo.MarshalTimestamp(s, x.LastStatusReceivedAt)
 		}
 	}
 	if x.LastStatus != nil || s.HasField("last_status") {
@@ -969,7 +969,7 @@ func (x *GatewayConnectionStats) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.LastUplinkReceivedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.LastUplinkReceivedAt)
+			gogo.MarshalTimestamp(s, x.LastUplinkReceivedAt)
 		}
 	}
 	if x.UplinkCount != 0 || s.HasField("uplink_count") {
@@ -983,7 +983,7 @@ func (x *GatewayConnectionStats) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.LastDownlinkReceivedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.LastDownlinkReceivedAt)
+			gogo.MarshalTimestamp(s, x.LastDownlinkReceivedAt)
 		}
 	}
 	if x.DownlinkCount != 0 || s.HasField("downlink_count") {
@@ -1023,7 +1023,7 @@ func (x *GatewayConnectionStats) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 			s.ReadAny() // ignore unknown field
 		case "connected_at", "connectedAt":
 			s.AddField("connected_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -1033,7 +1033,7 @@ func (x *GatewayConnectionStats) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 			x.Protocol = s.ReadString()
 		case "last_status_received_at", "lastStatusReceivedAt":
 			s.AddField("last_status_received_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -1045,7 +1045,7 @@ func (x *GatewayConnectionStats) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 			}
 		case "last_uplink_received_at", "lastUplinkReceivedAt":
 			s.AddField("last_uplink_received_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -1055,7 +1055,7 @@ func (x *GatewayConnectionStats) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 			x.UplinkCount = s.ReadUint64()
 		case "last_downlink_received_at", "lastDownlinkReceivedAt":
 			s.AddField("last_downlink_received_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}

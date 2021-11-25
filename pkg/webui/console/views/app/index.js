@@ -33,6 +33,7 @@ import WithAuth from '@ttn-lw/lib/components/with-auth'
 import FullViewError, { FullViewErrorInner } from '@ttn-lw/lib/components/full-view-error'
 
 import Header from '@console/containers/header'
+import LogBackInModal from '@console/containers/log-back-in-modal'
 
 import Overview from '@console/views/overview'
 import Applications from '@console/views/applications'
@@ -44,6 +45,7 @@ import User from '@console/views/user'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import dev from '@ttn-lw/lib/dev'
 import { setStatusOnline } from '@ttn-lw/lib/store/actions/status'
+import { selectStatusStore } from '@ttn-lw/lib/store/selectors/status'
 
 import {
   selectUser,
@@ -66,6 +68,7 @@ const errorRender = error => <FullViewError error={error} header={<Header />} />
     error: selectUserError(state),
     rights: selectUserRights(state),
     isAdmin: selectUserIsAdmin(state),
+    status: selectStatusStore(state),
   }),
   {
     setStatusOnline,
@@ -84,6 +87,7 @@ class ConsoleApp extends React.PureComponent {
     isAdmin: PropTypes.bool,
     rights: PropTypes.rights,
     setStatusOnline: PropTypes.func.isRequired,
+    status: PropTypes.shape({ onlineStatus: PropTypes.string, isLoginRequired: PropTypes.bool }),
     user: PropTypes.user,
   }
   static defaultProps = {
@@ -91,6 +95,7 @@ class ConsoleApp extends React.PureComponent {
     error: undefined,
     isAdmin: undefined,
     rights: undefined,
+    status: {},
   }
 
   @bind
@@ -124,6 +129,7 @@ class ConsoleApp extends React.PureComponent {
         siteName,
         config: { supportLink, documentationBaseUrl },
       },
+      status,
     } = this.props
 
     if (pageData && pageData.error) {
@@ -136,6 +142,7 @@ class ConsoleApp extends React.PureComponent {
 
     return (
       <React.Fragment>
+        {status.isLoginRequired && <LogBackInModal />}
         <ToastContainer />
         <ConnectedRouter history={history}>
           <ScrollToTop />

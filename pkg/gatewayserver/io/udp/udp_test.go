@@ -306,7 +306,7 @@ func TestTraffic(t *testing.T) {
 					case up := <-conn.Up():
 						data, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(p.Data, "="))
 						a.So(err, should.BeNil)
-						a.So(up.RawPayload, should.Resemble, data)
+						a.So(up.Message.RawPayload, should.Resemble, data)
 					case <-time.After(timeout):
 						t.Fatal("Receive expected uplink timeout")
 					}

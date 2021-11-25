@@ -376,8 +376,8 @@ func TestGatewaysSecrets(t *testing.T) {
 		to := from.Add(5 * time.Minute)
 
 		gtwClaimAuthCode := ttnpb.GatewayClaimAuthenticationCode{
-			ValidFrom: &from,
-			ValidTo:   &to,
+			ValidFrom: ttnpb.ProtoTimePtr(from),
+			ValidTo:   ttnpb.ProtoTimePtr(to),
 			Secret: &ttnpb.Secret{
 				KeyId: "is-test",
 				Value: []byte("my claim auth code"),
@@ -385,8 +385,8 @@ func TestGatewaysSecrets(t *testing.T) {
 		}
 
 		otherGtwClaimAuthCode := ttnpb.GatewayClaimAuthenticationCode{
-			ValidFrom: &from,
-			ValidTo:   &to,
+			ValidFrom: ttnpb.ProtoTimePtr(from),
+			ValidTo:   ttnpb.ProtoTimePtr(to),
 			Secret: &ttnpb.Secret{
 				KeyId: "is-test",
 				Value: []byte("my other claim auth code"),
@@ -533,8 +533,8 @@ func TestGatewaysSecrets(t *testing.T) {
 			Gateway: &ttnpb.Gateway{
 				Ids: created.GetIds(),
 				ClaimAuthenticationCode: &ttnpb.GatewayClaimAuthenticationCode{
-					ValidFrom: &validFrom,
-					ValidTo:   &validTo,
+					ValidFrom: ttnpb.ProtoTimePtr(validFrom),
+					ValidTo:   ttnpb.ProtoTimePtr(validTo),
 				},
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"claim_authentication_code"}},
@@ -551,8 +551,8 @@ func TestGatewaysSecrets(t *testing.T) {
 					Secret: &ttnpb.Secret{
 						Value: []byte("test"),
 					},
-					ValidFrom: &validFrom,
-					ValidTo:   &validTo,
+					ValidFrom: ttnpb.ProtoTimePtr(validFrom),
+					ValidTo:   ttnpb.ProtoTimePtr(validTo),
 				},
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"claim_authentication_code"}},

@@ -18,7 +18,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"sync"
@@ -437,7 +437,7 @@ func TestApplicationServer(t *testing.T) {
 							chs.downErr <- err
 							continue
 						}
-						token := client.Publish(fmt.Sprintf(topicFmt, unique.ID(ctx, req.ApplicationIdentifiers), req.DeviceId), 1, false, buf)
+						token := client.Publish(fmt.Sprintf(topicFmt, unique.ID(ctx, req.EndDeviceIds.ApplicationIdentifiers), req.EndDeviceIds.DeviceId), 1, false, buf)
 						token.Wait()
 						chs.downErr <- token.Error()
 					}
@@ -759,7 +759,7 @@ func TestApplicationServer(t *testing.T) {
 			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				// Start web server to read upstream.
 				webhookTarget := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-					buf, err := ioutil.ReadAll(req.Body)
+					buf, err := io.ReadAll(req.Body)
 					if !a.So(err, should.BeNil) {
 						t.FailNow()
 					}
@@ -829,7 +829,7 @@ func TestApplicationServer(t *testing.T) {
 							continue
 						}
 						url := fmt.Sprintf("http://127.0.0.1:8099/api/v3/as/applications/%s/webhooks/%s/devices/%s/down/%s",
-							data.ApplicationId, registeredApplicationWebhookID.WebhookId, data.DeviceId, action,
+							data.EndDeviceIds.ApplicationId, registeredApplicationWebhookID.WebhookId, data.EndDeviceIds.DeviceId, action,
 						)
 						req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(buf))
 						if err != nil {
@@ -914,6 +914,8 @@ func TestApplicationServer(t *testing.T) {
 			// Wait for connection to establish.
 			time.Sleep(2 * Timeout)
 
+			now := time.Now().UTC()
+
 			t.Run("Upstream", func(t *testing.T) {
 				ns.reset()
 				devsFlush()
@@ -934,7 +936,7 @@ func TestApplicationServer(t *testing.T) {
 						Name: "RegisteredDevice/JoinAccept",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x11, 0x11, 0x11, 0x11}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x11, 0x11, 0x11, 0x11}),
 							Up: &ttnpb.ApplicationUp_JoinAccept{
 								JoinAccept: &ttnpb.ApplicationJoinAccept{
 									SessionKeyId: []byte{0x11},
@@ -944,7 +946,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
 							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x11, 0x11, 0x11, 0x11}),
+								EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x11, 0x11, 0x11, 0x11}),
 								Up: &ttnpb.ApplicationUp_JoinAccept{
 									JoinAccept: &ttnpb.ApplicationJoinAccept{
 										SessionKeyId: []byte{0x11},
@@ -975,7 +977,7 @@ func TestApplicationServer(t *testing.T) {
 						Name: "RegisteredDevice/JoinAccept/WithAppSKey",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 							Up: &ttnpb.ApplicationUp_JoinAccept{
 								JoinAccept: &ttnpb.ApplicationJoinAccept{
 									SessionKeyId: []byte{0x22},
@@ -990,7 +992,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
 							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
+								EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 								Up: &ttnpb.ApplicationUp_JoinAccept{
 									JoinAccept: &ttnpb.ApplicationJoinAccept{
 										SessionKeyId: []byte{0x22},
@@ -1021,26 +1023,27 @@ func TestApplicationServer(t *testing.T) {
 						Name: "RegisteredDevice/UplinkMessage/PendingSession",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
 									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-									Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+									Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyId: []byte{0x22},
 									FPort:        22,
 									FCnt:         22,
 									FrmPayload:   []byte{0x01},
+									ReceivedAt:   &now,
 								},
 							},
 						},
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
 							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
+								EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 								Up: &ttnpb.ApplicationUp_UplinkMessage{
 									UplinkMessage: &ttnpb.ApplicationUplink{
 										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-										Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+										Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 										SessionKeyId: []byte{0x22},
 										FPort:        22,
 										FCnt:         22,
@@ -1055,6 +1058,7 @@ func TestApplicationServer(t *testing.T) {
 											},
 										},
 										VersionIds: registeredDevice.VersionIds,
+										ReceivedAt: up.GetUplinkMessage().ReceivedAt,
 									},
 								},
 								CorrelationIds: up.CorrelationIds,
@@ -1080,7 +1084,7 @@ func TestApplicationServer(t *testing.T) {
 							},
 						},
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 							Up: &ttnpb.ApplicationUp_JoinAccept{
 								JoinAccept: &ttnpb.ApplicationJoinAccept{
 									SessionKeyId: []byte{0x33},
@@ -1109,7 +1113,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
 							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+								EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 								Up: &ttnpb.ApplicationUp_JoinAccept{
 									JoinAccept: &ttnpb.ApplicationJoinAccept{
 										SessionKeyId: []byte{0x33},
@@ -1181,26 +1185,27 @@ func TestApplicationServer(t *testing.T) {
 						Name: "RegisteredDevice/UplinkMessage/CurrentSession",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
 									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-									Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+									Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyId: []byte{0x33},
 									FPort:        42,
 									FCnt:         42,
 									FrmPayload:   []byte{0xca, 0xa9, 0x42},
+									ReceivedAt:   &now,
 								},
 							},
 						},
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
 							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+								EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 								Up: &ttnpb.ApplicationUp_UplinkMessage{
 									UplinkMessage: &ttnpb.ApplicationUplink{
 										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-										Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+										Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 										SessionKeyId: []byte{0x33},
 										FPort:        42,
 										FCnt:         42,
@@ -1215,6 +1220,7 @@ func TestApplicationServer(t *testing.T) {
 											},
 										},
 										VersionIds: registeredDevice.VersionIds,
+										ReceivedAt: up.GetUplinkMessage().ReceivedAt,
 									},
 								},
 								CorrelationIds: up.CorrelationIds,
@@ -1226,7 +1232,7 @@ func TestApplicationServer(t *testing.T) {
 						Name: "RegisteredDevice/DownlinkMessage/Queued",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 							Up: &ttnpb.ApplicationUp_DownlinkQueued{
 								DownlinkQueued: &ttnpb.ApplicationDownlink{
 									SessionKeyId: []byte{0x33},
@@ -1239,7 +1245,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
 							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+								EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 								Up: &ttnpb.ApplicationUp_DownlinkQueued{
 									DownlinkQueued: &ttnpb.ApplicationDownlink{
 										SessionKeyId: []byte{0x33},
@@ -1266,7 +1272,7 @@ func TestApplicationServer(t *testing.T) {
 						Name: "RegisteredDevice/DownlinkMessage/QueueInvalidated",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 							Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 								DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 									Downlinks: []*ttnpb.ApplicationDownlink{
@@ -1288,7 +1294,7 @@ func TestApplicationServer(t *testing.T) {
 						Name: "RegisteredDevice/DownlinkMessage/Sent",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 							Up: &ttnpb.ApplicationUp_DownlinkSent{
 								DownlinkSent: &ttnpb.ApplicationDownlink{
 									SessionKeyId: []byte{0x33},
@@ -1310,7 +1316,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
 							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+								EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 								Up: &ttnpb.ApplicationUp_DownlinkSent{
 									DownlinkSent: &ttnpb.ApplicationDownlink{
 										SessionKeyId: []byte{0x33},
@@ -1337,16 +1343,16 @@ func TestApplicationServer(t *testing.T) {
 						Name: "RegisteredDevice/DownlinkMessage/Failed",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 							Up: &ttnpb.ApplicationUp_DownlinkFailed{
 								DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-									ApplicationDownlink: ttnpb.ApplicationDownlink{
+									Downlink: &ttnpb.ApplicationDownlink{
 										SessionKeyId: []byte{0x33},
 										FPort:        42,
 										FCnt:         42,
 										FrmPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
 									},
-									Error: ttnpb.ErrorDetails{
+									Error: &ttnpb.ErrorDetails{
 										Name: "test",
 									},
 								},
@@ -1355,10 +1361,10 @@ func TestApplicationServer(t *testing.T) {
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
 							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+								EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 								Up: &ttnpb.ApplicationUp_DownlinkFailed{
 									DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
-										ApplicationDownlink: ttnpb.ApplicationDownlink{
+										Downlink: &ttnpb.ApplicationDownlink{
 											SessionKeyId: []byte{0x33},
 											FPort:        42,
 											FCnt:         42,
@@ -1373,7 +1379,7 @@ func TestApplicationServer(t *testing.T) {
 												},
 											},
 										},
-										Error: ttnpb.ErrorDetails{
+										Error: &ttnpb.ErrorDetails{
 											Name: "test",
 										},
 									},
@@ -1387,7 +1393,7 @@ func TestApplicationServer(t *testing.T) {
 						Name: "RegisteredDevice/DownlinkMessage/Ack",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 							Up: &ttnpb.ApplicationUp_DownlinkAck{
 								DownlinkAck: &ttnpb.ApplicationDownlink{
 									SessionKeyId: []byte{0x33},
@@ -1400,7 +1406,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
 							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+								EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 								Up: &ttnpb.ApplicationUp_DownlinkAck{
 									DownlinkAck: &ttnpb.ApplicationDownlink{
 										SessionKeyId: []byte{0x33},
@@ -1435,7 +1441,7 @@ func TestApplicationServer(t *testing.T) {
 							},
 						},
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 							Up: &ttnpb.ApplicationUp_DownlinkNack{
 								DownlinkNack: &ttnpb.ApplicationDownlink{
 									SessionKeyId: []byte{0x33},
@@ -1448,7 +1454,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
 							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
+								EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
 								Up: &ttnpb.ApplicationUp_DownlinkNack{
 									DownlinkNack: &ttnpb.ApplicationDownlink{
 										SessionKeyId: []byte{0x33},
@@ -1510,7 +1516,7 @@ func TestApplicationServer(t *testing.T) {
 						Name: "RegisteredDevice/JoinAccept/WithAppSKey/WithQueue/WithPendingSession",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
 							Up: &ttnpb.ApplicationUp_JoinAccept{
 								JoinAccept: &ttnpb.ApplicationJoinAccept{
 									SessionKeyId: []byte{0x44},
@@ -1540,7 +1546,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
 							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
+								EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
 								Up: &ttnpb.ApplicationUp_JoinAccept{
 									JoinAccept: &ttnpb.ApplicationJoinAccept{
 										SessionKeyId:   []byte{0x44},
@@ -1613,26 +1619,27 @@ func TestApplicationServer(t *testing.T) {
 						Name: "RegisteredDevice/UplinkMessage/PendingSession",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
 									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-									Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+									Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyId: []byte{0x44},
 									FPort:        24,
 									FCnt:         24,
 									FrmPayload:   []byte{0x14, 0x4e, 0x3c},
+									ReceivedAt:   &now,
 								},
 							},
 						},
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
 							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
+								EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
 								Up: &ttnpb.ApplicationUp_UplinkMessage{
 									UplinkMessage: &ttnpb.ApplicationUplink{
 										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-										Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+										Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 										SessionKeyId: []byte{0x44},
 										FPort:        24,
 										FCnt:         24,
@@ -1647,6 +1654,7 @@ func TestApplicationServer(t *testing.T) {
 											},
 										},
 										VersionIds: registeredDevice.VersionIds,
+										ReceivedAt: up.GetUplinkMessage().ReceivedAt,
 									},
 								},
 								CorrelationIds: up.CorrelationIds,
@@ -1706,7 +1714,7 @@ func TestApplicationServer(t *testing.T) {
 						IDs:        registeredDevice.EndDeviceIdentifiers,
 						ResetQueue: make([]*ttnpb.ApplicationDownlink, 0),
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
 							Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 								DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 									Downlinks: []*ttnpb.ApplicationDownlink{
@@ -1769,7 +1777,7 @@ func TestApplicationServer(t *testing.T) {
 						Name: "RegisteredDevice/DownlinkQueueInvalidated/KnownSession/NoDownlinks",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
 							Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 								DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 									Downlinks:    nil,
@@ -1789,7 +1797,7 @@ func TestApplicationServer(t *testing.T) {
 						Name: "RegisteredDevice/DownlinkQueueInvalidated/UnknownSession",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x44, 0x44, 0x44, 0x44}),
 							Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 								DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 									Downlinks: []*ttnpb.ApplicationDownlink{
@@ -1858,26 +1866,27 @@ func TestApplicationServer(t *testing.T) {
 						Name: "RegisteredDevice/UplinkMessage/KnownSession",
 						IDs:  registeredDevice.EndDeviceIdentifiers,
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
 									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-									Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+									Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyId: []byte{0x55},
 									FPort:        42,
 									FCnt:         42,
 									FrmPayload:   []byte{0xd1, 0x43, 0x6a},
+									ReceivedAt:   &now,
 								},
 							},
 						},
 						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
 							a := assertions.New(t)
 							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
+								EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
 								Up: &ttnpb.ApplicationUp_UplinkMessage{
 									UplinkMessage: &ttnpb.ApplicationUplink{
 										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-										Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+										Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 										SessionKeyId: []byte{0x55},
 										FPort:        42,
 										FCnt:         42,
@@ -1892,6 +1901,7 @@ func TestApplicationServer(t *testing.T) {
 											},
 										},
 										VersionIds: registeredDevice.VersionIds,
+										ReceivedAt: up.GetUplinkMessage().ReceivedAt,
 									},
 								},
 								CorrelationIds: up.CorrelationIds,
@@ -1920,7 +1930,7 @@ func TestApplicationServer(t *testing.T) {
 						IDs:           unregisteredDeviceID,
 						ExpectTimeout: true,
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(unregisteredDeviceID, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
+							EndDeviceIds: withDevAddr(unregisteredDeviceID, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
 							Up: &ttnpb.ApplicationUp_JoinAccept{
 								JoinAccept: &ttnpb.ApplicationJoinAccept{
 									SessionKeyId: []byte{0x55},
@@ -1938,15 +1948,16 @@ func TestApplicationServer(t *testing.T) {
 						IDs:           unregisteredDeviceID,
 						ExpectTimeout: true,
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(unregisteredDeviceID, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
+							EndDeviceIds: withDevAddr(unregisteredDeviceID, types.DevAddr{0x55, 0x55, 0x55, 0x55}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
 									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-									Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+									Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyId: []byte{0x55},
 									FPort:        11,
 									FCnt:         11,
 									FrmPayload:   []byte{0xaa, 0x64, 0xb7, 0x7},
+									ReceivedAt:   &now,
 								},
 							},
 						},
@@ -1955,8 +1966,8 @@ func TestApplicationServer(t *testing.T) {
 					tcok := t.Run(tc.Name, func(t *testing.T) {
 						if tc.ResetQueue != nil {
 							_, err := ns.DownlinkQueueReplace(ctx, &ttnpb.DownlinkQueueRequest{
-								EndDeviceIdentifiers: tc.IDs,
-								Downlinks:            tc.ResetQueue,
+								EndDeviceIds: &tc.IDs,
+								Downlinks:    tc.ResetQueue,
 							})
 							if err != nil {
 								t.Fatalf("Unexpected error when resetting queue: %v", err)
@@ -1980,7 +1991,7 @@ func TestApplicationServer(t *testing.T) {
 							}
 						}
 						if tc.AssertDevice != nil {
-							dev, err := deviceRegistry.Get(ctx, tc.Message.EndDeviceIdentifiers, []string{"session", "pending_session"})
+							dev, err := deviceRegistry.Get(ctx, *tc.Message.EndDeviceIds, []string{"session", "pending_session"})
 							if !a.So(err, should.BeNil) {
 								t.FailNow()
 							}
@@ -2017,7 +2028,7 @@ func TestApplicationServer(t *testing.T) {
 				t.Run("UnregisteredDevice/Push", func(t *testing.T) {
 					a := assertions.New(t)
 					chs.downPush <- &ttnpb.DownlinkQueueRequest{
-						EndDeviceIdentifiers: unregisteredDeviceID,
+						EndDeviceIds: &unregisteredDeviceID,
 						Downlinks: []*ttnpb.ApplicationDownlink{
 							{
 								FPort:      11,
@@ -2070,8 +2081,8 @@ func TestApplicationServer(t *testing.T) {
 						},
 					} {
 						chs.downPush <- &ttnpb.DownlinkQueueRequest{
-							EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-							Downlinks:            items,
+							EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
+							Downlinks:    items,
 						}
 						time.Sleep(Timeout)
 						select {
@@ -2148,7 +2159,7 @@ func TestApplicationServer(t *testing.T) {
 				t.Run("RegisteredDevice/Replace", func(t *testing.T) {
 					a := assertions.New(t)
 					chs.downReplace <- &ttnpb.DownlinkQueueRequest{
-						EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+						EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
 						Downlinks: []*ttnpb.ApplicationDownlink{
 							{
 								FPort:      11,
@@ -2443,6 +2454,8 @@ func TestSkipPayloadCrypto(t *testing.T) {
 					}, nil
 				})
 
+				now := time.Now().UTC()
+
 				for _, step := range []struct {
 					Name         string
 					Message      *ttnpb.ApplicationUp
@@ -2452,7 +2465,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 					{
 						Name: "JoinAccept",
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 							Up: &ttnpb.ApplicationUp_JoinAccept{
 								JoinAccept: &ttnpb.ApplicationJoinAccept{
 									SessionKeyId: []byte{0x22},
@@ -2469,7 +2482,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 							a.So(up, should.NotBeNil)
 							if override.GetValue() {
 								a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-									EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
+									EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 									Up: &ttnpb.ApplicationUp_JoinAccept{
 										JoinAccept: &ttnpb.ApplicationJoinAccept{
 											SessionKeyId: []byte{0x22},
@@ -2485,7 +2498,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 								})
 							} else {
 								a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-									EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
+									EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 									Up: &ttnpb.ApplicationUp_JoinAccept{
 										JoinAccept: &ttnpb.ApplicationJoinAccept{
 											SessionKeyId: []byte{0x22},
@@ -2515,15 +2528,16 @@ func TestSkipPayloadCrypto(t *testing.T) {
 					{
 						Name: "UplinkMessage/PendingSession",
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
 									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-									Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+									Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyId: []byte{0x22},
 									FPort:        22,
 									FCnt:         22,
 									FrmPayload:   []byte{0x01},
+									ReceivedAt:   &now,
 								},
 							},
 						},
@@ -2532,11 +2546,11 @@ func TestSkipPayloadCrypto(t *testing.T) {
 							a.So(up, should.NotBeNil)
 							if override.GetValue() {
 								a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-									EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
+									EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 									Up: &ttnpb.ApplicationUp_UplinkMessage{
 										UplinkMessage: &ttnpb.ApplicationUplink{
 											RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-											Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+											Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 											SessionKeyId: []byte{0x22},
 											FPort:        22,
 											FCnt:         22,
@@ -2546,6 +2560,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 												KekLabel:     kekLabel,
 											},
 											VersionIds: registeredDevice.VersionIds,
+											ReceivedAt: up.GetUplinkMessage().ReceivedAt,
 										},
 									},
 									CorrelationIds: up.CorrelationIds,
@@ -2553,15 +2568,16 @@ func TestSkipPayloadCrypto(t *testing.T) {
 								})
 							} else {
 								a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-									EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
+									EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 									Up: &ttnpb.ApplicationUp_UplinkMessage{
 										UplinkMessage: &ttnpb.ApplicationUplink{
 											RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-											Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+											Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 											SessionKeyId: []byte{0x22},
 											FPort:        22,
 											FCnt:         22,
 											FrmPayload:   []byte{0xc1},
+											ReceivedAt:   up.GetUplinkMessage().ReceivedAt,
 										},
 									},
 									CorrelationIds: up.CorrelationIds,
@@ -2573,7 +2589,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 					{
 						Name: "DownlinkQueueInvalidation",
 						Message: &ttnpb.ApplicationUp{
-							EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
+							EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 							Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 								DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 									Downlinks: []*ttnpb.ApplicationDownlink{
@@ -2592,7 +2608,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 							a := assertions.New(t)
 							if override.GetValue() {
 								a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-									EndDeviceIdentifiers: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
+									EndDeviceIds: withDevAddr(registeredDevice.EndDeviceIdentifiers, types.DevAddr{0x22, 0x22, 0x22, 0x22}),
 									Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 										DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 											Downlinks: []*ttnpb.ApplicationDownlink{
@@ -2632,7 +2648,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 							}
 						}
 						if step.AssertDevice != nil {
-							dev, err := deviceRegistry.Get(ctx, step.Message.EndDeviceIdentifiers, []string{"session", "pending_session"})
+							dev, err := deviceRegistry.Get(ctx, *step.Message.EndDeviceIds, []string{"session", "pending_session"})
 							if !a.So(err, should.BeNil) {
 								t.FailNow()
 							}
@@ -2684,8 +2700,8 @@ func TestSkipPayloadCrypto(t *testing.T) {
 						},
 					} {
 						chs.downPush <- &ttnpb.DownlinkQueueRequest{
-							EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-							Downlinks:            items,
+							EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
+							Downlinks:    items,
 						}
 						time.Sleep(Timeout)
 						select {
@@ -2858,16 +2874,18 @@ func TestLocationFromPayload(t *testing.T) {
 	sub, err := as.Subscribe(ctx, "test", nil, false)
 	a.So(err, should.BeNil)
 
+	now := time.Now().UTC()
 	err = as.Publish(ctx, &ttnpb.ApplicationUp{
-		EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+		EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{
 			UplinkMessage: &ttnpb.ApplicationUplink{
 				RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-				Settings:     ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+				Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 				SessionKeyId: []byte{0x11},
 				FPort:        11,
 				FCnt:         11,
 				FrmPayload:   []byte{0x11},
+				ReceivedAt:   &now,
 			},
 		},
 	})
@@ -2882,7 +2900,7 @@ func TestLocationFromPayload(t *testing.T) {
 
 	assertApplicationlocation := func(loc *ttnpb.ApplicationLocation) {
 		a.So(loc.Service, should.Equal, "frm-payload")
-		assertLocation(&loc.Location)
+		assertLocation(loc.Location)
 	}
 
 	// The uplink message and the location solved message may come out of order.

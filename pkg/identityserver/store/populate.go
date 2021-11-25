@@ -103,7 +103,7 @@ func NewPopulator(size int, seed int64) *Populator {
 			Name:                           fmt.Sprintf("Random %d", i+1),
 			Description:                    fmt.Sprintf("Randomly generated User %d", i+1),
 			PrimaryEmailAddress:            fmt.Sprintf("user-%d@example.com", i+1),
-			PrimaryEmailAddressValidatedAt: &now,
+			PrimaryEmailAddressValidatedAt: ttnpb.ProtoTimePtr(now),
 		}
 		userID := user.GetEntityIdentifiers()
 		p.Users = append(p.Users, user)

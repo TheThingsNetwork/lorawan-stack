@@ -51,7 +51,7 @@ func TestContactInfoStore(t *testing.T) {
 		a.So(contactInfo, should.BeEmpty)
 
 		_, err = s.SetContactInfo(ctx, app.GetIds(), []*ttnpb.ContactInfo{
-			{ContactType: ttnpb.CONTACT_TYPE_TECHNICAL, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "foo@example.com", ValidatedAt: &now},
+			{ContactType: ttnpb.CONTACT_TYPE_TECHNICAL, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "foo@example.com", ValidatedAt: ttnpb.ProtoTimePtr(now)},
 			{ContactType: ttnpb.CONTACT_TYPE_BILLING, ContactMethod: ttnpb.CONTACT_METHOD_EMAIL, Value: "admin@example.com"},
 		})
 
@@ -123,7 +123,7 @@ func TestContactInfoValidation(t *testing.T) {
 			Token:       "validation-token",
 			Entity:      usr.GetEntityIdentifiers(),
 			ContactInfo: info,
-			ExpiresAt:   &expiresAt,
+			ExpiresAt:   ttnpb.ProtoTimePtr(expiresAt),
 		})
 
 		a.So(err, should.BeNil)
@@ -133,7 +133,7 @@ func TestContactInfoValidation(t *testing.T) {
 			Token:       "other-token",
 			Entity:      usr.GetEntityIdentifiers(),
 			ContactInfo: info,
-			ExpiresAt:   &expiresAt,
+			ExpiresAt:   ttnpb.ProtoTimePtr(expiresAt),
 		})
 
 		if a.So(err, should.NotBeNil) {

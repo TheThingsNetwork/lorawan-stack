@@ -20,8 +20,8 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/smartystreets/assertions"
@@ -126,7 +126,7 @@ func TestInteropTLS(t *testing.T) {
 	defer c.Close()
 
 	certPool := x509.NewCertPool()
-	certContent, err := ioutil.ReadFile("testdata/serverca.pem")
+	certContent, err := os.ReadFile("testdata/serverca.pem")
 	a.So(err, should.BeNil)
 	certPool.AppendCertsFromPEM(certContent)
 	client := http.Client{

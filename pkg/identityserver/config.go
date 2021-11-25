@@ -165,7 +165,7 @@ func (c Config) toProto() *ttnpb.IsConfiguration {
 			Enabled: c.UserRegistration.Enabled,
 			Invitation: &ttnpb.IsConfiguration_UserRegistration_Invitation{
 				Required: &pbtypes.BoolValue{Value: c.UserRegistration.Invitation.Required},
-				TokenTtl: &c.UserRegistration.Invitation.TokenTTL,
+				TokenTtl: ttnpb.ProtoDurationPtr(c.UserRegistration.Invitation.TokenTTL),
 			},
 			ContactInfoValidation: &ttnpb.IsConfiguration_UserRegistration_ContactInfoValidation{
 				Required: &pbtypes.BoolValue{Value: c.UserRegistration.ContactInfoValidation.Required},

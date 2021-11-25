@@ -17,10 +17,10 @@ package web
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -61,6 +61,8 @@ type Server struct {
 }
 
 type options struct {
+	disableWarnings bool
+
 	cookieHashKey  []byte
 	cookieBlockKey []byte
 
@@ -79,6 +81,13 @@ type options struct {
 
 // Option for the web server
 type Option func(*options)
+
+// WithDisableWarnings configures if the webserver should emit misconfiguration warnings.
+func WithDisableWarnings(disable bool) Option {
+	return func(o *options) {
+		o.disableWarnings = disable
+	}
+}
 
 // WithContextFiller sets context fillers that are executed on every request context.
 func WithContextFiller(contextFillers ...fillcontext.Filler) Option {
@@ -145,7 +154,9 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 
 	if len(hashKey) == 0 || isZeros(hashKey) {
 		hashKey = random.Bytes(64)
-		logger.Warn("No cookie hash key configured, generated a random one")
+		if !options.disableWarnings {
+			logger.Warn("No cookie hash key configured, generated a random one")
+		}
 	}
 
 	if len(hashKey) != 32 && len(hashKey) != 64 {
@@ -154,7 +165,9 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 
 	if len(blockKey) == 0 || isZeros(blockKey) {
 		blockKey = random.Bytes(32)
-		logger.Warn("No cookie block key configured, generated a random one")
+		if !options.disableWarnings {
+			logger.Warn("No cookie block key configured, generated a random one")
+		}
 	}
 
 	if len(blockKey) != 32 {
@@ -177,6 +190,7 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 		mux.MiddlewareFunc(webmiddleware.SecurityHeaders()),
 		mux.MiddlewareFunc(webmiddleware.Log(logger, options.logIgnorePaths)),
 		mux.MiddlewareFunc(webmiddleware.Cookies(hashKey, blockKey)),
+		mux.MiddlewareFunc(webmiddleware.NoCache),
 	)
 
 	var redirectConfig webmiddleware.RedirectConfiguration
@@ -268,7 +282,7 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 		s.Static(options.staticMount, staticDir)
 
 		// register hashed filenames
-		manifest, err := ioutil.ReadFile(filepath.Join(staticPath, "manifest.yaml"))
+		manifest, err := os.ReadFile(filepath.Join(staticPath, "manifest.yaml"))
 		if err != nil {
 			logger.WithError(err).Warn("Failed to load manifest.yaml")
 			return s, nil
@@ -283,7 +297,7 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 		}
 		logger.Debug("Loaded manifest.yaml")
 		logger.Debug("Serving static assets")
-	} else {
+	} else if !options.disableWarnings {
 		logger.WithField("search_paths", options.staticSearchPaths).Warn("No static assets found in any search path")
 	}
 
@@ -378,10 +392,19 @@ func (s *Server) DELETE(path string, h echo.HandlerFunc, m ...echo.MiddlewareFun
 	return s.echo.DELETE(replaceEchoVars(path), h, m...)
 }
 
+var hashRegex = regexp.MustCompile(`\.([a-f0-9]{20}|[a-f0-9]{32})(\.bundle)?\.(js|css|woff|woff2|ttf|eot|jpg|jpeg|png|svg)$`)
+
 // Static adds the http.FileSystem under the defined prefix.
 func (s *Server) Static(prefix string, fs http.FileSystem) {
 	prefix = "/" + strings.Trim(prefix, "/") + "/"
-	s.router.PathPrefix(prefix).Handler(http.StripPrefix(prefix, http.FileServer(fs)))
+	fileServer := http.StripPrefix(prefix, http.FileServer(fs))
+	s.router.PathPrefix(prefix).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if hashRegex.MatchString(path.Base(r.URL.String())) {
+			w.Header().Set("Cache-Control", "public, max-age=604800, immutable")
+			w.Header().Del("Pragma")
+		}
+		fileServer.ServeHTTP(w, r)
+	})
 }
 
 // Prefix returns a route for the given path prefix.

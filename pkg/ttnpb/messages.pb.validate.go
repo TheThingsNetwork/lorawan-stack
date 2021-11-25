@@ -66,7 +66,14 @@ func (m *UplinkMessage) ValidateFields(paths ...string) error {
 
 		case "settings":
 
-			if v, ok := interface{}(&m.Settings).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetSettings() == nil {
+				return UplinkMessageValidationError{
+					field:  "settings",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetSettings()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UplinkMessageValidationError{
 						field:  "settings",
@@ -95,7 +102,7 @@ func (m *UplinkMessage) ValidateFields(paths ...string) error {
 
 		case "received_at":
 
-			if v, ok := interface{}(&m.ReceivedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetReceivedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UplinkMessageValidationError{
 						field:  "received_at",
@@ -617,14 +624,14 @@ func (m *GatewayUplinkMessage) ValidateFields(paths ...string) error {
 		switch name {
 		case "message":
 
-			if m.UplinkMessage == nil {
+			if m.GetMessage() == nil {
 				return GatewayUplinkMessageValidationError{
 					field:  "message",
 					reason: "value is required",
 				}
 			}
 
-			if v, ok := interface{}(m.UplinkMessage).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetMessage()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GatewayUplinkMessageValidationError{
 						field:  "message",
@@ -779,7 +786,14 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 
 		case "settings":
 
-			if v, ok := interface{}(&m.Settings).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetSettings() == nil {
+				return ApplicationUplinkValidationError{
+					field:  "settings",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetSettings()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationUplinkValidationError{
 						field:  "settings",
@@ -791,7 +805,7 @@ func (m *ApplicationUplink) ValidateFields(paths ...string) error {
 
 		case "received_at":
 
-			if v, ok := interface{}(&m.ReceivedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetReceivedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationUplinkValidationError{
 						field:  "received_at",
@@ -961,7 +975,14 @@ func (m *ApplicationLocation) ValidateFields(paths ...string) error {
 			// no validation rules for Service
 		case "location":
 
-			if v, ok := interface{}(&m.Location).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetLocation() == nil {
+				return ApplicationLocationValidationError{
+					field:  "location",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetLocation()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationLocationValidationError{
 						field:  "location",
@@ -1131,7 +1152,7 @@ func (m *ApplicationJoinAccept) ValidateFields(paths ...string) error {
 			// no validation rules for PendingSession
 		case "received_at":
 
-			if v, ok := interface{}(&m.ReceivedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetReceivedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationJoinAcceptValidationError{
 						field:  "received_at",
@@ -1487,7 +1508,14 @@ func (m *ApplicationDownlinkFailed) ValidateFields(paths ...string) error {
 		switch name {
 		case "downlink":
 
-			if v, ok := interface{}(&m.ApplicationDownlink).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetDownlink() == nil {
+				return ApplicationDownlinkFailedValidationError{
+					field:  "downlink",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetDownlink()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationDownlinkFailedValidationError{
 						field:  "downlink",
@@ -1499,7 +1527,14 @@ func (m *ApplicationDownlinkFailed) ValidateFields(paths ...string) error {
 
 		case "error":
 
-			if v, ok := interface{}(&m.Error).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetError() == nil {
+				return ApplicationDownlinkFailedValidationError{
+					field:  "error",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetError()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationDownlinkFailedValidationError{
 						field:  "error",
@@ -1906,7 +1941,14 @@ func (m *ApplicationUp) ValidateFields(paths ...string) error {
 		switch name {
 		case "end_device_ids":
 
-			if v, ok := interface{}(&m.EndDeviceIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetEndDeviceIds() == nil {
+				return ApplicationUpValidationError{
+					field:  "end_device_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetEndDeviceIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ApplicationUpValidationError{
 						field:  "end_device_ids",
@@ -2320,7 +2362,14 @@ func (m *DownlinkQueueRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "end_device_ids":
 
-			if v, ok := interface{}(&m.EndDeviceIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetEndDeviceIds() == nil {
+				return DownlinkQueueRequestValidationError{
+					field:  "end_device_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetEndDeviceIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return DownlinkQueueRequestValidationError{
 						field:  "end_device_ids",

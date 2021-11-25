@@ -18,13 +18,11 @@ import (
 	"bufio"
 	"context"
 	"encoding/hex"
-	"io/ioutil"
+	stdio "io"
 	"mime"
 	"os"
 	"path"
 	"strings"
-
-	stdio "io"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
@@ -1132,7 +1130,7 @@ This command may take end device identifiers from stdin.`,
 				ext = exts[0]
 			}
 			filename := path.Join(folder, device.DeviceId+ext)
-			if err := ioutil.WriteFile(filename, res.Image.Embedded.Data, 0o644); err != nil {
+			if err := os.WriteFile(filename, res.Image.Embedded.Data, 0o644); err != nil {
 				return err
 			}
 

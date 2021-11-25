@@ -37,23 +37,23 @@ describe('Gateway-status reducer', () => {
 
       expect(newState !== defaultState).toBe(true)
       expect(newState.lastSeen).toBeDefined()
-      expect(newState.lastSeen).toStrictEqual(new Date(stats.last_status_received_at))
+      expect(newState.lastSeen).toEqual(stats.last_status_received_at)
     })
 
     it('sets `lastSeen` from `last_status_received_at` if have more recent value', () => {
       const stats = {
-        last_status_received_at: '2019-09-24T13:35:30.033728431Z',
-        last_uplink_received_at: '2019-09-24T13:35:10.536603866Z',
+        last_status_received_at: '2019-09-24T13:35:10.033728431Z',
+        last_uplink_received_at: '2019-09-24T13:35:30.536603866Z',
       }
 
       newState = reducer(newState, updateGatewayStatisticsSuccess({ stats }))
 
       expect(newState !== defaultState).toBe(true)
       expect(newState.lastSeen).toBeDefined()
-      expect(newState.lastSeen).not.toStrictEqual(new Date(stats.last_status_received_at))
+      expect(newState.lastSeen).not.toEqual(stats.last_uplink_received_at)
     })
 
-    it('updates `lastSeen` from `last_status_received_at` with most recent value', () => {
+    it("updates `lastSeen` from `last_uplink_received_at` if it's the most recent value", () => {
       const stats = {
         last_status_received_at: '2019-09-24T13:45:30.033728431Z',
         last_uplink_received_at: '2019-09-24T13:40:10.536603866Z',
@@ -63,7 +63,7 @@ describe('Gateway-status reducer', () => {
 
       expect(newState !== defaultState).toBe(true)
       expect(newState.lastSeen).toBeDefined()
-      expect(newState.lastSeen).toStrictEqual(new Date(stats.last_status_received_at))
+      expect(newState.lastSeen).toEqual(stats.last_status_received_at)
     })
 
     it('sets `lastSeen` from `last_uplink_received_at` if `last_status_received_at` not present', () => {
@@ -75,7 +75,7 @@ describe('Gateway-status reducer', () => {
 
       expect(newState !== defaultState).toBe(true)
       expect(newState.lastSeen).toBeDefined()
-      expect(newState.lastSeen).toStrictEqual(new Date(stats.last_uplink_received_at))
+      expect(newState.lastSeen).toEqual(stats.last_uplink_received_at)
     })
 
     it('sets `lastSeen` from `last_uplink_received_at` with most recent value if `last_status_received_at` not present', () => {
@@ -87,7 +87,7 @@ describe('Gateway-status reducer', () => {
 
       expect(newState !== defaultState).toBe(true)
       expect(newState.lastSeen).toBeDefined()
-      expect(newState.lastSeen).toStrictEqual(new Date(stats.last_uplink_received_at))
+      expect(newState.lastSeen).toEqual(stats.last_uplink_received_at)
     })
 
     it('does not set `lastSeen` from `last_uplink_received_at` if have more recent value', () => {
@@ -99,7 +99,7 @@ describe('Gateway-status reducer', () => {
 
       expect(newState !== defaultState).toBe(true)
       expect(newState.lastSeen).toBeDefined()
-      expect(newState.lastSeen).not.toStrictEqual(new Date(stats.last_uplink_received_at))
+      expect(newState.lastSeen).not.toEqual(stats.last_uplink_received_at)
     })
 
     it('resets state on gateway request', () => {
@@ -121,7 +121,7 @@ describe('Gateway-status reducer', () => {
       newState = reducer(defaultState, getGatewayEventMessageSuccess('test-gtw-id', event))
       expect(newState !== defaultState).toBe(true)
       expect(newState.lastSeen).toBeDefined()
-      expect(newState.lastSeen).toStrictEqual(new Date(event.time))
+      expect(newState.lastSeen).toStrictEqual(event.time)
     })
 
     it('updates `lastSeen` on most recent uplink event', () => {
@@ -133,7 +133,7 @@ describe('Gateway-status reducer', () => {
       newState = reducer(newState, getGatewayEventMessageSuccess('test-gtw-id', event))
       expect(newState !== defaultState).toBe(true)
       expect(newState.lastSeen).toBeDefined()
-      expect(newState.lastSeen).toStrictEqual(new Date(event.time))
+      expect(newState.lastSeen).toStrictEqual(event.time)
     })
 
     it('does not set `lastSeen` on uplink event if have more recent value', () => {
@@ -145,7 +145,7 @@ describe('Gateway-status reducer', () => {
       newState = reducer(newState, getGatewayEventMessageSuccess('test-gtw-id', event))
       expect(newState !== defaultState).toBe(true)
       expect(newState.lastSeen).toBeDefined()
-      expect(newState.lastSeen).not.toStrictEqual(new Date(event.time))
+      expect(newState.lastSeen).not.toStrictEqual(event.time)
     })
 
     it('updates `lastSeen` on status event', () => {
@@ -157,7 +157,7 @@ describe('Gateway-status reducer', () => {
       newState = reducer(newState, getGatewayEventMessageSuccess('test-gtw-id', event))
       expect(newState !== defaultState).toBe(true)
       expect(newState.lastSeen).toBeDefined()
-      expect(newState.lastSeen).toStrictEqual(new Date(event.time))
+      expect(newState.lastSeen).toStrictEqual(event.time)
     })
 
     it('updates `lastSeen` on most recent status event', () => {
@@ -169,7 +169,7 @@ describe('Gateway-status reducer', () => {
       newState = reducer(newState, getGatewayEventMessageSuccess('test-gtw-id', event))
       expect(newState !== defaultState).toBe(true)
       expect(newState.lastSeen).toBeDefined()
-      expect(newState.lastSeen).toStrictEqual(new Date(event.time))
+      expect(newState.lastSeen).toStrictEqual(event.time)
     })
 
     it('does not set `lastSeen` on status event if have more recent value', () => {
@@ -181,7 +181,7 @@ describe('Gateway-status reducer', () => {
       newState = reducer(newState, getGatewayEventMessageSuccess('test-gtw-id', event))
       expect(newState !== defaultState).toBe(true)
       expect(newState.lastSeen).toBeDefined()
-      expect(newState.lastSeen).not.toStrictEqual(new Date(event.time))
+      expect(newState.lastSeen).not.toStrictEqual(event.time)
     })
 
     it('resets state on gateway request', () => {

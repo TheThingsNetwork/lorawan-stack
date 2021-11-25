@@ -91,7 +91,7 @@ func (q *ApplicationUplinkQueue) Add(ctx context.Context, ups ...*ttnpb.Applicat
 		now := time.Now()
 		taskMap := map[string]time.Time{}
 		for _, up := range ups {
-			uid := unique.ID(ctx, up.ApplicationIdentifiers)
+			uid := unique.ID(ctx, up.EndDeviceIds.ApplicationIdentifiers)
 
 			s, err := ttnredis.MarshalProto(up)
 			if err != nil {

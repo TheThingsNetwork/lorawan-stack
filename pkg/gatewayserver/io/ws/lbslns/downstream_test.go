@@ -21,10 +21,9 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
-	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
@@ -231,24 +230,11 @@ func TestTransferTime(t *testing.T) {
 
 	ctx = ws.NewContextWithSession(ctx, &ws.Session{})
 
-	gtw := &ttnpb.Gateway{
-		Ids: &ttnpb.GatewayIdentifiers{
-			GatewayId: "eui-1122334455667788",
-			Eui:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
-		},
-		FrequencyPlanId: test.EUFrequencyPlanID,
-	}
-
-	conn, err := io.NewConnection(ctx, nil, gtw, test.FrequencyPlanStore, true, nil)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-
 	f := (*lbsLNS)(nil)
 	now := time.Unix(123, 456)
 
 	// No timesync settings available in the session.
-	b, err := f.TransferTime(ctx, now, conn)
+	b, err := f.TransferTime(ctx, now, nil, nil)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -257,51 +243,30 @@ func TestTransferTime(t *testing.T) {
 	// Enable timesync for the session.
 	updateSessionTimeSync(ctx, true)
 
-	// No session ID available.
-	b, err = f.TransferTime(ctx, now, conn)
+	// No GPSTime / ConcentratorTime - expect only MuxTime.
+	b, err = f.TransferTime(ctx, now, nil, nil)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	a.So(b, should.BeNil)
+	if a.So(b, should.NotBeNil) {
+		var res TimeSyncResponse
+		if err := json.Unmarshal(b, &res); !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		a.So(res.TxTime, should.Equal, 0.0)
+		a.So(res.XTime, should.Equal, 0)
+		a.So(res.GPSTime, should.Equal, 0)
+		a.So(res.MuxTime, should.Equal, TimeToUnixSeconds(now))
+	}
 
 	// Add fictional session ID.
 	updateSessionID(ctx, 0x42)
 
-	// Not enough RTTs.
-	b, err = f.TransferTime(ctx, now, conn)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	a.So(b, should.BeNil)
-
-	// Add fictional RTTs.
-	const rtt = 50 * time.Millisecond
-	for i := 0; i < transferTimeMinRTTCount; i++ {
-		conn.RecordRTT(rtt, now)
-	}
-
-	// No clock sync available.
-	b, err = f.TransferTime(ctx, now, conn)
-	if !a.So(err, should.BeNil) {
-		t.FailNow()
-	}
-	a.So(b, should.BeNil)
-
-	// Add fictional concentrator sync.
-	xTime := int64(123456)
-	timeAtSync := now
-	conn.SyncWithGatewayConcentrator(
-		TimestampFromXTime(xTime),
-		timeAtSync,
-		nil,
-		ConcentratorTimeFromXTime(xTime),
-	)
-
-	// Pass time.
-	now = now.Add(10 * time.Millisecond)
+	gpsTime := time.Unix(456, 678)
+	concentratorTime := scheduling.ConcentratorTime(890 * time.Microsecond)
 
 	// Attempt to transfer time.
-	b, err = f.TransferTime(ctx, now, conn)
+	b, err = f.TransferTime(ctx, now, &gpsTime, &concentratorTime)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -312,8 +277,8 @@ func TestTransferTime(t *testing.T) {
 		}
 		a.So(res.TxTime, should.Equal, 0.0)
 		a.So(SessionIDFromXTime(res.XTime), should.Equal, 0x42)
-		a.So(TimestampFromXTime(res.XTime), should.Equal, int64(xTime)+now.Add(rtt/2).Sub(timeAtSync).Microseconds())
-		a.So(res.GPSTime, should.Equal, TimeToGPSTime(now))
+		a.So(ConcentratorTimeFromXTime(res.XTime), should.Equal, 890*time.Microsecond)
+		a.So(res.GPSTime, should.Equal, TimeToGPSTime(gpsTime))
 		a.So(res.MuxTime, should.Equal, TimeToUnixSeconds(now))
 	}
 }

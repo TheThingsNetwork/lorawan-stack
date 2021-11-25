@@ -67,7 +67,7 @@ func (p *GeolocationPackage) HandleUp(ctx context.Context, def *ttnpb.Applicatio
 
 	defer func() {
 		if err != nil {
-			registerPackageFail(ctx, up.EndDeviceIdentifiers, err)
+			registerPackageFail(ctx, *up.EndDeviceIds, err)
 		}
 	}()
 
@@ -78,7 +78,7 @@ func (p *GeolocationPackage) HandleUp(ctx context.Context, def *ttnpb.Applicatio
 
 	switch m := up.Up.(type) {
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		return p.sendQuery(ctx, up.EndDeviceIdentifiers, m.UplinkMessage, data)
+		return p.sendQuery(ctx, *up.EndDeviceIds, m.UplinkMessage, data)
 	default:
 		return nil
 	}
@@ -144,7 +144,7 @@ func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids ttnpb.EndD
 	var mds [][]*ttnpb.RxMetadata
 	if err := p.server.RangeUplinks(ctx, ids, []string{"rx_metadata", "received_at"},
 		func(ctx context.Context, up *ttnpb.ApplicationUplink) bool {
-			if now.Sub(up.ReceivedAt) > data.MultiFrameWindowAge {
+			if now.Sub(*up.ReceivedAt) > data.MultiFrameWindowAge {
 				return true
 			}
 			mds = append(mds, up.RxMetadata)
@@ -244,9 +244,9 @@ func (p *GeolocationPackage) sendQuery(ctx context.Context, ids ttnpb.EndDeviceI
 
 func (p *GeolocationPackage) sendServiceData(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, data *types.Struct) error {
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
-		EndDeviceIdentifiers: ids,
-		CorrelationIds:       events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:           timePtr(time.Now().UTC()),
+		EndDeviceIds:   &ids,
+		CorrelationIds: events.CorrelationIDsFromContext(ctx),
+		ReceivedAt:     timePtr(time.Now().UTC()),
 		Up: &ttnpb.ApplicationUp_ServiceData{
 			ServiceData: &ttnpb.ApplicationServiceData{
 				Data:    data,
@@ -257,14 +257,15 @@ func (p *GeolocationPackage) sendServiceData(ctx context.Context, ids ttnpb.EndD
 }
 
 func (p *GeolocationPackage) sendLocationSolved(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, result api.AbstractLocationSolverResult) error {
+	loc := result.Location()
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
-		EndDeviceIdentifiers: ids,
-		CorrelationIds:       events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:           timePtr(time.Now().UTC()),
+		EndDeviceIds:   &ids,
+		CorrelationIds: events.CorrelationIDsFromContext(ctx),
+		ReceivedAt:     timePtr(time.Now().UTC()),
 		Up: &ttnpb.ApplicationUp_LocationSolved{
 			LocationSolved: &ttnpb.ApplicationLocation{
 				Service:  fmt.Sprintf("%v-%s", PackageName, result.Algorithm()),
-				Location: result.Location(),
+				Location: &loc,
 			},
 		},
 	})

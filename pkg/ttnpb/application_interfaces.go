@@ -144,11 +144,64 @@ func (m *GetApplicationCollaboratorRequest) ExtractRequestFields(dst map[string]
 	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
+func (m *ApplicationUp) ExtractRequestFields(dst map[string]interface{}) {
+	ids := m.EndDeviceIds
+	if ids == nil {
+		return
+	}
+	ids.ExtractRequestFields(dst)
+}
+
+func (m *DownlinkQueueRequest) ExtractRequestFields(dst map[string]interface{}) {
+	ids := m.EndDeviceIds
+	if ids == nil {
+		return
+	}
+	ids.ExtractRequestFields(dst)
+}
+
 // Wrap methods of m.ApplicationIdentifiers.
 
+// GetEntityIdentifiers returns entity identifiers.
 func (m *Application) GetEntityIdentifiers() *EntityIdentifiers {
 	if m == nil {
 		return nil
 	}
 	return m.GetIds().GetEntityIdentifiers()
+}
+
+// EntityType implements IDStringer.
+func (m *ApplicationUp) EntityType() string {
+	ids := m.EndDeviceIds
+	if ids == nil {
+		return ""
+	}
+	return ids.EntityType()
+}
+
+// IDString implements IDStringer.
+func (m *ApplicationUp) IDString() string {
+	ids := m.EndDeviceIds
+	if ids == nil {
+		return ""
+	}
+	return ids.IDString()
+}
+
+// EntityType implements IDStringer.
+func (m *DownlinkQueueRequest) EntityType() string {
+	ids := m.EndDeviceIds
+	if ids == nil {
+		return ""
+	}
+	return ids.EntityType()
+}
+
+// IDString implements IDStringer.
+func (m *DownlinkQueueRequest) IDString() string {
+	ids := m.EndDeviceIds
+	if ids == nil {
+		return ""
+	}
+	return ids.IDString()
 }

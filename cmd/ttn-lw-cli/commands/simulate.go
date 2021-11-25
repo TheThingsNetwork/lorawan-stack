@@ -191,7 +191,7 @@ func simulate(cmd *cobra.Command, forUp func(*ttnpb.UplinkMessage) error, forDow
 	}
 
 	upMsg := &ttnpb.UplinkMessage{
-		Settings: ttnpb.TxSettings{
+		Settings: &ttnpb.TxSettings{
 			DataRate: ttnpb.DataRate{
 				Modulation: &ttnpb.DataRate_Lora{
 					Lora: &ttnpb.LoRaDataRate{
@@ -681,7 +681,7 @@ var (
 			}
 			uplinkMessage := &ttnpb.ApplicationUplink{}
 			up := &ttnpb.ApplicationUp{
-				EndDeviceIdentifiers: *devID,
+				EndDeviceIds: devID,
 				Up: &ttnpb.ApplicationUp_UplinkMessage{
 					UplinkMessage: uplinkMessage,
 				},
@@ -693,8 +693,9 @@ var (
 			if err != nil {
 				return err
 			}
+			t := time.Now().UTC()
 			if uplinkMessage.ReceivedAt.IsZero() {
-				uplinkMessage.ReceivedAt = time.Now()
+				uplinkMessage.ReceivedAt = &t
 			}
 			_, err = ttnpb.NewAppAsClient(cc).SimulateUplink(ctx, up)
 			return err

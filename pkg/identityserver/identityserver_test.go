@@ -67,11 +67,11 @@ func init() {
 	newUser.State = ttnpb.STATE_REQUESTED
 
 	rejectedUser.Admin = false
-	rejectedUser.PrimaryEmailAddressValidatedAt = &now
+	rejectedUser.PrimaryEmailAddressValidatedAt = ttnpb.ProtoTimePtr(now)
 	rejectedUser.State = ttnpb.STATE_REJECTED
 
 	defaultUser.Admin = false
-	defaultUser.PrimaryEmailAddressValidatedAt = &now
+	defaultUser.PrimaryEmailAddressValidatedAt = ttnpb.ProtoTimePtr(now)
 	defaultUser.State = ttnpb.STATE_APPROVED
 
 	defaultUser.TemporaryPassword = ""
@@ -79,7 +79,7 @@ func init() {
 	defaultUser.TemporaryPasswordExpiresAt = nil
 
 	userTestUser.Admin = false
-	userTestUser.PrimaryEmailAddressValidatedAt = &now
+	userTestUser.PrimaryEmailAddressValidatedAt = ttnpb.ProtoTimePtr(now)
 	userTestUser.State = ttnpb.STATE_APPROVED
 
 	userTestUser.TemporaryPassword = ""
@@ -98,22 +98,22 @@ func init() {
 				&ttnpb.APIKey{
 					Name:      "expired key",
 					Rights:    []ttnpb.Right{ttnpb.RIGHT_USER_ALL},
-					ExpiresAt: &expiredTime,
+					ExpiresAt: ttnpb.ProtoTimePtr(expiredTime),
 				},
 			)
 		}
 	}
 
 	suspendedUser.Admin = false
-	suspendedUser.PrimaryEmailAddressValidatedAt = &now
+	suspendedUser.PrimaryEmailAddressValidatedAt = ttnpb.ProtoTimePtr(now)
 	suspendedUser.State = ttnpb.STATE_SUSPENDED
 
 	adminUser.Admin = true
-	adminUser.PrimaryEmailAddressValidatedAt = &now
+	adminUser.PrimaryEmailAddressValidatedAt = ttnpb.ProtoTimePtr(now)
 	adminUser.State = ttnpb.STATE_APPROVED
 
 	paginationUser.Admin = false
-	paginationUser.PrimaryEmailAddressValidatedAt = &now
+	paginationUser.PrimaryEmailAddressValidatedAt = ttnpb.ProtoTimePtr(now)
 	paginationUser.State = ttnpb.STATE_APPROVED
 }
 

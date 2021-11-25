@@ -18,7 +18,7 @@ package gatewayserver
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	stdio "io"
 	stdlog "log"
 	"math"
 	"net"
@@ -103,6 +103,9 @@ var (
 	errNotConnected        = errors.DefineNotFound("not_connected", "gateway `{gateway_uid}` not connected")
 	errSetupUpstream       = errors.DefineFailedPrecondition("upstream", "failed to setup upstream `{name}`")
 	errInvalidUpstreamName = errors.DefineInvalidArgument("invalid_upstream_name", "upstream `{name}` is invalid")
+
+	modelAttribute    = "model"
+	firmwareAttribute = "firmware"
 )
 
 // New returns new *GatewayServer.
@@ -272,7 +275,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		if version.listenerConfig.fallbackFreqPlanID != "" {
 			ctx = frequencyplans.WithFallbackID(ctx, version.listenerConfig.fallbackFreqPlanID)
 		}
-		webServer := ws.New(ctx, gs, version.Formatter, version.listenerConfig.frontend)
+		web, err := ws.New(ctx, gs, version.Formatter, version.listenerConfig.frontend)
+		if err != nil {
+			return nil, err
+		}
 		for _, endpoint := range []component.Endpoint{
 			component.NewTCPEndpoint(version.listenerConfig.listen, version.Name),
 			component.NewTLSEndpoint(version.listenerConfig.listenTLS, version.Name, component.WithNextProtos("h2", "http/1.1")),
@@ -302,10 +308,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 					defer lis.Close()
 
 					srv := http.Server{
-						Handler:           webServer,
+						Handler:           web,
 						ReadTimeout:       120 * time.Second,
 						ReadHeaderTimeout: 5 * time.Second,
-						ErrorLog:          stdlog.New(ioutil.Discard, "", 0),
+						ErrorLog:          stdlog.New(stdio.Discard, "", 0),
 					}
 					go func() {
 						<-ctx.Done()
@@ -410,8 +416,7 @@ var (
 
 type connectionEntry struct {
 	*io.Connection
-	upstreamDone chan struct{}
-	tasksDone    *sync.WaitGroup
+	tasksDone *sync.WaitGroup
 }
 
 // Connect connects a gateway by its identifiers to the Gateway Server, and returns a io.Connection for traffic and
@@ -438,6 +443,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{
 				"antennas",
+				"attributes",
 				"disable_packet_broker_forwarding",
 				"downlink_path_constraint",
 				"enforce_duty_cycle",
@@ -478,7 +484,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 
 	ids = *gtw.GetIds()
 
-	conn, err := io.NewConnection(ctx, frontend, gtw, gs.FrequencyPlans, gtw.EnforceDutyCycle, gtw.ScheduleAnytimeDelay)
+	conn, err := io.NewConnection(ctx, frontend, gtw, gs.FrequencyPlans, gtw.EnforceDutyCycle, ttnpb.StdDuration(gtw.ScheduleAnytimeDelay))
 	if err != nil {
 		return nil, err
 	}
@@ -488,19 +494,13 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	// all of the upstream tasks to finish.
 	wg.Add(len(gs.upstreamHandlers))
 	connEntry := connectionEntry{
-		Connection:   conn,
-		upstreamDone: make(chan struct{}),
-		tasksDone:    wg,
+		Connection: conn,
+		tasksDone:  wg,
 	}
 	for existing, exists := gs.connections.LoadOrStore(uid, connEntry); exists; existing, exists = gs.connections.LoadOrStore(uid, connEntry) {
 		existingConnEntry := existing.(connectionEntry)
 		logger.Warn("Disconnect existing connection")
-		existingConnEntry.Disconnect(errNewConnection)
-		select {
-		case <-ctx.Done():
-			return nil, ctx.Err()
-		case <-existingConnEntry.upstreamDone:
-		}
+		existingConnEntry.Disconnect(errNewConnection.New())
 		existingConnEntry.tasksDone.Wait()
 	}
 
@@ -511,6 +511,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	gs.startHandleUpstreamTask(connEntry)
 	gs.startUpdateConnStatsTask(connEntry)
 	gs.startHandleLocationUpdatesTask(connEntry)
+	gs.startHandleVersionUpdatesTask(connEntry)
 
 	for name, handler := range gs.upstreamHandlers {
 		connCtx := log.NewContextWithField(conn.Context(), "upstream_handler", name)
@@ -552,8 +553,7 @@ func requireDisconnect(connected, current *ttnpb.Gateway) bool {
 		connected.EnforceDutyCycle != current.EnforceDutyCycle ||
 		connected.LocationPublic != current.LocationPublic ||
 		connected.RequireAuthenticatedConnection != current.RequireAuthenticatedConnection ||
-		(connected.ScheduleAnytimeDelay != nil) != (current.ScheduleAnytimeDelay != nil) ||
-		connected.ScheduleAnytimeDelay != nil && *connected.ScheduleAnytimeDelay != *current.ScheduleAnytimeDelay ||
+		ttnpb.StdDurationOrZero(connected.ScheduleAnytimeDelay) != ttnpb.StdDurationOrZero(current.ScheduleAnytimeDelay) ||
 		connected.ScheduleDownlinkLate != current.ScheduleDownlinkLate ||
 		connected.StatusPublic != current.StatusPublic ||
 		connected.UpdateLocationFromStatus != current.UpdateLocationFromStatus ||
@@ -671,6 +671,21 @@ func (gs *GatewayServer) startHandleLocationUpdatesTask(conn connectionEntry) {
 	})
 }
 
+func (gs *GatewayServer) startHandleVersionUpdatesTask(conn connectionEntry) {
+	conn.tasksDone.Add(1)
+	gs.StartTask(&component.TaskConfig{
+		Context: conn.Context(),
+		ID:      fmt.Sprintf("handle_version_updates_%s", unique.ID(conn.Context(), conn.Gateway().GetIds())),
+		Func: func(ctx context.Context) error {
+			gs.handleVersionInfoUpdates(ctx, conn)
+			return nil
+		},
+		Done:    conn.tasksDone.Done,
+		Restart: component.TaskRestartNever,
+		Backoff: component.DialTaskBackoffConfig,
+	})
+}
+
 var errHostHandle = errors.Define("host_handle", "host `{host}` failed to handle message")
 
 type upstreamHost struct {
@@ -687,13 +702,13 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 	gtw := host.gtw
 	switch msg := item.(type) {
 	case *ttnpb.GatewayUplinkMessage:
-		up := *msg.UplinkMessage
+		up := *msg.Message
 		msg = &ttnpb.GatewayUplinkMessage{
-			BandId:        msg.BandId,
-			UplinkMessage: &up,
+			BandId:  msg.BandId,
+			Message: &up,
 		}
-		msg.CorrelationIds = append(make([]string, 0, len(msg.CorrelationIds)+1), msg.CorrelationIds...)
-		msg.CorrelationIds = append(msg.CorrelationIds, host.correlationID)
+		msg.Message.CorrelationIds = append(make([]string, 0, len(msg.Message.CorrelationIds)+1), msg.Message.CorrelationIds...)
+		msg.Message.CorrelationIds = append(msg.Message.CorrelationIds, host.correlationID)
 		drop := func(ids *ttnpb.EndDeviceIdentifiers, err error) {
 			logger := logger.WithError(err)
 			if ids.JoinEui != nil {
@@ -708,7 +723,7 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 			logger.Debug("Drop message")
 			registerDropUplink(ctx, gtw, msg, host.name, err)
 		}
-		ids := msg.Payload.EndDeviceIdentifiers()
+		ids := up.Payload.EndDeviceIdentifiers()
 		var pass bool
 		switch {
 		case ids.DevAddr != nil:
@@ -730,7 +745,7 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 			codes.Unimplemented, codes.Unavailable:
 			drop(ids, errHostHandle.WithCause(err).WithAttributes("host", host.name))
 		default:
-			registerForwardUplink(ctx, gtw, msg.UplinkMessage, host.name)
+			registerForwardUplink(ctx, gtw, msg.Message, host.name)
 		}
 	case *ttnpb.GatewayStatus:
 		if err := host.handler.HandleStatus(ctx, *gtw.Ids, msg); err != nil {
@@ -755,9 +770,8 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 	)
 	defer func() {
 		gs.connections.Delete(unique.ID(ctx, gtw.GetIds()))
-		registerGatewayDisconnect(ctx, *gtw.GetIds(), protocol)
+		registerGatewayDisconnect(ctx, *gtw.GetIds(), protocol, ctx.Err())
 		logger.Info("Disconnected")
-		close(conn.upstreamDone)
 	}()
 
 	hosts := make([]*upstreamHost, 0, len(gs.upstreamHandlers))
@@ -795,16 +809,16 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 			return
 		case msg := <-conn.Up():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:uplink:%s", events.NewCorrelationID()))
-			msg.CorrelationIds = append(msg.CorrelationIds, events.CorrelationIDsFromContext(ctx)...)
-			if msg.Payload == nil {
-				msg.Payload = &ttnpb.Message{}
-				if err := lorawan.UnmarshalMessage(msg.RawPayload, msg.Payload); err != nil {
+			msg.Message.CorrelationIds = append(msg.Message.CorrelationIds, events.CorrelationIDsFromContext(ctx)...)
+			if msg.Message.Payload == nil {
+				msg.Message.Payload = &ttnpb.Message{}
+				if err := lorawan.UnmarshalMessage(msg.Message.RawPayload, msg.Message.Payload); err != nil {
 					registerDropUplink(ctx, gtw, msg, "validation", err)
 					continue
 				}
 			}
 			val = msg
-			registerReceiveUplink(ctx, gtw, msg.UplinkMessage, protocol)
+			registerReceiveUplink(ctx, gtw, msg.Message, protocol)
 		case msg := <-conn.Status():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:status:%s", events.NewCorrelationID()))
 			val = msg
@@ -849,7 +863,7 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 	ids := conn.Connection.Gateway().GetIds()
 	connectTime := conn.Connection.ConnectTime()
 	stats := &ttnpb.GatewayConnectionStats{
-		ConnectedAt: &connectTime,
+		ConnectedAt: ttnpb.ProtoTimePtr(connectTime),
 		Protocol:    conn.Connection.Frontend().Protocol(),
 	}
 
@@ -978,6 +992,39 @@ func (gs *GatewayServer) handleLocationUpdates(ctx context.Context, conn connect
 	}
 }
 
+// handleVersionInfoUpdates updates gateway attributes with version info.
+// This function runs exactly once; only for the first status message of each connection, since version information should not change within the same connection.
+func (gs *GatewayServer) handleVersionInfoUpdates(ctx context.Context, conn connectionEntry) {
+	select {
+	case <-ctx.Done():
+		return
+	case <-conn.VersionInfoChanged():
+		status, _, ok := conn.StatusStats()
+		versionsFromStatus := status.Versions
+		if !ok || versionsFromStatus["model"] == "" || versionsFromStatus["firmware"] == "" {
+			return
+		}
+		gtwAttributes := conn.Gateway().Attributes
+		if versionsFromStatus[modelAttribute] == gtwAttributes[modelAttribute] && versionsFromStatus[firmwareAttribute] == gtwAttributes[firmwareAttribute] {
+			return
+		}
+		attributes := map[string]string{
+			modelAttribute:    versionsFromStatus[modelAttribute],
+			firmwareAttribute: versionsFromStatus[firmwareAttribute],
+		}
+		d := random.Jitter(gs.config.UpdateVersionInfoDelay, 0.25)
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(d):
+		}
+		err := gs.entityRegistry.UpdateAttributes(conn.Context(), *conn.Gateway().Ids, gtwAttributes, attributes)
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Debug("Failed to update version information")
+		}
+	}
+}
+
 // GetFrequencyPlans gets the frequency plans by the gateway identifiers.
 func (gs *GatewayServer) GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error) {
 	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
@@ -1018,6 +1065,7 @@ func (gs *GatewayServer) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayI
 	return gs.UnclaimIDs(ctx, &ids)
 }
 
+// ValidateGatewayID implements io.Server.
 func (gs *GatewayServer) ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
 	return gs.entityRegistry.ValidateGatewayID(ctx, ids)
 }

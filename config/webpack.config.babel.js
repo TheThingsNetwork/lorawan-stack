@@ -198,6 +198,8 @@ export default {
   output: {
     filename: production ? '[name].[chunkhash].js' : '[name].js',
     chunkFilename: production ? '[name].[chunkhash].js' : '[name].js',
+    hashDigest: 'hex',
+    hashDigestLength: 20,
     path: path.resolve(context, PUBLIC_DIR),
     crossOriginLoading: 'anonymous',
     publicPath: ASSETS_ROOT,
@@ -230,7 +232,7 @@ export default {
         test: /\.(woff|woff2|ttf|eot|jpg|jpeg|png|svg)$/i,
         loader: 'file-loader',
         options: {
-          name: '[name].[hash].[ext]',
+          name: '[name].[hash:hex:20].[ext]',
         },
       },
       styleConfig,
@@ -276,7 +278,11 @@ export default {
       new CleanWebpackPlugin({
         dry: WEBPACK_IS_DEV_SERVER_BUILD,
         verbose: false,
-        cleanOnceBeforeBuildPatterns: ['**/*', '!libs*bundle.js', '!libs*bundle.js.map'],
+        cleanOnceBeforeBuildPatterns: env({
+          all: ['**/*'],
+          development: ['!libs.bundle.js', '!libs.bundle.js.map'],
+          production: ['!libs.*.bundle.js', '!libs.*.bundle.js.map'],
+        }),
       }),
       // Copy static assets to output directory.
       new CopyWebpackPlugin({ patterns: [{ from: `${src}/assets/static` }] }),

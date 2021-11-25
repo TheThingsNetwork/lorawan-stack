@@ -15,7 +15,7 @@
 package webmiddleware
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -101,7 +101,7 @@ func TestBasicAuth(t *testing.T) {
 		})).ServeHTTP(rec, r)
 		res := rec.Result()
 		a.So(res.StatusCode, should.Equal, http.StatusOK)
-		body, _ := ioutil.ReadAll(res.Body)
+		body, _ := io.ReadAll(res.Body)
 		a.So(string(body), should.Equal, "Secret")
 	})
 }

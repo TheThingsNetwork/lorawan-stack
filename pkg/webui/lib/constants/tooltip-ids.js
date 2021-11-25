@@ -14,6 +14,10 @@
 
 export default Object.freeze({
   ACTIVATION_MODE: 'activation-mode',
+  ADR_ACK_DELAY: 'adr-ack-delay',
+  ADR_ACK_LIMIT: 'adr-ack-limit',
+  ADR_MARGIN: 'adr-margin',
+  ADR_USE: 'adr-use',
   APP_KEY: 'appkey',
   APP_SESSION_KEY: 'application-session-key',
   BEACON_FREQUENCY: 'beacon-frequency',
@@ -47,6 +51,7 @@ export default Object.freeze({
   JOIN_EUI: 'joineui',
   JOIN_SERVER: 'join-server',
   LORAWAN_VERSION: 'lorawan-version',
+  MAX_DUTY_CYCLE: 'max-duty-cycle',
   NETWORK_KEY: 'network-key',
   NETWORK_RX_DEFAULTS: 'network-rx-defaults',
   NETWORK_SESSION_KEY: 'network-session-key',
@@ -64,5 +69,7 @@ export default Object.freeze({
   SCHEDULE_DOWNLINK_LATE: 'schedule-downlink-late',
   SET_CLAIM_AUTH_CODE: 'set-claim-auth-code',
   SKIP_PAYLOAD_CRYPTO_OVERRIDE: 'skip-payload-crypto-override',
+  STATUS_COUNT_PERIODICITY: 'status-count-periodicity',
+  STATUS_TIME_PERIODICITY: 'status-time-periodicity',
   UPDATE_LOCATION_FROM_STATUS: 'update-location-from-status',
 })
