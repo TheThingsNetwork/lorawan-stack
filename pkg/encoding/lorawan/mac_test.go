@@ -259,7 +259,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		{
 			"DeviceTimeAns",
 			&ttnpb.MACCommand_DeviceTimeAns{
-				Time: ttnpb.ProtoTimePtr(gpstime.Parse(0x42ffffff*time.Second + 0x42*time.Duration(math.Pow(0.5, 8)*float64(time.Second))).UTC()),
+				Time: ttnpb.ProtoTimePtr(gpstime.Parse(0x42ffffff*time.Second + 0x42*time.Duration(math.Pow(0.5, 8)*float64(time.Second)))),
 			},
 			[]byte{0x0D, 0xff, 0xff, 0xff, 0x42, 0x42},
 			false,
@@ -400,7 +400,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 			cmd = &ttnpb.MACCommand{}
 			err = reader(phy, bytes.NewReader(tc.Bytes), cmd)
 			if pld := cmd.GetDeviceTimeAns(); pld != nil {
-				pld.Time = ttnpb.ProtoTimePtr(ttnpb.StdTime(pld.Time).UTC())
+				pld.Time = ttnpb.ProtoTimePtr(ttnpb.StdTime(pld.Time))
 			}
 			if a.So(err, should.BeNil) {
 				a.So(cmd, should.Resemble, tc.Payload.MACCommand())

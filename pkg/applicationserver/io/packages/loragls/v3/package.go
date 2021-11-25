@@ -246,7 +246,7 @@ func (p *GeolocationPackage) sendServiceData(ctx context.Context, ids ttnpb.EndD
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIds:   &ids,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now().UTC()),
+		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now()),
 		Up: &ttnpb.ApplicationUp_ServiceData{
 			ServiceData: &ttnpb.ApplicationServiceData{
 				Data:    data,
@@ -261,7 +261,7 @@ func (p *GeolocationPackage) sendLocationSolved(ctx context.Context, ids ttnpb.E
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIds:   &ids,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now().UTC()),
+		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now()),
 		Up: &ttnpb.ApplicationUp_LocationSolved{
 			LocationSolved: &ttnpb.ApplicationLocation{
 				Service:  fmt.Sprintf("%v-%s", PackageName, result.Algorithm()),

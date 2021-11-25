@@ -186,7 +186,7 @@ func (p *DeviceManagementPackage) sendServiceData(ctx context.Context, ids ttnpb
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIds:   &ids,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now().UTC()),
+		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now()),
 		Up: &ttnpb.ApplicationUp_ServiceData{
 			ServiceData: &ttnpb.ApplicationServiceData{
 				Data:    data,
@@ -214,7 +214,7 @@ func (p *DeviceManagementPackage) sendLocationSolved(ctx context.Context, ids tt
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIds:   &ids,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now().UTC()),
+		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now()),
 		Up: &ttnpb.ApplicationUp_LocationSolved{
 			LocationSolved: &ttnpb.ApplicationLocation{
 				Service: fmt.Sprintf("%v-%s", PackageName, position.Algorithm),

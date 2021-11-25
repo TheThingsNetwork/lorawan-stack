@@ -694,7 +694,7 @@ var (
 				return err
 			}
 			if uplinkMessage.ReceivedAt == nil {
-				uplinkMessage.ReceivedAt = ttnpb.ProtoTimePtr(time.Now().UTC())
+				uplinkMessage.ReceivedAt = ttnpb.ProtoTimePtr(time.Now())
 			}
 			_, err = ttnpb.NewAppAsClient(cc).SimulateUplink(ctx, up)
 			return err
