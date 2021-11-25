@@ -17896,7 +17896,7 @@
                 "validate.rules": [
                   {
                     "name": "map.max_pairs",
-                    "value": 10
+                    "value": 32
                   },
                   {
                     "name": "map.keys.string.max_len",

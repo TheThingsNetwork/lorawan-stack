@@ -2789,10 +2789,10 @@ func (m *GatewayStatus) ValidateFields(paths ...string) error {
 
 		case "metrics":
 
-			if len(m.GetMetrics()) > 10 {
+			if len(m.GetMetrics()) > 32 {
 				return GatewayStatusValidationError{
 					field:  "metrics",
-					reason: "value must contain no more than 10 pair(s)",
+					reason: "value must contain no more than 32 pair(s)",
 				}
 			}
 
