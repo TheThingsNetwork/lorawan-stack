@@ -73,10 +73,7 @@ describe('Application general settings', () => {
     cy.findByRole('button', { name: 'Save changes' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
-      .should('be.visible')
-      .findByText(`Application updated`)
-      .should('be.visible')
+    cy.findByTestId('toast-notification').findByText(`Application updated`).should('be.visible')
   })
 
   it('succeeds deleting application', () => {

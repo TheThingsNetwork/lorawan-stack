@@ -33,9 +33,10 @@ import { generate16BytesKey, isNonZeroSessionKey } from '@console/lib/device-uti
 import messages from '../messages'
 
 const m = defineMessages({
-  skip: 'Skip payload crypto',
-  include: 'Do not skip payload crypto',
-  default: 'Use default',
+  skip: 'Enforce skipping payload crypto',
+  include: 'Enforce payload crypto',
+  default: 'Use application default',
+  skipCryptoTitle: 'Payload crypto override',
 })
 
 const validationSchema = Yup.object()
@@ -181,19 +182,17 @@ const ApplicationServerForm = React.memo(props => {
     >
       {showResetNotification && <Notification content={messages.keysResetWarning} info small />}
       <Form.Field
-        required
-        title={sharedMessages.skipCryptoTitle}
+        title={m.skipCryptoTitle}
         name="skip_payload_crypto_override"
-        description={sharedMessages.skipCryptoDescription}
         component={RadioButton.Group}
         decode={decodeSkipPayloadCrypto}
-        horizontal
         encode={encodeSkipPayloadCrypto}
         onChange={handleSkipCryptoChange}
+        tooltipId={tooltipIds.SKIP_PAYLOAD_CRYPTO_OVERRIDE}
       >
+        <RadioButton label={m.default} value="default" />
         <RadioButton label={m.skip} value="skip" />
         <RadioButton label={m.include} value="include" />
-        <RadioButton label={m.default} value="default" />
       </Form.Field>
       <Form.Field
         required

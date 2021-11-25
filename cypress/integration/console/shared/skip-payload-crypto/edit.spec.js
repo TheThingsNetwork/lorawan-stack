@@ -1,3 +1,4 @@
+/* eslint-disable jest/no-commented-out-tests */
 // Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -84,16 +85,18 @@ describe('Skip payload crypto', () => {
           },
         })
 
-        const response = {
-          skip_payload_crypto_override: null,
-          session: {},
+        const endDeviceRequestBody = {
+          field_mask: { paths: ['skip_payload_crypto_override'] },
+          end_device: { skip_payload_crypto_override: null },
         }
-
-        cy.intercept(
-          'GET',
-          `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
-          response,
-        )
+        cy.request({
+          method: 'PUT',
+          url: `api/v3/as/applications/${applicationId}/devices/${endDeviceId}`,
+          body: endDeviceRequestBody,
+          headers: {
+            Authorization: `Bearer ${adminApiKey}`,
+          },
+        })
 
         cy.visit(
           `${Cypress.config(
@@ -105,9 +108,6 @@ describe('Skip payload crypto', () => {
           .should('be.visible')
           .findByText(`Simulation is disabled for devices that skip payload crypto`)
           .should('be.visible')
-
-        cy.findByLabelText('FPort').should('be.disabled')
-        cy.findByLabelText('Payload').should('be.disabled')
 
         cy.findByRole('button', { name: 'Simulate uplink' }).should('be.disabled')
       })
@@ -130,25 +130,24 @@ describe('Skip payload crypto', () => {
           },
         })
 
-        const response = {
-          skip_payload_crypto_override: false,
-          session: {},
+        const endDeviceRequestBody = {
+          field_mask: { paths: ['skip_payload_crypto_override'] },
+          end_device: { skip_payload_crypto_override: false },
         }
-
-        cy.intercept(
-          'GET',
-          `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
-          response,
-        )
+        cy.request({
+          method: 'PUT',
+          url: `api/v3/as/applications/${applicationId}/devices/${endDeviceId}`,
+          body: endDeviceRequestBody,
+          headers: {
+            Authorization: `Bearer ${adminApiKey}`,
+          },
+        })
 
         cy.visit(
           `${Cypress.config(
             'consoleRootPath',
           )}/applications/${applicationId}/devices/${endDeviceId}/messaging/uplink`,
         )
-
-        cy.findByLabelText('FPort').should('be.enabled')
-        cy.findByLabelText('Payload').should('be.enabled')
 
         cy.findByRole('button', { name: 'Simulate uplink' }).should('be.enabled')
       })
@@ -177,25 +176,24 @@ describe('Skip payload crypto', () => {
           },
         })
 
-        const response = {
-          skip_payload_crypto_override: null,
-          session: {},
+        const endDeviceRequestBody = {
+          field_mask: { paths: ['skip_payload_crypto_override'] },
+          end_device: { skip_payload_crypto_override: null },
         }
-
-        cy.intercept(
-          'GET',
-          `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
-          response,
-        )
+        cy.request({
+          method: 'PUT',
+          url: `api/v3/as/applications/${applicationId}/devices/${endDeviceId}`,
+          body: endDeviceRequestBody,
+          headers: {
+            Authorization: `Bearer ${adminApiKey}`,
+          },
+        })
 
         cy.visit(
           `${Cypress.config(
             'consoleRootPath',
           )}/applications/${applicationId}/devices/${endDeviceId}/messaging/uplink`,
         )
-
-        cy.findByLabelText('FPort').should('be.enabled')
-        cy.findByLabelText('Payload').should('be.enabled')
 
         cy.findByRole('button', { name: 'Simulate uplink' }).should('be.enabled')
       })
@@ -218,16 +216,18 @@ describe('Skip payload crypto', () => {
           },
         })
 
-        const response = {
-          skip_payload_crypto_override: true,
-          session: {},
+        const endDeviceRequestBody = {
+          field_mask: { paths: ['skip_payload_crypto_override'] },
+          end_device: { skip_payload_crypto_override: true },
         }
-
-        cy.intercept(
-          'GET',
-          `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
-          response,
-        )
+        cy.request({
+          method: 'PUT',
+          url: `api/v3/as/applications/${applicationId}/devices/${endDeviceId}`,
+          body: endDeviceRequestBody,
+          headers: {
+            Authorization: `Bearer ${adminApiKey}`,
+          },
+        })
 
         cy.visit(
           `${Cypress.config(
@@ -239,9 +239,6 @@ describe('Skip payload crypto', () => {
           .should('be.visible')
           .findByText(`Simulation is disabled for devices that skip payload crypto`)
           .should('be.visible')
-
-        cy.findByLabelText('FPort').should('be.disabled')
-        cy.findByLabelText('Payload').should('be.disabled')
 
         cy.findByRole('button', { name: 'Simulate uplink' }).should('be.disabled')
       })

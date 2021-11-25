@@ -232,6 +232,9 @@ const m = defineMessages({
 
   resetMacDescription:
     'Resetting the session context and MAC state will reset the end device to its initial (factory) state. This includes resetting the frame counters and any other persisted MAC setting on the end device. Over The Air Activation (OTAA) end devices will also lose their session context. This means that such devices must rejoin the network to continue operation. Activation-by-personalization (ABP) end devices will only reset the MAC state, while preserving up/downlink queues.',
+
+  skipPayloadCryptoOverride:
+    'Skip payload crypto disables the application layer encryption of LoRaWAN frames. This causes the Application Server to forward the messages without any processing, such as payload formatters, to the integrations.  When doing so, the integrations are responsible for decryption and processing of the binary format in order to understand the message. This application-wide setting can be overwritten per end device using this overwrite setting.',
 })
 
 const descriptions = Object.freeze({
@@ -447,6 +450,9 @@ const descriptions = Object.freeze({
   },
   [TOOLTIP_IDS.RESET_MAC]: {
     description: m.resetMacDescription,
+  },
+  [TOOLTIP_IDS.SKIP_PAYLOAD_CRYPTO_OVERRIDE]: {
+    description: m.skipPayloadCryptoOverride,
   },
 })
 
