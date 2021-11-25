@@ -982,7 +982,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 func joinResponseWithoutKeys(resp *ttnpb.JoinResponse) *ttnpb.JoinResponse {
 	return &ttnpb.JoinResponse{
 		RawPayload: resp.RawPayload,
-		SessionKeys: ttnpb.SessionKeys{
+		SessionKeys: &ttnpb.SessionKeys{
 			SessionKeyId: resp.SessionKeys.SessionKeyId,
 		},
 		Lifetime:       resp.Lifetime,
@@ -1151,7 +1151,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	}
 	macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
 		CorrelationIds: resp.CorrelationIds,
-		Keys:           keys,
+		Keys:           *keys,
 		Payload:        resp.RawPayload,
 		DevAddr:        devAddr,
 		NetId:          ns.netID,

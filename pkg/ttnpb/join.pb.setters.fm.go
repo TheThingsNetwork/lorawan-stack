@@ -5,7 +5,6 @@ package ttnpb
 import (
 	fmt "fmt"
 	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
-	time "time"
 )
 
 func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
@@ -169,10 +168,18 @@ func (dst *JoinResponse) SetFields(src *JoinResponse, paths ...string) error {
 		case "session_keys":
 			if len(subs) > 0 {
 				var newDst, newSrc *SessionKeys
-				if src != nil {
-					newSrc = &src.SessionKeys
+				if (src == nil || src.SessionKeys == nil) && dst.SessionKeys == nil {
+					continue
 				}
-				newDst = &dst.SessionKeys
+				if src != nil {
+					newSrc = src.SessionKeys
+				}
+				if dst.SessionKeys != nil {
+					newDst = dst.SessionKeys
+				} else {
+					newDst = &SessionKeys{}
+					dst.SessionKeys = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -180,8 +187,7 @@ func (dst *JoinResponse) SetFields(src *JoinResponse, paths ...string) error {
 				if src != nil {
 					dst.SessionKeys = src.SessionKeys
 				} else {
-					var zero SessionKeys
-					dst.SessionKeys = zero
+					dst.SessionKeys = nil
 				}
 			}
 		case "lifetime":
@@ -191,8 +197,7 @@ func (dst *JoinResponse) SetFields(src *JoinResponse, paths ...string) error {
 			if src != nil {
 				dst.Lifetime = src.Lifetime
 			} else {
-				var zero time.Duration
-				dst.Lifetime = zero
+				dst.Lifetime = nil
 			}
 		case "correlation_ids":
 			if len(subs) > 0 {

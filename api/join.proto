@@ -52,7 +52,7 @@ message JoinRequest {
 
 message JoinResponse {
   bytes raw_payload = 1 [(validate.rules).bytes = {min_len: 17, max_len: 33}];
-  SessionKeys session_keys = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  google.protobuf.Duration lifetime = 3 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
+  SessionKeys session_keys = 2 [(validate.rules).message.required = true];
+  google.protobuf.Duration lifetime = 3;
   repeated string correlation_ids = 4 [(validate.rules).repeated.items.string.max_len = 100];
 }

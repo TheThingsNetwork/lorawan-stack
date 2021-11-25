@@ -226,7 +226,14 @@ func (m *JoinResponse) ValidateFields(paths ...string) error {
 
 		case "session_keys":
 
-			if v, ok := interface{}(&m.SessionKeys).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetSessionKeys() == nil {
+				return JoinResponseValidationError{
+					field:  "session_keys",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetSessionKeys()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return JoinResponseValidationError{
 						field:  "session_keys",
@@ -238,7 +245,7 @@ func (m *JoinResponse) ValidateFields(paths ...string) error {
 
 		case "lifetime":
 
-			if v, ok := interface{}(&m.Lifetime).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetLifetime()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return JoinResponseValidationError{
 						field:  "lifetime",

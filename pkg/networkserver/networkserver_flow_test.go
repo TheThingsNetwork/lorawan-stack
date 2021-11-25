@@ -158,10 +158,10 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			ClusterResponse: &NsJsHandleJoinResponse{
 				Response: &ttnpb.JoinResponse{
 					RawPayload: bytes.Repeat([]byte{0x42}, 33),
-					SessionKeys: *test.MakeSessionKeys(
+					SessionKeys: test.MakeSessionKeys(
 						test.SessionKeysOptions.WithDefaultNwkKeys(dev.LorawanVersion),
 					),
-					Lifetime:       time.Hour,
+					Lifetime:       ttnpb.ProtoDurationPtr(time.Hour),
 					CorrelationIds: []string{"NsJs-1", "NsJs-2"},
 				},
 			},

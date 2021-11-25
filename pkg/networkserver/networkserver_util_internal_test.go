@@ -1702,8 +1702,8 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 				CorrelationIds: up.CorrelationIds,
 				Up: &ttnpb.ApplicationUp_JoinAccept{
 					JoinAccept: &ttnpb.ApplicationJoinAccept{
-						AppSKey:      joinResp.AppSKey,
-						SessionKeyId: joinResp.SessionKeyId,
+						AppSKey:      joinResp.SessionKeys.AppSKey,
+						SessionKeyId: joinResp.SessionKeys.SessionKeyId,
 						ReceivedAt:   recvAt,
 					},
 				},

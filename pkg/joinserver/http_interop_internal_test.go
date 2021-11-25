@@ -103,8 +103,8 @@ func TestInteropJoinRequest(t *testing.T) {
 			HandleJoinFunc: func() (*ttnpb.JoinResponse, error) {
 				return &ttnpb.JoinResponse{
 					RawPayload: []byte{0x1, 0x2, 0x3, 0x4},
-					Lifetime:   1 * time.Hour,
-					SessionKeys: ttnpb.SessionKeys{
+					Lifetime:   ttnpb.ProtoDurationPtr(1 * time.Hour),
+					SessionKeys: &ttnpb.SessionKeys{
 						SessionKeyId: []byte{0x1, 0x2, 0x3, 0x4},
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
 							KekLabel:     "test",
@@ -180,8 +180,8 @@ func TestInteropJoinRequest(t *testing.T) {
 			HandleJoinFunc: func() (*ttnpb.JoinResponse, error) {
 				return &ttnpb.JoinResponse{
 					RawPayload: []byte{0x1, 0x2, 0x3, 0x4},
-					Lifetime:   1 * time.Hour,
-					SessionKeys: ttnpb.SessionKeys{
+					Lifetime:   ttnpb.ProtoDurationPtr(1 * time.Hour),
+					SessionKeys: &ttnpb.SessionKeys{
 						SessionKeyId: []byte{0x1, 0x2, 0x3, 0x4},
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
 							KekLabel:     "test",
