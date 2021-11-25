@@ -428,7 +428,7 @@ func MakeUplinkMessage(conf UplinkMessageConfig) *ttnpb.UplinkMessage {
 		Payload:            conf.Payload,
 		Settings:           &settings,
 		RxMetadata:         deepcopy.Copy(conf.RxMetadata).([]*ttnpb.RxMetadata),
-		ReceivedAt:         &conf.ReceivedAt,
+		ReceivedAt:         ttnpb.ProtoTimePtr(conf.ReceivedAt),
 		CorrelationIds:     CopyStrings(conf.CorrelationIDs),
 		DeviceChannelIndex: uint32(conf.ChannelIndex),
 	}

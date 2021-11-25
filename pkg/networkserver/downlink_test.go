@@ -1848,7 +1848,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: TimePtr(now.Add(InfrastructureDelay)),
+								AbsoluteTime: ttnpb.ProtoTimePtr(now.Add(InfrastructureDelay)),
 							},
 						},
 					},
@@ -1985,7 +1985,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: TimePtr(now.Add(DefaultEU868RX1Delay.Duration())),
+								AbsoluteTime: ttnpb.ProtoTimePtr(now.Add(DefaultEU868RX1Delay.Duration())),
 							},
 						},
 					},
@@ -2288,7 +2288,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: TimePtr(now.Add(42 * time.Hour)),
+								AbsoluteTime: ttnpb.ProtoTimePtr(now.Add(42 * time.Hour)),
 							},
 						},
 					},
@@ -2350,7 +2350,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: TimePtr(now.Add(-2)),
+								AbsoluteTime: ttnpb.ProtoTimePtr(now.Add(-2)),
 							},
 						},
 						{
@@ -2361,7 +2361,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: TimePtr(now.Add(-1)),
+								AbsoluteTime: ttnpb.ProtoTimePtr(now.Add(-1)),
 							},
 						},
 					},

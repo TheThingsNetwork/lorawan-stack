@@ -144,7 +144,7 @@ func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids ttnpb.EndD
 	var mds [][]*ttnpb.RxMetadata
 	if err := p.server.RangeUplinks(ctx, ids, []string{"rx_metadata", "received_at"},
 		func(ctx context.Context, up *ttnpb.ApplicationUplink) bool {
-			if now.Sub(*up.ReceivedAt) > data.MultiFrameWindowAge {
+			if now.Sub(*ttnpb.StdTime(up.ReceivedAt)) > data.MultiFrameWindowAge {
 				return true
 			}
 			mds = append(mds, up.RxMetadata)
@@ -246,7 +246,7 @@ func (p *GeolocationPackage) sendServiceData(ctx context.Context, ids ttnpb.EndD
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIds:   &ids,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:     timePtr(time.Now().UTC()),
+		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now().UTC()),
 		Up: &ttnpb.ApplicationUp_ServiceData{
 			ServiceData: &ttnpb.ApplicationServiceData{
 				Data:    data,
@@ -261,7 +261,7 @@ func (p *GeolocationPackage) sendLocationSolved(ctx context.Context, ids ttnpb.E
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIds:   &ids,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
-		ReceivedAt:     timePtr(time.Now().UTC()),
+		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now().UTC()),
 		Up: &ttnpb.ApplicationUp_LocationSolved{
 			LocationSolved: &ttnpb.ApplicationLocation{
 				Service:  fmt.Sprintf("%v-%s", PackageName, result.Algorithm()),
@@ -302,10 +302,6 @@ func (p *GeolocationPackage) mergePackageData(def *ttnpb.ApplicationPackageDefau
 		merged.ServerURL = urlutil.CloneURL(api.DefaultServerURL)
 	}
 	return &merged, nil
-}
-
-func timePtr(x time.Time) *time.Time {
-	return &x
 }
 
 func toStruct(i interface{}) (*types.Struct, error) {

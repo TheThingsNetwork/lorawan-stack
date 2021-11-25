@@ -1345,7 +1345,7 @@ func TestGatewayServer(t *testing.T) {
 										if expected == nil {
 											t.Fatalf("Received unexpected message")
 										}
-										a.So(time.Since(*msg.ReceivedAt), should.BeLessThan, timeout)
+										a.So(time.Since(*ttnpb.StdTime(msg.ReceivedAt)), should.BeLessThan, timeout)
 										a.So(msg.Settings, should.Resemble, expected.Settings)
 										a.So(len(msg.RxMetadata), should.Equal, len(expected.RxMetadata))
 										for i, md := range msg.RxMetadata {

@@ -420,14 +420,8 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 		}
 	}
 
-	if t, err := pbtypes.TimestampProto(*msg.Message.ReceivedAt); err == nil {
-		up.ForwarderReceiveTime = t
-	}
-	if gatewayReceiveTime != nil {
-		if t, err := pbtypes.TimestampProto(*gatewayReceiveTime); err == nil {
-			up.GatewayReceiveTime = t
-		}
-	}
+	up.ForwarderReceiveTime = msg.Message.ReceivedAt
+	up.GatewayReceiveTime = ttnpb.ProtoTime(gatewayReceiveTime)
 	up.GatewayUplinkToken = gatewayUplinkToken
 
 	return up, nil
@@ -473,7 +467,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 			Frequency:  msg.Message.Frequency,
 			CodingRate: codingRate,
 		},
-		ReceivedAt:     &receivedAt,
+		ReceivedAt:     ttnpb.ProtoTimePtr(receivedAt),
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
 	}
 

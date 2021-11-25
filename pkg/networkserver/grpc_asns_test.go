@@ -46,7 +46,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			},
 		},
 		RxMetadata: DefaultRxMetadata[:],
-		ReceivedAt: &time.Time{},
+		ReceivedAt: ttnpb.ProtoTimePtr(time.Time{}),
 	}
 	ups := []*ttnpb.UplinkMessage{up}
 
@@ -747,7 +747,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 			},
 		},
 		RxMetadata: DefaultRxMetadata[:],
-		ReceivedAt: &time.Time{},
+		ReceivedAt: ttnpb.ProtoTimePtr(time.Time{}),
 	}
 	ups := []*ttnpb.UplinkMessage{up}
 

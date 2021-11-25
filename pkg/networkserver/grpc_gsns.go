@@ -255,7 +255,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			dev.PendingMacState.CurrentParameters.Channels = chs
 
 			dev.MacState = dev.PendingMacState
-			dev.PendingSession.StartedAt = *up.ReceivedAt
+			dev.PendingSession.StartedAt = *ttnpb.StdTime(up.ReceivedAt)
 
 			matchType = pendingMatch
 		}
@@ -294,7 +294,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 				}
 
 				dev.MacState = macState
-				dev.Session.StartedAt = *up.ReceivedAt
+				dev.Session.StartedAt = *ttnpb.StdTime(up.ReceivedAt)
 
 				matchType = currentResetMatch
 
@@ -347,8 +347,8 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 						return nil, false, nil
 					}
 					nbTrans++
-					if recentUp.ReceivedAt.After(lastAt) {
-						lastAt = *recentUp.ReceivedAt
+					if recvAt := ttnpb.StdTime(recentUp.ReceivedAt); recvAt.After(lastAt) {
+						lastAt = *recvAt
 					}
 				}
 				if nbTrans < 2 || lastAt.IsZero() {
@@ -356,7 +356,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 					return nil, false, nil
 				}
 				maxDelay := maxRetransmissionDelay(dev.MacState.CurrentParameters.Rx1Delay)
-				delay := up.ReceivedAt.Sub(lastAt)
+				delay := ttnpb.StdTime(up.ReceivedAt).Sub(lastAt)
 				ctx = log.NewContextWithFields(ctx, log.Fields(
 					"last_transmission_at", lastAt,
 					"max_retransmission_delay", maxDelay,
@@ -521,7 +521,7 @@ macLoop:
 		case ttnpb.CID_RX_PARAM_SETUP:
 			evs, err = mac.HandleRxParamSetupAns(ctx, dev, cmd.GetRxParamSetupAns())
 		case ttnpb.CID_DEV_STATUS:
-			evs, err = mac.HandleDevStatusAns(ctx, dev, cmd.GetDevStatusAns(), cmacFMatchResult.FullFCnt, *up.ReceivedAt)
+			evs, err = mac.HandleDevStatusAns(ctx, dev, cmd.GetDevStatusAns(), cmacFMatchResult.FullFCnt, *ttnpb.StdTime(up.ReceivedAt))
 			if err == nil {
 				setPaths = append(setPaths,
 					"battery_percentage",
@@ -1032,7 +1032,7 @@ func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids ttnpb.EndDevic
 }
 
 func (ns *NetworkServer) deduplicationDone(ctx context.Context, up *ttnpb.UplinkMessage) <-chan time.Time {
-	return time.After(time.Until(up.ReceivedAt.Add(ns.deduplicationWindow(ctx))))
+	return time.After(time.Until(ttnpb.StdTime(up.ReceivedAt).Add(ns.deduplicationWindow(ctx))))
 }
 
 func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.UplinkMessage) (err error) {
@@ -1121,13 +1121,13 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	}
 
 	cfList := frequencyplans.CFList(*fp, matched.LorawanPhyVersion)
-	dlSettings := ttnpb.DLSettings{
+	dlSettings := &ttnpb.DLSettings{
 		Rx1DrOffset: macState.DesiredParameters.Rx1DataRateOffset,
 		Rx2Dr:       macState.DesiredParameters.Rx2DataRateIndex,
 		OptNeg:      matched.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0,
 	}
 
-	jReq := &ttnpb.JoinRequest{
+	resp, joinEvents, err := ns.sendJoinRequest(ctx, matched.EndDeviceIdentifiers, &ttnpb.JoinRequest{
 		Payload:            up.Payload,
 		CfList:             cfList,
 		CorrelationIds:     events.CorrelationIDsFromContext(ctx),
@@ -1136,12 +1136,9 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		RawPayload:         up.RawPayload,
 		RxDelay:            macState.DesiredParameters.Rx1Delay,
 		SelectedMacVersion: matched.LorawanVersion, // Assume NS version is always higher than the version of the device
-		DownlinkSettings:   &dlSettings,
-	}
-	if up.ConsumedAirtime != nil {
-		jReq.ConsumedAirtime = ttnpb.ProtoDuration(up.ConsumedAirtime)
-	}
-	resp, joinEvents, err := ns.sendJoinRequest(ctx, matched.EndDeviceIdentifiers, jReq)
+		ConsumedAirtime:    up.ConsumedAirtime,
+		DownlinkSettings:   dlSettings,
+	})
 
 	queuedEvents = append(queuedEvents, joinEvents...)
 	if err != nil {
@@ -1163,7 +1160,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		Request: ttnpb.MACState_JoinRequest{
 			RxDelay:          macState.DesiredParameters.Rx1Delay,
 			CfList:           cfList,
-			DownlinkSettings: dlSettings,
+			DownlinkSettings: *dlSettings,
 		},
 	}
 	macState.RxWindowsAvailable = true
@@ -1216,7 +1213,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	ctx = storedCtx
 
 	// TODO: Extract this into a utility function shared with mac.HandleRejoinRequest. (https://github.com/TheThingsNetwork/lorawan-stack/issues/8)
-	downAt := up.ReceivedAt.Add(-infrastructureDelay/2 + phy.JoinAcceptDelay1 - macState.DesiredParameters.Rx1Delay.Duration()/2 - nsScheduleWindow())
+	downAt := ttnpb.StdTime(up.ReceivedAt).Add(-infrastructureDelay/2 + phy.JoinAcceptDelay1 - macState.DesiredParameters.Rx1Delay.Duration()/2 - nsScheduleWindow())
 	if earliestAt := time.Now().Add(nsScheduleWindow()); downAt.Before(earliestAt) {
 		downAt = earliestAt
 	}
@@ -1249,8 +1246,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	up.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 
 	registerUplinkLatency(ctx, up)
-	now := time.Now().UTC()
-	up.ReceivedAt = &now
+	up.ReceivedAt = ttnpb.ProtoTimePtr(time.Now().UTC())
 
 	up.Payload = &ttnpb.Message{}
 	if err := lorawan.UnmarshalMessage(up.RawPayload, up.Payload); err != nil {
@@ -1293,7 +1289,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	if t, err := toa.Compute(len(up.RawPayload), *up.Settings); err != nil {
 		log.FromContext(ctx).WithError(err).Debug("Failed to compute time-on-air")
 	} else {
-		up.ConsumedAirtime = &t
+		up.ConsumedAirtime = ttnpb.ProtoDurationPtr(t)
 	}
 	switch up.Payload.MHdr.MType {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:

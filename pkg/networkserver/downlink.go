@@ -396,7 +396,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				})
 				// TODO: Check if following downlinks must be dropped (https://github.com/TheThingsNetwork/lorawan-stack/issues/1653).
 
-			case down.ClassBC.GetAbsoluteTime() != nil && down.ClassBC.AbsoluteTime.Before(transmitAt):
+			case down.ClassBC.GetAbsoluteTime() != nil && ttnpb.StdTime(down.ClassBC.AbsoluteTime).Before(transmitAt):
 				logger.Debug("Drop expired downlink")
 				genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
 					EndDeviceIds:   &dev.EndDeviceIdentifiers,
@@ -1428,7 +1428,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 
 	case slot.Time.After(time.Now()):
 		log.FromContext(ctx).Debug("Slot starts in the future, set absolute time in downlink request")
-		absTime = &slot.Time
+		absTime = ttnpb.ProtoTimePtr(slot.Time)
 
 	case slot.Class == ttnpb.CLASS_B:
 		log.FromContext(ctx).Error("Class B ping slot expired, retry downlink attempt")
@@ -1472,7 +1472,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 		FrequencyPlanId: dev.FrequencyPlanId,
 		Rx2DataRate:     dr.Rate,
 		Rx2Frequency:    freq,
-		AbsoluteTime:    ttnpb.ProtoTime(absTime),
+		AbsoluteTime:    absTime,
 	}
 	down, queuedEvents, err := ns.scheduleDownlinkByPaths(
 		log.NewContext(ctx, loggerWithTxRequestFields(log.FromContext(ctx), req, false, true)),
@@ -1659,7 +1659,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 						}, nil
 					}
 
-					rx1 := up.ReceivedAt.Add(phy.JoinAcceptDelay1)
+					rx1 := ttnpb.StdTime(up.ReceivedAt).Add(phy.JoinAcceptDelay1)
 					now := time.Now()
 					if rx1.Add(time.Second).Before(now) {
 						logger.Warn("RX1 and RX2 are expired, skip join-accept downlink slot")

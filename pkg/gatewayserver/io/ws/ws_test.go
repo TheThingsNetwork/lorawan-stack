@@ -1069,7 +1069,7 @@ func TestTraffic(t *testing.T) {
 					}
 					select {
 					case up := <-gsConn.Up():
-						a.So(time.Since(*up.Message.ReceivedAt), should.BeLessThan, timeout)
+						a.So(time.Since(*ttnpb.StdTime(up.Message.ReceivedAt)), should.BeLessThan, timeout)
 						up.Message.ReceivedAt = nil
 						var payload ttnpb.Message
 						a.So(lorawan.UnmarshalMessage(up.Message.RawPayload, &payload), should.BeNil)

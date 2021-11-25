@@ -230,7 +230,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 			logger.WithError(err).Warn("Failed to unmarshal uplink message")
 			return
 		}
-		up.ReceivedAt = &pkt.Received
+		up.ReceivedAt = ttnpb.ProtoTimePtr(pkt.Received)
 		if err := c.io.HandleUp(up, nil); err != nil {
 			logger.WithError(err).Warn("Failed to handle uplink message")
 		}

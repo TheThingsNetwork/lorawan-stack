@@ -1700,7 +1700,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 		appUp = up
 		return test.AllTrue(
 			a.So(up.CorrelationIds, should.HaveSameElementsDeep, append(joinReq.CorrelationIds, joinResp.CorrelationIds...)),
-			a.So([]time.Time{start, *recvAt, time.Now()}, should.BeChronological),
+			a.So([]time.Time{start, *ttnpb.StdTime(recvAt), time.Now()}, should.BeChronological),
 			a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 				EndDeviceIds:   &idsWithDevAddr,
 				CorrelationIds: up.CorrelationIds,
@@ -1846,7 +1846,7 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 				return test.AllTrue(
 					a.So(up.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual, deduplicatedUp.CorrelationIds),
 					a.So(up.GetUplinkMessage().GetRxMetadata(), should.HaveSameElementsDeep, deduplicatedUp.RxMetadata),
-					a.So([]time.Time{start, *recvAt, time.Now()}, should.BeChronological),
+					a.So([]time.Time{start, *ttnpb.StdTime(recvAt), time.Now()}, should.BeChronological),
 					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIds:   &dev.EndDeviceIdentifiers,
 						CorrelationIds: up.CorrelationIds,

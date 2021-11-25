@@ -280,7 +280,7 @@ func registerDropUp(ctx context.Context, msg *ttnpb.ApplicationUp, err error) {
 }
 
 func registerUplinkLatency(ctx context.Context, msg *ttnpb.ApplicationUplink) {
-	asMetrics.nsAsUplinkLatency.WithLabelValues(ctx).Observe(time.Since(*msg.ReceivedAt).Seconds())
+	asMetrics.nsAsUplinkLatency.WithLabelValues(ctx).Observe(time.Since(*ttnpb.StdTime(msg.ReceivedAt)).Seconds())
 	for _, meta := range msg.RxMetadata {
 		if meta.Time != nil && !meta.Time.IsZero() {
 			asMetrics.gtwAsUplinkLatency.WithLabelValues(ctx).Observe(time.Since(*meta.Time).Seconds())

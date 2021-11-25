@@ -259,7 +259,7 @@ func TestTraffic(t *testing.T) {
 				select {
 				case up := <-conn.Up():
 					if tc.OK {
-						a.So(time.Since(*up.Message.ReceivedAt), should.BeLessThan, timeout)
+						a.So(time.Since(*ttnpb.StdTime(up.Message.ReceivedAt)), should.BeLessThan, timeout)
 						up.Message.ReceivedAt = nil
 						a.So(up.Message, should.Resemble, tc.Message)
 					} else {
