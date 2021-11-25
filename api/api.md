@@ -1764,14 +1764,13 @@ The NATS provider settings.
 | ----- | ---- | ----- | ----------- |
 | `failed_attempts` | [`uint64`](#uint64) |  |  |
 | `last_failed_attempt_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
-| `last_failed_attempt_details` | [`google.protobuf.Any`](#google.protobuf.Any) |  |  |
+| `last_failed_attempt_details` | [`ErrorDetails`](#ttn.lorawan.v3.ErrorDetails) |  |  |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
 | `last_failed_attempt_at` | <p>`timestamp.required`: `true`</p> |
-| `last_failed_attempt_details` | <p>`any.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationWebhookIdentifiers">Message `ApplicationWebhookIdentifiers`</a>
 

@@ -10659,7 +10659,7 @@
           "format": "date-time"
         },
         "last_failed_attempt_details": {
-          "$ref": "#/definitions/protobufAny"
+          "$ref": "#/definitions/v3ErrorDetails"
         }
       }
     },
