@@ -107,12 +107,8 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 		},
 		AppSKey:      (*interop.KeyEnvelope)(res.SessionKeys.AppSKey),
 		SessionKeyID: interop.Buffer(res.SessionKeys.SessionKeyId),
+		Lifetime:     uint32(ttnpb.StdDurationOrZero(res.Lifetime) / time.Second),
 	}
-
-	if res.Lifetime != nil {
-		ans.Lifetime = uint32(ttnpb.StdDurationOrZero(res.Lifetime) / time.Second)
-	}
-
 	if ttnpb.MACVersion(in.MACVersion).Compare(ttnpb.MAC_V1_1) < 0 {
 		ans.NwkSKey = (*interop.KeyEnvelope)(res.SessionKeys.FNwkSIntKey)
 	} else {
