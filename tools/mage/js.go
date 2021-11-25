@@ -306,7 +306,7 @@ func (js Js) Fmt() error {
 	return js.runYarnCommand("prettier",
 		"--config", "./config/.prettierrc.js",
 		"--write",
-		"./pkg/webui/**/*.js", "./config/**/*.js",
+		"./pkg/webui/**/*.js", "./config/**/*.js", "./cypress/**/*.js",
 	)
 }
 
@@ -316,7 +316,7 @@ func (js Js) Lint() error {
 	if mg.Verbose() {
 		fmt.Println("Running eslint on .js files")
 	}
-	return js.runEslint("./pkg/webui/**/*.js", "./config/**/*.js")
+	return js.runEslint("./pkg/webui/**/*.js", "./config/**/*.js", "./cypress/**/*.js")
 }
 
 // LintSnap runs eslint over frontend snap files.

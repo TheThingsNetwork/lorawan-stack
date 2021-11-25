@@ -184,6 +184,10 @@ overrides:
     rules:
       jest/valid-expect: off
       no-invalid-this: off
+      jest/valid-title: off
   - files: 'cypress/plugins/**/*.js'
     rules:
       import/no-commonjs: off
+  - files: 'cypress/integration/smoke/**/*.js'
+    rules:
+      jest/no-standalone-expect: off
