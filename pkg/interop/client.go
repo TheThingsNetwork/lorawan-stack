@@ -62,9 +62,6 @@ type jsRPCPaths struct {
 func (p jsRPCPaths) join() string    { return p.Join }
 func (p jsRPCPaths) appSKey() string { return p.AppSKey }
 
-//func (p jsRPCPaths) rejoin() string  { return p.Rejoin }
-//func (p jsRPCPaths) homeNS() string  { return p.HomeNS }
-
 func serverURL(scheme, fqdn, path string, port uint32) string {
 	if scheme == "" {
 		scheme = "https"
