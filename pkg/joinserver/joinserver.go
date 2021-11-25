@@ -541,7 +541,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			}
 
 			dev.Session = &ttnpb.Session{
-				StartedAt:   time.Now().UTC(),
+				StartedAt:   ttnpb.ProtoTimePtr(time.Now()),
 				DevAddr:     req.DevAddr,
 				SessionKeys: sk,
 			}

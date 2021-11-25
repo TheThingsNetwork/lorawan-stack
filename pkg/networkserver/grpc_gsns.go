@@ -255,7 +255,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			dev.PendingMacState.CurrentParameters.Channels = chs
 
 			dev.MacState = dev.PendingMacState
-			dev.PendingSession.StartedAt = *ttnpb.StdTime(up.ReceivedAt)
+			dev.PendingSession.StartedAt = up.ReceivedAt
 
 			matchType = pendingMatch
 		}
@@ -294,7 +294,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 				}
 
 				dev.MacState = macState
-				dev.Session.StartedAt = *ttnpb.StdTime(up.ReceivedAt)
+				dev.Session.StartedAt = up.ReceivedAt
 
 				matchType = currentResetMatch
 

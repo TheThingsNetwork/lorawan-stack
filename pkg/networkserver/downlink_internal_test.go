@@ -213,7 +213,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				},
 				LorawanPhyVersion:       ttnpb.RP001_V1_1_REV_B,
 				FrequencyPlanId:         band.EU_863_870,
-				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
+				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(time.Unix(42, 0)),
 			},
 			Error: errNoDownlink,
 		},
@@ -245,7 +245,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				},
 				LorawanPhyVersion:       ttnpb.RP001_V1_1_REV_B,
 				FrequencyPlanId:         band.EU_863_870,
-				LastDevStatusReceivedAt: TimePtr(time.Now()),
+				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(time.Now()),
 				Session:                 generateSession(),
 			},
 			Error: errNoDownlink,
@@ -1209,7 +1209,7 @@ func generateSession() *ttnpb.Session {
 		LastFCntUp:                 randomVal,
 		LastNFCntDown:              randomVal,
 		LastAFCntDown:              randomVal,
-		StartedAt:                  time.Now(),
+		StartedAt:                  ttnpb.ProtoTimePtr(time.Now()),
 		QueuedApplicationDownlinks: queuedDownlinks,
 	}
 }

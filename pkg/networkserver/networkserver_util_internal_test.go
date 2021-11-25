@@ -2121,7 +2121,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 				}),
 			),
 		)
-		return o.WithPendingMACState(MACStatePtr(MACStateOptions.WithQueuedJoinAccept(&ttnpb.MACState_JoinAccept{
+		return o.WithPendingMacState(MACStatePtr(MACStateOptions.WithQueuedJoinAccept(&ttnpb.MACState_JoinAccept{
 			Payload: bytes.Repeat([]byte{0xff}, 17),
 			Request: ttnpb.MACState_JoinRequest{
 				DownlinkSettings: ttnpb.DLSettings{
@@ -2212,7 +2212,7 @@ func (o EndDeviceOptionNamespace) Activate(defaults ttnpb.MACSettings, wrapKeys 
 			macState := MakeMACState(&x, defaults, macStateOpts...)
 			ses := MakeSession(macState.LorawanVersion, wrapKeys, false, sessionOpts...)
 			return o.Compose(
-				o.WithMACState(macState),
+				o.WithMacState(macState),
 				o.WithSession(ses),
 				o.WithEndDeviceIdentifiersOptions(
 					test.EndDeviceIdentifiersOptions.WithDevAddr(&ses.DevAddr),
@@ -2229,12 +2229,12 @@ func (o EndDeviceOptionNamespace) Activate(defaults ttnpb.MACSettings, wrapKeys 
 					o.WithEndDeviceIdentifiersOptions(
 						test.EndDeviceIdentifiersOptions.WithDevAddr(&x.PendingSession.DevAddr),
 					),
-					o.WithMACState(x.PendingMacState),
+					o.WithMacState(x.PendingMacState),
 					o.WithSession(x.PendingSession),
 				)(x)
 			},
 			o.WithMACStateOptions(MACStateOptions.WithPendingJoinRequest(nil)),
-			o.WithPendingMACState(nil),
+			o.WithPendingMacState(nil),
 			o.WithPendingSession(nil),
 		)(x)
 	}

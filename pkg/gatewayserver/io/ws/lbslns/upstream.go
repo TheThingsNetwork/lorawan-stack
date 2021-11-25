@@ -217,7 +217,7 @@ func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 	up.RxMetadata = []*ttnpb.RxMetadata{
 		{
 			GatewayIds:   &ids,
-			Time:         tm,
+			Time:         ttnpb.ProtoTime(tm),
 			Timestamp:    timestamp,
 			Rssi:         req.RadioMetaData.UpInfo.RSSI,
 			ChannelRssi:  req.RadioMetaData.UpInfo.RSSI,
@@ -291,7 +291,7 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 	}
 
 	rxMetadata := up.RxMetadata[0]
-	rxTime, gpsTime := TimePtrToUpInfoTime(rxMetadata.Time)
+	rxTime, gpsTime := TimePtrToUpInfoTime(ttnpb.StdTime(rxMetadata.Time))
 	req.RadioMetaData = RadioMetaData{
 		DataRate:  int(drIdx),
 		Frequency: up.Settings.GetFrequency(),
@@ -375,7 +375,7 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 	up.RxMetadata = []*ttnpb.RxMetadata{
 		{
 			GatewayIds:   &ids,
-			Time:         tm,
+			Time:         ttnpb.ProtoTime(tm),
 			Timestamp:    timestamp,
 			Rssi:         updf.RadioMetaData.UpInfo.RSSI,
 			ChannelRssi:  updf.RadioMetaData.UpInfo.RSSI,
@@ -461,7 +461,7 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 	}
 
 	rxMetadata := up.RxMetadata[0]
-	rxTime, gpsTime := TimePtrToUpInfoTime(rxMetadata.Time)
+	rxTime, gpsTime := TimePtrToUpInfoTime(ttnpb.StdTime(rxMetadata.Time))
 
 	updf.RadioMetaData = RadioMetaData{
 		DataRate:  int(drIdx),

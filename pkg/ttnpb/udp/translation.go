@@ -206,7 +206,7 @@ func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error
 	}
 	if !goTime.IsZero() {
 		for _, md := range up.RxMetadata {
-			md.Time = &goTime
+			md.Time = ttnpb.ProtoTimePtr(goTime)
 		}
 		up.Settings.Time = ttnpb.ProtoTimePtr(goTime)
 	}

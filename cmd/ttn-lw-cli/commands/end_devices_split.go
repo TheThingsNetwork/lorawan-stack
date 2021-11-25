@@ -95,10 +95,10 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 					logger.WithError(err).Error("Could not get end device from Join Server")
 				} else {
 					res.SetFields(jsRes, ttnpb.AllowedBottomLevelFields(jsPaths, getEndDeviceFromJS)...)
-					if res.CreatedAt.IsZero() || (!jsRes.CreatedAt.IsZero() && jsRes.CreatedAt.Before(res.CreatedAt)) {
+					if res.CreatedAt == nil || (jsRes.CreatedAt != nil && ttnpb.StdTime(jsRes.CreatedAt).Before(*ttnpb.StdTime(res.CreatedAt))) {
 						res.CreatedAt = jsRes.CreatedAt
 					}
-					if jsRes.UpdatedAt.After(res.UpdatedAt) {
+					if ttnpb.StdTime(jsRes.UpdatedAt).After(*ttnpb.StdTime(res.UpdatedAt)) {
 						res.UpdatedAt = jsRes.UpdatedAt
 					}
 				}
@@ -129,10 +129,10 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 					logger.WithError(err).Error("Could not get end device from Application Server")
 				} else {
 					res.SetFields(asRes, ttnpb.AllowedBottomLevelFields(asPaths, getEndDeviceFromAS)...)
-					if res.CreatedAt.IsZero() || (!asRes.CreatedAt.IsZero() && asRes.CreatedAt.Before(res.CreatedAt)) {
+					if res.CreatedAt == nil || (asRes.CreatedAt != nil && ttnpb.StdTime(asRes.CreatedAt).Before(*ttnpb.StdTime(res.CreatedAt))) {
 						res.CreatedAt = asRes.CreatedAt
 					}
-					if asRes.UpdatedAt.After(res.UpdatedAt) {
+					if ttnpb.StdTime(asRes.UpdatedAt).After(*ttnpb.StdTime(res.UpdatedAt)) {
 						res.UpdatedAt = asRes.UpdatedAt
 					}
 				}
@@ -164,10 +164,10 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 				} else {
 					res.SetFields(nsRes, "ids.dev_addr")
 					res.SetFields(nsRes, ttnpb.AllowedBottomLevelFields(nsPaths, getEndDeviceFromNS)...)
-					if res.CreatedAt.IsZero() || (!nsRes.CreatedAt.IsZero() && nsRes.CreatedAt.Before(res.CreatedAt)) {
+					if res.CreatedAt == nil || (nsRes.CreatedAt != nil && ttnpb.StdTime(nsRes.CreatedAt).Before(*ttnpb.StdTime(res.CreatedAt))) {
 						res.CreatedAt = nsRes.CreatedAt
 					}
-					if nsRes.UpdatedAt.After(res.UpdatedAt) {
+					if ttnpb.StdTime(nsRes.UpdatedAt).After(*ttnpb.StdTime(res.UpdatedAt)) {
 						res.UpdatedAt = nsRes.UpdatedAt
 					}
 				}
@@ -198,10 +198,10 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 			return nil, err
 		}
 		res.SetFields(isRes, isPaths...)
-		if res.CreatedAt.IsZero() || (!isRes.CreatedAt.IsZero() && isRes.CreatedAt.Before(res.CreatedAt)) {
+		if res.CreatedAt == nil || (isRes.CreatedAt != nil && ttnpb.StdTime(isRes.CreatedAt).Before(*ttnpb.StdTime(res.CreatedAt))) {
 			res.CreatedAt = isRes.CreatedAt
 		}
-		if isRes.UpdatedAt.After(res.UpdatedAt) {
+		if ttnpb.StdTime(isRes.UpdatedAt).After(*ttnpb.StdTime(res.UpdatedAt)) {
 			res.UpdatedAt = isRes.UpdatedAt
 		}
 	}
@@ -224,10 +224,10 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 			return nil, err
 		}
 		res.SetFields(jsRes, jsPaths...)
-		if res.CreatedAt.IsZero() || (!jsRes.CreatedAt.IsZero() && jsRes.CreatedAt.Before(res.CreatedAt)) {
+		if res.CreatedAt == nil || (jsRes.CreatedAt != nil && ttnpb.StdTime(jsRes.CreatedAt).Before(*ttnpb.StdTime(res.CreatedAt))) {
 			res.CreatedAt = jsRes.CreatedAt
 		}
-		if jsRes.UpdatedAt.After(res.UpdatedAt) {
+		if ttnpb.StdTime(jsRes.UpdatedAt).After(*ttnpb.StdTime(res.UpdatedAt)) {
 			res.UpdatedAt = jsRes.UpdatedAt
 		}
 	}
@@ -250,10 +250,10 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 			return nil, err
 		}
 		res.SetFields(nsRes, nsPaths...)
-		if res.CreatedAt.IsZero() || (!nsRes.CreatedAt.IsZero() && nsRes.CreatedAt.Before(res.CreatedAt)) {
+		if res.CreatedAt == nil || (nsRes.CreatedAt != nil && ttnpb.StdTime(nsRes.CreatedAt).Before(*ttnpb.StdTime(res.CreatedAt))) {
 			res.CreatedAt = nsRes.CreatedAt
 		}
-		if nsRes.UpdatedAt.After(res.UpdatedAt) {
+		if ttnpb.StdTime(nsRes.UpdatedAt).After(*ttnpb.StdTime(res.UpdatedAt)) {
 			res.UpdatedAt = nsRes.UpdatedAt
 		}
 	}
@@ -276,10 +276,10 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 			return nil, err
 		}
 		res.SetFields(asRes, asPaths...)
-		if res.CreatedAt.IsZero() || (!asRes.CreatedAt.IsZero() && asRes.CreatedAt.Before(res.CreatedAt)) {
+		if res.CreatedAt == nil || (asRes.CreatedAt != nil && ttnpb.StdTime(asRes.CreatedAt).Before(*ttnpb.StdTime(res.CreatedAt))) {
 			res.CreatedAt = asRes.CreatedAt
 		}
-		if asRes.UpdatedAt.After(res.UpdatedAt) {
+		if ttnpb.StdTime(asRes.UpdatedAt).After(*ttnpb.StdTime(res.UpdatedAt)) {
 			res.UpdatedAt = asRes.UpdatedAt
 		}
 	}

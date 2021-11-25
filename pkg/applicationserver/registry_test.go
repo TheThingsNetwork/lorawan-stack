@@ -89,8 +89,8 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
 		t.Fatalf("Failed to create device: %s", err)
 	}
-	a.So(ret.CreatedAt, should.HappenAfter, start)
-	a.So(ret.UpdatedAt, should.HappenAfter, start)
+	a.So(*ttnpb.StdTime(ret.CreatedAt), should.HappenAfter, start)
+	a.So(*ttnpb.StdTime(ret.UpdatedAt), should.HappenAfter, start)
 	a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
 	pb.CreatedAt = ret.CreatedAt
 	pb.UpdatedAt = ret.UpdatedAt
@@ -122,8 +122,8 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
 		t.Fatalf("Failed to update device: %s", err)
 	}
-	a.So(ret.UpdatedAt, should.HappenAfter, start)
-	a.So(ret.UpdatedAt, should.HappenAfter, ret.CreatedAt)
+	a.So(*ttnpb.StdTime(ret.UpdatedAt), should.HappenAfter, start)
+	a.So(*ttnpb.StdTime(ret.UpdatedAt), should.HappenAfter, *ttnpb.StdTime(ret.CreatedAt))
 	if !a.So(ret.SkipPayloadCryptoOverride, should.NotBeNil) || !a.So(ret.SkipPayloadCryptoOverride.Value, should.BeFalse) {
 		t.Fatalf("Setting deprecated field failed to update new field")
 	}

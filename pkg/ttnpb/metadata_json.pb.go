@@ -71,7 +71,7 @@ func (x *RxMetadata) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.Time == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.Time)
+			gogo.MarshalTimestamp(s, x.Time)
 		}
 	}
 	if x.Timestamp != 0 || s.HasField("timestamp") {
@@ -196,7 +196,7 @@ func (x *RxMetadata) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.AntennaIndex = s.ReadUint32()
 		case "time":
 			s.AddField("time")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}

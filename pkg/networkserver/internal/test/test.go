@@ -480,7 +480,7 @@ func MakeSessionKeys(macVersion ttnpb.MACVersion, wrapKeys, withID bool, opts ..
 	}
 	return test.MakeSessionKeys(
 		defaultKeyOpt(macVersion),
-		SessionKeysOptions.WithSessionKeyID(id),
+		SessionKeysOptions.WithSessionKeyId(id),
 		SessionKeysOptions.Compose(opts...),
 	)
 }

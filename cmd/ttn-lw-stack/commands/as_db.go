@@ -82,10 +82,10 @@ var (
 						}
 						var any bool
 						for _, sess := range []*ttnpb.Session{dev.Session, dev.PendingSession} {
-							if sess == nil || sess.StartedAt.IsZero() {
+							if sess == nil || sess.StartedAt == nil {
 								continue
 							}
-							sess.StartedAt = time.Time{}
+							sess.StartedAt = nil
 							any = true
 						}
 						if any {

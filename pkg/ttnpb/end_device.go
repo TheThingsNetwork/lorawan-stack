@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -832,7 +831,7 @@ func (v *Session) FieldIsZero(p string) bool {
 	case "queued_application_downlinks":
 		return v.QueuedApplicationDownlinks == nil
 	case "started_at":
-		return v.StartedAt == time.Time{}
+		return v.StartedAt == nil
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
@@ -884,7 +883,7 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	case "claim_authentication_code.value":
 		return v.ClaimAuthenticationCode.FieldIsZero("value")
 	case "created_at":
-		return v.CreatedAt == time.Time{}
+		return v.CreatedAt == nil
 	case "description":
 		return v.Description == ""
 	case "downlink_margin":
@@ -1216,7 +1215,7 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	case "supports_join":
 		return !v.SupportsJoin
 	case "updated_at":
-		return v.UpdatedAt == time.Time{}
+		return v.UpdatedAt == nil
 	case "used_dev_nonces":
 		return v.UsedDevNonces == nil
 	case "version_ids":

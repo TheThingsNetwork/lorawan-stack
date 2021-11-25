@@ -128,7 +128,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 		},
 		Timestamp: validV2Metadata.Timestamp,
 	}
-	nilTime := time.Unix(0, 0)
+	nilTime := ttnpb.ProtoTimePtr(time.Unix(0, 0))
 	ids := ttnpb.GatewayIdentifiers{
 		GatewayId: "gateway-id",
 	}
@@ -138,7 +138,7 @@ func TestProtobufV2Uplinks(t *testing.T) {
 			ChannelRssi: -2,
 			Rssi:        -2,
 			Snr:         -75,
-			Time:        &nilTime,
+			Time:        nilTime,
 			Timestamp:   1000,
 		},
 	}
