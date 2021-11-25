@@ -44,7 +44,7 @@ func (x *JoinRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("net_id")
 		x.NetId.MarshalProtoJSON(s.WithField("net_id"))
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.DownlinkSettings != nil || s.HasField("downlink_settings") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("downlink_settings")
 		x.DownlinkSettings.MarshalProtoJSON(s.WithField("downlink_settings"))
@@ -104,6 +104,7 @@ func (x *JoinRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.NetId.UnmarshalProtoJSON(s.WithField("net_id", false))
 		case "downlink_settings", "downlinkSettings":
 			if !s.ReadNil() {
+				x.DownlinkSettings = &DLSettings{}
 				x.DownlinkSettings.UnmarshalProtoJSON(s.WithField("downlink_settings", true))
 			}
 		case "rx_delay", "rxDelay":

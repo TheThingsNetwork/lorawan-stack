@@ -77,10 +77,18 @@ func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
 		case "downlink_settings":
 			if len(subs) > 0 {
 				var newDst, newSrc *DLSettings
-				if src != nil {
-					newSrc = &src.DownlinkSettings
+				if (src == nil || src.DownlinkSettings == nil) && dst.DownlinkSettings == nil {
+					continue
 				}
-				newDst = &dst.DownlinkSettings
+				if src != nil {
+					newSrc = src.DownlinkSettings
+				}
+				if dst.DownlinkSettings != nil {
+					newDst = dst.DownlinkSettings
+				} else {
+					newDst = &DLSettings{}
+					dst.DownlinkSettings = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -88,8 +96,7 @@ func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
 				if src != nil {
 					dst.DownlinkSettings = src.DownlinkSettings
 				} else {
-					var zero DLSettings
-					dst.DownlinkSettings = zero
+					dst.DownlinkSettings = nil
 				}
 			}
 		case "rx_delay":

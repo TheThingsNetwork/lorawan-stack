@@ -46,8 +46,8 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 			return nil, interop.ErrMalformedMessage.WithCause(err)
 		}
 	}
-	var dlSettings ttnpb.DLSettings
-	if err := lorawan.UnmarshalDLSettings(in.DLSettings, &dlSettings); err != nil {
+	dlSettings := &ttnpb.DLSettings{}
+	if err := lorawan.UnmarshalDLSettings(in.DLSettings, dlSettings); err != nil {
 		return nil, interop.ErrMalformedMessage.WithCause(err)
 	}
 

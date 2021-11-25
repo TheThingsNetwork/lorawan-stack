@@ -208,7 +208,7 @@ func MakeNsJsJoinRequest(conf NsJsJoinRequestConfig) *ttnpb.JoinRequest {
 		DevAddr:            *conf.DevAddr.Copy(&types.DevAddr{}),
 		SelectedMacVersion: conf.SelectedMACVersion,
 		NetId:              *conf.NetID.Copy(&types.NetID{}),
-		DownlinkSettings: ttnpb.DLSettings{
+		DownlinkSettings: &ttnpb.DLSettings{
 			Rx1DrOffset: conf.RX1DataRateOffset,
 			Rx2Dr:       conf.RX2DataRateIndex,
 			OptNeg:      conf.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) >= 0,
@@ -1624,7 +1624,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					DevAddr: joinReq.DevAddr,
 					NetId:   joinReq.NetId,
 					Request: ttnpb.MACState_JoinRequest{
-						DownlinkSettings: joinReq.DownlinkSettings,
+						DownlinkSettings: *joinReq.DownlinkSettings,
 						RxDelay:          joinReq.RxDelay,
 						CfList:           joinReq.CfList,
 					},

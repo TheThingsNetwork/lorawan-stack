@@ -187,7 +187,7 @@ func TestInvalidJoinRequests(t *testing.T) {
 					},
 					DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 					NetId:   types.NetID{0x42, 0xff, 0xff},
-					DownlinkSettings: ttnpb.DLSettings{
+					DownlinkSettings: &ttnpb.DLSettings{
 						OptNeg:      true,
 						Rx1DrOffset: 0x7,
 						Rx2Dr:       0xf,
@@ -268,7 +268,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -374,7 +374,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -505,7 +505,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -639,7 +639,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -748,7 +748,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -853,7 +853,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -957,7 +957,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1007,7 +1007,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1093,7 +1093,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1179,7 +1179,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1265,7 +1265,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1353,7 +1353,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1442,7 +1442,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1534,7 +1534,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1624,7 +1624,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0x42, 0x42},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1677,7 +1677,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1731,7 +1731,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1781,7 +1781,7 @@ func TestHandleJoin(t *testing.T) {
 					0xed, 0x8b, 0xd2, 0x24,
 				},
 				NetId: types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1816,7 +1816,7 @@ func TestHandleJoin(t *testing.T) {
 			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMacVersion: ttnpb.MAC_V1_0,
 				NetId:              types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1857,7 +1857,7 @@ func TestHandleJoin(t *testing.T) {
 					Payload: &ttnpb.Message_JoinAcceptPayload{},
 				},
 				NetId: types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1899,7 +1899,7 @@ func TestHandleJoin(t *testing.T) {
 					Payload: &ttnpb.Message_JoinRequestPayload{},
 				},
 				NetId: types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1945,7 +1945,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 				},
 				NetId: types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1983,7 +1983,7 @@ func TestHandleJoin(t *testing.T) {
 					0x23, 0x42, 0xff, 0xff, 0xaa, 0x42, 0x42, 0x0f, 0xff, 0xff, 0xff, 0xff, 0xff,
 				},
 				NetId: types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -2029,7 +2029,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 				},
 				NetId: types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,

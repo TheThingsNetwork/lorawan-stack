@@ -209,7 +209,7 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 		return nil, errNoJoinRequestPayload.New()
 	}
 
-	dlSettings, err := lorawan.MarshalDLSettings(req.DownlinkSettings)
+	dlSettings, err := lorawan.MarshalDLSettings(*req.DownlinkSettings)
 	if err != nil {
 		return nil, err
 	}

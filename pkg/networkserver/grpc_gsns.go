@@ -1136,7 +1136,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		RawPayload:         up.RawPayload,
 		RxDelay:            macState.DesiredParameters.Rx1Delay,
 		SelectedMacVersion: matched.LorawanVersion, // Assume NS version is always higher than the version of the device
-		DownlinkSettings:   dlSettings,
+		DownlinkSettings:   &dlSettings,
 	}
 	if up.ConsumedAirtime != nil {
 		jReq.ConsumedAirtime = ttnpb.ProtoDuration(up.ConsumedAirtime)
