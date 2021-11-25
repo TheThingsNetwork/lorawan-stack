@@ -101,7 +101,7 @@ export default class PubsubForm extends Component {
   }
 
   @bind
-  async handleSubmit(values, { setSubmitting, resetForm }) {
+  async handleSubmit(values, { resetForm }) {
     const { appId, onSubmit, onSubmitSuccess, onSubmitFailure, existCheck, update } = this.props
 
     const castedValues = validationSchema.cast(values)

@@ -20,7 +20,7 @@ import * as users from '@console/store/actions/users'
 
 const getUserLogic = createRequestLogic({
   type: users.GET_USER,
-  process: ({ action }, dispatch) => {
+  process: ({ action }) => {
     const {
       payload: { id },
       meta: { selector },
@@ -32,7 +32,7 @@ const getUserLogic = createRequestLogic({
 
 const updateUserLogic = createRequestLogic({
   type: users.UPDATE_USER,
-  process: ({ action }, dispatch) => {
+  process: ({ action }) => {
     const {
       payload: { id, patch },
     } = action
@@ -85,7 +85,7 @@ const getUsersLogic = createRequestLogic({
 
 const createUserLogic = createRequestLogic({
   type: users.CREATE_USER,
-  process: ({ action }, dispatch) => {
+  process: ({ action }) => {
     const {
       payload: { user },
     } = action

@@ -25,7 +25,7 @@ import * as user from '@account/store/actions/user'
 
 const accountAppInitLogic = createLogic({
   type: init.INITIALIZE,
-  process: async ({ getState, action }, dispatch, done) => {
+  process: async (_, dispatch, done) => {
     try {
       const meResult = await api.account.me()
       try {

@@ -61,7 +61,7 @@ const ForgotPassword = ({ location }) => {
   const [error, setError] = useState(undefined)
 
   const handleSubmit = useCallback(
-    async (values, { resetForm, setSubmitting }) => {
+    async (values, { setSubmitting }) => {
       try {
         setError(undefined)
         await tts.Users.createTemporaryPassword(values.user_id)

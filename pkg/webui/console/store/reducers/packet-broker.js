@@ -157,11 +157,7 @@ export default handleActions(
         homeNetworks: addPolicy(state.policies.homeNetworks, { home_network_id: id }, false),
       },
     }),
-    [GET_HOME_NETWORK_ROUTING_POLICIES_SUCCESS]: (
-      state,
-      { payload: policies },
-      getPacketBrokerHomeNewtorkId,
-    ) => ({
+    [GET_HOME_NETWORK_ROUTING_POLICIES_SUCCESS]: (state, { payload: policies }) => ({
       ...state,
       policies: {
         ...state.policies,

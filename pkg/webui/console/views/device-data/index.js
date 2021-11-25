@@ -32,7 +32,7 @@ import { selectSelectedDevice, selectSelectedDeviceId } from '@console/store/sel
 
 import style from './device-data.styl'
 
-@connect((state, props) => {
+@connect(state => {
   const device = selectSelectedDevice(state)
   return {
     device,

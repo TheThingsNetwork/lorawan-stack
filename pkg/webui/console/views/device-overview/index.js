@@ -45,7 +45,7 @@ const m = defineMessages({
   keysNotExposed: 'Keys are not exposed',
 })
 
-@connect((state, props) => ({
+@connect(state => ({
   device: selectSelectedDevice(state),
 }))
 class DeviceOverview extends React.Component {

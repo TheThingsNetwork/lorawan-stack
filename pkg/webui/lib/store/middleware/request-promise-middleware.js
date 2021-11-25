@@ -40,9 +40,8 @@ export const promisifyDispatch = dispatch => action => {
  * This middleware will check for request actions and attach a cancelable
  * promise to the action.
  *
- * @param {object} store - The store to apply the middleware to.
  * @returns {object} The middleware.
  */
-const requestPromiseMiddleware = store => promisifyDispatch
+const requestPromiseMiddleware = () => promisifyDispatch
 
 export default requestPromiseMiddleware

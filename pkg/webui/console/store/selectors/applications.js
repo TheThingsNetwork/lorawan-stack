@@ -48,7 +48,8 @@ export const selectApplicationDerivedById = (state, id) => selectApplicationDeri
 export const selectApplicationById = (state, id) => selectApplicationEntitiesStore(state)[id]
 export const selectSelectedApplicationId = state =>
   selectApplicationStore(state).selectedApplication
-export const selectApplicationNameById = (state, id) => (selectApplicationById(state) || {}).name
+export const selectApplicationNameById = (state, id) =>
+  (selectApplicationById(state, id) || {}).name
 export const selectSelectedApplication = state =>
   selectApplicationById(state, selectSelectedApplicationId(state))
 export const selectApplicationFetching = createFetchingSelector(GET_APP_BASE)

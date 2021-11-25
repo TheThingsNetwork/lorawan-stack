@@ -45,7 +45,7 @@ LanguageOption.propTypes = {
   title: PropTypes.string.isRequired,
 }
 
-const FooterSection = ({ className, action, link, children, primary, safe, ...rest }) => {
+const FooterSection = ({ className, action, link, children, primary, safe }) => {
   let content
   if (Boolean(link)) {
     content = safe ? (

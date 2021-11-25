@@ -163,14 +163,14 @@ export class SafeInspector extends Component {
   }
 
   @bind
-  handleDataClick(e) {
+  handleDataClick() {
     if (!this.state.hidden) {
       selectText(this.displayElem.current)
     }
   }
 
   @bind
-  handleCopyClick(e) {
+  handleCopyClick() {
     const { noCopyPopup } = this.props
     const { copied } = this.state
 

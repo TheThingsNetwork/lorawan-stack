@@ -72,7 +72,7 @@ export default class UserManagementAdd extends Component {
   }
 
   @bind
-  onSubmitSuccess(response) {
+  onSubmitSuccess() {
     const { navigateToList } = this.props
 
     navigateToList()

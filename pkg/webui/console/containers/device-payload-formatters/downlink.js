@@ -140,7 +140,7 @@ class DevicePayloadFormatters extends React.PureComponent {
   }
 
   @bind
-  async onTestSubmit(data, decode) {
+  async onTestSubmit(data) {
     const { appId, devId, encodeDownlink, device } = this.props
     const { f_port, payload, formatter, parameter } = data
     const { version_ids } = device

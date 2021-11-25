@@ -176,6 +176,11 @@ rules:
   arrow-body-style:
     - warn
     - as-needed
+  no-unused-vars:
+    - error
+    - vars: all
+      args: after-used
+      ignoreRestSiblings: true
 
 # Overwrite jest's expect rules for cypress test files, which uses a different
 # assertion syntax.

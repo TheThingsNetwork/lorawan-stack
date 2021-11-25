@@ -33,7 +33,7 @@ const user = (state = {}, user) => ({
   ...user,
 })
 
-const users = (state = initialState, { type, payload, meta }) => {
+const users = (state = initialState, { type, payload }) => {
   switch (type) {
     case GET_USER:
       return {
