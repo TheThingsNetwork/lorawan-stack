@@ -692,7 +692,7 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 
 	logger.WithFields(log.Fields(
 		"transmission_delay", res.Delay,
-		"transmit_at", time.Now().Add(res.Delay),
+		"transmit_at", time.Now().Add(ttnpb.StdDurationOrZero(res.Delay)),
 		"rx1", res.Rx1,
 		"rx2", res.Rx2,
 	)).Debug("Scheduled downlink")

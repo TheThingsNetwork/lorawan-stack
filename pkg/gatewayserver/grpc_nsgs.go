@@ -84,7 +84,7 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 		down.CorrelationIds = append(down.CorrelationIds, events.CorrelationIDsFromContext(ctx)...)
 		registerSendDownlink(ctx, conn.Gateway(), down, conn.Frontend().Protocol())
 		return &ttnpb.ScheduleDownlinkResponse{
-			Delay:        delay,
+			Delay:        ttnpb.ProtoDurationPtr(delay),
 			DownlinkPath: path,
 			Rx1:          rx1,
 			Rx2:          rx2,

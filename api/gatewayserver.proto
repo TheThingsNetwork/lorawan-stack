@@ -78,7 +78,7 @@ service GtwGs {
 
 message ScheduleDownlinkResponse {
   // The amount of time between the message has been scheduled and it will be transmitted by the gateway.
-  google.protobuf.Duration delay = 1 [(gogoproto.stdduration) = true, (gogoproto.nullable) = false, (validate.rules).duration.required = true];
+  google.protobuf.Duration delay = 1 [(validate.rules).duration.required = true];
   // Downlink path chosen by the Gateway Server.
   DownlinkPath downlink_path = 2;
   // Whether RX1 has been chosen for the downlink message.
