@@ -16,7 +16,6 @@ package web
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"net/http"
 	"os"
@@ -28,8 +27,6 @@ import (
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
-	echo "github.com/labstack/echo/v4"
-	echomiddleware "github.com/labstack/echo/v4/middleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fillcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -55,9 +52,6 @@ type Server struct {
 
 	// The HTTP router for API.
 	apiRouter *mux.Router
-
-	// The legacy HTTP framework.
-	echo *echo.Echo
 }
 
 type options struct {
@@ -253,20 +247,10 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 	)
 	root.PathPrefix("/api/").Handler(apiRouter)
 
-	server := echo.New()
-
-	server.Logger = &noopLogger{}
-	server.HTTPErrorHandler = errorHandler
-
-	server.Use(
-		echomiddleware.Gzip(),
-	)
-
 	s := &Server{
 		root:      root,
 		router:    router,
 		apiRouter: apiRouter,
-		echo:      server,
 	}
 
 	var staticPath string
@@ -340,56 +324,6 @@ func (s *Server) getRouter(path string) *mux.Router {
 		return s.apiRouter
 	}
 	return s.router
-}
-
-var echoVar = regexp.MustCompile(":[^/]+")
-
-// replaceEchoVars replaces Echo path variables with Mux path variables.
-// "/users/:user_id" will become "/users/{user_id}"
-func replaceEchoVars(path string) string {
-	return echoVar.ReplaceAllStringFunc(path, func(s string) string {
-		return fmt.Sprintf("{%s}", strings.TrimPrefix(s, ":"))
-	})
-}
-
-// Group creates a sub group.
-func (s *Server) Group(prefix string, middleware ...echo.MiddlewareFunc) *echo.Group {
-	path := "/" + strings.Trim(prefix, "/")
-	pathWithSlash := path + "/"
-	router := s.getRouter(pathWithSlash)
-	router.PathPrefix(replaceEchoVars(pathWithSlash)).Handler(s.echo)
-	if !strings.HasSuffix(path, "/") {
-		router.Handle(replaceEchoVars(path), http.RedirectHandler(pathWithSlash, http.StatusPermanentRedirect))
-	}
-	return s.echo.Group(path, middleware...)
-}
-
-// GET registers a GET handler at path.
-func (s *Server) GET(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route {
-	router := s.getRouter(path)
-	router.Path(path).Methods(http.MethodGet).Handler(s.echo)
-	return s.echo.GET(replaceEchoVars(path), h, m...)
-}
-
-// HEAD registers a HEAD handler at path.
-func (s *Server) HEAD(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route {
-	router := s.getRouter(path)
-	router.Path(path).Methods(http.MethodHead).Handler(s.echo)
-	return s.echo.HEAD(replaceEchoVars(path), h, m...)
-}
-
-// POST registers a POST handler at path.
-func (s *Server) POST(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route {
-	router := s.getRouter(path)
-	router.Path(path).Methods(http.MethodPost).Handler(s.echo)
-	return s.echo.POST(replaceEchoVars(path), h, m...)
-}
-
-// DELETE registers a DELETE handler at path.
-func (s *Server) DELETE(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route {
-	router := s.getRouter(path)
-	router.Path(path).Methods(http.MethodDelete).Handler(s.echo)
-	return s.echo.DELETE(replaceEchoVars(path), h, m...)
 }
 
 var hashRegex = regexp.MustCompile(`\.([a-f0-9]{20}|[a-f0-9]{32})(\.bundle)?\.(js|css|woff|woff2|ttf|eot|jpg|jpeg|png|svg)$`)

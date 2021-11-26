@@ -15,7 +15,7 @@
 package web
 
 import (
-	echo "github.com/labstack/echo/v4"
+	"net/http"
 )
 
 type redirector struct {
@@ -24,9 +24,9 @@ type redirector struct {
 	Location string
 }
 
-func (r redirector) RegisterRoutes(s *Server) {
-	s.GET(r.Path, func(c echo.Context) error {
-		return c.Redirect(r.Code, r.Location)
+func (red redirector) RegisterRoutes(s *Server) {
+	s.RootRouter().Path(red.Path).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, red.Location, red.Code)
 	})
 }
 

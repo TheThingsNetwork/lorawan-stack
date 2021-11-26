@@ -8306,6 +8306,15 @@
       "file": "callback.go"
     }
   },
+  "error:pkg/web/oauthclient:no_auth_cookie": {
+    "translations": {
+      "en": "no auth cookie"
+    },
+    "description": {
+      "package": "pkg/web/oauthclient",
+      "file": "cookie_auth.go"
+    }
+  },
   "error:pkg/web/oauthclient:no_code": {
     "translations": {
       "en": "no code parameter present in request"

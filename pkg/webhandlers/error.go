@@ -25,7 +25,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	sentryerrors "go.thethings.network/lorawan-stack/v3/pkg/errors/sentry"
-	weberrors "go.thethings.network/lorawan-stack/v3/pkg/errors/web"
 )
 
 var errRouteNotFound = errors.DefineNotFound("route_not_found", "route `{route}` not found")
@@ -49,9 +48,21 @@ func NewContextWithErrorValue(parent context.Context) (ctx context.Context, getE
 	return context.WithValue(parent, errorContextValue, &err), func() error { return err }
 }
 
+// ProcessError processes an HTTP error by converting it if appropriate, and
+// determining the HTTP status code to return.
+func ProcessError(in error) (statusCode int, err error) {
+	statusCode, err = http.StatusInternalServerError, in
+	if ttnErr, ok := errors.From(err); ok {
+		statusCode = errors.ToHTTPStatusCode(ttnErr)
+		return statusCode, ttnErr
+	}
+	ttnErr := errors.FromHTTPStatusCode(statusCode, "message")
+	return statusCode, ttnErr.WithCause(err).WithAttributes("message", err.Error())
+}
+
 // Error writes the error to the response writer.
 func Error(w http.ResponseWriter, r *http.Request, err error) {
-	code, err := weberrors.ProcessError(err)
+	code, err := ProcessError(err)
 	if code >= 500 && code != http.StatusNotImplemented {
 		errEvent := sentryerrors.NewEvent(err)
 		errEvent.Request = sentry.NewRequest(r)
