@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.16.1] - 2021-11-26
+
+### Added
+
 - Support for fine timestamps and frequency offsets sent by gateways with SX1303 concentrator using the legacy UDP protocol.
 - Support for resetting end device session context and MAC state in the Console.
 - The Content-Security-Policy header (that was previously behind the `webui.csp` feature flag) is now enabled by default.
@@ -27,18 +41,12 @@ For details about compatibility between different releases, see the **Commitment
 - Gateway server disconnects LoRa Basics Station gateways that stop sending pongs to server pings. This does not apply to gateways that don't support pongs.
 - The new plugin for reading/writing JSON in our API (that was previously behind the `jsonpb.jsonplugin` feature flag) is now enabled by default. All API responses should be equivalent, but in some cases object fields may be in a different order.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - The reported sub-band's `downlink_utilization` in gateway connection stats now represents the utilization of the available duty-cycle time.
 - Missing fields when admins list non-owned entities.
 - Using the correct timestamp when retreiving the "Last activity" data point for Gateways on initial page loads in the Console.
 - Events reappearing in the end device data view after clearing them when navigating back and forth.
-
-### Security
 
 ## [3.16.0] - 2021-11-12
 
@@ -1902,7 +1910,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.0...v3.16
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.1...v3.16
+[3.16.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.0...v3.16.1
 [3.16.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.3...v3.16.0
 [3.15.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.2...v3.15.3
 [3.15.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.1...v3.15.2
