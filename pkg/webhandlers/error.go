@@ -19,9 +19,11 @@ import (
 	"encoding/json"
 	"net"
 	"net/http"
+	"sort"
 	"strings"
 
 	"github.com/getsentry/sentry-go"
+	"github.com/golang/gddo/httputil"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	sentryerrors "go.thethings.network/lorawan-stack/v3/pkg/errors/sentry"
@@ -60,6 +62,32 @@ func ProcessError(in error) (statusCode int, err error) {
 	return statusCode, ttnErr.WithCause(err).WithAttributes("message", err.Error())
 }
 
+type errorHandlersKeyType struct{}
+
+var errorHandlersKey errorHandlersKeyType
+
+// WithErrorHandlers registers additional error handlers to be used while rendering errors.
+func WithErrorHandlers(h map[string]http.Handler) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			r = r.WithContext(context.WithValue(r.Context(), errorHandlersKey, h))
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
+type errorKeyType struct{}
+
+var errorKey errorKeyType
+
+// RetrieveError retrieves the error from the context.
+func RetrieveError(r *http.Request) error {
+	if err, ok := r.Context().Value(errorKey).(error); ok {
+		return err
+	}
+	return nil
+}
+
 // Error writes the error to the response writer.
 func Error(w http.ResponseWriter, r *http.Request, err error) {
 	code, err := ProcessError(err)
@@ -93,9 +121,24 @@ func Error(w http.ResponseWriter, r *http.Request, err error) {
 	if errPtr, ok := r.Context().Value(errorContextValue).(*error); ok && errPtr != nil {
 		*errPtr = err
 	}
-	w.Header().Set("Content-Type", "application/json")
+
+	handlers, _ := r.Context().Value(errorHandlersKey).(map[string]http.Handler)
+	offers := append(make([]string, 0, len(handlers)+1), "application/json")
+	for k := range handlers {
+		offers = append(offers, k)
+	}
+	sort.Strings(offers)
+
+	ct := httputil.NegotiateContentType(r, offers, "application/json")
+	w.Header().Set("Content-Type", ct)
 	w.WriteHeader(code)
-	enc := json.NewEncoder(w)
-	enc.SetIndent("", "  ")
-	enc.Encode(err)
+	switch ct {
+	case "application/json":
+		enc := json.NewEncoder(w)
+		enc.SetIndent("", "  ")
+		enc.Encode(err)
+	default:
+		r := r.WithContext(context.WithValue(r.Context(), errorKey, err))
+		handlers[ct].ServeHTTP(w, r)
+	}
 }

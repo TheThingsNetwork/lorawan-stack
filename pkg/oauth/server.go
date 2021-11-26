@@ -271,6 +271,9 @@ func (s *server) RegisterRoutes(server *web.Server) {
 				next.ServeHTTP(w, r)
 			})
 		},
+		webhandlers.WithErrorHandlers(map[string]http.Handler{
+			"text/html": webui.Template,
+		}),
 	)
 
 	csrfMiddleware := webmiddleware.CSRF(

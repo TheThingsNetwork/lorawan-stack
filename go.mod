@@ -58,6 +58,7 @@ require (
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/go-redis/redis/v8 v8.4.0
 	github.com/gogo/protobuf v1.3.2
+	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
 	// NOTE: github.com/golang/protobuf is actually pinned to v1.3.5 above.
 	github.com/golang/protobuf v1.5.1
 	github.com/google/go-cmp v0.5.6

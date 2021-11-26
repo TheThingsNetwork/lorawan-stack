@@ -204,11 +204,17 @@ func (t *AppTemplate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	templateData.JSFiles = jsFiles
+	pageData := ctx.Value(pageDataKey)
+	if err := webhandlers.RetrieveError(r); err != nil {
+		pageData = map[string]interface{}{
+			"error": err,
+		}
+	}
 	if err := t.template.Execute(w, Data{
 		TemplateData:         templateData,
 		AppConfig:            ctx.Value(appConfigKey),
 		ExperimentalFeatures: experimental.AllFeatures(ctx),
-		PageData:             ctx.Value(pageDataKey),
+		PageData:             pageData,
 		CSPNonce:             cspNonce,
 	}); err != nil {
 		webhandlers.Error(w, r, err)

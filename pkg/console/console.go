@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/web/oauthclient"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 )
@@ -152,6 +153,9 @@ func (console *Console) RegisterRoutes(server *web.Server) {
 				})
 				next.ServeHTTP(w, r)
 			})
+		}),
+		webhandlers.WithErrorHandlers(map[string]http.Handler{
+			"text/html": webui.Template,
 		}),
 		mux.MiddlewareFunc(
 			webmiddleware.CSRF(
