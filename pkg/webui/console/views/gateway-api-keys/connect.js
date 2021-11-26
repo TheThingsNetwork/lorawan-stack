@@ -12,9 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import GatewayApiKeyAdd from './gateway-api-key-add'
-import connect from './connect'
+import { connect } from 'react-redux'
 
-const ConnectedGatewayApiKeyAdd = connect(GatewayApiKeyAdd)
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
-export { ConnectedGatewayApiKeyAdd as default, GatewayApiKeyAdd }
+import { mayViewOrEditGatewayApiKeys } from '@console/lib/feature-checks'
+
+import { selectSelectedGatewayId } from '@console/store/selectors/gateways'
+
+const mapStateToProps = state => ({
+  gtwId: selectSelectedGatewayId(state),
+})
+
+export default GatewayApiKeys =>
+  connect(mapStateToProps)(
+    withFeatureRequirement(mayViewOrEditGatewayApiKeys, {
+      redirect: ({ gtwId }) => `/gateways/${gtwId}`,
+    })(GatewayApiKeys),
+  )
