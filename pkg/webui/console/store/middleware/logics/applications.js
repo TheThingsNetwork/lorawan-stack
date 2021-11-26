@@ -160,6 +160,20 @@ const getApplicationLinkLogic = createRequestLogic({
   },
 })
 
+const updateApplicationLinkLogic = createRequestLogic(
+  {
+    type: link.UPDATE_APP_LINK,
+    process: async ({ action }) => {
+      const { id, link } = action.payload
+
+      const updatedLink = await api.application.link.set(id, link)
+
+      return { ...link, ...updatedLink }
+    },
+  },
+  link.updateApplicationLinkSuccess,
+)
+
 export default [
   getApplicationLogic,
   getApplicationDeviceCountLogic,
@@ -169,6 +183,7 @@ export default [
   getApplicationsLogic,
   getApplicationsRightsLogic,
   getApplicationLinkLogic,
+  updateApplicationLinkLogic,
   getApplicationDevEUICountLogic,
   ...createEventsConnectLogics(
     applications.SHARED_NAME,

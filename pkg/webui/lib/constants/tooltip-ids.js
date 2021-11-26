@@ -68,6 +68,7 @@ export default Object.freeze({
   SCHEDULE_ANYTIME_DELAY: 'schedule-anytime-delay',
   SCHEDULE_DOWNLINK_LATE: 'schedule-downlink-late',
   SET_CLAIM_AUTH_CODE: 'set-claim-auth-code',
+  SKIP_PAYLOAD_CRYPTO_OVERRIDE: 'skip-payload-crypto-override',
   STATUS_COUNT_PERIODICITY: 'status-count-periodicity',
   STATUS_TIME_PERIODICITY: 'status-time-periodicity',
   UPDATE_LOCATION_FROM_STATUS: 'update-location-from-status',

@@ -82,7 +82,7 @@ const UplinkForm = props => {
     [simulateUplink],
   )
 
-  const deviceSimulationDisabled = device.skip_payload_crypto_override || skipPayloadCrypto
+  const deviceSimulationDisabled = device.skip_payload_crypto_override ?? skipPayloadCrypto
 
   return (
     <>

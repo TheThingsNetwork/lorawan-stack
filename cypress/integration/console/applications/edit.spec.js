@@ -65,6 +65,17 @@ describe('Application general settings', () => {
       .should('be.visible')
   })
 
+  it('suceeds at changing skip payload crypto', () => {
+    cy.visit(`${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`)
+
+    cy.findByLabelText('Skip payload encryption and decryption').click()
+
+    cy.findByRole('button', { name: 'Save changes' }).click()
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification').findByText(`Application updated`).should('be.visible')
+  })
+
   it('succeeds deleting application', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/applications/${applicationId}/general-settings`)
     cy.findByRole('button', { name: /Delete application/ }).click()

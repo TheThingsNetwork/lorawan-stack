@@ -25,7 +25,7 @@ describe('End device messaging', () => {
   const application = {
     ids: { application_id: applicationId },
     name: 'Application End Devices Test Name',
-    description: `Application End Devices Test Description`,
+    description: 'Application End Devices Test Description',
   }
 
   const endDeviceId = 'end-device-overview-test'
@@ -106,7 +106,7 @@ describe('End device messaging', () => {
 
       cy.findByTestId('notification')
         .should('be.visible')
-        .findByText(`Simulation is disabled for devices that skip payload crypto`)
+        .findByText('Simulation is disabled for devices that skip payload crypto')
         .should('be.visible')
 
       cy.findByLabelText('FPort').should('be.disabled')
@@ -164,7 +164,7 @@ describe('End device messaging', () => {
 
       cy.findByTestId('notification')
         .should('be.visible')
-        .findByText(`Simulation is disabled for devices that skip payload crypto`)
+        .findByText('Simulation is disabled for devices that skip payload crypto')
         .should('be.visible')
 
       cy.findByLabelText('Replace downlink queue').should('be.disabled')
