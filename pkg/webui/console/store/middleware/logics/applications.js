@@ -163,7 +163,7 @@ const getApplicationLinkLogic = createRequestLogic({
 const updateApplicationLinkLogic = createRequestLogic(
   {
     type: link.UPDATE_APP_LINK,
-    process: async ({ action }, dispatch, done) => {
+    process: async ({ action }) => {
       const { id, link } = action.payload
 
       const updatedLink = await api.application.link.set(id, link)
