@@ -12,9 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ApplicationApiKeyAdd from './application-api-key-add'
-import connect from './connect'
+import { connect } from 'react-redux'
 
-const ConnectedApplicationApiKeyAdd = connect(ApplicationApiKeyAdd)
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
-export { ConnectedApplicationApiKeyAdd as default, ApplicationApiKeyAdd }
+import { mayViewOrEditApplicationApiKeys } from '@console/lib/feature-checks'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+
+const mapStateToProps = state => ({
+  appId: selectSelectedApplicationId(state),
+})
+
+export default ApplicationApiKeys =>
+  connect(mapStateToProps)(
+    withFeatureRequirement(mayViewOrEditApplicationApiKeys, {
+      redirect: ({ appId }) => `/applications/${appId}`,
+    })(ApplicationApiKeys),
+  )
