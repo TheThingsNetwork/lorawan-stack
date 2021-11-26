@@ -106,9 +106,11 @@ export default class FileInput extends Component {
     const { files } = event.target
     const threeMb = 3 * 1024 * 1024
 
-    if (files && files[0] && files[0].size <= threeMb) {
-      this.setState({ isLarger: !this.state.isLarger })
-    } else if (files && files[0] && files[0].size <= maxSize) {
+    if (files && files[0] && files[0].size <= maxSize) {
+      if (files && files[0] && files[0].size <= threeMb) {
+        this.setState({ isLarger: !this.state.isLarger })
+      }
+
       this.setState({ filename: files[0].name, error: undefined })
       this.reader.readAsDataURL(files[0])
     } else {
