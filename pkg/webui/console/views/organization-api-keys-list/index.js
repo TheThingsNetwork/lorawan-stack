@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
 
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
-import bind from 'autobind-decorator'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
@@ -34,47 +33,45 @@ import {
   selectApiKeysError,
 } from '@console/store/selectors/api-keys'
 
-class OrganizationApiKeysList extends React.Component {
-  static propTypes = {
-    match: PropTypes.match.isRequired,
-  }
+const OrganizationApiKeysList = props => {
+  const { match } = props
+  const { orgId } = match.params
 
-  constructor(props) {
-    super(props)
+  const getApiKeys = React.useCallback(
+    filters => getApiKeysList('organization', orgId, filters),
+    [orgId],
+  )
+  const baseDataSelector = React.useCallback(
+    state => {
+      const id = { id: orgId }
+      return {
+        keys: selectApiKeys(state, id),
+        totalCount: selectApiKeysTotalCount(state, id),
+        fetching: selectApiKeysFetching(state),
+        error: selectApiKeysError(state),
+      }
+    },
+    [orgId],
+  )
 
-    const { orgId } = props.match.params
-    this.getApiKeysList = filters => getApiKeysList('organization', orgId, filters)
-  }
+  return (
+    <Container>
+      <Row>
+        <IntlHelmet title={sharedMessages.apiKeys} />
+        <Col>
+          <ApiKeysTable
+            pageSize={PAGE_SIZES.REGULAR}
+            baseDataSelector={baseDataSelector}
+            getItemsAction={getApiKeys}
+          />
+        </Col>
+      </Row>
+    </Container>
+  )
+}
 
-  @bind
-  baseDataSelector(state) {
-    const { orgId } = this.props.match.params
-
-    const id = { id: orgId }
-    return {
-      keys: selectApiKeys(state, id),
-      totalCount: selectApiKeysTotalCount(state, id),
-      fetching: selectApiKeysFetching(state),
-      error: selectApiKeysError(state),
-    }
-  }
-
-  render() {
-    return (
-      <Container>
-        <Row>
-          <IntlHelmet title={sharedMessages.apiKeys} />
-          <Col>
-            <ApiKeysTable
-              pageSize={PAGE_SIZES.REGULAR}
-              baseDataSelector={this.baseDataSelector}
-              getItemsAction={this.getApiKeysList}
-            />
-          </Col>
-        </Row>
-      </Container>
-    )
-  }
+OrganizationApiKeysList.propTypes = {
+  match: PropTypes.match.isRequired,
 }
 
 export default OrganizationApiKeysList

@@ -12,9 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import OrganizationApiKeys from './organization-api-keys'
-import connect from './connect'
+import { connect } from 'react-redux'
 
-const ConnectedOrganizationApiKeys = connect(OrganizationApiKeys)
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
-export { ConnectedOrganizationApiKeys as default, OrganizationApiKeys }
+import { mayViewOrEditOrganizationApiKeys } from '@console/lib/feature-checks'
+
+import { selectSelectedOrganizationId } from '@console/store/selectors/organizations'
+
+const mapStateToProps = state => ({
+  orgId: selectSelectedOrganizationId(state),
+})
+
+export default OrganizationApiKeys =>
+  connect(mapStateToProps)(
+    withFeatureRequirement(mayViewOrEditOrganizationApiKeys, {
+      redirect: ({ orgId }) => `/organizations/${orgId}`,
+    })(OrganizationApiKeys),
+  )
