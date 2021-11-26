@@ -21,6 +21,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/gorilla/csrf"
 	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
@@ -180,6 +181,7 @@ func WithPageData(r *http.Request, pageData interface{}) *http.Request {
 func (t *AppTemplate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	templateData := ctx.Value(templateDataKey).(TemplateData)
+	templateData.CSRFToken = csrf.Token(r)
 	var cspNonce string
 	if v, ok := ctx.Value(nonceKey).(string); ok {
 		cspNonce = v
