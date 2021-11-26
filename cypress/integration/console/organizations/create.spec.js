@@ -47,9 +47,7 @@ describe('Organization create', () => {
   })
 
   it('validates before submitting an empty form', () => {
-    cy.findByRole('button', { name: 'Create organization' })
-      .should('be.visible')
-      .click()
+    cy.findByRole('button', { name: 'Create organization' }).should('be.visible').click()
 
     cy.findErrorByLabelText('Organization ID')
       .should('contain.text', 'Organization ID is required')
@@ -60,9 +58,7 @@ describe('Organization create', () => {
   it('succeeds adding organization', () => {
     cy.findByLabelText('Organization ID').type(organizationId)
 
-    cy.findByRole('button', { name: 'Create organization' })
-      .should('be.visible')
-      .click()
+    cy.findByRole('button', { name: 'Create organization' }).should('be.visible').click()
 
     cy.findByTestId('error-notification').should('not.exist')
     cy.findByTestId('full-error-view').should('not.exist')

@@ -39,9 +39,7 @@ const forgotPasswordFlow = defineSmokeTest('forgot password flow succeeds', () =
   // Type in own username and hit `Send`.
   cy.findByLabelText('User ID').type(user.ids.user_id)
   cy.findByRole('button', { name: 'Send' }).click()
-  cy.findByTestId('notification')
-    .should('be.visible')
-    .should('contain', 'reset instruction')
+  cy.findByTestId('notification').should('be.visible').should('contain', 'reset instruction')
   cy.location('pathname').should('include', `${Cypress.config('accountAppRootPath')}/login`)
 
   // Retrieve password token link from email (via stack logs).
@@ -52,9 +50,7 @@ const forgotPasswordFlow = defineSmokeTest('forgot password flow succeeds', () =
     cy.visit(temporaryPasswordLink)
     cy.findByLabelText('New password').type(newPassword)
     cy.findByLabelText('Confirm new password').type(`${newPassword}{enter}`)
-    cy.findByTestId('notification')
-      .should('be.visible')
-      .should('contain', 'Password changed')
+    cy.findByTestId('notification').should('be.visible').should('contain', 'Password changed')
     cy.location('pathname').should('include', `${Cypress.config('accountAppRootPath')}/login`)
 
     // Verify new credentials by logging in.

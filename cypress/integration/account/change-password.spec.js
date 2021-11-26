@@ -40,9 +40,7 @@ describe('OAuth change password (logged in)', () => {
     cy.findByLabelText('Current password').should('be.visible')
     cy.findByLabelText('New password').should('be.visible')
     cy.findByLabelText('Confirm new password').should('be.visible')
-    cy.findByLabelText('Revoke all access')
-      .should('exist')
-      .and('not.be.checked')
+    cy.findByLabelText('Revoke all access').should('exist').and('not.be.checked')
     cy.findByRole('button', { name: 'Change password' }).should('be.visible')
   })
 
@@ -65,9 +63,7 @@ describe('OAuth change password (logged in)', () => {
     cy.findByLabelText('Revoke all access').check()
     cy.findByLabelText('Confirm new password').type(`${newPassword}{enter}`)
 
-    cy.findByTestId('toast-notification')
-      .should('be.visible')
-      .and('contain', 'Password changed')
+    cy.findByTestId('toast-notification').should('be.visible').and('contain', 'Password changed')
   })
 
   it('succeeds changing password without revoking access', () => {
@@ -76,9 +72,7 @@ describe('OAuth change password (logged in)', () => {
     cy.findByLabelText('Confirm new password').type(newPassword)
     cy.findByRole('button', { name: 'Change password' }).click()
 
-    cy.findByTestId('toast-notification')
-      .should('be.visible')
-      .and('contain', 'Password changed')
+    cy.findByTestId('toast-notification').should('be.visible').and('contain', 'Password changed')
   })
 })
 
@@ -102,9 +96,7 @@ describe('Account App change password (via forgot password)', () => {
     cy.visit(temporaryPasswordLink)
     cy.findByLabelText('New password').should('be.visible')
     cy.findByLabelText('Confirm new password').should('be.visible')
-    cy.findByLabelText('Revoke all access')
-      .should('exist')
-      .should('have.attr', 'value', 'false')
+    cy.findByLabelText('Revoke all access').should('exist').should('have.attr', 'value', 'false')
     cy.findByRole('button', { name: 'Change password' }).should('be.visible')
     cy.findByRole('link', { name: 'Cancel' }).should('be.visible')
   })
@@ -131,9 +123,7 @@ describe('Account App change password (via forgot password)', () => {
     cy.findByLabelText('Revoke all access').check()
     cy.findByRole('button', { name: 'Change password' }).click()
 
-    cy.findByTestId('notification')
-      .should('be.visible')
-      .should('contain', 'password was changed')
+    cy.findByTestId('notification').should('be.visible').should('contain', 'password was changed')
     cy.location('pathname').should('include', `${Cypress.config('accountAppRootPath')}/login`)
   })
 })

@@ -40,9 +40,7 @@ describe('Account App user registration', () => {
       .should('contain.text', 'User ID is required')
       .and('be.visible')
 
-    cy.findErrorByLabelText('Email')
-      .should('contain.text', 'Email is required')
-      .and('be.visible')
+    cy.findErrorByLabelText('Email').should('contain.text', 'Email is required').and('be.visible')
 
     cy.findErrorByLabelText('Password')
       .should('contain.text', 'Password is required')

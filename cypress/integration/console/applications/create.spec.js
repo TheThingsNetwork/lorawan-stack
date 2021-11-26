@@ -62,9 +62,7 @@ describe('Application create', () => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.visit(`${Cypress.config('consoleRootPath')}/applications/add`)
 
-    cy.findByRole('button', { name: 'Create application' })
-      .should('be.visible')
-      .click()
+    cy.findByRole('button', { name: 'Create application' }).should('be.visible').click()
 
     cy.findErrorByLabelText('Application ID')
       .should('contain.text', 'Application ID is required')
