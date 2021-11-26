@@ -22,15 +22,15 @@ describe('Packet Broker networks', () => {
     cy.fixture('console/packet-broker/networks.json').as('networks')
     cy.fixture('console/packet-broker/default-policy.json').as('defaultPolicy')
 
-    cy.intercept('/pba/info', { fixture: 'console/packet-broker/info-registered.json' })
-    cy.intercept('/pba/networks', { fixture: 'console/packet-broker/networks.json' })
-    cy.intercept('/pba/forwarders/policies', {
+    cy.intercept('/api/v3/pba/info', { fixture: 'console/packet-broker/info-registered.json' })
+    cy.intercept('/api/v3/pba/networks*', { fixture: 'console/packet-broker/networks.json' })
+    cy.intercept('/api/v3/pba/forwarders/policies*', {
       fixture: 'console/packet-broker/policies-forwarder.json',
     })
-    cy.intercept('GET', '/pba/home-networks/policies/default', {
+    cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', {
       fixture: 'console/packet-broker/default-policy.json',
     })
-    cy.intercept('GET', '/pba/home-networks/policies/19/johan', {
+    cy.intercept('GET', '/api/v3/pba/home-networks/policies/19/johan', {
       statusCode: 404,
       fixture: '404-body.json',
     })
@@ -39,7 +39,7 @@ describe('Packet Broker networks', () => {
   })
 
   it('displays the network table correctly', function () {
-    cy.intercept('/pba/home-networks/policies', {
+    cy.intercept('/api/v3/pba/home-networks/policies*', {
       fixture: 'console/packet-broker/policies-home-network.json',
     })
     cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker/networks`)
