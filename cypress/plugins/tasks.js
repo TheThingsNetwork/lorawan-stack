@@ -85,7 +85,7 @@ const stackConfigTask = (_, config) => {
   }
 }
 
-const sqlTask = (on, _) => {
+const sqlTask = on => {
   on('task', {
     execSql: async sql => {
       client = new Client(pgConfig)
@@ -110,7 +110,7 @@ const sqlTask = (on, _) => {
   })
 }
 
-const stackLogTask = (on, _) => {
+const stackLogTask = on => {
   on('task', {
     findEmailInStackLog: async (regExp, capturingGroup = 0) => {
       const re = new RegExp(regExp, 'm')
