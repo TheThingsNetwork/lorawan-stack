@@ -25,19 +25,21 @@ import (
 )
 
 var (
-	errContextDeadlineExceeded = DefineDeadlineExceeded("context_deadline_exceeded", "context deadline exceeded")
-	errContextCanceled         = DefineCanceled("context_canceled", "context canceled")
-
 	errNetInvalidAddr    = DefineInvalidArgument("net_invalid_addr", "{message}", "message", "temporary", "timeout")
 	errNetAddr           = DefineUnavailable("net_addr", "{message}", "message", "temporary", "timeout")
 	errNetDNS            = DefineUnavailable("net_dns", "{message}", "message", "temporary", "timeout", "not_found")
 	errNetUnknownNetwork = DefineNotFound("net_unknown_network", "{message}", "message", "temporary", "timeout")
 	errNetOperation      = DefineUnavailable("net_operation", "{message}", "message", "op", "net", "source", "address", "timeout", "temporary")
 
-	errRequest = Define("request", "request to `{url}` failed")
-	errURL     = DefineInvalidArgument("url", "invalid url `{url}`")
+	errRequest = Define("request", "request to `{url}` failed", "op")
+	errURL     = DefineInvalidArgument("url", "invalid url `{url}`", "op")
 
 	errX509UnknownAuthority = DefineUnavailable("x509_unknown_authority", "unknown certificate authority")
+
+	standardErrors = map[error]*Definition{
+		context.Canceled:         DefineCanceled("context_canceled", "context canceled"),
+		context.DeadlineExceeded: DefineDeadlineExceeded("context_deadline_exceeded", "context deadline exceeded"),
+	}
 )
 
 // From returns an *Error if it can be derived from the given input.
@@ -52,10 +54,8 @@ func From(err error) (out *Error, ok bool) {
 			out = &copy
 		}
 	}()
-	if err == context.Canceled {
-		return build(errContextCanceled, 0), true
-	} else if err == context.DeadlineExceeded {
-		return build(errContextDeadlineExceeded, 0), true
+	if def, ok := standardErrors[err]; ok {
+		return build(def, 0), true
 	}
 	switch err := err.(type) {
 	case *Error:
@@ -122,6 +122,7 @@ func From(err error) (out *Error, ok bool) {
 		}
 		e := build(definition, 0).WithAttributes(
 			"url", err.URL,
+			"op", err.Op,
 		)
 		if err.Err != nil {
 			e = e.WithCause(err.Err)
