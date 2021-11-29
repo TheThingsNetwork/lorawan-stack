@@ -62,7 +62,7 @@ require (
 	// NOTE: github.com/golang/protobuf is actually pinned to v1.3.5 above.
 	github.com/golang/protobuf v1.5.1
 	github.com/google/go-cmp v0.5.6
-	github.com/gorilla/csrf v1.7.0
+	github.com/gorilla/csrf v1.7.1
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/schema v1.2.0
