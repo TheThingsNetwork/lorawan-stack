@@ -54,8 +54,7 @@ func validLocation(loc ttnpb.Location) bool {
 			return false
 		}
 	}
-
-	return true
+	return loc.ValidateFields() == nil
 }
 
 // UpstreamMetadata related to an uplink.
@@ -264,7 +263,7 @@ func convertStatus(stat Stat, md UpstreamMetadata) *ttnpb.GatewayStatus {
 	}
 
 	if stat.Lati != nil && stat.Long != nil {
-		loc := &ttnpb.Location{Latitude: *stat.Lati, Longitude: *stat.Long}
+		loc := &ttnpb.Location{Latitude: *stat.Lati, Longitude: *stat.Long, Source: ttnpb.SOURCE_GPS}
 		if stat.Alti != nil {
 			loc.Altitude = *stat.Alti
 		}
