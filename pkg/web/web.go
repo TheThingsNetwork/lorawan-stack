@@ -345,3 +345,16 @@ func (s *Server) Static(prefix string, fs http.FileSystem) {
 func (s *Server) Prefix(prefix string) *mux.Route {
 	return s.getRouter(prefix).PathPrefix(prefix)
 }
+
+// PrefixWithRedirect will create a route ending in slash.
+// Paths which coincide with the route, but do not end with slash, will be
+// redirect to the slash ending route.
+func (s *Server) PrefixWithRedirect(prefix string) *mux.Route {
+	prefix = "/" + strings.Trim(prefix, "/")
+	prefixWithSlash := prefix
+	if prefix != "/" {
+		prefixWithSlash = prefix + "/"
+		s.getRouter(prefix).Path(prefix).Handler(http.RedirectHandler(prefixWithSlash, http.StatusPermanentRedirect))
+	}
+	return s.getRouter(prefixWithSlash).PathPrefix(prefixWithSlash)
+}

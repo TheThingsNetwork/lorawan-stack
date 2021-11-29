@@ -130,7 +130,7 @@ func generateConsoleCSPString(config *Config, nonce string) string {
 
 // RegisterRoutes implements web.Registerer. It registers the Console to the web server.
 func (console *Console) RegisterRoutes(server *web.Server) {
-	router := server.Router().NewRoute().PathPrefix(console.config.Mount).Subrouter()
+	router := server.PrefixWithRedirect(console.config.Mount).Subrouter()
 	router.Use(
 		mux.MiddlewareFunc(func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

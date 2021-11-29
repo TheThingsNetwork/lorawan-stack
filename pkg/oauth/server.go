@@ -246,7 +246,7 @@ func (s *server) output(w http.ResponseWriter, r *http.Request, resp *osin.Respo
 }
 
 func (s *server) RegisterRoutes(server *web.Server) {
-	router := server.Router().NewRoute().PathPrefix(s.config.Mount).Subrouter()
+	router := server.PrefixWithRedirect(s.config.Mount).Subrouter()
 	router.Use(
 		func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -25,9 +25,7 @@ type redirector struct {
 }
 
 func (red redirector) RegisterRoutes(s *Server) {
-	s.RootRouter().Path(red.Path).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, red.Location, red.Code)
-	})
+	s.RootRouter().Path(red.Path).Handler(http.RedirectHandler(red.Location, red.Code))
 }
 
 // Redirect returns a Registerer that redirects requests to the given path to

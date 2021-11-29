@@ -94,7 +94,7 @@ func (s *server) RegisterRoutes(server *web.Server) {
 		csrf.FieldName("_csrf"),
 		csrf.Path("/"),
 	)
-	router := server.Router().NewRoute().PathPrefix(s.config.Mount).Subrouter()
+	router := server.PrefixWithRedirect(s.config.Mount).Subrouter()
 	router.Use(
 		func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
