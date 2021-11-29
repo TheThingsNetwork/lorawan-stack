@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Access to application payload formatters for users with `RIGHT_APPLICATION_SETTINGS_BASIC` right.
+
 ### Security
 
 ## [3.16.1] - 2021-11-26

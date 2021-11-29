@@ -32,6 +32,8 @@ import PayloadFormattersForm from '@console/components/payload-formatters-form'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import { checkFromState, mayViewApplicationLink } from '@console/lib/feature-checks'
+
 import { updateApplicationLinkSuccess } from '@console/store/actions/link'
 
 import {
@@ -45,14 +47,18 @@ const m = defineMessages({
   title: 'Default uplink payload formatter',
   infoText:
     'You can use the "Payload formatter" tab of individual end devices to test uplink payload formatters and to define individual payload formatter settings per end device.',
+  uplinkResetWarning:
+    'You do not have sufficient rights to view the current uplink payload formatter. Only overwriting is allowed.',
 })
 @connect(
   state => {
     const formatters = selectApplicationLinkFormatters(state) || {}
+    const mayViewLink = checkFromState(mayViewApplicationLink, state)
 
     return {
       appId: selectSelectedApplicationId(state),
       formatters,
+      mayViewLink,
     }
   },
   { updateLinkSuccess: updateApplicationLinkSuccess },
@@ -71,6 +77,7 @@ class ApplicationPayloadFormatters extends React.PureComponent {
   static propTypes = {
     appId: PropTypes.string.isRequired,
     formatters: PropTypes.formatters.isRequired,
+    mayViewLink: PropTypes.bool.isRequired,
     updateLinkSuccess: PropTypes.func.isRequired,
   }
 
@@ -115,7 +122,7 @@ class ApplicationPayloadFormatters extends React.PureComponent {
   }
 
   render() {
-    const { formatters } = this.props
+    const { formatters, mayViewLink } = this.props
     const { type } = this.state
 
     const isNoneType = type === PAYLOAD_FORMATTER_TYPES.NONE
@@ -126,6 +133,7 @@ class ApplicationPayloadFormatters extends React.PureComponent {
         {!isNoneType && (
           <Notification className={style.notification} small info content={m.infoText} />
         )}
+        {!mayViewLink && <Notification content={m.uplinkResetWarning} info small />}
         <PayloadFormattersForm
           uplink
           onSubmit={this.onSubmit}
