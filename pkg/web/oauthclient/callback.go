@@ -54,16 +54,18 @@ func (res *oauthAuthorizeResponse) ValidateContext(c context.Context) error {
 	return nil
 }
 
+var errParse = errors.DefineAborted("parse", "request body parsing")
+
 // HandleCallback is a handler that takes the auth code and exchanges it for the
 // access token.
 func (oc *OAuthClient) HandleCallback(w http.ResponseWriter, r *http.Request) {
 	var response oauthAuthorizeResponse
 	if err := r.ParseForm(); err != nil {
-		webhandlers.Error(w, r, err)
+		webhandlers.Error(w, r, errParse.WithCause(err))
 		return
 	}
 	if err := schema.NewDecoder().Decode(&response, r.Form); err != nil {
-		webhandlers.Error(w, r, err)
+		webhandlers.Error(w, r, errParse.WithCause(err))
 		return
 	}
 	if err := response.ValidateContext(r.Context()); err != nil {

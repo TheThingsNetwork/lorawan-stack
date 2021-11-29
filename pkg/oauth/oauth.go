@@ -224,22 +224,24 @@ func (req *tokenRequest) ValidateContext(ctx context.Context) error {
 	return nil
 }
 
+var errParse = errors.DefineAborted("parse", "request body parsing")
+
 func (s *server) Token(w http.ResponseWriter, r *http.Request) {
 	// Convert request through tokenRequest so that we can accept both forms and JSON.
 	var tokenRequest tokenRequest
 	switch r.Header.Get("Content-Type") {
 	case "application/json":
 		if err := json.NewDecoder(r.Body).Decode(&tokenRequest); err != nil {
-			webhandlers.Error(w, r, err)
+			webhandlers.Error(w, r, errParse.WithCause(err))
 			return
 		}
 	default:
 		if err := r.ParseForm(); err != nil {
-			webhandlers.Error(w, r, err)
+			webhandlers.Error(w, r, errParse.WithCause(err))
 			return
 		}
 		if err := schema.NewDecoder().Decode(&tokenRequest, r.Form); err != nil {
-			webhandlers.Error(w, r, err)
+			webhandlers.Error(w, r, errParse.WithCause(err))
 			return
 		}
 	}

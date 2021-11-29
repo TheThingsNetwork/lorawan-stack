@@ -1952,6 +1952,15 @@
       "file": "middleware.go"
     }
   },
+  "error:pkg/account:parse": {
+    "translations": {
+      "en": "request body parsing"
+    },
+    "description": {
+      "package": "pkg/account",
+      "file": "user.go"
+    }
+  },
   "error:pkg/applicationserver/distribution/redis:channel_closed": {
     "translations": {
       "en": "channel closed"
@@ -7298,6 +7307,15 @@
       "file": "storage.go"
     }
   },
+  "error:pkg/oauth:parse": {
+    "translations": {
+      "en": "request body parsing"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "oauth.go"
+    }
+  },
   "error:pkg/oauth:token": {
     "translations": {
       "en": "invalid token"
@@ -8345,6 +8363,15 @@
   "error:pkg/web/oauthclient:no_state_param": {
     "translations": {
       "en": "no state parameter present in request"
+    },
+    "description": {
+      "package": "pkg/web/oauthclient",
+      "file": "callback.go"
+    }
+  },
+  "error:pkg/web/oauthclient:parse": {
+    "translations": {
+      "en": "request body parsing"
     },
     "description": {
       "package": "pkg/web/oauthclient",

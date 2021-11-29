@@ -97,21 +97,23 @@ func (req *loginRequest) ValidateContext(ctx context.Context) error {
 	}).ValidateFields("user_id")
 }
 
+var errParse = errors.DefineAborted("parse", "request body parsing")
+
 func (s *server) Login(w http.ResponseWriter, r *http.Request) {
 	var loginRequest loginRequest
 	switch r.Header.Get("Content-Type") {
 	case "application/json":
 		if err := json.NewDecoder(r.Body).Decode(&loginRequest); err != nil {
-			webhandlers.Error(w, r, err)
+			webhandlers.Error(w, r, errParse.WithCause(err))
 			return
 		}
 	default:
 		if err := r.ParseForm(); err != nil {
-			webhandlers.Error(w, r, err)
+			webhandlers.Error(w, r, errParse.WithCause(err))
 			return
 		}
 		if err := schema.NewDecoder().Decode(&loginRequest, r.Form); err != nil {
-			webhandlers.Error(w, r, err)
+			webhandlers.Error(w, r, errParse.WithCause(err))
 			return
 		}
 	}
@@ -150,16 +152,16 @@ func (s *server) TokenLogin(w http.ResponseWriter, r *http.Request) {
 	switch r.Header.Get("Content-Type") {
 	case "application/json":
 		if err := json.NewDecoder(r.Body).Decode(&tokenLoginRequest); err != nil {
-			webhandlers.Error(w, r, err)
+			webhandlers.Error(w, r, errParse.WithCause(err))
 			return
 		}
 	default:
 		if err := r.ParseForm(); err != nil {
-			webhandlers.Error(w, r, err)
+			webhandlers.Error(w, r, errParse.WithCause(err))
 			return
 		}
 		if err := schema.NewDecoder().Decode(&tokenLoginRequest, r.Form); err != nil {
-			webhandlers.Error(w, r, err)
+			webhandlers.Error(w, r, errParse.WithCause(err))
 			return
 		}
 	}
