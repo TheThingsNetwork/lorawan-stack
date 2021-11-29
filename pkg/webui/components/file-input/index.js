@@ -179,9 +179,11 @@ export default class FileInput extends Component {
       this.props
 
     return (
-      <div>
-        {true && <Notification warning content={m.largeFileWarning} small />}
-        <div className={style.container}>
+      <div className={style.container}>
+        {true && (
+          <Notification className={style.notification} warning content={m.largeFileWarning} small />
+        )}
+        <div>
           {image && Boolean(value) && (
             <img
               className={classnames(style.image, imageClassName)}
