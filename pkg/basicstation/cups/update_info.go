@@ -153,12 +153,14 @@ func (s *Server) UpdateInfo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+var errParse = errors.DefineAborted("parse", "request body parsing")
+
 func (s *Server) updateInfo(w http.ResponseWriter, r *http.Request) (err error) {
 	ctx := r.Context()
 
 	var req UpdateInfoRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return err
+		return errParse.WithCause(err)
 	}
 
 	if err := req.ValidateContext(ctx); err != nil {
