@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,19 +23,15 @@ import OrganizationsTable from '@console/containers/organizations-table'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-class List extends React.Component {
-  render() {
-    return (
-      <Container>
-        <Row>
-          <IntlHelmet title={sharedMessages.organizations} />
-          <Col>
-            <OrganizationsTable pageSize={PAGE_SIZES.REGULAR} />
-          </Col>
-        </Row>
-      </Container>
-    )
-  }
-}
+const List = () => (
+  <Container>
+    <Row>
+      <IntlHelmet title={sharedMessages.organizations} />
+      <Col>
+        <OrganizationsTable pageSize={PAGE_SIZES.REGULAR} />
+      </Col>
+    </Row>
+  </Container>
+)
 
 export default List

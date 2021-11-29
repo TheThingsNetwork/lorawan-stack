@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
@@ -29,25 +29,25 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { mayViewOrganizationsOfUser } from '@console/lib/feature-checks'
 
-@withFeatureRequirement(mayViewOrganizationsOfUser, { redirect: '/' })
-@withBreadcrumb('orgs', () => (
-  <Breadcrumb path="/organizations" content={sharedMessages.organizations} />
-))
-class Organizations extends React.Component {
-  static propTypes = {
-    match: PropTypes.match.isRequired,
-  }
+const Organizations = props => {
+  const { match } = props
 
-  render() {
-    const { path } = this.props.match
-    return (
-      <Switch>
-        <Route exact path={`${path}`} component={OrganizationsList} />
-        <Route exact path={`${path}/add`} component={OrganizationAdd} />
-        <Route path={`${path}/:orgId`} component={Organization} />
-      </Switch>
-    )
-  }
+  useBreadcrumbs(
+    'orgs',
+    <Breadcrumb path="/organizations" content={sharedMessages.organizations} />,
+  )
+
+  return (
+    <Switch>
+      <Route exact path={`${match.path}`} component={OrganizationsList} />
+      <Route exact path={`${match.path}/add`} component={OrganizationAdd} />
+      <Route path={`${match.path}/:orgId`} component={Organization} />
+    </Switch>
+  )
 }
 
-export default Organizations
+Organizations.propTypes = {
+  match: PropTypes.match.isRequired,
+}
+
+export default withFeatureRequirement(mayViewOrganizationsOfUser, { redirect: '/' })(Organizations)
