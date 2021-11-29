@@ -21,6 +21,7 @@ import (
 	"net"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
@@ -109,6 +110,16 @@ func (is *mockIS) Update(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (
 	}
 	gtw.SetFields(req.Gateway, req.FieldMask.GetPaths()...)
 	return gtw, nil
+}
+
+func (is *mockIS) Delete(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
+	uid := unique.ID(ctx, ids)
+	_, ok := is.gateways[uid]
+	if !ok {
+		return nil, errNotFound.New()
+	}
+	delete(is.gateways, uid)
+	return nil, nil
 }
 
 func (is *mockIS) GetIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewayIdentifiersForEUIRequest) (*ttnpb.GatewayIdentifiers, error) {

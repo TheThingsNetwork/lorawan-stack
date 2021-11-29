@@ -583,7 +583,6 @@ func (gs *GatewayServer) startDisconnectOnChangeTask(conn connectionEntry) {
 				return ctx.Err()
 			case <-time.After(d):
 			}
-
 			gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
 				GatewayIds: conn.Gateway().GetIds(),
 				FieldMask: &pbtypes.FieldMask{
@@ -604,7 +603,12 @@ func (gs *GatewayServer) startDisconnectOnChangeTask(conn connectionEntry) {
 				},
 			})
 			if err != nil {
-				log.FromContext(ctx).WithError(err).Warn("Failed to get gateway")
+				if errors.IsNotFound(err) {
+					// Gateway was deleted. Disconnect.
+					conn.Disconnect(err)
+				} else {
+					log.FromContext(ctx).WithError(err).Warn("Failed to get gateway")
+				}
 				return err
 			}
 			if requireDisconnect(conn.Gateway(), gtw) {
