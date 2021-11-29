@@ -263,7 +263,7 @@ func (s *Scheduler) syncWithUplinkToken(token *ttnpb.UplinkToken) bool {
 
 var (
 	errConflict              = errors.DefineAlreadyExists("conflict", "scheduling conflict")
-	errTooLate               = errors.DefineFailedPrecondition("too_late", "too late to transmission scheduled time (delta is `{delta}`)")
+	errTooLate               = errors.DefineFailedPrecondition("too_late", "too late to transmission scheduled time (delta is `{delta}`, min is `{min}`)")
 	errNoClockSync           = errors.DefineUnavailable("no_clock_sync", "no clock sync")
 	errNoAbsoluteGatewayTime = errors.DefineAborted("no_absolute_gateway_time", "no absolute gateway time")
 	errNoServerTime          = errors.DefineAborted("no_server_time", "no server time")
@@ -326,7 +326,10 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (Emission, err
 	}
 	if ok {
 		if delta := time.Duration(starts - now); delta < minScheduleTime {
-			return Emission{}, errTooLate.WithAttributes("delta", delta)
+			return Emission{}, errTooLate.WithAttributes(
+				"delta", delta,
+				"min", minScheduleTime,
+			)
 		}
 	}
 	sb, err := s.findSubBand(opts.Frequency)
