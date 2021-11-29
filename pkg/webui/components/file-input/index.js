@@ -108,7 +108,9 @@ export default class FileInput extends Component {
 
     if (files && files[0] && files[0].size <= maxSize) {
       if (files && files[0] && files[0].size <= threeMb) {
-        this.setState({ isLarger: !this.state.isLarger })
+        this.setState({ isLarger: true })
+      } else {
+        this.setState({ isLarger: false })
       }
 
       this.setState({ filename: files[0].name, error: undefined })
