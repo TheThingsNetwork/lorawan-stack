@@ -43,7 +43,7 @@ type authCookie struct {
 	Expiry       time.Time
 }
 
-var errNoAuthCookie = errors.DefinePermissionDenied("no_auth_cookie", "no auth cookie")
+var errNoAuthCookie = errors.DefineUnauthenticated("no_auth_cookie", "no auth cookie")
 
 func (oc *OAuthClient) getAuthCookie(w http.ResponseWriter, r *http.Request) (authCookie, error) {
 	value := authCookie{}
