@@ -32,8 +32,6 @@ const m = defineMessages({
   changeFile: 'Change file…',
   noFileSelected: 'No file selected',
   fileProvided: 'A file has been provided',
-  largeFileWarning:
-    'Providing files larger than 10MB can cause issues during the import process. We recommend you to split such files up into multiple smaller files and importing them one by one.',
   tooBig: 'The selected file is too large',
   remove: 'Remove',
 })
@@ -51,6 +49,7 @@ export default class FileInput extends Component {
     id: PropTypes.string.isRequired,
     image: PropTypes.bool,
     imageClassName: PropTypes.string,
+    largeFileWarningMessage: PropTypes.string.isRequired,
     maxSize: PropTypes.number,
     mayRemove: PropTypes.bool,
     message: PropTypes.message,
@@ -58,6 +57,8 @@ export default class FileInput extends Component {
     onChange: PropTypes.func.isRequired,
     providedMessage: PropTypes.message,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.shape({})]),
+    warningSize: PropTypes.number,
+    warningThreshold: PropTypes.string,
   }
 
   static defaultProps = {
@@ -72,6 +73,8 @@ export default class FileInput extends Component {
     changeMessage: m.changeFile,
     providedMessage: m.fileProvided,
     value: undefined,
+    warningSize: 10 * 1024 * 1024, // 10 MB
+    warningThreshold: '10MB',
   }
 
   constructor(props) {
@@ -103,9 +106,8 @@ export default class FileInput extends Component {
 
   @bind
   handleChange(event) {
-    const { maxSize } = this.props
+    const { maxSize, warningSize } = this.props
     const { files } = event.target
-    const warningSize = 10 * 1024 * 1024 // 10MB
 
     if (files && files[0] && files[0].size <= maxSize) {
       if (files && files[0] && files[0].size <= warningSize) {
@@ -175,13 +177,30 @@ export default class FileInput extends Component {
   }
 
   render() {
-    const { message, changeMessage, name, id, accept, value, disabled, image, imageClassName } =
-      this.props
+    const {
+      message,
+      changeMessage,
+      name,
+      id,
+      accept,
+      value,
+      disabled,
+      image,
+      imageClassName,
+      largeFileWarningMessage,
+      warningThreshold,
+    } = this.props
 
     return (
       <div className={style.container}>
         {this.state.isLarger && (
-          <Notification className={style.notification} warning content={m.largeFileWarning} small />
+          <Notification
+            className={style.notification}
+            content={largeFileWarningMessage}
+            messageValues={{ warningThreshold }}
+            small
+            warning
+          />
         )}
         <div>
           {image && Boolean(value) && (
