@@ -46,8 +46,8 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 			return nil, interop.ErrMalformedMessage.WithCause(err)
 		}
 	}
-	var dlSettings ttnpb.DLSettings
-	if err := lorawan.UnmarshalDLSettings(in.DLSettings, &dlSettings); err != nil {
+	dlSettings := &ttnpb.DLSettings{}
+	if err := lorawan.UnmarshalDLSettings(in.DLSettings, dlSettings); err != nil {
 		return nil, interop.ErrMalformedMessage.WithCause(err)
 	}
 
@@ -105,16 +105,16 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 		Result: interop.Result{
 			ResultCode: interop.ResultSuccess,
 		},
-		Lifetime:     uint32(res.Lifetime / time.Second),
-		AppSKey:      (*interop.KeyEnvelope)(res.AppSKey),
-		SessionKeyID: interop.Buffer(res.SessionKeyId),
+		AppSKey:      (*interop.KeyEnvelope)(res.SessionKeys.AppSKey),
+		SessionKeyID: interop.Buffer(res.SessionKeys.SessionKeyId),
+		Lifetime:     uint32(ttnpb.StdDurationOrZero(res.Lifetime) / time.Second),
 	}
 	if ttnpb.MACVersion(in.MACVersion).Compare(ttnpb.MAC_V1_1) < 0 {
-		ans.NwkSKey = (*interop.KeyEnvelope)(res.FNwkSIntKey)
+		ans.NwkSKey = (*interop.KeyEnvelope)(res.SessionKeys.FNwkSIntKey)
 	} else {
-		ans.FNwkSIntKey = (*interop.KeyEnvelope)(res.FNwkSIntKey)
-		ans.SNwkSIntKey = (*interop.KeyEnvelope)(res.SNwkSIntKey)
-		ans.NwkSEncKey = (*interop.KeyEnvelope)(res.NwkSEncKey)
+		ans.FNwkSIntKey = (*interop.KeyEnvelope)(res.SessionKeys.FNwkSIntKey)
+		ans.SNwkSIntKey = (*interop.KeyEnvelope)(res.SessionKeys.SNwkSIntKey)
+		ans.NwkSEncKey = (*interop.KeyEnvelope)(res.SessionKeys.NwkSEncKey)
 	}
 	return ans, nil
 }

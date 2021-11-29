@@ -209,7 +209,7 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 		return nil, errNoJoinRequestPayload.New()
 	}
 
-	dlSettings, err := lorawan.MarshalDLSettings(req.DownlinkSettings)
+	dlSettings, err := lorawan.MarshalDLSettings(*req.DownlinkSettings)
 	if err != nil {
 		return nil, err
 	}
@@ -264,14 +264,14 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 	}
 	return &ttnpb.JoinResponse{
 		RawPayload: interopAns.PHYPayload,
-		SessionKeys: ttnpb.SessionKeys{
+		SessionKeys: &ttnpb.SessionKeys{
 			SessionKeyId: sessionKeyID,
 			FNwkSIntKey:  (*ttnpb.KeyEnvelope)(fNwkSIntKey),
 			SNwkSIntKey:  (*ttnpb.KeyEnvelope)(interopAns.SNwkSIntKey),
 			NwkSEncKey:   (*ttnpb.KeyEnvelope)(interopAns.NwkSEncKey),
 			AppSKey:      (*ttnpb.KeyEnvelope)(interopAns.AppSKey),
 		},
-		Lifetime: time.Duration(interopAns.Lifetime) * time.Second,
+		Lifetime: ttnpb.ProtoDurationPtr(time.Duration(interopAns.Lifetime) * time.Second),
 	}, nil
 }
 

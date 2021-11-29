@@ -325,7 +325,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 	}
 	oneSecondScheduleResponse := NsGsScheduleDownlinkResponse{
 		Response: &ttnpb.ScheduleDownlinkResponse{
-			Delay: time.Second,
+			Delay: ttnpb.ProtoDurationPtr(time.Second),
 		},
 	}
 

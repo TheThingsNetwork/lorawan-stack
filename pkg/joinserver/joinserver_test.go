@@ -187,7 +187,7 @@ func TestInvalidJoinRequests(t *testing.T) {
 					},
 					DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 					NetId:   types.NetID{0x42, 0xff, 0xff},
-					DownlinkSettings: ttnpb.DLSettings{
+					DownlinkSettings: &ttnpb.DLSettings{
 						OptNeg:      true,
 						Rx1DrOffset: 0x7,
 						Rx2Dr:       0xf,
@@ -268,7 +268,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -295,7 +295,7 @@ func TestHandleJoin(t *testing.T) {
 						/* MIC */
 						0xeb, 0xcd, 0x74, 0x59,
 					})...),
-				SessionKeys: ttnpb.SessionKeys{
+				SessionKeys: &ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
 						Key: keyPtr(crypto.DeriveAppSKey(
 							appKey,
@@ -374,7 +374,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -401,7 +401,7 @@ func TestHandleJoin(t *testing.T) {
 						/* MIC */
 						0xeb, 0xcd, 0x74, 0x59,
 					})...),
-				SessionKeys: ttnpb.SessionKeys{
+				SessionKeys: &ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
 						KekLabel: "as:as.test.org",
 						EncryptedKey: mustWrapKey(
@@ -505,7 +505,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -532,7 +532,7 @@ func TestHandleJoin(t *testing.T) {
 						/* MIC */
 						0xeb, 0xcd, 0x74, 0x59,
 					})...),
-				SessionKeys: ttnpb.SessionKeys{
+				SessionKeys: &ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
 						KekLabel: "test-as-kek",
 						EncryptedKey: mustWrapKey(
@@ -639,7 +639,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -666,7 +666,7 @@ func TestHandleJoin(t *testing.T) {
 						/* MIC */
 						0xeb, 0xcd, 0x74, 0x59,
 					})...),
-				SessionKeys: ttnpb.SessionKeys{
+				SessionKeys: &ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
 						KekLabel: "test-aas-kek",
 						EncryptedKey: mustWrapKey(
@@ -748,7 +748,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -775,7 +775,7 @@ func TestHandleJoin(t *testing.T) {
 						/* MIC */
 						0xeb, 0xcd, 0x74, 0x59,
 					})...),
-				SessionKeys: ttnpb.SessionKeys{
+				SessionKeys: &ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
 						Key: keyPtr(crypto.DeriveAppSKey(
 							appKey,
@@ -853,7 +853,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -880,7 +880,7 @@ func TestHandleJoin(t *testing.T) {
 						/* MIC */
 						0xc8, 0xf7, 0x62, 0xf4,
 					})...),
-				SessionKeys: ttnpb.SessionKeys{
+				SessionKeys: &ttnpb.SessionKeys{
 					AppSKey: &ttnpb.KeyEnvelope{
 						Key: keyPtr(crypto.DeriveAppSKey(
 							appKey,
@@ -957,7 +957,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1007,7 +1007,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1034,7 +1034,7 @@ func TestHandleJoin(t *testing.T) {
 						/* MIC */
 						0xc9, 0x7a, 0x61, 0x04,
 					})...),
-				SessionKeys: ttnpb.SessionKeys{
+				SessionKeys: &ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: keyPtr(crypto.DeriveLegacyNwkSKey(
 							appKey,
@@ -1093,7 +1093,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1120,7 +1120,7 @@ func TestHandleJoin(t *testing.T) {
 						/* MIC */
 						0xc9, 0x7a, 0x61, 0x04,
 					})...),
-				SessionKeys: ttnpb.SessionKeys{
+				SessionKeys: &ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: keyPtr(crypto.DeriveLegacyNwkSKey(
 							appKey,
@@ -1179,7 +1179,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1206,7 +1206,7 @@ func TestHandleJoin(t *testing.T) {
 						/* MIC */
 						0xc9, 0x7a, 0x61, 0x04,
 					})...),
-				SessionKeys: ttnpb.SessionKeys{
+				SessionKeys: &ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: keyPtr(crypto.DeriveLegacyNwkSKey(
 							appKey,
@@ -1265,7 +1265,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1292,7 +1292,7 @@ func TestHandleJoin(t *testing.T) {
 						/* MIC */
 						0xc9, 0x7a, 0x61, 0x04,
 					})...),
-				SessionKeys: ttnpb.SessionKeys{
+				SessionKeys: &ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: keyPtr(crypto.DeriveLegacyNwkSKey(
 							appKey,
@@ -1353,7 +1353,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1380,7 +1380,7 @@ func TestHandleJoin(t *testing.T) {
 						/* MIC */
 						0xf8, 0x4a, 0x11, 0x8e,
 					})...),
-				SessionKeys: ttnpb.SessionKeys{
+				SessionKeys: &ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: keyPtr(crypto.DeriveLegacyNwkSKey(
 							appKey,
@@ -1442,7 +1442,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1469,7 +1469,7 @@ func TestHandleJoin(t *testing.T) {
 						/* MIC */
 						0xf8, 0x4a, 0x11, 0x8e,
 					})...),
-				SessionKeys: ttnpb.SessionKeys{
+				SessionKeys: &ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: keyPtr(crypto.DeriveLegacyNwkSKey(
 							appKey,
@@ -1534,7 +1534,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1561,7 +1561,7 @@ func TestHandleJoin(t *testing.T) {
 						/* MIC */
 						0xc9, 0x7a, 0x61, 0x04,
 					})...),
-				SessionKeys: ttnpb.SessionKeys{
+				SessionKeys: &ttnpb.SessionKeys{
 					FNwkSIntKey: &ttnpb.KeyEnvelope{
 						Key: keyPtr(crypto.DeriveLegacyNwkSKey(
 							appKey,
@@ -1624,7 +1624,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0x42, 0x42},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1677,7 +1677,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1731,7 +1731,7 @@ func TestHandleJoin(t *testing.T) {
 				},
 				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
 				NetId:   types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1781,7 +1781,7 @@ func TestHandleJoin(t *testing.T) {
 					0xed, 0x8b, 0xd2, 0x24,
 				},
 				NetId: types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1816,7 +1816,7 @@ func TestHandleJoin(t *testing.T) {
 			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMacVersion: ttnpb.MAC_V1_0,
 				NetId:              types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1857,7 +1857,7 @@ func TestHandleJoin(t *testing.T) {
 					Payload: &ttnpb.Message_JoinAcceptPayload{},
 				},
 				NetId: types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1899,7 +1899,7 @@ func TestHandleJoin(t *testing.T) {
 					Payload: &ttnpb.Message_JoinRequestPayload{},
 				},
 				NetId: types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1945,7 +1945,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 				},
 				NetId: types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -1983,7 +1983,7 @@ func TestHandleJoin(t *testing.T) {
 					0x23, 0x42, 0xff, 0xff, 0xaa, 0x42, 0x42, 0x0f, 0xff, 0xff, 0xff, 0xff, 0xff,
 				},
 				NetId: types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -2029,7 +2029,7 @@ func TestHandleJoin(t *testing.T) {
 					},
 				},
 				NetId: types.NetID{0x42, 0xff, 0xff},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x7,
 					Rx2Dr:       0xf,
@@ -2163,8 +2163,8 @@ func TestHandleJoin(t *testing.T) {
 					t.FailNow()
 				}
 				expectedResp := deepcopy.Copy(tc.JoinResponse).(*ttnpb.JoinResponse)
-				a.So(res.SessionKeyId, should.NotBeEmpty)
-				expectedResp.SessionKeyId = res.SessionKeyId
+				a.So(res.SessionKeys.SessionKeyId, should.NotBeEmpty)
+				expectedResp.SessionKeys.SessionKeyId = res.SessionKeys.SessionKeyId
 				a.So(res, should.Resemble, expectedResp)
 
 				retCtx, err := devReg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEui, *pb.EndDeviceIdentifiers.DevEui, ttnpb.EndDeviceFieldPathsTopLevel)
@@ -2187,7 +2187,7 @@ func TestHandleJoin(t *testing.T) {
 				a.So([]time.Time{start, ret.GetSession().GetStartedAt(), time.Now()}, should.BeChronological)
 				pb.Session = &ttnpb.Session{
 					DevAddr:     tc.JoinRequest.DevAddr,
-					SessionKeys: res.SessionKeys,
+					SessionKeys: *res.SessionKeys,
 					StartedAt:   ret.GetSession().GetStartedAt(),
 				}
 				pb.DevAddr = &tc.JoinRequest.DevAddr

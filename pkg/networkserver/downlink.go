@@ -831,7 +831,7 @@ func (t *gatewayServerDownlinkTarget) Schedule(ctx context.Context, msg *ttnpb.D
 	if err != nil {
 		return 0, err
 	}
-	return res.Delay, nil
+	return ttnpb.StdDurationOrZero(res.Delay), nil
 }
 
 type packetBrokerDownlinkTarget struct {
@@ -986,7 +986,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 		queuedEvents = append(queuedEvents, events.Builders(append([]events.Builder{
 			successEvent.With(
 				events.WithData(&ttnpb.ScheduleDownlinkResponse{
-					Delay: delay,
+					Delay: ttnpb.ProtoDurationPtr(delay),
 				}),
 			),
 		}, []events.Builder(req.DownlinkEvents)...)).New(ctx, eventIDOpt)...)

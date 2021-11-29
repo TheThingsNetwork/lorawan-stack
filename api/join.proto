@@ -39,7 +39,7 @@ message JoinRequest {
   bytes dev_addr = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
   MACVersion selected_mac_version = 4;
   bytes net_id = 5 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
-  DLSettings downlink_settings = 6 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  DLSettings downlink_settings = 6 [(validate.rules).message.required = true];
   RxDelay rx_delay = 7 [(validate.rules).enum.defined_only = true];
   // Optional CFList.
   CFList cf_list = 8;
@@ -47,12 +47,12 @@ message JoinRequest {
   repeated string correlation_ids = 10 [(validate.rules).repeated.items.string.max_len = 100];
 
   // Consumed airtime for the transmission of the join request. Calculated by Network Server using the RawPayload size and the transmission settings.
-  google.protobuf.Duration consumed_airtime = 11 [(gogoproto.stdduration) = true, (gogoproto.nullable) = true];
+  google.protobuf.Duration consumed_airtime = 11;
 }
 
 message JoinResponse {
   bytes raw_payload = 1 [(validate.rules).bytes = {min_len: 17, max_len: 33}];
-  SessionKeys session_keys = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  google.protobuf.Duration lifetime = 3 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];
+  SessionKeys session_keys = 2 [(validate.rules).message.required = true];
+  google.protobuf.Duration lifetime = 3;
   repeated string correlation_ids = 4 [(validate.rules).repeated.items.string.max_len = 100];
 }

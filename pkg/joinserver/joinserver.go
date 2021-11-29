@@ -367,7 +367,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				JoinNonce:  jn,
 				CfList:     req.CfList,
 				DevAddr:    req.DevAddr,
-				DLSettings: req.DownlinkSettings,
+				DLSettings: *req.DownlinkSettings,
 				RxDelay:    req.RxDelay,
 			})
 			if err != nil {
@@ -551,7 +551,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			handled = true
 			res = &ttnpb.JoinResponse{
 				RawPayload:  append(b[:1], enc...),
-				SessionKeys: sk,
+				SessionKeys: &sk,
 			}
 			return dev, paths, nil
 		},

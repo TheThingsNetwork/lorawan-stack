@@ -41,7 +41,7 @@ func (v *JoinRequest) FieldIsZero(p string) bool {
 	case "dev_addr":
 		return v.DevAddr == types.DevAddr{}
 	case "downlink_settings":
-		return v.DownlinkSettings == DLSettings{}
+		return v.DownlinkSettings == nil
 	case "downlink_settings.opt_neg":
 		return v.DownlinkSettings.FieldIsZero("opt_neg")
 	case "downlink_settings.rx1_dr_offset":
