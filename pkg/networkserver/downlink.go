@@ -65,7 +65,7 @@ func loggerWithApplicationDownlinkFields(logger log.Interface, down *ttnpb.Appli
 	if down.GetClassBC() != nil {
 		pairs = append(pairs, "class_b_c", true)
 		if down.ClassBC.GetAbsoluteTime() != nil {
-			pairs = append(pairs, "absolute_time", *down.ClassBC.AbsoluteTime)
+			pairs = append(pairs, "absolute_time", ttnpb.StdTime(down.ClassBC.AbsoluteTime))
 		}
 		if len(down.ClassBC.GetGateways()) > 0 {
 			pairs = append(pairs, "fixed_gateway_count", len(down.ClassBC.Gateways))
@@ -131,7 +131,7 @@ func (ns *NetworkServer) nextDataDownlinkTaskAt(ctx context.Context, dev *ttnpb.
 
 	case !from.IsZero():
 		// Absolute time downlink slot, enqueue in advance to allow for scheduling.
-		taskAt = from.Add(-dev.MacState.CurrentParameters.Rx1Delay.Duration() - nsScheduleWindow())
+		taskAt = from.Add(-absoluteTimeSchedulingDelay - nsScheduleWindow())
 	}
 	if taskAt.Before(earliestAt) {
 		taskAt = earliestAt

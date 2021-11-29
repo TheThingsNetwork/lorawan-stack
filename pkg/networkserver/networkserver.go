@@ -45,8 +45,13 @@ const (
 	// fOptsCapacity is the maximum length of FOpts in bytes.
 	fOptsCapacity = 15
 
-	// infrastructureDelay represents a time interval Network Server uses as a buffer to account for infrastructure delay.
+	// infrastructureDelay represents a time interval that the Network Server uses as a buffer to account for infrastructure delay.
 	infrastructureDelay = time.Second
+
+	// absoluteTimeSchedulingDelay represents a time interval that the Network Server uses as a buffer to account for the transmission
+	// time while scheduling absolute time downlinks, since absolute time scheduling considers the absolute time to be the timestamp
+	// for the arrival, not start, of the transmission.
+	absoluteTimeSchedulingDelay = 5 * time.Second
 
 	// peeringScheduleDelay is the schedule delay used for scheduling downlink via peering.
 	// The schedule delay is used to estimate the transmission time, which is used as the minimum time for a subsequent transmission.
