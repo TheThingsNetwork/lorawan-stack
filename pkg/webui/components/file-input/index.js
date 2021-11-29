@@ -19,6 +19,7 @@ import classnames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
+import Notification from '@ttn-lw/components/notification'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -32,7 +33,7 @@ const m = defineMessages({
   noFileSelected: 'No file selected',
   fileProvided: 'A file has been provided',
   largeFileWarning:
-    'Providing files larger than 3MB can cause issues during the import process. We recommend you to split such files up into multiple smaller files and importing them one by one.',
+    'Providing files larger than 10MB can cause issues during the import process. We recommend you to split such files up into multiple smaller files and importing them one by one.',
   tooBig: 'The selected file is too large',
   remove: 'Remove',
 })
@@ -65,7 +66,7 @@ export default class FileInput extends Component {
     disabled: false,
     image: false,
     imageClassName: undefined,
-    maxSize: 10 * 1024 * 1024, // 10 MB
+    maxSize: 16 * 1024 * 1024, // 16 MB
     mayRemove: true,
     message: m.selectAFile,
     changeMessage: m.changeFile,
@@ -104,10 +105,10 @@ export default class FileInput extends Component {
   handleChange(event) {
     const { maxSize } = this.props
     const { files } = event.target
-    const threeMb = 3 * 1024 * 1024
+    const warningSize = 10 * 1024 * 1024 // 10MB
 
     if (files && files[0] && files[0].size <= maxSize) {
-      if (files && files[0] && files[0].size <= threeMb) {
+      if (files && files[0] && files[0].size <= warningSize) {
         this.setState({ isLarger: true })
       } else {
         this.setState({ isLarger: false })
@@ -179,6 +180,7 @@ export default class FileInput extends Component {
 
     return (
       <div>
+        {true && <Notification warning content={m.largeFileWarning} small />}
         <div className={style.container}>
           {image && Boolean(value) && (
             <img
@@ -210,14 +212,6 @@ export default class FileInput extends Component {
             disabled={disabled}
             tabIndex="-1"
           />
-        </div>
-        <div>
-          {this.state.isLarger && (
-            <React.Fragment>
-              <Icon className={style.warningIcon} icon="error" />
-              <Message className={style.warning} content={m.largeFileWarning} />
-            </React.Fragment>
-          )}
         </div>
       </div>
     )
