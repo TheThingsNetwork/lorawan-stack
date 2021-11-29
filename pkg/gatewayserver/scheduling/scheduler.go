@@ -254,10 +254,10 @@ func (s *Scheduler) syncWithUplinkToken(token *ttnpb.UplinkToken) bool {
 	if token.GetServerTime() == nil || token.GetConcentratorTime() == 0 {
 		return false
 	}
-	if lastSync, ok := s.clock.SyncTime(); ok && lastSync.After(*token.ServerTime) {
+	if lastSync, ok := s.clock.SyncTime(); ok && lastSync.After(*ttnpb.StdTime(token.ServerTime)) {
 		return false
 	}
-	s.clock.SyncWithGatewayConcentrator(token.Timestamp, *token.ServerTime, token.GatewayTime, ConcentratorTime(token.ConcentratorTime))
+	s.clock.SyncWithGatewayConcentrator(token.Timestamp, *ttnpb.StdTime(token.ServerTime), ttnpb.StdTime(token.GatewayTime), ConcentratorTime(token.ConcentratorTime))
 	return true
 }
 
@@ -303,10 +303,10 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (Emission, err
 	now, ok := s.clock.FromServerTime(s.timeSource.Now())
 	if opts.Time != nil {
 		var ok bool
-		starts, ok = s.clock.FromGatewayTime(*opts.Time)
+		starts, ok = s.clock.FromGatewayTime(*ttnpb.StdTime(opts.Time))
 		if !ok {
 			if medianRTT != nil {
-				serverTime, ok := s.clock.FromServerTime(*opts.Time)
+				serverTime, ok := s.clock.FromServerTime(*ttnpb.StdTime(opts.Time))
 				if !ok {
 					return Emission{}, errNoServerTime.New()
 				}

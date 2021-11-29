@@ -76,7 +76,7 @@ func (x *UplinkMessage) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ReceivedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.ReceivedAt)
+			gogo.MarshalTimestamp(s, x.ReceivedAt)
 		}
 	}
 	if len(x.CorrelationIds) > 0 || s.HasField("correlation_ids") {
@@ -95,7 +95,7 @@ func (x *UplinkMessage) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ConsumedAirtime == nil {
 			s.WriteNil()
 		} else {
-			s.WriteDuration(*x.ConsumedAirtime)
+			gogo.MarshalDuration(s, x.ConsumedAirtime)
 		}
 	}
 	s.WriteObjectEnd()
@@ -140,7 +140,7 @@ func (x *UplinkMessage) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			})
 		case "received_at", "receivedAt":
 			s.AddField("received_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -153,7 +153,7 @@ func (x *UplinkMessage) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.DeviceChannelIndex = s.ReadUint32()
 		case "consumed_airtime", "consumedAirtime":
 			s.AddField("consumed_airtime")
-			v := s.ReadDuration()
+			v := gogo.UnmarshalDuration(s)
 			if s.Err() != nil {
 				return
 			}
@@ -478,7 +478,7 @@ func (x *ApplicationUplink) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ReceivedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.ReceivedAt)
+			gogo.MarshalTimestamp(s, x.ReceivedAt)
 		}
 	}
 	if x.AppSKey != nil || s.HasField("app_s_key") {
@@ -503,7 +503,7 @@ func (x *ApplicationUplink) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ConsumedAirtime == nil {
 			s.WriteNil()
 		} else {
-			s.WriteDuration(*x.ConsumedAirtime)
+			gogo.MarshalDuration(s, x.ConsumedAirtime)
 		}
 	}
 	if x.Locations != nil || s.HasField("locations") {
@@ -586,7 +586,7 @@ func (x *ApplicationUplink) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Settings = &v
 		case "received_at", "receivedAt":
 			s.AddField("received_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -605,7 +605,7 @@ func (x *ApplicationUplink) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Confirmed = s.ReadBool()
 		case "consumed_airtime", "consumedAirtime":
 			s.AddField("consumed_airtime")
-			v := s.ReadDuration()
+			v := gogo.UnmarshalDuration(s)
 			if s.Err() != nil {
 				return
 			}
@@ -735,7 +735,7 @@ func (x *ApplicationJoinAccept) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ReceivedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.ReceivedAt)
+			gogo.MarshalTimestamp(s, x.ReceivedAt)
 		}
 	}
 	s.WriteObjectEnd()
@@ -778,7 +778,7 @@ func (x *ApplicationJoinAccept) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState)
 			x.PendingSession = s.ReadBool()
 		case "received_at", "receivedAt":
 			s.AddField("received_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -1088,7 +1088,7 @@ func (x *ApplicationUp) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ReceivedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.ReceivedAt)
+			gogo.MarshalTimestamp(s, x.ReceivedAt)
 		}
 	}
 	if x.Up != nil {
@@ -1164,7 +1164,7 @@ func (x *ApplicationUp) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.CorrelationIds = s.ReadStringArray()
 		case "received_at", "receivedAt":
 			s.AddField("received_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}

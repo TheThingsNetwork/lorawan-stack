@@ -130,7 +130,7 @@ func MakeJoinRequestPHYPayload(joinEUI, devEUI types.EUI64, devNonce types.DevNo
 
 func MakeJoinRequestDecodedPayload(joinEUI, devEUI types.EUI64, devNonce types.DevNonce, mic [4]byte) *ttnpb.Message {
 	return &ttnpb.Message{
-		MHDR: ttnpb.MHDR{
+		MHdr: &ttnpb.MHDR{
 			MType: ttnpb.MType_JOIN_REQUEST,
 			Major: ttnpb.Major_LORAWAN_R1,
 		},
@@ -151,7 +151,7 @@ type JoinRequestConfig struct {
 	JoinEUI        types.EUI64
 	DevEUI         types.EUI64
 	DevNonce       types.DevNonce
-	DataRate       ttnpb.DataRate
+	DataRate       *ttnpb.DataRate
 	DataRateIndex  ttnpb.DataRateIndex
 	Frequency      uint64
 	ChannelIndex   uint8
@@ -1075,7 +1075,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 										DownlinkPaths:   expectedAttempt.RequestPaths,
 										Priority:        conf.Priority,
 										FrequencyPlanId: conf.FrequencyPlanID,
-										AbsoluteTime:    conf.AbsoluteTime,
+										AbsoluteTime:    ttnpb.ProtoTime(conf.AbsoluteTime),
 									}
 									if conf.SetRX1 {
 										drIdx, _, _ := phy.FindUplinkDataRate(conf.Uplink.Settings.DataRate)
@@ -1086,13 +1086,13 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 											conf.MACState.CurrentParameters.DownlinkDwellTime.GetValue()),
 										).(ttnpb.DataRateIndex)
 										rx1DR := phy.DataRates[rx1DRIdx]
-										txReq.Rx1DataRate = &rx1DR.Rate
+										txReq.Rx1DataRate = rx1DR.Rate
 										txReq.Rx1Frequency = conf.MACState.CurrentParameters.Channels[test.Must(phy.Rx1Channel(uint8(conf.Uplink.DeviceChannelIndex))).(uint8)].DownlinkFrequency
 									}
 									if conf.SetRX2 {
 										rx2DRIdx := conf.MACState.CurrentParameters.Rx2DataRateIndex
 										rx2DR := phy.DataRates[rx2DRIdx]
-										txReq.Rx2DataRate = &rx2DR.Rate
+										txReq.Rx2DataRate = rx2DR.Rate
 										txReq.Rx2Frequency = conf.MACState.CurrentParameters.Rx2Frequency
 									}
 									return txReq
@@ -1109,7 +1109,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 							a.So(actual, should.Resemble, expected)
 							if aPld, ePld := actual.GetMacPayload(), expected.GetMacPayload(); !conf.MACState.LorawanVersion.EncryptFOpts() &&
 								aPld != nil && ePld != nil &&
-								!bytes.Equal(aPld.FHDR.FOpts, ePld.FHDR.FOpts) {
+								!bytes.Equal(aPld.FHdr.FOpts, ePld.FHdr.FOpts) {
 								macCommands := func(b []byte) (cmds []*ttnpb.MACCommand) {
 									for r := bytes.NewReader(b); r.Len() > 0; {
 										cmd := &ttnpb.MACCommand{}
@@ -1120,7 +1120,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 									}
 									return cmds
 								}
-								a.So(macCommands(aPld.FHDR.FOpts), should.Resemble, macCommands(ePld.FHDR.FOpts))
+								a.So(macCommands(aPld.FHdr.FOpts), should.Resemble, macCommands(ePld.FHdr.FOpts))
 							}
 						}
 						t.Errorf("NsGs.ScheduleDownlink request assertion failed for schedule attempt number %d", i)
@@ -1180,7 +1180,7 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 					events.WithData(&ttnpb.DownlinkMessage{
 						RawPayload: dev.PendingMacState.QueuedJoinAccept.Payload,
 						Payload: &ttnpb.Message{
-							MHDR: ttnpb.MHDR{
+							MHdr: &ttnpb.MHDR{
 								MType: ttnpb.MType_JOIN_ACCEPT,
 								Major: ttnpb.Major_LORAWAN_R1,
 							},
@@ -1188,7 +1188,7 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 								JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
 									NetId:      dev.PendingMacState.QueuedJoinAccept.NetId,
 									DevAddr:    dev.PendingMacState.QueuedJoinAccept.DevAddr,
-									DLSettings: dev.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
+									DlSettings: &dev.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
 									RxDelay:    dev.PendingMacState.QueuedJoinAccept.Request.RxDelay,
 									CfList:     dev.PendingMacState.QueuedJoinAccept.Request.CfList,
 								},
@@ -1700,7 +1700,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 		appUp = up
 		return test.AllTrue(
 			a.So(up.CorrelationIds, should.HaveSameElementsDeep, append(joinReq.CorrelationIds, joinResp.CorrelationIds...)),
-			a.So([]time.Time{start, *recvAt, time.Now()}, should.BeChronological),
+			a.So([]time.Time{start, *ttnpb.StdTime(recvAt), time.Now()}, should.BeChronological),
 			a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 				EndDeviceIds:   &idsWithDevAddr,
 				CorrelationIds: up.CorrelationIds,
@@ -1748,7 +1748,7 @@ type DataUplinkAssertionConfig struct {
 	Pending      bool
 	FRMPayload   []byte
 	FOpts        []byte
-	FCtrl        ttnpb.FCtrl
+	FCtrl        *ttnpb.FCtrl
 	FCntDelta    uint32
 	ConfFCntDown uint32
 	FPort        uint8
@@ -1846,7 +1846,7 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 				return test.AllTrue(
 					a.So(up.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual, deduplicatedUp.CorrelationIds),
 					a.So(up.GetUplinkMessage().GetRxMetadata(), should.HaveSameElementsDeep, deduplicatedUp.RxMetadata),
-					a.So([]time.Time{start, *recvAt, time.Now()}, should.BeChronological),
+					a.So([]time.Time{start, *ttnpb.StdTime(recvAt), time.Now()}, should.BeChronological),
 					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
 						EndDeviceIds:   &dev.EndDeviceIdentifiers,
 						CorrelationIds: up.CorrelationIds,
@@ -2165,7 +2165,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 				MACStateOptions.AppendRecentDownlinks(&ttnpb.DownlinkMessage{
 					RawPayload: x.PendingMacState.QueuedJoinAccept.Payload,
 					Payload: &ttnpb.Message{
-						MHDR: ttnpb.MHDR{
+						MHdr: &ttnpb.MHDR{
 							MType: ttnpb.MType_JOIN_ACCEPT,
 							Major: ttnpb.Major_LORAWAN_R1,
 						},
@@ -2173,7 +2173,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 							JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
 								NetId:      x.PendingMacState.QueuedJoinAccept.NetId,
 								DevAddr:    x.PendingMacState.QueuedJoinAccept.DevAddr,
-								DLSettings: x.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
+								DlSettings: &x.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
 								RxDelay:    x.PendingMacState.QueuedJoinAccept.Request.RxDelay,
 								CfList:     x.PendingMacState.QueuedJoinAccept.Request.CfList,
 							},

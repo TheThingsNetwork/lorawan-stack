@@ -352,7 +352,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 	}
 
 	pbOther := CopyEndDevice(pb)
-	pbOther.Session.LastFCntUp = pbCurrentUp.Payload.GetMacPayload().FCnt
+	pbOther.Session.LastFCntUp = pbCurrentUp.Payload.GetMacPayload().FHdr.FCnt
 	pbOther.Session.FNwkSIntKey.Key = &types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe}
 	pbOther.PendingSession = nil
 	pbOther.EndDeviceIdentifiers.DeviceId = "test-dev-other"

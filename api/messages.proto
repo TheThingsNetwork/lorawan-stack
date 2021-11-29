@@ -87,7 +87,7 @@ message UplinkMessage {
   repeated RxMetadata rx_metadata = 5;
   // Server time when a component received the message.
   // The Gateway Server and Network Server set this value to their local server time of reception.
-  google.protobuf.Timestamp received_at = 6 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp received_at = 6;
   repeated string correlation_ids = 7 [(validate.rules).repeated.items.string.max_len = 100];
   reserved 8; // gateway_channel_index (obsolete).
   // Index of the device channel that received the message.
@@ -95,7 +95,7 @@ message UplinkMessage {
   uint32 device_channel_index = 9 [(validate.rules).uint32 = {lte: 255}];
 
   // Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings.
-  google.protobuf.Duration consumed_airtime = 10 [(gogoproto.stdduration) = true];
+  google.protobuf.Duration consumed_airtime = 10;
 }
 
 // Downlink message from the network to the end device
@@ -213,7 +213,7 @@ message ApplicationUplink {
   TxSettings settings = 7 [(validate.rules).message.required = true];
 
   // Server time when the Network Server received the message.
-  google.protobuf.Timestamp received_at = 8 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp received_at = 8;
 
   // The AppSKey of the current session.
   // This field is only present if the skip_payload_crypto field of the EndDevice
@@ -229,7 +229,7 @@ message ApplicationUplink {
   bool confirmed = 11;
 
   // Consumed airtime for the transmission of the uplink message. Calculated by Network Server using the RawPayload size and the transmission settings.
-  google.protobuf.Duration consumed_airtime = 13 [(gogoproto.stdduration) = true];
+  google.protobuf.Duration consumed_airtime = 13;
 
   // End device location metadata, set by the Application Server while handling the message.
   map<string,Location> locations = 14;
@@ -264,7 +264,7 @@ message ApplicationJoinAccept {
   // rejoin-request.
   bool pending_session = 4;
   // Server time when the Network Server received the message.
-  google.protobuf.Timestamp received_at = 8 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp received_at = 8;
 }
 
 message ApplicationDownlink {
@@ -298,7 +298,7 @@ message ApplicationDownlink {
     // This requires the gateway to have GPS time synchronization.
     // If the time is in the past or if there is a scheduling conflict, the downlink message fails.
     // If null, the time is selected based on slot availability. This is recommended in class B mode.
-    google.protobuf.Timestamp absolute_time = 8 [(gogoproto.stdtime) = true];
+    google.protobuf.Timestamp absolute_time = 8;
   }
   // Optional gateway and timing information for class B and C.
   // If set, this downlink message will only be transmitted as class B or C downlink.
@@ -347,7 +347,7 @@ message ApplicationUp {
   EndDeviceIdentifiers end_device_ids = 1 [(validate.rules).message.required = true];
   repeated string correlation_ids = 2 [(validate.rules).repeated.items.string.max_len = 100];
   // Server time when the Application Server received the message.
-  google.protobuf.Timestamp received_at = 12 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp received_at = 12;
 
   oneof up {
     option (validate.required) = true;

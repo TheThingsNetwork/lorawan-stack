@@ -60,9 +60,7 @@ type jsRPCPaths struct {
 }
 
 func (p jsRPCPaths) join() string    { return p.Join }
-func (p jsRPCPaths) rejoin() string  { return p.Rejoin }
 func (p jsRPCPaths) appSKey() string { return p.AppSKey }
-func (p jsRPCPaths) homeNS() string  { return p.HomeNS }
 
 func serverURL(scheme, fqdn, path string, port uint32) string {
 	if scheme == "" {
@@ -209,7 +207,7 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 		return nil, errNoJoinRequestPayload.New()
 	}
 
-	dlSettings, err := lorawan.MarshalDLSettings(*req.DownlinkSettings)
+	dlSettings, err := lorawan.MarshalDLSettings(req.DownlinkSettings)
 	if err != nil {
 		return nil, err
 	}

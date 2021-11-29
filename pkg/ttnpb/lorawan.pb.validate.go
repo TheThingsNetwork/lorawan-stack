@@ -52,7 +52,14 @@ func (m *Message) ValidateFields(paths ...string) error {
 		switch name {
 		case "m_hdr":
 
-			if v, ok := interface{}(&m.MHDR).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetMHdr() == nil {
+				return MessageValidationError{
+					field:  "m_hdr",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetMHdr()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MessageValidationError{
 						field:  "m_hdr",
@@ -329,7 +336,14 @@ func (m *MACPayload) ValidateFields(paths ...string) error {
 		switch name {
 		case "f_hdr":
 
-			if v, ok := interface{}(&m.FHDR).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetFHdr() == nil {
+				return MACPayloadValidationError{
+					field:  "f_hdr",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetFHdr()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACPayloadValidationError{
 						field:  "f_hdr",
@@ -446,7 +460,14 @@ func (m *FHDR) ValidateFields(paths ...string) error {
 			// no validation rules for DevAddr
 		case "f_ctrl":
 
-			if v, ok := interface{}(&m.FCtrl).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetFCtrl() == nil {
+				return FHDRValidationError{
+					field:  "f_ctrl",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetFCtrl()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return FHDRValidationError{
 						field:  "f_ctrl",
@@ -837,7 +858,14 @@ func (m *JoinAcceptPayload) ValidateFields(paths ...string) error {
 			// no validation rules for DevAddr
 		case "dl_settings":
 
-			if v, ok := interface{}(&m.DLSettings).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetDlSettings() == nil {
+				return JoinAcceptPayloadValidationError{
+					field:  "dl_settings",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetDlSettings()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return JoinAcceptPayloadValidationError{
 						field:  "dl_settings",
@@ -1535,7 +1563,14 @@ func (m *TxSettings) ValidateFields(paths ...string) error {
 		switch name {
 		case "data_rate":
 
-			if v, ok := interface{}(&m.DataRate).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetDataRate() == nil {
+				return TxSettingsValidationError{
+					field:  "data_rate",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetDataRate()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return TxSettingsValidationError{
 						field:  "data_rate",
@@ -5425,6 +5460,13 @@ func (m *MACCommand_DeviceTimeAns) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "time":
+
+			if m.GetTime() == nil {
+				return MACCommand_DeviceTimeAnsValidationError{
+					field:  "time",
+					reason: "value is required",
+				}
+			}
 
 		default:
 			return MACCommand_DeviceTimeAnsValidationError{

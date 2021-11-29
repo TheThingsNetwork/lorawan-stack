@@ -19,7 +19,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -109,7 +109,7 @@ func adrLossRate(ups ...*ttnpb.UplinkMessage) float32 {
 		}
 		lastFCnt = fCnt
 	}
-	return float32(lost) / float32(1+LastUplink(ups...).Payload.GetMacPayload().FullFCnt-min)
+	return float32(lost) / float32(1+internal.LastUplink(ups...).Payload.GetMacPayload().FullFCnt-min)
 }
 
 func maxSNRFromMetadata(mds ...*ttnpb.RxMetadata) (float32, bool) {
@@ -157,7 +157,7 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 				continue
 			}
 			switch {
-			case up.Payload.MType != ttnpb.MType_UNCONFIRMED_UP && up.Payload.MType != ttnpb.MType_CONFIRMED_UP,
+			case up.Payload.MHdr.MType != ttnpb.MType_UNCONFIRMED_UP && up.Payload.MHdr.MType != ttnpb.MType_CONFIRMED_UP,
 				dev.MacState.LastAdrChangeFCntUp != 0 && up.Payload.GetMacPayload().FullFCnt <= dev.MacState.LastAdrChangeFCntUp,
 				drIdx != dev.MacState.CurrentParameters.AdrDataRateIndex:
 				return dev.MacState.RecentUplinks[i+1:]
@@ -171,8 +171,8 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 
 	minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(dev.MacState.CurrentParameters.Channels...)
 	if !ok {
-		return ErrCorruptedMACState.
-			WithCause(ErrChannelDataRateRange)
+		return internal.ErrCorruptedMACState.
+			WithCause(internal.ErrChannelDataRateRange)
 	}
 	if maxDataRateIndex > phy.MaxADRDataRateIndex {
 		maxDataRateIndex = phy.MaxADRDataRateIndex
@@ -232,11 +232,11 @@ func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, de
 	// don't have enough data for our decision.
 	var margin float32
 	// NOTE: We currently assume that the uplink's SF and BW correspond to CurrentParameters.ADRDataRateIndex.
-	if dr := LastUplink(adrUplinks...).Settings.DataRate.GetLora(); dr != nil {
+	if dr := internal.LastUplink(adrUplinks...).Settings.DataRate.GetLora(); dr != nil {
 		var ok bool
 		df, ok := demodulationFloor[dr.SpreadingFactor][dr.Bandwidth]
 		if !ok {
-			return ErrInvalidDataRate.New()
+			return internal.ErrInvalidDataRate.New()
 		}
 		margin = maxSNR - df - DeviceADRMargin(dev, defaults)
 	}

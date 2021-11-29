@@ -19,7 +19,6 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	. "go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -579,8 +578,8 @@ func TestFindDataRate(t *testing.T) {
 	a := assertions.New(t)
 
 	// US_902_928
-	testBand, _ := Get(band.US_902_928, ttnpb.RP001_V1_0_2_REV_B)
-	dr := ttnpb.DataRate{
+	testBand, _ := Get(US_902_928, ttnpb.RP001_V1_0_2_REV_B)
+	dr := &ttnpb.DataRate{
 		Modulation: &ttnpb.DataRate_Lora{
 			Lora: &ttnpb.LoRaDataRate{
 				Bandwidth:       500000,
@@ -594,7 +593,7 @@ func TestFindDataRate(t *testing.T) {
 		t.Fatalf("Invalid index, expected 12. Got %d", index)
 	}
 
-	dr = ttnpb.DataRate{
+	dr = &ttnpb.DataRate{
 		Modulation: &ttnpb.DataRate_Lora{
 			Lora: &ttnpb.LoRaDataRate{
 				Bandwidth:       500000,
@@ -609,8 +608,8 @@ func TestFindDataRate(t *testing.T) {
 	}
 
 	// AU_915_928
-	testBand, _ = Get(band.AU_915_928, ttnpb.RP001_V1_0_3_REV_A)
-	dr = ttnpb.DataRate{
+	testBand, _ = Get(AU_915_928, ttnpb.RP001_V1_0_3_REV_A)
+	dr = &ttnpb.DataRate{
 		Modulation: &ttnpb.DataRate_Lora{
 			Lora: &ttnpb.LoRaDataRate{
 				Bandwidth:       500000,
@@ -624,7 +623,7 @@ func TestFindDataRate(t *testing.T) {
 		t.Fatalf("Invalid index, expected 8. Got %d", index)
 	}
 
-	dr = ttnpb.DataRate{
+	dr = &ttnpb.DataRate{
 		Modulation: &ttnpb.DataRate_Lora{
 			Lora: &ttnpb.LoRaDataRate{
 				Bandwidth:       500000,

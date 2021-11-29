@@ -18,7 +18,7 @@ import "context"
 
 // ValidateContext wraps the generated validator with (optionally context-based) custom checks.
 func (p MACPayload) ValidateContext(context.Context) error {
-	if p.DevAddr.IsZero() {
+	if h := p.GetFHdr(); h == nil || h.DevAddr.IsZero() {
 		return errMissing("DevAddr")
 	}
 	return p.ValidateFields()

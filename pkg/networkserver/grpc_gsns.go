@@ -87,7 +87,7 @@ func maxRetransmissionDelay(rxDelay ttnpb.RxDelay) time.Duration {
 
 func matchCmacF(ctx context.Context, fNwkSIntKey types.AES128Key, macVersion ttnpb.MACVersion, fCnt uint32, up *ttnpb.UplinkMessage) ([4]byte, bool) {
 	registerMICComputation(ctx)
-	cmacF, err := crypto.ComputeLegacyUplinkMIC(fNwkSIntKey, up.Payload.GetMacPayload().DevAddr, fCnt, up.RawPayload[:len(up.RawPayload)-4])
+	cmacF, err := crypto.ComputeLegacyUplinkMIC(fNwkSIntKey, up.Payload.GetMacPayload().FHdr.DevAddr, fCnt, up.RawPayload[:len(up.RawPayload)-4])
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to compute cmacF")
 		return [4]byte{}, false
@@ -223,11 +223,11 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 	var matchType sessionMatchType
 
 	// Pending session match
-	if !pld.Ack &&
+	if !pld.FHdr.FCtrl.Ack &&
 		cmacFMatchResult.IsPending &&
 		dev.PendingSession != nil &&
 		dev.PendingMacState != nil &&
-		pld.DevAddr.Equal(dev.PendingSession.DevAddr) &&
+		pld.FHdr.DevAddr.Equal(dev.PendingSession.DevAddr) &&
 		cmacFMatchResult.LoRaWANVersion.UseLegacyMIC() == dev.PendingMacState.LorawanVersion.UseLegacyMIC() {
 		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.PendingSession.FNwkSIntKey, ns.KeyVault)
 		if err != nil {
@@ -255,7 +255,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			dev.PendingMacState.CurrentParameters.Channels = chs
 
 			dev.MacState = dev.PendingMacState
-			dev.PendingSession.StartedAt = *up.ReceivedAt
+			dev.PendingSession.StartedAt = *ttnpb.StdTime(up.ReceivedAt)
 
 			matchType = pendingMatch
 		}
@@ -265,10 +265,10 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 	if matchType != pendingMatch &&
 		dev.Session != nil &&
 		dev.MacState != nil &&
-		pld.DevAddr.Equal(dev.Session.DevAddr) &&
+		pld.FHdr.DevAddr.Equal(dev.Session.DevAddr) &&
 		cmacFMatchResult.LoRaWANVersion.UseLegacyMIC() == dev.MacState.LorawanVersion.UseLegacyMIC() &&
-		(cmacFMatchResult.FullFCnt == FullFCnt(uint16(pld.FCnt), dev.Session.LastFCntUp, mac.DeviceSupports32BitFCnt(dev, ns.defaultMACSettings)) ||
-			cmacFMatchResult.FullFCnt == pld.FCnt) {
+		(cmacFMatchResult.FullFCnt == FullFCnt(uint16(pld.FHdr.FCnt), dev.Session.LastFCntUp, mac.DeviceSupports32BitFCnt(dev, ns.defaultMACSettings)) ||
+			cmacFMatchResult.FullFCnt == pld.FHdr.FCnt) {
 		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.FNwkSIntKey, ns.KeyVault)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).WithField("kek_label", dev.Session.FNwkSIntKey.KekLabel).Warn("Failed to unwrap FNwkSIntKey")
@@ -282,7 +282,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			))
 			switch {
 			case cmacFMatchResult.FullFCnt < dev.Session.LastFCntUp:
-				if pld.Ack || dev.Session.LastFCntUp != cmacFMatchResult.LastFCnt || !mac.DeviceResetsFCnt(dev, ns.defaultMACSettings) {
+				if pld.FHdr.FCtrl.Ack || dev.Session.LastFCntUp != cmacFMatchResult.LastFCnt || !mac.DeviceResetsFCnt(dev, ns.defaultMACSettings) {
 					return nil, false, nil
 				}
 				ctx = log.NewContextWithField(ctx, "f_cnt_reset", true)
@@ -294,7 +294,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 				}
 
 				dev.MacState = macState
-				dev.Session.StartedAt = *up.ReceivedAt
+				dev.Session.StartedAt = *ttnpb.StdTime(up.ReceivedAt)
 
 				matchType = currentResetMatch
 
@@ -317,7 +317,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			default: // cmacFMatchResult.FullFCnt == dev.Session.LastFCntUp
 				ctx = log.NewContextWithField(ctx, "f_cnt_reset", false)
 
-				maxNbTrans := maxTransmissionNumber(dev.MacState.LorawanVersion, up.Payload.MType == ttnpb.MType_CONFIRMED_UP, dev.MacState.CurrentParameters.AdrNbTrans)
+				maxNbTrans := maxTransmissionNumber(dev.MacState.LorawanVersion, up.Payload.MHdr.MType == ttnpb.MType_CONFIRMED_UP, dev.MacState.CurrentParameters.AdrNbTrans)
 				if maxNbTrans < 1 {
 					panic(fmt.Sprintf("invalid maximum transmission number %d", maxNbTrans))
 				}
@@ -347,8 +347,8 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 						return nil, false, nil
 					}
 					nbTrans++
-					if recentUp.ReceivedAt.After(lastAt) {
-						lastAt = *recentUp.ReceivedAt
+					if recvAt := ttnpb.StdTime(recentUp.ReceivedAt); recvAt.After(lastAt) {
+						lastAt = *recvAt
 					}
 				}
 				if nbTrans < 2 || lastAt.IsZero() {
@@ -356,7 +356,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 					return nil, false, nil
 				}
 				maxDelay := maxRetransmissionDelay(dev.MacState.CurrentParameters.Rx1Delay)
-				delay := up.ReceivedAt.Sub(lastAt)
+				delay := ttnpb.StdTime(up.ReceivedAt).Sub(lastAt)
 				ctx = log.NewContextWithFields(ctx, log.Fields(
 					"last_transmission_at", lastAt,
 					"max_retransmission_delay", maxDelay,
@@ -383,11 +383,11 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		return nil, false, nil
 	}
 
-	cmdBuf := pld.FOpts
+	cmdBuf := pld.FHdr.FOpts
 	if pld.FPort == 0 && len(pld.FrmPayload) > 0 {
 		cmdBuf = pld.FrmPayload
 	}
-	if len(cmdBuf) > 0 && (len(pld.FOpts) == 0 || dev.MacState.LorawanVersion.EncryptFOpts()) {
+	if len(cmdBuf) > 0 && (len(pld.FHdr.FOpts) == 0 || dev.MacState.LorawanVersion.EncryptFOpts()) {
 		session := dev.Session
 		if matchType == pendingMatch {
 			session = dev.PendingSession
@@ -401,7 +401,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			log.FromContext(ctx).WithField("kek_label", session.NwkSEncKey.KekLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
 			return nil, false, nil
 		}
-		cmdBuf, err = crypto.DecryptUplink(key, pld.DevAddr, cmacFMatchResult.FullFCnt, cmdBuf, len(pld.FOpts) > 0)
+		cmdBuf, err = crypto.DecryptUplink(key, pld.FHdr.DevAddr, cmacFMatchResult.FullFCnt, cmdBuf, len(pld.FHdr.FOpts) > 0)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to decrypt uplink")
 			return nil, false, nil
@@ -442,7 +442,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 	ctx = log.NewContext(ctx, logger)
 
 	var queuedEventBuilders []events.Builder
-	if pld.ClassB {
+	if pld.FHdr.FCtrl.ClassB {
 		switch {
 		case !dev.SupportsClassB:
 			logger.Debug("Ignore class B bit in uplink, since device does not support class B")
@@ -521,7 +521,7 @@ macLoop:
 		case ttnpb.CID_RX_PARAM_SETUP:
 			evs, err = mac.HandleRxParamSetupAns(ctx, dev, cmd.GetRxParamSetupAns())
 		case ttnpb.CID_DEV_STATUS:
-			evs, err = mac.HandleDevStatusAns(ctx, dev, cmd.GetDevStatusAns(), cmacFMatchResult.FullFCnt, *up.ReceivedAt)
+			evs, err = mac.HandleDevStatusAns(ctx, dev, cmd.GetDevStatusAns(), cmacFMatchResult.FullFCnt, *ttnpb.StdTime(up.ReceivedAt))
 			if err == nil {
 				setPaths = append(setPaths,
 					"battery_percentage",
@@ -539,7 +539,7 @@ macLoop:
 		case ttnpb.CID_DL_CHANNEL:
 			evs, err = mac.HandleDLChannelAns(ctx, dev, cmd.GetDlChannelAns())
 		case ttnpb.CID_REKEY:
-			evs, err = mac.HandleRekeyInd(ctx, dev, cmd.GetRekeyInd(), pld.DevAddr)
+			evs, err = mac.HandleRekeyInd(ctx, dev, cmd.GetRekeyInd(), pld.FHdr.DevAddr)
 		case ttnpb.CID_ADR_PARAM_SETUP:
 			evs, err = mac.HandleADRParamSetupAns(ctx, dev)
 		case ttnpb.CID_DEVICE_TIME:
@@ -573,7 +573,7 @@ macLoop:
 
 	if matchType == pendingMatch {
 		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-			dev.EndDeviceIdentifiers.DevAddr = &pld.DevAddr
+			dev.EndDeviceIdentifiers.DevAddr = &pld.FHdr.DevAddr
 			dev.Session = dev.PendingSession
 		} else if dev.PendingSession != nil || dev.PendingMacState != nil || dev.MacState.PendingJoinRequest != nil {
 			logger.Debug("No RekeyInd received for LoRaWAN 1.1+ device")
@@ -604,7 +604,7 @@ macLoop:
 		}
 
 		var confFCnt uint32
-		if pld.Ack {
+		if pld.FHdr.FCtrl.Ack {
 			confFCnt = dev.Session.LastConfFCntDown
 		}
 		registerMICComputation(ctx)
@@ -614,7 +614,7 @@ macLoop:
 			confFCnt,
 			uint8(drIdx),
 			chIdx,
-			pld.DevAddr,
+			pld.FHdr.DevAddr,
 			cmacFMatchResult.FullFCnt,
 			up.RawPayload[:len(up.RawPayload)-4],
 		)
@@ -633,7 +633,7 @@ macLoop:
 
 	var queuedApplicationUplinks []*ttnpb.ApplicationUp
 	if pendingAppDown != nil {
-		if pld.Ack {
+		if pld.FHdr.FCtrl.Ack {
 			queuedApplicationUplinks = []*ttnpb.ApplicationUp{
 				{
 					EndDeviceIds: &dev.EndDeviceIdentifiers,
@@ -746,14 +746,14 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	}
 	pld := up.Payload.GetMacPayload()
 	ctx = log.NewContextWithFields(ctx, log.Fields(
-		"ack", pld.Ack,
-		"adr", pld.Adr,
-		"adr_ack_req", pld.AdrAckReq,
-		"class_b", pld.ClassB,
-		"dev_addr", pld.DevAddr,
-		"f_opts_len", len(pld.FOpts),
+		"ack", pld.FHdr.FCtrl.Ack,
+		"adr", pld.FHdr.FCtrl.Adr,
+		"adr_ack_req", pld.FHdr.FCtrl.AdrAckReq,
+		"class_b", pld.FHdr.FCtrl.ClassB,
+		"dev_addr", pld.FHdr.DevAddr,
+		"f_opts_len", len(pld.FHdr.FOpts),
 		"f_port", pld.FPort,
-		"uplink_f_cnt", pld.FCnt,
+		"uplink_f_cnt", pld.FHdr.FCnt,
 	))
 
 	var (
@@ -773,7 +773,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				log.FromContext(ctx).WithError(err).WithField("kek_label", match.FNwkSIntKey.KekLabel).Warn("Failed to unwrap FNwkSIntKey")
 				return false, nil
 			}
-			fCnt := FullFCnt(uint16(pld.FCnt), match.LastFCnt, mac.DeviceSupports32BitFCnt(&ttnpb.EndDevice{
+			fCnt := FullFCnt(uint16(pld.FHdr.FCnt), match.LastFCnt, mac.DeviceSupports32BitFCnt(&ttnpb.EndDevice{
 				MacSettings: &ttnpb.MACSettings{
 					Supports_32BitFCnt: match.Supports32BitFCnt,
 				},
@@ -781,13 +781,13 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 
 			var cmacF [4]byte
 			cmacF, ok = matchCmacF(ctx, fNwkSIntKey, match.LoRaWANVersion, fCnt, up)
-			if !ok && fCnt != pld.FCnt && !pld.Ack && !match.IsPending && mac.DeviceResetsFCnt(&ttnpb.EndDevice{
+			if !ok && fCnt != pld.FHdr.FCnt && !pld.FHdr.FCtrl.Ack && !match.IsPending && mac.DeviceResetsFCnt(&ttnpb.EndDevice{
 				MacSettings: &ttnpb.MACSettings{
 					ResetsFCnt: match.ResetsFCnt,
 				},
 			}, ns.defaultMACSettings) {
 				// FCnt reset
-				fCnt = pld.FCnt
+				fCnt = pld.FHdr.FCnt
 				cmacF, ok = matchCmacF(ctx, fNwkSIntKey, match.LoRaWANVersion, fCnt, up)
 			}
 			if !ok {
@@ -928,7 +928,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				stored.MacState.DesiredParameters.AdrTxPowerIndex = stored.MacState.CurrentParameters.AdrTxPowerIndex
 				stored.MacState.DesiredParameters.AdrNbTrans = stored.MacState.CurrentParameters.AdrNbTrans
 			}
-			if !pld.FHDR.Adr || !useADR {
+			if !pld.FHdr.FCtrl.Adr || !useADR {
 				return stored, paths, nil
 			}
 			if err := mac.AdaptDataRate(ctx, stored, matched.phy, ns.defaultMACSettings); err != nil {
@@ -957,7 +957,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			CorrelationIds: up.CorrelationIds,
 			Up: &ttnpb.ApplicationUp_UplinkMessage{
 				UplinkMessage: &ttnpb.ApplicationUplink{
-					Confirmed:       up.Payload.MType == ttnpb.MType_CONFIRMED_UP,
+					Confirmed:       up.Payload.MHdr.MType == ttnpb.MType_CONFIRMED_UP,
 					FCnt:            pld.FullFCnt,
 					FPort:           pld.FPort,
 					FrmPayload:      frmPayload,
@@ -1032,7 +1032,7 @@ func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids ttnpb.EndDevic
 }
 
 func (ns *NetworkServer) deduplicationDone(ctx context.Context, up *ttnpb.UplinkMessage) <-chan time.Time {
-	return time.After(time.Until(up.ReceivedAt.Add(ns.deduplicationWindow(ctx))))
+	return time.After(time.Until(ttnpb.StdTime(up.ReceivedAt).Add(ns.deduplicationWindow(ctx))))
 }
 
 func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.UplinkMessage) (err error) {
@@ -1121,13 +1121,13 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	}
 
 	cfList := frequencyplans.CFList(*fp, matched.LorawanPhyVersion)
-	dlSettings := ttnpb.DLSettings{
+	dlSettings := &ttnpb.DLSettings{
 		Rx1DrOffset: macState.DesiredParameters.Rx1DataRateOffset,
 		Rx2Dr:       macState.DesiredParameters.Rx2DataRateIndex,
 		OptNeg:      matched.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0,
 	}
 
-	jReq := &ttnpb.JoinRequest{
+	resp, joinEvents, err := ns.sendJoinRequest(ctx, matched.EndDeviceIdentifiers, &ttnpb.JoinRequest{
 		Payload:            up.Payload,
 		CfList:             cfList,
 		CorrelationIds:     events.CorrelationIDsFromContext(ctx),
@@ -1136,12 +1136,9 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		RawPayload:         up.RawPayload,
 		RxDelay:            macState.DesiredParameters.Rx1Delay,
 		SelectedMacVersion: matched.LorawanVersion, // Assume NS version is always higher than the version of the device
-		DownlinkSettings:   &dlSettings,
-	}
-	if up.ConsumedAirtime != nil {
-		jReq.ConsumedAirtime = ttnpb.ProtoDuration(up.ConsumedAirtime)
-	}
-	resp, joinEvents, err := ns.sendJoinRequest(ctx, matched.EndDeviceIdentifiers, jReq)
+		ConsumedAirtime:    up.ConsumedAirtime,
+		DownlinkSettings:   dlSettings,
+	})
 
 	queuedEvents = append(queuedEvents, joinEvents...)
 	if err != nil {
@@ -1163,7 +1160,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		Request: ttnpb.MACState_JoinRequest{
 			RxDelay:          macState.DesiredParameters.Rx1Delay,
 			CfList:           cfList,
-			DownlinkSettings: dlSettings,
+			DownlinkSettings: *dlSettings,
 		},
 	}
 	macState.RxWindowsAvailable = true
@@ -1216,7 +1213,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	ctx = storedCtx
 
 	// TODO: Extract this into a utility function shared with mac.HandleRejoinRequest. (https://github.com/TheThingsNetwork/lorawan-stack/issues/8)
-	downAt := up.ReceivedAt.Add(-infrastructureDelay/2 + phy.JoinAcceptDelay1 - macState.DesiredParameters.Rx1Delay.Duration()/2 - nsScheduleWindow())
+	downAt := ttnpb.StdTime(up.ReceivedAt).Add(-infrastructureDelay/2 + phy.JoinAcceptDelay1 - macState.DesiredParameters.Rx1Delay.Duration()/2 - nsScheduleWindow())
 	if earliestAt := time.Now().Add(nsScheduleWindow()); downAt.Before(earliestAt) {
 		downAt = earliestAt
 	}
@@ -1249,8 +1246,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	up.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 
 	registerUplinkLatency(ctx, up)
-	now := time.Now().UTC()
-	up.ReceivedAt = &now
+	up.ReceivedAt = ttnpb.ProtoTimePtr(time.Now())
 
 	up.Payload = &ttnpb.Message{}
 	if err := lorawan.UnmarshalMessage(up.RawPayload, up.Payload); err != nil {
@@ -1262,15 +1258,15 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 			registerDropUplink(ctx, up, err)
 		}
 	}()
-	if up.Payload.Major != ttnpb.Major_LORAWAN_R1 {
+	if up.Payload.MHdr.Major != ttnpb.Major_LORAWAN_R1 {
 		return nil, errUnsupportedLoRaWANVersion.WithAttributes(
-			"version", up.Payload.Major,
+			"version", up.Payload.MHdr.Major,
 		)
 	}
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
-		"m_type", up.Payload.MType,
-		"major", up.Payload.Major,
+		"m_type", up.Payload.MHdr.MType,
+		"major", up.Payload.MHdr.Major,
 		"phy_payload_len", len(up.RawPayload),
 		"received_at", up.ReceivedAt,
 		"frequency", up.Settings.Frequency,
@@ -1293,9 +1289,9 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	if t, err := toa.Compute(len(up.RawPayload), *up.Settings); err != nil {
 		log.FromContext(ctx).WithError(err).Debug("Failed to compute time-on-air")
 	} else {
-		up.ConsumedAirtime = &t
+		up.ConsumedAirtime = ttnpb.ProtoDurationPtr(t)
 	}
-	switch up.Payload.MType {
+	switch up.Payload.MHdr.MType {
 	case ttnpb.MType_CONFIRMED_UP, ttnpb.MType_UNCONFIRMED_UP:
 		return ttnpb.Empty, ns.handleDataUplink(ctx, up)
 	case ttnpb.MType_JOIN_REQUEST:

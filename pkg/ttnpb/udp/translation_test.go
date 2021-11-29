@@ -34,9 +34,8 @@ import (
 
 var ids = ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}
 
-func timePtr(t time.Time) *time.Time { return &t }
-func uint32Ptr(v uint32) *uint32     { return &v }
-func int32Ptr(v int32) *int32        { return &v }
+func uint32Ptr(v uint32) *uint32 { return &v }
+func int32Ptr(v int32) *int32    { return &v }
 
 func TestStatusRaw(t *testing.T) {
 	a := assertions.New(t)
@@ -109,7 +108,7 @@ func TestToGatewayUp(t *testing.T) {
 					Freq:  868.0,
 					Chan:  2,
 					Modu:  "LORA",
-					DatR:  datarate.DR{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 125000}}}},
+					DatR:  datarate.DR{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 125000}}}},
 					CodR:  "4/7",
 					Data:  "QCkuASaAAAAByFaF53Iu+vzmwQ==",
 					Size:  19,
@@ -134,7 +133,7 @@ func TestToGatewayUp(t *testing.T) {
 	a.So(msg.Settings.CodingRate, should.Equal, "4/7")
 	a.So(msg.Settings.Frequency, should.Equal, 868000000)
 	a.So(msg.Settings.Timestamp, should.Equal, 1000)
-	a.So(msg.Settings.Time, should.Resemble, &absoluteTime)
+	a.So(*ttnpb.StdTime(msg.Settings.Time), should.Resemble, absoluteTime)
 	a.So(msg.RxMetadata[0].Timestamp, should.Equal, 1000)
 	a.So(msg.RxMetadata[0].Time, should.Resemble, &absoluteTime)
 	a.So(msg.RxMetadata[0].FineTimestamp, should.Equal, 12345678)
@@ -155,7 +154,7 @@ func TestToGatewayUpLRFHSS(t *testing.T) {
 					Freq: 868.0,
 					Chan: 2,
 					Modu: "LR-FHSS",
-					DatR: datarate.DR{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lrfhss{Lrfhss: &ttnpb.LRFHSSDataRate{ModulationType: 0, OperatingChannelWidth: 125}}}},
+					DatR: datarate.DR{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lrfhss{Lrfhss: &ttnpb.LRFHSSDataRate{ModulationType: 0, OperatingChannelWidth: 125}}}},
 					CodR: "5/6",
 					Data: "QCkuASaAAAAByFaF53Iu+vzmwQ==",
 					Size: 19,
@@ -211,7 +210,7 @@ func TestToGatewayUpRoundtrip(t *testing.T) {
 						Freq:  868.0,
 						Chan:  2,
 						Modu:  "LORA",
-						DatR:  datarate.DR{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 125000}}}},
+						DatR:  datarate.DR{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 10, Bandwidth: 125000}}}},
 						CodR:  "4/7",
 						Data:  "QCkuASaAAAAByFaF53Iu+vzmwQ==",
 						Size:  19,
@@ -353,7 +352,7 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 	err := json.Unmarshal(rx, &rxData)
 	a.So(err, should.BeNil)
 
-	utcTime := timePtr(time.Date(2017, 7, 4, 13, 51, 17, 997099000, time.UTC))
+	utcTime := time.Date(2017, 7, 4, 13, 51, 17, 997099000, time.UTC)
 	const timestamp = 879148780
 
 	up, err := udp.ToGatewayUp(rxData, udp.UpstreamMetadata{ID: ids})
@@ -363,7 +362,7 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 			{
 				RawPayload: []byte{0x80, 0xcf, 0x80, 0x31, 0x07, 0x00, 0xbe, 0x04, 0x01, 0x96, 0x88, 0x67, 0x94, 0x9a, 0x94, 0x18, 0xe2, 0x4a, 0x4c, 0x3b, 0x93, 0xb1, 0xc4, 0x03},
 				Settings: &ttnpb.TxSettings{
-					DataRate: ttnpb.DataRate{
+					DataRate: &ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 7,
@@ -373,7 +372,7 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 					},
 					CodingRate: "4/5",
 					Frequency:  868500000,
-					Time:       utcTime,
+					Time:       ttnpb.ProtoTimePtr(utcTime),
 					Timestamp:  timestamp,
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
@@ -383,7 +382,7 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 						},
 						AntennaIndex:                0,
 						ChannelIndex:                7,
-						Time:                        utcTime,
+						Time:                        &utcTime,
 						Timestamp:                   timestamp,
 						FineTimestamp:               1255738435,
 						EncryptedFineTimestamp:      []byte{0xe3, 0x64, 0x0c, 0xcc, 0xe9, 0x58, 0x49, 0x23, 0xcc, 0x31, 0xea, 0x95, 0x3e, 0xb6, 0x34, 0x7d},
@@ -401,7 +400,7 @@ func TestToGatewayUpRawMultiAntenna(t *testing.T) {
 						},
 						AntennaIndex:                1,
 						ChannelIndex:                23,
-						Time:                        utcTime,
+						Time:                        &utcTime,
 						Timestamp:                   timestamp,
 						FineTimestamp:               1252538436,
 						EncryptedFineTimestamp:      []byte{0x76, 0x31, 0xa2, 0x4b, 0x33, 0x82, 0xfa, 0x00, 0x93, 0xee, 0xf4, 0x4f, 0xbf, 0xbf, 0x80, 0xb3},
@@ -426,7 +425,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 		Settings: &ttnpb.DownlinkMessage_Scheduled{
 			Scheduled: &ttnpb.TxSettings{
 				Frequency: 925700000,
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							SpreadingFactor: 10,
@@ -445,7 +444,7 @@ func TestFromDownlinkMessage(t *testing.T) {
 	}
 	tx, err := udp.FromDownlinkMessage(msg)
 	a.So(err, should.BeNil)
-	a.So(tx.DatR, should.Resemble, datarate.DR{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{Bandwidth: 500000, SpreadingFactor: 10}}}})
+	a.So(tx.DatR, should.Resemble, datarate.DR{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{Bandwidth: 500000, SpreadingFactor: 10}}}})
 	a.So(tx.Tmst, should.Equal, 1886440700)
 	a.So(tx.NCRC, should.Equal, true)
 	a.So(tx.Data, should.Equal, "ffOO")
@@ -457,7 +456,7 @@ func TestDownlinkRoundtrip(t *testing.T) {
 		Settings: &ttnpb.DownlinkMessage_Scheduled{
 			Scheduled: &ttnpb.TxSettings{
 				Frequency: 925700000,
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							SpreadingFactor: 10,

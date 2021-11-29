@@ -22,7 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -58,12 +58,12 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 		return linkADRReqParameters{}, false, nil
 	}
 	if len(dev.MacState.DesiredParameters.Channels) > int(phy.MaxUplinkChannels) {
-		return linkADRReqParameters{}, false, ErrCorruptedMACState.
+		return linkADRReqParameters{}, false, internal.ErrCorruptedMACState.
 			WithAttributes(
 				"desired_channels_len", len(dev.MacState.DesiredParameters.Channels),
 				"phy_max_uplink_channels", phy.MaxUplinkChannels,
 			).
-			WithCause(ErrUnknownChannel)
+			WithCause(internal.ErrUnknownChannel)
 	}
 
 	currentChs := make([]bool, phy.MaxUplinkChannels)
@@ -74,13 +74,13 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 	for i, ch := range dev.MacState.DesiredParameters.Channels {
 		isEnabled := ch.GetEnableUplink()
 		if isEnabled && ch.UplinkFrequency == 0 {
-			return linkADRReqParameters{}, false, ErrCorruptedMACState.
+			return linkADRReqParameters{}, false, internal.ErrCorruptedMACState.
 				WithAttributes(
 					"i", i,
 					"enabled", isEnabled,
 					"uplink_frequency", ch.UplinkFrequency,
 				).
-				WithCause(ErrDownlinkChannel)
+				WithCause(internal.ErrDownlinkChannel)
 		}
 		if DeviceNeedsNewChannelReqAtIndex(dev, i) {
 			currentChs[i] = ch != nil && ch.UplinkFrequency != 0
@@ -103,11 +103,11 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 	}
 	if len(desiredMasks) > math.MaxUint16 {
 		// Something is really wrong.
-		return linkADRReqParameters{}, false, ErrCorruptedMACState.
+		return linkADRReqParameters{}, false, internal.ErrCorruptedMACState.
 			WithAttributes(
 				"len", len(desiredMasks),
 			).
-			WithCause(ErrChannelMask)
+			WithCause(internal.ErrChannelMask)
 	}
 
 	var (
@@ -117,8 +117,8 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 	)
 	minDataRateIndex, maxDataRateIndex, ok := channelDataRateRange(dev.MacState.DesiredParameters.Channels...)
 	if !ok {
-		return linkADRReqParameters{}, false, ErrCorruptedMACState.
-			WithCause(ErrChannelDataRateRange)
+		return linkADRReqParameters{}, false, internal.ErrCorruptedMACState.
+			WithCause(internal.ErrChannelDataRateRange)
 	}
 
 	if dev.MacState.DesiredParameters.AdrTxPowerIndex != dev.MacState.CurrentParameters.AdrTxPowerIndex {
@@ -128,7 +128,7 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 		}
 		switch {
 		case dev.MacState.DesiredParameters.AdrTxPowerIndex > uint32(phy.MaxTxPowerIndex()):
-			return linkADRReqParameters{}, false, ErrCorruptedMACState.
+			return linkADRReqParameters{}, false, internal.ErrCorruptedMACState.
 				WithAttributes(append(attributes,
 					"phy_max_tx_power_index", phy.MaxTxPowerIndex(),
 				)...)
@@ -141,17 +141,17 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 		}
 		switch {
 		case dev.MacState.DesiredParameters.AdrDataRateIndex > phy.MaxADRDataRateIndex:
-			return linkADRReqParameters{}, false, ErrCorruptedMACState.
+			return linkADRReqParameters{}, false, internal.ErrCorruptedMACState.
 				WithAttributes(append(attributes,
 					"phy_max_adr_data_rate_index", phy.MaxADRDataRateIndex,
 				)...)
 		case dev.MacState.DesiredParameters.AdrDataRateIndex < minDataRateIndex:
-			return linkADRReqParameters{}, false, ErrCorruptedMACState.
+			return linkADRReqParameters{}, false, internal.ErrCorruptedMACState.
 				WithAttributes(append(attributes,
 					"min_adr_data_rate_index", minDataRateIndex,
 				)...)
 		case dev.MacState.DesiredParameters.AdrDataRateIndex > maxDataRateIndex:
-			return linkADRReqParameters{}, false, ErrCorruptedMACState.
+			return linkADRReqParameters{}, false, internal.ErrCorruptedMACState.
 				WithAttributes(append(attributes,
 					"max_adr_data_rate_index", maxDataRateIndex,
 				)...)
@@ -287,7 +287,7 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 		return nil, ErrNoPayload.New()
 	}
 	if (dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) < 0 || dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0) && dupCount != 0 {
-		return nil, ErrInvalidPayload.New()
+		return nil, internal.ErrInvalidPayload.New()
 	}
 
 	ev := EvtReceiveLinkADRAccept
@@ -301,7 +301,7 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	}
 	evs := events.Builders{ev.With(events.WithData(pld))}
 
-	phy, err := DeviceBand(dev, fps)
+	phy, err := internal.DeviceBand(dev, fps)
 	if err != nil {
 		return evs, err
 	}
@@ -314,7 +314,7 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	var req *ttnpb.MACCommand_LinkADRReq
 	dev.MacState.PendingRequests, err = handler(ttnpb.CID_LINK_ADR, func(cmd *ttnpb.MACCommand) error {
 		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 && n > dupCount+1 {
-			return ErrInvalidPayload.New()
+			return internal.ErrInvalidPayload.New()
 		}
 		n++
 
@@ -338,12 +338,12 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 				if !masked {
 					continue
 				}
-				return ErrCorruptedMACState.
+				return internal.ErrCorruptedMACState.
 					WithAttributes(
 						"i", i,
 						"channels_len", len(dev.MacState.CurrentParameters.Channels),
 					).
-					WithCause(ErrUnknownChannel)
+					WithCause(internal.ErrUnknownChannel)
 			}
 			dev.MacState.CurrentParameters.Channels[i].EnableUplink = masked
 		}

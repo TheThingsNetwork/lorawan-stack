@@ -599,7 +599,7 @@ var DefaultMACCommands = MACCommandSpec{
 		AppendDownlink: func(phy band.Band, b []byte, cmd ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetDeviceTimeAns()
 
-			t := gpstime.ToGPS(pld.Time)
+			t := gpstime.ToGPS(*ttnpb.StdTime(pld.Time))
 			sec := t / time.Second
 			if sec > math.MaxUint32 {
 				return nil, errExpectedLowerOrEqual("Time", uint32(math.MaxUint32))(sec)
@@ -611,7 +611,7 @@ var DefaultMACCommands = MACCommandSpec{
 		UnmarshalDownlink: newMACUnmarshaler(ttnpb.CID_DEVICE_TIME, "DeviceTimeAns", 5, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			cmd.Payload = &ttnpb.MACCommand_DeviceTimeAns_{
 				DeviceTimeAns: &ttnpb.MACCommand_DeviceTimeAns{
-					Time: gpstime.Parse(time.Duration(byteutil.ParseUint32(b[0:4]))*time.Second + time.Duration(b[4])*fractStep),
+					Time: ttnpb.ProtoTimePtr(gpstime.Parse(time.Duration(byteutil.ParseUint32(b[0:4]))*time.Second + time.Duration(b[4])*fractStep)),
 				},
 			}
 			return nil

@@ -46,20 +46,24 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 
 	up := &ttnpb.UplinkMessage{
 		Payload: &ttnpb.Message{
-			MHDR: ttnpb.MHDR{
+			MHdr: &ttnpb.MHDR{
 				MType: ttnpb.MType_UNCONFIRMED_UP,
 			},
 			Payload: &ttnpb.Message_MacPayload{
-				MacPayload: &ttnpb.MACPayload{},
+				MacPayload: &ttnpb.MACPayload{
+					FHdr: &ttnpb.FHDR{
+						FCtrl: &ttnpb.FCtrl{},
+					},
+				},
 			},
 		},
 		RxMetadata: DefaultRxMetadata[:],
-		ReceivedAt: &beaconTime,
+		ReceivedAt: ttnpb.ProtoTimePtr(beaconTime),
 	}
 	ups := []*ttnpb.UplinkMessage{up}
 
 	rxDelay := ttnpb.RX_DELAY_4
-	rx1 := up.ReceivedAt.Add(rxDelay.Duration())
+	rx1 := ttnpb.StdTime(up.ReceivedAt).Add(rxDelay.Duration())
 	rx2 := rx1.Add(time.Second)
 
 	beforeRX1 := rx1.Add(-time.Millisecond)
@@ -398,7 +402,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: &absTime,
+								AbsoluteTime: ttnpb.ProtoTimePtr(absTime),
 								Gateways: []*ttnpb.GatewayAntennaIdentifiers{
 									{
 										GatewayIds: &ttnpb.GatewayIdentifiers{
@@ -434,7 +438,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: &absTime,
+								AbsoluteTime: ttnpb.ProtoTimePtr(absTime),
 								Gateways: []*ttnpb.GatewayAntennaIdentifiers{
 									{
 										GatewayIds: &ttnpb.GatewayIdentifiers{
@@ -464,7 +468,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: &absTime,
+								AbsoluteTime: ttnpb.ProtoTimePtr(absTime),
 							},
 						},
 					},
@@ -488,7 +492,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: &absTime,
+								AbsoluteTime: ttnpb.ProtoTimePtr(absTime),
 							},
 						},
 					},

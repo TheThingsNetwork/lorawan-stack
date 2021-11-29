@@ -121,7 +121,10 @@ func (b Band) FindSubBand(frequency uint64) (SubBandParameters, bool) {
 }
 
 // FindUplinkDataRate returns the uplink data rate with index by API data rate, if any.
-func (b Band) FindUplinkDataRate(dr ttnpb.DataRate) (ttnpb.DataRateIndex, DataRate, bool) {
+func (b Band) FindUplinkDataRate(dr *ttnpb.DataRate) (ttnpb.DataRateIndex, DataRate, bool) {
+	if dr == nil {
+		return 0, DataRate{}, false
+	}
 	for i := ttnpb.DATA_RATE_0; i <= ttnpb.DATA_RATE_15; i++ {
 		// NOTE: Some bands (e.g. US915) contain identical data rates under different indexes.
 		// It seems to be a convention in the spec for uplink-only data rates to be at indexes
@@ -137,7 +140,10 @@ func (b Band) FindUplinkDataRate(dr ttnpb.DataRate) (ttnpb.DataRateIndex, DataRa
 }
 
 // FindDownlinkDataRate returns the downlink data rate with index by API data rate, if any.
-func (b Band) FindDownlinkDataRate(dr ttnpb.DataRate) (ttnpb.DataRateIndex, DataRate, bool) {
+func (b Band) FindDownlinkDataRate(dr *ttnpb.DataRate) (ttnpb.DataRateIndex, DataRate, bool) {
+	if dr == nil {
+		return 0, DataRate{}, false
+	}
 	// NOTE: See notes in FindUplinkDataRate explaining the order of scanning data rates.
 	for i := ttnpb.DATA_RATE_15; i >= ttnpb.DATA_RATE_0; i-- {
 		bDR, ok := b.DataRates[i]

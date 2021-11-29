@@ -321,8 +321,7 @@ func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.Applicatio
 	up.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 	registerReceiveUp(ctx, up)
 
-	now := time.Now().UTC()
-	up.ReceivedAt = &now
+	up.ReceivedAt = ttnpb.ProtoTimePtr(time.Now())
 
 	pass, err := as.handleUp(ctx, up, link)
 	if err != nil {

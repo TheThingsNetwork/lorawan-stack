@@ -20,6 +20,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
@@ -28,11 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func uint8Ptr(v uint8) *uint8                    { return &v }
-func uint64Ptr(v uint64) *uint64                 { return &v }
-func float32Ptr(v float32) *float32              { return &v }
-func boolPtr(v bool) *bool                       { return &v }
-func durationPtr(v time.Duration) *time.Duration { return &v }
+func uint64Ptr(v uint64) *uint64 { return &v }
 
 func Example() {
 	fetcher, err := fetch.FromHTTP(http.DefaultClient, "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans", true)
@@ -334,7 +331,7 @@ func TestProtoConversion(t *testing.T) {
 			Input: &frequencyplans.FrequencyPlan{
 				BandID: "AS_923",
 				LBT: &frequencyplans.LBT{
-					ScanTime: 32,
+					ScanTime: 32 * time.Microsecond,
 				},
 				PingSlot: &frequencyplans.Channel{
 					Frequency: 923000000,
@@ -343,7 +340,7 @@ func TestProtoConversion(t *testing.T) {
 			},
 			Output: &ttnpb.ConcentratorConfig{
 				Lbt: &ttnpb.ConcentratorConfig_LBTConfiguration{
-					ScanTime: 32,
+					ScanTime: types.DurationProto(32 * time.Microsecond),
 				},
 				PingSlot: &ttnpb.ConcentratorConfig_Channel{
 					Frequency: 923000000,

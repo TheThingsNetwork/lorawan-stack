@@ -25,7 +25,7 @@ import (
 
 // DR encodes a LoRa data rate or an FSK data rate, and implements marshalling and unmarshalling between JSON.
 type DR struct {
-	ttnpb.DataRate
+	*ttnpb.DataRate
 }
 
 // MarshalJSON implements the json.Marshaler interface.
@@ -68,7 +68,7 @@ func (dr *DR) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	*dr = DR{
-		DataRate: ttnpb.DataRate{
+		DataRate: &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Fsk{
 				Fsk: &ttnpb.FSKDataRate{
 					BitRate: uint32(i),
@@ -119,7 +119,7 @@ func ParseLoRa(dr string) (DR, error) {
 		return DR{}, errDataRate.New()
 	}
 	return DR{
-		DataRate: ttnpb.DataRate{
+		DataRate: &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Lora{
 				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: uint32(sf),
@@ -145,7 +145,7 @@ func ParseLRFHSS(dr string) (DR, error) {
 		return DR{}, errDataRate.New()
 	}
 	return DR{
-		DataRate: ttnpb.DataRate{
+		DataRate: &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Lrfhss{
 				Lrfhss: &ttnpb.LRFHSSDataRate{
 					ModulationType:        uint32(mod),

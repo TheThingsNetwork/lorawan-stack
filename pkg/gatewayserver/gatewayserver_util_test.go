@@ -150,7 +150,7 @@ func randomJoinRequestPayload(joinEUI, devEUI types.EUI64) []byte {
 
 	msg := &ttnpb.UplinkMessage{
 		Payload: &ttnpb.Message{
-			MHDR: ttnpb.MHDR{
+			MHdr: &ttnpb.MHDR{
 				MType: ttnpb.MType_JOIN_REQUEST,
 				Major: ttnpb.Major_LORAWAN_R1,
 			},
@@ -181,14 +181,14 @@ func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 	random.Read(appSKey[:])
 
 	pld := &ttnpb.MACPayload{
-		FHDR: ttnpb.FHDR{
+		FHdr: &ttnpb.FHDR{
 			DevAddr: devAddr,
 			FCnt:    42,
 		},
 		FPort:      fPort,
 		FrmPayload: random.Bytes(size),
 	}
-	buf, err := crypto.EncryptUplink(appSKey, devAddr, pld.FCnt, pld.FrmPayload, false)
+	buf, err := crypto.EncryptUplink(appSKey, devAddr, pld.FHdr.FCnt, pld.FrmPayload, false)
 	if err != nil {
 		panic(err)
 	}
@@ -196,7 +196,7 @@ func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 
 	msg := &ttnpb.UplinkMessage{
 		Payload: &ttnpb.Message{
-			MHDR: ttnpb.MHDR{
+			MHdr: &ttnpb.MHDR{
 				MType: ttnpb.MType_UNCONFIRMED_UP,
 				Major: ttnpb.Major_LORAWAN_R1,
 			},
@@ -209,7 +209,7 @@ func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 	if err != nil {
 		panic(err)
 	}
-	mic, err := crypto.ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey, 0, 5, 0, devAddr, pld.FCnt, buf)
+	mic, err := crypto.ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey, 0, 5, 0, devAddr, pld.FHdr.FCnt, buf)
 	if err != nil {
 		panic(err)
 	}
@@ -222,21 +222,21 @@ func randomDownDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte
 	random.Read(appSKey[:])
 
 	pld := &ttnpb.MACPayload{
-		FHDR: ttnpb.FHDR{
+		FHdr: &ttnpb.FHDR{
 			DevAddr: devAddr,
 			FCnt:    42,
 		},
 		FPort:      fPort,
 		FrmPayload: random.Bytes(size),
 	}
-	buf, err := crypto.EncryptDownlink(appSKey, devAddr, pld.FCnt, pld.FrmPayload, false)
+	buf, err := crypto.EncryptDownlink(appSKey, devAddr, pld.FHdr.FCnt, pld.FrmPayload, false)
 	if err != nil {
 		panic(err)
 	}
 	pld.FrmPayload = buf
 
 	msg := ttnpb.Message{
-		MHDR: ttnpb.MHDR{
+		MHdr: &ttnpb.MHDR{
 			MType: ttnpb.MType_UNCONFIRMED_DOWN,
 			Major: ttnpb.Major_LORAWAN_R1,
 		},
@@ -248,7 +248,7 @@ func randomDownDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte
 	if err != nil {
 		panic(err)
 	}
-	mic, err := crypto.ComputeDownlinkMIC(sNwkSIntKey, devAddr, 0, pld.FCnt, buf)
+	mic, err := crypto.ComputeDownlinkMIC(sNwkSIntKey, devAddr, 0, pld.FHdr.FCnt, buf)
 	if err != nil {
 		panic(err)
 	}

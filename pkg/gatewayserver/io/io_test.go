@@ -36,8 +36,6 @@ import (
 
 var timeout = (1 << 3) * test.Delay
 
-func timePtr(t time.Time) *time.Time { return &t }
-
 func assertStatsIncludePaths(a *assertions.Assertion, conn *io.Connection, paths []string) {
 	_, statsPaths := conn.Stats()
 	for _, path := range paths {
@@ -98,7 +96,7 @@ func TestFlow(t *testing.T) {
 					Timestamp:    100,
 				},
 			},
-			Settings: &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+			Settings: &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 		}
 		select {
 		case up := <-conn.Up():
@@ -407,7 +405,7 @@ func TestFlow(t *testing.T) {
 							},
 						},
 						Rx2Frequency:    869525000,
-						AbsoluteTime:    timePtr(time.Unix(100, 0)), // The mock front-end uses Unix epoch as start time.
+						AbsoluteTime:    ttnpb.ProtoTimePtr(time.Unix(100, 0)), // The mock front-end uses Unix epoch as start time.
 						FrequencyPlanId: test.EUFrequencyPlanID,
 					},
 				},
@@ -432,7 +430,7 @@ func TestFlow(t *testing.T) {
 							},
 						},
 						Rx2Frequency:    869525000,
-						AbsoluteTime:    timePtr(time.Unix(100, 0)), // The mock front-end uses Unix epoch as start time.
+						AbsoluteTime:    ttnpb.ProtoTimePtr(time.Unix(100, 0)), // The mock front-end uses Unix epoch as start time.
 						FrequencyPlanId: test.EUFrequencyPlanID,
 					},
 				},
@@ -569,7 +567,7 @@ func TestSubBandEIRPOverride(t *testing.T) {
 					Timestamp:    100,
 				},
 			},
-			Settings: &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+			Settings: &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 		}
 		select {
 		case up := <-conn.Up():

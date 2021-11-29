@@ -2012,16 +2012,16 @@ func (v RxDelay) String() string {
 	return strconv.Itoa(int(v))
 }
 
-func (v LoRaDataRate) DataRate() DataRate {
-	return DataRate{
+func (v LoRaDataRate) DataRate() *DataRate {
+	return &DataRate{
 		Modulation: &DataRate_Lora{
 			Lora: &v,
 		},
 	}
 }
 
-func (v FSKDataRate) DataRate() DataRate {
-	return DataRate{
+func (v FSKDataRate) DataRate() *DataRate {
+	return &DataRate{
 		Modulation: &DataRate_Fsk{
 			Fsk: &v,
 		},
@@ -2091,13 +2091,13 @@ func (v *JoinAcceptPayload) FieldIsZero(p string) bool {
 	case "dev_addr":
 		return v.DevAddr == types.DevAddr{}
 	case "dl_settings":
-		return v.DLSettings == DLSettings{}
+		return v.DlSettings == nil
 	case "dl_settings.opt_neg":
-		return v.DLSettings.FieldIsZero("opt_neg")
+		return v.DlSettings.FieldIsZero("opt_neg")
 	case "dl_settings.rx1_dr_offset":
-		return v.DLSettings.FieldIsZero("rx1_dr_offset")
+		return v.DlSettings.FieldIsZero("rx1_dr_offset")
 	case "dl_settings.rx2_dr":
-		return v.DLSettings.FieldIsZero("rx2_dr")
+		return v.DlSettings.FieldIsZero("rx2_dr")
 	case "encrypted":
 		return v.Encrypted == nil
 	case "join_nonce":
@@ -2157,7 +2157,7 @@ func (v *FHDR) FieldIsZero(p string) bool {
 	case "f_cnt":
 		return v.FCnt == 0
 	case "f_ctrl":
-		return v.FCtrl == FCtrl{}
+		return v.FCtrl == nil
 	case "f_ctrl.ack":
 		return v.FCtrl.FieldIsZero("ack")
 	case "f_ctrl.adr":
@@ -2183,25 +2183,25 @@ func (v *MACPayload) FieldIsZero(p string) bool {
 	case "decoded_payload":
 		return v.DecodedPayload == nil
 	case "f_hdr":
-		return fieldsAreZero(&v.FHDR, FHDRFieldPathsTopLevel...)
+		return fieldsAreZero(v.FHdr, FHDRFieldPathsTopLevel...)
 	case "f_hdr.dev_addr":
-		return v.FHDR.FieldIsZero("dev_addr")
+		return v.FHdr.FieldIsZero("dev_addr")
 	case "f_hdr.f_cnt":
-		return v.FHDR.FieldIsZero("f_cnt")
+		return v.FHdr.FieldIsZero("f_cnt")
 	case "f_hdr.f_ctrl":
-		return v.FHDR.FieldIsZero("f_ctrl")
+		return v.FHdr.FieldIsZero("f_ctrl")
 	case "f_hdr.f_ctrl.ack":
-		return v.FHDR.FieldIsZero("f_ctrl.ack")
+		return v.FHdr.FieldIsZero("f_ctrl.ack")
 	case "f_hdr.f_ctrl.adr":
-		return v.FHDR.FieldIsZero("f_ctrl.adr")
+		return v.FHdr.FieldIsZero("f_ctrl.adr")
 	case "f_hdr.f_ctrl.adr_ack_req":
-		return v.FHDR.FieldIsZero("f_ctrl.adr_ack_req")
+		return v.FHdr.FieldIsZero("f_ctrl.adr_ack_req")
 	case "f_hdr.f_ctrl.class_b":
-		return v.FHDR.FieldIsZero("f_ctrl.class_b")
+		return v.FHdr.FieldIsZero("f_ctrl.class_b")
 	case "f_hdr.f_ctrl.f_pending":
-		return v.FHDR.FieldIsZero("f_ctrl.f_pending")
+		return v.FHdr.FieldIsZero("f_ctrl.f_pending")
 	case "f_hdr.f_opts":
-		return v.FHDR.FieldIsZero("f_opts")
+		return v.FHdr.FieldIsZero("f_opts")
 	case "f_port":
 		return v.FPort == 0
 	case "frm_payload":
@@ -2319,11 +2319,11 @@ func (v *Message) FieldIsZero(p string) bool {
 	case "Payload.rejoin_request_payload.rejoin_type":
 		return v.GetRejoinRequestPayload().FieldIsZero("rejoin_type")
 	case "m_hdr":
-		return v.MHDR == MHDR{}
+		return v.MHdr == nil
 	case "m_hdr.m_type":
-		return v.MHDR.FieldIsZero("m_type")
+		return v.MHdr.FieldIsZero("m_type")
 	case "m_hdr.major":
-		return v.MHDR.FieldIsZero("major")
+		return v.MHdr.FieldIsZero("major")
 	case "mic":
 		return v.Mic == nil
 	}
@@ -2413,9 +2413,9 @@ func (v *DeviceEIRPValue) FieldIsZero(p string) bool {
 // EndDeviceIdentifiers returns the end device identifiers (DevEUI/JoinEUI/DevAddr) available for the message payload.
 // Note that if the payload is nil, the end device identifiers will be nil.
 func (m *Message) EndDeviceIdentifiers() *EndDeviceIdentifiers {
-	if p := m.GetMacPayload(); p != nil {
+	if h := m.GetMacPayload().GetFHdr(); h != nil {
 		return &EndDeviceIdentifiers{
-			DevAddr: &p.DevAddr,
+			DevAddr: &h.DevAddr,
 		}
 	}
 	if p := m.GetJoinRequestPayload(); p != nil {
