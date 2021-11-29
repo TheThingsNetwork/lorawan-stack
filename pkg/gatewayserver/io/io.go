@@ -236,7 +236,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 			"concentrator_time", frontendSync.ConcentratorTime,
 			"server_time", frontendSync.ServerTime,
 			"gateway_time", frontendSync.GatewayTime,
-		)).Info("Gateway clocks have been synchronized by the frontend")
+		)).Debug("Gateway clocks have been synchronized by the frontend")
 	case up.Settings.Time != nil:
 		ct = c.scheduler.SyncWithGatewayAbsolute(up.Settings.Timestamp, *ttnpb.StdTime(up.ReceivedAt), *ttnpb.StdTime(up.Settings.Time))
 		log.FromContext(c.ctx).WithFields(log.Fields(
@@ -244,14 +244,14 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 			"concentrator_time", ct,
 			"server_time", up.ReceivedAt,
 			"gateway_time", *up.Settings.Time,
-		)).Info("Synchronized server and gateway absolute time")
+		)).Debug("Synchronized server and gateway absolute time")
 	case up.Settings.Time == nil:
 		ct = c.scheduler.Sync(up.Settings.Timestamp, *ttnpb.StdTime(up.ReceivedAt))
 		log.FromContext(c.ctx).WithFields(log.Fields(
 			"timestamp", up.Settings.Timestamp,
 			"concentrator_time", ct,
 			"server_time", up.ReceivedAt,
-		)).Info("Synchronized server absolute time only")
+		)).Debug("Synchronized server absolute time only")
 	default:
 		panic("unreachable")
 	}
