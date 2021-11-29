@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import axios from 'axios'
-
 import TTS, { STACK_COMPONENTS_MAP, AUTHORIZATION_MODES } from 'ttn-lw'
 
 import toast from '@ttn-lw/components/toast'
