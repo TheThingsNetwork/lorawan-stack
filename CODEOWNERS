@@ -2,6 +2,7 @@
 /** @johanstokking @htdvisser
 /CODEOWNERS @johanstokking
 /LICENSE @johanstokking
+/CHANGELOG.md
 
 # Clear common folders
 /pkg
