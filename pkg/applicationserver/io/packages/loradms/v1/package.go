@@ -85,7 +85,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 		join := m.JoinAccept
 		loraUp := &objects.LoRaUplink{
 			Type:      objects.JoiningUplinkType,
-			Timestamp: float64Ptr(float64(ttnpb.StdTime(join.ReceivedAt).UTC().Unix())),
+			Timestamp: float64PtrOfTimestamp(join.ReceivedAt),
 		}
 		return p.sendUplink(ctx, up, loraUp, data)
 	case *ttnpb.ApplicationUp_UplinkMessage:
@@ -97,7 +97,7 @@ func (p *DeviceManagementPackage) HandleUp(ctx context.Context, def *ttnpb.Appli
 			Port:      uint8Ptr(uint8(msg.GetFPort())),
 			Payload:   hexPtr(objects.Hex(msg.FrmPayload)),
 			Freq:      uint32Ptr(uint32(settings.Frequency)),
-			Timestamp: float64Ptr(float64(ttnpb.StdTime(msg.ReceivedAt).UTC().Unix())),
+			Timestamp: float64PtrOfTimestamp(msg.ReceivedAt),
 		}
 		if fPort != msg.FPort {
 			log.FromContext(ctx).Debug("Uplink received on unhandled FPort; drop payload")
@@ -329,8 +329,12 @@ func uint32Ptr(x uint32) *uint32 {
 	return &x
 }
 
-func float64Ptr(x float64) *float64 {
-	return &x
+func float64PtrOfTimestamp(x *types.Timestamp) *float64 {
+	if x == nil {
+		return nil
+	}
+	f := float64(ttnpb.StdTime(x).Unix())
+	return &f
 }
 
 func hexPtr(x objects.Hex) *objects.Hex {
