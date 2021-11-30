@@ -90,7 +90,8 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key str
 }
 
 var (
-	errNotFound = errors.DefineNotFound("not_found", "not found")
+	errNotFound        = errors.DefineNotFound("not_found", "not found")
+	errNoGatewayRights = errors.DefinePermissionDenied("no_gateway_rights", "no gateway rights")
 )
 
 func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
@@ -98,6 +99,9 @@ func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb
 	gtw, ok := is.gateways[uid]
 	if !ok {
 		return nil, errNotFound.New()
+	}
+	if gtw == nil {
+		return nil, errNoGatewayRights.New() // This simulates the behaviour of the IS with a deleted gateway.
 	}
 	return gtw, nil
 }
@@ -118,7 +122,7 @@ func (is *mockIS) Delete(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*p
 	if !ok {
 		return nil, errNotFound.New()
 	}
-	delete(is.gateways, uid)
+	is.gateways[uid] = nil
 	return nil, nil
 }
 

@@ -583,6 +583,7 @@ func (gs *GatewayServer) startDisconnectOnChangeTask(conn connectionEntry) {
 				return ctx.Err()
 			case <-time.After(d):
 			}
+
 			gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
 				GatewayIds: conn.Gateway().GetIds(),
 				FieldMask: &pbtypes.FieldMask{
@@ -603,8 +604,11 @@ func (gs *GatewayServer) startDisconnectOnChangeTask(conn connectionEntry) {
 				},
 			})
 			if err != nil {
-				if errors.IsNotFound(err) {
-					// Gateway was deleted. Disconnect.
+				if errors.IsUnauthenticated(err) || errors.IsPermissionDenied(err) {
+					// Since there is an active connection, the `Get` request will not return a 404 as the gateway existed during the connect. Instead,
+					// 1. If the gateway is connected with an API key and is deleted, the IS returns an `Unauthenticated`, since the API Key is also deleted.
+					// 2. If the gateway is connected without an API key (UDP, LBS in unauthenticated mode) and is deleted the IS returns an `PermissionDenied` as there are no rights for these IDs.
+					log.FromContext(ctx).WithError(err).Debug("Gateway was deleted and/or the API key used to link the gateway was invalidated. Disconnect.")
 					conn.Disconnect(err)
 				} else {
 					log.FromContext(ctx).WithError(err).Warn("Failed to get gateway")
