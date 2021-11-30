@@ -15,7 +15,7 @@
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
@@ -55,8 +55,8 @@ const mapStateToProps = (state, props) => {
 }
 
 const mapDispatchToProps = dispatch => ({
-  deleteApiKey: api.users.apiKeys.delete,
-  updateApiKey: api.users.apiKeys.update,
+  deleteApiKey: tts.Users.ApiKeys.deleteById,
+  updateApiKey: tts.Users.ApiKeys.updateById,
   deleteUserApiKeySuccess: () => dispatch(replace(`/user/api-keys`)),
   loadData: (userId, keyId) => {
     dispatch(getApiKey('users', userId, keyId))

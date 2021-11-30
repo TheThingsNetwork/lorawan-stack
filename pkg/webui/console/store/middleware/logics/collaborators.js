@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import api from '@console/api'
+import tts from '@console/api/tts'
+import { entitySdkServiceMap } from '@console/constants/entities'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
@@ -20,7 +21,7 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import * as collaborators from '@console/store/actions/collaborators'
 import { getUser } from '@console/store/actions/users'
 
-const validParentTypes = ['application', 'gateway', 'organization']
+const validParentTypes = Object.keys(entitySdkServiceMap)
 
 const parentTypeValidator = ({ action }, allow) => {
   if (!validParentTypes.includes(action.payload.parentType)) {
@@ -48,8 +49,11 @@ const getCollaboratorLogic = createRequestLogic({
     }
 
     return isUser
-      ? api[parentType].collaborators.getUser(parentId, collaboratorId)
-      : api[parentType].collaborators.getOrganization(parentId, collaboratorId)
+      ? tts[entitySdkServiceMap[parentType]].Collaborators.getByUserId(parentId, collaboratorId)
+      : tts[entitySdkServiceMap[parentType]].Collaborators.getByOrganizationId(
+          parentId,
+          collaboratorId,
+        )
   },
 })
 
@@ -58,7 +62,7 @@ const getCollaboratorsLogic = createRequestLogic({
   validate: parentTypeValidator,
   process: async ({ action }) => {
     const { parentType, parentId, params } = action.payload
-    const res = await api[parentType].collaborators.list(parentId, params)
+    const res = await tts[entitySdkServiceMap[parentType]].Collaborators.getAll(parentId, params)
     return { entities: res.collaborators, totalCount: res.totalCount }
   },
 })

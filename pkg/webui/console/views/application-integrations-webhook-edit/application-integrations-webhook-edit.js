@@ -17,7 +17,7 @@ import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -96,7 +96,7 @@ export default class ApplicationWebhookEdit extends Component {
       },
     } = this.props
 
-    await api.application.webhooks.delete(appId, webhookId)
+    await tts.Applications.Webhooks.deleteById(appId, webhookId)
   }
 
   @bind

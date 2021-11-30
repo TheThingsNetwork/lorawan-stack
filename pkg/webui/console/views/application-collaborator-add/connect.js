@@ -15,7 +15,7 @@
 import { push } from 'connected-react-router'
 import { connect } from 'react-redux'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import {
   selectSelectedApplicationId,
@@ -37,7 +37,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   redirectToList: appId => dispatch(push(`/applications/${appId}/collaborators`)),
-  addCollaborator: (appId, collaborator) => api.application.collaborators.add(appId, collaborator),
+  addCollaborator: (appId, collaborator) => tts.Applications.Collaborators.add(appId, collaborator),
 })
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({

@@ -20,7 +20,7 @@ import { defineMessages } from 'react-intl'
 import { Col, Row } from 'react-grid-system'
 import { isObject } from 'lodash'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import CodeEditor from '@ttn-lw/components/code-editor'
 import ProgressBar from '@ttn-lw/components/progress-bar'
@@ -221,7 +221,7 @@ export default class DeviceImporter extends Component {
       // Start template conversion.
       this.setState({ step: 'conversion', status: 'processing' })
       this.appendToLog('Converting end device templates…')
-      const templateStream = await api.deviceTemplates.convert(format_id, data)
+      const templateStream = await tts.Applications.Devices.convertTemplate(format_id, data)
       devices = await new Promise((resolve, reject) => {
         const chunks = []
 
@@ -273,7 +273,7 @@ export default class DeviceImporter extends Component {
     this.appendToLog('Creating end devices…')
 
     try {
-      this.createStream = api.device.bulkCreate(appId, devices)
+      this.createStream = tts.Applications.Devices.bulkCreate(appId, devices)
 
       await new Promise(resolve => {
         this.createStream.on('chunk', this.handleCreationSuccess)

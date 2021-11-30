@@ -14,7 +14,7 @@
 
 import { defineMessages } from 'react-intl'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 import {
@@ -62,7 +62,7 @@ const fetchThroughPagination = async (endpoint, additionalArgs, process, shouldS
 
 const getDefaultRoutingPolicy = async () => {
   try {
-    return await api.packetBroker.getHomeNetworkDefaultRoutingPolicy()
+    return await tts.PacketBrokerAgent.getHomeNetworkDefaultRoutingPolicy()
   } catch (error) {
     // Not found error means that no policy is set.
     if (isNotFoundError(error)) {
@@ -77,7 +77,7 @@ const getPacketBrokerInfoLogic = createRequestLogic({
   type: packetBroker.GET_PACKET_BROKER_INFO,
   process: async () => {
     try {
-      return await api.packetBroker.getInfo()
+      return await tts.PacketBrokerAgent.getInfo()
     } catch (error) {
       if (isUnauthenticatedError(error)) {
         // Faulty configurations can lead to 401, which in turn trigger
@@ -97,13 +97,13 @@ const registerPacketBrokerLogic = createRequestLogic({
   process: async ({ action }) => {
     const { registration } = action.payload
 
-    return await api.packetBroker.register(registration)
+    return await tts.PacketBrokerAgent.register(registration)
   },
 })
 
 const deregisterPacketBrokerLogic = createRequestLogic({
   type: packetBroker.DEREGISTER_PACKET_BROKER,
-  process: api.packetBroker.deregister,
+  process: tts.PacketBrokerAgent.deregister,
 })
 
 const getHomeNetworkDefaultRoutingPolicyLogic = createRequestLogic({
@@ -116,7 +116,7 @@ const setHomeNetworkDefaultRoutingPolicyLogic = createRequestLogic({
   process: async ({ action }) => {
     const { policy } = action.payload
 
-    await api.packetBroker.setHomeNetworkDefaultRoutingPolicy(policy)
+    await tts.PacketBrokerAgent.setHomeNetworkDefaultRoutingPolicy(policy)
 
     return policy
   },
@@ -126,7 +126,7 @@ const deleteHomeNetworkDefaultRoutingPolicyLogic = createRequestLogic({
   type: packetBroker.DELETE_HOME_NETWORK_DEFAULT_ROUTING_POLICY,
   process: async () => {
     try {
-      await api.packetBroker.deleteHomeNetworkDefaultRoutingPolicy()
+      await tts.PacketBrokerAgent.deleteHomeNetworkDefaultRoutingPolicy()
     } catch (error) {
       // We can ignore not found errors, meaning that the
       // policy was already deleted or never existed.
@@ -147,7 +147,7 @@ const getPacketBrokerNetworkLogic = createRequestLogic({
     const ids = extractPacketBrokerIdsFromCombinedId(id)
 
     const network = await fetchThroughPagination(
-      api.packetBroker.listNetworks,
+      tts.PacketBrokerAgent.listNetworks,
       ids.tenant_id ? { tenant_id_contains: ids.tenant_id } : undefined,
       result => result.networks.find(n => combinePacketBrokerIds(n.id) === id),
       (result, acc) => Boolean(acc),
@@ -156,7 +156,7 @@ const getPacketBrokerNetworkLogic = createRequestLogic({
     if (network && fetchPolicies) {
       const fetchHomeNetworkRoutingPolicy = async () => {
         try {
-          return await api.packetBroker.getHomeNetworkRoutingPolicy(ids.net_id, ids.tenant_id)
+          return await tts.PacketBrokerAgent.getHomeNetworkRoutingPolicy(ids.net_id, ids.tenant_id)
         } catch (error) {
           if (isNotFoundError(error)) {
             return { home_network_id: ids }
@@ -166,7 +166,7 @@ const getPacketBrokerNetworkLogic = createRequestLogic({
       }
       const [forwarder, homeNetwork] = await Promise.all([
         fetchThroughPagination(
-          api.packetBroker.listForwarderRoutingPolicies,
+          tts.PacketBrokerAgent.listForwarderRoutingPolicies,
           undefined,
           (result, acc = []) => [...acc, ...result.policies],
         ),
@@ -193,7 +193,7 @@ const getPacketBrokerNetworksLogic = createRequestLogic({
       },
     } = action
 
-    const data = await api.packetBroker.listNetworks({
+    const data = await tts.PacketBrokerAgent.listNetworks({
       page,
       limit,
       name_contains: query,
@@ -205,12 +205,12 @@ const getPacketBrokerNetworksLogic = createRequestLogic({
       const [defaultPolicy, forwarder, homeNetwork] = await Promise.all([
         getDefaultRoutingPolicy(),
         fetchThroughPagination(
-          api.packetBroker.listForwarderRoutingPolicies,
+          tts.PacketBrokerAgent.listForwarderRoutingPolicies,
           undefined,
           (result, acc = []) => [...acc, ...result.policies],
         ),
         fetchThroughPagination(
-          api.packetBroker.listHomeNetworkRoutingPolicies,
+          tts.PacketBrokerAgent.listHomeNetworkRoutingPolicies,
           undefined,
           (result, acc = []) => [...acc, ...result.policies],
         ),
@@ -228,7 +228,7 @@ const getPacketBrokerForwarderPoliciesLogic = createRequestLogic({
   type: packetBroker.GET_FORWARDER_ROUTING_POLICIES,
   process: async () => {
     const data = fetchThroughPagination(
-      api.packetBroker.listForwarderRoutingPolicies,
+      tts.PacketBrokerAgent.listForwarderRoutingPolicies,
       undefined,
       (result, acc = []) => [...acc, ...result.policies],
     )
@@ -241,7 +241,7 @@ const getPacketBrokerHomeNetworkPoliciesLogic = createRequestLogic({
   type: packetBroker.GET_HOME_NETWORK_ROUTING_POLICIES,
   process: async () => {
     const data = fetchThroughPagination(
-      api.packetBroker.listHomeNetworkRoutingPolicies,
+      tts.PacketBrokerAgent.listHomeNetworkRoutingPolicies,
       undefined,
       (result, acc = []) => [...acc, ...result.policies],
     )
@@ -257,7 +257,7 @@ const setPacketBrokerHomeNetworkPolicyLogic = createRequestLogic({
       payload: { id, policy },
     } = action
     const ids = extractPacketBrokerIdsFromCombinedId(id)
-    await api.packetBroker.setHomeNetworkRoutingPolicy(ids.net_id, ids.tenant_id, policy)
+    await tts.PacketBrokerAgent.setHomeNetworkRoutingPolicy(ids.net_id, ids.tenant_id, policy)
 
     return policy
   },
@@ -272,7 +272,7 @@ const deletePacketBrokerHomeNetworkPolicyLogic = createRequestLogic({
     const ids = extractPacketBrokerIdsFromCombinedId(id)
 
     try {
-      await api.packetBroker.deleteHomeNetworkRoutingPolicy(ids.net_id, ids.tenant_id)
+      await tts.PacketBrokerAgent.deleteHomeNetworkRoutingPolicy(ids.net_id, ids.tenant_id)
     } catch (error) {
       // We can ignore not found errors, meaning that the
       // policy was already deleted or never existed.

@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import api from '@console/api'
+import tts from '@console/api/tts'
+import { entitySdkServiceMap } from '@console/constants/entities'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as apiKeys from '@console/store/actions/api-keys'
 
-const validParentTypes = ['application', 'gateway', 'organization', 'users']
+const validParentTypes = Object.keys(entitySdkServiceMap)
 
 const parentTypeValidator = ({ action }, allow) => {
   if (!validParentTypes.includes(action.payload.parentType)) {
@@ -38,7 +39,10 @@ const getApiKeysLogic = createRequestLogic({
       parentId,
       params: { page, limit },
     } = action.payload
-    const data = await api[parentType].apiKeys.list(parentId, { limit, page })
+    const data = await tts[entitySdkServiceMap[parentType]].ApiKeys.getAll(parentId, {
+      limit,
+      page,
+    })
     return { parentType, entities: data.api_keys, totalCount: data.totalCount }
   },
 })
@@ -48,7 +52,7 @@ const getApiKeyLogic = createRequestLogic({
   validate: parentTypeValidator,
   process: async ({ action }) => {
     const { parentType, parentId, keyId } = action.payload
-    return api[parentType].apiKeys.get(parentId, keyId)
+    return tts[entitySdkServiceMap[parentType]].ApiKeys.getById(parentId, keyId)
   },
 })
 

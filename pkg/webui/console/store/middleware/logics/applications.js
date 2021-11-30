@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import { isNotFoundError, isConflictError } from '@ttn-lw/lib/errors/utils'
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
@@ -29,7 +29,7 @@ const getApplicationLogic = createRequestLogic({
       payload: { id },
       meta: { selector },
     } = action
-    const app = await api.application.get(id, selector)
+    const app = await tts.Applications.getById(id, selector)
     dispatch(applications.startApplicationEventsStream(id))
     return app
   },
@@ -41,7 +41,7 @@ const getApplicationDevEUICountLogic = createRequestLogic({
     const {
       payload: { id },
     } = action
-    const result = await api.application.get(id, 'dev_eui_counter')
+    const result = await tts.Applications.getById(id, 'dev_eui_counter')
     return { id, dev_eui_counter: result.dev_eui_counter }
   },
 })
@@ -51,7 +51,7 @@ const updateApplicationLogic = createRequestLogic({
   process: async ({ action }) => {
     const { id, patch } = action.payload
 
-    const result = await api.application.update(id, patch)
+    const result = await tts.Applications.updateById(id, patch)
 
     return { ...patch, ...result }
   },
@@ -64,9 +64,9 @@ const deleteApplicationLogic = createRequestLogic({
     const { options } = action.meta
 
     if (options.purge) {
-      await api.application.purge(id)
+      await tts.Applications.purgeById(id)
     } else {
-      await api.application.delete(id)
+      await tts.Applications.deleteById(id)
     }
 
     return { id }
@@ -78,7 +78,7 @@ const restoreApplicationLogic = createRequestLogic({
   process: async ({ action }) => {
     const { id } = action.payload
 
-    await api.application.restore(id)
+    await tts.Applications.restoreById(id)
 
     return { id }
   },
@@ -94,7 +94,7 @@ const getApplicationsLogic = createRequestLogic({
     const { selectors, options } = action.meta
 
     const data = options.isSearch
-      ? await api.applications.search(
+      ? await tts.Applications.search(
           {
             page,
             limit,
@@ -104,7 +104,7 @@ const getApplicationsLogic = createRequestLogic({
           },
           selectors,
         )
-      : await api.applications.list({ page, limit, order }, selectors)
+      : await tts.Applications.getAll({ page, limit, order }, selectors)
 
     return { entities: data.applications, totalCount: data.totalCount }
   },
@@ -114,7 +114,7 @@ const getApplicationDeviceCountLogic = createRequestLogic({
   type: applications.GET_APP_DEV_COUNT,
   process: async ({ action }) => {
     const { id: appId } = action.payload
-    const data = await api.devices.list(appId, { limit: 1 })
+    const data = await tts.Applications.Devices.getAll(appId, { limit: 1 })
 
     return { applicationDeviceCount: data.totalCount }
   },
@@ -124,7 +124,7 @@ const getApplicationsRightsLogic = createRequestLogic({
   type: applications.GET_APPS_RIGHTS_LIST,
   process: async ({ action }) => {
     const { id } = action.payload
-    const result = await api.rights.applications(id)
+    const result = await tts.Applications.getRightsById(id)
     return result.rights.sort()
   },
 })
@@ -139,7 +139,7 @@ const getApplicationLinkLogic = createRequestLogic({
 
     let linkResult
     try {
-      linkResult = await api.application.link.get(id, selector)
+      linkResult = await tts.Applications.Link.get(id, selector)
 
       return { link: linkResult }
     } catch (error) {
@@ -166,7 +166,7 @@ const updateApplicationLinkLogic = createRequestLogic(
     process: async ({ action }) => {
       const { id, link } = action.payload
 
-      const updatedLink = await api.application.link.set(id, link)
+      const updatedLink = await tts.Applications.Link.set(id, link)
 
       return { ...link, ...updatedLink }
     },
@@ -188,6 +188,6 @@ export default [
   ...createEventsConnectLogics(
     applications.SHARED_NAME,
     'applications',
-    api.application.eventsSubscribe,
+    tts.Applications.openStream,
   ),
 ]

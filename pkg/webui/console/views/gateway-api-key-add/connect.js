@@ -15,7 +15,7 @@
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
@@ -39,7 +39,7 @@ export default GatewayApiKeyAdd =>
       pseudoRights: selectGatewayPseudoRights(state),
     }),
     dispatch => ({
-      createApiKey: api.gateway.apiKeys.create,
+      createApiKey: tts.Gateways.ApiKeys.create,
       navigateToList: gtwId => dispatch(replace(`/gateways/${gtwId}/api-keys`)),
     }),
     (stateProps, dispatchProps, ownProps) => ({

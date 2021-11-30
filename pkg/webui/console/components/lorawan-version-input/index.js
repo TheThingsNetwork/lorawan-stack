@@ -16,7 +16,7 @@ import React from 'react'
 import { unionBy } from 'lodash'
 import { defineMessages } from 'react-intl'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import toast from '@ttn-lw/components/toast'
 import Select from '@ttn-lw/components/select'
@@ -63,7 +63,7 @@ const LorawanVersionInput = props => {
   React.useEffect(() => {
     const fetchPhyVersions = async () => {
       try {
-        const { version_info } = await api.configuration.getPhyVersions()
+        const { version_info } = await tts.Configuration.getPhyVersions()
         setPhyVersions(version_info)
       } catch (err) {
         toast({

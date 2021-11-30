@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
@@ -26,7 +26,7 @@ const listDeviceBrandsLogic = createRequestLogic({
       meta: { selector = [] },
     } = action
 
-    return api.deviceRepository.listBrands(appId, params, selector)
+    return tts.Applications.Devices.Repository.listBrands(appId, params, selector)
   },
 })
 
@@ -38,7 +38,7 @@ const getDeviceBrandLogic = createRequestLogic({
       meta: { selector = [] },
     } = action
 
-    return api.deviceRepository.getBrand(appId, brandId, selector)
+    return tts.Applications.Devices.Repository.getBrand(appId, brandId, selector)
   },
 })
 
@@ -50,7 +50,7 @@ const listDeviceModelsLogic = createRequestLogic({
       meta: { selector = [] },
     } = action
 
-    const { models, totalCount } = await api.deviceRepository.listModels(
+    const { models, totalCount } = await tts.Applications.Devices.Repository.listModels(
       appId,
       brandId,
       params,
@@ -69,7 +69,7 @@ const getDeviceModelLogic = createRequestLogic({
       meta: { selector = [] },
     } = action
 
-    return api.deviceRepository.getModel(appId, brandId, modelId, selector)
+    return tts.Applications.Devices.Repository.getModel(appId, brandId, modelId, selector)
   },
 })
 
@@ -80,7 +80,7 @@ const getTemplateLogic = createRequestLogic({
       payload: { appId, version },
     } = action
 
-    return api.deviceRepository.getTemplate(appId, version)
+    return tts.Applications.Devices.Repository.getTemplate(appId, version)
   },
 })
 

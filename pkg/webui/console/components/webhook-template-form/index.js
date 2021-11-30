@@ -17,7 +17,7 @@ import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
 import urlTemplate from 'url-template'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
@@ -100,7 +100,7 @@ export default class WebhookTemplateForm extends Component {
         name: `${webhook_id} downlink API key`,
         rights: ['RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE'],
       }
-      const { key: downlink_api_key } = await api.application.apiKeys.create(appId, key)
+      const { key: downlink_api_key } = await tts.Applications.ApiKeys.create(appId, key)
       webhook.downlink_api_key = downlink_api_key
     }
 

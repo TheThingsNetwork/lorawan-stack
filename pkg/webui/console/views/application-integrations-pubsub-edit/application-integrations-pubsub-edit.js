@@ -17,7 +17,7 @@ import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import PageTitle from '@ttn-lw/components/page-title'
@@ -82,7 +82,7 @@ export default class ApplicationPubsubEdit extends Component {
       },
     } = this.props
 
-    await api.application.pubsubs.delete(appId, pubsubId)
+    await tts.Applications.PubSubs.deleteById(appId, pubsubId)
   }
 
   @bind

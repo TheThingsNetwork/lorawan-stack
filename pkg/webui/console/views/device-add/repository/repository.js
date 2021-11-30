@@ -17,7 +17,7 @@ import { Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 import { merge, isEqual } from 'lodash'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import Form from '@ttn-lw/components/form'
 import SubmitBar from '@ttn-lw/components/submit-bar'
@@ -227,7 +227,7 @@ const DeviceRepository = props => {
   }, [])
 
   const handleDevEUIRequest = React.useCallback(async () => {
-    const result = await api.application.generateDevEUI(appId)
+    const result = await tts.Applications.issueDevEUI(appId)
     fetchDevEUICounter(appId)
     return result.dev_eui
   }, [appId, fetchDevEUICounter])

@@ -15,7 +15,7 @@
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
@@ -40,7 +40,7 @@ export default UserApiKeyAdd =>
     }),
     dispatch => ({
       navigateToList: () => dispatch(replace(`/user/api-keys`)),
-      createUserApiKey: api.users.apiKeys.create,
+      createUserApiKey: tts.Users.ApiKeys.create,
       getUsersRightsList: userId => dispatch(getUsersRightsList(userId)),
     }),
     (stateProps, dispatchProps, ownProps) => ({

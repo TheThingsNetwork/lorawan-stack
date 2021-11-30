@@ -18,8 +18,7 @@ import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
 import PAYLOAD_FORMATTER_TYPES from '@console/constants/formatter-types'
-
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import Notification from '@ttn-lw/components/notification'
 import PageTitle from '@ttn-lw/components/page-title'
@@ -88,7 +87,7 @@ class ApplicationPayloadFormatters extends React.PureComponent {
   async onSubmit(values) {
     const { appId, formatters } = this.props
 
-    return await api.application.link.set(appId, {
+    return await tts.Applications.Link.set(appId, {
       default_formatters: {
         up_formatter: formatters.up_formatter || PAYLOAD_FORMATTER_TYPES.NONE,
         up_formatter_parameter: formatters.up_formatter_parameter || '',

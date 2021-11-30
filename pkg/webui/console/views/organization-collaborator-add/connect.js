@@ -15,7 +15,7 @@
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import { getOrganizationsRightsList } from '@console/store/actions/organizations'
 
@@ -39,7 +39,7 @@ export default OrganizationCollaboratorAdd =>
     dispatch => ({
       getOrganizationsRightsList: orgId => dispatch(getOrganizationsRightsList(orgId)),
       redirectToList: orgId => dispatch(push(`/organizations/${orgId}/collaborators`)),
-      addOrganizationCollaborator: api.organization.collaborators.add,
+      addOrganizationCollaborator: tts.Organizations.Collaborators.add,
     }),
     (stateProps, dispatchProps, ownProps) => ({
       ...stateProps,
