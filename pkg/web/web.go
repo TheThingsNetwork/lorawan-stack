@@ -173,6 +173,9 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 	root := mux.NewRouter()
 	root.NotFoundHandler = http.HandlerFunc(webhandlers.NotFound)
 	root.Use(
+		webhandlers.WithErrorHandlers(map[string]http.Handler{
+			"text/html": webhandlers.Template,
+		}),
 		mux.MiddlewareFunc(webmiddleware.Recover()),
 		mux.MiddlewareFunc(webmiddleware.FillContext(options.contextFillers...)),
 		mux.MiddlewareFunc(webmiddleware.Peer()),
@@ -218,6 +221,9 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 	apiRouter := mux.NewRouter()
 	apiRouter.NotFoundHandler = http.HandlerFunc(webhandlers.NotFound)
 	apiRouter.Use(
+		webhandlers.WithErrorHandlers(map[string]http.Handler{
+			"text/html": webhandlers.Template,
+		}),
 		mux.MiddlewareFunc(webmiddleware.CookieAuth("_session")),
 		mux.MiddlewareFunc(webmiddleware.CSRF(
 			hashKey,
