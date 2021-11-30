@@ -45,7 +45,7 @@ const WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS =
   process.env.WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS === 'true'
 const TTN_LW_TLS_CERTIFICATE = process.env.TTN_LW_TLS_CERTIFICATE || './cert.pem'
 const TTN_LW_TLS_KEY = process.env.TTN_LW_TLS_KEY || './key.pem'
-const TTN_LW_TLS_ROOT_CA = process.env.TTN_LW_TLS_ROOT_CA || './cert.pem'
+const TTN_LW_TLS_ROOT_CA = process.env.TTN_LW_TLS_ROOT_CA || './ca.pem'
 
 const ASSETS_ROOT = '/assets'
 

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const { execSync, spawn } = require('child_process')
+const { execSync, exec, spawn } = require('child_process')
 const fs = require('fs')
 const readline = require('readline')
 
@@ -99,13 +99,16 @@ const sqlTask = on => {
       postgresContainer.stdin.write(
         `dropdb --if-exists --force ${devDatabase}; psql template1 -c "CREATE DATABASE ${devDatabase} TEMPLATE ${seedDatabase};"\n`,
       )
-      return new Promise(resolve => {
-        postgresContainer.stdout.on('data', resolve)
-        postgresContainer.stderr.on('data', data => {
-          throw new Error(data)
-        })
-        postgresContainer.on('close', resolve)
-      })
+      return Promise.all([
+        new Promise(resolve => exec('tools/bin/mage dev:redisFlush', resolve)),
+        new Promise(resolve => {
+          postgresContainer.stdout.on('data', resolve)
+          postgresContainer.stderr.on('data', data => {
+            throw new Error(data)
+          })
+          postgresContainer.on('close', resolve)
+        }),
+      ])
     },
   })
 }

@@ -14,7 +14,7 @@
 
 import { defineSmokeTest } from '../utils'
 
-const validatePasswordLinkRegExp = `http:\\/\\/localhost:\\d{4}\\/[a-zA-Z0-9-_]+\\/validate\\?.+&token=[A-Z0-9]+`
+const validatePasswordLinkRegExp = `https?:\\/\\/localhost:\\d{4}\\/[a-zA-Z0-9-_]+\\/validate\\?.+&token=[A-Z0-9]+`
 
 const contactInfoValidation = defineSmokeTest('succeeds validating contact info', () => {
   const user = {

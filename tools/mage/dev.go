@@ -295,7 +295,7 @@ func (Dev) StartDevStack() error {
 	}
 	defer logFile.Close()
 	if os.Getenv("CI") == "true" {
-		_, err := sh.ExecFrom("", map[string]string{}, logFile, logFile, "./ttn-lw-stack", "start", "--log.format=json")
+		_, err := sh.ExecFrom("", map[string]string{}, logFile, logFile, "./ttn-lw-stack", "start", "--log.format=json", "--config=config/stack/ttn-lw-stack-tls.yml")
 		return err
 	}
 	return execGo(logFile, logFile, "run", "./cmd/ttn-lw-stack", "start", "--log.format=json")

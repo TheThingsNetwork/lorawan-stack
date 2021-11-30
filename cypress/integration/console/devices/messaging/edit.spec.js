@@ -100,7 +100,7 @@ describe('End device messaging', () => {
 
       cy.intercept(
         'GET',
-        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
+        `/api/v3/as/applications/${applicationId}/devices/${endDeviceId}*`,
         response,
       )
 
@@ -158,7 +158,7 @@ describe('End device messaging', () => {
 
       cy.intercept(
         'GET',
-        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
+        `/api/v3/as/applications/${applicationId}/devices/${endDeviceId}*`,
         response,
       )
 

@@ -1,0 +1,45 @@
+# Example ttn-lw-stack configuration file for TLS-enabled local development instances
+
+# Identity Server configuration
+is:
+  oauth:
+    ui:
+      canonical-url: 'https://localhost:8885/oauth'
+      is:
+        base-url: 'https://localhost:8885/api/v3'
+  email:
+    network:
+      console-url: 'https://localhost:8885/console'
+      identity-server-url: 'https://localhost:8885/oauth'
+
+# Web UI configuration
+console:
+  ui:
+    canonical-url: 'https://localhost:8885/console'
+    is:
+      base-url: 'https://localhost:8885/api/v3'
+    gs:
+      base-url: 'https://localhost:8885/api/v3'
+    ns:
+      base-url: 'https://localhost:8885/api/v3'
+    as:
+      base-url: 'https://localhost:8885/api/v3'
+    js:
+      base-url: 'https://localhost:8885/api/v3'
+    qrg:
+      base-url: 'https://localhost:8885/api/v3'
+    edtc:
+      base-url: 'https://localhost:8885/api/v3'
+    gcs:
+      base-url: 'https://localhost:8885/api/v3'
+
+  oauth:
+    authorize-url: 'https://localhost:8885/oauth/authorize'
+    token-url: 'https://localhost:8885/oauth/token'
+    logout-url: 'https://localhost:8885/oauth/logout'
+
+tls:
+  source: file
+  root-ca: ./ca.pem
+  certificate: ./cert.pem
+  key: ./key.pem

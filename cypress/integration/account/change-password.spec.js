@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const updatePasswordLinkRegExp = `http:\\/\\/localhost:\\d{4}\\/[a-zA-Z0-9-_]+\\/update-password\\?.+&current=[A-Z0-9]+`
+const updatePasswordLinkRegExp = `https?:\\/\\/localhost:\\d{4}\\/[a-zA-Z0-9-_]+\\/update-password\\?.+&current=[A-Z0-9]+`
 const user = {
   ids: { user_id: 'test-user-id1' },
   primary_email_address: 'test-user1@example.com',

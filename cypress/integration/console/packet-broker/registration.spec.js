@@ -26,11 +26,11 @@ describe('Packet Broker registration', () => {
     }
     cy.createUser(user)
 
-    cy.intercept('/pba/networks', { fixture: 'console/packet-broker/networks.json' })
-    cy.intercept('/pba/home-networks/policies/', {
+    cy.intercept('/api/v3/pba/networks*', { fixture: 'console/packet-broker/networks.json' })
+    cy.intercept('/api/v3/pba/home-networks/policies*', {
       fixture: 'console/packet-broker/policies-home-network.json',
     })
-    cy.intercept('/pba/forwarders/policies/', {
+    cy.intercept('/api/v3/pba/forwarders/policies*', {
       fixture: 'console/packet-broker/policies-forwarder.json',
     })
 
@@ -44,7 +44,7 @@ describe('Packet Broker registration', () => {
   })
 
   it('displays a notification when Packet Broker is not set up', () => {
-    cy.intercept('/pba/info', { statusCode: 403 })
+    cy.intercept('/api/v3/pba/info', { statusCode: 403 })
 
     cy.loginConsole({ user_id: 'admin', password: 'admin' })
     cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker`)
@@ -56,7 +56,7 @@ describe('Packet Broker registration', () => {
   })
 
   it('displays UI elements in place', () => {
-    cy.intercept('/pba/info', { fixture: 'console/packet-broker/info.json' })
+    cy.intercept('/api/v3/pba/info', { fixture: 'console/packet-broker/info.json' })
     cy.loginConsole({ user_id: 'admin', password: 'admin' })
     cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker`)
 
@@ -82,8 +82,8 @@ describe('Packet Broker registration', () => {
     cy.loginConsole({ user_id: 'admin', password: 'admin' })
     cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker`)
 
-    cy.intercept('/pba/registration', { fixture: 'console/packet-broker/registration.json' })
-    cy.intercept('/pba/info', { fixture: 'console/packet-broker/info.json' })
+    cy.intercept('/api/v3/pba/registration', { fixture: 'console/packet-broker/registration.json' })
+    cy.intercept('/api/v3/pba/info', { fixture: 'console/packet-broker/info.json' })
 
     cy.findByText('Register network').click().next().findByTestId('switch').should('be.checked')
     cy.findByText('List network publicly')

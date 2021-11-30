@@ -20,9 +20,9 @@ describe('Packet Broker routing policies', () => {
   beforeEach(() => {
     cy.fixture('console/packet-broker/policies-home-network.json').as('homeNetworkPolicies')
 
-    cy.intercept('/pba/info', { fixture: 'console/packet-broker/info-registered.json' })
-    cy.intercept('/pba/networks', { fixture: 'console/packet-broker/networks.json' })
-    cy.intercept('/pba/forwarders/policies', {
+    cy.intercept('/api/v3/pba/info', { fixture: 'console/packet-broker/info-registered.json' })
+    cy.intercept('/api/v3/pba/networks*', { fixture: 'console/packet-broker/networks.json' })
+    cy.intercept('/api/v3/pba/forwarders/policies*', {
       fixture: 'console/packet-broker/policies-forwarder.json',
     })
 
@@ -30,7 +30,7 @@ describe('Packet Broker routing policies', () => {
   })
 
   it('succeeds setting a default routing policy', () => {
-    cy.intercept('PUT', '/pba/home-networks/policies/default', {})
+    cy.intercept('PUT', '/api/v3/pba/home-networks/policies/default', {})
     cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker`)
 
     cy.findByLabelText('Use default routing policy for this network').check()
@@ -62,10 +62,10 @@ describe('Packet Broker routing policies', () => {
   })
 
   it('succeeds unsetting a default routing policy', () => {
-    cy.intercept('GET', '/pba/home-networks/policies/default', {
+    cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', {
       fixture: 'console/packet-broker/default-policy.json',
     })
-    cy.intercept('DELETE', '/pba/home-networks/policies/default', {})
+    cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/default', {})
 
     cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker`)
 
@@ -80,14 +80,14 @@ describe('Packet Broker routing policies', () => {
   })
 
   it('succeeds setting individual per-network routing policy', () => {
-    cy.intercept('GET', '/pba/home-networks/policies/default', {
+    cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', {
       fixture: 'console/packet-broker/default-policy.json',
     })
-    cy.intercept('GET', '/pba/home-networks/policies/19', {
+    cy.intercept('GET', '/api/v3/pba/home-networks/policies/19', {
       statusCode: 404,
       fixture: '404-body.json',
     })
-    cy.intercept('PUT', '/pba/home-networks/policies/19', {})
+    cy.intercept('PUT', '/api/v3/pba/home-networks/policies/19', {})
 
     cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker/networks/19`)
 
@@ -123,12 +123,16 @@ describe('Packet Broker routing policies', () => {
   })
 
   it('succeeds unsetting individual per-network routing policy (without default policy)', function () {
-    cy.intercept('GET', '/pba/home-networks/policies/19', this.homeNetworkPolicies.policies[1])
-    cy.intercept('GET', '/pba/home-networks/policies/default', {
+    cy.intercept(
+      'GET',
+      '/api/v3/pba/home-networks/policies/19',
+      this.homeNetworkPolicies.policies[1],
+    )
+    cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', {
       statusCode: 404,
       fixture: '404-body.json',
     })
-    cy.intercept('DELETE', '/pba/home-networks/policies/19', {})
+    cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/19', {})
 
     cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker/networks/19`)
 
@@ -143,11 +147,15 @@ describe('Packet Broker routing policies', () => {
   })
 
   it('succeeds unsetting individual per-network routing policy (with default policy)', function () {
-    cy.intercept('GET', '/pba/home-networks/policies/19', this.homeNetworkPolicies.policies[1])
-    cy.intercept('GET', '/pba/home-networks/policies/default', {
+    cy.intercept(
+      'GET',
+      '/api/v3/pba/home-networks/policies/19',
+      this.homeNetworkPolicies.policies[1],
+    )
+    cy.intercept('GET', '/api/v3/pba/home-networks/policies/default', {
       fixture: 'console/packet-broker/default-policy.json',
     })
-    cy.intercept('DELETE', '/pba/home-networks/policies/19', {})
+    cy.intercept('DELETE', '/api/v3/pba/home-networks/policies/19', {})
 
     cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker/networks/19`)
 
