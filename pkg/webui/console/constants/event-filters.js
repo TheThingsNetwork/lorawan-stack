@@ -20,6 +20,8 @@ export const END_DEVICE_EVENTS_VERBOSE_FILTERS = [
   'as.up.*.forward',
   'js.join.accept',
   'js.join.reject',
+  'ns.up.data.process',
+  'ns.down.data.schedule.attempt',
   'ns.mac.*.answer.reject',
   '*.warning',
   '*.fail',
