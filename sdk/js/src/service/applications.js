@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import autoBind from 'auto-bind'
+
 import Marshaler from '../util/marshaler'
 import combineStreams from '../util/combine-streams'
 import { STACK_COMPONENTS_MAP } from '../util/constants'
@@ -64,6 +66,8 @@ class Applications {
     this.Webhooks = new Webhooks(api.ApplicationWebhookRegistry)
     this.PubSubs = new PubSubs(api.ApplicationPubSubRegistry)
     this.Packages = new Packages(api.ApplicationPackageRegistry)
+
+    autoBind(this)
   }
 
   // Retrieval.

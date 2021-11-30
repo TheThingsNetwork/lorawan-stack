@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import autoBind from 'auto-bind'
+
 import Marshaler from '../util/marshaler'
 
 class As {
   constructor(service) {
     this._api = service
+    autoBind(this)
   }
 
   async encodeDownlink(appId, deviceId, data) {

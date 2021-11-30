@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import autoBind from 'auto-bind'
+
 import Marshaler from '../util/marshaler'
 import combineStreams from '../util/combine-streams'
 import { STACK_COMPONENTS_MAP } from '../util/constants'
@@ -39,6 +41,7 @@ class Gateways {
         set: 'gateway_ids.gateway_id',
       },
     })
+    autoBind(this)
   }
 
   _emitDefaults(paths, gateway) {
