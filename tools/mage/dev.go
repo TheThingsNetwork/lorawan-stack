@@ -179,7 +179,7 @@ func (Dev) DBStart() error {
 		}
 		return cerr
 	}
-	return nil
+	return execDockerCompose("ps")
 }
 
 // DBStop stops the databases of the development environment.
