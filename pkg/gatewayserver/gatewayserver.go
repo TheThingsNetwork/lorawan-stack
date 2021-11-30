@@ -608,7 +608,7 @@ func (gs *GatewayServer) startDisconnectOnChangeTask(conn connectionEntry) {
 					// Since there is an active connection, the `Get` request will not return a 404 as the gateway existed during the connect. Instead,
 					// 1. If the gateway is connected with an API key and is deleted, the IS returns an `Unauthenticated`, since the API Key is also deleted.
 					// 2. If the gateway is connected without an API key (UDP, LBS in unauthenticated mode) and is deleted the IS returns an `PermissionDenied` as there are no rights for these IDs.
-					log.FromContext(ctx).WithError(err).Debug("Gateway was deleted and/or the API key used to link the gateway was invalidated. Disconnect.")
+					log.FromContext(ctx).WithError(err).Debug("Gateway was deleted and/or the API key used to link the gateway was invalidated")
 					conn.Disconnect(err)
 				} else {
 					log.FromContext(ctx).WithError(err).Warn("Failed to get gateway")

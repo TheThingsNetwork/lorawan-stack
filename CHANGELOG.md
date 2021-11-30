@@ -15,7 +15,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
-- Disconnect gateways that are deleted on the Identity Server.
+- Gateways which have been deleted are now automatically disconnected by the Gateway Server.
 
 ### Deprecated
 
