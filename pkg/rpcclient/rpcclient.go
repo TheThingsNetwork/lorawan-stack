@@ -57,6 +57,10 @@ func DefaultDialOptions(ctx context.Context) []grpc.DialOption {
 	}
 
 	return []grpc.DialOption{
+		grpc.WithDefaultCallOptions(
+			grpc.MaxCallSendMsgSize(1024*1024*16),
+			grpc.MaxCallRecvMsgSize(1024*1024*16),
+		),
 		grpc.WithStatsHandler(rpcmiddleware.StatsHandlers{new(ocgrpc.ClientHandler), metrics.StatsHandler}),
 		grpc.WithUserAgent(fmt.Sprintf(
 			"%s go/%s ttn/%s",

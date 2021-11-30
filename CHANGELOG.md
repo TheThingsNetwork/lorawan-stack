@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Increased the maximum gRPC message size to 16MB.
+
 ### Deprecated
 
 ### Removed
