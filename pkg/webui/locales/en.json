@@ -683,7 +683,7 @@
   "console.views.device-general-settings.messages.activationModeUnknown": "Activation mode unknown because Network Server is not available",
   "console.views.device-general-settings.messages.notInCluster": "Not registered in this cluster",
   "console.views.device-general-settings.messages.updateSuccess": "End device updated",
-  "console.views.device-general-settings.messages.keysResetWarning": "Viewing the end device keys is prohibited; overwriting is allowed",
+  "console.views.device-general-settings.messages.keysResetWarning": "You do not have sufficient rights to view end device keys. Only overwriting is allowed.",
   "console.views.device-general-settings.messages.validateSessionKey": "{field} must have non-zero value",
   "console.views.device-general-settings.messages.macSettingsError": "There was an error and the default MAC settings for the <code>{freqPlan}</code> frequency plan could not be loaded",
   "console.views.device-general-settings.messages.fpNotFoundError": "The LoRaWAN version <code>{lorawanVersion}</code> does not support the <code>{freqPlan}</code> frequency plan. Please choose a different MAC version or frequency plan.",
