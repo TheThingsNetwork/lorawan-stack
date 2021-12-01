@@ -195,7 +195,7 @@ export default class FileInput extends Component {
 
     return (
       <div className={style.container}>
-        {true && (
+        {this.state.isLarger && (
           <Notification
             className={style.notification}
             content={largeFileWarningMessage}
