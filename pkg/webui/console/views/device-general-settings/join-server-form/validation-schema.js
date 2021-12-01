@@ -23,7 +23,7 @@ const validationSchema = Yup.object()
       .emptyOrLength(3 * 2, Yup.passValues(sharedMessages.validateLength)) // 3 Byte hex.
       .default(null),
     root_keys: Yup.object().when(
-      ['$externalJs', '$lorawanVersion', '$mayEditKeys', '$mayEditkeys'],
+      ['$externalJs', '$lorawanVersion', '$mayEditKeys', '$mayReadKeys'],
       (externalJs, lorawanVersion, mayEditKeys, mayReadKeys, schema) => {
         const strippedSchema = Yup.object().strip()
         const keySchema = Yup.lazy(value =>
