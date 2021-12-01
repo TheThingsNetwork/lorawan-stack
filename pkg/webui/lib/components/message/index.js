@@ -16,6 +16,7 @@ import React, { useContext } from 'react'
 import { FormattedMessage, IntlContext } from 'react-intl'
 import classnames from 'classnames'
 import reactStringReplace from 'react-string-replace'
+import { isPlainObject } from 'lodash'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { warn } from '@ttn-lw/lib/log'
@@ -63,6 +64,16 @@ const Message = ({
 
   const intlContext = useContext(IntlContext)
 
+  if (typeof content === 'string' || typeof content === 'number') {
+    return renderContent(content, component, rest)
+  }
+
+  if (!isPlainObject(content)) {
+    // Better to render nothing rather than throwing an error
+    // that potentially causes the whole view to crash.
+    return renderContent(null, component, rest)
+  }
+
   let vals = values
   if (content.values && Object.keys(values).length === 0) {
     vals = content.values
@@ -84,10 +95,6 @@ const Message = ({
 
   if (cls) {
     rest.className = cls
-  }
-
-  if (typeof content === 'string' || typeof content === 'number') {
-    return renderContent(content, component, rest)
   }
 
   if (convertBackticks) {
