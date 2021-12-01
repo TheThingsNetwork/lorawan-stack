@@ -30,7 +30,7 @@ var (
 	errInvalidVendorID     = errors.DefineInvalidArgument("invalid_vendor_id", "invalid vendor ID")
 
 	ErrNoAction           = errors.DefineAborted("no_action", "no action")
-	ErrMIC                = errors.DefineCorruption("mic", "MIC failed")
+	ErrMIC                = errors.DefineInvalidArgument("mic", "MIC failed")
 	ErrFrameReplayed      = errors.DefineAborted("frame_replayed", "frame replayed")
 	ErrJoinReq            = errors.DefineAborted("join_req", "join-request failed")
 	ErrNoRoamingAgreement = errors.DefineFailedPrecondition("no_roaming_agreement", "no roaming agreement")
