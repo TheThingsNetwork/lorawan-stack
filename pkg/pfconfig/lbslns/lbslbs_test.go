@@ -203,7 +203,7 @@ func TestGetRouterConfig(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 			fps := map[string]*frequencyplans.FrequencyPlan{tc.FrequencyPlanID: &tc.FrequencyPlan}
-			cfg, err := GetRouterConfig(tc.FrequencyPlan.BandID, fps, tc.IsProd, time.Now())
+			cfg, err := GetRouterConfig(tc.FrequencyPlan.BandID, fps, tc.IsProd, time.Now(), 0)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -297,12 +297,14 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 					{
 						Radios: []LBSRFConfig{
 							{
-								Enable:    true,
-								Frequency: 924300000,
+								Enable:      true,
+								Frequency:   924300000,
+								AntennaGain: 3,
 							},
 							{
-								Enable:    false,
-								Frequency: 925000000,
+								Enable:      false,
+								Frequency:   925000000,
+								AntennaGain: 3,
 							},
 						},
 						Channels: []shared.IFConfig{
@@ -321,12 +323,14 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 					{
 						Radios: []LBSRFConfig{
 							{
-								Enable:    true,
-								Frequency: 924300000,
+								Enable:      true,
+								Frequency:   924300000,
+								AntennaGain: 3,
 							},
 							{
-								Enable:    false,
-								Frequency: 925000000,
+								Enable:      false,
+								Frequency:   925000000,
+								AntennaGain: 3,
 							},
 						},
 						Channels: []shared.IFConfig{
@@ -348,7 +352,7 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			cfg, err := GetRouterConfig(tc.BandID, tc.FrequencyPlans, tc.IsProd, time.Now())
+			cfg, err := GetRouterConfig(tc.BandID, tc.FrequencyPlans, tc.IsProd, time.Now(), 3)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)

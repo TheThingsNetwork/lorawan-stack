@@ -84,9 +84,11 @@ type DataRates [16][3]int
 // The other fields of RFConfig (in pkg/pfconfig/shared) are hardware specific and are left out here.
 // - `type`, `rssi_offset`, `tx_enable` and `tx_notch_freq` are set in the gateway.
 // - `tx_freq_min` and `tx_freq_max` are defined in the  `freq_range` parameter of `router_config`.
+// - `antenna_gain` is defined by the user for each antenna.
 type LBSRFConfig struct {
-	Enable    bool   `json:"enable"`
-	Frequency uint64 `json:"freq"`
+	Enable      bool   `json:"enable"`
+	Frequency   uint64 `json:"freq"`
+	AntennaGain int    `json:"antenna_gain"`
 }
 
 // LBSSX1301Config contains the configuration for the SX1301 concentrator for the LoRa Basics Station `router_config` message.
@@ -124,15 +126,16 @@ func (c LBSSX1301Config) MarshalJSON() ([]byte, error) {
 }
 
 // fromSX1301Conf updates fields from shared.SX1301Config.
-func (c *LBSSX1301Config) fromSX1301Conf(sx1301Conf shared.SX1301Config) error {
+func (c *LBSSX1301Config) fromSX1301Conf(sx1301Conf shared.SX1301Config, antennaGain int) error {
 	c.LoRaStandardChannel = sx1301Conf.LoRaStandardChannel
 	c.FSKChannel = sx1301Conf.FSKChannel
 	c.LBTConfig = sx1301Conf.LBTConfig
 
 	for _, radio := range sx1301Conf.Radios {
 		c.Radios = append(c.Radios, LBSRFConfig{
-			Enable:    radio.Enable,
-			Frequency: radio.Frequency,
+			Enable:      radio.Enable,
+			Frequency:   radio.Frequency,
+			AntennaGain: antennaGain,
 		})
 	}
 
@@ -231,7 +234,7 @@ func (conf RouterConfig) MarshalJSON() ([]byte, error) {
 
 // GetRouterConfig returns the routerconfig message to be sent to the gateway.
 // Currently as per the basic station docs, all frequency plans have to be from the same region (band) https://doc.sm.tc/station/tcproto.html#router-config-message.
-func GetRouterConfig(bandID string, fps map[string]*frequencyplans.FrequencyPlan, isProd bool, dlTime time.Time) (RouterConfig, error) {
+func GetRouterConfig(bandID string, fps map[string]*frequencyplans.FrequencyPlan, isProd bool, dlTime time.Time, antennaGain int) (RouterConfig, error) {
 	for _, fp := range fps {
 		if err := fp.Validate(); err != nil {
 			return RouterConfig{}, errFrequencyPlan.New()
@@ -278,7 +281,7 @@ func GetRouterConfig(bandID string, fps map[string]*frequencyplans.FrequencyPlan
 			return RouterConfig{}, err
 		}
 		var lbsSX1301Config LBSSX1301Config
-		err = lbsSX1301Config.fromSX1301Conf(*sx1301Conf)
+		err = lbsSX1301Config.fromSX1301Conf(*sx1301Conf, antennaGain)
 		if err != nil {
 			return RouterConfig{}, err
 		}
