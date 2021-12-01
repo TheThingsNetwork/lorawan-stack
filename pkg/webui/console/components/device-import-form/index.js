@@ -45,8 +45,6 @@ const m = defineMessages({
   advancedSectionTitle: 'Advanced end device claiming settings',
   infoText:
     'You can use the import functionality to register multiple end devices at once by uploading a file containing the registration information in one of the available formats. For more information, see also our documentation on <DocLink>Importing End Devices</DocLink>.',
-  largeFileWarningMessage:
-    'Providing files larger than {warningThreshold} can cause issues during the import process. We recommend you to split such files up into multiple smaller files and importing them one by one.',
 })
 
 const validationSchema = Yup.object({
@@ -63,7 +61,9 @@ export default class DeviceBulkCreateForm extends Component {
       set_claim_auth_code: PropTypes.bool,
     }).isRequired,
     jsEnabled: PropTypes.bool.isRequired,
+    largeFileWarningMessage: PropTypes.string.isRequired,
     onSubmit: PropTypes.func.isRequired,
+    warningSize: PropTypes.number.isRequired,
   }
 
   state = {
@@ -85,7 +85,7 @@ export default class DeviceBulkCreateForm extends Component {
   }
 
   render() {
-    const { initialValues, onSubmit, jsEnabled } = this.props
+    const { initialValues, onSubmit, jsEnabled, warningSize, largeFileWarningMessage } = this.props
     const { allowedFileExtensions, formatSelected, formatDescription } = this.state
     let passedInitialValues = initialValues
     if (!jsEnabled && initialValues.set_claim_auth_code) {
@@ -120,7 +120,8 @@ export default class DeviceBulkCreateForm extends Component {
               title={m.file}
               accept={allowedFileExtensions}
               component={FileInput}
-              largeFileWarningMessage={m.largeFileWarningMessage}
+              largeFileWarningMessage={largeFileWarningMessage}
+              warningSize={warningSize}
               name="data"
               required
             />

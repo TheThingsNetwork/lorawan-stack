@@ -57,8 +57,7 @@ export default class FileInput extends Component {
     onChange: PropTypes.func.isRequired,
     providedMessage: PropTypes.message,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.shape({})]),
-    warningSize: PropTypes.number,
-    warningThreshold: PropTypes.string,
+    warningSize: PropTypes.number.isRequired,
   }
 
   static defaultProps = {
@@ -73,8 +72,6 @@ export default class FileInput extends Component {
     changeMessage: m.changeFile,
     providedMessage: m.fileProvided,
     value: undefined,
-    warningSize: 10 * 1024 * 1024, // 10 MB
-    warningThreshold: '10MB',
   }
 
   constructor(props) {
@@ -110,10 +107,8 @@ export default class FileInput extends Component {
     const { files } = event.target
 
     if (files && files[0] && files[0].size <= maxSize) {
-      if (files && files[0] && files[0].size <= warningSize) {
+      if (files && files[0] && files[0].size >= warningSize) {
         this.setState({ isLarger: true })
-      } else {
-        this.setState({ isLarger: false })
       }
 
       this.setState({ filename: files[0].name, error: undefined })
@@ -135,6 +130,12 @@ export default class FileInput extends Component {
     this.fileInputRef.current.value = null
     this.setState({ filename: '', error: undefined })
     onChange(dataTransform(''), true)
+  }
+
+  @bind
+  humanFileSize(size) {
+    const i = size === 0 ? 0 : Math.floor(Math.log(size) / Math.log(1024))
+    return `${(size / Math.pow(1024, i)).toFixed(2) * 1} ${['B', 'kB', 'MB', 'GB', 'TB'][i]}`
   }
 
   handleImageError(error) {
@@ -188,12 +189,13 @@ export default class FileInput extends Component {
       image,
       imageClassName,
       largeFileWarningMessage,
-      warningThreshold,
+      warningSize,
     } = this.props
+    const warningThreshold = this.humanFileSize(warningSize)
 
     return (
       <div className={style.container}>
-        {this.state.isLarger && (
+        {true && (
           <Notification
             className={style.notification}
             content={largeFileWarningMessage}

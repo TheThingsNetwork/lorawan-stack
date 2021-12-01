@@ -80,6 +80,8 @@ const m = defineMessages({
   abortWarningTitle: 'Device import aborted',
   abortWarningMessage:
     'The end device import was aborted and the remaining {count} {count, plural, one {end device} other {end devices}} have not been imported',
+  largeFileWarningMessage:
+    'Providing files larger than {warningThreshold} can cause issues during the import process. We recommend you to split such files up into multiple smaller files and importing them one by one.',
 })
 
 const initialState = {
@@ -461,11 +463,14 @@ export default class DeviceImporter extends Component {
       data: '',
       set_claim_auth_code: true,
     }
+    const largeFile = 10 * 1024 * 1024
     return (
       <Row>
         <Col md={8}>
           <DeviceImportForm
             jsEnabled={availableComponents.includes('js')}
+            largeFileWarningMessage={m.largeFileWarningMessage}
+            warningSize={largeFile}
             initialValues={initialValues}
             onSubmit={this.handleSubmit}
           />
