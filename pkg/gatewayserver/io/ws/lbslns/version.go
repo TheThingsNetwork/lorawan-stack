@@ -64,7 +64,7 @@ func (v Version) IsProduction() bool {
 }
 
 // GetRouterConfig gets router config for the particular version message.
-func (f *lbsLNS) GetRouterConfig(ctx context.Context, msg []byte, bandID string, fps map[string]*frequencyplans.FrequencyPlan, receivedAt time.Time) (context.Context, []byte, *ttnpb.GatewayStatus, error) {
+func (f *lbsLNS) GetRouterConfig(ctx context.Context, msg []byte, bandID string, fps map[string]*frequencyplans.FrequencyPlan, antennaGain int, receivedAt time.Time) (context.Context, []byte, *ttnpb.GatewayStatus, error) {
 	var version Version
 	if err := json.Unmarshal(msg, &version); err != nil {
 		return nil, nil, nil, err
@@ -74,7 +74,7 @@ func (f *lbsLNS) GetRouterConfig(ctx context.Context, msg []byte, bandID string,
 	// to gateways that signal the presence of a PPS.
 	// References https://github.com/lorabasics/basicstation/issues/135.
 	updateSessionTimeSync(ctx, true)
-	cfg, err := pfconfig.GetRouterConfig(bandID, fps, version.IsProduction(), time.Now())
+	cfg, err := pfconfig.GetRouterConfig(bandID, fps, version.IsProduction(), time.Now(), antennaGain)
 	if err != nil {
 		return nil, nil, nil, err
 	}
