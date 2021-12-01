@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -70,7 +70,10 @@ export const mayViewApplicationLink = {
   rightsSelector: selectApplicationRights,
   check: rights => rights.includes('RIGHT_APPLICATION_LINK') && asEnabled,
 }
-export const maySetApplicationPayloadFormatters = mayViewApplicationLink
+export const maySetApplicationPayloadFormatters = {
+  rightsSelector: selectApplicationRights,
+  check: rights => rights.includes('RIGHT_APPLICATION_SETTINGS_BASIC') && asEnabled,
+}
 export const mayViewApplicationEvents = {
   rightsSelector: selectApplicationRights,
   check: rights => rights.includes('RIGHT_APPLICATION_TRAFFIC_READ'),
