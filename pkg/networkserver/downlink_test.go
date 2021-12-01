@@ -303,15 +303,15 @@ func TestProcessDownlinkTask(t *testing.T) {
 		return true
 	})
 	setLastConfirmedDownlinkAtDiff := DeviceDiffFunc(func(_ context.Context, expected, _, _ *ttnpb.EndDevice, _ *ttnpb.DownlinkMessage, downAt time.Time) bool {
-		expected.MacState.LastConfirmedDownlinkAt = &downAt
+		expected.MacState.LastConfirmedDownlinkAt = ttnpb.ProtoTimePtr(downAt)
 		return true
 	})
 	setLastDownlinkAtDiff := DeviceDiffFunc(func(_ context.Context, expected, _, _ *ttnpb.EndDevice, _ *ttnpb.DownlinkMessage, downAt time.Time) bool {
-		expected.MacState.LastDownlinkAt = &downAt
+		expected.MacState.LastDownlinkAt = ttnpb.ProtoTimePtr(downAt)
 		return true
 	})
 	setLastNetworkInitiatedDownlinkAtDiff := DeviceDiffFunc(func(_ context.Context, expected, _, _ *ttnpb.EndDevice, _ *ttnpb.DownlinkMessage, downAt time.Time) bool {
-		expected.MacState.LastNetworkInitiatedDownlinkAt = &downAt
+		expected.MacState.LastNetworkInitiatedDownlinkAt = ttnpb.ProtoTimePtr(downAt)
 		return true
 	})
 	setPendingApplicationDownlinkDiff := DeviceDiffFunc(func(_ context.Context, expected, created, _ *ttnpb.EndDevice, _ *ttnpb.DownlinkMessage, downAt time.Time) bool {
@@ -1803,7 +1803,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:                &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:         test.EUFrequencyPlanID,
-				LastDevStatusReceivedAt: TimePtr(now),
+				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(now),
 				LorawanPhyVersion:       ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					ClassCTimeout:         DurationPtr(42 * time.Second),
@@ -2598,7 +2598,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(updated, should.Resemble, created)
 				} else {
 					expected := CopyEndDevice(created)
-					expected.UpdatedAt = now
+					expected.UpdatedAt = ttnpb.ProtoTimePtr(now)
 					if down != nil {
 						msg := &ttnpb.Message{}
 						test.Must(nil, lorawan.UnmarshalMessage(down.RawPayload, msg))

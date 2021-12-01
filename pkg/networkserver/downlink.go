@@ -1121,12 +1121,12 @@ func recordDataDownlink(dev *ttnpb.EndDevice, genState generateDownlinkState, ne
 	if genState.ApplicationDownlink == nil || dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 && macPayload.FullFCnt > dev.Session.LastNFCntDown {
 		dev.Session.LastNFCntDown = macPayload.FullFCnt
 	}
-	dev.MacState.LastDownlinkAt = TimePtr(down.TransmitAt)
+	dev.MacState.LastDownlinkAt = ttnpb.ProtoTimePtr(down.TransmitAt)
 	if needsMACAnswer || down.Message.Payload.MHdr.MType == ttnpb.MType_CONFIRMED_DOWN {
-		dev.MacState.LastConfirmedDownlinkAt = TimePtr(down.TransmitAt)
+		dev.MacState.LastConfirmedDownlinkAt = ttnpb.ProtoTimePtr(down.TransmitAt)
 	}
 	if class := down.Message.GetRequest().GetClass(); class == ttnpb.CLASS_B || class == ttnpb.CLASS_C {
-		dev.MacState.LastNetworkInitiatedDownlinkAt = TimePtr(down.TransmitAt)
+		dev.MacState.LastNetworkInitiatedDownlinkAt = ttnpb.ProtoTimePtr(down.TransmitAt)
 	}
 
 	if genState.ApplicationDownlink != nil && genState.ApplicationDownlink.Confirmed {

@@ -89,8 +89,8 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
 		t.Fatalf("Failed to create device: %s", err)
 	}
-	a.So(ret.CreatedAt, should.HappenAfter, start)
-	a.So(ret.UpdatedAt, should.HappenAfter, start)
+	a.So(*ttnpb.StdTime(ret.CreatedAt), should.HappenAfter, start)
+	a.So(*ttnpb.StdTime(ret.UpdatedAt), should.HappenAfter, start)
 	a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
 	pb.CreatedAt = ret.CreatedAt
 	pb.UpdatedAt = ret.UpdatedAt
@@ -169,8 +169,8 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 		t.Fatalf("Failed to create device: %s", err)
 	}
 
-	a.So(ret.CreatedAt, should.HappenAfter, pb.CreatedAt)
-	a.So(ret.UpdatedAt, should.HappenAfter, pb.UpdatedAt)
+	a.So(*ttnpb.StdTime(ret.CreatedAt), should.HappenAfter, *ttnpb.StdTime(pb.CreatedAt))
+	a.So(*ttnpb.StdTime(ret.UpdatedAt), should.HappenAfter, *ttnpb.StdTime(pb.UpdatedAt))
 	a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
 	pbOther.CreatedAt = ret.CreatedAt
 	pbOther.UpdatedAt = ret.UpdatedAt

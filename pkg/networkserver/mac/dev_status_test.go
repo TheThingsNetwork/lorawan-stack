@@ -47,7 +47,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 		{
 			Name: "device-settings(count-periodicity:5,time-periodicity:nil),ns-settings(count-periodicity:nil,time-periodicity:nil),last-status-at:scheduleAt,last-status-fcnt:1,last-fcnt:5",
 			InputDevice: &ttnpb.EndDevice{
-				LastDevStatusReceivedAt: &scheduleAt,
+				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(scheduleAt),
 				MacSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &pbtypes.UInt32Value{
 						Value: 5,
@@ -64,7 +64,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 		{
 			Name: "device-settings(count-periodicity:5,time-periodicity:nil),ns-settings(count-periodicity:nil,time-periodicity:nil),last-status-at:scheduleAt,last-status-fcnt:1,last-fcnt:6",
 			InputDevice: &ttnpb.EndDevice{
-				LastDevStatusReceivedAt: &scheduleAt,
+				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(scheduleAt),
 				MacSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &pbtypes.UInt32Value{
 						Value: 5,
@@ -82,7 +82,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 		{
 			Name: "device-settings(count-periodicity:1000,time-periodicity:1hr),ns-settings(count-periodicity:nil,time-periodicity:nil),last-status-at:scheduleAt,last-status-fcnt:1,last-fcnt:2",
 			InputDevice: &ttnpb.EndDevice{
-				LastDevStatusReceivedAt: &scheduleAt,
+				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(scheduleAt),
 				MacSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &pbtypes.UInt32Value{
 						Value: 1000,
@@ -100,7 +100,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 		{
 			Name: "device-settings(count-periodicity:1000,time-periodicity:1hr),ns-settings(count-periodicity:nil,time-periodicity:nil),last-status-at:scheduleAt-1hr+1ns,last-status-fcnt:1,last-fcnt:2",
 			InputDevice: &ttnpb.EndDevice{
-				LastDevStatusReceivedAt: TimePtr(scheduleAt.Add(-time.Hour + time.Nanosecond)),
+				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(scheduleAt.Add(-time.Hour + time.Nanosecond)),
 				MacSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &pbtypes.UInt32Value{
 						Value: 1000,
@@ -118,7 +118,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 		{
 			Name: "device-settings(count-periodicity:1000,time-periodicity:1hr),ns-settings(count-periodicity:nil,time-periodicity:nil),last-status-at:scheduleAt-1hr,last-status-fcnt:1,last-fcnt:2",
 			InputDevice: &ttnpb.EndDevice{
-				LastDevStatusReceivedAt: TimePtr(scheduleAt.Add(-time.Hour)),
+				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(scheduleAt.Add(-time.Hour)),
 				MacSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &pbtypes.UInt32Value{
 						Value: 1000,
@@ -137,7 +137,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 		{
 			Name: "device-settings(count-periodicity:1000,time-periodicity:1hr),ns-settings(count-periodicity:nil,time-periodicity:nil),last-status-at:scheduleAt-1hr1ns,last-status-fcnt:1,last-fcnt:2",
 			InputDevice: &ttnpb.EndDevice{
-				LastDevStatusReceivedAt: TimePtr(scheduleAt.Add(-time.Hour - time.Nanosecond)),
+				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(scheduleAt.Add(-time.Hour - time.Nanosecond)),
 				MacSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &pbtypes.UInt32Value{
 						Value: 1000,
@@ -156,7 +156,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 		{
 			Name: "device-settings(nil),ns-settings(count-periodicity:nil,time-periodicity:nil),last-status-at:scheduleAt,last-status-fcnt:1,last-fcnt:1000",
 			InputDevice: &ttnpb.EndDevice{
-				LastDevStatusReceivedAt: &scheduleAt,
+				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(scheduleAt),
 				MacState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 1,
 				},
@@ -242,7 +242,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 				PowerState:        ttnpb.PowerState_POWER_EXTERNAL,
 			},
 			Expected: &ttnpb.EndDevice{
-				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
+				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(time.Unix(42, 0)),
 				MacState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 43,
 					PendingRequests:     []*ttnpb.MACCommand{},
@@ -277,7 +277,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 				PowerState:        ttnpb.PowerState_POWER_BATTERY,
 			},
 			Expected: &ttnpb.EndDevice{
-				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
+				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(time.Unix(42, 0)),
 				MacState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 43,
 					PendingRequests:     []*ttnpb.MACCommand{},
@@ -310,7 +310,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 				PowerState:        ttnpb.PowerState_POWER_BATTERY,
 			},
 			Expected: &ttnpb.EndDevice{
-				LastDevStatusReceivedAt: TimePtr(time.Unix(42, 0)),
+				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(time.Unix(42, 0)),
 				MacState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 43,
 					PendingRequests:     []*ttnpb.MACCommand{},

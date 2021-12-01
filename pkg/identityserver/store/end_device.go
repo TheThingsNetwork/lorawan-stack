@@ -112,7 +112,7 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 			pb.Picture = dev.Picture.toPB()
 		}
 	},
-	activatedAtField: func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.ActivatedAt = dev.ActivatedAt },
+	activatedAtField: func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.ActivatedAt = ttnpb.ProtoTime(dev.ActivatedAt) },
 }
 
 // functions to set fields from the device proto into the device model.
@@ -154,7 +154,7 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 			dev.Picture.fromPB(pb.Picture)
 		}
 	},
-	activatedAtField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.ActivatedAt = pb.ActivatedAt },
+	activatedAtField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.ActivatedAt = ttnpb.StdTime(pb.ActivatedAt) },
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
@@ -196,8 +196,8 @@ func (dev EndDevice) toPB(pb *ttnpb.EndDevice, fieldMask *pbtypes.FieldMask) {
 	pb.EndDeviceIdentifiers.DeviceId = dev.DeviceID
 	pb.EndDeviceIdentifiers.JoinEui = dev.JoinEUI.toPB() // Always present.
 	pb.EndDeviceIdentifiers.DevEui = dev.DevEUI.toPB()   // Always present.
-	pb.CreatedAt = cleanTime(dev.CreatedAt)
-	pb.UpdatedAt = cleanTime(dev.UpdatedAt)
+	pb.CreatedAt = ttnpb.ProtoTimePtr(cleanTime(dev.CreatedAt))
+	pb.UpdatedAt = ttnpb.ProtoTimePtr(cleanTime(dev.UpdatedAt))
 	if len(fieldMask.GetPaths()) == 0 {
 		fieldMask = defaultEndDeviceFieldMask
 	}

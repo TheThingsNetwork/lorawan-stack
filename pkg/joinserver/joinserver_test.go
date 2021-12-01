@@ -2142,9 +2142,9 @@ func TestHandleJoin(t *testing.T) {
 				if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
 					t.Fatalf("Failed to create device: %s", err)
 				}
-				a.So(ret.CreatedAt, should.HappenAfter, start)
-				a.So(ret.UpdatedAt, should.HappenAfter, start)
-				a.So(ret.UpdatedAt, should.Equal, ret.CreatedAt)
+				a.So(*ttnpb.StdTime(ret.CreatedAt), should.HappenAfter, start)
+				a.So(*ttnpb.StdTime(ret.UpdatedAt), should.HappenAfter, start)
+				a.So(ret.UpdatedAt, should.Resemble, ret.CreatedAt)
 				pb.CreatedAt = ret.CreatedAt
 				pb.UpdatedAt = ret.UpdatedAt
 				a.So(ret, should.HaveEmptyDiff, pb)
@@ -2171,8 +2171,8 @@ func TestHandleJoin(t *testing.T) {
 					t.FailNow()
 				}
 				ret = retCtx.EndDevice
-				a.So(ret.CreatedAt, should.Equal, pb.CreatedAt)
-				a.So(ret.UpdatedAt, should.HappenAfter, pb.UpdatedAt)
+				a.So(ret.CreatedAt, should.Resemble, pb.CreatedAt)
+				a.So(*ttnpb.StdTime(ret.UpdatedAt), should.HappenAfter, *ttnpb.StdTime(pb.UpdatedAt))
 				pb.UpdatedAt = ret.UpdatedAt
 				pb.LastJoinNonce = tc.NextLastJoinNonce
 				if tc.JoinRequest.SelectedMacVersion.Compare(ttnpb.MAC_V1_1) < 0 {
@@ -2183,7 +2183,7 @@ func TestHandleJoin(t *testing.T) {
 				if !a.So(ret.Session, should.NotBeNil) {
 					t.FailNow()
 				}
-				a.So([]time.Time{start, ret.GetSession().GetStartedAt(), time.Now()}, should.BeChronological)
+				a.So([]time.Time{start, *ttnpb.StdTime(ret.GetSession().GetStartedAt()), time.Now()}, should.BeChronological)
 				pb.Session = &ttnpb.Session{
 					DevAddr:     tc.JoinRequest.DevAddr,
 					SessionKeys: *res.SessionKeys,

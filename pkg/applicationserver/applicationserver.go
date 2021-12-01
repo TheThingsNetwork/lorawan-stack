@@ -919,7 +919,7 @@ func (as *ApplicationServer) markEndDeviceAsActivated(ctx context.Context, ids t
 		_, err = ttnpb.NewEndDeviceRegistryClient(cc).Update(ctx, &ttnpb.UpdateEndDeviceRequest{
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ids,
-				ActivatedAt:          &now,
+				ActivatedAt:          ttnpb.ProtoTimePtr(now),
 			},
 			FieldMask: &pbtypes.FieldMask{
 				Paths: mask,
@@ -933,7 +933,7 @@ func (as *ApplicationServer) markEndDeviceAsActivated(ctx context.Context, ids t
 				if dev == nil {
 					return nil, nil, errDeviceNotFound.WithAttributes("device_uid", devUID)
 				}
-				dev.ActivatedAt = &now
+				dev.ActivatedAt = ttnpb.ProtoTimePtr(now)
 				return dev, mask, nil
 			},
 		)

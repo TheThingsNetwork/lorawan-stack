@@ -136,9 +136,9 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			return
 		}
 		t.Log("Device created")
-		a.So(dev.CreatedAt, should.HappenAfter, start)
-		a.So(dev.UpdatedAt, should.Equal, dev.CreatedAt)
-		a.So([]time.Time{start, dev.CreatedAt, time.Now()}, should.BeChronological)
+		a.So(*ttnpb.StdTime(dev.CreatedAt), should.HappenAfter, start)
+		a.So(dev.UpdatedAt, should.Resemble, dev.CreatedAt)
+		a.So([]time.Time{start, *ttnpb.StdTime(dev.CreatedAt), time.Now()}, should.BeChronological)
 		a.So(dev, should.ResembleFields, &conf.CreateDevice.EndDevice, conf.CreateDevice.FieldMask.GetPaths())
 
 		dev, ok = env.AssertJoin(ctx, JoinAssertionConfig{
@@ -313,9 +313,9 @@ func makeClassAOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 	return makeOTAAFlowTest(OTAAFlowTestConfig{
 		CreateDevice: &ttnpb.SetEndDeviceRequest{
 			EndDevice: *MakeOTAAEndDevice(
-				EndDeviceOptions.WithFrequencyPlanID(fpID),
-				EndDeviceOptions.WithLoRaWANVersion(macVersion),
-				EndDeviceOptions.WithLoRaWANPHYVersion(phyVersion),
+				EndDeviceOptions.WithFrequencyPlanId(fpID),
+				EndDeviceOptions.WithLorawanVersion(macVersion),
+				EndDeviceOptions.WithLorawanPhyVersion(phyVersion),
 			),
 			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{
@@ -360,9 +360,9 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 	return makeOTAAFlowTest(OTAAFlowTestConfig{
 		CreateDevice: &ttnpb.SetEndDeviceRequest{
 			EndDevice: *MakeOTAAEndDevice(
-				EndDeviceOptions.WithFrequencyPlanID(fpID),
-				EndDeviceOptions.WithLoRaWANVersion(macVersion),
-				EndDeviceOptions.WithLoRaWANPHYVersion(phyVersion),
+				EndDeviceOptions.WithFrequencyPlanId(fpID),
+				EndDeviceOptions.WithLorawanVersion(macVersion),
+				EndDeviceOptions.WithLorawanPhyVersion(phyVersion),
 				EndDeviceOptions.WithSupportsClassC(true),
 			),
 			FieldMask: &pbtypes.FieldMask{

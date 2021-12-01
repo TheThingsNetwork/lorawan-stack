@@ -931,7 +931,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			if err != nil {
 				return err
 			}
-			updated.UpdatedAt = time.Now().UTC()
+			updated.UpdatedAt = ttnpb.ProtoTimePtr(time.Now())
 			if stored == nil {
 				updated.CreatedAt = updated.UpdatedAt
 			}

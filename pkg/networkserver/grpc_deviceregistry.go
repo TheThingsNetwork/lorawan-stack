@@ -2249,11 +2249,10 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 					"session.keys.s_nwk_s_int_key.key",
 				)
 			}
-
-			if st.HasSetField("session.started_at") && st.Device.GetSession().GetStartedAt().IsZero() ||
+			if st.HasSetField("session.started_at") && st.Device.GetSession().GetStartedAt() == nil ||
 				st.HasSetField("session.session_key_id") && !bytes.Equal(st.Device.GetSession().GetSessionKeyId(), stored.GetSession().GetSessionKeyId()) ||
-				stored.GetSession().GetStartedAt().IsZero() {
-				st.Device.Session.StartedAt = time.Now().UTC()
+				stored.GetSession().GetStartedAt() == nil {
+				st.Device.Session.StartedAt = ttnpb.ProtoTimePtr(time.Now())
 				st.AddSetFields(
 					"session.started_at",
 				)
@@ -2379,7 +2378,7 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 			stored.Session = &ttnpb.Session{
 				DevAddr:                    stored.Session.DevAddr,
 				SessionKeys:                stored.Session.SessionKeys,
-				StartedAt:                  time.Now().UTC(),
+				StartedAt:                  ttnpb.ProtoTimePtr(time.Now()),
 				QueuedApplicationDownlinks: stored.Session.QueuedApplicationDownlinks,
 			}
 		}

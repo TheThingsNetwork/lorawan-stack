@@ -74,7 +74,7 @@ func (m *Session) ValidateFields(paths ...string) error {
 			// no validation rules for LastConfFCntDown
 		case "started_at":
 
-			if v, ok := interface{}(&m.StartedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetStartedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SessionValidationError{
 						field:  "started_at",
@@ -1624,7 +1624,7 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 		case "created_at":
 
-			if v, ok := interface{}(&m.CreatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetCreatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return EndDeviceValidationError{
 						field:  "created_at",
@@ -1636,7 +1636,7 @@ func (m *EndDevice) ValidateFields(paths ...string) error {
 
 		case "updated_at":
 
-			if v, ok := interface{}(&m.UpdatedAt).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetUpdatedAt()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return EndDeviceValidationError{
 						field:  "updated_at",

@@ -371,9 +371,9 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 			}
 
 			if md.Time != nil {
-				t := *md.Time
+				t := ttnpb.StdTime(md.Time)
 				if gatewayReceiveTime == nil || t.Before(*gatewayReceiveTime) {
-					gatewayReceiveTime = &t
+					gatewayReceiveTime = t
 				}
 			}
 
@@ -471,9 +471,9 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
 	}
 
-	var receiveTime *time.Time
+	var receiveTime *pbtypes.Timestamp
 	if t, err := pbtypes.TimestampFromProto(msg.Message.GatewayReceiveTime); err == nil {
-		receiveTime = &t
+		receiveTime = ttnpb.ProtoTimePtr(t)
 	}
 	if gtwMd := msg.Message.GatewayMetadata; gtwMd != nil {
 		pbMD := &ttnpb.PacketBrokerMetadata{
@@ -509,7 +509,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 					continue
 				}
 				pbMD.Hops = append(pbMD.Hops, &ttnpb.PacketBrokerRouteHop{
-					ReceivedAt:    &receivedAt,
+					ReceivedAt:    ttnpb.ProtoTimePtr(receivedAt),
 					SenderName:    h.SenderName,
 					SenderAddress: h.SenderAddress,
 					ReceiverName:  h.ReceiverName,

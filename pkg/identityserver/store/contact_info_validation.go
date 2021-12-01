@@ -45,7 +45,7 @@ func (c ContactInfoValidation) toPB() *ttnpb.ContactInfoValidation {
 	return &ttnpb.ContactInfoValidation{
 		Id:        c.Reference,
 		Token:     c.Token,
-		CreatedAt: ttnpb.ProtoTime(&c.CreatedAt),
+		CreatedAt: ttnpb.ProtoTimePtr(c.CreatedAt),
 		ExpiresAt: ttnpb.ProtoTime(c.ExpiresAt),
 	}
 }

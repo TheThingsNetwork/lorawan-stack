@@ -214,7 +214,7 @@ func TestJoinRequest(t *testing.T) {
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
 						GatewayIds:  &gtwID,
-						Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Time:        ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
 						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:        89,
 						ChannelRssi: 89,
@@ -328,7 +328,7 @@ func TestUplinkDataFrame(t *testing.T) {
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
 						GatewayIds:  &gtwID,
-						Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Time:        ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
 						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:        89,
 						ChannelRssi: 89,
@@ -392,7 +392,7 @@ func TestUplinkDataFrame(t *testing.T) {
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
 						GatewayIds:  &gtwID,
-						Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Time:        ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
 						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:        89,
 						ChannelRssi: 89,
@@ -482,7 +482,7 @@ func TestFromUplinkDataFrame(t *testing.T) {
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
 						GatewayIds: &gtwID,
-						Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Time:       ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
 						Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:       89,
 						Snr:        9.25,
@@ -577,7 +577,7 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
 						GatewayIds: &gtwID,
-						Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Time:       ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
 						Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:       89,
 						Snr:        9.25,

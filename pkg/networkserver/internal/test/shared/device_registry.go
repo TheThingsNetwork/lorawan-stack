@@ -211,7 +211,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		if !test.AllTrue(
 			a.So(err, should.BeNil) || a.So(errors.Stack(err), should.BeEmpty),
 			a.So(storedCtx, should.HaveParentContextOrEqual, ctx),
-			a.So(stored.GetCreatedAt(), should.HappenAfter, start),
+			a.So(*ttnpb.StdTime(stored.GetCreatedAt()), should.HappenAfter, start),
 			a.So(stored.GetUpdatedAt(), should.Equal, stored.GetCreatedAt()),
 			a.So(stored, should.Resemble, pb),
 		) {

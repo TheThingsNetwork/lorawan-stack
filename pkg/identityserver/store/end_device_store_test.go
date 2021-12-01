@@ -77,8 +77,8 @@ func TestEndDeviceStore(t *testing.T) {
 			if a.So(created.Picture, should.NotBeNil) {
 				a.So(created.Picture.Embedded, should.NotBeNil)
 			}
-			a.So(created.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
-			a.So(created.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
 		}
 
 		got, err := store.GetEndDevice(ctx,
@@ -95,8 +95,8 @@ func TestEndDeviceStore(t *testing.T) {
 			if a.So(got.Locations, should.HaveLength, 1) {
 				a.So(got.Locations[""], should.Resemble, &ttnpb.Location{Latitude: 12.345, Longitude: 23.456, Altitude: 1090, Accuracy: 1, Source: ttnpb.SOURCE_REGISTRY})
 			}
-			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
-			a.So(got.UpdatedAt, should.Equal, created.UpdatedAt)
+			a.So(got.CreatedAt, should.Resemble, created.CreatedAt)
+			a.So(got.UpdatedAt, should.Resemble, created.UpdatedAt)
 		}
 
 		_, err = store.UpdateEndDevice(ctx, &ttnpb.EndDevice{
@@ -136,8 +136,8 @@ func TestEndDeviceStore(t *testing.T) {
 			if a.So(updated.Picture, should.NotBeNil) && a.So(updated.Picture.Sizes, should.HaveLength, 1) {
 				a.So(updated.Picture.Sizes[0], should.Equal, "https://example.com/picture.jpg")
 			}
-			a.So(updated.CreatedAt, should.Equal, created.CreatedAt)
-			a.So(updated.UpdatedAt, should.HappenAfter, created.CreatedAt)
+			a.So(updated.CreatedAt, should.Resemble, created.CreatedAt)
+			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenAfter, *ttnpb.StdTime(created.CreatedAt))
 		}
 
 		got, err = store.GetEndDevice(ctx, &deviceID, nil)
@@ -149,8 +149,8 @@ func TestEndDeviceStore(t *testing.T) {
 			a.So(got.Description, should.Equal, updated.Description)
 			a.So(got.Attributes, should.Resemble, updated.Attributes)
 			a.So(got.Locations, should.Resemble, updated.Locations)
-			a.So(got.CreatedAt, should.Equal, created.CreatedAt)
-			a.So(got.UpdatedAt, should.Equal, updated.UpdatedAt)
+			a.So(got.CreatedAt, should.Resemble, created.CreatedAt)
+			a.So(got.UpdatedAt, should.Resemble, updated.UpdatedAt)
 		}
 
 		count, err := store.CountEndDevices(ctx, &deviceID.ApplicationIdentifiers)
@@ -198,8 +198,8 @@ func TestEndDeviceStore(t *testing.T) {
 			a.So(createdNew.Name, should.Equal, "Bar EndDevice")
 			a.So(createdNew.Description, should.Equal, "The Amazing Bar EndDevice")
 			a.So(createdNew.Attributes, should.HaveLength, 3)
-			a.So(createdNew.CreatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
-			a.So(createdNew.UpdatedAt, should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(*ttnpb.StdTime(createdNew.CreatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
+			a.So(*ttnpb.StdTime(createdNew.UpdatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
 		}
 
 		count, err = store.CountEndDevices(ctx, &deviceID.ApplicationIdentifiers)

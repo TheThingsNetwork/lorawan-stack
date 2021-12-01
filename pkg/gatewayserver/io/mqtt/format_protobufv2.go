@@ -125,7 +125,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 		return nil, errModulation.WithAttributes("modulation", lorawanMetadata.Modulation)
 	}
 
-	mdTime := time.Unix(0, gwMetadata.Time)
+	mdTime := ttnpb.ProtoTimePtr(time.Unix(0, gwMetadata.Time))
 	if antennas := gwMetadata.Antennas; len(antennas) > 0 {
 		for _, antenna := range antennas {
 			rssi := antenna.ChannelRssi
@@ -140,7 +140,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 				Rssi:                  rssi,
 				RssiStandardDeviation: antenna.RssiStandardDeviation,
 				Snr:                   antenna.Snr,
-				Time:                  &mdTime,
+				Time:                  mdTime,
 				Timestamp:             gwMetadata.Timestamp,
 			})
 		}
@@ -151,7 +151,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 			ChannelRssi:  gwMetadata.Rssi,
 			Rssi:         gwMetadata.Rssi,
 			Snr:          gwMetadata.Snr,
-			Time:         &mdTime,
+			Time:         mdTime,
 			Timestamp:    gwMetadata.Timestamp,
 		})
 	}
