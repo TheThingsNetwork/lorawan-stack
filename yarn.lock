@@ -1597,6 +1597,14 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@formatjs/ecma402-abstract@1.11.0":
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/@formatjs/ecma402-abstract/-/ecma402-abstract-1.11.0.tgz#7e91e6cc7cfebdc07171e00a3288719705e0108c"
+  integrity sha512-TOp5La9wmSh9G5bqFGN/ApmOXtJDzBGkYW+OTRd3ukY7J32RVGZPpN4O9BD651JUy66nj3g9CIENTNCgm4IRXQ==
+  dependencies:
+    "@formatjs/intl-localematcher" "0.2.21"
+    tslib "^2.1.0"
+
 "@formatjs/ecma402-abstract@1.7.0":
   version "1.7.0"
   resolved "https://registry.yarnpkg.com/@formatjs/ecma402-abstract/-/ecma402-abstract-1.7.0.tgz#440b341ba18451d53d9172e3110d96ca420b3760"
@@ -1652,13 +1660,13 @@
     "@formatjs/ecma402-abstract" "1.9.9"
     tslib "^2.1.0"
 
-"@formatjs/intl-datetimeformat@^4.2.3":
-  version "4.2.3"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-datetimeformat/-/intl-datetimeformat-4.2.3.tgz#162d48091fd2a3c15ea4468665fca36bdc3c4cd0"
-  integrity sha512-GMVijELWrcHQNe+snkjRUbl+G8ag+sYM8I228mIjwvZ6FcmuhX2BwpUH8nRkGrPVnDL8qvyscMFrVA4LniZbcA==
+"@formatjs/intl-datetimeformat@^4.2.6":
+  version "4.2.6"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-datetimeformat/-/intl-datetimeformat-4.2.6.tgz#6eb86178c12aae9bf1c1ee55ef0ec71d8cd544e6"
+  integrity sha512-albFUNBwBvOKrWgjEr8I5oEzLZV2/EIpZC0BKIXRUmq3lmga6JsqUfeklrEkabjPYl+e+LyuUDceM/sxeEUF+Q==
   dependencies:
-    "@formatjs/ecma402-abstract" "1.9.8"
-    "@formatjs/intl-localematcher" "0.2.20"
+    "@formatjs/ecma402-abstract" "1.11.0"
+    "@formatjs/intl-localematcher" "0.2.21"
     tslib "^2.1.0"
 
 "@formatjs/intl-displaynames@5.2.4", "@formatjs/intl-displaynames@^5.2.2":
