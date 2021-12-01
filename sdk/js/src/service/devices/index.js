@@ -361,7 +361,7 @@ class Devices {
     }
 
     if (
-      !assembledValues.supports_join ||
+      (this._stackConfig.isComponentAvailable(NS) && !assembledValues.supports_join) ||
       assembledValues.join_server_address !== this._stackConfig.jsHost
     ) {
       delete requestTree.js
