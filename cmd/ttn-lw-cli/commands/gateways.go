@@ -368,7 +368,7 @@ var (
 				if antennaRemove {
 					gateway.Antennas = append(res.Antennas[:antennaIndex], res.Antennas[antennaIndex+1:]...)
 				} else { // create or update
-					if err = util.SetFields(&res.Antennas[antennaIndex], setGatewayAntennaFlags, "antenna"); err != nil {
+					if err = util.SetFields(res.Antennas[antennaIndex], setGatewayAntennaFlags, "antenna"); err != nil {
 						return err
 					}
 					gateway.Antennas = res.Antennas
