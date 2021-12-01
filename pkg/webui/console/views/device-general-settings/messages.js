@@ -34,7 +34,8 @@ const messages = defineMessages({
   activationModeUnknown: 'Activation mode unknown because Network Server is not available',
   notInCluster: 'Not registered in this cluster',
   updateSuccess: 'End device updated',
-  keysResetWarning: 'Viewing the end device keys is prohibited; overwriting is allowed',
+  keysResetWarning:
+    'You do not have sufficient rights to view end device keys. Only overwriting is allowed.',
   validateSessionKey: '{field} must have non-zero value',
   macSettingsError:
     'There was an error and the default MAC settings for the <code>{freqPlan}</code> frequency plan could not be loaded',
