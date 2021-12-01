@@ -20,6 +20,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Access to application payload formatters for users with `RIGHT_APPLICATION_SETTINGS_BASIC` right.
+- End device mac settings handling in the Console.
 
 ### Security
 
