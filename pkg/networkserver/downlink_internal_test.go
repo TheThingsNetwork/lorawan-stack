@@ -1171,7 +1171,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 }
 
 func generateSession() *ttnpb.Session {
-	randomVal := uint32(random.Intn(100))
+	randomVal := uint32(random.Int63n(100))
 	var key types.AES128Key
 	rand.Read(key[:])
 	keys := ttnpb.SessionKeys{

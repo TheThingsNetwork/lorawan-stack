@@ -20,14 +20,13 @@ import (
 	"encoding/base64"
 	"io"
 	"math/big"
-	mathrand "math/rand"
 	"time"
 )
 
 // Interface for random.
 type Interface interface {
 	io.Reader
-	Intn(n int) int
+	Int63n(n int64) int64
 	String(n int) string
 	Bytes(n int) []byte
 }
@@ -35,10 +34,6 @@ type Interface interface {
 // TTNRandom is used as a wrapper around crypto/rand.
 type TTNRandom struct {
 	io.Reader
-}
-
-func init() {
-	mathrand.Seed(time.Now().UTC().UnixNano())
 }
 
 // New returns a new Random, in most cases you can also just use the global funcs.
@@ -51,15 +46,15 @@ func New() Interface {
 var global = New()
 
 // Intn returns a random number in the range [0,n). This func uses the global TTNRandom.
-func Intn(n int) int { return global.Intn(n) }
+func Int63n(n int64) int64 { return global.Int63n(n) }
 
 // Intn returns a random number in the range [0,n).
-func (r *TTNRandom) Intn(n int) int {
+func (r *TTNRandom) Int63n(n int64) int64 {
 	i, err := rand.Int(r.Reader, big.NewInt(int64(n)))
 	if err != nil {
 		panic(err) // r.Reader is (very) broken.
 	}
-	return int(i.Int64())
+	return i.Int64()
 }
 
 // Bytes generates a random byte slice of length n. This func uses the global TTNRandom.
@@ -89,6 +84,6 @@ func (r *TTNRandom) String(n int) string {
 // With d=100 and p=0.1, the duration returned will be in [90,110].
 func Jitter(d time.Duration, p float64) time.Duration {
 	df := float64(d)
-	v := time.Duration(mathrand.Int63n(int64(df*p*2)) - int64(df*p))
+	v := time.Duration(global.Int63n(int64(df*p*2)) - int64(df*p))
 	return d + v
 }

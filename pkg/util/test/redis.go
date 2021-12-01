@@ -16,6 +16,7 @@ package test
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 	"os"
 	"runtime"
@@ -94,7 +95,7 @@ func NewRedis(ctx context.Context, namespace ...string) (*ttnredis.Client, func(
 		// Tests that require more than 10 concurrent connections, such as the ones which
 		// subscribe to messages, will fail since no connection will be available.
 		PoolSize: 32 * runtime.NumCPU(),
-	}.WithNamespace(append(append([]string{ulid.MustNew(ulid.Now(), Randy).String()}, namespace...), t.Name())...)
+	}.WithNamespace(append(append([]string{ulid.MustNew(ulid.Now(), rand.Reader).String()}, namespace...), t.Name())...)
 
 	if addr := os.Getenv("REDIS_ADDRESS"); addr != "" {
 		conf.Address = addr

@@ -30,10 +30,10 @@ func TestPseudoRandom(t *testing.T) {
 	a.So(Bytes(10), assertions.ShouldHaveLength, 10)
 	a.So(r.Bytes(10), assertions.ShouldHaveLength, 10)
 
-	a.So(Intn(10), assertions.ShouldBeGreaterThanOrEqualTo, 0)
-	a.So(r.Intn(10), assertions.ShouldBeGreaterThanOrEqualTo, 0)
-	a.So(Intn(10), assertions.ShouldBeLessThan, 10)
-	a.So(r.Intn(10), assertions.ShouldBeLessThan, 10)
+	a.So(Int63n(10), assertions.ShouldBeGreaterThanOrEqualTo, 0)
+	a.So(r.Int63n(10), assertions.ShouldBeGreaterThanOrEqualTo, 0)
+	a.So(Int63n(10), assertions.ShouldBeLessThan, 10)
+	a.So(r.Int63n(10), assertions.ShouldBeLessThan, 10)
 
 	a.So(String(10), assertions.ShouldHaveLength, 10)
 	a.So(r.String(10), assertions.ShouldHaveLength, 10)
@@ -55,7 +55,7 @@ func BenchmarkBytes(b *testing.B) {
 
 func BenchmarkIntn(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Intn(100)
+		Int63n(100)
 	}
 }
 

@@ -17,6 +17,7 @@ package networkserver_test
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
 	"fmt"
 	"strings"
 	"testing"
@@ -2042,22 +2043,22 @@ func TestProcessDownlinkTask(t *testing.T) {
 					NsGsScheduleDownlinkResponse{
 						Error: testErr.WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
 							PathErrors: []*ttnpb.ErrorDetails{
-								ttnpb.ErrorDetailsToProto(errors.DefineAborted(ulid.MustNew(0, test.Randy).String(), "aborted")),
-								ttnpb.ErrorDetailsToProto(errors.DefineResourceExhausted(ulid.MustNew(0, test.Randy).String(), "resource exhausted")),
+								ttnpb.ErrorDetailsToProto(errors.DefineAborted(ulid.MustNew(0, rand.Reader).String(), "aborted")),
+								ttnpb.ErrorDetailsToProto(errors.DefineResourceExhausted(ulid.MustNew(0, rand.Reader).String(), "resource exhausted")),
 							},
 						}),
 					},
 					NsGsScheduleDownlinkResponse{
 						Error: testErr.WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
 							PathErrors: []*ttnpb.ErrorDetails{
-								ttnpb.ErrorDetailsToProto(errors.DefineFailedPrecondition(ulid.MustNew(0, test.Randy).String(), "failed precondition")),
+								ttnpb.ErrorDetailsToProto(errors.DefineFailedPrecondition(ulid.MustNew(0, rand.Reader).String(), "failed precondition")),
 							},
 						}),
 					},
 					NsGsScheduleDownlinkResponse{
 						Error: testErr.WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
 							PathErrors: []*ttnpb.ErrorDetails{
-								ttnpb.ErrorDetailsToProto(errors.DefineResourceExhausted(ulid.MustNew(0, test.Randy).String(), "resource exhausted")),
+								ttnpb.ErrorDetailsToProto(errors.DefineResourceExhausted(ulid.MustNew(0, rand.Reader).String(), "resource exhausted")),
 							},
 						}),
 					},
@@ -2201,22 +2202,22 @@ func TestProcessDownlinkTask(t *testing.T) {
 					NsGsScheduleDownlinkResponse{
 						Error: testErr.WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
 							PathErrors: []*ttnpb.ErrorDetails{
-								ttnpb.ErrorDetailsToProto(errors.DefineAborted(ulid.MustNew(0, test.Randy).String(), "aborted")),
-								ttnpb.ErrorDetailsToProto(errors.DefineResourceExhausted(ulid.MustNew(0, test.Randy).String(), "resource exhausted")),
+								ttnpb.ErrorDetailsToProto(errors.DefineAborted(ulid.MustNew(0, rand.Reader).String(), "aborted")),
+								ttnpb.ErrorDetailsToProto(errors.DefineResourceExhausted(ulid.MustNew(0, rand.Reader).String(), "resource exhausted")),
 							},
 						}),
 					},
 					NsGsScheduleDownlinkResponse{
 						Error: testErr.WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
 							PathErrors: []*ttnpb.ErrorDetails{
-								ttnpb.ErrorDetailsToProto(errors.DefineCorruption(ulid.MustNew(0, test.Randy).String(), "corruption")), // retryable
+								ttnpb.ErrorDetailsToProto(errors.DefineCorruption(ulid.MustNew(0, rand.Reader).String(), "corruption")), // retryable
 							},
 						}),
 					},
 					NsGsScheduleDownlinkResponse{
 						Error: testErr.WithDetails(&ttnpb.ScheduleDownlinkErrorDetails{
 							PathErrors: []*ttnpb.ErrorDetails{
-								ttnpb.ErrorDetailsToProto(errors.DefineResourceExhausted(ulid.MustNew(0, test.Randy).String(), "resource exhausted")),
+								ttnpb.ErrorDetailsToProto(errors.DefineResourceExhausted(ulid.MustNew(0, rand.Reader).String(), "resource exhausted")),
 							},
 						}),
 					},

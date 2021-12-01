@@ -82,7 +82,7 @@ func makeNewDevAddrFunc(ps ...types.DevAddrPrefix) newDevAddrFunc {
 	return func(ctx context.Context, dev *ttnpb.EndDevice) types.DevAddr {
 		var devAddr types.DevAddr
 		random.Read(devAddr[:])
-		p := ps[random.Intn(len(ps))]
+		p := ps[random.Int63n(int64(len(ps)))]
 		return devAddr.WithPrefix(p)
 	}
 }
