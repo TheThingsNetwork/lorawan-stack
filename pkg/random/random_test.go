@@ -25,26 +25,12 @@ import (
 
 func TestPseudoRandom(t *testing.T) {
 	a := assertions.New(t)
-	r := New()
-
 	a.So(Bytes(10), assertions.ShouldHaveLength, 10)
-	a.So(r.Bytes(10), assertions.ShouldHaveLength, 10)
 
 	a.So(Int63n(10), assertions.ShouldBeGreaterThanOrEqualTo, 0)
-	a.So(r.Int63n(10), assertions.ShouldBeGreaterThanOrEqualTo, 0)
 	a.So(Int63n(10), assertions.ShouldBeLessThan, 10)
-	a.So(r.Int63n(10), assertions.ShouldBeLessThan, 10)
 
 	a.So(String(10), assertions.ShouldHaveLength, 10)
-	a.So(r.String(10), assertions.ShouldHaveLength, 10)
-
-	p := make([]byte, 100)
-	Read(p)
-	a.So(p, assertions.ShouldNotResemble, make([]byte, 100))
-
-	q := make([]byte, 100)
-	r.Read(q)
-	a.So(q, assertions.ShouldNotResemble, make([]byte, 100))
 }
 
 func BenchmarkBytes(b *testing.B) {
@@ -62,13 +48,6 @@ func BenchmarkIntn(b *testing.B) {
 func BenchmarkString(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		String(100)
-	}
-}
-
-func BenchmarkRead(b *testing.B) {
-	p := make([]byte, 100)
-	for i := 0; i < b.N; i++ {
-		Read(p)
 	}
 }
 

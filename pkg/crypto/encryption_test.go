@@ -15,12 +15,12 @@
 package crypto_test
 
 import (
+	"crypto/rand"
 	"fmt"
 	"testing"
 
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/crypto"
-	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
@@ -45,9 +45,8 @@ func TestEncryptDecrypt(t *testing.T) {
 	} {
 		t.Run(fmt.Sprintf("%s", tc.Name), func(t *testing.T) {
 			a := assertions.New(t)
-			rand := random.New()
 			var key types.AES128Key
-			err := key.UnmarshalBinary(rand.Bytes(16))
+			_, err := rand.Read(key[:])
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Failed to generate key: %v", err)
 			}

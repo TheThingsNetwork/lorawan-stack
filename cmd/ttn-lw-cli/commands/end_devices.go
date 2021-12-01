@@ -17,6 +17,7 @@ package commands
 import (
 	"bufio"
 	"context"
+	"crypto/rand"
 	"encoding/hex"
 	stdio "io"
 	"mime"
@@ -146,7 +147,7 @@ func getEndDeviceID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttn
 
 func generateKey() *types.AES128Key {
 	var key types.AES128Key
-	random.Read(key[:])
+	rand.Read(key[:])
 	return &key
 }
 

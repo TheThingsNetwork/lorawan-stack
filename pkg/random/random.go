@@ -18,65 +18,32 @@ package random
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"io"
 	"math/big"
 	"time"
 )
 
-// Interface for random.
-type Interface interface {
-	io.Reader
-	Int63n(n int64) int64
-	String(n int) string
-	Bytes(n int) []byte
-}
-
-// TTNRandom is used as a wrapper around crypto/rand.
-type TTNRandom struct {
-	io.Reader
-}
-
-// New returns a new Random, in most cases you can also just use the global funcs.
-func New() Interface {
-	return &TTNRandom{
-		Reader: rand.Reader,
-	}
-}
-
-var global = New()
-
-// Intn returns a random number in the range [0,n). This func uses the global TTNRandom.
-func Int63n(n int64) int64 { return global.Int63n(n) }
-
-// Intn returns a random number in the range [0,n).
-func (r *TTNRandom) Int63n(n int64) int64 {
-	i, err := rand.Int(r.Reader, big.NewInt(int64(n)))
+// Int63n returns a random number in the range [0,n).
+func Int63n(n int64) int64 {
+	i, err := rand.Int(rand.Reader, big.NewInt(int64(n)))
 	if err != nil {
-		panic(err) // r.Reader is (very) broken.
+		panic(err)
 	}
 	return i.Int64()
 }
 
-// Bytes generates a random byte slice of length n. This func uses the global TTNRandom.
-func Bytes(n int) []byte { return global.Bytes(n) }
-
 // Bytes generates a random byte slice of length n.
-func (r *TTNRandom) Bytes(n int) []byte {
+func Bytes(n int) []byte {
 	p := make([]byte, n)
-	r.Read(p)
+	_, err := rand.Read(p)
+	if err != nil {
+		panic(err)
+	}
 	return p
 }
 
-// Read fills the byte slice with random bytes. This func uses the global TTNRandom.
-func Read(b []byte) (int, error) { return global.Read(b) }
-
 // String returns a random string of length n, it uses the characters of base64.URLEncoding.
-// This func uses the global TTNRandom.
-func String(n int) string { return global.String(n) }
-
-// String returns a random string of length n, it uses the characters of base64.URLEncoding.
-func (r *TTNRandom) String(n int) string {
-	b := r.Bytes(n * 6 / 8)
+func String(n int) string {
+	b := Bytes(n * 6 / 8)
 	return base64.RawURLEncoding.EncodeToString(b)
 }
 
@@ -84,6 +51,6 @@ func (r *TTNRandom) String(n int) string {
 // With d=100 and p=0.1, the duration returned will be in [90,110].
 func Jitter(d time.Duration, p float64) time.Duration {
 	df := float64(d)
-	v := time.Duration(global.Int63n(int64(df*p*2)) - int64(df*p))
+	v := time.Duration(Int63n(int64(df*p*2)) - int64(df*p))
 	return d + v
 }

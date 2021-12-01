@@ -16,6 +16,7 @@ package udp_test
 
 import (
 	"bytes"
+	"crypto/rand"
 	"encoding/base64"
 	"net"
 	"sync"
@@ -159,9 +160,9 @@ func expectConnection(t *testing.T, server mock.Server, connections *sync.Map, e
 
 func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 	var fNwkSIntKey, sNwkSIntKey, appSKey types.AES128Key
-	random.Read(fNwkSIntKey[:])
-	random.Read(sNwkSIntKey[:])
-	random.Read(appSKey[:])
+	rand.Read(fNwkSIntKey[:])
+	rand.Read(sNwkSIntKey[:])
+	rand.Read(appSKey[:])
 
 	pld := &ttnpb.MACPayload{
 		FHdr: &ttnpb.FHDR{
