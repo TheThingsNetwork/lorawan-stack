@@ -16,7 +16,7 @@ import { replace } from 'connected-react-router'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import {
   selectIsConfig,
@@ -51,7 +51,7 @@ const mapStateToProps = state => ({
     mayEditApplicationDeviceKeys.rightsSelector(state),
   ),
   getDefaultMacSettings: (freqPlan, phyVersion) =>
-    api.ns.getDefaultMacSettings(freqPlan, phyVersion),
+    tts.Ns.getDefaultMacSettings(freqPlan, phyVersion),
 })
 const mapDispatchToProps = dispatch => ({
   ...bindActionCreators(
@@ -59,7 +59,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch,
   ),
   onDeleteSuccess: appId => dispatch(replace(`/applications/${appId}/devices`)),
-  onDelete: api.device.delete,
+  onDelete: tts.Applications.Devices.deleteById,
 })
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({

@@ -15,7 +15,7 @@
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
@@ -60,8 +60,8 @@ export default OrganizationApiKeyEdit =>
       },
       deleteOrganizationApiKeySuccess: orgId =>
         dispatch(replace(`/organizations/${orgId}/api-keys`)),
-      deleteOrganizationApiKey: api.organization.apiKeys.delete,
-      updateOrganizationApiKey: api.organization.apiKeys.update,
+      deleteOrganizationApiKey: tts.Organizations.ApiKeys.deleteById,
+      updateOrganizationApiKey: tts.Organizations.ApiKeys.updateById,
     }),
     (stateProps, dispatchProps, ownProps) => ({
       ...stateProps,

@@ -19,7 +19,7 @@ import { Container, Col, Row } from 'react-grid-system'
 import bind from 'autobind-decorator'
 import { push } from 'connected-react-router'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import FormSubmit from '@ttn-lw/components/form/submit'
@@ -82,7 +82,7 @@ export default class GatewayAdd extends React.Component {
 
     const gatewayValues = { ...gateway, attributes: mapFormValueToAttributes(attributes) }
     try {
-      await api.gateway.create(owner_id, gatewayValues, userId === owner_id)
+      await tts.Gateways.create(owner_id, gatewayValues, userId === owner_id)
 
       createSuccess(gateway_id)
     } catch (error) {

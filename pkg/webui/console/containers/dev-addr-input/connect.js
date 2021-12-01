@@ -14,7 +14,7 @@
 
 import React from 'react'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 export default Component => props => {
   const [state, setState] = React.useState({
@@ -28,7 +28,7 @@ export default Component => props => {
     setState(prev => ({ ...prev, loading: true }))
 
     try {
-      const { dev_addr } = await api.ns.generateDevAddress()
+      const { dev_addr } = await tts.Ns.generateDevAddress()
 
       setState({ loading: false, error: undefined, devAddr: dev_addr })
     } catch (error) {

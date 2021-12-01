@@ -18,7 +18,7 @@ import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -78,7 +78,7 @@ export default class ApplicationMqtt extends React.Component {
 
   async componentDidMount() {
     const { appId } = this.props
-    const connectionInfo = await api.application.getMqttConnectionInfo(appId)
+    const connectionInfo = await tts.Applications.getMqttConnectionInfo(appId)
 
     this.setState({ connectionInfo })
   }
@@ -90,7 +90,7 @@ export default class ApplicationMqtt extends React.Component {
       name: `mqtt-password-key-${Date.now()}`,
       rights: ['RIGHT_APPLICATION_TRAFFIC_READ', 'RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE'],
     }
-    const result = await api.application.apiKeys.create(appId, key)
+    const result = await tts.Applications.ApiKeys.create(appId, key)
 
     this.setState({
       key: result,

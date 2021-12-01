@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import autoBind from 'auto-bind'
+
 import Marshaler from '../util/marshaler'
 
 class DownlinkQueue {
   constructor(api, { stackConfig }) {
     this._api = api
     this._stackConfig = stackConfig
+    autoBind(this)
   }
 
   async list(applicationId, deviceId) {

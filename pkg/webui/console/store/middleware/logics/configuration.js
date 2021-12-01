@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
@@ -34,7 +34,7 @@ const getNsFrequencyPlansLogic = createRequestLogic({
     }
   },
   process: async () => {
-    const frequencyPlans = (await api.configuration.listNsFrequencyPlans()).frequency_plans
+    const frequencyPlans = (await tts.Configuration.listNsFrequencyPlans()).frequency_plans
 
     return frequencyPlans
   },
@@ -51,7 +51,7 @@ const getGsFrequencyPlansLogic = createRequestLogic({
     }
   },
   process: async () => {
-    const frequencyPlans = (await api.configuration.listGsFrequencyPlans()).frequency_plans
+    const frequencyPlans = (await tts.Configuration.listGsFrequencyPlans()).frequency_plans
 
     return frequencyPlans
   },

@@ -18,7 +18,7 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -57,7 +57,7 @@ export default class ApplicationPubsubAdd extends Component {
     const { appId } = this.props
 
     try {
-      await api.application.pubsubs.get(appId, pubsubId, [])
+      await tts.Applications.PubSubs.getById(appId, pubsubId, [])
       return true
     } catch (error) {
       if (isNotFoundError(error)) {
@@ -72,7 +72,7 @@ export default class ApplicationPubsubAdd extends Component {
   async handleSubmit(pubsub) {
     const { appId } = this.props
 
-    await api.application.pubsubs.create(appId, pubsub)
+    await tts.Applications.PubSubs.create(appId, pubsub)
   }
 
   @bind

@@ -19,7 +19,7 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import { push } from 'connected-react-router'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Form from '@ttn-lw/components/form'
@@ -95,7 +95,7 @@ export default class Add extends React.Component {
     await this.setState({ error: '' })
 
     try {
-      const result = await api.application.create(
+      const result = await tts.Applications.create(
         owner_id,
         {
           ids: { application_id },

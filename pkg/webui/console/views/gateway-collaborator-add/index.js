@@ -18,7 +18,7 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -81,7 +81,7 @@ export default class GatewayCollaboratorAdd extends React.Component {
   handleSubmit(collaborator) {
     const { gtwId } = this.props
 
-    return api.gateway.collaborators.add(gtwId, collaborator)
+    return tts.Gateways.Collaborators.add(gtwId, collaborator)
   }
 
   render() {

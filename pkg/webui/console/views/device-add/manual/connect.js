@@ -15,7 +15,7 @@
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import { selectNsConfig, selectAsConfig, selectJsConfig } from '@ttn-lw/lib/selectors/env'
 
@@ -36,10 +36,10 @@ const mapStateToProps = state => ({
   asConfig: selectAsConfig(),
   mayEditKeys: checkFromState(mayEditApplicationDeviceKeys, state),
   prefixes: selectJoinEUIPrefixes(state),
-  createDevice: (appId, device) => api.device.create(appId, device),
+  createDevice: (appId, device) => tts.Applications.Devices.create(appId, device),
   applicationDevEUICounter: selectApplicationDevEUICount(state),
   getDefaultMacSettings: (freqPlan, phyVersion) =>
-    api.ns.getDefaultMacSettings(freqPlan, phyVersion),
+    tts.Ns.getDefaultMacSettings(freqPlan, phyVersion),
 })
 
 const mapDispatchToProps = dispatch => ({

@@ -14,7 +14,7 @@
 
 import { connect } from 'react-redux'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import {
   selectSelectedApplicationId,
@@ -32,7 +32,7 @@ const mapStateToProps = state => {
     appId,
     devId,
     device,
-    simulateUplink: uplink => api.device.simulateUplink(appId, devId, uplink),
+    simulateUplink: uplink => tts.Applications.Devices.simulateUplink(appId, devId, uplink),
     skipPayloadCrypto,
   }
 }

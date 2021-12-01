@@ -15,7 +15,7 @@
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
@@ -69,9 +69,9 @@ export default OrganizationCollaboratorEdit =>
         dispatch(replace(`/organizations/${orgId}/collaborators`))
       },
       updateOrganizationCollaborator: (orgId, collaborator) =>
-        api.organization.collaborators.update(orgId, collaborator),
+        tts.Organizations.Collaborators.update(orgId, collaborator),
       removeOrganizationCollaborator: (orgId, collaborator) =>
-        api.organization.collaborators.remove(orgId, collaborator),
+        tts.Organizations.Collaborators.remove(orgId, collaborator),
     }),
     (stateProps, dispatchProps, ownProps) => ({
       ...stateProps,

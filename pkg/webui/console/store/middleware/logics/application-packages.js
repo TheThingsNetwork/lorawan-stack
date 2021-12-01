@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
@@ -27,7 +27,7 @@ const getApplicationPackagesDefaultAssociationLogic = createRequestLogic({
   process: ({ action }) => {
     const { appId, fPort } = action.payload
     const { selector } = action.meta
-    return api.application.packages.getDefaultAssociation(appId, fPort, selector)
+    return tts.Applications.Packages.getDefaultAssociation(appId, fPort, selector)
   },
 })
 
@@ -36,7 +36,7 @@ const setApplicationPackagesDefaultAssociationLogic = createRequestLogic({
   process: ({ action }) => {
     const { appId, fPort, data } = action.payload
     const { selector } = action.meta
-    return api.application.packages.setDefaultAssociation(appId, fPort, data, selector)
+    return tts.Applications.Packages.setDefaultAssociation(appId, fPort, data, selector)
   },
 })
 
@@ -44,7 +44,7 @@ const deleteApplicationPackagesDefaultAssociationLogic = createRequestLogic({
   type: DELETE_APP_PKG_DEFAULT_ASSOC,
   process: async ({ action }) => {
     const { appId, fPort } = action.payload
-    await api.application.packages.deleteDefaultAssociation(appId, fPort)
+    await tts.Applications.Packages.deleteDefaultAssociation(appId, fPort)
 
     return { fPort }
   },

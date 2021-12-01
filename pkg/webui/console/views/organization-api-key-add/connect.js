@@ -15,7 +15,7 @@
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import {
   selectSelectedOrganizationId,
@@ -36,7 +36,7 @@ export default OrganizationApiKeyAdd =>
     }),
     dispatch => ({
       navigateToList: orgId => dispatch(replace(`/organizations/${orgId}/api-keys`)),
-      createOrganizationApiKey: api.organization.apiKeys.create,
+      createOrganizationApiKey: tts.Organizations.ApiKeys.create,
     }),
     (stateProps, dispatchProps, ownProps) => ({
       ...stateProps,

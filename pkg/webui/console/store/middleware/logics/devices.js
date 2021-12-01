@@ -14,7 +14,7 @@
 
 import { STACK_COMPONENTS_MAP } from 'ttn-lw'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
@@ -32,7 +32,7 @@ const getDeviceLogic = createRequestLogic({
       payload: { appId, deviceId },
       meta: { selector },
     } = action
-    const dev = await api.device.get(appId, deviceId, selector)
+    const dev = await tts.Applications.Devices.getById(appId, deviceId, selector)
     dispatch(devices.startDeviceEventsStream(dev.ids))
     return dev
   },
@@ -45,7 +45,7 @@ const updateDeviceLogic = createRequestLogic(
       const {
         payload: { appId, deviceId, patch },
       } = action
-      const result = await api.device.update(appId, deviceId, patch)
+      const result = await tts.Applications.Devices.updateById(appId, deviceId, patch)
 
       return { ...patch, ...result }
     },
@@ -63,7 +63,7 @@ const getDevicesListLogic = createRequestLogic({
     const { selectors, options } = action.meta
 
     const data = query
-      ? await api.devices.search(
+      ? await tts.Applications.Devices.search(
           appId,
           {
             page,
@@ -73,7 +73,7 @@ const getDevicesListLogic = createRequestLogic({
           },
           selectors,
         )
-      : await api.devices.list(appId, { page, limit, order }, selectors)
+      : await tts.Applications.Devices.getAll(appId, { page, limit, order }, selectors)
 
     if (options.withLastSeen) {
       const mayReadKeys = checkFromState(mayReadApplicationDeviceKeys, getState())
@@ -82,9 +82,12 @@ const getDevicesListLogic = createRequestLogic({
         selector.push('session.started_at', 'pending_session')
       }
       const activityFetching = data.end_devices.map(async device => {
-        const deviceResult = await api.device.get(appId, device.ids.device_id, selector, [
-          STACK_COMPONENTS_MAP.ns,
-        ])
+        const deviceResult = await tts.Applications.Devices.getById(
+          appId,
+          device.ids.device_id,
+          selector,
+          [STACK_COMPONENTS_MAP.ns],
+        )
 
         // Merge activity-relevant fields into fetched device.
         if ('mac_state' in deviceResult) {
@@ -113,14 +116,14 @@ const resetDeviceLogic = createRequestLogic({
   process: async ({ action }) => {
     const { appId, deviceId } = action.payload
 
-    return api.device.reset(appId, deviceId)
+    return tts.Applications.Devices.resetById(appId, deviceId)
   },
 })
 
 const getDeviceTemplateFormatsLogic = createRequestLogic({
   type: deviceTemplateFormats.GET_DEVICE_TEMPLATE_FORMATS,
   process: async () => {
-    const formats = await api.deviceTemplates.listFormats()
+    const formats = await tts.Applications.Devices.listTemplateFormats()
     return formats
   },
 })
@@ -131,5 +134,5 @@ export default [
   getDeviceLogic,
   resetDeviceLogic,
   updateDeviceLogic,
-  ...createEventsConnectLogics(devices.SHARED_NAME, 'devices', api.device.eventsSubscribe),
+  ...createEventsConnectLogics(devices.SHARED_NAME, 'devices', tts.Applications.Devices.openStream),
 ]

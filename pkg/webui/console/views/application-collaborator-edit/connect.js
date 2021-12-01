@@ -15,7 +15,7 @@
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import { getCollaborator } from '@console/store/actions/collaborators'
 
@@ -64,8 +64,8 @@ const mapDispatchToProps = dispatch => ({
   redirectToList: appId => {
     dispatch(replace(`/applications/${appId}/collaborators`))
   },
-  updateCollaborator: (appId, patch) => api.application.collaborators.update(appId, patch),
-  removeCollaborator: (appId, patch) => api.application.collaborators.update(appId, patch),
+  updateCollaborator: (appId, patch) => tts.Applications.Collaborators.update(appId, patch),
+  removeCollaborator: (appId, patch) => tts.Applications.Collaborators.update(appId, patch),
 })
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({
@@ -79,8 +79,8 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
       stateProps.collaboratorType === 'user',
     ),
   redirectToList: () => dispatchProps.redirectToList(stateProps.appId),
-  updateCollaborator: patch => api.application.collaborators.update(stateProps.appId, patch),
-  removeCollaborator: patch => api.application.collaborators.update(stateProps.appId, patch),
+  updateCollaborator: patch => tts.Applications.Collaborators.update(stateProps.appId, patch),
+  removeCollaborator: patch => tts.Applications.Collaborators.update(stateProps.appId, patch),
 })
 
 export default ApplicationCollaboratorEdit =>
