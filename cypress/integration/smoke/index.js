@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import checkCollapsingFields from './devices'
 import registrationTests from './registration'
 import applicationTests from './applications'
 import featureToggleTests from './feature-toggles'
@@ -23,6 +24,7 @@ import authorizationTests from './authorization'
 import profileSettingsTests from './profile-settings'
 
 export default [
+  ...checkCollapsingFields,
   ...registrationTests,
   ...applicationTests,
   ...featureToggleTests,
