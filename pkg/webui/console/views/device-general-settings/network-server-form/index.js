@@ -269,6 +269,14 @@ const NetworkServerForm = React.memo(props => {
         }
       }
 
+      if (patch.session && patch.session.keys && Object.keys(patch.session.keys).length === 0) {
+        delete patch.session.keys
+      }
+
+      if (patch.session && Object.keys(patch.session).length === 0) {
+        delete patch.session
+      }
+
       setError('')
       try {
         await onSubmit(patch)
