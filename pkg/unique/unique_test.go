@@ -38,12 +38,12 @@ func TestValidity(t *testing.T) {
 		(*ttnpb.EndDeviceIdentifiers)(nil),
 		ttnpb.EndDeviceIdentifiers{},
 		&ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
-			DevEui:                 &eui,
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
+			DevEui:         &eui,
 		},
 		ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
-			DevEui:                 &eui,
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
+			DevEui:         &eui,
 		},
 		(*ttnpb.GatewayIdentifiers)(nil),
 		ttnpb.GatewayIdentifiers{},
@@ -93,7 +93,7 @@ func TestRoundtrip(t *testing.T) {
 		},
 		{
 			ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{
 					ApplicationId: "foo-app",
 				},
 				DeviceId: "foo-device",
@@ -103,7 +103,7 @@ func TestRoundtrip(t *testing.T) {
 		},
 		{
 			&ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{
 					ApplicationId: "foo-app",
 				},
 				DeviceId: "foo-device",
@@ -295,7 +295,7 @@ func TestValidatorForDeviceIDs(t *testing.T) {
 			"ValidID",
 			"foo-app.foo-device",
 			ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{
 					ApplicationId: "foo-app",
 				},
 				DeviceId: "foo-device",
@@ -306,7 +306,7 @@ func TestValidatorForDeviceIDs(t *testing.T) {
 			"ValidAppIDValidMinLength",
 			"foo-app.foo",
 			ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{
 					ApplicationId: "foo-app",
 				},
 				DeviceId: "foo",
@@ -317,7 +317,7 @@ func TestValidatorForDeviceIDs(t *testing.T) {
 			"ValidAppIDValidMaxLength",
 			"foo-app.ozaj8qs0sait7oudxqbfyx6b14yuahcfrdlb",
 			ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{
 					ApplicationId: "foo-app",
 				},
 				DeviceId: "ozaj8qs0sait7oudxqbfyx6b14yuahcfrdlb",
@@ -328,7 +328,7 @@ func TestValidatorForDeviceIDs(t *testing.T) {
 			"ValidAppIDValidNumerics",
 			"foo-app.1d1",
 			ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{
 					ApplicationId: "foo-app",
 				},
 				DeviceId: "1d1",

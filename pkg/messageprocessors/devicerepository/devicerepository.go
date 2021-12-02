@@ -139,7 +139,7 @@ func (h *host) retrieve(ctx context.Context, codec codecType, ids ttnpb.Applicat
 
 // EncodeDownlink encodes a downlink message.
 func (h *host) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, parameter string) error {
-	res, err := h.retrieve(ctx, downlinkEncoder, ids.ApplicationIdentifiers, version)
+	res, err := h.retrieve(ctx, downlinkEncoder, *ids.ApplicationIds, version)
 	if err != nil {
 		return err
 	}
@@ -148,7 +148,7 @@ func (h *host) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifier
 
 // DecodeUplink decodes an uplink message.
 func (h *host) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationUplink, parameter string) error {
-	res, err := h.retrieve(ctx, uplinkDecoder, ids.ApplicationIdentifiers, version)
+	res, err := h.retrieve(ctx, uplinkDecoder, *ids.ApplicationIds, version)
 	if err != nil {
 		return err
 	}
@@ -157,7 +157,7 @@ func (h *host) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers,
 
 // DecodeDownlink decodes a downlink message.
 func (h *host) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, parameter string) error {
-	res, err := h.retrieve(ctx, downlinkDecoder, ids.ApplicationIdentifiers, version)
+	res, err := h.retrieve(ctx, downlinkDecoder, *ids.ApplicationIds, version)
 	if err != nil {
 		return err
 	}

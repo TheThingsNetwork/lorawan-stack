@@ -34,7 +34,7 @@ func TestLegacyEncodeDownlink(t *testing.T) {
 
 	eui := types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 	ids := ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{
 			ApplicationId: "foo-app",
 		},
 		DeviceId: "foo-device",
@@ -103,7 +103,7 @@ func TestEncodeDownlink(t *testing.T) {
 
 	eui := types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 	ids := ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{
 			ApplicationId: "foo-app",
 		},
 		DeviceId: "foo-device",
@@ -238,7 +238,7 @@ func TestLegacyDecodeUplink(t *testing.T) {
 
 	eui := types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 	ids := ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{
 			ApplicationId: "foo-app",
 		},
 		DeviceId: "foo-device",
@@ -316,7 +316,7 @@ func TestDecodeUplink(t *testing.T) {
 
 	eui := types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 	ids := ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{
 			ApplicationId: "foo-app",
 		},
 		DeviceId: "foo-device",
@@ -451,7 +451,7 @@ func TestDecodeDownlink(t *testing.T) {
 
 	eui := types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 	ids := ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{
 			ApplicationId: "foo-app",
 		},
 		DeviceId: "foo-device",

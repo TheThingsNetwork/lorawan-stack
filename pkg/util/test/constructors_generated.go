@@ -486,9 +486,9 @@ func (EndDeviceIdentifiersOptionNamespace) WithDeviceId(v string) EndDeviceIdent
 }
 
 // WithApplicationIdentifiers returns a EndDeviceIdentifiersOption, which returns a copy of ttnpb.EndDeviceIdentifiers with ApplicationIdentifiers set to v.
-func (EndDeviceIdentifiersOptionNamespace) WithApplicationIdentifiers(v ttnpb.ApplicationIdentifiers) EndDeviceIdentifiersOption {
+func (EndDeviceIdentifiersOptionNamespace) WithApplicationIdentifiers(v *ttnpb.ApplicationIdentifiers) EndDeviceIdentifiersOption {
 	return func(x ttnpb.EndDeviceIdentifiers) ttnpb.EndDeviceIdentifiers {
-		x.ApplicationIdentifiers = v
+		x.ApplicationIds = v
 		return x
 	}
 }

@@ -35,7 +35,7 @@ func TestEncode(t *testing.T) {
 
 	eui := types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 	ids := ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{
 			ApplicationId: "foo-app",
 		},
 		DeviceId: "foo-device",
@@ -119,7 +119,7 @@ func TestDecode(t *testing.T) {
 
 	eui := types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}
 	ids := ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{
 			ApplicationId: "foo-app",
 		},
 		DeviceId: "foo-device",

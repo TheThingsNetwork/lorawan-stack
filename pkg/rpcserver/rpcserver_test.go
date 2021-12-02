@@ -36,7 +36,7 @@ import (
 
 var (
 	deviceID = ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{
 			ApplicationId: "bar",
 		},
 		DeviceId: "foo",
