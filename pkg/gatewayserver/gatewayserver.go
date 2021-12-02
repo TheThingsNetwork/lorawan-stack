@@ -605,7 +605,8 @@ func (gs *GatewayServer) startDisconnectOnChangeTask(conn connectionEntry) {
 			})
 			if err != nil {
 				if errors.IsUnauthenticated(err) || errors.IsPermissionDenied(err) {
-					// Since there is an active connection, the `Get` request will not return a 404 as the gateway existed during the connect. Instead,
+					// Since there is an active connection, the `Get` request will not return a `NotFound` error as the gateway existed during the connect, since the rights assertion fails first.
+					// Instead,
 					// 1. If the gateway is connected with an API key and is deleted, the IS returns an `Unauthenticated`, since the API Key is also deleted.
 					// 2. If the gateway is connected without an API key (UDP, LBS in unauthenticated mode) and is deleted the IS returns an `PermissionDenied` as there are no rights for these IDs.
 					log.FromContext(ctx).WithError(err).Debug("Gateway was deleted and/or the API key used to link the gateway was invalidated")
