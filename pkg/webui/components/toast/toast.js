@@ -101,7 +101,7 @@ const createToast = () => {
       })
     } else {
       show({ autoClose, ...toastOptions })
-      lastMessage = toastOptions
+      lastMessage = options
       lastMessageGroup = messageGroup
     }
   }
