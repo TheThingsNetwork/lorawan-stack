@@ -251,14 +251,14 @@ func unwrapSelectedSessionKeys(ctx context.Context, kv crypto.KeyVault, dev *ttn
 
 // Get implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, appendRequiredDeviceReadRights(
+	if err := rights.RequireApplication(ctx, *req.ApplicationIds, appendRequiredDeviceReadRights(
 		make([]ttnpb.Right, 0, maxRequiredDeviceReadRightCount),
 		req.FieldMask.GetPaths()...,
 	)...); err != nil {
 		return nil, err
 	}
 
-	dev, ctx, err := ns.devices.GetByID(ctx, req.ApplicationIdentifiers, req.DeviceId, addDeviceGetPaths(req.FieldMask.GetPaths()...))
+	dev, ctx, err := ns.devices.GetByID(ctx, *req.ApplicationIds, req.DeviceId, addDeviceGetPaths(req.FieldMask.GetPaths()...))
 	if err != nil {
 		logRegistryRPCError(ctx, err, "Failed to get device from registry")
 		return nil, err
@@ -946,7 +946,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	) {
 		requiredRights = append(requiredRights, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS)
 	}
-	if err := rights.RequireApplication(ctx, st.Device.ApplicationIdentifiers, requiredRights...); err != nil {
+	if err := rights.RequireApplication(ctx, *st.Device.ApplicationIds, requiredRights...); err != nil {
 		return nil, err
 	}
 
@@ -2307,7 +2307,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	}
 
 	var evt events.Event
-	dev, ctx, err := ns.devices.SetByID(ctx, st.Device.EndDeviceIdentifiers.ApplicationIdentifiers, st.Device.EndDeviceIdentifiers.DeviceId, st.GetFields(), st.SetFunc(func(ctx context.Context, stored *ttnpb.EndDevice) error {
+	dev, ctx, err := ns.devices.SetByID(ctx, *st.Device.EndDeviceIdentifiers.ApplicationIds, st.Device.EndDeviceIdentifiers.DeviceId, st.GetFields(), st.SetFunc(func(ctx context.Context, stored *ttnpb.EndDevice) error {
 		if hasSession {
 			macVersion := stored.GetMacState().GetLorawanVersion()
 			if stored.GetMacState() == nil && !st.HasSetField("mac_state") {
@@ -2423,14 +2423,14 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 
 // ResetFactoryDefaults implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.ResetAndGetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, appendRequiredDeviceReadRights(
+	if err := rights.RequireApplication(ctx, *req.ApplicationIds, appendRequiredDeviceReadRights(
 		append(make([]ttnpb.Right, 0, 1+maxRequiredDeviceReadRightCount), ttnpb.RIGHT_APPLICATION_DEVICES_WRITE),
 		req.FieldMask.GetPaths()...,
 	)...); err != nil {
 		return nil, err
 	}
 
-	dev, _, err := ns.devices.SetByID(ctx, req.ApplicationIdentifiers, req.DeviceId, addDeviceGetPaths(ttnpb.AddFields(append(req.FieldMask.GetPaths()[:0:0], req.FieldMask.GetPaths()...),
+	dev, _, err := ns.devices.SetByID(ctx, *req.ApplicationIds, req.DeviceId, addDeviceGetPaths(ttnpb.AddFields(append(req.FieldMask.GetPaths()[:0:0], req.FieldMask.GetPaths()...),
 		"frequency_plan_id",
 		"lorawan_phy_version",
 		"lorawan_version",
@@ -2497,11 +2497,11 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 
 // Delete implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireApplication(ctx, req.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	var evt events.Event
-	_, _, err := ns.devices.SetByID(ctx, req.ApplicationIdentifiers, req.DeviceId, nil, func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	_, _, err := ns.devices.SetByID(ctx, *req.ApplicationIds, req.DeviceId, nil, func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev == nil {
 			return nil, nil, errDeviceNotFound.New()
 		}

@@ -1598,7 +1598,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 		defer func() { ns.submitApplicationUplinks(ctx, queuedApplicationUplinks...) }()
 
 		taskUpdateStrategy := noDownlinkTask
-		dev, ctx, err := ns.devices.SetByID(ctx, devID.ApplicationIdentifiers, devID.DeviceId,
+		dev, ctx, err := ns.devices.SetByID(ctx, *devID.ApplicationIds, devID.DeviceId,
 			[]string{
 				"frequency_plan_id",
 				"last_dev_status_received_at",
@@ -1762,11 +1762,11 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 					}
 					queuedApplicationUplinks = append(queuedApplicationUplinks, &ttnpb.ApplicationUp{
 						EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-							ApplicationIdentifiers: dev.ApplicationIdentifiers,
-							DeviceId:               dev.DeviceId,
-							DevEui:                 dev.DevEui,
-							JoinEui:                dev.JoinEui,
-							DevAddr:                &dev.PendingMacState.QueuedJoinAccept.DevAddr,
+							ApplicationIds: dev.ApplicationIds,
+							DeviceId:       dev.DeviceId,
+							DevEui:         dev.DevEui,
+							JoinEui:        dev.JoinEui,
+							DevAddr:        &dev.PendingMacState.QueuedJoinAccept.DevAddr,
 						},
 						CorrelationIds: events.CorrelationIDsFromContext(ctx),
 						Up: &ttnpb.ApplicationUp_JoinAccept{

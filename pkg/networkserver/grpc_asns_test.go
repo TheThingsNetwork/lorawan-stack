@@ -94,8 +94,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{SessionKeyId: []byte("testSession"), FPort: 42},
@@ -137,8 +137,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					Session: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
@@ -162,8 +162,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{SessionKeyId: []byte("testSession"), FPort: 42},
@@ -207,8 +207,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
@@ -248,8 +248,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{SessionKeyId: []byte("testSession"), FPort: 42},
@@ -286,8 +286,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
@@ -343,8 +343,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{SessionKeyId: []byte("testSession"), FPort: 42},
@@ -361,8 +361,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				})
 				a.So(replace, should.BeTrue)
 				a.So(startAt, should.Resemble, time.Unix(0, 42).Add(NSScheduleWindow()).UTC())
@@ -389,8 +389,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
@@ -430,8 +430,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{SessionKeyId: []byte("testSession"), FPort: 42},
@@ -465,8 +465,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					Session: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
@@ -508,8 +508,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 			},
 			SetByIDCalls: 1,
@@ -538,8 +538,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
@@ -586,8 +586,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 			},
 			SetByIDCalls: 1,
@@ -616,8 +616,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
@@ -664,8 +664,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 			},
 			SetByIDCalls: 1,
@@ -795,8 +795,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{SessionKeyId: []byte("testSession"), FPort: 42},
@@ -838,8 +838,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					Session: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
@@ -863,8 +863,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{SessionKeyId: []byte("testSession"), FPort: 42},
@@ -908,8 +908,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
@@ -949,8 +949,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{SessionKeyId: []byte("testSession"), FPort: 42, FCnt: 6},
@@ -987,8 +987,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_A,
@@ -1040,8 +1040,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{SessionKeyId: []byte("testSession"), FPort: 42, FCnt: 6},
@@ -1074,8 +1074,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
@@ -1104,8 +1104,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{SessionKeyId: []byte("testSession"), FPort: 42},
@@ -1144,8 +1144,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
@@ -1169,8 +1169,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{SessionKeyId: []byte("testSession"), FPort: 42},
@@ -1209,8 +1209,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
 						DeviceClass:    ttnpb.CLASS_C,
@@ -1228,8 +1228,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 			},
 			Request: &ttnpb.DownlinkQueueRequest{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				Downlinks: []*ttnpb.ApplicationDownlink{
 					{SessionKeyId: []byte("testSession"), FPort: 42},
@@ -1324,14 +1324,14 @@ func TestDownlinkQueueList(t *testing.T) {
 				})
 				return &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 				}, ctx, nil
 			},
 			Request: &ttnpb.EndDeviceIdentifiers{
-				DeviceId:               "test-dev-id",
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+				DeviceId:       "test-dev-id",
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 			},
 			Downlinks:    &ttnpb.ApplicationDownlinks{},
 			GetByIDCalls: 1,
@@ -1351,8 +1351,8 @@ func TestDownlinkQueueList(t *testing.T) {
 				})
 				return &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					Session: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
@@ -1366,8 +1366,8 @@ func TestDownlinkQueueList(t *testing.T) {
 				}, ctx, nil
 			},
 			Request: &ttnpb.EndDeviceIdentifiers{
-				DeviceId:               "test-dev-id",
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+				DeviceId:       "test-dev-id",
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 			},
 			Downlinks: &ttnpb.ApplicationDownlinks{
 				Downlinks: []*ttnpb.ApplicationDownlink{
@@ -1392,8 +1392,8 @@ func TestDownlinkQueueList(t *testing.T) {
 				})
 				return &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					PendingSession: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
@@ -1408,8 +1408,8 @@ func TestDownlinkQueueList(t *testing.T) {
 				}, ctx, nil
 			},
 			Request: &ttnpb.EndDeviceIdentifiers{
-				DeviceId:               "test-dev-id",
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+				DeviceId:       "test-dev-id",
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 			},
 			Downlinks: &ttnpb.ApplicationDownlinks{
 				Downlinks: []*ttnpb.ApplicationDownlink{
@@ -1435,8 +1435,8 @@ func TestDownlinkQueueList(t *testing.T) {
 				})
 				return &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					Session: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
@@ -1460,8 +1460,8 @@ func TestDownlinkQueueList(t *testing.T) {
 				}, ctx, nil
 			},
 			Request: &ttnpb.EndDeviceIdentifiers{
-				DeviceId:               "test-dev-id",
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+				DeviceId:       "test-dev-id",
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 			},
 			Downlinks: &ttnpb.ApplicationDownlinks{
 				Downlinks: []*ttnpb.ApplicationDownlink{

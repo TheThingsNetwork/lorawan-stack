@@ -71,8 +71,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			Request: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
@@ -111,16 +111,16 @@ func TestDeviceRegistryGet(t *testing.T) {
 				})
 				return &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					FrequencyPlanId: test.EUFrequencyPlanID,
 				}, ctx, nil
 			},
 			Request: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
@@ -130,8 +130,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				FrequencyPlanId: test.EUFrequencyPlanID,
 			},
@@ -164,8 +164,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 				})
 				return &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					FrequencyPlanId: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
@@ -183,8 +183,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			Request: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
@@ -195,8 +195,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				FrequencyPlanId: test.EUFrequencyPlanID,
 				Session: &ttnpb.Session{
@@ -233,8 +233,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 				})
 				return &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					PendingSession: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
@@ -251,8 +251,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			Request: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
@@ -262,8 +262,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				PendingSession: &ttnpb.Session{
 					SessionKeys: ttnpb.SessionKeys{
@@ -301,8 +301,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 				})
 				return &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					PendingSession: &ttnpb.Session{
 						SessionKeys: ttnpb.SessionKeys{
@@ -319,8 +319,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			Request: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
@@ -330,8 +330,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			Device: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-dev-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					DeviceId:       "test-dev-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				PendingSession: &ttnpb.Session{
 					SessionKeys: ttnpb.SessionKeys{
@@ -925,7 +925,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					}
 					a.So(dev, should.Resemble, expectedReturn)
 
-					dev, _, err = env.Devices.GetByID(ctx, tc.SetDevice.ApplicationIdentifiers, tc.SetDevice.DeviceId, ttnpb.EndDeviceFieldPathsTopLevel)
+					dev, _, err = env.Devices.GetByID(ctx, *tc.SetDevice.ApplicationIds, tc.SetDevice.DeviceId, ttnpb.EndDeviceFieldPathsTopLevel)
 					if !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
 						if err != nil {
 							t.Errorf("Expected no error, got: %s", test.FormatError(err))
@@ -1130,7 +1130,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 					if tc.CreateDevice != nil {
 						created, ctx = MustCreateDevice(ctx, env.Devices, tc.CreateDevice.EndDevice)
 
-						req.ApplicationIdentifiers = tc.CreateDevice.ApplicationIdentifiers
+						req.ApplicationIds = tc.CreateDevice.ApplicationIds
 						req.DeviceId = tc.CreateDevice.DeviceId
 
 						clock.Add(time.Nanosecond)
@@ -1207,7 +1207,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 					if !a.So(dev, should.Resemble, test.Must(ttnpb.ApplyEndDeviceFieldMask(nil, expected, ttnpb.AddImplicitEndDeviceGetFields(conf.Paths...)...)).(*ttnpb.EndDevice)) {
 						return
 					}
-					updated, _, err := env.Devices.GetByID(ctx, tc.CreateDevice.ApplicationIdentifiers, tc.CreateDevice.DeviceId, ttnpb.EndDeviceFieldPathsTopLevel)
+					updated, _, err := env.Devices.GetByID(ctx, *tc.CreateDevice.ApplicationIds, tc.CreateDevice.DeviceId, ttnpb.EndDeviceFieldPathsTopLevel)
 					if a.So(err, should.BeNil) {
 						a.So(updated, should.Resemble, expected)
 					}
@@ -1245,8 +1245,8 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				return nil, ctx, err
 			},
 			Request: &ttnpb.EndDeviceIdentifiers{
-				DeviceId:               "test-dev-id",
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+				DeviceId:       "test-dev-id",
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				if !assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue) {
@@ -1286,8 +1286,8 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				return nil, ctx, nil
 			},
 			Request: &ttnpb.EndDeviceIdentifiers{
-				DeviceId:               "test-dev-id",
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+				DeviceId:       "test-dev-id",
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 			},
 			SetByIDCalls: 1,
 		},
@@ -1313,8 +1313,8 @@ func TestDeviceRegistryDelete(t *testing.T) {
 
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						DeviceId:               "test-dev-id",
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 				})
 				if !a.So(err, should.BeNil) {
@@ -1325,8 +1325,8 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				return nil, ctx, nil
 			},
 			Request: &ttnpb.EndDeviceIdentifiers{
-				DeviceId:               "test-dev-id",
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+				DeviceId:       "test-dev-id",
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 			},
 			SetByIDCalls: 1,
 		},

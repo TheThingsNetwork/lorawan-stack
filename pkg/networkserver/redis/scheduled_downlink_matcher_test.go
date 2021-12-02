@@ -34,7 +34,7 @@ func TestScheduledDownlinkMatcher(t *testing.T) {
 	m := redis.ScheduledDownlinkMatcher{cl}
 
 	ids := &ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{
 			ApplicationId: "app1",
 		},
 		DeviceId: "dev1",
