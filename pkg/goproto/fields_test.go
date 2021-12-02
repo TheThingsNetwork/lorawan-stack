@@ -113,15 +113,17 @@ func TestGoFieldsPathsEndDevice(t *testing.T) {
 		},
 		{
 			fields:   []string{"ids.application_ids.application_id"},
-			expected: []string{"EndDeviceIdentifiers.ApplicationIdentifiers.ApplicationId"},
+			expected: []string{"EndDeviceIdentifiers.ApplicationIds.ApplicationId"},
 		},
 	} {
 		goFields := goproto.GoFieldsPaths(&field_mask.FieldMask{Paths: tc.fields}, ttnpb.EndDevice{
+			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{},
+			},
 			Session: &ttnpb.Session{
 				LastFCntUp: 5,
 			},
 		})
-
 		a.So(goFields, should.HaveSameElementsDeep, tc.expected)
 	}
 }
