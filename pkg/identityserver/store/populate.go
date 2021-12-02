@@ -117,10 +117,10 @@ func NewPopulator(size int, seed int64) *Populator {
 		eui.UnmarshalNumber(uint64(i + 1))
 		endDevice := &ttnpb.EndDevice{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: *application.Ids,
-				JoinEui:                eui,
-				DevEui:                 eui,
-				DeviceId:               fmt.Sprintf("random-device-%d", i+1),
+				ApplicationIds: application.Ids,
+				JoinEui:        eui,
+				DevEui:         eui,
+				DeviceId:       fmt.Sprintf("random-device-%d", i+1),
 			},
 		}
 		p.EndDevices = append(p.EndDevices, endDevice)

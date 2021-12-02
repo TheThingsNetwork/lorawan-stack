@@ -37,15 +37,15 @@ func TestEndDeviceStore(t *testing.T) {
 		store := GetEndDeviceStore(db)
 
 		deviceID := ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test"},
-			JoinEui:                &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8},
-			DevEui:                 &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8},
-			DeviceId:               "foo",
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test"},
+			JoinEui:        &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8},
+			DevEui:         &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8},
+			DeviceId:       "foo",
 		}
 
 		deviceNewID := ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test"},
-			DeviceId:               "bar",
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test"},
+			DeviceId:       "bar",
 		}
 
 		created, err := store.CreateEndDevice(ctx, &ttnpb.EndDevice{
@@ -153,13 +153,13 @@ func TestEndDeviceStore(t *testing.T) {
 			a.So(got.UpdatedAt, should.Resemble, updated.UpdatedAt)
 		}
 
-		count, err := store.CountEndDevices(ctx, &deviceID.ApplicationIdentifiers)
+		count, err := store.CountEndDevices(ctx, deviceID.ApplicationIds)
 
 		a.So(err, should.BeNil)
 		a.So(count, should.Equal, 1)
 
 		list, err := store.ListEndDevices(ctx,
-			&deviceID.ApplicationIdentifiers,
+			deviceID.ApplicationIds,
 			&ptypes.FieldMask{Paths: []string{"name"}},
 		)
 
@@ -202,13 +202,13 @@ func TestEndDeviceStore(t *testing.T) {
 			a.So(*ttnpb.StdTime(createdNew.UpdatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
 		}
 
-		count, err = store.CountEndDevices(ctx, &deviceID.ApplicationIdentifiers)
+		count, err = store.CountEndDevices(ctx, deviceID.ApplicationIds)
 
 		a.So(err, should.BeNil)
 		a.So(count, should.Equal, 2)
 
 		list, err = store.ListEndDevices(ctx,
-			&deviceID.ApplicationIdentifiers,
+			deviceID.ApplicationIds,
 			nil,
 		)
 
@@ -249,12 +249,12 @@ func TestEndDeviceStore(t *testing.T) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		count, err = store.CountEndDevices(ctx, &deviceID.ApplicationIdentifiers)
+		count, err = store.CountEndDevices(ctx, deviceID.ApplicationIds)
 
 		a.So(err, should.BeNil)
 		a.So(count, should.Equal, 0)
 
-		list, err = store.ListEndDevices(ctx, &deviceID.ApplicationIdentifiers, nil)
+		list, err = store.ListEndDevices(ctx, deviceID.ApplicationIds, nil)
 
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
@@ -270,8 +270,8 @@ func TestEndDeviceStore(t *testing.T) {
 			[]*ttnpb.EndDeviceIdentifiers{
 				&deviceID,
 				{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-another"},
-					DeviceId:               "baz",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-another"},
+					DeviceId:       "baz",
 				},
 			},
 			nil)

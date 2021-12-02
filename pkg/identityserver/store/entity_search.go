@@ -277,8 +277,8 @@ func (s *entitySearch) FindEndDevices(ctx context.Context, req *ttnpb.SearchEndD
 	identifiers := make([]*ttnpb.EndDeviceIdentifiers, len(results))
 	for i, result := range results {
 		identifiers[i] = &ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: req.GetApplicationIds().GetApplicationId()},
-			DeviceId:               result.FriendlyID,
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: req.GetApplicationIds().GetApplicationId()},
+			DeviceId:       result.FriendlyID,
 		}
 	}
 	return identifiers, nil

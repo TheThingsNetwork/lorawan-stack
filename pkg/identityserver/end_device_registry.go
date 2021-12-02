@@ -57,7 +57,7 @@ var errEndDeviceEUIsTaken = errors.DefineAlreadyExists(
 )
 
 func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.CreateEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
-	if err = rights.RequireApplication(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	if err = rights.RequireApplication(ctx, *req.EndDeviceIdentifiers.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	if err = blacklist.Check(ctx, req.DeviceId); err != nil {
@@ -88,7 +88,7 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 					"join_eui", req.JoinEui.String(),
 					"dev_eui", req.DevEui.String(),
 					"device_id", ids.GetDeviceId(),
-					"application_id", ids.GetApplicationId(),
+					"application_id", ids.ApplicationIds.ApplicationId,
 				)
 			}
 		}
@@ -99,7 +99,7 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 }
 
 func (is *IdentityServer) getEndDevice(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
-	if err = rights.RequireApplication(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
+	if err = rights.RequireApplication(ctx, *req.EndDeviceIdentifiers.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
 
@@ -190,7 +190,7 @@ func (is *IdentityServer) setFullEndDevicePictureURL(ctx context.Context, dev *t
 func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.UpdateEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
 	if clusterauth.Authorized(ctx) == nil {
 		req.FieldMask = cleanFieldMaskPaths([]string{"activated_at", "locations"}, req.FieldMask, nil, getPaths)
-	} else if err = rights.RequireApplication(ctx, req.EndDeviceIdentifiers.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	} else if err = rights.RequireApplication(ctx, *req.EndDeviceIdentifiers.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.EndDeviceFieldPathsNested, req.FieldMask, nil, getPaths)
@@ -227,7 +227,7 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 }
 
 func (is *IdentityServer) deleteEndDevice(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireApplication(ctx, ids.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	if err := rights.RequireApplication(ctx, *ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
