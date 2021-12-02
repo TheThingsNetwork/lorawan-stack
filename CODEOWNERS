@@ -21,7 +21,7 @@
 /.github/workflows @htdvisser @adriansmares @michalborkowski96
 /config @bafonins @kschiffer
 /config/stack @benolayinka @neoaggelos
-/cypress @bafonins @kschiffer
+/cypress @bafonins @kschiffer @ryaplots
 
 # API, configuration, CLI and storage compatibility
 /api @johanstokking @htdvisser
@@ -52,7 +52,7 @@
 /pkg/types @johanstokking @htdvisser
 /pkg/web @bafonins @kschiffer
 /pkg/webmiddleware @htdvisser @bafonins @kschiffer
-/pkg/webui @bafonins @kschiffer
+/pkg/webui @bafonins @kschiffer @ryaplots
 /pkg/ratelimit @johanstokking @htdvisser @neoaggelos
 
 # Subsystems
@@ -89,7 +89,7 @@
 /pkg/devicerepository @adriansmares @neoaggelos
 
 # SDKs
-/sdk/js @bafonins @kschiffer
+/sdk/js @bafonins @kschiffer @ryaplots
 
 # Clear generated code
 /api/api.md
