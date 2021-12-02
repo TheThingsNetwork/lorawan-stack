@@ -473,24 +473,29 @@ func TestVersion(t *testing.T) {
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	is, isAddr := mock.NewIS(ctx)
-	is.Add(ctx, registeredGatewayID, registeredGatewayToken)
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
 				Listen:                      ":0",
 				AllowInsecureForCredentials: true,
 			},
-			Cluster: cluster.Config{
-				IdentityServer: isAddr,
-			},
 		},
 	})
+
 	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	componenttest.StartComponent(t, c)
 	defer c.Close()
-	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
+
+	gs.RegisterGateway(ctx, registeredGatewayID, &ttnpb.Gateway{
+		Ids:             &registeredGatewayID,
+		FrequencyPlanId: test.EUFrequencyPlanID,
+		Antennas: []*ttnpb.GatewayAntenna{
+			{
+				Gain: 3,
+			},
+		},
+	})
 
 	web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
 	if !a.So(err, should.BeNil) {
@@ -555,12 +560,14 @@ func TestVersion(t *testing.T) {
 					{
 						Radios: []pfconfig.LBSRFConfig{
 							{
-								Enable:    true,
-								Frequency: 867500000,
+								Enable:      true,
+								Frequency:   867500000,
+								AntennaGain: 3,
 							},
 							{
-								Enable:    true,
-								Frequency: 868500000,
+								Enable:      true,
+								Frequency:   868500000,
+								AntennaGain: 3,
 							},
 						},
 						Channels: []shared.IFConfig{
@@ -628,12 +635,14 @@ func TestVersion(t *testing.T) {
 					{
 						Radios: []pfconfig.LBSRFConfig{
 							{
-								Enable:    true,
-								Frequency: 867500000,
+								Enable:      true,
+								Frequency:   867500000,
+								AntennaGain: 3,
 							},
 							{
-								Enable:    true,
-								Frequency: 868500000,
+								Enable:      true,
+								Frequency:   868500000,
+								AntennaGain: 3,
 							},
 						},
 						Channels: []shared.IFConfig{

@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- User defined antenna gain for LBS gateways.
+
 ### Changed
 
 ### Deprecated

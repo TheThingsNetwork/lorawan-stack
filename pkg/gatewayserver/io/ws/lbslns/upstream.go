@@ -538,7 +538,16 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 
 	switch typ {
 	case TypeUpstreamVersion:
-		ctx, msg, stat, err := f.GetRouterConfig(ctx, raw, conn.BandID(), conn.FrequencyPlans(), receivedAt)
+		var antennaGain int
+		antennas := conn.Gateway().Antennas
+		if len(antennas) != 0 && antennas[0] != nil {
+			// TODO: Support downlink path to multiple antennas (https://github.com/TheThingsNetwork/lorawan-stack/issues/48).
+			// Need to set different gain value to each `SX1301_conf` object as per https://doc.sm.tc/station/gw_v1.5.html#multi-board-sample-configuration.
+			// Currently we support downlink to only one antenna so the gain of the first antenna is applied to all (though the latter ones are not used).
+			// FPs and Antennas need to be synchronized. See https://github.com/TheThingsNetwork/lorawan-stack/issues/48#issuecomment-983412639.
+			antennaGain = int(antennas[0].Gain)
+		}
+		ctx, msg, stat, err := f.GetRouterConfig(ctx, raw, conn.BandID(), conn.FrequencyPlans(), antennaGain, receivedAt)
 		logger = log.FromContext(ctx)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to generate router configuration")
