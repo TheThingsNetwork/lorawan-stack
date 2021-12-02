@@ -110,7 +110,10 @@ func (ids ClientIdentifiers) IDString() string { return ids.ClientId }
 
 // IDString returns the ID string of this Identifier.
 func (ids EndDeviceIdentifiers) IDString() string {
-	return fmt.Sprintf("%s.%s", ids.ApplicationIdentifiers.IDString(), ids.DeviceId)
+	if ids.ApplicationIds == nil {
+		return ""
+	}
+	return fmt.Sprintf("%s.%s", ids.ApplicationIds.IDString(), ids.DeviceId)
 }
 
 // IDString returns the ID string of this Identifier.

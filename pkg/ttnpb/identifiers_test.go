@@ -49,7 +49,7 @@ func TestIdentifiersIsZero(t *testing.T) {
 	for _, ids := range []interface{ IsZero() bool }{
 		ApplicationIdentifiers{ApplicationId: "foo"},
 		ClientIdentifiers{ClientId: "foo"},
-		EndDeviceIdentifiers{ApplicationIdentifiers: ApplicationIdentifiers{ApplicationId: "foo"}, DeviceId: "foo"},
+		EndDeviceIdentifiers{ApplicationIds: &ApplicationIdentifiers{ApplicationId: "foo"}, DeviceId: "foo"},
 		EndDeviceIdentifiers{JoinEui: &eui, DevEui: &eui},
 		EndDeviceIdentifiers{DevAddr: &devAddr},
 		GatewayIdentifiers{GatewayId: "foo"},
