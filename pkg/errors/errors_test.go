@@ -46,7 +46,7 @@ func Example() {
 	}
 
 	createDevice := func(dev *ttnpb.EndDevice) error {
-		app, err := findApplication(&dev.ApplicationIdentifiers)
+		app, err := findApplication(dev.ApplicationIds)
 		if err != nil {
 			return err // you can just pass errors up
 		}

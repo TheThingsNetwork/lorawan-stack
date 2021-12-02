@@ -47,7 +47,7 @@ func EventIsVisible(ctx context.Context, ev events.Event) (bool, error) {
 				return true, nil
 			}
 		case *ttnpb.EntityIdentifiers_DeviceIds:
-			rights, err := rights.ListApplication(ctx, ids.DeviceIds.ApplicationIdentifiers)
+			rights, err := rights.ListApplication(ctx, *ids.DeviceIds.ApplicationIds)
 			if err != nil {
 				return false, err
 			}
