@@ -213,11 +213,17 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue, consu
 
 	}
 
-	a.So(receivedSlots, should.Resemble, map[ttnpb.EndDeviceIdentifiers][]time.Time{
+	exp := map[ttnpb.EndDeviceIdentifiers][]time.Time{
 		pbs[0]: {time.Unix(0, 42).UTC()},
 		pbs[1]: {time.Unix(42, 0).UTC()},
 		pbs[2]: {time.Unix(42, 42).UTC()},
-	})
+	}
+
+	a.So(len(exp), should.Equal, len(pbs))
+
+	for k, v := range exp {
+		a.So(exp[k], should.Resemble, v)
+	}
 
 	cancelPopCtx()
 	for range consumerIDs {
