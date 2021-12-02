@@ -68,7 +68,7 @@ func TestGenerateEndDeviceQRCode(t *testing.T) {
 
 	dev := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{
 				ApplicationId: "test",
 			},
 			DeviceId: "test",

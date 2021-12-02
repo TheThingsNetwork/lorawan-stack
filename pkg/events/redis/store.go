@@ -399,7 +399,7 @@ func (ps *PubSubStore) Publish(evt events.Event) {
 			})
 			tx.Expire(ps.ctx, eventStream, ps.entityHistoryTTL)
 			if devID := id.GetDeviceIds(); devID != nil {
-				eventStream := ps.eventStream(evt.Context(), devID.ApplicationIdentifiers.GetEntityIdentifiers())
+				eventStream := ps.eventStream(evt.Context(), devID.ApplicationIds.GetEntityIdentifiers())
 				tx.XAdd(ps.ctx, &redis.XAddArgs{
 					Stream:       eventStream,
 					MaxLenApprox: int64(ps.entityHistoryCount),
