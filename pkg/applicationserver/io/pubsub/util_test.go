@@ -39,12 +39,12 @@ var (
 	registeredApplicationUID  = unique.ID(test.Context(), registeredApplicationID)
 	registeredApplicationKey  = "secret"
 	registeredDeviceID        = ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: registeredApplicationID,
-		DeviceId:               "foo-device",
-		DevAddr:                devAddrPtr(types.DevAddr{0x42, 0xff, 0xff, 0xff}),
+		ApplicationIds: &registeredApplicationID,
+		DeviceId:       "foo-device",
+		DevAddr:        devAddrPtr(types.DevAddr{0x42, 0xff, 0xff, 0xff}),
 	}
 	unregisteredDeviceID = ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{
 			ApplicationId: "bar-app",
 		},
 		DeviceId: "bar-device",

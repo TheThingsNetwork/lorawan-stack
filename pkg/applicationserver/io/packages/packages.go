@@ -118,7 +118,7 @@ func (s *server) findAssociations(ctx context.Context, ids *ttnpb.EndDeviceIdent
 	if err != nil {
 		return nil, err
 	}
-	defaults, err := s.registry.ListDefaultAssociations(ctx, &ids.ApplicationIdentifiers, paths)
+	defaults, err := s.registry.ListDefaultAssociations(ctx, ids.ApplicationIds, paths)
 	if err != nil {
 		return nil, err
 	}

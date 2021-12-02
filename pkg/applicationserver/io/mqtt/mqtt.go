@@ -265,8 +265,8 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 		return
 	}
 	ids := ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: *c.io.ApplicationIDs(),
-		DeviceId:               deviceID,
+		ApplicationIds: c.io.ApplicationIDs(),
+		DeviceId:       deviceID,
 	}
 	if err := ids.ValidateContext(c.io.Context()); err != nil {
 		logger.WithError(err).Warn("Failed to validate message identifiers")

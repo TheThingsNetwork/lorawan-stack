@@ -43,7 +43,7 @@ func (d *localDistributor) Publish(ctx context.Context, up *ttnpb.ApplicationUp)
 	if err := d.broadcast.Publish(ctx, up); err != nil {
 		return err
 	}
-	set, err := d.subscriptions.Load(ctx, up.EndDeviceIds.ApplicationIdentifiers)
+	set, err := d.subscriptions.Load(ctx, *up.EndDeviceIds.ApplicationIds)
 	if err != nil && !errors.IsNotFound(err) {
 		return err
 	} else if err == nil {

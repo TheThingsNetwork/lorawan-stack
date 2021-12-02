@@ -35,7 +35,7 @@ func TestJSONUpstream(t *testing.T) {
 		{
 			Message: &ttnpb.ApplicationUp{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{
 						ApplicationId: "foo-app",
 					},
 					DeviceId: "foo-device",
@@ -63,7 +63,7 @@ func TestJSONUpstream(t *testing.T) {
 		{
 			Message: &ttnpb.ApplicationUp{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{
 						ApplicationId: "foo-app",
 					},
 					DeviceId: "foo-device",
@@ -149,7 +149,7 @@ func TestJSONDownstream(t *testing.T) {
 				Input: []byte(`{"end_device_ids":{"application_ids":{"application_id":"foo-app"},"device_id":"foo-device"},"downlinks":[{"f_port":42,"frm_payload":"AQEB","confirmed":true},{"f_port":42,"frm_payload":"AgIC","confirmed":true}]}}`),
 				Request: &ttnpb.DownlinkQueueRequest{
 					EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{
 							ApplicationId: "foo-app",
 						},
 						DeviceId: "foo-device",

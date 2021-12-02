@@ -43,8 +43,8 @@ var (
 	registeredApplicationUID = unique.ID(test.Context(), registeredApplicationID)
 	registeredApplicationKey = "test-key"
 	registeredDeviceID       = ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: registeredApplicationID,
-		DeviceId:               "test-device",
+		ApplicationIds: &registeredApplicationID,
+		DeviceId:       "test-device",
 	}
 
 	timeout = 10 * test.Delay
@@ -198,7 +198,7 @@ func TestTraffic(t *testing.T) {
 				OK: true,
 			},
 			{
-				Topic: fmt.Sprintf("v3/%v/devices/%v/up", unique.ID(ctx, registeredDeviceID.ApplicationIdentifiers), registeredDeviceID.DeviceId),
+				Topic: fmt.Sprintf("v3/%v/devices/%v/up", unique.ID(ctx, registeredDeviceID.ApplicationIds), registeredDeviceID.DeviceId),
 				Message: &ttnpb.ApplicationUp{
 					EndDeviceIds: &registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
@@ -208,7 +208,7 @@ func TestTraffic(t *testing.T) {
 				OK: true,
 			},
 			{
-				Topic: fmt.Sprintf("v3/%v/devices/%v/join", unique.ID(ctx, registeredDeviceID.ApplicationIdentifiers), registeredDeviceID.DeviceId),
+				Topic: fmt.Sprintf("v3/%v/devices/%v/join", unique.ID(ctx, registeredDeviceID.ApplicationIds), registeredDeviceID.DeviceId),
 				Message: &ttnpb.ApplicationUp{
 					EndDeviceIds: &registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_JoinAccept{
@@ -218,7 +218,7 @@ func TestTraffic(t *testing.T) {
 				OK: true,
 			},
 			{
-				Topic: fmt.Sprintf("v3/%v/devices/%v/join", unique.ID(ctx, registeredDeviceID.ApplicationIdentifiers), registeredDeviceID.DeviceId),
+				Topic: fmt.Sprintf("v3/%v/devices/%v/join", unique.ID(ctx, registeredDeviceID.ApplicationIds), registeredDeviceID.DeviceId),
 				Message: &ttnpb.ApplicationUp{
 					EndDeviceIds: &registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
@@ -293,7 +293,7 @@ func TestTraffic(t *testing.T) {
 			Expected []*ttnpb.ApplicationDownlink
 		}{
 			{
-				Topic: fmt.Sprintf("v3/%v/devices/%v/down/push", unique.ID(ctx, registeredDeviceID.ApplicationIdentifiers), registeredDeviceID.DeviceId),
+				Topic: fmt.Sprintf("v3/%v/devices/%v/down/push", unique.ID(ctx, registeredDeviceID.ApplicationIds), registeredDeviceID.DeviceId),
 				IDs:   registeredDeviceID,
 				Message: &ttnpb.ApplicationDownlinks{
 					Downlinks: []*ttnpb.ApplicationDownlink{
@@ -311,7 +311,7 @@ func TestTraffic(t *testing.T) {
 				},
 			},
 			{
-				Topic: fmt.Sprintf("v3/%v/devices/%v/down/replace", unique.ID(ctx, registeredDeviceID.ApplicationIdentifiers), registeredDeviceID.DeviceId),
+				Topic: fmt.Sprintf("v3/%v/devices/%v/down/replace", unique.ID(ctx, registeredDeviceID.ApplicationIds), registeredDeviceID.DeviceId),
 				IDs:   registeredDeviceID,
 				Message: &ttnpb.ApplicationDownlinks{
 					Downlinks: []*ttnpb.ApplicationDownlink{
@@ -329,7 +329,7 @@ func TestTraffic(t *testing.T) {
 				},
 			},
 			{
-				Topic: fmt.Sprintf("v3/%v/devices/%v/down/push", unique.ID(ctx, registeredDeviceID.ApplicationIdentifiers), "invalid-device"),
+				Topic: fmt.Sprintf("v3/%v/devices/%v/down/push", unique.ID(ctx, registeredDeviceID.ApplicationIds), "invalid-device"),
 				IDs:   registeredDeviceID,
 				Message: &ttnpb.ApplicationDownlinks{
 					Downlinks: []*ttnpb.ApplicationDownlink{

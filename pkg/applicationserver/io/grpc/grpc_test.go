@@ -199,8 +199,8 @@ func TestTraffic(t *testing.T) {
 
 		up := &ttnpb.ApplicationUp{
 			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: registeredApplicationID,
-				DeviceId:               "foo-device",
+				ApplicationIds: &registeredApplicationID,
+				DeviceId:       "foo-device",
 			},
 			Up: &ttnpb.ApplicationUp_UplinkMessage{
 				UplinkMessage: &ttnpb.ApplicationUplink{
@@ -224,8 +224,8 @@ func TestTraffic(t *testing.T) {
 	t.Run("Downstream", func(t *testing.T) {
 		a := assertions.New(t)
 		ids := ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: registeredApplicationID,
-			DeviceId:               "foo-device",
+			ApplicationIds: &registeredApplicationID,
+			DeviceId:       "foo-device",
 		}
 
 		// List: unauthorized.
@@ -431,9 +431,9 @@ func TestSimulateUplink(t *testing.T) {
 	})
 
 	registeredDeviceID := ttnpb.EndDeviceIdentifiers{
-		DeviceId:               "dev1",
-		ApplicationIdentifiers: registeredApplicationID,
-		DevEui:                 &types.EUI64{0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01},
+		DeviceId:       "dev1",
+		ApplicationIds: &registeredApplicationID,
+		DevEui:         &types.EUI64{0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01},
 	}
 
 	as := mock.NewServer(c)
@@ -476,8 +476,8 @@ func TestSimulateUplink(t *testing.T) {
 			name: "Fetch",
 			up: &ttnpb.ApplicationUp{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:               registeredDeviceID.DeviceId,
-					ApplicationIdentifiers: registeredApplicationID,
+					DeviceId:       registeredDeviceID.DeviceId,
+					ApplicationIds: &registeredApplicationID,
 				},
 				Up: &ttnpb.ApplicationUp_ServiceData{
 					ServiceData: &ttnpb.ApplicationServiceData{},
@@ -495,8 +495,8 @@ func TestSimulateUplink(t *testing.T) {
 			name: "FetchError",
 			up: &ttnpb.ApplicationUp{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:               registeredDeviceID.DeviceId,
-					ApplicationIdentifiers: registeredApplicationID,
+					DeviceId:       registeredDeviceID.DeviceId,
+					ApplicationIds: &registeredApplicationID,
 				},
 				Up: &ttnpb.ApplicationUp_ServiceData{
 					ServiceData: &ttnpb.ApplicationServiceData{},
@@ -507,8 +507,8 @@ func TestSimulateUplink(t *testing.T) {
 				f.err = fmt.Errorf("mock error")
 			},
 			expectIdentifiers: ttnpb.EndDeviceIdentifiers{
-				DeviceId:               registeredDeviceID.DeviceId,
-				ApplicationIdentifiers: registeredApplicationID,
+				DeviceId:       registeredDeviceID.DeviceId,
+				ApplicationIds: &registeredApplicationID,
 			},
 		},
 	} {
@@ -573,8 +573,8 @@ func TestMessageProcessors(t *testing.T) {
 	{
 		resp, err := client.EncodeDownlink(ctx, &ttnpb.EncodeDownlinkRequest{
 			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: registeredApplicationID,
-				DeviceId:               "foobar",
+				ApplicationIds: &registeredApplicationID,
+				DeviceId:       "foobar",
 			},
 			Downlink: &ttnpb.ApplicationDownlink{
 				DecodedPayload: &pbtypes.Struct{
@@ -602,8 +602,8 @@ func TestMessageProcessors(t *testing.T) {
 	{
 		resp, err := client.DecodeUplink(ctx, &ttnpb.DecodeUplinkRequest{
 			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: registeredApplicationID,
-				DeviceId:               "foobar",
+				ApplicationIds: &registeredApplicationID,
+				DeviceId:       "foobar",
 			},
 			Uplink: &ttnpb.ApplicationUplink{
 				FrmPayload: []byte{1, 0, 255},
@@ -631,8 +631,8 @@ func TestMessageProcessors(t *testing.T) {
 	{
 		resp, err := client.DecodeDownlink(ctx, &ttnpb.DecodeDownlinkRequest{
 			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: registeredApplicationID,
-				DeviceId:               "foobar",
+				ApplicationIds: &registeredApplicationID,
+				DeviceId:       "foobar",
 			},
 			Downlink: &ttnpb.ApplicationDownlink{
 				FrmPayload: []byte{2, 236, 69},

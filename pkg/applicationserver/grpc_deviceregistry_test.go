@@ -42,7 +42,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 	registeredDeviceID := "foo-device"
 	registeredDevice := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{
 				ApplicationId: registeredApplicationID,
 			},
 			DeviceId: registeredDeviceID,
@@ -191,7 +191,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			GetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{
 						ApplicationId: registeredApplicationID,
 					},
 					DeviceId: registeredDeviceID,
@@ -260,7 +260,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			GetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{
 						ApplicationId: registeredApplicationID,
 					},
 					DeviceId: registeredDeviceID,
@@ -348,7 +348,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 	registeredDeviceID := "foo-device"
 	registeredDevice := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{
 				ApplicationId: registeredApplicationID,
 			},
 			DeviceId: registeredDeviceID,
@@ -436,7 +436,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{
 							ApplicationId: registeredApplicationID,
 						},
 						DeviceId: "new-device",
@@ -453,7 +453,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			SetFunc: func(ctx context.Context, deviceIds ttnpb.EndDeviceIdentifiers, gets []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(deviceIds, should.Resemble, ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{
 						ApplicationId: registeredApplicationID,
 					},
 					DeviceId: "new-device",
@@ -469,7 +469,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 				a.So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{
 							ApplicationId: registeredApplicationID,
 						},
 						DeviceId: "new-device",
@@ -485,7 +485,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				a := assertions.New(t)
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
 					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{
 							ApplicationId: registeredApplicationID,
 						},
 						DeviceId: "new-device",
@@ -647,7 +647,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 	registeredDeviceID := "foo-device"
 	registeredDevice := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{
 				ApplicationId: registeredApplicationID,
 			},
 			DeviceId: registeredDeviceID,

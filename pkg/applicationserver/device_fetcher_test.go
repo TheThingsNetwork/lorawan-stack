@@ -60,13 +60,13 @@ func TestEndDeviceFetcher(t *testing.T) {
 
 		dev1 := ttnpb.EndDeviceIdentifiers{
 			DeviceId: "dev1",
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{
 				ApplicationId: "app1",
 			},
 		}
 		dev2 := ttnpb.EndDeviceIdentifiers{
 			DeviceId: "dev2",
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{
 				ApplicationId: "app2",
 			},
 		}
@@ -134,7 +134,7 @@ func TestEndDeviceFetcher(t *testing.T) {
 
 		dev := ttnpb.EndDeviceIdentifiers{
 			DeviceId: "dev1",
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{
 				ApplicationId: "app1",
 			},
 		}
@@ -157,7 +157,7 @@ func TestEndDeviceFetcher(t *testing.T) {
 
 		dev := ttnpb.EndDeviceIdentifiers{
 			DeviceId: "dev1",
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{
 				ApplicationId: "app1",
 			},
 		}
