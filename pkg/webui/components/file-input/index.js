@@ -24,6 +24,7 @@ import Notification from '@ttn-lw/components/notification'
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import humanFileSize from '@ttn-lw/lib/utils/human-file-size'
 
 import style from './file-input.styl'
 
@@ -49,7 +50,7 @@ export default class FileInput extends Component {
     id: PropTypes.string.isRequired,
     image: PropTypes.bool,
     imageClassName: PropTypes.string,
-    largeFileWarningMessage: PropTypes.string.isRequired,
+    largeFileWarningMessage: PropTypes.string,
     maxSize: PropTypes.number,
     mayRemove: PropTypes.bool,
     message: PropTypes.message,
@@ -57,7 +58,7 @@ export default class FileInput extends Component {
     onChange: PropTypes.func.isRequired,
     providedMessage: PropTypes.message,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.shape({})]),
-    warningSize: PropTypes.number.isRequired,
+    warningSize: PropTypes.number,
   }
 
   static defaultProps = {
@@ -66,12 +67,14 @@ export default class FileInput extends Component {
     disabled: false,
     image: false,
     imageClassName: undefined,
+    largeFileWarningMessage: undefined,
     maxSize: 16 * 1024 * 1024, // 16 MB
     mayRemove: true,
     message: m.selectAFile,
     changeMessage: m.changeFile,
     providedMessage: m.fileProvided,
     value: undefined,
+    warningSize: undefined,
   }
 
   constructor(props) {
@@ -131,12 +134,6 @@ export default class FileInput extends Component {
     onChange(dataTransform(''), true)
   }
 
-  @bind
-  humanFileSize(size) {
-    const i = size === 0 ? 0 : Math.floor(Math.log(size) / Math.log(1024))
-    return `${(size / Math.pow(1024, i)).toFixed(2) * 1} ${['B', 'kB', 'MB', 'GB', 'TB'][i]}`
-  }
-
   handleImageError(error) {
     error.target.style.display = 'none'
   }
@@ -190,7 +187,7 @@ export default class FileInput extends Component {
       largeFileWarningMessage,
       warningSize,
     } = this.props
-    const warningThreshold = this.humanFileSize(warningSize)
+    const warningThreshold = humanFileSize(warningSize)
 
     return (
       <div className={style.container}>

@@ -61,9 +61,14 @@ export default class DeviceBulkCreateForm extends Component {
       set_claim_auth_code: PropTypes.bool,
     }).isRequired,
     jsEnabled: PropTypes.bool.isRequired,
-    largeFileWarningMessage: PropTypes.string.isRequired,
+    largeFileWarningMessage: PropTypes.string,
     onSubmit: PropTypes.func.isRequired,
-    warningSize: PropTypes.number.isRequired,
+    warningSize: PropTypes.number,
+  }
+
+  static defaultProps = {
+    largeFileWarningMessage: undefined,
+    warningSize: undefined,
   }
 
   state = {
