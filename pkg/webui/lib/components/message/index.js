@@ -25,13 +25,14 @@ import interpolate from '@ttn-lw/lib/interpolate'
 import style from './message.styl'
 
 const renderContent = (content, component, props) => {
-  let Component = component
+  const Component = component
+
   if (!Boolean(component)) {
     if (Boolean(props.className)) {
-      Component = 'span'
-    } else {
-      Component = React.Fragment
+      return <span {...props}>{content}</span>
     }
+
+    return <React.Fragment key={props.key}>{content}</React.Fragment>
   }
 
   if (Boolean(Component) || Boolean(props.className)) {
