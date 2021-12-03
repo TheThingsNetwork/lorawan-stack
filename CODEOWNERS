@@ -10,8 +10,8 @@
 # Dependencies
 /go.mod @johanstokking @htdvisser
 /go.sum @johanstokking @htdvisser
-/package.json @bafonins @kschiffer
-/yarn.lock @bafonins @kschiffer
+/package.json @bafonins @kschiffer @ryaplots
+/yarn.lock @bafonins @kschiffer @ryaplots
 /sdk/js/package.json @bafonins @kschiffer
 /sdk/js/yarn.lock @bafonins @kschiffer
 
