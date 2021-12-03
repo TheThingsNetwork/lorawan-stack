@@ -37,7 +37,7 @@ func nsScheduleWindow() time.Duration {
 
 func searchUplinkChannel(freq uint64, macState *ttnpb.MACState) (uint8, error) {
 	for i, ch := range macState.CurrentParameters.Channels {
-		if ch.UplinkFrequency == freq {
+		if ch.GetUplinkFrequency() == freq {
 			return uint8(i), nil
 		}
 	}

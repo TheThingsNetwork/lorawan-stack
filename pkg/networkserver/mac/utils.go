@@ -37,7 +37,7 @@ func channelDataRateRange(chs ...*ttnpb.MACParameters_Channel) (min, max ttnpb.D
 		if i >= len(chs) {
 			return 0, 0, false
 		}
-		if chs[i].EnableUplink {
+		if chs[i].GetEnableUplink() {
 			break
 		}
 		i++
@@ -46,7 +46,7 @@ func channelDataRateRange(chs ...*ttnpb.MACParameters_Channel) (min, max ttnpb.D
 	min = chs[i].MinDataRateIndex
 	max = chs[i].MaxDataRateIndex
 	for _, ch := range chs[i+1:] {
-		if !ch.EnableUplink {
+		if !ch.GetEnableUplink() {
 			continue
 		}
 		if ch.MaxDataRateIndex > max {

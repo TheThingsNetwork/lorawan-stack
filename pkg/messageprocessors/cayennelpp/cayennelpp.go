@@ -38,7 +38,7 @@ func New() messageprocessors.PayloadEncodeDecoder {
 
 var (
 	errInput  = errors.DefineInvalidArgument("input", "invalid input")
-	errOutput = errors.Define("output", "invalid output")
+	errOutput = errors.DefineInvalidArgument("output", "invalid output")
 )
 
 // EncodeDownlink encodes the message's DecodedPayload to FRMPayload using CayenneLPP encoding.

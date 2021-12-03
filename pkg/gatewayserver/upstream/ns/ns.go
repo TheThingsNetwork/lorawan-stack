@@ -74,15 +74,15 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 	if conn.Frontend().SupportsDownlinkClaim() {
 		return nil
 	}
+	decoupledCtx := h.contextDecoupler.FromRequestContext(ctx)
 	logger := log.FromContext(ctx)
-	if err := h.cluster.ClaimIDs(ctx, &ids); err != nil {
+	if err := h.cluster.ClaimIDs(decoupledCtx, &ids); err != nil {
 		logger.WithError(err).Error("Failed to claim downlink path")
 		return err
 	}
 	logger.Info("Downlink path claimed")
 	defer func() {
-		ctx := h.contextDecoupler.FromRequestContext(ctx)
-		if err := h.cluster.UnclaimIDs(ctx, &ids); err != nil {
+		if err := h.cluster.UnclaimIDs(decoupledCtx, &ids); err != nil {
 			logger.WithError(err).Error("Failed to unclaim downlink path")
 			return
 		}
