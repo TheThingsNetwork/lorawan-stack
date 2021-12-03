@@ -1,0 +1,27 @@
+{
+  "templates": [{
+    "ids":{
+      "template_id":"akenza"
+    },
+    "name":"Akenza Core",
+    "description":"Integrate with Akenza Core",
+    "logo_url":"https://www.thethingsnetwork.org/conference/wp-content/uploads/2020/01/Akenza-LogoClaim-rgb-positive_nb.png",
+    "info_url":"https://core.akenza.io/",
+    "documentation_url":"https://akenza.atlassian.net/servicedesk/customer/portals/",
+    "base_url":"https://data-gateway.core.akenza.io/v2/up/{domain_secret}?id={device_id}",
+    "format":"json",
+    "fields":[
+      {
+        "id":"domain_secret",
+        "name":"Domain Secret",
+        "description":"Akenza Core domain secret"
+      },
+      {
+        "id":"device_id",
+        "name":"Device ID",
+        "description":"Akenza Core device ID"
+      }
+    ],
+    "uplink_message":{"path":"/"}
+  }]
+}
