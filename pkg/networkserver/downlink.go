@@ -1038,9 +1038,12 @@ func loggerWithDownlinkSchedulingErrorFields(logger log.Interface, errs downlink
 }
 
 func appendRecentDownlink(recent []*ttnpb.DownlinkMessage, down *ttnpb.DownlinkMessage, window int) []*ttnpb.DownlinkMessage {
+	if n := len(recent); n > 0 {
+		recent[n-1].CorrelationIds = nil
+	}
 	recent = append(recent, down)
-	if len(recent) > window {
-		recent = recent[len(recent)-window:]
+	if extra := len(recent) - window; extra > 0 {
+		recent = recent[extra:]
 	}
 	return recent
 }
@@ -1133,12 +1136,11 @@ func recordDataDownlink(dev *ttnpb.EndDevice, genState generateDownlinkState, ne
 		dev.MacState.PendingApplicationDownlink = genState.ApplicationDownlink
 		dev.Session.LastConfFCntDown = macPayload.FullFCnt
 	}
-	msg := &ttnpb.DownlinkMessage{
+	dev.MacState.RecentDownlinks = appendRecentDownlink(dev.MacState.RecentDownlinks, &ttnpb.DownlinkMessage{
 		Payload:        down.Message.Payload,
 		Settings:       down.Message.Settings,
 		CorrelationIds: down.Message.CorrelationIds,
-	}
-	dev.MacState.RecentDownlinks = appendRecentDownlink(dev.MacState.RecentDownlinks, msg, recentDownlinkCount)
+	}, recentDownlinkCount)
 	dev.MacState.RxWindowsAvailable = false
 }
 
