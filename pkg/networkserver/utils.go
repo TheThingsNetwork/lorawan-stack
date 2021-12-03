@@ -19,7 +19,6 @@ import (
 	"fmt"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
@@ -380,66 +379,39 @@ func publishEvents(ctx context.Context, evs ...events.Event) {
 }
 
 func (ns *NetworkServer) enqueueApplicationUplinks(ctx context.Context, ups ...*ttnpb.ApplicationUp) {
+	log.FromContext(ctx).Debug("Enqueue application uplinks for sending to Application Server")
+	if err := ns.applicationUplinks.Add(ctx, ups...); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to enqueue application uplinks for sending to Application Server")
+	}
+}
+
+func (ns *NetworkServer) submitApplicationUplinks(ctx context.Context, ups ...*ttnpb.ApplicationUp) {
 	n := len(ups)
 	if n == 0 {
 		return
 	}
-
-	enqueue := func(ctx context.Context, ups ...*ttnpb.ApplicationUp) {
-		log.FromContext(ctx).Debug("Enqueue application uplinks for sending to Application Server")
-		if err := ns.applicationUplinks.Add(ctx, ups...); err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Failed to enqueue application uplinks for sending to Application Server")
-		}
-	}
-
-	send := func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, ups ...*ttnpb.ApplicationUp) error {
-		conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, nil)
-		if err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Failed to get Application Server peer")
-			return err
-		}
-		if err := ns.sendApplicationUplinks(ctx, ttnpb.NewNsAsClient(conn), appID, ups...); err != nil {
-			return err
-		}
-		return nil
-	}
-
-	partitionAndSend := func(ctx context.Context) error {
-		registerUplinkSenderStarted()
-		defer registerUplinkSenderFinished()
-
-		m := make(map[string][]*ttnpb.ApplicationUp)
-		for _, up := range ups {
-			appID := up.EndDeviceIds.ApplicationId
-			m[appID] = append(m[appID], up)
-		}
-		for id, ups := range m {
-			appID := ttnpb.ApplicationIdentifiers{
-				ApplicationId: id,
-			}
-			ctx := log.NewContextWithFields(ctx, log.Fields(
-				"application_uid", unique.ID(ctx, appID),
-				"uplink_count", len(ups),
-			))
-			if err := send(ctx, appID, ups...); err != nil {
-				log.FromContext(ctx).WithError(err).Warn("Failed to send application uplinks to Application Server")
-				enqueue(ctx, ups...)
-			}
-		}
-		return nil
-	}
-
-	if !ns.uplinkQueueSemaphore.TryAcquire(1) {
-		enqueue(ctx, ups...)
+	ctx = log.NewContextWithFields(ctx, log.Fields(
+		"device_uid", unique.ID(ctx, ups[0].EndDeviceIds),
+		"uplink_count", n,
+	))
+	if err := ns.uplinkSubmissionPool.Publish(ctx, ups); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to enqueue application uplinks in submission pool")
+		ns.enqueueApplicationUplinks(ctx, ups...)
 		return
 	}
+}
 
-	ns.StartTask(&component.TaskConfig{
-		Context: ns.FromRequestContext(ctx),
-		ID:      sendApplicationUplinkTaskName,
-		Func:    partitionAndSend,
-		Done:    func() { ns.uplinkQueueSemaphore.Release(1) },
-		Restart: component.TaskRestartNever,
-		Backoff: component.DialTaskBackoffConfig,
-	})
+func (ns *NetworkServer) handleUplinkSubmission(ctx context.Context, item interface{}) {
+	ups := item.([]*ttnpb.ApplicationUp)
+	conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, nil)
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to get Application Server peer")
+		ns.enqueueApplicationUplinks(ctx, ups...)
+		return
+	}
+	if err := ns.sendApplicationUplinks(ctx, ttnpb.NewNsAsClient(conn), ups...); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to send application uplinks to Application Server")
+		ns.enqueueApplicationUplinks(ctx, ups...)
+		return
+	}
 }

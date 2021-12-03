@@ -1595,7 +1595,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 		defer func() { publishEvents(ctx, queuedEvents...) }()
 
 		var queuedApplicationUplinks []*ttnpb.ApplicationUp
-		defer func() { ns.enqueueApplicationUplinks(ctx, queuedApplicationUplinks...) }()
+		defer func() { ns.submitApplicationUplinks(ctx, queuedApplicationUplinks...) }()
 
 		taskUpdateStrategy := noDownlinkTask
 		dev, ctx, err := ns.devices.SetByID(ctx, devID.ApplicationIdentifiers, devID.DeviceId,

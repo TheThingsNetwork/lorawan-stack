@@ -866,7 +866,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	}
 
 	var queuedApplicationUplinks []*ttnpb.ApplicationUp
-	defer func() { ns.enqueueApplicationUplinks(ctx, queuedApplicationUplinks...) }()
+	defer func() { ns.submitApplicationUplinks(ctx, queuedApplicationUplinks...) }()
 
 	stored, _, err := ns.devices.SetByID(ctx, matched.Device.ApplicationIdentifiers, matched.Device.DeviceId, handleDataUplinkGetPaths[:],
 		func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
@@ -1328,7 +1328,7 @@ func (ns *NetworkServer) ReportTxAcknowledgment(ctx context.Context, up *ttnpb.G
 	if pld.GetFPort() == 0 {
 		return ttnpb.Empty, nil
 	}
-	ns.enqueueApplicationUplinks(ctx, &ttnpb.ApplicationUp{
+	ns.submitApplicationUplinks(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIds: ids,
 		Up: &ttnpb.ApplicationUp_DownlinkSent{
 			DownlinkSent: &ttnpb.ApplicationDownlink{
