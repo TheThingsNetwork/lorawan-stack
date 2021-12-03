@@ -1,0 +1,24 @@
+{
+  "end_device":{
+    "ids":{
+      "device_id":"device-all-components",
+      "dev_eui":"70B3D57ED8000019"
+    },
+    "session":{
+      "keys":{
+        "app_s_key":{
+          "key":"1A63DBFBD8F96E500DF05D4BB909BB93"
+        }
+      },
+      "dev_addr":"270000FC"
+    }
+  },
+  "field_mask":{
+    "paths":[
+      "ids.device_id",
+      "ids.dev_eui",
+      "session.keys.app_s_key.key",
+      "session.dev_addr"
+    ]
+  }
+}

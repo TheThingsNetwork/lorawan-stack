@@ -256,6 +256,47 @@ Cypress.Commands.add('createEndDevice', (applicationId, endDevice) => {
   })
 })
 
+// Helper function to create a mock device in all components.
+Cypress.Commands.add('createEndDeviceAllComponents', applicationId => {
+  const baseUrl = Cypress.config('baseUrl')
+  const adminApiKey = Cypress.config('adminApiKey')
+  const headers = {
+    Authorization: `Bearer ${adminApiKey}`,
+  }
+  cy.fixture('console/devices/device.is.json').then(body => {
+    cy.request({
+      method: 'POST',
+      url: `${baseUrl}/api/v3/applications/${applicationId}/devices`,
+      body,
+      headers,
+    })
+  })
+  cy.fixture('console/devices/device.ns.json').then(body => {
+    cy.request({
+      method: 'PUT',
+      url: `${baseUrl}/api/v3/ns/applications/${applicationId}/devices/${body.end_device.ids.device_id}`,
+      body,
+      headers,
+    })
+  })
+  cy.fixture('console/devices/device.as.json').then(body => {
+    cy.request({
+      method: 'PUT',
+      url: `${baseUrl}/api/v3/as/applications/${applicationId}/devices/${body.end_device.ids.device_id}`,
+      body,
+      headers,
+    })
+  })
+  cy.fixture('console/devices/device.js.json').then(body => {
+    cy.request({
+      method: 'PUT',
+      url: `${baseUrl}/api/v3/js/applications/${applicationId}/devices/${body.end_device.ids.device_id}`,
+      body,
+      headers,
+    })
+  })
+})
+
 // Helper function to create a new pub sub programmatically.
 Cypress.Commands.add('createPubSub', (applicationId, pubSub) => {
   const baseUrl = Cypress.config('baseUrl')
