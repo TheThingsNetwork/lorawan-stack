@@ -232,17 +232,7 @@ func TestPba(t *testing.T) {
 						Name: &pbtypes.StringValue{
 							Value: "Test Network",
 						},
-						DevAddrBlocks: &iampb.DevAddrBlocksValue{
-							Value: []*packetbroker.DevAddrBlock{
-								{
-									Prefix: &packetbroker.DevAddrPrefix{
-										Value:  0x26000000,
-										Length: 24,
-									},
-									HomeNetworkClusterId: "test-cluster",
-								},
-							},
-						},
+						// NOTE: DevAddrBlocks are not updated here, as the tenant cannot change their own DevAddr blocks.
 						AdministrativeContact: &packetbroker.ContactInfoValue{
 							Value: &packetbroker.ContactInfo{
 								Email: "admin@example.com",
