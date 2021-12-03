@@ -25,14 +25,13 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
-	"go.thethings.network/lorawan-stack/v3/pkg/util/randutil"
 )
 
 // NewPopulator returns a new database populator with a population of the given size.
 // It is seeded by the given seed.
 func NewPopulator(size int, seed int64) *Populator {
 	now := time.Now()
-	randy := randutil.NewLockedRand(rand.NewSource(seed))
+	randy := rand.New(rand.NewSource(seed))
 	p := &Populator{
 		APIKeys:     make(map[*ttnpb.EntityIdentifiers][]*ttnpb.APIKey),
 		Memberships: make(map[*ttnpb.EntityIdentifiers][]*ttnpb.Collaborator),

@@ -16,6 +16,7 @@ package gatewayserver_test
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 	"net"
 	"time"
@@ -144,9 +145,9 @@ func (is *mockIS) ListRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers)
 
 func randomJoinRequestPayload(joinEUI, devEUI types.EUI64) []byte {
 	var nwkKey types.AES128Key
-	random.Read(nwkKey[:])
+	rand.Read(nwkKey[:])
 	var devNonce types.DevNonce
-	random.Read(devNonce[:])
+	rand.Read(devNonce[:])
 
 	msg := &ttnpb.UplinkMessage{
 		Payload: &ttnpb.Message{
@@ -176,9 +177,9 @@ func randomJoinRequestPayload(joinEUI, devEUI types.EUI64) []byte {
 
 func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 	var fNwkSIntKey, sNwkSIntKey, appSKey types.AES128Key
-	random.Read(fNwkSIntKey[:])
-	random.Read(sNwkSIntKey[:])
-	random.Read(appSKey[:])
+	rand.Read(fNwkSIntKey[:])
+	rand.Read(sNwkSIntKey[:])
+	rand.Read(appSKey[:])
 
 	pld := &ttnpb.MACPayload{
 		FHdr: &ttnpb.FHDR{
@@ -218,8 +219,8 @@ func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 
 func randomDownDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 	var sNwkSIntKey, appSKey types.AES128Key
-	random.Read(sNwkSIntKey[:])
-	random.Read(appSKey[:])
+	rand.Read(sNwkSIntKey[:])
+	rand.Read(appSKey[:])
 
 	pld := &ttnpb.MACPayload{
 		FHdr: &ttnpb.FHDR{
