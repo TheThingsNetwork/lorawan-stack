@@ -25,6 +25,7 @@ For details about compatibility between different releases, see the **Commitment
 - End device mac settings handling in the Console.
 - Uplink and downlink counters display on end device activity in the Console.
 - Join settings handling in JS-only deployments in the Console.
+- Configuring Packet Broker listed option when Packet Broker Agent is configured with a Packet Broker tenant API key.
 
 ### Security
 
