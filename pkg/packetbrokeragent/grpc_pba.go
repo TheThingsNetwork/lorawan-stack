@@ -150,14 +150,11 @@ func (s *pbaServer) Register(ctx context.Context, req *ttnpb.PacketBrokerRegiste
 			},
 		})
 	} else {
-		_, err = iampb.NewTenantRegistryClient(s.iamConn).UpdateTenant(ctx, &iampb.UpdateTenantRequest{
+		req := &iampb.UpdateTenantRequest{
 			NetId:    s.netID.MarshalNumber(),
 			TenantId: tenantID,
 			Name: &pbtypes.StringValue{
 				Value: registration.Name,
-			},
-			DevAddrBlocks: &iampb.DevAddrBlocksValue{
-				Value: devAddrBlocks,
 			},
 			AdministrativeContact: &packetbroker.ContactInfoValue{
 				Value: adminContact,
@@ -168,7 +165,16 @@ func (s *pbaServer) Register(ctx context.Context, req *ttnpb.PacketBrokerRegiste
 			Listed: &pbtypes.BoolValue{
 				Value: listed,
 			},
-		})
+		}
+		// Managing DevAddr blocks is only available if Packet Broker Agent is configured with NetID level authorization,
+		// and if the registration is a tenant within that NetID.
+		if id, err := s.authenticator.AuthInfo(ctx); err == nil && id.TenantId == "" {
+			req.DevAddrBlocks = &iampb.DevAddrBlocksValue{
+				Value: devAddrBlocks,
+			}
+		}
+
+		_, err = iampb.NewTenantRegistryClient(s.iamConn).UpdateTenant(ctx, req)
 	}
 
 	if err != nil {
