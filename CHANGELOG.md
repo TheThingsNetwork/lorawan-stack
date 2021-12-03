@@ -15,6 +15,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Gateways which have been deleted are now automatically disconnected by the Gateway Server.
+
 ### Deprecated
 
 ### Removed

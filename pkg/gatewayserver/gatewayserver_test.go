@@ -1781,8 +1781,11 @@ func TestUpdateVersionInfo(t *testing.T) {
 			},
 		},
 	})
+
+	gatewayFetchInterval := test.Delay
+
 	gsConfig := &gatewayserver.Config{
-		FetchGatewayInterval:   time.Minute,
+		FetchGatewayInterval:   gatewayFetchInterval,
 		FetchGatewayJitter:     1,
 		UpdateVersionInfoDelay: test.Delay,
 		MQTTV2: config.MQTT{
@@ -1808,10 +1811,13 @@ func TestUpdateVersionInfo(t *testing.T) {
 	time.Sleep(timeout) // Wait for component to start.
 
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
-	is.add(ctx, ttnpb.GatewayIdentifiers{
+
+	gtwIDs := ttnpb.GatewayIdentifiers{
 		GatewayId: registeredGatewayID,
 		Eui:       &registeredGatewayEUI,
-	}, registeredGatewayKey, true, true)
+	}
+
+	is.add(ctx, gtwIDs, registeredGatewayKey, true, true)
 	time.Sleep(timeout) // Wait for setup to be completed.
 
 	linkFn := func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, statCh <-chan *ttnpbv2.StatusMessage) error {
@@ -1903,4 +1909,31 @@ func TestUpdateVersionInfo(t *testing.T) {
 			a.So(gtw.Attributes, should.Resemble, tc.ExpectedAttributes)
 		})
 	}
+
+	// Test Disconnection on delete.
+	// Setup a stats client with independent context to query whether the gateway is connected and statistics on
+	// upstream and downstream.
+	statsConn, err := grpc.Dial(":9187", append(rpcclient.DefaultDialOptions(test.Context()), grpc.WithInsecure(), grpc.WithBlock())...)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	defer statsConn.Close()
+	statsCtx := metadata.AppendToOutgoingContext(test.Context(),
+		"id", ids.GatewayId,
+		"authorization", fmt.Sprintf("Bearer %v", registeredGatewayKey),
+	)
+	statsClient := ttnpb.NewGsClient(statsConn)
+
+	stat, err := statsClient.GetGatewayConnectionStats(statsCtx, &gtwIDs)
+	a.So(err, should.BeNil)
+	a.So(stat, should.NotBeNil)
+
+	// Delete and wait for fetch interval.
+	is.Delete(ctx, &gtwIDs)
+	time.Sleep(gatewayFetchInterval << 7)
+
+	stat, err = statsClient.GetGatewayConnectionStats(statsCtx, &gtwIDs)
+	a.So(errors.IsNotFound(err), should.BeTrue)
+	a.So(stat, should.BeNil)
+
 }
