@@ -86,6 +86,7 @@ type ApplicationServer struct {
 	endDeviceFetcher EndDeviceFetcher
 
 	activationPool workerpool.WorkerPool
+	processingPool workerpool.WorkerPool
 }
 
 // Context returns the context of the Application Server.
@@ -156,6 +157,12 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		Context:   ctx,
 		Name:      "save_activation_status",
 		Handler:   as.saveActivationStatus,
+	})
+	as.processingPool = workerpool.NewWorkerPool(workerpool.Config{
+		Component: c,
+		Context:   ctx,
+		Name:      "process_application_uplinks",
+		Handler:   as.processUpAsync,
 	})
 	as.formatters[ttnpb.PayloadFormatter_FORMATTER_REPOSITORY] = devicerepository.New(as.formatters, as)
 
@@ -312,14 +319,23 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 
 // Publish processes the given upstream message and then publishes it to the application frontends.
 func (as *ApplicationServer) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
+	return as.processingPool.Publish(ctx, up)
+}
+
+func (as *ApplicationServer) processUpAsync(ctx context.Context, item interface{}) {
+	up := item.(*ttnpb.ApplicationUp)
 	link, err := as.getLink(ctx, up.EndDeviceIds.ApplicationIds, []string{
 		"default_formatters",
 		"skip_payload_crypto",
 	})
 	if err != nil {
-		return err
+		log.FromContext(ctx).WithError(err).Warn("Failed to retrieve application link")
+		return
 	}
-	return as.processUp(ctx, up, link)
+	if err := as.processUp(ctx, up, link); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to process application uplink")
+		return
+	}
 }
 
 func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) error {
@@ -1004,7 +1020,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 			uplink.Locations = make(map[string]*ttnpb.Location)
 		}
 		uplink.Locations["frm-payload"] = loc
-		err := as.processUp(ctx, &ttnpb.ApplicationUp{
+		if err := as.Publish(ctx, &ttnpb.ApplicationUp{
 			EndDeviceIds:   &ids,
 			CorrelationIds: events.CorrelationIDsFromContext(ctx),
 			ReceivedAt:     uplink.ReceivedAt,
@@ -1014,9 +1030,8 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 					Location: loc,
 				},
 			},
-		}, link)
-		if err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Failed to process location solved message from location in payload")
+		}); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to publish location solved message from location in payload")
 		}
 	}
 

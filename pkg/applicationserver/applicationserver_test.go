@@ -2923,6 +2923,8 @@ func TestLocationFromPayload(t *testing.T) {
 
 	assertApplicationlocation(loc)
 
+	time.Sleep(Timeout)
+
 	dev, ok := is.endDeviceRegistry.get(ctx, registeredDevice.EndDeviceIdentifiers)
 	if !a.So(ok, should.BeTrue) {
 		t.FailNow()
