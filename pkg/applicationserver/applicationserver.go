@@ -20,7 +20,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net"
-	"sync"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -51,6 +50,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 	"google.golang.org/grpc"
 )
 
@@ -85,7 +85,7 @@ type ApplicationServer struct {
 
 	endDeviceFetcher EndDeviceFetcher
 
-	activationTasks sync.Map
+	activationPool workerpool.WorkerPool
 }
 
 // Context returns the context of the Application Server.
@@ -151,6 +151,12 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		interopID:        conf.Interop.ID,
 		endDeviceFetcher: conf.EndDeviceFetcher.Fetcher,
 	}
+	as.activationPool = workerpool.NewWorkerPool(workerpool.Config{
+		Component: c,
+		Context:   ctx,
+		Name:      "save_activation_status",
+		Handler:   as.saveActivationStatus,
+	})
 	as.formatters[ttnpb.PayloadFormatter_FORMATTER_REPOSITORY] = devicerepository.New(as.formatters, as)
 
 	if as.endDeviceFetcher == nil {
@@ -897,56 +903,43 @@ func (as *ApplicationServer) storeUplink(ctx context.Context, ids ttnpb.EndDevic
 	return as.appUpsRegistry.Push(ctx, ids, cleanUplink)
 }
 
-// markEndDeviceAsActivated attempts to mark the end device as activated in the Entity Registry.
-// This method does not block - a task will be spawned that updates the device in the Entity Registry.
-// If the update fails, the task will not restart, and this function is expected to be called again
-// on a subsequent uplink from the end device.
+// saveActivationStatus attempts to mark the end device as activated in the Entity Registry.
 // If the update succeeds, the end device will be updated in the Application Server end device registry
 // in order to avoid subsequent calls.
-func (as *ApplicationServer) markEndDeviceAsActivated(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) {
-	ctx = as.FromRequestContext(ctx)
-	devUID := unique.ID(ctx, ids)
-	if _, exists := as.activationTasks.LoadOrStore(devUID, struct{}{}); exists {
+func (as *ApplicationServer) saveActivationStatus(ctx context.Context, item interface{}) {
+	cc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to get Entity Registry peer")
 		return
 	}
+	ids := item.(ttnpb.EndDeviceIdentifiers)
 	now := time.Now().UTC()
 	mask := []string{"activated_at"}
-	f := func(ctx context.Context) error {
-		defer as.activationTasks.Delete(devUID)
-		cc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
-		if err != nil {
-			return err
-		}
-		_, err = ttnpb.NewEndDeviceRegistryClient(cc).Update(ctx, &ttnpb.UpdateEndDeviceRequest{
-			EndDevice: ttnpb.EndDevice{
-				EndDeviceIdentifiers: ids,
-				ActivatedAt:          ttnpb.ProtoTimePtr(now),
-			},
-			FieldMask: &pbtypes.FieldMask{
-				Paths: mask,
-			},
-		}, as.WithClusterAuth())
-		if err != nil {
-			return err
-		}
-		_, err = as.deviceRegistry.Set(ctx, ids, mask,
-			func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-				if dev == nil {
-					return nil, nil, errDeviceNotFound.WithAttributes("device_uid", devUID)
-				}
-				dev.ActivatedAt = ttnpb.ProtoTimePtr(now)
-				return dev, mask, nil
-			},
-		)
-		return err
+	_, err = ttnpb.NewEndDeviceRegistryClient(cc).Update(ctx, &ttnpb.UpdateEndDeviceRequest{
+		EndDevice: ttnpb.EndDevice{
+			EndDeviceIdentifiers: ids,
+			ActivatedAt:          ttnpb.ProtoTimePtr(now),
+		},
+		FieldMask: &pbtypes.FieldMask{
+			Paths: mask,
+		},
+	}, as.WithClusterAuth())
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to set end device activation status in Entity Registry")
+		return
 	}
-	as.StartTask(&task.Config{
-		Context: ctx,
-		ID:      fmt.Sprintf("mark_%s_activated", devUID),
-		Func:    f,
-		Restart: task.RestartNever,
-		Backoff: task.DefaultBackoffConfig,
-	})
+	if _, err = as.deviceRegistry.Set(ctx, ids, mask,
+		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			if dev == nil {
+				return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
+			}
+			dev.ActivatedAt = ttnpb.ProtoTimePtr(now)
+			return dev, mask, nil
+		},
+	); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to set end device activation status in local registry")
+		return
+	}
 }
 
 func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) error {
@@ -1028,7 +1021,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 	}
 
 	if dev.ActivatedAt == nil {
-		as.markEndDeviceAsActivated(ctx, ids)
+		as.activationPool.Publish(ctx, ids)
 	}
 
 	return nil
