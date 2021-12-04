@@ -2537,15 +2537,6 @@
       "file": "applicationserver.go"
     }
   },
-  "error:pkg/applicationserver:circuit_breaker_open": {
-    "translations": {
-      "en": "circuit breaker open"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "device_fetcher.go"
-    }
-  },
   "error:pkg/applicationserver:device_not_found": {
     "translations": {
       "en": "device `{device_uid}` not found"
@@ -2580,24 +2571,6 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "grpc_deviceregistry.go"
-    }
-  },
-  "error:pkg/applicationserver:invalid_threshold": {
-    "translations": {
-      "en": "invalid threshold `{threshold}`"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "config.go"
-    }
-  },
-  "error:pkg/applicationserver:invalid_ttl": {
-    "translations": {
-      "en": "invalid TTL `{ttl}`"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "config.go"
     }
   },
   "error:pkg/applicationserver:join_server_unavailable": {

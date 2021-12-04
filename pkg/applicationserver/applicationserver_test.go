@@ -307,9 +307,6 @@ func TestApplicationServer(t *testing.T) {
 		PubSub: applicationserver.PubSubConfig{
 			Registry: pubsubRegistry,
 		},
-		EndDeviceFetcher: applicationserver.EndDeviceFetcherConfig{
-			Fetcher: &noopEndDeviceFetcher{},
-		},
 		Distribution: applicationserver.DistributionConfig{
 			Global: applicationserver.GlobalDistributorConfig{
 				PubSub: distribPubSub,
@@ -2352,9 +2349,6 @@ func TestSkipPayloadCrypto(t *testing.T) {
 			Registry: applicationUpsRegistry,
 			Limit:    16,
 		},
-		EndDeviceFetcher: applicationserver.EndDeviceFetcherConfig{
-			Fetcher: &noopEndDeviceFetcher{},
-		},
 		Distribution: applicationserver.DistributionConfig{
 			Global: applicationserver.GlobalDistributorConfig{
 				PubSub: distribPubSub,
@@ -2847,9 +2841,6 @@ func TestLocationFromPayload(t *testing.T) {
 		UplinkStorage: applicationserver.UplinkStorageConfig{
 			Registry: applicationUpsRegistry,
 			Limit:    16,
-		},
-		EndDeviceFetcher: applicationserver.EndDeviceFetcherConfig{
-			Fetcher: &noopEndDeviceFetcher{},
 		},
 		Distribution: applicationserver.DistributionConfig{
 			Global: applicationserver.GlobalDistributorConfig{
