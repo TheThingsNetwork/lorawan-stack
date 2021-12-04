@@ -18,7 +18,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/bluele/gcache"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/distribution"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
@@ -45,7 +44,6 @@ type InteropConfig struct {
 
 // EndDeviceFetcherConfig represents configuration for the end device fetcher in Application Server.
 type EndDeviceFetcherConfig struct {
-	Fetcher        EndDeviceFetcher                     `name:"-"`
 	Timeout        time.Duration                        `name:"timeout" description:"Timeout of the end device retrival operation"`
 	Cache          EndDeviceFetcherCacheConfig          `name:"cache" description:"Cache configuration options for the end device fetcher"`
 	CircuitBreaker EndDeviceFetcherCircuitBreakerConfig `name:"circuit-breaker" description:"Circuit breaker options for the end device fetcher"`
@@ -248,39 +246,4 @@ func (c ApplicationPackagesConfig) NewApplicationPackages(ctx context.Context, s
 	handlers[loracloudgeolocationv3.PackageName] = loracloudgeolocationv3.New(server, c.Registry)
 
 	return packages.New(ctx, server, c.Registry, handlers, c.Workers, c.Timeout)
-}
-
-var (
-	errInvalidTTL       = errors.DefineInvalidArgument("invalid_ttl", "invalid TTL `{ttl}`")
-	errInvalidThreshold = errors.DefineInvalidArgument("invalid_threshold", "invalid threshold `{threshold}`")
-)
-
-// NewFetcher creates an EndDeviceFetcher from config.
-func (c EndDeviceFetcherConfig) NewFetcher(comp *component.Component) (EndDeviceFetcher, error) {
-	fetcher := NewRegistryEndDeviceFetcher(comp)
-	if c.Timeout != 0 {
-		fetcher = NewTimeoutEndDeviceFetcher(fetcher, c.Timeout)
-	}
-	if c.CircuitBreaker.Enable {
-		if c.CircuitBreaker.Threshold <= 0 {
-			return nil, errInvalidThreshold.WithAttributes("threshold", c.CircuitBreaker.Threshold)
-		}
-		fetcher = NewCircuitBreakerEndDeviceFetcher(fetcher, uint64(c.CircuitBreaker.Threshold), c.CircuitBreaker.Timeout)
-	}
-	if c.Cache.Enable {
-		if c.Cache.TTL <= 0 {
-			return nil, errInvalidTTL.WithAttributes("ttl", c.Cache.TTL)
-		}
-		var builder *gcache.CacheBuilder
-		if c.Cache.Size > 0 {
-			builder = gcache.New(c.Cache.Size).LFU()
-		} else {
-			builder = gcache.New(-1)
-		}
-		builder = builder.Expiration(c.Cache.TTL)
-		fetcher = NewCachedEndDeviceFetcher(fetcher, builder.Build())
-	}
-	fetcher = NewSingleFlightEndDeviceFetcher(fetcher)
-
-	return fetcher, nil
 }

@@ -83,8 +83,6 @@ type ApplicationServer struct {
 	interopClient InteropClient
 	interopID     string
 
-	endDeviceFetcher EndDeviceFetcher
-
 	activationPool workerpool.WorkerPool
 	processingPool workerpool.WorkerPool
 }
@@ -148,9 +146,8 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 			conf.Distribution.Local.Broadcast.SubscriptionOptions(),
 			conf.Distribution.Local.Individual.SubscriptionOptions(),
 		),
-		interopClient:    interopCl,
-		interopID:        conf.Interop.ID,
-		endDeviceFetcher: conf.EndDeviceFetcher.Fetcher,
+		interopClient: interopCl,
+		interopID:     conf.Interop.ID,
 	}
 	as.activationPool = workerpool.NewWorkerPool(workerpool.Config{
 		Component: c,
@@ -166,17 +163,12 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 	})
 	as.formatters[ttnpb.PayloadFormatter_FORMATTER_REPOSITORY] = devicerepository.New(as.formatters, as)
 
-	if as.endDeviceFetcher == nil {
-		as.endDeviceFetcher = &NoopEndDeviceFetcher{}
-	}
-
 	as.grpc.asDevices = asEndDeviceRegistryServer{
 		AS:       as,
 		kekLabel: conf.DeviceKEKLabel,
 	}
 	as.grpc.appAs = iogrpc.New(as,
 		iogrpc.WithMQTTConfigProvider(as),
-		iogrpc.WithEndDeviceFetcher(as.endDeviceFetcher),
 		iogrpc.WithPayloadProcessor(as.formatters),
 		iogrpc.WithSkipPayloadCrypto(func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (bool, error) {
 			link, err := as.getLink(ctx, ids.ApplicationIds, []string{"skip_payload_crypto"})
@@ -1007,13 +999,6 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		uplink.VersionIds = dev.VersionIds
 	}
 
-	isDev, err := as.endDeviceFetcher.Get(ctx, ids, "locations")
-	if err != nil {
-		log.FromContext(ctx).WithError(err).Warn("Failed to retrieve end device locations")
-	} else {
-		uplink.Locations = isDev.GetLocations()
-	}
-
 	loc := as.locationFromDecodedPayload(uplink)
 	if loc != nil {
 		if uplink.Locations == nil {
@@ -1052,13 +1037,6 @@ func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, ids ttnp
 	)
 	if err != nil {
 		return err
-	}
-
-	isDev, err := as.endDeviceFetcher.Get(ctx, ids, "locations")
-	if err != nil {
-		log.FromContext(ctx).WithError(err).Warn("Failed to retrieve end device locations")
-	} else {
-		uplink.Locations = isDev.GetLocations()
 	}
 
 	return as.decodeUplink(ctx, dev, uplink, link.DefaultFormatters)
