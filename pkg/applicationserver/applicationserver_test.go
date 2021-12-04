@@ -41,6 +41,7 @@ import (
 	iopubsubredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
 	iowebredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/metadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -310,6 +311,11 @@ func TestApplicationServer(t *testing.T) {
 		Distribution: applicationserver.DistributionConfig{
 			Global: applicationserver.GlobalDistributorConfig{
 				PubSub: distribPubSub,
+			},
+		},
+		EndDeviceMetadataStorage: applicationserver.EndDeviceMetadataStorageConfig{
+			Location: applicationserver.EndDeviceLocationStorageConfig{
+				Registry: metadata.NewNoopEndDeviceLocationRegistry(),
 			},
 		},
 	}
@@ -2354,6 +2360,11 @@ func TestSkipPayloadCrypto(t *testing.T) {
 				PubSub: distribPubSub,
 			},
 		},
+		EndDeviceMetadataStorage: applicationserver.EndDeviceMetadataStorageConfig{
+			Location: applicationserver.EndDeviceLocationStorageConfig{
+				Registry: metadata.NewNoopEndDeviceLocationRegistry(),
+			},
+		},
 	}
 	as, err := applicationserver.New(c, config)
 	if !a.So(err, should.BeNil) {
@@ -2845,6 +2856,11 @@ func TestLocationFromPayload(t *testing.T) {
 		Distribution: applicationserver.DistributionConfig{
 			Global: applicationserver.GlobalDistributorConfig{
 				PubSub: distribPubSub,
+			},
+		},
+		EndDeviceMetadataStorage: applicationserver.EndDeviceMetadataStorageConfig{
+			Location: applicationserver.EndDeviceLocationStorageConfig{
+				Registry: metadata.NewClusterEndDeviceLocationRegistry(c, (1<<4)*Timeout),
 			},
 		},
 	}

@@ -25,6 +25,7 @@ import (
 	loracloudgeolocationv3 "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/metadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -63,6 +64,27 @@ type EndDeviceFetcherCircuitBreakerConfig struct {
 	Threshold int           `name:"threshold" description:"Number of failed fetching attempts after which the circuit breaker opens"`
 }
 
+// EndDeviceMetadataStorageConfig represents the configuration of end device metadata operations.
+type EndDeviceMetadataStorageConfig struct {
+	Location EndDeviceLocationStorageConfig `name:"location"`
+}
+
+// EndDeviceLocationStorageConfig represents the configuration of end device locations storage.
+type EndDeviceLocationStorageConfig struct {
+	Registry metadata.EndDeviceLocationRegistry  `name:"-"`
+	Timeout  time.Duration                       `name:"timeout" description:"Timeout of the end device retrival operation"`
+	Cache    EndDeviceLocationStorageCacheConfig `name:"cache"`
+}
+
+// EndDeviceLocationStorageCacheConfig represents the configuration of end device location registry caching.
+type EndDeviceLocationStorageCacheConfig struct {
+	Cache    metadata.EndDeviceLocationCache `name:"-"`
+	Enable   bool                            `name:"enable" description:"Enable caching of end device locations"`
+	HardTTL  time.Duration                   `name:"hard-ttl" description:"Hard time to live of cached locations"`
+	SoftTTL  time.Duration                   `name:"soft-ttl" description:"Soft time to live of cached locations"`
+	ErrorTTL time.Duration                   `name:"error-ttl" description:"Time to live of location retrieval errors"`
+}
+
 // FormattersConfig represents the configuration for payload formatters.
 type FormattersConfig struct {
 	MaxParameterLength int `name:"max-parameter-length" description:"Maximum allowed size for length of formatter parameters (payload formatter scripts)"`
@@ -70,19 +92,20 @@ type FormattersConfig struct {
 
 // Config represents the ApplicationServer configuration.
 type Config struct {
-	LinkMode         string                    `name:"link-mode" description:"Deprecated - mode to link applications to their Network Server (all, explicit)"`
-	Devices          DeviceRegistry            `name:"-"`
-	Links            LinkRegistry              `name:"-"`
-	UplinkStorage    UplinkStorageConfig       `name:"uplink-storage" description:"Application uplinks storage configuration"`
-	Formatters       FormattersConfig          `name:"formatters" description:"Payload formatters configuration"`
-	Distribution     DistributionConfig        `name:"distribution" description:"Distribution configuration"`
-	EndDeviceFetcher EndDeviceFetcherConfig    `name:"fetcher" description:"End Device fetcher configuration"`
-	MQTT             config.MQTT               `name:"mqtt" description:"MQTT configuration"`
-	Webhooks         WebhooksConfig            `name:"webhooks" description:"Webhooks configuration"`
-	PubSub           PubSubConfig              `name:"pubsub" description:"Pub/sub messaging configuration"`
-	Packages         ApplicationPackagesConfig `name:"packages" description:"Application packages configuration"`
-	Interop          InteropConfig             `name:"interop" description:"Interop client configuration"`
-	DeviceKEKLabel   string                    `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
+	LinkMode                 string                         `name:"link-mode" description:"Deprecated - mode to link applications to their Network Server (all, explicit)"`
+	Devices                  DeviceRegistry                 `name:"-"`
+	Links                    LinkRegistry                   `name:"-"`
+	UplinkStorage            UplinkStorageConfig            `name:"uplink-storage" description:"Application uplinks storage configuration"`
+	Formatters               FormattersConfig               `name:"formatters" description:"Payload formatters configuration"`
+	Distribution             DistributionConfig             `name:"distribution" description:"Distribution configuration"`
+	EndDeviceFetcher         EndDeviceFetcherConfig         `name:"fetcher" description:"Deprecated - End Device fetcher configuration"`
+	EndDeviceMetadataStorage EndDeviceMetadataStorageConfig `name:"end-device-metadata-storage" description:"End device metadata storage configuration"`
+	MQTT                     config.MQTT                    `name:"mqtt" description:"MQTT configuration"`
+	Webhooks                 WebhooksConfig                 `name:"webhooks" description:"Webhooks configuration"`
+	PubSub                   PubSubConfig                   `name:"pubsub" description:"Pub/sub messaging configuration"`
+	Packages                 ApplicationPackagesConfig      `name:"packages" description:"Application packages configuration"`
+	Interop                  InteropConfig                  `name:"interop" description:"Interop client configuration"`
+	DeviceKEKLabel           string                         `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
 }
 
 func (c Config) toProto() *ttnpb.AsConfiguration {
@@ -246,4 +269,28 @@ func (c ApplicationPackagesConfig) NewApplicationPackages(ctx context.Context, s
 	handlers[loracloudgeolocationv3.PackageName] = loracloudgeolocationv3.New(server, c.Registry)
 
 	return packages.New(ctx, server, c.Registry, handlers, c.Workers, c.Timeout)
+}
+
+var (
+	errInvalidTimeout = errors.DefineInvalidArgument("invalid_timeout", "invalid timeout `{timeout}`")
+	errInvalidTTL     = errors.DefineInvalidArgument("invalid_ttl", "invalid TTL `{ttl}`")
+)
+
+// NewRegistry returns a new end device location registry based on the configuration.
+func (c EndDeviceLocationStorageConfig) NewRegistry(ctx context.Context, comp *component.Component) (metadata.EndDeviceLocationRegistry, error) {
+	if c.Timeout <= 0 {
+		return nil, errInvalidTimeout.WithAttributes("timeout", c.Timeout)
+	}
+	registry := metadata.NewClusterEndDeviceLocationRegistry(comp, c.Timeout)
+	registry = metadata.NewMetricsEndDeviceLocationRegistry(registry)
+	if c.Cache.Enable {
+		for _, ttl := range []time.Duration{c.Cache.SoftTTL, c.Cache.HardTTL, c.Cache.ErrorTTL} {
+			if ttl <= 0 {
+				return nil, errInvalidTTL.WithAttributes("ttl", ttl)
+			}
+		}
+		cache := metadata.NewMetricsEndDeviceLocationCache(c.Cache.Cache)
+		registry = metadata.NewCachedEndDeviceLocationRegistry(ctx, comp, registry, cache, c.Cache.SoftTTL, c.Cache.HardTTL, c.Cache.ErrorTTL)
+	}
+	return registry, nil
 }

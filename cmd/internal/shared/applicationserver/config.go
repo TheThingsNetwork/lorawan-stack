@@ -51,6 +51,17 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 	UplinkStorage: applicationserver.UplinkStorageConfig{
 		Limit: 16,
 	},
+	EndDeviceMetadataStorage: applicationserver.EndDeviceMetadataStorageConfig{
+		Location: applicationserver.EndDeviceLocationStorageConfig{
+			Timeout: 5 * time.Second,
+			Cache: applicationserver.EndDeviceLocationStorageCacheConfig{
+				Enable:   true,
+				SoftTTL:  2 * time.Hour,
+				HardTTL:  24 * time.Hour,
+				ErrorTTL: 30 * time.Minute,
+			},
+		},
+	},
 	Distribution: applicationserver.DistributionConfig{
 		Timeout: time.Minute,
 		Local: applicationserver.LocalDistributorConfig{
