@@ -438,7 +438,7 @@ func TestSimulateUplink(t *testing.T) {
 
 	as := mock.NewServer(c)
 	f := &mockFetcher{}
-	srv := New(as, WithEndDeviceFetcher(f))
+	srv := New(as, WithGetEndDeviceIdentifiers(f.Get))
 	c.RegisterGRPC(&mockRegisterer{ctx, srv})
 	componenttest.StartComponent(t, c)
 	defer c.Close()
@@ -484,9 +484,7 @@ func TestSimulateUplink(t *testing.T) {
 				},
 			},
 			setup: func(f *mockFetcher) {
-				f.dev = &ttnpb.EndDevice{
-					EndDeviceIdentifiers: registeredDeviceID,
-				}
+				f.ids = &registeredDeviceID
 				f.err = nil
 			},
 			expectIdentifiers: registeredDeviceID,
@@ -503,7 +501,7 @@ func TestSimulateUplink(t *testing.T) {
 				},
 			},
 			setup: func(f *mockFetcher) {
-				f.dev = nil
+				f.ids = nil
 				f.err = fmt.Errorf("mock error")
 			},
 			expectIdentifiers: ttnpb.EndDeviceIdentifiers{
@@ -524,8 +522,7 @@ func TestSimulateUplink(t *testing.T) {
 				if err := up.error; err != nil {
 					t.Fatalf("Received unexpected error: %s\n", err)
 				}
-				a.So(f.calledWithIdentifers, should.Resemble, tc.up.EndDeviceIds)
-				a.So(f.calledWithPaths, should.Resemble, []string{"ids"})
+				a.So(f.calledWithIdentifiers, should.Resemble, tc.up.EndDeviceIds)
 				a.So(up.EndDeviceIds, should.Resemble, tc.expectIdentifiers)
 			case <-time.After(timeout):
 				t.Fatal("Timed out waiting for simulated uplink")

@@ -169,6 +169,13 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 	}
 	as.grpc.appAs = iogrpc.New(as,
 		iogrpc.WithMQTTConfigProvider(as),
+		iogrpc.WithGetEndDeviceIdentifiers(func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDeviceIdentifiers, error) {
+			dev, err := as.deviceRegistry.Get(ctx, ids, []string{"ids"})
+			if err != nil {
+				return nil, err
+			}
+			return &dev.EndDeviceIdentifiers, nil
+		}),
 		iogrpc.WithPayloadProcessor(as.formatters),
 		iogrpc.WithSkipPayloadCrypto(func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (bool, error) {
 			link, err := as.getLink(ctx, ids.ApplicationIds, []string{"skip_payload_crypto"})
