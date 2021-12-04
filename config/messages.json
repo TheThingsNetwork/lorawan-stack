@@ -2492,6 +2492,24 @@
       "file": "io.go"
     }
   },
+  "error:pkg/applicationserver/metadata/redis:cache_miss": {
+    "translations": {
+      "en": "cache miss"
+    },
+    "description": {
+      "package": "pkg/applicationserver/metadata/redis",
+      "file": "location_cache.go"
+    }
+  },
+  "error:pkg/applicationserver/metadata:registry": {
+    "translations": {
+      "en": "registry unavailable"
+    },
+    "description": {
+      "package": "pkg/applicationserver/metadata",
+      "file": "location_registry.go"
+    }
+  },
   "error:pkg/applicationserver/redis:application_uid": {
     "translations": {
       "en": "invalid application UID `{application_uid}`"
@@ -2580,6 +2598,24 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "grpc_deviceregistry.go"
+    }
+  },
+  "error:pkg/applicationserver:invalid_timeout": {
+    "translations": {
+      "en": "invalid timeout `{timeout}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "config.go"
+    }
+  },
+  "error:pkg/applicationserver:invalid_ttl": {
+    "translations": {
+      "en": "invalid TTL `{ttl}`"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "config.go"
     }
   },
   "error:pkg/applicationserver:join_server_unavailable": {

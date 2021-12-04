@@ -33,6 +33,7 @@ import (
 	_ "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider/mqtt" // The MQTT integration provider
 	_ "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider/nats" // The NATS integration provider
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/metadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -66,6 +67,7 @@ type ApplicationServer struct {
 	linkRegistry     LinkRegistry
 	deviceRegistry   DeviceRegistry
 	appUpsRegistry   ApplicationUplinkRegistry
+	locationRegistry metadata.EndDeviceLocationRegistry
 	formatters       messageprocessors.MapPayloadProcessor
 	webhooks         web.Webhooks
 	webhookTemplates web.TemplateStore
@@ -122,12 +124,13 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 	}
 
 	as = &ApplicationServer{
-		Component:      c,
-		ctx:            ctx,
-		config:         conf,
-		linkRegistry:   conf.Links,
-		deviceRegistry: wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
-		appUpsRegistry: conf.UplinkStorage.Registry,
+		Component:        c,
+		ctx:              ctx,
+		config:           conf,
+		linkRegistry:     conf.Links,
+		deviceRegistry:   wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
+		appUpsRegistry:   conf.UplinkStorage.Registry,
+		locationRegistry: conf.EndDeviceMetadataStorage.Location.Registry,
 		formatters: messageprocessors.MapPayloadProcessor{
 			ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
 			ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
@@ -1006,10 +1009,16 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		uplink.VersionIds = dev.VersionIds
 	}
 
+	if locations, err := as.locationRegistry.Get(ctx, ids); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to retrieve end device locations")
+	} else {
+		uplink.Locations = locations
+	}
+
 	loc := as.locationFromDecodedPayload(uplink)
 	if loc != nil {
 		if uplink.Locations == nil {
-			uplink.Locations = make(map[string]*ttnpb.Location)
+			uplink.Locations = make(map[string]*ttnpb.Location, 1)
 		}
 		uplink.Locations["frm-payload"] = loc
 		if err := as.Publish(ctx, &ttnpb.ApplicationUp{
@@ -1044,6 +1053,12 @@ func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, ids ttnp
 	)
 	if err != nil {
 		return err
+	}
+
+	if locations, err := as.locationRegistry.Get(ctx, ids); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to retrieve end device locations")
+	} else {
+		uplink.Locations = locations
 	}
 
 	return as.decodeUplink(ctx, dev, uplink, link.DefaultFormatters)
@@ -1169,38 +1184,10 @@ var locationUpdateTimeout = 5 * time.Second
 // handleLocationSolved saves the provided *ttnpb.ApplicationLocation in the Entity Registry as part of the device locations.
 // Locations provided by other services will be maintained.
 func (as *ApplicationServer) handleLocationSolved(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationLocation, link *ttnpb.ApplicationLink) error {
-	fm := &pbtypes.FieldMask{Paths: []string{"locations"}}
-
-	ctx, cancel := context.WithTimeout(ctx, locationUpdateTimeout)
-	defer cancel()
-
-	cc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
-	if err != nil {
-		return err
-	}
-	cl := ttnpb.NewEndDeviceRegistryClient(cc)
-
-	dev, err := cl.Get(ctx, &ttnpb.GetEndDeviceRequest{
-		EndDeviceIdentifiers: ids,
-		FieldMask:            fm,
-	}, as.WithClusterAuth())
-	if err != nil {
-		return err
-	}
-
-	if dev.Locations == nil {
-		dev.Locations = make(map[string]*ttnpb.Location)
-	}
-	dev.Locations[msg.Service] = msg.Location
-
-	_, err = cl.Update(ctx, &ttnpb.UpdateEndDeviceRequest{
-		EndDevice: *dev,
-		FieldMask: fm,
-	}, as.WithClusterAuth())
-	if err != nil {
-		return err
-	}
-	return nil
+	_, err := as.locationRegistry.Merge(ctx, ids, map[string]*ttnpb.Location{
+		msg.Service: msg.Location,
+	})
+	return err
 }
 
 // decryptDownlinkMessage decrypts the downlink message.
