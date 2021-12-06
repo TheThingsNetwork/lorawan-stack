@@ -152,7 +152,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 				pb = &ttnpb.EndDevice{}
 			}
 
-			if pb.ApplicationIds.ApplicationId != ids.ApplicationIds.ApplicationId || pb.DeviceId != ids.DeviceId {
+			if pb.GetApplicationIds().GetApplicationId() != ids.GetApplicationIds().GetApplicationId() || pb.DeviceId != ids.DeviceId {
 				return errInvalidIdentifiers.New()
 			}
 
@@ -177,11 +177,11 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 				if err != nil {
 					return err
 				}
-				if updated.ApplicationIds.ApplicationId != ids.ApplicationIds.ApplicationId || updated.DeviceId != ids.DeviceId {
+				if updated.GetApplicationIds().GetApplicationId() != ids.GetApplicationIds().GetApplicationId() || updated.DeviceId != ids.DeviceId {
 					return errInvalidIdentifiers.New()
 				}
 			} else {
-				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.ApplicationIds.ApplicationId != stored.ApplicationIds.ApplicationId {
+				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.GetApplicationIds().GetApplicationId() != stored.GetApplicationIds().GetApplicationId() {
 					return errReadOnlyField.WithAttributes("field", "ids.application_ids.application_id")
 				}
 				if ttnpb.HasAnyField(sets, "ids.device_id") && pb.DeviceId != stored.DeviceId {

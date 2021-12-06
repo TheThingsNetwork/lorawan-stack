@@ -889,7 +889,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				); err != nil {
 					return errInvalidFieldmask.WithCause(err)
 				}
-				if pb.ApplicationIds.ApplicationId != appID.ApplicationId || pb.DeviceId != devID {
+				if pb.GetApplicationIds().GetApplicationId() != appID.ApplicationId || pb.DeviceId != devID {
 					return errInvalidIdentifiers.New()
 				}
 				if pb.JoinEui != nil && pb.DevEui != nil {
@@ -907,7 +907,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 					p.Set(ctx, ek, uid, 0)
 				}
 			} else {
-				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.ApplicationIds.ApplicationId != stored.ApplicationIds.ApplicationId {
+				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.GetApplicationIds().GetApplicationId() != stored.GetApplicationIds().GetApplicationId() {
 					return errReadOnlyField.WithAttributes("field", "ids.application_ids.application_id")
 				}
 				if ttnpb.HasAnyField(sets, "ids.device_id") && pb.DeviceId != stored.DeviceId {

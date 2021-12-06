@@ -32,7 +32,7 @@ func (ids *EndDeviceIdentifiers) ExtractRequestFields(m map[string]interface{}) 
 	if ids == nil || ids.ApplicationIds == nil {
 		return
 	}
-	m["application_id"] = ids.ApplicationIds.ApplicationId
+	m["application_id"] = ids.GetApplicationIds().GetApplicationId()
 	m["device_id"] = ids.DeviceId
 }
 

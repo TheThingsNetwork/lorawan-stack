@@ -403,7 +403,7 @@ command to assign EUIs to map to end device templates.`,
 				for _, e := range mapping {
 					switch {
 					case e.MappingKey != "" && e.MappingKey == inputEntry.MappingKey:
-					case e.EndDevice.ApplicationIds.ApplicationId != "" && e.EndDevice.ApplicationIds.ApplicationId == inputEntry.EndDevice.ApplicationIds.ApplicationId &&
+					case e.EndDevice.GetApplicationIds().GetApplicationId() != "" && e.EndDevice.GetApplicationIds().GetApplicationId() == inputEntry.EndDevice.GetApplicationIds().GetApplicationId() &&
 						e.EndDevice.DeviceId != "" && e.EndDevice.DeviceId == inputEntry.EndDevice.DeviceId:
 					case e.EndDevice.DevEui != nil && inputEntry.EndDevice.DevEui != nil && e.EndDevice.DevEui.Equal(*inputEntry.EndDevice.DevEui):
 					case e.EndDevice.EndDeviceIdentifiers.IsZero():

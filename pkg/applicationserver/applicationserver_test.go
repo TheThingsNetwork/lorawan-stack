@@ -829,7 +829,7 @@ func TestApplicationServer(t *testing.T) {
 							continue
 						}
 						url := fmt.Sprintf("http://127.0.0.1:8099/api/v3/as/applications/%s/webhooks/%s/devices/%s/down/%s",
-							data.EndDeviceIds.ApplicationIds.ApplicationId, registeredApplicationWebhookID.WebhookId, data.EndDeviceIds.DeviceId, action,
+							data.EndDeviceIds.GetApplicationIds().GetApplicationId(), registeredApplicationWebhookID.WebhookId, data.EndDeviceIds.DeviceId, action,
 						)
 						req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(buf))
 						if err != nil {

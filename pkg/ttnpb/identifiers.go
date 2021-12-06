@@ -47,7 +47,7 @@ func (ids ClientIdentifiers) IsZero() bool {
 // IsZero reports whether ids represent zero identifiers.
 func (ids EndDeviceIdentifiers) IsZero() bool {
 	return ids.GetDeviceId() == "" &&
-		(ids.ApplicationIds == nil || ids.ApplicationIds.ApplicationId == "") &&
+		ids.GetApplicationIds().GetApplicationId() == "" &&
 		(ids.DevAddr == nil || ids.DevAddr.IsZero()) &&
 		(ids.DevEui == nil || ids.DevEui.IsZero()) &&
 		ids.JoinEui == nil
@@ -128,7 +128,7 @@ func (ids EndDeviceIdentifiers) Copy(x *EndDeviceIdentifiers) *EndDeviceIdentifi
 	}
 	if ids.ApplicationIds != nil {
 		x.ApplicationIds = &ApplicationIdentifiers{
-			ApplicationId: ids.ApplicationIds.ApplicationId,
+			ApplicationId: ids.GetApplicationIds().GetApplicationId(),
 		}
 	}
 	if ids.DevEui != nil {

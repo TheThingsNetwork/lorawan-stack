@@ -523,7 +523,7 @@ var (
 			}
 			paths = append(paths, newPaths...)
 
-			if device.ApplicationIds == nil || device.ApplicationIds.ApplicationId == "" {
+			if device.GetApplicationIds().GetApplicationId() == "" {
 				return errNoApplicationID.New()
 			}
 			if device.DeviceId == "" {
@@ -1035,7 +1035,7 @@ This command may take end device identifiers from stdin.`,
 				if _, err := inputDecoder.Decode(&dev); err != nil {
 					return err
 				}
-				if dev.ApplicationIds == nil || dev.ApplicationIds.ApplicationId == "" {
+				if dev.GetApplicationIds().GetApplicationId() == "" {
 					return errNoApplicationID.New()
 				}
 				if dev.DeviceId == "" {
