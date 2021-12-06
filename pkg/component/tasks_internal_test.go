@@ -22,13 +22,14 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-var TestTaskBackoffConfig = &TaskBackoffConfig{
-	Jitter: DefaultTaskBackoffJitter,
-	IntervalFunc: MakeTaskBackoffIntervalFunc(false, 2*test.Delay,
+var TestTaskBackoffConfig = &task.BackoffConfig{
+	Jitter: task.DefaultBackoffJitter,
+	IntervalFunc: task.MakeBackoffIntervalFunc(false, 2*test.Delay,
 		test.Delay,
 		2*test.Delay,
 		3*test.Delay,
@@ -53,7 +54,7 @@ func TestTaskBackoffReset(t *testing.T) {
 		wg           sync.WaitGroup
 	)
 	wg.Add(4)
-	c.RegisterTask(&TaskConfig{
+	c.RegisterTask(&task.Config{
 		Context: ctx,
 		ID:      "failing_but_recovering",
 		Func: func(_ context.Context) error {
@@ -77,7 +78,7 @@ func TestTaskBackoffReset(t *testing.T) {
 			lastCallTime = time.Now()
 			return nil
 		},
-		Restart: TaskRestartAlways,
+		Restart: task.RestartAlways,
 		Backoff: TestTaskBackoffConfig,
 	})
 

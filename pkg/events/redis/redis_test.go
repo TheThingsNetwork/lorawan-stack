@@ -22,12 +22,12 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/internal/eventstest"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/redis"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
@@ -55,7 +55,7 @@ var redisConfig = func() ttnredis.Config {
 
 func Example() {
 	// The task starter is used for automatic re-subscription on failure.
-	taskStarter := component.StartTaskFunc(component.DefaultStartTask)
+	taskStarter := task.StartTaskFunc(task.DefaultStartTask)
 
 	redisPubSub := redis.NewPubSub(context.TODO(), taskStarter, config.RedisEvents{
 		// Config here...
@@ -69,7 +69,7 @@ var timeout = (1 << 11) * test.Delay
 
 func TestRedisPubSub(t *testing.T) {
 	events.IncludeCaller = true
-	taskStarter := component.StartTaskFunc(component.DefaultStartTask)
+	taskStarter := task.StartTaskFunc(task.DefaultStartTask)
 
 	test.RunTest(t, test.TestConfig{
 		Timeout: timeout,
@@ -89,7 +89,7 @@ func TestRedisPubSub(t *testing.T) {
 
 func TestRedisPubSubStore(t *testing.T) {
 	events.IncludeCaller = true
-	taskStarter := component.StartTaskFunc(component.DefaultStartTask)
+	taskStarter := task.StartTaskFunc(task.DefaultStartTask)
 
 	test.RunTest(t, test.TestConfig{
 		Timeout: timeout,

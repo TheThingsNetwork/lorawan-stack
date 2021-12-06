@@ -39,6 +39,7 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -1897,14 +1898,14 @@ func DownlinkProtoPaths(paths ...DownlinkPath) (pbs []*ttnpb.DownlinkPath) {
 	return pbs
 }
 
-func StartTaskExclude(names ...string) component.StartTaskFunc {
-	return func(conf *component.TaskConfig) {
+func StartTaskExclude(names ...string) task.StartTaskFunc {
+	return func(conf *task.Config) {
 		for _, name := range names {
 			if strings.HasPrefix(conf.ID, name) {
 				return
 			}
 		}
-		component.DefaultStartTask(conf)
+		task.DefaultStartTask(conf)
 	}
 }
 
@@ -1912,7 +1913,7 @@ type TestConfig struct {
 	NetworkServer        Config
 	NetworkServerOptions []Option
 	Component            component.Config
-	TaskStarter          component.TaskStarter
+	TaskStarter          task.Starter
 }
 
 func StartTest(ctx context.Context, conf TestConfig) (*NetworkServer, context.Context, TestEnvironment, func()) {

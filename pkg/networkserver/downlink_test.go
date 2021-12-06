@@ -28,7 +28,6 @@ import (
 	"github.com/oklog/ulid/v2"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -38,6 +37,7 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -2537,9 +2537,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				errCh := make(chan error, 1)
 				_, ctx, env, stop := StartTest(ctx, TestConfig{
 					NetworkServer: DefaultConfig,
-					TaskStarter: component.StartTaskFunc(func(conf *component.TaskConfig) {
+					TaskStarter: task.StartTaskFunc(func(conf *task.Config) {
 						if !strings.HasPrefix(conf.ID, DownlinkProcessTaskName) {
-							component.DefaultStartTask(conf)
+							task.DefaultStartTask(conf)
 							return
 						}
 						go func() {

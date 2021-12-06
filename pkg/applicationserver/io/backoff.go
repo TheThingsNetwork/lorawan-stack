@@ -18,12 +18,12 @@ import (
 	"context"
 	"time"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 )
 
 var (
-	dialTaskBackoffIntervals = append(component.DialTaskBackoffIntervals[:],
+	dialTaskBackoffIntervals = append(task.DialBackoffIntervals[:],
 		time.Minute,
 	)
 	dialTaskExtendedBackoffIntervals = append(dialTaskBackoffIntervals[:],
@@ -33,8 +33,8 @@ var (
 	)
 	// DialTaskBackoffConfig derives the component.DialTaskBackoffConfig and dynamically determines the backoff duration
 	// based on recent error codes.
-	DialTaskBackoffConfig = &component.TaskBackoffConfig{
-		Jitter: component.DefaultTaskBackoffJitter,
+	DialTaskBackoffConfig = &task.BackoffConfig{
+		Jitter: task.DefaultBackoffJitter,
 		IntervalFunc: func(ctx context.Context, executionDuration time.Duration, invocation uint, err error) time.Duration {
 			intervals := dialTaskBackoffIntervals
 			switch {
@@ -48,7 +48,7 @@ var (
 				intervals = dialTaskExtendedBackoffIntervals
 			}
 			switch {
-			case executionDuration > component.DefaultTaskBackoffResetDuration:
+			case executionDuration > task.DefaultBackoffResetDuration:
 				return intervals[0]
 			case invocation >= uint(len(intervals)):
 				return intervals[len(intervals)-1]

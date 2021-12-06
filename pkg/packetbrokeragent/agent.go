@@ -33,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -319,13 +320,13 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		a.grpc.nsPba = &disabledServer{}
 	}
 
-	newTaskConfig := func(id string, fn component.TaskFunc) *component.TaskConfig {
-		return &component.TaskConfig{
+	newTaskConfig := func(id string, fn task.Func) *task.Config {
+		return &task.Config{
 			Context: ctx,
 			ID:      id,
 			Func:    fn,
-			Restart: component.TaskRestartOnFailure,
-			Backoff: component.DialTaskBackoffConfig,
+			Restart: task.RestartOnFailure,
+			Backoff: task.DialBackoffConfig,
 		}
 	}
 	if a.forwarderConfig.Enable && a.dataPlaneAddress != "" {
@@ -492,13 +493,13 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 	defer wg.Wait()
 	for i := 0; i < subscribeStreamCount; i++ {
 		wg.Add(1)
-		a.StartTask(&component.TaskConfig{
+		a.StartTask(&task.Config{
 			Context: ctx,
 			ID:      "pb_forwarder_subscribe_stream",
 			Func:    a.subscribeDownlinkStream(client, downlinkPool),
 			Done:    wg.Done,
-			Restart: component.TaskRestartOnFailure,
-			Backoff: component.DialTaskBackoffConfig,
+			Restart: task.RestartOnFailure,
+			Backoff: task.DialBackoffConfig,
 		})
 	}
 
@@ -805,13 +806,13 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 	defer wg.Wait()
 	for i := 0; i < subscribeStreamCount; i++ {
 		wg.Add(1)
-		a.StartTask(&component.TaskConfig{
+		a.StartTask(&task.Config{
 			Context: ctx,
 			ID:      "pb_homenetwork_subscribe_stream",
 			Func:    a.subscribeUplinkStream(client, uplinkPool, filters),
 			Done:    wg.Done,
-			Restart: component.TaskRestartOnFailure,
-			Backoff: component.DialTaskBackoffConfig,
+			Restart: task.RestartOnFailure,
+			Backoff: task.DialBackoffConfig,
 		})
 	}
 

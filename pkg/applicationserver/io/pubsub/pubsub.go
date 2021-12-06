@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"gocloud.dev/pubsub"
@@ -56,12 +57,12 @@ func New(c *component.Component, server io.Server, registry Registry, providerSt
 
 		providerStatuses: providerStatuses,
 	}
-	ps.RegisterTask(&component.TaskConfig{
+	ps.RegisterTask(&task.Config{
 		Context: ctx,
 		ID:      "pubsubs_start_all",
 		Func:    ps.startAll,
-		Restart: component.TaskRestartOnFailure,
-		Backoff: component.DefaultTaskBackoffConfig,
+		Restart: task.RestartOnFailure,
+		Backoff: task.DefaultBackoffConfig,
 	})
 	return ps, nil
 }
@@ -80,7 +81,7 @@ func (ps *PubSub) startTask(ctx context.Context, ids *ttnpb.ApplicationPubSubIde
 		"application_uid", unique.ID(ctx, ids.ApplicationIds),
 		"pub_sub_id", ids.PubSubId,
 	))
-	ps.StartTask(&component.TaskConfig{
+	ps.StartTask(&task.Config{
 		Context: ctx,
 		ID:      "pubsub",
 		Func: func(ctx context.Context) error {
@@ -99,7 +100,7 @@ func (ps *PubSub) startTask(ctx context.Context, ids *ttnpb.ApplicationPubSubIde
 
 			return ps.start(ctx, target)
 		},
-		Restart: component.TaskRestartOnFailure,
+		Restart: task.RestartOnFailure,
 		Backoff: io.DialTaskBackoffConfig,
 	})
 }

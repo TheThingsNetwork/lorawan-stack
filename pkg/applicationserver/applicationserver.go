@@ -47,6 +47,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/devicerepository"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/javascript"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -202,7 +203,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 			if endpoint.Address() == "" {
 				continue
 			}
-			as.RegisterTask(&component.TaskConfig{
+			as.RegisterTask(&task.Config{
 				Context: as.Context(),
 				ID:      fmt.Sprintf("serve_mqtt/%s", endpoint.Address()),
 				Func: func(ctx context.Context) error {
@@ -220,8 +221,8 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 					defer lis.Close()
 					return mqtt.Serve(ctx, as, lis, version.Format, endpoint.Protocol())
 				},
-				Restart: component.TaskRestartOnFailure,
-				Backoff: component.DefaultTaskBackoffConfig,
+				Restart: task.RestartOnFailure,
+				Backoff: task.DefaultBackoffConfig,
 			})
 		}
 	}
@@ -939,12 +940,12 @@ func (as *ApplicationServer) markEndDeviceAsActivated(ctx context.Context, ids t
 		)
 		return err
 	}
-	as.StartTask(&component.TaskConfig{
+	as.StartTask(&task.Config{
 		Context: ctx,
 		ID:      fmt.Sprintf("mark_%s_activated", devUID),
 		Func:    f,
-		Restart: component.TaskRestartNever,
-		Backoff: component.DefaultTaskBackoffConfig,
+		Restart: task.RestartNever,
+		Backoff: task.DefaultBackoffConfig,
 	})
 }
 

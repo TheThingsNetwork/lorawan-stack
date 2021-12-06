@@ -22,17 +22,17 @@ import (
 	"sync"
 
 	"github.com/gogo/protobuf/proto"
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/basic"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"gocloud.dev/pubsub"
 )
 
 // NewPubSub creates a new PubSub that publishes and subscribes to Go Cloud.
 // If the subURL is an empty string, this PubSub will only publish to Go Cloud.
-func NewPubSub(ctx context.Context, taskStarter component.TaskStarter, pubURL, subURL string) (*PubSub, error) {
+func NewPubSub(ctx context.Context, taskStarter task.Starter, pubURL, subURL string) (*PubSub, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "events/cloud")
 	ctx, cancel := context.WithCancel(ctx)
 	ps := &PubSub{
@@ -55,7 +55,7 @@ func NewPubSub(ctx context.Context, taskStarter component.TaskStarter, pubURL, s
 type PubSub struct {
 	events.PubSub
 
-	taskStarter component.TaskStarter
+	taskStarter task.Starter
 	ctx         context.Context
 	cancel      context.CancelFunc
 	contentType string
@@ -130,12 +130,12 @@ func (ps *PubSub) subscribeTask(ctx context.Context) error {
 // Subscribe to events from Go Cloud.
 func (ps *PubSub) Subscribe(ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, hdl events.Handler) error {
 	ps.subOnce.Do(func() {
-		ps.taskStarter.StartTask(&component.TaskConfig{
+		ps.taskStarter.StartTask(&task.Config{
 			Context: ps.ctx,
 			ID:      "events_cloud_subscribe",
 			Func:    ps.subscribeTask,
-			Restart: component.TaskRestartOnFailure,
-			Backoff: component.DefaultTaskBackoffConfig,
+			Restart: task.RestartOnFailure,
+			Backoff: task.DefaultBackoffConfig,
 		})
 	})
 	return ps.PubSub.Subscribe(ctx, names, ids, hdl)

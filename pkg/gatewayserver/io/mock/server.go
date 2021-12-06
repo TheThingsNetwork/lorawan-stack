@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -132,8 +133,8 @@ func (s *server) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifie
 }
 
 // StartTask implements io.Server.
-func (s *server) StartTask(cfg *component.TaskConfig) {
-	component.DefaultStartTask(cfg)
+func (s *server) StartTask(cfg *task.Config) {
+	task.DefaultStartTask(cfg)
 }
 
 func (s *server) HasDownlinkClaim(ctx context.Context, ids ttnpb.GatewayIdentifiers) bool {

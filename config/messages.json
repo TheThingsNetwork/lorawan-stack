@@ -3149,15 +3149,6 @@
       "file": "listeners.go"
     }
   },
-  "error:pkg/component:task_recovered": {
-    "translations": {
-      "en": "task recovered"
-    },
-    "description": {
-      "package": "pkg/component",
-      "file": "tasks.go"
-    }
-  },
   "error:pkg/config/tlsconfig:acme_already_initialized": {
     "translations": {
       "en": "ACME already initialized"
@@ -7944,6 +7935,15 @@
     "description": {
       "package": "pkg/scripting/javascript",
       "file": "javascript.go"
+    }
+  },
+  "error:pkg/task:task_recovered": {
+    "translations": {
+      "en": "task recovered"
+    },
+    "description": {
+      "package": "pkg/task",
+      "file": "task.go"
     }
   },
   "error:pkg/toa:bandwidth": {
