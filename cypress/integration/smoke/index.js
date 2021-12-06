@@ -24,9 +24,9 @@ import authorizationTests from './authorization'
 import profileSettingsTests from './profile-settings'
 
 export default [
-  ...checkCollapsingFields,
   ...registrationTests,
   ...applicationTests,
+  ...checkCollapsingFields,
   ...featureToggleTests,
   ...gatewayTests,
   ...organizationTests,
