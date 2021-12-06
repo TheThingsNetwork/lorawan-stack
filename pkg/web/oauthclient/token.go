@@ -15,7 +15,6 @@
 package oauthclient
 
 import (
-	"encoding/json"
 	stderrors "errors"
 	"net/http"
 	"time"
@@ -83,15 +82,11 @@ func (oc *OAuthClient) HandleToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(struct {
+	webhandlers.JSON(w, r, struct {
 		AccessToken string    `json:"access_token"`
 		Expiry      time.Time `json:"expiry"`
 	}{
 		AccessToken: token.AccessToken,
 		Expiry:      token.Expiry,
-	}); err != nil {
-		webhandlers.Error(w, r, err)
-		return
-	}
+	})
 }

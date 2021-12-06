@@ -56,21 +56,13 @@ func (s *server) CurrentUser(w http.ResponseWriter, r *http.Request) {
 		webhandlers.Error(w, r, err)
 		return
 	}
-	b, err := json.Marshal(struct {
+	webhandlers.JSON(w, r, struct {
 		User       json.RawMessage `json:"user"`
 		LoggedInAt *time.Time      `json:"logged_in_at"`
 	}{
 		User:       userJSON,
 		LoggedInAt: ttnpb.StdTime(session.CreatedAt),
 	})
-	if err != nil {
-		webhandlers.Error(w, r, err)
-		return
-	}
-	if _, err := w.Write(b); err != nil {
-		webhandlers.Error(w, r, err)
-		return
-	}
 }
 
 var (

@@ -135,10 +135,22 @@ func Error(w http.ResponseWriter, r *http.Request, err error) {
 	switch ct {
 	case "application/json":
 		enc := json.NewEncoder(w)
-		enc.SetIndent("", "  ")
-		enc.Encode(err)
+		enc.SetIndent("", "\t")
+		_ = enc.Encode(err)
 	default:
 		r := r.WithContext(context.WithValue(r.Context(), errorKey, err))
 		handlers[ct].ServeHTTP(w, r)
 	}
+}
+
+// JSON encodes the provided message as JSON. When a marshalling error
+// is encountered, Error is used in order to handle the error.
+func JSON(w http.ResponseWriter, r *http.Request, i interface{}) {
+	b, err := json.Marshal(i)
+	if err != nil {
+		Error(w, r, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_, _ = w.Write(b)
 }

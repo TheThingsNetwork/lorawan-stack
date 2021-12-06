@@ -15,7 +15,6 @@
 package gatewayconfigurationserver
 
 import (
-	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
@@ -170,9 +169,7 @@ func (s *Server) handleGetGateway(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(res)
+	webhandlers.JSON(w, r, res)
 }
 
 func (s *Server) ttkgFirmwareURL(updateChannel string) string {

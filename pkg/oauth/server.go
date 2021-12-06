@@ -16,7 +16,6 @@ package oauth
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"strings"
 	"time"
@@ -233,16 +232,7 @@ func (s *server) output(w http.ResponseWriter, r *http.Request, resp *osin.Respo
 		return
 	}
 
-	b, err := json.Marshal(resp.Output)
-	if err != nil {
-		webhandlers.Error(w, r, err)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(resp.StatusCode)
-	if _, err := w.Write(b); err != nil {
-		webhandlers.Error(w, r, err)
-	}
+	webhandlers.JSON(w, r, resp.Output)
 }
 
 func (s *server) RegisterRoutes(server *web.Server) {

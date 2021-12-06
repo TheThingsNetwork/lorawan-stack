@@ -15,7 +15,6 @@
 package oauthclient
 
 import (
-	"encoding/json"
 	"net/http"
 	"net/url"
 	"strings"
@@ -73,15 +72,11 @@ func (oc *OAuthClient) HandleLogout(w http.ResponseWriter, r *http.Request) {
 		u.RawQuery = query.Encode()
 		oc.removeAuthCookie(w, r)
 
-		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(struct {
+		webhandlers.JSON(w, r, struct {
 			OpLogoutURI string `json:"op_logout_uri"`
 		}{
 			OpLogoutURI: u.String(),
-		}); err != nil {
-			webhandlers.Error(w, r, err)
-			return
-		}
+		})
 	}
 
 	// Otherwise, delete the access token in the OAuth server.
