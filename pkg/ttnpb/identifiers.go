@@ -62,7 +62,7 @@ func (v *EndDeviceIdentifiers) FieldIsZero(p string) bool {
 	case "application_ids":
 		return v.ApplicationIds == nil
 	case "application_ids.application_id":
-		return v.ApplicationIds == nil || v.ApplicationIds.FieldIsZero("application_id")
+		return v.ApplicationIds.FieldIsZero("application_id")
 	case "dev_addr":
 		return v.DevAddr == nil
 	case "dev_eui":

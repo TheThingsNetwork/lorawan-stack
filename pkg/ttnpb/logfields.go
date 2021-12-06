@@ -29,7 +29,7 @@ func (ids *ClientIdentifiers) ExtractRequestFields(m map[string]interface{}) {
 }
 
 func (ids *EndDeviceIdentifiers) ExtractRequestFields(m map[string]interface{}) {
-	if ids == nil || ids.ApplicationIds == nil {
+	if ids == nil {
 		return
 	}
 	m["application_id"] = ids.GetApplicationIds().GetApplicationId()

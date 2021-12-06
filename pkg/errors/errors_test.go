@@ -42,11 +42,7 @@ func Example() {
 
 	findApplication := func(id *ttnpb.ApplicationIdentifiers) (*ttnpb.Application, error) {
 		// try really hard, but fail
-		var appID string
-		if id != nil {
-			appID = id.ApplicationId
-		}
-		return nil, errApplicationNotFound.WithAttributes("id", appID)
+		return nil, errApplicationNotFound.WithAttributes("id", id.GetApplicationId())
 	}
 
 	createDevice := func(dev *ttnpb.EndDevice) error {
