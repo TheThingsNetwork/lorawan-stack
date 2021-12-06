@@ -122,7 +122,7 @@ func TestForwarder(t *testing.T) {
 				GatewayMessage: &ttnpb.GatewayUplinkMessage{
 					Message: &ttnpb.UplinkMessage{
 						RawPayload: []byte{0x40, 0x44, 0x33, 0x22, 0x11, 0x01, 0x01, 0x00, 0x42, 0x1, 0x42, 0x1, 0x2, 0x3, 0x4},
-						ReceivedAt: &receivedAt,
+						ReceivedAt: ttnpb.ProtoTimePtr(receivedAt),
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
 								GatewayIds: &ttnpb.GatewayIdentifiers{
@@ -142,7 +142,7 @@ func TestForwarder(t *testing.T) {
 							},
 						},
 						Settings: &ttnpb.TxSettings{
-							DataRate: ttnpb.DataRate{
+							DataRate: &ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{
 									Lora: &ttnpb.LoRaDataRate{
 										SpreadingFactor: 7,
@@ -247,7 +247,7 @@ func TestForwarder(t *testing.T) {
 				GatewayMessage: &ttnpb.GatewayUplinkMessage{
 					Message: &ttnpb.UplinkMessage{
 						RawPayload: []byte{0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42, 0x22, 0x11, 0x1, 0x2, 0x3, 0x4},
-						ReceivedAt: &receivedAt,
+						ReceivedAt: ttnpb.ProtoTimePtr(receivedAt),
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
 								GatewayIds: &ttnpb.GatewayIdentifiers{
@@ -262,7 +262,7 @@ func TestForwarder(t *testing.T) {
 							},
 						},
 						Settings: &ttnpb.TxSettings{
-							DataRate: ttnpb.DataRate{
+							DataRate: &ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{
 									Lora: &ttnpb.LoRaDataRate{
 										SpreadingFactor: 9,
@@ -709,7 +709,7 @@ func TestHomeNetwork(t *testing.T) {
 						},
 					},
 					Settings: &ttnpb.TxSettings{
-						DataRate: ttnpb.DataRate{
+						DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 7,
@@ -820,7 +820,7 @@ func TestHomeNetwork(t *testing.T) {
 						},
 					},
 					Settings: &ttnpb.TxSettings{
-						DataRate: ttnpb.DataRate{
+						DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
 								Lora: &ttnpb.LoRaDataRate{
 									SpreadingFactor: 9,
@@ -848,7 +848,7 @@ func TestHomeNetwork(t *testing.T) {
 				}
 				a.So(nsMsg.CorrelationIds, should.HaveLength, 2)
 				nsMsg.CorrelationIds = nil
-				a.So(*nsMsg.ReceivedAt, should.HappenBetween, before, time.Now()) // Packet Broker Agent sets local time on receive.
+				a.So(*ttnpb.StdTime(nsMsg.ReceivedAt), should.HappenBetween, before, time.Now()) // Packet Broker Agent sets local time on receive.
 				nsMsg.ReceivedAt = nil
 				a.So(nsMsg, should.Resemble, tc.UplinkMessage)
 

@@ -46,18 +46,18 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DeviceTimeAns{
-							Time: recvAt,
+							Time: ttnpb.ProtoTimePtr(recvAt),
 						}).MACCommand(),
 					},
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				ReceivedAt: &recvAt,
+				ReceivedAt: ttnpb.ProtoTimePtr(recvAt),
 			},
 			Events: events.Builders{
 				EvtReceiveDeviceTimeRequest,
 				EvtEnqueueDeviceTimeAnswer.With(events.WithData(&ttnpb.MACCommand_DeviceTimeAns{
-					Time: recvAt,
+					Time: ttnpb.ProtoTimePtr(recvAt),
 				})),
 			},
 		},
@@ -79,18 +79,18 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 						{},
 						{},
 						(&ttnpb.MACCommand_DeviceTimeAns{
-							Time: recvAt,
+							Time: ttnpb.ProtoTimePtr(recvAt),
 						}).MACCommand(),
 					},
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				ReceivedAt: &recvAt,
+				ReceivedAt: ttnpb.ProtoTimePtr(recvAt),
 			},
 			Events: events.Builders{
 				EvtReceiveDeviceTimeRequest,
 				EvtEnqueueDeviceTimeAnswer.With(events.WithData(&ttnpb.MACCommand_DeviceTimeAns{
-					Time: recvAt,
+					Time: ttnpb.ProtoTimePtr(recvAt),
 				})),
 			},
 		},
@@ -112,18 +112,18 @@ func TestHandleDeviceTimeReq(t *testing.T) {
 						{},
 						{},
 						(&ttnpb.MACCommand_DeviceTimeAns{
-							Time: recvAt,
+							Time: ttnpb.ProtoTimePtr(recvAt),
 						}).MACCommand(),
 					},
 				},
 			},
 			Message: &ttnpb.UplinkMessage{
-				ReceivedAt: &recvAt,
+				ReceivedAt: ttnpb.ProtoTimePtr(recvAt),
 			},
 			Events: events.Builders{
 				EvtReceiveDeviceTimeRequest,
 				EvtEnqueueDeviceTimeAnswer.With(events.WithData(&ttnpb.MACCommand_DeviceTimeAns{
-					Time: recvAt,
+					Time: ttnpb.ProtoTimePtr(recvAt),
 				})),
 			},
 		},

@@ -14,7 +14,7 @@
 
 import { createLogic } from 'redux-logic'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
@@ -37,7 +37,7 @@ const getGatewayLogic = createRequestLogic({
     const { payload, meta } = action
     const { id = {} } = payload
     const selector = meta.selector || ''
-    const gtw = await api.gateway.get(id, selector)
+    const gtw = await tts.Gateways.getById(id, selector)
     dispatch(gateways.startGatewayEventsStream(id))
     return gtw
   },
@@ -49,7 +49,7 @@ const updateGatewayLogic = createRequestLogic({
     const {
       payload: { id, patch },
     } = action
-    const result = await api.gateway.update(id, patch)
+    const result = await tts.Gateways.updateById(id, patch)
 
     return { ...patch, ...result }
   },
@@ -62,9 +62,9 @@ const deleteGatewayLogic = createRequestLogic({
     const { options } = action.meta
 
     if (options.purge) {
-      await api.gateway.purge(id)
+      await tts.Gateways.purgeById(id)
     } else {
-      await api.gateway.delete(id)
+      await tts.Gateways.deleteById(id)
     }
 
     return { id }
@@ -76,7 +76,7 @@ const restoreGatewayLogic = createRequestLogic({
   process: async ({ action }) => {
     const { id } = action.payload
 
-    await api.gateway.restore(id)
+    await tts.Gateways.restoreById(id)
 
     return { id }
   },
@@ -92,7 +92,7 @@ const getGatewaysLogic = createRequestLogic({
     const { selectors, options } = action.meta
 
     const data = options.isSearch
-      ? await api.gateways.search(
+      ? await tts.Gateways.search(
           {
             page,
             limit,
@@ -102,7 +102,7 @@ const getGatewaysLogic = createRequestLogic({
           },
           selectors,
         )
-      : await api.gateways.list({ page, limit, order }, selectors)
+      : await tts.Gateways.getAll({ page, limit, order }, selectors)
 
     let entities = data.gateways
     if (options.withStatus) {
@@ -122,8 +122,7 @@ const getGatewaysLogic = createRequestLogic({
           }
 
           const id = getGatewayId(gateway)
-          return api.gateway
-            .stats(id)
+          return tts.Gateways.getStatisticsById(id)
             .then(() => ({ ...gateway, status: 'connected' }))
             .catch(err => {
               if (err && err.code === 5) {
@@ -147,7 +146,7 @@ const getGatewaysRightsLogic = createRequestLogic({
   type: gateways.GET_GTWS_RIGHTS_LIST,
   process: async ({ action }) => {
     const { id } = action.payload
-    const result = await api.rights.gateways(id)
+    const result = await tts.Gateways.getRightsById(id)
     return result.rights.sort()
   },
 })
@@ -225,7 +224,7 @@ const updateGatewayStatisticsLogic = createRequestLogic({
   process: async ({ action }) => {
     const { id } = action.payload
 
-    const stats = await api.gateway.stats(id)
+    const stats = await tts.Gateways.getStatisticsById(id)
 
     return { stats }
   },
@@ -240,5 +239,5 @@ export default [
   getGatewaysRightsLogic,
   startGatewayStatisticsLogic,
   updateGatewayStatisticsLogic,
-  ...createEventsConnectLogics(gateways.SHARED_NAME, 'gateways', api.gateway.eventsSubscribe),
+  ...createEventsConnectLogics(gateways.SHARED_NAME, 'gateways', tts.Gateways.openStream),
 ]

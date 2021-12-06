@@ -82,7 +82,7 @@ func (o SessionKeysOptionNamespace) WithDefaultAppSKey() SessionKeysOption {
 }
 
 func (o SessionKeysOptionNamespace) WithDefaultSessionKeyID() SessionKeysOption {
-	return o.WithSessionKeyID(DefaultSessionKeyID)
+	return o.WithSessionKeyId(DefaultSessionKeyID)
 }
 
 func (o SessionOptionNamespace) WithSessionKeysOptions(opts ...SessionKeysOption) SessionOption {
@@ -115,11 +115,11 @@ func (o MACStateOptionNamespace) AppendRecentDownlinks(downs ...*ttnpb.DownlinkM
 }
 
 func (o EndDeviceIdentifiersOptionNamespace) WithDefaultJoinEUI() EndDeviceIdentifiersOption {
-	return o.WithJoinEUI(&DefaultJoinEUI)
+	return o.WithJoinEui(&DefaultJoinEUI)
 }
 
 func (o EndDeviceIdentifiersOptionNamespace) WithDefaultDevEUI() EndDeviceIdentifiersOption {
-	return o.WithDevEUI(&DefaultDevEUI)
+	return o.WithDevEui(&DefaultDevEUI)
 }
 
 func (o EndDeviceOptionNamespace) WithEndDeviceIdentifiersOptions(opts ...EndDeviceIdentifiersOption) EndDeviceOption {
@@ -130,7 +130,7 @@ func (o EndDeviceOptionNamespace) WithEndDeviceIdentifiersOptions(opts ...EndDev
 }
 
 func (o EndDeviceOptionNamespace) WithJoinEUI(v *types.EUI64) EndDeviceOption {
-	return o.WithEndDeviceIdentifiersOptions(EndDeviceIdentifiersOptions.WithJoinEUI(v))
+	return o.WithEndDeviceIdentifiersOptions(EndDeviceIdentifiersOptions.WithJoinEui(v))
 }
 
 func (o EndDeviceOptionNamespace) WithDefaultJoinEUI() EndDeviceOption {
@@ -138,7 +138,7 @@ func (o EndDeviceOptionNamespace) WithDefaultJoinEUI() EndDeviceOption {
 }
 
 func (o EndDeviceOptionNamespace) WithDevEUI(v *types.EUI64) EndDeviceOption {
-	return o.WithEndDeviceIdentifiersOptions(EndDeviceIdentifiersOptions.WithDevEUI(v))
+	return o.WithEndDeviceIdentifiersOptions(EndDeviceIdentifiersOptions.WithDevEui(v))
 }
 
 func (o EndDeviceOptionNamespace) WithDefaultDevEUI() EndDeviceOption {
@@ -146,15 +146,15 @@ func (o EndDeviceOptionNamespace) WithDefaultDevEUI() EndDeviceOption {
 }
 
 func (o EndDeviceOptionNamespace) WithDefaultFrequencyPlanID() EndDeviceOption {
-	return o.WithFrequencyPlanID(DefaultFrequencyPlanID)
+	return o.WithFrequencyPlanId(DefaultFrequencyPlanID)
 }
 
 func (o EndDeviceOptionNamespace) WithDefaultLoRaWANVersion() EndDeviceOption {
-	return o.WithLoRaWANVersion(DefaultMACVersion)
+	return o.WithLorawanVersion(DefaultMACVersion)
 }
 
 func (o EndDeviceOptionNamespace) WithDefaultLoRaWANPHYVersion() EndDeviceOption {
-	return o.WithLoRaWANPHYVersion(DefaultPHYVersion)
+	return o.WithLorawanPhyVersion(DefaultPHYVersion)
 }
 
 func (o EndDeviceOptionNamespace) WithMACStateOptions(opts ...MACStateOption) EndDeviceOption {

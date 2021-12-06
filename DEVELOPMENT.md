@@ -787,7 +787,7 @@ We use [Cypress](https://cypress.io) for running frontend-based end-to-end tests
 
 #### Running frontend end-to-end tests locally
 
-Make sure to [build the frontend assets](#building-the-frontend), [start The Things Stack](#starting-the-things-stack) and run `tools/bin/mage dev:sqlDump` after running `tools/bin/mage dev:initStack` to save database dump used as database seed when running end-to-end tests. To run the stack when working on end-to-end tests, use the `tools/bin/mage dev:startDevStack` command. This will run the stack in proper configuration for the end-to-end tests, note that this is an endless process that essentially runs the The Things Stack process so you don't have to wait for it to finish.
+Make sure to [build the frontend assets](#building-the-frontend), [start The Things Stack](#starting-the-things-stack) and run `tools/bin/mage dev:initStack dev:sqlDump dev:sqlCreateSeedDb` to create a seed database which the tests can reset the database to in between runs. To run the stack when working on end-to-end tests, use the `tools/bin/mage dev:startDevStack` command. This will run the stack in proper configuration for the end-to-end tests, note that this is an endless process that essentially runs the The Things Stack process in the background so you don't have to wait for it to finish.
 
 `Cypress` provides two modes for running tests: headless and interactive.
 - Headless mode - will not display any browser GUI and output test progress into your terminal instead. This is helpful when one just needs see the results of the tests.

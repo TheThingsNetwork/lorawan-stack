@@ -18,7 +18,7 @@ import bind from 'autobind-decorator'
 import { Container, Col, Row } from 'react-grid-system'
 import { replace } from 'connected-react-router'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -126,7 +126,7 @@ export default class GatewayCollaboratorEdit extends React.Component {
   handleSubmit(updatedCollaborator) {
     const { gtwId } = this.props
 
-    return api.gateway.collaborators.update(gtwId, updatedCollaborator)
+    return tts.Gateways.Collaborators.update(gtwId, updatedCollaborator)
   }
 
   handleSubmitSuccess() {
@@ -140,7 +140,7 @@ export default class GatewayCollaboratorEdit extends React.Component {
   async handleDelete(updatedCollaborator) {
     const { gtwId } = this.props
 
-    return api.gateway.collaborators.remove(gtwId, updatedCollaborator)
+    return tts.Gateways.Collaborators.remove(gtwId, updatedCollaborator)
   }
 
   render() {

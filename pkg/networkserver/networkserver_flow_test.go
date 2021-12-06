@@ -136,9 +136,9 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			return
 		}
 		t.Log("Device created")
-		a.So(dev.CreatedAt, should.HappenAfter, start)
-		a.So(dev.UpdatedAt, should.Equal, dev.CreatedAt)
-		a.So([]time.Time{start, dev.CreatedAt, time.Now()}, should.BeChronological)
+		a.So(*ttnpb.StdTime(dev.CreatedAt), should.HappenAfter, start)
+		a.So(dev.UpdatedAt, should.Resemble, dev.CreatedAt)
+		a.So([]time.Time{start, *ttnpb.StdTime(dev.CreatedAt), time.Now()}, should.BeChronological)
 		a.So(dev, should.ResembleFields, &conf.CreateDevice.EndDevice, conf.CreateDevice.FieldMask.GetPaths())
 
 		dev, ok = env.AssertJoin(ctx, JoinAssertionConfig{
@@ -158,10 +158,10 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			ClusterResponse: &NsJsHandleJoinResponse{
 				Response: &ttnpb.JoinResponse{
 					RawPayload: bytes.Repeat([]byte{0x42}, 33),
-					SessionKeys: *test.MakeSessionKeys(
+					SessionKeys: test.MakeSessionKeys(
 						test.SessionKeysOptions.WithDefaultNwkKeys(dev.LorawanVersion),
 					),
-					Lifetime:       time.Hour,
+					Lifetime:       ttnpb.ProtoDurationPtr(time.Hour),
 					CorrelationIds: []string{"NsJs-1", "NsJs-2"},
 				},
 			},
@@ -220,7 +220,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			Pending:       true,
 			FRMPayload:    []byte("test"),
 			FOpts:         MakeUplinkMACBuffer(phy, append(upCmders, conf.UplinkMACCommanders...)...),
-			FCtrl:         ttnpb.FCtrl{Adr: true},
+			FCtrl:         &ttnpb.FCtrl{Adr: true},
 			FPort:         0x42,
 			EventBuilders: append(upEvBuilders, conf.UplinkEventBuilders...),
 		})
@@ -245,7 +245,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 
 			MACVersion: dev.MacState.LorawanVersion,
 			DevAddr:    dev.Session.DevAddr,
-			FCtrl: ttnpb.FCtrl{
+			FCtrl: &ttnpb.FCtrl{
 				Adr: true,
 				Ack: true,
 			},
@@ -313,9 +313,9 @@ func makeClassAOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 	return makeOTAAFlowTest(OTAAFlowTestConfig{
 		CreateDevice: &ttnpb.SetEndDeviceRequest{
 			EndDevice: *MakeOTAAEndDevice(
-				EndDeviceOptions.WithFrequencyPlanID(fpID),
-				EndDeviceOptions.WithLoRaWANVersion(macVersion),
-				EndDeviceOptions.WithLoRaWANPHYVersion(phyVersion),
+				EndDeviceOptions.WithFrequencyPlanId(fpID),
+				EndDeviceOptions.WithLorawanVersion(macVersion),
+				EndDeviceOptions.WithLorawanPhyVersion(phyVersion),
 			),
 			FieldMask: &pbtypes.FieldMask{
 				Paths: []string{
@@ -360,9 +360,9 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 	return makeOTAAFlowTest(OTAAFlowTestConfig{
 		CreateDevice: &ttnpb.SetEndDeviceRequest{
 			EndDevice: *MakeOTAAEndDevice(
-				EndDeviceOptions.WithFrequencyPlanID(fpID),
-				EndDeviceOptions.WithLoRaWANVersion(macVersion),
-				EndDeviceOptions.WithLoRaWANPHYVersion(phyVersion),
+				EndDeviceOptions.WithFrequencyPlanId(fpID),
+				EndDeviceOptions.WithLorawanVersion(macVersion),
+				EndDeviceOptions.WithLorawanPhyVersion(phyVersion),
 				EndDeviceOptions.WithSupportsClassC(true),
 			),
 			FieldMask: &pbtypes.FieldMask{

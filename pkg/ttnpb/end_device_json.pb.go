@@ -74,10 +74,14 @@ func (x *Session) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("last_conf_f_cnt_down")
 		s.WriteUint32(x.LastConfFCntDown)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.StartedAt != nil || s.HasField("started_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("started_at")
-		s.WriteTime(x.StartedAt)
+		if x.StartedAt == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalTimestamp(s, x.StartedAt)
+		}
 	}
 	if len(x.QueuedApplicationDownlinks) > 0 || s.HasField("queued_application_downlinks") {
 		s.WriteMoreIf(&wroteField)
@@ -125,11 +129,11 @@ func (x *Session) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.LastConfFCntDown = s.ReadUint32()
 		case "started_at", "startedAt":
 			s.AddField("started_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
-			x.StartedAt = *v
+			x.StartedAt = v
 		case "queued_application_downlinks", "queuedApplicationDownlinks":
 			s.AddField("queued_application_downlinks")
 			s.ReadArray(func() {
@@ -1234,7 +1238,7 @@ func (x *MACState) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.LastConfirmedDownlinkAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.LastConfirmedDownlinkAt)
+			gogo.MarshalTimestamp(s, x.LastConfirmedDownlinkAt)
 		}
 	}
 	if x.LastDevStatusFCntUp != 0 || s.HasField("last_dev_status_f_cnt_up") {
@@ -1317,7 +1321,7 @@ func (x *MACState) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.LastNetworkInitiatedDownlinkAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.LastNetworkInitiatedDownlinkAt)
+			gogo.MarshalTimestamp(s, x.LastNetworkInitiatedDownlinkAt)
 		}
 	}
 	if len(x.RejectedAdrDataRateIndexes) > 0 || s.HasField("rejected_adr_data_rate_indexes") {
@@ -1347,7 +1351,7 @@ func (x *MACState) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.LastDownlinkAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.LastDownlinkAt)
+			gogo.MarshalTimestamp(s, x.LastDownlinkAt)
 		}
 	}
 	if x.RejectedDataRateRanges != nil || s.HasField("rejected_data_rate_ranges") {
@@ -1395,7 +1399,7 @@ func (x *MACState) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.LorawanVersion.UnmarshalProtoJSON(s)
 		case "last_confirmed_downlink_at", "lastConfirmedDownlinkAt":
 			s.AddField("last_confirmed_downlink_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -1485,7 +1489,7 @@ func (x *MACState) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			})
 		case "last_network_initiated_downlink_at", "lastNetworkInitiatedDownlinkAt":
 			s.AddField("last_network_initiated_downlink_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -1505,7 +1509,7 @@ func (x *MACState) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.RejectedFrequencies = s.ReadUint64Array()
 		case "last_downlink_at", "lastDownlinkAt":
 			s.AddField("last_downlink_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -1539,15 +1543,23 @@ func (x *EndDevice) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		// NOTE: EndDeviceIdentifiers does not seem to implement MarshalProtoJSON.
 		gogo.MarshalMessage(s, &x.EndDeviceIdentifiers)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.CreatedAt != nil || s.HasField("created_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("created_at")
-		s.WriteTime(x.CreatedAt)
+		if x.CreatedAt == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalTimestamp(s, x.CreatedAt)
+		}
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.UpdatedAt != nil || s.HasField("updated_at") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("updated_at")
-		s.WriteTime(x.UpdatedAt)
+		if x.UpdatedAt == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalTimestamp(s, x.UpdatedAt)
+		}
 	}
 	if x.Name != "" || s.HasField("name") {
 		s.WriteMoreIf(&wroteField)
@@ -1742,7 +1754,7 @@ func (x *EndDevice) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.LastDevStatusReceivedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.LastDevStatusReceivedAt)
+			gogo.MarshalTimestamp(s, x.LastDevStatusReceivedAt)
 		}
 	}
 	if x.PowerState != 0 || s.HasField("power_state") {
@@ -1825,7 +1837,7 @@ func (x *EndDevice) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ActivatedAt == nil {
 			s.WriteNil()
 		} else {
-			s.WriteTime(*x.ActivatedAt)
+			gogo.MarshalTimestamp(s, x.ActivatedAt)
 		}
 	}
 	s.WriteObjectEnd()
@@ -1848,18 +1860,18 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.EndDeviceIdentifiers = v
 		case "created_at", "createdAt":
 			s.AddField("created_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
-			x.CreatedAt = *v
+			x.CreatedAt = v
 		case "updated_at", "updatedAt":
 			s.AddField("updated_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
-			x.UpdatedAt = *v
+			x.UpdatedAt = v
 		case "name":
 			s.AddField("name")
 			x.Name = s.ReadString()
@@ -1994,7 +2006,7 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.LastRjCount_1 = s.ReadUint32()
 		case "last_dev_status_received_at", "lastDevStatusReceivedAt":
 			s.AddField("last_dev_status_received_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}
@@ -2066,7 +2078,7 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 		case "activated_at", "activatedAt":
 			s.AddField("activated_at")
-			v := s.ReadTime()
+			v := gogo.UnmarshalTimestamp(s)
 			if s.Err() != nil {
 				return
 			}

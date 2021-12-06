@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
@@ -27,7 +27,7 @@ const getWebhookLogic = createRequestLogic({
       payload: { appId, webhookId },
       meta: { selector },
     } = action
-    return api.application.webhooks.get(appId, webhookId, selector)
+    return tts.Applications.Webhooks.getById(appId, webhookId, selector)
   },
 })
 
@@ -38,7 +38,7 @@ const getWebhooksLogic = createRequestLogic({
       payload: { appId },
       meta: { selector },
     } = action
-    const res = await api.application.webhooks.list(appId, selector)
+    const res = await tts.Applications.Webhooks.getAll(appId, selector)
     return { entities: res.webhooks, totalCount: res.totalCount }
   },
 })
@@ -48,14 +48,14 @@ const updateWebhookLogic = createRequestLogic({
   process: async ({ action }) => {
     const { appId, webhookId, patch } = action.payload
 
-    return api.application.webhooks.update(appId, webhookId, patch)
+    return tts.Applications.Webhooks.updateById(appId, webhookId, patch)
   },
 })
 
 const getWebhookFormatsLogic = createRequestLogic({
   type: webhookFormats.GET_WEBHOOK_FORMATS,
   process: async () => {
-    const { formats } = await api.application.webhooks.getFormats()
+    const { formats } = await tts.Applications.Webhooks.getFormats()
     return formats
   },
 })
@@ -65,7 +65,7 @@ const getWebhookTemplateLogic = createRequestLogic({
   process: async ({ action }) => {
     const { id } = action.payload
     const { selector } = action.meta
-    const template = await api.application.webhooks.getTemplate(id, selector)
+    const template = await tts.Applications.Webhooks.getTemplate(id, selector)
 
     return template
   },
@@ -75,7 +75,7 @@ const getWebhookTemplatesLogic = createRequestLogic({
   type: webhookTemplates.LIST_WEBHOOK_TEMPLATES,
   process: async ({ action }) => {
     const { selector } = action.meta
-    const { templates } = await api.application.webhooks.listTemplates(selector)
+    const { templates } = await tts.Applications.Webhooks.listTemplates(selector)
 
     return templates
   },

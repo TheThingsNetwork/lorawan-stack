@@ -25,7 +25,7 @@ describe('End device messaging', () => {
   const application = {
     ids: { application_id: applicationId },
     name: 'Application End Devices Test Name',
-    description: `Application End Devices Test Description`,
+    description: 'Application End Devices Test Description',
   }
 
   const endDeviceId = 'end-device-overview-test'
@@ -100,13 +100,13 @@ describe('End device messaging', () => {
 
       cy.intercept(
         'GET',
-        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
+        `/api/v3/as/applications/${applicationId}/devices/${endDeviceId}*`,
         response,
       )
 
       cy.findByTestId('notification')
         .should('be.visible')
-        .findByText(`Simulation is disabled for devices that skip payload crypto`)
+        .findByText('Simulation is disabled for devices that skip payload crypto')
         .should('be.visible')
 
       cy.findByLabelText('FPort').should('be.disabled')
@@ -158,13 +158,13 @@ describe('End device messaging', () => {
 
       cy.intercept(
         'GET',
-        `as/applications/${applicationId}/devices/${endDeviceId}?field_mask=version_ids,formatters,skip_payload_crypto_override,session,pending_session`,
+        `/api/v3/as/applications/${applicationId}/devices/${endDeviceId}*`,
         response,
       )
 
       cy.findByTestId('notification')
         .should('be.visible')
-        .findByText(`Simulation is disabled for devices that skip payload crypto`)
+        .findByText('Simulation is disabled for devices that skip payload crypto')
         .should('be.visible')
 
       cy.findByLabelText('Replace downlink queue').should('be.disabled')

@@ -156,7 +156,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 				return errInvalidIdentifiers.New()
 			}
 
-			pb.UpdatedAt = time.Now().UTC()
+			pb.UpdatedAt = ttnpb.ProtoTimePtr(time.Now())
 			sets = append(append(sets[:0:0], sets...),
 				"updated_at",
 			)

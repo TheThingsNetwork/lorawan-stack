@@ -15,7 +15,7 @@
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import {
   selectNsConfig,
@@ -47,7 +47,7 @@ const mapStateToProps = state => ({
   template: selectDeviceTemplate(state),
   templateFetching: selectDeviceTemplateFetching(state),
   templateError: selectDeviceTemplateError(state),
-  createDevice: (appId, device) => api.device.create(appId, device),
+  createDevice: (appId, device) => tts.Applications.Devices.create(appId, device),
   mayEditKeys: checkFromState(mayEditApplicationDeviceKeys, state),
   jsConfig: selectJsConfig(),
   nsConfig: selectNsConfig(),

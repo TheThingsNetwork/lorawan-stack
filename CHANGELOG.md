@@ -11,15 +11,26 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- User defined antenna gain for LBS gateways.
+
 ### Changed
 
+
 - Increased the maximum gRPC message size to 16MB.
+- Gateways which have been deleted are now automatically disconnected by the Gateway Server.
+
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- Access to application payload formatters for users with `RIGHT_APPLICATION_SETTINGS_BASIC` right.
+- End device mac settings handling in the Console.
+- Uplink and downlink counters display on end device activity in the Console.
+- Join settings handling in JS-only deployments in the Console.
+- Configuring Packet Broker listed option when Packet Broker Agent is configured with a Packet Broker tenant API key.
 
 ### Security
 

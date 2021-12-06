@@ -26,7 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -37,7 +37,7 @@ func channelDataRateRange(chs ...*ttnpb.MACParameters_Channel) (min, max ttnpb.D
 		if i >= len(chs) {
 			return 0, 0, false
 		}
-		if chs[i].EnableUplink {
+		if chs[i].GetEnableUplink() {
 			break
 		}
 		i++
@@ -46,7 +46,7 @@ func channelDataRateRange(chs ...*ttnpb.MACParameters_Channel) (min, max ttnpb.D
 	min = chs[i].MinDataRateIndex
 	max = chs[i].MaxDataRateIndex
 	for _, ch := range chs[i+1:] {
-		if !ch.EnableUplink {
+		if !ch.GetEnableUplink() {
 			continue
 		}
 		if ch.MaxDataRateIndex > max {
@@ -584,7 +584,7 @@ func DeviceClassBCDownlinkInterval(dev *ttnpb.EndDevice, defaults ttnpb.MACSetti
 }
 
 func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MACSettings) (*ttnpb.MACState, error) {
-	fp, phy, err := DeviceFrequencyPlanAndBand(dev, fps)
+	fp, phy, err := internal.DeviceFrequencyPlanAndBand(dev, fps)
 	if err != nil {
 		return nil, err
 	}

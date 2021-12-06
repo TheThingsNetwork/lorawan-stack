@@ -24,7 +24,7 @@ func (x *GenerateEndDeviceQRCodeRequest) MarshalProtoJSON(s *jsonplugin.MarshalS
 		s.WriteObjectField("format_id")
 		s.WriteString(x.FormatId)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.EndDevice != nil || s.HasField("end_device") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("end_device")
 		x.EndDevice.MarshalProtoJSON(s.WithField("end_device"))
@@ -52,6 +52,7 @@ func (x *GenerateEndDeviceQRCodeRequest) UnmarshalProtoJSON(s *jsonplugin.Unmars
 			x.FormatId = s.ReadString()
 		case "end_device", "endDevice":
 			if !s.ReadNil() {
+				x.EndDevice = &EndDevice{}
 				x.EndDevice.UnmarshalProtoJSON(s.WithField("end_device", true))
 			}
 		case "image":

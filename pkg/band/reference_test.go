@@ -37,16 +37,16 @@ type serializableBeacon struct {
 }
 
 type serializableDataRate struct {
-	Rate              ttnpb.DataRate
+	Rate              *ttnpb.DataRate
 	MaxMACPayloadSize map[bool]uint16
 }
 
 func (dr serializableDataRate) MarshalJSON() ([]byte, error) {
-	drBytes, err := jsonpb.TTN().Marshal(&dr.Rate)
+	drBytes, err := jsonpb.TTN().Marshal(dr.Rate)
 	if err != nil {
 		return nil, err
 	}
-	sizeBytes, err := jsonpb.TTN().Marshal(&dr.MaxMACPayloadSize)
+	sizeBytes, err := jsonpb.TTN().Marshal(dr.MaxMACPayloadSize)
 	if err != nil {
 		return nil, err
 	}

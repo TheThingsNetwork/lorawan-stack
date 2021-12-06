@@ -43,7 +43,7 @@ message RxMetadata {
   PacketBrokerMetadata packet_broker = 18;
 
   uint32 antenna_index = 2;
-  google.protobuf.Timestamp time = 3 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp time = 3;
   // Gateway concentrator timestamp when the Rx finished (microseconds).
   uint32 timestamp = 4;
   // Gateway's internal fine timestamp when the Rx finished (nanoseconds).
@@ -147,7 +147,7 @@ message PacketBrokerMetadata {
 
 message PacketBrokerRouteHop {
   // Time when the service received the message.
-  google.protobuf.Timestamp received_at = 1 [ (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp received_at = 1;
   // Sender of the message, typically the authorized client identifier.
   string sender_name = 2;
   // Sender IP address or host name.

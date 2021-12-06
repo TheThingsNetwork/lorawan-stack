@@ -13,13 +13,14 @@
 // limitations under the License.
 
 import React from 'react'
+import { defineMessages } from 'react-intl'
 
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import Input from '@ttn-lw/components/input'
 import Form from '@ttn-lw/components/form'
 import Notification from '@ttn-lw/components/notification'
-import Checkbox from '@ttn-lw/components/checkbox'
+import RadioButton from '@ttn-lw/components/radio-button'
 
 import Yup from '@ttn-lw/lib/yup'
 import diff from '@ttn-lw/lib/diff'
@@ -31,9 +32,16 @@ import { generate16BytesKey, isNonZeroSessionKey } from '@console/lib/device-uti
 
 import messages from '../messages'
 
+const m = defineMessages({
+  skip: 'Enforce skipping payload crypto',
+  include: 'Enforce payload crypto',
+  default: 'Use application default',
+  skipCryptoTitle: 'Payload crypto override',
+})
+
 const validationSchema = Yup.object()
   .shape({
-    skip_payload_crypto_override: Yup.boolean().default(false),
+    skip_payload_crypto_override: Yup.boolean().nullable().default(null),
     session: Yup.object().when(
       ['skip_payload_crypto_override', '$mayEditKeys'],
       (skipPayloadCrypto, mayEditKeys, schema) => {
@@ -55,6 +63,17 @@ const validationSchema = Yup.object()
     ),
   })
   .noUnknown()
+
+const encodeSkipPayloadCrypto = value => (value === 'default' ? null : value === 'skip')
+const decodeSkipPayloadCrypto = value => {
+  if (value === null || value === undefined) {
+    return 'default'
+  } else if (value === false) {
+    return 'include'
+  }
+
+  return 'skip'
+}
 
 const ApplicationServerForm = React.memo(props => {
   const { device, onSubmit, onSubmitSuccess, mayEditKeys, mayReadKeys } = props
@@ -88,10 +107,10 @@ const ApplicationServerForm = React.memo(props => {
   const formRef = React.useRef(null)
   const sessionRef = React.useRef(device.session)
 
-  const [skipCrypto, setSkipCrypto] = React.useState(device.skip_payload_crypto_override || false)
+  const [skipCrypto, setSkipCrypto] = React.useState(device.skip_payload_crypto_override || null)
   const handleSkipCryptoChange = React.useCallback(
     evt => {
-      const { checked } = evt.target
+      const checked = evt
       const { setValues, values } = formRef.current
 
       setSkipCrypto(checked)
@@ -163,13 +182,18 @@ const ApplicationServerForm = React.memo(props => {
     >
       {showResetNotification && <Notification content={messages.keysResetWarning} info small />}
       <Form.Field
-        autoFocus
-        title={sharedMessages.skipCryptoTitle}
+        title={m.skipCryptoTitle}
         name="skip_payload_crypto_override"
-        description={sharedMessages.skipCryptoDescription}
-        component={Checkbox}
+        component={RadioButton.Group}
+        decode={decodeSkipPayloadCrypto}
+        encode={encodeSkipPayloadCrypto}
         onChange={handleSkipCryptoChange}
-      />
+        tooltipId={tooltipIds.SKIP_PAYLOAD_CRYPTO_OVERRIDE}
+      >
+        <RadioButton label={m.default} value="default" />
+        <RadioButton label={m.skip} value="skip" />
+        <RadioButton label={m.include} value="include" />
+      </Form.Field>
       <Form.Field
         required
         title={sharedMessages.appSKey}

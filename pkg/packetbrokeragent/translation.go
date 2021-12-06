@@ -54,11 +54,11 @@ var (
 	}
 )
 
-func fromPBDataRate(dataRate *packetbroker.DataRate) (dr ttnpb.DataRate, codingRate string, ok bool) {
+func fromPBDataRate(dataRate *packetbroker.DataRate) (dr *ttnpb.DataRate, codingRate string, ok bool) {
 	switch mod := dataRate.GetModulation().(type) {
 	case *packetbroker.DataRate_Lora:
 		// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466)
-		return ttnpb.DataRate{
+		return &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Lora{
 				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: mod.Lora.SpreadingFactor,
@@ -67,7 +67,7 @@ func fromPBDataRate(dataRate *packetbroker.DataRate) (dr ttnpb.DataRate, codingR
 			},
 		}, mod.Lora.CodingRate, true
 	case *packetbroker.DataRate_Fsk:
-		return ttnpb.DataRate{
+		return &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Fsk{
 				Fsk: &ttnpb.FSKDataRate{
 					BitRate: mod.Fsk.BitsPerSecond,
@@ -77,7 +77,7 @@ func fromPBDataRate(dataRate *packetbroker.DataRate) (dr ttnpb.DataRate, codingR
 	// TODO: Support LR-FHSS (https://github.com/TheThingsNetwork/lorawan-stack/issues/3806)
 	// TODO: Set coding rate from data rate (https://github.com/TheThingsNetwork/lorawan-stack/issues/4466)
 	// case *packetbroker.DataRate_Lrfhss:
-	// 	return ttnpb.DataRate{
+	// 	return &ttnpb.DataRate{
 	// 		Modulation: &ttnpb.DataRate_Lrfhss{
 	// 			Lrfhss: &ttnpb.LRFHSSDataRate{
 	// 				ModulationType:        mod.Lrfhss.ModulationType,
@@ -87,11 +87,14 @@ func fromPBDataRate(dataRate *packetbroker.DataRate) (dr ttnpb.DataRate, codingR
 	// 		},
 	// 	}, mod.Lrfhss.CodingRate, true
 	default:
-		return ttnpb.DataRate{}, "", false
+		return nil, "", false
 	}
 }
 
-func toPBDataRate(dataRate ttnpb.DataRate, codingRate string) (*packetbroker.DataRate, bool) {
+func toPBDataRate(dataRate *ttnpb.DataRate, codingRate string) (*packetbroker.DataRate, bool) {
+	if dataRate == nil {
+		return nil, false
+	}
 	switch mod := dataRate.GetModulation().(type) {
 	case *ttnpb.DataRate_Lora:
 		return &packetbroker.DataRate{
@@ -267,9 +270,9 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 	if err := lorawan.UnmarshalMessage(msg.Message.RawPayload, msg.Message.Payload); err != nil {
 		return nil, errDecodePayload.WithCause(err)
 	}
-	if msg.Message.Payload.Major != ttnpb.Major_LORAWAN_R1 {
+	if msg.Message.Payload.MHdr.Major != ttnpb.Major_LORAWAN_R1 {
 		return nil, errUnsupportedLoRaWANVersion.WithAttributes(
-			"version", msg.Message.Payload.Major,
+			"version", msg.Message.Payload.MHdr.Major,
 		)
 	}
 
@@ -308,16 +311,16 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 	case *ttnpb.Message_MacPayload:
 		up.PhyPayload.Teaser.Payload = &packetbroker.PHYPayloadTeaser_Mac{
 			Mac: &packetbroker.PHYPayloadTeaser_MACPayloadTeaser{
-				Confirmed:        pld.MacPayload.Ack,
-				DevAddr:          pld.MacPayload.DevAddr.MarshalNumber(),
-				FOpts:            len(pld.MacPayload.FOpts) > 0,
-				FCnt:             pld.MacPayload.FCnt,
+				Confirmed:        pld.MacPayload.FHdr.FCtrl.Ack,
+				DevAddr:          pld.MacPayload.FHdr.DevAddr.MarshalNumber(),
+				FOpts:            len(pld.MacPayload.FHdr.FOpts) > 0,
+				FCnt:             pld.MacPayload.FHdr.FCnt,
 				FPort:            pld.MacPayload.FPort,
 				FrmPayloadLength: uint32(len(pld.MacPayload.FrmPayload)),
 			},
 		}
 	default:
-		return nil, errUnsupportedMType.WithAttributes("m_type", msg.Message.Payload.MType)
+		return nil, errUnsupportedMType.WithAttributes("m_type", msg.Message.Payload.MHdr.MType)
 	}
 
 	var gatewayReceiveTime *time.Time
@@ -368,9 +371,9 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 			}
 
 			if md.Time != nil {
-				t := *md.Time
+				t := ttnpb.StdTime(md.Time)
 				if gatewayReceiveTime == nil || t.Before(*gatewayReceiveTime) {
-					gatewayReceiveTime = &t
+					gatewayReceiveTime = t
 				}
 			}
 
@@ -417,14 +420,8 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 		}
 	}
 
-	if t, err := pbtypes.TimestampProto(*msg.Message.ReceivedAt); err == nil {
-		up.ForwarderReceiveTime = t
-	}
-	if gatewayReceiveTime != nil {
-		if t, err := pbtypes.TimestampProto(*gatewayReceiveTime); err == nil {
-			up.GatewayReceiveTime = t
-		}
-	}
+	up.ForwarderReceiveTime = msg.Message.ReceivedAt
+	up.GatewayReceiveTime = ttnpb.ProtoTime(gatewayReceiveTime)
 	up.GatewayUplinkToken = gatewayUplinkToken
 
 	return up, nil
@@ -470,13 +467,13 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 			Frequency:  msg.Message.Frequency,
 			CodingRate: codingRate,
 		},
-		ReceivedAt:     &receivedAt,
+		ReceivedAt:     ttnpb.ProtoTimePtr(receivedAt),
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
 	}
 
-	var receiveTime *time.Time
+	var receiveTime *pbtypes.Timestamp
 	if t, err := pbtypes.TimestampFromProto(msg.Message.GatewayReceiveTime); err == nil {
-		receiveTime = &t
+		receiveTime = ttnpb.ProtoTimePtr(t)
 	}
 	if gtwMd := msg.Message.GatewayMetadata; gtwMd != nil {
 		pbMD := &ttnpb.PacketBrokerMetadata{
@@ -512,7 +509,7 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 					continue
 				}
 				pbMD.Hops = append(pbMD.Hops, &ttnpb.PacketBrokerRouteHop{
-					ReceivedAt:    &receivedAt,
+					ReceivedAt:    ttnpb.ProtoTimePtr(receivedAt),
 					SenderName:    h.SenderName,
 					SenderAddress: h.SenderAddress,
 					ReceiverName:  h.ReceiverName,
@@ -654,7 +651,7 @@ func toPBDownlink(ctx context.Context, msg *ttnpb.DownlinkMessage, fps frequency
 		case *ttnpb.DataRate_Lrfhss:
 			codingRate = mod.Lrfhss.CodingRate
 		}
-		pbDR, ok := toPBDataRate(*rx.dataRate, codingRate)
+		pbDR, ok := toPBDataRate(rx.dataRate, codingRate)
 		if !ok {
 			return nil, nil, errIncompatibleDataRate.WithAttributes("rx_window", i+1)
 		}
@@ -737,7 +734,7 @@ func fromPBDownlink(ctx context.Context, msg *packetbroker.DownlinkMessage, rece
 		if !ok {
 			return "", nil, errIncompatibleDataRate.WithAttributes("rx_window", i+1)
 		}
-		*rx.dataRate = &dr
+		*rx.dataRate = dr
 		*rx.frequency = rx.settings.Frequency
 	}
 

@@ -190,7 +190,7 @@ func TestTraffic(t *testing.T) {
 				Topic: fmt.Sprintf("v3/%v/up", registeredGatewayUID),
 				Message: &ttnpb.UplinkMessage{
 					RawPayload: []byte{0x01},
-					Settings:   &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+					Settings:   &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 				},
 				OK: true,
 			},
@@ -259,7 +259,7 @@ func TestTraffic(t *testing.T) {
 				select {
 				case up := <-conn.Up():
 					if tc.OK {
-						a.So(time.Since(*up.Message.ReceivedAt), should.BeLessThan, timeout)
+						a.So(time.Since(*ttnpb.StdTime(up.Message.ReceivedAt)), should.BeLessThan, timeout)
 						up.Message.ReceivedAt = nil
 						a.So(up.Message, should.Resemble, tc.Message)
 					} else {
@@ -359,7 +359,7 @@ func TestTraffic(t *testing.T) {
 					RawPayload: []byte{0x01},
 					Settings: &ttnpb.DownlinkMessage_Scheduled{
 						Scheduled: &ttnpb.TxSettings{
-							DataRate: ttnpb.DataRate{
+							DataRate: &ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{
 									Lora: &ttnpb.LoRaDataRate{
 										Bandwidth:       125000,

@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +14,10 @@
 
 import { connect } from 'react-redux'
 
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import { mayViewOrganizationInformation } from '@console/lib/feature-checks'
+
 import {
   selectSelectedOrganization,
   selectSelectedOrganizationId,
@@ -28,4 +32,9 @@ const mapStateToProps = state => {
   }
 }
 
-export default Overview => connect(mapStateToProps)(Overview)
+export default Overview =>
+  connect(mapStateToProps)(
+    withFeatureRequirement(mayViewOrganizationInformation, {
+      redirect: '/',
+    })(Overview),
+  )

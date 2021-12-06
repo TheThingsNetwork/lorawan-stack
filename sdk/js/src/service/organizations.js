@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import autoBind from 'auto-bind'
+
 import Marshaler from '../util/marshaler'
 
 import ApiKeys from './api-keys'
@@ -36,6 +38,7 @@ class Organizations {
         set: 'organization_ids.organization_id',
       },
     })
+    autoBind(this)
   }
 
   // Retrieval.

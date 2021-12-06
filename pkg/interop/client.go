@@ -60,9 +60,7 @@ type jsRPCPaths struct {
 }
 
 func (p jsRPCPaths) join() string    { return p.Join }
-func (p jsRPCPaths) rejoin() string  { return p.Rejoin }
 func (p jsRPCPaths) appSKey() string { return p.AppSKey }
-func (p jsRPCPaths) homeNS() string  { return p.HomeNS }
 
 func serverURL(scheme, fqdn, path string, port uint32) string {
 	if scheme == "" {
@@ -264,14 +262,14 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 	}
 	return &ttnpb.JoinResponse{
 		RawPayload: interopAns.PHYPayload,
-		SessionKeys: ttnpb.SessionKeys{
+		SessionKeys: &ttnpb.SessionKeys{
 			SessionKeyId: sessionKeyID,
 			FNwkSIntKey:  (*ttnpb.KeyEnvelope)(fNwkSIntKey),
 			SNwkSIntKey:  (*ttnpb.KeyEnvelope)(interopAns.SNwkSIntKey),
 			NwkSEncKey:   (*ttnpb.KeyEnvelope)(interopAns.NwkSEncKey),
 			AppSKey:      (*ttnpb.KeyEnvelope)(interopAns.AppSKey),
 		},
-		Lifetime: time.Duration(interopAns.Lifetime) * time.Second,
+		Lifetime: ttnpb.ProtoDurationPtr(time.Duration(interopAns.Lifetime) * time.Second),
 	}, nil
 }
 

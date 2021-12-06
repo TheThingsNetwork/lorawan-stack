@@ -18,7 +18,7 @@ import { defineMessages } from 'react-intl'
 import { Container, Col, Row } from 'react-grid-system'
 import { connect } from 'react-redux'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import Button from '@ttn-lw/components/button'
 import DataSheet from '@ttn-lw/components/data-sheet'
@@ -75,7 +75,7 @@ export default class GatewayOverview extends React.Component {
     const { gtwId } = this.props
 
     try {
-      const globalConf = await api.gateway.getGlobalConf(gtwId)
+      const globalConf = await tts.Gateways.getGlobalConf(gtwId)
       const globalConfDataUri = composeDataUri(JSON.stringify(globalConf, undefined, 2))
       downloadDataUriAsFile(globalConfDataUri, 'global_conf.json')
     } catch (err) {

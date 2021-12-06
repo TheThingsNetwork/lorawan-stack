@@ -169,14 +169,14 @@ func TestHandleResetInd(t *testing.T) {
 }
 
 func genMACParameters() ttnpb.MACParameters {
-	randomVal := random.Intn(100)
+	randomVal := random.Int63n(100)
 	channels := make([]*ttnpb.MACParameters_Channel, randomVal%16)
 	for i := range channels {
 		channels[i] = &ttnpb.MACParameters_Channel{
 			MinDataRateIndex:  ttnpb.DataRateIndex(randomVal % 5),
 			MaxDataRateIndex:  ttnpb.DataRateIndex(randomVal % 16),
-			UplinkFrequency:   uint64((randomVal + i) * 1000000000),
-			DownlinkFrequency: uint64((randomVal + i) * 1000000000),
+			UplinkFrequency:   uint64((randomVal + int64(i)) * 1000000000),
+			DownlinkFrequency: uint64((randomVal + int64(i)) * 1000000000),
 		}
 	}
 	return ttnpb.MACParameters{

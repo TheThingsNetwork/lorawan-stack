@@ -17,6 +17,7 @@ package commands
 import (
 	"bufio"
 	"context"
+	"crypto/rand"
 	"encoding/hex"
 	stdio "io"
 	"mime"
@@ -146,7 +147,7 @@ func getEndDeviceID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttn
 
 func generateKey() *types.AES128Key {
 	var key types.AES128Key
-	random.Read(key[:])
+	rand.Read(key[:])
 	return &key
 }
 
@@ -331,10 +332,10 @@ var (
 
 			device.SetFields(res, "ids.dev_addr")
 			device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...)
-			if device.CreatedAt.IsZero() || (!res.CreatedAt.IsZero() && res.CreatedAt.Before(res.CreatedAt)) {
+			if device.CreatedAt == nil || (res.CreatedAt != nil && ttnpb.StdTime(res.CreatedAt).Before(*ttnpb.StdTime(device.CreatedAt))) {
 				device.CreatedAt = res.CreatedAt
 			}
-			if res.UpdatedAt.After(device.UpdatedAt) {
+			if ttnpb.StdTime(res.UpdatedAt).After(*ttnpb.StdTime(device.UpdatedAt)) {
 				device.UpdatedAt = res.UpdatedAt
 			}
 
@@ -557,10 +558,10 @@ var (
 			}
 
 			device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...)
-			if device.CreatedAt.IsZero() || (!res.CreatedAt.IsZero() && res.CreatedAt.Before(device.CreatedAt)) {
+			if device.CreatedAt == nil || (res.CreatedAt != nil && ttnpb.StdTime(res.CreatedAt).Before(*ttnpb.StdTime(device.CreatedAt))) {
 				device.CreatedAt = res.CreatedAt
 			}
-			if res.UpdatedAt.After(device.UpdatedAt) {
+			if ttnpb.StdTime(res.UpdatedAt).After(*ttnpb.StdTime(device.UpdatedAt)) {
 				device.UpdatedAt = res.UpdatedAt
 			}
 
@@ -828,10 +829,10 @@ var (
 			}
 			device.SetFields(nsDevice, "ids.dev_addr")
 			device.SetFields(nsDevice, ttnpb.AllowedBottomLevelFields(nsPaths, getEndDeviceFromNS)...)
-			if device.CreatedAt.IsZero() || (!nsDevice.CreatedAt.IsZero() && nsDevice.CreatedAt.Before(device.CreatedAt)) {
+			if device.CreatedAt == nil || (nsDevice.CreatedAt != nil && ttnpb.StdTime(nsDevice.CreatedAt).Before(*ttnpb.StdTime(device.CreatedAt))) {
 				device.CreatedAt = nsDevice.CreatedAt
 			}
-			if nsDevice.UpdatedAt.After(device.UpdatedAt) {
+			if ttnpb.StdTime(nsDevice.UpdatedAt).After(*ttnpb.StdTime(device.UpdatedAt)) {
 				device.UpdatedAt = nsDevice.UpdatedAt
 			}
 			return io.Write(os.Stdout, config.OutputFormat, device)
@@ -1108,7 +1109,7 @@ This command may take end device identifiers from stdin.`,
 			size, _ := cmd.Flags().GetUint32("size")
 			res, err := client.Generate(ctx, &ttnpb.GenerateEndDeviceQRCodeRequest{
 				FormatId:  formatID,
-				EndDevice: *device,
+				EndDevice: device,
 				Image: &ttnpb.GenerateEndDeviceQRCodeRequest_Image{
 					ImageSize: size,
 				},

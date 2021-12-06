@@ -17,8 +17,7 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 
 import PAYLOAD_FORMATTER_TYPES from '@console/constants/formatter-types'
-
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import Notification from '@ttn-lw/components/notification'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -57,7 +56,7 @@ import messages from './messages'
     devId: selectSelectedDeviceId(state),
     link: selectApplicationLink(state),
     formatters: selectSelectedDeviceFormatters(state),
-    decodeUplink: api.as.decodeUplink,
+    decodeUplink: tts.As.decodeUplink,
   }),
   {
     updateDevice: attachPromise(updateDevice),

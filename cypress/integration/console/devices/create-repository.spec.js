@@ -112,7 +112,7 @@ describe('End device repository create', () => {
           templateJson => {
             cy.intercept(
               'GET',
-              `/dr/applications/${appId}/brands/test-brand-otaa/models/test-model3/1.0.1/EU_863_870/template`,
+              `/api/v3/dr/applications/${appId}/brands/test-brand-otaa/models/test-model3/1.0.1/EU_863_870/template`,
               templateJson,
             )
           },
@@ -121,16 +121,20 @@ describe('End device repository create', () => {
           templateJson => {
             cy.intercept(
               'GET',
-              `/dr/applications/${appId}/brands/test-brand-otaa/models/test-model2/1.0/EU_863_870/template`,
+              `/api/v3/dr/applications/${appId}/brands/test-brand-otaa/models/test-model2/1.0/EU_863_870/template`,
               templateJson,
             )
           },
         )
         cy.fixture('console/devices/repository/test-brand-otaa.models.json').then(modelsJson => {
-          cy.intercept('GET', `/dr/applications/${appId}/brands/test-brand-otaa/models`, modelsJson)
+          cy.intercept(
+            'GET',
+            `/api/v3/dr/applications/${appId}/brands/test-brand-otaa/models*`,
+            modelsJson,
+          )
         })
         cy.fixture('console/devices/repository/brands.json').then(brandsJson => {
-          cy.intercept('GET', `/dr/applications/${appId}/brands`, brandsJson)
+          cy.intercept('GET', `/api/v3/dr/applications/${appId}/brands*`, brandsJson)
         })
 
         cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
@@ -469,16 +473,20 @@ describe('End device repository create', () => {
           templateJson => {
             cy.intercept(
               'GET',
-              `/dr/applications/${appId}/brands/test-brand-abp/models/test-model1/1.0/EU_863_870/template`,
+              `/api/v3/dr/applications/${appId}/brands/test-brand-abp/models/test-model1/1.0/EU_863_870/template`,
               templateJson,
             )
           },
         )
         cy.fixture('console/devices/repository/test-brand-abp.models.json').then(modelsJson => {
-          cy.intercept('GET', `/dr/applications/${appId}/brands/test-brand-abp/models`, modelsJson)
+          cy.intercept(
+            'GET',
+            `/api/v3/dr/applications/${appId}/brands/test-brand-abp/models*`,
+            modelsJson,
+          )
         })
         cy.fixture('console/devices/repository/brands.json').then(brandsJson => {
-          cy.intercept('GET', `/dr/applications/${appId}/brands`, brandsJson)
+          cy.intercept('GET', `/api/v3/dr/applications/${appId}/brands*`, brandsJson)
         })
 
         cy.loginConsole({ user_id: user.ids.user_id, password: user.password })

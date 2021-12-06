@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import autoBind from 'auto-bind'
+
 import Marshaler from '../util/marshaler'
 
 import ApiKeys from './api-keys'
@@ -28,6 +30,8 @@ class Users {
         update: 'user_ids.user_id',
       },
     })
+
+    autoBind(this)
   }
 
   _addState(fieldMask, user) {

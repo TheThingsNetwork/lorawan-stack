@@ -37,7 +37,7 @@ func makeDwellTimeMaxMACPayloadSizeFunc(noDwellTimeSize, dwellTimeSize uint16) M
 
 // DataRate indicates the properties of a band's data rate.
 type DataRate struct {
-	Rate              ttnpb.DataRate
+	Rate              *ttnpb.DataRate
 	MaxMACPayloadSize MaxMACPayloadSizeFunc
 }
 

@@ -211,7 +211,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		if !test.AllTrue(
 			a.So(err, should.BeNil) || a.So(errors.Stack(err), should.BeEmpty),
 			a.So(storedCtx, should.HaveParentContextOrEqual, ctx),
-			a.So(stored.GetCreatedAt(), should.HappenAfter, start),
+			a.So(*ttnpb.StdTime(stored.GetCreatedAt()), should.HappenAfter, start),
 			a.So(stored.GetUpdatedAt(), should.Equal, stored.GetCreatedAt()),
 			a.So(stored, should.Resemble, pb),
 		) {
@@ -352,7 +352,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 	}
 
 	pbOther := CopyEndDevice(pb)
-	pbOther.Session.LastFCntUp = pbCurrentUp.Payload.GetMacPayload().FCnt
+	pbOther.Session.LastFCntUp = pbCurrentUp.Payload.GetMacPayload().FHdr.FCnt
 	pbOther.Session.FNwkSIntKey.Key = &types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe}
 	pbOther.PendingSession = nil
 	pbOther.EndDeviceIdentifiers.DeviceId = "test-dev-other"

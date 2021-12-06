@@ -51,7 +51,7 @@ func (s *endDeviceQRCodeGeneratorServer) Generate(ctx context.Context, req *ttnp
 		return nil, errFormatNotFound.New()
 	}
 	data := formatter.New()
-	if err := data.Encode(&req.EndDevice); err != nil {
+	if err := data.Encode(req.EndDevice); err != nil {
 		return nil, err
 	}
 	if err := data.Validate(); err != nil {

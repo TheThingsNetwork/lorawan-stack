@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	time "time"
-)
+import fmt "fmt"
 
 func (dst *GatewayUp) SetFields(src *GatewayUp, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -123,8 +120,7 @@ func (dst *ScheduleDownlinkResponse) SetFields(src *ScheduleDownlinkResponse, pa
 			if src != nil {
 				dst.Delay = src.Delay
 			} else {
-				var zero time.Duration
-				dst.Delay = zero
+				dst.Delay = nil
 			}
 		case "downlink_path":
 			if len(subs) > 0 {

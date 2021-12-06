@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import { clear as clearAccessToken } from '@ttn-lw/lib/access-token'
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
@@ -32,7 +32,7 @@ const consoleAppLogic = createRequestLogic({
       // There is no way to retrieve the current user directly within the
       // console app, so first get the authentication info and only afterwards
       // fetch the user.
-      info = await api.users.authInfo()
+      info = await tts.Auth.getAuthInfo()
       rights = info.oauth_access_token.rights
       dispatch(user.getUserRightsSuccess(rights))
     } catch (error) {
@@ -49,7 +49,7 @@ const consoleAppLogic = createRequestLogic({
       try {
         dispatch(user.getUserMe())
         const userId = info.oauth_access_token.user_ids.user_id
-        const userResult = await api.users.get(userId, [
+        const userResult = await tts.Users.getById(userId, [
           'state',
           'name',
           'primary_email_address_validated_at',

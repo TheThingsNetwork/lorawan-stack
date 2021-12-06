@@ -70,7 +70,7 @@ func DeviceNeedsDevStatusReqAt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings)
 	if dev.LastDevStatusReceivedAt == nil {
 		return time.Time{}, true
 	}
-	return dev.LastDevStatusReceivedAt.Add(tp).UTC(), true
+	return ttnpb.StdTime(dev.LastDevStatusReceivedAt).Add(tp).UTC(), true
 }
 
 func DeviceNeedsDevStatusReq(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, transmitAt time.Time) bool {
@@ -130,7 +130,7 @@ func HandleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 			dev.BatteryPercentage = &pbtypes.FloatValue{Value: float32(pld.Battery-1) / 253}
 		}
 		dev.DownlinkMargin = pld.Margin
-		dev.LastDevStatusReceivedAt = &recvAt
+		dev.LastDevStatusReceivedAt = ttnpb.ProtoTimePtr(recvAt)
 		dev.MacState.LastDevStatusFCntUp = fCntUp
 		return nil
 	}, dev.MacState.PendingRequests...)

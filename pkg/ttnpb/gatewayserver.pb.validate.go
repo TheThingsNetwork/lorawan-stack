@@ -263,6 +263,13 @@ func (m *ScheduleDownlinkResponse) ValidateFields(paths ...string) error {
 		switch name {
 		case "delay":
 
+			if m.GetDelay() == nil {
+				return ScheduleDownlinkResponseValidationError{
+					field:  "delay",
+					reason: "value is required",
+				}
+			}
+
 		case "downlink_path":
 
 			if v, ok := interface{}(m.GetDownlinkPath()).(interface{ ValidateFields(...string) error }); ok {

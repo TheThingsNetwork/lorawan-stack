@@ -321,8 +321,7 @@ func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.Applicatio
 	up.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 	registerReceiveUp(ctx, up)
 
-	now := time.Now().UTC()
-	up.ReceivedAt = &now
+	up.ReceivedAt = ttnpb.ProtoTimePtr(time.Now())
 
 	pass, err := as.handleUp(ctx, up, link)
 	if err != nil {
@@ -920,7 +919,7 @@ func (as *ApplicationServer) markEndDeviceAsActivated(ctx context.Context, ids t
 		_, err = ttnpb.NewEndDeviceRegistryClient(cc).Update(ctx, &ttnpb.UpdateEndDeviceRequest{
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ids,
-				ActivatedAt:          &now,
+				ActivatedAt:          ttnpb.ProtoTimePtr(now),
 			},
 			FieldMask: &pbtypes.FieldMask{
 				Paths: mask,
@@ -934,7 +933,7 @@ func (as *ApplicationServer) markEndDeviceAsActivated(ctx context.Context, ids t
 				if dev == nil {
 					return nil, nil, errDeviceNotFound.WithAttributes("device_uid", devUID)
 				}
-				dev.ActivatedAt = &now
+				dev.ActivatedAt = ttnpb.ProtoTimePtr(now)
 				return dev, mask, nil
 			},
 		)

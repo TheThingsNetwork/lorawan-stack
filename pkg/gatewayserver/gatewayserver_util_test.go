@@ -16,10 +16,12 @@ package gatewayserver_test
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 	"net"
 	"time"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
@@ -88,7 +90,8 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key str
 }
 
 var (
-	errNotFound = errors.DefineNotFound("not_found", "not found")
+	errNotFound        = errors.DefineNotFound("not_found", "not found")
+	errNoGatewayRights = errors.DefinePermissionDenied("no_gateway_rights", "no gateway rights")
 )
 
 func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
@@ -96,6 +99,9 @@ func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb
 	gtw, ok := is.gateways[uid]
 	if !ok {
 		return nil, errNotFound.New()
+	}
+	if gtw == nil {
+		return nil, errNoGatewayRights.New() // This simulates the behaviour of the IS with a deleted gateway.
 	}
 	return gtw, nil
 }
@@ -108,6 +114,16 @@ func (is *mockIS) Update(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (
 	}
 	gtw.SetFields(req.Gateway, req.FieldMask.GetPaths()...)
 	return gtw, nil
+}
+
+func (is *mockIS) Delete(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
+	uid := unique.ID(ctx, ids)
+	_, ok := is.gateways[uid]
+	if !ok {
+		return nil, errNotFound.New()
+	}
+	is.gateways[uid] = nil
+	return nil, nil
 }
 
 func (is *mockIS) GetIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewayIdentifiersForEUIRequest) (*ttnpb.GatewayIdentifiers, error) {
@@ -144,13 +160,13 @@ func (is *mockIS) ListRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers)
 
 func randomJoinRequestPayload(joinEUI, devEUI types.EUI64) []byte {
 	var nwkKey types.AES128Key
-	random.Read(nwkKey[:])
+	rand.Read(nwkKey[:])
 	var devNonce types.DevNonce
-	random.Read(devNonce[:])
+	rand.Read(devNonce[:])
 
 	msg := &ttnpb.UplinkMessage{
 		Payload: &ttnpb.Message{
-			MHDR: ttnpb.MHDR{
+			MHdr: &ttnpb.MHDR{
 				MType: ttnpb.MType_JOIN_REQUEST,
 				Major: ttnpb.Major_LORAWAN_R1,
 			},
@@ -176,19 +192,19 @@ func randomJoinRequestPayload(joinEUI, devEUI types.EUI64) []byte {
 
 func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 	var fNwkSIntKey, sNwkSIntKey, appSKey types.AES128Key
-	random.Read(fNwkSIntKey[:])
-	random.Read(sNwkSIntKey[:])
-	random.Read(appSKey[:])
+	rand.Read(fNwkSIntKey[:])
+	rand.Read(sNwkSIntKey[:])
+	rand.Read(appSKey[:])
 
 	pld := &ttnpb.MACPayload{
-		FHDR: ttnpb.FHDR{
+		FHdr: &ttnpb.FHDR{
 			DevAddr: devAddr,
 			FCnt:    42,
 		},
 		FPort:      fPort,
 		FrmPayload: random.Bytes(size),
 	}
-	buf, err := crypto.EncryptUplink(appSKey, devAddr, pld.FCnt, pld.FrmPayload, false)
+	buf, err := crypto.EncryptUplink(appSKey, devAddr, pld.FHdr.FCnt, pld.FrmPayload, false)
 	if err != nil {
 		panic(err)
 	}
@@ -196,7 +212,7 @@ func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 
 	msg := &ttnpb.UplinkMessage{
 		Payload: &ttnpb.Message{
-			MHDR: ttnpb.MHDR{
+			MHdr: &ttnpb.MHDR{
 				MType: ttnpb.MType_UNCONFIRMED_UP,
 				Major: ttnpb.Major_LORAWAN_R1,
 			},
@@ -209,7 +225,7 @@ func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 	if err != nil {
 		panic(err)
 	}
-	mic, err := crypto.ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey, 0, 5, 0, devAddr, pld.FCnt, buf)
+	mic, err := crypto.ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey, 0, 5, 0, devAddr, pld.FHdr.FCnt, buf)
 	if err != nil {
 		panic(err)
 	}
@@ -218,25 +234,25 @@ func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 
 func randomDownDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 	var sNwkSIntKey, appSKey types.AES128Key
-	random.Read(sNwkSIntKey[:])
-	random.Read(appSKey[:])
+	rand.Read(sNwkSIntKey[:])
+	rand.Read(appSKey[:])
 
 	pld := &ttnpb.MACPayload{
-		FHDR: ttnpb.FHDR{
+		FHdr: &ttnpb.FHDR{
 			DevAddr: devAddr,
 			FCnt:    42,
 		},
 		FPort:      fPort,
 		FrmPayload: random.Bytes(size),
 	}
-	buf, err := crypto.EncryptDownlink(appSKey, devAddr, pld.FCnt, pld.FrmPayload, false)
+	buf, err := crypto.EncryptDownlink(appSKey, devAddr, pld.FHdr.FCnt, pld.FrmPayload, false)
 	if err != nil {
 		panic(err)
 	}
 	pld.FrmPayload = buf
 
 	msg := ttnpb.Message{
-		MHDR: ttnpb.MHDR{
+		MHdr: &ttnpb.MHDR{
 			MType: ttnpb.MType_UNCONFIRMED_DOWN,
 			Major: ttnpb.Major_LORAWAN_R1,
 		},
@@ -248,7 +264,7 @@ func randomDownDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte
 	if err != nil {
 		panic(err)
 	}
-	mic, err := crypto.ComputeDownlinkMIC(sNwkSIntKey, devAddr, 0, pld.FCnt, buf)
+	mic, err := crypto.ComputeDownlinkMIC(sNwkSIntKey, devAddr, 0, pld.FHdr.FCnt, buf)
 	if err != nil {
 		panic(err)
 	}

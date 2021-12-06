@@ -154,8 +154,8 @@ func TestEndDevicesCRUD(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(created, should.NotBeNil) {
-			a.So(created.CreatedAt, should.HappenAfter, start)
-			a.So(created.UpdatedAt, should.HappenAfter, start)
+			a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenAfter, start)
+			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenAfter, start)
 			a.So(created.Name, should.Equal, "test-device-name")
 		}
 
@@ -226,7 +226,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 		a.So(err, should.BeNil)
 		if a.So(updated, should.NotBeNil) {
 			a.So(updated.Name, should.Equal, "test-device-name-new")
-			a.So(updated.UpdatedAt, should.HappenAfter, start)
+			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenAfter, start)
 		}
 
 		_, err = reg.Delete(ctx, &ttnpb.EndDeviceIdentifiers{

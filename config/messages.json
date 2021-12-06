@@ -2987,24 +2987,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/band:lorawan_version_unsupported": {
-    "translations": {
-      "en": "LoRaWAN Regional Parameters version not supported; supported versions: {supported}"
-    },
-    "description": {
-      "package": "pkg/band",
-      "file": "errors.go"
-    }
-  },
-  "error:pkg/band:unknown_phy_version": {
-    "translations": {
-      "en": "unknown LoRaWAN PHY version `{version}`"
-    },
-    "description": {
-      "package": "pkg/band",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/basicstation/cups:field_length": {
     "translations": {
       "en": "length of `{field}` (`{length}`) exceeds maximum `{maximum}`"
@@ -3039,6 +3021,15 @@
     "description": {
       "package": "pkg/basicstation/cups",
       "file": "server.go"
+    }
+  },
+  "error:pkg/basicstation/cups:parse": {
+    "translations": {
+      "en": "request body parsing"
+    },
+    "description": {
+      "package": "pkg/basicstation/cups",
+      "file": "update_info.go"
     }
   },
   "error:pkg/basicstation/cups:server_trust": {
@@ -4600,7 +4591,7 @@
   },
   "error:pkg/gatewayserver/scheduling:too_late": {
     "translations": {
-      "en": "too late to transmission scheduled time (delta is `{delta}`)"
+      "en": "too late to transmission scheduled time (delta is `{delta}`, min is `{min}`)"
     },
     "description": {
       "package": "pkg/gatewayserver/scheduling",
@@ -6326,15 +6317,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/joinserver:permission_denied": {
-    "translations": {
-      "en": "permission denied"
-    },
-    "description": {
-      "package": "pkg/joinserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/joinserver:provisioner_not_found": {
     "translations": {
       "en": "provisioner `{id}` not found"
@@ -7991,18 +7973,18 @@
       "file": "toa.go"
     }
   },
-  "error:pkg/ttnpb/udp:eui": {
+  "error:pkg/ttnpb/udp:data_rate": {
     "translations": {
-      "en": "failed to parse EUI"
+      "en": "invalid data rate"
     },
     "description": {
       "package": "pkg/ttnpb/udp",
       "file": "errors.go"
     }
   },
-  "error:pkg/ttnpb/udp:modulation": {
+  "error:pkg/ttnpb/udp:eui": {
     "translations": {
-      "en": "invalid modulation `{modulation}`"
+      "en": "failed to parse EUI"
     },
     "description": {
       "package": "pkg/ttnpb/udp",

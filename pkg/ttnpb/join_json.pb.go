@@ -7,6 +7,7 @@
 package ttnpb
 
 import (
+	gogo "github.com/TheThingsIndustries/protoc-gen-go-json/gogo"
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
 )
 
@@ -43,7 +44,7 @@ func (x *JoinRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("net_id")
 		x.NetId.MarshalProtoJSON(s.WithField("net_id"))
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.DownlinkSettings != nil || s.HasField("downlink_settings") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("downlink_settings")
 		x.DownlinkSettings.MarshalProtoJSON(s.WithField("downlink_settings"))
@@ -69,7 +70,7 @@ func (x *JoinRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ConsumedAirtime == nil {
 			s.WriteNil()
 		} else {
-			s.WriteDuration(*x.ConsumedAirtime)
+			gogo.MarshalDuration(s, x.ConsumedAirtime)
 		}
 	}
 	s.WriteObjectEnd()
@@ -103,6 +104,7 @@ func (x *JoinRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.NetId.UnmarshalProtoJSON(s.WithField("net_id", false))
 		case "downlink_settings", "downlinkSettings":
 			if !s.ReadNil() {
+				x.DownlinkSettings = &DLSettings{}
 				x.DownlinkSettings.UnmarshalProtoJSON(s.WithField("downlink_settings", true))
 			}
 		case "rx_delay", "rxDelay":
@@ -118,7 +120,7 @@ func (x *JoinRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.CorrelationIds = s.ReadStringArray()
 		case "consumed_airtime", "consumedAirtime":
 			s.AddField("consumed_airtime")
-			v := s.ReadDuration()
+			v := gogo.UnmarshalDuration(s)
 			if s.Err() != nil {
 				return
 			}

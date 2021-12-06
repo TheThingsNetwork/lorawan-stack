@@ -58,7 +58,7 @@ message Session {
   // Frame counter of the last confirmed downlink message sent. Network Server only.
   uint32 last_conf_f_cnt_down = 7;
   // Time when the session started. Network Server only.
-  google.protobuf.Timestamp started_at = 8 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp started_at = 8;
   // Queued Application downlink messages. Stored in Application Server and Network Server.
   repeated ApplicationDownlink queued_application_downlinks = 9;
 }
@@ -291,7 +291,7 @@ message MACState {
   // LoRaWAN MAC version.
   MACVersion lorawan_version = 4 [(validate.rules).enum.defined_only = true];
   // Time when the last confirmed downlink message or MAC command was scheduled.
-  google.protobuf.Timestamp last_confirmed_downlink_at = 5 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp last_confirmed_downlink_at = 5;
   // Frame counter value of last uplink containing DevStatusAns.
   uint32 last_dev_status_f_cnt_up = 6;
   // Periodicity of the class B ping slot.
@@ -341,7 +341,7 @@ message MACState {
   repeated DownlinkMessage recent_downlinks = 15;
 
   // Time when the last network-initiated downlink message was scheduled.
-  google.protobuf.Timestamp last_network_initiated_downlink_at = 16 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp last_network_initiated_downlink_at = 16;
 
   // ADR Data rate index values rejected by the device.
   // Reset each time `current_parameters.channels` change.
@@ -356,7 +356,7 @@ message MACState {
   repeated uint64 rejected_frequencies = 19 [(validate.rules).repeated.items.uint64.gte = 100000];
 
   // Time when the last downlink message was scheduled.
-  google.protobuf.Timestamp last_downlink_at = 20 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp last_downlink_at = 20;
 
   message DataRateRange {
     DataRateIndex min_data_rate_index = 1 [(validate.rules).enum.defined_only = true];
@@ -383,8 +383,8 @@ enum PowerState {
 // Authentication code for end devices.
 message EndDeviceAuthenticationCode {
   string value = 1 [(validate.rules).string.pattern = "^[A-Z0-9]{1,32}$"];
-  google.protobuf.Timestamp valid_from = 2 [(gogoproto.stdtime) = true];
-  google.protobuf.Timestamp valid_to = 3 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp valid_from = 2;
+  google.protobuf.Timestamp valid_to = 3;
 }
 
 // Defines an End Device registration and its state on the network.
@@ -392,8 +392,8 @@ message EndDeviceAuthenticationCode {
 // SDKs are responsible for combining (if desired) the three.
 message EndDevice {
   EndDeviceIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
-  google.protobuf.Timestamp created_at = 2 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
-  google.protobuf.Timestamp updated_at = 3 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp updated_at = 3;
 
   // Friendly name of the device. Stored in Entity Registry.
   string name = 4 [(validate.rules).string.max_len = 50];
@@ -516,7 +516,7 @@ message EndDevice {
 
   // Time when last DevStatus MAC command was received.
   // Stored in Network Server.
-  google.protobuf.Timestamp last_dev_status_received_at = 33 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp last_dev_status_received_at = 33;
   // The power state of the device; whether it is battery-powered or connected to an external power source.
   // Received via the DevStatus MAC command at status_received_at.
   // Stored in Network Server.
@@ -567,7 +567,7 @@ message EndDevice {
   // The Application Server will use the field in order to avoid repeated
   // calls to the Entity Registry.
   // The field cannot be unset once set.
-  google.protobuf.Timestamp activated_at = 53 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp activated_at = 53;
 
   // next: 54;
 }

@@ -14,27 +14,19 @@
 
 class ConfigurationStep {
   checkOTAA() {
-    cy.findByLabelText('Over the air activation (OTAA)')
-      .should('exist')
-      .check()
+    cy.findByLabelText('Over the air activation (OTAA)').should('exist').check()
   }
 
   checkABP() {
-    cy.findByLabelText('Activation by personalization (ABP)')
-      .should('exist')
-      .check()
+    cy.findByLabelText('Activation by personalization (ABP)').should('exist').check()
   }
 
   checkMulticast() {
-    cy.findByLabelText('Multicast')
-      .should('exist')
-      .check()
+    cy.findByLabelText('Multicast').should('exist').check()
   }
 
   checkNone() {
-    cy.findByLabelText('Do not configure activation')
-      .should('exist')
-      .check()
+    cy.findByLabelText('Do not configure activation').should('exist').check()
   }
 
   selectLorawanVersion(version) {
@@ -44,9 +36,7 @@ class ConfigurationStep {
   checkExternalJS() {
     cy.findByLabelText('Join Server address').then($input => {
       cy.wrap($input).should('not.be.disabled')
-      cy.findByLabelText('External Join Server')
-        .should('exist')
-        .check()
+      cy.findByLabelText('External Join Server').should('exist').check()
       cy.wrap($input)
         .should('be.disabled')
         .and('have.attr', 'placeholder', 'External')
@@ -55,45 +45,33 @@ class ConfigurationStep {
   }
 
   submit() {
-    cy.findByRole('button', { name: 'Start' })
-      .should('be.visible')
-      .click()
+    cy.findByRole('button', { name: 'Start' }).should('be.visible').click()
   }
 }
 
 class BasicSettingsStep {
   fillId(id) {
     cy.findByLabelText('End device ID').then($input => {
-      cy.wrap($input)
-        .should('be.visible')
-        .and('have.attr', 'placeholder', 'my-new-device')
+      cy.wrap($input).should('be.visible').and('have.attr', 'placeholder', 'my-new-device')
       cy.wrap($input).type(id)
     })
   }
 
   fillJoinEUI(eui) {
-    cy.findByLabelText('JoinEUI')
-      .should('be.visible')
-      .type(eui)
+    cy.findByLabelText('JoinEUI').should('be.visible').type(eui)
   }
 
   fillAppEUI(eui) {
-    cy.findByLabelText('AppEUI')
-      .should('be.visible')
-      .type(eui)
+    cy.findByLabelText('AppEUI').should('be.visible').type(eui)
   }
 
   fillDevEUI(eui) {
-    cy.findByLabelText('DevEUI')
-      .should('be.visible')
-      .type(eui)
+    cy.findByLabelText('DevEUI').should('be.visible').type(eui)
   }
 
   fillName(name) {
     cy.findByLabelText('End device name').then($input => {
-      cy.wrap($input)
-        .should('be.visible')
-        .and('have.attr', 'placeholder', 'My new end device')
+      cy.wrap($input).should('be.visible').and('have.attr', 'placeholder', 'My new end device')
       cy.wrap($input).type(name)
     })
   }
@@ -105,9 +83,7 @@ class BasicSettingsStep {
         'Optional end device description; can also be used to save notes about the end device',
       )
       .should('be.visible')
-    cy.findByLabelText('End device description')
-      .should('be.visible')
-      .type(description)
+    cy.findByLabelText('End device description').should('be.visible').type(description)
   }
 
   goToNetworkLayerStep() {
@@ -127,27 +103,19 @@ class NetworkLayerStep {
   }
 
   checkClassB() {
-    cy.findByLabelText('Supports class B')
-      .should('exist')
-      .check()
+    cy.findByLabelText('Supports class B').should('exist').check()
   }
 
   checkClassC() {
-    cy.findByLabelText('Supports class C')
-      .should('exist')
-      .check()
+    cy.findByLabelText('Supports class C').should('exist').check()
   }
 
   fillDevAddress(address) {
-    cy.findByLabelText('Device address')
-      .should('be.visible')
-      .type(address)
+    cy.findByLabelText('Device address').should('be.visible').type(address)
   }
 
   fillNwkSKey(key) {
-    cy.findByLabelText('NwkSKey')
-      .should('be.visible')
-      .type(key)
+    cy.findByLabelText('NwkSKey').should('be.visible').type(key)
   }
 
   openAdvancedSettings() {
@@ -165,21 +133,15 @@ class NetworkLayerStep {
   }
 
   check16BitFCnt() {
-    cy.findByLabelText('16 bit')
-      .should('exist')
-      .check()
+    cy.findByLabelText('16 bit').should('exist').check()
   }
 
   check32BitFCnt() {
-    cy.findByLabelText('32 bit')
-      .should('exist')
-      .check()
+    cy.findByLabelText('32 bit').should('exist').check()
   }
 
   fillRx2DataRateIndex(index) {
-    cy.findByLabelText('RX2 Data Rate Index')
-      .should('be.visible')
-      .type(index)
+    cy.findByLabelText('RX2 Data Rate Index').should('be.visible').type(index)
   }
 
   fillRx2Frequency(frequency) {
@@ -237,9 +199,7 @@ class NetworkLayerStep {
   }
 
   submit() {
-    cy.findByRole('button', { name: 'Add end device' })
-      .should('be.visible')
-      .click()
+    cy.findByRole('button', { name: 'Add end device' }).should('be.visible').click()
   }
 }
 
@@ -249,15 +209,11 @@ class JoinSettingsStep {
   }
 
   fillAppKey(key) {
-    cy.findByLabelText('AppKey')
-      .should('be.visible')
-      .type(key)
+    cy.findByLabelText('AppKey').should('be.visible').type(key)
   }
 
   fillNwkKey(key) {
-    cy.findByLabelText('NwkKey')
-      .should('be.visible')
-      .type(key)
+    cy.findByLabelText('NwkKey').should('be.visible').type(key)
   }
 
   openAdvancedSettings() {
@@ -282,9 +238,7 @@ class JoinSettingsStep {
   }
 
   submit() {
-    cy.findByRole('button', { name: 'Add end device' })
-      .should('be.visible')
-      .click()
+    cy.findByRole('button', { name: 'Add end device' }).should('be.visible').click()
   }
 }
 
@@ -293,21 +247,15 @@ class ApplicationLayerStep {
     cy.findDescriptionByLabelText('Skip payload encryption and decryption')
       .should('contain', 'Skip decryption of uplink payloads and encryption of downlink payloads')
       .should('be.visible')
-    cy.findByLabelText('Skip payload encryption and decryption')
-      .should('exist')
-      .check()
+    cy.findByLabelText('Skip payload encryption and decryption').should('exist').check()
   }
 
   fillAppSKey(key) {
-    cy.findByLabelText('AppSKey')
-      .should('be.visible')
-      .type(key)
+    cy.findByLabelText('AppSKey').should('be.visible').type(key)
   }
 
   submit() {
-    cy.findByRole('button', { name: 'Add end device' })
-      .should('be.visible')
-      .click()
+    cy.findByRole('button', { name: 'Add end device' }).should('be.visible').click()
   }
 }
 

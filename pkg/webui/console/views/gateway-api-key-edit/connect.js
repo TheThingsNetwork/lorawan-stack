@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
@@ -57,9 +57,9 @@ export default GatewayApiKeyEdit =>
       getApiKey: (gtwId, keyId) => {
         dispatch(getApiKey('gateway', gtwId, keyId))
       },
-      deleteApiKey: api.gateway.apiKeys.delete,
+      deleteApiKey: tts.Gateways.ApiKeys.deleteById,
       deleteSuccess: gtwId => dispatch(replace(`/gateways/${gtwId}/api-keys`)),
-      editApiKey: api.gateway.apiKeys.update,
+      editApiKey: tts.Gateways.ApiKeys.updateById,
     }),
     (stateProps, dispatchProps, ownProps) => ({
       ...stateProps,

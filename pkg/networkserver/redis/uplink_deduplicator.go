@@ -37,7 +37,7 @@ func NewUplinkDeduplicator(cl *ttnredis.Client) *UplinkDeduplicator {
 }
 
 func uplinkHash(ctx context.Context, up *ttnpb.UplinkMessage) (string, error) {
-	drBytes, err := proto.Marshal(&up.Settings.DataRate)
+	drBytes, err := proto.Marshal(up.Settings.DataRate)
 	if err != nil {
 		return "", err
 	}

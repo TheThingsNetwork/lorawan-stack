@@ -54,8 +54,7 @@ func validLocation(loc ttnpb.Location) bool {
 			return false
 		}
 	}
-
-	return true
+	return loc.ValidateFields() == nil
 }
 
 // UpstreamMetadata related to an uplink.
@@ -207,9 +206,9 @@ func convertUplink(rx RxPacket, md UpstreamMetadata) (ttnpb.UplinkMessage, error
 	}
 	if !goTime.IsZero() {
 		for _, md := range up.RxMetadata {
-			md.Time = &goTime
+			md.Time = ttnpb.ProtoTimePtr(goTime)
 		}
-		up.Settings.Time = &goTime
+		up.Settings.Time = ttnpb.ProtoTimePtr(goTime)
 	}
 
 	switch up.Settings.DataRate.Modulation.(type) {
@@ -264,7 +263,7 @@ func convertStatus(stat Stat, md UpstreamMetadata) *ttnpb.GatewayStatus {
 	}
 
 	if stat.Lati != nil && stat.Long != nil {
-		loc := &ttnpb.Location{Latitude: *stat.Lati, Longitude: *stat.Long}
+		loc := &ttnpb.Location{Latitude: *stat.Lati, Longitude: *stat.Long, Source: ttnpb.SOURCE_GPS}
 		if stat.Alti != nil {
 			loc.Altitude = *stat.Alti
 		}
@@ -365,7 +364,7 @@ func ToDownlinkMessage(tx *TxPacket) (*ttnpb.DownlinkMessage, error) {
 	}
 	if tx.Time != nil {
 		t := gpstime.Parse(time.Duration(*tx.Tmms) * time.Millisecond)
-		scheduled.Time = &t
+		scheduled.Time = ttnpb.ProtoTimePtr(t)
 	}
 	buf, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(tx.Data, "="))
 	if err != nil {
@@ -395,14 +394,14 @@ func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 		Tmst: scheduled.Timestamp,
 	}
 	if scheduled.Time != nil {
-		t := uint64(gpstime.ToGPS(*scheduled.Time) / time.Millisecond)
+		t := uint64(gpstime.ToGPS(*ttnpb.StdTime(scheduled.Time)) / time.Millisecond)
 		tx.Tmms = &t
 	} else if scheduled.Timestamp == 0 {
 		tx.Imme = true
 	}
 
 	tx.DatR.DataRate = scheduled.DataRate
-	switch scheduled.DataRate.Modulation.(type) {
+	switch scheduled.DataRate.GetModulation().(type) {
 	case *ttnpb.DataRate_Lora:
 		tx.CodR = scheduled.CodingRate
 		tx.NCRC = !scheduled.EnableCrc
@@ -410,7 +409,7 @@ func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 	case *ttnpb.DataRate_Fsk:
 		tx.Modu = fsk
 	default:
-		return tx, errModulation.WithAttributes("modulation", scheduled.DataRate)
+		return nil, errDataRate.New()
 	}
 	return tx, nil
 }

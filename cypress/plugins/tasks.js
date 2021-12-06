@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const { execSync, spawn } = require('child_process')
+const { execSync, exec, spawn } = require('child_process')
 const fs = require('fs')
 const readline = require('readline')
 
@@ -85,7 +85,7 @@ const stackConfigTask = (_, config) => {
   }
 }
 
-const sqlTask = (on, _) => {
+const sqlTask = on => {
   on('task', {
     execSql: async sql => {
       client = new Client(pgConfig)
@@ -99,18 +99,21 @@ const sqlTask = (on, _) => {
       postgresContainer.stdin.write(
         `dropdb --if-exists --force ${devDatabase}; psql template1 -c "CREATE DATABASE ${devDatabase} TEMPLATE ${seedDatabase};"\n`,
       )
-      return new Promise(resolve => {
-        postgresContainer.stdout.on('data', resolve)
-        postgresContainer.stderr.on('data', data => {
-          throw new Error(data)
-        })
-        postgresContainer.on('close', resolve)
-      })
+      return Promise.all([
+        new Promise(resolve => exec('tools/bin/mage dev:redisFlush', resolve)),
+        new Promise(resolve => {
+          postgresContainer.stdout.on('data', resolve)
+          postgresContainer.stderr.on('data', data => {
+            throw new Error(data)
+          })
+          postgresContainer.on('close', resolve)
+        }),
+      ])
     },
   })
 }
 
-const stackLogTask = (on, _) => {
+const stackLogTask = on => {
   on('task', {
     findEmailInStackLog: async (regExp, capturingGroup = 0) => {
       const re = new RegExp(regExp, 'm')

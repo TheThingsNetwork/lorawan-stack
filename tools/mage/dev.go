@@ -21,6 +21,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -122,7 +123,7 @@ func (Dev) SQLCreateSeedDB() error {
 	}
 	d := filepath.Join(".cache", "sqldump.sql")
 	if _, err := os.Stat(d); errors.Is(err, os.ErrNotExist) {
-		return fmt.Errorf("Dumpfile does not exist: %w", d)
+		return fmt.Errorf("Dumpfile does not exist: %s", d)
 	}
 	return sh.Run(filepath.Join("tools", "mage", "scripts", "recreate-db-from-dump.sh"), devSeedDatabaseName, d)
 }
@@ -166,6 +167,17 @@ func (Dev) DBStart() error {
 	}
 	if err := execDockerCompose(append([]string{"up", "-d"}, devDatabases...)...); err != nil {
 		return err
+	}
+	var cerr error
+	if os.Getenv("CI") != "true" {
+		flags := dockerComposeFlags(append([]string{"exec", "postgres", "pg_isready"})...)
+		for i := 0; i < 15; i++ {
+			if _, cerr = sh.Exec(nil, nil, nil, "docker-compose", flags...); cerr == nil {
+				break
+			}
+			time.Sleep(2 * time.Second)
+		}
+		return cerr
 	}
 	return execDockerCompose("ps")
 }
@@ -283,7 +295,7 @@ func (Dev) StartDevStack() error {
 	}
 	defer logFile.Close()
 	if os.Getenv("CI") == "true" {
-		_, err := sh.ExecFrom("", map[string]string{}, logFile, logFile, "./ttn-lw-stack", "start", "--log.format=json")
+		_, err := sh.ExecFrom("", map[string]string{}, logFile, logFile, "./ttn-lw-stack", "start", "--log.format=json", "--config=config/stack/ttn-lw-stack-tls.yml")
 		return err
 	}
 	return execGo(logFile, logFile, "run", "./cmd/ttn-lw-stack", "start", "--log.format=json")

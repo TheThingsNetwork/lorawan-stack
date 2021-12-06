@@ -42,6 +42,7 @@ tts.subscribe('warning', payload => {
     type: toast.types.WARNING,
     message: payload,
     preventConsecutive: true,
+    messageGroup: 'header-warning',
   })
 })
 

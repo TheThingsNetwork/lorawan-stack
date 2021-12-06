@@ -19,7 +19,7 @@ import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 import { push } from 'connected-react-router'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
@@ -96,7 +96,7 @@ export default class ApplicationWebhookAddForm extends Component {
   async handleSubmit(webhook) {
     const { appId } = this.props
 
-    await api.application.webhooks.create(appId, webhook)
+    await tts.Applications.Webhooks.create(appId, webhook)
   }
 
   @bind
@@ -111,7 +111,7 @@ export default class ApplicationWebhookAddForm extends Component {
     const { appId } = this.props
 
     try {
-      await api.application.webhooks.get(appId, webhookId, [])
+      await tts.Applications.Webhooks.getById(appId, webhookId, [])
       return true
     } catch (error) {
       if (isNotFoundError(error)) {

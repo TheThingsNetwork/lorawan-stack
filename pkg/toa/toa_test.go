@@ -25,7 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func buildLoRaDownlinkFromParameters(payloadSize int, frequency uint64, dataRate ttnpb.DataRate, codingRate string) (downlink ttnpb.DownlinkMessage, err error) {
+func buildLoRaDownlinkFromParameters(payloadSize int, frequency uint64, dataRate *ttnpb.DataRate, codingRate string) (downlink ttnpb.DownlinkMessage, err error) {
 	payload := bytes.Repeat([]byte{0x0}, payloadSize)
 	scheduled := &ttnpb.TxSettings{
 		Frequency:  frequency,
@@ -46,7 +46,7 @@ func TestInvalidLoRa(t *testing.T) {
 
 	// Invalid coding rate.
 	{
-		downlink, err := buildLoRaDownlinkFromParameters(10, 868100000, ttnpb.DataRate{
+		downlink, err := buildLoRaDownlinkFromParameters(10, 868100000, &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Lora{
 				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 10,
@@ -61,7 +61,7 @@ func TestInvalidLoRa(t *testing.T) {
 
 	// Invalid spreading factor.
 	{
-		downlink, err := buildLoRaDownlinkFromParameters(10, 868100000, ttnpb.DataRate{
+		downlink, err := buildLoRaDownlinkFromParameters(10, 868100000, &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Lora{
 				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 0,
@@ -76,7 +76,7 @@ func TestInvalidLoRa(t *testing.T) {
 
 	// Invalid bandwidth.
 	{
-		downlink, err := buildLoRaDownlinkFromParameters(10, 868100000, ttnpb.DataRate{
+		downlink, err := buildLoRaDownlinkFromParameters(10, 868100000, &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Lora{
 				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 7,
@@ -101,7 +101,7 @@ func TestDifferentLoRaSFs(t *testing.T) {
 		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 12, Bandwidth: 125000}}}: 991232,
 	}
 	for dr, us := range sfTests {
-		dl, err := buildLoRaDownlinkFromParameters(10, 868100000, dr, "4/5")
+		dl, err := buildLoRaDownlinkFromParameters(10, 868100000, &dr, "4/5")
 		a.So(err, should.BeNil)
 		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
 		a.So(err, should.BeNil)
@@ -117,7 +117,7 @@ func TestDifferentLoRaBWs(t *testing.T) {
 		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 500000}}}: 10304,
 	}
 	for dr, us := range bwTests {
-		dl, err := buildLoRaDownlinkFromParameters(10, 868100000, dr, "4/5")
+		dl, err := buildLoRaDownlinkFromParameters(10, 868100000, &dr, "4/5")
 		a.So(err, should.BeNil)
 		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
 		a.So(err, should.BeNil)
@@ -134,7 +134,7 @@ func TestDifferentLoRaCRs(t *testing.T) {
 		"4/8": 53504,
 	}
 	for cr, us := range crTests {
-		dl, err := buildLoRaDownlinkFromParameters(10, 868100000, ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}, cr)
+		dl, err := buildLoRaDownlinkFromParameters(10, 868100000, &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}, cr)
 		a.So(err, should.BeNil)
 		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
 		a.So(err, should.BeNil)
@@ -154,7 +154,7 @@ func TestDifferentLoRaPayloadSizes(t *testing.T) {
 		19: 51456,
 	}
 	for size, us := range plTests {
-		dl, err := buildLoRaDownlinkFromParameters(size, 868100000, ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}, "4/5")
+		dl, err := buildLoRaDownlinkFromParameters(size, 868100000, &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}, "4/5")
 		a.So(err, should.BeNil)
 		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
 		a.So(err, should.BeNil)
@@ -167,7 +167,7 @@ func TestFSK(t *testing.T) {
 	payloadSize := 200
 	scheduled := ttnpb.TxSettings{
 		Frequency: 868300000,
-		DataRate: ttnpb.DataRate{
+		DataRate: &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Fsk{
 				Fsk: &ttnpb.FSKDataRate{
 					BitRate: 50000,
@@ -197,7 +197,7 @@ func TestInvalidLoRa2400(t *testing.T) {
 
 	// Invalid coding rate.
 	{
-		downlink, err := buildLoRaDownlinkFromParameters(10, 2422000000, ttnpb.DataRate{
+		downlink, err := buildLoRaDownlinkFromParameters(10, 2422000000, &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Lora{
 				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 10,
@@ -212,7 +212,7 @@ func TestInvalidLoRa2400(t *testing.T) {
 
 	// Invalid spreading factor.
 	{
-		downlink, err := buildLoRaDownlinkFromParameters(10, 2422000000, ttnpb.DataRate{
+		downlink, err := buildLoRaDownlinkFromParameters(10, 2422000000, &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Lora{
 				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 0,
@@ -227,7 +227,7 @@ func TestInvalidLoRa2400(t *testing.T) {
 
 	// Invalid bandwidth.
 	{
-		downlink, err := buildLoRaDownlinkFromParameters(10, 2422000000, ttnpb.DataRate{
+		downlink, err := buildLoRaDownlinkFromParameters(10, 2422000000, &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Lora{
 				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 7,
@@ -254,7 +254,7 @@ func TestDifferentLoRa2400SFs(t *testing.T) {
 		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 12, Bandwidth: 812000}}}: 142502500,
 	}
 	for dr, ns := range sfTests {
-		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, dr, "4/5LI")
+		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, &dr, "4/5LI")
 		a.So(err, should.BeNil)
 		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
 		a.So(err, should.BeNil)
@@ -271,7 +271,7 @@ func TestDifferentLoRa2400BWs(t *testing.T) {
 		{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 1625000}}}: 2776600,
 	}
 	for dr, ns := range bwTests {
-		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, dr, "4/5LI")
+		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, &dr, "4/5LI")
 		a.So(err, should.BeNil)
 		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
 		a.So(err, should.BeNil)
@@ -288,7 +288,7 @@ func TestDifferentLoRa2400CRs(t *testing.T) {
 		"4/8LI": 6817700,
 	}
 	for cr, ns := range crTests {
-		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, ttnpb.DataRate{
+		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Lora{
 				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 7,
@@ -314,7 +314,7 @@ func TestDifferentLoRa2400PayloadSizes(t *testing.T) {
 		230: 1252256200,
 	}
 	for size, ns := range plTests {
-		dl, err := buildLoRaDownlinkFromParameters(size, 2422000000, ttnpb.DataRate{
+		dl, err := buildLoRaDownlinkFromParameters(size, 2422000000, &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Lora{
 				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 12,
@@ -336,7 +336,7 @@ func TestDifferentLoRa2400CRCs(t *testing.T) {
 		false: 5556700,
 	}
 	for crc, ns := range crcTests {
-		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, ttnpb.DataRate{
+		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Lora{
 				Lora: &ttnpb.LoRaDataRate{
 					SpreadingFactor: 7,

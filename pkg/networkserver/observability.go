@@ -302,15 +302,15 @@ func mTypeLabel(mType ttnpb.MType) string {
 }
 
 func registerReceiveUplink(ctx context.Context, msg *ttnpb.UplinkMessage) {
-	nsMetrics.uplinkReceived.WithLabelValues(ctx, mTypeLabel(msg.Payload.MType)).Inc()
+	nsMetrics.uplinkReceived.WithLabelValues(ctx, mTypeLabel(msg.Payload.MHdr.MType)).Inc()
 }
 
 func registerReceiveDuplicateUplink(ctx context.Context, msg *ttnpb.UplinkMessage) {
-	nsMetrics.uplinkDuplicates.WithLabelValues(ctx, mTypeLabel(msg.Payload.MType)).Inc()
+	nsMetrics.uplinkDuplicates.WithLabelValues(ctx, mTypeLabel(msg.Payload.MHdr.MType)).Inc()
 }
 
 func registerProcessUplink(ctx context.Context, msg *ttnpb.UplinkMessage) {
-	nsMetrics.uplinkProcessed.WithLabelValues(ctx, mTypeLabel(msg.Payload.MType)).Inc()
+	nsMetrics.uplinkProcessed.WithLabelValues(ctx, mTypeLabel(msg.Payload.MHdr.MType)).Inc()
 }
 
 func registerForwardDataUplink(ctx context.Context, msg *ttnpb.ApplicationUplink) {
@@ -322,7 +322,7 @@ func registerForwardDataUplink(ctx context.Context, msg *ttnpb.ApplicationUplink
 }
 
 func registerForwardJoinRequest(ctx context.Context, msg *ttnpb.UplinkMessage) {
-	nsMetrics.uplinkForwarded.WithLabelValues(ctx, mTypeLabel(msg.Payload.MType)).Inc()
+	nsMetrics.uplinkForwarded.WithLabelValues(ctx, mTypeLabel(msg.Payload.MHdr.MType)).Inc()
 }
 
 func registerDropUplink(ctx context.Context, msg *ttnpb.UplinkMessage, err error) {
@@ -330,11 +330,11 @@ func registerDropUplink(ctx context.Context, msg *ttnpb.UplinkMessage, err error
 	if ttnErr, ok := errors.From(err); ok {
 		cause = ttnErr.FullName()
 	}
-	nsMetrics.uplinkDropped.WithLabelValues(ctx, mTypeLabel(msg.Payload.MType), cause).Inc()
+	nsMetrics.uplinkDropped.WithLabelValues(ctx, mTypeLabel(msg.Payload.MHdr.MType), cause).Inc()
 }
 
 func registerUplinkLatency(ctx context.Context, msg *ttnpb.UplinkMessage) {
-	nsMetrics.gsNsUplinkLatency.WithLabelValues(ctx).Observe(time.Since(*msg.ReceivedAt).Seconds())
+	nsMetrics.gsNsUplinkLatency.WithLabelValues(ctx).Observe(time.Since(*ttnpb.StdTime(msg.ReceivedAt)).Seconds())
 }
 
 func registerMergeMetadata(ctx context.Context, msg *ttnpb.UplinkMessage) {

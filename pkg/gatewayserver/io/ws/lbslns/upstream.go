@@ -186,10 +186,10 @@ func (tsr TimeSyncResponse) MarshalJSON() ([]byte, error) {
 // toUplinkMessage extracts fields from the Basics Station Join Request "jreq" message and converts them into an UplinkMessage for the network server.
 func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
 	var up ttnpb.UplinkMessage
-	up.ReceivedAt = &receivedAt
+	up.ReceivedAt = ttnpb.ProtoTimePtr(receivedAt)
 
-	var parsedMHDR ttnpb.MHDR
-	if err := lorawan.UnmarshalMHDR([]byte{byte(req.MHdr)}, &parsedMHDR); err != nil {
+	parsedMHDR := &ttnpb.MHDR{}
+	if err := lorawan.UnmarshalMHDR([]byte{byte(req.MHdr)}, parsedMHDR); err != nil {
 		return nil, errMDHR.WithAttributes(`mhdr`, parsedMHDR)
 	}
 
@@ -198,7 +198,7 @@ func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 		return nil, errJoinRequestMessage.WithCause(err)
 	}
 	up.Payload = &ttnpb.Message{
-		MHDR: parsedMHDR,
+		MHdr: parsedMHDR,
 		Mic:  micBytes,
 		Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
 			JoinEui:  req.JoinEUI.EUI64,
@@ -217,7 +217,7 @@ func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 	up.RxMetadata = []*ttnpb.RxMetadata{
 		{
 			GatewayIds:   &ids,
-			Time:         tm,
+			Time:         ttnpb.ProtoTime(tm),
 			Timestamp:    timestamp,
 			Rssi:         req.RadioMetaData.UpInfo.RSSI,
 			ChannelRssi:  req.RadioMetaData.UpInfo.RSSI,
@@ -247,7 +247,7 @@ func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 		DataRate:   bandDR.Rate,
 		CodingRate: codingRate,
 		Timestamp:  timestamp,
-		Time:       tm,
+		Time:       ttnpb.ProtoTime(tm),
 	}
 
 	return &up, nil
@@ -260,7 +260,7 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 	if err != nil {
 		return errUplinkMessage.New()
 	}
-	req.MHdr = (uint(payload.MHDR.GetMType()) << 5) | uint(payload.MHDR.GetMajor())
+	req.MHdr = (uint(payload.MHdr.MType) << 5) | uint(payload.MHdr.Major)
 	req.MIC = int32(binary.LittleEndian.Uint32(payload.Mic[:]))
 	jreqPayload := payload.GetJoinRequestPayload()
 	if jreqPayload == nil {
@@ -291,7 +291,7 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 	}
 
 	rxMetadata := up.RxMetadata[0]
-	rxTime, gpsTime := TimePtrToUpInfoTime(rxMetadata.Time)
+	rxTime, gpsTime := TimePtrToUpInfoTime(ttnpb.StdTime(rxMetadata.Time))
 	req.RadioMetaData = RadioMetaData{
 		DataRate:  int(drIdx),
 		Frequency: up.Settings.GetFrequency(),
@@ -310,10 +310,10 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 // toUplinkMessage extracts fields from the LoRa Basics Station Uplink Data Frame "updf" message and converts them into an UplinkMessage for the network server.
 func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
 	var up ttnpb.UplinkMessage
-	up.ReceivedAt = &receivedAt
+	up.ReceivedAt = ttnpb.ProtoTimePtr(receivedAt)
 
-	var parsedMHDR ttnpb.MHDR
-	if err := lorawan.UnmarshalMHDR([]byte{byte(updf.MHdr)}, &parsedMHDR); err != nil {
+	parsedMHDR := &ttnpb.MHDR{}
+	if err := lorawan.UnmarshalMHDR([]byte{byte(updf.MHdr)}, parsedMHDR); err != nil {
 		return nil, errUplinkDataFrame.WithCause(err)
 	}
 	if parsedMHDR.MType != ttnpb.MType_UNCONFIRMED_UP && parsedMHDR.MType != ttnpb.MType_CONFIRMED_UP {
@@ -335,8 +335,8 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 	var devAddr types.DevAddr
 	devAddr.UnmarshalNumber(uint32(updf.DevAddr))
 
-	var fctrl ttnpb.FCtrl
-	if err := lorawan.UnmarshalFCtrl([]byte{byte(updf.FCtrl)}, &fctrl, true); err != nil {
+	fctrl := &ttnpb.FCtrl{}
+	if err := lorawan.UnmarshalFCtrl([]byte{byte(updf.FCtrl)}, fctrl, true); err != nil {
 		return nil, errUplinkDataFrame.WithCause(err)
 	}
 
@@ -351,12 +351,12 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 	}
 
 	up.Payload = &ttnpb.Message{
-		MHDR: parsedMHDR,
+		MHdr: parsedMHDR,
 		Mic:  micBytes,
 		Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 			FPort:      fPort,
 			FrmPayload: decFRMPayload,
-			FHDR: ttnpb.FHDR{
+			FHdr: &ttnpb.FHDR{
 				DevAddr: devAddr,
 				FCtrl:   fctrl,
 				FCnt:    uint32(updf.FCnt),
@@ -375,7 +375,7 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 	up.RxMetadata = []*ttnpb.RxMetadata{
 		{
 			GatewayIds:   &ids,
-			Time:         tm,
+			Time:         ttnpb.ProtoTime(tm),
 			Timestamp:    timestamp,
 			Rssi:         updf.RadioMetaData.UpInfo.RSSI,
 			ChannelRssi:  updf.RadioMetaData.UpInfo.RSSI,
@@ -405,12 +405,12 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 		DataRate:   bandDR.Rate,
 		CodingRate: codingRate,
 		Timestamp:  timestamp,
-		Time:       tm,
+		Time:       ttnpb.ProtoTime(tm),
 	}
 	return &up, nil
 }
 
-func getFCtrlAsUint(fCtrl ttnpb.FCtrl) uint {
+func getFCtrlAsUint(fCtrl *ttnpb.FCtrl) uint {
 	var ret uint
 	if fCtrl.GetAdr() {
 		ret = ret | 0x80
@@ -434,7 +434,7 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 	if err != nil {
 		return errUplinkMessage.New()
 	}
-	updf.MHdr = (uint(payload.MHDR.GetMType()) << 5) | uint(payload.MHDR.GetMajor())
+	updf.MHdr = (uint(payload.MHdr.MType) << 5) | uint(payload.MHdr.Major)
 
 	macPayload := payload.GetMacPayload()
 	if macPayload == nil {
@@ -443,11 +443,11 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 
 	updf.FPort = int(macPayload.GetFPort())
 
-	updf.DevAddr = int32(macPayload.DevAddr.MarshalNumber())
-	updf.FOpts = hex.EncodeToString(macPayload.GetFOpts())
+	updf.DevAddr = int32(macPayload.FHdr.DevAddr.MarshalNumber())
+	updf.FOpts = hex.EncodeToString(macPayload.FHdr.FOpts)
 
-	updf.FCtrl = getFCtrlAsUint(macPayload.FCtrl)
-	updf.FCnt = uint(macPayload.GetFCnt())
+	updf.FCtrl = getFCtrlAsUint(macPayload.FHdr.FCtrl)
+	updf.FCnt = uint(macPayload.FHdr.FCnt)
 	updf.FRMPayload = hex.EncodeToString(macPayload.GetFrmPayload())
 	updf.MIC = int32(binary.LittleEndian.Uint32(payload.Mic[:]))
 
@@ -461,7 +461,7 @@ func (updf *UplinkDataFrame) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID s
 	}
 
 	rxMetadata := up.RxMetadata[0]
-	rxTime, gpsTime := TimePtrToUpInfoTime(rxMetadata.Time)
+	rxTime, gpsTime := TimePtrToUpInfoTime(ttnpb.StdTime(rxMetadata.Time))
 
 	updf.RadioMetaData = RadioMetaData{
 		DataRate:  int(drIdx),
@@ -538,7 +538,16 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 
 	switch typ {
 	case TypeUpstreamVersion:
-		ctx, msg, stat, err := f.GetRouterConfig(ctx, raw, conn.BandID(), conn.FrequencyPlans(), receivedAt)
+		var antennaGain int
+		antennas := conn.Gateway().Antennas
+		if len(antennas) != 0 && antennas[0] != nil {
+			// TODO: Support downlink path to multiple antennas (https://github.com/TheThingsNetwork/lorawan-stack/issues/48).
+			// Need to set different gain value to each `SX1301_conf` object as per https://doc.sm.tc/station/gw_v1.5.html#multi-board-sample-configuration.
+			// Currently we support downlink to only one antenna so the gain of the first antenna is applied to all (though the latter ones are not used).
+			// FPs and Antennas need to be synchronized. See https://github.com/TheThingsNetwork/lorawan-stack/issues/48#issuecomment-983412639.
+			antennaGain = int(antennas[0].Gain)
+		}
+		ctx, msg, stat, err := f.GetRouterConfig(ctx, raw, conn.BandID(), conn.FrequencyPlans(), antennaGain, receivedAt)
 		logger = log.FromContext(ctx)
 		if err != nil {
 			logger.WithError(err).Warn("Failed to generate router configuration")

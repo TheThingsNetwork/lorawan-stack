@@ -206,7 +206,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 			pb = &ttnpb.EndDevice{}
 		}
 
-		pb.UpdatedAt = time.Now().UTC()
+		pb.UpdatedAt = ttnpb.ProtoTimePtr(time.Now())
 		sets = append(append(sets[:0:0], sets...),
 			"updated_at",
 		)

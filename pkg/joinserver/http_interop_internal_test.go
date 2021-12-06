@@ -89,7 +89,7 @@ func TestInteropJoinRequest(t *testing.T) {
 				DevAddr:            types.DevAddr{0x1, 0x2, 0x3, 0x4},
 				SelectedMacVersion: ttnpb.MAC_V1_0_3,
 				NetId:              types.NetID{0x0, 0x0, 0x13},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x6,
 					Rx2Dr:       0xf,
@@ -103,8 +103,8 @@ func TestInteropJoinRequest(t *testing.T) {
 			HandleJoinFunc: func() (*ttnpb.JoinResponse, error) {
 				return &ttnpb.JoinResponse{
 					RawPayload: []byte{0x1, 0x2, 0x3, 0x4},
-					Lifetime:   1 * time.Hour,
-					SessionKeys: ttnpb.SessionKeys{
+					Lifetime:   ttnpb.ProtoDurationPtr(1 * time.Hour),
+					SessionKeys: &ttnpb.SessionKeys{
 						SessionKeyId: []byte{0x1, 0x2, 0x3, 0x4},
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
 							KekLabel:     "test",
@@ -166,7 +166,7 @@ func TestInteropJoinRequest(t *testing.T) {
 				DevAddr:            types.DevAddr{0x1, 0x2, 0x3, 0x4},
 				SelectedMacVersion: ttnpb.MAC_V1_1,
 				NetId:              types.NetID{0x0, 0x0, 0x13},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x6,
 					Rx2Dr:       0xf,
@@ -180,8 +180,8 @@ func TestInteropJoinRequest(t *testing.T) {
 			HandleJoinFunc: func() (*ttnpb.JoinResponse, error) {
 				return &ttnpb.JoinResponse{
 					RawPayload: []byte{0x1, 0x2, 0x3, 0x4},
-					Lifetime:   1 * time.Hour,
-					SessionKeys: ttnpb.SessionKeys{
+					Lifetime:   ttnpb.ProtoDurationPtr(1 * time.Hour),
+					SessionKeys: &ttnpb.SessionKeys{
 						SessionKeyId: []byte{0x1, 0x2, 0x3, 0x4},
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
 							KekLabel:     "test",
@@ -259,7 +259,7 @@ func TestInteropJoinRequest(t *testing.T) {
 				DevAddr:            types.DevAddr{0x1, 0x2, 0x3, 0x4},
 				SelectedMacVersion: ttnpb.MAC_V1_1,
 				NetId:              types.NetID{0x0, 0x0, 0x13},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x6,
 					Rx2Dr:       0xf,
@@ -302,7 +302,7 @@ func TestInteropJoinRequest(t *testing.T) {
 				DevAddr:            types.DevAddr{0x1, 0x2, 0x3, 0x4},
 				SelectedMacVersion: ttnpb.MAC_V1_1,
 				NetId:              types.NetID{0x0, 0x0, 0x13},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x6,
 					Rx2Dr:       0xf,
@@ -345,7 +345,7 @@ func TestInteropJoinRequest(t *testing.T) {
 				DevAddr:            types.DevAddr{0x1, 0x2, 0x3, 0x4},
 				SelectedMacVersion: ttnpb.MAC_V1_1,
 				NetId:              types.NetID{0x0, 0x0, 0x13},
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
 					Rx1DrOffset: 0x6,
 					Rx2Dr:       0xf,

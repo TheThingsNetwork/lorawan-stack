@@ -36,7 +36,7 @@ option (gogoproto.stringer_all) = true;
 
 // Message represents a LoRaWAN message
 message Message {
-  MHDR m_hdr = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  MHDR m_hdr = 1 [(validate.rules).message.required = true];
   bytes mic = 2 [(validate.rules).bytes = { min_len: 0, max_len: 4 }];
 
   // Payload represents either MACPayload, RejoinRequestPayload, JoinRequestPayload or JoinAcceptPayload
@@ -152,7 +152,7 @@ message MHDR {
 }
 
 message MACPayload {
-  FHDR f_hdr = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  FHDR f_hdr = 1 [(validate.rules).message.required = true];
   uint32 f_port = 2 [(validate.rules).uint32.lte = 255];
   bytes frm_payload = 3;
   google.protobuf.Struct decoded_payload = 4;
@@ -162,7 +162,7 @@ message MACPayload {
 
 message FHDR {
   bytes dev_addr = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
-  FCtrl f_ctrl = 2 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  FCtrl f_ctrl = 2 [(validate.rules).message.required = true];
   uint32 f_cnt = 3 [(validate.rules).uint32.lte = 65535];
   bytes f_opts = 4 [(validate.rules).bytes.max_len = 15];
 }
@@ -211,7 +211,7 @@ message JoinAcceptPayload {
   bytes join_nonce = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.JoinNonce"];
   bytes net_id = 3 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
   bytes dev_addr = 4 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
-  DLSettings dl_settings = 5 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  DLSettings dl_settings = 5 [(validate.rules).message.required = true];
   RxDelay rx_delay = 6 [(validate.rules).enum.defined_only = true];
   CFList cf_list = 7;
 }
@@ -304,7 +304,7 @@ message TxSettings {
   }
 
   // Data rate.
-  DataRate data_rate = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  DataRate data_rate = 1 [(validate.rules).message.required = true];
   reserved 2; // data_rate_index
   // LoRa coding rate.
   string coding_rate = 3;
@@ -317,7 +317,7 @@ message TxSettings {
   uint32 timestamp = 6;
   // Time of the gateway when the uplink message was received, or when the downlink message should be transmitted.
   // For downlink, this requires the gateway to have GPS time synchronization.
-  google.protobuf.Timestamp time = 7 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp time = 7;
   // Transmission settings for downlink.
   Downlink downlink = 8;
 }
@@ -331,11 +331,11 @@ message UplinkToken {
   GatewayAntennaIdentifiers ids = 1 [(validate.rules).message.required = true];
   uint32 timestamp = 2;
   // Absolute time observed by the server when the uplink message has been received.
-  google.protobuf.Timestamp server_time = 3 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp server_time = 3;
   // Absolute concentrator time as observed by the Gateway Server, accounting for rollovers.
   int64 concentrator_time = 4;
   // Absolute time observed by the gateway when the uplink has been received.
-  google.protobuf.Timestamp gateway_time = 5 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp gateway_time = 5;
 }
 
 message DownlinkPath {
@@ -381,7 +381,7 @@ message TxRequest {
   // This value is only valid for class C downlink; class A downlink uses uplink tokens and class B downlink is scheduled on ping slots.
   // This requires the gateway to have GPS time sychronization.
   // If the absolute time is not set, the first available time will be used that does not conflict or violate regional limitations.
-  google.protobuf.Timestamp absolute_time = 9 [(gogoproto.stdtime) = true];
+  google.protobuf.Timestamp absolute_time = 9;
 
   // Frequency plan ID from which the frequencies in this message are retrieved.
   string frequency_plan_id = 10 [(validate.rules).string.max_len = 64];
@@ -544,7 +544,7 @@ message MACCommand {
     ADRAckDelayExponent adr_ack_delay_exponent = 2 [(validate.rules).enum.defined_only = true];
   }
   message DeviceTimeAns {
-    google.protobuf.Timestamp time = 7 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true, (validate.rules).timestamp.required = true];
+    google.protobuf.Timestamp time = 7 [(validate.rules).timestamp.required = true];
   }
   message ForceRejoinReq {
     RejoinRequestType rejoin_type = 1 [(validate.rules).enum.defined_only = true];

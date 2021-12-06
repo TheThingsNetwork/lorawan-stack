@@ -473,24 +473,29 @@ func TestVersion(t *testing.T) {
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	is, isAddr := mock.NewIS(ctx)
-	is.Add(ctx, registeredGatewayID, registeredGatewayToken)
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			GRPC: config.GRPC{
 				Listen:                      ":0",
 				AllowInsecureForCredentials: true,
 			},
-			Cluster: cluster.Config{
-				IdentityServer: isAddr,
-			},
 		},
 	})
+
 	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	componenttest.StartComponent(t, c)
 	defer c.Close()
-	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 	gs := mock.NewServer(c)
+
+	gs.RegisterGateway(ctx, registeredGatewayID, &ttnpb.Gateway{
+		Ids:             &registeredGatewayID,
+		FrequencyPlanId: test.EUFrequencyPlanID,
+		Antennas: []*ttnpb.GatewayAntenna{
+			{
+				Gain: 3,
+			},
+		},
+	})
 
 	web, err := New(ctx, gs, lbslns.NewFormatter(maxValidRoundTripDelay), defaultConfig)
 	if !a.So(err, should.BeNil) {
@@ -555,12 +560,14 @@ func TestVersion(t *testing.T) {
 					{
 						Radios: []pfconfig.LBSRFConfig{
 							{
-								Enable:    true,
-								Frequency: 867500000,
+								Enable:      true,
+								Frequency:   867500000,
+								AntennaGain: 3,
 							},
 							{
-								Enable:    true,
-								Frequency: 868500000,
+								Enable:      true,
+								Frequency:   868500000,
+								AntennaGain: 3,
 							},
 						},
 						Channels: []shared.IFConfig{
@@ -628,12 +635,14 @@ func TestVersion(t *testing.T) {
 					{
 						Radios: []pfconfig.LBSRFConfig{
 							{
-								Enable:    true,
-								Frequency: 867500000,
+								Enable:      true,
+								Frequency:   867500000,
+								AntennaGain: 3,
 							},
 							{
-								Enable:    true,
-								Frequency: 868500000,
+								Enable:      true,
+								Frequency:   868500000,
+								AntennaGain: 3,
 							},
 						},
 						Channels: []shared.IFConfig{
@@ -806,7 +815,7 @@ func TestTraffic(t *testing.T) {
 			},
 			ExpectedNetworkUpstream: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
+					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_JOIN_REQUEST, Major: ttnpb.Major_LORAWAN_R1},
 					Mic:  []byte{0x4E, 0x61, 0xBC, 0x00},
 					Payload: &ttnpb.Message_JoinRequestPayload{JoinRequestPayload: &ttnpb.JoinRequestPayload{
 						JoinEui:  types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22},
@@ -819,7 +828,7 @@ func TestTraffic(t *testing.T) {
 						GatewayId: "eui-0101010101010101",
 						Eui:       &types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
 					},
-					Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
+					Time:        ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
 					Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
 					Rssi:        89,
 					ChannelRssi: 89,
@@ -828,9 +837,9 @@ func TestTraffic(t *testing.T) {
 				Settings: &ttnpb.TxSettings{
 					Frequency:  868300000,
 					CodingRate: "4/5",
-					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
+					Time:       ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
 					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
-					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
+					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
 					}}},
@@ -861,14 +870,14 @@ func TestTraffic(t *testing.T) {
 			},
 			ExpectedNetworkUpstream: ttnpb.UplinkMessage{
 				Payload: &ttnpb.Message{
-					MHDR: ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
+					MHdr: &ttnpb.MHDR{MType: ttnpb.MType_UNCONFIRMED_UP, Major: ttnpb.Major_LORAWAN_R1},
 					Mic:  []byte{0x4E, 0x61, 0xBC, 0x00},
 					Payload: &ttnpb.Message_MacPayload{MacPayload: &ttnpb.MACPayload{
 						FPort:      0,
 						FrmPayload: []byte{0x5F, 0xCC},
-						FHDR: ttnpb.FHDR{
+						FHdr: &ttnpb.FHDR{
 							DevAddr: [4]byte{0x11, 0x22, 0x33, 0x44},
-							FCtrl: ttnpb.FCtrl{
+							FCtrl: &ttnpb.FCtrl{
 								Ack:    true,
 								ClassB: true,
 							},
@@ -883,7 +892,7 @@ func TestTraffic(t *testing.T) {
 							GatewayId: "eui-0101010101010101",
 							Eui:       &types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
 						},
-						Time:        &[]time.Time{time.Unix(1548059982, 0)}[0],
+						Time:        ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
 						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:        89,
 						ChannelRssi: 89,
@@ -892,10 +901,10 @@ func TestTraffic(t *testing.T) {
 				},
 				Settings: &ttnpb.TxSettings{
 					Frequency:  868300000,
-					Time:       &[]time.Time{time.Unix(1548059982, 0)}[0],
+					Time:       ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
 					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
 					CodingRate: "4/5",
-					DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
+					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
 					}}},
@@ -1069,7 +1078,7 @@ func TestTraffic(t *testing.T) {
 					}
 					select {
 					case up := <-gsConn.Up():
-						a.So(time.Since(*up.Message.ReceivedAt), should.BeLessThan, timeout)
+						a.So(time.Since(*ttnpb.StdTime(up.Message.ReceivedAt)), should.BeLessThan, timeout)
 						up.Message.ReceivedAt = nil
 						var payload ttnpb.Message
 						a.So(lorawan.UnmarshalMessage(up.Message.RawPayload, &payload), should.BeNil)

@@ -23,6 +23,6 @@ var (
 	errPayload      = errors.DefineInvalidArgument("payload", "failed to parse binary payload")
 	errEUI          = errors.DefineInvalidArgument("eui", "failed to parse EUI")
 	errTimestamp    = errors.DefineInvalidArgument("timestamp", "failed to parse timestamp")
-	errModulation   = errors.DefineInvalidArgument("modulation", "invalid modulation `{modulation}`")
+	errDataRate     = errors.DefineInvalidArgument("data_rate", "invalid data rate")
 	errNotScheduled = errors.DefineInvalidArgument("not_scheduled", "downlink message not scheduled")
 )

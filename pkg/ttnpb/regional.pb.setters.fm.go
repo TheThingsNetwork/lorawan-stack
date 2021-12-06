@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	time "time"
-)
+import fmt "fmt"
 
 func (dst *ConcentratorConfig) SetFields(src *ConcentratorConfig, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -289,8 +286,7 @@ func (dst *ConcentratorConfig_LBTConfiguration) SetFields(src *ConcentratorConfi
 			if src != nil {
 				dst.ScanTime = src.ScanTime
 			} else {
-				var zero time.Duration
-				dst.ScanTime = zero
+				dst.ScanTime = nil
 			}
 
 		default:

@@ -14,6 +14,7 @@
 
 /* eslint-disable no-invalid-this, no-await-in-loop */
 
+import autoBind from 'auto-bind'
 import traverse from 'traverse'
 
 import { notify, EVENTS } from '../../api/stream/shared'
@@ -44,6 +45,8 @@ class Devices {
 
     this.DownlinkQueue = new DownlinkQueue(api.AppAs, { stackConfig })
     this.Repository = new Repository(api.DeviceRepository)
+
+    autoBind(this)
   }
 
   _emitDefaults(paths, device) {
@@ -361,7 +364,7 @@ class Devices {
     }
 
     if (
-      !assembledValues.supports_join ||
+      (this._stackConfig.isComponentAvailable(NS) && !assembledValues.supports_join) ||
       assembledValues.join_server_address !== this._stackConfig.jsHost
     ) {
       delete requestTree.js

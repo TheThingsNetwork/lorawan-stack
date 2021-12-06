@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,51 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import { connect } from 'react-redux'
-import { Switch, Route } from 'react-router'
+import ApplicationApiKeys from './application-api-keys'
+import connect from './connect'
 
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+const ConnectedApplicationApiKeys = connect(ApplicationApiKeys)
 
-import ErrorView from '@ttn-lw/lib/components/error-view'
-
-import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
-
-import ApplicationApiKeysList from '@console/views/application-api-keys-list'
-import ApplicationApiKeyAdd from '@console/views/application-api-key-add'
-import SubViewError from '@console/views/sub-view-error'
-import ApplicationApiKeyEdit from '@console/views/application-api-key-edit'
-
-import PropTypes from '@ttn-lw/lib/prop-types'
-import sharedMessages from '@ttn-lw/lib/shared-messages'
-
-import { mayViewOrEditApplicationApiKeys } from '@console/lib/feature-checks'
-
-import { selectSelectedApplicationId } from '@console/store/selectors/applications'
-
-@connect(state => ({ appId: selectSelectedApplicationId(state) }))
-@withFeatureRequirement(mayViewOrEditApplicationApiKeys, {
-  redirect: ({ appId }) => `/applications/${appId}`,
-})
-@withBreadcrumb('apps.single.api-keys', ({ appId }) => (
-  <Breadcrumb path={`/applications/${appId}/api-keys`} content={sharedMessages.apiKeys} />
-))
-export default class ApplicationAccess extends React.Component {
-  static propTypes = {
-    match: PropTypes.match.isRequired,
-  }
-
-  render() {
-    const { match } = this.props
-    return (
-      <ErrorView errorRender={SubViewError}>
-        <Switch>
-          <Route exact path={`${match.path}`} component={ApplicationApiKeysList} />
-          <Route exact path={`${match.path}/add`} component={ApplicationApiKeyAdd} />
-          <Route path={`${match.path}/:apiKeyId`} component={ApplicationApiKeyEdit} />
-        </Switch>
-      </ErrorView>
-    )
-  }
-}
+export { ConnectedApplicationApiKeys as default, ApplicationApiKeys }

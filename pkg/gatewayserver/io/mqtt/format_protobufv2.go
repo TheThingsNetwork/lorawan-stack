@@ -55,7 +55,7 @@ func (protobufv2) FromDownlink(down *ttnpb.DownlinkMessage, _ ttnpb.GatewayIdent
 	}
 	lorawan := &ttnpbv2.LoRaWANTxConfiguration{}
 	if pld, ok := down.GetPayload().GetPayload().(*ttnpb.Message_MacPayload); ok && pld != nil {
-		lorawan.FCnt = pld.MacPayload.FHDR.FCnt
+		lorawan.FCnt = pld.MacPayload.FHdr.GetFCnt()
 	}
 	switch dr := settings.DataRate.Modulation.(type) {
 	case *ttnpb.DataRate_Lora:
@@ -114,7 +114,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 		settings.DataRate = loraDr.DataRate
 		settings.CodingRate = lorawanMetadata.CodingRate
 	case ttnpbv2.Modulation_FSK:
-		settings.DataRate = ttnpb.DataRate{
+		settings.DataRate = &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Fsk{
 				Fsk: &ttnpb.FSKDataRate{
 					BitRate: lorawanMetadata.BitRate,
@@ -125,7 +125,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 		return nil, errModulation.WithAttributes("modulation", lorawanMetadata.Modulation)
 	}
 
-	mdTime := time.Unix(0, gwMetadata.Time)
+	mdTime := ttnpb.ProtoTimePtr(time.Unix(0, gwMetadata.Time))
 	if antennas := gwMetadata.Antennas; len(antennas) > 0 {
 		for _, antenna := range antennas {
 			rssi := antenna.ChannelRssi
@@ -140,7 +140,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 				Rssi:                  rssi,
 				RssiStandardDeviation: antenna.RssiStandardDeviation,
 				Snr:                   antenna.Snr,
-				Time:                  &mdTime,
+				Time:                  mdTime,
 				Timestamp:             gwMetadata.Timestamp,
 			})
 		}
@@ -151,7 +151,7 @@ func (protobufv2) ToUplink(message []byte, ids ttnpb.GatewayIdentifiers) (*ttnpb
 			ChannelRssi:  gwMetadata.Rssi,
 			Rssi:         gwMetadata.Rssi,
 			Snr:          gwMetadata.Snr,
-			Time:         &mdTime,
+			Time:         mdTime,
 			Timestamp:    gwMetadata.Timestamp,
 		})
 	}

@@ -3,8 +3,6 @@
 package test
 
 import (
-	"time"
-
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -19,8 +17,8 @@ type (
 	RootKeysOptionNamespace struct{}
 )
 
-// WithRootKeyID returns a RootKeysOption, which returns a copy of ttnpb.RootKeys with RootKeyID set to v.
-func (RootKeysOptionNamespace) WithRootKeyID(v string) RootKeysOption {
+// WithRootKeyId returns a RootKeysOption, which returns a copy of ttnpb.RootKeys with RootKeyId set to v.
+func (RootKeysOptionNamespace) WithRootKeyId(v string) RootKeysOption {
 	return func(x ttnpb.RootKeys) ttnpb.RootKeys {
 		x.RootKeyId = v
 		return x
@@ -82,8 +80,8 @@ type (
 	SessionKeysOptionNamespace struct{}
 )
 
-// WithSessionKeyID returns a SessionKeysOption, which returns a copy of ttnpb.SessionKeys with SessionKeyID set to v.
-func (SessionKeysOptionNamespace) WithSessionKeyID(v []byte) SessionKeysOption {
+// WithSessionKeyId returns a SessionKeysOption, which returns a copy of ttnpb.SessionKeys with SessionKeyId set to v.
+func (SessionKeysOptionNamespace) WithSessionKeyId(v []byte) SessionKeysOption {
 	return func(x ttnpb.SessionKeys) ttnpb.SessionKeys {
 		x.SessionKeyId = v
 		return x
@@ -210,7 +208,7 @@ func (SessionOptionNamespace) WithLastConfFCntDown(v uint32) SessionOption {
 }
 
 // WithStartedAt returns a SessionOption, which returns a copy of ttnpb.Session with StartedAt set to v.
-func (SessionOptionNamespace) WithStartedAt(v time.Time) SessionOption {
+func (SessionOptionNamespace) WithStartedAt(v *pbtypes.Timestamp) SessionOption {
 	return func(x ttnpb.Session) ttnpb.Session {
 		x.StartedAt = v
 		return x
@@ -288,8 +286,8 @@ func (MACStateOptionNamespace) WithDeviceClass(v ttnpb.Class) MACStateOption {
 	}
 }
 
-// WithLoRaWANVersion returns a MACStateOption, which returns a copy of ttnpb.MACState with LoRaWANVersion set to v.
-func (MACStateOptionNamespace) WithLoRaWANVersion(v ttnpb.MACVersion) MACStateOption {
+// WithLorawanVersion returns a MACStateOption, which returns a copy of ttnpb.MACState with LorawanVersion set to v.
+func (MACStateOptionNamespace) WithLorawanVersion(v ttnpb.MACVersion) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {
 		x.LorawanVersion = v
 		return x
@@ -297,7 +295,7 @@ func (MACStateOptionNamespace) WithLoRaWANVersion(v ttnpb.MACVersion) MACStateOp
 }
 
 // WithLastConfirmedDownlinkAt returns a MACStateOption, which returns a copy of ttnpb.MACState with LastConfirmedDownlinkAt set to v.
-func (MACStateOptionNamespace) WithLastConfirmedDownlinkAt(v *time.Time) MACStateOption {
+func (MACStateOptionNamespace) WithLastConfirmedDownlinkAt(v *pbtypes.Timestamp) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {
 		x.LastConfirmedDownlinkAt = v
 		return x
@@ -385,23 +383,23 @@ func (MACStateOptionNamespace) WithRecentDownlinks(vs ...*ttnpb.DownlinkMessage)
 }
 
 // WithLastNetworkInitiatedDownlinkAt returns a MACStateOption, which returns a copy of ttnpb.MACState with LastNetworkInitiatedDownlinkAt set to v.
-func (MACStateOptionNamespace) WithLastNetworkInitiatedDownlinkAt(v *time.Time) MACStateOption {
+func (MACStateOptionNamespace) WithLastNetworkInitiatedDownlinkAt(v *pbtypes.Timestamp) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {
 		x.LastNetworkInitiatedDownlinkAt = v
 		return x
 	}
 }
 
-// WithRejectedADRDataRateIndexes returns a MACStateOption, which returns a copy of ttnpb.MACState with RejectedADRDataRateIndexes set to vs.
-func (MACStateOptionNamespace) WithRejectedADRDataRateIndexes(vs ...ttnpb.DataRateIndex) MACStateOption {
+// WithRejectedAdrDataRateIndexes returns a MACStateOption, which returns a copy of ttnpb.MACState with RejectedAdrDataRateIndexes set to vs.
+func (MACStateOptionNamespace) WithRejectedAdrDataRateIndexes(vs ...ttnpb.DataRateIndex) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {
 		x.RejectedAdrDataRateIndexes = vs
 		return x
 	}
 }
 
-// WithRejectedADRTxPowerIndexes returns a MACStateOption, which returns a copy of ttnpb.MACState with RejectedADRTxPowerIndexes set to vs.
-func (MACStateOptionNamespace) WithRejectedADRTxPowerIndexes(vs ...uint32) MACStateOption {
+// WithRejectedAdrTxPowerIndexes returns a MACStateOption, which returns a copy of ttnpb.MACState with RejectedAdrTxPowerIndexes set to vs.
+func (MACStateOptionNamespace) WithRejectedAdrTxPowerIndexes(vs ...uint32) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {
 		x.RejectedAdrTxPowerIndexes = vs
 		return x
@@ -417,7 +415,7 @@ func (MACStateOptionNamespace) WithRejectedFrequencies(vs ...uint64) MACStateOpt
 }
 
 // WithLastDownlinkAt returns a MACStateOption, which returns a copy of ttnpb.MACState with LastDownlinkAt set to v.
-func (MACStateOptionNamespace) WithLastDownlinkAt(v *time.Time) MACStateOption {
+func (MACStateOptionNamespace) WithLastDownlinkAt(v *pbtypes.Timestamp) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {
 		x.LastDownlinkAt = v
 		return x
@@ -432,8 +430,8 @@ func (MACStateOptionNamespace) WithRejectedDataRateRanges(v map[uint64]*ttnpb.MA
 	}
 }
 
-// WithLastADRChangeFCntUp returns a MACStateOption, which returns a copy of ttnpb.MACState with LastADRChangeFCntUp set to v.
-func (MACStateOptionNamespace) WithLastADRChangeFCntUp(v uint32) MACStateOption {
+// WithLastAdrChangeFCntUp returns a MACStateOption, which returns a copy of ttnpb.MACState with LastAdrChangeFCntUp set to v.
+func (MACStateOptionNamespace) WithLastAdrChangeFCntUp(v uint32) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {
 		x.LastAdrChangeFCntUp = v
 		return x
@@ -479,8 +477,8 @@ type (
 	EndDeviceIdentifiersOptionNamespace struct{}
 )
 
-// WithDeviceID returns a EndDeviceIdentifiersOption, which returns a copy of ttnpb.EndDeviceIdentifiers with DeviceID set to v.
-func (EndDeviceIdentifiersOptionNamespace) WithDeviceID(v string) EndDeviceIdentifiersOption {
+// WithDeviceId returns a EndDeviceIdentifiersOption, which returns a copy of ttnpb.EndDeviceIdentifiers with DeviceId set to v.
+func (EndDeviceIdentifiersOptionNamespace) WithDeviceId(v string) EndDeviceIdentifiersOption {
 	return func(x ttnpb.EndDeviceIdentifiers) ttnpb.EndDeviceIdentifiers {
 		x.DeviceId = v
 		return x
@@ -495,16 +493,16 @@ func (EndDeviceIdentifiersOptionNamespace) WithApplicationIdentifiers(v ttnpb.Ap
 	}
 }
 
-// WithDevEUI returns a EndDeviceIdentifiersOption, which returns a copy of ttnpb.EndDeviceIdentifiers with DevEUI set to v.
-func (EndDeviceIdentifiersOptionNamespace) WithDevEUI(v *types.EUI64) EndDeviceIdentifiersOption {
+// WithDevEui returns a EndDeviceIdentifiersOption, which returns a copy of ttnpb.EndDeviceIdentifiers with DevEui set to v.
+func (EndDeviceIdentifiersOptionNamespace) WithDevEui(v *types.EUI64) EndDeviceIdentifiersOption {
 	return func(x ttnpb.EndDeviceIdentifiers) ttnpb.EndDeviceIdentifiers {
 		x.DevEui = v
 		return x
 	}
 }
 
-// WithJoinEUI returns a EndDeviceIdentifiersOption, which returns a copy of ttnpb.EndDeviceIdentifiers with JoinEUI set to v.
-func (EndDeviceIdentifiersOptionNamespace) WithJoinEUI(v *types.EUI64) EndDeviceIdentifiersOption {
+// WithJoinEui returns a EndDeviceIdentifiersOption, which returns a copy of ttnpb.EndDeviceIdentifiers with JoinEui set to v.
+func (EndDeviceIdentifiersOptionNamespace) WithJoinEui(v *types.EUI64) EndDeviceIdentifiersOption {
 	return func(x ttnpb.EndDeviceIdentifiers) ttnpb.EndDeviceIdentifiers {
 		x.JoinEui = v
 		return x
@@ -567,7 +565,7 @@ func (EndDeviceOptionNamespace) WithEndDeviceIdentifiers(v ttnpb.EndDeviceIdenti
 }
 
 // WithCreatedAt returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with CreatedAt set to v.
-func (EndDeviceOptionNamespace) WithCreatedAt(v time.Time) EndDeviceOption {
+func (EndDeviceOptionNamespace) WithCreatedAt(v *pbtypes.Timestamp) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.CreatedAt = v
 		return x
@@ -575,7 +573,7 @@ func (EndDeviceOptionNamespace) WithCreatedAt(v time.Time) EndDeviceOption {
 }
 
 // WithUpdatedAt returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with UpdatedAt set to v.
-func (EndDeviceOptionNamespace) WithUpdatedAt(v time.Time) EndDeviceOption {
+func (EndDeviceOptionNamespace) WithUpdatedAt(v *pbtypes.Timestamp) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.UpdatedAt = v
 		return x
@@ -606,16 +604,16 @@ func (EndDeviceOptionNamespace) WithAttributes(v map[string]string) EndDeviceOpt
 	}
 }
 
-// WithVersionIDs returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with VersionIDs set to v.
-func (EndDeviceOptionNamespace) WithVersionIDs(v *ttnpb.EndDeviceVersionIdentifiers) EndDeviceOption {
+// WithVersionIds returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with VersionIds set to v.
+func (EndDeviceOptionNamespace) WithVersionIds(v *ttnpb.EndDeviceVersionIdentifiers) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.VersionIds = v
 		return x
 	}
 }
 
-// WithServiceProfileID returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with ServiceProfileID set to v.
-func (EndDeviceOptionNamespace) WithServiceProfileID(v string) EndDeviceOption {
+// WithServiceProfileId returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with ServiceProfileId set to v.
+func (EndDeviceOptionNamespace) WithServiceProfileId(v string) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.ServiceProfileId = v
 		return x
@@ -630,8 +628,8 @@ func (EndDeviceOptionNamespace) WithNetworkServerAddress(v string) EndDeviceOpti
 	}
 }
 
-// WithNetworkServerKEKLabel returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with NetworkServerKEKLabel set to v.
-func (EndDeviceOptionNamespace) WithNetworkServerKEKLabel(v string) EndDeviceOption {
+// WithNetworkServerKekLabel returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with NetworkServerKekLabel set to v.
+func (EndDeviceOptionNamespace) WithNetworkServerKekLabel(v string) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.NetworkServerKekLabel = v
 		return x
@@ -646,16 +644,16 @@ func (EndDeviceOptionNamespace) WithApplicationServerAddress(v string) EndDevice
 	}
 }
 
-// WithApplicationServerKEKLabel returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with ApplicationServerKEKLabel set to v.
-func (EndDeviceOptionNamespace) WithApplicationServerKEKLabel(v string) EndDeviceOption {
+// WithApplicationServerKekLabel returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with ApplicationServerKekLabel set to v.
+func (EndDeviceOptionNamespace) WithApplicationServerKekLabel(v string) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.ApplicationServerKekLabel = v
 		return x
 	}
 }
 
-// WithApplicationServerID returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with ApplicationServerID set to v.
-func (EndDeviceOptionNamespace) WithApplicationServerID(v string) EndDeviceOption {
+// WithApplicationServerId returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with ApplicationServerId set to v.
+func (EndDeviceOptionNamespace) WithApplicationServerId(v string) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.ApplicationServerId = v
 		return x
@@ -702,24 +700,24 @@ func (EndDeviceOptionNamespace) WithSupportsClassC(v bool) EndDeviceOption {
 	}
 }
 
-// WithLoRaWANVersion returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with LoRaWANVersion set to v.
-func (EndDeviceOptionNamespace) WithLoRaWANVersion(v ttnpb.MACVersion) EndDeviceOption {
+// WithLorawanVersion returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with LorawanVersion set to v.
+func (EndDeviceOptionNamespace) WithLorawanVersion(v ttnpb.MACVersion) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.LorawanVersion = v
 		return x
 	}
 }
 
-// WithLoRaWANPHYVersion returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with LoRaWANPHYVersion set to v.
-func (EndDeviceOptionNamespace) WithLoRaWANPHYVersion(v ttnpb.PHYVersion) EndDeviceOption {
+// WithLorawanPhyVersion returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with LorawanPhyVersion set to v.
+func (EndDeviceOptionNamespace) WithLorawanPhyVersion(v ttnpb.PHYVersion) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.LorawanPhyVersion = v
 		return x
 	}
 }
 
-// WithFrequencyPlanID returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with FrequencyPlanID set to v.
-func (EndDeviceOptionNamespace) WithFrequencyPlanID(v string) EndDeviceOption {
+// WithFrequencyPlanId returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with FrequencyPlanId set to v.
+func (EndDeviceOptionNamespace) WithFrequencyPlanId(v string) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.FrequencyPlanId = v
 		return x
@@ -766,32 +764,32 @@ func (EndDeviceOptionNamespace) WithRootKeys(v *ttnpb.RootKeys) EndDeviceOption 
 	}
 }
 
-// WithNetID returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with NetID set to v.
-func (EndDeviceOptionNamespace) WithNetID(v *types.NetID) EndDeviceOption {
+// WithNetId returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with NetId set to v.
+func (EndDeviceOptionNamespace) WithNetId(v *types.NetID) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.NetId = v
 		return x
 	}
 }
 
-// WithMACSettings returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with MACSettings set to v.
-func (EndDeviceOptionNamespace) WithMACSettings(v *ttnpb.MACSettings) EndDeviceOption {
+// WithMacSettings returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with MacSettings set to v.
+func (EndDeviceOptionNamespace) WithMacSettings(v *ttnpb.MACSettings) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.MacSettings = v
 		return x
 	}
 }
 
-// WithMACState returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with MACState set to v.
-func (EndDeviceOptionNamespace) WithMACState(v *ttnpb.MACState) EndDeviceOption {
+// WithMacState returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with MacState set to v.
+func (EndDeviceOptionNamespace) WithMacState(v *ttnpb.MACState) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.MacState = v
 		return x
 	}
 }
 
-// WithPendingMACState returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with PendingMACState set to v.
-func (EndDeviceOptionNamespace) WithPendingMACState(v *ttnpb.MACState) EndDeviceOption {
+// WithPendingMacState returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with PendingMacState set to v.
+func (EndDeviceOptionNamespace) WithPendingMacState(v *ttnpb.MACState) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.PendingMacState = v
 		return x
@@ -838,16 +836,16 @@ func (EndDeviceOptionNamespace) WithLastJoinNonce(v uint32) EndDeviceOption {
 	}
 }
 
-// WithLastRJCount0 returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with LastRJCount0 set to v.
-func (EndDeviceOptionNamespace) WithLastRJCount0(v uint32) EndDeviceOption {
+// WithLastRjCount_0 returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with LastRjCount_0 set to v.
+func (EndDeviceOptionNamespace) WithLastRjCount_0(v uint32) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.LastRjCount_0 = v
 		return x
 	}
 }
 
-// WithLastRJCount1 returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with LastRJCount1 set to v.
-func (EndDeviceOptionNamespace) WithLastRJCount1(v uint32) EndDeviceOption {
+// WithLastRjCount_1 returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with LastRjCount_1 set to v.
+func (EndDeviceOptionNamespace) WithLastRjCount_1(v uint32) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.LastRjCount_1 = v
 		return x
@@ -855,7 +853,7 @@ func (EndDeviceOptionNamespace) WithLastRJCount1(v uint32) EndDeviceOption {
 }
 
 // WithLastDevStatusReceivedAt returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with LastDevStatusReceivedAt set to v.
-func (EndDeviceOptionNamespace) WithLastDevStatusReceivedAt(v *time.Time) EndDeviceOption {
+func (EndDeviceOptionNamespace) WithLastDevStatusReceivedAt(v *pbtypes.Timestamp) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.LastDevStatusReceivedAt = v
 		return x
@@ -902,8 +900,8 @@ func (EndDeviceOptionNamespace) WithFormatters(v *ttnpb.MessagePayloadFormatters
 	}
 }
 
-// WithProvisionerID returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with ProvisionerID set to v.
-func (EndDeviceOptionNamespace) WithProvisionerID(v string) EndDeviceOption {
+// WithProvisionerId returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with ProvisionerId set to v.
+func (EndDeviceOptionNamespace) WithProvisionerId(v string) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.ProvisionerId = v
 		return x
@@ -946,6 +944,14 @@ func (EndDeviceOptionNamespace) WithSkipPayloadCrypto(v bool) EndDeviceOption {
 func (EndDeviceOptionNamespace) WithSkipPayloadCryptoOverride(v *pbtypes.BoolValue) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.SkipPayloadCryptoOverride = v
+		return x
+	}
+}
+
+// WithActivatedAt returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with ActivatedAt set to v.
+func (EndDeviceOptionNamespace) WithActivatedAt(v *pbtypes.Timestamp) EndDeviceOption {
+	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
+		x.ActivatedAt = v
 		return x
 	}
 }

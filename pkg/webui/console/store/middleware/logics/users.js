@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
@@ -26,7 +26,7 @@ const getUserLogic = createRequestLogic({
       meta: { selector },
     } = action
 
-    return api.users.get(id, selector)
+    return tts.Users.getById(id, selector)
   },
 })
 
@@ -37,7 +37,7 @@ const updateUserLogic = createRequestLogic({
       payload: { id, patch },
     } = action
 
-    return api.users.update(id, patch)
+    return tts.Users.updateById(id, patch)
   },
 })
 
@@ -50,9 +50,9 @@ const deleteUserLogic = createRequestLogic({
     } = action
 
     if (options.purge) {
-      await api.users.purge(id)
+      await tts.Users.purgeById(id)
     } else {
-      await api.users.delete(id)
+      await tts.Users.deleteById(id)
     }
 
     return { id }
@@ -68,7 +68,7 @@ const getUsersLogic = createRequestLogic({
     const { selectors } = action.meta
 
     const data = query
-      ? await api.users.search(
+      ? await tts.Users.search(
           {
             page,
             limit,
@@ -77,7 +77,7 @@ const getUsersLogic = createRequestLogic({
           },
           selectors,
         )
-      : await api.users.list({ page, limit, order }, selectors)
+      : await tts.Users.getAll({ page, limit, order }, selectors)
 
     return { entities: data.users, totalCount: data.totalCount }
   },
@@ -90,7 +90,7 @@ const createUserLogic = createRequestLogic({
       payload: { user },
     } = action
 
-    return api.users.create(user)
+    return tts.Users.create(user)
   },
 })
 
@@ -98,7 +98,7 @@ const getUsersRightsLogic = createRequestLogic({
   type: users.GET_USER_RIGHTS_LIST,
   process: async ({ action }) => {
     const { id } = action.payload
-    const result = await api.rights.users(id)
+    const result = await tts.Users.getRightsById(id)
 
     return result.rights.sort()
   },

@@ -27,9 +27,9 @@ func UplinkToken(ids *ttnpb.GatewayAntennaIdentifiers, timestamp uint32, concent
 	token := ttnpb.UplinkToken{
 		Ids:              ids,
 		Timestamp:        timestamp,
-		ServerTime:       &serverTime,
+		ServerTime:       ttnpb.ProtoTimePtr(serverTime),
 		ConcentratorTime: int64(concentratorTime),
-		GatewayTime:      gatewayTime,
+		GatewayTime:      ttnpb.ProtoTime(gatewayTime),
 	}
 	return proto.Marshal(&token)
 }

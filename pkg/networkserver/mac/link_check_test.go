@@ -47,7 +47,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			},
 			Message: &ttnpb.UplinkMessage{
 				Settings: &ttnpb.TxSettings{
-					DataRate: ttnpb.DataRate{
+					DataRate: &ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 13,
@@ -72,7 +72,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			},
 			Message: &ttnpb.UplinkMessage{
 				Settings: &ttnpb.TxSettings{
-					DataRate: ttnpb.DataRate{
+					DataRate: &ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 12,
@@ -103,7 +103,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			},
 			Message: &ttnpb.UplinkMessage{
 				Settings: &ttnpb.TxSettings{
-					DataRate: ttnpb.DataRate{
+					DataRate: &ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 12,
@@ -155,7 +155,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			},
 			Message: &ttnpb.UplinkMessage{
 				Settings: &ttnpb.TxSettings{
-					DataRate: ttnpb.DataRate{
+					DataRate: &ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 12,
@@ -207,7 +207,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			},
 			Message: &ttnpb.UplinkMessage{
 				Settings: &ttnpb.TxSettings{
-					DataRate: ttnpb.DataRate{
+					DataRate: &ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 12,
@@ -271,7 +271,7 @@ func TestHandleLinkCheckReq(t *testing.T) {
 			},
 			Message: &ttnpb.UplinkMessage{
 				Settings: &ttnpb.TxSettings{
-					DataRate: ttnpb.DataRate{
+					DataRate: &ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{
 								SpreadingFactor: 12,

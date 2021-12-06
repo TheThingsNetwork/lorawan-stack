@@ -1027,12 +1027,12 @@ func TestApplicationServer(t *testing.T) {
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
 									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-									Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+									Settings:     &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyId: []byte{0x22},
 									FPort:        22,
 									FCnt:         22,
 									FrmPayload:   []byte{0x01},
-									ReceivedAt:   &now,
+									ReceivedAt:   ttnpb.ProtoTimePtr(now),
 								},
 							},
 						},
@@ -1043,7 +1043,7 @@ func TestApplicationServer(t *testing.T) {
 								Up: &ttnpb.ApplicationUp_UplinkMessage{
 									UplinkMessage: &ttnpb.ApplicationUplink{
 										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-										Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+										Settings:     &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 										SessionKeyId: []byte{0x22},
 										FPort:        22,
 										FCnt:         22,
@@ -1189,12 +1189,12 @@ func TestApplicationServer(t *testing.T) {
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
 									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-									Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+									Settings:     &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyId: []byte{0x33},
 									FPort:        42,
 									FCnt:         42,
 									FrmPayload:   []byte{0xca, 0xa9, 0x42},
-									ReceivedAt:   &now,
+									ReceivedAt:   ttnpb.ProtoTimePtr(now),
 								},
 							},
 						},
@@ -1205,7 +1205,7 @@ func TestApplicationServer(t *testing.T) {
 								Up: &ttnpb.ApplicationUp_UplinkMessage{
 									UplinkMessage: &ttnpb.ApplicationUplink{
 										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-										Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+										Settings:     &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 										SessionKeyId: []byte{0x33},
 										FPort:        42,
 										FCnt:         42,
@@ -1623,12 +1623,12 @@ func TestApplicationServer(t *testing.T) {
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
 									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-									Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+									Settings:     &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyId: []byte{0x44},
 									FPort:        24,
 									FCnt:         24,
 									FrmPayload:   []byte{0x14, 0x4e, 0x3c},
-									ReceivedAt:   &now,
+									ReceivedAt:   ttnpb.ProtoTimePtr(now),
 								},
 							},
 						},
@@ -1639,7 +1639,7 @@ func TestApplicationServer(t *testing.T) {
 								Up: &ttnpb.ApplicationUp_UplinkMessage{
 									UplinkMessage: &ttnpb.ApplicationUplink{
 										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-										Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+										Settings:     &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 										SessionKeyId: []byte{0x44},
 										FPort:        24,
 										FCnt:         24,
@@ -1870,12 +1870,12 @@ func TestApplicationServer(t *testing.T) {
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
 									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-									Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+									Settings:     &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyId: []byte{0x55},
 									FPort:        42,
 									FCnt:         42,
 									FrmPayload:   []byte{0xd1, 0x43, 0x6a},
-									ReceivedAt:   &now,
+									ReceivedAt:   ttnpb.ProtoTimePtr(now),
 								},
 							},
 						},
@@ -1886,7 +1886,7 @@ func TestApplicationServer(t *testing.T) {
 								Up: &ttnpb.ApplicationUp_UplinkMessage{
 									UplinkMessage: &ttnpb.ApplicationUplink{
 										RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-										Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+										Settings:     &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 										SessionKeyId: []byte{0x55},
 										FPort:        42,
 										FCnt:         42,
@@ -1952,12 +1952,12 @@ func TestApplicationServer(t *testing.T) {
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
 									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-									Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+									Settings:     &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyId: []byte{0x55},
 									FPort:        11,
 									FCnt:         11,
 									FrmPayload:   []byte{0xaa, 0x64, 0xb7, 0x7},
-									ReceivedAt:   &now,
+									ReceivedAt:   ttnpb.ProtoTimePtr(now),
 								},
 							},
 						},
@@ -2532,12 +2532,12 @@ func TestSkipPayloadCrypto(t *testing.T) {
 							Up: &ttnpb.ApplicationUp_UplinkMessage{
 								UplinkMessage: &ttnpb.ApplicationUplink{
 									RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-									Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+									Settings:     &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 									SessionKeyId: []byte{0x22},
 									FPort:        22,
 									FCnt:         22,
 									FrmPayload:   []byte{0x01},
-									ReceivedAt:   &now,
+									ReceivedAt:   ttnpb.ProtoTimePtr(now),
 								},
 							},
 						},
@@ -2550,7 +2550,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 									Up: &ttnpb.ApplicationUp_UplinkMessage{
 										UplinkMessage: &ttnpb.ApplicationUplink{
 											RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-											Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+											Settings:     &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 											SessionKeyId: []byte{0x22},
 											FPort:        22,
 											FCnt:         22,
@@ -2572,7 +2572,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 									Up: &ttnpb.ApplicationUp_UplinkMessage{
 										UplinkMessage: &ttnpb.ApplicationUplink{
 											RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-											Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+											Settings:     &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 											SessionKeyId: []byte{0x22},
 											FPort:        22,
 											FCnt:         22,
@@ -2880,12 +2880,12 @@ func TestLocationFromPayload(t *testing.T) {
 		Up: &ttnpb.ApplicationUp_UplinkMessage{
 			UplinkMessage: &ttnpb.ApplicationUplink{
 				RxMetadata:   []*ttnpb.RxMetadata{{GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "gtw"}}},
-				Settings:     &ttnpb.TxSettings{DataRate: ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
+				Settings:     &ttnpb.TxSettings{DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{}}}},
 				SessionKeyId: []byte{0x11},
 				FPort:        11,
 				FCnt:         11,
 				FrmPayload:   []byte{0x11},
-				ReceivedAt:   &now,
+				ReceivedAt:   ttnpb.ProtoTimePtr(now),
 			},
 		},
 	})

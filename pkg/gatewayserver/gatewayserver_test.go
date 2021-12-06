@@ -29,6 +29,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
+	ttnpbv2 "go.thethings.network/lorawan-stack-legacy/v2/pkg/ttnpb"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
@@ -41,8 +42,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
-
-	ttnpbv2 "go.thethings.network/lorawan-stack-legacy/v2/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
@@ -510,7 +509,8 @@ func TestGatewayServer(t *testing.T) {
 											continue
 										}
 										var bsUpstream []byte
-										if payload.GetMType() == ttnpb.MType_JOIN_REQUEST {
+										switch payload.MHdr.MType {
+										case ttnpb.MType_JOIN_REQUEST:
 											var jreq lbslns.JoinRequest
 											err := jreq.FromUplinkMessage(uplink, band.EU_863_870)
 											if err != nil {
@@ -522,8 +522,7 @@ func TestGatewayServer(t *testing.T) {
 												cancel(err)
 												return
 											}
-										}
-										if payload.GetMType() == ttnpb.MType_UNCONFIRMED_UP || payload.GetMType() == ttnpb.MType_CONFIRMED_UP {
+										case ttnpb.MType_UNCONFIRMED_UP, ttnpb.MType_CONFIRMED_UP:
 											var updf lbslns.UplinkDataFrame
 											err := updf.FromUplinkMessage(uplink, band.EU_863_870)
 											if err != nil {
@@ -885,7 +884,7 @@ func TestGatewayServer(t *testing.T) {
 								UplinkMessages: []*ttnpb.UplinkMessage{
 									{
 										Settings: &ttnpb.TxSettings{
-											DataRate: ttnpb.DataRate{
+											DataRate: &ttnpb.DataRate{
 												Modulation: &ttnpb.DataRate_Lora{
 													Lora: &ttnpb.LoRaDataRate{
 														SpreadingFactor: 7,
@@ -1042,7 +1041,7 @@ func TestGatewayServer(t *testing.T) {
 									UplinkMessages: []*ttnpb.UplinkMessage{
 										{
 											Settings: &ttnpb.TxSettings{
-												DataRate: ttnpb.DataRate{
+												DataRate: &ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
 															SpreadingFactor: 7,
@@ -1076,7 +1075,7 @@ func TestGatewayServer(t *testing.T) {
 									UplinkMessages: []*ttnpb.UplinkMessage{
 										{
 											Settings: &ttnpb.TxSettings{
-												DataRate: ttnpb.DataRate{
+												DataRate: &ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
 															SpreadingFactor: 7,
@@ -1102,7 +1101,7 @@ func TestGatewayServer(t *testing.T) {
 										},
 										{
 											Settings: &ttnpb.TxSettings{
-												DataRate: ttnpb.DataRate{
+												DataRate: &ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
 															SpreadingFactor: 7,
@@ -1128,7 +1127,7 @@ func TestGatewayServer(t *testing.T) {
 										},
 										{
 											Settings: &ttnpb.TxSettings{
-												DataRate: ttnpb.DataRate{
+												DataRate: &ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
 															SpreadingFactor: 7,
@@ -1164,7 +1163,7 @@ func TestGatewayServer(t *testing.T) {
 									UplinkMessages: []*ttnpb.UplinkMessage{
 										{
 											Settings: &ttnpb.TxSettings{
-												DataRate: ttnpb.DataRate{
+												DataRate: &ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Fsk{
 														Fsk: &ttnpb.FSKDataRate{
 															BitRate: 50000,
@@ -1196,7 +1195,7 @@ func TestGatewayServer(t *testing.T) {
 									UplinkMessages: []*ttnpb.UplinkMessage{
 										{
 											Settings: &ttnpb.TxSettings{
-												DataRate: ttnpb.DataRate{
+												DataRate: &ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
 															SpreadingFactor: 9,
@@ -1222,7 +1221,7 @@ func TestGatewayServer(t *testing.T) {
 										},
 										{
 											Settings: &ttnpb.TxSettings{
-												DataRate: ttnpb.DataRate{
+												DataRate: &ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
 															SpreadingFactor: 7,
@@ -1248,7 +1247,7 @@ func TestGatewayServer(t *testing.T) {
 										},
 										{
 											Settings: &ttnpb.TxSettings{
-												DataRate: ttnpb.DataRate{
+												DataRate: &ttnpb.DataRate{
 													Modulation: &ttnpb.DataRate_Lora{
 														Lora: &ttnpb.LoRaDataRate{
 															SpreadingFactor: 12,
@@ -1346,7 +1345,7 @@ func TestGatewayServer(t *testing.T) {
 										if expected == nil {
 											t.Fatalf("Received unexpected message")
 										}
-										a.So(time.Since(*msg.ReceivedAt), should.BeLessThan, timeout)
+										a.So(time.Since(*ttnpb.StdTime(msg.ReceivedAt)), should.BeLessThan, timeout)
 										a.So(msg.Settings, should.Resemble, expected.Settings)
 										a.So(len(msg.RxMetadata), should.Equal, len(expected.RxMetadata))
 										for i, md := range msg.RxMetadata {
@@ -1436,7 +1435,7 @@ func TestGatewayServer(t *testing.T) {
 									RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
 									Settings: &ttnpb.DownlinkMessage_Scheduled{
 										Scheduled: &ttnpb.TxSettings{
-											DataRate: ttnpb.DataRate{
+											DataRate: &ttnpb.DataRate{
 												Modulation: &ttnpb.DataRate_Lora{
 													Lora: &ttnpb.LoRaDataRate{
 														SpreadingFactor: 12,
@@ -1782,8 +1781,11 @@ func TestUpdateVersionInfo(t *testing.T) {
 			},
 		},
 	})
+
+	gatewayFetchInterval := test.Delay
+
 	gsConfig := &gatewayserver.Config{
-		FetchGatewayInterval:   time.Minute,
+		FetchGatewayInterval:   gatewayFetchInterval,
 		FetchGatewayJitter:     1,
 		UpdateVersionInfoDelay: test.Delay,
 		MQTTV2: config.MQTT{
@@ -1809,10 +1811,13 @@ func TestUpdateVersionInfo(t *testing.T) {
 	time.Sleep(timeout) // Wait for component to start.
 
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
-	is.add(ctx, ttnpb.GatewayIdentifiers{
+
+	gtwIDs := ttnpb.GatewayIdentifiers{
 		GatewayId: registeredGatewayID,
 		Eui:       &registeredGatewayEUI,
-	}, registeredGatewayKey, true, true)
+	}
+
+	is.add(ctx, gtwIDs, registeredGatewayKey, true, true)
 	time.Sleep(timeout) // Wait for setup to be completed.
 
 	linkFn := func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, statCh <-chan *ttnpbv2.StatusMessage) error {
@@ -1904,4 +1909,31 @@ func TestUpdateVersionInfo(t *testing.T) {
 			a.So(gtw.Attributes, should.Resemble, tc.ExpectedAttributes)
 		})
 	}
+
+	// Test Disconnection on delete.
+	// Setup a stats client with independent context to query whether the gateway is connected and statistics on
+	// upstream and downstream.
+	statsConn, err := grpc.Dial(":9187", append(rpcclient.DefaultDialOptions(test.Context()), grpc.WithInsecure(), grpc.WithBlock())...)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	defer statsConn.Close()
+	statsCtx := metadata.AppendToOutgoingContext(test.Context(),
+		"id", ids.GatewayId,
+		"authorization", fmt.Sprintf("Bearer %v", registeredGatewayKey),
+	)
+	statsClient := ttnpb.NewGsClient(statsConn)
+
+	stat, err := statsClient.GetGatewayConnectionStats(statsCtx, &gtwIDs)
+	a.So(err, should.BeNil)
+	a.So(stat, should.NotBeNil)
+
+	// Delete and wait for fetch interval.
+	is.Delete(ctx, &gtwIDs)
+	time.Sleep(gatewayFetchInterval << 7)
+
+	stat, err = statsClient.GetGatewayConnectionStats(statsCtx, &gtwIDs)
+	a.So(errors.IsNotFound(err), should.BeTrue)
+	a.So(stat, should.BeNil)
+
 }

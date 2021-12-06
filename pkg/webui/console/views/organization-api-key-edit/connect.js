@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
@@ -60,8 +60,8 @@ export default OrganizationApiKeyEdit =>
       },
       deleteOrganizationApiKeySuccess: orgId =>
         dispatch(replace(`/organizations/${orgId}/api-keys`)),
-      deleteOrganizationApiKey: api.organization.apiKeys.delete,
-      updateOrganizationApiKey: api.organization.apiKeys.update,
+      deleteOrganizationApiKey: tts.Organizations.ApiKeys.deleteById,
+      updateOrganizationApiKey: tts.Organizations.ApiKeys.updateById,
     }),
     (stateProps, dispatchProps, ownProps) => ({
       ...stateProps,

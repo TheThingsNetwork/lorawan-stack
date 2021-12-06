@@ -1176,6 +1176,10 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"mac_settings.factory_preset_frequencies",
 		"mac_settings.ping_slot_frequency.value",
 		"mac_settings.use_adr.value",
+		"mac_settings.rx2_data_rate_index.value",
+		"mac_settings.desired_rx2_data_rate_index.value",
+		"mac_settings.ping_slot_data_rate_index.value",
+		"mac_settings.desired_ping_slot_data_rate_index.value",
 		"mac_state.current_parameters.adr_data_rate_index",
 		"mac_state.current_parameters.adr_tx_power_index",
 		"mac_state.current_parameters.channels",
@@ -1244,6 +1248,94 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 					return nil
 				})
 			}, "version_ids.band_id"); err != nil {
+				return nil, err
+			}
+		}
+		if st.HasSetField(
+			"frequency_plan_id",
+			"lorawan_phy_version",
+			"mac_settings.rx2_data_rate_index.value",
+		) {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, fp *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetRx2DataRateIndex() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacSettings.Rx2DataRateIndex.Value]
+					if !ok {
+						return newInvalidFieldValueError("mac_settings.rx2_data_rate_index.value")
+					}
+					return nil
+				})
+			},
+				"mac_settings.rx2_data_rate_index.value",
+			); err != nil {
+				return nil, err
+			}
+		}
+		if st.HasSetField(
+			"frequency_plan_id",
+			"lorawan_phy_version",
+			"mac_settings.desired_rx2_data_rate_index.value",
+		) {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, fp *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetDesiredRx2DataRateIndex() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacSettings.DesiredRx2DataRateIndex.Value]
+					if !ok {
+						return newInvalidFieldValueError("mac_settings.desired_rx2_data_rate_index.value")
+					}
+					return nil
+				})
+			},
+				"mac_settings.desired_rx2_data_rate_index.value",
+			); err != nil {
+				return nil, err
+			}
+		}
+		if st.HasSetField(
+			"frequency_plan_id",
+			"lorawan_phy_version",
+			"mac_settings.ping_slot_data_rate_index.value",
+		) {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, fp *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetPingSlotDataRateIndex() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacSettings.PingSlotDataRateIndex.Value]
+					if !ok {
+						return newInvalidFieldValueError("mac_settings.ping_slot_data_rate_index.value")
+					}
+					return nil
+				})
+			},
+				"mac_settings.ping_slot_data_rate_index.value",
+			); err != nil {
+				return nil, err
+			}
+		}
+		if st.HasSetField(
+			"frequency_plan_id",
+			"lorawan_phy_version",
+			"mac_settings.desired_ping_slot_data_rate_index.value",
+		) {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, fp *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetDesiredPingSlotDataRateIndex() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacSettings.DesiredPingSlotDataRateIndex.Value]
+					if !ok {
+						return newInvalidFieldValueError("mac_settings.desired_ping_slot_data_rate_index.value")
+					}
+					return nil
+				})
+			},
+				"mac_settings.desired_ping_slot_data_rate_index.value",
+			); err != nil {
 				return nil, err
 			}
 		}
@@ -2249,11 +2341,10 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 					"session.keys.s_nwk_s_int_key.key",
 				)
 			}
-
-			if st.HasSetField("session.started_at") && st.Device.GetSession().GetStartedAt().IsZero() ||
+			if st.HasSetField("session.started_at") && st.Device.GetSession().GetStartedAt() == nil ||
 				st.HasSetField("session.session_key_id") && !bytes.Equal(st.Device.GetSession().GetSessionKeyId(), stored.GetSession().GetSessionKeyId()) ||
-				stored.GetSession().GetStartedAt().IsZero() {
-				st.Device.Session.StartedAt = time.Now().UTC()
+				stored.GetSession().GetStartedAt() == nil {
+				st.Device.Session.StartedAt = ttnpb.ProtoTimePtr(time.Now())
 				st.AddSetFields(
 					"session.started_at",
 				)
@@ -2379,7 +2470,7 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 			stored.Session = &ttnpb.Session{
 				DevAddr:                    stored.Session.DevAddr,
 				SessionKeys:                stored.Session.SessionKeys,
-				StartedAt:                  time.Now().UTC(),
+				StartedAt:                  ttnpb.ProtoTimePtr(time.Now()),
 				QueuedApplicationDownlinks: stored.Session.QueuedApplicationDownlinks,
 			}
 		}

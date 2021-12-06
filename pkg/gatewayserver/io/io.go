@@ -236,22 +236,22 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 			"concentrator_time", frontendSync.ConcentratorTime,
 			"server_time", frontendSync.ServerTime,
 			"gateway_time", frontendSync.GatewayTime,
-		)).Info("Gateway clocks have been synchronized by the frontend")
+		)).Debug("Gateway clocks have been synchronized by the frontend")
 	case up.Settings.Time != nil:
-		ct = c.scheduler.SyncWithGatewayAbsolute(up.Settings.Timestamp, *up.ReceivedAt, *up.Settings.Time)
+		ct = c.scheduler.SyncWithGatewayAbsolute(up.Settings.Timestamp, *ttnpb.StdTime(up.ReceivedAt), *ttnpb.StdTime(up.Settings.Time))
 		log.FromContext(c.ctx).WithFields(log.Fields(
 			"timestamp", up.Settings.Timestamp,
 			"concentrator_time", ct,
 			"server_time", up.ReceivedAt,
 			"gateway_time", *up.Settings.Time,
-		)).Info("Synchronized server and gateway absolute time")
+		)).Debug("Synchronized server and gateway absolute time")
 	case up.Settings.Time == nil:
-		ct = c.scheduler.Sync(up.Settings.Timestamp, *up.ReceivedAt)
+		ct = c.scheduler.Sync(up.Settings.Timestamp, *ttnpb.StdTime(up.ReceivedAt))
 		log.FromContext(c.ctx).WithFields(log.Fields(
 			"timestamp", up.Settings.Timestamp,
 			"concentrator_time", ct,
 			"server_time", up.ReceivedAt,
-		)).Info("Synchronized server absolute time only")
+		)).Debug("Synchronized server absolute time only")
 	default:
 		panic("unreachable")
 	}
@@ -265,7 +265,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 		buf, err := UplinkToken(&ttnpb.GatewayAntennaIdentifiers{
 			GatewayIds:   c.gateway.GetIds(),
 			AntennaIndex: md.AntennaIndex,
-		}, md.Timestamp, ct, *up.ReceivedAt, up.Settings.Time)
+		}, md.Timestamp, ct, *ttnpb.StdTime(up.ReceivedAt), ttnpb.StdTime(up.Settings.Time))
 		if err != nil {
 			return err
 		}
@@ -292,7 +292,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 		return c.ctx.Err()
 	case c.upCh <- msg:
 		atomic.AddUint64(&c.uplinks, 1)
-		atomic.StoreInt64(&c.lastUplinkTime, up.ReceivedAt.UnixNano())
+		atomic.StoreInt64(&c.lastUplinkTime, ttnpb.StdTime(up.ReceivedAt).UnixNano())
 		c.notifyStatsChanged()
 	default:
 		return errBufferFull.New()
@@ -506,7 +506,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			rxErrs = append(rxErrs, errDataRateRxWindow.WithAttributes("window", i+1))
 			continue
 		}
-		_, bandDR, ok := phy.FindDownlinkDataRate(*rx.dataRate)
+		_, bandDR, ok := phy.FindDownlinkDataRate(rx.dataRate)
 		if !ok {
 			rxErrs = append(rxErrs, errDataRateRxWindow.WithAttributes("window", i+1))
 			continue
@@ -538,7 +538,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			eirp = *sb.MaxEIRP
 		}
 		settings := ttnpb.TxSettings{
-			DataRate:  *rx.dataRate,
+			DataRate:  rx.dataRate,
 			Frequency: rx.frequency,
 			Downlink: &ttnpb.TxSettings_Downlink{
 				TxPower:      eirp,

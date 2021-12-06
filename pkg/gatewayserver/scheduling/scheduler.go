@@ -254,16 +254,16 @@ func (s *Scheduler) syncWithUplinkToken(token *ttnpb.UplinkToken) bool {
 	if token.GetServerTime() == nil || token.GetConcentratorTime() == 0 {
 		return false
 	}
-	if lastSync, ok := s.clock.SyncTime(); ok && lastSync.After(*token.ServerTime) {
+	if lastSync, ok := s.clock.SyncTime(); ok && lastSync.After(*ttnpb.StdTime(token.ServerTime)) {
 		return false
 	}
-	s.clock.SyncWithGatewayConcentrator(token.Timestamp, *token.ServerTime, token.GatewayTime, ConcentratorTime(token.ConcentratorTime))
+	s.clock.SyncWithGatewayConcentrator(token.Timestamp, *ttnpb.StdTime(token.ServerTime), ttnpb.StdTime(token.GatewayTime), ConcentratorTime(token.ConcentratorTime))
 	return true
 }
 
 var (
 	errConflict              = errors.DefineAlreadyExists("conflict", "scheduling conflict")
-	errTooLate               = errors.DefineFailedPrecondition("too_late", "too late to transmission scheduled time (delta is `{delta}`)")
+	errTooLate               = errors.DefineFailedPrecondition("too_late", "too late to transmission scheduled time (delta is `{delta}`, min is `{min}`)")
 	errNoClockSync           = errors.DefineUnavailable("no_clock_sync", "no clock sync")
 	errNoAbsoluteGatewayTime = errors.DefineAborted("no_absolute_gateway_time", "no absolute gateway time")
 	errNoServerTime          = errors.DefineAborted("no_server_time", "no server time")
@@ -303,10 +303,10 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (Emission, err
 	now, ok := s.clock.FromServerTime(s.timeSource.Now())
 	if opts.Time != nil {
 		var ok bool
-		starts, ok = s.clock.FromGatewayTime(*opts.Time)
+		starts, ok = s.clock.FromGatewayTime(*ttnpb.StdTime(opts.Time))
 		if !ok {
 			if medianRTT != nil {
-				serverTime, ok := s.clock.FromServerTime(*opts.Time)
+				serverTime, ok := s.clock.FromServerTime(*ttnpb.StdTime(opts.Time))
 				if !ok {
 					return Emission{}, errNoServerTime.New()
 				}
@@ -326,7 +326,10 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (Emission, err
 	}
 	if ok {
 		if delta := time.Duration(starts - now); delta < minScheduleTime {
-			return Emission{}, errTooLate.WithAttributes("delta", delta)
+			return Emission{}, errTooLate.WithAttributes(
+				"delta", delta,
+				"min", minScheduleTime,
+			)
 		}
 	}
 	sb, err := s.findSubBand(opts.Frequency)

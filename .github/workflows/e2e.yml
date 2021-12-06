@@ -204,9 +204,10 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           config-file: config/cypress.json
-          config: baseUrl=http://localhost:1885
+          config: baseUrl=https://localhost:8885
           record: true
           parallel: true
+          browser: chrome
           group: main-${{ needs.determine-if-required.outputs.hash }}
       - name: Upload logs
         uses: actions/upload-artifact@v2
@@ -267,7 +268,7 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           config-file: config/cypress.json
-          config: baseUrl=http://localhost:1885
+          config: baseUrl=https://localhost:8885
           browser: firefox
           record: true
           spec: cypress/integration/smoke/smoke.spec.js

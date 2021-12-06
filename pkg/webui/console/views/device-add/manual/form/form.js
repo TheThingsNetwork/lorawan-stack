@@ -17,7 +17,7 @@ import { defineMessages } from 'react-intl'
 import { merge, isUndefined } from 'lodash'
 import classnames from 'classnames'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
@@ -223,7 +223,7 @@ const ManualForm = props => {
 
   const handleGenerate = React.useCallback(async () => {
     try {
-      const result = await api.application.generateDevEUI(appId)
+      const result = await tts.Applications.issueDevEUI(appId)
       setDevEUIGenerated(true)
       fetchDevEUICounter(appId)
       euiInputRef.current.focus()

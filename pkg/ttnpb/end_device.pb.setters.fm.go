@@ -5,7 +5,6 @@ package ttnpb
 import (
 	fmt "fmt"
 	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
-	time "time"
 )
 
 func (dst *Session) SetFields(src *Session, paths ...string) error {
@@ -86,8 +85,7 @@ func (dst *Session) SetFields(src *Session, paths ...string) error {
 			if src != nil {
 				dst.StartedAt = src.StartedAt
 			} else {
-				var zero time.Time
-				dst.StartedAt = zero
+				dst.StartedAt = nil
 			}
 		case "queued_application_downlinks":
 			if len(subs) > 0 {
@@ -1615,8 +1613,7 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			if src != nil {
 				dst.CreatedAt = src.CreatedAt
 			} else {
-				var zero time.Time
-				dst.CreatedAt = zero
+				dst.CreatedAt = nil
 			}
 		case "updated_at":
 			if len(subs) > 0 {
@@ -1625,8 +1622,7 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			if src != nil {
 				dst.UpdatedAt = src.UpdatedAt
 			} else {
-				var zero time.Time
-				dst.UpdatedAt = zero
+				dst.UpdatedAt = nil
 			}
 		case "name":
 			if len(subs) > 0 {

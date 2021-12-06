@@ -16,6 +16,7 @@ package udp_test
 
 import (
 	"bytes"
+	"crypto/rand"
 	"encoding/base64"
 	"net"
 	"sync"
@@ -60,7 +61,7 @@ func generatePushData(eui types.EUI64, status bool, timestamps ...time.Duration)
 			Modu: "LORA",
 			CodR: "4/5",
 			DatR: datarate.DR{
-				DataRate: ttnpb.DataRate{
+				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
 							SpreadingFactor: 7,
@@ -159,19 +160,19 @@ func expectConnection(t *testing.T, server mock.Server, connections *sync.Map, e
 
 func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 	var fNwkSIntKey, sNwkSIntKey, appSKey types.AES128Key
-	random.Read(fNwkSIntKey[:])
-	random.Read(sNwkSIntKey[:])
-	random.Read(appSKey[:])
+	rand.Read(fNwkSIntKey[:])
+	rand.Read(sNwkSIntKey[:])
+	rand.Read(appSKey[:])
 
 	pld := &ttnpb.MACPayload{
-		FHDR: ttnpb.FHDR{
+		FHdr: &ttnpb.FHDR{
 			DevAddr: devAddr,
 			FCnt:    42,
 		},
 		FPort:      fPort,
 		FrmPayload: random.Bytes(size),
 	}
-	buf, err := crypto.EncryptUplink(appSKey, devAddr, pld.FCnt, pld.FrmPayload, false)
+	buf, err := crypto.EncryptUplink(appSKey, devAddr, pld.FHdr.FCnt, pld.FrmPayload, false)
 	if err != nil {
 		panic(err)
 	}
@@ -179,7 +180,7 @@ func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 
 	msg := &ttnpb.UplinkMessage{
 		Payload: &ttnpb.Message{
-			MHDR: ttnpb.MHDR{
+			MHdr: &ttnpb.MHDR{
 				MType: ttnpb.MType_UNCONFIRMED_UP,
 				Major: ttnpb.Major_LORAWAN_R1,
 			},
@@ -192,7 +193,7 @@ func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 	if err != nil {
 		panic(err)
 	}
-	mic, err := crypto.ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey, 0, 5, 0, devAddr, pld.FCnt, buf)
+	mic, err := crypto.ComputeUplinkMIC(sNwkSIntKey, fNwkSIntKey, 0, 5, 0, devAddr, pld.FHdr.FCnt, buf)
 	if err != nil {
 		panic(err)
 	}

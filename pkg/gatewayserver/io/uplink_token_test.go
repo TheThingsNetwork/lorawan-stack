@@ -47,8 +47,8 @@ func TestUplinkToken(t *testing.T) {
 	a.So(token.Ids, should.Resemble, ids)
 	a.So(token.Timestamp, should.Equal, timestamp)
 	a.So(token.ConcentratorTime, should.Equal, int64(concentratorTime))
-	a.So(token.ServerTime, should.Resemble, &serverTime)
-	a.So(token.GatewayTime, should.Resemble, &gatewayTime)
+	a.So(ttnpb.StdTime(token.ServerTime), should.Resemble, &serverTime)
+	a.So(ttnpb.StdTime(token.GatewayTime), should.Resemble, &gatewayTime)
 
 	_, err = io.ParseUplinkToken(nil)
 	a.So(err, should.NotBeNil)

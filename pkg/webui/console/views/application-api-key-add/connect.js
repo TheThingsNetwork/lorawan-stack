@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import { getApplicationsRightsList } from '@console/store/actions/applications'
 
@@ -37,7 +37,7 @@ export default ApplicationApiKeyAdd =>
       pseudoRights: selectApplicationPseudoRights(state),
     }),
     dispatch => ({
-      createApiKey: api.application.apiKeys.create,
+      createApiKey: tts.Applications.ApiKeys.create,
       getApplicationsRightsList: appId => dispatch(getApplicationsRightsList(appId)),
       navigateToList: appId => dispatch(replace(`/applications/${appId}/api-keys`)),
     }),

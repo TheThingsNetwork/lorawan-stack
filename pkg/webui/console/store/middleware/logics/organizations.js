@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import api from '@console/api'
+import tts from '@console/api/tts'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
@@ -29,7 +29,7 @@ const getOrganizationLogic = createRequestLogic({
       payload: { id },
       meta: { selector },
     } = action
-    const org = await api.organization.get(id, selector)
+    const org = await tts.Organizations.getById(id, selector)
     dispatch(organizations.startOrganizationEventsStream(id))
     return org
   },
@@ -45,7 +45,7 @@ const getOrganizationsLogic = createRequestLogic({
     const { selectors, options } = action.meta
 
     const data = options.isSearch
-      ? await api.organizations.search(
+      ? await tts.Organizations.search(
           {
             page,
             limit,
@@ -54,7 +54,7 @@ const getOrganizationsLogic = createRequestLogic({
           },
           selectors,
         )
-      : await api.organizations.list({ page, limit, order }, selectors)
+      : await tts.Organizations.getAll({ page, limit, order }, selectors)
 
     return {
       entities: data.organizations,
@@ -68,7 +68,7 @@ const createOrganizationLogic = createRequestLogic({
   process: async ({ action, getState }) => {
     const userId = selectUserId(getState())
 
-    return api.organizations.create(userId, action.payload)
+    return tts.Organizations.create(userId, action.payload)
   },
 })
 
@@ -77,7 +77,7 @@ const updateOrganizationLogic = createRequestLogic({
   process: async ({ action }) => {
     const { id, patch } = action.payload
 
-    const result = await api.organization.update(id, patch)
+    const result = await tts.Organizations.updateById(id, patch)
 
     return { ...patch, ...result }
   },
@@ -90,9 +90,9 @@ const deleteOrganizationLogic = createRequestLogic({
     const { options } = action.meta
 
     if (options.purge) {
-      await api.organization.purge(id)
+      await tts.Organizations.purgeById(id)
     } else {
-      await api.organization.delete(id)
+      await tts.Organizations.deleteById(id)
     }
 
     return { id }
@@ -104,7 +104,7 @@ const restoreOrganizationLogic = createRequestLogic({
   process: async ({ action }) => {
     const { id } = action.payload
 
-    await api.organization.restore(id)
+    await tts.Organizations.restoreById(id)
 
     return { id }
   },
@@ -114,7 +114,7 @@ const getOrganizationsRightsLogic = createRequestLogic({
   type: organizations.GET_ORGS_RIGHTS_LIST,
   process: async ({ action }) => {
     const { id } = action.payload
-    const result = await api.rights.organizations(id)
+    const result = await tts.Organizations.getRightsById(id)
     return result.rights.sort()
   },
 })
@@ -130,6 +130,6 @@ export default [
   ...createEventsConnectLogics(
     organizations.SHARED_NAME,
     'organizations',
-    api.organization.eventsSubscribe,
+    tts.Organizations.openStream,
   ),
 ]
