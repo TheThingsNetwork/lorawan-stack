@@ -297,7 +297,8 @@ Cypress.Commands.add(
         headers,
       })
     })
-})
+  },
+)
 
 // Helper function to create a new pub sub programmatically.
 Cypress.Commands.add('createPubSub', (applicationId, pubSub) => {
