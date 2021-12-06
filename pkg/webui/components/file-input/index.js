@@ -109,13 +109,14 @@ export default class FileInput extends Component {
     const { maxSize, warningSize } = this.props
     const { files } = event.target
 
-    if (files && files[0] && files[0].size <= maxSize) {
-      if (typeof warningSize === 'number' && files && files[0] && files[0].size >= warningSize) {
-        this.setState({ isLarger: true })
-      }
-      this.setState({ filename: files[0].name, error: undefined })
+    if (files && files[0]) {
+      if (files[0].size <= maxSize) {
+        this.setState({ error: m.tooBig })
+      } else {
       this.reader.readAsDataURL(files[0])
-    } else {
+      this.setState({ filename: files[0].name, error: undefined, isLarger: files[0].size >= warningSize })      
+      }
+    }
       this.setState({ error: m.tooBig })
     }
   }
