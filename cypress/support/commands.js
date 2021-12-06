@@ -257,7 +257,7 @@ Cypress.Commands.add('createEndDevice', (applicationId, endDevice) => {
 })
 
 // Helper function to create a mock device in all components.
-Cypress.Commands.add('createEndDeviceAllComponents', applicationId => {
+Cypress.Commands.add('createMockDeviceAllComponents', (applicationId, overwrites = {}) => {
   const baseUrl = Cypress.config('baseUrl')
   const adminApiKey = Cypress.config('adminApiKey')
   const headers = {
@@ -275,7 +275,7 @@ Cypress.Commands.add('createEndDeviceAllComponents', applicationId => {
     cy.request({
       method: 'PUT',
       url: `${baseUrl}/api/v3/ns/applications/${applicationId}/devices/${body.end_device.ids.device_id}`,
-      body,
+      body: { ...body, ...overwrites.ns },
       headers,
     })
   })

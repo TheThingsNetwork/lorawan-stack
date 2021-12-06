@@ -1,31 +1,31 @@
 {
   "end_device":{
-    "frequency_plan_id":"EU_863_870_TTN",
-    "lorawan_phy_version":"PHY_V1_0_2_REV_B",
-    "multicast":false,
-    "supports_join":false,
+    "frequency_plan_id": "EU_863_870_TTN",
+    "lorawan_phy_version": "PHY_V1_0_2_REV_B",
+    "multicast": false,
+    "supports_join": true,
     "lorawan_version":"MAC_V1_0_2",
     "ids":{
       "device_id":"device-all-components",
       "dev_eui":"70B3D57ED8000019"
     },
-      "session":{
-        "keys":{
-          "f_nwk_s_int_key":{
-            "key":"CBFBF585D81A9063A31EA6922EDD6360"
-          }
-        },
-        "dev_addr":"270000FC"
+    "session":{
+      "keys":{
+        "f_nwk_s_int_key":{
+          "key":"CBFBF585D81A9063A31EA6922EDD6360"
+        }
       },
-      "supports_class_c":false,
-      "supports_class_b":false,
-      "mac_settings":{
-        "rx2_data_rate_index":0,
-        "rx2_frequency":869525000,
-        "rx1_delay":1,
-        "rx1_data_rate_offset":0,
-        "resets_f_cnt":false
-      }
+      "dev_addr":"270000FC"
+    },
+    "supports_class_c":false,
+    "supports_class_b":false,
+    "mac_settings":{
+      "rx2_data_rate_index":0,
+      "rx2_frequency":869525000,
+      "rx1_delay":1,
+      "rx1_data_rate_offset":0,
+      "resets_f_cnt":false
+    }
   },
   "field_mask":{
     "paths":[
