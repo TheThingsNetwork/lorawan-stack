@@ -7064,6 +7064,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/networkserver:transmission": {
+    "translations": {
+      "en": "downlink transsmission failed with result `{result}`"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_gsns.go"
+    }
+  },
   "error:pkg/networkserver:unknown_mac_state": {
     "translations": {
       "en": "MAC state is unknown"

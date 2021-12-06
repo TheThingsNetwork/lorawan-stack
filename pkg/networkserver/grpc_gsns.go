@@ -869,7 +869,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	}
 
 	var queuedApplicationUplinks []*ttnpb.ApplicationUp
-	defer func() { ns.enqueueApplicationUplinks(ctx, queuedApplicationUplinks...) }()
+	defer func() { ns.submitApplicationUplinks(ctx, queuedApplicationUplinks...) }()
 
 	stored, _, err := ns.devices.SetByID(ctx, matched.Device.ApplicationIdentifiers, matched.Device.DeviceId, handleDataUplinkGetPaths[:],
 		func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
@@ -1306,12 +1306,11 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	return ttnpb.Empty, nil
 }
 
+var errTransmission = errors.Define("transmission", "downlink transsmission failed with result `{result}`")
+
 // ReportTxAcknowledgment is called by the Gateway Server when a tx acknowledgment arrives.
-func (ns *NetworkServer) ReportTxAcknowledgment(ctx context.Context, up *ttnpb.GatewayTxAcknowledgment) (_ *pbtypes.Empty, err error) {
-	ack := up.GetTxAck()
-	if ack.GetResult() != ttnpb.TxAcknowledgment_SUCCESS {
-		return ttnpb.Empty, nil
-	}
+func (ns *NetworkServer) ReportTxAcknowledgment(ctx context.Context, txAck *ttnpb.GatewayTxAcknowledgment) (_ *pbtypes.Empty, err error) {
+	ack := txAck.GetTxAck()
 	down, err := ns.scheduledDownlinkMatcher.Match(ctx, ack)
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -1320,29 +1319,36 @@ func (ns *NetworkServer) ReportTxAcknowledgment(ctx context.Context, up *ttnpb.G
 		}
 		return nil, err
 	}
-	ids := down.GetEndDeviceIds()
-	if ids == nil {
+	macPayload := down.GetPayload().GetMacPayload()
+	if macPayload.GetFPort() == 0 {
 		return ttnpb.Empty, nil
 	}
-	pld := down.GetPayload().GetMacPayload()
-	if pld == nil {
-		return ttnpb.Empty, nil
+	appUp := &ttnpb.ApplicationUp{
+		EndDeviceIds:   down.GetEndDeviceIds(),
+		CorrelationIds: ack.GetCorrelationIds(),
 	}
-	if pld.GetFPort() == 0 {
-		return ttnpb.Empty, nil
+	appDown := &ttnpb.ApplicationDownlink{
+		SessionKeyId:   down.GetSessionKeyId(),
+		FPort:          macPayload.GetFPort(),
+		FCnt:           macPayload.GetFullFCnt(),
+		FrmPayload:     macPayload.GetFrmPayload(),
+		Confirmed:      down.GetPayload().GetMHdr().GetMType() == ttnpb.MType_CONFIRMED_DOWN,
+		Priority:       down.GetRequest().GetPriority(),
+		CorrelationIds: down.GetCorrelationIds(),
 	}
-	ns.enqueueApplicationUplinks(ctx, &ttnpb.ApplicationUp{
-		EndDeviceIds: ids,
-		Up: &ttnpb.ApplicationUp_DownlinkSent{
-			DownlinkSent: &ttnpb.ApplicationDownlink{
-				SessionKeyId:   down.GetSessionKeyId(),
-				FrmPayload:     pld.GetFrmPayload(),
-				FPort:          pld.GetFPort(),
-				FCnt:           pld.GetFullFCnt(),
-				CorrelationIds: ack.GetCorrelationIds(),
-				Priority:       down.GetRequest().GetPriority(),
+	switch ack.Result {
+	case ttnpb.TxAcknowledgment_SUCCESS:
+		appUp.Up = &ttnpb.ApplicationUp_DownlinkSent{
+			DownlinkSent: appDown,
+		}
+	default:
+		appUp.Up = &ttnpb.ApplicationUp_DownlinkFailed{
+			DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
+				Downlink: appDown,
+				Error:    ttnpb.ErrorDetailsToProto(errTransmission.WithAttributes("result", ack.GetResult().String())),
 			},
-		},
-	})
+		}
+	}
+	ns.submitApplicationUplinks(ctx, appUp)
 	return ttnpb.Empty, nil
 }

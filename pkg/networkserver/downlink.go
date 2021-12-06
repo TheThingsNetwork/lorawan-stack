@@ -796,7 +796,7 @@ func nonRetryableFixedPathGatewayError(err error) bool {
 
 type scheduleRequest struct {
 	*ttnpb.TxRequest
-	ttnpb.EndDeviceIdentifiers
+	*ttnpb.EndDeviceIdentifiers
 	Payload      *ttnpb.Message
 	RawPayload   []byte
 	SessionKeyID []byte
@@ -943,7 +943,7 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 	}
 	ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("ns:downlink:%s", events.NewCorrelationID()))
 	errs := make([]error, 0, len(attempts))
-	eventIDOpt := events.WithIdentifiers(&req.EndDeviceIdentifiers)
+	eventIDOpt := events.WithIdentifiers(req.EndDeviceIdentifiers)
 	for _, a := range attempts {
 		req.TxRequest.DownlinkPaths = a.paths
 		down := &ttnpb.DownlinkMessage{
@@ -969,13 +969,11 @@ func (ns *NetworkServer) scheduleDownlinkByPaths(ctx context.Context, req *sched
 		}
 		transmitAt := time.Now().Add(delay)
 		if err := ns.scheduledDownlinkMatcher.Add(ctx, &ttnpb.DownlinkMessage{
-			CorrelationIds: events.CorrelationIDsFromContext(ctx),
-			EndDeviceIds:   &req.EndDeviceIdentifiers,
-			Payload:        req.Payload,
+			Payload:        down.Payload,
+			EndDeviceIds:   req.EndDeviceIdentifiers,
+			Settings:       down.Settings,
+			CorrelationIds: down.CorrelationIds,
 			SessionKeyId:   req.SessionKeyID,
-			Settings: &ttnpb.DownlinkMessage_Request{
-				Request: req.TxRequest,
-			},
 		}); err != nil {
 			logger.WithError(err).Debug("Failed to store downlink metadata")
 		}
@@ -1313,7 +1311,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		log.NewContext(ctx, loggerWithTxRequestFields(logger, req, attemptRX1, attemptRX2).WithField("rx1_delay", req.Rx1Delay)),
 		&scheduleRequest{
 			TxRequest:            req,
-			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+			EndDeviceIdentifiers: &dev.EndDeviceIdentifiers,
 			Payload:              genDown.Payload,
 			RawPayload:           genDown.RawPayload,
 			SessionKeyID:         genDown.SessionKeyID,
@@ -1480,7 +1478,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 		log.NewContext(ctx, loggerWithTxRequestFields(log.FromContext(ctx), req, false, true)),
 		&scheduleRequest{
 			TxRequest:            req,
-			EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+			EndDeviceIdentifiers: &dev.EndDeviceIdentifiers,
 			Payload:              genDown.Payload,
 			RawPayload:           genDown.RawPayload,
 			DownlinkEvents:       genState.EventBuilders,
@@ -1597,7 +1595,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 		defer func() { publishEvents(ctx, queuedEvents...) }()
 
 		var queuedApplicationUplinks []*ttnpb.ApplicationUp
-		defer func() { ns.enqueueApplicationUplinks(ctx, queuedApplicationUplinks...) }()
+		defer func() { ns.submitApplicationUplinks(ctx, queuedApplicationUplinks...) }()
 
 		taskUpdateStrategy := noDownlinkTask
 		dev, ctx, err := ns.devices.SetByID(ctx, devID.ApplicationIdentifiers, devID.DeviceId,
@@ -1721,7 +1719,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 						log.NewContext(ctx, loggerWithTxRequestFields(logger, req, attemptRX1, attemptRX2).WithField("rx1_delay", req.Rx1Delay)),
 						&scheduleRequest{
 							TxRequest:            req,
-							EndDeviceIdentifiers: dev.EndDeviceIdentifiers,
+							EndDeviceIdentifiers: &dev.EndDeviceIdentifiers,
 							RawPayload:           dev.PendingMacState.QueuedJoinAccept.Payload,
 							Payload: &ttnpb.Message{
 								MHdr: &ttnpb.MHDR{

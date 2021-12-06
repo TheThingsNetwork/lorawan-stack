@@ -35,7 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
-	"golang.org/x/sync/semaphore"
+	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 	"google.golang.org/grpc"
 )
 
@@ -60,11 +60,6 @@ const (
 	// When scheduling downlink to a cluster Gateway Server, the schedule delay is reported by the Gateway Server and is accurate.
 	// When scheduling downlink via peering, the schedule delay is unknown, and should be sufficiently high to avoid conflicts.
 	peeringScheduleDelay = infrastructureDelay + 4*time.Second
-
-	// maxUplinkSubmissionConcurrency represents the maximum number of concurrent tasks that submit uplinks to the Application Server
-	// on the fast path. The fast path is achieved by skipping the enqueuing process and submitting the uplinks directly.
-	// When the concurrency limit is reached, uplinks are enqueued instead.
-	maxUplinkSubmissionConcurrency = 1024
 )
 
 // windowDurationFunc is a function, which is used by Network Server to determine the duration of deduplication and cooldown windows.
@@ -138,7 +133,7 @@ type NetworkServer struct {
 
 	scheduledDownlinkMatcher ScheduledDownlinkMatcher
 
-	uplinkQueueSemaphore *semaphore.Weighted
+	uplinkSubmissionPool workerpool.WorkerPool
 }
 
 // Option configures the NetworkServer.
@@ -156,7 +151,6 @@ var (
 const (
 	applicationUplinkProcessTaskName = "process_application_uplink"
 	downlinkProcessTaskName          = "process_downlink"
-	sendApplicationUplinkTaskName    = "send_application_uplink"
 
 	maxInt = int(^uint(0) >> 1)
 )
@@ -246,8 +240,13 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		deviceKEKLabel:           conf.DeviceKEKLabel,
 		downlinkQueueCapacity:    conf.DownlinkQueueCapacity,
 		scheduledDownlinkMatcher: conf.ScheduledDownlinkMatcher,
-		uplinkQueueSemaphore:     semaphore.NewWeighted(maxUplinkSubmissionConcurrency),
 	}
+	ns.uplinkSubmissionPool = workerpool.NewWorkerPool(workerpool.Config{
+		Component: c,
+		Context:   ctx,
+		Name:      "uplink_submission",
+		Handler:   ns.handleUplinkSubmission,
+	})
 	ctx = ns.Context()
 
 	if len(opts) == 0 {

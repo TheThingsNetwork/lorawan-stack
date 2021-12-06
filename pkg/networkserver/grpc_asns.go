@@ -59,7 +59,7 @@ const (
 	applicationUplinkLimit             = 100
 )
 
-func (ns *NetworkServer) sendApplicationUplinks(ctx context.Context, cl ttnpb.NsAsClient, appID ttnpb.ApplicationIdentifiers, ups ...*ttnpb.ApplicationUp) error {
+func (ns *NetworkServer) sendApplicationUplinks(ctx context.Context, cl ttnpb.NsAsClient, ups ...*ttnpb.ApplicationUp) error {
 	if _, err := cl.HandleUplink(ctx, &ttnpb.NsAsHandleUplinkRequest{
 		ApplicationUps: ups,
 	}, ns.WithClusterAuth()); err != nil {
@@ -102,7 +102,7 @@ func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context, consu
 		cl := ttnpb.NewNsAsClient(conn)
 		var sendErr bool
 		if err := drain(applicationUplinkLimit, func(ups ...*ttnpb.ApplicationUp) error {
-			err := ns.sendApplicationUplinks(ctx, cl, appID, ups...)
+			err := ns.sendApplicationUplinks(ctx, cl, ups...)
 			if err != nil {
 				sendErr = true
 			}
