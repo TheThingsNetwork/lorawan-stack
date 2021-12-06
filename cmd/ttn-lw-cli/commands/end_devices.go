@@ -492,8 +492,8 @@ var (
 				if devID.DeviceId != "" {
 					device.DeviceId = devID.DeviceId
 				}
-				if devID.ApplicationIds.ApplicationId != "" {
-					device.ApplicationIds.ApplicationId = devID.ApplicationIds.ApplicationId
+				if devID.ApplicationIds != nil {
+					device.ApplicationIds = devID.ApplicationIds
 				}
 				if device.SupportsJoin && devID.JoinEui != nil {
 					device.JoinEui = devID.JoinEui
