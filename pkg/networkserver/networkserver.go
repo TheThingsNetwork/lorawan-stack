@@ -41,7 +41,7 @@ import (
 
 const (
 	// recentDownlinkCount is the maximum amount of recent downlinks stored per device.
-	recentDownlinkCount = 20
+	recentDownlinkCount = 5
 
 	// fOptsCapacity is the maximum length of FOpts in bytes.
 	fOptsCapacity = 15

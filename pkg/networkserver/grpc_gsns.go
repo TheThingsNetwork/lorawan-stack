@@ -679,9 +679,12 @@ macLoop:
 }
 
 func appendRecentUplink(recent []*ttnpb.UplinkMessage, up *ttnpb.UplinkMessage, window int) []*ttnpb.UplinkMessage {
+	if n := len(recent); n > 0 {
+		recent[n-1].CorrelationIds = nil
+	}
 	recent = append(recent, up)
-	if len(recent) > window {
-		recent = recent[len(recent)-window:]
+	if extra := len(recent) - window; extra > 0 {
+		recent = recent[extra:]
 	}
 	return recent
 }
