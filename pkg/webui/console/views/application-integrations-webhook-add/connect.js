@@ -12,9 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import ApplicationWebhooks from './application-integrations-webhooks'
-import connect from './connect'
+import { connect } from 'react-redux'
 
-const ConnectedApplicationWebhooks = connect(ApplicationWebhooks)
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { selectWebhookTemplates } from '@console/store/selectors/webhook-templates'
 
-export { ConnectedApplicationWebhooks as default, ApplicationWebhooks }
+const mapStateToProps = state => ({
+  appId: selectSelectedApplicationId(state),
+  hasTemplates: selectWebhookTemplates(state).length > 0,
+})
+
+export default ApplicationWebhookAdd => connect(mapStateToProps)(ApplicationWebhookAdd)

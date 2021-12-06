@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,38 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import { Redirect } from 'react-router'
+import ApplicationWebhookAdd from './application-integrations-webhook-add'
+import connect from './connect'
 
-import ApplicationWebhookAddForm from '@console/views/application-integrations-webhook-add-form'
+const ConnectedApplicationWebhookAdd = connect(ApplicationWebhookAdd)
 
-import PropTypes from '@ttn-lw/lib/prop-types'
-
-import { selectSelectedApplicationId } from '@console/store/selectors/applications'
-import { selectWebhookTemplates } from '@console/store/selectors/webhook-templates'
-
-@connect(state => ({
-  appId: selectSelectedApplicationId(state),
-  hasTemplates: selectWebhookTemplates(state).length !== 0,
-}))
-export default class ApplicationWebhookAdd extends Component {
-  static propTypes = {
-    hasTemplates: PropTypes.bool.isRequired,
-    match: PropTypes.match.isRequired,
-  }
-  render() {
-    const {
-      match,
-      match: { url: path },
-      hasTemplates,
-    } = this.props
-
-    // Forward to the template chooser, when templates have been configured.
-    if (hasTemplates) {
-      return <Redirect to={`${path}/template`} />
-    }
-
-    return <ApplicationWebhookAddForm match={match} />
-  }
-}
+export { ConnectedApplicationWebhookAdd as default, ApplicationWebhookAdd }

@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { Component } from 'react'
+import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
-import bind from 'autobind-decorator'
 import { defineMessages } from 'react-intl'
 
 import tts from '@console/api/tts'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import toast from '@ttn-lw/components/toast'
 
 import WebhookForm from '@console/components/webhook-form'
@@ -36,102 +35,83 @@ const m = defineMessages({
   deleteSuccess: 'Webhook deleted',
 })
 
-@withBreadcrumb('apps.single.integrations.webhooks.edit', props => {
-  const {
-    appId,
-    match: {
-      params: { webhookId },
-    },
-  } = props
-  return (
+const ApplicationWebhookEdit = props => {
+  const { webhook, appId, webhookTemplate, updateWebhook, match, navigateToList } = props
+  const { webhookId } = match.params
+
+  useBreadcrumbs(
+    'apps.single.integrations.webhooks.edit',
     <Breadcrumb
       path={`/applications/${appId}/integrations/${webhookId}`}
       content={sharedMessages.edit}
-    />
+    />,
   )
-})
-export default class ApplicationWebhookEdit extends Component {
-  static propTypes = {
-    appId: PropTypes.string.isRequired,
-    match: PropTypes.match.isRequired,
-    navigateToList: PropTypes.func.isRequired,
-    updateWebhook: PropTypes.func.isRequired,
-    webhook: PropTypes.webhook.isRequired,
-    webhookTemplate: PropTypes.webhookTemplate,
-  }
 
-  static defaultProps = {
-    webhookTemplate: undefined,
-  }
+  const handleSubmit = React.useCallback(
+    async updatedWebhook => {
+      const patch = diff(webhook, updatedWebhook, ['ids'])
 
-  @bind
-  async handleSubmit(updatedWebhook) {
-    const { webhook: originalWebhook, updateWebhook } = this.props
+      // Ensure that the header prop is always patched fully, otherwise we loose
+      // old header entries.
+      if ('headers' in patch) {
+        patch.headers = updatedWebhook.headers
+      }
 
-    const patch = diff(originalWebhook, updatedWebhook, ['ids'])
-
-    // Ensure that the header prop is always patched fully, otherwise we loose
-    // old header entries.
-    if ('headers' in patch) {
-      patch.headers = updatedWebhook.headers
-    }
-
-    await updateWebhook(patch)
-  }
-
-  @bind
-  handleSubmitSuccess() {
+      await updateWebhook(patch)
+    },
+    [updateWebhook, webhook],
+  )
+  const handleSubmitSuccess = React.useCallback(() => {
     toast({
       message: m.updateSuccess,
       type: toast.types.SUCCESS,
     })
-  }
+  }, [])
 
-  @bind
-  async handleDelete() {
-    const {
-      appId,
-      match: {
-        params: { webhookId },
-      },
-    } = this.props
-
+  const handleDelete = React.useCallback(async () => {
     await tts.Applications.Webhooks.deleteById(appId, webhookId)
-  }
-
-  @bind
-  async handleDeleteSuccess() {
-    const { navigateToList } = this.props
-
+  }, [appId, webhookId])
+  const handleDeleteSuccess = React.useCallback(() => {
     toast({
       message: m.deleteSuccess,
       type: toast.types.SUCCESS,
     })
 
     navigateToList()
-  }
+  }, [navigateToList])
 
-  render() {
-    const { webhook, appId, webhookTemplate } = this.props
-
-    return (
-      <Container>
-        <PageTitle title={m.editWebhook} />
-        <Row>
-          <Col lg={8} md={12}>
-            <WebhookForm
-              update
-              appId={appId}
-              initialWebhookValue={webhook}
-              webhookTemplate={webhookTemplate}
-              onSubmit={this.handleSubmit}
-              onSubmitSuccess={this.handleSubmitSuccess}
-              onDelete={this.handleDelete}
-              onDeleteSuccess={this.handleDeleteSuccess}
-            />
-          </Col>
-        </Row>
-      </Container>
-    )
-  }
+  return (
+    <Container>
+      <PageTitle title={m.editWebhook} />
+      <Row>
+        <Col lg={8} md={12}>
+          <WebhookForm
+            update
+            appId={appId}
+            initialWebhookValue={webhook}
+            webhookTemplate={webhookTemplate}
+            onSubmit={handleSubmit}
+            onSubmitSuccess={handleSubmitSuccess}
+            onDelete={handleDelete}
+            onDeleteSuccess={handleDeleteSuccess}
+          />
+        </Col>
+      </Row>
+    </Container>
+  )
 }
+
+ApplicationWebhookEdit.propTypes = {
+  appId: PropTypes.string.isRequired,
+  match: PropTypes.match.isRequired,
+  navigateToList: PropTypes.func.isRequired,
+  updateWebhook: PropTypes.func.isRequired,
+  webhook: PropTypes.webhook.isRequired,
+  webhookTemplate: PropTypes.webhookTemplate,
+}
+
+ApplicationWebhookEdit.defaultProps = {
+  webhookTemplate: undefined,
+}
+
+export default ApplicationWebhookEdit
