@@ -2282,8 +2282,8 @@ PeerInfo
 
 | Field | Validations |
 | ----- | ----------- |
-| `id` | <p>`string.max_len`: `64`</p> |
-| `token` | <p>`string.max_len`: `64`</p> |
+| `id` | <p>`string.min_len`: `1`</p><p>`string.max_len`: `64`</p> |
+| `token` | <p>`string.min_len`: `1`</p><p>`string.max_len`: `64`</p> |
 
 ### <a name="ttn.lorawan.v3.ContactMethod">Enum `ContactMethod`</a>
 
@@ -2319,8 +2319,8 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
-| `RequestValidation` | `POST` | `/api/v3/contact_info/validation` |  |
-| `Validate` | `PATCH` | `/api/v3/contact_info/validation` |  |
+| `RequestValidation` | `POST` | `/api/v3/contact_info/validation` | `*` |
+| `Validate` | `PATCH` | `/api/v3/contact_info/validation` | `*` |
 
 ## <a name="lorawan-stack/api/deviceclaimingserver.proto">File `lorawan-stack/api/deviceclaimingserver.proto`</a>
 

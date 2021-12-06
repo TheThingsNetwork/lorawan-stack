@@ -3837,6 +3837,16 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3EntityIdentifiers"
+            }
+          }
+        ],
         "tags": [
           "ContactInfoRegistry"
         ]
@@ -3858,6 +3868,16 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/lorawanv3ContactInfoValidation"
+            }
+          }
+        ],
         "tags": [
           "ContactInfoRegistry"
         ]
