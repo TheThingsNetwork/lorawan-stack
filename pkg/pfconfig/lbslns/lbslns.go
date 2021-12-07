@@ -88,7 +88,7 @@ type DataRates [16][3]int
 type LBSRFConfig struct {
 	Enable      bool   `json:"enable"`
 	Frequency   uint64 `json:"freq"`
-	AntennaGain int    `json:"antenna_gain"`
+	AntennaGain int    `json:"antenna_gain,omitempty"`
 }
 
 // LBSSX1301Config contains the configuration for the SX1301 concentrator for the LoRa Basics Station `router_config` message.
