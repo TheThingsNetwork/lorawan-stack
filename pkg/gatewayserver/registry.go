@@ -16,6 +16,7 @@ package gatewayserver
 
 import (
 	"context"
+	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -25,7 +26,7 @@ type GatewayConnectionStatsRegistry interface {
 	// Get returns connection stats for a gateway.
 	Get(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*ttnpb.GatewayConnectionStats, error)
 	// Set sets, updates or clears the connection stats for a gateway. Only fields specified in the field mask paths are set.
-	Set(ctx context.Context, ids ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats, paths []string) error
+	Set(ctx context.Context, ids ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats, paths []string, ttl time.Duration) error
 }
 
 // EntityRegistry abstracts the Identity server gateway functions.
