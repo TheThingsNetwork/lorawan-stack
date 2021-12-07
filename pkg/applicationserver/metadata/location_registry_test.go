@@ -234,7 +234,7 @@ func TestCachedEndDeviceLocationRegistry(t *testing.T) {
 		Redis: cl,
 	}
 	registry = metadata.NewCachedEndDeviceLocationRegistry(
-		ctx, c, registry, cache, 4*Timeout, 8*Timeout,
+		ctx, c, registry, cache, 4*Timeout, 8*Timeout, 16*Timeout,
 	)
 
 	locations, err := registry.Get(ctx, registeredEndDeviceIDs)
@@ -283,8 +283,30 @@ func TestCachedEndDeviceLocationRegistry(t *testing.T) {
 		}
 	}
 
-	// Wait for the cached item to become older than the hard TTL.
-	time.Sleep(8 * Timeout)
+	// Wait for the entry to be evicted.
+	time.Sleep(16 * Timeout)
+
+	// There is no cached location anymore, and we have triggered an asynchronous refresh.
+	locations, err = registry.Get(ctx, registeredEndDeviceIDs)
+	a.So(err, should.BeNil)
+	a.So(locations, should.HaveLength, 0)
+
+	time.Sleep(Timeout)
+
+	locations, err = registry.Get(ctx, registeredEndDeviceIDs)
+	if a.So(err, should.BeNil) {
+		a.So(locations, should.NotBeNil)
+		a.So(len(locations), should.Equal, len(registeredEndDevice.Locations))
+		for k, v := range locations {
+			a.So(registeredEndDevice.Locations[k], should.Resemble, v)
+		}
+		for k, v := range originalLocations {
+			a.So(locations[k], should.Resemble, v)
+		}
+		for k, v := range locationsPatch {
+			a.So(locations[k], should.Resemble, v)
+		}
+	}
 
 	// Simulate a network partition.
 	closeIS()

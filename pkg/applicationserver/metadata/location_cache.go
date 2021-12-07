@@ -26,7 +26,7 @@ type EndDeviceLocationCache interface {
 	// Get retrieves the end device locations and the remaining TTL for the entry.
 	Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, *time.Time, error)
 	// Set sets the end device locations.
-	Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location) error
+	Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location, ttl time.Duration) error
 	// Delete removes the locations from the cache.
 	Delete(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error
 }
@@ -47,8 +47,8 @@ func (c *metricsEndDeviceLocationCache) Get(ctx context.Context, ids ttnpb.EndDe
 }
 
 // Set implements EndDeviceLocationCache.
-func (c *metricsEndDeviceLocationCache) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location) error {
-	return c.inner.Set(ctx, ids, update)
+func (c *metricsEndDeviceLocationCache) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location, ttl time.Duration) error {
+	return c.inner.Set(ctx, ids, update, ttl)
 }
 
 // Delete implements EndDeviceLocationCache.
