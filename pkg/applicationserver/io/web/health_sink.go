@@ -181,7 +181,9 @@ func (hcs *healthCheckSink) executeAndRecord(r *http.Request, healthy bool) erro
 	f := func(h *ttnpb.ApplicationWebhookHealth) (*ttnpb.ApplicationWebhookHealth, error) {
 		if sinkErr == nil {
 			return &ttnpb.ApplicationWebhookHealth{
-				Status: &ttnpb.ApplicationWebhookHealth_Healthy{},
+				Status: &ttnpb.ApplicationWebhookHealth_Healthy{
+					Healthy: &ttnpb.ApplicationWebhookHealth_WebhookHealthStatusHealthy{},
+				},
 			}, nil
 		}
 		return &ttnpb.ApplicationWebhookHealth{
