@@ -346,8 +346,13 @@ var startCommand = &cobra.Command{
 				config.AS.Webhooks.Registry = webhookRegistry
 			}
 			if cache := &config.AS.EndDeviceMetadataStorage.Location.Cache; cache.Enable {
-				cache.Cache = &asmetaredis.EndDeviceLocationCache{
-					Redis: redis.New(config.Cache.Redis.WithNamespace("as", "metadata", "locations")),
+				switch config.Cache.Service {
+				case "redis":
+					cache.Cache = &asmetaredis.EndDeviceLocationCache{
+						Redis: redis.New(config.Cache.Redis.WithNamespace("as", "metadata", "locations")),
+					}
+				default:
+					cache.Enable = false
 				}
 			}
 			locationRegistry, err := config.AS.EndDeviceMetadataStorage.Location.NewRegistry(ctx, c)
