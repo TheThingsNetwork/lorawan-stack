@@ -14865,6 +14865,10 @@
           "type": "string",
           "format": "date-time"
         },
+        "disconnected_at": {
+          "type": "string",
+          "format": "date-time"
+        },
         "protocol": {
           "type": "string"
         },
