@@ -96,6 +96,30 @@ type Config struct {
 	namespace []string
 }
 
+func equalsStringSlice(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
+// Equals checks if the other configuration is equivalent to this.
+func (c Config) Equals(other Config) bool {
+	return c.Address == other.Address &&
+		c.Password == other.Password &&
+		c.Database == other.Database &&
+		equalsStringSlice(c.RootNamespace, other.RootNamespace) &&
+		c.PoolSize == other.PoolSize &&
+		c.Failover.Equals(other.Failover) &&
+		c.TLS.Require == other.TLS.Require &&
+		c.TLS.Client.Equals(other.TLS.Client)
+}
+
 func (c Config) WithNamespace(namespace ...string) *Config {
 	deriv := c
 	deriv.namespace = namespace
@@ -115,6 +139,13 @@ type FailoverConfig struct {
 	Enable     bool     `name:"enable" description:"Enable failover using Redis Sentinel"`
 	Addresses  []string `name:"addresses" description:"Redis Sentinel server addresses"`
 	MasterName string   `name:"master-name" description:"Redis Sentinel master name"`
+}
+
+// Equals checks if the other configuration is equivalent to this.
+func (c FailoverConfig) Equals(other FailoverConfig) bool {
+	return c.Enable == other.Enable &&
+		equalsStringSlice(c.Addresses, other.Addresses) &&
+		c.MasterName == other.MasterName
 }
 
 func (c Config) makeDialer() func(ctx context.Context, network, addr string) (net.Conn, error) {

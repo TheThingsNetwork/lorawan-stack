@@ -95,11 +95,17 @@ var DefaultRedisConfig = redis.Config{
 	RootNamespace: []string{"ttn", "v3"},
 }
 
+// DefaultCacheConfig is the default cache configuration.
+var DefaultCacheConfig = config.Cache{
+	Redis: DefaultRedisConfig,
+}
+
 // DefaultEventsConfig is the default config for Events.
 var DefaultEventsConfig = func() config.Events {
 	c := config.Events{
 		Backend: "internal",
 	}
+	c.Redis.Config = DefaultRedisConfig
 	c.Redis.Store.TTL = 10 * time.Minute
 	c.Redis.Store.EntityTTL = 24 * time.Hour
 	c.Redis.Store.EntityCount = 100
@@ -136,6 +142,7 @@ var DefaultKeyVaultConfig = config.KeyVault{
 var DefaultServiceBase = config.ServiceBase{
 	Base:           DefaultBaseConfig,
 	Cluster:        DefaultClusterConfig,
+	Cache:          DefaultCacheConfig,
 	Redis:          DefaultRedisConfig,
 	Events:         DefaultEventsConfig,
 	GRPC:           DefaultGRPCConfig,
