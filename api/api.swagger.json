@@ -10671,6 +10671,18 @@
         }
       }
     },
+    "AsConfigurationWebhooks": {
+      "type": "object",
+      "properties": {
+        "unhealthy_attempts_threshold": {
+          "type": "string",
+          "format": "int64"
+        },
+        "unhealthy_retry_interval": {
+          "type": "string"
+        }
+      }
+    },
     "AuthInfoResponseAPIKeyAccess": {
       "type": "object",
       "properties": {
@@ -12994,6 +13006,9 @@
       "properties": {
         "pubsub": {
           "$ref": "#/definitions/AsConfigurationPubSub"
+        },
+        "webhooks": {
+          "$ref": "#/definitions/AsConfigurationWebhooks"
         }
       },
       "description": "Application Server configuration."

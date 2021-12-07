@@ -542,6 +542,18 @@ func (m *AsConfiguration) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "webhooks":
+
+			if v, ok := interface{}(m.GetWebhooks()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return AsConfigurationValidationError{
+						field:  "webhooks",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return AsConfigurationValidationError{
 				field:  name,
@@ -1669,6 +1681,102 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = AsConfiguration_PubSubValidationError{}
+
+// ValidateFields checks the field values on AsConfiguration_Webhooks with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *AsConfiguration_Webhooks) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = AsConfiguration_WebhooksFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "unhealthy_attempts_threshold":
+			// no validation rules for UnhealthyAttemptsThreshold
+		case "unhealthy_retry_interval":
+
+			if v, ok := interface{}(m.GetUnhealthyRetryInterval()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return AsConfiguration_WebhooksValidationError{
+						field:  "unhealthy_retry_interval",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return AsConfiguration_WebhooksValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// AsConfiguration_WebhooksValidationError is the validation error returned by
+// AsConfiguration_Webhooks.ValidateFields if the designated constraints
+// aren't met.
+type AsConfiguration_WebhooksValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AsConfiguration_WebhooksValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AsConfiguration_WebhooksValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AsConfiguration_WebhooksValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AsConfiguration_WebhooksValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AsConfiguration_WebhooksValidationError) ErrorName() string {
+	return "AsConfiguration_WebhooksValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e AsConfiguration_WebhooksValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAsConfiguration_Webhooks.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AsConfiguration_WebhooksValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AsConfiguration_WebhooksValidationError{}
 
 // ValidateFields checks the field values on AsConfiguration_PubSub_Providers
 // with the rules defined in the proto definition for this message. If any

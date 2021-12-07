@@ -228,6 +228,12 @@ func (x *AsConfiguration) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("pubsub")
 		x.Pubsub.MarshalProtoJSON(s.WithField("pubsub"))
 	}
+	if x.Webhooks != nil || s.HasField("webhooks") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("webhooks")
+		// NOTE: AsConfiguration_Webhooks does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.Webhooks)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -245,6 +251,12 @@ func (x *AsConfiguration) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				x.Pubsub = &AsConfiguration_PubSub{}
 				x.Pubsub.UnmarshalProtoJSON(s.WithField("pubsub", true))
 			}
+		case "webhooks":
+			s.AddField("webhooks")
+			// NOTE: AsConfiguration_Webhooks does not seem to implement UnmarshalProtoJSON.
+			var v AsConfiguration_Webhooks
+			gogo.UnmarshalMessage(s, &v)
+			x.Webhooks = &v
 		}
 	})
 }
