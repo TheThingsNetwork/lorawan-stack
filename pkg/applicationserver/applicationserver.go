@@ -1179,15 +1179,15 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 	return err
 }
 
-var locationUpdateTimeout = 5 * time.Second
-
 // handleLocationSolved saves the provided *ttnpb.ApplicationLocation in the Entity Registry as part of the device locations.
 // Locations provided by other services will be maintained.
 func (as *ApplicationServer) handleLocationSolved(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationLocation, link *ttnpb.ApplicationLink) error {
-	_, err := as.locationRegistry.Merge(ctx, ids, map[string]*ttnpb.Location{
+	if _, err := as.locationRegistry.Merge(ctx, ids, map[string]*ttnpb.Location{
 		msg.Service: msg.Location,
-	})
-	return err
+	}); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to merge end device locations")
+	}
+	return nil
 }
 
 // decryptDownlinkMessage decrypts the downlink message.
