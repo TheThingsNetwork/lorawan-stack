@@ -1563,6 +1563,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "webhooks",
+              "description": "",
+              "label": "",
+              "type": "Webhooks",
+              "longType": "AsConfiguration.Webhooks",
+              "fullType": "ttn.lorawan.v3.AsConfiguration.Webhooks",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -1619,6 +1631,42 @@
               "type": "Status",
               "longType": "AsConfiguration.PubSub.Providers.Status",
               "fullType": "ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Webhooks",
+          "longName": "AsConfiguration.Webhooks",
+          "fullName": "ttn.lorawan.v3.AsConfiguration.Webhooks",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "unhealthy_attempts_threshold",
+              "description": "",
+              "label": "",
+              "type": "int64",
+              "longType": "int64",
+              "fullType": "int64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "unhealthy_retry_interval",
+              "description": "",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",

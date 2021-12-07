@@ -30,6 +30,7 @@
   - [Message `AsConfiguration`](#ttn.lorawan.v3.AsConfiguration)
   - [Message `AsConfiguration.PubSub`](#ttn.lorawan.v3.AsConfiguration.PubSub)
   - [Message `AsConfiguration.PubSub.Providers`](#ttn.lorawan.v3.AsConfiguration.PubSub.Providers)
+  - [Message `AsConfiguration.Webhooks`](#ttn.lorawan.v3.AsConfiguration.Webhooks)
   - [Message `DecodeDownlinkRequest`](#ttn.lorawan.v3.DecodeDownlinkRequest)
   - [Message `DecodeDownlinkResponse`](#ttn.lorawan.v3.DecodeDownlinkResponse)
   - [Message `DecodeUplinkRequest`](#ttn.lorawan.v3.DecodeUplinkRequest)
@@ -911,6 +912,7 @@ Application Server configuration.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `pubsub` | [`AsConfiguration.PubSub`](#ttn.lorawan.v3.AsConfiguration.PubSub) |  |  |
+| `webhooks` | [`AsConfiguration.Webhooks`](#ttn.lorawan.v3.AsConfiguration.Webhooks) |  |  |
 
 ### <a name="ttn.lorawan.v3.AsConfiguration.PubSub">Message `AsConfiguration.PubSub`</a>
 
@@ -924,6 +926,13 @@ Application Server configuration.
 | ----- | ---- | ----- | ----------- |
 | `mqtt` | [`AsConfiguration.PubSub.Providers.Status`](#ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status) |  |  |
 | `nats` | [`AsConfiguration.PubSub.Providers.Status`](#ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status) |  |  |
+
+### <a name="ttn.lorawan.v3.AsConfiguration.Webhooks">Message `AsConfiguration.Webhooks`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `unhealthy_attempts_threshold` | [`int64`](#int64) |  |  |
+| `unhealthy_retry_interval` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
 
 ### <a name="ttn.lorawan.v3.DecodeDownlinkRequest">Message `DecodeDownlinkRequest`</a>
 

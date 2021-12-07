@@ -65,10 +65,14 @@ var AsConfigurationFieldPathsNested = []string{
 	"pubsub.providers",
 	"pubsub.providers.mqtt",
 	"pubsub.providers.nats",
+	"webhooks",
+	"webhooks.unhealthy_attempts_threshold",
+	"webhooks.unhealthy_retry_interval",
 }
 
 var AsConfigurationFieldPathsTopLevel = []string{
 	"pubsub",
+	"webhooks",
 }
 var GetAsConfigurationRequestFieldPathsNested []string
 var GetAsConfigurationRequestFieldPathsTopLevel []string
@@ -78,6 +82,9 @@ var GetAsConfigurationResponseFieldPathsNested = []string{
 	"configuration.pubsub.providers",
 	"configuration.pubsub.providers.mqtt",
 	"configuration.pubsub.providers.nats",
+	"configuration.webhooks",
+	"configuration.webhooks.unhealthy_attempts_threshold",
+	"configuration.webhooks.unhealthy_retry_interval",
 }
 
 var GetAsConfigurationResponseFieldPathsTopLevel = []string{
@@ -339,6 +346,15 @@ var AsConfiguration_PubSubFieldPathsNested = []string{
 
 var AsConfiguration_PubSubFieldPathsTopLevel = []string{
 	"providers",
+}
+var AsConfiguration_WebhooksFieldPathsNested = []string{
+	"unhealthy_attempts_threshold",
+	"unhealthy_retry_interval",
+}
+
+var AsConfiguration_WebhooksFieldPathsTopLevel = []string{
+	"unhealthy_attempts_threshold",
+	"unhealthy_retry_interval",
 }
 var AsConfiguration_PubSub_ProvidersFieldPathsNested = []string{
 	"mqtt",

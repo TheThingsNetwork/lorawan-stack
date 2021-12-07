@@ -260,6 +260,31 @@ func (dst *AsConfiguration) SetFields(src *AsConfiguration, paths ...string) err
 					dst.Pubsub = nil
 				}
 			}
+		case "webhooks":
+			if len(subs) > 0 {
+				var newDst, newSrc *AsConfiguration_Webhooks
+				if (src == nil || src.Webhooks == nil) && dst.Webhooks == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Webhooks
+				}
+				if dst.Webhooks != nil {
+					newDst = dst.Webhooks
+				} else {
+					newDst = &AsConfiguration_Webhooks{}
+					dst.Webhooks = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Webhooks = src.Webhooks
+				} else {
+					dst.Webhooks = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -787,6 +812,36 @@ func (dst *AsConfiguration_PubSub) SetFields(src *AsConfiguration_PubSub, paths 
 				} else {
 					dst.Providers = nil
 				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *AsConfiguration_Webhooks) SetFields(src *AsConfiguration_Webhooks, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "unhealthy_attempts_threshold":
+			if len(subs) > 0 {
+				return fmt.Errorf("'unhealthy_attempts_threshold' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UnhealthyAttemptsThreshold = src.UnhealthyAttemptsThreshold
+			} else {
+				var zero int64
+				dst.UnhealthyAttemptsThreshold = zero
+			}
+		case "unhealthy_retry_interval":
+			if len(subs) > 0 {
+				return fmt.Errorf("'unhealthy_retry_interval' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UnhealthyRetryInterval = src.UnhealthyRetryInterval
+			} else {
+				dst.UnhealthyRetryInterval = nil
 			}
 
 		default:
