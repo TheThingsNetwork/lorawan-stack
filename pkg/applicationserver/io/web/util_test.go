@@ -52,7 +52,7 @@ var (
 	}
 	registeredWebhookID = "foo-hook"
 
-	timeout = (1 << 5) * test.Delay
+	Timeout = (1 << 5) * test.Delay
 )
 
 func devAddrPtr(addr types.DevAddr) *types.DevAddr {

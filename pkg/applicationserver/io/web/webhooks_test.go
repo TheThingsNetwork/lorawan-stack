@@ -25,7 +25,6 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/formatters"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
@@ -390,7 +389,7 @@ func TestWebhooks(t *testing.T) {
 									if !tc.OK {
 										t.Fatalf("Did not expect message but received: %v", req)
 									}
-								case <-time.After(timeout):
+								case <-time.After(Timeout):
 									if tc.OK {
 										t.Fatal("Expected message but nothing received")
 									} else {
@@ -443,11 +442,8 @@ func TestWebhooks(t *testing.T) {
 		}
 		c := componenttest.NewComponent(t, conf)
 		io := mock.NewServer(c)
-		testSink := &mockSink{
-			Component: c,
-			Server:    io,
-		}
-		w, err := web.NewWebhooks(ctx, testSink.Server, registry, testSink, downlinks)
+		testSink := &mockSink{}
+		w, err := web.NewWebhooks(ctx, io, registry, testSink, downlinks)
 		if err != nil {
 			t.Fatalf("Unexpected error %v", err)
 		}
@@ -512,16 +508,15 @@ func TestWebhooks(t *testing.T) {
 }
 
 type mockSink struct {
-	Component *component.Component
-	Server    io.Server
-	ch        chan *http.Request
-}
-
-func (s *mockSink) FillContext(ctx context.Context) context.Context {
-	return s.Component.FillContext(ctx)
+	ch  chan *http.Request
+	err error
 }
 
 func (s *mockSink) Process(req *http.Request) error {
-	s.ch <- req
-	return nil
+	select {
+	case <-req.Context().Done():
+		return req.Context().Err()
+	case s.ch <- req:
+		return s.err
+	}
 }
