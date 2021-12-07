@@ -17336,6 +17336,18 @@
               "defaultValue": ""
             },
             {
+              "name": "disconnected_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
               "name": "protocol",
               "description": "Protocol used to connect (for example, udp, mqtt, grpc)",
               "label": "",

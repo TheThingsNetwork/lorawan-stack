@@ -3857,6 +3857,7 @@ Connection stats as monitored by the Gateway Server.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `connected_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `disconnected_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `protocol` | [`string`](#string) |  | Protocol used to connect (for example, udp, mqtt, grpc) |
 | `last_status_received_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `last_status` | [`GatewayStatus`](#ttn.lorawan.v3.GatewayStatus) |  |  |
