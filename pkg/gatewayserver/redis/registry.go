@@ -45,7 +45,7 @@ func (r *GatewayConnectionStatsRegistry) key(uid string) string {
 }
 
 // Set sets or clears the connection stats for a gateway.
-func (r *GatewayConnectionStatsRegistry) Set(ctx context.Context, ids ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats, paths []string) error {
+func (r *GatewayConnectionStatsRegistry) Set(ctx context.Context, ids ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats, paths []string, ttl time.Duration) error {
 	uid := unique.ID(ctx, ids)
 
 	lockerID, err := ttnredis.GenerateLockerID()
@@ -67,7 +67,7 @@ func (r *GatewayConnectionStatsRegistry) Set(ctx context.Context, ids ttnpb.Gate
 			if err := pb.SetFields(stats, paths...); err != nil {
 				return err
 			}
-			_, err := ttnredis.SetProto(ctx, tx, uk, pb, 0)
+			_, err := ttnredis.SetProto(ctx, tx, uk, pb, ttl)
 			return err
 		})
 	}
