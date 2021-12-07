@@ -491,7 +491,7 @@ const descriptions = Object.freeze({
     description: m.statusTimePeriodicityDescription,
   },
   [TOOLTIP_IDS.SKIP_PAYLOAD_CRYPTO_OVERRIDE]: {
-    description: m.skipPayloadCryptoOverride,
+    description: m.skipPayloadCryptoOverrideDescription,
   },
 })
 

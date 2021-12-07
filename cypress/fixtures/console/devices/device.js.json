@@ -1,0 +1,26 @@
+{
+  "end_device": {
+    "ids": {
+      "dev_eui": "9000BEEF9000BEEF",
+      "join_eui": "0000000000000000",
+      "device_id": "device-all-components"
+    },
+    "network_server_address": "localhost",
+    "application_server_address": "localhost",
+    "root_keys": {
+      "app_key": {
+        "key": "D367B1C9DF5A80A8F9A1C112E4167974"
+      }
+    }
+  },
+  "field_mask": {
+    "paths": [
+      "network_server_address",
+      "application_server_address",
+      "ids.dev_eui",
+      "ids.join_eui",
+      "ids.device_id",
+      "root_keys.app_key.key"
+    ]
+  }
+}
