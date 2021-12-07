@@ -63,35 +63,30 @@ func TestLocationCache(t *testing.T) {
 	a.So(err, should.NotBeNil)
 	a.So(errors.IsNotFound(err), should.BeTrue)
 
-	err = cache.SetLocations(ctx, registeredEndDeviceIDs, locationA, 10*time.Second)
+	storeTime := time.Now()
+	err = cache.Set(ctx, registeredEndDeviceIDs, locationA)
 	a.So(err, should.BeNil)
 
-	locations, ttl, err := cache.Get(ctx, registeredEndDeviceIDs)
+	locations, storedAt, err := cache.Get(ctx, registeredEndDeviceIDs)
 	if a.So(err, should.BeNil) {
-		a.So(ttl, should.BeGreaterThan, 0)
-		a.So(ttl, should.BeLessThanOrEqualTo, 10*time.Second)
+		if a.So(storedAt, should.NotBeNil) {
+			a.So(*storedAt, should.HappenAfter, storeTime)
+		}
 		a.So(len(locations), should.Equal, len(locationA))
 		for k, v := range locations {
 			a.So(locationA[k], should.Resemble, v)
 		}
 	}
 
-	err = cache.SetErrorDetails(ctx, registeredEndDeviceIDs, ttnpb.ErrorDetailsToProto(errUnavailable.New()), 5*time.Second)
+	storeTime = time.Now()
+	err = cache.Set(ctx, registeredEndDeviceIDs, locationB)
 	a.So(err, should.BeNil)
 
-	_, ttl, err = cache.Get(ctx, registeredEndDeviceIDs)
-	a.So(err, should.NotBeNil)
-	a.So(err, should.HaveSameErrorDefinitionAs, errUnavailable)
-	a.So(ttl, should.BeGreaterThan, 0)
-	a.So(ttl, should.BeLessThanOrEqualTo, 5*time.Second)
-
-	err = cache.SetLocations(ctx, registeredEndDeviceIDs, locationB, 10*time.Second)
-	a.So(err, should.BeNil)
-
-	locations, ttl, err = cache.Get(ctx, registeredEndDeviceIDs)
+	locations, storedAt, err = cache.Get(ctx, registeredEndDeviceIDs)
 	if a.So(err, should.BeNil) {
-		a.So(ttl, should.BeGreaterThan, 0)
-		a.So(ttl, should.BeLessThanOrEqualTo, 10*time.Second)
+		if a.So(storedAt, should.NotBeNil) {
+			a.So(*storedAt, should.HappenAfter, storeTime)
+		}
 		a.So(len(locations), should.Equal, len(locationB))
 		for k, v := range locations {
 			a.So(locationB[k], should.Resemble, v)

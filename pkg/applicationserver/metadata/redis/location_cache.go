@@ -16,6 +16,8 @@ package redis
 
 import (
 	"context"
+	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -35,10 +37,8 @@ func (r *EndDeviceLocationCache) uidKey(uid string) string {
 }
 
 const (
-	// cachedMarker signals that we have cached the end device locations even if there
-	// are no locations available, as Redis does not make a distinction between empty
-	// keys and non existing keys.
-	cachedMarker = "_cached"
+	// storedAtMarker is used to store the timestamp of the last Set operation.
+	storedAtMarker = "_stored_at"
 	// errorMarker is used to store errors.
 	errorMarker = "_error"
 )
@@ -46,68 +46,48 @@ const (
 var errCacheMiss = errors.DefineNotFound("cache_miss", "cache miss")
 
 // Get returns the locations by the end device identifiers.
-func (r *EndDeviceLocationCache) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, time.Duration, error) {
+func (r *EndDeviceLocationCache) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, *time.Time, error) {
 	uidKey := r.uidKey(unique.ID(ctx, ids))
-	var (
-		hGetAllCmd *redis.StringStringMapCmd
-		ttlCmd     *redis.DurationCmd
-	)
-	if _, err := r.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
-		hGetAllCmd = p.HGetAll(ctx, uidKey)
-		ttlCmd = p.PTTL(ctx, uidKey)
-		return nil
-	}); err != nil {
-		return nil, 0, ttnredis.ConvertError(err)
-	}
-	m, err := hGetAllCmd.Result()
+	m, err := r.Redis.HGetAll(ctx, uidKey).Result()
 	if err != nil {
-		return nil, 0, ttnredis.ConvertError(err)
+		return nil, nil, ttnredis.ConvertError(err)
 	}
 	if len(m) == 0 {
-		return nil, 0, errCacheMiss.New()
+		return nil, nil, errCacheMiss.New()
 	}
-	ttl, err := ttlCmd.Result()
-	if err != nil {
-		return nil, 0, ttnredis.ConvertError(err)
+	var storedAt time.Time
+	if s, ok := m[storedAtMarker]; ok {
+		n, err := strconv.ParseInt(s, 10, 64)
+		if err != nil {
+			return nil, nil, err
+		}
+		storedAt = time.Unix(0, n)
+		delete(m, storedAtMarker)
 	}
 	if s, ok := m[errorMarker]; ok {
 		details := &ttnpb.ErrorDetails{}
 		if err := ttnredis.UnmarshalProto(s, details); err != nil {
-			return nil, 0, err
+			return nil, nil, err
 		}
-		return nil, ttl, ttnpb.ErrorDetailsFromProto(details)
+		return nil, &storedAt, ttnpb.ErrorDetailsFromProto(details)
 	}
-	delete(m, cachedMarker)
 	if len(m) == 0 {
-		return nil, ttl, nil
+		return nil, &storedAt, nil
 	}
 	locations := make(map[string]*ttnpb.Location, len(m))
 	for k, v := range m {
 		loc := new(ttnpb.Location)
 		if err := ttnredis.UnmarshalProto(v, loc); err != nil {
-			return nil, 0, err
+			return nil, nil, err
 		}
 		locations[k] = loc
 	}
-	return locations, ttl, nil
+	return locations, &storedAt, nil
 }
 
-func (r *EndDeviceLocationCache) setPairs(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, pairs []string, ttl time.Duration) error {
-	uidKey := r.uidKey(unique.ID(ctx, ids))
-	if _, err := r.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
-		p.Del(ctx, uidKey)
-		p.HSet(ctx, uidKey, pairs)
-		p.PExpire(ctx, uidKey, ttl)
-		return nil
-	}); err != nil {
-		return ttnredis.ConvertError(err)
-	}
-	return nil
-}
-
-// SetLocations updates the locations by the end device identifiers.
-func (r *EndDeviceLocationCache) SetLocations(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location, ttl time.Duration) error {
-	pairs := append(make([]string, 0, 2*len(update)+2), cachedMarker, cachedMarker)
+// Set updates the locations by the end device identifiers.
+func (r *EndDeviceLocationCache) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location) error {
+	pairs := append(make([]string, 0, 2*len(update)+2), storedAtMarker, fmt.Sprintf("%v", time.Now().UnixNano()))
 	for k, v := range update {
 		s, err := ttnredis.MarshalProto(v)
 		if err != nil {
@@ -115,16 +95,15 @@ func (r *EndDeviceLocationCache) SetLocations(ctx context.Context, ids ttnpb.End
 		}
 		pairs = append(pairs, k, s)
 	}
-	return r.setPairs(ctx, ids, pairs, ttl)
-}
-
-// SetErrorDetails stores the location retrieval error by the end device identifiers.
-func (r *EndDeviceLocationCache) SetErrorDetails(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, details *ttnpb.ErrorDetails, ttl time.Duration) error {
-	s, err := ttnredis.MarshalProto(details)
-	if err != nil {
-		return err
+	uidKey := r.uidKey(unique.ID(ctx, ids))
+	if _, err := r.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
+		p.Del(ctx, uidKey)
+		p.HSet(ctx, uidKey, pairs)
+		return nil
+	}); err != nil {
+		return ttnredis.ConvertError(err)
 	}
-	return r.setPairs(ctx, ids, []string{errorMarker, s}, ttl)
+	return nil
 }
 
 // Delete deletes the locations by the end device identifiers.

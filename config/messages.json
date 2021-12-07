@@ -2501,15 +2501,6 @@
       "file": "location_cache.go"
     }
   },
-  "error:pkg/applicationserver/metadata:registry": {
-    "translations": {
-      "en": "registry unavailable"
-    },
-    "description": {
-      "package": "pkg/applicationserver/metadata",
-      "file": "location_registry.go"
-    }
-  },
   "error:pkg/applicationserver/redis:application_uid": {
     "translations": {
       "en": "invalid application UID `{application_uid}`"

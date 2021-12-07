@@ -78,11 +78,10 @@ type EndDeviceLocationStorageConfig struct {
 
 // EndDeviceLocationStorageCacheConfig represents the configuration of end device location registry caching.
 type EndDeviceLocationStorageCacheConfig struct {
-	Cache    metadata.EndDeviceLocationCache `name:"-"`
-	Enable   bool                            `name:"enable" description:"Enable caching of end device locations"`
-	HardTTL  time.Duration                   `name:"hard-ttl" description:"Hard time to live of cached locations"`
-	SoftTTL  time.Duration                   `name:"soft-ttl" description:"Soft time to live of cached locations"`
-	ErrorTTL time.Duration                   `name:"error-ttl" description:"Time to live of location retrieval errors"`
+	Cache   metadata.EndDeviceLocationCache `name:"-"`
+	Enable  bool                            `name:"enable" description:"Enable caching of end device locations"`
+	HardTTL time.Duration                   `name:"hard-ttl" description:"Hard time to live of cached locations"`
+	SoftTTL time.Duration                   `name:"soft-ttl" description:"Soft time to live of cached locations"`
 }
 
 // FormattersConfig represents the configuration for payload formatters.
@@ -284,13 +283,13 @@ func (c EndDeviceLocationStorageConfig) NewRegistry(ctx context.Context, comp *c
 	registry := metadata.NewClusterEndDeviceLocationRegistry(comp, c.Timeout)
 	registry = metadata.NewMetricsEndDeviceLocationRegistry(registry)
 	if c.Cache.Enable {
-		for _, ttl := range []time.Duration{c.Cache.SoftTTL, c.Cache.HardTTL, c.Cache.ErrorTTL} {
+		for _, ttl := range []time.Duration{c.Cache.SoftTTL, c.Cache.HardTTL} {
 			if ttl <= 0 {
 				return nil, errInvalidTTL.WithAttributes("ttl", ttl)
 			}
 		}
 		cache := metadata.NewMetricsEndDeviceLocationCache(c.Cache.Cache)
-		registry = metadata.NewCachedEndDeviceLocationRegistry(ctx, comp, registry, cache, c.Cache.SoftTTL, c.Cache.HardTTL, c.Cache.ErrorTTL)
+		registry = metadata.NewCachedEndDeviceLocationRegistry(ctx, comp, registry, cache, c.Cache.SoftTTL, c.Cache.HardTTL)
 	}
 	return registry, nil
 }

@@ -55,10 +55,9 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 		Location: applicationserver.EndDeviceLocationStorageConfig{
 			Timeout: 5 * time.Second,
 			Cache: applicationserver.EndDeviceLocationStorageCacheConfig{
-				Enable:   true,
-				SoftTTL:  2 * time.Hour,
-				HardTTL:  24 * time.Hour,
-				ErrorTTL: 30 * time.Minute,
+				Enable:  true,
+				SoftTTL: 15 * time.Minute,
+				HardTTL: 4 * time.Hour,
 			},
 		},
 	},

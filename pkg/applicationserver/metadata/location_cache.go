@@ -24,11 +24,9 @@ import (
 // EndDeviceLocationCache is a cache for end device locations.
 type EndDeviceLocationCache interface {
 	// Get retrieves the end device locations and the remaining TTL for the entry.
-	Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, time.Duration, error)
-	// SetLocations sets the end device locations.
-	SetLocations(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location, ttl time.Duration) error
-	// SetErrorDetails sets the the end device locations error details.
-	SetErrorDetails(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, details *ttnpb.ErrorDetails, ttl time.Duration) error
+	Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, *time.Time, error)
+	// Set sets the end device locations.
+	Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location) error
 	// Delete removes the locations from the cache.
 	Delete(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error
 }
@@ -38,24 +36,19 @@ type metricsEndDeviceLocationCache struct {
 }
 
 // Get implements EndDeviceLocationCache.
-func (c *metricsEndDeviceLocationCache) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, time.Duration, error) {
-	m, ttl, err := c.inner.Get(ctx, ids)
-	if ttl == 0 {
+func (c *metricsEndDeviceLocationCache) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, *time.Time, error) {
+	m, storedAt, err := c.inner.Get(ctx, ids)
+	if storedAt == nil {
 		registerMetadataCacheMiss(ctx, locationLabel)
 	} else {
 		registerMetadataCacheHit(ctx, locationLabel)
 	}
-	return m, ttl, err
+	return m, storedAt, err
 }
 
-// SetLocations implements EndDeviceLocationCache.
-func (c *metricsEndDeviceLocationCache) SetLocations(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location, ttl time.Duration) error {
-	return c.inner.SetLocations(ctx, ids, update, ttl)
-}
-
-// SetError implements EndDEviceLocationCache.
-func (c *metricsEndDeviceLocationCache) SetErrorDetails(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, details *ttnpb.ErrorDetails, ttl time.Duration) error {
-	return c.inner.SetErrorDetails(ctx, ids, details, ttl)
+// Set implements EndDeviceLocationCache.
+func (c *metricsEndDeviceLocationCache) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location) error {
+	return c.inner.Set(ctx, ids, update)
 }
 
 // Delete implements EndDeviceLocationCache.
