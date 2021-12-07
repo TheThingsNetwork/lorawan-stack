@@ -435,6 +435,8 @@
   "console.containers.webhooks-table.index.templateId": "Template ID",
   "console.containers.webhooks-table.index.format": "Format",
   "console.containers.webhooks-table.index.baseUrl": "Base URL",
+  "console.containers.webhooks-table.index.healthy": "Healthy",
+  "console.containers.webhooks-table.index.unhealthy": "Unhealthy",
   "console.lib.events.definitions.synthetic.error.unknown:type": "Unknown error",
   "console.lib.events.definitions.synthetic.error.unknown:preview": "An unknown error occurred and one or more events could not be retrieved",
   "console.lib.events.definitions.synthetic.error.unknown:details": "The Console encountered an unexpected error while handling the event stream data. It is possible that event data could not be displayed (correctly) as a result. Note that this is an internal error which does not imply any malfunction of your gateways or end devices.",

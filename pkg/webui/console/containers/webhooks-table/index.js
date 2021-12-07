@@ -36,6 +36,8 @@ const m = defineMessages({
   templateId: 'Template ID',
   format: 'Format',
   baseUrl: 'Base URL',
+  healthy: 'Healthy',
+  unhealthy: 'Unhealthy',
 })
 
 const headers = [
@@ -58,7 +60,20 @@ const headers = [
   {
     name: 'format',
     displayName: m.format,
-    width: 8,
+    width: 6,
+  },
+  {
+    name: 'health_status',
+    displayName: sharedMessages.status,
+    width: 10,
+    render: value => {
+      if (value && value.healthy) {
+        return <Message content={m.healthy} />
+      } else if (value && value.unhealthy) {
+        return <Message content={m.unhealthy} />
+      }
+      return <Message className={style.none} content={sharedMessages.unknown} />
+    },
   },
 ]
 
@@ -71,7 +86,7 @@ export default class WebhooksTable extends React.Component {
     super(props)
 
     const { appId } = props
-    this.getWebhooksList = () => getWebhooksList(appId, ['template_ids'])
+    this.getWebhooksList = () => getWebhooksList(appId, ['template_ids', 'health_status'])
   }
 
   baseDataSelector(state) {
