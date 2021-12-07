@@ -110,7 +110,8 @@ type Config struct {
 
 func (c Config) toProto() *ttnpb.AsConfiguration {
 	return &ttnpb.AsConfiguration{
-		Pubsub: c.PubSub.toProto(),
+		Pubsub:   c.PubSub.toProto(),
+		Webhooks: c.Webhooks.toProto(),
 	}
 }
 
@@ -136,6 +137,13 @@ type WebhooksConfig struct {
 	UnhealthyRetryInterval     time.Duration       `name:"unhealthy-retry-interval" description:"Time interval after which disabled webhooks may execute again"`
 	Templates                  web.TemplatesConfig `name:"templates" description:"The store of the webhook templates"`
 	Downlinks                  web.DownlinksConfig `name:"downlink" description:"The downlink queue operations configuration"`
+}
+
+func (c WebhooksConfig) toProto() *ttnpb.AsConfiguration_Webhooks {
+	return &ttnpb.AsConfiguration_Webhooks{
+		UnhealthyAttemptsThreshold: int64(c.UnhealthyAttemptsThreshold),
+		UnhealthyRetryInterval:     ttnpb.ProtoDurationPtr(c.UnhealthyRetryInterval),
+	}
 }
 
 // DistributionConfig contains the upstream traffic distribution configuration of the Application Server.
