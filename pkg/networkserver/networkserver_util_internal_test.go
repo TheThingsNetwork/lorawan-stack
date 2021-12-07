@@ -569,7 +569,7 @@ func (env TestEnvironment) AssertSetDevice(ctx context.Context, create bool, req
 		cancel()
 	}()
 
-	if !a.So(env.AssertListApplicationRights(reqCtx, req.EndDevice.ApplicationIdentifiers, authType, authValue, rights...), should.BeTrue) {
+	if !a.So(env.AssertListApplicationRights(reqCtx, *req.EndDevice.ApplicationIds, authType, authValue, rights...), should.BeTrue) {
 		t.Error("ListRights assertion failed")
 		return nil, err, false
 	}
@@ -638,7 +638,7 @@ func (env TestEnvironment) AssertGetDevice(ctx context.Context, req *ttnpb.GetEn
 		cancel()
 	}()
 
-	if !a.So(env.AssertListApplicationRights(reqCtx, req.ApplicationIdentifiers, authType, authValue, rights...), should.BeTrue) {
+	if !a.So(env.AssertListApplicationRights(reqCtx, *req.ApplicationIds, authType, authValue, rights...), should.BeTrue) {
 		t.Error("ListRights assertion failed")
 		return nil, nil, false
 	}
@@ -679,7 +679,7 @@ func (env TestEnvironment) AssertResetFactoryDefaults(ctx context.Context, req *
 		cancel()
 	}()
 
-	if !a.So(env.AssertListApplicationRights(reqCtx, req.ApplicationIdentifiers, authType, authValue, rights...), should.BeTrue) {
+	if !a.So(env.AssertListApplicationRights(reqCtx, *req.ApplicationIds, authType, authValue, rights...), should.BeTrue) {
 		t.Error("ListRights assertion failed")
 		return nil, nil, false
 	}
@@ -1690,7 +1690,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 	idsWithDevAddr.DevAddr = &joinReq.DevAddr
 
 	var appUp *ttnpb.ApplicationUp
-	if !a.So(env.AssertNsAsHandleUplink(ctx, conf.Device.ApplicationIdentifiers, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+	if !a.So(env.AssertNsAsHandleUplink(ctx, *conf.Device.ApplicationIds, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 		_, a := test.MustNewTFromContext(ctx)
 		if !a.So(ups, should.HaveLength, 1) {
 			return false
@@ -1835,7 +1835,7 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 			}
 			dev.MacState.RecentUplinks = AppendRecentUplink(dev.MacState.RecentUplinks, deduplicatedUp, RecentUplinkCount)
 			var appUp *ttnpb.ApplicationUp
-			if !a.So(env.AssertNsAsHandleUplink(ctx, conf.Device.ApplicationIdentifiers, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+			if !a.So(env.AssertNsAsHandleUplink(ctx, *conf.Device.ApplicationIds, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 				_, a := test.MustNewTFromContext(ctx)
 				if !a.So(ups, should.HaveLength, 1) {
 					return false

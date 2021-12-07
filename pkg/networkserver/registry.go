@@ -49,7 +49,7 @@ var errDeviceExists = errors.DefineAlreadyExists("device_exists", "device alread
 
 // CreateDevice creates device dev in r.
 func CreateDevice(ctx context.Context, r DeviceRegistry, dev *ttnpb.EndDevice, paths ...string) (*ttnpb.EndDevice, context.Context, error) {
-	return r.SetByID(ctx, dev.ApplicationIdentifiers, dev.DeviceId, ttnpb.EndDeviceFieldPathsTopLevel, func(_ context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	return r.SetByID(ctx, *dev.ApplicationIds, dev.DeviceId, ttnpb.EndDeviceFieldPathsTopLevel, func(_ context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if stored != nil {
 			return nil, nil, errDeviceExists.New()
 		}

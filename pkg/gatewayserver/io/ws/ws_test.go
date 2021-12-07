@@ -927,7 +927,7 @@ func TestTraffic(t *testing.T) {
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId: "testdevice",
 					DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{
 						ApplicationId: "testapp",
 					},
 				},
@@ -987,7 +987,7 @@ func TestTraffic(t *testing.T) {
 					EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 						DeviceId: "testdevice",
 						DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{
 							ApplicationId: "testapp",
 						},
 					},
@@ -1014,7 +1014,7 @@ func TestTraffic(t *testing.T) {
 					EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 						DeviceId: "testdevice",
 						DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{
 							ApplicationId: "testapp",
 						},
 					},
@@ -1290,7 +1290,7 @@ func TestRTT(t *testing.T) {
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId: "testdevice",
 					DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{
 						ApplicationId: "testapp",
 					},
 				},

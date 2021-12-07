@@ -205,7 +205,7 @@ func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID *ttnpb.Appli
 	}
 	return fmt.Sprintf(downlinkOperationURLFormat,
 		baseURL,
-		webhookID.ApplicationIds.ApplicationId,
+		webhookID.GetApplicationIds().GetApplicationId(),
 		webhookID.WebhookId,
 		devID.DeviceId,
 		op,
@@ -227,7 +227,7 @@ func (w *webhooks) createDomain(ctx context.Context) string {
 
 func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
 	ctx = log.NewContextWithField(ctx, "namespace", namespace)
-	hooks, err := w.registry.List(ctx, &msg.EndDeviceIds.ApplicationIdentifiers,
+	hooks, err := w.registry.List(ctx, msg.EndDeviceIds.ApplicationIds,
 		[]string{
 			"base_url",
 			"downlink_ack",
@@ -366,7 +366,7 @@ func (w *webhooks) handleDown(op func(io.Server, context.Context, ttnpb.EndDevic
 		devID := deviceIDFromContext(ctx)
 		hookID := webhookIDFromContext(ctx)
 		logger := log.FromContext(ctx).WithFields(log.Fields(
-			"application_id", devID.ApplicationId,
+			"application_id", devID.GetApplicationIds().GetApplicationId(),
 			"device_id", devID.DeviceId,
 			"webhook_id", hookID.WebhookId,
 		))
@@ -421,8 +421,8 @@ func expandVariables(u string, up *ttnpb.ApplicationUp) (*url.URL, error) {
 		return nil, err
 	}
 	expanded, err := tmpl.Expand(map[string]interface{}{
-		"appID":         up.EndDeviceIds.ApplicationId,
-		"applicationID": up.EndDeviceIds.ApplicationId,
+		"appID":         up.EndDeviceIds.GetApplicationIds().GetApplicationId(),
+		"applicationID": up.EndDeviceIds.GetApplicationIds().GetApplicationId(),
 		"appEUI":        joinEUI,
 		"joinEUI":       joinEUI,
 		"devID":         up.EndDeviceIds.DeviceId,

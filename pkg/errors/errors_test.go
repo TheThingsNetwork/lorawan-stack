@@ -42,11 +42,11 @@ func Example() {
 
 	findApplication := func(id *ttnpb.ApplicationIdentifiers) (*ttnpb.Application, error) {
 		// try really hard, but fail
-		return nil, errApplicationNotFound.WithAttributes("id", id.ApplicationId)
+		return nil, errApplicationNotFound.WithAttributes("id", id.GetApplicationId())
 	}
 
 	createDevice := func(dev *ttnpb.EndDevice) error {
-		app, err := findApplication(&dev.ApplicationIdentifiers)
+		app, err := findApplication(dev.ApplicationIds)
 		if err != nil {
 			return err // you can just pass errors up
 		}

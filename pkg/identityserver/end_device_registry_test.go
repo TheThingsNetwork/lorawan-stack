@@ -42,7 +42,7 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceId: "test-device-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{
 						ApplicationId: "test-app-id",
 					},
 				},
@@ -57,7 +57,7 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 				DeviceId: "test-device-id",
-				ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{
 					ApplicationId: "test-app-id",
 				},
 			},
@@ -92,7 +92,7 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
 					DeviceId: "test-device-id",
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{
 						ApplicationId: "test-app-id",
 					},
 				},
@@ -105,7 +105,7 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 
 		_, err = reg.Delete(ctx, &ttnpb.EndDeviceIdentifiers{
 			DeviceId: "test-device-id",
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{
 				ApplicationId: "test-app-id",
 			},
 		})
@@ -143,10 +143,10 @@ func TestEndDevicesCRUD(t *testing.T) {
 		created, err := reg.Create(ctx, &ttnpb.CreateEndDeviceRequest{
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-device-id",
-					ApplicationIdentifiers: *app.GetIds(),
-					JoinEui:                &joinEUI,
-					DevEui:                 &devEUI,
+					DeviceId:       "test-device-id",
+					ApplicationIds: app.GetIds(),
+					JoinEui:        &joinEUI,
+					DevEui:         &devEUI,
 				},
 				Name: "test-device-name",
 			},
@@ -162,8 +162,8 @@ func TestEndDevicesCRUD(t *testing.T) {
 		got, err := reg.Get(ctx, &ttnpb.GetEndDeviceRequest{
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				DeviceId:               "test-device-id",
-				ApplicationIdentifiers: *app.GetIds(),
+				DeviceId:       "test-device-id",
+				ApplicationIds: app.GetIds(),
 			},
 		}, creds)
 
@@ -185,10 +185,10 @@ func TestEndDevicesCRUD(t *testing.T) {
 		_, err = reg.Create(ctx, &ttnpb.CreateEndDeviceRequest{
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "other-test-device-id",
-					ApplicationIdentifiers: *app.GetIds(),
-					JoinEui:                &joinEUI,
-					DevEui:                 &devEUI,
+					DeviceId:       "other-test-device-id",
+					ApplicationIds: app.GetIds(),
+					JoinEui:        &joinEUI,
+					DevEui:         &devEUI,
 				},
 				Name: "test-device-name",
 			},
@@ -216,8 +216,8 @@ func TestEndDevicesCRUD(t *testing.T) {
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 			EndDevice: ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					DeviceId:               "test-device-id",
-					ApplicationIdentifiers: *app.GetIds(),
+					DeviceId:       "test-device-id",
+					ApplicationIds: app.GetIds(),
 				},
 				Name: "test-device-name-new",
 			},
@@ -230,8 +230,8 @@ func TestEndDevicesCRUD(t *testing.T) {
 		}
 
 		_, err = reg.Delete(ctx, &ttnpb.EndDeviceIdentifiers{
-			DeviceId:               "test-device-id",
-			ApplicationIdentifiers: *app.GetIds(),
+			DeviceId:       "test-device-id",
+			ApplicationIds: app.GetIds(),
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -239,8 +239,8 @@ func TestEndDevicesCRUD(t *testing.T) {
 		_, err = reg.Get(ctx, &ttnpb.GetEndDeviceRequest{
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				DeviceId:               "test-device-id",
-				ApplicationIdentifiers: *app.GetIds(),
+				DeviceId:       "test-device-id",
+				ApplicationIds: app.GetIds(),
 			},
 		}, creds)
 

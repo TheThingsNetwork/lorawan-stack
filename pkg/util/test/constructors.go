@@ -34,8 +34,8 @@ var (
 	}
 
 	baseEndDeviceIdentifiers = ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: DefaultApplicationIdentifiers,
-		DeviceId:               DefaultDeviceID,
+		ApplicationIds: &DefaultApplicationIdentifiers,
+		DeviceId:       DefaultDeviceID,
 	}
 
 	baseMACState = ttnpb.MACState{

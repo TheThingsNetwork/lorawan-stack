@@ -252,11 +252,11 @@ func (r ApplicationPackagesRegistry) SetAssociation(ctx context.Context, ids *tt
 				if err != nil {
 					return err
 				}
-				if updated.Ids.EndDeviceIds.ApplicationId != ids.EndDeviceIds.ApplicationId || updated.Ids.EndDeviceIds.DeviceId != ids.EndDeviceIds.DeviceId || updated.Ids.FPort != ids.FPort {
+				if updated.Ids.EndDeviceIds.GetApplicationIds().GetApplicationId() != ids.EndDeviceIds.GetApplicationIds().GetApplicationId() || updated.Ids.EndDeviceIds.DeviceId != ids.EndDeviceIds.DeviceId || updated.Ids.FPort != ids.FPort {
 					return errInvalidIdentifiers.New()
 				}
 			} else {
-				if ttnpb.HasAnyField(sets, "ids.end_device_ids.application_ids.application_id") && pb.Ids.EndDeviceIds.ApplicationId != stored.Ids.EndDeviceIds.ApplicationId {
+				if ttnpb.HasAnyField(sets, "ids.end_device_ids.application_ids.application_id") && pb.Ids.EndDeviceIds.GetApplicationIds().GetApplicationId() != stored.Ids.EndDeviceIds.GetApplicationIds().GetApplicationId() {
 					return errReadOnlyField.WithAttributes("field", "ids.end_device_ids.application_ids.application_id")
 				}
 				if ttnpb.HasAnyField(sets, "ids.end_device_ids.device_id") && pb.Ids.EndDeviceIds.DeviceId != stored.Ids.EndDeviceIds.DeviceId {
@@ -446,11 +446,11 @@ func (r ApplicationPackagesRegistry) SetDefaultAssociation(ctx context.Context, 
 				if err != nil {
 					return err
 				}
-				if updated.Ids.ApplicationIds.ApplicationId != ids.ApplicationIds.ApplicationId || updated.Ids.FPort != ids.FPort {
+				if updated.Ids.GetApplicationIds().GetApplicationId() != ids.GetApplicationIds().GetApplicationId() || updated.Ids.FPort != ids.FPort {
 					return errInvalidIdentifiers.New()
 				}
 			} else {
-				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.Ids.ApplicationIds.ApplicationId != stored.Ids.ApplicationIds.ApplicationId {
+				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.Ids.GetApplicationIds().GetApplicationId() != stored.Ids.GetApplicationIds().GetApplicationId() {
 					return errReadOnlyField.WithAttributes("field", "ids.application_ids.application_id")
 				}
 				if ttnpb.HasAnyField(sets, "ids.f_port") && pb.Ids.FPort != stored.Ids.FPort {

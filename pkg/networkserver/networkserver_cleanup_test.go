@@ -40,50 +40,50 @@ func TestNetworkServerCleanup(t *testing.T) {
 	deviceList := []*ttnpb.EndDevice{
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: appList[0],
-				DeviceId:               "dev-1",
-				JoinEui:                eui64Ptr(types.EUI64{0x41, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
-				DevEui:                 eui64Ptr(types.EUI64{0x41, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				ApplicationIds: &appList[0],
+				DeviceId:       "dev-1",
+				JoinEui:        eui64Ptr(types.EUI64{0x41, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:         eui64Ptr(types.EUI64{0x41, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 			},
 		},
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: appList[0],
-				DeviceId:               "dev-2",
-				JoinEui:                eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
-				DevEui:                 eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				ApplicationIds: &appList[0],
+				DeviceId:       "dev-2",
+				JoinEui:        eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:         eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 			},
 		},
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: appList[1],
-				DeviceId:               "dev-3",
-				JoinEui:                eui64Ptr(types.EUI64{0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
-				DevEui:                 eui64Ptr(types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				ApplicationIds: &appList[1],
+				DeviceId:       "dev-3",
+				JoinEui:        eui64Ptr(types.EUI64{0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:         eui64Ptr(types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 			},
 		},
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: appList[2],
-				DeviceId:               "dev-4",
-				JoinEui:                eui64Ptr(types.EUI64{0x44, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
-				DevEui:                 eui64Ptr(types.EUI64{0x44, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				ApplicationIds: &appList[2],
+				DeviceId:       "dev-4",
+				JoinEui:        eui64Ptr(types.EUI64{0x44, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:         eui64Ptr(types.EUI64{0x44, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 			},
 		},
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: appList[3],
-				DeviceId:               "dev-5",
-				JoinEui:                eui64Ptr(types.EUI64{0x45, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
-				DevEui:                 eui64Ptr(types.EUI64{0x45, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				ApplicationIds: &appList[3],
+				DeviceId:       "dev-5",
+				JoinEui:        eui64Ptr(types.EUI64{0x45, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:         eui64Ptr(types.EUI64{0x45, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 			},
 		},
 		{
 			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIdentifiers: appList[3],
-				DeviceId:               "dev-6",
-				JoinEui:                eui64Ptr(types.EUI64{0x46, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
-				DevEui:                 eui64Ptr(types.EUI64{0x46, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				ApplicationIds: &appList[3],
+				DeviceId:       "dev-6",
+				JoinEui:        eui64Ptr(types.EUI64{0x46, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
+				DevEui:         eui64Ptr(types.EUI64{0x46, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 			},
 		},
 	}
@@ -92,7 +92,7 @@ func TestNetworkServerCleanup(t *testing.T) {
 	defer t.Cleanup(closeFn)
 
 	for _, dev := range deviceList {
-		ret, _, err := deviceRegistry.SetByID(ctx, dev.ApplicationIdentifiers, dev.EndDeviceIdentifiers.DeviceId, []string{
+		ret, _, err := deviceRegistry.SetByID(ctx, *dev.ApplicationIds, dev.EndDeviceIdentifiers.DeviceId, []string{
 			"ids.application_ids",
 			"ids.dev_eui",
 			"ids.device_id",

@@ -36,7 +36,7 @@ func TestProtobufUpstream(t *testing.T) {
 		{
 			Message: &ttnpb.ApplicationUp{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{
 						ApplicationId: "foo-app",
 					},
 					DeviceId: "foo-device",
@@ -63,7 +63,7 @@ func TestProtobufUpstream(t *testing.T) {
 		{
 			Message: &ttnpb.ApplicationUp{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{
 						ApplicationId: "foo-app",
 					},
 					DeviceId: "foo-device",
@@ -157,7 +157,7 @@ func TestProtobufDownstream(t *testing.T) {
 			{
 				Request: &ttnpb.DownlinkQueueRequest{
 					EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-						ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{
 							ApplicationId: "foo-app",
 						},
 						DeviceId: "foo-device",

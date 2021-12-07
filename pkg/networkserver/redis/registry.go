@@ -69,8 +69,8 @@ func (r *DeviceRegistry) euiKey(joinEUI, devEUI types.EUI64) string {
 // GetByID gets device by appID, devID.
 func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error) {
 	ids := ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: appID,
-		DeviceId:               devID,
+		ApplicationIds: &appID,
+		DeviceId:       devID,
 	}
 	if err := ids.ValidateContext(ctx); err != nil {
 		return nil, ctx, err
@@ -545,7 +545,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			return errDatabaseCorruption.WithCause(err)
 		}
 		ok, err = f(ctx, &networkserver.UplinkMatch{
-			ApplicationIdentifiers: ids.ApplicationIdentifiers,
+			ApplicationIdentifiers: *ids.ApplicationIds,
 			DeviceID:               ids.DeviceId,
 			LoRaWANVersion:         res.LoRaWANVersion,
 			FNwkSIntKey:            res.FNwkSIntKey,
@@ -685,7 +685,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 				err = msgpack.Unmarshal([]byte(s), ses)
 				if err == nil {
 					m = &networkserver.UplinkMatch{
-						ApplicationIdentifiers: ids.ApplicationIdentifiers,
+						ApplicationIdentifiers: *ids.ApplicationIds,
 						DeviceID:               ids.DeviceId,
 						LoRaWANVersion:         ses.LoRaWANVersion,
 						FNwkSIntKey:            ses.FNwkSIntKey,
@@ -697,7 +697,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 				err = msgpack.Unmarshal([]byte(s), ses)
 				if err == nil {
 					m = &networkserver.UplinkMatch{
-						ApplicationIdentifiers: ids.ApplicationIdentifiers,
+						ApplicationIdentifiers: *ids.ApplicationIds,
 						DeviceID:               ids.DeviceId,
 						LoRaWANVersion:         ses.LoRaWANVersion,
 						FNwkSIntKey:            ses.FNwkSIntKey,
@@ -806,8 +806,8 @@ var errInvalidDevice = errors.DefineInvalidArgument("invalid_device", "device is
 // SetByID sets device by appID, devID.
 func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(ctx context.Context, pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 	ids := ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: appID,
-		DeviceId:               devID,
+		ApplicationIds: &appID,
+		DeviceId:       devID,
 	}
 	if err := ids.ValidateContext(ctx); err != nil {
 		return nil, ctx, err
@@ -889,7 +889,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				); err != nil {
 					return errInvalidFieldmask.WithCause(err)
 				}
-				if pb.ApplicationId != appID.ApplicationId || pb.DeviceId != devID {
+				if pb.GetApplicationIds().GetApplicationId() != appID.ApplicationId || pb.DeviceId != devID {
 					return errInvalidIdentifiers.New()
 				}
 				if pb.JoinEui != nil && pb.DevEui != nil {
@@ -907,7 +907,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 					p.Set(ctx, ek, uid, 0)
 				}
 			} else {
-				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.ApplicationId != stored.ApplicationId {
+				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.GetApplicationIds().GetApplicationId() != stored.GetApplicationIds().GetApplicationId() {
 					return errReadOnlyField.WithAttributes("field", "ids.application_ids.application_id")
 				}
 				if ttnpb.HasAnyField(sets, "ids.device_id") && pb.DeviceId != stored.DeviceId {

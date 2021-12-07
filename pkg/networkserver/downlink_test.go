@@ -50,7 +50,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 	errors.GenerateCorrelationIDs(false)
 
 	const appIDString = "process-downlink-test-app-id"
-	appID := ttnpb.ApplicationIdentifiers{ApplicationId: appIDString}
+	appID := &ttnpb.ApplicationIdentifiers{ApplicationId: appIDString}
 	const devID = "process-downlink-test-dev-id"
 
 	joinAcceptBytes := append([]byte{0b001_000_00}, bytes.Repeat([]byte{0x42}, 32)...)
@@ -346,9 +346,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "no MAC state",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
@@ -359,9 +359,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "Class A/windows closed",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
@@ -404,9 +404,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "Class A/windows open/1.1/no uplink",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
@@ -435,9 +435,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "Class A/windows open/1.1/no session",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
@@ -469,9 +469,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "Class A/windows open/1.1/RX1,RX2 expired",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
@@ -519,9 +519,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "Class A/windows open/1.1/RX1,RX2 available/no MAC/no application downlink",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
@@ -568,9 +568,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "Class A/windows open/1.0.3/RX1,RX2 available/no MAC/generic application downlink/FCnt too low",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_3_REV_A,
@@ -653,9 +653,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "Class A/windows open/1.0.3/RX1,RX2 available/no MAC/generic application downlink/application downlink exceeds length limit",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_3_REV_A,
@@ -729,9 +729,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "Class A/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX1,RX2/EU868/scheduling fail",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
@@ -880,9 +880,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "Class A/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX1,RX2/EU868",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
@@ -1041,9 +1041,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			// NOTE: Maximum MACPayload length in both RX1(DR0) and RX2(DR1) is 59. There are 6 bytes of FOpts, hence maximum fitting application downlink length is 59-8-6 == 45.
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
@@ -1196,9 +1196,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "Class A/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX2 does not fit/RX1/EU868",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
@@ -1354,9 +1354,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "Class B/windows closed/ping slot",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
@@ -1500,9 +1500,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "Class C/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX1,RX2/EU868",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
@@ -1663,9 +1663,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "Class C/windows open/1.1/RX1,RX2 expired/MAC answers/MAC requests/generic application downlink/data+MAC/RXC/EU868",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
@@ -1799,9 +1799,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "Class C/windows open/1.1/RX1,RX2 expired/no MAC answers/MAC requests/classBC application downlink/absolute time within window/no forced gateways/data+MAC/RXC/EU868",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:         test.EUFrequencyPlanID,
 				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(now),
@@ -1939,9 +1939,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "Class C/windows closed/1.1/no MAC answers/MAC requests/classBC application downlink with absolute time/no forced gateways/MAC/RXC/EU868/non-retryable errors",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
@@ -2099,9 +2099,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "Class C/windows closed/1.1/no MAC answers/MAC requests/classBC application downlink/forced gateways/MAC/RXC/EU868/retryable error",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
@@ -2239,9 +2239,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "Class C/windows open/1.1/RX1,RX2 available/no MAC/classBC application downlink/absolute time outside window",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
@@ -2301,9 +2301,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "Class C/windows open/1.1/RX1,RX2 available/no MAC/expired application downlinks",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &test.DefaultDevAddr,
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
@@ -2374,11 +2374,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "join-accept/windows open/RX1,RX2 available/active session/EU868",
 			CreateDevice: &ttnpb.EndDevice{
 				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
-					DevAddr:                &types.DevAddr{0x42, 0xff, 0xff, 0xff},
-					JoinEui:                &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-					DevEui:                 &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					ApplicationIds: appID,
+					DeviceId:       devID,
+					DevAddr:        &types.DevAddr{0x42, 0xff, 0xff, 0xff},
+					JoinEui:        &types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+					DevEui:         &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
@@ -2484,11 +2484,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 			ApplicationUplinkAssertion: func(ctx context.Context, dev *ttnpb.EndDevice, ups ...*ttnpb.ApplicationUp) ([]events.Event, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				ids := ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: dev.ApplicationIdentifiers,
-					DeviceId:               dev.DeviceId,
-					DevEui:                 dev.DevEui,
-					JoinEui:                dev.JoinEui,
-					DevAddr:                &dev.PendingMacState.QueuedJoinAccept.DevAddr,
+					ApplicationIds: dev.ApplicationIds,
+					DeviceId:       dev.DeviceId,
+					DevEui:         dev.DevEui,
+					JoinEui:        dev.JoinEui,
+					DevAddr:        &dev.PendingMacState.QueuedJoinAccept.DevAddr,
 				}
 				cids := LastUplink(dev.PendingMacState.RecentUplinks...).CorrelationIds
 				recvAt := LastUplink(dev.PendingMacState.RecentUplinks...).ReceivedAt
@@ -2554,8 +2554,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					created, ctx = MustCreateDevice(ctx, env.Devices, tc.CreateDevice)
 				}
 				test.Must(nil, env.DownlinkTaskQueue.Queue.Add(ctx, ttnpb.EndDeviceIdentifiers{
-					ApplicationIdentifiers: appID,
-					DeviceId:               devID,
+					ApplicationIds: appID,
+					DeviceId:       devID,
 				}, time.Now(), true))
 
 				var (
@@ -2582,7 +2582,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}
 				}
 
-				updated, ctx, err := env.Devices.GetByID(ctx, appID, devID, ttnpb.EndDeviceFieldPathsTopLevel)
+				updated, ctx, err := env.Devices.GetByID(ctx, *appID, devID, ttnpb.EndDeviceFieldPathsTopLevel)
 				if tc.CreateDevice != nil {
 					if !a.So(err, should.BeNil) {
 						t.FailNow()
@@ -2635,7 +2635,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 				if tc.ApplicationUplinkAssertion != nil {
 					var evs []events.Event
-					a.So(env.AssertNsAsHandleUplink(ctx, appID, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+					a.So(env.AssertNsAsHandleUplink(ctx, *appID, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 						var ok bool
 						evs, ok = tc.ApplicationUplinkAssertion(ctx, created, ups...)
 						return ok

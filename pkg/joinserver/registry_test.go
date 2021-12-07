@@ -42,10 +42,10 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 
 	pb := &ttnpb.EndDevice{
 		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-			JoinEui:                &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			DevEui:                 &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
-			DeviceId:               "test-dev",
+			JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
+			DeviceId:       "test-dev",
 		},
 		ProvisionerId: "mock",
 		ProvisioningData: &pbtypes.Struct{
@@ -67,7 +67,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 
 	start := time.Now()
 
-	ret, err := reg.SetByID(ctx, pb.ApplicationIdentifiers, pb.DeviceId,
+	ret, err := reg.SetByID(ctx, *pb.ApplicationIds, pb.DeviceId,
 		[]string{
 			"provisioner_id",
 			"provisioning_data",
@@ -112,7 +112,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	}
 	a.So(retCtx, should.BeNil)
 
-	_, err = reg.SetByID(ctx, pbOther.ApplicationIdentifiers, pbOther.DeviceId,
+	_, err = reg.SetByID(ctx, *pbOther.ApplicationIds, pbOther.DeviceId,
 		[]string{
 			"provisioner_id",
 			"provisioning_data",
@@ -135,7 +135,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 		t.Fatal("Device with conflicting provisioner unique ID created")
 	}
 
-	err = DeleteDevice(ctx, reg, pb.ApplicationIdentifiers, pb.DeviceId)
+	err = DeleteDevice(ctx, reg, *pb.ApplicationIds, pb.DeviceId)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -146,7 +146,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	}
 	a.So(retCtx, should.BeNil)
 
-	ret, err = reg.SetByID(ctx, pbOther.ApplicationIdentifiers, pbOther.DeviceId,
+	ret, err = reg.SetByID(ctx, *pbOther.ApplicationIds, pbOther.DeviceId,
 		[]string{
 			"provisioner_id",
 			"provisioning_data",
@@ -182,7 +182,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	}
 	a.So(retCtx.EndDevice, should.HaveEmptyDiff, pbOther)
 
-	err = DeleteDevice(ctx, reg, pbOther.ApplicationIdentifiers, pbOther.DeviceId)
+	err = DeleteDevice(ctx, reg, *pbOther.ApplicationIds, pbOther.DeviceId)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}

@@ -49,11 +49,11 @@ func TestBackend(ctx context.Context, t *testing.T, a *assertions.Assertion, bac
 		ApplicationId: "test-app",
 	}
 	devID := ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: appID,
-		DeviceId:               "test-dev",
-		DevEui:                 &eui,
-		JoinEui:                &eui,
-		DevAddr:                &devAddr,
+		ApplicationIds: &appID,
+		DeviceId:       "test-dev",
+		DevEui:         &eui,
+		JoinEui:        &eui,
+		DevAddr:        &devAddr,
 	}
 	gtwID := ttnpb.GatewayIdentifiers{
 		GatewayId: "test-gtw",

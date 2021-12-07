@@ -38,7 +38,7 @@ func TestInteropServer(t *testing.T) {
 		joinEUI := types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
 		devEUI := types.EUI64{8, 7, 6, 5, 4, 3, 2, 1}
 		id := ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{
 				ApplicationId: "test-app-id",
 			},
 			DeviceId: "test-device-id",

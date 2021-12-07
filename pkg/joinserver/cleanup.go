@@ -58,7 +58,7 @@ func (cleaner *RegistryCleaner) DeleteApplicationAndDeviceData(ctx context.Conte
 		if err != nil {
 			return err
 		}
-		err = DeleteDevice(ctx, cleaner.DevRegistry, devIds.ApplicationIdentifiers, devIds.DeviceId)
+		err = DeleteDevice(ctx, cleaner.DevRegistry, *devIds.ApplicationIds, devIds.DeviceId)
 		if err != nil {
 			return err
 		}

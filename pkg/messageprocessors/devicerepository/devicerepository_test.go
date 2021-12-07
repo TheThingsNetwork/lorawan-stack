@@ -166,7 +166,7 @@ func TestDeviceRepository(t *testing.T) {
 	}
 	devID := ttnpb.EndDeviceIdentifiers{
 		DeviceId: "dev1",
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{
 			ApplicationId: "app1",
 		},
 	}

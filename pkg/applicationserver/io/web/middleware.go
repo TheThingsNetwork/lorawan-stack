@@ -70,8 +70,8 @@ func (w *webhooks) validateAndFillIDs(next http.Handler) http.Handler {
 		}
 
 		devID := ttnpb.EndDeviceIdentifiers{
-			ApplicationIdentifiers: appID,
-			DeviceId:               vars["device_id"],
+			ApplicationIds: &appID,
+			DeviceId:       vars["device_id"],
 		}
 		if err := devID.ValidateContext(ctx); err != nil {
 			webhandlers.Error(w, r, err)
@@ -97,8 +97,8 @@ func (w *webhooks) requireApplicationRights(required ...ttnpb.Right) mux.Middlew
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 			ctx := req.Context()
-			appID := deviceIDFromContext(ctx).ApplicationIdentifiers
-			if err := rights.RequireApplication(ctx, appID, required...); err != nil {
+			appID := deviceIDFromContext(ctx).ApplicationIds
+			if err := rights.RequireApplication(ctx, *appID, required...); err != nil {
 				webhandlers.Error(res, req, err)
 				return
 			}

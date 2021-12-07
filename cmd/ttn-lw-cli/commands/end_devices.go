@@ -125,8 +125,8 @@ func getEndDeviceID(flagSet *pflag.FlagSet, args []string, requireID bool) (*ttn
 		return nil, errNoEndDeviceID.New()
 	}
 	ids := &ttnpb.EndDeviceIdentifiers{
-		ApplicationIdentifiers: ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
-		DeviceId:               deviceID,
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
+		DeviceId:       deviceID,
 	}
 	if joinEUIHex, _ := flagSet.GetString("join-eui"); joinEUIHex != "" {
 		var joinEUI types.EUI64
@@ -492,8 +492,8 @@ var (
 				if devID.DeviceId != "" {
 					device.DeviceId = devID.DeviceId
 				}
-				if devID.ApplicationId != "" {
-					device.ApplicationId = devID.ApplicationId
+				if devID.ApplicationIds != nil {
+					device.ApplicationIds = devID.ApplicationIds
 				}
 				if device.SupportsJoin && devID.JoinEui != nil {
 					device.JoinEui = devID.JoinEui
@@ -509,7 +509,7 @@ var (
 			requestDevEUI, _ := cmd.Flags().GetBool("request-dev-eui")
 			if requestDevEUI {
 				logger.Debug("request-dev-eui flag set, requesting a DevEUI")
-				devEUIResponse, err := ttnpb.NewApplicationRegistryClient(is).IssueDevEUI(ctx, &devID.ApplicationIdentifiers)
+				devEUIResponse, err := ttnpb.NewApplicationRegistryClient(is).IssueDevEUI(ctx, devID.ApplicationIds)
 				if err != nil {
 					return err
 				}
@@ -523,7 +523,7 @@ var (
 			}
 			paths = append(paths, newPaths...)
 
-			if device.ApplicationId == "" {
+			if device.GetApplicationIds().GetApplicationId() == "" {
 				return errNoApplicationID.New()
 			}
 			if device.DeviceId == "" {
@@ -734,7 +734,7 @@ var (
 					if err != nil {
 						return err
 					}
-					ids.ApplicationIdentifiers = *appID
+					ids.ApplicationIds = appID
 					list.EndDeviceIds = append(list.EndDeviceIds, &ids)
 				}
 				req.EndDevices = &ttnpb.ProvisionEndDevicesRequest_List{
@@ -1035,7 +1035,7 @@ This command may take end device identifiers from stdin.`,
 				if _, err := inputDecoder.Decode(&dev); err != nil {
 					return err
 				}
-				if dev.ApplicationId == "" {
+				if dev.GetApplicationIds().GetApplicationId() == "" {
 					return errNoApplicationID.New()
 				}
 				if dev.DeviceId == "" {

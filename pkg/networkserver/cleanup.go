@@ -49,7 +49,7 @@ func (cleaner *RegistryCleaner) DeleteDeviceData(ctx context.Context, devSet []s
 		if err != nil {
 			return err
 		}
-		_, _, err = cleaner.DevRegistry.SetByID(ctx, devIds.ApplicationIdentifiers, devIds.DeviceId, nil, func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		_, _, err = cleaner.DevRegistry.SetByID(ctx, *devIds.ApplicationIds, devIds.DeviceId, nil, func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if dev == nil {
 				return nil, nil, errDeviceNotFound.New()
 			}

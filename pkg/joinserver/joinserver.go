@@ -286,7 +286,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 					}
 					return res, err
 				}
-			}(dev.ApplicationIdentifiers)
+			}(*dev.ApplicationIds)
 
 			if externalAuth, ok := authorizer.(ExternalAuthorizer); ok {
 				netID := dev.NetId
@@ -593,7 +593,7 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 		}
 		netID := dev.NetId
 		if netID == nil {
-			appSettings, err := js.applicationActivationSettings.GetByID(ctx, dev.ApplicationIdentifiers, []string{
+			appSettings, err := js.applicationActivationSettings.GetByID(ctx, *dev.ApplicationIds, []string{
 				"home_net_id",
 				"kek_label",
 				"kek",
@@ -676,7 +676,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 				return nil, err
 			}
 		} else {
-			sets, err := js.applicationActivationSettings.GetByID(ctx, dev.ApplicationIdentifiers, []string{
+			sets, err := js.applicationActivationSettings.GetByID(ctx, *dev.ApplicationIds, []string{
 				"application_server_id",
 			})
 			if err != nil {
@@ -699,7 +699,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 			return nil, errRegistryOperation.WithCause(err)
 		}
 		ctx = dev.Context
-		if err := appAuth.RequireApplication(ctx, dev.ApplicationIdentifiers, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
+		if err := appAuth.RequireApplication(ctx, *dev.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 			return nil, err
 		}
 	}
@@ -752,7 +752,7 @@ func (js *JoinServer) GetHomeNetwork(ctx context.Context, joinEUI, devEUI types.
 	netID := dev.NetId
 
 	if netID == nil {
-		sets, err := js.applicationActivationSettings.GetByID(ctx, dev.ApplicationIdentifiers, []string{
+		sets, err := js.applicationActivationSettings.GetByID(ctx, *dev.ApplicationIds, []string{
 			"home_net_id",
 		})
 		if err != nil {

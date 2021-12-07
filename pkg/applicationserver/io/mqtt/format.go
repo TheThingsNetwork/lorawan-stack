@@ -55,5 +55,5 @@ func TopicParts(up *io.ContextualApplicationUp, layout topics.Layout) []string {
 	default:
 		panic("unreachable")
 	}
-	return f(unique.ID(up.Context, up.EndDeviceIds.ApplicationIdentifiers), up.EndDeviceIds.DeviceId)
+	return f(unique.ID(up.Context, up.EndDeviceIds.ApplicationIds), up.EndDeviceIds.DeviceId)
 }

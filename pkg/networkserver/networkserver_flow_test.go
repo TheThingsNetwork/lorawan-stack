@@ -281,7 +281,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		}
 
 		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-			if !a.So(env.AssertNsAsHandleUplink(ctx, dev.ApplicationIdentifiers, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+			if !a.So(env.AssertNsAsHandleUplink(ctx, *dev.ApplicationIds, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 				_, a := test.MustNewTFromContext(ctx)
 				if !a.So(ups, should.HaveLength, 1) {
 					return false

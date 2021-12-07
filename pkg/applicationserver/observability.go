@@ -260,7 +260,7 @@ func registerForwardUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 	default:
 		return
 	}
-	asMetrics.uplinkForwarded.WithLabelValues(ctx, msg.EndDeviceIds.ApplicationId).Inc()
+	asMetrics.uplinkForwarded.WithLabelValues(ctx, msg.EndDeviceIds.GetApplicationIds().GetApplicationId()).Inc()
 }
 
 func registerDropUp(ctx context.Context, msg *ttnpb.ApplicationUp, err error) {
@@ -290,7 +290,7 @@ func registerUplinkLatency(ctx context.Context, msg *ttnpb.ApplicationUplink) {
 
 func registerReceiveDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink) {
 	events.Publish(evtReceiveDataDown.NewWithIdentifiersAndData(ctx, &ids, msg))
-	asMetrics.downlinkReceived.WithLabelValues(ctx, ids.ApplicationId).Inc()
+	asMetrics.downlinkReceived.WithLabelValues(ctx, ids.GetApplicationIds().GetApplicationId()).Inc()
 }
 
 func registerReceiveDownlinks(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink) {
