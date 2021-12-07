@@ -118,7 +118,7 @@ class Tabular extends React.Component {
         key={appliedRowKeySelector(row)}
         id={rowIndex}
         onClick={onRowClick}
-        clickable={clickable}
+        clickable={row.status?.otherCluster ? !row.status.otherCluster : clickable}
         linkTo={rowHrefSelector ? rowHrefSelector(row) : undefined}
         body
       >

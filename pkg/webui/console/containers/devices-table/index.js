@@ -15,10 +15,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
+import { defineMessages } from 'react-intl'
 
 import Button from '@ttn-lw/components/button'
 import SafeInspector from '@ttn-lw/components/safe-inspector'
 import Status from '@ttn-lw/components/status'
+import DocTooltip from '@ttn-lw/components/tooltip/doc'
+import Icon from '@ttn-lw/components/icon'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
@@ -29,9 +32,10 @@ import LastSeen from '@console/components/last-seen'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
-import { selectNsConfig, selectJsConfig } from '@ttn-lw/lib/selectors/env'
+import { selectNsConfig, selectJsConfig, selectAsConfig } from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 
 import {
   checkFromState,
@@ -56,6 +60,12 @@ import {
 } from '@console/store/selectors/devices'
 
 import style from './devices-table.styl'
+
+const m = defineMessages({
+  otherClusterTooltip:
+    'This end device is registered on a different cluster or host. It cannot be accessed using this Console. To access this device, use the Console of the cluster that this device was registered on.',
+})
+
 
 const headers = [
   {
@@ -92,15 +102,27 @@ const headers = [
       ),
   },
   {
-    name: '_derivedLastSeen',
+    name: 'status',
     displayName: sharedMessages.lastSeen,
     width: 14,
-    render: lastSeen =>
-      lastSeen ? (
-        <LastSeen lastSeen={lastSeen} short />
-      ) : (
-        <Status status="mediocre" label={sharedMessages.never} />
-      ),
+    render: status => {
+      if (status.otherCluster) {
+        return (
+          <DocTooltip
+            docPath="getting-started/cloud-hosted"
+            content={<Message content={m.otherClusterTooltip} />}
+          >
+            <Status status="unknown" label={sharedMessages.otherCluster} >
+              <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
+            </Status>
+          </DocTooltip>
+        )
+      } else if (status._derivedLastSeen) {
+        return <LastSeen lastSeen={status._derivedLastSeen} short />
+      }
+
+      return  <Status status="mediocre" label={sharedMessages.never} />
+    }
   },
 ]
 
@@ -108,10 +130,12 @@ const headers = [
   state => {
     const nsEnabled = selectNsConfig().enabled
     const jsEnabled = selectJsConfig().enabled
+    const asConfig = selectAsConfig()
     const mayCreateDevices = checkFromState(mayCreateOrEditApplicationDevices, state)
 
     return {
       appId: selectSelectedApplicationId(state),
+      asConfig,
       deviceTemplateFormats: selectDeviceTemplateFormats(state),
       mayCreateDevices: mayCreateDevices && (nsEnabled || jsEnabled),
       mayImportDevices: mayCreateDevices,
@@ -126,6 +150,7 @@ const headers = [
 class DevicesTable extends React.Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
+    asConfig: PropTypes.stackComponent.isRequired,
     devicePathPrefix: PropTypes.string,
     deviceTemplateFormats: PropTypes.shape({}).isRequired,
     error: PropTypes.error,
@@ -146,18 +171,31 @@ class DevicesTable extends React.Component {
     super(props)
 
     this.getDevicesList = filters =>
-      getDevicesList(props.appId, filters, ['name'], { withLastSeen: true })
+      getDevicesList(
+        props.appId, 
+        filters, 
+        ['name', 'application_server_address', 'network_server_address', 'join_server_address'], 
+        { withLastSeen: true, withStatus: true },
+      )
   }
 
   @bind
   baseDataSelector(state) {
-    const { mayCreateDevices, appId } = this.props
+    const { mayCreateDevices, appId, asConfig } = this.props
     const devices = selectDevices(state)
     const decoratedDevices = []
+    const { base_url: stackAsUrl } = asConfig
+    const currentHost = getHostnameFromUrl(stackAsUrl)
+
     for (const device of devices) {
       decoratedDevices.push({
         ...device,
-        _derivedLastSeen: selectDeviceDerivedLastSeen(state, appId, device.ids.device_id),
+        status: {
+          _derivedLastSeen: selectDeviceDerivedLastSeen(state, appId, device.ids.device_id),
+          otherCluster: currentHost !== device.application_server_address ||
+          currentHost !== device.network_server_address ||
+          currentHost !== device.join_server_address,
+        }
       })
     }
     return {

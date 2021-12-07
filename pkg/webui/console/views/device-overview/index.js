@@ -16,19 +16,23 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
+import { Redirect } from 'react-router'
 
 import DataSheet from '@ttn-lw/components/data-sheet'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
 import DeviceMap from '@console/components/device-map'
 
 import DeviceEvents from '@console/containers/device-events'
 
+import { selectAsConfig } from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
@@ -45,12 +49,24 @@ const m = defineMessages({
   keysNotExposed: 'Keys are not exposed',
 })
 
-@connect(state => ({
-  device: selectSelectedDevice(state),
-}))
+@connect(state => {
+  const device = selectSelectedDevice(state)
+  const asConfig = selectAsConfig()
+  const currentHost = getHostnameFromUrl(asConfig.stackAsUrl)
+  const redirect = currentHost !== device.application_server_address ||
+  currentHost !== device.network_server_address ||
+  currentHost !== device.join_server_address
+  return {
+    device,
+    asConfig,
+    currentHost,
+    redirect,
+  }
+})
 class DeviceOverview extends React.Component {
   static propTypes = {
     device: PropTypes.device.isRequired,
+    asConfig: PropTypes.stackComponent.isRequired,
   }
 
   get deviceInfo() {
@@ -219,8 +235,13 @@ class DeviceOverview extends React.Component {
   }
 
   render() {
-    const { device } = this.props
+    const { device, redirect } = this.props
     const devIds = device && device.ids
+
+    if (redirect) {
+      return <Redirect to='/applications'/>
+    }
+
     return (
       <Container>
         <IntlHelmet title={sharedMessages.overview} />
