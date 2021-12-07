@@ -48,7 +48,10 @@ var (
 			Latitude: 567,
 		},
 	}
+
 	errUnavailable = errors.DefineUnavailable("unavailable", "unavailable")
+
+	Timeout = (1 << 8) * test.Delay
 )
 
 func TestLocationCache(t *testing.T) {
@@ -64,7 +67,7 @@ func TestLocationCache(t *testing.T) {
 	a.So(errors.IsNotFound(err), should.BeTrue)
 
 	storeTime := time.Now()
-	err = cache.Set(ctx, registeredEndDeviceIDs, locationA)
+	err = cache.Set(ctx, registeredEndDeviceIDs, locationA, Timeout)
 	a.So(err, should.BeNil)
 
 	locations, storedAt, err := cache.Get(ctx, registeredEndDeviceIDs)
@@ -79,7 +82,7 @@ func TestLocationCache(t *testing.T) {
 	}
 
 	storeTime = time.Now()
-	err = cache.Set(ctx, registeredEndDeviceIDs, locationB)
+	err = cache.Set(ctx, registeredEndDeviceIDs, locationB, Timeout)
 	a.So(err, should.BeNil)
 
 	locations, storedAt, err = cache.Get(ctx, registeredEndDeviceIDs)
@@ -95,6 +98,27 @@ func TestLocationCache(t *testing.T) {
 
 	err = cache.Delete(ctx, registeredEndDeviceIDs)
 	a.So(err, should.BeNil)
+
+	_, _, err = cache.Get(ctx, registeredEndDeviceIDs)
+	a.So(err, should.NotBeNil)
+	a.So(errors.IsNotFound(err), should.BeTrue)
+
+	storeTime = time.Now()
+	err = cache.Set(ctx, registeredEndDeviceIDs, locationA, Timeout)
+	a.So(err, should.BeNil)
+
+	locations, storedAt, err = cache.Get(ctx, registeredEndDeviceIDs)
+	if a.So(err, should.BeNil) {
+		if a.So(storedAt, should.NotBeNil) {
+			a.So(*storedAt, should.HappenAfter, storeTime)
+		}
+		a.So(len(locations), should.Equal, len(locationA))
+		for k, v := range locations {
+			a.So(locationA[k], should.Resemble, v)
+		}
+	}
+
+	time.Sleep(2 * Timeout)
 
 	_, _, err = cache.Get(ctx, registeredEndDeviceIDs)
 	a.So(err, should.NotBeNil)

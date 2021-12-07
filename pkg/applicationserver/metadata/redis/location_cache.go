@@ -86,7 +86,7 @@ func (r *EndDeviceLocationCache) Get(ctx context.Context, ids ttnpb.EndDeviceIde
 }
 
 // Set updates the locations by the end device identifiers.
-func (r *EndDeviceLocationCache) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location) error {
+func (r *EndDeviceLocationCache) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location, ttl time.Duration) error {
 	pairs := append(make([]string, 0, 2*len(update)+2), storedAtMarker, fmt.Sprintf("%v", time.Now().UnixNano()))
 	for k, v := range update {
 		s, err := ttnredis.MarshalProto(v)
@@ -99,6 +99,7 @@ func (r *EndDeviceLocationCache) Set(ctx context.Context, ids ttnpb.EndDeviceIde
 	if _, err := r.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
 		p.Del(ctx, uidKey)
 		p.HSet(ctx, uidKey, pairs)
+		p.PExpire(ctx, uidKey, ttl)
 		return nil
 	}); err != nil {
 		return ttnredis.ConvertError(err)

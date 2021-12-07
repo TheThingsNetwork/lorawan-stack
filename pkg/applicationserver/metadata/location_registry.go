@@ -161,8 +161,9 @@ type cachedEndDeviceLocationRegistry struct {
 	registry EndDeviceLocationRegistry
 	cache    EndDeviceLocationCache
 
-	softTTL time.Duration
-	hardTTL time.Duration
+	minRefreshInterval time.Duration
+	maxRefreshInterval time.Duration
+	ttl                time.Duration
 
 	replicationPool workerpool.WorkerPool
 }
@@ -177,16 +178,16 @@ func (c *cachedEndDeviceLocationRegistry) Get(ctx context.Context, ids ttnpb.End
 		locations = nil
 	case err == nil:
 		age := time.Since(*storedAt)
-		if age <= c.softTTL {
-			// If the object is younger than the soft TTL, just return the cached value.
+		if age <= c.minRefreshInterval {
+			// If the object is younger than the minimum refresh interval, just return the cached value.
 			return locations, nil
 		}
-		if remaining := c.hardTTL - age; remaining > 0 {
-			// If the objects age is between the soft and hard TTL, check if we should asynchronously
+		if remaining := c.maxRefreshInterval - age; remaining > 0 {
+			// If the objects age is between the minimum and maximum refresh interval, check if we should asynchronously
 			// refresh the cache.
-			window := c.hardTTL - c.softTTL
+			window := c.maxRefreshInterval - c.minRefreshInterval
 			threshold := time.Duration(random.Int63n(int64(window)))
-			// remaining is the remaining window of the soft TTL in the (0, window) interval.
+			// remaining is the remaining window of the refresh interval in the (0, window) interval.
 			// threshold is a uniformly distributed duration in the [0, window) interval.
 			if remaining >= threshold {
 				return locations, nil
@@ -205,7 +206,7 @@ func (c *cachedEndDeviceLocationRegistry) Merge(ctx context.Context, ids ttnpb.E
 	if err != nil {
 		return nil, err
 	}
-	if err := c.cache.Set(ctx, ids, locations); err != nil {
+	if err := c.cache.Set(ctx, ids, locations, c.ttl); err != nil {
 		return nil, err
 	}
 	return locations, nil
@@ -215,13 +216,14 @@ func (c *cachedEndDeviceLocationRegistry) Merge(ctx context.Context, ids ttnpb.E
 // EndDeviceLocationCache. On cache miss, the registry will retrieve and cache the locations asynchronously.
 // Items whose TTL is within the soft TTL window have a chance to trigger an asynchronous cache synchronization event on location retrieval.
 // The probability of a synchronization event increases linearly between the soft TTL (0%) and the hard TTL (100%).
-func NewCachedEndDeviceLocationRegistry(ctx context.Context, c workerpool.Component, registry EndDeviceLocationRegistry, cache EndDeviceLocationCache, softTTL, hardTTL time.Duration) EndDeviceLocationRegistry {
+func NewCachedEndDeviceLocationRegistry(ctx context.Context, c workerpool.Component, registry EndDeviceLocationRegistry, cache EndDeviceLocationCache, minRefreshInterval, maxRefreshInterval, ttl time.Duration) EndDeviceLocationRegistry {
 	st := &cachedEndDeviceLocationRegistry{
 		registry: registry,
 		cache:    cache,
 
-		softTTL: softTTL,
-		hardTTL: hardTTL,
+		minRefreshInterval: minRefreshInterval,
+		maxRefreshInterval: maxRefreshInterval,
+		ttl:                ttl,
 
 		replicationPool: workerpool.NewWorkerPool(workerpool.Config{
 			Component: c,
@@ -234,7 +236,7 @@ func NewCachedEndDeviceLocationRegistry(ctx context.Context, c workerpool.Compon
 					log.FromContext(ctx).WithError(err).Warn("Failed to retrieve end device locations")
 					return
 				}
-				if err := cache.Set(ctx, ids, locations); err != nil {
+				if err := cache.Set(ctx, ids, locations, ttl); err != nil {
 					log.FromContext(ctx).WithError(err).Warn("Failed to cache end device locations")
 					return
 				}
