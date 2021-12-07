@@ -161,32 +161,36 @@ type cachedEndDeviceLocationRegistry struct {
 	registry EndDeviceLocationRegistry
 	cache    EndDeviceLocationCache
 
-	softTTL  time.Duration
-	hardTTL  time.Duration
-	errorTTL time.Duration
+	softTTL time.Duration
+	hardTTL time.Duration
 
 	replicationPool workerpool.WorkerPool
 }
 
 // Get implements EndDeviceLocationRegistry.
 func (c *cachedEndDeviceLocationRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, error) {
-	locations, ttl, err := c.cache.Get(ctx, ids)
+	locations, storedAt, err := c.cache.Get(ctx, ids)
 	switch {
 	case err != nil && !errors.IsNotFound(err):
 		return nil, err
 	case err != nil && errors.IsNotFound(err):
 		locations = nil
 	case err == nil:
-		window := c.hardTTL - c.softTTL
-		remaining := window - ttl
-		if remaining <= 0 {
+		age := time.Since(*storedAt)
+		if age <= c.softTTL {
+			// If the object is younger than the soft TTL, just return the cached value.
 			return locations, nil
 		}
-		threshold := time.Duration(random.Int63n(int64(window)))
-		// remaining is the remaining window of the soft TTL in the (0, window) interval.
-		// threshold is a uniformly distributed duration in the [0, window) interval.
-		if remaining >= threshold {
-			return locations, nil
+		if remaining := c.hardTTL - age; remaining > 0 {
+			// If the objects age is between the soft and hard TTL, check if we should asynchronously
+			// refresh the cache.
+			window := c.hardTTL - c.softTTL
+			threshold := time.Duration(random.Int63n(int64(window)))
+			// remaining is the remaining window of the soft TTL in the (0, window) interval.
+			// threshold is a uniformly distributed duration in the [0, window) interval.
+			if remaining >= threshold {
+				return locations, nil
+			}
 		}
 	}
 	if err := c.replicationPool.Publish(ctx, ids); err != nil {
@@ -201,26 +205,23 @@ func (c *cachedEndDeviceLocationRegistry) Merge(ctx context.Context, ids ttnpb.E
 	if err != nil {
 		return nil, err
 	}
-	if err := c.cache.SetLocations(ctx, ids, locations, c.hardTTL); err != nil {
+	if err := c.cache.Set(ctx, ids, locations); err != nil {
 		return nil, err
 	}
 	return locations, nil
 }
 
-var errRegistry = errors.DefineUnavailable("registry", "registry unavailable")
-
 // NewCachedEndDeviceLocationRegistry returns an EndDeviceLocationRegistry that caches the responses of the provided EndDeviceLocationRegistry in the provided
 // EndDeviceLocationCache. On cache miss, the registry will retrieve and cache the locations asynchronously.
 // Items whose TTL is within the soft TTL window have a chance to trigger an asynchronous cache synchronization event on location retrieval.
 // The probability of a synchronization event increases linearly between the soft TTL (0%) and the hard TTL (100%).
-func NewCachedEndDeviceLocationRegistry(ctx context.Context, c workerpool.Component, registry EndDeviceLocationRegistry, cache EndDeviceLocationCache, softTTL, hardTTL, errorTTL time.Duration) EndDeviceLocationRegistry {
+func NewCachedEndDeviceLocationRegistry(ctx context.Context, c workerpool.Component, registry EndDeviceLocationRegistry, cache EndDeviceLocationCache, softTTL, hardTTL time.Duration) EndDeviceLocationRegistry {
 	st := &cachedEndDeviceLocationRegistry{
 		registry: registry,
 		cache:    cache,
 
-		softTTL:  softTTL,
-		hardTTL:  hardTTL,
-		errorTTL: errorTTL,
+		softTTL: softTTL,
+		hardTTL: hardTTL,
 
 		replicationPool: workerpool.NewWorkerPool(workerpool.Config{
 			Component: c,
@@ -231,13 +232,9 @@ func NewCachedEndDeviceLocationRegistry(ctx context.Context, c workerpool.Compon
 				locations, err := registry.Get(ctx, ids)
 				if err != nil {
 					log.FromContext(ctx).WithError(err).Warn("Failed to retrieve end device locations")
-					details := ttnpb.ErrorDetailsToProto(errRegistry.WithCause(err))
-					if err := cache.SetErrorDetails(ctx, ids, details, errorTTL); err != nil {
-						log.FromContext(ctx).WithError(err).Warn("Failed to cache end device location retrival error")
-					}
 					return
 				}
-				if err := cache.SetLocations(ctx, ids, locations, hardTTL); err != nil {
+				if err := cache.Set(ctx, ids, locations); err != nil {
 					log.FromContext(ctx).WithError(err).Warn("Failed to cache end device locations")
 					return
 				}

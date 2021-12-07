@@ -234,7 +234,7 @@ func TestCachedEndDeviceLocationRegistry(t *testing.T) {
 		Redis: cl,
 	}
 	registry = metadata.NewCachedEndDeviceLocationRegistry(
-		ctx, c, registry, cache, 4*Timeout, 8*Timeout, 2*Timeout,
+		ctx, c, registry, cache, 4*Timeout, 8*Timeout,
 	)
 
 	locations, err := registry.Get(ctx, registeredEndDeviceIDs)
@@ -283,29 +283,45 @@ func TestCachedEndDeviceLocationRegistry(t *testing.T) {
 		}
 	}
 
-	// Wait for the cache to evict the locations.
-	time.Sleep(8 * Timeout)
-
-	locations, err = registry.Get(ctx, registeredEndDeviceIDs)
-	a.So(err, should.BeNil)
-	a.So(locations, should.HaveLength, 0)
-
-	// Wait for the cache to evict the locations, as the previous
-	// check has triggered an asynchronous replication.
+	// Wait for the cached item to become older than the hard TTL.
 	time.Sleep(8 * Timeout)
 
 	// Simulate a network partition.
 	closeIS()
 	time.Sleep(Timeout)
 
+	// Do a read that will trigger an asynchronous cache refresh.
 	locations, err = registry.Get(ctx, registeredEndDeviceIDs)
-	a.So(err, should.BeNil)
-	a.So(locations, should.HaveLength, 0)
+	if a.So(err, should.BeNil) {
+		a.So(locations, should.NotBeNil)
+		a.So(len(locations), should.Equal, len(registeredEndDevice.Locations))
+		for k, v := range locations {
+			a.So(registeredEndDevice.Locations[k], should.Resemble, v)
+		}
+		for k, v := range originalLocations {
+			a.So(locations[k], should.Resemble, v)
+		}
+		for k, v := range locationsPatch {
+			a.So(locations[k], should.Resemble, v)
+		}
+	}
 
 	// Wait for the partition to be detected asynchronously.
 	time.Sleep(Timeout)
 
+	// We now serve stale data.
 	locations, err = registry.Get(ctx, registeredEndDeviceIDs)
-	a.So(err, should.NotBeNil)
-	a.So(errors.IsUnavailable(err), should.BeTrue)
+	if a.So(err, should.BeNil) {
+		a.So(locations, should.NotBeNil)
+		a.So(len(locations), should.Equal, len(registeredEndDevice.Locations))
+		for k, v := range locations {
+			a.So(registeredEndDevice.Locations[k], should.Resemble, v)
+		}
+		for k, v := range originalLocations {
+			a.So(locations[k], should.Resemble, v)
+		}
+		for k, v := range locationsPatch {
+			a.So(locations[k], should.Resemble, v)
+		}
+	}
 }
