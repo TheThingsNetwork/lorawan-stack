@@ -72,7 +72,7 @@ func TestRegistry(t *testing.T) {
 
 	t.Run("EmptyStats", func(t *testing.T) {
 		a, ctx := test.New(t)
-		err := registry.Set(ctx, ids3, nil, []string{})
+		err := registry.Set(ctx, ids3, nil, []string{}, 0)
 		a.So(err, should.BeNil)
 		retrieved, err := registry.Get(ctx, ids3)
 		a.So(retrieved, should.BeNil)
@@ -88,7 +88,7 @@ func TestRegistry(t *testing.T) {
 			"downlink_count",
 			"last_uplink_received_at",
 			"uplink_count",
-		})
+		}, 0)
 		a.So(err, should.BeNil)
 		retrieved, err := registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
@@ -100,7 +100,7 @@ func TestRegistry(t *testing.T) {
 		a.So(errors.IsNotFound(err), should.BeTrue)
 
 		// Unset
-		err = registry.Set(ctx, ids, nil, nil)
+		err = registry.Set(ctx, ids, nil, nil, 0)
 		a.So(err, should.BeNil)
 		retrieved, err = registry.Get(ctx, ids)
 		a.So(errors.IsNotFound(err), should.BeTrue)
@@ -109,8 +109,8 @@ func TestRegistry(t *testing.T) {
 
 	t.Run("ClearManyTimes", func(t *testing.T) {
 		a, ctx := test.New(t)
-		a.So(registry.Set(ctx, ids, nil, nil), should.BeNil)
-		a.So(registry.Set(ctx, ids, nil, nil), should.BeNil)
+		a.So(registry.Set(ctx, ids, nil, nil, 0), should.BeNil)
+		a.So(registry.Set(ctx, ids, nil, nil, 0), should.BeNil)
 	})
 
 	t.Run("UpdateFieldMask", func(t *testing.T) {
@@ -125,7 +125,7 @@ func TestRegistry(t *testing.T) {
 		err := registry.Set(ctx, ids, stats, []string{
 			"uplink_count",
 			"last_uplink_received_at",
-		})
+		}, 0)
 		a.So(err, should.BeNil)
 		retrieved, err := registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
@@ -135,7 +135,7 @@ func TestRegistry(t *testing.T) {
 		})
 
 		// Now update downlink also
-		err = registry.Set(ctx, ids, stats, []string{"downlink_count"})
+		err = registry.Set(ctx, ids, stats, []string{"downlink_count"}, 0)
 		a.So(err, should.BeNil)
 		retrieved, err = registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
@@ -153,7 +153,7 @@ func TestRegistry(t *testing.T) {
 			"uplink_count",
 			"last_uplink_received_at",
 			"downlink_count",
-		})
+		}, 0)
 		a.So(err, should.BeNil)
 		retrieved, err = registry.Get(ctx, ids)
 		a.So(err, should.BeNil)
