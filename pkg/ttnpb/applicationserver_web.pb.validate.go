@@ -498,7 +498,33 @@ func (m *ApplicationWebhookTemplate) ValidateFields(paths ...string) error {
 			}
 
 		case "headers":
-			// no validation rules for Headers
+
+			if len(m.GetHeaders()) > 50 {
+				return ApplicationWebhookTemplateValidationError{
+					field:  "headers",
+					reason: "value must contain no more than 50 pair(s)",
+				}
+			}
+
+			for key, val := range m.GetHeaders() {
+				_ = val
+
+				if utf8.RuneCountInString(key) > 64 {
+					return ApplicationWebhookTemplateValidationError{
+						field:  fmt.Sprintf("headers[%v]", key),
+						reason: "value length must be at most 64 runes",
+					}
+				}
+
+				if utf8.RuneCountInString(val) > 256 {
+					return ApplicationWebhookTemplateValidationError{
+						field:  fmt.Sprintf("headers[%v]", key),
+						reason: "value length must be at most 256 runes",
+					}
+				}
+
+			}
+
 		case "format":
 
 			if utf8.RuneCountInString(m.GetFormat()) > 20 {

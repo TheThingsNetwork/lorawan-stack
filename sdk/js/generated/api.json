@@ -6138,7 +6138,23 @@
               "ismap": true,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "map.max_pairs",
+                    "value": 50
+                  },
+                  {
+                    "name": "map.keys.string.max_len",
+                    "value": 64
+                  },
+                  {
+                    "name": "map.values.string.max_len",
+                    "value": 256
+                  }
+                ]
+              }
             },
             {
               "name": "format",
