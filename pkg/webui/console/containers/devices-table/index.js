@@ -66,7 +66,6 @@ const m = defineMessages({
     'This end device is registered on a different cluster or host. It cannot be accessed using this Console. To access this device, use the Console of the cluster that this device was registered on.',
 })
 
-
 const headers = [
   {
     name: 'ids.device_id',
@@ -112,7 +111,7 @@ const headers = [
             docPath="getting-started/cloud-hosted"
             content={<Message content={m.otherClusterTooltip} />}
           >
-            <Status status="unknown" label={sharedMessages.otherCluster} >
+            <Status status="unknown" label={sharedMessages.otherCluster}>
               <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
             </Status>
           </DocTooltip>
@@ -121,8 +120,8 @@ const headers = [
         return <LastSeen lastSeen={status._derivedLastSeen} short />
       }
 
-      return  <Status status="mediocre" label={sharedMessages.never} />
-    }
+      return <Status status="mediocre" label={sharedMessages.never} />
+    },
   },
 ]
 
@@ -172,9 +171,9 @@ class DevicesTable extends React.Component {
 
     this.getDevicesList = filters =>
       getDevicesList(
-        props.appId, 
-        filters, 
-        ['name', 'application_server_address', 'network_server_address', 'join_server_address'], 
+        props.appId,
+        filters,
+        ['name', 'application_server_address', 'network_server_address', 'join_server_address'],
         { withLastSeen: true, withStatus: true },
       )
   }
@@ -192,10 +191,11 @@ class DevicesTable extends React.Component {
         ...device,
         status: {
           _derivedLastSeen: selectDeviceDerivedLastSeen(state, appId, device.ids.device_id),
-          otherCluster: currentHost !== device.application_server_address ||
-          currentHost !== device.network_server_address ||
-          currentHost !== device.join_server_address,
-        }
+          otherCluster:
+            currentHost !== device.application_server_address ||
+            currentHost !== device.network_server_address ||
+            currentHost !== device.join_server_address,
+        },
       })
     }
     return {

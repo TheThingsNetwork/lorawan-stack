@@ -23,7 +23,6 @@ import DataSheet from '@ttn-lw/components/data-sheet'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
-import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
 import DeviceMap from '@console/components/device-map'
 
@@ -52,21 +51,24 @@ const m = defineMessages({
 @connect(state => {
   const device = selectSelectedDevice(state)
   const asConfig = selectAsConfig()
-  const currentHost = getHostnameFromUrl(asConfig.stackAsUrl)
-  const redirect = currentHost !== device.application_server_address ||
-  currentHost !== device.network_server_address ||
-  currentHost !== device.join_server_address
+  const currentHost = getHostnameFromUrl(asConfig.base_url)
+  const redirect =
+    currentHost !== device.application_server_address ||
+    currentHost !== device.network_server_address ||
+    currentHost !== device.join_server_address
   return {
     device,
-    asConfig,
-    currentHost,
     redirect,
   }
 })
 class DeviceOverview extends React.Component {
   static propTypes = {
     device: PropTypes.device.isRequired,
-    asConfig: PropTypes.stackComponent.isRequired,
+    redirect: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    redirect: false,
   }
 
   get deviceInfo() {
@@ -239,7 +241,7 @@ class DeviceOverview extends React.Component {
     const devIds = device && device.ids
 
     if (redirect) {
-      return <Redirect to='/applications'/>
+      return <Redirect to="/applications" />
     }
 
     return (
