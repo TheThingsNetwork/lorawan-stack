@@ -16,17 +16,19 @@ package account
 
 import (
 	"context"
+	"net/http"
 
-	echo "github.com/labstack/echo/v4"
+	"github.com/gorilla/csrf"
+	"github.com/gorilla/mux"
 	sess "go.thethings.network/lorawan-stack/v3/pkg/account/session"
 	account_store "go.thethings.network/lorawan-stack/v3/pkg/account/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
-	web_errors "go.thethings.network/lorawan-stack/v3/pkg/errors/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
-	"go.thethings.network/lorawan-stack/v3/pkg/web/middleware"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
+	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 )
 
@@ -34,9 +36,9 @@ import (
 type Server interface {
 	web.Registerer
 
-	Login(c echo.Context) error
-	CurrentUser(c echo.Context) error
-	Logout(c echo.Context) error
+	Login(w http.ResponseWriter, r *http.Request)
+	CurrentUser(w http.ResponseWriter, r *http.Request)
+	Logout(w http.ResponseWriter, r *http.Request)
 }
 
 // Component represents the Component to the Account app.
@@ -86,47 +88,54 @@ func (s *server) Printf(format string, v ...interface{}) {
 }
 
 func (s *server) RegisterRoutes(server *web.Server) {
-	csrfMiddleware := middleware.CSRF("_csrf", "/", s.config.CSRFAuthKey)
-	root := server.Group(
-		s.config.Mount,
-		func(next echo.HandlerFunc) echo.HandlerFunc {
-			return func(c echo.Context) error {
-				nonce := webui.GenerateNonce()
-				c.Set("csp_nonce", nonce)
-				cspString := s.generateCSP(s.configFromContext(c.Request().Context()), nonce)
-				c.Response().Header().Set("Content-Security-Policy", cspString)
-				return next(c)
-			}
+	csrfMiddleware := webmiddleware.CSRF(
+		s.config.CSRFAuthKey,
+		csrf.CookieName("_csrf"),
+		csrf.FieldName("_csrf"),
+		csrf.Path("/"),
+	)
+	router := server.PrefixWithRedirect(s.config.Mount).Subrouter()
+	router.Use(
+		func(next http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				r, nonce := webui.WithNonce(r)
+				cspString := s.generateCSP(s.configFromContext(r.Context()), nonce)
+				w.Header().Set("Content-Security-Policy", cspString)
+				next.ServeHTTP(w, r)
+			})
 		},
-		ratelimit.EchoMiddleware(s.c.RateLimiter(), "http:account"),
-		func(next echo.HandlerFunc) echo.HandlerFunc {
-			return func(c echo.Context) error {
-				config := s.configFromContext(c.Request().Context())
-				c.Set("template_data", config.UI.TemplateData)
+		ratelimit.HTTPMiddleware(s.c.RateLimiter(), "http:account"),
+		func(next http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				config := s.configFromContext(r.Context())
+				r = webui.WithTemplateData(r, config.UI.TemplateData)
 				frontendConfig := config.UI.FrontendConfig
 				frontendConfig.Language = config.UI.TemplateData.Language
-				c.Set("app_config", struct {
+				r = webui.WithAppConfig(r, struct {
 					oauth.FrontendConfig
 				}{
 					FrontendConfig: frontendConfig,
 				})
-				return next(c)
-			}
+				next.ServeHTTP(w, r)
+			})
 		},
-		web_errors.ErrorMiddleware(map[string]web_errors.ErrorRenderer{
+		webhandlers.WithErrorHandlers(map[string]http.Handler{
 			"text/html": webui.Template,
 		}),
-		csrfMiddleware,
+		mux.MiddlewareFunc(csrfMiddleware),
 	)
 
-	api := root.Group("/api")
-	api.POST("/auth/login", s.Login)
-	api.POST("/auth/token-login", s.TokenLogin)
-	api.POST("/auth/logout", s.Logout, s.requireLogin)
-	api.GET("/me", s.CurrentUser, s.requireLogin)
+	logoutHandler := s.requireLogin(http.HandlerFunc(s.Logout))
+	currentUserHandler := s.requireLogin(http.HandlerFunc(s.CurrentUser))
+	api := router.NewRoute().PathPrefix("/api").Subrouter()
+	api.Path("/auth/login").HandlerFunc(s.Login).Methods(http.MethodPost)
+	api.Path("/auth/token-login").HandlerFunc(s.TokenLogin).Methods(http.MethodPost)
+	api.Path("/auth/logout").Handler(logoutHandler).Methods(http.MethodPost)
+	api.Path("/me").Handler(currentUserHandler).Methods(http.MethodGet)
 
-	page := root.Group("")
-	page.GET("/login", webui.Template.Handler, s.redirectToNext)
-	page.GET("/token-login", webui.Template.Handler, s.redirectToNext)
-	page.GET("/*", webui.Template.Handler)
+	loginHandler := s.redirectToNext(webui.Template)
+	page := router.NewRoute().Subrouter()
+	page.Path("/login").Handler(loginHandler).Methods(http.MethodGet)
+	page.Path("/token-login").Handler(loginHandler).Methods(http.MethodGet)
+	page.NewRoute().Handler(webui.Template)
 }

@@ -21,7 +21,7 @@ import (
 	"strings"
 	"time"
 
-	echo "github.com/labstack/echo/v4"
+	"github.com/gorilla/schema"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
 
 var tokenHashSettings auth.HashValidator = pbkdf2.PBKDF2{
@@ -38,18 +39,24 @@ var tokenHashSettings auth.HashValidator = pbkdf2.PBKDF2{
 	SaltLength: 16,
 }
 
-func (s *server) CurrentUser(c echo.Context) error {
-	session, err := s.session.Get(c)
+func (s *server) CurrentUser(w http.ResponseWriter, r *http.Request) {
+	r, session, err := s.session.Get(w, r)
 	if err != nil {
-		return err
+		webhandlers.Error(w, r, err)
+		return
 	}
-	user, err := s.session.GetUser(c)
+	r, user, err := s.session.GetUser(w, r)
 	if err != nil {
-		return err
+		webhandlers.Error(w, r, err)
+		return
 	}
 	safeUser := user.PublicSafe()
-	userJSON, _ := jsonpb.TTN().Marshal(safeUser)
-	return c.JSON(http.StatusOK, struct {
+	userJSON, err := jsonpb.TTN().Marshal(safeUser)
+	if err != nil {
+		webhandlers.Error(w, r, err)
+		return
+	}
+	webhandlers.JSON(w, r, struct {
 		User       json.RawMessage `json:"user"`
 		LoggedInAt *time.Time      `json:"logged_in_at"`
 	}{
@@ -65,8 +72,8 @@ var (
 )
 
 type loginRequest struct {
-	UserID   string `json:"user_id" form:"user_id"`
-	Password string `json:"password" form:"password"`
+	UserID   string `json:"user_id" schema:"user_id"`
+	Password string `json:"password" schema:"password"`
 }
 
 // ValidateContext validates the login request.
@@ -82,26 +89,44 @@ func (req *loginRequest) ValidateContext(ctx context.Context) error {
 	}).ValidateFields("user_id")
 }
 
-func (s *server) Login(c echo.Context) error {
-	ctx := c.Request().Context()
-	req := new(loginRequest)
-	if err := c.Bind(req); err != nil {
-		return err
+var errParse = errors.DefineAborted("parse", "request body parsing")
+
+func (s *server) Login(w http.ResponseWriter, r *http.Request) {
+	var loginRequest loginRequest
+	switch r.Header.Get("Content-Type") {
+	case "application/json":
+		if err := json.NewDecoder(r.Body).Decode(&loginRequest); err != nil {
+			webhandlers.Error(w, r, errParse.WithCause(err))
+			return
+		}
+	default:
+		if err := r.ParseForm(); err != nil {
+			webhandlers.Error(w, r, errParse.WithCause(err))
+			return
+		}
+		if err := schema.NewDecoder().Decode(&loginRequest, r.Form); err != nil {
+			webhandlers.Error(w, r, errParse.WithCause(err))
+			return
+		}
 	}
-	if err := req.ValidateContext(c.Request().Context()); err != nil {
-		return err
+	ctx := r.Context()
+	if err := loginRequest.ValidateContext(ctx); err != nil {
+		webhandlers.Error(w, r, err)
+		return
 	}
-	if err := s.session.DoLogin(ctx, req.UserID, req.Password); err != nil {
-		return err
+	if err := s.session.DoLogin(ctx, loginRequest.UserID, loginRequest.Password); err != nil {
+		webhandlers.Error(w, r, err)
+		return
 	}
-	if err := s.CreateUserSession(c, &ttnpb.UserIdentifiers{UserId: req.UserID}); err != nil {
-		return err
+	if err := s.CreateUserSession(w, r, &ttnpb.UserIdentifiers{UserId: loginRequest.UserID}); err != nil {
+		webhandlers.Error(w, r, err)
+		return
 	}
-	return c.NoContent(http.StatusNoContent)
+	w.WriteHeader(http.StatusNoContent)
 }
 
 type tokenLoginRequest struct {
-	Token string `json:"token" form:"token"`
+	Token string `json:"token" schema:"token"`
 }
 
 var errMissingToken = errors.DefineInvalidArgument("missing_token", "missing token")
@@ -114,27 +139,43 @@ func (req *tokenLoginRequest) ValidateContext(ctx context.Context) error {
 	return nil
 }
 
-func (s *server) TokenLogin(c echo.Context) error {
-	ctx := c.Request().Context()
-	req := new(tokenLoginRequest)
-	if err := c.Bind(req); err != nil {
-		return err
+func (s *server) TokenLogin(w http.ResponseWriter, r *http.Request) {
+	var tokenLoginRequest tokenLoginRequest
+	switch r.Header.Get("Content-Type") {
+	case "application/json":
+		if err := json.NewDecoder(r.Body).Decode(&tokenLoginRequest); err != nil {
+			webhandlers.Error(w, r, errParse.WithCause(err))
+			return
+		}
+	default:
+		if err := r.ParseForm(); err != nil {
+			webhandlers.Error(w, r, errParse.WithCause(err))
+			return
+		}
+		if err := schema.NewDecoder().Decode(&tokenLoginRequest, r.Form); err != nil {
+			webhandlers.Error(w, r, errParse.WithCause(err))
+			return
+		}
 	}
-	if err := req.ValidateContext(c.Request().Context()); err != nil {
-		return err
+	ctx := r.Context()
+	if err := tokenLoginRequest.ValidateContext(ctx); err != nil {
+		webhandlers.Error(w, r, err)
+		return
 	}
-	loginToken, err := s.store.ConsumeLoginToken(ctx, req.Token)
+	loginToken, err := s.store.ConsumeLoginToken(ctx, tokenLoginRequest.Token)
 	if err != nil {
-		return err
+		webhandlers.Error(w, r, err)
+		return
 	}
-	if err := s.CreateUserSession(c, loginToken.GetUserIds()); err != nil {
-		return err
+	if err := s.CreateUserSession(w, r, loginToken.GetUserIds()); err != nil {
+		webhandlers.Error(w, r, err)
+		return
 	}
-	return c.NoContent(http.StatusNoContent)
+	w.WriteHeader(http.StatusNoContent)
 }
 
-func (s *server) CreateUserSession(c echo.Context, userIDs *ttnpb.UserIdentifiers) error {
-	ctx := c.Request().Context()
+func (s *server) CreateUserSession(w http.ResponseWriter, r *http.Request, userIDs *ttnpb.UserIdentifiers) error {
+	ctx := r.Context()
 	tokenSecret, err := auth.GenerateKey(ctx)
 	if err != nil {
 		return err
@@ -151,7 +192,7 @@ func (s *server) CreateUserSession(c echo.Context, userIDs *ttnpb.UserIdentifier
 		return err
 	}
 	events.Publish(oauth.EvtUserLogin.NewWithIdentifiersAndData(ctx, userIDs, nil))
-	return s.session.UpdateAuthCookie(c, func(cookie *auth.CookieShape) error {
+	return s.session.UpdateAuthCookie(w, r, func(cookie *auth.CookieShape) error {
 		cookie.UserID = session.GetUserIds().GetUserId()
 		cookie.SessionID = session.SessionId
 		cookie.SessionSecret = tokenSecret
@@ -159,16 +200,18 @@ func (s *server) CreateUserSession(c echo.Context, userIDs *ttnpb.UserIdentifier
 	})
 }
 
-func (s *server) Logout(c echo.Context) error {
-	ctx := c.Request().Context()
-	session, err := s.session.Get(c)
+func (s *server) Logout(w http.ResponseWriter, r *http.Request) {
+	r, session, err := s.session.Get(w, r)
 	if err != nil {
-		return err
+		webhandlers.Error(w, r, err)
+		return
 	}
+	ctx := r.Context()
 	events.Publish(oauth.EvtUserLogout.NewWithIdentifiersAndData(ctx, session.GetUserIds(), nil))
-	if err = s.store.DeleteSession(ctx, session.GetUserIds(), session.SessionId); err != nil {
-		return err
+	if err := s.store.DeleteSession(ctx, session.GetUserIds(), session.SessionId); err != nil {
+		webhandlers.Error(w, r, err)
+		return
 	}
-	s.session.RemoveAuthCookie(c)
-	return c.NoContent(http.StatusNoContent)
+	s.session.RemoveAuthCookie(w, r)
+	w.WriteHeader(http.StatusNoContent)
 }

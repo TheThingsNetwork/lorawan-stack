@@ -19,18 +19,16 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-
-	echo "github.com/labstack/echo/v4"
 )
 
-func (s *server) redirectToLocal(c echo.Context) error {
-	port, err := strconv.Atoi(c.QueryParam("port"))
+func (s *server) redirectToLocal(w http.ResponseWriter, r *http.Request) {
+	port, err := strconv.Atoi(r.URL.Query().Get("port"))
 	if err != nil {
 		port = 11885
 	}
 
 	params := make(url.Values)
-	for k, v := range c.QueryParams() {
+	for k, v := range r.URL.Query() {
 		params[k] = v
 	}
 	delete(params, "port")
@@ -42,5 +40,5 @@ func (s *server) redirectToLocal(c echo.Context) error {
 		RawQuery: params.Encode(),
 	}
 
-	return c.Redirect(http.StatusFound, url.String())
+	http.Redirect(w, r, url.String(), http.StatusFound)
 }

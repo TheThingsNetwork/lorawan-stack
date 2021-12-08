@@ -17,10 +17,10 @@ package oauthclient
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
 
-	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"golang.org/x/oauth2"
@@ -95,8 +95,8 @@ func (oc *OAuthClient) configFromContext(ctx context.Context) *Config {
 	return &oc.config
 }
 
-func (oc *OAuthClient) defaultOAuth(c echo.Context) (*oauth2.Config, error) {
-	config := oc.configFromContext(c.Request().Context())
+func (oc *OAuthClient) defaultOAuth(w http.ResponseWriter, r *http.Request) (*oauth2.Config, error) {
+	config := oc.configFromContext(r.Context())
 
 	authorizeURL := config.AuthorizeURL
 	redirectURL := fmt.Sprintf("%s/oauth/callback", strings.TrimSuffix(config.RootURL, "/"))

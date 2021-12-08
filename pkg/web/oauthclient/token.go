@@ -19,15 +19,15 @@ import (
 	"net/http"
 	"time"
 
-	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 	"golang.org/x/oauth2"
 )
 
 var errRefresh = errors.DefinePermissionDenied("refresh", "token refresh refused")
 
-func (oc *OAuthClient) freshToken(c echo.Context) (*oauth2.Token, error) {
-	value, err := oc.getAuthCookie(c)
+func (oc *OAuthClient) freshToken(w http.ResponseWriter, r *http.Request) (*oauth2.Token, error) {
+	value, err := oc.getAuthCookie(w, r)
 	if err != nil {
 		return nil, err
 	}
@@ -38,11 +38,11 @@ func (oc *OAuthClient) freshToken(c echo.Context) (*oauth2.Token, error) {
 		Expiry:       time.Now(),
 	}
 
-	ctx, err := oc.withHTTPClient(c.Request().Context())
+	ctx, err := oc.withHTTPClient(r.Context())
 	if err != nil {
 		return nil, err
 	}
-	conf, err := oc.oauth(c)
+	conf, err := oc.oauth(w, r)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (oc *OAuthClient) freshToken(c echo.Context) (*oauth2.Token, error) {
 	}
 
 	if freshToken.AccessToken != token.AccessToken {
-		err = oc.setAuthCookie(c, authCookie{
+		err = oc.setAuthCookie(w, r, authCookie{
 			AccessToken:  freshToken.AccessToken,
 			RefreshToken: freshToken.RefreshToken,
 			Expiry:       freshToken.Expiry,
@@ -75,13 +75,14 @@ func (oc *OAuthClient) freshToken(c echo.Context) (*oauth2.Token, error) {
 // HandleToken is a handler that returns a valid OAuth token.
 // It reads the token from the authorization cookie and refreshes it if needed.
 // If the cookie is not there, it returns a 401 Unauthorized error.
-func (oc *OAuthClient) HandleToken(c echo.Context) error {
-	token, err := oc.freshToken(c)
+func (oc *OAuthClient) HandleToken(w http.ResponseWriter, r *http.Request) {
+	token, err := oc.freshToken(w, r)
 	if err != nil {
-		return err
+		webhandlers.Error(w, r, err)
+		return
 	}
 
-	return c.JSON(http.StatusOK, struct {
+	webhandlers.JSON(w, r, struct {
 		AccessToken string    `json:"access_token"`
 		Expiry      time.Time `json:"expiry"`
 	}{

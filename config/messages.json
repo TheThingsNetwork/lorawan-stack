@@ -1952,6 +1952,15 @@
       "file": "middleware.go"
     }
   },
+  "error:pkg/account:parse": {
+    "translations": {
+      "en": "request body parsing"
+    },
+    "description": {
+      "package": "pkg/account",
+      "file": "user.go"
+    }
+  },
   "error:pkg/applicationserver/distribution/redis:channel_closed": {
     "translations": {
       "en": "channel closed"
@@ -7307,6 +7316,15 @@
       "file": "storage.go"
     }
   },
+  "error:pkg/oauth:parse": {
+    "translations": {
+      "en": "request body parsing"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "oauth.go"
+    }
+  },
   "error:pkg/oauth:token": {
     "translations": {
       "en": "invalid token"
@@ -8306,15 +8324,6 @@
       "file": "remote.go"
     }
   },
-  "error:pkg/web/middleware:http_recovered": {
-    "translations": {
-      "en": "Internal Server Error"
-    },
-    "description": {
-      "package": "pkg/web/middleware",
-      "file": "recover.go"
-    }
-  },
   "error:pkg/web/oauthclient:exchange": {
     "translations": {
       "en": "token exchange refused"
@@ -8331,6 +8340,15 @@
     "description": {
       "package": "pkg/web/oauthclient",
       "file": "callback.go"
+    }
+  },
+  "error:pkg/web/oauthclient:no_auth_cookie": {
+    "translations": {
+      "en": "no auth cookie"
+    },
+    "description": {
+      "package": "pkg/web/oauthclient",
+      "file": "cookie_auth.go"
     }
   },
   "error:pkg/web/oauthclient:no_code": {
@@ -8363,6 +8381,15 @@
   "error:pkg/web/oauthclient:no_state_param": {
     "translations": {
       "en": "no state parameter present in request"
+    },
+    "description": {
+      "package": "pkg/web/oauthclient",
+      "file": "callback.go"
+    }
+  },
+  "error:pkg/web/oauthclient:parse": {
+    "translations": {
+      "en": "request body parsing"
     },
     "description": {
       "package": "pkg/web/oauthclient",

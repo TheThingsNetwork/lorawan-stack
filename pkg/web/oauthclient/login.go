@@ -18,14 +18,13 @@ import (
 	"net/http"
 	"strings"
 
-	echo "github.com/labstack/echo/v4"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
 
 // HandleLogin is the handler for redirecting the user to the authorization
 // endpoint.
-func (oc *OAuthClient) HandleLogin(c echo.Context) error {
-	next := c.QueryParam(oc.nextKey)
-
+func (oc *OAuthClient) HandleLogin(w http.ResponseWriter, r *http.Request) {
+	next := r.URL.Query().Get(oc.nextKey)
 	// Only allow relative paths.
 	if !strings.HasPrefix(next, "/") && !strings.HasPrefix(next, "#") && !strings.HasPrefix(next, "?") {
 		next = ""
@@ -33,17 +32,20 @@ func (oc *OAuthClient) HandleLogin(c echo.Context) error {
 
 	// Set state cookie.
 	state := newState(next)
-	if err := oc.setStateCookie(c, state); err != nil {
-		return err
+	if err := oc.setStateCookie(w, r, state); err != nil {
+		webhandlers.Error(w, r, err)
+		return
 	}
 
-	conf, err := oc.oauth(c)
+	conf, err := oc.oauth(w, r)
 	if err != nil {
-		return err
+		webhandlers.Error(w, r, err)
+		return
 	}
-	opts, err := oc.authCodeURLOpts(c)
+	opts, err := oc.authCodeURLOpts(w, r)
 	if err != nil {
-		return err
+		webhandlers.Error(w, r, err)
+		return
 	}
-	return c.Redirect(http.StatusFound, conf.AuthCodeURL(state.Secret, opts...))
+	http.Redirect(w, r, conf.AuthCodeURL(state.Secret, opts...), http.StatusFound)
 }

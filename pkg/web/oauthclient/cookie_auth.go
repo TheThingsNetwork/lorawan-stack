@@ -19,7 +19,7 @@ import (
 	"net/http"
 	"time"
 
-	echo "github.com/labstack/echo/v4"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/web/cookie"
 )
 
@@ -43,22 +43,24 @@ type authCookie struct {
 	Expiry       time.Time
 }
 
-func (oc *OAuthClient) getAuthCookie(c echo.Context) (authCookie, error) {
+var errNoAuthCookie = errors.DefineUnauthenticated("no_auth_cookie", "no auth cookie")
+
+func (oc *OAuthClient) getAuthCookie(w http.ResponseWriter, r *http.Request) (authCookie, error) {
 	value := authCookie{}
-	ok, err := oc.AuthCookie().Get(c.Response(), c.Request(), &value)
+	ok, err := oc.AuthCookie().Get(w, r, &value)
 	if err != nil {
 		return authCookie{}, err
 	}
 	if !ok {
-		return authCookie{}, echo.NewHTTPError(http.StatusUnauthorized, "No auth cookie")
+		return authCookie{}, errNoAuthCookie.New()
 	}
 	return value, nil
 }
 
-func (oc *OAuthClient) setAuthCookie(c echo.Context, value authCookie) error {
-	return oc.AuthCookie().Set(c.Response(), c.Request(), value)
+func (oc *OAuthClient) setAuthCookie(w http.ResponseWriter, r *http.Request, value authCookie) error {
+	return oc.AuthCookie().Set(w, r, value)
 }
 
-func (oc *OAuthClient) removeAuthCookie(c echo.Context) {
-	oc.AuthCookie().Remove(c.Response(), c.Request())
+func (oc *OAuthClient) removeAuthCookie(w http.ResponseWriter, r *http.Request) {
+	oc.AuthCookie().Remove(w, r)
 }

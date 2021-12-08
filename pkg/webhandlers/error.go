@@ -19,13 +19,14 @@ import (
 	"encoding/json"
 	"net"
 	"net/http"
+	"sort"
 	"strings"
 
 	"github.com/getsentry/sentry-go"
+	"github.com/golang/gddo/httputil"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	sentryerrors "go.thethings.network/lorawan-stack/v3/pkg/errors/sentry"
-	weberrors "go.thethings.network/lorawan-stack/v3/pkg/errors/web"
 )
 
 var errRouteNotFound = errors.DefineNotFound("route_not_found", "route `{route}` not found")
@@ -49,9 +50,47 @@ func NewContextWithErrorValue(parent context.Context) (ctx context.Context, getE
 	return context.WithValue(parent, errorContextValue, &err), func() error { return err }
 }
 
+// ProcessError processes an HTTP error by converting it if appropriate, and
+// determining the HTTP status code to return.
+func ProcessError(in error) (statusCode int, err error) {
+	statusCode, err = http.StatusInternalServerError, in
+	if ttnErr, ok := errors.From(err); ok {
+		statusCode = errors.ToHTTPStatusCode(ttnErr)
+		return statusCode, ttnErr
+	}
+	ttnErr := errors.FromHTTPStatusCode(statusCode, "message")
+	return statusCode, ttnErr.WithCause(err).WithAttributes("message", err.Error())
+}
+
+type errorHandlersKeyType struct{}
+
+var errorHandlersKey errorHandlersKeyType
+
+// WithErrorHandlers registers additional error handlers to be used while rendering errors.
+func WithErrorHandlers(h map[string]http.Handler) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			r = r.WithContext(context.WithValue(r.Context(), errorHandlersKey, h))
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
+type errorKeyType struct{}
+
+var errorKey errorKeyType
+
+// RetrieveError retrieves the error from the context.
+func RetrieveError(r *http.Request) error {
+	if err, ok := r.Context().Value(errorKey).(error); ok {
+		return err
+	}
+	return nil
+}
+
 // Error writes the error to the response writer.
 func Error(w http.ResponseWriter, r *http.Request, err error) {
-	code, err := weberrors.ProcessError(err)
+	code, err := ProcessError(err)
 	if code >= 500 && code != http.StatusNotImplemented {
 		errEvent := sentryerrors.NewEvent(err)
 		errEvent.Request = sentry.NewRequest(r)
@@ -82,9 +121,36 @@ func Error(w http.ResponseWriter, r *http.Request, err error) {
 	if errPtr, ok := r.Context().Value(errorContextValue).(*error); ok && errPtr != nil {
 		*errPtr = err
 	}
-	w.Header().Set("Content-Type", "application/json")
+
+	handlers, _ := r.Context().Value(errorHandlersKey).(map[string]http.Handler)
+	offers := append(make([]string, 0, len(handlers)+1), "application/json")
+	for k := range handlers {
+		offers = append(offers, k)
+	}
+	sort.Strings(offers)
+
+	ct := httputil.NegotiateContentType(r, offers, "application/json")
+	w.Header().Set("Content-Type", ct)
 	w.WriteHeader(code)
-	enc := json.NewEncoder(w)
-	enc.SetIndent("", "  ")
-	enc.Encode(err)
+	switch ct {
+	case "application/json":
+		enc := json.NewEncoder(w)
+		enc.SetIndent("", "\t")
+		_ = enc.Encode(err)
+	default:
+		r := r.WithContext(context.WithValue(r.Context(), errorKey, err))
+		handlers[ct].ServeHTTP(w, r)
+	}
+}
+
+// JSON encodes the provided message as JSON. When a marshalling error
+// is encountered, Error is used in order to handle the error.
+func JSON(w http.ResponseWriter, r *http.Request, i interface{}) {
+	b, err := json.Marshal(i)
+	if err != nil {
+		Error(w, r, err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_, _ = w.Write(b)
 }

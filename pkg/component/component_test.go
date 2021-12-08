@@ -24,7 +24,6 @@ import (
 	"testing"
 	"time"
 
-	echo "github.com/labstack/echo/v4"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -81,9 +80,8 @@ func TestHTTP(t *testing.T) {
 
 	workingRoutePath := "/ok"
 	workingRoute := registererFunc(func(s *web.Server) {
-		s.GET(workingRoutePath, func(c echo.Context) error {
-			c.JSON(http.StatusOK, "OK")
-			return nil
+		s.Router().Path(workingRoutePath).HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
 		})
 	})
 

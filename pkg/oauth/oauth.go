@@ -22,7 +22,7 @@ import (
 	"strconv"
 	"strings"
 
-	echo "github.com/labstack/echo/v4"
+	"github.com/gorilla/schema"
 	"github.com/openshift/osin"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
@@ -31,6 +31,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
+	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 )
 
 var tokenHashSettings auth.HashValidator = pbkdf2.PBKDF2{
@@ -71,22 +73,20 @@ var (
 	errClientSuspended    = errors.DefinePermissionDenied("client_suspended", "OAuth client was suspended")
 )
 
-func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		req := c.Request()
-		if req.Method != http.MethodGet && req.Method != http.MethodPost {
-			return c.NoContent(http.StatusMethodNotAllowed)
-		}
-		session, err := s.session.Get(c)
+func (s *server) Authorize(authorizePage http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		r, session, err := s.session.Get(w, r)
 		if err != nil {
-			return err
+			webhandlers.Error(w, r, err)
+			return
 		}
-		oauth2 := s.oauth2(req.Context())
+		oauth2 := s.oauth2(r.Context())
 		resp := oauth2.NewResponse()
 		defer resp.Close()
-		ar := oauth2.HandleAuthorizeRequest(resp, req)
+		ar := oauth2.HandleAuthorizeRequest(resp, r)
 		if ar == nil {
-			return s.output(c, resp)
+			s.output(w, r, resp)
+			return
 		}
 		ar.UserData = userData{UserSessionIdentifiers: &ttnpb.UserSessionIdentifiers{
 			UserIds:   session.GetUserIds(),
@@ -96,80 +96,91 @@ func (s *server) Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc {
 		if !clientHasGrant(&client, ttnpb.GRANT_AUTHORIZATION_CODE) {
 			resp.InternalError = errClientMissingGrant.WithAttributes("grant", "authorization_code")
 			resp.SetError(osin.E_INVALID_GRANT, resp.InternalError.Error())
-			oauth2.FinishAuthorizeRequest(resp, req, ar)
-			return s.output(c, resp)
+			oauth2.FinishAuthorizeRequest(resp, r, ar)
+			s.output(w, r, resp)
+			return
 		}
 		switch client.State {
 		case ttnpb.STATE_REJECTED:
 			resp.InternalError = errClientRejected
 			resp.SetError(osin.E_INVALID_CLIENT, resp.InternalError.Error())
-			oauth2.FinishAuthorizeRequest(resp, req, ar)
-			return s.output(c, resp)
+			oauth2.FinishAuthorizeRequest(resp, r, ar)
+			s.output(w, r, resp)
+			return
 		case ttnpb.STATE_SUSPENDED:
 			resp.InternalError = errClientSuspended
 			resp.SetError(osin.E_INVALID_CLIENT, resp.InternalError.Error())
-			oauth2.FinishAuthorizeRequest(resp, req, ar)
-			return s.output(c, resp)
+			oauth2.FinishAuthorizeRequest(resp, r, ar)
+			s.output(w, r, resp)
+			return
 		case ttnpb.STATE_REQUESTED:
 			// TODO: Allow if user is collaborator (https://github.com/TheThingsNetwork/lorawan-stack/issues/49).
 			resp.InternalError = errClientNotApproved
 			resp.SetError(osin.E_INVALID_CLIENT, resp.InternalError.Error())
-			oauth2.FinishAuthorizeRequest(resp, req, ar)
-			return s.output(c, resp)
+			oauth2.FinishAuthorizeRequest(resp, r, ar)
+			s.output(w, r, resp)
+			return
 		}
 		ar.Authorized = client.SkipAuthorization
 		ar.Scope = rightsToScope(client.Rights...)
 		if !ar.Authorized {
 			authorization, err := s.store.GetAuthorization(
-				req.Context(),
+				r.Context(),
 				session.GetUserIds(),
 				client.GetIds(),
 			)
 			if err != nil && !errors.IsNotFound(err) {
-				return err
+				webhandlers.Error(w, r, err)
+				return
 			}
 			if ttnpb.RightsFrom(authorization.GetRights()...).IncludesAll(client.Rights...) {
 				ar.Authorized = true
 			}
 		}
 		if !ar.Authorized {
-			switch c.Request().Method {
+			switch r.Method {
 			case http.MethodPost:
-				ar.Authorized, _ = strconv.ParseBool(req.PostForm.Get("authorize"))
+				ar.Authorized, _ = strconv.ParseBool(r.PostForm.Get("authorize"))
 			case http.MethodGet:
 				safeClient := client.PublicSafe()
 				clientJSON, _ := jsonpb.TTN().Marshal(safeClient)
-				user, err := s.session.GetUser(c)
+				r, user, err := s.session.GetUser(w, r)
 				if err != nil {
-					return err
+					webhandlers.Error(w, r, err)
+					return
 				}
 				safeUser := user.PublicSafe()
-				userJSON, _ := jsonpb.TTN().Marshal(safeUser)
-				c.Set("page_data", struct {
+				userJSON, err := jsonpb.TTN().Marshal(safeUser)
+				if err != nil {
+					webhandlers.Error(w, r, err)
+					return
+				}
+				r = webui.WithPageData(r, struct {
 					Client json.RawMessage `json:"client"`
 					User   json.RawMessage `json:"user"`
 				}{
 					Client: clientJSON,
 					User:   userJSON,
 				})
-				return authorizePage(c)
+				authorizePage.ServeHTTP(w, r)
+				return
 			}
 		}
 		if ar.Authorized {
-			events.Publish(evtAuthorize.New(req.Context(), events.WithIdentifiers(session.GetUserIds(), client.GetIds())))
+			events.Publish(evtAuthorize.New(r.Context(), events.WithIdentifiers(session.GetUserIds(), client.GetIds())))
 		}
-		oauth2.FinishAuthorizeRequest(resp, req, ar)
-		return s.output(c, resp)
+		oauth2.FinishAuthorizeRequest(resp, r, ar)
+		s.output(w, r, resp)
 	}
 }
 
 type tokenRequest struct {
-	GrantType    string `json:"grant_type" form:"grant_type"`
-	Code         string `json:"code" form:"code"`
-	RefreshToken string `json:"refresh_token" form:"refresh_token"`
-	RedirectURI  string `json:"redirect_uri" form:"redirect_uri"`
-	ClientID     string `json:"client_id" form:"client_id"`
-	ClientSecret string `json:"client_secret" form:"client_secret"`
+	GrantType    string `json:"grant_type" schema:"grant_type"`
+	Code         string `json:"code" schema:"code"`
+	RefreshToken string `json:"refresh_token" schema:"refresh_token"`
+	RedirectURI  string `json:"redirect_uri" schema:"redirect_uri"`
+	ClientID     string `json:"client_id" schema:"client_id"`
+	ClientSecret string `json:"client_secret" schema:"client_secret"`
 }
 
 var (
@@ -213,54 +224,54 @@ func (req *tokenRequest) ValidateContext(ctx context.Context) error {
 	return nil
 }
 
-func (r tokenRequest) Values() url.Values {
-	values := make(url.Values)
-	if r.GrantType != "" {
-		values.Set("grant_type", r.GrantType)
-	}
-	if r.Code != "" {
-		values.Set("code", r.Code)
-	}
-	if r.RefreshToken != "" {
-		values.Set("refresh_token", r.RefreshToken)
-	}
-	if r.RedirectURI != "" {
-		values.Set("redirect_uri", r.RedirectURI)
-	}
-	values.Set("client_id", r.ClientID)
-	values.Set("client_secret", r.ClientSecret)
-	return values
-}
+var errParse = errors.DefineAborted("parse", "request body parsing")
 
-func (s *server) Token(c echo.Context) error {
-	req := c.Request()
-
+func (s *server) Token(w http.ResponseWriter, r *http.Request) {
 	// Convert request through tokenRequest so that we can accept both forms and JSON.
 	var tokenRequest tokenRequest
-	if err := c.Bind(&tokenRequest); err != nil {
-		return err
+	switch r.Header.Get("Content-Type") {
+	case "application/json":
+		if err := json.NewDecoder(r.Body).Decode(&tokenRequest); err != nil {
+			webhandlers.Error(w, r, errParse.WithCause(err))
+			return
+		}
+	default:
+		if err := r.ParseForm(); err != nil {
+			webhandlers.Error(w, r, errParse.WithCause(err))
+			return
+		}
+		if err := schema.NewDecoder().Decode(&tokenRequest, r.Form); err != nil {
+			webhandlers.Error(w, r, errParse.WithCause(err))
+			return
+		}
 	}
-	if username, password, ok := req.BasicAuth(); ok {
+	if username, password, ok := r.BasicAuth(); ok {
 		tokenRequest.ClientID, tokenRequest.ClientSecret = username, password
 	}
-	if err := tokenRequest.ValidateContext(req.Context()); err != nil {
-		return err
+	if err := tokenRequest.ValidateContext(r.Context()); err != nil {
+		webhandlers.Error(w, r, err)
+		return
 	}
 
-	req = req.WithContext(
-		log.NewContextWithField(req.Context(), "oauth_client_id", tokenRequest.ClientID),
+	r = r.WithContext(
+		log.NewContextWithField(r.Context(), "oauth_client_id", tokenRequest.ClientID),
 	)
-	c.SetRequest(req)
 
-	req.Form = tokenRequest.Values()
-	req.PostForm = req.Form
+	values := make(url.Values)
+	if err := schema.NewEncoder().Encode(tokenRequest, values); err != nil {
+		webhandlers.Error(w, r, err)
+		return
+	}
+	r.Form = values
+	r.PostForm = values
 
-	oauth2 := s.oauth2(req.Context())
+	oauth2 := s.oauth2(r.Context())
 	resp := oauth2.NewResponse()
 	defer resp.Close()
-	ar := oauth2.HandleAccessRequest(resp, req)
+	ar := oauth2.HandleAccessRequest(resp, r)
 	if ar == nil {
-		return s.output(c, resp)
+		s.output(w, r, resp)
+		return
 	}
 
 	client := ttnpb.Client(ar.Client.(osinClient))
@@ -273,18 +284,19 @@ func (s *server) Token(c echo.Context) error {
 		ar.Authorized = clientHasGrant(&client, ttnpb.GRANT_REFRESH_TOKEN)
 	case osin.PASSWORD:
 		if clientHasGrant(&client, ttnpb.GRANT_PASSWORD) {
-			if err := s.session.DoLogin(req.Context(), ar.Username, ar.Password); err != nil {
-				return err
+			if err := s.session.DoLogin(r.Context(), ar.Username, ar.Password); err != nil {
+				webhandlers.Error(w, r, err)
+				return
 			}
 			ar.Authorized = true
 		}
 	}
 	if ar.Authorized {
-		events.Publish(evtTokenExchange.New(req.Context(), events.WithIdentifiers(userIDs, client.GetIds())))
+		events.Publish(evtTokenExchange.New(r.Context(), events.WithIdentifiers(userIDs, client.GetIds())))
 	}
-	oauth2.FinishAccessRequest(resp, req, ar)
+	oauth2.FinishAccessRequest(resp, r, ar)
 	delete(resp.Output, "scope")
-	return s.output(c, resp)
+	s.output(w, r, resp)
 }
 
 func clientHasGrant(cli *ttnpb.Client, wanted ttnpb.GrantType) bool {
