@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package workerpool
+package workerpool_test
 
 import (
 	"context"
@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 )
 
 func TestAtomicConditionals(t *testing.T) {
@@ -48,7 +49,7 @@ func TestAtomicConditionals(t *testing.T) {
 		go func() {
 			release.Wait()
 			defer wg.Done()
-			if incrementIfSmallerThan(&value, upperBound) {
+			if workerpool.IncrementIfSmallerThan(&value, upperBound) {
 				if v := atomic.LoadInt32(&value); v > upperBound {
 					increaseFailures.Store(k, v)
 				}
@@ -59,7 +60,7 @@ func TestAtomicConditionals(t *testing.T) {
 		go func() {
 			release.Wait()
 			defer wg.Done()
-			if decrementIfGreaterThan(&value, lowerBound) {
+			if workerpool.DecrementIfGreaterThan(&value, lowerBound) {
 				if v := atomic.LoadInt32(&value); v < lowerBound {
 					decreaseFailures.Store(k, v)
 				}
@@ -143,7 +144,7 @@ func testWorkerPool(t *testing.T, minWorkers int, maxWorkers int, queueSize int,
 		}
 	}
 
-	wp := NewWorkerPool(Config{
+	wp := workerpool.NewWorkerPool(workerpool.Config{
 		Component:         &mockComponent{},
 		Context:           ctx,
 		Handler:           handler,
@@ -239,7 +240,7 @@ func benchmarkWorkerPool(b *testing.B, processingDelay time.Duration, publishing
 			time.Sleep(random.Jitter(processingDelay, 0.15))
 		}
 
-		wp := NewWorkerPool(Config{
+		wp := workerpool.NewWorkerPool(workerpool.Config{
 			Component: &mockComponent{},
 			Context:   ctx,
 			Handler:   handler,
@@ -258,7 +259,7 @@ func benchmarkWorkerPool(b *testing.B, processingDelay time.Duration, publishing
 			}
 		}
 
-		for i := 0; i < defaultMaxWorkers; i++ {
+		for i := 0; i < workerpool.DefaultMaxWorkers; i++ {
 			wg.Add(1)
 			go publisher()
 		}
