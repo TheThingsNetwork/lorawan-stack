@@ -8469,6 +8469,10 @@
               "options": {
                 "validate.rules": [
                   {
+                    "name": "string.min_len",
+                    "value": 1
+                  },
+                  {
                     "name": "string.max_len",
                     "value": 64
                   }
@@ -8488,6 +8492,10 @@
               "defaultValue": "",
               "options": {
                 "validate.rules": [
+                  {
+                    "name": "string.min_len",
+                    "value": 1
+                  },
                   {
                     "name": "string.max_len",
                     "value": 64
@@ -8569,7 +8577,8 @@
                   "rules": [
                     {
                       "method": "POST",
-                      "pattern": "/contact_info/validation"
+                      "pattern": "/contact_info/validation",
+                      "body": "*"
                     }
                   ]
                 }
@@ -8591,7 +8600,8 @@
                   "rules": [
                     {
                       "method": "PATCH",
-                      "pattern": "/contact_info/validation"
+                      "pattern": "/contact_info/validation",
+                      "body": "*"
                     }
                   ]
                 }

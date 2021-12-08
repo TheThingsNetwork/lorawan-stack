@@ -63,10 +63,8 @@ message ContactInfo {
 }
 
 message ContactInfoValidation {
-  string id = 1 [
-    (validate.rules).string.max_len = 64
-  ];
-  string token = 2 [(validate.rules).string.max_len = 64];
+  string id = 1 [(validate.rules).string = {max_len: 64, min_len: 1}];
+  string token = 2 [(validate.rules).string = {max_len: 64, min_len: 1}];
   EntityIdentifiers entity = 3;
   repeated ContactInfo contact_info = 4;
   google.protobuf.Timestamp created_at = 5;
@@ -83,12 +81,14 @@ service ContactInfoRegistry {
   rpc RequestValidation(EntityIdentifiers) returns (ContactInfoValidation) {
     option (google.api.http) = {
       post: "/contact_info/validation"
+      body: "*"
     };
   }
   // Validate confirms a contact info validation.
   rpc Validate(ContactInfoValidation) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       patch: "/contact_info/validation"
+      body: "*"
     };
   };
 }

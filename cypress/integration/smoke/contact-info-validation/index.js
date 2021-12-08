@@ -17,14 +17,28 @@ import { defineSmokeTest } from '../utils'
 const validatePasswordLinkRegExp = `https?:\\/\\/localhost:\\d{4}\\/[a-zA-Z0-9-_]+\\/validate\\?.+&token=[A-Z0-9]+`
 
 const contactInfoValidation = defineSmokeTest('succeeds validating contact info', () => {
-  const user = {
+  const user1 = {
     ids: { user_id: 'test-user-id1' },
     primary_email_address: 'test-user1@example.com',
     password: 'ABCDefg123!',
     password_confirm: 'ABCDefg123!',
   }
+  const user2 = {
+    ids: { user_id: 'test-user-id2' },
+    primary_email_address: 'test-user2@example.com',
+    password: 'ABCDefg123!',
+    password_confirm: 'ABCDefg123!',
+  }
 
-  cy.createUser(user)
+  cy.createUser(user1)
+
+  cy.task('findEmailInStackLog', validatePasswordLinkRegExp).then(validationUri => {
+    cy.log(validationUri)
+    cy.visit(validationUri)
+    cy.findByTestId('notification').should('be.visible').should('contain', 'Validation successful')
+  })
+
+  cy.createUser(user2)
 
   cy.task('findEmailInStackLog', validatePasswordLinkRegExp).then(validationUri => {
     cy.log(validationUri)
