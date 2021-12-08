@@ -1832,6 +1832,7 @@ The NATS provider settings.
 | `info_url` | <p>`string.uri`: `true`</p> |
 | `documentation_url` | <p>`string.uri`: `true`</p> |
 | `base_url` | <p>`string.uri`: `true`</p> |
+| `headers` | <p>`map.max_pairs`: `50`</p><p>`map.keys.string.max_len`: `64`</p><p>`map.values.string.max_len`: `256`</p> |
 | `format` | <p>`string.max_len`: `20`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationWebhookTemplate.HeadersEntry">Message `ApplicationWebhookTemplate.HeadersEntry`</a>
