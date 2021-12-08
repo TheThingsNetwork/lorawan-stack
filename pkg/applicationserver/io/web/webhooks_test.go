@@ -34,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -41,8 +42,8 @@ import (
 
 type mockComponent struct{}
 
-func (mockComponent) StartTask(conf *component.TaskConfig) {
-	component.DefaultStartTask(conf)
+func (mockComponent) StartTask(conf *task.Config) {
+	task.DefaultStartTask(conf)
 }
 
 func (mockComponent) FromRequestContext(ctx context.Context) context.Context {

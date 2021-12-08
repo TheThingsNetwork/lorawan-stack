@@ -20,12 +20,12 @@ import (
 	"net/http"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
 )
@@ -74,7 +74,7 @@ type Cluster interface {
 
 // Server represents the Application Server to application frontends.
 type Server interface {
-	component.TaskStarter
+	task.Starter
 	PubSub
 	DownlinkQueueOperator
 	UplinkStorage
@@ -211,7 +211,7 @@ func (s *Subscription) Up() <-chan *ContextualApplicationUp {
 }
 
 // Pipe pipes the output of the Subscription to the provided handler.
-func (s *Subscription) Pipe(ctx context.Context, ts component.TaskStarter, name string, submit func(context.Context, interface{}) error) {
+func (s *Subscription) Pipe(ctx context.Context, ts task.Starter, name string, submit func(context.Context, interface{}) error) {
 	f := func(ctx context.Context) error {
 		for {
 			select {
@@ -226,12 +226,12 @@ func (s *Subscription) Pipe(ctx context.Context, ts component.TaskStarter, name 
 			}
 		}
 	}
-	ts.StartTask(&component.TaskConfig{
+	ts.StartTask(&task.Config{
 		Context: ctx,
 		ID:      fmt.Sprintf("pipe_%v", name),
 		Func:    f,
-		Restart: component.TaskRestartOnFailure,
-		Backoff: component.DefaultTaskBackoffConfig,
+		Restart: task.RestartOnFailure,
+		Backoff: task.DefaultBackoffConfig,
 	})
 }
 

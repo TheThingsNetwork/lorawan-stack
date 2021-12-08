@@ -50,6 +50,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -174,7 +175,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	for addr, fallbackFrequencyPlanID := range conf.UDP.Listeners {
 		addr := addr
 		fallbackFrequencyPlanID := fallbackFrequencyPlanID
-		gs.RegisterTask(&component.TaskConfig{
+		gs.RegisterTask(&task.Config{
 			Context: gs.Context(),
 			ID:      fmt.Sprintf("serve_udp/%s", addr),
 			Func: func(ctx context.Context) error {
@@ -193,8 +194,8 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 				}
 				return udp.Serve(lisCtx, gs, conn, conf.UDP.Config)
 			},
-			Restart: component.TaskRestartOnFailure,
-			Backoff: component.DefaultTaskBackoffConfig,
+			Restart: task.RestartOnFailure,
+			Backoff: task.DefaultBackoffConfig,
 		})
 	}
 
@@ -221,7 +222,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 			if endpoint.Address() == "" {
 				continue
 			}
-			gs.RegisterTask(&component.TaskConfig{
+			gs.RegisterTask(&task.Config{
 				Context: gs.Context(),
 				ID:      fmt.Sprintf("serve_mqtt/%s", endpoint.Address()),
 				Func: func(ctx context.Context) error {
@@ -242,8 +243,8 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 					defer lis.Close()
 					return mqtt.Serve(ctx, gs, lis, version.Format, endpoint.Protocol())
 				},
-				Restart: component.TaskRestartOnFailure,
-				Backoff: component.DefaultTaskBackoffConfig,
+				Restart: task.RestartOnFailure,
+				Backoff: task.DefaultBackoffConfig,
 			})
 		}
 	}
@@ -287,7 +288,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 			if endpoint.Address() == "" {
 				continue
 			}
-			gs.RegisterTask(&component.TaskConfig{
+			gs.RegisterTask(&task.Config{
 				Context: gs.Context(),
 				ID:      fmt.Sprintf("serve_%s/%s", version.Name, endpoint.Address()),
 				Func: func(ctx context.Context) error {
@@ -319,8 +320,8 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 					}()
 					return srv.Serve(lis)
 				},
-				Restart: component.TaskRestartOnFailure,
-				Backoff: component.DefaultTaskBackoffConfig,
+				Restart: task.RestartOnFailure,
+				Backoff: task.DefaultBackoffConfig,
 			})
 		}
 	}
@@ -516,15 +517,15 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	for name, handler := range gs.upstreamHandlers {
 		connCtx := log.NewContextWithField(conn.Context(), "upstream_handler", name)
 		handler := handler
-		gs.StartTask(&component.TaskConfig{
+		gs.StartTask(&task.Config{
 			Context: connCtx,
 			ID:      fmt.Sprintf("%s_connect_gateway_%s", name, ids.GatewayId),
 			Func: func(ctx context.Context) error {
 				return handler.ConnectGateway(ctx, ids, conn)
 			},
 			Done:    wg.Done,
-			Restart: component.TaskRestartOnFailure,
-			Backoff: component.DialTaskBackoffConfig,
+			Restart: task.RestartOnFailure,
+			Backoff: task.DialBackoffConfig,
 		})
 	}
 	return conn, nil
@@ -573,7 +574,7 @@ var errGatewayChanged = errors.Define("gateway_changed", "gateway changed in reg
 
 func (gs *GatewayServer) startDisconnectOnChangeTask(conn connectionEntry) {
 	conn.tasksDone.Add(1)
-	gs.StartTask(&component.TaskConfig{
+	gs.StartTask(&task.Config{
 		Context: conn.Context(),
 		ID:      fmt.Sprintf("disconnect_on_change_%s", unique.ID(conn.Context(), conn.Gateway().GetIds())),
 		Func: func(ctx context.Context) error {
@@ -624,14 +625,14 @@ func (gs *GatewayServer) startDisconnectOnChangeTask(conn connectionEntry) {
 			return nil
 		},
 		Done:    conn.tasksDone.Done,
-		Restart: component.TaskRestartAlways,
-		Backoff: component.DialTaskBackoffConfig,
+		Restart: task.RestartAlways,
+		Backoff: task.DialBackoffConfig,
 	})
 }
 
 func (gs *GatewayServer) startHandleUpstreamTask(conn connectionEntry) {
 	conn.tasksDone.Add(1)
-	gs.StartTask(&component.TaskConfig{
+	gs.StartTask(&task.Config{
 		Context: conn.Context(),
 		ID:      fmt.Sprintf("handle_upstream_%s", unique.ID(conn.Context(), conn.Gateway().GetIds())),
 		Func: func(ctx context.Context) error {
@@ -639,8 +640,8 @@ func (gs *GatewayServer) startHandleUpstreamTask(conn connectionEntry) {
 			return nil
 		},
 		Done:    conn.tasksDone.Done,
-		Restart: component.TaskRestartNever,
-		Backoff: component.DialTaskBackoffConfig,
+		Restart: task.RestartNever,
+		Backoff: task.DialBackoffConfig,
 	})
 }
 
@@ -649,7 +650,7 @@ func (gs *GatewayServer) startUpdateConnStatsTask(conn connectionEntry) {
 		return
 	}
 	conn.tasksDone.Add(1)
-	gs.StartTask(&component.TaskConfig{
+	gs.StartTask(&task.Config{
 		Context: conn.Context(),
 		ID:      fmt.Sprintf("update_connection_stats_%s", unique.ID(conn.Context(), conn.Gateway().GetIds())),
 		Func: func(ctx context.Context) error {
@@ -657,8 +658,8 @@ func (gs *GatewayServer) startUpdateConnStatsTask(conn connectionEntry) {
 			return nil
 		},
 		Done:    conn.tasksDone.Done,
-		Restart: component.TaskRestartNever,
-		Backoff: component.DialTaskBackoffConfig,
+		Restart: task.RestartNever,
+		Backoff: task.DialBackoffConfig,
 	})
 }
 
@@ -667,7 +668,7 @@ func (gs *GatewayServer) startHandleLocationUpdatesTask(conn connectionEntry) {
 		return
 	}
 	conn.tasksDone.Add(1)
-	gs.StartTask(&component.TaskConfig{
+	gs.StartTask(&task.Config{
 		Context: conn.Context(),
 		ID:      fmt.Sprintf("handle_location_updates_%s", unique.ID(conn.Context(), conn.Gateway().GetIds())),
 		Func: func(ctx context.Context) error {
@@ -675,14 +676,14 @@ func (gs *GatewayServer) startHandleLocationUpdatesTask(conn connectionEntry) {
 			return nil
 		},
 		Done:    conn.tasksDone.Done,
-		Restart: component.TaskRestartNever,
-		Backoff: component.DialTaskBackoffConfig,
+		Restart: task.RestartNever,
+		Backoff: task.DialBackoffConfig,
 	})
 }
 
 func (gs *GatewayServer) startHandleVersionUpdatesTask(conn connectionEntry) {
 	conn.tasksDone.Add(1)
-	gs.StartTask(&component.TaskConfig{
+	gs.StartTask(&task.Config{
 		Context: conn.Context(),
 		ID:      fmt.Sprintf("handle_version_updates_%s", unique.ID(conn.Context(), conn.Gateway().GetIds())),
 		Func: func(ctx context.Context) error {
@@ -690,8 +691,8 @@ func (gs *GatewayServer) startHandleVersionUpdatesTask(conn connectionEntry) {
 			return nil
 		},
 		Done:    conn.tasksDone.Done,
-		Restart: component.TaskRestartNever,
-		Backoff: component.DialTaskBackoffConfig,
+		Restart: task.RestartNever,
+		Backoff: task.DialBackoffConfig,
 	})
 }
 

@@ -37,6 +37,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"golang.org/x/crypto/acme/autocert"
@@ -88,8 +89,8 @@ type Component struct {
 
 	rightsFetcher rights.Fetcher
 
-	taskStarter TaskStarter
-	taskConfigs []*TaskConfig
+	taskStarter task.Starter
+	taskConfigs []*task.Config
 
 	limiter ratelimit.Interface
 }
@@ -116,7 +117,7 @@ func WithGRPCLogger(l log.Interface) Option {
 
 // WithTaskStarter returns an option that overrides the component's TaskStarter for
 // starting tasks.
-func WithTaskStarter(s TaskStarter) Option {
+func WithTaskStarter(s task.Starter) Option {
 	return func(c *Component) {
 		c.taskStarter = s
 	}
@@ -161,7 +162,7 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 
 		KeyVault: keyVault,
 
-		taskStarter: StartTaskFunc(DefaultStartTask),
+		taskStarter: task.StartTaskFunc(task.DefaultStartTask),
 	}
 
 	c.limiter, err = ratelimit.New(ctx, config.RateLimiting, config.Blob)

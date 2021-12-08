@@ -20,8 +20,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 )
 
 const (
@@ -37,7 +37,7 @@ const (
 
 // Component contains a minimal component.Component definition.
 type Component interface {
-	StartTask(*component.TaskConfig)
+	StartTask(*task.Config)
 	FromRequestContext(context.Context) context.Context
 }
 
@@ -156,12 +156,12 @@ func (wp *workerPool) spawnWorker(initialWork *contextualItem) bool {
 	registerWorkerStarted(wp.Name)
 	wp.wg.Add(1)
 
-	wp.StartTask(&component.TaskConfig{
+	wp.StartTask(&task.Config{
 		Context: wp.Context,
 		ID:      wp.Name,
 		Func:    wp.workerBody(initialWork),
-		Restart: component.TaskRestartNever,
-		Backoff: component.DefaultTaskBackoffConfig,
+		Restart: task.RestartNever,
+		Backoff: task.DefaultBackoffConfig,
 	})
 
 	return true

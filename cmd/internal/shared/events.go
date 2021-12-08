@@ -18,18 +18,18 @@ import (
 	"context"
 	"fmt"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/basic"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/cloud"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	_ "gocloud.dev/pubsub/awssnssqs" // AWS backend for PubSub.
 	_ "gocloud.dev/pubsub/gcppubsub" // GCP backend for PubSub.
 )
 
 // InitializeEvents initializes the event system.
-func InitializeEvents(ctx context.Context, taskStarter component.TaskStarter, conf config.ServiceBase) error {
+func InitializeEvents(ctx context.Context, taskStarter task.Starter, conf config.ServiceBase) error {
 	switch conf.Events.Backend {
 	case "internal":
 		events.SetDefaultPubSub(basic.NewPubSub())

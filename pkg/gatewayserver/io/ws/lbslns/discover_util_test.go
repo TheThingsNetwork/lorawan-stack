@@ -17,11 +17,11 @@ package lbslns
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -65,6 +65,6 @@ func (srv mockServer) ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayId
 	return ids.ValidateContext(ctx)
 }
 
-func (srv mockServer) StartTask(cfg *component.TaskConfig) {
-	component.DefaultStartTask(cfg)
+func (srv mockServer) StartTask(cfg *task.Config) {
+	task.DefaultStartTask(cfg)
 }

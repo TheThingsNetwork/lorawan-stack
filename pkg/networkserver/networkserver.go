@@ -33,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
@@ -142,9 +143,9 @@ type Option func(ns *NetworkServer)
 var (
 	DefaultOptions []Option
 
-	processTaskBackoff = &component.TaskBackoffConfig{
-		Jitter:       component.DefaultTaskBackoffConfig.Jitter,
-		IntervalFunc: component.MakeTaskBackoffIntervalFunc(true, component.DefaultTaskBackoffResetDuration, component.DefaultTaskBackoffIntervals[:]...),
+	processTaskBackoff = &task.BackoffConfig{
+		Jitter:       task.DefaultBackoffConfig.Jitter,
+		IntervalFunc: task.MakeBackoffIntervalFunc(true, task.DefaultBackoffResetDuration, task.DefaultBackoffIntervals[:]...),
 	}
 )
 
@@ -272,21 +273,21 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	consumerIDPrefix := fmt.Sprintf("%s:%d", hostname, os.Getpid())
 	for i := uint64(0); i < conf.ApplicationUplinkQueue.NumConsumers; i++ {
 		consumerID := fmt.Sprintf("%s:%d", consumerIDPrefix, i)
-		ns.RegisterTask(&component.TaskConfig{
+		ns.RegisterTask(&task.Config{
 			Context: ctx,
 			ID:      fmt.Sprintf("%s_%d", applicationUplinkProcessTaskName, i),
 			Func:    ns.createProcessApplicationUplinkTask(consumerID),
-			Restart: component.TaskRestartAlways,
+			Restart: task.RestartAlways,
 			Backoff: processTaskBackoff,
 		})
 	}
 	for i := uint64(0); i < conf.DownlinkTaskQueue.NumConsumers; i++ {
 		consumerID := fmt.Sprintf("%s:%d", consumerIDPrefix, i)
-		ns.RegisterTask(&component.TaskConfig{
+		ns.RegisterTask(&task.Config{
 			Context: ctx,
 			ID:      fmt.Sprintf("%s_%d", downlinkProcessTaskName, i),
 			Func:    ns.createProcessDownlinkTask(consumerID),
-			Restart: component.TaskRestartAlways,
+			Restart: task.RestartAlways,
 			Backoff: processTaskBackoff,
 		})
 	}

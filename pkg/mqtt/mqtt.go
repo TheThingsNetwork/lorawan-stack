@@ -23,16 +23,16 @@ import (
 	mqttnet "github.com/TheThingsIndustries/mystique/pkg/net"
 	"github.com/TheThingsIndustries/mystique/pkg/packet"
 	"github.com/TheThingsIndustries/mystique/pkg/session"
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 )
 
 // RunListener runs the MQTT accept connection loop.
 func RunListener(
 	ctx context.Context,
 	lis mqttnet.Listener,
-	ts component.TaskStarter,
+	ts task.Starter,
 	createResource func(string) ratelimit.Resource,
 	rateLimiter ratelimit.Interface,
 	setupConnection func(context.Context, mqttnet.Conn) error,
@@ -65,12 +65,12 @@ func RunListener(
 			}()
 			return setupConnection(ctx, mqttConn)
 		}
-		ts.StartTask(&component.TaskConfig{
+		ts.StartTask(&task.Config{
 			Context: ctx,
 			ID:      "mqtt_setup_connection",
 			Func:    f,
-			Restart: component.TaskRestartNever,
-			Backoff: component.DefaultTaskBackoffConfig,
+			Restart: task.RestartNever,
+			Backoff: task.DefaultBackoffConfig,
 		})
 	}
 }
@@ -79,7 +79,7 @@ func RunListener(
 func RunSession(
 	ctx context.Context,
 	cancel func(error),
-	ts component.TaskStarter,
+	ts task.Starter,
 	session session.Session,
 	mqttConn mqttnet.Conn,
 	wg *sync.WaitGroup,
@@ -138,12 +138,12 @@ func RunSession(
 		"mqtt_write_packets":    writeFunc,
 		"mqtt_close_connection": closeFunc,
 	} {
-		ts.StartTask(&component.TaskConfig{
+		ts.StartTask(&task.Config{
 			Context: ctx,
 			ID:      name,
 			Func:    f,
-			Restart: component.TaskRestartNever,
-			Backoff: component.DefaultTaskBackoffConfig,
+			Restart: task.RestartNever,
+			Backoff: task.DefaultBackoffConfig,
 		})
 	}
 }

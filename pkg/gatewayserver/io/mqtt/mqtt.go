@@ -26,12 +26,12 @@ import (
 	"github.com/TheThingsIndustries/mystique/pkg/packet"
 	"github.com/TheThingsIndustries/mystique/pkg/session"
 	"github.com/TheThingsIndustries/mystique/pkg/topic"
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/mqtt"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc/metadata"
@@ -111,13 +111,13 @@ func setupConnection(ctx context.Context, mqttConn mqttnet.Conn, format Format, 
 			}
 		}
 	}
-	server.StartTask(&component.TaskConfig{
+	server.StartTask(&task.Config{
 		Context: ctx,
 		ID:      "mqtt_publish_downlinks",
 		Func:    f,
 		Done:    wg.Done,
-		Restart: component.TaskRestartNever,
-		Backoff: component.DefaultTaskBackoffConfig,
+		Restart: task.RestartNever,
+		Backoff: task.DefaultBackoffConfig,
 	})
 
 	mqtt.RunSession(ctx, c.io.Disconnect, server, session, mqttConn, wg)

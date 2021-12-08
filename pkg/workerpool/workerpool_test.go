@@ -23,8 +23,8 @@ import (
 	"testing"
 	"time"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
+	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
@@ -211,8 +211,8 @@ func testWorkerPool(t *testing.T, minWorkers int, maxWorkers int, queueSize int,
 
 type mockComponent struct{}
 
-func (*mockComponent) StartTask(cfg *component.TaskConfig) {
-	component.DefaultStartTask(cfg)
+func (*mockComponent) StartTask(cfg *task.Config) {
+	task.DefaultStartTask(cfg)
 }
 
 func (*mockComponent) FromRequestContext(ctx context.Context) context.Context {
