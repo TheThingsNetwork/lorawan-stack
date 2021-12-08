@@ -12,39 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.container
-  display: flex
-  align-items: center
-  justify-items: flex-start
-  flex-wrap: wrap
-  margin-bottom: $cs.xxs
+const humanFileSize = size => {
+  const i = size === 0 ? 0 : Math.floor(Math.log(size) / Math.log(1024))
+  return `${(size / Math.pow(1024, i)).toFixed(2) * 1} ${['B', 'kB', 'MB', 'GB', 'TB'][i]}`
+}
 
-.input
-  visually-hidden()
-
-.status
-  display: inline-flex
-  align-items: center
-  line-height: $default-input-height
-  margin-left: $cs.m
-
-  .remove-button
-    margin-left: $cs.xs
-
-.error
-  color: $c-error
-  &-icon
-    color: $c-error
-    margin-right: $cs.xxs
-
-.no-file
-  color: $tc-subtle-gray
-
-.image
-  height: 8rem
-  width: 8rem
-  object-fit: contain
-  margin-right: $cs.m
-
-.notification
-  flex-basis: 100%
+export default humanFileSize

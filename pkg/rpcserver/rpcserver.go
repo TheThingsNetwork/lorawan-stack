@@ -192,6 +192,8 @@ func New(ctx context.Context, opts ...Option) *Server {
 	baseOptions := []grpc.ServerOption{
 		grpc.StatsHandler(rpcmiddleware.StatsHandlers{new(ocgrpc.ServerHandler), metrics.StatsHandler}),
 		grpc.MaxConcurrentStreams(math.MaxUint16),
+		grpc.MaxRecvMsgSize(1024 * 1024 * 16),
+		grpc.MaxSendMsgSize(1024 * 1024 * 16),
 		grpc.KeepaliveEnforcementPolicy(keepalive.EnforcementPolicy{
 			MinTime:             1 * time.Minute,
 			PermitWithoutStream: true,

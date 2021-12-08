@@ -369,6 +369,7 @@
   "console.containers.device-importer.index.documentationHint": "Please also see our documentation on <DocLink>Importing End Devices</DocLink> for more information and possible resolutions.",
   "console.containers.device-importer.index.abortWarningTitle": "Device import aborted",
   "console.containers.device-importer.index.abortWarningMessage": "The end device import was aborted and the remaining {count} {count, plural, one {end device} other {end devices}} have not been imported",
+  "console.containers.device-importer.index.largeFileWarningMessage": "Providing files larger than {warningThreshold} can cause issues during the import process. We recommend you to split such files up into multiple smaller files and importing them one by one.",
   "console.containers.device-payload-formatters.messages.defaultFormatter": "Click <Link>here</Link> to modify the default payload formatter for this application",
   "console.containers.device-template-format-select.index.title": "File format",
   "console.containers.device-template-format-select.index.warning": "End device template formats unavailable",

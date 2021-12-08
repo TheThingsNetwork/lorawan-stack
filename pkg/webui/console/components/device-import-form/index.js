@@ -61,7 +61,14 @@ export default class DeviceBulkCreateForm extends Component {
       set_claim_auth_code: PropTypes.bool,
     }).isRequired,
     jsEnabled: PropTypes.bool.isRequired,
+    largeFileWarningMessage: PropTypes.string,
     onSubmit: PropTypes.func.isRequired,
+    warningSize: PropTypes.number,
+  }
+
+  static defaultProps = {
+    largeFileWarningMessage: undefined,
+    warningSize: undefined,
   }
 
   state = {
@@ -83,7 +90,7 @@ export default class DeviceBulkCreateForm extends Component {
   }
 
   render() {
-    const { initialValues, onSubmit, jsEnabled } = this.props
+    const { initialValues, onSubmit, jsEnabled, warningSize, largeFileWarningMessage } = this.props
     const { allowedFileExtensions, formatSelected, formatDescription } = this.state
     let passedInitialValues = initialValues
     if (!jsEnabled && initialValues.set_claim_auth_code) {
@@ -118,6 +125,8 @@ export default class DeviceBulkCreateForm extends Component {
               title={m.file}
               accept={allowedFileExtensions}
               component={FileInput}
+              largeFileWarningMessage={largeFileWarningMessage}
+              warningSize={warningSize}
               name="data"
               required
             />
