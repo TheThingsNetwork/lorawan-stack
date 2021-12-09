@@ -48,11 +48,11 @@ func (x *Session) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("dev_addr")
 		x.DevAddr.MarshalProtoJSON(s.WithField("dev_addr"))
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.Keys != nil || s.HasField("keys") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("keys")
 		// NOTE: SessionKeys does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.SessionKeys)
+		gogo.MarshalMessage(s, x.Keys)
 	}
 	if x.LastFCntUp != 0 || s.HasField("last_f_cnt_up") {
 		s.WriteMoreIf(&wroteField)
@@ -114,7 +114,7 @@ func (x *Session) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: SessionKeys does not seem to implement UnmarshalProtoJSON.
 			var v SessionKeys
 			gogo.UnmarshalMessage(s, &v)
-			x.SessionKeys = v
+			x.Keys = &v
 		case "last_f_cnt_up", "lastFCntUp":
 			s.AddField("last_f_cnt_up")
 			x.LastFCntUp = s.ReadUint32()
