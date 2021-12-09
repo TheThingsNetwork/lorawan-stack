@@ -105,7 +105,7 @@ message ListApplicationsRequest {
 message CreateApplicationRequest {
   Application application = 1 [(validate.rules).message.required = true];
   // Collaborator to grant all rights on the newly created application.
-  OrganizationOrUserIdentifiers collaborator = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  OrganizationOrUserIdentifiers collaborator = 2 [(validate.rules).message.required = true];
 }
 
 message UpdateApplicationRequest {
