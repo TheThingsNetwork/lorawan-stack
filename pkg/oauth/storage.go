@@ -87,8 +87,8 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 	client := ttnpb.Client(data.Client.(osinClient))
 	rights := rightsFromScope(data.Scope)
 	_, err := s.oauth.Authorize(s.ctx, &ttnpb.OAuthClientAuthorization{
-		ClientIds: *client.GetIds(),
-		UserIds:   *userSessionIDs.GetUserIds(),
+		ClientIds: client.GetIds(),
+		UserIds:   userSessionIDs.GetUserIds(),
 		Rights:    rights,
 	})
 	if err != nil {
@@ -98,8 +98,8 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 		data.CreatedAt = time.Now()
 	}
 	err = s.oauth.CreateAuthorizationCode(s.ctx, &ttnpb.OAuthAuthorizationCode{
-		ClientIds:     *client.GetIds(),
-		UserIds:       *userSessionIDs.GetUserIds(),
+		ClientIds:     client.GetIds(),
+		UserIds:       userSessionIDs.GetUserIds(),
 		UserSessionId: userSessionIDs.SessionId,
 		Rights:        rights,
 		Code:          data.Code,
@@ -137,7 +137,7 @@ func (s *storage) LoadAuthorize(code string) (data *osin.AuthorizeData, err erro
 		CreatedAt:   *ttnpb.StdTime(authorizationCode.CreatedAt),
 		UserData: userData{
 			UserSessionIdentifiers: &ttnpb.UserSessionIdentifiers{
-				UserIds:   &authorizationCode.UserIds,
+				UserIds:   authorizationCode.UserIds,
 				SessionId: authorizationCode.UserSessionId,
 			},
 		},
@@ -211,8 +211,8 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 		}
 	}
 	return s.oauth.CreateAccessToken(s.ctx, &ttnpb.OAuthAccessToken{
-		ClientIds:     *client.GetIds(),
-		UserIds:       *userSessionIDs.GetUserIds(),
+		ClientIds:     client.GetIds(),
+		UserIds:       userSessionIDs.GetUserIds(),
 		UserSessionId: userSessionIDs.SessionId,
 		Rights:        rights,
 		Id:            accessID,
@@ -245,7 +245,7 @@ func (s *storage) loadAccess(id string) (*osin.AccessData, error) {
 		CreatedAt:    *ttnpb.StdTime(accessToken.CreatedAt),
 		UserData: userData{
 			UserSessionIdentifiers: &ttnpb.UserSessionIdentifiers{
-				UserIds:   &accessToken.UserIds,
+				UserIds:   accessToken.UserIds,
 				SessionId: accessToken.UserSessionId,
 			},
 			ID: id,
