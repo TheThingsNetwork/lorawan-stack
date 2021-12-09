@@ -22,6 +22,7 @@ import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import toast from '@ttn-lw/components/toast'
+import Button from '@ttn-lw/components/button'
 
 import WebhookForm from '@console/components/webhook-form'
 
@@ -29,10 +30,15 @@ import diff from '@ttn-lw/lib/diff'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import style from './application-integration-webhook-edit.styl'
+
 const m = defineMessages({
   editWebhook: 'Edit webhook',
   updateSuccess: 'Webhook updated',
   deleteSuccess: 'Webhook deleted',
+  reactivateButton: 'Activate webhook',
+  reactivateSuccess: 'Webhook activated',
+  reactivateWebhookTitle: 'Activate suspended webhook'
 })
 
 const ApplicationWebhookEdit = props => {
@@ -80,6 +86,20 @@ const ApplicationWebhookEdit = props => {
     navigateToList()
   }, [navigateToList])
 
+  const handleReactivateSuccess = React.useCallback(() => {
+    toast({
+      message: m.reactivateSuccess,
+      type: toast.types.SUCCESS,
+    })
+  }, [])
+  const handleReactivate = React.useCallback(async () => {
+    const newHealthStatus = {
+      health_status: null,
+    }
+    await updateWebhook(newHealthStatus)
+    handleReactivateSuccess()
+  }, [updateWebhook, handleReactivateSuccess])
+
   return (
     <Container>
       <PageTitle title={m.editWebhook} />
@@ -94,6 +114,16 @@ const ApplicationWebhookEdit = props => {
             onSubmitSuccess={handleSubmitSuccess}
             onDelete={handleDelete}
             onDeleteSuccess={handleDeleteSuccess}
+            reactivateButton={
+              <Button
+                message={m.reactivateButton}
+                icon={'refresh'}
+                onClick={handleReactivate}
+                className={style.activateWebhookButton}
+              />
+            }
+            reactivate={webhook.health_status?.unhealthy !== undefined}
+            reactivateWebhookTitle={m.reactivateWebhookTitle}
           />
         </Col>
       </Row>
