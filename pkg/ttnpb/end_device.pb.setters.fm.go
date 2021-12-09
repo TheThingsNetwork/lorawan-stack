@@ -436,19 +436,26 @@ func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) e
 		case "ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDeviceVersionIdentifiers
-				if src != nil {
-					newSrc = &src.EndDeviceVersionIdentifiers
+				if (src == nil || src.Ids == nil) && dst.Ids == nil {
+					continue
 				}
-				newDst = &dst.EndDeviceVersionIdentifiers
+				if src != nil {
+					newSrc = src.Ids
+				}
+				if dst.Ids != nil {
+					newDst = dst.Ids
+				} else {
+					newDst = &EndDeviceVersionIdentifiers{}
+					dst.Ids = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.EndDeviceVersionIdentifiers = src.EndDeviceVersionIdentifiers
+					dst.Ids = src.Ids
 				} else {
-					var zero EndDeviceVersionIdentifiers
-					dst.EndDeviceVersionIdentifiers = zero
+					dst.Ids = nil
 				}
 			}
 		case "lorawan_version":
