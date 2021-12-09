@@ -62,7 +62,7 @@ func TestApplicationsPermissionDenied(t *testing.T) {
 			Application: &ttnpb.Application{
 				Ids: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
 			},
-			Collaborator: *ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
+			Collaborator: ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -142,7 +142,7 @@ func TestApplicationsCRUD(t *testing.T) {
 				Ids:  &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 				Name: "Foo Application",
 			},
-			Collaborator: *userID.GetOrganizationOrUserIdentifiers(),
+			Collaborator: userID.GetOrganizationOrUserIdentifiers(),
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -156,7 +156,7 @@ func TestApplicationsCRUD(t *testing.T) {
 				Ids:  &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 				Name: "Foo Application",
 			},
-			Collaborator: *userID.OrganizationOrUserIdentifiers(),
+			Collaborator: userID.OrganizationOrUserIdentifiers(),
 		}, creds)
 
 		a.So(err, should.BeNil)

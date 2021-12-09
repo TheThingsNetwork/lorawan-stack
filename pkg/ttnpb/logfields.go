@@ -77,7 +77,7 @@ func (req *CreateApplicationRequest) ExtractRequestFields(m map[string]interface
 		return
 	}
 	req.Application.ExtractRequestFields(m)
-	extractCollaboratorFields(m, &req.Collaborator)
+	extractCollaboratorFields(m, req.GetCollaborator())
 }
 
 func (req *CreateClientRequest) ExtractRequestFields(m map[string]interface{}) {
