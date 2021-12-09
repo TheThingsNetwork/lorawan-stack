@@ -127,28 +127,31 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 	})
 	for _, tc := range []struct {
 		Name                string
-		SessionKeys         ttnpb.SessionKeys
+		SessionKeys         *ttnpb.SessionKeys
 		Prefix              string
 		Paths               []string
-		ExpectedSessionKeys ttnpb.SessionKeys
+		ExpectedSessionKeys *ttnpb.SessionKeys
 		ErrorAssertion      func(*testing.T, error) bool
 	}{
 		{
-			Name:           "no keys/no prefix/no paths",
-			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
+			Name:                "no keys/no prefix/no paths",
+			SessionKeys:         &ttnpb.SessionKeys{},
+			ExpectedSessionKeys: &ttnpb.SessionKeys{},
+			ErrorAssertion:      func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
 		},
 		{
 			Name: "decrypted AppSKey/no prefix/no paths",
-			SessionKeys: ttnpb.SessionKeys{
+			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
 			},
-			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
+			ExpectedSessionKeys: &ttnpb.SessionKeys{},
+			ErrorAssertion:      func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
 		},
 		{
 			Name: "decrypted AppSKey/no prefix/paths(nwk_s_enc_key)",
-			SessionKeys: ttnpb.SessionKeys{
+			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
@@ -156,11 +159,12 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Paths: []string{
 				"nwk_s_enc_key",
 			},
-			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
+			ExpectedSessionKeys: &ttnpb.SessionKeys{},
+			ErrorAssertion:      func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
 		},
 		{
 			Name: "decrypted AppSKey/no prefix/paths(app_s_key)",
-			SessionKeys: ttnpb.SessionKeys{
+			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
@@ -168,7 +172,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Paths: []string{
 				"app_s_key",
 			},
-			ExpectedSessionKeys: ttnpb.SessionKeys{
+			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
@@ -177,7 +181,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 		},
 		{
 			Name: "decrypted AppSKey/no prefix/paths(app_s_key.key)",
-			SessionKeys: ttnpb.SessionKeys{
+			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
@@ -185,7 +189,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Paths: []string{
 				"app_s_key.key",
 			},
-			ExpectedSessionKeys: ttnpb.SessionKeys{
+			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
@@ -194,7 +198,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 		},
 		{
 			Name: "encrypted AppSKey/no prefix/paths(app_s_key)",
-			SessionKeys: ttnpb.SessionKeys{
+			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					KekLabel:     "key",
 					EncryptedKey: cipherKey,
@@ -203,7 +207,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Paths: []string{
 				"app_s_key",
 			},
-			ExpectedSessionKeys: ttnpb.SessionKeys{
+			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
@@ -212,7 +216,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 		},
 		{
 			Name: "encrypted AppSKey/no prefix/paths(app_s_key.key)",
-			SessionKeys: ttnpb.SessionKeys{
+			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					KekLabel:     "key",
 					EncryptedKey: cipherKey,
@@ -221,7 +225,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Paths: []string{
 				"app_s_key.key",
 			},
-			ExpectedSessionKeys: ttnpb.SessionKeys{
+			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
@@ -230,7 +234,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 		},
 		{
 			Name: "encrypted AppSKey, decrypted Nwk keys/no prefix/paths(app_s_key.key,f_nwk_s_int_key.key,nwk_s_enc_key,s_nwk_s_int_key)",
-			SessionKeys: ttnpb.SessionKeys{
+			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					KekLabel:     "key",
 					EncryptedKey: cipherKey,
@@ -251,7 +255,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 				"nwk_s_enc_key",
 				"s_nwk_s_int_key",
 			},
-			ExpectedSessionKeys: ttnpb.SessionKeys{
+			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
@@ -269,17 +273,18 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 		},
 		{
 			Name: "decrypted AppSKey/prefix(test)/no paths",
-			SessionKeys: ttnpb.SessionKeys{
+			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
 			},
-			Prefix:         "test",
-			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
+			Prefix:              "test",
+			ExpectedSessionKeys: &ttnpb.SessionKeys{},
+			ErrorAssertion:      func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
 		},
 		{
 			Name: "decrypted AppSKey/prefix(test)/paths(app_s_key)",
-			SessionKeys: ttnpb.SessionKeys{
+			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
@@ -288,11 +293,12 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Paths: []string{
 				"app_s_key",
 			},
-			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
+			ExpectedSessionKeys: &ttnpb.SessionKeys{},
+			ErrorAssertion:      func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
 		},
 		{
 			Name: "decrypted AppSKey/prefix(test)/paths(app_s_key.key)",
-			SessionKeys: ttnpb.SessionKeys{
+			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
@@ -301,11 +307,12 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Paths: []string{
 				"app_s_key.key",
 			},
-			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
+			ExpectedSessionKeys: &ttnpb.SessionKeys{},
+			ErrorAssertion:      func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
 		},
 		{
 			Name: "decrypted AppSKey/prefix(test)/paths(test.nwk_s_enc_key)",
-			SessionKeys: ttnpb.SessionKeys{
+			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
@@ -314,11 +321,12 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Paths: []string{
 				"test.nwk_s_enc_key",
 			},
-			ErrorAssertion: func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
+			ExpectedSessionKeys: &ttnpb.SessionKeys{},
+			ErrorAssertion:      func(t *testing.T, err error) bool { return assertions.New(t).So(err, should.BeNil) },
 		},
 		{
 			Name: "decrypted AppSKey/prefix(test)/paths(test.app_s_key)",
-			SessionKeys: ttnpb.SessionKeys{
+			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
@@ -327,7 +335,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Paths: []string{
 				"test.app_s_key",
 			},
-			ExpectedSessionKeys: ttnpb.SessionKeys{
+			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
@@ -336,7 +344,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 		},
 		{
 			Name: "decrypted AppSKey/prefix(test)/paths(test.app_s_key.key)",
-			SessionKeys: ttnpb.SessionKeys{
+			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
@@ -345,7 +353,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Paths: []string{
 				"test.app_s_key.key",
 			},
-			ExpectedSessionKeys: ttnpb.SessionKeys{
+			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
@@ -354,7 +362,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 		},
 		{
 			Name: "encrypted AppSKey/prefix(test)/paths(test.app_s_key)",
-			SessionKeys: ttnpb.SessionKeys{
+			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					KekLabel:     "key",
 					EncryptedKey: cipherKey,
@@ -364,7 +372,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Paths: []string{
 				"test.app_s_key",
 			},
-			ExpectedSessionKeys: ttnpb.SessionKeys{
+			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
@@ -373,7 +381,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 		},
 		{
 			Name: "encrypted AppSKey/prefix(test)/paths(test.app_s_key.key)",
-			SessionKeys: ttnpb.SessionKeys{
+			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					KekLabel:     "key",
 					EncryptedKey: cipherKey,
@@ -383,7 +391,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Paths: []string{
 				"test.app_s_key.key",
 			},
-			ExpectedSessionKeys: ttnpb.SessionKeys{
+			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
@@ -392,7 +400,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 		},
 		{
 			Name: "encrypted AppSKey, decrypted Nwk keys/prefix(test)/paths(test)",
-			SessionKeys: ttnpb.SessionKeys{
+			SessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					KekLabel:     "key",
 					EncryptedKey: cipherKey,
@@ -411,7 +419,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			Paths: []string{
 				"test",
 			},
-			ExpectedSessionKeys: ttnpb.SessionKeys{
+			ExpectedSessionKeys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					Key: &key,
 				},
@@ -431,7 +439,7 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			sk := deepcopy.Copy(tc.SessionKeys).(ttnpb.SessionKeys)
+			sk := deepcopy.Copy(tc.SessionKeys).(*ttnpb.SessionKeys)
 			ret, err := UnwrapSelectedSessionKeys(test.Context(), v, sk, tc.Prefix, tc.Paths...)
 			a.So(sk, should.Resemble, tc.SessionKeys)
 			a.So(ret, should.Resemble, tc.ExpectedSessionKeys)

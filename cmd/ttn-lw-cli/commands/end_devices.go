@@ -411,7 +411,7 @@ var (
 					device.DevAddr = devAddrRes.DevAddr
 					device.Session = &ttnpb.Session{
 						DevAddr: *devAddrRes.DevAddr,
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{Key: generateKey()},
 							AppSKey:     &ttnpb.KeyEnvelope{Key: generateKey()},
 						},
@@ -434,8 +434,8 @@ var (
 						return errInvalidMACVersion.WithCause(err)
 					}
 					if macVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
-						device.Session.SessionKeys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: generateKey()}
-						device.Session.SessionKeys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: generateKey()}
+						device.Session.Keys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: generateKey()}
+						device.Session.Keys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: generateKey()}
 						paths = append(paths,
 							"session.keys.s_nwk_s_int_key.key",
 							"session.keys.nwk_s_enc_key.key",

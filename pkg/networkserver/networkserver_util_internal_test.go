@@ -1208,8 +1208,8 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 				).New(events.ContextWithCorrelationID(ctx, scheduledDown.CorrelationIds...)),
 			)
 			dev.PendingSession = &ttnpb.Session{
-				DevAddr:     dev.PendingMacState.QueuedJoinAccept.DevAddr,
-				SessionKeys: dev.PendingMacState.QueuedJoinAccept.Keys,
+				DevAddr: dev.PendingMacState.QueuedJoinAccept.DevAddr,
+				Keys:    &dev.PendingMacState.QueuedJoinAccept.Keys,
 			}
 			dev.PendingMacState.PendingJoinRequest = &dev.PendingMacState.QueuedJoinAccept.Request
 			dev.PendingMacState.QueuedJoinAccept = nil
@@ -2086,7 +2086,7 @@ var SessionOptions SessionOptionNamespace
 
 func MakeSession(macVersion ttnpb.MACVersion, wrapKeys, withID bool, opts ...test.SessionOption) *ttnpb.Session {
 	return test.MakeSession(
-		SessionOptions.WithSessionKeys(*MakeSessionKeys(macVersion, wrapKeys, withID)),
+		SessionOptions.WithKeys(MakeSessionKeys(macVersion, wrapKeys, withID)),
 		SessionOptions.Compose(opts...),
 	)
 }
@@ -2152,7 +2152,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 		return o.Compose(
 			o.WithPendingSession(&ttnpb.Session{
 				DevAddr: x.PendingMacState.QueuedJoinAccept.DevAddr,
-				SessionKeys: ttnpb.SessionKeys{
+				Keys: &ttnpb.SessionKeys{
 					SessionKeyId: x.PendingMacState.QueuedJoinAccept.Keys.SessionKeyId,
 					FNwkSIntKey:  x.PendingMacState.QueuedJoinAccept.Keys.FNwkSIntKey,
 					SNwkSIntKey:  x.PendingMacState.QueuedJoinAccept.Keys.SNwkSIntKey,

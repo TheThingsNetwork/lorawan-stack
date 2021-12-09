@@ -2185,9 +2185,9 @@ func TestHandleJoin(t *testing.T) {
 				}
 				a.So([]time.Time{start, *ttnpb.StdTime(ret.GetSession().GetStartedAt()), time.Now()}, should.BeChronological)
 				pb.Session = &ttnpb.Session{
-					DevAddr:     tc.JoinRequest.DevAddr,
-					SessionKeys: *res.SessionKeys,
-					StartedAt:   ret.GetSession().GetStartedAt(),
+					DevAddr:   tc.JoinRequest.DevAddr,
+					Keys:      res.SessionKeys,
+					StartedAt: ret.GetSession().GetStartedAt(),
 				}
 				pb.DevAddr = &tc.JoinRequest.DevAddr
 				a.So(ret, should.HaveEmptyDiff, pb)

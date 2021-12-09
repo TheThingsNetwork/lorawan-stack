@@ -169,7 +169,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					},
 					FrequencyPlanId: test.EUFrequencyPlanID,
 					Session: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
 								KekLabel:     "test",
 								EncryptedKey: []byte{0x96, 0x77, 0x8b, 0x25, 0xae, 0x6c, 0xa4, 0x35, 0xf9, 0x2b, 0x5b, 0x97, 0xc0, 0x50, 0xae, 0xd2, 0x46, 0x8a, 0xb8, 0xa1, 0x7a, 0xd8, 0x4e, 0x5d},
@@ -200,7 +200,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				},
 				FrequencyPlanId: test.EUFrequencyPlanID,
 				Session: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
+					Keys: &ttnpb.SessionKeys{
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
 							Key: AES128KeyPtr(types.AES128Key{0x0, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}),
 						},
@@ -237,7 +237,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					PendingSession: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
 								KekLabel:     "test",
 								EncryptedKey: []byte{0x96, 0x77, 0x8b, 0x25, 0xae, 0x6c, 0xa4, 0x35, 0xf9, 0x2b, 0x5b, 0x97, 0xc0, 0x50, 0xae, 0xd2, 0x46, 0x8a, 0xb8, 0xa1, 0x7a, 0xd8, 0x4e, 0x5d},
@@ -266,7 +266,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				PendingSession: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
+					Keys: &ttnpb.SessionKeys{
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
 							Key: AES128KeyPtr(types.AES128Key{0x0, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}),
 						},
@@ -305,7 +305,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					PendingSession: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{
 								KekLabel:     "test",
 								EncryptedKey: []byte{0x96, 0x77, 0x8b, 0x25, 0xae, 0x6c, 0xa4, 0x35, 0xf9, 0x2b, 0x5b, 0x97, 0xc0, 0x50, 0xae, 0xd2, 0x46, 0x8a, 0xb8, 0xa1, 0x7a, 0xd8, 0x4e, 0x5d},
@@ -334,7 +334,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
 				PendingSession: &ttnpb.Session{
-					SessionKeys: ttnpb.SessionKeys{
+					Keys: &ttnpb.SessionKeys{
 						FNwkSIntKey: &ttnpb.KeyEnvelope{
 							Key: AES128KeyPtr(types.AES128Key{0x0, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}),
 						},
@@ -1087,7 +1087,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 							return fmt.Sprintf(MakeTestCaseName("ABP", "dev_addr:%s", "queue_len:%d", "session_keys:%v"),
 								tc.CreateDevice.Session.DevAddr,
 								len(tc.CreateDevice.EndDevice.Session.QueuedApplicationDownlinks),
-								tc.CreateDevice.Session.SessionKeys,
+								tc.CreateDevice.Session.Keys,
 							)
 						}(),
 					)
@@ -1185,7 +1185,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 						session = &ttnpb.Session{
 							DevAddr:                    created.Session.DevAddr,
 							QueuedApplicationDownlinks: created.Session.QueuedApplicationDownlinks,
-							SessionKeys:                created.Session.SessionKeys,
+							Keys:                       created.Session.Keys,
 							StartedAt:                  ttnpb.ProtoTimePtr(now),
 						}
 					}

@@ -251,7 +251,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			},
 			FRMPayload:  frmPayload,
 			FOpts:       fOpts,
-			SessionKeys: &dev.Session.SessionKeys,
+			SessionKeys: dev.Session.Keys,
 		})
 		dev, ok = env.AssertScheduleDataDownlink(ctx, DataDownlinkAssertionConfig{
 			SetRX1:      true,
@@ -295,7 +295,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 						CorrelationIds: up.CorrelationIds,
 						Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 							DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
-								SessionKeyId: dev.Session.SessionKeyId,
+								SessionKeyId: dev.Session.Keys.SessionKeyId,
 							},
 						},
 					}),

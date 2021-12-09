@@ -286,7 +286,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       devAddr,
 					LastNFCntDown: 41,
-					SessionKeys: ttnpb.SessionKeys{
+					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
 							Key: &nwkSEncKey,
 						},
@@ -353,7 +353,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 41,
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
 								Key: &nwkSEncKey,
 							},
@@ -393,7 +393,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
-					SessionKeys: ttnpb.SessionKeys{
+					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
 							Key: &nwkSEncKey,
 						},
@@ -467,7 +467,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					},
 					Session: &ttnpb.Session{
 						DevAddr: devAddr,
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
 								Key: &nwkSEncKey,
 							},
@@ -511,7 +511,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
-					SessionKeys: ttnpb.SessionKeys{
+					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
 							Key: &nwkSEncKey,
 						},
@@ -589,7 +589,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					},
 					Session: &ttnpb.Session{
 						DevAddr: devAddr,
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
 								Key: &nwkSEncKey,
 							},
@@ -629,7 +629,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
-					SessionKeys: ttnpb.SessionKeys{
+					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
 							Key: &nwkSEncKey,
 						},
@@ -706,7 +706,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					},
 					Session: &ttnpb.Session{
 						DevAddr: devAddr,
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
 								Key: &nwkSEncKey,
 							},
@@ -750,7 +750,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
-					SessionKeys: ttnpb.SessionKeys{
+					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
 							Key: &nwkSEncKey,
 						},
@@ -832,7 +832,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					},
 					Session: &ttnpb.Session{
 						DevAddr: devAddr,
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
 								Key: &nwkSEncKey,
 							},
@@ -884,7 +884,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DevAddr:       devAddr,
 					LastFCntUp:    99,
 					LastNFCntDown: 41,
-					SessionKeys: ttnpb.SessionKeys{
+					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
 							Key: &nwkSEncKey,
 						},
@@ -962,7 +962,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DevAddr:       devAddr,
 						LastFCntUp:    99,
 						LastNFCntDown: 41,
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
 								Key: &nwkSEncKey,
 							},
@@ -1011,7 +1011,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       devAddr,
 					LastNFCntDown: 41,
-					SessionKeys: ttnpb.SessionKeys{
+					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
 							Key: &nwkSEncKey,
 						},
@@ -1087,7 +1087,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					Session: &ttnpb.Session{
 						DevAddr:       devAddr,
 						LastNFCntDown: 41,
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
 								Key: &nwkSEncKey,
 							},
@@ -1174,7 +1174,7 @@ func generateSession() *ttnpb.Session {
 	randomVal := uint32(random.Int63n(100))
 	var key types.AES128Key
 	rand.Read(key[:])
-	keys := ttnpb.SessionKeys{
+	keys := &ttnpb.SessionKeys{
 		SessionKeyId: []byte{0x01, 0x02, 0x03, 0x04},
 		FNwkSIntKey: &ttnpb.KeyEnvelope{
 			KekLabel: "FNwkSIntKey",
@@ -1205,7 +1205,7 @@ func generateSession() *ttnpb.Session {
 	}
 	return &ttnpb.Session{
 		DevAddr:                    types.DevAddr{0x26, 0x01, 0xff, 0xff},
-		SessionKeys:                keys,
+		Keys:                       keys,
 		LastFCntUp:                 randomVal,
 		LastNFCntDown:              randomVal,
 		LastAFCntDown:              randomVal,

@@ -36,7 +36,7 @@ func (as *ApplicationServer) encodeAndEncryptDownlinks(ctx context.Context, dev 
 		skipPayloadCrypto := as.skipPayloadCrypto(ctx, link, dev, session)
 		for _, item := range items {
 			fCnt := session.LastAFCntDown + 1
-			sessionKeyID := session.SessionKeyId
+			sessionKeyID := session.Keys.SessionKeyId
 			if skipPayloadCrypto {
 				fCnt = item.FCnt
 
@@ -70,7 +70,7 @@ func (as *ApplicationServer) encodeAndEncryptDownlinks(ctx context.Context, dev 
 }
 
 func (as *ApplicationServer) encodeAndEncryptDownlink(ctx context.Context, dev *ttnpb.EndDevice, session *ttnpb.Session, downlink *ttnpb.ApplicationDownlink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
-	if session == nil || session.AppSKey == nil {
+	if session.GetKeys().GetAppSKey() == nil {
 		return errNoAppSKey.New()
 	}
 	if downlink.FrmPayload == nil && downlink.DecodedPayload == nil {
@@ -94,7 +94,7 @@ func (as *ApplicationServer) encodeAndEncryptDownlink(ctx context.Context, dev *
 			}
 		}
 	}
-	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, session.AppSKey, as.KeyVault)
+	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, session.Keys.AppSKey, as.KeyVault)
 	if err != nil {
 		return err
 	}
@@ -114,10 +114,10 @@ func (as *ApplicationServer) decryptAndDecodeUplink(ctx context.Context, dev *tt
 }
 
 func (as *ApplicationServer) decryptUplink(ctx context.Context, dev *ttnpb.EndDevice, uplink *ttnpb.ApplicationUplink) error {
-	if dev.Session == nil || dev.Session.AppSKey == nil {
+	if dev.GetSession().GetKeys().GetAppSKey() == nil {
 		return errNoAppSKey.New()
 	}
-	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.AppSKey, as.KeyVault)
+	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.Keys.AppSKey, as.KeyVault)
 	if err != nil {
 		return err
 	}
@@ -161,19 +161,19 @@ func (as *ApplicationServer) decryptAndDecodeDownlink(ctx context.Context, dev *
 func (as *ApplicationServer) decryptDownlink(ctx context.Context, dev *ttnpb.EndDevice, downlink *ttnpb.ApplicationDownlink, ternarySession *ttnpb.Session) error {
 	var session *ttnpb.Session
 	switch {
-	case dev.Session != nil && bytes.Equal(dev.Session.SessionKeyId, downlink.SessionKeyId):
+	case dev.Session != nil && bytes.Equal(dev.Session.Keys.SessionKeyId, downlink.SessionKeyId):
 		session = dev.Session
-	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyId, downlink.SessionKeyId):
+	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.Keys.SessionKeyId, downlink.SessionKeyId):
 		session = dev.PendingSession
-	case ternarySession != nil && bytes.Equal(ternarySession.SessionKeyId, downlink.SessionKeyId):
+	case ternarySession != nil && bytes.Equal(ternarySession.Keys.SessionKeyId, downlink.SessionKeyId):
 		session = ternarySession
 	default:
 		return errUnknownSession.New()
 	}
-	if session.GetAppSKey() == nil {
+	if session.GetKeys().GetAppSKey() == nil {
 		return errNoAppSKey.New()
 	}
-	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, session.AppSKey, as.KeyVault)
+	appSKey, err := cryptoutil.UnwrapAES128Key(ctx, session.Keys.AppSKey, as.KeyVault)
 	if err != nil {
 		return err
 	}
