@@ -55,7 +55,7 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 
 		_, err = reg.Get(ctx, &ttnpb.GetEndDeviceRequest{
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 				DeviceId: "test-device-id",
 				ApplicationIds: &ttnpb.ApplicationIdentifiers{
 					ApplicationId: "test-app-id",
@@ -161,7 +161,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 
 		got, err := reg.Get(ctx, &ttnpb.GetEndDeviceRequest{
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 				DeviceId:       "test-device-id",
 				ApplicationIds: app.GetIds(),
 			},
@@ -238,7 +238,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 
 		_, err = reg.Get(ctx, &ttnpb.GetEndDeviceRequest{
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 				DeviceId:       "test-device-id",
 				ApplicationIds: app.GetIds(),
 			},

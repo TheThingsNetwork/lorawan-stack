@@ -70,7 +70,7 @@ func splitEndDeviceSetPaths(supportsJoin bool, paths ...string) (is, ns, as, js 
 	return
 }
 
-func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []string, continueOnError bool) (*ttnpb.EndDevice, error) {
+func getEndDevice(ids *ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []string, continueOnError bool) (*ttnpb.EndDevice, error) {
 	var res ttnpb.EndDevice
 	if len(jsPaths) > 0 {
 		if !config.JoinServerEnabled {
@@ -85,8 +85,8 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 			} else {
 				logger.WithField("paths", jsPaths).Debug("Get end device from Join Server")
 				jsRes, err := ttnpb.NewJsEndDeviceRegistryClient(js).Get(ctx, &ttnpb.GetEndDeviceRequest{
-					EndDeviceIdentifiers: ids,
-					FieldMask:            &pbtypes.FieldMask{Paths: jsPaths},
+					EndDeviceIds: ids,
+					FieldMask:    &pbtypes.FieldMask{Paths: jsPaths},
 				})
 				if err != nil {
 					if !continueOnError {
@@ -119,8 +119,8 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 			} else {
 				logger.WithField("paths", asPaths).Debug("Get end device from Application Server")
 				asRes, err := ttnpb.NewAsEndDeviceRegistryClient(as).Get(ctx, &ttnpb.GetEndDeviceRequest{
-					EndDeviceIdentifiers: ids,
-					FieldMask:            &pbtypes.FieldMask{Paths: asPaths},
+					EndDeviceIds: ids,
+					FieldMask:    &pbtypes.FieldMask{Paths: asPaths},
 				})
 				if err != nil {
 					if !continueOnError {
@@ -153,8 +153,8 @@ func getEndDevice(ids ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []st
 			} else {
 				logger.WithField("paths", nsPaths).Debug("Get end device from Network Server")
 				nsRes, err := ttnpb.NewNsEndDeviceRegistryClient(ns).Get(ctx, &ttnpb.GetEndDeviceRequest{
-					EndDeviceIdentifiers: ids,
-					FieldMask:            &pbtypes.FieldMask{Paths: nsPaths},
+					EndDeviceIds: ids,
+					FieldMask:    &pbtypes.FieldMask{Paths: nsPaths},
 				})
 				if err != nil {
 					if !continueOnError {

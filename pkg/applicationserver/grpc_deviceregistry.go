@@ -118,7 +118,7 @@ func (r asEndDeviceRegistryServer) retrieveSessionKeys(ctx context.Context, dev 
 
 // Get implements ttnpb.AsEndDeviceRegistryServer.
 func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
+	if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
 
@@ -127,7 +127,7 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 		"pending_session.keys.app_s_key.key",
 		"session.keys.app_s_key.key",
 	) {
-		if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
+		if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 			return nil, err
 		}
 		gets = ttnpb.AddFields(gets, "skip_payload_crypto_override")
@@ -149,7 +149,7 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 		}
 	}
 
-	dev, err := r.AS.deviceRegistry.Get(ctx, req.EndDeviceIdentifiers, gets)
+	dev, err := r.AS.deviceRegistry.Get(ctx, *req.EndDeviceIds, gets)
 	if err != nil {
 		return nil, err
 	}
