@@ -46,6 +46,7 @@ const webhookEntitySelector = [
   'location_solved',
   'service_data',
   'template_ids',
+  'health_status',
 ]
 
 const mapStateToProps = state => {

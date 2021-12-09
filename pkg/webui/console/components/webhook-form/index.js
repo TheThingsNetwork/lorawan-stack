@@ -105,6 +105,9 @@ export default class WebhookForm extends Component {
     onSubmit: PropTypes.func.isRequired,
     onSubmitFailure: PropTypes.func,
     onSubmitSuccess: PropTypes.func.isRequired,
+    reactivate: PropTypes.bool,
+    reactivateButton: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
+    reactivateWebhookTitle: PropTypes.message,
     update: PropTypes.bool.isRequired,
     webhookTemplate: PropTypes.webhookTemplate,
   }
@@ -118,6 +121,9 @@ export default class WebhookForm extends Component {
     onDelete: () => null,
     webhookTemplate: undefined,
     existCheck: () => false,
+    reactivateButton: undefined,
+    reactivate: false,
+    reactivateWebhookTitle: undefined,
   }
 
   form = React.createRef()
@@ -185,7 +191,14 @@ export default class WebhookForm extends Component {
   }
 
   render() {
-    const { update, initialWebhookValue, webhookTemplate } = this.props
+    const {
+      update,
+      initialWebhookValue,
+      webhookTemplate,
+      reactivateButton,
+      reactivate,
+      reactivateWebhookTitle,
+    } = this.props
     const { error, displayOverwriteModal, existingId } = this.state
     let initialValues = blankValues
     if (update && initialWebhookValue) {
@@ -225,14 +238,21 @@ export default class WebhookForm extends Component {
             disabled={update}
           />
           <WebhookFormatSelector name="format" required />
+          {reactivate && (
+            <React.Fragment>
+              <div>
+                <Form.SubTitle title={reactivateWebhookTitle} />
+                {reactivateButton}
+              </div>
+            </React.Fragment>
+          )}
           <Form.SubTitle title={m.endpointSettings} />
           <Form.Field
             name="base_url"
+            type="button"
             title={sharedMessages.webhookBaseUrl}
             placeholder="https://example.com/webhooks"
             component={Input}
-            autoComplete="url"
-            required
           />
           <Form.Field
             name="downlink_api_key"

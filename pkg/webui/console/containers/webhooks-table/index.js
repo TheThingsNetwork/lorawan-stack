@@ -15,6 +15,7 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
+import Status from '@ttn-lw/components/status'
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -36,8 +37,9 @@ const m = defineMessages({
   templateId: 'Template ID',
   format: 'Format',
   baseUrl: 'Base URL',
-  healthy: 'Healthy',
-  unhealthy: 'Unhealthy',
+  active: 'Active',
+  suspended: 'Suspended',
+  pending: 'Pending',
 })
 
 const headers = [
@@ -67,12 +69,21 @@ const headers = [
     displayName: sharedMessages.status,
     width: 10,
     render: value => {
+      let indicator = 'unknown'
+      let label = sharedMessages.unknown
+
       if (value && value.healthy) {
-        return <Message content={m.healthy} />
+        indicator = 'good'
+        label = m.active
       } else if (value && value.unhealthy) {
-        return <Message content={m.unhealthy} />
+        indicator = 'bad'
+        label = m.suspended
+      } else {
+        indicator = 'mediocre'
+        label = m.pending
       }
-      return <Message className={style.none} content={sharedMessages.unknown} />
+
+      return <Status status={indicator} label={label} />
     },
   },
 ]
