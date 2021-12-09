@@ -113,6 +113,28 @@ func TestRegistry(t *testing.T) {
 		a.So(registry.Set(ctx, ids, nil, nil, 0), should.BeNil)
 	})
 
+	t.Run("SetWithTTL", func(t *testing.T) {
+		a, ctx := test.New(t)
+		stats := &ttnpb.GatewayConnectionStats{
+			DisconnectedAt: ttnpb.ProtoTimePtr(time.Date(2021, 12, 02, 11, 24, 58, 0, time.UTC)),
+		}
+
+		err := registry.Set(ctx, ids, stats, []string{"disconnected_at"}, Timeout)
+		a.So(err, should.BeNil)
+
+		// all data should exist
+		retrieved, err := registry.Get(ctx, ids)
+		a.So(err, should.BeNil)
+		a.So(retrieved, should.Resemble, stats)
+
+		time.Sleep(Timeout)
+
+		// shouldn't be found after ttl has passed
+		retrieved, err = registry.Get(ctx, ids)
+		a.So(errors.IsNotFound(err), should.BeTrue)
+		a.So(retrieved, should.BeNil)
+	})
+
 	t.Run("UpdateFieldMask", func(t *testing.T) {
 		a, ctx := test.New(t)
 
