@@ -29,8 +29,8 @@ var (
 	baseSessionKeys = ttnpb.SessionKeys{}
 
 	baseSession = ttnpb.Session{
-		DevAddr:     DefaultDevAddr,
-		SessionKeys: baseSessionKeys,
+		DevAddr: DefaultDevAddr,
+		Keys:    &baseSessionKeys,
 	}
 
 	baseEndDeviceIdentifiers = ttnpb.EndDeviceIdentifiers{
@@ -87,7 +87,8 @@ func (o SessionKeysOptionNamespace) WithDefaultSessionKeyID() SessionKeysOption 
 
 func (o SessionOptionNamespace) WithSessionKeysOptions(opts ...SessionKeysOption) SessionOption {
 	return func(x ttnpb.Session) ttnpb.Session {
-		x.SessionKeys = SessionKeysOptions.Compose(opts...)(x.SessionKeys)
+		keys := SessionKeysOptions.Compose(opts...)(*x.Keys)
+		x.Keys = &keys
 		return x
 	}
 }

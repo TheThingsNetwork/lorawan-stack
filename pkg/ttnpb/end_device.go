@@ -99,13 +99,6 @@ func (v *PowerState) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (v *Session) GetSessionKeys() *SessionKeys {
-	if v == nil {
-		return nil
-	}
-	return &v.SessionKeys
-}
-
 // FieldIsZero returns whether path p is zero.
 func (v *EndDeviceAuthenticationCode) FieldIsZero(p string) bool {
 	if v == nil {
@@ -785,41 +778,41 @@ func (v *Session) FieldIsZero(p string) bool {
 	case "dev_addr":
 		return v.DevAddr == types.DevAddr{}
 	case "keys":
-		return fieldsAreZero(&v.SessionKeys, SessionKeysFieldPathsTopLevel...)
+		return fieldsAreZero(v.Keys, SessionKeysFieldPathsTopLevel...)
 	case "keys.app_s_key":
-		return v.SessionKeys.FieldIsZero("app_s_key")
+		return v.GetKeys().FieldIsZero("app_s_key")
 	case "keys.app_s_key.encrypted_key":
-		return v.SessionKeys.FieldIsZero("app_s_key.encrypted_key")
+		return v.GetKeys().FieldIsZero("app_s_key.encrypted_key")
 	case "keys.app_s_key.kek_label":
-		return v.SessionKeys.FieldIsZero("app_s_key.kek_label")
+		return v.GetKeys().FieldIsZero("app_s_key.kek_label")
 	case "keys.app_s_key.key":
-		return v.SessionKeys.FieldIsZero("app_s_key.key")
+		return v.GetKeys().FieldIsZero("app_s_key.key")
 	case "keys.f_nwk_s_int_key":
-		return v.SessionKeys.FieldIsZero("f_nwk_s_int_key")
+		return v.GetKeys().FieldIsZero("f_nwk_s_int_key")
 	case "keys.f_nwk_s_int_key.encrypted_key":
-		return v.SessionKeys.FieldIsZero("f_nwk_s_int_key.encrypted_key")
+		return v.GetKeys().FieldIsZero("f_nwk_s_int_key.encrypted_key")
 	case "keys.f_nwk_s_int_key.kek_label":
-		return v.SessionKeys.FieldIsZero("f_nwk_s_int_key.kek_label")
+		return v.GetKeys().FieldIsZero("f_nwk_s_int_key.kek_label")
 	case "keys.f_nwk_s_int_key.key":
-		return v.SessionKeys.FieldIsZero("f_nwk_s_int_key.key")
+		return v.GetKeys().FieldIsZero("f_nwk_s_int_key.key")
 	case "keys.nwk_s_enc_key":
-		return v.SessionKeys.FieldIsZero("nwk_s_enc_key")
+		return v.GetKeys().FieldIsZero("nwk_s_enc_key")
 	case "keys.nwk_s_enc_key.encrypted_key":
-		return v.SessionKeys.FieldIsZero("nwk_s_enc_key.encrypted_key")
+		return v.GetKeys().FieldIsZero("nwk_s_enc_key.encrypted_key")
 	case "keys.nwk_s_enc_key.kek_label":
-		return v.SessionKeys.FieldIsZero("nwk_s_enc_key.kek_label")
+		return v.GetKeys().FieldIsZero("nwk_s_enc_key.kek_label")
 	case "keys.nwk_s_enc_key.key":
-		return v.SessionKeys.FieldIsZero("nwk_s_enc_key.key")
+		return v.GetKeys().FieldIsZero("nwk_s_enc_key.key")
 	case "keys.s_nwk_s_int_key":
-		return v.SessionKeys.FieldIsZero("s_nwk_s_int_key")
+		return v.GetKeys().FieldIsZero("s_nwk_s_int_key")
 	case "keys.s_nwk_s_int_key.encrypted_key":
-		return v.SessionKeys.FieldIsZero("s_nwk_s_int_key.encrypted_key")
+		return v.GetKeys().FieldIsZero("s_nwk_s_int_key.encrypted_key")
 	case "keys.s_nwk_s_int_key.kek_label":
-		return v.SessionKeys.FieldIsZero("s_nwk_s_int_key.kek_label")
+		return v.GetKeys().FieldIsZero("s_nwk_s_int_key.kek_label")
 	case "keys.s_nwk_s_int_key.key":
-		return v.SessionKeys.FieldIsZero("s_nwk_s_int_key.key")
+		return v.GetKeys().FieldIsZero("s_nwk_s_int_key.key")
 	case "keys.session_key_id":
-		return v.SessionKeys.FieldIsZero("session_key_id")
+		return v.GetKeys().FieldIsZero("session_key_id")
 	case "last_a_f_cnt_down":
 		return v.LastAFCntDown == 0
 	case "last_conf_f_cnt_down":

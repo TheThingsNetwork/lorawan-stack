@@ -218,33 +218,33 @@ func unwrapSelectedSessionKeys(ctx context.Context, kv crypto.KeyVault, dev *ttn
 		"pending_session.keys.nwk_s_enc_key.key",
 		"pending_session.keys.s_nwk_s_int_key.key",
 	) {
-		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, kv, dev.PendingSession.SessionKeys, "pending_session.keys", paths...)
+		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, kv, dev.PendingSession.Keys, "pending_session.keys", paths...)
 		if err != nil {
 			return err
 		}
-		dev.PendingSession.SessionKeys = sk
+		dev.PendingSession.Keys = sk
 	}
 	if dev.Session != nil && ttnpb.HasAnyField(paths,
 		"session.keys.f_nwk_s_int_key.key",
 		"session.keys.nwk_s_enc_key.key",
 		"session.keys.s_nwk_s_int_key.key",
 	) {
-		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, kv, dev.Session.SessionKeys, "session.keys", paths...)
+		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, kv, dev.Session.Keys, "session.keys", paths...)
 		if err != nil {
 			return err
 		}
-		dev.Session.SessionKeys = sk
+		dev.Session.Keys = sk
 	}
 	if dev.PendingMacState.GetQueuedJoinAccept() != nil && ttnpb.HasAnyField(paths,
 		"pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
 		"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
 		"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
 	) {
-		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, kv, dev.PendingMacState.QueuedJoinAccept.Keys, "pending_mac_state.queued_join_accept.keys", paths...)
+		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, kv, &dev.PendingMacState.QueuedJoinAccept.Keys, "pending_mac_state.queued_join_accept.keys", paths...)
 		if err != nil {
 			return err
 		}
-		dev.PendingMacState.QueuedJoinAccept.Keys = sk
+		dev.PendingMacState.QueuedJoinAccept.Keys = *sk
 	}
 	return nil
 }
@@ -1633,12 +1633,12 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	if st.Device.Session != nil {
 		for p, isZero := range map[string]func() bool{
 			"session.dev_addr":                 st.Device.Session.DevAddr.IsZero,
-			"session.keys.f_nwk_s_int_key.key": st.Device.Session.FNwkSIntKey.IsZero,
+			"session.keys.f_nwk_s_int_key.key": st.Device.Session.Keys.FNwkSIntKey.IsZero,
 			"session.keys.nwk_s_enc_key.key": func() bool {
-				return st.Device.Session.NwkSEncKey != nil && st.Device.Session.NwkSEncKey.IsZero()
+				return st.Device.Session.Keys.NwkSEncKey != nil && st.Device.Session.Keys.NwkSEncKey.IsZero()
 			},
 			"session.keys.s_nwk_s_int_key.key": func() bool {
-				return st.Device.Session.SNwkSIntKey != nil && st.Device.Session.SNwkSIntKey.IsZero()
+				return st.Device.Session.Keys.SNwkSIntKey != nil && st.Device.Session.Keys.SNwkSIntKey.IsZero()
 			},
 		} {
 			if err := st.ValidateSetField(func() bool { return !isZero() }, p); err != nil {
@@ -1646,50 +1646,50 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			}
 		}
 		if st.HasSetField("session.keys.f_nwk_s_int_key.key") {
-			k := st.Device.Session.FNwkSIntKey.Key
+			k := st.Device.Session.Keys.FNwkSIntKey.Key
 			fNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
-			st.Device.Session.FNwkSIntKey = fNwkSIntKey
+			st.Device.Session.Keys.FNwkSIntKey = fNwkSIntKey
 			st.AddSetFields(
 				"session.keys.f_nwk_s_int_key.encrypted_key",
 				"session.keys.f_nwk_s_int_key.kek_label",
 			)
 			getTransforms = append(getTransforms, func(dev *ttnpb.EndDevice) {
-				dev.Session.FNwkSIntKey = &ttnpb.KeyEnvelope{
+				dev.Session.Keys.FNwkSIntKey = &ttnpb.KeyEnvelope{
 					Key: k,
 				}
 			})
 		}
-		if k := st.Device.Session.NwkSEncKey.GetKey(); k != nil && st.HasSetField("session.keys.nwk_s_enc_key.key") {
+		if k := st.Device.Session.Keys.NwkSEncKey.GetKey(); k != nil && st.HasSetField("session.keys.nwk_s_enc_key.key") {
 			nwkSEncKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
-			st.Device.Session.NwkSEncKey = nwkSEncKey
+			st.Device.Session.Keys.NwkSEncKey = nwkSEncKey
 			st.AddSetFields(
 				"session.keys.nwk_s_enc_key.encrypted_key",
 				"session.keys.nwk_s_enc_key.kek_label",
 			)
 			getTransforms = append(getTransforms, func(dev *ttnpb.EndDevice) {
-				dev.Session.NwkSEncKey = &ttnpb.KeyEnvelope{
+				dev.Session.Keys.NwkSEncKey = &ttnpb.KeyEnvelope{
 					Key: k,
 				}
 			})
 		}
-		if k := st.Device.Session.SNwkSIntKey.GetKey(); k != nil && st.HasSetField("session.keys.s_nwk_s_int_key.key") {
+		if k := st.Device.Session.Keys.SNwkSIntKey.GetKey(); k != nil && st.HasSetField("session.keys.s_nwk_s_int_key.key") {
 			sNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
-			st.Device.Session.SNwkSIntKey = sNwkSIntKey
+			st.Device.Session.Keys.SNwkSIntKey = sNwkSIntKey
 			st.AddSetFields(
 				"session.keys.s_nwk_s_int_key.encrypted_key",
 				"session.keys.s_nwk_s_int_key.kek_label",
 			)
 			getTransforms = append(getTransforms, func(dev *ttnpb.EndDevice) {
-				dev.Session.SNwkSIntKey = &ttnpb.KeyEnvelope{
+				dev.Session.Keys.SNwkSIntKey = &ttnpb.KeyEnvelope{
 					Key: k,
 				}
 			})
@@ -1698,11 +1698,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	if st.Device.PendingSession != nil {
 		for p, isZero := range map[string]func() bool{
 			"pending_session.dev_addr":                 st.Device.PendingSession.DevAddr.IsZero,
-			"pending_session.keys.f_nwk_s_int_key.key": st.Device.PendingSession.FNwkSIntKey.IsZero,
-			"pending_session.keys.nwk_s_enc_key.key":   st.Device.PendingSession.NwkSEncKey.IsZero,
-			"pending_session.keys.s_nwk_s_int_key.key": st.Device.PendingSession.SNwkSIntKey.IsZero,
+			"pending_session.keys.f_nwk_s_int_key.key": st.Device.PendingSession.Keys.FNwkSIntKey.IsZero,
+			"pending_session.keys.nwk_s_enc_key.key":   st.Device.PendingSession.Keys.NwkSEncKey.IsZero,
+			"pending_session.keys.s_nwk_s_int_key.key": st.Device.PendingSession.Keys.SNwkSIntKey.IsZero,
 			"pending_session.keys.session_key_id": func() bool {
-				return len(st.Device.PendingSession.SessionKeyId) == 0
+				return len(st.Device.PendingSession.Keys.SessionKeyId) == 0
 			},
 		} {
 			if err := st.ValidateSetField(func() bool { return !isZero() }, p); err != nil {
@@ -1710,52 +1710,52 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			}
 		}
 		if st.HasSetField("pending_session.keys.f_nwk_s_int_key.key") {
-			k := st.Device.PendingSession.FNwkSIntKey.Key
+			k := st.Device.PendingSession.Keys.FNwkSIntKey.Key
 			fNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
-			st.Device.PendingSession.FNwkSIntKey = fNwkSIntKey
+			st.Device.PendingSession.Keys.FNwkSIntKey = fNwkSIntKey
 			st.AddSetFields(
 				"pending_session.keys.f_nwk_s_int_key.encrypted_key",
 				"pending_session.keys.f_nwk_s_int_key.kek_label",
 			)
 			getTransforms = append(getTransforms, func(dev *ttnpb.EndDevice) {
-				dev.PendingSession.FNwkSIntKey = &ttnpb.KeyEnvelope{
+				dev.PendingSession.Keys.FNwkSIntKey = &ttnpb.KeyEnvelope{
 					Key: k,
 				}
 			})
 		}
 		if st.HasSetField("pending_session.keys.nwk_s_enc_key.key") {
-			k := st.Device.PendingSession.NwkSEncKey.Key
+			k := st.Device.PendingSession.Keys.NwkSEncKey.Key
 			nwkSEncKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
-			st.Device.PendingSession.NwkSEncKey = nwkSEncKey
+			st.Device.PendingSession.Keys.NwkSEncKey = nwkSEncKey
 			st.AddSetFields(
 				"pending_session.keys.nwk_s_enc_key.encrypted_key",
 				"pending_session.keys.nwk_s_enc_key.kek_label",
 			)
 			getTransforms = append(getTransforms, func(dev *ttnpb.EndDevice) {
-				dev.PendingSession.NwkSEncKey = &ttnpb.KeyEnvelope{
+				dev.PendingSession.Keys.NwkSEncKey = &ttnpb.KeyEnvelope{
 					Key: k,
 				}
 			})
 		}
 		if st.HasSetField("pending_session.keys.s_nwk_s_int_key.key") {
-			k := st.Device.PendingSession.SNwkSIntKey.Key
+			k := st.Device.PendingSession.Keys.SNwkSIntKey.Key
 			sNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
 			}
-			st.Device.PendingSession.SNwkSIntKey = sNwkSIntKey
+			st.Device.PendingSession.Keys.SNwkSIntKey = sNwkSIntKey
 			st.AddSetFields(
 				"pending_session.keys.s_nwk_s_int_key.encrypted_key",
 				"pending_session.keys.s_nwk_s_int_key.kek_label",
 			)
 			getTransforms = append(getTransforms, func(dev *ttnpb.EndDevice) {
-				dev.PendingSession.SNwkSIntKey = &ttnpb.KeyEnvelope{
+				dev.PendingSession.Keys.SNwkSIntKey = &ttnpb.KeyEnvelope{
 					Key: k,
 				}
 			})
@@ -1888,17 +1888,17 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 
 		getFNwkSIntKey := func(dev *ttnpb.EndDevice) *ttnpb.KeyEnvelope {
-			return dev.GetSession().GetSessionKeys().GetFNwkSIntKey()
+			return dev.GetSession().GetKeys().GetFNwkSIntKey()
 		}
 		if setKeyIsZero(m, getFNwkSIntKey, "session.keys.f_nwk_s_int_key") {
 			return false, "session.keys.f_nwk_s_int_key.key"
 		}
 
 		getNwkSEncKey := func(dev *ttnpb.EndDevice) *ttnpb.KeyEnvelope {
-			return dev.GetSession().GetSessionKeys().GetNwkSEncKey()
+			return dev.GetSession().GetKeys().GetNwkSEncKey()
 		}
 		getSNwkSIntKey := func(dev *ttnpb.EndDevice) *ttnpb.KeyEnvelope {
-			return dev.GetSession().GetSessionKeys().GetSNwkSIntKey()
+			return dev.GetSession().GetKeys().GetSNwkSIntKey()
 		}
 		isZero := struct {
 			NwkSEncKey  bool
@@ -2067,19 +2067,19 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			}
 
 			getFNwkSIntKey := func(dev *ttnpb.EndDevice) *ttnpb.KeyEnvelope {
-				return dev.GetPendingSession().GetSessionKeys().GetFNwkSIntKey()
+				return dev.GetPendingSession().GetKeys().GetFNwkSIntKey()
 			}
 			if setKeyIsZero(m, getFNwkSIntKey, "pending_session.keys.f_nwk_s_int_key") {
 				return false, "pending_session.keys.f_nwk_s_int_key.key"
 			}
 			getNwkSEncKey := func(dev *ttnpb.EndDevice) *ttnpb.KeyEnvelope {
-				return dev.GetPendingSession().GetSessionKeys().GetNwkSEncKey()
+				return dev.GetPendingSession().GetKeys().GetNwkSEncKey()
 			}
 			if setKeyIsZero(m, getNwkSEncKey, "pending_session.keys.nwk_s_enc_key") {
 				return false, "pending_session.keys.nwk_s_enc_key.key"
 			}
 			getSNwkSIntKey := func(dev *ttnpb.EndDevice) *ttnpb.KeyEnvelope {
-				return dev.GetPendingSession().GetSessionKeys().GetSNwkSIntKey()
+				return dev.GetPendingSession().GetKeys().GetSNwkSIntKey()
 			}
 			if setKeyIsZero(m, getSNwkSIntKey, "pending_session.keys.s_nwk_s_int_key") {
 				return false, "pending_session.keys.s_nwk_s_int_key.key"
@@ -2330,8 +2330,8 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			}
 
 			if st.HasSetField("session.keys.f_nwk_s_int_key.key") && macVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-				st.Device.Session.NwkSEncKey = st.Device.Session.FNwkSIntKey
-				st.Device.Session.SNwkSIntKey = st.Device.Session.FNwkSIntKey
+				st.Device.Session.Keys.NwkSEncKey = st.Device.Session.Keys.FNwkSIntKey
+				st.Device.Session.Keys.SNwkSIntKey = st.Device.Session.Keys.FNwkSIntKey
 				st.AddSetFields(
 					"session.keys.nwk_s_enc_key.encrypted_key",
 					"session.keys.nwk_s_enc_key.kek_label",
@@ -2342,7 +2342,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				)
 			}
 			if st.HasSetField("session.started_at") && st.Device.GetSession().GetStartedAt() == nil ||
-				st.HasSetField("session.session_key_id") && !bytes.Equal(st.Device.GetSession().GetSessionKeyId(), stored.GetSession().GetSessionKeyId()) ||
+				st.HasSetField("session.session_key_id") && !bytes.Equal(st.Device.GetSession().GetKeys().GetSessionKeyId(), stored.GetSession().GetKeys().GetSessionKeyId()) ||
 				stored.GetSession().GetStartedAt() == nil {
 				st.Device.Session.StartedAt = ttnpb.ProtoTimePtr(time.Now())
 				st.AddSetFields(
@@ -2360,8 +2360,8 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 
 			supports1_1 := macVersion.Compare(ttnpb.MAC_V1_1) >= 0
 			if st.HasSetField("pending_session.keys.f_nwk_s_int_key.key") && !supports1_1 {
-				st.Device.PendingSession.NwkSEncKey = st.Device.PendingSession.FNwkSIntKey
-				st.Device.PendingSession.SNwkSIntKey = st.Device.PendingSession.FNwkSIntKey
+				st.Device.PendingSession.Keys.NwkSEncKey = st.Device.PendingSession.Keys.FNwkSIntKey
+				st.Device.PendingSession.Keys.SNwkSIntKey = st.Device.PendingSession.Keys.FNwkSIntKey
 				st.AddSetFields(
 					"pending_session.keys.nwk_s_enc_key.encrypted_key",
 					"pending_session.keys.nwk_s_enc_key.kek_label",
@@ -2469,7 +2469,7 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 			stored.MacState = macState
 			stored.Session = &ttnpb.Session{
 				DevAddr:                    stored.Session.DevAddr,
-				SessionKeys:                stored.Session.SessionKeys,
+				Keys:                       stored.Session.Keys,
 				StartedAt:                  ttnpb.ProtoTimePtr(time.Now()),
 				QueuedApplicationDownlinks: stored.Session.QueuedApplicationDownlinks,
 			}

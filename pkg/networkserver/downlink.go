@@ -349,8 +349,8 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			logger := loggerWithApplicationDownlinkFields(logger, down)
 
 			switch {
-			case !bytes.Equal(down.SessionKeyId, dev.Session.SessionKeyId):
-				if dev.PendingSession != nil && bytes.Equal(down.SessionKeyId, dev.PendingSession.SessionKeyId) {
+			case !bytes.Equal(down.SessionKeyId, dev.Session.Keys.SessionKeyId):
+				if dev.PendingSession != nil && bytes.Equal(down.SessionKeyId, dev.PendingSession.Keys.SessionKeyId) {
 					logger.Debug("Skip application downlink for pending session")
 					appDowns = append(appDowns, down)
 				} else {
@@ -376,7 +376,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 						DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 							Downlinks:    dev.Session.QueuedApplicationDownlinks[i:],
 							LastFCntDown: dev.Session.LastNFCntDown,
-							SessionKeyId: dev.Session.SessionKeyId,
+							SessionKeyId: dev.Session.Keys.SessionKeyId,
 						},
 					},
 				})
@@ -502,12 +502,12 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	ctx = log.NewContext(ctx, logger)
 
 	if len(cmdBuf) > 0 && (!cmdsInFOpts || dev.MacState.LorawanVersion.EncryptFOpts()) {
-		if dev.Session.NwkSEncKey == nil || len(dev.Session.NwkSEncKey.Key) == 0 {
+		if len(dev.GetSession().GetKeys().GetNwkSEncKey().GetKey()) == 0 {
 			return nil, genState, errUnknownNwkSEncKey.New()
 		}
-		key, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.NwkSEncKey, ns.KeyVault)
+		key, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.Keys.NwkSEncKey, ns.KeyVault)
 		if err != nil {
-			logger.WithField("kek_label", dev.Session.NwkSEncKey.KekLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
+			logger.WithField("kek_label", dev.Session.Keys.NwkSEncKey.KekLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
 			return nil, genState, err
 		}
 		fCnt := pld.FullFCnt
@@ -532,7 +532,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
 					Downlinks:    dev.Session.QueuedApplicationDownlinks,
 					LastFCntDown: pld.FullFCnt,
-					SessionKeyId: dev.Session.SessionKeyId,
+					SessionKeyId: dev.Session.Keys.SessionKeyId,
 				},
 			},
 		})
@@ -573,12 +573,12 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	}
 	// NOTE: It is assumed, that b does not contain MIC.
 
-	if dev.Session.SNwkSIntKey == nil || len(dev.Session.SNwkSIntKey.Key) == 0 {
+	if len(dev.Session.GetKeys().GetSNwkSIntKey().GetKey()) == 0 {
 		return nil, genState, errUnknownSNwkSIntKey.New()
 	}
-	key, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.SNwkSIntKey, ns.KeyVault)
+	key, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.Keys.SNwkSIntKey, ns.KeyVault)
 	if err != nil {
-		logger.WithField("kek_label", dev.Session.SNwkSIntKey.KekLabel).WithError(err).Warn("Failed to unwrap SNwkSIntKey")
+		logger.WithField("kek_label", dev.Session.Keys.SNwkSIntKey.KekLabel).WithError(err).Warn("Failed to unwrap SNwkSIntKey")
 		return nil, genState, err
 	}
 
@@ -629,7 +629,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		RawPayload:     b,
 		Priority:       priority,
 		NeedsMACAnswer: len(dev.MacState.PendingRequests) > 0 && class == ttnpb.CLASS_A,
-		SessionKeyID:   dev.Session.SessionKeyId,
+		SessionKeyID:   dev.Session.Keys.SessionKeyId,
 	}, genState, nil
 }
 
@@ -1482,7 +1482,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 			Payload:              genDown.Payload,
 			RawPayload:           genDown.RawPayload,
 			DownlinkEvents:       genState.EventBuilders,
-			SessionKeyID:         dev.GetSession().GetSessionKeyId(),
+			SessionKeyID:         dev.GetSession().GetKeys().GetSessionKeyId(),
 		},
 		paths...,
 	)
@@ -1781,7 +1781,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 
 					dev.PendingSession = &ttnpb.Session{
 						DevAddr: dev.PendingMacState.QueuedJoinAccept.DevAddr,
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: dev.PendingMacState.QueuedJoinAccept.Keys.SessionKeyId,
 							FNwkSIntKey:  dev.PendingMacState.QueuedJoinAccept.Keys.FNwkSIntKey,
 							SNwkSIntKey:  dev.PendingMacState.QueuedJoinAccept.Keys.SNwkSIntKey,

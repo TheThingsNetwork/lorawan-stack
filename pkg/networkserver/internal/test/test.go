@@ -564,7 +564,7 @@ func WithDeviceDataUplinkConfig(dev *ttnpb.EndDevice, pending bool, drIdx ttnpb.
 		conf.DataRateIndex = drIdx
 		conf.Frequency = macState.CurrentParameters.Channels[chIdx].UplinkFrequency
 		conf.ChannelIndex = chIdx
-		conf.SessionKeys = &session.SessionKeys
+		conf.SessionKeys = session.Keys
 		return conf
 	}
 }
