@@ -420,7 +420,8 @@ type PacketBrokerInteropAuth struct {
 
 // InteropServer represents the server-side interoperability through LoRaWAN Backend Interfaces configuration.
 type InteropServer struct {
-	ListenTLS        string `name:"listen-tls" description:"Address for the interop server for LoRaWAN Backend Interfaces to listen on"`
+	Listen           string `name:"listen" description:"Address for the interop server for LoRaWAN Backend Interfaces to listen on"`
+	ListenTLS        string `name:"listen-tls" description:"TLS address for the interop server for LoRaWAN Backend Interfaces to listen on"`
 	PublicTLSAddress string `name:"public-tls-address" description:"Public address of the interop server for LoRaWAN Backend Interfaces"`
 
 	SenderClientCA           SenderClientCA    `name:"sender-client-ca"`
