@@ -107,8 +107,8 @@ var (
 			}
 
 			res, err := ttnpb.NewOAuthAuthorizationRegistryClient(is).ListTokens(ctx, &ttnpb.ListOAuthAccessTokensRequest{
-				UserIds:   *usrID,
-				ClientIds: *cliID,
+				UserIds:   usrID,
+				ClientIds: cliID,
 			})
 			if err != nil {
 				return err
@@ -116,8 +116,8 @@ var (
 
 			for _, token := range res.Tokens {
 				_, err = ttnpb.NewOAuthAuthorizationRegistryClient(is).DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
-					UserIds:   *usrID,
-					ClientIds: *cliID,
+					UserIds:   usrID,
+					ClientIds: cliID,
 					Id:        token.Id,
 				})
 				if err != nil {
@@ -126,8 +126,8 @@ var (
 			}
 
 			_, err = ttnpb.NewOAuthAuthorizationRegistryClient(is).Delete(ctx, &ttnpb.OAuthClientAuthorizationIdentifiers{
-				UserIds:   *usrID,
-				ClientIds: *cliID,
+				UserIds:   usrID,
+				ClientIds: cliID,
 			})
 
 			return err
@@ -157,8 +157,8 @@ var (
 			}
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewOAuthAuthorizationRegistryClient(is).ListTokens(ctx, &ttnpb.ListOAuthAccessTokensRequest{
-				UserIds:   *usrID,
-				ClientIds: *cliID,
+				UserIds:   usrID,
+				ClientIds: cliID,
 				Limit:     limit,
 				Page:      page,
 				Order:     getOrder(cmd.Flags()),
@@ -194,8 +194,8 @@ var (
 			}
 
 			_, err = ttnpb.NewOAuthAuthorizationRegistryClient(is).DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
-				UserIds:   *usrID,
-				ClientIds: *cliID,
+				UserIds:   usrID,
+				ClientIds: cliID,
 				Id:        tokenID,
 			})
 

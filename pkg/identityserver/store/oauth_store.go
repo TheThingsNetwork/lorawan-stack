@@ -54,7 +54,7 @@ func (s *oauthStore) ListAuthorizations(ctx context.Context, userIDs *ttnpb.User
 	authProtos := make([]*ttnpb.OAuthClientAuthorization, len(authModels))
 	for i, authModel := range authModels {
 		authProto := authModel.toPB()
-		authProto.UserIds = *userIDs
+		authProto.UserIds = userIDs
 		authProtos[i] = authProto
 	}
 	return authProtos, nil
@@ -82,8 +82,8 @@ func (s *oauthStore) GetAuthorization(ctx context.Context, userIDs *ttnpb.UserId
 		return nil, err
 	}
 	authProto := authModel.toPB()
-	authProto.ClientIds.ClientId = clientIDs.ClientId
-	authProto.UserIds = *userIDs
+	authProto.ClientIds = clientIDs
+	authProto.UserIds = userIDs
 	return authProto, nil
 }
 
@@ -305,8 +305,8 @@ func (s *oauthStore) ListAccessTokens(ctx context.Context, userIDs *ttnpb.UserId
 	tokenProtos := make([]*ttnpb.OAuthAccessToken, len(tokenModels))
 	for i, tokenModel := range tokenModels {
 		tokenProto := tokenModel.toPB()
-		tokenProto.ClientIds.ClientId = clientIDs.ClientId
-		tokenProto.UserIds = *userIDs
+		tokenProto.ClientIds = clientIDs
+		tokenProto.UserIds = userIDs
 		tokenProtos[i] = tokenProto
 	}
 	return tokenProtos, nil
@@ -333,8 +333,8 @@ func (s *oauthStore) GetAccessToken(ctx context.Context, id string) (*ttnpb.OAut
 		}
 	}
 	tokenProto := tokenModel.AccessToken.toPB()
-	tokenProto.ClientIds.ClientId = tokenModel.FriendlyClientID
-	tokenProto.UserIds = ttnpb.UserIdentifiers{UserId: tokenModel.FriendlyUserID}
+	tokenProto.ClientIds = &ttnpb.ClientIdentifiers{ClientId: tokenModel.FriendlyClientID}
+	tokenProto.UserIds = &ttnpb.UserIdentifiers{UserId: tokenModel.FriendlyUserID}
 	return tokenProto, nil
 }
 
