@@ -23,19 +23,26 @@ func (dst *Session) SetFields(src *Session, paths ...string) error {
 		case "keys":
 			if len(subs) > 0 {
 				var newDst, newSrc *SessionKeys
-				if src != nil {
-					newSrc = &src.SessionKeys
+				if (src == nil || src.Keys == nil) && dst.Keys == nil {
+					continue
 				}
-				newDst = &dst.SessionKeys
+				if src != nil {
+					newSrc = src.Keys
+				}
+				if dst.Keys != nil {
+					newDst = dst.Keys
+				} else {
+					newDst = &SessionKeys{}
+					dst.Keys = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.SessionKeys = src.SessionKeys
+					dst.Keys = src.Keys
 				} else {
-					var zero SessionKeys
-					dst.SessionKeys = zero
+					dst.Keys = nil
 				}
 			}
 		case "last_f_cnt_up":
