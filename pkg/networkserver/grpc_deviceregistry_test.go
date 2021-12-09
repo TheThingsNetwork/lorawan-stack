@@ -1120,7 +1120,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 					defer SetMockClock(clock)()
 
 					req := &ttnpb.ResetAndGetEndDeviceRequest{
-						EndDeviceIdentifiers: *test.MakeEndDeviceIdentifiers(),
+						EndDeviceIds: test.MakeEndDeviceIdentifiers(),
 						FieldMask: &pbtypes.FieldMask{
 							Paths: conf.Paths,
 						},
@@ -1130,8 +1130,8 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 					if tc.CreateDevice != nil {
 						created, ctx = MustCreateDevice(ctx, env.Devices, tc.CreateDevice.EndDevice)
 
-						req.ApplicationIds = tc.CreateDevice.ApplicationIds
-						req.DeviceId = tc.CreateDevice.DeviceId
+						req.EndDeviceIds.ApplicationIds = tc.CreateDevice.ApplicationIds
+						req.EndDeviceIds.DeviceId = tc.CreateDevice.DeviceId
 
 						clock.Add(time.Nanosecond)
 					}
