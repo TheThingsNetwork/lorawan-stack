@@ -299,8 +299,8 @@ var (
 			}
 			logger.WithField("paths", isPaths).Debug("Get end device from Identity Server")
 			device, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: *devID,
-				FieldMask:            &pbtypes.FieldMask{Paths: isPaths},
+				EndDeviceIds: devID,
+				FieldMask:    &pbtypes.FieldMask{Paths: isPaths},
 			})
 			if err != nil {
 				return err
@@ -325,7 +325,7 @@ var (
 				jsPaths = nil
 			}
 
-			res, err := getEndDevice(device.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths, true)
+			res, err := getEndDevice(&device.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths, true)
 			if err != nil {
 				return err
 			}
@@ -645,8 +645,8 @@ var (
 			}
 			logger.WithField("paths", isPaths).Debug("Get end device from Identity Server")
 			existingDevice, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: *devID,
-				FieldMask:            &pbtypes.FieldMask{Paths: ttnpb.ExcludeFields(isPaths, unsetPaths...)},
+				EndDeviceIds: devID,
+				FieldMask:    &pbtypes.FieldMask{Paths: ttnpb.ExcludeFields(isPaths, unsetPaths...)},
 			})
 			if err != nil {
 				return err
@@ -803,8 +803,8 @@ var (
 			}
 			logger.WithField("paths", isPaths).Debug("Get end device from Identity Server")
 			device, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: *devID,
-				FieldMask:            &pbtypes.FieldMask{Paths: isPaths},
+				EndDeviceIds: devID,
+				FieldMask:    &pbtypes.FieldMask{Paths: isPaths},
 			})
 			if err != nil {
 				return err
@@ -853,7 +853,7 @@ var (
 				return err
 			}
 			existingDevice, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: *devID,
+				EndDeviceIds: devID,
 				FieldMask: &pbtypes.FieldMask{Paths: []string{
 					"network_server_address",
 					"application_server_address",
@@ -1082,8 +1082,8 @@ This command may take end device identifiers from stdin.`,
 			}
 			logger.WithField("paths", isPaths).Debug("Get end device from Identity Server")
 			device, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: *ids,
-				FieldMask:            &pbtypes.FieldMask{Paths: isPaths},
+				EndDeviceIds: ids,
+				FieldMask:    &pbtypes.FieldMask{Paths: isPaths},
 			})
 			if err != nil {
 				return err
@@ -1100,7 +1100,7 @@ This command may take end device identifiers from stdin.`,
 				return errAddressMismatchEndDevice.New()
 			}
 
-			dev, err := getEndDevice(device.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths, true)
+			dev, err := getEndDevice(&device.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths, true)
 			if err != nil {
 				return err
 			}
@@ -1160,7 +1160,7 @@ This command may take end device identifiers from stdin.`,
 				return err
 			}
 			dev, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: *devID,
+				EndDeviceIds: devID,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"join_server_address",

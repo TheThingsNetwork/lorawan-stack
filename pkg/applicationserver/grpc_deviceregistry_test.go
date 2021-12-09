@@ -113,7 +113,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return nil, errors.New("GetFunc must not be called")
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
@@ -138,7 +138,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return nil, errors.New("GetFunc must not be called")
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
@@ -167,7 +167,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return nil, errNotFound.New()
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
@@ -205,7 +205,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				}).(*ttnpb.EndDevice), nil
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
@@ -236,7 +236,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return nil, errors.New("GetFunc must not be called")
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters", "session"},
 				},
@@ -274,7 +274,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice), nil
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters", "session"},
 				},

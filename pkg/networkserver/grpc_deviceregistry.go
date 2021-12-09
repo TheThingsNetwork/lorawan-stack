@@ -251,14 +251,14 @@ func unwrapSelectedSessionKeys(ctx context.Context, kv crypto.KeyVault, dev *ttn
 
 // Get implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	if err := rights.RequireApplication(ctx, *req.ApplicationIds, appendRequiredDeviceReadRights(
+	if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, appendRequiredDeviceReadRights(
 		make([]ttnpb.Right, 0, maxRequiredDeviceReadRightCount),
 		req.FieldMask.GetPaths()...,
 	)...); err != nil {
 		return nil, err
 	}
 
-	dev, ctx, err := ns.devices.GetByID(ctx, *req.ApplicationIds, req.DeviceId, addDeviceGetPaths(req.FieldMask.GetPaths()...))
+	dev, ctx, err := ns.devices.GetByID(ctx, *req.EndDeviceIds.ApplicationIds, req.EndDeviceIds.DeviceId, addDeviceGetPaths(req.FieldMask.GetPaths()...))
 	if err != nil {
 		logRegistryRPCError(ctx, err, "Failed to get device from registry")
 		return nil, err

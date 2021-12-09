@@ -639,7 +639,7 @@ func (env TestEnvironment) AssertGetDevice(ctx context.Context, req *ttnpb.GetEn
 		cancel()
 	}()
 
-	if !a.So(env.AssertListApplicationRights(reqCtx, *req.ApplicationIds, authType, authValue, rights...), should.BeTrue) {
+	if !a.So(env.AssertListApplicationRights(reqCtx, *req.EndDeviceIds.ApplicationIds, authType, authValue, rights...), should.BeTrue) {
 		t.Error("ListRights assertion failed")
 		return nil, nil, false
 	}

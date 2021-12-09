@@ -595,7 +595,7 @@ message UpdateEndDeviceRequest {
 }
 
 message GetEndDeviceRequest {
-  EndDeviceIdentifiers end_device_ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  EndDeviceIdentifiers end_device_ids = 1 [(validate.rules).message.required = true];
   // The names of the end device fields that should be returned.
   // See the API reference for which fields can be returned by the different services.
   google.protobuf.FieldMask field_mask = 2;
