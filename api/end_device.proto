@@ -142,7 +142,7 @@ message MACParameters {
 // Template for creating end devices.
 message EndDeviceVersion {
   // Version identifiers.
-  EndDeviceVersionIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  EndDeviceVersionIdentifiers ids = 1 [(validate.rules).message.required = true];
 
   // LoRaWAN MAC version.
   MACVersion lorawan_version = 2 [(validate.rules).enum.defined_only = true];
