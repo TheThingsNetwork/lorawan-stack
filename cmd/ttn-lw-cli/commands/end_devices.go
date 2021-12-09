@@ -821,8 +821,8 @@ var (
 			}
 			logger.WithField("paths", nsPaths).Debug("Reset end device to factory defaults on Network Server")
 			nsDevice, err := ttnpb.NewNsEndDeviceRegistryClient(ns).ResetFactoryDefaults(ctx, &ttnpb.ResetAndGetEndDeviceRequest{
-				EndDeviceIdentifiers: *devID,
-				FieldMask:            &pbtypes.FieldMask{Paths: nsPaths},
+				EndDeviceIds: devID,
+				FieldMask:    &pbtypes.FieldMask{Paths: nsPaths},
 			})
 			if err != nil {
 				return err

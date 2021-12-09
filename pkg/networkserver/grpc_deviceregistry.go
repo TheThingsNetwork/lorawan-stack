@@ -2423,14 +2423,14 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 
 // ResetFactoryDefaults implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.ResetAndGetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	if err := rights.RequireApplication(ctx, *req.ApplicationIds, appendRequiredDeviceReadRights(
+	if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, appendRequiredDeviceReadRights(
 		append(make([]ttnpb.Right, 0, 1+maxRequiredDeviceReadRightCount), ttnpb.RIGHT_APPLICATION_DEVICES_WRITE),
 		req.FieldMask.GetPaths()...,
 	)...); err != nil {
 		return nil, err
 	}
 
-	dev, _, err := ns.devices.SetByID(ctx, *req.ApplicationIds, req.DeviceId, addDeviceGetPaths(ttnpb.AddFields(append(req.FieldMask.GetPaths()[:0:0], req.FieldMask.GetPaths()...),
+	dev, _, err := ns.devices.SetByID(ctx, *req.EndDeviceIds.ApplicationIds, req.EndDeviceIds.DeviceId, addDeviceGetPaths(ttnpb.AddFields(append(req.FieldMask.GetPaths()[:0:0], req.FieldMask.GetPaths()...),
 		"frequency_plan_id",
 		"lorawan_phy_version",
 		"lorawan_version",

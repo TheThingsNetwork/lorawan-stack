@@ -1255,3 +1255,21 @@ func (m *SetEndDeviceRequest) FieldIsZero(p string) bool {
 	}
 	return m.EndDevice.FieldIsZero(p)
 }
+
+// All EntityType methods implement the IDStringer interface.
+
+func (m *ResetAndGetEndDeviceRequest) EntityType() string {
+	return m.GetEndDeviceIds().EntityType()
+}
+
+// All IDString methods implement the IDStringer interface.
+
+func (m *ResetAndGetEndDeviceRequest) IDString() string {
+	return m.GetEndDeviceIds().IDString()
+}
+
+// All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
+
+func (m *ResetAndGetEndDeviceRequest) ExtractRequestFields(dst map[string]interface{}) {
+	m.GetEndDeviceIds().ExtractRequestFields(dst)
+}
