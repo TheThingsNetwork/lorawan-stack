@@ -67,42 +67,45 @@ describe('End device on other cluster', () => {
     },
   }
 
+  const is = {
+    end_device: {
+      ids: {
+        dev_eui: '9000BEEF9000BEEF',
+        join_eui: '0000000000000000',
+        device_id: 'device-all-components'
+      },
+      network_server_address: 'tti.staging1.cloud.thethings.industries',
+      application_server_address: 'tti.staging1.cloud.thethings.industries',
+      join_server_address: 'tti.staging1.cloud.thethings.industries'
+    },
+    field_mask: {
+      paths: [
+        'network_server_address',
+        'application_server_address',
+        'join_server_address'
+      ]
+    }
+  }
+
   before(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
     cy.createApplication(application, user.ids.user_id)
-    cy.createMockDeviceAllComponents(applicationId, { ns })
+    cy.createMockDeviceAllComponents(applicationId, { ns, is })
   })
 
   beforeEach(() => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-    const response = {
-      end_devices: [
-        {
-          ids: {
-            application_ids: {
-              application_id: applicationId,
-            },
-            device_id: deviceId,
-          },
-          network_server_address: 'tti.staging1.cloud.thethings.industries',
-          application_server_address: 'tti.staging1.cloud.thethings.industries',
-          join_server_address: 'tti.staging1.cloud.thethings.industries',
-        },
-      ],
-    }
-
     cy.visit(`${Cypress.config('consoleRootPath')}/applications/${applicationId}/devices`)
-    cy.intercept(
-      'GET',
-      `/api/v3/applications/${applicationId}/devices*`,
-      response,
-    )
   })
 
   it('succeeds disabling click on devices that are on another cluster', () => {
     cy.findByText(deviceId).click()
-    cy.findByText('End devices (1)')
+    cy.location('pathname').should(
+      'eq',
+      `${Cypress.config('consoleRootPath')}/applications/${appId}`,
+    )
+    cy.findByTestId('full-error-view').should('not.exist')
   })
 
   it('succeeds showing "Other cluster" status on devices that are on another cluster', () => {
@@ -118,25 +121,10 @@ describe('End device on other cluster', () => {
       `${Cypress.config('consoleRootPath')}/applications/${applicationId}/devices/${deviceId}`,
     )
 
-    const response = {
-      application_server_address: 'tti.staging1.cloud.thethings.industries',
-      ids: {
-        application_ids: {
-          application_id: 'cluster-app-test',
-        },
-        dev_eui: '9000BEEF9000BEEF',
-        device_id: deviceId,
-        join_eui: '0000000000000000',
-      },
-      network_server_address: 'tti.staging1.cloud.thethings.industries',
-    }
-
-    cy.intercept(
-      'GET',
-      `api/v3/applications/${applicationId}/devices/${deviceId}*`,
-      response,
+    cy.location('pathname').should(
+      'eq',
+      `${Cypress.config('consoleRootPath')}/applications/${appId}`,
     )
-
-    cy.findByText('Applications (1)')
+    cy.findByTestId('full-error-view').should('not.exist')
   })
 })
