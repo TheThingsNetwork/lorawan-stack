@@ -63,11 +63,6 @@ describe('End device on other cluster', () => {
         'ids.join_eui',
         'supports_class_c',
         'supports_class_b',
-        'mac_settings.rx2_data_rate_index',
-        'mac_settings.rx2_frequency',
-        'mac_settings.rx1_delay',
-        'mac_settings.rx1_data_rate_offset',
-        'mac_settings.resets_f_cnt',
       ],
     },
   }
@@ -100,7 +95,7 @@ describe('End device on other cluster', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/applications/${applicationId}/devices`)
     cy.intercept(
       'GET',
-      `/api/v3/applications/${applicationId}/devices?page=1&limit=20&field_mask=name,application_server_address,network_server_address,join_server_address`,
+      `/api/v3/applications/${applicationId}/devices*`,
       response,
     )
   })
@@ -138,7 +133,7 @@ describe('End device on other cluster', () => {
 
     cy.intercept(
       'GET',
-      `api/v3/applications/${applicationId}/devices/${deviceId}?field_mask=name,description,version_ids,network_server_address,application_server_address,join_server_address,locations,attributes`,
+      `api/v3/applications/${applicationId}/devices/${deviceId}*`,
       response,
     )
 
