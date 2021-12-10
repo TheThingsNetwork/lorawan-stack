@@ -35,7 +35,7 @@ import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
-import { selectSelectedDevice } from '@console/store/selectors/devices'
+import { selectSelectedDevice, isOtherClusterDevice } from '@console/store/selectors/devices'
 
 import style from './device-overview.styl'
 
@@ -52,10 +52,7 @@ const m = defineMessages({
   const device = selectSelectedDevice(state)
   const asConfig = selectAsConfig()
   const currentHost = getHostnameFromUrl(asConfig.base_url)
-  const redirect =
-    currentHost !== device.application_server_address ||
-    currentHost !== device.network_server_address ||
-    currentHost !== device.join_server_address
+  const redirect = isOtherClusterDevice(currentHost, device)
   return {
     device,
     redirect,
@@ -240,9 +237,9 @@ class DeviceOverview extends React.Component {
     const { device, redirect } = this.props
     const devIds = device && device.ids
 
-    if (redirect) {
+    /* if (redirect) {
       return <Redirect to="/applications" />
-    }
+    } */
 
     return (
       <Container>

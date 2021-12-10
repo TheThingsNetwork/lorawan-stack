@@ -50,6 +50,18 @@ export const selectSelectedDevice = state =>
 export const selectSelectedDeviceFormatters = state => selectSelectedDevice(state).formatters
 export const selectDeviceFetching = createFetchingSelector(GET_DEV_BASE)
 export const selectDeviceError = createErrorSelector(GET_DEV_BASE)
+export const isOtherClusterDevice = (currentHost, device, ) => {
+  if( device?.application_server_address &&
+    device?.network_server_address &&
+    device?.join_server_address
+  ) {
+    const otherCluster = currentHost !== device?.application_server_address ||
+    currentHost !== device?.network_server_address ||
+    currentHost !== device?.join_server_address
+    
+    return otherCluster
+  }
+}
 
 // Derived.
 export const selectDeviceDerivedUplinkFrameCount = (state, appId, devId) => {
