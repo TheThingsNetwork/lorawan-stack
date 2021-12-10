@@ -286,7 +286,7 @@ func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
 	setup.Do(func() {
 		dbAddress := os.Getenv("SQL_DB_ADDRESS")
 		if dbAddress == "" {
-			dbAddress = "localhost:26257"
+			dbAddress = "localhost:5432"
 		}
 		dbName := os.Getenv("TEST_DATABASE_NAME")
 		if dbName == "" {
@@ -294,7 +294,7 @@ func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
 		}
 		dbAuth := os.Getenv("SQL_DB_AUTH")
 		if dbAuth == "" {
-			dbAuth = "root"
+			dbAuth = "root:root"
 		}
 		dbConnString = fmt.Sprintf("postgresql://%s@%s/%s?sslmode=disable", dbAuth, dbAddress, dbName)
 		db, err := store.Open(ctx, dbConnString)
