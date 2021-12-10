@@ -57,13 +57,14 @@ import {
   selectDevicesTotalCount,
   selectDevicesFetching,
   selectDeviceDerivedLastSeen,
+  isOtherClusterDevice,
 } from '@console/store/selectors/devices'
 
 import style from './devices-table.styl'
 
 const m = defineMessages({
   otherClusterTooltip:
-    'This end device is registered on a different cluster or host. It cannot be accessed using this Console. To access this device, use the Console of the cluster that this device was registered on.',
+    'This end device is registered on a different cluster or host (`{host}`). It cannot be accessed using this Console. To access this device, use the Console of the cluster that this device was registered on.',
 })
 
 const headers = [
@@ -106,10 +107,11 @@ const headers = [
     width: 14,
     render: status => {
       if (status.otherCluster) {
+        let host = status.host
         return (
           <DocTooltip
             docPath="getting-started/cloud-hosted"
-            content={<Message content={m.otherClusterTooltip} />}
+            content={<Message content={m.otherClusterTooltip} values={{ host }} />}
           >
             <Status status="unknown" label={sharedMessages.otherCluster}>
               <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
@@ -191,10 +193,8 @@ class DevicesTable extends React.Component {
         ...device,
         status: {
           _derivedLastSeen: selectDeviceDerivedLastSeen(state, appId, device.ids.device_id),
-          otherCluster:
-            currentHost !== device.application_server_address ||
-            currentHost !== device.network_server_address ||
-            currentHost !== device.join_server_address,
+          otherCluster: isOtherClusterDevice(currentHost, device),
+          host: device.application_server_address || device.network_server_address || device.join_server_address
         },
       })
     }
