@@ -19,6 +19,7 @@ import { defineMessages } from 'react-intl'
 import { Redirect } from 'react-router'
 
 import DataSheet from '@ttn-lw/components/data-sheet'
+import toast from '@ttn-lw/components/toast'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import Message from '@ttn-lw/lib/components/message'
@@ -46,16 +47,21 @@ const m = defineMessages({
   latestData: 'Latest data',
   rootKeys: 'Root keys',
   keysNotExposed: 'Keys are not exposed',
+  failedAccessOtherHostDeviceMessage: 'The end device you attempted to visit is registered on a different host and needs to be accessed using its host Console.',
 })
 
 @connect(state => {
   const device = selectSelectedDevice(state)
   const asConfig = selectAsConfig()
-  const currentHost = getHostnameFromUrl(asConfig.base_url)
-  const redirect = isOtherClusterDevice(currentHost, device)
+  const nsConfig = selectAsConfig()
+  const jsConfig = selectAsConfig()
+  const asHost = getHostnameFromUrl(asConfig.base_url)
+  const nsHost = getHostnameFromUrl(nsConfig.base_url)
+  const jsHost = getHostnameFromUrl(jsConfig.base_url)
+  const shouldRedirect = isOtherClusterDevice(asHost, nsHost, jsHost, device)
   return {
     device,
-    redirect,
+    shouldRedirect,
   }
 })
 class DeviceOverview extends React.Component {
@@ -234,12 +240,19 @@ class DeviceOverview extends React.Component {
   }
 
   render() {
-    const { device, redirect } = this.props
+    const { device, shouldRedirect } = this.props
     const devIds = device && device.ids
 
-    /* if (redirect) {
-      return <Redirect to="/applications" />
-    } */
+    if (shouldRedirect) {
+      toast({
+        type: toast.types.WARNING,
+        message: m.failedAccessOtherHostDeviceMessage,
+      })
+
+      return (
+          <Redirect to="/applications" />
+      )
+    }
 
     return (
       <Container>
