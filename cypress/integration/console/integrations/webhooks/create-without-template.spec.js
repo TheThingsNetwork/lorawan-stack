@@ -55,7 +55,7 @@ describe('Application Webhook create without template', () => {
       'contain',
       'The API key will be provided to the endpoint using the "X-Downlink-Apikey" header',
     )
-    cy.findByText('Add header entry').should('exist')
+    cy.findByText('Add header entry').should('be.visible')
     cy.findByRole('heading', { name: 'Enabled messages' }).should('be.visible')
     cy.findByTestId('notification')
       .should('be.visible')
@@ -63,35 +63,35 @@ describe('Application Webhook create without template', () => {
         'For each enabled message type, an optional path can be defined which will be appended to the base URL',
       )
       .should('be.visible')
-    cy.findByText('Uplink message').should('exist')
-    cy.get('[for="uplink_message_checkbox"]').should('exist').and('not.be.checked')
+    cy.findByText('Uplink message').should('be.visible')
+    cy.get('[for="uplink_message_checkbox"]').should('be.visible').and('not.be.checked')
 
-    cy.findByText('Join accept').should('exist')
-    cy.get('[for="join_accept_checkbox"]').should('exist').and('not.be.checked')
+    cy.findByText('Join accept').should('be.visible')
+    cy.get('[for="join_accept_checkbox"]').should('be.visible').and('not.be.checked')
 
-    cy.findByText('Downlink ack').should('exist')
-    cy.get('[for="downlink_ack_checkbox"]').should('exist').and('not.be.checked')
+    cy.findByText('Downlink ack').should('be.visible')
+    cy.get('[for="downlink_ack_checkbox"]').should('be.visible').and('not.be.checked')
 
-    cy.findByText('Downlink nack').should('exist')
-    cy.get('[for="downlink_nack_checkbox"]').should('exist').and('not.be.checked')
+    cy.findByText('Downlink nack').should('be.visible')
+    cy.get('[for="downlink_nack_checkbox"]').should('be.visible').and('not.be.checked')
 
-    cy.findByText('Downlink sent').should('exist')
-    cy.get('[for="downlink_sent_checkbox"]').should('exist').and('not.be.checked')
+    cy.findByText('Downlink sent').should('be.visible')
+    cy.get('[for="downlink_sent_checkbox"]').should('be.visible').and('not.be.checked')
 
-    cy.findByText('Downlink failed').should('exist')
-    cy.get('[for="downlink_failed_checkbox"]').should('exist').and('not.be.checked')
+    cy.findByText('Downlink failed').should('be.visible')
+    cy.get('[for="downlink_failed_checkbox"]').should('be.visible').and('not.be.checked')
 
-    cy.findByText('Downlink queued').should('exist')
-    cy.get('[for="downlink_queued_checkbox"]').should('exist').and('not.be.checked')
+    cy.findByText('Downlink queued').should('be.visible')
+    cy.get('[for="downlink_queued_checkbox"]').should('be.visible').and('not.be.checked')
 
-    cy.findByText('Downlink queue invalidated').should('exist')
-    cy.get('[for="downlink_queue_invalidated_checkbox"]').should('exist').and('not.be.checked')
+    cy.findByText('Downlink queue invalidated').should('be.visible')
+    cy.get('[for="downlink_queue_invalidated_checkbox"]').should('be.visible').and('not.be.checked')
 
-    cy.findByText('Location solved').should('exist')
-    cy.get('[for="location_solved_checkbox"]').should('exist').and('not.be.checked')
+    cy.findByText('Location solved').should('be.visible')
+    cy.get('[for="location_solved_checkbox"]').should('be.visible').and('not.be.checked')
 
-    cy.findByText('Service data').should('exist')
-    cy.get('[for="service_data_checkbox"]').should('exist').and('not.be.checked')
+    cy.findByText('Service data').should('be.visible')
+    cy.get('[for="service_data_checkbox"]').should('be.visible').and('not.be.checked')
 
     cy.findByRole('button', { name: 'Add webhook' }).should('be.visible')
   })
@@ -132,5 +132,9 @@ describe('Application Webhook create without template', () => {
       'eq',
       `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/webhooks`,
     )
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('full-error-view').should('not.exist')
+    cy.findByText('my-new-webhook').should('be.visible')
   })
 })

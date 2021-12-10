@@ -5,7 +5,7 @@
     },
     "name":"Akenza Core",
     "description":"Integrate with Akenza Core",
-    "logo_url":"https://www.thethingsnetwork.org/conference/wp-content/uploads/2020/01/Akenza-LogoClaim-rgb-positive_nb.png",
+    "logo_url":"data:image/gif;base64,R0lGODdhEAAQAMwAAPj7+FmhUYjNfGuxYYDJdYTIeanOpT+DOTuANXi/bGOrWj6CONzv2sPjv2CmV1unU4zPgISg6DJnJ3ImTh8Mtbs00aNP1CZSGy0YqLEn47RgXW8amasW7XWsmmvX2iuXiwAAAAAEAAQAAAFVyAgjmRpnihqGCkpDQPbGkNUOFk6DZqgHCNGg2T4QAQBoIiRSAwBE4VA4FACKgkB5NGReASFZEmxsQ0whPDi9BiACYQAInXhwOUtgCUQoORFCGt/g4QAIQA7",
     "info_url":"https://core.akenza.io/",
     "documentation_url":"https://akenza.atlassian.net/servicedesk/customer/portals/",
     "base_url":"https://data-gateway.core.akenza.io/v2/up/{domain_secret}?id={device_id}",

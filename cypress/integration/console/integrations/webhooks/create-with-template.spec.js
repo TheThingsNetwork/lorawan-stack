@@ -35,19 +35,17 @@ describe('Application Webhook create', () => {
 
   beforeEach(() => {
     cy.loginConsole({ user_id: userId, password: user.password })
-    cy.fixture('console/application/integrations/webhook/template.json').then(webhookTemplate => {
-      cy.intercept(
-        'GET',
-        `/api/v3/as/webhook-templates?field_mask=base_url,create_downlink_api_key,description,documentation_url,downlink_ack,downlink_failed,downlink_nack,downlink_queue_invalidated,downlink_queued,downlink_sent,fields,format,headers,ids,info_url,join_accept,location_solved,logo_url,name,service_data,uplink_message`,
-        webhookTemplate,
-      )
-      cy.visit(
-        `${Cypress.config(
-          'consoleRootPath',
-        )}/applications/${appId}/integrations/webhooks/add/template`,
-      )
-      cy.findByText('Akenza Core').click()
-    })
+    cy.intercept(
+      'GET',
+      `/api/v3/as/webhook-templates?field_mask=base_url,create_downlink_api_key,description,documentation_url,downlink_ack,downlink_failed,downlink_nack,downlink_queue_invalidated,downlink_queued,downlink_sent,fields,format,headers,ids,info_url,join_accept,location_solved,logo_url,name,service_data,uplink_message`,
+      { fixture: 'console/application/integrations/webhook/template.json' },
+    )
+    cy.visit(
+      `${Cypress.config(
+        'consoleRootPath',
+      )}/applications/${appId}/integrations/webhooks/add/template`,
+    )
+    cy.findByText('Akenza Core').click()
   })
 
   it('displays UI elements in place', () => {
@@ -57,10 +55,10 @@ describe('Application Webhook create', () => {
     cy.findByLabelText('Webhook ID')
       .should('have.attr', 'placeholder')
       .and('eq', 'my-new-akenza-webhook')
-    cy.findByLabelText('Domain Secret').should('exist')
-    cy.findByText('Akenza Core domain secret')
-    cy.findByLabelText('Device ID').should('exist')
-    cy.findByText('Akenza Core device ID')
+    cy.findByLabelText('Domain Secret').should('be.visible')
+    cy.findByText('Akenza Core domain secret').should('be.visible')
+    cy.findByLabelText('Device ID').should('be.visible')
+    cy.findByText('Akenza Core device ID').should('be.visible')
     cy.findByRole('button', { name: 'Create akenza core webhook' }).should('be.visible')
   })
 
@@ -100,5 +98,9 @@ describe('Application Webhook create', () => {
       'eq',
       `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/webhooks`,
     )
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('full-error-view').should('not.exist')
+    cy.findByText('my-new-akenza-webhook').should('be.visible')
   })
 })
