@@ -71,6 +71,7 @@ var (
 	devSeedDatabaseName   = "tts_seed"
 	devDockerComposeFlags = []string{"-p", "lorawan-stack-dev"}
 	databaseURI           = fmt.Sprintf("postgresql://root:root@localhost:5432/%s?sslmode=disable", devDatabaseName)
+	testDatabaseNames     = []string{"ttn_lorawan_is_test", "ttn_lorawan_is_store_test"}
 )
 
 func dockerComposeFlags(args ...string) []string {
@@ -206,6 +207,20 @@ func (Dev) DBSQL() error {
 		fmt.Println("Starting SQL shell")
 	}
 	return execDockerCompose("exec", "postgres", "psql", devDatabaseName)
+}
+
+// DBCreate creates the SQL databases used for unit tests.
+func (Dev) DBCreate() error {
+	mg.Deps(Dev.DBStart)
+	if mg.Verbose() {
+		fmt.Println("Creating dev databases")
+	}
+	for _, db := range testDatabaseNames {
+		if err := execDockerCompose("exec", "postgres", "psql", devDatabaseName, "-c", fmt.Sprintf("CREATE DATABASE %s;", db)); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // DBRedisCli starts a Redis-CLI shell.
