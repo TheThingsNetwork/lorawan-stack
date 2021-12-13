@@ -111,29 +111,32 @@ class Tabular extends React.Component {
       return typeof key === 'string' || typeof key === 'number' ? key : JSON.stringify(key)
     }
     const appliedRowKeySelector = rowKeySelector ? rowKeySelector : defaultRowKeySelector
-
     const paginatedData = this.handlePagination(data)
-    const rows = paginatedData.map((row, rowIndex) => (
-      <Table.Row
-        key={appliedRowKeySelector(row)}
-        id={rowIndex}
-        onClick={onRowClick}
-        clickable={row.status?.otherCluster ? !row.status.otherCluster : clickable}
-        linkTo={rowHrefSelector ? rowHrefSelector(row) : undefined}
-        body
-      >
-        {headers.map((header, index) => {
-          const value = headers[index].getValue
-            ? headers[index].getValue(row)
-            : getByPath(row, headers[index].name)
-          return (
-            <Table.DataCell key={index} align={header.align} small={small}>
-              {headers[index].render ? headers[index].render(value) : value}
-            </Table.DataCell>
-          )
-        })}
-      </Table.Row>
-    ))
+    const rows = paginatedData.map((row, rowIndex) => {
+      const rowClickable = !clickable ? false : row._meta.clickable ?? clickable // If the whole table is disabled each row should be as well.
+
+      return (
+        <Table.Row
+          key={appliedRowKeySelector(row)}
+          id={rowIndex}
+          onClick={onRowClick}
+          clickable={rowClickable}
+          linkTo={rowHrefSelector ? rowHrefSelector(row) : undefined}
+          body
+        >
+          {headers.map((header, index) => {
+            const value = headers[index].getValue
+              ? headers[index].getValue(row)
+              : getByPath(row, headers[index].name)
+            return (
+              <Table.DataCell key={index} align={header.align} small={small}>
+                {headers[index].render ? headers[index].render(value) : value}
+              </Table.DataCell>
+            )
+          })}
+        </Table.Row>
+      )
+    })
 
     const pagination = paginated ? (
       <Table.Row footer>
