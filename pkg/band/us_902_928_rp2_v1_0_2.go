@@ -50,6 +50,8 @@ var US_902_928_RP2_V1_0_2 = Band{
 		ttnpb.DATA_RATE_2: makeLoRaDataRate(8, 125000, makeConstMaxMACPayloadSizeFunc(133)),
 		ttnpb.DATA_RATE_3: makeLoRaDataRate(7, 125000, makeConstMaxMACPayloadSizeFunc(250)),
 		ttnpb.DATA_RATE_4: makeLoRaDataRate(8, 500000, makeConstMaxMACPayloadSizeFunc(250)),
+		ttnpb.DATA_RATE_5: makeLRFHSSDataRate(0, 1523000, "1/3", makeConstMaxMACPayloadSizeFunc(58)),
+		ttnpb.DATA_RATE_6: makeLRFHSSDataRate(0, 1523000, "2/3", makeConstMaxMACPayloadSizeFunc(133)),
 
 		ttnpb.DATA_RATE_8:  makeLoRaDataRate(12, 500000, makeConstMaxMACPayloadSizeFunc(41)),
 		ttnpb.DATA_RATE_9:  makeLoRaDataRate(11, 500000, makeConstMaxMACPayloadSizeFunc(117)),

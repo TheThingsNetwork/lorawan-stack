@@ -2028,6 +2028,14 @@ func (v FSKDataRate) DataRate() *DataRate {
 	}
 }
 
+func (v LRFHSSDataRate) DataRate() *DataRate {
+	return &DataRate{
+		Modulation: &DataRate_Lrfhss{
+			Lrfhss: &v,
+		},
+	}
+}
+
 // FieldIsZero returns whether path p is zero.
 func (v *CFList) FieldIsZero(p string) bool {
 	if v == nil {
