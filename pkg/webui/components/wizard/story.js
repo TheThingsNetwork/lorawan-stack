@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
 
 import Wizard, { WizardContext } from '@ttn-lw/components/wizard'
@@ -59,7 +58,11 @@ const Debug = () => (
 const stepSubmit = desc => data => action(desc)(data)
 const onComplete = data => action('OnComplete')(data)
 
-storiesOf('Wizard', module).add('Basic', () => (
+export default {
+  title: 'Wizard',
+}
+
+export const Basic = () => (
   <Wizard onComplete={onComplete} completeMessage="Create account" initialStepId="1">
     <Wizard.Stepper>
       <Wizard.Stepper.Step title="Account settings" description="E-mail and password" />
@@ -117,4 +120,4 @@ storiesOf('Wizard', module).add('Basic', () => (
     </Wizard.Steps>
     <Debug />
   </Wizard>
-))
+)

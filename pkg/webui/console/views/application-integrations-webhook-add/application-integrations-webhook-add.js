@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Redirect } from 'react-router'
+import { Redirect } from 'react-router-dom'
 
 import ApplicationWebhookAddForm from '@console/views/application-integrations-webhook-add-form'
 
