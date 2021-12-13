@@ -22,7 +22,6 @@ import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import toast from '@ttn-lw/components/toast'
-import Button from '@ttn-lw/components/button'
 
 import WebhookForm from '@console/components/webhook-form'
 
@@ -30,15 +29,15 @@ import diff from '@ttn-lw/lib/diff'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import style from './application-integration-webhook-edit.styl'
-
 const m = defineMessages({
   editWebhook: 'Edit webhook',
   updateSuccess: 'Webhook updated',
   deleteSuccess: 'Webhook deleted',
-  reactivateButton: 'Activate webhook',
+  reactivateButton: 'Reactivate',
   reactivateSuccess: 'Webhook activated',
-  reactivateWebhookTitle: 'Activate suspended webhook'
+  reactivateWebhookTitle: 'Reactivate suspended webhook',
+  suspendedWebhookMessage:
+    'This webhook has been deactivated due to several unsuccessful forwarding attemps. It will be automatically reactivated after 24 hours. If you wish to reactivate right away, you can use the "Reactivate"-button.',
 })
 
 const ApplicationWebhookEdit = props => {
@@ -91,14 +90,17 @@ const ApplicationWebhookEdit = props => {
       message: m.reactivateSuccess,
       type: toast.types.SUCCESS,
     })
-  }, [])
-  const handleReactivate = React.useCallback(async () => {
-    const newHealthStatus = {
-      health_status: null,
-    }
-    await updateWebhook(newHealthStatus)
-    handleReactivateSuccess()
-  }, [updateWebhook, handleReactivateSuccess])
+
+    navigateToList()
+  }, [navigateToList])
+  const handleReactivate = React.useCallback(
+    async updatedHealthStatus => {
+      await tts.Applications.Webhooks.updateById(appId, webhookId, updatedHealthStatus, [
+        'health_status',
+      ])
+    },
+    [appId, webhookId],
+  )
 
   return (
     <Container>
@@ -114,16 +116,10 @@ const ApplicationWebhookEdit = props => {
             onSubmitSuccess={handleSubmitSuccess}
             onDelete={handleDelete}
             onDeleteSuccess={handleDeleteSuccess}
-            reactivateButton={
-              <Button
-                message={m.reactivateButton}
-                icon={'refresh'}
-                onClick={handleReactivate}
-                className={style.activateWebhookButton}
-              />
-            }
-            reactivate={webhook.health_status?.unhealthy !== undefined}
-            reactivateWebhookTitle={m.reactivateWebhookTitle}
+            onReactivate={handleReactivate}
+            onReactivateSuccess={handleReactivateSuccess}
+            reactivateButtonMessage={m.reactivateButton}
+            suspendedWebhookMessage={m.suspendedWebhookMessage}
           />
         </Col>
       </Row>
