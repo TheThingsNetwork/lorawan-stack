@@ -98,16 +98,20 @@ export default class WebhookForm extends Component {
       ids: PropTypes.shape({
         webhook_id: PropTypes.string,
       }),
+      health_status: PropTypes.shape({
+        unhealthy: {},
+      }),
     }),
     onDelete: PropTypes.func,
     onDeleteFailure: PropTypes.func,
     onDeleteSuccess: PropTypes.func,
+    onReactivate: PropTypes.func,
+    onReactivateSuccess: PropTypes.func,
     onSubmit: PropTypes.func.isRequired,
     onSubmitFailure: PropTypes.func,
     onSubmitSuccess: PropTypes.func.isRequired,
-    reactivate: PropTypes.bool,
-    reactivateButton: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
-    reactivateWebhookTitle: PropTypes.message,
+    reactivateButtonMessage: PropTypes.message,
+    suspendedWebhookMessage: PropTypes.message,
     update: PropTypes.bool.isRequired,
     webhookTemplate: PropTypes.webhookTemplate,
   }
@@ -115,15 +119,16 @@ export default class WebhookForm extends Component {
   static defaultProps = {
     appId: undefined,
     initialWebhookValue: undefined,
+    onReactivate: () => null,
+    onReactivateSuccess: () => null,
     onSubmitFailure: () => null,
     onDeleteFailure: () => null,
     onDeleteSuccess: () => null,
     onDelete: () => null,
     webhookTemplate: undefined,
     existCheck: () => false,
-    reactivateButton: undefined,
-    reactivate: false,
-    reactivateWebhookTitle: undefined,
+    reactivateButtonMessage: undefined,
+    suspendedWebhookMessage: undefined,
   }
 
   form = React.createRef()
@@ -190,14 +195,28 @@ export default class WebhookForm extends Component {
     this.setState({ displayOverwriteModal: false })
   }
 
+  @bind
+  async handleReactivate() {
+    const { onReactivate, onReactivateSuccess } = this.props
+    const healthStatus = {
+      health_status: null,
+    }
+
+    try {
+      await onReactivate(healthStatus)
+      onReactivateSuccess()
+    } catch (error) {
+      this.setState({ error })
+    }
+  }
+
   render() {
     const {
       update,
       initialWebhookValue,
       webhookTemplate,
-      reactivateButton,
-      reactivate,
-      reactivateWebhookTitle,
+      suspendedWebhookMessage,
+      reactivateButtonMessage,
     } = this.props
     const { error, displayOverwriteModal, existingId } = this.state
     let initialValues = blankValues
@@ -205,8 +224,23 @@ export default class WebhookForm extends Component {
       initialValues = mapWebhookToFormValues(initialWebhookValue)
     }
 
+    const mayReactivate =
+      update &&
+      initialWebhookValue &&
+      initialWebhookValue.health_status &&
+      initialWebhookValue.health_status.unhealthy
+
     return (
       <>
+        {mayReactivate && (
+          <Notification
+            warning
+            content={suspendedWebhookMessage}
+            action={this.handleReactivate}
+            actionMessage={reactivateButtonMessage}
+            buttonIcon="refresh"
+          />
+        )}
         <PortalledModal
           title={sharedMessages.idAlreadyExists}
           message={{
@@ -238,14 +272,6 @@ export default class WebhookForm extends Component {
             disabled={update}
           />
           <WebhookFormatSelector name="format" required />
-          {reactivate && (
-            <React.Fragment>
-              <div>
-                <Form.SubTitle title={reactivateWebhookTitle} />
-                {reactivateButton}
-              </div>
-            </React.Fragment>
-          )}
           <Form.SubTitle title={m.endpointSettings} />
           <Form.Field
             name="base_url"
