@@ -458,6 +458,7 @@ var GatewayStatusFieldPathsTopLevel = []string{
 }
 var GatewayConnectionStatsFieldPathsNested = []string{
 	"connected_at",
+	"disconnected_at",
 	"downlink_count",
 	"last_downlink_received_at",
 	"last_status",
@@ -482,6 +483,7 @@ var GatewayConnectionStatsFieldPathsNested = []string{
 
 var GatewayConnectionStatsFieldPathsTopLevel = []string{
 	"connected_at",
+	"disconnected_at",
 	"downlink_count",
 	"last_downlink_received_at",
 	"last_status",

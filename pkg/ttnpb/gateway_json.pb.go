@@ -944,6 +944,15 @@ func (x *GatewayConnectionStats) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 			gogo.MarshalTimestamp(s, x.ConnectedAt)
 		}
 	}
+	if x.DisconnectedAt != nil || s.HasField("disconnected_at") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("disconnected_at")
+		if x.DisconnectedAt == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalTimestamp(s, x.DisconnectedAt)
+		}
+	}
 	if x.Protocol != "" || s.HasField("protocol") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("protocol")
@@ -1028,6 +1037,13 @@ func (x *GatewayConnectionStats) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 				return
 			}
 			x.ConnectedAt = v
+		case "disconnected_at", "disconnectedAt":
+			s.AddField("disconnected_at")
+			v := gogo.UnmarshalTimestamp(s)
+			if s.Err() != nil {
+				return
+			}
+			x.DisconnectedAt = v
 		case "protocol":
 			s.AddField("protocol")
 			x.Protocol = s.ReadString()

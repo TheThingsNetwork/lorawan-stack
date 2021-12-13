@@ -1500,6 +1500,15 @@ func (dst *GatewayConnectionStats) SetFields(src *GatewayConnectionStats, paths 
 			} else {
 				dst.ConnectedAt = nil
 			}
+		case "disconnected_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'disconnected_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DisconnectedAt = src.DisconnectedAt
+			} else {
+				dst.DisconnectedAt = nil
+			}
 		case "protocol":
 			if len(subs) > 0 {
 				return fmt.Errorf("'protocol' has no subfields, but %s were specified", subs)
