@@ -15,6 +15,7 @@
 /* eslint-env node */
 
 import path from 'path'
+
 import webpack from 'webpack'
 
 const { CONTEXT = '.', CACHE_DIR = '.cache', PUBLIC_DIR = 'public' } = process.env

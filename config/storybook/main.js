@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable import/no-commonjs */
+
 module.exports = {
   stories: ['../../pkg/webui/**/story.js', '../../pkg/webui/**/*.stories.js'],
   addons: ['@storybook/addon-actions/register', '@storybook/addon-info'],
