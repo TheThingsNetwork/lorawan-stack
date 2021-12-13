@@ -553,6 +553,18 @@
         }
       }
     },
+    "7": {
+      "MaxMACPayloadSize": {
+        "false": 58,
+        "true": 58
+      },
+      "Rate": {
+        "lrfhss": {
+          "operating_channel_width": 1523000,
+          "coding_rate": "1/3"
+        }
+      }
+    },
     "8": {
       "MaxMACPayloadSize": {
         "false": 61,
