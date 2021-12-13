@@ -50,13 +50,8 @@ func InitializeLogger(conf *config.Log) (log.Stack, error) {
 	default:
 		return nil, ErrInvalidLogFormat.WithAttributes("format", format)
 	}
-	logger := log.NewLogger(
+	return log.NewLogger(
 		logHandler,
 		log.WithLevel(conf.Level),
-	)
-	if format == "old" {
-		logger.Warn(`You are using the "old" log format.`)
-		logger.Warn(`The Things Stack v3.14 will change the default log format to "console" and remove the "old" format.`)
-	}
-	return logger, nil
+	), nil
 }
