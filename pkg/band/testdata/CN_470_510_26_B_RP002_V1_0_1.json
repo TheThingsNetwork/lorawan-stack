@@ -381,22 +381,10 @@
     }
   ],
   "DataRates": {
-    "0": {
-      "MaxMACPayloadSize": {
-        "false": 59,
-        "true": 59
-      },
-      "Rate": {
-        "lora": {
-          "bandwidth": 125000,
-          "spreading_factor": 12
-        }
-      }
-    },
     "1": {
       "MaxMACPayloadSize": {
-        "false": 59,
-        "true": 59
+        "false": 31,
+        "true": 31
       },
       "Rate": {
         "lora": {
@@ -407,8 +395,8 @@
     },
     "2": {
       "MaxMACPayloadSize": {
-        "false": 59,
-        "true": 59
+        "false": 94,
+        "true": 94
       },
       "Rate": {
         "lora": {
@@ -419,8 +407,8 @@
     },
     "3": {
       "MaxMACPayloadSize": {
-        "false": 123,
-        "true": 123
+        "false": 172,
+        "true": 172
       },
       "Rate": {
         "lora": {
@@ -450,6 +438,29 @@
         "lora": {
           "bandwidth": 125000,
           "spreading_factor": 7
+        }
+      }
+    },
+    "6": {
+      "MaxMACPayloadSize": {
+        "false": 230,
+        "true": 230
+      },
+      "Rate": {
+        "lora": {
+          "bandwidth": 500000,
+          "spreading_factor": 7
+        }
+      }
+    },
+    "7": {
+      "MaxMACPayloadSize": {
+        "false": 230,
+        "true": 230
+      },
+      "Rate": {
+        "fsk": {
+          "bit_rate": 50000
         }
       }
     }
