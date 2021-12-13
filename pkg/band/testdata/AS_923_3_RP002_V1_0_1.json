@@ -67,7 +67,7 @@
     },
     "2": {
       "MaxMACPayloadSize": {
-        "false": 59,
+        "false": 123,
         "true": 19
       },
       "Rate": {
