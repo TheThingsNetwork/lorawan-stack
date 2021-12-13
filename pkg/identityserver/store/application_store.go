@@ -49,6 +49,12 @@ func selectApplicationFields(ctx context.Context, query *gorm.DB, fieldMask *pbt
 			// always selected
 		case attributesField:
 			query = query.Preload("Attributes")
+		case administrativeContactField:
+			applicationColumns = append(applicationColumns, applicationColumnNames[path]...)
+			query = query.Preload("AdministrativeContact")
+		case technicalContactField:
+			applicationColumns = append(applicationColumns, applicationColumnNames[path]...)
+			query = query.Preload("TechnicalContact")
 		default:
 			if columns, ok := applicationColumnNames[path]; ok {
 				applicationColumns = append(applicationColumns, columns...)
@@ -69,6 +75,15 @@ func (s *applicationStore) CreateApplication(ctx context.Context, app *ttnpb.App
 		ApplicationID: app.GetIds().GetApplicationId(), // The ID is not mutated by fromPB.
 	}
 	appModel.fromPB(app, nil)
+	var err error
+	appModel.AdministrativeContactID, err = s.loadContact(ctx, appModel.AdministrativeContact)
+	if err != nil {
+		return nil, err
+	}
+	appModel.TechnicalContactID, err = s.loadContact(ctx, appModel.TechnicalContact)
+	if err != nil {
+		return nil, err
+	}
 	if err := s.createEntity(ctx, &appModel); err != nil {
 		return nil, err
 	}
@@ -140,6 +155,14 @@ func (s *applicationStore) UpdateApplication(ctx context.Context, app *ttnpb.App
 	}
 	oldAttributes := appModel.Attributes
 	columns := appModel.fromPB(app, fieldMask)
+	appModel.AdministrativeContactID, err = s.loadContact(ctx, appModel.AdministrativeContact)
+	if err != nil {
+		return nil, err
+	}
+	appModel.TechnicalContactID, err = s.loadContact(ctx, appModel.TechnicalContact)
+	if err != nil {
+		return nil, err
+	}
 	if err = s.updateEntity(ctx, &appModel, columns...); err != nil {
 		return nil, err
 	}

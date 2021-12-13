@@ -87,9 +87,17 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 			return nil, err
 		}
 	}
+
+	if err := validateCollaboratorEqualsContact(req.Collaborator, req.Gateway.AdministrativeContact); err != nil {
+		return nil, err
+	}
+	if err := validateCollaboratorEqualsContact(req.Collaborator, req.Gateway.TechnicalContact); err != nil {
+		return nil, err
+	}
 	if err := validateContactInfo(reqGtw.ContactInfo); err != nil {
 		return nil, err
 	}
+
 	if len(reqGtw.FrequencyPlanIds) == 0 && reqGtw.FrequencyPlanId != "" {
 		reqGtw.FrequencyPlanIds = []string{reqGtw.FrequencyPlanId}
 	}
@@ -473,6 +481,16 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 			return nil, err
 		}
 	}
+	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.Paths), "administrative_contact") {
+		if !ttnpb.HasAnyField(req.FieldMask.Paths, "administrative_contact") {
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "administrative_contact")
+		}
+	}
+	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.Paths), "technical_contact") {
+		if !ttnpb.HasAnyField(req.FieldMask.Paths, "technical_contact") {
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "technical_contact")
+		}
+	}
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "lbs_lns_secret") {
 		if err := rights.RequireGateway(ctx, *reqGtw.GetIds(), ttnpb.RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
@@ -538,6 +556,12 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		if err := validateContactIsCollaborator(ctx, db, req.Gateway.AdministrativeContact, req.Gateway.GetEntityIdentifiers()); err != nil {
+			return err
+		}
+		if err := validateContactIsCollaborator(ctx, db, req.Gateway.TechnicalContact, req.Gateway.GetEntityIdentifiers()); err != nil {
+			return err
+		}
 		gtw, err = store.GetGatewayStore(db).UpdateGateway(ctx, reqGtw, req.FieldMask)
 		if err != nil {
 			return err

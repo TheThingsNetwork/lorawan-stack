@@ -33,9 +33,15 @@ func TestGatewayStore(t *testing.T) {
 	ctx := test.Context()
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
-		prepareTest(db, &Gateway{}, &GatewayAntenna{}, &Attribute{})
+		prepareTest(db, &Gateway{}, &GatewayAntenna{}, &Attribute{}, &Account{}, &Organization{}, &User{})
 		store := GetGatewayStore(db)
 		s := newStore(db)
+
+		usr1 := &User{Account: Account{UID: "test-user-1"}, PrimaryEmailAddress: "user1@example.com"}
+		s.createEntity(ctx, usr1)
+
+		usr2 := &User{Account: Account{UID: "test-user-2"}, PrimaryEmailAddress: "user2@example.com"}
+		s.createEntity(ctx, usr2)
 
 		eui := &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
 		scheduleAnytimeDelay := time.Second
@@ -81,6 +87,8 @@ func TestGatewayStore(t *testing.T) {
 				"bar": "baz",
 				"baz": "qux",
 			},
+			AdministrativeContact: usr1.Account.OrganizationOrUserIdentifiers(),
+			TechnicalContact:      usr2.Account.OrganizationOrUserIdentifiers(),
 			Antennas: []*ttnpb.GatewayAntenna{
 				{
 					Gain:      3,
@@ -103,6 +111,8 @@ func TestGatewayStore(t *testing.T) {
 			a.So(created.Name, should.Equal, "Foo Gateway")
 			a.So(created.Description, should.Equal, "The Amazing Foo Gateway")
 			a.So(created.Attributes, should.HaveLength, 3)
+			a.So(created.AdministrativeContact, should.Resemble, usr1.Account.OrganizationOrUserIdentifiers())
+			a.So(created.TechnicalContact, should.Resemble, usr2.Account.OrganizationOrUserIdentifiers())
 			if a.So(created.Antennas, should.HaveLength, 1) {
 				a.So(created.Antennas[0].Gain, should.Equal, 3)
 				a.So(created.Antennas[0].Placement, should.Equal, ttnpb.GatewayAntennaPlacement_OUTDOOR)
@@ -121,7 +131,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(created.DisablePacketBrokerForwarding, should.BeTrue)
 		}
 
-		got, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes", "lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key", "disable_packet_broker_forwarding"}})
+		got, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes", "administrative_contact", "lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key", "disable_packet_broker_forwarding"}})
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -129,6 +139,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(got.Name, should.Equal, "Foo Gateway")
 			a.So(got.Description, should.BeEmpty)
 			a.So(got.Attributes, should.HaveLength, 3)
+			a.So(got.AdministrativeContact, should.Resemble, usr1.Account.OrganizationOrUserIdentifiers())
 			a.So(got.CreatedAt, should.Resemble, created.CreatedAt)
 			a.So(got.UpdatedAt, should.Resemble, created.UpdatedAt)
 			a.So(got.LbsLnsSecret, should.Resemble, created.LbsLnsSecret)
@@ -165,6 +176,7 @@ func TestGatewayStore(t *testing.T) {
 				"baz": "baz",
 				"qux": "foo",
 			},
+			TechnicalContact: usr1.Account.OrganizationOrUserIdentifiers(),
 			Antennas: []*ttnpb.GatewayAntenna{
 				{
 					Gain:       6,
@@ -186,12 +198,13 @@ func TestGatewayStore(t *testing.T) {
 			TargetCupsUri:                 otherTargetCUPSURI,
 			TargetCupsKey:                 otherSecret,
 			DisablePacketBrokerForwarding: false,
-		}, &pbtypes.FieldMask{Paths: []string{"description", "attributes", "antennas", "schedule_anytime_delay", "update_location_from_status", "lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key", "disable_packet_broker_forwarding"}})
+		}, &pbtypes.FieldMask{Paths: []string{"description", "attributes", "technical_contact", "antennas", "schedule_anytime_delay", "update_location_from_status", "lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key", "disable_packet_broker_forwarding"}})
 
 		a.So(err, should.BeNil)
 		if a.So(updated, should.NotBeNil) {
 			a.So(updated.Description, should.Equal, "The Amazing Foobar Gateway")
 			a.So(updated.Attributes, should.HaveLength, 3)
+			a.So(updated.TechnicalContact, should.Resemble, usr1.Account.OrganizationOrUserIdentifiers())
 			if a.So(updated.Antennas, should.HaveLength, 2) {
 				a.So(updated.Antennas[0].Gain, should.Equal, 6)
 				a.So(updated.Antennas[0].Attributes, should.HaveLength, 1)

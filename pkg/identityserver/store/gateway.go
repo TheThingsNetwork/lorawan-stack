@@ -32,12 +32,19 @@ type Gateway struct {
 	GatewayEUI *EUI64 `gorm:"unique_index:gateway_eui_index;type:VARCHAR(16);column:gateway_eui"`
 
 	// BEGIN common fields
-	GatewayID   string       `gorm:"unique_index:gateway_id_index;type:VARCHAR(36);not null"`
-	Name        string       `gorm:"type:VARCHAR"`
-	Description string       `gorm:"type:TEXT"`
+	GatewayID   string `gorm:"unique_index:gateway_id_index;type:VARCHAR(36);not null"`
+	Name        string `gorm:"type:VARCHAR"`
+	Description string `gorm:"type:TEXT"`
+
 	Attributes  []Attribute  `gorm:"polymorphic:Entity;polymorphic_value:gateway"`
 	APIKeys     []APIKey     `gorm:"polymorphic:Entity;polymorphic_value:gateway"`
 	Memberships []Membership `gorm:"polymorphic:Entity;polymorphic_value:gateway"`
+
+	AdministrativeContactID *string  `gorm:"type:UUID;index"`
+	AdministrativeContact   *Account `gorm:"save_associations:false"`
+
+	TechnicalContactID *string  `gorm:"type:UUID;index"`
+	TechnicalContact   *Account `gorm:"save_associations:false"`
 	// END common fields
 
 	BrandID         string `gorm:"type:VARCHAR"`
@@ -93,6 +100,16 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 	nameField:        func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Name = gtw.Name },
 	descriptionField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Description = gtw.Description },
 	attributesField:  func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Attributes = attributes(gtw.Attributes).toMap() },
+	administrativeContactField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		if gtw.AdministrativeContact != nil {
+			pb.AdministrativeContact = gtw.AdministrativeContact.OrganizationOrUserIdentifiers()
+		}
+	},
+	technicalContactField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		if gtw.TechnicalContact != nil {
+			pb.TechnicalContact = gtw.TechnicalContact.OrganizationOrUserIdentifiers()
+		}
+	},
 	versionIDsField: func(pb *ttnpb.Gateway, gtw *Gateway) {
 		pb.VersionIds = &ttnpb.GatewayVersionIdentifiers{
 			BrandId:         gtw.BrandID,
@@ -229,6 +246,26 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 	descriptionField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.Description = pb.Description },
 	attributesField: func(gtw *Gateway, pb *ttnpb.Gateway) {
 		gtw.Attributes = attributes(gtw.Attributes).updateFromMap(pb.Attributes)
+	},
+	administrativeContactField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		if pb.AdministrativeContact == nil {
+			gtw.AdministrativeContact = nil
+			return
+		}
+		gtw.AdministrativeContact = &Account{
+			AccountType: pb.AdministrativeContact.EntityType(),
+			UID:         pb.AdministrativeContact.IDString(),
+		}
+	},
+	technicalContactField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		if pb.TechnicalContact == nil {
+			gtw.TechnicalContact = nil
+			return
+		}
+		gtw.TechnicalContact = &Account{
+			AccountType: pb.TechnicalContact.EntityType(),
+			UID:         pb.TechnicalContact.IDString(),
+		}
 	},
 	versionIDsField: func(gtw *Gateway, pb *ttnpb.Gateway) {
 		if pb.VersionIds != nil {
@@ -386,6 +423,8 @@ var gatewayColumnNames = map[string][]string{
 	lrfhssField:                         {"supports_lrfhss"},
 	lrfhssSupportedField:                {"supports_lrfhss"},
 	disablePacketBrokerForwardingField:  {disablePacketBrokerForwardingField},
+	administrativeContactField:          {administrativeContactField + "_id"},
+	technicalContactField:               {technicalContactField + "_id"},
 }
 
 func (gtw Gateway) toPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) {

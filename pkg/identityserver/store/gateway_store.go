@@ -49,6 +49,12 @@ func selectGatewayFields(ctx context.Context, query *gorm.DB, fieldMask *pbtypes
 			// always selected
 		case attributesField:
 			query = query.Preload("Attributes")
+		case administrativeContactField:
+			gatewayColumns = append(gatewayColumns, gatewayColumnNames[path]...)
+			query = query.Preload("AdministrativeContact")
+		case technicalContactField:
+			gatewayColumns = append(gatewayColumns, gatewayColumnNames[path]...)
+			query = query.Preload("TechnicalContact")
 		case antennasField:
 			query = query.Preload("Antennas")
 		default:
@@ -71,6 +77,15 @@ func (s *gatewayStore) CreateGateway(ctx context.Context, gtw *ttnpb.Gateway) (*
 		GatewayID: gtw.GetIds().GetGatewayId(), // The ID is not mutated by fromPB.
 	}
 	gtwModel.fromPB(gtw, nil)
+	var err error
+	gtwModel.AdministrativeContactID, err = s.loadContact(ctx, gtwModel.AdministrativeContact)
+	if err != nil {
+		return nil, err
+	}
+	gtwModel.TechnicalContactID, err = s.loadContact(ctx, gtwModel.TechnicalContact)
+	if err != nil {
+		return nil, err
+	}
 	if err := s.createEntity(ctx, &gtwModel); err != nil {
 		return nil, err
 	}
@@ -145,6 +160,14 @@ func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fi
 	}
 	oldAttributes, oldAntennas := gtwModel.Attributes, gtwModel.Antennas
 	columns := gtwModel.fromPB(gtw, fieldMask)
+	gtwModel.AdministrativeContactID, err = s.loadContact(ctx, gtwModel.AdministrativeContact)
+	if err != nil {
+		return nil, err
+	}
+	gtwModel.TechnicalContactID, err = s.loadContact(ctx, gtwModel.TechnicalContact)
+	if err != nil {
+		return nil, err
+	}
 	if err = s.updateEntity(ctx, &gtwModel, columns...); err != nil {
 		return nil, err
 	}

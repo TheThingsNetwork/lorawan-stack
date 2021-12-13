@@ -26,11 +26,18 @@ type Client struct {
 	SoftDelete
 
 	// BEGIN common fields
-	ClientID    string       `gorm:"unique_index:client_id_index;type:VARCHAR(36);not null"`
-	Name        string       `gorm:"type:VARCHAR"`
-	Description string       `gorm:"type:TEXT"`
+	ClientID    string `gorm:"unique_index:client_id_index;type:VARCHAR(36);not null"`
+	Name        string `gorm:"type:VARCHAR"`
+	Description string `gorm:"type:TEXT"`
+
 	Attributes  []Attribute  `gorm:"polymorphic:Entity;polymorphic_value:client"`
 	Memberships []Membership `gorm:"polymorphic:Entity;polymorphic_value:client"`
+
+	AdministrativeContactID *string  `gorm:"type:UUID;index"`
+	AdministrativeContact   *Account `gorm:"save_associations:false"`
+
+	TechnicalContactID *string  `gorm:"type:UUID;index"`
+	TechnicalContact   *Account `gorm:"save_associations:false"`
 	// END common fields
 
 	ClientSecret       string         `gorm:"type:VARCHAR"`
@@ -53,9 +60,19 @@ func init() {
 
 // functions to set fields from the client model into the client proto.
 var clientPBSetters = map[string]func(*ttnpb.Client, *Client){
-	nameField:               func(pb *ttnpb.Client, cli *Client) { pb.Name = cli.Name },
-	descriptionField:        func(pb *ttnpb.Client, cli *Client) { pb.Description = cli.Description },
-	attributesField:         func(pb *ttnpb.Client, cli *Client) { pb.Attributes = attributes(cli.Attributes).toMap() },
+	nameField:        func(pb *ttnpb.Client, cli *Client) { pb.Name = cli.Name },
+	descriptionField: func(pb *ttnpb.Client, cli *Client) { pb.Description = cli.Description },
+	attributesField:  func(pb *ttnpb.Client, cli *Client) { pb.Attributes = attributes(cli.Attributes).toMap() },
+	administrativeContactField: func(pb *ttnpb.Client, cli *Client) {
+		if cli.AdministrativeContact != nil {
+			pb.AdministrativeContact = cli.AdministrativeContact.OrganizationOrUserIdentifiers()
+		}
+	},
+	technicalContactField: func(pb *ttnpb.Client, cli *Client) {
+		if cli.TechnicalContact != nil {
+			pb.TechnicalContact = cli.TechnicalContact.OrganizationOrUserIdentifiers()
+		}
+	},
 	secretField:             func(pb *ttnpb.Client, cli *Client) { pb.Secret = cli.ClientSecret },
 	redirectURIsField:       func(pb *ttnpb.Client, cli *Client) { pb.RedirectUris = cli.RedirectURIs },
 	logoutRedirectURIsField: func(pb *ttnpb.Client, cli *Client) { pb.LogoutRedirectUris = cli.LogoutRedirectURIs },
@@ -73,6 +90,26 @@ var clientModelSetters = map[string]func(*Client, *ttnpb.Client){
 	descriptionField: func(cli *Client, pb *ttnpb.Client) { cli.Description = pb.Description },
 	attributesField: func(cli *Client, pb *ttnpb.Client) {
 		cli.Attributes = attributes(cli.Attributes).updateFromMap(pb.Attributes)
+	},
+	administrativeContactField: func(cli *Client, pb *ttnpb.Client) {
+		if pb.AdministrativeContact == nil {
+			cli.AdministrativeContact = nil
+			return
+		}
+		cli.AdministrativeContact = &Account{
+			AccountType: pb.AdministrativeContact.EntityType(),
+			UID:         pb.AdministrativeContact.IDString(),
+		}
+	},
+	technicalContactField: func(cli *Client, pb *ttnpb.Client) {
+		if pb.TechnicalContact == nil {
+			cli.TechnicalContact = nil
+			return
+		}
+		cli.TechnicalContact = &Account{
+			AccountType: pb.TechnicalContact.EntityType(),
+			UID:         pb.TechnicalContact.IDString(),
+		}
 	},
 	secretField:             func(cli *Client, pb *ttnpb.Client) { cli.ClientSecret = pb.Secret },
 	redirectURIsField:       func(cli *Client, pb *ttnpb.Client) { cli.RedirectURIs = pq.StringArray(pb.RedirectUris) },
@@ -100,19 +137,21 @@ func init() {
 
 // fieldmask path to column name in clients table.
 var clientColumnNames = map[string][]string{
-	attributesField:         {},
-	contactInfoField:        {},
-	nameField:               {nameField},
-	descriptionField:        {descriptionField},
-	secretField:             {"client_secret"},
-	redirectURIsField:       {redirectURIsField},
-	logoutRedirectURIsField: {logoutRedirectURIsField},
-	stateField:              {stateField},
-	stateDescriptionField:   {stateDescriptionField},
-	skipAuthorizationField:  {skipAuthorizationField},
-	endorsedField:           {endorsedField},
-	grantsField:             {grantsField},
-	rightsField:             {rightsField},
+	attributesField:            {},
+	contactInfoField:           {},
+	nameField:                  {nameField},
+	descriptionField:           {descriptionField},
+	secretField:                {"client_secret"},
+	redirectURIsField:          {redirectURIsField},
+	logoutRedirectURIsField:    {logoutRedirectURIsField},
+	stateField:                 {stateField},
+	stateDescriptionField:      {stateDescriptionField},
+	skipAuthorizationField:     {skipAuthorizationField},
+	endorsedField:              {endorsedField},
+	grantsField:                {grantsField},
+	rightsField:                {rightsField},
+	administrativeContactField: {administrativeContactField + "_id"},
+	technicalContactField:      {technicalContactField + "_id"},
 }
 
 func (cli Client) toPB(pb *ttnpb.Client, fieldMask *pbtypes.FieldMask) {

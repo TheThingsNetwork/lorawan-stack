@@ -90,6 +90,12 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 		}
 	}
 
+	if err := validateCollaboratorEqualsContact(req.Collaborator, req.Client.AdministrativeContact); err != nil {
+		return nil, err
+	}
+	if err := validateCollaboratorEqualsContact(req.Collaborator, req.Client.TechnicalContact); err != nil {
+		return nil, err
+	}
 	if err := validateContactInfo(req.Client.ContactInfo); err != nil {
 		return nil, err
 	}
@@ -287,6 +293,16 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 			return nil, err
 		}
 	}
+	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.Paths), "administrative_contact") {
+		if !ttnpb.HasAnyField(req.FieldMask.Paths, "administrative_contact") {
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "administrative_contact")
+		}
+	}
+	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.Paths), "technical_contact") {
+		if !ttnpb.HasAnyField(req.FieldMask.Paths, "technical_contact") {
+			req.FieldMask.Paths = append(req.FieldMask.Paths, "technical_contact")
+		}
+	}
 	updatedByAdmin := is.IsAdmin(ctx)
 
 	if !updatedByAdmin {
@@ -306,6 +322,12 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		if err := validateContactIsCollaborator(ctx, db, req.Client.AdministrativeContact, req.Client.GetEntityIdentifiers()); err != nil {
+			return err
+		}
+		if err := validateContactIsCollaborator(ctx, db, req.Client.TechnicalContact, req.Client.GetEntityIdentifiers()); err != nil {
+			return err
+		}
 		cli, err = store.GetClientStore(db).UpdateClient(ctx, req.Client, req.FieldMask)
 		if err != nil {
 			return err
