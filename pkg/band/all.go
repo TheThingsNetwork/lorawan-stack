@@ -29,6 +29,12 @@ var All = map[string]map[ttnpb.PHYVersion]Band{
 		ttnpb.RP002_V1_0_0:       AS_923_RP2_v1_0_0,
 		ttnpb.RP002_V1_0_1:       AS_923_RP2_v1_0_1,
 	},
+	AS_923_2: {
+		ttnpb.RP002_V1_0_1: AS_923_2_RP2_v1_0_1,
+	},
+	AS_923_3: {
+		ttnpb.RP002_V1_0_1: AS_923_3_RP2_v1_0_1,
+	},
 	AU_915_928: {
 		ttnpb.TS001_V1_0_1:       AU_915_928_TS1_v1_0_1,
 		ttnpb.RP001_V1_0_2:       AU_915_928_RP1_v1_0_2,
