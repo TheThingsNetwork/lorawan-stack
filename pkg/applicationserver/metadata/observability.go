@@ -28,32 +28,32 @@ const (
 )
 
 var metaMetrics = &metadataMetrics{
-	cacheHits: metrics.NewContextualGaugeVec(
-		prometheus.GaugeOpts{
+	cacheHits: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "cache_hits_total",
 			Help:      "Total number of metadata cache hits",
 		},
 		[]string{metadataLabel},
 	),
-	cacheMisses: metrics.NewContextualGaugeVec(
-		prometheus.GaugeOpts{
+	cacheMisses: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "cache_misses_total",
 			Help:      "Total number of metadata cache misses",
 		},
 		[]string{metadataLabel},
 	),
-	registryRetrievals: metrics.NewContextualGaugeVec(
-		prometheus.GaugeOpts{
+	registryRetrievals: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "registry_retrievals_total",
 			Help:      "Total number of metadata registry retrievals",
 		},
 		[]string{metadataLabel},
 	),
-	registryUpdates: metrics.NewContextualGaugeVec(
-		prometheus.GaugeOpts{
+	registryUpdates: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "registry_updates_total",
 			Help:      "Total number of metadata registry updates",
@@ -67,10 +67,10 @@ func init() {
 }
 
 type metadataMetrics struct {
-	cacheHits          *metrics.ContextualGaugeVec
-	cacheMisses        *metrics.ContextualGaugeVec
-	registryRetrievals *metrics.ContextualGaugeVec
-	registryUpdates    *metrics.ContextualGaugeVec
+	cacheHits          *metrics.ContextualCounterVec
+	cacheMisses        *metrics.ContextualCounterVec
+	registryRetrievals *metrics.ContextualCounterVec
+	registryUpdates    *metrics.ContextualCounterVec
 }
 
 func (m metadataMetrics) Describe(ch chan<- *prometheus.Desc) {
