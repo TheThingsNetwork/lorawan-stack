@@ -269,7 +269,7 @@ Cypress.Commands.add(
       cy.request({
         method: 'POST',
         url: `${baseUrl}/api/v3/applications/${applicationId}/devices`,
-        body,
+        body: { ...body, ...overwrites.is },
         headers,
       })
     })

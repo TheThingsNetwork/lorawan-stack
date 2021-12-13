@@ -47,7 +47,8 @@ const m = defineMessages({
   latestData: 'Latest data',
   rootKeys: 'Root keys',
   keysNotExposed: 'Keys are not exposed',
-  failedAccessOtherHostDeviceMessage: 'The end device you attempted to visit is registered on a different host and needs to be accessed using its host Console.',
+  failedAccessOtherHostDeviceMessage:
+    'The end device you attempted to visit is registered on a different host and needs to be accessed using its host Console.',
 })
 
 @connect(state => {
@@ -67,11 +68,11 @@ const m = defineMessages({
 class DeviceOverview extends React.Component {
   static propTypes = {
     device: PropTypes.device.isRequired,
-    redirect: PropTypes.bool,
+    shouldRedirect: PropTypes.bool,
   }
 
   static defaultProps = {
-    redirect: false,
+    shouldRedirect: false,
   }
 
   get deviceInfo() {
@@ -248,10 +249,7 @@ class DeviceOverview extends React.Component {
         type: toast.types.WARNING,
         message: m.failedAccessOtherHostDeviceMessage,
       })
-
-      return (
-          <Redirect to="/applications" />
-      )
+      return <Redirect to="/applications" />
     }
 
     return (

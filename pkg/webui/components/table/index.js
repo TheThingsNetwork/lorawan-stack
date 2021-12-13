@@ -113,7 +113,7 @@ class Tabular extends React.Component {
     const appliedRowKeySelector = rowKeySelector ? rowKeySelector : defaultRowKeySelector
     const paginatedData = this.handlePagination(data)
     const rows = paginatedData.map((row, rowIndex) => {
-      const rowClickable = !clickable ? false : row._meta.clickable ?? clickable // If the whole table is disabled each row should be as well.
+      const rowClickable = !clickable ? false : row._meta?.clickable ?? clickable // If the whole table is disabled each row should be as well.
 
       return (
         <Table.Row
