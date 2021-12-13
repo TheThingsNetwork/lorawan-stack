@@ -14,7 +14,6 @@
 
 /* global require */
 import React from 'react'
-import { configure, addDecorator } from '@storybook/react'
 import { Provider } from 'react-redux'
 import { ConnectedRouter } from 'connected-react-router'
 import { IntlProvider } from 'react-intl'
@@ -33,19 +32,17 @@ import env from './env'
 
 const history = createMemoryHistory()
 const store = createStore(history)
-const req = require.context('../../pkg/webui/', true, /story\.js$/)
-const load = () => req.keys().forEach(req)
 
-addDecorator(story => (
-  <EnvProvider env={env}>
-    <Provider store={store}>
-      <IntlProvider key="key" messages={{ ...messages, ...backendMessages }} locale="en-US">
-        <ConnectedRouter history={history}>
-          <Center>{story()}</Center>
-        </ConnectedRouter>
-      </IntlProvider>
-    </Provider>
-  </EnvProvider>
-))
-
-configure(load, module)
+export const decorators = [
+  Story => (
+    <EnvProvider env={env}>
+      <Provider store={store}>
+        <IntlProvider key="key" messages={{ ...messages, ...backendMessages }} locale="en-US">
+          <ConnectedRouter history={history}>
+            <Center>{Story()}</Center>
+          </ConnectedRouter>
+        </IntlProvider>
+      </Provider>
+    </EnvProvider>
+  ),
+]
