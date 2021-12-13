@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
 import style from './story.styl'
@@ -51,26 +50,31 @@ const iconElement = icons.map(icon => (
   </div>
 ))
 
-storiesOf('Icon', module)
-  .addDecorator((story, context) =>
+export default {
+  title: 'Icon',
+
+  decorators: [
     withInfo({
       inline: true,
       header: false,
       propTables: [Icon],
       text: doc,
-    })(story)(context),
-  )
-  .add('Icons', () => <div>{iconElement}</div>)
-  .add('Usage', () => (
-    <div className={style.wrapper}>
-      <div className={style.block}>
-        <Icon icon="devices" />
-        <span>{'display: inline-block'}</span>
-      </div>
-      <br />
-      <div className={style.flex}>
-        <Icon icon="devices" />
-        <span>{'display: flex'}</span>
-      </div>
+    }),
+  ],
+}
+
+export const Icons = () => <div>{iconElement}</div>
+
+export const Usage = () => (
+  <div className={style.wrapper}>
+    <div className={style.block}>
+      <Icon icon="devices" />
+      <span>{'display: inline-block'}</span>
     </div>
-  ))
+    <br />
+    <div className={style.flex}>
+      <Icon icon="devices" />
+      <span>{'display: flex'}</span>
+    </div>
+  </div>
+)

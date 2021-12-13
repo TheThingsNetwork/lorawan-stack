@@ -16,7 +16,6 @@
 
 import React, { Component } from 'react'
 import bind from 'autobind-decorator'
-import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
 import Tabs from '.'
@@ -42,77 +41,112 @@ class Example extends Component {
   }
 }
 
-storiesOf('Tabs', module)
-  .addDecorator((story, context) =>
+export default {
+  title: 'Tabs',
+
+  decorators: [
     withInfo({
       inline: true,
       header: false,
       source: true,
       propTables: [Tabs],
       propTablesExclude: [Example],
-    })(story)(context),
-  )
-  .add('Default', () => {
-    const tabs = [
-      { title: 'All', name: 'all' },
-      { title: 'Starred', name: 'starred' },
-    ]
+    }),
+  ],
+}
 
-    return <Example tabs={tabs} active={tabs[0].name} />
-  })
-  .add('Default (disabled)', () => {
-    const tabs = [
-      { title: 'All', name: 'all' },
-      { title: 'Starred', name: 'starred', disabled: true },
-    ]
+export const Default = () => {
+  const tabs = [
+    { title: 'All', name: 'all' },
+    { title: 'Starred', name: 'starred' },
+  ]
 
-    return <Example tabs={tabs} active={tabs[0].name} />
-  })
-  .add('Default (narrow)', () => {
-    const tabs = [
-      { title: 'All', name: 'all' },
-      { title: 'Starred', name: 'starred' },
-    ]
+  return <Example tabs={tabs} active={tabs[0].name} />
+}
 
-    return <Example tabs={tabs} active={tabs[0].name} narrow />
-  })
-  .add('With icons', () => {
-    const tabs = [
-      { title: 'People', name: 'people', icon: 'organization' },
-      { title: 'Data', name: 'data', icon: 'data' },
-    ]
+export const DefaultDisabled = () => {
+  const tabs = [
+    { title: 'All', name: 'all' },
+    { title: 'Starred', name: 'starred', disabled: true },
+  ]
 
-    return <Example tabs={tabs} active={tabs[0].name} narrow />
-  })
-  .add('With icons (disabled)', () => {
-    const tabs = [
-      { title: 'People', name: 'people', icon: 'organization' },
-      { title: 'Data', name: 'data', icon: 'data', disabled: true },
-    ]
+  return <Example tabs={tabs} active={tabs[0].name} />
+}
 
-    return <Example tabs={tabs} active={tabs[0].name} />
-  })
-  .add('Link', () => {
-    const tabs = [
-      { title: 'People', name: 'people', link: '/people' },
-      { title: 'Data', name: 'data', link: '/data' },
-    ]
+DefaultDisabled.story = {
+  name: 'Default (disabled)',
+}
 
-    return <Example tabs={tabs} />
-  })
-  .add('Link (disabled)', () => {
-    const tabs = [
-      { title: 'People', name: 'people', link: '/people' },
-      { title: 'Data', name: 'data', link: '/data', disabled: true },
-    ]
+export const DefaultNarrow = () => {
+  const tabs = [
+    { title: 'All', name: 'all' },
+    { title: 'Starred', name: 'starred' },
+  ]
 
-    return <Example tabs={tabs} />
-  })
-  .add('Link (narrow)', () => {
-    const tabs = [
-      { title: 'People', name: 'people', link: '/people' },
-      { title: 'Data', name: 'data', link: '/data' },
-    ]
+  return <Example tabs={tabs} active={tabs[0].name} narrow />
+}
 
-    return <Example tabs={tabs} narrow />
-  })
+DefaultNarrow.story = {
+  name: 'Default (narrow)',
+}
+
+export const WithIcons = () => {
+  const tabs = [
+    { title: 'People', name: 'people', icon: 'organization' },
+    { title: 'Data', name: 'data', icon: 'data' },
+  ]
+
+  return <Example tabs={tabs} active={tabs[0].name} narrow />
+}
+
+WithIcons.story = {
+  name: 'With icons',
+}
+
+export const WithIconsDisabled = () => {
+  const tabs = [
+    { title: 'People', name: 'people', icon: 'organization' },
+    { title: 'Data', name: 'data', icon: 'data', disabled: true },
+  ]
+
+  return <Example tabs={tabs} active={tabs[0].name} />
+}
+
+WithIconsDisabled.story = {
+  name: 'With icons (disabled)',
+}
+
+export const Link = () => {
+  const tabs = [
+    { title: 'People', name: 'people', link: '/people' },
+    { title: 'Data', name: 'data', link: '/data' },
+  ]
+
+  return <Example tabs={tabs} />
+}
+
+export const LinkDisabled = () => {
+  const tabs = [
+    { title: 'People', name: 'people', link: '/people' },
+    { title: 'Data', name: 'data', link: '/data', disabled: true },
+  ]
+
+  return <Example tabs={tabs} />
+}
+
+LinkDisabled.story = {
+  name: 'Link (disabled)',
+}
+
+export const LinkNarrow = () => {
+  const tabs = [
+    { title: 'People', name: 'people', link: '/people' },
+    { title: 'Data', name: 'data', link: '/data' },
+  ]
+
+  return <Example tabs={tabs} narrow />
+}
+
+LinkNarrow.story = {
+  name: 'Link (narrow)',
+}

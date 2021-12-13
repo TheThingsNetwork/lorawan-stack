@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
 import ErrorMessage from '.'
@@ -36,12 +35,16 @@ const exampleError = {
   ],
 }
 
-storiesOf('Utility Components/ErrorMessage', module)
-  .addDecorator((story, context) =>
+export default {
+  title: 'Utility Components/ErrorMessage',
+
+  decorators: [
     withInfo({
       inline: true,
       header: false,
       propTables: [ErrorMessage],
-    })(story)(context),
-  )
-  .add('Default', () => <ErrorMessage content={exampleError} />)
+    }),
+  ],
+}
+
+export const Default = () => <ErrorMessage content={exampleError} />

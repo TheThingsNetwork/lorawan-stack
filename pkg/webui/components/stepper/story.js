@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 import bind from 'autobind-decorator'
 
 import Stepper from '.'
@@ -79,34 +78,58 @@ class InteractiveExample extends React.Component {
   }
 }
 
-storiesOf('Stepper', module)
-  .add('Default', () => (
-    <Stepper currentStep={2}>
-      <Stepper.Step stepNumber={1} title="Step 1" description="Here is a description." />
-      <Stepper.Step stepNumber={2} title="Step 2" description="Here is a description." />
-      <Stepper.Step stepNumber={3} title="Step 3" description="Here is a description." />
-    </Stepper>
-  ))
-  .add('Default (Error)', () => (
-    <Stepper status="failure" currentStep={2}>
-      <Stepper.Step stepNumber={1} title="Step 1" description="Here is a description." />
-      <Stepper.Step stepNumber={2} title="Step 2" description="Here is a description." />
-      <Stepper.Step stepNumber={3} title="Step 3" description="Here is a description." />
-    </Stepper>
-  ))
-  .add('Default (Interactive)', () => <InteractiveExample />)
-  .add('Vertical', () => (
-    <Stepper currentStep={2} vertical>
-      <Stepper.Step stepNumber={1} title="Step 1" description="Here is a description." />
-      <Stepper.Step stepNumber={2} title="Step 2" description="Here is a description." />
-      <Stepper.Step stepNumber={3} title="Step 3" description="Here is a description." />
-    </Stepper>
-  ))
-  .add('Vertical (Error)', () => (
-    <Stepper status="failure" currentStep={2} vertical>
-      <Stepper.Step stepNumber={1} title="Step 1" description="Here is a description." />
-      <Stepper.Step stepNumber={2} title="Step 2" description="Here is a description." />
-      <Stepper.Step stepNumber={3} title="Step 3" description="Here is a description." />
-    </Stepper>
-  ))
-  .add('Vertical (Interactive)', () => <InteractiveExample vertical />)
+export default {
+  title: 'Stepper',
+}
+
+export const Default = () => (
+  <Stepper currentStep={2}>
+    <Stepper.Step stepNumber={1} title="Step 1" description="Here is a description." />
+    <Stepper.Step stepNumber={2} title="Step 2" description="Here is a description." />
+    <Stepper.Step stepNumber={3} title="Step 3" description="Here is a description." />
+  </Stepper>
+)
+
+export const DefaultError = () => (
+  <Stepper status="failure" currentStep={2}>
+    <Stepper.Step stepNumber={1} title="Step 1" description="Here is a description." />
+    <Stepper.Step stepNumber={2} title="Step 2" description="Here is a description." />
+    <Stepper.Step stepNumber={3} title="Step 3" description="Here is a description." />
+  </Stepper>
+)
+
+DefaultError.story = {
+  name: 'Default (Error)',
+}
+
+export const DefaultInteractive = () => <InteractiveExample />
+
+DefaultInteractive.story = {
+  name: 'Default (Interactive)',
+}
+
+export const Vertical = () => (
+  <Stepper currentStep={2} vertical>
+    <Stepper.Step stepNumber={1} title="Step 1" description="Here is a description." />
+    <Stepper.Step stepNumber={2} title="Step 2" description="Here is a description." />
+    <Stepper.Step stepNumber={3} title="Step 3" description="Here is a description." />
+  </Stepper>
+)
+
+export const VerticalError = () => (
+  <Stepper status="failure" currentStep={2} vertical>
+    <Stepper.Step stepNumber={1} title="Step 1" description="Here is a description." />
+    <Stepper.Step stepNumber={2} title="Step 2" description="Here is a description." />
+    <Stepper.Step stepNumber={3} title="Step 3" description="Here is a description." />
+  </Stepper>
+)
+
+VerticalError.story = {
+  name: 'Vertical (Error)',
+}
+
+export const VerticalInteractive = () => <InteractiveExample vertical />
+
+VerticalInteractive.story = {
+  name: 'Vertical (Interactive)',
+}

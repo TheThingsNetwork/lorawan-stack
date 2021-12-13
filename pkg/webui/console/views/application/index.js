@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Switch, Route } from 'react-router'
+import { Switch, Route } from 'react-router-dom'
 
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import SideNavigation from '@ttn-lw/components/navigation/side'

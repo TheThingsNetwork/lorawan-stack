@@ -13,17 +13,20 @@
 // limitations under the License.
 
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
 import Tab from '.'
 
-storiesOf('Tag', module)
-  .addDecorator((story, context) =>
+export default {
+  title: 'Tag',
+
+  decorators: [
     withInfo({
       inline: true,
       header: false,
       propTables: [Tab],
-    })(story)(context),
-  )
-  .add('Default', () => <Tab content="Info" />)
+    }),
+  ],
+}
+
+export const Default = () => <Tab content="Info" />

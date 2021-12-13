@@ -27,7 +27,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
 import DataSheet from '.'
@@ -72,17 +71,21 @@ const containerStyles = {
   maxWidth: '600px',
 }
 
-storiesOf('Data Sheet', module)
-  .addDecorator((story, context) =>
+export default {
+  title: 'Data Sheet',
+
+  decorators: [
     withInfo({
       inline: true,
       header: false,
       source: true,
       propTables: [DataSheet],
-    })(story)(context),
-  )
-  .add('Default', () => (
-    <div style={containerStyles}>
-      <DataSheet data={testData} />
-    </div>
-  ))
+    }),
+  ],
+}
+
+export const Default = () => (
+  <div style={containerStyles}>
+    <DataSheet data={testData} />
+  </div>
+)

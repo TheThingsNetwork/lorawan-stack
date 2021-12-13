@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router'
+import { Switch, Route } from 'react-router-dom'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'

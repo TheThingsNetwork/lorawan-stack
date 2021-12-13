@@ -15,7 +15,7 @@
 import React, { useCallback, useState } from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import { useSelector, useDispatch } from 'react-redux'
-import { Switch as RouteSwitch, Route } from 'react-router'
+import { Switch as RouteSwitch, Route } from 'react-router-dom'
 import classnames from 'classnames'
 
 import PacketBrokerLogo from '@assets/misc/packet-broker.svg'

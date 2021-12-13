@@ -15,7 +15,7 @@
 import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
-import { Switch, Route } from 'react-router'
+import { Switch, Route } from 'react-router-dom'
 
 import BlankWebhookImg from '@assets/misc/blank-webhook.svg'
 

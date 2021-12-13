@@ -16,7 +16,6 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
-import { storiesOf } from '@storybook/react'
 
 import CodeEditor from '.'
 
@@ -62,13 +61,22 @@ function Decoder(bytes, port) {
 }
 `
 
-storiesOf('CodeEditor', module)
-  .add('Default', () => (
-    <Example language="javascript" name="storybook-code-editor" placeholder={code} />
-  ))
-  .add('Readonly', () => (
-    <Example language="javascript" name="storybook-code-editor" placeholder={code} readOnly />
-  ))
-  .add('With warning', () => (
-    <Example language="javascript" name="storybook-code-editor" placeholder={`${code}}`} />
-  ))
+export default {
+  title: 'CodeEditor',
+}
+
+export const Default = () => (
+  <Example language="javascript" name="storybook-code-editor" placeholder={code} />
+)
+
+export const Readonly = () => (
+  <Example language="javascript" name="storybook-code-editor" placeholder={code} readOnly />
+)
+
+export const WithWarning = () => (
+  <Example language="javascript" name="storybook-code-editor" placeholder={`${code}}`} />
+)
+
+WithWarning.story = {
+  name: 'With warning',
+}

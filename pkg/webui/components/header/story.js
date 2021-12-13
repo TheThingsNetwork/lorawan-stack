@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
 
 import TtsLogo from '@assets/static/logo.svg'
@@ -56,24 +55,28 @@ const items = (
   </React.Fragment>
 )
 
-storiesOf('Header', module)
-  .add('Single Logo', () => (
-    <Header
-      dropdownItems={items}
-      handleSearchRequest={action('Search')}
-      navigationEntries={navigationEntries}
-      style={{ margin: '-1rem' }}
-      user={user}
-      logo={singleLogo}
-    />
-  ))
-  .add('Double Logo', () => (
-    <Header
-      dropdownItems={items}
-      handleSearchRequest={action('Search')}
-      navigationEntries={navigationEntries}
-      style={{ margin: '-1rem' }}
-      user={user}
-      logo={doubleLogo}
-    />
-  ))
+export default {
+  title: 'Header',
+}
+
+export const SingleLogo = () => (
+  <Header
+    dropdownItems={items}
+    handleSearchRequest={action('Search')}
+    navigationEntries={navigationEntries}
+    style={{ margin: '-1rem' }}
+    user={user}
+    logo={singleLogo}
+  />
+)
+
+export const DoubleLogo = () => (
+  <Header
+    dropdownItems={items}
+    handleSearchRequest={action('Search')}
+    navigationEntries={navigationEntries}
+    style={{ margin: '-1rem' }}
+    user={user}
+    logo={doubleLogo}
+  />
+)

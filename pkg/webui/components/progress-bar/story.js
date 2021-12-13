@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 
 import ProgressBar from '.'
 
@@ -40,7 +39,14 @@ class Helper extends React.Component {
   }
 }
 
-storiesOf('ProgressBar', module)
-  .add('Default', () => <ProgressBar percentage={50} />)
-  .add('With Status', () => <ProgressBar current={24} target={190} showStatus />)
-  .add('With ETA Estimation', () => <Helper />)
+export default {
+  title: 'ProgressBar',
+}
+
+export const Default = () => <ProgressBar percentage={50} />
+export const WithStatus = () => <ProgressBar current={24} target={190} showStatus />
+export const WithEtaEstimation = () => <Helper />
+
+WithEtaEstimation.story = {
+  name: 'With ETA Estimation',
+}

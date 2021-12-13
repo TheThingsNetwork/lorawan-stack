@@ -13,11 +13,14 @@
 // limitations under the License.
 
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 
 import WidgetContainer from '.'
 
-storiesOf('WidgetContainer', module).add('Default', () => (
+export default {
+  title: 'WidgetContainer',
+}
+
+export const Default = () => (
   <div style={{ width: '500px' }}>
     <WidgetContainer title="Location" toAllUrl="#" linkMessage="Change location">
       <div
@@ -35,4 +38,4 @@ storiesOf('WidgetContainer', module).add('Default', () => (
       </div>
     </WidgetContainer>
   </div>
-))
+)

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 import { defineMessages } from 'react-intl'
 
 import ErrorNotification from '.'
@@ -58,7 +57,11 @@ const testErrorWithMarkup = {
   ],
 }
 
-storiesOf('Notification/ErrorNotification', module).add('Error', () => (
+export default {
+  title: 'Notification/ErrorNotification',
+}
+
+export const Error = () => (
   <div>
     <ErrorNotification title="example message title" content={m.problem} />
     <ErrorNotification content={m.problem} />
@@ -66,4 +69,4 @@ storiesOf('Notification/ErrorNotification', module).add('Error', () => (
     <ErrorNotification content={exampleError} small />
     <ErrorNotification title="example of error with markup" content={testErrorWithMarkup} />
   </div>
-))
+)

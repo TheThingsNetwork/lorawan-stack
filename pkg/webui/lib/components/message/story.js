@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 import { IntlProvider } from 'react-intl'
 
@@ -48,25 +47,32 @@ const IntlDecorator = storyFn => (
   </IntlProvider>
 )
 
-storiesOf('Utility Components/Message', module)
-  .addDecorator((story, context) =>
+export default {
+  title: 'Utility Components/Message',
+
+  decorators: [
     withInfo({
       inline: true,
       header: false,
       text: doc,
       propTables: [Message],
-    })(story)(context),
-  )
-  .addDecorator(IntlDecorator)
-  .add('Default', () => <Message content={exampleMessage} />)
-  .add('Placeholder', () => <Message content={placeholderMessage} values={{ number: 5 }} />)
-  .add('String', () => <Message content="I can also be just a string, but will issue a warning" />)
-  .add('Transforms', () => (
-    <ul>
-      <Message capitalize component="li" content={exampleLowercaseMessage} />
-      <Message firstToUpper component="li" content={exampleLowercaseMessage} />
-      <Message firstToLower component="li" content={exampleMessage} />
-      <Message uppercase component="li" content={exampleLowercaseMessage} />
-      <Message lowercase component="li" content={exampleMessage} />
-    </ul>
-  ))
+    }),
+    IntlDecorator,
+  ],
+}
+
+export const Default = () => <Message content={exampleMessage} />
+export const Placeholder = () => <Message content={placeholderMessage} values={{ number: 5 }} />
+export const String = () => (
+  <Message content="I can also be just a string, but will issue a warning" />
+)
+
+export const Transforms = () => (
+  <ul>
+    <Message capitalize component="li" content={exampleLowercaseMessage} />
+    <Message firstToUpper component="li" content={exampleLowercaseMessage} />
+    <Message firstToLower component="li" content={exampleMessage} />
+    <Message uppercase component="li" content={exampleLowercaseMessage} />
+    <Message lowercase component="li" content={exampleMessage} />
+  </ul>
+)
