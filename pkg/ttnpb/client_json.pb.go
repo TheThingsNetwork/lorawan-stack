@@ -107,6 +107,18 @@ func (x *Client) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		}
 		s.WriteArrayEnd()
 	}
+	if x.AdministrativeContact != nil || s.HasField("administrative_contact") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("administrative_contact")
+		// NOTE: OrganizationOrUserIdentifiers does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.AdministrativeContact)
+	}
+	if x.TechnicalContact != nil || s.HasField("technical_contact") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("technical_contact")
+		// NOTE: OrganizationOrUserIdentifiers does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.TechnicalContact)
+	}
 	if x.Secret != "" || s.HasField("secret") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("secret")
@@ -229,6 +241,18 @@ func (x *Client) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				}
 				x.ContactInfo = append(x.ContactInfo, v)
 			})
+		case "administrative_contact", "administrativeContact":
+			s.AddField("administrative_contact")
+			// NOTE: OrganizationOrUserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v OrganizationOrUserIdentifiers
+			gogo.UnmarshalMessage(s, &v)
+			x.AdministrativeContact = &v
+		case "technical_contact", "technicalContact":
+			s.AddField("technical_contact")
+			// NOTE: OrganizationOrUserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v OrganizationOrUserIdentifiers
+			gogo.UnmarshalMessage(s, &v)
+			x.TechnicalContact = &v
 		case "secret":
 			s.AddField("secret")
 			x.Secret = s.ReadString()

@@ -12153,7 +12153,13 @@
           "items": {
             "$ref": "#/definitions/v3ContactInfo"
           },
-          "description": "Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application."
+          "description": "Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.\nThis field is deprecated. Use administrative_contact and technical_contact instead."
+        },
+        "administrative_contact": {
+          "$ref": "#/definitions/v3OrganizationOrUserIdentifiers"
+        },
+        "technical_contact": {
+          "$ref": "#/definitions/v3OrganizationOrUserIdentifiers"
         },
         "dev_eui_counter": {
           "type": "integer",
@@ -13302,7 +13308,13 @@
           "items": {
             "$ref": "#/definitions/v3ContactInfo"
           },
-          "description": "Contact information for this client. Typically used to indicate who to contact with technical/security questions about the application.\nThis information is public and can be seen by any authenticated user in the network."
+          "description": "Contact information for this client. Typically used to indicate who to contact with technical/security questions about the application.\nThis information is public and can be seen by any authenticated user in the network.\nThis field is deprecated. Use administrative_contact and technical_contact instead."
+        },
+        "administrative_contact": {
+          "$ref": "#/definitions/v3OrganizationOrUserIdentifiers"
+        },
+        "technical_contact": {
+          "$ref": "#/definitions/v3OrganizationOrUserIdentifiers"
         },
         "secret": {
           "type": "string",
@@ -14778,7 +14790,13 @@
           "items": {
             "$ref": "#/definitions/v3ContactInfo"
           },
-          "description": "Contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway."
+          "description": "Contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway.\nThis field is deprecated. Use administrative_contact and technical_contact instead."
+        },
+        "administrative_contact": {
+          "$ref": "#/definitions/v3OrganizationOrUserIdentifiers"
+        },
+        "technical_contact": {
+          "$ref": "#/definitions/v3OrganizationOrUserIdentifiers"
         },
         "version_ids": {
           "$ref": "#/definitions/v3GatewayVersionIdentifiers"
@@ -16355,7 +16373,13 @@
           "items": {
             "$ref": "#/definitions/v3ContactInfo"
           },
-          "description": "Contact information for this organization. Typically used to indicate who to contact with security/billing questions about the organization."
+          "description": "Contact information for this organization. Typically used to indicate who to contact with security/billing questions about the organization.\nThis field is deprecated. Use administrative_contact and technical_contact instead."
+        },
+        "administrative_contact": {
+          "$ref": "#/definitions/v3OrganizationOrUserIdentifiers"
+        },
+        "technical_contact": {
+          "$ref": "#/definitions/v3OrganizationOrUserIdentifiers"
         }
       }
     },
@@ -16461,7 +16485,14 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/v3ContactInfo"
-          }
+          },
+          "description": "This field is deprecated. Use administrative_contact and technical_contact instead."
+        },
+        "administrative_contact": {
+          "$ref": "#/definitions/v3OrganizationOrUserIdentifiers"
+        },
+        "technical_contact": {
+          "$ref": "#/definitions/v3OrganizationOrUserIdentifiers"
         },
         "antennas": {
           "type": "array",
@@ -16644,7 +16675,13 @@
           "items": {
             "$ref": "#/definitions/v3ContactInfo"
           },
-          "description": "Contact information."
+          "description": "Contact information.\nThis field is deprecated. Use administrative_contact and technical_contact instead."
+        },
+        "administrative_contact": {
+          "$ref": "#/definitions/v3ContactInfo"
+        },
+        "technical_contact": {
+          "$ref": "#/definitions/v3ContactInfo"
         },
         "listed": {
           "type": "boolean",
@@ -17923,7 +17960,7 @@
           "items": {
             "$ref": "#/definitions/v3ContactInfo"
           },
-          "description": "Contact information for this user. Typically used to indicate who to contact with security/billing questions about the user."
+          "description": "Contact information for this user. Typically used to indicate who to contact with security/billing questions about the user.\nThis field is deprecated."
         },
         "primary_email_address": {
           "type": "string",

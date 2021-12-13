@@ -93,6 +93,30 @@ func (m *PacketBrokerGateway) ValidateFields(paths ...string) error {
 
 			}
 
+		case "administrative_contact":
+
+			if v, ok := interface{}(m.GetAdministrativeContact()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return PacketBrokerGatewayValidationError{
+						field:  "administrative_contact",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "technical_contact":
+
+			if v, ok := interface{}(m.GetTechnicalContact()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return PacketBrokerGatewayValidationError{
+						field:  "technical_contact",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "antennas":
 
 			if len(m.GetAntennas()) > 8 {
@@ -689,6 +713,13 @@ func (m *PacketBrokerNetwork) ValidateFields(paths ...string) error {
 
 		case "contact_info":
 
+			if len(m.GetContactInfo()) > 10 {
+				return PacketBrokerNetworkValidationError{
+					field:  "contact_info",
+					reason: "value must contain no more than 10 item(s)",
+				}
+			}
+
 			for idx, item := range m.GetContactInfo() {
 				_, _ = idx, item
 
@@ -702,6 +733,30 @@ func (m *PacketBrokerNetwork) ValidateFields(paths ...string) error {
 					}
 				}
 
+			}
+
+		case "administrative_contact":
+
+			if v, ok := interface{}(m.GetAdministrativeContact()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return PacketBrokerNetworkValidationError{
+						field:  "administrative_contact",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "technical_contact":
+
+			if v, ok := interface{}(m.GetTechnicalContact()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return PacketBrokerNetworkValidationError{
+						field:  "technical_contact",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
 			}
 
 		case "listed":

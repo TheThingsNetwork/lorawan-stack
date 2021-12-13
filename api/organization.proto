@@ -60,9 +60,13 @@ message Organization {
   ];
 
   // Contact information for this organization. Typically used to indicate who to contact with security/billing questions about the organization.
-  repeated ContactInfo contact_info = 7 [(validate.rules).repeated.max_items = 10];
+  // This field is deprecated. Use administrative_contact and technical_contact instead.
+  repeated ContactInfo contact_info = 7 [deprecated = true, (validate.rules).repeated.max_items = 10];
 
-  // next: 9
+  OrganizationOrUserIdentifiers administrative_contact = 9;
+  OrganizationOrUserIdentifiers technical_contact = 10;
+
+  // next: 11
 }
 
 message Organizations {

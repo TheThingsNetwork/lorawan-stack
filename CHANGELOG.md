@@ -21,6 +21,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Deprecated
 
+- The `contact_info` fields of applications, OAuth clients, gateways, organizations and users.
+
 ### Removed
 
 ### Fixed

@@ -110,7 +110,11 @@ message Gateway {
   ];
 
   // Contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway.
-  repeated ContactInfo contact_info = 7 [(validate.rules).repeated.max_items = 10];
+  // This field is deprecated. Use administrative_contact and technical_contact instead.
+  repeated ContactInfo contact_info = 7 [deprecated = true, (validate.rules).repeated.max_items = 10];
+
+  OrganizationOrUserIdentifiers administrative_contact = 30;
+  OrganizationOrUserIdentifiers technical_contact = 31;
 
   GatewayVersionIdentifiers version_ids = 8;
 
@@ -190,7 +194,7 @@ message Gateway {
 
   bool disable_packet_broker_forwarding = 29;
 
-  // next: 30
+  // next: 32
 }
 
 message Gateways {

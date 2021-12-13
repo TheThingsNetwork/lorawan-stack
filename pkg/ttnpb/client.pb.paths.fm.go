@@ -3,6 +3,13 @@
 package ttnpb
 
 var ClientFieldPathsNested = []string{
+	"administrative_contact",
+	"administrative_contact.ids",
+	"administrative_contact.ids.organization_ids",
+	"administrative_contact.ids.organization_ids.organization_id",
+	"administrative_contact.ids.user_ids",
+	"administrative_contact.ids.user_ids.email",
+	"administrative_contact.ids.user_ids.user_id",
 	"attributes",
 	"contact_info",
 	"created_at",
@@ -20,10 +27,18 @@ var ClientFieldPathsNested = []string{
 	"skip_authorization",
 	"state",
 	"state_description",
+	"technical_contact",
+	"technical_contact.ids",
+	"technical_contact.ids.organization_ids",
+	"technical_contact.ids.organization_ids.organization_id",
+	"technical_contact.ids.user_ids",
+	"technical_contact.ids.user_ids.email",
+	"technical_contact.ids.user_ids.user_id",
 	"updated_at",
 }
 
 var ClientFieldPathsTopLevel = []string{
+	"administrative_contact",
 	"attributes",
 	"contact_info",
 	"created_at",
@@ -40,6 +55,7 @@ var ClientFieldPathsTopLevel = []string{
 	"skip_authorization",
 	"state",
 	"state_description",
+	"technical_contact",
 	"updated_at",
 }
 var ClientsFieldPathsNested = []string{
@@ -84,6 +100,13 @@ var ListClientsRequestFieldPathsTopLevel = []string{
 }
 var CreateClientRequestFieldPathsNested = []string{
 	"client",
+	"client.administrative_contact",
+	"client.administrative_contact.ids",
+	"client.administrative_contact.ids.organization_ids",
+	"client.administrative_contact.ids.organization_ids.organization_id",
+	"client.administrative_contact.ids.user_ids",
+	"client.administrative_contact.ids.user_ids.email",
+	"client.administrative_contact.ids.user_ids.user_id",
 	"client.attributes",
 	"client.contact_info",
 	"client.created_at",
@@ -101,6 +124,13 @@ var CreateClientRequestFieldPathsNested = []string{
 	"client.skip_authorization",
 	"client.state",
 	"client.state_description",
+	"client.technical_contact",
+	"client.technical_contact.ids",
+	"client.technical_contact.ids.organization_ids",
+	"client.technical_contact.ids.organization_ids.organization_id",
+	"client.technical_contact.ids.user_ids",
+	"client.technical_contact.ids.user_ids.email",
+	"client.technical_contact.ids.user_ids.user_id",
 	"client.updated_at",
 	"collaborator",
 	"collaborator.ids",
@@ -117,6 +147,13 @@ var CreateClientRequestFieldPathsTopLevel = []string{
 }
 var UpdateClientRequestFieldPathsNested = []string{
 	"client",
+	"client.administrative_contact",
+	"client.administrative_contact.ids",
+	"client.administrative_contact.ids.organization_ids",
+	"client.administrative_contact.ids.organization_ids.organization_id",
+	"client.administrative_contact.ids.user_ids",
+	"client.administrative_contact.ids.user_ids.email",
+	"client.administrative_contact.ids.user_ids.user_id",
 	"client.attributes",
 	"client.contact_info",
 	"client.created_at",
@@ -134,6 +171,13 @@ var UpdateClientRequestFieldPathsNested = []string{
 	"client.skip_authorization",
 	"client.state",
 	"client.state_description",
+	"client.technical_contact",
+	"client.technical_contact.ids",
+	"client.technical_contact.ids.organization_ids",
+	"client.technical_contact.ids.organization_ids.organization_id",
+	"client.technical_contact.ids.user_ids",
+	"client.technical_contact.ids.user_ids.email",
+	"client.technical_contact.ids.user_ids.user_id",
 	"client.updated_at",
 	"field_mask",
 }

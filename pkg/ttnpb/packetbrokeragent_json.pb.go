@@ -37,6 +37,18 @@ func (x *PacketBrokerGateway) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		}
 		s.WriteArrayEnd()
 	}
+	if x.AdministrativeContact != nil || s.HasField("administrative_contact") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("administrative_contact")
+		// NOTE: OrganizationOrUserIdentifiers does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.AdministrativeContact)
+	}
+	if x.TechnicalContact != nil || s.HasField("technical_contact") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("technical_contact")
+		// NOTE: OrganizationOrUserIdentifiers does not seem to implement MarshalProtoJSON.
+		gogo.MarshalMessage(s, x.TechnicalContact)
+	}
 	if len(x.Antennas) > 0 || s.HasField("antennas") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("antennas")
@@ -123,6 +135,18 @@ func (x *PacketBrokerGateway) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				}
 				x.ContactInfo = append(x.ContactInfo, v)
 			})
+		case "administrative_contact", "administrativeContact":
+			s.AddField("administrative_contact")
+			// NOTE: OrganizationOrUserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v OrganizationOrUserIdentifiers
+			gogo.UnmarshalMessage(s, &v)
+			x.AdministrativeContact = &v
+		case "technical_contact", "technicalContact":
+			s.AddField("technical_contact")
+			// NOTE: OrganizationOrUserIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v OrganizationOrUserIdentifiers
+			gogo.UnmarshalMessage(s, &v)
+			x.TechnicalContact = &v
 		case "antennas":
 			s.AddField("antennas")
 			s.ReadArray(func() {
@@ -266,6 +290,16 @@ func (x *PacketBrokerNetwork) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		}
 		s.WriteArrayEnd()
 	}
+	if x.AdministrativeContact != nil || s.HasField("administrative_contact") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("administrative_contact")
+		x.AdministrativeContact.MarshalProtoJSON(s.WithField("administrative_contact"))
+	}
+	if x.TechnicalContact != nil || s.HasField("technical_contact") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("technical_contact")
+		x.TechnicalContact.MarshalProtoJSON(s.WithField("technical_contact"))
+	}
 	if x.Listed || s.HasField("listed") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("listed")
@@ -314,6 +348,16 @@ func (x *PacketBrokerNetwork) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				}
 				x.ContactInfo = append(x.ContactInfo, v)
 			})
+		case "administrative_contact", "administrativeContact":
+			if !s.ReadNil() {
+				x.AdministrativeContact = &ContactInfo{}
+				x.AdministrativeContact.UnmarshalProtoJSON(s.WithField("administrative_contact", true))
+			}
+		case "technical_contact", "technicalContact":
+			if !s.ReadNil() {
+				x.TechnicalContact = &ContactInfo{}
+				x.TechnicalContact.UnmarshalProtoJSON(s.WithField("technical_contact", true))
+			}
 		case "listed":
 			s.AddField("listed")
 			x.Listed = s.ReadBool()
