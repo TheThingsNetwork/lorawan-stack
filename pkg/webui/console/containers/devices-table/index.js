@@ -107,7 +107,7 @@ const headers = [
     width: 14,
     render: status => {
       if (status.otherCluster) {
-        let host = status.host
+        const host = status.host
         return (
           <DocTooltip
             docPath="getting-started/cloud-hosted"
@@ -129,19 +129,23 @@ const headers = [
 
 @connect(
   state => {
-    const nsEnabled = selectNsConfig().enabled
-    const jsEnabled = selectJsConfig().enabled
     const asConfig = selectAsConfig()
+    const nsConfig = selectNsConfig()
+    const jsConfig = selectJsConfig()
+    const nsEnabled = nsConfig.enabled
+    const jsEnabled = jsConfig.enabled
     const mayCreateDevices = checkFromState(mayCreateOrEditApplicationDevices, state)
 
     return {
       appId: selectSelectedApplicationId(state),
-      asConfig,
       deviceTemplateFormats: selectDeviceTemplateFormats(state),
       mayCreateDevices: mayCreateDevices && (nsEnabled || jsEnabled),
       mayImportDevices: mayCreateDevices,
       error: getDeviceTemplateFormatsError(state),
       fetching: getDeviceTemplateFormatsFetching(state),
+      asConfig,
+      nsConfig,
+      jsConfig,
     }
   },
   { getDeviceTemplateFormats },
@@ -156,8 +160,10 @@ class DevicesTable extends React.Component {
     deviceTemplateFormats: PropTypes.shape({}).isRequired,
     error: PropTypes.error,
     fetching: PropTypes.bool,
+    jsConfig: PropTypes.stackComponent.isRequired,
     mayCreateDevices: PropTypes.bool.isRequired,
     mayImportDevices: PropTypes.bool.isRequired,
+    nsConfig: PropTypes.stackComponent.isRequired,
     totalCount: PropTypes.number,
   }
 
@@ -182,19 +188,27 @@ class DevicesTable extends React.Component {
 
   @bind
   baseDataSelector(state) {
-    const { mayCreateDevices, appId, asConfig } = this.props
+    const { mayCreateDevices, appId, asConfig, nsConfig, jsConfig } = this.props
     const devices = selectDevices(state)
     const decoratedDevices = []
-    const { base_url: stackAsUrl } = asConfig
-    const currentHost = getHostnameFromUrl(stackAsUrl)
+    const asHost = getHostnameFromUrl(asConfig.base_url)
+    const nsHost = getHostnameFromUrl(nsConfig.base_url)
+    const jsHost = getHostnameFromUrl(jsConfig.base_url)
 
     for (const device of devices) {
+      const isOtherCluster = isOtherClusterDevice(asHost, nsHost, jsHost, device)
       decoratedDevices.push({
         ...device,
         status: {
           _derivedLastSeen: selectDeviceDerivedLastSeen(state, appId, device.ids.device_id),
-          otherCluster: isOtherClusterDevice(currentHost, device),
-          host: device.application_server_address || device.network_server_address || device.join_server_address
+          otherCluster: isOtherCluster,
+          host:
+            device.application_server_address ||
+            device.network_server_address ||
+            device.join_server_address,
+        },
+        _meta: {
+          clickable: !isOtherCluster,
         },
       })
     }
