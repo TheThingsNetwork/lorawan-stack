@@ -15,6 +15,7 @@
 /* eslint-disable react/prop-types */
 
 import crypto from 'crypto'
+
 import React from 'react'
 
 import Input from '..'

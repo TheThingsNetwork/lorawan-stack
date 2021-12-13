@@ -14,7 +14,7 @@
 
 import React from 'react'
 
-import RoutingPolicy from '.'
+import RoutingPolicy from '..'
 
 export default {
   title: 'Routing Policy/Matrix',
