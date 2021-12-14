@@ -117,10 +117,7 @@ describe('End device on other cluster', () => {
       `${Cypress.config('consoleRootPath')}/applications/${applicationId}/devices/${deviceId}`,
     )
 
-    cy.location('pathname').should(
-      'eq',
-      `${Cypress.config('consoleRootPath')}/applications`,
-    )
+    cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/applications`)
     cy.findByTestId('full-error-view').should('not.exist')
   })
 })
