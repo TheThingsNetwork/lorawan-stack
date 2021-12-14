@@ -341,7 +341,6 @@ func (js Js) Storybook() error {
 	}
 	return js.runYarnCommandV("start-storybook",
 		"--config-dir", "./config/storybook",
-		"--static-dir", "public",
 		"--port", "9001",
 	)
 }
