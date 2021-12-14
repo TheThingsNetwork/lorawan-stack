@@ -35,11 +35,7 @@ const m = defineMessages({
   editWebhook: 'Edit webhook',
   updateSuccess: 'Webhook updated',
   deleteSuccess: 'Webhook deleted',
-  reactivateButton: 'Reactivate',
   reactivateSuccess: 'Webhook activated',
-  reactivateWebhookTitle: 'Reactivate suspended webhook',
-  suspendedWebhookMessage:
-    'This webhook has been deactivated due to several unsuccessful forwarding attempts. It will be automatically reactivated after 24 hours. If you wish to reactivate right away, you can use the button below.',
 })
 
 const ApplicationWebhookEdit = props => {
