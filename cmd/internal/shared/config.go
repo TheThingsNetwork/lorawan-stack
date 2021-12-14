@@ -73,6 +73,7 @@ var DefaultHTTPConfig = config.HTTP{
 
 // DefaultInteropServerConfig is the default interop server config.
 var DefaultInteropServerConfig = config.InteropServer{
+	Listen:    ":1886",
 	ListenTLS: ":8886",
 	PacketBroker: config.PacketBrokerInteropAuth{
 		Enabled:     false,
