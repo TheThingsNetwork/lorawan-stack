@@ -113,7 +113,8 @@ class Tabular extends React.Component {
     const appliedRowKeySelector = rowKeySelector ? rowKeySelector : defaultRowKeySelector
     const paginatedData = this.handlePagination(data)
     const rows = paginatedData.map((row, rowIndex) => {
-      const rowClickable = !clickable ? false : row._meta?.clickable ?? clickable // If the whole table is disabled each row should be as well.
+      // If the whole table is disabled each row should be as well.
+      const rowClickable = !clickable ? false : row._meta?.clickable ?? clickable
 
       return (
         <Table.Row
@@ -173,8 +174,17 @@ class Tabular extends React.Component {
 Tabular.propTypes = {
   className: PropTypes.string,
   clickable: PropTypes.bool,
-  /** A list of data entries to display within the table body. */
-  data: PropTypes.arrayOf(PropTypes.shape({})),
+  /** A list of data entries to display within the table body.
+   * Among them a `_meta` prop for options like clickable or
+   * any other that concern only one row.
+   */
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      _meta: PropTypes.shape({
+        clickable: PropTypes.bool,
+      }),
+    }),
+  ),
   /** The empty message to be displayed when no data provided. */
   emptyMessage: PropTypes.message.isRequired,
   /**
