@@ -99,7 +99,7 @@ export default class WebhookForm extends Component {
         webhook_id: PropTypes.string,
       }),
       health_status: PropTypes.shape({
-        unhealthy: {},
+        unhealthy: PropTypes.shape({}),
       }),
     }),
     onDelete: PropTypes.func,
