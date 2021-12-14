@@ -582,7 +582,7 @@
   "console.views.application-integrations-webhook-edit.application-integrations-webhook-edit.reactivateButton": "Reactivate",
   "console.views.application-integrations-webhook-edit.application-integrations-webhook-edit.reactivateSuccess": "Webhook activated",
   "console.views.application-integrations-webhook-edit.application-integrations-webhook-edit.reactivateWebhookTitle": "Reactivate suspended webhook",
-  "console.views.application-integrations-webhook-edit.application-integrations-webhook-edit.suspendedWebhookMessage": "This webhook has been deactivated due to several unsuccessful forwarding attemps. It will be automatically reactivated after 24 hours. If you wish to reactivate right away, you can use the \"Reactivate\"-button.",
+  "console.views.application-integrations-webhook-edit.application-integrations-webhook-edit.suspendedWebhookMessage": "This webhook has been deactivated due to several unsuccessful forwarding attempts. It will be automatically reactivated after 24 hours. If you wish to reactivate right away, you can use the button below.",
   "console.views.device-add.device-add.title": "Register end device",
   "console.views.device-add.manual.form.advanced-settings.advancedSectionTitle": "Show advanced activation, LoRaWAN class and cluster settings",
   "console.views.device-add.manual.form.advanced-settings.classA": "None (class A only)",
