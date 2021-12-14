@@ -1915,10 +1915,12 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return false, "session.keys.s_nwk_s_int_key.key"
 			}
 		} else {
-			if !isZero.NwkSEncKey && !setKeyEqual(m, getFNwkSIntKey, getNwkSEncKey, "session.keys.f_nwk_s_int_key", "session.keys.nwk_s_enc_key") {
+			if st.HasSetField("session.keys.nwk_s_enc_key.key") &&
+				!setKeyEqual(m, getFNwkSIntKey, getNwkSEncKey, "session.keys.f_nwk_s_int_key", "session.keys.nwk_s_enc_key") {
 				return false, "session.keys.nwk_s_enc_key.key"
 			}
-			if !isZero.SNwkSIntKey && !setKeyEqual(m, getFNwkSIntKey, getSNwkSIntKey, "session.keys.f_nwk_s_int_key", "session.keys.s_nwk_s_int_key") {
+			if st.HasSetField("session.keys.s_nwk_s_int_key.key") &&
+				!setKeyEqual(m, getFNwkSIntKey, getSNwkSIntKey, "session.keys.f_nwk_s_int_key", "session.keys.s_nwk_s_int_key") {
 				return false, "session.keys.s_nwk_s_int_key.key"
 			}
 		}
