@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
 import RadioGroup from './group'
@@ -27,69 +26,83 @@ const info = {
   propTables: [Radio],
 }
 
-storiesOf('Radio', module)
-  .addDecorator((story, context) => withInfo(info)(story)(context))
-  .add('Default', () => <Radio label="Radio" name="radio" value="1" />)
-  .add('Disabled', () => (
+export default {
+  title: 'Radio',
+  decorators: [withInfo(info)],
+}
+
+export const Default = () => <Radio label="Radio" name="radio" value="1" />
+
+export const Disabled = () => (
+  <div style={{ padding: '20px' }}>
+    <Radio name="radio" label="Radio 1" value="1" checked disabled />
+    <br />
+    <Radio name="radio" label="Radio 2" value="2" disabled />
+  </div>
+)
+
+export const GroupHorizontal = () => (
+  <div>
     <div style={{ padding: '20px' }}>
-      <Radio name="radio" label="Radio 1" value="1" checked disabled />
-      <br />
-      <Radio name="radio" label="Radio 2" value="2" disabled />
+      <RadioGroup name="radio" initialValue="1" horizontal>
+        <Radio label="Radio 1" value="1" />
+        <Radio label="Radio 2" value="2" />
+        <Radio label="Radio 3" value="3" />
+        <Radio label="Radio 4" value="4" />
+      </RadioGroup>
     </div>
-  ))
-  .add('Group (horizontal)', () => (
-    <div>
-      <div style={{ padding: '20px' }}>
-        <RadioGroup name="radio" initialValue="1" horizontal>
-          <Radio label="Radio 1" value="1" />
-          <Radio label="Radio 2" value="2" />
-          <Radio label="Radio 3" value="3" />
-          <Radio label="Radio 4" value="4" />
-        </RadioGroup>
-      </div>
-      <div style={{ padding: '20px' }}>
-        <RadioGroup name="radio-with-disabled" initialValue="1" horizontal>
-          <Radio label="Radio 1" value="1" />
-          <Radio label="Radio 2" value="2" disabled />
-          <Radio label="Radio 3" value="3" disabled />
-          <Radio label="Radio 4" value="4" />
-        </RadioGroup>
-      </div>
-      <div style={{ padding: '20px' }}>
-        <RadioGroup name="radio-all-disabled" initialValue="1" disabled horizontal>
-          <Radio label="Radio 1" value="1" />
-          <Radio label="Radio 2" value="2" />
-          <Radio label="Radio 3" value="3" />
-          <Radio label="Radio 4" value="4" />
-        </RadioGroup>
-      </div>
+    <div style={{ padding: '20px' }}>
+      <RadioGroup name="radio-with-disabled" initialValue="1" horizontal>
+        <Radio label="Radio 1" value="1" />
+        <Radio label="Radio 2" value="2" disabled />
+        <Radio label="Radio 3" value="3" disabled />
+        <Radio label="Radio 4" value="4" />
+      </RadioGroup>
     </div>
-  ))
-  .add('Group (vertical)', () => (
-    <div>
-      <div style={{ padding: '20px' }}>
-        <RadioGroup name="radio" initialValue="1">
-          <Radio label="Radio 1" value="1" />
-          <Radio label="Radio 2" value="2" />
-          <Radio label="Radio 3" value="3" />
-          <Radio label="Radio 4" value="4" />
-        </RadioGroup>
-      </div>
-      <div style={{ padding: '20px' }}>
-        <RadioGroup name="radio-with-disabled" initialValue="1">
-          <Radio label="Radio 1" value="1" />
-          <Radio label="Radio 2" value="2" disabled />
-          <Radio label="Radio 3" value="3" disabled />
-          <Radio label="Radio 4" value="4" />
-        </RadioGroup>
-      </div>
-      <div style={{ padding: '20px' }}>
-        <RadioGroup name="radio-all-disabled" initialValue="1" disabled>
-          <Radio label="Radio 1" value="1" />
-          <Radio label="Radio 2" value="2" />
-          <Radio label="Radio 3" value="3" />
-          <Radio label="Radio 4" value="4" />
-        </RadioGroup>
-      </div>
+    <div style={{ padding: '20px' }}>
+      <RadioGroup name="radio-all-disabled" initialValue="1" disabled horizontal>
+        <Radio label="Radio 1" value="1" />
+        <Radio label="Radio 2" value="2" />
+        <Radio label="Radio 3" value="3" />
+        <Radio label="Radio 4" value="4" />
+      </RadioGroup>
     </div>
-  ))
+  </div>
+)
+
+GroupHorizontal.story = {
+  name: 'Group (horizontal)',
+}
+
+export const GroupVertical = () => (
+  <div>
+    <div style={{ padding: '20px' }}>
+      <RadioGroup name="radio" initialValue="1">
+        <Radio label="Radio 1" value="1" />
+        <Radio label="Radio 2" value="2" />
+        <Radio label="Radio 3" value="3" />
+        <Radio label="Radio 4" value="4" />
+      </RadioGroup>
+    </div>
+    <div style={{ padding: '20px' }}>
+      <RadioGroup name="radio-with-disabled" initialValue="1">
+        <Radio label="Radio 1" value="1" />
+        <Radio label="Radio 2" value="2" disabled />
+        <Radio label="Radio 3" value="3" disabled />
+        <Radio label="Radio 4" value="4" />
+      </RadioGroup>
+    </div>
+    <div style={{ padding: '20px' }}>
+      <RadioGroup name="radio-all-disabled" initialValue="1" disabled>
+        <Radio label="Radio 1" value="1" />
+        <Radio label="Radio 2" value="2" />
+        <Radio label="Radio 3" value="3" />
+        <Radio label="Radio 4" value="4" />
+      </RadioGroup>
+    </div>
+  </div>
+)
+
+GroupVertical.story = {
+  name: 'Group (vertical)',
+}

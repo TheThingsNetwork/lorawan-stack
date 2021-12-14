@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
 import LogoSVG from '@assets/static/logo.svg'
@@ -38,67 +37,78 @@ const bottomLine = (
   </div>
 )
 
-storiesOf('Modal', module)
-  .addDecorator((story, context) =>
+export default {
+  title: 'Modal',
+
+  decorators: [
     withInfo({
       inline: true,
       header: false,
       text: 'The modal can be displayed inline or portalled via `<PortalledModal />`',
       propTables: [Modal],
-    })(story)(context),
-  )
-  .add('Basic Modal', () => (
-    <Modal title="Example Modal" message="This is something you need to know!" inline />
-  ))
-  .add('No Title', () => (
-    <Modal message="This modal has no title. Might be useful in some situations." inline />
-  ))
-  .add('OAuth Authorize Example', () => (
-    <Modal
-      title="Request for Permission"
-      subtitle="Console is requesting permission to do the following:"
-      bottomLine={bottomLine}
-      buttonMessage="Allow"
-      approval
-      logo={<StoryLogo />}
-      inline
-    >
-      <div className={style.left}>
-        <ul>
-          <li>
-            <Icon icon="check" className={style.icon} />
-            View your profile
-          </li>
-          <li>
-            <Icon icon="check" className={style.icon} />
-            Make changes to your profile
-          </li>
-          <li>
-            <Icon icon="check" className={style.icon} />
-            Perform administrative action
-          </li>
-          <li>
-            <Icon icon="check" className={style.icon} />
-            List your applications
-          </li>
-          <li>
-            <Icon icon="check" className={style.icon} />
-            Degister new gateways in your account
-          </li>
-          <li>
-            <Icon icon="check" className={style.icon} />
-            Create and edit end devices of your applications
-          </li>
-        </ul>
-      </div>
-      <div className={style.right}>
-        <h3>
-          Console <span title="This application is an official application">Official</span>
-        </h3>
-        <p>The Console is The Things Stack's official web application.</p>
-      </div>
-    </Modal>
-  ))
-  .add('As Overlay', () => (
-    <Modal title="Example Modal" message="This is something you need to know!" />
-  ))
+    }),
+  ],
+}
+
+export const BasicModal = () => (
+  <Modal title="Example Modal" message="This is something you need to know!" inline />
+)
+
+export const NoTitle = () => (
+  <Modal message="This modal has no title. Might be useful in some situations." inline />
+)
+
+export const OAuthAuthorizeExample = () => (
+  <Modal
+    title="Request for Permission"
+    subtitle="Console is requesting permission to do the following:"
+    bottomLine={bottomLine}
+    buttonMessage="Allow"
+    approval
+    logo={<StoryLogo />}
+    inline
+  >
+    <div className={style.left}>
+      <ul>
+        <li>
+          <Icon icon="check" className={style.icon} />
+          View your profile
+        </li>
+        <li>
+          <Icon icon="check" className={style.icon} />
+          Make changes to your profile
+        </li>
+        <li>
+          <Icon icon="check" className={style.icon} />
+          Perform administrative action
+        </li>
+        <li>
+          <Icon icon="check" className={style.icon} />
+          List your applications
+        </li>
+        <li>
+          <Icon icon="check" className={style.icon} />
+          Degister new gateways in your account
+        </li>
+        <li>
+          <Icon icon="check" className={style.icon} />
+          Create and edit end devices of your applications
+        </li>
+      </ul>
+    </div>
+    <div className={style.right}>
+      <h3>
+        Console <span title="This application is an official application">Official</span>
+      </h3>
+      <p>The Console is The Things Stack's official web application.</p>
+    </div>
+  </Modal>
+)
+
+OAuthAuthorizeExample.story = {
+  name: 'OAuth Authorize Example',
+}
+
+export const AsOverlay = () => (
+  <Modal title="Example Modal" message="This is something you need to know!" />
+)

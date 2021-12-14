@@ -14,7 +14,6 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
-import { storiesOf } from '@storybook/react'
 import { action } from '@storybook/addon-actions'
 
 import Button from '.'
@@ -76,157 +75,174 @@ class Example extends React.Component {
   }
 }
 
-storiesOf('Button', module)
-  .add('Default', () => (
-    <div>
-      <Button message="Default" />
-      <br />
-      <br />
-      <Button message="Default" disabled />
-      <br />
-      <br />
-      <Button message="Default" busy />
-      <br />
-      <br />
-      <Button message="Default" large />
-      <br />
-      <br />
-      <Button message="Default" large disabled />
-      <br />
-      <br />
-      <Button message="Default" large busy />
-      <br />
-      <br />
-      <Button.Link message="Router Link" to="/test" />
-      <br />
-      <br />
-      <Button.AnchorLink message="Anchor Link" href="#" />
-    </div>
-  ))
-  .add('Warning', () => (
-    <div>
-      <Button warning message="Warning" />
-      <br />
-      <br />
-      <Button warning message="Warning" disabled />
-      <br />
-      <br />
-      <Button warning message="Warning" busy />
-    </div>
-  ))
-  .add('Danger', () => (
-    <div>
-      <Button danger message="Danger" />
-      <br />
-      <br />
-      <Button danger message="Danger" disabled />
-      <br />
-      <br />
-      <Button danger message="Danger" busy />
-    </div>
-  ))
-  .add('Secondary', () => (
-    <div>
-      <Button secondary message="Secondary" />
-      <br />
-      <br />
-      <Button secondary message="Secondary" disabled />
-      <br />
-      <br />
-      <Button secondary message="Secondary" busy />
-    </div>
-  ))
-  .add('Raw', () => (
-    <div>
-      <Button raw message="Raw" />
-      <br />
-      <br />
-      <Button raw message="Raw" disabled />
-      <br />
-      <br />
-      <Button raw message="Raw" busy />
-    </div>
-  ))
-  .add('With Icon', () => (
-    <div>
-      <Button icon="check" message="With Icon" />
-      <br />
-      <br />
-      <Button icon="check" message="With Icon" disabled />
-      <br />
-      <br />
-      <Button icon="check" message="With Icon" busy />
-      <br />
-      <br />
-      <Button icon="check" message="With Icon" large />
-      <br />
-      <br />
-      <Button icon="check" message="With Icon" large disabled />
-      <br />
-      <br />
-      <Button icon="check" message="With Icon" large busy />
-    </div>
-  ))
-  .add('Naked', () => (
-    <div>
-      <Button naked message="Naked" />
-      <br />
-      <br />
-      <Button naked message="Naked" disabled />
-      <br />
-      <br />
-      <Button naked message="Naked" busy />
-      <br />
-      <br />
-      <Button naked secondary message="Naked Secondary" />
-      <br />
-      <br />
-      <Button naked secondary message="Naked Secondary" disabled />
-      <br />
-      <br />
-      <Button naked secondary message="Naked Secondary" busy />
-    </div>
-  ))
-  .add('Naked With Icon', () => (
-    <div>
-      <Button naked icon="favorite" message="Naked With Icon" />
-      <br />
-      <br />
-      <Button naked icon="favorite" message="Naked With Icon" disabled />
-      <br />
-      <br />
-      <Button naked icon="favorite" message="Naked With Icon" busy />
-    </div>
-  ))
-  .add('Only Icon', () => (
-    <div>
-      <Button icon="check" />
-      <br />
-      <br />
-      <Button icon="check" disabled />
-      <br />
-      <br />
-      <Button icon="check" busy />
-    </div>
-  ))
-  .add('Custom content', () => (
-    <div>
-      <Button>
-        Custom content
-        <Button.Icon icon="keyboard_arrow_right" type="right" />
-      </Button>
-      <br />
-      <br />
-      <Button disabled>
-        Custom content
-        <Button.Icon icon="keyboard_arrow_right" type="right" />
-      </Button>
-      <br />
-      <br />
-      <Button busy>
-        Custom content
-        <Button.Icon icon="keyboard_arrow_right" type="right" />
-      </Button>
-    </div>
-  ))
-  .add('Toggle', () => <Example />)
+export default {
+  title: 'Button',
+}
+
+export const Default = () => (
+  <div>
+    <Button message="Default" />
+    <br />
+    <br />
+    <Button message="Default" disabled />
+    <br />
+    <br />
+    <Button message="Default" busy />
+    <br />
+    <br />
+    <Button message="Default" large />
+    <br />
+    <br />
+    <Button message="Default" large disabled />
+    <br />
+    <br />
+    <Button message="Default" large busy />
+    <br />
+    <br />
+    <Button.Link message="Router Link" to="/test" />
+    <br />
+    <br />
+    <Button.AnchorLink message="Anchor Link" href="#" />
+  </div>
+)
+
+export const Warning = () => (
+  <div>
+    <Button warning message="Warning" />
+    <br />
+    <br />
+    <Button warning message="Warning" disabled />
+    <br />
+    <br />
+    <Button warning message="Warning" busy />
+  </div>
+)
+
+export const Danger = () => (
+  <div>
+    <Button danger message="Danger" />
+    <br />
+    <br />
+    <Button danger message="Danger" disabled />
+    <br />
+    <br />
+    <Button danger message="Danger" busy />
+  </div>
+)
+
+export const Secondary = () => (
+  <div>
+    <Button secondary message="Secondary" />
+    <br />
+    <br />
+    <Button secondary message="Secondary" disabled />
+    <br />
+    <br />
+    <Button secondary message="Secondary" busy />
+  </div>
+)
+
+export const Raw = () => (
+  <div>
+    <Button raw message="Raw" />
+    <br />
+    <br />
+    <Button raw message="Raw" disabled />
+    <br />
+    <br />
+    <Button raw message="Raw" busy />
+  </div>
+)
+
+export const WithIcon = () => (
+  <div>
+    <Button icon="check" message="With Icon" />
+    <br />
+    <br />
+    <Button icon="check" message="With Icon" disabled />
+    <br />
+    <br />
+    <Button icon="check" message="With Icon" busy />
+    <br />
+    <br />
+    <Button icon="check" message="With Icon" large />
+    <br />
+    <br />
+    <Button icon="check" message="With Icon" large disabled />
+    <br />
+    <br />
+    <Button icon="check" message="With Icon" large busy />
+  </div>
+)
+
+export const Naked = () => (
+  <div>
+    <Button naked message="Naked" />
+    <br />
+    <br />
+    <Button naked message="Naked" disabled />
+    <br />
+    <br />
+    <Button naked message="Naked" busy />
+    <br />
+    <br />
+    <Button naked secondary message="Naked Secondary" />
+    <br />
+    <br />
+    <Button naked secondary message="Naked Secondary" disabled />
+    <br />
+    <br />
+    <Button naked secondary message="Naked Secondary" busy />
+  </div>
+)
+
+export const NakedWithIcon = () => (
+  <div>
+    <Button naked icon="favorite" message="Naked With Icon" />
+    <br />
+    <br />
+    <Button naked icon="favorite" message="Naked With Icon" disabled />
+    <br />
+    <br />
+    <Button naked icon="favorite" message="Naked With Icon" busy />
+  </div>
+)
+
+export const OnlyIcon = () => (
+  <div>
+    <Button icon="check" />
+    <br />
+    <br />
+    <Button icon="check" disabled />
+    <br />
+    <br />
+    <Button icon="check" busy />
+  </div>
+)
+
+export const CustomContent = () => (
+  <div>
+    <Button>
+      Custom content
+      <Button.Icon icon="keyboard_arrow_right" type="right" />
+    </Button>
+    <br />
+    <br />
+    <Button disabled>
+      Custom content
+      <Button.Icon icon="keyboard_arrow_right" type="right" />
+    </Button>
+    <br />
+    <br />
+    <Button busy>
+      Custom content
+      <Button.Icon icon="keyboard_arrow_right" type="right" />
+    </Button>
+  </div>
+)
+
+CustomContent.story = {
+  name: 'Custom content',
+}
+
+export const Toggle = () => <Example />

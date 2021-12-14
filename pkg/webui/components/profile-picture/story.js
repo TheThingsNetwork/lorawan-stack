@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 
 import ProfilePicture from '.'
@@ -24,17 +23,21 @@ const pp = {
   },
 }
 
-storiesOf('Profile Picture', module)
-  .addDecorator((story, context) =>
+export default {
+  title: 'Profile Picture',
+
+  decorators: [
     withInfo({
       inline: true,
       header: false,
       source: false,
       propTables: [ProfilePicture],
-    })(story)(context),
-  )
-  .add('Default', () => (
-    <div style={{ height: '8rem' }}>
-      <ProfilePicture profilePicture={pp} />
-    </div>
-  ))
+    }),
+  ],
+}
+
+export const Default = () => (
+  <div style={{ height: '8rem' }}>
+    <ProfilePicture profilePicture={pp} />
+  </div>
+)

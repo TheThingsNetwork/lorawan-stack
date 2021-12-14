@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 import bind from 'autobind-decorator'
 
 import Button from '@ttn-lw/components/button'
@@ -65,4 +64,8 @@ class Example extends React.Component {
   }
 }
 
-storiesOf('Toast', module).add('Default', () => <Example />)
+export default {
+  title: 'Toast',
+}
+
+export const Default = () => <Example />

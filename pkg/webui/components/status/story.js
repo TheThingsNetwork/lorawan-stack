@@ -14,7 +14,6 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
-import { storiesOf } from '@storybook/react'
 
 import Status from '.'
 
@@ -64,57 +63,71 @@ class Toggle extends React.Component {
   }
 }
 
-storiesOf('Status', module)
-  .add('All types', () => (
-    <div>
-      <div style={containerStyle}>
-        <span>Good:</span>
-        <Status status="good" />
-      </div>
-      <div style={containerStyle}>
-        <span>Bad:</span>
-        <Status status="bad" />
-      </div>
-      <div style={containerStyle}>
-        <span>Mediocre:</span>
-        <Status status="mediocre" />
-      </div>
-      <div style={containerStyle}>
-        <span>Unknown:</span>
-        <Status status="unknown" />
-      </div>
+export default {
+  title: 'Status',
+}
+
+export const AllTypes = () => (
+  <div>
+    <div style={containerStyle}>
+      <span>Good:</span>
+      <Status status="good" />
     </div>
-  ))
-  .add('With label', () => (
-    <div>
-      <div style={containerStyle}>
-        <Status label="Network Status" status="good" />
-      </div>
-      <div style={containerStyle}>
-        <Status label="Network Status" status="bad" />
-      </div>
-      <div style={containerStyle}>
-        <Status label="Network Status" status="mediocre" />
-      </div>
-      <div style={containerStyle}>
-        <Status label="Network Status" status="unknown" />
-      </div>
+    <div style={containerStyle}>
+      <span>Bad:</span>
+      <Status status="bad" />
     </div>
-  ))
-  .add('Without Pulse', () => (
-    <div>
-      <div style={containerStyle}>
-        <Status label="No Pulse" status="good" pulse={false} />
-      </div>
-      <div style={containerStyle}>
-        <Status label="No Pulse" status="bad" pulse={false} />
-      </div>
-      <div style={containerStyle}>
-        <Status label="No Pulse" status="mediocre" pulse={false} />
-      </div>
-      <div style={containerStyle}>
-        <Status label="No Pulse" status="unknown" pulse={false} />
-      </div>
+    <div style={containerStyle}>
+      <span>Mediocre:</span>
+      <Status status="mediocre" />
     </div>
-  ))
-  .add('Toggle', () => <Toggle />)
+    <div style={containerStyle}>
+      <span>Unknown:</span>
+      <Status status="unknown" />
+    </div>
+  </div>
+)
+
+AllTypes.story = {
+  name: 'All types',
+}
+
+export const WithLabel = () => (
+  <div>
+    <div style={containerStyle}>
+      <Status label="Network Status" status="good" />
+    </div>
+    <div style={containerStyle}>
+      <Status label="Network Status" status="bad" />
+    </div>
+    <div style={containerStyle}>
+      <Status label="Network Status" status="mediocre" />
+    </div>
+    <div style={containerStyle}>
+      <Status label="Network Status" status="unknown" />
+    </div>
+  </div>
+)
+
+WithLabel.story = {
+  name: 'With label',
+}
+
+export const WithoutPulse = () => (
+  <div>
+    <div style={containerStyle}>
+      <Status label="No Pulse" status="good" pulse={false} />
+    </div>
+    <div style={containerStyle}>
+      <Status label="No Pulse" status="bad" pulse={false} />
+    </div>
+    <div style={containerStyle}>
+      <Status label="No Pulse" status="mediocre" pulse={false} />
+    </div>
+    <div style={containerStyle}>
+      <Status label="No Pulse" status="unknown" pulse={false} />
+    </div>
+  </div>
+)
+
+export const _Toggle = () => <Toggle />

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route, Redirect } from 'react-router'
+import { Switch, Route, Redirect } from 'react-router-dom'
 import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 

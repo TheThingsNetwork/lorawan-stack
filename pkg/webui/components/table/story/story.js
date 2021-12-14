@@ -16,7 +16,6 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
-import { storiesOf } from '@storybook/react'
 import { withInfo } from '@storybook/addon-info'
 import { action } from '@storybook/addon-actions'
 
@@ -217,8 +216,10 @@ class SortableExample extends React.Component {
   }
 }
 
-storiesOf('Table/Tabular', module)
-  .addDecorator((story, context) =>
+export default {
+  title: 'Table/Tabular',
+
+  decorators: [
     withInfo({
       inline: true,
       header: false,
@@ -226,66 +227,91 @@ storiesOf('Table/Tabular', module)
       propTables: [Tabular],
       propTablesExclude: [LoadingExample, PaginatedExample, ClickableExample],
       text: doc,
-    })(story)(context),
-  )
-  .add('Default', () => (
-    <Tabular
-      data={examples.defaultExample.rows}
-      headers={examples.defaultExample.headers}
-      emptyMessage="No entries to display"
-    />
-  ))
-  .add('Loading (slow)', () => (
-    <LoadingExample
-      slow
-      data={examples.defaultExample.rows}
-      headers={examples.defaultExample.headers}
-      emptyMessage="No entries to display"
-    />
-  ))
-  .add('Empty', () => (
-    <Tabular
-      data={examples.emptyExample.rows}
-      headers={examples.emptyExample.headers}
-      emptyMessage="No entries to display"
-    />
-  ))
-  .add('Paginated (slow loading)', () => (
-    <PaginatedExample
-      slow
-      data={examples.paginatedExample.rows}
-      headers={examples.paginatedExample.headers}
-      emptyMessage="No entries to display"
-    />
-  ))
-  .add('Paginated (fast loading)', () => (
-    <PaginatedExample
-      fast
-      data={examples.paginatedExample.rows}
-      headers={examples.paginatedExample.headers}
-      emptyMessage="No entries to display"
-    />
-  ))
-  .add('Small', () => (
-    <PaginatedExample
-      small
-      fast
-      data={examples.defaultExample.rows}
-      headers={examples.defaultExample.headers}
-      emptyMessage="No entries to display"
-    />
-  ))
-  .add('Clickable rows', () => (
-    <ClickableExample
-      data={examples.clickableRowsExample.rows}
-      headers={examples.clickableRowsExample.headers}
-      emptyMessage="No entries to display"
-    />
-  ))
-  .add('Sortable', () => (
-    <SortableExample
-      data={examples.sortableExample.rows}
-      headers={examples.sortableExample.headers}
-      emptyMessage="No entries to display"
-    />
-  ))
+    }),
+  ],
+}
+
+export const Default = () => (
+  <Tabular
+    data={examples.defaultExample.rows}
+    headers={examples.defaultExample.headers}
+    emptyMessage="No entries to display"
+  />
+)
+
+export const LoadingSlow = () => (
+  <LoadingExample
+    slow
+    data={examples.defaultExample.rows}
+    headers={examples.defaultExample.headers}
+    emptyMessage="No entries to display"
+  />
+)
+
+LoadingSlow.story = {
+  name: 'Loading (slow)',
+}
+
+export const Empty = () => (
+  <Tabular
+    data={examples.emptyExample.rows}
+    headers={examples.emptyExample.headers}
+    emptyMessage="No entries to display"
+  />
+)
+
+export const PaginatedSlowLoading = () => (
+  <PaginatedExample
+    slow
+    data={examples.paginatedExample.rows}
+    headers={examples.paginatedExample.headers}
+    emptyMessage="No entries to display"
+  />
+)
+
+PaginatedSlowLoading.story = {
+  name: 'Paginated (slow loading)',
+}
+
+export const PaginatedFastLoading = () => (
+  <PaginatedExample
+    fast
+    data={examples.paginatedExample.rows}
+    headers={examples.paginatedExample.headers}
+    emptyMessage="No entries to display"
+  />
+)
+
+PaginatedFastLoading.story = {
+  name: 'Paginated (fast loading)',
+}
+
+export const Small = () => (
+  <PaginatedExample
+    small
+    fast
+    data={examples.defaultExample.rows}
+    headers={examples.defaultExample.headers}
+    emptyMessage="No entries to display"
+  />
+)
+
+export const ClickableRows = () => (
+  <ClickableExample
+    data={examples.clickableRowsExample.rows}
+    headers={examples.clickableRowsExample.headers}
+    emptyMessage="No entries to display"
+  />
+)
+
+ClickableRows.story = {
+  name: 'Clickable rows',
+}
+
+export const Sortable = () => (
+  <SortableExample
+    data={examples.sortableExample.rows}
+    headers={examples.sortableExample.headers}
+    emptyMessage="No entries to display"
+  />
+)
