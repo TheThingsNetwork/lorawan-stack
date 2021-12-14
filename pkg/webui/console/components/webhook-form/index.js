@@ -93,6 +93,7 @@ const validationSchema = Yup.object().shape({
 export default class WebhookForm extends Component {
   static propTypes = {
     appId: PropTypes.string,
+    buttonStyle: PropTypes.shape({ activateWebhookButton: PropTypes.shape({}) }),
     existCheck: PropTypes.func,
     initialWebhookValue: PropTypes.shape({
       ids: PropTypes.shape({
@@ -129,6 +130,7 @@ export default class WebhookForm extends Component {
     existCheck: () => false,
     reactivateButtonMessage: undefined,
     suspendedWebhookMessage: undefined,
+    buttonStyle: undefined,
   }
 
   form = React.createRef()
@@ -217,6 +219,7 @@ export default class WebhookForm extends Component {
       webhookTemplate,
       suspendedWebhookMessage,
       reactivateButtonMessage,
+      buttonStyle,
     } = this.props
     const { error, displayOverwriteModal, existingId } = this.state
     let initialValues = blankValues
@@ -239,6 +242,8 @@ export default class WebhookForm extends Component {
             action={this.handleReactivate}
             actionMessage={reactivateButtonMessage}
             buttonIcon="refresh"
+            className={buttonStyle.activateWebhookButton}
+            small
           />
         )}
         <PortalledModal

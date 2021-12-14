@@ -29,6 +29,8 @@ import diff from '@ttn-lw/lib/diff'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import style from './application-integration-webhook-edit.styl'
+
 const m = defineMessages({
   editWebhook: 'Edit webhook',
   updateSuccess: 'Webhook updated',
@@ -37,7 +39,7 @@ const m = defineMessages({
   reactivateSuccess: 'Webhook activated',
   reactivateWebhookTitle: 'Reactivate suspended webhook',
   suspendedWebhookMessage:
-    'This webhook has been deactivated due to several unsuccessful forwarding attemps. It will be automatically reactivated after 24 hours. If you wish to reactivate right away, you can use the button below.',
+    'This webhook has been deactivated due to several unsuccessful forwarding attempts. It will be automatically reactivated after 24 hours. If you wish to reactivate right away, you can use the button below.',
 })
 
 const ApplicationWebhookEdit = props => {
@@ -90,8 +92,7 @@ const ApplicationWebhookEdit = props => {
       message: m.reactivateSuccess,
       type: toast.types.SUCCESS,
     })
-
-  }, [navigateToList])
+  }, [])
   const handleReactivate = React.useCallback(
     async updatedHealthStatus => {
       await tts.Applications.Webhooks.updateById(appId, webhookId, updatedHealthStatus, [
@@ -119,6 +120,7 @@ const ApplicationWebhookEdit = props => {
             onReactivateSuccess={handleReactivateSuccess}
             reactivateButtonMessage={m.reactivateButton}
             suspendedWebhookMessage={m.suspendedWebhookMessage}
+            buttonStyle={style}
           />
         </Col>
       </Row>
