@@ -48,6 +48,7 @@ For details about compatibility between different releases, see the **Commitment
   - This workaround will be available until the related gateway vendors will release patches for this issue.
 - Firmware version of The Things Kickstarter Gateway are written to the gateway attributes upon receiving a valid status message.
 - Desired mac settings to end device general settings in the Console.
+- Experimental support for Azure Blob Storage. Only authentication via Managed Identity is supported.
 
 ### Changed
 
