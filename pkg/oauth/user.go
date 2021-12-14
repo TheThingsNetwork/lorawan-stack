@@ -50,7 +50,7 @@ func (s *server) ClientLogout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if at != nil {
-		client, err := s.store.GetClient(ctx, &at.ClientIds, &types.FieldMask{Paths: []string{"logout_redirect_uris"}})
+		client, err := s.store.GetClient(ctx, at.ClientIds, &types.FieldMask{Paths: []string{"logout_redirect_uris"}})
 		if err != nil {
 			webhandlers.Error(w, r, err)
 			return
@@ -59,13 +59,13 @@ func (s *server) ClientLogout(w http.ResponseWriter, r *http.Request) {
 			webhandlers.Error(w, r, err)
 			return
 		}
-		events.Publish(evtAccessTokenDeleted.NewWithIdentifiersAndData(ctx, &at.UserIds, nil))
-		err = s.store.DeleteSession(ctx, &at.UserIds, at.UserSessionId)
+		events.Publish(evtAccessTokenDeleted.NewWithIdentifiersAndData(ctx, at.UserIds, nil))
+		err = s.store.DeleteSession(ctx, at.UserIds, at.UserSessionId)
 		if err != nil && !errors.IsNotFound(err) {
 			webhandlers.Error(w, r, err)
 			return
 		}
-		events.Publish(EvtUserLogout.NewWithIdentifiersAndData(ctx, &at.UserIds, nil))
+		events.Publish(EvtUserLogout.NewWithIdentifiersAndData(ctx, at.UserIds, nil))
 		redirectParam := r.URL.Query().Get("post_logout_redirect_uri")
 		if redirectParam == "" {
 			if len(client.LogoutRedirectUris) != 0 {

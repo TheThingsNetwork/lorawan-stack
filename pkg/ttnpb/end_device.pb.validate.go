@@ -54,7 +54,14 @@ func (m *Session) ValidateFields(paths ...string) error {
 			// no validation rules for DevAddr
 		case "keys":
 
-			if v, ok := interface{}(&m.SessionKeys).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetKeys() == nil {
+				return SessionValidationError{
+					field:  "keys",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetKeys()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return SessionValidationError{
 						field:  "keys",
@@ -542,7 +549,14 @@ func (m *EndDeviceVersion) ValidateFields(paths ...string) error {
 		switch name {
 		case "ids":
 
-			if v, ok := interface{}(&m.EndDeviceVersionIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetIds() == nil {
+				return EndDeviceVersionValidationError{
+					field:  "ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return EndDeviceVersionValidationError{
 						field:  "ids",
@@ -2543,7 +2557,14 @@ func (m *GetEndDeviceRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "end_device_ids":
 
-			if v, ok := interface{}(&m.EndDeviceIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetEndDeviceIds() == nil {
+				return GetEndDeviceRequestValidationError{
+					field:  "end_device_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetEndDeviceIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return GetEndDeviceRequestValidationError{
 						field:  "end_device_ids",
@@ -2980,7 +3001,14 @@ func (m *ResetAndGetEndDeviceRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "end_device_ids":
 
-			if v, ok := interface{}(&m.EndDeviceIdentifiers).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetEndDeviceIds() == nil {
+				return ResetAndGetEndDeviceRequestValidationError{
+					field:  "end_device_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetEndDeviceIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ResetAndGetEndDeviceRequestValidationError{
 						field:  "end_device_ids",

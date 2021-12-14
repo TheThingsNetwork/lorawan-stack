@@ -379,8 +379,8 @@ func (as *ApplicationServer) publishUp(ctx context.Context, up *ttnpb.Applicatio
 // This method returns true if the AppSKey of the given session is wrapped and cannot be unwrapped by the Application
 // Server, and if the end device's skip_payload_crypto_override is true or if the link's skip_payload_crypto is true.
 func (as *ApplicationServer) skipPayloadCrypto(ctx context.Context, link *ttnpb.ApplicationLink, dev *ttnpb.EndDevice, session *ttnpb.Session) bool {
-	if session != nil && session.AppSKey != nil {
-		if _, err := cryptoutil.UnwrapAES128Key(ctx, session.AppSKey, as.KeyVault); err == nil {
+	if appSKey := session.GetKeys().GetAppSKey(); appSKey != nil {
+		if _, err := cryptoutil.UnwrapAES128Key(ctx, appSKey, as.KeyVault); err == nil {
 			return false
 		}
 	}
@@ -419,7 +419,7 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 		}
 		return &ttnpb.Session{
 			DevAddr: *devAddr,
-			SessionKeys: ttnpb.SessionKeys{
+			Keys: &ttnpb.SessionKeys{
 				SessionKeyId: sessionKeyID,
 				AppSKey:      &appSKey,
 			},
@@ -451,7 +451,7 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 		switch {
 		// If the SessionKeyID and DevAddr did not change, just update the LastAFCntDown.
 		case dev.Session != nil &&
-			bytes.Equal(diagnostics.SessionKeyId, dev.Session.SessionKeyId) &&
+			bytes.Equal(diagnostics.SessionKeyId, dev.Session.Keys.SessionKeyId) &&
 			dev.Session.DevAddr.Equal(*diagnostics.DevAddr):
 			dev.Session.LastAFCntDown = lastAFCntDownFromMinFCnt(diagnostics.MinFCntDown)
 		// If there is a SessionKeyID on the Network Server side, rebuild the session.
@@ -475,7 +475,7 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 		switch {
 		// If the SessionKeyID did not change, just update the LastAFcntDown.
 		case dev.PendingSession != nil &&
-			bytes.Equal(diagnostics.PendingSessionKeyId, dev.PendingSession.SessionKeyId) &&
+			bytes.Equal(diagnostics.PendingSessionKeyId, dev.PendingSession.Keys.SessionKeyId) &&
 			dev.PendingSession.DevAddr.Equal(*diagnostics.PendingDevAddr):
 			dev.PendingSession.LastAFCntDown = lastAFCntDownFromMinFCnt(diagnostics.PendingMinFCntDown)
 		// If there is a SessionKeyID on the Network Server side, rebuild the session.
@@ -524,11 +524,11 @@ func (as *ApplicationServer) attemptDownlinkQueueOp(ctx context.Context, dev *tt
 		ctx := log.NewContextWithField(ctx, "attempt", attempt)
 
 		sessions := make([]*ttnpb.Session, 0, 2)
-		if dev.Session != nil && !op.shouldSkip(dev.Session.SessionKeyId) {
+		if dev.Session != nil && !op.shouldSkip(dev.Session.Keys.SessionKeyId) {
 			sessions = append(sessions, dev.Session)
 			mask = ttnpb.AddFields(mask, "session.last_a_f_cnt_down")
 		}
-		if dev.PendingSession != nil && !op.shouldSkip(dev.PendingSession.SessionKeyId) {
+		if dev.PendingSession != nil && !op.shouldSkip(dev.PendingSession.Keys.SessionKeyId) {
 			// Downlink can be encrypted with the pending session while the device first joined but not confirmed the
 			// session by sending an uplink.
 			sessions = append(sessions, dev.PendingSession)
@@ -661,10 +661,10 @@ func (as *ApplicationServer) DownlinkQueueList(ctx context.Context, ids ttnpb.En
 	default:
 		return nil, errNoDeviceSession.New()
 	}
-	if session.AppSKey == nil {
+	if session.GetKeys().GetAppSKey() == nil {
 		return nil, errNoAppSKey.New()
 	}
-	queue, _ = ttnpb.PartitionDownlinksBySessionKeyIDEquality(session.SessionKeyId, res.Downlinks...)
+	queue, _ = ttnpb.PartitionDownlinksBySessionKeyIDEquality(session.Keys.SessionKeyId, res.Downlinks...)
 	if as.skipPayloadCrypto(ctx, link, dev, session) {
 		return queue, nil
 	}
@@ -800,7 +800,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids ttnpb.End
 			previousSession := dev.PendingSession
 			dev.PendingSession = &ttnpb.Session{
 				DevAddr: *ids.DevAddr,
-				SessionKeys: ttnpb.SessionKeys{
+				Keys: &ttnpb.SessionKeys{
 					SessionKeyId: joinAccept.SessionKeyId,
 					AppSKey:      joinAccept.AppSKey,
 				},
@@ -867,8 +867,8 @@ func (as *ApplicationServer) matchSession(ctx context.Context, ids ttnpb.EndDevi
 	logger := log.FromContext(ctx)
 	var mask []string
 	switch {
-	case dev.Session != nil && bytes.Equal(dev.Session.SessionKeyId, sessionKeyID):
-	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyId, sessionKeyID):
+	case dev.Session != nil && bytes.Equal(dev.Session.Keys.SessionKeyId, sessionKeyID):
+	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.Keys.SessionKeyId, sessionKeyID):
 		dev.Session = dev.PendingSession
 		dev.PendingSession = nil
 		mask = ttnpb.AddFields(mask, "session", "pending_session")
@@ -880,7 +880,7 @@ func (as *ApplicationServer) matchSession(ctx context.Context, ids ttnpb.EndDevi
 		}
 		dev.Session = &ttnpb.Session{
 			DevAddr: *ids.DevAddr,
-			SessionKeys: ttnpb.SessionKeys{
+			Keys: &ttnpb.SessionKeys{
 				SessionKeyId: sessionKeyID,
 				AppSKey:      &appSKey,
 			},
@@ -982,7 +982,7 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 			if err != nil {
 				return nil, nil, err
 			}
-			if dev.Session.AppSKey == nil {
+			if dev.Session.GetKeys().GetAppSKey() == nil {
 				return nil, nil, errNoAppSKey.New()
 			}
 			return dev, mask, nil
@@ -998,8 +998,8 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		if err := as.storeUplink(ctx, ids, uplink); err != nil {
 			return err
 		}
-	} else if dev.Session != nil && dev.Session.AppSKey != nil {
-		uplink.AppSKey = dev.Session.AppSKey
+	} else if appSKey := dev.GetSession().GetKeys().GetAppSKey(); appSKey != nil {
+		uplink.AppSKey = appSKey
 		uplink.LastAFCntDown = dev.Session.LastAFCntDown
 	}
 
@@ -1205,9 +1205,9 @@ func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids ttn
 	}
 	var session *ttnpb.Session
 	switch {
-	case dev.Session != nil && bytes.Equal(dev.Session.SessionKeyId, msg.SessionKeyId):
+	case dev.Session != nil && bytes.Equal(dev.Session.Keys.SessionKeyId, msg.SessionKeyId):
 		session = dev.Session
-	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.SessionKeyId, msg.SessionKeyId):
+	case dev.PendingSession != nil && bytes.Equal(dev.PendingSession.Keys.SessionKeyId, msg.SessionKeyId):
 		session = dev.PendingSession
 	}
 	if as.skipPayloadCrypto(ctx, link, dev, session) {

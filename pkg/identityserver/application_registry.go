@@ -101,7 +101,7 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 		}
 		if err = is.getMembershipStore(ctx, db).SetMember(
 			ctx,
-			&req.Collaborator,
+			req.Collaborator,
 			app.GetIds().GetEntityIdentifiers(),
 			ttnpb.RightsFrom(ttnpb.RIGHT_ALL),
 		); err != nil {

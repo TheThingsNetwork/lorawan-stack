@@ -141,7 +141,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					Session: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -216,7 +216,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -295,7 +295,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -310,7 +310,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						LorawanVersion: ttnpb.MAC_V1_1,
 					},
 					PendingSession: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testPendingSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -398,7 +398,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -469,7 +469,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					Session: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -480,7 +480,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						},
 					},
 					PendingSession: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testPendingSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -547,7 +547,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -558,7 +558,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						},
 					},
 					PendingSession: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testPendingSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -625,7 +625,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -636,7 +636,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						},
 					},
 					PendingSession: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testPendingSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -842,7 +842,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					Session: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -917,7 +917,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -996,7 +996,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -1011,7 +1011,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 						LorawanVersion: ttnpb.MAC_V1_1,
 					},
 					PendingSession: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testPendingSession"),
 						},
 					},
@@ -1083,7 +1083,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -1153,7 +1153,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 						RecentUplinks:  ups,
 					},
 					Session: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testSession"),
 						},
 						LastNFCntDown: 10,
@@ -1355,7 +1355,7 @@ func TestDownlinkQueueList(t *testing.T) {
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					Session: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -1396,7 +1396,7 @@ func TestDownlinkQueueList(t *testing.T) {
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					PendingSession: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testPendingSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -1439,7 +1439,7 @@ func TestDownlinkQueueList(t *testing.T) {
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					Session: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -1448,7 +1448,7 @@ func TestDownlinkQueueList(t *testing.T) {
 						},
 					},
 					PendingSession: &ttnpb.Session{
-						SessionKeys: ttnpb.SessionKeys{
+						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte("testPendingSession"),
 						},
 						QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{

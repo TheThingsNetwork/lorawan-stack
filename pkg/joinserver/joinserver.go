@@ -508,7 +508,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				}
 			}
 
-			sk := ttnpb.SessionKeys{
+			sk := &ttnpb.SessionKeys{
 				SessionKeyId: skID[:],
 				FNwkSIntKey:  fNwkSIntKeyEnvelope,
 				NwkSEncKey:   nwkSEncKeyEnvelope,
@@ -527,7 +527,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 					if stored != nil {
 						return nil, nil, errDuplicateIdentifiers.New()
 					}
-					return &sk, []string{
+					return sk, []string{
 						"session_key_id",
 						"f_nwk_s_int_key",
 						"s_nwk_s_int_key",
@@ -541,9 +541,9 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			}
 
 			dev.Session = &ttnpb.Session{
-				StartedAt:   ttnpb.ProtoTimePtr(time.Now()),
-				DevAddr:     req.DevAddr,
-				SessionKeys: sk,
+				StartedAt: ttnpb.ProtoTimePtr(time.Now()),
+				DevAddr:   req.DevAddr,
+				Keys:      sk,
 			}
 			dev.EndDeviceIdentifiers.DevAddr = &req.DevAddr
 			paths = append(paths, "session", "ids.dev_addr")
@@ -551,7 +551,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			handled = true
 			res = &ttnpb.JoinResponse{
 				RawPayload:  append(b[:1], enc...),
-				SessionKeys: &sk,
+				SessionKeys: sk,
 			}
 			return dev, paths, nil
 		},

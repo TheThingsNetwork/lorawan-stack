@@ -109,7 +109,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 				ApplicationIdentifiers: *expectedMatch.ApplicationIds,
 				DeviceID:               expectedMatch.DeviceId,
 				LoRaWANVersion:         expectedMACState.LorawanVersion,
-				FNwkSIntKey:            expectedSession.FNwkSIntKey,
+				FNwkSIntKey:            expectedSession.Keys.FNwkSIntKey,
 				LastFCnt:               expectedSession.LastFCntUp,
 				ResetsFCnt:             expectedMatch.GetMacSettings().GetResetsFCnt(),
 				Supports32BitFCnt:      expectedMatch.GetMacSettings().GetSupports_32BitFCnt(),
@@ -275,7 +275,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		Session: &ttnpb.Session{
 			DevAddr:    types.DevAddr{0x42, 0xff, 0xff, 0xff},
 			LastFCntUp: 41,
-			SessionKeys: ttnpb.SessionKeys{
+			Keys: &ttnpb.SessionKeys{
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
 					Key: &types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 				},
@@ -284,7 +284,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		MacState: MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.RP001_V1_0_3_REV_A),
 		PendingSession: &ttnpb.Session{
 			DevAddr: types.DevAddr{0x43, 0xff, 0xff, 0xff},
-			SessionKeys: ttnpb.SessionKeys{
+			Keys: &ttnpb.SessionKeys{
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
 					EncryptedKey: []byte{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe},
 					KekLabel:     "kek-label",
@@ -353,7 +353,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 
 	pbOther := CopyEndDevice(pb)
 	pbOther.Session.LastFCntUp = pbCurrentUp.Payload.GetMacPayload().FHdr.FCnt
-	pbOther.Session.FNwkSIntKey.Key = &types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe}
+	pbOther.Session.Keys.FNwkSIntKey.Key = &types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe}
 	pbOther.PendingSession = nil
 	pbOther.EndDeviceIdentifiers.DeviceId = "test-dev-other"
 	pbOther.EndDeviceIdentifiers.DevEui = &types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}

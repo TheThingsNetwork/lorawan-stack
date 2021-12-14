@@ -48,11 +48,11 @@ func (x *Session) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("dev_addr")
 		x.DevAddr.MarshalProtoJSON(s.WithField("dev_addr"))
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.Keys != nil || s.HasField("keys") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("keys")
 		// NOTE: SessionKeys does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.SessionKeys)
+		gogo.MarshalMessage(s, x.Keys)
 	}
 	if x.LastFCntUp != 0 || s.HasField("last_f_cnt_up") {
 		s.WriteMoreIf(&wroteField)
@@ -114,7 +114,7 @@ func (x *Session) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: SessionKeys does not seem to implement UnmarshalProtoJSON.
 			var v SessionKeys
 			gogo.UnmarshalMessage(s, &v)
-			x.SessionKeys = v
+			x.Keys = &v
 		case "last_f_cnt_up", "lastFCntUp":
 			s.AddField("last_f_cnt_up")
 			x.LastFCntUp = s.ReadUint32()
@@ -475,11 +475,11 @@ func (x *EndDeviceVersion) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Ids != nil || s.HasField("ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("ids")
 		// NOTE: EndDeviceVersionIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.EndDeviceVersionIdentifiers)
+		gogo.MarshalMessage(s, x.Ids)
 	}
 	if x.LorawanVersion != 0 || s.HasField("lorawan_version") {
 		s.WriteMoreIf(&wroteField)
@@ -558,7 +558,7 @@ func (x *EndDeviceVersion) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: EndDeviceVersionIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v EndDeviceVersionIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.EndDeviceVersionIdentifiers = v
+			x.Ids = &v
 		case "lorawan_version", "lorawanVersion":
 			s.AddField("lorawan_version")
 			x.LorawanVersion.UnmarshalProtoJSON(s)

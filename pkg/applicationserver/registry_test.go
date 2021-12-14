@@ -50,6 +50,9 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 		},
 		Session: &ttnpb.Session{
 			DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+			Keys: &ttnpb.SessionKeys{
+				SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
+			},
 		},
 		SkipPayloadCryptoOverride: &pbtypes.BoolValue{Value: true},
 	}

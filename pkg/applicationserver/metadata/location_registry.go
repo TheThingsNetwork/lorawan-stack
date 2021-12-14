@@ -102,8 +102,8 @@ func (c clusterEndDeviceLocationRegistry) Get(ctx context.Context, ids ttnpb.End
 	ctx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
 	dev, err := cl.Get(ctx, &ttnpb.GetEndDeviceRequest{
-		EndDeviceIdentifiers: ids,
-		FieldMask:            endDeviceLocationFieldMask,
+		EndDeviceIds: &ids,
+		FieldMask:    endDeviceLocationFieldMask,
 	}, c.WithClusterAuth())
 	if err != nil {
 		return nil, err
@@ -121,8 +121,8 @@ func (c clusterEndDeviceLocationRegistry) Merge(ctx context.Context, ids ttnpb.E
 	ctx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
 	dev, err := cl.Get(ctx, &ttnpb.GetEndDeviceRequest{
-		EndDeviceIdentifiers: ids,
-		FieldMask:            endDeviceLocationFieldMask,
+		EndDeviceIds: &ids,
+		FieldMask:    endDeviceLocationFieldMask,
 	}, c.WithClusterAuth())
 	if err != nil {
 		return nil, err

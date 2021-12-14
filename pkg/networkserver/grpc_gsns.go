@@ -229,9 +229,9 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		dev.PendingMacState != nil &&
 		pld.FHdr.DevAddr.Equal(dev.PendingSession.DevAddr) &&
 		cmacFMatchResult.LoRaWANVersion.UseLegacyMIC() == dev.PendingMacState.LorawanVersion.UseLegacyMIC() {
-		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.PendingSession.FNwkSIntKey, ns.KeyVault)
+		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.PendingSession.Keys.FNwkSIntKey, ns.KeyVault)
 		if err != nil {
-			log.FromContext(ctx).WithError(err).WithField("kek_label", dev.PendingSession.FNwkSIntKey.KekLabel).Warn("Failed to unwrap FNwkSIntKey")
+			log.FromContext(ctx).WithError(err).WithField("kek_label", dev.PendingSession.Keys.FNwkSIntKey.KekLabel).Warn("Failed to unwrap FNwkSIntKey")
 			return nil, false, nil
 		}
 		if cmacFMatchResult.FNwkSIntKey.Equal(fNwkSIntKey) {
@@ -269,9 +269,9 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		cmacFMatchResult.LoRaWANVersion.UseLegacyMIC() == dev.MacState.LorawanVersion.UseLegacyMIC() &&
 		(cmacFMatchResult.FullFCnt == FullFCnt(uint16(pld.FHdr.FCnt), dev.Session.LastFCntUp, mac.DeviceSupports32BitFCnt(dev, ns.defaultMACSettings)) ||
 			cmacFMatchResult.FullFCnt == pld.FHdr.FCnt) {
-		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.FNwkSIntKey, ns.KeyVault)
+		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.Keys.FNwkSIntKey, ns.KeyVault)
 		if err != nil {
-			log.FromContext(ctx).WithError(err).WithField("kek_label", dev.Session.FNwkSIntKey.KekLabel).Warn("Failed to unwrap FNwkSIntKey")
+			log.FromContext(ctx).WithError(err).WithField("kek_label", dev.Session.Keys.FNwkSIntKey.KekLabel).Warn("Failed to unwrap FNwkSIntKey")
 			return nil, false, nil
 		}
 		if cmacFMatchResult.FNwkSIntKey.Equal(fNwkSIntKey) {
@@ -392,13 +392,13 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		if matchType == pendingMatch {
 			session = dev.PendingSession
 		}
-		if session.NwkSEncKey == nil || len(session.NwkSEncKey.Key) == 0 {
+		if len(session.GetKeys().GetNwkSEncKey().GetKey()) == 0 {
 			log.FromContext(ctx).Warn("Device missing NwkSEncKey in registry")
 			return nil, false, nil
 		}
-		key, err := cryptoutil.UnwrapAES128Key(ctx, session.NwkSEncKey, ns.KeyVault)
+		key, err := cryptoutil.UnwrapAES128Key(ctx, session.Keys.NwkSEncKey, ns.KeyVault)
 		if err != nil {
-			log.FromContext(ctx).WithField("kek_label", session.NwkSEncKey.KekLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
+			log.FromContext(ctx).WithField("kek_label", session.Keys.NwkSEncKey.KekLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
 			return nil, false, nil
 		}
 		cmdBuf, err = crypto.DecryptUplink(key, pld.FHdr.DevAddr, cmacFMatchResult.FullFCnt, cmdBuf, len(pld.FHdr.FOpts) > 0)
@@ -597,9 +597,9 @@ macLoop:
 
 	// NOTE: Legacy MIC check is already performed.
 	if !dev.MacState.LorawanVersion.UseLegacyMIC() {
-		sNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.SNwkSIntKey, ns.KeyVault)
+		sNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.Session.Keys.SNwkSIntKey, ns.KeyVault)
 		if err != nil {
-			logger.WithField("kek_label", dev.Session.SNwkSIntKey.GetKekLabel()).WithError(err).Warn("Failed to unwrap SNwkSIntKey")
+			logger.WithField("kek_label", dev.Session.Keys.SNwkSIntKey.GetKekLabel()).WithError(err).Warn("Failed to unwrap SNwkSIntKey")
 			return nil, false, nil
 		}
 
@@ -965,7 +965,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 					FPort:           pld.FPort,
 					FrmPayload:      frmPayload,
 					RxMetadata:      up.RxMetadata,
-					SessionKeyId:    stored.Session.SessionKeyId,
+					SessionKeyId:    stored.Session.Keys.SessionKeyId,
 					Settings:        up.Settings,
 					ReceivedAt:      up.ReceivedAt,
 					ConsumedAirtime: up.ConsumedAirtime,

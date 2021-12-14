@@ -23,19 +23,26 @@ func (dst *Session) SetFields(src *Session, paths ...string) error {
 		case "keys":
 			if len(subs) > 0 {
 				var newDst, newSrc *SessionKeys
-				if src != nil {
-					newSrc = &src.SessionKeys
+				if (src == nil || src.Keys == nil) && dst.Keys == nil {
+					continue
 				}
-				newDst = &dst.SessionKeys
+				if src != nil {
+					newSrc = src.Keys
+				}
+				if dst.Keys != nil {
+					newDst = dst.Keys
+				} else {
+					newDst = &SessionKeys{}
+					dst.Keys = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.SessionKeys = src.SessionKeys
+					dst.Keys = src.Keys
 				} else {
-					var zero SessionKeys
-					dst.SessionKeys = zero
+					dst.Keys = nil
 				}
 			}
 		case "last_f_cnt_up":
@@ -436,19 +443,26 @@ func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) e
 		case "ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDeviceVersionIdentifiers
-				if src != nil {
-					newSrc = &src.EndDeviceVersionIdentifiers
+				if (src == nil || src.Ids == nil) && dst.Ids == nil {
+					continue
 				}
-				newDst = &dst.EndDeviceVersionIdentifiers
+				if src != nil {
+					newSrc = src.Ids
+				}
+				if dst.Ids != nil {
+					newDst = dst.Ids
+				} else {
+					newDst = &EndDeviceVersionIdentifiers{}
+					dst.Ids = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.EndDeviceVersionIdentifiers = src.EndDeviceVersionIdentifiers
+					dst.Ids = src.Ids
 				} else {
-					var zero EndDeviceVersionIdentifiers
-					dst.EndDeviceVersionIdentifiers = zero
+					dst.Ids = nil
 				}
 			}
 		case "lorawan_version":
@@ -2365,19 +2379,26 @@ func (dst *GetEndDeviceRequest) SetFields(src *GetEndDeviceRequest, paths ...str
 		case "end_device_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDeviceIdentifiers
-				if src != nil {
-					newSrc = &src.EndDeviceIdentifiers
+				if (src == nil || src.EndDeviceIds == nil) && dst.EndDeviceIds == nil {
+					continue
 				}
-				newDst = &dst.EndDeviceIdentifiers
+				if src != nil {
+					newSrc = src.EndDeviceIds
+				}
+				if dst.EndDeviceIds != nil {
+					newDst = dst.EndDeviceIds
+				} else {
+					newDst = &EndDeviceIdentifiers{}
+					dst.EndDeviceIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
+					dst.EndDeviceIds = src.EndDeviceIds
 				} else {
-					var zero EndDeviceIdentifiers
-					dst.EndDeviceIdentifiers = zero
+					dst.EndDeviceIds = nil
 				}
 			}
 		case "field_mask":
@@ -2547,19 +2568,26 @@ func (dst *ResetAndGetEndDeviceRequest) SetFields(src *ResetAndGetEndDeviceReque
 		case "end_device_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDeviceIdentifiers
-				if src != nil {
-					newSrc = &src.EndDeviceIdentifiers
+				if (src == nil || src.EndDeviceIds == nil) && dst.EndDeviceIds == nil {
+					continue
 				}
-				newDst = &dst.EndDeviceIdentifiers
+				if src != nil {
+					newSrc = src.EndDeviceIds
+				}
+				if dst.EndDeviceIds != nil {
+					newDst = dst.EndDeviceIds
+				} else {
+					newDst = &EndDeviceIdentifiers{}
+					dst.EndDeviceIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.EndDeviceIdentifiers = src.EndDeviceIdentifiers
+					dst.EndDeviceIds = src.EndDeviceIds
 				} else {
-					var zero EndDeviceIdentifiers
-					dst.EndDeviceIdentifiers = zero
+					dst.EndDeviceIds = nil
 				}
 			}
 		case "field_mask":

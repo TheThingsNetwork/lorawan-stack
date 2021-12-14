@@ -57,11 +57,11 @@ type asEndDeviceRegistryServer struct {
 
 func (r asEndDeviceRegistryServer) retrieveSessionKeys(ctx context.Context, dev *ttnpb.EndDevice, paths []string) error {
 	unwrapKeys := func(ctx context.Context, session *ttnpb.Session, prefix string, paths ...string) error {
-		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, r.AS.KeyVault, session.SessionKeys, prefix, paths...)
+		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, r.AS.KeyVault, session.Keys, prefix, paths...)
 		if err != nil {
 			return err
 		}
-		session.SessionKeys = sk
+		session.Keys = sk
 		return nil
 	}
 
@@ -118,7 +118,7 @@ func (r asEndDeviceRegistryServer) retrieveSessionKeys(ctx context.Context, dev 
 
 // Get implements ttnpb.AsEndDeviceRegistryServer.
 func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
+	if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
 
@@ -127,7 +127,7 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 		"pending_session.keys.app_s_key.key",
 		"session.keys.app_s_key.key",
 	) {
-		if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
+		if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 			return nil, err
 		}
 		gets = ttnpb.AddFields(gets, "skip_payload_crypto_override")
@@ -149,7 +149,7 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 		}
 	}
 
-	dev, err := r.AS.deviceRegistry.Get(ctx, req.EndDeviceIdentifiers, gets)
+	dev, err := r.AS.deviceRegistry.Get(ctx, *req.EndDeviceIds, gets)
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +171,7 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "session.dev_addr") && (req.EndDevice.Session == nil || req.EndDevice.Session.DevAddr.IsZero()) {
 		return nil, errInvalidFieldValue.WithAttributes("field", "session.dev_addr")
 	}
-	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "session.keys.app_s_key.key") && (req.EndDevice.Session == nil || req.EndDevice.Session.AppSKey.GetKey().IsZero()) {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "session.keys.app_s_key.key") && (req.EndDevice.GetSession().GetKeys().GetAppSKey().GetKey().IsZero()) {
 		return nil, errInvalidFieldValue.WithAttributes("field", "session.keys.app_s_key.key")
 	}
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "formatters.up_formatter_parameter") {
@@ -202,16 +202,16 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 
 	sets := append(req.FieldMask.GetPaths()[:0:0], req.FieldMask.GetPaths()...)
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "session.keys.app_s_key.key") {
-		appSKey, err := cryptoutil.WrapAES128Key(ctx, *req.EndDevice.Session.AppSKey.Key, r.kekLabel, r.AS.KeyVault)
+		appSKey, err := cryptoutil.WrapAES128Key(ctx, *req.EndDevice.Session.Keys.AppSKey.Key, r.kekLabel, r.AS.KeyVault)
 		if err != nil {
 			return nil, err
 		}
 		defer func(ke ttnpb.KeyEnvelope) {
 			if dev != nil {
-				dev.Session.AppSKey = &ke
+				dev.Session.Keys.AppSKey = &ke
 			}
-		}(*req.EndDevice.Session.AppSKey)
-		req.EndDevice.Session.AppSKey = appSKey
+		}(*req.EndDevice.Session.Keys.AppSKey)
+		req.EndDevice.Session.Keys.AppSKey = appSKey
 		sets = ttnpb.AddFields(sets,
 			"session.keys.app_s_key.encrypted_key",
 			"session.keys.app_s_key.kek_label",

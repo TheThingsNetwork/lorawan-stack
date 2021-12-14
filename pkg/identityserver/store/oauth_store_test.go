@@ -63,8 +63,8 @@ func TestOAuthStore(t *testing.T) {
 			start := cleanTime(time.Now())
 
 			created, err := store.Authorize(ctx, &ttnpb.OAuthClientAuthorization{
-				ClientIds: *clientIDs,
-				UserIds:   *userIDs,
+				ClientIds: clientIDs,
+				UserIds:   userIDs,
 				Rights:    rights,
 			})
 
@@ -137,8 +137,8 @@ func TestOAuthStore(t *testing.T) {
 			start := cleanTime(time.Now())
 
 			err = store.CreateAuthorizationCode(ctx, &ttnpb.OAuthAuthorizationCode{
-				ClientIds:   *clientIDs,
-				UserIds:     *userIDs,
+				ClientIds:   clientIDs,
+				UserIds:     userIDs,
 				Rights:      rights,
 				Code:        code,
 				RedirectUri: redirectURI,
@@ -207,8 +207,8 @@ func TestOAuthStore(t *testing.T) {
 			start := cleanTime(time.Now())
 
 			err = store.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
-				UserIds:      *userIDs,
-				ClientIds:    *clientIDs,
+				UserIds:      userIDs,
+				ClientIds:    clientIDs,
 				Id:           tokenID,
 				AccessToken:  access,
 				RefreshToken: refresh,
@@ -266,8 +266,8 @@ func TestOAuthStore(t *testing.T) {
 			prevID := ""
 
 			store.Authorize(ctx, &ttnpb.OAuthClientAuthorization{
-				ClientIds: *clientIDs,
-				UserIds:   *userIDs,
+				ClientIds: clientIDs,
+				UserIds:   userIDs,
 				Rights:    rights,
 			})
 			authorizationList, _ := store.ListAuthorizations(ctx, userIDs)
@@ -275,8 +275,8 @@ func TestOAuthStore(t *testing.T) {
 			a.So(authorizationList, should.HaveLength, 1)
 
 			store.CreateAuthorizationCode(ctx, &ttnpb.OAuthAuthorizationCode{
-				ClientIds:   *clientIDs,
-				UserIds:     *userIDs,
+				ClientIds:   clientIDs,
+				UserIds:     userIDs,
 				Rights:      rights,
 				Code:        code,
 				RedirectUri: redirectURI,
@@ -286,8 +286,8 @@ func TestOAuthStore(t *testing.T) {
 			_, err := store.GetAuthorizationCode(ctx, code)
 
 			store.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
-				UserIds:      *userIDs,
-				ClientIds:    *clientIDs,
+				UserIds:      userIDs,
+				ClientIds:    clientIDs,
 				Id:           tokenID,
 				AccessToken:  access,
 				RefreshToken: refresh,

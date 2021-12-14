@@ -163,7 +163,7 @@ func (m *mockISEndDeviceRegistry) get(ctx context.Context, ids ttnpb.EndDeviceId
 func (m *mockISEndDeviceRegistry) Get(ctx context.Context, in *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	m.endDevicesMu.RLock()
 	defer m.endDevicesMu.RUnlock()
-	if dev, ok := m.endDevices[unique.ID(ctx, in.EndDeviceIdentifiers)]; ok {
+	if dev, ok := m.endDevices[unique.ID(ctx, in.EndDeviceIds)]; ok {
 		return dev, nil
 	}
 	return nil, errNotFound.New()

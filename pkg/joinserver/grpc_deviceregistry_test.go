@@ -101,7 +101,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return nil, errors.New("GetByIDFunc must not be called")
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: deepcopy.Copy(registeredDevice.EndDeviceIdentifiers).(ttnpb.EndDeviceIdentifiers),
+				EndDeviceIds: deepcopy.Copy(&registeredDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers),
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"ids"},
 				},
@@ -133,7 +133,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return nil, errNotFound.New()
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{
 						ApplicationId: registeredApplicationID,
 					},
@@ -175,7 +175,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				}), nil
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{
 						ApplicationId: "bar-application",
 					},
@@ -217,7 +217,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				}), nil
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: deepcopy.Copy(registeredDevice.EndDeviceIdentifiers).(ttnpb.EndDeviceIdentifiers),
+				EndDeviceIds: deepcopy.Copy(&registeredDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers),
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"ids"},
 				},
@@ -246,7 +246,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return nil, errors.New("GetByIDFunc must not be called")
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: deepcopy.Copy(registeredDevice.EndDeviceIdentifiers).(ttnpb.EndDeviceIdentifiers),
+				EndDeviceIds: deepcopy.Copy(&registeredDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers),
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"ids", "root_keys.app_key.key", "root_keys.nwk_key.key"},
 				},
@@ -297,7 +297,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return ret, nil
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: deepcopy.Copy(registeredDevice.EndDeviceIdentifiers).(ttnpb.EndDeviceIdentifiers),
+				EndDeviceIds: deepcopy.Copy(&registeredDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers),
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"ids", "root_keys.app_key.key", "root_keys.nwk_key.key"},
 				},
@@ -358,7 +358,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return ret, nil
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: deepcopy.Copy(registeredDevice.EndDeviceIdentifiers).(ttnpb.EndDeviceIdentifiers),
+				EndDeviceIds: deepcopy.Copy(&registeredDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers),
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"ids", "root_keys.app_key.key", "root_keys.nwk_key.key"},
 				},

@@ -171,14 +171,14 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			res.AccessMethod = &ttnpb.AuthInfoResponse_OauthAccessToken{
 				OauthAccessToken: accessToken,
 			}
-			user, err = store.GetUserStore(db).GetUser(ctx, &accessToken.UserIds, userFieldMask)
+			user, err = store.GetUserStore(db).GetUser(ctx, accessToken.UserIds, userFieldMask)
 			if err != nil {
 				if errors.IsNotFound(err) {
 					return errTokenNotFound.WithCause(err)
 				}
 				return err
 			}
-			client, err := store.GetClientStore(db).GetClient(ctx, &accessToken.ClientIds, clientFieldMask)
+			client, err := store.GetClientStore(db).GetClient(ctx, accessToken.ClientIds, clientFieldMask)
 			if err != nil {
 				if errors.IsNotFound(err) {
 					return errTokenNotFound.WithCause(err)

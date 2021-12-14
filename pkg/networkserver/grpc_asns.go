@@ -164,7 +164,7 @@ func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState,
 	if session == nil {
 		return downs, nil
 	}
-	downs, unmatched = ttnpb.PartitionDownlinksBySessionKeyIDEquality(session.SessionKeyId, downs...)
+	downs, unmatched = ttnpb.PartitionDownlinksBySessionKeyIDEquality(session.Keys.SessionKeyId, downs...)
 	switch {
 	case len(downs) == 0:
 		return unmatched, nil
@@ -180,7 +180,7 @@ func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState,
 		case down.FCnt < minFCnt:
 			return unmatched, errFCntTooLow.WithAttributes("f_cnt", down.FCnt, "min_f_cnt", minFCnt).WithDetails(makeQueueOperationErrorDetails())
 
-		case !bytes.Equal(down.SessionKeyId, session.SessionKeyId):
+		case !bytes.Equal(down.SessionKeyId, session.Keys.SessionKeyId):
 			return unmatched, errUnknownSession.WithDetails(makeQueueOperationErrorDetails())
 
 		case multicast && down.Confirmed:
@@ -240,12 +240,12 @@ func matchQueuedApplicationDownlinks(ctx context.Context, dev *ttnpb.EndDevice, 
 		d := &ttnpb.DownlinkQueueOperationErrorDetails{}
 		if dev.Session != nil {
 			d.DevAddr = &dev.Session.DevAddr
-			d.SessionKeyId = dev.Session.SessionKeyId
+			d.SessionKeyId = dev.Session.Keys.SessionKeyId
 			d.MinFCntDown = minCurrentFCntDown
 		}
 		if dev.PendingSession != nil {
 			d.PendingDevAddr = &dev.PendingSession.DevAddr
-			d.PendingSessionKeyId = dev.PendingSession.SessionKeyId
+			d.PendingSessionKeyId = dev.PendingSession.Keys.SessionKeyId
 			d.PendingMinFCntDown = minPendingFCntDown
 		}
 		return d

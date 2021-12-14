@@ -99,7 +99,7 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 }
 
 func (is *IdentityServer) getEndDevice(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
-	if err = rights.RequireApplication(ctx, *req.EndDeviceIdentifiers.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
+	if err = rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
 
@@ -109,7 +109,7 @@ func (is *IdentityServer) getEndDevice(ctx context.Context, req *ttnpb.GetEndDev
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		dev, err = store.GetEndDeviceStore(db).GetEndDevice(ctx, &req.EndDeviceIdentifiers, req.FieldMask)
+		dev, err = store.GetEndDeviceStore(db).GetEndDevice(ctx, req.EndDeviceIds, req.FieldMask)
 		return err
 	})
 	if err != nil {

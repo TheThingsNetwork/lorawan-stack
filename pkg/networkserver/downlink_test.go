@@ -395,7 +395,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastNFCntDown: 0x24,
-					SessionKeys:   *sessionKeys,
+					Keys:          sessionKeys,
 				},
 			},
 		},
@@ -426,7 +426,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastNFCntDown: 0x24,
-					SessionKeys:   *sessionKeys,
+					Keys:          sessionKeys,
 				},
 			},
 		},
@@ -510,7 +510,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastNFCntDown: 0x24,
-					SessionKeys:   *sessionKeys,
+					Keys:          sessionKeys,
 				},
 			},
 		},
@@ -559,7 +559,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastNFCntDown: 0x24,
-					SessionKeys:   *sessionKeys,
+					Keys:          sessionKeys,
 				},
 			},
 		},
@@ -608,7 +608,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastNFCntDown: 0x24,
-					SessionKeys:   *sessionKeys,
+					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
@@ -693,7 +693,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastNFCntDown: 0x24,
-					SessionKeys:   *sessionKeys,
+					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
@@ -774,7 +774,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastNFCntDown: 0x24,
-					SessionKeys:   *sessionKeys,
+					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
@@ -925,7 +925,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastNFCntDown: 0x24,
-					SessionKeys:   *sessionKeys,
+					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
@@ -1086,7 +1086,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastNFCntDown: 0x24,
-					SessionKeys:   *sessionKeys,
+					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
@@ -1241,7 +1241,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastNFCntDown: 0x24,
-					SessionKeys:   *sessionKeys,
+					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
@@ -1395,7 +1395,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastNFCntDown: 0x24,
-					SessionKeys:   *sessionKeys,
+					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							Confirmed:      true,
@@ -1547,7 +1547,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastNFCntDown: 0x24,
-					SessionKeys:   *sessionKeys,
+					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
@@ -1710,7 +1710,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastNFCntDown: 0x24,
-					SessionKeys:   *sessionKeys,
+					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
@@ -1839,7 +1839,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastNFCntDown: 0x24,
-					SessionKeys:   *sessionKeys,
+					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
@@ -1976,7 +1976,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastNFCntDown: 0x24,
-					SessionKeys:   *sessionKeys,
+					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
@@ -2136,7 +2136,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastNFCntDown: 0x24,
-					SessionKeys:   *sessionKeys,
+					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
@@ -2279,7 +2279,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastNFCntDown: 0x24,
-					SessionKeys:   *sessionKeys,
+					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
@@ -2341,7 +2341,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastNFCntDown: 0x24,
-					SessionKeys:   *sessionKeys,
+					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
@@ -2415,7 +2415,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastNFCntDown: 0x24,
-					SessionKeys:   *sessionKeys,
+					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							CorrelationIds: []string{"correlation-app-down-1", "correlation-app-down-2"},
@@ -2473,8 +2473,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					expected.PendingMacState.RxWindowsAvailable = false
 					expected.PendingMacState.PendingJoinRequest = &created.PendingMacState.QueuedJoinAccept.Request
 					expected.PendingSession = &ttnpb.Session{
-						DevAddr:     created.PendingMacState.QueuedJoinAccept.DevAddr,
-						SessionKeys: created.PendingMacState.QueuedJoinAccept.Keys,
+						DevAddr: created.PendingMacState.QueuedJoinAccept.DevAddr,
+						Keys:    &created.PendingMacState.QueuedJoinAccept.Keys,
 					}
 					expected.PendingMacState.QueuedJoinAccept = nil
 					expected.PendingMacState.RecentDownlinks = AppendRecentDownlink(expected.PendingMacState.RecentDownlinks, down, RecentDownlinkCount)

@@ -52,7 +52,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
 		},
 		Session: &ttnpb.Session{
-			SessionKeys: ttnpb.SessionKeys{
+			Keys: &ttnpb.SessionKeys{
 				AppSKey: &ttnpb.KeyEnvelope{
 					KekLabel:     "test",
 					EncryptedKey: []byte{0x96, 0x77, 0x8b, 0x25, 0xae, 0x6c, 0xa4, 0x35, 0xf9, 0x2b, 0x5b, 0x97, 0xc0, 0x50, 0xae, 0xd2, 0x46, 0x8a, 0xb8, 0xa1, 0x7a, 0xd8, 0x4e, 0x5d},
@@ -65,7 +65,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 	}
 
 	expectedSession := &ttnpb.Session{
-		SessionKeys: ttnpb.SessionKeys{
+		Keys: &ttnpb.SessionKeys{
 			AppSKey: &ttnpb.KeyEnvelope{
 				Key: aes128KeyPtr(types.AES128Key{0x0, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff}),
 			},
@@ -113,7 +113,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return nil, errors.New("GetFunc must not be called")
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
@@ -138,7 +138,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return nil, errors.New("GetFunc must not be called")
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
@@ -167,7 +167,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return nil, errNotFound.New()
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
@@ -205,7 +205,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				}).(*ttnpb.EndDevice), nil
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
@@ -236,7 +236,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return nil, errors.New("GetFunc must not be called")
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters", "session"},
 				},
@@ -274,7 +274,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice), nil
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
+				EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters", "session"},
 				},
