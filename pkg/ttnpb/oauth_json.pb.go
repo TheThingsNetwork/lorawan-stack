@@ -19,17 +19,17 @@ func (x *OAuthClientAuthorization) MarshalProtoJSON(s *jsonplugin.MarshalState) 
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.UserIds != nil || s.HasField("user_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("user_ids")
 		// NOTE: UserIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.UserIds)
+		gogo.MarshalMessage(s, x.UserIds)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.ClientIds != nil || s.HasField("client_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("client_ids")
 		// NOTE: ClientIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.ClientIds)
+		gogo.MarshalMessage(s, x.ClientIds)
 	}
 	if len(x.Rights) > 0 || s.HasField("rights") {
 		s.WriteMoreIf(&wroteField)
@@ -77,13 +77,13 @@ func (x *OAuthClientAuthorization) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSta
 			// NOTE: UserIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v UserIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.UserIds = v
+			x.UserIds = &v
 		case "client_ids", "clientIds":
 			s.AddField("client_ids")
 			// NOTE: ClientIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v ClientIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.ClientIds = v
+			x.ClientIds = &v
 		case "rights":
 			s.AddField("rights")
 			s.ReadArray(func() {
@@ -166,22 +166,22 @@ func (x *OAuthAuthorizationCode) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.UserIds != nil || s.HasField("user_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("user_ids")
 		// NOTE: UserIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.UserIds)
+		gogo.MarshalMessage(s, x.UserIds)
 	}
 	if x.UserSessionId != "" || s.HasField("user_session_id") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("user_session_id")
 		s.WriteString(x.UserSessionId)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.ClientIds != nil || s.HasField("client_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("client_ids")
 		// NOTE: ClientIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.ClientIds)
+		gogo.MarshalMessage(s, x.ClientIds)
 	}
 	if len(x.Rights) > 0 || s.HasField("rights") {
 		s.WriteMoreIf(&wroteField)
@@ -244,7 +244,7 @@ func (x *OAuthAuthorizationCode) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 			// NOTE: UserIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v UserIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.UserIds = v
+			x.UserIds = &v
 		case "user_session_id", "userSessionId":
 			s.AddField("user_session_id")
 			x.UserSessionId = s.ReadString()
@@ -253,7 +253,7 @@ func (x *OAuthAuthorizationCode) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 			// NOTE: ClientIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v ClientIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.ClientIds = v
+			x.ClientIds = &v
 		case "rights":
 			s.AddField("rights")
 			s.ReadArray(func() {
@@ -296,22 +296,22 @@ func (x *OAuthAccessToken) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.UserIds != nil || s.HasField("user_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("user_ids")
 		// NOTE: UserIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.UserIds)
+		gogo.MarshalMessage(s, x.UserIds)
 	}
 	if x.UserSessionId != "" || s.HasField("user_session_id") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("user_session_id")
 		s.WriteString(x.UserSessionId)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.ClientIds != nil || s.HasField("client_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("client_ids")
 		// NOTE: ClientIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.ClientIds)
+		gogo.MarshalMessage(s, x.ClientIds)
 	}
 	if x.Id != "" || s.HasField("id") {
 		s.WriteMoreIf(&wroteField)
@@ -374,7 +374,7 @@ func (x *OAuthAccessToken) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: UserIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v UserIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.UserIds = v
+			x.UserIds = &v
 		case "user_session_id", "userSessionId":
 			s.AddField("user_session_id")
 			x.UserSessionId = s.ReadString()
@@ -383,7 +383,7 @@ func (x *OAuthAccessToken) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: ClientIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v ClientIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.ClientIds = v
+			x.ClientIds = &v
 		case "id":
 			s.AddField("id")
 			x.Id = s.ReadString()

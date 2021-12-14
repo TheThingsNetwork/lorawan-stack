@@ -3837,6 +3837,16 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3EntityIdentifiers"
+            }
+          }
+        ],
         "tags": [
           "ContactInfoRegistry"
         ]
@@ -3858,6 +3868,16 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/lorawanv3ContactInfoValidation"
+            }
+          }
+        ],
         "tags": [
           "ContactInfoRegistry"
         ]
@@ -14890,6 +14910,10 @@
       "type": "object",
       "properties": {
         "connected_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "disconnected_at": {
           "type": "string",
           "format": "date-time"
         },

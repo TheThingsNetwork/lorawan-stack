@@ -19,7 +19,6 @@ import (
 	"net/http"
 	"time"
 
-	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/web/cookie"
 )
@@ -56,24 +55,24 @@ func newState(next string) state {
 	}
 }
 
-func (oc *OAuthClient) getStateCookie(c echo.Context) (state, error) {
+func (oc *OAuthClient) getStateCookie(w http.ResponseWriter, r *http.Request) (state, error) {
 	s := state{}
-	ok, err := oc.StateCookie().Get(c.Response(), c.Request(), &s)
+	ok, err := oc.StateCookie().Get(w, r, &s)
 	if err != nil {
-		return s, echo.NewHTTPError(http.StatusBadRequest, "Invalid state cookie")
+		return s, err
 	}
 
 	if !ok {
-		return s, echo.NewHTTPError(http.StatusBadRequest, "No state cookie")
+		return s, err
 	}
 
 	return s, nil
 }
 
-func (oc *OAuthClient) setStateCookie(c echo.Context, value state) error {
-	return oc.StateCookie().Set(c.Response(), c.Request(), value)
+func (oc *OAuthClient) setStateCookie(w http.ResponseWriter, r *http.Request, value state) error {
+	return oc.StateCookie().Set(w, r, value)
 }
 
-func (oc *OAuthClient) removeStateCookie(c echo.Context) {
-	oc.StateCookie().Remove(c.Response(), c.Request())
+func (oc *OAuthClient) removeStateCookie(w http.ResponseWriter, r *http.Request) {
+	oc.StateCookie().Remove(w, r)
 }

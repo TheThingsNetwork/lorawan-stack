@@ -172,19 +172,19 @@ func (m *ContactInfoValidation) ValidateFields(paths ...string) error {
 		switch name {
 		case "id":
 
-			if utf8.RuneCountInString(m.GetId()) > 64 {
+			if l := utf8.RuneCountInString(m.GetId()); l < 1 || l > 64 {
 				return ContactInfoValidationValidationError{
 					field:  "id",
-					reason: "value length must be at most 64 runes",
+					reason: "value length must be between 1 and 64 runes, inclusive",
 				}
 			}
 
 		case "token":
 
-			if utf8.RuneCountInString(m.GetToken()) > 64 {
+			if l := utf8.RuneCountInString(m.GetToken()); l < 1 || l > 64 {
 				return ContactInfoValidationValidationError{
 					field:  "token",
-					reason: "value length must be at most 64 runes",
+					reason: "value length must be between 1 and 64 runes, inclusive",
 				}
 			}
 

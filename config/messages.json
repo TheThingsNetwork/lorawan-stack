@@ -1952,6 +1952,15 @@
       "file": "middleware.go"
     }
   },
+  "error:pkg/account:parse": {
+    "translations": {
+      "en": "request body parsing"
+    },
+    "description": {
+      "package": "pkg/account",
+      "file": "user.go"
+    }
+  },
   "error:pkg/applicationserver/distribution/redis:channel_closed": {
     "translations": {
       "en": "channel closed"
@@ -2492,6 +2501,15 @@
       "file": "io.go"
     }
   },
+  "error:pkg/applicationserver/metadata/redis:cache_miss": {
+    "translations": {
+      "en": "cache miss"
+    },
+    "description": {
+      "package": "pkg/applicationserver/metadata/redis",
+      "file": "location_cache.go"
+    }
+  },
   "error:pkg/applicationserver/redis:application_uid": {
     "translations": {
       "en": "invalid application UID `{application_uid}`"
@@ -2546,15 +2564,6 @@
       "file": "applicationserver.go"
     }
   },
-  "error:pkg/applicationserver:circuit_breaker_open": {
-    "translations": {
-      "en": "circuit breaker open"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "device_fetcher.go"
-    }
-  },
   "error:pkg/applicationserver:device_not_found": {
     "translations": {
       "en": "device `{device_uid}` not found"
@@ -2591,9 +2600,9 @@
       "file": "grpc_deviceregistry.go"
     }
   },
-  "error:pkg/applicationserver:invalid_threshold": {
+  "error:pkg/applicationserver:invalid_timeout": {
     "translations": {
-      "en": "invalid threshold `{threshold}`"
+      "en": "invalid timeout `{timeout}`"
     },
     "description": {
       "package": "pkg/applicationserver",
@@ -7316,6 +7325,15 @@
       "file": "storage.go"
     }
   },
+  "error:pkg/oauth:parse": {
+    "translations": {
+      "en": "request body parsing"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "oauth.go"
+    }
+  },
   "error:pkg/oauth:token": {
     "translations": {
       "en": "invalid token"
@@ -8315,15 +8333,6 @@
       "file": "remote.go"
     }
   },
-  "error:pkg/web/middleware:http_recovered": {
-    "translations": {
-      "en": "Internal Server Error"
-    },
-    "description": {
-      "package": "pkg/web/middleware",
-      "file": "recover.go"
-    }
-  },
   "error:pkg/web/oauthclient:exchange": {
     "translations": {
       "en": "token exchange refused"
@@ -8340,6 +8349,15 @@
     "description": {
       "package": "pkg/web/oauthclient",
       "file": "callback.go"
+    }
+  },
+  "error:pkg/web/oauthclient:no_auth_cookie": {
+    "translations": {
+      "en": "no auth cookie"
+    },
+    "description": {
+      "package": "pkg/web/oauthclient",
+      "file": "cookie_auth.go"
     }
   },
   "error:pkg/web/oauthclient:no_code": {
@@ -8372,6 +8390,15 @@
   "error:pkg/web/oauthclient:no_state_param": {
     "translations": {
       "en": "no state parameter present in request"
+    },
+    "description": {
+      "package": "pkg/web/oauthclient",
+      "file": "callback.go"
+    }
+  },
+  "error:pkg/web/oauthclient:parse": {
+    "translations": {
+      "en": "request body parsing"
     },
     "description": {
       "package": "pkg/web/oauthclient",

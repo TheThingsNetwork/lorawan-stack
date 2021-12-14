@@ -224,11 +224,11 @@ func (x *CreateApplicationRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) 
 		s.WriteObjectField("application")
 		x.Application.MarshalProtoJSON(s.WithField("application"))
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.Collaborator != nil || s.HasField("collaborator") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("collaborator")
 		// NOTE: OrganizationOrUserIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.Collaborator)
+		gogo.MarshalMessage(s, x.Collaborator)
 	}
 	s.WriteObjectEnd()
 }
@@ -252,7 +252,7 @@ func (x *CreateApplicationRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSta
 			// NOTE: OrganizationOrUserIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v OrganizationOrUserIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.Collaborator = v
+			x.Collaborator = &v
 		}
 	})
 }

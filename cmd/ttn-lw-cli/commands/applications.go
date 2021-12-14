@@ -197,7 +197,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationRegistryClient(is).Create(ctx, &ttnpb.CreateApplicationRequest{
 				Application:  &application,
-				Collaborator: *collaborator,
+				Collaborator: collaborator,
 			})
 			if err != nil {
 				return err

@@ -20,7 +20,6 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -49,14 +48,6 @@ func (r *resource) Classes() []string { return r.classes }
 func httpRequestResource(r *http.Request, class string) Resource {
 	return &resource{
 		key:     fmt.Sprintf("%s:ip:%s:url:%s", class, httpRemoteIP(r), r.URL.Path),
-		classes: []string{class, "http"},
-	}
-}
-
-// echoRequestResource represents an HTTP request. Avoid using directly, use EchoMiddleware instead.
-func echoRequestResource(c echo.Context, class string) Resource {
-	return &resource{
-		key:     fmt.Sprintf("%s:ip:%s:url:%s", class, c.RealIP(), c.Request().URL.Path),
 		classes: []string{class, "http"},
 	}
 }

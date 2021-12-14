@@ -19,10 +19,12 @@ import classnames from 'classnames'
 
 import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
+import Notification from '@ttn-lw/components/notification'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import humanFileSize from '@ttn-lw/lib/utils/human-file-size'
 
 import style from './file-input.styl'
 
@@ -48,6 +50,7 @@ export default class FileInput extends Component {
     id: PropTypes.string.isRequired,
     image: PropTypes.bool,
     imageClassName: PropTypes.string,
+    largeFileWarningMessage: PropTypes.string,
     maxSize: PropTypes.number,
     mayRemove: PropTypes.bool,
     message: PropTypes.message,
@@ -55,6 +58,7 @@ export default class FileInput extends Component {
     onChange: PropTypes.func.isRequired,
     providedMessage: PropTypes.message,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.shape({})]),
+    warningSize: PropTypes.number,
   }
 
   static defaultProps = {
@@ -63,12 +67,14 @@ export default class FileInput extends Component {
     disabled: false,
     image: false,
     imageClassName: undefined,
-    maxSize: 10 * 1024 * 1024, // 10 MB
+    largeFileWarningMessage: undefined,
+    maxSize: 16 * 1024 * 1024, // 16 MB
     mayRemove: true,
     message: m.selectAFile,
     changeMessage: m.changeFile,
     providedMessage: m.fileProvided,
     value: undefined,
+    warningSize: undefined,
   }
 
   constructor(props) {
@@ -81,6 +87,7 @@ export default class FileInput extends Component {
 
     this.state = {
       filename: '',
+      isLarger: false,
     }
   }
 
@@ -99,14 +106,20 @@ export default class FileInput extends Component {
 
   @bind
   handleChange(event) {
-    const { maxSize } = this.props
+    const { maxSize, warningSize } = this.props
     const { files } = event.target
 
-    if (files && files[0] && files[0].size <= maxSize) {
-      this.setState({ filename: files[0].name, error: undefined })
-      this.reader.readAsDataURL(files[0])
-    } else {
-      this.setState({ error: m.tooBig })
+    if (files && files[0]) {
+      if (files[0].size >= maxSize) {
+        this.setState({ error: m.tooBig })
+      } else {
+        this.reader.readAsDataURL(files[0])
+        this.setState({
+          filename: files[0].name,
+          error: undefined,
+          isLarger: files[0].size >= warningSize,
+        })
+      }
     }
   }
 
@@ -164,41 +177,64 @@ export default class FileInput extends Component {
   }
 
   render() {
-    const { message, changeMessage, name, id, accept, value, disabled, image, imageClassName } =
-      this.props
+    const {
+      message,
+      changeMessage,
+      name,
+      id,
+      accept,
+      value,
+      disabled,
+      image,
+      imageClassName,
+      largeFileWarningMessage,
+      warningSize,
+    } = this.props
+    const warningThreshold = humanFileSize(warningSize)
 
     return (
       <div className={style.container}>
-        {image && Boolean(value) && (
-          <img
-            className={classnames(style.image, imageClassName)}
-            alt="Current image"
-            src={value}
-            onError={this.handleImageError}
-            ref={this.imageRef}
+        {this.state.isLarger && (
+          <Notification
+            className={style.notification}
+            content={largeFileWarningMessage}
+            messageValues={{ warningThreshold }}
+            small
+            warning
           />
         )}
-        <Button
-          type="button"
-          aria-controls="fileupload"
-          onClick={this.handleChooseClick}
-          disabled={disabled}
-          message={!value ? message : changeMessage}
-          icon="attachment"
-          secondary
-        />
-        <span className={style.status}>{this.statusMessage}</span>
-        <input
-          name={name}
-          id={id}
-          className={style.input}
-          type="file"
-          onChange={this.handleChange}
-          ref={this.fileInputRef}
-          accept={accept}
-          disabled={disabled}
-          tabIndex="-1"
-        />
+        <div>
+          {image && Boolean(value) && (
+            <img
+              className={classnames(style.image, imageClassName)}
+              alt="Current image"
+              src={value}
+              onError={this.handleImageError}
+              ref={this.imageRef}
+            />
+          )}
+          <Button
+            type="button"
+            aria-controls="fileupload"
+            onClick={this.handleChooseClick}
+            disabled={disabled}
+            message={!value ? message : changeMessage}
+            icon="attachment"
+            secondary
+          />
+          <span className={style.status}>{this.statusMessage}</span>
+          <input
+            name={name}
+            id={id}
+            className={style.input}
+            type="file"
+            onChange={this.handleChange}
+            ref={this.fileInputRef}
+            accept={accept}
+            disabled={disabled}
+            tabIndex="-1"
+          />
+        </div>
       </div>
     )
   }

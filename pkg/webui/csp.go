@@ -15,9 +15,11 @@
 package webui
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
 )
@@ -29,6 +31,16 @@ func GenerateNonce() string {
 		panic(err)
 	}
 	return base64.StdEncoding.EncodeToString(b[:])
+}
+
+type nonceKeyType struct{}
+
+var nonceKey nonceKeyType
+
+// WithNonce constructs a *http.Request which has a nonce attached.
+func WithNonce(r *http.Request) (*http.Request, string) {
+	nonce := GenerateNonce()
+	return r.WithContext(context.WithValue(r.Context(), nonceKey, nonce)), nonce
 }
 
 // CleanCSP de-duplicates and removes empty entries from the CSP directive map.

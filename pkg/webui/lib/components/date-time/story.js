@@ -15,7 +15,6 @@
 /* eslint-disable react/prop-types */
 
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 
 import RelativeDateTime from './relative'
 
@@ -42,7 +41,11 @@ const Example = ({ title, unit, ago }) => {
   )
 }
 
-storiesOf('DateTime/Relative', module).add('Default', () => (
+export default {
+  title: 'DateTime/Relative',
+}
+
+export const Default = () => (
   <div>
     <Example title="from now" />
     <Example title="from 1 minute ago" unit="minute" ago={1} />
@@ -56,4 +59,4 @@ storiesOf('DateTime/Relative', module).add('Default', () => (
     <Example title="from 1 year ago" unit="year" ago={1} />
     <Example title="from 2 years ago" unit="year" ago={2} />
   </div>
-))
+)

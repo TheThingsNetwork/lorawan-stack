@@ -22,41 +22,11 @@ import (
 	"strings"
 	"testing"
 
-	echo "github.com/labstack/echo/v4"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
-
-func handler(c echo.Context) error {
-	return nil
-}
-
-func TestGroup(t *testing.T) {
-	a := assertions.New(t)
-	s, err := New(test.Context())
-	if !a.So(err, should.BeNil) {
-		t.Fatal("Could not create a web instance")
-	}
-
-	a.So(s.echo, should.NotHaveRoute, "GET", "/")
-	s.GET("/", handler)
-	a.So(s.echo, should.HaveRoute, "GET", "/")
-
-	a.So(s.echo, should.NotHaveRoute, "POST", "/bar")
-	s.POST("/bar", handler)
-	a.So(s.echo, should.NotHaveRoute, "GET", "/bar")
-	a.So(s.echo, should.HaveRoute, "POST", "/bar")
-
-	grp := s.Group("/group")
-	grp.GET("/g", handler)
-	a.So(s.echo, should.HaveRoute, "GET", "/group/g")
-
-	ggrp := grp.Group("/quu")
-	ggrp.GET("/q", handler)
-	a.So(s.echo, should.HaveRoute, "GET", "/group/quu/q")
-}
 
 func TestIsZeros(t *testing.T) {
 	a := assertions.New(t)
@@ -67,27 +37,6 @@ func TestIsZeros(t *testing.T) {
 	{
 		res := isZeros([]byte{0, 0, 0, 1, 0})
 		a.So(res, should.BeFalse)
-	}
-}
-
-func TestServeHTTP(t *testing.T) {
-	a := assertions.New(t)
-	s, err := New(test.Context())
-	if !a.So(err, should.BeNil) {
-		t.Fatal("Could not create a web instance")
-	}
-
-	// HTTP server returns 200 on valid route
-	{
-		req := httptest.NewRequest(echo.GET, "/", nil)
-		rec := httptest.NewRecorder()
-
-		s.GET("/", handler)
-
-		s.ServeHTTP(rec, req)
-
-		resp := rec.Result()
-		a.So(resp.StatusCode, should.Equal, http.StatusOK)
 	}
 }
 
@@ -108,7 +57,7 @@ func TestStatic(t *testing.T) {
 
 	// HTTP server returns 200 on valid file request
 	{
-		req := httptest.NewRequest(echo.GET, "/assets/web_test.go", nil)
+		req := httptest.NewRequest(http.MethodGet, "/assets/web_test.go", nil)
 		rec := httptest.NewRecorder()
 
 		s.ServeHTTP(rec, req)
@@ -122,7 +71,7 @@ func TestStatic(t *testing.T) {
 
 	// HTTP server returns 404 on invalid file request
 	{
-		req := httptest.NewRequest(echo.GET, "/assets/null.txt", nil)
+		req := httptest.NewRequest(http.MethodGet, "/assets/null.txt", nil)
 		rec := httptest.NewRecorder()
 
 		s.Static("/assets", http.Dir(dir+"/teststatic"))

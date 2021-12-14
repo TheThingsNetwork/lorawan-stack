@@ -20,6 +20,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Increased the maximum gRPC message size to 16MB.
 - Gateways which have been deleted are now automatically disconnected by the Gateway Server.
 
 ### Deprecated
@@ -33,6 +34,7 @@ For details about compatibility between different releases, see the **Commitment
 - Uplink and downlink counters display on end device activity in the Console.
 - Join settings handling in JS-only deployments in the Console.
 - Configuring Packet Broker listed option when Packet Broker Agent is configured with a Packet Broker tenant API key.
+- Contact info validation through the Account app.
 
 ### Security
 
@@ -50,6 +52,7 @@ For details about compatibility between different releases, see the **Commitment
   - This workaround will be available until the related gateway vendors will release patches for this issue.
 - Firmware version of The Things Kickstarter Gateway are written to the gateway attributes upon receiving a valid status message.
 - Desired mac settings to end device general settings in the Console.
+- Experimental support for Azure Blob Storage. Only authentication via Managed Identity is supported.
 
 ### Changed
 

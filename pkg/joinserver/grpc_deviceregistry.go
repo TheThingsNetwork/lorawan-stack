@@ -56,7 +56,7 @@ type jsEndDeviceRegistryServer struct {
 
 // Get implements ttnpb.JsEndDeviceRegistryServer.
 func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
+	if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
 	gets := req.FieldMask.GetPaths()
@@ -64,7 +64,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 		"root_keys.app_key.key",
 		"root_keys.nwk_key.key",
 	) {
-		if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
+		if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 			return nil, err
 		}
 		gets = ttnpb.AddFields(gets,
@@ -89,14 +89,14 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 		}
 	}
 	logger := log.FromContext(ctx)
-	dev, err := srv.JS.devices.GetByID(ctx, *req.ApplicationIds, req.DeviceId, gets)
+	dev, err := srv.JS.devices.GetByID(ctx, *req.EndDeviceIds.ApplicationIds, req.EndDeviceIds.DeviceId, gets)
 	if errors.IsNotFound(err) {
 		return nil, errDeviceNotFound.New()
 	}
 	if err != nil {
 		return nil, err
 	}
-	if !dev.ApplicationIds.Equal(req.ApplicationIds) {
+	if !dev.ApplicationIds.Equal(req.EndDeviceIds.ApplicationIds) {
 		return nil, errDeviceNotFound.New()
 	}
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(),

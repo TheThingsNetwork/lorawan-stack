@@ -165,6 +165,8 @@ rules:
   jsdoc/require-hyphen-before-param-description: warn
   jsdoc/check-indentation: warn
   jsdoc/require-description-complete-sentence: warn
+  jsdoc/multiline-blocks: off
+  jsdoc/tag-lines: off
 
   prefer-arrow/prefer-arrow-functions:
     - warn

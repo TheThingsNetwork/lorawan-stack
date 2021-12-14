@@ -17,14 +17,16 @@ package console
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"net/url"
 
-	echo "github.com/labstack/echo/v4"
+	"github.com/gorilla/csrf"
+	"github.com/gorilla/mux"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
-	web_errors "go.thethings.network/lorawan-stack/v3/pkg/errors/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
-	"go.thethings.network/lorawan-stack/v3/pkg/web/middleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/web/oauthclient"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
+	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 )
 
@@ -128,44 +130,47 @@ func generateConsoleCSPString(config *Config, nonce string) string {
 
 // RegisterRoutes implements web.Registerer. It registers the Console to the web server.
 func (console *Console) RegisterRoutes(server *web.Server) {
-	group := server.Group(
-		console.config.Mount,
-		func(next echo.HandlerFunc) echo.HandlerFunc {
-			return func(c echo.Context) error {
-				nonce := webui.GenerateNonce()
-				c.Set("csp_nonce", nonce)
-				cspString := generateConsoleCSPString(console.configFromContext(c.Request().Context()), nonce)
-				c.Response().Header().Set("Content-Security-Policy", cspString)
-				return next(c)
-			}
-		},
-		func(next echo.HandlerFunc) echo.HandlerFunc {
-			return func(c echo.Context) error {
-				config := console.configFromContext(c.Request().Context())
-				c.Set("template_data", config.UI.TemplateData)
+	router := server.PrefixWithRedirect(console.config.Mount).Subrouter()
+	router.Use(
+		mux.MiddlewareFunc(func(next http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				r, nonce := webui.WithNonce(r)
+				cspString := generateConsoleCSPString(console.configFromContext(r.Context()), nonce)
+				w.Header().Set("Content-Security-Policy", cspString)
+				next.ServeHTTP(w, r)
+			})
+		}),
+		mux.MiddlewareFunc(func(next http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				config := console.configFromContext(r.Context())
+				r = webui.WithTemplateData(r, config.UI.TemplateData)
 				frontendConfig := config.UI.FrontendConfig
 				frontendConfig.Language = config.UI.TemplateData.Language
-				c.Set("app_config", struct {
+				r = webui.WithAppConfig(r, struct {
 					FrontendConfig
 				}{
 					FrontendConfig: frontendConfig,
 				})
-				return next(c)
-			}
-		},
-		web_errors.ErrorMiddleware(map[string]web_errors.ErrorRenderer{
+				next.ServeHTTP(w, r)
+			})
+		}),
+		webhandlers.WithErrorHandlers(map[string]http.Handler{
 			"text/html": webui.Template,
 		}),
-		middleware.CSRF("_console_csrf", console.config.Mount, console.GetBaseConfig(console.Context()).HTTP.Cookie.HashKey),
+		mux.MiddlewareFunc(
+			webmiddleware.CSRF(
+				console.GetBaseConfig(console.Context()).HTTP.Cookie.HashKey,
+				csrf.CookieName("_console_csrf"),
+				csrf.FieldName("_console_csrf"),
+				csrf.Path(console.config.Mount),
+			),
+		),
 	)
+	api := router.NewRoute().PathPrefix("/api/auth/").Subrouter()
+	api.Path("/token").HandlerFunc(console.oc.HandleToken).Methods(http.MethodGet)
+	api.Path("/logout").HandlerFunc(console.oc.HandleLogout).Methods(http.MethodPost)
 
-	api := group.Group("/api/auth")
-	api.GET("/token", console.oc.HandleToken)
-	api.POST("/logout", console.oc.HandleLogout)
-
-	group.GET("/oauth/callback", console.oc.HandleCallback)
-
-	group.GET("/login/ttn-stack", console.oc.HandleLogin)
-
-	group.GET("/*", webui.Template.Handler)
+	router.Path("/login/ttn-stack").HandlerFunc(console.oc.HandleLogin).Methods(http.MethodGet)
+	router.Path("/oauth/callback").HandlerFunc(console.oc.HandleCallback).Methods(http.MethodGet)
+	router.NewRoute().Handler(webui.Template)
 }

@@ -56,6 +56,7 @@ type Config struct {
 
 	UpdateGatewayLocationDebounceTime time.Duration `name:"update-gateway-location-debounce-time" description:"Debounce time for gateway location updates from status messages"`
 	UpdateConnectionStatsDebounceTime time.Duration `name:"update-connection-stats-debounce-time" description:"Time before repeated refresh of the gateway connection stats"`
+	ConnectionStatsDisconnectTTL      time.Duration `name:"connection-stats-disconnect-ttl" description:"Time to live of the gateway connection stats after disconnecting"`
 
 	UpdateVersionInfoDelay time.Duration `name:"update-version-info-delay" description:"Maximum time to wait to update version information. A Jitter of 25% is applied for randomization"`
 

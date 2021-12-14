@@ -22,14 +22,14 @@ class ContactInfo {
     autoBind(this)
   }
 
-  async validate() {
-    const result = await this._api.Validate()
+  async validate(token, id) {
+    const result = await this._api.Validate(undefined, token, id)
 
     return Marshaler.payloadSingleResponse(result)
   }
 
-  async requestValidation() {
-    const result = await this._api.RequestValidation()
+  async requestValidation(ids) {
+    const result = await this._api.RequestValidation(undefined, ids)
 
     return Marshaler.payloadSingleResponse(result)
   }

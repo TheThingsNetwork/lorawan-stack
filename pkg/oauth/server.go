@@ -20,17 +20,18 @@ import (
 	"strings"
 	"time"
 
-	echo "github.com/labstack/echo/v4"
+	"github.com/gorilla/csrf"
+	"github.com/gorilla/mux"
 	"github.com/openshift/osin"
 	"go.thethings.network/lorawan-stack/v3/pkg/account/session"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	web_errors "go.thethings.network/lorawan-stack/v3/pkg/errors/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
-	"go.thethings.network/lorawan-stack/v3/pkg/web/middleware"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
+	"go.thethings.network/lorawan-stack/v3/pkg/webmiddleware"
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 )
 
@@ -38,8 +39,8 @@ import (
 type Server interface {
 	web.Registerer
 
-	Authorize(authorizePage echo.HandlerFunc) echo.HandlerFunc
-	Token(c echo.Context) error
+	Authorize(authorizePage http.Handler) http.HandlerFunc
+	Token(w http.ResponseWriter, r *http.Request)
 }
 
 type server struct {
@@ -170,8 +171,8 @@ var (
 	errInvalidRedirectURI      = errors.DefinePermissionDenied("invalid_redirect_uri", "invalid redirect URI")
 )
 
-func (s *server) output(c echo.Context, resp *osin.Response) error {
-	headers := c.Response().Header()
+func (s *server) output(w http.ResponseWriter, r *http.Request, resp *osin.Response) {
+	headers := w.Header()
 	for i, k := range resp.Headers {
 		for _, v := range k {
 			headers.Add(i, v)
@@ -209,74 +210,81 @@ func (s *server) output(c echo.Context, resp *osin.Response) error {
 				osinErr = osinErr.(*errors.Definition).WithCause(resp.InternalError)
 			}
 		}
-		log.FromContext(c.Request().Context()).WithError(osinErr).Warn("OAuth error")
+		log.FromContext(r.Context()).WithError(osinErr).Warn("OAuth error")
 	}
 
 	if resp.Type == osin.REDIRECT {
 		location, err := resp.GetRedirectUrl()
 		if err != nil {
-			return err
+			webhandlers.Error(w, r, err)
+			return
 		}
 		uiMount := strings.TrimSuffix(s.config.UI.MountPath(), "/")
 		if strings.HasPrefix(location, "/code") || strings.HasPrefix(location, "/local-callback") {
 			location = uiMount + location
 		}
-		return c.Redirect(http.StatusFound, location)
+		http.Redirect(w, r, location, http.StatusFound)
+		return
 	}
 
 	if osinErr != nil {
-		return osinErr
+		webhandlers.Error(w, r, osinErr)
+		return
 	}
 
-	return c.JSON(resp.StatusCode, resp.Output)
+	webhandlers.JSON(w, r, resp.Output)
 }
 
 func (s *server) RegisterRoutes(server *web.Server) {
-	root := server.Group(
-		s.config.Mount,
-		func(next echo.HandlerFunc) echo.HandlerFunc {
-			return func(c echo.Context) error {
-				config := s.configFromContext(c.Request().Context())
-				nonce := webui.GenerateNonce()
-				c.Set("csp_nonce", nonce)
-				cspString := s.generateCSP(config, nonce)
-				c.Response().Header().Set("Content-Security-Policy", cspString)
-				return next(c)
-			}
+	router := server.PrefixWithRedirect(s.config.Mount).Subrouter()
+	router.Use(
+		func(next http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				r, nonce := webui.WithNonce(r)
+				cspString := s.generateCSP(s.configFromContext(r.Context()), nonce)
+				w.Header().Set("Content-Security-Policy", cspString)
+				next.ServeHTTP(w, r)
+			})
 		},
-		ratelimit.EchoMiddleware(s.c.RateLimiter(), "http:oauth"),
-		func(next echo.HandlerFunc) echo.HandlerFunc {
-			return func(c echo.Context) error {
-				config := s.configFromContext(c.Request().Context())
-				c.Set("template_data", config.UI.TemplateData)
+		ratelimit.HTTPMiddleware(s.c.RateLimiter(), "http:oauth"),
+		func(next http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				config := s.configFromContext(r.Context())
+				r = webui.WithTemplateData(r, config.UI.TemplateData)
 				frontendConfig := config.UI.FrontendConfig
 				frontendConfig.Language = config.UI.TemplateData.Language
-				c.Set("app_config", struct {
+				r = webui.WithAppConfig(r, struct {
 					FrontendConfig
 				}{
 					FrontendConfig: frontendConfig,
 				})
-				return next(c)
-			}
+				next.ServeHTTP(w, r)
+			})
 		},
-		web_errors.ErrorMiddleware(map[string]web_errors.ErrorRenderer{
+		webhandlers.WithErrorHandlers(map[string]http.Handler{
 			"text/html": webui.Template,
 		}),
 	)
 
-	csrfMiddleware := middleware.CSRF("_csrf", "/", s.config.CSRFAuthKey)
+	csrfMiddleware := webmiddleware.CSRF(
+		s.config.CSRFAuthKey,
+		csrf.CookieName("_csrf"),
+		csrf.FieldName("_csrf"),
+		csrf.Path("/"),
+	)
 
-	page := root.Group("", csrfMiddleware)
+	page := router.NewRoute().Subrouter()
+	page.Use(mux.MiddlewareFunc(csrfMiddleware))
 
 	// The logout route is currently in use by existing OAuth clients. As part of
 	// the public API it should not be removed in this major.
-	page.GET("/logout", s.ClientLogout)
+	page.Path("/logout").HandlerFunc(s.ClientLogout).Methods(http.MethodGet)
 
-	page.GET("/authorize", s.Authorize(webui.Template.Handler), s.redirectToLogin)
-	page.POST("/authorize", s.Authorize(webui.Template.Handler), s.redirectToLogin)
+	authorizeHandler := s.redirectToLogin(s.Authorize(webui.Template))
+	page.Path("/authorize").Handler(authorizeHandler).Methods(http.MethodGet, http.MethodPost)
 
-	root.GET("/local-callback", s.redirectToLocal)
+	router.Path("/local-callback").HandlerFunc(s.redirectToLocal).Methods(http.MethodGet)
 
 	// No CSRF here:
-	root.POST("/token", s.Token)
+	router.Path("/token").HandlerFunc(s.Token).Methods(http.MethodPost)
 }

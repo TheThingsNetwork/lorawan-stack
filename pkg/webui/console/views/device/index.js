@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Switch, Route } from 'react-router'
+import { Switch, Route } from 'react-router-dom'
 import { Col, Row, Container } from 'react-grid-system'
 
 import CONNECTION_STATUS from '@console/constants/connection-status'

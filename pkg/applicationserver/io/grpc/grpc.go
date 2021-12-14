@@ -38,16 +38,8 @@ type optionFunc func(*impl)
 
 func (f optionFunc) apply(i *impl) { f(i) }
 
-// EndDeviceFetcher retrieves end device information from identifiers.
-type EndDeviceFetcher interface {
-	Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error)
-}
-
-type defaultFetcher struct{}
-
-func (f *defaultFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
-	return &ttnpb.EndDevice{EndDeviceIdentifiers: ids}, nil
-}
+// GetEndDeviceIdentifiersFunc retrieves the end device identifiers including the EUIs and DevAddr.
+type GetEndDeviceIdentifiersFunc func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDeviceIdentifiers, error)
 
 type defaultMessageProcessor struct{}
 
@@ -66,13 +58,9 @@ func (p *defaultMessageProcessor) DecodeDownlink(ctx context.Context, ids ttnpb.
 // SkipPayloadCryptoFunc is a function that checks if the end device should skip payload crypto operations.
 type SkipPayloadCryptoFunc func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (bool, error)
 
-func defaultSkipPayloadCrypto(context.Context, ttnpb.EndDeviceIdentifiers) (bool, error) {
-	return false, nil
-}
-
 type impl struct {
 	server             io.Server
-	fetcher            EndDeviceFetcher
+	getIdentifiers     GetEndDeviceIdentifiersFunc
 	mqttConfigProvider config.MQTTConfigProvider
 	processor          messageprocessors.PayloadProcessor
 	skipPayloadCrypto  SkipPayloadCryptoFunc
@@ -85,10 +73,10 @@ func WithMQTTConfigProvider(provider config.MQTTConfigProvider) Option {
 	})
 }
 
-// WithEndDeviceFetcher sets the EndDeviceFetcher that will be used by the gRPC frontend.
-func WithEndDeviceFetcher(f EndDeviceFetcher) Option {
+// WithGetEndDeviceIdentifiers sets the end device identifiers retriever that will be used by the gRPC frontend.
+func WithGetEndDeviceIdentifiers(f GetEndDeviceIdentifiersFunc) Option {
 	return optionFunc(func(i *impl) {
-		i.fetcher = f
+		i.getIdentifiers = f
 	})
 }
 
@@ -108,7 +96,16 @@ func WithSkipPayloadCrypto(f SkipPayloadCryptoFunc) Option {
 
 // New returns a new gRPC frontend.
 func New(server io.Server, opts ...Option) ttnpb.AppAsServer {
-	i := &impl{server: server, fetcher: &defaultFetcher{}, processor: &defaultMessageProcessor{}, skipPayloadCrypto: defaultSkipPayloadCrypto}
+	i := &impl{
+		server: server,
+		getIdentifiers: func(_ context.Context, ids ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDeviceIdentifiers, error) {
+			return &ids, nil
+		},
+		processor: &defaultMessageProcessor{},
+		skipPayloadCrypto: func(_ context.Context, _ ttnpb.EndDeviceIdentifiers) (bool, error) {
+			return false, nil
+		},
+	}
 	for _, opt := range opts {
 		opt.apply(i)
 	}
@@ -220,11 +217,11 @@ func (s *impl) SimulateUplink(ctx context.Context, up *ttnpb.ApplicationUp) (*pb
 		return nil, errPayloadCryptoSkipped.New()
 	}
 	up.Simulated = true
-	dev, err := s.fetcher.Get(ctx, *up.EndDeviceIds, "ids")
+	ids, err := s.getIdentifiers(ctx, *up.EndDeviceIds)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Debug("Failed to fetch end device identifiers")
 	} else {
-		up.EndDeviceIds = &dev.EndDeviceIdentifiers
+		up.EndDeviceIds = ids
 	}
 	if err := s.server.Publish(ctx, up); err != nil {
 		return nil, err

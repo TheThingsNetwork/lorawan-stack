@@ -19,8 +19,9 @@ import (
 	stderrors "errors"
 	"net/http"
 
-	echo "github.com/labstack/echo/v4"
+	"github.com/gorilla/schema"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 	"golang.org/x/oauth2"
 )
 
@@ -34,10 +35,10 @@ var (
 )
 
 type oauthAuthorizeResponse struct {
-	Error            string `form:"error" query:"error"`
-	ErrorDescription string `form:"error_description" query:"error_description"`
-	State            string `form:"state" query:"state"`
-	Code             string `form:"code" query:"code"`
+	Error            string `schema:"error"`
+	ErrorDescription string `schema:"error_description"`
+	State            string `schema:"state"`
+	Code             string `schema:"code"`
 }
 
 func (res *oauthAuthorizeResponse) ValidateContext(c context.Context) error {
@@ -53,45 +54,59 @@ func (res *oauthAuthorizeResponse) ValidateContext(c context.Context) error {
 	return nil
 }
 
+var errParse = errors.DefineAborted("parse", "request body parsing")
+
 // HandleCallback is a handler that takes the auth code and exchanges it for the
 // access token.
-func (oc *OAuthClient) HandleCallback(c echo.Context) error {
+func (oc *OAuthClient) HandleCallback(w http.ResponseWriter, r *http.Request) {
 	var response oauthAuthorizeResponse
-	if err := c.Bind(&response); err != nil {
-		return err
+	if err := r.ParseForm(); err != nil {
+		webhandlers.Error(w, r, errParse.WithCause(err))
+		return
 	}
-	if err := response.ValidateContext(c.Request().Context()); err != nil {
-		return err
+	if err := schema.NewDecoder().Decode(&response, r.Form); err != nil {
+		webhandlers.Error(w, r, errParse.WithCause(err))
+		return
+	}
+	if err := response.ValidateContext(r.Context()); err != nil {
+		webhandlers.Error(w, r, err)
+		return
 	}
 
-	stateCookie, err := oc.getStateCookie(c)
-	value, acErr := oc.getAuthCookie(c)
+	stateCookie, err := oc.getStateCookie(w, r)
+	value, acErr := oc.getAuthCookie(w, r)
 	if err != nil {
 		// Running the callback without state cookie often occurs when re-running
 		// the callback after successful token exchange (e.g. using the browser's
 		// back button after logging in). If there is a valid auth cookie, we just
 		// redirect back to the client mount instead of showing an error.
 		if acErr != nil {
-			return errNoStateCookie.New()
+			webhandlers.Error(w, r, errNoStateCookie.WithCause(acErr))
+			return
 		}
 		if value.AccessToken != "" {
-			config := oc.configFromContext(c.Request().Context())
-			return c.Redirect(http.StatusFound, config.RootURL)
+			config := oc.configFromContext(r.Context())
+			http.Redirect(w, r, config.RootURL, http.StatusFound)
+			return
 		}
-		return err
+		webhandlers.Error(w, r, err)
+		return
 	}
 	if stateCookie.Secret != response.State {
-		return errInvalidState.New()
+		webhandlers.Error(w, r, errInvalidState.New())
+		return
 	}
 
 	// Exchange token.
-	ctx, err := oc.withHTTPClient(c.Request().Context())
+	ctx, err := oc.withHTTPClient(r.Context())
 	if err != nil {
-		return err
+		webhandlers.Error(w, r, err)
+		return
 	}
-	conf, err := oc.oauth(c)
+	conf, err := oc.oauth(w, r)
 	if err != nil {
-		return err
+		webhandlers.Error(w, r, err)
+		return
 	}
 	token, err := conf.Exchange(ctx, response.Code)
 	if err != nil {
@@ -99,31 +114,38 @@ func (oc *OAuthClient) HandleCallback(c echo.Context) error {
 		if stderrors.As(err, &retrieveError) {
 			var ttnErr errors.Error
 			if decErr := ttnErr.UnmarshalJSON(retrieveError.Body); decErr == nil {
-				return errExchange.WithCause(&ttnErr)
+				webhandlers.Error(w, r, errExchange.WithCause(&ttnErr))
+				return
 			}
 		}
-		return errExchange.WithCause(err)
+		webhandlers.Error(w, r, errExchange.WithCause(err))
+		return
 	}
 
-	oc.removeStateCookie(c)
+	oc.removeStateCookie(w, r)
 
-	err = oc.setAuthCookie(c, authCookie{
+	err = oc.setAuthCookie(w, r, authCookie{
 		AccessToken:  token.AccessToken,
 		RefreshToken: token.RefreshToken,
 		Expiry:       token.Expiry,
 	})
 	if err != nil {
-		return err
+		webhandlers.Error(w, r, err)
+		return
 	}
 
-	return oc.callback(c, token, stateCookie.Next)
+	if err := oc.callback(w, r, token, stateCookie.Next); err != nil {
+		webhandlers.Error(w, r, errExchange.WithCause(err))
+		return
+	}
 }
 
-func (oc *OAuthClient) defaultCallback(c echo.Context, _ *oauth2.Token, next string) error {
-	config := oc.configFromContext(c.Request().Context())
-	return c.Redirect(http.StatusFound, config.RootURL+next)
+func (oc *OAuthClient) defaultCallback(w http.ResponseWriter, r *http.Request, _ *oauth2.Token, next string) error {
+	config := oc.configFromContext(r.Context())
+	http.Redirect(w, r, config.RootURL+next, http.StatusFound)
+	return nil
 }
 
-func (oc *OAuthClient) defaultAuthCodeURLOptions(echo.Context) ([]oauth2.AuthCodeOption, error) {
+func (oc *OAuthClient) defaultAuthCodeURLOptions(w http.ResponseWriter, r *http.Request) ([]oauth2.AuthCodeOption, error) {
 	return nil, nil
 }

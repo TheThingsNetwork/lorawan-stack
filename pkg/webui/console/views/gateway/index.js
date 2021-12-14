@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { Switch, Route } from 'react-router'
+import { Switch, Route } from 'react-router-dom'
 import { connect } from 'react-redux'
 
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'

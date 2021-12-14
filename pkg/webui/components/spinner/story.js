@@ -13,15 +13,27 @@
 // limitations under the License.
 
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 
 import Spinner from '.'
 
-storiesOf('Spinner', module)
-  .add('Default', () => <Spinner />)
-  .add('With children', () => <Spinner>This is a message</Spinner>)
-  .add('With inline children', () => <Spinner inline>This is a message</Spinner>)
-  .add('Centered', () => <Spinner center>This is a message</Spinner>)
-  .add('Faded', () => <Spinner faded />)
-  .add('Small', () => <Spinner small />)
-  .add('Micro', () => <Spinner micro />)
+export default {
+  title: 'Spinner',
+}
+
+export const Default = () => <Spinner />
+export const WithChildren = () => <Spinner>This is a message</Spinner>
+
+WithChildren.story = {
+  name: 'With children',
+}
+
+export const WithInlineChildren = () => <Spinner inline>This is a message</Spinner>
+
+WithInlineChildren.story = {
+  name: 'With inline children',
+}
+
+export const Centered = () => <Spinner center>This is a message</Spinner>
+export const Faded = () => <Spinner faded />
+export const Small = () => <Spinner small />
+export const Micro = () => <Spinner micro />

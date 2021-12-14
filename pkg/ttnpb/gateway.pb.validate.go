@@ -2923,6 +2923,18 @@ func (m *GatewayConnectionStats) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "disconnected_at":
+
+			if v, ok := interface{}(m.GetDisconnectedAt()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return GatewayConnectionStatsValidationError{
+						field:  "disconnected_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "protocol":
 			// no validation rules for Protocol
 		case "last_status_received_at":

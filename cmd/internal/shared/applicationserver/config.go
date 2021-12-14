@@ -50,20 +50,19 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 		UnhealthyRetryInterval:     24 * time.Hour,
 		Downlinks:                  web.DownlinksConfig{PublicAddress: shared.DefaultPublicURL + "/api/v3"},
 	},
-	EndDeviceFetcher: applicationserver.EndDeviceFetcherConfig{
-		Timeout: 5 * time.Second,
-		Cache: applicationserver.EndDeviceFetcherCacheConfig{
-			Enable: true,
-			TTL:    5 * time.Minute,
-		},
-		CircuitBreaker: applicationserver.EndDeviceFetcherCircuitBreakerConfig{
-			Enable:    true,
-			Threshold: 10,
-			Timeout:   15 * time.Minute,
-		},
-	},
 	UplinkStorage: applicationserver.UplinkStorageConfig{
 		Limit: 16,
+	},
+	EndDeviceMetadataStorage: applicationserver.EndDeviceMetadataStorageConfig{
+		Location: applicationserver.EndDeviceLocationStorageConfig{
+			Timeout: 5 * time.Second,
+			Cache: applicationserver.EndDeviceLocationStorageCacheConfig{
+				Enable:             true,
+				MinRefreshInterval: 15 * time.Minute,
+				MaxRefreshInterval: 4 * time.Hour,
+				TTL:                14 * 24 * time.Hour,
+			},
+		},
 	},
 	Distribution: applicationserver.DistributionConfig{
 		Timeout: time.Minute,

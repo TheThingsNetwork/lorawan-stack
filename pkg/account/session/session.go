@@ -16,11 +16,11 @@ package session
 
 import (
 	"context"
+	"net/http"
 	"runtime/trace"
 	"time"
 
 	"github.com/gogo/protobuf/types"
-	echo "github.com/labstack/echo/v4"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -55,8 +55,8 @@ func (s *Session) authCookie() *cookie.Cookie {
 
 var errAuthCookie = errors.DefineUnauthenticated("auth_cookie", "could not get auth cookie")
 
-func (s *Session) getAuthCookie(c echo.Context) (cookie auth.CookieShape, err error) {
-	ok, err := s.authCookie().Get(c.Response(), c.Request(), &cookie)
+func (s *Session) getAuthCookie(w http.ResponseWriter, r *http.Request) (cookie auth.CookieShape, err error) {
+	ok, err := s.authCookie().Get(w, r, &cookie)
 	if err != nil {
 		return cookie, err
 	}
@@ -67,78 +67,80 @@ func (s *Session) getAuthCookie(c echo.Context) (cookie auth.CookieShape, err er
 }
 
 // UpdateAuthCookie updates the current authentication cookie.
-func (s *Session) UpdateAuthCookie(c echo.Context, update func(value *auth.CookieShape) error) error {
+func (s *Session) UpdateAuthCookie(w http.ResponseWriter, r *http.Request, update func(value *auth.CookieShape) error) error {
 	cookie := &auth.CookieShape{}
-	_, err := s.authCookie().Get(c.Response(), c.Request(), cookie)
+	_, err := s.authCookie().Get(w, r, cookie)
 	if err != nil {
 		return err
 	}
-	if err = update(cookie); err != nil {
+	if err := update(cookie); err != nil {
 		return err
 	}
-	return s.authCookie().Set(c.Response(), c.Request(), cookie)
+	return s.authCookie().Set(w, r, cookie)
 }
 
 // RemoveAuthCookie deletes the authentication cookie.
-func (s *Session) RemoveAuthCookie(c echo.Context) {
-	s.authCookie().Remove(c.Response(), c.Request())
+func (s *Session) RemoveAuthCookie(w http.ResponseWriter, r *http.Request) {
+	s.authCookie().Remove(w, r)
 }
 
-const userSessionKey = "user_session"
+type userSessionKeyType struct{}
+
+var userSessionKey userSessionKeyType
 
 var errSessionExpired = errors.DefineUnauthenticated("session_expired", "session expired")
 
 // Get retrieves the current session.
-func (s *Session) Get(c echo.Context) (*ttnpb.UserSession, error) {
-	existing := c.Get(userSessionKey)
-	if session, ok := existing.(*ttnpb.UserSession); ok {
-		return session, nil
+func (s *Session) Get(w http.ResponseWriter, r *http.Request) (*http.Request, *ttnpb.UserSession, error) {
+	ctx := r.Context()
+	if session, ok := ctx.Value(userSessionKey).(*ttnpb.UserSession); ok {
+		return r, session, nil
 	}
-	cookie, err := s.getAuthCookie(c)
+	cookie, err := s.getAuthCookie(w, r)
 	if err != nil {
-		return nil, err
+		return r, nil, err
 	}
 	session, err := s.Store.GetSession(
-		c.Request().Context(),
+		ctx,
 		&ttnpb.UserIdentifiers{UserId: cookie.UserID},
 		cookie.SessionID,
 	)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			s.RemoveAuthCookie(c)
+			s.RemoveAuthCookie(w, r)
 		}
-		return nil, err
+		return r, nil, err
 	}
 	if expiresAt := ttnpb.StdTime(session.ExpiresAt); expiresAt != nil && expiresAt.Before(time.Now()) {
-		s.RemoveAuthCookie(c)
-		return nil, errSessionExpired.New()
+		s.RemoveAuthCookie(w, r)
+		return r, nil, errSessionExpired.New()
 	}
-	c.Set(userSessionKey, session)
-	return session, nil
+	return r.WithContext(context.WithValue(ctx, userSessionKey, session)), session, nil
 }
 
-const userKey = "user"
+type userKeyType struct{}
+
+var userKey userKeyType
 
 // GetUser retrieves the user that is associated with the current session.
-func (s *Session) GetUser(c echo.Context) (*ttnpb.User, error) {
-	existing := c.Get(userKey)
-	if user, ok := existing.(*ttnpb.User); ok {
-		return user, nil
+func (s *Session) GetUser(w http.ResponseWriter, r *http.Request) (*http.Request, *ttnpb.User, error) {
+	if user, ok := r.Context().Value(userKey).(*ttnpb.User); ok {
+		return r, user, nil
 	}
-	session, err := s.Get(c)
+	r, session, err := s.Get(w, r)
 	if err != nil {
-		return nil, err
+		return r, nil, err
 	}
+	ctx := r.Context()
 	user, err := s.Store.GetUser(
-		c.Request().Context(),
+		ctx,
 		&ttnpb.UserIdentifiers{UserId: session.GetUserIds().GetUserId()},
 		nil,
 	)
 	if err != nil {
-		return nil, err
+		return r, nil, err
 	}
-	c.Set(userKey, user)
-	return user, nil
+	return r.WithContext(context.WithValue(ctx, userKey, user)), user, nil
 }
 
 // DoLogin performs the authentication using user id and password.

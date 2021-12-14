@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import { storiesOf } from '@storybook/react'
 
 import Icon from '@ttn-lw/components/icon'
 
@@ -28,7 +27,11 @@ const splitterStyles = {
   marginTop: '40px',
 }
 
-storiesOf('Tooltip', module).add('Text content', () => (
+export default {
+  title: 'Tooltip',
+}
+
+export const TextContent = () => (
   <div style={containerStyles}>
     <div style={splitterStyles} />
     <Tooltip content="Tooltip with top placement" placement="top">
@@ -79,4 +82,8 @@ storiesOf('Tooltip', module).add('Text content', () => (
       <Icon icon="info" />
     </Tooltip>
   </div>
-))
+)
+
+TextContent.story = {
+  name: 'Text content',
+}

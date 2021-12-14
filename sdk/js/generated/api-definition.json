@@ -1999,6 +1999,7 @@
         {
           "method": "post",
           "pattern": "/contact_info/validation",
+          "body": "*",
           "parameters": []
         }
       ]
@@ -2009,6 +2010,7 @@
         {
           "method": "patch",
           "pattern": "/contact_info/validation",
+          "body": "*",
           "parameters": []
         }
       ]

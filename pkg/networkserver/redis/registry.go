@@ -787,7 +787,7 @@ func removeAddrMapping(ctx context.Context, r redis.Cmdable, addrKey, uid string
 func MarshalDeviceCurrentSession(dev *ttnpb.EndDevice) ([]byte, error) {
 	return msgpack.Marshal(UplinkMatchSession{
 		LoRaWANVersion:    dev.GetMacState().GetLorawanVersion(),
-		FNwkSIntKey:       dev.GetSession().GetFNwkSIntKey(),
+		FNwkSIntKey:       dev.GetSession().GetKeys().GetFNwkSIntKey(),
 		LastFCnt:          dev.GetSession().GetLastFCntUp(),
 		ResetsFCnt:        dev.GetMacSettings().GetResetsFCnt(),
 		Supports32BitFCnt: dev.GetMacSettings().GetSupports_32BitFCnt(),
@@ -797,7 +797,7 @@ func MarshalDeviceCurrentSession(dev *ttnpb.EndDevice) ([]byte, error) {
 func MarshalDevicePendingSession(dev *ttnpb.EndDevice) ([]byte, error) {
 	return msgpack.Marshal(UplinkMatchSession{
 		LoRaWANVersion: dev.GetPendingMacState().GetLorawanVersion(),
-		FNwkSIntKey:    dev.GetPendingSession().GetFNwkSIntKey(),
+		FNwkSIntKey:    dev.GetPendingSession().GetKeys().GetFNwkSIntKey(),
 	})
 }
 
@@ -955,7 +955,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 					storedPendingMACState := stored.GetPendingMacState()
 					return false, false, storedPendingMACState == nil ||
 						updated.PendingMacState.LorawanVersion != storedPendingMACState.LorawanVersion ||
-						!updated.PendingSession.FNwkSIntKey.Equal(storedPendingSession.FNwkSIntKey)
+						!updated.PendingSession.Keys.FNwkSIntKey.Equal(storedPendingSession.Keys.FNwkSIntKey)
 				}()
 				if removeStored {
 					removeAddrMapping(ctx, p, PendingAddrKey(r.addrKey(storedPendingSession.DevAddr)), uid)
@@ -992,7 +992,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 					storedMACSettings := stored.GetMacSettings()
 					return false, false, storedMACState == nil ||
 						updated.MacState.LorawanVersion != storedMACState.LorawanVersion ||
-						!updated.Session.FNwkSIntKey.Equal(storedSession.FNwkSIntKey) ||
+						!updated.Session.Keys.FNwkSIntKey.Equal(storedSession.Keys.FNwkSIntKey) ||
 						!updated.MacSettings.GetResetsFCnt().Equal(storedMACSettings.GetResetsFCnt()) ||
 						!updated.MacSettings.GetSupports_32BitFCnt().Equal(storedMACSettings.GetSupports_32BitFCnt())
 				}()

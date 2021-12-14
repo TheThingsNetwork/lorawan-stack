@@ -18,7 +18,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/bluele/gcache"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/distribution"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
@@ -26,6 +25,7 @@ import (
 	loracloudgeolocationv3 "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/metadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -45,7 +45,6 @@ type InteropConfig struct {
 
 // EndDeviceFetcherConfig represents configuration for the end device fetcher in Application Server.
 type EndDeviceFetcherConfig struct {
-	Fetcher        EndDeviceFetcher                     `name:"-"`
 	Timeout        time.Duration                        `name:"timeout" description:"Timeout of the end device retrival operation"`
 	Cache          EndDeviceFetcherCacheConfig          `name:"cache" description:"Cache configuration options for the end device fetcher"`
 	CircuitBreaker EndDeviceFetcherCircuitBreakerConfig `name:"circuit-breaker" description:"Circuit breaker options for the end device fetcher"`
@@ -65,6 +64,27 @@ type EndDeviceFetcherCircuitBreakerConfig struct {
 	Threshold int           `name:"threshold" description:"Number of failed fetching attempts after which the circuit breaker opens"`
 }
 
+// EndDeviceMetadataStorageConfig represents the configuration of end device metadata operations.
+type EndDeviceMetadataStorageConfig struct {
+	Location EndDeviceLocationStorageConfig `name:"location"`
+}
+
+// EndDeviceLocationStorageConfig represents the configuration of end device locations storage.
+type EndDeviceLocationStorageConfig struct {
+	Registry metadata.EndDeviceLocationRegistry  `name:"-"`
+	Timeout  time.Duration                       `name:"timeout" description:"Timeout of the end device retrival operation"`
+	Cache    EndDeviceLocationStorageCacheConfig `name:"cache"`
+}
+
+// EndDeviceLocationStorageCacheConfig represents the configuration of end device location registry caching.
+type EndDeviceLocationStorageCacheConfig struct {
+	Cache              metadata.EndDeviceLocationCache `name:"-"`
+	Enable             bool                            `name:"enable" description:"Enable caching of end device locations"`
+	MinRefreshInterval time.Duration                   `name:"min-refresh-interval" description:"Minimum time interval between two asynchronous refreshes"`
+	MaxRefreshInterval time.Duration                   `name:"max-refresh-interval" description:"Maximum time interval between two asynchronous refreshes"`
+	TTL                time.Duration                   `name:"eviction-ttl" description:"Time to live of cached locations"`
+}
+
 // FormattersConfig represents the configuration for payload formatters.
 type FormattersConfig struct {
 	MaxParameterLength int `name:"max-parameter-length" description:"Maximum allowed size for length of formatter parameters (payload formatter scripts)"`
@@ -72,19 +92,20 @@ type FormattersConfig struct {
 
 // Config represents the ApplicationServer configuration.
 type Config struct {
-	LinkMode         string                    `name:"link-mode" description:"Deprecated - mode to link applications to their Network Server (all, explicit)"`
-	Devices          DeviceRegistry            `name:"-"`
-	Links            LinkRegistry              `name:"-"`
-	UplinkStorage    UplinkStorageConfig       `name:"uplink-storage" description:"Application uplinks storage configuration"`
-	Formatters       FormattersConfig          `name:"formatters" description:"Payload formatters configuration"`
-	Distribution     DistributionConfig        `name:"distribution" description:"Distribution configuration"`
-	EndDeviceFetcher EndDeviceFetcherConfig    `name:"fetcher" description:"End Device fetcher configuration"`
-	MQTT             config.MQTT               `name:"mqtt" description:"MQTT configuration"`
-	Webhooks         WebhooksConfig            `name:"webhooks" description:"Webhooks configuration"`
-	PubSub           PubSubConfig              `name:"pubsub" description:"Pub/sub messaging configuration"`
-	Packages         ApplicationPackagesConfig `name:"packages" description:"Application packages configuration"`
-	Interop          InteropConfig             `name:"interop" description:"Interop client configuration"`
-	DeviceKEKLabel   string                    `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
+	LinkMode                 string                         `name:"link-mode" description:"Deprecated - mode to link applications to their Network Server (all, explicit)"`
+	Devices                  DeviceRegistry                 `name:"-"`
+	Links                    LinkRegistry                   `name:"-"`
+	UplinkStorage            UplinkStorageConfig            `name:"uplink-storage" description:"Application uplinks storage configuration"`
+	Formatters               FormattersConfig               `name:"formatters" description:"Payload formatters configuration"`
+	Distribution             DistributionConfig             `name:"distribution" description:"Distribution configuration"`
+	EndDeviceFetcher         EndDeviceFetcherConfig         `name:"fetcher" description:"Deprecated - End Device fetcher configuration"`
+	EndDeviceMetadataStorage EndDeviceMetadataStorageConfig `name:"end-device-metadata-storage" description:"End device metadata storage configuration"`
+	MQTT                     config.MQTT                    `name:"mqtt" description:"MQTT configuration"`
+	Webhooks                 WebhooksConfig                 `name:"webhooks" description:"Webhooks configuration"`
+	PubSub                   PubSubConfig                   `name:"pubsub" description:"Pub/sub messaging configuration"`
+	Packages                 ApplicationPackagesConfig      `name:"packages" description:"Application packages configuration"`
+	Interop                  InteropConfig                  `name:"interop" description:"Interop client configuration"`
+	DeviceKEKLabel           string                         `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
 }
 
 func (c Config) toProto() *ttnpb.AsConfiguration {
@@ -266,36 +287,25 @@ func (c ApplicationPackagesConfig) NewApplicationPackages(ctx context.Context, s
 }
 
 var (
-	errInvalidTTL       = errors.DefineInvalidArgument("invalid_ttl", "invalid TTL `{ttl}`")
-	errInvalidThreshold = errors.DefineInvalidArgument("invalid_threshold", "invalid threshold `{threshold}`")
+	errInvalidTimeout = errors.DefineInvalidArgument("invalid_timeout", "invalid timeout `{timeout}`")
+	errInvalidTTL     = errors.DefineInvalidArgument("invalid_ttl", "invalid TTL `{ttl}`")
 )
 
-// NewFetcher creates an EndDeviceFetcher from config.
-func (c EndDeviceFetcherConfig) NewFetcher(comp *component.Component) (EndDeviceFetcher, error) {
-	fetcher := NewRegistryEndDeviceFetcher(comp)
-	if c.Timeout != 0 {
-		fetcher = NewTimeoutEndDeviceFetcher(fetcher, c.Timeout)
+// NewRegistry returns a new end device location registry based on the configuration.
+func (c EndDeviceLocationStorageConfig) NewRegistry(ctx context.Context, comp *component.Component) (metadata.EndDeviceLocationRegistry, error) {
+	if c.Timeout <= 0 {
+		return nil, errInvalidTimeout.WithAttributes("timeout", c.Timeout)
 	}
-	if c.CircuitBreaker.Enable {
-		if c.CircuitBreaker.Threshold <= 0 {
-			return nil, errInvalidThreshold.WithAttributes("threshold", c.CircuitBreaker.Threshold)
-		}
-		fetcher = NewCircuitBreakerEndDeviceFetcher(fetcher, uint64(c.CircuitBreaker.Threshold), c.CircuitBreaker.Timeout)
-	}
+	registry := metadata.NewClusterEndDeviceLocationRegistry(comp, c.Timeout)
+	registry = metadata.NewMetricsEndDeviceLocationRegistry(registry)
 	if c.Cache.Enable {
-		if c.Cache.TTL <= 0 {
-			return nil, errInvalidTTL.WithAttributes("ttl", c.Cache.TTL)
+		for _, ttl := range []time.Duration{c.Cache.MinRefreshInterval, c.Cache.MaxRefreshInterval, c.Cache.TTL} {
+			if ttl <= 0 {
+				return nil, errInvalidTTL.WithAttributes("ttl", ttl)
+			}
 		}
-		var builder *gcache.CacheBuilder
-		if c.Cache.Size > 0 {
-			builder = gcache.New(c.Cache.Size).LFU()
-		} else {
-			builder = gcache.New(-1)
-		}
-		builder = builder.Expiration(c.Cache.TTL)
-		fetcher = NewCachedEndDeviceFetcher(fetcher, builder.Build())
+		cache := metadata.NewMetricsEndDeviceLocationCache(c.Cache.Cache)
+		registry = metadata.NewCachedEndDeviceLocationRegistry(ctx, comp, registry, cache, c.Cache.MinRefreshInterval, c.Cache.MaxRefreshInterval, c.Cache.TTL)
 	}
-	fetcher = NewSingleFlightEndDeviceFetcher(fetcher)
-
-	return fetcher, nil
+	return registry, nil
 }

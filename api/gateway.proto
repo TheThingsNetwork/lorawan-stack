@@ -365,6 +365,7 @@ message GatewayStatus {
 // Connection stats as monitored by the Gateway Server.
 message GatewayConnectionStats {
   google.protobuf.Timestamp connected_at = 1;
+  google.protobuf.Timestamp disconnected_at = 11;
   string protocol = 2; // Protocol used to connect (for example, udp, mqtt, grpc)
   google.protobuf.Timestamp last_status_received_at = 3;
   GatewayStatus last_status = 4;
@@ -391,4 +392,6 @@ message GatewayConnectionStats {
   }
   // Statistics for each sub band.
   repeated SubBand sub_bands = 10;
+
+  // next: 12
 }

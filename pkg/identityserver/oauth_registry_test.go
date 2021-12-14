@@ -35,8 +35,8 @@ func TestOAuthRegistry(t *testing.T) {
 		client := population.Clients[0]
 
 		_, err := oauthStore.Authorize(ctx, &ttnpb.OAuthClientAuthorization{
-			UserIds:   *user.GetIds(),
-			ClientIds: *client.GetIds(),
+			UserIds:   user.GetIds(),
+			ClientIds: client.GetIds(),
 			Rights:    client.Rights,
 		})
 		if err != nil {
@@ -44,8 +44,8 @@ func TestOAuthRegistry(t *testing.T) {
 		}
 
 		err = oauthStore.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
-			UserIds:       *user.GetIds(),
-			ClientIds:     *client.GetIds(),
+			UserIds:       user.GetIds(),
+			ClientIds:     client.GetIds(),
 			UserSessionId: "12345678-1234-5678-1234-567812345678",
 			Id:            "access_token_id",
 			Rights:        client.Rights,
@@ -68,8 +68,8 @@ func TestOAuthRegistry(t *testing.T) {
 		}
 
 		tokens, err := reg.ListTokens(ctx, &ttnpb.ListOAuthAccessTokensRequest{
-			UserIds:   *user.GetIds(),
-			ClientIds: *client.GetIds(),
+			UserIds:   user.GetIds(),
+			ClientIds: client.GetIds(),
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -79,16 +79,16 @@ func TestOAuthRegistry(t *testing.T) {
 		}
 
 		_, err = reg.DeleteToken(ctx, &ttnpb.OAuthAccessTokenIdentifiers{
-			UserIds:   *user.GetIds(),
-			ClientIds: *client.GetIds(),
+			UserIds:   user.GetIds(),
+			ClientIds: client.GetIds(),
 			Id:        "access_token_id",
 		}, creds)
 
 		a.So(err, should.BeNil)
 
 		tokens, err = reg.ListTokens(ctx, &ttnpb.ListOAuthAccessTokensRequest{
-			UserIds:   *user.GetIds(),
-			ClientIds: *client.GetIds(),
+			UserIds:   user.GetIds(),
+			ClientIds: client.GetIds(),
 		}, creds)
 
 		a.So(err, should.BeNil)
@@ -97,8 +97,8 @@ func TestOAuthRegistry(t *testing.T) {
 		}
 
 		_, err = reg.Delete(ctx, &ttnpb.OAuthClientAuthorizationIdentifiers{
-			UserIds:   *user.GetIds(),
-			ClientIds: *client.GetIds(),
+			UserIds:   user.GetIds(),
+			ClientIds: client.GetIds(),
 		}, creds)
 
 		a.So(err, should.BeNil)

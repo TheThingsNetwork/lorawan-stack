@@ -167,10 +167,10 @@ func (SessionOptionNamespace) WithDevAddr(v types.DevAddr) SessionOption {
 	}
 }
 
-// WithSessionKeys returns a SessionOption, which returns a copy of ttnpb.Session with SessionKeys set to v.
-func (SessionOptionNamespace) WithSessionKeys(v ttnpb.SessionKeys) SessionOption {
+// WithKeys returns a SessionOption, which returns a copy of ttnpb.Session with Keys set to v.
+func (SessionOptionNamespace) WithKeys(v *ttnpb.SessionKeys) SessionOption {
 	return func(x ttnpb.Session) ttnpb.Session {
-		x.SessionKeys = v
+		x.Keys = v
 		return x
 	}
 }
@@ -485,8 +485,8 @@ func (EndDeviceIdentifiersOptionNamespace) WithDeviceId(v string) EndDeviceIdent
 	}
 }
 
-// WithApplicationIdentifiers returns a EndDeviceIdentifiersOption, which returns a copy of ttnpb.EndDeviceIdentifiers with ApplicationIdentifiers set to v.
-func (EndDeviceIdentifiersOptionNamespace) WithApplicationIdentifiers(v *ttnpb.ApplicationIdentifiers) EndDeviceIdentifiersOption {
+// WithApplicationIds returns a EndDeviceIdentifiersOption, which returns a copy of ttnpb.EndDeviceIdentifiers with ApplicationIds set to v.
+func (EndDeviceIdentifiersOptionNamespace) WithApplicationIds(v *ttnpb.ApplicationIdentifiers) EndDeviceIdentifiersOption {
 	return func(x ttnpb.EndDeviceIdentifiers) ttnpb.EndDeviceIdentifiers {
 		x.ApplicationIds = v
 		return x

@@ -15,15 +15,15 @@
 package webui
 
 import (
-	"bytes"
+	"context"
 	"html/template"
-	"io"
 	"net/http"
 	"net/url"
 	"strings"
 
-	echo "github.com/labstack/echo/v4"
+	"github.com/gorilla/csrf"
 	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
+	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
 
 // Data contains data to render templates.
@@ -150,11 +150,40 @@ func RegisterHashedFile(original, hashed string) {
 	hashedFiles[original] = hashed
 }
 
-// Render is the echo.Renderer that renders the web UI.
-func (t *AppTemplate) Render(w io.Writer, _ string, pageData interface{}, c echo.Context) error {
-	templateData := c.Get("template_data").(TemplateData)
+type templateDataKeyType struct{}
+
+var templateDataKey templateDataKeyType
+
+// WithTemplateData constructs a *http.Request which has the provided TemplateData attached.
+func WithTemplateData(r *http.Request, data TemplateData) *http.Request {
+	return r.WithContext(context.WithValue(r.Context(), templateDataKey, data))
+}
+
+type appConfigKeyType struct{}
+
+var appConfigKey appConfigKeyType
+
+// WithAppConfig constructs a *http.Request which has the provided app config attached.
+func WithAppConfig(r *http.Request, cfg interface{}) *http.Request {
+	return r.WithContext(context.WithValue(r.Context(), appConfigKey, cfg))
+}
+
+type pageDataKeyType struct{}
+
+var pageDataKey pageDataKeyType
+
+// WithPageData constructs a *http.Request which has the provided page data attached.
+func WithPageData(r *http.Request, pageData interface{}) *http.Request {
+	return r.WithContext(context.WithValue(r.Context(), pageDataKey, pageData))
+}
+
+// ServeHTTP renders the web UI.
+func (t *AppTemplate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	templateData := ctx.Value(templateDataKey).(TemplateData)
+	templateData.CSRFToken = csrf.Token(r)
 	var cspNonce string
-	if v, ok := c.Get("csp_nonce").(string); ok {
+	if v, ok := ctx.Value(nonceKey).(string); ok {
 		cspNonce = v
 	}
 	cssFiles := make([]string, len(templateData.CSSFiles))
@@ -175,31 +204,20 @@ func (t *AppTemplate) Render(w io.Writer, _ string, pageData interface{}, c echo
 		}
 	}
 	templateData.JSFiles = jsFiles
-	return t.template.Execute(w, Data{
+	pageData := ctx.Value(pageDataKey)
+	if err := webhandlers.RetrieveError(r); err != nil {
+		pageData = map[string]interface{}{
+			"error": err,
+		}
+	}
+	if err := t.template.Execute(w, Data{
 		TemplateData:         templateData,
-		AppConfig:            c.Get("app_config"),
-		ExperimentalFeatures: experimental.AllFeatures(c.Request().Context()),
+		AppConfig:            ctx.Value(appConfigKey),
+		ExperimentalFeatures: experimental.AllFeatures(ctx),
 		PageData:             pageData,
 		CSPNonce:             cspNonce,
-	})
-}
-
-// Handler is the echo.HandlerFunc that renders the web UI.
-// The context is expected to contain TemplateData as "template_data".
-// The "app_config" and "page_data" will be rendered into the environment.
-func (t *AppTemplate) Handler(c echo.Context) error {
-	buf := new(bytes.Buffer)
-	if err := Template.Render(buf, "", c.Get("page_data"), c); err != nil {
-		return err
+	}); err != nil {
+		webhandlers.Error(w, r, err)
+		return
 	}
-	return c.HTMLBlob(http.StatusOK, buf.Bytes())
-}
-
-// RenderError implements web.ErrorRenderer.
-func (t *AppTemplate) RenderError(c echo.Context, statusCode int, err error) error {
-	buf := new(bytes.Buffer)
-	if err := Template.Render(buf, "", map[string]interface{}{"error": err}, c); err != nil {
-		return err
-	}
-	return c.HTMLBlob(statusCode, buf.Bytes())
 }

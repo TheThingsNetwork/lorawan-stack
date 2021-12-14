@@ -878,13 +878,20 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 	}
 
 	// Initial update, so that the gateway appears connected.
-	if err := gs.statsRegistry.Set(decoupledCtx, *ids, stats, ttnpb.GatewayConnectionStatsFieldPathsTopLevel); err != nil {
+	if err := gs.statsRegistry.Set(decoupledCtx, *ids, stats, ttnpb.GatewayConnectionStatsFieldPathsTopLevel, 0); err != nil {
 		logger.WithError(err).Warn("Failed to initialize connection stats")
 	}
 
 	defer func() {
 		logger.Debug("Delete connection stats")
-		if err := gs.statsRegistry.Set(decoupledCtx, *ids, nil, nil); err != nil {
+		stats.ConnectedAt = nil
+		stats.DisconnectedAt = ttnpb.ProtoTimePtr(time.Now())
+
+		if err := gs.statsRegistry.Set(
+			decoupledCtx, *ids, stats,
+			[]string{"connected_at", "disconnected_at"},
+			gs.config.ConnectionStatsDisconnectTTL,
+		); err != nil {
 			logger.WithError(err).Warn("Failed to clear connection stats")
 		}
 	}()
@@ -895,7 +902,7 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 		case <-conn.StatsChanged():
 		}
 		stats, paths := conn.Stats()
-		if err := gs.statsRegistry.Set(decoupledCtx, *ids, stats, paths); err != nil {
+		if err := gs.statsRegistry.Set(decoupledCtx, *ids, stats, paths, 0); err != nil {
 			logger.WithError(err).Warn("Failed to update connection stats")
 		}
 		timeout := time.After(gs.updateConnectionStatsDebounceTime)
