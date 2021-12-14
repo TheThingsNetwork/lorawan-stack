@@ -284,7 +284,7 @@ func TestCachedEndDeviceLocationRegistry(t *testing.T) {
 	}
 
 	// Wait for the entry to be evicted.
-	time.Sleep(16 * Timeout)
+	time.Sleep(20 * Timeout)
 
 	// There is no cached location anymore, and we have triggered an asynchronous refresh.
 	locations, err = registry.Get(ctx, registeredEndDeviceIDs)

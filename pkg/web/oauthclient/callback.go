@@ -19,7 +19,6 @@ import (
 	stderrors "errors"
 	"net/http"
 
-	"github.com/gorilla/schema"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 	"golang.org/x/oauth2"
@@ -64,7 +63,7 @@ func (oc *OAuthClient) HandleCallback(w http.ResponseWriter, r *http.Request) {
 		webhandlers.Error(w, r, errParse.WithCause(err))
 		return
 	}
-	if err := schema.NewDecoder().Decode(&response, r.Form); err != nil {
+	if err := oc.schemaDecoder.Decode(&response, r.Form); err != nil {
 		webhandlers.Error(w, r, errParse.WithCause(err))
 		return
 	}
