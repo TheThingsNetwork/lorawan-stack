@@ -64,7 +64,7 @@ const m = defineMessages({
   suspendedWebhookMessage:
     'This webhook has been deactivated due to several unsuccessful forwarding attempts. It will be automatically reactivated after 24 hours. If you wish to reactivate right away, you can use the button below.',
   pendingInfo:
-    'This webhook is currently pending until attempting its first regular request attempt. Note that webhooks can be deactivated if they encounter too many request failures.'
+    'This webhook is currently pending until attempting its first regular request attempt. Note that webhooks can be deactivated if they encounter too many request failures.',
 })
 
 const headerCheck = headers =>
