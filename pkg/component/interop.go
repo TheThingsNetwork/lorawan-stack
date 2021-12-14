@@ -46,7 +46,7 @@ func (c *Component) serveInterop(lis net.Listener) error {
 
 func (c *Component) interopEndpoints() []Endpoint {
 	return []Endpoint{
-		// TODO: Enable TCP endpoint (https://github.com/TheThingsNetwork/lorawan-stack/issues/717)
+		NewTCPEndpoint(c.config.Interop.Listen, "Interop"),
 		NewTLSEndpoint(c.config.Interop.ListenTLS, "Interop",
 			WithTLSClientAuth(tls.VerifyClientCertIfGiven, c.interop.ClientCAPool(), nil),
 			WithNextProtos("h2", "http/1.1"),
