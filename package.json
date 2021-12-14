@@ -132,10 +132,13 @@
     "yup": "^0.32.9"
   },
   "resolutions": {
-    "cypress": "7.7.0",
-    "ssri": "8.0.1",
-    "glob-parent": "5.1.2",
-    "react-router-dom/react-router": "5.2.1"
+    "cypress": "^7.7.0",
+    "ssri": "^8.0.1",
+    "glob-parent": "^5.1.2",
+    "react-router-dom/react-router": "^5.2.1",
+    "prismjs": "^1.25.0",
+    "trim": "^0.0.3",
+    "immer": "^9.0.6"
   },
   "babel": {
     "extends": "./config/babel.config.json"
