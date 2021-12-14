@@ -51,15 +51,12 @@ export const selectSelectedDeviceFormatters = state => selectSelectedDevice(stat
 export const selectDeviceFetching = createFetchingSelector(GET_DEV_BASE)
 export const selectDeviceError = createErrorSelector(GET_DEV_BASE)
 export const isOtherClusterDevice = (asHost, nsHost, jsHost, device) => {
-  const isThisCluster =
-    (!('application_server_address' in device) ||
-    asHost === device.application_server_address) ||
-    (!('network_server_address' in device) ||
-    nsHost === device.network_server_address) ||
-    (!('join_server_address' in device) ||
-    jsHost === device.join_server_address)
+  const isOtherCluster =
+    asHost !== device.application_server_address &&
+    nsHost !== device.network_server_address &&
+    jsHost !== device.join_server_address
 
-  return !isThisCluster
+  return isOtherCluster
 }
 
 // Derived.
