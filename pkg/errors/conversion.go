@@ -36,10 +36,8 @@ var (
 
 	errX509UnknownAuthority = DefineUnavailable("x509_unknown_authority", "unknown certificate authority")
 
-	standardErrors = map[error]*Definition{
-		context.Canceled:         DefineCanceled("context_canceled", "context canceled"),
-		context.DeadlineExceeded: DefineDeadlineExceeded("context_deadline_exceeded", "context deadline exceeded"),
-	}
+	errContextCancelled        = DefineCanceled("context_canceled", "context canceled")
+	errContextDeadlineExceeded = DefineDeadlineExceeded("context_deadline_exceeded", "context deadline exceeded")
 )
 
 // From returns an *Error if it can be derived from the given input.
@@ -54,8 +52,13 @@ func From(err error) (out *Error, ok bool) {
 			out = &copy
 		}
 	}()
-	if def, ok := standardErrors[err]; ok {
-		return build(def, 0), true
+	// Do not refactor this into a map, as value-type
+	// errors are not usable as indices in a map.
+	switch {
+	case err == context.Canceled:
+		return build(errContextCancelled, 0), true
+	case err == context.DeadlineExceeded:
+		return build(errContextDeadlineExceeded, 0), true
 	}
 	switch err := err.(type) {
 	case *Error:
