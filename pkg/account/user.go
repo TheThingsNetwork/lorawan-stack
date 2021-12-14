@@ -21,7 +21,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gorilla/schema"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -104,7 +103,7 @@ func (s *server) Login(w http.ResponseWriter, r *http.Request) {
 			webhandlers.Error(w, r, errParse.WithCause(err))
 			return
 		}
-		if err := schema.NewDecoder().Decode(&loginRequest, r.Form); err != nil {
+		if err := s.schemaDecoder.Decode(&loginRequest, r.Form); err != nil {
 			webhandlers.Error(w, r, errParse.WithCause(err))
 			return
 		}
@@ -152,7 +151,7 @@ func (s *server) TokenLogin(w http.ResponseWriter, r *http.Request) {
 			webhandlers.Error(w, r, errParse.WithCause(err))
 			return
 		}
-		if err := schema.NewDecoder().Decode(&tokenLoginRequest, r.Form); err != nil {
+		if err := s.schemaDecoder.Decode(&tokenLoginRequest, r.Form); err != nil {
 			webhandlers.Error(w, r, errParse.WithCause(err))
 			return
 		}

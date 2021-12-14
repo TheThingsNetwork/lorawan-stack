@@ -240,7 +240,7 @@ func (s *server) Token(w http.ResponseWriter, r *http.Request) {
 			webhandlers.Error(w, r, errParse.WithCause(err))
 			return
 		}
-		if err := schema.NewDecoder().Decode(&tokenRequest, r.Form); err != nil {
+		if err := s.schemaDecoder.Decode(&tokenRequest, r.Form); err != nil {
 			webhandlers.Error(w, r, errParse.WithCause(err))
 			return
 		}

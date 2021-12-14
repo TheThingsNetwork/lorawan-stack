@@ -20,6 +20,7 @@ import (
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/schema"
 	sess "go.thethings.network/lorawan-stack/v3/pkg/account/session"
 	account_store "go.thethings.network/lorawan-stack/v3/pkg/account/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -48,22 +49,25 @@ type Component interface {
 }
 
 type server struct {
-	c           Component
-	config      oauth.Config
-	store       account_store.Interface
-	session     sess.Session
-	generateCSP func(config *oauth.Config, nonce string) string
+	c             Component
+	config        oauth.Config
+	store         account_store.Interface
+	session       sess.Session
+	generateCSP   func(config *oauth.Config, nonce string) string
+	schemaDecoder *schema.Decoder
 }
 
 // NewServer returns a new account app on top of the given store.
 func NewServer(c *component.Component, store account_store.Interface, config oauth.Config, cspFunc func(config *oauth.Config, nonce string) string) (Server, error) {
 	s := &server{
-		c:           c,
-		config:      config,
-		store:       store,
-		session:     sess.Session{Store: store},
-		generateCSP: cspFunc,
+		c:             c,
+		config:        config,
+		store:         store,
+		session:       sess.Session{Store: store},
+		generateCSP:   cspFunc,
+		schemaDecoder: schema.NewDecoder(),
 	}
+	s.schemaDecoder.IgnoreUnknownKeys(true)
 
 	if s.config.Mount == "" {
 		s.config.Mount = s.config.UI.MountPath()

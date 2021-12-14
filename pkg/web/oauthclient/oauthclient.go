@@ -21,6 +21,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/gorilla/schema"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"golang.org/x/oauth2"
@@ -35,6 +36,7 @@ type OAuthClient struct {
 	nextKey         string
 	callback        Callback
 	authCodeURLOpts OAuth2AuthCodeURLOptionsProvider
+	schemaDecoder   *schema.Decoder
 }
 
 var errNoOAuthConfig = errors.DefineInvalidArgument("no_oauth_config", "no OAuth configuration found for the OAuth client")
@@ -66,10 +68,13 @@ func (oc *OAuthClient) withHTTPClient(ctx context.Context) (context.Context, err
 // New returns a new OAuth client instance.
 func New(c *component.Component, config Config, opts ...Option) (*OAuthClient, error) {
 	oc := &OAuthClient{
-		component: c,
-		config:    config,
-		nextKey:   "next",
+		component:     c,
+		config:        config,
+		nextKey:       "next",
+		schemaDecoder: schema.NewDecoder(),
 	}
+	oc.schemaDecoder.IgnoreUnknownKeys(true)
+
 	oc.callback = oc.defaultCallback
 	oc.oauth = oc.defaultOAuth
 	oc.authCodeURLOpts = oc.defaultAuthCodeURLOptions
