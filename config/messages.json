@@ -2492,6 +2492,15 @@
       "file": "io.go"
     }
   },
+  "error:pkg/applicationserver/metadata/redis:cache_miss": {
+    "translations": {
+      "en": "cache miss"
+    },
+    "description": {
+      "package": "pkg/applicationserver/metadata/redis",
+      "file": "location_cache.go"
+    }
+  },
   "error:pkg/applicationserver/redis:application_uid": {
     "translations": {
       "en": "invalid application UID `{application_uid}`"
@@ -2546,15 +2555,6 @@
       "file": "applicationserver.go"
     }
   },
-  "error:pkg/applicationserver:circuit_breaker_open": {
-    "translations": {
-      "en": "circuit breaker open"
-    },
-    "description": {
-      "package": "pkg/applicationserver",
-      "file": "device_fetcher.go"
-    }
-  },
   "error:pkg/applicationserver:device_not_found": {
     "translations": {
       "en": "device `{device_uid}` not found"
@@ -2591,9 +2591,9 @@
       "file": "grpc_deviceregistry.go"
     }
   },
-  "error:pkg/applicationserver:invalid_threshold": {
+  "error:pkg/applicationserver:invalid_timeout": {
     "translations": {
-      "en": "invalid threshold `{threshold}`"
+      "en": "invalid timeout `{timeout}`"
     },
     "description": {
       "package": "pkg/applicationserver",

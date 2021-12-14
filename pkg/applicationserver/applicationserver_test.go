@@ -41,6 +41,7 @@ import (
 	iopubsubredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
 	iowebredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/metadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -307,12 +308,14 @@ func TestApplicationServer(t *testing.T) {
 		PubSub: applicationserver.PubSubConfig{
 			Registry: pubsubRegistry,
 		},
-		EndDeviceFetcher: applicationserver.EndDeviceFetcherConfig{
-			Fetcher: &noopEndDeviceFetcher{},
-		},
 		Distribution: applicationserver.DistributionConfig{
 			Global: applicationserver.GlobalDistributorConfig{
 				PubSub: distribPubSub,
+			},
+		},
+		EndDeviceMetadataStorage: applicationserver.EndDeviceMetadataStorageConfig{
+			Location: applicationserver.EndDeviceLocationStorageConfig{
+				Registry: metadata.NewNoopEndDeviceLocationRegistry(),
 			},
 		},
 	}
@@ -2352,12 +2355,14 @@ func TestSkipPayloadCrypto(t *testing.T) {
 			Registry: applicationUpsRegistry,
 			Limit:    16,
 		},
-		EndDeviceFetcher: applicationserver.EndDeviceFetcherConfig{
-			Fetcher: &noopEndDeviceFetcher{},
-		},
 		Distribution: applicationserver.DistributionConfig{
 			Global: applicationserver.GlobalDistributorConfig{
 				PubSub: distribPubSub,
+			},
+		},
+		EndDeviceMetadataStorage: applicationserver.EndDeviceMetadataStorageConfig{
+			Location: applicationserver.EndDeviceLocationStorageConfig{
+				Registry: metadata.NewNoopEndDeviceLocationRegistry(),
 			},
 		},
 	}
@@ -2848,12 +2853,14 @@ func TestLocationFromPayload(t *testing.T) {
 			Registry: applicationUpsRegistry,
 			Limit:    16,
 		},
-		EndDeviceFetcher: applicationserver.EndDeviceFetcherConfig{
-			Fetcher: &noopEndDeviceFetcher{},
-		},
 		Distribution: applicationserver.DistributionConfig{
 			Global: applicationserver.GlobalDistributorConfig{
 				PubSub: distribPubSub,
+			},
+		},
+		EndDeviceMetadataStorage: applicationserver.EndDeviceMetadataStorageConfig{
+			Location: applicationserver.EndDeviceLocationStorageConfig{
+				Registry: metadata.NewClusterEndDeviceLocationRegistry(c, (1<<4)*Timeout),
 			},
 		},
 	}
@@ -2922,6 +2929,8 @@ func TestLocationFromPayload(t *testing.T) {
 	}
 
 	assertApplicationlocation(loc)
+
+	time.Sleep(Timeout)
 
 	dev, ok := is.endDeviceRegistry.get(ctx, registeredDevice.EndDeviceIdentifiers)
 	if !a.So(ok, should.BeTrue) {

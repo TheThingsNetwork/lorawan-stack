@@ -20,7 +20,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net"
-	"sync"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -34,6 +33,7 @@ import (
 	_ "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider/mqtt" // The MQTT integration provider
 	_ "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider/nats" // The NATS integration provider
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/metadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -51,6 +51,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 	"google.golang.org/grpc"
 )
 
@@ -66,6 +67,7 @@ type ApplicationServer struct {
 	linkRegistry     LinkRegistry
 	deviceRegistry   DeviceRegistry
 	appUpsRegistry   ApplicationUplinkRegistry
+	locationRegistry metadata.EndDeviceLocationRegistry
 	formatters       messageprocessors.MapPayloadProcessor
 	webhooks         web.Webhooks
 	webhookTemplates web.TemplateStore
@@ -83,9 +85,8 @@ type ApplicationServer struct {
 	interopClient InteropClient
 	interopID     string
 
-	endDeviceFetcher EndDeviceFetcher
-
-	activationTasks sync.Map
+	activationPool workerpool.WorkerPool
+	processingPool workerpool.WorkerPool
 }
 
 // Context returns the context of the Application Server.
@@ -123,12 +124,13 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 	}
 
 	as = &ApplicationServer{
-		Component:      c,
-		ctx:            ctx,
-		config:         conf,
-		linkRegistry:   conf.Links,
-		deviceRegistry: wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
-		appUpsRegistry: conf.UplinkStorage.Registry,
+		Component:        c,
+		ctx:              ctx,
+		config:           conf,
+		linkRegistry:     conf.Links,
+		deviceRegistry:   wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
+		appUpsRegistry:   conf.UplinkStorage.Registry,
+		locationRegistry: conf.EndDeviceMetadataStorage.Location.Registry,
 		formatters: messageprocessors.MapPayloadProcessor{
 			ttnpb.PayloadFormatter_FORMATTER_JAVASCRIPT: javascript.New(),
 			ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP: cayennelpp.New(),
@@ -147,15 +149,22 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 			conf.Distribution.Local.Broadcast.SubscriptionOptions(),
 			conf.Distribution.Local.Individual.SubscriptionOptions(),
 		),
-		interopClient:    interopCl,
-		interopID:        conf.Interop.ID,
-		endDeviceFetcher: conf.EndDeviceFetcher.Fetcher,
+		interopClient: interopCl,
+		interopID:     conf.Interop.ID,
 	}
+	as.activationPool = workerpool.NewWorkerPool(workerpool.Config{
+		Component: c,
+		Context:   ctx,
+		Name:      "save_activation_status",
+		Handler:   as.saveActivationStatus,
+	})
+	as.processingPool = workerpool.NewWorkerPool(workerpool.Config{
+		Component: c,
+		Context:   ctx,
+		Name:      "process_application_uplinks",
+		Handler:   as.processUpAsync,
+	})
 	as.formatters[ttnpb.PayloadFormatter_FORMATTER_REPOSITORY] = devicerepository.New(as.formatters, as)
-
-	if as.endDeviceFetcher == nil {
-		as.endDeviceFetcher = &NoopEndDeviceFetcher{}
-	}
 
 	as.grpc.asDevices = asEndDeviceRegistryServer{
 		AS:       as,
@@ -163,7 +172,13 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 	}
 	as.grpc.appAs = iogrpc.New(as,
 		iogrpc.WithMQTTConfigProvider(as),
-		iogrpc.WithEndDeviceFetcher(as.endDeviceFetcher),
+		iogrpc.WithGetEndDeviceIdentifiers(func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDeviceIdentifiers, error) {
+			dev, err := as.deviceRegistry.Get(ctx, ids, []string{"ids"})
+			if err != nil {
+				return nil, err
+			}
+			return &dev.EndDeviceIdentifiers, nil
+		}),
 		iogrpc.WithPayloadProcessor(as.formatters),
 		iogrpc.WithSkipPayloadCrypto(func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (bool, error) {
 			link, err := as.getLink(ctx, ids.ApplicationIds, []string{"skip_payload_crypto"})
@@ -306,14 +321,23 @@ func (as *ApplicationServer) Subscribe(ctx context.Context, protocol string, ids
 
 // Publish processes the given upstream message and then publishes it to the application frontends.
 func (as *ApplicationServer) Publish(ctx context.Context, up *ttnpb.ApplicationUp) error {
+	return as.processingPool.Publish(ctx, up)
+}
+
+func (as *ApplicationServer) processUpAsync(ctx context.Context, item interface{}) {
+	up := item.(*ttnpb.ApplicationUp)
 	link, err := as.getLink(ctx, up.EndDeviceIds.ApplicationIds, []string{
 		"default_formatters",
 		"skip_payload_crypto",
 	})
 	if err != nil {
-		return err
+		log.FromContext(ctx).WithError(err).Warn("Failed to retrieve application link")
+		return
 	}
-	return as.processUp(ctx, up, link)
+	if err := as.processUp(ctx, up, link); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to process application uplink")
+		return
+	}
 }
 
 func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) error {
@@ -897,56 +921,43 @@ func (as *ApplicationServer) storeUplink(ctx context.Context, ids ttnpb.EndDevic
 	return as.appUpsRegistry.Push(ctx, ids, cleanUplink)
 }
 
-// markEndDeviceAsActivated attempts to mark the end device as activated in the Entity Registry.
-// This method does not block - a task will be spawned that updates the device in the Entity Registry.
-// If the update fails, the task will not restart, and this function is expected to be called again
-// on a subsequent uplink from the end device.
+// saveActivationStatus attempts to mark the end device as activated in the Entity Registry.
 // If the update succeeds, the end device will be updated in the Application Server end device registry
 // in order to avoid subsequent calls.
-func (as *ApplicationServer) markEndDeviceAsActivated(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) {
-	ctx = as.FromRequestContext(ctx)
-	devUID := unique.ID(ctx, ids)
-	if _, exists := as.activationTasks.LoadOrStore(devUID, struct{}{}); exists {
+func (as *ApplicationServer) saveActivationStatus(ctx context.Context, item interface{}) {
+	cc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to get Entity Registry peer")
 		return
 	}
+	ids := item.(ttnpb.EndDeviceIdentifiers)
 	now := time.Now().UTC()
 	mask := []string{"activated_at"}
-	f := func(ctx context.Context) error {
-		defer as.activationTasks.Delete(devUID)
-		cc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
-		if err != nil {
-			return err
-		}
-		_, err = ttnpb.NewEndDeviceRegistryClient(cc).Update(ctx, &ttnpb.UpdateEndDeviceRequest{
-			EndDevice: ttnpb.EndDevice{
-				EndDeviceIdentifiers: ids,
-				ActivatedAt:          ttnpb.ProtoTimePtr(now),
-			},
-			FieldMask: &pbtypes.FieldMask{
-				Paths: mask,
-			},
-		}, as.WithClusterAuth())
-		if err != nil {
-			return err
-		}
-		_, err = as.deviceRegistry.Set(ctx, ids, mask,
-			func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-				if dev == nil {
-					return nil, nil, errDeviceNotFound.WithAttributes("device_uid", devUID)
-				}
-				dev.ActivatedAt = ttnpb.ProtoTimePtr(now)
-				return dev, mask, nil
-			},
-		)
-		return err
+	_, err = ttnpb.NewEndDeviceRegistryClient(cc).Update(ctx, &ttnpb.UpdateEndDeviceRequest{
+		EndDevice: ttnpb.EndDevice{
+			EndDeviceIdentifiers: ids,
+			ActivatedAt:          ttnpb.ProtoTimePtr(now),
+		},
+		FieldMask: &pbtypes.FieldMask{
+			Paths: mask,
+		},
+	}, as.WithClusterAuth())
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to set end device activation status in Entity Registry")
+		return
 	}
-	as.StartTask(&task.Config{
-		Context: ctx,
-		ID:      fmt.Sprintf("mark_%s_activated", devUID),
-		Func:    f,
-		Restart: task.RestartNever,
-		Backoff: task.DefaultBackoffConfig,
-	})
+	if _, err = as.deviceRegistry.Set(ctx, ids, mask,
+		func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			if dev == nil {
+				return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
+			}
+			dev.ActivatedAt = ttnpb.ProtoTimePtr(now)
+			return dev, mask, nil
+		},
+	); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to set end device activation status in local registry")
+		return
+	}
 }
 
 func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) error {
@@ -998,20 +1009,19 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 		uplink.VersionIds = dev.VersionIds
 	}
 
-	isDev, err := as.endDeviceFetcher.Get(ctx, ids, "locations")
-	if err != nil {
+	if locations, err := as.locationRegistry.Get(ctx, ids); err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to retrieve end device locations")
 	} else {
-		uplink.Locations = isDev.GetLocations()
+		uplink.Locations = locations
 	}
 
 	loc := as.locationFromDecodedPayload(uplink)
 	if loc != nil {
 		if uplink.Locations == nil {
-			uplink.Locations = make(map[string]*ttnpb.Location)
+			uplink.Locations = make(map[string]*ttnpb.Location, 1)
 		}
 		uplink.Locations["frm-payload"] = loc
-		err := as.processUp(ctx, &ttnpb.ApplicationUp{
+		if err := as.Publish(ctx, &ttnpb.ApplicationUp{
 			EndDeviceIds:   &ids,
 			CorrelationIds: events.CorrelationIDsFromContext(ctx),
 			ReceivedAt:     uplink.ReceivedAt,
@@ -1021,14 +1031,13 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids ttnpb.EndDevi
 					Location: loc,
 				},
 			},
-		}, link)
-		if err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Failed to process location solved message from location in payload")
+		}); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to publish location solved message from location in payload")
 		}
 	}
 
 	if dev.ActivatedAt == nil {
-		as.markEndDeviceAsActivated(ctx, ids)
+		as.activationPool.Publish(ctx, ids)
 	}
 
 	return nil
@@ -1046,11 +1055,10 @@ func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, ids ttnp
 		return err
 	}
 
-	isDev, err := as.endDeviceFetcher.Get(ctx, ids, "locations")
-	if err != nil {
+	if locations, err := as.locationRegistry.Get(ctx, ids); err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to retrieve end device locations")
 	} else {
-		uplink.Locations = isDev.GetLocations()
+		uplink.Locations = locations
 	}
 
 	return as.decodeUplink(ctx, dev, uplink, link.DefaultFormatters)
@@ -1171,41 +1179,13 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids ttnpb.E
 	return err
 }
 
-var locationUpdateTimeout = 5 * time.Second
-
 // handleLocationSolved saves the provided *ttnpb.ApplicationLocation in the Entity Registry as part of the device locations.
 // Locations provided by other services will be maintained.
 func (as *ApplicationServer) handleLocationSolved(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationLocation, link *ttnpb.ApplicationLink) error {
-	fm := &pbtypes.FieldMask{Paths: []string{"locations"}}
-
-	ctx, cancel := context.WithTimeout(ctx, locationUpdateTimeout)
-	defer cancel()
-
-	cc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
-	if err != nil {
-		return err
-	}
-	cl := ttnpb.NewEndDeviceRegistryClient(cc)
-
-	dev, err := cl.Get(ctx, &ttnpb.GetEndDeviceRequest{
-		EndDeviceIdentifiers: ids,
-		FieldMask:            fm,
-	}, as.WithClusterAuth())
-	if err != nil {
-		return err
-	}
-
-	if dev.Locations == nil {
-		dev.Locations = make(map[string]*ttnpb.Location)
-	}
-	dev.Locations[msg.Service] = msg.Location
-
-	_, err = cl.Update(ctx, &ttnpb.UpdateEndDeviceRequest{
-		EndDevice: *dev,
-		FieldMask: fm,
-	}, as.WithClusterAuth())
-	if err != nil {
-		return err
+	if _, err := as.locationRegistry.Merge(ctx, ids, map[string]*ttnpb.Location{
+		msg.Service: msg.Location,
+	}); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to merge end device locations")
 	}
 	return nil
 }
