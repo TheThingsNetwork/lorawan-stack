@@ -37,7 +37,7 @@ const m = defineMessages({
   reactivateSuccess: 'Webhook activated',
   reactivateWebhookTitle: 'Reactivate suspended webhook',
   suspendedWebhookMessage:
-    'This webhook has been deactivated due to several unsuccessful forwarding attemps. It will be automatically reactivated after 24 hours. If you wish to reactivate right away, you can use the "Reactivate"-button.',
+    'This webhook has been deactivated due to several unsuccessful forwarding attemps. It will be automatically reactivated after 24 hours. If you wish to reactivate right away, you can use the button below.',
 })
 
 const ApplicationWebhookEdit = props => {
@@ -91,7 +91,6 @@ const ApplicationWebhookEdit = props => {
       type: toast.types.SUCCESS,
     })
 
-    navigateToList()
   }, [navigateToList])
   const handleReactivate = React.useCallback(
     async updatedHealthStatus => {
