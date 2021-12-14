@@ -22,6 +22,7 @@ import (
 
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/schema"
 	"github.com/openshift/osin"
 	"go.thethings.network/lorawan-stack/v3/pkg/account/session"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -44,12 +45,13 @@ type Server interface {
 }
 
 type server struct {
-	c           *component.Component
-	config      Config
-	osinConfig  *osin.ServerConfig
-	store       Store
-	session     session.Session
-	generateCSP func(config *Config, nonce string) string
+	c             *component.Component
+	config        Config
+	osinConfig    *osin.ServerConfig
+	store         Store
+	session       session.Session
+	generateCSP   func(config *Config, nonce string) string
+	schemaDecoder *schema.Decoder
 }
 
 // Store used by the OAuth server.
@@ -66,12 +68,14 @@ type Store interface {
 // NewServer returns a new OAuth server on top of the given store.
 func NewServer(c *component.Component, store Store, config Config, cspFunc func(config *Config, nonce string) string) (Server, error) {
 	s := &server{
-		c:           c,
-		config:      config,
-		store:       store,
-		session:     session.Session{Store: store},
-		generateCSP: cspFunc,
+		c:             c,
+		config:        config,
+		store:         store,
+		session:       session.Session{Store: store},
+		generateCSP:   cspFunc,
+		schemaDecoder: schema.NewDecoder(),
 	}
+	s.schemaDecoder.IgnoreUnknownKeys(true)
 
 	if s.config.Mount == "" {
 		s.config.Mount = s.config.UI.MountPath()
