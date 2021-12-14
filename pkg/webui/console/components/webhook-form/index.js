@@ -60,6 +60,10 @@ const m = defineMessages({
   endpointSettings: 'Endpoint settings',
   updateErrorTitle: 'Could not update webhook',
   createErrorTitle: 'Could not create webhook',
+  reactivateButtonMessage: 'Reactivate',
+  suspendedWebhookMessage:
+    'This webhook has been deactivated due to several unsuccessful forwarding attempts. It will be automatically reactivated after 24 hours. If you wish to reactivate right away, you can use the button below.',
+  pendingInfo: 'This webhook is currently pending until attempting its first regular request attempt. Note that webhooks can be deactivated if they encounter too many request failures.'
 })
 
 const headerCheck = headers =>
@@ -111,8 +115,6 @@ export default class WebhookForm extends Component {
     onSubmit: PropTypes.func.isRequired,
     onSubmitFailure: PropTypes.func,
     onSubmitSuccess: PropTypes.func.isRequired,
-    reactivateButtonMessage: PropTypes.message,
-    suspendedWebhookMessage: PropTypes.message,
     update: PropTypes.bool.isRequired,
     webhookTemplate: PropTypes.webhookTemplate,
   }
@@ -128,8 +130,6 @@ export default class WebhookForm extends Component {
     onDelete: () => null,
     webhookTemplate: undefined,
     existCheck: () => false,
-    reactivateButtonMessage: undefined,
-    suspendedWebhookMessage: undefined,
     buttonStyle: undefined,
   }
 
@@ -213,14 +213,7 @@ export default class WebhookForm extends Component {
   }
 
   render() {
-    const {
-      update,
-      initialWebhookValue,
-      webhookTemplate,
-      suspendedWebhookMessage,
-      reactivateButtonMessage,
-      buttonStyle,
-    } = this.props
+    const { update, initialWebhookValue, webhookTemplate, buttonStyle } = this.props
     const { error, displayOverwriteModal, existingId } = this.state
     let initialValues = blankValues
     if (update && initialWebhookValue) {
@@ -233,19 +226,26 @@ export default class WebhookForm extends Component {
       initialWebhookValue.health_status &&
       initialWebhookValue.health_status.unhealthy
 
+    const isPending =
+      update &&
+      initialWebhookValue &&
+      (initialWebhookValue.health_status === null ||
+        initialWebhookValue.health_status === undefined)
+
     return (
       <>
         {mayReactivate && (
           <Notification
             warning
-            content={suspendedWebhookMessage}
+            content={m.suspendedWebhookMessage}
             action={this.handleReactivate}
-            actionMessage={reactivateButtonMessage}
+            actionMessage={m.reactivateButtonMessage}
             buttonIcon="refresh"
             className={buttonStyle.activateWebhookButton}
             small
           />
         )}
+        {isPending && <Notification info content={m.pendingInfo} small />}
         <PortalledModal
           title={sharedMessages.idAlreadyExists}
           message={{
