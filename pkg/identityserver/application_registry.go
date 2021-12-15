@@ -269,16 +269,7 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 			return nil, err
 		}
 	}
-	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.Paths), "administrative_contact") {
-		if !ttnpb.HasAnyField(req.FieldMask.Paths, "administrative_contact") {
-			req.FieldMask.Paths = append(req.FieldMask.Paths, "administrative_contact")
-		}
-	}
-	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.Paths), "technical_contact") {
-		if !ttnpb.HasAnyField(req.FieldMask.Paths, "technical_contact") {
-			req.FieldMask.Paths = append(req.FieldMask.Paths, "technical_contact")
-		}
-	}
+	req.FieldMask.Paths = ttnpb.FlattenPaths(req.FieldMask.Paths, []string{"administrative_contact", "technical_contact"})
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		if err := validateContactIsCollaborator(ctx, db, req.Application.AdministrativeContact, req.Application.GetEntityIdentifiers()); err != nil {
 			return err

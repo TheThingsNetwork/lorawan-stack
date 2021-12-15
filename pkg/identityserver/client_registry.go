@@ -293,16 +293,7 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 			return nil, err
 		}
 	}
-	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.Paths), "administrative_contact") {
-		if !ttnpb.HasAnyField(req.FieldMask.Paths, "administrative_contact") {
-			req.FieldMask.Paths = append(req.FieldMask.Paths, "administrative_contact")
-		}
-	}
-	if ttnpb.HasAnyField(ttnpb.TopLevelFields(req.FieldMask.Paths), "technical_contact") {
-		if !ttnpb.HasAnyField(req.FieldMask.Paths, "technical_contact") {
-			req.FieldMask.Paths = append(req.FieldMask.Paths, "technical_contact")
-		}
-	}
+	req.FieldMask.Paths = ttnpb.FlattenPaths(req.FieldMask.Paths, []string{"administrative_contact", "technical_contact"})
 	updatedByAdmin := is.IsAdmin(ctx)
 
 	if !updatedByAdmin {
