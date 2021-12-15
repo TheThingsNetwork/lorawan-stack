@@ -129,11 +129,8 @@ const headers = [
 
 @connect(
   state => {
-    const asConfig = selectAsConfig()
-    const nsConfig = selectNsConfig()
-    const jsConfig = selectJsConfig()
-    const nsEnabled = nsConfig.enabled
-    const jsEnabled = jsConfig.enabled
+    const nsEnabled = selectNsConfig().enabled
+    const jsEnabled = selectJsConfig().enabled
     const mayCreateDevices = checkFromState(mayCreateOrEditApplicationDevices, state)
 
     return {
@@ -143,9 +140,6 @@ const headers = [
       mayImportDevices: mayCreateDevices,
       error: getDeviceTemplateFormatsError(state),
       fetching: getDeviceTemplateFormatsFetching(state),
-      asConfig,
-      nsConfig,
-      jsConfig,
     }
   },
   { getDeviceTemplateFormats },
@@ -155,15 +149,12 @@ const headers = [
 class DevicesTable extends React.Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
-    asConfig: PropTypes.stackComponent.isRequired,
     devicePathPrefix: PropTypes.string,
     deviceTemplateFormats: PropTypes.shape({}).isRequired,
     error: PropTypes.error,
     fetching: PropTypes.bool,
-    jsConfig: PropTypes.stackComponent.isRequired,
     mayCreateDevices: PropTypes.bool.isRequired,
     mayImportDevices: PropTypes.bool.isRequired,
-    nsConfig: PropTypes.stackComponent.isRequired,
     totalCount: PropTypes.number,
   }
 
@@ -188,27 +179,23 @@ class DevicesTable extends React.Component {
 
   @bind
   baseDataSelector(state) {
-    const { mayCreateDevices, appId, asConfig, nsConfig, jsConfig } = this.props
+    const { mayCreateDevices, appId } = this.props
     const devices = selectDevices(state)
     const decoratedDevices = []
-    const asHost = getHostnameFromUrl(asConfig.base_url)
-    const nsHost = getHostnameFromUrl(nsConfig.base_url)
-    const jsHost = getHostnameFromUrl(jsConfig.base_url)
 
     for (const device of devices) {
-      const isOtherCluster = isOtherClusterDevice(asHost, nsHost, jsHost, device)
       decoratedDevices.push({
         ...device,
         status: {
           _derivedLastSeen: selectDeviceDerivedLastSeen(state, appId, device.ids.device_id),
-          otherCluster: isOtherCluster,
+          otherCluster: isOtherClusterDevice(device),
           host:
             device.application_server_address ||
             device.network_server_address ||
             device.join_server_address,
         },
         _meta: {
-          clickable: !isOtherCluster,
+          clickable: !isOtherClusterDevice(device),
         },
       })
     }

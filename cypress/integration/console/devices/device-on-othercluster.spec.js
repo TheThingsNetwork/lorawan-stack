@@ -119,5 +119,11 @@ describe('End device on other cluster', () => {
 
     cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/applications`)
     cy.findByTestId('full-error-view').should('not.exist')
+    cy.findByTestId('notification')
+      .should('be.visible')
+      .findByText(
+        'Simulation is disabled for devices that skip payload cryptoThe end device you attempted to visit is registered on a different host and needs to be accessed using its host Console.',
+      )
+      .should('be.visible')
   })
 })

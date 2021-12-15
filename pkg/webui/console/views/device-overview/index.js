@@ -30,10 +30,9 @@ import DeviceEvents from '@console/containers/device-events'
 
 import Require from '@console/lib/components/require'
 
-import { selectAsConfig } from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
-import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
+
 
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
@@ -54,13 +53,7 @@ const m = defineMessages({
 
 @connect(state => {
   const device = selectSelectedDevice(state)
-  const asConfig = selectAsConfig()
-  const nsConfig = selectAsConfig()
-  const jsConfig = selectAsConfig()
-  const asHost = getHostnameFromUrl(asConfig.base_url)
-  const nsHost = getHostnameFromUrl(nsConfig.base_url)
-  const jsHost = getHostnameFromUrl(jsConfig.base_url)
-  const shouldRedirect = isOtherClusterDevice(asHost, nsHost, jsHost, device)
+  const shouldRedirect = isOtherClusterDevice(device)
   return {
     device,
     shouldRedirect,
