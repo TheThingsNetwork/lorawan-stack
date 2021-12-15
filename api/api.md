@@ -30,6 +30,7 @@
   - [Message `AsConfiguration`](#ttn.lorawan.v3.AsConfiguration)
   - [Message `AsConfiguration.PubSub`](#ttn.lorawan.v3.AsConfiguration.PubSub)
   - [Message `AsConfiguration.PubSub.Providers`](#ttn.lorawan.v3.AsConfiguration.PubSub.Providers)
+  - [Message `AsConfiguration.Webhooks`](#ttn.lorawan.v3.AsConfiguration.Webhooks)
   - [Message `DecodeDownlinkRequest`](#ttn.lorawan.v3.DecodeDownlinkRequest)
   - [Message `DecodeDownlinkResponse`](#ttn.lorawan.v3.DecodeDownlinkResponse)
   - [Message `DecodeUplinkRequest`](#ttn.lorawan.v3.DecodeUplinkRequest)
@@ -94,6 +95,9 @@
   - [Message `ApplicationWebhook.TemplateFieldsEntry`](#ttn.lorawan.v3.ApplicationWebhook.TemplateFieldsEntry)
   - [Message `ApplicationWebhookFormats`](#ttn.lorawan.v3.ApplicationWebhookFormats)
   - [Message `ApplicationWebhookFormats.FormatsEntry`](#ttn.lorawan.v3.ApplicationWebhookFormats.FormatsEntry)
+  - [Message `ApplicationWebhookHealth`](#ttn.lorawan.v3.ApplicationWebhookHealth)
+  - [Message `ApplicationWebhookHealth.WebhookHealthStatusHealthy`](#ttn.lorawan.v3.ApplicationWebhookHealth.WebhookHealthStatusHealthy)
+  - [Message `ApplicationWebhookHealth.WebhookHealthStatusUnhealthy`](#ttn.lorawan.v3.ApplicationWebhookHealth.WebhookHealthStatusUnhealthy)
   - [Message `ApplicationWebhookIdentifiers`](#ttn.lorawan.v3.ApplicationWebhookIdentifiers)
   - [Message `ApplicationWebhookTemplate`](#ttn.lorawan.v3.ApplicationWebhookTemplate)
   - [Message `ApplicationWebhookTemplate.HeadersEntry`](#ttn.lorawan.v3.ApplicationWebhookTemplate.HeadersEntry)
@@ -908,6 +912,7 @@ Application Server configuration.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `pubsub` | [`AsConfiguration.PubSub`](#ttn.lorawan.v3.AsConfiguration.PubSub) |  |  |
+| `webhooks` | [`AsConfiguration.Webhooks`](#ttn.lorawan.v3.AsConfiguration.Webhooks) |  |  |
 
 ### <a name="ttn.lorawan.v3.AsConfiguration.PubSub">Message `AsConfiguration.PubSub`</a>
 
@@ -921,6 +926,13 @@ Application Server configuration.
 | ----- | ---- | ----- | ----------- |
 | `mqtt` | [`AsConfiguration.PubSub.Providers.Status`](#ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status) |  |  |
 | `nats` | [`AsConfiguration.PubSub.Providers.Status`](#ttn.lorawan.v3.AsConfiguration.PubSub.Providers.Status) |  |  |
+
+### <a name="ttn.lorawan.v3.AsConfiguration.Webhooks">Message `AsConfiguration.Webhooks`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `unhealthy_attempts_threshold` | [`int64`](#int64) |  |  |
+| `unhealthy_retry_interval` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
 
 ### <a name="ttn.lorawan.v3.DecodeDownlinkRequest">Message `DecodeDownlinkRequest`</a>
 
@@ -1695,6 +1707,7 @@ The NATS provider settings.
 | `downlink_queue_invalidated` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 | `location_solved` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
 | `service_data` | [`ApplicationWebhook.Message`](#ttn.lorawan.v3.ApplicationWebhook.Message) |  |  |
+| `health_status` | [`ApplicationWebhookHealth`](#ttn.lorawan.v3.ApplicationWebhookHealth) |  |  |
 
 #### Field Rules
 
@@ -1702,6 +1715,7 @@ The NATS provider settings.
 | ----- | ----------- |
 | `ids` | <p>`message.required`: `true`</p> |
 | `base_url` | <p>`string.uri`: `true`</p> |
+| `headers` | <p>`map.max_pairs`: `50`</p><p>`map.keys.string.max_len`: `64`</p><p>`map.values.string.max_len`: `256`</p> |
 | `format` | <p>`string.max_len`: `20`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 | `downlink_api_key` | <p>`string.max_len`: `128`</p> |
 
@@ -1743,6 +1757,29 @@ The NATS provider settings.
 | ----- | ---- | ----- | ----------- |
 | `key` | [`string`](#string) |  |  |
 | `value` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.ApplicationWebhookHealth">Message `ApplicationWebhookHealth`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `healthy` | [`ApplicationWebhookHealth.WebhookHealthStatusHealthy`](#ttn.lorawan.v3.ApplicationWebhookHealth.WebhookHealthStatusHealthy) |  |  |
+| `unhealthy` | [`ApplicationWebhookHealth.WebhookHealthStatusUnhealthy`](#ttn.lorawan.v3.ApplicationWebhookHealth.WebhookHealthStatusUnhealthy) |  |  |
+
+### <a name="ttn.lorawan.v3.ApplicationWebhookHealth.WebhookHealthStatusHealthy">Message `ApplicationWebhookHealth.WebhookHealthStatusHealthy`</a>
+
+### <a name="ttn.lorawan.v3.ApplicationWebhookHealth.WebhookHealthStatusUnhealthy">Message `ApplicationWebhookHealth.WebhookHealthStatusUnhealthy`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `failed_attempts` | [`uint64`](#uint64) |  |  |
+| `last_failed_attempt_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `last_failed_attempt_details` | [`ErrorDetails`](#ttn.lorawan.v3.ErrorDetails) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `last_failed_attempt_at` | <p>`timestamp.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationWebhookIdentifiers">Message `ApplicationWebhookIdentifiers`</a>
 
@@ -1795,6 +1832,7 @@ The NATS provider settings.
 | `info_url` | <p>`string.uri`: `true`</p> |
 | `documentation_url` | <p>`string.uri`: `true`</p> |
 | `base_url` | <p>`string.uri`: `true`</p> |
+| `headers` | <p>`map.max_pairs`: `50`</p><p>`map.keys.string.max_len`: `64`</p><p>`map.values.string.max_len`: `256`</p> |
 | `format` | <p>`string.max_len`: `20`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.ApplicationWebhookTemplate.HeadersEntry">Message `ApplicationWebhookTemplate.HeadersEntry`</a>

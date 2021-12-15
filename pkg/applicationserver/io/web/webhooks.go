@@ -243,6 +243,7 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 			"location_solved",
 			"service_data",
 			"uplink_message",
+			"health_status",
 		},
 	)
 	if err != nil {
@@ -253,6 +254,7 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 	for i := range hooks {
 		hook := hooks[i]
 		ctx := withWebhookID(ctx, hook.Ids)
+		ctx = WithCachedHealthStatus(ctx, hook.HealthStatus)
 		logger := log.FromContext(ctx).WithField("hook", hook.Ids.WebhookId)
 		wg.Add(1)
 		go func() {

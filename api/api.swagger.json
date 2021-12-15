@@ -10644,11 +10644,42 @@
       },
       "description": "The NATS provider settings."
     },
+    "ApplicationWebhookHealthWebhookHealthStatusHealthy": {
+      "type": "object"
+    },
+    "ApplicationWebhookHealthWebhookHealthStatusUnhealthy": {
+      "type": "object",
+      "properties": {
+        "failed_attempts": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "last_failed_attempt_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "last_failed_attempt_details": {
+          "$ref": "#/definitions/v3ErrorDetails"
+        }
+      }
+    },
     "AsConfigurationPubSub": {
       "type": "object",
       "properties": {
         "providers": {
           "$ref": "#/definitions/PubSubProviders"
+        }
+      }
+    },
+    "AsConfigurationWebhooks": {
+      "type": "object",
+      "properties": {
+        "unhealthy_attempts_threshold": {
+          "type": "string",
+          "format": "int64"
+        },
+        "unhealthy_retry_interval": {
+          "type": "string"
         }
       }
     },
@@ -12769,6 +12800,9 @@
         },
         "service_data": {
           "$ref": "#/definitions/v3ApplicationWebhookMessage"
+        },
+        "health_status": {
+          "$ref": "#/definitions/v3ApplicationWebhookHealth"
         }
       }
     },
@@ -12781,6 +12815,17 @@
             "type": "string"
           },
           "description": "Format and description."
+        }
+      }
+    },
+    "v3ApplicationWebhookHealth": {
+      "type": "object",
+      "properties": {
+        "healthy": {
+          "$ref": "#/definitions/ApplicationWebhookHealthWebhookHealthStatusHealthy"
+        },
+        "unhealthy": {
+          "$ref": "#/definitions/ApplicationWebhookHealthWebhookHealthStatusUnhealthy"
         }
       }
     },
@@ -12961,6 +13006,9 @@
       "properties": {
         "pubsub": {
           "$ref": "#/definitions/AsConfigurationPubSub"
+        },
+        "webhooks": {
+          "$ref": "#/definitions/AsConfigurationWebhooks"
         }
       },
       "description": "Application Server configuration."

@@ -15,6 +15,8 @@
 import React from 'react'
 import { defineMessages } from 'react-intl'
 
+import Status from '@ttn-lw/components/status'
+
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -36,6 +38,9 @@ const m = defineMessages({
   templateId: 'Template ID',
   format: 'Format',
   baseUrl: 'Base URL',
+  active: 'Active',
+  suspended: 'Suspended',
+  pending: 'Pending',
 })
 
 const headers = [
@@ -58,7 +63,29 @@ const headers = [
   {
     name: 'format',
     displayName: m.format,
-    width: 8,
+    width: 6,
+  },
+  {
+    name: 'health_status',
+    displayName: sharedMessages.status,
+    width: 10,
+    render: value => {
+      let indicator = 'unknown'
+      let label = sharedMessages.unknown
+
+      if (value && value.healthy) {
+        indicator = 'good'
+        label = m.active
+      } else if (value && value.unhealthy) {
+        indicator = 'bad'
+        label = m.suspended
+      } else {
+        indicator = 'mediocre'
+        label = m.pending
+      }
+
+      return <Status status={indicator} label={label} />
+    },
   },
 ]
 
@@ -71,7 +98,7 @@ export default class WebhooksTable extends React.Component {
     super(props)
 
     const { appId } = props
-    this.getWebhooksList = () => getWebhooksList(appId, ['template_ids'])
+    this.getWebhooksList = () => getWebhooksList(appId, ['template_ids', 'health_status'])
   }
 
   baseDataSelector(state) {

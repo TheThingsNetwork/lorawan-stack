@@ -110,7 +110,8 @@ type Config struct {
 
 func (c Config) toProto() *ttnpb.AsConfiguration {
 	return &ttnpb.AsConfiguration{
-		Pubsub: c.PubSub.toProto(),
+		Pubsub:   c.PubSub.toProto(),
+		Webhooks: c.Webhooks.toProto(),
 	}
 }
 
@@ -127,13 +128,22 @@ type UplinkStorageConfig struct {
 
 // WebhooksConfig defines the configuration of the webhooks integration.
 type WebhooksConfig struct {
-	Registry  web.WebhookRegistry `name:"-"`
-	Target    string              `name:"target" description:"Target of the integration (direct)"`
-	Timeout   time.Duration       `name:"timeout" description:"Wait timeout of the target to process the request"`
-	QueueSize int                 `name:"queue-size" description:"Number of requests to queue"`
-	Workers   int                 `name:"workers" description:"Number of workers to process requests"`
-	Templates web.TemplatesConfig `name:"templates" description:"The store of the webhook templates"`
-	Downlinks web.DownlinksConfig `name:"downlink" description:"The downlink queue operations configuration"`
+	Registry                   web.WebhookRegistry `name:"-"`
+	Target                     string              `name:"target" description:"Target of the integration (direct)"`
+	Timeout                    time.Duration       `name:"timeout" description:"Wait timeout of the target to process the request"`
+	QueueSize                  int                 `name:"queue-size" description:"Number of requests to queue"`
+	Workers                    int                 `name:"workers" description:"Number of workers to process requests"`
+	UnhealthyAttemptsThreshold int                 `name:"unhealthy-attempts-threshold" description:"Number of failed webhook attempts before the webhook is disabled"`
+	UnhealthyRetryInterval     time.Duration       `name:"unhealthy-retry-interval" description:"Time interval after which disabled webhooks may execute again"`
+	Templates                  web.TemplatesConfig `name:"templates" description:"The store of the webhook templates"`
+	Downlinks                  web.DownlinksConfig `name:"downlink" description:"The downlink queue operations configuration"`
+}
+
+func (c WebhooksConfig) toProto() *ttnpb.AsConfiguration_Webhooks {
+	return &ttnpb.AsConfiguration_Webhooks{
+		UnhealthyAttemptsThreshold: int64(c.UnhealthyAttemptsThreshold),
+		UnhealthyRetryInterval:     ttnpb.ProtoDurationPtr(c.UnhealthyRetryInterval),
+	}
 }
 
 // DistributionConfig contains the upstream traffic distribution configuration of the Application Server.
@@ -234,6 +244,11 @@ func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.
 	}
 	if c.Registry == nil {
 		return nil, errWebhooksRegistry.New()
+	}
+	if c.UnhealthyAttemptsThreshold > 0 || c.UnhealthyRetryInterval > 0 {
+		registry := web.NewHealthStatusRegistry(c.Registry)
+		registry = web.NewCachedHealthStatusRegistry(registry)
+		sink = web.NewHealthCheckSink(sink, registry, c.UnhealthyAttemptsThreshold, c.UnhealthyRetryInterval)
 	}
 	if c.QueueSize > 0 || c.Workers > 0 {
 		sink = web.NewPooledSink(ctx, server, sink, c.Workers, c.QueueSize)

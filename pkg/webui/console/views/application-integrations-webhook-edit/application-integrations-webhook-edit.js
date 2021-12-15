@@ -29,10 +29,13 @@ import diff from '@ttn-lw/lib/diff'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import style from './application-integration-webhook-edit.styl'
+
 const m = defineMessages({
   editWebhook: 'Edit webhook',
   updateSuccess: 'Webhook updated',
   deleteSuccess: 'Webhook deleted',
+  reactivateSuccess: 'Webhook activated',
 })
 
 const ApplicationWebhookEdit = props => {
@@ -80,6 +83,21 @@ const ApplicationWebhookEdit = props => {
     navigateToList()
   }, [navigateToList])
 
+  const handleReactivateSuccess = React.useCallback(() => {
+    toast({
+      message: m.reactivateSuccess,
+      type: toast.types.SUCCESS,
+    })
+  }, [])
+  const handleReactivate = React.useCallback(
+    async updatedHealthStatus => {
+      await tts.Applications.Webhooks.updateById(appId, webhookId, updatedHealthStatus, [
+        'health_status',
+      ])
+    },
+    [appId, webhookId],
+  )
+
   return (
     <Container>
       <PageTitle title={m.editWebhook} />
@@ -94,6 +112,11 @@ const ApplicationWebhookEdit = props => {
             onSubmitSuccess={handleSubmitSuccess}
             onDelete={handleDelete}
             onDeleteSuccess={handleDeleteSuccess}
+            onReactivate={handleReactivate}
+            onReactivateSuccess={handleReactivateSuccess}
+            reactivateButtonMessage={m.reactivateButton}
+            suspendedWebhookMessage={m.suspendedWebhookMessage}
+            buttonStyle={style}
           />
         </Col>
       </Row>

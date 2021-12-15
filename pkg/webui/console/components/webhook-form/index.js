@@ -60,6 +60,11 @@ const m = defineMessages({
   endpointSettings: 'Endpoint settings',
   updateErrorTitle: 'Could not update webhook',
   createErrorTitle: 'Could not create webhook',
+  reactivateButtonMessage: 'Reactivate',
+  suspendedWebhookMessage:
+    'This webhook has been deactivated due to several unsuccessful forwarding attempts. It will be automatically reactivated after 24 hours. If you wish to reactivate right away, you can use the button below.',
+  pendingInfo:
+    'This webhook is currently pending until attempting its first regular request attempt. Note that webhooks can be deactivated if they encounter too many request failures.',
 })
 
 const headerCheck = headers =>
@@ -93,15 +98,21 @@ const validationSchema = Yup.object().shape({
 export default class WebhookForm extends Component {
   static propTypes = {
     appId: PropTypes.string,
+    buttonStyle: PropTypes.shape({ activateWebhookButton: PropTypes.shape({}) }),
     existCheck: PropTypes.func,
     initialWebhookValue: PropTypes.shape({
       ids: PropTypes.shape({
         webhook_id: PropTypes.string,
       }),
+      health_status: PropTypes.shape({
+        unhealthy: PropTypes.shape({}),
+      }),
     }),
     onDelete: PropTypes.func,
     onDeleteFailure: PropTypes.func,
     onDeleteSuccess: PropTypes.func,
+    onReactivate: PropTypes.func,
+    onReactivateSuccess: PropTypes.func,
     onSubmit: PropTypes.func.isRequired,
     onSubmitFailure: PropTypes.func,
     onSubmitSuccess: PropTypes.func.isRequired,
@@ -112,12 +123,15 @@ export default class WebhookForm extends Component {
   static defaultProps = {
     appId: undefined,
     initialWebhookValue: undefined,
+    onReactivate: () => null,
+    onReactivateSuccess: () => null,
     onSubmitFailure: () => null,
     onDeleteFailure: () => null,
     onDeleteSuccess: () => null,
     onDelete: () => null,
     webhookTemplate: undefined,
     existCheck: () => false,
+    buttonStyle: undefined,
   }
 
   form = React.createRef()
@@ -184,16 +198,55 @@ export default class WebhookForm extends Component {
     this.setState({ displayOverwriteModal: false })
   }
 
+  @bind
+  async handleReactivate() {
+    const { onReactivate, onReactivateSuccess } = this.props
+    const healthStatus = {
+      health_status: null,
+    }
+
+    try {
+      await onReactivate(healthStatus)
+      onReactivateSuccess()
+    } catch (error) {
+      this.setState({ error })
+    }
+  }
+
   render() {
-    const { update, initialWebhookValue, webhookTemplate } = this.props
+    const { update, initialWebhookValue, webhookTemplate, buttonStyle } = this.props
     const { error, displayOverwriteModal, existingId } = this.state
     let initialValues = blankValues
     if (update && initialWebhookValue) {
       initialValues = mapWebhookToFormValues(initialWebhookValue)
     }
 
+    const mayReactivate =
+      update &&
+      initialWebhookValue &&
+      initialWebhookValue.health_status &&
+      initialWebhookValue.health_status.unhealthy
+
+    const isPending =
+      update &&
+      initialWebhookValue &&
+      (initialWebhookValue.health_status === null ||
+        initialWebhookValue.health_status === undefined)
+
     return (
       <>
+        {mayReactivate && (
+          <Notification
+            warning
+            content={m.suspendedWebhookMessage}
+            action={this.handleReactivate}
+            actionMessage={m.reactivateButtonMessage}
+            buttonIcon="refresh"
+            className={buttonStyle.activateWebhookButton}
+            small
+          />
+        )}
+        {isPending && <Notification info content={m.pendingInfo} small />}
         <PortalledModal
           title={sharedMessages.idAlreadyExists}
           message={{
@@ -228,11 +281,10 @@ export default class WebhookForm extends Component {
           <Form.SubTitle title={m.endpointSettings} />
           <Form.Field
             name="base_url"
+            type="button"
             title={sharedMessages.webhookBaseUrl}
             placeholder="https://example.com/webhooks"
             component={Input}
-            autoComplete="url"
-            required
           />
           <Form.Field
             name="downlink_api_key"
