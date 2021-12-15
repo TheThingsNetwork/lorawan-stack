@@ -19,6 +19,7 @@ import (
 	"net/http"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/packetbroker"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"gopkg.in/square/go-jose.v2/jwt"
@@ -30,7 +31,7 @@ type packetBrokerTokenVerifier struct {
 }
 
 type httpClientProvider interface {
-	HTTPClient(context.Context) (*http.Client, error)
+	HTTPClient(context.Context, ...httpclient.Option) (*http.Client, error)
 }
 
 func newPacketBrokerTokenVerifier(ctx context.Context, issuer, audience string, httpClient httpClientProvider) (tokenVerifier, error) {

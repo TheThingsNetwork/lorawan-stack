@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/fillcontext"
+	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
@@ -78,11 +79,11 @@ type Server struct {
 	js JoinServer
 }
 
-// Components represents the Component to the Interop Server.
+// Component represents the Component to the Interop Server.
 type Component interface {
 	Context() context.Context
 	RateLimiter() ratelimit.Interface
-	HTTPClient(context.Context) (*http.Client, error)
+	HTTPClient(context.Context, ...httpclient.Option) (*http.Client, error)
 }
 
 // NewServer builds a new server.

@@ -39,6 +39,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayconfigurationserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
 	gsredis "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/joinserver"
 	jsredis "go.thethings.network/lorawan-stack/v3/pkg/joinserver/redis"
@@ -200,9 +201,11 @@ var startCommand = &cobra.Command{
 			if *httpClient != nil {
 				continue
 			}
-			*httpClient, err = c.HTTPClient(ctx, component.WithTransportOptions(
-				component.WithCache(true),
-			))
+			*httpClient, err = c.HTTPClient(ctx,
+				httpclient.WithTransportOptions(
+					httpclient.WithCache(true),
+				),
+			)
 			if err != nil {
 				return err
 			}

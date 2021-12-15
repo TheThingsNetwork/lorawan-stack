@@ -18,6 +18,7 @@ import (
 	"crypto/tls"
 	"net"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
@@ -29,7 +30,7 @@ var (
 
 // Listener that accepts multiple protocols on the same port
 type Listener interface {
-	TLS(opts ...TLSConfigOption) (net.Listener, error)
+	TLS(opts ...tlsconfig.Option) (net.Listener, error)
 	TCP() (net.Listener, error)
 	Addr() net.Addr
 	Close() error
@@ -48,7 +49,7 @@ func (l *listener) Addr() net.Addr {
 	return l.tcp.Addr()
 }
 
-func (l *listener) TLS(opts ...TLSConfigOption) (net.Listener, error) {
+func (l *listener) TLS(opts ...tlsconfig.Option) (net.Listener, error) {
 	if l.tcpUsed || l.tlsUsed {
 		return nil, errors.New("listener already in use")
 	}
@@ -129,11 +130,11 @@ func (tcpEndpoint) Listen(l Listener) (net.Listener, error) { return l.TCP() }
 type tlsEndpoint struct {
 	address    string
 	protocol   string
-	configOpts []TLSConfigOption
+	configOpts []tlsconfig.Option
 }
 
 // NewTLSEndpoint returns a new TLS endpoint.
-func NewTLSEndpoint(address, protocol string, configOpts ...TLSConfigOption) Endpoint {
+func NewTLSEndpoint(address, protocol string, configOpts ...tlsconfig.Option) Endpoint {
 	return &tlsEndpoint{address, protocol, configOpts}
 }
 
