@@ -16,7 +16,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
-import { Redirect } from 'react-router'
 
 import DataSheet from '@ttn-lw/components/data-sheet'
 import toast from '@ttn-lw/components/toast'
@@ -35,6 +34,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
+import Require from '@console/lib/components/require'
 
 import { selectSelectedDevice, isOtherClusterDevice } from '@console/store/selectors/devices'
 
@@ -243,28 +243,28 @@ class DeviceOverview extends React.Component {
   render() {
     const { device, shouldRedirect } = this.props
     const devIds = device && device.ids
-
-    if (shouldRedirect) {
-      toast({
+    const otherwise = {
+      redirect: '/applications',
+      render: toast({
         type: toast.types.WARNING,
         message: m.failedAccessOtherHostDeviceMessage,
-      })
-      return <Redirect to="/applications" />
+      }),
     }
-
     return (
-      <Container>
-        <IntlHelmet title={sharedMessages.overview} />
-        <Row className={style.head}>
-          <Col md={12} lg={6}>
-            {this.deviceInfo}
-          </Col>
-          <Col md={12} lg={6} className={style.latestEvents}>
-            <DeviceEvents devIds={devIds} widget />
-            <DeviceMap device={device} />
-          </Col>
-        </Row>
-      </Container>
+      <Require condition={!shouldRedirect} otherwise={otherwise}>
+        <Container>
+          <IntlHelmet title={sharedMessages.overview} />
+          <Row className={style.head}>
+            <Col md={12} lg={6}>
+              {this.deviceInfo}
+            </Col>
+            <Col md={12} lg={6} className={style.latestEvents}>
+              <DeviceEvents devIds={devIds} widget />
+              <DeviceMap device={device} />
+            </Col>
+          </Row>
+        </Container>
+      </Require>
     )
   }
 }
