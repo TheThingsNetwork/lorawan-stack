@@ -88,7 +88,11 @@ PropTypes.eventFilter = PropTypes.shape({
 PropTypes.eventFilters = PropTypes.arrayOf(PropTypes.eventFilter)
 
 PropTypes.gateway = PropTypes.shape({
-  antennas: PropTypes.Array,
+  antennas: PropTypes.arrayOf(
+    PropTypes.shape({
+      location: PropTypes.location,
+    }),
+  ),
   ids: PropTypes.shape({
     gateway_id: PropTypes.string,
   }).isRequired,
@@ -190,6 +194,25 @@ PropTypes.env = PropTypes.shape({
   }).isRequired,
 })
 
+PropTypes.entityLocation = PropTypes.shape({
+  latitude: PropTypes.number,
+  longitude: PropTypes.number,
+  altitude: PropTypes.number,
+  source: PropTypes.string,
+})
+
+PropTypes.entityLocations = PropTypes.shape({
+  user: PropTypes.entityLocation,
+  'frm-payload': PropTypes.entityLocation,
+  'lora-cloud-device-management-v1-gnss': PropTypes.entityLocation,
+  'lora-cloud-device-management-v1-wifi': PropTypes.entityLocation,
+  'lora-cloud-device-management-v1-unknown': PropTypes.entityLocation,
+  'lora-cloud-geolocation-v3-gnss': PropTypes.entityLocation,
+  'lora-cloud-geolocation-v3-rssi': PropTypes.entityLocation,
+  'lora-cloud-geolocation-v3-tdoa': PropTypes.entityLocation,
+  'lora-cloud-geolocation-v3-rssitdoacombined': PropTypes.entityLocation,
+})
+
 PropTypes.device = PropTypes.shape({
   ids: PropTypes.shape({
     device_id: PropTypes.string.isRequired,
@@ -201,13 +224,7 @@ PropTypes.device = PropTypes.shape({
   created_at: PropTypes.string,
   updated_at: PropTypes.string,
   description: PropTypes.string,
-  locations: PropTypes.shape({
-    // User is an object containing latitude and longitude property of number.
-    user: PropTypes.shape({
-      latitude: PropTypes.number,
-      longitude: PropTypes.number,
-    }),
-  }),
+  locations: PropTypes.entityLocations,
   lorawan_phy_version: PropTypes.string,
   lorawan_version: PropTypes.string,
   supports_join: PropTypes.bool,
@@ -250,6 +267,17 @@ PropTypes.location = PropTypes.shape({
     info: PropTypes.message,
   }),
 })
+
+PropTypes.marker = PropTypes.shape({
+  position: PropTypes.shape({
+    latitude: PropTypes.number,
+    longitude: PropTypes.number,
+  }).isRequired,
+  accuracy: PropTypes.number,
+  children: PropTypes.node,
+})
+
+PropTypes.markers = PropTypes.arrayOf(PropTypes.marker)
 
 PropTypes.history = PropTypes.shape({
   listen: PropTypes.func,
