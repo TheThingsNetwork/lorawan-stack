@@ -70,11 +70,14 @@ class RadioGroup extends React.Component {
     const { onChange } = this.props
     const { target } = event
 
+    // Retain boolean type if the value was initially provided as boolean.
+    const value = typeof this.props.value === 'boolean' ? target.value === 'true' : target.value
+
     if (!('value' in this.props)) {
-      this.setState({ value: target.value })
+      this.setState({ value })
     }
 
-    onChange(target.value)
+    onChange(value)
   }
 
   render() {
@@ -109,7 +112,7 @@ RadioGroup.propTypes = {
   initialValue: PropTypes.string,
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func,
-  value: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
 }
 
 RadioGroup.defaultProps = {

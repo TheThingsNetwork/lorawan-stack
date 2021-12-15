@@ -39,7 +39,7 @@ class RadioButton extends React.PureComponent {
     onChange: PropTypes.func,
     onFocus: PropTypes.func,
     readOnly: PropTypes.bool,
-    value: PropTypes.string,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
   }
 
   static defaultProps = {
