@@ -213,7 +213,9 @@ var (
 				return errNoOrganizationID.New()
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setOrganizationFlags, attributesFlags())
-			if len(paths) == 0 {
+			rawUnsetPaths, _ := cmd.Flags().GetStringSlice("unset")
+			unsetPaths := util.NormalizePaths(rawUnsetPaths)
+			if len(paths)+len(unsetPaths) == 0 {
 				logger.Warn("No fields selected, won't update anything")
 				return nil
 			}
@@ -230,7 +232,7 @@ var (
 			}
 			res, err := ttnpb.NewOrganizationRegistryClient(is).Update(ctx, &ttnpb.UpdateOrganizationRequest{
 				Organization: &organization,
-				FieldMask:    &pbtypes.FieldMask{Paths: paths},
+				FieldMask:    &pbtypes.FieldMask{Paths: append(paths, unsetPaths...)},
 			})
 			if err != nil {
 				return err
@@ -345,6 +347,7 @@ func init() {
 	organizationsCommand.AddCommand(organizationsCreateCommand)
 	organizationsSetCommand.Flags().AddFlagSet(organizationIDFlags())
 	organizationsSetCommand.Flags().AddFlagSet(setOrganizationFlags)
+	organizationsSetCommand.Flags().AddFlagSet(util.UnsetFlagSet())
 	organizationsSetCommand.Flags().AddFlagSet(attributesFlags())
 	organizationsCommand.AddCommand(organizationsSetCommand)
 	organizationsDeleteCommand.Flags().AddFlagSet(organizationIDFlags())

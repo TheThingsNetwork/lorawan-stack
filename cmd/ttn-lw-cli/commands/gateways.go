@@ -325,6 +325,8 @@ var (
 				return err
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setGatewayFlags, attributesFlags())
+			rawUnsetPaths, _ := cmd.Flags().GetStringSlice("unset")
+			unsetPaths := util.NormalizePaths(rawUnsetPaths)
 			antennaPaths := util.UpdateFieldMask(cmd.Flags(), setGatewayAntennaFlags)
 			paths = append(paths, ttnpb.FlattenPaths(paths, gatewayFlattenPaths)...)
 
@@ -333,7 +335,7 @@ var (
 			}
 			antennaAdd, _ := cmd.Flags().GetBool("antenna.add")
 			antennaRemove, _ := cmd.Flags().GetBool("antenna.remove")
-			if len(paths)+len(antennaPaths) == 0 && !antennaRemove {
+			if len(paths)+len(unsetPaths)+len(antennaPaths) == 0 && !antennaRemove {
 				logger.Warn("No fields selected, won't update anything")
 				return nil
 			}
@@ -378,7 +380,7 @@ var (
 
 			res, err := ttnpb.NewGatewayRegistryClient(is).Update(ctx, &ttnpb.UpdateGatewayRequest{
 				Gateway:   &gateway,
-				FieldMask: &pbtypes.FieldMask{Paths: paths},
+				FieldMask: &pbtypes.FieldMask{Paths: append(paths, unsetPaths...)},
 			})
 			if err != nil {
 				return err
@@ -537,6 +539,7 @@ func init() {
 	gatewaysCommand.AddCommand(gatewaysCreateCommand)
 	gatewaysSetCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysSetCommand.Flags().AddFlagSet(setGatewayFlags)
+	gatewaysSetCommand.Flags().AddFlagSet(util.UnsetFlagSet())
 	gatewaysSetCommand.Flags().Int("antenna.index", 0, "index of the antenna to update or remove")
 	gatewaysSetCommand.Flags().Bool("antenna.add", false, "add an extra antenna")
 	gatewaysSetCommand.Flags().Bool("antenna.remove", false, "remove an antenna")

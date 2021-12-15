@@ -223,7 +223,9 @@ var (
 				return errNoClientID.New()
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setClientFlags, attributesFlags())
-			if len(paths) == 0 {
+			rawUnsetPaths, _ := cmd.Flags().GetStringSlice("unset")
+			unsetPaths := util.NormalizePaths(rawUnsetPaths)
+			if len(paths)+len(unsetPaths) == 0 {
 				logger.Warn("No fields selected, won't update anything")
 				return nil
 			}
@@ -240,7 +242,7 @@ var (
 			}
 			res, err := ttnpb.NewClientRegistryClient(is).Update(ctx, &ttnpb.UpdateClientRequest{
 				Client:    &client,
-				FieldMask: &pbtypes.FieldMask{Paths: paths},
+				FieldMask: &pbtypes.FieldMask{Paths: append(paths, unsetPaths...)},
 			})
 			if err != nil {
 				return err
@@ -357,6 +359,7 @@ func init() {
 	clientsCommand.AddCommand(clientsCreateCommand)
 	clientsSetCommand.Flags().AddFlagSet(clientIDFlags())
 	clientsSetCommand.Flags().AddFlagSet(setClientFlags)
+	clientsSetCommand.Flags().AddFlagSet(util.UnsetFlagSet())
 	clientsSetCommand.Flags().AddFlagSet(attributesFlags())
 	clientsCommand.AddCommand(clientsSetCommand)
 	clientsDeleteCommand.Flags().AddFlagSet(clientIDFlags())
