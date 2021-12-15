@@ -88,16 +88,20 @@ func HasAnyField(requested []string, search ...string) bool {
 func FlattenPaths(paths, flatten []string) []string {
 	res := make([]string, 0, len(paths))
 	flattened := make(map[string]bool)
+nextPath:
 	for _, path := range paths {
+		var found bool
 		for _, flatten := range flatten {
 			if flatten == path || strings.HasPrefix(path, flatten+".") {
 				if !flattened[flatten] {
 					res = append(res, flatten)
 					flattened[flatten] = true
 				}
-			} else {
-				res = append(res, path)
+				continue nextPath
 			}
+		}
+		if !found {
+			res = append(res, path)
 		}
 	}
 	return res
