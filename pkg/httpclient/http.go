@@ -83,6 +83,7 @@ func (p *provider) HTTPClient(ctx context.Context, opts ...Option) (*http.Client
 
 type httpTransportOptions struct {
 	cache            bool
+	tlsConfig        *tls.Config
 	tlsConfigOptions []tlsconfig.Option
 }
 
@@ -103,6 +104,13 @@ func WithTLSConfigurationOptions(opts ...tlsconfig.Option) TransportOption {
 	})
 }
 
+// WithTLSConfig configures the TLS configuration to be used by the transport.
+func WithTLSConfig(c *tls.Config) TransportOption {
+	return TransportOption(func(o *httpTransportOptions) {
+		o.tlsConfig = c
+	})
+}
+
 // HTTPTransport returns a new http.RoundTripper with TLS client configuration.
 func (p *provider) HTTPTransport(ctx context.Context, opts ...TransportOption) (http.RoundTripper, error) {
 	options := &httpTransportOptions{}
@@ -110,13 +118,16 @@ func (p *provider) HTTPTransport(ctx context.Context, opts ...TransportOption) (
 		opt(options)
 	}
 
-	tlsConfig, err := p.tlsConfigProvider.GetTLSClientConfig(ctx, options.tlsConfigOptions...)
-	if err != nil {
-		return nil, err
+	if options.tlsConfig == nil {
+		tlsConfig, err := p.tlsConfigProvider.GetTLSClientConfig(ctx, options.tlsConfigOptions...)
+		if err != nil {
+			return nil, err
+		}
+		options.tlsConfig = tlsConfig
 	}
 
 	transport := http.DefaultTransport.(*http.Transport).Clone()
-	transport.TLSClientConfig = tlsConfig
+	transport.TLSClientConfig = options.tlsConfig
 
 	rt := http.RoundTripper(transport)
 	if options.cache {

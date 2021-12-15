@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"context"
 	"crypto/rand"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -33,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
+	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -142,7 +142,7 @@ func httpExchange(ctx context.Context, httpReq *http.Request, res interface{}, d
 }
 
 type joinServerHTTPClient struct {
-	Client         http.Client
+	Client         *http.Client
 	NewRequestFunc func(types.EUI64, func(jsRPCPaths) string, interface{}) (*http.Request, error)
 	Protocol       ProtocolVersion
 }
@@ -309,16 +309,8 @@ var errUnknownConfig = errors.DefineNotFound("unknown_config", "configuration is
 
 // NewClient return new interop client.
 // fallbackTLS is optional.
-func NewClient(ctx context.Context, conf config.InteropClient) (*Client, error) {
-	var fallbackTLS *tls.Config
-	tlsConf, err := conf.GetFallbackTLSConfig(ctx)
-	if err != nil {
-		log.FromContext(ctx).WithError(err).Warn("Could not get fallback TLS config for interoperability")
-	} else {
-		fallbackTLS = tlsConf
-	}
-
-	fetcher, err := conf.Fetcher(ctx)
+func NewClient(ctx context.Context, conf config.InteropClient, httpClientProvider httpclient.Provider) (*Client, error) {
+	fetcher, err := conf.Fetcher(ctx, httpClientProvider)
 	if err != nil {
 		return nil, err
 	}
@@ -370,25 +362,22 @@ func NewClient(ctx context.Context, conf config.InteropClient) (*Client, error) 
 		var js joinServerClient
 		switch yamlJSConf.Protocol {
 		case ProtocolV1_0, ProtocolV1_1:
-			tlsConf := fallbackTLS
+			var opts []httpclient.Option
 			if !yamlJSConf.TLS.IsZero() {
-				tlsConf, err = yamlJSConf.TLS.TLSConfig(fetcher)
+				tlsConf, err := yamlJSConf.TLS.TLSConfig(fetcher)
 				if err != nil {
 					return nil, err
 				}
+				opts = append(opts, httpclient.WithTransportOptions(httpclient.WithTLSConfig(tlsConf)))
 			}
 
-			tr := http.DefaultTransport.(*http.Transport).Clone()
-			if transport, ok := conf.HTTPClient.Transport.(*http.Transport); ok {
-				tr = transport.Clone()
+			httpClient, err := httpClientProvider.HTTPClient(ctx, opts...)
+			if err != nil {
+				return nil, err
 			}
-			if tlsConf != nil {
-				tr.TLSClientConfig = tlsConf
-			}
-			client := *conf.HTTPClient
-			client.Transport = tr
+
 			js = &joinServerHTTPClient{
-				Client:         client,
+				Client:         httpClient,
 				NewRequestFunc: makeJoinServerHTTPRequestFunc("https", yamlJSConf.DNS, yamlJSConf.FQDN, yamlJSConf.Port, yamlJSConf.Paths, yamlJSConf.Headers),
 				Protocol:       yamlJSConf.Protocol,
 			}

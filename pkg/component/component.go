@@ -165,7 +165,7 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 		taskStarter: task.StartTaskFunc(task.DefaultStartTask),
 	}
 
-	c.limiter, err = ratelimit.New(ctx, config.RateLimiting, config.Blob)
+	c.limiter, err = ratelimit.New(ctx, config.RateLimiting, config.Blob, c)
 	if err != nil {
 		return nil, err
 	}
@@ -174,7 +174,7 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 		opt(c)
 	}
 
-	fpsFetcher, err := config.FrequencyPlansFetcher(ctx)
+	fpsFetcher, err := config.FrequencyPlansFetcher(ctx, c)
 	if err != nil {
 		return nil, err
 	}

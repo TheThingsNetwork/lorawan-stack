@@ -34,7 +34,7 @@ func TestBucket(t *testing.T) {
 	filename := "file"
 	content := []byte("Hello world")
 
-	bucket, err := conf.Bucket(ctx, "bucket")
+	bucket, err := conf.Bucket(ctx, "bucket", test.HTTPClientProvider)
 	a.So(err, should.BeNil)
 
 	err = bucket.WriteAll(ctx, filename, content, nil)

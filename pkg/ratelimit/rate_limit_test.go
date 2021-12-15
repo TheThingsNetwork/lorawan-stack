@@ -57,7 +57,7 @@ func TestRateLimit(t *testing.T) {
 				Associations: []string{"override"},
 			},
 		},
-	}, config.BlobConfig{})
+	}, config.BlobConfig{}, nil)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -163,7 +163,7 @@ func TestRateLimit(t *testing.T) {
 		}
 
 		a := assertions.New(t)
-		limiter, err := ratelimit.New(test.Context(), conf, config.BlobConfig{})
+		limiter, err := ratelimit.New(test.Context(), conf, config.BlobConfig{}, nil)
 		a.So(err, should.BeNil)
 
 		resource := &mockResource{key: "key", classes: []string{"assoc1"}}

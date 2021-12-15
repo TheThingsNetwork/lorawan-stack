@@ -93,7 +93,7 @@ func (is *IdentityServer) processUserProfilePicture(ctx context.Context, usr *tt
 	}
 
 	// Store picture to bucket.
-	bucket, err := is.Component.GetBaseConfig(ctx).Blob.Bucket(ctx, config.ProfilePicture.Bucket)
+	bucket, err := is.Component.GetBaseConfig(ctx).Blob.Bucket(ctx, config.ProfilePicture.Bucket, is)
 	if err != nil {
 		return err
 	}
@@ -146,7 +146,7 @@ func (is *IdentityServer) processEndDevicePicture(ctx context.Context, dev *ttnp
 	}
 
 	// Store picture to bucket.
-	bucket, err := is.Component.GetBaseConfig(ctx).Blob.Bucket(ctx, config.EndDevicePicture.Bucket)
+	bucket, err := is.Component.GetBaseConfig(ctx).Blob.Bucket(ctx, config.EndDevicePicture.Bucket, is)
 	if err != nil {
 		return err
 	}

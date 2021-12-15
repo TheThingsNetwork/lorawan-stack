@@ -17,7 +17,6 @@ package applicationserver
 import (
 	"bytes"
 	"context"
-	"crypto/tls"
 	"fmt"
 	"net"
 	"time"
@@ -102,22 +101,12 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 
 	baseConf := c.GetBaseConfig(ctx)
 
-	httpClient, err := c.HTTPClient(ctx)
-	if err != nil {
-		return nil, err
-	}
 	var interopCl InteropClient
 	if !conf.Interop.IsZero() {
 		interopConf := conf.Interop.InteropClient
-		interopConf.GetFallbackTLSConfig = func(ctx context.Context) (*tls.Config, error) {
-			return c.GetTLSClientConfig(ctx)
-		}
 		interopConf.BlobConfig = baseConf.Blob
-		if interopConf.HTTPClient == nil {
-			interopConf.HTTPClient = httpClient
-		}
 
-		interopCl, err = interop.NewClient(ctx, interopConf)
+		interopCl, err = interop.NewClient(ctx, interopConf, c)
 		if err != nil {
 			return nil, err
 		}
@@ -249,10 +238,7 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		c.RegisterWeb(webhooks)
 	}
 
-	if conf.Webhooks.Templates.HTTPClient == nil {
-		conf.Webhooks.Templates.HTTPClient = httpClient
-	}
-	if as.webhookTemplates, err = conf.Webhooks.Templates.NewTemplateStore(); err != nil {
+	if as.webhookTemplates, err = conf.Webhooks.Templates.NewTemplateStore(ctx, as); err != nil {
 		return nil, err
 	}
 

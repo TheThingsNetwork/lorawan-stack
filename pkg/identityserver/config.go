@@ -16,7 +16,6 @@ package identityserver
 
 import (
 	"context"
-	"net/http"
 	"os"
 	"time"
 
@@ -26,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/email/sendgrid"
 	"go.thethings.network/lorawan-stack/v3/pkg/email/smtp"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
+	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	ttntypes "go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -117,13 +117,11 @@ type emailTemplatesConfig struct {
 	Blob      config.BlobPathConfig `name:"blob"`
 
 	Includes []string `name:"includes" description:"The email templates that will be preloaded on startup"`
-
-	HTTPClient *http.Client `name:"-"`
 }
 
 // Fetcher returns a fetch.Interface based on the configuration.
 // If no configuration source is set, this method returns nil, nil.
-func (c emailTemplatesConfig) Fetcher(ctx context.Context, blobConf config.BlobConfig) (fetch.Interface, error) {
+func (c emailTemplatesConfig) Fetcher(ctx context.Context, blobConf config.BlobConfig, httpClientProvider httpclient.Provider) (fetch.Interface, error) {
 	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
 	if c.Source == "" {
 		switch {
@@ -147,9 +145,13 @@ func (c emailTemplatesConfig) Fetcher(ctx context.Context, blobConf config.BlobC
 	case "directory":
 		return fetch.FromFilesystem(c.Directory), nil
 	case "url":
-		return fetch.FromHTTP(c.HTTPClient, c.URL, true)
+		httpClient, err := httpClientProvider.HTTPClient(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return fetch.FromHTTP(httpClient, c.URL, true)
 	case "blob":
-		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
+		b, err := blobConf.Bucket(ctx, c.Blob.Bucket, httpClientProvider)
 		if err != nil {
 			return nil, err
 		}

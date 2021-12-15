@@ -91,7 +91,7 @@ func NewServer(c Component, contextFillers []fillcontext.Filler, conf config.Int
 	ctx := log.NewContextWithField(c.Context(), "namespace", "interop")
 	logger := log.FromContext(ctx)
 
-	senderClientCAs, err := fetchSenderClientCAs(ctx, conf)
+	senderClientCAs, err := fetchSenderClientCAs(ctx, conf, c)
 	if err != nil {
 		return nil, err
 	}

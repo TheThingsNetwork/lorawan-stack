@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
+	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -80,7 +81,7 @@ const (
 	SenderClientCAsConfigurationName = "config.yml"
 )
 
-func fetchSenderClientCAs(ctx context.Context, conf config.InteropServer) (map[string][]*x509.Certificate, error) {
+func fetchSenderClientCAs(ctx context.Context, conf config.InteropServer, httpClientProvider httpclient.Provider) (map[string][]*x509.Certificate, error) {
 	decodeCerts := func(b []byte) (res []*x509.Certificate, err error) {
 		for len(b) > 0 {
 			var block *pem.Block
@@ -128,7 +129,7 @@ func fetchSenderClientCAs(ctx context.Context, conf config.InteropServer) (map[s
 			}
 		}
 	} else {
-		fetcher, err := conf.SenderClientCA.Fetcher(ctx)
+		fetcher, err := conf.SenderClientCA.Fetcher(ctx, httpClientProvider)
 		if err != nil {
 			return nil, err
 		}

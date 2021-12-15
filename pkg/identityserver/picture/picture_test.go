@@ -104,7 +104,7 @@ func TestStore(t *testing.T) {
 	ctx := test.Context()
 	var blobConfig config.BlobConfig
 	blobConfig.Provider, blobConfig.Local.Directory = "local", "."
-	bucket, _ := blobConfig.Bucket(ctx, "testdata")
+	bucket, _ := blobConfig.Bucket(ctx, "testdata", test.HTTPClientProvider)
 
 	pic, err := picture.Store(ctx, bucket, "picture", &ttnpb.Picture{
 		Sizes: map[uint32]string{

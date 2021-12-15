@@ -16,8 +16,6 @@ package config
 
 import (
 	"context"
-	"crypto/tls"
-	"net/http"
 	"os"
 	"time"
 
@@ -31,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
+	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"gocloud.dev/blob"
@@ -165,8 +164,6 @@ type KeyVault struct {
 	Provider string            `name:"provider" description:"Provider (static)"`
 	Cache    KeyVaultCache     `name:"cache"`
 	Static   map[string][]byte `name:"static"`
-
-	HTTPClient *http.Client `name:"-"`
 }
 
 // KeyVault returns an initialized crypto.KeyVault based on the configuration.
@@ -222,8 +219,6 @@ type BlobConfig struct {
 	AWS      BlobConfigAWS   `name:"aws"`
 	GCP      BlobConfigGCP   `name:"gcp"`
 	Azure    BlobConfigAzure `name:"azure" description:"Azure Storage configuration (EXPERIMENTAL)"`
-
-	HTTPClient *http.Client `name:"-"`
 }
 
 // IsZero returns whether conf is empty.
@@ -236,12 +231,16 @@ func (c BlobConfig) IsZero() bool {
 }
 
 // Bucket returns the requested blob bucket using the config.
-func (c BlobConfig) Bucket(ctx context.Context, bucket string) (*blob.Bucket, error) {
+func (c BlobConfig) Bucket(ctx context.Context, bucket string, httpClientProvider httpclient.Provider) (*blob.Bucket, error) {
 	switch c.Provider {
 	case "local":
 		return ttnblob.Local(ctx, bucket, c.Local.Directory)
 	case "aws":
-		conf := aws.NewConfig().WithHTTPClient(c.HTTPClient)
+		httpClient, err := httpClientProvider.HTTPClient(ctx)
+		if err != nil {
+			return nil, err
+		}
+		conf := aws.NewConfig().WithHTTPClient(httpClient)
 		if c.AWS.Endpoint != "" {
 			conf = conf.WithEndpoint(c.AWS.Endpoint)
 		}
@@ -294,13 +293,11 @@ type FrequencyPlansConfig struct {
 	Directory    string            `name:"directory" description:"OS filesystem directory, which contains frequency plans"`
 	URL          string            `name:"url" description:"URL, which contains frequency plans"`
 	Blob         BlobPathConfig    `name:"blob"`
-
-	HTTPClient *http.Client `name:"-"`
 }
 
 // Fetcher returns a fetch.Interface based on the configuration.
 // If no configuration source is set, this method returns nil, nil.
-func (c FrequencyPlansConfig) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.Interface, error) {
+func (c FrequencyPlansConfig) Fetcher(ctx context.Context, blobConf BlobConfig, httpClientProvider httpclient.Provider) (fetch.Interface, error) {
 	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
 	if c.ConfigSource == "" {
 		switch {
@@ -324,9 +321,13 @@ func (c FrequencyPlansConfig) Fetcher(ctx context.Context, blobConf BlobConfig) 
 	case "directory":
 		return fetch.FromFilesystem(c.Directory), nil
 	case "url":
-		return fetch.FromHTTP(c.HTTPClient, c.URL, true)
+		httpClient, err := httpClientProvider.HTTPClient(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return fetch.FromHTTP(httpClient, c.URL, true)
 	case "blob":
-		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
+		b, err := blobConf.Bucket(ctx, c.Blob.Bucket, httpClientProvider)
 		if err != nil {
 			return nil, err
 		}
@@ -343,10 +344,7 @@ type InteropClient struct {
 	URL          string         `name:"url" description:"URL, which contains interoperability client configuration"`
 	Blob         BlobPathConfig `name:"blob"`
 
-	GetFallbackTLSConfig func(ctx context.Context) (*tls.Config, error) `name:"-"`
-	BlobConfig           BlobConfig                                     `name:"-"`
-
-	HTTPClient *http.Client `name:"-"`
+	BlobConfig BlobConfig `name:"-"`
 }
 
 // IsZero returns whether conf is empty.
@@ -355,13 +353,12 @@ func (c InteropClient) IsZero() bool {
 		c.Directory == "" &&
 		c.URL == "" &&
 		c.Blob.IsZero() &&
-		c.GetFallbackTLSConfig == nil &&
 		c.BlobConfig.IsZero()
 }
 
 // Fetcher returns fetch.Interface defined by conf.
 // If no configuration source is set, this method returns nil, nil.
-func (c InteropClient) Fetcher(ctx context.Context) (fetch.Interface, error) {
+func (c InteropClient) Fetcher(ctx context.Context, httpClientProvider httpclient.Provider) (fetch.Interface, error) {
 	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
 	if c.ConfigSource == "" {
 		switch {
@@ -381,9 +378,13 @@ func (c InteropClient) Fetcher(ctx context.Context) (fetch.Interface, error) {
 	case "directory":
 		return fetch.FromFilesystem(c.Directory), nil
 	case "url":
-		return fetch.FromHTTP(c.HTTPClient, c.URL, true)
+		httpClient, err := httpClientProvider.HTTPClient(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return fetch.FromHTTP(httpClient, c.URL, true)
 	case "blob":
-		b, err := c.BlobConfig.Bucket(ctx, c.Blob.Bucket)
+		b, err := c.BlobConfig.Bucket(ctx, c.Blob.Bucket, httpClientProvider)
 		if err != nil {
 			return nil, err
 		}
@@ -401,20 +402,22 @@ type SenderClientCA struct {
 	Blob      BlobPathConfig    `name:"blob"`
 
 	BlobConfig BlobConfig `name:"-"`
-
-	HTTPClient *http.Client `name:"-"`
 }
 
 // Fetcher returns fetch.Interface defined by conf.
 // If no configuration source is set, this method returns nil, nil.
-func (c SenderClientCA) Fetcher(ctx context.Context) (fetch.Interface, error) {
+func (c SenderClientCA) Fetcher(ctx context.Context, httpClientProvider httpclient.Provider) (fetch.Interface, error) {
 	switch c.Source {
 	case "directory":
 		return fetch.FromFilesystem(c.Directory), nil
 	case "url":
-		return fetch.FromHTTP(c.HTTPClient, c.URL, true)
+		httpClient, err := httpClientProvider.HTTPClient(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return fetch.FromHTTP(httpClient, c.URL, true)
 	case "blob":
-		b, err := c.BlobConfig.Bucket(ctx, c.Blob.Bucket)
+		b, err := c.BlobConfig.Bucket(ctx, c.Blob.Bucket, httpClientProvider)
 		if err != nil {
 			return nil, err
 		}
@@ -464,8 +467,8 @@ type ServiceBase struct {
 
 // FrequencyPlansFetcher returns a fetch.Interface based on the frequency plans configuration.
 // If no configuration source is set, this method returns nil, nil.
-func (c ServiceBase) FrequencyPlansFetcher(ctx context.Context) (fetch.Interface, error) {
-	return c.FrequencyPlans.Fetcher(ctx, c.Blob)
+func (c ServiceBase) FrequencyPlansFetcher(ctx context.Context, httpClientProvider httpclient.Provider) (fetch.Interface, error) {
+	return c.FrequencyPlans.Fetcher(ctx, c.Blob, httpClientProvider)
 }
 
 // MQTT contains the listen and public addresses of an MQTT frontend.
@@ -509,22 +512,24 @@ type RateLimiting struct {
 	URL          string         `name:"url" description:"URL, which contains rate limiting configuration"`
 	Blob         BlobPathConfig `name:"blob"`
 
-	HTTPClient *http.Client `name:"-"`
-
 	Memory   RateLimitingMemory    `name:"memory" description:"In-memory rate limiting store configuration"`
 	Profiles []RateLimitingProfile `name:"profiles" description:"Rate limiting profiles"`
 }
 
 // Fetcher returns fetch.Interface defined by conf.
 // If no configuration source is set, this method returns nil, nil.
-func (c RateLimiting) Fetcher(ctx context.Context, blobConf BlobConfig) (fetch.Interface, error) {
+func (c RateLimiting) Fetcher(ctx context.Context, blobConf BlobConfig, httpClientProvider httpclient.Provider) (fetch.Interface, error) {
 	switch c.ConfigSource {
 	case "directory":
 		return fetch.FromFilesystem(c.Directory), nil
 	case "url":
-		return fetch.FromHTTP(c.HTTPClient, c.URL, true)
+		httpClient, err := httpClientProvider.HTTPClient(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return fetch.FromHTTP(httpClient, c.URL, true)
 	case "blob":
-		b, err := blobConf.Bucket(ctx, c.Blob.Bucket)
+		b, err := blobConf.Bucket(ctx, c.Blob.Bucket, httpClientProvider)
 		if err != nil {
 			return nil, err
 		}

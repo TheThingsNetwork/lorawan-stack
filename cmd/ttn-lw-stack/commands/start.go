@@ -39,7 +39,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayconfigurationserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
 	gsredis "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/redis"
-	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/joinserver"
 	jsredis "go.thethings.network/lorawan-stack/v3/pkg/joinserver/redis"
@@ -188,28 +187,6 @@ var startCommand = &cobra.Command{
 
 		c.RegisterGRPC(events_grpc.NewEventsServer(c.Context(), events.DefaultPubSub()))
 		c.RegisterGRPC(component.NewConfigurationServer(c))
-
-		for _, httpClient := range []**http.Client{
-			&config.ServiceBase.FrequencyPlans.HTTPClient,
-			&config.ServiceBase.Interop.SenderClientCA.HTTPClient,
-			&config.ServiceBase.KeyVault.HTTPClient,
-			&config.ServiceBase.RateLimiting.HTTPClient,
-			&config.ServiceBase.Blob.HTTPClient,
-			&config.AS.Interop.InteropClient.BlobConfig.HTTPClient,
-			&config.NS.Interop.BlobConfig.HTTPClient,
-		} {
-			if *httpClient != nil {
-				continue
-			}
-			*httpClient, err = c.HTTPClient(ctx,
-				httpclient.WithTransportOptions(
-					httpclient.WithCache(true),
-				),
-			)
-			if err != nil {
-				return err
-			}
-		}
 
 		if start.IdentityServer {
 			logger.Info("Setting up Identity Server")

@@ -21,6 +21,7 @@ import (
 	"github.com/throttled/throttled/v2/store/memstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"gopkg.in/yaml.v2"
 )
 
@@ -30,11 +31,11 @@ const defaultMaxSize = 1 << 12
 var errRateLimitExceeded = errors.DefineResourceExhausted("rate_limit_exceeded", "rate limit of `{rate}` accesses per minute exceeded for resource `{key}`")
 
 // New creates a new ratelimit.Interface from configuration.
-func New(ctx context.Context, conf config.RateLimiting, blobConf config.BlobConfig) (Interface, error) {
+func New(ctx context.Context, conf config.RateLimiting, blobConf config.BlobConfig, httpClientProvider httpclient.Provider) (Interface, error) {
 	defaultLimiter := &NoopRateLimiter{}
 	profiles := conf.Profiles
 
-	fetcher, err := conf.Fetcher(ctx, blobConf)
+	fetcher, err := conf.Fetcher(ctx, blobConf, httpClientProvider)
 	if err != nil {
 		return nil, err
 	}

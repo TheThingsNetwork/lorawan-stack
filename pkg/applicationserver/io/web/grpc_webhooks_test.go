@@ -16,7 +16,6 @@ package web_test
 
 import (
 	"context"
-	"net/http"
 	"testing"
 
 	"github.com/gogo/protobuf/types"
@@ -231,14 +230,14 @@ description: Bar`),
 
 			a := assertions.New(t)
 
+			c := componenttest.NewComponent(t, &component.Config{})
+
 			config := web.TemplatesConfig{
-				Static:     tc.contents,
-				HTTPClient: http.DefaultClient,
+				Static: tc.contents,
 			}
-			store, err := config.NewTemplateStore()
+			store, err := config.NewTemplateStore(ctx, c)
 			a.So(err, should.BeNil)
 
-			c := componenttest.NewComponent(t, &component.Config{})
 			c.RegisterGRPC(&mockRegisterer{ctx, web.NewWebhookRegistryRPC(nil, store)})
 			componenttest.StartComponent(t, c)
 			defer c.Close()
