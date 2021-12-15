@@ -44,16 +44,14 @@ describe('Gateway location create', () => {
     cy.findByText('Location', { selector: 'h1' }).should('be.visible')
     cy.findByText('Gateway antenna location settings', { selector: 'h3' }).should('be.visible')
     cy.findByLabelText('Location privacy').should('exist')
-    cy.findDescriptionByLabelText('Location privacy')
-      .should(
-        'contain',
-        'The location of this gateway may be visible to other users and on public gateway maps',
-      )
-      .and('be.visible')
-    cy.findByLabelText('Location source').should('exist')
-    cy.findDescriptionByLabelText('Location source')
-      .should('contain', 'Update the location of this gateway based on incoming status messages')
-      .and('be.visible')
+    cy.findDescriptionByLabelText('Location privacy').should('contain', 'public').and('be.visible')
+    cy.findByText('Location source').should('be.visible')
+    cy.findByLabelText('Set location manually').should('exist').and('be.checked')
+    cy.findByLabelText('Update from status messages').should('exist')
+    cy.findByText('Placement').should('be.visible')
+    cy.findByLabelText('Unknown').should('exist')
+    cy.findByLabelText('Indoor').should('exist')
+    cy.findByLabelText('Outdoor').should('exist')
     cy.findByTestId('location-map').should('be.visible')
     cy.findByLabelText('Latitude').should('be.visible')
     cy.findDescriptionByLabelText('Latitude')
@@ -97,16 +95,18 @@ describe('Gateway location create', () => {
 
   it('disables inputs when location source is checked', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/location`)
-    cy.findByLabelText('Location source').check()
+    cy.findByLabelText('Update from status messages').check()
 
     cy.findByLabelText('Latitude').should('be.disabled')
     cy.findByLabelText('Longitude').should('be.disabled')
     cy.findByLabelText('Altitude').should('be.disabled')
-    cy.findByRole('button', { name: /Remove location entry/ }).should('be.disabled')
+    cy.findByRole('button', { name: /Remove location/ }).should('be.disabled')
   })
 
   it('succeeds saving location', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/location`)
+    cy.findByLabelText('Make location public').check()
+    cy.findByLabelText('Indoor').check()
     cy.findByLabelText('Latitude').type(coordinates.latitude)
     cy.findByLabelText('Longitude').type(coordinates.longitude)
     cy.findByLabelText('Altitude').type(coordinates.altitude)

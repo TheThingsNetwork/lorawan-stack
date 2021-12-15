@@ -84,7 +84,7 @@ describe('Gateway location', () => {
       .should('be.visible')
   })
 
-  it('suceeds editing the location when location was null', () => {
+  it('succeeds editing the location when location was null', () => {
     cy.updateGateway(gatewayId, updatedGatewayNullLocation)
     cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/location`)
     cy.findByLabelText('Latitude').type(coordinates.latitude)
@@ -122,13 +122,13 @@ describe('Gateway location', () => {
   it('succeeds deleting location entry', () => {
     cy.updateGateway(gatewayId, updatedGatewayLocation)
     cy.visit(`${Cypress.config('consoleRootPath')}/gateways/${gatewayId}/location`)
-    cy.findByRole('button', { name: /Remove location entry/ }).click()
+    cy.findByRole('button', { name: /Remove location/ }).click()
 
     cy.findByTestId('modal-window')
       .should('be.visible')
       .within(() => {
-        cy.findByText('Remove location entry', { selector: 'h1' }).should('be.visible')
-        cy.findByRole('button', { name: /Remove location entry/ }).click()
+        cy.findByText('Remove location data', { selector: 'h1' }).should('be.visible')
+        cy.findByRole('button', { name: /Remove location/ }).click()
       })
 
     cy.findByTestId('error-notification').should('not.exist')

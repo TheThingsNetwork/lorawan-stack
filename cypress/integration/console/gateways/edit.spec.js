@@ -85,12 +85,7 @@ describe('Gateway general settings', () => {
     cy.findDescriptionByLabelText('Gateway status')
       .should('contain', 'The status of this gateway may be visible to other users')
       .and('be.visible')
-    cy.findDescriptionByLabelText('Gateway location')
-      .should(
-        'contain',
-        'The location of this gateway may be visible to other users and on public gateway maps',
-      )
-      .and('be.visible')
+    cy.findDescriptionByLabelText('Gateway location').should('contain', 'public').and('be.visible')
     cy.findByTestId('key-value-map').within(() => {
       cy.findByTestId('attributes[0].key').should('be.visible').and('have.attr', 'value', 'key')
       cy.findByTestId('attributes[0].value')
