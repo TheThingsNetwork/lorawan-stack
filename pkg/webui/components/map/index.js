@@ -14,12 +14,13 @@
 
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
-import { MapContainer, Marker, TileLayer } from 'react-leaflet'
+import { MapContainer, Marker, CircleMarker, Circle, TileLayer } from 'react-leaflet'
 import classnames from 'classnames'
-import Leaflet from 'leaflet'
+import Leaflet, { latLngBounds } from 'leaflet'
 import shadowImg from 'leaflet/dist/images/marker-shadow.png'
 
 import MarkerIcon from '@assets/auxiliary-icons/location_pin.svg'
+import COLORS from '@ttn-lw/constants/colors'
 
 import style from './map.styl'
 
@@ -41,19 +42,80 @@ Leaflet.Icon.Default.mergeOptions({
 const defaultMinZoom = 7
 
 const LocationMap = props => {
-  const { className, mapCenter, clickable, widget, markers, leafletConfig, onClick } = props
+  const {
+    className,
+    mapCenter,
+    clickable,
+    widget,
+    markers,
+    leafletConfig,
+    onClick,
+    centerOnMarkers,
+  } = props
 
   const hasValidCoordinates = mapCenter instanceof Array && mapCenter.length === 2
 
+  const bounds = latLngBounds(
+    markers.map(marker => [marker.position.latitude, marker.position.longitude]),
+  )
+
+  let center = [0, 0]
+
+  if (centerOnMarkers && markers.length >= 1) {
+    center = bounds.getCenter()
+  } else if (hasValidCoordinates) {
+    center = mapCenter
+  }
   const handleCreated = useCallback(
     map => {
       // Fix incomplete tile loading in some rare cases.
       map.invalidateSize()
       // Attach click handler.
       map.on('click', onClick)
+      if (centerOnMarkers && markers.length > 1) {
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 })
+      }
     },
-    [onClick],
+    [onClick, bounds, markers.length, centerOnMarkers],
   )
+
+  const renderMarker = useCallback(marker => {
+    if (!marker) {
+      return null
+    }
+
+    const hasAccuracy = typeof marker.accuracy === 'number'
+    const children = (
+      <>
+        {typeof marker.accuracy === 'number' && (
+          <Circle
+            center={[marker.position.latitude, marker.position.longitude]}
+            radius={marker.accuracy}
+            weight={1}
+            fillOpacity={0.1}
+          />
+        )}
+        {marker.children}
+      </>
+    )
+    return hasAccuracy ? (
+      <CircleMarker
+        key={`marker-${marker.position.latitude}-${marker.position.longitude}`}
+        center={[marker.position.latitude, marker.position.longitude]}
+        radius={8}
+        children={children}
+        color="#ffffff"
+        fillColor={COLORS.C_ACTIVE_BLUE}
+        fillOpacity={1}
+      />
+    ) : (
+      <Marker
+        key={`marker-${marker.position.latitude}-${marker.position.longitude}`}
+        position={[marker.position.latitude, marker.position.longitude]}
+        children={children}
+      />
+    )
+  }, [])
 
   return (
     <div
@@ -67,7 +129,7 @@ const LocationMap = props => {
           })}
           minZoom={defaultMinZoom}
           whenCreated={handleCreated}
-          center={mapCenter}
+          center={center}
           {...leafletConfig}
         >
           <TileLayer
@@ -75,15 +137,7 @@ const LocationMap = props => {
             attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             noWrap
           />
-          {markers.map(
-            marker =>
-              marker && (
-                <Marker
-                  key={`marker-${marker.position.latitude}-${marker.position.altitude}`}
-                  position={[marker.position.latitude, marker.position.longitude]}
-                />
-              ),
-          )}
+          {markers.map(renderMarker)}
         </MapContainer>
       )}
     </div>
@@ -91,6 +145,8 @@ const LocationMap = props => {
 }
 
 LocationMap.propTypes = {
+  // Whether the map should center on the provided markers (if exist), once loaded (regardless of `mapCenter`).
+  centerOnMarkers: PropTypes.bool,
   className: PropTypes.string,
   clickable: PropTypes.bool,
   // `LeafletConfig` is an object which can contain any number of properties
@@ -116,6 +172,7 @@ LocationMap.propTypes = {
 }
 
 LocationMap.defaultProps = {
+  centerOnMarkers: true,
   leafletConfig: {},
   className: undefined,
   widget: false,
