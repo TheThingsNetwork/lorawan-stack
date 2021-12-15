@@ -18,7 +18,7 @@ import (
 	"context"
 	"crypto/tls"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/packetbroker"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -28,7 +28,7 @@ import (
 )
 
 type tlsConfigurator interface {
-	GetTLSClientConfig(context.Context, ...component.TLSConfigOption) (*tls.Config, error)
+	GetTLSClientConfig(context.Context, ...tlsconfig.Option) (*tls.Config, error)
 }
 
 type authenticator interface {

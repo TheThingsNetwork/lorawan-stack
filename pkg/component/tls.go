@@ -17,61 +17,12 @@ package component
 import (
 	"context"
 	"crypto/tls"
-	"crypto/x509"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 )
 
-// TLSConfigOption provides customization for TLS configuration.
-type TLSConfigOption interface {
-	apply(*tls.Config)
-}
-
-// TLSConfigOptionFunc is a TLSConfigOption.
-type TLSConfigOptionFunc func(*tls.Config)
-
-func (fn TLSConfigOptionFunc) apply(c *tls.Config) {
-	fn(c)
-}
-
-// WithTLSClientAuth sets TLS client authentication options.
-func WithTLSClientAuth(auth tls.ClientAuthType, cas *x509.CertPool, verify func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error) TLSConfigOption {
-	return TLSConfigOptionFunc(func(c *tls.Config) {
-		c.ClientAuth = auth
-		c.ClientCAs = cas
-		c.VerifyPeerCertificate = verify
-	})
-}
-
-// WithTLSCertificates sets TLS certificates.
-func WithTLSCertificates(certificates ...tls.Certificate) TLSConfigOption {
-	return TLSConfigOptionFunc(func(c *tls.Config) {
-		c.Certificates = certificates
-	})
-}
-
-// WithNextProtos appends the given protocols to NextProtos.
-func WithNextProtos(protos ...string) TLSConfigOption {
-	return TLSConfigOptionFunc(func(c *tls.Config) {
-		c.NextProtos = append(c.NextProtos, protos...)
-	})
-}
-
-// GetTLSServerConfig gets the component's server TLS config and applies the given options.
-func (c *Component) GetTLSServerConfig(ctx context.Context, opts ...TLSConfigOption) (*tls.Config, error) {
+func (c *Component) getTLSConfig(ctx context.Context) tlsconfig.Config {
 	conf := c.GetBaseConfig(ctx).TLS
-	cipherSuites, err := conf.GetCipherSuites()
-	if cipherSuites != nil {
-		log.FromContext(ctx).Warn("TLS is configured to use a custom set of cipher suites. Make sure that your list is up to date, or disable the custom cipher suites")
-	}
-	if err != nil {
-		return nil, err
-	}
-	res := &tls.Config{
-		MinVersion:   tls.VersionTLS12,
-		CipherSuites: cipherSuites,
-	}
-
 	// TODO: Remove detection mechanism (https://github.com/TheThingsNetwork/lorawan-stack/issues/1450)
 	if conf.Source == "" {
 		switch {
@@ -86,27 +37,15 @@ func (c *Component) GetTLSServerConfig(ctx context.Context, opts ...TLSConfigOpt
 	if conf.Source == "key-vault" {
 		conf.KeyVault.KeyVault = c.KeyVault
 	}
-	if err := conf.ServerAuth.ApplyTo(res); err != nil {
-		return nil, err
-	}
-	for _, opt := range opts {
-		opt.apply(res)
-	}
-	return res, nil
+	return conf
+}
+
+// GetTLSServerConfig gets the component's server TLS config and applies the given options.
+func (c *Component) GetTLSServerConfig(ctx context.Context, opts ...tlsconfig.Option) (*tls.Config, error) {
+	return tlsconfig.ConfigurationProvider(c.getTLSConfig).GetTLSServerConfig(ctx, opts...)
 }
 
 // GetTLSClientConfig gets the component's client TLS config and applies the given options.
-func (c *Component) GetTLSClientConfig(ctx context.Context, opts ...TLSConfigOption) (*tls.Config, error) {
-	conf := c.GetBaseConfig(ctx).TLS
-	res := &tls.Config{
-		MinVersion:         tls.VersionTLS12,
-		InsecureSkipVerify: conf.InsecureSkipVerify,
-	}
-	if err := conf.Client.ApplyTo(res); err != nil {
-		return nil, err
-	}
-	for _, opt := range opts {
-		opt.apply(res)
-	}
-	return res, nil
+func (c *Component) GetTLSClientConfig(ctx context.Context, opts ...tlsconfig.Option) (*tls.Config, error) {
+	return tlsconfig.ConfigurationProvider(c.getTLSConfig).GetTLSClientConfig(ctx, opts...)
 }

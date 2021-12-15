@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 )
 
@@ -48,8 +49,8 @@ func (c *Component) interopEndpoints() []Endpoint {
 	return []Endpoint{
 		NewTCPEndpoint(c.config.Interop.Listen, "Interop"),
 		NewTLSEndpoint(c.config.Interop.ListenTLS, "Interop",
-			WithTLSClientAuth(tls.VerifyClientCertIfGiven, c.interop.ClientCAPool(), nil),
-			WithNextProtos("h2", "http/1.1"),
+			tlsconfig.WithTLSClientAuth(tls.VerifyClientCertIfGiven, c.interop.ClientCAPool(), nil),
+			tlsconfig.WithNextProtos("h2", "http/1.1"),
 		),
 	}
 }
