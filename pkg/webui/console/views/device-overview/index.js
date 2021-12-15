@@ -28,13 +28,14 @@ import DeviceMap from '@console/components/device-map'
 
 import DeviceEvents from '@console/containers/device-events'
 
+import Require from '@console/lib/components/require'
+
 import { selectAsConfig } from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
-import Require from '@console/lib/components/require'
 
 import { selectSelectedDevice, isOtherClusterDevice } from '@console/store/selectors/devices'
 
