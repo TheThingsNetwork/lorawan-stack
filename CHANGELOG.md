@@ -17,6 +17,7 @@ For details about compatibility between different releases, see the **Commitment
   - By default, a webhook is allowed 16 successive failures before it is disabled. The default cooldown period is 24 hours.
   - A successful HTTP request will reset the failure counter.
   - The number of allowed successive failures and cooldown period can be configured using the `--as.webhooks.unhealthy-attempts-threshold` and `--as.webhooks.unhealthy-retry-interval` configuration options.
+- Webhook enabled path validation in the Console.
 
 ### Changed
 
