@@ -368,7 +368,7 @@ func NewClient(ctx context.Context, conf config.InteropClient, httpClientProvide
 				if err != nil {
 					return nil, err
 				}
-				opts = append(opts, httpclient.WithTransportOptions(httpclient.WithTLSConfig(tlsConf)))
+				opts = append(opts, httpclient.WithTLSConfig(tlsConf))
 			}
 
 			httpClient, err := httpClientProvider.HTTPClient(ctx, opts...)

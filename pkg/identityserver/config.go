@@ -145,7 +145,7 @@ func (c emailTemplatesConfig) Fetcher(ctx context.Context, blobConf config.BlobC
 	case "directory":
 		return fetch.FromFilesystem(c.Directory), nil
 	case "url":
-		httpClient, err := httpClientProvider.HTTPClient(ctx)
+		httpClient, err := httpClientProvider.HTTPClient(ctx, httpclient.WithCache(true))
 		if err != nil {
 			return nil, err
 		}

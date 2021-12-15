@@ -27,6 +27,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/version"
 )
 
+// defaultHTTPClientTimeout is the default timeout for the HTTP client.
+const defaultHTTPClientTimeout = 10 * time.Second
+
 // TLSClientConfigurationProvider provides a *tls.Config to be used by TLS clients.
 type TLSClientConfigurationProvider interface {
 	GetTLSClientConfig(context.Context, ...tlsconfig.Option) (*tls.Config, error)
@@ -37,83 +40,44 @@ type Provider interface {
 	HTTPClient(context.Context, ...Option) (*http.Client, error)
 }
 
-type provider struct {
-	tlsConfigProvider TLSClientConfigurationProvider
-}
-
-// NewProvider constructs a Provider on top of the provided TLS configuration provider.
-func NewProvider(tlsConfigProvider TLSClientConfigurationProvider) Provider {
-	return &provider{tlsConfigProvider: tlsConfigProvider}
-}
-
-// defaultHTTPClientTimeout is the default timeout for the HTTP client.
-const defaultHTTPClientTimeout = 10 * time.Second
-
-type httpClientOptions struct {
-	transportOptions []TransportOption
-}
-
 // Option is an option for HTTP clients.
 type Option func(*httpClientOptions)
 
-// WithTransportOptions constructs a transport with the provided options.
-func WithTransportOptions(opts ...TransportOption) Option {
-	return Option(func(o *httpClientOptions) {
-		o.transportOptions = opts
-	})
-}
-
-// HTTPClient returns a new *http.Client with a default timeout and a configured transport.
-func (p *provider) HTTPClient(ctx context.Context, opts ...Option) (*http.Client, error) {
-	options := &httpClientOptions{}
-	for _, opt := range opts {
-		opt(options)
-	}
-
-	tr, err := p.HTTPTransport(ctx, options.transportOptions...)
-	if err != nil {
-		return nil, err
-	}
-
-	return &http.Client{
-		Timeout:   defaultHTTPClientTimeout,
-		Transport: tr,
-	}, nil
-}
-
-type httpTransportOptions struct {
+type httpClientOptions struct {
 	cache            bool
 	tlsConfig        *tls.Config
 	tlsConfigOptions []tlsconfig.Option
 }
 
-// TransportOption is an option for HTTP transports.
-type TransportOption func(*httpTransportOptions)
-
 // WithCache enables caching at transport level.
-func WithCache(b bool) TransportOption {
-	return TransportOption(func(o *httpTransportOptions) {
-		o.cache = b
-	})
-}
-
-// WithTLSConfigurationOptions provides the given tlsconfig.ConfigOption to the underlying TLS configuration provider.
-func WithTLSConfigurationOptions(opts ...tlsconfig.Option) TransportOption {
-	return TransportOption(func(o *httpTransportOptions) {
-		o.tlsConfigOptions = opts
+func WithCache(b bool) Option {
+	return Option(func(o *httpClientOptions) {
+		o.cache = true
 	})
 }
 
 // WithTLSConfig configures the TLS configuration to be used by the transport.
-func WithTLSConfig(c *tls.Config) TransportOption {
-	return TransportOption(func(o *httpTransportOptions) {
+func WithTLSConfig(c *tls.Config) Option {
+	return Option(func(o *httpClientOptions) {
 		o.tlsConfig = c
 	})
 }
 
-// HTTPTransport returns a new http.RoundTripper with TLS client configuration.
-func (p *provider) HTTPTransport(ctx context.Context, opts ...TransportOption) (http.RoundTripper, error) {
-	options := &httpTransportOptions{}
+// WithTLSConfigOptions configures the TLS configuration options provided to the TLS configuration provider
+// by the transport.
+func WithTLSConfigOptions(opts ...tlsconfig.Option) Option {
+	return Option(func(o *httpClientOptions) {
+		o.tlsConfigOptions = opts
+	})
+}
+
+type provider struct {
+	tlsConfigProvider TLSClientConfigurationProvider
+}
+
+// HTTPClient returns a new *http.Client with a default timeout and a configured transport.
+func (p *provider) HTTPClient(ctx context.Context, opts ...Option) (*http.Client, error) {
+	options := &httpClientOptions{}
 	for _, opt := range opts {
 		opt(options)
 	}
@@ -137,11 +101,20 @@ func (p *provider) HTTPTransport(ctx context.Context, opts ...TransportOption) (
 			MarkCachedResponses: true,
 		}
 	}
-
-	return &roundTripperWithUserAgent{
+	rt = &roundTripperWithUserAgent{
 		RoundTripper: rt,
 		UserAgent:    fmt.Sprintf("TheThingsStack/%s (%s/%s)", version.TTN, runtime.GOOS, runtime.GOARCH),
+	}
+
+	return &http.Client{
+		Timeout:   defaultHTTPClientTimeout,
+		Transport: rt,
 	}, nil
+}
+
+// NewProvider constructs a Provider on top of the provided TLS configuration provider.
+func NewProvider(tlsConfigProvider TLSClientConfigurationProvider) Provider {
+	return &provider{tlsConfigProvider: tlsConfigProvider}
 }
 
 type roundTripperWithUserAgent struct {

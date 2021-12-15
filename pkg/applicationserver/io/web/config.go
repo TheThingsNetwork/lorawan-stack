@@ -54,7 +54,7 @@ func (c TemplatesConfig) NewTemplateStore(ctx context.Context, httpClientProvide
 		fallthrough
 	case c.URL != "":
 		var err error
-		httpClient, err := httpClientProvider.HTTPClient(ctx)
+		httpClient, err := httpClientProvider.HTTPClient(ctx, httpclient.WithCache(true))
 		if err != nil {
 			return nil, err
 		}
