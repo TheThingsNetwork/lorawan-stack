@@ -174,13 +174,12 @@ class Tabular extends React.Component {
 Tabular.propTypes = {
   className: PropTypes.string,
   clickable: PropTypes.bool,
-  /** A list of data entries to display within the table body.
-   * Among them a `_meta` prop for options like clickable or
-   * any other that concern only one row.
-   */
+  /** A list of data entries to display within the table body. */
   data: PropTypes.arrayOf(
     PropTypes.shape({
+      /** A meta config object used to control the behavior of individual rows. */
       _meta: PropTypes.shape({
+        /** A flag specifying whether the row should be clickable. */
         clickable: PropTypes.bool,
       }),
     }),
