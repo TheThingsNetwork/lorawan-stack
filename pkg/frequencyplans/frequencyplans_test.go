@@ -32,7 +32,7 @@ import (
 func uint64Ptr(v uint64) *uint64 { return &v }
 
 func Example() {
-	fetcher, err := fetch.FromHTTP(http.DefaultClient, "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans", true)
+	fetcher, err := fetch.FromHTTP(http.DefaultClient, "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans")
 	if err != nil {
 		panic(err)
 	}

@@ -81,9 +81,9 @@ type Server struct {
 
 // Component represents the Component to the Interop Server.
 type Component interface {
+	httpclient.Provider
 	Context() context.Context
 	RateLimiter() ratelimit.Interface
-	HTTPClient(context.Context, ...httpclient.Option) (*http.Client, error)
 }
 
 // NewServer builds a new server.

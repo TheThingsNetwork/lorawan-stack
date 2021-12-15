@@ -18,12 +18,10 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/jarcoal/httpmock"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
-	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
@@ -32,13 +30,13 @@ func TestHTTP(t *testing.T) {
 
 	// Invalid path
 	{
-		fetcher, err := fetch.FromHTTP(http.DefaultClient, "", false)
+		fetcher, err := fetch.FromHTTP(http.DefaultClient, "")
 		if a.So(err, should.BeNil) && a.So(fetcher, should.NotBeNil) {
 			_, err = fetcher.File("test")
 			a.So(err, should.BeError)
 		}
 
-		fetcher, err = fetch.FromHTTP(http.DefaultClient, "/asd", false)
+		fetcher, err = fetch.FromHTTP(http.DefaultClient, "/asd")
 		if a.So(err, should.NotBeNil) {
 			a.So(fetcher, should.BeNil)
 		}
@@ -53,7 +51,7 @@ func TestHTTP(t *testing.T) {
 	httpmock.RegisterResponder("GET", fmt.Sprintf("%s/success", serverHost), httpmock.NewStringResponder(200, content))
 	httpmock.RegisterResponder("GET", fmt.Sprintf("%s/fail", serverHost), httpmock.NewStringResponder(500, ""))
 
-	fetcher, err := fetch.FromHTTP(http.DefaultClient, serverHost, false)
+	fetcher, err := fetch.FromHTTP(http.DefaultClient, serverHost)
 	if !a.So(err, should.BeNil) {
 		t.Fatalf("Failed to construct HTTP fetcher: %v", err)
 	}
@@ -71,49 +69,4 @@ func TestHTTP(t *testing.T) {
 		_, err := fetcher.File("fail")
 		a.So(err, should.NotBeNil)
 	}
-}
-
-func TestHTTPCache(t *testing.T) {
-	a := assertions.New(t)
-
-	cachedContent := "cached"
-	nonCachedContent := "non-cached"
-
-	servedContent := cachedContent
-	s := &http.Server{
-		Addr: "localhost:8083",
-		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			now := time.Now()
-			w.Header().Add("Date", now.Format(time.RFC1123))
-			w.Header().Add("Expires", now.Add(5*time.Minute).Format(time.RFC1123))
-			_, err := w.Write([]byte(servedContent))
-			if err != nil {
-				w.WriteHeader(500)
-			}
-			return
-		}),
-		ReadTimeout:  time.Second,
-		WriteTimeout: time.Second,
-	}
-	go s.ListenAndServe()
-	defer s.Close()
-
-	time.Sleep(10 * test.Delay)
-
-	fetcher, err := fetch.FromHTTP(http.DefaultClient, fmt.Sprintf("http://%s", s.Addr), true)
-	if !a.So(err, should.BeNil) {
-		t.Fatalf("Failed to construct HTTP fetcher: %v", err)
-	}
-
-	receivedContent, err := fetcher.File("cached")
-	a.So(err, should.BeNil)
-	a.So(string(receivedContent), should.Equal, cachedContent)
-
-	servedContent = nonCachedContent
-	receivedContent, err = fetcher.File("cached")
-	a.So(err, should.BeNil)
-	a.So(string(receivedContent), should.Equal, cachedContent)
-	receivedContent, err = fetcher.File("noncached")
-	a.So(err, should.BeNil)
-	a.So(string(receivedContent), should.Equal, nonCachedContent)
 }

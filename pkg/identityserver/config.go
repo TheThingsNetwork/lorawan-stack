@@ -149,7 +149,7 @@ func (c emailTemplatesConfig) Fetcher(ctx context.Context, blobConf config.BlobC
 		if err != nil {
 			return nil, err
 		}
-		return fetch.FromHTTP(httpClient, c.URL, true)
+		return fetch.FromHTTP(httpClient, c.URL)
 	case "blob":
 		b, err := blobConf.Bucket(ctx, c.Blob.Bucket, httpClientProvider)
 		if err != nil {

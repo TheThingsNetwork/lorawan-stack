@@ -308,7 +308,6 @@ type Client struct {
 var errUnknownConfig = errors.DefineNotFound("unknown_config", "configuration is unknown")
 
 // NewClient return new interop client.
-// fallbackTLS is optional.
 func NewClient(ctx context.Context, conf config.InteropClient, httpClientProvider httpclient.Provider) (*Client, error) {
 	fetcher, err := conf.Fetcher(ctx, httpClientProvider)
 	if err != nil {

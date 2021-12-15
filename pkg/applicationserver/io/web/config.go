@@ -58,7 +58,7 @@ func (c TemplatesConfig) NewTemplateStore(ctx context.Context, httpClientProvide
 		if err != nil {
 			return nil, err
 		}
-		fetcher, err = fetch.FromHTTP(httpClient, c.URL, true)
+		fetcher, err = fetch.FromHTTP(httpClient, c.URL)
 		if err != nil {
 			return nil, err
 		}

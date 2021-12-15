@@ -236,7 +236,7 @@ func (c BlobConfig) Bucket(ctx context.Context, bucket string, httpClientProvide
 	case "local":
 		return ttnblob.Local(ctx, bucket, c.Local.Directory)
 	case "aws":
-		httpClient, err := httpClientProvider.HTTPClient(ctx, httpclient.WithCache(true))
+		httpClient, err := httpClientProvider.HTTPClient(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -325,7 +325,7 @@ func (c FrequencyPlansConfig) Fetcher(ctx context.Context, blobConf BlobConfig, 
 		if err != nil {
 			return nil, err
 		}
-		return fetch.FromHTTP(httpClient, c.URL, true)
+		return fetch.FromHTTP(httpClient, c.URL)
 	case "blob":
 		b, err := blobConf.Bucket(ctx, c.Blob.Bucket, httpClientProvider)
 		if err != nil {
@@ -382,7 +382,7 @@ func (c InteropClient) Fetcher(ctx context.Context, httpClientProvider httpclien
 		if err != nil {
 			return nil, err
 		}
-		return fetch.FromHTTP(httpClient, c.URL, true)
+		return fetch.FromHTTP(httpClient, c.URL)
 	case "blob":
 		b, err := c.BlobConfig.Bucket(ctx, c.Blob.Bucket, httpClientProvider)
 		if err != nil {
@@ -415,7 +415,7 @@ func (c SenderClientCA) Fetcher(ctx context.Context, httpClientProvider httpclie
 		if err != nil {
 			return nil, err
 		}
-		return fetch.FromHTTP(httpClient, c.URL, true)
+		return fetch.FromHTTP(httpClient, c.URL)
 	case "blob":
 		b, err := c.BlobConfig.Bucket(ctx, c.Blob.Bucket, httpClientProvider)
 		if err != nil {
@@ -527,7 +527,7 @@ func (c RateLimiting) Fetcher(ctx context.Context, blobConf BlobConfig, httpClie
 		if err != nil {
 			return nil, err
 		}
-		return fetch.FromHTTP(httpClient, c.URL, true)
+		return fetch.FromHTTP(httpClient, c.URL)
 	case "blob":
 		b, err := blobConf.Bucket(ctx, c.Blob.Bucket, httpClientProvider)
 		if err != nil {
