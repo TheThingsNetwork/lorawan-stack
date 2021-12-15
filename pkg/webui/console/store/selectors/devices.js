@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { getHostnameFromUrl } from '@ttn-lw/lib/host-from-url'
+import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 import { combineDeviceIds, extractDeviceIdFromCombinedId } from '@ttn-lw/lib/selectors/id'
 import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
