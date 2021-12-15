@@ -29,9 +29,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
-	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
@@ -1109,14 +1109,20 @@ func TestGenerateDataDownlink(t *testing.T) {
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				c := component.MustNew(
 					log.Noop,
-					&component.Config{},
+					&component.Config{
+						ServiceBase: config.ServiceBase{
+							FrequencyPlans: config.FrequencyPlansConfig{
+								ConfigSource: "static",
+								Static:       test.StaticFrequencyPlans,
+							},
+						},
+					},
 					component.WithClusterNew(func(context.Context, *cluster.Config, ...cluster.Option) (cluster.Cluster, error) {
 						return &test.MockCluster{
 							JoinFunc: test.ClusterJoinNilFunc,
 						}, nil
 					}),
 				)
-				c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 
 				componenttest.StartComponent(t, c)
 
@@ -1130,7 +1136,13 @@ func TestGenerateDataDownlink(t *testing.T) {
 				}
 
 				dev := CopyEndDevice(tc.Device)
-				phy, err := DeviceBand(dev, ns.FrequencyPlans)
+				fps, err := ns.FrequencyPlansStore(ctx)
+				if !a.So(err, should.BeNil) {
+					t.Fail()
+					return
+				}
+
+				phy, err := DeviceBand(dev, fps)
 				if !a.So(err, should.BeNil) {
 					t.Fail()
 					return

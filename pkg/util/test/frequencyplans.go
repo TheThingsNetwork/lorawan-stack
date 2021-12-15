@@ -401,15 +401,19 @@ max-eirp: 27`
 )
 
 var (
-	// FrequencyPlansFetcher fetches frequency plans from memory.
-	FrequencyPlansFetcher = fetch.NewMemFetcher(map[string][]byte{
+	// StaticFrequencyPlans contains the values used to mock a static
+	// frequencyStore in most tests component related
+	StaticFrequencyPlans = map[string][]byte{
 		"frequency-plans.yml":  []byte(frequencyPlansDescription),
 		"EU_863_870.yml":       []byte(euFrequencyPlan),
 		"KR_920_923.yml":       []byte(krFrequencyPlan),
 		"US_902_928_FSB_2.yml": []byte(usFrequencyPlan),
 		"AS_923_925_AU.yml":    []byte(asAUFrequencyPlan),
 		"EXAMPLE.yml":          []byte(exampleFrequencyPlan),
-	})
+	}
+
+	// FrequencyPlansFetcher fetches frequency plans from memory.
+	FrequencyPlansFetcher = fetch.NewMemFetcher(StaticFrequencyPlans)
 
 	FrequencyPlanStore = frequencyplans.NewStore(FrequencyPlansFetcher)
 )

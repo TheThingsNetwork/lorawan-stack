@@ -239,10 +239,13 @@ func TestGetFrequencyPlan(t *testing.T) {
 					HTTP: config.HTTP{
 						Listen: ":0",
 					},
+					FrequencyPlans: config.FrequencyPlansConfig{
+						ConfigSource: "static",
+						Static:       test.StaticFrequencyPlans,
+					},
 				},
 			}
 			c := componenttest.NewComponent(t, conf)
-			c.FrequencyPlans.Fetcher = test.FrequencyPlansFetcher
 			New(c)
 			componenttest.StartComponent(t, c)
 			defer c.Close()

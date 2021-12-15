@@ -128,13 +128,21 @@ func (s *Server) RegisterRoutes(server *web.Server) {
 
 	router.Handle("/semtechudp/global_conf.json",
 		s.makeJSONHandler(func(ctx context.Context, gtw *ttnpb.Gateway) (interface{}, error) {
-			return semtechudp.Build(gtw, s.FrequencyPlans)
+			fps, err := s.FrequencyPlansStore(ctx)
+			if err != nil {
+				return nil, err
+			}
+			return semtechudp.Build(gtw, fps)
 		}),
 	).Methods(http.MethodGet)
 
 	router.Handle("/kerlink-cpf/lorad/lorad.json",
 		s.makeJSONHandler(func(ctx context.Context, gtw *ttnpb.Gateway) (interface{}, error) {
-			return cpf.BuildLorad(gtw, s.FrequencyPlans)
+			fps, err := s.FrequencyPlansStore(ctx)
+			if err != nil {
+				return nil, err
+			}
+			return cpf.BuildLorad(gtw, fps)
 		}),
 	).Methods(http.MethodGet)
 

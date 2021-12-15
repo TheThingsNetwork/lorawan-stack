@@ -25,6 +25,8 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
@@ -416,6 +418,14 @@ func TestFlow(t *testing.T) {
 
 					_, ctx, env, stop := StartTest(ctx, TestConfig{
 						NetworkServer: nsConf,
+						Component: component.Config{
+							ServiceBase: config.ServiceBase{
+								FrequencyPlans: config.FrequencyPlansConfig{
+									ConfigSource: "static",
+									Static:       test.StaticFrequencyPlans,
+								},
+							},
+						},
 					})
 					defer stop()
 					handleFlowTest(ctx, env)

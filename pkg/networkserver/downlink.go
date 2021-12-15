@@ -113,8 +113,14 @@ func (ns *NetworkServer) nextDataDownlinkTaskAt(ctx context.Context, dev *ttnpb.
 	if t := time.Now().UTC().Add(nsScheduleWindow()); earliestAt.Before(t) {
 		earliestAt = t
 	}
+
+	fps, err := ns.FrequencyPlansStore(ctx)
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to get frequency plans store")
+		return time.Time{}, nil
+	}
 	var taskAt time.Time
-	phy, err := DeviceBand(dev, ns.FrequencyPlans)
+	phy, err := DeviceBand(dev, fps)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to determine device band")
 		return time.Time{}, nil
@@ -1615,7 +1621,13 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 					return nil, nil, nil
 				}
 
-				fp, phy, err := DeviceFrequencyPlanAndBand(dev, ns.FrequencyPlans)
+				fps, err := ns.FrequencyPlansStore(ctx)
+				if err != nil {
+					logger.WithError(err).Error("Failed to get frequency plan store")
+					return nil, nil, err
+				}
+
+				fp, phy, err := DeviceFrequencyPlanAndBand(dev, fps)
 				if err != nil {
 					taskUpdateStrategy = retryDownlinkTask
 					logger.WithError(err).Error("Failed to get frequency plan of the device, retry downlink slot")

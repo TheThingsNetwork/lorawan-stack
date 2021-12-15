@@ -28,7 +28,6 @@ import (
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/grpc"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
@@ -67,9 +66,12 @@ func TestAuthentication(t *testing.T) {
 			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 			},
+			FrequencyPlans: config.FrequencyPlansConfig{
+				ConfigSource: "static",
+				Static:       test.StaticFrequencyPlans,
+			},
 		},
 	})
-	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	gs := mock.NewServer(c)
 	srv := New(gs)
 	c.RegisterGRPC(&mockRegisterer{ctx, srv})
@@ -165,9 +167,12 @@ func TestTraffic(t *testing.T) {
 			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 			},
+			FrequencyPlans: config.FrequencyPlansConfig{
+				ConfigSource: "static",
+				Static:       test.StaticFrequencyPlans,
+			},
 		},
 	})
-	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	gs := mock.NewServer(c)
 	srv := New(gs)
 	c.RegisterGRPC(&mockRegisterer{ctx, srv})
@@ -600,9 +605,12 @@ func TestConcentratorConfig(t *testing.T) {
 			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 			},
+			FrequencyPlans: config.FrequencyPlansConfig{
+				ConfigSource: "static",
+				Static:       test.StaticFrequencyPlans,
+			},
 		},
 	})
-	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	gs := mock.NewServer(c)
 	srv := New(gs)
 	c.RegisterGRPC(&mockRegisterer{ctx, srv})
@@ -653,9 +661,12 @@ func TestMQTTConfig(t *testing.T) {
 			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 			},
+			FrequencyPlans: config.FrequencyPlansConfig{
+				ConfigSource: "static",
+				Static:       test.StaticFrequencyPlans,
+			},
 		},
 	})
-	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	gs := mock.NewServer(c)
 	srv := New(gs,
 		WithMQTTConfigProvider(&mockMQTTConfigProvider{

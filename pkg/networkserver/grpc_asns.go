@@ -305,7 +305,11 @@ func (ns *NetworkServer) DownlinkQueueReplace(ctx context.Context, req *ttnpb.Do
 			if dev.PendingSession != nil {
 				dev.PendingSession.QueuedApplicationDownlinks = nil
 			}
-			if err := matchQueuedApplicationDownlinks(ctx, dev, ns.FrequencyPlans, req.Downlinks...); err != nil {
+			fps, err := ns.FrequencyPlansStore(ctx)
+			if err != nil {
+				return nil, nil, err
+			}
+			if err := matchQueuedApplicationDownlinks(ctx, dev, fps, req.Downlinks...); err != nil {
 				return nil, nil, err
 			}
 			if len(dev.Session.GetQueuedApplicationDownlinks()) > ns.downlinkQueueCapacity || len(dev.PendingSession.GetQueuedApplicationDownlinks()) > ns.downlinkQueueCapacity {
@@ -365,7 +369,11 @@ func (ns *NetworkServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.Downl
 			if dev == nil {
 				return nil, nil, errDeviceNotFound.New()
 			}
-			if err := matchQueuedApplicationDownlinks(ctx, dev, ns.FrequencyPlans, req.Downlinks...); err != nil {
+			fps, err := ns.FrequencyPlansStore(ctx)
+			if err != nil {
+				return nil, nil, err
+			}
+			if err := matchQueuedApplicationDownlinks(ctx, dev, fps, req.Downlinks...); err != nil {
 				return nil, nil, err
 			}
 			if len(dev.Session.GetQueuedApplicationDownlinks()) > ns.downlinkQueueCapacity || len(dev.PendingSession.GetQueuedApplicationDownlinks()) > ns.downlinkQueueCapacity {

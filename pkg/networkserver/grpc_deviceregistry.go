@@ -1208,10 +1208,14 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil
 		}
 		if err := st.WithFields(func(m map[string]*ttnpb.EndDevice) error {
+			fps, err := ns.FrequencyPlansStore(ctx)
+			if err != nil {
+				return err
+			}
 			fp, phy, err := DeviceFrequencyPlanAndBand(&ttnpb.EndDevice{
 				FrequencyPlanId:   m["frequency_plan_id"].GetFrequencyPlanId(),
 				LorawanPhyVersion: m["lorawan_phy_version"].GetLorawanPhyVersion(),
-			}, ns.FrequencyPlans)
+			}, fps)
 			if err != nil {
 				return err
 			}
@@ -2313,7 +2317,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if hasSession {
 			macVersion := stored.GetMacState().GetLorawanVersion()
 			if stored.GetMacState() == nil && !st.HasSetField("mac_state") {
-				macState, err := mac.NewState(st.Device, ns.FrequencyPlans, ns.defaultMACSettings)
+				fps, err := ns.FrequencyPlansStore(ctx)
+				if err != nil {
+					return err
+				}
+				macState, err := mac.NewState(st.Device, fps, ns.defaultMACSettings)
 				if err != nil {
 					return err
 				}
@@ -2464,7 +2472,11 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 					WithCause(ErrSession)
 			}
 
-			macState, err := mac.NewState(stored, ns.FrequencyPlans, ns.defaultMACSettings)
+			fps, err := ns.FrequencyPlansStore(ctx)
+			if err != nil {
+				return nil, nil, err
+			}
+			macState, err := mac.NewState(stored, fps, ns.defaultMACSettings)
 			if err != nil {
 				return nil, nil, err
 			}

@@ -84,7 +84,7 @@ type Component struct {
 
 	fillers []fillcontext.Filler
 
-	FrequencyPlans *frequencyplans.Store
+	frequencyPlans *frequencyplans.Store
 	KeyVault       crypto.KeyVault
 
 	rightsFetcher rights.Fetcher
@@ -178,7 +178,7 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 	if err != nil {
 		return nil, err
 	}
-	c.FrequencyPlans = frequencyplans.NewStore(fpsFetcher)
+	c.frequencyPlans = frequencyplans.NewStore(fpsFetcher)
 
 	if c.clusterNew == nil {
 		c.clusterNew = cluster.New
@@ -263,6 +263,11 @@ func (c *Component) FromRequestContext(ctx context.Context) context.Context {
 		valueCtx:  ctx,
 		cancelCtx: c.ctx,
 	}
+}
+
+// FrequencyPlansStore returns the component's frequencyPlans Store
+func (c *Component) FrequencyPlansStore(ctx context.Context) (*frequencyplans.Store, error) {
+	return c.frequencyPlans, nil
 }
 
 // Start starts the component.

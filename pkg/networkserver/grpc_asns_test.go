@@ -22,6 +22,8 @@ import (
 
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
@@ -705,6 +707,14 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						TaskStarter: StartTaskExclude(
 							DownlinkProcessTaskName,
 						),
+						Component: component.Config{
+							ServiceBase: config.ServiceBase{
+								FrequencyPlans: config.FrequencyPlansConfig{
+									ConfigSource: "static",
+									Static:       test.StaticFrequencyPlans,
+								},
+							},
+						},
 					},
 				)
 				defer stop()
@@ -1276,6 +1286,14 @@ func TestDownlinkQueuePush(t *testing.T) {
 						TaskStarter: StartTaskExclude(
 							DownlinkProcessTaskName,
 						),
+						Component: component.Config{
+							ServiceBase: config.ServiceBase{
+								FrequencyPlans: config.FrequencyPlansConfig{
+									ConfigSource: "static",
+									Static:       test.StaticFrequencyPlans,
+								},
+							},
+						},
 					},
 				)
 				defer stop()
@@ -1497,6 +1515,14 @@ func TestDownlinkQueueList(t *testing.T) {
 						TaskStarter: StartTaskExclude(
 							DownlinkProcessTaskName,
 						),
+						Component: component.Config{
+							ServiceBase: config.ServiceBase{
+								FrequencyPlans: config.FrequencyPlansConfig{
+									ConfigSource: "static",
+									Static:       test.StaticFrequencyPlans,
+								},
+							},
+						},
 					},
 				)
 				defer stop()

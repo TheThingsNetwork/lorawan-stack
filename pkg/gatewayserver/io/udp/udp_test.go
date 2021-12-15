@@ -26,7 +26,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
-	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
 	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
@@ -60,8 +60,14 @@ func TestConnection(t *testing.T) {
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	c := componenttest.NewComponent(t, &component.Config{})
-	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
+	c := componenttest.NewComponent(t, &component.Config{
+		ServiceBase: config.ServiceBase{
+			FrequencyPlans: config.FrequencyPlansConfig{
+				ConfigSource: "static",
+				Static:       test.StaticFrequencyPlans,
+			},
+		},
+	})
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 
@@ -200,8 +206,14 @@ func TestTraffic(t *testing.T) {
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	c := componenttest.NewComponent(t, &component.Config{})
-	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
+	c := componenttest.NewComponent(t, &component.Config{
+		ServiceBase: config.ServiceBase{
+			FrequencyPlans: config.FrequencyPlansConfig{
+				ConfigSource: "static",
+				Static:       test.StaticFrequencyPlans,
+			},
+		},
+	})
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 

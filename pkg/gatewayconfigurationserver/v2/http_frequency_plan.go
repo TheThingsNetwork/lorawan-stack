@@ -24,8 +24,14 @@ import (
 )
 
 func (s *Server) handleGetFrequencyPlan(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	frequencyPlanID := mux.Vars(r)["frequency_plan_id"]
-	plan, err := s.component.FrequencyPlans.GetByID(frequencyPlanID)
+	fps, err := s.component.FrequencyPlansStore(ctx)
+	if err != nil {
+		webhandlers.Error(w, r, err)
+		return
+	}
+	plan, err := fps.GetByID(frequencyPlanID)
 	if err != nil {
 		webhandlers.Error(w, r, err)
 		return

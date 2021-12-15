@@ -46,6 +46,9 @@ type frequencyPlansStore interface {
 	GetByID(id string) (*frequencyplans.FrequencyPlan, error)
 }
 
+// GetFrequencyPlansStore defines a function that returns the frequencyPlansStore interface
+type GetFrequencyPlansStore func(ctx context.Context) (frequencyPlansStore, error)
+
 type gsPbaServer struct {
 	netID               types.NetID
 	clusterID           string
@@ -53,7 +56,7 @@ type gsPbaServer struct {
 	messageEncrypter    messageEncrypter
 	contextDecoupler    contextDecoupler
 	tenantIDExtractor   TenantIDExtractor
-	frequencyPlansStore frequencyPlansStore
+	frequencyPlansStore GetFrequencyPlansStore
 	upstreamCh          chan *uplinkMessage
 	mapperConn          *grpc.ClientConn
 }
@@ -153,18 +156,22 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "frequency_plan_ids") {
-		fps := make([]*frequencyplans.FrequencyPlan, 0, len(req.Gateway.FrequencyPlanIds))
-		var err error
+		fps, err := s.frequencyPlansStore(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		fpSlice := make([]*frequencyplans.FrequencyPlan, 0, len(req.Gateway.FrequencyPlanIds))
 		for _, fpID := range req.Gateway.FrequencyPlanIds {
 			var fp *frequencyplans.FrequencyPlan
-			fp, err = s.frequencyPlansStore.GetByID(fpID)
+			fp, err = fps.GetByID(fpID)
 			if err != nil {
 				break
 			}
-			fps = append(fps, fp)
+			fpSlice = append(fpSlice, fp)
 		}
 		if err == nil {
-			if fp, err := toPBFrequencyPlan(fps...); err == nil {
+			if fp, err := toPBFrequencyPlan(fpSlice...); err == nil {
 				updateReq.FrequencyPlan = fp
 			}
 		}

@@ -23,8 +23,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -47,8 +47,14 @@ func TestFlow(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
-	c := componenttest.NewComponent(t, &component.Config{})
-	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
+	c := componenttest.NewComponent(t, &component.Config{
+		ServiceBase: config.ServiceBase{
+			FrequencyPlans: config.FrequencyPlansConfig{
+				ConfigSource: "static",
+				Static:       test.StaticFrequencyPlans,
+			},
+		},
+	})
 	gs := mock.NewServer(c)
 
 	ids := ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}
@@ -522,8 +528,14 @@ func TestSubBandEIRPOverride(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
-	c := componenttest.NewComponent(t, &component.Config{})
-	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
+	c := componenttest.NewComponent(t, &component.Config{
+		ServiceBase: config.ServiceBase{
+			FrequencyPlans: config.FrequencyPlansConfig{
+				ConfigSource: "static",
+				Static:       test.StaticFrequencyPlans,
+			},
+		},
+	})
 	gs := mock.NewServer(c)
 
 	ids := ttnpb.GatewayIdentifiers{GatewayId: "bar-gateway"}

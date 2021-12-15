@@ -74,9 +74,13 @@ func TestForwarder(t *testing.T) {
 	defer cancel()
 
 	c := componenttest.NewComponent(t, &component.Config{
-		ServiceBase: config.ServiceBase{},
+		ServiceBase: config.ServiceBase{
+			FrequencyPlans: config.FrequencyPlansConfig{
+				ConfigSource: "static",
+				Static:       test.StaticFrequencyPlans,
+			},
+		},
 	})
-	c.FrequencyPlans = test.FrequencyPlanStore
 
 	dp, dpAddr := mustServePBDataPlane(ctx, t)
 	mp, mpAddr := mustServePBMapper(ctx, t)
@@ -520,8 +524,14 @@ func TestHomeNetwork(t *testing.T) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	c := componenttest.NewComponent(t, &component.Config{})
-	c.FrequencyPlans = test.FrequencyPlanStore
+	c := componenttest.NewComponent(t, &component.Config{
+		ServiceBase: config.ServiceBase{
+			FrequencyPlans: config.FrequencyPlansConfig{
+				ConfigSource: "static",
+				Static:       test.StaticFrequencyPlans,
+			},
+		},
+	})
 
 	dp, addr := mustServePBDataPlane(ctx, t)
 
