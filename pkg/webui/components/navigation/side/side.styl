@@ -134,7 +134,8 @@ $minimize-button-height = 5rem
 .drawer
   background-color: white
   z-index: $zi.nav
-  overflow: auto
+  overflow: hidden
+  text-overflow: ellipsis
   +media-query($bp.s)
     sidebar-transition(left, box-shadow)
     position: fixed
