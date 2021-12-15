@@ -14,7 +14,13 @@
 
 import { handleActions } from 'redux-actions'
 
-import { isGsStatusReceiveEvent, isGsUplinkReceiveEvent } from '@ttn-lw/lib/selectors/event'
+import {
+  isGsStatusReceiveEvent,
+  isGsUplinkReceiveEvent,
+  isGsGatewayConnectedEvent,
+  isGsGatewayDisconnectedEvent,
+  isGsDownlinkSendEvent,
+} from '@ttn-lw/lib/selectors/event'
 
 import {
   GET_GTW,
@@ -23,30 +29,32 @@ import {
 } from '@console/store/actions/gateways'
 
 const handleStatsUpdate = (state, { stats = {} }) => {
-  if (
-    state.lastSeen &&
-    (!stats.last_status_received_at || state.lastSeen > stats.last_status_received_at) &&
-    (!stats.last_uplink_received_at || state.lastSeen > stats.last_uplink_received_at)
-  ) {
+  const lastSeen = [
+    stats.last_status_received_at,
+    stats.last_uplink_received_at,
+    stats.last_downlink_received_at,
+    stats.connected_at,
+    stats.disconnected_at,
+  ]
+    .filter(a => Boolean(a))
+    .reduce((max, current) => (max > current ? max : current), state.lastSeen)
+
+  if (lastSeen === state.lastSeen) {
     return state
   }
-
-  const lastSeen =
-    stats.last_status_received_at > stats.last_uplink_received_at
-      ? stats.last_status_received_at
-      : stats.last_uplink_received_at
 
   return { ...state, lastSeen }
 }
 
 const handleEventUpdate = (state, event) => {
-  if (isGsStatusReceiveEvent(event.name) || isGsUplinkReceiveEvent(event.name)) {
-    let lastSeen = event.time
-
-    if (state.lastSeen) {
-      lastSeen = lastSeen > state.lastSeen ? lastSeen : state.lastSeen
-    }
-
+  if (
+    isGsStatusReceiveEvent(event.name) ||
+    isGsUplinkReceiveEvent(event.name) ||
+    isGsDownlinkSendEvent(event.name) ||
+    isGsGatewayConnectedEvent(event.name) ||
+    isGsGatewayDisconnectedEvent(event.name)
+  ) {
+    const lastSeen = state.lastSeen > event.time ? state.lastSeen : event.time
     return { ...state, lastSeen }
   }
 

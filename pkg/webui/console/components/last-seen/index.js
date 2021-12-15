@@ -35,12 +35,21 @@ const computeDeltaInSeconds = (from, to) => {
 }
 
 const LastSeen = React.forwardRef((props, ref) => {
-  const { className, lastSeen, short, updateIntervalInSeconds, children, flipped } = props
+  const {
+    className,
+    lastSeen,
+    short,
+    updateIntervalInSeconds,
+    children,
+    flipped,
+    message,
+    status,
+  } = props
 
   return (
-    <Status status="good" pulseTrigger={lastSeen} flipped={flipped} ref={ref}>
+    <Status status={status} pulseTrigger={lastSeen} flipped={flipped} ref={ref}>
       <div className={classnames(className, style.container)}>
-        {!short && <Message className={style.message} content={sharedMessages.lastSeen} />}
+        {!short && <Message className={style.message} content={message} />}
         <DateTime.Relative
           value={lastSeen}
           computeDelta={computeDeltaInSeconds}
@@ -63,7 +72,9 @@ LastSeen.propTypes = {
     PropTypes.number, // Support timestamps.
     PropTypes.instanceOf(Date),
   ]).isRequired,
+  message: PropTypes.message,
   short: PropTypes.bool,
+  status: PropTypes.oneOf(['good', 'bad', 'mediocre', 'unknown']),
   updateIntervalInSeconds: PropTypes.number,
 }
 
@@ -73,6 +84,8 @@ LastSeen.defaultProps = {
   flipped: false,
   updateIntervalInSeconds: undefined,
   short: false,
+  status: 'good',
+  message: sharedMessages.lastSeen,
 }
 
 export default LastSeen
