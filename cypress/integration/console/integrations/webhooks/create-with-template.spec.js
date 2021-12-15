@@ -45,7 +45,7 @@ describe('Application Webhook create', () => {
         'consoleRootPath',
       )}/applications/${appId}/integrations/webhooks/add/template`,
     )
-    cy.findByText('Test Akenza Core').click()
+    cy.findByText('Integrate with Test Platform').click()
   })
 
   it('displays UI elements in place', () => {
@@ -54,16 +54,16 @@ describe('Application Webhook create', () => {
     cy.findByRole('heading', { name: 'Template settings' }).should('be.visible')
     cy.findByLabelText('Webhook ID')
       .should('have.attr', 'placeholder')
-      .and('eq', 'my-new-akenza-webhook')
+      .and('eq', 'my-new-test-tamplate-webhook')
     cy.findByLabelText('Domain Secret').should('be.visible')
     cy.findByText('Akenza Core domain secret').should('be.visible')
     cy.findByLabelText('Device ID').should('be.visible')
     cy.findByText('Akenza Core device ID').should('be.visible')
-    cy.findByRole('button', { name: 'Create test akenza core webhook' }).should('be.visible')
+    cy.findByRole('button', { name: 'Create integrate with test platform webhook' }).should('be.visible')
   })
 
   it('validates before submitting an empty form', () => {
-    cy.findByRole('button', { name: 'Create test akenza core webhook' }).click()
+    cy.findByRole('button', { name: 'Create integrate with test platform webhook' }).click()
 
     cy.findErrorByLabelText('Webhook ID')
       .should('contain.text', 'Webhook ID is required')
@@ -78,7 +78,7 @@ describe('Application Webhook create', () => {
       'eq',
       `${Cypress.config(
         'consoleRootPath',
-      )}/applications/${appId}/integrations/webhooks/add/template/akenza`,
+      )}/applications/${appId}/integrations/webhooks/add/template/test-tamplate`,
     )
   })
 
@@ -92,7 +92,7 @@ describe('Application Webhook create', () => {
     cy.findByLabelText('Domain Secret').type(webhook.domainSecret)
     cy.findByLabelText('Device ID').type(webhook.deviceId)
 
-    cy.findByRole('button', { name: 'Create test akenza core webhook' }).click()
+    cy.findByRole('button', { name: 'Create integrate with test platform webhook' }).click()
 
     cy.location('pathname').should(
       'eq',
