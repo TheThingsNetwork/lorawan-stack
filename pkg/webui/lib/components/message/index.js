@@ -125,7 +125,7 @@ Message.propTypes = {
    * The wrapping element component can also be set explicitly (defaults to
    * span). This can be useful to avoid unnecessary wrapping.
    */
-  component: PropTypes.node,
+  component: PropTypes.oneOfType([PropTypes.node, PropTypes.elementType]),
   /**
    * The translatable message, should be an object (with `id` or
    * `defaultMessage` key). Additionally the content can contain a `values` key,
