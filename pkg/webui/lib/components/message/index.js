@@ -63,6 +63,10 @@ const Message = ({
     [style.capitalize]: capitalize,
   })
 
+  if (cls) {
+    rest.className = cls
+  }
+
   const intlContext = useContext(IntlContext)
 
   if (typeof content === 'string' || typeof content === 'number') {
@@ -93,10 +97,6 @@ const Message = ({
   }
 
   const { formatMessage } = intlContext
-
-  if (cls) {
-    rest.className = cls
-  }
 
   if (convertBackticks) {
     const contentWithMarkdown = formatMessage(content, vals)
