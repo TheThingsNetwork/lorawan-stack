@@ -59,3 +59,14 @@ func makeFSKDataRate(bitRate uint32, maximumMACPayloadSize MaxMACPayloadSizeFunc
 		MaxMACPayloadSize: maximumMACPayloadSize,
 	}
 }
+
+func makeLRFHSSDataRate(modulationType uint32, operatingChannelWidth uint32, codingRate string, maximumMACPayloadSize MaxMACPayloadSizeFunc) DataRate {
+	return DataRate{
+		Rate: (&ttnpb.LRFHSSDataRate{
+			ModulationType:        modulationType,
+			OperatingChannelWidth: operatingChannelWidth,
+			CodingRate:            codingRate,
+		}).DataRate(),
+		MaxMACPayloadSize: maximumMACPayloadSize,
+	}
+}
