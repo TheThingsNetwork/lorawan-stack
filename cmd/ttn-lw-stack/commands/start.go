@@ -200,7 +200,9 @@ var startCommand = &cobra.Command{
 			if *httpClient != nil {
 				continue
 			}
-			*httpClient, err = c.HTTPClient(ctx)
+			*httpClient, err = c.HTTPClient(ctx, component.WithTransportOptions(
+				component.WithCache(true),
+			))
 			if err != nil {
 				return err
 			}
