@@ -59,7 +59,9 @@ describe('Application Webhook create', () => {
     cy.findByText('Akenza Core domain secret').should('be.visible')
     cy.findByLabelText('Device ID').should('be.visible')
     cy.findByText('Akenza Core device ID').should('be.visible')
-    cy.findByRole('button', { name: 'Create integrate with test platform webhook' }).should('be.visible')
+    cy.findByRole('button', { name: 'Create integrate with test platform webhook' }).should(
+      'be.visible',
+    )
   })
 
   it('validates before submitting an empty form', () => {
