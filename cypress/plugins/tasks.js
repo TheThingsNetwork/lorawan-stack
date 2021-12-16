@@ -143,9 +143,22 @@ const stackLogTask = on => {
   })
 }
 
+const fileExistsTask = on => {
+  on('task', {
+    fileExists: filename => {
+      if (fs.existsSync(filename)) {
+        return fs.readFileSync(filename)
+      }
+
+      return false
+    },
+  })
+}
+
 module.exports = {
   stackConfigTask,
   codeCoverageTask,
   sqlTask,
   stackLogTask,
+  fileExistsTask,
 }
