@@ -90,7 +90,7 @@ require (
 	github.com/jmhodges/levigo v1.0.0 // indirect
 	github.com/jtacoma/uritemplates v1.0.0
 	github.com/kr/pretty v0.2.1
-	github.com/lib/pq v1.10.1
+	github.com/lib/pq v1.10.4
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nats-io/nats-server/v2 v2.2.2
