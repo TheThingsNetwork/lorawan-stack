@@ -19,16 +19,17 @@ import (
 	"runtime/trace"
 
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // GetOAuthStore returns an OAuthStore on the given db (or transaction).
-func GetOAuthStore(db *gorm.DB) OAuthStore {
-	return &oauthStore{store: newStore(db)}
+func GetOAuthStore(db *gorm.DB) store.OAuthStore {
+	return &oauthStore{baseStore: newStore(db)}
 }
 
 type oauthStore struct {
-	*store
+	*baseStore
 }
 
 func (s *oauthStore) ListAuthorizations(ctx context.Context, userIDs *ttnpb.UserIdentifiers) ([]*ttnpb.OAuthClientAuthorization, error) {
@@ -41,16 +42,18 @@ func (s *oauthStore) ListAuthorizations(ctx context.Context, userIDs *ttnpb.User
 	query := s.query(ctx, ClientAuthorization{}).Where(ClientAuthorization{
 		UserID: user.PrimaryKey(),
 	})
-	query = query.Order(orderFromContext(ctx, "client_authorizations", "created_at", "DESC"))
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query.Model(ClientAuthorization{}))
+	query = query.Order(store.OrderFromContext(ctx, "client_authorizations", "created_at", "DESC"))
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
+		var total uint64
+		query.Count(&total)
+		store.SetTotal(ctx, total)
 		query = query.Limit(limit).Offset(offset)
 	}
 	err = query.Preload("Client").Find(&authModels).Error
 	if err != nil {
 		return nil, err
 	}
-	setTotal(ctx, uint64(len(authModels)))
+	store.SetTotal(ctx, uint64(len(authModels)))
 	authProtos := make([]*ttnpb.OAuthClientAuthorization, len(authModels))
 	for i, authModel := range authModels {
 		authProto := authModel.toPB()
@@ -292,16 +295,18 @@ func (s *oauthStore) ListAccessTokens(ctx context.Context, userIDs *ttnpb.UserId
 		ClientID: client.PrimaryKey(),
 		UserID:   user.PrimaryKey(),
 	})
-	query = query.Order(orderFromContext(ctx, "access_tokens", "created_at", "DESC"))
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query.Model(AccessToken{}))
+	query = query.Order(store.OrderFromContext(ctx, "access_tokens", "created_at", "DESC"))
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
+		var total uint64
+		query.Count(&total)
+		store.SetTotal(ctx, total)
 		query = query.Limit(limit).Offset(offset)
 	}
 	err = query.Find(&tokenModels).Error
 	if err != nil {
 		return nil, err
 	}
-	setTotal(ctx, uint64(len(tokenModels)))
+	store.SetTotal(ctx, uint64(len(tokenModels)))
 	tokenProtos := make([]*ttnpb.OAuthAccessToken, len(tokenModels))
 	for i, tokenModel := range tokenModels {
 		tokenProto := tokenModel.toPB()

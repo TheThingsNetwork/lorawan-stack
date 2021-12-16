@@ -23,6 +23,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
@@ -35,14 +36,14 @@ func TestUserStore(t *testing.T) {
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
 		prepareTest(db, &Account{}, &User{}, &Attribute{}, &Picture{})
 		s := newStore(db)
-		store := GetUserStore(db)
+		userStore := GetUserStore(db)
 
-		list, err := store.ListAdmins(ctx, &pbtypes.FieldMask{Paths: []string{"name"}})
+		list, err := userStore.ListAdmins(ctx, &pbtypes.FieldMask{Paths: []string{"name"}})
 
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
 
-		created, err := store.CreateUser(ctx, &ttnpb.User{
+		created, err := userStore.CreateUser(ctx, &ttnpb.User{
 			Ids:         &ttnpb.UserIdentifiers{UserId: "foo"},
 			Name:        "Foo User",
 			Description: "The Amazing Foo User",
@@ -74,7 +75,7 @@ func TestUserStore(t *testing.T) {
 			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
 		}
 
-		got, err := store.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes"}})
+		got, err := userStore.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes"}})
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -86,7 +87,7 @@ func TestUserStore(t *testing.T) {
 			a.So(got.UpdatedAt, should.Resemble, created.UpdatedAt)
 		}
 
-		got, err = store.GetUserByPrimaryEmailAddress(ctx, "foo@bar.org", &pbtypes.FieldMask{Paths: []string{"name", "attributes"}})
+		got, err = userStore.GetUserByPrimaryEmailAddress(ctx, "foo@bar.org", &pbtypes.FieldMask{Paths: []string{"name", "attributes"}})
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
 			a.So(got.GetIds().UserId, should.Equal, "foo")
@@ -97,7 +98,7 @@ func TestUserStore(t *testing.T) {
 			a.So(got.UpdatedAt, should.Resemble, created.UpdatedAt)
 		}
 
-		_, err = store.UpdateUser(ctx, &ttnpb.User{
+		_, err = userStore.UpdateUser(ctx, &ttnpb.User{
 			Ids: &ttnpb.UserIdentifiers{UserId: "bar"},
 		}, nil)
 
@@ -105,7 +106,7 @@ func TestUserStore(t *testing.T) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		updated, err := store.UpdateUser(ctx, &ttnpb.User{
+		updated, err := userStore.UpdateUser(ctx, &ttnpb.User{
 			Ids:         &ttnpb.UserIdentifiers{UserId: "foo"},
 			Name:        "Foobar User",
 			Description: "The Amazing Foobar User",
@@ -131,7 +132,7 @@ func TestUserStore(t *testing.T) {
 			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenAfter, *ttnpb.StdTime(created.CreatedAt))
 		}
 
-		got, err = store.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"}, nil)
+		got, err = userStore.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"}, nil)
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -143,55 +144,55 @@ func TestUserStore(t *testing.T) {
 			a.So(got.UpdatedAt, should.Resemble, updated.UpdatedAt)
 		}
 
-		list, err = store.FindUsers(ctx, nil, &pbtypes.FieldMask{Paths: []string{"name"}})
+		list, err = userStore.FindUsers(ctx, nil, &pbtypes.FieldMask{Paths: []string{"name"}})
 
 		a.So(err, should.BeNil)
 		if a.So(list, should.HaveLength, 1) {
 			a.So(list[0].Name, should.EndWith, got.Name)
 		}
 
-		list, err = store.ListAdmins(ctx, &pbtypes.FieldMask{Paths: []string{"name"}})
+		list, err = userStore.ListAdmins(ctx, &pbtypes.FieldMask{Paths: []string{"name"}})
 
 		a.So(err, should.BeNil)
 		if a.So(list, should.HaveLength, 1) {
 			a.So(list[0].Name, should.EndWith, got.Name)
 		}
 
-		err = store.DeleteUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"})
+		err = userStore.DeleteUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"})
 
 		a.So(err, should.BeNil)
 
-		got, err = store.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"}, nil)
+		got, err = userStore.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"}, nil)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		err = store.RestoreUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"})
+		err = userStore.RestoreUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"})
 
 		a.So(err, should.BeNil)
 
-		got, err = store.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"}, nil)
+		got, err = userStore.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"}, nil)
 
 		a.So(err, should.BeNil)
 
-		err = store.DeleteUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"})
+		err = userStore.DeleteUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"})
 
 		a.So(err, should.BeNil)
 
-		list, err = store.FindUsers(ctx, nil, nil)
+		list, err = userStore.FindUsers(ctx, nil, nil)
 
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
 
-		list, err = store.FindUsers(WithSoftDeleted(ctx, false), nil, nil)
+		list, err = userStore.FindUsers(store.WithSoftDeleted(ctx, false), nil, nil)
 
 		a.So(err, should.BeNil)
 		a.So(list, should.NotBeEmpty)
 
 		entity, _ := s.findDeletedEntity(ctx, &ttnpb.UserIdentifiers{UserId: "foo"}, "id")
 
-		err = store.PurgeUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"})
+		err = userStore.PurgeUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"})
 
 		a.So(err, should.BeNil)
 
@@ -204,7 +205,7 @@ func TestUserStore(t *testing.T) {
 		a.So(attribute, should.HaveLength, 0)
 
 		// Check that user ids are released
-		_, err = store.CreateUser(ctx, &ttnpb.User{
+		_, err = userStore.CreateUser(ctx, &ttnpb.User{
 			Ids:         &ttnpb.UserIdentifiers{UserId: "foo"},
 			Name:        "Foo User",
 			Description: "The Amazing Foo User",

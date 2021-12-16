@@ -23,6 +23,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
@@ -33,7 +34,7 @@ func TestOrganizationStore(t *testing.T) {
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
 		prepareTest(db, &Account{}, &Organization{}, &Attribute{}, &User{})
-		store := GetOrganizationStore(db)
+		organizationStore := GetOrganizationStore(db)
 		s := newStore(db)
 
 		usr1 := &User{Account: Account{UID: "test-user-1"}, PrimaryEmailAddress: "user1@example.com"}
@@ -42,7 +43,7 @@ func TestOrganizationStore(t *testing.T) {
 		usr2 := &User{Account: Account{UID: "test-user-2"}, PrimaryEmailAddress: "user2@example.com"}
 		s.createEntity(ctx, usr2)
 
-		created, err := store.CreateOrganization(ctx, &ttnpb.Organization{
+		created, err := organizationStore.CreateOrganization(ctx, &ttnpb.Organization{
 			Ids:         &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
 			Name:        "Foo Organization",
 			Description: "The Amazing Foo Organization",
@@ -67,7 +68,7 @@ func TestOrganizationStore(t *testing.T) {
 			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
 		}
 
-		got, err := store.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes", "administrative_contact"}})
+		got, err := organizationStore.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes", "administrative_contact"}})
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -80,7 +81,7 @@ func TestOrganizationStore(t *testing.T) {
 			a.So(got.UpdatedAt, should.Resemble, created.UpdatedAt)
 		}
 
-		_, err = store.UpdateOrganization(ctx, &ttnpb.Organization{
+		_, err = organizationStore.UpdateOrganization(ctx, &ttnpb.Organization{
 			Ids: &ttnpb.OrganizationIdentifiers{OrganizationId: "bar"},
 		}, nil)
 
@@ -88,7 +89,7 @@ func TestOrganizationStore(t *testing.T) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		updated, err := store.UpdateOrganization(ctx, &ttnpb.Organization{
+		updated, err := organizationStore.UpdateOrganization(ctx, &ttnpb.Organization{
 			Ids:         &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
 			Name:        "Foobar Organization",
 			Description: "The Amazing Foobar Organization",
@@ -109,7 +110,7 @@ func TestOrganizationStore(t *testing.T) {
 			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenAfter, *ttnpb.StdTime(created.CreatedAt))
 		}
 
-		got, err = store.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"}, nil)
+		got, err = organizationStore.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"}, nil)
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -121,48 +122,48 @@ func TestOrganizationStore(t *testing.T) {
 			a.So(got.UpdatedAt, should.Resemble, updated.UpdatedAt)
 		}
 
-		list, err := store.FindOrganizations(ctx, nil, &pbtypes.FieldMask{Paths: []string{"name"}})
+		list, err := organizationStore.FindOrganizations(ctx, nil, &pbtypes.FieldMask{Paths: []string{"name"}})
 
 		a.So(err, should.BeNil)
 		if a.So(list, should.HaveLength, 1) {
 			a.So(list[0].Name, should.EndWith, got.Name)
 		}
 
-		err = store.DeleteOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"})
+		err = organizationStore.DeleteOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"})
 
 		a.So(err, should.BeNil)
 
-		got, err = store.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"}, nil)
+		got, err = organizationStore.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"}, nil)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		err = store.RestoreOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"})
+		err = organizationStore.RestoreOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"})
 
 		a.So(err, should.BeNil)
 
-		got, err = store.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"}, nil)
+		got, err = organizationStore.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"}, nil)
 
 		a.So(err, should.BeNil)
 
-		err = store.DeleteOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"})
+		err = organizationStore.DeleteOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"})
 
 		a.So(err, should.BeNil)
 
-		list, err = store.FindOrganizations(ctx, nil, nil)
+		list, err = organizationStore.FindOrganizations(ctx, nil, nil)
 
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
 
-		list, err = store.FindOrganizations(WithSoftDeleted(ctx, false), nil, nil)
+		list, err = organizationStore.FindOrganizations(store.WithSoftDeleted(ctx, false), nil, nil)
 
 		a.So(err, should.BeNil)
 		a.So(list, should.NotBeEmpty)
 
 		entity, _ := s.findDeletedEntity(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"}, "id")
 
-		err = store.PurgeOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"})
+		err = organizationStore.PurgeOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"})
 
 		a.So(err, should.BeNil)
 
@@ -175,7 +176,7 @@ func TestOrganizationStore(t *testing.T) {
 		a.So(attribute, should.HaveLength, 0)
 
 		// Check that organization ids are released after purge
-		_, err = store.CreateOrganization(ctx, &ttnpb.Organization{
+		_, err = organizationStore.CreateOrganization(ctx, &ttnpb.Organization{
 			Ids:         &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
 			Name:        "Foo Organization",
 			Description: "The Amazing Foo Organization",

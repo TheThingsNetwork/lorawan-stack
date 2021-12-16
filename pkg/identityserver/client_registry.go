@@ -28,7 +28,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blacklist"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -125,7 +126,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		cli, err = store.GetClientStore(db).CreateClient(ctx, req.Client)
+		cli, err = gormstore.GetClientStore(db).CreateClient(ctx, req.Client)
 		if err != nil {
 			return err
 		}
@@ -139,7 +140,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 		}
 		if len(req.Client.ContactInfo) > 0 {
 			cleanContactInfo(req.Client.ContactInfo)
-			cli.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, cli.GetIds(), req.Client.ContactInfo)
+			cli.ContactInfo, err = gormstore.GetContactInfoStore(db).SetContactInfo(ctx, cli.GetIds(), req.Client.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -182,12 +183,12 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 		defer func() { cli = cli.PublicSafe() }()
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		cli, err = store.GetClientStore(db).GetClient(ctx, req.GetClientIds(), req.FieldMask)
+		cli, err = gormstore.GetClientStore(db).GetClient(ctx, req.GetClientIds(), req.FieldMask)
 		if err != nil {
 			return err
 		}
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-			cli.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, cli.GetIds())
+			cli.ContactInfo, err = gormstore.GetContactInfoStore(db).GetContactInfo(ctx, cli.GetIds())
 			if err != nil {
 				return err
 			}
@@ -262,7 +263,7 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 				cliIDs = append(cliIDs, cliID)
 			}
 		}
-		clis.Clients, err = store.GetClientStore(db).FindClients(ctx, cliIDs, req.FieldMask)
+		clis.Clients, err = gormstore.GetClientStore(db).FindClients(ctx, cliIDs, req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -323,13 +324,13 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 		if err := validateContactIsCollaborator(ctx, db, req.Client.TechnicalContact, req.Client.GetEntityIdentifiers()); err != nil {
 			return err
 		}
-		cli, err = store.GetClientStore(db).UpdateClient(ctx, req.Client, req.FieldMask)
+		cli, err = gormstore.GetClientStore(db).UpdateClient(ctx, req.Client, req.FieldMask)
 		if err != nil {
 			return err
 		}
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
 			cleanContactInfo(req.Client.ContactInfo)
-			cli.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, cli.Ids, req.Client.ContactInfo)
+			cli.ContactInfo, err = gormstore.GetContactInfoStore(db).SetContactInfo(ctx, cli.Ids, req.Client.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -361,7 +362,7 @@ func (is *IdentityServer) deleteClient(ctx context.Context, ids *ttnpb.ClientIde
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		return store.GetClientStore(db).DeleteClient(ctx, ids)
+		return gormstore.GetClientStore(db).DeleteClient(ctx, ids)
 	})
 	if err != nil {
 		return nil, err
@@ -375,7 +376,7 @@ func (is *IdentityServer) restoreClient(ctx context.Context, ids *ttnpb.ClientId
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		cliStore := store.GetClientStore(db)
+		cliStore := gormstore.GetClientStore(db)
 		cli, err := cliStore.GetClient(store.WithSoftDeleted(ctx, true), ids, softDeleteFieldMask)
 		if err != nil {
 			return err
@@ -402,21 +403,21 @@ func (is *IdentityServer) purgeClient(ctx context.Context, ids *ttnpb.ClientIden
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
 		// delete related authorizations before purging the client
-		err := store.GetOAuthStore(db).DeleteClientAuthorizations(ctx, ids)
+		err := gormstore.GetOAuthStore(db).DeleteClientAuthorizations(ctx, ids)
 		if err != nil {
 			return err
 		}
 		// delete related memberships before purging the client
-		err = store.GetMembershipStore(db).DeleteEntityMembers(ctx, ids.GetEntityIdentifiers())
+		err = gormstore.GetMembershipStore(db).DeleteEntityMembers(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}
 		// delete related contact info before purging the client
-		err = store.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids)
+		err = gormstore.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids)
 		if err != nil {
 			return err
 		}
-		return store.GetClientStore(db).PurgeClient(ctx, ids)
+		return gormstore.GetClientStore(db).PurgeClient(ctx, ids)
 	})
 	if err != nil {
 		return nil, err

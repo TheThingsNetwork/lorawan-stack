@@ -23,17 +23,18 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // GetApplicationStore returns an ApplicationStore on the given db (or transaction).
-func GetApplicationStore(db *gorm.DB) ApplicationStore {
-	return &applicationStore{store: newStore(db)}
+func GetApplicationStore(db *gorm.DB) store.ApplicationStore {
+	return &applicationStore{baseStore: newStore(db)}
 }
 
 type applicationStore struct {
-	*store
+	*baseStore
 }
 
 // selectApplicationFields selects relevant fields (based on fieldMask) and preloads details if needed.
@@ -100,17 +101,19 @@ func (s *applicationStore) FindApplications(ctx context.Context, ids []*ttnpb.Ap
 	}
 	query := s.query(ctx, Application{}, withApplicationID(idStrings...))
 	query = selectApplicationFields(ctx, query, fieldMask)
-	query = query.Order(orderFromContext(ctx, "applications", "application_id", "ASC"))
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query.Model(&Application{}))
+	query = query.Order(store.OrderFromContext(ctx, "applications", "application_id", "ASC"))
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
+		var total uint64
+		query.Count(&total)
+		store.SetTotal(ctx, total)
 		query = query.Limit(limit).Offset(offset)
 	}
-	if onlyExpired, expireThreshold := expiredFromContext(ctx); onlyExpired {
+	if onlyExpired, expireThreshold := store.ExpiredFromContext(ctx); onlyExpired {
 		query = query.Scopes(withExpiredEntities(expireThreshold))
 	}
 	var appModels []Application
 	query = query.Find(&appModels)
-	setTotal(ctx, uint64(len(appModels)))
+	store.SetTotal(ctx, uint64(len(appModels)))
 	if query.Error != nil {
 		return nil, query.Error
 	}

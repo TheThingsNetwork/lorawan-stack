@@ -19,16 +19,17 @@ import (
 	"runtime/trace"
 
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // GetUserSessionStore returns an UserSessionStore on the given db (or transaction).
-func GetUserSessionStore(db *gorm.DB) UserSessionStore {
-	return &userSessionStore{store: newStore(db)}
+func GetUserSessionStore(db *gorm.DB) store.UserSessionStore {
+	return &userSessionStore{baseStore: newStore(db)}
 }
 
 type userSessionStore struct {
-	*store
+	*baseStore
 }
 
 func (s *userSessionStore) CreateSession(ctx context.Context, sess *ttnpb.UserSession) (*ttnpb.UserSession, error) {
@@ -57,14 +58,16 @@ func (s *userSessionStore) FindSessions(ctx context.Context, userIDs *ttnpb.User
 		return nil, err
 	}
 	query := s.query(ctx, UserSession{}).Where(UserSession{UserID: user.PrimaryKey()})
-	query = query.Order(orderFromContext(ctx, "user_sessions", "created_at", "DESC"))
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query.Model(UserSession{}))
+	query = query.Order(store.OrderFromContext(ctx, "user_sessions", "created_at", "DESC"))
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
+		var total uint64
+		query.Count(&total)
+		store.SetTotal(ctx, total)
 		query = query.Limit(limit).Offset(offset)
 	}
 	var sessionModels []UserSession
 	query = query.Find(&sessionModels)
-	setTotal(ctx, uint64(len(sessionModels)))
+	store.SetTotal(ctx, uint64(len(sessionModels)))
 	if query.Error != nil {
 		return nil, query.Error
 	}

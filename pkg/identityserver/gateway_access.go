@@ -24,7 +24,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -91,7 +92,7 @@ func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.Cr
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		key, err = store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.GetGatewayIds().GetEntityIdentifiers(), key)
+		key, err = gormstore.GetAPIKeyStore(db).CreateAPIKey(ctx, req.GetGatewayIds().GetEntityIdentifiers(), key)
 		return err
 	})
 	if err != nil {
@@ -122,7 +123,7 @@ func (is *IdentityServer) listGatewayAPIKeys(ctx context.Context, req *ttnpb.Lis
 	}()
 	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keys.ApiKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.GetGatewayIds().GetEntityIdentifiers())
+		keys.ApiKeys, err = gormstore.GetAPIKeyStore(db).FindAPIKeys(ctx, req.GetGatewayIds().GetEntityIdentifiers())
 		return err
 	})
 	if err != nil {
@@ -140,7 +141,7 @@ func (is *IdentityServer) getGatewayAPIKey(ctx context.Context, req *ttnpb.GetGa
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		_, key, err = store.GetAPIKeyStore(db).GetAPIKey(ctx, req.KeyId)
+		_, key, err = gormstore.GetAPIKeyStore(db).GetAPIKey(ctx, req.KeyId)
 		if err != nil {
 			return err
 		}
@@ -163,7 +164,7 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 	apiKey := req.GetApiKey()
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		if len(apiKey.Rights) > 0 {
-			_, key, err := store.GetAPIKeyStore(db).GetAPIKey(ctx, apiKey.Id)
+			_, key, err := gormstore.GetAPIKeyStore(db).GetAPIKey(ctx, apiKey.Id)
 			if err != nil {
 				return err
 			}
@@ -181,7 +182,7 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 			}
 		}
 
-		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GetGatewayIds().GetEntityIdentifiers(), apiKey, req.FieldMask)
+		key, err = gormstore.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GetGatewayIds().GetEntityIdentifiers(), apiKey, req.FieldMask)
 		return err
 	})
 	if err != nil {

@@ -21,17 +21,18 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // GetEUIStore returns an EUIStore on the given db (or transaction).
-func GetEUIStore(db *gorm.DB) EUIStore {
-	return &euiStore{store: newStore(db)}
+func GetEUIStore(db *gorm.DB) store.EUIStore {
+	return &euiStore{baseStore: newStore(db)}
 }
 
 type euiStore struct {
-	*store
+	*baseStore
 }
 
 func getMaxCounter(addressBlock types.EUI64Prefix) int64 {
@@ -46,7 +47,7 @@ var (
 func (s *euiStore) incrementApplicationDevEUICounter(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, applicationLimit int) error {
 	var appModel Application
 	// Check if application exists.
-	query := s.query(WithoutSoftDeleted(ctx), Application{}, withApplicationID(ids.GetApplicationId()))
+	query := s.query(store.WithoutSoftDeleted(ctx), Application{}, withApplicationID(ids.GetApplicationId()))
 	if err := query.First(&appModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return errNotFoundForID(ids)

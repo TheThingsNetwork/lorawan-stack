@@ -23,6 +23,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -34,7 +35,7 @@ func TestGatewayStore(t *testing.T) {
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
 		prepareTest(db, &Gateway{}, &GatewayAntenna{}, &Attribute{}, &Account{}, &Organization{}, &User{})
-		store := GetGatewayStore(db)
+		gatewayStore := GetGatewayStore(db)
 		s := newStore(db)
 
 		usr1 := &User{Account: Account{UID: "test-user-1"}, PrimaryEmailAddress: "user1@example.com"}
@@ -75,7 +76,7 @@ func TestGatewayStore(t *testing.T) {
 			},
 		}
 
-		created, err := store.CreateGateway(ctx, &ttnpb.Gateway{
+		created, err := gatewayStore.CreateGateway(ctx, &ttnpb.Gateway{
 			Ids: &ttnpb.GatewayIdentifiers{
 				GatewayId: "foo",
 				Eui:       eui,
@@ -131,7 +132,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(created.DisablePacketBrokerForwarding, should.BeTrue)
 		}
 
-		got, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes", "administrative_contact", "lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key", "disable_packet_broker_forwarding"}})
+		got, err := gatewayStore.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes", "administrative_contact", "lbs_lns_secret", "claim_authentication_code", "target_cups_uri", "target_cups_key", "disable_packet_broker_forwarding"}})
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -149,7 +150,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(got.DisablePacketBrokerForwarding, should.BeTrue)
 		}
 
-		byEUI, err := store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{Eui: &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}}, &pbtypes.FieldMask{Paths: []string{"name"}})
+		byEUI, err := gatewayStore.GetGateway(ctx, &ttnpb.GatewayIdentifiers{Eui: &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}}, &pbtypes.FieldMask{Paths: []string{"name"}})
 
 		a.So(err, should.BeNil)
 		if a.So(byEUI, should.NotBeNil) {
@@ -159,7 +160,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(byEUI.TargetCupsKey, should.BeNil)
 		}
 
-		_, err = store.UpdateGateway(ctx, &ttnpb.Gateway{
+		_, err = gatewayStore.UpdateGateway(ctx, &ttnpb.Gateway{
 			Ids: &ttnpb.GatewayIdentifiers{GatewayId: "bar"},
 		}, nil)
 
@@ -167,7 +168,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		updated, err := store.UpdateGateway(ctx, &ttnpb.Gateway{
+		updated, err := gatewayStore.UpdateGateway(ctx, &ttnpb.Gateway{
 			Ids:         &ttnpb.GatewayIdentifiers{GatewayId: "foo"},
 			Name:        "Foobar Gateway",
 			Description: "The Amazing Foobar Gateway",
@@ -224,7 +225,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(updated.DisablePacketBrokerForwarding, should.BeFalse)
 		}
 
-		got, err = store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, nil)
+		got, err = gatewayStore.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, nil)
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -240,14 +241,14 @@ func TestGatewayStore(t *testing.T) {
 			a.So(got.TargetCupsKey, should.Resemble, otherSecret)
 		}
 
-		list, err := store.FindGateways(ctx, nil, &pbtypes.FieldMask{Paths: []string{"name"}})
+		list, err := gatewayStore.FindGateways(ctx, nil, &pbtypes.FieldMask{Paths: []string{"name"}})
 
 		a.So(err, should.BeNil)
 		if a.So(list, should.HaveLength, 1) {
 			a.So(list[0].Name, should.EndWith, got.Name)
 		}
 
-		updated, err = store.UpdateGateway(ctx, &ttnpb.Gateway{
+		updated, err = gatewayStore.UpdateGateway(ctx, &ttnpb.Gateway{
 			Ids:      &ttnpb.GatewayIdentifiers{GatewayId: "foo"},
 			Antennas: []*ttnpb.GatewayAntenna{},
 		}, &pbtypes.FieldMask{Paths: []string{"antennas"}})
@@ -257,7 +258,7 @@ func TestGatewayStore(t *testing.T) {
 			a.So(updated.Antennas, should.HaveLength, 0)
 		}
 
-		_, _ = store.UpdateGateway(ctx, &ttnpb.Gateway{
+		_, _ = gatewayStore.UpdateGateway(ctx, &ttnpb.Gateway{
 			Ids: &ttnpb.GatewayIdentifiers{GatewayId: "foo"},
 			Antennas: []*ttnpb.GatewayAntenna{
 				{
@@ -269,39 +270,39 @@ func TestGatewayStore(t *testing.T) {
 			},
 		}, &pbtypes.FieldMask{Paths: []string{"antennas"}})
 
-		err = store.DeleteGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"})
+		err = gatewayStore.DeleteGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"})
 
 		a.So(err, should.BeNil)
 
-		err = store.RestoreGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"})
+		err = gatewayStore.RestoreGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"})
 
 		a.So(err, should.BeNil)
 
-		got, err = store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, nil)
+		got, err = gatewayStore.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, nil)
 
 		a.So(err, should.BeNil)
 
-		err = store.DeleteGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"})
+		err = gatewayStore.DeleteGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"})
 
 		a.So(err, should.BeNil)
 
-		got, err = store.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, nil)
+		got, err = gatewayStore.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, nil)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		list, err = store.FindGateways(ctx, nil, nil)
+		list, err = gatewayStore.FindGateways(ctx, nil, nil)
 
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
 
-		list, err = store.FindGateways(WithSoftDeleted(ctx, false), nil, nil)
+		list, err = gatewayStore.FindGateways(store.WithSoftDeleted(ctx, false), nil, nil)
 
 		a.So(err, should.BeNil)
 		a.So(list, should.NotBeEmpty)
 
-		got, err = store.CreateGateway(ctx, &ttnpb.Gateway{
+		got, err = gatewayStore.CreateGateway(ctx, &ttnpb.Gateway{
 			Ids: &ttnpb.GatewayIdentifiers{
 				GatewayId: "reuse-foo-eui",
 				Eui:       eui,
@@ -316,7 +317,7 @@ func TestGatewayStore(t *testing.T) {
 
 		entity, _ := s.findDeletedEntity(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, "id")
 
-		err = store.PurgeGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"})
+		err = gatewayStore.PurgeGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"})
 
 		a.So(err, should.BeNil)
 
@@ -333,12 +334,12 @@ func TestGatewayStore(t *testing.T) {
 
 		a.So(attribute, should.HaveLength, 0)
 
-		err = store.PurgeGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "reuse-foo-eui"})
+		err = gatewayStore.PurgeGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "reuse-foo-eui"})
 
 		a.So(err, should.BeNil)
 
 		// Check that gateway ids are released after purge
-		got, err = store.CreateGateway(ctx, &ttnpb.Gateway{
+		got, err = gatewayStore.CreateGateway(ctx, &ttnpb.Gateway{
 			Ids: &ttnpb.GatewayIdentifiers{
 				GatewayId: "foo",
 				Eui:       eui,

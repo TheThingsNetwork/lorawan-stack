@@ -21,16 +21,17 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // GetLoginTokenStore returns an LoginTokenStore on the given db (or transaction).
-func GetLoginTokenStore(db *gorm.DB) LoginTokenStore {
-	return &loginTokenStore{store: newStore(db)}
+func GetLoginTokenStore(db *gorm.DB) store.LoginTokenStore {
+	return &loginTokenStore{baseStore: newStore(db)}
 }
 
 type loginTokenStore struct {
-	*store
+	*baseStore
 }
 
 func (s *loginTokenStore) FindActiveLoginTokens(ctx context.Context, userIDs *ttnpb.UserIdentifiers) ([]*ttnpb.LoginToken, error) {

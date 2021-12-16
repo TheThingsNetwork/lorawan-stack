@@ -20,16 +20,17 @@ import (
 	"runtime/trace"
 
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // GetEntitySearch returns an EntitySearch on the given db (or transaction).
-func GetEntitySearch(db *gorm.DB) EntitySearch {
-	return &entitySearch{store: newStore(db)}
+func GetEntitySearch(db *gorm.DB) store.EntitySearch {
+	return &entitySearch{baseStore: newStore(db)}
 }
 
 type entitySearch struct {
-	*store
+	*baseStore
 }
 
 type metaFields interface {
@@ -80,7 +81,7 @@ func (s *entitySearch) queryMembership(ctx context.Context, query *gorm.DB, enti
 	if member == nil {
 		return query
 	}
-	membershipsQuery := (&membershipStore{store: s.store}).queryMemberships(ctx, member, entityType, nil, true).Select(`"direct_memberships"."entity_id"`).QueryExpr()
+	membershipsQuery := (&membershipStore{baseStore: s.baseStore}).queryMemberships(ctx, member, entityType, nil, true).Select(`"direct_memberships"."entity_id"`).QueryExpr()
 	if entityType == "organization" {
 		query = query.Where(`"accounts"."account_type" = ? AND "accounts"."account_id" IN (?)`, entityType, membershipsQuery)
 	} else {
@@ -94,19 +95,21 @@ type searchResult struct {
 }
 
 func (s *entitySearch) runPaginatedQuery(ctx context.Context, query *gorm.DB, entityType string) ([]searchResult, error) {
-	query = query.Order(orderFromContext(ctx, fmt.Sprintf("%ss", entityType), "friendly_id", "ASC"))
+	query = query.Order(store.OrderFromContext(ctx, fmt.Sprintf("%ss", entityType), "friendly_id", "ASC"))
 	page := query
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
 		page = query.Limit(limit).Offset(offset)
 	}
 	var results []searchResult
 	if err := page.Scan(&results).Error; err != nil {
 		return nil, err
 	}
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 && (offset > 0 || len(results) == int(limit)) {
-		countTotal(ctx, query)
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 && (offset > 0 || len(results) == int(limit)) {
+		var total uint64
+		query.Count(&total)
+		store.SetTotal(ctx, total)
 	} else {
-		setTotal(ctx, uint64(len(results)))
+		store.SetTotal(ctx, uint64(len(results)))
 	}
 	return results, nil
 }
@@ -116,7 +119,7 @@ const application = "application"
 func (s *entitySearch) FindApplications(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchApplicationsRequest) ([]*ttnpb.ApplicationIdentifiers, error) {
 	defer trace.StartRegion(ctx, "find applications").End()
 	if req.Deleted {
-		ctx = WithSoftDeleted(ctx, true)
+		ctx = store.WithSoftDeleted(ctx, true)
 	}
 	query := s.query(ctx, &Application{})
 	query = query.Select(fmt.Sprintf(`"%[1]ss"."%[1]s_id" AS "friendly_id"`, application))
@@ -138,7 +141,7 @@ const client = "client"
 func (s *entitySearch) FindClients(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchClientsRequest) ([]*ttnpb.ClientIdentifiers, error) {
 	defer trace.StartRegion(ctx, "find clients").End()
 	if req.Deleted {
-		ctx = WithSoftDeleted(ctx, true)
+		ctx = store.WithSoftDeleted(ctx, true)
 	}
 	query := s.query(ctx, &Client{})
 	query = query.Select(fmt.Sprintf(`"%[1]ss"."%[1]s_id" AS "friendly_id"`, client))
@@ -167,7 +170,7 @@ const gateway = "gateway"
 func (s *entitySearch) FindGateways(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchGatewaysRequest) ([]*ttnpb.GatewayIdentifiers, error) {
 	defer trace.StartRegion(ctx, "find gateways").End()
 	if req.Deleted {
-		ctx = WithSoftDeleted(ctx, true)
+		ctx = store.WithSoftDeleted(ctx, true)
 	}
 	query := s.query(ctx, &Gateway{})
 	query = query.Select(fmt.Sprintf(`"%[1]ss"."%[1]s_id" AS "friendly_id"`, gateway))
@@ -192,7 +195,7 @@ const organization = "organization"
 func (s *entitySearch) FindOrganizations(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchOrganizationsRequest) ([]*ttnpb.OrganizationIdentifiers, error) {
 	defer trace.StartRegion(ctx, "find organizations").End()
 	if req.Deleted {
-		ctx = WithSoftDeleted(ctx, true)
+		ctx = store.WithSoftDeleted(ctx, true)
 	}
 	query := s.query(ctx, &Organization{})
 	query = query.
@@ -216,7 +219,7 @@ const user = "user"
 func (s *entitySearch) FindUsers(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchUsersRequest) ([]*ttnpb.UserIdentifiers, error) {
 	defer trace.StartRegion(ctx, "find users").End()
 	if req.Deleted {
-		ctx = WithSoftDeleted(ctx, true)
+		ctx = store.WithSoftDeleted(ctx, true)
 	}
 	query := s.query(ctx, &User{})
 	query = query.
@@ -258,9 +261,9 @@ func (s *entitySearch) FindEndDevices(ctx context.Context, req *ttnpb.SearchEndD
 	}
 	// DevAddrContains
 
-	query = query.Order(orderFromContext(ctx, "end_devices", "device_id", "ASC"))
+	query = query.Order(store.OrderFromContext(ctx, "end_devices", "device_id", "ASC"))
 	page := query
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
 		page = query.Limit(limit).Offset(offset)
 	}
 	var results []struct {
@@ -269,10 +272,12 @@ func (s *entitySearch) FindEndDevices(ctx context.Context, req *ttnpb.SearchEndD
 	if err := page.Scan(&results).Error; err != nil {
 		return nil, err
 	}
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 && (offset > 0 || len(results) == int(limit)) {
-		countTotal(ctx, query)
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 && (offset > 0 || len(results) == int(limit)) {
+		var total uint64
+		query.Count(&total)
+		store.SetTotal(ctx, total)
 	} else {
-		setTotal(ctx, uint64(len(results)))
+		store.SetTotal(ctx, uint64(len(results)))
 	}
 	identifiers := make([]*ttnpb.EndDeviceIdentifiers, len(results))
 	for i, result := range results {

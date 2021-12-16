@@ -23,17 +23,18 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // GetOrganizationStore returns an OrganizationStore on the given db (or transaction).
-func GetOrganizationStore(db *gorm.DB) OrganizationStore {
-	return &organizationStore{store: newStore(db)}
+func GetOrganizationStore(db *gorm.DB) store.OrganizationStore {
+	return &organizationStore{baseStore: newStore(db)}
 }
 
 type organizationStore struct {
-	*store
+	*baseStore
 }
 
 // selectOrganizationFields selects relevant fields (based on fieldMask) and preloads details if needed.
@@ -104,17 +105,19 @@ func (s *organizationStore) FindOrganizations(ctx context.Context, ids []*ttnpb.
 	}
 	query := s.query(ctx, Organization{}, withOrganizationID(idStrings...))
 	query = selectOrganizationFields(ctx, query, fieldMask)
-	query = query.Order(orderFromContext(ctx, "organizations", `"accounts"."uid"`, "ASC"))
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query.Model(Organization{}))
+	query = query.Order(store.OrderFromContext(ctx, "organizations", `"accounts"."uid"`, "ASC"))
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
+		var total uint64
+		query.Count(&total)
+		store.SetTotal(ctx, total)
 		query = query.Limit(limit).Offset(offset)
 	}
-	if onlyExpired, expireThreshold := expiredFromContext(ctx); onlyExpired {
+	if onlyExpired, expireThreshold := store.ExpiredFromContext(ctx); onlyExpired {
 		query = query.Scopes(withExpiredEntities(expireThreshold))
 	}
 	var orgModels []organizationWithUID
 	query = query.Find(&orgModels)
-	setTotal(ctx, uint64(len(orgModels)))
+	store.SetTotal(ctx, uint64(len(orgModels)))
 	if query.Error != nil {
 		return nil, query.Error
 	}

@@ -20,6 +20,7 @@ import (
 
 	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -27,7 +28,7 @@ import (
 )
 
 type membershipCache struct {
-	MembershipStore
+	store.MembershipStore
 	redis *redis.Client
 	ttl   time.Duration
 }
@@ -35,7 +36,7 @@ type membershipCache struct {
 // GetMembershipCache wraps the MembershipStore with a cache.
 // Make sure to not call FindIndirectMemberships or GetMember after calling
 // SetMember in the same transaction, this may result in an inconsistent cache.
-func GetMembershipCache(store MembershipStore, redis *redis.Client, ttl time.Duration) MembershipStore {
+func GetMembershipCache(store store.MembershipStore, redis *redis.Client, ttl time.Duration) store.MembershipStore {
 	return &membershipCache{
 		MembershipStore: store,
 		redis:           redis,

@@ -21,6 +21,7 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -73,8 +74,8 @@ func TestCleanupExpiredEntities(t *testing.T) {
 		cli3 := &Client{ClientID: "test-cli-3"}
 		s.createEntity(ctx, cli3)
 
-		expiredCtx := WithExpired(ctx, time.Second)
-		expiredCtx = WithSoftDeleted(expiredCtx, true)
+		expiredCtx := store.WithExpired(ctx, time.Second)
+		expiredCtx = store.WithSoftDeleted(expiredCtx, true)
 		appStore.DeleteApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: app1.ApplicationID})
 		time.Sleep(time.Second)
 		appStore.DeleteApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: app2.ApplicationID})

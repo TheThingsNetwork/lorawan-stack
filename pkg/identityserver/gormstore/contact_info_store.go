@@ -21,16 +21,17 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // GetContactInfoStore returns an ContactInfoStore on the given db (or transaction).
-func GetContactInfoStore(db *gorm.DB) ContactInfoStore {
-	return &contactInfoStore{store: newStore(db)}
+func GetContactInfoStore(db *gorm.DB) store.ContactInfoStore {
+	return &contactInfoStore{baseStore: newStore(db)}
 }
 
 type contactInfoStore struct {
-	*store
+	*baseStore
 }
 
 func (s *contactInfoStore) GetContactInfo(ctx context.Context, entityID ttnpb.IDStringer) ([]*ttnpb.ContactInfo, error) {

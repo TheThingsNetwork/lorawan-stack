@@ -41,7 +41,7 @@ type polymorphicEntity struct {
 	EntityType string
 }
 
-func (s *store) findIdentifiers(entities ...polymorphicEntity) (map[polymorphicEntity]*ttnpb.EntityIdentifiers, error) {
+func (s *baseStore) findIdentifiers(entities ...polymorphicEntity) (map[polymorphicEntity]*ttnpb.EntityIdentifiers, error) {
 	return findIdentifiers(s.DB, entities...)
 }
 

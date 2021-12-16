@@ -23,17 +23,18 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // GetGatewayStore returns an GatewayStore on the given db (or transaction).
-func GetGatewayStore(db *gorm.DB) GatewayStore {
-	return &gatewayStore{store: newStore(db)}
+func GetGatewayStore(db *gorm.DB) store.GatewayStore {
+	return &gatewayStore{baseStore: newStore(db)}
 }
 
 type gatewayStore struct {
-	*store
+	*baseStore
 }
 
 // selectGatewayFields selects relevant fields (based on fieldMask) and preloads details if needed.
@@ -102,17 +103,19 @@ func (s *gatewayStore) FindGateways(ctx context.Context, ids []*ttnpb.GatewayIde
 	}
 	query := s.query(ctx, Gateway{}, withGatewayID(idStrings...))
 	query = selectGatewayFields(ctx, query, fieldMask)
-	query = query.Order(orderFromContext(ctx, "gateways", "gateway_id", "ASC"))
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query.Model(Gateway{}))
+	query = query.Order(store.OrderFromContext(ctx, "gateways", "gateway_id", "ASC"))
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
+		var total uint64
+		query.Count(&total)
+		store.SetTotal(ctx, total)
 		query = query.Limit(limit).Offset(offset)
 	}
-	if onlyExpired, expireThreshold := expiredFromContext(ctx); onlyExpired {
+	if onlyExpired, expireThreshold := store.ExpiredFromContext(ctx); onlyExpired {
 		query = query.Scopes(withExpiredEntities(expireThreshold))
 	}
 	var gtwModels []Gateway
 	query = query.Find(&gtwModels)
-	setTotal(ctx, uint64(len(gtwModels)))
+	store.SetTotal(ctx, uint64(len(gtwModels)))
 	if query.Error != nil {
 		return nil, query.Error
 	}

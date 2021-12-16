@@ -26,7 +26,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -74,7 +75,7 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		key, err = store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.GetUserIds().GetEntityIdentifiers(), key)
+		key, err = gormstore.GetAPIKeyStore(db).CreateAPIKey(ctx, req.GetUserIds().GetEntityIdentifiers(), key)
 		return err
 	})
 	if err != nil {
@@ -105,7 +106,7 @@ func (is *IdentityServer) listUserAPIKeys(ctx context.Context, req *ttnpb.ListUs
 	}()
 	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keys.ApiKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.GetUserIds().GetEntityIdentifiers())
+		keys.ApiKeys, err = gormstore.GetAPIKeyStore(db).FindAPIKeys(ctx, req.GetUserIds().GetEntityIdentifiers())
 		return err
 	})
 	if err != nil {
@@ -123,7 +124,7 @@ func (is *IdentityServer) getUserAPIKey(ctx context.Context, req *ttnpb.GetUserA
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		_, key, err = store.GetAPIKeyStore(db).GetAPIKey(ctx, req.KeyId)
+		_, key, err = gormstore.GetAPIKeyStore(db).GetAPIKey(ctx, req.KeyId)
 		if err != nil {
 			return err
 		}
@@ -145,7 +146,7 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		if len(req.ApiKey.Rights) > 0 {
-			_, key, err := store.GetAPIKeyStore(db).GetAPIKey(ctx, req.ApiKey.Id)
+			_, key, err := gormstore.GetAPIKeyStore(db).GetAPIKey(ctx, req.ApiKey.Id)
 			if err != nil {
 				return err
 			}
@@ -163,7 +164,7 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 			}
 		}
 
-		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.UserIds.GetEntityIdentifiers(), req.ApiKey, req.FieldMask)
+		key, err = gormstore.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.UserIds.GetEntityIdentifiers(), req.ApiKey, req.FieldMask)
 		return err
 	})
 	if err != nil {
@@ -201,7 +202,7 @@ func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.Creat
 
 	var canCreateMoreTokens bool
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		activeTokens, err := store.GetLoginTokenStore(db).FindActiveLoginTokens(ctx, req.GetUserIds())
+		activeTokens, err := gormstore.GetLoginTokenStore(db).FindActiveLoginTokens(ctx, req.GetUserIds())
 		if err != nil {
 			return err
 		}
@@ -219,7 +220,7 @@ func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.Creat
 	if is.IsAdmin(ctx) {
 		canSkipEmail = true // Admin callers can skip sending emails.
 		err := is.withDatabase(ctx, func(db *gorm.DB) error {
-			usr, err := store.GetUserStore(db).GetUser(ctx, req.GetUserIds(), &pbtypes.FieldMask{Paths: []string{"admin"}})
+			usr, err := gormstore.GetUserStore(db).GetUser(ctx, req.GetUserIds(), &pbtypes.FieldMask{Paths: []string{"admin"}})
 			if !usr.Admin {
 				canReturnToken = true // Admin callers can get login tokens for non-admin users.
 			}
@@ -236,7 +237,7 @@ func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.Creat
 	}
 	expiresAt := time.Now().Add(loginTokenConfig.TokenTTL)
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		_, err := store.GetLoginTokenStore(db).CreateLoginToken(ctx, &ttnpb.LoginToken{
+		_, err := gormstore.GetLoginTokenStore(db).CreateLoginToken(ctx, &ttnpb.LoginToken{
 			UserIds:   req.GetUserIds(),
 			ExpiresAt: ttnpb.ProtoTimePtr(expiresAt),
 			Token:     token,

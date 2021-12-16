@@ -23,17 +23,18 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // GetClientStore returns an ClientStore on the given db (or transaction).
-func GetClientStore(db *gorm.DB) ClientStore {
-	return &clientStore{store: newStore(db)}
+func GetClientStore(db *gorm.DB) store.ClientStore {
+	return &clientStore{baseStore: newStore(db)}
 }
 
 type clientStore struct {
-	*store
+	*baseStore
 }
 
 // selectClientFields selects relevant fields (based on fieldMask) and preloads details if needed.
@@ -100,17 +101,19 @@ func (s *clientStore) FindClients(ctx context.Context, ids []*ttnpb.ClientIdenti
 	}
 	query := s.query(ctx, Client{}, withClientID(idStrings...))
 	query = selectClientFields(ctx, query, fieldMask)
-	query = query.Order(orderFromContext(ctx, "clients", "client_id", "ASC"))
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query.Model(Client{}))
+	query = query.Order(store.OrderFromContext(ctx, "clients", "client_id", "ASC"))
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
+		var total uint64
+		query.Count(&total)
+		store.SetTotal(ctx, total)
 		query = query.Limit(limit).Offset(offset)
 	}
-	if onlyExpired, expireThreshold := expiredFromContext(ctx); onlyExpired {
+	if onlyExpired, expireThreshold := store.ExpiredFromContext(ctx); onlyExpired {
 		query = query.Scopes(withExpiredEntities(expireThreshold))
 	}
 	var cliModels []Client
 	query = query.Find(&cliModels)
-	setTotal(ctx, uint64(len(cliModels)))
+	store.SetTotal(ctx, uint64(len(cliModels)))
 	if query.Error != nil {
 		return nil, query.Error
 	}

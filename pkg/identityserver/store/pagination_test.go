@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ func TestPagination(t *testing.T) {
 			func(t *testing.T) {
 				ctx := WithPagination(test.Context(), tc.limit, tc.page, nil)
 
-				limit, offset := limitAndOffsetFromContext(ctx)
+				limit, offset := LimitAndOffsetFromContext(ctx)
 
 				a.So(limit, should.Equal, tc.expectedLimit)
 				a.So(offset, should.Equal, tc.expectedOffset)
@@ -74,13 +74,13 @@ func TestPagination(t *testing.T) {
 		ctx := test.Context()
 		total := uint64(10)
 
-		setTotal(ctx, total)
+		SetTotal(ctx, total)
 		a.So(totalCount, should.BeZeroValue)
 
 		ctx = WithPagination(ctx, 5, 1, &totalCount)
 		a.So(totalCount, should.BeZeroValue)
 
-		setTotal(ctx, total)
+		SetTotal(ctx, total)
 		a.So(totalCount, should.Equal, total)
 	})
 }

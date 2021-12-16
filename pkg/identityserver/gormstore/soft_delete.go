@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 )
 
 // SoftDelete makes a Delete operation set a DeletedAt instead of actually deleting the model.
@@ -33,17 +34,8 @@ func withSoftDeleted() func(*gorm.DB) *gorm.DB {
 	}
 }
 
-type deletedOptionsKeyType struct{}
-
-var deletedOptionsKey deletedOptionsKeyType
-
-type deletedOptions struct {
-	IncludeDeleted bool
-	OnlyDeleted    bool
-}
-
 func withSoftDeletedIfRequested(ctx context.Context) func(*gorm.DB) *gorm.DB {
-	if opts, ok := ctx.Value(deletedOptionsKey).(*deletedOptions); ok {
+	if opts := store.SoftDeletedFromContext(ctx); opts != nil {
 		return func(db *gorm.DB) *gorm.DB {
 			if opts.IncludeDeleted || opts.OnlyDeleted {
 				db = db.Unscoped()
@@ -56,43 +48,6 @@ func withSoftDeletedIfRequested(ctx context.Context) func(*gorm.DB) *gorm.DB {
 		}
 	}
 	return func(db *gorm.DB) *gorm.DB { return db }
-}
-
-// WithSoftDeleted returns a context that tells the store to include (only) deleted entities.
-func WithSoftDeleted(ctx context.Context, onlyDeleted bool) context.Context {
-	return context.WithValue(ctx, deletedOptionsKey, &deletedOptions{
-		IncludeDeleted: true,
-		OnlyDeleted:    onlyDeleted,
-	})
-}
-
-// WithoutSoftDeleted returns a context that tells the store not to query for deleted entities.
-func WithoutSoftDeleted(ctx context.Context) context.Context {
-	return context.WithValue(ctx, deletedOptionsKey, &deletedOptions{})
-}
-
-type expiredOptionsKeyType struct{}
-
-var expiredOptionsKey expiredOptionsKeyType
-
-type expiredOptions struct {
-	OnlyExpired      bool
-	RestoreThreshold time.Duration
-}
-
-// WithExpired returns a context that tells the store to only query expired entities.
-func WithExpired(ctx context.Context, threshold time.Duration) context.Context {
-	return context.WithValue(ctx, expiredOptionsKey, expiredOptions{
-		OnlyExpired:      true,
-		RestoreThreshold: threshold,
-	})
-}
-
-func expiredFromContext(ctx context.Context) (onlyExpired bool, restoreThreshold time.Duration) {
-	if opts, ok := ctx.Value(expiredOptionsKey).(expiredOptions); ok {
-		return opts.OnlyExpired, opts.RestoreThreshold
-	}
-	return
 }
 
 func withExpiredEntities(expireThreshold time.Duration) func(*gorm.DB) *gorm.DB {

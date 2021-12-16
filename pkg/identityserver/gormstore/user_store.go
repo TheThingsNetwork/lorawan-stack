@@ -23,17 +23,18 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // GetUserStore returns an UserStore on the given db (or transaction).
-func GetUserStore(db *gorm.DB) UserStore {
-	return &userStore{store: newStore(db)}
+func GetUserStore(db *gorm.DB) store.UserStore {
+	return &userStore{baseStore: newStore(db)}
 }
 
 type userStore struct {
-	*store
+	*baseStore
 }
 
 // selectUserFields selects relevant fields (based on fieldMask) and preloads details if needed.
@@ -93,17 +94,19 @@ func (s *userStore) FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers,
 	}
 	query := s.query(ctx, User{}, withUserID(idStrings...))
 	query = selectUserFields(ctx, query, fieldMask)
-	query = query.Order(orderFromContext(ctx, "users", `"accounts"."uid"`, "ASC"))
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query.Model(User{}))
+	query = query.Order(store.OrderFromContext(ctx, "users", `"accounts"."uid"`, "ASC"))
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
+		var total uint64
+		query.Count(&total)
+		store.SetTotal(ctx, total)
 		query = query.Limit(limit).Offset(offset)
 	}
-	if onlyExpired, expireThreshold := expiredFromContext(ctx); onlyExpired {
+	if onlyExpired, expireThreshold := store.ExpiredFromContext(ctx); onlyExpired {
 		query = query.Scopes(withExpiredEntities(expireThreshold))
 	}
 	var userModels []userWithUID
 	query = query.Find(&userModels)
-	setTotal(ctx, uint64(len(userModels)))
+	store.SetTotal(ctx, uint64(len(userModels)))
 	if query.Error != nil {
 		return nil, query.Error
 	}
@@ -121,14 +124,16 @@ func (s *userStore) ListAdmins(ctx context.Context, fieldMask *pbtypes.FieldMask
 
 	query := s.query(ctx, User{}, withUserID()).Where(&User{Admin: true})
 	query = selectUserFields(ctx, query, fieldMask)
-	query = query.Order(orderFromContext(ctx, "users", `"accounts"."uid"`, "ASC"))
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query.Model(User{}))
+	query = query.Order(store.OrderFromContext(ctx, "users", `"accounts"."uid"`, "ASC"))
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
+		var total uint64
+		query.Count(&total)
+		store.SetTotal(ctx, total)
 		query = query.Limit(limit).Offset(offset)
 	}
 	var userModels []userWithUID
 	query = query.Find(&userModels)
-	setTotal(ctx, uint64(len(userModels)))
+	store.SetTotal(ctx, uint64(len(userModels)))
 	if query.Error != nil {
 		return nil, query.Error
 	}

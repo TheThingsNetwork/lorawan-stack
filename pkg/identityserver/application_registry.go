@@ -25,7 +25,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blacklist"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -105,7 +106,7 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		app, err = store.GetApplicationStore(db).CreateApplication(ctx, req.Application)
+		app, err = gormstore.GetApplicationStore(db).CreateApplication(ctx, req.Application)
 		if err != nil {
 			return err
 		}
@@ -119,7 +120,7 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 		}
 		if len(req.Application.ContactInfo) > 0 {
 			cleanContactInfo(req.Application.ContactInfo)
-			app.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, app.GetIds(), req.Application.ContactInfo)
+			app.ContactInfo, err = gormstore.GetContactInfoStore(db).SetContactInfo(ctx, app.GetIds(), req.Application.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -145,12 +146,12 @@ func (is *IdentityServer) getApplication(ctx context.Context, req *ttnpb.GetAppl
 		defer func() { app = app.PublicSafe() }()
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		app, err = store.GetApplicationStore(db).GetApplication(ctx, req.GetApplicationIds(), req.FieldMask)
+		app, err = gormstore.GetApplicationStore(db).GetApplication(ctx, req.GetApplicationIds(), req.FieldMask)
 		if err != nil {
 			return err
 		}
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-			app.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, app.GetIds())
+			app.ContactInfo, err = gormstore.GetContactInfoStore(db).GetContactInfo(ctx, app.GetIds())
 			if err != nil {
 				return err
 			}
@@ -240,7 +241,7 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 				appIDs = append(appIDs, appID)
 			}
 		}
-		apps.Applications, err = store.GetApplicationStore(db).FindApplications(ctx, appIDs, req.FieldMask)
+		apps.Applications, err = gormstore.GetApplicationStore(db).FindApplications(ctx, appIDs, req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -281,13 +282,13 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 		if err := validateContactIsCollaborator(ctx, db, req.Application.TechnicalContact, req.Application.GetEntityIdentifiers()); err != nil {
 			return err
 		}
-		app, err = store.GetApplicationStore(db).UpdateApplication(ctx, req.Application, req.FieldMask)
+		app, err = gormstore.GetApplicationStore(db).UpdateApplication(ctx, req.Application, req.FieldMask)
 		if err != nil {
 			return err
 		}
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
 			cleanContactInfo(req.Application.ContactInfo)
-			app.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, app.GetIds(), req.Application.ContactInfo)
+			app.ContactInfo, err = gormstore.GetContactInfoStore(db).SetContactInfo(ctx, app.GetIds(), req.Application.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -308,14 +309,14 @@ func (is *IdentityServer) deleteApplication(ctx context.Context, ids *ttnpb.Appl
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		total, err := store.GetEndDeviceStore(db).CountEndDevices(ctx, ids)
+		total, err := gormstore.GetEndDeviceStore(db).CountEndDevices(ctx, ids)
 		if err != nil {
 			return err
 		}
 		if total > 0 {
 			return errApplicationHasDevices.WithAttributes("count", int(total))
 		}
-		return store.GetApplicationStore(db).DeleteApplication(ctx, ids)
+		return gormstore.GetApplicationStore(db).DeleteApplication(ctx, ids)
 	})
 	if err != nil {
 		return nil, err
@@ -329,7 +330,7 @@ func (is *IdentityServer) restoreApplication(ctx context.Context, ids *ttnpb.App
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		appStore := store.GetApplicationStore(db)
+		appStore := gormstore.GetApplicationStore(db)
 		app, err := appStore.GetApplication(store.WithSoftDeleted(ctx, true), ids, softDeleteFieldMask)
 		if err != nil {
 			return err
@@ -355,7 +356,7 @@ func (is *IdentityServer) purgeApplication(ctx context.Context, ids *ttnpb.Appli
 		return nil, errAdminsPurgeApplications.New()
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		total, err := store.GetEndDeviceStore(db).CountEndDevices(ctx, ids)
+		total, err := gormstore.GetEndDeviceStore(db).CountEndDevices(ctx, ids)
 		if err != nil {
 			return err
 		}
@@ -363,21 +364,21 @@ func (is *IdentityServer) purgeApplication(ctx context.Context, ids *ttnpb.Appli
 			return errApplicationHasDevices.WithAttributes("count", int(total))
 		}
 		// delete related API keys before purging the application
-		err = store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())
+		err = gormstore.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}
 		// delete related memberships before purging the application
-		err = store.GetMembershipStore(db).DeleteEntityMembers(ctx, ids.GetEntityIdentifiers())
+		err = gormstore.GetMembershipStore(db).DeleteEntityMembers(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}
 		// delete related contact info before purging the application
-		err = store.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids)
+		err = gormstore.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids)
 		if err != nil {
 			return err
 		}
-		return store.GetApplicationStore(db).PurgeApplication(ctx, ids)
+		return gormstore.GetApplicationStore(db).PurgeApplication(ctx, ids)
 	})
 	if err != nil {
 		return nil, err
@@ -395,7 +396,7 @@ func (is *IdentityServer) issueDevEUI(ctx context.Context, ids *ttnpb.Applicatio
 	}
 	res := &ttnpb.IssueDevEUIResponse{}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		devEUI, err := store.GetEUIStore(db).IssueDevEUIForApplication(ctx, ids, is.config.DevEUIBlock.ApplicationLimit)
+		devEUI, err := gormstore.GetEUIStore(db).IssueDevEUIForApplication(ctx, ids, is.config.DevEUIBlock.ApplicationLimit)
 		if err != nil {
 			return err
 		}

@@ -21,7 +21,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func (s *store) replaceAttributes(ctx context.Context, entityType, entityUUID string, old []Attribute, new []Attribute) (err error) {
+func (s *baseStore) replaceAttributes(ctx context.Context, entityType, entityUUID string, old []Attribute, new []Attribute) (err error) {
 	return replaceAttributes(ctx, s.DB, entityType, entityUUID, old, new)
 }
 

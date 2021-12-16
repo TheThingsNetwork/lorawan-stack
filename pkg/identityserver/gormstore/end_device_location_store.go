@@ -21,7 +21,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func (s *store) replaceEndDeviceLocations(ctx context.Context, endDeviceUUID string, old []EndDeviceLocation, new []EndDeviceLocation) error {
+func (s *baseStore) replaceEndDeviceLocations(ctx context.Context, endDeviceUUID string, old []EndDeviceLocation, new []EndDeviceLocation) error {
 	return replaceEndDeviceLocations(ctx, s.DB, endDeviceUUID, old, new)
 }
 

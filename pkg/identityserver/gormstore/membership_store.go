@@ -21,16 +21,17 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // GetMembershipStore returns an MembershipStore on the given db (or transaction).
-func GetMembershipStore(db *gorm.DB) MembershipStore {
-	return &membershipStore{store: newStore(db)}
+func GetMembershipStore(db *gorm.DB) store.MembershipStore {
+	return &membershipStore{baseStore: newStore(db)}
 }
 
 type membershipStore struct {
-	*store
+	*baseStore
 }
 
 func (s *membershipStore) queryWithIndirectMemberships(ctx context.Context, entityType string, entityIDs ...string) *gorm.DB {
@@ -114,9 +115,9 @@ func (s *membershipStore) FindMemberships(ctx context.Context, accountID *ttnpb.
 			Select(fmt.Sprintf(`"%[1]ss"."%[1]s_id" AS "friendly_id"`, entityType))
 	}
 
-	query = query.Order(orderFromContext(ctx, fmt.Sprintf("%[1]ss", entityType), "friendly_id", "ASC"))
+	query = query.Order(store.OrderFromContext(ctx, fmt.Sprintf("%[1]ss", entityType), "friendly_id", "ASC"))
 	page := query
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
 		page = query.Limit(limit).Offset(offset)
 	}
 	var results []struct {
@@ -125,10 +126,12 @@ func (s *membershipStore) FindMemberships(ctx context.Context, accountID *ttnpb.
 	if err := page.Scan(&results).Error; err != nil {
 		return nil, err
 	}
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 && (offset > 0 || len(results) == int(limit)) {
-		countTotal(ctx, query)
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 && (offset > 0 || len(results) == int(limit)) {
+		var total uint64
+		query.Count(&total)
+		store.SetTotal(ctx, total)
 	} else {
-		setTotal(ctx, uint64(len(results)))
+		store.SetTotal(ctx, uint64(len(results)))
 	}
 	identifiers := make([]*ttnpb.EntityIdentifiers, len(results))
 	for i, result := range results {
@@ -148,10 +151,10 @@ type membershipChain struct {
 	EntityFriendlyID          string
 }
 
-func (m membershipChain) GetMembershipChain() *MembershipChain {
+func (m membershipChain) GetMembershipChain() *store.MembershipChain {
 	indirectAccountRights := ttnpb.Rights(m.IndirectAccountRights)
 	directAccountRights := ttnpb.Rights(m.DirectAccountRights)
-	c := &MembershipChain{
+	c := &store.MembershipChain{
 		RightsOnEntity:    &directAccountRights,
 		EntityIdentifiers: buildIdentifiers(m.EntityType, m.EntityFriendlyID),
 	}
@@ -168,58 +171,14 @@ func (m membershipChain) GetMembershipChain() *MembershipChain {
 	return c
 }
 
-// MembershipChain is a User -> (Membership -> Organization) -> Membership -> Entity chain.
-type MembershipChain struct {
-	UserIdentifiers         *ttnpb.UserIdentifiers
-	RightsOnOrganization    *ttnpb.Rights
-	OrganizationIdentifiers *ttnpb.OrganizationIdentifiers
-	RightsOnEntity          *ttnpb.Rights
-	EntityIdentifiers       *ttnpb.EntityIdentifiers
-}
-
-// GetRights returns the intersected rights.
-func (m *MembershipChain) GetRights() *ttnpb.Rights {
-	if m.RightsOnOrganization == nil {
-		return m.RightsOnEntity.Implied()
-	}
-	return m.RightsOnEntity.Implied().Intersect(m.RightsOnOrganization.Implied())
-}
-
-// MembershipChains is a list of membership chains.
-type MembershipChains []*MembershipChain
-
-// GetRights returns the rights of the member on the entity.
-func (c MembershipChains) GetRights(member *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.IDStringer) *ttnpb.Rights {
-	var entityRights *ttnpb.Rights
-	for _, membership := range c {
-		switch member.EntityType() {
-		case "organization":
-			if membership.OrganizationIdentifiers == nil || membership.OrganizationIdentifiers.IDString() != member.IDString() {
-				continue
-			}
-		case "user":
-			if membership.UserIdentifiers == nil || membership.UserIdentifiers.IDString() != member.IDString() {
-				continue
-			}
-		default:
-			continue
-		}
-		if membership.EntityIdentifiers.EntityType() != entityID.EntityType() || membership.EntityIdentifiers.IDString() != entityID.IDString() {
-			continue
-		}
-		entityRights = entityRights.Union(membership.GetRights())
-	}
-	return entityRights
-}
-
-func (s *membershipStore) FindAccountMembershipChains(ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, entityType string, entityIDs ...string) ([]*MembershipChain, error) {
+func (s *membershipStore) FindAccountMembershipChains(ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, entityType string, entityIDs ...string) ([]*store.MembershipChain, error) {
 	defer trace.StartRegion(ctx, fmt.Sprintf("find membership chains of user on %ss", entityType)).End()
 	query := s.queryMemberships(ctx, accountID, entityType, entityIDs, true)
 	var results []membershipChain
 	if err := query.Scan(&results).Error; err != nil {
 		return nil, err
 	}
-	chains := make([]*MembershipChain, len(results))
+	chains := make([]*store.MembershipChain, len(results))
 	for i, result := range results {
 		chains[i] = result.GetMembershipChain()
 	}
@@ -230,17 +189,19 @@ func (s *membershipStore) FindMembers(ctx context.Context, entityID *ttnpb.Entit
 	defer trace.StartRegion(ctx, fmt.Sprintf("find members of %s", entityID.EntityType())).End()
 	query := s.queryWithDirectMemberships(ctx, entityID.EntityType(), entityID.IDString()).Order("direct_account_friendly_id")
 	page := query
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
 		page = query.Limit(limit).Offset(offset)
 	}
 	var results []membershipChain
 	if err := page.Scan(&results).Error; err != nil {
 		return nil, err
 	}
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 && (offset > 0 || len(results) == int(limit)) {
-		countTotal(ctx, query)
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 && (offset > 0 || len(results) == int(limit)) {
+		var total uint64
+		query.Count(&total)
+		store.SetTotal(ctx, total)
 	} else {
-		setTotal(ctx, uint64(len(results)))
+		store.SetTotal(ctx, uint64(len(results)))
 	}
 	membershipRights := make(map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, len(results))
 	for _, result := range results {

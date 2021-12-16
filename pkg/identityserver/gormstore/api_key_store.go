@@ -23,17 +23,18 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // GetAPIKeyStore returns an APIKeyStore on the given db (or transaction).
-func GetAPIKeyStore(db *gorm.DB) APIKeyStore {
-	return &apiKeyStore{store: newStore(db)}
+func GetAPIKeyStore(db *gorm.DB) store.APIKeyStore {
+	return &apiKeyStore{baseStore: newStore(db)}
 }
 
 type apiKeyStore struct {
-	*store
+	*baseStore
 }
 
 func selectAPIKeyFields(ctx context.Context, query *gorm.DB, fieldMask *pbtypes.FieldMask) *gorm.DB {
@@ -91,16 +92,18 @@ func (s *apiKeyStore) FindAPIKeys(ctx context.Context, entityID *ttnpb.EntityIde
 		EntityID:   entity.PrimaryKey(),
 		EntityType: entityTypeForID(entityID),
 	})
-	query = query.Order(orderFromContext(ctx, "api_keys", "api_key_id", "ASC"))
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query)
+	query = query.Order(store.OrderFromContext(ctx, "api_keys", "api_key_id", "ASC"))
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
+		var total uint64
+		query.Count(&total)
+		store.SetTotal(ctx, total)
 		query = query.Limit(limit).Offset(offset)
 	}
 	var keyModels []APIKey
 	if err = query.Find(&keyModels).Error; err != nil {
 		return nil, err
 	}
-	setTotal(ctx, uint64(len(keyModels)))
+	store.SetTotal(ctx, uint64(len(keyModels)))
 	keyProtos := make([]*ttnpb.APIKey, len(keyModels))
 	for i, apiKey := range keyModels {
 		keyProtos[i] = apiKey.toPB()

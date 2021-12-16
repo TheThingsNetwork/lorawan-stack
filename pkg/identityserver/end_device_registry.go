@@ -25,7 +25,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blacklist"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -72,14 +73,14 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 	defer func() { is.setFullEndDevicePictureURL(ctx, dev) }()
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		dev, err = store.GetEndDeviceStore(db).CreateEndDevice(ctx, &req.EndDevice)
+		dev, err = gormstore.GetEndDeviceStore(db).CreateEndDevice(ctx, &req.EndDevice)
 		if err != nil {
 			return err
 		}
 		return nil
 	})
 	if err != nil {
-		if errors.IsAlreadyExists(err) && errors.Resemble(err, store.ErrEUITaken) {
+		if errors.IsAlreadyExists(err) && errors.Resemble(err, gormstore.ErrEUITaken) {
 			if ids, err := is.getEndDeviceIdentifiersForEUIs(ctx, &ttnpb.GetEndDeviceIdentifiersForEUIsRequest{
 				JoinEui: *req.Ids.JoinEui,
 				DevEui:  *req.Ids.DevEui,
@@ -109,7 +110,7 @@ func (is *IdentityServer) getEndDevice(ctx context.Context, req *ttnpb.GetEndDev
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		dev, err = store.GetEndDeviceStore(db).GetEndDevice(ctx, req.EndDeviceIds, req.FieldMask)
+		dev, err = gormstore.GetEndDeviceStore(db).GetEndDevice(ctx, req.EndDeviceIds, req.FieldMask)
 		return err
 	})
 	if err != nil {
@@ -123,7 +124,7 @@ func (is *IdentityServer) getEndDeviceIdentifiersForEUIs(ctx context.Context, re
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		dev, err := store.GetEndDeviceStore(db).GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
+		dev, err := gormstore.GetEndDeviceStore(db).GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
 			JoinEui: &req.JoinEui,
 			DevEui:  &req.DevEui,
 		}, &pbtypes.FieldMask{Paths: []string{"ids.application_ids.application_id", "ids.device_id", "ids.join_eui", "ids.dev_eui"}})
@@ -160,7 +161,7 @@ func (is *IdentityServer) listEndDevices(ctx context.Context, req *ttnpb.ListEnd
 	}()
 	devs = &ttnpb.EndDevices{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		devs.EndDevices, err = store.GetEndDeviceStore(db).ListEndDevices(ctx, req.GetApplicationIds(), req.FieldMask)
+		devs.EndDevices, err = gormstore.GetEndDeviceStore(db).ListEndDevices(ctx, req.GetApplicationIds(), req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -216,7 +217,7 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		dev, err = store.GetEndDeviceStore(db).UpdateEndDevice(ctx, &req.EndDevice, req.FieldMask)
+		dev, err = gormstore.GetEndDeviceStore(db).UpdateEndDevice(ctx, &req.EndDevice, req.FieldMask)
 		return err
 	})
 	if err != nil {
@@ -231,7 +232,7 @@ func (is *IdentityServer) deleteEndDevice(ctx context.Context, ids *ttnpb.EndDev
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		return store.GetEndDeviceStore(db).DeleteEndDevice(ctx, ids)
+		return gormstore.GetEndDeviceStore(db).DeleteEndDevice(ctx, ids)
 	})
 	if err != nil {
 		return nil, err

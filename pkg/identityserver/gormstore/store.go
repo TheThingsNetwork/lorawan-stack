@@ -29,17 +29,18 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/lib/pq"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-func newStore(db *gorm.DB) *store { return &store{DB: db} }
+func newStore(db *gorm.DB) *baseStore { return &baseStore{DB: db} }
 
-type store struct {
+type baseStore struct {
 	DB *gorm.DB
 }
 
-func (s *store) query(ctx context.Context, model interface{}, funcs ...func(*gorm.DB) *gorm.DB) *gorm.DB {
+func (s *baseStore) query(ctx context.Context, model interface{}, funcs ...func(*gorm.DB) *gorm.DB) *gorm.DB {
 	query := s.DB.Model(model).Scopes(withContext(ctx), withSoftDeletedIfRequested(ctx))
 	if len(funcs) > 0 {
 		query = query.Scopes(funcs...)
@@ -47,7 +48,7 @@ func (s *store) query(ctx context.Context, model interface{}, funcs ...func(*gor
 	return query
 }
 
-func (s *store) findEntity(ctx context.Context, entityID ttnpb.IDStringer, fields ...string) (modelInterface, error) {
+func (s *baseStore) findEntity(ctx context.Context, entityID ttnpb.IDStringer, fields ...string) (modelInterface, error) {
 	model := modelForID(entityID)
 	query := s.query(ctx, model, withID(entityID))
 	if len(fields) == 1 && fields[0] == "id" {
@@ -65,7 +66,7 @@ func (s *store) findEntity(ctx context.Context, entityID ttnpb.IDStringer, field
 	return model, nil
 }
 
-func (s *store) loadContact(ctx context.Context, contact *Account) (*string, error) {
+func (s *baseStore) loadContact(ctx context.Context, contact *Account) (*string, error) {
 	if contact == nil || contact.AccountType == "" || contact.UID == "" {
 		return nil, nil
 	}
@@ -82,24 +83,24 @@ func (s *store) loadContact(ctx context.Context, contact *Account) (*string, err
 	return &contact.ID, nil
 }
 
-func (s *store) findDeletedEntity(ctx context.Context, entityID ttnpb.IDStringer, fields ...string) (modelInterface, error) {
-	return s.findEntity(WithSoftDeleted(ctx, false), entityID, fields...)
+func (s *baseStore) findDeletedEntity(ctx context.Context, entityID ttnpb.IDStringer, fields ...string) (modelInterface, error) {
+	return s.findEntity(store.WithSoftDeleted(ctx, false), entityID, fields...)
 }
 
-func (s *store) createEntity(ctx context.Context, model interface{}) error {
+func (s *baseStore) createEntity(ctx context.Context, model interface{}) error {
 	if model, ok := model.(modelInterface); ok {
 		model.SetContext(ctx)
 	}
 	return s.DB.Create(model).Error
 }
 
-func (s *store) updateEntity(ctx context.Context, model interface{}, columns ...string) error {
+func (s *baseStore) updateEntity(ctx context.Context, model interface{}, columns ...string) error {
 	query := s.query(ctx, model)
 	query = query.Select(append(columns, "updated_at"))
 	return query.Save(model).Error
 }
 
-func (s *store) deleteEntity(ctx context.Context, entityID ttnpb.IDStringer) error {
+func (s *baseStore) deleteEntity(ctx context.Context, entityID ttnpb.IDStringer) error {
 	model, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
 		return err
@@ -120,7 +121,7 @@ func (s *store) deleteEntity(ctx context.Context, entityID ttnpb.IDStringer) err
 	return nil
 }
 
-func (s *store) restoreEntity(ctx context.Context, entityID ttnpb.IDStringer) error {
+func (s *baseStore) restoreEntity(ctx context.Context, entityID ttnpb.IDStringer) error {
 	model, err := s.findDeletedEntity(ctx, entityID, "id")
 	if err != nil {
 		return err
@@ -138,7 +139,7 @@ func (s *store) restoreEntity(ctx context.Context, entityID ttnpb.IDStringer) er
 	return s.DB.Unscoped().Model(model).UpdateColumn("deleted_at", gorm.Expr("NULL")).Error
 }
 
-func (s *store) purgeEntity(ctx context.Context, entityID ttnpb.IDStringer) error {
+func (s *baseStore) purgeEntity(ctx context.Context, entityID ttnpb.IDStringer) error {
 	model, err := s.findDeletedEntity(ctx, entityID, "id")
 	if err != nil {
 		return err

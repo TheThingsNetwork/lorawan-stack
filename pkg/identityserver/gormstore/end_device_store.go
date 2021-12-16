@@ -24,17 +24,18 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // GetEndDeviceStore returns an EndDeviceStore on the given db (or transaction).
-func GetEndDeviceStore(db *gorm.DB) EndDeviceStore {
-	return &deviceStore{store: newStore(db)}
+func GetEndDeviceStore(db *gorm.DB) store.EndDeviceStore {
+	return &deviceStore{baseStore: newStore(db)}
 }
 
 type deviceStore struct {
-	*store
+	*baseStore
 }
 
 // selectEndDeviceFields selects relevant fields (based on fieldMask) and preloads details if needed.
@@ -87,14 +88,16 @@ func (s *deviceStore) CreateEndDevice(ctx context.Context, dev *ttnpb.EndDevice)
 func (s *deviceStore) findEndDevices(ctx context.Context, query *gorm.DB, fieldMask *pbtypes.FieldMask) ([]*ttnpb.EndDevice, error) {
 	defer trace.StartRegion(ctx, "find end devices").End()
 	query = selectEndDeviceFields(ctx, query, fieldMask)
-	query = query.Order(orderFromContext(ctx, "end_devices", "device_id", "ASC"))
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query.Model(EndDevice{}))
+	query = query.Order(store.OrderFromContext(ctx, "end_devices", "device_id", "ASC"))
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
+		var total uint64
+		query.Count(&total)
+		store.SetTotal(ctx, total)
 		query = query.Limit(limit).Offset(offset)
 	}
 	var devModels []EndDevice
 	query = query.Find(&devModels)
-	setTotal(ctx, uint64(len(devModels)))
+	store.SetTotal(ctx, uint64(len(devModels)))
 	if query.Error != nil {
 		return nil, query.Error
 	}

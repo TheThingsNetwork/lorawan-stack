@@ -21,7 +21,8 @@ import (
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -39,7 +40,7 @@ func (is *IdentityServer) listOAuthClientAuthorizations(ctx context.Context, req
 	}()
 	authorizations = &ttnpb.OAuthClientAuthorizations{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		authorizations.Authorizations, err = store.GetOAuthStore(db).ListAuthorizations(ctx, req.UserIds)
+		authorizations.Authorizations, err = gormstore.GetOAuthStore(db).ListAuthorizations(ctx, req.UserIds)
 		return err
 	})
 	if err != nil {
@@ -69,7 +70,7 @@ func (is *IdentityServer) listOAuthAccessTokens(ctx context.Context, req *ttnpb.
 	}()
 	tokens = &ttnpb.OAuthAccessTokens{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		tokens.Tokens, err = store.GetOAuthStore(db).ListAccessTokens(ctx, req.UserIds, req.ClientIds)
+		tokens.Tokens, err = gormstore.GetOAuthStore(db).ListAccessTokens(ctx, req.UserIds, req.ClientIds)
 		return err
 	})
 	for _, token := range tokens.Tokens {
@@ -86,7 +87,7 @@ func (is *IdentityServer) deleteOAuthAuthorization(ctx context.Context, req *ttn
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		return store.GetOAuthStore(db).DeleteAuthorization(ctx, req.UserIds, req.ClientIds)
+		return gormstore.GetOAuthStore(db).DeleteAuthorization(ctx, req.UserIds, req.ClientIds)
 	})
 	if err != nil {
 		return nil, err
@@ -108,7 +109,7 @@ func (is *IdentityServer) deleteOAuthAccessToken(ctx context.Context, req *ttnpb
 		}
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		oauthStore := store.GetOAuthStore(db)
+		oauthStore := gormstore.GetOAuthStore(db)
 		if accessToken != nil && accessToken.Id != req.Id {
 			accessToken, err := oauthStore.GetAccessToken(ctx, req.Id)
 			if err != nil {

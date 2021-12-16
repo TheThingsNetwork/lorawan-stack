@@ -23,6 +23,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
@@ -33,7 +34,7 @@ func TestClientStore(t *testing.T) {
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
 		prepareTest(db, &Client{}, &Attribute{}, &Account{}, &Organization{}, &User{})
-		store := GetClientStore(db)
+		clientStore := GetClientStore(db)
 		s := newStore(db)
 
 		usr1 := &User{Account: Account{UID: "test-user-1"}, PrimaryEmailAddress: "user1@example.com"}
@@ -42,7 +43,7 @@ func TestClientStore(t *testing.T) {
 		usr2 := &User{Account: Account{UID: "test-user-2"}, PrimaryEmailAddress: "user2@example.com"}
 		s.createEntity(ctx, usr2)
 
-		created, err := store.CreateClient(ctx, &ttnpb.Client{
+		created, err := clientStore.CreateClient(ctx, &ttnpb.Client{
 			Ids:         &ttnpb.ClientIdentifiers{ClientId: "foo"},
 			Name:        "Foo Client",
 			Description: "The Amazing Foo Client",
@@ -67,7 +68,7 @@ func TestClientStore(t *testing.T) {
 			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
 		}
 
-		got, err := store.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes", "administrative_contact"}})
+		got, err := clientStore.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes", "administrative_contact"}})
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -80,7 +81,7 @@ func TestClientStore(t *testing.T) {
 			a.So(got.UpdatedAt, should.Resemble, created.UpdatedAt)
 		}
 
-		_, err = store.UpdateClient(ctx, &ttnpb.Client{
+		_, err = clientStore.UpdateClient(ctx, &ttnpb.Client{
 			Ids: &ttnpb.ClientIdentifiers{ClientId: "bar"},
 		}, nil)
 
@@ -88,7 +89,7 @@ func TestClientStore(t *testing.T) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		updated, err := store.UpdateClient(ctx, &ttnpb.Client{
+		updated, err := clientStore.UpdateClient(ctx, &ttnpb.Client{
 			Ids:         &ttnpb.ClientIdentifiers{ClientId: "foo"},
 			Name:        "Foobar Client",
 			Description: "The Amazing Foobar Client",
@@ -109,7 +110,7 @@ func TestClientStore(t *testing.T) {
 			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenAfter, *ttnpb.StdTime(created.CreatedAt))
 		}
 
-		got, err = store.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, nil)
+		got, err = clientStore.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, nil)
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -121,48 +122,48 @@ func TestClientStore(t *testing.T) {
 			a.So(got.UpdatedAt, should.Resemble, updated.UpdatedAt)
 		}
 
-		list, err := store.FindClients(ctx, nil, &pbtypes.FieldMask{Paths: []string{"name"}})
+		list, err := clientStore.FindClients(ctx, nil, &pbtypes.FieldMask{Paths: []string{"name"}})
 
 		a.So(err, should.BeNil)
 		if a.So(list, should.HaveLength, 1) {
 			a.So(list[0].Name, should.EndWith, got.Name)
 		}
 
-		err = store.DeleteClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"})
+		err = clientStore.DeleteClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"})
 
 		a.So(err, should.BeNil)
 
-		got, err = store.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, nil)
+		got, err = clientStore.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, nil)
 
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 
-		err = store.RestoreClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"})
+		err = clientStore.RestoreClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"})
 
 		a.So(err, should.BeNil)
 
-		got, err = store.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, nil)
+		got, err = clientStore.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, nil)
 
 		a.So(err, should.BeNil)
 
-		err = store.DeleteClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"})
+		err = clientStore.DeleteClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"})
 
 		a.So(err, should.BeNil)
 
-		list, err = store.FindClients(ctx, nil, nil)
+		list, err = clientStore.FindClients(ctx, nil, nil)
 
 		a.So(err, should.BeNil)
 		a.So(list, should.BeEmpty)
 
-		list, err = store.FindClients(WithSoftDeleted(ctx, false), nil, nil)
+		list, err = clientStore.FindClients(store.WithSoftDeleted(ctx, false), nil, nil)
 
 		a.So(err, should.BeNil)
 		a.So(list, should.NotBeEmpty)
 
 		entity, _ := s.findDeletedEntity(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, "id")
 
-		err = store.PurgeClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"})
+		err = clientStore.PurgeClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"})
 
 		a.So(err, should.BeNil)
 
@@ -175,7 +176,7 @@ func TestClientStore(t *testing.T) {
 		a.So(attribute, should.HaveLength, 0)
 
 		// Check that client ids are released after purge
-		_, err = store.CreateClient(ctx, &ttnpb.Client{
+		_, err = clientStore.CreateClient(ctx, &ttnpb.Client{
 			Ids: &ttnpb.ClientIdentifiers{ClientId: "foo"},
 		})
 

@@ -21,16 +21,17 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // GetInvitationStore returns an InvitationStore on the given db (or transaction).
-func GetInvitationStore(db *gorm.DB) InvitationStore {
-	return &invitationStore{store: newStore(db)}
+func GetInvitationStore(db *gorm.DB) store.InvitationStore {
+	return &invitationStore{baseStore: newStore(db)}
 }
 
 type invitationStore struct {
-	*store
+	*baseStore
 }
 
 var errInvitationAlreadySent = errors.DefineAlreadyExists("invitation_already_sent", "invitation already sent")
@@ -56,14 +57,17 @@ func (s *invitationStore) FindInvitations(ctx context.Context) ([]*ttnpb.Invitat
 	defer trace.StartRegion(ctx, "find invitations").End()
 	var invitationModels []Invitation
 	query := s.query(ctx, Invitation{})
-	query = query.Order(orderFromContext(ctx, "invitations", "id", "ASC"))
-	if limit, offset := limitAndOffsetFromContext(ctx); limit != 0 {
-		countTotal(ctx, query.Model(&Invitation{}))
+	query = query.Order(store.OrderFromContext(ctx, "invitations", "id", "ASC"))
+	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
+		var total uint64
+		query.Count(&total)
+		store.SetTotal(ctx, total)
 		query = query.Limit(limit).Offset(offset)
 	}
 	if err := query.Find(&invitationModels).Error; err != nil {
 		return nil, err
 	}
+	store.SetTotal(ctx, uint64(len(invitationModels)))
 	invitationProtos := make([]*ttnpb.Invitation, len(invitationModels))
 	for i, invitationModel := range invitationModels {
 		invitationProtos[i] = invitationModel.toPB()

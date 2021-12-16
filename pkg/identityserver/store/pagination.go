@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,15 +18,13 @@ import (
 	"context"
 	"fmt"
 	"strings"
-
-	"github.com/jinzhu/gorm"
 )
 
 type paginationOptionsKeyType struct{}
 
 var paginationOptionsKey paginationOptionsKeyType
 
-type paginationOptions struct {
+type PaginationOptions struct {
 	limit  uint32
 	offset uint32
 	total  *uint64
@@ -38,31 +36,24 @@ func WithPagination(ctx context.Context, limit, page uint32, total *uint64) cont
 	if page == 0 {
 		page = 1
 	}
-	return context.WithValue(ctx, paginationOptionsKey, paginationOptions{
+	return context.WithValue(ctx, paginationOptionsKey, PaginationOptions{
 		limit:  limit,
 		offset: (page - 1) * limit,
 		total:  total,
 	})
 }
 
-// countTotal counts the total number of results (without limiting) and sets it
-// into the destination set by SetTotalCount.
-func countTotal(ctx context.Context, db *gorm.DB) {
-	if opts, ok := ctx.Value(paginationOptionsKey).(paginationOptions); ok && opts.total != nil && *opts.total == 0 {
-		db.Count(opts.total)
-	}
-}
-
-// setTotal sets the total number of results into the destination set by
+// SetTotal sets the total number of results into the destination set by
 // SetTotalCount if not already set.
-func setTotal(ctx context.Context, total uint64) {
-	if opts, ok := ctx.Value(paginationOptionsKey).(paginationOptions); ok && opts.total != nil && *opts.total == 0 {
+func SetTotal(ctx context.Context, total uint64) {
+	if opts, ok := ctx.Value(paginationOptionsKey).(PaginationOptions); ok && opts.total != nil && *opts.total == 0 {
 		*opts.total = total
 	}
 }
 
-func limitAndOffsetFromContext(ctx context.Context) (limit, offset uint32) {
-	if opts, ok := ctx.Value(paginationOptionsKey).(paginationOptions); ok {
+// LimitAndOffsetFromContext gets the limit and offset from the context.
+func LimitAndOffsetFromContext(ctx context.Context) (limit, offset uint32) {
+	if opts, ok := ctx.Value(paginationOptionsKey).(PaginationOptions); ok {
 		return opts.limit, opts.offset
 	}
 	return 0, 0
@@ -80,7 +71,7 @@ func WithOrder(ctx context.Context, spec string) context.Context {
 		field = strings.TrimPrefix(spec, "-")
 		order = "DESC"
 	}
-	return context.WithValue(ctx, orderOptionsKey, orderOptions{
+	return context.WithValue(ctx, orderOptionsKey, OrderOptions{
 		field: field,
 		order: order,
 	})
@@ -90,13 +81,13 @@ type orderOptionsKeyType struct{}
 
 var orderOptionsKey orderOptionsKeyType
 
-type orderOptions struct {
+type OrderOptions struct {
 	field string
 	order string
 }
 
-func orderFromContext(ctx context.Context, table, defaultTableField, defaultOrder string) string {
-	if opts, ok := ctx.Value(orderOptionsKey).(orderOptions); ok && opts.field != "" {
+func OrderFromContext(ctx context.Context, table, defaultTableField, defaultOrder string) string {
+	if opts, ok := ctx.Value(orderOptionsKey).(OrderOptions); ok && opts.field != "" {
 		order := opts.order
 		if order == "" {
 			order = "ASC"

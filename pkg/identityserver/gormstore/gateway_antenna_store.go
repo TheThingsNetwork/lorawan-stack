@@ -21,7 +21,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func (s *store) replaceGatewayAntennas(ctx context.Context, gatewayUUID string, old []GatewayAntenna, new []GatewayAntenna) error {
+func (s *baseStore) replaceGatewayAntennas(ctx context.Context, gatewayUUID string, old []GatewayAntenna, new []GatewayAntenna) error {
 	return replaceGatewayAntennas(ctx, s.DB, gatewayUUID, old, new)
 }
 
