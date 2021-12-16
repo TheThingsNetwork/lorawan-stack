@@ -19,7 +19,7 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	account_store "go.thethings.network/lorawan-stack/v3/pkg/account/store"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

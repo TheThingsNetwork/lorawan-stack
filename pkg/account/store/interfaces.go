@@ -17,7 +17,7 @@ package store
 import (
 	"context"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 )
 
 // Interface is the store used by the account app.
