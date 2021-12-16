@@ -23,16 +23,16 @@ import (
 
 // PayloadEncodeDecoder provides an interface to encoding and decoding messages.
 type PayloadEncodeDecoder interface {
-	EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, parameter string) error
-	DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationUplink, parameter string) error
-	DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, parameter string) error
+	EncodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, parameter string) error
+	DecodeUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationUplink, parameter string) error
+	DecodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, parameter string) error
 }
 
 // PayloadProcessor provides an interface to processing payloads of multiple formats.
 type PayloadProcessor interface {
-	EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error
-	DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationUplink, formatter ttnpb.PayloadFormatter, parameter string) error
-	DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error
+	EncodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error
+	DecodeUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationUplink, formatter ttnpb.PayloadFormatter, parameter string) error
+	DecodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error
 }
 
 // MapPayloadProcessor implements PayloadProcessor using a mapping between ttnpb.PayloadFormatter and PayloadEncodeDecoder.
@@ -41,7 +41,7 @@ type MapPayloadProcessor map[ttnpb.PayloadFormatter]PayloadEncodeDecoder
 var errFormatterNotConfigured = errors.DefineFailedPrecondition("formatter_not_configured", "formatter `{formatter}` is not configured")
 
 // EncodeDownlink implements PayloadProcessor.
-func (p MapPayloadProcessor) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
+func (p MapPayloadProcessor) EncodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
 	mp, ok := p[formatter]
 	if !ok {
 		return errFormatterNotConfigured.WithAttributes("formatter", formatter)
@@ -53,7 +53,7 @@ func (p MapPayloadProcessor) EncodeDownlink(ctx context.Context, ids ttnpb.EndDe
 }
 
 // DecodeUplink implements PayloadProcessor.
-func (p MapPayloadProcessor) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, formatter ttnpb.PayloadFormatter, parameter string) error {
+func (p MapPayloadProcessor) DecodeUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, formatter ttnpb.PayloadFormatter, parameter string) error {
 	mp, ok := p[formatter]
 	if !ok {
 		return errFormatterNotConfigured.WithAttributes("formatter", formatter)
@@ -65,7 +65,7 @@ func (p MapPayloadProcessor) DecodeUplink(ctx context.Context, ids ttnpb.EndDevi
 }
 
 // DecodeDownlink implements PayloadProcessor.
-func (p MapPayloadProcessor) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
+func (p MapPayloadProcessor) DecodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
 	mp, ok := p[formatter]
 	if !ok {
 		return errFormatterNotConfigured.WithAttributes("formatter", formatter)

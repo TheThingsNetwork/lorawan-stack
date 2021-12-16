@@ -155,7 +155,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 		{
 			Name: "1.1/no app downlink/no MAC/no ack",
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &devAddr,
@@ -184,7 +184,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 		{
 			Name: "1.1/no app downlink/status after 1 downlink/no ack",
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &devAddr,
@@ -220,7 +220,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 		{
 			Name: "1.1/no app downlink/status after an hour/no ack",
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &devAddr,
@@ -253,7 +253,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 		{
 			Name: "1.1/no app downlink/no MAC/ack",
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &devAddr,
@@ -320,7 +320,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 			ConfFCnt: 24,
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: appID,
 						DeviceId:       devID,
 						DevAddr:        &devAddr,
@@ -370,7 +370,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 		{
 			Name: "1.1/unconfirmed app downlink/no MAC/no ack",
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &devAddr,
@@ -444,7 +444,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: appID,
 						DeviceId:       devID,
 						DevAddr:        &devAddr,
@@ -485,7 +485,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 		{
 			Name: "1.1/unconfirmed app downlink/no MAC/ack",
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &devAddr,
@@ -563,7 +563,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: appID,
 						DeviceId:       devID,
 						DevAddr:        &devAddr,
@@ -607,7 +607,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 		{
 			Name: "1.1/confirmed app downlink/no MAC/no ack",
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &devAddr,
@@ -684,7 +684,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					t.FailNow()
 				}
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: appID,
 						DeviceId:       devID,
 						DevAddr:        &devAddr,
@@ -724,7 +724,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 		{
 			Name: "1.1/confirmed app downlink/no MAC/ack",
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &devAddr,
@@ -806,7 +806,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					t.FailNow()
 				}
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: appID,
 						DeviceId:       devID,
 						DevAddr:        &devAddr,
@@ -850,7 +850,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 		{
 			Name: "1.1/no app downlink/status(count)/no ack",
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &devAddr,
@@ -925,7 +925,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					t.FailNow()
 				}
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: appID,
 						DeviceId:       devID,
 						DevAddr:        &devAddr,
@@ -979,7 +979,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 		{
 			Name: "1.1/no app downlink/status(time/zero time)/no ack",
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &devAddr,
@@ -1052,7 +1052,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					t.FailNow()
 				}
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: appID,
 						DeviceId:       devID,
 						DevAddr:        &devAddr,

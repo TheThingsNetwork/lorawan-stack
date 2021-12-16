@@ -76,7 +76,7 @@ func (r asEndDeviceRegistryServer) retrieveSessionKeys(ctx context.Context, dev 
 		return nil
 	}
 
-	link, err := r.AS.getLink(ctx, dev.ApplicationIds, []string{
+	link, err := r.AS.getLink(ctx, dev.Ids.ApplicationIds, []string{
 		"skip_payload_crypto",
 	})
 	if err != nil {
@@ -149,7 +149,7 @@ func (r asEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDev
 		}
 	}
 
-	dev, err := r.AS.deviceRegistry.Get(ctx, *req.EndDeviceIds, gets)
+	dev, err := r.AS.deviceRegistry.Get(ctx, req.EndDeviceIds, gets)
 	if err != nil {
 		return nil, err
 	}
@@ -188,14 +188,14 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 			)
 		}
 	}
-	if err := rights.RequireApplication(ctx, *req.EndDevice.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	if err := rights.RequireApplication(ctx, *req.EndDevice.Ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(),
 		"session.keys.app_s_key.key",
 		"session.keys.session_key_id",
 	) {
-		if err := rights.RequireApplication(ctx, *req.EndDevice.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
+		if err := rights.RequireApplication(ctx, *req.EndDevice.Ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 			return nil, err
 		}
 	}
@@ -219,16 +219,16 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 	}
 
 	var evt events.Event
-	dev, err = r.AS.deviceRegistry.Set(ctx, req.EndDevice.EndDeviceIdentifiers, req.FieldMask.GetPaths(), func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	dev, err = r.AS.deviceRegistry.Set(ctx, req.EndDevice.Ids, req.FieldMask.GetPaths(), func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev != nil {
-			evt = evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, &req.EndDevice.EndDeviceIdentifiers, req.FieldMask.GetPaths())
+			evt = evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDevice.Ids, req.FieldMask.GetPaths())
 			if err := ttnpb.ProhibitFields(sets,
 				"ids.dev_addr",
 			); err != nil {
 				return nil, nil, errInvalidFieldMask.WithCause(err)
 			}
 			if ttnpb.HasAnyField(sets, "session.dev_addr") {
-				req.EndDevice.DevAddr = &req.EndDevice.Session.DevAddr
+				req.EndDevice.Ids.DevAddr = &req.EndDevice.Session.DevAddr
 				sets = ttnpb.AddFields(sets,
 					"ids.dev_addr",
 				)
@@ -236,10 +236,10 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 			return &req.EndDevice, sets, nil
 		}
 
-		evt = evtCreateEndDevice.NewWithIdentifiersAndData(ctx, &req.EndDevice.EndDeviceIdentifiers, nil)
+		evt = evtCreateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDevice.Ids, nil)
 
-		if req.EndDevice.DevAddr != nil {
-			if !ttnpb.HasAnyField(sets, "session.dev_addr") || !req.EndDevice.DevAddr.Equal(req.EndDevice.Session.DevAddr) {
+		if req.EndDevice.Ids.DevAddr != nil {
+			if !ttnpb.HasAnyField(sets, "session.dev_addr") || !req.EndDevice.Ids.DevAddr.Equal(req.EndDevice.Session.DevAddr) {
 				return nil, nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
 			}
 		}
@@ -248,12 +248,12 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 			"ids.application_ids",
 			"ids.device_id",
 		)
-		if req.EndDevice.JoinEui != nil {
+		if req.EndDevice.Ids.JoinEui != nil {
 			sets = ttnpb.AddFields(sets,
 				"ids.join_eui",
 			)
 		}
-		if req.EndDevice.DevEui != nil && !req.EndDevice.DevEui.IsZero() {
+		if req.EndDevice.Ids.DevEui != nil && !req.EndDevice.Ids.DevEui.IsZero() {
 			sets = ttnpb.AddFields(sets,
 				"ids.dev_eui",
 			)
@@ -275,7 +275,7 @@ func (r asEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndDev
 		return nil, err
 	}
 	var evt events.Event
-	_, err := r.AS.deviceRegistry.Set(ctx, *ids, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	_, err := r.AS.deviceRegistry.Set(ctx, ids, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev == nil {
 			return nil, nil, errDeviceNotFound.New().WithAttributes("device_uid", unique.ID(ctx, ids))
 		}
@@ -288,7 +288,7 @@ func (r asEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndDev
 	if evt != nil {
 		events.Publish(evt)
 	}
-	if err := r.AS.appUpsRegistry.Clear(ctx, *ids); err != nil {
+	if err := r.AS.appUpsRegistry.Clear(ctx, ids); err != nil {
 		return nil, err
 	}
 	return ttnpb.Empty, nil

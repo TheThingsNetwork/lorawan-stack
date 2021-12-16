@@ -46,7 +46,7 @@ func Example() {
 	}
 
 	createDevice := func(dev *ttnpb.EndDevice) error {
-		app, err := findApplication(dev.ApplicationIds)
+		app, err := findApplication(dev.Ids.ApplicationIds)
 		if err != nil {
 			return err // you can just pass errors up
 		}
@@ -55,7 +55,7 @@ func Example() {
 		return nil
 	}
 
-	if err := createDevice(&ttnpb.EndDevice{}); err != nil {
+	if err := createDevice(&ttnpb.EndDevice{Ids: &ttnpb.EndDeviceIdentifiers{}}); err != nil {
 		fmt.Println(errCouldNotCreateDevice.WithCause(err).WithAttributes("right_answer", 42))
 	}
 

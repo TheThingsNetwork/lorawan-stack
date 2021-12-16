@@ -32,7 +32,7 @@ type RegistryCleaner struct {
 // RangeToLocalSet returns a set of devices that have data in the registry.
 func (cleaner *RegistryCleaner) RangeToLocalSet(ctx context.Context) error {
 	cleaner.LocalSet = make(map[string]struct{})
-	err := cleaner.DevRegistry.Range(ctx, []string{"ids"}, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, dev *ttnpb.EndDevice) bool {
+	err := cleaner.DevRegistry.Range(ctx, []string{"ids"}, func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, dev *ttnpb.EndDevice) bool {
 		cleaner.LocalSet[unique.ID(ctx, ids)] = struct{}{}
 		return true
 	},
@@ -51,13 +51,13 @@ func (cleaner *RegistryCleaner) DeleteDeviceData(ctx context.Context, devSet []s
 		if err != nil {
 			return err
 		}
-		_, err = cleaner.DevRegistry.Set(ctx, devIds, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		_, err = cleaner.DevRegistry.Set(ctx, &devIds, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			return nil, nil, nil
 		})
 		if err != nil {
 			return err
 		}
-		if err := cleaner.AppUpsRegistry.Clear(ctx, devIds); err != nil {
+		if err := cleaner.AppUpsRegistry.Clear(ctx, &devIds); err != nil {
 			return err
 		}
 	}

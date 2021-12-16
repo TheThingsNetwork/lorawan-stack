@@ -67,9 +67,9 @@ func (r *DeviceRegistry) euiKey(joinEUI, devEUI types.EUI64) string {
 }
 
 // GetByID gets device by appID, devID.
-func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error) {
+func (r *DeviceRegistry) GetByID(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error) {
 	ids := ttnpb.EndDeviceIdentifiers{
-		ApplicationIds: &appID,
+		ApplicationIds: appID,
 		DeviceId:       devID,
 	}
 	if err := ids.ValidateContext(ctx); err != nil {
@@ -545,7 +545,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			return errDatabaseCorruption.WithCause(err)
 		}
 		ok, err = f(ctx, &networkserver.UplinkMatch{
-			ApplicationIdentifiers: *ids.ApplicationIds,
+			ApplicationIdentifiers: ids.ApplicationIds,
 			DeviceID:               ids.DeviceId,
 			LoRaWANVersion:         res.LoRaWANVersion,
 			FNwkSIntKey:            res.FNwkSIntKey,
@@ -685,7 +685,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 				err = msgpack.Unmarshal([]byte(s), ses)
 				if err == nil {
 					m = &networkserver.UplinkMatch{
-						ApplicationIdentifiers: *ids.ApplicationIds,
+						ApplicationIdentifiers: ids.ApplicationIds,
 						DeviceID:               ids.DeviceId,
 						LoRaWANVersion:         ses.LoRaWANVersion,
 						FNwkSIntKey:            ses.FNwkSIntKey,
@@ -697,7 +697,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 				err = msgpack.Unmarshal([]byte(s), ses)
 				if err == nil {
 					m = &networkserver.UplinkMatch{
-						ApplicationIdentifiers: *ids.ApplicationIds,
+						ApplicationIdentifiers: ids.ApplicationIds,
 						DeviceID:               ids.DeviceId,
 						LoRaWANVersion:         ses.LoRaWANVersion,
 						FNwkSIntKey:            ses.FNwkSIntKey,
@@ -804,9 +804,9 @@ func MarshalDevicePendingSession(dev *ttnpb.EndDevice) ([]byte, error) {
 var errInvalidDevice = errors.DefineInvalidArgument("invalid_device", "device is invalid")
 
 // SetByID sets device by appID, devID.
-func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(ctx context.Context, pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(ctx context.Context, pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 	ids := ttnpb.EndDeviceIdentifiers{
-		ApplicationIds: &appID,
+		ApplicationIds: appID,
 		DeviceId:       devID,
 	}
 	if err := ids.ValidateContext(ctx); err != nil {
@@ -867,8 +867,8 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			if pb == nil && len(sets) == 0 {
 				p.Del(ctx, uk)
 				p.Del(ctx, uidLastInvalidationKey(r.Redis, uid))
-				if stored.JoinEui != nil && stored.DevEui != nil {
-					p.Del(ctx, r.euiKey(*stored.JoinEui, *stored.DevEui))
+				if stored.Ids.JoinEui != nil && stored.Ids.DevEui != nil {
+					p.Del(ctx, r.euiKey(*stored.Ids.JoinEui, *stored.Ids.DevEui))
 				}
 				if stored.PendingSession != nil {
 					removeAddrMapping(ctx, p, PendingAddrKey(r.addrKey(stored.PendingSession.DevAddr)), uid)
@@ -889,11 +889,11 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 				); err != nil {
 					return errInvalidFieldmask.WithCause(err)
 				}
-				if pb.GetApplicationIds().GetApplicationId() != appID.ApplicationId || pb.DeviceId != devID {
+				if pb.Ids.ApplicationIds.ApplicationId != appID.ApplicationId || pb.Ids.DeviceId != devID {
 					return errInvalidIdentifiers.New()
 				}
-				if pb.JoinEui != nil && pb.DevEui != nil {
-					ek := r.euiKey(*pb.JoinEui, *pb.DevEui)
+				if pb.Ids.JoinEui != nil && pb.Ids.DevEui != nil {
+					ek := r.euiKey(*pb.Ids.JoinEui, *pb.Ids.DevEui)
 					if err := tx.Watch(ctx, ek).Err(); err != nil {
 						return err
 					}
@@ -907,16 +907,16 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 					p.Set(ctx, ek, uid, 0)
 				}
 			} else {
-				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.GetApplicationIds().GetApplicationId() != stored.GetApplicationIds().GetApplicationId() {
+				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.Ids.ApplicationIds.ApplicationId != stored.Ids.ApplicationIds.ApplicationId {
 					return errReadOnlyField.WithAttributes("field", "ids.application_ids.application_id")
 				}
-				if ttnpb.HasAnyField(sets, "ids.device_id") && pb.DeviceId != stored.DeviceId {
+				if ttnpb.HasAnyField(sets, "ids.device_id") && pb.Ids.DeviceId != stored.Ids.DeviceId {
 					return errReadOnlyField.WithAttributes("field", "ids.device_id")
 				}
-				if ttnpb.HasAnyField(sets, "ids.join_eui") && !equalEUI64(pb.JoinEui, stored.JoinEui) {
+				if ttnpb.HasAnyField(sets, "ids.join_eui") && !equalEUI64(pb.Ids.JoinEui, stored.Ids.JoinEui) {
 					return errReadOnlyField.WithAttributes("field", "ids.join_eui")
 				}
-				if ttnpb.HasAnyField(sets, "ids.dev_eui") && !equalEUI64(pb.DevEui, stored.DevEui) {
+				if ttnpb.HasAnyField(sets, "ids.dev_eui") && !equalEUI64(pb.Ids.DevEui, stored.Ids.DevEui) {
 					return errReadOnlyField.WithAttributes("field", "ids.dev_eui")
 				}
 			}
@@ -1029,7 +1029,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 }
 
 // Range ranges over device uid keys in DeviceRegistry.
-func (r *DeviceRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
+func (r *DeviceRegistry) Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
 	deviceEntityRegex, err := ttnredis.EntityRegex((r.uidKey(unique.GenericID(ctx, "*"))))
 	if err != nil {
 		return err
@@ -1046,7 +1046,7 @@ func (r *DeviceRegistry) Range(ctx context.Context, paths []string, f func(conte
 		if err != nil {
 			return false, err
 		}
-		if !f(ctx, dev.EndDeviceIdentifiers, dev) {
+		if !f(ctx, dev.Ids, dev) {
 			return false, nil
 		}
 		return true, nil

@@ -41,7 +41,7 @@ type mockProcessor struct {
 	err error
 }
 
-func (p *mockProcessor) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
+func (p *mockProcessor) EncodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
 	if p.err == nil {
 		p.ch <- &ttnpb.MessagePayloadEncoder{
 			Formatter:          formatter,
@@ -51,7 +51,7 @@ func (p *mockProcessor) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceI
 	return p.err
 }
 
-func (p *mockProcessor) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationUplink, formatter ttnpb.PayloadFormatter, parameter string) error {
+func (p *mockProcessor) DecodeUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationUplink, formatter ttnpb.PayloadFormatter, parameter string) error {
 	if p.err == nil {
 		p.ch <- &ttnpb.MessagePayloadDecoder{
 			Formatter:          formatter,
@@ -61,7 +61,7 @@ func (p *mockProcessor) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIde
 	return p.err
 }
 
-func (p *mockProcessor) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
+func (p *mockProcessor) DecodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
 	if p.err == nil {
 		p.ch <- &ttnpb.MessagePayloadDecoder{
 			Formatter:          formatter,
@@ -164,7 +164,7 @@ func TestDeviceRepository(t *testing.T) {
 		HardwareVersion: "1.1",
 		BandId:          "band",
 	}
-	devID := ttnpb.EndDeviceIdentifiers{
+	devID := &ttnpb.EndDeviceIdentifiers{
 		DeviceId: "dev1",
 		ApplicationIds: &ttnpb.ApplicationIdentifiers{
 			ApplicationId: "app1",

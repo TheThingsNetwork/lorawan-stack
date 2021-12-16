@@ -205,7 +205,7 @@ func (w *webhooks) createDownlinkURL(ctx context.Context, webhookID *ttnpb.Appli
 	}
 	return fmt.Sprintf(downlinkOperationURLFormat,
 		baseURL,
-		webhookID.GetApplicationIds().GetApplicationId(),
+		webhookID.ApplicationIds.ApplicationId,
 		webhookID.WebhookId,
 		devID.DeviceId,
 		op,
@@ -249,7 +249,7 @@ func (w *webhooks) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error
 	if err != nil {
 		return err
 	}
-	ctx = withDeviceID(ctx, *msg.EndDeviceIds)
+	ctx = withDeviceID(ctx, msg.EndDeviceIds)
 	wg := sync.WaitGroup{}
 	for i := range hooks {
 		hook := hooks[i]
@@ -362,13 +362,13 @@ var (
 	errDecodeBody      = errors.DefineInvalidArgument("decode_body", "decode body")
 )
 
-func (w *webhooks) handleDown(op func(io.Server, context.Context, ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error) http.Handler {
+func (w *webhooks) handleDown(op func(io.Server, context.Context, *ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		ctx := req.Context()
 		devID := deviceIDFromContext(ctx)
 		hookID := webhookIDFromContext(ctx)
 		logger := log.FromContext(ctx).WithFields(log.Fields(
-			"application_id", devID.GetApplicationIds().GetApplicationId(),
+			"application_id", devID.ApplicationIds.ApplicationId,
 			"device_id", devID.DeviceId,
 			"webhook_id", hookID.WebhookId,
 		))
@@ -423,8 +423,8 @@ func expandVariables(u string, up *ttnpb.ApplicationUp) (*url.URL, error) {
 		return nil, err
 	}
 	expanded, err := tmpl.Expand(map[string]interface{}{
-		"appID":         up.EndDeviceIds.GetApplicationIds().GetApplicationId(),
-		"applicationID": up.EndDeviceIds.GetApplicationIds().GetApplicationId(),
+		"appID":         up.EndDeviceIds.ApplicationIds.ApplicationId,
+		"applicationID": up.EndDeviceIds.ApplicationIds.ApplicationId,
 		"appEUI":        joinEUI,
 		"joinEUI":       joinEUI,
 		"devID":         up.EndDeviceIds.DeviceId,

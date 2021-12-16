@@ -36,7 +36,7 @@ func (srv applicationActivationSettingsRegistryServer) Get(ctx context.Context, 
 	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 		return nil, err
 	}
-	sets, err := srv.JS.applicationActivationSettings.GetByID(ctx, *req.ApplicationIds, req.FieldMask.GetPaths())
+	sets, err := srv.JS.applicationActivationSettings.GetByID(ctx, req.ApplicationIds, req.FieldMask.GetPaths())
 	if errors.IsNotFound(err) {
 		return nil, errApplicationActivationSettingsNotFound.WithCause(err)
 	}
@@ -92,7 +92,7 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 			"kek.kek_label",
 		)
 	}
-	v, err := srv.JS.applicationActivationSettings.SetByID(ctx, *req.ApplicationIds, req.FieldMask.GetPaths(), func(stored *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
+	v, err := srv.JS.applicationActivationSettings.SetByID(ctx, req.ApplicationIds, req.FieldMask.GetPaths(), func(stored *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
 		return req.Settings, sets, nil
 	})
 	if err != nil {
@@ -107,7 +107,7 @@ func (srv applicationActivationSettingsRegistryServer) Delete(ctx context.Contex
 	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 		return nil, err
 	}
-	_, err := srv.JS.applicationActivationSettings.SetByID(ctx, *req.ApplicationIds, nil, func(stored *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
+	_, err := srv.JS.applicationActivationSettings.SetByID(ctx, req.ApplicationIds, nil, func(stored *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
 		if stored == nil {
 			return nil, nil, errApplicationActivationSettingsNotFound.New()
 		}

@@ -89,14 +89,14 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 		}
 	}
 	logger := log.FromContext(ctx)
-	dev, err := srv.JS.devices.GetByID(ctx, *req.EndDeviceIds.ApplicationIds, req.EndDeviceIds.DeviceId, gets)
+	dev, err := srv.JS.devices.GetByID(ctx, req.EndDeviceIds.ApplicationIds, req.EndDeviceIds.DeviceId, gets)
 	if errors.IsNotFound(err) {
 		return nil, errDeviceNotFound.New()
 	}
 	if err != nil {
 		return nil, err
 	}
-	if !dev.ApplicationIds.Equal(req.EndDeviceIds.ApplicationIds) {
+	if !dev.Ids.ApplicationIds.Equal(req.EndDeviceIds.ApplicationIds) {
 		return nil, errDeviceNotFound.New()
 	}
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(),
@@ -179,10 +179,10 @@ var (
 
 // Set implements ttnpb.JsEndDeviceRegistryServer.
 func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
-	if req.EndDevice.JoinEui == nil {
+	if req.EndDevice.Ids == nil || req.EndDevice.Ids.JoinEui == nil {
 		return nil, errNoJoinEUI.New()
 	}
-	if req.EndDevice.DevEui == nil || req.EndDevice.DevEui.IsZero() {
+	if req.EndDevice.Ids.DevEui == nil || req.EndDevice.Ids.DevEui.IsZero() {
 		return nil, errNoDevEUI.New()
 	}
 
@@ -190,7 +190,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 		return nil, errInvalidFieldValue.WithAttributes("field", "root_keys.app_key.key")
 	}
 
-	if err = rights.RequireApplication(ctx, *req.EndDevice.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	if err = rights.RequireApplication(ctx, *req.EndDevice.Ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(),
@@ -198,7 +198,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 		"root_keys.nwk_key.key",
 		"root_keys.root_key_id",
 	) {
-		if err := rights.RequireApplication(ctx, *req.EndDevice.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
+		if err := rights.RequireApplication(ctx, *req.EndDevice.Ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 			return nil, err
 		}
 	}
@@ -242,9 +242,9 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 	}
 
 	var evt events.Event
-	dev, err = srv.JS.devices.SetByID(ctx, *req.EndDevice.ApplicationIds, req.EndDevice.DeviceId, req.FieldMask.GetPaths(), func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	dev, err = srv.JS.devices.SetByID(ctx, req.EndDevice.Ids.ApplicationIds, req.EndDevice.Ids.DeviceId, req.FieldMask.GetPaths(), func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev != nil {
-			evt = evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, &req.EndDevice.EndDeviceIdentifiers, req.FieldMask.GetPaths())
+			evt = evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDevice.Ids, req.FieldMask.GetPaths())
 			if err := ttnpb.ProhibitFields(sets,
 				"ids.dev_addr",
 			); err != nil {
@@ -253,8 +253,8 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 			return &req.EndDevice, sets, nil
 		}
 
-		evt = evtCreateEndDevice.NewWithIdentifiersAndData(ctx, &req.EndDevice.EndDeviceIdentifiers, nil)
-		if req.EndDevice.DevAddr != nil && !req.EndDevice.DevAddr.IsZero() {
+		evt = evtCreateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDevice.Ids, nil)
+		if req.EndDevice.Ids != nil && req.EndDevice.Ids.DevAddr != nil && !req.EndDevice.Ids.DevAddr.IsZero() {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
 		}
 		return &req.EndDevice, ttnpb.AddFields(sets,
@@ -288,7 +288,7 @@ func (srv jsEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndD
 		return nil, err
 	}
 	var evt events.Event
-	_, err := srv.JS.devices.SetByID(ctx, *ids.ApplicationIds, ids.DeviceId, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	_, err := srv.JS.devices.SetByID(ctx, ids.ApplicationIds, ids.DeviceId, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev == nil {
 			return nil, nil, errDeviceNotFound.New()
 		}

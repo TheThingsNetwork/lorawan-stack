@@ -28,12 +28,12 @@ var (
 
 // MockDeviceRegistry is a mock DeviceRegistry used for testing.
 type MockDeviceRegistry struct {
-	GetFunc func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error)
-	SetFunc func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+	GetFunc func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error)
+	SetFunc func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 }
 
 // Get calls GetFunc if set and panics otherwise.
-func (r MockDeviceRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
+func (r MockDeviceRegistry) Get(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
 	if r.GetFunc == nil {
 		panic("Get called, but not set")
 	}
@@ -41,15 +41,15 @@ func (r MockDeviceRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifi
 }
 
 // Set calls SetFunc if set and panics otherwise.
-func (r MockDeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+func (r MockDeviceRegistry) Set(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	if r.SetFunc == nil {
 		panic("Set called, but not set")
 	}
 	return r.SetFunc(ctx, ids, paths, f)
 }
 
-// Range.
-func (r MockDeviceRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
+// Range is a no-op.
+func (r MockDeviceRegistry) Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
 	return nil
 }
 
@@ -94,13 +94,13 @@ func (m MockLinkRegistry) Set(ctx context.Context, ids *ttnpb.ApplicationIdentif
 
 // MockApplicationUplinkRegistry is a mock ApplicationUplinkRegistry used for testing.
 type MockApplicationUplinkRegistry struct {
-	RangeFunc func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(context.Context, *ttnpb.ApplicationUplink) bool) error
-	PushFunc  func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink) error
-	ClearFunc func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error
+	RangeFunc func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(context.Context, *ttnpb.ApplicationUplink) bool) error
+	PushFunc  func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink) error
+	ClearFunc func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error
 }
 
 // Range calls RangeFunc if set and panics otherwise.
-func (m MockApplicationUplinkRegistry) Range(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(context.Context, *ttnpb.ApplicationUplink) bool) error {
+func (m MockApplicationUplinkRegistry) Range(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(context.Context, *ttnpb.ApplicationUplink) bool) error {
 	if m.RangeFunc == nil {
 		panic("Range called, but not set")
 	}
@@ -108,7 +108,7 @@ func (m MockApplicationUplinkRegistry) Range(ctx context.Context, ids ttnpb.EndD
 }
 
 // Push calls PushFunc if set and panics otherwise.
-func (m MockApplicationUplinkRegistry) Push(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink) error {
+func (m MockApplicationUplinkRegistry) Push(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink) error {
 	if m.PushFunc == nil {
 		panic("Push called, but not set")
 	}
@@ -116,7 +116,7 @@ func (m MockApplicationUplinkRegistry) Push(ctx context.Context, ids ttnpb.EndDe
 }
 
 // Clear calls ClearFunc if set and panics otherwise.
-func (m MockApplicationUplinkRegistry) Clear(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error {
+func (m MockApplicationUplinkRegistry) Clear(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error {
 	if m.ClearFunc == nil {
 		panic("Clear called, but not set")
 	}

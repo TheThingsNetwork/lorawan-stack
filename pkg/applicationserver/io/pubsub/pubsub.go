@@ -170,7 +170,7 @@ func (i *integration) handleUp(ctx context.Context) {
 	}
 }
 
-func (i *integration) handleDown(ctx context.Context, op func(io.Server, context.Context, ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error, subscription *pubsub.Subscription) {
+func (i *integration) handleDown(ctx context.Context, op func(io.Server, context.Context, *ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error, subscription *pubsub.Subscription) {
 	logger := log.FromContext(ctx)
 	for {
 		select {
@@ -198,7 +198,7 @@ func (i *integration) handleDown(ctx context.Context, op func(io.Server, context
 			"device_uid", unique.ID(ctx, operation.EndDeviceIds),
 			"count", len(operation.Downlinks),
 		)).Debug("Handle downlink messages")
-		if err := op(i.server, ctx, *operation.EndDeviceIds, operation.Downlinks); err != nil {
+		if err := op(i.server, ctx, operation.EndDeviceIds, operation.Downlinks); err != nil {
 			logger.WithError(err).Warn("Failed to handle downlink messages")
 		}
 	}
@@ -207,7 +207,7 @@ func (i *integration) handleDown(ctx context.Context, op func(io.Server, context
 func (i *integration) startHandleDown(ctx context.Context) {
 	for _, downlink := range []struct {
 		name         string
-		op           func(io.Server, context.Context, ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error
+		op           func(io.Server, context.Context, *ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error
 		subscription *pubsub.Subscription
 	}{
 		{

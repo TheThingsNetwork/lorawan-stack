@@ -230,7 +230,7 @@ func TestHandleJoin(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			Authorizer:  joinserver.ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -335,7 +335,7 @@ func TestHandleJoin(t *testing.T) {
 				"as:as.test.org": {0xed, 0x8a, 0x2e, 0x97, 0xf6, 0x8e, 0xbb, 0x79, 0x4d, 0x96, 0x4b, 0xd6, 0x14, 0xbb, 0xbc, 0xf2, 0x25, 0xc3, 0x7d, 0x61, 0xa9, 0xfe, 0xd0, 0x83, 0x7b, 0x07, 0xc0, 0x5f, 0x02, 0x52, 0x3c, 0x8b},
 			},
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -461,7 +461,7 @@ func TestHandleJoin(t *testing.T) {
 				"test-as-kek": {0xed, 0x8a, 0x2e, 0x97, 0xf6, 0x8e, 0xbb, 0x79, 0x4d, 0x96, 0x4b, 0xd6, 0x14, 0xbb, 0xbc, 0xf2, 0x25, 0xc3, 0x7d, 0x61, 0xa9, 0xfe, 0xd0, 0x83, 0x7b, 0x07, 0xc0, 0x5f, 0x02, 0x52, 0x3c, 0x8b},
 			},
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -593,7 +593,7 @@ func TestHandleJoin(t *testing.T) {
 				"test-as-kek":      {0xed, 0x8a, 0x2e, 0x97, 0xf6, 0x8e, 0xbb, 0x79, 0x4d, 0x96, 0x4b, 0xd6, 0x14, 0xbb, 0xbc, 0xf2, 0x25, 0xc3, 0x7d, 0x61, 0xa9, 0xfe, 0xd0, 0x83, 0x7b, 0x07, 0xc0, 0x5f, 0x02, 0x52, 0x3c, 0x8b},
 			},
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -708,7 +708,7 @@ func TestHandleJoin(t *testing.T) {
 			Authorizer:  joinserver.ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
 				LastDevNonce: 0x2441,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -813,7 +813,7 @@ func TestHandleJoin(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				LastDevNonce:  0x2441,
 				LastJoinNonce: 0x42fffd,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -918,7 +918,7 @@ func TestHandleJoin(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				LastDevNonce:  0x2442,
 				LastJoinNonce: 0x42fffd,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -970,7 +970,7 @@ func TestHandleJoin(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			Authorizer:  joinserver.ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -1056,7 +1056,7 @@ func TestHandleJoin(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			Authorizer:  joinserver.ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -1142,7 +1142,7 @@ func TestHandleJoin(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			Authorizer:  joinserver.ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -1228,7 +1228,7 @@ func TestHandleJoin(t *testing.T) {
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			Authorizer:  joinserver.ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -1316,7 +1316,7 @@ func TestHandleJoin(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2444},
 				LastJoinNonce: 0x42fffd,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -1404,7 +1404,7 @@ func TestHandleJoin(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442, 0x2444},
 				LastJoinNonce: 0x42fffd,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -1496,7 +1496,7 @@ func TestHandleJoin(t *testing.T) {
 			},
 			Authorizer: joinserver.InteropAuthorizer,
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -1587,7 +1587,7 @@ func TestHandleJoin(t *testing.T) {
 			},
 			Authorizer: joinserver.InteropAuthorizer,
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -1641,7 +1641,7 @@ func TestHandleJoin(t *testing.T) {
 			},
 			Authorizer: joinserver.InteropAuthorizer,
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -1694,7 +1694,7 @@ func TestHandleJoin(t *testing.T) {
 			},
 			Authorizer: joinserver.InteropAuthorizer,
 			Device: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -1746,7 +1746,7 @@ func TestHandleJoin(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 				LastJoinNonce: 0x42fffe,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -1796,7 +1796,7 @@ func TestHandleJoin(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 				LastJoinNonce: 0x42fffe,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -1831,7 +1831,7 @@ func TestHandleJoin(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 				LastJoinNonce: 0x42fffe,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -1872,7 +1872,7 @@ func TestHandleJoin(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 				LastJoinNonce: 0x42fffe,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -1914,7 +1914,7 @@ func TestHandleJoin(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 				LastJoinNonce: 0x42fffe,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -1960,7 +1960,7 @@ func TestHandleJoin(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 				LastJoinNonce: 0x42fffe,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -1998,7 +1998,7 @@ func TestHandleJoin(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 				LastJoinNonce: 0x42fffe,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -2060,7 +2060,7 @@ func TestHandleJoin(t *testing.T) {
 				defer aasRegCloseFn()
 
 				if tc.ApplicationActivationSettings != nil {
-					_, err := aasReg.SetByID(ctx, *tc.Device.ApplicationIds, nil, func(sets *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
+					_, err := aasReg.SetByID(ctx, tc.Device.Ids.ApplicationIds, nil, func(sets *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {
 						if sets != nil {
 							panic("Application activation setting registry is not empty")
 						}
@@ -2094,7 +2094,7 @@ func TestHandleJoin(t *testing.T) {
 
 				start := time.Now()
 
-				ret, err := devReg.SetByID(ctx, *pb.ApplicationIds, pb.DeviceId,
+				ret, err := devReg.SetByID(ctx, pb.Ids.ApplicationIds, pb.Ids.DeviceId,
 					[]string{
 						"application_server_address",
 						"application_server_id",
@@ -2166,7 +2166,7 @@ func TestHandleJoin(t *testing.T) {
 				expectedResp.SessionKeys.SessionKeyId = res.SessionKeys.SessionKeyId
 				a.So(res, should.Resemble, expectedResp)
 
-				retCtx, err := devReg.GetByEUI(ctx, *pb.EndDeviceIdentifiers.JoinEui, *pb.EndDeviceIdentifiers.DevEui, ttnpb.EndDeviceFieldPathsTopLevel)
+				retCtx, err := devReg.GetByEUI(ctx, *pb.Ids.JoinEui, *pb.Ids.DevEui, ttnpb.EndDeviceFieldPathsTopLevel)
 				if !a.So(err, should.BeNil) || !a.So(ret, should.NotBeNil) {
 					t.FailNow()
 				}
@@ -2189,7 +2189,7 @@ func TestHandleJoin(t *testing.T) {
 					Keys:      res.SessionKeys,
 					StartedAt: ret.GetSession().GetStartedAt(),
 				}
-				pb.DevAddr = &tc.JoinRequest.DevAddr
+				pb.Ids.DevAddr = &tc.JoinRequest.DevAddr
 				a.So(ret, should.HaveEmptyDiff, pb)
 
 				res, err = js.HandleJoin(ctx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest), tc.Authorizer)
@@ -2573,7 +2573,7 @@ func TestGetAppSKey(t *testing.T) {
 				return &ttnpb.ContextualEndDevice{
 					Context: ctx,
 					EndDevice: &ttnpb.EndDevice{
-						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						Ids: &ttnpb.EndDeviceIdentifiers{
 							ApplicationIds: &ttnpb.ApplicationIdentifiers{
 								ApplicationId: "test-app",
 							},
@@ -2661,7 +2661,7 @@ func TestGetAppSKey(t *testing.T) {
 				return &ttnpb.ContextualEndDevice{
 					Context: ctx,
 					EndDevice: &ttnpb.EndDevice{
-						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						Ids: &ttnpb.EndDeviceIdentifiers{
 							ApplicationIds: &ttnpb.ApplicationIdentifiers{
 								ApplicationId: "test-app",
 							},
@@ -2717,7 +2717,7 @@ func TestGetAppSKey(t *testing.T) {
 				return &ttnpb.ContextualEndDevice{
 					Context: ctx,
 					EndDevice: &ttnpb.EndDevice{
-						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						Ids: &ttnpb.EndDeviceIdentifiers{
 							ApplicationIds: &ttnpb.ApplicationIdentifiers{
 								ApplicationId: "test-app",
 							},
@@ -2774,7 +2774,7 @@ func TestGetAppSKey(t *testing.T) {
 				return &ttnpb.ContextualEndDevice{
 					Context: ctx,
 					EndDevice: &ttnpb.EndDevice{
-						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						Ids: &ttnpb.EndDeviceIdentifiers{
 							ApplicationIds: &ttnpb.ApplicationIdentifiers{
 								ApplicationId: "test-app",
 							},
@@ -2935,7 +2935,7 @@ func TestGetHomeNetID(t *testing.T) {
 func TestJoinServerCleanup(t *testing.T) {
 	a, ctx := test.New(t)
 
-	appList := []ttnpb.ApplicationIdentifiers{
+	appList := []*ttnpb.ApplicationIdentifiers{
 		{ApplicationId: "app-1"},
 		{ApplicationId: "app-2"},
 		{ApplicationId: "app-3"},
@@ -2944,48 +2944,48 @@ func TestJoinServerCleanup(t *testing.T) {
 
 	deviceList := []*ttnpb.EndDevice{
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIds: &appList[0],
+			Ids: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIds: appList[0],
 				DeviceId:       "dev-1",
 				JoinEui:        eui64Ptr(types.EUI64{0x41, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 				DevEui:         eui64Ptr(types.EUI64{0x41, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 			},
 		},
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIds: &appList[0],
+			Ids: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIds: appList[0],
 				DeviceId:       "dev-2",
 				JoinEui:        eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 				DevEui:         eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 			},
 		},
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIds: &appList[1],
+			Ids: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIds: appList[1],
 				DeviceId:       "dev-3",
 				JoinEui:        eui64Ptr(types.EUI64{0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 				DevEui:         eui64Ptr(types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 			},
 		},
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIds: &appList[3],
+			Ids: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIds: appList[3],
 				DeviceId:       "dev-4",
 				JoinEui:        eui64Ptr(types.EUI64{0x44, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 				DevEui:         eui64Ptr(types.EUI64{0x44, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 			},
 		},
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIds: &appList[3],
+			Ids: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIds: appList[3],
 				DeviceId:       "dev-5",
 				JoinEui:        eui64Ptr(types.EUI64{0x45, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 				DevEui:         eui64Ptr(types.EUI64{0x45, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 			},
 		},
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
-				ApplicationIds: &appList[3],
+			Ids: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIds: appList[3],
 				DeviceId:       "dev-6",
 				JoinEui:        eui64Ptr(types.EUI64{0x46, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 				DevEui:         eui64Ptr(types.EUI64{0x46, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
@@ -3010,7 +3010,7 @@ func TestJoinServerCleanup(t *testing.T) {
 	}
 
 	for _, dev := range deviceList {
-		ret, err := deviceRegistry.SetByID(ctx, *dev.ApplicationIds, dev.EndDeviceIdentifiers.DeviceId, []string{
+		ret, err := deviceRegistry.SetByID(ctx, dev.Ids.ApplicationIds, dev.Ids.DeviceId, []string{
 			"ids.application_ids",
 			"ids.dev_eui",
 			"ids.device_id",
@@ -3043,8 +3043,8 @@ func TestJoinServerCleanup(t *testing.T) {
 		unique.ID(ctx, appList[3]): {},
 	}
 	isDeviceSet := map[string]struct{}{
-		unique.ID(ctx, deviceList[4].EndDeviceIdentifiers): {},
-		unique.ID(ctx, deviceList[5].EndDeviceIdentifiers): {},
+		unique.ID(ctx, deviceList[4].Ids): {},
+		unique.ID(ctx, deviceList[5].Ids): {},
 	}
 	joinServerCleaner := &joinserver.RegistryCleaner{
 		DevRegistry:   deviceRegistry,
@@ -3063,6 +3063,6 @@ func TestJoinServerCleanup(t *testing.T) {
 	a.So(joinServerCleaner.LocalApplicationSet, should.ContainKey, unique.ID(ctx, appList[3]))
 
 	a.So(joinServerCleaner.LocalDeviceSet, should.HaveLength, 2)
-	a.So(joinServerCleaner.LocalDeviceSet, should.ContainKey, unique.ID(ctx, deviceList[4].EndDeviceIdentifiers))
-	a.So(joinServerCleaner.LocalDeviceSet, should.ContainKey, unique.ID(ctx, deviceList[5].EndDeviceIdentifiers))
+	a.So(joinServerCleaner.LocalDeviceSet, should.ContainKey, unique.ID(ctx, deviceList[4].Ids))
+	a.So(joinServerCleaner.LocalDeviceSet, should.ContainKey, unique.ID(ctx, deviceList[5].Ids))
 }

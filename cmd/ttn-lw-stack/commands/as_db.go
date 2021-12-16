@@ -174,7 +174,7 @@ var (
 			}
 			deviceIdentityServerSet := make(map[string]struct{})
 			for _, dev := range endDeviceList {
-				deviceIdentityServerSet[unique.ID(ctx, dev.EndDeviceIdentifiers)] = struct{}{}
+				deviceIdentityServerSet[unique.ID(ctx, dev.Ids)] = struct{}{}
 			}
 			dryRun, err := cmd.Flags().GetBool("dry-run")
 			if err != nil {

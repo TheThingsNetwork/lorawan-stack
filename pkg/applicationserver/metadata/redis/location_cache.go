@@ -46,7 +46,7 @@ const (
 var errCacheMiss = errors.DefineNotFound("cache_miss", "cache miss")
 
 // Get returns the locations by the end device identifiers.
-func (r *EndDeviceLocationCache) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, *time.Time, error) {
+func (r *EndDeviceLocationCache) Get(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, *time.Time, error) {
 	uidKey := r.uidKey(unique.ID(ctx, ids))
 	m, err := r.Redis.HGetAll(ctx, uidKey).Result()
 	if err != nil {
@@ -86,7 +86,7 @@ func (r *EndDeviceLocationCache) Get(ctx context.Context, ids ttnpb.EndDeviceIde
 }
 
 // Set updates the locations by the end device identifiers.
-func (r *EndDeviceLocationCache) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location, ttl time.Duration) error {
+func (r *EndDeviceLocationCache) Set(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location, ttl time.Duration) error {
 	pairs := append(make([]string, 0, 2*len(update)+2), storedAtMarker, fmt.Sprintf("%v", time.Now().UnixNano()))
 	for k, v := range update {
 		s, err := ttnredis.MarshalProto(v)
@@ -108,7 +108,7 @@ func (r *EndDeviceLocationCache) Set(ctx context.Context, ids ttnpb.EndDeviceIde
 }
 
 // Delete deletes the locations by the end device identifiers.
-func (r *EndDeviceLocationCache) Delete(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error {
+func (r *EndDeviceLocationCache) Delete(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error {
 	uidKey := r.uidKey(unique.ID(ctx, ids))
 	if err := r.Redis.Del(ctx, uidKey).Err(); err != nil {
 		return ttnredis.ConvertError(err)

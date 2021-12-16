@@ -894,19 +894,19 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 	case "frequency_plan_id":
 		return v.FrequencyPlanId == ""
 	case "ids":
-		return v.EndDeviceIdentifiers == EndDeviceIdentifiers{}
+		return v.Ids == nil
 	case "ids.application_ids":
-		return v.EndDeviceIdentifiers.FieldIsZero("application_ids")
+		return v.Ids.FieldIsZero("application_ids")
 	case "ids.application_ids.application_id":
-		return v.EndDeviceIdentifiers.FieldIsZero("application_ids.application_id")
+		return v.Ids.FieldIsZero("application_ids.application_id")
 	case "ids.dev_addr":
-		return v.EndDeviceIdentifiers.FieldIsZero("dev_addr")
+		return v.Ids.FieldIsZero("dev_addr")
 	case "ids.dev_eui":
-		return v.EndDeviceIdentifiers.FieldIsZero("dev_eui")
+		return v.Ids.FieldIsZero("dev_eui")
 	case "ids.device_id":
-		return v.EndDeviceIdentifiers.FieldIsZero("device_id")
+		return v.Ids.FieldIsZero("device_id")
 	case "ids.join_eui":
-		return v.EndDeviceIdentifiers.FieldIsZero("join_eui")
+		return v.Ids.FieldIsZero("join_eui")
 	case "join_server_address":
 		return v.JoinServerAddress == ""
 	case "last_dev_nonce":
@@ -1259,6 +1259,10 @@ func (m *GetEndDeviceRequest) EntityType() string {
 	return m.GetEndDeviceIds().EntityType()
 }
 
+func (m *EndDevice) EntityType() string {
+	return m.GetIds().EntityType()
+}
+
 // All IDString methods implement the IDStringer interface.
 
 func (m *ResetAndGetEndDeviceRequest) IDString() string {
@@ -1269,6 +1273,10 @@ func (m *GetEndDeviceRequest) IDString() string {
 	return m.GetEndDeviceIds().IDString()
 }
 
+func (m *EndDevice) IDString() string {
+	return m.GetIds().IDString()
+}
+
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
 func (m *ResetAndGetEndDeviceRequest) ExtractRequestFields(dst map[string]interface{}) {
@@ -1277,4 +1285,8 @@ func (m *ResetAndGetEndDeviceRequest) ExtractRequestFields(dst map[string]interf
 
 func (m *GetEndDeviceRequest) ExtractRequestFields(dst map[string]interface{}) {
 	m.GetEndDeviceIds().ExtractRequestFields(dst)
+}
+
+func (m *EndDevice) ExtractRequestFields(dst map[string]interface{}) {
+	m.GetIds().ExtractRequestFields(dst)
 }

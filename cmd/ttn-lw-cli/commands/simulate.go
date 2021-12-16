@@ -331,7 +331,7 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 			expectedMIC, err = crypto.ComputeJoinAcceptMIC(
 				jsIntKey,
 				0xFF,
-				*dev.JoinEui,
+				*dev.Ids.JoinEui,
 				lastUpMsg.GetJoinRequestPayload().DevNonce,
 				append([]byte{downMsg.RawPayload[0]}, joinAcceptBytes...),
 			)
@@ -348,7 +348,7 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 			logger.Warnf("Expected MIC %x but got %x", expectedMIC, downMsg.Payload.Mic)
 		}
 
-		dev.DevAddr, dev.Session.DevAddr = &joinAcceptPayload.DevAddr, joinAcceptPayload.DevAddr
+		dev.Ids.DevAddr, dev.Session.DevAddr = &joinAcceptPayload.DevAddr, joinAcceptPayload.DevAddr
 
 		if dev.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 && joinAcceptPayload.DlSettings.OptNeg {
 			appSKey := crypto.DeriveAppSKey(*dev.GetRootKeys().GetAppKey().Key, joinAcceptPayload.JoinNonce, joinEUI, devNonce)
@@ -507,7 +507,7 @@ var (
 						LorawanVersion:    uplinkParams.LoRaWANVersion,
 						LorawanPhyVersion: uplinkParams.LoRaWANPHYVersion,
 						FrequencyPlanId:   uplinkParams.BandID,
-						EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+						Ids: &ttnpb.EndDeviceIdentifiers{
 							JoinEui: &joinParams.JoinEUI,
 							DevEui:  &joinParams.DevEUI,
 						},

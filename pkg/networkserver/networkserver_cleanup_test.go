@@ -39,7 +39,7 @@ func TestNetworkServerCleanup(t *testing.T) {
 	}
 	deviceList := []*ttnpb.EndDevice{
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			Ids: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIds: &appList[0],
 				DeviceId:       "dev-1",
 				JoinEui:        eui64Ptr(types.EUI64{0x41, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
@@ -47,7 +47,7 @@ func TestNetworkServerCleanup(t *testing.T) {
 			},
 		},
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			Ids: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIds: &appList[0],
 				DeviceId:       "dev-2",
 				JoinEui:        eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
@@ -55,7 +55,7 @@ func TestNetworkServerCleanup(t *testing.T) {
 			},
 		},
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			Ids: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIds: &appList[1],
 				DeviceId:       "dev-3",
 				JoinEui:        eui64Ptr(types.EUI64{0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
@@ -63,7 +63,7 @@ func TestNetworkServerCleanup(t *testing.T) {
 			},
 		},
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			Ids: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIds: &appList[2],
 				DeviceId:       "dev-4",
 				JoinEui:        eui64Ptr(types.EUI64{0x44, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
@@ -71,7 +71,7 @@ func TestNetworkServerCleanup(t *testing.T) {
 			},
 		},
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			Ids: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIds: &appList[3],
 				DeviceId:       "dev-5",
 				JoinEui:        eui64Ptr(types.EUI64{0x45, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
@@ -79,7 +79,7 @@ func TestNetworkServerCleanup(t *testing.T) {
 			},
 		},
 		{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			Ids: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIds: &appList[3],
 				DeviceId:       "dev-6",
 				JoinEui:        eui64Ptr(types.EUI64{0x46, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
@@ -92,7 +92,7 @@ func TestNetworkServerCleanup(t *testing.T) {
 	defer closeFn()
 
 	for _, dev := range deviceList {
-		ret, _, err := deviceRegistry.SetByID(ctx, *dev.ApplicationIds, dev.EndDeviceIdentifiers.DeviceId, []string{
+		ret, _, err := deviceRegistry.SetByID(ctx, dev.Ids.ApplicationIds, dev.Ids.DeviceId, []string{
 			"ids.application_ids",
 			"ids.dev_eui",
 			"ids.device_id",
@@ -109,9 +109,9 @@ func TestNetworkServerCleanup(t *testing.T) {
 	}
 
 	isDeviceSet := map[string]struct{}{
-		unique.ID(ctx, deviceList[1].EndDeviceIdentifiers): {},
-		unique.ID(ctx, deviceList[4].EndDeviceIdentifiers): {},
-		unique.ID(ctx, deviceList[5].EndDeviceIdentifiers): {},
+		unique.ID(ctx, deviceList[1].Ids): {},
+		unique.ID(ctx, deviceList[4].Ids): {},
+		unique.ID(ctx, deviceList[5].Ids): {},
 	}
 
 	deviceRegistryCleaner := &networkserver.RegistryCleaner{
@@ -124,7 +124,7 @@ func TestNetworkServerCleanup(t *testing.T) {
 	a.So(err, should.BeNil)
 	deviceRegistryCleaner.RangeToLocalSet(ctx)
 	a.So(deviceRegistryCleaner.LocalSet, should.HaveLength, 3)
-	a.So(deviceRegistryCleaner.LocalSet, should.ContainKey, unique.ID(ctx, deviceList[1].EndDeviceIdentifiers))
-	a.So(deviceRegistryCleaner.LocalSet, should.ContainKey, unique.ID(ctx, deviceList[4].EndDeviceIdentifiers))
-	a.So(deviceRegistryCleaner.LocalSet, should.ContainKey, unique.ID(ctx, deviceList[5].EndDeviceIdentifiers))
+	a.So(deviceRegistryCleaner.LocalSet, should.ContainKey, unique.ID(ctx, deviceList[1].Ids))
+	a.So(deviceRegistryCleaner.LocalSet, should.ContainKey, unique.ID(ctx, deviceList[4].Ids))
+	a.So(deviceRegistryCleaner.LocalSet, should.ContainKey, unique.ID(ctx, deviceList[5].Ids))
 }

@@ -39,24 +39,24 @@ type optionFunc func(*impl)
 func (f optionFunc) apply(i *impl) { f(i) }
 
 // GetEndDeviceIdentifiersFunc retrieves the end device identifiers including the EUIs and DevAddr.
-type GetEndDeviceIdentifiersFunc func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDeviceIdentifiers, error)
+type GetEndDeviceIdentifiersFunc func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDeviceIdentifiers, error)
 
 type defaultMessageProcessor struct{}
 
-func (p *defaultMessageProcessor) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
+func (p *defaultMessageProcessor) EncodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
 	return nil
 }
 
-func (p *defaultMessageProcessor) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, formatter ttnpb.PayloadFormatter, parameter string) error {
+func (p *defaultMessageProcessor) DecodeUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, formatter ttnpb.PayloadFormatter, parameter string) error {
 	return nil
 }
 
-func (p *defaultMessageProcessor) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
+func (p *defaultMessageProcessor) DecodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error {
 	return nil
 }
 
 // SkipPayloadCryptoFunc is a function that checks if the end device should skip payload crypto operations.
-type SkipPayloadCryptoFunc func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (bool, error)
+type SkipPayloadCryptoFunc func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (bool, error)
 
 type impl struct {
 	server             io.Server
@@ -98,11 +98,11 @@ func WithSkipPayloadCrypto(f SkipPayloadCryptoFunc) Option {
 func New(server io.Server, opts ...Option) ttnpb.AppAsServer {
 	i := &impl{
 		server: server,
-		getIdentifiers: func(_ context.Context, ids ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDeviceIdentifiers, error) {
-			return &ids, nil
+		getIdentifiers: func(_ context.Context, ids *ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDeviceIdentifiers, error) {
+			return ids, nil
 		},
 		processor: &defaultMessageProcessor{},
-		skipPayloadCrypto: func(_ context.Context, _ ttnpb.EndDeviceIdentifiers) (bool, error) {
+		skipPayloadCrypto: func(_ context.Context, _ *ttnpb.EndDeviceIdentifiers) (bool, error) {
 			return false, nil
 		},
 	}
@@ -155,7 +155,7 @@ func (s *impl) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRe
 	if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE); err != nil {
 		return nil, err
 	}
-	if err := s.server.DownlinkQueuePush(ctx, *req.EndDeviceIds, req.Downlinks); err != nil {
+	if err := s.server.DownlinkQueuePush(ctx, req.EndDeviceIds, req.Downlinks); err != nil {
 		return nil, err
 	}
 	return ttnpb.Empty, nil
@@ -165,7 +165,7 @@ func (s *impl) DownlinkQueueReplace(ctx context.Context, req *ttnpb.DownlinkQueu
 	if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE); err != nil {
 		return nil, err
 	}
-	if err := s.server.DownlinkQueueReplace(ctx, *req.EndDeviceIds, req.Downlinks); err != nil {
+	if err := s.server.DownlinkQueueReplace(ctx, req.EndDeviceIds, req.Downlinks); err != nil {
 		return nil, err
 	}
 	return ttnpb.Empty, nil
@@ -175,7 +175,7 @@ func (s *impl) DownlinkQueueList(ctx context.Context, ids *ttnpb.EndDeviceIdenti
 	if err := rights.RequireApplication(ctx, *ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	items, err := s.server.DownlinkQueueList(ctx, *ids)
+	items, err := s.server.DownlinkQueueList(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
@@ -210,14 +210,14 @@ func (s *impl) SimulateUplink(ctx context.Context, up *ttnpb.ApplicationUp) (*pb
 	if err := rights.RequireApplication(ctx, *up.EndDeviceIds.ApplicationIds, ttnpb.RIGHT_APPLICATION_TRAFFIC_UP_WRITE); err != nil {
 		return nil, err
 	}
-	skip, err := s.skipPayloadCrypto(ctx, *up.EndDeviceIds)
+	skip, err := s.skipPayloadCrypto(ctx, up.EndDeviceIds)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Debug("Failed to determine if the payload crypto should be skipped")
 	} else if skip {
 		return nil, errPayloadCryptoSkipped.New()
 	}
 	up.Simulated = true
-	ids, err := s.getIdentifiers(ctx, *up.EndDeviceIds)
+	ids, err := s.getIdentifiers(ctx, up.EndDeviceIds)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Debug("Failed to fetch end device identifiers")
 	} else {
@@ -233,7 +233,7 @@ func (s *impl) EncodeDownlink(ctx context.Context, req *ttnpb.EncodeDownlinkRequ
 	if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	if err := s.processor.EncodeDownlink(ctx, *req.EndDeviceIds, req.VersionIds, req.Downlink, req.Formatter, req.Parameter); err != nil {
+	if err := s.processor.EncodeDownlink(ctx, req.EndDeviceIds, req.VersionIds, req.Downlink, req.Formatter, req.Parameter); err != nil {
 		return nil, err
 	}
 	return &ttnpb.EncodeDownlinkResponse{
@@ -245,7 +245,7 @@ func (s *impl) DecodeUplink(ctx context.Context, req *ttnpb.DecodeUplinkRequest)
 	if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	if err := s.processor.DecodeUplink(ctx, *req.EndDeviceIds, req.VersionIds, req.Uplink, req.Formatter, req.Parameter); err != nil {
+	if err := s.processor.DecodeUplink(ctx, req.EndDeviceIds, req.VersionIds, req.Uplink, req.Formatter, req.Parameter); err != nil {
 		return nil, err
 	}
 	return &ttnpb.DecodeUplinkResponse{
@@ -257,7 +257,7 @@ func (s *impl) DecodeDownlink(ctx context.Context, req *ttnpb.DecodeDownlinkRequ
 	if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
-	if err := s.processor.DecodeDownlink(ctx, *req.EndDeviceIds, req.VersionIds, req.Downlink, req.Formatter, req.Parameter); err != nil {
+	if err := s.processor.DecodeDownlink(ctx, req.EndDeviceIds, req.VersionIds, req.Downlink, req.Formatter, req.Parameter); err != nil {
 		return nil, err
 	}
 	return &ttnpb.DecodeDownlinkResponse{

@@ -78,7 +78,7 @@ func (p *GeolocationPackage) HandleUp(ctx context.Context, def *ttnpb.Applicatio
 
 	switch m := up.Up.(type) {
 	case *ttnpb.ApplicationUp_UplinkMessage:
-		return p.sendQuery(ctx, *up.EndDeviceIds, m.UplinkMessage, data)
+		return p.sendQuery(ctx, up.EndDeviceIds, m.UplinkMessage, data)
 	default:
 		return nil
 	}
@@ -100,7 +100,7 @@ func New(server io.Server, registry packages.Registry) packages.ApplicationPacka
 	}
 }
 
-func (p *GeolocationPackage) singleFrameQuery(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
+func (p *GeolocationPackage) singleFrameQuery(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
 	req := api.BuildSingleFrameRequest(ctx, up.RxMetadata)
 	if len(req.Gateways) < 1 {
 		return nil, nil
@@ -112,7 +112,7 @@ func (p *GeolocationPackage) singleFrameQuery(ctx context.Context, ids ttnpb.End
 	return resp.AbstractResponse(), nil
 }
 
-func (p *GeolocationPackage) gnssQuery(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
+func (p *GeolocationPackage) gnssQuery(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
 	req := &api.GNSSRequest{
 		Payload: up.FrmPayload[:],
 	}
@@ -130,7 +130,7 @@ func minInt(a int, b int) int {
 	return b
 }
 
-func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
+func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
 	count := data.MultiFrameWindowSize
 	if count == 0 && len(up.FrmPayload) > 0 {
 		count = int(up.FrmPayload[0])
@@ -167,7 +167,7 @@ func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids ttnpb.EndD
 	return resp.AbstractResponse(), nil
 }
 
-func (p *GeolocationPackage) wifiQuery(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
+func (p *GeolocationPackage) wifiQuery(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
 	req := api.BuildWiFiRequest(ctx, up.RxMetadata, up.DecodedPayload)
 	if len(req.LoRaWAN) < 1 {
 		return nil, nil
@@ -179,8 +179,8 @@ func (p *GeolocationPackage) wifiQuery(ctx context.Context, ids ttnpb.EndDeviceI
 	return resp.AbstractResponse(), nil
 }
 
-func (p *GeolocationPackage) sendQuery(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data) error {
-	var runQuery func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.ApplicationUplink, *Data, *api.Client) (api.AbstractLocationSolverResponse, error)
+func (p *GeolocationPackage) sendQuery(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data) error {
+	var runQuery func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.ApplicationUplink, *Data, *api.Client) (api.AbstractLocationSolverResponse, error)
 	switch data.Query {
 	case QUERY_TOARSSI:
 		if data.MultiFrame {
@@ -242,9 +242,9 @@ func (p *GeolocationPackage) sendQuery(ctx context.Context, ids ttnpb.EndDeviceI
 	return nil
 }
 
-func (p *GeolocationPackage) sendServiceData(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, data *types.Struct) error {
+func (p *GeolocationPackage) sendServiceData(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, data *types.Struct) error {
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
-		EndDeviceIds:   &ids,
+		EndDeviceIds:   ids,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
 		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now()),
 		Up: &ttnpb.ApplicationUp_ServiceData{
@@ -256,10 +256,10 @@ func (p *GeolocationPackage) sendServiceData(ctx context.Context, ids ttnpb.EndD
 	})
 }
 
-func (p *GeolocationPackage) sendLocationSolved(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, result api.AbstractLocationSolverResult) error {
+func (p *GeolocationPackage) sendLocationSolved(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, result api.AbstractLocationSolverResult) error {
 	loc := result.Location()
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
-		EndDeviceIds:   &ids,
+		EndDeviceIds:   ids,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
 		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now()),
 		Up: &ttnpb.ApplicationUp_LocationSolved{

@@ -56,13 +56,13 @@ func (q *DownlinkTaskQueue) Close(ctx context.Context) error {
 }
 
 // Add adds downlink task for device identified by devID at time startAt.
-func (q *DownlinkTaskQueue) Add(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
+func (q *DownlinkTaskQueue) Add(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
 	return q.queue.Add(ctx, nil, unique.ID(ctx, devID), startAt, replace)
 }
 
 // Pop calls f on the earliest downlink task in the schedule, for which timestamp is in range [0, time.Now()],
 // if such is available, otherwise it blocks until it is.
-func (q *DownlinkTaskQueue) Pop(ctx context.Context, consumerID string, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error {
+func (q *DownlinkTaskQueue) Pop(ctx context.Context, consumerID string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error {
 	return q.queue.Pop(ctx, consumerID, nil, func(p redis.Pipeliner, uid string, startAt time.Time) error {
 		ids, err := unique.ToDeviceID(uid)
 		if err != nil {
@@ -72,7 +72,7 @@ func (q *DownlinkTaskQueue) Pop(ctx context.Context, consumerID string, f func(c
 		if err != nil {
 			return err
 		}
-		t, err := f(ctx, ids, startAt)
+		t, err := f(ctx, &ids, startAt)
 		if err != nil || t.IsZero() {
 			return err
 		}

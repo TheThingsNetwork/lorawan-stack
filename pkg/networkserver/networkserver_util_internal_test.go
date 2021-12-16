@@ -507,7 +507,7 @@ type TestEnvironment struct {
 	*grpc.ClientConn
 }
 
-func (env TestEnvironment) AssertListApplicationRights(ctx context.Context, appID ttnpb.ApplicationIdentifiers, authType, authValue string, rights ...ttnpb.Right) bool {
+func (env TestEnvironment) AssertListApplicationRights(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, authType, authValue string, rights ...ttnpb.Right) bool {
 	t, a := test.MustNewTFromContext(ctx)
 	t.Helper()
 
@@ -538,7 +538,7 @@ func (env TestEnvironment) AssertListApplicationRights(ctx context.Context, appI
 			return test.AllTrue(
 				a.So(md.AuthType, should.Equal, authType),
 				a.So(md.AuthValue, should.Equal, authValue),
-				a.So(ids, should.Resemble, &appID),
+				a.So(ids, should.Resemble, appID),
 			)
 		}, rights...,
 	), should.BeTrue)
@@ -570,7 +570,7 @@ func (env TestEnvironment) AssertSetDevice(ctx context.Context, create bool, req
 		cancel()
 	}()
 
-	if !a.So(env.AssertListApplicationRights(reqCtx, *req.EndDevice.ApplicationIds, authType, authValue, rights...), should.BeTrue) {
+	if !a.So(env.AssertListApplicationRights(reqCtx, req.EndDevice.Ids.ApplicationIds, authType, authValue, rights...), should.BeTrue) {
 		t.Error("ListRights assertion failed")
 		return nil, err, false
 	}
@@ -595,7 +595,7 @@ func (env TestEnvironment) AssertSetDevice(ctx context.Context, create bool, req
 	case ev := <-env.Events:
 		if !a.So(ev.Event, should.ResembleEvent, expectedEvent.New(
 			events.ContextWithCorrelationID(reqCtx, ev.Event.CorrelationIDs()...),
-			events.WithIdentifiers(&req.EndDevice.EndDeviceIdentifiers),
+			events.WithIdentifiers(req.EndDevice.Ids),
 		)) {
 			t.Errorf("Failed to assert device %s event", action)
 			return nil, err, false
@@ -639,7 +639,7 @@ func (env TestEnvironment) AssertGetDevice(ctx context.Context, req *ttnpb.GetEn
 		cancel()
 	}()
 
-	if !a.So(env.AssertListApplicationRights(reqCtx, *req.EndDeviceIds.ApplicationIds, authType, authValue, rights...), should.BeTrue) {
+	if !a.So(env.AssertListApplicationRights(reqCtx, req.EndDeviceIds.ApplicationIds, authType, authValue, rights...), should.BeTrue) {
 		t.Error("ListRights assertion failed")
 		return nil, nil, false
 	}
@@ -680,7 +680,7 @@ func (env TestEnvironment) AssertResetFactoryDefaults(ctx context.Context, req *
 		cancel()
 	}()
 
-	if !a.So(env.AssertListApplicationRights(reqCtx, *req.EndDeviceIds.ApplicationIds, authType, authValue, rights...), should.BeTrue) {
+	if !a.So(env.AssertListApplicationRights(reqCtx, req.EndDeviceIds.ApplicationIds, authType, authValue, rights...), should.BeTrue) {
 		t.Error("ListRights assertion failed")
 		return nil, nil, false
 	}
@@ -695,7 +695,7 @@ func (env TestEnvironment) AssertResetFactoryDefaults(ctx context.Context, req *
 	}
 }
 
-func (env TestEnvironment) AssertNsAsHandleUplink(ctx context.Context, appID ttnpb.ApplicationIdentifiers, assert func(context.Context, ...*ttnpb.ApplicationUp) bool, err error) bool {
+func (env TestEnvironment) AssertNsAsHandleUplink(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, assert func(context.Context, ...*ttnpb.ApplicationUp) bool, err error) bool {
 	test.MustTFromContext(ctx).Helper()
 	return test.RunSubtestFromContext(ctx, test.SubtestConfig{
 		Name: "NsAs.HandleUplink",
@@ -1198,13 +1198,13 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 						Settings:       scheduledDown.Settings,
 						CorrelationIds: scheduledDown.CorrelationIds,
 					}),
-					events.WithIdentifiers(&dev.EndDeviceIdentifiers),
+					events.WithIdentifiers(dev.Ids),
 				).New(ctx),
 				EvtScheduleJoinAcceptSuccess.With(
 					events.WithData(&ttnpb.ScheduleDownlinkResponse{
 						Delay: ttnpb.ProtoDurationPtr(0),
 					}),
-					events.WithIdentifiers(&dev.EndDeviceIdentifiers),
+					events.WithIdentifiers(dev.Ids),
 				).New(events.ContextWithCorrelationID(ctx, scheduledDown.CorrelationIds...)),
 			)
 			dev.PendingSession = &ttnpb.Session{
@@ -1267,13 +1267,13 @@ func (env TestEnvironment) AssertScheduleDataDownlink(ctx context.Context, conf 
 						Settings:       scheduledDown.Settings,
 						CorrelationIds: scheduledDown.CorrelationIds,
 					}),
-					events.WithIdentifiers(&dev.EndDeviceIdentifiers),
+					events.WithIdentifiers(dev.Ids),
 				).New(ctx),
 				EvtScheduleDataDownlinkSuccess.With(
 					events.WithData(&ttnpb.ScheduleDownlinkResponse{
 						Delay: ttnpb.ProtoDurationPtr(0),
 					}),
-					events.WithIdentifiers(&dev.EndDeviceIdentifiers),
+					events.WithIdentifiers(dev.Ids),
 				).New(events.ContextWithCorrelationID(ctx, scheduledDown.CorrelationIds...)),
 			)
 			dev.MacState.RecentDownlinks = AppendRecentDownlink(dev.MacState.RecentDownlinks, scheduledDown, RecentDownlinkCount)
@@ -1490,8 +1490,8 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 	start := time.Now().UTC()
 
 	upConf := JoinRequestConfig{
-		JoinEUI:        *conf.Device.JoinEui,
-		DevEUI:         *conf.Device.DevEui,
+		JoinEUI:        *conf.Device.Ids.JoinEui,
+		DevEUI:         *conf.Device.Ids.DevEui,
 		DevNonce:       devNonce,
 		DataRate:       upDR,
 		Frequency:      upCh.Frequency,
@@ -1548,8 +1548,8 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 							a.So(req.DevAddr.NetIDType(), should.Equal, env.Config.NetID.Type()),
 							a.So(req.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual, ups[0].CorrelationIds),
 							a.So(req, should.Resemble, MakeNsJsJoinRequest(NsJsJoinRequestConfig{
-								JoinEUI:            *conf.Device.JoinEui,
-								DevEUI:             *conf.Device.DevEui,
+								JoinEUI:            *conf.Device.Ids.JoinEui,
+								DevEUI:             *conf.Device.Ids.DevEui,
 								DevNonce:           devNonce,
 								MIC:                mic,
 								DevAddr:            req.DevAddr,
@@ -1674,7 +1674,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 				)
 			}()).New(
 				ctx,
-				events.WithIdentifiers(&conf.Device.EndDeviceIdentifiers),
+				events.WithIdentifiers(conf.Device.Ids),
 			)...), should.BeTrue)
 		},
 		conf.RxMetadatas[1:]...,
@@ -1687,11 +1687,15 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 		return nil, false
 	}
 
-	idsWithDevAddr := conf.Device.EndDeviceIdentifiers
+	idsWithDevAddr := &ttnpb.EndDeviceIdentifiers{}
+	if err := idsWithDevAddr.SetFields(conf.Device.Ids, ttnpb.EndDeviceIdentifiersFieldPathsNested...); !a.So(err, should.BeNil) {
+		t.Error("Failed to set identifiers")
+		return nil, false
+	}
 	idsWithDevAddr.DevAddr = &joinReq.DevAddr
 
 	var appUp *ttnpb.ApplicationUp
-	if !a.So(env.AssertNsAsHandleUplink(ctx, *conf.Device.ApplicationIds, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+	if !a.So(env.AssertNsAsHandleUplink(ctx, conf.Device.Ids.ApplicationIds, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 		_, a := test.MustNewTFromContext(ctx)
 		if !a.So(ups, should.HaveLength, 1) {
 			return false
@@ -1703,7 +1707,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 			a.So(up.CorrelationIds, should.HaveSameElementsDeep, append(joinReq.CorrelationIds, joinResp.CorrelationIds...)),
 			a.So([]time.Time{start, *ttnpb.StdTime(recvAt), time.Now()}, should.BeChronological),
 			a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-				EndDeviceIds:   &idsWithDevAddr,
+				EndDeviceIds:   idsWithDevAddr,
 				CorrelationIds: up.CorrelationIds,
 				Up: &ttnpb.ApplicationUp_JoinAccept{
 					JoinAccept: &ttnpb.ApplicationJoinAccept{
@@ -1728,8 +1732,8 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 		RemoteIP:       true,
 		UserAgent:      true,
 	}),
-		EvtForwardJoinAccept.NewWithIdentifiersAndData(ctx, &idsWithDevAddr, &ttnpb.ApplicationUp{
-			EndDeviceIds:   &idsWithDevAddr,
+		EvtForwardJoinAccept.NewWithIdentifiersAndData(ctx, idsWithDevAddr, &ttnpb.ApplicationUp{
+			EndDeviceIds:   idsWithDevAddr,
 			CorrelationIds: appUp.CorrelationIds,
 			Up: &ttnpb.ApplicationUp_JoinAccept{
 				JoinAccept: ApplicationJoinAcceptWithoutAppSKey(appUp.GetJoinAccept()),
@@ -1812,7 +1816,7 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 					)
 				}()).New(
 					ctx,
-					events.WithIdentifiers(&dev.EndDeviceIdentifiers),
+					events.WithIdentifiers(dev.Ids),
 				)...), should.BeTrue) {
 					t.Error("Uplink event assertion failed")
 					return false
@@ -1836,7 +1840,7 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 			}
 			dev.MacState.RecentUplinks = AppendRecentUplink(dev.MacState.RecentUplinks, deduplicatedUp, RecentUplinkCount)
 			var appUp *ttnpb.ApplicationUp
-			if !a.So(env.AssertNsAsHandleUplink(ctx, *conf.Device.ApplicationIds, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+			if !a.So(env.AssertNsAsHandleUplink(ctx, conf.Device.Ids.ApplicationIds, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 				_, a := test.MustNewTFromContext(ctx)
 				if !a.So(ups, should.HaveLength, 1) {
 					return false
@@ -1849,7 +1853,7 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 					a.So(up.GetUplinkMessage().GetRxMetadata(), should.HaveSameElementsDeep, deduplicatedUp.RxMetadata),
 					a.So([]time.Time{start, *ttnpb.StdTime(recvAt), time.Now()}, should.BeChronological),
 					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-						EndDeviceIds:   &dev.EndDeviceIdentifiers,
+						EndDeviceIds:   dev.Ids,
 						CorrelationIds: up.CorrelationIds,
 						Up: &ttnpb.ApplicationUp_UplinkMessage{
 							UplinkMessage: &ttnpb.ApplicationUplink{
@@ -1881,7 +1885,7 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 			}),
 				EvtForwardDataUplink.New(
 					ctx,
-					events.WithIdentifiers(&dev.EndDeviceIdentifiers),
+					events.WithIdentifiers(dev.Ids),
 					events.WithData(appUp),
 				),
 			) {
@@ -2112,8 +2116,8 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 			MACStateOptions.WithRecentUplinks(
 				MakeJoinRequest(JoinRequestConfig{
 					DecodePayload:  true,
-					JoinEUI:        *x.JoinEui,
-					DevEUI:         *x.DevEui,
+					JoinEUI:        *x.Ids.JoinEui,
+					DevEUI:         *x.Ids.DevEui,
 					CorrelationIDs: []string{"join-request"},
 					MIC:            [4]byte{0x42, 0xff, 0xff, 0xff},
 					DataRateIndex:  drIdx,
@@ -2180,7 +2184,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 							},
 						},
 					},
-					EndDeviceIds: &x.EndDeviceIdentifiers,
+					EndDeviceIds: x.Ids,
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
 							Class:           ttnpb.CLASS_A,
@@ -2265,7 +2269,7 @@ func MakeABPEndDevice(defaults ttnpb.MACSettings, wrapKeys bool, sessionOpts []t
 	return MakeEndDevice(
 		EndDeviceOptions.Compose(opts...),
 		func(x ttnpb.EndDevice) ttnpb.EndDevice {
-			if x.Multicast || x.DevEui != nil && !x.DevEui.IsZero() || !x.LorawanVersion.RequireDevEUIForABP() {
+			if x.Multicast || x.Ids.DevEui != nil && !x.Ids.DevEui.IsZero() || !x.LorawanVersion.RequireDevEUIForABP() {
 				return x
 			}
 			return EndDeviceOptions.WithDefaultDevEUI()(x)
@@ -2393,12 +2397,12 @@ var _ DownlinkTaskQueue = MockDownlinkTaskQueue{}
 
 // MockDownlinkTaskQueue is a mock DownlinkTaskQueue used for testing.
 type MockDownlinkTaskQueue struct {
-	AddFunc func(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error
-	PopFunc func(ctx context.Context, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error
+	AddFunc func(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error
+	PopFunc func(ctx context.Context, f func(context.Context, *ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error
 }
 
 // Add calls AddFunc if set and panics otherwise.
-func (m MockDownlinkTaskQueue) Add(ctx context.Context, devID ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error {
+func (m MockDownlinkTaskQueue) Add(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error {
 	if m.AddFunc == nil {
 		panic("Add called, but not set")
 	}
@@ -2406,7 +2410,7 @@ func (m MockDownlinkTaskQueue) Add(ctx context.Context, devID ttnpb.EndDeviceIde
 }
 
 // Pop calls PopFunc if set and panics otherwise.
-func (m MockDownlinkTaskQueue) Pop(ctx context.Context, consumerID string, f func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error {
+func (m MockDownlinkTaskQueue) Pop(ctx context.Context, consumerID string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error {
 	if m.PopFunc == nil {
 		panic("Pop called, but not set")
 	}
@@ -2417,8 +2421,8 @@ var _ DeviceRegistry = MockDeviceRegistry{}
 
 // MockDeviceRegistry is a mock DeviceRegistry used for testing.
 type MockDeviceRegistry struct {
-	GetByIDFunc func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error)
-	SetByIDFunc func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
+	GetByIDFunc func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error)
+	SetByIDFunc func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
 }
 
 // GetByEUI panics.
@@ -2427,7 +2431,7 @@ func (m MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI, devEUI types.
 }
 
 // GetByID calls GetByIDFunc if set and panics otherwise.
-func (m MockDeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error) {
+func (m MockDeviceRegistry) GetByID(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error) {
 	if m.GetByIDFunc == nil {
 		panic("GetByID called, but not set")
 	}
@@ -2435,7 +2439,7 @@ func (m MockDeviceRegistry) GetByID(ctx context.Context, appID ttnpb.Application
 }
 
 // SetByID calls SetByIDFunc if set and panics otherwise.
-func (m MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+func (m MockDeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 	if m.SetByIDFunc == nil {
 		panic("SetByID called, but not set")
 	}
@@ -2448,6 +2452,6 @@ func (m MockDeviceRegistry) RangeByUplinkMatches(context.Context, *ttnpb.UplinkM
 }
 
 // Range panics.
-func (m MockDeviceRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
+func (m MockDeviceRegistry) Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
 	panic("Range must not be called")
 }

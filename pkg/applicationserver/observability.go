@@ -260,7 +260,7 @@ func registerForwardUp(ctx context.Context, msg *ttnpb.ApplicationUp) {
 	default:
 		return
 	}
-	asMetrics.uplinkForwarded.WithLabelValues(ctx, msg.EndDeviceIds.GetApplicationIds().GetApplicationId()).Inc()
+	asMetrics.uplinkForwarded.WithLabelValues(ctx, msg.EndDeviceIds.ApplicationIds.ApplicationId).Inc()
 }
 
 func registerDropUp(ctx context.Context, msg *ttnpb.ApplicationUp, err error) {
@@ -288,24 +288,24 @@ func registerUplinkLatency(ctx context.Context, msg *ttnpb.ApplicationUplink) {
 	}
 }
 
-func registerReceiveDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink) {
-	events.Publish(evtReceiveDataDown.NewWithIdentifiersAndData(ctx, &ids, msg))
-	asMetrics.downlinkReceived.WithLabelValues(ctx, ids.GetApplicationIds().GetApplicationId()).Inc()
+func registerReceiveDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink) {
+	events.Publish(evtReceiveDataDown.NewWithIdentifiersAndData(ctx, ids, msg))
+	asMetrics.downlinkReceived.WithLabelValues(ctx, ids.ApplicationIds.ApplicationId).Inc()
 }
 
-func registerReceiveDownlinks(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink) {
+func registerReceiveDownlinks(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink) {
 	for _, item := range items {
 		registerReceiveDownlink(ctx, ids, item)
 	}
 }
 
-func registerForwardDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, ns string) {
-	events.Publish(evtForwardDataDown.NewWithIdentifiersAndData(ctx, &ids, msg))
+func registerForwardDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, ns string) {
+	events.Publish(evtForwardDataDown.NewWithIdentifiersAndData(ctx, ids, msg))
 	asMetrics.downlinkForwarded.WithLabelValues(ctx, ns).Inc()
 }
 
-func registerDropDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, err error) {
-	events.Publish(evtDropDataDown.NewWithIdentifiersAndData(ctx, &ids, err))
+func registerDropDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, err error) {
+	events.Publish(evtDropDataDown.NewWithIdentifiersAndData(ctx, ids, err))
 	if ttnErr, ok := errors.From(err); ok {
 		asMetrics.downlinkDropped.WithLabelValues(ctx, ttnErr.FullName()).Inc()
 	} else {
@@ -313,14 +313,14 @@ func registerDropDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, m
 	}
 }
 
-func (as *ApplicationServer) registerDropDownlinks(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, err error) {
+func (as *ApplicationServer) registerDropDownlinks(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, err error) {
 	var errorDetails ttnpb.ErrorDetails
 	if ttnErr, ok := err.(errors.ErrorDetails); ok {
 		errorDetails = *ttnpb.ErrorDetailsToProto(ttnErr)
 	}
 	for _, item := range items {
 		if err := as.publishUp(ctx, &ttnpb.ApplicationUp{
-			EndDeviceIds:   &ids,
+			EndDeviceIds:   ids,
 			CorrelationIds: item.CorrelationIds,
 			Up: &ttnpb.ApplicationUp_DownlinkFailed{
 				DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
@@ -335,10 +335,10 @@ func (as *ApplicationServer) registerDropDownlinks(ctx context.Context, ids ttnp
 	}
 }
 
-func (as *ApplicationServer) registerForwardDownlinks(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, peerName string) {
+func (as *ApplicationServer) registerForwardDownlinks(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, peerName string) {
 	for _, item := range items {
 		if err := as.publishUp(ctx, &ttnpb.ApplicationUp{
-			EndDeviceIds:   &ids,
+			EndDeviceIds:   ids,
 			CorrelationIds: item.CorrelationIds,
 			Up: &ttnpb.ApplicationUp_DownlinkQueued{
 				DownlinkQueued: item,

@@ -137,7 +137,7 @@ func ApplicationMQTTDownResource(ctx context.Context, ids ttnpb.ApplicationIdent
 }
 
 // ApplicationWebhooksDownResource represents downlink traffic for an application from a webhook.
-func ApplicationWebhooksDownResource(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, authTokenID string) Resource {
+func ApplicationWebhooksDownResource(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, authTokenID string) Resource {
 	key := fmt.Sprintf("as:down:web:dev:%s", unique.ID(ctx, ids))
 	if authTokenID != "" {
 		key = fmt.Sprintf("%s:token:%s", key, authTokenID)

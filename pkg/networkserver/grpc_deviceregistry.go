@@ -258,7 +258,7 @@ func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest
 		return nil, err
 	}
 
-	dev, ctx, err := ns.devices.GetByID(ctx, *req.EndDeviceIds.ApplicationIds, req.EndDeviceIds.DeviceId, addDeviceGetPaths(req.FieldMask.GetPaths()...))
+	dev, ctx, err := ns.devices.GetByID(ctx, req.EndDeviceIds.ApplicationIds, req.EndDeviceIds.DeviceId, addDeviceGetPaths(req.FieldMask.GetPaths()...))
 	if err != nil {
 		logRegistryRPCError(ctx, err, "Failed to get device from registry")
 		return nil, err
@@ -703,7 +703,7 @@ var (
 		"supports_join": {
 			{
 				Func: func(m map[string]*ttnpb.EndDevice) (bool, string) {
-					if dev, ok := m["ids.dev_eui"]; ok && dev.DevEui != nil && !dev.DevEui.IsZero() {
+					if dev, ok := m["ids.dev_eui"]; ok && dev.Ids.DevEui != nil && !dev.Ids.DevEui.IsZero() {
 						return true, ""
 					}
 					if m["lorawan_version"].GetLorawanVersion() == ttnpb.MAC_UNKNOWN {
@@ -946,7 +946,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	) {
 		requiredRights = append(requiredRights, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS)
 	}
-	if err := rights.RequireApplication(ctx, *st.Device.ApplicationIds, requiredRights...); err != nil {
+	if err := rights.RequireApplication(ctx, *st.Device.Ids.ApplicationIds, requiredRights...); err != nil {
 		return nil, err
 	}
 
@@ -955,17 +955,17 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"ids.application_ids",
 		"ids.device_id",
 	)
-	if st.Device.JoinEui != nil {
+	if st.Device.Ids.JoinEui != nil {
 		st.AddSetFields(
 			"ids.join_eui",
 		)
 	}
-	if st.Device.DevEui != nil {
+	if st.Device.Ids.DevEui != nil {
 		st.AddSetFields(
 			"ids.dev_eui",
 		)
 	}
-	if st.Device.DevAddr != nil {
+	if st.Device.Ids.DevAddr != nil {
 		st.AddSetFields(
 			"ids.dev_addr",
 		)
@@ -1015,10 +1015,10 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	// Ensure ids.dev_addr and session.dev_addr are consistent.
 	if st.HasSetField("ids.dev_addr") {
 		if err := st.ValidateField(func(dev *ttnpb.EndDevice) bool {
-			if st.Device.DevAddr == nil {
+			if st.Device.Ids.DevAddr == nil {
 				return dev.GetSession() == nil
 			}
-			return dev.GetSession() != nil && dev.Session.DevAddr.Equal(*st.Device.DevAddr)
+			return dev.GetSession() != nil && dev.Session.DevAddr.Equal(*st.Device.Ids.DevAddr)
 		}, "session.dev_addr"); err != nil {
 			return nil, err
 		}
@@ -1027,7 +1027,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if st.Device.Session != nil {
 			devAddr = &st.Device.Session.DevAddr
 		}
-		st.Device.DevAddr = devAddr
+		st.Device.Ids.DevAddr = devAddr
 		st.AddSetFields(
 			"ids.dev_addr",
 		)
@@ -2309,7 +2309,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	}
 
 	var evt events.Event
-	dev, ctx, err := ns.devices.SetByID(ctx, *st.Device.EndDeviceIdentifiers.ApplicationIds, st.Device.EndDeviceIdentifiers.DeviceId, st.GetFields(), st.SetFunc(func(ctx context.Context, stored *ttnpb.EndDevice) error {
+	dev, ctx, err := ns.devices.SetByID(ctx, st.Device.Ids.ApplicationIds, st.Device.Ids.DeviceId, st.GetFields(), st.SetFunc(func(ctx context.Context, stored *ttnpb.EndDevice) error {
 		if hasSession {
 			macVersion := stored.GetMacState().GetLorawanVersion()
 			if stored.GetMacState() == nil && !st.HasSetField("mac_state") {
@@ -2388,11 +2388,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		}
 
 		if stored == nil {
-			evt = evtCreateEndDevice.NewWithIdentifiersAndData(ctx, &st.Device.EndDeviceIdentifiers, nil)
+			evt = evtCreateEndDevice.NewWithIdentifiersAndData(ctx, st.Device.Ids, nil)
 			return nil
 		}
 
-		evt = evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, &st.Device.EndDeviceIdentifiers, req.FieldMask.GetPaths())
+		evt = evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, st.Device.Ids, req.FieldMask.GetPaths())
 		if st.HasSetField("multicast") && st.Device.Multicast != stored.Multicast {
 			return newInvalidFieldValueError("multicast")
 		}
@@ -2432,7 +2432,7 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 		return nil, err
 	}
 
-	dev, _, err := ns.devices.SetByID(ctx, *req.EndDeviceIds.ApplicationIds, req.EndDeviceIds.DeviceId, addDeviceGetPaths(ttnpb.AddFields(append(req.FieldMask.GetPaths()[:0:0], req.FieldMask.GetPaths()...),
+	dev, _, err := ns.devices.SetByID(ctx, req.EndDeviceIds.ApplicationIds, req.EndDeviceIds.DeviceId, addDeviceGetPaths(ttnpb.AddFields(append(req.FieldMask.GetPaths()[:0:0], req.FieldMask.GetPaths()...),
 		"frequency_plan_id",
 		"lorawan_phy_version",
 		"lorawan_version",
@@ -2503,7 +2503,7 @@ func (ns *NetworkServer) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentif
 		return nil, err
 	}
 	var evt events.Event
-	_, _, err := ns.devices.SetByID(ctx, *req.ApplicationIds, req.DeviceId, nil, func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	_, _, err := ns.devices.SetByID(ctx, req.ApplicationIds, req.DeviceId, nil, func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev == nil {
 			return nil, nil, errDeviceNotFound.New()
 		}

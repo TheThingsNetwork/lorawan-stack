@@ -43,7 +43,7 @@ var (
 	}
 
 	baseEndDevice = ttnpb.EndDevice{
-		EndDeviceIdentifiers: baseEndDeviceIdentifiers,
+		Ids: &baseEndDeviceIdentifiers,
 	}
 )
 
@@ -125,7 +125,8 @@ func (o EndDeviceIdentifiersOptionNamespace) WithDefaultDevEUI() EndDeviceIdenti
 
 func (o EndDeviceOptionNamespace) WithEndDeviceIdentifiersOptions(opts ...EndDeviceIdentifiersOption) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		x.EndDeviceIdentifiers = EndDeviceIdentifiersOptions.Compose(opts...)(x.EndDeviceIdentifiers)
+		ids := EndDeviceIdentifiersOptions.Compose(opts...)(*x.Ids)
+		x.Ids = &ids
 		return x
 	}
 }

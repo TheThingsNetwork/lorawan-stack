@@ -133,7 +133,7 @@ func TestAuthentication(t *testing.T) {
 			OK:  false,
 		},
 	} {
-		t.Run(fmt.Sprintf("%v:%v", tc.ID.GetApplicationIds().GetApplicationId(), tc.Key), func(t *testing.T) {
+		t.Run(fmt.Sprintf("%v:%v", tc.ID.ApplicationIds.ApplicationId, tc.Key), func(t *testing.T) {
 			a := assertions.New(t)
 
 			ctx, cancel := context.WithTimeout(ctx, timeout)

@@ -39,14 +39,14 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 func eui64Ptr(v types.EUI64) *types.EUI64 { return &v }
 
 type mock struct {
-	ids ttnpb.EndDeviceIdentifiers
+	ids *ttnpb.EndDeviceIdentifiers
 }
 
 func (mock) Validate() error { return nil }
 
 func (m *mock) Encode(dev *ttnpb.EndDevice) error {
 	*m = mock{
-		ids: dev.EndDeviceIdentifiers,
+		ids: dev.Ids,
 	}
 	return nil
 }

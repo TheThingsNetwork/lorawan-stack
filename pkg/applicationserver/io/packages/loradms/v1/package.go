@@ -147,15 +147,15 @@ func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.Appl
 		return err
 	}
 
-	if err := p.sendDownlink(ctx, *up.EndDeviceIds, result.Downlink, data); err != nil {
+	if err := p.sendDownlink(ctx, up.EndDeviceIds, result.Downlink, data); err != nil {
 		return err
 	}
 
-	if err := p.sendServiceData(ctx, *up.EndDeviceIds, resultStruct); err != nil {
+	if err := p.sendServiceData(ctx, up.EndDeviceIds, resultStruct); err != nil {
 		return err
 	}
 
-	if err := p.sendLocationSolved(ctx, *up.EndDeviceIds, result.Position); err != nil {
+	if err := p.sendLocationSolved(ctx, up.EndDeviceIds, result.Position); err != nil {
 		return err
 	}
 
@@ -166,7 +166,7 @@ func (p *DeviceManagementPackage) sendUplink(ctx context.Context, up *ttnpb.Appl
 	return nil
 }
 
-func (p *DeviceManagementPackage) sendDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, downlink *objects.LoRaDnlink, data *packageData) error {
+func (p *DeviceManagementPackage) sendDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, downlink *objects.LoRaDnlink, data *packageData) error {
 	if downlink == nil {
 		return nil
 	}
@@ -182,9 +182,9 @@ func (p *DeviceManagementPackage) sendDownlink(ctx context.Context, ids ttnpb.En
 	}})
 }
 
-func (p *DeviceManagementPackage) sendServiceData(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, data *types.Struct) error {
+func (p *DeviceManagementPackage) sendServiceData(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, data *types.Struct) error {
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
-		EndDeviceIds:   &ids,
+		EndDeviceIds:   ids,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
 		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now()),
 		Up: &ttnpb.ApplicationUp_ServiceData{
@@ -196,7 +196,7 @@ func (p *DeviceManagementPackage) sendServiceData(ctx context.Context, ids ttnpb
 	})
 }
 
-func (p *DeviceManagementPackage) sendLocationSolved(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, position *objects.PositionSolution) error {
+func (p *DeviceManagementPackage) sendLocationSolved(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, position *objects.PositionSolution) error {
 	if position == nil {
 		return nil
 	}
@@ -212,7 +212,7 @@ func (p *DeviceManagementPackage) sendLocationSolved(ctx context.Context, ids tt
 		source = ttnpb.SOURCE_WIFI_RSSI_GEOLOCATION
 	}
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
-		EndDeviceIds:   &ids,
+		EndDeviceIds:   ids,
 		CorrelationIds: events.CorrelationIDsFromContext(ctx),
 		ReceivedAt:     ttnpb.ProtoTimePtr(time.Now()),
 		Up: &ttnpb.ApplicationUp_LocationSolved{

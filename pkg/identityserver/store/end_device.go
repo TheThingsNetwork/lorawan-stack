@@ -71,8 +71,18 @@ func mustEndDeviceVersionIDs(pb *ttnpb.EndDevice) *ttnpb.EndDeviceVersionIdentif
 
 // functions to set fields from the device model into the device proto.
 var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
-	"ids.join_eui":   func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.JoinEui = dev.JoinEUI.toPB() },
-	"ids.dev_eui":    func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.DevEui = dev.DevEUI.toPB() },
+	"ids.join_eui": func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		if pb.Ids == nil {
+			pb.Ids = &ttnpb.EndDeviceIdentifiers{}
+		}
+		pb.Ids.JoinEui = dev.JoinEUI.toPB()
+	},
+	"ids.dev_eui": func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		if pb.Ids == nil {
+			pb.Ids = &ttnpb.EndDeviceIdentifiers{}
+		}
+		pb.Ids.DevEui = dev.DevEUI.toPB()
+	},
 	nameField:        func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.Name = dev.Name },
 	descriptionField: func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.Description = dev.Description },
 	attributesField:  func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.Attributes = attributes(dev.Attributes).toMap() },
@@ -117,8 +127,8 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 
 // functions to set fields from the device proto into the device model.
 var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
-	"ids.join_eui":   func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.JoinEUI = eui(pb.JoinEui) },
-	"ids.dev_eui":    func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.DevEUI = eui(pb.DevEui) },
+	"ids.join_eui":   func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.JoinEUI = eui(pb.Ids.JoinEui) },
+	"ids.dev_eui":    func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.DevEUI = eui(pb.Ids.DevEui) },
 	nameField:        func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.Name = pb.Name },
 	descriptionField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.Description = pb.Description },
 	attributesField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
@@ -192,12 +202,15 @@ var deviceColumnNames = map[string][]string{
 }
 
 func (dev EndDevice) toPB(pb *ttnpb.EndDevice, fieldMask *pbtypes.FieldMask) {
-	pb.EndDeviceIdentifiers.ApplicationIds = &ttnpb.ApplicationIdentifiers{
+	if pb.Ids == nil {
+		pb.Ids = &ttnpb.EndDeviceIdentifiers{}
+	}
+	pb.Ids.ApplicationIds = &ttnpb.ApplicationIdentifiers{
 		ApplicationId: dev.ApplicationID,
 	}
-	pb.EndDeviceIdentifiers.DeviceId = dev.DeviceID
-	pb.EndDeviceIdentifiers.JoinEui = dev.JoinEUI.toPB() // Always present.
-	pb.EndDeviceIdentifiers.DevEui = dev.DevEUI.toPB()   // Always present.
+	pb.Ids.DeviceId = dev.DeviceID
+	pb.Ids.JoinEui = dev.JoinEUI.toPB() // Always present.
+	pb.Ids.DevEui = dev.DevEUI.toPB()   // Always present.
 	pb.CreatedAt = ttnpb.ProtoTimePtr(cleanTime(dev.CreatedAt))
 	pb.UpdatedAt = ttnpb.ProtoTimePtr(cleanTime(dev.UpdatedAt))
 	if len(fieldMask.GetPaths()) == 0 {

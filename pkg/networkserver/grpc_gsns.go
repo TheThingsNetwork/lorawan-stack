@@ -573,7 +573,7 @@ macLoop:
 
 	if matchType == pendingMatch {
 		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-			dev.EndDeviceIdentifiers.DevAddr = &pld.FHdr.DevAddr
+			dev.Ids.DevAddr = &pld.FHdr.DevAddr
 			dev.Session = dev.PendingSession
 		} else if dev.PendingSession != nil || dev.PendingMacState != nil || dev.MacState.PendingJoinRequest != nil {
 			logger.Debug("No RekeyInd received for LoRaWAN 1.1+ device")
@@ -636,7 +636,7 @@ macLoop:
 		if pld.FHdr.FCtrl.Ack {
 			queuedApplicationUplinks = []*ttnpb.ApplicationUp{
 				{
-					EndDeviceIds: &dev.EndDeviceIdentifiers,
+					EndDeviceIds: dev.Ids,
 					Up: &ttnpb.ApplicationUp_DownlinkAck{
 						DownlinkAck: pendingAppDown,
 					},
@@ -646,7 +646,7 @@ macLoop:
 		} else {
 			queuedApplicationUplinks = []*ttnpb.ApplicationUp{
 				{
-					EndDeviceIds: &dev.EndDeviceIdentifiers,
+					EndDeviceIds: dev.Ids,
 					Up: &ttnpb.ApplicationUp_DownlinkNack{
 						DownlinkNack: pendingAppDown,
 					},
@@ -829,21 +829,21 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	ctx = matched.Context
 
 	queuedEvents := []events.Event{
-		evtReceiveDataUplink.NewWithIdentifiersAndData(ctx, &matched.Device.EndDeviceIdentifiers, up),
+		evtReceiveDataUplink.NewWithIdentifiersAndData(ctx, matched.Device.Ids, up),
 	}
-	defer func(ids ttnpb.EndDeviceIdentifiers) {
+	defer func(ids *ttnpb.EndDeviceIdentifiers) {
 		if err != nil {
-			queuedEvents = append(queuedEvents, evtDropDataUplink.NewWithIdentifiersAndData(ctx, &ids, err))
+			queuedEvents = append(queuedEvents, evtDropDataUplink.NewWithIdentifiersAndData(ctx, ids, err))
 		}
 		publishEvents(ctx, queuedEvents...)
-	}(matched.Device.EndDeviceIdentifiers)
+	}(matched.Device.Ids)
 
 	ok, err = ns.deduplicateUplink(ctx, up)
 	if err != nil {
 		return err
 	}
 	if !ok {
-		queuedEvents = append(queuedEvents, evtDropDataUplink.NewWithIdentifiersAndData(ctx, &matched.Device.EndDeviceIdentifiers, errDuplicate))
+		queuedEvents = append(queuedEvents, evtDropDataUplink.NewWithIdentifiersAndData(ctx, matched.Device.Ids, errDuplicate))
 		registerReceiveDuplicateUplink(ctx, up)
 		return nil
 	}
@@ -871,7 +871,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	var queuedApplicationUplinks []*ttnpb.ApplicationUp
 	defer func() { ns.submitApplicationUplinks(ctx, queuedApplicationUplinks...) }()
 
-	stored, _, err := ns.devices.SetByID(ctx, *matched.Device.ApplicationIds, matched.Device.DeviceId, handleDataUplinkGetPaths[:],
+	stored, _, err := ns.devices.SetByID(ctx, matched.Device.Ids.ApplicationIds, matched.Device.Ids.DeviceId, handleDataUplinkGetPaths[:],
 		func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			if stored == nil {
 				log.FromContext(ctx).Warn("Device deleted during uplink handling, drop")
@@ -892,7 +892,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			}
 
 			queuedApplicationUplinks = append(queuedApplicationUplinks, matched.QueuedApplicationUplinks...)
-			queuedEvents = append(queuedEvents, matched.QueuedEventBuilders.New(ctx, events.WithIdentifiers(&matched.Device.EndDeviceIdentifiers))...)
+			queuedEvents = append(queuedEvents, matched.QueuedEventBuilders.New(ctx, events.WithIdentifiers(matched.Device.Ids))...)
 
 			stored = matched.Device
 			paths := ttnpb.AddFields(matched.SetPaths,
@@ -956,7 +956,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			frmPayload = pld.FrmPayload
 		}
 		queuedApplicationUplinks = append(queuedApplicationUplinks, &ttnpb.ApplicationUp{
-			EndDeviceIds:   &stored.EndDeviceIdentifiers,
+			EndDeviceIds:   stored.Ids,
 			CorrelationIds: up.CorrelationIds,
 			Up: &ttnpb.ApplicationUp_UplinkMessage{
 				UplinkMessage: &ttnpb.ApplicationUplink{
@@ -977,7 +977,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 			},
 		})
 	}
-	queuedEvents = append(queuedEvents, evtProcessDataUplink.NewWithIdentifiersAndData(ctx, &matched.Device.EndDeviceIdentifiers, up))
+	queuedEvents = append(queuedEvents, evtProcessDataUplink.NewWithIdentifiersAndData(ctx, matched.Device.Ids, up))
 	registerProcessUplink(ctx, up)
 	return nil
 }
@@ -993,7 +993,7 @@ func joinResponseWithoutKeys(resp *ttnpb.JoinResponse) *ttnpb.JoinResponse {
 	}
 }
 
-func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, []events.Event, error) {
+func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, []events.Event, error) {
 	var queuedEvents []events.Event
 	logger := log.FromContext(ctx)
 	cc, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_JOIN_SERVER, nil)
@@ -1004,29 +1004,29 @@ func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids ttnpb.EndDevic
 			logger.WithError(err).Error("Join Server peer connection lookup failed")
 		}
 	} else {
-		queuedEvents = append(queuedEvents, evtClusterJoinAttempt.NewWithIdentifiersAndData(ctx, &ids, req))
+		queuedEvents = append(queuedEvents, evtClusterJoinAttempt.NewWithIdentifiersAndData(ctx, ids, req))
 		resp, err := ttnpb.NewNsJsClient(cc).HandleJoin(ctx, req, ns.WithClusterAuth())
 		if err == nil {
 			logger.Debug("Join-request accepted by cluster-local Join Server")
-			queuedEvents = append(queuedEvents, evtClusterJoinSuccess.NewWithIdentifiersAndData(ctx, &ids, joinResponseWithoutKeys(resp)))
+			queuedEvents = append(queuedEvents, evtClusterJoinSuccess.NewWithIdentifiersAndData(ctx, ids, joinResponseWithoutKeys(resp)))
 			return resp, queuedEvents, nil
 		}
 		logger.WithError(err).Info("Cluster-local Join Server did not accept join-request")
-		queuedEvents = append(queuedEvents, evtClusterJoinFail.NewWithIdentifiersAndData(ctx, &ids, err))
+		queuedEvents = append(queuedEvents, evtClusterJoinFail.NewWithIdentifiersAndData(ctx, ids, err))
 		if !errors.IsNotFound(err) {
 			return nil, queuedEvents, err
 		}
 	}
 	if ns.interopClient != nil {
-		queuedEvents = append(queuedEvents, evtInteropJoinAttempt.NewWithIdentifiersAndData(ctx, &ids, req))
+		queuedEvents = append(queuedEvents, evtInteropJoinAttempt.NewWithIdentifiersAndData(ctx, ids, req))
 		resp, err := ns.interopClient.HandleJoinRequest(ctx, ns.netID, req)
 		if err == nil {
 			logger.Debug("Join-request accepted by interop Join Server")
-			queuedEvents = append(queuedEvents, evtInteropJoinSuccess.NewWithIdentifiersAndData(ctx, &ids, joinResponseWithoutKeys(resp)))
+			queuedEvents = append(queuedEvents, evtInteropJoinSuccess.NewWithIdentifiersAndData(ctx, ids, joinResponseWithoutKeys(resp)))
 			return resp, queuedEvents, nil
 		}
 		logger.WithError(err).Warn("Interop Join Server did not accept join-request")
-		queuedEvents = append(queuedEvents, evtInteropJoinFail.NewWithIdentifiersAndData(ctx, &ids, err))
+		queuedEvents = append(queuedEvents, evtInteropJoinFail.NewWithIdentifiersAndData(ctx, ids, err))
 		if !errors.IsNotFound(err) {
 			return nil, queuedEvents, err
 		}
@@ -1062,21 +1062,21 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		return err
 	}
 	ctx = matchedCtx
-	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, matched.EndDeviceIdentifiers))
+	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, matched.Ids))
 
 	queuedEvents := []events.Event{
-		evtReceiveJoinRequest.NewWithIdentifiersAndData(ctx, &matched.EndDeviceIdentifiers, up),
+		evtReceiveJoinRequest.NewWithIdentifiersAndData(ctx, matched.Ids, up),
 	}
 	defer func() {
 		if err != nil {
-			queuedEvents = append(queuedEvents, evtDropJoinRequest.NewWithIdentifiersAndData(ctx, &matched.EndDeviceIdentifiers, err))
+			queuedEvents = append(queuedEvents, evtDropJoinRequest.NewWithIdentifiersAndData(ctx, matched.Ids, err))
 		}
 		publishEvents(ctx, queuedEvents...)
 	}()
 
 	if !matched.SupportsJoin {
 		log.FromContext(ctx).Warn("ABP device sent a join-request, drop")
-		queuedEvents = append(queuedEvents, evtDropJoinRequest.NewWithIdentifiersAndData(ctx, &matched.EndDeviceIdentifiers, errABPJoinRequest))
+		queuedEvents = append(queuedEvents, evtDropJoinRequest.NewWithIdentifiersAndData(ctx, matched.Ids, errABPJoinRequest))
 		return nil
 	}
 
@@ -1108,7 +1108,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		return err
 	}
 	if !ok {
-		queuedEvents = append(queuedEvents, evtDropJoinRequest.NewWithIdentifiersAndData(ctx, &matched.EndDeviceIdentifiers, errDuplicate))
+		queuedEvents = append(queuedEvents, evtDropJoinRequest.NewWithIdentifiersAndData(ctx, matched.Ids, errDuplicate))
 		registerReceiveDuplicateUplink(ctx, up)
 		return nil
 	}
@@ -1130,7 +1130,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		OptNeg:      matched.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0,
 	}
 
-	resp, joinEvents, err := ns.sendJoinRequest(ctx, matched.EndDeviceIdentifiers, &ttnpb.JoinRequest{
+	resp, joinEvents, err := ns.sendJoinRequest(ctx, matched.Ids, &ttnpb.JoinRequest{
 		Payload:            up.Payload,
 		CfList:             cfList,
 		CorrelationIds:     events.CorrelationIDsFromContext(ctx),
@@ -1190,7 +1190,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	}}
 
 	logger := log.FromContext(ctx)
-	stored, storedCtx, err := ns.devices.SetByID(ctx, *matched.EndDeviceIdentifiers.ApplicationIds, matched.EndDeviceIdentifiers.DeviceId,
+	stored, storedCtx, err := ns.devices.SetByID(ctx, matched.Ids.ApplicationIds, matched.Ids.DeviceId,
 		[]string{
 			"frequency_plan_id",
 			"lorawan_phy_version",
@@ -1221,10 +1221,10 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		downAt = earliestAt
 	}
 	logger.WithField("start_at", downAt).Debug("Add downlink task")
-	if err := ns.downlinkTasks.Add(ctx, stored.EndDeviceIdentifiers, downAt, true); err != nil {
+	if err := ns.downlinkTasks.Add(ctx, stored.Ids, downAt, true); err != nil {
 		logger.WithError(err).Error("Failed to add downlink task after join-request")
 	}
-	queuedEvents = append(queuedEvents, evtProcessJoinRequest.NewWithIdentifiersAndData(ctx, &matched.EndDeviceIdentifiers, up))
+	queuedEvents = append(queuedEvents, evtProcessJoinRequest.NewWithIdentifiersAndData(ctx, matched.Ids, up))
 	registerProcessUplink(ctx, up)
 	return nil
 }

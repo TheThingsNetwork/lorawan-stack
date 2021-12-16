@@ -204,7 +204,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			return
 		}
 		dev.PendingMacState.CurrentParameters.Channels = deviceChannels
-		dev.EndDeviceIdentifiers.DevAddr = &dev.PendingSession.DevAddr
+		dev.Ids.DevAddr = &dev.PendingSession.DevAddr
 		dev, ok = env.AssertHandleDataUplink(ctx, DataUplinkAssertionConfig{
 			Device:        dev,
 			ChannelIndex:  2,
@@ -274,14 +274,14 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		}
 		if !a.So(env.Events, should.ReceiveEventsResembling, events.Builders(downEvBuilders).New(
 			events.ContextWithCorrelationID(ctx, LastDownlink(dev.MacState.RecentDownlinks...).CorrelationIds...),
-			events.WithIdentifiers(&dev.EndDeviceIdentifiers)),
+			events.WithIdentifiers(dev.Ids)),
 		) {
 			t.Error("Data downlink event assertion failed")
 			return
 		}
 
 		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
-			if !a.So(env.AssertNsAsHandleUplink(ctx, *dev.ApplicationIds, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+			if !a.So(env.AssertNsAsHandleUplink(ctx, dev.Ids.ApplicationIds, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 				_, a := test.MustNewTFromContext(ctx)
 				if !a.So(ups, should.HaveLength, 1) {
 					return false
@@ -291,7 +291,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 					// TODO: Enable this assertion once https://github.com/TheThingsNetwork/lorawan-stack/issues/3416 is done.
 					// a.So(up.CorrelationIDs, should.HaveSameElementsDeep, LastDownlink(dev.RecentDownlinks...).CorrelationIDs),
 					a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-						EndDeviceIds:   &dev.EndDeviceIdentifiers,
+						EndDeviceIds:   dev.Ids,
 						CorrelationIds: up.CorrelationIds,
 						Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 							DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{

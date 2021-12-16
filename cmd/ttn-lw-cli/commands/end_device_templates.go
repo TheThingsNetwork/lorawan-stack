@@ -253,9 +253,11 @@ This command takes end device templates from stdin.`,
 					binary.BigEndian.PutUint64(devEUI[:], devEUIInt)
 					devEUIInt++
 
-					res.EndDevice.DeviceId = fmt.Sprintf("eui-%s", strings.ToLower(devEUI.String()))
-					res.EndDevice.JoinEui = &joinEUI
-					res.EndDevice.DevEui = &devEUI
+					res.EndDevice.Ids = &ttnpb.EndDeviceIdentifiers{
+						DeviceId: fmt.Sprintf("eui-%s", strings.ToLower(devEUI.String())),
+						JoinEui:  &joinEUI,
+						DevEui:   &devEUI,
+					}
 					res.FieldMask = &pbtypes.FieldMask{
 						Paths: ttnpb.BottomLevelFields(append(res.FieldMask.GetPaths(),
 							"ids.device_id",
@@ -403,10 +405,14 @@ command to assign EUIs to map to end device templates.`,
 				for _, e := range mapping {
 					switch {
 					case e.MappingKey != "" && e.MappingKey == inputEntry.MappingKey:
-					case e.EndDevice.GetApplicationIds().GetApplicationId() != "" && e.EndDevice.GetApplicationIds().GetApplicationId() == inputEntry.EndDevice.GetApplicationIds().GetApplicationId() &&
-						e.EndDevice.DeviceId != "" && e.EndDevice.DeviceId == inputEntry.EndDevice.DeviceId:
-					case e.EndDevice.DevEui != nil && inputEntry.EndDevice.DevEui != nil && e.EndDevice.DevEui.Equal(*inputEntry.EndDevice.DevEui):
-					case e.EndDevice.EndDeviceIdentifiers.IsZero():
+					case e.EndDevice.Ids != nil && inputEntry.EndDevice.Ids != nil &&
+						e.EndDevice.Ids.ApplicationIds != nil && inputEntry.EndDevice.Ids.ApplicationIds != nil &&
+						e.EndDevice.Ids.ApplicationIds.ApplicationId == inputEntry.EndDevice.Ids.ApplicationIds.ApplicationId &&
+						e.EndDevice.Ids.DeviceId != "" && e.EndDevice.Ids.DeviceId == inputEntry.EndDevice.Ids.DeviceId:
+					case e.EndDevice.Ids != nil && e.EndDevice.Ids.DevEui != nil &&
+						inputEntry.EndDevice.Ids != nil && inputEntry.EndDevice.Ids.DevEui != nil &&
+						e.EndDevice.Ids.DevEui.Equal(*inputEntry.EndDevice.Ids.DevEui):
+					case e.EndDevice.Ids.IsZero():
 					default:
 						continue
 					}

@@ -31,20 +31,20 @@ import (
 // EndDeviceLocationRegistry is a registry for end device locations.
 type EndDeviceLocationRegistry interface {
 	// Get retrieves the end device locations.
-	Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, error)
+	Get(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, error)
 	// Merge merges the end device locations.
-	Merge(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location) (map[string]*ttnpb.Location, error)
+	Merge(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location) (map[string]*ttnpb.Location, error)
 }
 
 type noopEndDeviceLocationRegistry struct{}
 
 // Get implements EndDeviceLocationRegistry.
-func (noopEndDeviceLocationRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, error) {
+func (noopEndDeviceLocationRegistry) Get(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, error) {
 	return nil, nil
 }
 
 // Merge implements EndDeviceLocationRegistry.
-func (noopEndDeviceLocationRegistry) Merge(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location) (map[string]*ttnpb.Location, error) {
+func (noopEndDeviceLocationRegistry) Merge(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location) (map[string]*ttnpb.Location, error) {
 	return update, nil
 }
 
@@ -58,13 +58,13 @@ type metricsEndDeviceLocationRegistry struct {
 }
 
 // Get implements EndDeviceLocationRegistry.
-func (m *metricsEndDeviceLocationRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, error) {
+func (m *metricsEndDeviceLocationRegistry) Get(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, error) {
 	registerMetadataRegistryRetrieval(ctx, locationLabel)
 	return m.inner.Get(ctx, ids)
 }
 
 // Merge implements EndDeviceLocationRegistry.
-func (m *metricsEndDeviceLocationRegistry) Merge(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location) (map[string]*ttnpb.Location, error) {
+func (m *metricsEndDeviceLocationRegistry) Merge(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location) (map[string]*ttnpb.Location, error) {
 	registerMetadataRegistryUpdate(ctx, locationLabel)
 	return m.inner.Merge(ctx, ids, update)
 }
@@ -93,7 +93,7 @@ type clusterEndDeviceLocationRegistry struct {
 }
 
 // Get implements EndDeviceLocationRegistry.
-func (c clusterEndDeviceLocationRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, error) {
+func (c clusterEndDeviceLocationRegistry) Get(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, error) {
 	cc, err := c.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
 	if err != nil {
 		return nil, err
@@ -102,7 +102,7 @@ func (c clusterEndDeviceLocationRegistry) Get(ctx context.Context, ids ttnpb.End
 	ctx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
 	dev, err := cl.Get(ctx, &ttnpb.GetEndDeviceRequest{
-		EndDeviceIds: &ids,
+		EndDeviceIds: ids,
 		FieldMask:    endDeviceLocationFieldMask,
 	}, c.WithClusterAuth())
 	if err != nil {
@@ -112,7 +112,7 @@ func (c clusterEndDeviceLocationRegistry) Get(ctx context.Context, ids ttnpb.End
 }
 
 // Merge implements EndDeviceLocationRegistry.
-func (c clusterEndDeviceLocationRegistry) Merge(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location) (map[string]*ttnpb.Location, error) {
+func (c clusterEndDeviceLocationRegistry) Merge(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location) (map[string]*ttnpb.Location, error) {
 	cc, err := c.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
 	if err != nil {
 		return nil, err
@@ -121,7 +121,7 @@ func (c clusterEndDeviceLocationRegistry) Merge(ctx context.Context, ids ttnpb.E
 	ctx, cancel := context.WithTimeout(ctx, c.timeout)
 	defer cancel()
 	dev, err := cl.Get(ctx, &ttnpb.GetEndDeviceRequest{
-		EndDeviceIds: &ids,
+		EndDeviceIds: ids,
 		FieldMask:    endDeviceLocationFieldMask,
 	}, c.WithClusterAuth())
 	if err != nil {
@@ -138,8 +138,8 @@ func (c clusterEndDeviceLocationRegistry) Merge(ctx context.Context, ids ttnpb.E
 	}
 	_, err = cl.Update(ctx, &ttnpb.UpdateEndDeviceRequest{
 		EndDevice: ttnpb.EndDevice{
-			EndDeviceIdentifiers: ids,
-			Locations:            dev.Locations,
+			Ids:       ids,
+			Locations: dev.Locations,
 		},
 		FieldMask: endDeviceLocationFieldMask,
 	}, c.WithClusterAuth())
@@ -169,7 +169,7 @@ type cachedEndDeviceLocationRegistry struct {
 }
 
 // Get implements EndDeviceLocationRegistry.
-func (c *cachedEndDeviceLocationRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, error) {
+func (c *cachedEndDeviceLocationRegistry) Get(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, error) {
 	locations, storedAt, err := c.cache.Get(ctx, ids)
 	switch {
 	case err != nil && !errors.IsNotFound(err):
@@ -201,7 +201,7 @@ func (c *cachedEndDeviceLocationRegistry) Get(ctx context.Context, ids ttnpb.End
 }
 
 // Merge implements EndDeviceLocationRegistry.
-func (c *cachedEndDeviceLocationRegistry) Merge(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location) (map[string]*ttnpb.Location, error) {
+func (c *cachedEndDeviceLocationRegistry) Merge(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location) (map[string]*ttnpb.Location, error) {
 	locations, err := c.registry.Merge(ctx, ids, update)
 	if err != nil {
 		return nil, err
@@ -230,7 +230,7 @@ func NewCachedEndDeviceLocationRegistry(ctx context.Context, c workerpool.Compon
 			Context:   ctx,
 			Name:      "replicate_end_device_locations",
 			Handler: func(ctx context.Context, item interface{}) {
-				ids := item.(ttnpb.EndDeviceIdentifiers)
+				ids := item.(*ttnpb.EndDeviceIdentifiers)
 				locations, err := registry.Get(ctx, ids)
 				if err != nil {
 					log.FromContext(ctx).WithError(err).Warn("Failed to retrieve end device locations")

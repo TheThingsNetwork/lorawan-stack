@@ -26,7 +26,7 @@ import (
 )
 
 var (
-	registeredEndDeviceIDs = ttnpb.EndDeviceIdentifiers{
+	registeredEndDeviceIDs = &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: &ttnpb.ApplicationIdentifiers{
 			ApplicationId: "foo",
 		},

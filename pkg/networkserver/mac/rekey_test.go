@@ -50,6 +50,7 @@ func TestHandleRekeyInd(t *testing.T) {
 			Name: "empty queue/original",
 			Device: &ttnpb.EndDevice{
 				SupportsJoin: true,
+				Ids:          &ttnpb.EndDeviceIdentifiers{},
 				PendingSession: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastFCntUp:    42,
@@ -63,7 +64,7 @@ func TestHandleRekeyInd(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				SupportsJoin: true,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevAddr: &test.DefaultDevAddr,
 				},
 				Session: &ttnpb.Session{
@@ -96,7 +97,7 @@ func TestHandleRekeyInd(t *testing.T) {
 			Name: "empty queue/retransmission/non-matching pending session",
 			Device: &ttnpb.EndDevice{
 				SupportsJoin: true,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevAddr: &test.DefaultDevAddr,
 				},
 				Session: &ttnpb.Session{
@@ -117,7 +118,7 @@ func TestHandleRekeyInd(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				SupportsJoin: true,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevAddr: &test.DefaultDevAddr,
 				},
 				Session: &ttnpb.Session{
@@ -150,7 +151,7 @@ func TestHandleRekeyInd(t *testing.T) {
 			Name: "empty queue/retransmission/no pending session",
 			Device: &ttnpb.EndDevice{
 				SupportsJoin: true,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevAddr: &test.DefaultDevAddr,
 				},
 				Session: &ttnpb.Session{
@@ -162,7 +163,7 @@ func TestHandleRekeyInd(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				SupportsJoin: true,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevAddr: &test.DefaultDevAddr,
 				},
 				Session: &ttnpb.Session{
@@ -195,6 +196,7 @@ func TestHandleRekeyInd(t *testing.T) {
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
 				SupportsJoin: true,
+				Ids:          &ttnpb.EndDeviceIdentifiers{},
 				PendingSession: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
 					LastFCntUp:    42,
@@ -212,7 +214,7 @@ func TestHandleRekeyInd(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				SupportsJoin: true,
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevAddr: &test.DefaultDevAddr,
 				},
 				Session: &ttnpb.Session{

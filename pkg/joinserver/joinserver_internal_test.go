@@ -37,10 +37,10 @@ type JsDeviceServer = jsEndDeviceRegistryServer
 
 type MockDeviceRegistry struct {
 	GetByEUIFunc  func(context.Context, types.EUI64, types.EUI64, []string) (*ttnpb.ContextualEndDevice, error)
-	GetByIDFunc   func(context.Context, ttnpb.ApplicationIdentifiers, string, []string) (*ttnpb.EndDevice, error)
+	GetByIDFunc   func(context.Context, *ttnpb.ApplicationIdentifiers, string, []string) (*ttnpb.EndDevice, error)
 	SetByEUIFunc  func(context.Context, types.EUI64, types.EUI64, []string, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.ContextualEndDevice, error)
-	SetByIDFunc   func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
-	RangeByIDFunc func(context.Context, []string, func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error
+	SetByIDFunc   func(context.Context, *ttnpb.ApplicationIdentifiers, string, []string, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+	RangeByIDFunc func(context.Context, []string, func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error
 }
 
 // GetByEUI calls GetByEUIFunc if set and panics otherwise.
@@ -52,7 +52,7 @@ func (m MockDeviceRegistry) GetByEUI(ctx context.Context, joinEUI types.EUI64, d
 }
 
 // GetByID calls GetByIDFunc if set and panics otherwise.
-func (m MockDeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
+func (m MockDeviceRegistry) GetByID(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
 	if m.GetByIDFunc == nil {
 		panic("GetByID called, but not set")
 	}
@@ -68,7 +68,7 @@ func (m MockDeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, d
 }
 
 // SetByID calls SetByIDFunc if set and panics otherwise.
-func (m MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+func (m MockDeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	if m.SetByIDFunc == nil {
 		panic("SetByID called, but not set")
 	}
@@ -76,7 +76,7 @@ func (m MockDeviceRegistry) SetByID(ctx context.Context, appID ttnpb.Application
 }
 
 // SetByID calls SetByIDFunc if set and panics otherwise.
-func (m MockDeviceRegistry) RangeByID(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
+func (m MockDeviceRegistry) RangeByID(ctx context.Context, paths []string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
 	if m.SetByIDFunc == nil {
 		panic("SetByID called, but not set")
 	}

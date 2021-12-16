@@ -72,8 +72,8 @@ func selectEndDeviceFields(ctx context.Context, query *gorm.DB, fieldMask *pbtyp
 func (s *deviceStore) CreateEndDevice(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, error) {
 	defer trace.StartRegion(ctx, "create end device").End()
 	devModel := EndDevice{
-		ApplicationID: dev.GetApplicationIds().GetApplicationId(), // The ApplicationID is not mutated by fromPB.
-		DeviceID:      dev.DeviceId,                               // The DeviceID is not mutated by fromPB.
+		ApplicationID: dev.GetIds().GetApplicationIds().GetApplicationId(), // The ApplicationID is not mutated by fromPB.
+		DeviceID:      dev.GetIds().GetDeviceId(),                          // The DeviceID is not mutated by fromPB.
 	}
 	devModel.fromPB(dev, nil)
 	if err := s.createEntity(ctx, &devModel); err != nil {
@@ -163,12 +163,12 @@ func (s *deviceStore) GetEndDevice(ctx context.Context, id *ttnpb.EndDeviceIdent
 
 func (s *deviceStore) UpdateEndDevice(ctx context.Context, dev *ttnpb.EndDevice, fieldMask *pbtypes.FieldMask) (updated *ttnpb.EndDevice, err error) {
 	defer trace.StartRegion(ctx, "update end device").End()
-	query := s.query(ctx, EndDevice{}, withApplicationID(dev.GetApplicationIds().GetApplicationId()), withDeviceID(dev.GetDeviceId()))
+	query := s.query(ctx, EndDevice{}, withApplicationID(dev.GetIds().GetApplicationIds().GetApplicationId()), withDeviceID(dev.GetIds().GetDeviceId()))
 	query = selectEndDeviceFields(ctx, query, fieldMask)
 	var devModel EndDevice
 	if err = query.First(&devModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errNotFoundForID(dev.EndDeviceIdentifiers)
+			return nil, errNotFoundForID(dev.Ids)
 		}
 		return nil, err
 	}

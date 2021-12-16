@@ -59,7 +59,7 @@ var (
 )
 
 // EncodeDownlink encodes the message's DecodedPayload to FRMPayload using the given script.
-func (h *host) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
+func (h *host) EncodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
 	defer trace.StartRegion(ctx, "encode downlink message").End()
 
 	decoded := msg.DecodedPayload
@@ -127,7 +127,7 @@ type decodeUplinkOutput struct {
 }
 
 // DecodeUplink decodes the message's FRMPayload to DecodedPayload using the given script.
-func (h *host) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, script string) error {
+func (h *host) DecodeUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, script string) error {
 	defer trace.StartRegion(ctx, "decode uplink message").End()
 
 	input := decodeUplinkInput{
@@ -187,7 +187,7 @@ type decodeDownlinkOutput struct {
 }
 
 // DecodeUplink decodes the message's FRMPayload to DecodedPayload using the given script.
-func (h *host) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
+func (h *host) DecodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
 	defer trace.StartRegion(ctx, "decode downlink message").End()
 
 	input := decodeDownlinkInput{

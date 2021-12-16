@@ -31,7 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func DeleteDevice(ctx context.Context, r DeviceRegistry, ids ttnpb.EndDeviceIdentifiers) error {
+func DeleteDevice(ctx context.Context, r DeviceRegistry, ids *ttnpb.EndDeviceIdentifiers) error {
 	_, err := r.Set(ctx, ids, nil, func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) { return nil, nil, nil })
 	return err
 }
@@ -42,7 +42,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	ctx := test.Context()
 
 	pb := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+		Ids: &ttnpb.EndDeviceIdentifiers{
 			JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
@@ -57,7 +57,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 		SkipPayloadCryptoOverride: &pbtypes.BoolValue{Value: true},
 	}
 
-	ret, err := reg.Get(ctx, pb.EndDeviceIdentifiers, ttnpb.EndDeviceFieldPathsTopLevel)
+	ret, err := reg.Get(ctx, pb.Ids, ttnpb.EndDeviceFieldPathsTopLevel)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
@@ -65,7 +65,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 
 	start := time.Now()
 
-	ret, err = reg.Set(ctx, pb.EndDeviceIdentifiers,
+	ret, err = reg.Set(ctx, pb.Ids,
 		[]string{
 			"ids.application_ids",
 			"ids.dev_eui",
@@ -100,7 +100,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	pb.SkipPayloadCrypto = true // Set because SkipPayloadCryptoOverride.GetValue() == true
 	a.So(ret, should.HaveEmptyDiff, pb)
 
-	ret, err = reg.Set(ctx, pb.EndDeviceIdentifiers,
+	ret, err = reg.Set(ctx, pb.Ids,
 		[]string{
 			"ids.application_ids",
 			"ids.dev_eui",
@@ -134,7 +134,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	pb.SkipPayloadCryptoOverride = ret.SkipPayloadCryptoOverride
 	a.So(ret, should.HaveEmptyDiff, pb)
 
-	ret, err = reg.Set(ctx, pb.EndDeviceIdentifiers,
+	ret, err = reg.Set(ctx, pb.Ids,
 		[]string{
 			"ids.application_ids",
 			"ids.dev_eui",
@@ -154,16 +154,16 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 	}
 	a.So(ret, should.HaveEmptyDiff, pb)
 
-	ret, err = reg.Get(ctx, pb.EndDeviceIdentifiers, ttnpb.EndDeviceFieldPathsTopLevel)
+	ret, err = reg.Get(ctx, pb.Ids, ttnpb.EndDeviceFieldPathsTopLevel)
 	a.So(err, should.BeNil)
 	a.So(ret, should.HaveEmptyDiff, pb)
 
-	err = DeleteDevice(ctx, reg, pb.EndDeviceIdentifiers)
+	err = DeleteDevice(ctx, reg, pb.Ids)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 
-	ret, err = reg.Get(ctx, pb.EndDeviceIdentifiers, ttnpb.EndDeviceFieldPathsTopLevel)
+	ret, err = reg.Get(ctx, pb.Ids, ttnpb.EndDeviceFieldPathsTopLevel)
 	if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 		t.Fatalf("Error received: %v", err)
 	}
@@ -373,7 +373,7 @@ func TestApplicationUplinksRegistry(t *testing.T) {
 				Limit: 16,
 			}
 
-			ids := ttnpb.EndDeviceIdentifiers{
+			ids := &ttnpb.EndDeviceIdentifiers{
 				ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
 				DeviceId:       "test-dev",
 			}
