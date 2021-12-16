@@ -1,0 +1,240 @@
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package storetest
+
+import (
+	. "testing"
+	"time"
+
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+)
+
+func (st *StoreTest) TestClientStoreCRUD(t *T) {
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+		is.ClientStore
+	})
+	defer st.DestroyDB(t, true)
+	if !ok {
+		t.Fatal("Store does not implement ClientStore")
+	}
+
+	mask := fieldMask(ttnpb.ClientFieldPathsTopLevel...)
+
+	var created *ttnpb.Client
+
+	t.Run("CreateClient", func(t *T) {
+		a, ctx := test.New(t)
+		var err error
+		start := time.Now().Truncate(time.Second)
+
+		created, err = s.CreateClient(ctx, &ttnpb.Client{
+			Ids:         &ttnpb.ClientIdentifiers{ClientId: "foo"},
+			Name:        "Foo Name",
+			Description: "Foo Description",
+			Attributes: map[string]string{
+				"foo": "bar",
+				"bar": "baz",
+				"baz": "qux",
+			},
+		})
+
+		if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
+			a.So(created.GetIds().GetClientId(), should.Equal, "foo")
+			a.So(created.Name, should.Equal, "Foo Name")
+			a.So(created.Description, should.Equal, "Foo Description")
+			a.So(created.Attributes, should.Resemble, map[string]string{
+				"foo": "bar",
+				"bar": "baz",
+				"baz": "qux",
+			})
+			a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenWithin, 5*time.Second, start)
+			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenWithin, 5*time.Second, start)
+		}
+	})
+
+	t.Run("CreateClient_AfterCreate", func(t *T) {
+		a, ctx := test.New(t)
+		_, err := s.CreateClient(ctx, &ttnpb.Client{
+			Ids: &ttnpb.ClientIdentifiers{ClientId: "foo"},
+		})
+		a.So(err, should.NotBeNil)
+	})
+
+	t.Run("GetClient", func(t *T) {
+		a, ctx := test.New(t)
+		got, err := s.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, mask)
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.Resemble, created)
+		}
+	})
+
+	t.Run("GetClient_Other", func(t *T) {
+		a, ctx := test.New(t)
+		_, err := s.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "other"}, mask)
+		a.So(err, should.NotBeNil)
+		// _, err = s.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: ""}, mask)
+		// a.So(err, should.NotBeNil)
+	})
+
+	t.Run("FindClients", func(t *T) {
+		a, ctx := test.New(t)
+		got, err := s.FindClients(ctx, nil, mask)
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) && a.So(got, should.HaveLength, 1) {
+			a.So(got[0], should.Resemble, created)
+		}
+	})
+
+	var updated *ttnpb.Client
+
+	t.Run("UpdateClient", func(t *T) {
+		a, ctx := test.New(t)
+		var err error
+		start := time.Now().Truncate(time.Second)
+
+		updated, err = s.UpdateClient(ctx, &ttnpb.Client{
+			Ids:         &ttnpb.ClientIdentifiers{ClientId: "foo"},
+			Name:        "New Foo Name",
+			Description: "New Foo Description",
+			Attributes: map[string]string{
+				"attribute": "new",
+			},
+		}, mask)
+		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
+			a.So(updated.GetIds().GetClientId(), should.Equal, "foo")
+			a.So(updated.Name, should.Equal, "New Foo Name")
+			a.So(updated.Description, should.Equal, "New Foo Description")
+			a.So(updated.Attributes, should.Resemble, map[string]string{
+				"attribute": "new",
+			})
+			a.So(*ttnpb.StdTime(updated.CreatedAt), should.Equal, *ttnpb.StdTime(created.CreatedAt))
+			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenWithin, 5*time.Second, start)
+		}
+	})
+
+	t.Run("UpdateClient_Other", func(t *T) {
+		a, ctx := test.New(t)
+		_, err := s.UpdateClient(ctx, &ttnpb.Client{
+			Ids: &ttnpb.ClientIdentifiers{ClientId: "other"},
+		}, mask)
+		a.So(err, should.NotBeNil)
+		// _, err = s.UpdateClient(ctx, &ttnpb.Client{
+		// 	Ids: &ttnpb.ClientIdentifiers{ClientId: ""},
+		// }, mask)
+		// a.So(err, should.NotBeNil)
+	})
+
+	t.Run("GetClient_AfterUpdate", func(t *T) {
+		a, ctx := test.New(t)
+		got, err := s.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, mask)
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.Resemble, updated)
+		}
+	})
+
+	t.Run("DeleteClient", func(t *T) {
+		a, ctx := test.New(t)
+		err := s.DeleteClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"})
+		a.So(err, should.BeNil)
+	})
+
+	t.Run("DeleteClient_Other", func(t *T) {
+		a, ctx := test.New(t)
+		err := s.DeleteClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "other"})
+		a.So(err, should.NotBeNil)
+		// err = s.DeleteClient(ctx, &ttnpb.ClientIdentifiers{ClientId: ""})
+		// a.So(err, should.NotBeNil)
+	})
+
+	t.Run("GetClient_AfterDelete", func(t *T) {
+		a, ctx := test.New(t)
+		_, err := s.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, mask)
+		a.So(err, should.NotBeNil)
+	})
+
+	t.Run("FindClients_AfterDelete", func(t *T) {
+		a, ctx := test.New(t)
+		got, err := s.FindClients(ctx, nil, mask)
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.BeEmpty)
+		}
+	})
+
+	t.Run("GetDeletedClient", func(t *T) {
+		a, ctx := test.New(t)
+		ctx = store.WithSoftDeleted(ctx, true)
+		got, err := s.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, mask)
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			if a.So(got.DeletedAt, should.NotBeNil) {
+				got.DeletedAt = nil // Unset DeletedAt for the should.Resemble below.
+			}
+			a.So(got, should.Resemble, updated)
+		}
+	})
+
+	t.Run("FindDeletedClients", func(t *T) {
+		a, ctx := test.New(t)
+		ctx = store.WithSoftDeleted(ctx, true)
+		got, err := s.FindClients(ctx, nil, mask)
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) && a.So(got, should.HaveLength, 1) {
+			if a.So(got[0].DeletedAt, should.NotBeNil) {
+				got[0].DeletedAt = nil // Unset DeletedAt for the should.Resemble below.
+			}
+			a.So(got[0], should.Resemble, updated)
+		}
+	})
+
+	t.Run("RestoreClient", func(t *T) {
+		a, ctx := test.New(t)
+		err := s.RestoreClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"})
+		a.So(err, should.BeNil)
+	})
+
+	t.Run("RestoreClient_Other", func(t *T) {
+		a, ctx := test.New(t)
+		err := s.RestoreClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "other"})
+		a.So(err, should.NotBeNil)
+		// err = s.RestoreClient(ctx, &ttnpb.ClientIdentifiers{ClientId: ""})
+		// a.So(err, should.NotBeNil)
+	})
+
+	t.Run("GetClient_AfterRestore", func(t *T) {
+		a, ctx := test.New(t)
+		got, err := s.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, mask)
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.Resemble, updated)
+		}
+	})
+
+	t.Run("PurgeClient", func(t *T) {
+		a, ctx := test.New(t)
+		err := s.PurgeClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"})
+		a.So(err, should.BeNil)
+	})
+
+	t.Run("PurgeClient_Other", func(t *T) {
+		a, ctx := test.New(t)
+		err := s.PurgeClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "other"})
+		a.So(err, should.NotBeNil)
+		// err = s.PurgeClient(ctx, &ttnpb.ClientIdentifiers{ClientId: ""})
+		// a.So(err, should.NotBeNil)
+	})
+}
+
+// TODO: Test Pagination

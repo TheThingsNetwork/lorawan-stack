@@ -16,6 +16,10 @@ package ttnpb
 
 // All EntityType methods implement the IDStringer interface.
 
+func (m *User) EntityType() string {
+	return m.GetIds().EntityType()
+}
+
 func (m *GetUserRequest) EntityType() string {
 	return m.GetUserIds().EntityType()
 }
@@ -73,6 +77,10 @@ func (m *CreateLoginTokenRequest) EntityType() string {
 }
 
 // All IDString methods implement the IDStringer interface.
+
+func (m *User) IDString() string {
+	return m.GetIds().IDString()
+}
 
 func (m *GetUserRequest) IDString() string {
 	return m.GetUserIds().IDString()
