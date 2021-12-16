@@ -1,4 +1,7 @@
 name: End-to-end Tests
+concurrency: 
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
 on:
   pull_request:
     paths:
@@ -16,7 +19,11 @@ on:
       - 'cypress/**'
       - 'docker-compose.yml'
       - '.github/workflows/e2e.yml'
-
+env:
+  TTN_LW_LOG_LEVEL: debug
+  CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+  CYPRESS_FAIL_FAST: true
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   determine-if-required:
     name: Determine if run is required
@@ -54,10 +61,6 @@ jobs:
     runs-on: ubuntu-20.04
     needs: determine-if-required
     if: needs.determine-if-required.outputs.needs-to-run == 'true'
-    env:
-      TTN_LW_LOG_LEVEL: debug
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      NODE_ENV: production
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -165,10 +168,8 @@ jobs:
     name: Main frontend end-to-end tests (Chrome)
     runs-on: ubuntu-20.04
     env:
-      TTN_LW_LOG_LEVEL: debug
-      CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       NODE_ENV: development
+      CYPRESS_MACHINE_NUMBER: ${{ matrix.machines }}
     strategy:
       matrix:
         machines: [1, 2, 3, 4]
@@ -184,6 +185,22 @@ jobs:
         name: Download build artifacts
         with:
           name: 'build-files'
+      - name: Download last failed spec
+        uses: dawidd6/action-download-artifact@v2
+        continue-on-error: true
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          workflow: e2e.yml
+          branch: ${{ github.head_ref }}
+          workflow_conclusion: completed
+          name: cypress-failed-test-spec
+          search_artifacts: true
+      - name: Read failed spec file
+        id: get-failed-spec
+        continue-on-error: true
+        run: |
+          echo "::set-output name=failed-test::$(paste -d , .failed-specs-*.txt)"
+          echo "::set-output name=neg-failed-test::!$(paste -d ',!' .failed-specs-*.txt)"
       - name: Unzip build artifacts
         run: unzip -o build.zip
       - name: Initialize Yarn module cache
@@ -200,6 +217,17 @@ jobs:
         run: tools/bin/mage dev:dbStart dev:sqlRestore dev:sqlCreateSeedDb
       - name: Run stack
         run: tools/bin/mage dev:startDevStack &
+      - name: Run previously failed test first
+        uses: cypress-io/github-action@v2
+        if: steps.get-failed-spec.outputs.failed-test != ''
+        with:
+          config-file: config/cypress.json
+          config: baseUrl=https://localhost:8885
+          record: true
+          parallel: true
+          browser: chrome
+          group: previously-failed-${{ needs.determine-if-required.outputs.hash }}
+          spec: ${{ steps.get-failed-spec.outputs.failed-test }}
       - name: Run frontend end-to-end tests
         uses: cypress-io/github-action@v2
         with:
@@ -209,6 +237,10 @@ jobs:
           parallel: true
           browser: chrome
           group: main-${{ needs.determine-if-required.outputs.hash }}
+          spec: |
+            **/*
+            !cypress/integration/smoke/smoke.spec.js
+            ${{ steps.get-failed-spec.outputs.neg-failed-test }}
       - name: Upload logs
         uses: actions/upload-artifact@v2
         if: failure()
@@ -221,14 +253,16 @@ jobs:
         with:
           name: cypress-screenshots
           path: cypress/screenshots
+      - name: Upload name of failing test
+        uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: cypress-failed-test-spec
+          path: .cache/.failed-specs-*.txt
   cross-browser-smoke:
     name: Cross-browser smoke tests (Firefox 78 ESR)
     runs-on: ubuntu-20.04
     env:
-      TTN_LW_LOG_LEVEL: debug
-      COCKROACHDB_COCKROACH_TAG: v19.2.12
-      CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       NODE_ENV: development
     needs: [determine-if-required, preparation]
     if: needs.determine-if-required.outputs.needs-to-run == 'true'
