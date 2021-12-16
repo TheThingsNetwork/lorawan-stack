@@ -314,6 +314,20 @@ Cypress.Commands.add('createPubSub', (applicationId, pubSub) => {
   })
 })
 
+// Helper function to create a new pub sub programmatically.
+Cypress.Commands.add('createWebhook', (applicationId, webhook) => {
+  const baseUrl = Cypress.config('baseUrl')
+  const adminApiKey = Cypress.config('adminApiKey')
+  cy.request({
+    method: 'POST',
+    url: `${baseUrl}/api/v3/as/webhooks/${applicationId}`,
+    body: webhook,
+    headers: {
+      Authorization: `Bearer ${adminApiKey}`,
+    },
+  })
+})
+
 // Helper function to update gateway programmatically.
 Cypress.Commands.add('updateGateway', (gatewayId, gateway) => {
   const baseUrl = Cypress.config('baseUrl')
