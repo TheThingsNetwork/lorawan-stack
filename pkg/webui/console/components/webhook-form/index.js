@@ -351,7 +351,6 @@ export default class WebhookForm extends Component {
           <Form.SubTitle title={m.endpointSettings} />
           <Form.Field
             name="base_url"
-            type="button"
             title={sharedMessages.webhookBaseUrl}
             placeholder="https://example.com/webhooks"
             component={Input}
