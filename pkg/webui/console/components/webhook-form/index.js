@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -65,10 +65,20 @@ const m = defineMessages({
     'This webhook has been deactivated due to several unsuccessful forwarding attempts. It will be automatically reactivated after 24 hours. If you wish to reactivate right away, you can use the button below.',
   pendingInfo:
     'This webhook is currently pending until attempting its first regular request attempt. Note that webhooks can be deactivated if they encounter too many request failures.',
+  messagePathValidateTooLong: 'Enabled message path must be at most 64 characters',
 })
 
 const headerCheck = headers =>
   headers.length === 0 || headers.every(({ value, key }) => value !== '' && key !== '')
+const messageCheck = message => {
+  if (message && message.enabled) {
+    const { value } = message
+
+    return value ? value.length <= 64 : true
+  }
+
+  return true
+}
 
 const validationSchema = Yup.object().shape({
   webhook_id: Yup.string()
@@ -93,6 +103,66 @@ const validationSchema = Yup.object().shape({
     webhookAPIKeyRegexp,
     Yup.passValues(sharedMessages.validateApiKey),
   ),
+  uplink_message: Yup.object()
+    .shape({
+      enabled: Yup.boolean(),
+      value: Yup.string(),
+    })
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
+  join_accept: Yup.object()
+    .shape({
+      enabled: Yup.boolean(),
+      value: Yup.string(),
+    })
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
+  downlink_ack: Yup.object()
+    .shape({
+      enabled: Yup.boolean(),
+      value: Yup.string(),
+    })
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
+  downlink_nack: Yup.object()
+    .shape({
+      enabled: Yup.boolean(),
+      value: Yup.string(),
+    })
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
+  downlink_sent: Yup.object()
+    .shape({
+      enabled: Yup.boolean(),
+      value: Yup.string(),
+    })
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
+  downlink_failed: Yup.object()
+    .shape({
+      enabled: Yup.boolean(),
+      value: Yup.string(),
+    })
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
+  downlink_queued: Yup.object()
+    .shape({
+      enabled: Yup.boolean(),
+      value: Yup.string(),
+    })
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
+  downlink_queue_invalidated: Yup.object()
+    .shape({
+      enabled: Yup.boolean(),
+      value: Yup.string(),
+    })
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
+  location_solved: Yup.object()
+    .shape({
+      enabled: Yup.boolean(),
+      value: Yup.string(),
+    })
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
+  service_data: Yup.object()
+    .shape({
+      enabled: Yup.boolean(),
+      value: Yup.string(),
+    })
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
 })
 
 export default class WebhookForm extends Component {
@@ -281,7 +351,6 @@ export default class WebhookForm extends Component {
           <Form.SubTitle title={m.endpointSettings} />
           <Form.Field
             name="base_url"
-            type="button"
             title={sharedMessages.webhookBaseUrl}
             placeholder="https://example.com/webhooks"
             component={Input}
