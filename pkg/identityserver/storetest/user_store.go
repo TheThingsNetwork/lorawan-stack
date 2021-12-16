@@ -18,6 +18,7 @@ import (
 	. "testing"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -121,13 +122,17 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 		_, err := s.CreateUser(ctx, &ttnpb.User{
 			Ids: &ttnpb.UserIdentifiers{UserId: "foo"},
 		})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsAlreadyExists(err), should.BeTrue)
+		}
 
 		_, err = s.CreateUser(ctx, &ttnpb.User{
 			Ids:                 &ttnpb.UserIdentifiers{UserId: "other"},
 			PrimaryEmailAddress: "foo@example.com",
 		})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsAlreadyExists(err), should.BeTrue)
+		}
 	})
 
 	t.Run("GetUser", func(t *T) {
@@ -141,9 +146,13 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 	t.Run("GetUser_Other", func(t *T) {
 		a, ctx := test.New(t)
 		_, err := s.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: "other"}, mask)
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// _, err = s.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: ""}, mask)
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	t.Run("GetUserByPrimaryEmailAddress", func(t *T) {
@@ -230,11 +239,15 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 		_, err := s.UpdateUser(ctx, &ttnpb.User{
 			Ids: &ttnpb.UserIdentifiers{UserId: "other"},
 		}, mask)
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// _, err = s.UpdateUser(ctx, &ttnpb.User{
 		// 	Ids: &ttnpb.UserIdentifiers{UserId: ""},
 		// }, mask)
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	t.Run("GetUser_AfterUpdate", func(t *T) {
@@ -254,15 +267,21 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 	t.Run("DeleteUser_Other", func(t *T) {
 		a, ctx := test.New(t)
 		err := s.DeleteUser(ctx, &ttnpb.UserIdentifiers{UserId: "other"})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// err = s.DeleteUser(ctx, &ttnpb.UserIdentifiers{UserId: ""})
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	t.Run("GetUser_AfterDelete", func(t *T) {
 		a, ctx := test.New(t)
 		_, err := s.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: "foo"}, mask)
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 	})
 
 	t.Run("FindUsers_AfterDelete", func(t *T) {
@@ -306,9 +325,13 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 	t.Run("RestoreUser_Other", func(t *T) {
 		a, ctx := test.New(t)
 		err := s.RestoreUser(ctx, &ttnpb.UserIdentifiers{UserId: "other"})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// err = s.RestoreUser(ctx, &ttnpb.UserIdentifiers{UserId: ""})
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	t.Run("GetUser_AfterRestore", func(t *T) {
@@ -328,9 +351,13 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 	t.Run("PurgeUser_Other", func(t *T) {
 		a, ctx := test.New(t)
 		err := s.PurgeUser(ctx, &ttnpb.UserIdentifiers{UserId: "other"})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// err = s.PurgeUser(ctx, &ttnpb.UserIdentifiers{UserId: ""})
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 }
 

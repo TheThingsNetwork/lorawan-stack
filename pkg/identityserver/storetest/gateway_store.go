@@ -18,6 +18,7 @@ import (
 	. "testing"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -143,12 +144,16 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		_, err := s.CreateGateway(ctx, &ttnpb.Gateway{
 			Ids: &ttnpb.GatewayIdentifiers{GatewayId: "foo"},
 		})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsAlreadyExists(err), should.BeTrue)
+		}
 
 		_, err = s.CreateGateway(ctx, &ttnpb.Gateway{
 			Ids: &ttnpb.GatewayIdentifiers{GatewayId: "other", Eui: eui},
 		})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsAlreadyExists(err), should.BeTrue)
+		}
 	})
 
 	t.Run("GetGateway", func(t *T) {
@@ -170,9 +175,13 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 	t.Run("GetGateway_Other", func(t *T) {
 		a, ctx := test.New(t)
 		_, err := s.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "other"}, mask)
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// _, err = s.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: ""}, mask)
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	t.Run("FindGateways", func(t *T) {
@@ -284,11 +293,15 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		_, err := s.UpdateGateway(ctx, &ttnpb.Gateway{
 			Ids: &ttnpb.GatewayIdentifiers{GatewayId: "other"},
 		}, mask)
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// _, err = s.UpdateGateway(ctx, &ttnpb.Gateway{
 		// 	Ids: &ttnpb.GatewayIdentifiers{GatewayId: ""},
 		// }, mask)
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	t.Run("GetGateway_AfterUpdate", func(t *T) {
@@ -308,9 +321,13 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 	t.Run("DeleteGateway_Other", func(t *T) {
 		a, ctx := test.New(t)
 		err := s.DeleteGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "other"})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// err = s.DeleteGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: ""})
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	updated.Ids.Eui = nil // Unset EUI for the should.Resembles below.
@@ -318,7 +335,9 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 	t.Run("GetGateway_AfterDelete", func(t *T) {
 		a, ctx := test.New(t)
 		_, err := s.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo"}, mask)
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 	})
 
 	t.Run("FindGateways_AfterDelete", func(t *T) {
@@ -362,9 +381,13 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 	t.Run("RestoreGateway_Other", func(t *T) {
 		a, ctx := test.New(t)
 		err := s.RestoreGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "other"})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// err = s.RestoreGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: ""})
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	t.Run("GetGateway_AfterRestore", func(t *T) {
@@ -384,9 +407,13 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 	t.Run("PurgeGateway_Other", func(t *T) {
 		a, ctx := test.New(t)
 		err := s.PurgeGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "other"})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// err = s.PurgeGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: ""})
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 }
 

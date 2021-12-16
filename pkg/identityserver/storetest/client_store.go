@@ -18,6 +18,7 @@ import (
 	. "testing"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -74,7 +75,9 @@ func (st *StoreTest) TestClientStoreCRUD(t *T) {
 		_, err := s.CreateClient(ctx, &ttnpb.Client{
 			Ids: &ttnpb.ClientIdentifiers{ClientId: "foo"},
 		})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsAlreadyExists(err), should.BeTrue)
+		}
 	})
 
 	t.Run("GetClient", func(t *T) {
@@ -88,9 +91,13 @@ func (st *StoreTest) TestClientStoreCRUD(t *T) {
 	t.Run("GetClient_Other", func(t *T) {
 		a, ctx := test.New(t)
 		_, err := s.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "other"}, mask)
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// _, err = s.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: ""}, mask)
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	t.Run("FindClients", func(t *T) {
@@ -133,11 +140,15 @@ func (st *StoreTest) TestClientStoreCRUD(t *T) {
 		_, err := s.UpdateClient(ctx, &ttnpb.Client{
 			Ids: &ttnpb.ClientIdentifiers{ClientId: "other"},
 		}, mask)
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// _, err = s.UpdateClient(ctx, &ttnpb.Client{
 		// 	Ids: &ttnpb.ClientIdentifiers{ClientId: ""},
 		// }, mask)
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	t.Run("GetClient_AfterUpdate", func(t *T) {
@@ -157,15 +168,21 @@ func (st *StoreTest) TestClientStoreCRUD(t *T) {
 	t.Run("DeleteClient_Other", func(t *T) {
 		a, ctx := test.New(t)
 		err := s.DeleteClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "other"})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// err = s.DeleteClient(ctx, &ttnpb.ClientIdentifiers{ClientId: ""})
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	t.Run("GetClient_AfterDelete", func(t *T) {
 		a, ctx := test.New(t)
 		_, err := s.GetClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo"}, mask)
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 	})
 
 	t.Run("FindClients_AfterDelete", func(t *T) {
@@ -209,9 +226,13 @@ func (st *StoreTest) TestClientStoreCRUD(t *T) {
 	t.Run("RestoreClient_Other", func(t *T) {
 		a, ctx := test.New(t)
 		err := s.RestoreClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "other"})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// err = s.RestoreClient(ctx, &ttnpb.ClientIdentifiers{ClientId: ""})
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	t.Run("GetClient_AfterRestore", func(t *T) {
@@ -231,9 +252,13 @@ func (st *StoreTest) TestClientStoreCRUD(t *T) {
 	t.Run("PurgeClient_Other", func(t *T) {
 		a, ctx := test.New(t)
 		err := s.PurgeClient(ctx, &ttnpb.ClientIdentifiers{ClientId: "other"})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// err = s.PurgeClient(ctx, &ttnpb.ClientIdentifiers{ClientId: ""})
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 }
 

@@ -18,6 +18,7 @@ import (
 	. "testing"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -74,7 +75,9 @@ func (st *StoreTest) TestApplicationStoreCRUD(t *T) {
 		_, err := s.CreateApplication(ctx, &ttnpb.Application{
 			Ids: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
 		})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsAlreadyExists(err), should.BeTrue)
+		}
 	})
 
 	t.Run("GetApplication", func(t *T) {
@@ -88,9 +91,13 @@ func (st *StoreTest) TestApplicationStoreCRUD(t *T) {
 	t.Run("GetApplication_Other", func(t *T) {
 		a, ctx := test.New(t)
 		_, err := s.GetApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: "other"}, mask)
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// _, err = s.GetApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: ""}, mask)
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	t.Run("FindApplications", func(t *T) {
@@ -133,11 +140,15 @@ func (st *StoreTest) TestApplicationStoreCRUD(t *T) {
 		_, err := s.UpdateApplication(ctx, &ttnpb.Application{
 			Ids: &ttnpb.ApplicationIdentifiers{ApplicationId: "other"},
 		}, mask)
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// _, err = s.UpdateApplication(ctx, &ttnpb.Application{
 		// 	Ids: &ttnpb.ApplicationIdentifiers{ApplicationId: ""},
 		// }, mask)
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	t.Run("GetApplication_AfterUpdate", func(t *T) {
@@ -157,15 +168,21 @@ func (st *StoreTest) TestApplicationStoreCRUD(t *T) {
 	t.Run("DeleteApplication_Other", func(t *T) {
 		a, ctx := test.New(t)
 		err := s.DeleteApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: "other"})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// err = s.DeleteApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: ""})
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	t.Run("GetApplication_AfterDelete", func(t *T) {
 		a, ctx := test.New(t)
 		_, err := s.GetApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"}, mask)
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 	})
 
 	t.Run("FindApplications_AfterDelete", func(t *T) {
@@ -209,9 +226,13 @@ func (st *StoreTest) TestApplicationStoreCRUD(t *T) {
 	t.Run("RestoreApplication_Other", func(t *T) {
 		a, ctx := test.New(t)
 		err := s.RestoreApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: "other"})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// err = s.RestoreApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: ""})
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	t.Run("GetApplication_AfterRestore", func(t *T) {
@@ -231,9 +252,13 @@ func (st *StoreTest) TestApplicationStoreCRUD(t *T) {
 	t.Run("PurgeApplication_Other", func(t *T) {
 		a, ctx := test.New(t)
 		err := s.PurgeApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: "other"})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// err = s.PurgeApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: ""})
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 }
 

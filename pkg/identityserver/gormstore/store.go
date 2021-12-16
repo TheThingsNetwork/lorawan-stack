@@ -91,7 +91,11 @@ func (s *baseStore) createEntity(ctx context.Context, model interface{}) error {
 	if model, ok := model.(modelInterface); ok {
 		model.SetContext(ctx)
 	}
-	return s.DB.Create(model).Error
+	err := s.DB.Create(model).Error
+	if err != nil {
+		return convertError(err)
+	}
+	return nil
 }
 
 func (s *baseStore) updateEntity(ctx context.Context, model interface{}, columns ...string) error {

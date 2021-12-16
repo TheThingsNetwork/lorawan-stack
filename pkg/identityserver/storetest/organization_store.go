@@ -18,6 +18,7 @@ import (
 	. "testing"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -74,7 +75,9 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 		_, err := s.CreateOrganization(ctx, &ttnpb.Organization{
 			Ids: &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
 		})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsAlreadyExists(err), should.BeTrue)
+		}
 	})
 
 	t.Run("GetOrganization", func(t *T) {
@@ -88,9 +91,13 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 	t.Run("GetOrganization_Other", func(t *T) {
 		a, ctx := test.New(t)
 		_, err := s.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "other"}, mask)
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// _, err = s.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: ""}, mask)
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	t.Run("FindOrganizations", func(t *T) {
@@ -133,11 +140,15 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 		_, err := s.UpdateOrganization(ctx, &ttnpb.Organization{
 			Ids: &ttnpb.OrganizationIdentifiers{OrganizationId: "other"},
 		}, mask)
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// _, err = s.UpdateOrganization(ctx, &ttnpb.Organization{
 		// 	Ids: &ttnpb.OrganizationIdentifiers{OrganizationId: ""},
 		// }, mask)
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	t.Run("GetOrganization_AfterUpdate", func(t *T) {
@@ -157,15 +168,21 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 	t.Run("DeleteOrganization_Other", func(t *T) {
 		a, ctx := test.New(t)
 		err := s.DeleteOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "other"})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// err = s.DeleteOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: ""})
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	t.Run("GetOrganization_AfterDelete", func(t *T) {
 		a, ctx := test.New(t)
 		_, err := s.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"}, mask)
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 	})
 
 	t.Run("FindOrganizations_AfterDelete", func(t *T) {
@@ -209,9 +226,13 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 	t.Run("RestoreOrganization_Other", func(t *T) {
 		a, ctx := test.New(t)
 		err := s.RestoreOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "other"})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// err = s.RestoreOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: ""})
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 
 	t.Run("GetOrganization_AfterRestore", func(t *T) {
@@ -231,9 +252,13 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 	t.Run("PurgeOrganization_Other", func(t *T) {
 		a, ctx := test.New(t)
 		err := s.PurgeOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "other"})
-		a.So(err, should.NotBeNil)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 		// err = s.PurgeOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: ""})
-		// a.So(err, should.NotBeNil)
+		// if a.So(err, should.NotBeNil) {
+		// 	a.So(errors.IsNotFound(err), should.BeTrue)
+		// }
 	})
 }
 
