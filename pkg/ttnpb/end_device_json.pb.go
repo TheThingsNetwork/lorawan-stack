@@ -1537,11 +1537,11 @@ func (x *EndDevice) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.Ids != nil || s.HasField("ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("ids")
 		// NOTE: EndDeviceIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.EndDeviceIdentifiers)
+		gogo.MarshalMessage(s, x.Ids)
 	}
 	if x.CreatedAt != nil || s.HasField("created_at") {
 		s.WriteMoreIf(&wroteField)
@@ -1857,7 +1857,7 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: EndDeviceIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v EndDeviceIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.EndDeviceIdentifiers = v
+			x.Ids = &v
 		case "created_at", "createdAt":
 			s.AddField("created_at")
 			v := gogo.UnmarshalTimestamp(s)
