@@ -83,7 +83,8 @@ class GatewayConnection extends React.PureComponent {
   get status() {
     const { statistics, error, fetching, lastSeen, isOtherCluster } = this.props
 
-    const isNotConnected = Boolean(error) && isNotFoundError(error)
+    const statsNotFound = Boolean(error) && isNotFoundError(error)
+    const isDisconnected = Boolean(statistics) && Boolean(statistics.disconnected_at)
     const isFetching = !Boolean(statistics) && fetching
     const isUnavailable = Boolean(error) && Boolean(error.message) && isTranslated(error.message)
     const hasStatistics = Boolean(statistics)
@@ -95,9 +96,12 @@ class GatewayConnection extends React.PureComponent {
     let docPath = '/getting-started/console/troubleshooting'
     let docTitle = sharedMessages.troubleshooting
 
-    if (isNotConnected) {
+    if (statsNotFound) {
       statusIndicator = 'bad'
       message = sharedMessages.disconnected
+      tooltipMessage = m.disconnectedTooltip
+      docPath = '/gateways/troubleshooting/#my-gateway-wont-connect-what-do-i-do'
+    } else if (isDisconnected) {
       tooltipMessage = m.disconnectedTooltip
       docPath = '/gateways/troubleshooting/#my-gateway-wont-connect-what-do-i-do'
     } else if (isFetching) {
@@ -127,16 +131,32 @@ class GatewayConnection extends React.PureComponent {
       docPath = '/gateways/troubleshooting'
     }
 
-    const node =
-      statusIndicator === 'good' && hasLastSeen ? (
+    let node
+
+    if (isDisconnected) {
+      node = (
+        <LastSeen
+          status="bad"
+          message={sharedMessages.disconnected}
+          lastSeen={statistics.disconnected_at}
+          flipped
+        >
+          <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
+        </LastSeen>
+      )
+    } else if (statusIndicator === 'good' && hasLastSeen) {
+      node = (
         <LastSeen lastSeen={lastSeen} flipped>
           <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
         </LastSeen>
-      ) : (
+      )
+    } else {
+      node = (
         <Status className={style.status} status={statusIndicator} label={message} flipped>
           <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
         </Status>
       )
+    }
 
     if (tooltipMessage) {
       return (

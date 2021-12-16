@@ -102,7 +102,8 @@ PropTypes.gateway = PropTypes.shape({
 })
 
 PropTypes.gatewayStats = PropTypes.shape({
-  connected_at: PropTypes.string.isRequired,
+  connected_at: PropTypes.string,
+  disconnected_at: PropTypes.string,
   last_uplink_received_at: PropTypes.string,
   protocol: PropTypes.string,
   uplink_count: PropTypes.string,

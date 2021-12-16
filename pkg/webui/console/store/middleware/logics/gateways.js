@@ -123,7 +123,15 @@ const getGatewaysLogic = createRequestLogic({
 
           const id = getGatewayId(gateway)
           return tts.Gateways.getStatisticsById(id)
-            .then(() => ({ ...gateway, status: 'connected' }))
+            .then(stats => {
+              let status = 'unknown'
+              if (Boolean(stats) && Boolean(stats.connected_at)) {
+                status = 'connected'
+              } else if (Boolean(stats) && Boolean(stats.disconnected_at)) {
+                status = 'disconnected'
+              }
+              return { ...gateway, status }
+            })
             .catch(err => {
               if (err && err.code === 5) {
                 return { ...gateway, status: 'disconnected' }
