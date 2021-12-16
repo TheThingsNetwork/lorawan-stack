@@ -1,0 +1,165 @@
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+describe('Device general settings', () => {
+  const appId = 'end-device-edit-test-application'
+  const application = { ids: { application_id: appId } }
+  const userId = 'end-device-edit-test-user'
+  const user = {
+    ids: { user_id: userId },
+    primary_email_address: 'end-device-edit-test-user@example.com',
+    password: 'ABCDefg123!',
+    password_confirm: 'ABCDefg123!',
+  }
+  const endDeviceId = 'end-device-edit-test'
+  const endDevice = {
+    application_server_address: 'localhost',
+    ids: {
+      device_id: endDeviceId,
+      dev_eui: '0000000000000001',
+      join_eui: '0000000000000000',
+    },
+    name: 'End Device Test Name',
+    description: 'End Device Test Description',
+    join_server_address: 'localhost',
+    network_server_address: 'localhost',
+  }
+  const endDeviceFieldMask = {
+    paths: [
+      'join_server_address',
+      'network_server_address',
+      'application_server_address',
+      'ids.dev_eui',
+      'ids.join_eui',
+      'name',
+      'description',
+    ],
+  }
+  const endDeviceRequestBody = {
+    end_device: endDevice,
+    field_mask: endDeviceFieldMask,
+  }
+
+  before(() => {
+    cy.dropAndSeedDatabase()
+    cy.createUser(user)
+    cy.createApplication(application, userId)
+    cy.createEndDevice(appId, endDeviceRequestBody)
+  })
+
+  beforeEach(() => {
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(
+      `${Cypress.config(
+        'consoleRootPath',
+      )}/applications/${appId}/devices/${endDeviceId}/general-settings`,
+    )
+  })
+
+  it('displays newly created end device values', () => {
+    cy.findByRole('heading', { name: 'Basic' }).should('be.visible')
+    cy.findByLabelText('End device ID')
+      .should('be.disabled')
+      .and('have.attr', 'value')
+      .and('eq', endDeviceId)
+    cy.findByLabelText(/AppEUI/)
+      .should('be.disabled')
+      .and('have.attr', 'value')
+      .and('eq', endDevice.ids.join_eui)
+    cy.findByLabelText('DevEUI')
+      .should('be.disabled')
+      .and('have.attr', 'value')
+      .and('eq', endDevice.ids.dev_eui)
+    cy.findByLabelText('End device name')
+      .should('be.visible')
+      .and('have.attr', 'value')
+      .and('eq', endDevice.name)
+    cy.findByLabelText('End device description')
+      .should('be.visible')
+      .and('have.text', endDevice.description)
+    cy.findDescriptionByLabelText('End device description')
+      .should(
+        'contain',
+        'Optional end device description; can also be used to save notes about the end device',
+      )
+      .and('be.visible')
+    cy.findByLabelText('Network Server address')
+      .should('be.visible')
+      .and('have.attr', 'value', endDevice.network_server_address)
+    cy.findByLabelText('Application Server address')
+      .should('be.visible')
+      .and('have.attr', 'value', endDevice.application_server_address)
+  })
+
+  it('succeeds editing device name and description', () => {
+    cy.findByLabelText(/name/).type(' Updated')
+    cy.findByLabelText(/description/).type('Updated ')
+
+    cy.findByRole('button', { name: 'Save changes' }).click()
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification')
+      .should('be.visible')
+      .findByText(`End device updated`)
+      .should('be.visible')
+  })
+
+  it('succeeds editing server adresses', () => {
+    cy.findByLabelText('Network Server address').type('.test')
+    cy.findByLabelText('Application Server address').type('.test')
+
+    cy.findByRole('button', { name: 'Save changes' }).click()
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification')
+      .should('be.visible')
+      .findByText(`End device updated`)
+      .should('be.visible')
+  })
+
+  it('succeeds adding end device attributes', () => {
+    cy.findByRole('button', { name: /Add attributes/ }).click()
+
+    cy.get(`[name="attributes[0].key"]`).type('end-device-test-key')
+    cy.get(`[name="attributes[0].value"]`).type('end-device-test-value')
+
+    cy.findByRole('button', { name: 'Save changes' }).click()
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification')
+      .should('be.visible')
+      .findByText(`End device updated`)
+      .should('be.visible')
+  })
+
+  it('succeeds deleting end device', () => {
+    cy.findByRole('button', { name: /Delete end device/ }).click()
+
+    cy.findByTestId('modal-window')
+      .should('be.visible')
+      .within(() => {
+        cy.findByText('Delete end device', { selector: 'h1' }).should('be.visible')
+        cy.findByRole('button', { name: /Delete end device/ }).click()
+      })
+
+    cy.findByTestId('error-notification').should('not.exist')
+
+    cy.location('pathname').should(
+      'eq',
+      `${Cypress.config('consoleRootPath')}/applications/${appId}/devices`,
+    )
+
+    cy.findByRole('cell', { name: appId }).should('not.exist')
+  })
+})
