@@ -28,6 +28,6 @@ var _ networkserver.DeviceRegistry = &DeviceRegistry{}
 func TestDeviceRegistry(t *testing.T) {
 	_, ctx := test.New(t)
 	reg, closeFn := NewRedisDeviceRegistry(ctx)
-	t.Cleanup(closeFn)
+	defer closeFn()
 	HandleDeviceRegistryTest(t, reg)
 }
