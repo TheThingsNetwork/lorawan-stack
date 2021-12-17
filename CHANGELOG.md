@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.16.2] - 2021-12-17
+
+### Added
+
 - User defined antenna gain for LBS gateways.
 - Webhooks now have a health status associated with them. Webhooks that fail successively are now disabled for a period of time.
   - Failure in this context means that the HTTP endpoint returned a non-2xx status code.
@@ -24,10 +38,6 @@ For details about compatibility between different releases, see the **Commitment
 - Increased the maximum gRPC message size to 16MB.
 - Gateways which have been deleted are now automatically disconnected by the Gateway Server.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Access to application payload formatters for users with `RIGHT_APPLICATION_SETTINGS_BASIC` right.
@@ -36,8 +46,6 @@ For details about compatibility between different releases, see the **Commitment
 - Join settings handling in JS-only deployments in the Console.
 - Configuring Packet Broker listed option when Packet Broker Agent is configured with a Packet Broker tenant API key.
 - Contact info validation through the Account app.
-
-### Security
 
 ## [3.16.1] - 2021-11-26
 
@@ -1929,7 +1937,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.1...v3.16
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.2...v3.16
+[3.16.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.1...v3.16.2
 [3.16.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.0...v3.16.1
 [3.16.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.3...v3.16.0
 [3.15.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.2...v3.15.3
