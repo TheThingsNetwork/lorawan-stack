@@ -63,6 +63,24 @@ const Modal = props => {
   const handleCancel = React.useCallback(() => {
     handleComplete(false)
   }, [handleComplete])
+  const handleKeyDown = React.useCallback(
+    evt => {
+      if (approval && evt.key === 'Escape') {
+        evt.stopPropagation()
+        handleCancel()
+
+        return
+      }
+
+      if (evt.key === 'Enter') {
+        evt.stopPropagation()
+        handleApprove()
+
+        return
+      }
+    },
+    [approval, handleApprove, handleCancel],
+  )
 
   const name = formName ? { name: formName } : {}
   const RootComponent = props.method ? 'form' : 'div'
@@ -121,7 +139,13 @@ const Modal = props => {
   return (
     <>
       {!inline && <div key="shadow" className={style.shadow} />}
-      <RootComponent data-test-id="modal-window" key="modal" className={modalClassNames} {...rest}>
+      <RootComponent
+        data-test-id="modal-window"
+        key="modal"
+        className={modalClassNames}
+        onKeyDown={handleKeyDown}
+        {...rest}
+      >
         {title && (
           <div className={style.titleSection}>
             <div>
