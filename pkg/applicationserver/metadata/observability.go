@@ -89,9 +89,11 @@ func (m metadataMetrics) Collect(ch chan<- prometheus.Metric) {
 
 func registerMetadataCacheHit(ctx context.Context, metadata string) {
 	metaMetrics.cacheHits.WithLabelValues(ctx, metadata).Inc()
+	metaMetrics.cacheMisses.WithLabelValues(ctx, metadata)
 }
 
 func registerMetadataCacheMiss(ctx context.Context, metadata string) {
+	metaMetrics.cacheHits.WithLabelValues(ctx, metadata)
 	metaMetrics.cacheMisses.WithLabelValues(ctx, metadata).Inc()
 }
 
