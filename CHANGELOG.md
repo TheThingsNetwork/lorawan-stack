@@ -36,6 +36,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Increased the maximum gRPC message size to 16MB.
 - Gateways which have been deleted are now automatically disconnected by the Gateway Server.
+- Disabled devices that are registered on a different cluster.
 
 ### Fixed
 

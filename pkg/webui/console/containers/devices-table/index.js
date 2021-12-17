@@ -32,10 +32,9 @@ import LastSeen from '@console/components/last-seen'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
-import { selectNsConfig, selectJsConfig, selectAsConfig } from '@ttn-lw/lib/selectors/env'
+import { selectNsConfig, selectJsConfig } from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
-import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 
 import {
   checkFromState,
@@ -64,7 +63,7 @@ import style from './devices-table.styl'
 
 const m = defineMessages({
   otherClusterTooltip:
-    'This end device is registered on a different cluster or host (`{host}`). It cannot be accessed using this Console. To access this device, use the Console of the cluster that this end device was registered on.',
+    'This end device is registered on a different cluster or host (`{host}`). To access this device, use the Console of the cluster that this end device was registered on.',
 })
 
 const headers = [
@@ -110,8 +109,9 @@ const headers = [
         const host = status.host
         return (
           <DocTooltip
-            docPath="getting-started/cloud-hosted"
-            content={<Message content={m.otherClusterTooltip} values={{ host }} />}
+            docPath="/getting-started/cloud-hosted"
+            content={<Message content={m.otherClusterTooltip} values={{ host }} convertBackticks />}
+            placement="top-end"
           >
             <Status status="unknown" label={sharedMessages.otherCluster}>
               <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />

@@ -18,7 +18,6 @@ import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
 import DataSheet from '@ttn-lw/components/data-sheet'
-import toast from '@ttn-lw/components/toast'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import Message from '@ttn-lw/lib/components/message'
@@ -32,7 +31,6 @@ import Require from '@console/lib/components/require'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
-
 
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
@@ -239,10 +237,7 @@ class DeviceOverview extends React.Component {
     const devIds = device && device.ids
     const otherwise = {
       redirect: '/applications',
-      render: toast({
-        type: toast.types.WARNING,
-        message: m.failedAccessOtherHostDeviceMessage,
-      }),
+      message: m.failedAccessOtherHostDeviceMessage,
     }
     return (
       <Require condition={!shouldRedirect} otherwise={otherwise}>
