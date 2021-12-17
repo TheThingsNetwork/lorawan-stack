@@ -14,6 +14,7 @@
 
 import React from 'react'
 import classnames from 'classnames'
+import FocusLock from 'react-focus-lock'
 
 import Button from '@ttn-lw/components/button'
 
@@ -137,7 +138,7 @@ const Modal = props => {
   }
 
   return (
-    <>
+    <FocusLock autoFocus returnFocus>
       {!inline && <div key="shadow" className={style.shadow} />}
       <RootComponent
         data-test-id="modal-window"
@@ -162,7 +163,7 @@ const Modal = props => {
           {buttons}
         </div>
       </RootComponent>
-    </>
+    </FocusLock>
   )
 }
 
