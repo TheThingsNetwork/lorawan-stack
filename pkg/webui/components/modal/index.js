@@ -15,6 +15,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import FocusLock from 'react-focus-lock'
+import { RemoveScroll } from 'react-remove-scroll'
 
 import Button from '@ttn-lw/components/button'
 
@@ -46,11 +47,19 @@ const Modal = props => {
     ...rest
   } = props
 
+  const approveButtonRef = React.useRef(null)
+  const approvalAllowed = !Boolean(approveButtonProps.disabled)
+
   const modalClassNames = classnames(style.modal, style.modal, {
     [style.modalInline]: inline,
     [style.modalAbsolute]: !Boolean(inline),
   })
 
+  const handleModalActivate = React.useCallback(() => {
+    if (approveButtonRef.current !== null) {
+      approveButtonRef.current.focus()
+    }
+  }, [])
   const handleComplete = React.useCallback(
     result => {
       onComplete(result)
@@ -60,7 +69,6 @@ const Modal = props => {
   const handleApprove = React.useCallback(() => {
     handleComplete(true)
   }, [handleComplete])
-
   const handleCancel = React.useCallback(() => {
     handleComplete(false)
   }, [handleComplete])
@@ -73,14 +81,14 @@ const Modal = props => {
         return
       }
 
-      if (evt.key === 'Enter') {
+      if (approvalAllowed && evt.key === 'Enter') {
         evt.stopPropagation()
         handleApprove()
 
         return
       }
     },
-    [approval, handleApprove, handleCancel],
+    [approval, approvalAllowed, handleApprove, handleCancel],
   )
 
   const name = formName ? { name: formName } : {}
@@ -105,6 +113,7 @@ const Modal = props => {
         message={approveButtonMessage}
         onClick={handleApprove}
         icon="check"
+        ref={approveButtonRef}
         {...approveButtonProps}
       />
     </div>
@@ -130,6 +139,7 @@ const Modal = props => {
           icon="check"
           value="true"
           danger={danger}
+          ref={approveButtonRef}
           {...name}
           {...approveButtonProps}
         />
@@ -138,38 +148,45 @@ const Modal = props => {
   }
 
   return (
-    <FocusLock autoFocus returnFocus>
-      {!inline && <div key="shadow" className={style.shadow} />}
-      <RootComponent
-        data-test-id="modal-window"
-        key="modal"
-        className={modalClassNames}
-        onKeyDown={handleKeyDown}
-        {...rest}
-      >
-        {title && (
-          <div className={style.titleSection}>
-            <div>
-              <Message className={style.title} content={title} component="h1" />
-              {subtitle && <Message component="span" content={subtitle} />}
+    <FocusLock autoFocus returnFocus onActivation={handleModalActivate}>
+      <RemoveScroll>
+        {!inline && <div key="shadow" className={style.shadow} />}
+        <RootComponent
+          data-test-id="modal-window"
+          key="modal"
+          className={modalClassNames}
+          onKeyDown={handleKeyDown}
+          aria-modal="true"
+          role="dialog"
+          tabIndex={-1}
+          {...rest}
+        >
+          {title && (
+            <div className={style.titleSection}>
+              <div>
+                <Message className={style.title} content={title} component="h1" />
+                {subtitle && <Message component="span" content={subtitle} />}
+              </div>
+              {logo}
             </div>
-            {logo}
+          )}
+          {title && <div className={style.line} />}
+          <div className={style.body}>{children || messageElement}</div>
+          <div className={style.controlBar}>
+            <div>{bottomLineElement}</div>
+            {buttons}
           </div>
-        )}
-        {title && <div className={style.line} />}
-        <div className={style.body}>{children || messageElement}</div>
-        <div className={style.controlBar}>
-          <div>{bottomLineElement}</div>
-          {buttons}
-        </div>
-      </RootComponent>
+        </RootComponent>
+      </RemoveScroll>
     </FocusLock>
   )
 }
 
 Modal.propTypes = {
   approval: PropTypes.bool,
-  approveButtonProps: PropTypes.shape({}),
+  approveButtonProps: PropTypes.shape({
+    disabled: PropTypes.bool,
+  }),
   bottomLine: PropTypes.oneOfType([PropTypes.element, PropTypes.message]),
   buttonMessage: PropTypes.message,
   buttonName: PropTypes.message,
