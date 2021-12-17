@@ -28,7 +28,6 @@ For details about compatibility between different releases, see the **Commitment
 - User defined antenna gain for LBS gateways.
 - Webhooks now have a health status associated with them. Webhooks that fail successively are now disabled for a period of time.
   - Failure in this context means that the HTTP endpoint returned a non-2xx status code.
-  - By default, a webhook is allowed 16 successive failures before it is disabled. The default cooldown period is 24 hours.
   - A successful HTTP request will reset the failure counter.
   - The number of allowed successive failures and cooldown period can be configured using the `--as.webhooks.unhealthy-attempts-threshold` and `--as.webhooks.unhealthy-retry-interval` configuration options.
 - Webhook enabled path validation in the Console.
