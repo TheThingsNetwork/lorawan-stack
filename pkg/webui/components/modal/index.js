@@ -125,9 +125,7 @@ const Modal = props => {
         {title && (
           <div className={style.titleSection}>
             <div>
-              <h1>
-                <Message content={title} />
-              </h1>
+              <Message className={style.title} content={title} component="h1" />
               {subtitle && <Message component="span" content={subtitle} />}
             </div>
             {logo}
