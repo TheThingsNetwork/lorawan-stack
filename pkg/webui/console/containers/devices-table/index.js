@@ -63,7 +63,7 @@ import style from './devices-table.styl'
 
 const m = defineMessages({
   otherClusterTooltip:
-    'This end device is registered on a different cluster or host (`{host}`). To access this device, use the Console of the cluster that this end device was registered on.',
+    'This end device is registered on a different cluster (`{host}`). To access this device, use the Console of the cluster that this end device was registered on.',
 })
 
 const headers = [

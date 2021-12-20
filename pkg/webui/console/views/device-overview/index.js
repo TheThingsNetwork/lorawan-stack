@@ -45,8 +45,8 @@ const m = defineMessages({
   latestData: 'Latest data',
   rootKeys: 'Root keys',
   keysNotExposed: 'Keys are not exposed',
-  failedAccessOtherHostDeviceMessage:
-    'The end device you attempted to visit is registered on a different host and needs to be accessed using its host Console.',
+  failedAccessOtherHostDevice:
+    'The end device you attempted to visit is registered on a different cluster and needs to be accessed using its host Console.',
 })
 
 @connect(state => {
