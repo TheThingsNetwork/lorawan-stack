@@ -27,6 +27,7 @@ type testStore struct {
 	db *gorm.DB
 	applicationStore
 	clientStore
+	deviceStore
 	gatewayStore
 	organizationStore
 	userStore
@@ -51,6 +52,7 @@ func newTestStore(t *testing.T, dsn url.URL) storetest.Store {
 		db:                db,
 		applicationStore:  applicationStore{baseStore: &baseStore},
 		clientStore:       clientStore{baseStore: &baseStore},
+		deviceStore:       deviceStore{baseStore: &baseStore},
 		gatewayStore:      gatewayStore{baseStore: &baseStore},
 		organizationStore: organizationStore{baseStore: &baseStore},
 		userStore:         userStore{baseStore: &baseStore},
@@ -69,6 +71,13 @@ func TestClientStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestClientStoreCRUD(t)
+}
+
+func TestEndDeviceStore(t *testing.T) {
+	t.Parallel()
+
+	st := storetest.New(t, newTestStore)
+	st.TestEndDeviceStoreCRUD(t)
 }
 
 func TestGatewayStore(t *testing.T) {
