@@ -1,7 +1,9 @@
 {
   "end_device": {
+    "name":"Test Device Name",
+    "description":"Test Device Descritpion",
     "ids": {
-      "dev_eui": "9000BEEF9000BEEF",
+      "dev_eui": "70B3D57ED8000019",
       "join_eui": "0000000000000000",
       "device_id": "device-all-components"
     },
@@ -11,6 +13,8 @@
   },
   "field_mask": {
     "paths": [
+      "name",
+      "description",
       "network_server_address",
       "application_server_address",
       "join_server_address"
