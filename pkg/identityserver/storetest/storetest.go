@@ -25,6 +25,7 @@ import (
 
 	"github.com/iancoleman/strcase"
 	_ "github.com/lib/pq" // PostgreSQL driver.
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
 func New(t *testing.T, newStore func(t *testing.T, dsn url.URL) Store) *StoreTest {
@@ -55,9 +56,10 @@ func New(t *testing.T, newStore func(t *testing.T, dsn url.URL) Store) *StoreTes
 	dsn.RawQuery = query.Encode()
 
 	return &StoreTest{
-		t:        t,
-		dsn:      dsn,
-		newStore: newStore,
+		t:          t,
+		dsn:        dsn,
+		newStore:   newStore,
+		population: &Population{},
 	}
 }
 
@@ -66,12 +68,15 @@ type Store interface {
 }
 
 type StoreTest struct {
-	t        *testing.T
-	dsn      url.URL
-	newStore func(t *testing.T, dsn url.URL) Store
+	t          *testing.T
+	dsn        url.URL
+	newStore   func(t *testing.T, dsn url.URL) Store
+	population *Population
 }
 
 func (s *StoreTest) PrepareDB(t *testing.T) Store {
+	_, ctx := test.New(t)
+
 	db, err := sql.Open("postgres", s.dsn.String())
 	if err != nil {
 		t.Fatal(err)
@@ -100,6 +105,10 @@ func (s *StoreTest) PrepareDB(t *testing.T) Store {
 	store := s.newStore(t, dsn)
 
 	if err := store.Init(); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := s.population.Populate(ctx, store); err != nil {
 		t.Fatal(err)
 	}
 
