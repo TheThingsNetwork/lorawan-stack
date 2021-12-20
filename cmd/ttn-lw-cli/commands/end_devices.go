@@ -335,7 +335,7 @@ var (
 			if device.CreatedAt == nil || (res.CreatedAt != nil && ttnpb.StdTime(res.CreatedAt).Before(*ttnpb.StdTime(device.CreatedAt))) {
 				device.CreatedAt = res.CreatedAt
 			}
-			if ttnpb.StdTime(res.UpdatedAt).After(*ttnpb.StdTime(device.UpdatedAt)) {
+			if res.UpdatedAt != nil && ttnpb.StdTime(res.UpdatedAt).After(*ttnpb.StdTime(device.UpdatedAt)) {
 				device.UpdatedAt = res.UpdatedAt
 			}
 
@@ -561,7 +561,7 @@ var (
 			if device.CreatedAt == nil || (res.CreatedAt != nil && ttnpb.StdTime(res.CreatedAt).Before(*ttnpb.StdTime(device.CreatedAt))) {
 				device.CreatedAt = res.CreatedAt
 			}
-			if ttnpb.StdTime(res.UpdatedAt).After(*ttnpb.StdTime(device.UpdatedAt)) {
+			if res.UpdatedAt != nil && ttnpb.StdTime(res.UpdatedAt).After(*ttnpb.StdTime(device.UpdatedAt)) {
 				device.UpdatedAt = res.UpdatedAt
 			}
 
@@ -832,7 +832,7 @@ var (
 			if device.CreatedAt == nil || (nsDevice.CreatedAt != nil && ttnpb.StdTime(nsDevice.CreatedAt).Before(*ttnpb.StdTime(device.CreatedAt))) {
 				device.CreatedAt = nsDevice.CreatedAt
 			}
-			if ttnpb.StdTime(nsDevice.UpdatedAt).After(*ttnpb.StdTime(device.UpdatedAt)) {
+			if nsDevice.UpdatedAt != nil && ttnpb.StdTime(nsDevice.UpdatedAt).After(*ttnpb.StdTime(device.UpdatedAt)) {
 				device.UpdatedAt = nsDevice.UpdatedAt
 			}
 			return io.Write(os.Stdout, config.OutputFormat, device)
