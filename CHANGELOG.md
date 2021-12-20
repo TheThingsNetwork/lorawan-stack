@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- CLI panic when getting devices.
+
 ### Security
 
 ## [3.16.2] - 2021-12-17
