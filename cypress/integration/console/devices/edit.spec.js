@@ -22,40 +22,43 @@ describe('Device general settings', () => {
     password: 'ABCDefg123!',
     password_confirm: 'ABCDefg123!',
   }
-  const endDeviceId = 'end-device-edit-test'
-  const endDevice = {
-    application_server_address: 'localhost',
-    ids: {
-      device_id: endDeviceId,
-      dev_eui: '0000000000000001',
-      join_eui: '0000000000000000',
+  const ns = {
+    end_device: {
+      frequency_plan_id: 'EU_863_870_TTN',
+      lorawan_phy_version: 'PHY_V1_0_2_REV_B',
+      multicast: false,
+      supports_join: false,
+      lorawan_version: 'MAC_V1_0_2',
+      ids: {
+        device_id: 'device-all-components',
+        dev_eui: '70B3D57ED8000019',
+      },
+      session: {
+        keys: {
+          f_nwk_s_int_key: {
+            key: 'CBFBF585D81A9063A31EA6922EDD6360',
+          },
+        },
+        dev_addr: '270000FC',
+      },
+      supports_class_c: false,
+      supports_class_b: false,
+      mac_settings: {
+        rx2_data_rate_index: 0,
+        rx2_frequency: 869525000,
+        rx1_delay: 1,
+        rx1_data_rate_offset: 0,
+        resets_f_cnt: false,
+      },
     },
-    name: 'End Device Test Name',
-    description: 'End Device Test Description',
-    join_server_address: 'localhost',
-    network_server_address: 'localhost',
   }
-  const endDeviceFieldMask = {
-    paths: [
-      'join_server_address',
-      'network_server_address',
-      'application_server_address',
-      'ids.dev_eui',
-      'ids.join_eui',
-      'name',
-      'description',
-    ],
-  }
-  const endDeviceRequestBody = {
-    end_device: endDevice,
-    field_mask: endDeviceFieldMask,
-  }
+  const endDeviceId = ns.end_device.ids.device_id
 
   before(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
     cy.createApplication(application, userId)
-    cy.createEndDevice(appId, endDeviceRequestBody)
+    cy.createMockDeviceAllComponents(appId, { ns })
   })
 
   beforeEach(() => {
@@ -73,33 +76,32 @@ describe('Device general settings', () => {
       .should('be.disabled')
       .and('have.attr', 'value')
       .and('eq', endDeviceId)
-    cy.findByLabelText(/AppEUI/)
-      .should('be.disabled')
-      .and('have.attr', 'value')
-      .and('eq', endDevice.ids.join_eui)
+    cy.findByLabelText(/AppEUI/).should('be.disabled')
     cy.findByLabelText('DevEUI')
       .should('be.disabled')
       .and('have.attr', 'value')
-      .and('eq', endDevice.ids.dev_eui)
-    cy.findByLabelText('End device name')
-      .should('be.visible')
-      .and('have.attr', 'value')
-      .and('eq', endDevice.name)
-    cy.findByLabelText('End device description')
-      .should('be.visible')
-      .and('have.text', endDevice.description)
-    cy.findDescriptionByLabelText('End device description')
-      .should(
-        'contain',
-        'Optional end device description; can also be used to save notes about the end device',
-      )
-      .and('be.visible')
-    cy.findByLabelText('Network Server address')
-      .should('be.visible')
-      .and('have.attr', 'value', endDevice.network_server_address)
-    cy.findByLabelText('Application Server address')
-      .should('be.visible')
-      .and('have.attr', 'value', endDevice.application_server_address)
+      .and('eq', ns.end_device.ids.dev_eui)
+
+    cy.fixture('console/devices/device.is.json').then(endDevice => {
+      cy.findByLabelText('End device name')
+        .should('be.visible')
+        .and('have.attr', 'value', endDevice.end_device.name)
+      cy.findByLabelText('End device description')
+        .should('be.visible')
+        .and('have.text', endDevice.end_device.description)
+      cy.findDescriptionByLabelText('End device description')
+        .should(
+          'contain',
+          'Optional end device description; can also be used to save notes about the end device',
+        )
+        .and('be.visible')
+      cy.findByLabelText('Network Server address')
+        .should('be.visible')
+        .and('have.attr', 'value', endDevice.end_device.network_server_address)
+      cy.findByLabelText('Application Server address')
+        .should('be.visible')
+        .and('have.attr', 'value', endDevice.end_device.application_server_address)
+    })
   })
 
   it('succeeds editing device name and description', () => {
