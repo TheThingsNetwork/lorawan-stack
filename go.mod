@@ -30,10 +30,6 @@ replace github.com/onsi/gomega => github.com/onsi/gomega v1.10.0
 // Optional dependencies of throttled/v2 update golang/protobuf past v1.3.5.
 replace github.com/throttled/throttled/v2 => github.com/TheThingsIndustries/throttled/v2 v2.7.1-noredis
 
-// Do not upgrade Mapstructure beyond v1.3.0.
-// See https://github.com/TheThingsNetwork/lorawan-stack/issues/3736.
-replace github.com/mitchellh/mapstructure => github.com/mitchellh/mapstructure v1.3.0
-
 require (
 	contrib.go.opencensus.io/exporter/prometheus v0.1.0
 	github.com/Azure/azure-storage-blob-go v0.8.0
@@ -87,7 +83,7 @@ require (
 	github.com/jtacoma/uritemplates v1.0.0
 	github.com/kr/pretty v0.2.1
 	github.com/lib/pq v1.10.4
-	github.com/mitchellh/mapstructure v1.4.1
+	github.com/mitchellh/mapstructure v1.4.3
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nats-io/nats-server/v2 v2.2.2
 	github.com/nats-io/nats.go v1.11.0

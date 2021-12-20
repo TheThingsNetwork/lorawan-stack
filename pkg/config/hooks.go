@@ -247,93 +247,93 @@ func stringToByteArrayHook(f reflect.Type, t reflect.Type, data interface{}) (in
 }
 
 func stringToTimeDurationPointerHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
-	if f != nil && f.Kind() != reflect.String {
+	d := time.Duration(0)
+	if f.Kind() != reflect.String || t != reflect.TypeOf(&d) {
 		return data, nil
 	}
-	if s, ok := data.(string); ok {
-		d := time.Duration(1)
-		if t == reflect.TypeOf(&d) {
-			if s == "" {
-				return nil, nil
-			}
-			return time.ParseDuration(s)
-		}
+	s := data.(string)
+	if s == "" {
+		return (*time.Duration)(nil), nil
 	}
-	return data, nil
+	d, err := time.ParseDuration(s)
+	if err != nil {
+		return nil, err
+	}
+	return &d, nil
 }
 
 func stringToRxDelayPointerHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
-	if f != nil && f.Kind() != reflect.String {
+	var enum ttnpb.RxDelay
+	if f.Kind() != reflect.String || t != reflect.TypeOf(&enum) {
 		return data, nil
 	}
-	if s, ok := data.(string); ok {
-		var enum ttnpb.RxDelay
-		if t == reflect.TypeOf(&enum) {
-			if s == "" {
-				return nil, nil
-			}
-			if err := enum.UnmarshalText([]byte(s)); err != nil {
-				return strconv.ParseInt(s, 10, 32)
-			}
-			return enum, nil
-		}
+	s := data.(string)
+	if s == "" {
+		return (*ttnpb.RxDelay)(nil), nil
 	}
-	return data, nil
+	if err := enum.UnmarshalText([]byte(s)); err != nil {
+		n, err := strconv.ParseInt(s, 10, 32)
+		if err != nil {
+			return nil, err
+		}
+		enum = ttnpb.RxDelay(n)
+	}
+	return &enum, nil
 }
 
 func stringToADRAckDelayExponentPointerHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
-	if f != nil && f.Kind() != reflect.String {
+	var enum ttnpb.ADRAckDelayExponent
+	if f.Kind() != reflect.String || t != reflect.TypeOf(&enum) {
 		return data, nil
 	}
-	if s, ok := data.(string); ok {
-		var enum ttnpb.ADRAckDelayExponent
-		if t == reflect.TypeOf(&enum) {
-			if s == "" {
-				return nil, nil
-			}
-			if err := enum.UnmarshalText([]byte(s)); err != nil {
-				return strconv.ParseInt(s, 10, 32)
-			}
-			return enum, nil
-		}
+	s := data.(string)
+	if s == "" {
+		return (*ttnpb.ADRAckDelayExponent)(nil), nil
 	}
-	return data, nil
+	if err := enum.UnmarshalText([]byte(s)); err != nil {
+		n, err := strconv.ParseInt(s, 10, 32)
+		if err != nil {
+			return nil, err
+		}
+		enum = ttnpb.ADRAckDelayExponent(n)
+	}
+	return &enum, nil
 }
 
 func stringToADRAckLimitExponentPointerHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
-	if f != nil && f.Kind() != reflect.String {
+	var enum ttnpb.ADRAckLimitExponent
+	if f.Kind() != reflect.String || t != reflect.TypeOf(&enum) {
 		return data, nil
 	}
-	if s, ok := data.(string); ok {
-		var enum ttnpb.ADRAckLimitExponent
-		if t == reflect.TypeOf(&enum) {
-			if s == "" {
-				return nil, nil
-			}
-			if err := enum.UnmarshalText([]byte(s)); err != nil {
-				return strconv.ParseInt(s, 10, 32)
-			}
-			return enum, nil
-		}
+	s := data.(string)
+	if s == "" {
+		return (*ttnpb.ADRAckLimitExponent)(nil), nil
 	}
-	return data, nil
+	if err := enum.UnmarshalText([]byte(s)); err != nil {
+		n, err := strconv.ParseInt(s, 10, 32)
+		if err != nil {
+			return nil, err
+		}
+		enum = ttnpb.ADRAckLimitExponent(n)
+	}
+	return &enum, nil
 }
 
 func stringToAggregatedDutyCyclePointerHook(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
-	if f != nil && f.Kind() != reflect.String {
+	var enum ttnpb.AggregatedDutyCycle
+	if f.Kind() != reflect.String || t != reflect.TypeOf(&enum) {
 		return data, nil
 	}
-	if s, ok := data.(string); ok {
-		var enum ttnpb.AggregatedDutyCycle
-		if t == reflect.TypeOf(&enum) {
-			if s == "" {
-				return nil, nil
-			}
-			if err := enum.UnmarshalText([]byte(s)); err != nil {
-				return strconv.ParseInt(s, 10, 32)
-			}
-			return enum, nil
-		}
+	s := data.(string)
+	if s == "" {
+		return (*ttnpb.AggregatedDutyCycle)(nil), nil
 	}
-	return data, nil
+	if err := enum.UnmarshalText([]byte(s)); err != nil {
+		n, err := strconv.ParseInt(s, 10, 32)
+		if err != nil {
+			return nil, err
+		}
+		enum = ttnpb.AggregatedDutyCycle(n)
+	}
+	return &enum, nil
 }
