@@ -120,7 +120,7 @@ describe('End device on other cluster', () => {
     cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/applications`)
     cy.findByTestId('full-error-view').should('not.exist')
     cy.findByText(
-      'The end device you attempted to visit is registered on a different host and needs to be accessed using its host Console.',
+      'The end device you attempted to visit is registered on a different cluster and needs to be accessed using its host Console.',
     )
   })
 })

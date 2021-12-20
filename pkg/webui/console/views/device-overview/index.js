@@ -237,7 +237,7 @@ class DeviceOverview extends React.Component {
     const devIds = device && device.ids
     const otherwise = {
       redirect: '/applications',
-      message: m.failedAccessOtherHostDeviceMessage,
+      message: m.failedAccessOtherHostDevice,
     }
     return (
       <Require condition={!shouldRedirect} otherwise={otherwise}>
