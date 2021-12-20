@@ -26,6 +26,7 @@ import Message from '@ttn-lw/lib/components/message'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
 
 import EventsList from './list'
 import EventDetails from './details'
@@ -50,6 +51,10 @@ const Events = React.memo(
   }) => {
     const [focus, setFocus] = useState({ eventId: undefined, visible: false })
     const onPause = useCallback(() => onPauseToggle(paused), [onPauseToggle, paused])
+    const onExport = useCallback(() => {
+      const eventLogData = composeDataUri(JSON.stringify(events, undefined, 2))
+      downloadDataUriAsFile(eventLogData, 'tts_live_data.json')
+    }, [events])
     const handleRowClick = useCallback(
       eventId => {
         if (eventId !== focus.eventId) {
@@ -87,6 +92,13 @@ const Events = React.memo(
                     <Switch onChange={handleVerboseFilterChange} checked={!Boolean(filter)} />
                   </label>
                 )}
+                <Button
+                  onClick={onExport}
+                  message={sharedMessages.exportJson}
+                  naked
+                  secondary
+                  icon="file_download"
+                />
                 <Button
                   onClick={onPause}
                   message={paused ? sharedMessages.resume : sharedMessages.pause}
@@ -152,6 +164,7 @@ Events.propTypes = {
   events: PropTypes.events.isRequired,
   filter: PropTypes.eventFilter,
   onClear: PropTypes.func,
+  onExport: PropTypes.func,
   onFilterChange: PropTypes.func,
   onPauseToggle: PropTypes.func,
   paused: PropTypes.bool.isRequired,
@@ -166,6 +179,7 @@ Events.defaultProps = {
   onClear: () => null,
   onPauseToggle: () => null,
   onFilterChange: () => null,
+  onExport: () => null,
 }
 
 Events.Widget = Widget
