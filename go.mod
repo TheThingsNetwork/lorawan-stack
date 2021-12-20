@@ -30,14 +30,6 @@ replace github.com/onsi/gomega => github.com/onsi/gomega v1.10.0
 // Optional dependencies of throttled/v2 update golang/protobuf past v1.3.5.
 replace github.com/throttled/throttled/v2 => github.com/TheThingsIndustries/throttled/v2 v2.7.1-noredis
 
-// Do not upgrade Mapstructure beyond v1.3.0.
-// See https://github.com/TheThingsNetwork/lorawan-stack/issues/3736.
-replace github.com/mitchellh/mapstructure => github.com/mitchellh/mapstructure v1.3.0
-
-// Do not upgrade Redis beyond v8.4.0.
-// See https://github.com/TheThingsNetwork/lorawan-stack/pull/3848.
-replace github.com/go-redis/redis/v8 => github.com/go-redis/redis/v8 v8.4.0
-
 require (
 	contrib.go.opencensus.io/exporter/prometheus v0.1.0
 	github.com/Azure/azure-storage-blob-go v0.8.0
@@ -59,7 +51,7 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v0.4.0
 	github.com/felixge/httpsnoop v1.0.2
 	github.com/getsentry/sentry-go v0.11.0
-	github.com/go-redis/redis/v8 v8.4.0
+	github.com/go-redis/redis/v8 v8.11.4
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
 	// NOTE: github.com/golang/protobuf is actually pinned to v1.3.5 above.
@@ -91,7 +83,7 @@ require (
 	github.com/jtacoma/uritemplates v1.0.0
 	github.com/kr/pretty v0.2.1
 	github.com/lib/pq v1.10.4
-	github.com/mitchellh/mapstructure v1.4.1
+	github.com/mitchellh/mapstructure v1.4.3
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/nats-io/nats-server/v2 v2.2.2
 	github.com/nats-io/nats.go v1.11.0
@@ -164,7 +156,7 @@ require (
 	github.com/blevesearch/zap/v13 v13.0.5 // indirect
 	github.com/blevesearch/zap/v14 v14.0.4 // indirect
 	github.com/blevesearch/zap/v15 v15.0.2 // indirect
-	github.com/cespare/xxhash/v2 v2.1.1 // indirect
+	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/couchbase/vellum v1.0.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
@@ -217,7 +209,6 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/willf/bitset v1.1.10 // indirect
 	go.etcd.io/bbolt v1.3.5 // indirect
-	go.opentelemetry.io/otel v0.14.0 // indirect
 	go.uber.org/atomic v1.5.0 // indirect
 	go.uber.org/multierr v1.3.0 // indirect
 	go.uber.org/tools v0.0.0-20190618225709-2cfd321de3ee // indirect

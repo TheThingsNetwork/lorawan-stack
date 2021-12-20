@@ -89,7 +89,7 @@ func TestNetworkServerCleanup(t *testing.T) {
 	}
 
 	deviceRegistry, closeFn := networkserver.NewDeviceRegistry(ctx)
-	defer t.Cleanup(closeFn)
+	defer closeFn()
 
 	for _, dev := range deviceList {
 		ret, _, err := deviceRegistry.SetByID(ctx, *dev.ApplicationIds, dev.EndDeviceIdentifiers.DeviceId, []string{

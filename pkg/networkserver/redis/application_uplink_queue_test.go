@@ -35,7 +35,7 @@ func TestApplicationUplinkQueue(t *testing.T) {
 				consumerIDs = append(consumerIDs, fmt.Sprintf("consumer-%d-%d", consumers, i))
 			}
 			q, closeFn := NewRedisApplicationUplinkQueue(ctx)
-			t.Cleanup(closeFn)
+			defer closeFn()
 			HandleApplicationUplinkQueueTest(t, q, consumerIDs)
 		})
 	}
