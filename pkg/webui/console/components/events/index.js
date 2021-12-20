@@ -164,7 +164,6 @@ Events.propTypes = {
   events: PropTypes.events.isRequired,
   filter: PropTypes.eventFilter,
   onClear: PropTypes.func,
-  onExport: PropTypes.func,
   onFilterChange: PropTypes.func,
   onPauseToggle: PropTypes.func,
   paused: PropTypes.bool.isRequired,
@@ -179,7 +178,6 @@ Events.defaultProps = {
   onClear: () => null,
   onPauseToggle: () => null,
   onFilterChange: () => null,
-  onExport: () => null,
 }
 
 Events.Widget = Widget
