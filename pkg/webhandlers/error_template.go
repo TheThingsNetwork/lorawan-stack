@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 )
 
 // Data contains data to render templates.
@@ -90,7 +91,6 @@ func (t *ErrorTemplate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Year:                time.Now().Year(),
 		IsGenericNotFound:   isGenericNotFound,
 	}); err != nil {
-		Error(w, r, err)
-		return
+		log.FromContext(r.Context()).WithError(err).Warn("Failed to execute template")
 	}
 }
