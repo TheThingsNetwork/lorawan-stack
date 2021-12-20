@@ -73,7 +73,7 @@ const Tooltip = props => {
       popperOptions={{ modifiers: popperModifiers }}
       delay={delay}
       onShow={handleShow}
-      appendTo={appendTo || interactive ? 'parent' : document.body}
+      appendTo={appendTo ? appendTo : interactive ? 'parent' : document.body}
       animation="fade"
       duration={250}
       hideOnClick={hideOnClick}

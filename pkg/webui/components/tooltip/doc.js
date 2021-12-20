@@ -27,6 +27,7 @@ import Tooltip from '.'
 
 const DocTooltip = ({ content, docPath, docTitle, interactive, ...rest }) => (
   <Tooltip
+    {...rest}
     interactive
     content={
       <>
@@ -38,7 +39,6 @@ const DocTooltip = ({ content, docPath, docTitle, interactive, ...rest }) => (
         </div>
       </>
     }
-    {...rest}
     appendTo={document.body}
   />
 )

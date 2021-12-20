@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 import { combineDeviceIds, extractDeviceIdFromCombinedId } from '@ttn-lw/lib/selectors/id'
 import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
@@ -19,6 +20,7 @@ import {
   createPaginationIdsSelectorByEntity,
   createPaginationTotalCountSelectorByEntity,
 } from '@ttn-lw/lib/store/selectors/pagination'
+import { selectAsConfig, selectJsConfig, selectNsConfig } from '@ttn-lw/lib/selectors/env'
 
 import { GET_DEV_BASE, GET_DEVICES_LIST_BASE } from '@console/store/actions/devices'
 
@@ -50,6 +52,14 @@ export const selectSelectedDevice = state =>
 export const selectSelectedDeviceFormatters = state => selectSelectedDevice(state).formatters
 export const selectDeviceFetching = createFetchingSelector(GET_DEV_BASE)
 export const selectDeviceError = createErrorSelector(GET_DEV_BASE)
+export const isOtherClusterDevice = device => {
+  const isOtherCluster =
+    getHostnameFromUrl(selectAsConfig().base_url) !== device.application_server_address &&
+    getHostnameFromUrl(selectNsConfig().base_url) !== device.network_server_address &&
+    getHostnameFromUrl(selectJsConfig().base_url) !== device.join_server_address
+
+  return isOtherCluster
+}
 
 // Derived.
 export const selectDeviceDerivedUplinkFrameCount = (state, appId, devId) => {

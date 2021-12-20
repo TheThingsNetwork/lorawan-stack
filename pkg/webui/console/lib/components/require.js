@@ -17,6 +17,8 @@ import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
 import { Redirect } from 'react-router-dom'
 
+import toast from '@ttn-lw/components/toast'
+
 import PropTypes from '../../../lib/prop-types'
 
 @connect((state, props) => {
@@ -33,6 +35,7 @@ export default class Require extends Component {
     otherwise: PropTypes.shape({
       redirect: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
       render: PropTypes.func,
+      message: PropTypes.string,
     }),
   }
   static defaultProps = {
@@ -43,7 +46,14 @@ export default class Require extends Component {
   alternativeRender() {
     const { otherwise } = this.props
     if (typeof otherwise === 'object') {
-      const { render, redirect } = otherwise
+      const { render, redirect, message } = otherwise
+
+      if (message) {
+        toast({
+          type: toast.types.WARNING,
+          message,
+        })
+      }
 
       if (typeof redirect === 'string') {
         return <Redirect to={redirect} />

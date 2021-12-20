@@ -27,12 +27,14 @@ import DeviceMap from '@console/components/device-map'
 
 import DeviceEvents from '@console/containers/device-events'
 
+import Require from '@console/lib/components/require'
+
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
-import { selectSelectedDevice } from '@console/store/selectors/devices'
+import { selectSelectedDevice, isOtherClusterDevice } from '@console/store/selectors/devices'
 
 import style from './device-overview.styl'
 
@@ -43,14 +45,26 @@ const m = defineMessages({
   latestData: 'Latest data',
   rootKeys: 'Root keys',
   keysNotExposed: 'Keys are not exposed',
+  failedAccessOtherHostDevice:
+    'The end device you attempted to visit is registered on a different cluster and needs to be accessed using its host Console.',
 })
 
-@connect(state => ({
-  device: selectSelectedDevice(state),
-}))
+@connect(state => {
+  const device = selectSelectedDevice(state)
+  const shouldRedirect = isOtherClusterDevice(device)
+  return {
+    device,
+    shouldRedirect,
+  }
+})
 class DeviceOverview extends React.Component {
   static propTypes = {
     device: PropTypes.device.isRequired,
+    shouldRedirect: PropTypes.bool,
+  }
+
+  static defaultProps = {
+    shouldRedirect: false,
   }
 
   get deviceInfo() {
@@ -219,21 +233,27 @@ class DeviceOverview extends React.Component {
   }
 
   render() {
-    const { device } = this.props
+    const { device, shouldRedirect } = this.props
     const devIds = device && device.ids
+    const otherwise = {
+      redirect: '/applications',
+      message: m.failedAccessOtherHostDevice,
+    }
     return (
-      <Container>
-        <IntlHelmet title={sharedMessages.overview} />
-        <Row className={style.head}>
-          <Col md={12} lg={6}>
-            {this.deviceInfo}
-          </Col>
-          <Col md={12} lg={6} className={style.latestEvents}>
-            <DeviceEvents devIds={devIds} widget />
-            <DeviceMap device={device} />
-          </Col>
-        </Row>
-      </Container>
+      <Require condition={!shouldRedirect} otherwise={otherwise}>
+        <Container>
+          <IntlHelmet title={sharedMessages.overview} />
+          <Row className={style.head}>
+            <Col md={12} lg={6}>
+              {this.deviceInfo}
+            </Col>
+            <Col md={12} lg={6} className={style.latestEvents}>
+              <DeviceEvents devIds={devIds} widget />
+              <DeviceMap device={device} />
+            </Col>
+          </Row>
+        </Container>
+      </Require>
     )
   }
 }

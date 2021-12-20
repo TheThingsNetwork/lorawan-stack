@@ -111,29 +111,33 @@ class Tabular extends React.Component {
       return typeof key === 'string' || typeof key === 'number' ? key : JSON.stringify(key)
     }
     const appliedRowKeySelector = rowKeySelector ? rowKeySelector : defaultRowKeySelector
-
     const paginatedData = this.handlePagination(data)
-    const rows = paginatedData.map((row, rowIndex) => (
-      <Table.Row
-        key={appliedRowKeySelector(row)}
-        id={rowIndex}
-        onClick={onRowClick}
-        clickable={clickable}
-        linkTo={rowHrefSelector ? rowHrefSelector(row) : undefined}
-        body
-      >
-        {headers.map((header, index) => {
-          const value = headers[index].getValue
-            ? headers[index].getValue(row)
-            : getByPath(row, headers[index].name)
-          return (
-            <Table.DataCell key={index} align={header.align} small={small}>
-              {headers[index].render ? headers[index].render(value) : value}
-            </Table.DataCell>
-          )
-        })}
-      </Table.Row>
-    ))
+    const rows = paginatedData.map((row, rowIndex) => {
+      // If the whole table is disabled each row should be as well.
+      const rowClickable = !clickable ? false : row._meta?.clickable ?? clickable
+
+      return (
+        <Table.Row
+          key={appliedRowKeySelector(row)}
+          id={rowIndex}
+          onClick={onRowClick}
+          clickable={rowClickable}
+          linkTo={rowHrefSelector ? rowHrefSelector(row) : undefined}
+          body
+        >
+          {headers.map((header, index) => {
+            const value = headers[index].getValue
+              ? headers[index].getValue(row)
+              : getByPath(row, headers[index].name)
+            return (
+              <Table.DataCell key={index} align={header.align} small={small}>
+                {headers[index].render ? headers[index].render(value) : value}
+              </Table.DataCell>
+            )
+          })}
+        </Table.Row>
+      )
+    })
 
     const pagination = paginated ? (
       <Table.Row footer>
@@ -171,7 +175,15 @@ Tabular.propTypes = {
   className: PropTypes.string,
   clickable: PropTypes.bool,
   /** A list of data entries to display within the table body. */
-  data: PropTypes.arrayOf(PropTypes.shape({})),
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      /** A meta config object used to control the behavior of individual rows. */
+      _meta: PropTypes.shape({
+        /** A flag specifying whether the row should be clickable. */
+        clickable: PropTypes.bool,
+      }),
+    }),
+  ),
   /** The empty message to be displayed when no data provided. */
   emptyMessage: PropTypes.message.isRequired,
   /**

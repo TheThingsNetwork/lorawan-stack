@@ -15,10 +15,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import bind from 'autobind-decorator'
+import { defineMessages } from 'react-intl'
 
 import Button from '@ttn-lw/components/button'
 import SafeInspector from '@ttn-lw/components/safe-inspector'
 import Status from '@ttn-lw/components/status'
+import DocTooltip from '@ttn-lw/components/tooltip/doc'
+import Icon from '@ttn-lw/components/icon'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
@@ -53,9 +56,15 @@ import {
   selectDevicesTotalCount,
   selectDevicesFetching,
   selectDeviceDerivedLastSeen,
+  isOtherClusterDevice,
 } from '@console/store/selectors/devices'
 
 import style from './devices-table.styl'
+
+const m = defineMessages({
+  otherClusterTooltip:
+    'This end device is registered on a different cluster (`{host}`). To access this device, use the Console of the cluster that this end device was registered on.',
+})
 
 const headers = [
   {
@@ -92,15 +101,29 @@ const headers = [
       ),
   },
   {
-    name: '_derivedLastSeen',
+    name: 'status',
     displayName: sharedMessages.lastSeen,
     width: 14,
-    render: lastSeen =>
-      lastSeen ? (
-        <LastSeen lastSeen={lastSeen} short />
-      ) : (
-        <Status status="mediocre" label={sharedMessages.never} />
-      ),
+    render: status => {
+      if (status.otherCluster) {
+        const host = status.host
+        return (
+          <DocTooltip
+            docPath="/getting-started/cloud-hosted"
+            content={<Message content={m.otherClusterTooltip} values={{ host }} convertBackticks />}
+            placement="top-end"
+          >
+            <Status status="unknown" label={sharedMessages.otherCluster}>
+              <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
+            </Status>
+          </DocTooltip>
+        )
+      } else if (status._derivedLastSeen) {
+        return <LastSeen lastSeen={status._derivedLastSeen} short />
+      }
+
+      return <Status status="mediocre" label={sharedMessages.never} />
+    },
   },
 ]
 
@@ -146,7 +169,12 @@ class DevicesTable extends React.Component {
     super(props)
 
     this.getDevicesList = filters =>
-      getDevicesList(props.appId, filters, ['name'], { withLastSeen: true })
+      getDevicesList(
+        props.appId,
+        filters,
+        ['name', 'application_server_address', 'network_server_address', 'join_server_address'],
+        { withLastSeen: true, withStatus: true },
+      )
   }
 
   @bind
@@ -154,10 +182,21 @@ class DevicesTable extends React.Component {
     const { mayCreateDevices, appId } = this.props
     const devices = selectDevices(state)
     const decoratedDevices = []
+
     for (const device of devices) {
       decoratedDevices.push({
         ...device,
-        _derivedLastSeen: selectDeviceDerivedLastSeen(state, appId, device.ids.device_id),
+        status: {
+          _derivedLastSeen: selectDeviceDerivedLastSeen(state, appId, device.ids.device_id),
+          otherCluster: isOtherClusterDevice(device),
+          host:
+            device.application_server_address ||
+            device.network_server_address ||
+            device.join_server_address,
+        },
+        _meta: {
+          clickable: !isOtherClusterDevice(device),
+        },
       })
     }
     return {
