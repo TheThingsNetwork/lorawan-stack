@@ -557,7 +557,7 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 				var def string
 				if val != nil {
 					def = fmt.Sprintf("%v", int32(*val))
-					m.viper.SetDefault(name, *val)
+					m.viper.SetDefault(name, def)
 				}
 				flags.StringP(name, shorthand, def, description)
 

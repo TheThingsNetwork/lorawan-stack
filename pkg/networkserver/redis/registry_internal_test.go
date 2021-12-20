@@ -34,12 +34,10 @@ import (
 func TestMsgpackCompatibility(t *testing.T) {
 	_, ctx := test.New(t)
 	cl, flush := test.NewRedis(ctx, "test", "devices")
-	t.Cleanup(func() {
+	defer func() {
 		flush()
-		if err := cl.Close(); err != nil {
-			t.Errorf("Failed to close Redis device registry client: %s", test.FormatError(err))
-		}
-	})
+		cl.Close()
+	}()
 	makeExpr := func(exprs ...string) string {
 		if len(exprs) == 0 {
 			panic("no expressions specified")

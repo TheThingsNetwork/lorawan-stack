@@ -49,9 +49,7 @@ func NewRedisApplicationActivationSettingRegistry(ctx context.Context) (Applicat
 	return reg,
 		func() {
 			flush()
-			if err := cl.Close(); err != nil {
-				tb.Errorf("Failed to close Redis appliation activation setting registry client: %s", err)
-			}
+			cl.Close()
 		}
 }
 
