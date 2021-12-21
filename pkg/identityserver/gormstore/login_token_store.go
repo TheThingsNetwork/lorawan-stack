@@ -50,12 +50,10 @@ func (s *loginTokenStore) FindActiveLoginTokens(ctx context.Context, userIDs *tt
 	).Find(&loginTokenModels).Error; err != nil {
 		return nil, err
 	}
-	if len(loginTokenModels) == 0 {
-		return nil, nil
-	}
 	loginTokenProtos := make([]*ttnpb.LoginToken, len(loginTokenModels))
 	for i, loginTokenModel := range loginTokenModels {
 		loginTokenProtos[i] = loginTokenModel.toPB()
+		loginTokenProtos[i].UserIds = userIDs
 	}
 	return loginTokenProtos, nil
 }
@@ -74,13 +72,15 @@ func (s *loginTokenStore) CreateLoginToken(ctx context.Context, loginToken *ttnp
 	if err := s.createEntity(ctx, &model); err != nil {
 		return nil, convertError(err)
 	}
-	return model.toPB(), nil
+	pb := model.toPB()
+	pb.UserIds = loginToken.UserIds
+	return pb, nil
 }
 
 var (
 	errLoginTokenNotFound    = errors.DefineNotFound("login_token_not_found", "login token not found")
-	errLoginTokenAlreadyUsed = errors.DefineAlreadyExists("login_token_already_used", "login token already used")
-	errLoginTokenExpired     = errors.DefineInvalidArgument("login_token_expired", "login token expired")
+	errLoginTokenAlreadyUsed = errors.DefineFailedPrecondition("login_token_already_used", "login token already used")
+	errLoginTokenExpired     = errors.DefineFailedPrecondition("login_token_expired", "login token expired")
 )
 
 func (s *loginTokenStore) ConsumeLoginToken(ctx context.Context, token string) (*ttnpb.LoginToken, error) {
