@@ -38,6 +38,7 @@ const RelativeTime = props => {
     children,
     justNowMessage,
     relativeTimeStyle,
+    noTitle,
   } = props
 
   const from = new Date(value)
@@ -66,7 +67,7 @@ const RelativeTime = props => {
   }, [showLessThan, absDelta, updateIntervalInSeconds])
 
   return (
-    <DateTime className={className} value={value} firstToLower={firstToLower}>
+    <DateTime className={className} value={value} firstToLower={firstToLower} noTitle={noTitle}>
       {dateTime => (
         <FormattedRelativeTime
           key={dateTime}
@@ -98,6 +99,8 @@ RelativeTime.propTypes = {
   firstToLower: PropTypes.bool,
   /** Message to render when the delta is less than `updateIntervalInSeconds`. */
   justNowMessage: PropTypes.message,
+  /** Whether to show the title or not. */
+  noTitle: PropTypes.bool,
   /** The style of the relative time rendering. */
   relativeTimeStyle: PropTypes.oneOf(['long', 'short', 'narrow']),
   /** The unit to calculate relative date time. */
@@ -121,6 +124,7 @@ RelativeTime.defaultProps = {
   unit: 'second',
   computeDelta: formatInSeconds,
   justNowMessage: m.justNow,
+  noTitle: false,
 }
 
 export default RelativeTime

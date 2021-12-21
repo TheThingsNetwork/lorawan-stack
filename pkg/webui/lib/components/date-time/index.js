@@ -42,7 +42,7 @@ class DateTime extends React.PureComponent {
   }
 
   renderDateTime(formattedDate, formattedTime, dateValue) {
-    const { className, children, date, time } = this.props
+    const { className, children, date, time, noTitle } = this.props
 
     let result = ''
     if (date) {
@@ -63,7 +63,7 @@ class DateTime extends React.PureComponent {
     }
 
     return (
-      <time className={className} dateTime={dateValue.toISOString()}>
+      <time className={className} dateTime={dateValue.toISOString()} title={noTitle || result}>
         {children ? children(result) : result}
       </time>
     )
@@ -105,6 +105,8 @@ DateTime.propTypes = {
   dateFormatOptions: PropTypes.shape({}),
   /** Whether to convert the first character of the resulting message to lowercase. */
   firstToLower: PropTypes.bool,
+  /** Whether to show the title or not. */
+  noTitle: PropTypes.bool,
   // See https://formatjs.io/docs/react-intl/components/#formatteddate
   time: PropTypes.bool,
   // See https://formatjs.io/docs/react-intl/components/#formattedtime
@@ -133,6 +135,7 @@ DateTime.defaultProps = {
     second: 'numeric',
     hour12: false,
   },
+  noTitle: false,
 }
 
 export default DateTime

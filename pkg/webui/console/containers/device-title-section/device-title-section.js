@@ -37,7 +37,7 @@ const m = defineMessages({
   uplinkDownlinkTooltip:
     'The number of sent uplinks and received downlinks of this end device since the last frame counter reset.',
   lastSeenAvailableTooltip:
-    'The elapsed time since the network registered the last activity of this end device. This is determined from sent uplinks, confirmed downlinks or (re)join requests. The last activity was received at {lastActivityInfo}',
+    'The elapsed time since the network registered the last activity of this end device. This is determined from sent uplinks, confirmed downlinks or (re)join requests.{lineBreak}The last activity was received at {lastActivityInfo}',
   noActivityTooltip:
     'The network has not registered any activity from this end device yet. This could mean that your end device has not sent any messages yet or only messages that cannot be handled by the network, e.g. due to a mismatch of EUIs or frequencies.',
 })
@@ -51,7 +51,8 @@ const DeviceTitleSection = props => {
   const showUplinkCount = typeof uplinkFrameCount === 'number'
   const showDownlinkCount = typeof downlinkFrameCount === 'number'
   const notAvailableElem = <Message content={sharedMessages.notAvailable} />
-  const lastActivityInfo = <DateTime value={lastSeen} />
+  const lastActivityInfo = <DateTime value={lastSeen} noTitle />
+  const lineBreak = <br />
   const bottomBarLeft = (
     <>
       <Tooltip content={<Message content={m.uplinkDownlinkTooltip} />}>
@@ -71,9 +72,14 @@ const DeviceTitleSection = props => {
       {showLastSeen ? (
         <DocTooltip
           docPath="/reference/last-activity"
-          content={<Message content={m.lastSeenAvailableTooltip} values={{ lastActivityInfo }} />}
+          content={
+            <Message
+              content={m.lastSeenAvailableTooltip}
+              values={{ lineBreak, lastActivityInfo }}
+            />
+          }
         >
-          <LastSeen lastSeen={lastSeen} flipped>
+          <LastSeen lastSeen={lastSeen} flipped noTitle>
             <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
           </LastSeen>
         </DocTooltip>
