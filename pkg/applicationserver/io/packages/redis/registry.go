@@ -123,27 +123,17 @@ func (r ApplicationPackagesRegistry) ListAssociations(ctx context.Context, ids *
 	devUID := unique.ID(ctx, ids)
 	uidKey := r.uidKey(devUID)
 
-	lockerID, err := ttnredis.GenerateLockerID()
-	if err != nil {
-		return nil, err
+	opts := []ttnredis.FindProtosOption{}
+	limit, offset := ttnredis.PaginationLimitAndOffsetFromContext(ctx)
+	if limit != 0 {
+		opts = append(opts,
+			ttnredis.FindProtosSorted(false),
+			ttnredis.FindProtosWithOffsetAndCount(offset, limit),
+		)
 	}
 
-	defer trace.StartRegion(ctx, "list application package associations by device id").End()
-
-	err = ttnredis.LockedWatch(ctx, r.Redis, uidKey, lockerID, r.LockTTL, func(tx *redis.Tx) (err error) {
-		opts := []ttnredis.FindProtosOption{ttnredis.FindProtosSorted(false)}
-
-		limit, offset := ttnredis.PaginationLimitAndOffsetFromContext(ctx)
-		if limit != 0 {
-			total, err := tx.SCard(ctx, uidKey).Result()
-			if err != nil {
-				return err
-			}
-			ttnredis.SetPaginationTotal(ctx, total)
-			opts = append(opts, ttnredis.FindProtosWithOffsetAndCount(offset, limit))
-		}
-
-		return ttnredis.FindProtos(ctx, tx, uidKey, r.makeAssociationKeyFunc(devUID), opts...).Range(func() (proto.Message, func() (bool, error)) {
+	rangeProtos := func(c redis.Cmdable) error {
+		return ttnredis.FindProtos(ctx, c, uidKey, r.makeAssociationKeyFunc(devUID), opts...).Range(func() (proto.Message, func() (bool, error)) {
 			pb := &ttnpb.ApplicationPackageAssociation{}
 			return pb, func() (bool, error) {
 				pb, err := applyAssociationFieldMask(nil, pb, appendImplicitAssociationGetPaths(paths...)...)
@@ -154,7 +144,28 @@ func (r ApplicationPackagesRegistry) ListAssociations(ctx context.Context, ids *
 				return true, nil
 			}
 		})
-	})
+	}
+
+	defer trace.StartRegion(ctx, "list application package associations by device id").End()
+
+	var err error
+	if limit != 0 {
+		var lockerID string
+		lockerID, err = ttnredis.GenerateLockerID()
+		if err != nil {
+			return nil, err
+		}
+		err = ttnredis.LockedWatch(ctx, r.Redis, uidKey, lockerID, r.LockTTL, func(tx *redis.Tx) (err error) {
+			total, err := tx.SCard(ctx, uidKey).Result()
+			if err != nil {
+				return err
+			}
+			ttnredis.SetPaginationTotal(ctx, total)
+			return rangeProtos(tx)
+		})
+	} else {
+		err = rangeProtos(r.Redis)
+	}
 	if err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}
@@ -318,27 +329,17 @@ func (r ApplicationPackagesRegistry) ListDefaultAssociations(ctx context.Context
 	appUID := unique.ID(ctx, ids)
 	uidKey := r.uidKey(appUID)
 
-	lockerID, err := ttnredis.GenerateLockerID()
-	if err != nil {
-		return nil, err
+	opts := []ttnredis.FindProtosOption{}
+	limit, offset := ttnredis.PaginationLimitAndOffsetFromContext(ctx)
+	if limit != 0 {
+		opts = append(opts,
+			ttnredis.FindProtosSorted(false),
+			ttnredis.FindProtosWithOffsetAndCount(offset, limit),
+		)
 	}
 
-	defer trace.StartRegion(ctx, "list application package default associations by application id").End()
-
-	err = ttnredis.LockedWatch(ctx, r.Redis, uidKey, lockerID, r.LockTTL, func(tx *redis.Tx) (err error) {
-		opts := []ttnredis.FindProtosOption{ttnredis.FindProtosSorted(false)}
-
-		limit, offset := ttnredis.PaginationLimitAndOffsetFromContext(ctx)
-		if limit != 0 {
-			total, err := tx.SCard(ctx, uidKey).Result()
-			if err != nil {
-				return err
-			}
-			ttnredis.SetPaginationTotal(ctx, total)
-			opts = append(opts, ttnredis.FindProtosWithOffsetAndCount(offset, limit))
-		}
-
-		return ttnredis.FindProtos(ctx, tx, uidKey, r.makeAssociationKeyFunc(appUID), opts...).Range(func() (proto.Message, func() (bool, error)) {
+	rangeProtos := func(c redis.Cmdable) error {
+		return ttnredis.FindProtos(ctx, c, uidKey, r.makeAssociationKeyFunc(appUID), opts...).Range(func() (proto.Message, func() (bool, error)) {
 			pb := &ttnpb.ApplicationPackageDefaultAssociation{}
 			return pb, func() (bool, error) {
 				pb, err := applyDefaultAssociationFieldMask(nil, pb, appendImplicitAssociationGetPaths(paths...)...)
@@ -349,7 +350,28 @@ func (r ApplicationPackagesRegistry) ListDefaultAssociations(ctx context.Context
 				return true, nil
 			}
 		})
-	})
+	}
+
+	defer trace.StartRegion(ctx, "list application package default associations by application id").End()
+
+	var err error
+	if limit != 0 {
+		var lockerID string
+		lockerID, err = ttnredis.GenerateLockerID()
+		if err != nil {
+			return nil, err
+		}
+		err = ttnredis.LockedWatch(ctx, r.Redis, uidKey, lockerID, r.LockTTL, func(tx *redis.Tx) (err error) {
+			total, err := tx.SCard(ctx, uidKey).Result()
+			if err != nil {
+				return err
+			}
+			ttnredis.SetPaginationTotal(ctx, total)
+			return rangeProtos(tx)
+		})
+	} else {
+		err = rangeProtos(r.Redis)
+	}
 	if err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}
