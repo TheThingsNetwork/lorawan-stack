@@ -127,7 +127,7 @@ func TestRegistry(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(retrieved, should.Resemble, stats)
 
-		time.Sleep(Timeout)
+		time.Sleep(2 * Timeout)
 
 		// shouldn't be found after ttl has passed
 		retrieved, err = registry.Get(ctx, ids)
