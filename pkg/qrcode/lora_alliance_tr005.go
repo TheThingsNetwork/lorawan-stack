@@ -40,15 +40,15 @@ type LoRaAllianceTR005 struct {
 
 // Encode implements the Data interface.
 func (m *LoRaAllianceTR005) Encode(dev *ttnpb.EndDevice) error {
-	if dev.JoinEui == nil {
+	if dev.Ids == nil || dev.Ids.JoinEui == nil {
 		return errNoJoinEUI.New()
 	}
-	if dev.DevEui == nil {
+	if dev.Ids.DevEui == nil {
 		return errNoDevEUI.New()
 	}
 	*m = LoRaAllianceTR005{
-		JoinEUI:    *dev.JoinEui,
-		DevEUI:     *dev.DevEui,
+		JoinEUI:    *dev.Ids.JoinEui,
+		DevEUI:     *dev.Ids.DevEui,
 		OwnerToken: dev.GetClaimAuthenticationCode().GetValue(),
 	}
 	return nil

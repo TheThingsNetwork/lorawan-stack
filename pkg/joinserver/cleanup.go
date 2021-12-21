@@ -34,14 +34,14 @@ type RegistryCleaner struct {
 func (cleaner *RegistryCleaner) RangeToLocalSet(ctx context.Context) error {
 	cleaner.LocalDeviceSet = make(map[string]struct{})
 	cleaner.LocalApplicationSet = make(map[string]struct{})
-	err := cleaner.DevRegistry.RangeByID(ctx, []string{"ids"}, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, dev *ttnpb.EndDevice) bool {
+	err := cleaner.DevRegistry.RangeByID(ctx, []string{"ids"}, func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, dev *ttnpb.EndDevice) bool {
 		cleaner.LocalDeviceSet[unique.ID(ctx, ids)] = struct{}{}
 		return true
 	})
 	if err != nil {
 		return err
 	}
-	return cleaner.AppAsRegistry.Range(ctx, []string{"application_server_id"}, func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, _ *ttnpb.ApplicationActivationSettings) bool {
+	return cleaner.AppAsRegistry.Range(ctx, []string{"application_server_id"}, func(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, _ *ttnpb.ApplicationActivationSettings) bool {
 		cleaner.LocalApplicationSet[unique.ID(ctx, ids)] = struct{}{}
 		return true
 	})
@@ -58,7 +58,7 @@ func (cleaner *RegistryCleaner) DeleteApplicationAndDeviceData(ctx context.Conte
 		if err != nil {
 			return err
 		}
-		err = DeleteDevice(ctx, cleaner.DevRegistry, *devIds.ApplicationIds, devIds.DeviceId)
+		err = DeleteDevice(ctx, cleaner.DevRegistry, devIds.ApplicationIds, devIds.DeviceId)
 		if err != nil {
 			return err
 		}
@@ -72,7 +72,7 @@ func (cleaner *RegistryCleaner) DeleteApplicationAndDeviceData(ctx context.Conte
 		if err != nil {
 			return err
 		}
-		err = DeleteApplicationActivationSettings(ctx, cleaner.AppAsRegistry, appIds)
+		err = DeleteApplicationActivationSettings(ctx, cleaner.AppAsRegistry, &appIds)
 		if err != nil {
 			return err
 		}

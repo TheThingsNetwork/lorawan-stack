@@ -49,7 +49,9 @@ func (t *tts) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDevi
 
 	dec := ttnio.NewJSONDecoder(r)
 	for {
-		dev := ttnpb.EndDevice{}
+		dev := ttnpb.EndDevice{
+			Ids: &ttnpb.EndDeviceIdentifiers{},
+		}
 		paths, err := dec.Decode(&dev)
 		if err != nil {
 			if err != io.EOF {
@@ -60,7 +62,7 @@ func (t *tts) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDevi
 		paths = append(paths, "supports_join")
 
 		// dev_addr must be set as `session.dev_addr`.
-		dev.DevAddr = nil
+		dev.Ids.DevAddr = nil
 		for idx, path := range paths {
 			if path == "dev_addr" {
 				switch idx {

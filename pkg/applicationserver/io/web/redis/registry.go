@@ -195,11 +195,11 @@ func (r WebhookRegistry) Set(ctx context.Context, ids *ttnpb.ApplicationWebhookI
 				if err != nil {
 					return err
 				}
-				if updated.Ids.GetApplicationIds().GetApplicationId() != ids.GetApplicationIds().GetApplicationId() || updated.Ids.WebhookId != ids.WebhookId {
+				if updated.Ids.ApplicationIds.ApplicationId != ids.ApplicationIds.ApplicationId || updated.Ids.WebhookId != ids.WebhookId {
 					return errInvalidIdentifiers.New()
 				}
 			} else {
-				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.Ids.GetApplicationIds().GetApplicationId() != stored.Ids.GetApplicationIds().GetApplicationId() {
+				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.Ids.ApplicationIds.ApplicationId != stored.Ids.ApplicationIds.ApplicationId {
 					return errReadOnlyField.WithAttributes("field", "ids.application_ids.application_id")
 				}
 				if ttnpb.HasAnyField(sets, "ids.webhook_id") && pb.Ids.WebhookId != stored.Ids.WebhookId {

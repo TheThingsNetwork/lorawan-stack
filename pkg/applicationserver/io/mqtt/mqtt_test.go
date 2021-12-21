@@ -42,7 +42,7 @@ var (
 	registeredApplicationID  = ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}
 	registeredApplicationUID = unique.ID(test.Context(), registeredApplicationID)
 	registeredApplicationKey = "test-key"
-	registeredDeviceID       = ttnpb.EndDeviceIdentifiers{
+	registeredDeviceID       = &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: &registeredApplicationID,
 		DeviceId:       "test-device",
 	}
@@ -190,7 +190,7 @@ func TestTraffic(t *testing.T) {
 			{
 				Topic: "#",
 				Message: &ttnpb.ApplicationUp{
-					EndDeviceIds: &registeredDeviceID,
+					EndDeviceIds: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
 						UplinkMessage: &ttnpb.ApplicationUplink{FrmPayload: []byte{0x1, 0x1, 0x1}},
 					},
@@ -200,7 +200,7 @@ func TestTraffic(t *testing.T) {
 			{
 				Topic: fmt.Sprintf("v3/%v/devices/%v/up", unique.ID(ctx, registeredDeviceID.ApplicationIds), registeredDeviceID.DeviceId),
 				Message: &ttnpb.ApplicationUp{
-					EndDeviceIds: &registeredDeviceID,
+					EndDeviceIds: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
 						UplinkMessage: &ttnpb.ApplicationUplink{FrmPayload: []byte{0x2, 0x2, 0x2}},
 					},
@@ -210,7 +210,7 @@ func TestTraffic(t *testing.T) {
 			{
 				Topic: fmt.Sprintf("v3/%v/devices/%v/join", unique.ID(ctx, registeredDeviceID.ApplicationIds), registeredDeviceID.DeviceId),
 				Message: &ttnpb.ApplicationUp{
-					EndDeviceIds: &registeredDeviceID,
+					EndDeviceIds: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_JoinAccept{
 						JoinAccept: &ttnpb.ApplicationJoinAccept{SessionKeyId: []byte{0x1, 0x1, 0x1}},
 					},
@@ -220,7 +220,7 @@ func TestTraffic(t *testing.T) {
 			{
 				Topic: fmt.Sprintf("v3/%v/devices/%v/join", unique.ID(ctx, registeredDeviceID.ApplicationIds), registeredDeviceID.DeviceId),
 				Message: &ttnpb.ApplicationUp{
-					EndDeviceIds: &registeredDeviceID,
+					EndDeviceIds: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
 						UplinkMessage: &ttnpb.ApplicationUplink{FrmPayload: []byte{0x3, 0x3, 0x3}},
 					},
@@ -230,7 +230,7 @@ func TestTraffic(t *testing.T) {
 			{
 				Topic: fmt.Sprintf("v3/%v/devices/%v/up", "invalid-application", "invalid-device"),
 				Message: &ttnpb.ApplicationUp{
-					EndDeviceIds: &registeredDeviceID,
+					EndDeviceIds: registeredDeviceID,
 					Up: &ttnpb.ApplicationUp_UplinkMessage{
 						UplinkMessage: &ttnpb.ApplicationUplink{FrmPayload: []byte{0x4, 0x4, 0x4}},
 					},
@@ -288,7 +288,7 @@ func TestTraffic(t *testing.T) {
 	t.Run("Downstream", func(t *testing.T) {
 		for _, tc := range []struct {
 			Topic    string
-			IDs      ttnpb.EndDeviceIdentifiers
+			IDs      *ttnpb.EndDeviceIdentifiers
 			Message  *ttnpb.ApplicationDownlinks
 			Expected []*ttnpb.ApplicationDownlink
 		}{

@@ -247,7 +247,7 @@ func TestTTSConverter(t *testing.T) {
 					t.FailNow()
 				}
 
-				a.So(tmpl.EndDevice.DevAddr, should.BeNil)
+				a.So(tmpl.EndDevice.Ids.DevAddr, should.BeNil)
 				a.So(tmpl.FieldMask.GetPaths(), should.NotContain, "dev_addr")
 			},
 			nExpect: 1,

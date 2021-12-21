@@ -31,7 +31,7 @@ import (
 func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue, consumerIDs []string) {
 	t, a := test.MustNewTFromContext(ctx)
 
-	pbs := [...]ttnpb.EndDeviceIdentifiers{
+	pbs := [...]*ttnpb.EndDeviceIdentifiers{
 		{
 			ApplicationIds: &ttnpb.ApplicationIdentifiers{
 				ApplicationId: "test-app",
@@ -54,7 +54,7 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue, consu
 
 	type slot struct {
 		ctx        context.Context
-		id         ttnpb.EndDeviceIdentifiers
+		id         *ttnpb.EndDeviceIdentifiers
 		t          time.Time
 		consumerID string
 		respCh     chan<- TaskPopFuncResponse
@@ -79,7 +79,7 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue, consu
 				select {
 				case <-ctx.Done():
 					return
-				case errCh <- q.Pop(popCtx, consumerID, func(ctx context.Context, id ttnpb.EndDeviceIdentifiers, t time.Time) (time.Time, error) {
+				case errCh <- q.Pop(popCtx, consumerID, func(ctx context.Context, id *ttnpb.EndDeviceIdentifiers, t time.Time) (time.Time, error) {
 					respCh := make(chan TaskPopFuncResponse)
 					slotCh <- slot{
 						ctx:        ctx,
@@ -182,7 +182,7 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue, consu
 	}
 
 	// Expect 3 slots
-	receivedSlots := make(map[ttnpb.EndDeviceIdentifiers][]time.Time, 3)
+	receivedSlots := make(map[*ttnpb.EndDeviceIdentifiers][]time.Time, 3)
 	for i := 0; i < 3; i++ {
 		t.Helper()
 		a := assertions.New(t)
@@ -213,7 +213,7 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue, consu
 
 	}
 
-	exp := map[ttnpb.EndDeviceIdentifiers][]time.Time{
+	exp := map[*ttnpb.EndDeviceIdentifiers][]time.Time{
 		pbs[0]: {time.Unix(0, 42).UTC()},
 		pbs[1]: {time.Unix(42, 0).UTC()},
 		pbs[2]: {time.Unix(42, 42).UTC()},

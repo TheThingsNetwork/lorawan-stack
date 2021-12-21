@@ -46,17 +46,17 @@ type PubSub interface {
 // DownlinkQueueOperator represents the Application Server downlink queue operations to application frontends.
 type DownlinkQueueOperator interface {
 	// DownlinkQueuePush pushes the given downlink messages to the end device's application downlink queue.
-	DownlinkQueuePush(context.Context, ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error
+	DownlinkQueuePush(context.Context, *ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error
 	// DownlinkQueueReplace replaces the end device's application downlink queue with the given downlink messages.
-	DownlinkQueueReplace(context.Context, ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error
+	DownlinkQueueReplace(context.Context, *ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error
 	// DownlinkQueueList lists the application downlink queue of the given end device.
-	DownlinkQueueList(context.Context, ttnpb.EndDeviceIdentifiers) ([]*ttnpb.ApplicationDownlink, error)
+	DownlinkQueueList(context.Context, *ttnpb.EndDeviceIdentifiers) ([]*ttnpb.ApplicationDownlink, error)
 }
 
 // UplinkStorage represents the Application Server uplink storage to application frontends.
 type UplinkStorage interface {
 	// RangeUplinks ranges the application uplinks and calls the callback function, until false is returned.
-	RangeUplinks(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(ctx context.Context, up *ttnpb.ApplicationUplink) bool) error
+	RangeUplinks(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(ctx context.Context, up *ttnpb.ApplicationUplink) bool) error
 }
 
 // Cluster represents the Application Server cluster peers to application frontends.

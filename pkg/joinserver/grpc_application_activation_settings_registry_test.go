@@ -63,7 +63,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		appIDStr = "test-app"
 		asID     = "test-as-id"
 	)
-	appID := ttnpb.ApplicationIdentifiers{
+	appID := &ttnpb.ApplicationIdentifiers{
 		ApplicationId: appIDStr,
 	}
 	netID := types.NetID{0x0, 0x1, 0x2}
@@ -96,7 +96,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 							a.So(role, should.Equal, ttnpb.ClusterRole_ACCESS)
 							return test.Must(test.NewGRPCServerPeer(ctx, &test.MockApplicationAccessServer{
 								ListRightsFunc: func(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
-									a.So(ids, should.Resemble, &appID)
+									a.So(ids, should.Resemble, appID)
 									return &ttnpb.Rights{
 										Rights: rights,
 									}, nil
@@ -136,7 +136,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		{
 			Name: "No rights",
 			Request: &ttnpb.GetApplicationActivationSettingsRequest{
-				ApplicationIds: &appID,
+				ApplicationIds: appID,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"kek",
@@ -151,7 +151,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		{
 			Name: "No read right",
 			Request: &ttnpb.GetApplicationActivationSettingsRequest{
-				ApplicationIds: &appID,
+				ApplicationIds: appID,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"kek",
@@ -169,7 +169,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		{
 			Name: "Not found/no paths",
 			Request: &ttnpb.GetApplicationActivationSettingsRequest{
-				ApplicationIds: &appID,
+				ApplicationIds: appID,
 			},
 			Rights: []ttnpb.Right{
 				ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
@@ -181,7 +181,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		{
 			Name: "Not found/with paths",
 			Request: &ttnpb.GetApplicationActivationSettingsRequest{
-				ApplicationIds: &appID,
+				ApplicationIds: appID,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{
 						"kek",
@@ -233,7 +233,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		{
 			Name: "No rights",
 			Request: &ttnpb.SetApplicationActivationSettingsRequest{
-				ApplicationIds: &appID,
+				ApplicationIds: appID,
 				Settings: &ttnpb.ApplicationActivationSettings{
 					KekLabel: sessionKEKLabel,
 					Kek:      jsKEKEnvelopeUnwrapped,
@@ -252,7 +252,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		{
 			Name: "No write right",
 			Request: &ttnpb.SetApplicationActivationSettingsRequest{
-				ApplicationIds: &appID,
+				ApplicationIds: appID,
 				Settings: &ttnpb.ApplicationActivationSettings{
 					KekLabel: sessionKEKLabel,
 					Kek:      jsKEKEnvelopeUnwrapped,
@@ -274,7 +274,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		{
 			Name: "No read right",
 			Request: &ttnpb.SetApplicationActivationSettingsRequest{
-				ApplicationIds: &appID,
+				ApplicationIds: appID,
 				Settings: &ttnpb.ApplicationActivationSettings{
 					KekLabel: sessionKEKLabel,
 					Kek:      jsKEKEnvelopeUnwrapped,
@@ -296,7 +296,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		{
 			Name: "No paths",
 			Request: &ttnpb.SetApplicationActivationSettingsRequest{
-				ApplicationIds: &appID,
+				ApplicationIds: appID,
 				Settings: &ttnpb.ApplicationActivationSettings{
 					KekLabel: sessionKEKLabel,
 					Kek:      jsKEKEnvelopeUnwrapped,
@@ -313,7 +313,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		{
 			Name: "Empty KEK",
 			Request: &ttnpb.SetApplicationActivationSettingsRequest{
-				ApplicationIds: &appID,
+				ApplicationIds: appID,
 				Settings: &ttnpb.ApplicationActivationSettings{
 					KekLabel: sessionKEKLabel,
 					Kek: &ttnpb.KeyEnvelope{
@@ -338,7 +338,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		{
 			Name: "KEK with empty label",
 			Request: &ttnpb.SetApplicationActivationSettingsRequest{
-				ApplicationIds: &appID,
+				ApplicationIds: appID,
 				Settings: &ttnpb.ApplicationActivationSettings{
 					Kek: jsKEKEnvelopeUnwrapped,
 				},
@@ -394,7 +394,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		{
 			Name: "No rights",
 			Request: &ttnpb.DeleteApplicationActivationSettingsRequest{
-				ApplicationIds: &appID,
+				ApplicationIds: appID,
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				return assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -403,7 +403,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		{
 			Name: "No write right",
 			Request: &ttnpb.DeleteApplicationActivationSettingsRequest{
-				ApplicationIds: &appID,
+				ApplicationIds: appID,
 			},
 			Rights: []ttnpb.Right{
 				ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
@@ -415,7 +415,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		{
 			Name: "No read right",
 			Request: &ttnpb.DeleteApplicationActivationSettingsRequest{
-				ApplicationIds: &appID,
+				ApplicationIds: appID,
 			},
 			Rights: []ttnpb.Right{
 				ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
@@ -427,7 +427,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 		{
 			Name: "Not found",
 			Request: &ttnpb.DeleteApplicationActivationSettingsRequest{
-				ApplicationIds: &appID,
+				ApplicationIds: appID,
 			},
 			Rights: []ttnpb.Right{
 				ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
@@ -500,7 +500,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 					Name: "Create",
 					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 						sets, err := cl.Set(ctx, &ttnpb.SetApplicationActivationSettingsRequest{
-							ApplicationIds: &appID,
+							ApplicationIds: appID,
 							Settings:       tc.CreateSettings,
 							FieldMask: &pbtypes.FieldMask{
 								Paths: tc.CreatePaths,
@@ -528,7 +528,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 					Name: "Get after creation",
 					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 						sets, err := cl.Get(ctx, &ttnpb.GetApplicationActivationSettingsRequest{
-							ApplicationIds: &appID,
+							ApplicationIds: appID,
 							FieldMask: &pbtypes.FieldMask{
 								Paths: tc.CreatePaths,
 							},
@@ -543,7 +543,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 					Name: "Update",
 					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 						sets, err := cl.Set(ctx, &ttnpb.SetApplicationActivationSettingsRequest{
-							ApplicationIds: &appID,
+							ApplicationIds: appID,
 							Settings:       tc.CreateSettings,
 							FieldMask: &pbtypes.FieldMask{
 								Paths: tc.CreatePaths,
@@ -559,7 +559,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 					Name: "Remove KEK",
 					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 						sets, err := cl.Set(ctx, &ttnpb.SetApplicationActivationSettingsRequest{
-							ApplicationIds: &appID,
+							ApplicationIds: appID,
 							Settings:       &ttnpb.ApplicationActivationSettings{},
 							FieldMask: &pbtypes.FieldMask{
 								Paths: []string{
@@ -578,7 +578,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 					Name: "Delete",
 					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 						_, err := cl.Delete(ctx, &ttnpb.DeleteApplicationActivationSettingsRequest{
-							ApplicationIds: &appID,
+							ApplicationIds: appID,
 						}, credOpt)
 						if !a.So(err, should.BeNil) {
 							t.Fatalf("Failed to delete settings: %s", test.FormatError(err))
@@ -589,7 +589,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 					Name: "Get after deletion",
 					Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 						sets, err := cl.Get(ctx, &ttnpb.GetApplicationActivationSettingsRequest{
-							ApplicationIds: &appID,
+							ApplicationIds: appID,
 							FieldMask: &pbtypes.FieldMask{
 								Paths: tc.CreatePaths,
 							},

@@ -42,7 +42,7 @@ func NewNetworkRPCClient(cc *grpc.ClientConn, keyVault crypto.KeyVault, callOpts
 
 func (s *networkRPCClient) JoinRequestMIC(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) (mic [4]byte, err error) {
 	res, err := s.Client.JoinRequestMIC(ctx, &ttnpb.CryptoServicePayloadRequest{
-		Ids:              &dev.EndDeviceIdentifiers,
+		Ids:              dev.Ids,
 		LorawanVersion:   version,
 		Payload:          payload,
 		ProvisionerId:    dev.ProvisionerId,
@@ -58,7 +58,7 @@ func (s *networkRPCClient) JoinRequestMIC(ctx context.Context, dev *ttnpb.EndDev
 func (s *networkRPCClient) JoinAcceptMIC(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, joinReqType byte, dn types.DevNonce, payload []byte) (mic [4]byte, err error) {
 	res, err := s.Client.JoinAcceptMIC(ctx, &ttnpb.JoinAcceptMICRequest{
 		PayloadRequest: &ttnpb.CryptoServicePayloadRequest{
-			Ids:              &dev.EndDeviceIdentifiers,
+			Ids:              dev.Ids,
 			LorawanVersion:   version,
 			Payload:          payload,
 			ProvisionerId:    dev.ProvisionerId,
@@ -76,7 +76,7 @@ func (s *networkRPCClient) JoinAcceptMIC(ctx context.Context, dev *ttnpb.EndDevi
 
 func (s *networkRPCClient) EncryptJoinAccept(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([]byte, error) {
 	res, err := s.Client.EncryptJoinAccept(ctx, &ttnpb.CryptoServicePayloadRequest{
-		Ids:              &dev.EndDeviceIdentifiers,
+		Ids:              dev.Ids,
 		LorawanVersion:   version,
 		Payload:          payload,
 		ProvisionerId:    dev.ProvisionerId,
@@ -90,7 +90,7 @@ func (s *networkRPCClient) EncryptJoinAccept(ctx context.Context, dev *ttnpb.End
 
 func (s *networkRPCClient) EncryptRejoinAccept(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([]byte, error) {
 	res, err := s.Client.EncryptRejoinAccept(ctx, &ttnpb.CryptoServicePayloadRequest{
-		Ids:              &dev.EndDeviceIdentifiers,
+		Ids:              dev.Ids,
 		LorawanVersion:   version,
 		Payload:          payload,
 		ProvisionerId:    dev.ProvisionerId,
@@ -104,7 +104,7 @@ func (s *networkRPCClient) EncryptRejoinAccept(ctx context.Context, dev *ttnpb.E
 
 func (s *networkRPCClient) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (NwkSKeys, error) {
 	keys, err := s.Client.DeriveNwkSKeys(ctx, &ttnpb.DeriveSessionKeysRequest{
-		Ids:              &dev.EndDeviceIdentifiers,
+		Ids:              dev.Ids,
 		LorawanVersion:   version,
 		JoinNonce:        jn,
 		DevNonce:         dn,
@@ -133,7 +133,7 @@ func (s *networkRPCClient) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDev
 
 func (s *networkRPCClient) GetNwkKey(ctx context.Context, dev *ttnpb.EndDevice) (*types.AES128Key, error) {
 	ke, err := s.Client.GetNwkKey(ctx, &ttnpb.GetRootKeysRequest{
-		Ids:              &dev.EndDeviceIdentifiers,
+		Ids:              dev.Ids,
 		ProvisionerId:    dev.ProvisionerId,
 		ProvisioningData: dev.ProvisioningData,
 	}, s.callOpts...)
@@ -167,7 +167,7 @@ func NewApplicationRPCClient(cc *grpc.ClientConn, keyVault crypto.KeyVault, call
 
 func (s *applicationRPCClient) DeriveAppSKey(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, jn types.JoinNonce, dn types.DevNonce, nid types.NetID) (types.AES128Key, error) {
 	res, err := s.Client.DeriveAppSKey(ctx, &ttnpb.DeriveSessionKeysRequest{
-		Ids:              &dev.EndDeviceIdentifiers,
+		Ids:              dev.Ids,
 		LorawanVersion:   version,
 		JoinNonce:        jn,
 		DevNonce:         dn,
@@ -183,7 +183,7 @@ func (s *applicationRPCClient) DeriveAppSKey(ctx context.Context, dev *ttnpb.End
 
 func (s *applicationRPCClient) GetAppKey(ctx context.Context, dev *ttnpb.EndDevice) (*types.AES128Key, error) {
 	ke, err := s.Client.GetAppKey(ctx, &ttnpb.GetRootKeysRequest{
-		Ids:              &dev.EndDeviceIdentifiers,
+		Ids:              dev.Ids,
 		ProvisionerId:    dev.ProvisionerId,
 		ProvisioningData: dev.ProvisioningData,
 	}, s.callOpts...)

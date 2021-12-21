@@ -78,9 +78,9 @@ func (r *DeviceRegistry) provisionerKey(provisionerID, pid string) string {
 }
 
 // GetByID gets device by appID, devID.
-func (r *DeviceRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) GetByID(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, error) {
 	ids := ttnpb.EndDeviceIdentifiers{
-		ApplicationIds: &appID,
+		ApplicationIds: appID,
 		DeviceId:       devID,
 	}
 	if err := ids.ValidateContext(ctx); err != nil {
@@ -189,8 +189,8 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 	if pb == nil && len(sets) == 0 {
 		pipelined = func(p redis.Pipeliner) error {
 			p.Del(ctx, uk)
-			if stored.JoinEui != nil && stored.DevEui != nil {
-				p.Del(ctx, r.euiKey(*stored.JoinEui, *stored.DevEui))
+			if stored.Ids.JoinEui != nil && stored.Ids.DevEui != nil {
+				p.Del(ctx, r.euiKey(*stored.Ids.JoinEui, *stored.Ids.DevEui))
 			}
 			pid, err := provisionerUniqueID(stored)
 			if err != nil {
@@ -234,20 +234,20 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 			if err != nil {
 				return nil, err
 			}
-			if updated.JoinEui == nil || updated.DevEui == nil || updated.DevEui.IsZero() {
+			if updated.Ids.JoinEui == nil || updated.Ids.DevEui == nil || updated.Ids.DevEui.IsZero() {
 				return nil, errInvalidIdentifiers.New()
 			}
 		} else {
-			if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.GetApplicationIds().GetApplicationId() != stored.GetApplicationIds().GetApplicationId() {
+			if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.Ids.ApplicationIds.ApplicationId != stored.Ids.ApplicationIds.ApplicationId {
 				return nil, errReadOnlyField.WithAttributes("field", "ids.application_ids.application_id")
 			}
-			if ttnpb.HasAnyField(sets, "ids.device_id") && pb.DeviceId != stored.DeviceId {
+			if ttnpb.HasAnyField(sets, "ids.device_id") && pb.Ids.DeviceId != stored.Ids.DeviceId {
 				return nil, errReadOnlyField.WithAttributes("field", "ids.device_id")
 			}
-			if ttnpb.HasAnyField(sets, "ids.join_eui") && !equalEUI64(pb.JoinEui, stored.JoinEui) {
+			if ttnpb.HasAnyField(sets, "ids.join_eui") && !equalEUI64(pb.Ids.JoinEui, stored.Ids.JoinEui) {
 				return nil, errReadOnlyField.WithAttributes("field", "ids.join_eui")
 			}
-			if ttnpb.HasAnyField(sets, "ids.dev_eui") && !equalEUI64(pb.DevEui, stored.DevEui) {
+			if ttnpb.HasAnyField(sets, "ids.dev_eui") && !equalEUI64(pb.Ids.DevEui, stored.Ids.DevEui) {
 				return nil, errReadOnlyField.WithAttributes("field", "ids.dev_eui")
 			}
 			if ttnpb.HasAnyField(sets, "provisioner_id") && pb.ProvisionerId != stored.ProvisionerId {
@@ -270,7 +270,7 @@ func (r *DeviceRegistry) set(ctx context.Context, tx *redis.Tx, uid string, gets
 
 		pipelined = func(p redis.Pipeliner) error {
 			if stored == nil {
-				ek := r.euiKey(*updated.JoinEui, *updated.DevEui)
+				ek := r.euiKey(*updated.Ids.JoinEui, *updated.Ids.DevEui)
 				if err := tx.Watch(ctx, ek).Err(); err != nil {
 					return err
 				}
@@ -354,9 +354,9 @@ func (r *DeviceRegistry) SetByEUI(ctx context.Context, joinEUI types.EUI64, devE
 }
 
 // SetByID sets device by appID, devID.
-func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(pb *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	ids := ttnpb.EndDeviceIdentifiers{
-		ApplicationIds: &appID,
+		ApplicationIds: appID,
 		DeviceId:       devID,
 	}
 	if err := ids.ValidateContext(ctx); err != nil {
@@ -374,7 +374,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 			if err != nil {
 				return nil, nil, err
 			}
-			if stored == nil && updated != nil && (updated.GetApplicationIds().GetApplicationId() != appID.ApplicationId || updated.DeviceId != devID) {
+			if stored == nil && updated != nil && (updated.Ids.ApplicationIds.ApplicationId != appID.ApplicationId || updated.Ids.DeviceId != devID) {
 				return nil, nil, errInvalidIdentifiers.New()
 			}
 			return updated, sets, nil
@@ -387,7 +387,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIde
 	return pb.EndDevice, nil
 }
 
-func (r *DeviceRegistry) RangeByID(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
+func (r *DeviceRegistry) RangeByID(ctx context.Context, paths []string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
 	deviceEntityRegex, err := ttnredis.EntityRegex((r.uidKey(unique.GenericID(ctx, "*"))))
 	if err != nil {
 		return err
@@ -404,7 +404,7 @@ func (r *DeviceRegistry) RangeByID(ctx context.Context, paths []string, f func(c
 		if err != nil {
 			return false, err
 		}
-		if !f(ctx, dev.EndDeviceIdentifiers, dev) {
+		if !f(ctx, dev.Ids, dev) {
 			return false, nil
 		}
 		return true, nil
@@ -593,7 +593,7 @@ func (r *ApplicationActivationSettingRegistry) uidKey(uid string) string {
 }
 
 // GetByID gets application activation settings by appID.
-func (r *ApplicationActivationSettingRegistry) GetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationActivationSettings, error) {
+func (r *ApplicationActivationSettingRegistry) GetByID(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationActivationSettings, error) {
 	if appID.IsZero() {
 		return nil, errInvalidIdentifiers.New()
 	}
@@ -608,7 +608,7 @@ func (r *ApplicationActivationSettingRegistry) GetByID(ctx context.Context, appI
 }
 
 // SetByID sets application activation settings by appID.
-func (r *ApplicationActivationSettingRegistry) SetByID(ctx context.Context, appID ttnpb.ApplicationIdentifiers, gets []string, f func(*ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error)) (*ttnpb.ApplicationActivationSettings, error) {
+func (r *ApplicationActivationSettingRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, gets []string, f func(*ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error)) (*ttnpb.ApplicationActivationSettings, error) {
 	if appID.IsZero() {
 		return nil, errInvalidIdentifiers.New()
 	}
@@ -712,7 +712,7 @@ func (r *ApplicationActivationSettingRegistry) SetByID(ctx context.Context, appI
 
 var uniqueIDPattern = regexp.MustCompile("(.*)\\:(.*)")
 
-func (r *ApplicationActivationSettingRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationActivationSettings) bool) error {
+func (r *ApplicationActivationSettingRegistry) Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationActivationSettings) bool) error {
 	appKeyRegex, err := ttnredis.EntityRegex((r.uidKey(unique.GenericID(ctx, "*"))))
 	if err != nil {
 		return err
@@ -739,7 +739,7 @@ func (r *ApplicationActivationSettingRegistry) Range(ctx context.Context, paths 
 		if err != nil {
 			return false, err
 		}
-		if !f(ctx, applicationId, appAs) {
+		if !f(ctx, &applicationId, appAs) {
 			return false, nil
 		}
 		return true, nil

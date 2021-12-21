@@ -60,7 +60,7 @@ func (r *DeviceRegistry) euiKey(joinEUI, devEUI types.EUI64) string {
 }
 
 // Get returns the end device by its identifiers.
-func (r *DeviceRegistry) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) Get(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
 	if err := ids.ValidateContext(ctx); err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func equalEUI64(x, y *types.EUI64) bool {
 }
 
 // Set creates, updates or deletes the end device by its identifiers.
-func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+func (r *DeviceRegistry) Set(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, gets []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	if err := ids.ValidateContext(ctx); err != nil {
 		return nil, err
 	}
@@ -142,8 +142,8 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 		if pb == nil && len(sets) == 0 {
 			pipelined = func(p redis.Pipeliner) error {
 				p.Del(ctx, uk)
-				if stored.JoinEui != nil && stored.DevEui != nil {
-					p.Del(ctx, r.euiKey(*stored.JoinEui, *stored.DevEui))
+				if stored.Ids.JoinEui != nil && stored.Ids.DevEui != nil {
+					p.Del(ctx, r.euiKey(*stored.Ids.JoinEui, *stored.Ids.DevEui))
 				}
 				return nil
 			}
@@ -152,7 +152,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 				pb = &ttnpb.EndDevice{}
 			}
 
-			if pb.GetApplicationIds().GetApplicationId() != ids.GetApplicationIds().GetApplicationId() || pb.DeviceId != ids.DeviceId {
+			if pb.Ids.ApplicationIds.ApplicationId != ids.ApplicationIds.ApplicationId || pb.Ids.DeviceId != ids.DeviceId {
 				return errInvalidIdentifiers.New()
 			}
 
@@ -177,20 +177,20 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 				if err != nil {
 					return err
 				}
-				if updated.GetApplicationIds().GetApplicationId() != ids.GetApplicationIds().GetApplicationId() || updated.DeviceId != ids.DeviceId {
+				if updated.Ids.ApplicationIds.ApplicationId != ids.ApplicationIds.ApplicationId || updated.Ids.DeviceId != ids.DeviceId {
 					return errInvalidIdentifiers.New()
 				}
 			} else {
-				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.GetApplicationIds().GetApplicationId() != stored.GetApplicationIds().GetApplicationId() {
+				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.Ids.ApplicationIds.ApplicationId != stored.Ids.ApplicationIds.ApplicationId {
 					return errReadOnlyField.WithAttributes("field", "ids.application_ids.application_id")
 				}
-				if ttnpb.HasAnyField(sets, "ids.device_id") && pb.DeviceId != stored.DeviceId {
+				if ttnpb.HasAnyField(sets, "ids.device_id") && pb.Ids.DeviceId != stored.Ids.DeviceId {
 					return errReadOnlyField.WithAttributes("field", "ids.device_id")
 				}
-				if ttnpb.HasAnyField(sets, "ids.join_eui") && !equalEUI64(pb.JoinEui, stored.JoinEui) {
+				if ttnpb.HasAnyField(sets, "ids.join_eui") && !equalEUI64(pb.Ids.JoinEui, stored.Ids.JoinEui) {
 					return errReadOnlyField.WithAttributes("field", "ids.join_eui")
 				}
-				if ttnpb.HasAnyField(sets, "ids.dev_eui") && !equalEUI64(pb.DevEui, stored.DevEui) {
+				if ttnpb.HasAnyField(sets, "ids.dev_eui") && !equalEUI64(pb.Ids.DevEui, stored.Ids.DevEui) {
 					return errReadOnlyField.WithAttributes("field", "ids.dev_eui")
 				}
 				if err := cmd.ScanProto(updated); err != nil {
@@ -206,8 +206,8 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 			}
 
 			pipelined = func(p redis.Pipeliner) error {
-				if stored == nil && updated.JoinEui != nil && updated.DevEui != nil {
-					ek := r.euiKey(*updated.JoinEui, *updated.DevEui)
+				if stored == nil && updated.Ids.JoinEui != nil && updated.Ids.DevEui != nil {
+					ek := r.euiKey(*updated.Ids.JoinEui, *updated.Ids.DevEui)
 					if err := tx.Watch(ctx, ek).Err(); err != nil {
 						return err
 					}
@@ -244,7 +244,7 @@ func (r *DeviceRegistry) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers
 }
 
 // Range ranges over the end devices and calls the callback function, until false is returned.
-func (r *DeviceRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
+func (r *DeviceRegistry) Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
 	deviceEntityRegex, err := ttnredis.EntityRegex((r.uidKey(unique.GenericID(ctx, "*"))))
 	if err != nil {
 		return err
@@ -261,7 +261,7 @@ func (r *DeviceRegistry) Range(ctx context.Context, paths []string, f func(conte
 		if err != nil {
 			return false, err
 		}
-		if !f(ctx, dev.EndDeviceIdentifiers, dev) {
+		if !f(ctx, dev.Ids, dev) {
 			return false, nil
 		}
 		return true, nil
@@ -452,7 +452,7 @@ func (r *ApplicationUplinkRegistry) uidKey(uid string) string {
 }
 
 // Range ranges the uplink messagess and calls the callback function, until false is returned.
-func (r *ApplicationUplinkRegistry) Range(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(context.Context, *ttnpb.ApplicationUplink) bool) error {
+func (r *ApplicationUplinkRegistry) Range(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(context.Context, *ttnpb.ApplicationUplink) bool) error {
 	defer trace.StartRegion(ctx, "range application uplinks").End()
 
 	uidKey := r.uidKey(unique.ID(ctx, ids))
@@ -478,7 +478,7 @@ func (r *ApplicationUplinkRegistry) Range(ctx context.Context, ids ttnpb.EndDevi
 }
 
 // Push pushes the provided uplink message to the storage.
-func (r *ApplicationUplinkRegistry) Push(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink) error {
+func (r *ApplicationUplinkRegistry) Push(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink) error {
 	defer trace.StartRegion(ctx, "push application uplink").End()
 
 	s, err := ttnredis.MarshalProto(up)
@@ -500,7 +500,7 @@ func (r *ApplicationUplinkRegistry) Push(ctx context.Context, ids ttnpb.EndDevic
 }
 
 // Clear empties the application uplink storage by the end device identifiers.
-func (r *ApplicationUplinkRegistry) Clear(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error {
+func (r *ApplicationUplinkRegistry) Clear(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error {
 	defer trace.StartRegion(ctx, "clear application uplinks").End()
 
 	uidKey := r.uidKey(unique.ID(ctx, ids))

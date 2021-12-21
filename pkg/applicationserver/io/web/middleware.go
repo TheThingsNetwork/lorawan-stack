@@ -37,12 +37,12 @@ var (
 	webhookIDKey webhookIDKeyType
 )
 
-func withDeviceID(ctx context.Context, id ttnpb.EndDeviceIdentifiers) context.Context {
+func withDeviceID(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) context.Context {
 	return context.WithValue(ctx, deviceIDKey, id)
 }
 
-func deviceIDFromContext(ctx context.Context) ttnpb.EndDeviceIdentifiers {
-	id, ok := ctx.Value(deviceIDKey).(ttnpb.EndDeviceIdentifiers)
+func deviceIDFromContext(ctx context.Context) *ttnpb.EndDeviceIdentifiers {
+	id, ok := ctx.Value(deviceIDKey).(*ttnpb.EndDeviceIdentifiers)
 	if !ok {
 		panic("no end device identifiers found in context")
 	}
@@ -69,7 +69,7 @@ func (w *webhooks) validateAndFillIDs(next http.Handler) http.Handler {
 			ApplicationId: vars["application_id"],
 		}
 
-		devID := ttnpb.EndDeviceIdentifiers{
+		devID := &ttnpb.EndDeviceIdentifiers{
 			ApplicationIds: &appID,
 			DeviceId:       vars["device_id"],
 		}

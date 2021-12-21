@@ -150,7 +150,7 @@ func (is *IdentityServer) processEndDevicePicture(ctx context.Context, dev *ttnp
 	if err != nil {
 		return err
 	}
-	id := fmt.Sprintf("%s.%s", unique.ID(ctx, dev.EndDeviceIdentifiers), ulid.MustNew(ulid.Now(), rand.Reader).String())
+	id := fmt.Sprintf("%s.%s", unique.ID(ctx, dev.Ids), ulid.MustNew(ulid.Now(), rand.Reader).String())
 
 	region := trace.StartRegion(ctx, "store end device picture")
 	dev.Picture, err = picture.Store(ctx, bucket, id, dev.Picture, endDevicePictureDimensions...)

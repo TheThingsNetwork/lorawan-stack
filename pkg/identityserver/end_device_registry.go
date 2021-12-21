@@ -57,10 +57,10 @@ var errEndDeviceEUIsTaken = errors.DefineAlreadyExists(
 )
 
 func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.CreateEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
-	if err = rights.RequireApplication(ctx, *req.EndDeviceIdentifiers.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	if err = rights.RequireApplication(ctx, *req.Ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
-	if err = blacklist.Check(ctx, req.DeviceId); err != nil {
+	if err = blacklist.Check(ctx, req.Ids.DeviceId); err != nil {
 		return nil, err
 	}
 
@@ -81,12 +81,12 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 	if err != nil {
 		if errors.IsAlreadyExists(err) && errors.Resemble(err, store.ErrEUITaken) {
 			if ids, err := is.getEndDeviceIdentifiersForEUIs(ctx, &ttnpb.GetEndDeviceIdentifiersForEUIsRequest{
-				JoinEui: *req.JoinEui,
-				DevEui:  *req.DevEui,
+				JoinEui: *req.Ids.JoinEui,
+				DevEui:  *req.Ids.DevEui,
 			}); err == nil {
 				return nil, errEndDeviceEUIsTaken.WithAttributes(
-					"join_eui", req.JoinEui.String(),
-					"dev_eui", req.DevEui.String(),
+					"join_eui", req.Ids.JoinEui.String(),
+					"dev_eui", req.Ids.DevEui.String(),
 					"device_id", ids.GetDeviceId(),
 					"application_id", ids.GetApplicationIds().GetApplicationId(),
 				)
@@ -94,7 +94,7 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 		}
 		return nil, err
 	}
-	events.Publish(evtCreateEndDevice.NewWithIdentifiersAndData(ctx, &req.EndDeviceIdentifiers, nil))
+	events.Publish(evtCreateEndDevice.NewWithIdentifiersAndData(ctx, req.Ids, nil))
 	return dev, nil
 }
 
@@ -130,7 +130,7 @@ func (is *IdentityServer) getEndDeviceIdentifiersForEUIs(ctx context.Context, re
 		if err != nil {
 			return err
 		}
-		ids = &dev.EndDeviceIdentifiers
+		ids = dev.Ids
 		return nil
 	})
 	if err != nil {
@@ -190,7 +190,7 @@ func (is *IdentityServer) setFullEndDevicePictureURL(ctx context.Context, dev *t
 func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.UpdateEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
 	if clusterauth.Authorized(ctx) == nil {
 		req.FieldMask = cleanFieldMaskPaths([]string{"activated_at", "locations"}, req.FieldMask, nil, getPaths)
-	} else if err = rights.RequireApplication(ctx, *req.EndDeviceIdentifiers.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	} else if err = rights.RequireApplication(ctx, *req.Ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.EndDeviceFieldPathsNested, req.FieldMask, nil, getPaths)
@@ -222,7 +222,7 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, &req.EndDeviceIdentifiers, req.FieldMask.GetPaths()))
+	events.Publish(evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, req.Ids, req.FieldMask.GetPaths()))
 	return dev, nil
 }
 

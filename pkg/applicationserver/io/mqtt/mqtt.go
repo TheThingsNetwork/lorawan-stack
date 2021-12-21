@@ -247,7 +247,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 	}
 
 	var deviceID string
-	var op func(io.Server, context.Context, ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error
+	var op func(io.Server, context.Context, *ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error
 	switch {
 	case c.format.IsDownlinkPushTopic(pkt.TopicParts):
 		deviceID = c.format.ParseDownlinkPushTopic(pkt.TopicParts)
@@ -264,7 +264,7 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 		logger.WithError(err).Warn("Failed to decode downlink messages")
 		return
 	}
-	ids := ttnpb.EndDeviceIdentifiers{
+	ids := &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: c.io.ApplicationIDs(),
 		DeviceId:       deviceID,
 	}

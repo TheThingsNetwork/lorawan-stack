@@ -26,11 +26,11 @@ import (
 // DeviceRegistry is a store for end devices.
 type DeviceRegistry interface {
 	// Get returns the end device by its identifiers.
-	Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error)
+	Get(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error)
 	// Set creates, updates or deletes the end device by its identifiers.
-	Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+	Set(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 	// Range ranges over the end devices and calls the callback function, until false is returned.
-	Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error
+	Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error
 }
 
 type replacedEndDeviceFieldRegistryWrapper struct {
@@ -38,7 +38,7 @@ type replacedEndDeviceFieldRegistryWrapper struct {
 	registry DeviceRegistry
 }
 
-func (w replacedEndDeviceFieldRegistryWrapper) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
+func (w replacedEndDeviceFieldRegistryWrapper) Get(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
 	paths, replaced := registry.MatchReplacedEndDeviceFields(paths, w.fields)
 	dev, err := w.registry.Get(ctx, ids, paths)
 	if err != nil || dev == nil {
@@ -50,7 +50,7 @@ func (w replacedEndDeviceFieldRegistryWrapper) Get(ctx context.Context, ids ttnp
 	return dev, nil
 }
 
-func (w replacedEndDeviceFieldRegistryWrapper) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+func (w replacedEndDeviceFieldRegistryWrapper) Set(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 	paths, replaced := registry.MatchReplacedEndDeviceFields(paths, w.fields)
 	dev, err := w.registry.Set(ctx, ids, paths, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev != nil {
@@ -79,9 +79,9 @@ func (w replacedEndDeviceFieldRegistryWrapper) Set(ctx context.Context, ids ttnp
 	return dev, nil
 }
 
-func (w replacedEndDeviceFieldRegistryWrapper) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
+func (w replacedEndDeviceFieldRegistryWrapper) Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
 	paths, replaced := registry.MatchReplacedEndDeviceFields(paths, w.fields)
-	return w.registry.Range(ctx, paths, func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, dev *ttnpb.EndDevice) bool {
+	return w.registry.Range(ctx, paths, func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, dev *ttnpb.EndDevice) bool {
 		if dev != nil {
 			for _, d := range replaced {
 				d.GetTransform(dev)
@@ -140,9 +140,9 @@ type LinkRegistry interface {
 // ApplicationUplinkRegistry is a store for uplink messages.
 type ApplicationUplinkRegistry interface {
 	// Range ranges the uplink messagess and calls the callback function, until false is returned.
-	Range(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(context.Context, *ttnpb.ApplicationUplink) bool) error
+	Range(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(context.Context, *ttnpb.ApplicationUplink) bool) error
 	// Push pushes the provided uplink message to the storage.
-	Push(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink) error
+	Push(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink) error
 	// Clear empties the uplink messages storage by the end device identifiers.
-	Clear(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error
+	Clear(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error
 }

@@ -40,7 +40,7 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 
 		_, err := reg.Create(ctx, &ttnpb.CreateEndDeviceRequest{
 			EndDevice: ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DeviceId: "test-device-id",
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{
 						ApplicationId: "test-app-id",
@@ -90,7 +90,7 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 		_, err = reg.Update(ctx, &ttnpb.UpdateEndDeviceRequest{
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 			EndDevice: ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DeviceId: "test-device-id",
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{
 						ApplicationId: "test-app-id",
@@ -142,7 +142,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 
 		created, err := reg.Create(ctx, &ttnpb.CreateEndDeviceRequest{
 			EndDevice: ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:       "test-device-id",
 					ApplicationIds: app.GetIds(),
 					JoinEui:        &joinEUI,
@@ -179,12 +179,12 @@ func TestEndDevicesCRUD(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(ids, should.NotBeNil) {
-			a.So(*ids, should.Resemble, created.EndDeviceIdentifiers)
+			a.So(*ids, should.Resemble, created.Ids)
 		}
 
 		_, err = reg.Create(ctx, &ttnpb.CreateEndDeviceRequest{
 			EndDevice: ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:       "other-test-device-id",
 					ApplicationIds: app.GetIds(),
 					JoinEui:        &joinEUI,
@@ -215,7 +215,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 		updated, err := reg.Update(ctx, &ttnpb.UpdateEndDeviceRequest{
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 			EndDevice: ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:       "test-device-id",
 					ApplicationIds: app.GetIds(),
 				},

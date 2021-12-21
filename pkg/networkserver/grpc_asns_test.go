@@ -53,8 +53,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 	for _, tc := range []struct {
 		Name           string
 		Time           time.Time
-		AddFunc        func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time, bool) error
-		SetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
+		AddFunc        func(context.Context, *ttnpb.EndDeviceIdentifiers, time.Time, bool) error
+		SetByIDFunc    func(context.Context, *ttnpb.ApplicationIdentifiers, string, []string, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
 		Request        *ttnpb.DownlinkQueueRequest
 		ErrorAssertion func(*testing.T, error) bool
 		AddCalls       uint64
@@ -62,11 +62,11 @@ func TestDownlinkQueueReplace(t *testing.T) {
 	}{
 		{
 			Name: "Non-existing device",
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
+			AddFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
 				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
 				return errors.New("AddFunc must not be called")
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
@@ -113,11 +113,11 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 		{
 			Name: "Valid request/replace/active session/MAC state",
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
+			AddFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
 				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
 				return errors.New("AddFunc must not be called")
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -136,7 +136,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
@@ -182,11 +182,11 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 		{
 			Name: "Valid request/replace/Class A/active session",
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
+			AddFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
 				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
 				return errors.New("AddFunc must not be called")
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -206,7 +206,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
@@ -261,11 +261,11 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 		{
 			Name: "Valid request/replace/Class A/both sessions",
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
+			AddFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
 				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
 				return errors.New("AddFunc must not be called")
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -285,7 +285,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
@@ -358,7 +358,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 		{
 			Name: "Valid request/replace/Class C/active session",
 			Time: time.Unix(0, 42),
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
+			AddFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
 					DeviceId:       "test-dev-id",
@@ -368,7 +368,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				a.So(startAt, should.Resemble, time.Unix(0, 42).Add(NSScheduleWindow()).UTC())
 				return nil
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -388,7 +388,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
@@ -444,11 +444,11 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 		{
 			Name: "Valid request/delete/no active MAC state",
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
+			AddFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
 				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
 				return errors.New("AddFunc must not be called")
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -464,7 +464,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
@@ -517,11 +517,11 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 		{
 			Name: "Valid request/delete/Class A",
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
+			AddFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
 				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
 				return errors.New("AddFunc must not be called")
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -537,7 +537,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
@@ -595,11 +595,11 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 		{
 			Name: "Valid request/delete/Class C",
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
+			AddFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
 				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
 				return errors.New("AddFunc must not be called")
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -615,7 +615,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
@@ -683,14 +683,14 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					TestConfig{
 						NetworkServer: Config{
 							Devices: &MockDeviceRegistry{
-								SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+								SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 									atomic.AddUint64(&setByIDCalls, 1)
 									return tc.SetByIDFunc(ctx, appID, devID, gets, f)
 								},
 							},
 							DownlinkTaskQueue: DownlinkTaskQueueConfig{
 								Queue: &MockDownlinkTaskQueue{
-									AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
+									AddFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
 										atomic.AddUint64(&addCalls, 1)
 										return tc.AddFunc(ctx, ids, startAt, replace)
 									},
@@ -753,8 +753,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 	for _, tc := range []struct {
 		Name           string
-		AddFunc        func(context.Context, ttnpb.EndDeviceIdentifiers, time.Time, bool) error
-		SetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
+		AddFunc        func(context.Context, *ttnpb.EndDeviceIdentifiers, time.Time, bool) error
+		SetByIDFunc    func(context.Context, *ttnpb.ApplicationIdentifiers, string, []string, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
 		Request        *ttnpb.DownlinkQueueRequest
 		ErrorAssertion func(*testing.T, error) bool
 		AddCalls       uint64
@@ -762,11 +762,11 @@ func TestDownlinkQueuePush(t *testing.T) {
 	}{
 		{
 			Name: "Non-existing device",
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
+			AddFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
 				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
 				return errors.New("AddFunc must not be called")
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
@@ -814,11 +814,11 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 		{
 			Name: "Valid request/push/no MAC state",
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
+			AddFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
 				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
 				return errors.New("AddFunc must not be called")
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -837,7 +837,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
@@ -883,11 +883,11 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 		{
 			Name: "Valid request/push/Class A/active session",
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
+			AddFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
 				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
 				return errors.New("AddFunc must not be called")
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -907,7 +907,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
@@ -962,11 +962,11 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 		{
 			Name: "Valid request/push/Class A/both sessions",
-			AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
+			AddFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
 				test.MustTFromContext(ctx).Errorf("Add called with %v %v %v", ids, startAt, replace)
 				return errors.New("AddFunc must not be called")
 			},
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -986,7 +986,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
@@ -1054,7 +1054,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 		{
 			Name: "Invalid request/push/Class C/FCnt too low",
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -1073,7 +1073,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
@@ -1124,7 +1124,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 		{
 			Name: "Invalid request/push/Class C/FCnt lower than NFCntDown",
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -1143,7 +1143,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
@@ -1189,7 +1189,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 		{
 			Name: "Valid request/push/Class C/No session",
-			SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
@@ -1208,7 +1208,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
 					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
@@ -1258,14 +1258,14 @@ func TestDownlinkQueuePush(t *testing.T) {
 					TestConfig{
 						NetworkServer: Config{
 							Devices: &MockDeviceRegistry{
-								SetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+								SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
 									atomic.AddUint64(&setByIDCalls, 1)
 									return tc.SetByIDFunc(ctx, appID, devID, gets, f)
 								},
 							},
 							DownlinkTaskQueue: DownlinkTaskQueueConfig{
 								Queue: &MockDownlinkTaskQueue{
-									AddFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
+									AddFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, startAt time.Time, replace bool) error {
 										atomic.AddUint64(&addCalls, 1)
 										return tc.AddFunc(ctx, ids, startAt, replace)
 									},
@@ -1304,7 +1304,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 func TestDownlinkQueueList(t *testing.T) {
 	for _, tc := range []struct {
 		Name           string
-		GetByIDFunc    func(context.Context, ttnpb.ApplicationIdentifiers, string, []string) (*ttnpb.EndDevice, context.Context, error)
+		GetByIDFunc    func(context.Context, *ttnpb.ApplicationIdentifiers, string, []string) (*ttnpb.EndDevice, context.Context, error)
 		Request        *ttnpb.EndDeviceIdentifiers
 		Downlinks      *ttnpb.ApplicationDownlinks
 		ErrorAssertion func(*testing.T, error) bool
@@ -1312,7 +1312,7 @@ func TestDownlinkQueueList(t *testing.T) {
 	}{
 		{
 			Name: "Valid request/empty queues",
-			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
+			GetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
@@ -1323,7 +1323,7 @@ func TestDownlinkQueueList(t *testing.T) {
 					"session.queued_application_downlinks",
 				})
 				return &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
@@ -1339,7 +1339,7 @@ func TestDownlinkQueueList(t *testing.T) {
 
 		{
 			Name: "Valid request/active session queue",
-			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
+			GetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
@@ -1350,7 +1350,7 @@ func TestDownlinkQueueList(t *testing.T) {
 					"session.queued_application_downlinks",
 				})
 				return &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
@@ -1380,7 +1380,7 @@ func TestDownlinkQueueList(t *testing.T) {
 
 		{
 			Name: "Valid request/pending session queue",
-			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
+			GetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
@@ -1391,7 +1391,7 @@ func TestDownlinkQueueList(t *testing.T) {
 					"session.queued_application_downlinks",
 				})
 				return &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
@@ -1423,7 +1423,7 @@ func TestDownlinkQueueList(t *testing.T) {
 
 		{
 			Name: "Valid request/both queues present",
-			GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
+			GetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 				a.So(appID, should.Resemble, ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
@@ -1434,7 +1434,7 @@ func TestDownlinkQueueList(t *testing.T) {
 					"session.queued_application_downlinks",
 				})
 				return &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
@@ -1487,7 +1487,7 @@ func TestDownlinkQueueList(t *testing.T) {
 					TestConfig{
 						NetworkServer: Config{
 							Devices: &MockDeviceRegistry{
-								GetByIDFunc: func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
+								GetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string) (*ttnpb.EndDevice, context.Context, error) {
 									atomic.AddUint64(&getByIDCalls, 1)
 									return tc.GetByIDFunc(ctx, appID, devID, gets)
 								},

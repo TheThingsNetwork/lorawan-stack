@@ -46,9 +46,13 @@ func eui64Ptr(eui types.EUI64) *types.EUI64 {
 	return &eui
 }
 
-func withDevAddr(ids ttnpb.EndDeviceIdentifiers, devAddr types.DevAddr) *ttnpb.EndDeviceIdentifiers {
-	ids.DevAddr = &devAddr
-	return &ids
+func withDevAddr(ids *ttnpb.EndDeviceIdentifiers, devAddr types.DevAddr) *ttnpb.EndDeviceIdentifiers {
+	newIds := &ttnpb.EndDeviceIdentifiers{}
+	if err := newIds.SetFields(ids, ttnpb.EndDeviceIdentifiersFieldPathsNested...); err != nil {
+		panic(err)
+	}
+	newIds.DevAddr = &devAddr
+	return newIds
 }
 
 func aes128KeyPtr(key types.AES128Key) *types.AES128Key {
@@ -150,10 +154,10 @@ type mockISEndDeviceRegistry struct {
 func (m *mockISEndDeviceRegistry) add(ctx context.Context, dev *ttnpb.EndDevice) {
 	m.endDevicesMu.Lock()
 	defer m.endDevicesMu.Unlock()
-	m.endDevices[unique.ID(ctx, dev.EndDeviceIdentifiers)] = dev
+	m.endDevices[unique.ID(ctx, dev.Ids)] = dev
 }
 
-func (m *mockISEndDeviceRegistry) get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevice, bool) {
+func (m *mockISEndDeviceRegistry) get(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevice, bool) {
 	m.endDevicesMu.RLock()
 	defer m.endDevicesMu.RUnlock()
 	dev, ok := m.endDevices[unique.ID(ctx, ids)]
@@ -172,14 +176,14 @@ func (m *mockISEndDeviceRegistry) Get(ctx context.Context, in *ttnpb.GetEndDevic
 func (m *mockISEndDeviceRegistry) Update(ctx context.Context, in *ttnpb.UpdateEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	m.endDevicesMu.Lock()
 	defer m.endDevicesMu.Unlock()
-	dev, ok := m.endDevices[unique.ID(ctx, in.EndDeviceIdentifiers)]
+	dev, ok := m.endDevices[unique.ID(ctx, in.Ids)]
 	if !ok {
 		return nil, errNotFound.New()
 	}
 	if err := dev.SetFields(&in.EndDevice, in.GetFieldMask().GetPaths()...); err != nil {
 		return nil, err
 	}
-	m.endDevices[unique.ID(ctx, in.EndDeviceIdentifiers)] = dev
+	m.endDevices[unique.ID(ctx, in.Ids)] = dev
 	return dev, nil
 }
 

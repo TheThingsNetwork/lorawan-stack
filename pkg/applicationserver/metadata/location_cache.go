@@ -24,11 +24,11 @@ import (
 // EndDeviceLocationCache is a cache for end device locations.
 type EndDeviceLocationCache interface {
 	// Get retrieves the end device locations and the remaining TTL for the entry.
-	Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, *time.Time, error)
+	Get(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, *time.Time, error)
 	// Set sets the end device locations.
-	Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location, ttl time.Duration) error
+	Set(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location, ttl time.Duration) error
 	// Delete removes the locations from the cache.
-	Delete(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error
+	Delete(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error
 }
 
 type metricsEndDeviceLocationCache struct {
@@ -36,7 +36,7 @@ type metricsEndDeviceLocationCache struct {
 }
 
 // Get implements EndDeviceLocationCache.
-func (c *metricsEndDeviceLocationCache) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, *time.Time, error) {
+func (c *metricsEndDeviceLocationCache) Get(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (map[string]*ttnpb.Location, *time.Time, error) {
 	m, storedAt, err := c.inner.Get(ctx, ids)
 	if storedAt == nil {
 		registerMetadataCacheMiss(ctx, locationLabel)
@@ -47,12 +47,12 @@ func (c *metricsEndDeviceLocationCache) Get(ctx context.Context, ids ttnpb.EndDe
 }
 
 // Set implements EndDeviceLocationCache.
-func (c *metricsEndDeviceLocationCache) Set(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location, ttl time.Duration) error {
+func (c *metricsEndDeviceLocationCache) Set(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, update map[string]*ttnpb.Location, ttl time.Duration) error {
 	return c.inner.Set(ctx, ids, update, ttl)
 }
 
 // Delete implements EndDeviceLocationCache.
-func (c *metricsEndDeviceLocationCache) Delete(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error {
+func (c *metricsEndDeviceLocationCache) Delete(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error {
 	return c.inner.Delete(ctx, ids)
 }
 

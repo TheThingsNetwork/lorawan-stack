@@ -325,7 +325,7 @@ var (
 				jsPaths = nil
 			}
 
-			res, err := getEndDevice(&device.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths, true)
+			res, err := getEndDevice(device.Ids, nsPaths, asPaths, jsPaths, true)
 			if err != nil {
 				return err
 			}
@@ -358,9 +358,11 @@ var (
 			abp, _ := cmd.Flags().GetBool("abp")
 			multicast, _ := cmd.Flags().GetBool("multicast")
 			abp = abp || multicast
-			var device ttnpb.EndDevice
+			device := &ttnpb.EndDevice{
+				Ids: &ttnpb.EndDeviceIdentifiers{},
+			}
 			if inputDecoder != nil {
-				decodedPaths, err := inputDecoder.Decode(&device)
+				decodedPaths, err := inputDecoder.Decode(device)
 				if err != nil {
 					return err
 				}
@@ -408,7 +410,7 @@ var (
 					if err != nil {
 						return err
 					}
-					device.DevAddr = devAddrRes.DevAddr
+					device.Ids.DevAddr = devAddrRes.DevAddr
 					device.Session = &ttnpb.Session{
 						DevAddr: *devAddrRes.DevAddr,
 						Keys: &ttnpb.SessionKeys{
@@ -479,27 +481,27 @@ var (
 				paths = append(paths, "claim_authentication_code")
 			}
 			if hasUpdateDeviceLocationFlags(cmd.Flags()) {
-				updateDeviceLocation(&device, cmd.Flags())
+				updateDeviceLocation(device, cmd.Flags())
 				paths = append(paths, "locations")
 			}
 
-			if err = util.SetFields(&device, setEndDeviceFlags); err != nil {
+			if err = util.SetFields(device, setEndDeviceFlags); err != nil {
 				return err
 			}
 
 			device.Attributes = mergeAttributes(device.Attributes, cmd.Flags())
 			if devID != nil {
 				if devID.DeviceId != "" {
-					device.DeviceId = devID.DeviceId
+					device.Ids.DeviceId = devID.DeviceId
 				}
 				if devID.ApplicationIds != nil {
-					device.ApplicationIds = devID.ApplicationIds
+					device.Ids.ApplicationIds = devID.ApplicationIds
 				}
 				if device.SupportsJoin && devID.JoinEui != nil {
-					device.JoinEui = devID.JoinEui
+					device.Ids.JoinEui = devID.JoinEui
 				}
 				if devID.DevEui != nil {
-					device.DevEui = devID.DevEui
+					device.Ids.DevEui = devID.DevEui
 				}
 			}
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -515,7 +517,7 @@ var (
 				}
 				logger.WithField("dev_eui", devEUIResponse.DevEui.String()).
 					Debug("successfully obtained DevEUI")
-				device.DevEui = &devEUIResponse.DevEui
+				device.Ids.DevEui = &devEUIResponse.DevEui
 			}
 			newPaths, err := parsePayloadFormatterParameterFlags("formatters", device.Formatters, cmd.Flags())
 			if err != nil {
@@ -523,22 +525,22 @@ var (
 			}
 			paths = append(paths, newPaths...)
 
-			if device.GetApplicationIds().GetApplicationId() == "" {
+			if device.GetIds().GetApplicationIds().GetApplicationId() == "" {
 				return errNoApplicationID.New()
 			}
-			if device.DeviceId == "" {
+			if device.Ids.DeviceId == "" {
 				return errNoEndDeviceID.New()
 			}
 
 			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceSetPaths(device.SupportsJoin, paths...)
 
 			// Require EUIs for devices that need to be added to the Join Server.
-			if len(jsPaths) > 0 && (device.JoinEui == nil || device.DevEui == nil) {
+			if len(jsPaths) > 0 && (device.Ids.JoinEui == nil || device.Ids.DevEui == nil) {
 				return errNoEndDeviceEUI.New()
 			}
 			var isDevice ttnpb.EndDevice
 			logger.WithField("paths", isPaths).Debug("Create end device on Identity Server")
-			isDevice.SetFields(&device, append(isPaths, "ids")...)
+			isDevice.SetFields(device, append(isPaths, "ids")...)
 			isRes, err := ttnpb.NewEndDeviceRegistryClient(is).Create(ctx, &ttnpb.CreateEndDeviceRequest{
 				EndDevice: isDevice,
 			})
@@ -548,10 +550,10 @@ var (
 
 			device.SetFields(isRes, append(isPaths, "created_at", "updated_at")...)
 
-			res, err := setEndDevice(&device, nil, nsPaths, asPaths, jsPaths, nil, true, false)
+			res, err := setEndDevice(device, nil, nsPaths, asPaths, jsPaths, nil, true, false)
 			if err != nil {
 				logger.WithError(err).Error("Could not create end device, rolling back...")
-				if err := deleteEndDevice(context.Background(), &device.EndDeviceIdentifiers); err != nil {
+				if err := deleteEndDevice(context.Background(), device.Ids); err != nil {
 					logger.WithError(err).Error("Could not roll back end device creation")
 				}
 				return err
@@ -595,11 +597,13 @@ var (
 				overlapPaths := ttnpb.ExcludeFields(paths, remainingPaths...)
 				return errConflictingPaths.WithAttributes("field_mask_paths", overlapPaths)
 			}
-			var device ttnpb.EndDevice
+			device := &ttnpb.EndDevice{
+				Ids: &ttnpb.EndDeviceIdentifiers{},
+			}
 			if ttnpb.HasAnyField(paths, setEndDeviceToJS...) || ttnpb.HasAnyField(unsetPaths, setEndDeviceToJS...) {
 				device.SupportsJoin = true
 			}
-			if err = util.SetFields(&device, setEndDeviceFlags); err != nil {
+			if err = util.SetFields(device, setEndDeviceFlags); err != nil {
 				return err
 			}
 			newPaths, err := parsePayloadFormatterParameterFlags("formatters", device.Formatters, cmd.Flags())
@@ -608,7 +612,7 @@ var (
 			}
 			paths = append(paths, newPaths...)
 			device.Attributes = mergeAttributes(device.Attributes, cmd.Flags())
-			device.EndDeviceIdentifiers = *devID
+			device.Ids = devID
 
 			paths = append(paths, unsetPaths...)
 			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceSetPaths(device.SupportsJoin, paths...)
@@ -653,23 +657,23 @@ var (
 			}
 
 			// EUIs can not be updated, so we only accept EUI flags if they are equal to the existing ones.
-			if device.JoinEui != nil {
-				if existingDevice.JoinEui != nil && *device.JoinEui != *existingDevice.JoinEui {
+			if device.Ids.JoinEui != nil {
+				if existingDevice.Ids.JoinEui != nil && *device.Ids.JoinEui != *existingDevice.Ids.JoinEui {
 					return errEndDeviceEUIUpdate.New()
 				}
 			} else {
-				device.JoinEui = existingDevice.JoinEui
+				device.Ids.JoinEui = existingDevice.Ids.JoinEui
 			}
-			if device.DevEui != nil {
-				if existingDevice.DevEui != nil && *device.DevEui != *existingDevice.DevEui {
+			if device.Ids.DevEui != nil {
+				if existingDevice.Ids.DevEui != nil && *device.Ids.DevEui != *existingDevice.Ids.DevEui {
 					return errEndDeviceEUIUpdate.New()
 				}
 			} else {
-				device.DevEui = existingDevice.DevEui
+				device.Ids.DevEui = existingDevice.Ids.DevEui
 			}
 
 			// Require EUIs for devices that need to be updated in the Join Server.
-			if len(jsPaths) > 0 && (device.JoinEui == nil || device.DevEui == nil) {
+			if len(jsPaths) > 0 && (device.Ids.JoinEui == nil || device.Ids.DevEui == nil) {
 				return errNoEndDeviceEUI.New()
 			}
 
@@ -679,11 +683,11 @@ var (
 
 			if hasUpdateDeviceLocationFlags(cmd.Flags()) {
 				device.SetFields(existingDevice, "locations")
-				updateDeviceLocation(&device, cmd.Flags())
+				updateDeviceLocation(device, cmd.Flags())
 			}
 
 			touch, _ := cmd.Flags().GetBool("touch")
-			res, err := setEndDevice(&device, isPaths, nsPaths, asPaths, jsPaths, unsetPaths, false, touch)
+			res, err := setEndDevice(device, isPaths, nsPaths, asPaths, jsPaths, unsetPaths, false, touch)
 			if err != nil {
 				return err
 			}
@@ -866,18 +870,18 @@ var (
 
 			// EUIs must match registered EUIs if set.
 			if devID.JoinEui != nil {
-				if existingDevice.JoinEui != nil && *devID.JoinEui != *existingDevice.JoinEui {
+				if existingDevice.Ids.JoinEui != nil && *devID.JoinEui != *existingDevice.Ids.JoinEui {
 					return errInconsistentEndDeviceEUI.New()
 				}
 			} else {
-				devID.JoinEui = existingDevice.JoinEui
+				devID.JoinEui = existingDevice.Ids.JoinEui
 			}
 			if devID.DevEui != nil {
-				if existingDevice.DevEui != nil && *devID.DevEui != *existingDevice.DevEui {
+				if existingDevice.Ids.DevEui != nil && *devID.DevEui != *existingDevice.Ids.DevEui {
 					return errInconsistentEndDeviceEUI.New()
 				}
 			} else {
-				devID.DevEui = existingDevice.DevEui
+				devID.DevEui = existingDevice.Ids.DevEui
 			}
 
 			if nsMismatch, asMismatch, jsMismatch := compareServerAddressesEndDevice(existingDevice, config); nsMismatch || asMismatch || jsMismatch {
@@ -1035,13 +1039,13 @@ This command may take end device identifiers from stdin.`,
 				if _, err := inputDecoder.Decode(&dev); err != nil {
 					return err
 				}
-				if dev.GetApplicationIds().GetApplicationId() == "" {
+				if dev.GetIds().GetApplicationIds().GetApplicationId() == "" {
 					return errNoApplicationID.New()
 				}
-				if dev.DeviceId == "" {
+				if dev.Ids.DeviceId == "" {
 					return errNoEndDeviceID.New()
 				}
-				ids = &dev.EndDeviceIdentifiers
+				ids = dev.Ids
 			} else {
 				var err error
 				ids, err = getEndDeviceID(cmd.Flags(), args, true)
@@ -1100,7 +1104,7 @@ This command may take end device identifiers from stdin.`,
 				return errAddressMismatchEndDevice.New()
 			}
 
-			dev, err := getEndDevice(&device.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths, true)
+			dev, err := getEndDevice(device.Ids, nsPaths, asPaths, jsPaths, true)
 			if err != nil {
 				return err
 			}
@@ -1130,7 +1134,7 @@ This command may take end device identifiers from stdin.`,
 			if exts, err := mime.ExtensionsByType(res.Image.Embedded.MimeType); err == nil && len(exts) > 0 {
 				ext = exts[0]
 			}
-			filename := path.Join(folder, device.DeviceId+ext)
+			filename := path.Join(folder, device.Ids.DeviceId+ext)
 			if err := os.WriteFile(filename, res.Image.Embedded.Data, 0o644); err != nil {
 				return err
 			}
@@ -1185,7 +1189,7 @@ This command may take end device identifiers from stdin.`,
 
 			_, err = ttnpb.NewEndDeviceRegistryClient(is).Update(ctx, &ttnpb.UpdateEndDeviceRequest{
 				EndDevice: ttnpb.EndDevice{
-					EndDeviceIdentifiers: *devID,
+					Ids: devID,
 				},
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{

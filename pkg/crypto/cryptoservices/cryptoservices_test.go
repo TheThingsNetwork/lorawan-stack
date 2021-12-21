@@ -42,7 +42,7 @@ func TestCryptoServices(t *testing.T) {
 		aes128KeyPtr(types.AES128Key{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}),
 		aes128KeyPtr(types.AES128Key{0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2}),
 	)
-	ids := ttnpb.EndDeviceIdentifiers{
+	ids := &ttnpb.EndDeviceIdentifiers{
 		JoinEui: eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 		DevEui:  eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 	}
@@ -96,7 +96,7 @@ func TestCryptoServices(t *testing.T) {
 					t.Run(fmt.Sprintf("%v", tc.Version), func(t *testing.T) {
 						a := assertions.New(t)
 						dev := &ttnpb.EndDevice{
-							EndDeviceIdentifiers: ids,
+							Ids: ids,
 						}
 						res, err := svc.JoinRequestMIC(ctx, dev, tc.Version, tc.Payload)
 						a.So(err, should.BeNil)
@@ -160,7 +160,7 @@ func TestCryptoServices(t *testing.T) {
 					t.Run(fmt.Sprintf("%v", tc.Version), func(t *testing.T) {
 						a := assertions.New(t)
 						dev := &ttnpb.EndDevice{
-							EndDeviceIdentifiers: ids,
+							Ids: ids,
 						}
 						res, err := svc.JoinAcceptMIC(ctx, dev, tc.Version, tc.JoinReqType, tc.DevNonce, tc.Payload)
 						a.So(err, should.BeNil)
@@ -199,7 +199,7 @@ func TestCryptoServices(t *testing.T) {
 					t.Run(fmt.Sprintf("%v", tc.Version), func(t *testing.T) {
 						a := assertions.New(t)
 						dev := &ttnpb.EndDevice{
-							EndDeviceIdentifiers: ids,
+							Ids: ids,
 						}
 						res, err := svc.EncryptJoinAccept(ctx, dev, tc.Version, tc.Payload)
 						a.So(err, should.BeNil)
@@ -223,7 +223,7 @@ func TestCryptoServices(t *testing.T) {
 					t.Run(fmt.Sprintf("%v", tc.Version), func(t *testing.T) {
 						a := assertions.New(t)
 						dev := &ttnpb.EndDevice{
-							EndDeviceIdentifiers: ids,
+							Ids: ids,
 						}
 						res, err := svc.EncryptRejoinAccept(ctx, dev, tc.Version, tc.Payload)
 						a.So(err, should.BeNil)
@@ -282,7 +282,7 @@ func TestCryptoServices(t *testing.T) {
 					t.Run(fmt.Sprintf("%v", tc.Version), func(t *testing.T) {
 						a := assertions.New(t)
 						dev := &ttnpb.EndDevice{
-							EndDeviceIdentifiers: ids,
+							Ids: ids,
 						}
 						keys, err := svc.DeriveNwkSKeys(ctx, dev, tc.Version, tc.JoinNonce, tc.DevNonce, tc.NetID)
 						a.So(err, should.BeNil)
@@ -295,7 +295,7 @@ func TestCryptoServices(t *testing.T) {
 
 			t.Run("NwkKey", func(t *testing.T) {
 				a := assertions.New(t)
-				key, err := svc.GetNwkKey(ctx, &ttnpb.EndDevice{EndDeviceIdentifiers: ids})
+				key, err := svc.GetNwkKey(ctx, &ttnpb.EndDevice{Ids: ids})
 				a.So(err, should.BeNil)
 				a.So(key, should.Resemble, &types.AES128Key{0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1})
 			})
@@ -353,7 +353,7 @@ func TestCryptoServices(t *testing.T) {
 					t.Run(fmt.Sprintf("%v", tc.Version), func(t *testing.T) {
 						a := assertions.New(t)
 						dev := &ttnpb.EndDevice{
-							EndDeviceIdentifiers: ids,
+							Ids: ids,
 						}
 						appSKey, err := svc.DeriveAppSKey(ctx, dev, tc.Version, tc.JoinNonce, tc.DevNonce, tc.NetID)
 						a.So(err, should.BeNil)
@@ -364,7 +364,7 @@ func TestCryptoServices(t *testing.T) {
 
 			t.Run("AppKey", func(t *testing.T) {
 				a := assertions.New(t)
-				key, err := svc.GetAppKey(ctx, &ttnpb.EndDevice{EndDeviceIdentifiers: ids})
+				key, err := svc.GetAppKey(ctx, &ttnpb.EndDevice{Ids: ids})
 				a.So(err, should.BeNil)
 				a.So(key, should.Resemble, &types.AES128Key{0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2, 0x2})
 			})
@@ -379,7 +379,7 @@ type mockNetworkRPCServer struct {
 
 func (s *mockNetworkRPCServer) JoinRequestMIC(ctx context.Context, req *ttnpb.CryptoServicePayloadRequest) (*ttnpb.CryptoServicePayloadResponse, error) {
 	dev := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: *req.Ids,
+		Ids: req.Ids,
 	}
 	mic, err := s.Network.JoinRequestMIC(ctx, dev, req.LorawanVersion, req.Payload)
 	if err != nil {
@@ -392,7 +392,7 @@ func (s *mockNetworkRPCServer) JoinRequestMIC(ctx context.Context, req *ttnpb.Cr
 
 func (s *mockNetworkRPCServer) JoinAcceptMIC(ctx context.Context, req *ttnpb.JoinAcceptMICRequest) (*ttnpb.CryptoServicePayloadResponse, error) {
 	dev := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: *req.PayloadRequest.Ids,
+		Ids: req.PayloadRequest.Ids,
 	}
 	mic, err := s.Network.JoinAcceptMIC(ctx, dev, req.PayloadRequest.LorawanVersion, byte(req.JoinRequestType), req.DevNonce, req.PayloadRequest.Payload)
 	if err != nil {
@@ -405,7 +405,7 @@ func (s *mockNetworkRPCServer) JoinAcceptMIC(ctx context.Context, req *ttnpb.Joi
 
 func (s *mockNetworkRPCServer) EncryptJoinAccept(ctx context.Context, req *ttnpb.CryptoServicePayloadRequest) (*ttnpb.CryptoServicePayloadResponse, error) {
 	dev := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: *req.Ids,
+		Ids: req.Ids,
 	}
 	data, err := s.Network.EncryptJoinAccept(ctx, dev, req.LorawanVersion, req.Payload)
 	if err != nil {
@@ -418,7 +418,7 @@ func (s *mockNetworkRPCServer) EncryptJoinAccept(ctx context.Context, req *ttnpb
 
 func (s *mockNetworkRPCServer) EncryptRejoinAccept(ctx context.Context, req *ttnpb.CryptoServicePayloadRequest) (*ttnpb.CryptoServicePayloadResponse, error) {
 	dev := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: *req.Ids,
+		Ids: req.Ids,
 	}
 	data, err := s.Network.EncryptRejoinAccept(ctx, dev, req.LorawanVersion, req.Payload)
 	if err != nil {
@@ -431,7 +431,7 @@ func (s *mockNetworkRPCServer) EncryptRejoinAccept(ctx context.Context, req *ttn
 
 func (s *mockNetworkRPCServer) DeriveNwkSKeys(ctx context.Context, req *ttnpb.DeriveSessionKeysRequest) (*ttnpb.NwkSKeysResponse, error) {
 	dev := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: *req.Ids,
+		Ids: req.Ids,
 	}
 	nwkSKeys, err := s.Network.DeriveNwkSKeys(ctx, dev, req.LorawanVersion, req.JoinNonce, req.DevNonce, req.NetId)
 	if err != nil {
@@ -458,7 +458,7 @@ func (s *mockNetworkRPCServer) DeriveNwkSKeys(ctx context.Context, req *ttnpb.De
 
 func (s *mockNetworkRPCServer) GetNwkKey(ctx context.Context, req *ttnpb.GetRootKeysRequest) (*ttnpb.KeyEnvelope, error) {
 	dev := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: *req.Ids,
+		Ids: req.Ids,
 	}
 	nwkKey, err := s.Network.GetNwkKey(ctx, dev)
 	if err != nil {
@@ -474,7 +474,7 @@ type mockApplicationRPCServer struct {
 
 func (s *mockApplicationRPCServer) DeriveAppSKey(ctx context.Context, req *ttnpb.DeriveSessionKeysRequest) (*ttnpb.AppSKeyResponse, error) {
 	dev := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: *req.Ids,
+		Ids: req.Ids,
 	}
 	appSKey, err := s.Application.DeriveAppSKey(ctx, dev, req.LorawanVersion, req.JoinNonce, req.DevNonce, req.NetId)
 	if err != nil {
@@ -491,7 +491,7 @@ func (s *mockApplicationRPCServer) DeriveAppSKey(ctx context.Context, req *ttnpb
 
 func (s *mockApplicationRPCServer) GetAppKey(ctx context.Context, req *ttnpb.GetRootKeysRequest) (*ttnpb.KeyEnvelope, error) {
 	dev := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: *req.Ids,
+		Ids: req.Ids,
 	}
 	appKey, err := s.Application.GetAppKey(ctx, dev)
 	if err != nil {

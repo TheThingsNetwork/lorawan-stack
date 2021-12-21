@@ -36,7 +36,7 @@ func TestLoRaAllianceTR005Draft2(t *testing.T) {
 			{
 				Name: "Simple",
 				Device: ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						JoinEui: eui64Ptr(types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00}),
 						DevEui:  eui64Ptr(types.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8}),
 					},

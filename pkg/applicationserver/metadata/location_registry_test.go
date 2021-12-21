@@ -45,7 +45,7 @@ type mockISEndDeviceRegistry struct {
 func (m *mockISEndDeviceRegistry) add(ctx context.Context, dev *ttnpb.EndDevice) {
 	m.endDevicesMu.Lock()
 	defer m.endDevicesMu.Unlock()
-	m.endDevices[unique.ID(ctx, dev.EndDeviceIdentifiers)] = dev
+	m.endDevices[unique.ID(ctx, dev.Ids)] = dev
 }
 
 func (m *mockISEndDeviceRegistry) get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevice, bool) {
@@ -69,14 +69,14 @@ func (m *mockISEndDeviceRegistry) Get(ctx context.Context, in *ttnpb.GetEndDevic
 func (m *mockISEndDeviceRegistry) Update(ctx context.Context, in *ttnpb.UpdateEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	m.endDevicesMu.Lock()
 	defer m.endDevicesMu.Unlock()
-	dev, ok := m.endDevices[unique.ID(ctx, in.EndDeviceIdentifiers)]
+	dev, ok := m.endDevices[unique.ID(ctx, in.Ids)]
 	if !ok {
 		return nil, errNotFound.New()
 	}
 	if err := dev.SetFields(&in.EndDevice, in.GetFieldMask().GetPaths()...); err != nil {
 		return nil, err
 	}
-	m.endDevices[unique.ID(ctx, in.EndDeviceIdentifiers)] = dev
+	m.endDevices[unique.ID(ctx, in.Ids)] = dev
 	return dev, nil
 }
 
@@ -117,7 +117,7 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 }
 
 var (
-	registeredEndDeviceIDs = ttnpb.EndDeviceIdentifiers{
+	registeredEndDeviceIDs = &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: &ttnpb.ApplicationIdentifiers{
 			ApplicationId: "foo",
 		},
@@ -144,8 +144,8 @@ func TestClusterEndDeviceLocationRegistry(t *testing.T) {
 	defer closeIS()
 
 	registeredEndDevice := ttnpb.EndDevice{
-		EndDeviceIdentifiers: registeredEndDeviceIDs,
-		Locations:            originalLocations,
+		Ids:       registeredEndDeviceIDs,
+		Locations: originalLocations,
 	}
 	is.endDeviceRegistry.add(ctx, &registeredEndDevice)
 
@@ -211,8 +211,8 @@ func TestCachedEndDeviceLocationRegistry(t *testing.T) {
 	defer closeIS()
 
 	registeredEndDevice := ttnpb.EndDevice{
-		EndDeviceIdentifiers: registeredEndDeviceIDs,
-		Locations:            originalLocations,
+		Ids:       registeredEndDeviceIDs,
+		Locations: originalLocations,
 	}
 	is.endDeviceRegistry.add(ctx, &registeredEndDevice)
 

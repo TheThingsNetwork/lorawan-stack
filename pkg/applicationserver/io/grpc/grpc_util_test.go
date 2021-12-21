@@ -131,13 +131,13 @@ func (is *mockIS) ListRights(ctx context.Context, ids *ttnpb.ApplicationIdentifi
 }
 
 type mockFetcher struct {
-	calledWithIdentifiers ttnpb.EndDeviceIdentifiers
+	calledWithIdentifiers *ttnpb.EndDeviceIdentifiers
 
 	ids *ttnpb.EndDeviceIdentifiers
 	err error
 }
 
-func (f *mockFetcher) Get(_ context.Context, ids ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDeviceIdentifiers, error) {
+func (f *mockFetcher) Get(_ context.Context, ids *ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDeviceIdentifiers, error) {
 	f.calledWithIdentifiers = ids
 	return f.ids, f.err
 }

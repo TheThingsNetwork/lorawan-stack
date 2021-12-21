@@ -46,8 +46,8 @@ func (ids ClientIdentifiers) IsZero() bool {
 
 // IsZero reports whether ids represent zero identifiers.
 func (ids EndDeviceIdentifiers) IsZero() bool {
-	return ids.GetDeviceId() == "" &&
-		ids.GetApplicationIds().GetApplicationId() == "" &&
+	return ids.DeviceId == "" &&
+		ids.ApplicationIds == nil &&
 		(ids.DevAddr == nil || ids.DevAddr.IsZero()) &&
 		(ids.DevEui == nil || ids.DevEui.IsZero()) &&
 		ids.JoinEui == nil

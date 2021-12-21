@@ -391,7 +391,7 @@ message EndDeviceAuthenticationCode {
 // The persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.
 // SDKs are responsible for combining (if desired) the three.
 message EndDevice {
-  EndDeviceIdentifiers ids = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  EndDeviceIdentifiers ids = 1 [(validate.rules).message.required = true];
   google.protobuf.Timestamp created_at = 2;
   google.protobuf.Timestamp updated_at = 3;
 

@@ -235,11 +235,11 @@ func (r PubSubRegistry) Set(ctx context.Context, ids *ttnpb.ApplicationPubSubIde
 				if err != nil {
 					return err
 				}
-				if updated.Ids.GetApplicationIds().GetApplicationId() != ids.GetApplicationIds().GetApplicationId() || updated.Ids.PubSubId != ids.PubSubId {
+				if updated.Ids.ApplicationIds.ApplicationId != ids.ApplicationIds.ApplicationId || updated.Ids.PubSubId != ids.PubSubId {
 					return errInvalidIdentifiers.New()
 				}
 			} else {
-				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.Ids.GetApplicationIds().GetApplicationId() != stored.Ids.GetApplicationIds().GetApplicationId() {
+				if ttnpb.HasAnyField(sets, "ids.application_ids.application_id") && pb.Ids.ApplicationIds.ApplicationId != stored.Ids.ApplicationIds.ApplicationId {
 					return errReadOnlyField.WithAttributes("field", "ids.application_ids.application_id")
 				}
 				if ttnpb.HasAnyField(sets, "ids.pub_sub_id") && pb.Ids.PubSubId != stored.Ids.PubSubId {

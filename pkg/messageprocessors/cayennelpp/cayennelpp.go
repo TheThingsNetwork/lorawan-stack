@@ -42,7 +42,7 @@ var (
 )
 
 // EncodeDownlink encodes the message's DecodedPayload to FRMPayload using CayenneLPP encoding.
-func (h *host) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
+func (h *host) EncodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
 	defer trace.StartRegion(ctx, "encode downlink message").End()
 
 	decoded := msg.DecodedPayload
@@ -71,7 +71,7 @@ func (h *host) EncodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifier
 }
 
 // DecodeUplink decodes the message's FRMPayload to DecodedPayload using CayenneLPP decoding.
-func (h *host) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, script string) error {
+func (h *host) DecodeUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, script string) error {
 	defer trace.StartRegion(ctx, "decode uplink message").End()
 
 	decoder := lpp.NewDecoder(bytes.NewBuffer(msg.FrmPayload))
@@ -88,7 +88,7 @@ func (h *host) DecodeUplink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers,
 }
 
 // DecodeDownlink decodes the message's FRMPayload to DecodedPayload using CayenneLPP decoding.
-func (h *host) DecodeDownlink(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
+func (h *host) DecodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
 	defer trace.StartRegion(ctx, "decode downlink message").End()
 
 	decoder := lpp.NewDecoder(bytes.NewBuffer(msg.FrmPayload))

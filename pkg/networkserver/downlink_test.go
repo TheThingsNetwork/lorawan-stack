@@ -187,11 +187,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 		RemoteIP:       true,
 		UserAgent:      true,
 	})
-	makeAssertReceiveScheduleFailAttemptEvents := func(attempt, fail events.Builder) func(context.Context, TestEnvironment, *ttnpb.DownlinkMessage, ttnpb.EndDeviceIdentifiers, error, uint) bool {
-		return func(ctx context.Context, env TestEnvironment, down *ttnpb.DownlinkMessage, ids ttnpb.EndDeviceIdentifiers, err error, n uint) bool {
+	makeAssertReceiveScheduleFailAttemptEvents := func(attempt, fail events.Builder) func(context.Context, TestEnvironment, *ttnpb.DownlinkMessage, *ttnpb.EndDeviceIdentifiers, error, uint) bool {
+		return func(ctx context.Context, env TestEnvironment, down *ttnpb.DownlinkMessage, ids *ttnpb.EndDeviceIdentifiers, err error, n uint) bool {
 			_, a := test.MustNewTFromContext(ctx)
 			ctx = events.ContextWithCorrelationID(ctx, down.CorrelationIds...)
-			evIDOpt := events.WithIdentifiers(&ids)
+			evIDOpt := events.WithIdentifiers(ids)
 			for i := uint(0); i < n; i++ {
 				if !test.AllTrue(
 					a.So(env.Events, should.ReceiveEventFunc, attemptEventEqual,
@@ -206,11 +206,11 @@ func TestProcessDownlinkTask(t *testing.T) {
 			return true
 		}
 	}
-	makeAssertReceiveScheduleSuccessAttemptEvents := func(attempt, success events.Builder) func(context.Context, TestEnvironment, *ttnpb.DownlinkMessage, ttnpb.EndDeviceIdentifiers, *ttnpb.ScheduleDownlinkResponse, ...events.Builder) bool {
-		return func(ctx context.Context, env TestEnvironment, down *ttnpb.DownlinkMessage, ids ttnpb.EndDeviceIdentifiers, resp *ttnpb.ScheduleDownlinkResponse, evs ...events.Builder) bool {
+	makeAssertReceiveScheduleSuccessAttemptEvents := func(attempt, success events.Builder) func(context.Context, TestEnvironment, *ttnpb.DownlinkMessage, *ttnpb.EndDeviceIdentifiers, *ttnpb.ScheduleDownlinkResponse, ...events.Builder) bool {
+		return func(ctx context.Context, env TestEnvironment, down *ttnpb.DownlinkMessage, ids *ttnpb.EndDeviceIdentifiers, resp *ttnpb.ScheduleDownlinkResponse, evs ...events.Builder) bool {
 			_, a := test.MustNewTFromContext(ctx)
 			ctx = events.ContextWithCorrelationID(ctx, down.CorrelationIds...)
-			evIDOpt := events.WithIdentifiers(&ids)
+			evIDOpt := events.WithIdentifiers(ids)
 			return test.AllTrue(
 				a.So(env.Events, should.ReceiveEventFunc, attemptEventEqual,
 					attempt.With(events.WithData(down)).New(ctx, evIDOpt),
@@ -345,7 +345,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "no MAC state",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -358,7 +358,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "Class A/windows closed",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -403,7 +403,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "Class A/windows open/1.1/no uplink",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -434,7 +434,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "Class A/windows open/1.1/no session",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -468,7 +468,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "Class A/windows open/1.1/RX1,RX2 expired",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -518,7 +518,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "Class A/windows open/1.1/RX1,RX2 available/no MAC/no application downlink",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -567,7 +567,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "Class A/windows open/1.0.3/RX1,RX2 available/no MAC/generic application downlink/FCnt too low",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -636,7 +636,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				_, a := test.MustNewTFromContext(ctx)
 				return nil, a.So(ups, should.HaveLength, 1) &&
 					a.So(ups[0], should.Resemble, &ttnpb.ApplicationUp{
-						EndDeviceIds:   &dev.EndDeviceIdentifiers,
+						EndDeviceIds:   dev.Ids,
 						CorrelationIds: LastUplink(dev.MacState.RecentUplinks...).CorrelationIds,
 						Up: &ttnpb.ApplicationUp_DownlinkQueueInvalidated{
 							DownlinkQueueInvalidated: &ttnpb.ApplicationInvalidatedDownlinks{
@@ -652,7 +652,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "Class A/windows open/1.0.3/RX1,RX2 available/no MAC/generic application downlink/application downlink exceeds length limit",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -713,7 +713,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				_, a := test.MustNewTFromContext(ctx)
 				return nil, a.So(ups, should.HaveLength, 1) &&
 					a.So(ups[0], should.Resemble, &ttnpb.ApplicationUp{
-						EndDeviceIds:   &dev.EndDeviceIdentifiers,
+						EndDeviceIds:   dev.Ids,
 						CorrelationIds: append(LastUplink(dev.MacState.RecentUplinks...).CorrelationIds, dev.Session.QueuedApplicationDownlinks[0].CorrelationIds...),
 						Up: &ttnpb.ApplicationUp_DownlinkFailed{
 							DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
@@ -728,7 +728,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "Class A/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX1,RX2/EU868/scheduling fail",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -867,7 +867,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						append(lastUp.CorrelationIds, dev.Session.QueuedApplicationDownlinks[0].CorrelationIds...),
 					),
-					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 3),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 3),
 				)
 			},
 			DeviceDiffs: []DeviceDiffFunc{
@@ -879,7 +879,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "Class A/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX1,RX2/EU868",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -1017,8 +1017,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						append(lastUp.CorrelationIds, dev.Session.QueuedApplicationDownlinks[0].CorrelationIds...),
 					),
-					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
-					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response,
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 2),
+					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.Ids, oneSecondScheduleResponse.Response,
 						mac.EvtEnqueueDevStatusRequest,
 					),
 				)
@@ -1040,7 +1040,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			Name: "Class A/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/application downlink does not fit due to FOpts/MAC/RX1,RX2/EU868",
 			// NOTE: Maximum MACPayload length in both RX1(DR0) and RX2(DR1) is 59. There are 6 bytes of FOpts, hence maximum fitting application downlink length is 59-8-6 == 45.
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -1172,8 +1172,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						lastUp.CorrelationIds,
 					),
-					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
-					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response,
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 2),
+					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.Ids, oneSecondScheduleResponse.Response,
 						mac.EvtEnqueueDevStatusRequest,
 					),
 				)
@@ -1195,7 +1195,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "Class A/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX2 does not fit/RX1/EU868",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -1331,8 +1331,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						append(lastUp.CorrelationIds, dev.Session.QueuedApplicationDownlinks[0].CorrelationIds...),
 					),
-					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
-					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response,
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 2),
+					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.Ids, oneSecondScheduleResponse.Response,
 						mac.EvtEnqueueDevStatusRequest,
 					),
 				)
@@ -1353,7 +1353,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "Class B/windows closed/ping slot",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -1482,7 +1482,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						dev.Session.QueuedApplicationDownlinks[0].CorrelationIds,
 					),
-					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response),
+					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.Ids, oneSecondScheduleResponse.Response),
 				)
 			},
 			DeviceDiffs: []DeviceDiffFunc{
@@ -1499,7 +1499,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "Class C/windows open/1.1/RX1,RX2 available/MAC answers/MAC requests/generic application downlink/data+MAC/RX1,RX2/EU868",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -1639,8 +1639,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						append(lastUp.CorrelationIds, dev.Session.QueuedApplicationDownlinks[0].CorrelationIds...),
 					),
-					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
-					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response,
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 2),
+					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.Ids, oneSecondScheduleResponse.Response,
 						mac.EvtEnqueueDevStatusRequest,
 					),
 				)
@@ -1662,7 +1662,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "Class C/windows open/1.1/RX1,RX2 expired/MAC answers/MAC requests/generic application downlink/data+MAC/RXC/EU868",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -1782,8 +1782,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						dev.Session.QueuedApplicationDownlinks[0].CorrelationIds,
 					),
-					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
-					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 2),
+					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.Ids, oneSecondScheduleResponse.Response),
 				)
 			},
 			DeviceDiffs: []DeviceDiffFunc{
@@ -1798,7 +1798,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "Class C/windows open/1.1/RX1,RX2 expired/no MAC answers/MAC requests/classBC application downlink/absolute time within window/no forced gateways/data+MAC/RXC/EU868",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -1922,8 +1922,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						dev.Session.QueuedApplicationDownlinks[0].CorrelationIds,
 					),
-					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
-					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 2),
+					assertReceiveScheduleDataSuccessAttemptEvents(ctx, env, lastDown, dev.Ids, oneSecondScheduleResponse.Response),
 				)
 			},
 			DeviceDiffs: []DeviceDiffFunc{
@@ -1938,7 +1938,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "Class C/windows closed/1.1/no MAC answers/MAC requests/classBC application downlink with absolute time/no forced gateways/MAC/RXC/EU868/non-retryable errors",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -2071,7 +2071,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						dev.Session.QueuedApplicationDownlinks[0].CorrelationIds,
 					),
-					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 3),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 3),
 				)
 			},
 			DeviceDiffs: []DeviceDiffFunc{
@@ -2083,7 +2083,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				_, a := test.MustNewTFromContext(ctx)
 				return nil, a.So(ups, should.HaveLength, 1) &&
 					a.So(ups[0], should.Resemble, &ttnpb.ApplicationUp{
-						EndDeviceIds:   &dev.EndDeviceIdentifiers,
+						EndDeviceIds:   dev.Ids,
 						CorrelationIds: dev.Session.QueuedApplicationDownlinks[0].CorrelationIds,
 						Up: &ttnpb.ApplicationUp_DownlinkFailed{
 							DownlinkFailed: &ttnpb.ApplicationDownlinkFailed{
@@ -2098,7 +2098,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "Class C/windows closed/1.1/no MAC answers/MAC requests/classBC application downlink/forced gateways/MAC/RXC/EU868/retryable error",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -2230,7 +2230,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						dev.Session.QueuedApplicationDownlinks[0].CorrelationIds,
 					),
-					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 3),
+					assertReceiveScheduleDataFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 3),
 				)
 			},
 		},
@@ -2238,7 +2238,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "Class C/windows open/1.1/RX1,RX2 available/no MAC/classBC application downlink/absolute time outside window",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -2300,7 +2300,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "Class C/windows open/1.1/RX1,RX2 available/no MAC/expired application downlinks",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &test.DefaultDevAddr,
@@ -2373,7 +2373,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		{
 			Name: "join-accept/windows open/RX1,RX2 available/active session/EU868",
 			CreateDevice: &ttnpb.EndDevice{
-				EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+				Ids: &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 					DevAddr:        &types.DevAddr{0x42, 0xff, 0xff, 0xff},
@@ -2464,8 +2464,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 					a.So(lastDown.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual,
 						lastUp.CorrelationIds,
 					),
-					assertReceiveScheduleJoinFailAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, testErr, 2),
-					assertReceiveScheduleJoinSuccessAttemptEvents(ctx, env, lastDown, dev.EndDeviceIdentifiers, oneSecondScheduleResponse.Response),
+					assertReceiveScheduleJoinFailAttemptEvents(ctx, env, lastDown, dev.Ids, testErr, 2),
+					assertReceiveScheduleJoinSuccessAttemptEvents(ctx, env, lastDown, dev.Ids, oneSecondScheduleResponse.Response),
 				)
 			},
 			DeviceDiffs: []DeviceDiffFunc{
@@ -2484,10 +2484,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 			ApplicationUplinkAssertion: func(ctx context.Context, dev *ttnpb.EndDevice, ups ...*ttnpb.ApplicationUp) ([]events.Event, bool) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				ids := ttnpb.EndDeviceIdentifiers{
-					ApplicationIds: dev.ApplicationIds,
-					DeviceId:       dev.DeviceId,
-					DevEui:         dev.DevEui,
-					JoinEui:        dev.JoinEui,
+					ApplicationIds: dev.Ids.ApplicationIds,
+					DeviceId:       dev.Ids.DeviceId,
+					DevEui:         dev.Ids.DevEui,
+					JoinEui:        dev.Ids.JoinEui,
 					DevAddr:        &dev.PendingMacState.QueuedJoinAccept.DevAddr,
 				}
 				cids := LastUplink(dev.PendingMacState.RecentUplinks...).CorrelationIds
@@ -2553,7 +2553,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				if tc.CreateDevice != nil {
 					created, ctx = MustCreateDevice(ctx, env.Devices, tc.CreateDevice)
 				}
-				test.Must(nil, env.DownlinkTaskQueue.Queue.Add(ctx, ttnpb.EndDeviceIdentifiers{
+				test.Must(nil, env.DownlinkTaskQueue.Queue.Add(ctx, &ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: appID,
 					DeviceId:       devID,
 				}, time.Now(), true))
@@ -2582,7 +2582,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}
 				}
 
-				updated, ctx, err := env.Devices.GetByID(ctx, *appID, devID, ttnpb.EndDeviceFieldPathsTopLevel)
+				updated, ctx, err := env.Devices.GetByID(ctx, appID, devID, ttnpb.EndDeviceFieldPathsTopLevel)
 				if tc.CreateDevice != nil {
 					if !a.So(err, should.BeNil) {
 						t.FailNow()
@@ -2635,7 +2635,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				}
 				if tc.ApplicationUplinkAssertion != nil {
 					var evs []events.Event
-					a.So(env.AssertNsAsHandleUplink(ctx, *appID, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
+					a.So(env.AssertNsAsHandleUplink(ctx, appID, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 						var ok bool
 						evs, ok = tc.ApplicationUplinkAssertion(ctx, created, ups...)
 						return ok

@@ -41,7 +41,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 	registeredApplicationID := "foo-application"
 	registeredDeviceID := "foo-device"
 	registeredDevice := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+		Ids: &ttnpb.EndDeviceIdentifiers{
 			ApplicationIds: &ttnpb.ApplicationIdentifiers{
 				ApplicationId: registeredApplicationID,
 			},
@@ -93,7 +93,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 	for _, tc := range []struct {
 		Name            string
 		ContextFunc     func(context.Context) context.Context
-		GetFunc         func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error)
+		GetFunc         func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error)
 		DeviceRequest   *ttnpb.GetEndDeviceRequest
 		DeviceAssertion func(*testing.T, *ttnpb.EndDevice) bool
 		ErrorAssertion  func(*testing.T, error) bool
@@ -108,12 +108,12 @@ func TestDeviceRegistryGet(t *testing.T) {
 					},
 				})
 			},
-			GetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
+			GetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
 				test.MustTFromContext(ctx).Errorf("GetFunc must not be called")
 				return nil, errors.New("GetFunc must not be called")
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
+				EndDeviceIds: registeredDevice.Ids,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
@@ -133,12 +133,12 @@ func TestDeviceRegistryGet(t *testing.T) {
 					},
 				})
 			},
-			GetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
+			GetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
 				test.MustTFromContext(ctx).Errorf("GetFunc must not be called")
 				return nil, errors.New("GetFunc must not be called")
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
+				EndDeviceIds: registeredDevice.Ids,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
@@ -158,7 +158,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					},
 				})
 			},
-			GetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
+			GetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(ids, should.Resemble, ids)
 				a.So(paths, should.HaveSameElementsDeep, []string{
@@ -167,7 +167,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return nil, errNotFound.New()
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
+				EndDeviceIds: registeredDevice.Ids,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
@@ -188,7 +188,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					},
 				})
 			},
-			GetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
+			GetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{
@@ -200,20 +200,20 @@ func TestDeviceRegistryGet(t *testing.T) {
 					"formatters",
 				})
 				return deepcopy.Copy(&ttnpb.EndDevice{
-					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-					Formatters:           registeredDevice.Formatters,
+					Ids:        registeredDevice.Ids,
+					Formatters: registeredDevice.Formatters,
 				}).(*ttnpb.EndDevice), nil
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
+				EndDeviceIds: registeredDevice.Ids,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
-					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-					Formatters:           registeredDevice.Formatters,
+					Ids:        registeredDevice.Ids,
+					Formatters: registeredDevice.Formatters,
 				})
 			},
 			ErrorAssertion: nilErrorAssertion,
@@ -231,12 +231,12 @@ func TestDeviceRegistryGet(t *testing.T) {
 					},
 				})
 			},
-			GetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
+			GetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
 				test.MustTFromContext(ctx).Errorf("GetFunc must not be called")
 				return nil, errors.New("GetFunc must not be called")
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
+				EndDeviceIds: registeredDevice.Ids,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters", "session"},
 				},
@@ -257,7 +257,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					},
 				})
 			},
-			GetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
+			GetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(ids, should.Resemble, ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{
@@ -274,16 +274,16 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice), nil
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
-				EndDeviceIds: &registeredDevice.EndDeviceIdentifiers,
+				EndDeviceIds: registeredDevice.Ids,
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters", "session"},
 				},
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
-					EndDeviceIdentifiers: registeredDevice.EndDeviceIdentifiers,
-					Formatters:           registeredDevice.Formatters,
-					Session:              expectedSession,
+					Ids:        registeredDevice.Ids,
+					Formatters: registeredDevice.Formatters,
+					Session:    expectedSession,
 				})
 			},
 			ErrorAssertion: nilErrorAssertion,
@@ -311,7 +311,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 						},
 					},
 					Devices: &MockDeviceRegistry{
-						GetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
+						GetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
 							atomic.AddUint64(&getCalls, 1)
 							return tc.GetFunc(ctx, ids, paths)
 						},
@@ -347,7 +347,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 	registeredApplicationID := "foo-application"
 	registeredDeviceID := "foo-device"
 	registeredDevice := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+		Ids: &ttnpb.EndDeviceIdentifiers{
 			ApplicationIds: &ttnpb.ApplicationIdentifiers{
 				ApplicationId: registeredApplicationID,
 			},
@@ -362,7 +362,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 	for _, tc := range []struct {
 		Name            string
 		ContextFunc     func(context.Context) context.Context
-		SetFunc         func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+		SetFunc         func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
 		DeviceRequest   *ttnpb.SetEndDeviceRequest
 		ErrorAssertion  func(*testing.T, error) bool
 		DeviceAssertion func(*testing.T, *ttnpb.EndDevice) bool
@@ -377,7 +377,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					},
 				})
 			},
-			SetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				test.MustTFromContext(ctx).Errorf("SetFunc must not be called")
 				return nil, errors.New("SetFunc must not be called")
 			},
@@ -404,7 +404,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					},
 				})
 			},
-			SetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				test.MustTFromContext(ctx).Errorf("SetFunc must not be called")
 				return nil, errors.New("SetFunc must not be called")
 			},
@@ -435,7 +435,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{
 							ApplicationId: registeredApplicationID,
 						},
@@ -450,7 +450,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					Paths: []string{"formatters"},
 				},
 			},
-			SetFunc: func(ctx context.Context, deviceIds ttnpb.EndDeviceIdentifiers, gets []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetFunc: func(ctx context.Context, deviceIds *ttnpb.EndDeviceIdentifiers, gets []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(deviceIds, should.Resemble, ttnpb.EndDeviceIdentifiers{
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{
@@ -468,7 +468,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"ids.device_id",
 				})
 				a.So(dev, should.Resemble, &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{
 							ApplicationId: registeredApplicationID,
 						},
@@ -484,7 +484,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				a := assertions.New(t)
 				return a.So(dev, should.Resemble, &ttnpb.EndDevice{
-					EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{
 							ApplicationId: registeredApplicationID,
 						},
@@ -516,9 +516,9 @@ func TestDeviceRegistrySet(t *testing.T) {
 					Paths: []string{"formatters"},
 				},
 			},
-			SetFunc: func(ctx context.Context, deviceIds ttnpb.EndDeviceIdentifiers, gets []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetFunc: func(ctx context.Context, deviceIds *ttnpb.EndDeviceIdentifiers, gets []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
-				a.So(deviceIds, should.Resemble, registeredDevice.EndDeviceIdentifiers)
+				a.So(deviceIds, should.Resemble, registeredDevice.Ids)
 				a.So(gets, should.HaveSameElementsDeep, []string{
 					"formatters",
 				})
@@ -553,7 +553,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					Paths: []string{"formatters.up_formatter_parameter"},
 				},
 			},
-			SetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				test.MustTFromContext(ctx).Errorf("SetFunc must not be called")
 				return nil, errors.New("SetFunc must not be called")
 			},
@@ -583,7 +583,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					Paths: []string{"formatters.down_formatter_parameter"},
 				},
 			},
-			SetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				test.MustTFromContext(ctx).Errorf("SetFunc must not be called")
 				return nil, errors.New("SetFunc must not be called")
 			},
@@ -601,7 +601,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			as := test.Must(applicationserver.New(componenttest.NewComponent(t, &component.Config{}),
 				&applicationserver.Config{
 					Devices: &MockDeviceRegistry{
-						SetFunc: func(ctx context.Context, deviceIds ttnpb.EndDeviceIdentifiers, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+						SetFunc: func(ctx context.Context, deviceIds *ttnpb.EndDeviceIdentifiers, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 							atomic.AddUint64(&setCalls, 1)
 							return tc.SetFunc(ctx, deviceIds, paths, cb)
 						},
@@ -646,7 +646,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 	registeredApplicationID := "foo-application"
 	registeredDeviceID := "foo-device"
 	registeredDevice := &ttnpb.EndDevice{
-		EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+		Ids: &ttnpb.EndDeviceIdentifiers{
 			ApplicationIds: &ttnpb.ApplicationIdentifiers{
 				ApplicationId: registeredApplicationID,
 			},
@@ -656,8 +656,8 @@ func TestDeviceRegistryDelete(t *testing.T) {
 	for _, tc := range []struct {
 		Name           string
 		ContextFunc    func(context.Context) context.Context
-		SetFunc        func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
-		UpClearFunc    func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error
+		SetFunc        func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+		UpClearFunc    func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error
 		DeviceRequest  *ttnpb.EndDeviceIdentifiers
 		ErrorAssertion func(*testing.T, error) bool
 		SetCalls       uint64
@@ -672,15 +672,15 @@ func TestDeviceRegistryDelete(t *testing.T) {
 					},
 				})
 			},
-			SetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				test.MustTFromContext(ctx).Errorf("SetFunc must not be called")
 				return nil, errors.New("SetFunc must not be called")
 			},
-			UpClearFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error {
+			UpClearFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error {
 				test.MustTFromContext(ctx).Errorf("UpClearFunc must not be called")
 				return errors.New("UpClearFunc must not be called")
 			},
-			DeviceRequest: deepcopy.Copy(&registeredDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers),
+			DeviceRequest: deepcopy.Copy(registeredDevice.Ids).(*ttnpb.EndDeviceIdentifiers),
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
 				return a.So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -698,15 +698,15 @@ func TestDeviceRegistryDelete(t *testing.T) {
 					},
 				})
 			},
-			SetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				test.MustTFromContext(ctx).Errorf("SetFunc must not be called")
 				return nil, errors.New("SetFunc must not be called")
 			},
-			UpClearFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error {
+			UpClearFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error {
 				test.MustTFromContext(ctx).Errorf("UpClearFunc must not be called")
 				return errors.New("UpClearFunc must not be called")
 			},
-			DeviceRequest: deepcopy.Copy(&registeredDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers),
+			DeviceRequest: deepcopy.Copy(registeredDevice.Ids).(*ttnpb.EndDeviceIdentifiers),
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
 				return a.So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -724,23 +724,23 @@ func TestDeviceRegistryDelete(t *testing.T) {
 					},
 				})
 			},
-			SetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
-				a.So(ids, should.Resemble, registeredDevice.EndDeviceIdentifiers)
+				a.So(ids, should.Resemble, registeredDevice.Ids)
 				dev, sets, err := f(nil)
 				a.So(errors.IsNotFound(err), should.BeTrue)
 				a.So(sets, should.BeNil)
 				a.So(dev, should.BeNil)
 				return nil, nil
 			},
-			UpClearFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error {
+			UpClearFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
-				a.So(ids, should.Resemble, registeredDevice.EndDeviceIdentifiers)
+				a.So(ids, should.Resemble, registeredDevice.Ids)
 				return nil
 			},
-			DeviceRequest: deepcopy.Copy(&registeredDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers),
+			DeviceRequest: deepcopy.Copy(registeredDevice.Ids).(*ttnpb.EndDeviceIdentifiers),
 			SetCalls:      1,
 			UpClearCalls:  1,
 		},
@@ -756,23 +756,23 @@ func TestDeviceRegistryDelete(t *testing.T) {
 					},
 				})
 			},
-			SetFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
-				a.So(ids, should.Resemble, registeredDevice.EndDeviceIdentifiers)
+				a.So(ids, should.Resemble, registeredDevice.Ids)
 				dev, sets, err := f(registeredDevice)
 				a.So(err, should.BeNil)
 				a.So(sets, should.BeNil)
 				a.So(dev, should.BeNil)
 				return nil, nil
 			},
-			UpClearFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error {
+			UpClearFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
-				a.So(ids, should.Resemble, registeredDevice.EndDeviceIdentifiers)
+				a.So(ids, should.Resemble, registeredDevice.Ids)
 				return nil
 			},
-			DeviceRequest: deepcopy.Copy(&registeredDevice.EndDeviceIdentifiers).(*ttnpb.EndDeviceIdentifiers),
+			DeviceRequest: deepcopy.Copy(registeredDevice.Ids).(*ttnpb.EndDeviceIdentifiers),
 			SetCalls:      1,
 			UpClearCalls:  1,
 		},
@@ -787,14 +787,14 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				&applicationserver.Config{
 					UplinkStorage: applicationserver.UplinkStorageConfig{
 						Registry: &MockApplicationUplinkRegistry{
-							ClearFunc: func(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) error {
+							ClearFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) error {
 								atomic.AddUint64(&upClearCalls, 1)
 								return tc.UpClearFunc(ctx, ids)
 							},
 						},
 					},
 					Devices: &MockDeviceRegistry{
-						SetFunc: func(ctx context.Context, deviceIds ttnpb.EndDeviceIdentifiers, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
+						SetFunc: func(ctx context.Context, deviceIds *ttnpb.EndDeviceIdentifiers, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 							atomic.AddUint64(&setCalls, 1)
 							return tc.SetFunc(ctx, deviceIds, paths, cb)
 						},

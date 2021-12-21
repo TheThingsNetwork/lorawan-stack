@@ -556,10 +556,10 @@ type (
 	EndDeviceOptionNamespace struct{}
 )
 
-// WithEndDeviceIdentifiers returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with EndDeviceIdentifiers set to v.
-func (EndDeviceOptionNamespace) WithEndDeviceIdentifiers(v ttnpb.EndDeviceIdentifiers) EndDeviceOption {
+// WithIds returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with Ids set to v.
+func (EndDeviceOptionNamespace) WithIds(v *ttnpb.EndDeviceIdentifiers) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
-		x.EndDeviceIdentifiers = v
+		x.Ids = v
 		return x
 	}
 }

@@ -84,5 +84,5 @@ func registerWebhookFailed(ctx context.Context, err error) {
 	}
 	webhookMetrics.webhooksFailed.WithLabelValues(ctx, errorLabel).Inc()
 	ids := deviceIDFromContext(ctx)
-	events.Publish(evtWebhookFail.NewWithIdentifiersAndData(ctx, &ids, err))
+	events.Publish(evtWebhookFail.NewWithIdentifiersAndData(ctx, ids, err))
 }

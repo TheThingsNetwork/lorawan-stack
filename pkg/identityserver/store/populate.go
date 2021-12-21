@@ -116,7 +116,7 @@ func NewPopulator(size int, seed int64) *Populator {
 		eui := &types.EUI64{}
 		eui.UnmarshalNumber(uint64(i + 1))
 		endDevice := &ttnpb.EndDevice{
-			EndDeviceIdentifiers: ttnpb.EndDeviceIdentifiers{
+			Ids: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIds: application.Ids,
 				JoinEui:        eui,
 				DevEui:         eui,
