@@ -13,6 +13,16 @@ jobs:
     name: Check Mergeability
     if: ${{ github.repository == 'TheThingsNetwork/lorawan-stack' }}
     runs-on: ubuntu-20.04
+    env:
+      MERGE_CONFLICTS_IGNORE: |
+        CHANGELOG.md
+        config/messages.json
+        go.mod
+        go.sum
+        package.json
+        tools/go.mod
+        tools/go.sum
+        yarn.lock
     steps:
       - name: Configure Git
         run: |
@@ -25,10 +35,28 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
       - name: Merge TheThingsNetwork/lorawan-stack:${{ github.event.pull_request.base.ref }}
+        continue-on-error: true
         run: |
           git fetch origin ${{ github.event.pull_request.base.ref }}
           git merge FETCH_HEAD -m "Merge ${{ github.event.pull_request.base.ref }} into #${{ github.event.inputs.pull_request_number }}"
+      - name: Check for conflicts with TheThingsNetwork/lorawan-stack:${{ github.event.pull_request.base.ref }}
+        run: |
+          conflicts=$(comm -23 <(git diff --name-only --diff-filter=U | sort) <(echo "$MERGE_CONFLICTS_IGNORE" | sort))
+          if [[ ! -z "$conflicts" ]]; then
+            echo "Merge conflicts in the following files:"
+            echo "$conflicts"
+            false
+          fi
       - name: Merge TheThingsIndustries/lorawan-stack:${{ github.event.pull_request.base.ref }}
+        continue-on-error: true
         run: |
           git fetch https://github.com/TheThingsIndustries/lorawan-stack ${{ github.event.pull_request.base.ref }}
           git merge FETCH_HEAD -m "Merge remote/${{ github.event.pull_request.base.ref }} into #${{ github.event.inputs.pull_request_number }}"
+      - name: Check for conflicts with TheThingsIndustries/lorawan-stack:${{ github.event.pull_request.base.ref }}
+        run: |
+          conflicts=$(comm -23 <(git diff --name-only --diff-filter=U | sort) <(echo "$MERGE_CONFLICTS_IGNORE" | sort))
+          if [[ ! -z "$conflicts" ]]; then
+            echo "Merge conflicts in the following files:"
+            echo "$conflicts"
+            false
+          fi
