@@ -2003,7 +2003,6 @@ func StartTest(ctx context.Context, conf TestConfig) (*NetworkServer, context.Co
 		&conf.NetworkServer,
 		conf.NetworkServerOptions...,
 	)).(*NetworkServer)
-	ns.Component.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 
 	env := TestEnvironment{
 		Config: conf.NetworkServer,

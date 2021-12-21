@@ -28,6 +28,8 @@ import (
 	"github.com/oklog/ulid/v2"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -2546,6 +2548,14 @@ func TestProcessDownlinkTask(t *testing.T) {
 							errCh <- conf.Func(conf.Context)
 						}()
 					}),
+					Component: component.Config{
+						ServiceBase: config.ServiceBase{
+							FrequencyPlans: config.FrequencyPlansConfig{
+								ConfigSource: "static",
+								Static:       test.StaticFrequencyPlans,
+							},
+						},
+					},
 				})
 				defer stop()
 

@@ -49,7 +49,11 @@ func (c *ConfigurationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.C
 
 // ListFrequencyPlans implements the Configuration service's ListFrequencyPlans RPC.
 func (c *ConfigurationServer) ListFrequencyPlans(ctx context.Context, req *ttnpb.ListFrequencyPlansRequest) (*ttnpb.ListFrequencyPlansResponse, error) {
-	return frequencyplans.NewRPCServer(c.component.FrequencyPlans).ListFrequencyPlans(ctx, req)
+	fps, err := c.component.FrequencyPlansStore(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return frequencyplans.NewRPCServer(fps).ListFrequencyPlans(ctx, req)
 }
 
 // GetPhyVersions implements the Configuration service's GetPhyVersions RPC.

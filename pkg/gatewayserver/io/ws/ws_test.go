@@ -35,7 +35,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
 	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws"
@@ -91,9 +90,12 @@ func TestClientTokenAuth(t *testing.T) {
 			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 			},
+			FrequencyPlans: config.FrequencyPlansConfig{
+				ConfigSource: "static",
+				Static:       test.StaticFrequencyPlans,
+			},
 		},
 	})
-	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
@@ -224,9 +226,12 @@ func TestDiscover(t *testing.T) {
 			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 			},
+			FrequencyPlans: config.FrequencyPlansConfig{
+				ConfigSource: "static",
+				Static:       test.StaticFrequencyPlans,
+			},
 		},
 	})
-	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
@@ -479,10 +484,12 @@ func TestVersion(t *testing.T) {
 				Listen:                      ":0",
 				AllowInsecureForCredentials: true,
 			},
+			FrequencyPlans: config.FrequencyPlansConfig{
+				ConfigSource: "static",
+				Static:       test.StaticFrequencyPlans,
+			},
 		},
 	})
-
-	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 	gs := mock.NewServer(c)
@@ -749,9 +756,12 @@ func TestTraffic(t *testing.T) {
 			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 			},
+			FrequencyPlans: config.FrequencyPlansConfig{
+				ConfigSource: "static",
+				Static:       test.StaticFrequencyPlans,
+			},
 		},
 	})
-	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
@@ -1209,9 +1219,12 @@ func TestRTT(t *testing.T) {
 			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 			},
+			FrequencyPlans: config.FrequencyPlansConfig{
+				ConfigSource: "static",
+				Static:       test.StaticFrequencyPlans,
+			},
 		},
 	})
-	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
@@ -1532,9 +1545,12 @@ func TestPingPong(t *testing.T) {
 			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 			},
+			FrequencyPlans: config.FrequencyPlansConfig{
+				ConfigSource: "static",
+				Static:       test.StaticFrequencyPlans,
+			},
 		},
 	})
-	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)

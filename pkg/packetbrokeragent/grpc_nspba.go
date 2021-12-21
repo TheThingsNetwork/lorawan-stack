@@ -28,7 +28,7 @@ import (
 type nsPbaServer struct {
 	contextDecoupler contextDecoupler
 	downstreamCh     chan *downlinkMessage
-	frequencyPlans   frequencyPlansStore
+	frequencyPlans   GetFrequencyPlansStore
 }
 
 // PublishDownlink is called by the Network Server when a downlink message needs to get scheduled via Packet Broker.
@@ -43,7 +43,12 @@ func (s *nsPbaServer) PublishDownlink(ctx context.Context, down *ttnpb.DownlinkM
 	)...)
 	down.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 
-	msg, token, err := toPBDownlink(ctx, down, s.frequencyPlans)
+	fps, err := s.frequencyPlans(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	msg, token, err := toPBDownlink(ctx, down, fps)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to convert outgoing downlink message")
 		return nil, err

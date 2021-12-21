@@ -192,7 +192,12 @@ func applyCFList(cfList *ttnpb.CFList, phy *band.Band, chs ...*ttnpb.MACParamete
 
 // matchAndHandleDataUplink handles and matches a device prematched by CMACF check.
 func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.UplinkMessage, deduplicated bool, cmacFMatchResult cmacFMatchingResult) (*matchResult, bool, error) {
-	phy, err := DeviceBand(dev, ns.FrequencyPlans)
+	fps, err := ns.FrequencyPlansStore(ctx)
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to get frequency plans store")
+		return nil, false, nil
+	}
+	phy, err := DeviceBand(dev, fps)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to get device's versioned band")
 		return nil, false, nil
@@ -287,7 +292,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 				}
 				ctx = log.NewContextWithField(ctx, "f_cnt_reset", true)
 
-				macState, err := mac.NewState(dev, ns.FrequencyPlans, ns.defaultMACSettings)
+				macState, err := mac.NewState(dev, fps, ns.defaultMACSettings)
 				if err != nil {
 					log.FromContext(ctx).WithError(err).Warn("Failed to generate new MAC state")
 					return nil, false, nil
@@ -489,7 +494,7 @@ macLoop:
 		var err error
 		switch cmd.Cid {
 		case ttnpb.CID_RESET:
-			evs, err = mac.HandleResetInd(ctx, dev, cmd.GetResetInd(), ns.FrequencyPlans, ns.defaultMACSettings)
+			evs, err = mac.HandleResetInd(ctx, dev, cmd.GetResetInd(), fps, ns.defaultMACSettings)
 		case ttnpb.CID_LINK_CHECK:
 			if !deduplicated {
 				deferredMACHandlers = append(deferredMACHandlers, makeDeferredMACHandler(dev, mac.HandleLinkCheckReq))
@@ -515,7 +520,7 @@ macLoop:
 				break
 			}
 			cmds = cmds[dupCount:]
-			evs, err = mac.HandleLinkADRAns(ctx, dev, pld, uint(dupCount), cmacFMatchResult.FullFCnt, ns.FrequencyPlans)
+			evs, err = mac.HandleLinkADRAns(ctx, dev, pld, uint(dupCount), cmacFMatchResult.FullFCnt, fps)
 		case ttnpb.CID_DUTY_CYCLE:
 			evs, err = mac.HandleDutyCycleAns(ctx, dev)
 		case ttnpb.CID_RX_PARAM_SETUP:
@@ -1080,7 +1085,11 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		return nil
 	}
 
-	fp, phy, err := DeviceFrequencyPlanAndBand(matched, ns.FrequencyPlans)
+	fps, err := ns.FrequencyPlansStore(ctx)
+	if err != nil {
+		return err
+	}
+	fp, phy, err := DeviceFrequencyPlanAndBand(matched, fps)
 	if err != nil {
 		return err
 	}
@@ -1088,7 +1097,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		"data_rate", up.Settings.DataRate,
 	)
 
-	macState, err := mac.NewState(matched, ns.FrequencyPlans, ns.defaultMACSettings)
+	macState, err := mac.NewState(matched, fps, ns.defaultMACSettings)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to reset device's MAC state")
 		return err

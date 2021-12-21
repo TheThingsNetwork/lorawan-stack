@@ -853,6 +853,10 @@ func TestDeviceRegistrySet(t *testing.T) {
 									},
 								},
 								KeyVault: test.DefaultKeyVault,
+								FrequencyPlans: config.FrequencyPlansConfig{
+									ConfigSource: "static",
+									Static:       test.StaticFrequencyPlans,
+								},
 							},
 						},
 						NetworkServer: nsConf,
@@ -1107,6 +1111,10 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 									},
 								},
 								KeyVault: test.DefaultKeyVault,
+								FrequencyPlans: config.FrequencyPlansConfig{
+									ConfigSource: "static",
+									Static:       test.StaticFrequencyPlans,
+								},
 							},
 						},
 						NetworkServer: nsConf,
@@ -1175,8 +1183,13 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 							return
 						}
 
+						fps, err := ns.FrequencyPlansStore(ctx)
+						if !a.So(err, should.BeNil) {
+							t.Fail()
+							return
+						}
 						var newErr error
-						macState, newErr = mac.NewState(created, ns.FrequencyPlans, DefaultConfig.DefaultMACSettings.Parse())
+						macState, newErr = mac.NewState(created, fps, DefaultConfig.DefaultMACSettings.Parse())
 						if newErr != nil {
 							a.So(err, should.NotBeNil)
 							a.So(err, should.HaveSameErrorDefinitionAs, newErr)

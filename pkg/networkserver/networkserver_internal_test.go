@@ -19,6 +19,8 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -38,6 +40,14 @@ func TestNewDevAddr(t *testing.T) {
 					TaskStarter: StartTaskExclude(
 						DownlinkProcessTaskName,
 					),
+					Component: component.Config{
+						ServiceBase: config.ServiceBase{
+							FrequencyPlans: config.FrequencyPlansConfig{
+								ConfigSource: "static",
+								Static:       test.StaticFrequencyPlans,
+							},
+						},
+					},
 				},
 			)
 			defer stop()
@@ -77,6 +87,14 @@ func TestNewDevAddr(t *testing.T) {
 					TaskStarter: StartTaskExclude(
 						DownlinkProcessTaskName,
 					),
+					Component: component.Config{
+						ServiceBase: config.ServiceBase{
+							FrequencyPlans: config.FrequencyPlansConfig{
+								ConfigSource: "static",
+								Static:       test.StaticFrequencyPlans,
+							},
+						},
+					},
 				},
 			)
 			defer stop()

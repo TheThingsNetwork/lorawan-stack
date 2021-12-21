@@ -486,7 +486,12 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 
 	ids = *gtw.GetIds()
 
-	conn, err := io.NewConnection(ctx, frontend, gtw, gs.FrequencyPlans, gtw.EnforceDutyCycle, ttnpb.StdDuration(gtw.ScheduleAnytimeDelay))
+	fps, err := gs.FrequencyPlansStore(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	conn, err := io.NewConnection(ctx, frontend, gtw, fps, gtw.EnforceDutyCycle, ttnpb.StdDuration(gtw.ScheduleAnytimeDelay))
 	if err != nil {
 		return nil, err
 	}
@@ -1062,15 +1067,20 @@ func (gs *GatewayServer) GetFrequencyPlans(ctx context.Context, ids ttnpb.Gatewa
 		return nil, err
 	}
 
-	fps := make(map[string]*frequencyplans.FrequencyPlan, len(fpIDs))
+	fps, err := gs.FrequencyPlansStore(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	fpGroup := make(map[string]*frequencyplans.FrequencyPlan, len(fpIDs))
 	for _, fpID := range fpIDs {
-		fp, err := gs.FrequencyPlans.GetByID(fpID)
+		fp, err := fps.GetByID(fpID)
 		if err != nil {
 			return nil, err
 		}
-		fps[fpID] = fp
+		fpGroup[fpID] = fp
 	}
-	return fps, nil
+	return fpGroup, nil
 }
 
 // ClaimDownlink claims the downlink path for the given gateway.

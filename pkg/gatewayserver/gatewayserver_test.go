@@ -40,7 +40,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
@@ -91,6 +90,10 @@ func TestGatewayServer(t *testing.T) {
 						Cluster: cluster.Config{
 							IdentityServer: isAddr,
 							NetworkServer:  nsAddr,
+						},
+						FrequencyPlans: config.FrequencyPlansConfig{
+							ConfigSource: "static",
+							Static:       test.StaticFrequencyPlans,
 						},
 					},
 				})
@@ -162,8 +165,6 @@ func TestGatewayServer(t *testing.T) {
 			roles := gs.Roles()
 			a.So(len(roles), should.Equal, 1)
 			a.So(roles[0], should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER)
-
-			c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 
 			config, err := gs.GetConfig(ctx)
 			a.So(err, should.BeNil)
@@ -1779,6 +1780,10 @@ func TestUpdateVersionInfo(t *testing.T) {
 			Cluster: cluster.Config{
 				IdentityServer: isAddr,
 			},
+			FrequencyPlans: config.FrequencyPlansConfig{
+				ConfigSource: "static",
+				Static:       test.StaticFrequencyPlans,
+			},
 		},
 	})
 
@@ -1803,8 +1808,6 @@ func TestUpdateVersionInfo(t *testing.T) {
 	roles := gs.Roles()
 	a.So(len(roles), should.Equal, 1)
 	a.So(roles[0], should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER)
-
-	c.FrequencyPlans = frequencyplans.NewStore(test.FrequencyPlansFetcher)
 	a.So(err, should.BeNil)
 
 	componenttest.StartComponent(t, c)

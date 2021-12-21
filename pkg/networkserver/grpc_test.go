@@ -19,6 +19,8 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -70,6 +72,14 @@ func TestGenerateDevAddr(t *testing.T) {
 					TaskStarter: StartTaskExclude(
 						DownlinkProcessTaskName,
 					),
+					Component: component.Config{
+						ServiceBase: config.ServiceBase{
+							FrequencyPlans: config.FrequencyPlansConfig{
+								ConfigSource: "static",
+								Static:       test.StaticFrequencyPlans,
+							},
+						},
+					},
 				})
 				defer stop()
 
@@ -149,6 +159,14 @@ func TestGenerateDevAddr(t *testing.T) {
 					TaskStarter: StartTaskExclude(
 						DownlinkProcessTaskName,
 					),
+					Component: component.Config{
+						ServiceBase: config.ServiceBase{
+							FrequencyPlans: config.FrequencyPlansConfig{
+								ConfigSource: "static",
+								Static:       test.StaticFrequencyPlans,
+							},
+						},
+					},
 				})
 				defer stop()
 
@@ -209,7 +227,16 @@ func TestGetDefaultMACSettings(t *testing.T) {
 			Name:     tc.name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				ns, _, _, stop := StartTest(ctx, TestConfig{})
+				ns, _, _, stop := StartTest(ctx, TestConfig{
+					Component: component.Config{
+						ServiceBase: config.ServiceBase{
+							FrequencyPlans: config.FrequencyPlansConfig{
+								ConfigSource: "static",
+								Static:       test.StaticFrequencyPlans,
+							},
+						},
+					},
+				})
 				defer stop()
 				settings, err := ttnpb.NewNsClient(ns.LoopbackConn()).GetDefaultMACSettings(test.Context(), tc.req)
 				if tc.assertion != nil {

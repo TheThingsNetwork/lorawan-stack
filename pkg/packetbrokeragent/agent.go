@@ -291,6 +291,11 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 	} else {
 		a.grpc.pba = &disabledServer{}
 	}
+
+	getFrequencyPlanStore := func(ctx context.Context) (frequencyPlansStore, error) {
+		return a.FrequencyPlansStore(ctx)
+	}
+
 	if a.forwarderConfig.Enable {
 		mapperConn, err := a.dialContext(ctx, conf.MapperAddress)
 		if err != nil {
@@ -303,7 +308,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 			messageEncrypter:    a,
 			contextDecoupler:    a,
 			tenantIDExtractor:   a.tenantIDExtractor,
-			frequencyPlansStore: a.FrequencyPlans,
+			frequencyPlansStore: getFrequencyPlanStore,
 			upstreamCh:          a.upstreamCh,
 			mapperConn:          mapperConn,
 		}
@@ -314,7 +319,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		a.grpc.nsPba = &nsPbaServer{
 			contextDecoupler: a,
 			downstreamCh:     a.downstreamCh,
-			frequencyPlans:   a.FrequencyPlans,
+			frequencyPlans:   getFrequencyPlanStore,
 		}
 	} else {
 		a.grpc.nsPba = &disabledServer{}
