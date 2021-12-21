@@ -53,8 +53,8 @@ const Events = React.memo(
     const onPause = useCallback(() => onPauseToggle(paused), [onPauseToggle, paused])
     const onExport = useCallback(() => {
       const eventLogData = composeDataUri(JSON.stringify(events, undefined, 2))
-      downloadDataUriAsFile(eventLogData, 'tts_live_data.json')
-    }, [events])
+      downloadDataUriAsFile(eventLogData, `${entityId}_live_data_${Date.now()}.json`)
+    }, [entityId, events])
     const handleRowClick = useCallback(
       eventId => {
         if (eventId !== focus.eventId) {
