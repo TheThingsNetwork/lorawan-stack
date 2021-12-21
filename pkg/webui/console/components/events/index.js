@@ -98,6 +98,7 @@ const Events = React.memo(
                   naked
                   secondary
                   icon="file_download"
+                  responsiveLabel
                 />
                 <Button
                   onClick={onPause}
@@ -106,6 +107,7 @@ const Events = React.memo(
                   secondary={!paused}
                   warning={paused}
                   icon={paused ? 'play_arrow' : 'pause'}
+                  responsiveLabel
                 />
                 <Button
                   onClick={onClear}
@@ -113,6 +115,7 @@ const Events = React.memo(
                   naked
                   secondary
                   icon="delete"
+                  responsiveLabel
                 />
               </div>
             </div>
