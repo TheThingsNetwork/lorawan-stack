@@ -115,6 +115,12 @@ type Client struct {
 	InsecureSkipVerify bool   `name:"insecure-skip-verify" description:"Skip verification of certificate chains (insecure)"`
 }
 
+// Equals checks if the other configuration is equivalent to this.
+func (c Client) Equals(other Client) bool {
+	return c.RootCA == other.RootCA &&
+		c.InsecureSkipVerify == other.InsecureSkipVerify
+}
+
 // ApplyTo applies the client configuration options to the given TLS configuration.
 // If tlsConfig is nil, this is a no-op.
 func (c *Client) ApplyTo(tlsConfig *tls.Config) error {
