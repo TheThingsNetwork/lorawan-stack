@@ -32,6 +32,7 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 		is.UserStore
 	})
 	defer st.DestroyDB(t, true, "pictures")
+	defer s.Close()
 	if !ok {
 		t.Fatal("Store does not implement UserStore")
 	}

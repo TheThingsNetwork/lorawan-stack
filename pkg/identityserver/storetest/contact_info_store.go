@@ -42,6 +42,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 		is.ContactInfoStore
 	})
 	defer st.DestroyDB(t, false)
+	defer s.Close()
 	if !ok {
 		t.Fatal("Store does not implement ContactInfoStore")
 	}

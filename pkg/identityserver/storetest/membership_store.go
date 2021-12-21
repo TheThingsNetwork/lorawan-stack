@@ -44,6 +44,7 @@ func (st *StoreTest) TestMembershipStoreCRUD(t *T) {
 		is.MembershipStore
 	})
 	defer st.DestroyDB(t, true, "applications", "clients", "gateways", "organizations", "users", "accounts")
+	defer s.Close()
 	if !ok {
 		t.Fatal("Store does not implement MembershipStore")
 	}

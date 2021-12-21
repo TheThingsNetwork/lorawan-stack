@@ -33,6 +33,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		is.GatewayStore
 	})
 	defer st.DestroyDB(t, true)
+	defer s.Close()
 	if !ok {
 		t.Fatal("Store does not implement GatewayStore")
 	}

@@ -32,6 +32,7 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 		is.OrganizationStore
 	})
 	defer st.DestroyDB(t, true)
+	defer s.Close()
 	if !ok {
 		t.Fatal("Store does not implement OrganizationStore")
 	}

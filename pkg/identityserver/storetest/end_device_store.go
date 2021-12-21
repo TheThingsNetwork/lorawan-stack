@@ -35,6 +35,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		is.EndDeviceStore
 	})
 	defer st.DestroyDB(t, true, "applications", "attributes", "end_device_locations", "pictures") // TODO: Make sure (at least) attributes and end_device_locations are deleted when deleting end devices.
+	defer s.Close()
 	if !ok {
 		t.Fatal("Store does not implement ApplicationStore and EndDeviceStore")
 	}

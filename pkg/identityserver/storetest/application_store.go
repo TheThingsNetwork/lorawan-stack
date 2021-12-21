@@ -32,6 +32,7 @@ func (st *StoreTest) TestApplicationStoreCRUD(t *T) {
 		is.ApplicationStore
 	})
 	defer st.DestroyDB(t, true)
+	defer s.Close()
 	if !ok {
 		t.Fatal("Store does not implement ApplicationStore")
 	}
