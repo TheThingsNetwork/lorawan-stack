@@ -4958,6 +4958,15 @@
       "file": "invitation_store.go"
     }
   },
+  "error:pkg/identityserver/gormstore:invitation_expired": {
+    "translations": {
+      "en": "invitation expired"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "invitation_store.go"
+    }
+  },
   "error:pkg/identityserver/gormstore:invitation_not_found": {
     "translations": {
       "en": "invitation not found"

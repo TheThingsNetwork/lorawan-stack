@@ -64,7 +64,7 @@ func (s *invitationStore) FindInvitations(ctx context.Context) ([]*ttnpb.Invitat
 		store.SetTotal(ctx, total)
 		query = query.Limit(limit).Offset(offset)
 	}
-	if err := query.Find(&invitationModels).Error; err != nil {
+	if err := query.Preload("AcceptedBy.Account").Find(&invitationModels).Error; err != nil {
 		return nil, err
 	}
 	store.SetTotal(ctx, uint64(len(invitationModels)))
@@ -80,7 +80,7 @@ var errInvitationNotFound = errors.DefineNotFound("invitation_not_found", "invit
 func (s *invitationStore) GetInvitation(ctx context.Context, token string) (*ttnpb.Invitation, error) {
 	defer trace.StartRegion(ctx, "get invitation").End()
 	var invitationModel Invitation
-	if err := s.query(ctx, Invitation{}).Where(Invitation{Token: token}).First(&invitationModel).Error; err != nil {
+	if err := s.query(ctx, Invitation{}).Where(Invitation{Token: token}).Preload("AcceptedBy.Account").First(&invitationModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errInvitationNotFound.New()
 		}
@@ -89,7 +89,10 @@ func (s *invitationStore) GetInvitation(ctx context.Context, token string) (*ttn
 	return invitationModel.toPB(), nil
 }
 
-var errInvitationAlreadyAccepted = errors.DefineAlreadyExists("invitation_already_accepted", "invitation already accepted")
+var (
+	errInvitationExpired         = errors.DefineFailedPrecondition("invitation_expired", "invitation expired")
+	errInvitationAlreadyAccepted = errors.DefineFailedPrecondition("invitation_already_accepted", "invitation already accepted")
+)
 
 func (s *invitationStore) SetInvitationAcceptedBy(ctx context.Context, token string, acceptedByID *ttnpb.UserIdentifiers) error {
 	defer trace.StartRegion(ctx, "update invitation").End()
@@ -99,6 +102,10 @@ func (s *invitationStore) SetInvitationAcceptedBy(ctx context.Context, token str
 			return errInvitationNotFound.New()
 		}
 		return err
+	}
+
+	if invitationModel.ExpiresAt != nil && invitationModel.ExpiresAt.Before(time.Now()) {
+		return errInvitationExpired.New()
 	}
 
 	user, err := s.findEntity(ctx, acceptedByID, "id")
@@ -125,9 +132,6 @@ func (s *invitationStore) DeleteInvitation(ctx context.Context, email string) er
 			return errInvitationNotFound.New()
 		}
 		return err
-	}
-	if invitationModel.AcceptedByID != nil {
-		return errInvitationAlreadyAccepted.New()
 	}
 	return s.query(ctx, Invitation{}).Delete(&invitationModel).Error
 }

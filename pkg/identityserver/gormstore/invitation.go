@@ -39,11 +39,15 @@ func init() {
 
 func (i Invitation) toPB() *ttnpb.Invitation {
 	pb := &ttnpb.Invitation{
-		Email:     i.Email,
-		Token:     i.Token,
-		CreatedAt: ttnpb.ProtoTimePtr(cleanTime(i.CreatedAt)),
-		UpdatedAt: ttnpb.ProtoTimePtr(cleanTime(i.UpdatedAt)),
-		ExpiresAt: ttnpb.ProtoTime(cleanTimePtr(i.ExpiresAt)),
+		Email:      i.Email,
+		Token:      i.Token,
+		CreatedAt:  ttnpb.ProtoTimePtr(cleanTime(i.CreatedAt)),
+		UpdatedAt:  ttnpb.ProtoTimePtr(cleanTime(i.UpdatedAt)),
+		ExpiresAt:  ttnpb.ProtoTime(cleanTimePtr(i.ExpiresAt)),
+		AcceptedAt: ttnpb.ProtoTime(cleanTimePtr(i.AcceptedAt)),
+	}
+	if i.AcceptedBy != nil {
+		pb.AcceptedBy = &ttnpb.UserIdentifiers{UserId: i.AcceptedBy.Account.UID}
 	}
 	return pb
 }
