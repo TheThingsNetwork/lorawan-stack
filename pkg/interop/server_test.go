@@ -25,6 +25,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -45,7 +46,7 @@ func (c *mockComponent) RateLimiter() ratelimit.Interface {
 	return &ratelimit.NoopRateLimiter{}
 }
 
-func (c *mockComponent) HTTPClient(context.Context) (*http.Client, error) {
+func (c *mockComponent) HTTPClient(context.Context, ...httpclient.Option) (*http.Client, error) {
 	return http.DefaultClient, nil
 }
 

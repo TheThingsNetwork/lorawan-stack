@@ -18,7 +18,6 @@ package networkserver
 import (
 	"context"
 	"crypto/rand"
-	"crypto/tls"
 	"fmt"
 	"os"
 	"sync"
@@ -204,19 +203,9 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	var interopCl InteropClient
 	if !conf.Interop.IsZero() {
 		interopConf := conf.Interop
-		interopConf.GetFallbackTLSConfig = func(ctx context.Context) (*tls.Config, error) {
-			return c.GetTLSClientConfig(ctx)
-		}
 		interopConf.BlobConfig = c.GetBaseConfig(ctx).Blob
-		if interopConf.HTTPClient == nil {
-			httpClient, err := c.HTTPClient(ctx)
-			if err != nil {
-				return nil, err
-			}
-			interopConf.HTTPClient = httpClient
-		}
 
-		interopCl, err = interop.NewClient(ctx, interopConf)
+		interopCl, err = interop.NewClient(ctx, interopConf, c)
 		if err != nil {
 			return nil, err
 		}

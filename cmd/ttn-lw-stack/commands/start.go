@@ -188,24 +188,6 @@ var startCommand = &cobra.Command{
 		c.RegisterGRPC(events_grpc.NewEventsServer(c.Context(), events.DefaultPubSub()))
 		c.RegisterGRPC(component.NewConfigurationServer(c))
 
-		for _, httpClient := range []**http.Client{
-			&config.ServiceBase.FrequencyPlans.HTTPClient,
-			&config.ServiceBase.Interop.SenderClientCA.HTTPClient,
-			&config.ServiceBase.KeyVault.HTTPClient,
-			&config.ServiceBase.RateLimiting.HTTPClient,
-			&config.ServiceBase.Blob.HTTPClient,
-			&config.AS.Interop.InteropClient.BlobConfig.HTTPClient,
-			&config.NS.Interop.BlobConfig.HTTPClient,
-		} {
-			if *httpClient != nil {
-				continue
-			}
-			*httpClient, err = c.HTTPClient(ctx)
-			if err != nil {
-				return err
-			}
-		}
-
 		if start.IdentityServer {
 			logger.Info("Setting up Identity Server")
 			if config.IS.OAuth.UI.TemplateData.SentryDSN == "" {

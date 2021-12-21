@@ -16,9 +16,9 @@ package interop
 
 import (
 	"context"
-	"net/http"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/packetbroker"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"gopkg.in/square/go-jose.v2/jwt"
@@ -29,11 +29,7 @@ type packetBrokerTokenVerifier struct {
 	issuer, audience  string
 }
 
-type httpClientProvider interface {
-	HTTPClient(context.Context) (*http.Client, error)
-}
-
-func newPacketBrokerTokenVerifier(ctx context.Context, issuer, audience string, httpClient httpClientProvider) (tokenVerifier, error) {
+func newPacketBrokerTokenVerifier(ctx context.Context, issuer, audience string, httpClient httpclient.Provider) (tokenVerifier, error) {
 	client, err := httpClient.HTTPClient(ctx)
 	if err != nil {
 		return nil, err

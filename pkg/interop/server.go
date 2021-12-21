@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/fillcontext"
+	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
@@ -78,11 +79,11 @@ type Server struct {
 	js JoinServer
 }
 
-// Components represents the Component to the Interop Server.
+// Component represents the Component to the Interop Server.
 type Component interface {
+	httpclient.Provider
 	Context() context.Context
 	RateLimiter() ratelimit.Interface
-	HTTPClient(context.Context) (*http.Client, error)
 }
 
 // NewServer builds a new server.
@@ -90,7 +91,7 @@ func NewServer(c Component, contextFillers []fillcontext.Filler, conf config.Int
 	ctx := log.NewContextWithField(c.Context(), "namespace", "interop")
 	logger := log.FromContext(ctx)
 
-	senderClientCAs, err := fetchSenderClientCAs(ctx, conf)
+	senderClientCAs, err := fetchSenderClientCAs(ctx, conf, c)
 	if err != nil {
 		return nil, err
 	}

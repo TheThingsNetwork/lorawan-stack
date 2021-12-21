@@ -47,7 +47,7 @@ const (
 // Run test with `$ go test -tags=slowtests ./pkg/devicerepository/store/remote`.
 func TestGithubDeviceRepository(t *testing.T) {
 	a := assertions.New(t)
-	f, err := fetch.FromHTTP(http.DefaultClient, githubRepository, true)
+	f, err := fetch.FromHTTP(http.DefaultClient, githubRepository)
 	a.So(err, should.BeNil)
 	s := remote.NewRemoteStore(f)
 	brands, err := s.GetBrands(store.GetBrandsRequest{Limit: 0, Paths: []string{"brand_id"}})

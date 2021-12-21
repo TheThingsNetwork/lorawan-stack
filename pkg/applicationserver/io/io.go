@@ -17,12 +17,12 @@ package io
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errorcontext"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
@@ -75,6 +75,7 @@ type Cluster interface {
 // Server represents the Application Server to application frontends.
 type Server interface {
 	task.Starter
+	httpclient.Provider
 	PubSub
 	DownlinkQueueOperator
 	UplinkStorage
@@ -86,8 +87,6 @@ type Server interface {
 	// FillContext fills the given context.
 	// This method should only be used for request contexts.
 	FillContext(ctx context.Context) context.Context
-	// HTTPClient returns a configured *http.Client.
-	HTTPClient(context.Context) (*http.Client, error)
 	// RateLimiter returns the rate limiter instance.
 	RateLimiter() ratelimit.Interface
 }

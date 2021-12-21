@@ -16,11 +16,11 @@ package web
 
 import (
 	"context"
-	"net/http"
 	"net/url"
 	"os"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
+	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -30,8 +30,6 @@ type TemplatesConfig struct {
 	Directory   string            `name:"directory" description:"Retrieve the webhook templates from the filesystem"`
 	URL         string            `name:"url" description:"Retrieve the webhook templates from a web server"`
 	LogoBaseURL string            `name:"logo-base-url" description:"The base URL for the logo storage"`
-
-	HTTPClient *http.Client `name:"-"`
 }
 
 // TemplateStore contains the webhook templates.
@@ -43,7 +41,7 @@ type TemplateStore interface {
 }
 
 // NewTemplateStore returns a TemplateStore based on the configuration.
-func (c TemplatesConfig) NewTemplateStore() (TemplateStore, error) {
+func (c TemplatesConfig) NewTemplateStore(ctx context.Context, httpClientProvider httpclient.Provider) (TemplateStore, error) {
 	var fetcher fetch.Interface
 	switch {
 	case c.Static != nil:
@@ -56,7 +54,11 @@ func (c TemplatesConfig) NewTemplateStore() (TemplateStore, error) {
 		fallthrough
 	case c.URL != "":
 		var err error
-		fetcher, err = fetch.FromHTTP(c.HTTPClient, c.URL, true)
+		httpClient, err := httpClientProvider.HTTPClient(ctx, httpclient.WithCache(true))
+		if err != nil {
+			return nil, err
+		}
+		fetcher, err = fetch.FromHTTP(httpClient, c.URL)
 		if err != nil {
 			return nil, err
 		}

@@ -21,7 +21,6 @@ import (
 	"path"
 	"time"
 
-	"github.com/gregjones/httpcache"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
@@ -62,19 +61,7 @@ func (f httpFetcher) File(pathElements ...string) ([]byte, error) {
 }
 
 // FromHTTP returns an object to fetch files from a webserver.
-func FromHTTP(client *http.Client, rootURL string, cache bool) (Interface, error) {
-	if client == nil {
-		client = http.DefaultClient
-	}
-	if cache {
-		cp := *client
-		client = &cp
-		client.Transport = &httpcache.Transport{
-			Transport:           client.Transport,
-			Cache:               httpcache.NewMemoryCache(),
-			MarkCachedResponses: true,
-		}
-	}
+func FromHTTP(client *http.Client, rootURL string) (Interface, error) {
 	var root *url.URL
 	if rootURL != "" {
 		var err error

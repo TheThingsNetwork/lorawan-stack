@@ -19,6 +19,7 @@ import (
 	"net"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
@@ -80,7 +81,7 @@ func (c *Component) serveGRPC(lis net.Listener) error {
 func (c *Component) grpcEndpoints() []Endpoint {
 	return []Endpoint{
 		NewTCPEndpoint(c.config.GRPC.Listen, "gRPC"),
-		NewTLSEndpoint(c.config.GRPC.ListenTLS, "gRPC", WithNextProtos("h2", "http/1.1")),
+		NewTLSEndpoint(c.config.GRPC.ListenTLS, "gRPC", tlsconfig.WithNextProtos("h2", "http/1.1")),
 	}
 }
 

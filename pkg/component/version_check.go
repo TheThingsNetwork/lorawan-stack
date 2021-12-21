@@ -16,9 +16,9 @@ package component
 
 import (
 	"context"
-	"net/http"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/version"
 )
@@ -28,12 +28,8 @@ const (
 	versionCheckTimeout = 10 * time.Second
 )
 
-type httpClientProvider interface {
-	HTTPClient(context.Context) (*http.Client, error)
-}
-
 // versionCheckTask returns the task configuration for a periodic version check.
-func versionCheckTask(ctx context.Context, clientProvider httpClientProvider) *task.Config {
+func versionCheckTask(ctx context.Context, clientProvider httpclient.Provider) *task.Config {
 	taskConfig := task.Config{
 		Context: ctx,
 		ID:      "version_check",

@@ -15,8 +15,6 @@
 package interop_test
 
 import (
-	"context"
-	"crypto/tls"
 	"fmt"
 	"io"
 	"net/http"
@@ -174,9 +172,7 @@ paths:
 				), 0644))
 
 				return config.InteropClient{
-						Directory:            confDir,
-						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
-						HTTPClient:           http.DefaultClient,
+						Directory: confDir,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -293,9 +289,7 @@ paths:
 				), 0644))
 
 				return config.InteropClient{
-						Directory:            confDir,
-						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
-						HTTPClient:           http.DefaultClient,
+						Directory: confDir,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -424,9 +418,7 @@ paths:
 				), 0644))
 
 				return config.InteropClient{
-						Directory:            confDir,
-						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
-						HTTPClient:           http.DefaultClient,
+						Directory: confDir,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -560,9 +552,7 @@ paths:
 				), 0644))
 
 				return config.InteropClient{
-						Directory:            confDir,
-						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
-						HTTPClient:           http.DefaultClient,
+						Directory: confDir,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -599,7 +589,7 @@ paths:
 			conf, flush := tc.NewClientConfig(host[0], uint32(test.Must(strconv.ParseUint(host[1], 10, 32)).(uint64)))
 			defer flush()
 
-			cl, err := NewClient(ctx, conf)
+			cl, err := NewClient(ctx, conf, test.HTTPClientProvider)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Failed to create new client: %s", err)
 			}
@@ -744,9 +734,7 @@ paths:
 				), 0644))
 
 				return config.InteropClient{
-						Directory:            confDir,
-						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
-						HTTPClient:           http.DefaultClient,
+						Directory: confDir,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -863,9 +851,7 @@ paths:
 				), 0644))
 
 				return config.InteropClient{
-						Directory:            confDir,
-						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
-						HTTPClient:           http.DefaultClient,
+						Directory: confDir,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -999,9 +985,7 @@ paths:
 				), 0644))
 
 				return config.InteropClient{
-						Directory:            confDir,
-						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
-						HTTPClient:           http.DefaultClient,
+						Directory: confDir,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -1149,9 +1133,7 @@ paths:
 				), 0644))
 
 				return config.InteropClient{
-						Directory:            confDir,
-						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
-						HTTPClient:           http.DefaultClient,
+						Directory: confDir,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -1298,9 +1280,7 @@ paths:
 				), 0644))
 
 				return config.InteropClient{
-						Directory:            confDir,
-						GetFallbackTLSConfig: func(context.Context) (*tls.Config, error) { return nil, nil },
-						HTTPClient:           http.DefaultClient,
+						Directory: confDir,
 					}, func() error {
 						return os.RemoveAll(confDir)
 					}
@@ -1350,7 +1330,7 @@ paths:
 			conf, flush := tc.NewClientConfig(host[0], uint32(test.Must(strconv.ParseUint(host[1], 10, 32)).(uint64)))
 			defer flush()
 
-			cl, err := NewClient(ctx, conf)
+			cl, err := NewClient(ctx, conf, test.HTTPClientProvider)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Failed to create new client: %s", err)
 			}

@@ -16,7 +16,6 @@ package blob_test
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 	"path/filepath"
 	"testing"
@@ -40,7 +39,7 @@ func testBucket(t *testing.T, conf config.BlobConfig) {
 	a := assertions.New(t)
 	ctx := test.Context()
 
-	bucket, err := conf.Bucket(ctx, bucketName())
+	bucket, err := conf.Bucket(ctx, bucketName(), test.HTTPClientProvider)
 	if !a.So(err, should.BeNil) {
 		t.Errorf("Failed to create bucket: %v", err)
 		return
@@ -84,7 +83,6 @@ func TestAWS(t *testing.T) {
 	conf.AWS.Region = os.Getenv("AWS_REGION")
 	conf.AWS.AccessKeyID = os.Getenv("AWS_ACCESS_KEY_ID")
 	conf.AWS.SecretAccessKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
-	conf.HTTPClient = http.DefaultClient
 
 	if conf.AWS.Region == "" || conf.AWS.AccessKeyID == "" || conf.AWS.SecretAccessKey == "" {
 		t.Skip("Missing AWS credentials")

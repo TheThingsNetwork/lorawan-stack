@@ -24,6 +24,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/heptiolabs/healthcheck"
+	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
@@ -151,7 +152,7 @@ func (c *Component) serveWeb(lis net.Listener) error {
 func (c *Component) webEndpoints() []Endpoint {
 	return []Endpoint{
 		NewTCPEndpoint(c.config.HTTP.Listen, "Web"),
-		NewTLSEndpoint(c.config.HTTP.ListenTLS, "Web", WithNextProtos("h2", "http/1.1")),
+		NewTLSEndpoint(c.config.HTTP.ListenTLS, "Web", tlsconfig.WithNextProtos("h2", "http/1.1")),
 	}
 }
 

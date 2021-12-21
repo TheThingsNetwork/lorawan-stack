@@ -81,7 +81,7 @@ func TestWeb(t *testing.T) {
 	fpConf := config.FrequencyPlansConfig{
 		URL: "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans/master",
 	}
-	fps := frequencyplans.NewStore(test.Must(fpConf.Fetcher(ctx, config.BlobConfig{})).(fetch.Interface))
+	fps := frequencyplans.NewStore(test.Must(fpConf.Fetcher(ctx, config.BlobConfig{}, test.HTTPClientProvider)).(fetch.Interface))
 
 	conf := &component.Config{
 		ServiceBase: config.ServiceBase{

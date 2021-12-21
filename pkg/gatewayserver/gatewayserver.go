@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -282,7 +283,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 		}
 		for _, endpoint := range []component.Endpoint{
 			component.NewTCPEndpoint(version.listenerConfig.listen, version.Name),
-			component.NewTLSEndpoint(version.listenerConfig.listenTLS, version.Name, component.WithNextProtos("h2", "http/1.1")),
+			component.NewTLSEndpoint(version.listenerConfig.listenTLS, version.Name, tlsconfig.WithNextProtos("h2", "http/1.1")),
 		} {
 			endpoint := endpoint
 			if endpoint.Address() == "" {

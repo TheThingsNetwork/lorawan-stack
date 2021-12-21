@@ -30,14 +30,7 @@ import (
 
 func (is *IdentityServer) initEmailTemplates(ctx context.Context) (*email.TemplateRegistry, error) {
 	config := is.configFromContext(ctx).Email.Templates
-	if config.HTTPClient == nil {
-		httpClient, err := is.HTTPClient(ctx)
-		if err != nil {
-			return nil, err
-		}
-		config.HTTPClient = httpClient
-	}
-	fetcher, err := config.Fetcher(ctx, is.Component.GetBaseConfig(ctx).Blob)
+	fetcher, err := config.Fetcher(ctx, is.Component.GetBaseConfig(ctx).Blob, is)
 	if err != nil {
 		return nil, err
 	}
