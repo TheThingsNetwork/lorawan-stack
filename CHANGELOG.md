@@ -20,6 +20,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - CLI panic when getting devices.
+- Application uplink processing serialization behavior in the Application Server.
 
 ### Security
 
