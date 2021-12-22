@@ -31,6 +31,7 @@ type testStore struct {
 	gatewayStore
 	organizationStore
 	userStore
+	userSessionStore
 	apiKeyStore
 	membershipStore
 	contactInfoStore
@@ -65,6 +66,7 @@ func newTestStore(t *testing.T, dsn url.URL) storetest.Store {
 		gatewayStore:      gatewayStore{baseStore: &baseStore},
 		organizationStore: organizationStore{baseStore: &baseStore},
 		userStore:         userStore{baseStore: &baseStore},
+		userSessionStore:  userSessionStore{baseStore: &baseStore},
 		apiKeyStore:       apiKeyStore{baseStore: &baseStore},
 		membershipStore:   membershipStore{baseStore: &baseStore},
 		contactInfoStore:  contactInfoStore{baseStore: &baseStore},
@@ -113,6 +115,13 @@ func TestUserStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestUserStoreCRUD(t)
+}
+
+func TestUserSessionStore(t *testing.T) {
+	t.Parallel()
+
+	st := storetest.New(t, newTestStore)
+	st.TestUserSessionStore(t)
 }
 
 func TestAPIKeyStore(t *testing.T) {
