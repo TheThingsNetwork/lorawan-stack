@@ -21771,6 +21771,30 @@
           ]
         },
         {
+          "name": "JoinEUI",
+          "longName": "JoinEUI",
+          "fullName": "ttn.lorawan.v3.JoinEUI",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "eui",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "JoinEUIPrefix",
           "longName": "JoinEUIPrefix",
           "fullName": "ttn.lorawan.v3.JoinEUIPrefix",
@@ -22397,6 +22421,28 @@
                     {
                       "method": "GET",
                       "pattern": "/js/join_eui_prefixes"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetDefaultJoinEUI",
+              "description": "Request the default JoinEUI that is configured for this Join Server.",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "JoinEUI",
+              "responseLongType": "JoinEUI",
+              "responseFullType": "ttn.lorawan.v3.JoinEUI",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/js/default_join_eui"
                     }
                   ]
                 }

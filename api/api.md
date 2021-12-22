@@ -322,6 +322,7 @@
   - [Message `GetApplicationActivationSettingsRequest`](#ttn.lorawan.v3.GetApplicationActivationSettingsRequest)
   - [Message `GetRootKeysRequest`](#ttn.lorawan.v3.GetRootKeysRequest)
   - [Message `JoinAcceptMICRequest`](#ttn.lorawan.v3.JoinAcceptMICRequest)
+  - [Message `JoinEUI`](#ttn.lorawan.v3.JoinEUI)
   - [Message `JoinEUIPrefix`](#ttn.lorawan.v3.JoinEUIPrefix)
   - [Message `JoinEUIPrefixes`](#ttn.lorawan.v3.JoinEUIPrefixes)
   - [Message `NwkSKeysResponse`](#ttn.lorawan.v3.NwkSKeysResponse)
@@ -4771,6 +4772,12 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | `payload_request` | <p>`message.required`: `true`</p> |
 | `join_request_type` | <p>`enum.defined_only`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.JoinEUI">Message `JoinEUI`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `eui` | [`bytes`](#bytes) |  |  |
+
 ### <a name="ttn.lorawan.v3.JoinEUIPrefix">Message `JoinEUIPrefix`</a>
 
 | Field | Type | Label | Description |
@@ -4915,12 +4922,14 @@ The AsJs service connects an Application Server to a Join Server.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `GetJoinEUIPrefixes` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`JoinEUIPrefixes`](#ttn.lorawan.v3.JoinEUIPrefixes) | Request the JoinEUI prefixes that are configured for this Join Server. |
+| `GetDefaultJoinEUI` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`JoinEUI`](#ttn.lorawan.v3.JoinEUI) | Request the default JoinEUI that is configured for this Join Server. |
 
 #### HTTP bindings
 
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `GetJoinEUIPrefixes` | `GET` | `/api/v3/js/join_eui_prefixes` |  |
+| `GetDefaultJoinEUI` | `GET` | `/api/v3/js/default_join_eui` |  |
 
 ### <a name="ttn.lorawan.v3.JsEndDeviceRegistry">Service `JsEndDeviceRegistry`</a>
 
