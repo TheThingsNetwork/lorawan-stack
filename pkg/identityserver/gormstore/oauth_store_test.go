@@ -136,7 +136,7 @@ func TestOAuthStore(t *testing.T) {
 
 			start := cleanTime(time.Now())
 
-			err = store.CreateAuthorizationCode(ctx, &ttnpb.OAuthAuthorizationCode{
+			_, err = store.CreateAuthorizationCode(ctx, &ttnpb.OAuthAuthorizationCode{
 				ClientIds:   clientIDs,
 				UserIds:     userIDs,
 				Rights:      rights,
@@ -206,7 +206,7 @@ func TestOAuthStore(t *testing.T) {
 
 			start := cleanTime(time.Now())
 
-			err = store.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
+			_, err = store.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
 				UserIds:      userIDs,
 				ClientIds:    clientIDs,
 				Id:           tokenID,

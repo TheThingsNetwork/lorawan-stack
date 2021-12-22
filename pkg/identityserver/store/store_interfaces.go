@@ -171,11 +171,11 @@ type OAuthStore interface {
 	DeleteUserAuthorizations(ctx context.Context, userIDs *ttnpb.UserIdentifiers) error
 	DeleteClientAuthorizations(ctx context.Context, clientIDs *ttnpb.ClientIdentifiers) error
 
-	CreateAuthorizationCode(ctx context.Context, code *ttnpb.OAuthAuthorizationCode) error
+	CreateAuthorizationCode(ctx context.Context, code *ttnpb.OAuthAuthorizationCode) (*ttnpb.OAuthAuthorizationCode, error)
 	GetAuthorizationCode(ctx context.Context, code string) (*ttnpb.OAuthAuthorizationCode, error)
 	DeleteAuthorizationCode(ctx context.Context, code string) error
 
-	CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAccessToken, previousID string) error
+	CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAccessToken, previousID string) (*ttnpb.OAuthAccessToken, error)
 	ListAccessTokens(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) ([]*ttnpb.OAuthAccessToken, error)
 	GetAccessToken(ctx context.Context, id string) (*ttnpb.OAuthAccessToken, error)
 	DeleteAccessToken(ctx context.Context, id string) error

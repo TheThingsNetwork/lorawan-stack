@@ -43,7 +43,7 @@ func TestOAuthRegistry(t *testing.T) {
 			panic(err)
 		}
 
-		err = oauthStore.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
+		_, err = oauthStore.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
 			UserIds:       user.GetIds(),
 			ClientIds:     client.GetIds(),
 			UserSessionId: "12345678-1234-5678-1234-567812345678",

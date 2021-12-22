@@ -189,15 +189,15 @@ func (s *oauthStore) DeleteClientAuthorizations(ctx context.Context, clientIDs *
 	}).Delete(&AccessToken{}).Error
 }
 
-func (s *oauthStore) CreateAuthorizationCode(ctx context.Context, code *ttnpb.OAuthAuthorizationCode) error {
+func (s *oauthStore) CreateAuthorizationCode(ctx context.Context, code *ttnpb.OAuthAuthorizationCode) (*ttnpb.OAuthAuthorizationCode, error) {
 	defer trace.StartRegion(ctx, "create authorization code").End()
 	client, err := s.findEntity(ctx, code.ClientIds, "id")
 	if err != nil {
-		return err
+		return nil, err
 	}
 	user, err := s.findEntity(ctx, code.UserIds, "id")
 	if err != nil {
-		return err
+		return nil, err
 	}
 	codeModel := AuthorizationCode{
 		ClientID:    client.PrimaryKey(),
@@ -214,7 +214,13 @@ func (s *oauthStore) CreateAuthorizationCode(ctx context.Context, code *ttnpb.OA
 	if code.UserSessionId != "" {
 		codeModel.UserSessionID = &code.UserSessionId
 	}
-	return s.createEntity(ctx, &codeModel)
+	if err = s.createEntity(ctx, &codeModel); err != nil {
+		return nil, err
+	}
+	codeProto := codeModel.toPB()
+	codeProto.ClientIds = code.ClientIds
+	codeProto.UserIds = code.UserIds
+	return codeProto, nil
 }
 
 func (s *oauthStore) GetAuthorizationCode(ctx context.Context, code string) (*ttnpb.OAuthAuthorizationCode, error) {
@@ -251,15 +257,15 @@ func (s *oauthStore) DeleteAuthorizationCode(ctx context.Context, code string) e
 	return nil
 }
 
-func (s *oauthStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAccessToken, previousID string) error {
+func (s *oauthStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAccessToken, previousID string) (*ttnpb.OAuthAccessToken, error) {
 	defer trace.StartRegion(ctx, "create access token").End()
 	client, err := s.findEntity(ctx, token.ClientIds, "id")
 	if err != nil {
-		return err
+		return nil, err
 	}
 	user, err := s.findEntity(ctx, token.UserIds, "id")
 	if err != nil {
-		return err
+		return nil, err
 	}
 	tokenModel := AccessToken{
 		ClientID:     client.PrimaryKey(),
@@ -277,7 +283,13 @@ func (s *oauthStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAc
 	if token.UserSessionId != "" {
 		tokenModel.UserSessionID = &token.UserSessionId
 	}
-	return s.createEntity(ctx, &tokenModel)
+	if err = s.createEntity(ctx, &tokenModel); err != nil {
+		return nil, err
+	}
+	tokenProto := tokenModel.toPB()
+	tokenProto.ClientIds = token.ClientIds
+	tokenProto.UserIds = token.UserIds
+	return tokenProto, nil
 }
 
 func (s *oauthStore) ListAccessTokens(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) ([]*ttnpb.OAuthAccessToken, error) {

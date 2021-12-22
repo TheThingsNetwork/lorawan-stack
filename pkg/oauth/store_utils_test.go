@@ -118,10 +118,10 @@ func (s *mockStore) Authorize(ctx context.Context, req *ttnpb.OAuthClientAuthori
 	return s.res.authorization, s.err.authorize
 }
 
-func (s *mockStore) CreateAuthorizationCode(ctx context.Context, code *ttnpb.OAuthAuthorizationCode) error {
+func (s *mockStore) CreateAuthorizationCode(ctx context.Context, code *ttnpb.OAuthAuthorizationCode) (*ttnpb.OAuthAuthorizationCode, error) {
 	s.req.ctx, s.req.authorizationCode = ctx, code
 	s.calls = append(s.calls, "CreateAuthorizationCode")
-	return s.err.createAuthorizationCode
+	return s.res.authorizationCode, s.err.createAuthorizationCode
 }
 
 func (s *mockStore) GetAuthorizationCode(ctx context.Context, code string) (*ttnpb.OAuthAuthorizationCode, error) {
@@ -136,10 +136,10 @@ func (s *mockStore) DeleteAuthorizationCode(ctx context.Context, code string) er
 	return s.err.deleteAuthorizationCode
 }
 
-func (s *mockStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAccessToken, previousID string) error {
+func (s *mockStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAccessToken, previousID string) (*ttnpb.OAuthAccessToken, error) {
 	s.req.ctx, s.req.token, s.req.previousID = ctx, token, previousID
 	s.calls = append(s.calls, "CreateAccessToken")
-	return s.err.createAccessToken
+	return s.res.accessToken, s.err.createAccessToken
 }
 
 func (s *mockStore) GetAccessToken(ctx context.Context, tokenID string) (*ttnpb.OAuthAccessToken, error) {

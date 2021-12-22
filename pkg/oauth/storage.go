@@ -97,7 +97,7 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 	if data.CreatedAt.IsZero() {
 		data.CreatedAt = time.Now()
 	}
-	err = s.oauth.CreateAuthorizationCode(s.ctx, &ttnpb.OAuthAuthorizationCode{
+	_, err = s.oauth.CreateAuthorizationCode(s.ctx, &ttnpb.OAuthAuthorizationCode{
 		ClientIds:     client.GetIds(),
 		UserIds:       userSessionIDs.GetUserIds(),
 		UserSessionId: userSessionIDs.SessionId,
@@ -108,10 +108,7 @@ func (s *storage) SaveAuthorize(data *osin.AuthorizeData) error {
 		CreatedAt:     ttnpb.ProtoTimePtr(data.CreatedAt),
 		ExpiresAt:     ttnpb.ProtoTimePtr(data.CreatedAt.Add(time.Duration(data.ExpiresIn) * time.Second)),
 	})
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 func (s *storage) LoadAuthorize(code string) (data *osin.AuthorizeData, err error) {
@@ -210,7 +207,7 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 			data.AccessData.RefreshToken = previousID // Used for deleting the old access token
 		}
 	}
-	return s.oauth.CreateAccessToken(s.ctx, &ttnpb.OAuthAccessToken{
+	_, err = s.oauth.CreateAccessToken(s.ctx, &ttnpb.OAuthAccessToken{
 		ClientIds:     client.GetIds(),
 		UserIds:       userSessionIDs.GetUserIds(),
 		UserSessionId: userSessionIDs.SessionId,
@@ -221,6 +218,7 @@ func (s *storage) SaveAccess(data *osin.AccessData) error {
 		CreatedAt:     ttnpb.ProtoTimePtr(data.CreatedAt),
 		ExpiresAt:     ttnpb.ProtoTimePtr(data.CreatedAt.Add(time.Duration(data.ExpiresIn) * time.Second)),
 	}, previousID)
+	return err
 }
 
 func (s *storage) loadAccess(id string) (*osin.AccessData, error) {
