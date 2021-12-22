@@ -21639,6 +21639,30 @@
           ]
         },
         {
+          "name": "GetDefaultJoinEUIResponse",
+          "longName": "GetDefaultJoinEUIResponse",
+          "fullName": "ttn.lorawan.v3.GetDefaultJoinEUIResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "join_eui",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "GetRootKeysRequest",
           "longName": "GetRootKeysRequest",
           "fullName": "ttn.lorawan.v3.GetRootKeysRequest",
@@ -21759,30 +21783,6 @@
             {
               "name": "dev_nonce",
               "description": "LoRaWAN DevNonce.",
-              "label": "",
-              "type": "bytes",
-              "longType": "bytes",
-              "fullType": "bytes",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "JoinEUI",
-          "longName": "JoinEUI",
-          "fullName": "ttn.lorawan.v3.JoinEUI",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "eui",
-              "description": "",
               "label": "",
               "type": "bytes",
               "longType": "bytes",
@@ -22433,9 +22433,9 @@
               "requestLongType": ".google.protobuf.Empty",
               "requestFullType": "google.protobuf.Empty",
               "requestStreaming": false,
-              "responseType": "JoinEUI",
-              "responseLongType": "JoinEUI",
-              "responseFullType": "ttn.lorawan.v3.JoinEUI",
+              "responseType": "GetDefaultJoinEUIResponse",
+              "responseLongType": "GetDefaultJoinEUIResponse",
+              "responseFullType": "ttn.lorawan.v3.GetDefaultJoinEUIResponse",
               "responseStreaming": false,
               "options": {
                 "google.api.http": {

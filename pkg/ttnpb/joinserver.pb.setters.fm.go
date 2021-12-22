@@ -911,17 +911,17 @@ func (dst *JoinEUIPrefixes) SetFields(src *JoinEUIPrefixes, paths ...string) err
 	return nil
 }
 
-func (dst *JoinEUI) SetFields(src *JoinEUI, paths ...string) error {
+func (dst *GetDefaultJoinEUIResponse) SetFields(src *GetDefaultJoinEUIResponse, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "eui":
+		case "join_eui":
 			if len(subs) > 0 {
-				return fmt.Errorf("'eui' has no subfields, but %s were specified", subs)
+				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
 			}
 			if src != nil {
-				dst.Eui = src.Eui
+				dst.JoinEui = src.JoinEui
 			} else {
-				dst.Eui = nil
+				dst.JoinEui = nil
 			}
 
 		default:

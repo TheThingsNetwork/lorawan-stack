@@ -226,12 +226,12 @@ var JoinEUIPrefixesFieldPathsNested = []string{
 var JoinEUIPrefixesFieldPathsTopLevel = []string{
 	"prefixes",
 }
-var JoinEUIFieldPathsNested = []string{
-	"eui",
+var GetDefaultJoinEUIResponseFieldPathsNested = []string{
+	"join_eui",
 }
 
-var JoinEUIFieldPathsTopLevel = []string{
-	"eui",
+var GetDefaultJoinEUIResponseFieldPathsTopLevel = []string{
+	"join_eui",
 }
 var ProvisionEndDevicesRequest_IdentifiersListFieldPathsNested = []string{
 	"end_device_ids",

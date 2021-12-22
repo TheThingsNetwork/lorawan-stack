@@ -466,9 +466,9 @@ var (
 							if err != nil {
 								return err
 							}
-							logger.WithField("default_join_eui", defaultJoinEUI.Eui.String()).
-								Info("successfully obtained Join Server's default Join EUI")
-							device.Ids.JoinEui = defaultJoinEUI.Eui
+							logger.WithField("default_join_eui", defaultJoinEUI.JoinEui.String()).
+								Info("Successfully obtained Join Server's default Join EUI")
+							device.Ids.JoinEui = defaultJoinEUI.JoinEui
 						}
 					}
 				}
@@ -531,7 +531,7 @@ var (
 					return err
 				}
 				logger.WithField("dev_eui", devEUIResponse.DevEui.String()).
-					Info("successfully obtained DevEUI")
+					Info("Successfully obtained DevEUI")
 				device.Ids.DevEui = &devEUIResponse.DevEui
 			}
 			newPaths, err := parsePayloadFormatterParameterFlags("formatters", device.Formatters, cmd.Flags())

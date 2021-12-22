@@ -6180,7 +6180,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v3JoinEUI"
+              "$ref": "#/definitions/v3GetDefaultJoinEUIResponse"
             }
           },
           "default": {
@@ -15150,6 +15150,15 @@
         }
       }
     },
+    "v3GetDefaultJoinEUIResponse": {
+      "type": "object",
+      "properties": {
+        "join_eui": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
     "v3GetIsConfigurationResponse": {
       "type": "object",
       "properties": {
@@ -15256,15 +15265,6 @@
         },
         "cf_list": {
           "$ref": "#/definitions/v3CFList"
-        }
-      }
-    },
-    "v3JoinEUI": {
-      "type": "object",
-      "properties": {
-        "eui": {
-          "type": "string",
-          "format": "byte"
         }
       }
     },

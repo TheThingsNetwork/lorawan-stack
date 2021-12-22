@@ -40,8 +40,8 @@ func (srv jsServer) GetJoinEUIPrefixes(ctx context.Context, _ *pbtypes.Empty) (*
 }
 
 // GetDefaultJoinEUI returns the default JoinEUI that is configured for this Join Server.
-func (srv jsServer) GetDefaultJoinEUI(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.JoinEUI, error) {
-	return &ttnpb.JoinEUI{
-		Eui: &srv.JS.defaultJoinEUI,
+func (srv jsServer) GetDefaultJoinEUI(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.GetDefaultJoinEUIResponse, error) {
+	return &ttnpb.GetDefaultJoinEUIResponse{
+		JoinEui: &srv.JS.defaultJoinEUI,
 	}, nil
 }

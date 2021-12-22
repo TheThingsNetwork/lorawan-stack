@@ -1802,25 +1802,25 @@ var _ interface {
 	ErrorName() string
 } = JoinEUIPrefixesValidationError{}
 
-// ValidateFields checks the field values on JoinEUI with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
-func (m *JoinEUI) ValidateFields(paths ...string) error {
+// ValidateFields checks the field values on GetDefaultJoinEUIResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *GetDefaultJoinEUIResponse) ValidateFields(paths ...string) error {
 	if m == nil {
 		return nil
 	}
 
 	if len(paths) == 0 {
-		paths = JoinEUIFieldPathsNested
+		paths = GetDefaultJoinEUIResponseFieldPathsNested
 	}
 
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "eui":
-			// no validation rules for Eui
+		case "join_eui":
+			// no validation rules for JoinEui
 		default:
-			return JoinEUIValidationError{
+			return GetDefaultJoinEUIResponseValidationError{
 				field:  name,
 				reason: "invalid field path",
 			}
@@ -1829,9 +1829,10 @@ func (m *JoinEUI) ValidateFields(paths ...string) error {
 	return nil
 }
 
-// JoinEUIValidationError is the validation error returned by
-// JoinEUI.ValidateFields if the designated constraints aren't met.
-type JoinEUIValidationError struct {
+// GetDefaultJoinEUIResponseValidationError is the validation error returned by
+// GetDefaultJoinEUIResponse.ValidateFields if the designated constraints
+// aren't met.
+type GetDefaultJoinEUIResponseValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -1839,22 +1840,24 @@ type JoinEUIValidationError struct {
 }
 
 // Field function returns field value.
-func (e JoinEUIValidationError) Field() string { return e.field }
+func (e GetDefaultJoinEUIResponseValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e JoinEUIValidationError) Reason() string { return e.reason }
+func (e GetDefaultJoinEUIResponseValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e JoinEUIValidationError) Cause() error { return e.cause }
+func (e GetDefaultJoinEUIResponseValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e JoinEUIValidationError) Key() bool { return e.key }
+func (e GetDefaultJoinEUIResponseValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e JoinEUIValidationError) ErrorName() string { return "JoinEUIValidationError" }
+func (e GetDefaultJoinEUIResponseValidationError) ErrorName() string {
+	return "GetDefaultJoinEUIResponseValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e JoinEUIValidationError) Error() string {
+func (e GetDefaultJoinEUIResponseValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -1866,14 +1869,14 @@ func (e JoinEUIValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sJoinEUI.%s: %s%s",
+		"invalid %sGetDefaultJoinEUIResponse.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = JoinEUIValidationError{}
+var _ error = GetDefaultJoinEUIResponseValidationError{}
 
 var _ interface {
 	Field() string
@@ -1881,7 +1884,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = JoinEUIValidationError{}
+} = GetDefaultJoinEUIResponseValidationError{}
 
 // ValidateFields checks the field values on
 // ProvisionEndDevicesRequest_IdentifiersList with the rules defined in the
