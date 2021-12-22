@@ -39,10 +39,12 @@ describe('End device messaging', () => {
     cy.findByText('Import end devices').should('be.visible')
     cy.findByLabelText('File format').selectOption('The Things Stack JSON')
 
-    const devicesFile = 'devices.json'
+    const devicesFile = 'successful-devices.json'
     cy.findByLabelText('File').attachFile(devicesFile)
     cy.findByRole('button', { name: 'Import end devices' }).click()
+    cy.findByText('0 of 3 (0.00% finished)')
     cy.findByText('Operation finished')
+    cy.findByText('3 of 3 (100.00% finished)')
     cy.findByTestId('notification')
       .should('be.visible')
       .findByText('All end devices imported successfully')
@@ -53,5 +55,29 @@ describe('End device messaging', () => {
       `${Cypress.config('consoleRootPath')}/applications/${appId}/devices`,
     )
     cy.findByTestId('error-notification').should('not.exist')
+    cy.findByRole('rowgroup').within(() => {
+      cy.findAllByRole('row').should('have.length', 3)
+    })
+  })
+
+  it('fails adding devices with existant ids', () => {
+    const devicesFile = 'failed-devices.json'
+    cy.findByLabelText('File format').selectOption('The Things Stack JSON')
+    cy.findByLabelText('File').attachFile(devicesFile)
+    cy.findByRole('button', { name: 'Import end devices' }).click()
+    cy.findByText('Operation finished').should('be.visible')
+    cy.findByText('3 of 3 (100.00% finished)').should('be.visible')
+    cy.findByText('Successfully converted 1 of 3 end devices').should('be.visible')
+    cy.findByTestId('notification')
+      .should('be.visible')
+      .findByText('Not all devices imported successfully')
+      .should('be.visible')
+    cy.findByText('The registration of the following end devices failed:')
+      .should('be.visible')
+      .closest('div')
+      .within(() => {
+        cy.findByText(/ID already taken/).should('be.visible')
+        cy.findByText(/an end device with/, /is already registered/).should('be.visible')
+      })
   })
 })
