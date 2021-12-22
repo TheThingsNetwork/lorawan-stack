@@ -63,7 +63,11 @@ class DateTime extends React.PureComponent {
     }
 
     return (
-      <time className={className} dateTime={dateValue.toISOString()} title={noTitle || result}>
+      <time
+        className={className}
+        dateTime={dateValue.toISOString()}
+        title={noTitle ? undefined : result}
+      >
         {children ? children(result) : result}
       </time>
     )

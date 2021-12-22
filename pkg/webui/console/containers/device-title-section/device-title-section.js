@@ -51,7 +51,7 @@ const DeviceTitleSection = props => {
   const showUplinkCount = typeof uplinkFrameCount === 'number'
   const showDownlinkCount = typeof downlinkFrameCount === 'number'
   const notAvailableElem = <Message content={sharedMessages.notAvailable} />
-  const lastActivityInfo = <DateTime value={lastSeen} noTitle />
+  const lastActivityInfo = lastSeen ? <DateTime value={lastSeen} noTitle /> : lastSeen
   const lineBreak = <br />
   const bottomBarLeft = (
     <>
