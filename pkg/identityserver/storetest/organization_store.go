@@ -50,22 +50,14 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 			Ids:         &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
 			Name:        "Foo Name",
 			Description: "Foo Description",
-			Attributes: map[string]string{
-				"foo": "bar",
-				"bar": "baz",
-				"baz": "qux",
-			},
+			Attributes:  attributes,
 		})
 
 		if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
 			a.So(created.GetIds().GetOrganizationId(), should.Equal, "foo")
 			a.So(created.Name, should.Equal, "Foo Name")
 			a.So(created.Description, should.Equal, "Foo Description")
-			a.So(created.Attributes, should.Resemble, map[string]string{
-				"foo": "bar",
-				"bar": "baz",
-				"baz": "qux",
-			})
+			a.So(created.Attributes, should.Resemble, attributes)
 			a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenWithin, 5*time.Second, start)
 			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenWithin, 5*time.Second, start)
 		}
@@ -120,17 +112,13 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 			Ids:         &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
 			Name:        "New Foo Name",
 			Description: "New Foo Description",
-			Attributes: map[string]string{
-				"attribute": "new",
-			},
+			Attributes:  updatedAttributes,
 		}, mask)
 		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.GetIds().GetOrganizationId(), should.Equal, "foo")
 			a.So(updated.Name, should.Equal, "New Foo Name")
 			a.So(updated.Description, should.Equal, "New Foo Description")
-			a.So(updated.Attributes, should.Resemble, map[string]string{
-				"attribute": "new",
-			})
+			a.So(updated.Attributes, should.Resemble, updatedAttributes)
 			a.So(*ttnpb.StdTime(updated.CreatedAt), should.Equal, *ttnpb.StdTime(created.CreatedAt))
 			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenWithin, 5*time.Second, start)
 		}

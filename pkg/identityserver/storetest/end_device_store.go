@@ -90,11 +90,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			},
 			Name:        "Foo Name",
 			Description: "Foo Description",
-			Attributes: map[string]string{
-				"foo": "bar",
-				"bar": "baz",
-				"baz": "qux",
-			},
+			Attributes:  attributes,
 			VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
 				BrandId:         "some_brand_id",
 				ModelId:         "some_model_id",
@@ -119,11 +115,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			a.So(created.GetIds().GetDeviceId(), should.Equal, "foo")
 			a.So(created.Name, should.Equal, "Foo Name")
 			a.So(created.Description, should.Equal, "Foo Description")
-			a.So(created.Attributes, should.Resemble, map[string]string{
-				"foo": "bar",
-				"bar": "baz",
-				"baz": "qux",
-			})
+			a.So(created.Attributes, should.Resemble, attributes)
 			a.So(created.VersionIds, should.Resemble, &ttnpb.EndDeviceVersionIdentifiers{
 				BrandId:         "some_brand_id",
 				ModelId:         "some_model_id",
@@ -284,9 +276,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			},
 			Name:        "New Foo Name",
 			Description: "New Foo Description",
-			Attributes: map[string]string{
-				"attribute": "new",
-			},
+			Attributes:  updatedAttributes,
 			VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
 				BrandId:         "other_brand_id",
 				ModelId:         "other_model_id",
@@ -309,9 +299,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			a.So(updated.GetIds().GetDeviceId(), should.Equal, "foo")
 			a.So(updated.Name, should.Equal, "New Foo Name")
 			a.So(updated.Description, should.Equal, "New Foo Description")
-			a.So(updated.Attributes, should.Resemble, map[string]string{
-				"attribute": "new",
-			})
+			a.So(updated.Attributes, should.Resemble, updatedAttributes)
 			a.So(updated.VersionIds, should.Resemble, &ttnpb.EndDeviceVersionIdentifiers{
 				BrandId:         "other_brand_id",
 				ModelId:         "other_model_id",

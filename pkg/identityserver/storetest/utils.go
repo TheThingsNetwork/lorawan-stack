@@ -32,3 +32,15 @@ func fieldMask(paths ...string) *pbtypes.FieldMask {
 func fieldMaskWith(mask *pbtypes.FieldMask, paths ...string) *pbtypes.FieldMask {
 	return &pbtypes.FieldMask{Paths: append(mask.Paths, paths...)}
 }
+
+var attributes = map[string]string{
+	"foo": "bar",
+	"bar": "baz",
+	"baz": "qux",
+}
+
+var updatedAttributes = map[string]string{
+	"attribute": "new",
+	"foo":       "bar",
+	"bar":       "updated",
+}

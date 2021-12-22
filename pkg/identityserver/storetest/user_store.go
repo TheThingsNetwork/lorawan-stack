@@ -70,14 +70,10 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 		stamp := start.Add(-1 * time.Minute)
 
 		created, err = s.CreateUser(ctx, &ttnpb.User{
-			Ids:         &ttnpb.UserIdentifiers{UserId: "foo"},
-			Name:        "Foo Name",
-			Description: "Foo Description",
-			Attributes: map[string]string{
-				"foo": "bar",
-				"bar": "baz",
-				"baz": "qux",
-			},
+			Ids:                            &ttnpb.UserIdentifiers{UserId: "foo"},
+			Name:                           "Foo Name",
+			Description:                    "Foo Description",
+			Attributes:                     attributes,
 			PrimaryEmailAddress:            "foo@example.com",
 			PrimaryEmailAddressValidatedAt: ttnpb.ProtoTimePtr(stamp),
 			Password:                       "password_hash",
@@ -96,11 +92,7 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 			a.So(created.GetIds().GetUserId(), should.Equal, "foo")
 			a.So(created.Name, should.Equal, "Foo Name")
 			a.So(created.Description, should.Equal, "Foo Description")
-			a.So(created.Attributes, should.Resemble, map[string]string{
-				"foo": "bar",
-				"bar": "baz",
-				"baz": "qux",
-			})
+			a.So(created.Attributes, should.Resemble, attributes)
 			a.So(created.PrimaryEmailAddress, should.Equal, "foo@example.com")
 			a.So(*ttnpb.StdTime(created.PrimaryEmailAddressValidatedAt), should.Equal, stamp)
 			a.So(created.Password, should.Equal, "password_hash")
@@ -192,12 +184,10 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 		stamp := start.Add(time.Minute)
 
 		updated, err = s.UpdateUser(ctx, &ttnpb.User{
-			Ids:         &ttnpb.UserIdentifiers{UserId: "foo"},
-			Name:        "New Foo Name",
-			Description: "New Foo Description",
-			Attributes: map[string]string{
-				"attribute": "new",
-			},
+			Ids:                            &ttnpb.UserIdentifiers{UserId: "foo"},
+			Name:                           "New Foo Name",
+			Description:                    "New Foo Description",
+			Attributes:                     updatedAttributes,
 			PrimaryEmailAddress:            "updated@example.com",
 			PrimaryEmailAddressValidatedAt: ttnpb.ProtoTimePtr(stamp),
 			Password:                       "updated_password_hash",
@@ -215,9 +205,7 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 			a.So(updated.GetIds().GetUserId(), should.Equal, "foo")
 			a.So(updated.Name, should.Equal, "New Foo Name")
 			a.So(updated.Description, should.Equal, "New Foo Description")
-			a.So(updated.Attributes, should.Resemble, map[string]string{
-				"attribute": "new",
-			})
+			a.So(updated.Attributes, should.Resemble, updatedAttributes)
 			a.So(updated.PrimaryEmailAddress, should.Equal, "updated@example.com")
 			a.So(*ttnpb.StdTime(updated.PrimaryEmailAddressValidatedAt), should.Equal, stamp)
 			a.So(updated.Password, should.Equal, "updated_password_hash")
