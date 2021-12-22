@@ -22,5 +22,6 @@ type Config struct {
 	Keys                          KeyRegistry                          `name:"-"`
 	ApplicationActivationSettings ApplicationActivationSettingRegistry `name:"-"`
 	JoinEUIPrefixes               []types.EUI64Prefix                  `name:"join-eui-prefix" description:"JoinEUI prefixes handled by this JS"`
+	DefaultJoinEUI                types.EUI64                          `name:"default-join-eui" description:"the default JoinEUI for this JS"`
 	DeviceKEKLabel                string                               `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
 }

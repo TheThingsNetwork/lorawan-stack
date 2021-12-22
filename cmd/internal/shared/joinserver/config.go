@@ -24,4 +24,5 @@ var DefaultJoinServerConfig = joinserver.Config{
 	JoinEUIPrefixes: []types.EUI64Prefix{
 		{},
 	},
+	DefaultJoinEUI: types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00},
 }
