@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
@@ -45,6 +46,7 @@ type Population struct {
 	Gateways      []*ttnpb.Gateway
 	Organizations []*ttnpb.Organization
 	Users         []*ttnpb.User
+	UserSessions  []*ttnpb.UserSession
 
 	APIKeys     []*EntityAPIKey
 	Memberships []*EntityCollaborator
@@ -191,6 +193,32 @@ func (p *Population) NewUser() *ttnpb.User {
 	return usr
 }
 
+// NewUserSession adds a new user session to the population and returns it.
+// The returned user session can not be modified and will not have its CreatedAt/UpdatedAt fields populated.
+func (p *Population) NewUserSession(user *ttnpb.UserIdentifiers) *ttnpb.UserSession {
+	sessionID := uuid.New().String()
+	generatedKey, err := auth.GenerateKey(context.Background())
+	if err != nil {
+		panic(err)
+	}
+	hashValidator := pbkdf2.Default()
+	hashValidator.Iterations = 10
+	hashedKey, err := auth.Hash(auth.NewContextWithHashValidator(context.Background(), hashValidator), generatedKey)
+	if err != nil {
+		panic(err)
+	}
+	p.UserSessions = append(p.UserSessions, &ttnpb.UserSession{
+		UserIds:       user,
+		SessionId:     sessionID,
+		SessionSecret: hashedKey,
+	})
+	return &ttnpb.UserSession{
+		UserIds:       user,
+		SessionId:     sessionID,
+		SessionSecret: generatedKey,
+	}
+}
+
 // Populate creates the population in the database.
 // After calling Populate, the entities in the population should no longer be modified.
 func (p *Population) Populate(ctx context.Context, st Store) error {
@@ -270,6 +298,19 @@ func (p *Population) Populate(ctx context.Context, st Store) error {
 				return err
 			}
 			*usr = *created
+		}
+	}
+	if len(p.UserSessions) > 0 {
+		s, ok := st.(store.UserSessionStore)
+		if !ok {
+			return fmt.Errorf("store of type %T does not implement UserSessionStore", st)
+		}
+		for _, sess := range p.UserSessions {
+			created, err := s.CreateSession(ctx, sess)
+			if err != nil {
+				return err
+			}
+			*sess = *created
 		}
 	}
 	if len(p.APIKeys) > 0 {

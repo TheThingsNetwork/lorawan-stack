@@ -37,6 +37,7 @@ type testStore struct {
 	contactInfoStore
 	invitationStore
 	loginTokenStore
+	oauthStore
 }
 
 func (t testStore) Init() error {
@@ -72,6 +73,7 @@ func newTestStore(t *testing.T, dsn url.URL) storetest.Store {
 		contactInfoStore:  contactInfoStore{baseStore: &baseStore},
 		invitationStore:   invitationStore{baseStore: &baseStore},
 		loginTokenStore:   loginTokenStore{baseStore: &baseStore},
+		oauthStore:        oauthStore{baseStore: &baseStore},
 	}
 }
 
@@ -157,4 +159,11 @@ func TestLoginTokenStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestLoginTokenStore(t)
+}
+
+func TestOAuthStore(t *testing.T) {
+	t.Parallel()
+
+	st := storetest.New(t, newTestStore)
+	st.TestOAuthStore(t)
 }
