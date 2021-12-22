@@ -455,6 +455,21 @@ var (
 						paths = append(paths,
 							"join_server_address",
 						)
+						if device.Ids.JoinEui == nil {
+							// Get the default JoinEUI for JS.
+							logger.WithField("join_server_address", config.JoinServerGRPCAddress).Info("JoinEUI empty but defaults flag is set, fetch default JoinEUI of the Join Server")
+							js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
+							if err != nil {
+								return err
+							}
+							defaultJoinEUI, err := ttnpb.NewJsClient(js).GetDefaultJoinEUI(ctx, ttnpb.Empty)
+							if err != nil {
+								return err
+							}
+							logger.WithField("default_join_eui", defaultJoinEUI.Eui.String()).
+								Info("successfully obtained Join Server's default Join EUI")
+							device.Ids.JoinEui = defaultJoinEUI.Eui
+						}
 					}
 				}
 				if withKeys, _ := cmd.Flags().GetBool("with-root-keys"); withKeys {
@@ -516,7 +531,7 @@ var (
 					return err
 				}
 				logger.WithField("dev_eui", devEUIResponse.DevEui.String()).
-					Debug("successfully obtained DevEUI")
+					Info("successfully obtained DevEUI")
 				device.Ids.DevEui = &devEUIResponse.DevEui
 			}
 			newPaths, err := parsePayloadFormatterParameterFlags("formatters", device.Formatters, cmd.Flags())
@@ -567,7 +582,7 @@ var (
 				device.UpdatedAt = res.UpdatedAt
 			}
 
-			return io.Write(os.Stdout, config.OutputFormat, &device)
+			return io.Write(os.Stdout, config.OutputFormat, device)
 		}),
 	}
 	endDevicesSetCommand = &cobra.Command{
