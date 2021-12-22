@@ -93,34 +93,6 @@ func TestUserSessionStore(t *testing.T) {
 			a.So(got.ExpiresAt, should.BeNil)
 		}
 
-		later := time.Now().Add(time.Hour)
-		updated, err := store.UpdateSession(ctx, &ttnpb.UserSession{
-			UserIds:   userIDs,
-			SessionId: created.SessionId,
-			ExpiresAt: ttnpb.ProtoTimePtr(later),
-		})
-
-		a.So(err, should.BeNil)
-		if a.So(updated, should.NotBeNil) {
-			a.So(updated.CreatedAt, should.Resemble, created.CreatedAt)
-			a.So(updated.UpdatedAt, should.NotResemble, created.UpdatedAt)
-			a.So(updated.ExpiresAt, should.NotBeNil)
-		}
-
-		_, err = store.UpdateSession(ctx, &ttnpb.UserSession{
-			UserIds: &ttnpb.UserIdentifiers{UserId: "does_not_exist"},
-		})
-
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsNotFound(err), should.BeTrue)
-		}
-
-		_, err = store.UpdateSession(ctx, &ttnpb.UserSession{UserIds: userIDs, SessionId: "00000000-0000-0000-0000-000000000000"})
-
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsNotFound(err), should.BeTrue)
-		}
-
 		_, err = store.FindSessions(ctx, doesNotExistIDs)
 
 		if a.So(err, should.NotBeNil) {
@@ -132,8 +104,8 @@ func TestUserSessionStore(t *testing.T) {
 		a.So(err, should.BeNil)
 		if a.So(list, should.HaveLength, 1) {
 			a.So(list[0].CreatedAt, should.Resemble, created.CreatedAt)
-			a.So(list[0].UpdatedAt, should.Resemble, updated.UpdatedAt)
-			a.So(list[0].ExpiresAt, should.Resemble, updated.ExpiresAt)
+			a.So(list[0].UpdatedAt, should.Resemble, created.UpdatedAt)
+			a.So(list[0].ExpiresAt, should.Resemble, created.ExpiresAt)
 		}
 
 		err = store.DeleteSession(ctx, doesNotExistIDs, created.SessionId)

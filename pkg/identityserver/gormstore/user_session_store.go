@@ -136,21 +136,6 @@ func (s *userSessionStore) GetSessionByID(ctx context.Context, sessionID string)
 	return sessionProto, nil
 }
 
-func (s *userSessionStore) UpdateSession(ctx context.Context, sess *ttnpb.UserSession) (*ttnpb.UserSession, error) {
-	defer trace.StartRegion(ctx, "update user session").End()
-	sessionModel, err := s.findSession(ctx, sess.GetUserIds(), sess.GetSessionId())
-	if err != nil {
-		return nil, err
-	}
-	columns := sessionModel.fromPB(sess)
-	if err = s.updateEntity(ctx, &sessionModel, columns...); err != nil {
-		return nil, err
-	}
-	updated := &ttnpb.UserSession{}
-	sessionModel.toPB(updated)
-	return updated, nil
-}
-
 func (s *userSessionStore) DeleteSession(ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string) error {
 	defer trace.StartRegion(ctx, "delete user session").End()
 	sessionModel, err := s.findSession(ctx, userIDs, sessionID)
