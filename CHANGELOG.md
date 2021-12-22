@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Support reading the Join Server's default JoinEUI and using this in the CLI for end device creation.
+
 ### Changed
 
 ### Deprecated
