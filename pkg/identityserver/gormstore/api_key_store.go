@@ -157,10 +157,6 @@ func (s *apiKeyStore) UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityId
 		}
 		return nil, err
 	}
-	// Support for previous versions of The Things Stack.
-	if len(fieldMask.GetPaths()) == 0 {
-		fieldMask = &pbtypes.FieldMask{Paths: []string{"rights", "name"}}
-	}
 	// If empty rights are passed and rights are in the fieldmask, delete the key.
 	if len(key.Rights) == 0 && ttnpb.HasAnyField(fieldMask.GetPaths(), "rights") {
 		return nil, query.Delete(&keyModel).Error

@@ -144,6 +144,11 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 		return nil, err
 	}
 
+	// Backwards compatibility for older clients.
+	if len(req.FieldMask.GetPaths()) == 0 {
+		req.FieldMask = &pbtypes.FieldMask{Paths: []string{"rights", "name"}}
+	}
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		if len(req.ApiKey.Rights) > 0 {
 			_, key, err := gormstore.GetAPIKeyStore(db).GetAPIKey(ctx, req.ApiKey.Id)
