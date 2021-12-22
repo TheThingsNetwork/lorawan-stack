@@ -108,9 +108,6 @@ func (s *applicationStore) FindApplications(ctx context.Context, ids []*ttnpb.Ap
 		store.SetTotal(ctx, total)
 		query = query.Limit(limit).Offset(offset)
 	}
-	if onlyExpired, expireThreshold := store.ExpiredFromContext(ctx); onlyExpired {
-		query = query.Scopes(withExpiredEntities(expireThreshold))
-	}
 	var appModels []Application
 	query = query.Find(&appModels)
 	store.SetTotal(ctx, uint64(len(appModels)))

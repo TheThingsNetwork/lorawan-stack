@@ -16,6 +16,7 @@ package commands
 
 import (
 	"context"
+	"time"
 
 	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
@@ -109,8 +110,8 @@ var (
 			organizationStore := gormstore.GetOrganizationStore(db)
 			gatewayStore := gormstore.GetGatewayStore(db)
 			clientStore := gormstore.GetClientStore(db)
-			ctx := store.WithSoftDeleted(ctx, true)
-			ctx = store.WithExpired(ctx, config.IS.Delete.Restore)
+			expiryDate := time.Now().Add(-1 * config.IS.Delete.Restore)
+			ctx := store.WithSoftDeletedBetween(ctx, nil, &expiryDate)
 			dryRun, err := cmd.Flags().GetBool("dry-run")
 			if err != nil {
 				return err

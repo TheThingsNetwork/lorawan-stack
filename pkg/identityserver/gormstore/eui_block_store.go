@@ -47,7 +47,7 @@ var (
 func (s *euiStore) incrementApplicationDevEUICounter(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, applicationLimit int) error {
 	var appModel Application
 	// Check if application exists.
-	query := s.query(store.WithoutSoftDeleted(ctx), Application{}, withApplicationID(ids.GetApplicationId()))
+	query := s.query(ctx, Application{}, withApplicationID(ids.GetApplicationId()))
 	if err := query.First(&appModel).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return errNotFoundForID(ids)

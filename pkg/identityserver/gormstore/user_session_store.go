@@ -147,7 +147,7 @@ func (s *userSessionStore) DeleteSession(ctx context.Context, userIDs *ttnpb.Use
 
 func (s *userSessionStore) DeleteAllUserSessions(ctx context.Context, userIDs *ttnpb.UserIdentifiers) error {
 	defer trace.StartRegion(ctx, "delete all user sessions").End()
-	user, err := s.findDeletedEntity(ctx, userIDs, "id")
+	user, err := s.findEntity(store.WithSoftDeleted(ctx, false), userIDs, "id")
 	if err != nil {
 		return err
 	}

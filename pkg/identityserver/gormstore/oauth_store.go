@@ -145,7 +145,7 @@ func (s *oauthStore) DeleteAuthorization(ctx context.Context, userIDs *ttnpb.Use
 
 func (s *oauthStore) DeleteUserAuthorizations(ctx context.Context, userIDs *ttnpb.UserIdentifiers) error {
 	defer trace.StartRegion(ctx, "delete user authorizations").End()
-	user, err := s.findDeletedEntity(ctx, userIDs, "id")
+	user, err := s.findEntity(store.WithSoftDeleted(ctx, false), userIDs, "id")
 	if err != nil {
 		return err
 	}
@@ -168,7 +168,7 @@ func (s *oauthStore) DeleteUserAuthorizations(ctx context.Context, userIDs *ttnp
 
 func (s *oauthStore) DeleteClientAuthorizations(ctx context.Context, clientIDs *ttnpb.ClientIdentifiers) error {
 	defer trace.StartRegion(ctx, "delete client authorizations").End()
-	client, err := s.findDeletedEntity(ctx, clientIDs, "id")
+	client, err := s.findEntity(store.WithSoftDeleted(ctx, false), clientIDs, "id")
 	if err != nil {
 		return err
 	}

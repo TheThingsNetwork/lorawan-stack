@@ -112,9 +112,6 @@ func (s *organizationStore) FindOrganizations(ctx context.Context, ids []*ttnpb.
 		store.SetTotal(ctx, total)
 		query = query.Limit(limit).Offset(offset)
 	}
-	if onlyExpired, expireThreshold := store.ExpiredFromContext(ctx); onlyExpired {
-		query = query.Scopes(withExpiredEntities(expireThreshold))
-	}
 	var orgModels []organizationWithUID
 	query = query.Find(&orgModels)
 	store.SetTotal(ctx, uint64(len(orgModels)))

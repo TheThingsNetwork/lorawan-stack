@@ -83,10 +83,6 @@ func (s *baseStore) loadContact(ctx context.Context, contact *Account) (*string,
 	return &contact.ID, nil
 }
 
-func (s *baseStore) findDeletedEntity(ctx context.Context, entityID ttnpb.IDStringer, fields ...string) (modelInterface, error) {
-	return s.findEntity(store.WithSoftDeleted(ctx, false), entityID, fields...)
-}
-
 func (s *baseStore) createEntity(ctx context.Context, model interface{}) error {
 	if model, ok := model.(modelInterface); ok {
 		model.SetContext(ctx)
@@ -126,7 +122,7 @@ func (s *baseStore) deleteEntity(ctx context.Context, entityID ttnpb.IDStringer)
 }
 
 func (s *baseStore) restoreEntity(ctx context.Context, entityID ttnpb.IDStringer) error {
-	model, err := s.findDeletedEntity(ctx, entityID, "id")
+	model, err := s.findEntity(store.WithSoftDeleted(ctx, false), entityID, "id")
 	if err != nil {
 		return err
 	}
@@ -144,7 +140,7 @@ func (s *baseStore) restoreEntity(ctx context.Context, entityID ttnpb.IDStringer
 }
 
 func (s *baseStore) purgeEntity(ctx context.Context, entityID ttnpb.IDStringer) error {
-	model, err := s.findDeletedEntity(ctx, entityID, "id")
+	model, err := s.findEntity(store.WithSoftDeleted(ctx, false), entityID, "id")
 	if err != nil {
 		return err
 	}

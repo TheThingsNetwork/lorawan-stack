@@ -26,6 +26,8 @@ var deletedOptionsKey deletedOptionsKeyType
 type DeletedOptions struct {
 	IncludeDeleted bool
 	OnlyDeleted    bool
+	DeletedBefore  *time.Time
+	DeletedAfter   *time.Time
 }
 
 // WithSoftDeleted returns a context that tells the store to include (only) deleted entities.
@@ -36,9 +38,14 @@ func WithSoftDeleted(ctx context.Context, onlyDeleted bool) context.Context {
 	})
 }
 
-// WithoutSoftDeleted returns a context that tells the store not to query for deleted entities.
-func WithoutSoftDeleted(ctx context.Context) context.Context {
-	return context.WithValue(ctx, deletedOptionsKey, &DeletedOptions{})
+// WithSoftDeletedBetween returns a context that tells the store to include deleted entities between (exclusive) those times.
+func WithSoftDeletedBetween(ctx context.Context, deletedAfter, deletedBefore *time.Time) context.Context {
+	return context.WithValue(ctx, deletedOptionsKey, &DeletedOptions{
+		IncludeDeleted: true,
+		OnlyDeleted:    deletedBefore != nil || deletedAfter != nil,
+		DeletedBefore:  deletedBefore,
+		DeletedAfter:   deletedAfter,
+	})
 }
 
 func SoftDeletedFromContext(ctx context.Context) *DeletedOptions {
@@ -46,28 +53,4 @@ func SoftDeletedFromContext(ctx context.Context) *DeletedOptions {
 		return opts
 	}
 	return nil
-}
-
-type expiredOptionsKeyType struct{}
-
-var expiredOptionsKey expiredOptionsKeyType
-
-type ExpiredOptions struct {
-	OnlyExpired      bool
-	RestoreThreshold time.Duration
-}
-
-// WithExpired returns a context that tells the store to only query expired entities.
-func WithExpired(ctx context.Context, threshold time.Duration) context.Context {
-	return context.WithValue(ctx, expiredOptionsKey, ExpiredOptions{
-		OnlyExpired:      true,
-		RestoreThreshold: threshold,
-	})
-}
-
-func ExpiredFromContext(ctx context.Context) (onlyExpired bool, restoreThreshold time.Duration) {
-	if opts, ok := ctx.Value(expiredOptionsKey).(ExpiredOptions); ok {
-		return opts.OnlyExpired, opts.RestoreThreshold
-	}
-	return
 }

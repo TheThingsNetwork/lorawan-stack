@@ -37,26 +37,26 @@ func withSoftDeleted() func(*gorm.DB) *gorm.DB {
 func withSoftDeletedIfRequested(ctx context.Context) func(*gorm.DB) *gorm.DB {
 	if opts := store.SoftDeletedFromContext(ctx); opts != nil {
 		return func(db *gorm.DB) *gorm.DB {
-			if opts.IncludeDeleted || opts.OnlyDeleted {
+			scope := db.NewScope(db.Value)
+			if !scope.HasColumn("deleted_at") {
+				return db
+			}
+			if opts.IncludeDeleted {
 				db = db.Unscoped()
 			}
-			scope := db.NewScope(db.Value)
-			if opts.OnlyDeleted && scope.HasColumn("deleted_at") {
+			if opts.OnlyDeleted {
 				db = db.Where(fmt.Sprintf("%s.deleted_at IS NOT NULL", scope.TableName()))
+			}
+			if opts.DeletedBefore != nil || opts.DeletedAfter != nil && scope.HasColumn("deleted_at") {
+				if opts.DeletedBefore != nil {
+					db = db.Where(fmt.Sprintf("%s.deleted_at < ?", scope.TableName()), opts.DeletedBefore)
+				}
+				if opts.DeletedAfter != nil {
+					db = db.Where(fmt.Sprintf("%s.deleted_at > ?", scope.TableName()), opts.DeletedAfter)
+				}
 			}
 			return db
 		}
 	}
 	return func(db *gorm.DB) *gorm.DB { return db }
-}
-
-func withExpiredEntities(expireThreshold time.Duration) func(*gorm.DB) *gorm.DB {
-	return func(db *gorm.DB) *gorm.DB {
-		scope := db.NewScope(db.Value)
-		if scope.HasColumn("deleted_at") {
-			db = db.Where(fmt.Sprintf("%s.deleted_at IS NOT NULL", scope.TableName())).
-				Where(fmt.Sprintf("%s.deleted_at < ?", scope.TableName()), time.Now().UTC().Add(-expireThreshold))
-		}
-		return db
-	}
 }

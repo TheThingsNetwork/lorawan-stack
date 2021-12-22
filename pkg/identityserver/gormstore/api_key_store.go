@@ -179,7 +179,7 @@ func (s *apiKeyStore) UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityId
 
 func (s *apiKeyStore) DeleteEntityAPIKeys(ctx context.Context, entityID *ttnpb.EntityIdentifiers) error {
 	defer trace.StartRegion(ctx, "delete entity api keys").End()
-	entity, err := s.findDeletedEntity(ctx, entityID, "id")
+	entity, err := s.findEntity(store.WithSoftDeleted(ctx, false), entityID, "id")
 	if err != nil {
 		return err
 	}

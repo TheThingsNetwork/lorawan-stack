@@ -101,9 +101,6 @@ func (s *userStore) FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers,
 		store.SetTotal(ctx, total)
 		query = query.Limit(limit).Offset(offset)
 	}
-	if onlyExpired, expireThreshold := store.ExpiredFromContext(ctx); onlyExpired {
-		query = query.Scopes(withExpiredEntities(expireThreshold))
-	}
 	var userModels []userWithUID
 	query = query.Find(&userModels)
 	store.SetTotal(ctx, uint64(len(userModels)))

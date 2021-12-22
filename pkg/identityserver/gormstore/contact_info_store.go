@@ -270,7 +270,7 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 
 func (s *contactInfoStore) DeleteEntityContactInfo(ctx context.Context, entityID ttnpb.IDStringer) error {
 	defer trace.StartRegion(ctx, "delete entity contact info").End()
-	entity, err := s.findDeletedEntity(ctx, entityID, "id")
+	entity, err := s.findEntity(store.WithSoftDeleted(ctx, false), entityID, "id")
 	if err != nil {
 		return err
 	}

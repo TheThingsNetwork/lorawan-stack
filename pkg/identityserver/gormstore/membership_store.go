@@ -311,7 +311,7 @@ func (s *membershipStore) SetMember(ctx context.Context, id *ttnpb.OrganizationO
 
 func (s *membershipStore) DeleteEntityMembers(ctx context.Context, entityID *ttnpb.EntityIdentifiers) error {
 	defer trace.StartRegion(ctx, "delete entity memberships").End()
-	entity, err := s.findDeletedEntity(ctx, entityID, "id")
+	entity, err := s.findEntity(store.WithSoftDeleted(ctx, false), entityID, "id")
 	if err != nil {
 		return err
 	}

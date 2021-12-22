@@ -176,3 +176,10 @@ func TestEUIStore(t *testing.T) {
 	st := storetest.New(t, newTestStore)
 	st.TestEUIStore(t)
 }
+
+func TestDeletedEntities(t *testing.T) {
+	t.Parallel()
+
+	st := storetest.New(t, newTestStore)
+	st.TestDeletedEntities(t)
+}
