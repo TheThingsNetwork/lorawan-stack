@@ -12,9 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import GatewayCollaborators from './gateway-collaborators'
-import connect from './connect'
+import { connect } from 'react-redux'
 
-const ConnectedGatewayCollaborators = connect(GatewayCollaborators)
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
-export { ConnectedGatewayCollaborators as default, GatewayCollaborators }
+import { mayViewOrEditGatewayCollaborators } from '@console/lib/feature-checks'
+
+import { selectSelectedGatewayId } from '@console/store/selectors/gateways'
+
+const mapStateToProps = state => ({ gtwId: selectSelectedGatewayId(state) })
+
+export default GatewayCollaborators =>
+  connect(mapStateToProps)(
+    withFeatureRequirement(mayViewOrEditGatewayCollaborators, {
+      redirect: ({ gtwId }) => `/gateways/${gtwId}`,
+    })(GatewayCollaborators),
+  )
