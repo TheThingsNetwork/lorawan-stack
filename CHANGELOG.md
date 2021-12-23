@@ -19,10 +19,14 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+### Security
+
+## [3.16.3] - 2021-12-23
+
+### Fixed
+
 - CLI panic when getting devices.
 - Application uplink processing serialization behavior in the Application Server.
-
-### Security
 
 ## [3.16.2] - 2021-12-17
 
@@ -1939,7 +1943,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.2...v3.16
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.3...v3.16
+[3.16.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.2...v3.16.3
 [3.16.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.1...v3.16.2
 [3.16.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.0...v3.16.1
 [3.16.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.3...v3.16.0
