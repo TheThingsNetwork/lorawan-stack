@@ -216,7 +216,7 @@ func (s *entitySearch) SearchOrganizations(ctx context.Context, member *ttnpb.Or
 
 const user = "user"
 
-func (s *entitySearch) SearchUsers(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchUsersRequest) ([]*ttnpb.UserIdentifiers, error) {
+func (s *entitySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUsersRequest) ([]*ttnpb.UserIdentifiers, error) {
 	defer trace.StartRegion(ctx, "find users").End()
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
@@ -225,7 +225,6 @@ func (s *entitySearch) SearchUsers(ctx context.Context, member *ttnpb.Organizati
 	query = query.
 		Joins(`JOIN "accounts" ON "accounts"."account_type" = 'user' AND "accounts"."account_id" = "users"."id"`).
 		Select(`"accounts"."uid" AS "friendly_id"`)
-	query = s.queryMembership(ctx, query, user, member)
 	query = s.queryMetaFields(ctx, query, user, req)
 	if len(req.State) > 0 {
 		stateNumbers := make([]int, len(req.State))

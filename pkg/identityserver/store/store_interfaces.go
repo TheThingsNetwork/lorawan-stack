@@ -204,7 +204,7 @@ type EntitySearch interface {
 	SearchEndDevices(ctx context.Context, req *ttnpb.SearchEndDevicesRequest) ([]*ttnpb.EndDeviceIdentifiers, error)
 	SearchGateways(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchGatewaysRequest) ([]*ttnpb.GatewayIdentifiers, error)
 	SearchOrganizations(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchOrganizationsRequest) ([]*ttnpb.OrganizationIdentifiers, error)
-	SearchUsers(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchUsersRequest) ([]*ttnpb.UserIdentifiers, error)
+	SearchUsers(ctx context.Context, req *ttnpb.SearchUsersRequest) ([]*ttnpb.UserIdentifiers, error)
 }
 
 // ContactInfoStore interface for contact info validation.

@@ -276,7 +276,7 @@ func TestEntitySearch(t *testing.T) {
 		})
 
 		t.Run("User", func(t *testing.T) {
-			ids, err := s.SearchUsers(ctx, nil, &ttnpb.SearchUsersRequest{
+			ids, err := s.SearchUsers(ctx, &ttnpb.SearchUsersRequest{
 				IdContains:          "foo",
 				NameContains:        "foo",
 				DescriptionContains: "foo",
@@ -288,28 +288,28 @@ func TestEntitySearch(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(ids, should.HaveLength, 1)
 
-			ids, err = s.SearchUsers(ctx, nil, &ttnpb.SearchUsersRequest{
+			ids, err = s.SearchUsers(ctx, &ttnpb.SearchUsersRequest{
 				IdContains: "foo",
 			})
 
 			a.So(err, should.BeNil)
 			a.So(ids, should.HaveLength, 1)
 
-			ids, err = s.SearchUsers(ctx, nil, &ttnpb.SearchUsersRequest{
+			ids, err = s.SearchUsers(ctx, &ttnpb.SearchUsersRequest{
 				NameContains: "foo",
 			})
 
 			a.So(err, should.BeNil)
 			a.So(ids, should.HaveLength, 1)
 
-			ids, err = s.SearchUsers(ctx, nil, &ttnpb.SearchUsersRequest{
+			ids, err = s.SearchUsers(ctx, &ttnpb.SearchUsersRequest{
 				DescriptionContains: "foo",
 			})
 
 			a.So(err, should.BeNil)
 			a.So(ids, should.HaveLength, 1)
 
-			ids, err = s.SearchUsers(ctx, nil, &ttnpb.SearchUsersRequest{
+			ids, err = s.SearchUsers(ctx, &ttnpb.SearchUsersRequest{
 				AttributesContain: map[string]string{
 					"test": "foo",
 				},
@@ -434,7 +434,7 @@ func TestEntitySearch(t *testing.T) {
 		})
 
 		t.Run("deleted user", func(t *testing.T) {
-			ids, err := s.SearchUsers(ctx, nil, &ttnpb.SearchUsersRequest{
+			ids, err := s.SearchUsers(ctx, &ttnpb.SearchUsersRequest{
 				IdContains:          "foo",
 				NameContains:        "foo",
 				DescriptionContains: "foo",
@@ -446,7 +446,7 @@ func TestEntitySearch(t *testing.T) {
 			a.So(err, should.BeNil)
 			a.So(ids, should.HaveLength, 0)
 
-			ids, err = s.SearchUsers(ctx, nil, &ttnpb.SearchUsersRequest{
+			ids, err = s.SearchUsers(ctx, &ttnpb.SearchUsersRequest{
 				IdContains:          "foo",
 				NameContains:        "foo",
 				DescriptionContains: "foo",

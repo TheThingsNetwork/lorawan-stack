@@ -421,7 +421,7 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUser
 	res := &ttnpb.Users{}
 
 	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := gormstore.GetEntitySearch(db).SearchUsers(ctx, nil, req)
+		entityIDs, err := gormstore.GetEntitySearch(db).SearchUsers(ctx, req)
 		if err != nil {
 			return err
 		}
