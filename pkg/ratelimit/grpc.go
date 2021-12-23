@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/peer"
 )
 
 // grpcRemoteIP retrieves the remote IP address by the X-Real-IP header. The header is set by rpcmiddleware.ProxyHeaders
@@ -32,6 +33,9 @@ func grpcRemoteIP(ctx context.Context) string {
 	md, _ := metadata.FromIncomingContext(ctx)
 	if v := md.Get("x-real-ip"); len(v) > 0 {
 		return v[0]
+	}
+	if p, ok := peer.FromContext(ctx); ok {
+		return p.Addr.String()
 	}
 	return ""
 }
