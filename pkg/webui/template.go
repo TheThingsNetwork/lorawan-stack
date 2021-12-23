@@ -23,6 +23,7 @@ import (
 
 	"github.com/gorilla/csrf"
 	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
 
@@ -217,7 +218,6 @@ func (t *AppTemplate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		PageData:             pageData,
 		CSPNonce:             cspNonce,
 	}); err != nil {
-		webhandlers.Error(w, r, err)
-		return
+		log.FromContext(ctx).WithError(err).Warn("Failed to execute template")
 	}
 }
