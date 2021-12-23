@@ -28,7 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
-func New(t *testing.T, newStore func(t *testing.T, dsn url.URL) Store) *StoreTest {
+func New(t *testing.T, newStore func(t *testing.T, dsn *url.URL) Store) *StoreTest {
 	dsn := url.URL{
 		Scheme: "postgresql",
 		Host:   "localhost:5432",
@@ -71,8 +71,16 @@ type Store interface {
 type StoreTest struct {
 	t          *testing.T
 	dsn        url.URL
-	newStore   func(t *testing.T, dsn url.URL) Store
+	newStore   func(t *testing.T, dsn *url.URL) Store
 	population *Population
+}
+
+func (s *StoreTest) schemaDSN(schemaName string) *url.URL {
+	dsn := s.dsn
+	query := dsn.Query()
+	query.Add("search_path", schemaName)
+	dsn.RawQuery = query.Encode()
+	return &dsn
 }
 
 func (s *StoreTest) PrepareDB(t *testing.T) Store {
@@ -98,12 +106,7 @@ func (s *StoreTest) PrepareDB(t *testing.T) Store {
 		t.Fatal(err)
 	}
 
-	dsn := s.dsn
-	query := dsn.Query()
-	query.Add("search_path", schemaName)
-	dsn.RawQuery = query.Encode()
-
-	store := s.newStore(t, dsn)
+	store := s.newStore(t, s.schemaDSN(schemaName))
 
 	if err := store.Init(); err != nil {
 		t.Fatal(err)
@@ -119,13 +122,19 @@ func (s *StoreTest) PrepareDB(t *testing.T) Store {
 }
 
 func (s *StoreTest) DestroyDB(t *testing.T, assertClean bool, exceptions ...string) {
+	schemaName := strcase.ToSnake(t.Name())
+
+	if t.Failed() {
+		t.Logf("Keeping database to help debugging: %q", s.schemaDSN(schemaName).String())
+		return
+	}
+
 	db, err := sql.Open("postgres", s.dsn.String())
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer db.Close()
 
-	schemaName := strcase.ToSnake(t.Name())
 	start := time.Now()
 
 	var totalRowCount int
