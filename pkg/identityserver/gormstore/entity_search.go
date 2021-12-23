@@ -116,7 +116,7 @@ func (s *entitySearch) runPaginatedQuery(ctx context.Context, query *gorm.DB, en
 
 const application = "application"
 
-func (s *entitySearch) FindApplications(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchApplicationsRequest) ([]*ttnpb.ApplicationIdentifiers, error) {
+func (s *entitySearch) SearchApplications(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchApplicationsRequest) ([]*ttnpb.ApplicationIdentifiers, error) {
 	defer trace.StartRegion(ctx, "find applications").End()
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
@@ -138,7 +138,7 @@ func (s *entitySearch) FindApplications(ctx context.Context, member *ttnpb.Organ
 
 const client = "client"
 
-func (s *entitySearch) FindClients(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchClientsRequest) ([]*ttnpb.ClientIdentifiers, error) {
+func (s *entitySearch) SearchClients(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchClientsRequest) ([]*ttnpb.ClientIdentifiers, error) {
 	defer trace.StartRegion(ctx, "find clients").End()
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
@@ -167,7 +167,7 @@ func (s *entitySearch) FindClients(ctx context.Context, member *ttnpb.Organizati
 
 const gateway = "gateway"
 
-func (s *entitySearch) FindGateways(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchGatewaysRequest) ([]*ttnpb.GatewayIdentifiers, error) {
+func (s *entitySearch) SearchGateways(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchGatewaysRequest) ([]*ttnpb.GatewayIdentifiers, error) {
 	defer trace.StartRegion(ctx, "find gateways").End()
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
@@ -192,7 +192,7 @@ func (s *entitySearch) FindGateways(ctx context.Context, member *ttnpb.Organizat
 
 const organization = "organization"
 
-func (s *entitySearch) FindOrganizations(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchOrganizationsRequest) ([]*ttnpb.OrganizationIdentifiers, error) {
+func (s *entitySearch) SearchOrganizations(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchOrganizationsRequest) ([]*ttnpb.OrganizationIdentifiers, error) {
 	defer trace.StartRegion(ctx, "find organizations").End()
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
@@ -216,7 +216,7 @@ func (s *entitySearch) FindOrganizations(ctx context.Context, member *ttnpb.Orga
 
 const user = "user"
 
-func (s *entitySearch) FindUsers(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchUsersRequest) ([]*ttnpb.UserIdentifiers, error) {
+func (s *entitySearch) SearchUsers(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchUsersRequest) ([]*ttnpb.UserIdentifiers, error) {
 	defer trace.StartRegion(ctx, "find users").End()
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
@@ -245,7 +245,7 @@ func (s *entitySearch) FindUsers(ctx context.Context, member *ttnpb.Organization
 	return identifiers, nil
 }
 
-func (s *entitySearch) FindEndDevices(ctx context.Context, req *ttnpb.SearchEndDevicesRequest) ([]*ttnpb.EndDeviceIdentifiers, error) {
+func (s *entitySearch) SearchEndDevices(ctx context.Context, req *ttnpb.SearchEndDevicesRequest) ([]*ttnpb.EndDeviceIdentifiers, error) {
 	defer trace.StartRegion(ctx, "find end devices").End()
 
 	query := s.query(ctx, &EndDevice{}).

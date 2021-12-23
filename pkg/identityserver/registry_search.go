@@ -75,7 +75,7 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 	var callerMemberships store.MembershipChains
 
 	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := gormstore.GetEntitySearch(db).FindApplications(ctx, member, req)
+		entityIDs, err := gormstore.GetEntitySearch(db).SearchApplications(ctx, member, req)
 		if err != nil {
 			return err
 		}
@@ -160,7 +160,7 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchCl
 	var callerMemberships store.MembershipChains
 
 	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := gormstore.GetEntitySearch(db).FindClients(ctx, member, req)
+		entityIDs, err := gormstore.GetEntitySearch(db).SearchClients(ctx, member, req)
 		if err != nil {
 			return err
 		}
@@ -248,7 +248,7 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchG
 	var callerMemberships store.MembershipChains
 
 	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := gormstore.GetEntitySearch(db).FindGateways(ctx, member, req)
+		entityIDs, err := gormstore.GetEntitySearch(db).SearchGateways(ctx, member, req)
 		if err != nil {
 			return err
 		}
@@ -339,7 +339,7 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 	var callerMemberships store.MembershipChains
 
 	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := gormstore.GetEntitySearch(db).FindOrganizations(ctx, member, req)
+		entityIDs, err := gormstore.GetEntitySearch(db).SearchOrganizations(ctx, member, req)
 		if err != nil {
 			return err
 		}
@@ -421,7 +421,7 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUser
 	res := &ttnpb.Users{}
 
 	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := gormstore.GetEntitySearch(db).FindUsers(ctx, nil, req)
+		entityIDs, err := gormstore.GetEntitySearch(db).SearchUsers(ctx, nil, req)
 		if err != nil {
 			return err
 		}
@@ -479,7 +479,7 @@ func (rs *registrySearch) SearchEndDevices(ctx context.Context, req *ttnpb.Searc
 
 	res := &ttnpb.EndDevices{}
 	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
-		ids, err := gormstore.GetEntitySearch(db).FindEndDevices(ctx, req)
+		ids, err := gormstore.GetEntitySearch(db).SearchEndDevices(ctx, req)
 		if err != nil {
 			return err
 		}
