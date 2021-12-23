@@ -39,6 +39,7 @@ type testStore struct {
 	loginTokenStore
 	oauthStore
 	euiStore
+	entitySearch
 }
 
 func (t testStore) Init() error {
@@ -76,6 +77,7 @@ func newTestStore(t *testing.T, dsn url.URL) storetest.Store {
 		loginTokenStore:   loginTokenStore{baseStore: &baseStore},
 		oauthStore:        oauthStore{baseStore: &baseStore},
 		euiStore:          euiStore{baseStore: &baseStore},
+		entitySearch:      entitySearch{baseStore: &baseStore},
 	}
 }
 
@@ -182,4 +184,11 @@ func TestDeletedEntities(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestDeletedEntities(t)
+}
+
+func TestEntitySearch(t *testing.T) {
+	t.Parallel()
+
+	st := storetest.New(t, newTestStore)
+	st.TestEntitySearch(t)
 }
