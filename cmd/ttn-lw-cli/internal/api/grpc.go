@@ -26,7 +26,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpcretry"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials"
 )
@@ -36,6 +38,9 @@ var (
 	tlsConfig    *tls.Config
 	auth         *rpcmetadata.MD
 	withDump     bool
+	retryMax     uint
+	retryTimeout time.Duration
+	retryCodes   []codes.Code
 )
 
 // SetLogger sets the default API logger
@@ -51,6 +56,21 @@ func SetInsecure(insecure bool) {
 // SetDumpRequests configures the API options to dump gRPC requests.
 func SetDumpRequests(dump bool) {
 	withDump = dump
+}
+
+// SetRetryMax configures the amount of time the client will retry the request
+func SetRetryMax(rm uint) {
+	retryMax = rm
+}
+
+// SetRetryTimeout configures the default timeout before making a retry in a failed request
+func SetRetryTimeout(rt time.Duration) {
+	retryTimeout = rt
+}
+
+// SetRetryCodes configures which response codes will trigger the retry
+func SetRetryCodes(rc ...codes.Code) {
+	retryCodes = rc
 }
 
 // AddCA adds the CA certificate file.
@@ -107,6 +127,12 @@ func GetDialOptions() (opts []grpc.DialOption) {
 	if withDump {
 		opts = append(opts, grpc.WithChainUnaryInterceptor(requestInterceptor))
 	}
+
+	opts = append(opts, grpc.WithChainUnaryInterceptor(
+		rpcretry.UnaryClientInterceptor(
+			rpcretry.WithMax(retryMax),
+			rpcretry.WithDefaultTimeout(retryTimeout),
+		)))
 	return
 }
 

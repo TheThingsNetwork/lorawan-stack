@@ -181,6 +181,10 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 		if config.DumpRequests {
 			api.SetDumpRequests(true)
 		}
+
+		api.SetRetryMax(config.Retry.Max)
+		api.SetRetryTimeout(config.Retry.Timeout)
+
 		if config.CA != "" {
 			pemBytes, err := os.ReadFile(config.CA)
 			if err != nil {

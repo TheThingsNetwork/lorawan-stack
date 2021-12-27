@@ -15,6 +15,8 @@
 package commands
 
 import (
+	"time"
+
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/commands"
 	conf "go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -27,33 +29,44 @@ var (
 	defaultGRPCAddress, _            = discover.DefaultPort(defaultClusterHost, discover.DefaultPorts[!defaultInsecure])
 	defaultOAuthServerBaseAddress, _ = discover.DefaultURL(defaultClusterHost, discover.DefaultHTTPPorts[!defaultInsecure], !defaultInsecure)
 	defaultOAuthServerAddress        = defaultOAuthServerBaseAddress + "/oauth"
+	defaultRetryConfig               = RetryConfig{
+		Max:     5,
+		Timeout: 50 * time.Millisecond,
+	}
 )
 
 // Config for the ttn-lw-cli binary.
 type Config struct {
 	conf.Base                          `name:",squash"`
-	CredentialsID                      string `name:"credentials-id" yaml:"credentials-id" description:"Credentials ID (if using multiple configurations)"`
-	InputFormat                        string `name:"input-format" yaml:"input-format" description:"Input format"`
-	OutputFormat                       string `name:"output-format" yaml:"output-format" description:"Output format"`
-	AllowUnknownHosts                  bool   `name:"allow-unknown-hosts" yaml:"allow-unknown-hosts" description:"Allow sending credentials to unknown hosts"`
-	OAuthServerAddress                 string `name:"oauth-server-address" yaml:"oauth-server-address" description:"OAuth Server address"`
-	IdentityServerGRPCAddress          string `name:"identity-server-grpc-address" yaml:"identity-server-grpc-address" description:"Identity Server address"`
-	GatewayServerEnabled               bool   `name:"gateway-server-enabled" yaml:"gateway-server-enabled" description:"Gateway Server enabled"`
-	GatewayServerGRPCAddress           string `name:"gateway-server-grpc-address" yaml:"gateway-server-grpc-address" description:"Gateway Server address"`
-	NetworkServerEnabled               bool   `name:"network-server-enabled" yaml:"network-server-enabled" description:"Network Server enabled"`
-	NetworkServerGRPCAddress           string `name:"network-server-grpc-address" yaml:"network-server-grpc-address" description:"Network Server address"`
-	ApplicationServerEnabled           bool   `name:"application-server-enabled" yaml:"application-server-enabled" description:"Application Server enabled"`
-	ApplicationServerGRPCAddress       string `name:"application-server-grpc-address" yaml:"application-server-grpc-address" description:"Application Server address"`
-	JoinServerEnabled                  bool   `name:"join-server-enabled" yaml:"join-server-enabled" description:"Join Server enabled"`
-	JoinServerGRPCAddress              string `name:"join-server-grpc-address" yaml:"join-server-grpc-address" description:"Join Server address"`
-	DeviceTemplateConverterGRPCAddress string `name:"device-template-converter-grpc-address" yaml:"device-template-converter-grpc-address" description:"Device Template Converter address"`
-	DeviceClaimingServerGRPCAddress    string `name:"device-claiming-server-grpc-address" yaml:"device-claiming-server-grpc-address" description:"Device Claiming Server address"`
-	QRCodeGeneratorGRPCAddress         string `name:"qr-code-generator-grpc-address" yaml:"qr-code-generator-grpc-address" description:"QR Code Generator address"`
-	PacketBrokerAgentGRPCAddress       string `name:"packet-broker-agent-grpc-address" yaml:"packet-broker-agent-grpc-address" description:"Packet Broker Agent address"`
-	Insecure                           bool   `name:"insecure" yaml:"insecure" description:"Connect without TLS"`
-	CA                                 string `name:"ca" yaml:"ca" description:"CA certificate file"`
-	DumpRequests                       bool   `name:"dump-requests" yaml:"dump-requests" description:"When log level is set to debug, also dump request payload as JSON"`
-	SkipVersionCheck                   bool   `name:"skip-version-check" yaml:"skip-version-check" description:"Do not perform version checks"`
+	CredentialsID                      string      `name:"credentials-id" yaml:"credentials-id" description:"Credentials ID (if using multiple configurations)"`
+	InputFormat                        string      `name:"input-format" yaml:"input-format" description:"Input format"`
+	OutputFormat                       string      `name:"output-format" yaml:"output-format" description:"Output format"`
+	AllowUnknownHosts                  bool        `name:"allow-unknown-hosts" yaml:"allow-unknown-hosts" description:"Allow sending credentials to unknown hosts"`
+	OAuthServerAddress                 string      `name:"oauth-server-address" yaml:"oauth-server-address" description:"OAuth Server address"`
+	IdentityServerGRPCAddress          string      `name:"identity-server-grpc-address" yaml:"identity-server-grpc-address" description:"Identity Server address"`
+	GatewayServerEnabled               bool        `name:"gateway-server-enabled" yaml:"gateway-server-enabled" description:"Gateway Server enabled"`
+	GatewayServerGRPCAddress           string      `name:"gateway-server-grpc-address" yaml:"gateway-server-grpc-address" description:"Gateway Server address"`
+	NetworkServerEnabled               bool        `name:"network-server-enabled" yaml:"network-server-enabled" description:"Network Server enabled"`
+	NetworkServerGRPCAddress           string      `name:"network-server-grpc-address" yaml:"network-server-grpc-address" description:"Network Server address"`
+	ApplicationServerEnabled           bool        `name:"application-server-enabled" yaml:"application-server-enabled" description:"Application Server enabled"`
+	ApplicationServerGRPCAddress       string      `name:"application-server-grpc-address" yaml:"application-server-grpc-address" description:"Application Server address"`
+	JoinServerEnabled                  bool        `name:"join-server-enabled" yaml:"join-server-enabled" description:"Join Server enabled"`
+	JoinServerGRPCAddress              string      `name:"join-server-grpc-address" yaml:"join-server-grpc-address" description:"Join Server address"`
+	DeviceTemplateConverterGRPCAddress string      `name:"device-template-converter-grpc-address" yaml:"device-template-converter-grpc-address" description:"Device Template Converter address"`
+	DeviceClaimingServerGRPCAddress    string      `name:"device-claiming-server-grpc-address" yaml:"device-claiming-server-grpc-address" description:"Device Claiming Server address"`
+	QRCodeGeneratorGRPCAddress         string      `name:"qr-code-generator-grpc-address" yaml:"qr-code-generator-grpc-address" description:"QR Code Generator address"`
+	PacketBrokerAgentGRPCAddress       string      `name:"packet-broker-agent-grpc-address" yaml:"packet-broker-agent-grpc-address" description:"Packet Broker Agent address"`
+	Insecure                           bool        `name:"insecure" yaml:"insecure" description:"Connect without TLS"`
+	CA                                 string      `name:"ca" yaml:"ca" description:"CA certificate file"`
+	DumpRequests                       bool        `name:"dump-requests" yaml:"dump-requests" description:"When log level is set to debug, also dump request payload as JSON"`
+	SkipVersionCheck                   bool        `name:"skip-version-check" yaml:"skip-version-check" description:"Do not perform version checks"`
+	Retry                              RetryConfig `name:"retry-config" yaml:"retry-config" description:"group of settings that describe the behaviour of the retry interceptor of the cli. If not specified the retry will only happen on the ResourceExhausted and Unavailable status codes"`
+}
+
+// RetryConfig defines the values for the retry behaviour in the cli
+type RetryConfig struct {
+	Max     uint          `name:"max" yaml:"max" description:"defines the amount of retries to be attempted when "`
+	Timeout time.Duration `name:"timeout" yaml:"timeout" description:"determines the default amount of time that the client will wait in between retry requests, the value will be used when the rate limit headers cannot be found in the request response"`
 }
 
 func (c Config) getHosts() []string {
@@ -105,6 +118,7 @@ func MakeDefaultConfig(clusterGRPCAddress string, oauthServerAddress string, ins
 		QRCodeGeneratorGRPCAddress:         clusterGRPCAddress,
 		PacketBrokerAgentGRPCAddress:       clusterGRPCAddress,
 		Insecure:                           insecure,
+		Retry:                              defaultRetryConfig,
 	}
 }
 
