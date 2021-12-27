@@ -220,6 +220,7 @@ func (st *StoreTest) TestOAuthStore(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// _, err = s.GetAuthorizationCode(ctx, "")
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -233,13 +234,14 @@ func (st *StoreTest) TestOAuthStore(t *T) {
 	})
 
 	t.Run("DeleteAuthorizationCode_Other", func(t *T) {
-		// FIXME: DeleteAuthorizationCode does not return NotFound error when code not found
+		// FIXME: DeleteAuthorizationCode does not return NotFound error when code not found (https://github.com/TheThingsNetwork/lorawan-stack/issues/5046).
 		t.Skip("DeleteAuthorizationCode does not return NotFound error when code not found")
 		// a, ctx := test.New(t)
 		// err := s.DeleteAuthorizationCode(ctx, "OTHER_CODE")
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
 		// }
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// err = s.DeleteAuthorizationCode(ctx, "")
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -298,6 +300,7 @@ func (st *StoreTest) TestOAuthStore(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// _, err = s.GetAccessToken(ctx, "")
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -319,13 +322,14 @@ func (st *StoreTest) TestOAuthStore(t *T) {
 	})
 
 	t.Run("DeleteAccessToken_Other", func(t *T) {
-		// FIXME: DeleteAccessToken does not return NotFound error when token not found
+		// FIXME: DeleteAccessToken does not return NotFound error when token not found (https://github.com/TheThingsNetwork/lorawan-stack/issues/5046).
 		t.Skip("DeleteAccessToken does not return NotFound error when token not found")
 		// a, ctx := test.New(t)
 		// err := s.DeleteAccessToken(ctx, "other_id")
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
 		// }
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// err = s.DeleteAccessToken(ctx, "")
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -349,4 +353,4 @@ func (st *StoreTest) TestOAuthStore(t *T) {
 	})
 }
 
-// TODO: Test Pagination
+// TODO: Test Pagination (https://github.com/TheThingsNetwork/lorawan-stack/issues/5047).

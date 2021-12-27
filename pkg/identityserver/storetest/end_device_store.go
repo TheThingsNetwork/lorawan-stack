@@ -171,6 +171,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// _, err = s.GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
 		// 	ApplicationIds: application.GetIds(),
 		// 	DeviceId:       "",
@@ -200,12 +201,6 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		if a.So(err, should.BeNil) {
 			a.So(count, should.Equal, 0)
 		}
-		// count, err = s.CountEndDevices(ctx, &ttnpb.ApplicationIdentifiers{
-		// 	ApplicationId: "",
-		// })
-		// if a.So(err, should.BeNil) {
-		// 	a.So(count, should.Equal, 0)
-		// }
 	})
 
 	t.Run("ListEndDevices", func(t *T) {
@@ -228,12 +223,6 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 			a.So(got, should.BeEmpty)
 		}
-		// got, err = s.ListEndDevices(ctx, &ttnpb.ApplicationIdentifiers{
-		// 	ApplicationId: "",
-		// }, mask)
-		// if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-		// 	a.So(got, should.BeEmpty)
-		// }
 	})
 
 	t.Run("FindEndDevices", func(t *T) {
@@ -333,6 +322,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// _, err = s.UpdateEndDevice(ctx, &ttnpb.EndDevice{
 		// 	Ids: &ttnpb.EndDeviceIdentifiers{
 		// 		ApplicationIds: application.GetIds(),
@@ -373,6 +363,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// err = s.DeleteEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
 		// 	ApplicationIds: application.GetIds(),
 		// 	DeviceId:       "",

@@ -84,7 +84,7 @@ func (st *StoreTest) TestEUIStore(t *T) {
 	})
 
 	t.Run("CreateEUIBlock_Extra", func(t *T) {
-		// FIXME: CreateEUIBlock updates an EUI block instead of creating a new one
+		// FIXME: CreateEUIBlock updates an EUI block instead of creating a new one (https://github.com/TheThingsNetwork/lorawan-stack/issues/5045).
 		t.Skip("CreateEUIBlock updates an EUI block instead of creating a new one")
 		// a, ctx := test.New(t)
 		// err := s.CreateEUIBlock(ctx, "dev_eui", types.EUI64Prefix{
@@ -95,7 +95,8 @@ func (st *StoreTest) TestEUIStore(t *T) {
 	})
 
 	t.Run("IssueDevEUIForApplication_ExtraBlock", func(t *T) {
-		// TODO: Enable after FIXME above done.
+		// TODO: See CreateEUIBlock_Extra.
+		t.Skip("See CreateEUIBlock_Extra")
 		// a, ctx := test.New(t)
 		// eui, err := s.IssueDevEUIForApplication(ctx, app1.GetIds(), 3)
 		// if a.So(err, should.BeNil) && a.So(eui, should.NotBeNil) {

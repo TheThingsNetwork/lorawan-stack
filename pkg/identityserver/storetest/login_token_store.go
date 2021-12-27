@@ -91,6 +91,7 @@ func (st *StoreTest) TestLoginTokenStore(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// _, err = s.ConsumeLoginToken(ctx, "")
 		// a.So(err, should.BeNil)
 		// if a.So(err, should.NotBeNil) {

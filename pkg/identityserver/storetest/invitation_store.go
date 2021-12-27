@@ -87,6 +87,7 @@ func (st *StoreTest) TestInvitationStore(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// _, err = s.GetInvitation(ctx, "")
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -121,6 +122,7 @@ func (st *StoreTest) TestInvitationStore(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// err = s.SetInvitationAcceptedBy(ctx, "", usr1.GetIds())
 		// a.So(err, should.BeNil)
 		// if a.So(err, should.NotBeNil) {
@@ -164,6 +166,7 @@ func (st *StoreTest) TestInvitationStore(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// err = s.DeleteInvitation(ctx, "")
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -210,4 +213,4 @@ func (st *StoreTest) TestInvitationStore(t *T) {
 	})
 }
 
-// TODO: Test Pagination
+// TODO: Test Pagination (https://github.com/TheThingsNetwork/lorawan-stack/issues/5047).

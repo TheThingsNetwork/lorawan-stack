@@ -74,6 +74,7 @@ func (st *StoreTest) TestUserSessionStore(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// _, err = s.GetSession(ctx, usr1.GetIds(), "")
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -94,6 +95,7 @@ func (st *StoreTest) TestUserSessionStore(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// _, err = s.GetSessionByID(ctx, "")
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -120,6 +122,7 @@ func (st *StoreTest) TestUserSessionStore(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// err = s.DeleteSession(ctx, usr1.GetIds(), "")
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)

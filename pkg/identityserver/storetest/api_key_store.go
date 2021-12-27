@@ -197,4 +197,4 @@ func (st *StoreTest) TestAPIKeyStoreCRUD(t *T) {
 	}
 }
 
-// TODO: Test Pagination
+// TODO: Test Pagination (https://github.com/TheThingsNetwork/lorawan-stack/issues/5047).

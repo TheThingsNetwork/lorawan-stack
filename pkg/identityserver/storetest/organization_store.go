@@ -87,6 +87,7 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// _, err = s.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: ""}, mask)
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -132,6 +133,7 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// _, err = s.UpdateOrganization(ctx, &ttnpb.Organization{
 		// 	Ids: &ttnpb.OrganizationIdentifiers{OrganizationId: ""},
 		// }, mask)
@@ -160,6 +162,7 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// err = s.DeleteOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: ""})
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -218,6 +221,7 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// err = s.RestoreOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: ""})
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -244,6 +248,7 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// err = s.PurgeOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: ""})
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -251,4 +256,4 @@ func (st *StoreTest) TestOrganizationStoreCRUD(t *T) {
 	})
 }
 
-// TODO: Test Pagination
+// TODO: Test Pagination (https://github.com/TheThingsNetwork/lorawan-stack/issues/5047).

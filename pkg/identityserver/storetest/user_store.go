@@ -142,6 +142,7 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// _, err = s.GetUser(ctx, &ttnpb.UserIdentifiers{UserId: ""}, mask)
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -231,6 +232,7 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// _, err = s.UpdateUser(ctx, &ttnpb.User{
 		// 	Ids: &ttnpb.UserIdentifiers{UserId: ""},
 		// }, mask)
@@ -259,6 +261,7 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// err = s.DeleteUser(ctx, &ttnpb.UserIdentifiers{UserId: ""})
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -317,6 +320,7 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// err = s.RestoreUser(ctx, &ttnpb.UserIdentifiers{UserId: ""})
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -343,6 +347,7 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// err = s.PurgeUser(ctx, &ttnpb.UserIdentifiers{UserId: ""})
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -350,4 +355,4 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 	})
 }
 
-// TODO: Test Pagination
+// TODO: Test Pagination (https://github.com/TheThingsNetwork/lorawan-stack/issues/5047).

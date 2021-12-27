@@ -171,6 +171,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// _, err = s.GetGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: ""}, mask)
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -285,6 +286,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// _, err = s.UpdateGateway(ctx, &ttnpb.Gateway{
 		// 	Ids: &ttnpb.GatewayIdentifiers{GatewayId: ""},
 		// }, mask)
@@ -313,6 +315,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// err = s.DeleteGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: ""})
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -373,6 +376,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// err = s.RestoreGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: ""})
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -399,6 +403,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		// TODO: Enable test (https://github.com/TheThingsIndustries/lorawan-stack/issues/3034).
 		// err = s.PurgeGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: ""})
 		// if a.So(err, should.NotBeNil) {
 		// 	a.So(errors.IsNotFound(err), should.BeTrue)
@@ -406,4 +411,4 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 	})
 }
 
-// TODO: Test Pagination
+// TODO: Test Pagination (https://github.com/TheThingsNetwork/lorawan-stack/issues/5047).
