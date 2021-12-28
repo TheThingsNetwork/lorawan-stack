@@ -1,5 +1,5 @@
 name: End-to-end Tests
-concurrency: 
+concurrency:
   group: e2e-${{ github.ref }}
   cancel-in-progress: true
 on:
@@ -32,6 +32,7 @@ jobs:
       needs-to-run: ${{ steps.check-result.outputs.passed != 'true' }}
       hash: ${{ steps.get-hash.outputs.hash }}
       yarn-cache-dir-path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+    timeout-minutes: 5
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -61,6 +62,7 @@ jobs:
     runs-on: ubuntu-20.04
     needs: determine-if-required
     if: needs.determine-if-required.outputs.needs-to-run == 'true'
+    timeout-minutes: 30
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -175,6 +177,7 @@ jobs:
         machines: [1, 2, 3, 4]
     needs: [determine-if-required, preparation]
     if: needs.determine-if-required.outputs.needs-to-run == 'true'
+    timeout-minutes: 15
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -266,6 +269,7 @@ jobs:
       NODE_ENV: development
     needs: [determine-if-required, preparation]
     if: needs.determine-if-required.outputs.needs-to-run == 'true'
+    timeout-minutes: 15
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -322,6 +326,7 @@ jobs:
     name: Write result cache
     runs-on: ubuntu-20.04
     needs: [preparation, end-to-end, cross-browser-smoke, determine-if-required]
+    timeout-minutes: 5
     steps:
       - name: Setup result cache to skip redundant runs
         id: run-cache

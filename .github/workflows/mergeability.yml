@@ -23,6 +23,7 @@ jobs:
         tools/go.mod
         tools/go.sum
         yarn.lock
+    timeout-minutes: 5
     steps:
       - name: Configure Git
         run: |
