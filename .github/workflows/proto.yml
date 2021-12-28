@@ -11,6 +11,7 @@ jobs:
   protos:
     name: Generate protos
     runs-on: ubuntu-20.04
+    timeout-minutes: 5
     steps:
     - name: Check out code
       uses: actions/checkout@v2
