@@ -91,10 +91,14 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 			return nil, err
 		}
 	}
-	if err := validateCollaboratorEqualsContact(req.Collaborator, req.Application.AdministrativeContact); err != nil {
+	if req.Application.AdministrativeContact == nil {
+		req.Application.AdministrativeContact = req.Collaborator
+	} else if err := validateCollaboratorEqualsContact(req.Collaborator, req.Application.AdministrativeContact); err != nil {
 		return nil, err
 	}
-	if err := validateCollaboratorEqualsContact(req.Collaborator, req.Application.TechnicalContact); err != nil {
+	if req.Application.TechnicalContact == nil {
+		req.Application.TechnicalContact = req.Collaborator
+	} else if err := validateCollaboratorEqualsContact(req.Collaborator, req.Application.TechnicalContact); err != nil {
 		return nil, err
 	}
 	if err := validateContactInfo(req.Application.ContactInfo); err != nil {

@@ -90,10 +90,14 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 		}
 	}
 
-	if err := validateCollaboratorEqualsContact(req.Collaborator, req.Client.AdministrativeContact); err != nil {
+	if req.Client.AdministrativeContact == nil {
+		req.Client.AdministrativeContact = req.Collaborator
+	} else if err := validateCollaboratorEqualsContact(req.Collaborator, req.Client.AdministrativeContact); err != nil {
 		return nil, err
 	}
-	if err := validateCollaboratorEqualsContact(req.Collaborator, req.Client.TechnicalContact); err != nil {
+	if req.Client.TechnicalContact == nil {
+		req.Client.TechnicalContact = req.Collaborator
+	} else if err := validateCollaboratorEqualsContact(req.Collaborator, req.Client.TechnicalContact); err != nil {
 		return nil, err
 	}
 	if err := validateContactInfo(req.Client.ContactInfo); err != nil {

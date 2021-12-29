@@ -83,10 +83,14 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 		return nil, errNestedOrganizations.New()
 	}
 
-	if err := validateCollaboratorEqualsContact(req.Collaborator, req.Organization.AdministrativeContact); err != nil {
+	if req.Organization.AdministrativeContact == nil {
+		req.Organization.AdministrativeContact = req.Collaborator
+	} else if err := validateCollaboratorEqualsContact(req.Collaborator, req.Organization.AdministrativeContact); err != nil {
 		return nil, err
 	}
-	if err := validateCollaboratorEqualsContact(req.Collaborator, req.Organization.TechnicalContact); err != nil {
+	if req.Organization.TechnicalContact == nil {
+		req.Organization.TechnicalContact = req.Collaborator
+	} else if err := validateCollaboratorEqualsContact(req.Collaborator, req.Organization.TechnicalContact); err != nil {
 		return nil, err
 	}
 	if err := validateContactInfo(req.Organization.ContactInfo); err != nil {

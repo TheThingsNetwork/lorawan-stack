@@ -88,10 +88,14 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		}
 	}
 
-	if err := validateCollaboratorEqualsContact(req.Collaborator, req.Gateway.AdministrativeContact); err != nil {
+	if req.Gateway.AdministrativeContact == nil {
+		req.Gateway.AdministrativeContact = req.Collaborator
+	} else if err := validateCollaboratorEqualsContact(req.Collaborator, req.Gateway.AdministrativeContact); err != nil {
 		return nil, err
 	}
-	if err := validateCollaboratorEqualsContact(req.Collaborator, req.Gateway.TechnicalContact); err != nil {
+	if req.Gateway.TechnicalContact == nil {
+		req.Gateway.TechnicalContact = req.Collaborator
+	} else if err := validateCollaboratorEqualsContact(req.Collaborator, req.Gateway.TechnicalContact); err != nil {
 		return nil, err
 	}
 	if err := validateContactInfo(reqGtw.ContactInfo); err != nil {
