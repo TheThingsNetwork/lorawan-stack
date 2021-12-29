@@ -467,7 +467,7 @@ var (
 								return err
 							}
 							logger.WithField("default_join_eui", defaultJoinEUI.JoinEui.String()).
-								Info("Successfully obtained Join Server's default Join EUI")
+								Info("Successfully obtained Join Server's default JoinEUI")
 							device.Ids.JoinEui = defaultJoinEUI.JoinEui
 						}
 					}
