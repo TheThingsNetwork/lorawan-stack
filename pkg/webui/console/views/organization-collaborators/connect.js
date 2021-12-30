@@ -12,9 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import OrganizationCollaborators from './organization-collaborators'
-import connect from './connect'
+import { connect } from 'react-redux'
 
-const ConnectedOrganizationCollaborators = connect(OrganizationCollaborators)
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
-export { ConnectedOrganizationCollaborators as default, OrganizationCollaborators }
+import { mayViewOrEditOrganizationCollaborators } from '@console/lib/feature-checks'
+
+import { selectSelectedOrganizationId } from '@console/store/selectors/organizations'
+
+const mapStateToProps = state => ({ orgId: selectSelectedOrganizationId(state) })
+
+export default OrganizationCollaborators =>
+  connect(mapStateToProps)(
+    withFeatureRequirement(mayViewOrEditOrganizationCollaborators, {
+      redirect: ({ orgId }) => `/organizations/${orgId}`,
+    })(OrganizationCollaborators),
+  )
