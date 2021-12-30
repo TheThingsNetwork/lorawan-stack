@@ -18902,6 +18902,1441 @@
       "services": []
     },
     {
+      "name": "lorawan-stack/api/gateway_configuration.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "GatewayInfoResponse",
+          "longName": "GatewayInfoResponse",
+          "fullName": "ttn.lorawan.v3.GatewayInfoResponse",
+          "description": "GatewayInfoResponse represents the response of the v2 route of the gateway\nconfiguration server",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "attributes",
+              "description": "",
+              "label": "",
+              "type": "Attributes",
+              "longType": "GatewayInfoResponse.Attributes",
+              "fullType": "ttn.lorawan.v3.GatewayInfoResponse.Attributes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "frequency_plan",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "frequency_plan_url",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "auto_update",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "firmware_url",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "antenna_location",
+              "description": "",
+              "label": "",
+              "type": "AntennaLocation",
+              "longType": "GatewayInfoResponse.AntennaLocation",
+              "fullType": "ttn.lorawan.v3.GatewayInfoResponse.AntennaLocation",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "oauth2_token",
+              "description": "",
+              "label": "",
+              "type": "OAuth2Token",
+              "longType": "GatewayInfoResponse.OAuth2Token",
+              "fullType": "ttn.lorawan.v3.GatewayInfoResponse.OAuth2Token",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "router",
+              "description": "",
+              "label": "",
+              "type": "Router",
+              "longType": "GatewayInfoResponse.Router",
+              "fullType": "ttn.lorawan.v3.GatewayInfoResponse.Router",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "fallback_routers",
+              "description": "",
+              "label": "repeated",
+              "type": "Router",
+              "longType": "GatewayInfoResponse.Router",
+              "fullType": "ttn.lorawan.v3.GatewayInfoResponse.Router",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "AntennaLocation",
+          "longName": "GatewayInfoResponse.AntennaLocation",
+          "fullName": "ttn.lorawan.v3.GatewayInfoResponse.AntennaLocation",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "latitude",
+              "description": "",
+              "label": "",
+              "type": "double",
+              "longType": "double",
+              "fullType": "double",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "longitude",
+              "description": "",
+              "label": "",
+              "type": "double",
+              "longType": "double",
+              "fullType": "double",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "Altitude",
+              "description": "",
+              "label": "",
+              "type": "int32",
+              "longType": "int32",
+              "fullType": "int32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Attributes",
+          "longName": "GatewayInfoResponse.Attributes",
+          "fullName": "ttn.lorawan.v3.GatewayInfoResponse.Attributes",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "description",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "OAuth2Token",
+          "longName": "GatewayInfoResponse.OAuth2Token",
+          "fullName": "ttn.lorawan.v3.GatewayInfoResponse.OAuth2Token",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "access_token",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "expires_in",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Router",
+          "longName": "GatewayInfoResponse.Router",
+          "fullName": "ttn.lorawan.v3.GatewayInfoResponse.Router",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "mqtt_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "IFConfig",
+          "longName": "IFConfig",
+          "fullName": "ttn.lorawan.v3.IFConfig",
+          "description": "IFConfig contains the configuration for one of the channels.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "enable",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "radio",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "if_value",
+              "description": "",
+              "label": "",
+              "type": "int32",
+              "longType": "int32",
+              "fullType": "int32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "bandwidth",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "spread_factor",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "datarate",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "LBTChannelConfig",
+          "longName": "LBTChannelConfig",
+          "fullName": "ttn.lorawan.v3.LBTChannelConfig",
+          "description": "LBTChannelConfig contains the listen-before-talk configuration for a channel.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "frequency",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "scan_time_microseconds",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "LBTConfig",
+          "longName": "LBTConfig",
+          "fullName": "ttn.lorawan.v3.LBTConfig",
+          "description": "LBTConfig contains the configuration for listen-before-talk.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "enable",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "rssi_target",
+              "description": "",
+              "label": "",
+              "type": "float",
+              "longType": "float",
+              "fullType": "float",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "channel_configs",
+              "description": "",
+              "label": "repeated",
+              "type": "LBTChannelConfig",
+              "longType": "LBTChannelConfig",
+              "fullType": "ttn.lorawan.v3.LBTChannelConfig",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "rssi_offset",
+              "description": "",
+              "label": "",
+              "type": "float",
+              "longType": "float",
+              "fullType": "float",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "LoraFwdConfig",
+          "longName": "LoraFwdConfig",
+          "fullName": "ttn.lorawan.v3.LoraFwdConfig",
+          "description": "LorafwdConfig represents the Lorafwd configuration of Semtech's UDP Packet Forwarder.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "filter",
+              "description": "",
+              "label": "",
+              "type": "Filter",
+              "longType": "LoraFwdConfig.Filter",
+              "fullType": "ttn.lorawan.v3.LoraFwdConfig.Filter",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "database",
+              "description": "",
+              "label": "",
+              "type": "Database",
+              "longType": "LoraFwdConfig.Database",
+              "fullType": "ttn.lorawan.v3.LoraFwdConfig.Database",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "gwmp",
+              "description": "",
+              "label": "",
+              "type": "GWMPConfig",
+              "longType": "LoraFwdConfig.GWMPConfig",
+              "fullType": "ttn.lorawan.v3.LoraFwdConfig.GWMPConfig",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "api",
+              "description": "",
+              "label": "",
+              "type": "API",
+              "longType": "LoraFwdConfig.API",
+              "fullType": "ttn.lorawan.v3.LoraFwdConfig.API",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "API",
+          "longName": "LoraFwdConfig.API",
+          "fullName": "ttn.lorawan.v3.LoraFwdConfig.API",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "Database",
+          "longName": "LoraFwdConfig.Database",
+          "fullName": "ttn.lorawan.v3.LoraFwdConfig.Database",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "Filter",
+          "longName": "LoraFwdConfig.Filter",
+          "fullName": "ttn.lorawan.v3.LoraFwdConfig.Filter",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "GWMPConfig",
+          "longName": "LoraFwdConfig.GWMPConfig",
+          "fullName": "ttn.lorawan.v3.LoraFwdConfig.GWMPConfig",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "node",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "service_uplink",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "service_downlink",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "LoradConfig",
+          "longName": "LoradConfig",
+          "fullName": "ttn.lorawan.v3.LoradConfig",
+          "description": "LoradConfig represents the Lorad configuration of Semtech's UDP Packet Forwarder.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "sx1301_config",
+              "description": "",
+              "label": "",
+              "type": "LoradSX1301Config",
+              "longType": "LoradConfig.LoradSX1301Config",
+              "fullType": "ttn.lorawan.v3.LoradConfig.LoradSX1301Config",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "gateway_config",
+              "description": "",
+              "label": "",
+              "type": "GatewayConfig",
+              "longType": "LoradConfig.GatewayConfig",
+              "fullType": "ttn.lorawan.v3.LoradConfig.GatewayConfig",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GatewayConfig",
+          "longName": "LoradConfig.GatewayConfig",
+          "fullName": "ttn.lorawan.v3.LoradConfig.GatewayConfig",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "beacon_enable",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "beacon_period",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "beacon_freq_hz",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "beacon_freq_nb",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "beacon_step",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "beacon_datarate",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "beacon_bw_hz",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "beacon_power",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "beacon_infodesc",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "beacon_latitude",
+              "description": "",
+              "label": "",
+              "type": "double",
+              "longType": "double",
+              "fullType": "double",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "beacon_longitude",
+              "description": "",
+              "label": "",
+              "type": "double",
+              "longType": "double",
+              "fullType": "double",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "LoradSX1301Config",
+          "longName": "LoradConfig.LoradSX1301Config",
+          "fullName": "ttn.lorawan.v3.LoradConfig.LoradSX1301Config",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "global_config",
+              "description": "",
+              "label": "",
+              "type": "SX1301Config",
+              "longType": "SX1301Config",
+              "fullType": "ttn.lorawan.v3.SX1301Config",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "insertion_loss",
+              "description": "",
+              "label": "",
+              "type": "float",
+              "longType": "float",
+              "fullType": "float",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "insertion_loss_desc",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "antenna_gain_desc",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PullFrequencyPlanConfigRequest",
+          "longName": "PullFrequencyPlanConfigRequest",
+          "fullName": "ttn.lorawan.v3.PullFrequencyPlanConfigRequest",
+          "description": "request information necessary for the v2 route that returns the frequency\nplans configuraiton",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "frequency_plan_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "RFConfig",
+          "longName": "RFConfig",
+          "fullName": "ttn.lorawan.v3.RFConfig",
+          "description": "RFConfig contains the configuration for one of the radios.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "enable",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "type",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "frequency",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "rssi_offset",
+              "description": "",
+              "label": "",
+              "type": "float",
+              "longType": "float",
+              "fullType": "float",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tx_enable",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tx_freq_min",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tx_freq_max",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tx_notch_freq",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "SX1301Config",
+          "longName": "SX1301Config",
+          "fullName": "ttn.lorawan.v3.SX1301Config",
+          "description": "SX1301Config contains the configuration for the SX1301 concentrator.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "lorawan_public",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "clock_source",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "antenna_gain",
+              "description": "",
+              "label": "",
+              "type": "float",
+              "longType": "float",
+              "fullType": "float",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "lbt_config",
+              "description": "",
+              "label": "",
+              "type": "LBTConfig",
+              "longType": "LBTConfig",
+              "fullType": "ttn.lorawan.v3.LBTConfig",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "radios",
+              "description": "",
+              "label": "repeated",
+              "type": "RFConfig",
+              "longType": "RFConfig",
+              "fullType": "ttn.lorawan.v3.RFConfig",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "channels",
+              "description": "",
+              "label": "repeated",
+              "type": "IFConfig",
+              "longType": "IFConfig",
+              "fullType": "ttn.lorawan.v3.IFConfig",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "lora_standard_channel",
+              "description": "",
+              "label": "",
+              "type": "IFConfig",
+              "longType": "IFConfig",
+              "fullType": "ttn.lorawan.v3.IFConfig",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "fsk_channel",
+              "description": "",
+              "label": "",
+              "type": "IFConfig",
+              "longType": "IFConfig",
+              "fullType": "ttn.lorawan.v3.IFConfig",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tx_lut_configs",
+              "description": "",
+              "label": "repeated",
+              "type": "TxLUTConfig",
+              "longType": "TxLUTConfig",
+              "fullType": "ttn.lorawan.v3.TxLUTConfig",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "SemtechUDPConfig",
+          "longName": "SemtechUDPConfig",
+          "fullName": "ttn.lorawan.v3.SemtechUDPConfig",
+          "description": "SemtechUDPConfig is the full configuration for Semtech's UDP Packet Forwarder.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "sx1301_config",
+              "description": "",
+              "label": "",
+              "type": "SX1301Config",
+              "longType": "SX1301Config",
+              "fullType": "ttn.lorawan.v3.SX1301Config",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "gateway_config",
+              "description": "",
+              "label": "",
+              "type": "GatewayConfig",
+              "longType": "SemtechUDPConfig.GatewayConfig",
+              "fullType": "ttn.lorawan.v3.SemtechUDPConfig.GatewayConfig",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GatewayConfig",
+          "longName": "SemtechUDPConfig.GatewayConfig",
+          "fullName": "ttn.lorawan.v3.SemtechUDPConfig.GatewayConfig",
+          "description": "GatewayConf contains the configuration for the gateway's server connection.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_id",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "server_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "server_port_up",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "server_port_down",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "enabled",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "servers",
+              "description": "",
+              "label": "repeated",
+              "type": "GatewayConfig",
+              "longType": "SemtechUDPConfig.GatewayConfig",
+              "fullType": "ttn.lorawan.v3.SemtechUDPConfig.GatewayConfig",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "TxLUTConfig",
+          "longName": "TxLUTConfig",
+          "fullName": "ttn.lorawan.v3.TxLUTConfig",
+          "description": "TxLUTConfig contains the configuration for the TX LUT ind",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "pa_gain",
+              "description": "",
+              "label": "",
+              "type": "int32",
+              "longType": "int32",
+              "fullType": "int32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "mix_gain",
+              "description": "",
+              "label": "",
+              "type": "int32",
+              "longType": "int32",
+              "fullType": "int32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "rf_power",
+              "description": "",
+              "label": "",
+              "type": "int32",
+              "longType": "int32",
+              "fullType": "int32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "dig_gain",
+              "description": "",
+              "label": "",
+              "type": "int32",
+              "longType": "int32",
+              "fullType": "int32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "lorawan-stack/api/gateway_configuration_service.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": false,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [],
+      "services": [
+        {
+          "name": "GatewayConfigurationService",
+          "longName": "GatewayConfigurationService",
+          "fullName": "ttn.lorawan.v3.GatewayConfigurationService",
+          "description": "",
+          "methods": [
+            {
+              "name": "SemtechUDPGlobalConfig",
+              "description": "",
+              "requestType": "PullGatewayConfigurationRequest",
+              "requestLongType": "PullGatewayConfigurationRequest",
+              "requestFullType": "ttn.lorawan.v3.PullGatewayConfigurationRequest",
+              "requestStreaming": false,
+              "responseType": "SemtechUDPConfig",
+              "responseLongType": "SemtechUDPConfig",
+              "responseFullType": "ttn.lorawan.v3.SemtechUDPConfig",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/api/v3/gcs/gateways/{gateway_ids.gateway_id}/semtechudp/global_conf"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "KerlinkLoradConfig",
+              "description": "",
+              "requestType": "PullGatewayConfigurationRequest",
+              "requestLongType": "PullGatewayConfigurationRequest",
+              "requestFullType": "ttn.lorawan.v3.PullGatewayConfigurationRequest",
+              "requestStreaming": false,
+              "responseType": "LoradConfig",
+              "responseLongType": "LoradConfig",
+              "responseFullType": "ttn.lorawan.v3.LoradConfig",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/api/v3/gcs/gateways/{gateway_ids.gateway_id}/kerlink-cpf/lorad/lorad.json"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "KerlinkLoradFwdConfig",
+              "description": "",
+              "requestType": "PullGatewayConfigurationRequest",
+              "requestLongType": "PullGatewayConfigurationRequest",
+              "requestFullType": "ttn.lorawan.v3.PullGatewayConfigurationRequest",
+              "requestStreaming": false,
+              "responseType": "LoraFwdConfig",
+              "responseLongType": "LoraFwdConfig",
+              "responseFullType": "ttn.lorawan.v3.LoraFwdConfig",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/api/v3/gcs/gateways/{gateway_ids.gateway_id}/kerlink-cpf/lorafwd/lorafwd.toml"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "GatewayConfigurationServiceV2",
+          "longName": "GatewayConfigurationServiceV2",
+          "fullName": "ttn.lorawan.v3.GatewayConfigurationServiceV2",
+          "description": "",
+          "methods": [
+            {
+              "name": "GetGateway",
+              "description": "",
+              "requestType": "PullGatewayConfigurationRequest",
+              "requestLongType": "PullGatewayConfigurationRequest",
+              "requestFullType": "ttn.lorawan.v3.PullGatewayConfigurationRequest",
+              "requestStreaming": false,
+              "responseType": "GatewayInfoResponse",
+              "responseLongType": "GatewayInfoResponse",
+              "responseFullType": "ttn.lorawan.v3.GatewayInfoResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/api/v2/gateways/{gateway_ids.gateway_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetFrequencyPlan",
+              "description": "",
+              "requestType": "PullFrequencyPlanConfigRequest",
+              "requestLongType": "PullFrequencyPlanConfigRequest",
+              "requestFullType": "ttn.lorawan.v3.PullFrequencyPlanConfigRequest",
+              "requestStreaming": false,
+              "responseType": "SX1301Config",
+              "responseLongType": "SX1301Config",
+              "responseFullType": "ttn.lorawan.v3.SX1301Config",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/api/v2/frequency-plans/{frequency_plan_id}"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "lorawan-stack/api/gateway_services.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
@@ -19114,7 +20549,7 @@
                   "rules": [
                     {
                       "method": "PUT",
-                      "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators",
+                      "pattern": "/api/v3/gateways/{gateway_ids.gateway_id}/collaborators",
                       "body": "*"
                     }
                   ]
@@ -19137,7 +20572,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators"
+                      "pattern": "/api/v3/gateways/{gateway_ids.gateway_id}/collaborators"
                     }
                   ]
                 }

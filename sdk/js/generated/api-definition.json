@@ -2526,6 +2526,70 @@
       ]
     }
   },
+  "GatewayConfigurationService": {
+    "SemtechUDPGlobalConfig": {
+      "file": "lorawan-stack/api/gateway_configuration_service.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/api/v3/gcs/gateways/{gateway_ids.gateway_id}/semtechudp/global_conf",
+          "parameters": [
+            "gateway_ids.gateway_id"
+          ]
+        }
+      ]
+    },
+    "KerlinkLoradConfig": {
+      "file": "lorawan-stack/api/gateway_configuration_service.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/api/v3/gcs/gateways/{gateway_ids.gateway_id}/kerlink-cpf/lorad/lorad.json",
+          "parameters": [
+            "gateway_ids.gateway_id"
+          ]
+        }
+      ]
+    },
+    "KerlinkLoradFwdConfig": {
+      "file": "lorawan-stack/api/gateway_configuration_service.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/api/v3/gcs/gateways/{gateway_ids.gateway_id}/kerlink-cpf/lorafwd/lorafwd.toml",
+          "parameters": [
+            "gateway_ids.gateway_id"
+          ]
+        }
+      ]
+    }
+  },
+  "GatewayConfigurationServiceV2": {
+    "GetGateway": {
+      "file": "lorawan-stack/api/gateway_configuration_service.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/api/v2/gateways/{gateway_ids.gateway_id}",
+          "parameters": [
+            "gateway_ids.gateway_id"
+          ]
+        }
+      ]
+    },
+    "GetFrequencyPlan": {
+      "file": "lorawan-stack/api/gateway_configuration_service.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/api/v2/frequency-plans/{frequency_plan_id}",
+          "parameters": [
+            "frequency_plan_id"
+          ]
+        }
+      ]
+    }
+  },
   "GatewayAccess": {
     "ListRights": {
       "file": "lorawan-stack/api/gateway_services.proto",
@@ -2631,7 +2695,7 @@
       "http": [
         {
           "method": "put",
-          "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators",
+          "pattern": "/api/v3/gateways/{gateway_ids.gateway_id}/collaborators",
           "body": "*",
           "parameters": [
             "gateway_ids.gateway_id"
@@ -2644,7 +2708,7 @@
       "http": [
         {
           "method": "get",
-          "pattern": "/gateways/{gateway_ids.gateway_id}/collaborators",
+          "pattern": "/api/v3/gateways/{gateway_ids.gateway_id}/collaborators",
           "parameters": [
             "gateway_ids.gateway_id"
           ]

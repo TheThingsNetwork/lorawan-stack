@@ -2417,9 +2417,9 @@ var (
 
 	pattern_GatewayAccess_GetCollaborator_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"gateways", "gateway_ids.gateway_id", "collaborator", "organization", "collaborator.organization_ids.organization_id"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_GatewayAccess_SetCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_ids.gateway_id", "collaborators"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_GatewayAccess_SetCollaborator_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v3", "gateways", "gateway_ids.gateway_id", "collaborators"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_GatewayAccess_ListCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"gateways", "gateway_ids.gateway_id", "collaborators"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_GatewayAccess_ListCollaborators_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"api", "v3", "gateways", "gateway_ids.gateway_id", "collaborators"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

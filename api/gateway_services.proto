@@ -176,7 +176,7 @@ service GatewayAccess {
   // The caller is required to have all assigned or/and removed rights.
   rpc SetCollaborator(SetGatewayCollaboratorRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      put: "/gateways/{gateway_ids.gateway_id}/collaborators"
+      put: "/api/v3/gateways/{gateway_ids.gateway_id}/collaborators"
       body: "*"
     };
   };
@@ -184,7 +184,7 @@ service GatewayAccess {
   // List the collaborators on this gateway.
   rpc ListCollaborators(ListGatewayCollaboratorsRequest) returns (Collaborators) {
     option (google.api.http) = {
-      get: "/gateways/{gateway_ids.gateway_id}/collaborators"
+      get: "/api/v3/gateways/{gateway_ids.gateway_id}/collaborators"
     };
   };
 }

@@ -1,0 +1,212 @@
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package ttn.lorawan.v3;
+
+import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
+import "lorawan-stack/api/identifiers.proto";
+
+option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
+
+/*
+  Shared Messages
+*/
+
+// LBTChannelConfig contains the listen-before-talk configuration for a channel.
+message LBTChannelConfig {
+  uint64 frequency = 1;
+  uint32 scan_time_microseconds = 2;
+}
+
+// LBTConfig contains the configuration for listen-before-talk.
+message LBTConfig {
+  bool enable = 1;
+  float rssi_target = 2;
+  repeated LBTChannelConfig channel_configs = 3;
+  float rssi_offset = 4;
+}
+
+// RFConfig contains the configuration for one of the radios.
+message RFConfig {
+  bool enable = 1;
+  string type = 2;
+  uint64 frequency = 3;
+  float rssi_offset = 4;
+  bool tx_enable = 5;
+  uint64 tx_freq_min = 6;
+  uint64 tx_freq_max = 7;
+  uint64 tx_notch_freq = 8;
+}
+
+// IFConfig contains the configuration for one of the channels.
+message IFConfig {
+  bool enable = 1;
+  uint32 radio = 2;
+  int32 if_value = 3;
+  uint32 bandwidth = 4;
+  uint32 spread_factor = 5;
+  uint32 datarate = 6;
+}
+
+// TxLUTConfig contains the configuration for the TX LUT ind
+message TxLUTConfig {
+  int32 pa_gain = 1;
+  int32 mix_gain = 2;
+  int32 rf_power = 3;
+  int32 dig_gain = 4;
+}
+
+
+// SX1301Config contains the configuration for the SX1301 concentrator.
+message SX1301Config {
+  bool lorawan_public = 1;
+  uint32 clock_source = 2;
+  float antenna_gain = 3;
+  LBTConfig lbt_config = 4;
+  repeated RFConfig radios = 5;
+  repeated IFConfig channels = 6;
+  IFConfig lora_standard_channel = 7;
+  IFConfig fsk_channel = 8;
+  repeated TxLUTConfig tx_lut_configs = 9;
+}
+
+/*
+  Semtech definitions
+*/
+
+// SemtechUDPConfig is the full configuration for Semtech's UDP Packet Forwarder.
+message SemtechUDPConfig{
+  SX1301Config sx1301_config = 1;
+
+  // GatewayConf contains the configuration for the gateway's server connection.
+  message GatewayConfig {
+    GatewayIdentifiers gateway_id = 1;
+    string server_address = 2;
+    uint32 server_port_up = 3;
+    uint32 server_port_down = 4;
+    bool enabled = 5;
+    repeated GatewayConfig servers = 6;
+  }
+
+  GatewayConfig gateway_config = 2;
+}
+
+/*
+  Cpf Lorad definitions
+*/
+
+// LoradConfig represents the Lorad configuration of Semtech's UDP Packet Forwarder.
+message LoradConfig{
+  message LoradSX1301Config {
+    SX1301Config global_config = 1;
+    float insertion_loss = 2;
+    string insertion_loss_desc = 3;
+    string antenna_gain_desc = 4;
+  }
+  LoradSX1301Config sx1301_config = 1;
+
+  message GatewayConfig {
+    bool beacon_enable = 1;
+    uint32 beacon_period = 2;
+    uint32 beacon_freq_hz = 3;
+    uint32 beacon_freq_nb = 4;
+    uint32 beacon_step = 5;
+    uint32 beacon_datarate = 6;
+    uint32 beacon_bw_hz = 7;
+    uint32 beacon_power = 8;
+    bytes beacon_infodesc = 9;
+    double beacon_latitude = 10;
+    double beacon_longitude = 11;
+  }
+
+  GatewayConfig gateway_config = 2;
+}
+
+/*
+  Cpf LoraFwd definitions
+*/
+
+// LorafwdConfig represents the Lorafwd configuration of Semtech's UDP Packet Forwarder.
+message LoraFwdConfig{
+  GatewayIdentifiers gateway = 1;
+
+  message Filter {}
+  Filter filter = 2;
+
+  message Database {}
+  Database database = 3;
+
+  message GWMPConfig {
+    string node = 1;
+    uint32 service_uplink = 2;
+    uint32 service_downlink = 3;
+  }
+  GWMPConfig gwmp = 4;
+
+  message API{}
+  API api = 5;
+}
+
+
+
+/*
+  Definitions for the requests that exists in the v2 folder of gateway
+  configuration server
+*/
+
+// GatewayInfoResponse represents the response of the v2 route of the gateway
+// configuration server
+message GatewayInfoResponse {
+  string id = 1;
+
+  message Attributes {
+    string description = 1;
+  }
+  Attributes attributes = 2;
+
+  string frequency_plan = 3;
+  string frequency_plan_url = 4;
+  bool auto_update = 5;
+  string firmware_url = 6;
+
+  message AntennaLocation {
+    double latitude = 1;
+    double longitude = 2;
+    int32 Altitude = 3;
+  }
+  AntennaLocation antenna_location = 7;
+
+
+  message OAuth2Token {
+    string access_token = 1;
+    uint32 expires_in = 2;
+  }
+  OAuth2Token oauth2_token = 8;
+
+  message Router {
+    string id = 1;
+    string mqtt_address = 2;
+  }
+  Router router = 9;
+  repeated Router fallback_routers = 10;
+}
+
+// request information necessary for the v2 route that returns the frequency
+// plans configuraiton
+message PullFrequencyPlanConfigRequest {
+  string frequency_plan_id = 1;
+}
+

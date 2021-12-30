@@ -269,6 +269,32 @@
   - [Message `UpdateGatewayAPIKeyRequest`](#ttn.lorawan.v3.UpdateGatewayAPIKeyRequest)
   - [Message `UpdateGatewayRequest`](#ttn.lorawan.v3.UpdateGatewayRequest)
   - [Enum `GatewayAntennaPlacement`](#ttn.lorawan.v3.GatewayAntennaPlacement)
+- [File `lorawan-stack/api/gateway_configuration.proto`](#lorawan-stack/api/gateway_configuration.proto)
+  - [Message `GatewayInfoResponse`](#ttn.lorawan.v3.GatewayInfoResponse)
+  - [Message `GatewayInfoResponse.AntennaLocation`](#ttn.lorawan.v3.GatewayInfoResponse.AntennaLocation)
+  - [Message `GatewayInfoResponse.Attributes`](#ttn.lorawan.v3.GatewayInfoResponse.Attributes)
+  - [Message `GatewayInfoResponse.OAuth2Token`](#ttn.lorawan.v3.GatewayInfoResponse.OAuth2Token)
+  - [Message `GatewayInfoResponse.Router`](#ttn.lorawan.v3.GatewayInfoResponse.Router)
+  - [Message `IFConfig`](#ttn.lorawan.v3.IFConfig)
+  - [Message `LBTChannelConfig`](#ttn.lorawan.v3.LBTChannelConfig)
+  - [Message `LBTConfig`](#ttn.lorawan.v3.LBTConfig)
+  - [Message `LoraFwdConfig`](#ttn.lorawan.v3.LoraFwdConfig)
+  - [Message `LoraFwdConfig.API`](#ttn.lorawan.v3.LoraFwdConfig.API)
+  - [Message `LoraFwdConfig.Database`](#ttn.lorawan.v3.LoraFwdConfig.Database)
+  - [Message `LoraFwdConfig.Filter`](#ttn.lorawan.v3.LoraFwdConfig.Filter)
+  - [Message `LoraFwdConfig.GWMPConfig`](#ttn.lorawan.v3.LoraFwdConfig.GWMPConfig)
+  - [Message `LoradConfig`](#ttn.lorawan.v3.LoradConfig)
+  - [Message `LoradConfig.GatewayConfig`](#ttn.lorawan.v3.LoradConfig.GatewayConfig)
+  - [Message `LoradConfig.LoradSX1301Config`](#ttn.lorawan.v3.LoradConfig.LoradSX1301Config)
+  - [Message `PullFrequencyPlanConfigRequest`](#ttn.lorawan.v3.PullFrequencyPlanConfigRequest)
+  - [Message `RFConfig`](#ttn.lorawan.v3.RFConfig)
+  - [Message `SX1301Config`](#ttn.lorawan.v3.SX1301Config)
+  - [Message `SemtechUDPConfig`](#ttn.lorawan.v3.SemtechUDPConfig)
+  - [Message `SemtechUDPConfig.GatewayConfig`](#ttn.lorawan.v3.SemtechUDPConfig.GatewayConfig)
+  - [Message `TxLUTConfig`](#ttn.lorawan.v3.TxLUTConfig)
+- [File `lorawan-stack/api/gateway_configuration_service.proto`](#lorawan-stack/api/gateway_configuration_service.proto)
+  - [Service `GatewayConfigurationService`](#ttn.lorawan.v3.GatewayConfigurationService)
+  - [Service `GatewayConfigurationServiceV2`](#ttn.lorawan.v3.GatewayConfigurationServiceV2)
 - [File `lorawan-stack/api/gateway_services.proto`](#lorawan-stack/api/gateway_services.proto)
   - [Message `PullGatewayConfigurationRequest`](#ttn.lorawan.v3.PullGatewayConfigurationRequest)
   - [Service `GatewayAccess`](#ttn.lorawan.v3.GatewayAccess)
@@ -4171,6 +4197,252 @@ Identifies an end device model with version information.
 | `INDOOR` | 1 |  |
 | `OUTDOOR` | 2 |  |
 
+## <a name="lorawan-stack/api/gateway_configuration.proto">File `lorawan-stack/api/gateway_configuration.proto`</a>
+
+### <a name="ttn.lorawan.v3.GatewayInfoResponse">Message `GatewayInfoResponse`</a>
+
+GatewayInfoResponse represents the response of the v2 route of the gateway
+configuration server
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [`string`](#string) |  |  |
+| `attributes` | [`GatewayInfoResponse.Attributes`](#ttn.lorawan.v3.GatewayInfoResponse.Attributes) |  |  |
+| `frequency_plan` | [`string`](#string) |  |  |
+| `frequency_plan_url` | [`string`](#string) |  |  |
+| `auto_update` | [`bool`](#bool) |  |  |
+| `firmware_url` | [`string`](#string) |  |  |
+| `antenna_location` | [`GatewayInfoResponse.AntennaLocation`](#ttn.lorawan.v3.GatewayInfoResponse.AntennaLocation) |  |  |
+| `oauth2_token` | [`GatewayInfoResponse.OAuth2Token`](#ttn.lorawan.v3.GatewayInfoResponse.OAuth2Token) |  |  |
+| `router` | [`GatewayInfoResponse.Router`](#ttn.lorawan.v3.GatewayInfoResponse.Router) |  |  |
+| `fallback_routers` | [`GatewayInfoResponse.Router`](#ttn.lorawan.v3.GatewayInfoResponse.Router) | repeated |  |
+
+### <a name="ttn.lorawan.v3.GatewayInfoResponse.AntennaLocation">Message `GatewayInfoResponse.AntennaLocation`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `latitude` | [`double`](#double) |  |  |
+| `longitude` | [`double`](#double) |  |  |
+| `Altitude` | [`int32`](#int32) |  |  |
+
+### <a name="ttn.lorawan.v3.GatewayInfoResponse.Attributes">Message `GatewayInfoResponse.Attributes`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `description` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.GatewayInfoResponse.OAuth2Token">Message `GatewayInfoResponse.OAuth2Token`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `access_token` | [`string`](#string) |  |  |
+| `expires_in` | [`uint32`](#uint32) |  |  |
+
+### <a name="ttn.lorawan.v3.GatewayInfoResponse.Router">Message `GatewayInfoResponse.Router`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [`string`](#string) |  |  |
+| `mqtt_address` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.IFConfig">Message `IFConfig`</a>
+
+IFConfig contains the configuration for one of the channels.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `enable` | [`bool`](#bool) |  |  |
+| `radio` | [`uint32`](#uint32) |  |  |
+| `if_value` | [`int32`](#int32) |  |  |
+| `bandwidth` | [`uint32`](#uint32) |  |  |
+| `spread_factor` | [`uint32`](#uint32) |  |  |
+| `datarate` | [`uint32`](#uint32) |  |  |
+
+### <a name="ttn.lorawan.v3.LBTChannelConfig">Message `LBTChannelConfig`</a>
+
+LBTChannelConfig contains the listen-before-talk configuration for a channel.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `frequency` | [`uint64`](#uint64) |  |  |
+| `scan_time_microseconds` | [`uint32`](#uint32) |  |  |
+
+### <a name="ttn.lorawan.v3.LBTConfig">Message `LBTConfig`</a>
+
+LBTConfig contains the configuration for listen-before-talk.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `enable` | [`bool`](#bool) |  |  |
+| `rssi_target` | [`float`](#float) |  |  |
+| `channel_configs` | [`LBTChannelConfig`](#ttn.lorawan.v3.LBTChannelConfig) | repeated |  |
+| `rssi_offset` | [`float`](#float) |  |  |
+
+### <a name="ttn.lorawan.v3.LoraFwdConfig">Message `LoraFwdConfig`</a>
+
+LorafwdConfig represents the Lorafwd configuration of Semtech's UDP Packet Forwarder.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| `filter` | [`LoraFwdConfig.Filter`](#ttn.lorawan.v3.LoraFwdConfig.Filter) |  |  |
+| `database` | [`LoraFwdConfig.Database`](#ttn.lorawan.v3.LoraFwdConfig.Database) |  |  |
+| `gwmp` | [`LoraFwdConfig.GWMPConfig`](#ttn.lorawan.v3.LoraFwdConfig.GWMPConfig) |  |  |
+| `api` | [`LoraFwdConfig.API`](#ttn.lorawan.v3.LoraFwdConfig.API) |  |  |
+
+### <a name="ttn.lorawan.v3.LoraFwdConfig.API">Message `LoraFwdConfig.API`</a>
+
+### <a name="ttn.lorawan.v3.LoraFwdConfig.Database">Message `LoraFwdConfig.Database`</a>
+
+### <a name="ttn.lorawan.v3.LoraFwdConfig.Filter">Message `LoraFwdConfig.Filter`</a>
+
+### <a name="ttn.lorawan.v3.LoraFwdConfig.GWMPConfig">Message `LoraFwdConfig.GWMPConfig`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `node` | [`string`](#string) |  |  |
+| `service_uplink` | [`uint32`](#uint32) |  |  |
+| `service_downlink` | [`uint32`](#uint32) |  |  |
+
+### <a name="ttn.lorawan.v3.LoradConfig">Message `LoradConfig`</a>
+
+LoradConfig represents the Lorad configuration of Semtech's UDP Packet Forwarder.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `sx1301_config` | [`LoradConfig.LoradSX1301Config`](#ttn.lorawan.v3.LoradConfig.LoradSX1301Config) |  |  |
+| `gateway_config` | [`LoradConfig.GatewayConfig`](#ttn.lorawan.v3.LoradConfig.GatewayConfig) |  |  |
+
+### <a name="ttn.lorawan.v3.LoradConfig.GatewayConfig">Message `LoradConfig.GatewayConfig`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `beacon_enable` | [`bool`](#bool) |  |  |
+| `beacon_period` | [`uint32`](#uint32) |  |  |
+| `beacon_freq_hz` | [`uint32`](#uint32) |  |  |
+| `beacon_freq_nb` | [`uint32`](#uint32) |  |  |
+| `beacon_step` | [`uint32`](#uint32) |  |  |
+| `beacon_datarate` | [`uint32`](#uint32) |  |  |
+| `beacon_bw_hz` | [`uint32`](#uint32) |  |  |
+| `beacon_power` | [`uint32`](#uint32) |  |  |
+| `beacon_infodesc` | [`bytes`](#bytes) |  |  |
+| `beacon_latitude` | [`double`](#double) |  |  |
+| `beacon_longitude` | [`double`](#double) |  |  |
+
+### <a name="ttn.lorawan.v3.LoradConfig.LoradSX1301Config">Message `LoradConfig.LoradSX1301Config`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `global_config` | [`SX1301Config`](#ttn.lorawan.v3.SX1301Config) |  |  |
+| `insertion_loss` | [`float`](#float) |  |  |
+| `insertion_loss_desc` | [`string`](#string) |  |  |
+| `antenna_gain_desc` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.PullFrequencyPlanConfigRequest">Message `PullFrequencyPlanConfigRequest`</a>
+
+request information necessary for the v2 route that returns the frequency
+plans configuraiton
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `frequency_plan_id` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.RFConfig">Message `RFConfig`</a>
+
+RFConfig contains the configuration for one of the radios.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `enable` | [`bool`](#bool) |  |  |
+| `type` | [`string`](#string) |  |  |
+| `frequency` | [`uint64`](#uint64) |  |  |
+| `rssi_offset` | [`float`](#float) |  |  |
+| `tx_enable` | [`bool`](#bool) |  |  |
+| `tx_freq_min` | [`uint64`](#uint64) |  |  |
+| `tx_freq_max` | [`uint64`](#uint64) |  |  |
+| `tx_notch_freq` | [`uint64`](#uint64) |  |  |
+
+### <a name="ttn.lorawan.v3.SX1301Config">Message `SX1301Config`</a>
+
+SX1301Config contains the configuration for the SX1301 concentrator.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `lorawan_public` | [`bool`](#bool) |  |  |
+| `clock_source` | [`uint32`](#uint32) |  |  |
+| `antenna_gain` | [`float`](#float) |  |  |
+| `lbt_config` | [`LBTConfig`](#ttn.lorawan.v3.LBTConfig) |  |  |
+| `radios` | [`RFConfig`](#ttn.lorawan.v3.RFConfig) | repeated |  |
+| `channels` | [`IFConfig`](#ttn.lorawan.v3.IFConfig) | repeated |  |
+| `lora_standard_channel` | [`IFConfig`](#ttn.lorawan.v3.IFConfig) |  |  |
+| `fsk_channel` | [`IFConfig`](#ttn.lorawan.v3.IFConfig) |  |  |
+| `tx_lut_configs` | [`TxLUTConfig`](#ttn.lorawan.v3.TxLUTConfig) | repeated |  |
+
+### <a name="ttn.lorawan.v3.SemtechUDPConfig">Message `SemtechUDPConfig`</a>
+
+SemtechUDPConfig is the full configuration for Semtech's UDP Packet Forwarder.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `sx1301_config` | [`SX1301Config`](#ttn.lorawan.v3.SX1301Config) |  |  |
+| `gateway_config` | [`SemtechUDPConfig.GatewayConfig`](#ttn.lorawan.v3.SemtechUDPConfig.GatewayConfig) |  |  |
+
+### <a name="ttn.lorawan.v3.SemtechUDPConfig.GatewayConfig">Message `SemtechUDPConfig.GatewayConfig`</a>
+
+GatewayConf contains the configuration for the gateway's server connection.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_id` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| `server_address` | [`string`](#string) |  |  |
+| `server_port_up` | [`uint32`](#uint32) |  |  |
+| `server_port_down` | [`uint32`](#uint32) |  |  |
+| `enabled` | [`bool`](#bool) |  |  |
+| `servers` | [`SemtechUDPConfig.GatewayConfig`](#ttn.lorawan.v3.SemtechUDPConfig.GatewayConfig) | repeated |  |
+
+### <a name="ttn.lorawan.v3.TxLUTConfig">Message `TxLUTConfig`</a>
+
+TxLUTConfig contains the configuration for the TX LUT ind
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pa_gain` | [`int32`](#int32) |  |  |
+| `mix_gain` | [`int32`](#int32) |  |  |
+| `rf_power` | [`int32`](#int32) |  |  |
+| `dig_gain` | [`int32`](#int32) |  |  |
+
+## <a name="lorawan-stack/api/gateway_configuration_service.proto">File `lorawan-stack/api/gateway_configuration_service.proto`</a>
+
+### <a name="ttn.lorawan.v3.GatewayConfigurationService">Service `GatewayConfigurationService`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `SemtechUDPGlobalConfig` | [`PullGatewayConfigurationRequest`](#ttn.lorawan.v3.PullGatewayConfigurationRequest) | [`SemtechUDPConfig`](#ttn.lorawan.v3.SemtechUDPConfig) |  |
+| `KerlinkLoradConfig` | [`PullGatewayConfigurationRequest`](#ttn.lorawan.v3.PullGatewayConfigurationRequest) | [`LoradConfig`](#ttn.lorawan.v3.LoradConfig) |  |
+| `KerlinkLoradFwdConfig` | [`PullGatewayConfigurationRequest`](#ttn.lorawan.v3.PullGatewayConfigurationRequest) | [`LoraFwdConfig`](#ttn.lorawan.v3.LoraFwdConfig) |  |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `SemtechUDPGlobalConfig` | `GET` | `/api/v3/api/v3/gcs/gateways/{gateway_ids.gateway_id}/semtechudp/global_conf` |  |
+| `KerlinkLoradConfig` | `GET` | `/api/v3/api/v3/gcs/gateways/{gateway_ids.gateway_id}/kerlink-cpf/lorad/lorad.json` |  |
+| `KerlinkLoradFwdConfig` | `GET` | `/api/v3/api/v3/gcs/gateways/{gateway_ids.gateway_id}/kerlink-cpf/lorafwd/lorafwd.toml` |  |
+
+### <a name="ttn.lorawan.v3.GatewayConfigurationServiceV2">Service `GatewayConfigurationServiceV2`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `GetGateway` | [`PullGatewayConfigurationRequest`](#ttn.lorawan.v3.PullGatewayConfigurationRequest) | [`GatewayInfoResponse`](#ttn.lorawan.v3.GatewayInfoResponse) |  |
+| `GetFrequencyPlan` | [`PullFrequencyPlanConfigRequest`](#ttn.lorawan.v3.PullFrequencyPlanConfigRequest) | [`SX1301Config`](#ttn.lorawan.v3.SX1301Config) |  |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `GetGateway` | `GET` | `/api/v3/api/v2/gateways/{gateway_ids.gateway_id}` |  |
+| `GetFrequencyPlan` | `GET` | `/api/v3/api/v2/frequency-plans/{frequency_plan_id}` |  |
+
 ## <a name="lorawan-stack/api/gateway_services.proto">File `lorawan-stack/api/gateway_services.proto`</a>
 
 ### <a name="ttn.lorawan.v3.PullGatewayConfigurationRequest">Message `PullGatewayConfigurationRequest`</a>
@@ -4208,8 +4480,8 @@ API keys and collaborators of gateways.
 | `GetCollaborator` | `` | `/api/v3` |  |
 | `GetCollaborator` | `GET` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborator/user/{collaborator.user_ids.user_id}` |  |
 | `GetCollaborator` | `GET` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborator/organization/{collaborator.organization_ids.organization_id}` |  |
-| `SetCollaborator` | `PUT` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborators` | `*` |
-| `ListCollaborators` | `GET` | `/api/v3/gateways/{gateway_ids.gateway_id}/collaborators` |  |
+| `SetCollaborator` | `PUT` | `/api/v3/api/v3/gateways/{gateway_ids.gateway_id}/collaborators` | `*` |
+| `ListCollaborators` | `GET` | `/api/v3/api/v3/gateways/{gateway_ids.gateway_id}/collaborators` |  |
 
 ### <a name="ttn.lorawan.v3.GatewayConfigurator">Service `GatewayConfigurator`</a>
 

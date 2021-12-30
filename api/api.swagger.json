@@ -11,6 +11,324 @@
     "application/json"
   ],
   "paths": {
+    "/api/v2/frequency-plans/{frequency_plan_id}": {
+      "get": {
+        "operationId": "GatewayConfigurationServiceV2_GetFrequencyPlan",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3SX1301Config"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "frequency_plan_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "GatewayConfigurationServiceV2"
+        ]
+      }
+    },
+    "/api/v2/gateways/{gateway_ids.gateway_id}": {
+      "get": {
+        "operationId": "GatewayConfigurationServiceV2_GetGateway",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GatewayInfoResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "GatewayConfigurationServiceV2"
+        ]
+      }
+    },
+    "/api/v3/gateways/{gateway_ids.gateway_id}/collaborators": {
+      "get": {
+        "summary": "List the collaborators on this gateway.",
+        "operationId": "GatewayAccess_ListCollaborators",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3Collaborators"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "limit",
+            "description": "Limit the number of results per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "page",
+            "description": "Page number for pagination. 0 is interpreted as 1.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "GatewayAccess"
+        ]
+      },
+      "put": {
+        "summary": "Set the rights of a collaborator (member) on the gateway.\nThis method can also be used to delete the collaborator, by giving them no rights.\nThe caller is required to have all assigned or/and removed rights.",
+        "operationId": "GatewayAccess_SetCollaborator",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3SetGatewayCollaboratorRequest"
+            }
+          }
+        ],
+        "tags": [
+          "GatewayAccess"
+        ]
+      }
+    },
+    "/api/v3/gcs/gateways/{gateway_ids.gateway_id}/kerlink-cpf/lorad/lorad.json": {
+      "get": {
+        "operationId": "GatewayConfigurationService_KerlinkLoradConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3LoradConfig"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "GatewayConfigurationService"
+        ]
+      }
+    },
+    "/api/v3/gcs/gateways/{gateway_ids.gateway_id}/kerlink-cpf/lorafwd/lorafwd.toml": {
+      "get": {
+        "operationId": "GatewayConfigurationService_KerlinkLoradFwdConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3LoraFwdConfig"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "GatewayConfigurationService"
+        ]
+      }
+    },
+    "/api/v3/gcs/gateways/{gateway_ids.gateway_id}/semtechudp/global_conf": {
+      "get": {
+        "operationId": "GatewayConfigurationService_SemtechUDPGlobalConfig",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3SemtechUDPConfig"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "field_mask.paths",
+            "description": "The set of field mask paths.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "GatewayConfigurationService"
+        ]
+      }
+    },
     "/applications": {
       "get": {
         "summary": "List applications where the given user or organization is a direct collaborator.\nIf no user or organization is given, this returns the applications the caller\nhas access to.\nSimilar to Get, this selects the fields given by the field mask.\nMore or less fields may be returned, depending on the rights of the caller.",
@@ -5199,98 +5517,6 @@
             "in": "query",
             "required": false,
             "type": "string"
-          }
-        ],
-        "tags": [
-          "GatewayAccess"
-        ]
-      }
-    },
-    "/gateways/{gateway_ids.gateway_id}/collaborators": {
-      "get": {
-        "summary": "List the collaborators on this gateway.",
-        "operationId": "GatewayAccess_ListCollaborators",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v3Collaborators"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "gateway_ids.gateway_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "gateway_ids.eui",
-            "description": "Secondary identifier, which can only be used in specific requests.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "format": "byte"
-          },
-          {
-            "name": "limit",
-            "description": "Limit the number of results per page.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "page",
-            "description": "Page number for pagination. 0 is interpreted as 1.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          }
-        ],
-        "tags": [
-          "GatewayAccess"
-        ]
-      },
-      "put": {
-        "summary": "Set the rights of a collaborator (member) on the gateway.\nThis method can also be used to delete the collaborator, by giving them no rights.\nThe caller is required to have all assigned or/and removed rights.",
-        "operationId": "GatewayAccess_SetCollaborator",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "properties": {}
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "gateway_ids.gateway_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v3SetGatewayCollaboratorRequest"
-            }
           }
         ],
         "tags": [
@@ -11051,6 +11277,54 @@
         }
       }
     },
+    "GatewayInfoResponseAntennaLocation": {
+      "type": "object",
+      "properties": {
+        "latitude": {
+          "type": "number",
+          "format": "double"
+        },
+        "longitude": {
+          "type": "number",
+          "format": "double"
+        },
+        "Altitude": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "GatewayInfoResponseAttributes": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "GatewayInfoResponseOAuth2Token": {
+      "type": "object",
+      "properties": {
+        "access_token": {
+          "type": "string"
+        },
+        "expires_in": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "GatewayInfoResponseRouter": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "mqtt_address": {
+          "type": "string"
+        }
+      }
+    },
     "GatewayLRFHSS": {
       "type": "object",
       "properties": {
@@ -11174,6 +11448,49 @@
         },
         "create_organizations": {
           "type": "boolean"
+        }
+      }
+    },
+    "LoraFwdConfigAPI": {
+      "type": "object"
+    },
+    "LoraFwdConfigDatabase": {
+      "type": "object"
+    },
+    "LoraFwdConfigFilter": {
+      "type": "object"
+    },
+    "LoraFwdConfigGWMPConfig": {
+      "type": "object",
+      "properties": {
+        "node": {
+          "type": "string"
+        },
+        "service_uplink": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "service_downlink": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "LoradConfigLoradSX1301Config": {
+      "type": "object",
+      "properties": {
+        "global_config": {
+          "$ref": "#/definitions/v3SX1301Config"
+        },
+        "insertion_loss": {
+          "type": "number",
+          "format": "float"
+        },
+        "insertion_loss_desc": {
+          "type": "string"
+        },
+        "antenna_gain_desc": {
+          "type": "string"
         }
       }
     },
@@ -14989,6 +15306,45 @@
       },
       "description": "GatewayDown contains downlink messages for the gateway."
     },
+    "v3GatewayInfoResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "attributes": {
+          "$ref": "#/definitions/GatewayInfoResponseAttributes"
+        },
+        "frequency_plan": {
+          "type": "string"
+        },
+        "frequency_plan_url": {
+          "type": "string"
+        },
+        "auto_update": {
+          "type": "boolean"
+        },
+        "firmware_url": {
+          "type": "string"
+        },
+        "antenna_location": {
+          "$ref": "#/definitions/GatewayInfoResponseAntennaLocation"
+        },
+        "oauth2_token": {
+          "$ref": "#/definitions/GatewayInfoResponseOAuth2Token"
+        },
+        "router": {
+          "$ref": "#/definitions/GatewayInfoResponseRouter"
+        },
+        "fallback_routers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GatewayInfoResponseRouter"
+          }
+        }
+      },
+      "title": "GatewayInfoResponse represents the response of the v2 route of the gateway\nconfiguration server"
+    },
     "v3GatewayRadio": {
       "type": "object",
       "properties": {
@@ -15201,6 +15557,35 @@
       "default": "GRANT_AUTHORIZATION_CODE",
       "description": "The OAuth2 flows an OAuth client can use to get an access token.\n\n - GRANT_AUTHORIZATION_CODE: Grant type used to exchange an authorization code for an access token.\n - GRANT_PASSWORD: Grant type used to exchange a user ID and password for an access token.\n - GRANT_REFRESH_TOKEN: Grant type used to exchange a refresh token for an access token."
     },
+    "v3IFConfig": {
+      "type": "object",
+      "properties": {
+        "enable": {
+          "type": "boolean"
+        },
+        "radio": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "if_value": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "bandwidth": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "spread_factor": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "datarate": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "description": "IFConfig contains the configuration for one of the channels."
+    },
     "v3Invitations": {
       "type": "object",
       "properties": {
@@ -15380,6 +15765,43 @@
       "default": "KEY_SECURITY_UNKNOWN",
       "description": " - KEY_SECURITY_UNKNOWN: Unknown key security.\n - KEY_SECURITY_NONE: No key security.\n - KEY_SECURITY_READ_PROTECTED: Read Protected key security.\n - KEY_SECURITY_SECURE_ELEMENT: Key security using the Security Element."
     },
+    "v3LBTChannelConfig": {
+      "type": "object",
+      "properties": {
+        "frequency": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "scan_time_microseconds": {
+          "type": "integer",
+          "format": "int64"
+        }
+      },
+      "description": "LBTChannelConfig contains the listen-before-talk configuration for a channel."
+    },
+    "v3LBTConfig": {
+      "type": "object",
+      "properties": {
+        "enable": {
+          "type": "boolean"
+        },
+        "rssi_target": {
+          "type": "number",
+          "format": "float"
+        },
+        "channel_configs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3LBTChannelConfig"
+          }
+        },
+        "rssi_offset": {
+          "type": "number",
+          "format": "float"
+        }
+      },
+      "description": "LBTConfig contains the configuration for listen-before-talk."
+    },
     "v3LRFHSSDataRate": {
       "type": "object",
       "properties": {
@@ -15459,6 +15881,87 @@
       ],
       "default": "SOURCE_UNKNOWN",
       "description": " - SOURCE_UNKNOWN: The source of the location is not known or not set.\n - SOURCE_GPS: The location is determined by GPS.\n - SOURCE_REGISTRY: The location is set in and updated from a registry.\n - SOURCE_IP_GEOLOCATION: The location is estimated with IP geolocation.\n - SOURCE_WIFI_RSSI_GEOLOCATION: The location is estimated with WiFi RSSI geolocation.\n - SOURCE_BT_RSSI_GEOLOCATION: The location is estimated with BT/BLE RSSI geolocation.\n - SOURCE_LORA_RSSI_GEOLOCATION: The location is estimated with LoRa RSSI geolocation.\n - SOURCE_LORA_TDOA_GEOLOCATION: The location is estimated with LoRa TDOA geolocation.\n - SOURCE_COMBINED_GEOLOCATION: The location is estimated by a combination of geolocation sources."
+    },
+    "v3LoraFwdConfig": {
+      "type": "object",
+      "properties": {
+        "gateway": {
+          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
+        },
+        "filter": {
+          "$ref": "#/definitions/LoraFwdConfigFilter"
+        },
+        "database": {
+          "$ref": "#/definitions/LoraFwdConfigDatabase"
+        },
+        "gwmp": {
+          "$ref": "#/definitions/LoraFwdConfigGWMPConfig"
+        },
+        "api": {
+          "$ref": "#/definitions/LoraFwdConfigAPI"
+        }
+      },
+      "description": "LorafwdConfig represents the Lorafwd configuration of Semtech's UDP Packet Forwarder."
+    },
+    "v3LoradConfig": {
+      "type": "object",
+      "properties": {
+        "sx1301_config": {
+          "$ref": "#/definitions/LoradConfigLoradSX1301Config"
+        },
+        "gateway_config": {
+          "$ref": "#/definitions/v3LoradConfigGatewayConfig"
+        }
+      },
+      "description": "LoradConfig represents the Lorad configuration of Semtech's UDP Packet Forwarder."
+    },
+    "v3LoradConfigGatewayConfig": {
+      "type": "object",
+      "properties": {
+        "beacon_enable": {
+          "type": "boolean"
+        },
+        "beacon_period": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "beacon_freq_hz": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "beacon_freq_nb": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "beacon_step": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "beacon_datarate": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "beacon_bw_hz": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "beacon_power": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "beacon_infodesc": {
+          "type": "string",
+          "format": "byte"
+        },
+        "beacon_latitude": {
+          "type": "number",
+          "format": "double"
+        },
+        "beacon_longitude": {
+          "type": "number",
+          "format": "double"
+        }
+      }
     },
     "v3MACCommand": {
       "type": "object",
@@ -16907,6 +17410,41 @@
         }
       }
     },
+    "v3RFConfig": {
+      "type": "object",
+      "properties": {
+        "enable": {
+          "type": "boolean"
+        },
+        "type": {
+          "type": "string"
+        },
+        "frequency": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "rssi_offset": {
+          "type": "number",
+          "format": "float"
+        },
+        "tx_enable": {
+          "type": "boolean"
+        },
+        "tx_freq_min": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "tx_freq_max": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "tx_notch_freq": {
+          "type": "string",
+          "format": "uint64"
+        }
+      },
+      "description": "RFConfig contains the configuration for one of the radios."
+    },
     "v3RejoinCountExponent": {
       "type": "string",
       "enum": [
@@ -17235,6 +17773,50 @@
       },
       "description": "Contains metadata for a received message. Each antenna that receives\na message corresponds to one RxMetadata."
     },
+    "v3SX1301Config": {
+      "type": "object",
+      "properties": {
+        "lorawan_public": {
+          "type": "boolean"
+        },
+        "clock_source": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "antenna_gain": {
+          "type": "number",
+          "format": "float"
+        },
+        "lbt_config": {
+          "$ref": "#/definitions/v3LBTConfig"
+        },
+        "radios": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3RFConfig"
+          }
+        },
+        "channels": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3IFConfig"
+          }
+        },
+        "lora_standard_channel": {
+          "$ref": "#/definitions/v3IFConfig"
+        },
+        "fsk_channel": {
+          "$ref": "#/definitions/v3IFConfig"
+        },
+        "tx_lut_configs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3TxLUTConfig"
+          }
+        }
+      },
+      "description": "SX1301Config contains the configuration for the SX1301 concentrator."
+    },
     "v3ScheduleDownlinkResponse": {
       "type": "object",
       "properties": {
@@ -17269,6 +17851,47 @@
         }
       },
       "description": "Secret contains a secret value. It also contains the ID of the Encryption key used to encrypt it."
+    },
+    "v3SemtechUDPConfig": {
+      "type": "object",
+      "properties": {
+        "sx1301_config": {
+          "$ref": "#/definitions/v3SX1301Config"
+        },
+        "gateway_config": {
+          "$ref": "#/definitions/v3SemtechUDPConfigGatewayConfig"
+        }
+      },
+      "description": "SemtechUDPConfig is the full configuration for Semtech's UDP Packet Forwarder."
+    },
+    "v3SemtechUDPConfigGatewayConfig": {
+      "type": "object",
+      "properties": {
+        "gateway_id": {
+          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
+        },
+        "server_address": {
+          "type": "string"
+        },
+        "server_port_up": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "server_port_down": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "servers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/v3SemtechUDPConfigGatewayConfig"
+          }
+        }
+      },
+      "description": "GatewayConf contains the configuration for the gateway's server connection."
     },
     "v3SendInvitationRequest": {
       "type": "object",
@@ -17574,6 +18197,28 @@
           "description": "The acknowledged downlink message. Set by the Gateway Server."
         }
       }
+    },
+    "v3TxLUTConfig": {
+      "type": "object",
+      "properties": {
+        "pa_gain": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "mix_gain": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "rf_power": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "dig_gain": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "TxLUTConfig contains the configuration for the TX LUT ind"
     },
     "v3TxRequest": {
       "type": "object",
