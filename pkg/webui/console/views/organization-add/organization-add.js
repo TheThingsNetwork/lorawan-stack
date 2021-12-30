@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import bind from 'autobind-decorator'
+import React, { useState, useCallback } from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
@@ -44,55 +43,51 @@ const m = defineMessages({
   createOrganization: 'Create organization',
 })
 
-@withFeatureRequirement(mayCreateOrganizations, { redirect: '/organizations' })
-class Add extends React.Component {
-  static propTypes = {
-    createOrganization: PropTypes.func.isRequired,
-    createOrganizationSuccess: PropTypes.func.isRequired,
-  }
+const OrganizationAdd = props => {
+  const { createOrganization, createOrganizationSuccess } = props
 
-  state = {
-    error: '',
-  }
+  const [error, setError] = useState('')
 
-  @bind
-  handleSubmitFailure(error) {
-    this.setState({ error })
-  }
+  const handleSubmitSuccess = useCallback(
+    organization => {
+      const orgId = getOrganizationId(organization)
 
-  @bind
-  handleSubmitSuccess(organization) {
-    const { createOrganizationSuccess } = this.props
-    const orgId = getOrganizationId(organization)
+      createOrganizationSuccess(orgId)
+    },
+    [createOrganizationSuccess],
+  )
 
-    createOrganizationSuccess(orgId)
-  }
+  const handleSubmitFailure = useCallback(error => {
+    setError(error)
+  }, [])
 
-  render() {
-    const { createOrganization } = this.props
-    const { error } = this.state
-
-    return (
-      <Container>
-        <PageTitle tall title={sharedMessages.addOrganization} />
-        <Row>
-          <Col md={10} lg={9}>
-            <OrganizationForm
-              error={error}
-              onSubmit={createOrganization}
-              onSubmitSuccess={this.handleSubmitSuccess}
-              onSubmitFailure={this.handleSubmitFailure}
-              initialValues={initialValues}
-            >
-              <SubmitBar>
-                <Form.Submit message={m.createOrganization} component={SubmitButton} />
-              </SubmitBar>
-            </OrganizationForm>
-          </Col>
-        </Row>
-      </Container>
-    )
-  }
+  return (
+    <Container>
+      <PageTitle tall title={sharedMessages.addOrganization} />
+      <Row>
+        <Col md={10} lg={9}>
+          <OrganizationForm
+            error={error}
+            onSubmit={createOrganization}
+            onSubmitSuccess={handleSubmitSuccess}
+            onSubmitFailure={handleSubmitFailure}
+            initialValues={initialValues}
+          >
+            <SubmitBar>
+              <Form.Submit message={m.createOrganization} component={SubmitButton} />
+            </SubmitBar>
+          </OrganizationForm>
+        </Col>
+      </Row>
+    </Container>
+  )
 }
 
-export default Add
+OrganizationAdd.propTypes = {
+  createOrganization: PropTypes.func.isRequired,
+  createOrganizationSuccess: PropTypes.func.isRequired,
+}
+
+export default withFeatureRequirement(mayCreateOrganizations, { redirect: '/organizations' })(
+  OrganizationAdd,
+)
