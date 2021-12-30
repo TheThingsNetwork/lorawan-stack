@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,30 +24,28 @@ import CollaboratorsTable from '@console/containers/collaborators-table'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-class OrganizationCollaboratorsList extends React.Component {
-  static propTypes = {
-    getCollaboratorsList: PropTypes.func.isRequired,
-    selectTableData: PropTypes.func.isRequired,
-  }
+const OrganizationCollaboratorsList = props => {
+  const { getCollaboratorsList, selectTableData } = props
 
-  render() {
-    const { getCollaboratorsList, selectTableData } = this.props
+  return (
+    <Container>
+      <Row>
+        <IntlHelmet title={sharedMessages.collaborators} />
+        <Col>
+          <CollaboratorsTable
+            pageSize={PAGE_SIZES.REGULAR}
+            baseDataSelector={selectTableData}
+            getItemsAction={getCollaboratorsList}
+          />
+        </Col>
+      </Row>
+    </Container>
+  )
+}
 
-    return (
-      <Container>
-        <Row>
-          <IntlHelmet title={sharedMessages.collaborators} />
-          <Col>
-            <CollaboratorsTable
-              pageSize={PAGE_SIZES.REGULAR}
-              baseDataSelector={selectTableData}
-              getItemsAction={getCollaboratorsList}
-            />
-          </Col>
-        </Row>
-      </Container>
-    )
-  }
+OrganizationCollaboratorsList.propTypes = {
+  getCollaboratorsList: PropTypes.func.isRequired,
+  selectTableData: PropTypes.func.isRequired,
 }
 
 export default OrganizationCollaboratorsList
