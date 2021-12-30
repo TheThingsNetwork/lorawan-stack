@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Switch, Route } from 'react-router-dom'
 
-import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 import SideNavigation from '@ttn-lw/components/navigation/side'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-import { withEnv } from '@ttn-lw/lib/components/env'
 import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
 import OrganizationOverview from '@console/views/organization-overview'
@@ -33,99 +32,96 @@ import OrganizationCollaborators from '@console/views/organization-collaborators
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import {
-  mayViewOrganizationInformation,
-  mayViewOrEditOrganizationApiKeys,
-  mayViewOrEditOrganizationCollaborators,
-  mayEditBasicOrganizationInformation,
-} from '@console/lib/feature-checks'
-
-@withEnv
-@withBreadcrumb('orgs.single', props => {
+const Organization = props => {
   const {
+    match: { url: matchedUrl, path },
+    siteName,
+    organization,
     orgId,
-    organization: { name },
+    stopStream,
+    mayViewInformation,
+    mayEditInformation,
+    mayViewOrEditApiKeys,
+    mayViewOrEditCollaborators,
   } = props
-  return <Breadcrumb path={`/organizations/${orgId}`} content={name || orgId} />
-})
-class Organization extends React.Component {
-  static propTypes = {
-    env: PropTypes.env.isRequired,
-    match: PropTypes.match.isRequired,
-    orgId: PropTypes.string.isRequired,
-    organization: PropTypes.organization.isRequired,
-    rights: PropTypes.rights.isRequired,
-    stopStream: PropTypes.func.isRequired,
-  }
+  const { name: organizationName } = organization
 
-  componentWillUnmount() {
-    const { orgId, stopStream } = this.props
+  useBreadcrumbs(
+    'orgs.single',
+    <Breadcrumb path={`/organizations/${orgId}`} content={organizationName || orgId} />,
+  )
 
-    stopStream(orgId)
-  }
+  useEffect(
+    () => () => {
+      stopStream(orgId)
+    },
+    [orgId, stopStream],
+  )
 
-  render() {
-    const {
-      match: { url: matchedUrl, path },
-      organization,
-      orgId,
-      env,
-      rights,
-    } = this.props
-
-    return (
-      <React.Fragment>
-        <Breadcrumbs />
-        <IntlHelmet titleTemplate={`%s - ${organization.name || orgId} - ${env.siteName}`} />
-        <SideNavigation
-          header={{ title: organization.name || orgId, icon: 'organization', to: matchedUrl }}
-        >
-          {mayViewOrganizationInformation.check(rights) && (
-            <SideNavigation.Item
-              title={sharedMessages.overview}
-              icon="overview"
-              path={matchedUrl}
-              exact
-            />
-          )}
+  return (
+    <React.Fragment>
+      <Breadcrumbs />
+      <IntlHelmet titleTemplate={`%s - ${organization.name || orgId} - ${siteName}`} />
+      <SideNavigation
+        header={{ title: organization.name || orgId, icon: 'organization', to: matchedUrl }}
+      >
+        {mayViewInformation && (
           <SideNavigation.Item
-            title={sharedMessages.liveData}
-            icon="data"
-            path={`${matchedUrl}/data`}
+            title={sharedMessages.overview}
+            icon="overview"
+            path={matchedUrl}
+            exact
           />
-          {mayViewOrEditOrganizationApiKeys.check(rights) && (
-            <SideNavigation.Item
-              title={sharedMessages.apiKeys}
-              icon="api_keys"
-              path={`${matchedUrl}/api-keys`}
-            />
-          )}
-          {mayViewOrEditOrganizationCollaborators.check(rights) && (
-            <SideNavigation.Item
-              title={sharedMessages.collaborators}
-              icon="collaborators"
-              path={`${matchedUrl}/collaborators`}
-            />
-          )}
-          {mayEditBasicOrganizationInformation.check(rights) && (
-            <SideNavigation.Item
-              title={sharedMessages.generalSettings}
-              icon="general_settings"
-              path={`${matchedUrl}/general-settings`}
-            />
-          )}
-        </SideNavigation>
-        <Switch>
-          <Route exact path={`${path}`} component={OrganizationOverview} />
-          <Route path={`${path}/data`} component={OrganizationData} />
-          <Route path={`${path}/general-settings`} component={OrganizationGeneralSettings} />
-          <Route path={`${path}/api-keys`} component={OrganizationApiKeys} />
-          <Route path={`${path}/collaborators`} component={OrganizationCollaborators} />
-          <NotFoundRoute />
-        </Switch>
-      </React.Fragment>
-    )
-  }
+        )}
+        <SideNavigation.Item
+          title={sharedMessages.liveData}
+          icon="data"
+          path={`${matchedUrl}/data`}
+        />
+        {mayViewOrEditApiKeys && (
+          <SideNavigation.Item
+            title={sharedMessages.apiKeys}
+            icon="api_keys"
+            path={`${matchedUrl}/api-keys`}
+          />
+        )}
+        {mayViewOrEditCollaborators && (
+          <SideNavigation.Item
+            title={sharedMessages.collaborators}
+            icon="collaborators"
+            path={`${matchedUrl}/collaborators`}
+          />
+        )}
+        {mayEditInformation && (
+          <SideNavigation.Item
+            title={sharedMessages.generalSettings}
+            icon="general_settings"
+            path={`${matchedUrl}/general-settings`}
+          />
+        )}
+      </SideNavigation>
+      <Switch>
+        <Route exact path={`${path}`} component={OrganizationOverview} />
+        <Route path={`${path}/data`} component={OrganizationData} />
+        <Route path={`${path}/general-settings`} component={OrganizationGeneralSettings} />
+        <Route path={`${path}/api-keys`} component={OrganizationApiKeys} />
+        <Route path={`${path}/collaborators`} component={OrganizationCollaborators} />
+        <NotFoundRoute />
+      </Switch>
+    </React.Fragment>
+  )
+}
+
+Organization.propTypes = {
+  match: PropTypes.match.isRequired,
+  mayEditInformation: PropTypes.bool.isRequired,
+  mayViewInformation: PropTypes.bool.isRequired,
+  mayViewOrEditApiKeys: PropTypes.bool.isRequired,
+  mayViewOrEditCollaborators: PropTypes.bool.isRequired,
+  orgId: PropTypes.string.isRequired,
+  organization: PropTypes.organization.isRequired,
+  siteName: PropTypes.string.isRequired,
+  stopStream: PropTypes.func.isRequired,
 }
 
 export default Organization
