@@ -20,6 +20,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/shared"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
 
@@ -43,12 +44,12 @@ func (s *Server) handleGetFrequencyPlan(w http.ResponseWriter, r *http.Request) 
 	}
 	if r.Header.Get("User-Agent") == "TTNGateway" {
 		// Filter out fields to reduce response size.
-		config.TxLUTConfigs = nil
+		config.TxLutConfigs = nil
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(struct {
-		SX1301Conf *shared.SX1301Config `json:"SX1301_conf"`
+		SX1301Conf *ttnpb.GlobalSX1301Config `json:"SX1301_conf"`
 	}{
 		SX1301Conf: config,
 	})

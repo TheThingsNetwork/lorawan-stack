@@ -15,6 +15,7 @@
 package shared_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -23,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	. "go.thethings.network/lorawan-stack/v3/pkg/pfconfig/shared"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 func TestSX1301Conf(t *testing.T) {
@@ -30,7 +32,7 @@ func TestSX1301Conf(t *testing.T) {
 	for _, tc := range []struct {
 		Name         string
 		FP           *frequencyplans.FrequencyPlan
-		SX1301Config SX1301Config
+		SX1301Config ttnpb.SX1301Config
 	}{
 		{
 			"EU_863_870",
@@ -86,11 +88,11 @@ func TestSX1301Conf(t *testing.T) {
 				},
 				ClockSource: 1,
 			},
-			SX1301Config{
-				LoRaWANPublic: true,
+			ttnpb.SX1301Config{
+				LorawanPublic: true,
 				ClockSource:   1,
 				AntennaGain:   0,
-				Radios: []RFConfig{
+				Radios: []*ttnpb.RFConfig{
 					{
 						Enable:     true,
 						Type:       "SX1257",
@@ -98,7 +100,7 @@ func TestSX1301Conf(t *testing.T) {
 						TxEnable:   true,
 						TxFreqMin:  863000000,
 						TxFreqMax:  870000000,
-						RSSIOffset: -166,
+						RssiOffset: -166,
 					},
 					{
 						Enable: true, Type: "SX1257",
@@ -106,38 +108,38 @@ func TestSX1301Conf(t *testing.T) {
 						TxEnable:   false,
 						TxFreqMin:  0,
 						TxFreqMax:  0,
-						RSSIOffset: -166,
+						RssiOffset: -166,
 					},
 				},
-				Channels: []IFConfig{
-					{Enable: true, Radio: 1, IFValue: -400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-					{Enable: true, Radio: 1, IFValue: -200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-					{Enable: true, Radio: 1, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-					{Enable: true, Radio: 0, IFValue: -400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-					{Enable: true, Radio: 0, IFValue: -200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-					{Enable: true, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-					{Enable: true, Radio: 0, IFValue: 200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-					{Enable: true, Radio: 0, IFValue: 400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+				Channels: []*ttnpb.IFConfig{
+					{Enable: true, Radio: 1, IfValue: -400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+					{Enable: true, Radio: 1, IfValue: -200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+					{Enable: true, Radio: 1, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+					{Enable: true, Radio: 0, IfValue: -400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+					{Enable: true, Radio: 0, IfValue: -200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+					{Enable: true, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+					{Enable: true, Radio: 0, IfValue: 200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+					{Enable: true, Radio: 0, IfValue: 400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 				},
-				LoRaStandardChannel: &IFConfig{Enable: true, Radio: 1, IFValue: -200000, Bandwidth: 250000, SpreadFactor: 7, Datarate: 0},
-				FSKChannel:          &IFConfig{Enable: true, Radio: 1, IFValue: 300000, Bandwidth: 125000, SpreadFactor: 0, Datarate: 50000},
-				TxLUTConfigs: []TxLUTConfig{
-					{PAGain: 0, MixGain: 8, RFPower: -6, DigGain: 0},
-					{PAGain: 0, MixGain: 10, RFPower: -3, DigGain: 0},
-					{PAGain: 0, MixGain: 12, RFPower: 0, DigGain: 0},
-					{PAGain: 1, MixGain: 8, RFPower: 3, DigGain: 0},
-					{PAGain: 1, MixGain: 10, RFPower: 6, DigGain: 0},
-					{PAGain: 1, MixGain: 12, RFPower: 10, DigGain: 0},
-					{PAGain: 1, MixGain: 13, RFPower: 11, DigGain: 0},
-					{PAGain: 2, MixGain: 9, RFPower: 12, DigGain: 0},
-					{PAGain: 1, MixGain: 15, RFPower: 13, DigGain: 0},
-					{PAGain: 2, MixGain: 10, RFPower: 14, DigGain: 0},
-					{PAGain: 2, MixGain: 11, RFPower: 16, DigGain: 0},
-					{PAGain: 3, MixGain: 9, RFPower: 20, DigGain: 0},
-					{PAGain: 3, MixGain: 10, RFPower: 23, DigGain: 0},
-					{PAGain: 3, MixGain: 11, RFPower: 25, DigGain: 0},
-					{PAGain: 3, MixGain: 12, RFPower: 26, DigGain: 0},
-					{PAGain: 3, MixGain: 14, RFPower: 27, DigGain: 0},
+				LoraStandardChannel: &ttnpb.IFConfig{Enable: true, Radio: 1, IfValue: -200000, Bandwidth: 250000, SpreadFactor: 7, Datarate: 0},
+				FskChannel:          &ttnpb.IFConfig{Enable: true, Radio: 1, IfValue: 300000, Bandwidth: 125000, SpreadFactor: 0, Datarate: 50000},
+				TxLutConfigs: []*ttnpb.TxLUTConfig{
+					{PaGain: 0, MixGain: 8, RfPower: -6, DigGain: 0},
+					{PaGain: 0, MixGain: 10, RfPower: -3, DigGain: 0},
+					{PaGain: 0, MixGain: 12, RfPower: 0, DigGain: 0},
+					{PaGain: 1, MixGain: 8, RfPower: 3, DigGain: 0},
+					{PaGain: 1, MixGain: 10, RfPower: 6, DigGain: 0},
+					{PaGain: 1, MixGain: 12, RfPower: 10, DigGain: 0},
+					{PaGain: 1, MixGain: 13, RfPower: 11, DigGain: 0},
+					{PaGain: 2, MixGain: 9, RfPower: 12, DigGain: 0},
+					{PaGain: 1, MixGain: 15, RfPower: 13, DigGain: 0},
+					{PaGain: 2, MixGain: 10, RfPower: 14, DigGain: 0},
+					{PaGain: 2, MixGain: 11, RfPower: 16, DigGain: 0},
+					{PaGain: 3, MixGain: 9, RfPower: 20, DigGain: 0},
+					{PaGain: 3, MixGain: 10, RfPower: 23, DigGain: 0},
+					{PaGain: 3, MixGain: 11, RfPower: 25, DigGain: 0},
+					{PaGain: 3, MixGain: 12, RfPower: 26, DigGain: 0},
+					{PaGain: 3, MixGain: 14, RfPower: 27, DigGain: 0},
 				},
 			},
 		},
@@ -150,17 +152,17 @@ func TestSX1301Conf(t *testing.T) {
 			if !(a.So(*cfg, should.Resemble, tc.SX1301Config)) {
 				t.Fatalf("Invalid config: %v", cfg)
 			}
-			msg, err := cfg.MarshalJSON()
+			msg, err := json.Marshal(cfg)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Unexpected error: %v", err)
 			}
-			var unmarshaledCfg SX1301Config
-			err = unmarshaledCfg.UnmarshalJSON(msg)
+			var unmarshaledCfg ttnpb.SX1301Config
+			err = json.Unmarshal(msg, &unmarshaledCfg)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Unexpected error: %v", err)
 			}
 			if !(a.So(unmarshaledCfg, should.Resemble, *cfg)) {
-				t.Fatalf("Invalid config after unmarshaling: %v", cfg)
+				t.Fatalf("Invalid config after unmarshaling: \n '%v' \n\n '%v'", *cfg, unmarshaledCfg)
 			}
 		})
 	}

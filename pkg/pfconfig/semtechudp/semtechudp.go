@@ -23,8 +23,8 @@ import (
 
 // Config represents the full configuration for Semtech's UDP Packet Forwarder.
 type Config struct {
-	SX1301Conf  shared.SX1301Config `json:"SX1301_conf"`
-	GatewayConf GatewayConf         `json:"gateway_conf"`
+	SX1301Conf  ttnpb.GlobalSX1301Config `json:"SX1301_conf"`
+	GatewayConf GatewayConf              `json:"gateway_conf"`
 }
 
 // GatewayConf contains the configuration for the gateway's server connection.

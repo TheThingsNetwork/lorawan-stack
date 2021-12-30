@@ -32,14 +32,14 @@ import (
 func TestBuildLorad(t *testing.T) {
 	fps := frequencyplans.NewStore(test.FrequencyPlansFetcher)
 
-	sx1301Config := func(fpID string) shared.SX1301Config {
-		return *test.Must(shared.BuildSX1301Config(test.Must(fps.GetByID(fpID)).(*frequencyplans.FrequencyPlan))).(*shared.SX1301Config)
+	sx1301Config := func(fpID string) *ttnpb.GlobalSX1301Config {
+		return test.Must(shared.BuildSX1301Config(test.Must(fps.GetByID(fpID)).(*frequencyplans.FrequencyPlan))).(*ttnpb.GlobalSX1301Config)
 	}
 
 	for _, tc := range []struct {
 		Name           string
 		Gateway        *ttnpb.Gateway
-		Config         *LoradConfig
+		Config         *ttnpb.CpfLoradConfig
 		ErrorAssertion func(t *testing.T, err error) bool
 	}{
 		{
@@ -54,9 +54,9 @@ func TestBuildLorad(t *testing.T) {
 			Gateway: &ttnpb.Gateway{
 				FrequencyPlanId: test.EUFrequencyPlanID,
 			},
-			Config: &LoradConfig{
-				SX1301Conf: LoradSX1301Conf{
-					SX1301Config:      sx1301Config(test.EUFrequencyPlanID),
+			Config: &ttnpb.CpfLoradConfig{
+				Sx1301Config: &ttnpb.CpfLoradConfig_SX1301Config{
+					GlobalConfig:      sx1301Config(test.EUFrequencyPlanID),
 					AntennaGainDesc:   "Antenna gain, in dBi",
 					InsertionLoss:     0.5,
 					InsertionLossDesc: "Insertion loss, in dBi",
@@ -80,9 +80,9 @@ func TestBuildLorad(t *testing.T) {
 					},
 				},
 			},
-			Config: &LoradConfig{
-				SX1301Conf: LoradSX1301Conf{
-					SX1301Config: func() shared.SX1301Config {
+			Config: &ttnpb.CpfLoradConfig{
+				Sx1301Config: &ttnpb.CpfLoradConfig_SX1301Config{
+					GlobalConfig: func() *ttnpb.GlobalSX1301Config {
 						conf := sx1301Config(test.EUFrequencyPlanID)
 						conf.AntennaGain = 4
 						return conf
@@ -91,7 +91,7 @@ func TestBuildLorad(t *testing.T) {
 					InsertionLoss:     0.5,
 					InsertionLossDesc: "Insertion loss, in dBi",
 				},
-				GatewayConf: LoradGatewayConf{
+				GatewayConfig: &ttnpb.CpfLoradConfig_GatewayConfig{
 					BeaconLatitude:  0.42,
 					BeaconLongitude: 42.42,
 				},
@@ -110,9 +110,9 @@ func TestBuildLorad(t *testing.T) {
 					},
 				},
 			},
-			Config: &LoradConfig{
-				SX1301Conf: LoradSX1301Conf{
-					SX1301Config: func() shared.SX1301Config {
+			Config: &ttnpb.CpfLoradConfig{
+				Sx1301Config: &ttnpb.CpfLoradConfig_SX1301Config{
+					GlobalConfig: func() *ttnpb.GlobalSX1301Config {
 						conf := sx1301Config(test.EUFrequencyPlanID)
 						conf.AntennaGain = 4
 						return conf
@@ -154,9 +154,9 @@ func TestBuildLorad(t *testing.T) {
 					},
 				},
 			},
-			Config: &LoradConfig{
-				SX1301Conf: LoradSX1301Conf{
-					SX1301Config: func() shared.SX1301Config {
+			Config: &ttnpb.CpfLoradConfig{
+				Sx1301Config: &ttnpb.CpfLoradConfig_SX1301Config{
+					GlobalConfig: func() *ttnpb.GlobalSX1301Config {
 						conf := sx1301Config(test.EUFrequencyPlanID)
 						conf.AntennaGain = 4
 						return conf
@@ -165,7 +165,7 @@ func TestBuildLorad(t *testing.T) {
 					InsertionLoss:     0.5,
 					InsertionLossDesc: "Insertion loss, in dBi",
 				},
-				GatewayConf: LoradGatewayConf{
+				GatewayConfig: &ttnpb.CpfLoradConfig_GatewayConfig{
 					BeaconLatitude:  0.42,
 					BeaconLongitude: 42.42,
 				},

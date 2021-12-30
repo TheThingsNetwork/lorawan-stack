@@ -42,7 +42,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	pfconfig "go.thethings.network/lorawan-stack/v3/pkg/pfconfig/lbslns"
-	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/shared"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -577,18 +576,18 @@ func TestVersion(t *testing.T) {
 								AntennaGain: 3,
 							},
 						},
-						Channels: []shared.IFConfig{
-							{Enable: true, Radio: 0, IFValue: 600000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-							{Enable: true, Radio: 0, IFValue: 800000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-							{Enable: true, Radio: 0, IFValue: 1000000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-							{Enable: true, Radio: 0, IFValue: -400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-							{Enable: true, Radio: 0, IFValue: -200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-							{Enable: true, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-							{Enable: true, Radio: 0, IFValue: 200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-							{Enable: true, Radio: 0, IFValue: 400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						Channels: []ttnpb.GlobalSX1301Config_IFConfig{
+							{Enable: true, Radio: 0, IfValue: 600000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: true, Radio: 0, IfValue: 800000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: true, Radio: 0, IfValue: 1000000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: true, Radio: 0, IfValue: -400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: true, Radio: 0, IfValue: -200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: true, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: true, Radio: 0, IfValue: 200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: true, Radio: 0, IfValue: 400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 						},
-						LoRaStandardChannel: &shared.IFConfig{Enable: true, Radio: 0, IFValue: 800000, Bandwidth: 250000, SpreadFactor: 7, Datarate: 0},
-						FSKChannel:          &shared.IFConfig{Enable: true, Radio: 0, IFValue: 1300000, Bandwidth: 0, SpreadFactor: 0, Datarate: 50000},
+						LoRaStandardChannel: &ttnpb.GlobalSX1301Config_IFConfig{Enable: true, Radio: 0, IfValue: 800000, Bandwidth: 250000, SpreadFactor: 7, Datarate: 0},
+						FSKChannel:          &ttnpb.GlobalSX1301Config_IFConfig{Enable: true, Radio: 0, IfValue: 1300000, Bandwidth: 0, SpreadFactor: 0, Datarate: 50000},
 					},
 				},
 			},
@@ -652,18 +651,18 @@ func TestVersion(t *testing.T) {
 								AntennaGain: 3,
 							},
 						},
-						Channels: []shared.IFConfig{
-							{Enable: true, Radio: 0, IFValue: 600000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-							{Enable: true, Radio: 0, IFValue: 800000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-							{Enable: true, Radio: 0, IFValue: 1000000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-							{Enable: true, Radio: 0, IFValue: -400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-							{Enable: true, Radio: 0, IFValue: -200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-							{Enable: true, Radio: 0, IFValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-							{Enable: true, Radio: 0, IFValue: 200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-							{Enable: true, Radio: 0, IFValue: 400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						Channels: []ttnpb.GlobalSX1301Config_IFConfig{
+							{Enable: true, Radio: 0, IfValue: 600000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: true, Radio: 0, IfValue: 800000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: true, Radio: 0, IfValue: 1000000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: true, Radio: 0, IfValue: -400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: true, Radio: 0, IfValue: -200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: true, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: true, Radio: 0, IfValue: 200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+							{Enable: true, Radio: 0, IfValue: 400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 						},
-						LoRaStandardChannel: &shared.IFConfig{Enable: true, Radio: 0, IFValue: 800000, Bandwidth: 250000, SpreadFactor: 7, Datarate: 0},
-						FSKChannel:          &shared.IFConfig{Enable: true, Radio: 0, IFValue: 1300000, Bandwidth: 0, SpreadFactor: 0, Datarate: 50000},
+						LoRaStandardChannel: &ttnpb.GlobalSX1301Config_IFConfig{Enable: true, Radio: 0, IfValue: 800000, Bandwidth: 250000, SpreadFactor: 7, Datarate: 0},
+						FSKChannel:          &ttnpb.GlobalSX1301Config_IFConfig{Enable: true, Radio: 0, IfValue: 1300000, Bandwidth: 0, SpreadFactor: 0, Datarate: 50000},
 					},
 				},
 			},

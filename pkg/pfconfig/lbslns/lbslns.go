@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/shared"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 const (
@@ -97,11 +98,11 @@ type LBSRFConfig struct {
 // https://doc.sm.tc/station/gw_v2.html
 // The fields `lorawan_public` and `clock_source` are omitted as they should be present in the gateway's `station.conf`.
 type LBSSX1301Config struct {
-	LBTConfig           *shared.LBTConfig
+	LBTConfig           *ttnpb.GlobalSX1301Config_LBTConfig
 	Radios              []LBSRFConfig
-	Channels            []shared.IFConfig
-	LoRaStandardChannel *shared.IFConfig
-	FSKChannel          *shared.IFConfig
+	Channels            []ttnpb.GlobalSX1301Config_IFConfig
+	LoRaStandardChannel *ttnpb.GlobalSX1301Config_IFConfig
+	FSKChannel          *ttnpb.GlobalSX1301Config_IFConfig
 }
 
 // MarshalJSON implements json.Marshaler.
@@ -126,10 +127,10 @@ func (c LBSSX1301Config) MarshalJSON() ([]byte, error) {
 }
 
 // fromSX1301Conf updates fields from shared.SX1301Config.
-func (c *LBSSX1301Config) fromSX1301Conf(sx1301Conf shared.SX1301Config, antennaGain int) error {
-	c.LoRaStandardChannel = sx1301Conf.LoRaStandardChannel
-	c.FSKChannel = sx1301Conf.FSKChannel
-	c.LBTConfig = sx1301Conf.LBTConfig
+func (c *LBSSX1301Config) fromSX1301Conf(sx1301Conf ttnpb.GlobalSX1301Config, antennaGain int) error {
+	c.LoRaStandardChannel = sx1301Conf.LoraStandardChannel
+	c.FSKChannel = sx1301Conf.FskChannel
+	c.LBTConfig = sx1301Conf.LbtConfig
 
 	for _, radio := range sx1301Conf.Radios {
 		c.Radios = append(c.Radios, LBSRFConfig{
@@ -140,7 +141,7 @@ func (c *LBSSX1301Config) fromSX1301Conf(sx1301Conf shared.SX1301Config, antenna
 	}
 
 	for _, channel := range sx1301Conf.Channels {
-		c.Channels = append(c.Channels, channel)
+		c.Channels = append(c.Channels, *channel)
 	}
 	return nil
 }
@@ -151,7 +152,7 @@ func (c *LBSSX1301Config) UnmarshalJSON(msg []byte) error {
 	if err := json.Unmarshal(msg, &root); err != nil {
 		return err
 	}
-	radioMap, chanMap := make(map[int]LBSRFConfig), make(map[int]shared.IFConfig)
+	radioMap, chanMap := make(map[int]LBSRFConfig), make(map[int]ttnpb.GlobalSX1301Config_IFConfig)
 	for key, value := range root {
 		switch {
 		case key == "lbt_cfg":
@@ -167,7 +168,7 @@ func (c *LBSSX1301Config) UnmarshalJSON(msg []byte) error {
 				return err
 			}
 		case strings.HasPrefix(key, "chan_multiSF_"):
-			var channel shared.IFConfig
+			var channel ttnpb.GlobalSX1301Config_IFConfig
 			if err := json.Unmarshal(value, &channel); err != nil {
 				return err
 			}
@@ -191,7 +192,7 @@ func (c *LBSSX1301Config) UnmarshalJSON(msg []byte) error {
 		}
 	}
 
-	c.Radios, c.Channels = make([]LBSRFConfig, len(radioMap)), make([]shared.IFConfig, len(chanMap))
+	c.Radios, c.Channels = make([]LBSRFConfig, len(radioMap)), make([]ttnpb.GlobalSX1301Config_IFConfig, len(chanMap))
 	for key, value := range radioMap {
 		c.Radios[key] = value
 	}
