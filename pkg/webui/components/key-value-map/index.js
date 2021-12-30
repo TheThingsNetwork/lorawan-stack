@@ -21,6 +21,8 @@ import Button from '@ttn-lw/components/button'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import { hexToBase64, base64ToHex } from '@console/lib/bytes'
+
 import Entry from './entry'
 
 import style from './key-value-map.styl'
@@ -63,6 +65,17 @@ class KeyValueMap extends React.PureComponent {
   }
 
   @bind
+  handlePasswordUsernameChange(newValues) {
+    const { onChange, value } = this.props
+    const encodedNewValues = newValues
+
+    // eslint-disable-next-line no-console
+    console.log(encodedNewValues)
+
+    onChange([...value, ...encodedNewValues])
+  }
+
+  @bind
   handleEntryChange(index, newValues) {
     const { onChange, value, indexAsKey } = this.props
 
@@ -92,6 +105,20 @@ class KeyValueMap extends React.PureComponent {
     onChange([...value, entry])
   }
 
+  @bind
+  decodeValue(value) {
+    if (value.key === 'Authorization' && value.value.startsWith('Basic')) {
+      const [username, ...password] = hexToBase64(value.value).split(':')
+      const decodedValue = {
+        key: username,
+        value: password.join(':'),
+      }
+      return decodedValue
+    }
+
+    return value
+  }
+
   render() {
     const {
       className,
@@ -105,6 +132,11 @@ class KeyValueMap extends React.PureComponent {
       disabled,
     } = this.props
 
+    const mayShowAddBasicAuthButton = !(
+      value.some(header => header.key === 'Authorization') &&
+      value.some(header => header.value?.startsWith('Basic'))
+    )
+
     return (
       <div data-test-id={'key-value-map'} className={classnames(className, style.container)}>
         <div>
@@ -113,7 +145,7 @@ class KeyValueMap extends React.PureComponent {
               <Entry
                 key={`${name}[${index}]`}
                 name={name}
-                value={value}
+                value={this.decodeValue(value)}
                 keyPlaceholder={keyPlaceholder}
                 valuePlaceholder={valuePlaceholder}
                 index={index}
@@ -133,6 +165,19 @@ class KeyValueMap extends React.PureComponent {
             disabled={disabled}
             icon="add"
           />
+        </div>
+        <div>
+          {mayShowAddBasicAuthButton && (
+            <Button
+              name={`${name}.push`}
+              type="button"
+              message={'add basic auth'}
+              onClick={this.addEmptyEntry}
+              disabled={disabled}
+              icon="add"
+              secondary
+            />
+          )}
         </div>
       </div>
     )

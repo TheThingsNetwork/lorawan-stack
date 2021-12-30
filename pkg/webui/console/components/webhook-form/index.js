@@ -67,6 +67,9 @@ const m = defineMessages({
   pendingInfo:
     'This webhook is currently pending until attempting its first regular request attempt. Note that webhooks can be deactivated if they encounter too many request failures.',
   messagePathValidateTooLong: 'Enabled message path must be at most 64 characters',
+  headersBasicAuthValuePlaceholder: 'Password',
+  headersBasicAuthKeyPlaceholder: 'Username',
+  basicAuthHeader: 'Add Basic Auth header',
 })
 
 const headerCheck = headers =>
@@ -178,6 +181,9 @@ export default class WebhookForm extends Component {
       health_status: PropTypes.shape({
         unhealthy: PropTypes.shape({}),
       }),
+      headers: PropTypes.shape({
+        Authorization: PropTypes.string,
+      }),
     }),
     onDelete: PropTypes.func,
     onDeleteFailure: PropTypes.func,
@@ -219,6 +225,8 @@ export default class WebhookForm extends Component {
   async handleSubmit(values, { resetForm }) {
     const { appId, onSubmit, onSubmitSuccess, onSubmitFailure, existCheck, update } = this.props
     const webhook = mapFormValuesToWebhook(values, appId)
+    // eslint-disable-next-line no-console
+    console.log(webhook.headers)
 
     await this.setState({ error: '' })
 
