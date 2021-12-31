@@ -114,7 +114,7 @@ func TestWeb(t *testing.T) {
 		return string(mustMarshal(v.MarshalText()))
 	}
 	semtechUDPConfig := func(gtw *ttnpb.Gateway) string {
-		return marshalJSON(test.Must(semtechudp.Build(gtw, fps)).(*semtechudp.Config))
+		return marshalJSON(test.Must(semtechudp.Build(gtw, fps)).(*ttnpb.SemtechUDPConfig))
 	}
 	cpfLoradConfig := func(gtw *ttnpb.Gateway) string {
 		return marshalJSON(test.Must(cpf.BuildLorad(gtw, fps)).(*cpf.LoradConfig))

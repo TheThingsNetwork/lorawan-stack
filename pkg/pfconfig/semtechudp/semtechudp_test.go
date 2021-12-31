@@ -66,7 +66,7 @@ func TestBuild(t *testing.T) {
 			panic(err)
 		}
 		removeDescs(expectedMap)
-		configJSON, _ := json.Marshal(actual.(*Config))
+		configJSON, _ := json.Marshal(actual.(*ttnpb.SemtechUDPConfig))
 		var actualMap map[string]interface{}
 		json.Unmarshal(configJSON, &actualMap)
 		return should.BeEmpty(pretty.Diff(actualMap, expectedMap))
@@ -75,7 +75,7 @@ func TestBuild(t *testing.T) {
 	for _, tt := range []struct {
 		Name    string
 		Gateway *ttnpb.Gateway
-		Assert  func(a *assertions.Assertion, config *Config)
+		Assert  func(a *assertions.Assertion, config *ttnpb.SemtechUDPConfig)
 	}{
 		{
 			Name: "Reference: EU global_conf",
@@ -83,7 +83,7 @@ func TestBuild(t *testing.T) {
 				FrequencyPlanId:      "EU_863_870_TTN",
 				GatewayServerAddress: "router.eu.thethings.network",
 			},
-			Assert: func(a *assertions.Assertion, config *Config) {
+			Assert: func(a *assertions.Assertion, config *ttnpb.SemtechUDPConfig) {
 				a.So(config, shouldResembleReference, "EU-global_conf.json")
 			},
 		},
@@ -93,7 +93,7 @@ func TestBuild(t *testing.T) {
 				FrequencyPlanId:      "US_902_928_FSB_2",
 				GatewayServerAddress: "router.us.thethings.network",
 			},
-			Assert: func(a *assertions.Assertion, config *Config) {
+			Assert: func(a *assertions.Assertion, config *ttnpb.SemtechUDPConfig) {
 				a.So(config, shouldResembleReference, "US-global_conf.json")
 			},
 		},
@@ -103,7 +103,7 @@ func TestBuild(t *testing.T) {
 				FrequencyPlanId:      "AU_915_928_FSB_2",
 				GatewayServerAddress: "router.au.thethings.network",
 			},
-			Assert: func(a *assertions.Assertion, config *Config) {
+			Assert: func(a *assertions.Assertion, config *ttnpb.SemtechUDPConfig) {
 				a.So(config, shouldResembleReference, "AU-global_conf.json")
 			},
 		},
@@ -113,7 +113,7 @@ func TestBuild(t *testing.T) {
 				FrequencyPlanId:      "AS_920_923_LBT",
 				GatewayServerAddress: "router.as1.thethings.network",
 			},
-			Assert: func(a *assertions.Assertion, config *Config) {
+			Assert: func(a *assertions.Assertion, config *ttnpb.SemtechUDPConfig) {
 				a.So(config, shouldResembleReference, "AS1-global_conf.json")
 			},
 		},
@@ -123,7 +123,7 @@ func TestBuild(t *testing.T) {
 				FrequencyPlanId:      "KR_920_923_TTN",
 				GatewayServerAddress: "router.kr.thethings.network",
 			},
-			Assert: func(a *assertions.Assertion, config *Config) {
+			Assert: func(a *assertions.Assertion, config *ttnpb.SemtechUDPConfig) {
 				a.So(config, shouldResembleReference, "KR-global_conf.json")
 			},
 		},

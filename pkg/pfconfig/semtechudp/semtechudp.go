@@ -21,25 +21,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-// Config represents the full configuration for Semtech's UDP Packet Forwarder.
-type Config struct {
-	SX1301Conf  ttnpb.GlobalSX1301Config `json:"SX1301_conf"`
-	GatewayConf GatewayConf              `json:"gateway_conf"`
-}
-
-// GatewayConf contains the configuration for the gateway's server connection.
-type GatewayConf struct {
-	GatewayID      string        `json:"gateway_ID,omitempty"`
-	ServerAddress  string        `json:"server_address"`
-	ServerPortUp   uint32        `json:"serv_port_up"`
-	ServerPortDown uint32        `json:"serv_port_down"`
-	Enabled        bool          `json:"serv_enabled,omitempty"` // only used inside servers
-	Servers        []GatewayConf `json:"servers,omitempty"`
-}
-
 // Build builds a packet forwarder configuration for the given gateway, using the given frequency plan store.
-func Build(gateway *ttnpb.Gateway, store *frequencyplans.Store) (*Config, error) {
-	var c Config
+func Build(gateway *ttnpb.Gateway, store *frequencyplans.Store) (*ttnpb.SemtechUDPConfig, error) {
+	var c ttnpb.SemtechUDPConfig
 
 	host, port, err := shared.ParseGatewayServerAddress(gateway.GatewayServerAddress)
 	if err != nil {
@@ -47,12 +31,12 @@ func Build(gateway *ttnpb.Gateway, store *frequencyplans.Store) (*Config, error)
 	}
 
 	if gateway.GetIds().GetEui() != nil {
-		c.GatewayConf.GatewayID = gateway.GetIds().GetEui().String()
+		c.GatewayConfig.GatewayId = gateway.GetEntityIdentifiers().GetGatewayIds()
 	}
-	c.GatewayConf.ServerAddress, c.GatewayConf.ServerPortUp, c.GatewayConf.ServerPortDown = host, uint32(port), uint32(port)
-	server := c.GatewayConf
+	c.GatewayConfig.ServerAddress, c.GatewayConfig.ServerPortUp, c.GatewayConfig.ServerPortDown = host, uint32(port), uint32(port)
+	server := c.GatewayConfig
 	server.Enabled = true
-	c.GatewayConf.Servers = append(c.GatewayConf.Servers, server)
+	c.GatewayConfig.Servers = append(c.GatewayConfig.Servers, server)
 
 	frequencyPlan, err := store.GetByID(gateway.FrequencyPlanId)
 	if err != nil {
@@ -63,7 +47,7 @@ func Build(gateway *ttnpb.Gateway, store *frequencyplans.Store) (*Config, error)
 		if err != nil {
 			return nil, err
 		}
-		c.SX1301Conf = *sx1301Config
+		c.Sx1301Config = sx1301Config
 	}
 
 	return &c, nil
