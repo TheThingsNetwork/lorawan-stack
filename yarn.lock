@@ -1487,10 +1487,19 @@
     "@formatjs/intl-localematcher" "0.2.21"
     tslib "^2.1.0"
 
-"@formatjs/intl-displaynames@5.2.6", "@formatjs/intl-displaynames@^5.2.2":
+"@formatjs/intl-displaynames@5.2.6":
   version "5.2.6"
   resolved "https://registry.yarnpkg.com/@formatjs/intl-displaynames/-/intl-displaynames-5.2.6.tgz#f3d2a8459c50629aeeee6b8cc91b13ca354420a3"
   integrity sha512-dtJanE76eHl3IQfbCBdlx/5J/D4PZxMQ403GuZW043m8uPCANArDX53esKwVgIpNa84lSTY3Ksf876hFJhki8w==
+  dependencies:
+    "@formatjs/ecma402-abstract" "1.11.0"
+    "@formatjs/intl-localematcher" "0.2.21"
+    tslib "^2.1.0"
+
+"@formatjs/intl-displaynames@^5.3.0":
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-displaynames/-/intl-displaynames-5.3.0.tgz#e042460af49d4b1444853aac482a8fda85bcafe3"
+  integrity sha512-QTwQitgjeExoKEl2TLWOsv3vxdd7tvugwVnT1Bh9RD+fjQXQbOts2crGI65fxlOruCgXVqRp99t5HxyzjX53kw==
   dependencies:
     "@formatjs/ecma402-abstract" "1.11.0"
     "@formatjs/intl-localematcher" "0.2.21"
