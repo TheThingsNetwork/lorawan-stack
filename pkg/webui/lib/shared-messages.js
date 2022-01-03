@@ -237,7 +237,11 @@ export default defineMessages({
   liveData: 'Live data',
   location: 'Location',
   locationDescription:
-    'The location of this gateway may be visible to other users and on public gateway maps',
+    'When set to public, the gateway location may be visible to other users of the network',
+  locationMarkerDescriptionNonUser:
+    'This location has been set automatically from incoming messages of this device',
+  locationMarkerDescriptionUser:
+    'This location has been set manually (e.g. by using the "Location"-tab)',
   locationSolved: 'Location solved',
   login: 'Login',
   logout: 'Logout',
@@ -311,7 +315,7 @@ export default defineMessages({
   profileSettings: 'Profile settings',
   provider: 'Provider',
   provisionedOnExternalJoinServer: 'Provisioned on external Join Server',
-  public: 'Public',
+  public: 'Make location public',
   pubsubBaseTopic: 'Base topic',
   pubsubFormat: 'Pub/Sub format',
   pubsubId: 'Pub/Sub ID',

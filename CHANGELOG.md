@@ -15,6 +15,7 @@ For details about compatibility between different releases, see the **Commitment
  - The Join Server has a new API `GetDefaultJoinEUI`.
  - The default JoinEUI can be configured on the Join Server using the option `--js.default-join-eui`.
 - Filtering of end device frequency plans in end device forms based on band id in the Console.
+- Showing automatically set entity locations in the Console.
 
 ### Changed
 

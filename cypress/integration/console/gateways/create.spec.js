@@ -60,12 +60,7 @@ describe('Gateway create', () => {
     cy.findDescriptionByLabelText('Gateway status')
       .should('contain', 'The status of this gateway may be visible to other users')
       .and('be.visible')
-    cy.findDescriptionByLabelText('Gateway location')
-      .should(
-        'contain',
-        'The location of this gateway may be visible to other users and on public gateway maps',
-      )
-      .and('be.visible')
+    cy.findDescriptionByLabelText('Gateway location').should('contain', 'public').and('be.visible')
     cy.findByRole('button', { name: /Add attributes/ }).should('be.visible')
     cy.findByLabelText('Frequency plan').should('be.visible')
     cy.findByLabelText('Schedule downlink late').should('exist')

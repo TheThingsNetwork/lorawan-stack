@@ -175,7 +175,7 @@ const m = defineMessages({
     'Adjust the time that the Network Server schedules class C messages in advance. This is useful for gateways that have a known high latency backhaul, like 3G and satellite.',
 
   updateGtwLocationFromStatusDescription:
-    'When checked, the location of this gateway will be updated from status messages. This only works for gateways connecting with authentication; gateways connected over UDP are not supported.',
+    'Instead of setting the location manually, you can alternatively choose to update the location of this gateway from status messages. This only works for gateways that send their locations within status messages while using an authenticated connection; gateways connected over UDP are not supported. Please refer to the manual of your gateway model to see whether sending location data is supported.',
 
   disablePacketBrokerForwardingDescription:
     'When checked, uplink messages received from this gateway will not be forwarded to Packet Broker. This option takes effect only after the gateway reconnects.',

@@ -18,6 +18,8 @@ import MapWidget from '@ttn-lw/components/map/widget'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import locationToMarkers from '@console/lib/location-to-markers'
+
 export default class DeviceMap extends React.Component {
   static propTypes = {
     device: PropTypes.device.isRequired,
@@ -28,17 +30,7 @@ export default class DeviceMap extends React.Component {
     const { device_id } = device.ids
     const { application_id } = device.ids.application_ids
 
-    const markers =
-      device.locations && device.locations.user
-        ? [
-            {
-              position: {
-                latitude: device.locations.user.latitude || 0,
-                longitude: device.locations.user.longitude || 0,
-              },
-            },
-          ]
-        : []
+    const markers = locationToMarkers(device.locations)
 
     return (
       <MapWidget

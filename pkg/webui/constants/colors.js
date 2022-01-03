@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,5 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.map
-  margin-bottom: $ls.s
+export default Object.freeze({
+  C_ACTIVE_BLUE: '#3D73FF',
+  C_ACTIVE_BLUE_HOVER: '#1E5DFF',
+  C_ACTIVE_BLUE_ACTIVE: '#0047FF',
+  C_ICON_FILL: '#686868',
+  C_SUBTLE_FILL: '#AAAAAA',
+  C_BACKDROP: '#F3F3F3',
+  C_BACKDROP_LIGHTER: '#FAFAFA',
+  C_TEXT_BACKDROP: '#ECECEC',
+  TC_ACTIVE: '#3D73FF',
+  TC_ACTIVE_HOVER: '#3D73FF',
+  TC_ERROR: '#EA0000',
+})

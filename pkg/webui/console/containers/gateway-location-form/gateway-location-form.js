@@ -19,7 +19,7 @@ import Checkbox from '@ttn-lw/components/checkbox'
 import Form from '@ttn-lw/components/form'
 import Radio from '@ttn-lw/components/radio-button'
 
-import LocationForm from '@console/components/location-form'
+import LocationForm, { hasLocationSet } from '@console/components/location-form'
 
 import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -38,6 +38,9 @@ const m = defineMessages({
   placement: 'Placement',
   indoor: 'Indoor',
   outdoor: 'Outdoor',
+  locationFromStatusMessage: 'Location set automatically from status messages',
+  setLocationManually: 'Set location manually',
+  noLocationSetInfo: 'This gateway has no location information set',
 })
 
 const validationSchema = Yup.object().shape({
@@ -69,7 +72,7 @@ const validationSchema = Yup.object().shape({
   }),
   location_public: Yup.bool(),
   update_location_from_status: Yup.bool(),
-  _placement: Yup.string().oneOf(['PLACEMENT_UNKNOWN', 'INDOOR', 'OUTDOOR']),
+  placement: Yup.string().oneOf(['PLACEMENT_UNKNOWN', 'INDOOR', 'OUTDOOR']),
 })
 
 const getRegistryLocation = antennas => {
@@ -94,13 +97,13 @@ const getRegistryLocation = antennas => {
 const GatewayLocationForm = ({ gateway, gatewayId, updateGateway }) => {
   const registryLocation = getRegistryLocation(gateway.antennas)
   const initialValues = {
-    _placement:
+    placement:
       registryLocation && registryLocation.antenna.placement
         ? registryLocation.antenna.placement
         : 'PLACEMENT_UNKNOWN',
     location_public: gateway.location_public || false,
     update_location_from_status: gateway.update_location_from_status || false,
-    ...(registryLocation
+    ...(hasLocationSet(registryLocation?.antenna?.location)
       ? registryLocation.antenna.location
       : {
           latitude: undefined,
@@ -111,9 +114,10 @@ const GatewayLocationForm = ({ gateway, gatewayId, updateGateway }) => {
 
   const handleSubmit = useCallback(
     async values => {
+      const { update_location_from_status, location_public, placement, ...location } = values
       const patch = {
-        location_public: values.location_public,
-        update_location_from_status: values.update_location_from_status,
+        location_public,
+        update_location_from_status,
       }
 
       const registryLocation = getRegistryLocation(gateway.antennas)
@@ -123,9 +127,9 @@ const GatewayLocationForm = ({ gateway, gatewayId, updateGateway }) => {
           patch.antennas = [...gateway.antennas]
           patch.antennas[registryLocation.key].location = {
             ...registryLocation.antenna.location,
-            ...values,
+            ...location,
           }
-          patch.antennas[registryLocation.key].placement = values._placement
+          patch.antennas[registryLocation.key].placement = placement
         } else {
           // Create new location value.
           patch.antennas = [
@@ -136,7 +140,7 @@ const GatewayLocationForm = ({ gateway, gatewayId, updateGateway }) => {
                 accuracy: 0,
                 source: 'SOURCE_REGISTRY',
               },
-              placement: values._placement,
+              placement,
             },
           ]
         }
@@ -145,9 +149,9 @@ const GatewayLocationForm = ({ gateway, gatewayId, updateGateway }) => {
           const { location, ...rest } = antenna
           return rest
         })
-        patch.antennas[registryLocation.key].placement = values._placement
+        patch.antennas[registryLocation.key].placement = values.placement
       } else {
-        patch.antennas = [{ gain: 0, placement: values._placement }]
+        patch.antennas = [{ gain: 0, placement: values.placement }]
       }
 
       return updateGateway(gatewayId, patch)
@@ -155,23 +159,30 @@ const GatewayLocationForm = ({ gateway, gatewayId, updateGateway }) => {
     [gateway, gatewayId, updateGateway],
   )
 
-  const handleDelete = useCallback(async () => {
-    const registryLocation = getRegistryLocation(gateway.antennas)
+  const handleDelete = useCallback(
+    async deleteAll => {
+      const registryLocation = getRegistryLocation(gateway.antennas)
 
-    const patch = {
-      antennas: [...gateway.antennas],
-    }
-    patch.antennas.splice(registryLocation.key, 1)
+      if (deleteAll) {
+        return updateGateway(gatewayId, { antennas: [] })
+      }
 
-    return updateGateway(gatewayId, patch)
-  }, [gateway, gatewayId, updateGateway])
+      const patch = {
+        antennas: [...gateway.antennas],
+      }
+      patch.antennas.splice(registryLocation.key, 1)
+
+      return updateGateway(gatewayId, patch)
+    },
+    [gateway, gatewayId, updateGateway],
+  )
 
   const [updateLocationFromStatus, setUpdateLocationFromStatus] = useState(
     initialValues.update_location_from_status,
   )
 
-  const handleUpdateLocationFromStatusChange = useCallback(evt => {
-    setUpdateLocationFromStatus(evt.target.checked)
+  const handleUpdateLocationFromStatusChange = useCallback(useAutomaticUpdates => {
+    setUpdateLocationFromStatus(useAutomaticUpdates)
   }, [])
 
   return (
@@ -182,8 +193,9 @@ const GatewayLocationForm = ({ gateway, gatewayId, updateGateway }) => {
       formTitle={m.setGatewayLocation}
       onSubmit={handleSubmit}
       onDelete={handleDelete}
-      locationFieldsDisabled={updateLocationFromStatus}
-      allowDelete={!updateLocationFromStatus}
+      updatesDisabled={updateLocationFromStatus}
+      disabledInfo={m.locationFromStatusMessage}
+      noLocationSetInfo={m.noLocationSetInfo}
     >
       <Form.Field
         title={m.locationPrivacy}
@@ -196,15 +208,16 @@ const GatewayLocationForm = ({ gateway, gatewayId, updateGateway }) => {
       <Form.Field
         title={m.locationSource}
         name="update_location_from_status"
-        component={Checkbox}
-        description={m.updateLocationFromStatusDescription}
-        label={m.updateLocationFromStatus}
-        onChange={handleUpdateLocationFromStatusChange}
+        component={Radio.Group}
         tooltipId={tooltipIds.UPDATE_LOCATION_FROM_STATUS}
-      />
+        onChange={handleUpdateLocationFromStatusChange}
+      >
+        <Radio label={m.setLocationManually} value={false} />
+        <Radio label={m.updateLocationFromStatus} value />
+      </Form.Field>
       <Form.Field
         title={m.placement}
-        name="_placement"
+        name="placement"
         component={Radio.Group}
         horizontal
         tooltipId={tooltipIds.GATEWAY_PLACEMENT}
