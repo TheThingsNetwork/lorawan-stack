@@ -16,68 +16,10 @@
 package cpf
 
 import (
-	"bytes"
-
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/shared"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
-
-type LorafwdGatewayConfig struct {
-	ID *types.EUI64
-}
-
-type LorafwdGWMPConfig struct {
-	Node            string
-	ServiceUplink   uint16
-	ServiceDownlink uint16
-}
-
-// LorafwdConfig represents the Lorafwd configuration of Semtech's UDP Packet Forwarder.
-type LorafwdConfig struct {
-	Gateway  LorafwdGatewayConfig
-	Filter   struct{}
-	Database struct{}
-	GWMP     LorafwdGWMPConfig
-	API      struct{}
-}
-
-func (conf LorafwdConfig) MarshalText() ([]byte, error) {
-	buf := &bytes.Buffer{}
-	if err := lorafwdTmpl.Execute(buf, conf); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
-}
-
-// LoradGatewayConf contains the Lorad configuration for the gateway's server connection.
-type LoradGatewayConf struct {
-	BeaconEnable    bool        `json:"beacon_enable"`
-	BeaconPeriod    uint        `json:"beacon_period,omitempty"`
-	BeaconFreqHz    uint        `json:"beacon_freq_hz,omitempty"`
-	BeaconFreqNb    uint        `json:"beacon_freq_nb,omitempty"`
-	BeaconStep      uint        `json:"beacon_step,omitempty"`
-	BeaconDatarate  uint        `json:"beacon_datarate,omitempty"`
-	BeaconBwHz      uint        `json:"beacon_bw_hz,omitempty"`
-	BeaconPower     uint        `json:"beacon_power,omitempty"`
-	BeaconInfodesc  interface{} `json:"beacon_infodesc,omitempty"`
-	BeaconLatitude  float64     `json:"beacon_latitude,omitempty"`
-	BeaconLongitude float64     `json:"beacon_longitude,omitempty"`
-}
-
-type LoradSX1301Conf struct {
-	ttnpb.SX1301Config
-	InsertionLoss     float32 `json:"insertion_loss"`
-	InsertionLossDesc string  `json:"insertion_loss_desc,omitempty"`
-	AntennaGainDesc   string  `json:"antenna_gain_desc,omitempty"`
-}
-
-// LoradConfig represents the Lorad configuration of Semtech's UDP Packet Forwarder.
-type LoradConfig struct {
-	SX1301Conf  LoradSX1301Conf  `json:"SX1301_conf"`
-	GatewayConf LoradGatewayConf `json:"gateway_conf"`
-}
 
 // BuildLorad builds Lorad configuration for the given gateway, using the given frequency plan store.
 func BuildLorad(gtw *ttnpb.Gateway, fps *frequencyplans.Store) (*ttnpb.LoradConfig, error) {

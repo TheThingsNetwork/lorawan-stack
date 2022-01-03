@@ -194,7 +194,7 @@ func TestBuildLorafwd(t *testing.T) {
 	for _, tc := range []struct {
 		Name           string
 		Gateway        *ttnpb.Gateway
-		Config         *LorafwdConfig
+		Config         *ttnpb.LoraFwdConfig
 		ErrorAssertion func(t *testing.T, err error) bool
 	}{
 		{
@@ -209,8 +209,8 @@ func TestBuildLorafwd(t *testing.T) {
 			Gateway: &ttnpb.Gateway{
 				GatewayServerAddress: host,
 			},
-			Config: &LorafwdConfig{
-				GWMP: LorafwdGWMPConfig{
+			Config: &ttnpb.LoraFwdConfig{
+				Gwmp: &ttnpb.LoraFwdConfig_GWMPConfig{
 					Node:            host,
 					ServiceUplink:   shared.DefaultGatewayServerUDPPort,
 					ServiceDownlink: shared.DefaultGatewayServerUDPPort,
@@ -228,11 +228,11 @@ func TestBuildLorafwd(t *testing.T) {
 				},
 				GatewayServerAddress: host,
 			},
-			Config: &LorafwdConfig{
-				Gateway: LorafwdGatewayConfig{
-					ID: &eui,
+			Config: &ttnpb.LoraFwdConfig{
+				Gateway: &ttnpb.GatewayIdentifiers{
+					Eui: &eui,
 				},
-				GWMP: LorafwdGWMPConfig{
+				Gwmp: &ttnpb.LoraFwdConfig_GWMPConfig{
 					Node:            host,
 					ServiceUplink:   shared.DefaultGatewayServerUDPPort,
 					ServiceDownlink: shared.DefaultGatewayServerUDPPort,
@@ -250,11 +250,11 @@ func TestBuildLorafwd(t *testing.T) {
 				},
 				GatewayServerAddress: fmt.Sprintf("%s:%d", host, 42),
 			},
-			Config: &LorafwdConfig{
-				Gateway: LorafwdGatewayConfig{
-					ID: &eui,
+			Config: &ttnpb.LoraFwdConfig{
+				Gateway: &ttnpb.GatewayIdentifiers{
+					Eui: &eui,
 				},
-				GWMP: LorafwdGWMPConfig{
+				Gwmp: &ttnpb.LoraFwdConfig_GWMPConfig{
 					Node:            host,
 					ServiceUplink:   42,
 					ServiceDownlink: 42,
@@ -280,14 +280,14 @@ func TestBuildLorafwd(t *testing.T) {
 func TestLorafwdConfigMarshalText(t *testing.T) {
 	for _, tc := range []struct {
 		Name           string
-		Config         LorafwdConfig
+		Config         ttnpb.LoraFwdConfig
 		Text           string
 		ErrorAssertion func(t *testing.T, err error) bool
 	}{
 		{
 			Name: "no EUI;node:'thethings.example.com';uplink:1704;downlink:1706",
-			Config: LorafwdConfig{
-				GWMP: LorafwdGWMPConfig{
+			Config: ttnpb.LoraFwdConfig{
+				Gwmp: &ttnpb.LoraFwdConfig_GWMPConfig{
 					Node:            "thethings.example.com",
 					ServiceUplink:   1704,
 					ServiceDownlink: 1706,
@@ -498,11 +498,11 @@ service.downlink = 1706
 		},
 		{
 			Name: "EUI:0x42FF42FFFFFFFFFF;node:'thethings.example.com';uplink:1704;downlink:1706",
-			Config: LorafwdConfig{
-				Gateway: LorafwdGatewayConfig{
-					ID: &types.EUI64{0x42, 0xff, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff},
+			Config: ttnpb.LoraFwdConfig{
+				Gateway: &ttnpb.GatewayIdentifiers{
+					Eui: &types.EUI64{0x42, 0xff, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff},
 				},
-				GWMP: LorafwdGWMPConfig{
+				Gwmp: &ttnpb.LoraFwdConfig_GWMPConfig{
 					Node:            "thethings.example.com",
 					ServiceUplink:   1704,
 					ServiceDownlink: 1706,
@@ -714,7 +714,7 @@ service.downlink = 1706
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
-			conf := deepcopy.Copy(tc.Config).(LorafwdConfig)
+			conf := deepcopy.Copy(tc.Config).(ttnpb.LoraFwdConfig)
 			b, err := conf.MarshalText()
 			if a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 				a.So(string(b), should.Equal, tc.Text)
