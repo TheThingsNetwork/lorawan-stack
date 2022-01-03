@@ -576,7 +576,7 @@ func TestVersion(t *testing.T) {
 								AntennaGain: 3,
 							},
 						},
-						Channels: []ttnpb.GlobalSX1301Config_IFConfig{
+						Channels: []ttnpb.IFConfig{
 							{Enable: true, Radio: 0, IfValue: 600000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: true, Radio: 0, IfValue: 800000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: true, Radio: 0, IfValue: 1000000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
@@ -586,8 +586,8 @@ func TestVersion(t *testing.T) {
 							{Enable: true, Radio: 0, IfValue: 200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: true, Radio: 0, IfValue: 400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 						},
-						LoRaStandardChannel: &ttnpb.GlobalSX1301Config_IFConfig{Enable: true, Radio: 0, IfValue: 800000, Bandwidth: 250000, SpreadFactor: 7, Datarate: 0},
-						FSKChannel:          &ttnpb.GlobalSX1301Config_IFConfig{Enable: true, Radio: 0, IfValue: 1300000, Bandwidth: 0, SpreadFactor: 0, Datarate: 50000},
+						LoRaStandardChannel: &ttnpb.IFConfig{Enable: true, Radio: 0, IfValue: 800000, Bandwidth: 250000, SpreadFactor: 7, Datarate: 0},
+						FSKChannel:          &ttnpb.IFConfig{Enable: true, Radio: 0, IfValue: 1300000, Bandwidth: 0, SpreadFactor: 0, Datarate: 50000},
 					},
 				},
 			},
@@ -651,7 +651,7 @@ func TestVersion(t *testing.T) {
 								AntennaGain: 3,
 							},
 						},
-						Channels: []ttnpb.GlobalSX1301Config_IFConfig{
+						Channels: []ttnpb.IFConfig{
 							{Enable: true, Radio: 0, IfValue: 600000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: true, Radio: 0, IfValue: 800000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: true, Radio: 0, IfValue: 1000000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
@@ -661,8 +661,8 @@ func TestVersion(t *testing.T) {
 							{Enable: true, Radio: 0, IfValue: 200000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: true, Radio: 0, IfValue: 400000, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 						},
-						LoRaStandardChannel: &ttnpb.GlobalSX1301Config_IFConfig{Enable: true, Radio: 0, IfValue: 800000, Bandwidth: 250000, SpreadFactor: 7, Datarate: 0},
-						FSKChannel:          &ttnpb.GlobalSX1301Config_IFConfig{Enable: true, Radio: 0, IfValue: 1300000, Bandwidth: 0, SpreadFactor: 0, Datarate: 50000},
+						LoRaStandardChannel: &ttnpb.IFConfig{Enable: true, Radio: 0, IfValue: 800000, Bandwidth: 250000, SpreadFactor: 7, Datarate: 0},
+						FSKChannel:          &ttnpb.IFConfig{Enable: true, Radio: 0, IfValue: 1300000, Bandwidth: 0, SpreadFactor: 0, Datarate: 50000},
 					},
 				},
 			},

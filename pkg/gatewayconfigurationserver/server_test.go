@@ -116,7 +116,7 @@ func TestWeb(t *testing.T) {
 	semtechUDPConfig := func(gtw *ttnpb.Gateway) string {
 		return marshalJSON(test.Must(semtechudp.Build(gtw, fps)).(*ttnpb.SemtechUDPConfig))
 	}
-	cpfLoradConfig := func(gtw *ttnpb.Gateway) string {
+	LoradConfig := func(gtw *ttnpb.Gateway) string {
 		return marshalJSON(test.Must(cpf.BuildLorad(gtw, fps)).(*cpf.LoradConfig))
 	}
 	cpfLorafwdConfig := func(gtw *ttnpb.Gateway) string {
@@ -201,7 +201,7 @@ func TestWeb(t *testing.T) {
 						if err != nil {
 							t.Fatalf("Failed to read response body: %s", err)
 						}
-						a.So(string(b), should.Equal, cpfLoradConfig(is.res.Get)+"\n")
+						a.So(string(b), should.Equal, LoradConfig(is.res.Get)+"\n")
 					}
 				})
 				t.Run("cpf/lorafwd/lorafwd.toml", func(t *testing.T) {

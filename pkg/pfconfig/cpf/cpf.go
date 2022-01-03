@@ -67,7 +67,7 @@ type LoradGatewayConf struct {
 }
 
 type LoradSX1301Conf struct {
-	ttnpb.GlobalSX1301Config
+	ttnpb.SX1301Config
 	InsertionLoss     float32 `json:"insertion_loss"`
 	InsertionLossDesc string  `json:"insertion_loss_desc,omitempty"`
 	AntennaGainDesc   string  `json:"antenna_gain_desc,omitempty"`
@@ -80,19 +80,19 @@ type LoradConfig struct {
 }
 
 // BuildLorad builds Lorad configuration for the given gateway, using the given frequency plan store.
-func BuildLorad(gtw *ttnpb.Gateway, fps *frequencyplans.Store) (*ttnpb.CpfLoradConfig, error) {
+func BuildLorad(gtw *ttnpb.Gateway, fps *frequencyplans.Store) (*ttnpb.LoradConfig, error) {
 	fp, err := fps.GetByID(gtw.FrequencyPlanId)
 	if err != nil {
 		return nil, err
 	}
-	sx1301Conf := &ttnpb.GlobalSX1301Config{}
+	sx1301Conf := &ttnpb.SX1301Config{}
 	if len(fp.Radios) != 0 {
 		sx1301Conf, err = shared.BuildSX1301Config(fp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	var gatewayConf ttnpb.CpfLoradConfig_GatewayConfig
+	var gatewayConf ttnpb.LoradConfig_GatewayConfig
 	if antennas := gtw.GetAntennas(); len(antennas) > 0 {
 		antenna := antennas[0]
 		sx1301Conf.AntennaGain = antenna.Gain
@@ -102,8 +102,8 @@ func BuildLorad(gtw *ttnpb.Gateway, fps *frequencyplans.Store) (*ttnpb.CpfLoradC
 		}
 	}
 	// TODO: Configure Class B (https://github.com/TheThingsNetwork/lorawan-stack/issues/1748).
-	return &ttnpb.CpfLoradConfig{
-		Sx1301Config: &ttnpb.CpfLoradConfig_SX1301Config{
+	return &ttnpb.LoradConfig{
+		Sx1301Config: &ttnpb.LoradConfig_LoradSX1301Config{
 			GlobalConfig: sx1301Conf,
 			// Following fields are set equal to defaults present in CPF 1.1.6 DOTA for Kerlink Wirnet Station.
 			AntennaGainDesc:   "Antenna gain, in dBi",
@@ -115,20 +115,20 @@ func BuildLorad(gtw *ttnpb.Gateway, fps *frequencyplans.Store) (*ttnpb.CpfLoradC
 }
 
 // BuildLorafwd builds Lorafwd configuration for the given gateway.
-func BuildLorafwd(gtw *ttnpb.Gateway) (*ttnpb.CpfLoradFwdConfig, error) {
+func BuildLorafwd(gtw *ttnpb.Gateway) (*ttnpb.LoraFwdConfig, error) {
 	host, port, err := shared.ParseGatewayServerAddress(gtw.GatewayServerAddress)
 	if err != nil {
 		return nil, err
 	}
 
-	return &ttnpb.CpfLoradFwdConfig{
-		GatewayConfig: &ttnpb.CpfLoradFwdConfig_GatewayConfig{
-			Id: gtw.GetIds().GetEui()[:],
+	return &ttnpb.LoraFwdConfig{
+		Gateway: &ttnpb.GatewayIdentifiers{
+			Eui: gtw.GetIds().GetEui(),
 		},
-		GwmpConfig: &ttnpb.CpfLoradFwdConfig_GWMPConfig{
+		Gwmp: &ttnpb.LoraFwdConfig_GWMPConfig{
 			Node:            host,
-			ServiceUpLink:   uint32(port),
-			ServiceDownLink: uint32(port),
+			ServiceUplink:   uint32(port),
+			ServiceDownlink: uint32(port),
 		},
 	}, nil
 }

@@ -112,7 +112,7 @@ func TestGetRouterConfig(t *testing.T) {
 								Frequency: 923000000,
 							},
 						},
-						Channels: []ttnpb.GlobalSX1301Config_IFConfig{
+						Channels: []ttnpb.IFConfig{
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
@@ -122,8 +122,8 @@ func TestGetRouterConfig(t *testing.T) {
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 						},
-						LoRaStandardChannel: &ttnpb.GlobalSX1301Config_IFConfig{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-						FSKChannel:          &ttnpb.GlobalSX1301Config_IFConfig{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						LoRaStandardChannel: &ttnpb.IFConfig{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						FSKChannel:          &ttnpb.IFConfig{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 					},
 				},
 			},
@@ -182,7 +182,7 @@ func TestGetRouterConfig(t *testing.T) {
 								Frequency: 923000000,
 							},
 						},
-						Channels: []ttnpb.GlobalSX1301Config_IFConfig{
+						Channels: []ttnpb.IFConfig{
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
@@ -192,8 +192,8 @@ func TestGetRouterConfig(t *testing.T) {
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 						},
-						LoRaStandardChannel: &ttnpb.GlobalSX1301Config_IFConfig{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-						FSKChannel:          &ttnpb.GlobalSX1301Config_IFConfig{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						LoRaStandardChannel: &ttnpb.IFConfig{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						FSKChannel:          &ttnpb.IFConfig{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 					},
 				},
 			},
@@ -307,7 +307,7 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 								AntennaGain: 3,
 							},
 						},
-						Channels: []ttnpb.GlobalSX1301Config_IFConfig{
+						Channels: []ttnpb.IFConfig{
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
@@ -317,8 +317,8 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 						},
-						LoRaStandardChannel: &ttnpb.GlobalSX1301Config_IFConfig{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-						FSKChannel:          &ttnpb.GlobalSX1301Config_IFConfig{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						LoRaStandardChannel: &ttnpb.IFConfig{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						FSKChannel:          &ttnpb.IFConfig{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 					},
 					{
 						Radios: []LBSRFConfig{
@@ -333,7 +333,7 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 								AntennaGain: 3,
 							},
 						},
-						Channels: []ttnpb.GlobalSX1301Config_IFConfig{
+						Channels: []ttnpb.IFConfig{
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
@@ -343,8 +343,8 @@ func TestGetRouterConfigWithMultipleFP(t *testing.T) {
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 							{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 						},
-						LoRaStandardChannel: &ttnpb.GlobalSX1301Config_IFConfig{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
-						FSKChannel:          &ttnpb.GlobalSX1301Config_IFConfig{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						LoRaStandardChannel: &ttnpb.IFConfig{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
+						FSKChannel:          &ttnpb.IFConfig{Enable: false, Radio: 0, IfValue: 0, Bandwidth: 0, SpreadFactor: 0, Datarate: 0},
 					},
 				},
 			},

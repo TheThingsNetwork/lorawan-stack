@@ -162,7 +162,7 @@ func TestSX1301Conf(t *testing.T) {
 				t.Fatalf("Unexpected error: %v", err)
 			}
 			if !(a.So(unmarshaledCfg, should.Resemble, *cfg)) {
-				t.Fatalf("Invalid config after unmarshaling: \n '%v' \n\n '%v'", *cfg, unmarshaledCfg)
+				t.Fatalf("Invalid config after unmarshaling: %v", cfg)
 			}
 		})
 	}

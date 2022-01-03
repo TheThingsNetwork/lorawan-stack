@@ -98,11 +98,11 @@ type LBSRFConfig struct {
 // https://doc.sm.tc/station/gw_v2.html
 // The fields `lorawan_public` and `clock_source` are omitted as they should be present in the gateway's `station.conf`.
 type LBSSX1301Config struct {
-	LBTConfig           *ttnpb.GlobalSX1301Config_LBTConfig
+	LBTConfig           *ttnpb.LBTConfig
 	Radios              []LBSRFConfig
-	Channels            []ttnpb.GlobalSX1301Config_IFConfig
-	LoRaStandardChannel *ttnpb.GlobalSX1301Config_IFConfig
-	FSKChannel          *ttnpb.GlobalSX1301Config_IFConfig
+	Channels            []ttnpb.IFConfig
+	LoRaStandardChannel *ttnpb.IFConfig
+	FSKChannel          *ttnpb.IFConfig
 }
 
 // MarshalJSON implements json.Marshaler.
@@ -127,7 +127,7 @@ func (c LBSSX1301Config) MarshalJSON() ([]byte, error) {
 }
 
 // fromSX1301Conf updates fields from shared.SX1301Config.
-func (c *LBSSX1301Config) fromSX1301Conf(sx1301Conf ttnpb.GlobalSX1301Config, antennaGain int) error {
+func (c *LBSSX1301Config) fromSX1301Conf(sx1301Conf ttnpb.SX1301Config, antennaGain int) error {
 	c.LoRaStandardChannel = sx1301Conf.LoraStandardChannel
 	c.FSKChannel = sx1301Conf.FskChannel
 	c.LBTConfig = sx1301Conf.LbtConfig
@@ -152,7 +152,7 @@ func (c *LBSSX1301Config) UnmarshalJSON(msg []byte) error {
 	if err := json.Unmarshal(msg, &root); err != nil {
 		return err
 	}
-	radioMap, chanMap := make(map[int]LBSRFConfig), make(map[int]ttnpb.GlobalSX1301Config_IFConfig)
+	radioMap, chanMap := make(map[int]LBSRFConfig), make(map[int]ttnpb.IFConfig)
 	for key, value := range root {
 		switch {
 		case key == "lbt_cfg":
@@ -168,7 +168,7 @@ func (c *LBSSX1301Config) UnmarshalJSON(msg []byte) error {
 				return err
 			}
 		case strings.HasPrefix(key, "chan_multiSF_"):
-			var channel ttnpb.GlobalSX1301Config_IFConfig
+			var channel ttnpb.IFConfig
 			if err := json.Unmarshal(value, &channel); err != nil {
 				return err
 			}
@@ -192,7 +192,7 @@ func (c *LBSSX1301Config) UnmarshalJSON(msg []byte) error {
 		}
 	}
 
-	c.Radios, c.Channels = make([]LBSRFConfig, len(radioMap)), make([]ttnpb.GlobalSX1301Config_IFConfig, len(chanMap))
+	c.Radios, c.Channels = make([]LBSRFConfig, len(radioMap)), make([]ttnpb.IFConfig, len(chanMap))
 	for key, value := range radioMap {
 		c.Radios[key] = value
 	}

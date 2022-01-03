@@ -49,7 +49,7 @@ func (s *Server) handleGetFrequencyPlan(w http.ResponseWriter, r *http.Request) 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(struct {
-		SX1301Conf *ttnpb.GlobalSX1301Config `json:"SX1301_conf"`
+		SX1301Conf *ttnpb.SX1301Config `json:"SX1301_conf"`
 	}{
 		SX1301Conf: config,
 	})
