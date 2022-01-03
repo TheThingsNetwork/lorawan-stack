@@ -1037,6 +1037,7 @@
   "lib.shared-messages.enforceDutyCycle": "Enforce duty cycle",
   "lib.shared-messages.entityId": "Entity ID",
   "lib.shared-messages.eventsCannotShow": "Cannot show events",
+  "lib.shared-messages.exportJson": "Export as JSON",
   "lib.shared-messages.external": "External",
   "lib.shared-messages.externalJoinServer": "External Join Server",
   "lib.shared-messages.fetching": "Fetching data…",
