@@ -15,6 +15,7 @@
 import React, { Component } from 'react'
 import { defineMessages } from 'react-intl'
 import bind from 'autobind-decorator'
+import { isPlainObject } from 'lodash'
 
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
@@ -75,8 +76,7 @@ const validationSchema = Yup.object()
 // We consider location of an entity set iff at least one coordinate is set,
 // i.e. longitude, altitude, latitude.
 const hasLocationSet = location =>
-  location !== null &&
-  typeof location === 'object' &&
+  isPlainObject(location) &&
   (typeof location.altitude !== 'undefined' ||
     typeof location.latitude !== 'undefined' ||
     typeof location.longitude !== 'undefined')
@@ -374,4 +374,4 @@ class LocationForm extends Component {
   }
 }
 
-export default LocationForm
+export { LocationForm as default, hasLocationSet }

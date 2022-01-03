@@ -19,7 +19,7 @@ import Checkbox from '@ttn-lw/components/checkbox'
 import Form from '@ttn-lw/components/form'
 import Radio from '@ttn-lw/components/radio-button'
 
-import LocationForm from '@console/components/location-form'
+import LocationForm, { hasLocationSet } from '@console/components/location-form'
 
 import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -103,7 +103,7 @@ const GatewayLocationForm = ({ gateway, gatewayId, updateGateway }) => {
         : 'PLACEMENT_UNKNOWN',
     location_public: gateway.location_public || false,
     update_location_from_status: gateway.update_location_from_status || false,
-    ...(registryLocation
+    ...(hasLocationSet(registryLocation?.antenna?.location)
       ? registryLocation.antenna.location
       : {
           latitude: undefined,
