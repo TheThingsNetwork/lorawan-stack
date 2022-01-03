@@ -48,7 +48,7 @@ $event-container-height = 40px
     font-weight: $fw.bold
     +media-query($bp.s)
         display: none
-  
+
   .cell-data
     +media-query($bp.l)
         display: none
@@ -70,13 +70,16 @@ $event-container-height = 40px
   flex-grow: 1
   right: $cs.s
   display: flex
-  justify-content: flex-end
   +media-query-min($bp.xs)
+    justify-content: flex-end
     position: sticky
 
   .actions
     background-color: white
     display: flex
+  
+  button
+    margin-right: 0 !important
 
 .toggle-container
   display: flex
