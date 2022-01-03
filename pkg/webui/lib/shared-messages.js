@@ -176,6 +176,7 @@ export default defineMessages({
   enforceDutyCycle: 'Enforce duty cycle',
   entityId: 'Entity ID',
   eventsCannotShow: 'Cannot show events',
+  exportJson: 'Export as JSON',
   external: 'External',
   externalJoinServer: 'External Join Server',
   fetching: 'Fetching data…',

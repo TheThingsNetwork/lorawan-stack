@@ -46,6 +46,12 @@ $event-container-height = 40px
 
   & > div:not(.cell-preview):not(:last-child)
     font-weight: $fw.bold
+    +media-query($bp.s)
+        display: none
+
+  .cell-data
+    +media-query($bp.l)
+        display: none
 
 .header-cells, .event
   padding: $cs.xxs 0 $cs.xxs $cs.xs
@@ -64,13 +70,16 @@ $event-container-height = 40px
   flex-grow: 1
   right: $cs.s
   display: flex
-  justify-content: flex-end
   +media-query-min($bp.xs)
+    justify-content: flex-end
     position: sticky
 
   .actions
     background-color: white
     display: flex
+  
+  button
+    margin-right: 0 !important
 
 .toggle-container
   display: flex
@@ -181,6 +190,8 @@ $event-container-height = 40px
   min-width: 14rem
   max-width: 20rem
   display: flex
+  +media-query($bp.m)
+    display: none
 
 .cell-preview
   flex-basis: auto

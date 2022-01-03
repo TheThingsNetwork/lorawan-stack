@@ -26,6 +26,7 @@ import Message from '@ttn-lw/lib/components/message'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
 
 import EventsList from './list'
 import EventDetails from './details'
@@ -50,6 +51,10 @@ const Events = React.memo(
   }) => {
     const [focus, setFocus] = useState({ eventId: undefined, visible: false })
     const onPause = useCallback(() => onPauseToggle(paused), [onPauseToggle, paused])
+    const onExport = useCallback(() => {
+      const eventLogData = composeDataUri(JSON.stringify(events, undefined, 2))
+      downloadDataUriAsFile(eventLogData, `${entityId}_live_data_${Date.now()}.json`)
+    }, [entityId, events])
     const handleRowClick = useCallback(
       eventId => {
         if (eventId !== focus.eventId) {
@@ -88,12 +93,21 @@ const Events = React.memo(
                   </label>
                 )}
                 <Button
+                  onClick={onExport}
+                  message={sharedMessages.exportJson}
+                  naked
+                  secondary
+                  icon="file_download"
+                  responsiveLabel
+                />
+                <Button
                   onClick={onPause}
                   message={paused ? sharedMessages.resume : sharedMessages.pause}
                   naked
                   secondary={!paused}
                   warning={paused}
                   icon={paused ? 'play_arrow' : 'pause'}
+                  responsiveLabel
                 />
                 <Button
                   onClick={onClear}
@@ -101,6 +115,7 @@ const Events = React.memo(
                   naked
                   secondary
                   icon="delete"
+                  responsiveLabel
                 />
               </div>
             </div>
