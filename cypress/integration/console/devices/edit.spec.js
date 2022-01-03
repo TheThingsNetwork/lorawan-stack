@@ -140,7 +140,6 @@ describe('Device general settings', () => {
 
     cy.findByTestId('error-notification').should('not.exist')
     cy.findByTestId('toast-notification')
-      .should('be.visible')
       .findByText(`End device updated`)
       .should('be.visible')
   })
