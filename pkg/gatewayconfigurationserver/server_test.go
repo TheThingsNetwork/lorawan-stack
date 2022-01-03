@@ -117,10 +117,10 @@ func TestWeb(t *testing.T) {
 		return marshalJSON(test.Must(semtechudp.Build(gtw, fps)).(*ttnpb.SemtechUDPConfig))
 	}
 	LoradConfig := func(gtw *ttnpb.Gateway) string {
-		return marshalJSON(test.Must(cpf.BuildLorad(gtw, fps)).(*cpf.LoradConfig))
+		return marshalJSON(test.Must(cpf.BuildLorad(gtw, fps)).(*ttnpb.LoradConfig))
 	}
 	cpfLorafwdConfig := func(gtw *ttnpb.Gateway) string {
-		return marshalText(test.Must(cpf.BuildLorafwd(gtw)).(*cpf.LorafwdConfig))
+		return marshalText(test.Must(cpf.BuildLorafwd(gtw)).(*ttnpb.LoraFwdConfig))
 	}
 
 	t.Run("Authorization", func(t *testing.T) {
