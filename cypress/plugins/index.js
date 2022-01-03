@@ -12,13 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const fs = require('fs')
-
 const tasks = require('./tasks')
-
-const failedSpecsFilename = `./.cache/.failed-specs-${
-  process.env.CYPRESS_MACHINE_NUMBER || '0'
-}.txt`
 
 module.exports = (on, config) => {
   tasks.stackConfigTask(on, config)
