@@ -3087,6 +3087,16 @@
           "parameters": []
         }
       ]
+    },
+    "GetDefaultJoinEUI": {
+      "file": "lorawan-stack/api/joinserver.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/js/default_join_eui",
+          "parameters": []
+        }
+      ]
     }
   },
   "JsEndDeviceRegistry": {

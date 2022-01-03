@@ -911,6 +911,26 @@ func (dst *JoinEUIPrefixes) SetFields(src *JoinEUIPrefixes, paths ...string) err
 	return nil
 }
 
+func (dst *GetDefaultJoinEUIResponse) SetFields(src *GetDefaultJoinEUIResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "join_eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.JoinEui = src.JoinEui
+			} else {
+				dst.JoinEui = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *ProvisionEndDevicesRequest_IdentifiersList) SetFields(src *ProvisionEndDevicesRequest_IdentifiersList, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

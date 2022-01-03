@@ -320,6 +320,7 @@
   - [Message `DeleteApplicationActivationSettingsRequest`](#ttn.lorawan.v3.DeleteApplicationActivationSettingsRequest)
   - [Message `DeriveSessionKeysRequest`](#ttn.lorawan.v3.DeriveSessionKeysRequest)
   - [Message `GetApplicationActivationSettingsRequest`](#ttn.lorawan.v3.GetApplicationActivationSettingsRequest)
+  - [Message `GetDefaultJoinEUIResponse`](#ttn.lorawan.v3.GetDefaultJoinEUIResponse)
   - [Message `GetRootKeysRequest`](#ttn.lorawan.v3.GetRootKeysRequest)
   - [Message `JoinAcceptMICRequest`](#ttn.lorawan.v3.JoinAcceptMICRequest)
   - [Message `JoinEUIPrefix`](#ttn.lorawan.v3.JoinEUIPrefix)
@@ -4741,6 +4742,12 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ----- | ----------- |
 | `application_ids` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.GetDefaultJoinEUIResponse">Message `GetDefaultJoinEUIResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `join_eui` | [`bytes`](#bytes) |  |  |
+
 ### <a name="ttn.lorawan.v3.GetRootKeysRequest">Message `GetRootKeysRequest`</a>
 
 | Field | Type | Label | Description |
@@ -4915,12 +4922,14 @@ The AsJs service connects an Application Server to a Join Server.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `GetJoinEUIPrefixes` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`JoinEUIPrefixes`](#ttn.lorawan.v3.JoinEUIPrefixes) | Request the JoinEUI prefixes that are configured for this Join Server. |
+| `GetDefaultJoinEUI` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`GetDefaultJoinEUIResponse`](#ttn.lorawan.v3.GetDefaultJoinEUIResponse) | Request the default JoinEUI that is configured for this Join Server. |
 
 #### HTTP bindings
 
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `GetJoinEUIPrefixes` | `GET` | `/api/v3/js/join_eui_prefixes` |  |
+| `GetDefaultJoinEUI` | `GET` | `/api/v3/js/default_join_eui` |  |
 
 ### <a name="ttn.lorawan.v3.JsEndDeviceRegistry">Service `JsEndDeviceRegistry`</a>
 

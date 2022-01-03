@@ -21639,6 +21639,30 @@
           ]
         },
         {
+          "name": "GetDefaultJoinEUIResponse",
+          "longName": "GetDefaultJoinEUIResponse",
+          "fullName": "ttn.lorawan.v3.GetDefaultJoinEUIResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "join_eui",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "GetRootKeysRequest",
           "longName": "GetRootKeysRequest",
           "fullName": "ttn.lorawan.v3.GetRootKeysRequest",
@@ -22397,6 +22421,28 @@
                     {
                       "method": "GET",
                       "pattern": "/js/join_eui_prefixes"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetDefaultJoinEUI",
+              "description": "Request the default JoinEUI that is configured for this Join Server.",
+              "requestType": "Empty",
+              "requestLongType": ".google.protobuf.Empty",
+              "requestFullType": "google.protobuf.Empty",
+              "requestStreaming": false,
+              "responseType": "GetDefaultJoinEUIResponse",
+              "responseLongType": "GetDefaultJoinEUIResponse",
+              "responseFullType": "ttn.lorawan.v3.GetDefaultJoinEUIResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/js/default_join_eui"
                     }
                   ]
                 }

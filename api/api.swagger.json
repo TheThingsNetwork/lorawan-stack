@@ -6172,6 +6172,29 @@
         ]
       }
     },
+    "/js/default_join_eui": {
+      "get": {
+        "summary": "Request the default JoinEUI that is configured for this Join Server.",
+        "operationId": "Js_GetDefaultJoinEUI",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetDefaultJoinEUIResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "Js"
+        ]
+      }
+    },
     "/js/join_eui_prefixes": {
       "get": {
         "summary": "Request the JoinEUI prefixes that are configured for this Join Server.",
@@ -15124,6 +15147,15 @@
           "items": {
             "$ref": "#/definitions/v3Right"
           }
+        }
+      }
+    },
+    "v3GetDefaultJoinEUIResponse": {
+      "type": "object",
+      "properties": {
+        "join_eui": {
+          "type": "string",
+          "format": "byte"
         }
       }
     },

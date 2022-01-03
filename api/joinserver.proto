@@ -298,11 +298,22 @@ message JoinEUIPrefixes {
   repeated JoinEUIPrefix prefixes = 1;
 }
 
+message GetDefaultJoinEUIResponse {
+  bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+}
+
 service Js {
   // Request the JoinEUI prefixes that are configured for this Join Server.
   rpc GetJoinEUIPrefixes(google.protobuf.Empty) returns (JoinEUIPrefixes) {
     option (google.api.http) = {
       get: "/js/join_eui_prefixes"
+    };
+  };
+
+  // Request the default JoinEUI that is configured for this Join Server.
+  rpc GetDefaultJoinEUI(google.protobuf.Empty) returns (GetDefaultJoinEUIResponse) {
+    option (google.api.http) = {
+      get: "/js/default_join_eui"
     };
   };
 }

@@ -549,6 +549,11 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config interf
 				m.viper.SetDefault(name, str)
 				flags.StringP(name, shorthand, str, description)
 
+			case types.EUI64:
+				str := val.String()
+				m.viper.SetDefault(name, str)
+				flags.StringP(name, shorthand, str, description)
+
 			case ttnpb.RxDelay:
 				m.viper.SetDefault(name, int32(val))
 				flags.Int32P(name, shorthand, int32(val), description)

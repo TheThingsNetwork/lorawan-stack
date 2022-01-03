@@ -52,7 +52,8 @@ type JoinServer struct {
 	keys                          KeyRegistry
 	applicationActivationSettings ApplicationActivationSettingRegistry
 
-	euiPrefixes []types.EUI64Prefix
+	euiPrefixes    []types.EUI64Prefix
+	defaultJoinEUI types.EUI64
 
 	grpc struct {
 		nsJs                          nsJsServer
@@ -80,7 +81,8 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 		keys:                          conf.Keys,
 		applicationActivationSettings: conf.ApplicationActivationSettings,
 
-		euiPrefixes: conf.JoinEUIPrefixes,
+		euiPrefixes:    conf.JoinEUIPrefixes,
+		defaultJoinEUI: conf.DefaultJoinEUI,
 	}
 
 	js.grpc.applicationActivationSettings = applicationActivationSettingsRegistryServer{

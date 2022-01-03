@@ -97,3 +97,43 @@ func TestGetJoinEUIPrefixes(t *testing.T) {
 		})
 	}
 }
+
+func TestGetDefaultJoinEUI(t *testing.T) {
+	for _, tc := range []struct {
+		Name           string
+		DefaultJoinEUI types.EUI64
+		Response       ttnpb.GetDefaultJoinEUIResponse
+	}{
+		{
+			Name:           "Default",
+			DefaultJoinEUI: types.EUI64{0xff, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			Response: ttnpb.GetDefaultJoinEUIResponse{
+				JoinEui: &types.EUI64{0xff, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+			},
+		},
+		{
+			Name:           "AnotherDefault",
+			DefaultJoinEUI: types.EUI64{0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			Response: ttnpb.GetDefaultJoinEUIResponse{
+				JoinEui: &types.EUI64{0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
+			},
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			a := assertions.New(t)
+
+			js := test.Must(New(
+				componenttest.NewComponent(t, &component.Config{}),
+				&Config{
+					DefaultJoinEUI: tc.DefaultJoinEUI,
+				})).(*JoinServer)
+			componenttest.StartComponent(t, js.Component)
+			defer js.Close()
+
+			resp, err := ttnpb.NewJsClient(js.LoopbackConn()).GetDefaultJoinEUI(test.Context(), ttnpb.Empty)
+			if a.So(err, should.BeNil) {
+				a.So(resp, should.Resemble, tc.Response)
+			}
+		})
+	}
+}
