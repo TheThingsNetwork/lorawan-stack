@@ -146,7 +146,7 @@ export default class WebhookTemplateForm extends Component {
 
   render() {
     const { templateId, webhookTemplate } = this.props
-    const { name, fields } = webhookTemplate
+    const { name, fields = [] } = webhookTemplate
     const { error, displayOverwriteModal, existingId } = this.state
     const validationSchema = Yup.object({
       ...fields.reduce(
