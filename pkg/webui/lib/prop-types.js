@@ -221,9 +221,7 @@ PropTypes.deviceTemplate = PropTypes.shape({
     lorawan_version: PropTypes.string.isRequired,
     lorawan_phy_version: PropTypes.string.isRequired,
   }),
-  field_mask: PropTypes.shape({
-    paths: PropTypes.arrayOf(PropTypes.string).isRequired,
-  }).isRequired,
+  field_mask: PropTypes.string.isRequired,
 })
 
 PropTypes.organization = PropTypes.shape({
