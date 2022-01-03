@@ -23,6 +23,7 @@ import DocTooltip from '@ttn-lw/components/tooltip/doc'
 import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
+import DateTime from '@ttn-lw/lib/components/date-time'
 
 import EntityTitleSection from '@console/components/entity-title-section'
 import LastSeen from '@console/components/last-seen'
@@ -36,7 +37,7 @@ const m = defineMessages({
   uplinkDownlinkTooltip:
     'The number of sent uplinks and received downlinks of this end device since the last frame counter reset.',
   lastSeenAvailableTooltip:
-    'The elapsed time since the network registered the last activity of this end device. This is determined from sent uplinks, confirmed downlinks or (re)join requests.',
+    'The elapsed time since the network registered the last activity of this end device. This is determined from sent uplinks, confirmed downlinks or (re)join requests.{lineBreak}The last activity was received at {lastActivityInfo}',
   noActivityTooltip:
     'The network has not registered any activity from this end device yet. This could mean that your end device has not sent any messages yet or only messages that cannot be handled by the network, e.g. due to a mismatch of EUIs or frequencies.',
 })
@@ -46,11 +47,12 @@ const { Content } = EntityTitleSection
 const DeviceTitleSection = props => {
   const { devId, fetching, device, uplinkFrameCount, downlinkFrameCount, lastSeen, children } =
     props
-
   const showLastSeen = Boolean(lastSeen)
   const showUplinkCount = typeof uplinkFrameCount === 'number'
   const showDownlinkCount = typeof downlinkFrameCount === 'number'
   const notAvailableElem = <Message content={sharedMessages.notAvailable} />
+  const lastActivityInfo = lastSeen ? <DateTime value={lastSeen} noTitle /> : lastSeen
+  const lineBreak = <br />
   const bottomBarLeft = (
     <>
       <Tooltip content={<Message content={m.uplinkDownlinkTooltip} />}>
@@ -70,9 +72,14 @@ const DeviceTitleSection = props => {
       {showLastSeen ? (
         <DocTooltip
           docPath="/reference/last-activity"
-          content={<Message content={m.lastSeenAvailableTooltip} />}
+          content={
+            <Message
+              content={m.lastSeenAvailableTooltip}
+              values={{ lineBreak, lastActivityInfo }}
+            />
+          }
         >
-          <LastSeen lastSeen={lastSeen} flipped>
+          <LastSeen lastSeen={lastSeen} flipped noTitle>
             <Icon icon="help_outline" textPaddedLeft small nudgeUp className="tc-subtle-gray" />
           </LastSeen>
         </DocTooltip>

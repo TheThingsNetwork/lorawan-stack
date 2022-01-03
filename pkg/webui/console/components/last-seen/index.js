@@ -44,6 +44,7 @@ const LastSeen = React.forwardRef((props, ref) => {
     flipped,
     message,
     status,
+    noTitle,
   } = props
 
   return (
@@ -56,6 +57,7 @@ const LastSeen = React.forwardRef((props, ref) => {
           firstToLower={!short}
           updateIntervalInSeconds={updateIntervalInSeconds}
           relativeTimeStyle={short ? 'short' : undefined}
+          noTitle={noTitle}
         />
       </div>
       {children}
@@ -73,6 +75,7 @@ LastSeen.propTypes = {
     PropTypes.instanceOf(Date),
   ]).isRequired,
   message: PropTypes.message,
+  noTitle: PropTypes.bool,
   short: PropTypes.bool,
   status: PropTypes.oneOf(['good', 'bad', 'mediocre', 'unknown']),
   updateIntervalInSeconds: PropTypes.number,
@@ -86,6 +89,7 @@ LastSeen.defaultProps = {
   short: false,
   status: 'good',
   message: sharedMessages.lastSeen,
+  noTitle: false,
 }
 
 export default LastSeen
