@@ -12,6 +12,7 @@ on:
       - '!pkg/webui/**.go'
       - 'sdk/js/**'
       - 'tools/**'
+      - 'cypress/**'
       - 'yarn.lock'
 
 jobs:
