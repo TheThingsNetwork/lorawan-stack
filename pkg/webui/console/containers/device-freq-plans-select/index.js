@@ -18,13 +18,15 @@ import { CreateFrequencyPlansSelect } from '@console/containers/freq-plans-selec
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+const getRegionFromBandId = (bandId = '') => bandId.split('_')[0]
+
 const FreqPlansSelect = React.memo(props => {
   const { bandId, ...rest } = props
 
   return React.createElement(
     CreateFrequencyPlansSelect('ns', {
       optionsFormatter: plans => {
-        const region = bandId.split('_')[0]
+        const region = getRegionFromBandId(bandId)
         if (!Boolean(region)) {
           return plans.map(plan => ({ value: plan.id, label: plan.name }))
         }

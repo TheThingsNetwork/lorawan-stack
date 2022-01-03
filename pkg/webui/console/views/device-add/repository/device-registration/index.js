@@ -27,6 +27,7 @@ import Message from '@ttn-lw/lib/components/message'
 import JoinEUIPRefixesInput from '@console/components/join-eui-prefixes-input'
 
 import DevAddrInput from '@console/containers/dev-addr-input'
+import FreqPlansSelect from '@console/containers/device-freq-plans-select'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -40,8 +41,6 @@ import { selectBand } from '../reducer'
 import { REGISTRATION_TYPES } from '../../utils'
 import messages from '../../messages'
 import style from '../../device-add.styl'
-
-import FreqPlansSelect from './freq-plans-select'
 
 const m = defineMessages({
   fetching: 'Fetching template…',

@@ -32,7 +32,7 @@ import PhyVersionInput from '@console/components/phy-version-input'
 import LorawanVersionInput from '@console/components/lorawan-version-input'
 import MacSettingsSection from '@console/components/mac-settings-section'
 
-import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
+import FreqPlansSelect from '@console/containers/device-freq-plans-select'
 import DevAddrInput from '@console/containers/dev-addr-input'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
@@ -89,11 +89,13 @@ const NetworkServerForm = React.memo(props => {
     supports_class_b = false,
     supports_class_c = false,
     mac_settings = {},
+    version_ids = {},
   } = device
 
   const isABP = isDeviceABP(device)
   const isMulticast = isDeviceMulticast(device)
   const isJoinedOTAA = isDeviceOTAA(device) && isDeviceJoined(device)
+  const bandId = version_ids.band_id
 
   const validationContext = React.useMemo(
     () => ({
@@ -369,11 +371,12 @@ const NetworkServerForm = React.memo(props => {
       error={error}
       formikRef={formRef}
     >
-      <NsFrequencyPlansSelect
+      <FreqPlansSelect
         name="frequency_plan_id"
         required
         tooltipId={tooltipIds.FREQUENCY_PLAN}
         onChange={handleFreqPlanChange}
+        bandId={bandId}
       />
       <Form.Field
         title={sharedMessages.macVersion}
