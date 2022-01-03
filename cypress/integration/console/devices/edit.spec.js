@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { generateHexValue } from '../../../support/utils'
+
 describe('Device general settings', () => {
   const appId = 'end-device-edit-test-application'
   const application = { ids: { application_id: appId } }
@@ -111,10 +113,71 @@ describe('Device general settings', () => {
     cy.findByRole('button', { name: 'Save changes' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification').findByText(`End device updated`).should('be.visible')
+  })
+
+  it('succeeds editing Network layer', () => {
+    const device = {
+      dev_addr: generateHexValue(8),
+      nwk_s_key: generateHexValue(32),
+      lorawan_version: 'MAC_V1_0',
+      frequency_plan_id: '863-870 MHz',
+    }
+
+    cy.findByText('Network layer', { selector: 'h3' })
+      .closest('[data-test-id="collapsible-section"]')
+      .within(() => {
+        cy.findByRole('button', { name: 'Expand' }).click()
+        cy.findByLabelText('Frequency plan').type(device.frequency_plan_id)
+        cy.findByLabelText('LoRaWAN version').type(device.lorawan_version)
+        cy.findByLabelText('Device address').type(device.dev_addr)
+        cy.findByLabelText('NwkSKey').type(device.nwk_s_key)
+        cy.findByRole('button', { name: 'Save changes' }).click()
+      })
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification').findByText(`End device updated`).should('be.visible')
+  })
+
+  it('succeeds editing Application layer', () => {
+    const device = {
+      app_s_key: generateHexValue(32),
+    }
+
+    cy.findByText('Application layer', { selector: 'h3' })
+      .closest('[data-test-id="collapsible-section"]')
+      .within(() => {
+        cy.findByRole('button', { name: 'Expand' }).click()
+        cy.findByLabelText('AppSKey').type(device.app_s_key)
+        cy.findByRole('button', { name: 'Save changes' }).click()
+      })
+
+    cy.findByTestId('error-notification').should('not.exist')
     cy.findByTestId('toast-notification')
       .should('be.visible')
       .findByText(`End device updated`)
       .should('be.visible')
+  })
+
+  it('succeeds editing Join Settings', () => {
+    const device = {
+      home_netid: generateHexValue(6),
+      server_id: 'test-server-id',
+      app_key: generateHexValue(32),
+    }
+
+    cy.findByText('Join Settings', { selector: 'h3' })
+      .closest('[data-test-id="collapsible-section"]')
+      .within(() => {
+        cy.findByRole('button', { name: 'Expand' }).click()
+        cy.findByLabelText('Home NetID').type(device.home_netid)
+        cy.findByLabelText('Application Server ID').type(device.server_id)
+        cy.findByLabelText('AppKey').type(device.app_key)
+        cy.findByRole('button', { name: 'Save changes' }).click()
+      })
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification').findByText(`End device updated`).should('be.visible')
   })
 
   it('succeeds editing server adresses', () => {
@@ -124,10 +187,7 @@ describe('Device general settings', () => {
     cy.findByRole('button', { name: 'Save changes' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
-      .should('be.visible')
-      .findByText(`End device updated`)
-      .should('be.visible')
+    cy.findByTestId('toast-notification').findByText(`End device updated`).should('be.visible')
   })
 
   it('succeeds adding end device attributes', () => {
@@ -139,10 +199,7 @@ describe('Device general settings', () => {
     cy.findByRole('button', { name: 'Save changes' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
-      .should('be.visible')
-      .findByText(`End device updated`)
-      .should('be.visible')
+    cy.findByTestId('toast-notification').findByText(`End device updated`).should('be.visible')
   })
 
   it('succeeds deleting end device', () => {
