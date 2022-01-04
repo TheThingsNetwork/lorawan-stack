@@ -3,6 +3,13 @@
 package ttnpb
 
 var ApplicationFieldPathsNested = []string{
+	"administrative_contact",
+	"administrative_contact.ids",
+	"administrative_contact.ids.organization_ids",
+	"administrative_contact.ids.organization_ids.organization_id",
+	"administrative_contact.ids.user_ids",
+	"administrative_contact.ids.user_ids.email",
+	"administrative_contact.ids.user_ids.user_id",
 	"attributes",
 	"contact_info",
 	"created_at",
@@ -12,10 +19,18 @@ var ApplicationFieldPathsNested = []string{
 	"ids",
 	"ids.application_id",
 	"name",
+	"technical_contact",
+	"technical_contact.ids",
+	"technical_contact.ids.organization_ids",
+	"technical_contact.ids.organization_ids.organization_id",
+	"technical_contact.ids.user_ids",
+	"technical_contact.ids.user_ids.email",
+	"technical_contact.ids.user_ids.user_id",
 	"updated_at",
 }
 
 var ApplicationFieldPathsTopLevel = []string{
+	"administrative_contact",
 	"attributes",
 	"contact_info",
 	"created_at",
@@ -24,6 +39,7 @@ var ApplicationFieldPathsTopLevel = []string{
 	"dev_eui_counter",
 	"ids",
 	"name",
+	"technical_contact",
 	"updated_at",
 }
 var ApplicationsFieldPathsNested = []string{
@@ -75,6 +91,13 @@ var ListApplicationsRequestFieldPathsTopLevel = []string{
 }
 var CreateApplicationRequestFieldPathsNested = []string{
 	"application",
+	"application.administrative_contact",
+	"application.administrative_contact.ids",
+	"application.administrative_contact.ids.organization_ids",
+	"application.administrative_contact.ids.organization_ids.organization_id",
+	"application.administrative_contact.ids.user_ids",
+	"application.administrative_contact.ids.user_ids.email",
+	"application.administrative_contact.ids.user_ids.user_id",
 	"application.attributes",
 	"application.contact_info",
 	"application.created_at",
@@ -84,6 +107,13 @@ var CreateApplicationRequestFieldPathsNested = []string{
 	"application.ids",
 	"application.ids.application_id",
 	"application.name",
+	"application.technical_contact",
+	"application.technical_contact.ids",
+	"application.technical_contact.ids.organization_ids",
+	"application.technical_contact.ids.organization_ids.organization_id",
+	"application.technical_contact.ids.user_ids",
+	"application.technical_contact.ids.user_ids.email",
+	"application.technical_contact.ids.user_ids.user_id",
 	"application.updated_at",
 	"collaborator",
 	"collaborator.ids",
@@ -100,6 +130,13 @@ var CreateApplicationRequestFieldPathsTopLevel = []string{
 }
 var UpdateApplicationRequestFieldPathsNested = []string{
 	"application",
+	"application.administrative_contact",
+	"application.administrative_contact.ids",
+	"application.administrative_contact.ids.organization_ids",
+	"application.administrative_contact.ids.organization_ids.organization_id",
+	"application.administrative_contact.ids.user_ids",
+	"application.administrative_contact.ids.user_ids.email",
+	"application.administrative_contact.ids.user_ids.user_id",
 	"application.attributes",
 	"application.contact_info",
 	"application.created_at",
@@ -109,6 +146,13 @@ var UpdateApplicationRequestFieldPathsNested = []string{
 	"application.ids",
 	"application.ids.application_id",
 	"application.name",
+	"application.technical_contact",
+	"application.technical_contact.ids",
+	"application.technical_contact.ids.organization_ids",
+	"application.technical_contact.ids.organization_ids.organization_id",
+	"application.technical_contact.ids.user_ids",
+	"application.technical_contact.ids.user_ids.email",
+	"application.technical_contact.ids.user_ids.user_id",
 	"application.updated_at",
 	"field_mask",
 }

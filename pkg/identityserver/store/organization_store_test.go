@@ -32,9 +32,15 @@ func TestOrganizationStore(t *testing.T) {
 	ctx := test.Context()
 
 	WithDB(t, func(t *testing.T, db *gorm.DB) {
-		prepareTest(db, &Account{}, &Organization{}, &Attribute{})
+		prepareTest(db, &Account{}, &Organization{}, &Attribute{}, &User{})
 		store := GetOrganizationStore(db)
 		s := newStore(db)
+
+		usr1 := &User{Account: Account{UID: "test-user-1"}, PrimaryEmailAddress: "user1@example.com"}
+		s.createEntity(ctx, usr1)
+
+		usr2 := &User{Account: Account{UID: "test-user-2"}, PrimaryEmailAddress: "user2@example.com"}
+		s.createEntity(ctx, usr2)
 
 		created, err := store.CreateOrganization(ctx, &ttnpb.Organization{
 			Ids:         &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
@@ -45,6 +51,8 @@ func TestOrganizationStore(t *testing.T) {
 				"bar": "baz",
 				"baz": "qux",
 			},
+			AdministrativeContact: usr1.Account.OrganizationOrUserIdentifiers(),
+			TechnicalContact:      usr2.Account.OrganizationOrUserIdentifiers(),
 		})
 
 		a.So(err, should.BeNil)
@@ -53,11 +61,13 @@ func TestOrganizationStore(t *testing.T) {
 			a.So(created.Name, should.Equal, "Foo Organization")
 			a.So(created.Description, should.Equal, "The Amazing Foo Organization")
 			a.So(created.Attributes, should.HaveLength, 3)
+			a.So(created.AdministrativeContact, should.Resemble, usr1.Account.OrganizationOrUserIdentifiers())
+			a.So(created.TechnicalContact, should.Resemble, usr2.Account.OrganizationOrUserIdentifiers())
 			a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
 			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenAfter, time.Now().Add(-1*time.Hour))
 		}
 
-		got, err := store.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes"}})
+		got, err := store.GetOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"}, &pbtypes.FieldMask{Paths: []string{"name", "attributes", "administrative_contact"}})
 
 		a.So(err, should.BeNil)
 		if a.So(got, should.NotBeNil) {
@@ -65,6 +75,7 @@ func TestOrganizationStore(t *testing.T) {
 			a.So(got.Name, should.Equal, "Foo Organization")
 			a.So(got.Description, should.BeEmpty)
 			a.So(got.Attributes, should.HaveLength, 3)
+			a.So(got.AdministrativeContact, should.Resemble, usr1.Account.OrganizationOrUserIdentifiers())
 			a.So(got.CreatedAt, should.Resemble, created.CreatedAt)
 			a.So(got.UpdatedAt, should.Resemble, created.UpdatedAt)
 		}
@@ -86,12 +97,14 @@ func TestOrganizationStore(t *testing.T) {
 				"baz": "baz",
 				"qux": "foo",
 			},
-		}, &pbtypes.FieldMask{Paths: []string{"description", "attributes"}})
+			TechnicalContact: usr1.Account.OrganizationOrUserIdentifiers(),
+		}, &pbtypes.FieldMask{Paths: []string{"description", "attributes", "technical_contact"}})
 
 		a.So(err, should.BeNil)
 		if a.So(updated, should.NotBeNil) {
 			a.So(updated.Description, should.Equal, "The Amazing Foobar Organization")
 			a.So(updated.Attributes, should.HaveLength, 3)
+			a.So(updated.TechnicalContact, should.Resemble, usr1.Account.OrganizationOrUserIdentifiers())
 			a.So(updated.CreatedAt, should.Resemble, created.CreatedAt)
 			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenAfter, *ttnpb.StdTime(created.CreatedAt))
 		}

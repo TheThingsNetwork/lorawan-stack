@@ -65,6 +65,23 @@ func (s *store) findEntity(ctx context.Context, entityID ttnpb.IDStringer, field
 	return model, nil
 }
 
+func (s *store) loadContact(ctx context.Context, contact *Account) (*string, error) {
+	if contact == nil || contact.AccountType == "" || contact.UID == "" {
+		return nil, nil
+	}
+	err := s.query(ctx, Account{}).
+		Where(contact).
+		First(contact).
+		Error
+	if err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return nil, errNotFoundForID(contact.OrganizationOrUserIdentifiers())
+		}
+		return nil, convertError(err)
+	}
+	return &contact.ID, nil
+}
+
 func (s *store) findDeletedEntity(ctx context.Context, entityID ttnpb.IDStringer, fields ...string) (modelInterface, error) {
 	return s.findEntity(WithSoftDeleted(ctx, false), entityID, fields...)
 }

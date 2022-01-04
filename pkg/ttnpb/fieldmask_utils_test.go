@@ -111,8 +111,10 @@ func TestFlattenPaths(t *testing.T) {
 		"a.b.c",
 		"a.b.c.d",
 		"e.f",
+		"x.y",
+		"x.y.z",
 	}
-	a.So(FlattenPaths(paths, []string{"a.b"}), should.Resemble, []string{"a", "a.b", "e.f"})
+	a.So(FlattenPaths(paths, []string{"a.b", "x", "notfound"}), should.Resemble, []string{"a", "a.b", "e.f", "x"})
 }
 
 func TestContainsField(t *testing.T) {

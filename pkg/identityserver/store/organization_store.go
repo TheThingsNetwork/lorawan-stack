@@ -53,6 +53,12 @@ func selectOrganizationFields(ctx context.Context, query *gorm.DB, fieldMask *pb
 			// always selected
 		case attributesField:
 			query = query.Preload("Attributes")
+		case administrativeContactField:
+			organizationColumns = append(organizationColumns, organizationColumnNames[path]...)
+			query = query.Preload("AdministrativeContact")
+		case technicalContactField:
+			organizationColumns = append(organizationColumns, organizationColumnNames[path]...)
+			query = query.Preload("TechnicalContact")
 		default:
 			if columns, ok := organizationColumnNames[path]; ok {
 				organizationColumns = append(organizationColumns, columns...)
@@ -73,6 +79,15 @@ func (s *organizationStore) CreateOrganization(ctx context.Context, org *ttnpb.O
 		Account: Account{UID: org.GetIds().GetOrganizationId()}, // The ID is not mutated by fromPB.
 	}
 	orgModel.fromPB(org, nil)
+	var err error
+	orgModel.AdministrativeContactID, err = s.loadContact(ctx, orgModel.AdministrativeContact)
+	if err != nil {
+		return nil, err
+	}
+	orgModel.TechnicalContactID, err = s.loadContact(ctx, orgModel.TechnicalContact)
+	if err != nil {
+		return nil, err
+	}
 	if err := s.createEntity(ctx, &orgModel); err != nil {
 		return nil, err
 	}
@@ -144,6 +159,14 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 	}
 	oldAttributes := orgModel.Attributes
 	columns := orgModel.fromPB(org, fieldMask)
+	orgModel.AdministrativeContactID, err = s.loadContact(ctx, orgModel.AdministrativeContact)
+	if err != nil {
+		return nil, err
+	}
+	orgModel.TechnicalContactID, err = s.loadContact(ctx, orgModel.TechnicalContact)
+	if err != nil {
+		return nil, err
+	}
 	if err = s.updateEntity(ctx, &orgModel.Organization, columns...); err != nil {
 		return nil, err
 	}

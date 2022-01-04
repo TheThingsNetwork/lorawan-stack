@@ -5264,6 +5264,15 @@
       "file": "user_registry.go"
     }
   },
+  "error:pkg/identityserver:contact_no_collaborator": {
+    "translations": {
+      "en": "contact `{contact}` is not a collaborator"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "contact_info_registry.go"
+    }
+  },
   "error:pkg/identityserver:db_needs_migration": {
     "translations": {
       "en": "the database needs to be migrated"

@@ -90,6 +90,16 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 		}
 	}
 
+	if req.Client.AdministrativeContact == nil {
+		req.Client.AdministrativeContact = req.Collaborator
+	} else if err := validateCollaboratorEqualsContact(req.Collaborator, req.Client.AdministrativeContact); err != nil {
+		return nil, err
+	}
+	if req.Client.TechnicalContact == nil {
+		req.Client.TechnicalContact = req.Collaborator
+	} else if err := validateCollaboratorEqualsContact(req.Collaborator, req.Client.TechnicalContact); err != nil {
+		return nil, err
+	}
 	if err := validateContactInfo(req.Client.ContactInfo); err != nil {
 		return nil, err
 	}
@@ -287,6 +297,7 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 			return nil, err
 		}
 	}
+	req.FieldMask.Paths = ttnpb.FlattenPaths(req.FieldMask.Paths, []string{"administrative_contact", "technical_contact"})
 	updatedByAdmin := is.IsAdmin(ctx)
 
 	if !updatedByAdmin {
@@ -306,6 +317,12 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		if err := validateContactIsCollaborator(ctx, db, req.Client.AdministrativeContact, req.Client.GetEntityIdentifiers()); err != nil {
+			return err
+		}
+		if err := validateContactIsCollaborator(ctx, db, req.Client.TechnicalContact, req.Client.GetEntityIdentifiers()); err != nil {
+			return err
+		}
 		cli, err = store.GetClientStore(db).UpdateClient(ctx, req.Client, req.FieldMask)
 		if err != nil {
 			return err

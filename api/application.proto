@@ -61,11 +61,15 @@ message Application {
   ];
 
   // Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.
-  repeated ContactInfo contact_info = 7 [(validate.rules).repeated.max_items = 10];
+  // This field is deprecated. Use administrative_contact and technical_contact instead.
+  repeated ContactInfo contact_info = 7 [deprecated = true, (validate.rules).repeated.max_items = 10];
+
+  OrganizationOrUserIdentifiers administrative_contact = 10;
+  OrganizationOrUserIdentifiers technical_contact = 11;
 
   uint32 dev_eui_counter = 9;
 
-  // next: 10
+  // next: 12
 }
 
 message Applications {

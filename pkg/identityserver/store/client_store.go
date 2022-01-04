@@ -49,6 +49,12 @@ func selectClientFields(ctx context.Context, query *gorm.DB, fieldMask *pbtypes.
 			// always selected
 		case attributesField:
 			query = query.Preload("Attributes")
+		case administrativeContactField:
+			clientColumns = append(clientColumns, clientColumnNames[path]...)
+			query = query.Preload("AdministrativeContact")
+		case technicalContactField:
+			clientColumns = append(clientColumns, clientColumnNames[path]...)
+			query = query.Preload("TechnicalContact")
 		default:
 			if columns, ok := clientColumnNames[path]; ok {
 				clientColumns = append(clientColumns, columns...)
@@ -69,6 +75,15 @@ func (s *clientStore) CreateClient(ctx context.Context, cli *ttnpb.Client) (*ttn
 		ClientID: cli.GetIds().GetClientId(), // The ID is not mutated by fromPB.
 	}
 	cliModel.fromPB(cli, nil)
+	var err error
+	cliModel.AdministrativeContactID, err = s.loadContact(ctx, cliModel.AdministrativeContact)
+	if err != nil {
+		return nil, err
+	}
+	cliModel.TechnicalContactID, err = s.loadContact(ctx, cliModel.TechnicalContact)
+	if err != nil {
+		return nil, err
+	}
 	if err := s.createEntity(ctx, &cliModel); err != nil {
 		return nil, err
 	}
@@ -140,6 +155,14 @@ func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, field
 	}
 	oldAttributes := cliModel.Attributes
 	columns := cliModel.fromPB(cli, fieldMask)
+	cliModel.AdministrativeContactID, err = s.loadContact(ctx, cliModel.AdministrativeContact)
+	if err != nil {
+		return nil, err
+	}
+	cliModel.TechnicalContactID, err = s.loadContact(ctx, cliModel.TechnicalContact)
+	if err != nil {
+		return nil, err
+	}
 	if err = s.updateEntity(ctx, &cliModel, columns...); err != nil {
 		return nil, err
 	}

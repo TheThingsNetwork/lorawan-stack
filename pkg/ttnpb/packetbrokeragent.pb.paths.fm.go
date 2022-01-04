@@ -3,6 +3,13 @@
 package ttnpb
 
 var PacketBrokerGatewayFieldPathsNested = []string{
+	"administrative_contact",
+	"administrative_contact.ids",
+	"administrative_contact.ids.organization_ids",
+	"administrative_contact.ids.organization_ids.organization_id",
+	"administrative_contact.ids.user_ids",
+	"administrative_contact.ids.user_ids.email",
+	"administrative_contact.ids.user_ids.user_id",
 	"antennas",
 	"contact_info",
 	"frequency_plan_ids",
@@ -13,11 +20,19 @@ var PacketBrokerGatewayFieldPathsNested = []string{
 	"online",
 	"rx_rate",
 	"status_public",
+	"technical_contact",
+	"technical_contact.ids",
+	"technical_contact.ids.organization_ids",
+	"technical_contact.ids.organization_ids.organization_id",
+	"technical_contact.ids.user_ids",
+	"technical_contact.ids.user_ids.email",
+	"technical_contact.ids.user_ids.user_id",
 	"tx_rate",
 	"update_location_from_status",
 }
 
 var PacketBrokerGatewayFieldPathsTopLevel = []string{
+	"administrative_contact",
 	"antennas",
 	"contact_info",
 	"frequency_plan_ids",
@@ -26,12 +41,20 @@ var PacketBrokerGatewayFieldPathsTopLevel = []string{
 	"online",
 	"rx_rate",
 	"status_public",
+	"technical_contact",
 	"tx_rate",
 	"update_location_from_status",
 }
 var UpdatePacketBrokerGatewayRequestFieldPathsNested = []string{
 	"field_mask",
 	"gateway",
+	"gateway.administrative_contact",
+	"gateway.administrative_contact.ids",
+	"gateway.administrative_contact.ids.organization_ids",
+	"gateway.administrative_contact.ids.organization_ids.organization_id",
+	"gateway.administrative_contact.ids.user_ids",
+	"gateway.administrative_contact.ids.user_ids.email",
+	"gateway.administrative_contact.ids.user_ids.user_id",
 	"gateway.antennas",
 	"gateway.contact_info",
 	"gateway.frequency_plan_ids",
@@ -42,6 +65,13 @@ var UpdatePacketBrokerGatewayRequestFieldPathsNested = []string{
 	"gateway.online",
 	"gateway.rx_rate",
 	"gateway.status_public",
+	"gateway.technical_contact",
+	"gateway.technical_contact.ids",
+	"gateway.technical_contact.ids.organization_ids",
+	"gateway.technical_contact.ids.organization_ids.organization_id",
+	"gateway.technical_contact.ids.user_ids",
+	"gateway.technical_contact.ids.user_ids.email",
+	"gateway.technical_contact.ids.user_ids.user_id",
 	"gateway.tx_rate",
 	"gateway.update_location_from_status",
 }
@@ -78,6 +108,12 @@ var PacketBrokerDevAddrBlockFieldPathsTopLevel = []string{
 	"home_network_cluster_id",
 }
 var PacketBrokerNetworkFieldPathsNested = []string{
+	"administrative_contact",
+	"administrative_contact.contact_method",
+	"administrative_contact.contact_type",
+	"administrative_contact.public",
+	"administrative_contact.validated_at",
+	"administrative_contact.value",
 	"contact_info",
 	"dev_addr_blocks",
 	"id",
@@ -85,14 +121,22 @@ var PacketBrokerNetworkFieldPathsNested = []string{
 	"id.tenant_id",
 	"listed",
 	"name",
+	"technical_contact",
+	"technical_contact.contact_method",
+	"technical_contact.contact_type",
+	"technical_contact.public",
+	"technical_contact.validated_at",
+	"technical_contact.value",
 }
 
 var PacketBrokerNetworkFieldPathsTopLevel = []string{
+	"administrative_contact",
 	"contact_info",
 	"dev_addr_blocks",
 	"id",
 	"listed",
 	"name",
+	"technical_contact",
 }
 var PacketBrokerNetworksFieldPathsNested = []string{
 	"networks",
@@ -106,6 +150,12 @@ var PacketBrokerInfoFieldPathsNested = []string{
 	"home_network_enabled",
 	"register_enabled",
 	"registration",
+	"registration.administrative_contact",
+	"registration.administrative_contact.contact_method",
+	"registration.administrative_contact.contact_type",
+	"registration.administrative_contact.public",
+	"registration.administrative_contact.validated_at",
+	"registration.administrative_contact.value",
 	"registration.contact_info",
 	"registration.dev_addr_blocks",
 	"registration.id",
@@ -113,6 +163,12 @@ var PacketBrokerInfoFieldPathsNested = []string{
 	"registration.id.tenant_id",
 	"registration.listed",
 	"registration.name",
+	"registration.technical_contact",
+	"registration.technical_contact.contact_method",
+	"registration.technical_contact.contact_type",
+	"registration.technical_contact.public",
+	"registration.technical_contact.validated_at",
+	"registration.technical_contact.value",
 }
 
 var PacketBrokerInfoFieldPathsTopLevel = []string{

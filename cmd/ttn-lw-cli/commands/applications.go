@@ -216,7 +216,9 @@ var (
 				return errNoApplicationID.New()
 			}
 			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationFlags, attributesFlags())
-			if len(paths) == 0 {
+			rawUnsetPaths, _ := cmd.Flags().GetStringSlice("unset")
+			unsetPaths := util.NormalizePaths(rawUnsetPaths)
+			if len(paths)+len(unsetPaths) == 0 {
 				logger.Warn("No fields selected, won't update anything")
 				return nil
 			}
@@ -233,7 +235,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationRegistryClient(is).Update(ctx, &ttnpb.UpdateApplicationRequest{
 				Application: &application,
-				FieldMask:   &pbtypes.FieldMask{Paths: paths},
+				FieldMask:   &pbtypes.FieldMask{Paths: append(paths, unsetPaths...)},
 			})
 			if err != nil {
 				return err
@@ -369,6 +371,7 @@ func init() {
 	applicationsCommand.AddCommand(applicationsCreateCommand)
 	applicationsSetCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationsSetCommand.Flags().AddFlagSet(setApplicationFlags)
+	applicationsSetCommand.Flags().AddFlagSet(util.UnsetFlagSet())
 	applicationsSetCommand.Flags().AddFlagSet(attributesFlags())
 	applicationsCommand.AddCommand(applicationsSetCommand)
 	applicationsDeleteCommand.Flags().AddFlagSet(applicationIDFlags())

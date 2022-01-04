@@ -25,6 +25,7 @@ import "google/protobuf/wrappers.proto";
 import "lorawan-stack/api/contact_info.proto";
 import "lorawan-stack/api/gateway.proto";
 import "lorawan-stack/api/end_device.proto";
+import "lorawan-stack/api/identifiers.proto";
 import "lorawan-stack/api/messages.proto";
 
 package ttn.lorawan.v3;
@@ -59,7 +60,10 @@ message PacketBrokerGateway {
     bytes eui = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
   }
   GatewayIdentifiers ids = 1 [(validate.rules).message.required = true];
-  repeated ContactInfo contact_info = 7 [(validate.rules).repeated.max_items = 10];
+  // This field is deprecated. Use administrative_contact and technical_contact instead.
+  repeated ContactInfo contact_info = 7 [deprecated = true, (validate.rules).repeated.max_items = 10];
+  OrganizationOrUserIdentifiers administrative_contact = 10;
+  OrganizationOrUserIdentifiers technical_contact = 11;
   repeated GatewayAntenna antennas = 13 [
     (validate.rules).repeated.max_items = 8
   ];
@@ -127,9 +131,14 @@ message PacketBrokerNetwork {
   // DevAddr blocks that are assigned to this registration.
   repeated PacketBrokerDevAddrBlock dev_addr_blocks = 3;
   // Contact information.
-  repeated ContactInfo contact_info = 4;
+  // This field is deprecated. Use administrative_contact and technical_contact instead.
+  repeated ContactInfo contact_info = 4 [deprecated = true, (validate.rules).repeated.max_items = 10];
+  ContactInfo administrative_contact = 6;
+  ContactInfo technical_contact = 7;
   // Whether the network is listed so it can be viewed by other networks.
   bool listed = 5;
+
+  // next: 8
 }
 
 message PacketBrokerNetworks {

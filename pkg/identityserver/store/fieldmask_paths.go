@@ -18,6 +18,7 @@ const (
 	// NOTE: please keep this sorted
 	activatedAtField                    = "activated_at"
 	adminField                          = "admin"
+	administrativeContactField          = "administrative_contact"
 	antennasField                       = "antennas"
 	applicationServerAddressField       = "application_server_address"
 	attributesField                     = "attributes"
@@ -67,6 +68,7 @@ const (
 	statusPublicField                   = "status_public"
 	targetCUPSKeyField                  = "target_cups_key"
 	targetCUPSURIField                  = "target_cups_uri"
+	technicalContactField               = "technical_contact"
 	temporaryPasswordCreatedAtField     = "temporary_password_created_at"
 	temporaryPasswordExpiresAtField     = "temporary_password_expires_at"
 	temporaryPasswordField              = "temporary_password"

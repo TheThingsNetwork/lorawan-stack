@@ -82,9 +82,21 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 	} else if orgIDs := req.GetCollaborator().GetOrganizationIds(); orgIDs != nil {
 		return nil, errNestedOrganizations.New()
 	}
+
+	if req.Organization.AdministrativeContact == nil {
+		req.Organization.AdministrativeContact = req.Collaborator
+	} else if err := validateCollaboratorEqualsContact(req.Collaborator, req.Organization.AdministrativeContact); err != nil {
+		return nil, err
+	}
+	if req.Organization.TechnicalContact == nil {
+		req.Organization.TechnicalContact = req.Collaborator
+	} else if err := validateCollaboratorEqualsContact(req.Collaborator, req.Organization.TechnicalContact); err != nil {
+		return nil, err
+	}
 	if err := validateContactInfo(req.Organization.ContactInfo); err != nil {
 		return nil, err
 	}
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		org, err = store.GetOrganizationStore(db).CreateOrganization(ctx, req.Organization)
 		if err != nil {
@@ -235,7 +247,14 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 			return nil, err
 		}
 	}
+	req.FieldMask.Paths = ttnpb.FlattenPaths(req.FieldMask.Paths, []string{"administrative_contact", "technical_contact"})
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+		if err := validateContactIsCollaborator(ctx, db, req.Organization.AdministrativeContact, req.Organization.GetEntityIdentifiers()); err != nil {
+			return err
+		}
+		if err := validateContactIsCollaborator(ctx, db, req.Organization.TechnicalContact, req.Organization.GetEntityIdentifiers()); err != nil {
+			return err
+		}
 		org, err = store.GetOrganizationStore(db).UpdateOrganization(ctx, req.Organization, req.FieldMask)
 		if err != nil {
 			return err

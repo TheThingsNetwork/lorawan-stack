@@ -164,7 +164,7 @@
             },
             {
               "name": "contact_info",
-              "description": "Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.",
+              "description": "Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application.\nThis field is deprecated. Use administrative_contact and technical_contact instead.",
               "label": "repeated",
               "type": "ContactInfo",
               "longType": "ContactInfo",
@@ -174,6 +174,7 @@
               "oneofdecl": "",
               "defaultValue": "",
               "options": {
+                "deprecated": true,
                 "validate.rules": [
                   {
                     "name": "repeated.max_items",
@@ -181,6 +182,30 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "administrative_contact",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "technical_contact",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             },
             {
               "name": "dev_eui_counter",
@@ -7145,7 +7170,7 @@
             },
             {
               "name": "contact_info",
-              "description": "Contact information for this client. Typically used to indicate who to contact with technical/security questions about the application.\nThis information is public and can be seen by any authenticated user in the network.",
+              "description": "Contact information for this client. Typically used to indicate who to contact with technical/security questions about the application.\nThis information is public and can be seen by any authenticated user in the network.\nThis field is deprecated. Use administrative_contact and technical_contact instead.",
               "label": "repeated",
               "type": "ContactInfo",
               "longType": "ContactInfo",
@@ -7155,6 +7180,7 @@
               "oneofdecl": "",
               "defaultValue": "",
               "options": {
+                "deprecated": true,
                 "validate.rules": [
                   {
                     "name": "repeated.max_items",
@@ -7162,6 +7188,30 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "administrative_contact",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "technical_contact",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             },
             {
               "name": "secret",
@@ -16892,7 +16942,7 @@
             },
             {
               "name": "contact_info",
-              "description": "Contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway.",
+              "description": "Contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway.\nThis field is deprecated. Use administrative_contact and technical_contact instead.",
               "label": "repeated",
               "type": "ContactInfo",
               "longType": "ContactInfo",
@@ -16902,6 +16952,7 @@
               "oneofdecl": "",
               "defaultValue": "",
               "options": {
+                "deprecated": true,
                 "validate.rules": [
                   {
                     "name": "repeated.max_items",
@@ -16909,6 +16960,30 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "administrative_contact",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "technical_contact",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             },
             {
               "name": "version_ids",
@@ -32147,7 +32222,7 @@
             },
             {
               "name": "contact_info",
-              "description": "Contact information for this organization. Typically used to indicate who to contact with security/billing questions about the organization.",
+              "description": "Contact information for this organization. Typically used to indicate who to contact with security/billing questions about the organization.\nThis field is deprecated. Use administrative_contact and technical_contact instead.",
               "label": "repeated",
               "type": "ContactInfo",
               "longType": "ContactInfo",
@@ -32157,6 +32232,7 @@
               "oneofdecl": "",
               "defaultValue": "",
               "options": {
+                "deprecated": true,
                 "validate.rules": [
                   {
                     "name": "repeated.max_items",
@@ -32164,6 +32240,30 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "administrative_contact",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "technical_contact",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -33198,7 +33298,7 @@
             },
             {
               "name": "contact_info",
-              "description": "",
+              "description": "This field is deprecated. Use administrative_contact and technical_contact instead.",
               "label": "repeated",
               "type": "ContactInfo",
               "longType": "ContactInfo",
@@ -33208,6 +33308,7 @@
               "oneofdecl": "",
               "defaultValue": "",
               "options": {
+                "deprecated": true,
                 "validate.rules": [
                   {
                     "name": "repeated.max_items",
@@ -33215,6 +33316,30 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "administrative_contact",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "technical_contact",
+              "description": "",
+              "label": "",
+              "type": "OrganizationOrUserIdentifiers",
+              "longType": "OrganizationOrUserIdentifiers",
+              "fullType": "ttn.lorawan.v3.OrganizationOrUserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             },
             {
               "name": "antennas",
@@ -33598,8 +33723,41 @@
             },
             {
               "name": "contact_info",
-              "description": "Contact information.",
+              "description": "Contact information.\nThis field is deprecated. Use administrative_contact and technical_contact instead.",
               "label": "repeated",
+              "type": "ContactInfo",
+              "longType": "ContactInfo",
+              "fullType": "ttn.lorawan.v3.ContactInfo",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "deprecated": true,
+                "validate.rules": [
+                  {
+                    "name": "repeated.max_items",
+                    "value": 10
+                  }
+                ]
+              }
+            },
+            {
+              "name": "administrative_contact",
+              "description": "",
+              "label": "",
+              "type": "ContactInfo",
+              "longType": "ContactInfo",
+              "fullType": "ttn.lorawan.v3.ContactInfo",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "technical_contact",
+              "description": "",
+              "label": "",
               "type": "ContactInfo",
               "longType": "ContactInfo",
               "fullType": "ttn.lorawan.v3.ContactInfo",
@@ -39024,7 +39182,7 @@
             },
             {
               "name": "contact_info",
-              "description": "Contact information for this user. Typically used to indicate who to contact with security/billing questions about the user.",
+              "description": "Contact information for this user. Typically used to indicate who to contact with security/billing questions about the user.\nThis field is deprecated.",
               "label": "repeated",
               "type": "ContactInfo",
               "longType": "ContactInfo",
@@ -39034,6 +39192,7 @@
               "oneofdecl": "",
               "defaultValue": "",
               "options": {
+                "deprecated": true,
                 "validate.rules": [
                   {
                     "name": "repeated.max_items",

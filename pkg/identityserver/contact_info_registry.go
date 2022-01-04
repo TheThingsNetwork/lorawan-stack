@@ -31,9 +31,34 @@ import (
 )
 
 var (
+	errContactNoCollaborator  = errors.DefineInvalidArgument("contact_no_collaborator", "contact `{contact}` is not a collaborator")
 	errNoValidationNeeded     = errors.DefineInvalidArgument("no_validation_needed", "no validation needed for this contact info")
 	errValidationsAlreadySent = errors.DefineAlreadyExists("validations_already_sent", "validations for this contact info already sent")
 )
+
+func validateCollaboratorEqualsContact(collaborator, contact *ttnpb.OrganizationOrUserIdentifiers) error {
+	if contact == nil {
+		return nil
+	}
+	if collaborator.EntityType() != contact.EntityType() || collaborator.IDString() != contact.IDString() {
+		return errContactNoCollaborator.WithAttributes("contact", contact.IDString())
+	}
+	return nil
+}
+
+func validateContactIsCollaborator(ctx context.Context, db *gorm.DB, contact *ttnpb.OrganizationOrUserIdentifiers, entity *ttnpb.EntityIdentifiers) error {
+	if contact == nil {
+		return nil
+	}
+	_, err := store.GetMembershipStore(db).GetMember(ctx, contact, entity)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return errContactNoCollaborator.WithAttributes("contact", contact.IDString())
+		}
+		return err
+	}
+	return nil
+}
 
 func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids *ttnpb.EntityIdentifiers) (*ttnpb.ContactInfoValidation, error) {
 	// NOTE: This does NOT check auth. Internal use only.

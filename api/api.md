@@ -617,7 +617,9 @@ Application is the message that defines an Application in the network.
 | `name` | [`string`](#string) |  | The name of the application. |
 | `description` | [`string`](#string) |  | A description for the application. |
 | `attributes` | [`Application.AttributesEntry`](#ttn.lorawan.v3.Application.AttributesEntry) | repeated | Key-value attributes for this application. Typically used for organizing applications or for storing integration-specific data. |
-| `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application. |
+| `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application. This field is deprecated. Use administrative_contact and technical_contact instead. |
+| `administrative_contact` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+| `technical_contact` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
 | `dev_eui_counter` | [`uint32`](#uint32) |  |  |
 
 #### Field Rules
@@ -2001,7 +2003,9 @@ An OAuth client on the network.
 | `name` | [`string`](#string) |  | The name of the OAuth client. This information is public and can be seen by any authenticated user in the network. |
 | `description` | [`string`](#string) |  | A description for the OAuth client. This information is public and can be seen by any authenticated user in the network. |
 | `attributes` | [`Client.AttributesEntry`](#ttn.lorawan.v3.Client.AttributesEntry) | repeated | Key-value attributes for this client. Typically used for organizing clients or for storing integration-specific data. |
-| `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this client. Typically used to indicate who to contact with technical/security questions about the application. This information is public and can be seen by any authenticated user in the network. |
+| `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this client. Typically used to indicate who to contact with technical/security questions about the application. This information is public and can be seen by any authenticated user in the network. This field is deprecated. Use administrative_contact and technical_contact instead. |
+| `administrative_contact` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+| `technical_contact` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
 | `secret` | [`string`](#string) |  | The client secret is only visible to collaborators of the client. |
 | `redirect_uris` | [`string`](#string) | repeated | The allowed redirect URIs against which authorization requests are checked. If the authorization request does not pass a redirect URI, the first one from this list is taken. This information is public and can be seen by any authenticated user in the network. |
 | `logout_redirect_uris` | [`string`](#string) | repeated | The allowed logout redirect URIs against which client initiated logout requests are checked. If the authorization request does not pass a redirect URI, the first one from this list is taken. This information is public and can be seen by any authenticated user in the network. |
@@ -3791,7 +3795,9 @@ Gateway is the message that defines a gateway on the network.
 | `name` | [`string`](#string) |  | The name of the gateway. This information is public and can be seen by any authenticated user in the network. |
 | `description` | [`string`](#string) |  | A description for the gateway. This information is public and can be seen by any authenticated user in the network. |
 | `attributes` | [`Gateway.AttributesEntry`](#ttn.lorawan.v3.Gateway.AttributesEntry) | repeated | Key-value attributes for this gateway. Typically used for organizing gateways or for storing integration-specific data. |
-| `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway. |
+| `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway. This field is deprecated. Use administrative_contact and technical_contact instead. |
+| `administrative_contact` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+| `technical_contact` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
 | `version_ids` | [`GatewayVersionIdentifiers`](#ttn.lorawan.v3.GatewayVersionIdentifiers) |  |  |
 | `gateway_server_address` | [`string`](#string) |  | The address of the Gateway Server to connect to. This information is public and can be seen by any authenticated user in the network if status_public is true. The typical format of the address is "scheme://host:port". The scheme is optional. If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
 | `auto_update` | [`bool`](#bool) |  |  |
@@ -6994,7 +7000,9 @@ is used to manage OAuth client authorizations for users.
 | `name` | [`string`](#string) |  | The name of the organization. This information is public and can be seen by any authenticated user in the network. |
 | `description` | [`string`](#string) |  | A description for the organization. |
 | `attributes` | [`Organization.AttributesEntry`](#ttn.lorawan.v3.Organization.AttributesEntry) | repeated | Key-value attributes for this organization. Typically used for organizing organizations or for storing integration-specific data. |
-| `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this organization. Typically used to indicate who to contact with security/billing questions about the organization. |
+| `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this organization. Typically used to indicate who to contact with security/billing questions about the organization. This field is deprecated. Use administrative_contact and technical_contact instead. |
+| `administrative_contact` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+| `technical_contact` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
 
 #### Field Rules
 
@@ -7212,7 +7220,9 @@ There is no (longer) wire compatibility needed; new fields may use any tag.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `ids` | [`PacketBrokerGateway.GatewayIdentifiers`](#ttn.lorawan.v3.PacketBrokerGateway.GatewayIdentifiers) |  |  |
-| `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated |  |
+| `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | This field is deprecated. Use administrative_contact and technical_contact instead. |
+| `administrative_contact` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+| `technical_contact` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
 | `antennas` | [`GatewayAntenna`](#ttn.lorawan.v3.GatewayAntenna) | repeated |  |
 | `status_public` | [`bool`](#bool) |  |  |
 | `location_public` | [`bool`](#bool) |  |  |
@@ -7273,8 +7283,16 @@ There is no (longer) wire compatibility needed; new fields may use any tag.
 | `id` | [`PacketBrokerNetworkIdentifier`](#ttn.lorawan.v3.PacketBrokerNetworkIdentifier) |  | Packet Broker network identifier. |
 | `name` | [`string`](#string) |  | Name of the network. |
 | `dev_addr_blocks` | [`PacketBrokerDevAddrBlock`](#ttn.lorawan.v3.PacketBrokerDevAddrBlock) | repeated | DevAddr blocks that are assigned to this registration. |
-| `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information. |
+| `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information. This field is deprecated. Use administrative_contact and technical_contact instead. |
+| `administrative_contact` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) |  |  |
+| `technical_contact` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) |  |  |
 | `listed` | [`bool`](#bool) |  | Whether the network is listed so it can be viewed by other networks. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `contact_info` | <p>`repeated.max_items`: `10`</p> |
 
 ### <a name="ttn.lorawan.v3.PacketBrokerNetworkIdentifier">Message `PacketBrokerNetworkIdentifier`</a>
 
@@ -8329,7 +8347,7 @@ User is the message that defines a user on the network.
 | `name` | [`string`](#string) |  | The name of the user. This information is public and can be seen by any authenticated user in the network. |
 | `description` | [`string`](#string) |  | A description for the user. This information is public and can be seen by any authenticated user in the network. |
 | `attributes` | [`User.AttributesEntry`](#ttn.lorawan.v3.User.AttributesEntry) | repeated | Key-value attributes for this users. Typically used for storing integration-specific data. |
-| `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this user. Typically used to indicate who to contact with security/billing questions about the user. |
+| `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this user. Typically used to indicate who to contact with security/billing questions about the user. This field is deprecated. |
 | `primary_email_address` | [`string`](#string) |  | Primary email address that can be used for logging in. This address is not public, use contact_info for that. |
 | `primary_email_address_validated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | When the primary email address was validated. Note that email address validation is not required on all networks. |
 | `password` | [`string`](#string) |  | The password field is only considered when creating a user. It is not returned on API calls, and can not be updated by updating the User. See the UpdatePassword method of the UserRegistry service for more information. |

@@ -27,11 +27,18 @@ type Organization struct {
 	Account Account `gorm:"polymorphic:Account;polymorphic_value:organization"`
 
 	// BEGIN common fields
-	Name        string       `gorm:"type:VARCHAR"`
-	Description string       `gorm:"type:TEXT"`
+	Name        string `gorm:"type:VARCHAR"`
+	Description string `gorm:"type:TEXT"`
+
 	Attributes  []Attribute  `gorm:"polymorphic:Entity;polymorphic_value:organization"`
 	APIKeys     []APIKey     `gorm:"polymorphic:Entity;polymorphic_value:organization"`
 	Memberships []Membership `gorm:"polymorphic:Entity;polymorphic_value:organization"`
+
+	AdministrativeContactID *string  `gorm:"type:UUID;index"`
+	AdministrativeContact   *Account `gorm:"save_associations:false"`
+
+	TechnicalContactID *string  `gorm:"type:UUID;index"`
+	TechnicalContact   *Account `gorm:"save_associations:false"`
 	// END common fields
 }
 
@@ -44,6 +51,16 @@ var organizationPBSetters = map[string]func(*ttnpb.Organization, *Organization){
 	nameField:        func(pb *ttnpb.Organization, org *Organization) { pb.Name = org.Name },
 	descriptionField: func(pb *ttnpb.Organization, org *Organization) { pb.Description = org.Description },
 	attributesField:  func(pb *ttnpb.Organization, org *Organization) { pb.Attributes = attributes(org.Attributes).toMap() },
+	administrativeContactField: func(pb *ttnpb.Organization, org *Organization) {
+		if org.AdministrativeContact != nil {
+			pb.AdministrativeContact = org.AdministrativeContact.OrganizationOrUserIdentifiers()
+		}
+	},
+	technicalContactField: func(pb *ttnpb.Organization, org *Organization) {
+		if org.TechnicalContact != nil {
+			pb.TechnicalContact = org.TechnicalContact.OrganizationOrUserIdentifiers()
+		}
+	},
 }
 
 // functions to set fields from the organization proto into the organization model.
@@ -52,6 +69,26 @@ var organizationModelSetters = map[string]func(*Organization, *ttnpb.Organizatio
 	descriptionField: func(org *Organization, pb *ttnpb.Organization) { org.Description = pb.Description },
 	attributesField: func(org *Organization, pb *ttnpb.Organization) {
 		org.Attributes = attributes(org.Attributes).updateFromMap(pb.Attributes)
+	},
+	administrativeContactField: func(org *Organization, pb *ttnpb.Organization) {
+		if pb.AdministrativeContact == nil {
+			org.AdministrativeContact = nil
+			return
+		}
+		org.AdministrativeContact = &Account{
+			AccountType: pb.AdministrativeContact.EntityType(),
+			UID:         pb.AdministrativeContact.IDString(),
+		}
+	},
+	technicalContactField: func(org *Organization, pb *ttnpb.Organization) {
+		if pb.TechnicalContact == nil {
+			org.TechnicalContact = nil
+			return
+		}
+		org.TechnicalContact = &Account{
+			AccountType: pb.TechnicalContact.EntityType(),
+			UID:         pb.TechnicalContact.IDString(),
+		}
 	},
 }
 
@@ -70,10 +107,12 @@ func init() {
 
 // fieldmask path to column name in organizations table.
 var organizationColumnNames = map[string][]string{
-	attributesField:  {},
-	contactInfoField: {},
-	nameField:        {nameField},
-	descriptionField: {descriptionField},
+	attributesField:            {},
+	contactInfoField:           {},
+	nameField:                  {nameField},
+	descriptionField:           {descriptionField},
+	administrativeContactField: {administrativeContactField + "_id"},
+	technicalContactField:      {technicalContactField + "_id"},
 }
 
 func (org Organization) toPB(pb *ttnpb.Organization, fieldMask *pbtypes.FieldMask) {

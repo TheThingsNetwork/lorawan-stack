@@ -25,13 +25,21 @@ type Application struct {
 	SoftDelete
 
 	// BEGIN common fields
-	ApplicationID string       `gorm:"unique_index:application_id_index;type:VARCHAR(36);not null"`
-	Name          string       `gorm:"type:VARCHAR"`
-	Description   string       `gorm:"type:TEXT"`
-	Attributes    []Attribute  `gorm:"polymorphic:Entity;polymorphic_value:application"`
-	APIKeys       []APIKey     `gorm:"polymorphic:Entity;polymorphic_value:application"`
-	Memberships   []Membership `gorm:"polymorphic:Entity;polymorphic_value:application"`
+	ApplicationID string `gorm:"unique_index:application_id_index;type:VARCHAR(36);not null"`
+	Name          string `gorm:"type:VARCHAR"`
+	Description   string `gorm:"type:TEXT"`
+
+	Attributes  []Attribute  `gorm:"polymorphic:Entity;polymorphic_value:application"`
+	APIKeys     []APIKey     `gorm:"polymorphic:Entity;polymorphic_value:application"`
+	Memberships []Membership `gorm:"polymorphic:Entity;polymorphic_value:application"`
+
+	AdministrativeContactID *string  `gorm:"type:UUID;index"`
+	AdministrativeContact   *Account `gorm:"save_associations:false"`
+
+	TechnicalContactID *string  `gorm:"type:UUID;index"`
+	TechnicalContact   *Account `gorm:"save_associations:false"`
 	// END common fields
+
 	DevEUICounter int `gorm:"<-:create;type:INT;default:'0';column:dev_eui_counter"`
 }
 
@@ -41,9 +49,19 @@ func init() {
 
 // functions to set fields from the application model into the application proto.
 var applicationPBSetters = map[string]func(*ttnpb.Application, *Application){
-	nameField:          func(pb *ttnpb.Application, app *Application) { pb.Name = app.Name },
-	descriptionField:   func(pb *ttnpb.Application, app *Application) { pb.Description = app.Description },
-	attributesField:    func(pb *ttnpb.Application, app *Application) { pb.Attributes = attributes(app.Attributes).toMap() },
+	nameField:        func(pb *ttnpb.Application, app *Application) { pb.Name = app.Name },
+	descriptionField: func(pb *ttnpb.Application, app *Application) { pb.Description = app.Description },
+	attributesField:  func(pb *ttnpb.Application, app *Application) { pb.Attributes = attributes(app.Attributes).toMap() },
+	administrativeContactField: func(pb *ttnpb.Application, app *Application) {
+		if app.AdministrativeContact != nil {
+			pb.AdministrativeContact = app.AdministrativeContact.OrganizationOrUserIdentifiers()
+		}
+	},
+	technicalContactField: func(pb *ttnpb.Application, app *Application) {
+		if app.TechnicalContact != nil {
+			pb.TechnicalContact = app.TechnicalContact.OrganizationOrUserIdentifiers()
+		}
+	},
 	devEuiCounterField: func(pb *ttnpb.Application, app *Application) { pb.DevEuiCounter = uint32(app.DevEUICounter) },
 }
 
@@ -51,6 +69,26 @@ var applicationPBSetters = map[string]func(*ttnpb.Application, *Application){
 var applicationModelSetters = map[string]func(*Application, *ttnpb.Application){
 	nameField:        func(app *Application, pb *ttnpb.Application) { app.Name = pb.Name },
 	descriptionField: func(app *Application, pb *ttnpb.Application) { app.Description = pb.Description },
+	administrativeContactField: func(app *Application, pb *ttnpb.Application) {
+		if pb.AdministrativeContact == nil {
+			app.AdministrativeContact = nil
+			return
+		}
+		app.AdministrativeContact = &Account{
+			AccountType: pb.AdministrativeContact.EntityType(),
+			UID:         pb.AdministrativeContact.IDString(),
+		}
+	},
+	technicalContactField: func(app *Application, pb *ttnpb.Application) {
+		if pb.TechnicalContact == nil {
+			app.TechnicalContact = nil
+			return
+		}
+		app.TechnicalContact = &Account{
+			AccountType: pb.TechnicalContact.EntityType(),
+			UID:         pb.TechnicalContact.IDString(),
+		}
+	},
 	attributesField: func(app *Application, pb *ttnpb.Application) {
 		app.Attributes = attributes(app.Attributes).updateFromMap(pb.Attributes)
 	},
@@ -71,11 +109,13 @@ func init() {
 
 // fieldmask path to column name in applications table.
 var applicationColumnNames = map[string][]string{
-	attributesField:    {},
-	contactInfoField:   {},
-	nameField:          {nameField},
-	descriptionField:   {descriptionField},
-	devEuiCounterField: {devEuiCounterField},
+	attributesField:            {},
+	contactInfoField:           {},
+	nameField:                  {nameField},
+	descriptionField:           {descriptionField},
+	devEuiCounterField:         {devEuiCounterField},
+	administrativeContactField: {administrativeContactField + "_id"},
+	technicalContactField:      {technicalContactField + "_id"},
 }
 
 func (app Application) toPB(pb *ttnpb.Application, fieldMask *pbtypes.FieldMask) {
