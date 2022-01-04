@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import bind from 'autobind-decorator'
+import React, { useCallback } from 'react'
 import { defineMessages } from 'react-intl'
 
 import Form from '@ttn-lw/components/form'
@@ -46,83 +45,91 @@ const m = defineMessages({
   orgNamePlaceholder: 'My new organization',
 })
 
-class OrganizationForm extends React.Component {
-  static propTypes = {
-    children: PropTypes.node.isRequired,
-    error: PropTypes.error,
-    formRef: Form.propTypes.formikRef,
-    initialValues: PropTypes.shape({
-      ids: PropTypes.shape({
-        organization_id: PropTypes.string.isRequired,
-      }).isRequired,
-      name: PropTypes.string,
-      description: PropTypes.string,
-    }).isRequired,
-    onSubmit: PropTypes.func.isRequired,
-    onSubmitFailure: PropTypes.func,
-    onSubmitSuccess: PropTypes.func,
-    update: PropTypes.bool,
-  }
+const OrganizationForm = props => {
+  const {
+    error,
+    initialValues,
+    update,
+    children,
+    formRef,
+    onSubmit,
+    onSubmitSuccess,
+    onSubmitFailure,
+  } = props
 
-  static defaultProps = {
-    update: false,
-    error: '',
-    onSubmitFailure: () => null,
-    onSubmitSuccess: () => null,
-    formRef: undefined,
-  }
+  const handleSubmit = useCallback(
+    async (values, { resetForm }) => {
+      const castedValues = validationSchema.cast(values)
 
-  @bind
-  async handleSubmit(values, { resetForm }) {
-    const { onSubmit, onSubmitSuccess, onSubmitFailure } = this.props
-    const castedValues = validationSchema.cast(values)
+      try {
+        const result = await onSubmit(castedValues)
+        onSubmitSuccess(result)
+      } catch (error) {
+        resetForm({ values })
+        onSubmitFailure(error)
+      }
+    },
+    [onSubmit, onSubmitFailure, onSubmitSuccess],
+  )
 
-    try {
-      const result = await onSubmit(castedValues)
-      onSubmitSuccess(result)
-    } catch (error) {
-      resetForm({ values })
-      onSubmitFailure(error)
-    }
-  }
-
-  render() {
-    const { error, initialValues, update, children, formRef } = this.props
-
-    return (
-      <Form
-        error={error}
-        onSubmit={this.handleSubmit}
-        initialValues={initialValues}
-        validationSchema={validationSchema}
-        formikRef={formRef}
-      >
-        <Form.Field
-          title={sharedMessages.organizationId}
-          name="ids.organization_id"
-          placeholder={m.orgIdPlaceholder}
-          autoFocus={!update}
-          disabled={update}
-          required
-          component={Input}
-        />
-        <Form.Field
-          title={sharedMessages.name}
-          name="name"
-          placeholder={m.orgNamePlaceholder}
-          component={Input}
-        />
-        <Form.Field
-          title={sharedMessages.description}
-          name="description"
-          type="textarea"
-          placeholder={m.orgDescPlaceholder}
-          description={m.orgDescDescription}
-          component={Input}
-        />
-        {children}
-      </Form>
-    )
-  }
+  return (
+    <Form
+      error={error}
+      onSubmit={handleSubmit}
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      formikRef={formRef}
+    >
+      <Form.Field
+        title={sharedMessages.organizationId}
+        name="ids.organization_id"
+        placeholder={m.orgIdPlaceholder}
+        autoFocus={!update}
+        disabled={update}
+        required
+        component={Input}
+      />
+      <Form.Field
+        title={sharedMessages.name}
+        name="name"
+        placeholder={m.orgNamePlaceholder}
+        component={Input}
+      />
+      <Form.Field
+        title={sharedMessages.description}
+        name="description"
+        type="textarea"
+        placeholder={m.orgDescPlaceholder}
+        description={m.orgDescDescription}
+        component={Input}
+      />
+      {children}
+    </Form>
+  )
 }
+OrganizationForm.propTypes = {
+  children: PropTypes.node.isRequired,
+  error: PropTypes.error,
+  formRef: Form.propTypes.formikRef,
+  initialValues: PropTypes.shape({
+    ids: PropTypes.shape({
+      organization_id: PropTypes.string.isRequired,
+    }).isRequired,
+    name: PropTypes.string,
+    description: PropTypes.string,
+  }).isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  onSubmitFailure: PropTypes.func,
+  onSubmitSuccess: PropTypes.func,
+  update: PropTypes.bool,
+}
+
+OrganizationForm.defaultProps = {
+  update: false,
+  error: '',
+  onSubmitFailure: () => null,
+  onSubmitSuccess: () => null,
+  formRef: undefined,
+}
+
 export default OrganizationForm

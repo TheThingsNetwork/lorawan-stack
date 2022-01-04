@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,51 +17,48 @@ import { Container, Col, Row } from 'react-grid-system'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import CollaboratorForm from '@console/components/collaborator-form'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-@withBreadcrumb('orgs.single.collaborators.add', props => {
-  const { orgId } = props
+const OrganizationCollaboratorAdd = props => {
+  const { orgId, rights, redirectToList, pseudoRights, addOrganizationCollaborator } = props
+
+  useBreadcrumbs(
+    'orgs.single.collaborators.add',
+    <Breadcrumb path={`/organizations/${orgId}/collaborators/add`} content={sharedMessages.add} />,
+  )
 
   return (
-    <Breadcrumb path={`/organizations/${orgId}/collaborators/add`} content={sharedMessages.add} />
+    <Container>
+      <PageTitle title={sharedMessages.addCollaborator} />
+      <Row>
+        <Col lg={8} md={12}>
+          <CollaboratorForm
+            onSubmit={addOrganizationCollaborator}
+            onSubmitSuccess={redirectToList}
+            pseudoRights={pseudoRights}
+            rights={rights}
+          />
+        </Col>
+      </Row>
+    </Container>
   )
-})
-class OrganizationCollaboratorAdd extends React.Component {
-  static propTypes = {
-    addOrganizationCollaborator: PropTypes.func.isRequired,
-    pseudoRights: PropTypes.rights,
-    redirectToList: PropTypes.func.isRequired,
-    rights: PropTypes.rights.isRequired,
-  }
+}
 
-  static defaultProps = {
-    pseudoRights: [],
-  }
+OrganizationCollaboratorAdd.propTypes = {
+  addOrganizationCollaborator: PropTypes.func.isRequired,
+  orgId: PropTypes.string.isRequired,
+  pseudoRights: PropTypes.rights,
+  redirectToList: PropTypes.func.isRequired,
+  rights: PropTypes.rights.isRequired,
+}
 
-  render() {
-    const { rights, redirectToList, pseudoRights, addOrganizationCollaborator } = this.props
-
-    return (
-      <Container>
-        <PageTitle title={sharedMessages.addCollaborator} />
-        <Row>
-          <Col lg={8} md={12}>
-            <CollaboratorForm
-              onSubmit={addOrganizationCollaborator}
-              onSubmitSuccess={redirectToList}
-              pseudoRights={pseudoRights}
-              rights={rights}
-            />
-          </Col>
-        </Row>
-      </Container>
-    )
-  }
+OrganizationCollaboratorAdd.defaultProps = {
+  pseudoRights: [],
 }
 
 export default OrganizationCollaboratorAdd
