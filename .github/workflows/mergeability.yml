@@ -23,6 +23,7 @@ jobs:
         tools/go.mod
         tools/go.sum
         yarn.lock
+        pkg/webui/locales/en.json
     timeout-minutes: 5
     steps:
       - name: Configure Git
