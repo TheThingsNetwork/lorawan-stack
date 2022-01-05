@@ -253,6 +253,8 @@ const m = defineMessages({
     'Interval to request the end device status. Set to 0 to disable requesting the end device status on an interval.',
   skipPayloadCryptoOverrideDescription:
     'Skip payload crypto disables the application layer encryption of LoRaWAN frames. This causes the Application Server to forward the messages without any processing, such as payload formatters, to the integrations.  When doing so, the integrations are responsible for decryption and processing of the binary format in order to understand the message. This application-wide setting can be overwritten per end device using this overwrite setting.',
+  basicAuthDescription:
+    'To increase access security, you can choose to generate a "basic auth" authorization header to be attached to the webhook requests, if the target server requires doing so. This will authenticate the webhook requests with the defined credentials.',
 })
 
 const descriptions = Object.freeze({
@@ -492,6 +494,9 @@ const descriptions = Object.freeze({
   },
   [TOOLTIP_IDS.SKIP_PAYLOAD_CRYPTO_OVERRIDE]: {
     description: m.skipPayloadCryptoOverrideDescription,
+  },
+  [TOOLTIP_IDS.BASIC_AUTH]: {
+    description: m.basicAuthDescription,
   },
 })
 
