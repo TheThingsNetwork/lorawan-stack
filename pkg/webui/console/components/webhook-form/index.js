@@ -25,6 +25,7 @@ import Notification from '@ttn-lw/components/notification'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
+import Checkbox from '@ttn-lw/components/checkbox'
 
 import WebhookTemplateInfo from '@console/components/webhook-template-info'
 
@@ -34,6 +35,7 @@ import Yup from '@ttn-lw/lib/yup'
 import { url as urlRegexp, id as webhookIdRegexp } from '@ttn-lw/lib/regexp'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
 import { apiKey as webhookAPIKeyRegexp } from '@console/lib/regexp'
 
@@ -67,9 +69,8 @@ const m = defineMessages({
   pendingInfo:
     'This webhook is currently pending until attempting its first regular request attempt. Note that webhooks can be deactivated if they encounter too many request failures.',
   messagePathValidateTooLong: 'Enabled message path must be at most 64 characters',
-  headersBasicAuthValuePlaceholder: 'Password',
-  headersBasicAuthKeyPlaceholder: 'Username',
-  basicAuthHeader: 'Add Basic Auth header',
+  basicAuthCheckbox: 'Use basic access authentication (basic auth)',
+  requestBasicAuth: 'Request authentication',
 })
 
 const headerCheck = headers =>
@@ -91,6 +92,11 @@ const validationSchema = Yup.object().shape({
     .matches(webhookIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
     .required(sharedMessages.validateRequired),
   format: Yup.string().required(sharedMessages.validateRequired),
+  basic_auth: Yup.object().shape({
+    value: Yup.boolean(),
+    username: Yup.string().default('').required(sharedMessages.validateRequired),
+    password: Yup.string().default('').required(sharedMessages.validateRequired),
+  }),
   headers: Yup.array()
     .of(
       Yup.object({
@@ -175,6 +181,7 @@ export default class WebhookForm extends Component {
     buttonStyle: PropTypes.shape({ activateWebhookButton: PropTypes.shape({}) }),
     existCheck: PropTypes.func,
     initialWebhookValue: PropTypes.shape({
+      basic_auth: PropTypes.bool,
       ids: PropTypes.shape({
         webhook_id: PropTypes.string,
       }),
@@ -215,18 +222,24 @@ export default class WebhookForm extends Component {
   modalResolve = () => null
   modalReject = () => null
 
-  state = {
-    error: undefined,
-    displayOverwriteModal: false,
-    existingId: undefined,
+  constructor(props) {
+    super(props)
+    const { initialWebhookValue } = this.props
+
+    this.state = {
+      error: undefined,
+      displayOverwriteModal: false,
+      existingId: undefined,
+      mayShowCredentialsInput: initialWebhookValue.headers.Authorization?.startsWith('Basic'),
+      hasAuthorization: Boolean(initialWebhookValue.headers.Authorization),
+    }
   }
 
   @bind
   async handleSubmit(values, { resetForm }) {
     const { appId, onSubmit, onSubmitSuccess, onSubmitFailure, existCheck, update } = this.props
+    console.log(values)
     const webhook = mapFormValuesToWebhook(values, appId)
-    // eslint-disable-next-line no-console
-    console.log(webhook.headers)
 
     await this.setState({ error: '' })
 
@@ -292,9 +305,15 @@ export default class WebhookForm extends Component {
     }
   }
 
+  @bind
+  handleRequestAuthenticationChange(event) {
+    this.setState({ mayShowCredentialsInput: event.target.checked })
+  }
+
   render() {
     const { update, initialWebhookValue, webhookTemplate, buttonStyle } = this.props
     const { error, displayOverwriteModal, existingId } = this.state
+    console.log(initialWebhookValue)
     let initialValues = blankValues
     if (update && initialWebhookValue) {
       initialValues = mapWebhookToFormValues(initialWebhookValue)
@@ -376,6 +395,39 @@ export default class WebhookForm extends Component {
             sensitive
             code
           />
+          <Form.Field
+            autoFocus
+            title={m.requestBasicAuth}
+            name="basic_auth.value"
+            label={m.basicAuthCheckbox}
+            onChange={this.handleRequestAuthenticationChange}
+            component={Checkbox}
+            tooltipId={tooltipIds.BASIC_AUTH}
+          />
+          {this.state.hasAuthorization && (
+            <Notification
+              content='There is already an "Authorization" header attached to the webhook requests'
+              small
+              warning
+            />
+          )}
+          {this.state.mayShowCredentialsInput && (
+            <Form.FieldContainer horizontal>
+              <Form.Field
+                required
+                title={sharedMessages.username}
+                name="basic_auth.username"
+                component={Input}
+              />
+              <Form.Field
+                required
+                title={sharedMessages.password}
+                name="basic_auth.password"
+                component={Input}
+                sensitive
+              />
+            </Form.FieldContainer>
+          )}
           <Form.Field
             name="headers"
             title={m.additionalHeaders}
