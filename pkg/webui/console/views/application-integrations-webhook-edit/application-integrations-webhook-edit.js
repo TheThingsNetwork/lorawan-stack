@@ -52,11 +52,6 @@ const ApplicationWebhookEdit = props => {
 
   const handleSubmit = React.useCallback(
     async updatedWebhook => {
-      if ('basic_auth' in updatedWebhook && !updatedWebhook.basic_auth?.value) {
-        const { Authorization, ...restHeaders } = updatedWebhook.headers
-        updatedWebhook.headers = restHeaders
-      }
-      console.log(updatedWebhook)
       const patch = diff(webhook, updatedWebhook, ['ids'])
 
       // Ensure that the header prop is always patched fully, otherwise we loose

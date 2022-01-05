@@ -39,7 +39,17 @@ import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 
 import { apiKey as webhookAPIKeyRegexp } from '@console/lib/regexp'
 
-import { mapWebhookToFormValues, mapFormValuesToWebhook, blankValues } from './mapping'
+import {
+  mapWebhookToFormValues,
+  mapFormValuesToWebhook,
+  blankValues,
+  mapBasicAuthHeaderToBoolean,
+  mapBooleanToBasicAuthHeader,
+  mapBasicAuthHeaderToUsername,
+  mapBasicAuthHeaderToPassword,
+  mapCredentialsToPassword,
+  mapCredentialsToUsername,
+} from './mapping'
 
 const pathPlaceholder = '/path/to/webhook'
 
@@ -92,11 +102,6 @@ const validationSchema = Yup.object().shape({
     .matches(webhookIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
     .required(sharedMessages.validateRequired),
   format: Yup.string().required(sharedMessages.validateRequired),
-  basic_auth: Yup.object().shape({
-    value: Yup.boolean(),
-    username: Yup.string().default('').required(sharedMessages.validateRequired),
-    password: Yup.string().default('').required(sharedMessages.validateRequired),
-  }),
   headers: Yup.array()
     .of(
       Yup.object({
@@ -181,7 +186,6 @@ export default class WebhookForm extends Component {
     buttonStyle: PropTypes.shape({ activateWebhookButton: PropTypes.shape({}) }),
     existCheck: PropTypes.func,
     initialWebhookValue: PropTypes.shape({
-      basic_auth: PropTypes.bool,
       ids: PropTypes.shape({
         webhook_id: PropTypes.string,
       }),
@@ -230,17 +234,18 @@ export default class WebhookForm extends Component {
       error: undefined,
       displayOverwriteModal: false,
       existingId: undefined,
-      mayShowCredentialsInput: initialWebhookValue.headers.Authorization?.startsWith('Basic'),
-      hasAuthorization: Boolean(initialWebhookValue.headers.Authorization),
+      shouldShowCredentialsInput:
+        initialWebhookValue &&
+        initialWebhookValue.headers &&
+        initialWebhookValue.headers.Authorization &&
+        initialWebhookValue.headers.Authorization.startsWith('Basic'),
     }
   }
 
   @bind
   async handleSubmit(values, { resetForm }) {
     const { appId, onSubmit, onSubmitSuccess, onSubmitFailure, existCheck, update } = this.props
-    console.log(values)
     const webhook = mapFormValuesToWebhook(values, appId)
-
     await this.setState({ error: '' })
 
     try {
@@ -261,7 +266,6 @@ export default class WebhookForm extends Component {
       await onSubmitSuccess(result)
     } catch (error) {
       resetForm({ values })
-
       await this.setState({ error })
       await onSubmitFailure(error)
     }
@@ -307,13 +311,20 @@ export default class WebhookForm extends Component {
 
   @bind
   handleRequestAuthenticationChange(event) {
-    this.setState({ mayShowCredentialsInput: event.target.checked })
+    this.setState({ shouldShowCredentialsInput: event.target.checked })
+  }
+
+  @bind
+  hasAuthorizationBasic(header) {
+    if (header?.key === 'Authorization' && header.value?.startsWith('Basic')) {
+      this.setState({ shouldShowCredentialsInput: true })
+      return true
+    }
   }
 
   render() {
     const { update, initialWebhookValue, webhookTemplate, buttonStyle } = this.props
     const { error, displayOverwriteModal, existingId } = this.state
-    console.log(initialWebhookValue)
     let initialValues = blankValues
     if (update && initialWebhookValue) {
       initialValues = mapWebhookToFormValues(initialWebhookValue)
@@ -396,33 +407,31 @@ export default class WebhookForm extends Component {
             code
           />
           <Form.Field
-            autoFocus
             title={m.requestBasicAuth}
-            name="basic_auth.value"
+            name="headers"
             label={m.basicAuthCheckbox}
             onChange={this.handleRequestAuthenticationChange}
+            decode={mapBasicAuthHeaderToBoolean}
+            encode={mapBooleanToBasicAuthHeader}
             component={Checkbox}
             tooltipId={tooltipIds.BASIC_AUTH}
           />
-          {this.state.hasAuthorization && (
-            <Notification
-              content='There is already an "Authorization" header attached to the webhook requests'
-              small
-              warning
-            />
-          )}
-          {this.state.mayShowCredentialsInput && (
+          {this.state.shouldShowCredentialsInput && (
             <Form.FieldContainer horizontal>
               <Form.Field
                 required
                 title={sharedMessages.username}
-                name="basic_auth.username"
+                name="headers"
+                decode={mapBasicAuthHeaderToUsername}
+                encode={mapCredentialsToUsername}
                 component={Input}
               />
               <Form.Field
                 required
                 title={sharedMessages.password}
-                name="basic_auth.password"
+                name="headers"
+                decode={mapBasicAuthHeaderToPassword}
+                encode={mapCredentialsToPassword}
                 component={Input}
                 sensitive
               />
@@ -435,6 +444,7 @@ export default class WebhookForm extends Component {
             valuePlaceholder={m.headersValuePlaceholder}
             addMessage={m.headersAdd}
             component={KeyValueMap}
+            isReadOnly={this.hasAuthorizationBasic}
           />
           <Form.SubTitle title={m.enabledMessages} />
           <Notification info content={m.messageInfo} small />

@@ -27,6 +27,97 @@ const mapWebhookHeadersTypeToFormValue = headersType =>
     )) ||
   []
 
+// Encode and decode basic auth header.
+let currentHeaders
+
+export const mapBasicAuthHeaderToBoolean = value => {
+  currentHeaders = value
+  const useBasicAuth =
+    value?.some(header => header.key === 'Authorization') &&
+    value?.some(header => header.value.startsWith('Basic'))
+  return useBasicAuth
+}
+
+export const mapBooleanToBasicAuthHeader = value => {
+  if (value) {
+    return [...currentHeaders, ...{ key: 'Authorization', value: 'Basic' }]
+  }
+  return currentHeaders.filter(
+    header => header.key !== 'Authorizarion' && !header.value.startsWith('Basic'),
+  )
+}
+
+export const mapBasicAuthHeaderToUsername = value => {
+  const basicAuth = value.filter(
+    header => header.key === 'Authorization' && header.value.startsWith('Basic'),
+  )
+  const encodedCredentials = basicAuth[0]?.value.split('Basic')[1]
+  if (encodedCredentials) {
+    const decodedCredentials = atob(encodedCredentials)
+    const decodedUsername = decodedCredentials.slice(0, decodedCredentials.indexOf(':'))
+    return decodedUsername
+  }
+
+  return ''
+}
+
+const createCredentialsToAuthHeaderMapper = forUsername => fieldValue => {
+  const updatedHeaders = currentHeaders?.map(({ key, value }) => {
+    if (key === 'Authorization' && value.startsWith('Basic')) {
+      const encodedCredentials = value.split('Basic')[1]
+
+      if (encodedCredentials) {
+        const decodedCredentials = atob(encodedCredentials)
+        const username = decodedCredentials.slice(0, decodedCredentials.indexOf(':'))
+        const password = decodedCredentials.slice(
+          decodedCredentials.indexOf(':') + 1,
+          decodedCredentials.length,
+        )
+        if (forUsername) {
+          return {
+            key: 'Authorization',
+            value: `Basic ${btoa(`${fieldValue}:${password}`)}`,
+          }
+        }
+        return {
+          key: 'Authorization',
+          value: `Basic ${btoa(`${username}:${fieldValue}`)}`,
+        }
+      }
+      if (forUsername) {
+        return { key: 'Authorization', value: `Basic ${btoa(`${fieldValue}:`)}` }
+      }
+
+      return { key: 'Authorization', value: `Basic ${btoa(`:${fieldValue}`)}` }
+    }
+
+    return { key, value }
+  })
+
+  currentHeaders = updatedHeaders
+  return currentHeaders
+}
+
+export const mapBasicAuthHeaderToPassword = value => {
+  const basicAuth = value.filter(
+    header => header.key === 'Authorization' && header.value.startsWith('Basic'),
+  )
+  const encodedCredentials = basicAuth[0]?.value.split('Basic')[1]
+  if (encodedCredentials) {
+    const decodedCredentials = atob(encodedCredentials)
+    const decodedPassword = decodedCredentials.slice(
+      decodedCredentials.indexOf(':') + 1,
+      decodedCredentials.length,
+    )
+    return decodedPassword
+  }
+
+  return ''
+}
+
+export const mapCredentialsToPassword = createCredentialsToAuthHeaderMapper(true)
+export const mapCredentialsToUsername = createCredentialsToAuthHeaderMapper(false)
+
 export const mapWebhookToFormValues = webhook => ({
   webhook_id: webhook.ids.webhook_id,
   base_url: webhook.base_url,

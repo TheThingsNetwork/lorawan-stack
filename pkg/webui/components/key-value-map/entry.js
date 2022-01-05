@@ -29,6 +29,11 @@ const m = defineMessages({
 })
 
 class Entry extends React.Component {
+  static propTypes = {
+    readOnly: PropTypes.bool,
+  }
+  static defaultProps = { readOnly: false }
+
   _getKeyInputName() {
     const { name, index } = this.props
 
@@ -83,7 +88,7 @@ class Entry extends React.Component {
   }
 
   render() {
-    const { keyPlaceholder, valuePlaceholder, value, indexAsKey } = this.props
+    const { keyPlaceholder, valuePlaceholder, value, indexAsKey, readOnly } = this.props
 
     return (
       <div className={style.entriesRow}>
@@ -97,6 +102,7 @@ class Entry extends React.Component {
             onChange={this.handleKeyChanged}
             onBlur={this.handleBlur}
             value={value.key}
+            readOnly={readOnly}
             code
           />
         )}
@@ -109,6 +115,7 @@ class Entry extends React.Component {
           onChange={this.handleValueChanged}
           onBlur={this.handleBlur}
           value={indexAsKey ? value : value.value}
+          readOnly={readOnly}
           code
         />
         <Button
