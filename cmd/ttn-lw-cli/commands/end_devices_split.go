@@ -227,7 +227,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 		if res.CreatedAt == nil || (jsRes.CreatedAt != nil && ttnpb.StdTime(jsRes.CreatedAt).Before(*ttnpb.StdTime(res.CreatedAt))) {
 			res.CreatedAt = jsRes.CreatedAt
 		}
-		if ttnpb.StdTime(jsRes.UpdatedAt).After(*ttnpb.StdTime(res.UpdatedAt)) {
+		if res.UpdatedAt == nil || (jsRes.UpdatedAt != nil && ttnpb.StdTime(jsRes.UpdatedAt).After(*ttnpb.StdTime(res.UpdatedAt))) {
 			res.UpdatedAt = jsRes.UpdatedAt
 		}
 	}
@@ -253,7 +253,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 		if res.CreatedAt == nil || (nsRes.CreatedAt != nil && ttnpb.StdTime(nsRes.CreatedAt).Before(*ttnpb.StdTime(res.CreatedAt))) {
 			res.CreatedAt = nsRes.CreatedAt
 		}
-		if ttnpb.StdTime(nsRes.UpdatedAt).After(*ttnpb.StdTime(res.UpdatedAt)) {
+		if res.UpdatedAt == nil || (nsRes.UpdatedAt != nil && ttnpb.StdTime(nsRes.UpdatedAt).After(*ttnpb.StdTime(res.UpdatedAt))) {
 			res.UpdatedAt = nsRes.UpdatedAt
 		}
 	}
@@ -279,7 +279,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 		if res.CreatedAt == nil || (asRes.CreatedAt != nil && ttnpb.StdTime(asRes.CreatedAt).Before(*ttnpb.StdTime(res.CreatedAt))) {
 			res.CreatedAt = asRes.CreatedAt
 		}
-		if ttnpb.StdTime(asRes.UpdatedAt).After(*ttnpb.StdTime(res.UpdatedAt)) {
+		if res.UpdatedAt == nil || (asRes.UpdatedAt != nil && ttnpb.StdTime(asRes.UpdatedAt).After(*ttnpb.StdTime(res.UpdatedAt))) {
 			res.UpdatedAt = asRes.UpdatedAt
 		}
 	}
