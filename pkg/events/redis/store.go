@@ -351,17 +351,18 @@ func (ps *PubSubStore) FindRelated(ctx context.Context, correlationID string) ([
 	if err = ps.loadEventData(ctx, evtPBs...); err != nil {
 		return nil, err
 	}
-	evts := make([]events.Event, len(evtPBs))
-	for i, evtPB := range evtPBs {
+	evts := make([]events.Event, 0, len(evtPBs))
+	for _, evtPB := range evtPBs {
 		if evtPB.Name == "" {
 			// loadEventData was supposed to write this, so if it's not present
 			// the event was no longer available.
 			continue
 		}
-		evts[i], err = events.FromProto(evtPB)
+		evt, err := events.FromProto(evtPB)
 		if err != nil {
 			return nil, err
 		}
+		evts = append(evts, evt)
 	}
 	return evts, nil
 }
