@@ -26,17 +26,14 @@ import {
 
 const mapStateToProps = state => ({
   gtwId: selectSelectedGatewayId(state),
-})
-
-const mapDispatchToProps = dispatch => ({
-  getCollaboratorsList: (id, filters) => dispatch(getCollaboratorsList('gateway', id, filters)),
+  getCollaboratorsList: (id, filters) => getCollaboratorsList('gateway', id, filters),
 })
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   ...stateProps,
   ...dispatchProps,
   ...ownProps,
-  getCollaboratorsList: filters => dispatchProps.getCollaboratorsList(stateProps.gtwId, filters),
+  getCollaboratorsList: filters => stateProps.getCollaboratorsList(stateProps.gtwId, filters),
   selectTableData: state => {
     const id = { id: stateProps.orgId }
 
@@ -50,4 +47,4 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
 })
 
 export default GatewayCollaboratorsList =>
-  connect(mapStateToProps, mapDispatchToProps, mergeProps)(GatewayCollaboratorsList)
+  connect(mapStateToProps, null, mergeProps)(GatewayCollaboratorsList)

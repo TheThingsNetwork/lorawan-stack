@@ -28,17 +28,14 @@ export default OrganizationCollaboratorsList =>
   connect(
     state => ({
       orgId: selectSelectedOrganizationId(state),
+      getCollaboratorsList: (id, filters) => getCollaboratorsList('organization', id, filters),
     }),
-    dispatch => ({
-      getCollaboratorsList: (id, filters) =>
-        dispatch(getCollaboratorsList('organization', id, filters)),
-    }),
+    null,
     (stateProps, dispatchProps, ownProps) => ({
       ...stateProps,
       ...dispatchProps,
       ...ownProps,
-      getCollaboratorsList: filters =>
-        dispatchProps.getCollaboratorsList(stateProps.orgId, filters),
+      getCollaboratorsList: filters => stateProps.getCollaboratorsList(stateProps.orgId, filters),
       selectTableData: state => {
         const id = { id: stateProps.orgId }
 
