@@ -1,0 +1,36 @@
+name: Prepare tag release
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Branch
+        required: true
+      minor_patch:
+        description: minor/patch
+        required: true
+
+jobs:
+  release:
+    name: Prepare tag release
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        submodules: true
+        ref: ${{ github.event.inputs.branch }}
+    - uses: actions/setup-go@v2
+      with:
+        go-version: '~1.17'
+    - name: Prepare dev environment
+      run: |
+        make init
+    - name: Prepare release
+      run: |
+        git config user.name "The Things Bot"
+        git config user.email "github@thethingsindustries.com"
+        tools/bin/prepare_release ${{ github.event.inputs.minor_patch }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
