@@ -11,28 +11,36 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Support reading the Join Server's default JoinEUI and using this in the CLI for end device creation.
- - The Join Server has a new API `GetDefaultJoinEUI`.
- - The default JoinEUI can be configured on the Join Server using the option `--js.default-join-eui`.
-- Filtering of end device frequency plans in end device forms based on band id in the Console.
-- Showing automatically set entity locations in the Console.
-- Applications, OAuth clients, gateways and organizations now have an `administrative_contact` and `technical_contact`.
-  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
-
 ### Changed
 
 ### Deprecated
-
-- The `contact_info` fields of applications, OAuth clients, gateways, organizations and users.
 
 ### Removed
 
 ### Fixed
 
+### Security
+
+## [3.17.0] - 2022-01-07
+
+### Added
+
+- Support reading the Join Server's default JoinEUI and using this in the CLI for end device creation.
+  - The Join Server has a new API `GetDefaultJoinEUI`.
+  - The default JoinEUI can be configured on the Join Server using the option `--js.default-join-eui`.
+- Filtering of end device frequency plans in end device forms based on band id in the Console.
+- Showing automatically set entity locations in the Console.
+- Applications, OAuth clients, gateways and organizations now have an `administrative_contact` and `technical_contact`.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
+
+### Deprecated
+
+- The `contact_info` fields of applications, OAuth clients, gateways, organizations and users.
+
+### Fixed
+
 - CLI panic when getting devices.
 - Application uplink processing serialization behavior in the Application Server.
-
-### Security
 
 ## [3.16.2] - 2021-12-17
 
@@ -1952,7 +1960,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.2...v3.16
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.17.0...v3.17
+[3.17.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.2...v3.17.0
 [3.16.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.1...v3.16.2
 [3.16.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.0...v3.16.1
 [3.16.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.15.3...v3.16.0
