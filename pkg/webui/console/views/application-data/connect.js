@@ -12,9 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import connect from './connect'
-import ApplicationData from './application-data'
+import { connect as withConnect } from 'react-redux'
 
-const ConnectedApplicationData = connect(ApplicationData)
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
-export { ConnectedApplicationData as default, ApplicationData }
+import pipe from '@ttn-lw/lib/pipe'
+
+import { mayViewApplicationEvents } from '@console/lib/feature-checks'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+
+const addHocs = pipe(
+  withConnect(state => ({ appId: selectSelectedApplicationId(state) })),
+  withFeatureRequirement(mayViewApplicationEvents, {
+    redirect: ({ appId }) => `/applications/${appId}`,
+  }),
+)
+
+export default ApplicationData => addHocs(ApplicationData)
