@@ -97,7 +97,7 @@ func StreamClientInterceptor(opts ...Option) grpc.StreamClientInterceptor {
 		for attempt := uint(1); attempt <= callOpts.max; attempt++ {
 			retryTimeout := callOpts.timeout
 			if callOpts.enableXrateHeader {
-				if headerTimeout := getHeaderLimiterTimeout(ctx, md); headerTimeout > 0 {
+				if headerTimeout := getHeaderLimiterTimeout(ctx, md, callOpts); headerTimeout > 0 {
 					retryTimeout = headerTimeout
 				}
 			}
