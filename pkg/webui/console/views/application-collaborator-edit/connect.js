@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@ import { connect } from 'react-redux'
 import { replace } from 'connected-react-router'
 
 import tts from '@console/api/tts'
+
+import withRequest from '@ttn-lw/lib/components/with-request'
 
 import { getCollaborator } from '@console/store/actions/collaborators'
 
@@ -84,4 +86,13 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
 })
 
 export default ApplicationCollaboratorEdit =>
-  connect(mapStateToProps, mapDispatchToProps, mergeProps)(ApplicationCollaboratorEdit)
+  connect(
+    mapStateToProps,
+    mapDispatchToProps,
+    mergeProps,
+  )(
+    withRequest(
+      ({ getCollaborator }) => getCollaborator(),
+      ({ fetching, collaborator }) => fetching || !Boolean(collaborator),
+    )(ApplicationCollaboratorEdit),
+  )

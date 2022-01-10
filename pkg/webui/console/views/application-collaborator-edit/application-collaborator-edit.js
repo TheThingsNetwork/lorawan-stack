@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,76 +12,58 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
-import bind from 'autobind-decorator'
+import React, { useState, useCallback } from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 
-import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import toast from '@ttn-lw/components/toast'
-
-import withRequest from '@ttn-lw/lib/components/with-request'
 
 import CollaboratorForm from '@console/components/collaborator-form'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-const isUser = collaborator => collaborator.ids && 'user_ids' in collaborator.ids
+const showSuccessToast = () => {
+  toast({
+    message: sharedMessages.collaboratorUpdateSuccess,
+    type: toast.types.SUCCESS,
+  })
+}
 
-@withRequest(
-  ({ getCollaborator }) => getCollaborator(),
-  ({ fetching, collaborator }) => fetching || !Boolean(collaborator),
-)
-@withBreadcrumb('apps.single.collaborators.edit', props => {
-  const { appId, collaboratorId, collaboratorType } = props
+const ApplicationCollaboratorEdit = props => {
+  const {
+    appId,
+    removeCollaborator,
+    updateCollaborator,
+    collaborator,
+    collaboratorId,
+    rights,
+    pseudoRights,
+    redirectToList,
+    collaboratorType,
+  } = props
 
-  return (
+  useBreadcrumbs(
+    'apps.single.collaborators.edit',
     <Breadcrumb
       path={`/applications/${appId}/collaborators/${collaboratorType}/${collaboratorId}`}
       content={sharedMessages.edit}
-    />
+    />,
   )
-})
-export default class ApplicationCollaboratorEdit extends React.Component {
-  static propTypes = {
-    appId: PropTypes.string.isRequired,
-    collaborator: PropTypes.collaborator.isRequired,
-    collaboratorId: PropTypes.string.isRequired,
-    pseudoRights: PropTypes.rights.isRequired,
-    redirectToList: PropTypes.func.isRequired,
-    removeCollaborator: PropTypes.func.isRequired,
-    rights: PropTypes.rights.isRequired,
-    updateCollaborator: PropTypes.func.isRequired,
-  }
 
-  state = {
-    error: undefined,
-  }
+  const [error, setError] = useState(undefined)
 
-  @bind
-  async handleSubmit(updatedCollaborator) {
-    const { updateCollaborator } = this.props
+  const handleSubmit = useCallback(
+    updatedCollaborator => updateCollaborator(updatedCollaborator),
+    [updateCollaborator],
+  )
 
-    await updateCollaborator(updatedCollaborator)
-  }
-
-  handleSubmitSuccess() {
-    toast({
-      message: sharedMessages.collaboratorUpdateSuccess,
-      type: toast.types.SUCCESS,
-    })
-  }
-
-  @bind
-  async handleDelete() {
-    const { collaborator, collaboratorId, redirectToList, appId, removeCollaborator } = this.props
-    const collaborator_type = isUser(collaborator) ? 'user' : 'organization'
-
+  const handleDelete = useCallback(async () => {
     const collaborator_ids = {
-      [`${collaborator_type}_ids`]: {
-        [`${collaborator_type}_id`]: collaboratorId,
+      [`${collaboratorType}_ids`]: {
+        [`${collaboratorType}_id`]: collaboratorId,
       },
     }
     const updatedCollaborator = {
@@ -96,32 +78,42 @@ export default class ApplicationCollaboratorEdit extends React.Component {
       })
       redirectToList(appId)
     } catch (error) {
-      await this.setState({ error })
+      setError(error)
     }
-  }
+  }, [appId, collaboratorId, collaboratorType, redirectToList, removeCollaborator])
 
-  render() {
-    const { collaborator, collaboratorId, rights, pseudoRights, redirectToList } = this.props
-
-    return (
-      <Container>
-        <PageTitle title={sharedMessages.collaboratorEdit} values={{ collaboratorId }} />
-        <Row>
-          <Col lg={8} md={12}>
-            <CollaboratorForm
-              error={this.state.error}
-              onSubmit={this.handleSubmit}
-              onSubmitSuccess={this.handleSubmitSuccess}
-              onDelete={this.handleDelete}
-              onDeleteSuccess={redirectToList}
-              collaborator={collaborator}
-              pseudoRights={pseudoRights}
-              rights={rights}
-              update
-            />
-          </Col>
-        </Row>
-      </Container>
-    )
-  }
+  return (
+    <Container>
+      <PageTitle title={sharedMessages.collaboratorEdit} values={{ collaboratorId }} />
+      <Row>
+        <Col lg={8} md={12}>
+          <CollaboratorForm
+            error={error}
+            onSubmit={handleSubmit}
+            onSubmitSuccess={showSuccessToast}
+            onDelete={handleDelete}
+            onDeleteSuccess={redirectToList}
+            collaborator={collaborator}
+            pseudoRights={pseudoRights}
+            rights={rights}
+            update
+          />
+        </Col>
+      </Row>
+    </Container>
+  )
 }
+
+ApplicationCollaboratorEdit.propTypes = {
+  appId: PropTypes.string.isRequired,
+  collaborator: PropTypes.collaborator.isRequired,
+  collaboratorId: PropTypes.string.isRequired,
+  collaboratorType: PropTypes.oneOf(['collaborator', 'user']).isRequired,
+  pseudoRights: PropTypes.rights.isRequired,
+  redirectToList: PropTypes.func.isRequired,
+  removeCollaborator: PropTypes.func.isRequired,
+  rights: PropTypes.rights.isRequired,
+  updateCollaborator: PropTypes.func.isRequired,
+}
+
+export default ApplicationCollaboratorEdit

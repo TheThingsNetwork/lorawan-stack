@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ import { connect } from 'react-redux'
 
 import { getCollaboratorsList } from '@console/store/actions/collaborators'
 
-import { selectSelectedGatewayId } from '@console/store/selectors/gateways'
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import {
   selectCollaborators,
   selectCollaboratorsTotalCount,
@@ -25,17 +25,17 @@ import {
 } from '@console/store/selectors/collaborators'
 
 const mapStateToProps = state => ({
-  gtwId: selectSelectedGatewayId(state),
-  getCollaboratorsList: (id, filters) => getCollaboratorsList('gateway', id, filters),
+  appId: selectSelectedApplicationId(state),
+  getCollaboratorsList: (id, filters) => getCollaboratorsList('application', id, filters),
 })
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   ...stateProps,
   ...dispatchProps,
   ...ownProps,
-  getCollaboratorsList: filters => stateProps.getCollaboratorsList(stateProps.gtwId, filters),
+  getCollaboratorsList: filters => stateProps.getCollaboratorsList(stateProps.appId, filters),
   selectTableData: state => {
-    const id = { id: stateProps.orgId }
+    const id = { id: stateProps.appId }
 
     return {
       collaborators: selectCollaborators(state, id),
@@ -46,5 +46,5 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   },
 })
 
-export default GatewayCollaboratorsList =>
-  connect(mapStateToProps, null, mergeProps)(GatewayCollaboratorsList)
+export default ApplicationCollaboratorsList =>
+  connect(mapStateToProps, null, mergeProps)(ApplicationCollaboratorsList)

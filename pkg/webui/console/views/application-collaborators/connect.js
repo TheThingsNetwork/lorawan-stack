@@ -12,9 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import connect from './connect'
-import ApplicationCollaboratorsList from './application-collaborators-list'
+import { connect } from 'react-redux'
 
-const ConnectedApplicationCollaboratorsList = connect(ApplicationCollaboratorsList)
+import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
-export { ConnectedApplicationCollaboratorsList as default, ApplicationCollaboratorsList }
+import { mayViewOrEditApplicationCollaborators } from '@console/lib/feature-checks'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+
+const mapStateToProps = state => ({ appId: selectSelectedApplicationId(state) })
+
+export default ApplicationCollaborators =>
+  connect(mapStateToProps)(
+    withFeatureRequirement(mayViewOrEditApplicationCollaborators, {
+      redirect: ({ appId }) => `/applications/${appId}`,
+    })(ApplicationCollaborators),
+  )
