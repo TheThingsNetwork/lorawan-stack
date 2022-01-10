@@ -19,6 +19,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/grpc-ecosystem/go-grpc-middleware/util/backoffutils"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -33,6 +34,8 @@ const (
 	AttemptMetadataKey = "x-retry-attempty"
 )
 
+// UnaryClientInterceptor returns a new unary client interceptor that retries the execution of external gRPC calls, the
+// retry attempt will only occur if any of the validators define the error as a trigger.
 func UnaryClientInterceptor(opts ...Option) grpc.UnaryClientInterceptor {
 	callOpts := evaluateClientOpt(opts...)
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
@@ -41,21 +44,14 @@ func UnaryClientInterceptor(opts ...Option) grpc.UnaryClientInterceptor {
 		var md metadata.MD
 		var err error
 		err = invoker(ctx, method, req, reply, cc, append(opts, grpc.Header(&md))...)
-		var available, reset, retry int
-		available, _ = strconv.Atoi(md.Get(headerXRateAvailable)[0])
-		reset, _ = strconv.Atoi(md.Get(headerXRateReset)[0])
-		retry, _ = strconv.Atoi(md.Get(headerXRateRetry)[0])
-		log.FromContext(ctx).Debugf("Available: %d, Reset: %d, Retry: %d", available, reset, retry)
-
 		if err == nil || !isRetriable(err, callOpts) {
 			return err
 		}
 
-		// retries after the initial request
 		for attempt := uint(1); attempt <= callOpts.max; attempt++ {
 			retryTimeout := callOpts.timeout
 			if callOpts.enableXrateHeader {
-				if headerTimeout := getHeaderLimiterTimeout(ctx, md); headerTimeout > 0 {
+				if headerTimeout := getHeaderLimiterTimeout(ctx, md, callOpts); headerTimeout > 0 {
 					retryTimeout = headerTimeout
 				}
 			}
@@ -80,6 +76,51 @@ func UnaryClientInterceptor(opts ...Option) grpc.UnaryClientInterceptor {
 		}
 
 		return err
+	}
+}
+
+// StreamClientInterceptor returns a new streaming client interceptor that retries the execution of external gRPC
+// calls, the retry attempt will only occur if any of the validators define the error as a trigger.
+func StreamClientInterceptor(opts ...Option) grpc.StreamClientInterceptor {
+	callOpts := evaluateClientOpt(opts...)
+	return func(ctx context.Context, desc *grpc.StreamDesc, cc *grpc.ClientConn, method string, streamer grpc.Streamer, opts ...grpc.CallOption) (grpc.ClientStream, error) {
+		logger := log.FromContext(ctx)
+
+		var md metadata.MD
+		var err error
+		clientStream, err := streamer(ctx, desc, cc, method, append(opts, grpc.Header(&md))...)
+		if err == nil || !isRetriable(err, callOpts) {
+			return clientStream, nil
+		}
+
+		// retries after the initial request
+		for attempt := uint(1); attempt <= callOpts.max; attempt++ {
+			retryTimeout := callOpts.timeout
+			if callOpts.enableXrateHeader {
+				if headerTimeout := getHeaderLimiterTimeout(ctx, md); headerTimeout > 0 {
+					retryTimeout = headerTimeout
+				}
+			}
+
+			logger.WithField("attempt", attempt).Infof("Failed request, waiting %v until next attempt", retryTimeout)
+			err = waitRetryBackoff(ctx, retryTimeout)
+			if err != nil {
+				logger.WithError(err).Debug("An unexpected error occurred while in the timeout for the next request retry")
+				return nil, err
+			}
+
+			callCtx := context.WithValue(ctx, AttemptMetadataKey, attempt)
+			clientStream, err = streamer(callCtx, desc, cc, method, append(opts, grpc.Header(&md))...)
+			if err == nil {
+				return clientStream, nil
+			}
+			logger.WithField("attempt", attempt).WithError(err).Debug("Failed request retry")
+
+			if !isRetriable(err, callOpts) {
+				return clientStream, err
+			}
+		}
+		return clientStream, err
 	}
 }
 
@@ -123,7 +164,7 @@ func hasRateLimitHeaders(md metadata.MD) bool {
 		len(md.Get(headerXRateRetry)) > 0
 }
 
-func getHeaderLimiterTimeout(ctx context.Context, md metadata.MD) time.Duration {
+func getHeaderLimiterTimeout(ctx context.Context, md metadata.MD, opt *options) time.Duration {
 	if !hasRateLimitHeaders(md) {
 		return -1
 	}
@@ -132,24 +173,26 @@ func getHeaderLimiterTimeout(ctx context.Context, md metadata.MD) time.Duration 
 	reset, _ = strconv.Atoi(md.Get(headerXRateReset)[0])
 	retry, _ = strconv.Atoi(md.Get(headerXRateRetry)[0])
 
-	log.FromContext(ctx).Debugf("Available: %d, Reset: %d, Retry: %d", available, reset, retry)
-
-	if available == 0 {
+	// With no more available request it uses the reset value to wait until the server limit resets.
+	if available == 0 && reset > 0 {
 		return time.Duration(reset) * time.Second
 	}
 
-	return time.Duration(retry) * time.Second
+	var timeout time.Duration
 
-	//// When setting the retry header with a value bigger than zero the limiter signals that the amount of requests
-	//// permitted have been reached, meaning that the client should wait until the reset
-	//if retry > 0 {
-	//	// Waits until reset is finished
-	//	return time.Duration(retry) * time.Second
-	//}
+	// If provided by the header, the wait time before the next request will be the value of retry
+	if retry > 0 {
+		timeout = time.Duration(retry) * time.Second
+	}
 
-	//// Defines timeout as the amount of time remaining until the reset divided by the amount of requests tha can still be
-	//// made, that allows to disperse the requests in a more even manner. For the sake of avoiding multiple concurrent
-	//// retries to have the same timeout jitter is used.
-	//timeout := time.Minute - (time.Duration(reset) * time.Second)
-	//return backoffutils.JitterUp(timeout, 0.1)
+	// Spreads the retry request through the available time.
+	timeout = time.Minute - (time.Duration(reset) * time.Second)
+
+	// Applied if there is the possibility of having a big set of requests in a short span of time, avoiding all of them
+	// retrying at the same time.
+	if opt.jitter > 0 {
+		timeout = backoffutils.JitterUp(timeout, opt.jitter)
+	}
+
+	return timeout
 }

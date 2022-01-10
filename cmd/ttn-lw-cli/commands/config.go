@@ -30,8 +30,10 @@ var (
 	defaultOAuthServerBaseAddress, _ = discover.DefaultURL(defaultClusterHost, discover.DefaultHTTPPorts[!defaultInsecure], !defaultInsecure)
 	defaultOAuthServerAddress        = defaultOAuthServerBaseAddress + "/oauth"
 	defaultRetryConfig               = RetryConfig{
-		Max:     5,
-		Timeout: 50 * time.Millisecond,
+		Max:               0,
+		DefaultTimeout:    100 * time.Millisecond,
+		EnableXRateHeader: true,
+		Jitter:            0.0,
 	}
 )
 
@@ -65,8 +67,10 @@ type Config struct {
 
 // RetryConfig defines the values for the retry behaviour in the cli
 type RetryConfig struct {
-	Max     uint          `name:"max" yaml:"max" description:"defines the amount of retries to be attempted when "`
-	Timeout time.Duration `name:"timeout" yaml:"timeout" description:"determines the default amount of time that the client will wait in between retry requests, the value will be used when the rate limit headers cannot be found in the request response"`
+	Max               uint          `name:"max" yaml:"max" description:"Defines the maximum amount of times that a request can be attempted"`
+	DefaultTimeout    time.Duration `name:"default_timeout" yaml:"default_timeout" description:"Determines the default amount of time that the client will wait between retry requests"`
+	EnableXRateHeader bool          `name:"enable_x_rate_header" yaml:"enable_x_rate_header" description:"Determines if the xrate-limit headers will be used to dynamically calculate the timeout between requests. If disabled, the default timeout will always be used."`
+	Jitter            float64       `name:"jitter" yaml:"jitter" description:"Represents the fraction that will be used to create a deviation of the timeout calculated. If the value is zero it will be disabled."`
 }
 
 func (c Config) getHosts() []string {

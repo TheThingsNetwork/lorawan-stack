@@ -28,7 +28,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpcretry"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials"
 )
@@ -38,9 +37,11 @@ var (
 	tlsConfig    *tls.Config
 	auth         *rpcmetadata.MD
 	withDump     bool
-	retryMax     uint
-	retryTimeout time.Duration
-	retryCodes   []codes.Code
+
+	retryMax                uint
+	retryDefaultTimeout     time.Duration
+	retryEnableXrateHeaders bool
+	retryJitter             float64
 )
 
 // SetLogger sets the default API logger
@@ -64,13 +65,18 @@ func SetRetryMax(rm uint) {
 }
 
 // SetRetryTimeout configures the default timeout before making a retry in a failed request
-func SetRetryTimeout(rt time.Duration) {
-	retryTimeout = rt
+func SetRetryDefaultTimeout(rt time.Duration) {
+	retryDefaultTimeout = rt
 }
 
-// SetRetryCodes configures which response codes will trigger the retry
-func SetRetryCodes(rc ...codes.Code) {
-	retryCodes = rc
+// SetEnableXrateHeaders configures if the xrate-limit headers will be used in the retry interceptor
+func SetRetryEnableXrateHeaders(b bool) {
+	retryEnableXrateHeaders = b
+}
+
+// SetRetryJitter configures the jitter that will be used for the retry interceptor
+func SetRetryJitter(f float64) {
+	retryJitter = f
 }
 
 // AddCA adds the CA certificate file.
@@ -131,7 +137,9 @@ func GetDialOptions() (opts []grpc.DialOption) {
 	opts = append(opts, grpc.WithChainUnaryInterceptor(
 		rpcretry.UnaryClientInterceptor(
 			rpcretry.WithMax(retryMax),
-			rpcretry.WithDefaultTimeout(retryTimeout),
+			rpcretry.WithDefaultTimeout(retryDefaultTimeout),
+			rpcretry.UseXRateHeader(retryEnableXrateHeaders),
+			rpcretry.WithJitter(retryJitter),
 		)))
 	return
 }
