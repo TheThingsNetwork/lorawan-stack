@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
+	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -52,10 +53,15 @@ func (ss *serverStream) SetHeader(md metadata.MD) error {
 	return nil
 }
 
-func grpcContext(remoteIP, authTokenID string) context.Context {
+func grpcTokenContext(authTokenID string) context.Context {
 	return metadata.NewIncomingContext(test.Context(), metadata.Pairs(
-		"x-real-ip", remoteIP,
 		"authorization", fmt.Sprintf("Bearer NNSXS.%s.authTokenKey", authTokenID),
+	))
+}
+
+func grpcClusterContext() context.Context {
+	return metadata.NewIncomingContext(test.Context(), metadata.Pairs(
+		"authorization", fmt.Sprintf("%s %X", clusterauth.AuthType, []byte{0x00, 0x01, 0x02}),
 	))
 }
 
@@ -81,15 +87,16 @@ func TestGRPC(t *testing.T) {
 	t.Run("UnaryServerInterceptor", func(t *testing.T) {
 
 		for _, tc := range []struct {
-			name     string
-			limiter  *mockLimiter
-			remoteIP string
-			assert   func(t *testing.T, limiter *mockLimiter, resp interface{}, err error)
-			request  interface{}
+			name    string
+			limiter *mockLimiter
+			cluster bool
+			assert  func(t *testing.T, limiter *mockLimiter, resp interface{}, err error)
+			request interface{}
 		}{
 			{
-				name:    "NoIP",
+				name:    "Cluster",
 				limiter: &mockLimiter{limit: true},
+				cluster: true,
 				assert: func(t *testing.T, limiter *mockLimiter, resp interface{}, err error) {
 					a := assertions.New(t)
 					a.So(resp, should.Resemble, "response")
@@ -98,9 +105,8 @@ func TestGRPC(t *testing.T) {
 				},
 			},
 			{
-				name:     "Pass",
-				limiter:  &mockLimiter{},
-				remoteIP: "10.10.10.10",
+				name:    "Pass",
+				limiter: &mockLimiter{},
 				assert: func(t *testing.T, limiter *mockLimiter, resp interface{}, err error) {
 					a := assertions.New(t)
 					a.So(resp, should.Resemble, "response")
@@ -113,9 +119,8 @@ func TestGRPC(t *testing.T) {
 				},
 			},
 			{
-				name:     "Limit",
-				limiter:  &mockLimiter{limit: true},
-				remoteIP: "10.10.10.10",
+				name:    "Limit",
+				limiter: &mockLimiter{limit: true},
 				assert: func(t *testing.T, limiter *mockLimiter, resp interface{}, err error) {
 					a := assertions.New(t)
 					a.So(resp, should.BeNil)
@@ -125,10 +130,9 @@ func TestGRPC(t *testing.T) {
 				},
 			},
 			{
-				name:     "Keyer",
-				limiter:  &mockLimiter{limit: true},
-				remoteIP: "10.10.10.10",
-				request:  &mockRequestWithKeyer{key: "test_keyer"},
+				name:    "Keyer",
+				limiter: &mockLimiter{limit: true},
+				request: &mockRequestWithKeyer{key: "test_keyer"},
 				assert: func(t *testing.T, limiter *mockLimiter, resp interface{}, err error) {
 					a := assertions.New(t)
 					a.So(limiter.calledWithResource.Key(), should.ContainSubstring, "test_keyer")
@@ -138,7 +142,10 @@ func TestGRPC(t *testing.T) {
 			t.Run(tc.name, func(t *testing.T) {
 				intercept := ratelimit.UnaryServerInterceptor(tc.limiter)
 
-				ctx := grpcContext(tc.remoteIP, authTokenID)
+				ctx := grpcTokenContext(authTokenID)
+				if tc.cluster {
+					ctx = grpcClusterContext()
+				}
 				info := &grpc.UnaryServerInfo{FullMethod: unaryMethod}
 				resp, err := intercept(ctx, tc.request, info, grpcUnaryHandler)
 				tc.assert(t, tc.limiter, resp, err)
@@ -148,14 +155,15 @@ func TestGRPC(t *testing.T) {
 	t.Run("StreamServerInterceptor", func(t *testing.T) {
 		t.Run("Streams", func(t *testing.T) {
 			for _, tc := range []struct {
-				name     string
-				limiter  *mockLimiter
-				remoteIP string
-				assert   func(t *testing.T, limiter *mockLimiter, err error)
+				name    string
+				limiter *mockLimiter
+				cluster bool
+				assert  func(t *testing.T, limiter *mockLimiter, err error)
 			}{
 				{
-					name:    "NoIP",
+					name:    "Cluster",
 					limiter: &mockLimiter{limit: true},
+					cluster: true,
 					assert: func(t *testing.T, limiter *mockLimiter, err error) {
 						a := assertions.New(t)
 						a.So(err, should.BeNil)
@@ -163,9 +171,8 @@ func TestGRPC(t *testing.T) {
 					},
 				},
 				{
-					name:     "Pass",
-					limiter:  &mockLimiter{result: ratelimit.Result{Limit: 10}},
-					remoteIP: "10.10.10.10",
+					name:    "Pass",
+					limiter: &mockLimiter{result: ratelimit.Result{Limit: 10}},
 					assert: func(t *testing.T, limiter *mockLimiter, err error) {
 						a := assertions.New(t)
 						a.So(err, should.BeNil)
@@ -176,9 +183,8 @@ func TestGRPC(t *testing.T) {
 					},
 				},
 				{
-					name:     "Limit",
-					limiter:  &mockLimiter{limit: true, result: ratelimit.Result{Limit: 10}},
-					remoteIP: "10.10.10.10",
+					name:    "Limit",
+					limiter: &mockLimiter{limit: true, result: ratelimit.Result{Limit: 10}},
 					assert: func(t *testing.T, limiter *mockLimiter, err error) {
 						assertions.New(t).So(errors.IsResourceExhausted(err), should.BeTrue)
 					},
@@ -186,7 +192,10 @@ func TestGRPC(t *testing.T) {
 			} {
 				t.Run(tc.name, func(t *testing.T) {
 					intercept := ratelimit.StreamServerInterceptor(tc.limiter)
-					ss := &serverStream{t: t, ctx: grpcContext(tc.remoteIP, authTokenID)}
+					ss := &serverStream{t: t, ctx: grpcTokenContext(authTokenID)}
+					if tc.cluster {
+						ss.ctx = grpcClusterContext()
+					}
 					info := &grpc.StreamServerInfo{FullMethod: streamMethod}
 
 					err := intercept(nil, ss, info, grpcStreamHandler)
@@ -202,7 +211,7 @@ func TestGRPC(t *testing.T) {
 				"grpc:stream:up":     &mockLimiter{},
 			}
 			intercept := ratelimit.StreamServerInterceptor(limiter)
-			ss := &serverStream{t: t, ctx: grpcContext("10.10.10.10", authTokenID)}
+			ss := &serverStream{t: t, ctx: grpcTokenContext(authTokenID)}
 			info := &grpc.StreamServerInfo{FullMethod: streamMethod}
 
 			keyFromFirstStream := ""
