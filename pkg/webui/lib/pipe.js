@@ -12,9 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import connect from './connect'
-import ApplicationGeneralSettings from './application-general-settings'
+/**
+ * Performs left-to-right function composition.
+ *
+ * @param {Function[]}funcs - A list of functions.
+ * @returns {Function} A single function composed from `funcs`.
+ */
+const pipe = (...funcs) =>
+  funcs.reduce(
+    (a, b) =>
+      (...args) =>
+        a(b(...args)),
+    arg => arg,
+  )
 
-const ConnectedApplicationGeneralSettings = connect(ApplicationGeneralSettings)
-
-export { ConnectedApplicationGeneralSettings as default, ApplicationGeneralSettings }
+export default pipe
