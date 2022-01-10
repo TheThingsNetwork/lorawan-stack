@@ -30,7 +30,7 @@ var (
 	defaultOAuthServerBaseAddress, _ = discover.DefaultURL(defaultClusterHost, discover.DefaultHTTPPorts[!defaultInsecure], !defaultInsecure)
 	defaultOAuthServerAddress        = defaultOAuthServerBaseAddress + "/oauth"
 	defaultRetryConfig               = RetryConfig{
-		Max:     0,
+		Max:     5,
 		Timeout: 50 * time.Millisecond,
 	}
 )

@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpcretry"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/connectivity"
@@ -126,6 +127,12 @@ func GetDialOptions() (opts []grpc.DialOption) {
 	if withDump {
 		opts = append(opts, grpc.WithChainUnaryInterceptor(requestInterceptor))
 	}
+
+	opts = append(opts, grpc.WithChainUnaryInterceptor(
+		rpcretry.UnaryClientInterceptor(
+			rpcretry.WithMax(retryMax),
+			rpcretry.WithDefaultTimeout(retryTimeout),
+		)))
 	return
 }
 
