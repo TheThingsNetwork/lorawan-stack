@@ -178,10 +178,10 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 			},
 		}
 
-		// Only update the location when it is public and when it may be updated from status messages.
-		// location_public should only be in the field mask if the location is known, so only when a location in the status.
-		// This is to avoid that the location gets reset when there is no location in the status.
 		if gtw.LocationPublic {
+			// Only update the location when it is public and when it may be updated from status messages.
+			// location_public should only be in the field mask if the location is known, so only when a location in the status.
+			// This is to avoid that the location gets reset when there is no location in the status.
 			if status, _, ok := conn.StatusStats(); ok && gtw.UpdateLocationFromStatus && len(status.GetAntennaLocations()) > 0 && status.AntennaLocations[0] != nil {
 				loc := *status.AntennaLocations[0]
 				loc.Source = ttnpb.SOURCE_GPS
@@ -193,6 +193,9 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 				}
 				req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "antennas", "location_public")
 			}
+		} else {
+			// Explicitly disable location public so that the existing gateway location, if any, gets reset.
+			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "location_public")
 		}
 
 		now := time.Now()
