@@ -389,28 +389,43 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				cc = nil
 			}
 
-			var networkCryptoService cryptoservices.Network
-			if req.SelectedMacVersion.UseNwkKey() && dev.RootKeys != nil && dev.RootKeys.NwkKey != nil {
-				// LoRaWAN 1.1 and higher use a NwkKey.
+			// The root keys are used according to the following table:
+			//
+			//  Has NwkKey | Activation | Network uses | Application uses
+			//  ---------- | ---------- | ------------ | ----------------
+			//  No         | 1.0.x      | AppKey       | AppKey
+			//  Yes        | 1.0.x      | NwkKey       | NwkKey
+			//  No         | 1.1.x      | ERROR        | ERROR
+			//  Yes        | 1.1.x      | NwkKey       | AppKey
+			//
+			// See LoRaWAN 1.1 section 6.1.1.3.
+			var (
+				networkCryptoService     cryptoservices.Network
+				applicationCryptoService cryptoservices.Application
+			)
+			if dev.RootKeys != nil && dev.RootKeys.NwkKey != nil {
+				// If a NwkKey is set, assume that the end device is capable of LoRaWAN 1.1.
 				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.RootKeys.NwkKey, js.KeyVault)
 				if err != nil {
 					return nil, nil, err
 				}
 				networkCryptoService = cryptoservices.NewMemory(&nwkKey, nil)
+				if !req.SelectedMacVersion.UseNwkKey() {
+					// If NwkKey is set and the Network Server uses LoRaWAN 1.0.x, use NwkKey as the AppKey.
+					applicationCryptoService = cryptoservices.NewMemory(nil, &nwkKey)
+				}
 			} else if cc != nil && dev.ProvisionerId != "" {
 				networkCryptoService = cryptoservices.NewNetworkRPCClient(cc, js.KeyVault, js.WithClusterAuth())
 			}
-
-			var applicationCryptoService cryptoservices.Application
-			if dev.RootKeys != nil && dev.RootKeys.AppKey != nil {
+			if applicationCryptoService == nil && dev.RootKeys != nil && dev.RootKeys.AppKey != nil {
 				appKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.RootKeys.AppKey, js.KeyVault)
 				if err != nil {
 					return nil, nil, err
 				}
 				applicationCryptoService = cryptoservices.NewMemory(nil, &appKey)
-				if !req.SelectedMacVersion.UseNwkKey() {
-					// LoRaWAN 1.0.x use the AppKey for network security operations.
-					networkCryptoService = cryptoservices.NewMemory(nil, &appKey)
+				if networkCryptoService == nil && !req.SelectedMacVersion.UseNwkKey() {
+					// If the end device is not provisioned with a NwkKey, use AppKey. This only works with LoRaWAN 1.0.x.
+					networkCryptoService = cryptoservices.NewMemory(&appKey, nil)
 				}
 			} else if cc != nil && dev.ProvisionerId != "" {
 				applicationCryptoService = cryptoservices.NewApplicationRPCClient(cc, js.KeyVault, js.WithClusterAuth())
