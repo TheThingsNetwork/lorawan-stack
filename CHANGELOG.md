@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Rate limiting of cluster authenticated RPCs.
+
 ### Security
 
 ## [3.17.0] - 2022-01-07

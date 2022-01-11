@@ -19,26 +19,13 @@ import (
 	"fmt"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
+	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/peer"
 )
-
-// grpcRemoteIP retrieves the remote IP address by the X-Real-IP header. The header is set by rpcmiddleware.ProxyHeaders
-func grpcRemoteIP(ctx context.Context) string {
-	md, _ := metadata.FromIncomingContext(ctx)
-	if v := md.Get("x-real-ip"); len(v) > 0 {
-		return v[0]
-	}
-	if p, ok := peer.FromContext(ctx); ok {
-		return p.Addr.String()
-	}
-	return ""
-}
 
 func grpcEntityFromRequest(ctx context.Context, req interface{}) string {
 	if r, ok := req.(RateLimitKeyer); ok {
@@ -53,6 +40,10 @@ func grpcEntityFromRequest(ctx context.Context, req interface{}) string {
 	return ""
 }
 
+func grpcIsClusterAuthCall(ctx context.Context) bool {
+	return rpcmetadata.FromIncomingContext(ctx).AuthType == clusterauth.AuthType
+}
+
 func grpcAuthTokenID(ctx context.Context) string {
 	if authValue := rpcmetadata.FromIncomingContext(ctx).AuthValue; authValue != "" {
 		_, id, _, err := auth.SplitToken(authValue)
@@ -65,11 +56,9 @@ func grpcAuthTokenID(ctx context.Context) string {
 }
 
 // UnaryServerInterceptor returns a gRPC unary server interceptor that rate limits incoming gRPC requests.
-// If the X-Real-IP header is not set, it is assumed that the request originates from the cluster, and no rate limits are enforced.
 func UnaryServerInterceptor(limiter Interface) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
-		remoteIP := grpcRemoteIP(ctx)
-		if remoteIP == "" {
+		if grpcIsClusterAuthCall(ctx) {
 			return handler(ctx, req)
 		}
 
@@ -103,12 +92,13 @@ func (s *rateLimitedServerStream) RecvMsg(msg interface{}) error {
 // If the X-Real-IP header is not set, it is assumed that the gRPC request originates from the cluster, and no rate limits are enforced.
 func StreamServerInterceptor(limiter Interface) grpc.StreamServerInterceptor {
 	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
-		remoteIP := grpcRemoteIP(stream.Context())
-		if remoteIP == "" {
-			return handler(srv, stream)
+		ctx := stream.Context()
+
+		if grpcIsClusterAuthCall(ctx) {
+			return handler(ctx, stream)
 		}
 
-		acceptResource := grpcStreamAcceptResource(stream.Context(), info.FullMethod)
+		acceptResource := grpcStreamAcceptResource(ctx, info.FullMethod)
 		limit, result := limiter.RateLimit(acceptResource)
 		stream.SetHeader(result.GRPCHeaders())
 		if limit {
@@ -118,7 +108,7 @@ func StreamServerInterceptor(limiter Interface) grpc.StreamServerInterceptor {
 		return handler(srv, &rateLimitedServerStream{
 			ServerStream: stream,
 			limiter:      limiter,
-			resource:     grpcStreamUpResource(stream.Context(), info.FullMethod),
+			resource:     grpcStreamUpResource(ctx, info.FullMethod),
 		})
 	}
 }
