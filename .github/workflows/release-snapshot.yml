@@ -128,7 +128,7 @@ jobs:
       - name: Run Goreleaser
         uses: goreleaser/goreleaser-action@v2
         with:
-          version: 'v0.184.0'
+          version: 'v1.2.5'
           args: release --config .goreleaser.snapshot.yml --snapshot --timeout 60m
         env:
           SIGN_KEY_NAME: ${{ secrets.SIGN_KEY_NAME }}
