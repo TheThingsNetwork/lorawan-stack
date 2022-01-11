@@ -38,30 +38,11 @@ func NewMemory(nwkKey, appKey *types.AES128Key) NetworkApplication {
 
 var errNoNwkKey = errors.DefineCorruption("no_nwk_key", "no NwkKey specified")
 
-func (d *mem) getNwkKey(version ttnpb.MACVersion) (*types.AES128Key, error) {
-	switch {
-	case version.Compare(ttnpb.MAC_V1_1) >= 0:
-		if d.nwkKey == nil {
-			return nil, errNoNwkKey.New()
-		}
-		return d.nwkKey, nil
-	default:
-		if d.appKey == nil {
-			return nil, errNoAppKey.New()
-		}
-		return d.appKey, nil
-	}
-}
-
 func (d *mem) JoinRequestMIC(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) (res [4]byte, err error) {
-	key, err := d.getNwkKey(version)
-	if err != nil {
-		return
-	}
-	if key == nil {
+	if d.nwkKey == nil {
 		return [4]byte{}, errNoNwkKey.New()
 	}
-	return crypto.ComputeJoinRequestMIC(*key, payload)
+	return crypto.ComputeJoinRequestMIC(*d.nwkKey, payload)
 }
 
 var (
@@ -76,31 +57,23 @@ func (d *mem) JoinAcceptMIC(ctx context.Context, dev *ttnpb.EndDevice, version t
 	if dev.Ids.DevEui == nil || dev.Ids.DevEui.IsZero() {
 		return [4]byte{}, errNoDevEUI.New()
 	}
-	key, err := d.getNwkKey(version)
-	if err != nil {
-		return [4]byte{}, err
-	}
-	if key == nil {
+	if d.nwkKey == nil {
 		return [4]byte{}, errNoNwkKey.New()
 	}
 	switch {
 	case version.Compare(ttnpb.MAC_V1_1) >= 0:
-		jsIntKey := crypto.DeriveJSIntKey(*key, *dev.Ids.DevEui)
+		jsIntKey := crypto.DeriveJSIntKey(*d.nwkKey, *dev.Ids.DevEui)
 		return crypto.ComputeJoinAcceptMIC(jsIntKey, joinReqType, *dev.Ids.JoinEui, dn, payload)
 	default:
-		return crypto.ComputeLegacyJoinAcceptMIC(*key, payload)
+		return crypto.ComputeLegacyJoinAcceptMIC(*d.nwkKey, payload)
 	}
 }
 
 func (d *mem) EncryptJoinAccept(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([]byte, error) {
-	key, err := d.getNwkKey(version)
-	if err != nil {
-		return nil, err
-	}
-	if key == nil {
+	if d.nwkKey == nil {
 		return nil, errNoNwkKey.New()
 	}
-	return crypto.EncryptJoinAccept(*key, payload)
+	return crypto.EncryptJoinAccept(*d.nwkKey, payload)
 }
 
 func (d *mem) EncryptRejoinAccept(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([]byte, error) {
@@ -127,23 +100,19 @@ func (d *mem) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDevice, version 
 	if dev.Ids.DevEui == nil || dev.Ids.DevEui.IsZero() {
 		return NwkSKeys{}, errNoDevEUI.New()
 	}
+	if d.nwkKey == nil {
+		return NwkSKeys{}, errNoNwkKey.New()
+	}
 	switch {
 	case version.Compare(ttnpb.MAC_V1_1) >= 0:
-		if d.nwkKey == nil {
-			return NwkSKeys{}, errNoNwkKey.New()
-		}
 		return NwkSKeys{
 			FNwkSIntKey: crypto.DeriveFNwkSIntKey(*d.nwkKey, jn, *dev.Ids.JoinEui, dn),
 			SNwkSIntKey: crypto.DeriveSNwkSIntKey(*d.nwkKey, jn, *dev.Ids.JoinEui, dn),
 			NwkSEncKey:  crypto.DeriveNwkSEncKey(*d.nwkKey, jn, *dev.Ids.JoinEui, dn),
 		}, nil
-
 	default:
-		if d.appKey == nil {
-			return NwkSKeys{}, errNoAppKey.New()
-		}
 		return NwkSKeys{
-			FNwkSIntKey: crypto.DeriveLegacyNwkSKey(*d.appKey, jn, nid, dn),
+			FNwkSIntKey: crypto.DeriveLegacyNwkSKey(*d.nwkKey, jn, nid, dn),
 		}, nil
 	}
 }
