@@ -29,9 +29,10 @@ var errInvalidShell = errors.DefineInvalidArgument("invalid_shell", "invalid she
 // Complete returns the auto-complete command
 func Complete() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:    "complete",
-		Hidden: true,
-		Short:  "Generate script for auto-completion",
+		Use:     "complete",
+		Aliases: []string{"completion"},
+		Hidden:  true,
+		Short:   "Generate script for auto-completion",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if name, _ := cmd.Flags().GetString("executable"); name != "" {
 				cmd.Root().Use = name
