@@ -59,12 +59,22 @@ var (
 
 	// Root command is the entrypoint of the program
 	Root = &cobra.Command{
-		Use:               name,
-		SilenceErrors:     true,
-		SilenceUsage:      true,
-		Short:             "The Things Network Command-line Interface",
-		PersistentPreRunE: preRun(checkAuth, refreshToken, requireAuth),
+		Use:           name,
+		SilenceErrors: true,
+		SilenceUsage:  true,
+		Short:         "The Things Network Command-line Interface",
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			if cmd.Name() == "__complete" {
+				return nil
+			}
+
+			return preRun(checkAuth, refreshToken, requireAuth)(cmd, args)
+		},
 		PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
+			if cmd.Name() == "__complete" {
+				return nil
+			}
+
 			// clean up the API
 			api.CloseAll()
 
@@ -87,6 +97,8 @@ var (
 		},
 	}
 )
+
+func runNoop(cmd *cobra.Command, args []string) error { return nil }
 
 func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error {
 	return func(cmd *cobra.Command, args []string) error {
@@ -321,14 +333,24 @@ var (
 func init() {
 	Root.SetGlobalNormalizationFunc(util.NormalizeFlags)
 	Root.PersistentFlags().AddFlagSet(mgr.Flags())
-	versionCommand.PersistentPreRunE = preRun()
+
+	versionCommand.PersistentPreRunE = runNoop
+	versionCommand.PersistentPostRunE = runNoop
 	Root.AddCommand(versionCommand)
-	genManPagesCommand.PersistentPreRunE = preRun()
+
+	genManPagesCommand.PersistentPreRunE = runNoop
+	genManPagesCommand.PersistentPostRunE = runNoop
 	Root.AddCommand(genManPagesCommand)
-	genMDDocCommand.PersistentPreRunE = preRun()
+
+	genMDDocCommand.PersistentPreRunE = runNoop
+	genMDDocCommand.PersistentPostRunE = runNoop
 	Root.AddCommand(genMDDocCommand)
-	genJSONTreeCommand.PersistentPreRunE = preRun()
+
+	genJSONTreeCommand.PersistentPreRunE = runNoop
+	genJSONTreeCommand.PersistentPostRunE = runNoop
 	Root.AddCommand(genJSONTreeCommand)
-	completeCommand.PersistentPreRunE = preRun()
+
+	completeCommand.PersistentPreRunE = runNoop
+	completeCommand.PersistentPostRunE = runNoop
 	Root.AddCommand(completeCommand)
 }

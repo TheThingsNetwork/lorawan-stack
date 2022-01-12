@@ -55,6 +55,10 @@ var (
 		SilenceUsage:  true,
 		Short:         "The Things Stack for LoRaWAN",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			if cmd.Name() == "__complete" {
+				return nil
+			}
+
 			// read in config from file
 			err := mgr.ReadInConfig()
 			if err != nil {
@@ -121,6 +125,10 @@ var (
 			return nil
 		},
 		PersistentPostRunE: func(cmd *cobra.Command, args []string) error {
+			if cmd.Name() == "__complete" {
+				return nil
+			}
+
 			select {
 			case <-ctx.Done():
 			case <-time.After(versionCheckTimeout):
@@ -135,11 +143,36 @@ var (
 	}
 )
 
+var (
+	versionCommand     = version.Print(Root)
+	genManPagesCommand = commands.GenManPages(Root)
+	genMDDocCommand    = commands.GenMDDoc(Root)
+	genJSONTreeCommand = commands.GenJSONTree(Root)
+	completeCommand    = commands.Complete()
+)
+
+func runNoop(cmd *cobra.Command, args []string) error { return nil }
+
 func init() {
 	Root.PersistentFlags().AddFlagSet(mgr.Flags())
-	Root.AddCommand(version.Print(Root))
-	Root.AddCommand(commands.GenManPages(Root))
-	Root.AddCommand(commands.GenMDDoc(Root))
-	Root.AddCommand(commands.GenJSONTree(Root))
-	Root.AddCommand(commands.Complete())
+
+	versionCommand.PersistentPreRunE = runNoop
+	versionCommand.PersistentPostRunE = runNoop
+	Root.AddCommand(versionCommand)
+
+	genManPagesCommand.PersistentPreRunE = runNoop
+	genManPagesCommand.PersistentPostRunE = runNoop
+	Root.AddCommand(genManPagesCommand)
+
+	genMDDocCommand.PersistentPreRunE = runNoop
+	genMDDocCommand.PersistentPostRunE = runNoop
+	Root.AddCommand(genMDDocCommand)
+
+	genJSONTreeCommand.PersistentPreRunE = runNoop
+	genJSONTreeCommand.PersistentPostRunE = runNoop
+	Root.AddCommand(genJSONTreeCommand)
+
+	completeCommand.PersistentPreRunE = runNoop
+	completeCommand.PersistentPostRunE = runNoop
+	Root.AddCommand(completeCommand)
 }

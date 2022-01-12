@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- CLI Completion and Documentation commands no longer try to make a server connection.
+
 ### Security
 
 ## [3.17.1] - 2022-01-12
