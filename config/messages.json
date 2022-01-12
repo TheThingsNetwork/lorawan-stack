@@ -6983,15 +6983,6 @@
       "file": "grpc_asns.go"
     }
   },
-  "error:pkg/networkserver:duplicate": {
-    "translations": {
-      "en": "uplink is a duplicate"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/networkserver:empty_session": {
     "translations": {
       "en": "session in empty"
