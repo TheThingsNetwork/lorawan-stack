@@ -72,13 +72,16 @@ $xs = $cs.m
   color: $tc-subtle-gray
 
 .center
-  position: absolute
-  top: ($l * -1) // To achieve visual centering.
-  left: 0
-  right: 0
-  bottom: 0
-  margin: auto
-  height: $l
+  &:not(.inline)
+    position: absolute
+    top: ($l * -1) // To achieve visual centering.
+    left: 0
+    right: 0
+    bottom: 0
+    margin: auto
+    height: $l
+  &.inline
+    justify-content: center
 
   &.small
     height: $s
