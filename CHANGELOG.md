@@ -20,6 +20,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Rate limiting of cluster authenticated RPCs.
+- CLI panic when setting end devices.
 
 ### Security
 
