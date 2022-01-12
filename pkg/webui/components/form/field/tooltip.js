@@ -46,17 +46,32 @@ const Content = props => {
   return (
     <div>
       <Message className={style.tooltipTitle} content={m.descriptionTitle} component="h4" />
-      <Message className={style.tooltipDescription} content={description} component="p" />
+      <Message
+        className={style.tooltipDescription}
+        content={description}
+        component="p"
+        convertBackticks
+      />
       {hasLocation && (
         <>
           <Message className={style.tooltipTitle} content={m.locationTitle} component="h4" />
-          <Message className={style.tooltipDescription} content={location} component="p" />
+          <Message
+            className={style.tooltipDescription}
+            content={location}
+            component="p"
+            convertBackticks
+          />
         </>
       )}
       {hasAbsence && (
         <>
           <Message className={style.tooltipTitle} content={m.absenceTitle} component="h4" />
-          <Message className={style.tooltipDescription} content={absence} component="p" />
+          <Message
+            className={style.tooltipDescription}
+            content={absence}
+            component="p"
+            convertBackticks
+          />
         </>
       )}
       {(hasChildren || hasGlossary) && (
