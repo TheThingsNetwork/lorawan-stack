@@ -28,6 +28,9 @@ import (
 )
 
 func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
+	usr1 := st.population.NewUser()
+	org1 := st.population.NewOrganization(usr1.GetOrganizationOrUserIdentifiers())
+
 	s, ok := st.PrepareDB(t).(interface {
 		Store
 		is.GatewayStore
@@ -63,10 +66,12 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		start := time.Now().Truncate(time.Second)
 
 		created, err = s.CreateGateway(ctx, &ttnpb.Gateway{
-			Ids:         &ttnpb.GatewayIdentifiers{GatewayId: "foo", Eui: eui},
-			Name:        "Foo Name",
-			Description: "Foo Description",
-			Attributes:  attributes,
+			Ids:                   &ttnpb.GatewayIdentifiers{GatewayId: "foo", Eui: eui},
+			Name:                  "Foo Name",
+			Description:           "Foo Description",
+			Attributes:            attributes,
+			AdministrativeContact: usr1.GetOrganizationOrUserIdentifiers(),
+			TechnicalContact:      org1.GetOrganizationOrUserIdentifiers(),
 			VersionIds: &ttnpb.GatewayVersionIdentifiers{
 				BrandId:         "some_brand_id",
 				ModelId:         "some_model_id",
@@ -100,6 +105,8 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 			a.So(created.Name, should.Equal, "Foo Name")
 			a.So(created.Description, should.Equal, "Foo Description")
 			a.So(created.Attributes, should.Resemble, attributes)
+			a.So(created.AdministrativeContact, should.Resemble, usr1.GetOrganizationOrUserIdentifiers())
+			a.So(created.TechnicalContact, should.Resemble, org1.GetOrganizationOrUserIdentifiers())
 			a.So(created.VersionIds, should.Resemble, &ttnpb.GatewayVersionIdentifiers{
 				BrandId:         "some_brand_id",
 				ModelId:         "some_model_id",
@@ -209,10 +216,12 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 		start := time.Now().Truncate(time.Second)
 
 		updated, err = s.UpdateGateway(ctx, &ttnpb.Gateway{
-			Ids:         &ttnpb.GatewayIdentifiers{GatewayId: "foo", Eui: updatedEUI},
-			Name:        "New Foo Name",
-			Description: "New Foo Description",
-			Attributes:  updatedAttributes,
+			Ids:                   &ttnpb.GatewayIdentifiers{GatewayId: "foo", Eui: updatedEUI},
+			Name:                  "New Foo Name",
+			Description:           "New Foo Description",
+			Attributes:            updatedAttributes,
+			AdministrativeContact: org1.GetOrganizationOrUserIdentifiers(),
+			TechnicalContact:      usr1.GetOrganizationOrUserIdentifiers(),
 			VersionIds: &ttnpb.GatewayVersionIdentifiers{
 				BrandId:         "other_brand_id",
 				ModelId:         "other_model_id",
@@ -245,6 +254,8 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 			a.So(updated.Name, should.Equal, "New Foo Name")
 			a.So(updated.Description, should.Equal, "New Foo Description")
 			a.So(updated.Attributes, should.Resemble, updatedAttributes)
+			a.So(updated.AdministrativeContact, should.Resemble, org1.GetOrganizationOrUserIdentifiers())
+			a.So(updated.TechnicalContact, should.Resemble, usr1.GetOrganizationOrUserIdentifiers())
 			a.So(updated.VersionIds, should.Resemble, &ttnpb.GatewayVersionIdentifiers{
 				BrandId:         "other_brand_id",
 				ModelId:         "other_model_id",

@@ -27,6 +27,9 @@ import (
 )
 
 func (st *StoreTest) TestApplicationStoreCRUD(t *T) {
+	usr1 := st.population.NewUser()
+	org1 := st.population.NewOrganization(usr1.GetOrganizationOrUserIdentifiers())
+
 	s, ok := st.PrepareDB(t).(interface {
 		Store
 		is.ApplicationStore
@@ -47,10 +50,12 @@ func (st *StoreTest) TestApplicationStoreCRUD(t *T) {
 		start := time.Now().Truncate(time.Second)
 
 		created, err = s.CreateApplication(ctx, &ttnpb.Application{
-			Ids:         &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
-			Name:        "Foo Name",
-			Description: "Foo Description",
-			Attributes:  attributes,
+			Ids:                   &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
+			Name:                  "Foo Name",
+			Description:           "Foo Description",
+			Attributes:            attributes,
+			AdministrativeContact: usr1.GetOrganizationOrUserIdentifiers(),
+			TechnicalContact:      org1.GetOrganizationOrUserIdentifiers(),
 		})
 
 		if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
@@ -58,6 +63,8 @@ func (st *StoreTest) TestApplicationStoreCRUD(t *T) {
 			a.So(created.Name, should.Equal, "Foo Name")
 			a.So(created.Description, should.Equal, "Foo Description")
 			a.So(created.Attributes, should.Resemble, attributes)
+			a.So(created.AdministrativeContact, should.Resemble, usr1.GetOrganizationOrUserIdentifiers())
+			a.So(created.TechnicalContact, should.Resemble, org1.GetOrganizationOrUserIdentifiers())
 			a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenWithin, 5*time.Second, start)
 			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenWithin, 5*time.Second, start)
 		}
@@ -110,16 +117,20 @@ func (st *StoreTest) TestApplicationStoreCRUD(t *T) {
 		start := time.Now().Truncate(time.Second)
 
 		updated, err = s.UpdateApplication(ctx, &ttnpb.Application{
-			Ids:         &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
-			Name:        "New Foo Name",
-			Description: "New Foo Description",
-			Attributes:  updatedAttributes,
+			Ids:                   &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
+			Name:                  "New Foo Name",
+			Description:           "New Foo Description",
+			Attributes:            updatedAttributes,
+			AdministrativeContact: org1.GetOrganizationOrUserIdentifiers(),
+			TechnicalContact:      usr1.GetOrganizationOrUserIdentifiers(),
 		}, mask)
 		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.GetIds().GetApplicationId(), should.Equal, "foo")
 			a.So(updated.Name, should.Equal, "New Foo Name")
 			a.So(updated.Description, should.Equal, "New Foo Description")
 			a.So(updated.Attributes, should.Resemble, updatedAttributes)
+			a.So(updated.AdministrativeContact, should.Resemble, org1.GetOrganizationOrUserIdentifiers())
+			a.So(updated.TechnicalContact, should.Resemble, usr1.GetOrganizationOrUserIdentifiers())
 			a.So(*ttnpb.StdTime(updated.CreatedAt), should.Equal, *ttnpb.StdTime(created.CreatedAt))
 			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenWithin, 5*time.Second, start)
 		}
