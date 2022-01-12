@@ -57,6 +57,7 @@ func (s *Subscription) matchIdentifiers(evt events.Event) bool {
 	if len(s.identifiers) == 0 {
 		return true
 	}
+	definition := events.GetDefinition(evt)
 	for _, evtIDs := range evt.Identifiers() {
 		evtEntityType := evtIDs.EntityType()
 		for _, subIDs := range s.identifiers {
@@ -65,7 +66,8 @@ func (s *Subscription) matchIdentifiers(evt events.Event) bool {
 				return true
 			}
 			if evtEntityType == "end device" && subEntityType == "application" &&
-				unique.ID(evt.Context(), evtIDs.GetDeviceIds().ApplicationIds) == unique.ID(s.ctx, subIDs) {
+				unique.ID(evt.Context(), evtIDs.GetDeviceIds().ApplicationIds) == unique.ID(s.ctx, subIDs) &&
+				definition != nil && definition.PropagateToParent() {
 				return true
 			}
 		}

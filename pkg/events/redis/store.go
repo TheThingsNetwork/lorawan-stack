@@ -385,6 +385,7 @@ func (ps *PubSubStore) Publish(evt events.Event) {
 		if len(ids) == 0 {
 			tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), nil), m)
 		}
+		definition := events.GetDefinition(evt)
 		for _, id := range ids {
 			tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), id), m)
 			streamValues, err := encodeEventMeta(evt, id)
@@ -399,7 +400,7 @@ func (ps *PubSubStore) Publish(evt events.Event) {
 				Values:       streamValues,
 			})
 			tx.Expire(ps.ctx, eventStream, ps.entityHistoryTTL)
-			if devID := id.GetDeviceIds(); devID != nil {
+			if devID := id.GetDeviceIds(); devID != nil && definition != nil && definition.PropagateToParent() {
 				eventStream := ps.eventStream(evt.Context(), devID.ApplicationIds.GetEntityIdentifiers())
 				tx.XAdd(ps.ctx, &redis.XAddArgs{
 					Stream:       eventStream,
