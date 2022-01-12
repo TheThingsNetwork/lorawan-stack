@@ -20589,6 +20589,42 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "admin_rights",
+              "description": "",
+              "label": "",
+              "type": "AdminRights",
+              "longType": "IsConfiguration.AdminRights",
+              "fullType": "ttn.lorawan.v3.IsConfiguration.AdminRights",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "AdminRights",
+          "longName": "IsConfiguration.AdminRights",
+          "fullName": "ttn.lorawan.v3.IsConfiguration.AdminRights",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "all",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },

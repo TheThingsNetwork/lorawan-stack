@@ -11102,6 +11102,14 @@
         }
       }
     },
+    "IsConfigurationAdminRights": {
+      "type": "object",
+      "properties": {
+        "all": {
+          "type": "boolean"
+        }
+      }
+    },
     "IsConfigurationEndDevicePicture": {
       "type": "object",
       "properties": {
@@ -15244,6 +15252,9 @@
         },
         "user_rights": {
           "$ref": "#/definitions/IsConfigurationUserRights"
+        },
+        "admin_rights": {
+          "$ref": "#/definitions/IsConfigurationAdminRights"
         }
       }
     },

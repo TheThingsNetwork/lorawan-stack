@@ -114,6 +114,11 @@ message IsConfiguration {
     google.protobuf.BoolValue create_organizations = 4;
   }
   UserRights user_rights = 6;
+  
+  message AdminRights {
+    google.protobuf.BoolValue all = 1;
+  }
+  AdminRights admin_rights = 8;
 }
 
 message GetIsConfigurationResponse {

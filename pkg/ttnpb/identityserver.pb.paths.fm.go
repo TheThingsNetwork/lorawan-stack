@@ -69,6 +69,8 @@ var AuthInfoResponseFieldPathsTopLevel = []string{
 var GetIsConfigurationRequestFieldPathsNested []string
 var GetIsConfigurationRequestFieldPathsTopLevel []string
 var IsConfigurationFieldPathsNested = []string{
+	"admin_rights",
+	"admin_rights.all",
 	"end_device_picture",
 	"end_device_picture.disable_upload",
 	"profile_picture",
@@ -97,6 +99,7 @@ var IsConfigurationFieldPathsNested = []string{
 }
 
 var IsConfigurationFieldPathsTopLevel = []string{
+	"admin_rights",
 	"end_device_picture",
 	"profile_picture",
 	"user_registration",
@@ -104,6 +107,8 @@ var IsConfigurationFieldPathsTopLevel = []string{
 }
 var GetIsConfigurationResponseFieldPathsNested = []string{
 	"configuration",
+	"configuration.admin_rights",
+	"configuration.admin_rights.all",
 	"configuration.end_device_picture",
 	"configuration.end_device_picture.disable_upload",
 	"configuration.profile_picture",
@@ -222,6 +227,13 @@ var IsConfiguration_UserRightsFieldPathsTopLevel = []string{
 	"create_clients",
 	"create_gateways",
 	"create_organizations",
+}
+var IsConfiguration_AdminRightsFieldPathsNested = []string{
+	"all",
+}
+
+var IsConfiguration_AdminRightsFieldPathsTopLevel = []string{
+	"all",
 }
 var IsConfiguration_UserRegistration_InvitationFieldPathsNested = []string{
 	"required",

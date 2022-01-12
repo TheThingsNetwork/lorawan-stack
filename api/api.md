@@ -299,6 +299,7 @@
   - [Message `GetIsConfigurationRequest`](#ttn.lorawan.v3.GetIsConfigurationRequest)
   - [Message `GetIsConfigurationResponse`](#ttn.lorawan.v3.GetIsConfigurationResponse)
   - [Message `IsConfiguration`](#ttn.lorawan.v3.IsConfiguration)
+  - [Message `IsConfiguration.AdminRights`](#ttn.lorawan.v3.IsConfiguration.AdminRights)
   - [Message `IsConfiguration.EndDevicePicture`](#ttn.lorawan.v3.IsConfiguration.EndDevicePicture)
   - [Message `IsConfiguration.ProfilePicture`](#ttn.lorawan.v3.IsConfiguration.ProfilePicture)
   - [Message `IsConfiguration.UserRegistration`](#ttn.lorawan.v3.IsConfiguration.UserRegistration)
@@ -4520,6 +4521,13 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | `profile_picture` | [`IsConfiguration.ProfilePicture`](#ttn.lorawan.v3.IsConfiguration.ProfilePicture) |  |  |
 | `end_device_picture` | [`IsConfiguration.EndDevicePicture`](#ttn.lorawan.v3.IsConfiguration.EndDevicePicture) |  |  |
 | `user_rights` | [`IsConfiguration.UserRights`](#ttn.lorawan.v3.IsConfiguration.UserRights) |  |  |
+| `admin_rights` | [`IsConfiguration.AdminRights`](#ttn.lorawan.v3.IsConfiguration.AdminRights) |  |  |
+
+### <a name="ttn.lorawan.v3.IsConfiguration.AdminRights">Message `IsConfiguration.AdminRights`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `all` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
 
 ### <a name="ttn.lorawan.v3.IsConfiguration.EndDevicePicture">Message `IsConfiguration.EndDevicePicture`</a>
 

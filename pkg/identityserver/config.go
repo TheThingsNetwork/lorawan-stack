@@ -196,6 +196,9 @@ func (c Config) toProto() *ttnpb.IsConfiguration {
 			CreateGateways:      &pbtypes.BoolValue{Value: c.UserRights.CreateGateways},
 			CreateOrganizations: &pbtypes.BoolValue{Value: c.UserRights.CreateOrganizations},
 		},
+		AdminRights: &ttnpb.IsConfiguration_AdminRights{
+			All: &pbtypes.BoolValue{Value: c.AdminRights.All},
+		},
 	}
 }
 
