@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Gateways are removed from the Packet Broker Mapper API when unsetting the location public setting. This is to remove gateways from the map. Previously, the location was still set, but it did not get updated.
+
 ### Deprecated
 
 ### Removed
