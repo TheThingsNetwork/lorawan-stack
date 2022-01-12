@@ -13,18 +13,24 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
-- Gateways are removed from the Packet Broker Mapper API when unsetting the location public setting. This is to remove gateways from the map. Previously, the location was still set, but it did not get updated.
-
 ### Deprecated
 
 ### Removed
 
 ### Fixed
 
+### Security
+
+## [3.17.1] - 2022-01-12
+
+### Changed
+
+- Gateways are removed from the Packet Broker Mapper API when unsetting the location public setting. This is to remove gateways from the map. Previously, the location was still set, but it did not get updated.
+
+### Fixed
+
 - Rate limiting of cluster authenticated RPCs.
 - CLI panic when setting end devices.
-
-### Security
 
 ## [3.17.0] - 2022-01-07
 
@@ -1965,7 +1971,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.17.0...v3.17
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.17.1...v3.17
+[3.17.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.17.0...v3.17.1
 [3.17.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.2...v3.17.0
 [3.16.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.1...v3.16.2
 [3.16.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.0...v3.16.1
