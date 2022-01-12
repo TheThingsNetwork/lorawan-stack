@@ -201,7 +201,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 		if res.CreatedAt == nil || (isRes.CreatedAt != nil && ttnpb.StdTime(isRes.CreatedAt).Before(*ttnpb.StdTime(res.CreatedAt))) {
 			res.CreatedAt = isRes.CreatedAt
 		}
-		if ttnpb.StdTime(isRes.UpdatedAt).After(*ttnpb.StdTime(res.UpdatedAt)) {
+		if res.UpdatedAt == nil || ttnpb.StdTime(isRes.UpdatedAt).After(*ttnpb.StdTime(res.UpdatedAt)) {
 			res.UpdatedAt = isRes.UpdatedAt
 		}
 	}
