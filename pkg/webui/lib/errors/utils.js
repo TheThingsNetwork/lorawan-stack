@@ -44,7 +44,6 @@ export const isBackend = error =>
   typeof error === 'object' &&
   !('id' in error) &&
   error.message &&
-  hasValidDetails(error) &&
   (error.code || error.grpc_code)
 
 /**
@@ -279,7 +278,7 @@ export const getSentryErrorTitle = error => {
 
   if (isBackend(error)) {
     const title = error.message
-    if (hasCauses(getBackendErrorDetails(error))) {
+    if (hasValidDetails(error) && hasCauses(getBackendErrorDetails(error))) {
       const rootCause = getBackendErrorRootCause(getBackendErrorDetails(error))
       const message =
         'attributes' in rootCause
@@ -368,7 +367,9 @@ export const getBackendErrorName = error =>
  * @returns {string} The default message.
  */
 export const getBackendErrorDefaultMessage = error =>
-  error.details[0].message_format || error.message.replace(/^.*\s/, '')
+  hasValidDetails(error)
+    ? error.details[0].message_format || error.details[0].message
+    : error.message.replace(/^.*\s/, '')
 
 /**
  * Returns whether the error has one or more cause properties.
@@ -433,33 +434,42 @@ export const toMessageProps = (error, each = false) => {
   if (isBackendErrorDetails(error) || isBackend(error)) {
     const pathErrors = getBackendErrorDetailsPathError(error)
     let errorDetails
-    if (isBackendErrorDetails(pathErrors)) {
-      errorDetails = pathErrors
-    } else if ('details' in error) {
-      errorDetails = error.details[0]
-    } else {
-      errorDetails = error
-    }
+    if (hasValidDetails(error) || isBackendErrorDetails(error)) {
+      if (isBackendErrorDetails(pathErrors)) {
+        errorDetails = pathErrors
+      } else if ('details' in error) {
+        errorDetails = error.details[0]
+      } else {
+        errorDetails = error
+      }
 
-    if (hasCauses(errorDetails)) {
-      // Use the root cause if any.
-      const rootCause = getBackendErrorRootCause(errorDetails)
+      if (hasCauses(errorDetails)) {
+        // Use the root cause if any.
+        const rootCause = getBackendErrorRootCause(errorDetails)
+        props.push({
+          content: {
+            id: getBackendErrorDetailsId(rootCause),
+            defaultMessage: rootCause.message_format,
+          },
+          values: rootCause.attributes,
+        })
+      }
+
       props.push({
         content: {
-          id: getBackendErrorDetailsId(rootCause),
-          defaultMessage: rootCause.message_format,
+          id: getBackendErrorDetailsId(errorDetails),
+          defaultMessage: errorDetails.message_format,
         },
-        values: rootCause.attributes,
+        values: errorDetails.attributes,
+      })
+    } else {
+      props.push({
+        content: {
+          id: getBackendErrorId(error),
+          defaultMessage: getBackendErrorDefaultMessage(error),
+        },
       })
     }
-
-    props.push({
-      content: {
-        id: getBackendErrorDetailsId(errorDetails),
-        defaultMessage: errorDetails.message_format,
-      },
-      values: errorDetails.attributes,
-    })
   } else if (isFrontend(error)) {
     props.push({
       content: error.errorMessage,
