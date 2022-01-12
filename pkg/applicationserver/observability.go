@@ -36,21 +36,25 @@ var (
 		"as.up.data.drop", "drop uplink data message",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
+		events.WithPropagateToParent(),
 	)
 	evtForwardDataUp = events.Define(
 		"as.up.data.forward", "forward uplink data message",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationUp{}),
+		events.WithPropagateToParent(),
 	)
 	evtDecodeFailDataUp = events.Define(
 		"as.up.data.decode.fail", "decode uplink data message failure",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
+		events.WithPropagateToParent(),
 	)
 	evtDecodeWarningDataUp = events.Define(
 		"as.up.data.decode.warning", "decode uplink data message warning",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationUplink{}),
+		events.WithPropagateToParent(),
 	)
 	evtReceiveJoinAccept = events.Define(
 		"as.up.join.receive", "receive join-accept message",
@@ -60,11 +64,13 @@ var (
 		"as.up.join.drop", "drop join-accept message",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
+		events.WithPropagateToParent(),
 	)
 	evtForwardJoinAccept = events.Define(
 		"as.up.join.forward", "forward join-accept message",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationUp{}),
+		events.WithPropagateToParent(),
 	)
 	evtForwardLocationSolved = events.Define(
 		"as.up.location.forward", "forward location solved message",
@@ -87,6 +93,7 @@ var (
 		"as.down.data.drop", "drop downlink data message",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
+		events.WithPropagateToParent(),
 	)
 	evtForwardDataDown = events.Define(
 		"as.down.data.forward", "forward downlink data message",
@@ -94,26 +101,31 @@ var (
 		events.WithDataType(&ttnpb.ApplicationDownlink{}),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
+		events.WithPropagateToParent(),
 	)
 	evtEncodeFailDataDown = events.Define(
 		"as.down.data.encode.fail", "encode downlink data message failure",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
+		events.WithPropagateToParent(),
 	)
 	evtEncodeWarningDataDown = events.Define(
 		"as.down.data.encode.warning", "encode downlink data message warning",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationDownlink{}),
+		events.WithPropagateToParent(),
 	)
 	evtDecodeFailDataDown = events.Define(
 		"as.down.data.decode.fail", "decode downlink data message failure",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
+		events.WithPropagateToParent(),
 	)
 	evtDecodeWarningDataDown = events.Define(
 		"as.down.data.decode.warning", "decode downlink data message warning",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationDownlink{}),
+		events.WithPropagateToParent(),
 	)
 )
 

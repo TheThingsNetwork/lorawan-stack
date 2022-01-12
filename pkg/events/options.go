@@ -164,3 +164,11 @@ func WithUpdatedFieldsDataType() DefinitionOption {
 		d.dataType = updatedFieldsDataType
 	})
 }
+
+// WithPropagateToParent returns an option that propagate the event to its parent.
+// Typically used to propagate end device events to applications.
+func WithPropagateToParent() DefinitionOption {
+	return definitionOptionFunc(func(d *definition) {
+		d.propagateToParent = true
+	})
+}
