@@ -4778,6 +4778,330 @@
       "file": "blacklist.go"
     }
   },
+  "error:pkg/identityserver/gormstore:access_token_not_found": {
+    "translations": {
+      "en": "access token `{access_token_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:account_type": {
+    "translations": {
+      "en": "account of type `{account_type}` can not collaborate on `{entity_type}`"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "membership_store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:already_exists": {
+    "translations": {
+      "en": "entity already exists"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:api_key_entity": {
+    "translations": {
+      "en": "API key not linked to an entity"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "api_key_store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:api_key_not_found": {
+    "translations": {
+      "en": "API key not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:application_dev_eui_limit_reached": {
+    "translations": {
+      "en": "application issued DevEUI limit ({dev_eui_limit}) reached"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "eui_block_store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:application_not_found": {
+    "translations": {
+      "en": "application `{application_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:authorization_code_not_found": {
+    "translations": {
+      "en": "authorization code not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:authorization_not_found": {
+    "translations": {
+      "en": "authorization of `{user_id}` for `{client_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:client_not_found": {
+    "translations": {
+      "en": "client `{client_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:database": {
+    "translations": {
+      "en": "database error"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:database_table": {
+    "translations": {
+      "en": "database table `{table}` does not exist"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:database_table_column": {
+    "translations": {
+      "en": "column `{column}` does not exist in database table `{table}`"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:end_device_not_found": {
+    "translations": {
+      "en": "end device `{application_id}:{device_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:eui_taken": {
+    "translations": {
+      "en": "EUI already taken"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:gateway_not_found": {
+    "translations": {
+      "en": "gateway `{gateway_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:global_eui_limit_reached": {
+    "translations": {
+      "en": "global eui limit from address block reached"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "eui_block_store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:id_taken": {
+    "translations": {
+      "en": "ID already taken"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:invitation_already_accepted": {
+    "translations": {
+      "en": "invitation already accepted"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "invitation_store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:invitation_already_sent": {
+    "translations": {
+      "en": "invitation already sent"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "invitation_store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:invitation_expired": {
+    "translations": {
+      "en": "invitation expired"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "invitation_store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:invitation_not_found": {
+    "translations": {
+      "en": "invitation not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "invitation_store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:login_token_already_used": {
+    "translations": {
+      "en": "login token already used"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "login_token_store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:login_token_expired": {
+    "translations": {
+      "en": "login token expired"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "login_token_store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:login_token_not_found": {
+    "translations": {
+      "en": "login token not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "login_token_store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:membership_not_found": {
+    "translations": {
+      "en": "account `{account_id}` is not a member of `{entity_type}` `{entity_id}`"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "membership_store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:migration_not_found": {
+    "translations": {
+      "en": "migration not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:multiple_application_ids": {
+    "translations": {
+      "en": "can not list devices for multiple application IDs"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "end_device_store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:organization_not_found": {
+    "translations": {
+      "en": "organization `{organization_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:session_not_found": {
+    "translations": {
+      "en": "session `{session_id}` for user `{user_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:transaction_recovered": {
+    "translations": {
+      "en": "Internal Server Error"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:user_not_found": {
+    "translations": {
+      "en": "user `{user_id}` not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:validation_already_exists": {
+    "translations": {
+      "en": "contact info validation already exists"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "contact_info_store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:validation_token": {
+    "translations": {
+      "en": "validation token not found"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "contact_info_store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:validation_token_expired": {
+    "translations": {
+      "en": "validation token expired"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "contact_info_store.go"
+    }
+  },
+  "error:pkg/identityserver/gormstore:validation_token_used": {
+    "translations": {
+      "en": "validation token already used"
+    },
+    "description": {
+      "package": "pkg/identityserver/gormstore",
+      "file": "contact_info_store.go"
+    }
+  },
   "error:pkg/identityserver/picture:original_not_found": {
     "translations": {
       "en": "original picture not found"
@@ -4785,321 +5109,6 @@
     "description": {
       "package": "pkg/identityserver/picture",
       "file": "picture.go"
-    }
-  },
-  "error:pkg/identityserver/store:access_token_not_found": {
-    "translations": {
-      "en": "access token `{access_token_id}` not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/store:account_type": {
-    "translations": {
-      "en": "account of type `{account_type}` can not collaborate on `{entity_type}`"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "membership_store.go"
-    }
-  },
-  "error:pkg/identityserver/store:already_exists": {
-    "translations": {
-      "en": "entity already exists"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/store:api_key_entity": {
-    "translations": {
-      "en": "API key not linked to an entity"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "api_key_store.go"
-    }
-  },
-  "error:pkg/identityserver/store:api_key_not_found": {
-    "translations": {
-      "en": "API key not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/store:application_dev_eui_limit_reached": {
-    "translations": {
-      "en": "application issued DevEUI limit ({dev_eui_limit}) reached"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "eui_block_store.go"
-    }
-  },
-  "error:pkg/identityserver/store:application_not_found": {
-    "translations": {
-      "en": "application `{application_id}` not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/store:authorization_code_not_found": {
-    "translations": {
-      "en": "authorization code not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/store:authorization_not_found": {
-    "translations": {
-      "en": "authorization of `{user_id}` for `{client_id}` not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/store:client_not_found": {
-    "translations": {
-      "en": "client `{client_id}` not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/store:database": {
-    "translations": {
-      "en": "database error"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/store:database_table": {
-    "translations": {
-      "en": "database table `{table}` does not exist"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "registry.go"
-    }
-  },
-  "error:pkg/identityserver/store:database_table_column": {
-    "translations": {
-      "en": "column `{column}` does not exist in database table `{table}`"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "registry.go"
-    }
-  },
-  "error:pkg/identityserver/store:end_device_not_found": {
-    "translations": {
-      "en": "end device `{application_id}:{device_id}` not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/store:eui_taken": {
-    "translations": {
-      "en": "EUI already taken"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/store:gateway_not_found": {
-    "translations": {
-      "en": "gateway `{gateway_id}` not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/store:global_eui_limit_reached": {
-    "translations": {
-      "en": "global eui limit from address block reached"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "eui_block_store.go"
-    }
-  },
-  "error:pkg/identityserver/store:id_taken": {
-    "translations": {
-      "en": "ID already taken"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/store:invitation_already_accepted": {
-    "translations": {
-      "en": "invitation already accepted"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "invitation_store.go"
-    }
-  },
-  "error:pkg/identityserver/store:invitation_already_sent": {
-    "translations": {
-      "en": "invitation already sent"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "invitation_store.go"
-    }
-  },
-  "error:pkg/identityserver/store:invitation_not_found": {
-    "translations": {
-      "en": "invitation not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "invitation_store.go"
-    }
-  },
-  "error:pkg/identityserver/store:login_token_already_used": {
-    "translations": {
-      "en": "login token already used"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "login_token_store.go"
-    }
-  },
-  "error:pkg/identityserver/store:login_token_expired": {
-    "translations": {
-      "en": "login token expired"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "login_token_store.go"
-    }
-  },
-  "error:pkg/identityserver/store:login_token_not_found": {
-    "translations": {
-      "en": "login token not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "login_token_store.go"
-    }
-  },
-  "error:pkg/identityserver/store:membership_not_found": {
-    "translations": {
-      "en": "account `{account_id}` is not a member of `{entity_type}` `{entity_id}`"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "membership_store.go"
-    }
-  },
-  "error:pkg/identityserver/store:migration_not_found": {
-    "translations": {
-      "en": "migration not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/store:multiple_application_ids": {
-    "translations": {
-      "en": "can not list devices for multiple application IDs"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "end_device_store.go"
-    }
-  },
-  "error:pkg/identityserver/store:organization_not_found": {
-    "translations": {
-      "en": "organization `{organization_id}` not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/store:session_not_found": {
-    "translations": {
-      "en": "session `{session_id}` for user `{user_id}` not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/store:transaction_recovered": {
-    "translations": {
-      "en": "Internal Server Error"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/store:user_not_found": {
-    "translations": {
-      "en": "user `{user_id}` not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "store.go"
-    }
-  },
-  "error:pkg/identityserver/store:validation_already_exists": {
-    "translations": {
-      "en": "contact info validation already exists"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "contact_info_store.go"
-    }
-  },
-  "error:pkg/identityserver/store:validation_token": {
-    "translations": {
-      "en": "validation token not found"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "contact_info_store.go"
-    }
-  },
-  "error:pkg/identityserver/store:validation_token_expired": {
-    "translations": {
-      "en": "validation token expired"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "contact_info_store.go"
-    }
-  },
-  "error:pkg/identityserver/store:validation_token_used": {
-    "translations": {
-      "en": "validation token already used"
-    },
-    "description": {
-      "package": "pkg/identityserver/store",
-      "file": "contact_info_store.go"
     }
   },
   "error:pkg/identityserver:access_token_mismatch": {

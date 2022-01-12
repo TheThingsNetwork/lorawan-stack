@@ -23,7 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/email/sendgrid"
 	"go.thethings.network/lorawan-stack/v3/pkg/email/smtp"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )

@@ -116,7 +116,6 @@ type UserSessionStore interface {
 	FindSessions(ctx context.Context, userIDs *ttnpb.UserIdentifiers) ([]*ttnpb.UserSession, error)
 	GetSession(ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string) (*ttnpb.UserSession, error)
 	GetSessionByID(ctx context.Context, tokenID string) (*ttnpb.UserSession, error)
-	UpdateSession(ctx context.Context, sess *ttnpb.UserSession) (*ttnpb.UserSession, error)
 	DeleteSession(ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string) error
 	DeleteAllUserSessions(ctx context.Context, userIDs *ttnpb.UserIdentifiers) error
 }
@@ -172,11 +171,11 @@ type OAuthStore interface {
 	DeleteUserAuthorizations(ctx context.Context, userIDs *ttnpb.UserIdentifiers) error
 	DeleteClientAuthorizations(ctx context.Context, clientIDs *ttnpb.ClientIdentifiers) error
 
-	CreateAuthorizationCode(ctx context.Context, code *ttnpb.OAuthAuthorizationCode) error
+	CreateAuthorizationCode(ctx context.Context, code *ttnpb.OAuthAuthorizationCode) (*ttnpb.OAuthAuthorizationCode, error)
 	GetAuthorizationCode(ctx context.Context, code string) (*ttnpb.OAuthAuthorizationCode, error)
 	DeleteAuthorizationCode(ctx context.Context, code string) error
 
-	CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAccessToken, previousID string) error
+	CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAccessToken, previousID string) (*ttnpb.OAuthAccessToken, error)
 	ListAccessTokens(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) ([]*ttnpb.OAuthAccessToken, error)
 	GetAccessToken(ctx context.Context, id string) (*ttnpb.OAuthAccessToken, error)
 	DeleteAccessToken(ctx context.Context, id string) error
@@ -200,12 +199,12 @@ type LoginTokenStore interface {
 
 // EntitySearch interface for searching entities.
 type EntitySearch interface {
-	FindApplications(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchApplicationsRequest) ([]*ttnpb.ApplicationIdentifiers, error)
-	FindClients(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchClientsRequest) ([]*ttnpb.ClientIdentifiers, error)
-	FindEndDevices(ctx context.Context, req *ttnpb.SearchEndDevicesRequest) ([]*ttnpb.EndDeviceIdentifiers, error)
-	FindGateways(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchGatewaysRequest) ([]*ttnpb.GatewayIdentifiers, error)
-	FindOrganizations(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchOrganizationsRequest) ([]*ttnpb.OrganizationIdentifiers, error)
-	FindUsers(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchUsersRequest) ([]*ttnpb.UserIdentifiers, error)
+	SearchApplications(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchApplicationsRequest) ([]*ttnpb.ApplicationIdentifiers, error)
+	SearchClients(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchClientsRequest) ([]*ttnpb.ClientIdentifiers, error)
+	SearchEndDevices(ctx context.Context, req *ttnpb.SearchEndDevicesRequest) ([]*ttnpb.EndDeviceIdentifiers, error)
+	SearchGateways(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchGatewaysRequest) ([]*ttnpb.GatewayIdentifiers, error)
+	SearchOrganizations(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchOrganizationsRequest) ([]*ttnpb.OrganizationIdentifiers, error)
+	SearchUsers(ctx context.Context, req *ttnpb.SearchUsersRequest) ([]*ttnpb.UserIdentifiers, error)
 }
 
 // ContactInfoStore interface for contact info validation.
@@ -216,14 +215,6 @@ type ContactInfoStore interface {
 	// Confirm a validation. Only the ID and Token need to be set.
 	Validate(ctx context.Context, validation *ttnpb.ContactInfoValidation) error
 	DeleteEntityContactInfo(ctx context.Context, entityID ttnpb.IDStringer) error
-}
-
-// MigrationStore interface for migration history.
-type MigrationStore interface {
-	CreateMigration(ctx context.Context, migration *Migration) error
-	FindMigrations(ctx context.Context) ([]*Migration, error)
-	GetMigration(ctx context.Context, id string) (*Migration, error)
-	DeleteMigration(ctx context.Context, id string) error
 }
 
 // EUIStore interface for assigning DevEUI blocks and addresses

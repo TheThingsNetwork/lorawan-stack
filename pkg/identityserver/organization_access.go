@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
+	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -91,7 +92,7 @@ func (is *IdentityServer) createOrganizationAPIKey(ctx context.Context, req *ttn
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		key, err = store.GetAPIKeyStore(db).CreateAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), key)
+		key, err = gormstore.GetAPIKeyStore(db).CreateAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), key)
 		return err
 	})
 	if err != nil {
@@ -122,7 +123,7 @@ func (is *IdentityServer) listOrganizationAPIKeys(ctx context.Context, req *ttnp
 	}()
 	keys = &ttnpb.APIKeys{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keys.ApiKeys, err = store.GetAPIKeyStore(db).FindAPIKeys(ctx, req.GetOrganizationIds().GetEntityIdentifiers())
+		keys.ApiKeys, err = gormstore.GetAPIKeyStore(db).FindAPIKeys(ctx, req.GetOrganizationIds().GetEntityIdentifiers())
 		return err
 	})
 	if err != nil {
@@ -140,7 +141,7 @@ func (is *IdentityServer) getOrganizationAPIKey(ctx context.Context, req *ttnpb.
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		_, key, err = store.GetAPIKeyStore(db).GetAPIKey(ctx, req.KeyId)
+		_, key, err = gormstore.GetAPIKeyStore(db).GetAPIKey(ctx, req.KeyId)
 		if err != nil {
 			return err
 		}
@@ -160,9 +161,14 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 		return nil, err
 	}
 
+	// Backwards compatibility for older clients.
+	if len(req.FieldMask.GetPaths()) == 0 {
+		req.FieldMask = &pbtypes.FieldMask{Paths: []string{"rights", "name"}}
+	}
+
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		if len(req.ApiKey.Rights) > 0 {
-			_, key, err := store.GetAPIKeyStore(db).GetAPIKey(ctx, req.ApiKey.Id)
+			_, key, err := gormstore.GetAPIKeyStore(db).GetAPIKey(ctx, req.ApiKey.Id)
 			if err != nil {
 				return err
 			}
@@ -180,7 +186,7 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 			}
 		}
 
-		key, err = store.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), req.ApiKey, req.FieldMask)
+		key, err = gormstore.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), req.ApiKey, req.FieldMask)
 		return err
 	})
 	if err != nil {

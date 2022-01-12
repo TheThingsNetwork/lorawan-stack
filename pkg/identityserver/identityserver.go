@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -126,7 +127,7 @@ func (as *accountAppStore) WithSoftDeleted(ctx context.Context, onlyDeleted bool
 
 // Transact implements account_store.Interface.
 func (as *accountAppStore) Transact(ctx context.Context, f func(context.Context, account_store.Interface) error) error {
-	return store.Transact(ctx, as.db, func(db *gorm.DB) error {
+	return gormstore.Transact(ctx, as.db, func(db *gorm.DB) error {
 		return f(ctx, createAccountAppStore(db))
 	})
 }
@@ -135,9 +136,9 @@ func createAccountAppStore(db *gorm.DB) account_store.Interface {
 	return &accountAppStore{
 		db: db,
 
-		UserStore:        store.GetUserStore(db),
-		LoginTokenStore:  store.GetLoginTokenStore(db),
-		UserSessionStore: store.GetUserSessionStore(db),
+		UserStore:        gormstore.GetUserStore(db),
+		LoginTokenStore:  gormstore.GetLoginTokenStore(db),
+		UserSessionStore: gormstore.GetUserSessionStore(db),
 	}
 }
 
@@ -150,14 +151,14 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		ctx:       log.NewContextWithField(c.Context(), "namespace", "identityserver"),
 		config:    config,
 	}
-	is.db, err = store.Open(is.Context(), is.config.DatabaseURI)
+	is.db, err = gormstore.Open(is.Context(), is.config.DatabaseURI)
 	if err != nil {
 		return nil, err
 	}
 	if c.LogDebug() {
 		is.db = is.db.Debug()
 	}
-	if err = store.Check(is.db); err != nil {
+	if err = gormstore.Check(is.db); err != nil {
 		return nil, errDBNeedsMigration.WithCause(err)
 	}
 	go func() {
@@ -171,8 +172,8 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 	}
 
 	if is.config.DevEUIBlock.Enabled {
-		err := store.Transact(is.Context(), is.db, func(db *gorm.DB) error {
-			err = store.GetEUIStore(db).CreateEUIBlock(is.Context(), "dev_eui", is.config.DevEUIBlock.Prefix, is.config.DevEUIBlock.InitCounter)
+		err := gormstore.Transact(is.Context(), is.db, func(db *gorm.DB) error {
+			err = gormstore.GetEUIStore(db).CreateEUIBlock(is.Context(), "dev_eui", is.config.DevEUIBlock.Prefix, is.config.DevEUIBlock.InitCounter)
 			if err != nil {
 				return err
 			}
@@ -191,10 +192,10 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		store.ClientStore
 		store.OAuthStore
 	}{
-		UserStore:        store.GetUserStore(is.db),
-		UserSessionStore: store.GetUserSessionStore(is.db),
-		ClientStore:      store.GetClientStore(is.db),
-		OAuthStore:       store.GetOAuthStore(is.db),
+		UserStore:        gormstore.GetUserStore(is.db),
+		UserSessionStore: gormstore.GetUserSessionStore(is.db),
+		ClientStore:      gormstore.GetClientStore(is.db),
+		OAuthStore:       gormstore.GetOAuthStore(is.db),
 	}, is.config.OAuth, GenerateCSPString)
 
 	is.account, err = account.NewServer(c, createAccountAppStore(is.db), is.config.OAuth, GenerateCSPString)
@@ -243,7 +244,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 }
 
 func (is *IdentityServer) withDatabase(ctx context.Context, f func(*gorm.DB) error) error {
-	return store.Transact(ctx, is.db, f)
+	return gormstore.Transact(ctx, is.db, f)
 }
 
 // RegisterServices registers services provided by is at s.
@@ -303,10 +304,10 @@ func (is *IdentityServer) Roles() []ttnpb.ClusterRole {
 }
 
 func (is *IdentityServer) getMembershipStore(ctx context.Context, db *gorm.DB) store.MembershipStore {
-	s := store.GetMembershipStore(db)
+	s := gormstore.GetMembershipStore(db)
 	if is.redis != nil {
 		if membershipTTL := is.configFromContext(ctx).AuthCache.MembershipTTL; membershipTTL > 0 {
-			s = store.GetMembershipCache(s, is.redis, membershipTTL)
+			s = gormstore.GetMembershipCache(s, is.redis, membershipTTL)
 		}
 	}
 	return s

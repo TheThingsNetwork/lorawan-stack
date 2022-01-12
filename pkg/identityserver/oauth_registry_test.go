@@ -19,7 +19,7 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc"
@@ -43,7 +43,7 @@ func TestOAuthRegistry(t *testing.T) {
 			panic(err)
 		}
 
-		err = oauthStore.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
+		_, err = oauthStore.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
 			UserIds:       user.GetIds(),
 			ClientIds:     client.GetIds(),
 			UserSessionId: "12345678-1234-5678-1234-567812345678",

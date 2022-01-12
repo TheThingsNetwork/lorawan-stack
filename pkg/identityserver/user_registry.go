@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blacklist"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
+	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -249,7 +250,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		if req.InvitationToken != "" {
-			invitationToken, err := store.GetInvitationStore(db).GetInvitation(ctx, req.InvitationToken)
+			invitationToken, err := gormstore.GetInvitationStore(db).GetInvitation(ctx, req.InvitationToken)
 			if err != nil {
 				return err
 			}
@@ -258,20 +259,20 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 			}
 		}
 
-		usr, err = store.GetUserStore(db).CreateUser(ctx, req.User)
+		usr, err = gormstore.GetUserStore(db).CreateUser(ctx, req.User)
 		if err != nil {
 			return err
 		}
 
 		if len(req.User.ContactInfo) > 0 {
-			usr.ContactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, usr.GetIds(), req.User.ContactInfo)
+			usr.ContactInfo, err = gormstore.GetContactInfoStore(db).SetContactInfo(ctx, usr.GetIds(), req.User.ContactInfo)
 			if err != nil {
 				return err
 			}
 		}
 
 		if req.InvitationToken != "" {
-			if err = store.GetInvitationStore(db).SetInvitationAcceptedBy(ctx, req.InvitationToken, usr.GetIds()); err != nil {
+			if err = gormstore.GetInvitationStore(db).SetInvitationAcceptedBy(ctx, req.InvitationToken, usr.GetIds()); err != nil {
 				return err
 			}
 		}
@@ -333,12 +334,12 @@ func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		usr, err = store.GetUserStore(db).GetUser(ctx, req.GetUserIds(), req.FieldMask)
+		usr, err = gormstore.GetUserStore(db).GetUser(ctx, req.GetUserIds(), req.FieldMask)
 		if err != nil {
 			return err
 		}
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-			usr.ContactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, usr.GetIds())
+			usr.ContactInfo, err = gormstore.GetContactInfoStore(db).GetContactInfo(ctx, usr.GetIds())
 			if err != nil {
 				return err
 			}
@@ -369,7 +370,7 @@ func (is *IdentityServer) listUsers(ctx context.Context, req *ttnpb.ListUsersReq
 	}()
 	users = &ttnpb.Users{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		users.Users, err = store.GetUserStore(db).FindUsers(paginateCtx, nil, req.FieldMask)
+		users.Users, err = gormstore.GetUserStore(db).FindUsers(paginateCtx, nil, req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -476,14 +477,14 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 		updatingPrimaryEmailAddress := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "primary_email_address")
 		if updatingContactInfo || updatingPrimaryEmailAddress {
 			if updatingContactInfo {
-				contactInfo, err = store.GetContactInfoStore(db).SetContactInfo(ctx, req.User.GetIds(), req.User.ContactInfo)
+				contactInfo, err = gormstore.GetContactInfoStore(db).SetContactInfo(ctx, req.User.GetIds(), req.User.ContactInfo)
 				if err != nil {
 					return err
 				}
 			}
 			if updatingPrimaryEmailAddress {
 				if !updatingContactInfo {
-					contactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, req.User.GetIds())
+					contactInfo, err = gormstore.GetContactInfoStore(db).GetContactInfo(ctx, req.User.GetIds())
 					if err != nil {
 						return err
 					}
@@ -499,7 +500,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 				}
 			}
 		}
-		usr, err = store.GetUserStore(db).UpdateUser(ctx, req.User, req.FieldMask)
+		usr, err = gormstore.GetUserStore(db).UpdateUser(ctx, req.User, req.FieldMask)
 		if err != nil {
 			return err
 		}
@@ -563,7 +564,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 	}
 	updateMask := updatePasswordFieldMask
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		usr, err := store.GetUserStore(db).GetUser(ctx, req.GetUserIds(), temporaryPasswordFieldMask)
+		usr, err := gormstore.GetUserStore(db).GetUser(ctx, req.GetUserIds(), temporaryPasswordFieldMask)
 		if err != nil {
 			return err
 		}
@@ -601,7 +602,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 			updateMask = temporaryPasswordFieldMask
 		}
 		if req.RevokeAllAccess {
-			sessionStore := store.GetUserSessionStore(db)
+			sessionStore := gormstore.GetUserSessionStore(db)
 			sessions, err := sessionStore.FindSessions(ctx, req.GetUserIds())
 			if err != nil {
 				return err
@@ -612,7 +613,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 					return err
 				}
 			}
-			oauthStore := store.GetOAuthStore(db)
+			oauthStore := gormstore.GetOAuthStore(db)
 			authorizations, err := oauthStore.ListAuthorizations(ctx, req.GetUserIds())
 			if err != nil {
 				return err
@@ -632,7 +633,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 		}
 		now := time.Now()
 		usr.Password, usr.PasswordUpdatedAt, usr.RequirePasswordUpdate = hashedPassword, ttnpb.ProtoTimePtr(now), false
-		usr, err = store.GetUserStore(db).UpdateUser(ctx, usr, updateMask)
+		usr, err = gormstore.GetUserStore(db).UpdateUser(ctx, usr, updateMask)
 		return err
 	})
 	if err != nil {
@@ -663,7 +664,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 	ttl := time.Hour
 	expires := now.Add(ttl)
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		usr, err := store.GetUserStore(db).GetUser(ctx, req.GetUserIds(), temporaryPasswordFieldMask)
+		usr, err := gormstore.GetUserStore(db).GetUser(ctx, req.GetUserIds(), temporaryPasswordFieldMask)
 		if err != nil {
 			return err
 		}
@@ -672,7 +673,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 		}
 		usr.TemporaryPassword = hashedTemporaryPassword
 		usr.TemporaryPasswordCreatedAt, usr.TemporaryPasswordExpiresAt = ttnpb.ProtoTimePtr(now), ttnpb.ProtoTimePtr(expires)
-		usr, err = store.GetUserStore(db).UpdateUser(ctx, usr, updateTemporaryPasswordFieldMask)
+		usr, err = gormstore.GetUserStore(db).UpdateUser(ctx, usr, updateTemporaryPasswordFieldMask)
 		return err
 	})
 	if err != nil {
@@ -701,12 +702,12 @@ func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentif
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		err := store.GetUserStore(db).DeleteUser(ctx, ids)
+		err := gormstore.GetUserStore(db).DeleteUser(ctx, ids)
 		if err != nil {
 			return err
 		}
 		// Also delete the the user's sessions to enforce logouts.
-		return store.GetUserSessionStore(db).DeleteAllUserSessions(ctx, ids)
+		return gormstore.GetUserSessionStore(db).DeleteAllUserSessions(ctx, ids)
 	})
 	if err != nil {
 		return nil, err
@@ -720,7 +721,7 @@ func (is *IdentityServer) restoreUser(ctx context.Context, ids *ttnpb.UserIdenti
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		usrStore := store.GetUserStore(db)
+		usrStore := gormstore.GetUserStore(db)
 		usr, err := usrStore.GetUser(store.WithSoftDeleted(ctx, true), ids, softDeleteFieldMask)
 		if err != nil {
 			return err
@@ -746,28 +747,28 @@ func (is *IdentityServer) purgeUser(ctx context.Context, ids *ttnpb.UserIdentifi
 		return nil, errAdminsPurgeUsers.New()
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		err := store.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids)
+		err := gormstore.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids)
 		if err != nil {
 			return err
 		}
 		// delete related API keys before purging the user
-		err = store.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())
+		err = gormstore.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}
-		err = store.GetMembershipStore(db).DeleteAccountMembers(ctx, ids.GetOrganizationOrUserIdentifiers())
+		err = gormstore.GetMembershipStore(db).DeleteAccountMembers(ctx, ids.GetOrganizationOrUserIdentifiers())
 		if err != nil {
 			return err
 		}
-		err = store.GetOAuthStore(db).DeleteUserAuthorizations(ctx, ids)
+		err = gormstore.GetOAuthStore(db).DeleteUserAuthorizations(ctx, ids)
 		if err != nil {
 			return err
 		}
-		err = store.GetUserSessionStore(db).DeleteAllUserSessions(ctx, ids)
+		err = gormstore.GetUserSessionStore(db).DeleteAllUserSessions(ctx, ids)
 		if err != nil {
 			return err
 		}
-		return store.GetUserStore(db).PurgeUser(ctx, ids)
+		return gormstore.GetUserStore(db).PurgeUser(ctx, ids)
 	})
 	if err != nil {
 		return nil, err
