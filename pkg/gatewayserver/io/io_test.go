@@ -89,7 +89,7 @@ func TestFlow(t *testing.T) {
 	a.So(conn.PrimaryFrequencyPlan().BandID, should.Equal, "EU_863_870")
 
 	_, paths := conn.Stats()
-	a.So(paths, should.Resemble, []string{"connected_at", "protocol"})
+	a.So(paths, should.Resemble, []string{"connected_at", "disconnected_at", "protocol"})
 
 	{
 		frontend.Up <- &ttnpb.UplinkMessage{
