@@ -21,6 +21,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - CLI Completion and Documentation commands no longer try to make a server connection.
 - When an end device has both `NwkKey` and `AppKey` provisioned in the Join Server, `NwkKey` is used for MIC and session key derivation when activating the device in LoRaWAN 1.0.x. This is per LoRaWAN 1.1 specification.
+- Gateway Server will no longer report the gateways as being both connected and disconnected at the same time.
 
 ### Security
 
