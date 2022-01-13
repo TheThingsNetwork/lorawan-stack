@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/gogo/protobuf/proto"
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
@@ -741,10 +742,10 @@ var (
 		"multicast": append(func() (rs []ifThenFuncFieldRight) {
 			for s, eq := range map[string]func(ttnpb.MACParameters, ttnpb.MACParameters) bool{
 				"adr_ack_delay_exponent.value": func(a, b ttnpb.MACParameters) bool {
-					return a.AdrAckDelayExponent.Equal(b.AdrAckDelayExponent)
+					return proto.Equal(a.AdrAckDelayExponent, b.AdrAckDelayExponent)
 				},
 				"adr_ack_limit_exponent.value": func(a, b ttnpb.MACParameters) bool {
-					return a.AdrAckLimitExponent.Equal(b.AdrAckLimitExponent)
+					return proto.Equal(a.AdrAckLimitExponent, b.AdrAckLimitExponent)
 				},
 				"adr_data_rate_index": func(a, b ttnpb.MACParameters) bool {
 					return a.AdrDataRateIndex == b.AdrDataRateIndex
@@ -763,14 +764,14 @@ var (
 						return false
 					}
 					for i, ch := range a.Channels {
-						if !ch.Equal(b.Channels[i]) {
+						if !proto.Equal(ch, b.Channels[i]) {
 							return false
 						}
 					}
 					return true
 				},
 				"downlink_dwell_time.value": func(a, b ttnpb.MACParameters) bool {
-					return a.DownlinkDwellTime.Equal(b.DownlinkDwellTime)
+					return proto.Equal(a.DownlinkDwellTime, b.DownlinkDwellTime)
 				},
 				"max_duty_cycle": func(a, b ttnpb.MACParameters) bool {
 					return a.MaxDutyCycle == b.MaxDutyCycle
@@ -779,7 +780,7 @@ var (
 					return a.MaxEirp == b.MaxEirp
 				},
 				"ping_slot_data_rate_index_value.value": func(a, b ttnpb.MACParameters) bool {
-					return a.PingSlotDataRateIndexValue.Equal(b.PingSlotDataRateIndexValue)
+					return proto.Equal(a.PingSlotDataRateIndexValue, b.PingSlotDataRateIndexValue)
 				},
 				"ping_slot_frequency": func(a, b ttnpb.MACParameters) bool {
 					return a.PingSlotFrequency == b.PingSlotFrequency
@@ -803,7 +804,7 @@ var (
 					return a.Rx2Frequency == b.Rx2Frequency
 				},
 				"uplink_dwell_time.value": func(a, b ttnpb.MACParameters) bool {
-					return a.UplinkDwellTime.Equal(b.UplinkDwellTime)
+					return proto.Equal(a.UplinkDwellTime, b.UplinkDwellTime)
 				},
 			} {
 				curPath := "mac_state.current_parameters." + s
