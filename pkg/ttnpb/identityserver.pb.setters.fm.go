@@ -283,6 +283,31 @@ func (dst *IsConfiguration) SetFields(src *IsConfiguration, paths ...string) err
 					dst.UserRights = nil
 				}
 			}
+		case "user_login":
+			if len(subs) > 0 {
+				var newDst, newSrc *IsConfiguration_UserLogin
+				if (src == nil || src.UserLogin == nil) && dst.UserLogin == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.UserLogin
+				}
+				if dst.UserLogin != nil {
+					newDst = dst.UserLogin
+				} else {
+					newDst = &IsConfiguration_UserLogin{}
+					dst.UserLogin = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UserLogin = src.UserLogin
+				} else {
+					dst.UserLogin = nil
+				}
+			}
 		case "admin_rights":
 			if len(subs) > 0 {
 				var newDst, newSrc *IsConfiguration_AdminRights
@@ -621,6 +646,26 @@ func (dst *IsConfiguration_UserRights) SetFields(src *IsConfiguration_UserRights
 				dst.CreateOrganizations = src.CreateOrganizations
 			} else {
 				dst.CreateOrganizations = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *IsConfiguration_UserLogin) SetFields(src *IsConfiguration_UserLogin, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "disable_credentials_login":
+			if len(subs) > 0 {
+				return fmt.Errorf("'disable_credentials_login' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DisableCredentialsLogin = src.DisableCredentialsLogin
+			} else {
+				dst.DisableCredentialsLogin = nil
 			}
 
 		default:

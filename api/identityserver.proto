@@ -114,7 +114,10 @@ message IsConfiguration {
     google.protobuf.BoolValue create_organizations = 4;
   }
   UserRights user_rights = 6;
-  
+  message UserLogin {
+    google.protobuf.BoolValue disable_credentials_login = 1;
+  }
+  UserLogin user_login = 7;
   message AdminRights {
     google.protobuf.BoolValue all = 1;
   }

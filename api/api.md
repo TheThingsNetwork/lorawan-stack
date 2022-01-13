@@ -302,6 +302,7 @@
   - [Message `IsConfiguration.AdminRights`](#ttn.lorawan.v3.IsConfiguration.AdminRights)
   - [Message `IsConfiguration.EndDevicePicture`](#ttn.lorawan.v3.IsConfiguration.EndDevicePicture)
   - [Message `IsConfiguration.ProfilePicture`](#ttn.lorawan.v3.IsConfiguration.ProfilePicture)
+  - [Message `IsConfiguration.UserLogin`](#ttn.lorawan.v3.IsConfiguration.UserLogin)
   - [Message `IsConfiguration.UserRegistration`](#ttn.lorawan.v3.IsConfiguration.UserRegistration)
   - [Message `IsConfiguration.UserRegistration.AdminApproval`](#ttn.lorawan.v3.IsConfiguration.UserRegistration.AdminApproval)
   - [Message `IsConfiguration.UserRegistration.ContactInfoValidation`](#ttn.lorawan.v3.IsConfiguration.UserRegistration.ContactInfoValidation)
@@ -4521,6 +4522,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | `profile_picture` | [`IsConfiguration.ProfilePicture`](#ttn.lorawan.v3.IsConfiguration.ProfilePicture) |  |  |
 | `end_device_picture` | [`IsConfiguration.EndDevicePicture`](#ttn.lorawan.v3.IsConfiguration.EndDevicePicture) |  |  |
 | `user_rights` | [`IsConfiguration.UserRights`](#ttn.lorawan.v3.IsConfiguration.UserRights) |  |  |
+| `user_login` | [`IsConfiguration.UserLogin`](#ttn.lorawan.v3.IsConfiguration.UserLogin) |  |  |
 | `admin_rights` | [`IsConfiguration.AdminRights`](#ttn.lorawan.v3.IsConfiguration.AdminRights) |  |  |
 
 ### <a name="ttn.lorawan.v3.IsConfiguration.AdminRights">Message `IsConfiguration.AdminRights`</a>
@@ -4541,6 +4543,12 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ----- | ---- | ----- | ----------- |
 | `disable_upload` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
 | `use_gravatar` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
+
+### <a name="ttn.lorawan.v3.IsConfiguration.UserLogin">Message `IsConfiguration.UserLogin`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `disable_credentials_login` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  |  |
 
 ### <a name="ttn.lorawan.v3.IsConfiguration.UserRegistration">Message `IsConfiguration.UserRegistration`</a>
 

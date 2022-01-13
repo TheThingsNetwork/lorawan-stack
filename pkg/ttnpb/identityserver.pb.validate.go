@@ -317,6 +317,18 @@ func (m *IsConfiguration) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "user_login":
+
+			if v, ok := interface{}(m.GetUserLogin()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfigurationValidationError{
+						field:  "user_login",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "admin_rights":
 
 			if v, ok := interface{}(m.GetAdminRights()).(interface{ ValidateFields(...string) error }); ok {
@@ -1068,6 +1080,100 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = IsConfiguration_UserRightsValidationError{}
+
+// ValidateFields checks the field values on IsConfiguration_UserLogin with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *IsConfiguration_UserLogin) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = IsConfiguration_UserLoginFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "disable_credentials_login":
+
+			if v, ok := interface{}(m.GetDisableCredentialsLogin()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return IsConfiguration_UserLoginValidationError{
+						field:  "disable_credentials_login",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return IsConfiguration_UserLoginValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// IsConfiguration_UserLoginValidationError is the validation error returned by
+// IsConfiguration_UserLogin.ValidateFields if the designated constraints
+// aren't met.
+type IsConfiguration_UserLoginValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IsConfiguration_UserLoginValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IsConfiguration_UserLoginValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IsConfiguration_UserLoginValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IsConfiguration_UserLoginValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IsConfiguration_UserLoginValidationError) ErrorName() string {
+	return "IsConfiguration_UserLoginValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e IsConfiguration_UserLoginValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIsConfiguration_UserLogin.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IsConfiguration_UserLoginValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IsConfiguration_UserLoginValidationError{}
 
 // ValidateFields checks the field values on IsConfiguration_AdminRights with
 // the rules defined in the proto definition for this message. If any rules

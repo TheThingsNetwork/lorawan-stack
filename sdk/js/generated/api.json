@@ -20591,6 +20591,18 @@
               "defaultValue": ""
             },
             {
+              "name": "user_login",
+              "description": "",
+              "label": "",
+              "type": "UserLogin",
+              "longType": "IsConfiguration.UserLogin",
+              "fullType": "ttn.lorawan.v3.IsConfiguration.UserLogin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
               "name": "admin_rights",
               "description": "",
               "label": "",
@@ -20676,6 +20688,30 @@
             },
             {
               "name": "use_gravatar",
+              "description": "",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "google.protobuf.BoolValue",
+              "fullType": "google.protobuf.BoolValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "UserLogin",
+          "longName": "IsConfiguration.UserLogin",
+          "fullName": "ttn.lorawan.v3.IsConfiguration.UserLogin",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "disable_credentials_login",
               "description": "",
               "label": "",
               "type": "BoolValue",

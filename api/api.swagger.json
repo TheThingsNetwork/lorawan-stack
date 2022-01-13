@@ -11129,6 +11129,14 @@
         }
       }
     },
+    "IsConfigurationUserLogin": {
+      "type": "object",
+      "properties": {
+        "disable_credentials_login": {
+          "type": "boolean"
+        }
+      }
+    },
     "IsConfigurationUserRegistration": {
       "type": "object",
       "properties": {
@@ -15252,6 +15260,9 @@
         },
         "user_rights": {
           "$ref": "#/definitions/IsConfigurationUserRights"
+        },
+        "user_login": {
+          "$ref": "#/definitions/IsConfigurationUserLogin"
         },
         "admin_rights": {
           "$ref": "#/definitions/IsConfigurationAdminRights"
