@@ -109,8 +109,7 @@ func TestInvalidJoinRequests(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
-					/** DevNonce **/
-					0x00, 0x00,
+					/** DevNonce **/ 0x00, 0x00,
 					/* MIC */
 					0x55, 0x17, 0x54, 0x8e,
 				}
@@ -128,8 +127,7 @@ func TestInvalidJoinRequests(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
 					/** DevEUI **/
 					0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-					/** DevNonce **/
-					0x00, 0x00,
+					/** DevNonce **/ 0x00, 0x00,
 					/* MIC */
 					0x55, 0x17, 0x54, 0x8e,
 				}
@@ -226,6 +224,52 @@ func TestHandleJoin(t *testing.T) {
 		ErrorAssertion func(error) bool
 	}{
 		{
+			Name:        "1.1.0/cluster auth/new device/no NwkKey",
+			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
+			Authorizer:  joinserver.ClusterAuthorizer(ctx),
+			Device: &ttnpb.EndDevice{
+				Ids: &ttnpb.EndDeviceIdentifiers{
+					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
+					DeviceId:       "test-dev",
+				},
+				RootKeys: &ttnpb.RootKeys{
+					AppKey: &ttnpb.KeyEnvelope{
+						Key: &nwkKey,
+					},
+				},
+				LorawanVersion:       ttnpb.MAC_V1_1,
+				NetworkServerAddress: nsAddr,
+			},
+			NextLastJoinNonce: 1,
+			JoinRequest: &ttnpb.JoinRequest{
+				SelectedMacVersion: ttnpb.MAC_V1_1,
+				RawPayload: []byte{
+					/* MHDR */
+					0x00,
+					/* MACPayload */
+					/** JoinEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
+					/** DevEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+					/** DevNonce **/
+					0x00, 0x00,
+					/* MIC */
+					0x55, 0x17, 0x54, 0x8e,
+				},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				NetId:   types.NetID{0x42, 0xff, 0xff},
+				DownlinkSettings: &ttnpb.DLSettings{
+					OptNeg:      true,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
+				},
+				RxDelay: 0x42,
+			},
+			ErrorAssertion: errors.IsFailedPrecondition,
+		},
+		{
 			Name:        "1.1.0/cluster auth/new device/unwrapped keys",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			Authorizer:  joinserver.ClusterAuthorizer(ctx),
@@ -253,7 +297,6 @@ func TestHandleJoin(t *testing.T) {
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
-
 					/* MACPayload */
 					/** JoinEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
@@ -261,7 +304,6 @@ func TestHandleJoin(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
 					0x00, 0x00,
-
 					/* MIC */
 					0x55, 0x17, 0x54, 0x8e,
 				},
@@ -290,7 +332,6 @@ func TestHandleJoin(t *testing.T) {
 						0xff,
 						/* RxDelay */
 						0x42,
-
 						/* MIC */
 						0xeb, 0xcd, 0x74, 0x59,
 					})...),
@@ -359,7 +400,6 @@ func TestHandleJoin(t *testing.T) {
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
-
 					/* MACPayload */
 					/** JoinEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
@@ -367,7 +407,6 @@ func TestHandleJoin(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
 					0x00, 0x00,
-
 					/* MIC */
 					0x55, 0x17, 0x54, 0x8e,
 				},
@@ -396,7 +435,6 @@ func TestHandleJoin(t *testing.T) {
 						0xff,
 						/* RxDelay */
 						0x42,
-
 						/* MIC */
 						0xeb, 0xcd, 0x74, 0x59,
 					})...),
@@ -490,7 +528,6 @@ func TestHandleJoin(t *testing.T) {
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
-
 					/* MACPayload */
 					/** JoinEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
@@ -498,7 +535,6 @@ func TestHandleJoin(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
 					0x00, 0x00,
-
 					/* MIC */
 					0x55, 0x17, 0x54, 0x8e,
 				},
@@ -527,7 +563,6 @@ func TestHandleJoin(t *testing.T) {
 						0xff,
 						/* RxDelay */
 						0x42,
-
 						/* MIC */
 						0xeb, 0xcd, 0x74, 0x59,
 					})...),
@@ -624,7 +659,6 @@ func TestHandleJoin(t *testing.T) {
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
-
 					/* MACPayload */
 					/** JoinEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
@@ -632,7 +666,6 @@ func TestHandleJoin(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
 					0x00, 0x00,
-
 					/* MIC */
 					0x55, 0x17, 0x54, 0x8e,
 				},
@@ -661,7 +694,6 @@ func TestHandleJoin(t *testing.T) {
 						0xff,
 						/* RxDelay */
 						0x42,
-
 						/* MIC */
 						0xeb, 0xcd, 0x74, 0x59,
 					})...),
@@ -733,7 +765,6 @@ func TestHandleJoin(t *testing.T) {
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
-
 					/* MACPayload */
 					/** JoinEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
@@ -741,7 +772,6 @@ func TestHandleJoin(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
 					0x00, 0x00,
-
 					/* MIC */
 					0x55, 0x17, 0x54, 0x8e,
 				},
@@ -770,7 +800,6 @@ func TestHandleJoin(t *testing.T) {
 						0xff,
 						/* RxDelay */
 						0x42,
-
 						/* MIC */
 						0xeb, 0xcd, 0x74, 0x59,
 					})...),
@@ -838,7 +867,6 @@ func TestHandleJoin(t *testing.T) {
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
-
 					/* MACPayload */
 					/** JoinEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
@@ -846,7 +874,6 @@ func TestHandleJoin(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
 					0x42, 0x24,
-
 					/* MIC */
 					0x6e, 0x54, 0x1b, 0x37,
 				},
@@ -875,7 +902,6 @@ func TestHandleJoin(t *testing.T) {
 						0xff,
 						/* RxDelay */
 						0x42,
-
 						/* MIC */
 						0xc8, 0xf7, 0x62, 0xf4,
 					})...),
@@ -942,7 +968,6 @@ func TestHandleJoin(t *testing.T) {
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
-
 					/* MACPayload */
 					/** JoinEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
@@ -950,7 +975,6 @@ func TestHandleJoin(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
 					0x42, 0x24,
-
 					/* MIC */
 					0x6e, 0x54, 0x1b, 0x37,
 				},
@@ -966,7 +990,93 @@ func TestHandleJoin(t *testing.T) {
 			ErrorAssertion: errors.IsInvalidArgument,
 		},
 		{
-			Name:        "1.0.3/cluster auth/new device",
+			Name:        "1.0.3/cluster auth/new device/provisioned with NwkKey",
+			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
+			Authorizer:  joinserver.ClusterAuthorizer(ctx),
+			Device: &ttnpb.EndDevice{
+				Ids: &ttnpb.EndDeviceIdentifiers{
+					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
+					DeviceId:       "test-dev",
+				},
+				RootKeys: &ttnpb.RootKeys{
+					NwkKey: &ttnpb.KeyEnvelope{
+						Key: &nwkKey,
+					},
+					AppKey: &ttnpb.KeyEnvelope{
+						Key: &appKey,
+					},
+				},
+				LorawanVersion:       ttnpb.MAC_V1_1,
+				NetworkServerAddress: nsAddr,
+			},
+			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{},
+			NextLastJoinNonce:             1,
+			NextUsedDevNonces:             []uint32{1},
+			JoinRequest: &ttnpb.JoinRequest{
+				SelectedMacVersion: ttnpb.MAC_V1_0_3,
+				RawPayload: []byte{
+					/* MHDR */
+					0x00,
+					/* MACPayload */
+					/** JoinEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
+					/** DevEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+					/** DevNonce **/
+					0x01, 0x00,
+					/* MIC */
+					0x29, 0xa8, 0xe5, 0x7d,
+				},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				NetId:   types.NetID{0x42, 0xff, 0xff},
+				DownlinkSettings: &ttnpb.DLSettings{
+					OptNeg:      false,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
+				},
+				RxDelay: 0x42,
+			},
+			JoinResponse: &ttnpb.JoinResponse{
+				RawPayload: append([]byte{
+					/* MHDR */
+					0x20,
+				},
+					mustEncryptJoinAccept(nwkKey, []byte{
+						/* JoinNonce */
+						0x01, 0x00, 0x00,
+						/* NetID */
+						0xff, 0xff, 0x42,
+						/* DevAddr */
+						0xff, 0xff, 0xff, 0x42,
+						/* DLSettings */
+						0x7f,
+						/* RxDelay */
+						0x42,
+						/* MIC */
+						0x9a, 0x99, 0x1e, 0x72,
+					})...),
+				SessionKeys: &ttnpb.SessionKeys{
+					FNwkSIntKey: &ttnpb.KeyEnvelope{
+						Key: keyPtr(crypto.DeriveLegacyNwkSKey(
+							nwkKey,
+							types.JoinNonce{0x00, 0x00, 0x01},
+							types.NetID{0x42, 0xff, 0xff},
+							types.DevNonce{0x00, 0x01})),
+					},
+					AppSKey: &ttnpb.KeyEnvelope{
+						Key: keyPtr(crypto.DeriveLegacyAppSKey(
+							nwkKey,
+							types.JoinNonce{0x00, 0x00, 0x01},
+							types.NetID{0x42, 0xff, 0xff},
+							types.DevNonce{0x00, 0x01})),
+					},
+				},
+			},
+		},
+		{
+			Name:        "1.0.3/cluster auth/new device/provisioned without NwkKey",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			Authorizer:  joinserver.ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
@@ -992,7 +1102,6 @@ func TestHandleJoin(t *testing.T) {
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
-
 					/* MACPayload */
 					/** JoinEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
@@ -1000,7 +1109,6 @@ func TestHandleJoin(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
 					0x01, 0x00,
-
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
@@ -1029,7 +1137,6 @@ func TestHandleJoin(t *testing.T) {
 						0xff,
 						/* RxDelay */
 						0x42,
-
 						/* MIC */
 						0xc9, 0x7a, 0x61, 0x04,
 					})...),
@@ -1078,7 +1185,6 @@ func TestHandleJoin(t *testing.T) {
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
-
 					/* MACPayload */
 					/** JoinEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
@@ -1086,7 +1192,6 @@ func TestHandleJoin(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
 					0x01, 0x00,
-
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
@@ -1115,7 +1220,6 @@ func TestHandleJoin(t *testing.T) {
 						0xff,
 						/* RxDelay */
 						0x42,
-
 						/* MIC */
 						0xc9, 0x7a, 0x61, 0x04,
 					})...),
@@ -1164,7 +1268,6 @@ func TestHandleJoin(t *testing.T) {
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
-
 					/* MACPayload */
 					/** JoinEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
@@ -1172,7 +1275,6 @@ func TestHandleJoin(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
 					0x01, 0x00,
-
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
@@ -1201,7 +1303,6 @@ func TestHandleJoin(t *testing.T) {
 						0xff,
 						/* RxDelay */
 						0x42,
-
 						/* MIC */
 						0xc9, 0x7a, 0x61, 0x04,
 					})...),
@@ -1250,7 +1351,6 @@ func TestHandleJoin(t *testing.T) {
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
-
 					/* MACPayload */
 					/** JoinEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
@@ -1258,7 +1358,6 @@ func TestHandleJoin(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
 					0x01, 0x00,
-
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
@@ -1287,7 +1386,6 @@ func TestHandleJoin(t *testing.T) {
 						0xff,
 						/* RxDelay */
 						0x42,
-
 						/* MIC */
 						0xc9, 0x7a, 0x61, 0x04,
 					})...),
@@ -1338,7 +1436,6 @@ func TestHandleJoin(t *testing.T) {
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
-
 					/* MACPayload */
 					/** JoinEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
@@ -1346,7 +1443,6 @@ func TestHandleJoin(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
 					0x42, 0x24,
-
 					/* MIC */
 					0xed, 0x8b, 0xd2, 0x24,
 				},
@@ -1375,7 +1471,6 @@ func TestHandleJoin(t *testing.T) {
 						0xff,
 						/* RxDelay */
 						0x42,
-
 						/* MIC */
 						0xf8, 0x4a, 0x11, 0x8e,
 					})...),
@@ -1427,7 +1522,6 @@ func TestHandleJoin(t *testing.T) {
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
-
 					/* MACPayload */
 					/** JoinEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
@@ -1435,7 +1529,6 @@ func TestHandleJoin(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
 					0x42, 0x24,
-
 					/* MIC */
 					0xed, 0x8b, 0xd2, 0x24,
 				},
@@ -1464,7 +1557,6 @@ func TestHandleJoin(t *testing.T) {
 						0xff,
 						/* RxDelay */
 						0x42,
-
 						/* MIC */
 						0xf8, 0x4a, 0x11, 0x8e,
 					})...),
@@ -1519,7 +1611,6 @@ func TestHandleJoin(t *testing.T) {
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
-
 					/* MACPayload */
 					/** JoinEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
@@ -1527,7 +1618,6 @@ func TestHandleJoin(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
 					0x01, 0x00,
-
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
@@ -1556,7 +1646,6 @@ func TestHandleJoin(t *testing.T) {
 						0xff,
 						/* RxDelay */
 						0x42,
-
 						/* MIC */
 						0xc9, 0x7a, 0x61, 0x04,
 					})...),
@@ -1609,7 +1698,6 @@ func TestHandleJoin(t *testing.T) {
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
-
 					/* MACPayload */
 					/** JoinEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
@@ -1617,7 +1705,6 @@ func TestHandleJoin(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
 					0x01, 0x00,
-
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
@@ -1662,7 +1749,6 @@ func TestHandleJoin(t *testing.T) {
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
-
 					/* MACPayload */
 					/** JoinEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
@@ -1670,7 +1756,6 @@ func TestHandleJoin(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
 					0x01, 0x00,
-
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
@@ -1716,7 +1801,6 @@ func TestHandleJoin(t *testing.T) {
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
-
 					/* MACPayload */
 					/** JoinEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
@@ -1724,7 +1808,6 @@ func TestHandleJoin(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
 					0x01, 0x00,
-
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
@@ -1767,7 +1850,6 @@ func TestHandleJoin(t *testing.T) {
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
-
 					/* MACPayload */
 					/** JoinEUI **/
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
@@ -1775,7 +1857,6 @@ func TestHandleJoin(t *testing.T) {
 					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
 					/** DevNonce **/
 					0x42, 0x24,
-
 					/* MIC */
 					0xed, 0x8b, 0xd2, 0x24,
 				},
