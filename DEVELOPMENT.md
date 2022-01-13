@@ -1102,7 +1102,7 @@ It is also possible to use `go build`, or release snapshots, as described below.
 The Things Stack uses [GoReleaser](https://goreleaser.com/) for releases. If you want to build a release (snapshot), you first need to install GoReleaser:
 
 ```bash
-$ go install github.com/goreleaser/goreleaser@v0.184.0
+$ go install github.com/goreleaser/goreleaser@v1.2.5
 ```
 
 The command for building a release snapshot is:

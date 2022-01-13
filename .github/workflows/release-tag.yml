@@ -125,7 +125,7 @@ jobs:
     - name: Run Goreleaser
       uses: goreleaser/goreleaser-action@v2
       with:
-        version: 'v0.184.0'
+        version: 'v1.2.5'
         args: release --config .goreleaser.release.yml --release-notes /tmp/release-notes.md --timeout 120m
       env:
         AWS_REGION: ${{ secrets.AWS_REGION }}
