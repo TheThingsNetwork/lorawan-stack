@@ -712,7 +712,7 @@ func (c *Connection) Stats() (*ttnpb.GatewayConnectionStats, []string) {
 		Protocol:    c.Frontend().Protocol(),
 	}
 	paths := make([]string, 0, len(ttnpb.GatewayConnectionStatsFieldPathsTopLevel))
-	paths = append(paths, "connected_at", "protocol")
+	paths = append(paths, "connected_at", "disconnected_at", "protocol")
 
 	if s, t, ok := c.StatusStats(); ok {
 		stats.LastStatusReceivedAt = ttnpb.ProtoTimePtr(t)
