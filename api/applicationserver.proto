@@ -36,7 +36,6 @@ option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 option (gogoproto.enum_stringer_all) = true;
 option (gogoproto.goproto_enum_stringer_all) = false;
 option (gogoproto.goproto_registration) = true;
-option (gogoproto.goproto_unrecognized_all) = false;
 
 message ApplicationLink {
   reserved 1; // Deprecated: network_server_address
