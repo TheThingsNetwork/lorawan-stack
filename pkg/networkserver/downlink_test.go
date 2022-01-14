@@ -1509,7 +1509,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout: DurationPtr(42 * time.Second),
+					ClassCTimeout: ttnpb.ProtoDurationPtr(42 * time.Second),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -1672,7 +1672,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout: DurationPtr(42 * time.Second),
+					ClassCTimeout: ttnpb.ProtoDurationPtr(42 * time.Second),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -1809,7 +1809,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(now),
 				LorawanPhyVersion:       ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout:         DurationPtr(42 * time.Second),
+					ClassCTimeout:         ttnpb.ProtoDurationPtr(42 * time.Second),
 					StatusTimePeriodicity: DurationPtr(time.Hour),
 				},
 				MacState: &ttnpb.MACState{
@@ -1948,7 +1948,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout: DurationPtr(42 * time.Second),
+					ClassCTimeout: ttnpb.ProtoDurationPtr(42 * time.Second),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -2108,7 +2108,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout: DurationPtr(42 * time.Second),
+					ClassCTimeout: ttnpb.ProtoDurationPtr(42 * time.Second),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -2248,7 +2248,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout:          DurationPtr(42 * time.Second),
+					ClassCTimeout:          ttnpb.ProtoDurationPtr(42 * time.Second),
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
 					StatusTimePeriodicity:  DurationPtr(0),
 				},
@@ -2310,7 +2310,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout:          DurationPtr(42 * time.Second),
+					ClassCTimeout:          ttnpb.ProtoDurationPtr(42 * time.Second),
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
 					StatusTimePeriodicity:  DurationPtr(0),
 				},

@@ -368,7 +368,7 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 	}
 	if p.ClassCTimeout > 0 {
 		t := time.Duration(p.ClassCTimeout) * time.Second
-		dev.MacSettings.ClassCTimeout = &t
+		dev.MacSettings.ClassCTimeout = ttnpb.ProtoDurationPtr(t)
 		paths = append(paths, "mac_settings.class_c_timeout")
 	}
 	if v := p.PingSlotDataRateIndex; v != nil {

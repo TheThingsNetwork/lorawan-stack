@@ -82,10 +82,10 @@ const DefaultClassCTimeout = 5 * time.Minute
 
 func DeviceClassCTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
 	if t := dev.GetMacSettings().GetClassCTimeout(); t != nil {
-		return *t
+		return ttnpb.StdDurationOrZero(t)
 	}
 	if defaults.ClassCTimeout != nil {
-		return *defaults.ClassCTimeout
+		return ttnpb.StdDurationOrZero(defaults.ClassCTimeout)
 	}
 	return DefaultClassCTimeout
 }

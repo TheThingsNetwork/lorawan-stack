@@ -54,7 +54,7 @@ type MACSettingConfig struct {
 func (c MACSettingConfig) Parse() ttnpb.MACSettings {
 	p := ttnpb.MACSettings{
 		ClassBTimeout:         ttnpb.ProtoDuration(c.ClassBTimeout),
-		ClassCTimeout:         c.ClassCTimeout,
+		ClassCTimeout:         ttnpb.ProtoDuration(c.ClassCTimeout),
 		StatusTimePeriodicity: c.StatusTimePeriodicity,
 	}
 	if c.ADRMargin != nil {

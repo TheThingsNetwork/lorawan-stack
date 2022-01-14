@@ -184,7 +184,7 @@ func TestProfile(t *testing.T) {
 					SupportsClassC:    true,
 					SupportsJoin:      true,
 					MacSettings: &ttnpb.MACSettings{
-						ClassCTimeout: durationPtr(64 * time.Second),
+						ClassCTimeout: ttnpb.ProtoDurationPtr(64 * time.Second),
 					},
 				},
 				FieldMask: &pbtypes.FieldMask{
