@@ -709,7 +709,7 @@ func (x *MACSettings) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.StatusTimePeriodicity == nil {
 			s.WriteNil()
 		} else {
-			s.WriteDuration(*x.StatusTimePeriodicity)
+			gogo.MarshalDuration(s, x.StatusTimePeriodicity)
 		}
 	}
 	if x.StatusCountPeriodicity != nil || s.HasField("status_count_periodicity") {
@@ -897,7 +897,7 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 		case "status_time_periodicity", "statusTimePeriodicity":
 			s.AddField("status_time_periodicity")
-			v := s.ReadDuration()
+			v := gogo.UnmarshalDuration(s)
 			if s.Err() != nil {
 				return
 			}

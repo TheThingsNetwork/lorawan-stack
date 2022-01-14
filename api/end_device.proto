@@ -225,7 +225,7 @@ message MACSettings {
   BoolValue resets_f_cnt = 15;
   // The interval after which a DevStatusReq MACCommand shall be sent.
   // If unset, the default value from Network Server configuration will be used.
-  google.protobuf.Duration status_time_periodicity = 16 [(gogoproto.stdduration) = true];
+  google.protobuf.Duration status_time_periodicity = 16;
   // Number of uplink messages after which a DevStatusReq MACCommand shall be sent.
   // If unset, the default value from Network Server configuration will be used.
   google.protobuf.UInt32Value status_count_periodicity = 17;
