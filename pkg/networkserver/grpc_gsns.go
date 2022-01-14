@@ -1173,7 +1173,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		Request: ttnpb.MACState_JoinRequest{
 			RxDelay:          macState.DesiredParameters.Rx1Delay,
 			CfList:           cfList,
-			DownlinkSettings: *dlSettings,
+			DownlinkSettings: dlSettings,
 		},
 	}
 	macState.RxWindowsAvailable = true

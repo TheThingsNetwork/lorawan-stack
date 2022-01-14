@@ -2622,7 +2622,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
 									NetId:      created.PendingMacState.QueuedJoinAccept.NetId,
 									DevAddr:    created.PendingMacState.QueuedJoinAccept.DevAddr,
-									DlSettings: &created.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
+									DlSettings: created.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
 									RxDelay:    created.PendingMacState.QueuedJoinAccept.Request.RxDelay,
 									CfList:     created.PendingMacState.QueuedJoinAccept.Request.CfList,
 								},

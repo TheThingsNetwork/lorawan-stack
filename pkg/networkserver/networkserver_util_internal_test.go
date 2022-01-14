@@ -1190,7 +1190,7 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 								JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
 									NetId:      dev.PendingMacState.QueuedJoinAccept.NetId,
 									DevAddr:    dev.PendingMacState.QueuedJoinAccept.DevAddr,
-									DlSettings: &dev.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
+									DlSettings: dev.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
 									RxDelay:    dev.PendingMacState.QueuedJoinAccept.Request.RxDelay,
 									CfList:     dev.PendingMacState.QueuedJoinAccept.Request.CfList,
 								},
@@ -1626,7 +1626,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					DevAddr: joinReq.DevAddr,
 					NetId:   joinReq.NetId,
 					Request: ttnpb.MACState_JoinRequest{
-						DownlinkSettings: *joinReq.DownlinkSettings,
+						DownlinkSettings: joinReq.DownlinkSettings,
 						RxDelay:          joinReq.RxDelay,
 						CfList:           joinReq.CfList,
 					},
@@ -2129,7 +2129,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 		return o.WithPendingMacState(MACStatePtr(MACStateOptions.WithQueuedJoinAccept(&ttnpb.MACState_JoinAccept{
 			Payload: bytes.Repeat([]byte{0xff}, 17),
 			Request: ttnpb.MACState_JoinRequest{
-				DownlinkSettings: ttnpb.DLSettings{
+				DownlinkSettings: &ttnpb.DLSettings{
 					Rx1DrOffset: macState.DesiredParameters.Rx1DataRateOffset,
 					Rx2Dr:       macState.DesiredParameters.Rx2DataRateIndex,
 					OptNeg:      x.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0,
@@ -2178,7 +2178,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 							JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
 								NetId:      x.PendingMacState.QueuedJoinAccept.NetId,
 								DevAddr:    x.PendingMacState.QueuedJoinAccept.DevAddr,
-								DlSettings: &x.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
+								DlSettings: x.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
 								RxDelay:    x.PendingMacState.QueuedJoinAccept.Request.RxDelay,
 								CfList:     x.PendingMacState.QueuedJoinAccept.Request.CfList,
 							},
