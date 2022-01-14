@@ -153,7 +153,7 @@ func TestProfile(t *testing.T) {
 					SupportsClassB:    true,
 					SupportsJoin:      true,
 					MacSettings: &ttnpb.MACSettings{
-						ClassBTimeout:         durationPtr(8 * time.Second),
+						ClassBTimeout:         ttnpb.ProtoDurationPtr(8 * time.Second),
 						PingSlotPeriodicity:   &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
 						PingSlotDataRateIndex: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_3},
 						PingSlotFrequency:     &ttnpb.FrequencyValue{Value: 868300000},

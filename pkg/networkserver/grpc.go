@@ -46,7 +46,7 @@ func (ns *NetworkServer) GetDefaultMACSettings(ctx context.Context, req *ttnpb.G
 	statusTimePeriodicity := mac.DeviceStatusTimePeriodicity(nil, ns.defaultMACSettings)
 	statusCountPeriodicity := mac.DeviceStatusCountPeriodicity(nil, ns.defaultMACSettings)
 	settings := &ttnpb.MACSettings{
-		ClassBTimeout:                &classBTimeout,
+		ClassBTimeout:                ttnpb.ProtoDurationPtr(classBTimeout),
 		PingSlotPeriodicity:          mac.DeviceDefaultPingSlotPeriodicity(nil, ns.defaultMACSettings),
 		PingSlotDataRateIndex:        mac.DeviceDefaultPingSlotDataRateIndexValue(nil, phy, ns.defaultMACSettings),
 		PingSlotFrequency:            &ttnpb.FrequencyValue{Value: mac.DeviceDefaultPingSlotFrequency(nil, phy, ns.defaultMACSettings)},
