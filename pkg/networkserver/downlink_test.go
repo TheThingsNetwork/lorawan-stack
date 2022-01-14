@@ -2473,7 +2473,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DeviceDiffs: []DeviceDiffFunc{
 				func(ctx context.Context, expected, created, updated *ttnpb.EndDevice, down *ttnpb.DownlinkMessage, downAt time.Time) bool {
 					expected.PendingMacState.RxWindowsAvailable = false
-					expected.PendingMacState.PendingJoinRequest = &created.PendingMacState.QueuedJoinAccept.Request
+					expected.PendingMacState.PendingJoinRequest = created.PendingMacState.QueuedJoinAccept.Request
 					expected.PendingSession = &ttnpb.Session{
 						DevAddr: created.PendingMacState.QueuedJoinAccept.DevAddr,
 						Keys:    &created.PendingMacState.QueuedJoinAccept.Keys,

@@ -1212,7 +1212,7 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 				DevAddr: dev.PendingMacState.QueuedJoinAccept.DevAddr,
 				Keys:    &dev.PendingMacState.QueuedJoinAccept.Keys,
 			}
-			dev.PendingMacState.PendingJoinRequest = &dev.PendingMacState.QueuedJoinAccept.Request
+			dev.PendingMacState.PendingJoinRequest = dev.PendingMacState.QueuedJoinAccept.Request
 			dev.PendingMacState.QueuedJoinAccept = nil
 			dev.PendingMacState.RxWindowsAvailable = false
 			dev.PendingMacState.RecentDownlinks = AppendRecentDownlink(dev.PendingMacState.RecentDownlinks, scheduledDown, RecentDownlinkCount)
@@ -1625,7 +1625,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					Payload: joinResp.RawPayload,
 					DevAddr: joinReq.DevAddr,
 					NetId:   joinReq.NetId,
-					Request: ttnpb.MACState_JoinRequest{
+					Request: &ttnpb.MACState_JoinRequest{
 						DownlinkSettings: joinReq.DownlinkSettings,
 						RxDelay:          joinReq.RxDelay,
 						CfList:           joinReq.CfList,
@@ -2128,7 +2128,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 		)
 		return o.WithPendingMacState(MACStatePtr(MACStateOptions.WithQueuedJoinAccept(&ttnpb.MACState_JoinAccept{
 			Payload: bytes.Repeat([]byte{0xff}, 17),
-			Request: ttnpb.MACState_JoinRequest{
+			Request: &ttnpb.MACState_JoinRequest{
 				DownlinkSettings: &ttnpb.DLSettings{
 					Rx1DrOffset: macState.DesiredParameters.Rx1DataRateOffset,
 					Rx2Dr:       macState.DesiredParameters.Rx2DataRateIndex,
@@ -2164,7 +2164,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 				},
 			}),
 			o.WithPendingMACStateOptions(
-				MACStateOptions.WithPendingJoinRequest(&x.PendingMacState.QueuedJoinAccept.Request),
+				MACStateOptions.WithPendingJoinRequest(x.PendingMacState.QueuedJoinAccept.Request),
 				MACStateOptions.WithQueuedJoinAccept(nil),
 				MACStateOptions.WithRxWindowsAvailable(false),
 				MACStateOptions.AppendRecentDownlinks(&ttnpb.DownlinkMessage{
