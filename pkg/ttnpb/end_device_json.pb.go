@@ -1058,11 +1058,11 @@ func (x *MACState_JoinAccept) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("request")
 		x.Request.MarshalProtoJSON(s.WithField("request"))
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.Keys != nil || s.HasField("keys") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("keys")
 		// NOTE: SessionKeys does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.Keys)
+		gogo.MarshalMessage(s, x.Keys)
 	}
 	if len(x.CorrelationIds) > 0 || s.HasField("correlation_ids") {
 		s.WriteMoreIf(&wroteField)
@@ -1104,7 +1104,7 @@ func (x *MACState_JoinAccept) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: SessionKeys does not seem to implement UnmarshalProtoJSON.
 			var v SessionKeys
 			gogo.UnmarshalMessage(s, &v)
-			x.Keys = v
+			x.Keys = &v
 		case "correlation_ids", "correlationIds":
 			s.AddField("correlation_ids")
 			x.CorrelationIds = s.ReadStringArray()

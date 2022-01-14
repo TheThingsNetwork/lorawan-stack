@@ -334,7 +334,7 @@ func (v *MACState_JoinAccept) FieldIsZero(p string) bool {
 	case "dev_addr":
 		return v.DevAddr == types.DevAddr{}
 	case "keys":
-		return fieldsAreZero(&v.Keys, SessionKeysFieldPathsTopLevel...)
+		return v.Keys == nil
 	case "keys.app_s_key":
 		return v.Keys.FieldIsZero("app_s_key")
 	case "keys.app_s_key.encrypted_key":

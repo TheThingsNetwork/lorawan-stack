@@ -3853,7 +3853,14 @@ func (m *MACState_JoinAccept) ValidateFields(paths ...string) error {
 
 		case "keys":
 
-			if v, ok := interface{}(&m.Keys).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetKeys() == nil {
+				return MACState_JoinAcceptValidationError{
+					field:  "keys",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetKeys()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACState_JoinAcceptValidationError{
 						field:  "keys",
