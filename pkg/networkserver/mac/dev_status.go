@@ -51,10 +51,10 @@ func DeviceStatusCountPeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSettin
 
 func DeviceStatusTimePeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
 	if v := dev.GetMacSettings().GetStatusTimePeriodicity(); v != nil {
-		return *v
+		return ttnpb.StdDurationOrZero(v)
 	}
 	if defaults.StatusTimePeriodicity != nil {
-		return *defaults.StatusTimePeriodicity
+		return ttnpb.StdDurationOrZero(defaults.StatusTimePeriodicity)
 	}
 	return DefaultStatusTimePeriodicity
 }

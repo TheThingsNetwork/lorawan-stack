@@ -55,7 +55,7 @@ func (c MACSettingConfig) Parse() ttnpb.MACSettings {
 	p := ttnpb.MACSettings{
 		ClassBTimeout:         ttnpb.ProtoDuration(c.ClassBTimeout),
 		ClassCTimeout:         ttnpb.ProtoDuration(c.ClassCTimeout),
-		StatusTimePeriodicity: c.StatusTimePeriodicity,
+		StatusTimePeriodicity: ttnpb.ProtoDuration(c.StatusTimePeriodicity),
 	}
 	if c.ADRMargin != nil {
 		p.AdrMargin = &pbtypes.FloatValue{Value: *c.ADRMargin}

@@ -61,7 +61,7 @@ func (ns *NetworkServer) GetDefaultMACSettings(ctx context.Context, req *ttnpb.G
 		UseAdr:                       &ttnpb.BoolValue{Value: mac.DeviceUseADR(nil, ns.defaultMACSettings, phy)},
 		AdrMargin:                    &pbtypes.FloatValue{Value: adrMargin},
 		ResetsFCnt:                   &ttnpb.BoolValue{Value: mac.DeviceResetsFCnt(nil, ns.defaultMACSettings)},
-		StatusTimePeriodicity:        &statusTimePeriodicity,
+		StatusTimePeriodicity:        ttnpb.ProtoDurationPtr(statusTimePeriodicity),
 		StatusCountPeriodicity:       &pbtypes.UInt32Value{Value: statusCountPeriodicity},
 		DesiredRx1Delay:              &ttnpb.RxDelayValue{Value: mac.DeviceDesiredRX1Delay(nil, phy, ns.defaultMACSettings)},
 		DesiredRx1DataRateOffset:     &ttnpb.DataRateOffsetValue{Value: mac.DeviceDesiredRX1DataRateOffset(nil, ns.defaultMACSettings)},

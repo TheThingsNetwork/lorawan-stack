@@ -506,7 +506,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					},
 				},
 				MacSettings: &ttnpb.MACSettings{
-					StatusTimePeriodicity:  DurationPtr(0),
+					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
 				},
 				Session: &ttnpb.Session{
@@ -556,7 +556,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				},
 				MacSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
-					StatusTimePeriodicity:  DurationPtr(0),
+					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
@@ -605,7 +605,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				},
 				MacSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
-					StatusTimePeriodicity:  DurationPtr(0),
+					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
@@ -690,7 +690,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				},
 				MacSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
-					StatusTimePeriodicity:  DurationPtr(0),
+					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
@@ -1810,7 +1810,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				LorawanPhyVersion:       ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					ClassCTimeout:         ttnpb.ProtoDurationPtr(42 * time.Second),
-					StatusTimePeriodicity: DurationPtr(time.Hour),
+					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Hour),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -2250,7 +2250,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacSettings: &ttnpb.MACSettings{
 					ClassCTimeout:          ttnpb.ProtoDurationPtr(42 * time.Second),
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
-					StatusTimePeriodicity:  DurationPtr(0),
+					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -2312,7 +2312,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacSettings: &ttnpb.MACSettings{
 					ClassCTimeout:          ttnpb.ProtoDurationPtr(42 * time.Second),
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
-					StatusTimePeriodicity:  DurationPtr(0),
+					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),

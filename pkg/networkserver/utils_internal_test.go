@@ -151,7 +151,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:      ups,
 				},
 				MacSettings: &ttnpb.MACSettings{
-					StatusTimePeriodicity:  DurationPtr(0),
+					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
 				},
 				Session: &ttnpb.Session{
