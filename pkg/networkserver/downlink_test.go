@@ -2390,7 +2390,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceClass:       ttnpb.CLASS_A,
 					LorawanVersion:    ttnpb.MAC_V1_1,
 					QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
-						Keys:    *sessionKeys,
+						Keys:    sessionKeys,
 						Payload: joinAcceptBytes,
 						DevAddr: test.DefaultDevAddr,
 					},
@@ -2476,7 +2476,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					expected.PendingMacState.PendingJoinRequest = created.PendingMacState.QueuedJoinAccept.Request
 					expected.PendingSession = &ttnpb.Session{
 						DevAddr: created.PendingMacState.QueuedJoinAccept.DevAddr,
-						Keys:    &created.PendingMacState.QueuedJoinAccept.Keys,
+						Keys:    created.PendingMacState.QueuedJoinAccept.Keys,
 					}
 					expected.PendingMacState.QueuedJoinAccept = nil
 					expected.PendingMacState.RecentDownlinks = AppendRecentDownlink(expected.PendingMacState.RecentDownlinks, down, RecentDownlinkCount)

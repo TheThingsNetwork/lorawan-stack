@@ -1166,7 +1166,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	}
 	macState.QueuedJoinAccept = &ttnpb.MACState_JoinAccept{
 		CorrelationIds: resp.CorrelationIds,
-		Keys:           *keys,
+		Keys:           keys,
 		Payload:        resp.RawPayload,
 		DevAddr:        devAddr,
 		NetId:          ns.netID,

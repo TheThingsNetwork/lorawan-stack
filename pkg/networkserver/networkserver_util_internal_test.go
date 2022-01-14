@@ -1210,7 +1210,7 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 			)
 			dev.PendingSession = &ttnpb.Session{
 				DevAddr: dev.PendingMacState.QueuedJoinAccept.DevAddr,
-				Keys:    &dev.PendingMacState.QueuedJoinAccept.Keys,
+				Keys:    dev.PendingMacState.QueuedJoinAccept.Keys,
 			}
 			dev.PendingMacState.PendingJoinRequest = dev.PendingMacState.QueuedJoinAccept.Request
 			dev.PendingMacState.QueuedJoinAccept = nil
@@ -1630,8 +1630,8 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 						RxDelay:          joinReq.RxDelay,
 						CfList:           joinReq.CfList,
 					},
-					Keys: func() ttnpb.SessionKeys {
-						keys := ttnpb.SessionKeys{
+					Keys: func() *ttnpb.SessionKeys {
+						keys := &ttnpb.SessionKeys{
 							SessionKeyId: joinResp.SessionKeys.SessionKeyId,
 							FNwkSIntKey:  joinResp.SessionKeys.FNwkSIntKey,
 							NwkSEncKey:   joinResp.SessionKeys.NwkSEncKey,
@@ -2137,7 +2137,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 				RxDelay: macState.DesiredParameters.Rx1Delay,
 				CfList:  frequencyplans.CFList(*test.FrequencyPlan(x.FrequencyPlanId), x.LorawanPhyVersion),
 			},
-			Keys:           *MakeSessionKeys(x.LorawanVersion, wrapKeys, true),
+			Keys:           MakeSessionKeys(x.LorawanVersion, wrapKeys, true),
 			DevAddr:        test.DefaultDevAddr,
 			NetId:          test.DefaultNetID,
 			CorrelationIds: []string{"join-request"},
