@@ -575,10 +575,10 @@ const defaultClassBCDownlinkInterval = time.Second
 
 func DeviceClassBCDownlinkInterval(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
 	if t := dev.GetMacSettings().GetClassBCDownlinkInterval(); t != nil {
-		return *t
+		return ttnpb.StdDurationOrZero(t)
 	}
 	if t := defaults.GetClassBCDownlinkInterval(); t != nil {
-		return *t
+		return ttnpb.StdDurationOrZero(t)
 	}
 	return defaultClassBCDownlinkInterval
 }
