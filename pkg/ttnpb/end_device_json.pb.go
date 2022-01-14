@@ -646,7 +646,7 @@ func (x *MACSettings) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ClassCTimeout == nil {
 			s.WriteNil()
 		} else {
-			s.WriteDuration(*x.ClassCTimeout)
+			gogo.MarshalDuration(s, x.ClassCTimeout)
 		}
 	}
 	if x.Rx1Delay != nil || s.HasField("rx1_delay") {
@@ -830,7 +830,7 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 		case "class_c_timeout", "classCTimeout":
 			s.AddField("class_c_timeout")
-			v := s.ReadDuration()
+			v := gogo.UnmarshalDuration(s)
 			if s.Err() != nil {
 				return
 			}
