@@ -617,7 +617,7 @@ func (x *MACSettings) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ClassBTimeout == nil {
 			s.WriteNil()
 		} else {
-			s.WriteDuration(*x.ClassBTimeout)
+			gogo.MarshalDuration(s, x.ClassBTimeout)
 		}
 	}
 	if x.PingSlotPeriodicity != nil || s.HasField("ping_slot_periodicity") {
@@ -799,7 +799,7 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			s.ReadAny() // ignore unknown field
 		case "class_b_timeout", "classBTimeout":
 			s.AddField("class_b_timeout")
-			v := s.ReadDuration()
+			v := gogo.UnmarshalDuration(s)
 			if s.Err() != nil {
 				return
 			}

@@ -172,7 +172,7 @@ message EndDeviceVersion {
 message MACSettings {
   // Maximum delay for the device to answer a MAC request or a confirmed downlink frame.
   // If unset, the default value from Network Server configuration will be used.
-  google.protobuf.Duration class_b_timeout = 1 [(gogoproto.stdduration) = true];
+  google.protobuf.Duration class_b_timeout = 1;
   // Periodicity of the class B ping slot.
   // If unset, the default value from Network Server configuration will be used.
   PingSlotPeriodValue ping_slot_periodicity = 2;
