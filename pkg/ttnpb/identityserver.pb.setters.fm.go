@@ -358,10 +358,18 @@ func (dst *AuthInfoResponse_APIKeyAccess) SetFields(src *AuthInfoResponse_APIKey
 		case "entity_ids":
 			if len(subs) > 0 {
 				var newDst, newSrc *EntityIdentifiers
-				if src != nil {
-					newSrc = &src.EntityIds
+				if (src == nil || src.EntityIds == nil) && dst.EntityIds == nil {
+					continue
 				}
-				newDst = &dst.EntityIds
+				if src != nil {
+					newSrc = src.EntityIds
+				}
+				if dst.EntityIds != nil {
+					newDst = dst.EntityIds
+				} else {
+					newDst = &EntityIdentifiers{}
+					dst.EntityIds = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -369,8 +377,7 @@ func (dst *AuthInfoResponse_APIKeyAccess) SetFields(src *AuthInfoResponse_APIKey
 				if src != nil {
 					dst.EntityIds = src.EntityIds
 				} else {
-					var zero EntityIdentifiers
-					dst.EntityIds = zero
+					dst.EntityIds = nil
 				}
 			}
 
