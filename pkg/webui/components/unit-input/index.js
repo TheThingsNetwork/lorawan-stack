@@ -134,7 +134,7 @@ WrappedUnitInput.propTypes = {
 WrappedUnitInput.defaultProps = {
   decode: value => {
     const duration = value.split(unitRegexp)[0]
-    const unit = value.split(duration)[1]
+    const unit = value.split(duration)[1] || value
     return {
       duration: duration ? Number(duration) : undefined,
       unit,
