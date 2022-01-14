@@ -374,7 +374,7 @@ func (v *MACState_JoinAccept) FieldIsZero(p string) bool {
 	case "payload":
 		return v.Payload == nil
 	case "request":
-		return fieldsAreZero(&v.Request, MACState_JoinRequestFieldPathsTopLevel...)
+		return v.Request == nil
 	case "request.cf_list":
 		return v.Request.FieldIsZero("cf_list")
 	case "request.cf_list.ch_masks":

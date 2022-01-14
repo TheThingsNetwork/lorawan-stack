@@ -2906,10 +2906,18 @@ func (dst *MACState_JoinAccept) SetFields(src *MACState_JoinAccept, paths ...str
 		case "request":
 			if len(subs) > 0 {
 				var newDst, newSrc *MACState_JoinRequest
-				if src != nil {
-					newSrc = &src.Request
+				if (src == nil || src.Request == nil) && dst.Request == nil {
+					continue
 				}
-				newDst = &dst.Request
+				if src != nil {
+					newSrc = src.Request
+				}
+				if dst.Request != nil {
+					newDst = dst.Request
+				} else {
+					newDst = &MACState_JoinRequest{}
+					dst.Request = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -2917,8 +2925,7 @@ func (dst *MACState_JoinAccept) SetFields(src *MACState_JoinAccept, paths ...str
 				if src != nil {
 					dst.Request = src.Request
 				} else {
-					var zero MACState_JoinRequest
-					dst.Request = zero
+					dst.Request = nil
 				}
 			}
 		case "keys":

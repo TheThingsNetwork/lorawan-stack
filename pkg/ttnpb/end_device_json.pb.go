@@ -1053,7 +1053,7 @@ func (x *MACState_JoinAccept) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("payload")
 		s.WriteBytes(x.Payload)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.Request != nil || s.HasField("request") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("request")
 		x.Request.MarshalProtoJSON(s.WithField("request"))
@@ -1096,6 +1096,7 @@ func (x *MACState_JoinAccept) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Payload = s.ReadBytes()
 		case "request":
 			if !s.ReadNil() {
+				x.Request = &MACState_JoinRequest{}
 				x.Request.UnmarshalProtoJSON(s.WithField("request", true))
 			}
 		case "keys":

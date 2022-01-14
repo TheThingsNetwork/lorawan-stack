@@ -3841,7 +3841,7 @@ func (m *MACState_JoinAccept) ValidateFields(paths ...string) error {
 
 		case "request":
 
-			if v, ok := interface{}(&m.Request).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetRequest()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACState_JoinAcceptValidationError{
 						field:  "request",

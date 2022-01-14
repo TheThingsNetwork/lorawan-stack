@@ -310,7 +310,7 @@ message MACState {
   message JoinAccept {
     // Payload of the join-accept received from Join Server.
     bytes payload = 1 [(validate.rules).bytes = {min_len: 17, max_len: 33}];
-    JoinRequest request = 2 [(gogoproto.nullable) = false];
+    JoinRequest request = 2;
     // Network session keys associated with the join.
     SessionKeys keys = 3 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
     repeated string correlation_ids = 4 [(validate.rules).repeated.items.string.max_len = 100];
