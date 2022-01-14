@@ -145,7 +145,10 @@ class LocationForm extends Component {
           navigator.geolocation.getCurrentPosition(
             position => {
               resolve({
-                mapCenter: [position.coords.latitude, position.coords.longitude],
+                mapCenter: [
+                  isNaN(position.coords.latitude) ? defaultLocation[0] : position.coords.latitude,
+                  isNaN(position.coords.longitude) ? defaultLocation[1] : position.coords.latitude,
+                ],
                 loading: false,
               })
             },
@@ -184,16 +187,18 @@ class LocationForm extends Component {
   handleClick(event) {
     const { updatesDisabled } = this.props
     const { setValues, values } = this.form.current
+    const latitude = isNaN(event.latlng.lat) ? defaultLocation[0] : event.latlng.lat
+    const longitude = isNaN(event.latlng.lng) ? defaultLocation[1] : event.latlng.lng
 
     if (updatesDisabled) {
       return
     }
 
-    this.setState({ latitude: event.latlng.lat, longitude: event.latlng.lng })
+    this.setState({ latitude, longitude })
     setValues({
       ...values,
-      latitude: event.latlng.lat,
-      longitude: event.latlng.lng,
+      latitude,
+      longitude,
       altitude: values.altitude ? values.altitude : 0,
     })
   }
