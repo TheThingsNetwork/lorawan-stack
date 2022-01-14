@@ -782,7 +782,7 @@ func (x *MACSettings) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ClassBCDownlinkInterval == nil {
 			s.WriteNil()
 		} else {
-			s.WriteDuration(*x.ClassBCDownlinkInterval)
+			gogo.MarshalDuration(s, x.ClassBCDownlinkInterval)
 		}
 	}
 	s.WriteObjectEnd()
@@ -979,7 +979,7 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 		case "class_b_c_downlink_interval", "classBCDownlinkInterval":
 			s.AddField("class_b_c_downlink_interval")
-			v := s.ReadDuration()
+			v := gogo.UnmarshalDuration(s)
 			if s.Err() != nil {
 				return
 			}
