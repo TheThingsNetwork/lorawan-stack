@@ -166,7 +166,7 @@ message EndDeviceVersion {
   bool resets_join_nonces = 12;
 
   // Default formatters defining the payload formats for this end device.
-  MessagePayloadFormatters default_formatters = 13 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  MessagePayloadFormatters default_formatters = 13 [(validate.rules).message.required = true];
 }
 
 message MACSettings {

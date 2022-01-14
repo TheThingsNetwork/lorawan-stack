@@ -628,7 +628,14 @@ func (m *EndDeviceVersion) ValidateFields(paths ...string) error {
 			// no validation rules for ResetsJoinNonces
 		case "default_formatters":
 
-			if v, ok := interface{}(&m.DefaultFormatters).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetDefaultFormatters() == nil {
+				return EndDeviceVersionValidationError{
+					field:  "default_formatters",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetDefaultFormatters()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return EndDeviceVersionValidationError{
 						field:  "default_formatters",

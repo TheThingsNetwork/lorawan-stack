@@ -536,7 +536,7 @@ func (x *EndDeviceVersion) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("resets_join_nonces")
 		s.WriteBool(x.ResetsJoinNonces)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.DefaultFormatters != nil || s.HasField("default_formatters") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("default_formatters")
 		x.DefaultFormatters.MarshalProtoJSON(s.WithField("default_formatters"))
@@ -596,6 +596,7 @@ func (x *EndDeviceVersion) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.ResetsJoinNonces = s.ReadBool()
 		case "default_formatters", "defaultFormatters":
 			if !s.ReadNil() {
+				x.DefaultFormatters = &MessagePayloadFormatters{}
 				x.DefaultFormatters.UnmarshalProtoJSON(s.WithField("default_formatters", true))
 			}
 		}

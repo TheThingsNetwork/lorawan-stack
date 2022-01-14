@@ -592,10 +592,18 @@ func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) e
 		case "default_formatters":
 			if len(subs) > 0 {
 				var newDst, newSrc *MessagePayloadFormatters
-				if src != nil {
-					newSrc = &src.DefaultFormatters
+				if (src == nil || src.DefaultFormatters == nil) && dst.DefaultFormatters == nil {
+					continue
 				}
-				newDst = &dst.DefaultFormatters
+				if src != nil {
+					newSrc = src.DefaultFormatters
+				}
+				if dst.DefaultFormatters != nil {
+					newDst = dst.DefaultFormatters
+				} else {
+					newDst = &MessagePayloadFormatters{}
+					dst.DefaultFormatters = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -603,8 +611,7 @@ func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) e
 				if src != nil {
 					dst.DefaultFormatters = src.DefaultFormatters
 				} else {
-					var zero MessagePayloadFormatters
-					dst.DefaultFormatters = zero
+					dst.DefaultFormatters = nil
 				}
 			}
 
