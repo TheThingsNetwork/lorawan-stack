@@ -18,42 +18,11 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-func parseWiFiStruct(payload *types.Struct) []AccessPoint {
-	points := []AccessPoint{}
-	if payload == nil {
-		return points
-	}
-	accessPoints := payload.Fields["access_points"].GetListValue()
-	if accessPoints == nil {
-		return nil
-	}
-	for _, ap := range accessPoints.Values {
-		accessPoint := ap.GetStructValue()
-		if accessPoint == nil {
-			continue
-		}
-		bssid, ok := accessPoint.Fields["bssid"]
-		if !ok {
-			continue
-		}
-		rssi, ok := accessPoint.Fields["rssi"]
-		if !ok {
-			continue
-		}
-		points = append(points, AccessPoint{
-			MACAddress:     bssid.GetStringValue(),
-			SignalStrength: int64(rssi.GetNumberValue()),
-		})
-	}
-	return points
-}
-
 // BuildWiFiRequest builds a WiFiRequest from the provided metadata and payload.
-func BuildWiFiRequest(ctx context.Context, metadata []*ttnpb.RxMetadata, payload *types.Struct) *WiFiRequest {
+func BuildWiFiRequest(ctx context.Context, metadata []*ttnpb.RxMetadata, accessPoints []AccessPoint) *WiFiRequest {
 	removeNil := func(v *uint64) uint64 {
 		if v == nil {
 			return 0
@@ -62,7 +31,7 @@ func BuildWiFiRequest(ctx context.Context, metadata []*ttnpb.RxMetadata, payload
 	}
 	r := &WiFiRequest{
 		LoRaWAN:          []TDOAUplink{},
-		WiFiAccessPoints: parseWiFiStruct(payload),
+		WiFiAccessPoints: accessPoints,
 	}
 	for _, m := range metadata {
 		if m.Location == nil || m.GatewayIds == nil {
