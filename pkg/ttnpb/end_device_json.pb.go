@@ -996,7 +996,7 @@ func (x *MACState_JoinRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.DownlinkSettings != nil || s.HasField("downlink_settings") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("downlink_settings")
 		x.DownlinkSettings.MarshalProtoJSON(s.WithField("downlink_settings"))
@@ -1025,6 +1025,7 @@ func (x *MACState_JoinRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 			s.ReadAny() // ignore unknown field
 		case "downlink_settings", "downlinkSettings":
 			if !s.ReadNil() {
+				x.DownlinkSettings = &DLSettings{}
 				x.DownlinkSettings.UnmarshalProtoJSON(s.WithField("downlink_settings", true))
 			}
 		case "rx_delay", "rxDelay":

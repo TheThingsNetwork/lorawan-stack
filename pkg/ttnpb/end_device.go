@@ -19,7 +19,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
@@ -311,7 +310,7 @@ func (v *MACState_JoinRequest) FieldIsZero(p string) bool {
 	case "cf_list.type":
 		return v.CfList.FieldIsZero("type")
 	case "downlink_settings":
-		return proto.Equal(&v.DownlinkSettings, &DLSettings{})
+		return v.DownlinkSettings == nil
 	case "downlink_settings.opt_neg":
 		return v.DownlinkSettings.FieldIsZero("opt_neg")
 	case "downlink_settings.rx1_dr_offset":

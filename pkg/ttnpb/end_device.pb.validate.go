@@ -3711,7 +3711,14 @@ func (m *MACState_JoinRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "downlink_settings":
 
-			if v, ok := interface{}(&m.DownlinkSettings).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetDownlinkSettings() == nil {
+				return MACState_JoinRequestValidationError{
+					field:  "downlink_settings",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetDownlinkSettings()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACState_JoinRequestValidationError{
 						field:  "downlink_settings",
