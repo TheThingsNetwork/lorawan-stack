@@ -21,11 +21,13 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	"github.com/golang/protobuf/proto"
+	apppayload "go.thethings.network/lorawan-application-payload"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -105,8 +107,19 @@ func (p *GeolocationPackage) singleFrameQuery(ctx context.Context, ids *ttnpb.En
 }
 
 func (p *GeolocationPackage) gnssQuery(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
-	req := &api.GNSSRequest{
-		Payload: up.FrmPayload[:],
+	req := &api.GNSSRequest{}
+	if up.DecodedPayload == nil {
+		req.Payload = up.FrmPayload
+	} else {
+		m, err := gogoproto.Map(up.DecodedPayload)
+		if err != nil {
+			return nil, err
+		}
+		payload, ok := apppayload.InferGNSS(m)
+		if !ok {
+			return nil, nil
+		}
+		req.Payload = payload
 	}
 	resp, err := client.SolveGNSS(ctx, req)
 	if err != nil {
@@ -160,7 +173,32 @@ func (p *GeolocationPackage) multiFrameQuery(ctx context.Context, ids *ttnpb.End
 }
 
 func (p *GeolocationPackage) wifiQuery(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, up *ttnpb.ApplicationUplink, data *Data, client *api.Client) (api.AbstractLocationSolverResponse, error) {
-	req := api.BuildWiFiRequest(ctx, up.RxMetadata, up.DecodedPayload)
+	m, err := gogoproto.Map(up.DecodedPayload)
+	if err != nil {
+		return nil, err
+	}
+	aps, ok := apppayload.InferWiFiAccessPoints(m)
+	if !ok {
+		return nil, nil
+	}
+	if len(aps) < 2 {
+		return nil, nil
+	}
+	accessPoints := make([]api.AccessPoint, 0, len(aps))
+	for _, accessPoint := range aps {
+		accessPoints = append(accessPoints, api.AccessPoint{
+			MACAddress: fmt.Sprintf("%x:%x:%x:%x:%x:%x",
+				accessPoint.BSSID[0],
+				accessPoint.BSSID[1],
+				accessPoint.BSSID[2],
+				accessPoint.BSSID[3],
+				accessPoint.BSSID[4],
+				accessPoint.BSSID[5],
+			),
+			SignalStrength: int64(accessPoint.RSSI),
+		})
+	}
+	req := api.BuildWiFiRequest(ctx, up.RxMetadata, accessPoints)
 	if len(req.LoRaWAN) < 1 {
 		return nil, nil
 	}

@@ -101,10 +101,10 @@ type WiFiLocationSolverResult struct {
 	Latitude         float64 `json:"latitude"`
 	Longitude        float64 `json:"longitude"`
 	Altitude         float64 `json:"altitude"`
-	Accuracy         int64   `json:"accuracy"`
+	Accuracy         float64 `json:"accuracy"`
 	Algorithm        string  `json:"algorithmType"`
-	GatewaysReceived int64   `json:"numberOfGatewaysReceived"`
-	GatewaysUsed     int64   `json:"numberOfGatewaysUsed"`
+	GatewaysReceived float64 `json:"numberOfGatewaysReceived"`
+	GatewaysUsed     float64 `json:"numberOfGatewaysUsed"`
 }
 
 // ExtendedWiFiLocationSolverResponse extends WiFiLocationQueryResponse with the raw JSON representation.
