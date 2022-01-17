@@ -5473,7 +5473,7 @@
                   },
                   {
                     "name": "map.values.string.max_len",
-                    "value": 256
+                    "value": 4096
                   }
                 ]
               }
