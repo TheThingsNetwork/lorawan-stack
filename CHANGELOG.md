@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Webhook maximum header value length extended to 4096 characters.
+
 ### Deprecated
 
 ### Removed
