@@ -73,6 +73,10 @@ func TestWebhooks(t *testing.T) {
 		ApplicationIds: &registeredApplicationID,
 		WebhookId:      registeredWebhookID,
 	}
+
+	// Use a dummy JWT for auth check.
+	var longAuthHeader = "Bearer eyJhbGciOiJIUzI1NiJ9.eyJSb2xlIjoidGVzdHdocm9sZSIsIklzc3VlciI6Iklzc3VlciIsIlVzZXJuYW1lIjoidGVzdHVzZXIiLCJleHAiOjE2NDI0MjU3NDgsImlhdCI6MTY0MjQyNTc0OH0.imuGY_5xnhZYSqjPrc6EUoYV1eapswDBUIBXKVCIYSw"
+
 	for _, tc := range []struct {
 		prefix string
 		suffix string
@@ -101,7 +105,7 @@ func TestWebhooks(t *testing.T) {
 						Ids:     ids,
 						BaseUrl: "https://myapp.com/api/ttn/v3{/appID,devID}" + tc.suffix,
 						Headers: map[string]string{
-							"Authorization": "key secret",
+							"Authorization": longAuthHeader,
 						},
 						DownlinkApiKey: "foo.secret",
 						Format:         "json",
@@ -397,7 +401,7 @@ func TestWebhooks(t *testing.T) {
 									}
 								}
 								a.So(req.URL.String(), should.Equal, tc.URL)
-								a.So(req.Header.Get("Authorization"), should.Equal, "key secret")
+								a.So(req.Header.Get("Authorization"), should.Equal, longAuthHeader)
 								a.So(req.Header.Get("Content-Type"), should.Equal, "application/json")
 								a.So(req.Header.Get("X-Downlink-Apikey"), should.Equal, "foo.secret")
 								a.So(req.Header.Get("X-Downlink-Push"), should.Equal,

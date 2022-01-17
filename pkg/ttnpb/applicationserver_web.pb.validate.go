@@ -1065,10 +1065,10 @@ func (m *ApplicationWebhook) ValidateFields(paths ...string) error {
 					}
 				}
 
-				if utf8.RuneCountInString(val) > 256 {
+				if utf8.RuneCountInString(val) > 4096 {
 					return ApplicationWebhookValidationError{
 						field:  fmt.Sprintf("headers[%v]", key),
-						reason: "value length must be at most 256 runes",
+						reason: "value length must be at most 4096 runes",
 					}
 				}
 

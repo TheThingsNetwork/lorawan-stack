@@ -129,7 +129,7 @@ message ApplicationWebhook {
     (validate.rules).map = {
       max_pairs: 50,
       keys: { string: { max_len: 64 } },
-      values: { string: { max_len: 256 } }
+      values: { string: { max_len: 4096 } }
     }
   ];
   // The format to use for the body.
