@@ -24,7 +24,7 @@ describe('End Device list', () => {
   }
   const endDevices = [
     {
-      application_server_address: 'localhost',
+      application_server_address: window.location.hostname,
       ids: {
         device_id: 'some-test-end-device',
         dev_eui: '0000000000000001',
@@ -32,11 +32,11 @@ describe('End Device list', () => {
       },
       name: 'End Device Test Name',
       description: 'End Device Test Description',
-      join_server_address: 'localhost',
-      network_server_address: 'localhost',
+      join_server_address: window.location.hostname,
+      network_server_address: window.location.hostname,
     },
     {
-      application_server_address: 'localhost',
+      application_server_address: window.location.hostname,
       ids: {
         device_id: 'other-test-end-device',
         dev_eui: '0000000000000002',
@@ -44,11 +44,11 @@ describe('End Device list', () => {
       },
       name: 'End Device Test Name',
       description: 'End Device Test Description',
-      join_server_address: 'localhost',
-      network_server_address: 'localhost',
+      join_server_address: window.location.hostname,
+      network_server_address: window.location.hostname,
     },
     {
-      application_server_address: 'localhost',
+      application_server_address: window.location.hostname,
       ids: {
         device_id: 'third-test-end-device',
         dev_eui: '0000000000000003',
@@ -56,8 +56,8 @@ describe('End Device list', () => {
       },
       name: 'End Device Test Name',
       description: 'End Device Test Description',
-      join_server_address: 'localhost',
-      network_server_address: 'localhost',
+      join_server_address: window.location.hostname,
+      network_server_address: window.location.hostname,
     },
   ]
 
@@ -92,9 +92,9 @@ describe('End Device list', () => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
     cy.createApplication(application, userId)
-    cy.createEndDevice(appId, endDeviceRequestBody[0])
-    cy.createEndDevice(appId, endDeviceRequestBody[1])
-    cy.createEndDevice(appId, endDeviceRequestBody[2])
+    cy.createEndDeviceIsOnly(appId, endDeviceRequestBody[0])
+    cy.createEndDeviceIsOnly(appId, endDeviceRequestBody[1])
+    cy.createEndDeviceIsOnly(appId, endDeviceRequestBody[2])
   })
 
   beforeEach(() => {

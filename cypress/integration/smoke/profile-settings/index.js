@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable jest/valid-expect */
+
 import { defineSmokeTest } from '../utils'
 
 const profileSettingsNavigation = defineSmokeTest('succeeds navigating to Account App', () => {
@@ -34,8 +36,9 @@ const profileSettingsNavigation = defineSmokeTest('succeeds navigating to Accoun
 
     cy.get('@profileDropdown')
       .findByText(/Profile settings/)
-      .should('have.attr', 'href', '/oauth/profile-settings')
-      .should('have.attr', 'target', 'blank')
+      .should('have.attr', 'target', '_blank')
+      .invoke('attr', 'href')
+      .then(href => expect(href.endsWith('/oauth/profile-settings')).to.be.true)
 
     cy.get('@profileDropdown')
       .findByText('Profile settings')

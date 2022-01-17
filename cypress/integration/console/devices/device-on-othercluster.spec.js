@@ -87,7 +87,7 @@ describe('End device on other cluster', () => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
     cy.createApplication(application, user.ids.user_id)
-    cy.createMockDeviceAllComponents(applicationId, { ns, is })
+    cy.createMockDeviceAllComponents(applicationId, undefined, { ns, is })
   })
 
   beforeEach(() => {

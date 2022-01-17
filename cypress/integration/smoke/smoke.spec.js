@@ -19,5 +19,7 @@ describe('Smoke tests', () => {
     cy.dropAndSeedDatabase()
   })
 
-  tests.forEach(({ description, test }) => it(description, test))
+  tests.forEach(({ description, options, test }) =>
+    options ? it(description, options, test) : it(description, test),
+  )
 })

@@ -134,39 +134,13 @@ describe('Overview', () => {
       name: 'Application End Devices Test Name',
       description: `Application End Devices Test Description`,
     }
-
-    const endDeviceId = 'end-device-overview-test'
-    const endDevice = {
-      application_server_address: 'localhost',
-      ids: {
-        device_id: endDeviceId,
-        dev_eui: '0000000000000001',
-        join_eui: '0000000000000000',
-      },
-      name: 'End Device Test Name',
-      description: 'End Device Test Description',
-      join_server_address: 'localhost',
-      network_server_address: 'localhost',
-    }
-    const endDeviceFieldMask = {
-      paths: [
-        'join_server_address',
-        'network_server_address',
-        'application_server_address',
-        'ids.dev_eui',
-        'ids.join_eui',
-        'name',
-        'description',
-      ],
-    }
-    const endDeviceRequestBody = {
-      end_device: endDevice,
-      field_mask: endDeviceFieldMask,
-    }
+    let endDevice
 
     before(() => {
       cy.createApplication(application, userId)
-      cy.createEndDevice(applicationId, endDeviceRequestBody)
+      cy.createMockDeviceAllComponents(applicationId).then(body => {
+        endDevice = body.end_device
+      })
     })
 
     beforeEach(() => {
@@ -175,12 +149,14 @@ describe('Overview', () => {
 
     it('displays UI elements in place', () => {
       cy.visit(
-        `${Cypress.config('consoleRootPath')}/applications/${applicationId}/devices/${endDeviceId}`,
+        `${Cypress.config('consoleRootPath')}/applications/${applicationId}/devices/${
+          endDevice.ids.device_id
+        }`,
       )
 
       cy.findByText(`${endDevice.name}`, { selector: 'h1' }).should('be.visible')
 
-      cy.findByRole('row', { name: new RegExp(endDeviceId) }).should('be.visible')
+      cy.findByRole('row', { name: new RegExp(endDevice.ids.device_id) }).should('be.visible')
       cy.findByText(new RegExp(endDevice.description)).should('be.visible')
       cy.findByRole('row', { name: new RegExp(endDevice.ids.dev_eui) }).should('be.visible')
       cy.findByRole('row', { name: new RegExp(endDevice.ids.join_eui) }).should('be.visible')
