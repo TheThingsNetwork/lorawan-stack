@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+
+set -e
+
+case "$1" in
+minor|Minor ) BUMP="Minor" ;;
+patch|Patch ) BUMP="Patch" ;;
+* ) echo "Missing release type [minor|patch]"; exit 1;;
+esac
+MAGE_BUMP="version:bump$BUMP"
+
+export MAGEFILE_VERSBOSE=0
+
+MAGE=${MAGE:-tools/bin/mage}
+ORIGIN=${ORIGIN:-origin}
+
+MINOR_BRANCH=$($MAGE "$MAGE_BUMP" version:majorMinor)
+RELEASE_TAG=$($MAGE "$MAGE_BUMP" version:current)
+RELEASE_DATE=$(date +%Y-%m-%d)
+RELEASE_BRANCH=release/$RELEASE_TAG
+
+echo "Current Version: $($MAGE version:current)"
+echo "$BUMP bump branch $MINOR_BRANCH to $RELEASE_TAG"
+
+echo "Checking out $RELEASE_BRANCH"
+git checkout -b "$RELEASE_BRANCH"
+
+echo "Pulling latest changes for submodules"
+$MAGE git:pullSubmodules
+
+if [[ ! -z "$(git diff --name-only data)" ]]; then
+  echo "Committing changes for updated submodules"
+  git add data
+  git commit -m "data: Update external repositories"
+fi
+
+echo "Updating CHANGELOG.md"
+
+# Take care of the [3.x.y] section
+cat CHANGELOG.md | tr '\n' '\000' `# First change newlines to \x00 so that sed can treat whole file as a stream of text` | \
+    sed 's/## [A-Z][a-z]*\x00\x00#/\x01\x00#/g' `# Then replace empty sections with \x01, we mark them for deletion later` | \
+    # The reason why we mark for deletion and then delete later is because otherwise there are issues when two consecutive sections are empty
+    sed 's/## \[Unreleased\]/## \[Unreleased\]\x00\x00### Added\x00\x00### Changed\x00\x00### Deprecated\x00\x00### Removed\x00\x00### Fixed\x00\x00### Security\x00\x00'"## \\[${RELEASE_TAG:1}\\] - ${RELEASE_DATE}"'/' `# Rename the "Unreleased" section to "Tag - Date", and add a new, empty one` | \
+    tr '\000' '\n' `# Change \x00 back to newlines` | \
+    sed '/\x01/d' `# Remove lines with \x01 (previously marked for deletion)` | \
+    sed "s/\[unreleased\]: https:\/\/github.com\/$(echo "${GITHUB_REPOSITORY}" | sed 's/\//\\\//g')\/compare\/\(v3\.[0-9][0-9]*\.[0-9][0-9]*\)\.\.\.\(v3\.[0-9][0-9]*\)/[unreleased]: https:\/\/github.com\/$(echo "${GITHUB_REPOSITORY}" | sed 's/\//\\\//g')\/compare\/${RELEASE_TAG}...${MINOR_BRANCH}\n[${RELEASE_TAG}]: https:\/\/github.com\/$(echo "${GITHUB_REPOSITORY}" | sed 's/\//\\\//g')\/compare\/\1...${RELEASE_TAG}/" > CHANGELOG2.md # Add new github diff link
+mv -f CHANGELOG2.md CHANGELOG.md
+git add CHANGELOG.md
+
+echo "Generating version files"
+$MAGE "$MAGE_BUMP" version:files
+
+echo "Committing version bump"
+$MAGE "$MAGE_BUMP" version:commitBump
+
+echo "Pushing ${RELEASE_BRANCH} to ${ORIGIN}"
+git push -u "$ORIGIN" "${RELEASE_BRANCH}:${RELEASE_BRANCH}"
+
+echo "Creating pull request for ${RELEASE_TAG} release"
+gh pr create \
+    --assignee "${GITHUB_ACTOR}" \
+    --base "${MINOR_BRANCH}" \
+    --body "This pull request prepares for the ${RELEASE_TAG} release." \
+    --head "${RELEASE_BRANCH}" \
+    --label "release" \
+    --milestone "${RELEASE_TAG}" \
+    --title "Release ${RELEASE_TAG}" \
+    --repo "${GITHUB_REPOSITORY}"
