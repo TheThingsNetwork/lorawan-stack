@@ -958,7 +958,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 				RequestPaths []*ttnpb.DownlinkPath
 			}
 			peerByIdx := map[uint]*Peer{}
-			peerByIDs := map[ttnpb.GatewayIdentifiers]*Peer{}
+			peerByIDs := map[string]*Peer{}
 			var expectedAttempts []ExpectedAttempt
 			for i, path := range downlinkPaths {
 				if len(conf.PeerIndexes) <= i || conf.PeerIndexes[i] == 0 {
@@ -975,7 +975,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 					}
 					peerByIdx[conf.PeerIndexes[i]] = peer
 				}
-				peerByIDs[*path.GatewayIdentifiers] = peer
+				peerByIDs[unique.ID(ctx, path.GatewayIdentifiers)] = peer
 				if len(expectedAttempts) == 0 || expectedAttempts[len(expectedAttempts)-1].PeerIndex != conf.PeerIndexes[i] {
 					expectedAttempts = append(expectedAttempts, ExpectedAttempt{
 						PeerIndex:    conf.PeerIndexes[i],
@@ -1020,7 +1020,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 						}, false
 					}
 					reqIDs = append(reqIDs, gtwIDs)
-					peer, ok := peerByIDs[*gtwIDs]
+					peer, ok := peerByIDs[unique.ID(ctx, gtwIDs)]
 					if !ok {
 						return test.ClusterGetPeerResponse{
 							Error: errPeerNotFound.New(),
