@@ -17,6 +17,7 @@ package joinserver
 import (
 	"context"
 
+	"github.com/gogo/protobuf/proto"
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoservices"
@@ -96,7 +97,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 	if err != nil {
 		return nil, err
 	}
-	if !dev.Ids.ApplicationIds.Equal(req.EndDeviceIds.ApplicationIds) {
+	if !proto.Equal(dev.Ids.ApplicationIds, req.EndDeviceIds.ApplicationIds) {
 		return nil, errDeviceNotFound.New()
 	}
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(),

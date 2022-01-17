@@ -20,6 +20,7 @@ import (
 	"runtime/trace"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/gogo/protobuf/proto"
 	"github.com/vmihailenco/msgpack/v5"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -955,7 +956,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 					storedPendingMACState := stored.GetPendingMacState()
 					return false, false, storedPendingMACState == nil ||
 						updated.PendingMacState.LorawanVersion != storedPendingMACState.LorawanVersion ||
-						!updated.PendingSession.Keys.FNwkSIntKey.Equal(storedPendingSession.Keys.FNwkSIntKey)
+						!proto.Equal(updated.PendingSession.Keys.FNwkSIntKey, storedPendingSession.Keys.FNwkSIntKey)
 				}()
 				if removeStored {
 					removeAddrMapping(ctx, p, PendingAddrKey(r.addrKey(storedPendingSession.DevAddr)), uid)
@@ -992,9 +993,9 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 					storedMACSettings := stored.GetMacSettings()
 					return false, false, storedMACState == nil ||
 						updated.MacState.LorawanVersion != storedMACState.LorawanVersion ||
-						!updated.Session.Keys.FNwkSIntKey.Equal(storedSession.Keys.FNwkSIntKey) ||
-						!updated.MacSettings.GetResetsFCnt().Equal(storedMACSettings.GetResetsFCnt()) ||
-						!updated.MacSettings.GetSupports_32BitFCnt().Equal(storedMACSettings.GetSupports_32BitFCnt())
+						!proto.Equal(updated.Session.Keys.FNwkSIntKey, storedSession.Keys.FNwkSIntKey) ||
+						!proto.Equal(updated.MacSettings.GetResetsFCnt(), storedMACSettings.GetResetsFCnt()) ||
+						!proto.Equal(updated.MacSettings.GetSupports_32BitFCnt(), storedMACSettings.GetSupports_32BitFCnt())
 				}()
 				if removeStored {
 					removeAddrMapping(ctx, p, CurrentAddrKey(r.addrKey(storedSession.DevAddr)), uid)

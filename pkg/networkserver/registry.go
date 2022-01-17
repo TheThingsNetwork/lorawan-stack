@@ -17,6 +17,7 @@ package networkserver
 import (
 	"context"
 
+	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/internal/registry"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -247,7 +248,7 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 					return errInvalidFieldValue.WithAttributes("field", "queued_application_downlinks")
 				}
 				for i := 0; i < n; i++ {
-					if !oldValue[i].Equal(newValue[i]) {
+					if !proto.Equal(oldValue[i], newValue[i]) {
 						return errInvalidFieldValue.WithAttributes("field", "queued_application_downlinks")
 					}
 				}

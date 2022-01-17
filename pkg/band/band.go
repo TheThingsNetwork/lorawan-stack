@@ -18,6 +18,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/gogo/protobuf/proto"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -132,7 +133,7 @@ func (b Band) FindUplinkDataRate(dr *ttnpb.DataRate) (ttnpb.DataRateIndex, DataR
 		// NOTE(2): A more robust solution could be to record a list of uplink-only data rates
 		// per band and only match those here, however it is more complex and is not necessary.
 		bDR, ok := b.DataRates[i]
-		if ok && bDR.Rate.Equal(dr) {
+		if ok && proto.Equal(bDR.Rate, dr) {
 			return i, bDR, true
 		}
 	}
@@ -147,7 +148,7 @@ func (b Band) FindDownlinkDataRate(dr *ttnpb.DataRate) (ttnpb.DataRateIndex, Dat
 	// NOTE: See notes in FindUplinkDataRate explaining the order of scanning data rates.
 	for i := ttnpb.DATA_RATE_15; i >= ttnpb.DATA_RATE_0; i-- {
 		bDR, ok := b.DataRates[i]
-		if ok && bDR.Rate.Equal(dr) {
+		if ok && proto.Equal(bDR.Rate, dr) {
 			return i, bDR, true
 		}
 	}
