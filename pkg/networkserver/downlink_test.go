@@ -2392,6 +2392,15 @@ func TestProcessDownlinkTask(t *testing.T) {
 					QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
 						Keys:    sessionKeys,
 						Payload: joinAcceptBytes,
+						Request: &ttnpb.MACState_JoinRequest{
+							DownlinkSettings: &ttnpb.DLSettings{
+								Rx1DrOffset: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B).Rx1DataRateOffset,
+								Rx2Dr:       makeEU868macParameters(ttnpb.RP001_V1_1_REV_B).Rx2DataRateIndex,
+								OptNeg:      true,
+							},
+							RxDelay: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B).Rx1Delay,
+							CfList:  frequencyplans.CFList(*test.FrequencyPlan(test.EUFrequencyPlanID), ttnpb.RP001_V1_1_REV_B),
+						},
 						DevAddr: test.DefaultDevAddr,
 					},
 					RxWindowsAvailable: true,
