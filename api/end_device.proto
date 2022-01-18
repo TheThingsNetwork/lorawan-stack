@@ -166,13 +166,13 @@ message EndDeviceVersion {
   bool resets_join_nonces = 12;
 
   // Default formatters defining the payload formats for this end device.
-  MessagePayloadFormatters default_formatters = 13 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  MessagePayloadFormatters default_formatters = 13 [(validate.rules).message.required = true];
 }
 
 message MACSettings {
   // Maximum delay for the device to answer a MAC request or a confirmed downlink frame.
   // If unset, the default value from Network Server configuration will be used.
-  google.protobuf.Duration class_b_timeout = 1 [(gogoproto.stdduration) = true];
+  google.protobuf.Duration class_b_timeout = 1;
   // Periodicity of the class B ping slot.
   // If unset, the default value from Network Server configuration will be used.
   PingSlotPeriodValue ping_slot_periodicity = 2;
@@ -188,7 +188,7 @@ message MACSettings {
 
   // Maximum delay for the device to answer a MAC request or a confirmed downlink frame.
   // If unset, the default value from Network Server configuration will be used.
-  google.protobuf.Duration class_c_timeout = 5 [(gogoproto.stdduration) = true];
+  google.protobuf.Duration class_c_timeout = 5;
 
   // Class A Rx1 delay.
   // If unset, the default value from Network Server configuration or regional parameters specification will be used.
@@ -225,7 +225,7 @@ message MACSettings {
   BoolValue resets_f_cnt = 15;
   // The interval after which a DevStatusReq MACCommand shall be sent.
   // If unset, the default value from Network Server configuration will be used.
-  google.protobuf.Duration status_time_periodicity = 16 [(gogoproto.stdduration) = true];
+  google.protobuf.Duration status_time_periodicity = 16;
   // Number of uplink messages after which a DevStatusReq MACCommand shall be sent.
   // If unset, the default value from Network Server configuration will be used.
   google.protobuf.UInt32Value status_count_periodicity = 17;
@@ -267,7 +267,7 @@ message MACSettings {
   // If unset, the default value from regional parameters specification will be used.
   DeviceEIRPValue desired_max_eirp = 30;
   // The minimum duration passed before a network-initiated(e.g. Class B or C) downlink following an arbitrary downlink.
-  google.protobuf.Duration class_b_c_downlink_interval = 31 [(gogoproto.stdduration) = true];
+  google.protobuf.Duration class_b_c_downlink_interval = 31;
 }
 
 // MACState represents the state of MAC layer of the device.
@@ -303,16 +303,16 @@ message MACState {
 
   message JoinRequest {
     reserved 1,2,3,4,5,9,10; // deprecated JoinRequest fields.
-    DLSettings downlink_settings = 6 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+    DLSettings downlink_settings = 6 [(validate.rules).message.required = true];
     RxDelay rx_delay = 7 [(validate.rules).enum.defined_only = true];
     CFList cf_list = 8;
   }
   message JoinAccept {
     // Payload of the join-accept received from Join Server.
     bytes payload = 1 [(validate.rules).bytes = {min_len: 17, max_len: 33}];
-    JoinRequest request = 2 [(gogoproto.nullable) = false];
+    JoinRequest request = 2 [(validate.rules).message.required = true];
     // Network session keys associated with the join.
-    SessionKeys keys = 3 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+    SessionKeys keys = 3 [(validate.rules).message.required = true];
     repeated string correlation_ids = 4 [(validate.rules).repeated.items.string.max_len = 100];
     bytes dev_addr = 5 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.DevAddr"];
     bytes net_id = 6 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];

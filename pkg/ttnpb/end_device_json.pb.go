@@ -536,7 +536,7 @@ func (x *EndDeviceVersion) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("resets_join_nonces")
 		s.WriteBool(x.ResetsJoinNonces)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.DefaultFormatters != nil || s.HasField("default_formatters") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("default_formatters")
 		x.DefaultFormatters.MarshalProtoJSON(s.WithField("default_formatters"))
@@ -596,6 +596,7 @@ func (x *EndDeviceVersion) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.ResetsJoinNonces = s.ReadBool()
 		case "default_formatters", "defaultFormatters":
 			if !s.ReadNil() {
+				x.DefaultFormatters = &MessagePayloadFormatters{}
 				x.DefaultFormatters.UnmarshalProtoJSON(s.WithField("default_formatters", true))
 			}
 		}
@@ -616,7 +617,7 @@ func (x *MACSettings) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ClassBTimeout == nil {
 			s.WriteNil()
 		} else {
-			s.WriteDuration(*x.ClassBTimeout)
+			gogo.MarshalDuration(s, x.ClassBTimeout)
 		}
 	}
 	if x.PingSlotPeriodicity != nil || s.HasField("ping_slot_periodicity") {
@@ -645,7 +646,7 @@ func (x *MACSettings) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ClassCTimeout == nil {
 			s.WriteNil()
 		} else {
-			s.WriteDuration(*x.ClassCTimeout)
+			gogo.MarshalDuration(s, x.ClassCTimeout)
 		}
 	}
 	if x.Rx1Delay != nil || s.HasField("rx1_delay") {
@@ -708,7 +709,7 @@ func (x *MACSettings) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.StatusTimePeriodicity == nil {
 			s.WriteNil()
 		} else {
-			s.WriteDuration(*x.StatusTimePeriodicity)
+			gogo.MarshalDuration(s, x.StatusTimePeriodicity)
 		}
 	}
 	if x.StatusCountPeriodicity != nil || s.HasField("status_count_periodicity") {
@@ -781,7 +782,7 @@ func (x *MACSettings) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		if x.ClassBCDownlinkInterval == nil {
 			s.WriteNil()
 		} else {
-			s.WriteDuration(*x.ClassBCDownlinkInterval)
+			gogo.MarshalDuration(s, x.ClassBCDownlinkInterval)
 		}
 	}
 	s.WriteObjectEnd()
@@ -798,7 +799,7 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			s.ReadAny() // ignore unknown field
 		case "class_b_timeout", "classBTimeout":
 			s.AddField("class_b_timeout")
-			v := s.ReadDuration()
+			v := gogo.UnmarshalDuration(s)
 			if s.Err() != nil {
 				return
 			}
@@ -829,7 +830,7 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 		case "class_c_timeout", "classCTimeout":
 			s.AddField("class_c_timeout")
-			v := s.ReadDuration()
+			v := gogo.UnmarshalDuration(s)
 			if s.Err() != nil {
 				return
 			}
@@ -896,7 +897,7 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 		case "status_time_periodicity", "statusTimePeriodicity":
 			s.AddField("status_time_periodicity")
-			v := s.ReadDuration()
+			v := gogo.UnmarshalDuration(s)
 			if s.Err() != nil {
 				return
 			}
@@ -978,7 +979,7 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 		case "class_b_c_downlink_interval", "classBCDownlinkInterval":
 			s.AddField("class_b_c_downlink_interval")
-			v := s.ReadDuration()
+			v := gogo.UnmarshalDuration(s)
 			if s.Err() != nil {
 				return
 			}
@@ -995,7 +996,7 @@ func (x *MACState_JoinRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.DownlinkSettings != nil || s.HasField("downlink_settings") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("downlink_settings")
 		x.DownlinkSettings.MarshalProtoJSON(s.WithField("downlink_settings"))
@@ -1024,6 +1025,7 @@ func (x *MACState_JoinRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 			s.ReadAny() // ignore unknown field
 		case "downlink_settings", "downlinkSettings":
 			if !s.ReadNil() {
+				x.DownlinkSettings = &DLSettings{}
 				x.DownlinkSettings.UnmarshalProtoJSON(s.WithField("downlink_settings", true))
 			}
 		case "rx_delay", "rxDelay":
@@ -1051,16 +1053,16 @@ func (x *MACState_JoinAccept) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("payload")
 		s.WriteBytes(x.Payload)
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.Request != nil || s.HasField("request") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("request")
 		x.Request.MarshalProtoJSON(s.WithField("request"))
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.Keys != nil || s.HasField("keys") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("keys")
 		// NOTE: SessionKeys does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.Keys)
+		gogo.MarshalMessage(s, x.Keys)
 	}
 	if len(x.CorrelationIds) > 0 || s.HasField("correlation_ids") {
 		s.WriteMoreIf(&wroteField)
@@ -1094,6 +1096,7 @@ func (x *MACState_JoinAccept) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Payload = s.ReadBytes()
 		case "request":
 			if !s.ReadNil() {
+				x.Request = &MACState_JoinRequest{}
 				x.Request.UnmarshalProtoJSON(s.WithField("request", true))
 			}
 		case "keys":
@@ -1101,7 +1104,7 @@ func (x *MACState_JoinAccept) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			// NOTE: SessionKeys does not seem to implement UnmarshalProtoJSON.
 			var v SessionKeys
 			gogo.UnmarshalMessage(s, &v)
-			x.Keys = v
+			x.Keys = &v
 		case "correlation_ids", "correlationIds":
 			s.AddField("correlation_ids")
 			x.CorrelationIds = s.ReadStringArray()

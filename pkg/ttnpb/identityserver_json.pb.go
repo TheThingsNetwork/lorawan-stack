@@ -24,11 +24,11 @@ func (x *AuthInfoResponse_APIKeyAccess) MarshalProtoJSON(s *jsonplugin.MarshalSt
 		s.WriteObjectField("api_key")
 		x.ApiKey.MarshalProtoJSON(s.WithField("api_key"))
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.EntityIds != nil || s.HasField("entity_ids") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("entity_ids")
 		// NOTE: EntityIdentifiers does not seem to implement MarshalProtoJSON.
-		gogo.MarshalMessage(s, &x.EntityIds)
+		gogo.MarshalMessage(s, x.EntityIds)
 	}
 	s.WriteObjectEnd()
 }
@@ -52,7 +52,7 @@ func (x *AuthInfoResponse_APIKeyAccess) UnmarshalProtoJSON(s *jsonplugin.Unmarsh
 			// NOTE: EntityIdentifiers does not seem to implement UnmarshalProtoJSON.
 			var v EntityIdentifiers
 			gogo.UnmarshalMessage(s, &v)
-			x.EntityIds = v
+			x.EntityIds = &v
 		}
 	})
 }

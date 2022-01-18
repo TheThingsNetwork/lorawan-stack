@@ -226,7 +226,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DevAddr:        &devAddr,
 				},
 				MacSettings: &ttnpb.MACSettings{
-					StatusTimePeriodicity: DurationPtr(24 * time.Hour),
+					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(24 * time.Hour),
 				},
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
@@ -985,7 +985,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DevAddr:        &devAddr,
 				},
 				MacSettings: &ttnpb.MACSettings{
-					StatusTimePeriodicity: DurationPtr(time.Nanosecond),
+					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Nanosecond),
 				},
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
@@ -1058,7 +1058,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DevAddr:        &devAddr,
 					},
 					MacSettings: &ttnpb.MACSettings{
-						StatusTimePeriodicity: DurationPtr(time.Nanosecond),
+						StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Nanosecond),
 					},
 					MacState: &ttnpb.MACState{
 						LorawanVersion: ttnpb.MAC_V1_1,
@@ -1130,7 +1130,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					Component: c,
 					ctx:       ctx,
 					defaultMACSettings: ttnpb.MACSettings{
-						StatusTimePeriodicity:  DurationPtr(0),
+						StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
 					},
 				}

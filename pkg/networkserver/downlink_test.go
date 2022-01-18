@@ -506,7 +506,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					},
 				},
 				MacSettings: &ttnpb.MACSettings{
-					StatusTimePeriodicity:  DurationPtr(0),
+					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
 				},
 				Session: &ttnpb.Session{
@@ -556,7 +556,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				},
 				MacSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
-					StatusTimePeriodicity:  DurationPtr(0),
+					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
@@ -605,7 +605,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				},
 				MacSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
-					StatusTimePeriodicity:  DurationPtr(0),
+					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
@@ -690,7 +690,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				},
 				MacSettings: &ttnpb.MACSettings{
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
-					StatusTimePeriodicity:  DurationPtr(0),
+					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				Session: &ttnpb.Session{
 					DevAddr:       test.DefaultDevAddr,
@@ -1363,7 +1363,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassBTimeout: DurationPtr(42 * time.Second),
+					ClassBTimeout: ttnpb.ProtoDurationPtr(42 * time.Second),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters:   makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -1509,7 +1509,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout: DurationPtr(42 * time.Second),
+					ClassCTimeout: ttnpb.ProtoDurationPtr(42 * time.Second),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -1672,7 +1672,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout: DurationPtr(42 * time.Second),
+					ClassCTimeout: ttnpb.ProtoDurationPtr(42 * time.Second),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -1809,8 +1809,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(now),
 				LorawanPhyVersion:       ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout:         DurationPtr(42 * time.Second),
-					StatusTimePeriodicity: DurationPtr(time.Hour),
+					ClassCTimeout:         ttnpb.ProtoDurationPtr(42 * time.Second),
+					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Hour),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -1948,7 +1948,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout: DurationPtr(42 * time.Second),
+					ClassCTimeout: ttnpb.ProtoDurationPtr(42 * time.Second),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -2108,7 +2108,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout: DurationPtr(42 * time.Second),
+					ClassCTimeout: ttnpb.ProtoDurationPtr(42 * time.Second),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -2248,9 +2248,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout:          DurationPtr(42 * time.Second),
+					ClassCTimeout:          ttnpb.ProtoDurationPtr(42 * time.Second),
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
-					StatusTimePeriodicity:  DurationPtr(0),
+					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -2310,9 +2310,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
-					ClassCTimeout:          DurationPtr(42 * time.Second),
+					ClassCTimeout:          ttnpb.ProtoDurationPtr(42 * time.Second),
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
-					StatusTimePeriodicity:  DurationPtr(0),
+					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
@@ -2390,8 +2390,17 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DeviceClass:       ttnpb.CLASS_A,
 					LorawanVersion:    ttnpb.MAC_V1_1,
 					QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
-						Keys:    *sessionKeys,
+						Keys:    sessionKeys,
 						Payload: joinAcceptBytes,
+						Request: &ttnpb.MACState_JoinRequest{
+							DownlinkSettings: &ttnpb.DLSettings{
+								Rx1DrOffset: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B).Rx1DataRateOffset,
+								Rx2Dr:       makeEU868macParameters(ttnpb.RP001_V1_1_REV_B).Rx2DataRateIndex,
+								OptNeg:      true,
+							},
+							RxDelay: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B).Rx1Delay,
+							CfList:  frequencyplans.CFList(*test.FrequencyPlan(test.EUFrequencyPlanID), ttnpb.RP001_V1_1_REV_B),
+						},
 						DevAddr: test.DefaultDevAddr,
 					},
 					RxWindowsAvailable: true,
@@ -2473,10 +2482,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DeviceDiffs: []DeviceDiffFunc{
 				func(ctx context.Context, expected, created, updated *ttnpb.EndDevice, down *ttnpb.DownlinkMessage, downAt time.Time) bool {
 					expected.PendingMacState.RxWindowsAvailable = false
-					expected.PendingMacState.PendingJoinRequest = &created.PendingMacState.QueuedJoinAccept.Request
+					expected.PendingMacState.PendingJoinRequest = created.PendingMacState.QueuedJoinAccept.Request
 					expected.PendingSession = &ttnpb.Session{
 						DevAddr: created.PendingMacState.QueuedJoinAccept.DevAddr,
-						Keys:    &created.PendingMacState.QueuedJoinAccept.Keys,
+						Keys:    created.PendingMacState.QueuedJoinAccept.Keys,
 					}
 					expected.PendingMacState.QueuedJoinAccept = nil
 					expected.PendingMacState.RecentDownlinks = AppendRecentDownlink(expected.PendingMacState.RecentDownlinks, down, RecentDownlinkCount)
@@ -2622,7 +2631,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
 									NetId:      created.PendingMacState.QueuedJoinAccept.NetId,
 									DevAddr:    created.PendingMacState.QueuedJoinAccept.DevAddr,
-									DlSettings: &created.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
+									DlSettings: created.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
 									RxDelay:    created.PendingMacState.QueuedJoinAccept.Request.RxDelay,
 									CfList:     created.PendingMacState.QueuedJoinAccept.Request.CfList,
 								},

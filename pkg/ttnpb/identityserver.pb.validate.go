@@ -511,7 +511,14 @@ func (m *AuthInfoResponse_APIKeyAccess) ValidateFields(paths ...string) error {
 
 		case "entity_ids":
 
-			if v, ok := interface{}(&m.EntityIds).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetEntityIds() == nil {
+				return AuthInfoResponse_APIKeyAccessValidationError{
+					field:  "entity_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetEntityIds()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return AuthInfoResponse_APIKeyAccessValidationError{
 						field:  "entity_ids",

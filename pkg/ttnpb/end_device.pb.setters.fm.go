@@ -592,10 +592,18 @@ func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) e
 		case "default_formatters":
 			if len(subs) > 0 {
 				var newDst, newSrc *MessagePayloadFormatters
-				if src != nil {
-					newSrc = &src.DefaultFormatters
+				if (src == nil || src.DefaultFormatters == nil) && dst.DefaultFormatters == nil {
+					continue
 				}
-				newDst = &dst.DefaultFormatters
+				if src != nil {
+					newSrc = src.DefaultFormatters
+				}
+				if dst.DefaultFormatters != nil {
+					newDst = dst.DefaultFormatters
+				} else {
+					newDst = &MessagePayloadFormatters{}
+					dst.DefaultFormatters = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -603,8 +611,7 @@ func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) e
 				if src != nil {
 					dst.DefaultFormatters = src.DefaultFormatters
 				} else {
-					var zero MessagePayloadFormatters
-					dst.DefaultFormatters = zero
+					dst.DefaultFormatters = nil
 				}
 			}
 
@@ -2819,10 +2826,18 @@ func (dst *MACState_JoinRequest) SetFields(src *MACState_JoinRequest, paths ...s
 		case "downlink_settings":
 			if len(subs) > 0 {
 				var newDst, newSrc *DLSettings
-				if src != nil {
-					newSrc = &src.DownlinkSettings
+				if (src == nil || src.DownlinkSettings == nil) && dst.DownlinkSettings == nil {
+					continue
 				}
-				newDst = &dst.DownlinkSettings
+				if src != nil {
+					newSrc = src.DownlinkSettings
+				}
+				if dst.DownlinkSettings != nil {
+					newDst = dst.DownlinkSettings
+				} else {
+					newDst = &DLSettings{}
+					dst.DownlinkSettings = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -2830,8 +2845,7 @@ func (dst *MACState_JoinRequest) SetFields(src *MACState_JoinRequest, paths ...s
 				if src != nil {
 					dst.DownlinkSettings = src.DownlinkSettings
 				} else {
-					var zero DLSettings
-					dst.DownlinkSettings = zero
+					dst.DownlinkSettings = nil
 				}
 			}
 		case "rx_delay":
@@ -2892,10 +2906,18 @@ func (dst *MACState_JoinAccept) SetFields(src *MACState_JoinAccept, paths ...str
 		case "request":
 			if len(subs) > 0 {
 				var newDst, newSrc *MACState_JoinRequest
-				if src != nil {
-					newSrc = &src.Request
+				if (src == nil || src.Request == nil) && dst.Request == nil {
+					continue
 				}
-				newDst = &dst.Request
+				if src != nil {
+					newSrc = src.Request
+				}
+				if dst.Request != nil {
+					newDst = dst.Request
+				} else {
+					newDst = &MACState_JoinRequest{}
+					dst.Request = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -2903,17 +2925,24 @@ func (dst *MACState_JoinAccept) SetFields(src *MACState_JoinAccept, paths ...str
 				if src != nil {
 					dst.Request = src.Request
 				} else {
-					var zero MACState_JoinRequest
-					dst.Request = zero
+					dst.Request = nil
 				}
 			}
 		case "keys":
 			if len(subs) > 0 {
 				var newDst, newSrc *SessionKeys
-				if src != nil {
-					newSrc = &src.Keys
+				if (src == nil || src.Keys == nil) && dst.Keys == nil {
+					continue
 				}
-				newDst = &dst.Keys
+				if src != nil {
+					newSrc = src.Keys
+				}
+				if dst.Keys != nil {
+					newDst = dst.Keys
+				} else {
+					newDst = &SessionKeys{}
+					dst.Keys = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -2921,8 +2950,7 @@ func (dst *MACState_JoinAccept) SetFields(src *MACState_JoinAccept, paths ...str
 				if src != nil {
 					dst.Keys = src.Keys
 				} else {
-					var zero SessionKeys
-					dst.Keys = zero
+					dst.Keys = nil
 				}
 			}
 		case "correlation_ids":

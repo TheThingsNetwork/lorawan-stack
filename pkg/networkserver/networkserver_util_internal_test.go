@@ -1190,7 +1190,7 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 								JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
 									NetId:      dev.PendingMacState.QueuedJoinAccept.NetId,
 									DevAddr:    dev.PendingMacState.QueuedJoinAccept.DevAddr,
-									DlSettings: &dev.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
+									DlSettings: dev.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
 									RxDelay:    dev.PendingMacState.QueuedJoinAccept.Request.RxDelay,
 									CfList:     dev.PendingMacState.QueuedJoinAccept.Request.CfList,
 								},
@@ -1210,9 +1210,9 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 			)
 			dev.PendingSession = &ttnpb.Session{
 				DevAddr: dev.PendingMacState.QueuedJoinAccept.DevAddr,
-				Keys:    &dev.PendingMacState.QueuedJoinAccept.Keys,
+				Keys:    dev.PendingMacState.QueuedJoinAccept.Keys,
 			}
-			dev.PendingMacState.PendingJoinRequest = &dev.PendingMacState.QueuedJoinAccept.Request
+			dev.PendingMacState.PendingJoinRequest = dev.PendingMacState.QueuedJoinAccept.Request
 			dev.PendingMacState.QueuedJoinAccept = nil
 			dev.PendingMacState.RxWindowsAvailable = false
 			dev.PendingMacState.RecentDownlinks = AppendRecentDownlink(dev.PendingMacState.RecentDownlinks, scheduledDown, RecentDownlinkCount)
@@ -1625,13 +1625,13 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					Payload: joinResp.RawPayload,
 					DevAddr: joinReq.DevAddr,
 					NetId:   joinReq.NetId,
-					Request: ttnpb.MACState_JoinRequest{
-						DownlinkSettings: *joinReq.DownlinkSettings,
+					Request: &ttnpb.MACState_JoinRequest{
+						DownlinkSettings: joinReq.DownlinkSettings,
 						RxDelay:          joinReq.RxDelay,
 						CfList:           joinReq.CfList,
 					},
-					Keys: func() ttnpb.SessionKeys {
-						keys := ttnpb.SessionKeys{
+					Keys: func() *ttnpb.SessionKeys {
+						keys := &ttnpb.SessionKeys{
 							SessionKeyId: joinResp.SessionKeys.SessionKeyId,
 							FNwkSIntKey:  joinResp.SessionKeys.FNwkSIntKey,
 							NwkSEncKey:   joinResp.SessionKeys.NwkSEncKey,
@@ -2128,8 +2128,8 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 		)
 		return o.WithPendingMacState(MACStatePtr(MACStateOptions.WithQueuedJoinAccept(&ttnpb.MACState_JoinAccept{
 			Payload: bytes.Repeat([]byte{0xff}, 17),
-			Request: ttnpb.MACState_JoinRequest{
-				DownlinkSettings: ttnpb.DLSettings{
+			Request: &ttnpb.MACState_JoinRequest{
+				DownlinkSettings: &ttnpb.DLSettings{
 					Rx1DrOffset: macState.DesiredParameters.Rx1DataRateOffset,
 					Rx2Dr:       macState.DesiredParameters.Rx2DataRateIndex,
 					OptNeg:      x.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0,
@@ -2137,7 +2137,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 				RxDelay: macState.DesiredParameters.Rx1Delay,
 				CfList:  frequencyplans.CFList(*test.FrequencyPlan(x.FrequencyPlanId), x.LorawanPhyVersion),
 			},
-			Keys:           *MakeSessionKeys(x.LorawanVersion, wrapKeys, true),
+			Keys:           MakeSessionKeys(x.LorawanVersion, wrapKeys, true),
 			DevAddr:        test.DefaultDevAddr,
 			NetId:          test.DefaultNetID,
 			CorrelationIds: []string{"join-request"},
@@ -2164,7 +2164,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 				},
 			}),
 			o.WithPendingMACStateOptions(
-				MACStateOptions.WithPendingJoinRequest(&x.PendingMacState.QueuedJoinAccept.Request),
+				MACStateOptions.WithPendingJoinRequest(x.PendingMacState.QueuedJoinAccept.Request),
 				MACStateOptions.WithQueuedJoinAccept(nil),
 				MACStateOptions.WithRxWindowsAvailable(false),
 				MACStateOptions.AppendRecentDownlinks(&ttnpb.DownlinkMessage{
@@ -2178,7 +2178,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 							JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
 								NetId:      x.PendingMacState.QueuedJoinAccept.NetId,
 								DevAddr:    x.PendingMacState.QueuedJoinAccept.DevAddr,
-								DlSettings: &x.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
+								DlSettings: x.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
 								RxDelay:    x.PendingMacState.QueuedJoinAccept.Request.RxDelay,
 								CfList:     x.PendingMacState.QueuedJoinAccept.Request.CfList,
 							},

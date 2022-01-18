@@ -628,7 +628,14 @@ func (m *EndDeviceVersion) ValidateFields(paths ...string) error {
 			// no validation rules for ResetsJoinNonces
 		case "default_formatters":
 
-			if v, ok := interface{}(&m.DefaultFormatters).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetDefaultFormatters() == nil {
+				return EndDeviceVersionValidationError{
+					field:  "default_formatters",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetDefaultFormatters()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return EndDeviceVersionValidationError{
 						field:  "default_formatters",
@@ -3704,7 +3711,14 @@ func (m *MACState_JoinRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "downlink_settings":
 
-			if v, ok := interface{}(&m.DownlinkSettings).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetDownlinkSettings() == nil {
+				return MACState_JoinRequestValidationError{
+					field:  "downlink_settings",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetDownlinkSettings()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACState_JoinRequestValidationError{
 						field:  "downlink_settings",
@@ -3827,7 +3841,14 @@ func (m *MACState_JoinAccept) ValidateFields(paths ...string) error {
 
 		case "request":
 
-			if v, ok := interface{}(&m.Request).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetRequest() == nil {
+				return MACState_JoinAcceptValidationError{
+					field:  "request",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetRequest()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACState_JoinAcceptValidationError{
 						field:  "request",
@@ -3839,7 +3860,14 @@ func (m *MACState_JoinAccept) ValidateFields(paths ...string) error {
 
 		case "keys":
 
-			if v, ok := interface{}(&m.Keys).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetKeys() == nil {
+				return MACState_JoinAcceptValidationError{
+					field:  "keys",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetKeys()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACState_JoinAcceptValidationError{
 						field:  "keys",

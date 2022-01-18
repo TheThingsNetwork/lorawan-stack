@@ -24,7 +24,6 @@ import (
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
-	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -87,7 +86,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 					StatusCountPeriodicity: &pbtypes.UInt32Value{
 						Value: 1000,
 					},
-					StatusTimePeriodicity: DurationPtr(time.Hour),
+					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Hour),
 				},
 				MacState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 1,
@@ -105,7 +104,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 					StatusCountPeriodicity: &pbtypes.UInt32Value{
 						Value: 1000,
 					},
-					StatusTimePeriodicity: DurationPtr(time.Hour),
+					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Hour),
 				},
 				MacState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 1,
@@ -123,7 +122,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 					StatusCountPeriodicity: &pbtypes.UInt32Value{
 						Value: 1000,
 					},
-					StatusTimePeriodicity: DurationPtr(time.Hour),
+					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Hour),
 				},
 				MacState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 1,
@@ -142,7 +141,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 					StatusCountPeriodicity: &pbtypes.UInt32Value{
 						Value: 1000,
 					},
-					StatusTimePeriodicity: DurationPtr(time.Hour),
+					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Hour),
 				},
 				MacState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 1,

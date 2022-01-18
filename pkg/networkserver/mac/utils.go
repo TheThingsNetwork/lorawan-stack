@@ -68,10 +68,10 @@ const DefaultClassBTimeout = 10 * time.Minute
 
 func DeviceClassBTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
 	if t := dev.GetMacSettings().GetClassBTimeout(); t != nil {
-		return *t
+		return ttnpb.StdDurationOrZero(t)
 	}
 	if defaults.ClassBTimeout != nil {
-		return *defaults.ClassBTimeout
+		return ttnpb.StdDurationOrZero(defaults.ClassBTimeout)
 	}
 	return DefaultClassBTimeout
 }
@@ -82,10 +82,10 @@ const DefaultClassCTimeout = 5 * time.Minute
 
 func DeviceClassCTimeout(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
 	if t := dev.GetMacSettings().GetClassCTimeout(); t != nil {
-		return *t
+		return ttnpb.StdDurationOrZero(t)
 	}
 	if defaults.ClassCTimeout != nil {
-		return *defaults.ClassCTimeout
+		return ttnpb.StdDurationOrZero(defaults.ClassCTimeout)
 	}
 	return DefaultClassCTimeout
 }
@@ -575,10 +575,10 @@ const defaultClassBCDownlinkInterval = time.Second
 
 func DeviceClassBCDownlinkInterval(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
 	if t := dev.GetMacSettings().GetClassBCDownlinkInterval(); t != nil {
-		return *t
+		return ttnpb.StdDurationOrZero(t)
 	}
 	if t := defaults.GetClassBCDownlinkInterval(); t != nil {
-		return *t
+		return ttnpb.StdDurationOrZero(t)
 	}
 	return defaultClassBCDownlinkInterval
 }

@@ -1742,7 +1742,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 									JoinAcceptPayload: &ttnpb.JoinAcceptPayload{
 										NetId:      dev.PendingMacState.QueuedJoinAccept.NetId,
 										DevAddr:    dev.PendingMacState.QueuedJoinAccept.DevAddr,
-										DlSettings: &dev.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
+										DlSettings: dev.PendingMacState.QueuedJoinAccept.Request.DownlinkSettings,
 										RxDelay:    dev.PendingMacState.QueuedJoinAccept.Request.RxDelay,
 										CfList:     dev.PendingMacState.QueuedJoinAccept.Request.CfList,
 									},
@@ -1801,7 +1801,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 						},
 						QueuedApplicationDownlinks: nil,
 					}
-					dev.PendingMacState.PendingJoinRequest = &dev.PendingMacState.QueuedJoinAccept.Request
+					dev.PendingMacState.PendingJoinRequest = dev.PendingMacState.QueuedJoinAccept.Request
 					dev.PendingMacState.QueuedJoinAccept = nil
 					dev.PendingMacState.RxWindowsAvailable = false
 					dev.PendingMacState.RecentDownlinks = appendRecentDownlink(dev.PendingMacState.RecentDownlinks, &ttnpb.DownlinkMessage{

@@ -241,11 +241,11 @@ func unwrapSelectedSessionKeys(ctx context.Context, kv crypto.KeyVault, dev *ttn
 		"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key",
 		"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key",
 	) {
-		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, kv, &dev.PendingMacState.QueuedJoinAccept.Keys, "pending_mac_state.queued_join_accept.keys", paths...)
+		sk, err := cryptoutil.UnwrapSelectedSessionKeys(ctx, kv, dev.PendingMacState.QueuedJoinAccept.Keys, "pending_mac_state.queued_join_accept.keys", paths...)
 		if err != nil {
 			return err
 		}
-		dev.PendingMacState.QueuedJoinAccept.Keys = *sk
+		dev.PendingMacState.QueuedJoinAccept.Keys = sk
 	}
 	return nil
 }
