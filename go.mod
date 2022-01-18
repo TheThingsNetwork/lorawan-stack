@@ -40,7 +40,7 @@ require (
 	github.com/Azure/go-autorest/autorest v0.11.23
 	github.com/Azure/go-autorest/autorest/adal v0.9.18
 	github.com/TheThingsIndustries/mystique v0.0.0-20211230093812-d4088bd06959
-	github.com/TheThingsIndustries/protoc-gen-go-json v1.1.3
+	github.com/TheThingsIndustries/protoc-gen-go-json v1.3.0
 	github.com/TheThingsNetwork/go-cayenne-lib v1.1.0
 	github.com/aws/aws-sdk-go v1.42.25
 	github.com/blang/semver v3.5.1+incompatible
@@ -165,7 +165,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.2.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/uuid v1.3.0 // indirect
+	github.com/google/uuid v1.3.0
 	github.com/google/wire v0.5.0 // indirect
 	github.com/googleapis/gax-go v2.0.2+incompatible // indirect
 	github.com/googleapis/gax-go/v2 v2.1.1 // indirect
