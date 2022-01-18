@@ -3460,6 +3460,7 @@ This is used internally by the Network Server.
 | Field | Validations |
 | ----- | ----------- |
 | `payload` | <p>`bytes.min_len`: `17`</p><p>`bytes.max_len`: `33`</p> |
+| `request` | <p>`message.required`: `true`</p> |
 | `keys` | <p>`message.required`: `true`</p> |
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
 
