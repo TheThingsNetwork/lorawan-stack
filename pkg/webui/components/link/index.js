@@ -176,7 +176,7 @@ const DocLink = props => {
       title={formattedTitle}
       id={id}
       href={link}
-      target="blank"
+      target="_blank"
       name={name}
       onClick={onClick}
       tabIndex={tabIndex}
@@ -289,7 +289,7 @@ const AnchorLink = props => {
       title={formattedTitle}
       id={id}
       href={href}
-      target={external ? 'blank' : target}
+      target={external ? '_blank' : target}
       name={name}
     >
       {children}
