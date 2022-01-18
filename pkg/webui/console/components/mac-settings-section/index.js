@@ -125,12 +125,14 @@ const MacSettingsSection = props => {
     isClassB,
     isClassC,
     isUseAdr,
+    initialValues,
   } = props
 
   const isNewLorawanVersion = parseLorawanMacVersion(lorawanVersion) >= 110
   const isABP = activationMode === ACTIVATION_MODES.ABP
   const isMulticast = activationMode === ACTIVATION_MODES.MULTICAST
   const isOTAA = activationMode === ACTIVATION_MODES.OTAA
+  const toEnableClassB = isClassB && !initialValues.mac_settings.ping_slot_frequency
 
   const [resetsFCnt, setResetsFCnt] = React.useState(isABP && initialFCnt)
   const handleResetsFCntChange = React.useCallback(evt => {
@@ -390,7 +392,7 @@ const MacSettingsSection = props => {
             />
           </Form.FieldContainer>
           <Form.FieldContainer horizontal>
-            {!isOTAA && (
+            {(!isOTAA || toEnableClassB) && (
               <Form.Field
                 type="number"
                 min={100000}
@@ -501,6 +503,11 @@ const MacSettingsSection = props => {
 
 MacSettingsSection.propTypes = {
   activationMode: PropTypes.oneOf(Object.values(ACTIVATION_MODES)).isRequired,
+  initialValues: PropTypes.shape({
+    mac_settings: PropTypes.shape({
+      ping_slot_frequency: PropTypes.number,
+    }),
+  }),
   initiallyCollapsed: PropTypes.bool,
   isClassB: PropTypes.bool,
   isClassC: PropTypes.bool,
@@ -515,6 +522,7 @@ MacSettingsSection.defaultProps = {
   isClassB: false,
   isClassC: false,
   isUseAdr: false,
+  initialValues: undefined,
 }
 
 export default MacSettingsSection
