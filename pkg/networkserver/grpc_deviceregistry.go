@@ -923,7 +923,7 @@ var (
 
 // Set implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	st := newSetDeviceState(&req.EndDevice, req.FieldMask.GetPaths()...)
+	st := newSetDeviceState(req.EndDevice, req.FieldMask.GetPaths()...)
 
 	requiredRights := append(make([]ttnpb.Right, 0, 2),
 		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,

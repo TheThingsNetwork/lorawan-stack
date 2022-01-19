@@ -382,7 +382,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				return nil, errors.New("SetFunc must not be called")
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
+				EndDevice: deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice),
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
@@ -409,7 +409,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				return nil, errors.New("SetFunc must not be called")
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
+				EndDevice: deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice),
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
@@ -434,7 +434,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: ttnpb.EndDevice{
+				EndDevice: &ttnpb.EndDevice{
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{
 							ApplicationId: registeredApplicationID,
@@ -511,7 +511,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice),
+				EndDevice: deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice),
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"formatters"},
 				},
@@ -544,8 +544,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: func() ttnpb.EndDevice {
-					dev := deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice)
+				EndDevice: func() *ttnpb.EndDevice {
+					dev := deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice)
 					dev.Formatters.UpFormatterParameter = strings.Repeat("-", maxParameterLength+1)
 					return dev
 				}(),
@@ -574,8 +574,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: func() ttnpb.EndDevice {
-					dev := deepcopy.Copy(*registeredDevice).(ttnpb.EndDevice)
+				EndDevice: func() *ttnpb.EndDevice {
+					dev := deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice)
 					dev.Formatters.DownFormatterParameter = strings.Repeat("-", maxParameterLength+1)
 					return dev
 				}(),

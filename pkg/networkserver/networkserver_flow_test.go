@@ -314,7 +314,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 func makeClassAOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion, fpID string) func(context.Context, TestEnvironment) {
 	return makeOTAAFlowTest(OTAAFlowTestConfig{
 		CreateDevice: &ttnpb.SetEndDeviceRequest{
-			EndDevice: *MakeOTAAEndDevice(
+			EndDevice: MakeOTAAEndDevice(
 				EndDeviceOptions.WithFrequencyPlanId(fpID),
 				EndDeviceOptions.WithLorawanVersion(macVersion),
 				EndDeviceOptions.WithLorawanPhyVersion(phyVersion),
@@ -361,7 +361,7 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 	}
 	return makeOTAAFlowTest(OTAAFlowTestConfig{
 		CreateDevice: &ttnpb.SetEndDeviceRequest{
-			EndDevice: *MakeOTAAEndDevice(
+			EndDevice: MakeOTAAEndDevice(
 				EndDeviceOptions.WithFrequencyPlanId(fpID),
 				EndDeviceOptions.WithLorawanVersion(macVersion),
 				EndDeviceOptions.WithLorawanPhyVersion(phyVersion),
