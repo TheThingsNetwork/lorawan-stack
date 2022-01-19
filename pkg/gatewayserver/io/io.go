@@ -387,7 +387,7 @@ var (
 // Class A downlink requires the path to provide an uplink token, while class B and C downlink may use a fixed downlink path.
 func getDownlinkPath(path *ttnpb.DownlinkPath, class ttnpb.Class) (ttnpb.GatewayAntennaIdentifiers, *ttnpb.UplinkToken, error) {
 	if buf := path.GetUplinkToken(); len(buf) == 0 {
-		if class == ttnpb.CLASS_A {
+		if class == ttnpb.Class_CLASS_A {
 			return ttnpb.GatewayAntennaIdentifiers{}, nil, errNoUplinkToken.New()
 		}
 	} else {
@@ -558,13 +558,13 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		}
 		var f func(context.Context, scheduling.Options) (scheduling.Emission, error)
 		switch request.Class {
-		case ttnpb.CLASS_A:
+		case ttnpb.Class_CLASS_A:
 			f = c.scheduler.ScheduleAt
 			if request.Rx1Delay == ttnpb.RxDelay_RX_DELAY_0 {
 				return false, false, 0, errNoRxDelay.New()
 			}
 			settings.Timestamp = uplinkToken.Timestamp + uint32((time.Duration(request.Rx1Delay)*time.Second+rx.delay)/time.Microsecond)
-		case ttnpb.CLASS_B:
+		case ttnpb.Class_CLASS_B:
 			if request.AbsoluteTime == nil {
 				return false, false, 0, errNoAbsoluteTime.New()
 			}
@@ -574,7 +574,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			}
 			f = c.scheduler.ScheduleAt
 			settings.Time = request.AbsoluteTime
-		case ttnpb.CLASS_C:
+		case ttnpb.Class_CLASS_C:
 			if request.AbsoluteTime != nil {
 				f = c.scheduler.ScheduleAt
 				settings.Time = request.AbsoluteTime

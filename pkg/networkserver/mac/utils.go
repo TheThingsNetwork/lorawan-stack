@@ -188,15 +188,15 @@ var errClassAMulticast = errors.DefineInvalidArgument("class_a_multicast", "mult
 func DeviceDefaultClass(dev *ttnpb.EndDevice) (ttnpb.Class, error) {
 	switch {
 	case dev.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 && dev.SupportsClassC:
-		return ttnpb.CLASS_C, nil
+		return ttnpb.Class_CLASS_C, nil
 	case !dev.Multicast:
-		return ttnpb.CLASS_A, nil
+		return ttnpb.Class_CLASS_A, nil
 	case dev.SupportsClassC:
-		return ttnpb.CLASS_C, nil
+		return ttnpb.Class_CLASS_C, nil
 	case dev.SupportsClassB:
-		return ttnpb.CLASS_B, nil
+		return ttnpb.Class_CLASS_B, nil
 	default:
-		return ttnpb.CLASS_A, errClassAMulticast.New()
+		return ttnpb.Class_CLASS_A, errClassAMulticast.New()
 	}
 }
 

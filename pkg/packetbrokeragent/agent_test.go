@@ -407,7 +407,7 @@ func TestForwarder(t *testing.T) {
 			CorrelationIds: gtwMsg.CorrelationIds,
 			Settings: &ttnpb.DownlinkMessage_Request{
 				Request: &ttnpb.TxRequest{
-					Class: ttnpb.CLASS_A,
+					Class: ttnpb.Class_CLASS_A,
 					DownlinkPaths: []*ttnpb.DownlinkPath{
 						{
 							Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -881,7 +881,7 @@ func TestHomeNetwork(t *testing.T) {
 			Settings: &ttnpb.DownlinkMessage_Request{
 				Request: &ttnpb.TxRequest{
 					FrequencyPlanId: test.EUFrequencyPlanID,
-					Class:           ttnpb.CLASS_A,
+					Class:           ttnpb.Class_CLASS_A,
 					DownlinkPaths: []*ttnpb.DownlinkPath{
 						{
 							Path: &ttnpb.DownlinkPath_UplinkToken{

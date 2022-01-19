@@ -1088,7 +1088,7 @@ func (m *MACState) GetDeviceClass() Class {
 	if m != nil {
 		return m.DeviceClass
 	}
-	return CLASS_A
+	return Class_CLASS_A
 }
 
 func (m *MACState) GetLorawanVersion() MACVersion {

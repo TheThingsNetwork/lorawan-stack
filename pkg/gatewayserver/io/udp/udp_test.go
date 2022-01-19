@@ -392,7 +392,7 @@ func TestTraffic(t *testing.T) {
 					RawPayload: []byte{0x01},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
-							Class:    ttnpb.CLASS_A,
+							Class:    ttnpb.Class_CLASS_A,
 							Priority: ttnpb.TxSchedulePriority_NORMAL,
 							Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
 							Rx1DataRate: &ttnpb.DataRate{
@@ -434,7 +434,7 @@ func TestTraffic(t *testing.T) {
 					RawPayload: []byte{0x03},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
-							Class:    ttnpb.CLASS_A,
+							Class:    ttnpb.Class_CLASS_A,
 							Priority: ttnpb.TxSchedulePriority_NORMAL,
 							Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
 							Rx1DataRate: &ttnpb.DataRate{
@@ -476,7 +476,7 @@ func TestTraffic(t *testing.T) {
 					RawPayload: []byte{0x04},
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
-							Class:    ttnpb.CLASS_A,
+							Class:    ttnpb.Class_CLASS_A,
 							Priority: ttnpb.TxSchedulePriority_NORMAL,
 							Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
 							Rx1DataRate: &ttnpb.DataRate{

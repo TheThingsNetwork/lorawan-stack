@@ -370,7 +370,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
 					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_A,
+					DeviceClass:       ttnpb.Class_CLASS_A,
 					LorawanVersion:    ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
@@ -415,7 +415,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters:  makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
 					DesiredParameters:  makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:        ttnpb.CLASS_A,
+					DeviceClass:        ttnpb.Class_CLASS_A,
 					LorawanVersion:     ttnpb.MAC_V1_1,
 					RxWindowsAvailable: true,
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
@@ -446,7 +446,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
 					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_A,
+					DeviceClass:       ttnpb.Class_CLASS_A,
 					LorawanVersion:    ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
@@ -480,7 +480,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters:  makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
 					DesiredParameters:  makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:        ttnpb.CLASS_A,
+					DeviceClass:        ttnpb.Class_CLASS_A,
 					LorawanVersion:     ttnpb.MAC_V1_1,
 					RxWindowsAvailable: true,
 					RecentUplinks: []*ttnpb.UplinkMessage{
@@ -530,7 +530,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
 					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_A,
+					DeviceClass:       ttnpb.Class_CLASS_A,
 					LorawanVersion:    ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
@@ -579,7 +579,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_0_3_REV_A),
 					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_0_3_REV_A),
-					DeviceClass:       ttnpb.CLASS_A,
+					DeviceClass:       ttnpb.Class_CLASS_A,
 					LorawanVersion:    ttnpb.MAC_V1_0_3,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
@@ -664,7 +664,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_0_3_REV_A),
 					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_0_3_REV_A),
-					DeviceClass:       ttnpb.CLASS_A,
+					DeviceClass:       ttnpb.Class_CLASS_A,
 					LorawanVersion:    ttnpb.MAC_V1_0_3,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
@@ -740,7 +740,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
 					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_A,
+					DeviceClass:       ttnpb.Class_CLASS_A,
 					LorawanVersion:    ttnpb.MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_ResetConf{
@@ -845,7 +845,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_A,
+							Class:           ttnpb.Class_CLASS_A,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
 							Rx1DataRate:     lastUp.Settings.DataRate,
@@ -891,7 +891,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
 					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_A,
+					DeviceClass:       ttnpb.Class_CLASS_A,
 					LorawanVersion:    ttnpb.MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_ResetConf{
@@ -996,7 +996,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_A,
+							Class:           ttnpb.Class_CLASS_A,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
 							Rx1DataRate:     lastUp.Settings.DataRate,
@@ -1052,7 +1052,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
 					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_A,
+					DeviceClass:       ttnpb.Class_CLASS_A,
 					LorawanVersion:    ttnpb.MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_ResetConf{
@@ -1151,7 +1151,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_A,
+							Class:           ttnpb.Class_CLASS_A,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
 							Rx1DataRate:     lastUp.Settings.DataRate,
@@ -1207,7 +1207,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
 					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_A,
+					DeviceClass:       ttnpb.Class_CLASS_A,
 					LorawanVersion:    ttnpb.MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_ResetConf{
@@ -1312,7 +1312,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_A,
+							Class:           ttnpb.Class_CLASS_A,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
 							Rx1DataRate:     lastUp.Settings.DataRate,
@@ -1368,7 +1368,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters:   makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
 					DesiredParameters:   makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:         ttnpb.CLASS_B,
+					DeviceClass:         ttnpb.Class_CLASS_B,
 					LorawanVersion:      ttnpb.MAC_V1_1,
 					PingSlotPeriodicity: pingSlotPeriodicity,
 					RecentUplinks: []*ttnpb.UplinkMessage{
@@ -1458,7 +1458,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:         ttnpb.CLASS_B,
+							Class:         ttnpb.Class_CLASS_B,
 							DownlinkPaths: paths,
 							Priority:      ttnpb.TxSchedulePriority_HIGH,
 							Rx2DataRate: &ttnpb.DataRate{
@@ -1514,7 +1514,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
 					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_C,
+					DeviceClass:       ttnpb.Class_CLASS_C,
 					LorawanVersion:    ttnpb.MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_ResetConf{
@@ -1618,7 +1618,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_A,
+							Class:           ttnpb.Class_CLASS_A,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
 							Rx1DataRate:     lastUp.Settings.DataRate,
@@ -1677,7 +1677,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
 					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_C,
+					DeviceClass:       ttnpb.Class_CLASS_C,
 					LorawanVersion:    ttnpb.MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_ResetConf{
@@ -1764,7 +1764,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_C,
+							Class:           ttnpb.Class_CLASS_C,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGH,
 							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
@@ -1815,7 +1815,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
 					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_C,
+					DeviceClass:       ttnpb.Class_CLASS_C,
 					LorawanVersion:    ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
@@ -1896,7 +1896,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:         ttnpb.CLASS_C,
+							Class:         ttnpb.Class_CLASS_C,
 							DownlinkPaths: paths,
 							Priority:      ttnpb.TxSchedulePriority_HIGH,
 							Rx2DataRate: &ttnpb.DataRate{
@@ -1953,7 +1953,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
 					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_C,
+					DeviceClass:       ttnpb.Class_CLASS_C,
 					LorawanVersion:    ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
@@ -2033,7 +2033,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_C,
+							Class:           ttnpb.Class_CLASS_C,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGH,
 							AbsoluteTime:    ttnpb.ProtoTimePtr(now.Add(DefaultEU868RX1Delay.Duration())),
@@ -2113,7 +2113,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
 					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_C,
+					DeviceClass:       ttnpb.Class_CLASS_C,
 					LorawanVersion:    ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
@@ -2193,7 +2193,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_C,
+							Class:           ttnpb.Class_CLASS_C,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGH,
 							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
@@ -2255,7 +2255,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
 					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_C,
+					DeviceClass:       ttnpb.Class_CLASS_C,
 					LorawanVersion:    ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
@@ -2317,7 +2317,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
 					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_C,
+					DeviceClass:       ttnpb.Class_CLASS_C,
 					LorawanVersion:    ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
@@ -2387,7 +2387,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 				PendingMacState: &ttnpb.MACState{
 					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
 					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_A,
+					DeviceClass:       ttnpb.Class_CLASS_A,
 					LorawanVersion:    ttnpb.MAC_V1_1,
 					QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
 						Keys:    sessionKeys,
@@ -2438,7 +2438,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						},
 					},
 				},
-				MacState:     MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.RP001_V1_1_REV_B),
+				MacState:     MakeDefaultEU868MACState(ttnpb.Class_CLASS_A, ttnpb.MAC_V1_1, ttnpb.RP001_V1_1_REV_B),
 				SupportsJoin: true,
 			},
 			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
@@ -2452,7 +2452,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					joinAcceptBytes,
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_A,
+							Class:           ttnpb.Class_CLASS_A,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
 							Rx1DataRate:     lastUp.Settings.DataRate,

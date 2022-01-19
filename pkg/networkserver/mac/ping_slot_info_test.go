@@ -39,12 +39,12 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					DeviceClass: ttnpb.CLASS_B,
+					DeviceClass: ttnpb.Class_CLASS_B,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					DeviceClass: ttnpb.CLASS_B,
+					DeviceClass: ttnpb.Class_CLASS_B,
 				},
 			},
 			Error: ErrNoPayload,
@@ -53,12 +53,12 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 			Name: "class B device",
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					DeviceClass: ttnpb.CLASS_B,
+					DeviceClass: ttnpb.Class_CLASS_B,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					DeviceClass: ttnpb.CLASS_B,
+					DeviceClass: ttnpb.Class_CLASS_B,
 				},
 			},
 			Payload: &ttnpb.MACCommand_PingSlotInfoReq{
@@ -74,12 +74,12 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 			Name: "empty queue",
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					DeviceClass: ttnpb.CLASS_A,
+					DeviceClass: ttnpb.Class_CLASS_A,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					DeviceClass:         ttnpb.CLASS_A,
+					DeviceClass:         ttnpb.Class_CLASS_A,
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: 42},
 					QueuedResponses: []*ttnpb.MACCommand{
 						ttnpb.MACCommandIdentifier_CID_PING_SLOT_INFO.MACCommand(),
@@ -100,7 +100,7 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 			Name: "non-empty queue",
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					DeviceClass: ttnpb.CLASS_A,
+					DeviceClass: ttnpb.Class_CLASS_A,
 					QueuedResponses: []*ttnpb.MACCommand{
 						{},
 						{},
@@ -110,7 +110,7 @@ func TestHandlePingSlotInfoReq(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					DeviceClass:         ttnpb.CLASS_A,
+					DeviceClass:         ttnpb.Class_CLASS_A,
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: 42},
 					QueuedResponses: []*ttnpb.MACCommand{
 						{},

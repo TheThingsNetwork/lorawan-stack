@@ -49,28 +49,28 @@ func TestHandleDeviceModeInd(t *testing.T) {
 			Name: "does not support class C/empty queue",
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					DeviceClass: ttnpb.CLASS_A,
+					DeviceClass: ttnpb.Class_CLASS_A,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DeviceModeConf{
-							Class: ttnpb.CLASS_A,
+							Class: ttnpb.Class_CLASS_A,
 						}).MACCommand(),
 					},
-					DeviceClass: ttnpb.CLASS_A,
+					DeviceClass: ttnpb.Class_CLASS_A,
 				},
 			},
 			Payload: &ttnpb.MACCommand_DeviceModeInd{
-				Class: ttnpb.CLASS_C,
+				Class: ttnpb.Class_CLASS_C,
 			},
 			Events: events.Builders{
 				EvtReceiveDeviceModeIndication.With(events.WithData(&ttnpb.MACCommand_DeviceModeInd{
-					Class: ttnpb.CLASS_C,
+					Class: ttnpb.Class_CLASS_C,
 				})),
 				EvtEnqueueDeviceModeConfirmation.With(events.WithData(&ttnpb.MACCommand_DeviceModeConf{
-					Class: ttnpb.CLASS_A,
+					Class: ttnpb.Class_CLASS_A,
 				})),
 			},
 		},
@@ -79,7 +79,7 @@ func TestHandleDeviceModeInd(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				SupportsClassC: true,
 				MacState: &ttnpb.MACState{
-					DeviceClass: ttnpb.CLASS_A,
+					DeviceClass: ttnpb.Class_CLASS_A,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
@@ -87,22 +87,22 @@ func TestHandleDeviceModeInd(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DeviceModeConf{
-							Class: ttnpb.CLASS_C,
+							Class: ttnpb.Class_CLASS_C,
 						}).MACCommand(),
 					},
-					DeviceClass: ttnpb.CLASS_C,
+					DeviceClass: ttnpb.Class_CLASS_C,
 				},
 			},
 			Payload: &ttnpb.MACCommand_DeviceModeInd{
-				Class: ttnpb.CLASS_C,
+				Class: ttnpb.Class_CLASS_C,
 			},
 			Events: events.Builders{
 				EvtReceiveDeviceModeIndication.With(events.WithData(&ttnpb.MACCommand_DeviceModeInd{
-					Class: ttnpb.CLASS_C,
+					Class: ttnpb.Class_CLASS_C,
 				})),
-				EvtClassCSwitch.With(events.WithData(ttnpb.CLASS_A)),
+				EvtClassCSwitch.With(events.WithData(ttnpb.Class_CLASS_A)),
 				EvtEnqueueDeviceModeConfirmation.With(events.WithData(&ttnpb.MACCommand_DeviceModeConf{
-					Class: ttnpb.CLASS_C,
+					Class: ttnpb.Class_CLASS_C,
 				})),
 			},
 		},
@@ -116,7 +116,7 @@ func TestHandleDeviceModeInd(t *testing.T) {
 						{},
 						{},
 					},
-					DeviceClass: ttnpb.CLASS_C,
+					DeviceClass: ttnpb.Class_CLASS_C,
 				},
 			},
 			Expected: &ttnpb.EndDevice{
@@ -127,22 +127,22 @@ func TestHandleDeviceModeInd(t *testing.T) {
 						{},
 						{},
 						(&ttnpb.MACCommand_DeviceModeConf{
-							Class: ttnpb.CLASS_A,
+							Class: ttnpb.Class_CLASS_A,
 						}).MACCommand(),
 					},
-					DeviceClass: ttnpb.CLASS_A,
+					DeviceClass: ttnpb.Class_CLASS_A,
 				},
 			},
 			Payload: &ttnpb.MACCommand_DeviceModeInd{
-				Class: ttnpb.CLASS_A,
+				Class: ttnpb.Class_CLASS_A,
 			},
 			Events: events.Builders{
 				EvtReceiveDeviceModeIndication.With(events.WithData(&ttnpb.MACCommand_DeviceModeInd{
-					Class: ttnpb.CLASS_A,
+					Class: ttnpb.Class_CLASS_A,
 				})),
-				EvtClassASwitch.With(events.WithData(ttnpb.CLASS_C)),
+				EvtClassASwitch.With(events.WithData(ttnpb.Class_CLASS_C)),
 				EvtEnqueueDeviceModeConfirmation.With(events.WithData(&ttnpb.MACCommand_DeviceModeConf{
-					Class: ttnpb.CLASS_A,
+					Class: ttnpb.Class_CLASS_A,
 				})),
 			},
 		},

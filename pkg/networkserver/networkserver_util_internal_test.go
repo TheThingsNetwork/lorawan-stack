@@ -1160,7 +1160,7 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 				PHYVersion:      dev.LorawanPhyVersion,
 				MACState:        dev.PendingMacState,
 				Session:         dev.PendingSession,
-				Class:           ttnpb.CLASS_A,
+				Class:           ttnpb.Class_CLASS_A,
 				RX1Delay:        ttnpb.RxDelay(phy.JoinAcceptDelay1.Seconds()),
 				Uplink:          LastUplink(dev.PendingMacState.RecentUplinks...),
 				Priority:        ttnpb.TxSchedulePriority_HIGHEST,
@@ -2187,7 +2187,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 					EndDeviceIds: x.Ids,
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_A,
+							Class:           ttnpb.Class_CLASS_A,
 							Priority:        priority,
 							FrequencyPlanId: x.FrequencyPlanId,
 							Rx1Delay:        ttnpb.RxDelay(Band(x.FrequencyPlanId, x.LorawanPhyVersion).JoinAcceptDelay1 / time.Second),
@@ -2283,9 +2283,9 @@ func MakeMulticastEndDevice(class ttnpb.Class, defaults ttnpb.MACSettings, wrapK
 		EndDeviceOptions.WithMulticast(true),
 		func() test.EndDeviceOption {
 			switch class {
-			case ttnpb.CLASS_B:
+			case ttnpb.Class_CLASS_B:
 				return EndDeviceOptions.WithSupportsClassB(true)
-			case ttnpb.CLASS_C:
+			case ttnpb.Class_CLASS_C:
 				return EndDeviceOptions.WithSupportsClassC(true)
 			default:
 				panic(fmt.Sprintf("invalid multicast device class: %v", class))

@@ -104,7 +104,7 @@ func (f *lbsLNS) FromDownlink(ctx context.Context, down ttnpb.DownlinkMessage, b
 	dnmsg.MuxTime = TimeToUnixSeconds(dlTime)
 
 	// The GS controls the scheduling and hence for the gateway, its always Class A.
-	dnmsg.DeviceClass = uint(ttnpb.CLASS_A)
+	dnmsg.DeviceClass = uint(ttnpb.Class_CLASS_A)
 
 	return dnmsg.marshalJSON()
 }

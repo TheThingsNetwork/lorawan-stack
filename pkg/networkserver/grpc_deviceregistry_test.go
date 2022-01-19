@@ -737,15 +737,15 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 			// Multicast Create
 			{
-				SetDevice: *MakeMulticastSetDeviceRequest(ttnpb.CLASS_C, defaultMACSettings, activeSessionOpts, nil, nil,
+				SetDevice: *MakeMulticastSetDeviceRequest(ttnpb.Class_CLASS_C, defaultMACSettings, activeSessionOpts, nil, nil,
 					"session.last_n_f_cnt_down",
 				),
 				RequiredRights: []ttnpb.Right{
 					ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 				},
 
-				ReturnedDevice: MakeMulticastEndDevice(ttnpb.CLASS_C, defaultMACSettings, false, activeSessionOpts, nil),
-				StoredDevice:   MakeMulticastEndDevice(ttnpb.CLASS_C, defaultMACSettings, true, activeSessionOpts, nil),
+				ReturnedDevice: MakeMulticastEndDevice(ttnpb.Class_CLASS_C, defaultMACSettings, false, activeSessionOpts, nil),
+				StoredDevice:   MakeMulticastEndDevice(ttnpb.Class_CLASS_C, defaultMACSettings, true, activeSessionOpts, nil),
 			},
 		},
 
@@ -796,7 +796,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 		},
 
 		// Multicast Update
-		MakeMulticastEndDevice(ttnpb.CLASS_B, defaultMACSettings, true, activeSessionOptsWithStartedAt, nil): {
+		MakeMulticastEndDevice(ttnpb.Class_CLASS_B, defaultMACSettings, true, activeSessionOptsWithStartedAt, nil): {
 			{
 				SetDevice: *makeUpdateDeviceRequest([]test.EndDeviceOption{
 					multicastClassBMACSettingsOpt,
@@ -804,8 +804,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"mac_settings",
 				),
 
-				ReturnedDevice: EndDevicePtr(multicastClassBMACSettingsOpt(*MakeMulticastEndDevice(ttnpb.CLASS_B, defaultMACSettings, false, activeSessionOptsWithStartedAt, nil))),
-				StoredDevice:   EndDevicePtr(multicastClassBMACSettingsOpt(*MakeMulticastEndDevice(ttnpb.CLASS_B, defaultMACSettings, true, activeSessionOptsWithStartedAt, nil))),
+				ReturnedDevice: EndDevicePtr(multicastClassBMACSettingsOpt(*MakeMulticastEndDevice(ttnpb.Class_CLASS_B, defaultMACSettings, false, activeSessionOptsWithStartedAt, nil))),
+				StoredDevice:   EndDevicePtr(multicastClassBMACSettingsOpt(*MakeMulticastEndDevice(ttnpb.Class_CLASS_B, defaultMACSettings, true, activeSessionOptsWithStartedAt, nil))),
 			},
 		},
 	} {

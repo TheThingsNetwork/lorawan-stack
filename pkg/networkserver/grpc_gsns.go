@@ -462,18 +462,18 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		case dev.MacState.PingSlotPeriodicity == nil:
 			logger.Debug("Ignore class B bit in uplink, since ping slot periodicity is not known")
 
-		case dev.MacState.DeviceClass != ttnpb.CLASS_B:
+		case dev.MacState.DeviceClass != ttnpb.Class_CLASS_B:
 			logger.WithField("previous_class", dev.MacState.DeviceClass).Debug("Switch device class to class B")
 			queuedEventBuilders = append(queuedEventBuilders, mac.EvtClassBSwitch.BindData(dev.MacState.DeviceClass))
-			dev.MacState.DeviceClass = ttnpb.CLASS_B
+			dev.MacState.DeviceClass = ttnpb.Class_CLASS_B
 		}
-	} else if dev.MacState.DeviceClass == ttnpb.CLASS_B {
+	} else if dev.MacState.DeviceClass == ttnpb.Class_CLASS_B {
 		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 && dev.SupportsClassC {
-			queuedEventBuilders = append(queuedEventBuilders, mac.EvtClassCSwitch.BindData(ttnpb.CLASS_B))
-			dev.MacState.DeviceClass = ttnpb.CLASS_C
+			queuedEventBuilders = append(queuedEventBuilders, mac.EvtClassCSwitch.BindData(ttnpb.Class_CLASS_B))
+			dev.MacState.DeviceClass = ttnpb.Class_CLASS_C
 		} else {
-			queuedEventBuilders = append(queuedEventBuilders, mac.EvtClassASwitch.BindData(ttnpb.CLASS_B))
-			dev.MacState.DeviceClass = ttnpb.CLASS_A
+			queuedEventBuilders = append(queuedEventBuilders, mac.EvtClassASwitch.BindData(ttnpb.Class_CLASS_B))
+			dev.MacState.DeviceClass = ttnpb.Class_CLASS_A
 		}
 	}
 

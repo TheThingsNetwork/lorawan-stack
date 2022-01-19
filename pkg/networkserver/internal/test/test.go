@@ -810,9 +810,9 @@ func ForEachMACVersion(tb testing.TB, f func(func(...string) string, ttnpb.MACVe
 
 func ForEachClass(tb testing.TB, f func(func(...string) string, ttnpb.Class)) {
 	for _, class := range []ttnpb.Class{
-		ttnpb.CLASS_A,
-		ttnpb.CLASS_B,
-		ttnpb.CLASS_C,
+		ttnpb.Class_CLASS_A,
+		ttnpb.Class_CLASS_B,
+		ttnpb.Class_CLASS_C,
 	} {
 		f(func(parts ...string) string {
 			return MakeTestCaseName(append(parts, fmt.Sprintf("Class:%s", class.String()))...)

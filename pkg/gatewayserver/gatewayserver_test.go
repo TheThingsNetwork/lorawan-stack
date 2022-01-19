@@ -1460,7 +1460,7 @@ func TestGatewayServer(t *testing.T) {
 								Message: &ttnpb.DownlinkMessage{
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
-											Class: ttnpb.CLASS_C,
+											Class: ttnpb.Class_CLASS_C,
 											DownlinkPaths: []*ttnpb.DownlinkPath{
 												{
 													Path: &ttnpb.DownlinkPath_Fixed{
@@ -1484,7 +1484,7 @@ func TestGatewayServer(t *testing.T) {
 									RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
-											Class: ttnpb.CLASS_A,
+											Class: ttnpb.Class_CLASS_A,
 											DownlinkPaths: []*ttnpb.DownlinkPath{
 												{
 													Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -1524,7 +1524,7 @@ func TestGatewayServer(t *testing.T) {
 									RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x01, 0xff, 0xff}, 1, 6),
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
-											Class: ttnpb.CLASS_A,
+											Class: ttnpb.Class_CLASS_A,
 											DownlinkPaths: []*ttnpb.DownlinkPath{
 												{
 													Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -1563,7 +1563,7 @@ func TestGatewayServer(t *testing.T) {
 									RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x02, 0xff, 0xff}, 1, 6),
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
-											Class: ttnpb.CLASS_A,
+											Class: ttnpb.Class_CLASS_A,
 											DownlinkPaths: []*ttnpb.DownlinkPath{
 												{
 													Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -1608,7 +1608,7 @@ func TestGatewayServer(t *testing.T) {
 									RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x02, 0xff, 0xff}, 1, 6),
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
-											Class: ttnpb.CLASS_C,
+											Class: ttnpb.Class_CLASS_C,
 											DownlinkPaths: []*ttnpb.DownlinkPath{
 												{
 													Path: &ttnpb.DownlinkPath_Fixed{
@@ -1642,7 +1642,7 @@ func TestGatewayServer(t *testing.T) {
 									RawPayload: randomDownDataPayload(types.DevAddr{0x26, 0x02, 0xff, 0xff}, 1, 6),
 									Settings: &ttnpb.DownlinkMessage_Request{
 										Request: &ttnpb.TxRequest{
-											Class: ttnpb.CLASS_C,
+											Class: ttnpb.Class_CLASS_C,
 											DownlinkPaths: []*ttnpb.DownlinkPath{
 												{
 													Path: &ttnpb.DownlinkPath_Fixed{

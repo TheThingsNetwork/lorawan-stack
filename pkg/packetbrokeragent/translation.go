@@ -572,14 +572,14 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 
 var (
 	fromPBClass = map[packetbroker.DownlinkMessageClass]ttnpb.Class{
-		packetbroker.DownlinkMessageClass_CLASS_A: ttnpb.CLASS_A,
-		packetbroker.DownlinkMessageClass_CLASS_B: ttnpb.CLASS_B,
-		packetbroker.DownlinkMessageClass_CLASS_C: ttnpb.CLASS_C,
+		packetbroker.DownlinkMessageClass_CLASS_A: ttnpb.Class_CLASS_A,
+		packetbroker.DownlinkMessageClass_CLASS_B: ttnpb.Class_CLASS_B,
+		packetbroker.DownlinkMessageClass_CLASS_C: ttnpb.Class_CLASS_C,
 	}
 	toPBClass = map[ttnpb.Class]packetbroker.DownlinkMessageClass{
-		ttnpb.CLASS_A: packetbroker.DownlinkMessageClass_CLASS_A,
-		ttnpb.CLASS_B: packetbroker.DownlinkMessageClass_CLASS_B,
-		ttnpb.CLASS_C: packetbroker.DownlinkMessageClass_CLASS_C,
+		ttnpb.Class_CLASS_A: packetbroker.DownlinkMessageClass_CLASS_A,
+		ttnpb.Class_CLASS_B: packetbroker.DownlinkMessageClass_CLASS_B,
+		ttnpb.Class_CLASS_C: packetbroker.DownlinkMessageClass_CLASS_C,
 	}
 	fromPBPriority = map[packetbroker.DownlinkMessagePriority]ttnpb.TxSchedulePriority{
 		packetbroker.DownlinkMessagePriority_LOWEST:  ttnpb.TxSchedulePriority_LOWEST,

@@ -1872,7 +1872,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		if hasMACState {
 			// NOTE: If not set, this will be derived from top-level device model.
 			if isMulticast {
-				if dev, ok := m["mac_state.device_class"]; ok && dev.MacState.GetDeviceClass() == ttnpb.CLASS_A {
+				if dev, ok := m["mac_state.device_class"]; ok && dev.MacState.GetDeviceClass() == ttnpb.Class_CLASS_A {
 					return false, "mac_state.device_class"
 				}
 			}

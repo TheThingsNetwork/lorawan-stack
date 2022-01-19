@@ -242,7 +242,7 @@ message CFList {
 
 enum Class {
   option (thethings.json.enum) = { marshal_as_string: true, prefix: "CLASS" };
-  option (gogoproto.goproto_enum_prefix) = false;
+
   CLASS_A = 0;
   CLASS_B = 1;
   CLASS_C = 2;

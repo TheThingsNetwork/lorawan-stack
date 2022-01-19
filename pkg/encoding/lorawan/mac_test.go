@@ -358,7 +358,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		{
 			"DeviceModeInd",
 			&ttnpb.MACCommand_DeviceModeInd{
-				Class: ttnpb.CLASS_A,
+				Class: ttnpb.Class_CLASS_A,
 			},
 			[]byte{0x20, 0x00},
 			true,
@@ -366,7 +366,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		{
 			"DeviceModeConf",
 			&ttnpb.MACCommand_DeviceModeConf{
-				Class: ttnpb.CLASS_C,
+				Class: ttnpb.Class_CLASS_C,
 			},
 			[]byte{0x20, 0x02},
 			false,

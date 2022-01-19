@@ -259,7 +259,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			SetRX1:      true,
 			SetRX2:      true,
 			Device:      dev,
-			Class:       ttnpb.CLASS_A,
+			Class:       ttnpb.Class_CLASS_A,
 			Priority:    ttnpb.TxSchedulePriority_HIGHEST,
 			Payload:     down.Payload,
 			RawPayload:  down.RawPayload,
@@ -341,18 +341,18 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 	var downCmders []MACCommander
 	if macVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
 		deviceModeInd := &ttnpb.MACCommand_DeviceModeInd{
-			Class: ttnpb.CLASS_C,
+			Class: ttnpb.Class_CLASS_C,
 		}
 		upCmders = []MACCommander{
 			deviceModeInd,
 		}
 
 		deviceModeConf := &ttnpb.MACCommand_DeviceModeConf{
-			Class: ttnpb.CLASS_C,
+			Class: ttnpb.Class_CLASS_C,
 		}
 		upEvBuilders = []events.Builder{
 			mac.EvtReceiveDeviceModeIndication.With(events.WithData(deviceModeInd)),
-			mac.EvtClassCSwitch.With(events.WithData(ttnpb.CLASS_A)),
+			mac.EvtClassCSwitch.With(events.WithData(ttnpb.Class_CLASS_A)),
 			mac.EvtEnqueueDeviceModeConfirmation.With(events.WithData(deviceModeConf)),
 		}
 		downCmders = []MACCommander{
