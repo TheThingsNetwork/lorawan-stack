@@ -1219,6 +1219,10 @@ func (m *CreateEndDeviceRequest) EntityType() string {
 	return m.GetEndDevice().EntityType()
 }
 
+func (m *UpdateEndDeviceRequest) EntityType() string {
+	return m.GetEndDevice().EntityType()
+}
+
 func (m *GetEndDeviceRequest) EntityType() string {
 	return m.GetEndDeviceIds().EntityType()
 }
@@ -1237,6 +1241,10 @@ func (m *CreateEndDeviceRequest) IDString() string {
 	return m.GetEndDevice().IDString()
 }
 
+func (m *UpdateEndDeviceRequest) IDString() string {
+	return m.GetEndDevice().IDString()
+}
+
 func (m *GetEndDeviceRequest) IDString() string {
 	return m.GetEndDeviceIds().IDString()
 }
@@ -1252,6 +1260,10 @@ func (m *ResetAndGetEndDeviceRequest) ExtractRequestFields(dst map[string]interf
 }
 
 func (m *CreateEndDeviceRequest) ExtractRequestFields(dst map[string]interface{}) {
+	m.GetEndDevice().ExtractRequestFields(dst)
+}
+
+func (m *UpdateEndDeviceRequest) ExtractRequestFields(dst map[string]interface{}) {
 	m.GetEndDevice().ExtractRequestFields(dst)
 }
 

@@ -582,7 +582,7 @@ message CreateEndDeviceRequest {
 }
 
 message UpdateEndDeviceRequest {
-  EndDevice end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  EndDevice end_device = 1 [(validate.rules).message.required = true];
   // The names of the end device fields that should be updated.
   // See the API reference for which fields can be set on the different services.
   google.protobuf.FieldMask field_mask = 2;
