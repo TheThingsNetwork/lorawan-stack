@@ -631,7 +631,7 @@ message ResetAndGetEndDeviceRequest {
 }
 
 message EndDeviceTemplate {
-  EndDevice end_device = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  EndDevice end_device = 1 [(validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 2;
   string mapping_key = 3 [(validate.rules).string.max_len = 100];
 }
