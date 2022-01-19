@@ -100,7 +100,7 @@ func (m *JoinRequest) GetRxDelay() RxDelay {
 	if m != nil {
 		return m.RxDelay
 	}
-	return RX_DELAY_0
+	return RxDelay_RX_DELAY_0
 }
 
 func (m *JoinRequest) GetCfList() *CFList {

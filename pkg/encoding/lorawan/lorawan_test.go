@@ -840,7 +840,7 @@ func TestMessageEncodingSymmetricityJoinAcceptPayload(t *testing.T) {
 					Rx2Dr:       ttnpb.DATA_RATE_1,
 					OptNeg:      false,
 				},
-				RxDelay: ttnpb.RX_DELAY_5,
+				RxDelay: ttnpb.RxDelay_RX_DELAY_5,
 				CfList: &ttnpb.CFList{
 					Type: ttnpb.CFListType_FREQUENCIES,
 					Freq: []uint32{
@@ -864,7 +864,7 @@ func TestMessageEncodingSymmetricityJoinAcceptPayload(t *testing.T) {
 					Rx2Dr:       ttnpb.DATA_RATE_1,
 					OptNeg:      false,
 				},
-				RxDelay: ttnpb.RX_DELAY_5,
+				RxDelay: ttnpb.RxDelay_RX_DELAY_5,
 			},
 		},
 	} {

@@ -751,7 +751,6 @@ enum ADRAckDelayExponent {
 
 enum RxDelay {
   option (thethings.json.enum) = { marshal_as_number: true, prefix: "RX_DELAY" };
-  option (gogoproto.goproto_enum_prefix) = false;
 
   RX_DELAY_0 = 0;   // 1 second.
   RX_DELAY_1 = 1;   // 1 second.

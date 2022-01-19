@@ -215,8 +215,8 @@ var (
 )
 
 const (
-	DefaultEU868JoinAcceptDelay = ttnpb.RX_DELAY_5
-	DefaultEU868RX1Delay        = ttnpb.RX_DELAY_1
+	DefaultEU868JoinAcceptDelay = ttnpb.RxDelay_RX_DELAY_5
+	DefaultEU868RX1Delay        = ttnpb.RxDelay_RX_DELAY_1
 	DefaultEU868RX2Frequency    = 869525000
 )
 
@@ -359,7 +359,7 @@ func MakeDefaultUS915CurrentMACParameters(ver ttnpb.PHYVersion) *ttnpb.MACParame
 		PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_8},
 		RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
 		RejoinTimePeriodicity:      ttnpb.REJOIN_TIME_0,
-		Rx1Delay:                   ttnpb.RX_DELAY_1,
+		Rx1Delay:                   ttnpb.RxDelay_RX_DELAY_1,
 		Rx2DataRateIndex:           ttnpb.DATA_RATE_8,
 		Rx2Frequency:               923300000,
 		Channels:                   MakeDefaultUS915CurrentChannels(),

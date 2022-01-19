@@ -425,7 +425,7 @@ func TestForwarder(t *testing.T) {
 						},
 					},
 					Rx1Frequency: 868100000,
-					Rx1Delay:     ttnpb.RX_DELAY_5,
+					Rx1Delay:     ttnpb.RxDelay_RX_DELAY_5,
 					Rx2DataRate: &ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{
@@ -903,7 +903,7 @@ func TestHomeNetwork(t *testing.T) {
 						},
 					},
 					Rx1Frequency: 868100000,
-					Rx1Delay:     ttnpb.RX_DELAY_5,
+					Rx1Delay:     ttnpb.RxDelay_RX_DELAY_5,
 					Rx2DataRate: &ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{

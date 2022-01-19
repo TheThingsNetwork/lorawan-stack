@@ -47,13 +47,13 @@ func TestNewState(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 			},
 			MACState: func() *ttnpb.MACState {
 				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.RP001_V1_0_2_REV_B)
-				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
+				macState.DesiredParameters.Rx1Delay = ttnpb.RxDelay_RX_DELAY_13
 				return macState
 			}(),
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
@@ -85,7 +85,7 @@ func TestNewState(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 				Multicast: true,
@@ -103,7 +103,7 @@ func TestNewState(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 				Multicast:      true,
@@ -133,7 +133,7 @@ func TestNewState(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 				Multicast:      true,
@@ -272,13 +272,13 @@ func TestNewState(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 			},
 			MACState: func() *ttnpb.MACState {
 				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.RP001_V1_1_REV_B)
-				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
+				macState.DesiredParameters.Rx1Delay = ttnpb.RxDelay_RX_DELAY_13
 				return macState
 			}(),
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
@@ -291,7 +291,7 @@ func TestNewState(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 				Multicast: true,
@@ -309,7 +309,7 @@ func TestNewState(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 				Multicast:      true,
@@ -339,7 +339,7 @@ func TestNewState(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 				Multicast:      true,
@@ -369,13 +369,13 @@ func TestNewState(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 			},
 			MACState: func() *ttnpb.MACState {
 				macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.RP001_V1_0_2_REV_B)
-				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
+				macState.DesiredParameters.Rx1Delay = ttnpb.RxDelay_RX_DELAY_13
 				return macState
 			}(),
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
@@ -461,13 +461,13 @@ func TestNewState(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 			},
 			MACState: func() *ttnpb.MACState {
 				macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.RP001_V1_1_REV_B)
-				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
+				macState.DesiredParameters.Rx1Delay = ttnpb.RxDelay_RX_DELAY_13
 				return macState
 			}(),
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),

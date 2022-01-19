@@ -1503,7 +1503,7 @@ func TestGatewayServer(t *testing.T) {
 												},
 											},
 											Priority: ttnpb.TxSchedulePriority_NORMAL,
-											Rx1Delay: ttnpb.RX_DELAY_1,
+											Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
 											Rx1DataRate: &ttnpb.DataRate{
 												Modulation: &ttnpb.DataRate_Lora{
 													Lora: &ttnpb.LoRaDataRate{
@@ -1543,7 +1543,7 @@ func TestGatewayServer(t *testing.T) {
 												},
 											},
 											Priority: ttnpb.TxSchedulePriority_NORMAL,
-											Rx1Delay: ttnpb.RX_DELAY_1,
+											Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
 											Rx1DataRate: &ttnpb.DataRate{
 												Modulation: &ttnpb.DataRate_Lora{
 													Lora: &ttnpb.LoRaDataRate{
@@ -1582,7 +1582,7 @@ func TestGatewayServer(t *testing.T) {
 												},
 											},
 											Priority: ttnpb.TxSchedulePriority_NORMAL,
-											Rx1Delay: ttnpb.RX_DELAY_1,
+											Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
 											Rx1DataRate: &ttnpb.DataRate{
 												Modulation: &ttnpb.DataRate_Lora{
 													Lora: &ttnpb.LoRaDataRate{
@@ -1621,7 +1621,7 @@ func TestGatewayServer(t *testing.T) {
 												},
 											},
 											Priority: ttnpb.TxSchedulePriority_NORMAL,
-											Rx1Delay: ttnpb.RX_DELAY_1,
+											Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
 											Rx1DataRate: &ttnpb.DataRate{
 												Modulation: &ttnpb.DataRate_Lora{
 													Lora: &ttnpb.LoRaDataRate{
@@ -1655,7 +1655,7 @@ func TestGatewayServer(t *testing.T) {
 												},
 											},
 											Priority: ttnpb.TxSchedulePriority_NORMAL,
-											Rx1Delay: ttnpb.RX_DELAY_1,
+											Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
 											Rx1DataRate: &ttnpb.DataRate{
 												Modulation: &ttnpb.DataRate_Lora{
 													Lora: &ttnpb.LoRaDataRate{

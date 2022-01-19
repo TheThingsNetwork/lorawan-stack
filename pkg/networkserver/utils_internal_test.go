@@ -62,7 +62,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 	}
 	ups := []*ttnpb.UplinkMessage{up}
 
-	rxDelay := ttnpb.RX_DELAY_4
+	rxDelay := ttnpb.RxDelay_RX_DELAY_4
 	rx1 := ttnpb.StdTime(up.ReceivedAt).Add(rxDelay.Duration())
 	rx2 := rx1.Add(time.Second)
 

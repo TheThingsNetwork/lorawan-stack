@@ -199,7 +199,7 @@ func TestFlow(t *testing.T) {
 					Request: &ttnpb.TxRequest{
 						Class:    ttnpb.CLASS_A,
 						Priority: ttnpb.TxSchedulePriority_NORMAL,
-						Rx1Delay: ttnpb.RX_DELAY_1,
+						Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
 						Rx1DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
 								Lora: &ttnpb.LoRaDataRate{
@@ -233,7 +233,7 @@ func TestFlow(t *testing.T) {
 					Request: &ttnpb.TxRequest{
 						Class:    ttnpb.CLASS_A,
 						Priority: ttnpb.TxSchedulePriority_NORMAL,
-						Rx1Delay: ttnpb.RX_DELAY_1,
+						Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
 						Rx1DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
 								Lora: &ttnpb.LoRaDataRate{
@@ -269,7 +269,7 @@ func TestFlow(t *testing.T) {
 					Request: &ttnpb.TxRequest{
 						Class:    ttnpb.CLASS_A,
 						Priority: ttnpb.TxSchedulePriority_NORMAL,
-						Rx1Delay: ttnpb.RX_DELAY_1,
+						Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
 						Rx1DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
 								Lora: &ttnpb.LoRaDataRate{
@@ -623,7 +623,7 @@ func TestSubBandEIRPOverride(t *testing.T) {
 					Request: &ttnpb.TxRequest{
 						Class:    ttnpb.CLASS_A,
 						Priority: ttnpb.TxSchedulePriority_NORMAL,
-						Rx1Delay: ttnpb.RX_DELAY_1,
+						Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
 						Rx1DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
 								Lora: &ttnpb.LoRaDataRate{

@@ -609,7 +609,7 @@ func TestHandleJoinRequest(t *testing.T) {
 		return &ttnpb.JoinRequest{
 			SelectedMacVersion: ttnpb.MAC_V1_0_3,
 			DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04},
-			RxDelay:            ttnpb.RX_DELAY_5,
+			RxDelay:            ttnpb.RxDelay_RX_DELAY_5,
 			DownlinkSettings:   &ttnpb.DLSettings{},
 			Payload: &ttnpb.Message{
 				Payload: &ttnpb.Message_JoinRequestPayload{

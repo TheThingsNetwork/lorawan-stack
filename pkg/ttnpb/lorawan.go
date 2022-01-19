@@ -1039,7 +1039,7 @@ func (v PHYVersion) Validate() error {
 // Duration returns v as time.Duration.
 func (v RxDelay) Duration() time.Duration {
 	switch v {
-	case RX_DELAY_0, RX_DELAY_1:
+	case RxDelay_RX_DELAY_0, RxDelay_RX_DELAY_1:
 		return time.Second
 	default:
 		return time.Duration(v) * time.Second

@@ -400,7 +400,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 	defaultMACSettings := DefaultConfig.DefaultMACSettings.Parse()
 
 	customMACSettings := defaultMACSettings
-	customMACSettings.Rx1Delay = &ttnpb.RxDelayValue{Value: ttnpb.RX_DELAY_2}
+	customMACSettings.Rx1Delay = &ttnpb.RxDelayValue{Value: ttnpb.RxDelay_RX_DELAY_2}
 	customMACSettings.Rx1DataRateOffset = nil
 
 	customMACSettingsOpt := EndDeviceOptions.WithMacSettings(&customMACSettings)
@@ -413,12 +413,12 @@ func TestDeviceRegistrySet(t *testing.T) {
 	multicastClassBMACSettingsOpt := EndDeviceOptions.WithMacSettings(&multicastClassBMACSettings)
 
 	currentMACStateOverrideOpt := func(macState ttnpb.MACState) ttnpb.MACState {
-		macState.CurrentParameters.Rx1Delay = ttnpb.RX_DELAY_3
+		macState.CurrentParameters.Rx1Delay = ttnpb.RxDelay_RX_DELAY_3
 		macState.CurrentParameters.Rx1DataRateOffset = ttnpb.DataRateOffset_DATA_RATE_OFFSET_1
 		return macState
 	}
 	desiredMACStateOverrideOpt := func(macState ttnpb.MACState) ttnpb.MACState {
-		macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_4
+		macState.DesiredParameters.Rx1Delay = ttnpb.RxDelay_RX_DELAY_4
 		macState.DesiredParameters.Rx1DataRateOffset = ttnpb.DataRateOffset_DATA_RATE_OFFSET_2
 		return macState
 	}

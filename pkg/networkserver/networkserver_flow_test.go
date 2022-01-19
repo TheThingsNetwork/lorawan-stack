@@ -403,9 +403,9 @@ func TestFlow(t *testing.T) {
 						var d ttnpb.RxDelay
 						switch cpus := runtime.NumCPU(); {
 						case cpus <= 1:
-							d = ttnpb.RX_DELAY_4
+							d = ttnpb.RxDelay_RX_DELAY_4
 						case cpus >= 12:
-							d = ttnpb.RX_DELAY_15
+							d = ttnpb.RxDelay_RX_DELAY_15
 						default:
 							d = ttnpb.RxDelay(cpus + 3)
 						}

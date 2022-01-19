@@ -81,7 +81,7 @@ func TestInteropJoinRequest(t *testing.T) {
 				DevEUI:     interop.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 				MACVersion: interop.MACVersion(ttnpb.MAC_V1_0_3),
 				DLSettings: interop.Buffer{0xef},
-				RxDelay:    ttnpb.RX_DELAY_5,
+				RxDelay:    ttnpb.RxDelay_RX_DELAY_5,
 				CFList:     interop.Buffer{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0, 0x0, 0x0, 0x0},
 			},
 			ExpectedJoinRequest: &ttnpb.JoinRequest{
@@ -94,7 +94,7 @@ func TestInteropJoinRequest(t *testing.T) {
 					Rx1DrOffset: 0x6,
 					Rx2Dr:       0xf,
 				},
-				RxDelay: ttnpb.RX_DELAY_5,
+				RxDelay: ttnpb.RxDelay_RX_DELAY_5,
 				CfList: &ttnpb.CFList{
 					Type: ttnpb.CFListType_FREQUENCIES,
 					Freq: []uint32{0xffff42, 0xffffff, 0xffffff, 0xffffff},
@@ -158,7 +158,7 @@ func TestInteropJoinRequest(t *testing.T) {
 				DevEUI:     interop.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 				MACVersion: interop.MACVersion(ttnpb.MAC_V1_1),
 				DLSettings: interop.Buffer{0xef},
-				RxDelay:    ttnpb.RX_DELAY_5,
+				RxDelay:    ttnpb.RxDelay_RX_DELAY_5,
 				CFList:     interop.Buffer{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0, 0x0, 0x0, 0x0},
 			},
 			ExpectedJoinRequest: &ttnpb.JoinRequest{
@@ -171,7 +171,7 @@ func TestInteropJoinRequest(t *testing.T) {
 					Rx1DrOffset: 0x6,
 					Rx2Dr:       0xf,
 				},
-				RxDelay: ttnpb.RX_DELAY_5,
+				RxDelay: ttnpb.RxDelay_RX_DELAY_5,
 				CfList: &ttnpb.CFList{
 					Type: ttnpb.CFListType_FREQUENCIES,
 					Freq: []uint32{0xffff42, 0xffffff, 0xffffff, 0xffffff},
@@ -251,7 +251,7 @@ func TestInteropJoinRequest(t *testing.T) {
 				DevEUI:     interop.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 				MACVersion: interop.MACVersion(ttnpb.MAC_V1_1),
 				DLSettings: interop.Buffer{0xef},
-				RxDelay:    ttnpb.RX_DELAY_5,
+				RxDelay:    ttnpb.RxDelay_RX_DELAY_5,
 				CFList:     interop.Buffer{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0, 0x0, 0x0, 0x0},
 			},
 			ExpectedJoinRequest: &ttnpb.JoinRequest{
@@ -264,7 +264,7 @@ func TestInteropJoinRequest(t *testing.T) {
 					Rx1DrOffset: 0x6,
 					Rx2Dr:       0xf,
 				},
-				RxDelay: ttnpb.RX_DELAY_5,
+				RxDelay: ttnpb.RxDelay_RX_DELAY_5,
 				CfList: &ttnpb.CFList{
 					Type: ttnpb.CFListType_FREQUENCIES,
 					Freq: []uint32{0xffff42, 0xffffff, 0xffffff, 0xffffff},
@@ -294,7 +294,7 @@ func TestInteropJoinRequest(t *testing.T) {
 				DevEUI:     interop.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 				MACVersion: interop.MACVersion(ttnpb.MAC_V1_1),
 				DLSettings: interop.Buffer{0xef},
-				RxDelay:    ttnpb.RX_DELAY_5,
+				RxDelay:    ttnpb.RxDelay_RX_DELAY_5,
 				CFList:     interop.Buffer{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0, 0x0, 0x0, 0x0},
 			},
 			ExpectedJoinRequest: &ttnpb.JoinRequest{
@@ -307,7 +307,7 @@ func TestInteropJoinRequest(t *testing.T) {
 					Rx1DrOffset: 0x6,
 					Rx2Dr:       0xf,
 				},
-				RxDelay: ttnpb.RX_DELAY_5,
+				RxDelay: ttnpb.RxDelay_RX_DELAY_5,
 				CfList: &ttnpb.CFList{
 					Type: ttnpb.CFListType_FREQUENCIES,
 					Freq: []uint32{0xffff42, 0xffffff, 0xffffff, 0xffffff},
@@ -337,7 +337,7 @@ func TestInteropJoinRequest(t *testing.T) {
 				DevEUI:     interop.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 				MACVersion: interop.MACVersion(ttnpb.MAC_V1_1),
 				DLSettings: interop.Buffer{0xef},
-				RxDelay:    ttnpb.RX_DELAY_5,
+				RxDelay:    ttnpb.RxDelay_RX_DELAY_5,
 				CFList:     interop.Buffer{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0, 0x0, 0x0, 0x0},
 			},
 			ExpectedJoinRequest: &ttnpb.JoinRequest{
@@ -350,7 +350,7 @@ func TestInteropJoinRequest(t *testing.T) {
 					Rx1DrOffset: 0x6,
 					Rx2Dr:       0xf,
 				},
-				RxDelay: ttnpb.RX_DELAY_5,
+				RxDelay: ttnpb.RxDelay_RX_DELAY_5,
 				CfList: &ttnpb.CFList{
 					Type: ttnpb.CFListType_FREQUENCIES,
 					Freq: []uint32{0xffff42, 0xffffff, 0xffffff, 0xffffff},
@@ -380,7 +380,7 @@ func TestInteropJoinRequest(t *testing.T) {
 				DevEUI:     interop.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 				MACVersion: interop.MACVersion(ttnpb.MAC_V1_1),
 				DLSettings: interop.Buffer{0xef},
-				RxDelay:    ttnpb.RX_DELAY_5,
+				RxDelay:    ttnpb.RxDelay_RX_DELAY_5,
 				CFList:     interop.Buffer{0x42, 0x42},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
@@ -404,7 +404,7 @@ func TestInteropJoinRequest(t *testing.T) {
 				DevEUI:     interop.EUI64{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 				MACVersion: interop.MACVersion(ttnpb.MAC_V1_1),
 				DLSettings: interop.Buffer{0xef, 0xff},
-				RxDelay:    ttnpb.RX_DELAY_5,
+				RxDelay:    ttnpb.RxDelay_RX_DELAY_5,
 				CFList:     interop.Buffer{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0, 0x0, 0x0, 0x0},
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {

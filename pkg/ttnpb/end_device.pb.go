@@ -318,7 +318,7 @@ func (m *MACParameters) GetRx1Delay() RxDelay {
 	if m != nil {
 		return m.Rx1Delay
 	}
-	return RX_DELAY_0
+	return RxDelay_RX_DELAY_0
 }
 
 func (m *MACParameters) GetRx1DataRateOffset() DataRateOffset {
@@ -1268,7 +1268,7 @@ func (m *MACState_JoinRequest) GetRxDelay() RxDelay {
 	if m != nil {
 		return m.RxDelay
 	}
-	return RX_DELAY_0
+	return RxDelay_RX_DELAY_0
 }
 
 func (m *MACState_JoinRequest) GetCfList() *CFList {

@@ -560,7 +560,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		switch request.Class {
 		case ttnpb.CLASS_A:
 			f = c.scheduler.ScheduleAt
-			if request.Rx1Delay == ttnpb.RX_DELAY_0 {
+			if request.Rx1Delay == ttnpb.RxDelay_RX_DELAY_0 {
 				return false, false, 0, errNoRxDelay.New()
 			}
 			settings.Timestamp = uplinkToken.Timestamp + uint32((time.Duration(request.Rx1Delay)*time.Second+rx.delay)/time.Microsecond)
