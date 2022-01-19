@@ -940,7 +940,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 							FCnt: 42,
 							FOpts: MustEncryptDownlink(nwkSEncKey, devAddr, 42, true, MakeDownlinkMACBuffer(
 								LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B],
-								ttnpb.CID_DEV_STATUS,
+								ttnpb.MACCommandIdentifier_CID_DEV_STATUS,
 							)...),
 						},
 						FullFCnt: 42,
@@ -967,7 +967,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						LorawanVersion:      ttnpb.MAC_V1_1,
 						LastDevStatusFCntUp: 4,
 						PendingRequests: []*ttnpb.MACCommand{
-							ttnpb.CID_DEV_STATUS.MACCommand(),
+							ttnpb.MACCommandIdentifier_CID_DEV_STATUS.MACCommand(),
 						},
 						RecentUplinks: []*ttnpb.UplinkMessage{{
 							Payload: &ttnpb.Message{
@@ -1071,7 +1071,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 							FCnt: 42,
 							FOpts: MustEncryptDownlink(nwkSEncKey, devAddr, 42, true, MakeDownlinkMACBuffer(
 								LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B],
-								ttnpb.CID_DEV_STATUS,
+								ttnpb.MACCommandIdentifier_CID_DEV_STATUS,
 							)...),
 						},
 						FullFCnt: 42,
@@ -1097,7 +1097,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DesiredParameters: &ttnpb.MACParameters{},
 						LorawanVersion:    ttnpb.MAC_V1_1,
 						PendingRequests: []*ttnpb.MACCommand{
-							ttnpb.CID_DEV_STATUS.MACCommand(),
+							ttnpb.MACCommandIdentifier_CID_DEV_STATUS.MACCommand(),
 						},
 						RecentUplinks: []*ttnpb.UplinkMessage{{
 							Payload: &ttnpb.Message{

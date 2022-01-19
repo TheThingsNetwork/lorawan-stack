@@ -83,7 +83,7 @@ func EnqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownL
 	}
 
 	var st EnqueueState
-	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_ADR_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
+	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.MACCommandIdentifier_CID_ADR_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, nil, false
 		}
@@ -110,7 +110,7 @@ func EnqueueADRParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownL
 
 func HandleADRParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice) (events.Builders, error) {
 	var err error
-	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.CID_ADR_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
+	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.MACCommandIdentifier_CID_ADR_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetAdrParamSetupReq()
 
 		dev.MacState.CurrentParameters.AdrAckLimitExponent = &ttnpb.ADRAckLimitExponentValue{Value: req.AdrAckLimitExponent}

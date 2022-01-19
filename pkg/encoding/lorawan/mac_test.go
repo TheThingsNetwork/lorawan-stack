@@ -60,7 +60,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"LinkCheckReq",
-			ttnpb.CID_LINK_CHECK,
+			ttnpb.MACCommandIdentifier_CID_LINK_CHECK,
 			[]byte{0x02},
 			true,
 		},
@@ -105,7 +105,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"DutyCycleAns",
-			ttnpb.CID_DUTY_CYCLE,
+			ttnpb.MACCommandIdentifier_CID_DUTY_CYCLE,
 			[]byte{0x04},
 			true,
 		},
@@ -131,7 +131,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"DevStatusReq",
-			ttnpb.CID_DEV_STATUS,
+			ttnpb.MACCommandIdentifier_CID_DEV_STATUS,
 			[]byte{0x06},
 			false,
 		},
@@ -185,7 +185,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"RxTimingSetupAns",
-			ttnpb.CID_RX_TIMING_SETUP,
+			ttnpb.MACCommandIdentifier_CID_RX_TIMING_SETUP,
 			[]byte{0x08},
 			true,
 		},
@@ -201,7 +201,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"TxParamSetupAns",
-			ttnpb.CID_TX_PARAM_SETUP,
+			ttnpb.MACCommandIdentifier_CID_TX_PARAM_SETUP,
 			[]byte{0x09},
 			true,
 		},
@@ -246,13 +246,13 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"ADRParamSetupAns",
-			ttnpb.CID_ADR_PARAM_SETUP,
+			ttnpb.MACCommandIdentifier_CID_ADR_PARAM_SETUP,
 			[]byte{0x0C},
 			true,
 		},
 		{
 			"DeviceTimeReq",
-			ttnpb.CID_DEVICE_TIME,
+			ttnpb.MACCommandIdentifier_CID_DEVICE_TIME,
 			[]byte{0x0D},
 			true,
 		},
@@ -302,7 +302,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"PingSlotInfoAns",
-			ttnpb.CID_PING_SLOT_INFO,
+			ttnpb.MACCommandIdentifier_CID_PING_SLOT_INFO,
 			[]byte{0x10},
 			false,
 		},
@@ -326,7 +326,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		},
 		{
 			"BeaconTimingReq",
-			ttnpb.CID_BEACON_TIMING,
+			ttnpb.MACCommandIdentifier_CID_BEACON_TIMING,
 			[]byte{0x12},
 			true,
 		},

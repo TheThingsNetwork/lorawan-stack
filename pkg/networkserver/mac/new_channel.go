@@ -90,7 +90,7 @@ func EnqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 	}
 
 	var st EnqueueState
-	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_NEW_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
+	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.MACCommandIdentifier_CID_NEW_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		var reqs []*ttnpb.MACCommand_NewChannelReq
 		for i := 0; i < len(dev.MacState.DesiredParameters.Channels) || i < len(dev.MacState.CurrentParameters.Channels); i++ {
 			switch {
@@ -138,7 +138,7 @@ func HandleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 	}
 
 	var err error
-	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.CID_NEW_CHANNEL, func(cmd *ttnpb.MACCommand) error {
+	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.MACCommandIdentifier_CID_NEW_CHANNEL, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetNewChannelReq()
 		if !pld.DataRateAck {
 			if dev.MacState.RejectedDataRateRanges == nil {

@@ -328,7 +328,7 @@ func makeClassAOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 				},
 			},
 		},
-		DownlinkMACCommanders: []MACCommander{ttnpb.CID_DEV_STATUS},
+		DownlinkMACCommanders: []MACCommander{ttnpb.MACCommandIdentifier_CID_DEV_STATUS},
 		DownlinkEventBuilders: []events.Builder{mac.EvtEnqueueDevStatusRequest},
 		Func: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) {
 		},
@@ -379,7 +379,7 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 		},
 		UplinkMACCommanders:   upCmders,
 		UplinkEventBuilders:   upEvBuilders,
-		DownlinkMACCommanders: append(downCmders, ttnpb.CID_DEV_STATUS),
+		DownlinkMACCommanders: append(downCmders, ttnpb.MACCommandIdentifier_CID_DEV_STATUS),
 		DownlinkEventBuilders: []events.Builder{mac.EvtEnqueueDevStatusRequest},
 		Func: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) {
 		},

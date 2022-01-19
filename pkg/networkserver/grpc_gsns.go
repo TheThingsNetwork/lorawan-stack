@@ -494,20 +494,20 @@ macLoop:
 		var evs events.Builders
 		var err error
 		switch cmd.Cid {
-		case ttnpb.CID_RESET:
+		case ttnpb.MACCommandIdentifier_CID_RESET:
 			evs, err = mac.HandleResetInd(ctx, dev, cmd.GetResetInd(), fps, ns.defaultMACSettings)
-		case ttnpb.CID_LINK_CHECK:
+		case ttnpb.MACCommandIdentifier_CID_LINK_CHECK:
 			if !deduplicated {
 				deferredMACHandlers = append(deferredMACHandlers, makeDeferredMACHandler(dev, mac.HandleLinkCheckReq))
 				continue macLoop
 			}
 			evs, err = mac.HandleLinkCheckReq(ctx, dev, up)
-		case ttnpb.CID_LINK_ADR:
+		case ttnpb.MACCommandIdentifier_CID_LINK_ADR:
 			pld := cmd.GetLinkAdrAns()
 			dupCount := 0
 			if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
 				for _, dup := range cmds {
-					if dup.Cid != ttnpb.CID_LINK_ADR {
+					if dup.Cid != ttnpb.MACCommandIdentifier_CID_LINK_ADR {
 						break
 					}
 					if !proto.Equal(dup.GetLinkAdrAns(), pld) {
@@ -522,11 +522,11 @@ macLoop:
 			}
 			cmds = cmds[dupCount:]
 			evs, err = mac.HandleLinkADRAns(ctx, dev, pld, uint(dupCount), cmacFMatchResult.FullFCnt, fps)
-		case ttnpb.CID_DUTY_CYCLE:
+		case ttnpb.MACCommandIdentifier_CID_DUTY_CYCLE:
 			evs, err = mac.HandleDutyCycleAns(ctx, dev)
-		case ttnpb.CID_RX_PARAM_SETUP:
+		case ttnpb.MACCommandIdentifier_CID_RX_PARAM_SETUP:
 			evs, err = mac.HandleRxParamSetupAns(ctx, dev, cmd.GetRxParamSetupAns())
-		case ttnpb.CID_DEV_STATUS:
+		case ttnpb.MACCommandIdentifier_CID_DEV_STATUS:
 			evs, err = mac.HandleDevStatusAns(ctx, dev, cmd.GetDevStatusAns(), cmacFMatchResult.FullFCnt, *ttnpb.StdTime(up.ReceivedAt))
 			if err == nil {
 				setPaths = append(setPaths,
@@ -536,31 +536,31 @@ macLoop:
 					"power_state",
 				)
 			}
-		case ttnpb.CID_NEW_CHANNEL:
+		case ttnpb.MACCommandIdentifier_CID_NEW_CHANNEL:
 			evs, err = mac.HandleNewChannelAns(ctx, dev, cmd.GetNewChannelAns())
-		case ttnpb.CID_RX_TIMING_SETUP:
+		case ttnpb.MACCommandIdentifier_CID_RX_TIMING_SETUP:
 			evs, err = mac.HandleRxTimingSetupAns(ctx, dev)
-		case ttnpb.CID_TX_PARAM_SETUP:
+		case ttnpb.MACCommandIdentifier_CID_TX_PARAM_SETUP:
 			evs, err = mac.HandleTxParamSetupAns(ctx, dev)
-		case ttnpb.CID_DL_CHANNEL:
+		case ttnpb.MACCommandIdentifier_CID_DL_CHANNEL:
 			evs, err = mac.HandleDLChannelAns(ctx, dev, cmd.GetDlChannelAns())
-		case ttnpb.CID_REKEY:
+		case ttnpb.MACCommandIdentifier_CID_REKEY:
 			evs, err = mac.HandleRekeyInd(ctx, dev, cmd.GetRekeyInd(), pld.FHdr.DevAddr)
-		case ttnpb.CID_ADR_PARAM_SETUP:
+		case ttnpb.MACCommandIdentifier_CID_ADR_PARAM_SETUP:
 			evs, err = mac.HandleADRParamSetupAns(ctx, dev)
-		case ttnpb.CID_DEVICE_TIME:
+		case ttnpb.MACCommandIdentifier_CID_DEVICE_TIME:
 			evs, err = mac.HandleDeviceTimeReq(ctx, dev, up)
-		case ttnpb.CID_REJOIN_PARAM_SETUP:
+		case ttnpb.MACCommandIdentifier_CID_REJOIN_PARAM_SETUP:
 			evs, err = mac.HandleRejoinParamSetupAns(ctx, dev, cmd.GetRejoinParamSetupAns())
-		case ttnpb.CID_PING_SLOT_INFO:
+		case ttnpb.MACCommandIdentifier_CID_PING_SLOT_INFO:
 			evs, err = mac.HandlePingSlotInfoReq(ctx, dev, cmd.GetPingSlotInfoReq())
-		case ttnpb.CID_PING_SLOT_CHANNEL:
+		case ttnpb.MACCommandIdentifier_CID_PING_SLOT_CHANNEL:
 			evs, err = mac.HandlePingSlotChannelAns(ctx, dev, cmd.GetPingSlotChannelAns())
-		case ttnpb.CID_BEACON_TIMING:
+		case ttnpb.MACCommandIdentifier_CID_BEACON_TIMING:
 			evs, err = mac.HandleBeaconTimingReq(ctx, dev)
-		case ttnpb.CID_BEACON_FREQ:
+		case ttnpb.MACCommandIdentifier_CID_BEACON_FREQ:
 			evs, err = mac.HandleBeaconFreqAns(ctx, dev, cmd.GetBeaconFreqAns())
-		case ttnpb.CID_DEVICE_MODE:
+		case ttnpb.MACCommandIdentifier_CID_DEVICE_MODE:
 			evs, err = mac.HandleDeviceModeInd(ctx, dev, cmd.GetDeviceModeInd())
 		default:
 			logger.Warn("Unknown MAC command received, skip the rest")

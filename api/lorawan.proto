@@ -393,7 +393,6 @@ message TxRequest {
 
 enum MACCommandIdentifier {
   option (thethings.json.enum) = { marshal_as_string: true, prefix: "CID" };
-  option (gogoproto.goproto_enum_prefix) = false;
 
   CID_RFU_0 = 0;
   CID_RESET = 1;

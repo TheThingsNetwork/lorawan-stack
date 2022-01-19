@@ -371,9 +371,9 @@ func TestLinkADRReq(t *testing.T) {
 					}
 				}() {
 					cmdsFit := n >= len(tc.Commands)
-					cmdLen := (1 + lorawan.DefaultMACCommands[ttnpb.CID_LINK_ADR].DownlinkLength) * uint16(n)
+					cmdLen := (1 + lorawan.DefaultMACCommands[ttnpb.MACCommandIdentifier_CID_LINK_ADR].DownlinkLength) * uint16(n)
 					cmds := tc.Commands[:n]
-					answerLen := (1 + lorawan.DefaultMACCommands[ttnpb.CID_LINK_ADR].UplinkLength) * func() uint16 {
+					answerLen := (1 + lorawan.DefaultMACCommands[ttnpb.MACCommandIdentifier_CID_LINK_ADR].UplinkLength) * func() uint16 {
 						switch {
 						case n == 0:
 							return 0

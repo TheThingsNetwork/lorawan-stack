@@ -245,7 +245,7 @@ func EnqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 	}
 
 	var st EnqueueState
-	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_LINK_ADR, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
+	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.MACCommandIdentifier_CID_LINK_ADR, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if int(nDown) < len(params.Masks) {
 			return nil, 0, nil, false
 		}
@@ -312,7 +312,7 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	}
 	var n uint
 	var req *ttnpb.MACCommand_LinkADRReq
-	dev.MacState.PendingRequests, err = handler(ttnpb.CID_LINK_ADR, func(cmd *ttnpb.MACCommand) error {
+	dev.MacState.PendingRequests, err = handler(ttnpb.MACCommandIdentifier_CID_LINK_ADR, func(cmd *ttnpb.MACCommand) error {
 		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 && n > dupCount+1 {
 			return internal.ErrInvalidPayload.New()
 		}

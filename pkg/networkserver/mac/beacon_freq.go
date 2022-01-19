@@ -53,7 +53,7 @@ func EnqueueBeaconFreqReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 	}
 
 	var st EnqueueState
-	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_BEACON_FREQ, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
+	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.MACCommandIdentifier_CID_BEACON_FREQ, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, nil, false
 		}
@@ -87,7 +87,7 @@ func HandleBeaconFreqAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 	}
 
 	var err error
-	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.CID_BEACON_FREQ, func(cmd *ttnpb.MACCommand) error {
+	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.MACCommandIdentifier_CID_BEACON_FREQ, func(cmd *ttnpb.MACCommand) error {
 		if !pld.FrequencyAck {
 			return nil
 		}

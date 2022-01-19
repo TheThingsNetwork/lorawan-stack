@@ -1028,7 +1028,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DeviceDiffs: []DeviceDiffFunc{
 				appendRecentMACStateDownlinkDiff,
 				makePendingMACCommandsDiff(
-					ttnpb.CID_DEV_STATUS.MACCommand(),
+					ttnpb.MACCommandIdentifier_CID_DEV_STATUS.MACCommand(),
 				),
 				setLastConfirmedDownlinkAtDiff,
 				setLastDownlinkAtDiff,
@@ -1183,7 +1183,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DeviceDiffs: []DeviceDiffFunc{
 				appendRecentMACStateDownlinkDiff,
 				makePendingMACCommandsDiff(
-					ttnpb.CID_DEV_STATUS.MACCommand(),
+					ttnpb.MACCommandIdentifier_CID_DEV_STATUS.MACCommand(),
 				),
 				makeSetLastNFCntDownDiff(0x25),
 				setLastConfirmedDownlinkAtDiff,
@@ -1342,7 +1342,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DeviceDiffs: []DeviceDiffFunc{
 				appendRecentMACStateDownlinkDiff,
 				makePendingMACCommandsDiff(
-					ttnpb.CID_DEV_STATUS.MACCommand(),
+					ttnpb.MACCommandIdentifier_CID_DEV_STATUS.MACCommand(),
 				),
 				setLastDownlinkAtDiff,
 				setLastConfirmedDownlinkAtDiff,
@@ -1650,7 +1650,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DeviceDiffs: []DeviceDiffFunc{
 				appendRecentMACStateDownlinkDiff,
 				makePendingMACCommandsDiff(
-					ttnpb.CID_DEV_STATUS.MACCommand(),
+					ttnpb.MACCommandIdentifier_CID_DEV_STATUS.MACCommand(),
 				),
 				makeSetLastNFCntDownDiff(0x24),
 				setLastDownlinkAtDiff,

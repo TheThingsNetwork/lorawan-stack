@@ -306,9 +306,9 @@ func TestDLChannelReq(t *testing.T) {
 					}
 				}() {
 					cmdsFit := n >= len(tc.Commands)
-					cmdLen := (1 + lorawan.DefaultMACCommands[ttnpb.CID_DL_CHANNEL].DownlinkLength) * uint16(n)
+					cmdLen := (1 + lorawan.DefaultMACCommands[ttnpb.MACCommandIdentifier_CID_DL_CHANNEL].DownlinkLength) * uint16(n)
 					cmds := tc.Commands[:n]
-					answerLen := (1 + lorawan.DefaultMACCommands[ttnpb.CID_DL_CHANNEL].UplinkLength) * uint16(n)
+					answerLen := (1 + lorawan.DefaultMACCommands[ttnpb.MACCommandIdentifier_CID_DL_CHANNEL].UplinkLength) * uint16(n)
 					test.RunSubtestFromContext(ctx, test.SubtestConfig{
 						Name:     fmt.Sprintf("EnqueueDLChannelReq/max_down_len:%d", cmdLen),
 						Parallel: true,

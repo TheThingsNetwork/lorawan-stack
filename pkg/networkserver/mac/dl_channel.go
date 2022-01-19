@@ -80,7 +80,7 @@ func EnqueueDLChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 	}
 
 	var st EnqueueState
-	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_DL_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
+	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.MACCommandIdentifier_CID_DL_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		var cmds []*ttnpb.MACCommand
 		var evs events.Builders
 		for i := 0; i < len(dev.MacState.DesiredParameters.Channels) && i < len(dev.MacState.CurrentParameters.Channels); i++ {
@@ -119,7 +119,7 @@ func HandleDLChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 	}
 
 	var err error
-	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.CID_DL_CHANNEL, func(cmd *ttnpb.MACCommand) error {
+	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.MACCommandIdentifier_CID_DL_CHANNEL, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetDlChannelReq()
 		if !pld.FrequencyAck {
 			if i := searchUint64(req.Frequency, dev.MacState.RejectedFrequencies...); i == len(dev.MacState.RejectedFrequencies) || dev.MacState.RejectedFrequencies[i] != req.Frequency {

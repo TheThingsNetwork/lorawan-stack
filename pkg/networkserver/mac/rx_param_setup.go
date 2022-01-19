@@ -55,7 +55,7 @@ func EnqueueRxParamSetupReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLe
 	}
 
 	var st EnqueueState
-	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_RX_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
+	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.MACCommandIdentifier_CID_RX_PARAM_SETUP, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, nil, false
 		}
@@ -87,7 +87,7 @@ func HandleRxParamSetupAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 	}
 
 	var err error
-	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.CID_RX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
+	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.MACCommandIdentifier_CID_RX_PARAM_SETUP, func(cmd *ttnpb.MACCommand) error {
 		if !pld.Rx1DataRateOffsetAck || !pld.Rx2DataRateIndexAck || !pld.Rx2FrequencyAck {
 			return nil
 		}

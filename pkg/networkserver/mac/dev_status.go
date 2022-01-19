@@ -94,13 +94,13 @@ func EnqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, 
 	}
 
 	var st EnqueueState
-	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_DEV_STATUS, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
+	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.MACCommandIdentifier_CID_DEV_STATUS, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		if nDown < 1 || nUp < 1 {
 			return nil, 0, nil, false
 		}
 		log.FromContext(ctx).Debug("Enqueued DevStatusReq")
 		return []*ttnpb.MACCommand{
-				ttnpb.CID_DEV_STATUS.MACCommand(),
+				ttnpb.MACCommandIdentifier_CID_DEV_STATUS.MACCommand(),
 			},
 			1,
 			events.Builders{
@@ -117,7 +117,7 @@ func HandleDevStatusAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MA
 	}
 
 	var err error
-	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.CID_DEV_STATUS, func(*ttnpb.MACCommand) error {
+	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.MACCommandIdentifier_CID_DEV_STATUS, func(*ttnpb.MACCommand) error {
 		switch pld.Battery {
 		case 0:
 			dev.PowerState = ttnpb.PowerState_POWER_EXTERNAL
