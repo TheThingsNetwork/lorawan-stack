@@ -192,7 +192,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		{
 			"TxParamSetupReq",
 			&ttnpb.MACCommand_TxParamSetupReq{
-				MaxEirpIndex:      ttnpb.DEVICE_EIRP_36,
+				MaxEirpIndex:      ttnpb.DeviceEIRP_DEVICE_EIRP_36,
 				UplinkDwellTime:   false,
 				DownlinkDwellTime: true,
 			},

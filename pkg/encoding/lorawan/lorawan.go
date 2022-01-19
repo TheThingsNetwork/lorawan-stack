@@ -44,37 +44,37 @@ func appendReverse(dst []byte, src ...byte) []byte {
 // DeviceEIRPToFloat32 returns v as a float32 value.
 func DeviceEIRPToFloat32(v ttnpb.DeviceEIRP) float32 {
 	switch v {
-	case ttnpb.DEVICE_EIRP_36:
+	case ttnpb.DeviceEIRP_DEVICE_EIRP_36:
 		return 36
-	case ttnpb.DEVICE_EIRP_33:
+	case ttnpb.DeviceEIRP_DEVICE_EIRP_33:
 		return 33
-	case ttnpb.DEVICE_EIRP_30:
+	case ttnpb.DeviceEIRP_DEVICE_EIRP_30:
 		return 30
-	case ttnpb.DEVICE_EIRP_29:
+	case ttnpb.DeviceEIRP_DEVICE_EIRP_29:
 		return 29
-	case ttnpb.DEVICE_EIRP_27:
+	case ttnpb.DeviceEIRP_DEVICE_EIRP_27:
 		return 27
-	case ttnpb.DEVICE_EIRP_26:
+	case ttnpb.DeviceEIRP_DEVICE_EIRP_26:
 		return 26
-	case ttnpb.DEVICE_EIRP_24:
+	case ttnpb.DeviceEIRP_DEVICE_EIRP_24:
 		return 24
-	case ttnpb.DEVICE_EIRP_21:
+	case ttnpb.DeviceEIRP_DEVICE_EIRP_21:
 		return 21
-	case ttnpb.DEVICE_EIRP_20:
+	case ttnpb.DeviceEIRP_DEVICE_EIRP_20:
 		return 20
-	case ttnpb.DEVICE_EIRP_18:
+	case ttnpb.DeviceEIRP_DEVICE_EIRP_18:
 		return 18
-	case ttnpb.DEVICE_EIRP_16:
+	case ttnpb.DeviceEIRP_DEVICE_EIRP_16:
 		return 16
-	case ttnpb.DEVICE_EIRP_14:
+	case ttnpb.DeviceEIRP_DEVICE_EIRP_14:
 		return 14
-	case ttnpb.DEVICE_EIRP_13:
+	case ttnpb.DeviceEIRP_DEVICE_EIRP_13:
 		return 13
-	case ttnpb.DEVICE_EIRP_12:
+	case ttnpb.DeviceEIRP_DEVICE_EIRP_12:
 		return 12
-	case ttnpb.DEVICE_EIRP_10:
+	case ttnpb.DeviceEIRP_DEVICE_EIRP_10:
 		return 10
-	case ttnpb.DEVICE_EIRP_8:
+	case ttnpb.DeviceEIRP_DEVICE_EIRP_8:
 		return 8
 	}
 	panic(fmt.Errorf("unknown DeviceEIRP value `%d`", v))
@@ -84,37 +84,37 @@ func DeviceEIRPToFloat32(v ttnpb.DeviceEIRP) float32 {
 func Float32ToDeviceEIRP(v float32) ttnpb.DeviceEIRP {
 	switch {
 	case v >= 36:
-		return ttnpb.DEVICE_EIRP_36
+		return ttnpb.DeviceEIRP_DEVICE_EIRP_36
 	case v >= 33:
-		return ttnpb.DEVICE_EIRP_33
+		return ttnpb.DeviceEIRP_DEVICE_EIRP_33
 	case v >= 30:
-		return ttnpb.DEVICE_EIRP_30
+		return ttnpb.DeviceEIRP_DEVICE_EIRP_30
 	case v >= 29:
-		return ttnpb.DEVICE_EIRP_29
+		return ttnpb.DeviceEIRP_DEVICE_EIRP_29
 	case v >= 27:
-		return ttnpb.DEVICE_EIRP_27
+		return ttnpb.DeviceEIRP_DEVICE_EIRP_27
 	case v >= 26:
-		return ttnpb.DEVICE_EIRP_26
+		return ttnpb.DeviceEIRP_DEVICE_EIRP_26
 	case v >= 24:
-		return ttnpb.DEVICE_EIRP_24
+		return ttnpb.DeviceEIRP_DEVICE_EIRP_24
 	case v >= 21:
-		return ttnpb.DEVICE_EIRP_21
+		return ttnpb.DeviceEIRP_DEVICE_EIRP_21
 	case v >= 20:
-		return ttnpb.DEVICE_EIRP_20
+		return ttnpb.DeviceEIRP_DEVICE_EIRP_20
 	case v >= 18:
-		return ttnpb.DEVICE_EIRP_18
+		return ttnpb.DeviceEIRP_DEVICE_EIRP_18
 	case v >= 16:
-		return ttnpb.DEVICE_EIRP_16
+		return ttnpb.DeviceEIRP_DEVICE_EIRP_16
 	case v >= 14:
-		return ttnpb.DEVICE_EIRP_14
+		return ttnpb.DeviceEIRP_DEVICE_EIRP_14
 	case v >= 13:
-		return ttnpb.DEVICE_EIRP_13
+		return ttnpb.DeviceEIRP_DEVICE_EIRP_13
 	case v >= 12:
-		return ttnpb.DEVICE_EIRP_12
+		return ttnpb.DeviceEIRP_DEVICE_EIRP_12
 	case v >= 10:
-		return ttnpb.DEVICE_EIRP_10
+		return ttnpb.DeviceEIRP_DEVICE_EIRP_10
 	}
-	return ttnpb.DEVICE_EIRP_8
+	return ttnpb.DeviceEIRP_DEVICE_EIRP_8
 }
 
 // ADRAckLimitExponentToUint32 returns v as a uint32 value.

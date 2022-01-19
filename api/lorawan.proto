@@ -685,7 +685,6 @@ enum RejoinPeriodExponent {
 
 enum DeviceEIRP {
   option (thethings.json.enum) = { marshal_as_string: true, prefix: "DEVICE_EIRP" };
-  option (gogoproto.goproto_enum_prefix) = false;
 
   DEVICE_EIRP_8 = 0;   // 8 dBm.
   DEVICE_EIRP_10 = 1;  // 10 dBm.

@@ -195,7 +195,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 					},
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_TxParamSetupReq{
-							MaxEirpIndex:      ttnpb.DEVICE_EIRP_26,
+							MaxEirpIndex:      ttnpb.DeviceEIRP_DEVICE_EIRP_26,
 							DownlinkDwellTime: true,
 							UplinkDwellTime:   true,
 						}).MACCommand(),
@@ -210,7 +210,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 				Ok:         true,
 				QueuedEvents: events.Builders{
 					EvtEnqueueTxParamSetupRequest.With(events.WithData(&ttnpb.MACCommand_TxParamSetupReq{
-						MaxEirpIndex:      ttnpb.DEVICE_EIRP_26,
+						MaxEirpIndex:      ttnpb.DeviceEIRP_DEVICE_EIRP_26,
 						DownlinkDwellTime: true,
 						UplinkDwellTime:   true,
 					})),
@@ -367,7 +367,7 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_TxParamSetupReq{
-							MaxEirpIndex:      ttnpb.DEVICE_EIRP_26,
+							MaxEirpIndex:      ttnpb.DeviceEIRP_DEVICE_EIRP_26,
 							DownlinkDwellTime: true,
 							UplinkDwellTime:   true,
 						}).MACCommand(),

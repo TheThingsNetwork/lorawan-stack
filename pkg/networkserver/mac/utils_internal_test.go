@@ -66,7 +66,7 @@ func TestNewState(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredMaxEirp: &ttnpb.DeviceEIRPValue{
-						Value: ttnpb.DEVICE_EIRP_18,
+						Value: ttnpb.DeviceEIRP_DEVICE_EIRP_18,
 					},
 				},
 			},
