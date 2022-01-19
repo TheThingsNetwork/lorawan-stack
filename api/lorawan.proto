@@ -74,13 +74,13 @@ enum MACVersion {
   option (gogoproto.goproto_enum_prefix) = false;
   option (gogoproto.enum_stringer) = false;
 
-  MAC_UNKNOWN = 0;
-  MAC_V1_0 = 1;
-  MAC_V1_0_1 = 2;
-  MAC_V1_0_2 = 3;
-  MAC_V1_1 = 4;
-  MAC_V1_0_3 = 5;
-  MAC_V1_0_4 = 6;
+  MAC_UNKNOWN = 0 [(thethings.json.enum_value) = { aliases: ["unknown"] }];
+  MAC_V1_0 = 1 [(thethings.json.enum_value) = { aliases: ["1.0", "1.0.0"] }];
+  MAC_V1_0_1 = 2 [(thethings.json.enum_value) = { aliases: ["1.0.1"] }];
+  MAC_V1_0_2 = 3 [(thethings.json.enum_value) = { aliases: ["1.0.2"] }];
+  MAC_V1_1 = 4 [(thethings.json.enum_value) = { aliases: ["1.1", "1.1.0"] }];
+  MAC_V1_0_3 = 5 [(thethings.json.enum_value) = { aliases: ["1.0.3"] }];
+  MAC_V1_0_4 = 6 [(thethings.json.enum_value) = { aliases: ["1.0.4"] }];
 }
 
 enum PHYVersion {
@@ -88,9 +88,9 @@ enum PHYVersion {
   option (gogoproto.goproto_enum_prefix) = false;
   option (gogoproto.enum_stringer) = false;
 
-  PHY_UNKNOWN = 0 [(thethings.json.enum_value) = { value: "unknown" }];
+  PHY_UNKNOWN = 0 [(thethings.json.enum_value) = { value: "PHY_UNKNOWN", aliases: ["unknown"] }];
 
-  TS001_V1_0 = 1 [(thethings.json.enum_value) = { value: "PHY_V1_0", aliases: ["1.0","1.0.0"] }];
+  TS001_V1_0 = 1 [(thethings.json.enum_value) = { value: "PHY_V1_0", aliases: ["1.0", "1.0.0"] }];
   TS001_V1_0_1 = 2 [(thethings.json.enum_value) = { value: "PHY_V1_0_1", aliases: ["1.0.1"] }];
 
   RP001_V1_0_2 = 3 [(thethings.json.enum_value) = { value: "PHY_V1_0_2_REV_A", aliases: ["1.0.2", "1.0.2-a"] }];

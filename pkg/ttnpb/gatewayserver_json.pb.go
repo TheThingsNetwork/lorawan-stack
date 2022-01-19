@@ -42,6 +42,11 @@ func (x *GatewayUp) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the GatewayUp to JSON.
+func (x GatewayUp) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the GatewayUp message from JSON.
 func (x *GatewayUp) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -79,6 +84,11 @@ func (x *GatewayUp) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// UnmarshalJSON unmarshals the GatewayUp from JSON.
+func (x *GatewayUp) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the GatewayDown message to JSON.
 func (x *GatewayDown) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -93,6 +103,11 @@ func (x *GatewayDown) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		x.DownlinkMessage.MarshalProtoJSON(s.WithField("downlink_message"))
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GatewayDown to JSON.
+func (x GatewayDown) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the GatewayDown message from JSON.
@@ -111,4 +126,9 @@ func (x *GatewayDown) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the GatewayDown from JSON.
+func (x *GatewayDown) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

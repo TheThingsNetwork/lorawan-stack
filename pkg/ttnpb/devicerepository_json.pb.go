@@ -25,6 +25,16 @@ func (x KeyProvisioning) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteEnumString(int32(x), KeyProvisioning_customname, KeyProvisioning_name)
 }
 
+// MarshalText marshals the KeyProvisioning to text.
+func (x KeyProvisioning) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), KeyProvisioning_customname, KeyProvisioning_name)), nil
+}
+
+// MarshalJSON marshals the KeyProvisioning to JSON.
+func (x KeyProvisioning) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
 // KeyProvisioning_customvalue contains custom string values that extend KeyProvisioning_value.
 var KeyProvisioning_customvalue = map[string]int32{
 	"UNKNOWN":     0,
@@ -47,6 +57,21 @@ func (x *KeyProvisioning) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	*x = KeyProvisioning(v)
 }
 
+// UnmarshalText unmarshals the KeyProvisioning from text.
+func (x *KeyProvisioning) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), KeyProvisioning_customvalue, KeyProvisioning_value)
+	if err != nil {
+		return err
+	}
+	*x = KeyProvisioning(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the KeyProvisioning from JSON.
+func (x *KeyProvisioning) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // KeySecurity_customname contains custom string values that override KeySecurity_name.
 var KeySecurity_customname = map[int32]string{
 	0: "unknown",
@@ -58,6 +83,16 @@ var KeySecurity_customname = map[int32]string{
 // MarshalProtoJSON marshals the KeySecurity to JSON.
 func (x KeySecurity) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteEnumString(int32(x), KeySecurity_customname, KeySecurity_name)
+}
+
+// MarshalText marshals the KeySecurity to text.
+func (x KeySecurity) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), KeySecurity_customname, KeySecurity_name)), nil
+}
+
+// MarshalJSON marshals the KeySecurity to JSON.
+func (x KeySecurity) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
 }
 
 // KeySecurity_customvalue contains custom string values that extend KeySecurity_value.
@@ -80,6 +115,21 @@ func (x *KeySecurity) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		return
 	}
 	*x = KeySecurity(v)
+}
+
+// UnmarshalText unmarshals the KeySecurity from text.
+func (x *KeySecurity) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), KeySecurity_customvalue, KeySecurity_value)
+	if err != nil {
+		return err
+	}
+	*x = KeySecurity(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the KeySecurity from JSON.
+func (x *KeySecurity) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the EndDeviceModel message to JSON.
@@ -235,6 +285,11 @@ func (x *EndDeviceModel) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the EndDeviceModel to JSON.
+func (x EndDeviceModel) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the EndDeviceModel message from JSON.
 func (x *EndDeviceModel) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -354,6 +409,11 @@ func (x *EndDeviceModel) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// UnmarshalJSON unmarshals the EndDeviceModel from JSON.
+func (x *EndDeviceModel) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the ListEndDeviceModelsResponse message to JSON.
 func (x *ListEndDeviceModelsResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -374,6 +434,11 @@ func (x *ListEndDeviceModelsResponse) MarshalProtoJSON(s *jsonplugin.MarshalStat
 		s.WriteArrayEnd()
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ListEndDeviceModelsResponse to JSON.
+func (x ListEndDeviceModelsResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the ListEndDeviceModelsResponse message from JSON.
@@ -401,6 +466,11 @@ func (x *ListEndDeviceModelsResponse) UnmarshalProtoJSON(s *jsonplugin.Unmarshal
 			})
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the ListEndDeviceModelsResponse from JSON.
+func (x *ListEndDeviceModelsResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the MessagePayloadDecoder message to JSON.
@@ -441,6 +511,11 @@ func (x *MessagePayloadDecoder) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the MessagePayloadDecoder to JSON.
+func (x MessagePayloadDecoder) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the MessagePayloadDecoder message from JSON.
 func (x *MessagePayloadDecoder) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -469,6 +544,11 @@ func (x *MessagePayloadDecoder) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState)
 			})
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the MessagePayloadDecoder from JSON.
+func (x *MessagePayloadDecoder) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the MessagePayloadEncoder message to JSON.
@@ -509,6 +589,11 @@ func (x *MessagePayloadEncoder) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the MessagePayloadEncoder to JSON.
+func (x MessagePayloadEncoder) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the MessagePayloadEncoder message from JSON.
 func (x *MessagePayloadEncoder) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -537,4 +622,9 @@ func (x *MessagePayloadEncoder) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState)
 			})
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the MessagePayloadEncoder from JSON.
+func (x *MessagePayloadEncoder) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

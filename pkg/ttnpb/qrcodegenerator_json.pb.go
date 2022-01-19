@@ -38,6 +38,11 @@ func (x *GenerateEndDeviceQRCodeRequest) MarshalProtoJSON(s *jsonplugin.MarshalS
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the GenerateEndDeviceQRCodeRequest to JSON.
+func (x GenerateEndDeviceQRCodeRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the GenerateEndDeviceQRCodeRequest message from JSON.
 func (x *GenerateEndDeviceQRCodeRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -63,4 +68,9 @@ func (x *GenerateEndDeviceQRCodeRequest) UnmarshalProtoJSON(s *jsonplugin.Unmars
 			x.Image = &v
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the GenerateEndDeviceQRCodeRequest from JSON.
+func (x *GenerateEndDeviceQRCodeRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

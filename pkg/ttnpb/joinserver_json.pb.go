@@ -52,6 +52,11 @@ func (x *CryptoServicePayloadRequest) MarshalProtoJSON(s *jsonplugin.MarshalStat
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the CryptoServicePayloadRequest to JSON.
+func (x CryptoServicePayloadRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the CryptoServicePayloadRequest message from JSON.
 func (x *CryptoServicePayloadRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -87,6 +92,11 @@ func (x *CryptoServicePayloadRequest) UnmarshalProtoJSON(s *jsonplugin.Unmarshal
 	})
 }
 
+// UnmarshalJSON unmarshals the CryptoServicePayloadRequest from JSON.
+func (x *CryptoServicePayloadRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the JoinAcceptMICRequest message to JSON.
 func (x *JoinAcceptMICRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -113,6 +123,11 @@ func (x *JoinAcceptMICRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the JoinAcceptMICRequest to JSON.
+func (x JoinAcceptMICRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the JoinAcceptMICRequest message from JSON.
 func (x *JoinAcceptMICRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -135,6 +150,11 @@ func (x *JoinAcceptMICRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 			x.DevNonce.UnmarshalProtoJSON(s.WithField("dev_nonce", false))
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the JoinAcceptMICRequest from JSON.
+func (x *JoinAcceptMICRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the DeriveSessionKeysRequest message to JSON.
@@ -188,6 +208,11 @@ func (x *DeriveSessionKeysRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) 
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the DeriveSessionKeysRequest to JSON.
+func (x DeriveSessionKeysRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the DeriveSessionKeysRequest message from JSON.
 func (x *DeriveSessionKeysRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -227,4 +252,9 @@ func (x *DeriveSessionKeysRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSta
 			x.ProvisioningData = v
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the DeriveSessionKeysRequest from JSON.
+func (x *DeriveSessionKeysRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

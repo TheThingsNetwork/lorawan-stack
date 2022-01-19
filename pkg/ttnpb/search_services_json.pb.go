@@ -89,6 +89,11 @@ func (x *SearchClientsRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the SearchClientsRequest to JSON.
+func (x SearchClientsRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the SearchClientsRequest message from JSON.
 func (x *SearchClientsRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -141,6 +146,11 @@ func (x *SearchClientsRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 			x.Deleted = s.ReadBool()
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the SearchClientsRequest from JSON.
+func (x *SearchClientsRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the SearchUsersRequest message to JSON.
@@ -221,6 +231,11 @@ func (x *SearchUsersRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the SearchUsersRequest to JSON.
+func (x SearchUsersRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the SearchUsersRequest message from JSON.
 func (x *SearchUsersRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -273,4 +288,9 @@ func (x *SearchUsersRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Deleted = s.ReadBool()
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the SearchUsersRequest from JSON.
+func (x *SearchUsersRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

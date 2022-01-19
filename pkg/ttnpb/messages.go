@@ -17,43 +17,7 @@ package ttnpb
 import (
 	"bytes"
 	"fmt"
-	"strconv"
-	"strings"
 )
-
-// MarshalText implements encoding.TextMarshaler interface.
-func (v PayloadFormatter) MarshalText() ([]byte, error) {
-	return []byte(v.String()), nil
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler interface.
-func (v *PayloadFormatter) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := PayloadFormatter_value[s]; ok {
-		*v = PayloadFormatter(i)
-		return nil
-	}
-	if !strings.HasPrefix(s, "FORMATTER_") {
-		if i, ok := PayloadFormatter_value["FORMATTER_"+s]; ok {
-			*v = PayloadFormatter(i)
-			return nil
-		}
-	}
-	return errCouldNotParse("PayloadFormatter")(string(b))
-}
-
-// UnmarshalJSON implements json.Unmarshaler interface.
-func (v *PayloadFormatter) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
-	}
-	i, err := strconv.Atoi(string(b))
-	if err != nil {
-		return errCouldNotParse("PayloadFormatter")(string(b)).WithCause(err)
-	}
-	*v = PayloadFormatter(i)
-	return nil
-}
 
 // FieldIsZero returns whether path p is zero.
 func (v *MessagePayloadFormatters) FieldIsZero(p string) bool {
@@ -119,34 +83,6 @@ func (v *ApplicationDownlink) FieldIsZero(p string) bool {
 		return v.SessionKeyId == nil
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
-}
-
-// MarshalText implements encoding.TextMarshaler interface.
-func (v TxAcknowledgment_Result) MarshalText() ([]byte, error) {
-	return []byte(v.String()), nil
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler interface.
-func (v *TxAcknowledgment_Result) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := TxAcknowledgment_Result_value[s]; ok {
-		*v = TxAcknowledgment_Result(i)
-		return nil
-	}
-	return errCouldNotParse("TxAcknowledgment_Result")(string(b))
-}
-
-// UnmarshalJSON implements json.Unmarshaler interface.
-func (v *TxAcknowledgment_Result) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
-	}
-	i, err := strconv.Atoi(string(b))
-	if err != nil {
-		return errCouldNotParse("TxAcknowledgment_Result")(string(b)).WithCause(err)
-	}
-	*v = TxAcknowledgment_Result(i)
-	return nil
 }
 
 // PartitionDownlinks partitions downlinks based on the general predicate p.

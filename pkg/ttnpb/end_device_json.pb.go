@@ -18,6 +18,16 @@ func (x PowerState) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteEnumString(int32(x), PowerState_name)
 }
 
+// MarshalText marshals the PowerState to text.
+func (x PowerState) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), PowerState_name)), nil
+}
+
+// MarshalJSON marshals the PowerState to JSON.
+func (x PowerState) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
 // PowerState_customvalue contains custom string values that extend PowerState_value.
 var PowerState_customvalue = map[string]int32{
 	"UNKNOWN":  0,
@@ -33,6 +43,21 @@ func (x *PowerState) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		return
 	}
 	*x = PowerState(v)
+}
+
+// UnmarshalText unmarshals the PowerState from text.
+func (x *PowerState) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), PowerState_value)
+	if err != nil {
+		return err
+	}
+	*x = PowerState(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the PowerState from JSON.
+func (x *PowerState) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the Session message to JSON.
@@ -97,6 +122,11 @@ func (x *Session) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the Session to JSON.
+func (x Session) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the Session message from JSON.
 func (x *Session) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -152,6 +182,11 @@ func (x *Session) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// UnmarshalJSON unmarshals the Session from JSON.
+func (x *Session) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the BoolValue message to JSON.
 func (x *BoolValue) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -162,6 +197,11 @@ func (x *BoolValue) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	return
 }
 
+// MarshalJSON marshals the BoolValue to JSON.
+func (x BoolValue) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the BoolValue message from JSON.
 func (x *BoolValue) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -169,6 +209,11 @@ func (x *BoolValue) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	}
 	x.Value = s.ReadBool()
 	return
+}
+
+// UnmarshalJSON unmarshals the BoolValue from JSON.
+func (x *BoolValue) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the MACParameters_Channel message to JSON.
@@ -207,6 +252,11 @@ func (x *MACParameters_Channel) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the MACParameters_Channel to JSON.
+func (x MACParameters_Channel) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the MACParameters_Channel message from JSON.
 func (x *MACParameters_Channel) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -233,6 +283,11 @@ func (x *MACParameters_Channel) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState)
 			x.EnableUplink = s.ReadBool()
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the MACParameters_Channel from JSON.
+func (x *MACParameters_Channel) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the MACParameters message to JSON.
@@ -362,6 +417,11 @@ func (x *MACParameters) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the MACParameters to JSON.
+func (x MACParameters) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the MACParameters message from JSON.
 func (x *MACParameters) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -467,6 +527,11 @@ func (x *MACParameters) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// UnmarshalJSON unmarshals the MACParameters from JSON.
+func (x *MACParameters) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the EndDeviceVersion message to JSON.
 func (x *EndDeviceVersion) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -544,6 +609,11 @@ func (x *EndDeviceVersion) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the EndDeviceVersion to JSON.
+func (x EndDeviceVersion) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the EndDeviceVersion message from JSON.
 func (x *EndDeviceVersion) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -601,6 +671,11 @@ func (x *EndDeviceVersion) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the EndDeviceVersion from JSON.
+func (x *EndDeviceVersion) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the MACSettings message to JSON.
@@ -786,6 +861,11 @@ func (x *MACSettings) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		}
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the MACSettings to JSON.
+func (x MACSettings) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the MACSettings message from JSON.
@@ -988,6 +1068,11 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// UnmarshalJSON unmarshals the MACSettings from JSON.
+func (x *MACSettings) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the MACState_JoinRequest message to JSON.
 func (x *MACState_JoinRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -1014,6 +1099,11 @@ func (x *MACState_JoinRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the MACState_JoinRequest to JSON.
+func (x MACState_JoinRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the MACState_JoinRequest message from JSON.
 func (x *MACState_JoinRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -1038,6 +1128,11 @@ func (x *MACState_JoinRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 			}
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the MACState_JoinRequest from JSON.
+func (x *MACState_JoinRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the MACState_JoinAccept message to JSON.
@@ -1082,6 +1177,11 @@ func (x *MACState_JoinAccept) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the MACState_JoinAccept to JSON.
+func (x MACState_JoinAccept) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the MACState_JoinAccept message from JSON.
 func (x *MACState_JoinAccept) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -1118,6 +1218,11 @@ func (x *MACState_JoinAccept) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// UnmarshalJSON unmarshals the MACState_JoinAccept from JSON.
+func (x *MACState_JoinAccept) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the MACState_DataRateRange message to JSON.
 func (x *MACState_DataRateRange) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -1139,6 +1244,11 @@ func (x *MACState_DataRateRange) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the MACState_DataRateRange to JSON.
+func (x MACState_DataRateRange) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the MACState_DataRateRange message from JSON.
 func (x *MACState_DataRateRange) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -1156,6 +1266,11 @@ func (x *MACState_DataRateRange) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 			x.MaxDataRateIndex.UnmarshalProtoJSON(s)
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the MACState_DataRateRange from JSON.
+func (x *MACState_DataRateRange) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the MACState_DataRateRanges message to JSON.
@@ -1178,6 +1293,11 @@ func (x *MACState_DataRateRanges) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteArrayEnd()
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the MACState_DataRateRanges to JSON.
+func (x MACState_DataRateRanges) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the MACState_DataRateRanges message from JSON.
@@ -1205,6 +1325,11 @@ func (x *MACState_DataRateRanges) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 			})
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the MACState_DataRateRanges from JSON.
+func (x *MACState_DataRateRanges) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the MACState message to JSON.
@@ -1377,6 +1502,11 @@ func (x *MACState) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the MACState to JSON.
+func (x MACState) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the MACState message from JSON.
 func (x *MACState) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -1530,6 +1660,11 @@ func (x *MACState) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.LastAdrChangeFCntUp = s.ReadUint32()
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the MACState from JSON.
+func (x *MACState) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the EndDevice message to JSON.
@@ -1846,6 +1981,11 @@ func (x *EndDevice) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the EndDevice to JSON.
+func (x EndDevice) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the EndDevice message from JSON.
 func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -2090,6 +2230,11 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// UnmarshalJSON unmarshals the EndDevice from JSON.
+func (x *EndDevice) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the EndDevices message to JSON.
 func (x *EndDevices) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -2110,6 +2255,11 @@ func (x *EndDevices) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteArrayEnd()
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the EndDevices to JSON.
+func (x EndDevices) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the EndDevices message from JSON.
@@ -2139,6 +2289,11 @@ func (x *EndDevices) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// UnmarshalJSON unmarshals the EndDevices from JSON.
+func (x *EndDevices) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the CreateEndDeviceRequest message to JSON.
 func (x *CreateEndDeviceRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -2153,6 +2308,11 @@ func (x *CreateEndDeviceRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		x.EndDevice.MarshalProtoJSON(s.WithField("end_device"))
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the CreateEndDeviceRequest to JSON.
+func (x CreateEndDeviceRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the CreateEndDeviceRequest message from JSON.
@@ -2170,6 +2330,11 @@ func (x *CreateEndDeviceRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 			}
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the CreateEndDeviceRequest from JSON.
+func (x *CreateEndDeviceRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the UpdateEndDeviceRequest message to JSON.
@@ -2197,6 +2362,11 @@ func (x *UpdateEndDeviceRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the UpdateEndDeviceRequest to JSON.
+func (x UpdateEndDeviceRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the UpdateEndDeviceRequest message from JSON.
 func (x *UpdateEndDeviceRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -2219,6 +2389,11 @@ func (x *UpdateEndDeviceRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 			x.FieldMask = v
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the UpdateEndDeviceRequest from JSON.
+func (x *UpdateEndDeviceRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the SetEndDeviceRequest message to JSON.
@@ -2246,6 +2421,11 @@ func (x *SetEndDeviceRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the SetEndDeviceRequest to JSON.
+func (x SetEndDeviceRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the SetEndDeviceRequest message from JSON.
 func (x *SetEndDeviceRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -2268,6 +2448,11 @@ func (x *SetEndDeviceRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.FieldMask = v
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the SetEndDeviceRequest from JSON.
+func (x *SetEndDeviceRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the EndDeviceTemplate message to JSON.
@@ -2300,6 +2485,11 @@ func (x *EndDeviceTemplate) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the EndDeviceTemplate to JSON.
+func (x EndDeviceTemplate) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the EndDeviceTemplate message from JSON.
 func (x *EndDeviceTemplate) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -2325,4 +2515,9 @@ func (x *EndDeviceTemplate) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.MappingKey = s.ReadString()
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the EndDeviceTemplate from JSON.
+func (x *EndDeviceTemplate) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

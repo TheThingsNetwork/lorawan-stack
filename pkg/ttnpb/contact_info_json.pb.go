@@ -16,6 +16,16 @@ func (x ContactType) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteEnumString(int32(x), ContactType_name)
 }
 
+// MarshalText marshals the ContactType to text.
+func (x ContactType) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), ContactType_name)), nil
+}
+
+// MarshalJSON marshals the ContactType to JSON.
+func (x ContactType) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
 // ContactType_customvalue contains custom string values that extend ContactType_value.
 var ContactType_customvalue = map[string]int32{
 	"OTHER":     0,
@@ -34,9 +44,34 @@ func (x *ContactType) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	*x = ContactType(v)
 }
 
+// UnmarshalText unmarshals the ContactType from text.
+func (x *ContactType) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), ContactType_value)
+	if err != nil {
+		return err
+	}
+	*x = ContactType(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the ContactType from JSON.
+func (x *ContactType) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the ContactMethod to JSON.
 func (x ContactMethod) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteEnumString(int32(x), ContactMethod_name)
+}
+
+// MarshalText marshals the ContactMethod to text.
+func (x ContactMethod) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), ContactMethod_name)), nil
+}
+
+// MarshalJSON marshals the ContactMethod to JSON.
+func (x ContactMethod) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
 }
 
 // ContactMethod_customvalue contains custom string values that extend ContactMethod_value.
@@ -54,6 +89,21 @@ func (x *ContactMethod) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		return
 	}
 	*x = ContactMethod(v)
+}
+
+// UnmarshalText unmarshals the ContactMethod from text.
+func (x *ContactMethod) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), ContactMethod_value)
+	if err != nil {
+		return err
+	}
+	*x = ContactMethod(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the ContactMethod from JSON.
+func (x *ContactMethod) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the ContactInfo message to JSON.
@@ -96,6 +146,11 @@ func (x *ContactInfo) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the ContactInfo to JSON.
+func (x ContactInfo) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the ContactInfo message from JSON.
 func (x *ContactInfo) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -126,6 +181,11 @@ func (x *ContactInfo) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.ValidatedAt = v
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the ContactInfo from JSON.
+func (x *ContactInfo) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the ContactInfoValidation message to JSON.
@@ -184,6 +244,11 @@ func (x *ContactInfoValidation) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the ContactInfoValidation to JSON.
+func (x ContactInfoValidation) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the ContactInfoValidation message from JSON.
 func (x *ContactInfoValidation) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -235,4 +300,9 @@ func (x *ContactInfoValidation) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState)
 			x.ExpiresAt = v
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the ContactInfoValidation from JSON.
+func (x *ContactInfoValidation) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

@@ -16,6 +16,16 @@ func (x GatewayAntennaPlacement) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteEnumString(int32(x), GatewayAntennaPlacement_name)
 }
 
+// MarshalText marshals the GatewayAntennaPlacement to text.
+func (x GatewayAntennaPlacement) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), GatewayAntennaPlacement_name)), nil
+}
+
+// MarshalJSON marshals the GatewayAntennaPlacement to JSON.
+func (x GatewayAntennaPlacement) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
 // GatewayAntennaPlacement_customvalue contains custom string values that extend GatewayAntennaPlacement_value.
 var GatewayAntennaPlacement_customvalue = map[string]int32{
 	"UNKNOWN": 0,
@@ -29,6 +39,21 @@ func (x *GatewayAntennaPlacement) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 		return
 	}
 	*x = GatewayAntennaPlacement(v)
+}
+
+// UnmarshalText unmarshals the GatewayAntennaPlacement from text.
+func (x *GatewayAntennaPlacement) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), GatewayAntennaPlacement_value)
+	if err != nil {
+		return err
+	}
+	*x = GatewayAntennaPlacement(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the GatewayAntennaPlacement from JSON.
+func (x *GatewayAntennaPlacement) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the Gateway message to JSON.
@@ -240,6 +265,11 @@ func (x *Gateway) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the Gateway to JSON.
+func (x Gateway) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the Gateway message from JSON.
 func (x *Gateway) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -411,6 +441,11 @@ func (x *Gateway) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// UnmarshalJSON unmarshals the Gateway from JSON.
+func (x *Gateway) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the Gateways message to JSON.
 func (x *Gateways) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -431,6 +466,11 @@ func (x *Gateways) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteArrayEnd()
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the Gateways to JSON.
+func (x Gateways) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the Gateways message from JSON.
@@ -460,6 +500,11 @@ func (x *Gateways) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// UnmarshalJSON unmarshals the Gateways from JSON.
+func (x *Gateways) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the CreateGatewayRequest message to JSON.
 func (x *CreateGatewayRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -480,6 +525,11 @@ func (x *CreateGatewayRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		gogo.MarshalMessage(s, x.Collaborator)
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the CreateGatewayRequest to JSON.
+func (x CreateGatewayRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the CreateGatewayRequest message from JSON.
@@ -504,6 +554,11 @@ func (x *CreateGatewayRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 			x.Collaborator = &v
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the CreateGatewayRequest from JSON.
+func (x *CreateGatewayRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the UpdateGatewayRequest message to JSON.
@@ -531,6 +586,11 @@ func (x *UpdateGatewayRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the UpdateGatewayRequest to JSON.
+func (x UpdateGatewayRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the UpdateGatewayRequest message from JSON.
 func (x *UpdateGatewayRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -554,6 +614,11 @@ func (x *UpdateGatewayRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 			x.FieldMask = v
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the UpdateGatewayRequest from JSON.
+func (x *UpdateGatewayRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the CreateGatewayAPIKeyRequest message to JSON.
@@ -598,6 +663,11 @@ func (x *CreateGatewayAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the CreateGatewayAPIKeyRequest to JSON.
+func (x CreateGatewayAPIKeyRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the CreateGatewayAPIKeyRequest message from JSON.
 func (x *CreateGatewayAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -634,6 +704,11 @@ func (x *CreateGatewayAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalS
 	})
 }
 
+// UnmarshalJSON unmarshals the CreateGatewayAPIKeyRequest from JSON.
+func (x *CreateGatewayAPIKeyRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the UpdateGatewayAPIKeyRequest message to JSON.
 func (x *UpdateGatewayAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -663,6 +738,11 @@ func (x *UpdateGatewayAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState
 		}
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the UpdateGatewayAPIKeyRequest to JSON.
+func (x UpdateGatewayAPIKeyRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the UpdateGatewayAPIKeyRequest message from JSON.
@@ -696,6 +776,11 @@ func (x *UpdateGatewayAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalS
 	})
 }
 
+// UnmarshalJSON unmarshals the UpdateGatewayAPIKeyRequest from JSON.
+func (x *UpdateGatewayAPIKeyRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the SetGatewayCollaboratorRequest message to JSON.
 func (x *SetGatewayCollaboratorRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -716,6 +801,11 @@ func (x *SetGatewayCollaboratorRequest) MarshalProtoJSON(s *jsonplugin.MarshalSt
 		x.Collaborator.MarshalProtoJSON(s.WithField("collaborator"))
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the SetGatewayCollaboratorRequest to JSON.
+func (x SetGatewayCollaboratorRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the SetGatewayCollaboratorRequest message from JSON.
@@ -740,6 +830,11 @@ func (x *SetGatewayCollaboratorRequest) UnmarshalProtoJSON(s *jsonplugin.Unmarsh
 			}
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the SetGatewayCollaboratorRequest from JSON.
+func (x *SetGatewayCollaboratorRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the GatewayAntenna message to JSON.
@@ -780,6 +875,11 @@ func (x *GatewayAntenna) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the GatewayAntenna to JSON.
+func (x GatewayAntenna) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the GatewayAntenna message from JSON.
 func (x *GatewayAntenna) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -808,6 +908,11 @@ func (x *GatewayAntenna) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Placement.UnmarshalProtoJSON(s)
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the GatewayAntenna from JSON.
+func (x *GatewayAntenna) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the GatewayStatus message to JSON.
@@ -888,6 +993,11 @@ func (x *GatewayStatus) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the GatewayStatus to JSON.
+func (x GatewayStatus) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the GatewayStatus message from JSON.
 func (x *GatewayStatus) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -949,6 +1059,11 @@ func (x *GatewayStatus) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Advanced = v
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the GatewayStatus from JSON.
+func (x *GatewayStatus) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the GatewayConnectionStats message to JSON.
@@ -1045,6 +1160,11 @@ func (x *GatewayConnectionStats) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the GatewayConnectionStats to JSON.
+func (x GatewayConnectionStats) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the GatewayConnectionStats message from JSON.
 func (x *GatewayConnectionStats) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -1119,4 +1239,9 @@ func (x *GatewayConnectionStats) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 			})
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the GatewayConnectionStats from JSON.
+func (x *GatewayConnectionStats) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

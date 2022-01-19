@@ -76,6 +76,11 @@ func (x *JoinRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the JoinRequest to JSON.
+func (x JoinRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the JoinRequest message from JSON.
 func (x *JoinRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -127,4 +132,9 @@ func (x *JoinRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.ConsumedAirtime = v
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the JoinRequest from JSON.
+func (x *JoinRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

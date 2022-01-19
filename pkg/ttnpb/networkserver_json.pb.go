@@ -31,6 +31,11 @@ func (x *GetDefaultMACSettingsRequest) MarshalProtoJSON(s *jsonplugin.MarshalSta
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the GetDefaultMACSettingsRequest to JSON.
+func (x GetDefaultMACSettingsRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the GetDefaultMACSettingsRequest message from JSON.
 func (x *GetDefaultMACSettingsRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -48,4 +53,9 @@ func (x *GetDefaultMACSettingsRequest) UnmarshalProtoJSON(s *jsonplugin.Unmarsha
 			x.LorawanPhyVersion.UnmarshalProtoJSON(s)
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the GetDefaultMACSettingsRequest from JSON.
+func (x *GetDefaultMACSettingsRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

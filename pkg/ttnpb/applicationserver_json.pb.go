@@ -37,6 +37,11 @@ func (x *ApplicationLink) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the ApplicationLink to JSON.
+func (x ApplicationLink) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the ApplicationLink message from JSON.
 func (x *ApplicationLink) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -62,6 +67,11 @@ func (x *ApplicationLink) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the ApplicationLink from JSON.
+func (x *ApplicationLink) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the SetApplicationLinkRequest message to JSON.
@@ -95,6 +105,11 @@ func (x *SetApplicationLinkRequest) MarshalProtoJSON(s *jsonplugin.MarshalState)
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the SetApplicationLinkRequest to JSON.
+func (x SetApplicationLinkRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the SetApplicationLinkRequest message from JSON.
 func (x *SetApplicationLinkRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -126,9 +141,24 @@ func (x *SetApplicationLinkRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSt
 	})
 }
 
+// UnmarshalJSON unmarshals the SetApplicationLinkRequest from JSON.
+func (x *SetApplicationLinkRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the AsConfiguration_PubSub_Providers_Status to JSON.
 func (x AsConfiguration_PubSub_Providers_Status) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteEnumString(int32(x), AsConfiguration_PubSub_Providers_Status_name)
+}
+
+// MarshalText marshals the AsConfiguration_PubSub_Providers_Status to text.
+func (x AsConfiguration_PubSub_Providers_Status) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), AsConfiguration_PubSub_Providers_Status_name)), nil
+}
+
+// MarshalJSON marshals the AsConfiguration_PubSub_Providers_Status to JSON.
+func (x AsConfiguration_PubSub_Providers_Status) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
 }
 
 // UnmarshalProtoJSON unmarshals the AsConfiguration_PubSub_Providers_Status from JSON.
@@ -139,6 +169,21 @@ func (x *AsConfiguration_PubSub_Providers_Status) UnmarshalProtoJSON(s *jsonplug
 		return
 	}
 	*x = AsConfiguration_PubSub_Providers_Status(v)
+}
+
+// UnmarshalText unmarshals the AsConfiguration_PubSub_Providers_Status from text.
+func (x *AsConfiguration_PubSub_Providers_Status) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), AsConfiguration_PubSub_Providers_Status_value)
+	if err != nil {
+		return err
+	}
+	*x = AsConfiguration_PubSub_Providers_Status(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the AsConfiguration_PubSub_Providers_Status from JSON.
+func (x *AsConfiguration_PubSub_Providers_Status) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the AsConfiguration_PubSub_Providers message to JSON.
@@ -162,6 +207,11 @@ func (x *AsConfiguration_PubSub_Providers) MarshalProtoJSON(s *jsonplugin.Marsha
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the AsConfiguration_PubSub_Providers to JSON.
+func (x AsConfiguration_PubSub_Providers) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the AsConfiguration_PubSub_Providers message from JSON.
 func (x *AsConfiguration_PubSub_Providers) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -181,6 +231,11 @@ func (x *AsConfiguration_PubSub_Providers) UnmarshalProtoJSON(s *jsonplugin.Unma
 	})
 }
 
+// UnmarshalJSON unmarshals the AsConfiguration_PubSub_Providers from JSON.
+func (x *AsConfiguration_PubSub_Providers) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the AsConfiguration_PubSub message to JSON.
 func (x *AsConfiguration_PubSub) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -195,6 +250,11 @@ func (x *AsConfiguration_PubSub) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		x.Providers.MarshalProtoJSON(s.WithField("providers"))
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the AsConfiguration_PubSub to JSON.
+func (x AsConfiguration_PubSub) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the AsConfiguration_PubSub message from JSON.
@@ -213,6 +273,11 @@ func (x *AsConfiguration_PubSub) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 			}
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the AsConfiguration_PubSub from JSON.
+func (x *AsConfiguration_PubSub) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the AsConfiguration message to JSON.
@@ -235,6 +300,11 @@ func (x *AsConfiguration) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		gogo.MarshalMessage(s, x.Webhooks)
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the AsConfiguration to JSON.
+func (x AsConfiguration) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the AsConfiguration message from JSON.
@@ -261,6 +331,11 @@ func (x *AsConfiguration) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// UnmarshalJSON unmarshals the AsConfiguration from JSON.
+func (x *AsConfiguration) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the GetAsConfigurationResponse message to JSON.
 func (x *GetAsConfigurationResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -275,6 +350,11 @@ func (x *GetAsConfigurationResponse) MarshalProtoJSON(s *jsonplugin.MarshalState
 		x.Configuration.MarshalProtoJSON(s.WithField("configuration"))
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GetAsConfigurationResponse to JSON.
+func (x GetAsConfigurationResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the GetAsConfigurationResponse message from JSON.
@@ -293,6 +373,11 @@ func (x *GetAsConfigurationResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalS
 			}
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the GetAsConfigurationResponse from JSON.
+func (x *GetAsConfigurationResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the NsAsHandleUplinkRequest message to JSON.
@@ -315,6 +400,11 @@ func (x *NsAsHandleUplinkRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteArrayEnd()
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the NsAsHandleUplinkRequest to JSON.
+func (x NsAsHandleUplinkRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the NsAsHandleUplinkRequest message from JSON.
@@ -342,6 +432,11 @@ func (x *NsAsHandleUplinkRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 			})
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the NsAsHandleUplinkRequest from JSON.
+func (x *NsAsHandleUplinkRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the EncodeDownlinkRequest message to JSON.
@@ -382,6 +477,11 @@ func (x *EncodeDownlinkRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the EncodeDownlinkRequest to JSON.
+func (x EncodeDownlinkRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the EncodeDownlinkRequest message from JSON.
 func (x *EncodeDownlinkRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -418,6 +518,11 @@ func (x *EncodeDownlinkRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState)
 	})
 }
 
+// UnmarshalJSON unmarshals the EncodeDownlinkRequest from JSON.
+func (x *EncodeDownlinkRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the EncodeDownlinkResponse message to JSON.
 func (x *EncodeDownlinkResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -432,6 +537,11 @@ func (x *EncodeDownlinkResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		x.Downlink.MarshalProtoJSON(s.WithField("downlink"))
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the EncodeDownlinkResponse to JSON.
+func (x EncodeDownlinkResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the EncodeDownlinkResponse message from JSON.
@@ -450,6 +560,11 @@ func (x *EncodeDownlinkResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 			}
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the EncodeDownlinkResponse from JSON.
+func (x *EncodeDownlinkResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the DecodeUplinkRequest message to JSON.
@@ -490,6 +605,11 @@ func (x *DecodeUplinkRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the DecodeUplinkRequest to JSON.
+func (x DecodeUplinkRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the DecodeUplinkRequest message from JSON.
 func (x *DecodeUplinkRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -526,6 +646,11 @@ func (x *DecodeUplinkRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// UnmarshalJSON unmarshals the DecodeUplinkRequest from JSON.
+func (x *DecodeUplinkRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the DecodeUplinkResponse message to JSON.
 func (x *DecodeUplinkResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -540,6 +665,11 @@ func (x *DecodeUplinkResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		x.Uplink.MarshalProtoJSON(s.WithField("uplink"))
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the DecodeUplinkResponse to JSON.
+func (x DecodeUplinkResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the DecodeUplinkResponse message from JSON.
@@ -558,6 +688,11 @@ func (x *DecodeUplinkResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 			}
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the DecodeUplinkResponse from JSON.
+func (x *DecodeUplinkResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the DecodeDownlinkRequest message to JSON.
@@ -598,6 +733,11 @@ func (x *DecodeDownlinkRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the DecodeDownlinkRequest to JSON.
+func (x DecodeDownlinkRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the DecodeDownlinkRequest message from JSON.
 func (x *DecodeDownlinkRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -634,6 +774,11 @@ func (x *DecodeDownlinkRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState)
 	})
 }
 
+// UnmarshalJSON unmarshals the DecodeDownlinkRequest from JSON.
+func (x *DecodeDownlinkRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the DecodeDownlinkResponse message to JSON.
 func (x *DecodeDownlinkResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -648,6 +793,11 @@ func (x *DecodeDownlinkResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		x.Downlink.MarshalProtoJSON(s.WithField("downlink"))
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the DecodeDownlinkResponse to JSON.
+func (x DecodeDownlinkResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the DecodeDownlinkResponse message from JSON.
@@ -666,4 +816,9 @@ func (x *DecodeDownlinkResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 			}
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the DecodeDownlinkResponse from JSON.
+func (x *DecodeDownlinkResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

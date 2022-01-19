@@ -106,6 +106,11 @@ func (x *PacketBrokerGateway) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the PacketBrokerGateway to JSON.
+func (x PacketBrokerGateway) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the PacketBrokerGateway message from JSON.
 func (x *PacketBrokerGateway) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -198,6 +203,11 @@ func (x *PacketBrokerGateway) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// UnmarshalJSON unmarshals the PacketBrokerGateway from JSON.
+func (x *PacketBrokerGateway) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the UpdatePacketBrokerGatewayRequest message to JSON.
 func (x *UpdatePacketBrokerGatewayRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -223,6 +233,11 @@ func (x *UpdatePacketBrokerGatewayRequest) MarshalProtoJSON(s *jsonplugin.Marsha
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the UpdatePacketBrokerGatewayRequest to JSON.
+func (x UpdatePacketBrokerGatewayRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the UpdatePacketBrokerGatewayRequest message from JSON.
 func (x *UpdatePacketBrokerGatewayRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -246,6 +261,11 @@ func (x *UpdatePacketBrokerGatewayRequest) UnmarshalProtoJSON(s *jsonplugin.Unma
 			x.FieldMask = v
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the UpdatePacketBrokerGatewayRequest from JSON.
+func (x *UpdatePacketBrokerGatewayRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the PacketBrokerNetwork message to JSON.
@@ -308,6 +328,11 @@ func (x *PacketBrokerNetwork) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the PacketBrokerNetwork to JSON.
+func (x PacketBrokerNetwork) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the PacketBrokerNetwork message from JSON.
 func (x *PacketBrokerNetwork) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -365,6 +390,11 @@ func (x *PacketBrokerNetwork) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// UnmarshalJSON unmarshals the PacketBrokerNetwork from JSON.
+func (x *PacketBrokerNetwork) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the PacketBrokerNetworks message to JSON.
 func (x *PacketBrokerNetworks) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -385,6 +415,11 @@ func (x *PacketBrokerNetworks) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteArrayEnd()
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the PacketBrokerNetworks to JSON.
+func (x PacketBrokerNetworks) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the PacketBrokerNetworks message from JSON.
@@ -412,6 +447,11 @@ func (x *PacketBrokerNetworks) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 			})
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the PacketBrokerNetworks from JSON.
+func (x *PacketBrokerNetworks) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the PacketBrokerInfo message to JSON.
@@ -445,6 +485,11 @@ func (x *PacketBrokerInfo) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the PacketBrokerInfo to JSON.
+func (x PacketBrokerInfo) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the PacketBrokerInfo message from JSON.
 func (x *PacketBrokerInfo) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -470,4 +515,9 @@ func (x *PacketBrokerInfo) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.RegisterEnabled = s.ReadBool()
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the PacketBrokerInfo from JSON.
+func (x *PacketBrokerInfo) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

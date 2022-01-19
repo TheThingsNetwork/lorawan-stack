@@ -16,7 +16,6 @@ package ttnpb
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -35,11 +34,6 @@ func (v BoolValue) MarshalText() ([]byte, error) {
 	return []byte("true"), nil
 }
 
-// MarshalJSON implements json.Marshaler interface.
-func (v BoolValue) MarshalJSON() ([]byte, error) {
-	return v.MarshalText()
-}
-
 // UnmarshalText implements encoding.TextUnmarshaler interface.
 func (v *BoolValue) UnmarshalText(b []byte) error {
 	switch s := string(b); s {
@@ -53,11 +47,6 @@ func (v *BoolValue) UnmarshalText(b []byte) error {
 	return nil
 }
 
-// UnmarshalJSON implements json.Unmarshaler interface.
-func (v *BoolValue) UnmarshalJSON(b []byte) error {
-	return v.UnmarshalText(b)
-}
-
 // FieldIsZero returns whether path p is zero.
 func (v *BoolValue) FieldIsZero(p string) bool {
 	if v == nil {
@@ -68,35 +57,6 @@ func (v *BoolValue) FieldIsZero(p string) bool {
 		return !v.Value
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler interface.
-func (v *PowerState) UnmarshalText(b []byte) error {
-	s := string(b)
-	if i, ok := PowerState_value[s]; ok {
-		*v = PowerState(i)
-		return nil
-	}
-	if !strings.HasPrefix(s, "POWER_") {
-		if i, ok := PowerState_value["POWER_"+s]; ok {
-			*v = PowerState(i)
-			return nil
-		}
-	}
-	return errCouldNotParse("PowerState")(string(b))
-}
-
-// UnmarshalJSON implements json.Unmarshaler interface.
-func (v *PowerState) UnmarshalJSON(b []byte) error {
-	if len(b) > 2 && b[0] == '"' && b[len(b)-1] == '"' {
-		return v.UnmarshalText(b[1 : len(b)-1])
-	}
-	i, err := strconv.Atoi(string(b))
-	if err != nil {
-		return errCouldNotParse("PowerState")(string(b)).WithCause(err)
-	}
-	*v = PowerState(i)
-	return nil
 }
 
 // FieldIsZero returns whether path p is zero.

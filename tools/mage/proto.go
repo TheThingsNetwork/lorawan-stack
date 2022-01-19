@@ -114,6 +114,7 @@ func (p Proto) json(context.Context) error {
 	return withProtoc(jsonProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
 			"--go-json_opt=lang=gogo",
+			"--go-json_opt=std=true",
 			fmt.Sprintf("--go-json_out=%s:%s", strings.Join(jsonConvs, ","), protocOut),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {

@@ -105,6 +105,11 @@ func (x *Event) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the Event to JSON.
+func (x Event) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the Event message from JSON.
 func (x *Event) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -175,6 +180,11 @@ func (x *Event) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// UnmarshalJSON unmarshals the Event from JSON.
+func (x *Event) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the FindRelatedEventsResponse message to JSON.
 func (x *FindRelatedEventsResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -195,6 +205,11 @@ func (x *FindRelatedEventsResponse) MarshalProtoJSON(s *jsonplugin.MarshalState)
 		s.WriteArrayEnd()
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the FindRelatedEventsResponse to JSON.
+func (x FindRelatedEventsResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the FindRelatedEventsResponse message from JSON.
@@ -222,4 +237,9 @@ func (x *FindRelatedEventsResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSt
 			})
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the FindRelatedEventsResponse from JSON.
+func (x *FindRelatedEventsResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

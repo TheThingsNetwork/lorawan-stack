@@ -84,11 +84,13 @@ func TestDataRateIndex(t *testing.T) {
 
 	b, err := DATA_RATE_4.MarshalText()
 	a.So(err, should.BeNil)
-	a.So(b, should.Resemble, []byte("4"))
+	a.So(string(b), should.Resemble, "4")
 
-	var idx DataRateIndex
-	err = idx.UnmarshalText([]byte("4"))
-	a.So(idx, should.Equal, DATA_RATE_4)
+	for _, str := range []string{"4", "DATA_RATE_4"} {
+		var idx DataRateIndex
+		err = idx.UnmarshalText([]byte(str))
+		a.So(idx, should.Equal, DATA_RATE_4)
+	}
 }
 
 func TestDeviceEIRP(t *testing.T) {

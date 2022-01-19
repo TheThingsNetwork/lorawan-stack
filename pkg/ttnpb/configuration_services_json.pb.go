@@ -37,6 +37,11 @@ func (x *GetPhyVersionsResponse_VersionInfo) MarshalProtoJSON(s *jsonplugin.Mars
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the GetPhyVersionsResponse_VersionInfo to JSON.
+func (x GetPhyVersionsResponse_VersionInfo) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the GetPhyVersionsResponse_VersionInfo message from JSON.
 func (x *GetPhyVersionsResponse_VersionInfo) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -60,6 +65,11 @@ func (x *GetPhyVersionsResponse_VersionInfo) UnmarshalProtoJSON(s *jsonplugin.Un
 	})
 }
 
+// UnmarshalJSON unmarshals the GetPhyVersionsResponse_VersionInfo from JSON.
+func (x *GetPhyVersionsResponse_VersionInfo) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the GetPhyVersionsResponse message to JSON.
 func (x *GetPhyVersionsResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -80,6 +90,11 @@ func (x *GetPhyVersionsResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteArrayEnd()
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GetPhyVersionsResponse to JSON.
+func (x GetPhyVersionsResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the GetPhyVersionsResponse message from JSON.
@@ -107,4 +122,9 @@ func (x *GetPhyVersionsResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 			})
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the GetPhyVersionsResponse from JSON.
+func (x *GetPhyVersionsResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

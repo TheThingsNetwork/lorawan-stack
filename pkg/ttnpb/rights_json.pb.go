@@ -16,6 +16,16 @@ func (x Right) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteEnumString(int32(x), Right_name)
 }
 
+// MarshalText marshals the Right to text.
+func (x Right) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), Right_name)), nil
+}
+
+// MarshalJSON marshals the Right to JSON.
+func (x Right) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
 // Right_customvalue contains custom string values that extend Right_value.
 var Right_customvalue = map[string]int32{
 	"USER_INFO":                          1,
@@ -88,6 +98,21 @@ func (x *Right) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	*x = Right(v)
 }
 
+// UnmarshalText unmarshals the Right from text.
+func (x *Right) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), Right_value)
+	if err != nil {
+		return err
+	}
+	*x = Right(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the Right from JSON.
+func (x *Right) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the Rights message to JSON.
 func (x *Rights) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -110,6 +135,11 @@ func (x *Rights) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the Rights to JSON.
+func (x Rights) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the Rights message from JSON.
 func (x *Rights) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -128,6 +158,11 @@ func (x *Rights) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			})
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the Rights from JSON.
+func (x *Rights) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the APIKey message to JSON.
@@ -194,6 +229,11 @@ func (x *APIKey) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the APIKey to JSON.
+func (x APIKey) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the APIKey message from JSON.
 func (x *APIKey) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -244,6 +284,11 @@ func (x *APIKey) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// UnmarshalJSON unmarshals the APIKey from JSON.
+func (x *APIKey) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the APIKeys message to JSON.
 func (x *APIKeys) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -264,6 +309,11 @@ func (x *APIKeys) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteArrayEnd()
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the APIKeys to JSON.
+func (x APIKeys) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the APIKeys message from JSON.
@@ -291,6 +341,11 @@ func (x *APIKeys) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			})
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the APIKeys from JSON.
+func (x *APIKeys) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the Collaborator message to JSON.
@@ -321,6 +376,11 @@ func (x *Collaborator) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the Collaborator to JSON.
+func (x Collaborator) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the Collaborator message from JSON.
 func (x *Collaborator) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -345,6 +405,11 @@ func (x *Collaborator) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			})
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the Collaborator from JSON.
+func (x *Collaborator) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the GetCollaboratorResponse message to JSON.
@@ -375,6 +440,11 @@ func (x *GetCollaboratorResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the GetCollaboratorResponse to JSON.
+func (x GetCollaboratorResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the GetCollaboratorResponse message from JSON.
 func (x *GetCollaboratorResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -401,6 +471,11 @@ func (x *GetCollaboratorResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 	})
 }
 
+// UnmarshalJSON unmarshals the GetCollaboratorResponse from JSON.
+func (x *GetCollaboratorResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the Collaborators message to JSON.
 func (x *Collaborators) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -421,6 +496,11 @@ func (x *Collaborators) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteArrayEnd()
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the Collaborators to JSON.
+func (x Collaborators) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the Collaborators message from JSON.
@@ -448,4 +528,9 @@ func (x *Collaborators) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			})
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the Collaborators from JSON.
+func (x *Collaborators) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

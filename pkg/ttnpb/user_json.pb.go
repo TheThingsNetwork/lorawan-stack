@@ -165,6 +165,11 @@ func (x *User) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the User to JSON.
+func (x User) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the User message from JSON.
 func (x *User) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -286,6 +291,11 @@ func (x *User) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// UnmarshalJSON unmarshals the User from JSON.
+func (x *User) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the Users message to JSON.
 func (x *Users) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -306,6 +316,11 @@ func (x *Users) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteArrayEnd()
 	}
 	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the Users to JSON.
+func (x Users) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
 // UnmarshalProtoJSON unmarshals the Users message from JSON.
@@ -335,6 +350,11 @@ func (x *Users) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// UnmarshalJSON unmarshals the Users from JSON.
+func (x *Users) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the CreateUserRequest message to JSON.
 func (x *CreateUserRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -356,6 +376,11 @@ func (x *CreateUserRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the CreateUserRequest to JSON.
+func (x CreateUserRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the CreateUserRequest message from JSON.
 func (x *CreateUserRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -375,6 +400,11 @@ func (x *CreateUserRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.InvitationToken = s.ReadString()
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the CreateUserRequest from JSON.
+func (x *CreateUserRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the UpdateUserRequest message to JSON.
@@ -402,6 +432,11 @@ func (x *UpdateUserRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the UpdateUserRequest to JSON.
+func (x UpdateUserRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the UpdateUserRequest message from JSON.
 func (x *UpdateUserRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -425,6 +460,11 @@ func (x *UpdateUserRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.FieldMask = v
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the UpdateUserRequest from JSON.
+func (x *UpdateUserRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the CreateUserAPIKeyRequest message to JSON.
@@ -469,6 +509,11 @@ func (x *CreateUserAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the CreateUserAPIKeyRequest to JSON.
+func (x CreateUserAPIKeyRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the CreateUserAPIKeyRequest message from JSON.
 func (x *CreateUserAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -505,6 +550,11 @@ func (x *CreateUserAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 	})
 }
 
+// UnmarshalJSON unmarshals the CreateUserAPIKeyRequest from JSON.
+func (x *CreateUserAPIKeyRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the UpdateUserAPIKeyRequest message to JSON.
 func (x *UpdateUserAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -536,6 +586,11 @@ func (x *UpdateUserAPIKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the UpdateUserAPIKeyRequest to JSON.
+func (x UpdateUserAPIKeyRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the UpdateUserAPIKeyRequest message from JSON.
 func (x *UpdateUserAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -565,4 +620,9 @@ func (x *UpdateUserAPIKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 			x.FieldMask = v
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the UpdateUserAPIKeyRequest from JSON.
+func (x *UpdateUserAPIKeyRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

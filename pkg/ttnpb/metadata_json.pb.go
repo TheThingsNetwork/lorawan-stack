@@ -17,6 +17,16 @@ func (x LocationSource) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteEnumString(int32(x), LocationSource_name)
 }
 
+// MarshalText marshals the LocationSource to text.
+func (x LocationSource) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), LocationSource_name)), nil
+}
+
+// MarshalJSON marshals the LocationSource to JSON.
+func (x LocationSource) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
 // LocationSource_customvalue contains custom string values that extend LocationSource_value.
 var LocationSource_customvalue = map[string]int32{
 	"UNKNOWN":               0,
@@ -38,6 +48,21 @@ func (x *LocationSource) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		return
 	}
 	*x = LocationSource(v)
+}
+
+// UnmarshalText unmarshals the LocationSource from text.
+func (x *LocationSource) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), LocationSource_value)
+	if err != nil {
+		return err
+	}
+	*x = LocationSource(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the LocationSource from JSON.
+func (x *LocationSource) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
 // MarshalProtoJSON marshals the RxMetadata message to JSON.
@@ -170,6 +195,11 @@ func (x *RxMetadata) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the RxMetadata to JSON.
+func (x RxMetadata) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the RxMetadata message from JSON.
 func (x *RxMetadata) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -268,6 +298,11 @@ func (x *RxMetadata) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	})
 }
 
+// UnmarshalJSON unmarshals the RxMetadata from JSON.
+func (x *RxMetadata) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the Location message to JSON.
 func (x *Location) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -304,6 +339,11 @@ func (x *Location) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteObjectEnd()
 }
 
+// MarshalJSON marshals the Location to JSON.
+func (x Location) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
 // UnmarshalProtoJSON unmarshals the Location message from JSON.
 func (x *Location) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
@@ -330,4 +370,9 @@ func (x *Location) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Source.UnmarshalProtoJSON(s)
 		}
 	})
+}
+
+// UnmarshalJSON unmarshals the Location from JSON.
+func (x *Location) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
