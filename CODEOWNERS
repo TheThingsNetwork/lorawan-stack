@@ -20,7 +20,7 @@
 /tools @htdvisser @adriansmares @michalborkowski96
 /.github/workflows @htdvisser @adriansmares @michalborkowski96
 /config @bafonins @kschiffer
-/config/stack @benolayinka @neoaggelos
+/config/stack @benolayinka @KrishnaIyer
 /cypress @bafonins @kschiffer @ryaplots
 
 # API, configuration, CLI and storage compatibility
@@ -53,7 +53,7 @@
 /pkg/web @bafonins @kschiffer
 /pkg/webmiddleware @htdvisser @bafonins @kschiffer
 /pkg/webui @bafonins @kschiffer @ryaplots
-/pkg/ratelimit @johanstokking @htdvisser @neoaggelos
+/pkg/ratelimit @johanstokking @htdvisser @KrishnaIyer
 
 # Subsystems
 
@@ -81,12 +81,14 @@
 
 /pkg/packetbrokeragent @johanstokking @adriansmares
 
-/pkg/devicetemplateconverter @adriansmares @neoaggelos
-/pkg/devicetemplates @adriansmares @neoaggelos
-/pkg/qrcode @adriansmares @neoaggelos
-/pkg/qrcodegenerator @adriansmares @neoaggelos
+/pkg/devicetemplateconverter @adriansmares @KrishnaIyer
+/pkg/devicetemplates @adriansmares @KrishnaIyer
+/pkg/qrcode @adriansmares @KrishnaIyer
+/pkg/qrcodegenerator @adriansmares @KrishnaIyer
 
-/pkg/devicerepository @adriansmares @neoaggelos
+/pkg/deviceclaimingserver @johanstokking @KrishnaIyer
+
+/pkg/devicerepository @adriansmares @KrishnaIyer
 
 # SDKs
 /sdk/js @bafonins @kschiffer @ryaplots
