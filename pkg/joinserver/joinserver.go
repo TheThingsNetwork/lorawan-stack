@@ -333,6 +333,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			if req.SelectedMacVersion.IncrementDevNonce() {
 				if (dn != 0 || dev.LastDevNonce != 0 || dev.LastJoinNonce != 0) && !dev.ResetsJoinNonces {
 					if dn <= dev.LastDevNonce {
+						registerDevNonceTooSmall(ctx, req)
 						return nil, nil, errDevNonceTooSmall.New()
 					}
 				}
@@ -354,6 +355,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 					}
 					paths = append(paths, "used_dev_nonces")
 				} else if !dev.ResetsJoinNonces {
+					registerDevNonceReuse(ctx, req)
 					return nil, nil, errReuseDevNonce.New()
 				}
 			}
