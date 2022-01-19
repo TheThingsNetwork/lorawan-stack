@@ -360,7 +360,7 @@ func (m *MACParameters) GetRejoinCountPeriodicity() RejoinCountExponent {
 	if m != nil {
 		return m.RejoinCountPeriodicity
 	}
-	return REJOIN_COUNT_16
+	return RejoinCountExponent_REJOIN_COUNT_16
 }
 
 func (m *MACParameters) GetPingSlotFrequency() uint64 {

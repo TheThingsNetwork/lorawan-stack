@@ -627,7 +627,6 @@ enum PingSlotPeriod {
 
 enum RejoinCountExponent {
   option (thethings.json.enum) = { marshal_as_string: true, prefix: "REJOIN_COUNT" };
-  option (gogoproto.goproto_enum_prefix) = false;
 
   REJOIN_COUNT_16 = 0;
   REJOIN_COUNT_32 = 1;
