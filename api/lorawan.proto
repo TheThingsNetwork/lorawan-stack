@@ -649,7 +649,6 @@ enum RejoinCountExponent {
 
 enum RejoinTimeExponent {
   option (thethings.json.enum) = { marshal_as_string: true, prefix: "REJOIN_TIME" };
-  option (gogoproto.goproto_enum_prefix) = false;
 
   REJOIN_TIME_0 = 0;   // Every ~17.1 minutes.
   REJOIN_TIME_1 = 1;   // Every ~34.1 minutes.

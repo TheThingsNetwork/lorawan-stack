@@ -49,22 +49,22 @@ func TestNeedsRejoinParamSetupReq(t *testing.T) {
 			Suffix: "current(count:128,time:10),desired(count:128,time:10)",
 			CurrentParameters: &ttnpb.MACParameters{
 				RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_128,
-				RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_10,
+				RejoinTimePeriodicity:  ttnpb.RejoinTimeExponent_REJOIN_TIME_10,
 			},
 			DesiredParameters: &ttnpb.MACParameters{
 				RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_128,
-				RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_10,
+				RejoinTimePeriodicity:  ttnpb.RejoinTimeExponent_REJOIN_TIME_10,
 			},
 		},
 		{
 			Suffix: "current(count:128,time:10),desired(count:128,time:12)",
 			CurrentParameters: &ttnpb.MACParameters{
 				RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_128,
-				RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_10,
+				RejoinTimePeriodicity:  ttnpb.RejoinTimeExponent_REJOIN_TIME_10,
 			},
 			DesiredParameters: &ttnpb.MACParameters{
 				RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_128,
-				RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_12,
+				RejoinTimePeriodicity:  ttnpb.RejoinTimeExponent_REJOIN_TIME_12,
 			},
 			Needs: true,
 		},
@@ -72,11 +72,11 @@ func TestNeedsRejoinParamSetupReq(t *testing.T) {
 			Suffix: "current(count:128,time:10),desired(count:256,time:10)",
 			CurrentParameters: &ttnpb.MACParameters{
 				RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_128,
-				RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_10,
+				RejoinTimePeriodicity:  ttnpb.RejoinTimeExponent_REJOIN_TIME_10,
 			},
 			DesiredParameters: &ttnpb.MACParameters{
 				RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_256,
-				RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_10,
+				RejoinTimePeriodicity:  ttnpb.RejoinTimeExponent_REJOIN_TIME_10,
 			},
 			Needs: true,
 		},
@@ -172,7 +172,7 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_RejoinParamSetupReq{
 							MaxCountExponent: ttnpb.REJOIN_COUNT_128,
-							MaxTimeExponent:  ttnpb.REJOIN_TIME_10,
+							MaxTimeExponent:  ttnpb.RejoinTimeExponent_REJOIN_TIME_10,
 						}).MACCommand(),
 					},
 					CurrentParameters: &ttnpb.MACParameters{},
@@ -183,7 +183,7 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{
 						RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_128,
-						RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_10,
+						RejoinTimePeriodicity:  ttnpb.RejoinTimeExponent_REJOIN_TIME_10,
 					},
 					DesiredParameters: &ttnpb.MACParameters{},
 					PendingRequests:   []*ttnpb.MACCommand{},
@@ -203,13 +203,13 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{
-						RejoinTimePeriodicity: ttnpb.REJOIN_TIME_1,
+						RejoinTimePeriodicity: ttnpb.RejoinTimeExponent_REJOIN_TIME_1,
 					},
 					DesiredParameters: &ttnpb.MACParameters{},
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_RejoinParamSetupReq{
 							MaxCountExponent: ttnpb.REJOIN_COUNT_1024,
-							MaxTimeExponent:  ttnpb.REJOIN_TIME_11,
+							MaxTimeExponent:  ttnpb.RejoinTimeExponent_REJOIN_TIME_11,
 						}).MACCommand(),
 					},
 				},
@@ -218,7 +218,7 @@ func TestHandleRejoinParamSetupAns(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{
 						RejoinCountPeriodicity: ttnpb.REJOIN_COUNT_1024,
-						RejoinTimePeriodicity:  ttnpb.REJOIN_TIME_1,
+						RejoinTimePeriodicity:  ttnpb.RejoinTimeExponent_REJOIN_TIME_1,
 					},
 					DesiredParameters: &ttnpb.MACParameters{},
 					PendingRequests:   []*ttnpb.MACCommand{},

@@ -353,7 +353,7 @@ func (m *MACParameters) GetRejoinTimePeriodicity() RejoinTimeExponent {
 	if m != nil {
 		return m.RejoinTimePeriodicity
 	}
-	return REJOIN_TIME_0
+	return RejoinTimeExponent_REJOIN_TIME_0
 }
 
 func (m *MACParameters) GetRejoinCountPeriodicity() RejoinCountExponent {
