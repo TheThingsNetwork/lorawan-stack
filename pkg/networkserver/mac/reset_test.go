@@ -168,7 +168,7 @@ func TestHandleResetInd(t *testing.T) {
 	}
 }
 
-func genMACParameters() ttnpb.MACParameters {
+func genMACParameters() *ttnpb.MACParameters {
 	randomVal := random.Int63n(100)
 	channels := make([]*ttnpb.MACParameters_Channel, randomVal%16)
 	for i := range channels {
@@ -179,7 +179,7 @@ func genMACParameters() ttnpb.MACParameters {
 			DownlinkFrequency: uint64((randomVal + int64(i)) * 1000000000),
 		}
 	}
-	return ttnpb.MACParameters{
+	return &ttnpb.MACParameters{
 		MaxEirp:           float32(randomVal),
 		AdrDataRateIndex:  ttnpb.DataRateIndex(randomVal % 16),
 		AdrTxPowerIndex:   uint32(randomVal % 16),

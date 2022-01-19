@@ -45,24 +45,24 @@ func TestNeedsBeaconFreqReq(t *testing.T) {
 	ForEachClass(t, func(makeClassName func(parts ...string) string, class ttnpb.Class) {
 		for _, conf := range []struct {
 			Suffix                               string
-			CurrentParameters, DesiredParameters ttnpb.MACParameters
+			CurrentParameters, DesiredParameters *ttnpb.MACParameters
 			Needs                                bool
 		}{
 			{
 				Suffix: "current(frequency:42),desired(frequency:42)",
-				CurrentParameters: ttnpb.MACParameters{
+				CurrentParameters: &ttnpb.MACParameters{
 					BeaconFrequency: 42,
 				},
-				DesiredParameters: ttnpb.MACParameters{
+				DesiredParameters: &ttnpb.MACParameters{
 					BeaconFrequency: 42,
 				},
 			},
 			{
 				Suffix: "current(frequency:24),desired(frequency:42)",
-				CurrentParameters: ttnpb.MACParameters{
+				CurrentParameters: &ttnpb.MACParameters{
 					BeaconFrequency: 24,
 				},
-				DesiredParameters: ttnpb.MACParameters{
+				DesiredParameters: &ttnpb.MACParameters{
 					BeaconFrequency: 42,
 				},
 				Needs: true,
@@ -167,7 +167,7 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 			Expected: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						BeaconFrequency: 42,
 					},
 				},

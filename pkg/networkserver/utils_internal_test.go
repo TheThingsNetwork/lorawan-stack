@@ -93,7 +93,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			EarliestAt: beforeRX1,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
 					LorawanVersion:     ttnpb.MAC_V1_0_3,
@@ -113,10 +113,10 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			EarliestAt: beforeRX1,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
 					LorawanVersion:     ttnpb.MAC_V1_0_3,
@@ -139,10 +139,10 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			EarliestAt: beforeRX1,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
 					LorawanVersion:     ttnpb.MAC_V1_0_3,
@@ -169,7 +169,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			EarliestAt: rx2,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
 					LorawanVersion:     ttnpb.MAC_V1_0_3,
@@ -189,7 +189,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			EarliestAt: afterRX2,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
 					LorawanVersion: ttnpb.MAC_V1_0_3,
@@ -206,7 +206,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			EarliestAt: rx1,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{
@@ -229,7 +229,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			EarliestAt: rx1,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{
@@ -247,7 +247,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 		func() TestCase {
 			dev := &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{
@@ -280,7 +280,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			EarliestAt: beforeRX1,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
 					LorawanVersion:     ttnpb.MAC_V1_0_3,
@@ -300,7 +300,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			EarliestAt: beforeRX1,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
 					LorawanVersion: ttnpb.MAC_V1_0_3,
@@ -317,7 +317,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			EarliestAt: rx1,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
 					LorawanVersion: ttnpb.MAC_V1_0_3,
@@ -342,7 +342,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			EarliestAt: rx1,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
 					LorawanVersion: ttnpb.MAC_V1_0_3,
@@ -358,7 +358,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			EarliestAt: rx1,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
 					LorawanVersion: ttnpb.MAC_V1_0_3,
@@ -391,7 +391,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			EarliestAt: absTime,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
 					DeviceClass:    ttnpb.CLASS_C,
@@ -427,7 +427,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			EarliestAt: absTime.Add(time.Nanosecond),
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
 					LorawanVersion: ttnpb.MAC_V1_0_3,
@@ -457,7 +457,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			EarliestAt: absTime,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
 					DeviceClass:    ttnpb.CLASS_C,
@@ -481,7 +481,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				Multicast: true,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
 					DeviceClass:    ttnpb.CLASS_C,
@@ -504,7 +504,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			Device: &ttnpb.EndDevice{
 				Multicast: true,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: rxDelay,
 					},
 					DeviceClass:    ttnpb.CLASS_C,

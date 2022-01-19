@@ -48,7 +48,7 @@ func TestNeedsADRParamSetupReq(t *testing.T) {
 		)
 		for _, conf := range []struct {
 			Suffix                               string
-			CurrentParameters, DesiredParameters ttnpb.MACParameters
+			CurrentParameters, DesiredParameters *ttnpb.MACParameters
 			Needs                                bool
 		}{
 			{
@@ -56,7 +56,7 @@ func TestNeedsADRParamSetupReq(t *testing.T) {
 			},
 			{
 				Suffix: "current(limit:32768,delay:1024),desired(limit:32768,delay:1024)",
-				CurrentParameters: ttnpb.MACParameters{
+				CurrentParameters: &ttnpb.MACParameters{
 					AdrAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{
 						Value: ttnpb.ADR_ACK_LIMIT_32768,
 					},
@@ -64,7 +64,7 @@ func TestNeedsADRParamSetupReq(t *testing.T) {
 						Value: ttnpb.ADR_ACK_DELAY_1024,
 					},
 				},
-				DesiredParameters: ttnpb.MACParameters{
+				DesiredParameters: &ttnpb.MACParameters{
 					AdrAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{
 						Value: ttnpb.ADR_ACK_LIMIT_32768,
 					},
@@ -75,7 +75,7 @@ func TestNeedsADRParamSetupReq(t *testing.T) {
 			},
 			{
 				Suffix: "current(limit:32768,delay:1024),desired(limit:nil,delay:nil)",
-				CurrentParameters: ttnpb.MACParameters{
+				CurrentParameters: &ttnpb.MACParameters{
 					AdrAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{
 						Value: ttnpb.ADR_ACK_LIMIT_32768,
 					},
@@ -86,12 +86,12 @@ func TestNeedsADRParamSetupReq(t *testing.T) {
 			},
 			{
 				Suffix: "current(limit:nil,delay:1024),desired(limit:32768,delay:1024)",
-				CurrentParameters: ttnpb.MACParameters{
+				CurrentParameters: &ttnpb.MACParameters{
 					AdrAckDelayExponent: &ttnpb.ADRAckDelayExponentValue{
 						Value: ttnpb.ADR_ACK_DELAY_1024,
 					},
 				},
-				DesiredParameters: ttnpb.MACParameters{
+				DesiredParameters: &ttnpb.MACParameters{
 					AdrAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{
 						Value: ttnpb.ADR_ACK_LIMIT_32768,
 					},
@@ -103,7 +103,7 @@ func TestNeedsADRParamSetupReq(t *testing.T) {
 			},
 			{
 				Suffix: "current(limit:nil,delay:nil),desired(limit:32768,delay:1024)",
-				DesiredParameters: ttnpb.MACParameters{
+				DesiredParameters: &ttnpb.MACParameters{
 					AdrAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{
 						Value: ttnpb.ADR_ACK_LIMIT_32768,
 					},
@@ -115,12 +115,12 @@ func TestNeedsADRParamSetupReq(t *testing.T) {
 			},
 			{
 				Suffix: "current(limit:32768,delay:nil),desired(limit:nil,delay:1024)",
-				CurrentParameters: ttnpb.MACParameters{
+				CurrentParameters: &ttnpb.MACParameters{
 					AdrAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{
 						Value: ttnpb.ADR_ACK_LIMIT_32768,
 					},
 				},
-				DesiredParameters: ttnpb.MACParameters{
+				DesiredParameters: &ttnpb.MACParameters{
 					AdrAckDelayExponent: &ttnpb.ADRAckDelayExponentValue{
 						Value: ttnpb.ADR_ACK_DELAY_1024,
 					},
@@ -129,7 +129,7 @@ func TestNeedsADRParamSetupReq(t *testing.T) {
 			},
 			{
 				Suffix: "current(limit:32768,delay:1024),desired(limit:32768,delay:2048)",
-				CurrentParameters: ttnpb.MACParameters{
+				CurrentParameters: &ttnpb.MACParameters{
 					AdrAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{
 						Value: ttnpb.ADR_ACK_LIMIT_32768,
 					},
@@ -137,7 +137,7 @@ func TestNeedsADRParamSetupReq(t *testing.T) {
 						Value: ttnpb.ADR_ACK_DELAY_1024,
 					},
 				},
-				DesiredParameters: ttnpb.MACParameters{
+				DesiredParameters: &ttnpb.MACParameters{
 					AdrAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{
 						Value: ttnpb.ADR_ACK_LIMIT_32768,
 					},
@@ -220,7 +220,7 @@ func TestHandleADRParamSetupAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						AdrAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_32768},
 						AdrAckDelayExponent: &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_1024},
 					},

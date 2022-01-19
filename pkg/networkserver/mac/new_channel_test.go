@@ -309,10 +309,10 @@ func TestNewChannelReq(t *testing.T) {
 				makeDevice := func() *ttnpb.EndDevice {
 					return CopyEndDevice(&ttnpb.EndDevice{
 						MacState: &ttnpb.MACState{
-							CurrentParameters: ttnpb.MACParameters{
+							CurrentParameters: &ttnpb.MACParameters{
 								Channels: tc.CurrentChannels,
 							},
-							DesiredParameters: ttnpb.MACParameters{
+							DesiredParameters: &ttnpb.MACParameters{
 								Channels: tc.DesiredChannels,
 							},
 							RejectedFrequencies:    tc.RejectedFrequencies,
@@ -521,7 +521,7 @@ func TestHandleNewChannelAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
 							nil,
 							nil,

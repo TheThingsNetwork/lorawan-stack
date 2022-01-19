@@ -42,12 +42,12 @@ func TestNeedsRxParamSetupReq(t *testing.T) {
 			Name: "current(data-rate-offset:1,data-rate-index:2,frequency:123),desired(data-rate-offset:1,data-rate-index:2,frequency:123)",
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 1,
 						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
 						Rx2Frequency:      123,
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 1,
 						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
 						Rx2Frequency:      123,
@@ -59,12 +59,12 @@ func TestNeedsRxParamSetupReq(t *testing.T) {
 			Name: "current(data-rate-offset:1,data-rate-index:2,frequency:123),desired(data-rate-offset:1,data-rate-index:3,frequency:123)",
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 1,
 						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
 						Rx2Frequency:      123,
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 1,
 						Rx2DataRateIndex:  ttnpb.DATA_RATE_3,
 						Rx2Frequency:      123,
@@ -77,12 +77,12 @@ func TestNeedsRxParamSetupReq(t *testing.T) {
 			Name: "current(data-rate-offset:1,data-rate-index:2,frequency:123),desired(data-rate-offset:1,data-rate-index:2,frequency:124)",
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 1,
 						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
 						Rx2Frequency:      123,
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 1,
 						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
 						Rx2Frequency:      124,
@@ -95,12 +95,12 @@ func TestNeedsRxParamSetupReq(t *testing.T) {
 			Name: "current(data-rate-offset:1,data-rate-index:2,frequency:123),desired(data-rate-offset:2,data-rate-index:2,frequency:123)",
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 1,
 						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
 						Rx2Frequency:      123,
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 2,
 						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
 						Rx2Frequency:      123,
@@ -172,7 +172,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 			Name: "all ack",
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 99,
 						Rx2Frequency:      99,
 					},
@@ -187,7 +187,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 42,
 						Rx2DataRateIndex:  43,
 						Rx2Frequency:      44,
@@ -212,7 +212,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 			Name: "data rate ack",
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 99,
 						Rx2Frequency:      99,
 					},
@@ -227,7 +227,7 @@ func TestHandleRxParamSetupAns(t *testing.T) {
 			},
 			Expected: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 99,
 						Rx2Frequency:      99,
 					},

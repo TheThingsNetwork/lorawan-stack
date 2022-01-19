@@ -248,8 +248,8 @@ func MakeDefaultEU868CurrentChannels() []*ttnpb.MACParameters_Channel {
 	return deepcopy.Copy(DefaultEU868Channels[:]).([]*ttnpb.MACParameters_Channel)
 }
 
-func MakeDefaultEU868CurrentMACParameters(phyVersion ttnpb.PHYVersion) ttnpb.MACParameters {
-	return ttnpb.MACParameters{
+func MakeDefaultEU868CurrentMACParameters(phyVersion ttnpb.PHYVersion) *ttnpb.MACParameters {
+	return &ttnpb.MACParameters{
 		AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
 		AdrAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
 		AdrNbTrans:                 1,
@@ -306,7 +306,7 @@ func MakeDefaultEU868DesiredChannels() []*ttnpb.MACParameters_Channel {
 	)
 }
 
-func MakeDefaultEU868DesiredMACParameters(phyVersion ttnpb.PHYVersion) ttnpb.MACParameters {
+func MakeDefaultEU868DesiredMACParameters(phyVersion ttnpb.PHYVersion) *ttnpb.MACParameters {
 	params := MakeDefaultEU868CurrentMACParameters(phyVersion)
 	params.Channels = MakeDefaultEU868DesiredChannels()
 	return params
@@ -349,8 +349,8 @@ func MakeDefaultUS915CurrentChannels() []*ttnpb.MACParameters_Channel {
 	return deepcopy.Copy(DefaultUS915Channels[:]).([]*ttnpb.MACParameters_Channel)
 }
 
-func MakeDefaultUS915CurrentMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParameters {
-	return ttnpb.MACParameters{
+func MakeDefaultUS915CurrentMACParameters(ver ttnpb.PHYVersion) *ttnpb.MACParameters {
+	return &ttnpb.MACParameters{
 		AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
 		AdrAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
 		AdrNbTrans:                 1,
@@ -385,7 +385,7 @@ func MakeDefaultUS915FSB2DesiredChannels() []*ttnpb.MACParameters_Channel {
 	return chs
 }
 
-func MakeDefaultUS915FSB2DesiredMACParameters(ver ttnpb.PHYVersion) ttnpb.MACParameters {
+func MakeDefaultUS915FSB2DesiredMACParameters(ver ttnpb.PHYVersion) *ttnpb.MACParameters {
 	params := MakeDefaultUS915CurrentMACParameters(ver)
 	params.Channels = MakeDefaultUS915FSB2DesiredChannels()
 	return params

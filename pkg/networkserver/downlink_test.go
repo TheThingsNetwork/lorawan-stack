@@ -77,7 +77,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 		MaxDataRateIndex:  ttnpb.DATA_RATE_6,
 	}
 	const customChIdx = 3
-	makeEU868macParameters := func(ver ttnpb.PHYVersion) ttnpb.MACParameters {
+	makeEU868macParameters := func(ver ttnpb.PHYVersion) *ttnpb.MACParameters {
 		params := MakeDefaultEU868CurrentMACParameters(ver)
 		if len(params.Channels) != customChIdx {
 			panic(fmt.Sprintf("invalid EU868 default channel count, expected %d, got %d", customChIdx, len(params.Channels)))

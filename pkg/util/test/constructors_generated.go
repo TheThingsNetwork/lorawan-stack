@@ -41,6 +41,14 @@ func (RootKeysOptionNamespace) WithNwkKey(v *ttnpb.KeyEnvelope) RootKeysOption {
 	}
 }
 
+// WithXXX_unrecognized returns a RootKeysOption, which returns a copy of ttnpb.RootKeys with XXX_unrecognized set to v.
+func (RootKeysOptionNamespace) WithXXX_unrecognized(v []byte) RootKeysOption {
+	return func(x ttnpb.RootKeys) ttnpb.RootKeys {
+		x.XXX_unrecognized = v
+		return x
+	}
+}
+
 // Compose returns a functional composition of opts as a singular RootKeysOption.
 func (RootKeysOptionNamespace) Compose(opts ...RootKeysOption) RootKeysOption {
 	return func(x ttnpb.RootKeys) ttnpb.RootKeys {
@@ -116,6 +124,14 @@ func (SessionKeysOptionNamespace) WithNwkSEncKey(v *ttnpb.KeyEnvelope) SessionKe
 func (SessionKeysOptionNamespace) WithAppSKey(v *ttnpb.KeyEnvelope) SessionKeysOption {
 	return func(x ttnpb.SessionKeys) ttnpb.SessionKeys {
 		x.AppSKey = v
+		return x
+	}
+}
+
+// WithXXX_unrecognized returns a SessionKeysOption, which returns a copy of ttnpb.SessionKeys with XXX_unrecognized set to v.
+func (SessionKeysOptionNamespace) WithXXX_unrecognized(v []byte) SessionKeysOption {
+	return func(x ttnpb.SessionKeys) ttnpb.SessionKeys {
+		x.XXX_unrecognized = v
 		return x
 	}
 }
@@ -223,6 +239,14 @@ func (SessionOptionNamespace) WithQueuedApplicationDownlinks(vs ...*ttnpb.Applic
 	}
 }
 
+// WithXXX_unrecognized returns a SessionOption, which returns a copy of ttnpb.Session with XXX_unrecognized set to v.
+func (SessionOptionNamespace) WithXXX_unrecognized(v []byte) SessionOption {
+	return func(x ttnpb.Session) ttnpb.Session {
+		x.XXX_unrecognized = v
+		return x
+	}
+}
+
 // Compose returns a functional composition of opts as a singular SessionOption.
 func (SessionOptionNamespace) Compose(opts ...SessionOption) SessionOption {
 	return func(x ttnpb.Session) ttnpb.Session {
@@ -263,7 +287,7 @@ type (
 )
 
 // WithCurrentParameters returns a MACStateOption, which returns a copy of ttnpb.MACState with CurrentParameters set to v.
-func (MACStateOptionNamespace) WithCurrentParameters(v ttnpb.MACParameters) MACStateOption {
+func (MACStateOptionNamespace) WithCurrentParameters(v *ttnpb.MACParameters) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {
 		x.CurrentParameters = v
 		return x
@@ -271,7 +295,7 @@ func (MACStateOptionNamespace) WithCurrentParameters(v ttnpb.MACParameters) MACS
 }
 
 // WithDesiredParameters returns a MACStateOption, which returns a copy of ttnpb.MACState with DesiredParameters set to v.
-func (MACStateOptionNamespace) WithDesiredParameters(v ttnpb.MACParameters) MACStateOption {
+func (MACStateOptionNamespace) WithDesiredParameters(v *ttnpb.MACParameters) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {
 		x.DesiredParameters = v
 		return x
@@ -438,6 +462,14 @@ func (MACStateOptionNamespace) WithLastAdrChangeFCntUp(v uint32) MACStateOption 
 	}
 }
 
+// WithXXX_unrecognized returns a MACStateOption, which returns a copy of ttnpb.MACState with XXX_unrecognized set to v.
+func (MACStateOptionNamespace) WithXXX_unrecognized(v []byte) MACStateOption {
+	return func(x ttnpb.MACState) ttnpb.MACState {
+		x.XXX_unrecognized = v
+		return x
+	}
+}
+
 // Compose returns a functional composition of opts as a singular MACStateOption.
 func (MACStateOptionNamespace) Compose(opts ...MACStateOption) MACStateOption {
 	return func(x ttnpb.MACState) ttnpb.MACState {
@@ -513,6 +545,14 @@ func (EndDeviceIdentifiersOptionNamespace) WithJoinEui(v *types.EUI64) EndDevice
 func (EndDeviceIdentifiersOptionNamespace) WithDevAddr(v *types.DevAddr) EndDeviceIdentifiersOption {
 	return func(x ttnpb.EndDeviceIdentifiers) ttnpb.EndDeviceIdentifiers {
 		x.DevAddr = v
+		return x
+	}
+}
+
+// WithXXX_unrecognized returns a EndDeviceIdentifiersOption, which returns a copy of ttnpb.EndDeviceIdentifiers with XXX_unrecognized set to v.
+func (EndDeviceIdentifiersOptionNamespace) WithXXX_unrecognized(v []byte) EndDeviceIdentifiersOption {
+	return func(x ttnpb.EndDeviceIdentifiers) ttnpb.EndDeviceIdentifiers {
+		x.XXX_unrecognized = v
 		return x
 	}
 }
@@ -952,6 +992,14 @@ func (EndDeviceOptionNamespace) WithSkipPayloadCryptoOverride(v *pbtypes.BoolVal
 func (EndDeviceOptionNamespace) WithActivatedAt(v *pbtypes.Timestamp) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.ActivatedAt = v
+		return x
+	}
+}
+
+// WithXXX_unrecognized returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with XXX_unrecognized set to v.
+func (EndDeviceOptionNamespace) WithXXX_unrecognized(v []byte) EndDeviceOption {
+	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
+		x.XXX_unrecognized = v
 		return x
 	}
 }
