@@ -364,7 +364,7 @@ func (v *MACState) FieldIsZero(p string) bool {
 	}
 	switch p {
 	case "current_parameters":
-		return fieldsAreZero(&v.CurrentParameters, MACParametersFieldPathsTopLevel...)
+		return v.CurrentParameters == nil
 	case "current_parameters.adr_ack_delay":
 		return v.CurrentParameters.FieldIsZero("adr_ack_delay")
 	case "current_parameters.adr_ack_delay_exponent":
@@ -420,7 +420,7 @@ func (v *MACState) FieldIsZero(p string) bool {
 	case "current_parameters.uplink_dwell_time.value":
 		return v.CurrentParameters.FieldIsZero("uplink_dwell_time.value")
 	case "desired_parameters":
-		return fieldsAreZero(&v.DesiredParameters, MACParametersFieldPathsTopLevel...)
+		return v.DesiredParameters == nil
 	case "desired_parameters.adr_ack_delay":
 		return v.DesiredParameters.FieldIsZero("adr_ack_delay")
 	case "desired_parameters.adr_ack_delay_exponent":

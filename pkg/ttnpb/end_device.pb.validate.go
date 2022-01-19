@@ -1162,7 +1162,14 @@ func (m *MACState) ValidateFields(paths ...string) error {
 		switch name {
 		case "current_parameters":
 
-			if v, ok := interface{}(&m.CurrentParameters).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetCurrentParameters() == nil {
+				return MACStateValidationError{
+					field:  "current_parameters",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetCurrentParameters()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACStateValidationError{
 						field:  "current_parameters",
@@ -1174,7 +1181,14 @@ func (m *MACState) ValidateFields(paths ...string) error {
 
 		case "desired_parameters":
 
-			if v, ok := interface{}(&m.DesiredParameters).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetDesiredParameters() == nil {
+				return MACStateValidationError{
+					field:  "desired_parameters",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetDesiredParameters()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACStateValidationError{
 						field:  "desired_parameters",

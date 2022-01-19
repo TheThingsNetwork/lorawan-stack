@@ -273,9 +273,9 @@ message MACSettings {
 // This is used internally by the Network Server.
 message MACState {
   // Current LoRaWAN MAC parameters.
-  MACParameters current_parameters = 1 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  MACParameters current_parameters = 1 [(validate.rules).message.required = true];
   // Desired LoRaWAN MAC parameters.
-  MACParameters desired_parameters = 2 [(gogoproto.nullable) = false, (validate.rules).message.required = true];
+  MACParameters desired_parameters = 2 [(validate.rules).message.required = true];
 
   // Currently active LoRaWAN device class
   // - Device class is A by default

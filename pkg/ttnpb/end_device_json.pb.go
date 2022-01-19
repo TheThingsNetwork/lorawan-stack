@@ -1340,12 +1340,12 @@ func (x *MACState) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.CurrentParameters != nil || s.HasField("current_parameters") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("current_parameters")
 		x.CurrentParameters.MarshalProtoJSON(s.WithField("current_parameters"))
 	}
-	if true { // (gogoproto.nullable) = false
+	if x.DesiredParameters != nil || s.HasField("desired_parameters") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("desired_parameters")
 		x.DesiredParameters.MarshalProtoJSON(s.WithField("desired_parameters"))
@@ -1518,10 +1518,12 @@ func (x *MACState) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			s.ReadAny() // ignore unknown field
 		case "current_parameters", "currentParameters":
 			if !s.ReadNil() {
+				x.CurrentParameters = &MACParameters{}
 				x.CurrentParameters.UnmarshalProtoJSON(s.WithField("current_parameters", true))
 			}
 		case "desired_parameters", "desiredParameters":
 			if !s.ReadNil() {
+				x.DesiredParameters = &MACParameters{}
 				x.DesiredParameters.UnmarshalProtoJSON(s.WithField("desired_parameters", true))
 			}
 		case "device_class", "deviceClass":
