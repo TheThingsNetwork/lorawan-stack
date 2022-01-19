@@ -412,10 +412,16 @@ func TestHandleNewChannelAns(t *testing.T) {
 		{
 			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Payload: nil,
 			Error:   ErrNoPayload,
@@ -423,10 +429,16 @@ func TestHandleNewChannelAns(t *testing.T) {
 		{
 			Name: "no request",
 			Device: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Payload: &ttnpb.MACCommand_NewChannelAns{
 				FrequencyAck: true,
@@ -452,12 +464,16 @@ func TestHandleNewChannelAns(t *testing.T) {
 							MaxDataRateIndex: ttnpb.DATA_RATE_3,
 						}).MACCommand(),
 					},
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					PendingRequests:     []*ttnpb.MACCommand{},
 					RejectedFrequencies: []uint64{42},
+					CurrentParameters:   &ttnpb.MACParameters{},
+					DesiredParameters:   &ttnpb.MACParameters{},
 				},
 			},
 			Payload: &ttnpb.MACCommand_NewChannelAns{
@@ -482,6 +498,8 @@ func TestHandleNewChannelAns(t *testing.T) {
 						}).MACCommand(),
 					},
 					RejectedFrequencies: []uint64{1, 2, 100},
+					CurrentParameters:   &ttnpb.MACParameters{},
+					DesiredParameters:   &ttnpb.MACParameters{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
@@ -498,6 +516,8 @@ func TestHandleNewChannelAns(t *testing.T) {
 							},
 						},
 					},
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			Payload: &ttnpb.MACCommand_NewChannelAns{},
@@ -517,6 +537,8 @@ func TestHandleNewChannelAns(t *testing.T) {
 							MaxDataRateIndex: ttnpb.DATA_RATE_3,
 						}).MACCommand(),
 					},
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
@@ -536,7 +558,8 @@ func TestHandleNewChannelAns(t *testing.T) {
 							},
 						},
 					},
-					PendingRequests: []*ttnpb.MACCommand{},
+					DesiredParameters: &ttnpb.MACParameters{},
+					PendingRequests:   []*ttnpb.MACCommand{},
 				},
 			},
 			Payload: &ttnpb.MACCommand_NewChannelAns{

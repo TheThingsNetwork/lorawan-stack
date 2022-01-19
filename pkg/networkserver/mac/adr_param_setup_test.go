@@ -52,7 +52,9 @@ func TestNeedsADRParamSetupReq(t *testing.T) {
 			Needs                                bool
 		}{
 			{
-				Suffix: "current(limit:nil,delay:nil),desired(limit:nil,delay:nil)",
+				Suffix:            "current(limit:nil,delay:nil),desired(limit:nil,delay:nil)",
+				CurrentParameters: &ttnpb.MACParameters{},
+				DesiredParameters: &ttnpb.MACParameters{},
 			},
 			{
 				Suffix: "current(limit:32768,delay:1024),desired(limit:32768,delay:1024)",
@@ -83,6 +85,7 @@ func TestNeedsADRParamSetupReq(t *testing.T) {
 						Value: ttnpb.ADR_ACK_DELAY_1024,
 					},
 				},
+				DesiredParameters: &ttnpb.MACParameters{},
 			},
 			{
 				Suffix: "current(limit:nil,delay:1024),desired(limit:32768,delay:1024)",
@@ -102,7 +105,8 @@ func TestNeedsADRParamSetupReq(t *testing.T) {
 				Needs: phy.ADRAckLimit != ttnpb.ADR_ACK_LIMIT_32768,
 			},
 			{
-				Suffix: "current(limit:nil,delay:nil),desired(limit:32768,delay:1024)",
+				Suffix:            "current(limit:nil,delay:nil),desired(limit:32768,delay:1024)",
+				CurrentParameters: &ttnpb.MACParameters{},
 				DesiredParameters: &ttnpb.MACParameters{
 					AdrAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{
 						Value: ttnpb.ADR_ACK_LIMIT_32768,
@@ -196,10 +200,16 @@ func TestHandleADRParamSetupAns(t *testing.T) {
 		{
 			Name: "no request",
 			Device: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Events: events.Builders{
 				EvtReceiveADRParamSetupAnswer,
@@ -216,6 +226,8 @@ func TestHandleADRParamSetupAns(t *testing.T) {
 							AdrAckDelayExponent: ttnpb.ADR_ACK_DELAY_1024,
 						}).MACCommand(),
 					},
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
@@ -224,7 +236,8 @@ func TestHandleADRParamSetupAns(t *testing.T) {
 						AdrAckLimitExponent: &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_32768},
 						AdrAckDelayExponent: &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_1024},
 					},
-					PendingRequests: []*ttnpb.MACCommand{},
+					DesiredParameters: &ttnpb.MACParameters{},
+					PendingRequests:   []*ttnpb.MACCommand{},
 				},
 			},
 			Events: events.Builders{

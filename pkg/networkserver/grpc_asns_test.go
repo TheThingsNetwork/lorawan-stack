@@ -213,9 +213,11 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
-						DeviceClass:    ttnpb.CLASS_A,
-						LorawanVersion: ttnpb.MAC_V1_1,
-						RecentUplinks:  ups,
+						CurrentParameters: &ttnpb.MACParameters{},
+						DesiredParameters: &ttnpb.MACParameters{},
+						DeviceClass:       ttnpb.CLASS_A,
+						LorawanVersion:    ttnpb.MAC_V1_1,
+						RecentUplinks:     ups,
 					},
 					Session: &ttnpb.Session{
 						Keys: &ttnpb.SessionKeys{
@@ -292,9 +294,11 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
-						DeviceClass:    ttnpb.CLASS_A,
-						LorawanVersion: ttnpb.MAC_V1_1,
-						RecentUplinks:  ups,
+						CurrentParameters: &ttnpb.MACParameters{},
+						DesiredParameters: &ttnpb.MACParameters{},
+						DeviceClass:       ttnpb.CLASS_A,
+						LorawanVersion:    ttnpb.MAC_V1_1,
+						RecentUplinks:     ups,
 					},
 					Session: &ttnpb.Session{
 						Keys: &ttnpb.SessionKeys{
@@ -308,8 +312,10 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						},
 					},
 					PendingMacState: &ttnpb.MACState{
-						DeviceClass:    ttnpb.CLASS_A,
-						LorawanVersion: ttnpb.MAC_V1_1,
+						CurrentParameters: &ttnpb.MACParameters{},
+						DesiredParameters: &ttnpb.MACParameters{},
+						DeviceClass:       ttnpb.CLASS_A,
+						LorawanVersion:    ttnpb.MAC_V1_1,
 					},
 					PendingSession: &ttnpb.Session{
 						Keys: &ttnpb.SessionKeys{
@@ -395,9 +401,11 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
-						DeviceClass:    ttnpb.CLASS_C,
-						LorawanVersion: ttnpb.MAC_V1_1,
-						RecentUplinks:  ups,
+						CurrentParameters: &ttnpb.MACParameters{},
+						DesiredParameters: &ttnpb.MACParameters{},
+						DeviceClass:       ttnpb.CLASS_C,
+						LorawanVersion:    ttnpb.MAC_V1_1,
+						RecentUplinks:     ups,
 					},
 					Session: &ttnpb.Session{
 						Keys: &ttnpb.SessionKeys{
@@ -544,9 +552,11 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
-						DeviceClass:    ttnpb.CLASS_A,
-						LorawanVersion: ttnpb.MAC_V1_1,
-						RecentUplinks:  ups,
+						CurrentParameters: &ttnpb.MACParameters{},
+						DesiredParameters: &ttnpb.MACParameters{},
+						DeviceClass:       ttnpb.CLASS_A,
+						LorawanVersion:    ttnpb.MAC_V1_1,
+						RecentUplinks:     ups,
 					},
 					Session: &ttnpb.Session{
 						Keys: &ttnpb.SessionKeys{
@@ -622,9 +632,11 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
-						DeviceClass:    ttnpb.CLASS_C,
-						LorawanVersion: ttnpb.MAC_V1_1,
-						RecentUplinks:  ups,
+						CurrentParameters: &ttnpb.MACParameters{},
+						DesiredParameters: &ttnpb.MACParameters{},
+						DeviceClass:       ttnpb.CLASS_C,
+						LorawanVersion:    ttnpb.MAC_V1_1,
+						RecentUplinks:     ups,
 					},
 					Session: &ttnpb.Session{
 						Keys: &ttnpb.SessionKeys{
@@ -922,9 +934,11 @@ func TestDownlinkQueuePush(t *testing.T) {
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
-						DeviceClass:    ttnpb.CLASS_A,
-						LorawanVersion: ttnpb.MAC_V1_1,
-						RecentUplinks:  ups,
+						CurrentParameters: &ttnpb.MACParameters{},
+						DesiredParameters: &ttnpb.MACParameters{},
+						DeviceClass:       ttnpb.CLASS_A,
+						LorawanVersion:    ttnpb.MAC_V1_1,
+						RecentUplinks:     ups,
 					},
 					Session: &ttnpb.Session{
 						Keys: &ttnpb.SessionKeys{
@@ -1001,9 +1015,11 @@ func TestDownlinkQueuePush(t *testing.T) {
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
-						DeviceClass:    ttnpb.CLASS_A,
-						LorawanVersion: ttnpb.MAC_V1_1,
-						RecentUplinks:  ups,
+						CurrentParameters: &ttnpb.MACParameters{},
+						DesiredParameters: &ttnpb.MACParameters{},
+						DeviceClass:       ttnpb.CLASS_A,
+						LorawanVersion:    ttnpb.MAC_V1_1,
+						RecentUplinks:     ups,
 					},
 					Session: &ttnpb.Session{
 						Keys: &ttnpb.SessionKeys{
@@ -1017,8 +1033,10 @@ func TestDownlinkQueuePush(t *testing.T) {
 						},
 					},
 					PendingMacState: &ttnpb.MACState{
-						DeviceClass:    ttnpb.CLASS_A,
-						LorawanVersion: ttnpb.MAC_V1_1,
+						CurrentParameters: &ttnpb.MACParameters{},
+						DesiredParameters: &ttnpb.MACParameters{},
+						DeviceClass:       ttnpb.CLASS_A,
+						LorawanVersion:    ttnpb.MAC_V1_1,
 					},
 					PendingSession: &ttnpb.Session{
 						Keys: &ttnpb.SessionKeys{
@@ -1088,9 +1106,11 @@ func TestDownlinkQueuePush(t *testing.T) {
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
-						DeviceClass:    ttnpb.CLASS_C,
-						LorawanVersion: ttnpb.MAC_V1_1,
-						RecentUplinks:  ups,
+						CurrentParameters: &ttnpb.MACParameters{},
+						DesiredParameters: &ttnpb.MACParameters{},
+						DeviceClass:       ttnpb.CLASS_C,
+						LorawanVersion:    ttnpb.MAC_V1_1,
+						RecentUplinks:     ups,
 					},
 					Session: &ttnpb.Session{
 						Keys: &ttnpb.SessionKeys{
@@ -1158,9 +1178,11 @@ func TestDownlinkQueuePush(t *testing.T) {
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
-						DeviceClass:    ttnpb.CLASS_C,
-						LorawanVersion: ttnpb.MAC_V1_0_2,
-						RecentUplinks:  ups,
+						CurrentParameters: &ttnpb.MACParameters{},
+						DesiredParameters: &ttnpb.MACParameters{},
+						DeviceClass:       ttnpb.CLASS_C,
+						LorawanVersion:    ttnpb.MAC_V1_0_2,
+						RecentUplinks:     ups,
 					},
 					Session: &ttnpb.Session{
 						Keys: &ttnpb.SessionKeys{
@@ -1223,9 +1245,11 @@ func TestDownlinkQueuePush(t *testing.T) {
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 					},
 					MacState: &ttnpb.MACState{
-						DeviceClass:    ttnpb.CLASS_C,
-						LorawanVersion: ttnpb.MAC_V1_0_2,
-						RecentUplinks:  ups,
+						CurrentParameters: &ttnpb.MACParameters{},
+						DesiredParameters: &ttnpb.MACParameters{},
+						DeviceClass:       ttnpb.CLASS_C,
+						LorawanVersion:    ttnpb.MAC_V1_0_2,
+						RecentUplinks:     ups,
 					},
 				})
 				if !a.So(err, should.BeError) {

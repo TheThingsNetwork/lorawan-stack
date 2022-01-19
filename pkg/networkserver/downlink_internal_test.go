@@ -161,7 +161,9 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DevAddr:        &devAddr,
 				},
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+					LorawanVersion:    ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHdr: &ttnpb.MHDR{
@@ -193,6 +195,8 @@ func TestGenerateDataDownlink(t *testing.T) {
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 3},
 				},
 				MacState: &ttnpb.MACState{
+					CurrentParameters:   &ttnpb.MACParameters{},
+					DesiredParameters:   &ttnpb.MACParameters{},
 					LorawanVersion:      ttnpb.MAC_V1_1,
 					LastDevStatusFCntUp: 2,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
@@ -229,7 +233,9 @@ func TestGenerateDataDownlink(t *testing.T) {
 					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(24 * time.Hour),
 				},
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+					LorawanVersion:    ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHdr: &ttnpb.MHDR{
@@ -259,7 +265,9 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DevAddr:        &devAddr,
 				},
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+					LorawanVersion:    ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHdr: &ttnpb.MHDR{
@@ -326,7 +334,9 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DevAddr:        &devAddr,
 					},
 					MacState: &ttnpb.MACState{
-						LorawanVersion: ttnpb.MAC_V1_1,
+						CurrentParameters: &ttnpb.MACParameters{},
+						DesiredParameters: &ttnpb.MACParameters{},
+						LorawanVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{{
 							Payload: &ttnpb.Message{
 								MHdr: &ttnpb.MHDR{
@@ -376,7 +386,9 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DevAddr:        &devAddr,
 				},
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+					LorawanVersion:    ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHdr: &ttnpb.MHDR{
@@ -450,7 +462,9 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DevAddr:        &devAddr,
 					},
 					MacState: &ttnpb.MACState{
-						LorawanVersion: ttnpb.MAC_V1_1,
+						CurrentParameters: &ttnpb.MACParameters{},
+						DesiredParameters: &ttnpb.MACParameters{},
+						LorawanVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{{
 							Payload: &ttnpb.Message{
 								MHdr: &ttnpb.MHDR{
@@ -491,7 +505,9 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DevAddr:        &devAddr,
 				},
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+					LorawanVersion:    ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHdr: &ttnpb.MHDR{
@@ -569,7 +585,9 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DevAddr:        &devAddr,
 					},
 					MacState: &ttnpb.MACState{
-						LorawanVersion: ttnpb.MAC_V1_1,
+						CurrentParameters: &ttnpb.MACParameters{},
+						DesiredParameters: &ttnpb.MACParameters{},
+						LorawanVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{{
 							Payload: &ttnpb.Message{
 								MHdr: &ttnpb.MHDR{
@@ -613,7 +631,9 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DevAddr:        &devAddr,
 				},
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+					LorawanVersion:    ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHdr: &ttnpb.MHDR{
@@ -690,7 +710,9 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DevAddr:        &devAddr,
 					},
 					MacState: &ttnpb.MACState{
-						LorawanVersion: ttnpb.MAC_V1_1,
+						CurrentParameters: &ttnpb.MACParameters{},
+						DesiredParameters: &ttnpb.MACParameters{},
+						LorawanVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{{
 							Payload: &ttnpb.Message{
 								MHdr: &ttnpb.MHDR{
@@ -730,7 +752,9 @@ func TestGenerateDataDownlink(t *testing.T) {
 					DevAddr:        &devAddr,
 				},
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+					LorawanVersion:    ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHdr: &ttnpb.MHDR{
@@ -812,7 +836,9 @@ func TestGenerateDataDownlink(t *testing.T) {
 						DevAddr:        &devAddr,
 					},
 					MacState: &ttnpb.MACState{
-						LorawanVersion: ttnpb.MAC_V1_1,
+						CurrentParameters: &ttnpb.MACParameters{},
+						DesiredParameters: &ttnpb.MACParameters{},
+						LorawanVersion:    ttnpb.MAC_V1_1,
 						RecentUplinks: []*ttnpb.UplinkMessage{{
 							Payload: &ttnpb.Message{
 								MHdr: &ttnpb.MHDR{
@@ -859,6 +885,8 @@ func TestGenerateDataDownlink(t *testing.T) {
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 3},
 				},
 				MacState: &ttnpb.MACState{
+					CurrentParameters:   &ttnpb.MACParameters{},
+					DesiredParameters:   &ttnpb.MACParameters{},
 					LorawanVersion:      ttnpb.MAC_V1_1,
 					LastDevStatusFCntUp: 4,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
@@ -934,6 +962,8 @@ func TestGenerateDataDownlink(t *testing.T) {
 						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 3},
 					},
 					MacState: &ttnpb.MACState{
+						CurrentParameters:   &ttnpb.MACParameters{},
+						DesiredParameters:   &ttnpb.MACParameters{},
 						LorawanVersion:      ttnpb.MAC_V1_1,
 						LastDevStatusFCntUp: 4,
 						PendingRequests: []*ttnpb.MACCommand{
@@ -988,7 +1018,9 @@ func TestGenerateDataDownlink(t *testing.T) {
 					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Nanosecond),
 				},
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+					LorawanVersion:    ttnpb.MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{{
 						Payload: &ttnpb.Message{
 							MHdr: &ttnpb.MHDR{
@@ -1061,7 +1093,9 @@ func TestGenerateDataDownlink(t *testing.T) {
 						StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Nanosecond),
 					},
 					MacState: &ttnpb.MACState{
-						LorawanVersion: ttnpb.MAC_V1_1,
+						CurrentParameters: &ttnpb.MACParameters{},
+						DesiredParameters: &ttnpb.MACParameters{},
+						LorawanVersion:    ttnpb.MAC_V1_1,
 						PendingRequests: []*ttnpb.MACCommand{
 							ttnpb.CID_DEV_STATUS.MACCommand(),
 						},

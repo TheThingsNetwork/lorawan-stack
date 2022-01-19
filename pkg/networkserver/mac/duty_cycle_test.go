@@ -93,10 +93,16 @@ func TestHandleDutyCycleAns(t *testing.T) {
 		{
 			Name: "no request",
 			Device: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Events: events.Builders{
 				EvtReceiveDutyCycleAnswer,
@@ -112,6 +118,8 @@ func TestHandleDutyCycleAns(t *testing.T) {
 							MaxDutyCycle: ttnpb.DUTY_CYCLE_2048,
 						}).MACCommand(),
 					},
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
@@ -120,6 +128,7 @@ func TestHandleDutyCycleAns(t *testing.T) {
 					CurrentParameters: &ttnpb.MACParameters{
 						MaxDutyCycle: ttnpb.DUTY_CYCLE_2048,
 					},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			Events: events.Builders{

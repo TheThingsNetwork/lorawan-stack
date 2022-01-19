@@ -345,10 +345,16 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 		{
 			Name: "no request",
 			InputDevice: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Events: events.Builders{
 				EvtReceiveTxParamSetupAnswer,
@@ -366,6 +372,8 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 							UplinkDwellTime:   true,
 						}).MACCommand(),
 					},
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
@@ -375,7 +383,8 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 						DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
 						UplinkDwellTime:   &ttnpb.BoolValue{Value: true},
 					},
-					PendingRequests: []*ttnpb.MACCommand{},
+					DesiredParameters: &ttnpb.MACParameters{},
+					PendingRequests:   []*ttnpb.MACCommand{},
 				},
 			},
 			Events: events.Builders{
