@@ -2304,7 +2304,7 @@ func (x *CreateEndDeviceRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
-	if true { // (gogoproto.nullable) = false
+	if x.EndDevice != nil || s.HasField("end_device") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("end_device")
 		x.EndDevice.MarshalProtoJSON(s.WithField("end_device"))
@@ -2328,6 +2328,7 @@ func (x *CreateEndDeviceRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState
 			s.ReadAny() // ignore unknown field
 		case "end_device", "endDevice":
 			if !s.ReadNil() {
+				x.EndDevice = &EndDevice{}
 				x.EndDevice.UnmarshalProtoJSON(s.WithField("end_device", true))
 			}
 		}

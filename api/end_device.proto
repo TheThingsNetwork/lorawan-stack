@@ -578,7 +578,7 @@ message DevAddrPrefix {
 }
 
 message CreateEndDeviceRequest {
-  EndDevice end_device = 1 [(gogoproto.embed) = true, (gogoproto.nullable) = false, (validate.rules).message.required = true];
+  EndDevice end_device = 1 [(validate.rules).message.required = true];
 }
 
 message UpdateEndDeviceRequest {

@@ -2387,7 +2387,14 @@ func (m *CreateEndDeviceRequest) ValidateFields(paths ...string) error {
 		switch name {
 		case "end_device":
 
-			if v, ok := interface{}(&m.EndDevice).(interface{ ValidateFields(...string) error }); ok {
+			if m.GetEndDevice() == nil {
+				return CreateEndDeviceRequestValidationError{
+					field:  "end_device",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetEndDevice()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return CreateEndDeviceRequestValidationError{
 						field:  "end_device",
