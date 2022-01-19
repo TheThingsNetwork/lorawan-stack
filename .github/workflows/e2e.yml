@@ -84,7 +84,7 @@ jobs:
           path: |
             .cache/sqldump.sql
             .env/admin_api_key.txt
-          key: db-cache-${{ hashFiles('pkg/identityserver/store/**/*.go', 'cmd/ttn-lw-stack/commands/is-db.go') }}
+          key: db-cache-${{ hashFiles('pkg/identityserver/store/**/*.go', 'cmd/ttn-lw-stack/commands/is-db.go', '.github/workflows/e2e.yml') }}
       - name: Set up Go
         uses: actions/setup-go@v2
         with:

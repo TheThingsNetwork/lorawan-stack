@@ -17,7 +17,6 @@ package ttnmage
 import (
 	"fmt"
 	"io"
-	"net/url"
 	"os"
 	"path/filepath"
 
@@ -68,14 +67,10 @@ func (js Js) runEslint(args ...string) error {
 }
 
 func (js Js) waitOn() error {
-	u, err := url.Parse(js.frontendURL())
-	if err != nil {
-		return err
-	}
 	return js.runYarnCommand("wait-on", []string{
 		fmt.Sprintf("--timeout=%d", 120000),
 		fmt.Sprintf("--interval=%d", 1000),
-		fmt.Sprintf("http-get://%s/oauth", u.Host),
+		fmt.Sprintf("%s/oauth", js.frontendURL()),
 	}...)
 }
 
@@ -89,6 +84,10 @@ func (js Js) runCypress(command string, args ...string) error {
 }
 
 func (js Js) frontendURL() string {
+	baseUrl := os.Getenv("CYPRESS_BASE_URL")
+	if baseUrl != "" {
+		return baseUrl
+	}
 	if js.isProductionMode() {
 		return fmt.Sprintf("http://localhost:%d", prodPort)
 	}

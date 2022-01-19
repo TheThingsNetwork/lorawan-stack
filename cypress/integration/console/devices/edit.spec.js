@@ -60,7 +60,7 @@ describe('Device general settings', () => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
     cy.createApplication(application, userId)
-    cy.createMockDeviceAllComponents(appId, { ns })
+    cy.createMockDeviceAllComponents(appId, undefined, { ns })
   })
 
   beforeEach(() => {
@@ -99,10 +99,10 @@ describe('Device general settings', () => {
         .and('be.visible')
       cy.findByLabelText('Network Server address')
         .should('be.visible')
-        .and('have.attr', 'value', endDevice.end_device.network_server_address)
+        .and('have.attr', 'value', window.location.hostname)
       cy.findByLabelText('Application Server address')
         .should('be.visible')
-        .and('have.attr', 'value', endDevice.end_device.application_server_address)
+        .and('have.attr', 'value', window.location.hostname)
     })
   })
 

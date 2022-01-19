@@ -63,7 +63,7 @@ const checkCollapsingFields = defineSmokeTest(
 
     cy.createUser(user)
     cy.createApplication(application, user.ids.user_id)
-    cy.createMockDeviceAllComponents(applicationId, { ns })
+    cy.createMockDeviceAllComponents(applicationId, undefined, { ns })
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.visit(
       `${Cypress.config(

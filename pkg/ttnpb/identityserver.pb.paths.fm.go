@@ -69,11 +69,15 @@ var AuthInfoResponseFieldPathsTopLevel = []string{
 var GetIsConfigurationRequestFieldPathsNested []string
 var GetIsConfigurationRequestFieldPathsTopLevel []string
 var IsConfigurationFieldPathsNested = []string{
+	"admin_rights",
+	"admin_rights.all",
 	"end_device_picture",
 	"end_device_picture.disable_upload",
 	"profile_picture",
 	"profile_picture.disable_upload",
 	"profile_picture.use_gravatar",
+	"user_login",
+	"user_login.disable_credentials_login",
 	"user_registration",
 	"user_registration.admin_approval",
 	"user_registration.admin_approval.required",
@@ -97,18 +101,24 @@ var IsConfigurationFieldPathsNested = []string{
 }
 
 var IsConfigurationFieldPathsTopLevel = []string{
+	"admin_rights",
 	"end_device_picture",
 	"profile_picture",
+	"user_login",
 	"user_registration",
 	"user_rights",
 }
 var GetIsConfigurationResponseFieldPathsNested = []string{
 	"configuration",
+	"configuration.admin_rights",
+	"configuration.admin_rights.all",
 	"configuration.end_device_picture",
 	"configuration.end_device_picture.disable_upload",
 	"configuration.profile_picture",
 	"configuration.profile_picture.disable_upload",
 	"configuration.profile_picture.use_gravatar",
+	"configuration.user_login",
+	"configuration.user_login.disable_credentials_login",
 	"configuration.user_registration",
 	"configuration.user_registration.admin_approval",
 	"configuration.user_registration.admin_approval.required",
@@ -222,6 +232,20 @@ var IsConfiguration_UserRightsFieldPathsTopLevel = []string{
 	"create_clients",
 	"create_gateways",
 	"create_organizations",
+}
+var IsConfiguration_UserLoginFieldPathsNested = []string{
+	"disable_credentials_login",
+}
+
+var IsConfiguration_UserLoginFieldPathsTopLevel = []string{
+	"disable_credentials_login",
+}
+var IsConfiguration_AdminRightsFieldPathsNested = []string{
+	"all",
+}
+
+var IsConfiguration_AdminRightsFieldPathsTopLevel = []string{
+	"all",
 }
 var IsConfiguration_UserRegistration_InvitationFieldPathsNested = []string{
 	"required",

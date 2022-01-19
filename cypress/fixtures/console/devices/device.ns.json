@@ -7,15 +7,8 @@
     "lorawan_version":"MAC_V1_0_2",
     "ids":{
       "device_id":"device-all-components",
+      "join_eui": "0000000000000000",
       "dev_eui":"70B3D57ED8000019"
-    },
-    "session":{
-      "keys":{
-        "f_nwk_s_int_key":{
-          "key":"CBFBF585D81A9063A31EA6922EDD6360"
-        }
-      },
-      "dev_addr":"270000FC"
     },
     "supports_class_c":false,
     "supports_class_b":false

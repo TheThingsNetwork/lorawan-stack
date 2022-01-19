@@ -23,40 +23,13 @@ describe('Payload formatters', () => {
     password_confirm: 'ABCDefg123!',
   }
 
-  const endDeviceId = 'end-device-payload-formatters-test'
-  const endDevice = {
-    application_server_address: 'localhost',
-    ids: {
-      device_id: endDeviceId,
-      dev_eui: '0000000000000001',
-      join_eui: '0000000000000000',
-    },
-    name: 'End Device Test Name',
-    description: 'End Device Test Description',
-    join_server_address: 'localhost',
-    network_server_address: 'localhost',
-  }
-  const endDeviceFieldMask = {
-    paths: [
-      'join_server_address',
-      'network_server_address',
-      'application_server_address',
-      'ids.dev_eui',
-      'ids.join_eui',
-      'name',
-      'description',
-    ],
-  }
-  const endDeviceRequestBody = {
-    end_device: endDevice,
-    field_mask: endDeviceFieldMask,
-  }
+  const endDeviceId = 'device-all-components'
 
   before(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
     cy.createApplication(application, userId)
-    cy.createEndDevice(applicationId, endDeviceRequestBody)
+    cy.createMockDeviceAllComponents(applicationId)
   })
 
   describe('Application', () => {

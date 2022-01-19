@@ -29,7 +29,7 @@ const RequireRequest = ({ requestAction, children }) => {
   const [fetching] = useRequest(requestAction)
   if (fetching) {
     return (
-      <Spinner center>
+      <Spinner inline center>
         <Message content={sharedMessages.fetching} />
       </Spinner>
     )

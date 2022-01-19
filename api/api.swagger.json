@@ -11102,6 +11102,14 @@
         }
       }
     },
+    "IsConfigurationAdminRights": {
+      "type": "object",
+      "properties": {
+        "all": {
+          "type": "boolean"
+        }
+      }
+    },
     "IsConfigurationEndDevicePicture": {
       "type": "object",
       "properties": {
@@ -11117,6 +11125,14 @@
           "type": "boolean"
         },
         "use_gravatar": {
+          "type": "boolean"
+        }
+      }
+    },
+    "IsConfigurationUserLogin": {
+      "type": "object",
+      "properties": {
+        "disable_credentials_login": {
           "type": "boolean"
         }
       }
@@ -15244,6 +15260,12 @@
         },
         "user_rights": {
           "$ref": "#/definitions/IsConfigurationUserRights"
+        },
+        "user_login": {
+          "$ref": "#/definitions/IsConfigurationUserLogin"
+        },
+        "admin_rights": {
+          "$ref": "#/definitions/IsConfigurationAdminRights"
         }
       }
     },
