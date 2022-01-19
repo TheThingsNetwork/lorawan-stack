@@ -1160,6 +1160,15 @@
       "file": "errors.go"
     }
   },
+  "error:cmd/internal/shared:initialize_device_claiming_server": {
+    "translations": {
+      "en": "could not initialize Device Claiming Server"
+    },
+    "description": {
+      "package": "cmd/internal/shared",
+      "file": "errors.go"
+    }
+  },
   "error:cmd/internal/shared:initialize_device_repository": {
     "translations": {
       "en": "could not initialize Device Repository"
@@ -3417,6 +3426,42 @@
     "description": {
       "package": "pkg/crypto",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:method_unavailable": {
+    "translations": {
+      "en": "method available"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_end_devices.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:no_join_eui": {
+    "translations": {
+      "en": "failed to extract JoinEUI from request"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_end_devices.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:parse_qr_code": {
+    "translations": {
+      "en": "parse QR code failed"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_end_devices.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:qr_code_data": {
+    "translations": {
+      "en": "invalid QR code data"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_end_devices.go"
     }
   },
   "error:pkg/devicerepository/store/bleve:cannot_open_index": {
