@@ -274,7 +274,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 
 		if c.gateway.LocationPublic && len(c.gateway.Antennas) > int(md.AntennaIndex) {
 			location := c.gateway.Antennas[md.AntennaIndex].Location
-			if location != nil && location.Source != ttnpb.SOURCE_UNKNOWN {
+			if location != nil && location.Source != ttnpb.LocationSource_SOURCE_UNKNOWN {
 				md.Location = location
 			}
 		} else if !c.gateway.LocationPublic {

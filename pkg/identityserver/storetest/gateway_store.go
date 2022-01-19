@@ -47,7 +47,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 	eui := &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
 	antenna := &ttnpb.GatewayAntenna{
 		Gain:      6.0,
-		Location:  &ttnpb.Location{Latitude: 12.34, Longitude: 56.78, Altitude: 42, Source: ttnpb.SOURCE_REGISTRY},
+		Location:  &ttnpb.Location{Latitude: 12.34, Longitude: 56.78, Altitude: 42, Source: ttnpb.LocationSource_SOURCE_REGISTRY},
 		Placement: ttnpb.GatewayAntennaPlacement_OUTDOOR,
 	}
 	secret := &ttnpb.Secret{
@@ -196,7 +196,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 	updatedEUI := &types.EUI64{8, 7, 6, 5, 4, 3, 2, 1}
 	extraAntenna := &ttnpb.GatewayAntenna{
 		Gain:      3.0,
-		Location:  &ttnpb.Location{Latitude: 12.34, Longitude: 56.78, Altitude: 30, Source: ttnpb.SOURCE_REGISTRY},
+		Location:  &ttnpb.Location{Latitude: 12.34, Longitude: 56.78, Altitude: 30, Source: ttnpb.LocationSource_SOURCE_REGISTRY},
 		Placement: ttnpb.GatewayAntennaPlacement_OUTDOOR,
 	}
 	updatedSecret := &ttnpb.Secret{

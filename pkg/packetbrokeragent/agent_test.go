@@ -483,7 +483,7 @@ func TestForwarder(t *testing.T) {
 							Longitude: 52.34562,
 							Altitude:  16,
 							Accuracy:  10,
-							Source:    ttnpb.SOURCE_REGISTRY,
+							Source:    ttnpb.LocationSource_SOURCE_REGISTRY,
 						},
 					},
 				},

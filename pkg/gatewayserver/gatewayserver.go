@@ -551,7 +551,7 @@ func requireDisconnect(connected, current *ttnpb.Gateway) bool {
 		// Gateway Server may update the location from status messages. If the locations aren't the same, but if the new
 		// location is a GPS location, do not disconnect the gateway. This is to avoid that updating the location from a
 		// gateway status message results in disconnecting the gateway.
-		if len(current.Antennas) > 0 && current.Antennas[0].Location != nil && current.Antennas[0].Location.Source != ttnpb.SOURCE_GPS {
+		if len(current.Antennas) > 0 && current.Antennas[0].Location != nil && current.Antennas[0].Location.Source != ttnpb.LocationSource_SOURCE_GPS {
 			return true
 		}
 	}
@@ -983,7 +983,7 @@ func (gs *GatewayServer) handleLocationUpdates(ctx context.Context, conn connect
 
 					if i < len(status.AntennaLocations) && status.AntennaLocations[i] != nil {
 						antennas[i].Location = &ttnpb.Location{
-							Source: ttnpb.SOURCE_GPS,
+							Source: ttnpb.LocationSource_SOURCE_GPS,
 						}
 						if err := antennas[i].Location.SetFields(
 							status.AntennaLocations[i],

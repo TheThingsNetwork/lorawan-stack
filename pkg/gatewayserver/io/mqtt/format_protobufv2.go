@@ -33,10 +33,10 @@ const eirpDelta = 2.15
 
 var (
 	sourceToV3 = map[ttnpbv2.LocationMetadata_LocationSource]ttnpb.LocationSource{
-		ttnpbv2.LocationMetadata_GPS:            ttnpb.SOURCE_GPS,
-		ttnpbv2.LocationMetadata_CONFIG:         ttnpb.SOURCE_REGISTRY,
-		ttnpbv2.LocationMetadata_REGISTRY:       ttnpb.SOURCE_REGISTRY,
-		ttnpbv2.LocationMetadata_IP_GEOLOCATION: ttnpb.SOURCE_IP_GEOLOCATION,
+		ttnpbv2.LocationMetadata_GPS:            ttnpb.LocationSource_SOURCE_GPS,
+		ttnpbv2.LocationMetadata_CONFIG:         ttnpb.LocationSource_SOURCE_REGISTRY,
+		ttnpbv2.LocationMetadata_REGISTRY:       ttnpb.LocationSource_SOURCE_REGISTRY,
+		ttnpbv2.LocationMetadata_IP_GEOLOCATION: ttnpb.LocationSource_SOURCE_IP_GEOLOCATION,
 	}
 
 	errNotScheduled    = errors.DefineInvalidArgument("not_scheduled", "not scheduled")

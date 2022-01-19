@@ -93,7 +93,7 @@ message Location {
 
 enum LocationSource {
   option (thethings.json.enum) = { marshal_as_string: true, prefix: "SOURCE" };
-  option (gogoproto.goproto_enum_prefix) = false;
+
   // The source of the location is not known or not set.
   SOURCE_UNKNOWN = 0;
   // The location is determined by GPS.

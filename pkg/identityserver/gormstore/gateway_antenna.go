@@ -45,7 +45,7 @@ func (a GatewayAntenna) toPB() *ttnpb.GatewayAntenna {
 			Longitude: a.Longitude,
 			Altitude:  a.Altitude,
 			Accuracy:  a.Accuracy,
-			Source:    ttnpb.SOURCE_REGISTRY,
+			Source:    ttnpb.LocationSource_SOURCE_REGISTRY,
 		}
 	}
 	return &ttnpb.GatewayAntenna{

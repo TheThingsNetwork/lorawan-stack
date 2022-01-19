@@ -350,7 +350,7 @@ func TestProtobufV2Status(t *testing.T) {
 						Altitude:  10,
 						Latitude:  10.0,
 						Longitude: 10.0,
-						Source:    ttnpb.SOURCE_GPS,
+						Source:    ttnpb.LocationSource_SOURCE_GPS,
 					},
 				},
 			},

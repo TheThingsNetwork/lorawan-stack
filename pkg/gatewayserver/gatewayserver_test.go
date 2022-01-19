@@ -766,7 +766,7 @@ func TestGatewayServer(t *testing.T) {
 											Time: ttnpb.ProtoTimePtr(time.Unix(424242, 0)),
 											AntennaLocations: []*ttnpb.Location{
 												{
-													Source:    ttnpb.SOURCE_GPS,
+													Source:    ttnpb.LocationSource_SOURCE_GPS,
 													Altitude:  10,
 													Latitude:  12,
 													Longitude: 14,
@@ -775,7 +775,7 @@ func TestGatewayServer(t *testing.T) {
 										},
 									},
 									ExpectLocation: &ttnpb.Location{
-										Source: ttnpb.SOURCE_GPS,
+										Source: ttnpb.LocationSource_SOURCE_GPS,
 									},
 								},
 								{
@@ -787,7 +787,7 @@ func TestGatewayServer(t *testing.T) {
 										},
 									},
 									ExpectLocation: &ttnpb.Location{
-										Source: ttnpb.SOURCE_GPS,
+										Source: ttnpb.LocationSource_SOURCE_GPS,
 									},
 								},
 								{
@@ -798,7 +798,7 @@ func TestGatewayServer(t *testing.T) {
 											Time: ttnpb.ProtoTimePtr(time.Unix(42424242, 0)),
 											AntennaLocations: []*ttnpb.Location{
 												{
-													Source:    ttnpb.SOURCE_GPS,
+													Source:    ttnpb.LocationSource_SOURCE_GPS,
 													Altitude:  10,
 													Latitude:  12,
 													Longitude: 14,
@@ -807,7 +807,7 @@ func TestGatewayServer(t *testing.T) {
 										},
 									},
 									ExpectLocation: &ttnpb.Location{
-										Source:    ttnpb.SOURCE_GPS,
+										Source:    ttnpb.LocationSource_SOURCE_GPS,
 										Altitude:  10,
 										Latitude:  12,
 										Longitude: 14,
@@ -823,7 +823,7 @@ func TestGatewayServer(t *testing.T) {
 									a.So(err, should.BeNil)
 
 									gtw.Antennas[0].Location = &ttnpb.Location{
-										Source: ttnpb.SOURCE_GPS,
+										Source: ttnpb.LocationSource_SOURCE_GPS,
 									}
 									gtw.UpdateLocationFromStatus = tc.UpdateLocation
 									gtw, err = is.Update(ctx, &ttnpb.UpdateGatewayRequest{
@@ -876,7 +876,7 @@ func TestGatewayServer(t *testing.T) {
 					if rtc.SupportsLocationUpdate {
 						t.Run("LocationMetadata", func(t *testing.T) {
 							location := &ttnpb.Location{
-								Source:    ttnpb.SOURCE_GPS,
+								Source:    ttnpb.LocationSource_SOURCE_GPS,
 								Altitude:  10,
 								Latitude:  12,
 								Longitude: 14,
@@ -1938,5 +1938,4 @@ func TestUpdateVersionInfo(t *testing.T) {
 	stat, err = statsClient.GetGatewayConnectionStats(statsCtx, &gtwIDs)
 	a.So(errors.IsNotFound(err), should.BeTrue)
 	a.So(stat, should.BeNil)
-
 }

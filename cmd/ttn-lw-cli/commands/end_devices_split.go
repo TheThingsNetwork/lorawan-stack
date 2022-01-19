@@ -356,7 +356,7 @@ func updateDeviceLocation(device *ttnpb.EndDevice, flags *pflag.FlagSet) {
 	if !ok {
 		loc = &ttnpb.Location{}
 	}
-	loc.Source = ttnpb.SOURCE_REGISTRY
+	loc.Source = ttnpb.LocationSource_SOURCE_REGISTRY
 	if flags.Changed("location.longitude") {
 		longitude, _ := flags.GetFloat64("location.longitude")
 		loc.Longitude = longitude

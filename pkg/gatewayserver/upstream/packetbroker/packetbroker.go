@@ -184,7 +184,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 			// This is to avoid that the location gets reset when there is no location in the status.
 			if status, _, ok := conn.StatusStats(); ok && gtw.UpdateLocationFromStatus && len(status.GetAntennaLocations()) > 0 && status.AntennaLocations[0] != nil {
 				loc := *status.AntennaLocations[0]
-				loc.Source = ttnpb.SOURCE_GPS
+				loc.Source = ttnpb.LocationSource_SOURCE_GPS
 				req.Gateway.LocationPublic = true
 				req.Gateway.Antennas = []*ttnpb.GatewayAntenna{
 					{

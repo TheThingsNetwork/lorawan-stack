@@ -218,6 +218,6 @@ func (as *ApplicationServer) locationFromDecodedPayload(uplink *ttnpb.Applicatio
 		Longitude: loc.Longitude,
 		Altitude:  int32(loc.Altitude),
 		Accuracy:  int32(loc.Accuracy),
-		Source:    ttnpb.SOURCE_GPS,
+		Source:    ttnpb.LocationSource_SOURCE_GPS,
 	}
 }

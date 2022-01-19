@@ -70,12 +70,12 @@ func (r *LocationSolverResult) abstractResult() AbstractLocationSolverResult {
 	if r == nil {
 		return nil
 	}
-	source := ttnpb.SOURCE_UNKNOWN
+	source := ttnpb.LocationSource_SOURCE_UNKNOWN
 	switch r.Algorithm {
 	case Algorithm_RSSI:
-		source = ttnpb.SOURCE_LORA_RSSI_GEOLOCATION
+		source = ttnpb.LocationSource_SOURCE_LORA_RSSI_GEOLOCATION
 	case Algorithm_TDOA, Algorithm_RSSITDOA:
-		source = ttnpb.SOURCE_LORA_TDOA_GEOLOCATION
+		source = ttnpb.LocationSource_SOURCE_LORA_TDOA_GEOLOCATION
 	}
 	return abstractLocationSolverResult{
 		algorithm: strings.ToLower(r.Algorithm),
@@ -109,7 +109,7 @@ func (r *GNSSLocationSolverResult) abstractResult() AbstractLocationSolverResult
 			Longitude: r.LLH[1],
 			Altitude:  int32(r.LLH[2]),
 			Accuracy:  int32(r.Accuracy),
-			Source:    ttnpb.SOURCE_GPS,
+			Source:    ttnpb.LocationSource_SOURCE_GPS,
 		},
 	}
 }
@@ -135,7 +135,7 @@ func (r *WiFiLocationSolverResult) abstractResult() AbstractLocationSolverResult
 			Longitude: r.Longitude,
 			Altitude:  int32(r.Altitude),
 			Accuracy:  int32(r.Accuracy),
-			Source:    ttnpb.SOURCE_WIFI_RSSI_GEOLOCATION,
+			Source:    ttnpb.LocationSource_SOURCE_WIFI_RSSI_GEOLOCATION,
 		},
 	}
 }

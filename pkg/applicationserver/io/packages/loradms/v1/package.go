@@ -204,12 +204,12 @@ func (p *DeviceManagementPackage) sendLocationSolved(ctx context.Context, ids *t
 		log.FromContext(ctx).WithField("len", len(position.LLH)).Warn("Invalid LLH length")
 		return nil
 	}
-	source := ttnpb.SOURCE_UNKNOWN
+	source := ttnpb.LocationSource_SOURCE_UNKNOWN
 	switch position.Algorithm {
 	case objects.GNSSPositionSolutionType:
-		source = ttnpb.SOURCE_GPS
+		source = ttnpb.LocationSource_SOURCE_GPS
 	case objects.WiFiPositionSolutionType:
-		source = ttnpb.SOURCE_WIFI_RSSI_GEOLOCATION
+		source = ttnpb.LocationSource_SOURCE_WIFI_RSSI_GEOLOCATION
 	}
 	return p.server.Publish(ctx, &ttnpb.ApplicationUp{
 		EndDeviceIds:   ids,
