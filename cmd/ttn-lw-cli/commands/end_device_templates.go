@@ -181,7 +181,7 @@ This command takes end device templates from stdin.`,
 			}
 
 			var device ttnpb.EndDevice
-			device.SetFields(&input.EndDevice, input.FieldMask.GetPaths()...)
+			device.SetFields(input.EndDevice, input.FieldMask.GetPaths()...)
 			if err := util.SetFields(&device, setEndDeviceFlags); err != nil {
 				return err
 			}
@@ -427,8 +427,8 @@ command to assign EUIs to map to end device templates.`,
 				}
 
 				var res ttnpb.EndDeviceTemplate
-				res.EndDevice.SetFields(&inputEntry.EndDevice, inputEntry.FieldMask.GetPaths()...)
-				res.EndDevice.SetFields(&mappedEntry.EndDevice, mappedEntry.FieldMask.GetPaths()...)
+				res.EndDevice.SetFields(inputEntry.EndDevice, inputEntry.FieldMask.GetPaths()...)
+				res.EndDevice.SetFields(mappedEntry.EndDevice, mappedEntry.FieldMask.GetPaths()...)
 				res.FieldMask = &pbtypes.FieldMask{Paths: ttnpb.BottomLevelFields(append(inputEntry.FieldMask.GetPaths(), mappedEntry.FieldMask.GetPaths()...))}
 
 				if err := io.Write(os.Stdout, config.OutputFormat, &res); err != nil {

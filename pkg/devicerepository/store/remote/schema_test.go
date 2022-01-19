@@ -69,7 +69,7 @@ func TestProfile(t *testing.T) {
 		{
 			profile: "example-1",
 			template: &ttnpb.EndDeviceTemplate{
-				EndDevice: ttnpb.EndDevice{
+				EndDevice: &ttnpb.EndDevice{
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_2,
 					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 					SupportsJoin:      true,
@@ -94,7 +94,7 @@ func TestProfile(t *testing.T) {
 			profile: "example-2",
 			codec:   "codec",
 			template: &ttnpb.EndDeviceTemplate{
-				EndDevice: ttnpb.EndDevice{
+				EndDevice: &ttnpb.EndDevice{
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 					Formatters: &ttnpb.MessagePayloadFormatters{
@@ -147,7 +147,7 @@ func TestProfile(t *testing.T) {
 		{
 			profile: "class-b-profile",
 			template: &ttnpb.EndDeviceTemplate{
-				EndDevice: ttnpb.EndDevice{
+				EndDevice: &ttnpb.EndDevice{
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_2,
 					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 					SupportsClassB:    true,
@@ -178,7 +178,7 @@ func TestProfile(t *testing.T) {
 		{
 			profile: "class-c-profile",
 			template: &ttnpb.EndDeviceTemplate{
-				EndDevice: ttnpb.EndDevice{
+				EndDevice: &ttnpb.EndDevice{
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_2,
 					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 					SupportsClassC:    true,

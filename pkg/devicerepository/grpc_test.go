@@ -594,7 +594,7 @@ func TestGRPC(t *testing.T) {
 
 	t.Run("GetTemplate", func(t *testing.T) {
 		st.template = &ttnpb.EndDeviceTemplate{
-			EndDevice: ttnpb.EndDevice{
+			EndDevice: &ttnpb.EndDevice{
 				VersionIds: ids,
 			},
 			FieldMask: &types.FieldMask{

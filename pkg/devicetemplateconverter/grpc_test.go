@@ -54,7 +54,7 @@ func TestConvertEndDeviceTemplate(t *testing.T) {
 					return err
 				}
 				ch <- &ttnpb.EndDeviceTemplate{
-					EndDevice: ttnpb.EndDevice{
+					EndDevice: &ttnpb.EndDevice{
 						Ids: &ttnpb.EndDeviceIdentifiers{
 							DeviceId: fmt.Sprintf("sn-%d", b),
 						},
@@ -103,7 +103,7 @@ func TestConvertEndDeviceTemplate(t *testing.T) {
 	}
 	a.So(tmpls, should.Resemble, []*ttnpb.EndDeviceTemplate{
 		{
-			EndDevice: ttnpb.EndDevice{
+			EndDevice: &ttnpb.EndDevice{
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					DeviceId: "sn-1",
 				},
@@ -113,7 +113,7 @@ func TestConvertEndDeviceTemplate(t *testing.T) {
 			},
 		},
 		{
-			EndDevice: ttnpb.EndDevice{
+			EndDevice: &ttnpb.EndDevice{
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					DeviceId: "sn-2",
 				},
