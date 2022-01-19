@@ -346,7 +346,7 @@ func (m *MACParameters) GetMaxDutyCycle() AggregatedDutyCycle {
 	if m != nil {
 		return m.MaxDutyCycle
 	}
-	return DUTY_CYCLE_1
+	return AggregatedDutyCycle_DUTY_CYCLE_1
 }
 
 func (m *MACParameters) GetRejoinTimePeriodicity() RejoinTimeExponent {

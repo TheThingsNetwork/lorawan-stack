@@ -36,23 +36,23 @@ func TestDutyCycleFromFloat(t *testing.T) {
 	}{
 		{
 			Float: 1.0,
-			Enum:  ttnpb.DUTY_CYCLE_1,
+			Enum:  ttnpb.AggregatedDutyCycle_DUTY_CYCLE_1,
 		},
 		{
 			Float: 0.5,
-			Enum:  ttnpb.DUTY_CYCLE_2,
+			Enum:  ttnpb.AggregatedDutyCycle_DUTY_CYCLE_2,
 		},
 		{
 			Float: 0.25,
-			Enum:  ttnpb.DUTY_CYCLE_4,
+			Enum:  ttnpb.AggregatedDutyCycle_DUTY_CYCLE_4,
 		},
 		{
 			Float: 0.14,
-			Enum:  ttnpb.DUTY_CYCLE_8,
+			Enum:  ttnpb.AggregatedDutyCycle_DUTY_CYCLE_8,
 		},
 		{
 			Float: 1 / (2 << 20),
-			Enum:  ttnpb.DUTY_CYCLE_32768,
+			Enum:  ttnpb.AggregatedDutyCycle_DUTY_CYCLE_32768,
 		},
 	} {
 		a := assertions.New(t)

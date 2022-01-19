@@ -591,7 +591,6 @@ message MACCommand {
 
 enum AggregatedDutyCycle {
   option (thethings.json.enum) = { marshal_as_string: true, prefix: "DUTY_CYCLE" };
-  option (gogoproto.goproto_enum_prefix) = false;
 
   DUTY_CYCLE_1 = 0;      // 100%.
   DUTY_CYCLE_2 = 1;      // 50%.

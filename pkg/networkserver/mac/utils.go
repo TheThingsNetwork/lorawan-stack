@@ -368,7 +368,7 @@ func DeviceDefaultMaxDutyCycle(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings)
 	case defaults.MaxDutyCycle != nil:
 		return defaults.MaxDutyCycle.Value
 	default:
-		return ttnpb.DUTY_CYCLE_1
+		return ttnpb.AggregatedDutyCycle_DUTY_CYCLE_1
 	}
 }
 

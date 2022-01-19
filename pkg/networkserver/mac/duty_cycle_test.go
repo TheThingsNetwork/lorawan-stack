@@ -42,10 +42,10 @@ func TestNeedsDutyCycleReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{
-						MaxDutyCycle: ttnpb.DUTY_CYCLE_1024,
+						MaxDutyCycle: ttnpb.AggregatedDutyCycle_DUTY_CYCLE_1024,
 					},
 					DesiredParameters: &ttnpb.MACParameters{
-						MaxDutyCycle: ttnpb.DUTY_CYCLE_1024,
+						MaxDutyCycle: ttnpb.AggregatedDutyCycle_DUTY_CYCLE_1024,
 					},
 				},
 			},
@@ -55,10 +55,10 @@ func TestNeedsDutyCycleReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{
-						MaxDutyCycle: ttnpb.DUTY_CYCLE_1024,
+						MaxDutyCycle: ttnpb.AggregatedDutyCycle_DUTY_CYCLE_1024,
 					},
 					DesiredParameters: &ttnpb.MACParameters{
-						MaxDutyCycle: ttnpb.DUTY_CYCLE_2048,
+						MaxDutyCycle: ttnpb.AggregatedDutyCycle_DUTY_CYCLE_2048,
 					},
 				},
 			},
@@ -115,7 +115,7 @@ func TestHandleDutyCycleAns(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_DutyCycleReq{
-							MaxDutyCycle: ttnpb.DUTY_CYCLE_2048,
+							MaxDutyCycle: ttnpb.AggregatedDutyCycle_DUTY_CYCLE_2048,
 						}).MACCommand(),
 					},
 					CurrentParameters: &ttnpb.MACParameters{},
@@ -126,7 +126,7 @@ func TestHandleDutyCycleAns(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
 					CurrentParameters: &ttnpb.MACParameters{
-						MaxDutyCycle: ttnpb.DUTY_CYCLE_2048,
+						MaxDutyCycle: ttnpb.AggregatedDutyCycle_DUTY_CYCLE_2048,
 					},
 					DesiredParameters: &ttnpb.MACParameters{},
 				},
