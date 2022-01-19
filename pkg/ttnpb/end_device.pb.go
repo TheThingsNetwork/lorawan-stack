@@ -570,7 +570,7 @@ func (m *EndDeviceVersion) GetLorawanVersion() MACVersion {
 	if m != nil {
 		return m.LorawanVersion
 	}
-	return MAC_UNKNOWN
+	return MACVersion_MAC_UNKNOWN
 }
 
 func (m *EndDeviceVersion) GetLorawanPhyVersion() PHYVersion {
@@ -1095,7 +1095,7 @@ func (m *MACState) GetLorawanVersion() MACVersion {
 	if m != nil {
 		return m.LorawanVersion
 	}
-	return MAC_UNKNOWN
+	return MACVersion_MAC_UNKNOWN
 }
 
 func (m *MACState) GetLastConfirmedDownlinkAt() *types.Timestamp {
@@ -1794,7 +1794,7 @@ func (m *EndDevice) GetLorawanVersion() MACVersion {
 	if m != nil {
 		return m.LorawanVersion
 	}
-	return MAC_UNKNOWN
+	return MACVersion_MAC_UNKNOWN
 }
 
 func (m *EndDevice) GetLorawanPhyVersion() PHYVersion {

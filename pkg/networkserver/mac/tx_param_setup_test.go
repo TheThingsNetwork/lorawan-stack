@@ -134,7 +134,7 @@ func TestNeedsTxParamSetupReq(t *testing.T) {
 						},
 					},
 					Band:  phy,
-					Needs: phy.TxParamSetupReqSupport && conf.Needs && macVersion.Compare(ttnpb.MAC_V1_0_2) >= 0,
+					Needs: phy.TxParamSetupReqSupport && conf.Needs && macVersion.Compare(ttnpb.MACVersion_MAC_V1_0_2) >= 0,
 				},
 			)
 		})
@@ -171,7 +171,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			Name: "payload fits/EIRP 26/dwell time both",
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
 					CurrentParameters: &ttnpb.MACParameters{
 						MaxEirp: 26,
 					},
@@ -184,7 +184,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
 					CurrentParameters: &ttnpb.MACParameters{
 						MaxEirp: 26,
 					},
@@ -221,7 +221,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			Name: "payload fits/EIRP 26/no dwell time limitations",
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
 					CurrentParameters: &ttnpb.MACParameters{
 						MaxEirp: 26,
 					},
@@ -232,7 +232,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
 					CurrentParameters: &ttnpb.MACParameters{
 						MaxEirp: 26,
 					},
@@ -253,7 +253,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			Name: "downlink does not fit/EIRP 26/dwell time both",
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
 					CurrentParameters: &ttnpb.MACParameters{
 						MaxEirp: 26,
 					},
@@ -266,7 +266,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
 					CurrentParameters: &ttnpb.MACParameters{
 						MaxEirp: 26,
 					},
@@ -288,7 +288,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			Name: "uplink does not fit/EIRP 26/dwell time both",
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
 					CurrentParameters: &ttnpb.MACParameters{
 						MaxEirp: 26,
 					},
@@ -301,7 +301,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
 					CurrentParameters: &ttnpb.MACParameters{
 						MaxEirp: 26,
 					},

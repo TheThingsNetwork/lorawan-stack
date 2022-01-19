@@ -92,7 +92,7 @@ func TestNeedsRejoinParamSetupReq(t *testing.T) {
 							DesiredParameters: conf.DesiredParameters,
 						},
 					},
-					Needs: conf.Needs && macVersion.Compare(ttnpb.MAC_V1_1) >= 0,
+					Needs: conf.Needs && macVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0,
 				},
 			)
 		})

@@ -227,17 +227,17 @@ type MACVersion ttnpb.MACVersion
 func (v MACVersion) MarshalText() ([]byte, error) {
 	var res string
 	switch ttnpb.MACVersion(v) {
-	case ttnpb.MAC_V1_0:
+	case ttnpb.MACVersion_MAC_V1_0:
 		res = "1.0"
-	case ttnpb.MAC_V1_0_1:
+	case ttnpb.MACVersion_MAC_V1_0_1:
 		res = "1.0.1"
-	case ttnpb.MAC_V1_0_2:
+	case ttnpb.MACVersion_MAC_V1_0_2:
 		res = "1.0.2"
-	case ttnpb.MAC_V1_0_3:
+	case ttnpb.MACVersion_MAC_V1_0_3:
 		res = "1.0.3"
-	case ttnpb.MAC_V1_0_4:
+	case ttnpb.MACVersion_MAC_V1_0_4:
 		res = "1.0.4"
-	case ttnpb.MAC_V1_1:
+	case ttnpb.MACVersion_MAC_V1_1:
 		res = "1.1"
 	default:
 		return nil, errUnknownMACVersion.New()
@@ -250,17 +250,17 @@ func (v *MACVersion) UnmarshalText(data []byte) error {
 	var res ttnpb.MACVersion
 	switch string(data) {
 	case "1.0":
-		res = ttnpb.MAC_V1_0
+		res = ttnpb.MACVersion_MAC_V1_0
 	case "1.0.1":
-		res = ttnpb.MAC_V1_0_1
+		res = ttnpb.MACVersion_MAC_V1_0_1
 	case "1.0.2":
-		res = ttnpb.MAC_V1_0_2
+		res = ttnpb.MACVersion_MAC_V1_0_2
 	case "1.0.3":
-		res = ttnpb.MAC_V1_0_3
+		res = ttnpb.MACVersion_MAC_V1_0_3
 	case "1.0.4":
-		res = ttnpb.MAC_V1_0_4
+		res = ttnpb.MACVersion_MAC_V1_0_4
 	case "1.1":
-		res = ttnpb.MAC_V1_1
+		res = ttnpb.MACVersion_MAC_V1_1
 	default:
 		return errUnknownMACVersion.New()
 	}

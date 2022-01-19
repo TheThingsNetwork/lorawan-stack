@@ -306,7 +306,7 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 		}
 
 		var key types.AES128Key
-		if dev.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+		if dev.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
 			key = *dev.GetRootKeys().GetNwkKey().Key
 		} else {
 			key = *dev.GetRootKeys().GetAppKey().Key
@@ -325,7 +325,7 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 		}
 
 		var expectedMIC [4]byte
-		if dev.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 && joinAcceptPayload.DlSettings.OptNeg {
+		if dev.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 && joinAcceptPayload.DlSettings.OptNeg {
 			jsIntKey := crypto.DeriveJSIntKey(key, devEUI)
 			// TODO: Support RejoinRequest (https://github.com/TheThingsNetwork/lorawan-stack/issues/536)
 			expectedMIC, err = crypto.ComputeJoinAcceptMIC(
@@ -351,7 +351,7 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 		dev.Ids.DevAddr, dev.Session.DevAddr = &joinAcceptPayload.DevAddr, joinAcceptPayload.DevAddr
 		dev.Session.Keys = &ttnpb.SessionKeys{}
 
-		if dev.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 && joinAcceptPayload.DlSettings.OptNeg {
+		if dev.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 && joinAcceptPayload.DlSettings.OptNeg {
 			appSKey := crypto.DeriveAppSKey(*dev.GetRootKeys().GetAppKey().Key, joinAcceptPayload.JoinNonce, joinEUI, devNonce)
 			dev.Session.Keys.AppSKey = &ttnpb.KeyEnvelope{Key: &appSKey}
 			logger.Infof("Derived AppSKey %X (%s)", appSKey[:], base64.StdEncoding.EncodeToString(appSKey[:]))
@@ -382,7 +382,7 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 		macPayload := downMsg.Payload.GetMacPayload()
 
 		var expectedMIC [4]byte
-		if dev.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		if dev.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
 			expectedMIC, err = crypto.ComputeLegacyDownlinkMIC(*dev.Session.Keys.GetFNwkSIntKey().Key, macPayload.FHdr.DevAddr, macPayload.FHdr.FCnt, downMsg.RawPayload[:len(downMsg.RawPayload)-4])
 		} else {
 			var confFCnt uint32
@@ -490,7 +490,7 @@ var (
 						return err
 					}
 					var key types.AES128Key
-					if uplinkParams.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+					if uplinkParams.LoRaWANVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
 						key = joinParams.NwkKey
 					} else {
 						key = joinParams.AppKey
@@ -619,7 +619,7 @@ var (
 						return err
 					}
 					var mic [4]byte
-					if uplinkParams.LoRaWANVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+					if uplinkParams.LoRaWANVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
 						mic, err = crypto.ComputeUplinkMIC(
 							dataUplinkParams.SNwkSIntKey,
 							dataUplinkParams.FNwkSIntKey,

@@ -251,7 +251,7 @@ func EnqueueLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, ma
 		}
 
 		uplinksNeeded := uint16(1)
-		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
 			uplinksNeeded = uint16(len(params.Masks))
 		}
 		if nUp < uplinksNeeded {
@@ -286,7 +286,7 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	if pld == nil {
 		return nil, ErrNoPayload.New()
 	}
-	if (dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) < 0 || dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0) && dupCount != 0 {
+	if (dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_0_2) < 0 || dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0) && dupCount != 0 {
 		return nil, internal.ErrInvalidPayload.New()
 	}
 
@@ -307,13 +307,13 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 	}
 
 	handler := handleMACResponseBlock
-	if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) < 0 {
+	if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_0_2) < 0 {
 		handler = handleMACResponse
 	}
 	var n uint
 	var req *ttnpb.MACCommand_LinkADRReq
 	dev.MacState.PendingRequests, err = handler(ttnpb.MACCommandIdentifier_CID_LINK_ADR, func(cmd *ttnpb.MACCommand) error {
-		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 && n > dupCount+1 {
+		if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_0_2) >= 0 && dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 && n > dupCount+1 {
 			return internal.ErrInvalidPayload.New()
 		}
 		n++

@@ -611,7 +611,7 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 	})).([]byte)
 	var mic [4]byte
 	switch {
-	case conf.MACVersion.Compare(ttnpb.MAC_V1_1) < 0:
+	case conf.MACVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0:
 		mic = test.Must(crypto.ComputeLegacyUplinkMIC(*keys.FNwkSIntKey.Key, devAddr, conf.FCnt, phyPayload)).([4]byte)
 	default:
 		mic = test.Must(crypto.ComputeUplinkMIC(*keys.SNwkSIntKey.Key, *keys.FNwkSIntKey.Key, conf.ConfFCntDown, uint8(conf.DataRateIndex), conf.ChannelIndex, devAddr, conf.FCnt, phyPayload)).([4]byte)
@@ -726,7 +726,7 @@ func MakeDataDownlink(conf DataDownlinkConfig) *ttnpb.DownlinkMessage {
 	phyPayload := test.Must(lorawan.MarshalMessage(*msg)).([]byte)
 	var mic [4]byte
 	switch {
-	case conf.MACVersion.Compare(ttnpb.MAC_V1_1) < 0:
+	case conf.MACVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0:
 		mic = test.Must(crypto.ComputeLegacyDownlinkMIC(*keys.FNwkSIntKey.Key, devAddr, conf.FCnt, phyPayload)).([4]byte)
 	default:
 		mic = test.Must(crypto.ComputeDownlinkMIC(*keys.SNwkSIntKey.Key, devAddr, conf.ConfFCntUp, conf.FCnt, phyPayload)).([4]byte)
@@ -784,16 +784,16 @@ func ForEachBand(tb testing.TB, f func(func(...string) string, *band.Band, ttnpb
 
 func ForEachMACVersion(tb testing.TB, f func(func(...string) string, ttnpb.MACVersion)) {
 	for _, macVersion := range []ttnpb.MACVersion{
-		ttnpb.MAC_V1_0,
-		ttnpb.MAC_V1_0_1,
-		ttnpb.MAC_V1_0_2,
-		ttnpb.MAC_V1_0_3,
-		ttnpb.MAC_V1_0_4,
-		ttnpb.MAC_V1_1,
+		ttnpb.MACVersion_MAC_V1_0,
+		ttnpb.MACVersion_MAC_V1_0_1,
+		ttnpb.MACVersion_MAC_V1_0_2,
+		ttnpb.MACVersion_MAC_V1_0_3,
+		ttnpb.MACVersion_MAC_V1_0_4,
+		ttnpb.MACVersion_MAC_V1_1,
 	} {
 		switch macVersion {
-		case ttnpb.MAC_V1_0_4, ttnpb.MAC_V1_1:
-		case ttnpb.MAC_V1_0_3:
+		case ttnpb.MACVersion_MAC_V1_0_4, ttnpb.MACVersion_MAC_V1_1:
+		case ttnpb.MACVersion_MAC_V1_0_3:
 			if !testing.Short() {
 				break
 			}
@@ -847,8 +847,8 @@ func ForEachFrequencyPlan(tb testing.TB, f func(func(...string) string, string, 
 func ForEachLoRaWANVersionPair(tb testing.TB, f func(func(...string) string, ttnpb.MACVersion, ttnpb.PHYVersion)) {
 	for macVersion, phyVersions := range internal.LoRaWANVersionPairs {
 		switch macVersion {
-		case ttnpb.MAC_V1_0_3, ttnpb.MAC_V1_1:
-		case ttnpb.MAC_V1_0_2:
+		case ttnpb.MACVersion_MAC_V1_0_3, ttnpb.MACVersion_MAC_V1_1:
+		case ttnpb.MACVersion_MAC_V1_0_2:
 			if !testing.Short() {
 				break
 			}

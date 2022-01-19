@@ -435,7 +435,7 @@ var (
 					if err := macVersion.Validate(); err != nil {
 						return errInvalidMACVersion.WithCause(err)
 					}
-					if macVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+					if macVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
 						device.Session.Keys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: generateKey()}
 						device.Session.Keys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: generateKey()}
 						paths = append(paths,

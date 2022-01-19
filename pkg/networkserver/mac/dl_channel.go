@@ -59,7 +59,7 @@ func DeviceNeedsDLChannelReqAtIndex(dev *ttnpb.EndDevice, i int) bool {
 func DeviceNeedsDLChannelReq(dev *ttnpb.EndDevice) bool {
 	if dev.GetMulticast() ||
 		dev.GetMacState() == nil ||
-		dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) < 0 {
+		dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_0_2) < 0 {
 		return false
 	}
 	for i := range dev.MacState.DesiredParameters.Channels {

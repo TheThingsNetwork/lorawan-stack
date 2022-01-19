@@ -50,7 +50,7 @@ type lorawanConfig struct {
 }
 
 func (c *lorawanConfig) getJoinAcceptDecodeKey() (types.AES128Key, string) {
-	if c.MACVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+	if c.MACVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
 		return c.AppKey, "AppKey"
 	} else {
 		return c.NwkKey, "NwkKey"
@@ -291,7 +291,7 @@ var (
 				}
 			}
 
-			if lorawanConfig.MACVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+			if lorawanConfig.MACVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
 				for _, key := range []*types.AES128Key{&lorawanConfig.FNwkSIntKey, &lorawanConfig.SNwkSIntKey, &lorawanConfig.NwkSEncKey} {
 					if key.IsZero() {
 						*key = lorawanConfig.NwkSKey

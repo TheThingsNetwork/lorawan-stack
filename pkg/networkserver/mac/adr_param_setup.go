@@ -50,7 +50,7 @@ func deviceADRAckDelay(dev *ttnpb.EndDevice, phy *band.Band) ttnpb.ADRAckDelayEx
 func DeviceNeedsADRParamSetupReq(dev *ttnpb.EndDevice, phy *band.Band) bool {
 	if dev.GetMulticast() ||
 		dev.GetMacState() == nil ||
-		dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
 		return false
 	}
 	return dev.MacState.DesiredParameters.AdrAckLimitExponent != nil &&

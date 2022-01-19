@@ -73,7 +73,7 @@ func TestHandleRekeyInd(t *testing.T) {
 					LastNFCntDown: 43,
 				},
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_RekeyConf{
 							MinorVersion: 1,
@@ -127,7 +127,7 @@ func TestHandleRekeyInd(t *testing.T) {
 					LastNFCntDown: 43,
 				},
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_RekeyConf{
 							MinorVersion: 1,
@@ -172,7 +172,7 @@ func TestHandleRekeyInd(t *testing.T) {
 					LastNFCntDown: 43,
 				},
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_RekeyConf{
 							MinorVersion: 1,
@@ -223,7 +223,7 @@ func TestHandleRekeyInd(t *testing.T) {
 					LastNFCntDown: 43,
 				},
 				MacState: &ttnpb.MACState{
-					LorawanVersion: ttnpb.MAC_V1_1,
+					LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						{},
 						{},

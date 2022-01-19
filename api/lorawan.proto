@@ -69,7 +69,6 @@ enum Major {
 
 enum MACVersion {
   option (thethings.json.enum) = { marshal_as_string: true, prefix: "MAC" };
-  option (gogoproto.goproto_enum_prefix) = false;
 
   MAC_UNKNOWN = 0 [(thethings.json.enum_value) = { aliases: ["unknown"] }];
   MAC_V1_0 = 1 [(thethings.json.enum_value) = { aliases: ["1.0", "1.0.0"] }];

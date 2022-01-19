@@ -226,7 +226,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		dev.MacState.PendingRequests = dev.MacState.PendingRequests[:0]
 
 		enqueuers := make([]func(context.Context, *ttnpb.EndDevice, uint16, uint16) mac.EnqueueState, 0, 13)
-		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_0) >= 0 {
+		if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_0) >= 0 {
 			enqueuers = append(enqueuers,
 				mac.EnqueueDutyCycleReq,
 				mac.EnqueueRxParamSetupReq,
@@ -259,7 +259,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				)
 			}
 		}
-		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 {
+		if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_0_2) >= 0 {
 			if phy.TxParamSetupReqSupport {
 				enqueuers = append(enqueuers,
 					func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
@@ -271,7 +271,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				mac.EnqueueDLChannelReq,
 			)
 		}
-		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+		if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
 			enqueuers = append(enqueuers,
 				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
 					return mac.EnqueueADRParamSetupReq(ctx, dev, maxDownLen, maxUpLen, phy)
@@ -373,7 +373,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 					})
 				}
 
-			case down.FCnt <= dev.Session.LastNFCntDown && dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0:
+			case down.FCnt <= dev.Session.LastNFCntDown && dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0:
 				logger.WithField("last_f_cnt_down", dev.Session.LastNFCntDown).Debug("Drop application downlink with too low FCnt")
 				genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
 					EndDeviceIds:   dev.Ids,
@@ -530,7 +530,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	} else {
 		pld.FrmPayload = cmdBuf
 	}
-	if pld.FPort == 0 && dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+	if pld.FPort == 0 && dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
 		genState.ifScheduledApplicationUps = append(genState.ifScheduledApplicationUps, &ttnpb.ApplicationUp{
 			EndDeviceIds:   dev.Ids,
 			CorrelationIds: events.CorrelationIDsFromContext(ctx),
@@ -589,7 +589,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	}
 
 	var mic [4]byte
-	if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+	if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
 		mic, err = crypto.ComputeLegacyDownlinkMIC(
 			key,
 			dev.Session.DevAddr,
@@ -1125,7 +1125,7 @@ func recordDataDownlink(dev *ttnpb.EndDevice, genState generateDownlinkState, ne
 	if macPayload == nil {
 		panic("invalid downlink")
 	}
-	if genState.ApplicationDownlink == nil || dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 && macPayload.FullFCnt > dev.Session.LastNFCntDown {
+	if genState.ApplicationDownlink == nil || dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 && macPayload.FullFCnt > dev.Session.LastNFCntDown {
 		dev.Session.LastNFCntDown = macPayload.FullFCnt
 	}
 	dev.MacState.LastDownlinkAt = ttnpb.ProtoTimePtr(down.TransmitAt)
@@ -1836,7 +1836,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 				ctx = log.NewContext(ctx, logger)
 
 				var maxUpLength uint16 = math.MaxUint16
-				if !dev.Multicast && dev.MacState.LorawanVersion == ttnpb.MAC_V1_1 {
+				if !dev.Multicast && dev.MacState.LorawanVersion == ttnpb.MACVersion_MAC_V1_1 {
 					maxUpLength, err = maximumUplinkLength(fp, phy, dev.MacState.RecentUplinks...)
 					if err != nil {
 						logger.WithError(err).Error("Failed to determine maximum uplink length")

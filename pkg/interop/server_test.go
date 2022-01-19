@@ -108,7 +108,7 @@ func TestServer(t *testing.T) {
 					SenderID:   interop.NetID{0x0, 0x0, 0x02},
 					ReceiverID: interop.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 				},
-				MACVersion: interop.MACVersion(ttnpb.MAC_V1_0_3),
+				MACVersion: interop.MACVersion(ttnpb.MACVersion_MAC_V1_0_3),
 			},
 			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
 				a := assertions.New(t)
@@ -135,7 +135,7 @@ func TestServer(t *testing.T) {
 					SenderID:   interop.NetID{0x0, 0x0, 0x01},
 					ReceiverID: interop.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 				},
-				MACVersion: interop.MACVersion(ttnpb.MAC_V1_0_3),
+				MACVersion: interop.MACVersion(ttnpb.MACVersion_MAC_V1_0_3),
 			},
 			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
 				a := assertions.New(t)
@@ -170,7 +170,7 @@ func TestServer(t *testing.T) {
 					SenderID:   interop.NetID{0x0, 0x0, 0x01},
 					ReceiverID: interop.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 				},
-				MACVersion: interop.MACVersion(ttnpb.MAC_V1_0_3),
+				MACVersion: interop.MACVersion(ttnpb.MACVersion_MAC_V1_0_3),
 			},
 			ResponseAssertion: func(t *testing.T, res *http.Response) bool {
 				a := assertions.New(t)
@@ -231,7 +231,7 @@ func TestServer(t *testing.T) {
 					SenderID:   interop.NetID{0x0, 0x0, 0x01},
 					ReceiverID: interop.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 				},
-				MACVersion: interop.MACVersion(ttnpb.MAC_V1_0_3),
+				MACVersion: interop.MACVersion(ttnpb.MACVersion_MAC_V1_0_3),
 				DevEUI:     interop.EUI64{0x42, 0xff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 			},
 			ResponseAssertion: func(t *testing.T, res *http.Response) bool {

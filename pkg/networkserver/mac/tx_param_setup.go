@@ -38,7 +38,7 @@ func DeviceNeedsTxParamSetupReq(dev *ttnpb.EndDevice, phy *band.Band) bool {
 	if !phy.TxParamSetupReqSupport ||
 		dev.GetMulticast() ||
 		dev.GetMacState() == nil ||
-		dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) < 0 {
+		dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_0_2) < 0 {
 		return false
 	}
 	if dev.MacState.DesiredParameters.MaxEirp != dev.MacState.CurrentParameters.MaxEirp {

@@ -213,7 +213,7 @@ func MakeNsJsJoinRequest(conf NsJsJoinRequestConfig) *ttnpb.JoinRequest {
 		DownlinkSettings: &ttnpb.DLSettings{
 			Rx1DrOffset: conf.RX1DataRateOffset,
 			Rx2Dr:       conf.RX2DataRateIndex,
-			OptNeg:      conf.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) >= 0,
+			OptNeg:      conf.SelectedMACVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0,
 		},
 		RxDelay: conf.RXDelay,
 		CfList:  frequencyplans.CFList(*test.FrequencyPlan(conf.FrequencyPlanID), conf.PHYVersion),
@@ -2132,7 +2132,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 				DownlinkSettings: &ttnpb.DLSettings{
 					Rx1DrOffset: macState.DesiredParameters.Rx1DataRateOffset,
 					Rx2Dr:       macState.DesiredParameters.Rx2DataRateIndex,
-					OptNeg:      x.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0,
+					OptNeg:      x.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0,
 				},
 				RxDelay: macState.DesiredParameters.Rx1Delay,
 				CfList:  frequencyplans.CFList(*test.FrequencyPlan(x.FrequencyPlanId), x.LorawanPhyVersion),

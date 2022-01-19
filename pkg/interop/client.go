@@ -245,7 +245,7 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 	}
 
 	fNwkSIntKey := interopAns.FNwkSIntKey
-	if req.SelectedMacVersion.Compare(ttnpb.MAC_V1_1) <= 0 {
+	if req.SelectedMacVersion.Compare(ttnpb.MACVersion_MAC_V1_1) <= 0 {
 		fNwkSIntKey = interopAns.NwkSKey
 	}
 

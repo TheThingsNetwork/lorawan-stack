@@ -29,20 +29,20 @@ import (
 )
 
 var LoRaWANVersionPairs = map[ttnpb.MACVersion]map[ttnpb.PHYVersion]struct{}{
-	ttnpb.MAC_V1_0: {
+	ttnpb.MACVersion_MAC_V1_0: {
 		ttnpb.PHYVersion_TS001_V1_0: struct{}{},
 	},
-	ttnpb.MAC_V1_0_1: {
+	ttnpb.MACVersion_MAC_V1_0_1: {
 		ttnpb.PHYVersion_TS001_V1_0_1: struct{}{},
 	},
-	ttnpb.MAC_V1_0_2: {
+	ttnpb.MACVersion_MAC_V1_0_2: {
 		ttnpb.PHYVersion_RP001_V1_0_2:       struct{}{},
 		ttnpb.PHYVersion_RP001_V1_0_2_REV_B: struct{}{},
 	},
-	ttnpb.MAC_V1_0_3: {
+	ttnpb.MACVersion_MAC_V1_0_3: {
 		ttnpb.PHYVersion_RP001_V1_0_3_REV_A: struct{}{},
 	},
-	ttnpb.MAC_V1_1: {
+	ttnpb.MACVersion_MAC_V1_1: {
 		ttnpb.PHYVersion_RP001_V1_1_REV_A: struct{}{},
 		ttnpb.PHYVersion_RP001_V1_1_REV_B: struct{}{},
 	},

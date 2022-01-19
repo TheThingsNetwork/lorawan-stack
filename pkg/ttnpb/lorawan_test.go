@@ -25,7 +25,7 @@ import (
 func TestMACVersion_Version(t *testing.T) {
 	a := assertions.New(t)
 	for v := range MACVersion_name {
-		if v == int32(MAC_UNKNOWN) {
+		if v == int32(MACVersion_MAC_UNKNOWN) {
 			continue
 		}
 		a.So(func() { MACVersion(v).Version() }, should.NotPanic)
@@ -39,38 +39,38 @@ func TestMACVersionCompare(t *testing.T) {
 		Panics   bool
 	}{
 		{
-			A:        MAC_V1_0,
-			B:        MAC_V1_0_1,
+			A:        MACVersion_MAC_V1_0,
+			B:        MACVersion_MAC_V1_0_1,
 			Expected: -1,
 		},
 		{
-			A:        MAC_V1_1,
-			B:        MAC_V1_0,
+			A:        MACVersion_MAC_V1_1,
+			B:        MACVersion_MAC_V1_0,
 			Expected: 1,
 		},
 		{
-			A:        MAC_V1_1,
-			B:        MAC_V1_1,
+			A:        MACVersion_MAC_V1_1,
+			B:        MACVersion_MAC_V1_1,
 			Expected: 0,
 		},
 		{
-			A:        MAC_V1_0_2,
-			B:        MAC_V1_1,
+			A:        MACVersion_MAC_V1_0_2,
+			B:        MACVersion_MAC_V1_1,
 			Expected: -1,
 		},
 		{
-			A:      MAC_UNKNOWN,
-			B:      MAC_V1_1,
+			A:      MACVersion_MAC_UNKNOWN,
+			B:      MACVersion_MAC_V1_1,
 			Panics: true,
 		},
 		{
-			A:      MAC_UNKNOWN,
-			B:      MAC_UNKNOWN,
+			A:      MACVersion_MAC_UNKNOWN,
+			B:      MACVersion_MAC_UNKNOWN,
 			Panics: true,
 		},
 		{
-			A:      MAC_V1_0,
-			B:      MAC_UNKNOWN,
+			A:      MACVersion_MAC_V1_0,
+			B:      MACVersion_MAC_UNKNOWN,
 			Panics: true,
 		},
 	} {

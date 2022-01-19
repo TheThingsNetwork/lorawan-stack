@@ -76,7 +76,7 @@ func maxTransmissionNumber(ver ttnpb.MACVersion, confirmed bool, nbTrans uint32)
 	if !confirmed {
 		return nbTrans
 	}
-	if ver.Compare(ttnpb.MAC_V1_0_4) < 0 {
+	if ver.Compare(ttnpb.MACVersion_MAC_V1_0_4) < 0 {
 		return maxConfNbTrans
 	}
 	return nbTrans
@@ -249,9 +249,9 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			dev.PendingMacState.CurrentParameters.Rx1Delay = dev.PendingMacState.PendingJoinRequest.RxDelay
 			dev.PendingMacState.CurrentParameters.Rx1DataRateOffset = dev.PendingMacState.PendingJoinRequest.DownlinkSettings.Rx1DrOffset
 			dev.PendingMacState.CurrentParameters.Rx2DataRateIndex = dev.PendingMacState.PendingJoinRequest.DownlinkSettings.Rx2Dr
-			if dev.PendingMacState.PendingJoinRequest.DownlinkSettings.OptNeg && dev.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+			if dev.PendingMacState.PendingJoinRequest.DownlinkSettings.OptNeg && dev.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
 				// The version will be further negotiated via RekeyInd/RekeyConf
-				dev.PendingMacState.LorawanVersion = ttnpb.MAC_V1_1
+				dev.PendingMacState.LorawanVersion = ttnpb.MACVersion_MAC_V1_1
 			}
 			chs, ok := applyCFList(dev.PendingMacState.PendingJoinRequest.CfList, phy, dev.PendingMacState.CurrentParameters.Channels...)
 			if !ok {
@@ -468,7 +468,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			dev.MacState.DeviceClass = ttnpb.Class_CLASS_B
 		}
 	} else if dev.MacState.DeviceClass == ttnpb.Class_CLASS_B {
-		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 && dev.SupportsClassC {
+		if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 && dev.SupportsClassC {
 			queuedEventBuilders = append(queuedEventBuilders, mac.EvtClassCSwitch.BindData(ttnpb.Class_CLASS_B))
 			dev.MacState.DeviceClass = ttnpb.Class_CLASS_C
 		} else {
@@ -505,7 +505,7 @@ macLoop:
 		case ttnpb.MACCommandIdentifier_CID_LINK_ADR:
 			pld := cmd.GetLinkAdrAns()
 			dupCount := 0
-			if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+			if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_0_2) >= 0 && dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
 				for _, dup := range cmds {
 					if dup.Cid != ttnpb.MACCommandIdentifier_CID_LINK_ADR {
 						break
@@ -578,7 +578,7 @@ macLoop:
 	}
 
 	if matchType == pendingMatch {
-		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
 			dev.Ids.DevAddr = &pld.FHdr.DevAddr
 			dev.Session = dev.PendingSession
 		} else if dev.PendingSession != nil || dev.PendingMacState != nil || dev.MacState.PendingJoinRequest != nil {
@@ -1137,7 +1137,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	dlSettings := &ttnpb.DLSettings{
 		Rx1DrOffset: macState.DesiredParameters.Rx1DataRateOffset,
 		Rx2Dr:       macState.DesiredParameters.Rx2DataRateIndex,
-		OptNeg:      matched.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0,
+		OptNeg:      matched.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0,
 	}
 
 	resp, joinEvents, err := ns.sendJoinRequest(ctx, matched.Ids, &ttnpb.JoinRequest{

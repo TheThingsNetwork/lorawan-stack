@@ -73,22 +73,22 @@ func TestCryptoServices(t *testing.T) {
 					Result  [4]byte
 				}{
 					{
-						Version: ttnpb.MAC_V1_1,
+						Version: ttnpb.MACVersion_MAC_V1_1,
 						Payload: bytes.Repeat([]byte{0x1}, 19),
 						Result:  [4]byte{0x21, 0x4d, 0x19, 0x7d},
 					},
 					{
-						Version: ttnpb.MAC_V1_0_2,
+						Version: ttnpb.MACVersion_MAC_V1_0_2,
 						Payload: bytes.Repeat([]byte{0x1}, 19),
 						Result:  [4]byte{0x21, 0x4d, 0x19, 0x7d},
 					},
 					{
-						Version: ttnpb.MAC_V1_0_1,
+						Version: ttnpb.MACVersion_MAC_V1_0_1,
 						Payload: bytes.Repeat([]byte{0x1}, 19),
 						Result:  [4]byte{0x21, 0x4d, 0x19, 0x7d},
 					},
 					{
-						Version: ttnpb.MAC_V1_0,
+						Version: ttnpb.MACVersion_MAC_V1_0,
 						Payload: bytes.Repeat([]byte{0x1}, 19),
 						Result:  [4]byte{0x21, 0x4d, 0x19, 0x7d},
 					},
@@ -114,45 +114,45 @@ func TestCryptoServices(t *testing.T) {
 					Result      [4]byte
 				}{
 					{
-						Version:     ttnpb.MAC_V1_1,
+						Version:     ttnpb.MACVersion_MAC_V1_1,
 						JoinReqType: 0xff,
 						DevNonce:    types.DevNonce{0x1, 0x2},
 						Payload:     bytes.Repeat([]byte{0x1}, 13),
 						Result:      [4]byte{0x1, 0xdf, 0x1e, 0xff},
 					},
 					{
-						Version:     ttnpb.MAC_V1_1,
+						Version:     ttnpb.MACVersion_MAC_V1_1,
 						JoinReqType: 0x0,
 						DevNonce:    types.DevNonce{0x1, 0x2},
 						Payload:     bytes.Repeat([]byte{0x1}, 13),
 						Result:      [4]byte{0xa, 0x9c, 0x88, 0x33},
 					},
 					{
-						Version:     ttnpb.MAC_V1_1,
+						Version:     ttnpb.MACVersion_MAC_V1_1,
 						JoinReqType: 0x1,
 						DevNonce:    types.DevNonce{0x1, 0x2},
 						Payload:     bytes.Repeat([]byte{0x1}, 13),
 						Result:      [4]byte{0xae, 0x2d, 0xdc, 0xd1},
 					},
 					{
-						Version:     ttnpb.MAC_V1_1,
+						Version:     ttnpb.MACVersion_MAC_V1_1,
 						JoinReqType: 0x2,
 						DevNonce:    types.DevNonce{0x1, 0x2},
 						Payload:     bytes.Repeat([]byte{0x1}, 13),
 						Result:      [4]byte{0x18, 0x32, 0x16, 0xb1},
 					},
 					{
-						Version: ttnpb.MAC_V1_0_2,
+						Version: ttnpb.MACVersion_MAC_V1_0_2,
 						Payload: bytes.Repeat([]byte{0x1}, 13),
 						Result:  [4]byte{0x34, 0xa5, 0xb9, 0x83},
 					},
 					{
-						Version: ttnpb.MAC_V1_0_1,
+						Version: ttnpb.MACVersion_MAC_V1_0_1,
 						Payload: bytes.Repeat([]byte{0x1}, 13),
 						Result:  [4]byte{0x34, 0xa5, 0xb9, 0x83},
 					},
 					{
-						Version: ttnpb.MAC_V1_0,
+						Version: ttnpb.MACVersion_MAC_V1_0,
 						Payload: bytes.Repeat([]byte{0x1}, 13),
 						Result:  [4]byte{0x34, 0xa5, 0xb9, 0x83},
 					},
@@ -176,22 +176,22 @@ func TestCryptoServices(t *testing.T) {
 					Result  []byte
 				}{
 					{
-						Version: ttnpb.MAC_V1_1,
+						Version: ttnpb.MACVersion_MAC_V1_1,
 						Payload: bytes.Repeat([]byte{0x1}, 16),
 						Result:  []byte{0xbc, 0x6e, 0x2b, 0xaf, 0x23, 0xca, 0x1e, 0x66, 0xaa, 0xd7, 0xb3, 0x95, 0xc1, 0xd6, 0xa6, 0xa},
 					},
 					{
-						Version: ttnpb.MAC_V1_0_2,
+						Version: ttnpb.MACVersion_MAC_V1_0_2,
 						Payload: bytes.Repeat([]byte{0x1}, 16),
 						Result:  []byte{0xbc, 0x6e, 0x2b, 0xaf, 0x23, 0xca, 0x1e, 0x66, 0xaa, 0xd7, 0xb3, 0x95, 0xc1, 0xd6, 0xa6, 0xa},
 					},
 					{
-						Version: ttnpb.MAC_V1_0_1,
+						Version: ttnpb.MACVersion_MAC_V1_0_1,
 						Payload: bytes.Repeat([]byte{0x1}, 16),
 						Result:  []byte{0xbc, 0x6e, 0x2b, 0xaf, 0x23, 0xca, 0x1e, 0x66, 0xaa, 0xd7, 0xb3, 0x95, 0xc1, 0xd6, 0xa6, 0xa},
 					},
 					{
-						Version: ttnpb.MAC_V1_0,
+						Version: ttnpb.MACVersion_MAC_V1_0,
 						Payload: bytes.Repeat([]byte{0x1}, 16),
 						Result:  []byte{0xbc, 0x6e, 0x2b, 0xaf, 0x23, 0xca, 0x1e, 0x66, 0xaa, 0xd7, 0xb3, 0x95, 0xc1, 0xd6, 0xa6, 0xa},
 					},
@@ -215,7 +215,7 @@ func TestCryptoServices(t *testing.T) {
 					Result  []byte
 				}{
 					{
-						Version: ttnpb.MAC_V1_1,
+						Version: ttnpb.MACVersion_MAC_V1_1,
 						Payload: bytes.Repeat([]byte{0x1}, 16),
 						Result:  []byte{0x61, 0x58, 0x25, 0x46, 0x6a, 0x90, 0xec, 0xce, 0xf5, 0xd1, 0xf1, 0xc5, 0xba, 0x56, 0x6b, 0xe7},
 					},
@@ -243,7 +243,7 @@ func TestCryptoServices(t *testing.T) {
 					NwkSEncKey  types.AES128Key
 				}{
 					{
-						Version:     ttnpb.MAC_V1_1,
+						Version:     ttnpb.MACVersion_MAC_V1_1,
 						JoinNonce:   types.JoinNonce{0x1, 0x2, 0x3},
 						DevNonce:    types.DevNonce{0x1, 0x2},
 						FNwkSIntKey: types.AES128Key{0xf8, 0xd8, 0xb8, 0xb9, 0xb1, 0xec, 0x36, 0xe8, 0xb8, 0x10, 0x84, 0x29, 0xd3, 0xf7, 0x3d, 0xd2},
@@ -251,28 +251,28 @@ func TestCryptoServices(t *testing.T) {
 						NwkSEncKey:  types.AES128Key{0x31, 0x87, 0x9c, 0xf0, 0x93, 0xc2, 0x41, 0x11, 0xe3, 0x99, 0x5, 0xc7, 0x72, 0x76, 0xbf, 0xd8},
 					},
 					{
-						Version:     ttnpb.MAC_V1_0_3,
+						Version:     ttnpb.MACVersion_MAC_V1_0_3,
 						JoinNonce:   types.JoinNonce{0x1, 0x2, 0x3},
 						DevNonce:    types.DevNonce{0x1, 0x2},
 						NetID:       types.NetID{0x1, 0x2, 0x3},
 						FNwkSIntKey: types.AES128Key{0x38, 0xe0, 0xc1, 0xd1, 0x50, 0x3b, 0xd4, 0xc1, 0x6b, 0x29, 0xbb, 0x9, 0xd6, 0xef, 0xf4, 0x44},
 					},
 					{
-						Version:     ttnpb.MAC_V1_0_2,
+						Version:     ttnpb.MACVersion_MAC_V1_0_2,
 						JoinNonce:   types.JoinNonce{0x1, 0x2, 0x3},
 						DevNonce:    types.DevNonce{0x1, 0x2},
 						NetID:       types.NetID{0x1, 0x2, 0x3},
 						FNwkSIntKey: types.AES128Key{0x38, 0xe0, 0xc1, 0xd1, 0x50, 0x3b, 0xd4, 0xc1, 0x6b, 0x29, 0xbb, 0x9, 0xd6, 0xef, 0xf4, 0x44},
 					},
 					{
-						Version:     ttnpb.MAC_V1_0_1,
+						Version:     ttnpb.MACVersion_MAC_V1_0_1,
 						JoinNonce:   types.JoinNonce{0x1, 0x2, 0x3},
 						DevNonce:    types.DevNonce{0x1, 0x2},
 						NetID:       types.NetID{0x1, 0x2, 0x3},
 						FNwkSIntKey: types.AES128Key{0x38, 0xe0, 0xc1, 0xd1, 0x50, 0x3b, 0xd4, 0xc1, 0x6b, 0x29, 0xbb, 0x9, 0xd6, 0xef, 0xf4, 0x44},
 					},
 					{
-						Version:     ttnpb.MAC_V1_0,
+						Version:     ttnpb.MACVersion_MAC_V1_0,
 						JoinNonce:   types.JoinNonce{0x1, 0x2, 0x3},
 						DevNonce:    types.DevNonce{0x1, 0x2},
 						NetID:       types.NetID{0x1, 0x2, 0x3},
@@ -316,34 +316,34 @@ func TestCryptoServices(t *testing.T) {
 					AppSKey   types.AES128Key
 				}{
 					{
-						Version:   ttnpb.MAC_V1_1,
+						Version:   ttnpb.MACVersion_MAC_V1_1,
 						JoinNonce: types.JoinNonce{0x1, 0x2, 0x3},
 						DevNonce:  types.DevNonce{0x1, 0x2},
 						AppSKey:   types.AES128Key{0x4, 0x30, 0x89, 0x5c, 0x7b, 0xa7, 0xb1, 0x51, 0xcf, 0x97, 0x36, 0x84, 0xf6, 0x22, 0xff, 0xc1},
 					},
 					{
-						Version:   ttnpb.MAC_V1_0_3,
+						Version:   ttnpb.MACVersion_MAC_V1_0_3,
 						JoinNonce: types.JoinNonce{0x1, 0x2, 0x3},
 						DevNonce:  types.DevNonce{0x1, 0x2},
 						NetID:     types.NetID{0x1, 0x2, 0x3},
 						AppSKey:   types.AES128Key{0xeb, 0x55, 0x14, 0xa2, 0x16, 0x6, 0xd8, 0x3d, 0x49, 0xec, 0x12, 0x73, 0x1, 0xf0, 0x7a, 0x91},
 					},
 					{
-						Version:   ttnpb.MAC_V1_0_2,
+						Version:   ttnpb.MACVersion_MAC_V1_0_2,
 						JoinNonce: types.JoinNonce{0x1, 0x2, 0x3},
 						DevNonce:  types.DevNonce{0x1, 0x2},
 						NetID:     types.NetID{0x1, 0x2, 0x3},
 						AppSKey:   types.AES128Key{0xeb, 0x55, 0x14, 0xa2, 0x16, 0x6, 0xd8, 0x3d, 0x49, 0xec, 0x12, 0x73, 0x1, 0xf0, 0x7a, 0x91},
 					},
 					{
-						Version:   ttnpb.MAC_V1_0_1,
+						Version:   ttnpb.MACVersion_MAC_V1_0_1,
 						JoinNonce: types.JoinNonce{0x1, 0x2, 0x3},
 						DevNonce:  types.DevNonce{0x1, 0x2},
 						NetID:     types.NetID{0x1, 0x2, 0x3},
 						AppSKey:   types.AES128Key{0xeb, 0x55, 0x14, 0xa2, 0x16, 0x6, 0xd8, 0x3d, 0x49, 0xec, 0x12, 0x73, 0x1, 0xf0, 0x7a, 0x91},
 					},
 					{
-						Version:   ttnpb.MAC_V1_0,
+						Version:   ttnpb.MACVersion_MAC_V1_0,
 						JoinNonce: types.JoinNonce{0x1, 0x2, 0x3},
 						DevNonce:  types.DevNonce{0x1, 0x2},
 						NetID:     types.NetID{0x1, 0x2, 0x3},

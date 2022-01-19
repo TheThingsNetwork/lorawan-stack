@@ -34,8 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-type mockInterop struct {
-}
+type mockInterop struct{}
 
 func (m mockInterop) RegisterInterop(s *interop.Server) {
 	s.RegisterJS(m)
@@ -155,7 +154,7 @@ func TestInteropTLS(t *testing.T) {
 				SenderID:   interop.NetID{0x0, 0x0, 0x1},
 				ReceiverID: interop.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 			},
-			MACVersion: interop.MACVersion(ttnpb.MAC_V1_0_3),
+			MACVersion: interop.MACVersion(ttnpb.MACVersion_MAC_V1_0_3),
 		}
 		buf, err := json.Marshal(req)
 		a.So(err, should.BeNil)
@@ -175,7 +174,7 @@ func TestInteropTLS(t *testing.T) {
 				SenderID:   interop.NetID{0x0, 0x0, 0x2},
 				ReceiverID: interop.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 			},
-			MACVersion: interop.MACVersion(ttnpb.MAC_V1_0_3),
+			MACVersion: interop.MACVersion(ttnpb.MACVersion_MAC_V1_0_3),
 		}
 		buf, err := json.Marshal(req)
 		a.So(err, should.BeNil)

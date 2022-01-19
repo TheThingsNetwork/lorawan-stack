@@ -177,7 +177,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		var upCmders []MACCommander
 		var upEvBuilders []events.Builder
 		var downCmders []MACCommander
-		if dev.PendingMacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+		if dev.PendingMacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
 			rekeyInd := &ttnpb.MACCommand_RekeyInd{
 				MinorVersion: ttnpb.Minor_MINOR_1,
 			}
@@ -282,7 +282,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			return
 		}
 
-		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
 			if !a.So(env.AssertNsAsHandleUplink(ctx, dev.Ids.ApplicationIds, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 				_, a := test.MustNewTFromContext(ctx)
 				if !a.So(ups, should.HaveLength, 1) {
@@ -339,7 +339,7 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 	var upCmders []MACCommander
 	var upEvBuilders []events.Builder
 	var downCmders []MACCommander
-	if macVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+	if macVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
 		deviceModeInd := &ttnpb.MACCommand_DeviceModeInd{
 			Class: ttnpb.Class_CLASS_C,
 		}

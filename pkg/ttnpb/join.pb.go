@@ -86,7 +86,7 @@ func (m *JoinRequest) GetSelectedMacVersion() MACVersion {
 	if m != nil {
 		return m.SelectedMacVersion
 	}
-	return MAC_UNKNOWN
+	return MACVersion_MAC_UNKNOWN
 }
 
 func (m *JoinRequest) GetDownlinkSettings() *DLSettings {

@@ -947,17 +947,17 @@ func (v MACVersion) Validate() error {
 // Version returns the MACVersion as a semver.Version.
 func (v MACVersion) Version() semver.Version {
 	switch v {
-	case MAC_V1_0:
+	case MACVersion_MAC_V1_0:
 		return semver.Version{Major: 1, Minor: 0, Patch: 0}
-	case MAC_V1_0_1:
+	case MACVersion_MAC_V1_0_1:
 		return semver.Version{Major: 1, Minor: 0, Patch: 1}
-	case MAC_V1_0_2:
+	case MACVersion_MAC_V1_0_2:
 		return semver.Version{Major: 1, Minor: 0, Patch: 2}
-	case MAC_V1_0_3:
+	case MACVersion_MAC_V1_0_3:
 		return semver.Version{Major: 1, Minor: 0, Patch: 3}
-	case MAC_V1_0_4:
+	case MACVersion_MAC_V1_0_4:
 		return semver.Version{Major: 1, Minor: 0, Patch: 4}
-	case MAC_V1_1:
+	case MACVersion_MAC_V1_1:
 		return semver.Version{Major: 1, Minor: 1, Patch: 0}
 	default:
 		panic(fmt.Errorf("missed %q in MACVersion.Version()", v))
@@ -976,56 +976,56 @@ func (v MACVersion) Compare(o MACVersion) int {
 // EncryptFOpts reports whether v requires MAC commands in FOpts to be encrypted.
 // EncryptFOpts panics, if v.Validate() returns non-nil error.
 func (v MACVersion) EncryptFOpts() bool {
-	return v.Compare(MAC_V1_1) >= 0
+	return v.Compare(MACVersion_MAC_V1_1) >= 0
 }
 
 // HasMaxFCntGap reports whether v defines a MaxFCntGap.
 // HasMaxFCntGap panics, if v.Validate() returns non-nil error.
 func (v MACVersion) HasMaxFCntGap() bool {
-	return v.Compare(MAC_V1_0_4) < 0
+	return v.Compare(MACVersion_MAC_V1_0_4) < 0
 }
 
 // HasNoChangeTXPowerIndex reports whether v defines a no-change TxPowerIndex value.
 // HasNoChangeTXPowerIndex panics, if v.Validate() returns non-nil error.
 func (v MACVersion) HasNoChangeTXPowerIndex() bool {
-	return v.Compare(MAC_V1_0_4) >= 0
+	return v.Compare(MACVersion_MAC_V1_0_4) >= 0
 }
 
 // HasNoChangeDataRateIndex reports whether v defines a no-change DataRateIndex value.
 // HasNoChangeDataRateIndex panics, if v.Validate() returns non-nil error.
 func (v MACVersion) HasNoChangeDataRateIndex() bool {
-	return v.Compare(MAC_V1_0_4) >= 0
+	return v.Compare(MACVersion_MAC_V1_0_4) >= 0
 }
 
 // IgnoreUplinksExceedingLengthLimit reports whether v requires Network Server to
 // silently drop uplinks exceeding selected data rate payload length limits.
 // IgnoreUplinksExceedingLengthLimit panics, if v.Validate() returns non-nil error.
 func (v MACVersion) IgnoreUplinksExceedingLengthLimit() bool {
-	return v.Compare(MAC_V1_0_4) >= 0 && v.Compare(MAC_V1_1) < 0
+	return v.Compare(MACVersion_MAC_V1_0_4) >= 0 && v.Compare(MACVersion_MAC_V1_1) < 0
 }
 
 // IncrementDevNonce reports whether v defines DevNonce as an incrementing counter.
 // IncrementDevNonce panics, if v.Validate() returns non-nil error.
 func (v MACVersion) IncrementDevNonce() bool {
-	return v.Compare(MAC_V1_0_4) >= 0
+	return v.Compare(MACVersion_MAC_V1_0_4) >= 0
 }
 
 // UseNwkKey reports whether v uses a root NwkKey.
 // UseNwkKey panics, if v.Validate() returns non-nil error.
 func (v MACVersion) UseNwkKey() bool {
-	return v.Compare(MAC_V1_1) >= 0
+	return v.Compare(MACVersion_MAC_V1_1) >= 0
 }
 
 // UseLegacyMIC reports whether v uses legacy MIC computation algorithm.
 // UseLegacyMIC panics, if v.Validate() returns non-nil error.
 func (v MACVersion) UseLegacyMIC() bool {
-	return v.Compare(MAC_V1_1) < 0
+	return v.Compare(MACVersion_MAC_V1_1) < 0
 }
 
 // RequireDevEUIForABP reports whether v requires ABP devices to have a DevEUI associated.
 // RequireDevEUIForABP panics, if v.Validate() returns non-nil error.
 func (v MACVersion) RequireDevEUIForABP() bool {
-	return v.Compare(MAC_V1_0_4) >= 0 && v.Compare(MAC_V1_1) < 0
+	return v.Compare(MACVersion_MAC_V1_0_4) >= 0 && v.Compare(MACVersion_MAC_V1_1) < 0
 }
 
 // Validate reports whether v represents a valid PHYVersion.

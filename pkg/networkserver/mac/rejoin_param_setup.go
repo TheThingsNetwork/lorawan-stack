@@ -36,7 +36,7 @@ var (
 func DeviceNeedsRejoinParamSetupReq(dev *ttnpb.EndDevice) bool {
 	return !dev.GetMulticast() &&
 		dev.GetMacState() != nil &&
-		dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 &&
+		dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 &&
 		(dev.MacState.DesiredParameters.RejoinTimePeriodicity != dev.MacState.CurrentParameters.RejoinTimePeriodicity ||
 			dev.MacState.DesiredParameters.RejoinCountPeriodicity != dev.MacState.CurrentParameters.RejoinCountPeriodicity)
 }

@@ -168,7 +168,7 @@ func TestInvalidJoinRequests(t *testing.T) {
 
 				ctx = clusterauth.NewContext(ctx, nil)
 				req := &ttnpb.JoinRequest{
-					SelectedMacVersion: ttnpb.MAC_V1_1,
+					SelectedMacVersion: ttnpb.MACVersion_MAC_V1_1,
 					RawPayload: []byte{
 						/* MHDR */
 						0x00,
@@ -239,12 +239,12 @@ func TestHandleJoin(t *testing.T) {
 						Key: &nwkKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_1,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_1,
 				NetworkServerAddress: nsAddr,
 			},
 			NextLastJoinNonce: 1,
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_1,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -288,12 +288,12 @@ func TestHandleJoin(t *testing.T) {
 						Key: &nwkKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_1,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_1,
 				NetworkServerAddress: nsAddr,
 			},
 			NextLastJoinNonce: 1,
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_1,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -390,13 +390,13 @@ func TestHandleJoin(t *testing.T) {
 						Key: &nwkKey,
 					},
 				},
-				LorawanVersion:           ttnpb.MAC_V1_1,
+				LorawanVersion:           ttnpb.MACVersion_MAC_V1_1,
 				ApplicationServerAddress: asAddr,
 				NetworkServerAddress:     nsAddr,
 			},
 			NextLastJoinNonce: 1,
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_1,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -513,7 +513,7 @@ func TestHandleJoin(t *testing.T) {
 						Key: &nwkKey,
 					},
 				},
-				LorawanVersion:            ttnpb.MAC_V1_1,
+				LorawanVersion:            ttnpb.MACVersion_MAC_V1_1,
 				ApplicationServerAddress:  asAddr,
 				ApplicationServerKekLabel: "test-as-kek",
 				NetworkServerAddress:      nsAddr,
@@ -524,7 +524,7 @@ func TestHandleJoin(t *testing.T) {
 			},
 			NextLastJoinNonce: 1,
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_1,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -642,7 +642,7 @@ func TestHandleJoin(t *testing.T) {
 						Key: &nwkKey,
 					},
 				},
-				LorawanVersion: ttnpb.MAC_V1_1,
+				LorawanVersion: ttnpb.MACVersion_MAC_V1_1,
 			},
 			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{
 				KekLabel: "test-aas-kek",
@@ -655,7 +655,7 @@ func TestHandleJoin(t *testing.T) {
 			},
 			NextLastJoinNonce: 1,
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_1,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -754,14 +754,14 @@ func TestHandleJoin(t *testing.T) {
 						Key: &nwkKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_1,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_1,
 				NetworkServerAddress: nsAddr,
 				ResetsJoinNonces:     true,
 			},
 			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{},
 			NextLastJoinNonce:             1,
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_1,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -856,14 +856,14 @@ func TestHandleJoin(t *testing.T) {
 						Key: &nwkKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_1,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_1,
 				NetworkServerAddress: nsAddr,
 			},
 			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{},
 			NextLastDevNonce:              0x2442,
 			NextLastJoinNonce:             0x42fffe,
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_1,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -958,13 +958,13 @@ func TestHandleJoin(t *testing.T) {
 						Key: &nwkKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_1,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_1,
 				NetworkServerAddress: nsAddr,
 			},
 			NextLastDevNonce:  0x2442,
 			NextLastJoinNonce: 0x42fffd,
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_1,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1008,14 +1008,14 @@ func TestHandleJoin(t *testing.T) {
 						Key: &appKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_1,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_1,
 				NetworkServerAddress: nsAddr,
 			},
 			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{},
 			NextLastJoinNonce:             1,
 			NextUsedDevNonces:             []uint32{1},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0_3,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0_3,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1091,14 +1091,14 @@ func TestHandleJoin(t *testing.T) {
 						Key: &appKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_0_3,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0_3,
 				NetworkServerAddress: nsAddr,
 			},
 			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{},
 			NextLastJoinNonce:             1,
 			NextUsedDevNonces:             []uint32{1},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0_3,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0_3,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1174,14 +1174,14 @@ func TestHandleJoin(t *testing.T) {
 						Key: &appKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_0_2,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0_2,
 				NetworkServerAddress: nsAddr,
 			},
 			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{},
 			NextLastJoinNonce:             1,
 			NextUsedDevNonces:             []uint32{1},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0_2,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0_2,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1257,14 +1257,14 @@ func TestHandleJoin(t *testing.T) {
 						Key: &appKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_0_1,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0_1,
 				NetworkServerAddress: nsAddr,
 			},
 			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{},
 			NextLastJoinNonce:             1,
 			NextUsedDevNonces:             []uint32{1},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0_1,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0_1,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1340,14 +1340,14 @@ func TestHandleJoin(t *testing.T) {
 						Key: &appKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_0,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
 			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{},
 			NextLastJoinNonce:             1,
 			NextUsedDevNonces:             []uint32{1},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1425,14 +1425,14 @@ func TestHandleJoin(t *testing.T) {
 						Key: &appKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_0,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
 			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{},
 			NextLastJoinNonce:             0x42fffe,
 			NextUsedDevNonces:             []uint32{23, 41, 42, 52, 0x2442, 0x2444},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1510,7 +1510,7 @@ func TestHandleJoin(t *testing.T) {
 						Key: &appKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_0,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 				ResetsJoinNonces:     true,
 			},
@@ -1518,7 +1518,7 @@ func TestHandleJoin(t *testing.T) {
 			NextLastJoinNonce:             0x42fffe,
 			NextUsedDevNonces:             []uint32{23, 41, 42, 52, 0x2442, 0x2444},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1599,7 +1599,7 @@ func TestHandleJoin(t *testing.T) {
 						Key: &appKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_0,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0,
 				NetId:                &types.NetID{0x42, 0xff, 0xff},
 				NetworkServerAddress: nsAddr,
 			},
@@ -1607,7 +1607,7 @@ func TestHandleJoin(t *testing.T) {
 			NextLastJoinNonce:             1,
 			NextUsedDevNonces:             []uint32{1},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1687,14 +1687,14 @@ func TestHandleJoin(t *testing.T) {
 						Key: &appKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_0,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0,
 				NetId:                &types.NetID{0x42, 0xff, 0xff},
 				NetworkServerAddress: nsAddr,
 			},
 			NextLastJoinNonce: 1,
 			NextUsedDevNonces: []uint32{1},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1739,13 +1739,13 @@ func TestHandleJoin(t *testing.T) {
 						Key: &appKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_0,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
 			NextLastJoinNonce: 1,
 			NextUsedDevNonces: []uint32{1},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1790,14 +1790,14 @@ func TestHandleJoin(t *testing.T) {
 						Key: &appKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_0,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0,
 				NetId:                &types.NetID{0x42, 0xff, 0xff},
 				NetworkServerAddress: nsAddr,
 			},
 			NextLastJoinNonce: 1,
 			NextUsedDevNonces: []uint32{1},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1840,13 +1840,13 @@ func TestHandleJoin(t *testing.T) {
 						Key: &appKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_0,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
 			NextLastJoinNonce: 0x42fffe,
 			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0,
 				RawPayload: []byte{
 					/* MHDR */
 					0x00,
@@ -1888,13 +1888,13 @@ func TestHandleJoin(t *testing.T) {
 						Key: &appKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_0,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
 			NextLastJoinNonce: 0x42fffe,
 			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0,
 				NetId:              types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -1923,13 +1923,13 @@ func TestHandleJoin(t *testing.T) {
 						Key: &appKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_0,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
 			NextLastJoinNonce: 0x42fffe,
 			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0,
 				Payload: &ttnpb.Message{
 					MHdr: &ttnpb.MHDR{
 						MType: ttnpb.MType_JOIN_REQUEST,
@@ -1964,13 +1964,13 @@ func TestHandleJoin(t *testing.T) {
 						Key: &appKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_0,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
 			NextLastJoinNonce: 0x42fffe,
 			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0,
 				Payload: &ttnpb.Message{
 					MHdr: &ttnpb.MHDR{
 						MType: ttnpb.MType_JOIN_REQUEST,
@@ -2006,13 +2006,13 @@ func TestHandleJoin(t *testing.T) {
 						Key: &appKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_0,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
 			NextLastJoinNonce: 0x42fffe,
 			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0,
 				Payload: &ttnpb.Message{
 					MHdr: &ttnpb.MHDR{
 						MType: ttnpb.MType_JOIN_REQUEST,
@@ -2052,13 +2052,13 @@ func TestHandleJoin(t *testing.T) {
 						Key: &appKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_0,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
 			NextLastJoinNonce: 0x42fffe,
 			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0,
 				RawPayload: []byte{
 					0x23, 0x42, 0xff, 0xff, 0xaa, 0x42, 0x42, 0x0f, 0xff, 0xff, 0xff, 0xff, 0xff,
 				},
@@ -2090,13 +2090,13 @@ func TestHandleJoin(t *testing.T) {
 						Key: &appKey,
 					},
 				},
-				LorawanVersion:       ttnpb.MAC_V1_0,
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0,
 				NetworkServerAddress: nsAddr,
 			},
 			NextLastJoinNonce: 0x42fffe,
 			NextUsedDevNonces: []uint32{23, 41, 42, 52, 0x2442},
 			JoinRequest: &ttnpb.JoinRequest{
-				SelectedMacVersion: ttnpb.MAC_V1_0,
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0,
 				Payload: &ttnpb.Message{
 					MHdr: &ttnpb.MHDR{
 						MType: ttnpb.MType_JOIN_REQUEST,
@@ -2256,7 +2256,7 @@ func TestHandleJoin(t *testing.T) {
 				a.So(*ttnpb.StdTime(ret.UpdatedAt), should.HappenAfter, *ttnpb.StdTime(pb.UpdatedAt))
 				pb.UpdatedAt = ret.UpdatedAt
 				pb.LastJoinNonce = tc.NextLastJoinNonce
-				if tc.JoinRequest.SelectedMacVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+				if tc.JoinRequest.SelectedMacVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
 					pb.UsedDevNonces = tc.NextUsedDevNonces
 				} else {
 					pb.LastDevNonce = tc.NextLastDevNonce
