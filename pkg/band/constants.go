@@ -33,7 +33,7 @@ const (
 	defaultMaxFCntGap uint = 16384
 
 	defaultADRAckLimit = ttnpb.ADR_ACK_LIMIT_64
-	defaultADRAckDelay = ttnpb.ADR_ACK_DELAY_32
+	defaultADRAckDelay = ttnpb.ADRAckDelayExponent_ADR_ACK_DELAY_32
 
 	// Random delay between 1 and 3 seconds
 	defaultRetransmitTimeout       time.Duration = 2 * time.Second

@@ -250,7 +250,7 @@ func MakeDefaultEU868CurrentChannels() []*ttnpb.MACParameters_Channel {
 
 func MakeDefaultEU868CurrentMACParameters(phyVersion ttnpb.PHYVersion) *ttnpb.MACParameters {
 	return &ttnpb.MACParameters{
-		AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
+		AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADRAckDelayExponent_ADR_ACK_DELAY_32},
 		AdrAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
 		AdrNbTrans:                 1,
 		MaxDutyCycle:               ttnpb.DUTY_CYCLE_1,
@@ -351,7 +351,7 @@ func MakeDefaultUS915CurrentChannels() []*ttnpb.MACParameters_Channel {
 
 func MakeDefaultUS915CurrentMACParameters(ver ttnpb.PHYVersion) *ttnpb.MACParameters {
 	return &ttnpb.MACParameters{
-		AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
+		AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADRAckDelayExponent_ADR_ACK_DELAY_32},
 		AdrAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
 		AdrNbTrans:                 1,
 		MaxDutyCycle:               ttnpb.DUTY_CYCLE_1,

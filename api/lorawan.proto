@@ -729,7 +729,6 @@ enum ADRAckLimitExponent {
 
 enum ADRAckDelayExponent {
   option (thethings.json.enum) = { marshal_as_string: true, prefix: "ADR_ACK_DELAY" };
-  option (gogoproto.goproto_enum_prefix) = false;
 
   ADR_ACK_DELAY_1 = 0;
   ADR_ACK_DELAY_2 = 1;

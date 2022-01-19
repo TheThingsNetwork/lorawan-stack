@@ -238,7 +238,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 		{
 			"ADRParamSetupReq",
 			&ttnpb.MACCommand_ADRParamSetupReq{
-				AdrAckDelayExponent: ttnpb.ADR_ACK_DELAY_4,
+				AdrAckDelayExponent: ttnpb.ADRAckDelayExponent_ADR_ACK_DELAY_4,
 				AdrAckLimitExponent: ttnpb.ADR_ACK_LIMIT_16,
 			},
 			[]byte{0x0C, 0x42},
