@@ -58,22 +58,22 @@ var errEndDeviceEUIsTaken = errors.DefineAlreadyExists(
 )
 
 func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.CreateEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
-	if err = rights.RequireApplication(ctx, *req.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	if err = rights.RequireApplication(ctx, *req.EndDevice.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
-	if err = blacklist.Check(ctx, req.Ids.DeviceId); err != nil {
+	if err = blacklist.Check(ctx, req.EndDevice.Ids.DeviceId); err != nil {
 		return nil, err
 	}
 
 	if req.EndDevice.Picture != nil {
-		if err = is.processEndDevicePicture(ctx, &req.EndDevice); err != nil {
+		if err = is.processEndDevicePicture(ctx, req.EndDevice); err != nil {
 			return nil, err
 		}
 	}
 	defer func() { is.setFullEndDevicePictureURL(ctx, dev) }()
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		dev, err = gormstore.GetEndDeviceStore(db).CreateEndDevice(ctx, &req.EndDevice)
+		dev, err = gormstore.GetEndDeviceStore(db).CreateEndDevice(ctx, req.EndDevice)
 		if err != nil {
 			return err
 		}
@@ -82,12 +82,12 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 	if err != nil {
 		if errors.IsAlreadyExists(err) && errors.Resemble(err, gormstore.ErrEUITaken) {
 			if ids, err := is.getEndDeviceIdentifiersForEUIs(ctx, &ttnpb.GetEndDeviceIdentifiersForEUIsRequest{
-				JoinEui: *req.Ids.JoinEui,
-				DevEui:  *req.Ids.DevEui,
+				JoinEui: *req.EndDevice.Ids.JoinEui,
+				DevEui:  *req.EndDevice.Ids.DevEui,
 			}); err == nil {
 				return nil, errEndDeviceEUIsTaken.WithAttributes(
-					"join_eui", req.Ids.JoinEui.String(),
-					"dev_eui", req.Ids.DevEui.String(),
+					"join_eui", req.EndDevice.Ids.JoinEui.String(),
+					"dev_eui", req.EndDevice.Ids.DevEui.String(),
 					"device_id", ids.GetDeviceId(),
 					"application_id", ids.GetApplicationIds().GetApplicationId(),
 				)
@@ -95,7 +95,7 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 		}
 		return nil, err
 	}
-	events.Publish(evtCreateEndDevice.NewWithIdentifiersAndData(ctx, req.Ids, nil))
+	events.Publish(evtCreateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDevice.Ids, nil))
 	return dev, nil
 }
 
@@ -191,7 +191,7 @@ func (is *IdentityServer) setFullEndDevicePictureURL(ctx context.Context, dev *t
 func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.UpdateEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
 	if clusterauth.Authorized(ctx) == nil {
 		req.FieldMask = cleanFieldMaskPaths([]string{"activated_at", "locations"}, req.FieldMask, nil, getPaths)
-	} else if err = rights.RequireApplication(ctx, *req.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	} else if err = rights.RequireApplication(ctx, *req.EndDevice.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.EndDeviceFieldPathsNested, req.FieldMask, nil, getPaths)
@@ -199,7 +199,7 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 		req.FieldMask = &pbtypes.FieldMask{Paths: updatePaths}
 	}
 
-	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "activated_at") && req.ActivatedAt == nil {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "activated_at") && req.EndDevice.ActivatedAt == nil {
 		// The end device activation state may not be unset once set.
 		req.FieldMask = cleanFieldMaskPaths(ttnpb.EndDeviceFieldPathsNested, req.FieldMask, nil, []string{"activated_at"})
 	}
@@ -209,7 +209,7 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 			req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "picture")
 		}
 		if req.EndDevice.Picture != nil {
-			if err = is.processEndDevicePicture(ctx, &req.EndDevice); err != nil {
+			if err = is.processEndDevicePicture(ctx, req.EndDevice); err != nil {
 				return nil, err
 			}
 		}
@@ -217,13 +217,13 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		dev, err = gormstore.GetEndDeviceStore(db).UpdateEndDevice(ctx, &req.EndDevice, req.FieldMask)
+		dev, err = gormstore.GetEndDeviceStore(db).UpdateEndDevice(ctx, req.EndDevice, req.FieldMask)
 		return err
 	})
 	if err != nil {
 		return nil, err
 	}
-	events.Publish(evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, req.Ids, req.FieldMask.GetPaths()))
+	events.Publish(evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDevice.Ids, req.FieldMask.GetPaths()))
 	return dev, nil
 }
 

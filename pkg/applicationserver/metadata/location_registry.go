@@ -137,7 +137,7 @@ func (c clusterEndDeviceLocationRegistry) Merge(ctx context.Context, ids *ttnpb.
 		dev.Locations[k] = l
 	}
 	_, err = cl.Update(ctx, &ttnpb.UpdateEndDeviceRequest{
-		EndDevice: ttnpb.EndDevice{
+		EndDevice: &ttnpb.EndDevice{
 			Ids:       ids,
 			Locations: dev.Locations,
 		},

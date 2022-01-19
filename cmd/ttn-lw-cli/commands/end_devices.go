@@ -553,7 +553,7 @@ var (
 			if len(jsPaths) > 0 && (device.Ids.JoinEui == nil || device.Ids.DevEui == nil) {
 				return errNoEndDeviceEUI.New()
 			}
-			var isDevice ttnpb.EndDevice
+			isDevice := &ttnpb.EndDevice{}
 			logger.WithField("paths", isPaths).Debug("Create end device on Identity Server")
 			isDevice.SetFields(device, append(isPaths, "ids")...)
 			isRes, err := ttnpb.NewEndDeviceRegistryClient(is).Create(ctx, &ttnpb.CreateEndDeviceRequest{
@@ -1203,7 +1203,7 @@ This command may take end device identifiers from stdin.`,
 			}
 
 			_, err = ttnpb.NewEndDeviceRegistryClient(is).Update(ctx, &ttnpb.UpdateEndDeviceRequest{
-				EndDevice: ttnpb.EndDevice{
+				EndDevice: &ttnpb.EndDevice{
 					Ids: devID,
 				},
 				FieldMask: &pbtypes.FieldMask{

@@ -187,7 +187,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 		if err != nil {
 			return nil, err
 		}
-		var isDevice ttnpb.EndDevice
+		isDevice := &ttnpb.EndDevice{}
 		logger.WithField("paths", isPaths).Debug("Set end device on Identity Server")
 		isDevice.SetFields(device, append(ttnpb.ExcludeFields(isPaths, unsetPaths...), "ids")...)
 		isRes, err := ttnpb.NewEndDeviceRegistryClient(is).Update(ctx, &ttnpb.UpdateEndDeviceRequest{
