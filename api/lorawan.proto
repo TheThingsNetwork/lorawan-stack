@@ -81,19 +81,27 @@ enum MACVersion {
 }
 
 enum PHYVersion {
-  option (thethings.json.enum) = { marshal_as_string: true, prefix: "PHY" };
+  option allow_alias = true;
+  option (thethings.json.enum) = { marshal_as_string: true };
   option (gogoproto.goproto_enum_prefix) = false;
 
-  PHY_UNKNOWN = 0 [(thethings.json.enum_value) = { value: "PHY_UNKNOWN", aliases: ["unknown"] }];
+  PHY_UNKNOWN = 0 [(thethings.json.enum_value) = { aliases: ["unknown"] }];
 
-  TS001_V1_0 = 1 [(thethings.json.enum_value) = { value: "PHY_V1_0", aliases: ["1.0", "1.0.0"] }];
-  TS001_V1_0_1 = 2 [(thethings.json.enum_value) = { value: "PHY_V1_0_1", aliases: ["1.0.1"] }];
+  PHY_V1_0 = 1 [(thethings.json.enum_value) = { aliases: ["1.0", "1.0.0", "V1_0"] }];
+  TS001_V1_0 = 1;
+  PHY_V1_0_1 = 2 [(thethings.json.enum_value) = { aliases: ["1.0.1", "V1_0_1"] }];
+  TS001_V1_0_1 = 2;
 
-  RP001_V1_0_2 = 3 [(thethings.json.enum_value) = { value: "PHY_V1_0_2_REV_A", aliases: ["1.0.2", "1.0.2-a"] }];
-  RP001_V1_0_2_REV_B = 4 [(thethings.json.enum_value) = { value: "PHY_V1_0_2_REV_B", aliases: ["1.0.2-b"] }];
-  RP001_V1_1_REV_A = 5 [(thethings.json.enum_value) = { value: "PHY_V1_1_REV_A", aliases: ["1.1-a", "1.1.0-a"] }];
-  RP001_V1_1_REV_B = 6 [(thethings.json.enum_value) = { value: "PHY_V1_1_REV_B", aliases: ["1.1-b", "1.1.0-b"] }];
-  RP001_V1_0_3_REV_A = 7 [(thethings.json.enum_value) = { value: "PHY_V1_0_3_REV_A", aliases: ["1.0.3-a"] }];
+  PHY_V1_0_2_REV_A = 3 [(thethings.json.enum_value) = { aliases: ["1.0.2", "1.0.2-a", "V1_0_2", "V1_0_2_REV_A"] }];
+  RP001_V1_0_2 = 3;
+  PHY_V1_0_2_REV_B = 4 [(thethings.json.enum_value) = { aliases: ["1.0.2-b", "V1_0_2_REV_B"] }];
+  RP001_V1_0_2_REV_B = 4;
+  PHY_V1_1_REV_A = 5 [(thethings.json.enum_value) = { aliases: ["1.1-a", "1.1.0-a", "V1_1_REV_A"] }];
+  RP001_V1_1_REV_A = 5;
+  PHY_V1_1_REV_B = 6 [(thethings.json.enum_value) = { aliases: ["1.1-b", "1.1.0-b", "V1_1_REV_B"] }];
+  RP001_V1_1_REV_B = 6;
+  PHY_V1_0_3_REV_A = 7 [(thethings.json.enum_value) = { aliases: ["1.0.3-a", "V1_0_3_REV_A"] }];
+  RP001_V1_0_3_REV_A = 7;
 
   RP002_V1_0_0 = 8;
   RP002_V1_0_1 = 9;

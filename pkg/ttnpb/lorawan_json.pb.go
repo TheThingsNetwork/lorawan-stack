@@ -157,26 +157,14 @@ func (x *MACVersion) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
-// PHYVersion_customname contains custom string values that override PHYVersion_name.
-var PHYVersion_customname = map[int32]string{
-	0: "PHY_UNKNOWN",
-	1: "PHY_V1_0",
-	2: "PHY_V1_0_1",
-	3: "PHY_V1_0_2_REV_A",
-	4: "PHY_V1_0_2_REV_B",
-	5: "PHY_V1_1_REV_A",
-	6: "PHY_V1_1_REV_B",
-	7: "PHY_V1_0_3_REV_A",
-}
-
 // MarshalProtoJSON marshals the PHYVersion to JSON.
 func (x PHYVersion) MarshalProtoJSON(s *jsonplugin.MarshalState) {
-	s.WriteEnumString(int32(x), PHYVersion_customname, PHYVersion_name)
+	s.WriteEnumString(int32(x), PHYVersion_name)
 }
 
 // MarshalText marshals the PHYVersion to text.
 func (x PHYVersion) MarshalText() ([]byte, error) {
-	return []byte(jsonplugin.GetEnumString(int32(x), PHYVersion_customname, PHYVersion_name)), nil
+	return []byte(jsonplugin.GetEnumString(int32(x), PHYVersion_name)), nil
 }
 
 // MarshalJSON marshals the PHYVersion to JSON.
@@ -186,27 +174,26 @@ func (x PHYVersion) MarshalJSON() ([]byte, error) {
 
 // PHYVersion_customvalue contains custom string values that extend PHYVersion_value.
 var PHYVersion_customvalue = map[string]int32{
-	"UNKNOWN":          0,
-	"PHY_UNKNOWN":      0,
-	"unknown":          0,
-	"PHY_V1_0":         1,
-	"1.0":              1,
-	"1.0.0":            1,
-	"PHY_V1_0_1":       2,
-	"1.0.1":            2,
-	"PHY_V1_0_2_REV_A": 3,
-	"1.0.2":            3,
-	"1.0.2-a":          3,
-	"PHY_V1_0_2_REV_B": 4,
-	"1.0.2-b":          4,
-	"PHY_V1_1_REV_A":   5,
-	"1.1-a":            5,
-	"1.1.0-a":          5,
-	"PHY_V1_1_REV_B":   6,
-	"1.1-b":            6,
-	"1.1.0-b":          6,
-	"PHY_V1_0_3_REV_A": 7,
-	"1.0.3-a":          7,
+	"unknown":      0,
+	"1.0":          1,
+	"1.0.0":        1,
+	"V1_0":         1,
+	"1.0.1":        2,
+	"V1_0_1":       2,
+	"1.0.2":        3,
+	"1.0.2-a":      3,
+	"V1_0_2":       3,
+	"V1_0_2_REV_A": 3,
+	"1.0.2-b":      4,
+	"V1_0_2_REV_B": 4,
+	"1.1-a":        5,
+	"1.1.0-a":      5,
+	"V1_1_REV_A":   5,
+	"1.1-b":        6,
+	"1.1.0-b":      6,
+	"V1_1_REV_B":   6,
+	"1.0.3-a":      7,
+	"V1_0_3_REV_A": 7,
 }
 
 // UnmarshalProtoJSON unmarshals the PHYVersion from JSON.
