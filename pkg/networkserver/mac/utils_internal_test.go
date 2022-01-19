@@ -584,7 +584,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			EarliestAt: beaconAt,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_1S},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_1S},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
@@ -598,7 +598,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			EarliestAt: beaconAt,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_2S},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_2S},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
@@ -612,7 +612,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			EarliestAt: beaconAt,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_4S},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_4S},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
@@ -626,7 +626,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			EarliestAt: beaconAt,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_8S},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_8S},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
@@ -640,7 +640,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			EarliestAt: beaconAt,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_16S},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
@@ -654,7 +654,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			EarliestAt: beaconAt.Add(12*time.Second + 120*time.Millisecond + 1*time.Microsecond + 500*time.Nanosecond),
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_8S},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_8S},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
@@ -668,7 +668,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			EarliestAt: beaconAt.Add(20 * time.Second),
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_16S},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
@@ -682,7 +682,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			EarliestAt: beaconAt.Add(38 * time.Second),
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_16S},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
@@ -696,7 +696,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			EarliestAt: beaconAt.Add(50 * time.Second),
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_16S},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,

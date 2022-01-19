@@ -56,14 +56,14 @@ var regionalParametersToPB = map[string]ttnpb.PHYVersion{
 
 // pingSlotPeriodToPB maps LoRaWAN schema ping slot period to ttnpb.PingSlotPeriod enum values.
 var pingSlotPeriodToPB = map[uint32]ttnpb.PingSlotPeriod{
-	1:   ttnpb.PING_EVERY_1S,
-	2:   ttnpb.PING_EVERY_2S,
-	4:   ttnpb.PING_EVERY_4S,
-	8:   ttnpb.PING_EVERY_8S,
-	16:  ttnpb.PING_EVERY_16S,
-	32:  ttnpb.PING_EVERY_32S,
-	64:  ttnpb.PING_EVERY_64S,
-	128: ttnpb.PING_EVERY_128S,
+	1:   ttnpb.PingSlotPeriod_PING_EVERY_1S,
+	2:   ttnpb.PingSlotPeriod_PING_EVERY_2S,
+	4:   ttnpb.PingSlotPeriod_PING_EVERY_4S,
+	8:   ttnpb.PingSlotPeriod_PING_EVERY_8S,
+	16:  ttnpb.PingSlotPeriod_PING_EVERY_16S,
+	32:  ttnpb.PingSlotPeriod_PING_EVERY_32S,
+	64:  ttnpb.PingSlotPeriod_PING_EVERY_64S,
+	128: ttnpb.PingSlotPeriod_PING_EVERY_128S,
 }
 
 func init() {

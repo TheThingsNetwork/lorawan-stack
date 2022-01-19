@@ -214,7 +214,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					},
 					DesiredParameters: &ttnpb.MACParameters{},
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{
-						Value: ttnpb.PING_EVERY_2S,
+						Value: ttnpb.PingSlotPeriod_PING_EVERY_2S,
 					},
 					LorawanVersion:     ttnpb.MAC_V1_0_3,
 					DeviceClass:        ttnpb.CLASS_B,
@@ -238,7 +238,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					},
 					DesiredParameters: &ttnpb.MACParameters{},
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{
-						Value: ttnpb.PING_EVERY_2S,
+						Value: ttnpb.PingSlotPeriod_PING_EVERY_2S,
 					},
 					LorawanVersion: ttnpb.MAC_V1_0_3,
 					DeviceClass:    ttnpb.CLASS_B,
@@ -257,7 +257,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					},
 					DesiredParameters: &ttnpb.MACParameters{},
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{
-						Value: ttnpb.PING_EVERY_2S,
+						Value: ttnpb.PingSlotPeriod_PING_EVERY_2S,
 					},
 					LorawanVersion: ttnpb.MAC_V1_0_3,
 					DeviceClass:    ttnpb.CLASS_B,

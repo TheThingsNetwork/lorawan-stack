@@ -407,7 +407,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 	multicastClassBMACSettings := defaultMACSettings
 	multicastClassBMACSettings.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
-		Value: ttnpb.PING_EVERY_16S,
+		Value: ttnpb.PingSlotPeriod_PING_EVERY_16S,
 	}
 
 	multicastClassBMACSettingsOpt := EndDeviceOptions.WithMacSettings(&multicastClassBMACSettings)

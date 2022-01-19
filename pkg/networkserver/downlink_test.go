@@ -242,7 +242,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 	)
 
 	pingSlotPeriodicity := &ttnpb.PingSlotPeriodValue{
-		Value: ttnpb.PING_EVERY_8S,
+		Value: ttnpb.PingSlotPeriod_PING_EVERY_8S,
 	}
 
 	_, ctx := test.New(t)

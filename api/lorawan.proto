@@ -613,7 +613,6 @@ enum AggregatedDutyCycle {
 
 enum PingSlotPeriod {
   option (thethings.json.enum) = { marshal_as_string: true, prefix: "PING_EVERY" };
-  option (gogoproto.goproto_enum_prefix) = false;
 
   PING_EVERY_1S = 0;   // Every second.
   PING_EVERY_2S = 1;   // Every 2 seconds.
