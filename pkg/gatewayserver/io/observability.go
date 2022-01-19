@@ -65,22 +65,22 @@ var ioMetrics = &messageMetrics{
 var (
 	evtRepeatUp = events.Define(
 		"gs.io.up.repeat", "received repeated uplink message from gateway",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.GatewayIdentifiers{}),
 	)
 	evtDropUplink = events.Define(
 		"gs.io.up.drop", "drop uplink message",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)
 	evtDropStatus = events.Define(
 		"gs.io.status.drop", "drop gateway status",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_STATUS_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_STATUS_READ),
 		events.WithErrorDataType(),
 	)
 	evtDropTxAck = events.Define(
 		"gs.io.tx.ack.drop", "drop tx ack message",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)
 )

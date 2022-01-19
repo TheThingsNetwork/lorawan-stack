@@ -24,7 +24,7 @@ import (
 
 // GetGatewayConnectionStats returns statistics about a gateway connection.
 func (gs *GatewayServer) GetGatewayConnectionStats(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayConnectionStats, error) {
-	if err := gs.entityRegistry.AssertGatewayRights(ctx, *ids, ttnpb.RIGHT_GATEWAY_STATUS_READ); err != nil {
+	if err := gs.entityRegistry.AssertGatewayRights(ctx, *ids, ttnpb.Right_RIGHT_GATEWAY_STATUS_READ); err != nil {
 		return nil, err
 	}
 

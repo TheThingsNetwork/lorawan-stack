@@ -91,7 +91,7 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 	if err = s.server.ValidateGatewayID(ctx, ids); err != nil {
 		return err
 	}
-	if err = rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
+	if err = rights.RequireGateway(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_LINK); err != nil {
 		return err
 	}
 
@@ -183,7 +183,7 @@ func (s *impl) GetConcentratorConfig(ctx context.Context, _ *pbtypes.Empty) (*tt
 	if err := ids.ValidateContext(ctx); err != nil {
 		return nil, err
 	}
-	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
+	if err := rights.RequireGateway(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
 	fps, err := s.server.GetFrequencyPlans(ctx, ids)
@@ -202,7 +202,7 @@ func (s *impl) GetConcentratorConfig(ctx context.Context, _ *pbtypes.Empty) (*tt
 var errNoMQTTConfigProvider = errors.DefineUnimplemented("no_configuration_provider", "no MQTT configuration provider available")
 
 func getMQTTConnectionProvider(ctx context.Context, ids *ttnpb.GatewayIdentifiers, provider config.MQTTConfigProvider) (*ttnpb.MQTTConnectionInfo, error) {
-	if err := rights.RequireGateway(ctx, *ids, ttnpb.RIGHT_GATEWAY_INFO); err != nil {
+	if err := rights.RequireGateway(ctx, *ids, ttnpb.Right_RIGHT_GATEWAY_INFO); err != nil {
 		return nil, err
 	}
 	if provider == nil {

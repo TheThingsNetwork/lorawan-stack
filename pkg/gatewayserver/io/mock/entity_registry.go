@@ -93,8 +93,8 @@ func (is *IdentityServer) ListRights(ctx context.Context, ids *ttnpb.GatewayIden
 	for _, auth := range auths {
 		if auth == authorization[0] {
 			res.Rights = append(res.Rights,
-				ttnpb.RIGHT_GATEWAY_INFO,
-				ttnpb.RIGHT_GATEWAY_LINK,
+				ttnpb.Right_RIGHT_GATEWAY_INFO,
+				ttnpb.Right_RIGHT_GATEWAY_LINK,
 			)
 		}
 	}

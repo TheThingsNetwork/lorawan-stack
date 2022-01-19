@@ -40,20 +40,20 @@ import (
 var (
 	evtCreateEndDevice = events.Define(
 		"ns.end_device.create", "create end device",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_DEVICES_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtUpdateEndDevice = events.Define(
 		"ns.end_device.update", "update end device",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_DEVICES_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ),
 		events.WithUpdatedFieldsDataType(),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtDeleteEndDevice = events.Define(
 		"ns.end_device.delete", "delete end device",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_DEVICES_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
@@ -66,14 +66,14 @@ func appendRequiredDeviceReadRights(rights []ttnpb.Right, gets ...string) []ttnp
 		return rights
 	}
 	rights = append(rights,
-		ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 	)
 	if ttnpb.HasAnyField(gets,
 		"pending_session.queued_application_downlinks",
 		"queued_application_downlinks",
 		"session.queued_application_downlinks",
 	) {
-		rights = append(rights, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ)
+		rights = append(rights, ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ)
 	}
 	if ttnpb.HasAnyField(gets,
 		"mac_state.queued_join_accept.keys.f_nwk_s_int_key.key",
@@ -89,7 +89,7 @@ func appendRequiredDeviceReadRights(rights []ttnpb.Right, gets ...string) []ttnp
 		"session.keys.nwk_s_enc_key.key",
 		"session.keys.s_nwk_s_int_key.key",
 	) {
-		rights = append(rights, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS)
+		rights = append(rights, ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS)
 	}
 	return rights
 }
@@ -926,7 +926,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	st := newSetDeviceState(&req.EndDevice, req.FieldMask.GetPaths()...)
 
 	requiredRights := append(make([]ttnpb.Right, 0, 2),
-		ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 	)
 	if st.HasSetField(
 		"pending_mac_state.queued_join_accept.keys.app_s_key.encrypted_key",
@@ -945,7 +945,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"session.keys.s_nwk_s_int_key.key",
 		"session.keys.session_key_id",
 	) {
-		requiredRights = append(requiredRights, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS)
+		requiredRights = append(requiredRights, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS)
 	}
 	if err := rights.RequireApplication(ctx, *st.Device.Ids.ApplicationIds, requiredRights...); err != nil {
 		return nil, err
@@ -2435,7 +2435,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 // ResetFactoryDefaults implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.ResetAndGetEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, appendRequiredDeviceReadRights(
-		append(make([]ttnpb.Right, 0, 1+maxRequiredDeviceReadRightCount), ttnpb.RIGHT_APPLICATION_DEVICES_WRITE),
+		append(make([]ttnpb.Right, 0, 1+maxRequiredDeviceReadRightCount), ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE),
 		req.FieldMask.GetPaths()...,
 	)...); err != nil {
 		return nil, err
@@ -2512,7 +2512,7 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 
 // Delete implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	var evt events.Event

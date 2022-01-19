@@ -27,7 +27,7 @@ import (
 )
 
 func (is *IdentityServer) listOAuthClientAuthorizations(ctx context.Context, req *ttnpb.ListOAuthClientAuthorizationsRequest) (authorizations *ttnpb.OAuthClientAuthorizations, err error) {
-	if err := rights.RequireUser(ctx, *req.UserIds, ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
+	if err := rights.RequireUser(ctx, *req.UserIds, ttnpb.Right_RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
 		return nil, err
 	}
 	ctx = store.WithOrder(ctx, req.Order)
@@ -56,7 +56,7 @@ func (is *IdentityServer) listOAuthAccessTokens(ctx context.Context, req *ttnpb.
 	}
 	accessToken := authInfo.GetOauthAccessToken()
 	if accessToken == nil || accessToken.UserIds.GetUserId() != req.UserIds.GetUserId() || accessToken.ClientIds.ClientId != req.ClientIds.ClientId {
-		if err := rights.RequireUser(ctx, *req.UserIds, ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
+		if err := rights.RequireUser(ctx, *req.UserIds, ttnpb.Right_RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
 			return nil, err
 		}
 	}
@@ -83,7 +83,7 @@ func (is *IdentityServer) listOAuthAccessTokens(ctx context.Context, req *ttnpb.
 }
 
 func (is *IdentityServer) deleteOAuthAuthorization(ctx context.Context, req *ttnpb.OAuthClientAuthorizationIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireUser(ctx, *req.UserIds, ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
+	if err := rights.RequireUser(ctx, *req.UserIds, ttnpb.Right_RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) (err error) {
@@ -104,7 +104,7 @@ func (is *IdentityServer) deleteOAuthAccessToken(ctx context.Context, req *ttnpb
 	}
 	accessToken := authInfo.GetOauthAccessToken()
 	if accessToken == nil || accessToken.UserIds.GetUserId() != req.UserIds.GetUserId() || accessToken.ClientIds.ClientId != req.ClientIds.ClientId {
-		if err := rights.RequireUser(ctx, *req.UserIds, ttnpb.RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
+		if err := rights.RequireUser(ctx, *req.UserIds, ttnpb.Right_RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
 			return nil, err
 		}
 	}

@@ -46,7 +46,7 @@ func (is *IdentityServer) sendInvitation(ctx context.Context, in *ttnpb.SendInvi
 	if err != nil {
 		return nil, err
 	}
-	if !authInfo.GetUniversalRights().IncludesAll(ttnpb.RIGHT_SEND_INVITES) {
+	if !authInfo.GetUniversalRights().IncludesAll(ttnpb.Right_RIGHT_SEND_INVITES) {
 		return nil, errNoInviteRights.New()
 	}
 	token, err := auth.GenerateKey(ctx)
@@ -88,7 +88,7 @@ func (is *IdentityServer) listInvitations(ctx context.Context, req *ttnpb.ListIn
 	if err != nil {
 		return nil, err
 	}
-	if !authInfo.GetUniversalRights().IncludesAll(ttnpb.RIGHT_SEND_INVITES) {
+	if !authInfo.GetUniversalRights().IncludesAll(ttnpb.Right_RIGHT_SEND_INVITES) {
 		return nil, errNoInviteRights.New()
 	}
 	invitations = &ttnpb.Invitations{}
@@ -107,7 +107,7 @@ func (is *IdentityServer) deleteInvitation(ctx context.Context, in *ttnpb.Delete
 	if err != nil {
 		return nil, err
 	}
-	if !authInfo.GetUniversalRights().IncludesAll(ttnpb.RIGHT_SEND_INVITES) {
+	if !authInfo.GetUniversalRights().IncludesAll(ttnpb.Right_RIGHT_SEND_INVITES) {
 		return nil, errNoInviteRights.New()
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {

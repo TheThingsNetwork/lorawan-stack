@@ -46,7 +46,7 @@ func init() {
 		applicationID := population.Applications[i].GetEntityIdentifiers()
 		population.Memberships[applicationID] = append(population.Memberships[applicationID], &ttnpb.Collaborator{
 			Ids:    paginationUser.OrganizationOrUserIdentifiers(),
-			Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
+			Rights: []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL},
 		})
 	}
 }

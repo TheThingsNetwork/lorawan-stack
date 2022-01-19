@@ -146,11 +146,11 @@ func (is *mockIS) ListRights(ctx context.Context, ids *ttnpb.ApplicationIdentifi
 	for _, auth := range auths {
 		if auth == authorization[0] {
 			res.Rights = append(res.Rights,
-				ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
-				ttnpb.RIGHT_APPLICATION_DEVICES_READ,
-				ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
-				ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
-				ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
+				ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
+				ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
+				ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+				ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ,
+				ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
 			)
 		}
 	}

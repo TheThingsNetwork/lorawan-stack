@@ -47,7 +47,7 @@ func TestNew(t *testing.T) {
 	ctx := events.ContextWithCorrelationID(test.Context(), t.Name())
 	evt := events.New(ctx, "test.evt", "test event", events.WithAuthFromContext())
 	a.So(evt.CorrelationIDs(), should.Resemble, []string{"TestNew"})
-	a.So(evt.Visibility().GetRights(), should.Contain, ttnpb.RIGHT_ALL)
+	a.So(evt.Visibility().GetRights(), should.Contain, ttnpb.Right_RIGHT_ALL)
 	a.So(evt.AuthType(), should.Equal, "")
 	a.So(evt.AuthTokenType(), should.Equal, "")
 	a.So(evt.AuthTokenID(), should.Equal, "")
@@ -88,7 +88,7 @@ func TestUnmarshalJSON(t *testing.T) {
 			context.Background(), "name", "description",
 			events.WithIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationId: "application_id"}),
 			events.WithData("data"),
-			events.WithVisibility(ttnpb.RIGHT_ALL),
+			events.WithVisibility(ttnpb.Right_RIGHT_ALL),
 		)
 		json, err := json.Marshal(evt)
 		a.So(err, should.BeNil)
@@ -103,7 +103,7 @@ func TestUnmarshalJSON(t *testing.T) {
 			context.Background(), "name", "description",
 			events.WithIdentifiers(&ttnpb.ApplicationIdentifiers{ApplicationId: "application_id"}),
 			events.WithData(fieldmask),
-			events.WithVisibility(ttnpb.RIGHT_ALL),
+			events.WithVisibility(ttnpb.Right_RIGHT_ALL),
 		)
 		json, err := json.Marshal(evt)
 		a.So(err, should.BeNil)
@@ -137,7 +137,7 @@ func Example() {
 	// Event names are lowercase snake_case and can be dot-separated as component.subsystem.subsystem.event
 	// Event descriptions are short descriptions of what the event means.
 	// Visibility rights are optional. If no rights are supplied, then the _ALL right is assumed.
-	adrSendEvent := events.Define("ns.mac.adr.send_req", "send ADR request", events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ))
+	adrSendEvent := events.Define("ns.mac.adr.send_req", "send ADR request", events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ))
 
 	// These variables come from the request or you got them from the db or something.
 	var (

@@ -111,7 +111,7 @@ func (p *Population) NewApplication(owner *ttnpb.OrganizationOrUserIdentifiers) 
 		Name: fmt.Sprintf("Application %02d", i),
 	}
 	p.Applications = append(p.Applications, app)
-	p.NewMembership(owner, app.GetEntityIdentifiers(), ttnpb.RIGHT_ALL)
+	p.NewMembership(owner, app.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
 	return app
 }
 
@@ -127,7 +127,7 @@ func (p *Population) NewClient(owner *ttnpb.OrganizationOrUserIdentifiers) *ttnp
 		State: ttnpb.State_STATE_APPROVED,
 	}
 	p.Clients = append(p.Clients, cli)
-	p.NewMembership(owner, cli.GetEntityIdentifiers(), ttnpb.RIGHT_ALL)
+	p.NewMembership(owner, cli.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
 	return cli
 }
 
@@ -157,7 +157,7 @@ func (p *Population) NewGateway(owner *ttnpb.OrganizationOrUserIdentifiers) *ttn
 		Name: fmt.Sprintf("Gateway %02d", i),
 	}
 	p.Gateways = append(p.Gateways, gtw)
-	p.NewMembership(owner, gtw.GetEntityIdentifiers(), ttnpb.RIGHT_ALL)
+	p.NewMembership(owner, gtw.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
 	return gtw
 }
 
@@ -172,7 +172,7 @@ func (p *Population) NewOrganization(owner *ttnpb.OrganizationOrUserIdentifiers)
 		Name: fmt.Sprintf("Organization %02d", i),
 	}
 	p.Organizations = append(p.Organizations, org)
-	p.NewMembership(owner, org.GetEntityIdentifiers(), ttnpb.RIGHT_ALL)
+	p.NewMembership(owner, org.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
 	return org
 }
 

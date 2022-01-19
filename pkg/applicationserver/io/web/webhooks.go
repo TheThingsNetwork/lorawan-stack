@@ -179,7 +179,7 @@ func (w *webhooks) RegisterRoutes(server *ttnweb.Server) {
 		mux.MiddlewareFunc(webmiddleware.Namespace("applicationserver/io/web")),
 		mux.MiddlewareFunc(webmiddleware.Metadata("Authorization")),
 		w.validateAndFillIDs,
-		w.requireApplicationRights(ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE),
+		w.requireApplicationRights(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE),
 		w.requireRateLimits(),
 	)
 

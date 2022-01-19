@@ -424,7 +424,7 @@ type connectionEntry struct {
 // Connect connects a gateway by its identifiers to the Gateway Server, and returns a io.Connection for traffic and
 // control.
 func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
-	if err := gs.entityRegistry.AssertGatewayRights(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
+	if err := gs.entityRegistry.AssertGatewayRights(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
 

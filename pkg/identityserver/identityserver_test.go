@@ -93,11 +93,11 @@ func init() {
 				apiKeys,
 				&ttnpb.APIKey{
 					Name:   "key without rights",
-					Rights: []ttnpb.Right{ttnpb.RIGHT_SEND_INVITES},
+					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_SEND_INVITES},
 				},
 				&ttnpb.APIKey{
 					Name:      "expired key",
-					Rights:    []ttnpb.Right{ttnpb.RIGHT_USER_ALL},
+					Rights:    []ttnpb.Right{ttnpb.Right_RIGHT_USER_ALL},
 					ExpiresAt: ttnpb.ProtoTimePtr(expiredTime),
 				},
 			)

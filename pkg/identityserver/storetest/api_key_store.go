@@ -46,13 +46,13 @@ func (st *StoreTest) TestAPIKeyStoreCRUD(t *T) {
 	}
 
 	someRights := map[string]*ttnpb.Rights{
-		app1.EntityType(): ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_ALL),
-		cli1.EntityType(): ttnpb.RightsFrom(ttnpb.RIGHT_CLIENT_ALL),
-		gtw1.EntityType(): ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_ALL),
-		org1.EntityType(): ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_ALL),
-		usr1.EntityType(): ttnpb.RightsFrom(ttnpb.RIGHT_USER_ALL),
+		app1.EntityType(): ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_ALL),
+		cli1.EntityType(): ttnpb.RightsFrom(ttnpb.Right_RIGHT_CLIENT_ALL),
+		gtw1.EntityType(): ttnpb.RightsFrom(ttnpb.Right_RIGHT_GATEWAY_ALL),
+		org1.EntityType(): ttnpb.RightsFrom(ttnpb.Right_RIGHT_ORGANIZATION_ALL),
+		usr1.EntityType(): ttnpb.RightsFrom(ttnpb.Right_RIGHT_USER_ALL),
 	}
-	allRights := ttnpb.RightsFrom(ttnpb.RIGHT_ALL)
+	allRights := ttnpb.RightsFrom(ttnpb.Right_RIGHT_ALL)
 
 	for _, ids := range []*ttnpb.EntityIdentifiers{
 		app1.GetEntityIdentifiers(),

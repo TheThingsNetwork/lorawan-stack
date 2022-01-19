@@ -156,10 +156,10 @@ func (is *IdentityServer) GatewayRights(ctx context.Context, gtwIDs ttnpb.Gatewa
 			return err
 		}
 		if gtw.StatusPublic {
-			entity = entity.Union(ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_STATUS_READ))
+			entity = entity.Union(ttnpb.RightsFrom(ttnpb.Right_RIGHT_GATEWAY_STATUS_READ))
 		}
 		if gtw.LocationPublic {
-			entity = entity.Union(ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_LOCATION_READ))
+			entity = entity.Union(ttnpb.RightsFrom(ttnpb.Right_RIGHT_GATEWAY_LOCATION_READ))
 		}
 		return nil
 	})

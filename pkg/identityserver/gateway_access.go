@@ -34,27 +34,27 @@ import (
 var (
 	evtCreateGatewayAPIKey = events.Define(
 		"gateway.api-key.create", "create gateway API key",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtUpdateGatewayAPIKey = events.Define(
 		"gateway.api-key.update", "update gateway API key",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtDeleteGatewayAPIKey = events.Define(
 		"gateway.api-key.delete", "delete gateway API key",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtUpdateGatewayCollaborator = events.Define(
 		"gateway.collaborator.update", "update gateway collaborator",
 		events.WithVisibility(
-			ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS,
-			ttnpb.RIGHT_USER_GATEWAYS_LIST,
+			ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS,
+			ttnpb.Right_RIGHT_USER_GATEWAYS_LIST,
 		),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
@@ -62,8 +62,8 @@ var (
 	evtDeleteGatewayCollaborator = events.Define(
 		"gateway.collaborator.delete", "delete gateway collaborator",
 		events.WithVisibility(
-			ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS,
-			ttnpb.RIGHT_USER_GATEWAYS_LIST,
+			ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS,
+			ttnpb.Right_RIGHT_USER_GATEWAYS_LIST,
 		),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
@@ -80,7 +80,7 @@ func (is *IdentityServer) listGatewayRights(ctx context.Context, ids *ttnpb.Gate
 
 func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.CreateGatewayAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
-	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 	// Require that caller has at least the rights of the API key.
@@ -111,7 +111,7 @@ func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.Cr
 }
 
 func (is *IdentityServer) listGatewayAPIKeys(ctx context.Context, req *ttnpb.ListGatewayAPIKeysRequest) (keys *ttnpb.APIKeys, err error) {
-	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 	var total uint64
@@ -136,7 +136,7 @@ func (is *IdentityServer) listGatewayAPIKeys(ctx context.Context, req *ttnpb.Lis
 }
 
 func (is *IdentityServer) getGatewayAPIKey(ctx context.Context, req *ttnpb.GetGatewayAPIKeyRequest) (key *ttnpb.APIKey, err error) {
-	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 
@@ -157,7 +157,7 @@ func (is *IdentityServer) getGatewayAPIKey(ctx context.Context, req *ttnpb.GetGa
 
 func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.UpdateGatewayAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
-	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 
@@ -211,7 +211,7 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 }
 
 func (is *IdentityServer) getGatewayCollaborator(ctx context.Context, req *ttnpb.GetGatewayCollaboratorRequest) (*ttnpb.GetCollaboratorResponse, error) {
-	if err := rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
+	if err := rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
 	res := &ttnpb.GetCollaboratorResponse{
@@ -239,7 +239,7 @@ var errGatewayNeedsCollaborator = errors.DefineFailedPrecondition("gateway_needs
 
 func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest) (*pbtypes.Empty, error) {
 	// Require that caller has rights to manage collaborators.
-	if err := rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
+	if err := rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
@@ -272,7 +272,7 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 			}
 		}
 
-		if removedRights.IncludesAll(ttnpb.RIGHT_GATEWAY_ALL) {
+		if removedRights.IncludesAll(ttnpb.Right_RIGHT_GATEWAY_ALL) {
 			memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.GetGatewayIds().GetEntityIdentifiers())
 			if err != nil {
 				return err
@@ -282,7 +282,7 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 				if unique.ID(ctx, member) == unique.ID(ctx, req.GetCollaborator().GetIds()) {
 					continue
 				}
-				if rights.Implied().IncludesAll(ttnpb.RIGHT_GATEWAY_ALL) {
+				if rights.Implied().IncludesAll(ttnpb.Right_RIGHT_GATEWAY_ALL) {
 					hasOtherOwner = true
 					break
 				}
@@ -321,7 +321,7 @@ func (is *IdentityServer) listGatewayCollaborators(ctx context.Context, req *ttn
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
+	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		defer func() { collaborators = collaborators.PublicSafe() }()
 	}
 	var total uint64

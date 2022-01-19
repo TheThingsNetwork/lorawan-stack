@@ -252,7 +252,7 @@ func newContextWithRightsFetcher(ctx context.Context) context.Context {
 				return nil, nil
 			}
 			return ttnpb.RightsFrom(
-				ttnpb.RIGHT_GATEWAY_INFO,
+				ttnpb.Right_RIGHT_GATEWAY_INFO,
 			), nil
 		}),
 	})

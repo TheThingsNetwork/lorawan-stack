@@ -68,7 +68,7 @@ var createAPIKeyCommand = &cobra.Command{
 		usr := &ttnpb.User{
 			Ids: &ttnpb.UserIdentifiers{UserId: userID},
 		}
-		rights := []ttnpb.Right{ttnpb.RIGHT_ALL}
+		rights := []ttnpb.Right{ttnpb.Right_RIGHT_ALL}
 		apiKeyStore := store.GetAPIKeyStore(db)
 		key, token, err := is.GenerateAPIKey(ctx, name, expiryDate, rights...)
 		if err != nil {

@@ -41,7 +41,7 @@ func (m *AuthInfoResponse) GetRights() []Right {
 	case *AuthInfoResponse_OauthAccessToken:
 		return accessMethod.OauthAccessToken.GetRights()
 	case *AuthInfoResponse_UserSession:
-		return RightsFrom(RIGHT_ALL).Implied().GetRights()
+		return RightsFrom(Right_RIGHT_ALL).Implied().GetRights()
 	}
 	return nil
 }

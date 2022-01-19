@@ -245,7 +245,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			// current and future rights. When using this auth type, the respective
 			// handlers need to ensure thorough CSRF and CORS protection using
 			// appropriate middleware.
-			userRights = ttnpb.RightsFrom(ttnpb.RIGHT_ALL).Implied()
+			userRights = ttnpb.RightsFrom(ttnpb.Right_RIGHT_ALL).Implied()
 			return nil
 		}
 	default:
@@ -261,14 +261,14 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 
 		if is.configFromContext(ctx).UserRegistration.ContactInfoValidation.Required && user.PrimaryEmailAddressValidatedAt == nil {
 			// Go to profile page, edit basic settings (such as email), delete account.
-			restrictRights(res, ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO, ttnpb.RIGHT_USER_SETTINGS_BASIC, ttnpb.RIGHT_USER_DELETE))
+			restrictRights(res, ttnpb.RightsFrom(ttnpb.Right_RIGHT_USER_INFO, ttnpb.Right_RIGHT_USER_SETTINGS_BASIC, ttnpb.Right_RIGHT_USER_DELETE))
 			warning.Add(ctx, "Restricted rights until email address validated")
 		}
 
 		switch user.State {
 		case ttnpb.State_STATE_REQUESTED:
 			// Go to profile page, edit basic settings (such as email), delete account.
-			restrictRights(res, ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO, ttnpb.RIGHT_USER_SETTINGS_BASIC, ttnpb.RIGHT_USER_DELETE))
+			restrictRights(res, ttnpb.RightsFrom(ttnpb.Right_RIGHT_USER_INFO, ttnpb.Right_RIGHT_USER_SETTINGS_BASIC, ttnpb.Right_RIGHT_USER_DELETE))
 			warning.Add(ctx, "Restricted rights while account pending")
 		case ttnpb.State_STATE_APPROVED:
 			// Normal user.
@@ -282,7 +282,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			}
 		case ttnpb.State_STATE_REJECTED:
 			// Go to profile page, delete account.
-			restrictRights(res, ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO, ttnpb.RIGHT_USER_DELETE))
+			restrictRights(res, ttnpb.RightsFrom(ttnpb.Right_RIGHT_USER_INFO, ttnpb.Right_RIGHT_USER_DELETE))
 			if user.StateDescription != "" {
 				warning.Add(ctx, fmt.Sprintf("Restricted rights after account rejection: %s", user.StateDescription))
 			} else {
@@ -292,7 +292,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			// Innocent until proven guilty.
 		case ttnpb.State_STATE_SUSPENDED:
 			// Go to profile page.
-			restrictRights(res, ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO))
+			restrictRights(res, ttnpb.RightsFrom(ttnpb.Right_RIGHT_USER_INFO))
 			if user.StateDescription != "" {
 				warning.Add(ctx, fmt.Sprintf("Restricted rights after account suspension: %s", user.StateDescription))
 			} else {

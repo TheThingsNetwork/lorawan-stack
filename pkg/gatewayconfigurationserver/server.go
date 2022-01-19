@@ -123,7 +123,7 @@ func (s *Server) RegisterRoutes(server *web.Server) {
 		validateAndFillIDs,
 	)
 	if s.config.RequireAuth {
-		router.Use(mux.MiddlewareFunc(s.requireGatewayRights(ttnpb.RIGHT_GATEWAY_INFO)))
+		router.Use(mux.MiddlewareFunc(s.requireGatewayRights(ttnpb.Right_RIGHT_GATEWAY_INFO)))
 	}
 
 	router.Handle("/semtechudp/global_conf.json",

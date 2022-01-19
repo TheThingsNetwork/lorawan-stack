@@ -37,14 +37,14 @@ var withIdentifiersOption = events.WithDataType(&ttnpb.ApplicationPubSubIdentifi
 var (
 	evtSetPubSub = events.Define(
 		"as.pubsub.set", "set pub/sub",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC),
 		withIdentifiersOption,
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtDeletePubSub = events.Define(
 		"as.pubsub.delete", "delete pub/sub",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC),
 		withIdentifiersOption,
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
@@ -52,27 +52,27 @@ var (
 	evtPubSubStart = events.Define(
 		"as.pubsub.start", "start pub/sub",
 		events.WithVisibility(
-			ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
-			ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
-			ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
+			ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
+			ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ,
+			ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
 		),
 		withIdentifiersOption,
 	)
 	evtPubSubStop = events.Define(
 		"as.pubsub.stop", "stop pub/sub",
 		events.WithVisibility(
-			ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
-			ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
-			ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
+			ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
+			ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ,
+			ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
 		),
 		withIdentifiersOption,
 	)
 	evtPubSubFail = events.Define(
 		"as.pubsub.fail", "fail pub/sub",
 		events.WithVisibility(
-			ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
-			ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
-			ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
+			ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
+			ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ,
+			ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
 		),
 		events.WithErrorDataType(),
 	)

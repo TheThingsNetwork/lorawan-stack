@@ -31,20 +31,20 @@ import (
 var (
 	evtCreateEndDevice = events.Define(
 		"js.end_device.create", "create end device",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_DEVICES_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtUpdateEndDevice = events.Define(
 		"js.end_device.update", "update end device",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_DEVICES_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ),
 		events.WithUpdatedFieldsDataType(),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtDeleteEndDevice = events.Define(
 		"js.end_device.delete", "delete end device",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_DEVICES_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
@@ -57,7 +57,7 @@ type jsEndDeviceRegistryServer struct {
 
 // Get implements ttnpb.JsEndDeviceRegistryServer.
 func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ); err != nil {
+	if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
 	gets := req.FieldMask.GetPaths()
@@ -65,7 +65,7 @@ func (srv jsEndDeviceRegistryServer) Get(ctx context.Context, req *ttnpb.GetEndD
 		"root_keys.app_key.key",
 		"root_keys.nwk_key.key",
 	) {
-		if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
+		if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 			return nil, err
 		}
 		gets = ttnpb.AddFields(gets,
@@ -191,7 +191,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 		return nil, errInvalidFieldValue.WithAttributes("field", "root_keys.app_key.key")
 	}
 
-	if err = rights.RequireApplication(ctx, *req.EndDevice.Ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	if err = rights.RequireApplication(ctx, *req.EndDevice.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(),
@@ -199,7 +199,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 		"root_keys.nwk_key.key",
 		"root_keys.root_key_id",
 	) {
-		if err := rights.RequireApplication(ctx, *req.EndDevice.Ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
+		if err := rights.RequireApplication(ctx, *req.EndDevice.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 			return nil, err
 		}
 	}
@@ -277,7 +277,7 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 // Provision is deprecated.
 // TODO: Remove (https://github.com/TheThingsNetwork/lorawan-stack/issues/999)
 func (srv jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesRequest, stream ttnpb.JsEndDeviceRegistry_ProvisionServer) error {
-	if err := rights.RequireApplication(stream.Context(), *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
+	if err := rights.RequireApplication(stream.Context(), *req.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 		return err
 	}
 	return errProvisionerNotFound.WithAttributes("id", req.ProvisionerId)
@@ -285,7 +285,7 @@ func (srv jsEndDeviceRegistryServer) Provision(req *ttnpb.ProvisionEndDevicesReq
 
 // Delete implements ttnpb.JsEndDeviceRegistryServer.
 func (srv jsEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireApplication(ctx, *ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	if err := rights.RequireApplication(ctx, *ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	var evt events.Event

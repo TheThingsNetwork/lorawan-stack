@@ -75,7 +75,7 @@ var (
 		Grants:             []ttnpb.GrantType{ttnpb.GrantType_GRANT_AUTHORIZATION_CODE, ttnpb.GrantType_GRANT_REFRESH_TOKEN},
 		RedirectUris:       []string{"https://uri/callback", "http://uri/callback"},
 		LogoutRedirectUris: []string{"https://uri/logout-callback", "http://uri/logout-callback", "http://uri/alternative-logout-callback", "http://other-host/logout-callback"},
-		Rights:             []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
+		Rights:             []ttnpb.Right{ttnpb.Right_RIGHT_USER_INFO},
 	}
 	mockAccessToken = &ttnpb.OAuthAccessToken{
 		UserIds:       &ttnpb.UserIdentifiers{UserId: "user"},
@@ -242,7 +242,7 @@ func TestOAuthFlow(t *testing.T) {
 					State:        ttnpb.State_STATE_REJECTED,
 					Grants:       []ttnpb.GrantType{ttnpb.GrantType_GRANT_AUTHORIZATION_CODE, ttnpb.GrantType_GRANT_REFRESH_TOKEN},
 					RedirectUris: []string{"https://uri/callback", "http://uri/callback"},
-					Rights:       []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
+					Rights:       []ttnpb.Right{ttnpb.Right_RIGHT_USER_INFO},
 				}
 			},
 			Method:       "GET",
@@ -261,7 +261,7 @@ func TestOAuthFlow(t *testing.T) {
 					State:        ttnpb.State_STATE_REQUESTED,
 					Grants:       []ttnpb.GrantType{ttnpb.GrantType_GRANT_AUTHORIZATION_CODE, ttnpb.GrantType_GRANT_REFRESH_TOKEN},
 					RedirectUris: []string{"https://uri/callback", "http://uri/callback"},
-					Rights:       []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
+					Rights:       []ttnpb.Right{ttnpb.Right_RIGHT_USER_INFO},
 				}
 			},
 			Method:           "GET",
@@ -280,7 +280,7 @@ func TestOAuthFlow(t *testing.T) {
 					State:        ttnpb.State_STATE_SUSPENDED,
 					Grants:       []ttnpb.GrantType{ttnpb.GrantType_GRANT_AUTHORIZATION_CODE, ttnpb.GrantType_GRANT_REFRESH_TOKEN},
 					RedirectUris: []string{"https://uri/callback", "http://uri/callback"},
-					Rights:       []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
+					Rights:       []ttnpb.Right{ttnpb.Right_RIGHT_USER_INFO},
 				}
 			},
 			Method:           "GET",
@@ -299,7 +299,7 @@ func TestOAuthFlow(t *testing.T) {
 					State:        ttnpb.State_STATE_REJECTED,
 					Grants:       []ttnpb.GrantType{ttnpb.GrantType_GRANT_AUTHORIZATION_CODE, ttnpb.GrantType_GRANT_REFRESH_TOKEN},
 					RedirectUris: []string{"https://uri/callback", "http://uri/callback"},
-					Rights:       []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
+					Rights:       []ttnpb.Right{ttnpb.Right_RIGHT_USER_INFO},
 				}
 			},
 			Method:           "GET",
@@ -318,7 +318,7 @@ func TestOAuthFlow(t *testing.T) {
 					State:        ttnpb.State_STATE_APPROVED,
 					Grants:       []ttnpb.GrantType{},
 					RedirectUris: []string{"https://uri/callback", "http://uri/callback"},
-					Rights:       []ttnpb.Right{ttnpb.RIGHT_USER_INFO},
+					Rights:       []ttnpb.Right{ttnpb.Right_RIGHT_USER_INFO},
 				}
 			},
 			Method:           "GET",

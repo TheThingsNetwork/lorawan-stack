@@ -25,26 +25,26 @@ import (
 func TestRights(t *testing.T) {
 	var nilRights *ttnpb.Rights
 	someAppRights := ttnpb.RightsFrom(
-		ttnpb.RIGHT_APPLICATION_INFO,
-		ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+		ttnpb.Right_RIGHT_APPLICATION_INFO,
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 	)
 
 	t.Run("Sorted", func(t *testing.T) {
 		a := assertions.New(t)
 		a.So(nilRights.Sorted().GetRights(), should.BeEmpty)
 		a.So(someAppRights.Sorted().GetRights(), should.Resemble, []ttnpb.Right{
-			ttnpb.RIGHT_APPLICATION_DEVICES_READ,
-			ttnpb.RIGHT_APPLICATION_INFO,
+			ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
+			ttnpb.Right_RIGHT_APPLICATION_INFO,
 		})
 	})
 	t.Run("Unique", func(t *testing.T) {
 		a := assertions.New(t)
 		a.So(nilRights.Unique().GetRights(), should.BeEmpty)
 		a.So(ttnpb.RightsFrom(
-			ttnpb.RIGHT_GATEWAY_INFO,
-			ttnpb.RIGHT_GATEWAY_LOCATION_READ,
-			ttnpb.RIGHT_GATEWAY_STATUS_READ,
-			ttnpb.RIGHT_GATEWAY_LOCATION_READ,
+			ttnpb.Right_RIGHT_GATEWAY_INFO,
+			ttnpb.Right_RIGHT_GATEWAY_LOCATION_READ,
+			ttnpb.Right_RIGHT_GATEWAY_STATUS_READ,
+			ttnpb.Right_RIGHT_GATEWAY_LOCATION_READ,
 		).Unique().GetRights(), should.HaveLength, 3)
 	})
 	t.Run("Union", func(t *testing.T) {
@@ -52,38 +52,38 @@ func TestRights(t *testing.T) {
 		a.So(nilRights.Union(nilRights).GetRights(), should.BeEmpty)
 		a.So(someAppRights.Union(nilRights).GetRights(), should.HaveLength, 2)
 		a.So(nilRights.Union(someAppRights).GetRights(), should.HaveLength, 2)
-		a.So(someAppRights.Union(ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_INFO)).GetRights(), should.HaveLength, 2)
+		a.So(someAppRights.Union(ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_INFO)).GetRights(), should.HaveLength, 2)
 	})
 	t.Run("Sub", func(t *testing.T) {
 		a := assertions.New(t)
 		a.So(nilRights.Sub(nilRights).GetRights(), should.BeEmpty)
 		a.So(nilRights.Sub(someAppRights).GetRights(), should.BeEmpty)
-		a.So(someAppRights.Sub(ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_INFO)).GetRights(), should.HaveLength, 1)
-		a.So(ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_INFO).Sub(someAppRights).GetRights(), should.BeEmpty)
+		a.So(someAppRights.Sub(ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_INFO)).GetRights(), should.HaveLength, 1)
+		a.So(ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_INFO).Sub(someAppRights).GetRights(), should.BeEmpty)
 	})
 	t.Run("Intersect", func(t *testing.T) {
 		a := assertions.New(t)
 		a.So(nilRights.Intersect(nilRights).GetRights(), should.BeEmpty)
-		a.So(someAppRights.Intersect(ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_INFO)).GetRights(), should.Contain, ttnpb.RIGHT_APPLICATION_INFO)
-		a.So(ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_INFO).Intersect(someAppRights).GetRights(), should.Contain, ttnpb.RIGHT_APPLICATION_INFO)
+		a.So(someAppRights.Intersect(ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_INFO)).GetRights(), should.Contain, ttnpb.Right_RIGHT_APPLICATION_INFO)
+		a.So(ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_INFO).Intersect(someAppRights).GetRights(), should.Contain, ttnpb.Right_RIGHT_APPLICATION_INFO)
 	})
 	t.Run("Implied", func(t *testing.T) {
 		a := assertions.New(t)
 		a.So(nilRights.Implied().GetRights(), should.BeEmpty)
-		a.So(ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_ALL).Implied().GetRights(), should.Contain, ttnpb.RIGHT_APPLICATION_DELETE)
-		a.So(ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_ALL).Implied().GetRights(), should.Contain, ttnpb.RIGHT_GATEWAY_DELETE)
-		a.So(ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_ALL).Implied().GetRights(), should.Contain, ttnpb.RIGHT_ORGANIZATION_DELETE)
-		a.So(ttnpb.RightsFrom(ttnpb.RIGHT_USER_ALL).Implied().GetRights(), should.Contain, ttnpb.RIGHT_USER_DELETE)
+		a.So(ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_ALL).Implied().GetRights(), should.Contain, ttnpb.Right_RIGHT_APPLICATION_DELETE)
+		a.So(ttnpb.RightsFrom(ttnpb.Right_RIGHT_GATEWAY_ALL).Implied().GetRights(), should.Contain, ttnpb.Right_RIGHT_GATEWAY_DELETE)
+		a.So(ttnpb.RightsFrom(ttnpb.Right_RIGHT_ORGANIZATION_ALL).Implied().GetRights(), should.Contain, ttnpb.Right_RIGHT_ORGANIZATION_DELETE)
+		a.So(ttnpb.RightsFrom(ttnpb.Right_RIGHT_USER_ALL).Implied().GetRights(), should.Contain, ttnpb.Right_RIGHT_USER_DELETE)
 	})
 	t.Run("IncludesAll", func(t *testing.T) {
 		a := assertions.New(t)
 		a.So(nilRights.IncludesAll(), should.BeTrue)
 		a.So(
-			ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_INFO, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC).IncludesAll(ttnpb.RIGHT_APPLICATION_INFO),
+			ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_INFO, ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC).IncludesAll(ttnpb.Right_RIGHT_APPLICATION_INFO),
 			should.BeTrue,
 		)
 		a.So(
-			ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_INFO).IncludesAll(ttnpb.RIGHT_APPLICATION_INFO, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC),
+			ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_INFO).IncludesAll(ttnpb.Right_RIGHT_APPLICATION_INFO, ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC),
 			should.BeFalse,
 		)
 	})

@@ -28,11 +28,11 @@ import (
 var (
 	evtApplicationSubscribe = events.Define(
 		"as.application.subscribe", "subscribe application",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_LINK),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_LINK),
 	)
 	evtApplicationUnsubscribe = events.Define(
 		"as.application.unsubscribe", "unsubscribe application",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_LINK),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_LINK),
 	)
 )
 

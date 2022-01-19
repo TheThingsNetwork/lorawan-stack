@@ -32,7 +32,7 @@ func init() {
 	userAccessUser.Admin = false
 	userAccessUser.State = ttnpb.State_STATE_APPROVED
 	for _, apiKey := range userAPIKeys(userAccessUser.GetIds()).ApiKeys {
-		apiKey.Rights = []ttnpb.Right{ttnpb.RIGHT_USER_SETTINGS_API_KEYS}
+		apiKey.Rights = []ttnpb.Right{ttnpb.Right_RIGHT_USER_SETTINGS_API_KEYS}
 	}
 }
 
@@ -85,7 +85,7 @@ func TestUserAccessRightsPermissionDenied(t *testing.T) {
 		apiKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
 			UserIds: userID,
 			Name:    "test-api-key-name",
-			Rights:  []ttnpb.Right{ttnpb.RIGHT_USER_ALL},
+			Rights:  []ttnpb.Right{ttnpb.Right_RIGHT_USER_ALL},
 		}, creds)
 
 		if a.So(err, should.NotBeNil) {
@@ -94,7 +94,7 @@ func TestUserAccessRightsPermissionDenied(t *testing.T) {
 		a.So(apiKey, should.BeNil)
 
 		apiKey = userAPIKeys(userID).ApiKeys[0]
-		apiKey.Rights = []ttnpb.Right{ttnpb.RIGHT_USER_ALL}
+		apiKey.Rights = []ttnpb.Right{ttnpb.Right_RIGHT_USER_ALL}
 
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
 			UserIds:   userID,
@@ -148,7 +148,7 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 		apiKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
 			UserIds: userID,
 			Name:    "test-api-key-name",
-			Rights:  []ttnpb.Right{ttnpb.RIGHT_ALL},
+			Rights:  []ttnpb.Right{ttnpb.Right_RIGHT_ALL},
 		})
 
 		if a.So(err, should.NotBeNil) {
@@ -245,7 +245,7 @@ func TestUserAccessCRUD(t *testing.T) {
 		created, err := reg.CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
 			UserIds: user.GetIds(),
 			Name:    createdAPIKeyName,
-			Rights:  []ttnpb.Right{ttnpb.RIGHT_ALL},
+			Rights:  []ttnpb.Right{ttnpb.Right_RIGHT_ALL},
 		}, creds)
 
 		a.So(err, should.BeNil)

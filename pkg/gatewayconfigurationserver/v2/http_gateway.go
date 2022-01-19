@@ -93,7 +93,7 @@ func (s *Server) handleGetGateway(w http.ResponseWriter, r *http.Request) {
 	md := rpcmetadata.FromIncomingContext(ctx)
 	switch md.AuthType {
 	case "bearer":
-		if err := rights.RequireGateway(ctx, id, ttnpb.RIGHT_GATEWAY_INFO); err != nil {
+		if err := rights.RequireGateway(ctx, id, ttnpb.Right_RIGHT_GATEWAY_INFO); err != nil {
 			webhandlers.Error(w, r, err)
 			return
 		}

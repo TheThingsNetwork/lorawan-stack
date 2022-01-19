@@ -105,7 +105,7 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 
 	for i, app := range res.Applications {
 		entityRights := callerMemberships.GetRights(member, app.GetIds()).Union(authInfo.GetUniversalRights())
-		if !entityRights.IncludesAll(ttnpb.RIGHT_APPLICATION_INFO) {
+		if !entityRights.IncludesAll(ttnpb.Right_RIGHT_APPLICATION_INFO) {
 			res.Applications[i] = app.PublicSafe()
 		}
 	}
@@ -190,7 +190,7 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchCl
 
 	for i, cli := range res.Clients {
 		entityRights := callerMemberships.GetRights(member, cli.GetIds()).Union(authInfo.GetUniversalRights())
-		if !entityRights.IncludesAll(ttnpb.RIGHT_CLIENT_ALL) {
+		if !entityRights.IncludesAll(ttnpb.Right_RIGHT_CLIENT_ALL) {
 			res.Clients[i] = cli.PublicSafe()
 		}
 	}
@@ -279,7 +279,7 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchG
 	if member != nil {
 		for i, gtw := range res.Gateways {
 			entityRights := callerMemberships.GetRights(member, gtw.GetIds()).Union(authInfo.GetUniversalRights())
-			if !entityRights.IncludesAll(ttnpb.RIGHT_GATEWAY_INFO) {
+			if !entityRights.IncludesAll(ttnpb.Right_RIGHT_GATEWAY_INFO) {
 				res.Gateways[i] = gtw.PublicSafe()
 			}
 		}
@@ -370,7 +370,7 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 	if member != nil {
 		for i, org := range res.Organizations {
 			entityRights := callerMemberships.GetRights(member, org.GetIds()).Union(authInfo.GetUniversalRights())
-			if !entityRights.IncludesAll(ttnpb.RIGHT_CLIENT_ALL) {
+			if !entityRights.IncludesAll(ttnpb.Right_RIGHT_CLIENT_ALL) {
 				res.Organizations[i] = org.PublicSafe()
 			}
 		}
@@ -449,7 +449,7 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUser
 }
 
 func (rs *registrySearch) SearchEndDevices(ctx context.Context, req *ttnpb.SearchEndDevicesRequest) (*ttnpb.EndDevices, error) {
-	err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ)
+	err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ)
 	if err != nil {
 		return nil, err
 	}

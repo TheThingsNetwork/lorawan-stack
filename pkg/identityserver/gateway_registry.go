@@ -33,32 +33,32 @@ import (
 var (
 	evtCreateGateway = events.Define(
 		"gateway.create", "create gateway",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_INFO),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_INFO),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtUpdateGateway = events.Define(
 		"gateway.update", "update gateway",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_INFO),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_INFO),
 		events.WithUpdatedFieldsDataType(),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtDeleteGateway = events.Define(
 		"gateway.delete", "delete gateway",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_INFO),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_INFO),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtRestoreGateway = events.Define(
 		"gateway.restore", "restore gateway",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_INFO),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_INFO),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtPurgeGateway = events.Define(
 		"gateway.purge", "purge gateway",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_INFO),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_INFO),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
@@ -80,11 +80,11 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		if !is.IsAdmin(ctx) && !is.configFromContext(ctx).UserRights.CreateGateways {
 			return nil, errAdminsCreateGateways.New()
 		}
-		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_GATEWAYS_CREATE); err != nil {
+		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.Right_RIGHT_USER_GATEWAYS_CREATE); err != nil {
 			return nil, err
 		}
 	} else if orgIDs := req.Collaborator.GetOrganizationIds(); orgIDs != nil {
-		if err = rights.RequireOrganization(ctx, *orgIDs, ttnpb.RIGHT_ORGANIZATION_GATEWAYS_CREATE); err != nil {
+		if err = rights.RequireOrganization(ctx, *orgIDs, ttnpb.Right_RIGHT_ORGANIZATION_GATEWAYS_CREATE); err != nil {
 			return nil, err
 		}
 	}
@@ -160,7 +160,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 			ctx,
 			req.Collaborator,
 			gtw.GetIds().GetEntityIdentifiers(),
-			ttnpb.RightsFrom(ttnpb.RIGHT_ALL),
+			ttnpb.RightsFrom(ttnpb.Right_RIGHT_ALL),
 		); err != nil {
 			return err
 		}
@@ -204,7 +204,7 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask, getPaths, []string{"frequency_plan_id"})
 
-	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.RIGHT_GATEWAY_INFO); err != nil {
+	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_INFO); err != nil {
 		if !ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicGatewayFields...) {
 			return nil, err
 		}
@@ -212,7 +212,7 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "lbs_lns_secret", "claim_authentication_code", "target_cups_key") {
-		if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.RIGHT_GATEWAY_READ_SECRETS); err != nil {
+		if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_READ_SECRETS); err != nil {
 			return nil, err
 		}
 	}
@@ -328,11 +328,11 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 	}
 
 	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
-		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_GATEWAYS_LIST); err != nil {
+		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.Right_RIGHT_USER_GATEWAYS_LIST); err != nil {
 			return nil, err
 		}
 	} else if orgIDs := req.Collaborator.GetOrganizationIds(); orgIDs != nil {
-		if err = rights.RequireOrganization(ctx, *orgIDs, ttnpb.RIGHT_ORGANIZATION_GATEWAYS_LIST); err != nil {
+		if err = rights.RequireOrganization(ctx, *orgIDs, ttnpb.Right_RIGHT_ORGANIZATION_GATEWAYS_LIST); err != nil {
 			return nil, err
 		}
 	}
@@ -390,12 +390,12 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 			gtw.FrequencyPlanId = gtw.FrequencyPlanIds[0]
 		}
 
-		if !entityRights.IncludesAll(ttnpb.RIGHT_GATEWAY_INFO) {
+		if !entityRights.IncludesAll(ttnpb.Right_RIGHT_GATEWAY_INFO) {
 			gtws.Gateways[i] = gtw.PublicSafe()
 		}
 
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "lbs_lns_secret") {
-			if !entityRights.IncludesAll(ttnpb.RIGHT_GATEWAY_READ_SECRETS) {
+			if !entityRights.IncludesAll(ttnpb.Right_RIGHT_GATEWAY_READ_SECRETS) {
 				gtws.Gateways[i].LbsLnsSecret = nil
 			} else if gtws.Gateways[i].LbsLnsSecret != nil {
 				value := gtws.Gateways[i].LbsLnsSecret.Value
@@ -414,7 +414,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 		}
 
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "target_cups_key") {
-			if !entityRights.IncludesAll(ttnpb.RIGHT_GATEWAY_READ_SECRETS) {
+			if !entityRights.IncludesAll(ttnpb.Right_RIGHT_GATEWAY_READ_SECRETS) {
 				gtws.Gateways[i].TargetCupsKey = nil
 			} else if gtws.Gateways[i].TargetCupsKey != nil {
 				value := gtws.Gateways[i].TargetCupsKey.Value
@@ -433,7 +433,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 		}
 
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "claim_authentication_code") {
-			if !entityRights.IncludesAll(ttnpb.RIGHT_GATEWAY_READ_SECRETS) {
+			if !entityRights.IncludesAll(ttnpb.Right_RIGHT_GATEWAY_READ_SECRETS) {
 				gtws.Gateways[i].ClaimAuthenticationCode = nil
 			} else if gtws.Gateways[i].ClaimAuthenticationCode != nil && gtws.Gateways[i].ClaimAuthenticationCode.Secret != nil {
 				value := gtws.Gateways[i].ClaimAuthenticationCode.Secret.Value
@@ -456,9 +456,9 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 
 func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (gtw *ttnpb.Gateway, err error) {
 	reqGtw := req.GetGateway()
-	if err = rights.RequireGateway(ctx, *reqGtw.GetIds(), ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC); err != nil {
+	if err = rights.RequireGateway(ctx, *reqGtw.GetIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC); err != nil {
 		// Allow setting the location field or the attributes field with the RIGHT_GATEWAY_LINK right.
-		isLink := rights.RequireGateway(ctx, *reqGtw.GetIds(), ttnpb.RIGHT_GATEWAY_LINK) == nil
+		isLink := rights.RequireGateway(ctx, *reqGtw.GetIds(), ttnpb.Right_RIGHT_GATEWAY_LINK) == nil
 		if !(isLink && ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), "antennas", "attributes")) {
 			return nil, err
 		}
@@ -489,7 +489,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	req.FieldMask.Paths = ttnpb.FlattenPaths(req.FieldMask.Paths, []string{"administrative_contact", "technical_contact"})
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "lbs_lns_secret") {
-		if err := rights.RequireGateway(ctx, *reqGtw.GetIds(), ttnpb.RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
+		if err := rights.RequireGateway(ctx, *reqGtw.GetIds(), ttnpb.Right_RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
 			return nil, err
 		} else if reqGtw.LbsLnsSecret != nil {
 			value := reqGtw.LbsLnsSecret.Value
@@ -509,7 +509,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "target_cups_key") {
-		if err := rights.RequireGateway(ctx, *reqGtw.GetIds(), ttnpb.RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
+		if err := rights.RequireGateway(ctx, *reqGtw.GetIds(), ttnpb.Right_RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
 			return nil, err
 		} else if reqGtw.TargetCupsKey != nil {
 			value := reqGtw.TargetCupsKey.Value
@@ -529,7 +529,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "claim_authentication_code") {
-		if err := rights.RequireGateway(ctx, *reqGtw.GetIds(), ttnpb.RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
+		if err := rights.RequireGateway(ctx, *reqGtw.GetIds(), ttnpb.Right_RIGHT_GATEWAY_WRITE_SECRETS); err != nil {
 			return nil, err
 		} else if reqGtw.ClaimAuthenticationCode != nil {
 			if err := validateClaimAuthenticationCode(*reqGtw.ClaimAuthenticationCode); err != nil {
@@ -590,7 +590,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 }
 
 func (is *IdentityServer) deleteGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireGateway(ctx, *ids, ttnpb.RIGHT_GATEWAY_DELETE); err != nil {
+	if err := rights.RequireGateway(ctx, *ids, ttnpb.Right_RIGHT_GATEWAY_DELETE); err != nil {
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
@@ -604,7 +604,7 @@ func (is *IdentityServer) deleteGateway(ctx context.Context, ids *ttnpb.GatewayI
 }
 
 func (is *IdentityServer) restoreGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireGateway(store.WithSoftDeleted(ctx, false), *ids, ttnpb.RIGHT_GATEWAY_DELETE); err != nil {
+	if err := rights.RequireGateway(store.WithSoftDeleted(ctx, false), *ids, ttnpb.Right_RIGHT_GATEWAY_DELETE); err != nil {
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {

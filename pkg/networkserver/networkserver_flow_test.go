@@ -131,7 +131,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		start := time.Now()
 
 		dev, err, ok := env.AssertSetDevice(ctx, true, conf.CreateDevice,
-			ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+			ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 		)
 		if !a.So(err, should.BeNil) || !a.So(ok, should.BeTrue) {
 			t.Error("Failed to create device")

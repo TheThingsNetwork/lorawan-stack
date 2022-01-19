@@ -174,15 +174,15 @@ func (cir *contactInfoRegistry) RequestValidation(ctx context.Context, ids *ttnp
 	var err error
 	switch id := ids.GetIds().(type) {
 	case *ttnpb.EntityIdentifiers_ApplicationIds:
-		err = rights.RequireApplication(ctx, *id.ApplicationIds, ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC)
+		err = rights.RequireApplication(ctx, *id.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC)
 	case *ttnpb.EntityIdentifiers_ClientIds:
-		err = rights.RequireClient(ctx, *id.ClientIds, ttnpb.RIGHT_CLIENT_ALL)
+		err = rights.RequireClient(ctx, *id.ClientIds, ttnpb.Right_RIGHT_CLIENT_ALL)
 	case *ttnpb.EntityIdentifiers_GatewayIds:
-		err = rights.RequireGateway(ctx, *id.GatewayIds, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC)
+		err = rights.RequireGateway(ctx, *id.GatewayIds, ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC)
 	case *ttnpb.EntityIdentifiers_OrganizationIds:
-		err = rights.RequireOrganization(ctx, *id.OrganizationIds, ttnpb.RIGHT_ORGANIZATION_SETTINGS_BASIC)
+		err = rights.RequireOrganization(ctx, *id.OrganizationIds, ttnpb.Right_RIGHT_ORGANIZATION_SETTINGS_BASIC)
 	case *ttnpb.EntityIdentifiers_UserIds:
-		err = rights.RequireUser(ctx, *id.UserIds, ttnpb.RIGHT_USER_SETTINGS_BASIC)
+		err = rights.RequireUser(ctx, *id.UserIds, ttnpb.Right_RIGHT_USER_SETTINGS_BASIC)
 	default:
 		return nil, errNoContactInfoForEntity.New()
 	}

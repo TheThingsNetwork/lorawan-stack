@@ -69,14 +69,14 @@ func (s webhookRegistryRPC) ListTemplates(ctx context.Context, req *ttnpb.ListAp
 }
 
 func (s webhookRegistryRPC) Get(ctx context.Context, req *ttnpb.GetApplicationWebhookRequest) (*ttnpb.ApplicationWebhook, error) {
-	if err := rights.RequireApplication(ctx, *req.Ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
+	if err := rights.RequireApplication(ctx, *req.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
 	return s.webhooks.Get(ctx, req.Ids, appendImplicitWebhookGetPaths(req.FieldMask.GetPaths()...))
 }
 
 func (s webhookRegistryRPC) List(ctx context.Context, req *ttnpb.ListApplicationWebhooksRequest) (*ttnpb.ApplicationWebhooks, error) {
-	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
+	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
 	webhooks, err := s.webhooks.List(ctx, req.ApplicationIds, appendImplicitWebhookGetPaths(req.FieldMask.GetPaths()...))
@@ -95,9 +95,9 @@ func (s webhookRegistryRPC) List(ctx context.Context, req *ttnpb.ListApplication
 
 func (s webhookRegistryRPC) Set(ctx context.Context, req *ttnpb.SetApplicationWebhookRequest) (*ttnpb.ApplicationWebhook, error) {
 	if err := rights.RequireApplication(ctx, *req.Webhook.Ids.ApplicationIds,
-		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
+		ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
+		ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ,
+		ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
 	); err != nil {
 		return nil, err
 	}
@@ -116,9 +116,9 @@ func (s webhookRegistryRPC) Set(ctx context.Context, req *ttnpb.SetApplicationWe
 
 func (s webhookRegistryRPC) Delete(ctx context.Context, req *ttnpb.ApplicationWebhookIdentifiers) (*pbtypes.Empty, error) {
 	if err := rights.RequireApplication(ctx, *req.ApplicationIds,
-		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
+		ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
+		ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ,
+		ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
 	); err != nil {
 		return nil, err
 	}

@@ -61,7 +61,7 @@ func (dr *DeviceRepository) ensureBaseAssetURLs(models []*ttnpb.EndDeviceModel) 
 const defaultLimit = 1000
 
 func requireApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) error {
-	return rights.RequireApplication(ctx, *ids, ttnpb.RIGHT_APPLICATION_DEVICES_READ)
+	return rights.RequireApplication(ctx, *ids, ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ)
 }
 
 // ListBrands implements the ttnpb.DeviceRepositoryServer interface.

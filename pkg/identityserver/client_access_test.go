@@ -30,7 +30,7 @@ func init() {
 	clientAccessUser.State = ttnpb.State_STATE_APPROVED
 	for _, apiKey := range userAPIKeys(clientAccessUser.GetIds()).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{
-			ttnpb.RIGHT_CLIENT_ALL,
+			ttnpb.Right_RIGHT_CLIENT_ALL,
 		}
 	}
 }
@@ -50,7 +50,7 @@ func TestClientAccessRightsPermissionDenied(t *testing.T) {
 			ClientIds: clientID,
 			Collaborator: &ttnpb.Collaborator{
 				Ids:    collaboratorID,
-				Rights: []ttnpb.Right{ttnpb.RIGHT_ALL},
+				Rights: []ttnpb.Right{ttnpb.Right_RIGHT_ALL},
 			},
 		}, creds)
 
@@ -91,7 +91,7 @@ func TestClientAccessPermissionDenied(t *testing.T) {
 			ClientIds: clientID,
 			Collaborator: &ttnpb.Collaborator{
 				Ids:    collaboratorID,
-				Rights: []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
+				Rights: []ttnpb.Right{ttnpb.Right_RIGHT_CLIENT_ALL},
 			},
 		})
 
@@ -135,7 +135,7 @@ func TestClientAccessCRUD(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(rights, should.NotBeNil) {
-			a.So(rights.Rights, should.Contain, ttnpb.RIGHT_CLIENT_ALL)
+			a.So(rights.Rights, should.Contain, ttnpb.Right_RIGHT_CLIENT_ALL)
 		}
 
 		modifiedClientID := &ttnpb.ClientIdentifiers{ClientId: reverse(clientID.GetClientId())}
@@ -160,7 +160,7 @@ func TestClientAccessCRUD(t *testing.T) {
 			ClientIds: clientID,
 			Collaborator: &ttnpb.Collaborator{
 				Ids:    collaboratorID,
-				Rights: []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
+				Rights: []ttnpb.Right{ttnpb.Right_RIGHT_CLIENT_ALL},
 			},
 		}, creds)
 
@@ -173,7 +173,7 @@ func TestClientAccessCRUD(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(res, should.NotBeNil) {
-			a.So(res.Rights, should.Resemble, []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL})
+			a.So(res.Rights, should.Resemble, []ttnpb.Right{ttnpb.Right_RIGHT_CLIENT_ALL})
 		}
 
 		_, err = reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{

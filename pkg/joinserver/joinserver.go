@@ -716,7 +716,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 			return nil, errRegistryOperation.WithCause(err)
 		}
 		ctx = dev.Context
-		if err := appAuth.RequireApplication(ctx, *dev.Ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
+		if err := appAuth.RequireApplication(ctx, *dev.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 			return nil, err
 		}
 	}

@@ -72,7 +72,7 @@ func TestFlow(t *testing.T) {
 
 	gtwCtx := rights.NewContext(ctx, rights.Rights{
 		GatewayRights: map[string]*ttnpb.Rights{
-			unique.ID(ctx, ids): ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_LINK),
+			unique.ID(ctx, ids): ttnpb.RightsFrom(ttnpb.Right_RIGHT_GATEWAY_LINK),
 		},
 	})
 	frontend, err := mock.ConnectFrontend(gtwCtx, ids, gs)
@@ -553,7 +553,7 @@ func TestSubBandEIRPOverride(t *testing.T) {
 
 	gtwCtx := rights.NewContext(ctx, rights.Rights{
 		GatewayRights: map[string]*ttnpb.Rights{
-			unique.ID(ctx, ids): ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_LINK),
+			unique.ID(ctx, ids): ttnpb.RightsFrom(ttnpb.Right_RIGHT_GATEWAY_LINK),
 		},
 	})
 	frontend, err := mock.ConnectFrontend(gtwCtx, ids, gs)

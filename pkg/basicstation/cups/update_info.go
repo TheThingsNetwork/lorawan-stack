@@ -87,9 +87,9 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 		GatewayIds: gtw.GetIds(),
 		Name:       fmt.Sprintf("CUPS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
 		Rights: []ttnpb.Right{
-			ttnpb.RIGHT_GATEWAY_INFO,
-			ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
-			ttnpb.RIGHT_GATEWAY_READ_SECRETS,
+			ttnpb.Right_RIGHT_GATEWAY_INFO,
+			ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC,
+			ttnpb.Right_RIGHT_GATEWAY_READ_SECRETS,
 		},
 	}, auth)
 	if err != nil {
@@ -100,8 +100,8 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 		GatewayIds: gtw.GetIds(),
 		Name:       fmt.Sprintf("LNS Key, generated %s", time.Now().UTC().Format(time.RFC3339)),
 		Rights: []ttnpb.Right{
-			ttnpb.RIGHT_GATEWAY_INFO,
-			ttnpb.RIGHT_GATEWAY_LINK,
+			ttnpb.Right_RIGHT_GATEWAY_INFO,
+			ttnpb.Right_RIGHT_GATEWAY_LINK,
 		},
 	}, auth)
 	if err != nil {
@@ -226,9 +226,9 @@ func (s *Server) updateInfo(w http.ResponseWriter, r *http.Request) (err error) 
 
 	var gatewayAuth grpc.CallOption
 	if rights.RequireGateway(ctx, *ids,
-		ttnpb.RIGHT_GATEWAY_INFO,
-		ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
-		ttnpb.RIGHT_GATEWAY_READ_SECRETS,
+		ttnpb.Right_RIGHT_GATEWAY_INFO,
+		ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC,
+		ttnpb.Right_RIGHT_GATEWAY_READ_SECRETS,
 	) == nil {
 		logger.Debug("Authorized with The Things Stack token")
 	} else {
