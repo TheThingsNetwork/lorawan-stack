@@ -329,13 +329,13 @@ func TestLinkADRReq(t *testing.T) {
 					return CopyEndDevice(&ttnpb.EndDevice{
 						MacState: &ttnpb.MACState{
 							LorawanVersion: tc.LoRaWANVersion,
-							CurrentParameters: ttnpb.MACParameters{
+							CurrentParameters: &ttnpb.MACParameters{
 								Channels:         tc.CurrentChannels,
 								AdrDataRateIndex: tc.CurrentADRDataRateIndex,
 								AdrTxPowerIndex:  tc.CurrentADRTxPowerIndex,
 								AdrNbTrans:       tc.CurrentADRNbTrans,
 							},
-							DesiredParameters: ttnpb.MACParameters{
+							DesiredParameters: &ttnpb.MACParameters{
 								Channels:         tc.DesiredChannels,
 								AdrDataRateIndex: tc.DesiredADRDataRateIndex,
 								AdrTxPowerIndex:  tc.DesiredADRTxPowerIndex,
@@ -489,7 +489,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
 							nil,
 							{UplinkFrequency: 42},
@@ -516,7 +516,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						AdrDataRateIndex: ttnpb.DATA_RATE_4,
 						AdrTxPowerIndex:  42,
 						Channels: []*ttnpb.MACParameters_Channel{
@@ -556,7 +556,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
 							{EnableUplink: true},
 							{EnableUplink: true},
@@ -604,7 +604,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						AdrDataRateIndex: ttnpb.DATA_RATE_10,
 						AdrTxPowerIndex:  43,
 						Channels: []*ttnpb.MACParameters_Channel{
@@ -650,7 +650,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_0_2,
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
 							{EnableUplink: true},
 							{EnableUplink: true},
@@ -698,7 +698,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_0_2,
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						AdrDataRateIndex: ttnpb.DATA_RATE_10,
 						AdrTxPowerIndex:  43,
 						Channels: []*ttnpb.MACParameters_Channel{
@@ -743,7 +743,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_0,
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
 							{EnableUplink: true},
 							{EnableUplink: true},
@@ -792,7 +792,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_0,
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						AdrDataRateIndex: ttnpb.DATA_RATE_5,
 						AdrTxPowerIndex:  42,
 						Channels: []*ttnpb.MACParameters_Channel{
@@ -883,7 +883,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_0_2,
-					CurrentParameters: func() ttnpb.MACParameters {
+					CurrentParameters: func() *ttnpb.MACParameters {
 						params := MakeDefaultUS915FSB2DesiredMACParameters(ttnpb.RP001_V1_0_2_REV_B)
 						params.AdrDataRateIndex = ttnpb.DATA_RATE_3
 						params.AdrTxPowerIndex = 1

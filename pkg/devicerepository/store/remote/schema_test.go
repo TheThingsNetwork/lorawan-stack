@@ -119,7 +119,7 @@ func TestProfile(t *testing.T) {
 						Supports_32BitFCnt: &ttnpb.BoolValue{Value: true},
 					},
 					MacState: &ttnpb.MACState{
-						DesiredParameters: ttnpb.MACParameters{
+						DesiredParameters: &ttnpb.MACParameters{
 							MaxEirp: 14,
 						},
 					},

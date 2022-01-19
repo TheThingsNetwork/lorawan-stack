@@ -740,26 +740,26 @@ var (
 
 	ifNotZeroThenFuncFields = map[string][]ifThenFuncFieldRight{
 		"multicast": append(func() (rs []ifThenFuncFieldRight) {
-			for s, eq := range map[string]func(ttnpb.MACParameters, ttnpb.MACParameters) bool{
-				"adr_ack_delay_exponent.value": func(a, b ttnpb.MACParameters) bool {
+			for s, eq := range map[string]func(*ttnpb.MACParameters, *ttnpb.MACParameters) bool{
+				"adr_ack_delay_exponent.value": func(a, b *ttnpb.MACParameters) bool {
 					return proto.Equal(a.AdrAckDelayExponent, b.AdrAckDelayExponent)
 				},
-				"adr_ack_limit_exponent.value": func(a, b ttnpb.MACParameters) bool {
+				"adr_ack_limit_exponent.value": func(a, b *ttnpb.MACParameters) bool {
 					return proto.Equal(a.AdrAckLimitExponent, b.AdrAckLimitExponent)
 				},
-				"adr_data_rate_index": func(a, b ttnpb.MACParameters) bool {
+				"adr_data_rate_index": func(a, b *ttnpb.MACParameters) bool {
 					return a.AdrDataRateIndex == b.AdrDataRateIndex
 				},
-				"adr_nb_trans": func(a, b ttnpb.MACParameters) bool {
+				"adr_nb_trans": func(a, b *ttnpb.MACParameters) bool {
 					return a.AdrNbTrans == b.AdrNbTrans
 				},
-				"adr_tx_power_index": func(a, b ttnpb.MACParameters) bool {
+				"adr_tx_power_index": func(a, b *ttnpb.MACParameters) bool {
 					return a.AdrTxPowerIndex == b.AdrTxPowerIndex
 				},
-				"beacon_frequency": func(a, b ttnpb.MACParameters) bool {
+				"beacon_frequency": func(a, b *ttnpb.MACParameters) bool {
 					return a.BeaconFrequency == b.BeaconFrequency
 				},
-				"channels": func(a, b ttnpb.MACParameters) bool {
+				"channels": func(a, b *ttnpb.MACParameters) bool {
 					if len(a.Channels) != len(b.Channels) {
 						return false
 					}
@@ -770,40 +770,40 @@ var (
 					}
 					return true
 				},
-				"downlink_dwell_time.value": func(a, b ttnpb.MACParameters) bool {
+				"downlink_dwell_time.value": func(a, b *ttnpb.MACParameters) bool {
 					return proto.Equal(a.DownlinkDwellTime, b.DownlinkDwellTime)
 				},
-				"max_duty_cycle": func(a, b ttnpb.MACParameters) bool {
+				"max_duty_cycle": func(a, b *ttnpb.MACParameters) bool {
 					return a.MaxDutyCycle == b.MaxDutyCycle
 				},
-				"max_eirp": func(a, b ttnpb.MACParameters) bool {
+				"max_eirp": func(a, b *ttnpb.MACParameters) bool {
 					return a.MaxEirp == b.MaxEirp
 				},
-				"ping_slot_data_rate_index_value.value": func(a, b ttnpb.MACParameters) bool {
+				"ping_slot_data_rate_index_value.value": func(a, b *ttnpb.MACParameters) bool {
 					return proto.Equal(a.PingSlotDataRateIndexValue, b.PingSlotDataRateIndexValue)
 				},
-				"ping_slot_frequency": func(a, b ttnpb.MACParameters) bool {
+				"ping_slot_frequency": func(a, b *ttnpb.MACParameters) bool {
 					return a.PingSlotFrequency == b.PingSlotFrequency
 				},
-				"rejoin_count_periodicity": func(a, b ttnpb.MACParameters) bool {
+				"rejoin_count_periodicity": func(a, b *ttnpb.MACParameters) bool {
 					return a.RejoinCountPeriodicity == b.RejoinCountPeriodicity
 				},
-				"rejoin_time_periodicity": func(a, b ttnpb.MACParameters) bool {
+				"rejoin_time_periodicity": func(a, b *ttnpb.MACParameters) bool {
 					return a.RejoinTimePeriodicity == b.RejoinTimePeriodicity
 				},
-				"rx1_data_rate_offset": func(a, b ttnpb.MACParameters) bool {
+				"rx1_data_rate_offset": func(a, b *ttnpb.MACParameters) bool {
 					return a.Rx1DataRateOffset == b.Rx1DataRateOffset
 				},
-				"rx1_delay": func(a, b ttnpb.MACParameters) bool {
+				"rx1_delay": func(a, b *ttnpb.MACParameters) bool {
 					return a.Rx1Delay == b.Rx1Delay
 				},
-				"rx2_data_rate_index": func(a, b ttnpb.MACParameters) bool {
+				"rx2_data_rate_index": func(a, b *ttnpb.MACParameters) bool {
 					return a.Rx2DataRateIndex == b.Rx2DataRateIndex
 				},
-				"rx2_frequency": func(a, b ttnpb.MACParameters) bool {
+				"rx2_frequency": func(a, b *ttnpb.MACParameters) bool {
 					return a.Rx2Frequency == b.Rx2Frequency
 				},
-				"uplink_dwell_time.value": func(a, b ttnpb.MACParameters) bool {
+				"uplink_dwell_time.value": func(a, b *ttnpb.MACParameters) bool {
 					return proto.Equal(a.UplinkDwellTime, b.UplinkDwellTime)
 				},
 			} {
@@ -1577,40 +1577,40 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return !dev.GetMacSettings().GetUseAdr().GetValue() || phy.EnableADR
 			},
 			"mac_state.current_parameters.adr_data_rate_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetMacState().GetCurrentParameters().AdrDataRateIndex <= phy.MaxADRDataRateIndex
+				return dev.GetMacState().GetCurrentParameters().GetAdrDataRateIndex() <= phy.MaxADRDataRateIndex
 			},
 			"mac_state.current_parameters.adr_tx_power_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetMacState().GetCurrentParameters().AdrTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
+				return dev.GetMacState().GetCurrentParameters().GetAdrTxPowerIndex() <= uint32(phy.MaxTxPowerIndex())
 			},
 			"mac_state.current_parameters.channels": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return len(dev.GetMacState().GetCurrentParameters().Channels) <= int(phy.MaxUplinkChannels)
+				return len(dev.GetMacState().GetCurrentParameters().GetChannels()) <= int(phy.MaxUplinkChannels)
 			},
 			"mac_state.desired_parameters.adr_data_rate_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetMacState().GetDesiredParameters().AdrDataRateIndex <= phy.MaxADRDataRateIndex
+				return dev.GetMacState().GetDesiredParameters().GetAdrDataRateIndex() <= phy.MaxADRDataRateIndex
 			},
 			"mac_state.desired_parameters.adr_tx_power_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetMacState().GetDesiredParameters().AdrTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
+				return dev.GetMacState().GetDesiredParameters().GetAdrTxPowerIndex() <= uint32(phy.MaxTxPowerIndex())
 			},
 			"mac_state.desired_parameters.channels": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return len(dev.GetMacState().GetDesiredParameters().Channels) <= int(phy.MaxUplinkChannels)
+				return len(dev.GetMacState().GetDesiredParameters().GetChannels()) <= int(phy.MaxUplinkChannels)
 			},
 			"pending_mac_state.current_parameters.adr_data_rate_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetPendingMacState().GetCurrentParameters().AdrDataRateIndex <= phy.MaxADRDataRateIndex
+				return dev.GetPendingMacState().GetCurrentParameters().GetAdrDataRateIndex() <= phy.MaxADRDataRateIndex
 			},
 			"pending_mac_state.current_parameters.adr_tx_power_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetPendingMacState().GetCurrentParameters().AdrTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
+				return dev.GetPendingMacState().GetCurrentParameters().GetAdrTxPowerIndex() <= uint32(phy.MaxTxPowerIndex())
 			},
 			"pending_mac_state.current_parameters.channels": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return len(dev.GetPendingMacState().GetCurrentParameters().Channels) <= int(phy.MaxUplinkChannels)
+				return len(dev.GetPendingMacState().GetCurrentParameters().GetChannels()) <= int(phy.MaxUplinkChannels)
 			},
 			"pending_mac_state.desired_parameters.adr_data_rate_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetPendingMacState().GetDesiredParameters().AdrDataRateIndex <= phy.MaxADRDataRateIndex
+				return dev.GetPendingMacState().GetDesiredParameters().GetAdrDataRateIndex() <= phy.MaxADRDataRateIndex
 			},
 			"pending_mac_state.desired_parameters.adr_tx_power_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return dev.GetPendingMacState().GetDesiredParameters().AdrTxPowerIndex <= uint32(phy.MaxTxPowerIndex())
+				return dev.GetPendingMacState().GetDesiredParameters().GetAdrTxPowerIndex() <= uint32(phy.MaxTxPowerIndex())
 			},
 			"pending_mac_state.desired_parameters.channels": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return len(dev.GetPendingMacState().GetDesiredParameters().Channels) <= int(phy.MaxUplinkChannels)
+				return len(dev.GetPendingMacState().GetDesiredParameters().GetChannels()) <= int(phy.MaxUplinkChannels)
 			},
 		} {
 			if !st.HasSetField(

@@ -75,12 +75,12 @@ func TestAdaptDataRate(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						AdrNbTrans:      1,
 						AdrTxPowerIndex: 1,
 						Channels:        MakeDefaultEU868CurrentChannels(),
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						AdrDataRateIndex: ttnpb.DATA_RATE_4,
 						AdrNbTrans:       3,
 						AdrTxPowerIndex:  2,
@@ -106,12 +106,12 @@ func TestAdaptDataRate(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						AdrNbTrans:      1,
 						AdrTxPowerIndex: 1,
 						Channels:        MakeDefaultEU868CurrentChannels(),
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						Channels: MakeDefaultEU868CurrentChannels(),
 					},
 					RejectedAdrDataRateIndexes: []ttnpb.DataRateIndex{
@@ -137,12 +137,12 @@ func TestAdaptDataRate(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						AdrNbTrans:      1,
 						AdrTxPowerIndex: 1,
 						Channels:        MakeDefaultEU868CurrentChannels(),
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						Channels: MakeDefaultEU868CurrentChannels(),
 					},
 					RejectedAdrTxPowerIndexes: []uint32{
@@ -168,12 +168,12 @@ func TestAdaptDataRate(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						AdrNbTrans:      1,
 						AdrTxPowerIndex: 1,
 						Channels:        MakeDefaultEU868CurrentChannels(),
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						Channels: MakeDefaultEU868CurrentChannels(),
 					},
 					RejectedAdrTxPowerIndexes: []uint32{
@@ -199,12 +199,12 @@ func TestAdaptDataRate(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						AdrNbTrans:      1,
 						AdrTxPowerIndex: 1,
 						Channels:        MakeDefaultEU868CurrentChannels(),
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						Channels: MakeDefaultEU868CurrentChannels(),
 					},
 					RejectedAdrTxPowerIndexes: []uint32{
@@ -233,12 +233,12 @@ func TestAdaptDataRate(t *testing.T) {
 				FrequencyPlanId:   test.EUFrequencyPlanID,
 				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						AdrNbTrans:      1,
 						AdrTxPowerIndex: 1,
 						Channels:        MakeDefaultEU868CurrentChannels(),
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						Channels: MakeDefaultEU868CurrentChannels(),
 					},
 					RejectedAdrTxPowerIndexes: []uint32{

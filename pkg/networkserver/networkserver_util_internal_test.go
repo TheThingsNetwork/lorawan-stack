@@ -1581,7 +1581,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 
 			dev = CopyEndDevice(conf.Device)
 			dev.PendingMacState = &ttnpb.MACState{
-				CurrentParameters: ttnpb.MACParameters{
+				CurrentParameters: &ttnpb.MACParameters{
 					MaxEirp:                    phy.DefaultMaxEIRP,
 					AdrDataRateIndex:           ttnpb.DATA_RATE_0,
 					AdrNbTrans:                 1,
@@ -1599,7 +1599,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: phy.ADRAckDelay},
 					PingSlotDataRateIndexValue: mac.DeviceDefaultPingSlotDataRateIndexValue(dev, phy, defaultMACSettings),
 				},
-				DesiredParameters: ttnpb.MACParameters{
+				DesiredParameters: &ttnpb.MACParameters{
 					MaxEirp:                    mac.DeviceDesiredMaxEIRP(dev, phy, fp, defaultMACSettings),
 					AdrDataRateIndex:           ttnpb.DATA_RATE_0,
 					AdrNbTrans:                 1,

@@ -239,10 +239,10 @@ func TestDLChannelReq(t *testing.T) {
 				makeDevice := func() *ttnpb.EndDevice {
 					return CopyEndDevice(&ttnpb.EndDevice{
 						MacState: &ttnpb.MACState{
-							CurrentParameters: ttnpb.MACParameters{
+							CurrentParameters: &ttnpb.MACParameters{
 								Channels: tc.CurrentChannels,
 							},
-							DesiredParameters: ttnpb.MACParameters{
+							DesiredParameters: &ttnpb.MACParameters{
 								Channels: tc.DesiredChannels,
 							},
 							RejectedFrequencies: tc.RejectedFrequencies,
@@ -347,20 +347,32 @@ func TestHandleDLChannelAns(t *testing.T) {
 		{
 			Name: "nil payload",
 			InputDevice: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Error: ErrNoPayload,
 		},
 		{
 			Name: "frequency ack/chanel index ack/no request",
 			InputDevice: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Payload: &ttnpb.MACCommand_DLChannelAns{
 				FrequencyAck:    true,
@@ -377,10 +389,16 @@ func TestHandleDLChannelAns(t *testing.T) {
 		{
 			Name: "frequency nack/channel index ack/no request",
 			InputDevice: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Payload: &ttnpb.MACCommand_DLChannelAns{
 				ChannelIndexAck: true,
@@ -402,7 +420,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 							Frequency:    42,
 						}).MACCommand(),
 					},
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
 							{
 								EnableUplink: true,
@@ -413,12 +431,13 @@ func TestHandleDLChannelAns(t *testing.T) {
 							},
 						},
 					},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
 							{
 								EnableUplink: true,
@@ -429,6 +448,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 							},
 						},
 					},
+					DesiredParameters:   &ttnpb.MACParameters{},
 					RejectedFrequencies: []uint64{42},
 				},
 			},
@@ -447,7 +467,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 							Frequency:    42,
 						}).MACCommand(),
 					},
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
 							{
 								EnableUplink: true,
@@ -458,13 +478,14 @@ func TestHandleDLChannelAns(t *testing.T) {
 							},
 						},
 					},
+					DesiredParameters:   &ttnpb.MACParameters{},
 					RejectedFrequencies: []uint64{1, 2, 100},
 				},
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
 							{
 								EnableUplink: true,
@@ -475,6 +496,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 							},
 						},
 					},
+					DesiredParameters:   &ttnpb.MACParameters{},
 					RejectedFrequencies: []uint64{1, 2, 42, 100},
 				},
 			},
@@ -497,6 +519,8 @@ func TestHandleDLChannelAns(t *testing.T) {
 							Frequency:    42,
 						}).MACCommand(),
 					},
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
@@ -507,6 +531,8 @@ func TestHandleDLChannelAns(t *testing.T) {
 							Frequency:    42,
 						}).MACCommand(),
 					},
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			Payload: &ttnpb.MACCommand_DLChannelAns{
@@ -536,7 +562,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 							Frequency:    42,
 						}).MACCommand(),
 					},
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
 							{
 								EnableUplink: true,
@@ -547,12 +573,13 @@ func TestHandleDLChannelAns(t *testing.T) {
 							},
 						},
 					},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Channels: []*ttnpb.MACParameters_Channel{
 							{
 								EnableUplink: true,
@@ -563,6 +590,7 @@ func TestHandleDLChannelAns(t *testing.T) {
 							},
 						},
 					},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			Payload: &ttnpb.MACCommand_DLChannelAns{

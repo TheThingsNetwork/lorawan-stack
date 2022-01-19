@@ -593,7 +593,7 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MA
 		return nil, err
 	}
 
-	current := ttnpb.MACParameters{
+	current := &ttnpb.MACParameters{
 		MaxEirp:                    phy.DefaultMaxEIRP,
 		AdrDataRateIndex:           ttnpb.DATA_RATE_0,
 		AdrNbTrans:                 1,
@@ -613,7 +613,7 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MA
 	}
 	desired := current
 	if !dev.Multicast {
-		desired = ttnpb.MACParameters{
+		desired = &ttnpb.MACParameters{
 			MaxEirp:                    DeviceDesiredMaxEIRP(dev, phy, fp, defaults),
 			AdrDataRateIndex:           ttnpb.DATA_RATE_0,
 			AdrNbTrans:                 1,

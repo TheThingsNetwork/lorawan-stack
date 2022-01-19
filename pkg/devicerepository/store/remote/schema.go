@@ -435,7 +435,7 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 
 	if !p.SupportsJoin && p.MaxEIRP > 0 {
 		dev.MacState = &ttnpb.MACState{
-			DesiredParameters: ttnpb.MACParameters{
+			DesiredParameters: &ttnpb.MACParameters{
 				MaxEirp: p.MaxEIRP,
 			},
 		}

@@ -1277,10 +1277,18 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 		case "current_parameters":
 			if len(subs) > 0 {
 				var newDst, newSrc *MACParameters
-				if src != nil {
-					newSrc = &src.CurrentParameters
+				if (src == nil || src.CurrentParameters == nil) && dst.CurrentParameters == nil {
+					continue
 				}
-				newDst = &dst.CurrentParameters
+				if src != nil {
+					newSrc = src.CurrentParameters
+				}
+				if dst.CurrentParameters != nil {
+					newDst = dst.CurrentParameters
+				} else {
+					newDst = &MACParameters{}
+					dst.CurrentParameters = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -1288,17 +1296,24 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 				if src != nil {
 					dst.CurrentParameters = src.CurrentParameters
 				} else {
-					var zero MACParameters
-					dst.CurrentParameters = zero
+					dst.CurrentParameters = nil
 				}
 			}
 		case "desired_parameters":
 			if len(subs) > 0 {
 				var newDst, newSrc *MACParameters
-				if src != nil {
-					newSrc = &src.DesiredParameters
+				if (src == nil || src.DesiredParameters == nil) && dst.DesiredParameters == nil {
+					continue
 				}
-				newDst = &dst.DesiredParameters
+				if src != nil {
+					newSrc = src.DesiredParameters
+				}
+				if dst.DesiredParameters != nil {
+					newDst = dst.DesiredParameters
+				} else {
+					newDst = &MACParameters{}
+					dst.DesiredParameters = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -1306,8 +1321,7 @@ func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 				if src != nil {
 					dst.DesiredParameters = src.DesiredParameters
 				} else {
-					var zero MACParameters
-					dst.DesiredParameters = zero
+					dst.DesiredParameters = nil
 				}
 			}
 		case "device_class":

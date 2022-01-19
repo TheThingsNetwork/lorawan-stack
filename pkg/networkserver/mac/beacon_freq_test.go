@@ -45,24 +45,24 @@ func TestNeedsBeaconFreqReq(t *testing.T) {
 	ForEachClass(t, func(makeClassName func(parts ...string) string, class ttnpb.Class) {
 		for _, conf := range []struct {
 			Suffix                               string
-			CurrentParameters, DesiredParameters ttnpb.MACParameters
+			CurrentParameters, DesiredParameters *ttnpb.MACParameters
 			Needs                                bool
 		}{
 			{
 				Suffix: "current(frequency:42),desired(frequency:42)",
-				CurrentParameters: ttnpb.MACParameters{
+				CurrentParameters: &ttnpb.MACParameters{
 					BeaconFrequency: 42,
 				},
-				DesiredParameters: ttnpb.MACParameters{
+				DesiredParameters: &ttnpb.MACParameters{
 					BeaconFrequency: 42,
 				},
 			},
 			{
 				Suffix: "current(frequency:24),desired(frequency:42)",
-				CurrentParameters: ttnpb.MACParameters{
+				CurrentParameters: &ttnpb.MACParameters{
 					BeaconFrequency: 24,
 				},
-				DesiredParameters: ttnpb.MACParameters{
+				DesiredParameters: &ttnpb.MACParameters{
 					BeaconFrequency: 42,
 				},
 				Needs: true,
@@ -114,20 +114,32 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 		{
 			Name: "nil payload",
 			Device: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Error: ErrNoPayload,
 		},
 		{
 			Name: "ack/no request",
 			Device: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Payload: &ttnpb.MACCommand_BeaconFreqAns{
 				FrequencyAck: true,
@@ -142,10 +154,16 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 		{
 			Name: "nack/no request",
 			Device: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Payload: &ttnpb.MACCommand_BeaconFreqAns{},
 			Events: events.Builders{
@@ -162,14 +180,17 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 							Frequency: 42,
 						}).MACCommand(),
 					},
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						BeaconFrequency: 42,
 					},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			Payload: &ttnpb.MACCommand_BeaconFreqAns{
@@ -190,11 +211,15 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 							Frequency: 42,
 						}).MACCommand(),
 					},
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					PendingRequests: []*ttnpb.MACCommand{},
+					PendingRequests:   []*ttnpb.MACCommand{},
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			Payload: &ttnpb.MACCommand_BeaconFreqAns{},

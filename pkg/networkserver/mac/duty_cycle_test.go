@@ -41,10 +41,10 @@ func TestNeedsDutyCycleReq(t *testing.T) {
 			Name: "current(max-duty-cycle:1024),desired(max-duty-cycle:1024)",
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						MaxDutyCycle: ttnpb.DUTY_CYCLE_1024,
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						MaxDutyCycle: ttnpb.DUTY_CYCLE_1024,
 					},
 				},
@@ -54,10 +54,10 @@ func TestNeedsDutyCycleReq(t *testing.T) {
 			Name: "current(max-duty-cycle:1024),desired(max-duty-cycle:2048)",
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						MaxDutyCycle: ttnpb.DUTY_CYCLE_1024,
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						MaxDutyCycle: ttnpb.DUTY_CYCLE_2048,
 					},
 				},
@@ -93,10 +93,16 @@ func TestHandleDutyCycleAns(t *testing.T) {
 		{
 			Name: "no request",
 			Device: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Events: events.Builders{
 				EvtReceiveDutyCycleAnswer,
@@ -112,14 +118,17 @@ func TestHandleDutyCycleAns(t *testing.T) {
 							MaxDutyCycle: ttnpb.DUTY_CYCLE_2048,
 						}).MACCommand(),
 					},
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					PendingRequests: []*ttnpb.MACCommand{},
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						MaxDutyCycle: ttnpb.DUTY_CYCLE_2048,
 					},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			Events: events.Builders{

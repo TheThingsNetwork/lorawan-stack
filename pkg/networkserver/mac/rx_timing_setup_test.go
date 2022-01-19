@@ -42,10 +42,10 @@ func TestNeedsRxTimingSetupReq(t *testing.T) {
 			Name: "current(delay:1),desired(delay:1)",
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: ttnpb.RX_DELAY_1,
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						Rx1Delay: ttnpb.RX_DELAY_1,
 					},
 				},
@@ -55,10 +55,10 @@ func TestNeedsRxTimingSetupReq(t *testing.T) {
 			Name: "current(delay:1),desired(delay:5)",
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: ttnpb.RX_DELAY_1,
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						Rx1Delay: ttnpb.RX_DELAY_5,
 					},
 				},
@@ -94,10 +94,16 @@ func TestHandleRxTimingSetupAns(t *testing.T) {
 		{
 			Name: "no request",
 			Device: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Expected: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Events: events.Builders{
 				EvtReceiveRxTimingSetupAnswer,
@@ -113,14 +119,17 @@ func TestHandleRxTimingSetupAns(t *testing.T) {
 							Delay: 42,
 						}).MACCommand(),
 					},
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			Expected: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						Rx1Delay: 42,
 					},
-					PendingRequests: []*ttnpb.MACCommand{},
+					DesiredParameters: &ttnpb.MACParameters{},
+					PendingRequests:   []*ttnpb.MACCommand{},
 				},
 			},
 			Events: events.Builders{

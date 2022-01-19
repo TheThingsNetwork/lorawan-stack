@@ -45,35 +45,35 @@ func TestNeedsTxParamSetupReq(t *testing.T) {
 	}
 	for _, conf := range []struct {
 		Suffix                               string
-		CurrentParameters, DesiredParameters ttnpb.MACParameters
+		CurrentParameters, DesiredParameters *ttnpb.MACParameters
 		Needs                                bool
 	}{
 		{
 			Suffix: "current(EIRP:26,downlink:nil,uplink:nil),desired(EIRP:26,downlink:nil,uplink:nil)",
-			CurrentParameters: ttnpb.MACParameters{
+			CurrentParameters: &ttnpb.MACParameters{
 				MaxEirp: 26,
 			},
-			DesiredParameters: ttnpb.MACParameters{
+			DesiredParameters: &ttnpb.MACParameters{
 				MaxEirp: 26,
 			},
 		},
 		{
 			Suffix: "current(EIRP:26,downlink:true,uplink:false),desired(EIRP:26,downlink:nil,uplink:nil)",
-			CurrentParameters: ttnpb.MACParameters{
+			CurrentParameters: &ttnpb.MACParameters{
 				MaxEirp:           26,
 				DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
 				UplinkDwellTime:   &ttnpb.BoolValue{Value: false},
 			},
-			DesiredParameters: ttnpb.MACParameters{
+			DesiredParameters: &ttnpb.MACParameters{
 				MaxEirp: 26,
 			},
 		},
 		{
 			Suffix: "current(EIRP:26,downlink:nil,uplink:nil),desired(EIRP:26,downlink:true,uplink:true)",
-			CurrentParameters: ttnpb.MACParameters{
+			CurrentParameters: &ttnpb.MACParameters{
 				MaxEirp: 26,
 			},
-			DesiredParameters: ttnpb.MACParameters{
+			DesiredParameters: &ttnpb.MACParameters{
 				MaxEirp:           26,
 				DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
 				UplinkDwellTime:   &ttnpb.BoolValue{Value: true},
@@ -82,10 +82,10 @@ func TestNeedsTxParamSetupReq(t *testing.T) {
 		},
 		{
 			Suffix: "current(EIRP:26,downlink:nil,uplink:nil),desired(EIRP:26,downlink:false,uplink:false)",
-			CurrentParameters: ttnpb.MACParameters{
+			CurrentParameters: &ttnpb.MACParameters{
 				MaxEirp: 26,
 			},
-			DesiredParameters: ttnpb.MACParameters{
+			DesiredParameters: &ttnpb.MACParameters{
 				MaxEirp:           26,
 				DownlinkDwellTime: &ttnpb.BoolValue{Value: false},
 				UplinkDwellTime:   &ttnpb.BoolValue{Value: false},
@@ -94,11 +94,11 @@ func TestNeedsTxParamSetupReq(t *testing.T) {
 		},
 		{
 			Suffix: "current(EIRP:26,downlink:true,uplink:nil),desired(EIRP:26,downlink:false,uplink:false)",
-			CurrentParameters: ttnpb.MACParameters{
+			CurrentParameters: &ttnpb.MACParameters{
 				MaxEirp:           26,
 				DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
 			},
-			DesiredParameters: ttnpb.MACParameters{
+			DesiredParameters: &ttnpb.MACParameters{
 				MaxEirp:           26,
 				DownlinkDwellTime: &ttnpb.BoolValue{Value: false},
 				UplinkDwellTime:   &ttnpb.BoolValue{Value: false},
@@ -107,12 +107,12 @@ func TestNeedsTxParamSetupReq(t *testing.T) {
 		},
 		{
 			Suffix: "current(EIRP:24,downlink:true,uplink:false),desired(EIRP:26,downlink:true,uplink:false)",
-			CurrentParameters: ttnpb.MACParameters{
+			CurrentParameters: &ttnpb.MACParameters{
 				MaxEirp:           24,
 				DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
 				UplinkDwellTime:   &ttnpb.BoolValue{Value: false},
 			},
-			DesiredParameters: ttnpb.MACParameters{
+			DesiredParameters: &ttnpb.MACParameters{
 				MaxEirp:           26,
 				DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
 				UplinkDwellTime:   &ttnpb.BoolValue{Value: false},
@@ -172,10 +172,10 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						MaxEirp: 26,
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						MaxEirp:           26,
 						DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
 						UplinkDwellTime:   &ttnpb.BoolValue{Value: true},
@@ -185,10 +185,10 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			ExpectedDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						MaxEirp: 26,
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						MaxEirp:           26,
 						DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
 						UplinkDwellTime:   &ttnpb.BoolValue{Value: true},
@@ -222,10 +222,10 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						MaxEirp: 26,
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						MaxEirp: 26,
 					},
 				},
@@ -233,10 +233,10 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			ExpectedDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						MaxEirp: 26,
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						MaxEirp: 26,
 					},
 				},
@@ -254,10 +254,10 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						MaxEirp: 26,
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						MaxEirp:           26,
 						DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
 						UplinkDwellTime:   &ttnpb.BoolValue{Value: true},
@@ -267,10 +267,10 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			ExpectedDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						MaxEirp: 26,
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						MaxEirp:           26,
 						DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
 						UplinkDwellTime:   &ttnpb.BoolValue{Value: true},
@@ -289,10 +289,10 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						MaxEirp: 26,
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						MaxEirp:           26,
 						DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
 						UplinkDwellTime:   &ttnpb.BoolValue{Value: true},
@@ -302,10 +302,10 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			ExpectedDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						MaxEirp: 26,
 					},
-					DesiredParameters: ttnpb.MACParameters{
+					DesiredParameters: &ttnpb.MACParameters{
 						MaxEirp:           26,
 						DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
 						UplinkDwellTime:   &ttnpb.BoolValue{Value: true},
@@ -345,10 +345,16 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 		{
 			Name: "no request",
 			InputDevice: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
-				MacState: &ttnpb.MACState{},
+				MacState: &ttnpb.MACState{
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
+				},
 			},
 			Events: events.Builders{
 				EvtReceiveTxParamSetupAnswer,
@@ -366,16 +372,19 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 							UplinkDwellTime:   true,
 						}).MACCommand(),
 					},
+					CurrentParameters: &ttnpb.MACParameters{},
+					DesiredParameters: &ttnpb.MACParameters{},
 				},
 			},
 			ExpectedDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					CurrentParameters: ttnpb.MACParameters{
+					CurrentParameters: &ttnpb.MACParameters{
 						MaxEirp:           26,
 						DownlinkDwellTime: &ttnpb.BoolValue{Value: true},
 						UplinkDwellTime:   &ttnpb.BoolValue{Value: true},
 					},
-					PendingRequests: []*ttnpb.MACCommand{},
+					DesiredParameters: &ttnpb.MACParameters{},
+					PendingRequests:   []*ttnpb.MACCommand{},
 				},
 			},
 			Events: events.Builders{
