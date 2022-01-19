@@ -40,7 +40,7 @@ func TestNeedsTxParamSetupReq(t *testing.T) {
 		{
 			Name:        "no MAC state",
 			InputDevice: &ttnpb.EndDevice{},
-			Band:        LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B],
+			Band:        LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B],
 		},
 	}
 	for _, conf := range []struct {
@@ -325,7 +325,7 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				dev := CopyEndDevice(tc.InputDevice)
 
-				st := EnqueueTxParamSetupReq(ctx, dev, tc.MaxDownlinkLength, tc.MaxUplinkLength, LoRaWANBands[band.AS_923][ttnpb.RP001_V1_1_REV_B])
+				st := EnqueueTxParamSetupReq(ctx, dev, tc.MaxDownlinkLength, tc.MaxUplinkLength, LoRaWANBands[band.AS_923][ttnpb.PHYVersion_RP001_V1_1_REV_B])
 				a.So(dev, should.Resemble, tc.ExpectedDevice)
 				a.So(st.QueuedEvents, should.ResembleEventBuilders, tc.State.QueuedEvents)
 				st.QueuedEvents = tc.State.QueuedEvents

@@ -589,7 +589,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			{
 				SetDevice: *MakeOTAASetDeviceRequest([]test.EndDeviceOption{
 					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					activateOpt,
 				},
 					"mac_state",
@@ -601,19 +601,19 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 				ReturnedDevice: MakeOTAAEndDevice(
 					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					activateOpt,
 				),
 				StoredDevice: MakeOTAAEndDevice(
 					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.Activate(customMACSettings, true, activeSessionOpts, activeMACStateOpts...),
 				),
 			},
 			{
 				SetDevice: *MakeOTAASetDeviceRequest([]test.EndDeviceOption{
 					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.SendJoinRequest(customMACSettings, false),
 				},
 					"pending_mac_state",
@@ -624,19 +624,19 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 				ReturnedDevice: MakeOTAAEndDevice(
 					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.SendJoinRequest(customMACSettings, false),
 				),
 				StoredDevice: MakeOTAAEndDevice(
 					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.SendJoinRequest(customMACSettings, true),
 				),
 			},
 			{
 				SetDevice: *MakeOTAASetDeviceRequest([]test.EndDeviceOption{
 					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.SendJoinRequest(customMACSettings, false),
 					EndDeviceOptions.SendJoinAccept(ttnpb.TxSchedulePriority_HIGHEST),
 				},
@@ -649,13 +649,13 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 				ReturnedDevice: MakeOTAAEndDevice(
 					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.SendJoinRequest(customMACSettings, false),
 					EndDeviceOptions.SendJoinAccept(ttnpb.TxSchedulePriority_HIGHEST),
 				),
 				StoredDevice: MakeOTAAEndDevice(
 					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.SendJoinRequest(customMACSettings, true),
 					EndDeviceOptions.SendJoinAccept(ttnpb.TxSchedulePriority_HIGHEST),
 				),
@@ -663,7 +663,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			{
 				SetDevice: *MakeOTAASetDeviceRequest([]test.EndDeviceOption{
 					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					activateOpt,
 				},
 					"mac_state.current_parameters",
@@ -676,12 +676,12 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 				ReturnedDevice: MakeOTAAEndDevice(
 					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.Activate(customMACSettings, false, activeSessionOpts, currentMACStateOverrideOpt),
 				),
 				StoredDevice: MakeOTAAEndDevice(
 					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.Activate(customMACSettings, true, activeSessionOpts, currentMACStateOverrideOpt),
 					EndDeviceOptions.WithMACStateOptions(
 						MACStateOptions.WithRecentUplinks(),
@@ -692,7 +692,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			{
 				SetDevice: *MakeOTAASetDeviceRequest([]test.EndDeviceOption{
 					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					activateOpt,
 				},
 					"mac_state.desired_parameters",
@@ -707,12 +707,12 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 				ReturnedDevice: MakeOTAAEndDevice(
 					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.Activate(defaultMACSettings, false, nil, desiredMACStateOverrideOpt),
 				),
 				StoredDevice: MakeOTAAEndDevice(
 					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.Activate(defaultMACSettings, true, nil, desiredMACStateOverrideOpt),
 					EndDeviceOptions.WithMACStateOptions(
 						MACStateOptions.WithRecentUplinks(),
@@ -984,7 +984,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 		{
 			CreateDevice: MakeOTAASetDeviceRequest([]test.EndDeviceOption{
 				EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-				EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+				EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 				activateOpt,
 			},
 				"mac_state",
@@ -1001,7 +1001,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 		{
 			CreateDevice: MakeABPSetDeviceRequest(macSettings, activeSessionOpts, nil, []test.EndDeviceOption{
 				EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-				EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+				EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 			}),
 		},
 	} {

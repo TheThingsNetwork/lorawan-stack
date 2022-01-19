@@ -71,7 +71,7 @@ func TestProfile(t *testing.T) {
 			template: &ttnpb.EndDeviceTemplate{
 				EndDevice: ttnpb.EndDevice{
 					LorawanVersion:    ttnpb.MAC_V1_0_2,
-					LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 					SupportsJoin:      true,
 					MacSettings: &ttnpb.MACSettings{
 						Supports_32BitFCnt: &ttnpb.BoolValue{Value: true},
@@ -96,7 +96,7 @@ func TestProfile(t *testing.T) {
 			template: &ttnpb.EndDeviceTemplate{
 				EndDevice: ttnpb.EndDevice{
 					LorawanVersion:    ttnpb.MAC_V1_1,
-					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 					Formatters: &ttnpb.MessagePayloadFormatters{
 						UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
 						DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
@@ -149,7 +149,7 @@ func TestProfile(t *testing.T) {
 			template: &ttnpb.EndDeviceTemplate{
 				EndDevice: ttnpb.EndDevice{
 					LorawanVersion:    ttnpb.MAC_V1_0_2,
-					LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 					SupportsClassB:    true,
 					SupportsJoin:      true,
 					MacSettings: &ttnpb.MACSettings{
@@ -180,7 +180,7 @@ func TestProfile(t *testing.T) {
 			template: &ttnpb.EndDeviceTemplate{
 				EndDevice: ttnpb.EndDevice{
 					LorawanVersion:    ttnpb.MAC_V1_0_2,
-					LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 					SupportsClassC:    true,
 					SupportsJoin:      true,
 					MacSettings: &ttnpb.MACSettings{

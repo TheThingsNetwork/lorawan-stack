@@ -64,10 +64,10 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 		}
 		beforeRP001_V1_0_3_REV_A := func(v ttnpb.PHYVersion) bool {
 			switch v {
-			case ttnpb.TS001_V1_0,
-				ttnpb.TS001_V1_0_1,
-				ttnpb.RP001_V1_0_2,
-				ttnpb.RP001_V1_0_2_REV_B:
+			case ttnpb.PHYVersion_TS001_V1_0,
+				ttnpb.PHYVersion_TS001_V1_0_1,
+				ttnpb.PHYVersion_RP001_V1_0_2,
+				ttnpb.PHYVersion_RP001_V1_0_2_REV_B:
 				return true
 			default:
 				return false

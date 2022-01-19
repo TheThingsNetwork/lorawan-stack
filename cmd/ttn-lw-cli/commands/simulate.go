@@ -67,8 +67,8 @@ func (m *simulateMetadataParams) setDefaults() error {
 	if m.BandID == "" {
 		m.BandID = band.EU_863_870
 	}
-	if m.LoRaWANPHYVersion == ttnpb.PHY_UNKNOWN {
-		m.LoRaWANPHYVersion = ttnpb.RP001_V1_0_2_REV_B
+	if m.LoRaWANPHYVersion == ttnpb.PHYVersion_PHY_UNKNOWN {
+		m.LoRaWANPHYVersion = ttnpb.PHYVersion_RP001_V1_0_2_REV_B
 	}
 	phy, err := band.Get(m.BandID, m.LoRaWANPHYVersion)
 	if err != nil {

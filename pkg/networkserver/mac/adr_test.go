@@ -73,7 +73,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Name: "adapted example from Semtech paper/no rejections",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{
 						AdrNbTrans:      1,
@@ -104,7 +104,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Name: "adapted example from Semtech paper/rejected DR:(1,4)",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{
 						AdrNbTrans:      1,
@@ -135,7 +135,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Name: "adapted example from Semtech paper/rejected TXPower:(1)",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{
 						AdrNbTrans:      1,
@@ -166,7 +166,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Name: "adapted example from Semtech paper/rejected TXPower:(0,1)",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{
 						AdrNbTrans:      1,
@@ -197,7 +197,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Name: "adapted example from Semtech paper/rejected DR:(1,4), rejected TXPower:(0,2,3)",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{
 						AdrNbTrans:      1,
@@ -231,7 +231,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Name: "adapted example from Semtech paper/rejected DR:(3), rejected TXPower:(0,1)",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{
 						AdrNbTrans:      1,
@@ -340,10 +340,10 @@ func TestIssue458(t *testing.T) {
 			Name: "initial uplinks, no change",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.USFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: MakeDefaultUS915CurrentMACParameters(ttnpb.RP001_V1_0_2_REV_B),
-					DesiredParameters: MakeDefaultUS915CurrentMACParameters(ttnpb.RP001_V1_0_2_REV_B),
+					CurrentParameters: MakeDefaultUS915CurrentMACParameters(ttnpb.PHYVersion_RP001_V1_0_2_REV_B),
+					DesiredParameters: MakeDefaultUS915CurrentMACParameters(ttnpb.PHYVersion_RP001_V1_0_2_REV_B),
 					RecentUplinks:     issue458Uplinks[:9],
 				},
 			},
@@ -352,10 +352,10 @@ func TestIssue458(t *testing.T) {
 			Name: "all uplinks, increase nbTrans",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.USFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: MakeDefaultUS915CurrentMACParameters(ttnpb.RP001_V1_0_2_REV_B),
-					DesiredParameters: MakeDefaultUS915CurrentMACParameters(ttnpb.RP001_V1_0_2_REV_B),
+					CurrentParameters: MakeDefaultUS915CurrentMACParameters(ttnpb.PHYVersion_RP001_V1_0_2_REV_B),
+					DesiredParameters: MakeDefaultUS915CurrentMACParameters(ttnpb.PHYVersion_RP001_V1_0_2_REV_B),
 					RecentUplinks:     issue458Uplinks[:],
 				},
 			},

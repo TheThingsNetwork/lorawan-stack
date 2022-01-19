@@ -265,7 +265,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 	pb := &ttnpb.EndDevice{
 		FrequencyPlanId:   test.EUFrequencyPlanID,
 		LorawanVersion:    ttnpb.MAC_V1_0_3,
-		LorawanPhyVersion: ttnpb.RP001_V1_0_3_REV_A,
+		LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_3_REV_A,
 		Ids: &ttnpb.EndDeviceIdentifiers{
 			JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -281,7 +281,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 				},
 			},
 		},
-		MacState: MakeDefaultEU868MACState(ttnpb.Class_CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.RP001_V1_0_3_REV_A),
+		MacState: MakeDefaultEU868MACState(ttnpb.Class_CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 		PendingSession: &ttnpb.Session{
 			DevAddr: types.DevAddr{0x43, 0xff, 0xff, 0xff},
 			Keys: &ttnpb.SessionKeys{
@@ -299,7 +299,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 				},
 			},
 		},
-		PendingMacState: MakeDefaultEU868MACState(ttnpb.Class_CLASS_A, ttnpb.MAC_V1_1, ttnpb.RP001_V1_1_REV_B),
+		PendingMacState: MakeDefaultEU868MACState(ttnpb.Class_CLASS_A, ttnpb.MAC_V1_1, ttnpb.PHYVersion_RP001_V1_1_REV_B),
 	}
 	pbFields := []string{
 		"frequency_plan_id",

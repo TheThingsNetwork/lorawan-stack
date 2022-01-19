@@ -578,7 +578,7 @@ func TestFindDataRate(t *testing.T) {
 	a := assertions.New(t)
 
 	// US_902_928
-	testBand, _ := Get(US_902_928, ttnpb.RP001_V1_0_2_REV_B)
+	testBand, _ := Get(US_902_928, ttnpb.PHYVersion_RP001_V1_0_2_REV_B)
 	dr := &ttnpb.DataRate{
 		Modulation: &ttnpb.DataRate_Lora{
 			Lora: &ttnpb.LoRaDataRate{
@@ -608,7 +608,7 @@ func TestFindDataRate(t *testing.T) {
 	}
 
 	// AU_915_928
-	testBand, _ = Get(AU_915_928, ttnpb.RP001_V1_0_3_REV_A)
+	testBand, _ = Get(AU_915_928, ttnpb.PHYVersion_RP001_V1_0_3_REV_A)
 	dr = &ttnpb.DataRate{
 		Modulation: &ttnpb.DataRate_Lora{
 			Lora: &ttnpb.LoRaDataRate{

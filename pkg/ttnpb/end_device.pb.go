@@ -577,7 +577,7 @@ func (m *EndDeviceVersion) GetLorawanPhyVersion() PHYVersion {
 	if m != nil {
 		return m.LorawanPhyVersion
 	}
-	return PHY_UNKNOWN
+	return PHYVersion_PHY_UNKNOWN
 }
 
 func (m *EndDeviceVersion) GetFrequencyPlanId() string {
@@ -1801,7 +1801,7 @@ func (m *EndDevice) GetLorawanPhyVersion() PHYVersion {
 	if m != nil {
 		return m.LorawanPhyVersion
 	}
-	return PHY_UNKNOWN
+	return PHYVersion_PHY_UNKNOWN
 }
 
 func (m *EndDevice) GetFrequencyPlanId() string {
