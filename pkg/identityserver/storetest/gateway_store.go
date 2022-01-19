@@ -87,7 +87,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 			LocationPublic:                 true,
 			ScheduleDownlinkLate:           true,
 			EnforceDutyCycle:               true,
-			DownlinkPathConstraint:         ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
+			DownlinkPathConstraint:         ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
 			ScheduleAnytimeDelay:           ttnpb.ProtoDurationPtr(time.Second),
 			UpdateLocationFromStatus:       true,
 			LbsLnsSecret:                   secret,
@@ -124,7 +124,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 			a.So(created.LocationPublic, should.BeTrue)
 			a.So(created.ScheduleDownlinkLate, should.BeTrue)
 			a.So(created.EnforceDutyCycle, should.BeTrue)
-			a.So(created.DownlinkPathConstraint, should.Equal, ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER)
+			a.So(created.DownlinkPathConstraint, should.Equal, ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER)
 			a.So(*ttnpb.StdDuration(created.ScheduleAnytimeDelay), should.Equal, time.Second)
 			a.So(created.UpdateLocationFromStatus, should.BeTrue)
 			a.So(created.LbsLnsSecret, should.Resemble, secret)
@@ -237,7 +237,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 			LocationPublic:                 false,
 			ScheduleDownlinkLate:           false,
 			EnforceDutyCycle:               false,
-			DownlinkPathConstraint:         ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
+			DownlinkPathConstraint:         ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NONE,
 			ScheduleAnytimeDelay:           ttnpb.ProtoDurationPtr(time.Second / 2),
 			UpdateLocationFromStatus:       false,
 			LbsLnsSecret:                   updatedSecret,
@@ -274,7 +274,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 			a.So(updated.LocationPublic, should.BeFalse)
 			a.So(updated.ScheduleDownlinkLate, should.BeFalse)
 			a.So(updated.EnforceDutyCycle, should.BeFalse)
-			a.So(updated.DownlinkPathConstraint, should.Equal, ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE)
+			a.So(updated.DownlinkPathConstraint, should.Equal, ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NONE)
 			a.So(*ttnpb.StdDuration(updated.ScheduleAnytimeDelay), should.Equal, time.Second/2)
 			a.So(updated.UpdateLocationFromStatus, should.BeFalse)
 			a.So(updated.LbsLnsSecret, should.Resemble, updatedSecret)

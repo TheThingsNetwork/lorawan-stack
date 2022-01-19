@@ -259,7 +259,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 	for _, md := range up.RxMetadata {
 		if md.AntennaIndex != 0 {
 			// TODO: Support downlink path to multiple antennas (https://github.com/TheThingsNetwork/lorawan-stack/issues/48)
-			md.DownlinkPathConstraint = ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER
+			md.DownlinkPathConstraint = ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER
 			continue
 		}
 		buf, err := UplinkToken(&ttnpb.GatewayAntennaIdentifiers{
@@ -428,7 +428,7 @@ var (
 // ScheduleDown schedules and sends a downlink message by using the given path and updates the downlink stats.
 // This method returns an error if the downlink message is not a Tx request.
 func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkMessage) (rx1, rx2 bool, delay time.Duration, err error) {
-	if c.gateway.DownlinkPathConstraint == ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER {
+	if c.gateway.DownlinkPathConstraint == ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER {
 		return false, false, 0, errNotAllowed.New()
 	}
 	request := msg.GetRequest()

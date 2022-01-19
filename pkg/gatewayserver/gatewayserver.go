@@ -474,7 +474,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 			FrequencyPlanId:        fpID,
 			FrequencyPlanIds:       []string{fpID},
 			EnforceDutyCycle:       true,
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
+			DownlinkPathConstraint: ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NONE,
 			Antennas:               []*ttnpb.GatewayAntenna{},
 		}
 	} else if err != nil {

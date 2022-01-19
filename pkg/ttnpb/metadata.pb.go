@@ -263,7 +263,7 @@ func (m *RxMetadata) GetDownlinkPathConstraint() DownlinkPathConstraint {
 	if m != nil {
 		return m.DownlinkPathConstraint
 	}
-	return DOWNLINK_PATH_CONSTRAINT_NONE
+	return DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NONE
 }
 
 func (m *RxMetadata) GetUplinkToken() []byte {

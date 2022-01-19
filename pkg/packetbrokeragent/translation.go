@@ -377,7 +377,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 				}
 			}
 
-			if md.DownlinkPathConstraint == ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER {
+			if md.DownlinkPathConstraint == ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER {
 				continue
 			}
 
@@ -443,11 +443,11 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 		return nil, errNetID.WithCause(err).WithAttributes("net_id", msg.HomeNetworkNetId)
 	}
 	var (
-		downlinkPathConstraint = ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER
+		downlinkPathConstraint = ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER
 		uplinkToken            []byte
 	)
 	if len(msg.Message.GatewayUplinkToken) > 0 || len(msg.Message.ForwarderUplinkToken) > 0 {
-		downlinkPathConstraint = ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE
+		downlinkPathConstraint = ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NONE
 		token := &agentUplinkToken{
 			ForwarderNetID:     forwarderNetID,
 			ForwarderTenantID:  msg.ForwarderTenantId,

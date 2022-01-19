@@ -697,7 +697,7 @@ func downlinkPathsFromMetadata(ctx context.Context, mds ...*ttnpb.RxMetadata) []
 	body := make([]downlinkPath, 0, len(mds))
 	tail := make([]downlinkPath, 0, len(mds))
 	for _, md := range mds {
-		if len(md.UplinkToken) == 0 || md.DownlinkPathConstraint == ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER {
+		if len(md.UplinkToken) == 0 || md.DownlinkPathConstraint == ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER {
 			continue
 		}
 		path := downlinkPath{
@@ -712,9 +712,9 @@ func downlinkPathsFromMetadata(ctx context.Context, mds ...*ttnpb.RxMetadata) []
 		} else {
 			path.GatewayIdentifiers = md.GatewayIds
 			switch md.DownlinkPathConstraint {
-			case ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE:
+			case ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NONE:
 				head = append(head, path)
-			case ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER:
+			case ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER:
 				body = append(body, path)
 			}
 		}
