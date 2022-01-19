@@ -33,56 +33,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func TestStringers(t *testing.T) {
-	for _, tc := range []struct {
-		Stringer fmt.Stringer
-		String   string
-	}{
-		{
-			Stringer: MAC_V1_0,
-			String:   "1.0.0",
-		},
-		{
-			Stringer: MAC_V1_0_1,
-			String:   "1.0.1",
-		},
-		{
-			Stringer: MAC_V1_0_2,
-			String:   "1.0.2",
-		},
-		{
-			Stringer: MAC_V1_1,
-			String:   "1.1.0",
-		},
-		{
-			Stringer: TS001_V1_0,
-			String:   "1.0.0",
-		},
-		{
-			Stringer: TS001_V1_0_1,
-			String:   "1.0.1",
-		},
-		{
-			Stringer: RP001_V1_0_2,
-			String:   "1.0.2-a",
-		},
-		{
-			Stringer: RP001_V1_0_2_REV_B,
-			String:   "1.0.2-b",
-		},
-		{
-			Stringer: RP001_V1_1_REV_A,
-			String:   "1.1.0-a",
-		},
-		{
-			Stringer: RP001_V1_1_REV_B,
-			String:   "1.1.0-b",
-		},
-	} {
-		assertions.New(t).So(tc.Stringer.String(), should.Equal, tc.String)
-	}
-}
-
 func TestMarshalers(t *testing.T) {
 	var vals [][]interface{}
 

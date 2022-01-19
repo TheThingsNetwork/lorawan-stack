@@ -23920,8 +23920,18 @@
               "description": ""
             },
             {
+              "name": "PHY_V1_0",
+              "number": "1",
+              "description": ""
+            },
+            {
               "name": "TS001_V1_0",
               "number": "1",
+              "description": ""
+            },
+            {
+              "name": "PHY_V1_0_1",
+              "number": "2",
               "description": ""
             },
             {
@@ -23930,8 +23940,18 @@
               "description": ""
             },
             {
+              "name": "PHY_V1_0_2_REV_A",
+              "number": "3",
+              "description": ""
+            },
+            {
               "name": "RP001_V1_0_2",
               "number": "3",
+              "description": ""
+            },
+            {
+              "name": "PHY_V1_0_2_REV_B",
+              "number": "4",
               "description": ""
             },
             {
@@ -23940,13 +23960,28 @@
               "description": ""
             },
             {
+              "name": "PHY_V1_1_REV_A",
+              "number": "5",
+              "description": ""
+            },
+            {
               "name": "RP001_V1_1_REV_A",
               "number": "5",
               "description": ""
             },
             {
+              "name": "PHY_V1_1_REV_B",
+              "number": "6",
+              "description": ""
+            },
+            {
               "name": "RP001_V1_1_REV_B",
               "number": "6",
+              "description": ""
+            },
+            {
+              "name": "PHY_V1_0_3_REV_A",
+              "number": "7",
               "description": ""
             },
             {

@@ -101,54 +101,54 @@ Binary | ttnpb.CFListType | FREQUENCIES | [0]
 Binary | ttnpb.Class | CLASS_A | [0]
 Binary | ttnpb.Class | CLASS_B | [1]
 Binary | ttnpb.Class | CLASS_C | [2]
-Binary | ttnpb.DataRateIndex | 0 | [0]
-Binary | ttnpb.DataRateIndex | 1 | [1]
-Binary | ttnpb.DataRateIndex | 10 | [10]
-Binary | ttnpb.DataRateIndex | 11 | [11]
-Binary | ttnpb.DataRateIndex | 12 | [12]
-Binary | ttnpb.DataRateIndex | 13 | [13]
-Binary | ttnpb.DataRateIndex | 14 | [14]
-Binary | ttnpb.DataRateIndex | 15 | [15]
-Binary | ttnpb.DataRateIndex | 2 | [2]
-Binary | ttnpb.DataRateIndex | 3 | [3]
-Binary | ttnpb.DataRateIndex | 4 | [4]
-Binary | ttnpb.DataRateIndex | 5 | [5]
-Binary | ttnpb.DataRateIndex | 6 | [6]
-Binary | ttnpb.DataRateIndex | 7 | [7]
-Binary | ttnpb.DataRateIndex | 8 | [8]
-Binary | ttnpb.DataRateIndex | 9 | [9]
-Binary | ttnpb.DataRateIndexValue | {0 {} [] 0} | [0]
-Binary | ttnpb.DataRateIndexValue | {1 {} [] 0} | [1]
-Binary | ttnpb.DataRateIndexValue | {10 {} [] 0} | [10]
-Binary | ttnpb.DataRateIndexValue | {11 {} [] 0} | [11]
-Binary | ttnpb.DataRateIndexValue | {12 {} [] 0} | [12]
-Binary | ttnpb.DataRateIndexValue | {13 {} [] 0} | [13]
-Binary | ttnpb.DataRateIndexValue | {14 {} [] 0} | [14]
-Binary | ttnpb.DataRateIndexValue | {15 {} [] 0} | [15]
-Binary | ttnpb.DataRateIndexValue | {2 {} [] 0} | [2]
-Binary | ttnpb.DataRateIndexValue | {3 {} [] 0} | [3]
-Binary | ttnpb.DataRateIndexValue | {4 {} [] 0} | [4]
-Binary | ttnpb.DataRateIndexValue | {5 {} [] 0} | [5]
-Binary | ttnpb.DataRateIndexValue | {6 {} [] 0} | [6]
-Binary | ttnpb.DataRateIndexValue | {7 {} [] 0} | [7]
-Binary | ttnpb.DataRateIndexValue | {8 {} [] 0} | [8]
-Binary | ttnpb.DataRateIndexValue | {9 {} [] 0} | [9]
-Binary | ttnpb.DataRateOffset | 0 | [0]
-Binary | ttnpb.DataRateOffset | 1 | [1]
-Binary | ttnpb.DataRateOffset | 2 | [2]
-Binary | ttnpb.DataRateOffset | 3 | [3]
-Binary | ttnpb.DataRateOffset | 4 | [4]
-Binary | ttnpb.DataRateOffset | 5 | [5]
-Binary | ttnpb.DataRateOffset | 6 | [6]
-Binary | ttnpb.DataRateOffset | 7 | [7]
-Binary | ttnpb.DataRateOffsetValue | {0 {} [] 0} | [0]
-Binary | ttnpb.DataRateOffsetValue | {1 {} [] 0} | [1]
-Binary | ttnpb.DataRateOffsetValue | {2 {} [] 0} | [2]
-Binary | ttnpb.DataRateOffsetValue | {3 {} [] 0} | [3]
-Binary | ttnpb.DataRateOffsetValue | {4 {} [] 0} | [4]
-Binary | ttnpb.DataRateOffsetValue | {5 {} [] 0} | [5]
-Binary | ttnpb.DataRateOffsetValue | {6 {} [] 0} | [6]
-Binary | ttnpb.DataRateOffsetValue | {7 {} [] 0} | [7]
+Binary | ttnpb.DataRateIndex | DATA_RATE_0 | [0]
+Binary | ttnpb.DataRateIndex | DATA_RATE_1 | [1]
+Binary | ttnpb.DataRateIndex | DATA_RATE_10 | [10]
+Binary | ttnpb.DataRateIndex | DATA_RATE_11 | [11]
+Binary | ttnpb.DataRateIndex | DATA_RATE_12 | [12]
+Binary | ttnpb.DataRateIndex | DATA_RATE_13 | [13]
+Binary | ttnpb.DataRateIndex | DATA_RATE_14 | [14]
+Binary | ttnpb.DataRateIndex | DATA_RATE_15 | [15]
+Binary | ttnpb.DataRateIndex | DATA_RATE_2 | [2]
+Binary | ttnpb.DataRateIndex | DATA_RATE_3 | [3]
+Binary | ttnpb.DataRateIndex | DATA_RATE_4 | [4]
+Binary | ttnpb.DataRateIndex | DATA_RATE_5 | [5]
+Binary | ttnpb.DataRateIndex | DATA_RATE_6 | [6]
+Binary | ttnpb.DataRateIndex | DATA_RATE_7 | [7]
+Binary | ttnpb.DataRateIndex | DATA_RATE_8 | [8]
+Binary | ttnpb.DataRateIndex | DATA_RATE_9 | [9]
+Binary | ttnpb.DataRateIndexValue | {DATA_RATE_0 {} [] 0} | [0]
+Binary | ttnpb.DataRateIndexValue | {DATA_RATE_1 {} [] 0} | [1]
+Binary | ttnpb.DataRateIndexValue | {DATA_RATE_10 {} [] 0} | [10]
+Binary | ttnpb.DataRateIndexValue | {DATA_RATE_11 {} [] 0} | [11]
+Binary | ttnpb.DataRateIndexValue | {DATA_RATE_12 {} [] 0} | [12]
+Binary | ttnpb.DataRateIndexValue | {DATA_RATE_13 {} [] 0} | [13]
+Binary | ttnpb.DataRateIndexValue | {DATA_RATE_14 {} [] 0} | [14]
+Binary | ttnpb.DataRateIndexValue | {DATA_RATE_15 {} [] 0} | [15]
+Binary | ttnpb.DataRateIndexValue | {DATA_RATE_2 {} [] 0} | [2]
+Binary | ttnpb.DataRateIndexValue | {DATA_RATE_3 {} [] 0} | [3]
+Binary | ttnpb.DataRateIndexValue | {DATA_RATE_4 {} [] 0} | [4]
+Binary | ttnpb.DataRateIndexValue | {DATA_RATE_5 {} [] 0} | [5]
+Binary | ttnpb.DataRateIndexValue | {DATA_RATE_6 {} [] 0} | [6]
+Binary | ttnpb.DataRateIndexValue | {DATA_RATE_7 {} [] 0} | [7]
+Binary | ttnpb.DataRateIndexValue | {DATA_RATE_8 {} [] 0} | [8]
+Binary | ttnpb.DataRateIndexValue | {DATA_RATE_9 {} [] 0} | [9]
+Binary | ttnpb.DataRateOffset | DATA_RATE_OFFSET_0 | [0]
+Binary | ttnpb.DataRateOffset | DATA_RATE_OFFSET_1 | [1]
+Binary | ttnpb.DataRateOffset | DATA_RATE_OFFSET_2 | [2]
+Binary | ttnpb.DataRateOffset | DATA_RATE_OFFSET_3 | [3]
+Binary | ttnpb.DataRateOffset | DATA_RATE_OFFSET_4 | [4]
+Binary | ttnpb.DataRateOffset | DATA_RATE_OFFSET_5 | [5]
+Binary | ttnpb.DataRateOffset | DATA_RATE_OFFSET_6 | [6]
+Binary | ttnpb.DataRateOffset | DATA_RATE_OFFSET_7 | [7]
+Binary | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_0 {} [] 0} | [0]
+Binary | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_1 {} [] 0} | [1]
+Binary | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_2 {} [] 0} | [2]
+Binary | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_3 {} [] 0} | [3]
+Binary | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_4 {} [] 0} | [4]
+Binary | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_5 {} [] 0} | [5]
+Binary | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_6 {} [] 0} | [6]
+Binary | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_7 {} [] 0} | [7]
 Binary | ttnpb.DeviceEIRP | DEVICE_EIRP_10 | [1]
 Binary | ttnpb.DeviceEIRP | DEVICE_EIRP_12 | [2]
 Binary | ttnpb.DeviceEIRP | DEVICE_EIRP_13 | [3]
@@ -206,13 +206,13 @@ Binary | ttnpb.MACCommandIdentifier | CID_RFU_0 | [0]
 Binary | ttnpb.MACCommandIdentifier | CID_RX_PARAM_SETUP | [5]
 Binary | ttnpb.MACCommandIdentifier | CID_RX_TIMING_SETUP | [8]
 Binary | ttnpb.MACCommandIdentifier | CID_TX_PARAM_SETUP | [9]
-Binary | ttnpb.MACVersion | 1.0.0 | [1]
-Binary | ttnpb.MACVersion | 1.0.1 | [2]
-Binary | ttnpb.MACVersion | 1.0.2 | [3]
-Binary | ttnpb.MACVersion | 1.0.3 | [5]
-Binary | ttnpb.MACVersion | 1.0.4 | [6]
-Binary | ttnpb.MACVersion | 1.1.0 | [4]
-Binary | ttnpb.MACVersion | unknown | [0]
+Binary | ttnpb.MACVersion | MAC_UNKNOWN | [0]
+Binary | ttnpb.MACVersion | MAC_V1_0 | [1]
+Binary | ttnpb.MACVersion | MAC_V1_0_1 | [2]
+Binary | ttnpb.MACVersion | MAC_V1_0_2 | [3]
+Binary | ttnpb.MACVersion | MAC_V1_0_3 | [5]
+Binary | ttnpb.MACVersion | MAC_V1_0_4 | [6]
+Binary | ttnpb.MACVersion | MAC_V1_1 | [4]
 Binary | ttnpb.MType | CONFIRMED_DOWN | [5]
 Binary | ttnpb.MType | CONFIRMED_UP | [4]
 Binary | ttnpb.MType | JOIN_ACCEPT | [1]
@@ -238,18 +238,18 @@ Binary | ttnpb.Minor | MINOR_RFU_6 | [6]
 Binary | ttnpb.Minor | MINOR_RFU_7 | [7]
 Binary | ttnpb.Minor | MINOR_RFU_8 | [8]
 Binary | ttnpb.Minor | MINOR_RFU_9 | [9]
-Binary | ttnpb.PHYVersion | 1.0.0 | [1]
-Binary | ttnpb.PHYVersion | 1.0.1 | [2]
-Binary | ttnpb.PHYVersion | 1.0.2-a | [3]
-Binary | ttnpb.PHYVersion | 1.0.2-b | [4]
-Binary | ttnpb.PHYVersion | 1.0.3-a | [7]
-Binary | ttnpb.PHYVersion | 1.1.0-a | [5]
-Binary | ttnpb.PHYVersion | 1.1.0-b | [6]
+Binary | ttnpb.PHYVersion | PHY_UNKNOWN | [0]
+Binary | ttnpb.PHYVersion | PHY_V1_0 | [1]
+Binary | ttnpb.PHYVersion | PHY_V1_0_1 | [2]
+Binary | ttnpb.PHYVersion | PHY_V1_0_2_REV_A | [3]
+Binary | ttnpb.PHYVersion | PHY_V1_0_2_REV_B | [4]
+Binary | ttnpb.PHYVersion | PHY_V1_0_3_REV_A | [7]
+Binary | ttnpb.PHYVersion | PHY_V1_1_REV_A | [5]
+Binary | ttnpb.PHYVersion | PHY_V1_1_REV_B | [6]
 Binary | ttnpb.PHYVersion | RP002_V1_0_0 | [8]
 Binary | ttnpb.PHYVersion | RP002_V1_0_1 | [9]
 Binary | ttnpb.PHYVersion | RP002_V1_0_2 | [10]
 Binary | ttnpb.PHYVersion | RP002_V1_0_3 | [11]
-Binary | ttnpb.PHYVersion | unknown | [0]
 Binary | ttnpb.PingSlotPeriod | PING_EVERY_128S | [7]
 Binary | ttnpb.PingSlotPeriod | PING_EVERY_16S | [4]
 Binary | ttnpb.PingSlotPeriod | PING_EVERY_1S | [0]
@@ -309,38 +309,38 @@ Binary | ttnpb.RejoinTimeExponent | REJOIN_TIME_6 | [6]
 Binary | ttnpb.RejoinTimeExponent | REJOIN_TIME_7 | [7]
 Binary | ttnpb.RejoinTimeExponent | REJOIN_TIME_8 | [8]
 Binary | ttnpb.RejoinTimeExponent | REJOIN_TIME_9 | [9]
-Binary | ttnpb.RxDelay | 0 | [0]
-Binary | ttnpb.RxDelay | 1 | [1]
-Binary | ttnpb.RxDelay | 10 | [10]
-Binary | ttnpb.RxDelay | 11 | [11]
-Binary | ttnpb.RxDelay | 12 | [12]
-Binary | ttnpb.RxDelay | 13 | [13]
-Binary | ttnpb.RxDelay | 14 | [14]
-Binary | ttnpb.RxDelay | 15 | [15]
-Binary | ttnpb.RxDelay | 2 | [2]
-Binary | ttnpb.RxDelay | 3 | [3]
-Binary | ttnpb.RxDelay | 4 | [4]
-Binary | ttnpb.RxDelay | 5 | [5]
-Binary | ttnpb.RxDelay | 6 | [6]
-Binary | ttnpb.RxDelay | 7 | [7]
-Binary | ttnpb.RxDelay | 8 | [8]
-Binary | ttnpb.RxDelay | 9 | [9]
-Binary | ttnpb.RxDelayValue | {0 {} [] 0} | [0]
-Binary | ttnpb.RxDelayValue | {1 {} [] 0} | [1]
-Binary | ttnpb.RxDelayValue | {10 {} [] 0} | [10]
-Binary | ttnpb.RxDelayValue | {11 {} [] 0} | [11]
-Binary | ttnpb.RxDelayValue | {12 {} [] 0} | [12]
-Binary | ttnpb.RxDelayValue | {13 {} [] 0} | [13]
-Binary | ttnpb.RxDelayValue | {14 {} [] 0} | [14]
-Binary | ttnpb.RxDelayValue | {15 {} [] 0} | [15]
-Binary | ttnpb.RxDelayValue | {2 {} [] 0} | [2]
-Binary | ttnpb.RxDelayValue | {3 {} [] 0} | [3]
-Binary | ttnpb.RxDelayValue | {4 {} [] 0} | [4]
-Binary | ttnpb.RxDelayValue | {5 {} [] 0} | [5]
-Binary | ttnpb.RxDelayValue | {6 {} [] 0} | [6]
-Binary | ttnpb.RxDelayValue | {7 {} [] 0} | [7]
-Binary | ttnpb.RxDelayValue | {8 {} [] 0} | [8]
-Binary | ttnpb.RxDelayValue | {9 {} [] 0} | [9]
+Binary | ttnpb.RxDelay | RX_DELAY_0 | [0]
+Binary | ttnpb.RxDelay | RX_DELAY_1 | [1]
+Binary | ttnpb.RxDelay | RX_DELAY_10 | [10]
+Binary | ttnpb.RxDelay | RX_DELAY_11 | [11]
+Binary | ttnpb.RxDelay | RX_DELAY_12 | [12]
+Binary | ttnpb.RxDelay | RX_DELAY_13 | [13]
+Binary | ttnpb.RxDelay | RX_DELAY_14 | [14]
+Binary | ttnpb.RxDelay | RX_DELAY_15 | [15]
+Binary | ttnpb.RxDelay | RX_DELAY_2 | [2]
+Binary | ttnpb.RxDelay | RX_DELAY_3 | [3]
+Binary | ttnpb.RxDelay | RX_DELAY_4 | [4]
+Binary | ttnpb.RxDelay | RX_DELAY_5 | [5]
+Binary | ttnpb.RxDelay | RX_DELAY_6 | [6]
+Binary | ttnpb.RxDelay | RX_DELAY_7 | [7]
+Binary | ttnpb.RxDelay | RX_DELAY_8 | [8]
+Binary | ttnpb.RxDelay | RX_DELAY_9 | [9]
+Binary | ttnpb.RxDelayValue | {RX_DELAY_0 {} [] 0} | [0]
+Binary | ttnpb.RxDelayValue | {RX_DELAY_1 {} [] 0} | [1]
+Binary | ttnpb.RxDelayValue | {RX_DELAY_10 {} [] 0} | [10]
+Binary | ttnpb.RxDelayValue | {RX_DELAY_11 {} [] 0} | [11]
+Binary | ttnpb.RxDelayValue | {RX_DELAY_12 {} [] 0} | [12]
+Binary | ttnpb.RxDelayValue | {RX_DELAY_13 {} [] 0} | [13]
+Binary | ttnpb.RxDelayValue | {RX_DELAY_14 {} [] 0} | [14]
+Binary | ttnpb.RxDelayValue | {RX_DELAY_15 {} [] 0} | [15]
+Binary | ttnpb.RxDelayValue | {RX_DELAY_2 {} [] 0} | [2]
+Binary | ttnpb.RxDelayValue | {RX_DELAY_3 {} [] 0} | [3]
+Binary | ttnpb.RxDelayValue | {RX_DELAY_4 {} [] 0} | [4]
+Binary | ttnpb.RxDelayValue | {RX_DELAY_5 {} [] 0} | [5]
+Binary | ttnpb.RxDelayValue | {RX_DELAY_6 {} [] 0} | [6]
+Binary | ttnpb.RxDelayValue | {RX_DELAY_7 {} [] 0} | [7]
+Binary | ttnpb.RxDelayValue | {RX_DELAY_8 {} [] 0} | [8]
+Binary | ttnpb.RxDelayValue | {RX_DELAY_9 {} [] 0} | [9]
 Binary | ttnpb.TxSchedulePriority | ABOVE_NORMAL | [4]
 Binary | ttnpb.TxSchedulePriority | BELOW_NORMAL | [2]
 Binary | ttnpb.TxSchedulePriority | HIGH | [5]
@@ -451,54 +451,54 @@ JSON | ttnpb.CFListType | FREQUENCIES | "FREQUENCIES"
 JSON | ttnpb.Class | CLASS_A | "CLASS_A"
 JSON | ttnpb.Class | CLASS_B | "CLASS_B"
 JSON | ttnpb.Class | CLASS_C | "CLASS_C"
-JSON | ttnpb.DataRateIndex | 0 | 0
-JSON | ttnpb.DataRateIndex | 1 | 1
-JSON | ttnpb.DataRateIndex | 10 | 10
-JSON | ttnpb.DataRateIndex | 11 | 11
-JSON | ttnpb.DataRateIndex | 12 | 12
-JSON | ttnpb.DataRateIndex | 13 | 13
-JSON | ttnpb.DataRateIndex | 14 | 14
-JSON | ttnpb.DataRateIndex | 15 | 15
-JSON | ttnpb.DataRateIndex | 2 | 2
-JSON | ttnpb.DataRateIndex | 3 | 3
-JSON | ttnpb.DataRateIndex | 4 | 4
-JSON | ttnpb.DataRateIndex | 5 | 5
-JSON | ttnpb.DataRateIndex | 6 | 6
-JSON | ttnpb.DataRateIndex | 7 | 7
-JSON | ttnpb.DataRateIndex | 8 | 8
-JSON | ttnpb.DataRateIndex | 9 | 9
-JSON | ttnpb.DataRateIndexValue | {0 {} [] 0} | 0
-JSON | ttnpb.DataRateIndexValue | {1 {} [] 0} | 1
-JSON | ttnpb.DataRateIndexValue | {10 {} [] 0} | 10
-JSON | ttnpb.DataRateIndexValue | {11 {} [] 0} | 11
-JSON | ttnpb.DataRateIndexValue | {12 {} [] 0} | 12
-JSON | ttnpb.DataRateIndexValue | {13 {} [] 0} | 13
-JSON | ttnpb.DataRateIndexValue | {14 {} [] 0} | 14
-JSON | ttnpb.DataRateIndexValue | {15 {} [] 0} | 15
-JSON | ttnpb.DataRateIndexValue | {2 {} [] 0} | 2
-JSON | ttnpb.DataRateIndexValue | {3 {} [] 0} | 3
-JSON | ttnpb.DataRateIndexValue | {4 {} [] 0} | 4
-JSON | ttnpb.DataRateIndexValue | {5 {} [] 0} | 5
-JSON | ttnpb.DataRateIndexValue | {6 {} [] 0} | 6
-JSON | ttnpb.DataRateIndexValue | {7 {} [] 0} | 7
-JSON | ttnpb.DataRateIndexValue | {8 {} [] 0} | 8
-JSON | ttnpb.DataRateIndexValue | {9 {} [] 0} | 9
-JSON | ttnpb.DataRateOffset | 0 | 0
-JSON | ttnpb.DataRateOffset | 1 | 1
-JSON | ttnpb.DataRateOffset | 2 | 2
-JSON | ttnpb.DataRateOffset | 3 | 3
-JSON | ttnpb.DataRateOffset | 4 | 4
-JSON | ttnpb.DataRateOffset | 5 | 5
-JSON | ttnpb.DataRateOffset | 6 | 6
-JSON | ttnpb.DataRateOffset | 7 | 7
-JSON | ttnpb.DataRateOffsetValue | {0 {} [] 0} | 0
-JSON | ttnpb.DataRateOffsetValue | {1 {} [] 0} | 1
-JSON | ttnpb.DataRateOffsetValue | {2 {} [] 0} | 2
-JSON | ttnpb.DataRateOffsetValue | {3 {} [] 0} | 3
-JSON | ttnpb.DataRateOffsetValue | {4 {} [] 0} | 4
-JSON | ttnpb.DataRateOffsetValue | {5 {} [] 0} | 5
-JSON | ttnpb.DataRateOffsetValue | {6 {} [] 0} | 6
-JSON | ttnpb.DataRateOffsetValue | {7 {} [] 0} | 7
+JSON | ttnpb.DataRateIndex | DATA_RATE_0 | 0
+JSON | ttnpb.DataRateIndex | DATA_RATE_1 | 1
+JSON | ttnpb.DataRateIndex | DATA_RATE_10 | 10
+JSON | ttnpb.DataRateIndex | DATA_RATE_11 | 11
+JSON | ttnpb.DataRateIndex | DATA_RATE_12 | 12
+JSON | ttnpb.DataRateIndex | DATA_RATE_13 | 13
+JSON | ttnpb.DataRateIndex | DATA_RATE_14 | 14
+JSON | ttnpb.DataRateIndex | DATA_RATE_15 | 15
+JSON | ttnpb.DataRateIndex | DATA_RATE_2 | 2
+JSON | ttnpb.DataRateIndex | DATA_RATE_3 | 3
+JSON | ttnpb.DataRateIndex | DATA_RATE_4 | 4
+JSON | ttnpb.DataRateIndex | DATA_RATE_5 | 5
+JSON | ttnpb.DataRateIndex | DATA_RATE_6 | 6
+JSON | ttnpb.DataRateIndex | DATA_RATE_7 | 7
+JSON | ttnpb.DataRateIndex | DATA_RATE_8 | 8
+JSON | ttnpb.DataRateIndex | DATA_RATE_9 | 9
+JSON | ttnpb.DataRateIndexValue | {DATA_RATE_0 {} [] 0} | 0
+JSON | ttnpb.DataRateIndexValue | {DATA_RATE_1 {} [] 0} | 1
+JSON | ttnpb.DataRateIndexValue | {DATA_RATE_10 {} [] 0} | 10
+JSON | ttnpb.DataRateIndexValue | {DATA_RATE_11 {} [] 0} | 11
+JSON | ttnpb.DataRateIndexValue | {DATA_RATE_12 {} [] 0} | 12
+JSON | ttnpb.DataRateIndexValue | {DATA_RATE_13 {} [] 0} | 13
+JSON | ttnpb.DataRateIndexValue | {DATA_RATE_14 {} [] 0} | 14
+JSON | ttnpb.DataRateIndexValue | {DATA_RATE_15 {} [] 0} | 15
+JSON | ttnpb.DataRateIndexValue | {DATA_RATE_2 {} [] 0} | 2
+JSON | ttnpb.DataRateIndexValue | {DATA_RATE_3 {} [] 0} | 3
+JSON | ttnpb.DataRateIndexValue | {DATA_RATE_4 {} [] 0} | 4
+JSON | ttnpb.DataRateIndexValue | {DATA_RATE_5 {} [] 0} | 5
+JSON | ttnpb.DataRateIndexValue | {DATA_RATE_6 {} [] 0} | 6
+JSON | ttnpb.DataRateIndexValue | {DATA_RATE_7 {} [] 0} | 7
+JSON | ttnpb.DataRateIndexValue | {DATA_RATE_8 {} [] 0} | 8
+JSON | ttnpb.DataRateIndexValue | {DATA_RATE_9 {} [] 0} | 9
+JSON | ttnpb.DataRateOffset | DATA_RATE_OFFSET_0 | 0
+JSON | ttnpb.DataRateOffset | DATA_RATE_OFFSET_1 | 1
+JSON | ttnpb.DataRateOffset | DATA_RATE_OFFSET_2 | 2
+JSON | ttnpb.DataRateOffset | DATA_RATE_OFFSET_3 | 3
+JSON | ttnpb.DataRateOffset | DATA_RATE_OFFSET_4 | 4
+JSON | ttnpb.DataRateOffset | DATA_RATE_OFFSET_5 | 5
+JSON | ttnpb.DataRateOffset | DATA_RATE_OFFSET_6 | 6
+JSON | ttnpb.DataRateOffset | DATA_RATE_OFFSET_7 | 7
+JSON | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_0 {} [] 0} | 0
+JSON | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_1 {} [] 0} | 1
+JSON | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_2 {} [] 0} | 2
+JSON | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_3 {} [] 0} | 3
+JSON | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_4 {} [] 0} | 4
+JSON | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_5 {} [] 0} | 5
+JSON | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_6 {} [] 0} | 6
+JSON | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_7 {} [] 0} | 7
 JSON | ttnpb.DeviceEIRP | DEVICE_EIRP_10 | "DEVICE_EIRP_10"
 JSON | ttnpb.DeviceEIRP | DEVICE_EIRP_12 | "DEVICE_EIRP_12"
 JSON | ttnpb.DeviceEIRP | DEVICE_EIRP_13 | "DEVICE_EIRP_13"
@@ -534,10 +534,25 @@ JSON | ttnpb.DeviceEIRPValue | {DEVICE_EIRP_8 {} [] 0} | "DEVICE_EIRP_8"
 JSON | ttnpb.FrequencyValue | {100000 {} [] 0} | "100000"
 JSON | ttnpb.FrequencyValue | {2000000 {} [] 0} | "2000000"
 JSON | ttnpb.FrequencyValue | {30000000 {} [] 0} | "30000000"
+JSON | ttnpb.GatewayAntennaPlacement | INDOOR | "INDOOR"
+JSON | ttnpb.GatewayAntennaPlacement | OUTDOOR | "OUTDOOR"
+JSON | ttnpb.GatewayAntennaPlacement | PLACEMENT_UNKNOWN | "PLACEMENT_UNKNOWN"
+JSON | ttnpb.GrantType | GRANT_AUTHORIZATION_CODE | "GRANT_AUTHORIZATION_CODE"
+JSON | ttnpb.GrantType | GRANT_PASSWORD | "GRANT_PASSWORD"
+JSON | ttnpb.GrantType | GRANT_REFRESH_TOKEN | "GRANT_REFRESH_TOKEN"
 JSON | ttnpb.JoinRequestType | JOIN | "JOIN"
 JSON | ttnpb.JoinRequestType | REJOIN_CONTEXT | "REJOIN_CONTEXT"
 JSON | ttnpb.JoinRequestType | REJOIN_KEYS | "REJOIN_KEYS"
 JSON | ttnpb.JoinRequestType | REJOIN_SESSION | "REJOIN_SESSION"
+JSON | ttnpb.LocationSource | SOURCE_BT_RSSI_GEOLOCATION | "SOURCE_BT_RSSI_GEOLOCATION"
+JSON | ttnpb.LocationSource | SOURCE_COMBINED_GEOLOCATION | "SOURCE_COMBINED_GEOLOCATION"
+JSON | ttnpb.LocationSource | SOURCE_GPS | "SOURCE_GPS"
+JSON | ttnpb.LocationSource | SOURCE_IP_GEOLOCATION | "SOURCE_IP_GEOLOCATION"
+JSON | ttnpb.LocationSource | SOURCE_LORA_RSSI_GEOLOCATION | "SOURCE_LORA_RSSI_GEOLOCATION"
+JSON | ttnpb.LocationSource | SOURCE_LORA_TDOA_GEOLOCATION | "SOURCE_LORA_TDOA_GEOLOCATION"
+JSON | ttnpb.LocationSource | SOURCE_REGISTRY | "SOURCE_REGISTRY"
+JSON | ttnpb.LocationSource | SOURCE_UNKNOWN | "SOURCE_UNKNOWN"
+JSON | ttnpb.LocationSource | SOURCE_WIFI_RSSI_GEOLOCATION | "SOURCE_WIFI_RSSI_GEOLOCATION"
 JSON | ttnpb.MACCommandIdentifier | CID_ADR_PARAM_SETUP | "CID_ADR_PARAM_SETUP"
 JSON | ttnpb.MACCommandIdentifier | CID_BEACON_FREQ | "CID_BEACON_FREQ"
 JSON | ttnpb.MACCommandIdentifier | CID_BEACON_TIMING | "CID_BEACON_TIMING"
@@ -559,13 +574,13 @@ JSON | ttnpb.MACCommandIdentifier | CID_RFU_0 | "CID_RFU_0"
 JSON | ttnpb.MACCommandIdentifier | CID_RX_PARAM_SETUP | "CID_RX_PARAM_SETUP"
 JSON | ttnpb.MACCommandIdentifier | CID_RX_TIMING_SETUP | "CID_RX_TIMING_SETUP"
 JSON | ttnpb.MACCommandIdentifier | CID_TX_PARAM_SETUP | "CID_TX_PARAM_SETUP"
-JSON | ttnpb.MACVersion | 1.0.0 | "MAC_V1_0"
-JSON | ttnpb.MACVersion | 1.0.1 | "MAC_V1_0_1"
-JSON | ttnpb.MACVersion | 1.0.2 | "MAC_V1_0_2"
-JSON | ttnpb.MACVersion | 1.0.3 | "MAC_V1_0_3"
-JSON | ttnpb.MACVersion | 1.0.4 | "MAC_V1_0_4"
-JSON | ttnpb.MACVersion | 1.1.0 | "MAC_V1_1"
-JSON | ttnpb.MACVersion | unknown | "MAC_UNKNOWN"
+JSON | ttnpb.MACVersion | MAC_UNKNOWN | "MAC_UNKNOWN"
+JSON | ttnpb.MACVersion | MAC_V1_0 | "MAC_V1_0"
+JSON | ttnpb.MACVersion | MAC_V1_0_1 | "MAC_V1_0_1"
+JSON | ttnpb.MACVersion | MAC_V1_0_2 | "MAC_V1_0_2"
+JSON | ttnpb.MACVersion | MAC_V1_0_3 | "MAC_V1_0_3"
+JSON | ttnpb.MACVersion | MAC_V1_0_4 | "MAC_V1_0_4"
+JSON | ttnpb.MACVersion | MAC_V1_1 | "MAC_V1_1"
 JSON | ttnpb.MType | CONFIRMED_DOWN | "CONFIRMED_DOWN"
 JSON | ttnpb.MType | CONFIRMED_UP | "CONFIRMED_UP"
 JSON | ttnpb.MType | JOIN_ACCEPT | "JOIN_ACCEPT"
@@ -591,18 +606,18 @@ JSON | ttnpb.Minor | MINOR_RFU_6 | "MINOR_RFU_6"
 JSON | ttnpb.Minor | MINOR_RFU_7 | "MINOR_RFU_7"
 JSON | ttnpb.Minor | MINOR_RFU_8 | "MINOR_RFU_8"
 JSON | ttnpb.Minor | MINOR_RFU_9 | "MINOR_RFU_9"
-JSON | ttnpb.PHYVersion | 1.0.0 | "PHY_V1_0"
-JSON | ttnpb.PHYVersion | 1.0.1 | "PHY_V1_0_1"
-JSON | ttnpb.PHYVersion | 1.0.2-a | "PHY_V1_0_2_REV_A"
-JSON | ttnpb.PHYVersion | 1.0.2-b | "PHY_V1_0_2_REV_B"
-JSON | ttnpb.PHYVersion | 1.0.3-a | "PHY_V1_0_3_REV_A"
-JSON | ttnpb.PHYVersion | 1.1.0-a | "PHY_V1_1_REV_A"
-JSON | ttnpb.PHYVersion | 1.1.0-b | "PHY_V1_1_REV_B"
+JSON | ttnpb.PHYVersion | PHY_UNKNOWN | "PHY_UNKNOWN"
+JSON | ttnpb.PHYVersion | PHY_V1_0 | "PHY_V1_0"
+JSON | ttnpb.PHYVersion | PHY_V1_0_1 | "PHY_V1_0_1"
+JSON | ttnpb.PHYVersion | PHY_V1_0_2_REV_A | "PHY_V1_0_2_REV_A"
+JSON | ttnpb.PHYVersion | PHY_V1_0_2_REV_B | "PHY_V1_0_2_REV_B"
+JSON | ttnpb.PHYVersion | PHY_V1_0_3_REV_A | "PHY_V1_0_3_REV_A"
+JSON | ttnpb.PHYVersion | PHY_V1_1_REV_A | "PHY_V1_1_REV_A"
+JSON | ttnpb.PHYVersion | PHY_V1_1_REV_B | "PHY_V1_1_REV_B"
 JSON | ttnpb.PHYVersion | RP002_V1_0_0 | "RP002_V1_0_0"
 JSON | ttnpb.PHYVersion | RP002_V1_0_1 | "RP002_V1_0_1"
 JSON | ttnpb.PHYVersion | RP002_V1_0_2 | "RP002_V1_0_2"
 JSON | ttnpb.PHYVersion | RP002_V1_0_3 | "RP002_V1_0_3"
-JSON | ttnpb.PHYVersion | unknown | "PHY_UNKNOWN"
 JSON | ttnpb.PingSlotPeriod | PING_EVERY_128S | "PING_EVERY_128S"
 JSON | ttnpb.PingSlotPeriod | PING_EVERY_16S | "PING_EVERY_16S"
 JSON | ttnpb.PingSlotPeriod | PING_EVERY_1S | "PING_EVERY_1S"
@@ -662,38 +677,102 @@ JSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_6 | "REJOIN_TIME_6"
 JSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_7 | "REJOIN_TIME_7"
 JSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_8 | "REJOIN_TIME_8"
 JSON | ttnpb.RejoinTimeExponent | REJOIN_TIME_9 | "REJOIN_TIME_9"
-JSON | ttnpb.RxDelay | 0 | 0
-JSON | ttnpb.RxDelay | 1 | 1
-JSON | ttnpb.RxDelay | 10 | 10
-JSON | ttnpb.RxDelay | 11 | 11
-JSON | ttnpb.RxDelay | 12 | 12
-JSON | ttnpb.RxDelay | 13 | 13
-JSON | ttnpb.RxDelay | 14 | 14
-JSON | ttnpb.RxDelay | 15 | 15
-JSON | ttnpb.RxDelay | 2 | 2
-JSON | ttnpb.RxDelay | 3 | 3
-JSON | ttnpb.RxDelay | 4 | 4
-JSON | ttnpb.RxDelay | 5 | 5
-JSON | ttnpb.RxDelay | 6 | 6
-JSON | ttnpb.RxDelay | 7 | 7
-JSON | ttnpb.RxDelay | 8 | 8
-JSON | ttnpb.RxDelay | 9 | 9
-JSON | ttnpb.RxDelayValue | {0 {} [] 0} | 0
-JSON | ttnpb.RxDelayValue | {1 {} [] 0} | 1
-JSON | ttnpb.RxDelayValue | {10 {} [] 0} | 10
-JSON | ttnpb.RxDelayValue | {11 {} [] 0} | 11
-JSON | ttnpb.RxDelayValue | {12 {} [] 0} | 12
-JSON | ttnpb.RxDelayValue | {13 {} [] 0} | 13
-JSON | ttnpb.RxDelayValue | {14 {} [] 0} | 14
-JSON | ttnpb.RxDelayValue | {15 {} [] 0} | 15
-JSON | ttnpb.RxDelayValue | {2 {} [] 0} | 2
-JSON | ttnpb.RxDelayValue | {3 {} [] 0} | 3
-JSON | ttnpb.RxDelayValue | {4 {} [] 0} | 4
-JSON | ttnpb.RxDelayValue | {5 {} [] 0} | 5
-JSON | ttnpb.RxDelayValue | {6 {} [] 0} | 6
-JSON | ttnpb.RxDelayValue | {7 {} [] 0} | 7
-JSON | ttnpb.RxDelayValue | {8 {} [] 0} | 8
-JSON | ttnpb.RxDelayValue | {9 {} [] 0} | 9
+JSON | ttnpb.Right | RIGHT_ALL | "RIGHT_ALL"
+JSON | ttnpb.Right | RIGHT_APPLICATION_ALL | "RIGHT_APPLICATION_ALL"
+JSON | ttnpb.Right | RIGHT_APPLICATION_DELETE | "RIGHT_APPLICATION_DELETE"
+JSON | ttnpb.Right | RIGHT_APPLICATION_DEVICES_READ | "RIGHT_APPLICATION_DEVICES_READ"
+JSON | ttnpb.Right | RIGHT_APPLICATION_DEVICES_READ_KEYS | "RIGHT_APPLICATION_DEVICES_READ_KEYS"
+JSON | ttnpb.Right | RIGHT_APPLICATION_DEVICES_WRITE | "RIGHT_APPLICATION_DEVICES_WRITE"
+JSON | ttnpb.Right | RIGHT_APPLICATION_DEVICES_WRITE_KEYS | "RIGHT_APPLICATION_DEVICES_WRITE_KEYS"
+JSON | ttnpb.Right | RIGHT_APPLICATION_INFO | "RIGHT_APPLICATION_INFO"
+JSON | ttnpb.Right | RIGHT_APPLICATION_LINK | "RIGHT_APPLICATION_LINK"
+JSON | ttnpb.Right | RIGHT_APPLICATION_SETTINGS_API_KEYS | "RIGHT_APPLICATION_SETTINGS_API_KEYS"
+JSON | ttnpb.Right | RIGHT_APPLICATION_SETTINGS_BASIC | "RIGHT_APPLICATION_SETTINGS_BASIC"
+JSON | ttnpb.Right | RIGHT_APPLICATION_SETTINGS_COLLABORATORS | "RIGHT_APPLICATION_SETTINGS_COLLABORATORS"
+JSON | ttnpb.Right | RIGHT_APPLICATION_SETTINGS_PACKAGES | "RIGHT_APPLICATION_SETTINGS_PACKAGES"
+JSON | ttnpb.Right | RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE | "RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE"
+JSON | ttnpb.Right | RIGHT_APPLICATION_TRAFFIC_READ | "RIGHT_APPLICATION_TRAFFIC_READ"
+JSON | ttnpb.Right | RIGHT_APPLICATION_TRAFFIC_UP_WRITE | "RIGHT_APPLICATION_TRAFFIC_UP_WRITE"
+JSON | ttnpb.Right | RIGHT_CLIENT_ALL | "RIGHT_CLIENT_ALL"
+JSON | ttnpb.Right | RIGHT_GATEWAY_ALL | "RIGHT_GATEWAY_ALL"
+JSON | ttnpb.Right | RIGHT_GATEWAY_DELETE | "RIGHT_GATEWAY_DELETE"
+JSON | ttnpb.Right | RIGHT_GATEWAY_INFO | "RIGHT_GATEWAY_INFO"
+JSON | ttnpb.Right | RIGHT_GATEWAY_LINK | "RIGHT_GATEWAY_LINK"
+JSON | ttnpb.Right | RIGHT_GATEWAY_LOCATION_READ | "RIGHT_GATEWAY_LOCATION_READ"
+JSON | ttnpb.Right | RIGHT_GATEWAY_READ_SECRETS | "RIGHT_GATEWAY_READ_SECRETS"
+JSON | ttnpb.Right | RIGHT_GATEWAY_SETTINGS_API_KEYS | "RIGHT_GATEWAY_SETTINGS_API_KEYS"
+JSON | ttnpb.Right | RIGHT_GATEWAY_SETTINGS_BASIC | "RIGHT_GATEWAY_SETTINGS_BASIC"
+JSON | ttnpb.Right | RIGHT_GATEWAY_SETTINGS_COLLABORATORS | "RIGHT_GATEWAY_SETTINGS_COLLABORATORS"
+JSON | ttnpb.Right | RIGHT_GATEWAY_STATUS_READ | "RIGHT_GATEWAY_STATUS_READ"
+JSON | ttnpb.Right | RIGHT_GATEWAY_TRAFFIC_DOWN_WRITE | "RIGHT_GATEWAY_TRAFFIC_DOWN_WRITE"
+JSON | ttnpb.Right | RIGHT_GATEWAY_TRAFFIC_READ | "RIGHT_GATEWAY_TRAFFIC_READ"
+JSON | ttnpb.Right | RIGHT_GATEWAY_WRITE_SECRETS | "RIGHT_GATEWAY_WRITE_SECRETS"
+JSON | ttnpb.Right | RIGHT_ORGANIZATION_ADD_AS_COLLABORATOR | "RIGHT_ORGANIZATION_ADD_AS_COLLABORATOR"
+JSON | ttnpb.Right | RIGHT_ORGANIZATION_ALL | "RIGHT_ORGANIZATION_ALL"
+JSON | ttnpb.Right | RIGHT_ORGANIZATION_APPLICATIONS_CREATE | "RIGHT_ORGANIZATION_APPLICATIONS_CREATE"
+JSON | ttnpb.Right | RIGHT_ORGANIZATION_APPLICATIONS_LIST | "RIGHT_ORGANIZATION_APPLICATIONS_LIST"
+JSON | ttnpb.Right | RIGHT_ORGANIZATION_CLIENTS_CREATE | "RIGHT_ORGANIZATION_CLIENTS_CREATE"
+JSON | ttnpb.Right | RIGHT_ORGANIZATION_CLIENTS_LIST | "RIGHT_ORGANIZATION_CLIENTS_LIST"
+JSON | ttnpb.Right | RIGHT_ORGANIZATION_DELETE | "RIGHT_ORGANIZATION_DELETE"
+JSON | ttnpb.Right | RIGHT_ORGANIZATION_GATEWAYS_CREATE | "RIGHT_ORGANIZATION_GATEWAYS_CREATE"
+JSON | ttnpb.Right | RIGHT_ORGANIZATION_GATEWAYS_LIST | "RIGHT_ORGANIZATION_GATEWAYS_LIST"
+JSON | ttnpb.Right | RIGHT_ORGANIZATION_INFO | "RIGHT_ORGANIZATION_INFO"
+JSON | ttnpb.Right | RIGHT_ORGANIZATION_SETTINGS_API_KEYS | "RIGHT_ORGANIZATION_SETTINGS_API_KEYS"
+JSON | ttnpb.Right | RIGHT_ORGANIZATION_SETTINGS_BASIC | "RIGHT_ORGANIZATION_SETTINGS_BASIC"
+JSON | ttnpb.Right | RIGHT_ORGANIZATION_SETTINGS_MEMBERS | "RIGHT_ORGANIZATION_SETTINGS_MEMBERS"
+JSON | ttnpb.Right | RIGHT_SEND_INVITES | "RIGHT_SEND_INVITES"
+JSON | ttnpb.Right | RIGHT_USER_ALL | "RIGHT_USER_ALL"
+JSON | ttnpb.Right | RIGHT_USER_APPLICATIONS_CREATE | "RIGHT_USER_APPLICATIONS_CREATE"
+JSON | ttnpb.Right | RIGHT_USER_APPLICATIONS_LIST | "RIGHT_USER_APPLICATIONS_LIST"
+JSON | ttnpb.Right | RIGHT_USER_AUTHORIZED_CLIENTS | "RIGHT_USER_AUTHORIZED_CLIENTS"
+JSON | ttnpb.Right | RIGHT_USER_CLIENTS_CREATE | "RIGHT_USER_CLIENTS_CREATE"
+JSON | ttnpb.Right | RIGHT_USER_CLIENTS_LIST | "RIGHT_USER_CLIENTS_LIST"
+JSON | ttnpb.Right | RIGHT_USER_DELETE | "RIGHT_USER_DELETE"
+JSON | ttnpb.Right | RIGHT_USER_GATEWAYS_CREATE | "RIGHT_USER_GATEWAYS_CREATE"
+JSON | ttnpb.Right | RIGHT_USER_GATEWAYS_LIST | "RIGHT_USER_GATEWAYS_LIST"
+JSON | ttnpb.Right | RIGHT_USER_INFO | "RIGHT_USER_INFO"
+JSON | ttnpb.Right | RIGHT_USER_ORGANIZATIONS_CREATE | "RIGHT_USER_ORGANIZATIONS_CREATE"
+JSON | ttnpb.Right | RIGHT_USER_ORGANIZATIONS_LIST | "RIGHT_USER_ORGANIZATIONS_LIST"
+JSON | ttnpb.Right | RIGHT_USER_SETTINGS_API_KEYS | "RIGHT_USER_SETTINGS_API_KEYS"
+JSON | ttnpb.Right | RIGHT_USER_SETTINGS_BASIC | "RIGHT_USER_SETTINGS_BASIC"
+JSON | ttnpb.Right | right_invalid | "right_invalid"
+JSON | ttnpb.RxDelay | RX_DELAY_0 | 0
+JSON | ttnpb.RxDelay | RX_DELAY_1 | 1
+JSON | ttnpb.RxDelay | RX_DELAY_10 | 10
+JSON | ttnpb.RxDelay | RX_DELAY_11 | 11
+JSON | ttnpb.RxDelay | RX_DELAY_12 | 12
+JSON | ttnpb.RxDelay | RX_DELAY_13 | 13
+JSON | ttnpb.RxDelay | RX_DELAY_14 | 14
+JSON | ttnpb.RxDelay | RX_DELAY_15 | 15
+JSON | ttnpb.RxDelay | RX_DELAY_2 | 2
+JSON | ttnpb.RxDelay | RX_DELAY_3 | 3
+JSON | ttnpb.RxDelay | RX_DELAY_4 | 4
+JSON | ttnpb.RxDelay | RX_DELAY_5 | 5
+JSON | ttnpb.RxDelay | RX_DELAY_6 | 6
+JSON | ttnpb.RxDelay | RX_DELAY_7 | 7
+JSON | ttnpb.RxDelay | RX_DELAY_8 | 8
+JSON | ttnpb.RxDelay | RX_DELAY_9 | 9
+JSON | ttnpb.RxDelayValue | {RX_DELAY_0 {} [] 0} | 0
+JSON | ttnpb.RxDelayValue | {RX_DELAY_1 {} [] 0} | 1
+JSON | ttnpb.RxDelayValue | {RX_DELAY_10 {} [] 0} | 10
+JSON | ttnpb.RxDelayValue | {RX_DELAY_11 {} [] 0} | 11
+JSON | ttnpb.RxDelayValue | {RX_DELAY_12 {} [] 0} | 12
+JSON | ttnpb.RxDelayValue | {RX_DELAY_13 {} [] 0} | 13
+JSON | ttnpb.RxDelayValue | {RX_DELAY_14 {} [] 0} | 14
+JSON | ttnpb.RxDelayValue | {RX_DELAY_15 {} [] 0} | 15
+JSON | ttnpb.RxDelayValue | {RX_DELAY_2 {} [] 0} | 2
+JSON | ttnpb.RxDelayValue | {RX_DELAY_3 {} [] 0} | 3
+JSON | ttnpb.RxDelayValue | {RX_DELAY_4 {} [] 0} | 4
+JSON | ttnpb.RxDelayValue | {RX_DELAY_5 {} [] 0} | 5
+JSON | ttnpb.RxDelayValue | {RX_DELAY_6 {} [] 0} | 6
+JSON | ttnpb.RxDelayValue | {RX_DELAY_7 {} [] 0} | 7
+JSON | ttnpb.RxDelayValue | {RX_DELAY_8 {} [] 0} | 8
+JSON | ttnpb.RxDelayValue | {RX_DELAY_9 {} [] 0} | 9
+JSON | ttnpb.State | STATE_APPROVED | "STATE_APPROVED"
+JSON | ttnpb.State | STATE_FLAGGED | "STATE_FLAGGED"
+JSON | ttnpb.State | STATE_REJECTED | "STATE_REJECTED"
+JSON | ttnpb.State | STATE_REQUESTED | "STATE_REQUESTED"
+JSON | ttnpb.State | STATE_SUSPENDED | "STATE_SUSPENDED"
 JSON | ttnpb.TxSchedulePriority | ABOVE_NORMAL | "ABOVE_NORMAL"
 JSON | ttnpb.TxSchedulePriority | BELOW_NORMAL | "BELOW_NORMAL"
 JSON | ttnpb.TxSchedulePriority | HIGH | "HIGH"
@@ -797,54 +876,54 @@ JSONPB | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_512 {} [] 0} | "DUTY_CYCLE
 JSONPB | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_64 {} [] 0} | "DUTY_CYCLE_64"
 JSONPB | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_8 {} [] 0} | "DUTY_CYCLE_8"
 JSONPB | ttnpb.AggregatedDutyCycleValue | {DUTY_CYCLE_8192 {} [] 0} | "DUTY_CYCLE_8192"
-JSONPB | ttnpb.DataRateIndex | 0 | 0
-JSONPB | ttnpb.DataRateIndex | 1 | 1
-JSONPB | ttnpb.DataRateIndex | 10 | 10
-JSONPB | ttnpb.DataRateIndex | 11 | 11
-JSONPB | ttnpb.DataRateIndex | 12 | 12
-JSONPB | ttnpb.DataRateIndex | 13 | 13
-JSONPB | ttnpb.DataRateIndex | 14 | 14
-JSONPB | ttnpb.DataRateIndex | 15 | 15
-JSONPB | ttnpb.DataRateIndex | 2 | 2
-JSONPB | ttnpb.DataRateIndex | 3 | 3
-JSONPB | ttnpb.DataRateIndex | 4 | 4
-JSONPB | ttnpb.DataRateIndex | 5 | 5
-JSONPB | ttnpb.DataRateIndex | 6 | 6
-JSONPB | ttnpb.DataRateIndex | 7 | 7
-JSONPB | ttnpb.DataRateIndex | 8 | 8
-JSONPB | ttnpb.DataRateIndex | 9 | 9
-JSONPB | ttnpb.DataRateIndexValue | {0 {} [] 0} | 0
-JSONPB | ttnpb.DataRateIndexValue | {1 {} [] 0} | 1
-JSONPB | ttnpb.DataRateIndexValue | {10 {} [] 0} | 10
-JSONPB | ttnpb.DataRateIndexValue | {11 {} [] 0} | 11
-JSONPB | ttnpb.DataRateIndexValue | {12 {} [] 0} | 12
-JSONPB | ttnpb.DataRateIndexValue | {13 {} [] 0} | 13
-JSONPB | ttnpb.DataRateIndexValue | {14 {} [] 0} | 14
-JSONPB | ttnpb.DataRateIndexValue | {15 {} [] 0} | 15
-JSONPB | ttnpb.DataRateIndexValue | {2 {} [] 0} | 2
-JSONPB | ttnpb.DataRateIndexValue | {3 {} [] 0} | 3
-JSONPB | ttnpb.DataRateIndexValue | {4 {} [] 0} | 4
-JSONPB | ttnpb.DataRateIndexValue | {5 {} [] 0} | 5
-JSONPB | ttnpb.DataRateIndexValue | {6 {} [] 0} | 6
-JSONPB | ttnpb.DataRateIndexValue | {7 {} [] 0} | 7
-JSONPB | ttnpb.DataRateIndexValue | {8 {} [] 0} | 8
-JSONPB | ttnpb.DataRateIndexValue | {9 {} [] 0} | 9
-JSONPB | ttnpb.DataRateOffset | 0 | 0
-JSONPB | ttnpb.DataRateOffset | 1 | 1
-JSONPB | ttnpb.DataRateOffset | 2 | 2
-JSONPB | ttnpb.DataRateOffset | 3 | 3
-JSONPB | ttnpb.DataRateOffset | 4 | 4
-JSONPB | ttnpb.DataRateOffset | 5 | 5
-JSONPB | ttnpb.DataRateOffset | 6 | 6
-JSONPB | ttnpb.DataRateOffset | 7 | 7
-JSONPB | ttnpb.DataRateOffsetValue | {0 {} [] 0} | 0
-JSONPB | ttnpb.DataRateOffsetValue | {1 {} [] 0} | 1
-JSONPB | ttnpb.DataRateOffsetValue | {2 {} [] 0} | 2
-JSONPB | ttnpb.DataRateOffsetValue | {3 {} [] 0} | 3
-JSONPB | ttnpb.DataRateOffsetValue | {4 {} [] 0} | 4
-JSONPB | ttnpb.DataRateOffsetValue | {5 {} [] 0} | 5
-JSONPB | ttnpb.DataRateOffsetValue | {6 {} [] 0} | 6
-JSONPB | ttnpb.DataRateOffsetValue | {7 {} [] 0} | 7
+JSONPB | ttnpb.DataRateIndex | DATA_RATE_0 | 0
+JSONPB | ttnpb.DataRateIndex | DATA_RATE_1 | 1
+JSONPB | ttnpb.DataRateIndex | DATA_RATE_10 | 10
+JSONPB | ttnpb.DataRateIndex | DATA_RATE_11 | 11
+JSONPB | ttnpb.DataRateIndex | DATA_RATE_12 | 12
+JSONPB | ttnpb.DataRateIndex | DATA_RATE_13 | 13
+JSONPB | ttnpb.DataRateIndex | DATA_RATE_14 | 14
+JSONPB | ttnpb.DataRateIndex | DATA_RATE_15 | 15
+JSONPB | ttnpb.DataRateIndex | DATA_RATE_2 | 2
+JSONPB | ttnpb.DataRateIndex | DATA_RATE_3 | 3
+JSONPB | ttnpb.DataRateIndex | DATA_RATE_4 | 4
+JSONPB | ttnpb.DataRateIndex | DATA_RATE_5 | 5
+JSONPB | ttnpb.DataRateIndex | DATA_RATE_6 | 6
+JSONPB | ttnpb.DataRateIndex | DATA_RATE_7 | 7
+JSONPB | ttnpb.DataRateIndex | DATA_RATE_8 | 8
+JSONPB | ttnpb.DataRateIndex | DATA_RATE_9 | 9
+JSONPB | ttnpb.DataRateIndexValue | {DATA_RATE_0 {} [] 0} | 0
+JSONPB | ttnpb.DataRateIndexValue | {DATA_RATE_1 {} [] 0} | 1
+JSONPB | ttnpb.DataRateIndexValue | {DATA_RATE_10 {} [] 0} | 10
+JSONPB | ttnpb.DataRateIndexValue | {DATA_RATE_11 {} [] 0} | 11
+JSONPB | ttnpb.DataRateIndexValue | {DATA_RATE_12 {} [] 0} | 12
+JSONPB | ttnpb.DataRateIndexValue | {DATA_RATE_13 {} [] 0} | 13
+JSONPB | ttnpb.DataRateIndexValue | {DATA_RATE_14 {} [] 0} | 14
+JSONPB | ttnpb.DataRateIndexValue | {DATA_RATE_15 {} [] 0} | 15
+JSONPB | ttnpb.DataRateIndexValue | {DATA_RATE_2 {} [] 0} | 2
+JSONPB | ttnpb.DataRateIndexValue | {DATA_RATE_3 {} [] 0} | 3
+JSONPB | ttnpb.DataRateIndexValue | {DATA_RATE_4 {} [] 0} | 4
+JSONPB | ttnpb.DataRateIndexValue | {DATA_RATE_5 {} [] 0} | 5
+JSONPB | ttnpb.DataRateIndexValue | {DATA_RATE_6 {} [] 0} | 6
+JSONPB | ttnpb.DataRateIndexValue | {DATA_RATE_7 {} [] 0} | 7
+JSONPB | ttnpb.DataRateIndexValue | {DATA_RATE_8 {} [] 0} | 8
+JSONPB | ttnpb.DataRateIndexValue | {DATA_RATE_9 {} [] 0} | 9
+JSONPB | ttnpb.DataRateOffset | DATA_RATE_OFFSET_0 | 0
+JSONPB | ttnpb.DataRateOffset | DATA_RATE_OFFSET_1 | 1
+JSONPB | ttnpb.DataRateOffset | DATA_RATE_OFFSET_2 | 2
+JSONPB | ttnpb.DataRateOffset | DATA_RATE_OFFSET_3 | 3
+JSONPB | ttnpb.DataRateOffset | DATA_RATE_OFFSET_4 | 4
+JSONPB | ttnpb.DataRateOffset | DATA_RATE_OFFSET_5 | 5
+JSONPB | ttnpb.DataRateOffset | DATA_RATE_OFFSET_6 | 6
+JSONPB | ttnpb.DataRateOffset | DATA_RATE_OFFSET_7 | 7
+JSONPB | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_0 {} [] 0} | 0
+JSONPB | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_1 {} [] 0} | 1
+JSONPB | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_2 {} [] 0} | 2
+JSONPB | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_3 {} [] 0} | 3
+JSONPB | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_4 {} [] 0} | 4
+JSONPB | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_5 {} [] 0} | 5
+JSONPB | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_6 {} [] 0} | 6
+JSONPB | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_7 {} [] 0} | 7
 JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_10 | "DEVICE_EIRP_10"
 JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_12 | "DEVICE_EIRP_12"
 JSONPB | ttnpb.DeviceEIRP | DEVICE_EIRP_13 | "DEVICE_EIRP_13"
@@ -896,38 +975,38 @@ JSONPB | ttnpb.PingSlotPeriodValue | {PING_EVERY_32S {} [] 0} | "PING_EVERY_32S"
 JSONPB | ttnpb.PingSlotPeriodValue | {PING_EVERY_4S {} [] 0} | "PING_EVERY_4S"
 JSONPB | ttnpb.PingSlotPeriodValue | {PING_EVERY_64S {} [] 0} | "PING_EVERY_64S"
 JSONPB | ttnpb.PingSlotPeriodValue | {PING_EVERY_8S {} [] 0} | "PING_EVERY_8S"
-JSONPB | ttnpb.RxDelay | 0 | 0
-JSONPB | ttnpb.RxDelay | 1 | 1
-JSONPB | ttnpb.RxDelay | 10 | 10
-JSONPB | ttnpb.RxDelay | 11 | 11
-JSONPB | ttnpb.RxDelay | 12 | 12
-JSONPB | ttnpb.RxDelay | 13 | 13
-JSONPB | ttnpb.RxDelay | 14 | 14
-JSONPB | ttnpb.RxDelay | 15 | 15
-JSONPB | ttnpb.RxDelay | 2 | 2
-JSONPB | ttnpb.RxDelay | 3 | 3
-JSONPB | ttnpb.RxDelay | 4 | 4
-JSONPB | ttnpb.RxDelay | 5 | 5
-JSONPB | ttnpb.RxDelay | 6 | 6
-JSONPB | ttnpb.RxDelay | 7 | 7
-JSONPB | ttnpb.RxDelay | 8 | 8
-JSONPB | ttnpb.RxDelay | 9 | 9
-JSONPB | ttnpb.RxDelayValue | {0 {} [] 0} | 0
-JSONPB | ttnpb.RxDelayValue | {1 {} [] 0} | 1
-JSONPB | ttnpb.RxDelayValue | {10 {} [] 0} | 10
-JSONPB | ttnpb.RxDelayValue | {11 {} [] 0} | 11
-JSONPB | ttnpb.RxDelayValue | {12 {} [] 0} | 12
-JSONPB | ttnpb.RxDelayValue | {13 {} [] 0} | 13
-JSONPB | ttnpb.RxDelayValue | {14 {} [] 0} | 14
-JSONPB | ttnpb.RxDelayValue | {15 {} [] 0} | 15
-JSONPB | ttnpb.RxDelayValue | {2 {} [] 0} | 2
-JSONPB | ttnpb.RxDelayValue | {3 {} [] 0} | 3
-JSONPB | ttnpb.RxDelayValue | {4 {} [] 0} | 4
-JSONPB | ttnpb.RxDelayValue | {5 {} [] 0} | 5
-JSONPB | ttnpb.RxDelayValue | {6 {} [] 0} | 6
-JSONPB | ttnpb.RxDelayValue | {7 {} [] 0} | 7
-JSONPB | ttnpb.RxDelayValue | {8 {} [] 0} | 8
-JSONPB | ttnpb.RxDelayValue | {9 {} [] 0} | 9
+JSONPB | ttnpb.RxDelay | RX_DELAY_0 | 0
+JSONPB | ttnpb.RxDelay | RX_DELAY_1 | 1
+JSONPB | ttnpb.RxDelay | RX_DELAY_10 | 10
+JSONPB | ttnpb.RxDelay | RX_DELAY_11 | 11
+JSONPB | ttnpb.RxDelay | RX_DELAY_12 | 12
+JSONPB | ttnpb.RxDelay | RX_DELAY_13 | 13
+JSONPB | ttnpb.RxDelay | RX_DELAY_14 | 14
+JSONPB | ttnpb.RxDelay | RX_DELAY_15 | 15
+JSONPB | ttnpb.RxDelay | RX_DELAY_2 | 2
+JSONPB | ttnpb.RxDelay | RX_DELAY_3 | 3
+JSONPB | ttnpb.RxDelay | RX_DELAY_4 | 4
+JSONPB | ttnpb.RxDelay | RX_DELAY_5 | 5
+JSONPB | ttnpb.RxDelay | RX_DELAY_6 | 6
+JSONPB | ttnpb.RxDelay | RX_DELAY_7 | 7
+JSONPB | ttnpb.RxDelay | RX_DELAY_8 | 8
+JSONPB | ttnpb.RxDelay | RX_DELAY_9 | 9
+JSONPB | ttnpb.RxDelayValue | {RX_DELAY_0 {} [] 0} | 0
+JSONPB | ttnpb.RxDelayValue | {RX_DELAY_1 {} [] 0} | 1
+JSONPB | ttnpb.RxDelayValue | {RX_DELAY_10 {} [] 0} | 10
+JSONPB | ttnpb.RxDelayValue | {RX_DELAY_11 {} [] 0} | 11
+JSONPB | ttnpb.RxDelayValue | {RX_DELAY_12 {} [] 0} | 12
+JSONPB | ttnpb.RxDelayValue | {RX_DELAY_13 {} [] 0} | 13
+JSONPB | ttnpb.RxDelayValue | {RX_DELAY_14 {} [] 0} | 14
+JSONPB | ttnpb.RxDelayValue | {RX_DELAY_15 {} [] 0} | 15
+JSONPB | ttnpb.RxDelayValue | {RX_DELAY_2 {} [] 0} | 2
+JSONPB | ttnpb.RxDelayValue | {RX_DELAY_3 {} [] 0} | 3
+JSONPB | ttnpb.RxDelayValue | {RX_DELAY_4 {} [] 0} | 4
+JSONPB | ttnpb.RxDelayValue | {RX_DELAY_5 {} [] 0} | 5
+JSONPB | ttnpb.RxDelayValue | {RX_DELAY_6 {} [] 0} | 6
+JSONPB | ttnpb.RxDelayValue | {RX_DELAY_7 {} [] 0} | 7
+JSONPB | ttnpb.RxDelayValue | {RX_DELAY_8 {} [] 0} | 8
+JSONPB | ttnpb.RxDelayValue | {RX_DELAY_9 {} [] 0} | 9
 ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_1 | "ADR_ACK_DELAY_1"
 ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_1024 | "ADR_ACK_DELAY_1024"
 ProtoJSON | ttnpb.ADRAckDelayExponent | ADR_ACK_DELAY_128 | "ADR_ACK_DELAY_128"
@@ -1031,54 +1110,54 @@ ProtoJSON | ttnpb.CFListType | FREQUENCIES | "FREQUENCIES"
 ProtoJSON | ttnpb.Class | CLASS_A | "CLASS_A"
 ProtoJSON | ttnpb.Class | CLASS_B | "CLASS_B"
 ProtoJSON | ttnpb.Class | CLASS_C | "CLASS_C"
-ProtoJSON | ttnpb.DataRateIndex | 0 | 0
-ProtoJSON | ttnpb.DataRateIndex | 1 | 1
-ProtoJSON | ttnpb.DataRateIndex | 10 | 10
-ProtoJSON | ttnpb.DataRateIndex | 11 | 11
-ProtoJSON | ttnpb.DataRateIndex | 12 | 12
-ProtoJSON | ttnpb.DataRateIndex | 13 | 13
-ProtoJSON | ttnpb.DataRateIndex | 14 | 14
-ProtoJSON | ttnpb.DataRateIndex | 15 | 15
-ProtoJSON | ttnpb.DataRateIndex | 2 | 2
-ProtoJSON | ttnpb.DataRateIndex | 3 | 3
-ProtoJSON | ttnpb.DataRateIndex | 4 | 4
-ProtoJSON | ttnpb.DataRateIndex | 5 | 5
-ProtoJSON | ttnpb.DataRateIndex | 6 | 6
-ProtoJSON | ttnpb.DataRateIndex | 7 | 7
-ProtoJSON | ttnpb.DataRateIndex | 8 | 8
-ProtoJSON | ttnpb.DataRateIndex | 9 | 9
-ProtoJSON | ttnpb.DataRateIndexValue | {0 {} [] 0} | 0
-ProtoJSON | ttnpb.DataRateIndexValue | {1 {} [] 0} | 1
-ProtoJSON | ttnpb.DataRateIndexValue | {10 {} [] 0} | 10
-ProtoJSON | ttnpb.DataRateIndexValue | {11 {} [] 0} | 11
-ProtoJSON | ttnpb.DataRateIndexValue | {12 {} [] 0} | 12
-ProtoJSON | ttnpb.DataRateIndexValue | {13 {} [] 0} | 13
-ProtoJSON | ttnpb.DataRateIndexValue | {14 {} [] 0} | 14
-ProtoJSON | ttnpb.DataRateIndexValue | {15 {} [] 0} | 15
-ProtoJSON | ttnpb.DataRateIndexValue | {2 {} [] 0} | 2
-ProtoJSON | ttnpb.DataRateIndexValue | {3 {} [] 0} | 3
-ProtoJSON | ttnpb.DataRateIndexValue | {4 {} [] 0} | 4
-ProtoJSON | ttnpb.DataRateIndexValue | {5 {} [] 0} | 5
-ProtoJSON | ttnpb.DataRateIndexValue | {6 {} [] 0} | 6
-ProtoJSON | ttnpb.DataRateIndexValue | {7 {} [] 0} | 7
-ProtoJSON | ttnpb.DataRateIndexValue | {8 {} [] 0} | 8
-ProtoJSON | ttnpb.DataRateIndexValue | {9 {} [] 0} | 9
-ProtoJSON | ttnpb.DataRateOffset | 0 | 0
-ProtoJSON | ttnpb.DataRateOffset | 1 | 1
-ProtoJSON | ttnpb.DataRateOffset | 2 | 2
-ProtoJSON | ttnpb.DataRateOffset | 3 | 3
-ProtoJSON | ttnpb.DataRateOffset | 4 | 4
-ProtoJSON | ttnpb.DataRateOffset | 5 | 5
-ProtoJSON | ttnpb.DataRateOffset | 6 | 6
-ProtoJSON | ttnpb.DataRateOffset | 7 | 7
-ProtoJSON | ttnpb.DataRateOffsetValue | {0 {} [] 0} | 0
-ProtoJSON | ttnpb.DataRateOffsetValue | {1 {} [] 0} | 1
-ProtoJSON | ttnpb.DataRateOffsetValue | {2 {} [] 0} | 2
-ProtoJSON | ttnpb.DataRateOffsetValue | {3 {} [] 0} | 3
-ProtoJSON | ttnpb.DataRateOffsetValue | {4 {} [] 0} | 4
-ProtoJSON | ttnpb.DataRateOffsetValue | {5 {} [] 0} | 5
-ProtoJSON | ttnpb.DataRateOffsetValue | {6 {} [] 0} | 6
-ProtoJSON | ttnpb.DataRateOffsetValue | {7 {} [] 0} | 7
+ProtoJSON | ttnpb.DataRateIndex | DATA_RATE_0 | 0
+ProtoJSON | ttnpb.DataRateIndex | DATA_RATE_1 | 1
+ProtoJSON | ttnpb.DataRateIndex | DATA_RATE_10 | 10
+ProtoJSON | ttnpb.DataRateIndex | DATA_RATE_11 | 11
+ProtoJSON | ttnpb.DataRateIndex | DATA_RATE_12 | 12
+ProtoJSON | ttnpb.DataRateIndex | DATA_RATE_13 | 13
+ProtoJSON | ttnpb.DataRateIndex | DATA_RATE_14 | 14
+ProtoJSON | ttnpb.DataRateIndex | DATA_RATE_15 | 15
+ProtoJSON | ttnpb.DataRateIndex | DATA_RATE_2 | 2
+ProtoJSON | ttnpb.DataRateIndex | DATA_RATE_3 | 3
+ProtoJSON | ttnpb.DataRateIndex | DATA_RATE_4 | 4
+ProtoJSON | ttnpb.DataRateIndex | DATA_RATE_5 | 5
+ProtoJSON | ttnpb.DataRateIndex | DATA_RATE_6 | 6
+ProtoJSON | ttnpb.DataRateIndex | DATA_RATE_7 | 7
+ProtoJSON | ttnpb.DataRateIndex | DATA_RATE_8 | 8
+ProtoJSON | ttnpb.DataRateIndex | DATA_RATE_9 | 9
+ProtoJSON | ttnpb.DataRateIndexValue | {DATA_RATE_0 {} [] 0} | 0
+ProtoJSON | ttnpb.DataRateIndexValue | {DATA_RATE_1 {} [] 0} | 1
+ProtoJSON | ttnpb.DataRateIndexValue | {DATA_RATE_10 {} [] 0} | 10
+ProtoJSON | ttnpb.DataRateIndexValue | {DATA_RATE_11 {} [] 0} | 11
+ProtoJSON | ttnpb.DataRateIndexValue | {DATA_RATE_12 {} [] 0} | 12
+ProtoJSON | ttnpb.DataRateIndexValue | {DATA_RATE_13 {} [] 0} | 13
+ProtoJSON | ttnpb.DataRateIndexValue | {DATA_RATE_14 {} [] 0} | 14
+ProtoJSON | ttnpb.DataRateIndexValue | {DATA_RATE_15 {} [] 0} | 15
+ProtoJSON | ttnpb.DataRateIndexValue | {DATA_RATE_2 {} [] 0} | 2
+ProtoJSON | ttnpb.DataRateIndexValue | {DATA_RATE_3 {} [] 0} | 3
+ProtoJSON | ttnpb.DataRateIndexValue | {DATA_RATE_4 {} [] 0} | 4
+ProtoJSON | ttnpb.DataRateIndexValue | {DATA_RATE_5 {} [] 0} | 5
+ProtoJSON | ttnpb.DataRateIndexValue | {DATA_RATE_6 {} [] 0} | 6
+ProtoJSON | ttnpb.DataRateIndexValue | {DATA_RATE_7 {} [] 0} | 7
+ProtoJSON | ttnpb.DataRateIndexValue | {DATA_RATE_8 {} [] 0} | 8
+ProtoJSON | ttnpb.DataRateIndexValue | {DATA_RATE_9 {} [] 0} | 9
+ProtoJSON | ttnpb.DataRateOffset | DATA_RATE_OFFSET_0 | 0
+ProtoJSON | ttnpb.DataRateOffset | DATA_RATE_OFFSET_1 | 1
+ProtoJSON | ttnpb.DataRateOffset | DATA_RATE_OFFSET_2 | 2
+ProtoJSON | ttnpb.DataRateOffset | DATA_RATE_OFFSET_3 | 3
+ProtoJSON | ttnpb.DataRateOffset | DATA_RATE_OFFSET_4 | 4
+ProtoJSON | ttnpb.DataRateOffset | DATA_RATE_OFFSET_5 | 5
+ProtoJSON | ttnpb.DataRateOffset | DATA_RATE_OFFSET_6 | 6
+ProtoJSON | ttnpb.DataRateOffset | DATA_RATE_OFFSET_7 | 7
+ProtoJSON | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_0 {} [] 0} | 0
+ProtoJSON | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_1 {} [] 0} | 1
+ProtoJSON | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_2 {} [] 0} | 2
+ProtoJSON | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_3 {} [] 0} | 3
+ProtoJSON | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_4 {} [] 0} | 4
+ProtoJSON | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_5 {} [] 0} | 5
+ProtoJSON | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_6 {} [] 0} | 6
+ProtoJSON | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_7 {} [] 0} | 7
 ProtoJSON | ttnpb.DeviceEIRP | DEVICE_EIRP_10 | "DEVICE_EIRP_10"
 ProtoJSON | ttnpb.DeviceEIRP | DEVICE_EIRP_12 | "DEVICE_EIRP_12"
 ProtoJSON | ttnpb.DeviceEIRP | DEVICE_EIRP_13 | "DEVICE_EIRP_13"
@@ -1154,13 +1233,13 @@ ProtoJSON | ttnpb.MACCommandIdentifier | CID_RFU_0 | "CID_RFU_0"
 ProtoJSON | ttnpb.MACCommandIdentifier | CID_RX_PARAM_SETUP | "CID_RX_PARAM_SETUP"
 ProtoJSON | ttnpb.MACCommandIdentifier | CID_RX_TIMING_SETUP | "CID_RX_TIMING_SETUP"
 ProtoJSON | ttnpb.MACCommandIdentifier | CID_TX_PARAM_SETUP | "CID_TX_PARAM_SETUP"
-ProtoJSON | ttnpb.MACVersion | 1.0.0 | "MAC_V1_0"
-ProtoJSON | ttnpb.MACVersion | 1.0.1 | "MAC_V1_0_1"
-ProtoJSON | ttnpb.MACVersion | 1.0.2 | "MAC_V1_0_2"
-ProtoJSON | ttnpb.MACVersion | 1.0.3 | "MAC_V1_0_3"
-ProtoJSON | ttnpb.MACVersion | 1.0.4 | "MAC_V1_0_4"
-ProtoJSON | ttnpb.MACVersion | 1.1.0 | "MAC_V1_1"
-ProtoJSON | ttnpb.MACVersion | unknown | "MAC_UNKNOWN"
+ProtoJSON | ttnpb.MACVersion | MAC_UNKNOWN | "MAC_UNKNOWN"
+ProtoJSON | ttnpb.MACVersion | MAC_V1_0 | "MAC_V1_0"
+ProtoJSON | ttnpb.MACVersion | MAC_V1_0_1 | "MAC_V1_0_1"
+ProtoJSON | ttnpb.MACVersion | MAC_V1_0_2 | "MAC_V1_0_2"
+ProtoJSON | ttnpb.MACVersion | MAC_V1_0_3 | "MAC_V1_0_3"
+ProtoJSON | ttnpb.MACVersion | MAC_V1_0_4 | "MAC_V1_0_4"
+ProtoJSON | ttnpb.MACVersion | MAC_V1_1 | "MAC_V1_1"
 ProtoJSON | ttnpb.MType | CONFIRMED_DOWN | "CONFIRMED_DOWN"
 ProtoJSON | ttnpb.MType | CONFIRMED_UP | "CONFIRMED_UP"
 ProtoJSON | ttnpb.MType | JOIN_ACCEPT | "JOIN_ACCEPT"
@@ -1186,18 +1265,18 @@ ProtoJSON | ttnpb.Minor | MINOR_RFU_6 | "MINOR_RFU_6"
 ProtoJSON | ttnpb.Minor | MINOR_RFU_7 | "MINOR_RFU_7"
 ProtoJSON | ttnpb.Minor | MINOR_RFU_8 | "MINOR_RFU_8"
 ProtoJSON | ttnpb.Minor | MINOR_RFU_9 | "MINOR_RFU_9"
-ProtoJSON | ttnpb.PHYVersion | 1.0.0 | "PHY_V1_0"
-ProtoJSON | ttnpb.PHYVersion | 1.0.1 | "PHY_V1_0_1"
-ProtoJSON | ttnpb.PHYVersion | 1.0.2-a | "PHY_V1_0_2_REV_A"
-ProtoJSON | ttnpb.PHYVersion | 1.0.2-b | "PHY_V1_0_2_REV_B"
-ProtoJSON | ttnpb.PHYVersion | 1.0.3-a | "PHY_V1_0_3_REV_A"
-ProtoJSON | ttnpb.PHYVersion | 1.1.0-a | "PHY_V1_1_REV_A"
-ProtoJSON | ttnpb.PHYVersion | 1.1.0-b | "PHY_V1_1_REV_B"
+ProtoJSON | ttnpb.PHYVersion | PHY_UNKNOWN | "PHY_UNKNOWN"
+ProtoJSON | ttnpb.PHYVersion | PHY_V1_0 | "PHY_V1_0"
+ProtoJSON | ttnpb.PHYVersion | PHY_V1_0_1 | "PHY_V1_0_1"
+ProtoJSON | ttnpb.PHYVersion | PHY_V1_0_2_REV_A | "PHY_V1_0_2_REV_A"
+ProtoJSON | ttnpb.PHYVersion | PHY_V1_0_2_REV_B | "PHY_V1_0_2_REV_B"
+ProtoJSON | ttnpb.PHYVersion | PHY_V1_0_3_REV_A | "PHY_V1_0_3_REV_A"
+ProtoJSON | ttnpb.PHYVersion | PHY_V1_1_REV_A | "PHY_V1_1_REV_A"
+ProtoJSON | ttnpb.PHYVersion | PHY_V1_1_REV_B | "PHY_V1_1_REV_B"
 ProtoJSON | ttnpb.PHYVersion | RP002_V1_0_0 | "RP002_V1_0_0"
 ProtoJSON | ttnpb.PHYVersion | RP002_V1_0_1 | "RP002_V1_0_1"
 ProtoJSON | ttnpb.PHYVersion | RP002_V1_0_2 | "RP002_V1_0_2"
 ProtoJSON | ttnpb.PHYVersion | RP002_V1_0_3 | "RP002_V1_0_3"
-ProtoJSON | ttnpb.PHYVersion | unknown | "unknown"
 ProtoJSON | ttnpb.PingSlotPeriod | PING_EVERY_128S | "PING_EVERY_128S"
 ProtoJSON | ttnpb.PingSlotPeriod | PING_EVERY_16S | "PING_EVERY_16S"
 ProtoJSON | ttnpb.PingSlotPeriod | PING_EVERY_1S | "PING_EVERY_1S"
@@ -1316,38 +1395,38 @@ ProtoJSON | ttnpb.Right | RIGHT_USER_ORGANIZATIONS_LIST | "RIGHT_USER_ORGANIZATI
 ProtoJSON | ttnpb.Right | RIGHT_USER_SETTINGS_API_KEYS | "RIGHT_USER_SETTINGS_API_KEYS"
 ProtoJSON | ttnpb.Right | RIGHT_USER_SETTINGS_BASIC | "RIGHT_USER_SETTINGS_BASIC"
 ProtoJSON | ttnpb.Right | right_invalid | "right_invalid"
-ProtoJSON | ttnpb.RxDelay | 0 | 0
-ProtoJSON | ttnpb.RxDelay | 1 | 1
-ProtoJSON | ttnpb.RxDelay | 10 | 10
-ProtoJSON | ttnpb.RxDelay | 11 | 11
-ProtoJSON | ttnpb.RxDelay | 12 | 12
-ProtoJSON | ttnpb.RxDelay | 13 | 13
-ProtoJSON | ttnpb.RxDelay | 14 | 14
-ProtoJSON | ttnpb.RxDelay | 15 | 15
-ProtoJSON | ttnpb.RxDelay | 2 | 2
-ProtoJSON | ttnpb.RxDelay | 3 | 3
-ProtoJSON | ttnpb.RxDelay | 4 | 4
-ProtoJSON | ttnpb.RxDelay | 5 | 5
-ProtoJSON | ttnpb.RxDelay | 6 | 6
-ProtoJSON | ttnpb.RxDelay | 7 | 7
-ProtoJSON | ttnpb.RxDelay | 8 | 8
-ProtoJSON | ttnpb.RxDelay | 9 | 9
-ProtoJSON | ttnpb.RxDelayValue | {0 {} [] 0} | 0
-ProtoJSON | ttnpb.RxDelayValue | {1 {} [] 0} | 1
-ProtoJSON | ttnpb.RxDelayValue | {10 {} [] 0} | 10
-ProtoJSON | ttnpb.RxDelayValue | {11 {} [] 0} | 11
-ProtoJSON | ttnpb.RxDelayValue | {12 {} [] 0} | 12
-ProtoJSON | ttnpb.RxDelayValue | {13 {} [] 0} | 13
-ProtoJSON | ttnpb.RxDelayValue | {14 {} [] 0} | 14
-ProtoJSON | ttnpb.RxDelayValue | {15 {} [] 0} | 15
-ProtoJSON | ttnpb.RxDelayValue | {2 {} [] 0} | 2
-ProtoJSON | ttnpb.RxDelayValue | {3 {} [] 0} | 3
-ProtoJSON | ttnpb.RxDelayValue | {4 {} [] 0} | 4
-ProtoJSON | ttnpb.RxDelayValue | {5 {} [] 0} | 5
-ProtoJSON | ttnpb.RxDelayValue | {6 {} [] 0} | 6
-ProtoJSON | ttnpb.RxDelayValue | {7 {} [] 0} | 7
-ProtoJSON | ttnpb.RxDelayValue | {8 {} [] 0} | 8
-ProtoJSON | ttnpb.RxDelayValue | {9 {} [] 0} | 9
+ProtoJSON | ttnpb.RxDelay | RX_DELAY_0 | 0
+ProtoJSON | ttnpb.RxDelay | RX_DELAY_1 | 1
+ProtoJSON | ttnpb.RxDelay | RX_DELAY_10 | 10
+ProtoJSON | ttnpb.RxDelay | RX_DELAY_11 | 11
+ProtoJSON | ttnpb.RxDelay | RX_DELAY_12 | 12
+ProtoJSON | ttnpb.RxDelay | RX_DELAY_13 | 13
+ProtoJSON | ttnpb.RxDelay | RX_DELAY_14 | 14
+ProtoJSON | ttnpb.RxDelay | RX_DELAY_15 | 15
+ProtoJSON | ttnpb.RxDelay | RX_DELAY_2 | 2
+ProtoJSON | ttnpb.RxDelay | RX_DELAY_3 | 3
+ProtoJSON | ttnpb.RxDelay | RX_DELAY_4 | 4
+ProtoJSON | ttnpb.RxDelay | RX_DELAY_5 | 5
+ProtoJSON | ttnpb.RxDelay | RX_DELAY_6 | 6
+ProtoJSON | ttnpb.RxDelay | RX_DELAY_7 | 7
+ProtoJSON | ttnpb.RxDelay | RX_DELAY_8 | 8
+ProtoJSON | ttnpb.RxDelay | RX_DELAY_9 | 9
+ProtoJSON | ttnpb.RxDelayValue | {RX_DELAY_0 {} [] 0} | 0
+ProtoJSON | ttnpb.RxDelayValue | {RX_DELAY_1 {} [] 0} | 1
+ProtoJSON | ttnpb.RxDelayValue | {RX_DELAY_10 {} [] 0} | 10
+ProtoJSON | ttnpb.RxDelayValue | {RX_DELAY_11 {} [] 0} | 11
+ProtoJSON | ttnpb.RxDelayValue | {RX_DELAY_12 {} [] 0} | 12
+ProtoJSON | ttnpb.RxDelayValue | {RX_DELAY_13 {} [] 0} | 13
+ProtoJSON | ttnpb.RxDelayValue | {RX_DELAY_14 {} [] 0} | 14
+ProtoJSON | ttnpb.RxDelayValue | {RX_DELAY_15 {} [] 0} | 15
+ProtoJSON | ttnpb.RxDelayValue | {RX_DELAY_2 {} [] 0} | 2
+ProtoJSON | ttnpb.RxDelayValue | {RX_DELAY_3 {} [] 0} | 3
+ProtoJSON | ttnpb.RxDelayValue | {RX_DELAY_4 {} [] 0} | 4
+ProtoJSON | ttnpb.RxDelayValue | {RX_DELAY_5 {} [] 0} | 5
+ProtoJSON | ttnpb.RxDelayValue | {RX_DELAY_6 {} [] 0} | 6
+ProtoJSON | ttnpb.RxDelayValue | {RX_DELAY_7 {} [] 0} | 7
+ProtoJSON | ttnpb.RxDelayValue | {RX_DELAY_8 {} [] 0} | 8
+ProtoJSON | ttnpb.RxDelayValue | {RX_DELAY_9 {} [] 0} | 9
 ProtoJSON | ttnpb.State | STATE_APPROVED | "STATE_APPROVED"
 ProtoJSON | ttnpb.State | STATE_FLAGGED | "STATE_FLAGGED"
 ProtoJSON | ttnpb.State | STATE_REJECTED | "STATE_REJECTED"
@@ -1463,54 +1542,54 @@ Text | ttnpb.CFListType | FREQUENCIES | FREQUENCIES
 Text | ttnpb.Class | CLASS_A | CLASS_A
 Text | ttnpb.Class | CLASS_B | CLASS_B
 Text | ttnpb.Class | CLASS_C | CLASS_C
-Text | ttnpb.DataRateIndex | 0 | 0
-Text | ttnpb.DataRateIndex | 1 | 1
-Text | ttnpb.DataRateIndex | 10 | 10
-Text | ttnpb.DataRateIndex | 11 | 11
-Text | ttnpb.DataRateIndex | 12 | 12
-Text | ttnpb.DataRateIndex | 13 | 13
-Text | ttnpb.DataRateIndex | 14 | 14
-Text | ttnpb.DataRateIndex | 15 | 15
-Text | ttnpb.DataRateIndex | 2 | 2
-Text | ttnpb.DataRateIndex | 3 | 3
-Text | ttnpb.DataRateIndex | 4 | 4
-Text | ttnpb.DataRateIndex | 5 | 5
-Text | ttnpb.DataRateIndex | 6 | 6
-Text | ttnpb.DataRateIndex | 7 | 7
-Text | ttnpb.DataRateIndex | 8 | 8
-Text | ttnpb.DataRateIndex | 9 | 9
-Text | ttnpb.DataRateIndexValue | {0 {} [] 0} | 0
-Text | ttnpb.DataRateIndexValue | {1 {} [] 0} | 1
-Text | ttnpb.DataRateIndexValue | {10 {} [] 0} | 10
-Text | ttnpb.DataRateIndexValue | {11 {} [] 0} | 11
-Text | ttnpb.DataRateIndexValue | {12 {} [] 0} | 12
-Text | ttnpb.DataRateIndexValue | {13 {} [] 0} | 13
-Text | ttnpb.DataRateIndexValue | {14 {} [] 0} | 14
-Text | ttnpb.DataRateIndexValue | {15 {} [] 0} | 15
-Text | ttnpb.DataRateIndexValue | {2 {} [] 0} | 2
-Text | ttnpb.DataRateIndexValue | {3 {} [] 0} | 3
-Text | ttnpb.DataRateIndexValue | {4 {} [] 0} | 4
-Text | ttnpb.DataRateIndexValue | {5 {} [] 0} | 5
-Text | ttnpb.DataRateIndexValue | {6 {} [] 0} | 6
-Text | ttnpb.DataRateIndexValue | {7 {} [] 0} | 7
-Text | ttnpb.DataRateIndexValue | {8 {} [] 0} | 8
-Text | ttnpb.DataRateIndexValue | {9 {} [] 0} | 9
-Text | ttnpb.DataRateOffset | 0 | 0
-Text | ttnpb.DataRateOffset | 1 | 1
-Text | ttnpb.DataRateOffset | 2 | 2
-Text | ttnpb.DataRateOffset | 3 | 3
-Text | ttnpb.DataRateOffset | 4 | 4
-Text | ttnpb.DataRateOffset | 5 | 5
-Text | ttnpb.DataRateOffset | 6 | 6
-Text | ttnpb.DataRateOffset | 7 | 7
-Text | ttnpb.DataRateOffsetValue | {0 {} [] 0} | 0
-Text | ttnpb.DataRateOffsetValue | {1 {} [] 0} | 1
-Text | ttnpb.DataRateOffsetValue | {2 {} [] 0} | 2
-Text | ttnpb.DataRateOffsetValue | {3 {} [] 0} | 3
-Text | ttnpb.DataRateOffsetValue | {4 {} [] 0} | 4
-Text | ttnpb.DataRateOffsetValue | {5 {} [] 0} | 5
-Text | ttnpb.DataRateOffsetValue | {6 {} [] 0} | 6
-Text | ttnpb.DataRateOffsetValue | {7 {} [] 0} | 7
+Text | ttnpb.DataRateIndex | DATA_RATE_0 | 0
+Text | ttnpb.DataRateIndex | DATA_RATE_1 | 1
+Text | ttnpb.DataRateIndex | DATA_RATE_10 | 10
+Text | ttnpb.DataRateIndex | DATA_RATE_11 | 11
+Text | ttnpb.DataRateIndex | DATA_RATE_12 | 12
+Text | ttnpb.DataRateIndex | DATA_RATE_13 | 13
+Text | ttnpb.DataRateIndex | DATA_RATE_14 | 14
+Text | ttnpb.DataRateIndex | DATA_RATE_15 | 15
+Text | ttnpb.DataRateIndex | DATA_RATE_2 | 2
+Text | ttnpb.DataRateIndex | DATA_RATE_3 | 3
+Text | ttnpb.DataRateIndex | DATA_RATE_4 | 4
+Text | ttnpb.DataRateIndex | DATA_RATE_5 | 5
+Text | ttnpb.DataRateIndex | DATA_RATE_6 | 6
+Text | ttnpb.DataRateIndex | DATA_RATE_7 | 7
+Text | ttnpb.DataRateIndex | DATA_RATE_8 | 8
+Text | ttnpb.DataRateIndex | DATA_RATE_9 | 9
+Text | ttnpb.DataRateIndexValue | {DATA_RATE_0 {} [] 0} | 0
+Text | ttnpb.DataRateIndexValue | {DATA_RATE_1 {} [] 0} | 1
+Text | ttnpb.DataRateIndexValue | {DATA_RATE_10 {} [] 0} | 10
+Text | ttnpb.DataRateIndexValue | {DATA_RATE_11 {} [] 0} | 11
+Text | ttnpb.DataRateIndexValue | {DATA_RATE_12 {} [] 0} | 12
+Text | ttnpb.DataRateIndexValue | {DATA_RATE_13 {} [] 0} | 13
+Text | ttnpb.DataRateIndexValue | {DATA_RATE_14 {} [] 0} | 14
+Text | ttnpb.DataRateIndexValue | {DATA_RATE_15 {} [] 0} | 15
+Text | ttnpb.DataRateIndexValue | {DATA_RATE_2 {} [] 0} | 2
+Text | ttnpb.DataRateIndexValue | {DATA_RATE_3 {} [] 0} | 3
+Text | ttnpb.DataRateIndexValue | {DATA_RATE_4 {} [] 0} | 4
+Text | ttnpb.DataRateIndexValue | {DATA_RATE_5 {} [] 0} | 5
+Text | ttnpb.DataRateIndexValue | {DATA_RATE_6 {} [] 0} | 6
+Text | ttnpb.DataRateIndexValue | {DATA_RATE_7 {} [] 0} | 7
+Text | ttnpb.DataRateIndexValue | {DATA_RATE_8 {} [] 0} | 8
+Text | ttnpb.DataRateIndexValue | {DATA_RATE_9 {} [] 0} | 9
+Text | ttnpb.DataRateOffset | DATA_RATE_OFFSET_0 | 0
+Text | ttnpb.DataRateOffset | DATA_RATE_OFFSET_1 | 1
+Text | ttnpb.DataRateOffset | DATA_RATE_OFFSET_2 | 2
+Text | ttnpb.DataRateOffset | DATA_RATE_OFFSET_3 | 3
+Text | ttnpb.DataRateOffset | DATA_RATE_OFFSET_4 | 4
+Text | ttnpb.DataRateOffset | DATA_RATE_OFFSET_5 | 5
+Text | ttnpb.DataRateOffset | DATA_RATE_OFFSET_6 | 6
+Text | ttnpb.DataRateOffset | DATA_RATE_OFFSET_7 | 7
+Text | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_0 {} [] 0} | 0
+Text | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_1 {} [] 0} | 1
+Text | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_2 {} [] 0} | 2
+Text | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_3 {} [] 0} | 3
+Text | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_4 {} [] 0} | 4
+Text | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_5 {} [] 0} | 5
+Text | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_6 {} [] 0} | 6
+Text | ttnpb.DataRateOffsetValue | {DATA_RATE_OFFSET_7 {} [] 0} | 7
 Text | ttnpb.DeviceEIRP | DEVICE_EIRP_10 | DEVICE_EIRP_10
 Text | ttnpb.DeviceEIRP | DEVICE_EIRP_12 | DEVICE_EIRP_12
 Text | ttnpb.DeviceEIRP | DEVICE_EIRP_13 | DEVICE_EIRP_13
@@ -1586,13 +1665,13 @@ Text | ttnpb.MACCommandIdentifier | CID_RFU_0 | CID_RFU_0
 Text | ttnpb.MACCommandIdentifier | CID_RX_PARAM_SETUP | CID_RX_PARAM_SETUP
 Text | ttnpb.MACCommandIdentifier | CID_RX_TIMING_SETUP | CID_RX_TIMING_SETUP
 Text | ttnpb.MACCommandIdentifier | CID_TX_PARAM_SETUP | CID_TX_PARAM_SETUP
-Text | ttnpb.MACVersion | 1.0.0 | 1.0.0
-Text | ttnpb.MACVersion | 1.0.1 | 1.0.1
-Text | ttnpb.MACVersion | 1.0.2 | 1.0.2
-Text | ttnpb.MACVersion | 1.0.3 | 1.0.3
-Text | ttnpb.MACVersion | 1.0.4 | 1.0.4
-Text | ttnpb.MACVersion | 1.1.0 | 1.1.0
-Text | ttnpb.MACVersion | unknown | unknown
+Text | ttnpb.MACVersion | MAC_UNKNOWN | MAC_UNKNOWN
+Text | ttnpb.MACVersion | MAC_V1_0 | MAC_V1_0
+Text | ttnpb.MACVersion | MAC_V1_0_1 | MAC_V1_0_1
+Text | ttnpb.MACVersion | MAC_V1_0_2 | MAC_V1_0_2
+Text | ttnpb.MACVersion | MAC_V1_0_3 | MAC_V1_0_3
+Text | ttnpb.MACVersion | MAC_V1_0_4 | MAC_V1_0_4
+Text | ttnpb.MACVersion | MAC_V1_1 | MAC_V1_1
 Text | ttnpb.MType | CONFIRMED_DOWN | CONFIRMED_DOWN
 Text | ttnpb.MType | CONFIRMED_UP | CONFIRMED_UP
 Text | ttnpb.MType | JOIN_ACCEPT | JOIN_ACCEPT
@@ -1618,18 +1697,18 @@ Text | ttnpb.Minor | MINOR_RFU_6 | MINOR_RFU_6
 Text | ttnpb.Minor | MINOR_RFU_7 | MINOR_RFU_7
 Text | ttnpb.Minor | MINOR_RFU_8 | MINOR_RFU_8
 Text | ttnpb.Minor | MINOR_RFU_9 | MINOR_RFU_9
-Text | ttnpb.PHYVersion | 1.0.0 | 1.0.0
-Text | ttnpb.PHYVersion | 1.0.1 | 1.0.1
-Text | ttnpb.PHYVersion | 1.0.2-a | 1.0.2-a
-Text | ttnpb.PHYVersion | 1.0.2-b | 1.0.2-b
-Text | ttnpb.PHYVersion | 1.0.3-a | 1.0.3-a
-Text | ttnpb.PHYVersion | 1.1.0-a | 1.1.0-a
-Text | ttnpb.PHYVersion | 1.1.0-b | 1.1.0-b
+Text | ttnpb.PHYVersion | PHY_UNKNOWN | PHY_UNKNOWN
+Text | ttnpb.PHYVersion | PHY_V1_0 | PHY_V1_0
+Text | ttnpb.PHYVersion | PHY_V1_0_1 | PHY_V1_0_1
+Text | ttnpb.PHYVersion | PHY_V1_0_2_REV_A | PHY_V1_0_2_REV_A
+Text | ttnpb.PHYVersion | PHY_V1_0_2_REV_B | PHY_V1_0_2_REV_B
+Text | ttnpb.PHYVersion | PHY_V1_0_3_REV_A | PHY_V1_0_3_REV_A
+Text | ttnpb.PHYVersion | PHY_V1_1_REV_A | PHY_V1_1_REV_A
+Text | ttnpb.PHYVersion | PHY_V1_1_REV_B | PHY_V1_1_REV_B
 Text | ttnpb.PHYVersion | RP002_V1_0_0 | RP002_V1_0_0
 Text | ttnpb.PHYVersion | RP002_V1_0_1 | RP002_V1_0_1
 Text | ttnpb.PHYVersion | RP002_V1_0_2 | RP002_V1_0_2
 Text | ttnpb.PHYVersion | RP002_V1_0_3 | RP002_V1_0_3
-Text | ttnpb.PHYVersion | unknown | unknown
 Text | ttnpb.PingSlotPeriod | PING_EVERY_128S | PING_EVERY_128S
 Text | ttnpb.PingSlotPeriod | PING_EVERY_16S | PING_EVERY_16S
 Text | ttnpb.PingSlotPeriod | PING_EVERY_1S | PING_EVERY_1S
@@ -1748,38 +1827,38 @@ Text | ttnpb.Right | RIGHT_USER_ORGANIZATIONS_LIST | RIGHT_USER_ORGANIZATIONS_LI
 Text | ttnpb.Right | RIGHT_USER_SETTINGS_API_KEYS | RIGHT_USER_SETTINGS_API_KEYS
 Text | ttnpb.Right | RIGHT_USER_SETTINGS_BASIC | RIGHT_USER_SETTINGS_BASIC
 Text | ttnpb.Right | right_invalid | right_invalid
-Text | ttnpb.RxDelay | 0 | 0
-Text | ttnpb.RxDelay | 1 | 1
-Text | ttnpb.RxDelay | 10 | 10
-Text | ttnpb.RxDelay | 11 | 11
-Text | ttnpb.RxDelay | 12 | 12
-Text | ttnpb.RxDelay | 13 | 13
-Text | ttnpb.RxDelay | 14 | 14
-Text | ttnpb.RxDelay | 15 | 15
-Text | ttnpb.RxDelay | 2 | 2
-Text | ttnpb.RxDelay | 3 | 3
-Text | ttnpb.RxDelay | 4 | 4
-Text | ttnpb.RxDelay | 5 | 5
-Text | ttnpb.RxDelay | 6 | 6
-Text | ttnpb.RxDelay | 7 | 7
-Text | ttnpb.RxDelay | 8 | 8
-Text | ttnpb.RxDelay | 9 | 9
-Text | ttnpb.RxDelayValue | {0 {} [] 0} | 0
-Text | ttnpb.RxDelayValue | {1 {} [] 0} | 1
-Text | ttnpb.RxDelayValue | {10 {} [] 0} | 10
-Text | ttnpb.RxDelayValue | {11 {} [] 0} | 11
-Text | ttnpb.RxDelayValue | {12 {} [] 0} | 12
-Text | ttnpb.RxDelayValue | {13 {} [] 0} | 13
-Text | ttnpb.RxDelayValue | {14 {} [] 0} | 14
-Text | ttnpb.RxDelayValue | {15 {} [] 0} | 15
-Text | ttnpb.RxDelayValue | {2 {} [] 0} | 2
-Text | ttnpb.RxDelayValue | {3 {} [] 0} | 3
-Text | ttnpb.RxDelayValue | {4 {} [] 0} | 4
-Text | ttnpb.RxDelayValue | {5 {} [] 0} | 5
-Text | ttnpb.RxDelayValue | {6 {} [] 0} | 6
-Text | ttnpb.RxDelayValue | {7 {} [] 0} | 7
-Text | ttnpb.RxDelayValue | {8 {} [] 0} | 8
-Text | ttnpb.RxDelayValue | {9 {} [] 0} | 9
+Text | ttnpb.RxDelay | RX_DELAY_0 | 0
+Text | ttnpb.RxDelay | RX_DELAY_1 | 1
+Text | ttnpb.RxDelay | RX_DELAY_10 | 10
+Text | ttnpb.RxDelay | RX_DELAY_11 | 11
+Text | ttnpb.RxDelay | RX_DELAY_12 | 12
+Text | ttnpb.RxDelay | RX_DELAY_13 | 13
+Text | ttnpb.RxDelay | RX_DELAY_14 | 14
+Text | ttnpb.RxDelay | RX_DELAY_15 | 15
+Text | ttnpb.RxDelay | RX_DELAY_2 | 2
+Text | ttnpb.RxDelay | RX_DELAY_3 | 3
+Text | ttnpb.RxDelay | RX_DELAY_4 | 4
+Text | ttnpb.RxDelay | RX_DELAY_5 | 5
+Text | ttnpb.RxDelay | RX_DELAY_6 | 6
+Text | ttnpb.RxDelay | RX_DELAY_7 | 7
+Text | ttnpb.RxDelay | RX_DELAY_8 | 8
+Text | ttnpb.RxDelay | RX_DELAY_9 | 9
+Text | ttnpb.RxDelayValue | {RX_DELAY_0 {} [] 0} | 0
+Text | ttnpb.RxDelayValue | {RX_DELAY_1 {} [] 0} | 1
+Text | ttnpb.RxDelayValue | {RX_DELAY_10 {} [] 0} | 10
+Text | ttnpb.RxDelayValue | {RX_DELAY_11 {} [] 0} | 11
+Text | ttnpb.RxDelayValue | {RX_DELAY_12 {} [] 0} | 12
+Text | ttnpb.RxDelayValue | {RX_DELAY_13 {} [] 0} | 13
+Text | ttnpb.RxDelayValue | {RX_DELAY_14 {} [] 0} | 14
+Text | ttnpb.RxDelayValue | {RX_DELAY_15 {} [] 0} | 15
+Text | ttnpb.RxDelayValue | {RX_DELAY_2 {} [] 0} | 2
+Text | ttnpb.RxDelayValue | {RX_DELAY_3 {} [] 0} | 3
+Text | ttnpb.RxDelayValue | {RX_DELAY_4 {} [] 0} | 4
+Text | ttnpb.RxDelayValue | {RX_DELAY_5 {} [] 0} | 5
+Text | ttnpb.RxDelayValue | {RX_DELAY_6 {} [] 0} | 6
+Text | ttnpb.RxDelayValue | {RX_DELAY_7 {} [] 0} | 7
+Text | ttnpb.RxDelayValue | {RX_DELAY_8 {} [] 0} | 8
+Text | ttnpb.RxDelayValue | {RX_DELAY_9 {} [] 0} | 9
 Text | ttnpb.State | STATE_APPROVED | STATE_APPROVED
 Text | ttnpb.State | STATE_FLAGGED | STATE_FLAGGED
 Text | ttnpb.State | STATE_REJECTED | STATE_REJECTED

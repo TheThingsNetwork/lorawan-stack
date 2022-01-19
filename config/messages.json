@@ -8153,15 +8153,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/ttnpb:parsing_semantic_version": {
-    "translations": {
-      "en": "could not parse semantic version"
-    },
-    "description": {
-      "package": "pkg/ttnpb",
-      "file": "lorawan.go"
-    }
-  },
   "error:pkg/ttnpb:prohibited_field": {
     "translations": {
       "en": "field `{field}` is prohibited"

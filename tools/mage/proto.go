@@ -31,7 +31,7 @@ import (
 const (
 	protocOut             = "/out"
 	gogoProtoImage        = "ghcr.io/thethingsindustries/protoc:gen-gogo-1.3.1"
-	jsonProtoImage        = "ghcr.io/thethingsindustries/protoc:3.9.1-gen-go-json-1.1.0"
+	jsonProtoImage        = "ghcr.io/thethingsindustries/protoc:3.9.1-gen-go-json-1.3.0"
 	fieldMaskProtoImage   = "ghcr.io/thethingsindustries/protoc:3.9.1-gen-fieldmask-0.5.0"
 	grpcGatewayProtoImage = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-1.16.0"
 	swaggerProtoImage     = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-1.16.0"
@@ -114,6 +114,7 @@ func (p Proto) json(context.Context) error {
 	return withProtoc(jsonProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
 			"--go-json_opt=lang=gogo",
+			"--go-json_opt=std=true",
 			fmt.Sprintf("--go-json_out=%s:%s", strings.Join(jsonConvs, ","), protocOut),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {

@@ -6069,12 +6069,19 @@ Transmission settings for downlink.
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | `PHY_UNKNOWN` | 0 |  |
+| `PHY_V1_0` | 1 |  |
 | `TS001_V1_0` | 1 |  |
+| `PHY_V1_0_1` | 2 |  |
 | `TS001_V1_0_1` | 2 |  |
+| `PHY_V1_0_2_REV_A` | 3 |  |
 | `RP001_V1_0_2` | 3 |  |
+| `PHY_V1_0_2_REV_B` | 4 |  |
 | `RP001_V1_0_2_REV_B` | 4 |  |
+| `PHY_V1_1_REV_A` | 5 |  |
 | `RP001_V1_1_REV_A` | 5 |  |
+| `PHY_V1_1_REV_B` | 6 |  |
 | `RP001_V1_1_REV_B` | 6 |  |
+| `PHY_V1_0_3_REV_A` | 7 |  |
 | `RP001_V1_0_3_REV_A` | 7 |  |
 | `RP002_V1_0_0` | 8 |  |
 | `RP002_V1_0_1` | 9 |  |
