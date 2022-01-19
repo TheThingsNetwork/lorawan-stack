@@ -25,9 +25,9 @@ func defineEnum(e fmt.Stringer, message string) {
 }
 
 func init() {
-	defineEnum(GRANT_AUTHORIZATION_CODE, "authorization code")
-	defineEnum(GRANT_PASSWORD, "username and password")
-	defineEnum(GRANT_REFRESH_TOKEN, "refresh token")
+	defineEnum(GrantType_GRANT_AUTHORIZATION_CODE, "authorization code")
+	defineEnum(GrantType_GRANT_PASSWORD, "username and password")
+	defineEnum(GrantType_GRANT_REFRESH_TOKEN, "refresh token")
 
 	defineEnum(STATE_REQUESTED, "requested and pending review")
 	defineEnum(STATE_APPROVED, "reviewed and approved")

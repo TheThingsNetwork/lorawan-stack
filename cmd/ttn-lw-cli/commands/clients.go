@@ -175,7 +175,7 @@ var (
 			var client ttnpb.Client
 			client.State = ttnpb.STATE_APPROVED // This may not be honored by the server.
 			client.Grants = []ttnpb.GrantType{
-				ttnpb.GRANT_AUTHORIZATION_CODE,
+				ttnpb.GrantType_GRANT_AUTHORIZATION_CODE,
 			}
 			if inputDecoder != nil {
 				_, err := inputDecoder.Decode(&client)
@@ -355,7 +355,7 @@ func init() {
 	clientsCreateCommand.Flags().AddFlagSet(setClientFlags)
 	clientsCreateCommand.Flags().AddFlagSet(attributesFlags())
 	clientsCreateCommand.Flags().Lookup("state").DefValue = ttnpb.STATE_APPROVED.String()
-	clientsCreateCommand.Flags().Lookup("grants").DefValue = ttnpb.GRANT_AUTHORIZATION_CODE.String()
+	clientsCreateCommand.Flags().Lookup("grants").DefValue = ttnpb.GrantType_GRANT_AUTHORIZATION_CODE.String()
 	clientsCommand.AddCommand(clientsCreateCommand)
 	clientsSetCommand.Flags().AddFlagSet(clientIDFlags())
 	clientsSetCommand.Flags().AddFlagSet(setClientFlags)

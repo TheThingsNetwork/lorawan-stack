@@ -121,7 +121,7 @@ var createOAuthClient = &cobra.Command{
 			cli.State = ttnpb.STATE_APPROVED
 			cli.SkipAuthorization = authorized
 			cli.Endorsed = endorsed
-			cli.Grants = []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN}
+			cli.Grants = []ttnpb.GrantType{ttnpb.GrantType_GRANT_AUTHORIZATION_CODE, ttnpb.GrantType_GRANT_REFRESH_TOKEN}
 			cli.Rights = []ttnpb.Right{ttnpb.RIGHT_ALL}
 
 			if cliExists {
