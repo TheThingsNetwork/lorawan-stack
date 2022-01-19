@@ -22,6 +22,16 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
+func TestMACVersion_Version(t *testing.T) {
+	a := assertions.New(t)
+	for v := range MACVersion_name {
+		if v == int32(MAC_UNKNOWN) {
+			continue
+		}
+		a.So(func() { MACVersion(v).Version() }, should.NotPanic)
+	}
+}
+
 func TestMACVersionCompare(t *testing.T) {
 	for _, tc := range []struct {
 		A, B     MACVersion
@@ -80,7 +90,7 @@ func TestMACVersionCompare(t *testing.T) {
 
 func TestDataRateIndex(t *testing.T) {
 	a := assertions.New(t)
-	a.So(DATA_RATE_4.String(), should.Equal, "4")
+	a.So(DATA_RATE_4.String(), should.Equal, "DATA_RATE_4")
 
 	b, err := DATA_RATE_4.MarshalText()
 	a.So(err, should.BeNil)

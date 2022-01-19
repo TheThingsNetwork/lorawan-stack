@@ -22,7 +22,6 @@ import (
 	"github.com/blang/semver"
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/vmihailenco/msgpack/v5"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
@@ -102,11 +101,6 @@ func (v *PHYVersion) UnmarshalBinary(b []byte) error {
 	}
 	*v = PHYVersion(i)
 	return nil
-}
-
-// String implements fmt.Stringer.
-func (v DataRateIndex) String() string {
-	return strconv.Itoa(int(v))
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
@@ -196,11 +190,6 @@ func (v *DataRateIndexValue) FieldIsZero(p string) bool {
 		return v.Value == 0
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
-}
-
-// String implements fmt.Stringer.
-func (v DataRateOffset) String() string {
-	return strconv.Itoa(int(v))
 }
 
 // MarshalBinary implements encoding.BinaryMarshaler interface.
@@ -947,40 +936,32 @@ func (v *Minor) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-var errParsingSemanticVersion = unexpectedValue(
-	errors.DefineInvalidArgument("parsing_semantic_version", "could not parse semantic version", valueKey),
-)
-
 // Validate reports whether v represents a valid MACVersion.
 func (v MACVersion) Validate() error {
 	if v < 1 || v >= MACVersion(len(MACVersion_name)) {
 		return errExpectedBetween("MACVersion", 1, len(MACVersion_name)-1)(v)
 	}
-
-	_, err := semver.Parse(v.String())
-	if err != nil {
-		return errParsingSemanticVersion(v.String()).WithCause(err)
-	}
 	return nil
 }
 
-// String implements fmt.Stringer.
-func (v MACVersion) String() string {
+// Version returns the MACVersion as a semver.Version.
+func (v MACVersion) Version() semver.Version {
 	switch v {
 	case MAC_V1_0:
-		return "1.0.0"
+		return semver.Version{Major: 1, Minor: 0, Patch: 0}
 	case MAC_V1_0_1:
-		return "1.0.1"
+		return semver.Version{Major: 1, Minor: 0, Patch: 1}
 	case MAC_V1_0_2:
-		return "1.0.2"
+		return semver.Version{Major: 1, Minor: 0, Patch: 2}
 	case MAC_V1_0_3:
-		return "1.0.3"
+		return semver.Version{Major: 1, Minor: 0, Patch: 3}
 	case MAC_V1_0_4:
-		return "1.0.4"
+		return semver.Version{Major: 1, Minor: 0, Patch: 4}
 	case MAC_V1_1:
-		return "1.1.0"
+		return semver.Version{Major: 1, Minor: 1, Patch: 0}
+	default:
+		panic(fmt.Errorf("missed %q in MACVersion.Version()", v))
 	}
-	return "unknown"
 }
 
 // Compare compares MACVersions v to o:
@@ -989,9 +970,7 @@ func (v MACVersion) String() string {
 // 1 == v is greater than o
 // Compare panics, if v.Validate() returns non-nil error.
 func (v MACVersion) Compare(o MACVersion) int {
-	return semver.MustParse(v.String()).Compare(
-		semver.MustParse(o.String()),
-	)
+	return v.Version().Compare(o.Version())
 }
 
 // EncryptFOpts reports whether v requires MAC commands in FOpts to be encrypted.
@@ -1057,32 +1036,6 @@ func (v PHYVersion) Validate() error {
 	return nil
 }
 
-// String implements fmt.Stringer.
-func (v PHYVersion) String() string {
-	switch v {
-	case TS001_V1_0:
-		return "1.0.0"
-	case TS001_V1_0_1:
-		return "1.0.1"
-	case RP001_V1_0_2:
-		return "1.0.2-a"
-	case RP001_V1_0_2_REV_B:
-		return "1.0.2-b"
-	case RP001_V1_0_3_REV_A:
-		return "1.0.3-a"
-	case RP001_V1_1_REV_A:
-		return "1.1.0-a"
-	case RP001_V1_1_REV_B:
-		return "1.1.0-b"
-	case PHY_UNKNOWN:
-		return "unknown"
-	}
-	if name, exists := PHYVersion_name[int32(v)]; exists {
-		return name
-	}
-	return "unknown"
-}
-
 // Duration returns v as time.Duration.
 func (v RxDelay) Duration() time.Duration {
 	switch v {
@@ -1099,11 +1052,6 @@ func (v RxDelay) Validate() error {
 		return errExpectedBetween("RxDelay", 0, len(RxDelay_name)-1)(v)
 	}
 	return nil
-}
-
-// String implements fmt.Stringer.
-func (v RxDelay) String() string {
-	return strconv.Itoa(int(v))
 }
 
 func (v LoRaDataRate) DataRate() *DataRate {

@@ -26,8 +26,6 @@ package ttn.lorawan.v3;
 option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 
 // TODO: Migrate away from GoGo Protobuf (https://github.com/TheThingsNetwork/lorawan-stack/issues/2798).
-option (gogoproto.enum_stringer_all) = true;
-option (gogoproto.goproto_enum_stringer_all) = false;
 option (gogoproto.goproto_registration) = true;
 
 // Message represents a LoRaWAN message
@@ -72,7 +70,6 @@ enum Major {
 enum MACVersion {
   option (thethings.json.enum) = { marshal_as_string: true, prefix: "MAC" };
   option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_stringer) = false;
 
   MAC_UNKNOWN = 0 [(thethings.json.enum_value) = { aliases: ["unknown"] }];
   MAC_V1_0 = 1 [(thethings.json.enum_value) = { aliases: ["1.0", "1.0.0"] }];
@@ -86,7 +83,6 @@ enum MACVersion {
 enum PHYVersion {
   option (thethings.json.enum) = { marshal_as_string: true, prefix: "PHY" };
   option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_stringer) = false;
 
   PHY_UNKNOWN = 0 [(thethings.json.enum_value) = { value: "PHY_UNKNOWN", aliases: ["unknown"] }];
 
@@ -108,7 +104,6 @@ enum PHYVersion {
 enum DataRateIndex {
   option (thethings.json.enum) = { marshal_as_number: true, prefix: "DATA_RATE" };
   option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_stringer) = false;
 
   DATA_RATE_0 = 0;
   DATA_RATE_1 = 1;
@@ -130,7 +125,6 @@ enum DataRateIndex {
 
 enum DataRateOffset {
   option (thethings.json.enum) = { marshal_as_number: true, prefix: "DATA_RATE_OFFSET" };
-  option (gogoproto.enum_stringer) = false;
 
   DATA_RATE_OFFSET_0 = 0;
   DATA_RATE_OFFSET_1 = 1;
@@ -750,7 +744,6 @@ enum ADRAckDelayExponent {
 enum RxDelay {
   option (thethings.json.enum) = { marshal_as_number: true, prefix: "RX_DELAY" };
   option (gogoproto.goproto_enum_prefix) = false;
-  option (gogoproto.enum_stringer) = false;
 
   RX_DELAY_0 = 0;   // 1 second.
   RX_DELAY_1 = 1;   // 1 second.
