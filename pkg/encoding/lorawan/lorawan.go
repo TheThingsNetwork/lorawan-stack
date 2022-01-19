@@ -120,37 +120,37 @@ func Float32ToDeviceEIRP(v float32) ttnpb.DeviceEIRP {
 // ADRAckLimitExponentToUint32 returns v as a uint32 value.
 func ADRAckLimitExponentToUint32(v ttnpb.ADRAckLimitExponent) uint32 {
 	switch v {
-	case ttnpb.ADR_ACK_LIMIT_32768:
+	case ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_32768:
 		return 32768
-	case ttnpb.ADR_ACK_LIMIT_16384:
+	case ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_16384:
 		return 16384
-	case ttnpb.ADR_ACK_LIMIT_8192:
+	case ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_8192:
 		return 8192
-	case ttnpb.ADR_ACK_LIMIT_4096:
+	case ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_4096:
 		return 4096
-	case ttnpb.ADR_ACK_LIMIT_2048:
+	case ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_2048:
 		return 2048
-	case ttnpb.ADR_ACK_LIMIT_1024:
+	case ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_1024:
 		return 1024
-	case ttnpb.ADR_ACK_LIMIT_512:
+	case ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_512:
 		return 512
-	case ttnpb.ADR_ACK_LIMIT_256:
+	case ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_256:
 		return 256
-	case ttnpb.ADR_ACK_LIMIT_128:
+	case ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_128:
 		return 128
-	case ttnpb.ADR_ACK_LIMIT_64:
+	case ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_64:
 		return 64
-	case ttnpb.ADR_ACK_LIMIT_32:
+	case ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_32:
 		return 32
-	case ttnpb.ADR_ACK_LIMIT_16:
+	case ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_16:
 		return 16
-	case ttnpb.ADR_ACK_LIMIT_8:
+	case ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_8:
 		return 8
-	case ttnpb.ADR_ACK_LIMIT_4:
+	case ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_4:
 		return 4
-	case ttnpb.ADR_ACK_LIMIT_2:
+	case ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_2:
 		return 2
-	case ttnpb.ADR_ACK_LIMIT_1:
+	case ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_1:
 		return 1
 	}
 	panic(fmt.Errorf("unknown ADRAckLimitExponent value `%d`", v))
@@ -160,37 +160,37 @@ func ADRAckLimitExponentToUint32(v ttnpb.ADRAckLimitExponent) uint32 {
 func Uint32ToADRAckLimitExponent(v uint32) ttnpb.ADRAckLimitExponent {
 	switch {
 	case v >= 32768:
-		return ttnpb.ADR_ACK_LIMIT_32768
+		return ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_32768
 	case v >= 16384:
-		return ttnpb.ADR_ACK_LIMIT_16384
+		return ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_16384
 	case v >= 8192:
-		return ttnpb.ADR_ACK_LIMIT_8192
+		return ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_8192
 	case v >= 4096:
-		return ttnpb.ADR_ACK_LIMIT_4096
+		return ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_4096
 	case v >= 2048:
-		return ttnpb.ADR_ACK_LIMIT_2048
+		return ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_2048
 	case v >= 1024:
-		return ttnpb.ADR_ACK_LIMIT_1024
+		return ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_1024
 	case v >= 512:
-		return ttnpb.ADR_ACK_LIMIT_512
+		return ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_512
 	case v >= 256:
-		return ttnpb.ADR_ACK_LIMIT_256
+		return ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_256
 	case v >= 128:
-		return ttnpb.ADR_ACK_LIMIT_128
+		return ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_128
 	case v >= 64:
-		return ttnpb.ADR_ACK_LIMIT_64
+		return ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_64
 	case v >= 32:
-		return ttnpb.ADR_ACK_LIMIT_32
+		return ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_32
 	case v >= 16:
-		return ttnpb.ADR_ACK_LIMIT_16
+		return ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_16
 	case v >= 8:
-		return ttnpb.ADR_ACK_LIMIT_8
+		return ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_8
 	case v >= 4:
-		return ttnpb.ADR_ACK_LIMIT_4
+		return ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_4
 	case v >= 2:
-		return ttnpb.ADR_ACK_LIMIT_2
+		return ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_2
 	}
-	return ttnpb.ADR_ACK_LIMIT_1
+	return ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_1
 }
 
 // ADRAckDelayExponentToUint32 returns v as a uint32 value.
