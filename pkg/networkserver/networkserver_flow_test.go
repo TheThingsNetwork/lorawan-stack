@@ -179,14 +179,14 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		var downCmders []MACCommander
 		if dev.PendingMacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
 			rekeyInd := &ttnpb.MACCommand_RekeyInd{
-				MinorVersion: ttnpb.MINOR_1,
+				MinorVersion: ttnpb.Minor_MINOR_1,
 			}
 			upCmders = []MACCommander{
 				rekeyInd,
 			}
 
 			rekeyConf := &ttnpb.MACCommand_RekeyConf{
-				MinorVersion: ttnpb.MINOR_1,
+				MinorVersion: ttnpb.Minor_MINOR_1,
 			}
 			upEvBuilders = []events.Builder{
 				mac.EvtReceiveRekeyIndication.With(events.WithData(rekeyInd)),
