@@ -44,12 +44,12 @@ func TestNeedsRxParamSetupReq(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 1,
-						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
+						Rx2DataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_2,
 						Rx2Frequency:      123,
 					},
 					DesiredParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 1,
-						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
+						Rx2DataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_2,
 						Rx2Frequency:      123,
 					},
 				},
@@ -61,12 +61,12 @@ func TestNeedsRxParamSetupReq(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 1,
-						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
+						Rx2DataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_2,
 						Rx2Frequency:      123,
 					},
 					DesiredParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 1,
-						Rx2DataRateIndex:  ttnpb.DATA_RATE_3,
+						Rx2DataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_3,
 						Rx2Frequency:      123,
 					},
 				},
@@ -79,12 +79,12 @@ func TestNeedsRxParamSetupReq(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 1,
-						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
+						Rx2DataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_2,
 						Rx2Frequency:      123,
 					},
 					DesiredParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 1,
-						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
+						Rx2DataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_2,
 						Rx2Frequency:      124,
 					},
 				},
@@ -97,12 +97,12 @@ func TestNeedsRxParamSetupReq(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 1,
-						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
+						Rx2DataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_2,
 						Rx2Frequency:      123,
 					},
 					DesiredParameters: &ttnpb.MACParameters{
 						Rx1DataRateOffset: 2,
-						Rx2DataRateIndex:  ttnpb.DATA_RATE_2,
+						Rx2DataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_2,
 						Rx2Frequency:      123,
 					},
 				},

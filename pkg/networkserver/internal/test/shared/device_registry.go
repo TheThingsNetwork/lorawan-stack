@@ -315,11 +315,11 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		"session",
 	}
 
-	pbCurrentUp := MakeDataUplink(WithDeviceDataUplinkConfig(pb, false, ttnpb.DATA_RATE_2, 1, 1)(DataUplinkConfig{
+	pbCurrentUp := MakeDataUplink(WithDeviceDataUplinkConfig(pb, false, ttnpb.DataRateIndex_DATA_RATE_2, 1, 1)(DataUplinkConfig{
 		DecodePayload: true,
 		FPort:         0x01,
 	}))
-	pbPendingUp := MakeDataUplink(WithDeviceDataUplinkConfig(pb, true, ttnpb.DATA_RATE_1, 2, 42)(DataUplinkConfig{
+	pbPendingUp := MakeDataUplink(WithDeviceDataUplinkConfig(pb, true, ttnpb.DataRateIndex_DATA_RATE_1, 2, 42)(DataUplinkConfig{
 		DecodePayload: true,
 		FPort:         0x42,
 	}))
@@ -358,7 +358,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 	pbOther.Ids.DeviceId = "test-dev-other"
 	pbOther.Ids.DevEui = &types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
 
-	pbOtherCurrentUp := MakeDataUplink(WithDeviceDataUplinkConfig(pbOther, false, ttnpb.DATA_RATE_2, 1, 0)(DataUplinkConfig{
+	pbOtherCurrentUp := MakeDataUplink(WithDeviceDataUplinkConfig(pbOther, false, ttnpb.DataRateIndex_DATA_RATE_2, 1, 0)(DataUplinkConfig{
 		DecodePayload: true,
 		FPort:         0x01,
 	}))

@@ -90,16 +90,16 @@ func TestMACVersionCompare(t *testing.T) {
 
 func TestDataRateIndex(t *testing.T) {
 	a := assertions.New(t)
-	a.So(DATA_RATE_4.String(), should.Equal, "DATA_RATE_4")
+	a.So(DataRateIndex_DATA_RATE_4.String(), should.Equal, "DATA_RATE_4")
 
-	b, err := DATA_RATE_4.MarshalText()
+	b, err := DataRateIndex_DATA_RATE_4.MarshalText()
 	a.So(err, should.BeNil)
 	a.So(string(b), should.Resemble, "4")
 
 	for _, str := range []string{"4", "DATA_RATE_4"} {
 		var idx DataRateIndex
 		err = idx.UnmarshalText([]byte(str))
-		a.So(idx, should.Equal, DATA_RATE_4)
+		a.So(idx, should.Equal, DataRateIndex_DATA_RATE_4)
 	}
 }
 

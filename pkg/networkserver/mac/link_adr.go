@@ -42,7 +42,7 @@ var (
 )
 
 const (
-	noChangeDataRateIndex = ttnpb.DATA_RATE_15
+	noChangeDataRateIndex = ttnpb.DataRateIndex_DATA_RATE_15
 	noChangeTXPowerIndex  = 15
 )
 
@@ -355,7 +355,7 @@ func HandleLinkADRAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACC
 
 	if !pld.DataRateIndexAck {
 		if i := searchDataRateIndex(req.DataRateIndex, dev.MacState.RejectedAdrDataRateIndexes...); i == len(dev.MacState.RejectedAdrDataRateIndexes) || dev.MacState.RejectedAdrDataRateIndexes[i] != req.DataRateIndex {
-			dev.MacState.RejectedAdrDataRateIndexes = append(dev.MacState.RejectedAdrDataRateIndexes, ttnpb.DATA_RATE_0)
+			dev.MacState.RejectedAdrDataRateIndexes = append(dev.MacState.RejectedAdrDataRateIndexes, ttnpb.DataRateIndex_DATA_RATE_0)
 			copy(dev.MacState.RejectedAdrDataRateIndexes[i+1:], dev.MacState.RejectedAdrDataRateIndexes[i:])
 			dev.MacState.RejectedAdrDataRateIndexes[i] = req.DataRateIndex
 		}

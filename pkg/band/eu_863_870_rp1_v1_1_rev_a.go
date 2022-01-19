@@ -76,16 +76,16 @@ var EU_863_870_RP1_V1_1_Rev_A = Band{
 	},
 
 	DataRates: map[ttnpb.DataRateIndex]DataRate{
-		ttnpb.DATA_RATE_0: makeLoRaDataRate(12, 125000, makeConstMaxMACPayloadSizeFunc(59)),
-		ttnpb.DATA_RATE_1: makeLoRaDataRate(11, 125000, makeConstMaxMACPayloadSizeFunc(59)),
-		ttnpb.DATA_RATE_2: makeLoRaDataRate(10, 125000, makeConstMaxMACPayloadSizeFunc(59)),
-		ttnpb.DATA_RATE_3: makeLoRaDataRate(9, 125000, makeConstMaxMACPayloadSizeFunc(123)),
-		ttnpb.DATA_RATE_4: makeLoRaDataRate(8, 125000, makeConstMaxMACPayloadSizeFunc(230)),
-		ttnpb.DATA_RATE_5: makeLoRaDataRate(7, 125000, makeConstMaxMACPayloadSizeFunc(230)),
-		ttnpb.DATA_RATE_6: makeLoRaDataRate(7, 250000, makeConstMaxMACPayloadSizeFunc(230)),
-		ttnpb.DATA_RATE_7: makeFSKDataRate(50000, makeConstMaxMACPayloadSizeFunc(230)),
+		ttnpb.DataRateIndex_DATA_RATE_0: makeLoRaDataRate(12, 125000, makeConstMaxMACPayloadSizeFunc(59)),
+		ttnpb.DataRateIndex_DATA_RATE_1: makeLoRaDataRate(11, 125000, makeConstMaxMACPayloadSizeFunc(59)),
+		ttnpb.DataRateIndex_DATA_RATE_2: makeLoRaDataRate(10, 125000, makeConstMaxMACPayloadSizeFunc(59)),
+		ttnpb.DataRateIndex_DATA_RATE_3: makeLoRaDataRate(9, 125000, makeConstMaxMACPayloadSizeFunc(123)),
+		ttnpb.DataRateIndex_DATA_RATE_4: makeLoRaDataRate(8, 125000, makeConstMaxMACPayloadSizeFunc(230)),
+		ttnpb.DataRateIndex_DATA_RATE_5: makeLoRaDataRate(7, 125000, makeConstMaxMACPayloadSizeFunc(230)),
+		ttnpb.DataRateIndex_DATA_RATE_6: makeLoRaDataRate(7, 250000, makeConstMaxMACPayloadSizeFunc(230)),
+		ttnpb.DataRateIndex_DATA_RATE_7: makeFSKDataRate(50000, makeConstMaxMACPayloadSizeFunc(230)),
 	},
-	MaxADRDataRateIndex: ttnpb.DATA_RATE_5,
+	MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 
 	ReceiveDelay1:        defaultReceiveDelay1,
 	ReceiveDelay2:        defaultReceiveDelay2,
@@ -111,7 +111,7 @@ var EU_863_870_RP1_V1_1_Rev_A = Band{
 
 	Rx1Channel: channelIndexIdentity,
 	Rx1DataRate: func(idx ttnpb.DataRateIndex, offset ttnpb.DataRateOffset, _ bool) (ttnpb.DataRateIndex, error) {
-		if idx > ttnpb.DATA_RATE_7 {
+		if idx > ttnpb.DataRateIndex_DATA_RATE_7 {
 			return 0, errDataRateIndexTooHigh.WithAttributes("max", 7)
 		}
 		if offset > 5 {
@@ -129,10 +129,10 @@ var EU_863_870_RP1_V1_1_Rev_A = Band{
 	ImplementsCFList: true,
 	CFListType:       ttnpb.CFListType_FREQUENCIES,
 
-	DefaultRx2Parameters: Rx2Parameters{ttnpb.DATA_RATE_0, 869525000},
+	DefaultRx2Parameters: Rx2Parameters{ttnpb.DataRateIndex_DATA_RATE_0, 869525000},
 
 	Beacon: Beacon{
-		DataRateIndex:    ttnpb.DATA_RATE_3,
+		DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_3,
 		CodingRate:       "4/5",
 		ComputeFrequency: func(_ float64) uint64 { return eu863870BeaconFrequency },
 	},

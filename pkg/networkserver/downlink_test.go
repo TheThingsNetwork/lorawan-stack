@@ -73,8 +73,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 	customCh := &ttnpb.MACParameters_Channel{
 		UplinkFrequency:   430000000,
 		DownlinkFrequency: 431000000,
-		MinDataRateIndex:  ttnpb.DATA_RATE_0,
-		MaxDataRateIndex:  ttnpb.DATA_RATE_6,
+		MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+		MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_6,
 	}
 	const customChIdx = 3
 	makeEU868macParameters := func(ver ttnpb.PHYVersion) *ttnpb.MACParameters {
@@ -1224,8 +1224,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Matched:       true,
 							MACVersion:    ttnpb.MAC_V1_1,
 							DevAddr:       test.DefaultDevAddr,
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B].DataRates[ttnpb.DATA_RATE_6].Rate,
-							DataRateIndex: ttnpb.DATA_RATE_6,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B].DataRates[ttnpb.DataRateIndex_DATA_RATE_6].Rate,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_6,
 							Frequency:     customCh.UplinkFrequency,
 							ChannelIndex:  customChIdx,
 							RxMetadata:    DefaultRxMetadata[:],

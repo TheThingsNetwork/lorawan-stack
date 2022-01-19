@@ -48,7 +48,7 @@ func DeviceNeedsNewChannelReqAtIndex(dev *ttnpb.EndDevice, i int) bool {
 		dev.MacState.DesiredParameters.Channels[i] == nil:
 		// A channel is desired to be deleted.
 		if currentCh := dev.MacState.CurrentParameters.Channels[i]; currentCh != nil && currentCh.UplinkFrequency > 0 {
-			return !deviceRejectedNewChannelReq(dev, 0, ttnpb.DATA_RATE_0, ttnpb.DATA_RATE_0)
+			return !deviceRejectedNewChannelReq(dev, 0, ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_0)
 		}
 	case i >= len(dev.MacState.CurrentParameters.Channels),
 		dev.MacState.CurrentParameters.Channels[i] == nil:

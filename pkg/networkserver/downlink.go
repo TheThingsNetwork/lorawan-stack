@@ -1093,7 +1093,7 @@ func rx1Parameters(phy *band.Band, macState *ttnpb.MACState, up *ttnpb.UplinkMes
 // maximumUplinkLength returns the maximum length of the next uplink after ups.
 func maximumUplinkLength(fp *frequencyplans.FrequencyPlan, phy *band.Band, ups ...*ttnpb.UplinkMessage) (uint16, error) {
 	// NOTE: If no data uplink is found, we assume ADR is off on the device and, hence, data rate index 0 is used in computation.
-	maxUpDRIdx := ttnpb.DATA_RATE_0
+	maxUpDRIdx := ttnpb.DataRateIndex_DATA_RATE_0
 loop:
 	for i := len(ups) - 1; i >= 0; i-- {
 		switch ups[i].Payload.MHdr.MType {

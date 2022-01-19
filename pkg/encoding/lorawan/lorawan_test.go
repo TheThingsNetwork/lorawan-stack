@@ -837,7 +837,7 @@ func TestMessageEncodingSymmetricityJoinAcceptPayload(t *testing.T) {
 				DevAddr:   test.DefaultDevAddr,
 				DlSettings: &ttnpb.DLSettings{
 					Rx1DrOffset: ttnpb.DataRateOffset_DATA_RATE_OFFSET_2,
-					Rx2Dr:       ttnpb.DATA_RATE_1,
+					Rx2Dr:       ttnpb.DataRateIndex_DATA_RATE_1,
 					OptNeg:      false,
 				},
 				RxDelay: ttnpb.RxDelay_RX_DELAY_5,
@@ -861,7 +861,7 @@ func TestMessageEncodingSymmetricityJoinAcceptPayload(t *testing.T) {
 				DevAddr:   test.DefaultDevAddr,
 				DlSettings: &ttnpb.DLSettings{
 					Rx1DrOffset: ttnpb.DataRateOffset_DATA_RATE_OFFSET_2,
-					Rx2Dr:       ttnpb.DATA_RATE_1,
+					Rx2Dr:       ttnpb.DataRateIndex_DATA_RATE_1,
 					OptNeg:      false,
 				},
 				RxDelay: ttnpb.RxDelay_RX_DELAY_5,

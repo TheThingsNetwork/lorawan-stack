@@ -27,15 +27,15 @@ var (
 	kr920923DefaultChannels = []Channel{
 		{
 			Frequency:   922100000,
-			MaxDataRate: ttnpb.DATA_RATE_5,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 		},
 		{
 			Frequency:   922300000,
-			MaxDataRate: ttnpb.DATA_RATE_5,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 		},
 		{
 			Frequency:   922500000,
-			MaxDataRate: ttnpb.DATA_RATE_5,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 		},
 	}
 

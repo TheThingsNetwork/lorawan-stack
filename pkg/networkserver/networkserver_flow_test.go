@@ -44,7 +44,7 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 	case test.EUFrequencyPlanID:
 		linkADRReq := &ttnpb.MACCommand_LinkADRReq{
 			ChannelMask:   []bool{true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false},
-			DataRateIndex: ttnpb.DATA_RATE_5,
+			DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 			TxPowerIndex:  1,
 			NbTrans:       1,
 		}
@@ -57,7 +57,7 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 		linkADRReqs := []MACCommander{
 			&ttnpb.MACCommand_LinkADRReq{
 				ChannelMask:   []bool{false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true},
-				DataRateIndex: ttnpb.DATA_RATE_3,
+				DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
 				TxPowerIndex:  1,
 				NbTrans:       1,
 			},
@@ -78,7 +78,7 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 				&ttnpb.MACCommand_LinkADRReq{
 					ChannelMask:        []bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
 					ChannelMaskControl: 7,
-					DataRateIndex:      ttnpb.DATA_RATE_3,
+					DataRateIndex:      ttnpb.DataRateIndex_DATA_RATE_3,
 					TxPowerIndex:       1,
 					NbTrans:            1,
 				},
@@ -94,11 +94,11 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 		newChannelReq := &ttnpb.MACCommand_NewChannelReq{
 			ChannelIndex:     7,
 			Frequency:        924600000,
-			MaxDataRateIndex: ttnpb.DATA_RATE_5,
+			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 		}
 		linkADRReq := &ttnpb.MACCommand_LinkADRReq{
 			ChannelMask:   []bool{true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false},
-			DataRateIndex: ttnpb.DATA_RATE_5,
+			DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 			TxPowerIndex:  1,
 			NbTrans:       1,
 		}
@@ -146,7 +146,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		dev, ok = env.AssertJoin(ctx, JoinAssertionConfig{
 			Device:        dev,
 			ChannelIndex:  1,
-			DataRateIndex: ttnpb.DATA_RATE_2,
+			DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
 			RxMetadatas: [][]*ttnpb.RxMetadata{
 				nil,
 				DefaultRxMetadata[3:],
@@ -210,7 +210,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		dev, ok = env.AssertHandleDataUplink(ctx, DataUplinkAssertionConfig{
 			Device:        dev,
 			ChannelIndex:  2,
-			DataRateIndex: ttnpb.DATA_RATE_1,
+			DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
 			RxMetadatas: [][]*ttnpb.RxMetadata{
 				DefaultRxMetadata[:2],
 				DefaultRxMetadata[2:],

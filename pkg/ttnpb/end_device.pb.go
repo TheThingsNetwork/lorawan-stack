@@ -281,7 +281,7 @@ func (m *MACParameters) GetAdrDataRateIndex() DataRateIndex {
 	if m != nil {
 		return m.AdrDataRateIndex
 	}
-	return DATA_RATE_0
+	return DataRateIndex_DATA_RATE_0
 }
 
 func (m *MACParameters) GetAdrTxPowerIndex() uint32 {
@@ -332,7 +332,7 @@ func (m *MACParameters) GetRx2DataRateIndex() DataRateIndex {
 	if m != nil {
 		return m.Rx2DataRateIndex
 	}
-	return DATA_RATE_0
+	return DataRateIndex_DATA_RATE_0
 }
 
 func (m *MACParameters) GetRx2Frequency() uint64 {
@@ -375,7 +375,7 @@ func (m *MACParameters) GetPingSlotDataRateIndex() DataRateIndex {
 	if m != nil {
 		return m.PingSlotDataRateIndex
 	}
-	return DATA_RATE_0
+	return DataRateIndex_DATA_RATE_0
 }
 
 func (m *MACParameters) GetBeaconFrequency() uint64 {
@@ -485,14 +485,14 @@ func (m *MACParameters_Channel) GetMinDataRateIndex() DataRateIndex {
 	if m != nil {
 		return m.MinDataRateIndex
 	}
-	return DATA_RATE_0
+	return DataRateIndex_DATA_RATE_0
 }
 
 func (m *MACParameters_Channel) GetMaxDataRateIndex() DataRateIndex {
 	if m != nil {
 		return m.MaxDataRateIndex
 	}
-	return DATA_RATE_0
+	return DataRateIndex_DATA_RATE_0
 }
 
 func (m *MACParameters_Channel) GetEnableUplink() bool {
@@ -1380,14 +1380,14 @@ func (m *MACState_DataRateRange) GetMinDataRateIndex() DataRateIndex {
 	if m != nil {
 		return m.MinDataRateIndex
 	}
-	return DATA_RATE_0
+	return DataRateIndex_DATA_RATE_0
 }
 
 func (m *MACState_DataRateRange) GetMaxDataRateIndex() DataRateIndex {
 	if m != nil {
 		return m.MaxDataRateIndex
 	}
-	return DATA_RATE_0
+	return DataRateIndex_DATA_RATE_0
 }
 
 type MACState_DataRateRanges struct {

@@ -42,11 +42,11 @@ func TestNeedsPingSlotChannelReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{
-						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_1},
+						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex_DATA_RATE_1},
 						PingSlotFrequency:          123,
 					},
 					DesiredParameters: &ttnpb.MACParameters{
-						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_1},
+						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex_DATA_RATE_1},
 						PingSlotFrequency:          123,
 					},
 				},
@@ -57,11 +57,11 @@ func TestNeedsPingSlotChannelReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{
-						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_1},
+						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex_DATA_RATE_1},
 						PingSlotFrequency:          123,
 					},
 					DesiredParameters: &ttnpb.MACParameters{
-						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_2},
+						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex_DATA_RATE_2},
 						PingSlotFrequency:          123,
 					},
 				},
@@ -73,11 +73,11 @@ func TestNeedsPingSlotChannelReq(t *testing.T) {
 			InputDevice: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
 					CurrentParameters: &ttnpb.MACParameters{
-						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_1},
+						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex_DATA_RATE_1},
 						PingSlotFrequency:          123,
 					},
 					DesiredParameters: &ttnpb.MACParameters{
-						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_1},
+						PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex_DATA_RATE_1},
 						PingSlotFrequency:          124,
 					},
 				},

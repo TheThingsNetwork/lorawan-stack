@@ -38,16 +38,16 @@ var IN_865_867_RP1_V1_0_3_Rev_A = Band{
 	},
 
 	DataRates: map[ttnpb.DataRateIndex]DataRate{
-		ttnpb.DATA_RATE_0: makeLoRaDataRate(12, 125000, makeConstMaxMACPayloadSizeFunc(59)),
-		ttnpb.DATA_RATE_1: makeLoRaDataRate(11, 125000, makeConstMaxMACPayloadSizeFunc(59)),
-		ttnpb.DATA_RATE_2: makeLoRaDataRate(10, 125000, makeConstMaxMACPayloadSizeFunc(59)),
-		ttnpb.DATA_RATE_3: makeLoRaDataRate(9, 125000, makeConstMaxMACPayloadSizeFunc(123)),
-		ttnpb.DATA_RATE_4: makeLoRaDataRate(8, 125000, makeConstMaxMACPayloadSizeFunc(230)),
-		ttnpb.DATA_RATE_5: makeLoRaDataRate(7, 125000, makeConstMaxMACPayloadSizeFunc(230)),
+		ttnpb.DataRateIndex_DATA_RATE_0: makeLoRaDataRate(12, 125000, makeConstMaxMACPayloadSizeFunc(59)),
+		ttnpb.DataRateIndex_DATA_RATE_1: makeLoRaDataRate(11, 125000, makeConstMaxMACPayloadSizeFunc(59)),
+		ttnpb.DataRateIndex_DATA_RATE_2: makeLoRaDataRate(10, 125000, makeConstMaxMACPayloadSizeFunc(59)),
+		ttnpb.DataRateIndex_DATA_RATE_3: makeLoRaDataRate(9, 125000, makeConstMaxMACPayloadSizeFunc(123)),
+		ttnpb.DataRateIndex_DATA_RATE_4: makeLoRaDataRate(8, 125000, makeConstMaxMACPayloadSizeFunc(230)),
+		ttnpb.DataRateIndex_DATA_RATE_5: makeLoRaDataRate(7, 125000, makeConstMaxMACPayloadSizeFunc(230)),
 
-		ttnpb.DATA_RATE_7: makeFSKDataRate(50000, makeConstMaxMACPayloadSizeFunc(230)),
+		ttnpb.DataRateIndex_DATA_RATE_7: makeFSKDataRate(50000, makeConstMaxMACPayloadSizeFunc(230)),
 	},
-	MaxADRDataRateIndex: ttnpb.DATA_RATE_5,
+	MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 
 	ReceiveDelay1:        defaultReceiveDelay1,
 	ReceiveDelay2:        defaultReceiveDelay2,
@@ -84,9 +84,9 @@ var IN_865_867_RP1_V1_0_3_Rev_A = Band{
 
 		switch {
 		case si <= 0:
-			return ttnpb.DATA_RATE_0, nil
+			return ttnpb.DataRateIndex_DATA_RATE_0, nil
 		case si >= 5:
-			return ttnpb.DATA_RATE_5, nil
+			return ttnpb.DataRateIndex_DATA_RATE_5, nil
 		}
 		return ttnpb.DataRateIndex(si), nil
 	},
@@ -100,10 +100,10 @@ var IN_865_867_RP1_V1_0_3_Rev_A = Band{
 	ImplementsCFList: true,
 	CFListType:       ttnpb.CFListType_FREQUENCIES,
 
-	DefaultRx2Parameters: Rx2Parameters{ttnpb.DATA_RATE_2, 866550000},
+	DefaultRx2Parameters: Rx2Parameters{ttnpb.DataRateIndex_DATA_RATE_2, 866550000},
 
 	Beacon: Beacon{
-		DataRateIndex:    ttnpb.DATA_RATE_4,
+		DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_4,
 		CodingRate:       "4/5",
 		ComputeFrequency: func(_ float64) uint64 { return in865867BeaconFrequency },
 	},

@@ -512,7 +512,7 @@ outer:
 		// In the latest regional parameters spec(1.1b) the data rate ranges are DR0-DR5 for mandatory channels in all non-fixed channel plans,
 		// hence we assume the same range for predefined channels.
 		chs = append(chs, &ttnpb.MACParameters_Channel{
-			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 			UplinkFrequency:   freq,
 			DownlinkFrequency: freq,
 			EnableUplink:      true,
@@ -595,7 +595,7 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MA
 
 	current := &ttnpb.MACParameters{
 		MaxEirp:                    phy.DefaultMaxEIRP,
-		AdrDataRateIndex:           ttnpb.DATA_RATE_0,
+		AdrDataRateIndex:           ttnpb.DataRateIndex_DATA_RATE_0,
 		AdrNbTrans:                 1,
 		Rx1Delay:                   DeviceDefaultRX1Delay(dev, phy, defaults),
 		Rx1DataRateOffset:          DeviceDefaultRX1DataRateOffset(dev, defaults),
@@ -615,7 +615,7 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MA
 	if !dev.Multicast {
 		desired = &ttnpb.MACParameters{
 			MaxEirp:                    DeviceDesiredMaxEIRP(dev, phy, fp, defaults),
-			AdrDataRateIndex:           ttnpb.DATA_RATE_0,
+			AdrDataRateIndex:           ttnpb.DataRateIndex_DATA_RATE_0,
 			AdrNbTrans:                 1,
 			Rx1Delay:                   DeviceDesiredRX1Delay(dev, phy, defaults),
 			Rx1DataRateOffset:          DeviceDesiredRX1DataRateOffset(dev, defaults),

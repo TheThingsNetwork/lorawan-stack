@@ -1583,7 +1583,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 			dev.PendingMacState = &ttnpb.MACState{
 				CurrentParameters: &ttnpb.MACParameters{
 					MaxEirp:                    phy.DefaultMaxEIRP,
-					AdrDataRateIndex:           ttnpb.DATA_RATE_0,
+					AdrDataRateIndex:           ttnpb.DataRateIndex_DATA_RATE_0,
 					AdrNbTrans:                 1,
 					Rx1Delay:                   mac.DeviceDefaultRX1Delay(dev, phy, defaultMACSettings),
 					Rx1DataRateOffset:          defaultRX1DROffset,
@@ -1601,7 +1601,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 				},
 				DesiredParameters: &ttnpb.MACParameters{
 					MaxEirp:                    mac.DeviceDesiredMaxEIRP(dev, phy, fp, defaultMACSettings),
-					AdrDataRateIndex:           ttnpb.DATA_RATE_0,
+					AdrDataRateIndex:           ttnpb.DataRateIndex_DATA_RATE_0,
 					AdrNbTrans:                 1,
 					Rx1Delay:                   desiredRX1Delay,
 					Rx1DataRateOffset:          desiredRX1DROffset,
@@ -2104,7 +2104,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 		}
 		phy := Band(x.FrequencyPlanId, x.LorawanPhyVersion)
 		drIdx := func() ttnpb.DataRateIndex {
-			for idx := ttnpb.DATA_RATE_0; idx <= ttnpb.DATA_RATE_15; idx++ {
+			for idx := ttnpb.DataRateIndex_DATA_RATE_0; idx <= ttnpb.DataRateIndex_DATA_RATE_15; idx++ {
 				if _, ok := phy.DataRates[idx]; ok {
 					return idx
 				}

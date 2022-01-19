@@ -126,7 +126,7 @@ func (b Band) FindUplinkDataRate(dr *ttnpb.DataRate) (ttnpb.DataRateIndex, DataR
 	if dr == nil {
 		return 0, DataRate{}, false
 	}
-	for i := ttnpb.DATA_RATE_0; i <= ttnpb.DATA_RATE_15; i++ {
+	for i := ttnpb.DataRateIndex_DATA_RATE_0; i <= ttnpb.DataRateIndex_DATA_RATE_15; i++ {
 		// NOTE: Some bands (e.g. US915) contain identical data rates under different indexes.
 		// It seems to be a convention in the spec for uplink-only data rates to be at indexes
 		// lower than downlink-only indexes, hence match the smallest index.
@@ -146,7 +146,7 @@ func (b Band) FindDownlinkDataRate(dr *ttnpb.DataRate) (ttnpb.DataRateIndex, Dat
 		return 0, DataRate{}, false
 	}
 	// NOTE: See notes in FindUplinkDataRate explaining the order of scanning data rates.
-	for i := ttnpb.DATA_RATE_15; i >= ttnpb.DATA_RATE_0; i-- {
+	for i := ttnpb.DataRateIndex_DATA_RATE_15; i >= ttnpb.DataRateIndex_DATA_RATE_0; i-- {
 		bDR, ok := b.DataRates[i]
 		if ok && proto.Equal(bDR.Rate, dr) {
 			return i, bDR, true

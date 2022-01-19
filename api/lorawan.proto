@@ -111,7 +111,6 @@ enum PHYVersion {
 
 enum DataRateIndex {
   option (thethings.json.enum) = { marshal_as_number: true, prefix: "DATA_RATE" };
-  option (gogoproto.goproto_enum_prefix) = false;
 
   DATA_RATE_0 = 0;
   DATA_RATE_1 = 1;

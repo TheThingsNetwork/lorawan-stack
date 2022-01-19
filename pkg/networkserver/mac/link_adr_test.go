@@ -107,7 +107,7 @@ func TestLinkADRReq(t *testing.T) {
 			CurrentChannels:         MakeDefaultEU868DesiredChannels(),
 			CurrentADRNbTrans:       1,
 			DesiredChannels:         MakeDefaultEU868DesiredChannels(),
-			DesiredADRDataRateIndex: ttnpb.DATA_RATE_15,
+			DesiredADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_15,
 			DesiredADRNbTrans:       1,
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a, _ := test.New(t)
@@ -172,7 +172,7 @@ func TestLinkADRReq(t *testing.T) {
 						false, false, false, false, false, false, false, false,
 					},
 					ChannelMaskControl: 7,
-					DataRateIndex:      ttnpb.DATA_RATE_15,
+					DataRateIndex:      ttnpb.DataRateIndex_DATA_RATE_15,
 					TxPowerIndex:       15,
 					NbTrans:            1,
 				},
@@ -181,7 +181,7 @@ func TestLinkADRReq(t *testing.T) {
 						false, false, false, false, false, false, false, false,
 						true, true, true, true, true, true, true, true,
 					},
-					DataRateIndex: ttnpb.DATA_RATE_15,
+					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_15,
 					TxPowerIndex:  15,
 					NbTrans:       1,
 				},
@@ -195,11 +195,11 @@ func TestLinkADRReq(t *testing.T) {
 			CurrentChannels:         MakeDefaultUS915FSB2DesiredChannels(),
 			CurrentADRNbTrans:       1,
 			DesiredChannels:         MakeDefaultUS915FSB2DesiredChannels(),
-			DesiredADRDataRateIndex: ttnpb.DATA_RATE_3,
+			DesiredADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
 			DesiredADRTxPowerIndex:  1,
 			DesiredADRNbTrans:       2,
 			RejectedADRDataRateIndexes: []ttnpb.DataRateIndex{
-				ttnpb.DATA_RATE_2,
+				ttnpb.DataRateIndex_DATA_RATE_2,
 			},
 			RejectedADRTxPowerIndexes: []uint32{
 				0,
@@ -211,7 +211,7 @@ func TestLinkADRReq(t *testing.T) {
 						false, false, false, false, false, false, false, false,
 						true, true, true, true, true, true, true, true,
 					},
-					DataRateIndex: ttnpb.DATA_RATE_1,
+					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
 					TxPowerIndex:  15,
 					NbTrans:       2,
 				},
@@ -222,18 +222,18 @@ func TestLinkADRReq(t *testing.T) {
 			BandID:                  band.EU_863_870,
 			LoRaWANVersion:          ttnpb.MAC_V1_0_1,
 			LoRaWANPHYVersion:       ttnpb.TS001_V1_0_1,
-			CurrentADRDataRateIndex: ttnpb.DATA_RATE_1,
+			CurrentADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
 			CurrentADRNbTrans:       1,
 			CurrentChannels:         MakeDefaultEU868DesiredChannels(),
-			DesiredADRDataRateIndex: ttnpb.DATA_RATE_5,
+			DesiredADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 			DesiredADRNbTrans:       2,
 			DesiredADRTxPowerIndex:  3,
 			DesiredChannels:         MakeDefaultEU868DesiredChannels(),
 			RejectedADRDataRateIndexes: []ttnpb.DataRateIndex{
-				ttnpb.DATA_RATE_1,
-				ttnpb.DATA_RATE_2,
-				ttnpb.DATA_RATE_3,
-				ttnpb.DATA_RATE_4,
+				ttnpb.DataRateIndex_DATA_RATE_1,
+				ttnpb.DataRateIndex_DATA_RATE_2,
+				ttnpb.DataRateIndex_DATA_RATE_3,
+				ttnpb.DataRateIndex_DATA_RATE_4,
 			},
 			Commands: []*ttnpb.MACCommand_LinkADRReq{
 				{
@@ -241,7 +241,7 @@ func TestLinkADRReq(t *testing.T) {
 						true, true, true, true, true, true, true, true,
 						false, false, false, false, false, false, false, false,
 					},
-					DataRateIndex: ttnpb.DATA_RATE_5,
+					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 					TxPowerIndex:  3,
 					NbTrans:       2,
 				},
@@ -252,17 +252,17 @@ func TestLinkADRReq(t *testing.T) {
 			BandID:                  band.EU_863_870,
 			LoRaWANVersion:          ttnpb.MAC_V1_0_1,
 			LoRaWANPHYVersion:       ttnpb.TS001_V1_0_1,
-			CurrentADRDataRateIndex: ttnpb.DATA_RATE_5,
+			CurrentADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 			CurrentADRNbTrans:       1,
 			CurrentChannels:         MakeDefaultEU868DesiredChannels(),
-			DesiredADRDataRateIndex: ttnpb.DATA_RATE_1,
+			DesiredADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
 			DesiredADRNbTrans:       1,
 			DesiredADRTxPowerIndex:  3,
 			DesiredChannels:         MakeDefaultEU868DesiredChannels(),
 			RejectedADRDataRateIndexes: []ttnpb.DataRateIndex{
-				ttnpb.DATA_RATE_2,
-				ttnpb.DATA_RATE_3,
-				ttnpb.DATA_RATE_4,
+				ttnpb.DataRateIndex_DATA_RATE_2,
+				ttnpb.DataRateIndex_DATA_RATE_3,
+				ttnpb.DataRateIndex_DATA_RATE_4,
 			},
 			Commands: []*ttnpb.MACCommand_LinkADRReq{
 				{
@@ -270,7 +270,7 @@ func TestLinkADRReq(t *testing.T) {
 						true, true, true, true, true, true, true, true,
 						false, false, false, false, false, false, false, false,
 					},
-					DataRateIndex: ttnpb.DATA_RATE_1,
+					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
 					TxPowerIndex:  3,
 					NbTrans:       1,
 				},
@@ -283,10 +283,10 @@ func TestLinkADRReq(t *testing.T) {
 			LoRaWANPHYVersion:       ttnpb.RP001_V1_0_3_REV_A,
 			CurrentChannels:         MakeDefaultUS915CurrentChannels(),
 			CurrentADRNbTrans:       1,
-			CurrentADRDataRateIndex: ttnpb.DATA_RATE_1,
+			CurrentADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
 			DesiredChannels:         MakeDefaultUS915FSB2DesiredChannels(),
 			DesiredADRNbTrans:       2,
-			DesiredADRDataRateIndex: ttnpb.DATA_RATE_2,
+			DesiredADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
 			DesiredADRTxPowerIndex:  3,
 			Commands: []*ttnpb.MACCommand_LinkADRReq{
 				{
@@ -295,7 +295,7 @@ func TestLinkADRReq(t *testing.T) {
 						false, false, false, false, false, false, false, false,
 					},
 					ChannelMaskControl: 7,
-					DataRateIndex:      ttnpb.DATA_RATE_2,
+					DataRateIndex:      ttnpb.DataRateIndex_DATA_RATE_2,
 					TxPowerIndex:       3,
 					NbTrans:            2,
 				},
@@ -304,7 +304,7 @@ func TestLinkADRReq(t *testing.T) {
 						false, false, false, false, false, false, false, false,
 						true, true, true, true, true, true, true, true,
 					},
-					DataRateIndex: ttnpb.DATA_RATE_2,
+					DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
 					TxPowerIndex:  3,
 					NbTrans:       2,
 				},
@@ -499,7 +499,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 					},
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_LinkADRReq{
-							DataRateIndex: ttnpb.DATA_RATE_4,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
 							TxPowerIndex:  42,
 							ChannelMask: []bool{
 								false, true, false, false,
@@ -517,7 +517,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: &ttnpb.MACParameters{
-						AdrDataRateIndex: ttnpb.DATA_RATE_4,
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
 						AdrTxPowerIndex:  42,
 						Channels: []*ttnpb.MACParameters_Channel{
 							nil,
@@ -577,7 +577,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 					},
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_LinkADRReq{
-							DataRateIndex: ttnpb.DATA_RATE_5,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 							TxPowerIndex:  42,
 							ChannelMask: []bool{
 								true, true, true, false,
@@ -587,7 +587,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 							},
 						}).MACCommand(),
 						(&ttnpb.MACCommand_LinkADRReq{
-							DataRateIndex: ttnpb.DATA_RATE_10,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_10,
 							TxPowerIndex:  43,
 							ChannelMask: []bool{
 								false, true, true, false,
@@ -605,7 +605,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_1,
 					CurrentParameters: &ttnpb.MACParameters{
-						AdrDataRateIndex: ttnpb.DATA_RATE_10,
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_10,
 						AdrTxPowerIndex:  43,
 						Channels: []*ttnpb.MACParameters_Channel{
 							{EnableUplink: false},
@@ -671,7 +671,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 					},
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_LinkADRReq{
-							DataRateIndex: ttnpb.DATA_RATE_5,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 							TxPowerIndex:  42,
 							ChannelMask: []bool{
 								true, true, true, false,
@@ -681,7 +681,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 							},
 						}).MACCommand(),
 						(&ttnpb.MACCommand_LinkADRReq{
-							DataRateIndex: ttnpb.DATA_RATE_10,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_10,
 							TxPowerIndex:  43,
 							ChannelMask: []bool{
 								false, true, true, false,
@@ -699,7 +699,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_0_2,
 					CurrentParameters: &ttnpb.MACParameters{
-						AdrDataRateIndex: ttnpb.DATA_RATE_10,
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_10,
 						AdrTxPowerIndex:  43,
 						Channels: []*ttnpb.MACParameters_Channel{
 							{EnableUplink: false},
@@ -764,7 +764,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 					},
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_LinkADRReq{
-							DataRateIndex: ttnpb.DATA_RATE_5,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 							TxPowerIndex:  42,
 							ChannelMask: []bool{
 								true, true, true, false,
@@ -774,7 +774,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 							},
 						}).MACCommand(),
 						(&ttnpb.MACCommand_LinkADRReq{
-							DataRateIndex: ttnpb.DATA_RATE_10,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_10,
 							TxPowerIndex:  43,
 							ChannelMask: []bool{
 								false, true, true, false,
@@ -793,7 +793,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					LorawanVersion: ttnpb.MAC_V1_0,
 					CurrentParameters: &ttnpb.MACParameters{
-						AdrDataRateIndex: ttnpb.DATA_RATE_5,
+						AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 						AdrTxPowerIndex:  42,
 						Channels: []*ttnpb.MACParameters_Channel{
 							{EnableUplink: true},
@@ -815,7 +815,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 					},
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_LinkADRReq{
-							DataRateIndex: ttnpb.DATA_RATE_10,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_10,
 							TxPowerIndex:  43,
 							ChannelMask: []bool{
 								false, true, true, false,
@@ -852,7 +852,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 					DesiredParameters: MakeDefaultUS915FSB2DesiredMACParameters(ttnpb.RP001_V1_0_2_REV_B),
 					PendingRequests: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_LinkADRReq{
-							DataRateIndex:      ttnpb.DATA_RATE_3,
+							DataRateIndex:      ttnpb.DataRateIndex_DATA_RATE_3,
 							TxPowerIndex:       1,
 							ChannelMaskControl: 7,
 							NbTrans:            3,
@@ -864,7 +864,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 							},
 						}).MACCommand(),
 						(&ttnpb.MACCommand_LinkADRReq{
-							DataRateIndex: ttnpb.DATA_RATE_3,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
 							TxPowerIndex:  1,
 							NbTrans:       3,
 							ChannelMask: []bool{
@@ -885,7 +885,7 @@ func TestHandleLinkADRAns(t *testing.T) {
 					LorawanVersion: ttnpb.MAC_V1_0_2,
 					CurrentParameters: func() *ttnpb.MACParameters {
 						params := MakeDefaultUS915FSB2DesiredMACParameters(ttnpb.RP001_V1_0_2_REV_B)
-						params.AdrDataRateIndex = ttnpb.DATA_RATE_3
+						params.AdrDataRateIndex = ttnpb.DataRateIndex_DATA_RATE_3
 						params.AdrTxPowerIndex = 1
 						params.AdrNbTrans = 3
 						return params

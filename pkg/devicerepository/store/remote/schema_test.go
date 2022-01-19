@@ -104,7 +104,7 @@ func TestProfile(t *testing.T) {
 					MacSettings: &ttnpb.MACSettings{
 						Rx1Delay:          &ttnpb.RxDelayValue{Value: ttnpb.RxDelay_RX_DELAY_1},
 						Rx1DataRateOffset: &ttnpb.DataRateOffsetValue{Value: ttnpb.DataRateOffset_DATA_RATE_OFFSET_0},
-						Rx2DataRateIndex:  &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_3},
+						Rx2DataRateIndex:  &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex_DATA_RATE_3},
 						Rx2Frequency:      &ttnpb.FrequencyValue{Value: 869525000},
 						FactoryPresetFrequencies: []uint64{
 							868100000,
@@ -155,7 +155,7 @@ func TestProfile(t *testing.T) {
 					MacSettings: &ttnpb.MACSettings{
 						ClassBTimeout:         ttnpb.ProtoDurationPtr(8 * time.Second),
 						PingSlotPeriodicity:   &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_16S},
-						PingSlotDataRateIndex: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_3},
+						PingSlotDataRateIndex: &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex_DATA_RATE_3},
 						PingSlotFrequency:     &ttnpb.FrequencyValue{Value: 868300000},
 					},
 				},

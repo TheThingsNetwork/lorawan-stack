@@ -27,15 +27,15 @@ var (
 	eu433DefaultChannels = []Channel{
 		{
 			Frequency:   433175000,
-			MaxDataRate: ttnpb.DATA_RATE_5,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 		},
 		{
 			Frequency:   433375000,
-			MaxDataRate: ttnpb.DATA_RATE_5,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 		},
 		{
 			Frequency:   433575000,
-			MaxDataRate: ttnpb.DATA_RATE_5,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 		},
 	}
 

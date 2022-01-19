@@ -41,27 +41,27 @@ func TestNewChannelReq(t *testing.T) {
 			CurrentChannels: []*ttnpb.MACParameters_Channel{
 				{
 					UplinkFrequency:  123,
-					MinDataRateIndex: ttnpb.DATA_RATE_1,
-					MaxDataRateIndex: ttnpb.DATA_RATE_5,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 				},
 				nil,
 				{
 					UplinkFrequency:  128,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_4,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
 				},
 			},
 			DesiredChannels: []*ttnpb.MACParameters_Channel{
 				{
 					UplinkFrequency:  123,
-					MinDataRateIndex: ttnpb.DATA_RATE_1,
-					MaxDataRateIndex: ttnpb.DATA_RATE_5,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 				},
 				nil,
 				{
 					UplinkFrequency:  128,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_4,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
 				},
 			},
 		},
@@ -69,35 +69,35 @@ func TestNewChannelReq(t *testing.T) {
 			CurrentChannels: []*ttnpb.MACParameters_Channel{
 				{
 					UplinkFrequency:  123,
-					MinDataRateIndex: ttnpb.DATA_RATE_1,
-					MaxDataRateIndex: ttnpb.DATA_RATE_5,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 				},
 				{
 					UplinkFrequency:  124,
-					MinDataRateIndex: ttnpb.DATA_RATE_1,
-					MaxDataRateIndex: ttnpb.DATA_RATE_3,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
 				},
 				{
 					UplinkFrequency:  128,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_4,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
 				},
 			},
 			DesiredChannels: []*ttnpb.MACParameters_Channel{
 				{
 					UplinkFrequency:  123,
-					MinDataRateIndex: ttnpb.DATA_RATE_1,
-					MaxDataRateIndex: ttnpb.DATA_RATE_5,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 				},
 				{
 					UplinkFrequency:  124,
-					MinDataRateIndex: ttnpb.DATA_RATE_1,
-					MaxDataRateIndex: ttnpb.DATA_RATE_3,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
 				},
 				{
 					UplinkFrequency:  128,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_4,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
 				},
 			},
 		},
@@ -105,42 +105,42 @@ func TestNewChannelReq(t *testing.T) {
 			CurrentChannels: []*ttnpb.MACParameters_Channel{
 				{
 					UplinkFrequency:  124,
-					MinDataRateIndex: ttnpb.DATA_RATE_1,
-					MaxDataRateIndex: ttnpb.DATA_RATE_3,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
 				},
 				nil,
 				{
 					UplinkFrequency:  123,
-					MinDataRateIndex: ttnpb.DATA_RATE_1,
-					MaxDataRateIndex: ttnpb.DATA_RATE_5,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 				},
 				{
 					UplinkFrequency:  129,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_4,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
 				},
 				{
 					UplinkFrequency:  150,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_5,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 				},
 			},
 			DesiredChannels: []*ttnpb.MACParameters_Channel{
 				nil,
 				{
 					UplinkFrequency:  128,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_4,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
 				},
 				{
 					UplinkFrequency:  123,
-					MinDataRateIndex: ttnpb.DATA_RATE_1,
-					MaxDataRateIndex: ttnpb.DATA_RATE_5,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 				},
 				{
 					UplinkFrequency:  130,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_5,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 				},
 			},
 			Commands: []*ttnpb.MACCommand_NewChannelReq{
@@ -148,14 +148,14 @@ func TestNewChannelReq(t *testing.T) {
 				{
 					ChannelIndex:     1,
 					Frequency:        128,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_4,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
 				},
 				{
 					ChannelIndex:     3,
 					Frequency:        130,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_5,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 				},
 				{
 					ChannelIndex: 4,
@@ -166,42 +166,42 @@ func TestNewChannelReq(t *testing.T) {
 			CurrentChannels: []*ttnpb.MACParameters_Channel{
 				{
 					UplinkFrequency:  124,
-					MinDataRateIndex: ttnpb.DATA_RATE_1,
-					MaxDataRateIndex: ttnpb.DATA_RATE_3,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
 				},
 				nil,
 				{
 					UplinkFrequency:  123,
-					MinDataRateIndex: ttnpb.DATA_RATE_1,
-					MaxDataRateIndex: ttnpb.DATA_RATE_5,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 				},
 				{
 					UplinkFrequency:  129,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_4,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
 				},
 				{
 					UplinkFrequency:  150,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_5,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 				},
 			},
 			DesiredChannels: []*ttnpb.MACParameters_Channel{
 				nil,
 				{
 					UplinkFrequency:  128,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_4,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
 				},
 				{
 					UplinkFrequency:  123,
-					MinDataRateIndex: ttnpb.DATA_RATE_1,
-					MaxDataRateIndex: ttnpb.DATA_RATE_5,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 				},
 				{
 					UplinkFrequency:  130,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_5,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 				},
 			},
 			Commands: []*ttnpb.MACCommand_NewChannelReq{
@@ -209,8 +209,8 @@ func TestNewChannelReq(t *testing.T) {
 				{
 					ChannelIndex:     1,
 					Frequency:        128,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_4,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
 				},
 				{
 					ChannelIndex: 4,
@@ -222,50 +222,50 @@ func TestNewChannelReq(t *testing.T) {
 			CurrentChannels: []*ttnpb.MACParameters_Channel{
 				{
 					UplinkFrequency:  124,
-					MinDataRateIndex: ttnpb.DATA_RATE_1,
-					MaxDataRateIndex: ttnpb.DATA_RATE_3,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
 				},
 				nil,
 				{
 					UplinkFrequency:  123,
-					MinDataRateIndex: ttnpb.DATA_RATE_1,
-					MaxDataRateIndex: ttnpb.DATA_RATE_5,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 				},
 				{
 					UplinkFrequency:  129,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_4,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
 				},
 				{
 					UplinkFrequency:  150,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_5,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 				},
 			},
 			DesiredChannels: []*ttnpb.MACParameters_Channel{
 				nil,
 				{
 					UplinkFrequency:  128,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_4,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
 				},
 				{
 					UplinkFrequency:  123,
-					MinDataRateIndex: ttnpb.DATA_RATE_1,
-					MaxDataRateIndex: ttnpb.DATA_RATE_5,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 				},
 				{
 					UplinkFrequency:  130,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_5,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 				},
 			},
 			Commands: []*ttnpb.MACCommand_NewChannelReq{
 				{
 					ChannelIndex:     1,
 					Frequency:        128,
-					MinDataRateIndex: ttnpb.DATA_RATE_2,
-					MaxDataRateIndex: ttnpb.DATA_RATE_4,
+					MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
 				},
 			},
 			RejectedFrequencies: []uint64{130},
@@ -460,8 +460,8 @@ func TestHandleNewChannelAns(t *testing.T) {
 						(&ttnpb.MACCommand_NewChannelReq{
 							ChannelIndex:     4,
 							Frequency:        42,
-							MinDataRateIndex: ttnpb.DATA_RATE_2,
-							MaxDataRateIndex: ttnpb.DATA_RATE_3,
+							MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+							MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
 						}).MACCommand(),
 					},
 					CurrentParameters: &ttnpb.MACParameters{},
@@ -493,8 +493,8 @@ func TestHandleNewChannelAns(t *testing.T) {
 						(&ttnpb.MACCommand_NewChannelReq{
 							ChannelIndex:     4,
 							Frequency:        42,
-							MinDataRateIndex: ttnpb.DATA_RATE_2,
-							MaxDataRateIndex: ttnpb.DATA_RATE_3,
+							MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+							MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
 						}).MACCommand(),
 					},
 					RejectedFrequencies: []uint64{1, 2, 100},
@@ -510,8 +510,8 @@ func TestHandleNewChannelAns(t *testing.T) {
 						42: {
 							Ranges: []*ttnpb.MACState_DataRateRange{
 								{
-									MinDataRateIndex: ttnpb.DATA_RATE_2,
-									MaxDataRateIndex: ttnpb.DATA_RATE_3,
+									MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+									MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
 								},
 							},
 						},
@@ -533,8 +533,8 @@ func TestHandleNewChannelAns(t *testing.T) {
 						(&ttnpb.MACCommand_NewChannelReq{
 							ChannelIndex:     4,
 							Frequency:        42,
-							MinDataRateIndex: ttnpb.DATA_RATE_2,
-							MaxDataRateIndex: ttnpb.DATA_RATE_3,
+							MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+							MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
 						}).MACCommand(),
 					},
 					CurrentParameters: &ttnpb.MACParameters{},

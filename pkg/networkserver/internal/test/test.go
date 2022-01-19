@@ -224,22 +224,22 @@ var DefaultEU868Channels = [...]*ttnpb.MACParameters_Channel{
 	{
 		UplinkFrequency:   868100000,
 		DownlinkFrequency: 868100000,
-		MinDataRateIndex:  ttnpb.DATA_RATE_0,
-		MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+		MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+		MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 		EnableUplink:      true,
 	},
 	{
 		UplinkFrequency:   868300000,
 		DownlinkFrequency: 868300000,
-		MinDataRateIndex:  ttnpb.DATA_RATE_0,
-		MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+		MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+		MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 		EnableUplink:      true,
 	},
 	{
 		UplinkFrequency:   868500000,
 		DownlinkFrequency: 868500000,
-		MinDataRateIndex:  ttnpb.DATA_RATE_0,
-		MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+		MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+		MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 		EnableUplink:      true,
 	},
 }
@@ -255,12 +255,12 @@ func MakeDefaultEU868CurrentMACParameters(phyVersion ttnpb.PHYVersion) *ttnpb.MA
 		AdrNbTrans:                 1,
 		MaxDutyCycle:               ttnpb.AggregatedDutyCycle_DUTY_CYCLE_1,
 		MaxEirp:                    16,
-		PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_3},
+		PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex_DATA_RATE_3},
 		PingSlotFrequency:          869525000,
 		RejoinCountPeriodicity:     ttnpb.RejoinCountExponent_REJOIN_COUNT_16,
 		RejoinTimePeriodicity:      ttnpb.RejoinTimeExponent_REJOIN_TIME_0,
 		Rx1Delay:                   DefaultEU868RX1Delay,
-		Rx2DataRateIndex:           ttnpb.DATA_RATE_0,
+		Rx2DataRateIndex:           ttnpb.DataRateIndex_DATA_RATE_0,
 		Rx2Frequency:               DefaultEU868RX2Frequency,
 		Channels:                   MakeDefaultEU868CurrentChannels(),
 	}
@@ -271,36 +271,36 @@ func MakeDefaultEU868DesiredChannels() []*ttnpb.MACParameters_Channel {
 		&ttnpb.MACParameters_Channel{
 			UplinkFrequency:   867100000,
 			DownlinkFrequency: 867100000,
-			MinDataRateIndex:  ttnpb.DATA_RATE_0,
-			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 			EnableUplink:      true,
 		},
 		&ttnpb.MACParameters_Channel{
 			UplinkFrequency:   867300000,
 			DownlinkFrequency: 867300000,
-			MinDataRateIndex:  ttnpb.DATA_RATE_0,
-			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 			EnableUplink:      true,
 		},
 		&ttnpb.MACParameters_Channel{
 			UplinkFrequency:   867500000,
 			DownlinkFrequency: 867500000,
-			MinDataRateIndex:  ttnpb.DATA_RATE_0,
-			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 			EnableUplink:      true,
 		},
 		&ttnpb.MACParameters_Channel{
 			UplinkFrequency:   867700000,
 			DownlinkFrequency: 867700000,
-			MinDataRateIndex:  ttnpb.DATA_RATE_0,
-			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 			EnableUplink:      true,
 		},
 		&ttnpb.MACParameters_Channel{
 			UplinkFrequency:   867900000,
 			DownlinkFrequency: 867900000,
-			MinDataRateIndex:  ttnpb.DATA_RATE_0,
-			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 			EnableUplink:      true,
 		},
 	)
@@ -326,16 +326,16 @@ var DefaultUS915Channels = func() []*ttnpb.MACParameters_Channel {
 	for i := 0; i < 64; i++ {
 		chs = append(chs, &ttnpb.MACParameters_Channel{
 			UplinkFrequency:  uint64(902300000 + 200000*i),
-			MinDataRateIndex: ttnpb.DATA_RATE_0,
-			MaxDataRateIndex: ttnpb.DATA_RATE_3,
+			MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
 			EnableUplink:     true,
 		})
 	}
 	for i := 0; i < 8; i++ {
 		chs = append(chs, &ttnpb.MACParameters_Channel{
 			UplinkFrequency:  uint64(903000000 + 1600000*i),
-			MinDataRateIndex: ttnpb.DATA_RATE_4,
-			MaxDataRateIndex: ttnpb.DATA_RATE_4,
+			MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
+			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
 			EnableUplink:     true,
 		})
 	}
@@ -356,11 +356,11 @@ func MakeDefaultUS915CurrentMACParameters(ver ttnpb.PHYVersion) *ttnpb.MACParame
 		AdrNbTrans:                 1,
 		MaxDutyCycle:               ttnpb.AggregatedDutyCycle_DUTY_CYCLE_1,
 		MaxEirp:                    30,
-		PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_8},
+		PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex_DATA_RATE_8},
 		RejoinCountPeriodicity:     ttnpb.RejoinCountExponent_REJOIN_COUNT_16,
 		RejoinTimePeriodicity:      ttnpb.RejoinTimeExponent_REJOIN_TIME_0,
 		Rx1Delay:                   ttnpb.RxDelay_RX_DELAY_1,
-		Rx2DataRateIndex:           ttnpb.DATA_RATE_8,
+		Rx2DataRateIndex:           ttnpb.DataRateIndex_DATA_RATE_8,
 		Rx2Frequency:               923300000,
 		Channels:                   MakeDefaultUS915CurrentChannels(),
 	}

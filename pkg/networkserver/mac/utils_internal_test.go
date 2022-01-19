@@ -196,13 +196,13 @@ func TestNewState(t *testing.T) {
 						&ttnpb.MACParameters_Channel{
 							UplinkFrequency:   868700000,
 							DownlinkFrequency: 868700000,
-							MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+							MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 							EnableUplink:      true,
 						},
 						&ttnpb.MACParameters_Channel{
 							UplinkFrequency:   867100000,
 							DownlinkFrequency: 867100000,
-							MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+							MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 							EnableUplink:      true,
 						},
 					)
@@ -233,29 +233,29 @@ func TestNewState(t *testing.T) {
 						&ttnpb.MACParameters_Channel{
 							UplinkFrequency:   867300000,
 							DownlinkFrequency: 867300000,
-							MinDataRateIndex:  ttnpb.DATA_RATE_0,
-							MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+							MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+							MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 							EnableUplink:      true,
 						},
 						&ttnpb.MACParameters_Channel{
 							UplinkFrequency:   867500000,
 							DownlinkFrequency: 867500000,
-							MinDataRateIndex:  ttnpb.DATA_RATE_0,
-							MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+							MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+							MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 							EnableUplink:      true,
 						},
 						&ttnpb.MACParameters_Channel{
 							UplinkFrequency:   867700000,
 							DownlinkFrequency: 867700000,
-							MinDataRateIndex:  ttnpb.DATA_RATE_0,
-							MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+							MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+							MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 							EnableUplink:      true,
 						},
 						&ttnpb.MACParameters_Channel{
 							UplinkFrequency:   867900000,
 							DownlinkFrequency: 867900000,
-							MinDataRateIndex:  ttnpb.DATA_RATE_0,
-							MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+							MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+							MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 							EnableUplink:      true,
 						},
 					)
