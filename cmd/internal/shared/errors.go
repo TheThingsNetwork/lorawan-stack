@@ -32,4 +32,5 @@ var (
 	ErrInitializeQRCodeGenerator            = errors.Define("initialize_qr_code_generator", "could not initialize QR Code Generator")
 	ErrInitializePacketBrokerAgent          = errors.Define("initialize_packet_broker_agent", "could not initialize Packet Broker Agent")
 	ErrInitializeDeviceRepository           = errors.Define("initialize_device_repository", "could not initialize Device Repository")
+	ErrInitializeDeviceClaimingServer       = errors.Define("initialize_device_claiming_server", "could not initialize Device Claiming Server")
 )
