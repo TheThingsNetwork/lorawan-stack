@@ -36,25 +36,23 @@ import (
 	"gopkg.in/square/go-jose.v2"
 )
 
-var (
-	toPBRegion = map[string]packetbroker.Region{
-		band.EU_863_870: packetbroker.Region_EU_863_870,
-		band.US_902_928: packetbroker.Region_US_902_928,
-		band.CN_779_787: packetbroker.Region_CN_779_787,
-		band.EU_433:     packetbroker.Region_EU_433,
-		band.AU_915_928: packetbroker.Region_AU_915_928,
-		band.CN_470_510: packetbroker.Region_CN_470_510,
-		// TODO: Add CN_470_510_* regions.
-		// https://github.com/TheThingsNetwork/lorawan-stack/issues/3513
-		band.AS_923:     packetbroker.Region_AS_923,
-		band.AS_923_2:   packetbroker.Region_AS_923_2,
-		band.AS_923_3:   packetbroker.Region_AS_923_3,
-		band.KR_920_923: packetbroker.Region_KR_920_923,
-		band.IN_865_867: packetbroker.Region_IN_865_867,
-		band.RU_864_870: packetbroker.Region_RU_864_870,
-		band.ISM_2400:   packetbroker.Region_WW_2G4,
-	}
-)
+var toPBRegion = map[string]packetbroker.Region{
+	band.EU_863_870: packetbroker.Region_EU_863_870,
+	band.US_902_928: packetbroker.Region_US_902_928,
+	band.CN_779_787: packetbroker.Region_CN_779_787,
+	band.EU_433:     packetbroker.Region_EU_433,
+	band.AU_915_928: packetbroker.Region_AU_915_928,
+	band.CN_470_510: packetbroker.Region_CN_470_510,
+	// TODO: Add CN_470_510_* regions.
+	// https://github.com/TheThingsNetwork/lorawan-stack/issues/3513
+	band.AS_923:     packetbroker.Region_AS_923,
+	band.AS_923_2:   packetbroker.Region_AS_923_2,
+	band.AS_923_3:   packetbroker.Region_AS_923_3,
+	band.KR_920_923: packetbroker.Region_KR_920_923,
+	band.IN_865_867: packetbroker.Region_IN_865_867,
+	band.RU_864_870: packetbroker.Region_RU_864_870,
+	band.ISM_2400:   packetbroker.Region_WW_2G4,
+}
 
 func fromPBDataRate(dataRate *packetbroker.DataRate) (dr *ttnpb.DataRate, codingRate string, ok bool) {
 	switch mod := dataRate.GetModulation().(type) {
@@ -783,14 +781,14 @@ func fromPBContactInfo(admin, technical *packetbroker.ContactInfo) []*ttnpb.Cont
 	res := make([]*ttnpb.ContactInfo, 0, 2)
 	if email := admin.GetEmail(); email != "" {
 		res = append(res, &ttnpb.ContactInfo{
-			ContactType:   ttnpb.CONTACT_TYPE_OTHER,
+			ContactType:   ttnpb.ContactType_CONTACT_TYPE_OTHER,
 			ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
 			Value:         email,
 		})
 	}
 	if email := technical.GetEmail(); email != "" {
 		res = append(res, &ttnpb.ContactInfo{
-			ContactType:   ttnpb.CONTACT_TYPE_TECHNICAL,
+			ContactType:   ttnpb.ContactType_CONTACT_TYPE_TECHNICAL,
 			ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
 			Value:         email,
 		})
@@ -804,11 +802,11 @@ func toPBContactInfo(info []*ttnpb.ContactInfo) (admin, technical *packetbroker.
 			continue
 		}
 		switch c.GetContactType() {
-		case ttnpb.CONTACT_TYPE_OTHER:
+		case ttnpb.ContactType_CONTACT_TYPE_OTHER:
 			admin = &packetbroker.ContactInfo{
 				Email: c.GetValue(),
 			}
-		case ttnpb.CONTACT_TYPE_TECHNICAL:
+		case ttnpb.ContactType_CONTACT_TYPE_TECHNICAL:
 			technical = &packetbroker.ContactInfo{
 				Email: c.GetValue(),
 			}

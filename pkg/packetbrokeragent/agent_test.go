@@ -465,12 +465,12 @@ func TestForwarder(t *testing.T) {
 				},
 				ContactInfo: []*ttnpb.ContactInfo{
 					{
-						ContactType:   ttnpb.CONTACT_TYPE_OTHER,
+						ContactType:   ttnpb.ContactType_CONTACT_TYPE_OTHER,
 						ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
 						Value:         "admin@example.com",
 					},
 					{
-						ContactType:   ttnpb.CONTACT_TYPE_TECHNICAL,
+						ContactType:   ttnpb.ContactType_CONTACT_TYPE_TECHNICAL,
 						ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
 						Value:         "tech@example.com",
 					},

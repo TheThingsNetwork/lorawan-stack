@@ -35,10 +35,10 @@ func init() {
 	defineEnum(STATE_FLAGGED, "flagged and pending review")
 	defineEnum(STATE_SUSPENDED, "reviewed and suspended")
 
-	defineEnum(CONTACT_TYPE_OTHER, "other")
-	defineEnum(CONTACT_TYPE_ABUSE, "abuse")
-	defineEnum(CONTACT_TYPE_BILLING, "billing")
-	defineEnum(CONTACT_TYPE_TECHNICAL, "technical")
+	defineEnum(ContactType_CONTACT_TYPE_OTHER, "other")
+	defineEnum(ContactType_CONTACT_TYPE_ABUSE, "abuse")
+	defineEnum(ContactType_CONTACT_TYPE_BILLING, "billing")
+	defineEnum(ContactType_CONTACT_TYPE_TECHNICAL, "technical")
 
 	defineEnum(CONTACT_METHOD_OTHER, "other")
 	defineEnum(CONTACT_METHOD_EMAIL, "email")

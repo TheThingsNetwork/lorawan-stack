@@ -214,10 +214,10 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 				}
 			}
 			contactInfo := make([]*ttnpb.ContactInfo, 0, 2)
-			if adminContact := conf.Registration.AdministrativeContact.ContactInfo(ttnpb.CONTACT_TYPE_OTHER); adminContact != nil {
+			if adminContact := conf.Registration.AdministrativeContact.ContactInfo(ttnpb.ContactType_CONTACT_TYPE_OTHER); adminContact != nil {
 				contactInfo = append(contactInfo, adminContact)
 			}
-			if techContact := conf.Registration.TechnicalContact.ContactInfo(ttnpb.CONTACT_TYPE_TECHNICAL); techContact != nil {
+			if techContact := conf.Registration.TechnicalContact.ContactInfo(ttnpb.ContactType_CONTACT_TYPE_TECHNICAL); techContact != nil {
 				contactInfo = append(contactInfo, techContact)
 			}
 			return &RegistrationInfo{

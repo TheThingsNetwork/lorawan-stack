@@ -31,7 +31,6 @@ option (gogoproto.goproto_registration) = true;
 
 enum ContactType {
   option (thethings.json.enum) = { marshal_as_string: true, prefix: "CONTACT_TYPE" };
-  option (gogoproto.goproto_enum_prefix) = false;
 
   CONTACT_TYPE_OTHER = 0;
   CONTACT_TYPE_ABUSE = 1;
