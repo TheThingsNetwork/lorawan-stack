@@ -68,7 +68,7 @@ func (d *Data) SetEntity(ids ttnpb.IDStringer) {
 // SetContact sets the contact info as recipient of the email.
 func (d *Data) SetContact(contact *ttnpb.ContactInfo) {
 	d.Contact.Type = contact.ContactType.String()
-	if contact.ContactMethod == ttnpb.CONTACT_METHOD_EMAIL {
+	if contact.ContactMethod == ttnpb.ContactMethod_CONTACT_METHOD_EMAIL {
 		d.User.Email = contact.Value
 	}
 	if d.User.Name == "" {

@@ -215,7 +215,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 
 	var primaryEmailAddressFound bool
 	for _, contactInfo := range req.User.ContactInfo {
-		if contactInfo.ContactMethod == ttnpb.CONTACT_METHOD_EMAIL && contactInfo.Value == req.User.PrimaryEmailAddress {
+		if contactInfo.ContactMethod == ttnpb.ContactMethod_CONTACT_METHOD_EMAIL && contactInfo.Value == req.User.PrimaryEmailAddress {
 			primaryEmailAddressFound = true
 			if contactInfo.ValidatedAt != nil {
 				req.User.PrimaryEmailAddressValidatedAt = contactInfo.ValidatedAt
@@ -225,7 +225,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	}
 	if !primaryEmailAddressFound {
 		req.User.ContactInfo = append(req.User.ContactInfo, &ttnpb.ContactInfo{
-			ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+			ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 			Value:         req.User.PrimaryEmailAddress,
 			ValidatedAt:   req.User.PrimaryEmailAddressValidatedAt,
 		})
@@ -491,7 +491,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 				}
 				if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "primary_email_address_validated_at") {
 					for _, contactInfo := range contactInfo {
-						if contactInfo.ContactMethod == ttnpb.CONTACT_METHOD_EMAIL && contactInfo.Value == req.User.PrimaryEmailAddress {
+						if contactInfo.ContactMethod == ttnpb.ContactMethod_CONTACT_METHOD_EMAIL && contactInfo.Value == req.User.PrimaryEmailAddress {
 							req.User.PrimaryEmailAddressValidatedAt = contactInfo.ValidatedAt
 							req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "primary_email_address_validated_at")
 							break

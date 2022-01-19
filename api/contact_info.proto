@@ -40,7 +40,6 @@ enum ContactType {
 
 enum ContactMethod {
   option (thethings.json.enum) = { marshal_as_string: true, prefix: "CONTACT_METHOD" };
-  option (gogoproto.goproto_enum_prefix) = false;
 
   CONTACT_METHOD_OTHER = 0;
   CONTACT_METHOD_EMAIL = 1;

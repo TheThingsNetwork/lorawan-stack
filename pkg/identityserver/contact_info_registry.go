@@ -79,7 +79,7 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 	expires := now.Add(ttl)
 	emailValidations := make(map[string]*ttnpb.ContactInfoValidation)
 	for _, info := range contactInfo {
-		if info.ContactMethod == ttnpb.CONTACT_METHOD_EMAIL && info.ValidatedAt == nil {
+		if info.ContactMethod == ttnpb.ContactMethod_CONTACT_METHOD_EMAIL && info.ValidatedAt == nil {
 			validation, ok := emailValidations[info.Value]
 			if !ok {
 				key, err := auth.GenerateKey(ctx)

@@ -40,9 +40,9 @@ func init() {
 	defineEnum(ContactType_CONTACT_TYPE_BILLING, "billing")
 	defineEnum(ContactType_CONTACT_TYPE_TECHNICAL, "technical")
 
-	defineEnum(CONTACT_METHOD_OTHER, "other")
-	defineEnum(CONTACT_METHOD_EMAIL, "email")
-	defineEnum(CONTACT_METHOD_PHONE, "phone")
+	defineEnum(ContactMethod_CONTACT_METHOD_OTHER, "other")
+	defineEnum(ContactMethod_CONTACT_METHOD_EMAIL, "email")
+	defineEnum(ContactMethod_CONTACT_METHOD_PHONE, "phone")
 
 	defineEnum(MType_JOIN_REQUEST, "join request")
 	defineEnum(MType_JOIN_ACCEPT, "join accept")

@@ -241,7 +241,7 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 		return err
 	}
 
-	if model.EntityType == "user" && model.ContactMethod == int(ttnpb.CONTACT_METHOD_EMAIL) {
+	if model.EntityType == "user" && model.ContactMethod == int(ttnpb.ContactMethod_CONTACT_METHOD_EMAIL) {
 		err = s.query(ctx, User{
 			Model: Model{ID: model.EntityID},
 		}).Where(User{

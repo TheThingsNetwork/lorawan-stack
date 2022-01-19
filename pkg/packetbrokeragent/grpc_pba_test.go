@@ -109,12 +109,12 @@ func TestPba(t *testing.T) {
 						ContactInfo: []*ttnpb.ContactInfo{
 							{
 								ContactType:   ttnpb.ContactType_CONTACT_TYPE_OTHER,
-								ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+								ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 								Value:         "admin@example.com",
 							},
 							{
 								ContactType:   ttnpb.ContactType_CONTACT_TYPE_TECHNICAL,
-								ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+								ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 								Value:         "tech@example.com",
 							},
 						},
@@ -183,12 +183,12 @@ func TestPba(t *testing.T) {
 					ContactInfo: []*ttnpb.ContactInfo{
 						{
 							ContactType:   ttnpb.ContactType_CONTACT_TYPE_OTHER,
-							ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+							ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 							Value:         "admin@example.com",
 						},
 						{
 							ContactType:   ttnpb.ContactType_CONTACT_TYPE_TECHNICAL,
-							ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+							ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 							Value:         "tech@example.com",
 						},
 					},
@@ -274,12 +274,12 @@ func TestPba(t *testing.T) {
 					ContactInfo: []*ttnpb.ContactInfo{
 						{
 							ContactType:   ttnpb.ContactType_CONTACT_TYPE_OTHER,
-							ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+							ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 							Value:         "admin@example.com",
 						},
 						{
 							ContactType:   ttnpb.ContactType_CONTACT_TYPE_TECHNICAL,
-							ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+							ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 							Value:         "tech@example.com",
 						},
 					},

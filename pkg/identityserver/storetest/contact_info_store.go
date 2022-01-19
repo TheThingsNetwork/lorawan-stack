@@ -58,7 +58,7 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 			start := time.Now().Truncate(time.Second)
 			info := &ttnpb.ContactInfo{
 				ContactType:   ttnpb.ContactType_CONTACT_TYPE_TECHNICAL,
-				ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+				ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 				Value:         "foo@example.com",
 				Public:        true,
 			}
@@ -195,14 +195,14 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 
 			updatedInfo := &ttnpb.ContactInfo{
 				ContactType:   ttnpb.ContactType_CONTACT_TYPE_TECHNICAL,
-				ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+				ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 				Value:         "foo@example.com",
 				Public:        false,
 				ValidatedAt:   ttnpb.ProtoTimePtr(start.Add(time.Minute)),
 			}
 			extraInfo := &ttnpb.ContactInfo{
 				ContactType:   ttnpb.ContactType_CONTACT_TYPE_TECHNICAL,
-				ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+				ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 				Value:         "extra@example.com",
 				Public:        true,
 				ValidatedAt:   ttnpb.ProtoTimePtr(start.Add(time.Minute)),

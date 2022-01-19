@@ -60,7 +60,7 @@ func (c ContactInfoConfig) ContactInfo(contactType ttnpb.ContactType) *ttnpb.Con
 	}
 	return &ttnpb.ContactInfo{
 		ContactType:   contactType,
-		ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+		ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 		Value:         c.Email,
 	}
 }

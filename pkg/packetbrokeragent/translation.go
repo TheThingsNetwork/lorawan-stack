@@ -782,14 +782,14 @@ func fromPBContactInfo(admin, technical *packetbroker.ContactInfo) []*ttnpb.Cont
 	if email := admin.GetEmail(); email != "" {
 		res = append(res, &ttnpb.ContactInfo{
 			ContactType:   ttnpb.ContactType_CONTACT_TYPE_OTHER,
-			ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+			ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 			Value:         email,
 		})
 	}
 	if email := technical.GetEmail(); email != "" {
 		res = append(res, &ttnpb.ContactInfo{
 			ContactType:   ttnpb.ContactType_CONTACT_TYPE_TECHNICAL,
-			ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+			ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 			Value:         email,
 		})
 	}
@@ -798,7 +798,7 @@ func fromPBContactInfo(admin, technical *packetbroker.ContactInfo) []*ttnpb.Cont
 
 func toPBContactInfo(info []*ttnpb.ContactInfo) (admin, technical *packetbroker.ContactInfo) {
 	for _, c := range info {
-		if c.GetContactMethod() != ttnpb.CONTACT_METHOD_EMAIL || c.GetValue() == "" {
+		if c.GetContactMethod() != ttnpb.ContactMethod_CONTACT_METHOD_EMAIL || c.GetValue() == "" {
 			continue
 		}
 		switch c.GetContactType() {
