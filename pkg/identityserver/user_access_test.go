@@ -30,7 +30,7 @@ import (
 
 func init() {
 	userAccessUser.Admin = false
-	userAccessUser.State = ttnpb.STATE_APPROVED
+	userAccessUser.State = ttnpb.State_STATE_APPROVED
 	for _, apiKey := range userAPIKeys(userAccessUser.GetIds()).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{ttnpb.RIGHT_USER_SETTINGS_API_KEYS}
 	}

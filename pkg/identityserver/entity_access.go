@@ -186,18 +186,18 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 				return err
 			}
 			switch client.State {
-			case ttnpb.STATE_REQUESTED:
+			case ttnpb.State_STATE_REQUESTED:
 				// OAuth authorization only passes for collaborators, so this is ok.
-			case ttnpb.STATE_APPROVED:
+			case ttnpb.State_STATE_APPROVED:
 				// Normal OAuth client.
-			case ttnpb.STATE_REJECTED:
+			case ttnpb.State_STATE_REJECTED:
 				if client.StateDescription != "" {
 					return errOAuthClientRejected.WithAttributes("description", client.StateDescription)
 				}
 				return errOAuthClientRejected.New()
-			case ttnpb.STATE_FLAGGED:
+			case ttnpb.State_STATE_FLAGGED:
 				// Innocent until proven guilty.
-			case ttnpb.STATE_SUSPENDED:
+			case ttnpb.State_STATE_SUSPENDED:
 				if client.StateDescription != "" {
 					return errOAuthClientSuspended.WithAttributes("description", client.StateDescription)
 				}
@@ -266,11 +266,11 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 		}
 
 		switch user.State {
-		case ttnpb.STATE_REQUESTED:
+		case ttnpb.State_STATE_REQUESTED:
 			// Go to profile page, edit basic settings (such as email), delete account.
 			restrictRights(res, ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO, ttnpb.RIGHT_USER_SETTINGS_BASIC, ttnpb.RIGHT_USER_DELETE))
 			warning.Add(ctx, "Restricted rights while account pending")
-		case ttnpb.STATE_APPROVED:
+		case ttnpb.State_STATE_APPROVED:
 			// Normal user.
 			if user.Admin {
 				res.IsAdmin = true
@@ -280,7 +280,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 					res.UniversalRights = ttnpb.AllAdminRights.Implied().Intersect(userRights)
 				}
 			}
-		case ttnpb.STATE_REJECTED:
+		case ttnpb.State_STATE_REJECTED:
 			// Go to profile page, delete account.
 			restrictRights(res, ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO, ttnpb.RIGHT_USER_DELETE))
 			if user.StateDescription != "" {
@@ -288,9 +288,9 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			} else {
 				warning.Add(ctx, "Restricted rights after account rejection")
 			}
-		case ttnpb.STATE_FLAGGED:
+		case ttnpb.State_STATE_FLAGGED:
 			// Innocent until proven guilty.
-		case ttnpb.STATE_SUSPENDED:
+		case ttnpb.State_STATE_SUSPENDED:
 			// Go to profile page.
 			restrictRights(res, ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO))
 			if user.StateDescription != "" {
@@ -329,22 +329,22 @@ func (is *IdentityServer) RequireAuthenticated(ctx context.Context) error {
 			}
 
 			switch user.State {
-			case ttnpb.STATE_APPROVED:
+			case ttnpb.State_STATE_APPROVED:
 				return nil
-			case ttnpb.STATE_FLAGGED:
+			case ttnpb.State_STATE_FLAGGED:
 				// Flagged users have the same authentication presence as approved users until proven guilty.
 				return nil
-			case ttnpb.STATE_REQUESTED:
+			case ttnpb.State_STATE_REQUESTED:
 				if user.StateDescription != "" {
 					return errUserRequested.WithAttributes("description", user.StateDescription)
 				}
 				return errUserRequested.New()
-			case ttnpb.STATE_REJECTED:
+			case ttnpb.State_STATE_REJECTED:
 				if user.StateDescription != "" {
 					return errUserRejected.WithAttributes("description", user.StateDescription)
 				}
 				return errUserRejected.New()
-			case ttnpb.STATE_SUSPENDED:
+			case ttnpb.State_STATE_SUSPENDED:
 				if user.StateDescription != "" {
 					return errUserSuspended.WithAttributes("description", user.StateDescription)
 				}

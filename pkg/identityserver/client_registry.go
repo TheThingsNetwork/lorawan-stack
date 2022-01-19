@@ -119,7 +119,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 	req.Client.Secret = hashedSecret
 
 	if !createdByAdmin {
-		req.Client.State = ttnpb.STATE_REQUESTED
+		req.Client.State = ttnpb.State_STATE_REQUESTED
 		req.Client.StateDescription = "admin approval required"
 		req.Client.SkipAuthorization = false
 		req.Client.Endorsed = false
@@ -151,7 +151,7 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 		return nil, err
 	}
 
-	if cli.State == ttnpb.STATE_REQUESTED {
+	if cli.State == ttnpb.State_STATE_REQUESTED {
 		err = is.SendAdminsEmail(ctx, func(data emails.Data) email.MessageData {
 			data.Entity.Type, data.Entity.ID = "client", cli.Ids.GetClientId()
 			return &emails.ClientRequested{

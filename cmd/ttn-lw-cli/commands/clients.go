@@ -173,7 +173,7 @@ var (
 				return errNoCollaborator.New()
 			}
 			var client ttnpb.Client
-			client.State = ttnpb.STATE_APPROVED // This may not be honored by the server.
+			client.State = ttnpb.State_STATE_APPROVED // This may not be honored by the server.
 			client.Grants = []ttnpb.GrantType{
 				ttnpb.GrantType_GRANT_AUTHORIZATION_CODE,
 			}
@@ -354,7 +354,7 @@ func init() {
 	clientsCreateCommand.Flags().AddFlagSet(collaboratorFlags())
 	clientsCreateCommand.Flags().AddFlagSet(setClientFlags)
 	clientsCreateCommand.Flags().AddFlagSet(attributesFlags())
-	clientsCreateCommand.Flags().Lookup("state").DefValue = ttnpb.STATE_APPROVED.String()
+	clientsCreateCommand.Flags().Lookup("state").DefValue = ttnpb.State_STATE_APPROVED.String()
 	clientsCreateCommand.Flags().Lookup("grants").DefValue = ttnpb.GrantType_GRANT_AUTHORIZATION_CODE.String()
 	clientsCommand.AddCommand(clientsCreateCommand)
 	clientsSetCommand.Flags().AddFlagSet(clientIDFlags())

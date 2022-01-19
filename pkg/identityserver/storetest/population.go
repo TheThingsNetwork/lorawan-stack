@@ -124,7 +124,7 @@ func (p *Population) NewClient(owner *ttnpb.OrganizationOrUserIdentifiers) *ttnp
 			ClientId: fmt.Sprintf("cli-%02d", i),
 		},
 		Name:  fmt.Sprintf("Client %02d", i),
-		State: ttnpb.STATE_APPROVED,
+		State: ttnpb.State_STATE_APPROVED,
 	}
 	p.Clients = append(p.Clients, cli)
 	p.NewMembership(owner, cli.GetEntityIdentifiers(), ttnpb.RIGHT_ALL)
@@ -187,7 +187,7 @@ func (p *Population) NewUser() *ttnpb.User {
 		Name:                           fmt.Sprintf("User %02d", i),
 		PrimaryEmailAddress:            fmt.Sprintf("usr-%02d@example.com", i),
 		PrimaryEmailAddressValidatedAt: ttnpb.ProtoTimePtr(now),
-		State:                          ttnpb.STATE_APPROVED,
+		State:                          ttnpb.State_STATE_APPROVED,
 	}
 	p.Users = append(p.Users, usr)
 	return usr

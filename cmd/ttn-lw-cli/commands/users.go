@@ -195,7 +195,7 @@ var (
 		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
 			usrID := getUserID(cmd.Flags(), args)
 			var user ttnpb.User
-			user.State = ttnpb.STATE_APPROVED // This may not be honored by the server.
+			user.State = ttnpb.State_STATE_APPROVED // This may not be honored by the server.
 			if inputDecoder != nil {
 				_, err := inputDecoder.Decode(&user)
 				if err != nil {
@@ -516,7 +516,7 @@ func init() {
 	usersCreateCommand.Flags().AddFlagSet(setUserFlags)
 	usersCreateCommand.Flags().AddFlagSet(attributesFlags())
 	usersCreateCommand.Flags().AddFlagSet(profilePictureFlags)
-	usersCreateCommand.Flags().Lookup("state").DefValue = ttnpb.STATE_APPROVED.String()
+	usersCreateCommand.Flags().Lookup("state").DefValue = ttnpb.State_STATE_APPROVED.String()
 	usersCreateCommand.Flags().String("invitation-token", "", "")
 	usersCommand.AddCommand(usersCreateCommand)
 	usersSetCommand.Flags().AddFlagSet(userIDFlags())

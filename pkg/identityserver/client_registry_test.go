@@ -197,7 +197,7 @@ func TestClientsCRUD(t *testing.T) {
 		updated, err = reg.Update(ctx, &ttnpb.UpdateClientRequest{
 			Client: &ttnpb.Client{
 				Ids:              created.GetIds(),
-				State:            ttnpb.STATE_FLAGGED,
+				State:            ttnpb.State_STATE_FLAGGED,
 				StateDescription: "something is wrong",
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"state", "state_description"}},
@@ -205,21 +205,21 @@ func TestClientsCRUD(t *testing.T) {
 
 		a.So(err, should.BeNil)
 		if a.So(updated, should.NotBeNil) {
-			a.So(updated.State, should.Equal, ttnpb.STATE_FLAGGED)
+			a.So(updated.State, should.Equal, ttnpb.State_STATE_FLAGGED)
 			a.So(updated.StateDescription, should.Equal, "something is wrong")
 		}
 
 		updated, err = reg.Update(ctx, &ttnpb.UpdateClientRequest{
 			Client: &ttnpb.Client{
 				Ids:   created.GetIds(),
-				State: ttnpb.STATE_APPROVED,
+				State: ttnpb.State_STATE_APPROVED,
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"state"}},
 		}, userCreds(adminUserIdx))
 
 		a.So(err, should.BeNil)
 		if a.So(updated, should.NotBeNil) {
-			a.So(updated.State, should.Equal, ttnpb.STATE_APPROVED)
+			a.So(updated.State, should.Equal, ttnpb.State_STATE_APPROVED)
 		}
 
 		got, err = reg.Get(ctx, &ttnpb.GetClientRequest{
@@ -228,7 +228,7 @@ func TestClientsCRUD(t *testing.T) {
 		}, creds)
 
 		if a.So(err, should.BeNil) {
-			a.So(got.State, should.Equal, ttnpb.STATE_APPROVED)
+			a.So(got.State, should.Equal, ttnpb.State_STATE_APPROVED)
 			a.So(got.StateDescription, should.Equal, "")
 		}
 

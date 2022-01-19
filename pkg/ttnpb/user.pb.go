@@ -201,7 +201,7 @@ func (m *User) GetState() State {
 	if m != nil {
 		return m.State
 	}
-	return STATE_REQUESTED
+	return State_STATE_REQUESTED
 }
 
 func (m *User) GetStateDescription() string {

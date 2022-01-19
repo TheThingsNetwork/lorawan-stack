@@ -29,11 +29,11 @@ func init() {
 	defineEnum(GrantType_GRANT_PASSWORD, "username and password")
 	defineEnum(GrantType_GRANT_REFRESH_TOKEN, "refresh token")
 
-	defineEnum(STATE_REQUESTED, "requested and pending review")
-	defineEnum(STATE_APPROVED, "reviewed and approved")
-	defineEnum(STATE_REJECTED, "reviewed and rejected")
-	defineEnum(STATE_FLAGGED, "flagged and pending review")
-	defineEnum(STATE_SUSPENDED, "reviewed and suspended")
+	defineEnum(State_STATE_REQUESTED, "requested and pending review")
+	defineEnum(State_STATE_APPROVED, "reviewed and approved")
+	defineEnum(State_STATE_REJECTED, "reviewed and rejected")
+	defineEnum(State_STATE_FLAGGED, "flagged and pending review")
+	defineEnum(State_STATE_SUSPENDED, "reviewed and suspended")
 
 	defineEnum(ContactType_CONTACT_TYPE_OTHER, "other")
 	defineEnum(ContactType_CONTACT_TYPE_ABUSE, "abuse")

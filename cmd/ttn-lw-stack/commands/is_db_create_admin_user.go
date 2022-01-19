@@ -105,7 +105,7 @@ var createAdminUserCommand = &cobra.Command{
 		usr.PrimaryEmailAddressValidatedAt = ttnpb.ProtoTimePtr(now)
 		usr.Password = hashedPassword
 		usr.PasswordUpdatedAt = ttnpb.ProtoTimePtr(now)
-		usr.State = ttnpb.STATE_APPROVED
+		usr.State = ttnpb.State_STATE_APPROVED
 		usr.Admin = true
 
 		if usrExists {

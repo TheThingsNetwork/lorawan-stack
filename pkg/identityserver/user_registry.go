@@ -201,10 +201,10 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		req.User.PrimaryEmailAddressValidatedAt = nil
 		req.User.RequirePasswordUpdate = false
 		if config.UserRegistration.AdminApproval.Required {
-			req.User.State = ttnpb.STATE_REQUESTED
+			req.User.State = ttnpb.State_STATE_REQUESTED
 			req.User.StateDescription = "admin approval required"
 		} else {
-			req.User.State = ttnpb.STATE_APPROVED
+			req.User.State = ttnpb.State_STATE_APPROVED
 		}
 		req.User.Admin = false
 		req.User.TemporaryPassword = ""
@@ -283,7 +283,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		return nil, err
 	}
 
-	if usr.State == ttnpb.STATE_REQUESTED {
+	if usr.State == ttnpb.State_STATE_REQUESTED {
 		err = is.SendAdminsEmail(ctx, func(data emails.Data) email.MessageData {
 			data.Entity.Type, data.Entity.ID = "user", usr.GetIds().GetUserId()
 			return &emails.UserRequested{

@@ -28,7 +28,7 @@ import (
 
 func init() {
 	gatewayAccessUser.Admin = false
-	gatewayAccessUser.State = ttnpb.STATE_APPROVED
+	gatewayAccessUser.State = ttnpb.State_STATE_APPROVED
 	for _, apiKey := range userAPIKeys(gatewayAccessUser.GetIds()).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_GATEWAY_LINK,
@@ -37,7 +37,7 @@ func init() {
 		}
 	}
 	gtwAccessCollaboratorUser.Admin = false
-	gtwAccessCollaboratorUser.State = ttnpb.STATE_APPROVED
+	gtwAccessCollaboratorUser.State = ttnpb.State_STATE_APPROVED
 	for _, apiKey := range userAPIKeys(gtwAccessCollaboratorUser.GetIds()).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_GATEWAY_ALL,

@@ -27,7 +27,7 @@ import (
 
 func init() {
 	clientAccessUser.Admin = false
-	clientAccessUser.State = ttnpb.STATE_APPROVED
+	clientAccessUser.State = ttnpb.State_STATE_APPROVED
 	for _, apiKey := range userAPIKeys(clientAccessUser.GetIds()).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_CLIENT_ALL,

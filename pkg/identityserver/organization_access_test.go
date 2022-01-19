@@ -28,7 +28,7 @@ import (
 
 func init() {
 	organizationAccessUser.Admin = false
-	organizationAccessUser.State = ttnpb.STATE_APPROVED
+	organizationAccessUser.State = ttnpb.State_STATE_APPROVED
 	for _, apiKey := range userAPIKeys(organizationAccessUser.GetIds()).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_APPLICATION_LINK,
@@ -38,7 +38,7 @@ func init() {
 	}
 
 	orgAccessCollaboratorUser.Admin = false
-	orgAccessCollaboratorUser.State = ttnpb.STATE_APPROVED
+	orgAccessCollaboratorUser.State = ttnpb.State_STATE_APPROVED
 	for _, apiKey := range userAPIKeys(orgAccessCollaboratorUser.GetIds()).ApiKeys {
 		apiKey.Rights = []ttnpb.Right{
 			ttnpb.RIGHT_ORGANIZATION_ALL,

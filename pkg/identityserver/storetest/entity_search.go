@@ -28,7 +28,7 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 	usr1 := st.population.NewUser()
 	usr1.Description = "This is the description of " + usr1.Name
 	usr1.Attributes = attributes
-	usr1.State = ttnpb.STATE_FLAGGED
+	usr1.State = ttnpb.State_STATE_FLAGGED
 	st.population.NewUser()
 
 	app1 := st.population.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
@@ -46,7 +46,7 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 	cli1 := st.population.NewClient(usr1.GetOrganizationOrUserIdentifiers())
 	cli1.Description = "This is the description of " + cli1.Name
 	cli1.Attributes = attributes
-	cli1.State = ttnpb.STATE_FLAGGED
+	cli1.State = ttnpb.State_STATE_FLAGGED
 	st.population.NewClient(nil)
 
 	gtw1 := st.population.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
@@ -182,7 +182,7 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 		t.Run("State", func(t *T) {
 			a, ctx := test.New(t)
 			ids, err := s.SearchClients(ctx, nil, &ttnpb.SearchClientsRequest{
-				State: []ttnpb.State{ttnpb.STATE_FLAGGED},
+				State: []ttnpb.State{ttnpb.State_STATE_FLAGGED},
 			})
 			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
 				a.So(ids[0], should.Resemble, cli1.GetIds())
@@ -437,7 +437,7 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 		t.Run("State", func(t *T) {
 			a, ctx := test.New(t)
 			ids, err := s.SearchUsers(ctx, &ttnpb.SearchUsersRequest{
-				State: []ttnpb.State{ttnpb.STATE_FLAGGED},
+				State: []ttnpb.State{ttnpb.State_STATE_FLAGGED},
 			})
 			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
 				a.So(ids[0], should.Resemble, usr1.GetIds())

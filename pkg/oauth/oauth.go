@@ -101,19 +101,19 @@ func (s *server) Authorize(authorizePage http.Handler) http.HandlerFunc {
 			return
 		}
 		switch client.State {
-		case ttnpb.STATE_REJECTED:
+		case ttnpb.State_STATE_REJECTED:
 			resp.InternalError = errClientRejected
 			resp.SetError(osin.E_INVALID_CLIENT, resp.InternalError.Error())
 			oauth2.FinishAuthorizeRequest(resp, r, ar)
 			s.output(w, r, resp)
 			return
-		case ttnpb.STATE_SUSPENDED:
+		case ttnpb.State_STATE_SUSPENDED:
 			resp.InternalError = errClientSuspended
 			resp.SetError(osin.E_INVALID_CLIENT, resp.InternalError.Error())
 			oauth2.FinishAuthorizeRequest(resp, r, ar)
 			s.output(w, r, resp)
 			return
-		case ttnpb.STATE_REQUESTED:
+		case ttnpb.State_STATE_REQUESTED:
 			// TODO: Allow if user is collaborator (https://github.com/TheThingsNetwork/lorawan-stack/issues/49).
 			resp.InternalError = errClientNotApproved
 			resp.SetError(osin.E_INVALID_CLIENT, resp.InternalError.Error())
