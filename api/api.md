@@ -559,10 +559,14 @@
   - [Message `GenerateEndDeviceQRCodeRequest.Image`](#ttn.lorawan.v3.GenerateEndDeviceQRCodeRequest.Image)
   - [Message `GenerateQRCodeResponse`](#ttn.lorawan.v3.GenerateQRCodeResponse)
   - [Message `GetQRCodeFormatRequest`](#ttn.lorawan.v3.GetQRCodeFormatRequest)
+  - [Message `LoRaAllianceTR005EndDevice`](#ttn.lorawan.v3.LoRaAllianceTR005EndDevice)
+  - [Message `ParseQRCodeRequest`](#ttn.lorawan.v3.ParseQRCodeRequest)
+  - [Message `ParseQRCodeResponse`](#ttn.lorawan.v3.ParseQRCodeResponse)
   - [Message `QRCodeFormat`](#ttn.lorawan.v3.QRCodeFormat)
   - [Message `QRCodeFormats`](#ttn.lorawan.v3.QRCodeFormats)
   - [Message `QRCodeFormats.FormatsEntry`](#ttn.lorawan.v3.QRCodeFormats.FormatsEntry)
   - [Service `EndDeviceQRCodeGenerator`](#ttn.lorawan.v3.EndDeviceQRCodeGenerator)
+  - [Service `QRCodeParser`](#ttn.lorawan.v3.QRCodeParser)
 - [File `lorawan-stack/api/regional.proto`](#lorawan-stack/api/regional.proto)
   - [Message `ConcentratorConfig`](#ttn.lorawan.v3.ConcentratorConfig)
   - [Message `ConcentratorConfig.Channel`](#ttn.lorawan.v3.ConcentratorConfig.Channel)
@@ -7928,6 +7932,44 @@ The Pba service allows clients to manage peering through Packet Broker.
 | ----- | ----------- |
 | `format_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
+### <a name="ttn.lorawan.v3.LoRaAllianceTR005EndDevice">Message `LoRaAllianceTR005EndDevice`</a>
+
+LoRaAllianceTR005 is the LoRa Alliance defined format in Technical Recommendation TR005.
+See https://lora-alliance.org/wp-content/uploads/2020/11/TR005_LoRaWAN_Device_Identification_QR_Codes.pdf
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `schema_id` | [`bytes`](#bytes) |  |  |
+| `join_eui` | [`bytes`](#bytes) |  |  |
+| `dev_eui` | [`bytes`](#bytes) |  |  |
+| `vendor_id` | [`bytes`](#bytes) |  |  |
+| `model_id` | [`bytes`](#bytes) |  | model_id is referred to as VendorProfileID in TR005. |
+| `checksum` | [`string`](#string) |  | The following are optional fields. |
+| `owner_token` | [`string`](#string) |  |  |
+| `serial_number` | [`string`](#string) |  |  |
+| `proprietary` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.ParseQRCodeRequest">Message `ParseQRCodeRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `format_id` | [`string`](#string) |  | QR code format identifier. Enumerate available formats with rpc ListFormats in the EndDeviceQRCodeGenerator service. |
+| `qr_code` | [`bytes`](#bytes) |  | Raw QR code contents. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `format_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `qr_code` | <p>`bytes.min_len`: `0`</p><p>`bytes.max_len`: `1024`</p> |
+
+### <a name="ttn.lorawan.v3.ParseQRCodeResponse">Message `ParseQRCodeResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `format_id` | [`string`](#string) |  | QR code format identifier that was used to parse the QR Code. |
+| `la_tr005_end_device` | [`LoRaAllianceTR005EndDevice`](#ttn.lorawan.v3.LoRaAllianceTR005EndDevice) |  |  |
+
 ### <a name="ttn.lorawan.v3.QRCodeFormat">Message `QRCodeFormat`</a>
 
 | Field | Type | Label | Description |
@@ -7977,6 +8019,18 @@ The Pba service allows clients to manage peering through Packet Broker.
 | `GetFormat` | `GET` | `/api/v3/qr-codes/end-devices/formats/{format_id}` |  |
 | `ListFormats` | `GET` | `/api/v3/qr-codes/end-devices/formats` |  |
 | `Generate` | `POST` | `/api/v3/qr-codes/end-devices` | `*` |
+
+### <a name="ttn.lorawan.v3.QRCodeParser">Service `QRCodeParser`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Parse` | [`ParseQRCodeRequest`](#ttn.lorawan.v3.ParseQRCodeRequest) | [`ParseQRCodeResponse`](#ttn.lorawan.v3.ParseQRCodeResponse) | Parse QR Codes of known formats and return the information contained within. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `Parse` | `POST` | `/api/v3/qr-codes/format_id` | `*` |
 
 ## <a name="lorawan-stack/api/regional.proto">File `lorawan-stack/api/regional.proto`</a>
 

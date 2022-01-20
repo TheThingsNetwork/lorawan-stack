@@ -8846,6 +8846,39 @@
         ]
       }
     },
+    "/qr-codes/format_id": {
+      "post": {
+        "summary": "Parse QR Codes of known formats and return the information contained within.",
+        "operationId": "QRCodeParser_Parse",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ParseQRCodeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ParseQRCodeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "QRCodeParser"
+        ]
+      }
+    },
     "/search/applications": {
       "get": {
         "summary": "Search for applications that match the conditions specified in the request.\nNon-admin users will only match applications that they have rights on.",
@@ -17664,6 +17697,32 @@
         "localization": {
           "type": "boolean",
           "description": "Forward gateway location, RSSI, SNR and fine timestamp."
+        }
+      }
+    },
+    "v3ParseQRCodeRequest": {
+      "type": "object",
+      "properties": {
+        "format_id": {
+          "type": "string",
+          "description": "QR code format identifier. Enumerate available formats with rpc ListFormats in the EndDeviceQRCodeGenerator service."
+        },
+        "qr_code": {
+          "type": "string",
+          "format": "byte",
+          "description": "Raw QR code contents."
+        }
+      }
+    },
+    "v3ParseQRCodeResponse": {
+      "type": "object",
+      "properties": {
+        "format_id": {
+          "type": "string",
+          "description": "QR code format identifier that was used to parse the QR Code."
+        },
+        "la_tr005_end_device": {
+          "$ref": "#/definitions/v3LoRaAllianceTR005EndDevice"
         }
       }
     },

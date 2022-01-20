@@ -518,6 +518,57 @@ var GenerateQRCodeResponseFieldPathsTopLevel = []string{
 	"image",
 	"text",
 }
+var LoRaAllianceTR005EndDeviceFieldPathsNested = []string{
+	"checksum",
+	"dev_eui",
+	"join_eui",
+	"model_id",
+	"owner_token",
+	"proprietary",
+	"schema_id",
+	"serial_number",
+	"vendor_id",
+}
+
+var LoRaAllianceTR005EndDeviceFieldPathsTopLevel = []string{
+	"checksum",
+	"dev_eui",
+	"join_eui",
+	"model_id",
+	"owner_token",
+	"proprietary",
+	"schema_id",
+	"serial_number",
+	"vendor_id",
+}
+var ParseQRCodeRequestFieldPathsNested = []string{
+	"format_id",
+	"qr_code",
+}
+
+var ParseQRCodeRequestFieldPathsTopLevel = []string{
+	"format_id",
+	"qr_code",
+}
+var ParseQRCodeResponseFieldPathsNested = []string{
+	"format_id",
+	"onboardingdata",
+	"onboardingdata.la_tr005_end_device",
+	"onboardingdata.la_tr005_end_device.checksum",
+	"onboardingdata.la_tr005_end_device.dev_eui",
+	"onboardingdata.la_tr005_end_device.join_eui",
+	"onboardingdata.la_tr005_end_device.model_id",
+	"onboardingdata.la_tr005_end_device.owner_token",
+	"onboardingdata.la_tr005_end_device.proprietary",
+	"onboardingdata.la_tr005_end_device.schema_id",
+	"onboardingdata.la_tr005_end_device.serial_number",
+	"onboardingdata.la_tr005_end_device.vendor_id",
+}
+
+var ParseQRCodeResponseFieldPathsTopLevel = []string{
+	"format_id",
+	"onboardingdata",
+}
 var GenerateEndDeviceQRCodeRequest_ImageFieldPathsNested = []string{
 	"image_size",
 }
