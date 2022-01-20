@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package qrcode
+package enddevice
 
 import (
 	"bytes"
@@ -21,12 +21,13 @@ import (
 	"strings"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
-// LoRaAllianceTR005Draft3 is the LoRa Alliance defined format in Technical Recommendation TR005 Draft 3.
-type LoRaAllianceTR005Draft3 struct {
+// LoRaAllianceTR005Draft2 is the LoRa Alliance defined format in Technical Recommendation TR005 Draft 2.
+type LoRaAllianceTR005Draft2 struct {
 	JoinEUI,
 	DevEUI types.EUI64
 	VendorID,
@@ -37,14 +38,14 @@ type LoRaAllianceTR005Draft3 struct {
 }
 
 // Encode implements the Data interface.
-func (m *LoRaAllianceTR005Draft3) Encode(dev *ttnpb.EndDevice) error {
+func (m *LoRaAllianceTR005Draft2) Encode(dev *ttnpb.EndDevice) error {
 	if dev.Ids == nil || dev.Ids.JoinEui == nil {
 		return errNoJoinEUI.New()
 	}
 	if dev.Ids.DevEui == nil {
 		return errNoDevEUI.New()
 	}
-	*m = LoRaAllianceTR005Draft3{
+	*m = LoRaAllianceTR005Draft2{
 		JoinEUI:              *dev.Ids.JoinEui,
 		DevEUI:               *dev.Ids.DevEui,
 		DeviceValidationCode: dev.GetClaimAuthenticationCode().GetValue(),
@@ -52,12 +53,12 @@ func (m *LoRaAllianceTR005Draft3) Encode(dev *ttnpb.EndDevice) error {
 	return nil
 }
 
-// validTR005Draft3ExtensionChars defines only alphanumeric characters.
-const validTR005Draft3ExtensionChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+// validTR005Draft2ExtensionChars defines the QR code alphanumeric character set except :, % and space.
+const validTR005Draft2ExtensionChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ$*+-./"
 
-func (LoRaAllianceTR005Draft3) validateExtensionChars(s string) error {
+func (LoRaAllianceTR005Draft2) validateExtensionChars(s string) error {
 	for _, r := range s {
-		if strings.IndexRune(validTR005Draft3ExtensionChars, r) == -1 {
+		if strings.IndexRune(validTR005Draft2ExtensionChars, r) == -1 {
 			return errCharacter.WithAttributes("r", r)
 		}
 	}
@@ -65,7 +66,7 @@ func (LoRaAllianceTR005Draft3) validateExtensionChars(s string) error {
 }
 
 // Validate implements the Data interface.
-func (m LoRaAllianceTR005Draft3) Validate() error {
+func (m LoRaAllianceTR005Draft2) Validate() error {
 	for _, ext := range []string{
 		m.DeviceValidationCode,
 		m.SerialNumber,
@@ -79,45 +80,44 @@ func (m LoRaAllianceTR005Draft3) Validate() error {
 }
 
 // MarshalText implements the TextMarshaler interface.
-func (m LoRaAllianceTR005Draft3) MarshalText() ([]byte, error) {
+func (m LoRaAllianceTR005Draft2) MarshalText() ([]byte, error) {
 	if err := m.Validate(); err != nil {
 		return nil, err
 	}
 	var ext string
 	if m.DeviceValidationCode != "" {
-		ext += fmt.Sprintf("_V%s", m.DeviceValidationCode)
+		ext += fmt.Sprintf("%%V%s", m.DeviceValidationCode)
 	}
 	if m.SerialNumber != "" {
-		ext += fmt.Sprintf("_S%s", m.SerialNumber)
+		ext += fmt.Sprintf("%%S%s", m.SerialNumber)
 	}
 	if m.Proprietary != "" {
-		ext += fmt.Sprintf("_P%s", m.Proprietary)
+		ext += fmt.Sprintf("%%P%s", m.Proprietary)
 	}
-	return []byte(fmt.Sprintf("URN:DEV:LW:%X_%X_%X%X%s", m.JoinEUI[:], m.DevEUI[:], m.VendorID[:], m.ModelID[:], ext)), nil
+	if ext != "" {
+		ext = ":" + ext
+	}
+	return []byte(fmt.Sprintf("URN:LW:DP:%X:%X:%X%X%s", m.JoinEUI[:], m.DevEUI[:], m.VendorID[:], m.ModelID[:], ext)), nil
 }
 
 // UnmarshalText implements the TextUnmarshaler interface.
-func (m *LoRaAllianceTR005Draft3) UnmarshalText(text []byte) error {
-	parts := bytes.SplitN(text, []byte(":"), 4)
-	if len(parts) < 4 ||
+func (m *LoRaAllianceTR005Draft2) UnmarshalText(text []byte) error {
+	parts := bytes.SplitN(text, []byte(":"), 7)
+	if len(parts) < 6 ||
 		!bytes.Equal(parts[0], []byte("URN")) ||
-		!bytes.Equal(parts[1], []byte("DEV")) ||
-		!bytes.Equal(parts[2], []byte("LW")) {
+		!bytes.Equal(parts[1], []byte("LW")) ||
+		!bytes.Equal(parts[2], []byte("DP")) {
 		return errFormat.New()
 	}
-	parts = bytes.SplitN(parts[3], []byte("_"), 4)
-	if len(parts) < 3 {
-		return errFormat.New()
-	}
-	*m = LoRaAllianceTR005Draft3{}
-	if err := m.JoinEUI.UnmarshalText(parts[0]); err != nil {
+	*m = LoRaAllianceTR005Draft2{}
+	if err := m.JoinEUI.UnmarshalText(parts[3]); err != nil {
 		return err
 	}
-	if err := m.DevEUI.UnmarshalText(parts[1]); err != nil {
+	if err := m.DevEUI.UnmarshalText(parts[4]); err != nil {
 		return err
 	}
-	prodID := make([]byte, hex.DecodedLen(len(parts[2])))
-	if n, err := hex.Decode(prodID, parts[2]); err == nil && n == 4 {
+	prodID := make([]byte, hex.DecodedLen(len(parts[5])))
+	if n, err := hex.Decode(prodID, parts[5]); err == nil && n == 4 {
 		copy(m.VendorID[:], prodID[:2])
 		copy(m.ModelID[:], prodID[2:])
 	} else if n != 4 {
@@ -125,8 +125,9 @@ func (m *LoRaAllianceTR005Draft3) UnmarshalText(text []byte) error {
 	} else {
 		return err
 	}
-	if len(parts) == 4 {
-		for _, ext := range strings.Split(string(parts[3]), "_") {
+	if len(parts) == 7 {
+		exts := strings.ReplaceAll(string(parts[6]), "%25", "%")
+		for _, ext := range strings.Split(exts, "%") {
 			if len(ext) < 1 {
 				continue
 			}
@@ -145,15 +146,17 @@ func (m *LoRaAllianceTR005Draft3) UnmarshalText(text []byte) error {
 }
 
 // AuthenticatedEndDeviceIdentifiers implements the AuthenticatedEndDeviceIdentifiers interface.
-func (m *LoRaAllianceTR005Draft3) AuthenticatedEndDeviceIdentifiers() (joinEUI, devEUI types.EUI64, authenticationCode string) {
+func (m *LoRaAllianceTR005Draft2) AuthenticatedEndDeviceIdentifiers() (joinEUI, devEUI types.EUI64, authenticationCode string) {
 	return m.JoinEUI, m.DevEUI, m.DeviceValidationCode
 }
 
-type loRaAllianceTR005Draft3Format struct{}
+// LoRaAllianceTR005Draft2Format implements the LoRa Alliance TR005 Draft2 Format.
+type LoRaAllianceTR005Draft2Format struct{}
 
-func (loRaAllianceTR005Draft3Format) Format() *ttnpb.QRCodeFormat {
+// Format implements EndDeviceFormat.
+func (LoRaAllianceTR005Draft2Format) Format() *ttnpb.QRCodeFormat {
 	return &ttnpb.QRCodeFormat{
-		Name:        "LoRa Alliance TR005 Draft 3 (DEPRECATED)",
+		Name:        "LoRa Alliance TR005 Draft 2 (DEPRECATED)",
 		Description: "Standard QR code format defined by LoRa Alliance.",
 		FieldMask: &pbtypes.FieldMask{
 			Paths: []string{
@@ -165,10 +168,7 @@ func (loRaAllianceTR005Draft3Format) Format() *ttnpb.QRCodeFormat {
 	}
 }
 
-func (loRaAllianceTR005Draft3Format) New() EndDeviceData {
-	return new(LoRaAllianceTR005Draft3)
-}
-
-func init() {
-	RegisterEndDeviceFormat("tr005draft3", new(loRaAllianceTR005Draft3Format))
+// New implements EndDeviceFormat.
+func (LoRaAllianceTR005Draft2Format) New() qrcode.EndDeviceData {
+	return new(LoRaAllianceTR005Draft2)
 }

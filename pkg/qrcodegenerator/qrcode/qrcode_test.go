@@ -20,7 +20,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
-	. "go.thethings.network/lorawan-stack/v3/pkg/qrcode"
+	. "go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -52,7 +52,7 @@ func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
-			data := test.Must(Parse(tc.Data)).(Data)
+			data := test.Must(Parse("", tc.Data)).(Data)
 			intf, ok := data.(AuthenticatedEndDeviceIdentifiers)
 			if !ok {
 				t.Fatalf("Expected %T to implement AuthenticatedEndDeviceIdentifiers", data)

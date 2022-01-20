@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package qrcode
+package enddevice
 
 import (
 	"bytes"
@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -148,9 +149,11 @@ func (m *LoRaAllianceTR005) AuthenticatedEndDeviceIdentifiers() (joinEUI, devEUI
 	return m.JoinEUI, m.DevEUI, m.OwnerToken
 }
 
-type loRaAllianceTR005Format struct{}
+// LoRaAllianceTR005Format implements the LoRa Alliance TR005 Format.
+type LoRaAllianceTR005Format struct{}
 
-func (loRaAllianceTR005Format) Format() *ttnpb.QRCodeFormat {
+// Format implements EndDeviceFormat.
+func (LoRaAllianceTR005Format) Format() *ttnpb.QRCodeFormat {
 	return &ttnpb.QRCodeFormat{
 		Name:        "LoRa Alliance TR005",
 		Description: "Standard QR code format defined by LoRa Alliance.",
@@ -164,10 +167,7 @@ func (loRaAllianceTR005Format) Format() *ttnpb.QRCodeFormat {
 	}
 }
 
-func (loRaAllianceTR005Format) New() EndDeviceData {
+// New implements EndDeviceFormat.
+func (LoRaAllianceTR005Format) New() qrcode.EndDeviceData {
 	return new(LoRaAllianceTR005)
-}
-
-func init() {
-	RegisterEndDeviceFormat("tr005", new(loRaAllianceTR005Format))
 }

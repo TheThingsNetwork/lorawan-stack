@@ -12,23 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package qrcodegenerator
+package enddevice
 
-import (
-	"context"
+import "go.thethings.network/lorawan-stack/v3/pkg/errors"
 
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+var (
+	errCharacter = errors.DefineInvalidArgument("character", "invalid character `{r}`")
+	errNoJoinEUI = errors.DefineFailedPrecondition("no_join_eui", "no JoinEUI")
+	errNoDevEUI  = errors.DefineFailedPrecondition("no_dev_eui", "no DevEUI")
+	errFormat    = errors.DefineInvalidArgument("format", "invalid format")
 )
-
-type qrCodeParserServer struct {
-	QRG *QRCodeGenerator
-}
-
-// Parse implementes QRCodeParserServer.
-func (s *qrCodeParserServer) Parse(ctx context.Context, req *ttnpb.ParseQRCodeRequest) (*ttnpb.ParseQRCodeResponse, error) {
-	_, _, err := s.QRG.qrCode.Parse(req.FormatId, "type", req.QrCode)
-	if err != nil {
-		return nil, err
-	}
-	return nil, nil
-}
