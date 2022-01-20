@@ -57,7 +57,8 @@ func New(c *component.Component, conf *Config) (*QRCodeGenerator, error) {
 
 	qrCode := qrcode.New(ctx)
 	qrCode.RegisterEndDeviceFormat("tr005", new(enddevice.LoRaAllianceTR005Format))
-
+	qrCode.RegisterEndDeviceFormat("tr005draft2", new(enddevice.LoRaAllianceTR005Draft2Format))
+	qrCode.RegisterEndDeviceFormat("tr005draft3", new(enddevice.LoRaAllianceTR005Draft3Format))
 	c.RegisterGRPC(qrg)
 	return qrg, nil
 }

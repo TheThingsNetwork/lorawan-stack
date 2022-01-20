@@ -71,8 +71,9 @@ func (c *QRCode) Parse(formatID string, entity string, data []byte) (Data, strin
 			if formatID != "" && formatID != id {
 				continue
 			}
-			if err := format.New().UnmarshalText(data); err == nil {
-				return format.New(), id, nil
+			edFormat := format.New()
+			if err := edFormat.UnmarshalText(data); err == nil {
+				return edFormat, id, nil
 			}
 		}
 	default:

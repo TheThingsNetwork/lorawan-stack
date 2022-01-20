@@ -15,12 +15,14 @@
 package qrcode_test
 
 import (
+	"context"
 	"strconv"
 	"testing"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode"
+	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode/enddevice"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -52,7 +54,14 @@ func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
-			data := test.Must(Parse("", tc.Data)).(Data)
+			qrCode := New(context.Background())
+			qrCode.RegisterEndDeviceFormat("tr005", new(enddevice.LoRaAllianceTR005Format))
+			qrCode.RegisterEndDeviceFormat("tr005draft2", new(enddevice.LoRaAllianceTR005Draft2Format))
+			qrCode.RegisterEndDeviceFormat("tr005draft3", new(enddevice.LoRaAllianceTR005Draft3Format))
+
+			d, _, err := qrCode.Parse("", "enddevice", tc.Data)
+			data := test.Must(d, err).(Data)
+
 			intf, ok := data.(AuthenticatedEndDeviceIdentifiers)
 			if !ok {
 				t.Fatalf("Expected %T to implement AuthenticatedEndDeviceIdentifiers", data)
@@ -92,16 +101,17 @@ func (mockFormat) New() EndDeviceData {
 
 func TestQRCodeFormats(t *testing.T) {
 	a := assertions.New(t)
+	qrCode := New(context.Background())
 
-	a.So(GetEndDeviceFormat("mock"), should.BeNil)
+	a.So(qrCode.GetEndDeviceFormat("mock"), should.BeNil)
 
-	RegisterEndDeviceFormat("mock", new(mockFormat))
-	f := GetEndDeviceFormat("mock")
+	qrCode.RegisterEndDeviceFormat("mock", new(mockFormat))
+	f := qrCode.GetEndDeviceFormat("mock")
 	if !a.So(f, should.NotBeNil) {
 		t.FailNow()
 	}
 	a.So(f.Format().Name, should.Equal, "test")
 
-	fs := GetEndDeviceFormats()
+	fs := qrCode.GetEndDeviceFormats()
 	a.So(fs["mock"], should.Equal, f)
 }
