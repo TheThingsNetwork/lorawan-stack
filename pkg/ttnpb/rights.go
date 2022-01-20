@@ -71,25 +71,25 @@ func init() {
 func (r Right) Implied() *Rights {
 	// NOTE: Changes here require the documentation in rights.proto to be updated.
 	switch r {
-	case RIGHT_USER_ALL:
+	case Right_RIGHT_USER_ALL:
 		return AllUserRights
-	case RIGHT_APPLICATION_ALL:
+	case Right_RIGHT_APPLICATION_ALL:
 		return AllApplicationRights
-	case RIGHT_APPLICATION_LINK:
+	case Right_RIGHT_APPLICATION_LINK:
 		return RightsFrom(
-			RIGHT_APPLICATION_INFO,
-			RIGHT_APPLICATION_TRAFFIC_READ,
-			RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
+			Right_RIGHT_APPLICATION_INFO,
+			Right_RIGHT_APPLICATION_TRAFFIC_READ,
+			Right_RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
 		)
-	case RIGHT_GATEWAY_ALL:
+	case Right_RIGHT_GATEWAY_ALL:
 		return AllGatewayRights
-	case RIGHT_GATEWAY_LINK:
+	case Right_RIGHT_GATEWAY_LINK:
 		return RightsFrom(
-			RIGHT_GATEWAY_INFO,
+			Right_RIGHT_GATEWAY_INFO,
 		)
-	case RIGHT_ORGANIZATION_ALL:
+	case Right_RIGHT_ORGANIZATION_ALL:
 		return AllOrganizationRights
-	case RIGHT_ALL:
+	case Right_RIGHT_ALL:
 		return AllRights
 	}
 	return RightsFrom(r)

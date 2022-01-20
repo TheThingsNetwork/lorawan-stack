@@ -137,7 +137,7 @@ func (is *IdentityServer) SendContactsEmail(ctx context.Context, ids ttnpb.IDStr
 		return err
 	}
 	for _, contactInfo := range contacts {
-		if contactInfo.ContactMethod != ttnpb.CONTACT_METHOD_EMAIL {
+		if contactInfo.ContactMethod != ttnpb.ContactMethod_CONTACT_METHOD_EMAIL {
 			continue
 		}
 		err := is.SendEmail(ctx, func(data emails.Data) email.MessageData {

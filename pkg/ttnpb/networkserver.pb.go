@@ -107,7 +107,7 @@ func (m *GetDefaultMACSettingsRequest) GetLorawanPhyVersion() PHYVersion {
 	if m != nil {
 		return m.LorawanPhyVersion
 	}
-	return PHY_UNKNOWN
+	return PHYVersion_PHY_UNKNOWN
 }
 
 func init() {

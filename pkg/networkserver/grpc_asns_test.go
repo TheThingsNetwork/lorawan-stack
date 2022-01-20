@@ -137,7 +137,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
-					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
@@ -207,7 +207,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
-					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
@@ -215,8 +215,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					MacState: &ttnpb.MACState{
 						CurrentParameters: &ttnpb.MACParameters{},
 						DesiredParameters: &ttnpb.MACParameters{},
-						DeviceClass:       ttnpb.CLASS_A,
-						LorawanVersion:    ttnpb.MAC_V1_1,
+						DeviceClass:       ttnpb.Class_CLASS_A,
+						LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 						RecentUplinks:     ups,
 					},
 					Session: &ttnpb.Session{
@@ -288,7 +288,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
-					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
@@ -296,8 +296,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					MacState: &ttnpb.MACState{
 						CurrentParameters: &ttnpb.MACParameters{},
 						DesiredParameters: &ttnpb.MACParameters{},
-						DeviceClass:       ttnpb.CLASS_A,
-						LorawanVersion:    ttnpb.MAC_V1_1,
+						DeviceClass:       ttnpb.Class_CLASS_A,
+						LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 						RecentUplinks:     ups,
 					},
 					Session: &ttnpb.Session{
@@ -314,8 +314,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					PendingMacState: &ttnpb.MACState{
 						CurrentParameters: &ttnpb.MACParameters{},
 						DesiredParameters: &ttnpb.MACParameters{},
-						DeviceClass:       ttnpb.CLASS_A,
-						LorawanVersion:    ttnpb.MAC_V1_1,
+						DeviceClass:       ttnpb.Class_CLASS_A,
+						LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 					},
 					PendingSession: &ttnpb.Session{
 						Keys: &ttnpb.SessionKeys{
@@ -395,7 +395,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
-					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
@@ -403,8 +403,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					MacState: &ttnpb.MACState{
 						CurrentParameters: &ttnpb.MACParameters{},
 						DesiredParameters: &ttnpb.MACParameters{},
-						DeviceClass:       ttnpb.CLASS_C,
-						LorawanVersion:    ttnpb.MAC_V1_1,
+						DeviceClass:       ttnpb.Class_CLASS_C,
+						LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 						RecentUplinks:     ups,
 					},
 					Session: &ttnpb.Session{
@@ -473,7 +473,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
-					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
@@ -546,7 +546,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
-					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
@@ -554,8 +554,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					MacState: &ttnpb.MACState{
 						CurrentParameters: &ttnpb.MACParameters{},
 						DesiredParameters: &ttnpb.MACParameters{},
-						DeviceClass:       ttnpb.CLASS_A,
-						LorawanVersion:    ttnpb.MAC_V1_1,
+						DeviceClass:       ttnpb.Class_CLASS_A,
+						LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 						RecentUplinks:     ups,
 					},
 					Session: &ttnpb.Session{
@@ -626,7 +626,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
-					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
@@ -634,8 +634,8 @@ func TestDownlinkQueueReplace(t *testing.T) {
 					MacState: &ttnpb.MACState{
 						CurrentParameters: &ttnpb.MACParameters{},
 						DesiredParameters: &ttnpb.MACParameters{},
-						DeviceClass:       ttnpb.CLASS_C,
-						LorawanVersion:    ttnpb.MAC_V1_1,
+						DeviceClass:       ttnpb.Class_CLASS_C,
+						LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 						RecentUplinks:     ups,
 					},
 					Session: &ttnpb.Session{
@@ -858,7 +858,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
-					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
@@ -928,7 +928,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
-					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
@@ -936,8 +936,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					MacState: &ttnpb.MACState{
 						CurrentParameters: &ttnpb.MACParameters{},
 						DesiredParameters: &ttnpb.MACParameters{},
-						DeviceClass:       ttnpb.CLASS_A,
-						LorawanVersion:    ttnpb.MAC_V1_1,
+						DeviceClass:       ttnpb.Class_CLASS_A,
+						LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 						RecentUplinks:     ups,
 					},
 					Session: &ttnpb.Session{
@@ -1009,7 +1009,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 
 				getDevice := &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
-					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
@@ -1017,8 +1017,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					MacState: &ttnpb.MACState{
 						CurrentParameters: &ttnpb.MACParameters{},
 						DesiredParameters: &ttnpb.MACParameters{},
-						DeviceClass:       ttnpb.CLASS_A,
-						LorawanVersion:    ttnpb.MAC_V1_1,
+						DeviceClass:       ttnpb.Class_CLASS_A,
+						LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 						RecentUplinks:     ups,
 					},
 					Session: &ttnpb.Session{
@@ -1035,8 +1035,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					PendingMacState: &ttnpb.MACState{
 						CurrentParameters: &ttnpb.MACParameters{},
 						DesiredParameters: &ttnpb.MACParameters{},
-						DeviceClass:       ttnpb.CLASS_A,
-						LorawanVersion:    ttnpb.MAC_V1_1,
+						DeviceClass:       ttnpb.Class_CLASS_A,
+						LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 					},
 					PendingSession: &ttnpb.Session{
 						Keys: &ttnpb.SessionKeys{
@@ -1100,7 +1100,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
-					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
@@ -1108,8 +1108,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					MacState: &ttnpb.MACState{
 						CurrentParameters: &ttnpb.MACParameters{},
 						DesiredParameters: &ttnpb.MACParameters{},
-						DeviceClass:       ttnpb.CLASS_C,
-						LorawanVersion:    ttnpb.MAC_V1_1,
+						DeviceClass:       ttnpb.Class_CLASS_C,
+						LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 						RecentUplinks:     ups,
 					},
 					Session: &ttnpb.Session{
@@ -1172,7 +1172,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
-					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
@@ -1180,8 +1180,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					MacState: &ttnpb.MACState{
 						CurrentParameters: &ttnpb.MACParameters{},
 						DesiredParameters: &ttnpb.MACParameters{},
-						DeviceClass:       ttnpb.CLASS_C,
-						LorawanVersion:    ttnpb.MAC_V1_0_2,
+						DeviceClass:       ttnpb.Class_CLASS_C,
+						LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_2,
 						RecentUplinks:     ups,
 					},
 					Session: &ttnpb.Session{
@@ -1239,7 +1239,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 				})
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					FrequencyPlanId:   test.EUFrequencyPlanID,
-					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						DeviceId:       "test-dev-id",
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
@@ -1247,8 +1247,8 @@ func TestDownlinkQueuePush(t *testing.T) {
 					MacState: &ttnpb.MACState{
 						CurrentParameters: &ttnpb.MACParameters{},
 						DesiredParameters: &ttnpb.MACParameters{},
-						DeviceClass:       ttnpb.CLASS_C,
-						LorawanVersion:    ttnpb.MAC_V1_0_2,
+						DeviceClass:       ttnpb.Class_CLASS_C,
+						LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_2,
 						RecentUplinks:     ups,
 					},
 				})

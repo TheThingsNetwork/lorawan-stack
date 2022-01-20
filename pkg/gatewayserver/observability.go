@@ -28,8 +28,8 @@ var (
 	evtGatewayConnect = events.Define(
 		"gs.gateway.connect", "connect gateway",
 		events.WithVisibility(
-			ttnpb.RIGHT_GATEWAY_LINK,
-			ttnpb.RIGHT_GATEWAY_STATUS_READ,
+			ttnpb.Right_RIGHT_GATEWAY_LINK,
+			ttnpb.Right_RIGHT_GATEWAY_STATUS_READ,
 		),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
@@ -37,62 +37,62 @@ var (
 	evtGatewayDisconnect = events.Define(
 		"gs.gateway.disconnect", "disconnect gateway",
 		events.WithVisibility(
-			ttnpb.RIGHT_GATEWAY_LINK,
-			ttnpb.RIGHT_GATEWAY_STATUS_READ,
+			ttnpb.Right_RIGHT_GATEWAY_LINK,
+			ttnpb.Right_RIGHT_GATEWAY_STATUS_READ,
 		),
 		events.WithErrorDataType(),
 	)
 	evtReceiveStatus = events.Define(
 		"gs.status.receive", "receive gateway status",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_STATUS_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_STATUS_READ),
 		events.WithDataType(&ttnpb.GatewayStatus{}),
 	)
 	evtDropStatus = events.Define(
 		"gs.status.drop", "drop gateway status",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_STATUS_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_STATUS_READ),
 		events.WithErrorDataType(),
 	)
 	evtReceiveUp = events.Define(
 		"gs.up.receive", "receive uplink message",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.UplinkMessage{}),
 	)
 	evtDropUp = events.Define(
 		"gs.up.drop", "drop uplink message",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)
 	evtForwardUp = events.Define(
 		"gs.up.forward", "forward uplink message",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ),
 	)
 	evtSendDown = events.Define(
 		"gs.down.send", "send downlink message",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.DownlinkMessage{}),
 	)
 	evtTxSuccessDown = events.Define(
 		"gs.down.tx.success", "transmit downlink message successful",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ),
 	)
 	evtTxFailureDown = events.Define(
 		"gs.down.tx.fail", "transmit downlink message failure",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ),
 		events.WithDataType(ttnpb.TxAcknowledgment_COLLISION_PACKET),
 	)
 	evtReceiveTxAck = events.Define(
 		"gs.txack.receive", "receive transmission acknowledgement",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.TxAcknowledgment{}),
 	)
 	evtDropTxAck = events.Define(
 		"gs.txack.drop", "drop transmission acknowledgement",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_STATUS_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_STATUS_READ),
 		events.WithErrorDataType(),
 	)
 	evtForwardTxAck = events.Define(
 		"gs.txack.forward", "forward transmission acknowledgement",
-		events.WithVisibility(ttnpb.RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ),
 	)
 )
 

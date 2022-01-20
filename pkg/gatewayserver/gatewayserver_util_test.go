@@ -77,7 +77,7 @@ func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key str
 		Antennas: []*ttnpb.GatewayAntenna{
 			{
 				Location: &ttnpb.Location{
-					Source: ttnpb.SOURCE_REGISTRY,
+					Source: ttnpb.LocationSource_SOURCE_REGISTRY,
 				},
 			},
 		},
@@ -152,7 +152,7 @@ func (is *mockIS) ListRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers)
 	}
 	for _, auth := range auths {
 		if auth == authorization[0] {
-			res.Rights = append(res.Rights, ttnpb.RIGHT_GATEWAY_LINK, ttnpb.RIGHT_GATEWAY_STATUS_READ)
+			res.Rights = append(res.Rights, ttnpb.Right_RIGHT_GATEWAY_LINK, ttnpb.Right_RIGHT_GATEWAY_STATUS_READ)
 		}
 	}
 	return

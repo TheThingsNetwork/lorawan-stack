@@ -122,7 +122,7 @@ func minAFCntDown(session *ttnpb.Session, macState *ttnpb.MACState) (uint32, err
 		return 0, nil
 	}
 	var minFCnt uint32
-	if macState.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+	if macState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
 	outer:
 		for i := len(macState.RecentDownlinks) - 1; i >= 0; i-- {
 			pld := macState.RecentDownlinks[i].Payload

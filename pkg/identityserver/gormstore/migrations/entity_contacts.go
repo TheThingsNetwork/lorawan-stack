@@ -46,7 +46,7 @@ func (m EntityContacts) Apply(ctx context.Context, db *gorm.DB) error {
 		logger = log.FromContext(ctx)
 	)
 
-	res, err = sqlDB.Exec(fmt.Sprintf(entityContactsQuery, "application", ttnpb.RIGHT_APPLICATION_ALL))
+	res, err = sqlDB.Exec(fmt.Sprintf(entityContactsQuery, "application", ttnpb.Right_RIGHT_APPLICATION_ALL))
 	if err != nil {
 		return err
 	}
@@ -56,7 +56,7 @@ func (m EntityContacts) Apply(ctx context.Context, db *gorm.DB) error {
 	}
 	logger.WithField("rows", rows).Debug("updated application contacts")
 
-	res, err = sqlDB.Exec(fmt.Sprintf(entityContactsQuery, "client", ttnpb.RIGHT_CLIENT_ALL))
+	res, err = sqlDB.Exec(fmt.Sprintf(entityContactsQuery, "client", ttnpb.Right_RIGHT_CLIENT_ALL))
 	if err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ func (m EntityContacts) Apply(ctx context.Context, db *gorm.DB) error {
 	}
 	logger.WithField("rows", rows).Debug("updated client contacts")
 
-	res, err = sqlDB.Exec(fmt.Sprintf(entityContactsQuery, "gateway", ttnpb.RIGHT_GATEWAY_ALL))
+	res, err = sqlDB.Exec(fmt.Sprintf(entityContactsQuery, "gateway", ttnpb.Right_RIGHT_GATEWAY_ALL))
 	if err != nil {
 		return err
 	}
@@ -76,7 +76,7 @@ func (m EntityContacts) Apply(ctx context.Context, db *gorm.DB) error {
 	}
 	logger.WithField("rows", rows).Debug("updated gateway contacts")
 
-	res, err = sqlDB.Exec(fmt.Sprintf(entityContactsQuery, "organization", ttnpb.RIGHT_ORGANIZATION_ALL))
+	res, err = sqlDB.Exec(fmt.Sprintf(entityContactsQuery, "organization", ttnpb.Right_RIGHT_ORGANIZATION_ALL))
 	if err != nil {
 		return err
 	}

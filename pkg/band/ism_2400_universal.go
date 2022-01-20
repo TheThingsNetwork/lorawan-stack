@@ -36,14 +36,14 @@ var ISM_2400_Universal = Band{
 	},
 
 	DataRates: map[ttnpb.DataRateIndex]DataRate{
-		ttnpb.DATA_RATE_0: makeLoRaDataRate(12, 812000, makeConstMaxMACPayloadSizeFunc(59)),
-		ttnpb.DATA_RATE_1: makeLoRaDataRate(11, 812000, makeConstMaxMACPayloadSizeFunc(123)),
-		ttnpb.DATA_RATE_2: makeLoRaDataRate(10, 812000, makeConstMaxMACPayloadSizeFunc(230)),
-		ttnpb.DATA_RATE_3: makeLoRaDataRate(9, 812000, makeConstMaxMACPayloadSizeFunc(230)),
-		ttnpb.DATA_RATE_4: makeLoRaDataRate(8, 812000, makeConstMaxMACPayloadSizeFunc(230)),
-		ttnpb.DATA_RATE_5: makeLoRaDataRate(7, 812000, makeConstMaxMACPayloadSizeFunc(230)),
-		ttnpb.DATA_RATE_6: makeLoRaDataRate(6, 812000, makeConstMaxMACPayloadSizeFunc(230)),
-		ttnpb.DATA_RATE_7: makeLoRaDataRate(5, 812000, makeConstMaxMACPayloadSizeFunc(230)),
+		ttnpb.DataRateIndex_DATA_RATE_0: makeLoRaDataRate(12, 812000, makeConstMaxMACPayloadSizeFunc(59)),
+		ttnpb.DataRateIndex_DATA_RATE_1: makeLoRaDataRate(11, 812000, makeConstMaxMACPayloadSizeFunc(123)),
+		ttnpb.DataRateIndex_DATA_RATE_2: makeLoRaDataRate(10, 812000, makeConstMaxMACPayloadSizeFunc(230)),
+		ttnpb.DataRateIndex_DATA_RATE_3: makeLoRaDataRate(9, 812000, makeConstMaxMACPayloadSizeFunc(230)),
+		ttnpb.DataRateIndex_DATA_RATE_4: makeLoRaDataRate(8, 812000, makeConstMaxMACPayloadSizeFunc(230)),
+		ttnpb.DataRateIndex_DATA_RATE_5: makeLoRaDataRate(7, 812000, makeConstMaxMACPayloadSizeFunc(230)),
+		ttnpb.DataRateIndex_DATA_RATE_6: makeLoRaDataRate(6, 812000, makeConstMaxMACPayloadSizeFunc(230)),
+		ttnpb.DataRateIndex_DATA_RATE_7: makeLoRaDataRate(5, 812000, makeConstMaxMACPayloadSizeFunc(230)),
 	},
 
 	ReceiveDelay1:        defaultReceiveDelay1,
@@ -70,7 +70,7 @@ var ISM_2400_Universal = Band{
 
 	Rx1Channel: channelIndexIdentity,
 	Rx1DataRate: func(idx ttnpb.DataRateIndex, offset ttnpb.DataRateOffset, _ bool) (ttnpb.DataRateIndex, error) {
-		if idx > ttnpb.DATA_RATE_7 {
+		if idx > ttnpb.DataRateIndex_DATA_RATE_7 {
 			return 0, errDataRateIndexTooHigh.WithAttributes("max", 7)
 		}
 		if offset > 5 {
@@ -88,10 +88,10 @@ var ISM_2400_Universal = Band{
 	ImplementsCFList: true,
 	CFListType:       ttnpb.CFListType_FREQUENCIES,
 
-	DefaultRx2Parameters: Rx2Parameters{ttnpb.DATA_RATE_0, 2423000000},
+	DefaultRx2Parameters: Rx2Parameters{ttnpb.DataRateIndex_DATA_RATE_0, 2423000000},
 
 	Beacon: Beacon{
-		DataRateIndex:    ttnpb.DATA_RATE_3,
+		DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_3,
 		CodingRate:       "4/8LI",
 		ComputeFrequency: func(_ float64) uint64 { return ism2400BeaconFrequency },
 	},

@@ -25,7 +25,7 @@ import (
 func TestMACVersion_Version(t *testing.T) {
 	a := assertions.New(t)
 	for v := range MACVersion_name {
-		if v == int32(MAC_UNKNOWN) {
+		if v == int32(MACVersion_MAC_UNKNOWN) {
 			continue
 		}
 		a.So(func() { MACVersion(v).Version() }, should.NotPanic)
@@ -39,38 +39,38 @@ func TestMACVersionCompare(t *testing.T) {
 		Panics   bool
 	}{
 		{
-			A:        MAC_V1_0,
-			B:        MAC_V1_0_1,
+			A:        MACVersion_MAC_V1_0,
+			B:        MACVersion_MAC_V1_0_1,
 			Expected: -1,
 		},
 		{
-			A:        MAC_V1_1,
-			B:        MAC_V1_0,
+			A:        MACVersion_MAC_V1_1,
+			B:        MACVersion_MAC_V1_0,
 			Expected: 1,
 		},
 		{
-			A:        MAC_V1_1,
-			B:        MAC_V1_1,
+			A:        MACVersion_MAC_V1_1,
+			B:        MACVersion_MAC_V1_1,
 			Expected: 0,
 		},
 		{
-			A:        MAC_V1_0_2,
-			B:        MAC_V1_1,
+			A:        MACVersion_MAC_V1_0_2,
+			B:        MACVersion_MAC_V1_1,
 			Expected: -1,
 		},
 		{
-			A:      MAC_UNKNOWN,
-			B:      MAC_V1_1,
+			A:      MACVersion_MAC_UNKNOWN,
+			B:      MACVersion_MAC_V1_1,
 			Panics: true,
 		},
 		{
-			A:      MAC_UNKNOWN,
-			B:      MAC_UNKNOWN,
+			A:      MACVersion_MAC_UNKNOWN,
+			B:      MACVersion_MAC_UNKNOWN,
 			Panics: true,
 		},
 		{
-			A:      MAC_V1_0,
-			B:      MAC_UNKNOWN,
+			A:      MACVersion_MAC_V1_0,
+			B:      MACVersion_MAC_UNKNOWN,
 			Panics: true,
 		},
 	} {
@@ -90,29 +90,29 @@ func TestMACVersionCompare(t *testing.T) {
 
 func TestDataRateIndex(t *testing.T) {
 	a := assertions.New(t)
-	a.So(DATA_RATE_4.String(), should.Equal, "DATA_RATE_4")
+	a.So(DataRateIndex_DATA_RATE_4.String(), should.Equal, "DATA_RATE_4")
 
-	b, err := DATA_RATE_4.MarshalText()
+	b, err := DataRateIndex_DATA_RATE_4.MarshalText()
 	a.So(err, should.BeNil)
 	a.So(string(b), should.Resemble, "4")
 
 	for _, str := range []string{"4", "DATA_RATE_4"} {
 		var idx DataRateIndex
 		err = idx.UnmarshalText([]byte(str))
-		a.So(idx, should.Equal, DATA_RATE_4)
+		a.So(idx, should.Equal, DataRateIndex_DATA_RATE_4)
 	}
 }
 
 func TestDeviceEIRP(t *testing.T) {
 	a := assertions.New(t)
-	a.So(DEVICE_EIRP_10.String(), should.Equal, "DEVICE_EIRP_10")
+	a.So(DeviceEIRP_DEVICE_EIRP_10.String(), should.Equal, "DEVICE_EIRP_10")
 
-	b, err := DEVICE_EIRP_10.MarshalText()
+	b, err := DeviceEIRP_DEVICE_EIRP_10.MarshalText()
 	a.So(err, should.BeNil)
 	a.So(b, should.Resemble, []byte("DEVICE_EIRP_10"))
 
 	var v DeviceEIRP
 	err = v.UnmarshalText([]byte("DEVICE_EIRP_10"))
-	a.So(v, should.Equal, DEVICE_EIRP_10)
+	a.So(v, should.Equal, DeviceEIRP_DEVICE_EIRP_10)
 	a.So(err, should.BeNil)
 }

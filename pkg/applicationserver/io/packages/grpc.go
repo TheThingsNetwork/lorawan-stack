@@ -34,7 +34,7 @@ func appendImplicitAssociationsGetPaths(paths ...string) []string {
 
 // List implements ttnpb.ApplicationPackageRegistryServer.
 func (s *server) List(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*ttnpb.ApplicationPackages, error) {
-	if err := rights.RequireApplication(ctx, *ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
+	if err := rights.RequireApplication(ctx, *ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
 		return nil, err
 	}
 	var packages ttnpb.ApplicationPackages
@@ -46,7 +46,7 @@ func (s *server) List(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*tt
 
 // GetAssociation implements ttnpb.ApplicationPackageRegistryServer.
 func (s *server) GetAssociation(ctx context.Context, req *ttnpb.GetApplicationPackageAssociationRequest) (*ttnpb.ApplicationPackageAssociation, error) {
-	if err := rights.RequireApplication(ctx, *req.Ids.EndDeviceIds.ApplicationIds, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
+	if err := rights.RequireApplication(ctx, *req.Ids.EndDeviceIds.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
 		return nil, err
 	}
 	return s.registry.GetAssociation(ctx, req.Ids, appendImplicitAssociationsGetPaths(req.FieldMask.GetPaths()...))
@@ -54,7 +54,7 @@ func (s *server) GetAssociation(ctx context.Context, req *ttnpb.GetApplicationPa
 
 // ListAssociations implements tnpb.ApplicationPackageRegistryServer.
 func (s *server) ListAssociations(ctx context.Context, req *ttnpb.ListApplicationPackageAssociationRequest) (assoc *ttnpb.ApplicationPackageAssociations, err error) {
-	if err := rights.RequireApplication(ctx, *req.Ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
+	if err := rights.RequireApplication(ctx, *req.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
 		return nil, err
 	}
 	var total int64
@@ -75,7 +75,7 @@ func (s *server) ListAssociations(ctx context.Context, req *ttnpb.ListApplicatio
 
 // SetAssociation implements ttnpb.ApplicationPackageRegistryServer.
 func (s *server) SetAssociation(ctx context.Context, req *ttnpb.SetApplicationPackageAssociationRequest) (*ttnpb.ApplicationPackageAssociation, error) {
-	if err := rights.RequireApplication(ctx, *req.Association.Ids.EndDeviceIds.ApplicationIds, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
+	if err := rights.RequireApplication(ctx, *req.Association.Ids.EndDeviceIds.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
 		return nil, err
 	}
 	return s.registry.SetAssociation(ctx, req.Association.Ids, appendImplicitAssociationsGetPaths(req.FieldMask.GetPaths()...),
@@ -93,7 +93,7 @@ func (s *server) SetAssociation(ctx context.Context, req *ttnpb.SetApplicationPa
 
 // DeleteAssociation implements ttnpb.ApplicationPackageRegistryServer.
 func (s *server) DeleteAssociation(ctx context.Context, ids *ttnpb.ApplicationPackageAssociationIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireApplication(ctx, *ids.EndDeviceIds.ApplicationIds, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
+	if err := rights.RequireApplication(ctx, *ids.EndDeviceIds.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
 		return nil, err
 	}
 	_, err := s.registry.SetAssociation(ctx, ids, nil,
@@ -109,7 +109,7 @@ func (s *server) DeleteAssociation(ctx context.Context, ids *ttnpb.ApplicationPa
 
 // GetDefaultAssociation implements ttnpb.ApplicationPackageRegistryServer.
 func (s *server) GetDefaultAssociation(ctx context.Context, req *ttnpb.GetApplicationPackageDefaultAssociationRequest) (*ttnpb.ApplicationPackageDefaultAssociation, error) {
-	if err := rights.RequireApplication(ctx, *req.Ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
+	if err := rights.RequireApplication(ctx, *req.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
 		return nil, err
 	}
 	return s.registry.GetDefaultAssociation(ctx, req.Ids, appendImplicitAssociationsGetPaths(req.FieldMask.GetPaths()...))
@@ -117,7 +117,7 @@ func (s *server) GetDefaultAssociation(ctx context.Context, req *ttnpb.GetApplic
 
 // ListDefaultAssociations implements ttnpb.ApplicationPackageRegistryServer.
 func (s *server) ListDefaultAssociations(ctx context.Context, req *ttnpb.ListApplicationPackageDefaultAssociationRequest) (assoc *ttnpb.ApplicationPackageDefaultAssociations, err error) {
-	if err := rights.RequireApplication(ctx, *req.Ids, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
+	if err := rights.RequireApplication(ctx, *req.Ids, ttnpb.Right_RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
 		return nil, err
 	}
 	var total int64
@@ -138,7 +138,7 @@ func (s *server) ListDefaultAssociations(ctx context.Context, req *ttnpb.ListApp
 
 // SetDefaultAssociation implements ttnpb.ApplicationPackageRegistryServer.
 func (s *server) SetDefaultAssociation(ctx context.Context, req *ttnpb.SetApplicationPackageDefaultAssociationRequest) (*ttnpb.ApplicationPackageDefaultAssociation, error) {
-	if err := rights.RequireApplication(ctx, *req.Default.Ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
+	if err := rights.RequireApplication(ctx, *req.Default.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
 		return nil, err
 	}
 	return s.registry.SetDefaultAssociation(ctx, req.Default.Ids, appendImplicitAssociationsGetPaths(req.FieldMask.GetPaths()...),
@@ -156,7 +156,7 @@ func (s *server) SetDefaultAssociation(ctx context.Context, req *ttnpb.SetApplic
 
 // DeleteDefaultAssociation implements ttnpb.ApplicationPackageRegistryServer.
 func (s *server) DeleteDefaultAssociation(ctx context.Context, ids *ttnpb.ApplicationPackageDefaultAssociationIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireApplication(ctx, *ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
+	if err := rights.RequireApplication(ctx, *ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_SETTINGS_PACKAGES); err != nil {
 		return nil, err
 	}
 	_, err := s.registry.SetDefaultAssociation(ctx, ids, nil,

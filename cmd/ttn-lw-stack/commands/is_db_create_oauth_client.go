@@ -118,11 +118,11 @@ var createOAuthClient = &cobra.Command{
 			cli.Secret = hashedSecret
 			cli.RedirectUris = redirectURIs
 			cli.LogoutRedirectUris = logoutRedirectURIs
-			cli.State = ttnpb.STATE_APPROVED
+			cli.State = ttnpb.State_STATE_APPROVED
 			cli.SkipAuthorization = authorized
 			cli.Endorsed = endorsed
-			cli.Grants = []ttnpb.GrantType{ttnpb.GRANT_AUTHORIZATION_CODE, ttnpb.GRANT_REFRESH_TOKEN}
-			cli.Rights = []ttnpb.Right{ttnpb.RIGHT_ALL}
+			cli.Grants = []ttnpb.GrantType{ttnpb.GrantType_GRANT_AUTHORIZATION_CODE, ttnpb.GrantType_GRANT_REFRESH_TOKEN}
+			cli.Rights = []ttnpb.Right{ttnpb.Right_RIGHT_ALL}
 
 			if cliExists {
 				logger.Info("Updating OAuth client...")
@@ -145,7 +145,7 @@ var createOAuthClient = &cobra.Command{
 					ctx,
 					ttnpb.UserIdentifiers{UserId: owner}.OrganizationOrUserIdentifiers(),
 					cli.GetIds().GetEntityIdentifiers(),
-					ttnpb.RightsFrom(ttnpb.RIGHT_CLIENT_ALL),
+					ttnpb.RightsFrom(ttnpb.Right_RIGHT_CLIENT_ALL),
 				)
 				if err != nil {
 					return err

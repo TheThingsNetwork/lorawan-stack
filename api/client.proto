@@ -34,7 +34,6 @@ option (gogoproto.goproto_registration) = true;
 // The OAuth2 flows an OAuth client can use to get an access token.
 enum GrantType {
   option (thethings.json.enum) = { marshal_as_string: true, prefix: "GRANT" };
-  option (gogoproto.goproto_enum_prefix) = false;
 
   // Grant type used to exchange an authorization code for an access token.
   GRANT_AUTHORIZATION_CODE = 0;

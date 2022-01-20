@@ -30,89 +30,89 @@ import (
 var (
 	evtReceiveDataUp = events.Define(
 		"as.up.data.receive", "receive uplink data message",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 	)
 	evtDropDataUp = events.Define(
 		"as.up.data.drop", "drop uplink data message",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)
 	evtForwardDataUp = events.Define(
 		"as.up.data.forward", "forward uplink data message",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationUp{}),
 	)
 	evtDecodeFailDataUp = events.Define(
 		"as.up.data.decode.fail", "decode uplink data message failure",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)
 	evtDecodeWarningDataUp = events.Define(
 		"as.up.data.decode.warning", "decode uplink data message warning",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationUplink{}),
 	)
 	evtReceiveJoinAccept = events.Define(
 		"as.up.join.receive", "receive join-accept message",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 	)
 	evtDropJoinAccept = events.Define(
 		"as.up.join.drop", "drop join-accept message",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)
 	evtForwardJoinAccept = events.Define(
 		"as.up.join.forward", "forward join-accept message",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationUp{}),
 	)
 	evtForwardLocationSolved = events.Define(
 		"as.up.location.forward", "forward location solved message",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationUp{}),
 	)
 	evtForwardServiceData = events.Define(
 		"as.up.service.forward", "forward service data message",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationUp{}),
 	)
 	evtReceiveDataDown = events.Define(
 		"as.down.data.receive", "receive downlink data message",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationDownlink{}),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtDropDataDown = events.Define(
 		"as.down.data.drop", "drop downlink data message",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)
 	evtForwardDataDown = events.Define(
 		"as.down.data.forward", "forward downlink data message",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationDownlink{}),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtEncodeFailDataDown = events.Define(
 		"as.down.data.encode.fail", "encode downlink data message failure",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)
 	evtEncodeWarningDataDown = events.Define(
 		"as.down.data.encode.warning", "encode downlink data message warning",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationDownlink{}),
 	)
 	evtDecodeFailDataDown = events.Define(
 		"as.down.data.decode.fail", "decode downlink data message failure",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)
 	evtDecodeWarningDataDown = events.Define(
 		"as.down.data.decode.warning", "decode downlink data message warning",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationDownlink{}),
 	)
 )

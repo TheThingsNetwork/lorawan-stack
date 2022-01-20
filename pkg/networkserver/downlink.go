@@ -195,7 +195,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		genState generateDownlinkState
 		cmdBuf   []byte
 	)
-	if class == ttnpb.CLASS_A {
+	if class == ttnpb.Class_CLASS_A {
 		spec := lorawan.DefaultMACCommands
 		cmds := make([]*ttnpb.MACCommand, 0, len(dev.MacState.QueuedResponses)+len(dev.MacState.PendingRequests))
 
@@ -226,7 +226,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		dev.MacState.PendingRequests = dev.MacState.PendingRequests[:0]
 
 		enqueuers := make([]func(context.Context, *ttnpb.EndDevice, uint16, uint16) mac.EnqueueState, 0, 13)
-		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_0) >= 0 {
+		if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_0) >= 0 {
 			enqueuers = append(enqueuers,
 				mac.EnqueueDutyCycleReq,
 				mac.EnqueueRxParamSetupReq,
@@ -248,8 +248,8 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				},
 				mac.EnqueueRxTimingSetupReq,
 			)
-			if dev.MacState.DeviceClass == ttnpb.CLASS_B {
-				if class == ttnpb.CLASS_A {
+			if dev.MacState.DeviceClass == ttnpb.Class_CLASS_B {
+				if class == ttnpb.Class_CLASS_A {
 					enqueuers = append(enqueuers,
 						mac.EnqueuePingSlotChannelReq,
 					)
@@ -259,7 +259,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				)
 			}
 		}
-		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 {
+		if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_0_2) >= 0 {
 			if phy.TxParamSetupReqSupport {
 				enqueuers = append(enqueuers,
 					func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
@@ -271,7 +271,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				mac.EnqueueDLChannelReq,
 			)
 		}
-		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+		if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
 			enqueuers = append(enqueuers,
 				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
 					return mac.EnqueueADRParamSetupReq(ctx, dev, maxDownLen, maxUpLen, phy)
@@ -373,7 +373,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 					})
 				}
 
-			case down.FCnt <= dev.Session.LastNFCntDown && dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0:
+			case down.FCnt <= dev.Session.LastNFCntDown && dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0:
 				logger.WithField("last_f_cnt_down", dev.Session.LastNFCntDown).Debug("Drop application downlink with too low FCnt")
 				genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
 					EndDeviceIds:   dev.Ids,
@@ -416,7 +416,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 				})
 				// TODO: Check if following downlinks must be dropped (https://github.com/TheThingsNetwork/lorawan-stack/issues/1653).
 
-			case down.ClassBC != nil && class == ttnpb.CLASS_A:
+			case down.ClassBC != nil && class == ttnpb.Class_CLASS_A:
 				appDowns = append(appDowns, dev.Session.QueuedApplicationDownlinks[i:]...)
 				logger.Debug("Skip class B/C downlink for class A downlink slot")
 				break outer
@@ -530,7 +530,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	} else {
 		pld.FrmPayload = cmdBuf
 	}
-	if pld.FPort == 0 && dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+	if pld.FPort == 0 && dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
 		genState.ifScheduledApplicationUps = append(genState.ifScheduledApplicationUps, &ttnpb.ApplicationUp{
 			EndDeviceIds:   dev.Ids,
 			CorrelationIds: events.CorrelationIDsFromContext(ctx),
@@ -544,14 +544,14 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		})
 		genState.EvictDownlinkQueueIfScheduled = true
 	}
-	if class != ttnpb.CLASS_C {
+	if class != ttnpb.Class_CLASS_C {
 		pld.FHdr.FCtrl.FPending = fPending || len(dev.Session.QueuedApplicationDownlinks) > 0
 	}
 
 	logger = logger.WithField("f_pending", pld.FHdr.FCtrl.FPending)
 	ctx = log.NewContext(ctx, logger)
 
-	if mType == ttnpb.MType_CONFIRMED_DOWN && class != ttnpb.CLASS_A {
+	if mType == ttnpb.MType_CONFIRMED_DOWN && class != ttnpb.Class_CLASS_A {
 		confirmedAt, ok := nextConfirmedNetworkInitiatedDownlinkAt(ctx, dev, phy, ns.defaultMACSettings)
 		if !ok {
 			return nil, genState, ErrCorruptedMACState.
@@ -589,7 +589,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	}
 
 	var mic [4]byte
-	if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+	if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
 		mic, err = crypto.ComputeLegacyDownlinkMIC(
 			key,
 			dev.Session.DevAddr,
@@ -634,7 +634,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		Payload:        msg,
 		RawPayload:     b,
 		Priority:       priority,
-		NeedsMACAnswer: len(dev.MacState.PendingRequests) > 0 && class == ttnpb.CLASS_A,
+		NeedsMACAnswer: len(dev.MacState.PendingRequests) > 0 && class == ttnpb.Class_CLASS_A,
 		SessionKeyID:   dev.Session.Keys.SessionKeyId,
 	}, genState, nil
 }
@@ -697,7 +697,7 @@ func downlinkPathsFromMetadata(ctx context.Context, mds ...*ttnpb.RxMetadata) []
 	body := make([]downlinkPath, 0, len(mds))
 	tail := make([]downlinkPath, 0, len(mds))
 	for _, md := range mds {
-		if len(md.UplinkToken) == 0 || md.DownlinkPathConstraint == ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER {
+		if len(md.UplinkToken) == 0 || md.DownlinkPathConstraint == ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER {
 			continue
 		}
 		path := downlinkPath{
@@ -712,9 +712,9 @@ func downlinkPathsFromMetadata(ctx context.Context, mds ...*ttnpb.RxMetadata) []
 		} else {
 			path.GatewayIdentifiers = md.GatewayIds
 			switch md.DownlinkPathConstraint {
-			case ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE:
+			case ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NONE:
 				head = append(head, path)
-			case ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER:
+			case ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER:
 				body = append(body, path)
 			}
 		}
@@ -1093,7 +1093,7 @@ func rx1Parameters(phy *band.Band, macState *ttnpb.MACState, up *ttnpb.UplinkMes
 // maximumUplinkLength returns the maximum length of the next uplink after ups.
 func maximumUplinkLength(fp *frequencyplans.FrequencyPlan, phy *band.Band, ups ...*ttnpb.UplinkMessage) (uint16, error) {
 	// NOTE: If no data uplink is found, we assume ADR is off on the device and, hence, data rate index 0 is used in computation.
-	maxUpDRIdx := ttnpb.DATA_RATE_0
+	maxUpDRIdx := ttnpb.DataRateIndex_DATA_RATE_0
 loop:
 	for i := len(ups) - 1; i >= 0; i-- {
 		switch ups[i].Payload.MHdr.MType {
@@ -1125,14 +1125,14 @@ func recordDataDownlink(dev *ttnpb.EndDevice, genState generateDownlinkState, ne
 	if macPayload == nil {
 		panic("invalid downlink")
 	}
-	if genState.ApplicationDownlink == nil || dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 && macPayload.FullFCnt > dev.Session.LastNFCntDown {
+	if genState.ApplicationDownlink == nil || dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 && macPayload.FullFCnt > dev.Session.LastNFCntDown {
 		dev.Session.LastNFCntDown = macPayload.FullFCnt
 	}
 	dev.MacState.LastDownlinkAt = ttnpb.ProtoTimePtr(down.TransmitAt)
 	if needsMACAnswer || down.Message.Payload.MHdr.MType == ttnpb.MType_CONFIRMED_DOWN {
 		dev.MacState.LastConfirmedDownlinkAt = ttnpb.ProtoTimePtr(down.TransmitAt)
 	}
-	if class := down.Message.GetRequest().GetClass(); class == ttnpb.CLASS_B || class == ttnpb.CLASS_C {
+	if class := down.Message.GetRequest().GetClass(); class == ttnpb.Class_CLASS_B || class == ttnpb.Class_CLASS_C {
 		dev.MacState.LastNetworkInitiatedDownlinkAt = ttnpb.ProtoTimePtr(down.TransmitAt)
 	}
 
@@ -1248,7 +1248,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	}
 	downDwellTime := fp.DwellTime.GetDownlinks()
 
-	genDown, genState, err := ns.generateDataDownlink(ctx, dev, phy, ttnpb.CLASS_A, transmitAt,
+	genDown, genState, err := ns.generateDataDownlink(ctx, dev, phy, ttnpb.Class_CLASS_A, transmitAt,
 		maxDR.MaxMACPayloadSize(downDwellTime),
 		maxUpLength,
 	)
@@ -1300,7 +1300,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	logger := log.FromContext(ctx)
 
 	req := &ttnpb.TxRequest{
-		Class:           ttnpb.CLASS_A,
+		Class:           ttnpb.Class_CLASS_A,
 		Priority:        genDown.Priority,
 		FrequencyPlanId: dev.FrequencyPlanId,
 		Rx1Delay:        ttnpb.RxDelay(slot.RxDelay / time.Second),
@@ -1373,7 +1373,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 	var drIdx ttnpb.DataRateIndex
 	var freq uint64
 	switch slot.Class {
-	case ttnpb.CLASS_B:
+	case ttnpb.Class_CLASS_B:
 		if dev.MacState.CurrentParameters.PingSlotDataRateIndexValue == nil {
 			log.FromContext(ctx).Error("Device is in class B mode, but ping slot data rate index is not known, skip class B/C downlink slot")
 			return downlinkAttemptResult{
@@ -1383,7 +1383,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 		drIdx = dev.MacState.CurrentParameters.PingSlotDataRateIndexValue.Value
 		freq = dev.MacState.CurrentParameters.PingSlotFrequency
 
-	case ttnpb.CLASS_C:
+	case ttnpb.Class_CLASS_C:
 		drIdx = dev.MacState.CurrentParameters.Rx2DataRateIndex
 		freq = dev.MacState.CurrentParameters.Rx2Frequency
 
@@ -1436,7 +1436,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 		log.FromContext(ctx).Debug("Slot starts in the future, set absolute time in downlink request")
 		absTime = ttnpb.ProtoTimePtr(slot.Time)
 
-	case slot.Class == ttnpb.CLASS_B:
+	case slot.Class == ttnpb.Class_CLASS_B:
 		log.FromContext(ctx).Error("Class B ping slot expired, retry downlink attempt")
 		return downlinkAttemptResult{
 			SetPaths:                 sets,
@@ -1714,7 +1714,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 					}
 
 					req := &ttnpb.TxRequest{
-						Class:           ttnpb.CLASS_A,
+						Class:           ttnpb.Class_CLASS_A,
 						Priority:        ns.downlinkPriorities.JoinAccept,
 						FrequencyPlanId: dev.FrequencyPlanId,
 						Rx1Delay:        ttnpb.RxDelay(phy.JoinAcceptDelay1 / time.Second),
@@ -1836,7 +1836,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 				ctx = log.NewContext(ctx, logger)
 
 				var maxUpLength uint16 = math.MaxUint16
-				if !dev.Multicast && dev.MacState.LorawanVersion == ttnpb.MAC_V1_1 {
+				if !dev.Multicast && dev.MacState.LorawanVersion == ttnpb.MACVersion_MAC_V1_1 {
 					maxUpLength, err = maximumUplinkLength(fp, phy, dev.MacState.RecentUplinks...)
 					if err != nil {
 						logger.WithError(err).Error("Failed to determine maximum uplink length")
@@ -1859,12 +1859,12 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 
 					case *networkInitiatedDownlinkSlot:
 						switch {
-						case slot.Class == ttnpb.CLASS_B && slot.Time.IsZero(),
+						case slot.Class == ttnpb.Class_CLASS_B && slot.Time.IsZero(),
 							slot.IsApplicationTime && slot.Time.IsZero():
 							logger.Error("Invalid downlink slot generated, skip class B/C downlink slot")
 							return dev, nil, nil
 
-						case !slot.IsApplicationTime && slot.Class == ttnpb.CLASS_C && time.Until(slot.Time) > 0:
+						case !slot.IsApplicationTime && slot.Class == ttnpb.Class_CLASS_C && time.Until(slot.Time) > 0:
 							logger.WithFields(log.Fields(
 								"slot_start", slot.Time,
 							)).Info("Class C downlink scheduling attempt performed too soon, retry attempt")
@@ -1878,7 +1878,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 							taskUpdateStrategy = nextDownlinkTask
 							return dev, nil, nil
 
-						case !slot.IsApplicationTime && slot.Class == ttnpb.CLASS_B && time.Until(slot.Time) < dev.MacState.CurrentParameters.Rx1Delay.Duration()/2:
+						case !slot.IsApplicationTime && slot.Class == ttnpb.Class_CLASS_B && time.Until(slot.Time) < dev.MacState.CurrentParameters.Rx1Delay.Duration()/2:
 							earliestAt = time.Now().Add(dev.MacState.CurrentParameters.Rx1Delay.Duration() / 2)
 							continue
 						}

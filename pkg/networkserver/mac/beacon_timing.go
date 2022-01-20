@@ -25,7 +25,7 @@ import (
 
 func DeviceNeedsBeaconTimingReq(dev *ttnpb.EndDevice) bool {
 	// TODO: Support BeaconTimingReq. (https://github.com/TheThingsNetwork/lorawan-stack/issues/2431)
-	return !dev.GetMulticast() && dev.GetMacState().GetDeviceClass() == ttnpb.CLASS_B && false
+	return !dev.GetMulticast() && dev.GetMacState().GetDeviceClass() == ttnpb.Class_CLASS_B && false
 }
 
 func HandleBeaconTimingReq(ctx context.Context, dev *ttnpb.EndDevice) (events.Builders, error) {

@@ -35,19 +35,19 @@ import (
 var (
 	evtCreateUserAPIKey = events.Define(
 		"user.api-key.create", "create user API key",
-		events.WithVisibility(ttnpb.RIGHT_USER_SETTINGS_API_KEYS),
+		events.WithVisibility(ttnpb.Right_RIGHT_USER_SETTINGS_API_KEYS),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtUpdateUserAPIKey = events.Define(
 		"user.api-key.update", "update user API key",
-		events.WithVisibility(ttnpb.RIGHT_USER_SETTINGS_API_KEYS),
+		events.WithVisibility(ttnpb.Right_RIGHT_USER_SETTINGS_API_KEYS),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtDeleteUserAPIKey = events.Define(
 		"user.api-key.delete", "delete user API key",
-		events.WithVisibility(ttnpb.RIGHT_USER_SETTINGS_API_KEYS),
+		events.WithVisibility(ttnpb.Right_RIGHT_USER_SETTINGS_API_KEYS),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
@@ -63,7 +63,7 @@ func (is *IdentityServer) listUserRights(ctx context.Context, ids *ttnpb.UserIde
 
 func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.CreateUserAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
-	if err = rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.Right_RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 	// Require that caller has at least the rights of the API key.
@@ -94,7 +94,7 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 }
 
 func (is *IdentityServer) listUserAPIKeys(ctx context.Context, req *ttnpb.ListUserAPIKeysRequest) (keys *ttnpb.APIKeys, err error) {
-	if err = rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.Right_RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 	var total uint64
@@ -119,7 +119,7 @@ func (is *IdentityServer) listUserAPIKeys(ctx context.Context, req *ttnpb.ListUs
 }
 
 func (is *IdentityServer) getUserAPIKey(ctx context.Context, req *ttnpb.GetUserAPIKeyRequest) (key *ttnpb.APIKey, err error) {
-	if err = rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.Right_RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 
@@ -140,7 +140,7 @@ func (is *IdentityServer) getUserAPIKey(ctx context.Context, req *ttnpb.GetUserA
 
 func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.UpdateUserAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
-	if err = rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.RIGHT_USER_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.Right_RIGHT_USER_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 

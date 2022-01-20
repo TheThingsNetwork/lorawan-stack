@@ -72,7 +72,7 @@ func TestFlow(t *testing.T) {
 
 	gtwCtx := rights.NewContext(ctx, rights.Rights{
 		GatewayRights: map[string]*ttnpb.Rights{
-			unique.ID(ctx, ids): ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_LINK),
+			unique.ID(ctx, ids): ttnpb.RightsFrom(ttnpb.Right_RIGHT_GATEWAY_LINK),
 		},
 	})
 	frontend, err := mock.ConnectFrontend(gtwCtx, ids, gs)
@@ -197,9 +197,9 @@ func TestFlow(t *testing.T) {
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:    ttnpb.CLASS_A,
+						Class:    ttnpb.Class_CLASS_A,
 						Priority: ttnpb.TxSchedulePriority_NORMAL,
-						Rx1Delay: ttnpb.RX_DELAY_1,
+						Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
 						Rx1DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
 								Lora: &ttnpb.LoRaDataRate{
@@ -231,9 +231,9 @@ func TestFlow(t *testing.T) {
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:    ttnpb.CLASS_A,
+						Class:    ttnpb.Class_CLASS_A,
 						Priority: ttnpb.TxSchedulePriority_NORMAL,
-						Rx1Delay: ttnpb.RX_DELAY_1,
+						Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
 						Rx1DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
 								Lora: &ttnpb.LoRaDataRate{
@@ -267,9 +267,9 @@ func TestFlow(t *testing.T) {
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:    ttnpb.CLASS_A,
+						Class:    ttnpb.Class_CLASS_A,
 						Priority: ttnpb.TxSchedulePriority_NORMAL,
-						Rx1Delay: ttnpb.RX_DELAY_1,
+						Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
 						Rx1DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
 								Lora: &ttnpb.LoRaDataRate{
@@ -302,7 +302,7 @@ func TestFlow(t *testing.T) {
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:    ttnpb.CLASS_A,
+						Class:    ttnpb.Class_CLASS_A,
 						Priority: ttnpb.TxSchedulePriority_NORMAL,
 						Rx1DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
@@ -336,7 +336,7 @@ func TestFlow(t *testing.T) {
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:    ttnpb.CLASS_C,
+						Class:    ttnpb.Class_CLASS_C,
 						Priority: ttnpb.TxSchedulePriority_NORMAL,
 						Rx2DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
@@ -368,7 +368,7 @@ func TestFlow(t *testing.T) {
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:    ttnpb.CLASS_C,
+						Class:    ttnpb.Class_CLASS_C,
 						Priority: ttnpb.TxSchedulePriority_NORMAL,
 						Rx2DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
@@ -400,7 +400,7 @@ func TestFlow(t *testing.T) {
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:    ttnpb.CLASS_C,
+						Class:    ttnpb.Class_CLASS_C,
 						Priority: ttnpb.TxSchedulePriority_NORMAL,
 						Rx2DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
@@ -425,7 +425,7 @@ func TestFlow(t *testing.T) {
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:    ttnpb.CLASS_C,
+						Class:    ttnpb.Class_CLASS_C,
 						Priority: ttnpb.TxSchedulePriority_NORMAL,
 						Rx2DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
@@ -460,7 +460,7 @@ func TestFlow(t *testing.T) {
 				RawPayload: bytes.Repeat([]byte{0x01}, 80),
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:    ttnpb.CLASS_C,
+						Class:    ttnpb.Class_CLASS_C,
 						Priority: ttnpb.TxSchedulePriority_NORMAL,
 						Rx2DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
@@ -553,7 +553,7 @@ func TestSubBandEIRPOverride(t *testing.T) {
 
 	gtwCtx := rights.NewContext(ctx, rights.Rights{
 		GatewayRights: map[string]*ttnpb.Rights{
-			unique.ID(ctx, ids): ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_LINK),
+			unique.ID(ctx, ids): ttnpb.RightsFrom(ttnpb.Right_RIGHT_GATEWAY_LINK),
 		},
 	})
 	frontend, err := mock.ConnectFrontend(gtwCtx, ids, gs)
@@ -621,9 +621,9 @@ func TestSubBandEIRPOverride(t *testing.T) {
 				RawPayload: []byte{0x01},
 				Settings: &ttnpb.DownlinkMessage_Request{
 					Request: &ttnpb.TxRequest{
-						Class:    ttnpb.CLASS_A,
+						Class:    ttnpb.Class_CLASS_A,
 						Priority: ttnpb.TxSchedulePriority_NORMAL,
-						Rx1Delay: ttnpb.RX_DELAY_1,
+						Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
 						Rx1DataRate: &ttnpb.DataRate{
 							Modulation: &ttnpb.DataRate_Lora{
 								Lora: &ttnpb.LoRaDataRate{

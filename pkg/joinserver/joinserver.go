@@ -142,12 +142,12 @@ func (js *JoinServer) RegisterInterop(srv *interop.Server) {
 }
 
 var supportedMACVersions = [...]ttnpb.MACVersion{
-	ttnpb.MAC_V1_0,
-	ttnpb.MAC_V1_0_1,
-	ttnpb.MAC_V1_0_2,
-	ttnpb.MAC_V1_0_3,
-	ttnpb.MAC_V1_0_4,
-	ttnpb.MAC_V1_1,
+	ttnpb.MACVersion_MAC_V1_0,
+	ttnpb.MACVersion_MAC_V1_0_1,
+	ttnpb.MACVersion_MAC_V1_0_2,
+	ttnpb.MACVersion_MAC_V1_0_3,
+	ttnpb.MACVersion_MAC_V1_0_4,
+	ttnpb.MACVersion_MAC_V1_1,
 }
 
 // wrapKeyWithVault wraps the given key with the configured KEK label.
@@ -716,7 +716,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 			return nil, errRegistryOperation.WithCause(err)
 		}
 		ctx = dev.Context
-		if err := appAuth.RequireApplication(ctx, *dev.Ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
+		if err := appAuth.RequireApplication(ctx, *dev.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 			return nil, err
 		}
 	}

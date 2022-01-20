@@ -34,19 +34,19 @@ func TestContext(t *testing.T) {
 
 	fooRights := Rights{
 		ApplicationRights: map[string]*ttnpb.Rights{
-			unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"}): ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_INFO),
+			unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"}): ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_INFO),
 		},
 		ClientRights: map[string]*ttnpb.Rights{
-			unique.ID(ctx, ttnpb.ClientIdentifiers{ClientId: "foo-cli"}): ttnpb.RightsFrom(ttnpb.RIGHT_CLIENT_ALL),
+			unique.ID(ctx, ttnpb.ClientIdentifiers{ClientId: "foo-cli"}): ttnpb.RightsFrom(ttnpb.Right_RIGHT_CLIENT_ALL),
 		},
 		GatewayRights: map[string]*ttnpb.Rights{
-			unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayId: "foo-gtw"}): ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO),
+			unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayId: "foo-gtw"}): ttnpb.RightsFrom(ttnpb.Right_RIGHT_GATEWAY_INFO),
 		},
 		OrganizationRights: map[string]*ttnpb.Rights{
-			unique.ID(ctx, ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"}): ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_INFO),
+			unique.ID(ctx, ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"}): ttnpb.RightsFrom(ttnpb.Right_RIGHT_ORGANIZATION_INFO),
 		},
 		UserRights: map[string]*ttnpb.Rights{
-			unique.ID(ctx, ttnpb.UserIdentifiers{UserId: "foo-usr"}): ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO),
+			unique.ID(ctx, ttnpb.UserIdentifiers{UserId: "foo-usr"}): ttnpb.RightsFrom(ttnpb.Right_RIGHT_USER_INFO),
 		},
 	}
 
@@ -55,9 +55,9 @@ func TestContext(t *testing.T) {
 	rights, ok = fromContext(ctx)
 	a.So(ok, should.BeTrue)
 	a.So(rights, should.Resemble, fooRights)
-	a.So(rights.IncludesApplicationRights(unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"}), ttnpb.RIGHT_APPLICATION_INFO), should.BeTrue)
-	a.So(rights.IncludesClientRights(unique.ID(ctx, ttnpb.ClientIdentifiers{ClientId: "foo-cli"}), ttnpb.RIGHT_CLIENT_ALL), should.BeTrue)
-	a.So(rights.IncludesGatewayRights(unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayId: "foo-gtw"}), ttnpb.RIGHT_GATEWAY_INFO), should.BeTrue)
-	a.So(rights.IncludesOrganizationRights(unique.ID(ctx, ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"}), ttnpb.RIGHT_ORGANIZATION_INFO), should.BeTrue)
-	a.So(rights.IncludesUserRights(unique.ID(ctx, ttnpb.UserIdentifiers{UserId: "foo-usr"}), ttnpb.RIGHT_USER_INFO), should.BeTrue)
+	a.So(rights.IncludesApplicationRights(unique.ID(ctx, ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"}), ttnpb.Right_RIGHT_APPLICATION_INFO), should.BeTrue)
+	a.So(rights.IncludesClientRights(unique.ID(ctx, ttnpb.ClientIdentifiers{ClientId: "foo-cli"}), ttnpb.Right_RIGHT_CLIENT_ALL), should.BeTrue)
+	a.So(rights.IncludesGatewayRights(unique.ID(ctx, ttnpb.GatewayIdentifiers{GatewayId: "foo-gtw"}), ttnpb.Right_RIGHT_GATEWAY_INFO), should.BeTrue)
+	a.So(rights.IncludesOrganizationRights(unique.ID(ctx, ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"}), ttnpb.Right_RIGHT_ORGANIZATION_INFO), should.BeTrue)
+	a.So(rights.IncludesUserRights(unique.ID(ctx, ttnpb.UserIdentifiers{UserId: "foo-usr"}), ttnpb.Right_RIGHT_USER_INFO), should.BeTrue)
 }

@@ -30,106 +30,106 @@ import (
 var (
 	evtReceiveDataUplink = events.Define(
 		"ns.up.data.receive", "receive data message",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.UplinkMessage{}),
 	)
 	evtDropDataUplink = events.Define(
 		"ns.up.data.drop", "drop data message",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)
 	evtProcessDataUplink = events.Define(
 		"ns.up.data.process", "successfully processed data message",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.UplinkMessage{}),
 	)
 	evtForwardDataUplink = events.Define(
 		"ns.up.data.forward", "forward data message to Application Server",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationUp{
 			Up: &ttnpb.ApplicationUp_UplinkMessage{UplinkMessage: &ttnpb.ApplicationUplink{}},
 		}),
 	)
 	evtScheduleDataDownlinkAttempt = events.Define(
 		"ns.down.data.schedule.attempt", "schedule data downlink for transmission on Gateway Server",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.DownlinkMessage{}),
 	)
 	evtScheduleDataDownlinkSuccess = events.Define(
 		"ns.down.data.schedule.success", "successfully scheduled data downlink for transmission on Gateway Server",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ScheduleDownlinkResponse{}),
 	)
 	evtScheduleDataDownlinkFail = events.Define(
 		"ns.down.data.schedule.fail", "failed to schedule data downlink for transmission on Gateway Server",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)
 	evtReceiveJoinRequest = events.Define(
 		"ns.up.join.receive", "receive join-request",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.UplinkMessage{}),
 	)
 	evtDropJoinRequest = events.Define(
 		"ns.up.join.drop", "drop join-request",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)
 	evtProcessJoinRequest = events.Define(
 		"ns.up.join.process", "successfully processed join-request",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.UplinkMessage{}),
 	)
 	evtClusterJoinAttempt = events.Define(
 		"ns.up.join.cluster.attempt", "send join-request to cluster-local Join Server",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.JoinRequest{}),
 	)
 	evtClusterJoinSuccess = events.Define(
 		"ns.up.join.cluster.success", "join-request to cluster-local Join Server succeeded",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.JoinResponse{}),
 	)
 	evtClusterJoinFail = events.Define(
 		"ns.up.join.cluster.fail", "join-request to cluster-local Join Server failed",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)
 	evtInteropJoinAttempt = events.Define(
 		"ns.up.join.interop.attempt", "forward join-request to interoperability Join Server",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.JoinRequest{}),
 	)
 	evtInteropJoinSuccess = events.Define(
 		"ns.up.join.interop.success", "join-request to interoperability Join Server succeeded",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.JoinResponse{}),
 	)
 	evtInteropJoinFail = events.Define(
 		"ns.up.join.interop.fail", "join-request to interoperability Join Server failed",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)
 	evtForwardJoinAccept = events.Define(
 		"ns.up.join.accept.forward", "forward join-accept to Application Server",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ApplicationUp{
 			Up: &ttnpb.ApplicationUp_JoinAccept{JoinAccept: &ttnpb.ApplicationJoinAccept{}},
 		}),
 	)
 	evtScheduleJoinAcceptAttempt = events.Define(
 		"ns.down.join.schedule.attempt", "schedule join-accept for transmission on Gateway Server",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.DownlinkMessage{}),
 	)
 	evtScheduleJoinAcceptSuccess = events.Define(
 		"ns.down.join.schedule.success", "successfully scheduled join-accept for transmission on Gateway Server",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithDataType(&ttnpb.ScheduleDownlinkResponse{}),
 	)
 	evtScheduleJoinAcceptFail = events.Define(
 		"ns.down.join.schedule.fail", "failed to schedule join-accept for transmission on Gateway Server",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
 	)
 )

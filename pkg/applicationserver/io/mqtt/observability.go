@@ -23,7 +23,7 @@ import (
 
 var evtConnectFail = events.Define(
 	"as.mqtt.connect.fail", "fail to connect to MQTT",
-	events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+	events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 	events.WithErrorDataType(),
 )
 

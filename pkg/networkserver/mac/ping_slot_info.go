@@ -40,13 +40,13 @@ func HandlePingSlotInfoReq(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb
 	evs := events.Builders{
 		EvtReceivePingSlotInfoRequest.With(events.WithData(pld)),
 	}
-	if dev.MacState.DeviceClass != ttnpb.CLASS_A {
+	if dev.MacState.DeviceClass != ttnpb.Class_CLASS_A {
 		log.FromContext(ctx).Debug("Ignore PingSlotInfoReq from device not in class A mode")
 		return evs, nil
 	}
 
 	dev.MacState.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{Value: pld.Period}
-	dev.MacState.QueuedResponses = append(dev.MacState.QueuedResponses, ttnpb.CID_PING_SLOT_INFO.MACCommand())
+	dev.MacState.QueuedResponses = append(dev.MacState.QueuedResponses, ttnpb.MACCommandIdentifier_CID_PING_SLOT_INFO.MACCommand())
 	return append(evs,
 		EvtEnqueuePingSlotInfoAnswer,
 	), nil

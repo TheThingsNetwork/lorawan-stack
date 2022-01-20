@@ -218,7 +218,7 @@ func TestGetDefaultMACSettings(t *testing.T) {
 			assertion: func(err error) bool { return err == nil },
 			req: &ttnpb.GetDefaultMACSettingsRequest{
 				FrequencyPlanId:   "EU_863_870",
-				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 			},
 		},
 	} {

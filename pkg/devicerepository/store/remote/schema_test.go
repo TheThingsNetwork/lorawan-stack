@@ -36,23 +36,23 @@ func TestDutyCycleFromFloat(t *testing.T) {
 	}{
 		{
 			Float: 1.0,
-			Enum:  ttnpb.DUTY_CYCLE_1,
+			Enum:  ttnpb.AggregatedDutyCycle_DUTY_CYCLE_1,
 		},
 		{
 			Float: 0.5,
-			Enum:  ttnpb.DUTY_CYCLE_2,
+			Enum:  ttnpb.AggregatedDutyCycle_DUTY_CYCLE_2,
 		},
 		{
 			Float: 0.25,
-			Enum:  ttnpb.DUTY_CYCLE_4,
+			Enum:  ttnpb.AggregatedDutyCycle_DUTY_CYCLE_4,
 		},
 		{
 			Float: 0.14,
-			Enum:  ttnpb.DUTY_CYCLE_8,
+			Enum:  ttnpb.AggregatedDutyCycle_DUTY_CYCLE_8,
 		},
 		{
 			Float: 1 / (2 << 20),
-			Enum:  ttnpb.DUTY_CYCLE_32768,
+			Enum:  ttnpb.AggregatedDutyCycle_DUTY_CYCLE_32768,
 		},
 	} {
 		a := assertions.New(t)
@@ -70,8 +70,8 @@ func TestProfile(t *testing.T) {
 			profile: "example-1",
 			template: &ttnpb.EndDeviceTemplate{
 				EndDevice: ttnpb.EndDevice{
-					LorawanVersion:    ttnpb.MAC_V1_0_2,
-					LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_2,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 					SupportsJoin:      true,
 					MacSettings: &ttnpb.MACSettings{
 						Supports_32BitFCnt: &ttnpb.BoolValue{Value: true},
@@ -95,16 +95,16 @@ func TestProfile(t *testing.T) {
 			codec:   "codec",
 			template: &ttnpb.EndDeviceTemplate{
 				EndDevice: ttnpb.EndDevice{
-					LorawanVersion:    ttnpb.MAC_V1_1,
-					LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 					Formatters: &ttnpb.MessagePayloadFormatters{
 						UpFormatter:   ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
 						DownFormatter: ttnpb.PayloadFormatter_FORMATTER_REPOSITORY,
 					},
 					MacSettings: &ttnpb.MACSettings{
-						Rx1Delay:          &ttnpb.RxDelayValue{Value: ttnpb.RX_DELAY_1},
+						Rx1Delay:          &ttnpb.RxDelayValue{Value: ttnpb.RxDelay_RX_DELAY_1},
 						Rx1DataRateOffset: &ttnpb.DataRateOffsetValue{Value: ttnpb.DataRateOffset_DATA_RATE_OFFSET_0},
-						Rx2DataRateIndex:  &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_3},
+						Rx2DataRateIndex:  &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex_DATA_RATE_3},
 						Rx2Frequency:      &ttnpb.FrequencyValue{Value: 869525000},
 						FactoryPresetFrequencies: []uint64{
 							868100000,
@@ -148,14 +148,14 @@ func TestProfile(t *testing.T) {
 			profile: "class-b-profile",
 			template: &ttnpb.EndDeviceTemplate{
 				EndDevice: ttnpb.EndDevice{
-					LorawanVersion:    ttnpb.MAC_V1_0_2,
-					LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_2,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 					SupportsClassB:    true,
 					SupportsJoin:      true,
 					MacSettings: &ttnpb.MACSettings{
 						ClassBTimeout:         ttnpb.ProtoDurationPtr(8 * time.Second),
-						PingSlotPeriodicity:   &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
-						PingSlotDataRateIndex: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_3},
+						PingSlotPeriodicity:   &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_16S},
+						PingSlotDataRateIndex: &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex_DATA_RATE_3},
 						PingSlotFrequency:     &ttnpb.FrequencyValue{Value: 868300000},
 					},
 				},
@@ -179,8 +179,8 @@ func TestProfile(t *testing.T) {
 			profile: "class-c-profile",
 			template: &ttnpb.EndDeviceTemplate{
 				EndDevice: ttnpb.EndDevice{
-					LorawanVersion:    ttnpb.MAC_V1_0_2,
-					LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_2,
+					LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 					SupportsClassC:    true,
 					SupportsJoin:      true,
 					MacSettings: &ttnpb.MACSettings{

@@ -138,37 +138,37 @@ var (
 			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-1"},
 			Snr:                    -9,
 			UplinkToken:            []byte("token-gtw-1"),
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
+			DownlinkPathConstraint: ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NONE,
 		},
 		{
 			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-3"},
 			Snr:                    -5.3,
 			UplinkToken:            []byte("token-gtw-3"),
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
+			DownlinkPathConstraint: ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
 		},
 		{
 			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-5"},
 			Snr:                    12,
 			UplinkToken:            []byte("token-gtw-5"),
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER,
+			DownlinkPathConstraint: ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER,
 		},
 		{
 			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-0"},
 			Snr:                    5.2,
 			UplinkToken:            []byte("token-gtw-0"),
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
+			DownlinkPathConstraint: ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NONE,
 		},
 		{
 			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-2"},
 			Snr:                    6.3,
 			UplinkToken:            []byte("token-gtw-2"),
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
+			DownlinkPathConstraint: ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
 		},
 		{
 			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-4"},
 			Snr:                    -7,
 			UplinkToken:            []byte("token-gtw-4"),
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
+			DownlinkPathConstraint: ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
 		},
 	}
 	PacketBrokerRxMetadata = [...]*ttnpb.RxMetadata{
@@ -180,7 +180,7 @@ var (
 				ForwarderNetId:     test.DefaultNetID,
 				ForwarderClusterId: "test-cluster",
 			},
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER,
+			DownlinkPathConstraint: ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER,
 		},
 		{
 			GatewayIds:  &ttnpb.GatewayIdentifiers{GatewayId: cluster.PacketBrokerGatewayID.GatewayId},
@@ -190,7 +190,7 @@ var (
 				ForwarderNetId:     test.DefaultNetID,
 				ForwarderClusterId: "other-cluster",
 			},
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER,
+			DownlinkPathConstraint: ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER,
 		},
 	}
 
@@ -215,8 +215,8 @@ var (
 )
 
 const (
-	DefaultEU868JoinAcceptDelay = ttnpb.RX_DELAY_5
-	DefaultEU868RX1Delay        = ttnpb.RX_DELAY_1
+	DefaultEU868JoinAcceptDelay = ttnpb.RxDelay_RX_DELAY_5
+	DefaultEU868RX1Delay        = ttnpb.RxDelay_RX_DELAY_1
 	DefaultEU868RX2Frequency    = 869525000
 )
 
@@ -224,22 +224,22 @@ var DefaultEU868Channels = [...]*ttnpb.MACParameters_Channel{
 	{
 		UplinkFrequency:   868100000,
 		DownlinkFrequency: 868100000,
-		MinDataRateIndex:  ttnpb.DATA_RATE_0,
-		MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+		MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+		MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 		EnableUplink:      true,
 	},
 	{
 		UplinkFrequency:   868300000,
 		DownlinkFrequency: 868300000,
-		MinDataRateIndex:  ttnpb.DATA_RATE_0,
-		MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+		MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+		MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 		EnableUplink:      true,
 	},
 	{
 		UplinkFrequency:   868500000,
 		DownlinkFrequency: 868500000,
-		MinDataRateIndex:  ttnpb.DATA_RATE_0,
-		MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+		MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+		MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 		EnableUplink:      true,
 	},
 }
@@ -250,17 +250,17 @@ func MakeDefaultEU868CurrentChannels() []*ttnpb.MACParameters_Channel {
 
 func MakeDefaultEU868CurrentMACParameters(phyVersion ttnpb.PHYVersion) *ttnpb.MACParameters {
 	return &ttnpb.MACParameters{
-		AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
-		AdrAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
+		AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADRAckDelayExponent_ADR_ACK_DELAY_32},
+		AdrAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_64},
 		AdrNbTrans:                 1,
-		MaxDutyCycle:               ttnpb.DUTY_CYCLE_1,
+		MaxDutyCycle:               ttnpb.AggregatedDutyCycle_DUTY_CYCLE_1,
 		MaxEirp:                    16,
-		PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_3},
+		PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex_DATA_RATE_3},
 		PingSlotFrequency:          869525000,
-		RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
-		RejoinTimePeriodicity:      ttnpb.REJOIN_TIME_0,
+		RejoinCountPeriodicity:     ttnpb.RejoinCountExponent_REJOIN_COUNT_16,
+		RejoinTimePeriodicity:      ttnpb.RejoinTimeExponent_REJOIN_TIME_0,
 		Rx1Delay:                   DefaultEU868RX1Delay,
-		Rx2DataRateIndex:           ttnpb.DATA_RATE_0,
+		Rx2DataRateIndex:           ttnpb.DataRateIndex_DATA_RATE_0,
 		Rx2Frequency:               DefaultEU868RX2Frequency,
 		Channels:                   MakeDefaultEU868CurrentChannels(),
 	}
@@ -271,36 +271,36 @@ func MakeDefaultEU868DesiredChannels() []*ttnpb.MACParameters_Channel {
 		&ttnpb.MACParameters_Channel{
 			UplinkFrequency:   867100000,
 			DownlinkFrequency: 867100000,
-			MinDataRateIndex:  ttnpb.DATA_RATE_0,
-			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 			EnableUplink:      true,
 		},
 		&ttnpb.MACParameters_Channel{
 			UplinkFrequency:   867300000,
 			DownlinkFrequency: 867300000,
-			MinDataRateIndex:  ttnpb.DATA_RATE_0,
-			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 			EnableUplink:      true,
 		},
 		&ttnpb.MACParameters_Channel{
 			UplinkFrequency:   867500000,
 			DownlinkFrequency: 867500000,
-			MinDataRateIndex:  ttnpb.DATA_RATE_0,
-			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 			EnableUplink:      true,
 		},
 		&ttnpb.MACParameters_Channel{
 			UplinkFrequency:   867700000,
 			DownlinkFrequency: 867700000,
-			MinDataRateIndex:  ttnpb.DATA_RATE_0,
-			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 			EnableUplink:      true,
 		},
 		&ttnpb.MACParameters_Channel{
 			UplinkFrequency:   867900000,
 			DownlinkFrequency: 867900000,
-			MinDataRateIndex:  ttnpb.DATA_RATE_0,
-			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+			MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 			EnableUplink:      true,
 		},
 	)
@@ -326,16 +326,16 @@ var DefaultUS915Channels = func() []*ttnpb.MACParameters_Channel {
 	for i := 0; i < 64; i++ {
 		chs = append(chs, &ttnpb.MACParameters_Channel{
 			UplinkFrequency:  uint64(902300000 + 200000*i),
-			MinDataRateIndex: ttnpb.DATA_RATE_0,
-			MaxDataRateIndex: ttnpb.DATA_RATE_3,
+			MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
 			EnableUplink:     true,
 		})
 	}
 	for i := 0; i < 8; i++ {
 		chs = append(chs, &ttnpb.MACParameters_Channel{
 			UplinkFrequency:  uint64(903000000 + 1600000*i),
-			MinDataRateIndex: ttnpb.DATA_RATE_4,
-			MaxDataRateIndex: ttnpb.DATA_RATE_4,
+			MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
+			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
 			EnableUplink:     true,
 		})
 	}
@@ -351,16 +351,16 @@ func MakeDefaultUS915CurrentChannels() []*ttnpb.MACParameters_Channel {
 
 func MakeDefaultUS915CurrentMACParameters(ver ttnpb.PHYVersion) *ttnpb.MACParameters {
 	return &ttnpb.MACParameters{
-		AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADR_ACK_DELAY_32},
-		AdrAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADR_ACK_LIMIT_64},
+		AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: ttnpb.ADRAckDelayExponent_ADR_ACK_DELAY_32},
+		AdrAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: ttnpb.ADRAckLimitExponent_ADR_ACK_LIMIT_64},
 		AdrNbTrans:                 1,
-		MaxDutyCycle:               ttnpb.DUTY_CYCLE_1,
+		MaxDutyCycle:               ttnpb.AggregatedDutyCycle_DUTY_CYCLE_1,
 		MaxEirp:                    30,
-		PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DATA_RATE_8},
-		RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
-		RejoinTimePeriodicity:      ttnpb.REJOIN_TIME_0,
-		Rx1Delay:                   ttnpb.RX_DELAY_1,
-		Rx2DataRateIndex:           ttnpb.DATA_RATE_8,
+		PingSlotDataRateIndexValue: &ttnpb.DataRateIndexValue{Value: ttnpb.DataRateIndex_DATA_RATE_8},
+		RejoinCountPeriodicity:     ttnpb.RejoinCountExponent_REJOIN_COUNT_16,
+		RejoinTimePeriodicity:      ttnpb.RejoinTimeExponent_REJOIN_TIME_0,
+		Rx1Delay:                   ttnpb.RxDelay_RX_DELAY_1,
+		Rx2DataRateIndex:           ttnpb.DataRateIndex_DATA_RATE_8,
 		Rx2Frequency:               923300000,
 		Channels:                   MakeDefaultUS915CurrentChannels(),
 	}
@@ -611,7 +611,7 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 	})).([]byte)
 	var mic [4]byte
 	switch {
-	case conf.MACVersion.Compare(ttnpb.MAC_V1_1) < 0:
+	case conf.MACVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0:
 		mic = test.Must(crypto.ComputeLegacyUplinkMIC(*keys.FNwkSIntKey.Key, devAddr, conf.FCnt, phyPayload)).([4]byte)
 	default:
 		mic = test.Must(crypto.ComputeUplinkMIC(*keys.SNwkSIntKey.Key, *keys.FNwkSIntKey.Key, conf.ConfFCntDown, uint8(conf.DataRateIndex), conf.ChannelIndex, devAddr, conf.FCnt, phyPayload)).([4]byte)
@@ -726,7 +726,7 @@ func MakeDataDownlink(conf DataDownlinkConfig) *ttnpb.DownlinkMessage {
 	phyPayload := test.Must(lorawan.MarshalMessage(*msg)).([]byte)
 	var mic [4]byte
 	switch {
-	case conf.MACVersion.Compare(ttnpb.MAC_V1_1) < 0:
+	case conf.MACVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0:
 		mic = test.Must(crypto.ComputeLegacyDownlinkMIC(*keys.FNwkSIntKey.Key, devAddr, conf.FCnt, phyPayload)).([4]byte)
 	default:
 		mic = test.Must(crypto.ComputeDownlinkMIC(*keys.SNwkSIntKey.Key, devAddr, conf.ConfFCntUp, conf.FCnt, phyPayload)).([4]byte)
@@ -765,8 +765,8 @@ func ForEachBand(tb testing.TB, f func(func(...string) string, *band.Band, ttnpb
 		}
 		for phyVersion, b := range phyVersions {
 			switch phyVersion {
-			case ttnpb.RP001_V1_0_3_REV_A, ttnpb.RP001_V1_1_REV_B:
-			case ttnpb.RP001_V1_0_2_REV_B:
+			case ttnpb.PHYVersion_RP001_V1_0_3_REV_A, ttnpb.PHYVersion_RP001_V1_1_REV_B:
+			case ttnpb.PHYVersion_RP001_V1_0_2_REV_B:
 				if !testing.Short() {
 					break
 				}
@@ -784,16 +784,16 @@ func ForEachBand(tb testing.TB, f func(func(...string) string, *band.Band, ttnpb
 
 func ForEachMACVersion(tb testing.TB, f func(func(...string) string, ttnpb.MACVersion)) {
 	for _, macVersion := range []ttnpb.MACVersion{
-		ttnpb.MAC_V1_0,
-		ttnpb.MAC_V1_0_1,
-		ttnpb.MAC_V1_0_2,
-		ttnpb.MAC_V1_0_3,
-		ttnpb.MAC_V1_0_4,
-		ttnpb.MAC_V1_1,
+		ttnpb.MACVersion_MAC_V1_0,
+		ttnpb.MACVersion_MAC_V1_0_1,
+		ttnpb.MACVersion_MAC_V1_0_2,
+		ttnpb.MACVersion_MAC_V1_0_3,
+		ttnpb.MACVersion_MAC_V1_0_4,
+		ttnpb.MACVersion_MAC_V1_1,
 	} {
 		switch macVersion {
-		case ttnpb.MAC_V1_0_4, ttnpb.MAC_V1_1:
-		case ttnpb.MAC_V1_0_3:
+		case ttnpb.MACVersion_MAC_V1_0_4, ttnpb.MACVersion_MAC_V1_1:
+		case ttnpb.MACVersion_MAC_V1_0_3:
 			if !testing.Short() {
 				break
 			}
@@ -810,9 +810,9 @@ func ForEachMACVersion(tb testing.TB, f func(func(...string) string, ttnpb.MACVe
 
 func ForEachClass(tb testing.TB, f func(func(...string) string, ttnpb.Class)) {
 	for _, class := range []ttnpb.Class{
-		ttnpb.CLASS_A,
-		ttnpb.CLASS_B,
-		ttnpb.CLASS_C,
+		ttnpb.Class_CLASS_A,
+		ttnpb.Class_CLASS_B,
+		ttnpb.Class_CLASS_C,
 	} {
 		f(func(parts ...string) string {
 			return MakeTestCaseName(append(parts, fmt.Sprintf("Class:%s", class.String()))...)
@@ -847,8 +847,8 @@ func ForEachFrequencyPlan(tb testing.TB, f func(func(...string) string, string, 
 func ForEachLoRaWANVersionPair(tb testing.TB, f func(func(...string) string, ttnpb.MACVersion, ttnpb.PHYVersion)) {
 	for macVersion, phyVersions := range internal.LoRaWANVersionPairs {
 		switch macVersion {
-		case ttnpb.MAC_V1_0_3, ttnpb.MAC_V1_1:
-		case ttnpb.MAC_V1_0_2:
+		case ttnpb.MACVersion_MAC_V1_0_3, ttnpb.MACVersion_MAC_V1_1:
+		case ttnpb.MACVersion_MAC_V1_0_2:
 			if !testing.Short() {
 				break
 			}

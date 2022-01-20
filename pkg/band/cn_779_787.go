@@ -27,27 +27,27 @@ var (
 	cn779787DefaultChannels = []Channel{
 		{
 			Frequency:   779500000,
-			MaxDataRate: ttnpb.DATA_RATE_5,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 		},
 		{
 			Frequency:   779700000,
-			MaxDataRate: ttnpb.DATA_RATE_5,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 		},
 		{
 			Frequency:   779900000,
-			MaxDataRate: ttnpb.DATA_RATE_5,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 		},
 		{
 			Frequency:   780500000,
-			MaxDataRate: ttnpb.DATA_RATE_5,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 		},
 		{
 			Frequency:   780700000,
-			MaxDataRate: ttnpb.DATA_RATE_5,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 		},
 		{
 			Frequency:   780900000,
-			MaxDataRate: ttnpb.DATA_RATE_5,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 		},
 	}
 

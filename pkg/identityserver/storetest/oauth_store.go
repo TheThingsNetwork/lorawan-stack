@@ -50,12 +50,12 @@ func (st *StoreTest) TestOAuthStore(t *T) {
 		createdAuthorization, err = s.Authorize(ctx, &ttnpb.OAuthClientAuthorization{
 			UserIds:   usr1.GetIds(),
 			ClientIds: cli1.GetIds(),
-			Rights:    []ttnpb.Right{ttnpb.RIGHT_USER_ALL},
+			Rights:    []ttnpb.Right{ttnpb.Right_RIGHT_USER_ALL},
 		})
 		if a.So(err, should.BeNil) && a.So(createdAuthorization, should.NotBeNil) {
 			a.So(createdAuthorization.UserIds, should.Resemble, usr1.GetIds())
 			a.So(createdAuthorization.ClientIds, should.Resemble, cli1.GetIds())
-			a.So(createdAuthorization.Rights, should.Resemble, []ttnpb.Right{ttnpb.RIGHT_USER_ALL})
+			a.So(createdAuthorization.Rights, should.Resemble, []ttnpb.Right{ttnpb.Right_RIGHT_USER_ALL})
 			a.So(*ttnpb.StdTime(createdAuthorization.CreatedAt), should.HappenWithin, 5*time.Second, start)
 			a.So(*ttnpb.StdTime(createdAuthorization.UpdatedAt), should.HappenWithin, 5*time.Second, start)
 		}
@@ -87,12 +87,12 @@ func (st *StoreTest) TestOAuthStore(t *T) {
 		updatedAuthorization, err = s.Authorize(ctx, &ttnpb.OAuthClientAuthorization{
 			UserIds:   usr1.GetIds(),
 			ClientIds: cli1.GetIds(),
-			Rights:    []ttnpb.Right{ttnpb.RIGHT_USER_ALL},
+			Rights:    []ttnpb.Right{ttnpb.Right_RIGHT_USER_ALL},
 		})
 		if a.So(err, should.BeNil) && a.So(updatedAuthorization, should.NotBeNil) {
 			a.So(updatedAuthorization.UserIds, should.Resemble, usr1.GetIds())
 			a.So(updatedAuthorization.ClientIds, should.Resemble, cli1.GetIds())
-			a.So(updatedAuthorization.Rights, should.Resemble, []ttnpb.Right{ttnpb.RIGHT_USER_ALL})
+			a.So(updatedAuthorization.Rights, should.Resemble, []ttnpb.Right{ttnpb.Right_RIGHT_USER_ALL})
 			a.So(*ttnpb.StdTime(updatedAuthorization.CreatedAt), should.Equal, *ttnpb.StdTime(createdAuthorization.CreatedAt))
 			a.So(*ttnpb.StdTime(updatedAuthorization.UpdatedAt), should.HappenWithin, 5*time.Second, start)
 		}
@@ -141,7 +141,7 @@ func (st *StoreTest) TestOAuthStore(t *T) {
 		_, err := s.Authorize(ctx, &ttnpb.OAuthClientAuthorization{
 			UserIds:   usr1.GetIds(),
 			ClientIds: cli1.GetIds(),
-			Rights:    []ttnpb.Right{ttnpb.RIGHT_USER_ALL},
+			Rights:    []ttnpb.Right{ttnpb.Right_RIGHT_USER_ALL},
 		})
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
@@ -161,7 +161,7 @@ func (st *StoreTest) TestOAuthStore(t *T) {
 		_, err := s.Authorize(ctx, &ttnpb.OAuthClientAuthorization{
 			UserIds:   usr1.GetIds(),
 			ClientIds: cli1.GetIds(),
-			Rights:    []ttnpb.Right{ttnpb.RIGHT_USER_ALL},
+			Rights:    []ttnpb.Right{ttnpb.Right_RIGHT_USER_ALL},
 		})
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
@@ -187,7 +187,7 @@ func (st *StoreTest) TestOAuthStore(t *T) {
 			UserIds:       usr1.GetIds(),
 			UserSessionId: ses1.GetSessionId(),
 			ClientIds:     cli1.GetIds(),
-			Rights:        []ttnpb.Right{ttnpb.RIGHT_USER_ALL},
+			Rights:        []ttnpb.Right{ttnpb.Right_RIGHT_USER_ALL},
 			Code:          "CODE",
 			RedirectUri:   "https://example.com",
 			State:         "state",
@@ -197,7 +197,7 @@ func (st *StoreTest) TestOAuthStore(t *T) {
 			a.So(createdAuthorizationCode.UserIds, should.Resemble, usr1.GetIds())
 			a.So(createdAuthorizationCode.UserSessionId, should.Equal, ses1.GetSessionId())
 			a.So(createdAuthorizationCode.ClientIds, should.Resemble, cli1.GetIds())
-			a.So(createdAuthorizationCode.Rights, should.Resemble, []ttnpb.Right{ttnpb.RIGHT_USER_ALL})
+			a.So(createdAuthorizationCode.Rights, should.Resemble, []ttnpb.Right{ttnpb.Right_RIGHT_USER_ALL})
 			a.So(createdAuthorizationCode.Code, should.Equal, "CODE")
 			a.So(createdAuthorizationCode.RedirectUri, should.Equal, "https://example.com")
 			a.So(createdAuthorizationCode.State, should.Equal, "state")
@@ -270,7 +270,7 @@ func (st *StoreTest) TestOAuthStore(t *T) {
 			Id:            "token_id",
 			AccessToken:   "access_token",
 			RefreshToken:  "refresh_token",
-			Rights:        []ttnpb.Right{ttnpb.RIGHT_USER_ALL},
+			Rights:        []ttnpb.Right{ttnpb.Right_RIGHT_USER_ALL},
 			ExpiresAt:     ttnpb.ProtoTimePtr(start.Add(5 * time.Minute)),
 		}, "")
 		if a.So(err, should.BeNil) && a.So(createdAccessToken, should.NotBeNil) {
@@ -280,7 +280,7 @@ func (st *StoreTest) TestOAuthStore(t *T) {
 			a.So(createdAccessToken.Id, should.Equal, "token_id")
 			a.So(createdAccessToken.AccessToken, should.Equal, "access_token")
 			a.So(createdAccessToken.RefreshToken, should.Equal, "refresh_token")
-			a.So(createdAccessToken.Rights, should.Resemble, []ttnpb.Right{ttnpb.RIGHT_USER_ALL})
+			a.So(createdAccessToken.Rights, should.Resemble, []ttnpb.Right{ttnpb.Right_RIGHT_USER_ALL})
 			a.So(*ttnpb.StdTime(createdAccessToken.ExpiresAt), should.Equal, start.Add(5*time.Minute))
 			a.So(*ttnpb.StdTime(createdAccessToken.CreatedAt), should.HappenWithin, 5*time.Second, start)
 		}

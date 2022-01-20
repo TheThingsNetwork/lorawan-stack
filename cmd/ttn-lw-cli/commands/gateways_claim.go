@@ -133,9 +133,9 @@ If no API key is provided, a new one will be created.`,
 			}
 
 			requiredRights := []ttnpb.Right{
-				ttnpb.RIGHT_GATEWAY_READ_SECRETS,
-				ttnpb.RIGHT_GATEWAY_DELETE,
-				ttnpb.RIGHT_GATEWAY_INFO,
+				ttnpb.Right_RIGHT_GATEWAY_READ_SECRETS,
+				ttnpb.Right_RIGHT_GATEWAY_DELETE,
+				ttnpb.Right_RIGHT_GATEWAY_INFO,
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)

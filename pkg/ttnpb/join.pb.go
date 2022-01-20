@@ -86,7 +86,7 @@ func (m *JoinRequest) GetSelectedMacVersion() MACVersion {
 	if m != nil {
 		return m.SelectedMacVersion
 	}
-	return MAC_UNKNOWN
+	return MACVersion_MAC_UNKNOWN
 }
 
 func (m *JoinRequest) GetDownlinkSettings() *DLSettings {
@@ -100,7 +100,7 @@ func (m *JoinRequest) GetRxDelay() RxDelay {
 	if m != nil {
 		return m.RxDelay
 	}
-	return RX_DELAY_0
+	return RxDelay_RX_DELAY_0
 }
 
 func (m *JoinRequest) GetCfList() *CFList {

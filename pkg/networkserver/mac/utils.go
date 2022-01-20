@@ -187,16 +187,16 @@ var errClassAMulticast = errors.DefineInvalidArgument("class_a_multicast", "mult
 
 func DeviceDefaultClass(dev *ttnpb.EndDevice) (ttnpb.Class, error) {
 	switch {
-	case dev.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 && dev.SupportsClassC:
-		return ttnpb.CLASS_C, nil
+	case dev.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 && dev.SupportsClassC:
+		return ttnpb.Class_CLASS_C, nil
 	case !dev.Multicast:
-		return ttnpb.CLASS_A, nil
+		return ttnpb.Class_CLASS_A, nil
 	case dev.SupportsClassC:
-		return ttnpb.CLASS_C, nil
+		return ttnpb.Class_CLASS_C, nil
 	case dev.SupportsClassB:
-		return ttnpb.CLASS_B, nil
+		return ttnpb.Class_CLASS_B, nil
 	default:
-		return ttnpb.CLASS_A, errClassAMulticast.New()
+		return ttnpb.Class_CLASS_A, errClassAMulticast.New()
 	}
 }
 
@@ -204,8 +204,8 @@ func DeviceDefaultLoRaWANVersion(dev *ttnpb.EndDevice) ttnpb.MACVersion {
 	switch {
 	case dev.Multicast:
 		return dev.LorawanVersion
-	case dev.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0:
-		return ttnpb.MAC_V1_1
+	case dev.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0:
+		return ttnpb.MACVersion_MAC_V1_1
 	default:
 		return dev.LorawanVersion
 	}
@@ -368,7 +368,7 @@ func DeviceDefaultMaxDutyCycle(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings)
 	case defaults.MaxDutyCycle != nil:
 		return defaults.MaxDutyCycle.Value
 	default:
-		return ttnpb.DUTY_CYCLE_1
+		return ttnpb.AggregatedDutyCycle_DUTY_CYCLE_1
 	}
 }
 
@@ -512,7 +512,7 @@ outer:
 		// In the latest regional parameters spec(1.1b) the data rate ranges are DR0-DR5 for mandatory channels in all non-fixed channel plans,
 		// hence we assume the same range for predefined channels.
 		chs = append(chs, &ttnpb.MACParameters_Channel{
-			MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+			MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 			UplinkFrequency:   freq,
 			DownlinkFrequency: freq,
 			EnableUplink:      true,
@@ -595,15 +595,15 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MA
 
 	current := &ttnpb.MACParameters{
 		MaxEirp:                    phy.DefaultMaxEIRP,
-		AdrDataRateIndex:           ttnpb.DATA_RATE_0,
+		AdrDataRateIndex:           ttnpb.DataRateIndex_DATA_RATE_0,
 		AdrNbTrans:                 1,
 		Rx1Delay:                   DeviceDefaultRX1Delay(dev, phy, defaults),
 		Rx1DataRateOffset:          DeviceDefaultRX1DataRateOffset(dev, defaults),
 		Rx2DataRateIndex:           DeviceDefaultRX2DataRateIndex(dev, phy, defaults),
 		Rx2Frequency:               DeviceDefaultRX2Frequency(dev, phy, defaults),
 		MaxDutyCycle:               DeviceDefaultMaxDutyCycle(dev, defaults),
-		RejoinTimePeriodicity:      ttnpb.REJOIN_TIME_0,
-		RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
+		RejoinTimePeriodicity:      ttnpb.RejoinTimeExponent_REJOIN_TIME_0,
+		RejoinCountPeriodicity:     ttnpb.RejoinCountExponent_REJOIN_COUNT_16,
 		PingSlotFrequency:          DeviceDefaultPingSlotFrequency(dev, phy, defaults),
 		BeaconFrequency:            DeviceDefaultBeaconFrequency(dev, defaults),
 		Channels:                   DeviceDefaultChannels(dev, phy, defaults),
@@ -615,15 +615,15 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MA
 	if !dev.Multicast {
 		desired = &ttnpb.MACParameters{
 			MaxEirp:                    DeviceDesiredMaxEIRP(dev, phy, fp, defaults),
-			AdrDataRateIndex:           ttnpb.DATA_RATE_0,
+			AdrDataRateIndex:           ttnpb.DataRateIndex_DATA_RATE_0,
 			AdrNbTrans:                 1,
 			Rx1Delay:                   DeviceDesiredRX1Delay(dev, phy, defaults),
 			Rx1DataRateOffset:          DeviceDesiredRX1DataRateOffset(dev, defaults),
 			Rx2DataRateIndex:           DeviceDesiredRX2DataRateIndex(dev, phy, fp, defaults),
 			Rx2Frequency:               DeviceDesiredRX2Frequency(dev, phy, fp, defaults),
 			MaxDutyCycle:               DeviceDesiredMaxDutyCycle(dev, defaults),
-			RejoinTimePeriodicity:      ttnpb.REJOIN_TIME_0,
-			RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
+			RejoinTimePeriodicity:      ttnpb.RejoinTimeExponent_REJOIN_TIME_0,
+			RejoinCountPeriodicity:     ttnpb.RejoinCountExponent_REJOIN_COUNT_16,
 			PingSlotFrequency:          DeviceDesiredPingSlotFrequency(dev, phy, fp, defaults),
 			BeaconFrequency:            DeviceDesiredBeaconFrequency(dev, defaults),
 			Channels:                   DeviceDesiredChannels(dev, phy, fp, defaults),

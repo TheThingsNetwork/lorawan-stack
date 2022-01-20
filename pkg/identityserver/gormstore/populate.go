@@ -48,7 +48,7 @@ func NewPopulator(size int, seed int64) *Populator {
 			p.APIKeys[applicationID],
 			&ttnpb.APIKey{
 				Name:   "default key",
-				Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
+				Rights: []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL},
 			},
 		)
 		client := &ttnpb.Client{
@@ -80,7 +80,7 @@ func NewPopulator(size int, seed int64) *Populator {
 			p.APIKeys[gatewayID],
 			&ttnpb.APIKey{
 				Name:   "default key",
-				Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
+				Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_ALL},
 			},
 		)
 		organization := &ttnpb.Organization{
@@ -94,7 +94,7 @@ func NewPopulator(size int, seed int64) *Populator {
 			p.APIKeys[organizationID],
 			&ttnpb.APIKey{
 				Name:   "default key",
-				Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL, ttnpb.RIGHT_CLIENT_ALL, ttnpb.RIGHT_GATEWAY_ALL, ttnpb.RIGHT_ORGANIZATION_ALL},
+				Rights: []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL, ttnpb.Right_RIGHT_CLIENT_ALL, ttnpb.Right_RIGHT_GATEWAY_ALL, ttnpb.Right_RIGHT_ORGANIZATION_ALL},
 			},
 		)
 		user := &ttnpb.User{
@@ -110,7 +110,7 @@ func NewPopulator(size int, seed int64) *Populator {
 			p.APIKeys[userID],
 			&ttnpb.APIKey{
 				Name:   "default key",
-				Rights: []ttnpb.Right{ttnpb.RIGHT_ALL},
+				Rights: []ttnpb.Right{ttnpb.Right_RIGHT_ALL},
 			},
 		)
 		eui := &types.EUI64{}
@@ -133,7 +133,7 @@ func NewPopulator(size int, seed int64) *Populator {
 			ouID := p.Users[userIndex%len(p.Users)].OrganizationOrUserIdentifiers()
 			p.Memberships[applicationID] = append(p.Memberships[applicationID], &ttnpb.Collaborator{
 				Ids:    ouID,
-				Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
+				Rights: []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL},
 			})
 			userIndex++
 		}
@@ -142,7 +142,7 @@ func NewPopulator(size int, seed int64) *Populator {
 			ouID := p.Organizations[organizationIndex%len(p.Organizations)].OrganizationOrUserIdentifiers()
 			p.Memberships[applicationID] = append(p.Memberships[applicationID], &ttnpb.Collaborator{
 				Ids:    ouID,
-				Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL},
+				Rights: []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL},
 			})
 			organizationIndex++
 		}
@@ -154,7 +154,7 @@ func NewPopulator(size int, seed int64) *Populator {
 			ouID := p.Users[userIndex%len(p.Users)].OrganizationOrUserIdentifiers()
 			p.Memberships[clientID] = append(p.Memberships[clientID], &ttnpb.Collaborator{
 				Ids:    ouID,
-				Rights: []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
+				Rights: []ttnpb.Right{ttnpb.Right_RIGHT_CLIENT_ALL},
 			})
 			userIndex++
 		}
@@ -163,7 +163,7 @@ func NewPopulator(size int, seed int64) *Populator {
 			ouID := p.Organizations[organizationIndex%len(p.Organizations)].OrganizationOrUserIdentifiers()
 			p.Memberships[clientID] = append(p.Memberships[clientID], &ttnpb.Collaborator{
 				Ids:    ouID,
-				Rights: []ttnpb.Right{ttnpb.RIGHT_CLIENT_ALL},
+				Rights: []ttnpb.Right{ttnpb.Right_RIGHT_CLIENT_ALL},
 			})
 			organizationIndex++
 		}
@@ -175,7 +175,7 @@ func NewPopulator(size int, seed int64) *Populator {
 			ouID := p.Users[userIndex%len(p.Users)].OrganizationOrUserIdentifiers()
 			p.Memberships[gatewayID] = append(p.Memberships[gatewayID], &ttnpb.Collaborator{
 				Ids:    ouID,
-				Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
+				Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_ALL},
 			})
 			userIndex++
 		}
@@ -184,7 +184,7 @@ func NewPopulator(size int, seed int64) *Populator {
 			ouID := p.Organizations[organizationIndex%len(p.Organizations)].OrganizationOrUserIdentifiers()
 			p.Memberships[gatewayID] = append(p.Memberships[gatewayID], &ttnpb.Collaborator{
 				Ids:    ouID,
-				Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_ALL},
+				Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_ALL},
 			})
 			organizationIndex++
 		}
@@ -196,7 +196,7 @@ func NewPopulator(size int, seed int64) *Populator {
 			ouID := p.Users[userIndex%len(p.Users)].OrganizationOrUserIdentifiers()
 			p.Memberships[organizationID] = append(p.Memberships[organizationID], &ttnpb.Collaborator{
 				Ids:    ouID,
-				Rights: []ttnpb.Right{ttnpb.RIGHT_APPLICATION_ALL, ttnpb.RIGHT_CLIENT_ALL, ttnpb.RIGHT_GATEWAY_ALL, ttnpb.RIGHT_ORGANIZATION_ALL},
+				Rights: []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL, ttnpb.Right_RIGHT_CLIENT_ALL, ttnpb.Right_RIGHT_GATEWAY_ALL, ttnpb.Right_RIGHT_ORGANIZATION_ALL},
 			})
 			userIndex++
 		}

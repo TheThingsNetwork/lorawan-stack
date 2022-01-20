@@ -76,7 +76,7 @@ func (s *server) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdenti
 
 // Connect implements io.Server.
 func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
-	if err := rights.RequireGateway(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
+	if err := rights.RequireGateway(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
 	gtw, ok := s.gateways[unique.ID(ctx, ids)]

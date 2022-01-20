@@ -108,13 +108,13 @@ func TestPba(t *testing.T) {
 						},
 						ContactInfo: []*ttnpb.ContactInfo{
 							{
-								ContactType:   ttnpb.CONTACT_TYPE_OTHER,
-								ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+								ContactType:   ttnpb.ContactType_CONTACT_TYPE_OTHER,
+								ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 								Value:         "admin@example.com",
 							},
 							{
-								ContactType:   ttnpb.CONTACT_TYPE_TECHNICAL,
-								ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+								ContactType:   ttnpb.ContactType_CONTACT_TYPE_TECHNICAL,
+								ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 								Value:         "tech@example.com",
 							},
 						},
@@ -182,13 +182,13 @@ func TestPba(t *testing.T) {
 					},
 					ContactInfo: []*ttnpb.ContactInfo{
 						{
-							ContactType:   ttnpb.CONTACT_TYPE_OTHER,
-							ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+							ContactType:   ttnpb.ContactType_CONTACT_TYPE_OTHER,
+							ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 							Value:         "admin@example.com",
 						},
 						{
-							ContactType:   ttnpb.CONTACT_TYPE_TECHNICAL,
-							ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+							ContactType:   ttnpb.ContactType_CONTACT_TYPE_TECHNICAL,
+							ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 							Value:         "tech@example.com",
 						},
 					},
@@ -273,13 +273,13 @@ func TestPba(t *testing.T) {
 					},
 					ContactInfo: []*ttnpb.ContactInfo{
 						{
-							ContactType:   ttnpb.CONTACT_TYPE_OTHER,
-							ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+							ContactType:   ttnpb.ContactType_CONTACT_TYPE_OTHER,
+							ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 							Value:         "admin@example.com",
 						},
 						{
-							ContactType:   ttnpb.CONTACT_TYPE_TECHNICAL,
-							ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+							ContactType:   ttnpb.ContactType_CONTACT_TYPE_TECHNICAL,
+							ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 							Value:         "tech@example.com",
 						},
 					},

@@ -221,7 +221,7 @@ func (m *CryptoServicePayloadRequest) GetLorawanVersion() MACVersion {
 	if m != nil {
 		return m.LorawanVersion
 	}
-	return MAC_UNKNOWN
+	return MACVersion_MAC_UNKNOWN
 }
 
 func (m *CryptoServicePayloadRequest) GetPayload() []byte {
@@ -390,7 +390,7 @@ func (m *DeriveSessionKeysRequest) GetLorawanVersion() MACVersion {
 	if m != nil {
 		return m.LorawanVersion
 	}
-	return MAC_UNKNOWN
+	return MACVersion_MAC_UNKNOWN
 }
 
 func (m *DeriveSessionKeysRequest) GetProvisionerId() string {

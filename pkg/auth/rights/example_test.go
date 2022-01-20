@@ -27,7 +27,7 @@ func ExampleRequireApplication() {
 		dev ttnpb.EndDevice
 	)
 
-	if err := rights.RequireApplication(ctx, *dev.Ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	if err := rights.RequireApplication(ctx, *dev.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		// return nil, err
 	}
 }

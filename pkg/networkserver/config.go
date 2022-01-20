@@ -156,7 +156,7 @@ var DefaultConfig = Config{
 	},
 	DefaultMACSettings: MACSettingConfig{
 		ADRMargin:              func(v float32) *float32 { return &v }(mac.DefaultADRMargin),
-		DesiredRx1Delay:        func(v ttnpb.RxDelay) *ttnpb.RxDelay { return &v }(ttnpb.RX_DELAY_5),
+		DesiredRx1Delay:        func(v ttnpb.RxDelay) *ttnpb.RxDelay { return &v }(ttnpb.RxDelay_RX_DELAY_5),
 		ClassBTimeout:          func(v time.Duration) *time.Duration { return &v }(mac.DefaultClassBTimeout),
 		ClassCTimeout:          func(v time.Duration) *time.Duration { return &v }(mac.DefaultClassCTimeout),
 		StatusTimePeriodicity:  func(v time.Duration) *time.Duration { return &v }(mac.DefaultStatusTimePeriodicity),

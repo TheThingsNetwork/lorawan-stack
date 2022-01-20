@@ -25,11 +25,11 @@ var (
 	ru864870DefaultChannels = []Channel{
 		{
 			Frequency:   868900000,
-			MaxDataRate: ttnpb.DATA_RATE_5,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 		},
 		{
 			Frequency:   869100000,
-			MaxDataRate: ttnpb.DATA_RATE_5,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 		},
 	}
 

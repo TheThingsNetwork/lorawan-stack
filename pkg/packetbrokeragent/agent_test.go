@@ -407,7 +407,7 @@ func TestForwarder(t *testing.T) {
 			CorrelationIds: gtwMsg.CorrelationIds,
 			Settings: &ttnpb.DownlinkMessage_Request{
 				Request: &ttnpb.TxRequest{
-					Class: ttnpb.CLASS_A,
+					Class: ttnpb.Class_CLASS_A,
 					DownlinkPaths: []*ttnpb.DownlinkPath{
 						{
 							Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -425,7 +425,7 @@ func TestForwarder(t *testing.T) {
 						},
 					},
 					Rx1Frequency: 868100000,
-					Rx1Delay:     ttnpb.RX_DELAY_5,
+					Rx1Delay:     ttnpb.RxDelay_RX_DELAY_5,
 					Rx2DataRate: &ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{
@@ -465,13 +465,13 @@ func TestForwarder(t *testing.T) {
 				},
 				ContactInfo: []*ttnpb.ContactInfo{
 					{
-						ContactType:   ttnpb.CONTACT_TYPE_OTHER,
-						ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+						ContactType:   ttnpb.ContactType_CONTACT_TYPE_OTHER,
+						ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 						Value:         "admin@example.com",
 					},
 					{
-						ContactType:   ttnpb.CONTACT_TYPE_TECHNICAL,
-						ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+						ContactType:   ttnpb.ContactType_CONTACT_TYPE_TECHNICAL,
+						ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 						Value:         "tech@example.com",
 					},
 				},
@@ -483,7 +483,7 @@ func TestForwarder(t *testing.T) {
 							Longitude: 52.34562,
 							Altitude:  16,
 							Accuracy:  10,
-							Source:    ttnpb.SOURCE_REGISTRY,
+							Source:    ttnpb.LocationSource_SOURCE_REGISTRY,
 						},
 					},
 				},
@@ -881,7 +881,7 @@ func TestHomeNetwork(t *testing.T) {
 			Settings: &ttnpb.DownlinkMessage_Request{
 				Request: &ttnpb.TxRequest{
 					FrequencyPlanId: test.EUFrequencyPlanID,
-					Class:           ttnpb.CLASS_A,
+					Class:           ttnpb.Class_CLASS_A,
 					DownlinkPaths: []*ttnpb.DownlinkPath{
 						{
 							Path: &ttnpb.DownlinkPath_UplinkToken{
@@ -903,7 +903,7 @@ func TestHomeNetwork(t *testing.T) {
 						},
 					},
 					Rx1Frequency: 868100000,
-					Rx1Delay:     ttnpb.RX_DELAY_5,
+					Rx1Delay:     ttnpb.RxDelay_RX_DELAY_5,
 					Rx2DataRate: &ttnpb.DataRate{
 						Modulation: &ttnpb.DataRate_Lora{
 							Lora: &ttnpb.LoRaDataRate{

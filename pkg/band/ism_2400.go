@@ -27,15 +27,15 @@ var (
 	ism2400DefaultChannels = []Channel{
 		{
 			Frequency:   2403000000,
-			MaxDataRate: ttnpb.DATA_RATE_7,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_7,
 		},
 		{
 			Frequency:   2425000000,
-			MaxDataRate: ttnpb.DATA_RATE_7,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_7,
 		},
 		{
 			Frequency:   2479000000,
-			MaxDataRate: ttnpb.DATA_RATE_7,
+			MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_7,
 		},
 	}
 

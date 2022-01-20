@@ -100,8 +100,8 @@ var (
 	DefaultLegacyAppSKey = crypto.DeriveLegacyAppSKey(DefaultNwkKey, DefaultJoinNonce, DefaultNetID, DefaultDevNonce)
 	DefaultLegacyNwkSKey = crypto.DeriveLegacyNwkSKey(DefaultNwkKey, DefaultJoinNonce, DefaultNetID, DefaultDevNonce)
 
-	DefaultMACVersion      = ttnpb.MAC_V1_1
-	DefaultPHYVersion      = ttnpb.RP001_V1_1_REV_B
+	DefaultMACVersion      = ttnpb.MACVersion_MAC_V1_1
+	DefaultPHYVersion      = ttnpb.PHYVersion_RP001_V1_1_REV_B
 	DefaultFrequencyPlanID = EUFrequencyPlanID
 )
 

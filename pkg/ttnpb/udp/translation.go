@@ -263,7 +263,7 @@ func convertStatus(stat Stat, md UpstreamMetadata) *ttnpb.GatewayStatus {
 	}
 
 	if stat.Lati != nil && stat.Long != nil {
-		loc := &ttnpb.Location{Latitude: *stat.Lati, Longitude: *stat.Long, Source: ttnpb.SOURCE_GPS}
+		loc := &ttnpb.Location{Latitude: *stat.Lati, Longitude: *stat.Long, Source: ttnpb.LocationSource_SOURCE_GPS}
 		if stat.Alti != nil {
 			loc.Altitude = *stat.Alti
 		}

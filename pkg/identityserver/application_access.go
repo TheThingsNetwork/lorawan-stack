@@ -34,27 +34,27 @@ import (
 var (
 	evtCreateApplicationAPIKey = events.Define(
 		"application.api-key.create", "create application API key",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_SETTINGS_API_KEYS),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtUpdateApplicationAPIKey = events.Define(
 		"application.api-key.update", "update application API key",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_SETTINGS_API_KEYS),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtDeleteApplicationAPIKey = events.Define(
 		"application.api-key.delete", "delete application API key",
-		events.WithVisibility(ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS),
+		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_SETTINGS_API_KEYS),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtUpdateApplicationCollaborator = events.Define(
 		"application.collaborator.update", "update application collaborator",
 		events.WithVisibility(
-			ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS,
-			ttnpb.RIGHT_USER_APPLICATIONS_LIST,
+			ttnpb.Right_RIGHT_APPLICATION_SETTINGS_COLLABORATORS,
+			ttnpb.Right_RIGHT_USER_APPLICATIONS_LIST,
 		),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
@@ -62,8 +62,8 @@ var (
 	evtDeleteApplicationCollaborator = events.Define(
 		"application.collaborator.delete", "delete application collaborator",
 		events.WithVisibility(
-			ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS,
-			ttnpb.RIGHT_USER_APPLICATIONS_LIST,
+			ttnpb.Right_RIGHT_APPLICATION_SETTINGS_COLLABORATORS,
+			ttnpb.Right_RIGHT_USER_APPLICATIONS_LIST,
 		),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
@@ -80,7 +80,7 @@ func (is *IdentityServer) listApplicationRights(ctx context.Context, ids *ttnpb.
 
 func (is *IdentityServer) createApplicationAPIKey(ctx context.Context, req *ttnpb.CreateApplicationAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
-	if err = rights.RequireApplication(ctx, *req.GetApplicationIds(), ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireApplication(ctx, *req.GetApplicationIds(), ttnpb.Right_RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 	// Require that caller has at least the rights of the API key.
@@ -111,7 +111,7 @@ func (is *IdentityServer) createApplicationAPIKey(ctx context.Context, req *ttnp
 }
 
 func (is *IdentityServer) listApplicationAPIKeys(ctx context.Context, req *ttnpb.ListApplicationAPIKeysRequest) (keys *ttnpb.APIKeys, err error) {
-	if err = rights.RequireApplication(ctx, *req.GetApplicationIds(), ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireApplication(ctx, *req.GetApplicationIds(), ttnpb.Right_RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 	var total uint64
@@ -136,7 +136,7 @@ func (is *IdentityServer) listApplicationAPIKeys(ctx context.Context, req *ttnpb
 }
 
 func (is *IdentityServer) getApplicationAPIKey(ctx context.Context, req *ttnpb.GetApplicationAPIKeyRequest) (key *ttnpb.APIKey, err error) {
-	if err = rights.RequireApplication(ctx, *req.GetApplicationIds(), ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireApplication(ctx, *req.GetApplicationIds(), ttnpb.Right_RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 
@@ -157,7 +157,7 @@ func (is *IdentityServer) getApplicationAPIKey(ctx context.Context, req *ttnpb.G
 
 func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnpb.UpdateApplicationAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
-	if err := rights.RequireApplication(ctx, *req.GetApplicationIds(), ttnpb.RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
+	if err := rights.RequireApplication(ctx, *req.GetApplicationIds(), ttnpb.Right_RIGHT_APPLICATION_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 
@@ -210,7 +210,7 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 }
 
 func (is *IdentityServer) getApplicationCollaborator(ctx context.Context, req *ttnpb.GetApplicationCollaboratorRequest) (*ttnpb.GetCollaboratorResponse, error) {
-	if err := rights.RequireApplication(ctx, *req.GetApplicationIds(), ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS); err != nil {
+	if err := rights.RequireApplication(ctx, *req.GetApplicationIds(), ttnpb.Right_RIGHT_APPLICATION_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
 	res := &ttnpb.GetCollaboratorResponse{
@@ -238,7 +238,7 @@ var errApplicationNeedsCollaborator = errors.DefineFailedPrecondition("applicati
 
 func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *ttnpb.SetApplicationCollaboratorRequest) (*pbtypes.Empty, error) {
 	// Require that caller has rights to manage collaborators.
-	if err := rights.RequireApplication(ctx, *req.GetApplicationIds(), ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS); err != nil {
+	if err := rights.RequireApplication(ctx, *req.GetApplicationIds(), ttnpb.Right_RIGHT_APPLICATION_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
 
@@ -271,7 +271,7 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 			}
 		}
 
-		if removedRights.IncludesAll(ttnpb.RIGHT_APPLICATION_ALL) {
+		if removedRights.IncludesAll(ttnpb.Right_RIGHT_APPLICATION_ALL) {
 			memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.GetApplicationIds().GetEntityIdentifiers())
 			if err != nil {
 				return err
@@ -281,7 +281,7 @@ func (is *IdentityServer) setApplicationCollaborator(ctx context.Context, req *t
 				if unique.ID(ctx, member) == unique.ID(ctx, req.GetCollaborator().GetIds()) {
 					continue
 				}
-				if rights.Implied().IncludesAll(ttnpb.RIGHT_APPLICATION_ALL) {
+				if rights.Implied().IncludesAll(ttnpb.Right_RIGHT_APPLICATION_ALL) {
 					hasOtherOwner = true
 					break
 				}
@@ -320,7 +320,7 @@ func (is *IdentityServer) listApplicationCollaborators(ctx context.Context, req 
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	if err = rights.RequireApplication(ctx, *req.GetApplicationIds(), ttnpb.RIGHT_APPLICATION_SETTINGS_COLLABORATORS); err != nil {
+	if err = rights.RequireApplication(ctx, *req.GetApplicationIds(), ttnpb.Right_RIGHT_APPLICATION_SETTINGS_COLLABORATORS); err != nil {
 		defer func() { collaborators = collaborators.PublicSafe() }()
 	}
 

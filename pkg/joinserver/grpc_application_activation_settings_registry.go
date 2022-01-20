@@ -33,7 +33,7 @@ var errApplicationActivationSettingsNotFound = errors.DefineNotFound("applicatio
 
 // Get implements ttnpb.ApplicationActivationSettingsRegistryServer.
 func (srv applicationActivationSettingsRegistryServer) Get(ctx context.Context, req *ttnpb.GetApplicationActivationSettingsRequest) (*ttnpb.ApplicationActivationSettings, error) {
-	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
+	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 		return nil, err
 	}
 	sets, err := srv.JS.applicationActivationSettings.GetByID(ctx, req.ApplicationIds, req.FieldMask.GetPaths())
@@ -75,7 +75,7 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 		}
 	}
 
-	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
+	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 		return nil, err
 	}
 
@@ -104,7 +104,7 @@ func (srv applicationActivationSettingsRegistryServer) Set(ctx context.Context, 
 
 // Delete implements ttnpb.ApplicationActivationSettingsRegistryServer.
 func (srv applicationActivationSettingsRegistryServer) Delete(ctx context.Context, req *ttnpb.DeleteApplicationActivationSettingsRequest) (*pbtypes.Empty, error) {
-	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS, ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
+	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS); err != nil {
 		return nil, err
 	}
 	_, err := srv.JS.applicationActivationSettings.SetByID(ctx, req.ApplicationIds, nil, func(stored *ttnpb.ApplicationActivationSettings) (*ttnpb.ApplicationActivationSettings, []string, error) {

@@ -58,14 +58,14 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		Longitude: 56.78,
 		Altitude:  42,
 		Accuracy:  2,
-		Source:    ttnpb.SOURCE_REGISTRY,
+		Source:    ttnpb.LocationSource_SOURCE_REGISTRY,
 	}
 	wifiLocation := &ttnpb.Location{
 		Latitude:  12.34,
 		Longitude: 56.78,
 		Altitude:  42,
 		Accuracy:  50,
-		Source:    ttnpb.SOURCE_WIFI_RSSI_GEOLOCATION,
+		Source:    ttnpb.LocationSource_SOURCE_WIFI_RSSI_GEOLOCATION,
 	}
 	picture := &ttnpb.Picture{
 		Embedded: &ttnpb.Picture_Embedded{
@@ -238,14 +238,14 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		Longitude: 56.78,
 		Altitude:  42,
 		Accuracy:  1,
-		Source:    ttnpb.SOURCE_REGISTRY,
+		Source:    ttnpb.LocationSource_SOURCE_REGISTRY,
 	}
 	extraLocation := &ttnpb.Location{
 		Latitude:  12.34,
 		Longitude: 56.78,
 		Altitude:  30,
 		Accuracy:  5,
-		Source:    ttnpb.SOURCE_COMBINED_GEOLOCATION,
+		Source:    ttnpb.LocationSource_SOURCE_COMBINED_GEOLOCATION,
 	}
 	updatedPicture := &ttnpb.Picture{
 		Sizes: map[uint32]string{0: "https://example.com/device_picture.jpg"},

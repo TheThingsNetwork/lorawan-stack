@@ -44,7 +44,7 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 	case test.EUFrequencyPlanID:
 		linkADRReq := &ttnpb.MACCommand_LinkADRReq{
 			ChannelMask:   []bool{true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false},
-			DataRateIndex: ttnpb.DATA_RATE_5,
+			DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 			TxPowerIndex:  1,
 			NbTrans:       1,
 		}
@@ -57,17 +57,17 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 		linkADRReqs := []MACCommander{
 			&ttnpb.MACCommand_LinkADRReq{
 				ChannelMask:   []bool{false, false, false, false, false, false, false, false, true, true, true, true, true, true, true, true},
-				DataRateIndex: ttnpb.DATA_RATE_3,
+				DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
 				TxPowerIndex:  1,
 				NbTrans:       1,
 			},
 		}
 		beforeRP001_V1_0_3_REV_A := func(v ttnpb.PHYVersion) bool {
 			switch v {
-			case ttnpb.TS001_V1_0,
-				ttnpb.TS001_V1_0_1,
-				ttnpb.RP001_V1_0_2,
-				ttnpb.RP001_V1_0_2_REV_B:
+			case ttnpb.PHYVersion_TS001_V1_0,
+				ttnpb.PHYVersion_TS001_V1_0_1,
+				ttnpb.PHYVersion_RP001_V1_0_2,
+				ttnpb.PHYVersion_RP001_V1_0_2_REV_B:
 				return true
 			default:
 				return false
@@ -78,7 +78,7 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 				&ttnpb.MACCommand_LinkADRReq{
 					ChannelMask:        []bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
 					ChannelMaskControl: 7,
-					DataRateIndex:      ttnpb.DATA_RATE_3,
+					DataRateIndex:      ttnpb.DataRateIndex_DATA_RATE_3,
 					TxPowerIndex:       1,
 					NbTrans:            1,
 				},
@@ -94,11 +94,11 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 		newChannelReq := &ttnpb.MACCommand_NewChannelReq{
 			ChannelIndex:     7,
 			Frequency:        924600000,
-			MaxDataRateIndex: ttnpb.DATA_RATE_5,
+			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 		}
 		linkADRReq := &ttnpb.MACCommand_LinkADRReq{
 			ChannelMask:   []bool{true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false},
-			DataRateIndex: ttnpb.DATA_RATE_5,
+			DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 			TxPowerIndex:  1,
 			NbTrans:       1,
 		}
@@ -131,7 +131,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		start := time.Now()
 
 		dev, err, ok := env.AssertSetDevice(ctx, true, conf.CreateDevice,
-			ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+			ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 		)
 		if !a.So(err, should.BeNil) || !a.So(ok, should.BeTrue) {
 			t.Error("Failed to create device")
@@ -146,7 +146,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		dev, ok = env.AssertJoin(ctx, JoinAssertionConfig{
 			Device:        dev,
 			ChannelIndex:  1,
-			DataRateIndex: ttnpb.DATA_RATE_2,
+			DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
 			RxMetadatas: [][]*ttnpb.RxMetadata{
 				nil,
 				DefaultRxMetadata[3:],
@@ -177,16 +177,16 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		var upCmders []MACCommander
 		var upEvBuilders []events.Builder
 		var downCmders []MACCommander
-		if dev.PendingMacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+		if dev.PendingMacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
 			rekeyInd := &ttnpb.MACCommand_RekeyInd{
-				MinorVersion: ttnpb.MINOR_1,
+				MinorVersion: ttnpb.Minor_MINOR_1,
 			}
 			upCmders = []MACCommander{
 				rekeyInd,
 			}
 
 			rekeyConf := &ttnpb.MACCommand_RekeyConf{
-				MinorVersion: ttnpb.MINOR_1,
+				MinorVersion: ttnpb.Minor_MINOR_1,
 			}
 			upEvBuilders = []events.Builder{
 				mac.EvtReceiveRekeyIndication.With(events.WithData(rekeyInd)),
@@ -210,7 +210,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		dev, ok = env.AssertHandleDataUplink(ctx, DataUplinkAssertionConfig{
 			Device:        dev,
 			ChannelIndex:  2,
-			DataRateIndex: ttnpb.DATA_RATE_1,
+			DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_1,
 			RxMetadatas: [][]*ttnpb.RxMetadata{
 				DefaultRxMetadata[:2],
 				DefaultRxMetadata[2:],
@@ -259,7 +259,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			SetRX1:      true,
 			SetRX2:      true,
 			Device:      dev,
-			Class:       ttnpb.CLASS_A,
+			Class:       ttnpb.Class_CLASS_A,
 			Priority:    ttnpb.TxSchedulePriority_HIGHEST,
 			Payload:     down.Payload,
 			RawPayload:  down.RawPayload,
@@ -282,7 +282,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			return
 		}
 
-		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
 			if !a.So(env.AssertNsAsHandleUplink(ctx, dev.Ids.ApplicationIds, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 				_, a := test.MustNewTFromContext(ctx)
 				if !a.So(ups, should.HaveLength, 1) {
@@ -328,7 +328,7 @@ func makeClassAOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 				},
 			},
 		},
-		DownlinkMACCommanders: []MACCommander{ttnpb.CID_DEV_STATUS},
+		DownlinkMACCommanders: []MACCommander{ttnpb.MACCommandIdentifier_CID_DEV_STATUS},
 		DownlinkEventBuilders: []events.Builder{mac.EvtEnqueueDevStatusRequest},
 		Func: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) {
 		},
@@ -339,20 +339,20 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 	var upCmders []MACCommander
 	var upEvBuilders []events.Builder
 	var downCmders []MACCommander
-	if macVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+	if macVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
 		deviceModeInd := &ttnpb.MACCommand_DeviceModeInd{
-			Class: ttnpb.CLASS_C,
+			Class: ttnpb.Class_CLASS_C,
 		}
 		upCmders = []MACCommander{
 			deviceModeInd,
 		}
 
 		deviceModeConf := &ttnpb.MACCommand_DeviceModeConf{
-			Class: ttnpb.CLASS_C,
+			Class: ttnpb.Class_CLASS_C,
 		}
 		upEvBuilders = []events.Builder{
 			mac.EvtReceiveDeviceModeIndication.With(events.WithData(deviceModeInd)),
-			mac.EvtClassCSwitch.With(events.WithData(ttnpb.CLASS_A)),
+			mac.EvtClassCSwitch.With(events.WithData(ttnpb.Class_CLASS_A)),
 			mac.EvtEnqueueDeviceModeConfirmation.With(events.WithData(deviceModeConf)),
 		}
 		downCmders = []MACCommander{
@@ -379,7 +379,7 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 		},
 		UplinkMACCommanders:   upCmders,
 		UplinkEventBuilders:   upEvBuilders,
-		DownlinkMACCommanders: append(downCmders, ttnpb.CID_DEV_STATUS),
+		DownlinkMACCommanders: append(downCmders, ttnpb.MACCommandIdentifier_CID_DEV_STATUS),
 		DownlinkEventBuilders: []events.Builder{mac.EvtEnqueueDevStatusRequest},
 		Func: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) {
 		},
@@ -403,9 +403,9 @@ func TestFlow(t *testing.T) {
 						var d ttnpb.RxDelay
 						switch cpus := runtime.NumCPU(); {
 						case cpus <= 1:
-							d = ttnpb.RX_DELAY_4
+							d = ttnpb.RxDelay_RX_DELAY_4
 						case cpus >= 12:
-							d = ttnpb.RX_DELAY_15
+							d = ttnpb.RxDelay_RX_DELAY_15
 						default:
 							d = ttnpb.RxDelay(cpus + 3)
 						}

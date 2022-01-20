@@ -44,11 +44,11 @@ var (
 		return []Channel{
 			{
 				Frequency:   uint64(923200000 + offset),
-				MaxDataRate: ttnpb.DATA_RATE_5,
+				MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 			},
 			{
 				Frequency:   uint64(923400000 + offset),
-				MaxDataRate: ttnpb.DATA_RATE_5,
+				MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 			},
 		}
 	}

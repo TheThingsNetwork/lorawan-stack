@@ -48,7 +48,7 @@ func DeviceNeedsNewChannelReqAtIndex(dev *ttnpb.EndDevice, i int) bool {
 		dev.MacState.DesiredParameters.Channels[i] == nil:
 		// A channel is desired to be deleted.
 		if currentCh := dev.MacState.CurrentParameters.Channels[i]; currentCh != nil && currentCh.UplinkFrequency > 0 {
-			return !deviceRejectedNewChannelReq(dev, 0, ttnpb.DATA_RATE_0, ttnpb.DATA_RATE_0)
+			return !deviceRejectedNewChannelReq(dev, 0, ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_0)
 		}
 	case i >= len(dev.MacState.CurrentParameters.Channels),
 		dev.MacState.CurrentParameters.Channels[i] == nil:
@@ -90,7 +90,7 @@ func EnqueueNewChannelReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen,
 	}
 
 	var st EnqueueState
-	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.CID_NEW_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
+	dev.MacState.PendingRequests, st = enqueueMACCommand(ttnpb.MACCommandIdentifier_CID_NEW_CHANNEL, maxDownLen, maxUpLen, func(nDown, nUp uint16) ([]*ttnpb.MACCommand, uint16, events.Builders, bool) {
 		var reqs []*ttnpb.MACCommand_NewChannelReq
 		for i := 0; i < len(dev.MacState.DesiredParameters.Channels) || i < len(dev.MacState.CurrentParameters.Channels); i++ {
 			switch {
@@ -138,7 +138,7 @@ func HandleNewChannelAns(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.M
 	}
 
 	var err error
-	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.CID_NEW_CHANNEL, func(cmd *ttnpb.MACCommand) error {
+	dev.MacState.PendingRequests, err = handleMACResponse(ttnpb.MACCommandIdentifier_CID_NEW_CHANNEL, func(cmd *ttnpb.MACCommand) error {
 		req := cmd.GetNewChannelReq()
 		if !pld.DataRateAck {
 			if dev.MacState.RejectedDataRateRanges == nil {

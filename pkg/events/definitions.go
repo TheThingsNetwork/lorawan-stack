@@ -54,7 +54,7 @@ func (d *definition) With(options ...Option) Builder {
 }
 
 var defaultOptions = []Option{
-	WithVisibility(ttnpb.RIGHT_ALL),
+	WithVisibility(ttnpb.Right_RIGHT_ALL),
 }
 
 func (d *definition) New(ctx context.Context, opts ...Option) Event {

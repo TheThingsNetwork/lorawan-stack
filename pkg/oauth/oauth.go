@@ -93,7 +93,7 @@ func (s *server) Authorize(authorizePage http.Handler) http.HandlerFunc {
 			SessionId: session.SessionId,
 		}}
 		client := ttnpb.Client(ar.Client.(osinClient))
-		if !clientHasGrant(&client, ttnpb.GRANT_AUTHORIZATION_CODE) {
+		if !clientHasGrant(&client, ttnpb.GrantType_GRANT_AUTHORIZATION_CODE) {
 			resp.InternalError = errClientMissingGrant.WithAttributes("grant", "authorization_code")
 			resp.SetError(osin.E_INVALID_GRANT, resp.InternalError.Error())
 			oauth2.FinishAuthorizeRequest(resp, r, ar)
@@ -101,19 +101,19 @@ func (s *server) Authorize(authorizePage http.Handler) http.HandlerFunc {
 			return
 		}
 		switch client.State {
-		case ttnpb.STATE_REJECTED:
+		case ttnpb.State_STATE_REJECTED:
 			resp.InternalError = errClientRejected
 			resp.SetError(osin.E_INVALID_CLIENT, resp.InternalError.Error())
 			oauth2.FinishAuthorizeRequest(resp, r, ar)
 			s.output(w, r, resp)
 			return
-		case ttnpb.STATE_SUSPENDED:
+		case ttnpb.State_STATE_SUSPENDED:
 			resp.InternalError = errClientSuspended
 			resp.SetError(osin.E_INVALID_CLIENT, resp.InternalError.Error())
 			oauth2.FinishAuthorizeRequest(resp, r, ar)
 			s.output(w, r, resp)
 			return
-		case ttnpb.STATE_REQUESTED:
+		case ttnpb.State_STATE_REQUESTED:
 			// TODO: Allow if user is collaborator (https://github.com/TheThingsNetwork/lorawan-stack/issues/49).
 			resp.InternalError = errClientNotApproved
 			resp.SetError(osin.E_INVALID_CLIENT, resp.InternalError.Error())
@@ -276,14 +276,14 @@ func (s *server) Token(w http.ResponseWriter, r *http.Request) {
 
 	client := ttnpb.Client(ar.Client.(osinClient))
 	userIDs := ar.UserData.(userData).UserSessionIdentifiers.GetUserIds()
-	ar.GenerateRefresh = clientHasGrant(&client, ttnpb.GRANT_REFRESH_TOKEN)
+	ar.GenerateRefresh = clientHasGrant(&client, ttnpb.GrantType_GRANT_REFRESH_TOKEN)
 	switch ar.Type {
 	case osin.AUTHORIZATION_CODE:
-		ar.Authorized = clientHasGrant(&client, ttnpb.GRANT_AUTHORIZATION_CODE)
+		ar.Authorized = clientHasGrant(&client, ttnpb.GrantType_GRANT_AUTHORIZATION_CODE)
 	case osin.REFRESH_TOKEN:
-		ar.Authorized = clientHasGrant(&client, ttnpb.GRANT_REFRESH_TOKEN)
+		ar.Authorized = clientHasGrant(&client, ttnpb.GrantType_GRANT_REFRESH_TOKEN)
 	case osin.PASSWORD:
-		if clientHasGrant(&client, ttnpb.GRANT_PASSWORD) {
+		if clientHasGrant(&client, ttnpb.GrantType_GRANT_PASSWORD) {
 			if err := s.session.DoLogin(r.Context(), ar.Username, ar.Password); err != nil {
 				webhandlers.Error(w, r, err)
 				return

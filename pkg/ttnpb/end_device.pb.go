@@ -281,7 +281,7 @@ func (m *MACParameters) GetAdrDataRateIndex() DataRateIndex {
 	if m != nil {
 		return m.AdrDataRateIndex
 	}
-	return DATA_RATE_0
+	return DataRateIndex_DATA_RATE_0
 }
 
 func (m *MACParameters) GetAdrTxPowerIndex() uint32 {
@@ -318,7 +318,7 @@ func (m *MACParameters) GetRx1Delay() RxDelay {
 	if m != nil {
 		return m.Rx1Delay
 	}
-	return RX_DELAY_0
+	return RxDelay_RX_DELAY_0
 }
 
 func (m *MACParameters) GetRx1DataRateOffset() DataRateOffset {
@@ -332,7 +332,7 @@ func (m *MACParameters) GetRx2DataRateIndex() DataRateIndex {
 	if m != nil {
 		return m.Rx2DataRateIndex
 	}
-	return DATA_RATE_0
+	return DataRateIndex_DATA_RATE_0
 }
 
 func (m *MACParameters) GetRx2Frequency() uint64 {
@@ -346,21 +346,21 @@ func (m *MACParameters) GetMaxDutyCycle() AggregatedDutyCycle {
 	if m != nil {
 		return m.MaxDutyCycle
 	}
-	return DUTY_CYCLE_1
+	return AggregatedDutyCycle_DUTY_CYCLE_1
 }
 
 func (m *MACParameters) GetRejoinTimePeriodicity() RejoinTimeExponent {
 	if m != nil {
 		return m.RejoinTimePeriodicity
 	}
-	return REJOIN_TIME_0
+	return RejoinTimeExponent_REJOIN_TIME_0
 }
 
 func (m *MACParameters) GetRejoinCountPeriodicity() RejoinCountExponent {
 	if m != nil {
 		return m.RejoinCountPeriodicity
 	}
-	return REJOIN_COUNT_16
+	return RejoinCountExponent_REJOIN_COUNT_16
 }
 
 func (m *MACParameters) GetPingSlotFrequency() uint64 {
@@ -375,7 +375,7 @@ func (m *MACParameters) GetPingSlotDataRateIndex() DataRateIndex {
 	if m != nil {
 		return m.PingSlotDataRateIndex
 	}
-	return DATA_RATE_0
+	return DataRateIndex_DATA_RATE_0
 }
 
 func (m *MACParameters) GetBeaconFrequency() uint64 {
@@ -485,14 +485,14 @@ func (m *MACParameters_Channel) GetMinDataRateIndex() DataRateIndex {
 	if m != nil {
 		return m.MinDataRateIndex
 	}
-	return DATA_RATE_0
+	return DataRateIndex_DATA_RATE_0
 }
 
 func (m *MACParameters_Channel) GetMaxDataRateIndex() DataRateIndex {
 	if m != nil {
 		return m.MaxDataRateIndex
 	}
-	return DATA_RATE_0
+	return DataRateIndex_DATA_RATE_0
 }
 
 func (m *MACParameters_Channel) GetEnableUplink() bool {
@@ -570,14 +570,14 @@ func (m *EndDeviceVersion) GetLorawanVersion() MACVersion {
 	if m != nil {
 		return m.LorawanVersion
 	}
-	return MAC_UNKNOWN
+	return MACVersion_MAC_UNKNOWN
 }
 
 func (m *EndDeviceVersion) GetLorawanPhyVersion() PHYVersion {
 	if m != nil {
 		return m.LorawanPhyVersion
 	}
-	return PHY_UNKNOWN
+	return PHYVersion_PHY_UNKNOWN
 }
 
 func (m *EndDeviceVersion) GetFrequencyPlanId() string {
@@ -1088,14 +1088,14 @@ func (m *MACState) GetDeviceClass() Class {
 	if m != nil {
 		return m.DeviceClass
 	}
-	return CLASS_A
+	return Class_CLASS_A
 }
 
 func (m *MACState) GetLorawanVersion() MACVersion {
 	if m != nil {
 		return m.LorawanVersion
 	}
-	return MAC_UNKNOWN
+	return MACVersion_MAC_UNKNOWN
 }
 
 func (m *MACState) GetLastConfirmedDownlinkAt() *types.Timestamp {
@@ -1268,7 +1268,7 @@ func (m *MACState_JoinRequest) GetRxDelay() RxDelay {
 	if m != nil {
 		return m.RxDelay
 	}
-	return RX_DELAY_0
+	return RxDelay_RX_DELAY_0
 }
 
 func (m *MACState_JoinRequest) GetCfList() *CFList {
@@ -1380,14 +1380,14 @@ func (m *MACState_DataRateRange) GetMinDataRateIndex() DataRateIndex {
 	if m != nil {
 		return m.MinDataRateIndex
 	}
-	return DATA_RATE_0
+	return DataRateIndex_DATA_RATE_0
 }
 
 func (m *MACState_DataRateRange) GetMaxDataRateIndex() DataRateIndex {
 	if m != nil {
 		return m.MaxDataRateIndex
 	}
-	return DATA_RATE_0
+	return DataRateIndex_DATA_RATE_0
 }
 
 type MACState_DataRateRanges struct {
@@ -1794,14 +1794,14 @@ func (m *EndDevice) GetLorawanVersion() MACVersion {
 	if m != nil {
 		return m.LorawanVersion
 	}
-	return MAC_UNKNOWN
+	return MACVersion_MAC_UNKNOWN
 }
 
 func (m *EndDevice) GetLorawanPhyVersion() PHYVersion {
 	if m != nil {
 		return m.LorawanPhyVersion
 	}
-	return PHY_UNKNOWN
+	return PHYVersion_PHY_UNKNOWN
 }
 
 func (m *EndDevice) GetFrequencyPlanId() string {

@@ -43,17 +43,17 @@ func TestNewState(t *testing.T) {
 			Name: "1.0.2/EU868",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanVersion:    ttnpb.MAC_V1_0_2,
-				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+				LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_2,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.RP001_V1_0_2_REV_B)
-				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
+				macState := MakeDefaultEU868MACState(ttnpb.Class_CLASS_A, ttnpb.MACVersion_MAC_V1_0_2, ttnpb.PHYVersion_RP001_V1_0_2_REV_B)
+				macState.DesiredParameters.Rx1Delay = ttnpb.RxDelay_RX_DELAY_13
 				return macState
 			}(),
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
@@ -62,16 +62,16 @@ func TestNewState(t *testing.T) {
 			Name: "1.0.2/EU868/DesiredMaxEirp",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanVersion:    ttnpb.MAC_V1_0_2,
-				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+				LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_2,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredMaxEirp: &ttnpb.DeviceEIRPValue{
-						Value: ttnpb.DEVICE_EIRP_18,
+						Value: ttnpb.DeviceEIRP_DEVICE_EIRP_18,
 					},
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.RP001_V1_0_2_REV_B)
+				macState := MakeDefaultEU868MACState(ttnpb.Class_CLASS_A, ttnpb.MACVersion_MAC_V1_0_2, ttnpb.PHYVersion_RP001_V1_0_2_REV_B)
 				macState.DesiredParameters.MaxEirp = 18
 				return macState
 			}(),
@@ -81,11 +81,11 @@ func TestNewState(t *testing.T) {
 			Name: "1.0.2/EU868/multicast/class A",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanVersion:    ttnpb.MAC_V1_0_2,
-				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+				LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_2,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 				Multicast: true,
@@ -99,18 +99,18 @@ func TestNewState(t *testing.T) {
 			Name: "1.0.2/EU868/multicast/class B",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanVersion:    ttnpb.MAC_V1_0_2,
-				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+				LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_2,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 				Multicast:      true,
 				SupportsClassB: true,
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.RP001_V1_0_2_REV_B)
+				macState := MakeDefaultEU868MACState(ttnpb.Class_CLASS_A, ttnpb.MACVersion_MAC_V1_0_2, ttnpb.PHYVersion_RP001_V1_0_2_REV_B)
 				macState.CurrentParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
 					for _, ch := range macState.CurrentParameters.Channels {
 						chs = append(chs, &ttnpb.MACParameters_Channel{
@@ -120,7 +120,7 @@ func TestNewState(t *testing.T) {
 					return chs
 				}()
 				macState.DesiredParameters = macState.CurrentParameters
-				macState.DeviceClass = ttnpb.CLASS_B
+				macState.DeviceClass = ttnpb.Class_CLASS_B
 				return macState
 			}(),
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
@@ -129,18 +129,18 @@ func TestNewState(t *testing.T) {
 			Name: "1.0.2/EU868/multicast/class C",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanVersion:    ttnpb.MAC_V1_0_2,
-				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+				LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_2,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 				Multicast:      true,
 				SupportsClassC: true,
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.RP001_V1_0_2_REV_B)
+				macState := MakeDefaultEU868MACState(ttnpb.Class_CLASS_A, ttnpb.MACVersion_MAC_V1_0_2, ttnpb.PHYVersion_RP001_V1_0_2_REV_B)
 				macState.CurrentParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
 					for _, ch := range macState.CurrentParameters.Channels {
 						chs = append(chs, &ttnpb.MACParameters_Channel{
@@ -150,7 +150,7 @@ func TestNewState(t *testing.T) {
 					return chs
 				}()
 				macState.DesiredParameters = macState.CurrentParameters
-				macState.DeviceClass = ttnpb.CLASS_C
+				macState.DeviceClass = ttnpb.Class_CLASS_C
 				return macState
 			}(),
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
@@ -159,8 +159,8 @@ func TestNewState(t *testing.T) {
 			Name: "1.0.3/EU868/factory preset frequencies",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanVersion:    ttnpb.MAC_V1_0_3,
-				LorawanPhyVersion: ttnpb.RP001_V1_0_3_REV_A,
+				LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_3,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_3_REV_A,
 				MacSettings: &ttnpb.MACSettings{
 					FactoryPresetFrequencies: []uint64{
 						868100000,
@@ -171,7 +171,7 @@ func TestNewState(t *testing.T) {
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.RP001_V1_0_3_REV_A)
+				macState := MakeDefaultEU868MACState(ttnpb.Class_CLASS_A, ttnpb.MACVersion_MAC_V1_0_3, ttnpb.PHYVersion_RP001_V1_0_3_REV_A)
 				macState.CurrentParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
 					for _, ch := range macState.CurrentParameters.Channels {
 						chs = append(chs, &ttnpb.MACParameters_Channel{
@@ -196,13 +196,13 @@ func TestNewState(t *testing.T) {
 						&ttnpb.MACParameters_Channel{
 							UplinkFrequency:   868700000,
 							DownlinkFrequency: 868700000,
-							MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+							MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 							EnableUplink:      true,
 						},
 						&ttnpb.MACParameters_Channel{
 							UplinkFrequency:   867100000,
 							DownlinkFrequency: 867100000,
-							MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+							MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 							EnableUplink:      true,
 						},
 					)
@@ -233,29 +233,29 @@ func TestNewState(t *testing.T) {
 						&ttnpb.MACParameters_Channel{
 							UplinkFrequency:   867300000,
 							DownlinkFrequency: 867300000,
-							MinDataRateIndex:  ttnpb.DATA_RATE_0,
-							MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+							MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+							MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 							EnableUplink:      true,
 						},
 						&ttnpb.MACParameters_Channel{
 							UplinkFrequency:   867500000,
 							DownlinkFrequency: 867500000,
-							MinDataRateIndex:  ttnpb.DATA_RATE_0,
-							MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+							MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+							MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 							EnableUplink:      true,
 						},
 						&ttnpb.MACParameters_Channel{
 							UplinkFrequency:   867700000,
 							DownlinkFrequency: 867700000,
-							MinDataRateIndex:  ttnpb.DATA_RATE_0,
-							MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+							MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+							MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 							EnableUplink:      true,
 						},
 						&ttnpb.MACParameters_Channel{
 							UplinkFrequency:   867900000,
 							DownlinkFrequency: 867900000,
-							MinDataRateIndex:  ttnpb.DATA_RATE_0,
-							MaxDataRateIndex:  ttnpb.DATA_RATE_5,
+							MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+							MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_5,
 							EnableUplink:      true,
 						},
 					)
@@ -268,17 +268,17 @@ func TestNewState(t *testing.T) {
 			Name: "1.1/EU868",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanVersion:    ttnpb.MAC_V1_1,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.RP001_V1_1_REV_B)
-				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
+				macState := MakeDefaultEU868MACState(ttnpb.Class_CLASS_A, ttnpb.MACVersion_MAC_V1_1, ttnpb.PHYVersion_RP001_V1_1_REV_B)
+				macState.DesiredParameters.Rx1Delay = ttnpb.RxDelay_RX_DELAY_13
 				return macState
 			}(),
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
@@ -287,11 +287,11 @@ func TestNewState(t *testing.T) {
 			Name: "1.1/EU868/multicast/class A",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanVersion:    ttnpb.MAC_V1_1,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 				Multicast: true,
@@ -305,18 +305,18 @@ func TestNewState(t *testing.T) {
 			Name: "1.1/EU868/multicast/class B",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanVersion:    ttnpb.MAC_V1_1,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 				Multicast:      true,
 				SupportsClassB: true,
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.RP001_V1_1_REV_B)
+				macState := MakeDefaultEU868MACState(ttnpb.Class_CLASS_A, ttnpb.MACVersion_MAC_V1_1, ttnpb.PHYVersion_RP001_V1_1_REV_B)
 				macState.CurrentParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
 					for _, ch := range macState.CurrentParameters.Channels {
 						chs = append(chs, &ttnpb.MACParameters_Channel{
@@ -326,7 +326,7 @@ func TestNewState(t *testing.T) {
 					return chs
 				}()
 				macState.DesiredParameters = macState.CurrentParameters
-				macState.DeviceClass = ttnpb.CLASS_B
+				macState.DeviceClass = ttnpb.Class_CLASS_B
 				return macState
 			}(),
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
@@ -335,18 +335,18 @@ func TestNewState(t *testing.T) {
 			Name: "1.1/EU868/multicast/class C",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanVersion:    ttnpb.MAC_V1_1,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 				Multicast:      true,
 				SupportsClassC: true,
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.RP001_V1_1_REV_B)
+				macState := MakeDefaultEU868MACState(ttnpb.Class_CLASS_A, ttnpb.MACVersion_MAC_V1_1, ttnpb.PHYVersion_RP001_V1_1_REV_B)
 				macState.CurrentParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
 					for _, ch := range macState.CurrentParameters.Channels {
 						chs = append(chs, &ttnpb.MACParameters_Channel{
@@ -356,7 +356,7 @@ func TestNewState(t *testing.T) {
 					return chs
 				}()
 				macState.DesiredParameters = macState.CurrentParameters
-				macState.DeviceClass = ttnpb.CLASS_C
+				macState.DeviceClass = ttnpb.Class_CLASS_C
 				return macState
 			}(),
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
@@ -365,17 +365,17 @@ func TestNewState(t *testing.T) {
 			Name: "1.0.2/US915_FSB2",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.USFrequencyPlanID,
-				LorawanVersion:    ttnpb.MAC_V1_0_2,
-				LorawanPhyVersion: ttnpb.RP001_V1_0_2_REV_B,
+				LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_2,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_2, ttnpb.RP001_V1_0_2_REV_B)
-				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
+				macState := MakeDefaultUS915FSB2MACState(ttnpb.Class_CLASS_A, ttnpb.MACVersion_MAC_V1_0_2, ttnpb.PHYVersion_RP001_V1_0_2_REV_B)
+				macState.DesiredParameters.Rx1Delay = ttnpb.RxDelay_RX_DELAY_13
 				return macState
 			}(),
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
@@ -384,8 +384,8 @@ func TestNewState(t *testing.T) {
 			Name: "1.0.3/US915_FSB2/factory preset frequencies",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.USFrequencyPlanID,
-				LorawanVersion:    ttnpb.MAC_V1_0_3,
-				LorawanPhyVersion: ttnpb.RP001_V1_0_3_REV_A,
+				LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_3,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_3_REV_A,
 				MacSettings: &ttnpb.MACSettings{
 					FactoryPresetFrequencies: []uint64{
 						904300000,
@@ -396,7 +396,7 @@ func TestNewState(t *testing.T) {
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_0_3, ttnpb.RP001_V1_0_3_REV_A)
+				macState := MakeDefaultUS915FSB2MACState(ttnpb.Class_CLASS_A, ttnpb.MACVersion_MAC_V1_0_3, ttnpb.PHYVersion_RP001_V1_0_3_REV_A)
 				macState.CurrentParameters.Channels = func() (chs []*ttnpb.MACParameters_Channel) {
 					for _, ch := range macState.CurrentParameters.Channels {
 						chs = append(chs, &ttnpb.MACParameters_Channel{
@@ -457,17 +457,17 @@ func TestNewState(t *testing.T) {
 			Name: "1.1/US915_FSB2",
 			Device: &ttnpb.EndDevice{
 				FrequencyPlanId:   test.USFrequencyPlanID,
-				LorawanVersion:    ttnpb.MAC_V1_1,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					DesiredRx1Delay: &ttnpb.RxDelayValue{
-						Value: ttnpb.RX_DELAY_13,
+						Value: ttnpb.RxDelay_RX_DELAY_13,
 					},
 				},
 			},
 			MACState: func() *ttnpb.MACState {
-				macState := MakeDefaultUS915FSB2MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.RP001_V1_1_REV_B)
-				macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_13
+				macState := MakeDefaultUS915FSB2MACState(ttnpb.Class_CLASS_A, ttnpb.MACVersion_MAC_V1_1, ttnpb.PHYVersion_RP001_V1_1_REV_B)
+				macState.DesiredParameters.Rx1Delay = ttnpb.RxDelay_RX_DELAY_13
 				return macState
 			}(),
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
@@ -584,7 +584,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			EarliestAt: beaconAt,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_1S},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_1S},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
@@ -598,7 +598,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			EarliestAt: beaconAt,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_2S},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_2S},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
@@ -612,7 +612,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			EarliestAt: beaconAt,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_4S},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_4S},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
@@ -626,7 +626,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			EarliestAt: beaconAt,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_8S},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_8S},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
@@ -640,7 +640,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			EarliestAt: beaconAt,
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_16S},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
@@ -654,7 +654,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			EarliestAt: beaconAt.Add(12*time.Second + 120*time.Millisecond + 1*time.Microsecond + 500*time.Nanosecond),
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_8S},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_8S},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
@@ -668,7 +668,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			EarliestAt: beaconAt.Add(20 * time.Second),
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_16S},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
@@ -682,7 +682,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			EarliestAt: beaconAt.Add(38 * time.Second),
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_16S},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,
@@ -696,7 +696,7 @@ func TestNextPingSlotAt(t *testing.T) {
 			EarliestAt: beaconAt.Add(50 * time.Second),
 			Device: &ttnpb.EndDevice{
 				MacState: &ttnpb.MACState{
-					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PING_EVERY_16S},
+					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_16S},
 				},
 				Session: &ttnpb.Session{
 					DevAddr: devAddr,

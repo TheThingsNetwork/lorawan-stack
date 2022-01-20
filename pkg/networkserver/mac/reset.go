@@ -50,7 +50,7 @@ func HandleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 		return evs, err
 	}
 	dev.MacState = macState
-	dev.MacState.LorawanVersion = ttnpb.MAC_V1_1
+	dev.MacState.LorawanVersion = ttnpb.MACVersion_MAC_V1_1
 
 	conf := &ttnpb.MACCommand_ResetConf{
 		MinorVersion: pld.MinorVersion,

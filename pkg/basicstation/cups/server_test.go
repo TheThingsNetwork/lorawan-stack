@@ -166,7 +166,7 @@ var (
 		EntityFetcher: rights.EntityFetcherFunc(func(ctx context.Context, ids *ttnpb.EntityIdentifiers) (*ttnpb.Rights, error) {
 			md := rpcmetadata.FromIncomingContext(ctx)
 			if md.AuthType == "Bearer" {
-				return ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO, ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC, ttnpb.RIGHT_GATEWAY_READ_SECRETS), nil
+				return ttnpb.RightsFrom(ttnpb.Right_RIGHT_GATEWAY_INFO, ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC, ttnpb.Right_RIGHT_GATEWAY_READ_SECRETS), nil
 			}
 			return nil, rights.ErrNoGatewayRights
 		}),

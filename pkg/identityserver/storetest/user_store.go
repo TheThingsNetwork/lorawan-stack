@@ -79,7 +79,7 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 			Password:                       "password_hash",
 			PasswordUpdatedAt:              ttnpb.ProtoTimePtr(stamp),
 			RequirePasswordUpdate:          true,
-			State:                          ttnpb.STATE_APPROVED,
+			State:                          ttnpb.State_STATE_APPROVED,
 			StateDescription:               "welcome!",
 			Admin:                          true,
 			TemporaryPassword:              "temporary_hash",
@@ -98,7 +98,7 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 			a.So(created.Password, should.Equal, "password_hash")
 			a.So(*ttnpb.StdTime(created.PasswordUpdatedAt), should.Equal, stamp)
 			a.So(created.RequirePasswordUpdate, should.BeTrue)
-			a.So(created.State, should.Equal, ttnpb.STATE_APPROVED)
+			a.So(created.State, should.Equal, ttnpb.State_STATE_APPROVED)
 			a.So(created.StateDescription, should.Equal, "welcome!")
 			a.So(created.Admin, should.BeTrue)
 			a.So(created.TemporaryPassword, should.Equal, "temporary_hash")
@@ -194,7 +194,7 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 			Password:                       "updated_password_hash",
 			PasswordUpdatedAt:              ttnpb.ProtoTimePtr(stamp),
 			RequirePasswordUpdate:          false,
-			State:                          ttnpb.STATE_FLAGGED,
+			State:                          ttnpb.State_STATE_FLAGGED,
 			StateDescription:               "flagged",
 			Admin:                          false,
 			TemporaryPassword:              "updated_temporary_hash",
@@ -212,7 +212,7 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 			a.So(updated.Password, should.Equal, "updated_password_hash")
 			a.So(*ttnpb.StdTime(updated.PasswordUpdatedAt), should.Equal, stamp)
 			a.So(updated.RequirePasswordUpdate, should.BeFalse)
-			a.So(updated.State, should.Equal, ttnpb.STATE_FLAGGED)
+			a.So(updated.State, should.Equal, ttnpb.State_STATE_FLAGGED)
 			a.So(updated.StateDescription, should.Equal, "flagged")
 			a.So(updated.Admin, should.BeFalse)
 			a.So(updated.TemporaryPassword, should.Equal, "updated_temporary_hash")

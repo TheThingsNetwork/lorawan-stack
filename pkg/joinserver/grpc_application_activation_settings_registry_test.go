@@ -160,7 +160,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				},
 			},
 			Rights: []ttnpb.Right{
-				ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+				ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				return assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -172,7 +172,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				ApplicationIds: appID,
 			},
 			Rights: []ttnpb.Right{
-				ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
+				ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				return assertions.New(t).So(errors.IsNotFound(err), should.BeTrue)
@@ -190,7 +190,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				},
 			},
 			Rights: []ttnpb.Right{
-				ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
+				ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				return assertions.New(t).So(errors.IsNotFound(err), should.BeTrue)
@@ -265,7 +265,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				},
 			},
 			Rights: []ttnpb.Right{
-				ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
+				ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				return assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -287,7 +287,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				},
 			},
 			Rights: []ttnpb.Right{
-				ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+				ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				return assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -303,8 +303,8 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				},
 			},
 			Rights: []ttnpb.Right{
-				ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
-				ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+				ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
+				ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
@@ -328,8 +328,8 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				},
 			},
 			Rights: []ttnpb.Right{
-				ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
-				ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+				ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
+				ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
@@ -350,8 +350,8 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				},
 			},
 			Rights: []ttnpb.Right{
-				ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
-				ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+				ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
+				ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				return assertions.New(t).So(errors.IsInvalidArgument(err), should.BeTrue)
@@ -406,7 +406,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				ApplicationIds: appID,
 			},
 			Rights: []ttnpb.Right{
-				ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
+				ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				return assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -418,7 +418,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				ApplicationIds: appID,
 			},
 			Rights: []ttnpb.Right{
-				ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+				ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				return assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -430,8 +430,8 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 				ApplicationIds: appID,
 			},
 			Rights: []ttnpb.Right{
-				ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
-				ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+				ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
+				ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				return assertions.New(t).So(errors.IsNotFound(err), should.BeTrue)
@@ -491,8 +491,8 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				cl, reg, stop := newJS(ctx,
-					ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
-					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 				)
 				defer stop()
 

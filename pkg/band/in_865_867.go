@@ -23,19 +23,17 @@ const (
 	in865867BeaconFrequency = 866500000
 )
 
-var (
-	in865867DefaultChannels = []Channel{
-		{
-			Frequency:   865062500,
-			MaxDataRate: ttnpb.DATA_RATE_5,
-		},
-		{
-			Frequency:   865402500,
-			MaxDataRate: ttnpb.DATA_RATE_5,
-		},
-		{
-			Frequency:   865985000,
-			MaxDataRate: ttnpb.DATA_RATE_5,
-		},
-	}
-)
+var in865867DefaultChannels = []Channel{
+	{
+		Frequency:   865062500,
+		MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
+	},
+	{
+		Frequency:   865402500,
+		MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
+	},
+	{
+		Frequency:   865985000,
+		MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
+	},
+}

@@ -32,32 +32,32 @@ import (
 var (
 	evtCreateOrganization = events.Define(
 		"organization.create", "create organization",
-		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_INFO),
+		events.WithVisibility(ttnpb.Right_RIGHT_ORGANIZATION_INFO),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtUpdateOrganization = events.Define(
 		"organization.update", "update organization",
-		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_INFO),
+		events.WithVisibility(ttnpb.Right_RIGHT_ORGANIZATION_INFO),
 		events.WithUpdatedFieldsDataType(),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtDeleteOrganization = events.Define(
 		"organization.delete", "delete organization",
-		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_INFO),
+		events.WithVisibility(ttnpb.Right_RIGHT_ORGANIZATION_INFO),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtRestoreOrganization = events.Define(
 		"organization.restore", "restore organization",
-		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_INFO),
+		events.WithVisibility(ttnpb.Right_RIGHT_ORGANIZATION_INFO),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtPurgeOrganization = events.Define(
 		"organization.purge", "purge organization",
-		events.WithVisibility(ttnpb.RIGHT_ORGANIZATION_INFO),
+		events.WithVisibility(ttnpb.Right_RIGHT_ORGANIZATION_INFO),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
@@ -77,7 +77,7 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 		if !is.IsAdmin(ctx) && !is.configFromContext(ctx).UserRights.CreateOrganizations {
 			return nil, errAdminsCreateOrganizations.New()
 		}
-		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_ORGANIZATIONS_CREATE); err != nil {
+		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.Right_RIGHT_USER_ORGANIZATIONS_CREATE); err != nil {
 			return nil, err
 		}
 	} else if orgIDs := req.GetCollaborator().GetOrganizationIds(); orgIDs != nil {
@@ -107,7 +107,7 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 			ctx,
 			req.GetCollaborator(),
 			org.GetIds().GetEntityIdentifiers(),
-			ttnpb.RightsFrom(ttnpb.RIGHT_ALL),
+			ttnpb.RightsFrom(ttnpb.Right_RIGHT_ALL),
 		); err != nil {
 			return err
 		}
@@ -132,7 +132,7 @@ func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrg
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask, getPaths, nil)
-	if err = rights.RequireOrganization(ctx, *req.GetOrganizationIds(), ttnpb.RIGHT_ORGANIZATION_INFO); err != nil {
+	if err = rights.RequireOrganization(ctx, *req.GetOrganizationIds(), ttnpb.Right_RIGHT_ORGANIZATION_INFO); err != nil {
 		if !ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicOrganizationFields...) {
 			return nil, err
 		}
@@ -173,7 +173,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 	}
 
 	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
-		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.RIGHT_USER_ORGANIZATIONS_LIST); err != nil {
+		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.Right_RIGHT_USER_ORGANIZATIONS_LIST); err != nil {
 			return nil, err
 		}
 	} else if orgIDs := req.Collaborator.GetOrganizationIds(); orgIDs != nil {
@@ -227,7 +227,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 
 	for i, org := range orgs.Organizations {
 		entityRights := callerMemberships.GetRights(callerAccountID, org.GetIds()).Union(authInfo.GetUniversalRights())
-		if !entityRights.IncludesAll(ttnpb.RIGHT_ORGANIZATION_INFO) {
+		if !entityRights.IncludesAll(ttnpb.Right_RIGHT_ORGANIZATION_INFO) {
 			orgs.Organizations[i] = org.PublicSafe()
 		}
 	}
@@ -236,7 +236,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 }
 
 func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.UpdateOrganizationRequest) (org *ttnpb.Organization, err error) {
-	if err = rights.RequireOrganization(ctx, *req.Organization.GetIds(), ttnpb.RIGHT_ORGANIZATION_SETTINGS_BASIC); err != nil {
+	if err = rights.RequireOrganization(ctx, *req.Organization.GetIds(), ttnpb.Right_RIGHT_ORGANIZATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.OrganizationFieldPathsNested, req.FieldMask, nil, getPaths)
@@ -277,7 +277,7 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 }
 
 func (is *IdentityServer) deleteOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireOrganization(ctx, *ids, ttnpb.RIGHT_ORGANIZATION_DELETE); err != nil {
+	if err := rights.RequireOrganization(ctx, *ids, ttnpb.Right_RIGHT_ORGANIZATION_DELETE); err != nil {
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
@@ -291,7 +291,7 @@ func (is *IdentityServer) deleteOrganization(ctx context.Context, ids *ttnpb.Org
 }
 
 func (is *IdentityServer) restoreOrganization(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireOrganization(store.WithSoftDeleted(ctx, false), *ids, ttnpb.RIGHT_ORGANIZATION_DELETE); err != nil {
+	if err := rights.RequireOrganization(store.WithSoftDeleted(ctx, false), *ids, ttnpb.Right_RIGHT_ORGANIZATION_DELETE); err != nil {
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {

@@ -26,8 +26,8 @@ import (
 
 func TestDefinitions(t *testing.T) {
 	a := assertions.New(t)
-	testEvent := events.Define("test", "Test Event", events.WithVisibility(ttnpb.RIGHT_ALL))
+	testEvent := events.Define("test", "Test Event", events.WithVisibility(ttnpb.Right_RIGHT_ALL))
 	evt := testEvent.New(test.Context())
 	a.So(evt.Name(), should.Equal, "test")
-	a.So(evt.Visibility().Rights, should.Contain, ttnpb.RIGHT_ALL)
+	a.So(evt.Visibility().Rights, should.Contain, ttnpb.Right_RIGHT_ALL)
 }

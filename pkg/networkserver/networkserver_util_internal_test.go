@@ -213,7 +213,7 @@ func MakeNsJsJoinRequest(conf NsJsJoinRequestConfig) *ttnpb.JoinRequest {
 		DownlinkSettings: &ttnpb.DLSettings{
 			Rx1DrOffset: conf.RX1DataRateOffset,
 			Rx2Dr:       conf.RX2DataRateIndex,
-			OptNeg:      conf.SelectedMACVersion.Compare(ttnpb.MAC_V1_1) >= 0,
+			OptNeg:      conf.SelectedMACVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0,
 		},
 		RxDelay: conf.RXDelay,
 		CfList:  frequencyplans.CFList(*test.FrequencyPlan(conf.FrequencyPlanID), conf.PHYVersion),
@@ -1160,7 +1160,7 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 				PHYVersion:      dev.LorawanPhyVersion,
 				MACState:        dev.PendingMacState,
 				Session:         dev.PendingSession,
-				Class:           ttnpb.CLASS_A,
+				Class:           ttnpb.Class_CLASS_A,
 				RX1Delay:        ttnpb.RxDelay(phy.JoinAcceptDelay1.Seconds()),
 				Uplink:          LastUplink(dev.PendingMacState.RecentUplinks...),
 				Priority:        ttnpb.TxSchedulePriority_HIGHEST,
@@ -1583,15 +1583,15 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 			dev.PendingMacState = &ttnpb.MACState{
 				CurrentParameters: &ttnpb.MACParameters{
 					MaxEirp:                    phy.DefaultMaxEIRP,
-					AdrDataRateIndex:           ttnpb.DATA_RATE_0,
+					AdrDataRateIndex:           ttnpb.DataRateIndex_DATA_RATE_0,
 					AdrNbTrans:                 1,
 					Rx1Delay:                   mac.DeviceDefaultRX1Delay(dev, phy, defaultMACSettings),
 					Rx1DataRateOffset:          defaultRX1DROffset,
 					Rx2DataRateIndex:           defaultRX2DRIdx,
 					Rx2Frequency:               defaultRX2Freq,
 					MaxDutyCycle:               mac.DeviceDefaultMaxDutyCycle(dev, defaultMACSettings),
-					RejoinTimePeriodicity:      ttnpb.REJOIN_TIME_0,
-					RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
+					RejoinTimePeriodicity:      ttnpb.RejoinTimeExponent_REJOIN_TIME_0,
+					RejoinCountPeriodicity:     ttnpb.RejoinCountExponent_REJOIN_COUNT_16,
 					PingSlotFrequency:          mac.DeviceDefaultPingSlotFrequency(dev, phy, defaultMACSettings),
 					BeaconFrequency:            mac.DeviceDefaultBeaconFrequency(dev, defaultMACSettings),
 					Channels:                   mac.DeviceDefaultChannels(dev, phy, defaultMACSettings),
@@ -1601,15 +1601,15 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 				},
 				DesiredParameters: &ttnpb.MACParameters{
 					MaxEirp:                    mac.DeviceDesiredMaxEIRP(dev, phy, fp, defaultMACSettings),
-					AdrDataRateIndex:           ttnpb.DATA_RATE_0,
+					AdrDataRateIndex:           ttnpb.DataRateIndex_DATA_RATE_0,
 					AdrNbTrans:                 1,
 					Rx1Delay:                   desiredRX1Delay,
 					Rx1DataRateOffset:          desiredRX1DROffset,
 					Rx2DataRateIndex:           desiredRX2DRIdx,
 					Rx2Frequency:               mac.DeviceDesiredRX2Frequency(dev, phy, fp, defaultMACSettings),
 					MaxDutyCycle:               mac.DeviceDesiredMaxDutyCycle(dev, defaultMACSettings),
-					RejoinTimePeriodicity:      ttnpb.REJOIN_TIME_0,
-					RejoinCountPeriodicity:     ttnpb.REJOIN_COUNT_16,
+					RejoinTimePeriodicity:      ttnpb.RejoinTimeExponent_REJOIN_TIME_0,
+					RejoinCountPeriodicity:     ttnpb.RejoinCountExponent_REJOIN_COUNT_16,
 					PingSlotFrequency:          mac.DeviceDesiredPingSlotFrequency(dev, phy, fp, defaultMACSettings),
 					BeaconFrequency:            mac.DeviceDesiredBeaconFrequency(dev, defaultMACSettings),
 					Channels:                   mac.DeviceDesiredChannels(dev, phy, fp, defaultMACSettings),
@@ -2104,7 +2104,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 		}
 		phy := Band(x.FrequencyPlanId, x.LorawanPhyVersion)
 		drIdx := func() ttnpb.DataRateIndex {
-			for idx := ttnpb.DATA_RATE_0; idx <= ttnpb.DATA_RATE_15; idx++ {
+			for idx := ttnpb.DataRateIndex_DATA_RATE_0; idx <= ttnpb.DataRateIndex_DATA_RATE_15; idx++ {
 				if _, ok := phy.DataRates[idx]; ok {
 					return idx
 				}
@@ -2132,7 +2132,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 				DownlinkSettings: &ttnpb.DLSettings{
 					Rx1DrOffset: macState.DesiredParameters.Rx1DataRateOffset,
 					Rx2Dr:       macState.DesiredParameters.Rx2DataRateIndex,
-					OptNeg:      x.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0,
+					OptNeg:      x.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0,
 				},
 				RxDelay: macState.DesiredParameters.Rx1Delay,
 				CfList:  frequencyplans.CFList(*test.FrequencyPlan(x.FrequencyPlanId), x.LorawanPhyVersion),
@@ -2187,7 +2187,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 					EndDeviceIds: x.Ids,
 					Settings: &ttnpb.DownlinkMessage_Request{
 						Request: &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_A,
+							Class:           ttnpb.Class_CLASS_A,
 							Priority:        priority,
 							FrequencyPlanId: x.FrequencyPlanId,
 							Rx1Delay:        ttnpb.RxDelay(Band(x.FrequencyPlanId, x.LorawanPhyVersion).JoinAcceptDelay1 / time.Second),
@@ -2283,9 +2283,9 @@ func MakeMulticastEndDevice(class ttnpb.Class, defaults ttnpb.MACSettings, wrapK
 		EndDeviceOptions.WithMulticast(true),
 		func() test.EndDeviceOption {
 			switch class {
-			case ttnpb.CLASS_B:
+			case ttnpb.Class_CLASS_B:
 				return EndDeviceOptions.WithSupportsClassB(true)
-			case ttnpb.CLASS_C:
+			case ttnpb.Class_CLASS_C:
 				return EndDeviceOptions.WithSupportsClassC(true)
 			default:
 				panic(fmt.Sprintf("invalid multicast device class: %v", class))

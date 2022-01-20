@@ -45,7 +45,7 @@ func TestScheduledDownlinkMatcher(t *testing.T) {
 		EndDeviceIds: ids,
 		Settings: &ttnpb.DownlinkMessage_Request{
 			Request: &ttnpb.TxRequest{
-				Class: ttnpb.CLASS_A,
+				Class: ttnpb.Class_CLASS_A,
 			},
 		},
 		CorrelationIds: []string{"corr1", "corr2", "ns:downlink:CORRELATIONID"},

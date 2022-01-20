@@ -40,16 +40,16 @@ var AS_923_RP1_v1_0_2_RevB = Band{
 	},
 
 	DataRates: map[ttnpb.DataRateIndex]DataRate{
-		ttnpb.DATA_RATE_0: makeLoRaDataRate(12, 125000, makeDwellTimeMaxMACPayloadSizeFunc(59, 0)),
-		ttnpb.DATA_RATE_1: makeLoRaDataRate(11, 125000, makeDwellTimeMaxMACPayloadSizeFunc(59, 0)),
-		ttnpb.DATA_RATE_2: makeLoRaDataRate(10, 125000, makeDwellTimeMaxMACPayloadSizeFunc(59, 19)),
-		ttnpb.DATA_RATE_3: makeLoRaDataRate(9, 125000, makeDwellTimeMaxMACPayloadSizeFunc(123, 61)),
-		ttnpb.DATA_RATE_4: makeLoRaDataRate(8, 125000, makeDwellTimeMaxMACPayloadSizeFunc(230, 133)),
-		ttnpb.DATA_RATE_5: makeLoRaDataRate(7, 125000, makeDwellTimeMaxMACPayloadSizeFunc(230, 250)),
-		ttnpb.DATA_RATE_6: makeLoRaDataRate(7, 250000, makeDwellTimeMaxMACPayloadSizeFunc(230, 250)),
-		ttnpb.DATA_RATE_7: makeFSKDataRate(50000, makeDwellTimeMaxMACPayloadSizeFunc(230, 250)),
+		ttnpb.DataRateIndex_DATA_RATE_0: makeLoRaDataRate(12, 125000, makeDwellTimeMaxMACPayloadSizeFunc(59, 0)),
+		ttnpb.DataRateIndex_DATA_RATE_1: makeLoRaDataRate(11, 125000, makeDwellTimeMaxMACPayloadSizeFunc(59, 0)),
+		ttnpb.DataRateIndex_DATA_RATE_2: makeLoRaDataRate(10, 125000, makeDwellTimeMaxMACPayloadSizeFunc(59, 19)),
+		ttnpb.DataRateIndex_DATA_RATE_3: makeLoRaDataRate(9, 125000, makeDwellTimeMaxMACPayloadSizeFunc(123, 61)),
+		ttnpb.DataRateIndex_DATA_RATE_4: makeLoRaDataRate(8, 125000, makeDwellTimeMaxMACPayloadSizeFunc(230, 133)),
+		ttnpb.DataRateIndex_DATA_RATE_5: makeLoRaDataRate(7, 125000, makeDwellTimeMaxMACPayloadSizeFunc(230, 250)),
+		ttnpb.DataRateIndex_DATA_RATE_6: makeLoRaDataRate(7, 250000, makeDwellTimeMaxMACPayloadSizeFunc(230, 250)),
+		ttnpb.DataRateIndex_DATA_RATE_7: makeFSKDataRate(50000, makeDwellTimeMaxMACPayloadSizeFunc(230, 250)),
 	},
-	MaxADRDataRateIndex: ttnpb.DATA_RATE_5,
+	MaxADRDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 
 	ReceiveDelay1:        defaultReceiveDelay1,
 	ReceiveDelay2:        defaultReceiveDelay2,
@@ -87,15 +87,15 @@ var AS_923_RP1_v1_0_2_RevB = Band{
 		}
 		si := int8(idx) - so
 
-		minDR := ttnpb.DATA_RATE_0
+		minDR := ttnpb.DataRateIndex_DATA_RATE_0
 		if dwellTime {
-			minDR = ttnpb.DATA_RATE_2
+			minDR = ttnpb.DataRateIndex_DATA_RATE_2
 		}
 		switch {
 		case si <= int8(minDR):
 			return minDR, nil
 		case si >= 5:
-			return ttnpb.DATA_RATE_5, nil
+			return ttnpb.DataRateIndex_DATA_RATE_5, nil
 		}
 		return ttnpb.DataRateIndex(si), nil
 	},
@@ -104,12 +104,12 @@ var AS_923_RP1_v1_0_2_RevB = Band{
 	ParseChMask:     parseChMask16,
 
 	DefaultRx2Parameters: Rx2Parameters{
-		DataRateIndex: ttnpb.DATA_RATE_2,
+		DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
 		Frequency:     923200000,
 	},
 
 	Beacon: Beacon{
-		DataRateIndex:    ttnpb.DATA_RATE_3,
+		DataRateIndex:    ttnpb.DataRateIndex_DATA_RATE_3,
 		CodingRate:       "4/5",
 		ComputeFrequency: func(_ float64) uint64 { return as923BeaconFrequency(as923Group1Offset) },
 	},

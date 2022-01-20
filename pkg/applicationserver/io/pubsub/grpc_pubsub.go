@@ -48,7 +48,7 @@ func (ps *PubSub) GetFormats(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.Appl
 
 // Get implements ttnpb.ApplicationPubSubRegistryServer.
 func (ps *PubSub) Get(ctx context.Context, req *ttnpb.GetApplicationPubSubRequest) (*ttnpb.ApplicationPubSub, error) {
-	if err := rights.RequireApplication(ctx, *req.Ids.ApplicationIds, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
+	if err := rights.RequireApplication(ctx, *req.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
 	pubsub, err := ps.registry.Get(ctx, req.Ids, appendImplicitPubSubGetPaths(req.FieldMask.GetPaths()...))
@@ -63,7 +63,7 @@ func (ps *PubSub) Get(ctx context.Context, req *ttnpb.GetApplicationPubSubReques
 
 // List implements ttnpb.ApplicationPubSubRegistryServer.
 func (ps *PubSub) List(ctx context.Context, req *ttnpb.ListApplicationPubSubsRequest) (*ttnpb.ApplicationPubSubs, error) {
-	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
+	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ); err != nil {
 		return nil, err
 	}
 	pubsubs, err := ps.registry.List(ctx, req.ApplicationIds, appendImplicitPubSubGetPaths(req.FieldMask.GetPaths()...))
@@ -81,9 +81,9 @@ func (ps *PubSub) List(ctx context.Context, req *ttnpb.ListApplicationPubSubsReq
 // Set implements ttnpb.ApplicationPubSubRegistryServer.
 func (ps *PubSub) Set(ctx context.Context, req *ttnpb.SetApplicationPubSubRequest) (*ttnpb.ApplicationPubSub, error) {
 	if err := rights.RequireApplication(ctx, *req.Pubsub.Ids.ApplicationIds,
-		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
+		ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
+		ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ,
+		ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
 	); err != nil {
 		return nil, err
 	}
@@ -119,9 +119,9 @@ func (ps *PubSub) Set(ctx context.Context, req *ttnpb.SetApplicationPubSubReques
 // Delete implements ttnpb.ApplicationPubSubRegistryServer.
 func (ps *PubSub) Delete(ctx context.Context, ids *ttnpb.ApplicationPubSubIdentifiers) (*pbtypes.Empty, error) {
 	if err := rights.RequireApplication(ctx, *ids.ApplicationIds,
-		ttnpb.RIGHT_APPLICATION_SETTINGS_BASIC,
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
-		ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
+		ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
+		ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ,
+		ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
 	); err != nil {
 		return nil, err
 	}

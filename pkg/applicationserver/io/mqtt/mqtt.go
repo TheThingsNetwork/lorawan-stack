@@ -181,7 +181,7 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (_ context.Co
 	access := topicAccess{
 		appUID: uid,
 	}
-	if err := rights.RequireApplication(ctx, ids, ttnpb.RIGHT_APPLICATION_TRAFFIC_READ); err == nil {
+	if err := rights.RequireApplication(ctx, ids, ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ); err == nil {
 		access.reads = append(access.reads,
 			c.format.UplinkTopic(uid, topic.PartWildcard),
 			c.format.JoinAcceptTopic(uid, topic.PartWildcard),
@@ -195,7 +195,7 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (_ context.Co
 			c.format.ServiceDataTopic(uid, topic.PartWildcard),
 		)
 	}
-	if err := rights.RequireApplication(ctx, ids, ttnpb.RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE); err == nil {
+	if err := rights.RequireApplication(ctx, ids, ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE); err == nil {
 		access.writes = append(access.writes,
 			c.format.DownlinkPushTopic(uid, topic.PartWildcard),
 			c.format.DownlinkReplaceTopic(uid, topic.PartWildcard),

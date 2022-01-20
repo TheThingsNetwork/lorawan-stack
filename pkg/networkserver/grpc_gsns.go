@@ -76,7 +76,7 @@ func maxTransmissionNumber(ver ttnpb.MACVersion, confirmed bool, nbTrans uint32)
 	if !confirmed {
 		return nbTrans
 	}
-	if ver.Compare(ttnpb.MAC_V1_0_4) < 0 {
+	if ver.Compare(ttnpb.MACVersion_MAC_V1_0_4) < 0 {
 		return maxConfNbTrans
 	}
 	return nbTrans
@@ -249,9 +249,9 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			dev.PendingMacState.CurrentParameters.Rx1Delay = dev.PendingMacState.PendingJoinRequest.RxDelay
 			dev.PendingMacState.CurrentParameters.Rx1DataRateOffset = dev.PendingMacState.PendingJoinRequest.DownlinkSettings.Rx1DrOffset
 			dev.PendingMacState.CurrentParameters.Rx2DataRateIndex = dev.PendingMacState.PendingJoinRequest.DownlinkSettings.Rx2Dr
-			if dev.PendingMacState.PendingJoinRequest.DownlinkSettings.OptNeg && dev.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0 {
+			if dev.PendingMacState.PendingJoinRequest.DownlinkSettings.OptNeg && dev.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
 				// The version will be further negotiated via RekeyInd/RekeyConf
-				dev.PendingMacState.LorawanVersion = ttnpb.MAC_V1_1
+				dev.PendingMacState.LorawanVersion = ttnpb.MACVersion_MAC_V1_1
 			}
 			chs, ok := applyCFList(dev.PendingMacState.PendingJoinRequest.CfList, phy, dev.PendingMacState.CurrentParameters.Channels...)
 			if !ok {
@@ -462,18 +462,18 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		case dev.MacState.PingSlotPeriodicity == nil:
 			logger.Debug("Ignore class B bit in uplink, since ping slot periodicity is not known")
 
-		case dev.MacState.DeviceClass != ttnpb.CLASS_B:
+		case dev.MacState.DeviceClass != ttnpb.Class_CLASS_B:
 			logger.WithField("previous_class", dev.MacState.DeviceClass).Debug("Switch device class to class B")
 			queuedEventBuilders = append(queuedEventBuilders, mac.EvtClassBSwitch.BindData(dev.MacState.DeviceClass))
-			dev.MacState.DeviceClass = ttnpb.CLASS_B
+			dev.MacState.DeviceClass = ttnpb.Class_CLASS_B
 		}
-	} else if dev.MacState.DeviceClass == ttnpb.CLASS_B {
-		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 && dev.SupportsClassC {
-			queuedEventBuilders = append(queuedEventBuilders, mac.EvtClassCSwitch.BindData(ttnpb.CLASS_B))
-			dev.MacState.DeviceClass = ttnpb.CLASS_C
+	} else if dev.MacState.DeviceClass == ttnpb.Class_CLASS_B {
+		if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 && dev.SupportsClassC {
+			queuedEventBuilders = append(queuedEventBuilders, mac.EvtClassCSwitch.BindData(ttnpb.Class_CLASS_B))
+			dev.MacState.DeviceClass = ttnpb.Class_CLASS_C
 		} else {
-			queuedEventBuilders = append(queuedEventBuilders, mac.EvtClassASwitch.BindData(ttnpb.CLASS_B))
-			dev.MacState.DeviceClass = ttnpb.CLASS_A
+			queuedEventBuilders = append(queuedEventBuilders, mac.EvtClassASwitch.BindData(ttnpb.Class_CLASS_B))
+			dev.MacState.DeviceClass = ttnpb.Class_CLASS_A
 		}
 	}
 
@@ -494,20 +494,20 @@ macLoop:
 		var evs events.Builders
 		var err error
 		switch cmd.Cid {
-		case ttnpb.CID_RESET:
+		case ttnpb.MACCommandIdentifier_CID_RESET:
 			evs, err = mac.HandleResetInd(ctx, dev, cmd.GetResetInd(), fps, ns.defaultMACSettings)
-		case ttnpb.CID_LINK_CHECK:
+		case ttnpb.MACCommandIdentifier_CID_LINK_CHECK:
 			if !deduplicated {
 				deferredMACHandlers = append(deferredMACHandlers, makeDeferredMACHandler(dev, mac.HandleLinkCheckReq))
 				continue macLoop
 			}
 			evs, err = mac.HandleLinkCheckReq(ctx, dev, up)
-		case ttnpb.CID_LINK_ADR:
+		case ttnpb.MACCommandIdentifier_CID_LINK_ADR:
 			pld := cmd.GetLinkAdrAns()
 			dupCount := 0
-			if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_0_2) >= 0 && dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+			if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_0_2) >= 0 && dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
 				for _, dup := range cmds {
-					if dup.Cid != ttnpb.CID_LINK_ADR {
+					if dup.Cid != ttnpb.MACCommandIdentifier_CID_LINK_ADR {
 						break
 					}
 					if !proto.Equal(dup.GetLinkAdrAns(), pld) {
@@ -522,11 +522,11 @@ macLoop:
 			}
 			cmds = cmds[dupCount:]
 			evs, err = mac.HandleLinkADRAns(ctx, dev, pld, uint(dupCount), cmacFMatchResult.FullFCnt, fps)
-		case ttnpb.CID_DUTY_CYCLE:
+		case ttnpb.MACCommandIdentifier_CID_DUTY_CYCLE:
 			evs, err = mac.HandleDutyCycleAns(ctx, dev)
-		case ttnpb.CID_RX_PARAM_SETUP:
+		case ttnpb.MACCommandIdentifier_CID_RX_PARAM_SETUP:
 			evs, err = mac.HandleRxParamSetupAns(ctx, dev, cmd.GetRxParamSetupAns())
-		case ttnpb.CID_DEV_STATUS:
+		case ttnpb.MACCommandIdentifier_CID_DEV_STATUS:
 			evs, err = mac.HandleDevStatusAns(ctx, dev, cmd.GetDevStatusAns(), cmacFMatchResult.FullFCnt, *ttnpb.StdTime(up.ReceivedAt))
 			if err == nil {
 				setPaths = append(setPaths,
@@ -536,31 +536,31 @@ macLoop:
 					"power_state",
 				)
 			}
-		case ttnpb.CID_NEW_CHANNEL:
+		case ttnpb.MACCommandIdentifier_CID_NEW_CHANNEL:
 			evs, err = mac.HandleNewChannelAns(ctx, dev, cmd.GetNewChannelAns())
-		case ttnpb.CID_RX_TIMING_SETUP:
+		case ttnpb.MACCommandIdentifier_CID_RX_TIMING_SETUP:
 			evs, err = mac.HandleRxTimingSetupAns(ctx, dev)
-		case ttnpb.CID_TX_PARAM_SETUP:
+		case ttnpb.MACCommandIdentifier_CID_TX_PARAM_SETUP:
 			evs, err = mac.HandleTxParamSetupAns(ctx, dev)
-		case ttnpb.CID_DL_CHANNEL:
+		case ttnpb.MACCommandIdentifier_CID_DL_CHANNEL:
 			evs, err = mac.HandleDLChannelAns(ctx, dev, cmd.GetDlChannelAns())
-		case ttnpb.CID_REKEY:
+		case ttnpb.MACCommandIdentifier_CID_REKEY:
 			evs, err = mac.HandleRekeyInd(ctx, dev, cmd.GetRekeyInd(), pld.FHdr.DevAddr)
-		case ttnpb.CID_ADR_PARAM_SETUP:
+		case ttnpb.MACCommandIdentifier_CID_ADR_PARAM_SETUP:
 			evs, err = mac.HandleADRParamSetupAns(ctx, dev)
-		case ttnpb.CID_DEVICE_TIME:
+		case ttnpb.MACCommandIdentifier_CID_DEVICE_TIME:
 			evs, err = mac.HandleDeviceTimeReq(ctx, dev, up)
-		case ttnpb.CID_REJOIN_PARAM_SETUP:
+		case ttnpb.MACCommandIdentifier_CID_REJOIN_PARAM_SETUP:
 			evs, err = mac.HandleRejoinParamSetupAns(ctx, dev, cmd.GetRejoinParamSetupAns())
-		case ttnpb.CID_PING_SLOT_INFO:
+		case ttnpb.MACCommandIdentifier_CID_PING_SLOT_INFO:
 			evs, err = mac.HandlePingSlotInfoReq(ctx, dev, cmd.GetPingSlotInfoReq())
-		case ttnpb.CID_PING_SLOT_CHANNEL:
+		case ttnpb.MACCommandIdentifier_CID_PING_SLOT_CHANNEL:
 			evs, err = mac.HandlePingSlotChannelAns(ctx, dev, cmd.GetPingSlotChannelAns())
-		case ttnpb.CID_BEACON_TIMING:
+		case ttnpb.MACCommandIdentifier_CID_BEACON_TIMING:
 			evs, err = mac.HandleBeaconTimingReq(ctx, dev)
-		case ttnpb.CID_BEACON_FREQ:
+		case ttnpb.MACCommandIdentifier_CID_BEACON_FREQ:
 			evs, err = mac.HandleBeaconFreqAns(ctx, dev, cmd.GetBeaconFreqAns())
-		case ttnpb.CID_DEVICE_MODE:
+		case ttnpb.MACCommandIdentifier_CID_DEVICE_MODE:
 			evs, err = mac.HandleDeviceModeInd(ctx, dev, cmd.GetDeviceModeInd())
 		default:
 			logger.Warn("Unknown MAC command received, skip the rest")
@@ -578,7 +578,7 @@ macLoop:
 	}
 
 	if matchType == pendingMatch {
-		if dev.MacState.LorawanVersion.Compare(ttnpb.MAC_V1_1) < 0 {
+		if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
 			dev.Ids.DevAddr = &pld.FHdr.DevAddr
 			dev.Session = dev.PendingSession
 		} else if dev.PendingSession != nil || dev.PendingMacState != nil || dev.MacState.PendingJoinRequest != nil {
@@ -1137,7 +1137,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 	dlSettings := &ttnpb.DLSettings{
 		Rx1DrOffset: macState.DesiredParameters.Rx1DataRateOffset,
 		Rx2Dr:       macState.DesiredParameters.Rx2DataRateIndex,
-		OptNeg:      matched.LorawanVersion.Compare(ttnpb.MAC_V1_1) >= 0,
+		OptNeg:      matched.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0,
 	}
 
 	resp, joinEvents, err := ns.sendJoinRequest(ctx, matched.Ids, &ttnpb.JoinRequest{

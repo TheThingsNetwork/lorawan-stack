@@ -28,14 +28,14 @@ var (
 		for i := 0; i < 32; i++ {
 			uplinkChannels = append(uplinkChannels, Channel{
 				Frequency:   uint64(470300000 + 200000*i),
-				MaxDataRate: ttnpb.DATA_RATE_5,
+				MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 			})
 		}
 		// 20 MHz Type A Group 2
 		for i := 0; i < 32; i++ {
 			uplinkChannels = append(uplinkChannels, Channel{
 				Frequency:   uint64(503500000 + 200000*i),
-				MaxDataRate: ttnpb.DATA_RATE_5,
+				MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 			})
 		}
 		return uplinkChannels
@@ -47,14 +47,14 @@ var (
 		for i := 0; i < 32; i++ {
 			downlinkChannels = append(downlinkChannels, Channel{
 				Frequency:   uint64(483900000 + 200000*i),
-				MaxDataRate: ttnpb.DATA_RATE_5,
+				MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 			})
 		}
 		// 20 MHz Type A Group 2
 		for i := 0; i < 32; i++ {
 			downlinkChannels = append(downlinkChannels, Channel{
 				Frequency:   uint64(490300000 + 200000*i),
-				MaxDataRate: ttnpb.DATA_RATE_5,
+				MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
 			})
 		}
 		return downlinkChannels

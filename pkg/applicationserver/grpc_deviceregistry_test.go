@@ -128,7 +128,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "bar-application"}): ttnpb.RightsFrom(
-							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 						),
 					},
 				})
@@ -153,7 +153,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
-							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 						),
 					},
 				})
@@ -183,7 +183,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
-							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 						),
 					},
 				})
@@ -226,7 +226,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
-							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 						),
 					},
 				})
@@ -251,8 +251,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
-							ttnpb.RIGHT_APPLICATION_DEVICES_READ,
-							ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
 						),
 					},
 				})
@@ -399,7 +399,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "bar-application"}): ttnpb.RightsFrom(
-							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 						),
 					},
 				})
@@ -427,7 +427,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): {
 							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 							},
 						},
 					},
@@ -505,7 +505,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
-							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 						),
 					},
 				})
@@ -538,7 +538,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
-							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 						),
 					},
 				})
@@ -568,7 +568,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
-							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 						),
 					},
 				})
@@ -693,7 +693,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "bar-application"}): ttnpb.RightsFrom(
-							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 						),
 					},
 				})
@@ -719,7 +719,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
-							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 						),
 					},
 				})
@@ -751,7 +751,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				return rights.NewContext(ctx, rights.Rights{
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: registeredApplicationID}): ttnpb.RightsFrom(
-							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 						),
 					},
 				})

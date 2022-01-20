@@ -228,14 +228,14 @@ func TestAccessFetcher(t *testing.T) {
 	is := &mockAccessServer{
 		mockFetcher: mockFetcher{
 			authInfoResponse: &ttnpb.AuthInfoResponse{
-				UniversalRights: ttnpb.RightsFrom(ttnpb.RIGHT_SEND_INVITES),
+				UniversalRights: ttnpb.RightsFrom(ttnpb.Right_RIGHT_SEND_INVITES),
 				IsAdmin:         true,
 			},
-			applicationRights:  ttnpb.RightsFrom(ttnpb.RIGHT_APPLICATION_INFO),
-			clientRights:       ttnpb.RightsFrom(ttnpb.RIGHT_CLIENT_ALL),
-			gatewayRights:      ttnpb.RightsFrom(ttnpb.RIGHT_GATEWAY_INFO),
-			organizationRights: ttnpb.RightsFrom(ttnpb.RIGHT_ORGANIZATION_INFO),
-			userRights:         ttnpb.RightsFrom(ttnpb.RIGHT_USER_INFO),
+			applicationRights:  ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_INFO),
+			clientRights:       ttnpb.RightsFrom(ttnpb.Right_RIGHT_CLIENT_ALL),
+			gatewayRights:      ttnpb.RightsFrom(ttnpb.Right_RIGHT_GATEWAY_INFO),
+			organizationRights: ttnpb.RightsFrom(ttnpb.Right_RIGHT_ORGANIZATION_INFO),
+			userRights:         ttnpb.RightsFrom(ttnpb.Right_RIGHT_USER_INFO),
 		},
 	}
 	srv := is.Server()

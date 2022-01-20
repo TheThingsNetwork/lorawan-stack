@@ -26,7 +26,7 @@ import (
 
 var evtWebhookFail = events.Define(
 	"as.webhook.fail", "fail to send webhook",
-	events.WithVisibility(ttnpb.RIGHT_APPLICATION_TRAFFIC_READ),
+	events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 	events.WithErrorDataType(),
 )
 

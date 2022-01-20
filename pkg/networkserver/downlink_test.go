@@ -73,8 +73,8 @@ func TestProcessDownlinkTask(t *testing.T) {
 	customCh := &ttnpb.MACParameters_Channel{
 		UplinkFrequency:   430000000,
 		DownlinkFrequency: 431000000,
-		MinDataRateIndex:  ttnpb.DATA_RATE_0,
-		MaxDataRateIndex:  ttnpb.DATA_RATE_6,
+		MinDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_0,
+		MaxDataRateIndex:  ttnpb.DataRateIndex_DATA_RATE_6,
 	}
 	const customChIdx = 3
 	makeEU868macParameters := func(ver ttnpb.PHYVersion) *ttnpb.MACParameters {
@@ -242,7 +242,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 	)
 
 	pingSlotPeriodicity := &ttnpb.PingSlotPeriodValue{
-		Value: ttnpb.PING_EVERY_8S,
+		Value: ttnpb.PingSlotPeriod_PING_EVERY_8S,
 	}
 
 	_, ctx := test.New(t)
@@ -353,7 +353,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 			},
 		},
 
@@ -366,20 +366,20 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_A,
-					LorawanVersion:    ttnpb.MAC_V1_1,
+					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DeviceClass:       ttnpb.Class_CLASS_A,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
 							Confirmed:     true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							DevAddr:       test.DefaultDevAddr,
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 							DataRateIndex: customCh.MinDataRateIndex,
 							Frequency:     customCh.UplinkFrequency,
 							ChannelIndex:  customChIdx,
@@ -390,7 +390,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(DataDownlinkConfig{
 							DecodePayload: true,
-							MACVersion:    ttnpb.MAC_V1_0_3,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 						}),
 					},
 				},
@@ -411,17 +411,17 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacState: &ttnpb.MACState{
-					CurrentParameters:  makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DesiredParameters:  makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:        ttnpb.CLASS_A,
-					LorawanVersion:     ttnpb.MAC_V1_1,
+					CurrentParameters:  makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DesiredParameters:  makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DeviceClass:        ttnpb.Class_CLASS_A,
+					LorawanVersion:     ttnpb.MACVersion_MAC_V1_1,
 					RxWindowsAvailable: true,
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(DataDownlinkConfig{
 							DecodePayload: true,
-							MACVersion:    ttnpb.MAC_V1_0_3,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 						}),
 					},
 				},
@@ -442,20 +442,20 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_A,
-					LorawanVersion:    ttnpb.MAC_V1_1,
+					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DeviceClass:       ttnpb.Class_CLASS_A,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
 							Confirmed:     true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							DevAddr:       test.DefaultDevAddr,
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 							DataRateIndex: customCh.MinDataRateIndex,
 							Frequency:     customCh.UplinkFrequency,
 							ChannelIndex:  customChIdx,
@@ -476,21 +476,21 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacState: &ttnpb.MACState{
-					CurrentParameters:  makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DesiredParameters:  makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:        ttnpb.CLASS_A,
-					LorawanVersion:     ttnpb.MAC_V1_1,
+					CurrentParameters:  makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DesiredParameters:  makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DeviceClass:        ttnpb.Class_CLASS_A,
+					LorawanVersion:     ttnpb.MACVersion_MAC_V1_1,
 					RxWindowsAvailable: true,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
 							Confirmed:     true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							DevAddr:       test.DefaultDevAddr,
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 							DataRateIndex: customCh.MinDataRateIndex,
 							Frequency:     customCh.UplinkFrequency,
 							ChannelIndex:  customChIdx,
@@ -501,7 +501,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(DataDownlinkConfig{
 							DecodePayload: true,
-							MACVersion:    ttnpb.MAC_V1_0_3,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 						}),
 					},
 				},
@@ -526,19 +526,19 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_A,
-					LorawanVersion:    ttnpb.MAC_V1_1,
+					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DeviceClass:       ttnpb.Class_CLASS_A,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							DevAddr:       test.DefaultDevAddr,
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 							DataRateIndex: customCh.MinDataRateIndex,
 							Frequency:     customCh.UplinkFrequency,
 							ChannelIndex:  customChIdx,
@@ -549,7 +549,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(DataDownlinkConfig{
 							DecodePayload: true,
-							MACVersion:    ttnpb.MAC_V1_0_3,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 						}),
 					},
 					RxWindowsAvailable: true,
@@ -575,19 +575,19 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_0_3_REV_A,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_3_REV_A,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_0_3_REV_A),
-					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_0_3_REV_A),
-					DeviceClass:       ttnpb.CLASS_A,
-					LorawanVersion:    ttnpb.MAC_V1_0_3,
+					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
+					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
+					DeviceClass:       ttnpb.Class_CLASS_A,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
-							MACVersion:    ttnpb.MAC_V1_0_3,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 							DevAddr:       test.DefaultDevAddr,
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_0_3_REV_A].DataRates[customCh.MinDataRateIndex].Rate,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_0_3_REV_A].DataRates[customCh.MinDataRateIndex].Rate,
 							DataRateIndex: customCh.MinDataRateIndex,
 							Frequency:     customCh.UplinkFrequency,
 							ChannelIndex:  customChIdx,
@@ -598,7 +598,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(DataDownlinkConfig{
 							DecodePayload: true,
-							MACVersion:    ttnpb.MAC_V1_0_3,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 						}),
 					},
 					RxWindowsAvailable: true,
@@ -660,19 +660,19 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_0_3_REV_A,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_0_3_REV_A,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_0_3_REV_A),
-					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_0_3_REV_A),
-					DeviceClass:       ttnpb.CLASS_A,
-					LorawanVersion:    ttnpb.MAC_V1_0_3,
+					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
+					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
+					DeviceClass:       ttnpb.Class_CLASS_A,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
-							MACVersion:    ttnpb.MAC_V1_0_3,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 							DevAddr:       test.DefaultDevAddr,
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_0_3_REV_A].DataRates[customCh.MinDataRateIndex].Rate,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_0_3_REV_A].DataRates[customCh.MinDataRateIndex].Rate,
 							DataRateIndex: customCh.MinDataRateIndex,
 							Frequency:     customCh.UplinkFrequency,
 							ChannelIndex:  customChIdx,
@@ -683,7 +683,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(DataDownlinkConfig{
 							DecodePayload: true,
-							MACVersion:    ttnpb.MAC_V1_0_3,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 						}),
 					},
 					RxWindowsAvailable: true,
@@ -736,12 +736,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_A,
-					LorawanVersion:    ttnpb.MAC_V1_1,
+					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DeviceClass:       ttnpb.Class_CLASS_A,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_ResetConf{
 							MinorVersion: 1,
@@ -755,9 +755,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							DevAddr:       test.DefaultDevAddr,
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 							DataRateIndex: customCh.MinDataRateIndex,
 							Frequency:     customCh.UplinkFrequency,
 							ChannelIndex:  customChIdx,
@@ -768,7 +768,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(DataDownlinkConfig{
 							DecodePayload: true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
 					},
 					RxWindowsAvailable: true,
@@ -845,7 +845,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_A,
+							Class:           ttnpb.Class_CLASS_A,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
 							Rx1DataRate:     lastUp.Settings.DataRate,
@@ -887,12 +887,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_A,
-					LorawanVersion:    ttnpb.MAC_V1_1,
+					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DeviceClass:       ttnpb.Class_CLASS_A,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_ResetConf{
 							MinorVersion: 1,
@@ -906,9 +906,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							DevAddr:       test.DefaultDevAddr,
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 							DataRateIndex: customCh.MinDataRateIndex,
 							Frequency:     customCh.UplinkFrequency,
 							ChannelIndex:  customChIdx,
@@ -919,7 +919,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(DataDownlinkConfig{
 							DecodePayload: true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
 					},
 					RxWindowsAvailable: true,
@@ -996,7 +996,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_A,
+							Class:           ttnpb.Class_CLASS_A,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
 							Rx1DataRate:     lastUp.Settings.DataRate,
@@ -1028,7 +1028,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DeviceDiffs: []DeviceDiffFunc{
 				appendRecentMACStateDownlinkDiff,
 				makePendingMACCommandsDiff(
-					ttnpb.CID_DEV_STATUS.MACCommand(),
+					ttnpb.MACCommandIdentifier_CID_DEV_STATUS.MACCommand(),
 				),
 				setLastConfirmedDownlinkAtDiff,
 				setLastDownlinkAtDiff,
@@ -1048,12 +1048,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_A,
-					LorawanVersion:    ttnpb.MAC_V1_1,
+					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DeviceClass:       ttnpb.Class_CLASS_A,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_ResetConf{
 							MinorVersion: 1,
@@ -1067,9 +1067,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							DevAddr:       test.DefaultDevAddr,
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 							DataRateIndex: customCh.MinDataRateIndex,
 							Frequency:     customCh.UplinkFrequency,
 							ChannelIndex:  customChIdx,
@@ -1080,7 +1080,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(DataDownlinkConfig{
 							DecodePayload: true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
 					},
 					RxWindowsAvailable: true,
@@ -1151,7 +1151,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_A,
+							Class:           ttnpb.Class_CLASS_A,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
 							Rx1DataRate:     lastUp.Settings.DataRate,
@@ -1183,7 +1183,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DeviceDiffs: []DeviceDiffFunc{
 				appendRecentMACStateDownlinkDiff,
 				makePendingMACCommandsDiff(
-					ttnpb.CID_DEV_STATUS.MACCommand(),
+					ttnpb.MACCommandIdentifier_CID_DEV_STATUS.MACCommand(),
 				),
 				makeSetLastNFCntDownDiff(0x25),
 				setLastConfirmedDownlinkAtDiff,
@@ -1203,12 +1203,12 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacState: &ttnpb.MACState{
-					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_A,
-					LorawanVersion:    ttnpb.MAC_V1_1,
+					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DeviceClass:       ttnpb.Class_CLASS_A,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_ResetConf{
 							MinorVersion: 1,
@@ -1222,10 +1222,10 @@ func TestProcessDownlinkTask(t *testing.T) {
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							DevAddr:       test.DefaultDevAddr,
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B].DataRates[ttnpb.DATA_RATE_6].Rate,
-							DataRateIndex: ttnpb.DATA_RATE_6,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B].DataRates[ttnpb.DataRateIndex_DATA_RATE_6].Rate,
+							DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_6,
 							Frequency:     customCh.UplinkFrequency,
 							ChannelIndex:  customChIdx,
 							RxMetadata:    DefaultRxMetadata[:],
@@ -1235,7 +1235,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(DataDownlinkConfig{
 							DecodePayload: true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
 					},
 					RxWindowsAvailable: true,
@@ -1312,7 +1312,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_A,
+							Class:           ttnpb.Class_CLASS_A,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
 							Rx1DataRate:     lastUp.Settings.DataRate,
@@ -1342,7 +1342,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DeviceDiffs: []DeviceDiffFunc{
 				appendRecentMACStateDownlinkDiff,
 				makePendingMACCommandsDiff(
-					ttnpb.CID_DEV_STATUS.MACCommand(),
+					ttnpb.MACCommandIdentifier_CID_DEV_STATUS.MACCommand(),
 				),
 				setLastDownlinkAtDiff,
 				setLastConfirmedDownlinkAtDiff,
@@ -1361,23 +1361,23 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					ClassBTimeout: ttnpb.ProtoDurationPtr(42 * time.Second),
 				},
 				MacState: &ttnpb.MACState{
-					CurrentParameters:   makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DesiredParameters:   makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:         ttnpb.CLASS_B,
-					LorawanVersion:      ttnpb.MAC_V1_1,
+					CurrentParameters:   makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DesiredParameters:   makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DeviceClass:         ttnpb.Class_CLASS_B,
+					LorawanVersion:      ttnpb.MACVersion_MAC_V1_1,
 					PingSlotPeriodicity: pingSlotPeriodicity,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							DevAddr:       test.DefaultDevAddr,
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 							Frequency:     customCh.UplinkFrequency,
 							ChannelIndex:  customChIdx,
 							RxMetadata:    DefaultRxMetadata[:],
@@ -1390,7 +1390,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(DataDownlinkConfig{
 							DecodePayload: true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
 					},
 				},
@@ -1458,7 +1458,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:         ttnpb.CLASS_B,
+							Class:         ttnpb.Class_CLASS_B,
 							DownlinkPaths: paths,
 							Priority:      ttnpb.TxSchedulePriority_HIGH,
 							Rx2DataRate: &ttnpb.DataRate{
@@ -1507,15 +1507,15 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					ClassCTimeout: ttnpb.ProtoDurationPtr(42 * time.Second),
 				},
 				MacState: &ttnpb.MACState{
-					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_C,
-					LorawanVersion:    ttnpb.MAC_V1_1,
+					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DeviceClass:       ttnpb.Class_CLASS_C,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_ResetConf{
 							MinorVersion: 1,
@@ -1529,9 +1529,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							DevAddr:       test.DefaultDevAddr,
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 							Frequency:     customCh.UplinkFrequency,
 							ChannelIndex:  customChIdx,
 							RxMetadata:    DefaultRxMetadata[:],
@@ -1541,7 +1541,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(DataDownlinkConfig{
 							DecodePayload: true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
 					},
 					RxWindowsAvailable: true,
@@ -1618,7 +1618,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_A,
+							Class:           ttnpb.Class_CLASS_A,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
 							Rx1DataRate:     lastUp.Settings.DataRate,
@@ -1650,7 +1650,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			DeviceDiffs: []DeviceDiffFunc{
 				appendRecentMACStateDownlinkDiff,
 				makePendingMACCommandsDiff(
-					ttnpb.CID_DEV_STATUS.MACCommand(),
+					ttnpb.MACCommandIdentifier_CID_DEV_STATUS.MACCommand(),
 				),
 				makeSetLastNFCntDownDiff(0x24),
 				setLastDownlinkAtDiff,
@@ -1670,15 +1670,15 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					ClassCTimeout: ttnpb.ProtoDurationPtr(42 * time.Second),
 				},
 				MacState: &ttnpb.MACState{
-					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_C,
-					LorawanVersion:    ttnpb.MAC_V1_1,
+					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DeviceClass:       ttnpb.Class_CLASS_C,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 					QueuedResponses: []*ttnpb.MACCommand{
 						(&ttnpb.MACCommand_ResetConf{
 							MinorVersion: 1,
@@ -1692,9 +1692,9 @@ func TestProcessDownlinkTask(t *testing.T) {
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							DevAddr:       test.DefaultDevAddr,
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 							Frequency:     customCh.UplinkFrequency,
 							ChannelIndex:  customChIdx,
 							RxMetadata:    DefaultRxMetadata[:],
@@ -1704,7 +1704,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(DataDownlinkConfig{
 							DecodePayload: true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
 					},
 					RxWindowsAvailable: true,
@@ -1764,7 +1764,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_C,
+							Class:           ttnpb.Class_CLASS_C,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGH,
 							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
@@ -1807,23 +1807,23 @@ func TestProcessDownlinkTask(t *testing.T) {
 				},
 				FrequencyPlanId:         test.EUFrequencyPlanID,
 				LastDevStatusReceivedAt: ttnpb.ProtoTimePtr(now),
-				LorawanPhyVersion:       ttnpb.RP001_V1_1_REV_B,
+				LorawanPhyVersion:       ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					ClassCTimeout:         ttnpb.ProtoDurationPtr(42 * time.Second),
 					StatusTimePeriodicity: ttnpb.ProtoDurationPtr(time.Hour),
 				},
 				MacState: &ttnpb.MACState{
-					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_C,
-					LorawanVersion:    ttnpb.MAC_V1_1,
+					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DeviceClass:       ttnpb.Class_CLASS_C,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							DevAddr:       test.DefaultDevAddr,
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 							Frequency:     customCh.UplinkFrequency,
 							ChannelIndex:  customChIdx,
 							RxMetadata:    DefaultRxMetadata[:],
@@ -1833,7 +1833,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(DataDownlinkConfig{
 							DecodePayload: true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
 					},
 					RxWindowsAvailable: true,
@@ -1896,7 +1896,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:         ttnpb.CLASS_C,
+							Class:         ttnpb.Class_CLASS_C,
 							DownlinkPaths: paths,
 							Priority:      ttnpb.TxSchedulePriority_HIGH,
 							Rx2DataRate: &ttnpb.DataRate{
@@ -1946,22 +1946,22 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					ClassCTimeout: ttnpb.ProtoDurationPtr(42 * time.Second),
 				},
 				MacState: &ttnpb.MACState{
-					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_C,
-					LorawanVersion:    ttnpb.MAC_V1_1,
+					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DeviceClass:       ttnpb.Class_CLASS_C,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							DevAddr:       test.DefaultDevAddr,
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 							Frequency:     customCh.UplinkFrequency,
 							ChannelIndex:  customChIdx,
 							RxMetadata:    DefaultRxMetadata[:],
@@ -1971,7 +1971,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(DataDownlinkConfig{
 							DecodePayload: true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
 					},
 				},
@@ -2033,7 +2033,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_C,
+							Class:           ttnpb.Class_CLASS_C,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGH,
 							AbsoluteTime:    ttnpb.ProtoTimePtr(now.Add(DefaultEU868RX1Delay.Duration())),
@@ -2106,22 +2106,22 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					ClassCTimeout: ttnpb.ProtoDurationPtr(42 * time.Second),
 				},
 				MacState: &ttnpb.MACState{
-					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_C,
-					LorawanVersion:    ttnpb.MAC_V1_1,
+					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DeviceClass:       ttnpb.Class_CLASS_C,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							DevAddr:       test.DefaultDevAddr,
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 							Frequency:     customCh.UplinkFrequency,
 							ChannelIndex:  customChIdx,
 							RxMetadata:    DefaultRxMetadata[:],
@@ -2131,7 +2131,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(DataDownlinkConfig{
 							DecodePayload: true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
 					},
 				},
@@ -2193,7 +2193,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					}(),
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_C,
+							Class:           ttnpb.Class_CLASS_C,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGH,
 							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
@@ -2246,24 +2246,24 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					ClassCTimeout:          ttnpb.ProtoDurationPtr(42 * time.Second),
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
 					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				MacState: &ttnpb.MACState{
-					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_C,
-					LorawanVersion:    ttnpb.MAC_V1_1,
+					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DeviceClass:       ttnpb.Class_CLASS_C,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							DevAddr:       test.DefaultDevAddr,
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 							Frequency:     customCh.UplinkFrequency,
 							ChannelIndex:  customChIdx,
 							RxMetadata:    DefaultRxMetadata[:],
@@ -2273,7 +2273,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(DataDownlinkConfig{
 							DecodePayload: true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
 					},
 					RxWindowsAvailable: true,
@@ -2308,24 +2308,24 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevAddr:        &test.DefaultDevAddr,
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				MacSettings: &ttnpb.MACSettings{
 					ClassCTimeout:          ttnpb.ProtoDurationPtr(42 * time.Second),
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
 					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				MacState: &ttnpb.MACState{
-					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_C,
-					LorawanVersion:    ttnpb.MAC_V1_1,
+					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DeviceClass:       ttnpb.Class_CLASS_C,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 					RecentUplinks: []*ttnpb.UplinkMessage{
 						MakeDataUplink(DataUplinkConfig{
 							DecodePayload: true,
 							Matched:       true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 							DevAddr:       test.DefaultDevAddr,
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 							Frequency:     customCh.UplinkFrequency,
 							ChannelIndex:  customChIdx,
 							RxMetadata:    DefaultRxMetadata[:],
@@ -2335,7 +2335,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(DataDownlinkConfig{
 							DecodePayload: true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
 					},
 					RxWindowsAvailable: true,
@@ -2383,23 +2383,23 @@ func TestProcessDownlinkTask(t *testing.T) {
 					DevEui:         &types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 				},
 				FrequencyPlanId:   test.EUFrequencyPlanID,
-				LorawanPhyVersion: ttnpb.RP001_V1_1_REV_B,
+				LorawanPhyVersion: ttnpb.PHYVersion_RP001_V1_1_REV_B,
 				PendingMacState: &ttnpb.MACState{
-					CurrentParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DesiredParameters: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B),
-					DeviceClass:       ttnpb.CLASS_A,
-					LorawanVersion:    ttnpb.MAC_V1_1,
+					CurrentParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DesiredParameters: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B),
+					DeviceClass:       ttnpb.Class_CLASS_A,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_1,
 					QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
 						Keys:    sessionKeys,
 						Payload: joinAcceptBytes,
 						Request: &ttnpb.MACState_JoinRequest{
 							DownlinkSettings: &ttnpb.DLSettings{
-								Rx1DrOffset: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B).Rx1DataRateOffset,
-								Rx2Dr:       makeEU868macParameters(ttnpb.RP001_V1_1_REV_B).Rx2DataRateIndex,
+								Rx1DrOffset: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B).Rx1DataRateOffset,
+								Rx2Dr:       makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B).Rx2DataRateIndex,
 								OptNeg:      true,
 							},
-							RxDelay: makeEU868macParameters(ttnpb.RP001_V1_1_REV_B).Rx1Delay,
-							CfList:  frequencyplans.CFList(*test.FrequencyPlan(test.EUFrequencyPlanID), ttnpb.RP001_V1_1_REV_B),
+							RxDelay: makeEU868macParameters(ttnpb.PHYVersion_RP001_V1_1_REV_B).Rx1Delay,
+							CfList:  frequencyplans.CFList(*test.FrequencyPlan(test.EUFrequencyPlanID), ttnpb.PHYVersion_RP001_V1_1_REV_B),
 						},
 						DevAddr: test.DefaultDevAddr,
 					},
@@ -2409,7 +2409,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							DecodePayload: true,
 							JoinEUI:       types.EUI64{0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 							DevEUI:        types.EUI64{0x42, 0x42, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
+							DataRate:      LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B].DataRates[customCh.MinDataRateIndex].Rate,
 							DataRateIndex: customCh.MinDataRateIndex,
 							Frequency:     DefaultEU868Channels[0].UplinkFrequency,
 							RxMetadata:    DefaultRxMetadata[:],
@@ -2419,7 +2419,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RecentDownlinks: []*ttnpb.DownlinkMessage{
 						MakeDataDownlink(DataDownlinkConfig{
 							DecodePayload: true,
-							MACVersion:    ttnpb.MAC_V1_1,
+							MACVersion:    ttnpb.MACVersion_MAC_V1_1,
 						}),
 					},
 				},
@@ -2438,7 +2438,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						},
 					},
 				},
-				MacState:     MakeDefaultEU868MACState(ttnpb.CLASS_A, ttnpb.MAC_V1_1, ttnpb.RP001_V1_1_REV_B),
+				MacState:     MakeDefaultEU868MACState(ttnpb.Class_CLASS_A, ttnpb.MACVersion_MAC_V1_1, ttnpb.PHYVersion_RP001_V1_1_REV_B),
 				SupportsJoin: true,
 			},
 			DownlinkAssertion: func(ctx context.Context, env TestEnvironment, dev *ttnpb.EndDevice) (*ttnpb.DownlinkMessage, time.Time, bool) {
@@ -2452,7 +2452,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					joinAcceptBytes,
 					func(paths ...*ttnpb.DownlinkPath) *ttnpb.TxRequest {
 						return &ttnpb.TxRequest{
-							Class:           ttnpb.CLASS_A,
+							Class:           ttnpb.Class_CLASS_A,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGHEST,
 							Rx1DataRate:     lastUp.Settings.DataRate,

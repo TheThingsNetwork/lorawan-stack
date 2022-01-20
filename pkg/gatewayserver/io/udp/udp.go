@@ -216,7 +216,7 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 		ctx = rights.NewContext(ctx, rights.Rights{
 			GatewayRights: map[string]*ttnpb.Rights{
 				uid: {
-					Rights: []ttnpb.Right{ttnpb.RIGHT_GATEWAY_LINK},
+					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_LINK},
 				},
 			},
 		})

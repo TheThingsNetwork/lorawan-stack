@@ -424,7 +424,7 @@ type connectionEntry struct {
 // Connect connects a gateway by its identifiers to the Gateway Server, and returns a io.Connection for traffic and
 // control.
 func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
-	if err := gs.entityRegistry.AssertGatewayRights(ctx, ids, ttnpb.RIGHT_GATEWAY_LINK); err != nil {
+	if err := gs.entityRegistry.AssertGatewayRights(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
 
@@ -474,7 +474,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 			FrequencyPlanId:        fpID,
 			FrequencyPlanIds:       []string{fpID},
 			EnforceDutyCycle:       true,
-			DownlinkPathConstraint: ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE,
+			DownlinkPathConstraint: ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NONE,
 			Antennas:               []*ttnpb.GatewayAntenna{},
 		}
 	} else if err != nil {
@@ -551,7 +551,7 @@ func requireDisconnect(connected, current *ttnpb.Gateway) bool {
 		// Gateway Server may update the location from status messages. If the locations aren't the same, but if the new
 		// location is a GPS location, do not disconnect the gateway. This is to avoid that updating the location from a
 		// gateway status message results in disconnecting the gateway.
-		if len(current.Antennas) > 0 && current.Antennas[0].Location != nil && current.Antennas[0].Location.Source != ttnpb.SOURCE_GPS {
+		if len(current.Antennas) > 0 && current.Antennas[0].Location != nil && current.Antennas[0].Location.Source != ttnpb.LocationSource_SOURCE_GPS {
 			return true
 		}
 	}
@@ -983,7 +983,7 @@ func (gs *GatewayServer) handleLocationUpdates(ctx context.Context, conn connect
 
 					if i < len(status.AntennaLocations) && status.AntennaLocations[i] != nil {
 						antennas[i].Location = &ttnpb.Location{
-							Source: ttnpb.SOURCE_GPS,
+							Source: ttnpb.LocationSource_SOURCE_GPS,
 						}
 						if err := antennas[i].Location.SetFields(
 							status.AntennaLocations[i],

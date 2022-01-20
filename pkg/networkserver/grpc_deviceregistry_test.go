@@ -58,7 +58,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
+								ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC,
 							},
 						},
 					},
@@ -96,7 +96,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 							},
 						},
 					},
@@ -145,9 +145,9 @@ func TestDeviceRegistryGet(t *testing.T) {
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_DEVICES_READ,
-								ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
-								ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
+								ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ,
 							},
 						},
 					},
@@ -217,8 +217,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_DEVICES_READ,
-								ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
 							},
 						},
 					},
@@ -283,8 +283,8 @@ func TestDeviceRegistryGet(t *testing.T) {
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_DEVICES_READ,
-								ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
 							},
 						},
 					},
@@ -400,25 +400,25 @@ func TestDeviceRegistrySet(t *testing.T) {
 	defaultMACSettings := DefaultConfig.DefaultMACSettings.Parse()
 
 	customMACSettings := defaultMACSettings
-	customMACSettings.Rx1Delay = &ttnpb.RxDelayValue{Value: ttnpb.RX_DELAY_2}
+	customMACSettings.Rx1Delay = &ttnpb.RxDelayValue{Value: ttnpb.RxDelay_RX_DELAY_2}
 	customMACSettings.Rx1DataRateOffset = nil
 
 	customMACSettingsOpt := EndDeviceOptions.WithMacSettings(&customMACSettings)
 
 	multicastClassBMACSettings := defaultMACSettings
 	multicastClassBMACSettings.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
-		Value: ttnpb.PING_EVERY_16S,
+		Value: ttnpb.PingSlotPeriod_PING_EVERY_16S,
 	}
 
 	multicastClassBMACSettingsOpt := EndDeviceOptions.WithMacSettings(&multicastClassBMACSettings)
 
 	currentMACStateOverrideOpt := func(macState ttnpb.MACState) ttnpb.MACState {
-		macState.CurrentParameters.Rx1Delay = ttnpb.RX_DELAY_3
+		macState.CurrentParameters.Rx1Delay = ttnpb.RxDelay_RX_DELAY_3
 		macState.CurrentParameters.Rx1DataRateOffset = ttnpb.DataRateOffset_DATA_RATE_OFFSET_1
 		return macState
 	}
 	desiredMACStateOverrideOpt := func(macState ttnpb.MACState) ttnpb.MACState {
-		macState.DesiredParameters.Rx1Delay = ttnpb.RX_DELAY_4
+		macState.DesiredParameters.Rx1Delay = ttnpb.RxDelay_RX_DELAY_4
 		macState.DesiredParameters.Rx1DataRateOffset = ttnpb.DataRateOffset_DATA_RATE_OFFSET_2
 		return macState
 	}
@@ -470,7 +470,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"pending_mac_state",
 				),
 				RequiredRights: []ttnpb.Right{
-					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 				},
 
 				ReturnedDevice: MakeOTAAEndDevice(
@@ -489,7 +489,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"pending_session",
 				),
 				RequiredRights: []ttnpb.Right{
-					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 				},
 
 				ReturnedDevice: MakeOTAAEndDevice(
@@ -524,7 +524,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"session",
 				),
 				RequiredRights: []ttnpb.Right{
-					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 				},
 
 				ReturnedDevice: MakeOTAAEndDevice(
@@ -543,7 +543,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"session",
 				),
 				RequiredRights: []ttnpb.Right{
-					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 				},
 
 				ReturnedDevice: MakeOTAAEndDevice(
@@ -570,7 +570,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"session.keys.session_key_id",
 				),
 				RequiredRights: []ttnpb.Right{
-					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 				},
 
 				ReturnedDevice: MakeOTAAEndDevice(
@@ -588,55 +588,55 @@ func TestDeviceRegistrySet(t *testing.T) {
 			// OTAA Create 1.0.3
 			{
 				SetDevice: *MakeOTAASetDeviceRequest([]test.EndDeviceOption{
-					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanVersion(ttnpb.MACVersion_MAC_V1_0_3),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					activateOpt,
 				},
 					"mac_state",
 					"session",
 				),
 				RequiredRights: []ttnpb.Right{
-					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 				},
 
 				ReturnedDevice: MakeOTAAEndDevice(
-					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanVersion(ttnpb.MACVersion_MAC_V1_0_3),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					activateOpt,
 				),
 				StoredDevice: MakeOTAAEndDevice(
-					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanVersion(ttnpb.MACVersion_MAC_V1_0_3),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.Activate(customMACSettings, true, activeSessionOpts, activeMACStateOpts...),
 				),
 			},
 			{
 				SetDevice: *MakeOTAASetDeviceRequest([]test.EndDeviceOption{
-					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanVersion(ttnpb.MACVersion_MAC_V1_0_3),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.SendJoinRequest(customMACSettings, false),
 				},
 					"pending_mac_state",
 				),
 				RequiredRights: []ttnpb.Right{
-					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 				},
 
 				ReturnedDevice: MakeOTAAEndDevice(
-					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanVersion(ttnpb.MACVersion_MAC_V1_0_3),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.SendJoinRequest(customMACSettings, false),
 				),
 				StoredDevice: MakeOTAAEndDevice(
-					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanVersion(ttnpb.MACVersion_MAC_V1_0_3),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.SendJoinRequest(customMACSettings, true),
 				),
 			},
 			{
 				SetDevice: *MakeOTAASetDeviceRequest([]test.EndDeviceOption{
-					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanVersion(ttnpb.MACVersion_MAC_V1_0_3),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.SendJoinRequest(customMACSettings, false),
 					EndDeviceOptions.SendJoinAccept(ttnpb.TxSchedulePriority_HIGHEST),
 				},
@@ -644,26 +644,26 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"pending_session",
 				),
 				RequiredRights: []ttnpb.Right{
-					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 				},
 
 				ReturnedDevice: MakeOTAAEndDevice(
-					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanVersion(ttnpb.MACVersion_MAC_V1_0_3),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.SendJoinRequest(customMACSettings, false),
 					EndDeviceOptions.SendJoinAccept(ttnpb.TxSchedulePriority_HIGHEST),
 				),
 				StoredDevice: MakeOTAAEndDevice(
-					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanVersion(ttnpb.MACVersion_MAC_V1_0_3),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.SendJoinRequest(customMACSettings, true),
 					EndDeviceOptions.SendJoinAccept(ttnpb.TxSchedulePriority_HIGHEST),
 				),
 			},
 			{
 				SetDevice: *MakeOTAASetDeviceRequest([]test.EndDeviceOption{
-					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanVersion(ttnpb.MACVersion_MAC_V1_0_3),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					activateOpt,
 				},
 					"mac_state.current_parameters",
@@ -671,17 +671,17 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"session",
 				),
 				RequiredRights: []ttnpb.Right{
-					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 				},
 
 				ReturnedDevice: MakeOTAAEndDevice(
-					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanVersion(ttnpb.MACVersion_MAC_V1_0_3),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.Activate(customMACSettings, false, activeSessionOpts, currentMACStateOverrideOpt),
 				),
 				StoredDevice: MakeOTAAEndDevice(
-					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanVersion(ttnpb.MACVersion_MAC_V1_0_3),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.Activate(customMACSettings, true, activeSessionOpts, currentMACStateOverrideOpt),
 					EndDeviceOptions.WithMACStateOptions(
 						MACStateOptions.WithRecentUplinks(),
@@ -691,8 +691,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 			{
 				SetDevice: *MakeOTAASetDeviceRequest([]test.EndDeviceOption{
-					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanVersion(ttnpb.MACVersion_MAC_V1_0_3),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					activateOpt,
 				},
 					"mac_state.desired_parameters",
@@ -702,17 +702,17 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"session.keys.session_key_id",
 				),
 				RequiredRights: []ttnpb.Right{
-					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 				},
 
 				ReturnedDevice: MakeOTAAEndDevice(
-					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanVersion(ttnpb.MACVersion_MAC_V1_0_3),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.Activate(defaultMACSettings, false, nil, desiredMACStateOverrideOpt),
 				),
 				StoredDevice: MakeOTAAEndDevice(
-					EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+					EndDeviceOptions.WithLorawanVersion(ttnpb.MACVersion_MAC_V1_0_3),
+					EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 					EndDeviceOptions.Activate(defaultMACSettings, true, nil, desiredMACStateOverrideOpt),
 					EndDeviceOptions.WithMACStateOptions(
 						MACStateOptions.WithRecentUplinks(),
@@ -728,7 +728,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"session",
 				),
 				RequiredRights: []ttnpb.Right{
-					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 				},
 
 				ReturnedDevice: MakeABPEndDevice(customMACSettings, false, activeSessionOpts, nil),
@@ -737,15 +737,15 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 			// Multicast Create
 			{
-				SetDevice: *MakeMulticastSetDeviceRequest(ttnpb.CLASS_C, defaultMACSettings, activeSessionOpts, nil, nil,
+				SetDevice: *MakeMulticastSetDeviceRequest(ttnpb.Class_CLASS_C, defaultMACSettings, activeSessionOpts, nil, nil,
 					"session.last_n_f_cnt_down",
 				),
 				RequiredRights: []ttnpb.Right{
-					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS,
 				},
 
-				ReturnedDevice: MakeMulticastEndDevice(ttnpb.CLASS_C, defaultMACSettings, false, activeSessionOpts, nil),
-				StoredDevice:   MakeMulticastEndDevice(ttnpb.CLASS_C, defaultMACSettings, true, activeSessionOpts, nil),
+				ReturnedDevice: MakeMulticastEndDevice(ttnpb.Class_CLASS_C, defaultMACSettings, false, activeSessionOpts, nil),
+				StoredDevice:   MakeMulticastEndDevice(ttnpb.Class_CLASS_C, defaultMACSettings, true, activeSessionOpts, nil),
 			},
 		},
 
@@ -787,7 +787,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"pending_mac_state",
 				),
 				RequiredRights: []ttnpb.Right{
-					ttnpb.RIGHT_APPLICATION_DEVICES_WRITE_KEYS, // `pending_mac_state` requires key write rights
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS, // `pending_mac_state` requires key write rights
 				},
 
 				ReturnedDevice: EndDevicePtr(macStateWithoutRX1DelayOpt(*MakeABPEndDevice(defaultMACSettings, false, activeSessionOptsWithStartedAt, nil))),
@@ -796,7 +796,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 		},
 
 		// Multicast Update
-		MakeMulticastEndDevice(ttnpb.CLASS_B, defaultMACSettings, true, activeSessionOptsWithStartedAt, nil): {
+		MakeMulticastEndDevice(ttnpb.Class_CLASS_B, defaultMACSettings, true, activeSessionOptsWithStartedAt, nil): {
 			{
 				SetDevice: *makeUpdateDeviceRequest([]test.EndDeviceOption{
 					multicastClassBMACSettingsOpt,
@@ -804,8 +804,8 @@ func TestDeviceRegistrySet(t *testing.T) {
 					"mac_settings",
 				),
 
-				ReturnedDevice: EndDevicePtr(multicastClassBMACSettingsOpt(*MakeMulticastEndDevice(ttnpb.CLASS_B, defaultMACSettings, false, activeSessionOptsWithStartedAt, nil))),
-				StoredDevice:   EndDevicePtr(multicastClassBMACSettingsOpt(*MakeMulticastEndDevice(ttnpb.CLASS_B, defaultMACSettings, true, activeSessionOptsWithStartedAt, nil))),
+				ReturnedDevice: EndDevicePtr(multicastClassBMACSettingsOpt(*MakeMulticastEndDevice(ttnpb.Class_CLASS_B, defaultMACSettings, false, activeSessionOptsWithStartedAt, nil))),
+				StoredDevice:   EndDevicePtr(multicastClassBMACSettingsOpt(*MakeMulticastEndDevice(ttnpb.Class_CLASS_B, defaultMACSettings, true, activeSessionOptsWithStartedAt, nil))),
 			},
 		},
 	} {
@@ -904,7 +904,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					a.So(dev, should.BeNil)
 					if len(tc.RequiredRights) > 0 {
 						dev, err, ok = env.AssertSetDevice(ctx, createDevice == nil, req,
-							ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+							ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 						)
 						if !a.So(ok, should.BeTrue) || !a.So(err, should.BeError) || !a.So(errors.IsPermissionDenied(err), should.BeTrue) {
 							if err != nil {
@@ -916,7 +916,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					}
 
 					rights := append([]ttnpb.Right{
-						ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+						ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 					}, tc.RequiredRights...)
 					expectedReturn := test.Must(ttnpb.ApplyEndDeviceFieldMask(nil, EndDevicePtr(withTimestamps(*tc.ReturnedDevice)), ttnpb.AddImplicitEndDeviceGetFields(tc.SetDevice.Paths...)...)).(*ttnpb.EndDevice)
 
@@ -983,8 +983,8 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 		},
 		{
 			CreateDevice: MakeOTAASetDeviceRequest([]test.EndDeviceOption{
-				EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-				EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+				EndDeviceOptions.WithLorawanVersion(ttnpb.MACVersion_MAC_V1_0_3),
+				EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 				activateOpt,
 			},
 				"mac_state",
@@ -1000,8 +1000,8 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 		},
 		{
 			CreateDevice: MakeABPSetDeviceRequest(macSettings, activeSessionOpts, nil, []test.EndDeviceOption{
-				EndDeviceOptions.WithLorawanVersion(ttnpb.MAC_V1_0_3),
-				EndDeviceOptions.WithLorawanPhyVersion(ttnpb.RP001_V1_0_3_REV_A),
+				EndDeviceOptions.WithLorawanVersion(ttnpb.MACVersion_MAC_V1_0_3),
+				EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 			}),
 		},
 	} {
@@ -1019,7 +1019,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 					"session.last_f_cnt_up",
 				},
 				RequiredRights: []ttnpb.Right{
-					ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 				},
 			},
 			{
@@ -1028,7 +1028,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 					"session.last_f_cnt_up",
 				},
 				RequiredRights: []ttnpb.Right{
-					ttnpb.RIGHT_APPLICATION_DEVICES_READ,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
 				},
 			},
 			{
@@ -1036,8 +1036,8 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 					"session.keys",
 				},
 				RequiredRights: []ttnpb.Right{
-					ttnpb.RIGHT_APPLICATION_DEVICES_READ,
-					ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
 				},
 			},
 			{
@@ -1049,9 +1049,9 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 					"pending_session",
 				},
 				RequiredRights: []ttnpb.Right{
-					ttnpb.RIGHT_APPLICATION_DEVICES_READ,
-					ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
-					ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
+					ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ,
 				},
 			},
 			{
@@ -1066,9 +1066,9 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 					"supports_join",
 				},
 				RequiredRights: []ttnpb.Right{
-					ttnpb.RIGHT_APPLICATION_DEVICES_READ,
-					ttnpb.RIGHT_APPLICATION_DEVICES_READ_KEYS,
-					ttnpb.RIGHT_APPLICATION_TRAFFIC_READ,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
+					ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS,
+					ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ,
 				},
 			},
 		} {
@@ -1157,7 +1157,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 					now := clock.Now().UTC()
 
 					dev, err, ok = env.AssertResetFactoryDefaults(ctx, req, append([]ttnpb.Right{
-						ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+						ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 					}, conf.RequiredRights...)...)
 					if !a.So(ok, should.BeTrue) {
 						return
@@ -1246,7 +1246,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_GATEWAY_SETTINGS_BASIC,
+								ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC,
 							},
 						},
 					},
@@ -1277,7 +1277,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 							},
 						},
 					},
@@ -1312,7 +1312,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 					ApplicationRights: map[string]*ttnpb.Rights{
 						unique.ID(test.Context(), ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
 							Rights: []ttnpb.Right{
-								ttnpb.RIGHT_APPLICATION_DEVICES_WRITE,
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
 							},
 						},
 					},

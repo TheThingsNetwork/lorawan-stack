@@ -234,7 +234,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 2,
 					PendingRequests: []*ttnpb.MACCommand{
-						ttnpb.CID_DEV_STATUS.MACCommand(),
+						ttnpb.MACCommandIdentifier_CID_DEV_STATUS.MACCommand(),
 					},
 				},
 				BatteryPercentage: &pbtypes.FloatValue{Value: 0.44},
@@ -269,7 +269,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 2,
 					PendingRequests: []*ttnpb.MACCommand{
-						ttnpb.CID_DEV_STATUS.MACCommand(),
+						ttnpb.MACCommandIdentifier_CID_DEV_STATUS.MACCommand(),
 					},
 				},
 				BatteryPercentage: &pbtypes.FloatValue{Value: 0.44},
@@ -302,7 +302,7 @@ func TestHandleDevStatusAns(t *testing.T) {
 				MacState: &ttnpb.MACState{
 					LastDevStatusFCntUp: 2,
 					PendingRequests: []*ttnpb.MACCommand{
-						ttnpb.CID_DEV_STATUS.MACCommand(),
+						ttnpb.MACCommandIdentifier_CID_DEV_STATUS.MACCommand(),
 					},
 				},
 				BatteryPercentage: &pbtypes.FloatValue{Value: 0.44},

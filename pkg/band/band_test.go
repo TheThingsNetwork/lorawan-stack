@@ -578,7 +578,7 @@ func TestFindDataRate(t *testing.T) {
 	a := assertions.New(t)
 
 	// US_902_928
-	testBand, _ := Get(US_902_928, ttnpb.RP001_V1_0_2_REV_B)
+	testBand, _ := Get(US_902_928, ttnpb.PHYVersion_RP001_V1_0_2_REV_B)
 	dr := &ttnpb.DataRate{
 		Modulation: &ttnpb.DataRate_Lora{
 			Lora: &ttnpb.LoRaDataRate{
@@ -589,7 +589,7 @@ func TestFindDataRate(t *testing.T) {
 	}
 	index, _, ok := testBand.FindDownlinkDataRate(dr)
 	a.So(ok, should.BeTrue)
-	if index != ttnpb.DATA_RATE_12 {
+	if index != ttnpb.DataRateIndex_DATA_RATE_12 {
 		t.Fatalf("Invalid index, expected 12. Got %d", index)
 	}
 
@@ -603,12 +603,12 @@ func TestFindDataRate(t *testing.T) {
 	}
 	index, _, ok = testBand.FindUplinkDataRate(dr)
 	a.So(ok, should.BeTrue)
-	if index != ttnpb.DATA_RATE_4 {
+	if index != ttnpb.DataRateIndex_DATA_RATE_4 {
 		t.Fatalf("Invalid index, expected 4. Got %d", index)
 	}
 
 	// AU_915_928
-	testBand, _ = Get(AU_915_928, ttnpb.RP001_V1_0_3_REV_A)
+	testBand, _ = Get(AU_915_928, ttnpb.PHYVersion_RP001_V1_0_3_REV_A)
 	dr = &ttnpb.DataRate{
 		Modulation: &ttnpb.DataRate_Lora{
 			Lora: &ttnpb.LoRaDataRate{
@@ -619,7 +619,7 @@ func TestFindDataRate(t *testing.T) {
 	}
 	index, _, ok = testBand.FindDownlinkDataRate(dr)
 	a.So(ok, should.BeTrue)
-	if index != ttnpb.DATA_RATE_8 {
+	if index != ttnpb.DataRateIndex_DATA_RATE_8 {
 		t.Fatalf("Invalid index, expected 8. Got %d", index)
 	}
 
@@ -633,8 +633,7 @@ func TestFindDataRate(t *testing.T) {
 	}
 	index, _, ok = testBand.FindUplinkDataRate(dr)
 	a.So(ok, should.BeTrue)
-	if index != ttnpb.DATA_RATE_8 {
+	if index != ttnpb.DataRateIndex_DATA_RATE_8 {
 		t.Fatalf("Invalid index, expected 8. Got %d", index)
 	}
-
 }

@@ -36,25 +36,23 @@ import (
 	"gopkg.in/square/go-jose.v2"
 )
 
-var (
-	toPBRegion = map[string]packetbroker.Region{
-		band.EU_863_870: packetbroker.Region_EU_863_870,
-		band.US_902_928: packetbroker.Region_US_902_928,
-		band.CN_779_787: packetbroker.Region_CN_779_787,
-		band.EU_433:     packetbroker.Region_EU_433,
-		band.AU_915_928: packetbroker.Region_AU_915_928,
-		band.CN_470_510: packetbroker.Region_CN_470_510,
-		// TODO: Add CN_470_510_* regions.
-		// https://github.com/TheThingsNetwork/lorawan-stack/issues/3513
-		band.AS_923:     packetbroker.Region_AS_923,
-		band.AS_923_2:   packetbroker.Region_AS_923_2,
-		band.AS_923_3:   packetbroker.Region_AS_923_3,
-		band.KR_920_923: packetbroker.Region_KR_920_923,
-		band.IN_865_867: packetbroker.Region_IN_865_867,
-		band.RU_864_870: packetbroker.Region_RU_864_870,
-		band.ISM_2400:   packetbroker.Region_WW_2G4,
-	}
-)
+var toPBRegion = map[string]packetbroker.Region{
+	band.EU_863_870: packetbroker.Region_EU_863_870,
+	band.US_902_928: packetbroker.Region_US_902_928,
+	band.CN_779_787: packetbroker.Region_CN_779_787,
+	band.EU_433:     packetbroker.Region_EU_433,
+	band.AU_915_928: packetbroker.Region_AU_915_928,
+	band.CN_470_510: packetbroker.Region_CN_470_510,
+	// TODO: Add CN_470_510_* regions.
+	// https://github.com/TheThingsNetwork/lorawan-stack/issues/3513
+	band.AS_923:     packetbroker.Region_AS_923,
+	band.AS_923_2:   packetbroker.Region_AS_923_2,
+	band.AS_923_3:   packetbroker.Region_AS_923_3,
+	band.KR_920_923: packetbroker.Region_KR_920_923,
+	band.IN_865_867: packetbroker.Region_IN_865_867,
+	band.RU_864_870: packetbroker.Region_RU_864_870,
+	band.ISM_2400:   packetbroker.Region_WW_2G4,
+}
 
 func fromPBDataRate(dataRate *packetbroker.DataRate) (dr *ttnpb.DataRate, codingRate string, ok bool) {
 	switch mod := dataRate.GetModulation().(type) {
@@ -379,7 +377,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 				}
 			}
 
-			if md.DownlinkPathConstraint == ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER {
+			if md.DownlinkPathConstraint == ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER {
 				continue
 			}
 
@@ -445,11 +443,11 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 		return nil, errNetID.WithCause(err).WithAttributes("net_id", msg.HomeNetworkNetId)
 	}
 	var (
-		downlinkPathConstraint = ttnpb.DOWNLINK_PATH_CONSTRAINT_NEVER
+		downlinkPathConstraint = ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER
 		uplinkToken            []byte
 	)
 	if len(msg.Message.GatewayUplinkToken) > 0 || len(msg.Message.ForwarderUplinkToken) > 0 {
-		downlinkPathConstraint = ttnpb.DOWNLINK_PATH_CONSTRAINT_NONE
+		downlinkPathConstraint = ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NONE
 		token := &agentUplinkToken{
 			ForwarderNetID:     forwarderNetID,
 			ForwarderTenantID:  msg.ForwarderTenantId,
@@ -574,14 +572,14 @@ func fromPBUplink(ctx context.Context, msg *packetbroker.RoutedUplinkMessage, re
 
 var (
 	fromPBClass = map[packetbroker.DownlinkMessageClass]ttnpb.Class{
-		packetbroker.DownlinkMessageClass_CLASS_A: ttnpb.CLASS_A,
-		packetbroker.DownlinkMessageClass_CLASS_B: ttnpb.CLASS_B,
-		packetbroker.DownlinkMessageClass_CLASS_C: ttnpb.CLASS_C,
+		packetbroker.DownlinkMessageClass_CLASS_A: ttnpb.Class_CLASS_A,
+		packetbroker.DownlinkMessageClass_CLASS_B: ttnpb.Class_CLASS_B,
+		packetbroker.DownlinkMessageClass_CLASS_C: ttnpb.Class_CLASS_C,
 	}
 	toPBClass = map[ttnpb.Class]packetbroker.DownlinkMessageClass{
-		ttnpb.CLASS_A: packetbroker.DownlinkMessageClass_CLASS_A,
-		ttnpb.CLASS_B: packetbroker.DownlinkMessageClass_CLASS_B,
-		ttnpb.CLASS_C: packetbroker.DownlinkMessageClass_CLASS_C,
+		ttnpb.Class_CLASS_A: packetbroker.DownlinkMessageClass_CLASS_A,
+		ttnpb.Class_CLASS_B: packetbroker.DownlinkMessageClass_CLASS_B,
+		ttnpb.Class_CLASS_C: packetbroker.DownlinkMessageClass_CLASS_C,
 	}
 	fromPBPriority = map[packetbroker.DownlinkMessagePriority]ttnpb.TxSchedulePriority{
 		packetbroker.DownlinkMessagePriority_LOWEST:  ttnpb.TxSchedulePriority_LOWEST,
@@ -783,15 +781,15 @@ func fromPBContactInfo(admin, technical *packetbroker.ContactInfo) []*ttnpb.Cont
 	res := make([]*ttnpb.ContactInfo, 0, 2)
 	if email := admin.GetEmail(); email != "" {
 		res = append(res, &ttnpb.ContactInfo{
-			ContactType:   ttnpb.CONTACT_TYPE_OTHER,
-			ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+			ContactType:   ttnpb.ContactType_CONTACT_TYPE_OTHER,
+			ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 			Value:         email,
 		})
 	}
 	if email := technical.GetEmail(); email != "" {
 		res = append(res, &ttnpb.ContactInfo{
-			ContactType:   ttnpb.CONTACT_TYPE_TECHNICAL,
-			ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+			ContactType:   ttnpb.ContactType_CONTACT_TYPE_TECHNICAL,
+			ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 			Value:         email,
 		})
 	}
@@ -800,15 +798,15 @@ func fromPBContactInfo(admin, technical *packetbroker.ContactInfo) []*ttnpb.Cont
 
 func toPBContactInfo(info []*ttnpb.ContactInfo) (admin, technical *packetbroker.ContactInfo) {
 	for _, c := range info {
-		if c.GetContactMethod() != ttnpb.CONTACT_METHOD_EMAIL || c.GetValue() == "" {
+		if c.GetContactMethod() != ttnpb.ContactMethod_CONTACT_METHOD_EMAIL || c.GetValue() == "" {
 			continue
 		}
 		switch c.GetContactType() {
-		case ttnpb.CONTACT_TYPE_OTHER:
+		case ttnpb.ContactType_CONTACT_TYPE_OTHER:
 			admin = &packetbroker.ContactInfo{
 				Email: c.GetValue(),
 			}
-		case ttnpb.CONTACT_TYPE_TECHNICAL:
+		case ttnpb.ContactType_CONTACT_TYPE_TECHNICAL:
 			technical = &packetbroker.ContactInfo{
 				Email: c.GetValue(),
 			}

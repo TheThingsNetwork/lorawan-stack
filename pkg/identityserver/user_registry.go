@@ -41,38 +41,38 @@ import (
 var (
 	evtCreateUser = events.Define(
 		"user.create", "create user",
-		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
+		events.WithVisibility(ttnpb.Right_RIGHT_USER_INFO),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtUpdateUser = events.Define(
 		"user.update", "update user",
-		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
+		events.WithVisibility(ttnpb.Right_RIGHT_USER_INFO),
 		events.WithUpdatedFieldsDataType(),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtDeleteUser = events.Define(
 		"user.delete", "delete user",
-		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
+		events.WithVisibility(ttnpb.Right_RIGHT_USER_INFO),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtRestoreUser = events.Define(
 		"user.restore", "restore user",
-		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
+		events.WithVisibility(ttnpb.Right_RIGHT_USER_INFO),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtPurgeUser = events.Define(
 		"user.purge", "purge user",
-		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
+		events.WithVisibility(ttnpb.Right_RIGHT_USER_INFO),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
 	evtUpdateUserIncorrectPassword = events.Define(
 		"user.update.incorrect_password", "update user failure: incorrect password",
-		events.WithVisibility(ttnpb.RIGHT_USER_INFO),
+		events.WithVisibility(ttnpb.Right_RIGHT_USER_INFO),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
 	)
@@ -201,10 +201,10 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		req.User.PrimaryEmailAddressValidatedAt = nil
 		req.User.RequirePasswordUpdate = false
 		if config.UserRegistration.AdminApproval.Required {
-			req.User.State = ttnpb.STATE_REQUESTED
+			req.User.State = ttnpb.State_STATE_REQUESTED
 			req.User.StateDescription = "admin approval required"
 		} else {
-			req.User.State = ttnpb.STATE_APPROVED
+			req.User.State = ttnpb.State_STATE_APPROVED
 		}
 		req.User.Admin = false
 		req.User.TemporaryPassword = ""
@@ -215,7 +215,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 
 	var primaryEmailAddressFound bool
 	for _, contactInfo := range req.User.ContactInfo {
-		if contactInfo.ContactMethod == ttnpb.CONTACT_METHOD_EMAIL && contactInfo.Value == req.User.PrimaryEmailAddress {
+		if contactInfo.ContactMethod == ttnpb.ContactMethod_CONTACT_METHOD_EMAIL && contactInfo.Value == req.User.PrimaryEmailAddress {
 			primaryEmailAddressFound = true
 			if contactInfo.ValidatedAt != nil {
 				req.User.PrimaryEmailAddressValidatedAt = contactInfo.ValidatedAt
@@ -225,7 +225,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	}
 	if !primaryEmailAddressFound {
 		req.User.ContactInfo = append(req.User.ContactInfo, &ttnpb.ContactInfo{
-			ContactMethod: ttnpb.CONTACT_METHOD_EMAIL,
+			ContactMethod: ttnpb.ContactMethod_CONTACT_METHOD_EMAIL,
 			Value:         req.User.PrimaryEmailAddress,
 			ValidatedAt:   req.User.PrimaryEmailAddressValidatedAt,
 		})
@@ -283,7 +283,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 		return nil, err
 	}
 
-	if usr.State == ttnpb.STATE_REQUESTED {
+	if usr.State == ttnpb.State_STATE_REQUESTED {
 		err = is.SendAdminsEmail(ctx, func(data emails.Data) email.MessageData {
 			data.Entity.Type, data.Entity.ID = "user", usr.GetIds().GetUserId()
 			return &emails.UserRequested{
@@ -308,7 +308,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 
 func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest) (usr *ttnpb.User, err error) {
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask, getPaths, nil)
-	if err = rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.RIGHT_USER_INFO); err != nil {
+	if err = rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.Right_RIGHT_USER_INFO); err != nil {
 		if err := is.RequireAuthenticated(ctx); err != nil {
 			return nil, err
 		}
@@ -403,7 +403,7 @@ func (is *IdentityServer) setFullProfilePictureURL(ctx context.Context, usr *ttn
 }
 
 func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserRequest) (usr *ttnpb.User, err error) {
-	if err = rights.RequireUser(ctx, *req.User.GetIds(), ttnpb.RIGHT_USER_SETTINGS_BASIC); err != nil {
+	if err = rights.RequireUser(ctx, *req.User.GetIds(), ttnpb.Right_RIGHT_USER_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask, nil, getPaths)
@@ -491,7 +491,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 				}
 				if !ttnpb.HasAnyField(req.FieldMask.GetPaths(), "primary_email_address_validated_at") {
 					for _, contactInfo := range contactInfo {
-						if contactInfo.ContactMethod == ttnpb.CONTACT_METHOD_EMAIL && contactInfo.Value == req.User.PrimaryEmailAddress {
+						if contactInfo.ContactMethod == ttnpb.ContactMethod_CONTACT_METHOD_EMAIL && contactInfo.Value == req.User.PrimaryEmailAddress {
 							req.User.PrimaryEmailAddressValidatedAt = contactInfo.ValidatedAt
 							req.FieldMask.Paths = append(req.FieldMask.GetPaths(), "primary_email_address_validated_at")
 							break
@@ -698,7 +698,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 }
 
 func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireUser(ctx, *ids, ttnpb.RIGHT_USER_DELETE); err != nil {
+	if err := rights.RequireUser(ctx, *ids, ttnpb.Right_RIGHT_USER_DELETE); err != nil {
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
@@ -717,7 +717,7 @@ func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentif
 }
 
 func (is *IdentityServer) restoreUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireUser(store.WithSoftDeleted(ctx, false), *ids, ttnpb.RIGHT_USER_DELETE); err != nil {
+	if err := rights.RequireUser(store.WithSoftDeleted(ctx, false), *ids, ttnpb.Right_RIGHT_USER_DELETE); err != nil {
 		return nil, err
 	}
 	err := is.withDatabase(ctx, func(db *gorm.DB) error {
