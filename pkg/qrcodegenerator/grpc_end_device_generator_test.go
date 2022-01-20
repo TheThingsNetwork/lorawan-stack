@@ -26,7 +26,6 @@ import (
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator"
-	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -37,12 +36,10 @@ func TestGenerateEndDeviceQRCode(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
-	qrCode := qrcode.New(ctx)
-
-	qrCode.RegisterEndDeviceFormat("test", new(mockFormat))
-
 	c := componenttest.NewComponent(t, &component.Config{})
-	test.Must(New(c, &Config{}))
+	qrg, err := New(c, &Config{})
+	test.Must(qrg, err)
+	qrg.RegisterEndDeviceFormat("test", new(mockFormat))
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 

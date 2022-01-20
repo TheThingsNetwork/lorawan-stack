@@ -55,10 +55,12 @@ func New(c *component.Component, conf *Config) (*QRCodeGenerator, error) {
 	qrg.grpc.endDeviceQRCodeGenerator = &endDeviceQRCodeGeneratorServer{QRG: qrg}
 	qrg.grpc.qrCodeParser = &qrCodeParserServer{QRG: qrg}
 
-	qrCode := qrcode.New(ctx)
-	qrCode.RegisterEndDeviceFormat("tr005", new(enddevice.LoRaAllianceTR005Format))
-	qrCode.RegisterEndDeviceFormat("tr005draft2", new(enddevice.LoRaAllianceTR005Draft2Format))
-	qrCode.RegisterEndDeviceFormat("tr005draft3", new(enddevice.LoRaAllianceTR005Draft3Format))
+	// Register known formats.
+	qrg.qrCode = qrcode.New(ctx)
+	qrg.qrCode.RegisterEndDeviceFormat("tr005", new(enddevice.LoRaAllianceTR005Format))
+	qrg.qrCode.RegisterEndDeviceFormat("tr005draft2", new(enddevice.LoRaAllianceTR005Draft2Format))
+	qrg.qrCode.RegisterEndDeviceFormat("tr005draft3", new(enddevice.LoRaAllianceTR005Draft3Format))
+
 	c.RegisterGRPC(qrg)
 	return qrg, nil
 }
@@ -66,6 +68,11 @@ func New(c *component.Component, conf *Config) (*QRCodeGenerator, error) {
 // Context returns the context of the QR Code Generator.
 func (qrg *QRCodeGenerator) Context() context.Context {
 	return qrg.ctx
+}
+
+// RegisterEndDeviceFormat registers a new end device format.
+func (qrg *QRCodeGenerator) RegisterEndDeviceFormat(id string, f qrcode.EndDeviceFormat) {
+	qrg.qrCode.RegisterEndDeviceFormat(id, f)
 }
 
 // Roles returns the roles that the QR Code Generator fulfills.
