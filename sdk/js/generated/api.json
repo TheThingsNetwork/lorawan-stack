@@ -36620,11 +36620,25 @@
       "name": "lorawan-stack/api/qrcodegenerator.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
-      "hasEnums": false,
+      "hasEnums": true,
       "hasExtensions": false,
       "hasMessages": true,
       "hasServices": true,
-      "enums": [],
+      "enums": [
+        {
+          "name": "OnboardingEntityType",
+          "longName": "OnboardingEntityType",
+          "fullName": "ttn.lorawan.v3.OnboardingEntityType",
+          "description": "The type of entity that's being onboarded.",
+          "values": [
+            {
+              "name": "END_DEVICE",
+              "number": "0",
+              "description": "LoRaWAN End Device."
+            }
+          ]
+        }
+      ],
       "extensions": [],
       "messages": [
         {
@@ -36924,6 +36938,30 @@
           ]
         },
         {
+          "name": "OnboardingEntityData",
+          "longName": "OnboardingEntityData",
+          "fullName": "ttn.lorawan.v3.OnboardingEntityData",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "la_tr005_end_device",
+              "description": "",
+              "label": "",
+              "type": "LoRaAllianceTR005EndDevice",
+              "longType": "LoRaAllianceTR005EndDevice",
+              "fullType": "ttn.lorawan.v3.LoRaAllianceTR005EndDevice",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "data",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ParseQRCodeRequest",
           "longName": "ParseQRCodeRequest",
           "fullName": "ttn.lorawan.v3.ParseQRCodeRequest",
@@ -36952,7 +36990,27 @@
                   },
                   {
                     "name": "string.pattern",
-                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9])$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "entity_type",
+              "description": "Entity type for which the QR Code is being generated. Ex: `enddevice`.",
+              "label": "",
+              "type": "OnboardingEntityType",
+              "longType": "OnboardingEntityType",
+              "fullType": "ttn.lorawan.v3.OnboardingEntityType",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
                   }
                 ]
               }
@@ -36990,7 +37048,7 @@
           "description": "",
           "hasExtensions": false,
           "hasFields": true,
-          "hasOneofs": true,
+          "hasOneofs": false,
           "extensions": [],
           "fields": [
             {
@@ -37006,15 +37064,15 @@
               "defaultValue": ""
             },
             {
-              "name": "la_tr005_end_device",
+              "name": "onboarding_entity_data",
               "description": "",
               "label": "",
-              "type": "LoRaAllianceTR005EndDevice",
-              "longType": "LoRaAllianceTR005EndDevice",
-              "fullType": "ttn.lorawan.v3.LoRaAllianceTR005EndDevice",
+              "type": "OnboardingEntityData",
+              "longType": "OnboardingEntityData",
+              "fullType": "ttn.lorawan.v3.OnboardingEntityData",
               "ismap": false,
-              "isoneof": true,
-              "oneofdecl": "onboardingdata",
+              "isoneof": false,
+              "oneofdecl": "",
               "defaultValue": ""
             }
           ]
@@ -37254,7 +37312,7 @@
                   "rules": [
                     {
                       "method": "POST",
-                      "pattern": "/qr-codes/format_id",
+                      "pattern": "/qr-codes",
                       "body": "*"
                     }
                   ]

@@ -560,11 +560,13 @@
   - [Message `GenerateQRCodeResponse`](#ttn.lorawan.v3.GenerateQRCodeResponse)
   - [Message `GetQRCodeFormatRequest`](#ttn.lorawan.v3.GetQRCodeFormatRequest)
   - [Message `LoRaAllianceTR005EndDevice`](#ttn.lorawan.v3.LoRaAllianceTR005EndDevice)
+  - [Message `OnboardingEntityData`](#ttn.lorawan.v3.OnboardingEntityData)
   - [Message `ParseQRCodeRequest`](#ttn.lorawan.v3.ParseQRCodeRequest)
   - [Message `ParseQRCodeResponse`](#ttn.lorawan.v3.ParseQRCodeResponse)
   - [Message `QRCodeFormat`](#ttn.lorawan.v3.QRCodeFormat)
   - [Message `QRCodeFormats`](#ttn.lorawan.v3.QRCodeFormats)
   - [Message `QRCodeFormats.FormatsEntry`](#ttn.lorawan.v3.QRCodeFormats.FormatsEntry)
+  - [Enum `OnboardingEntityType`](#ttn.lorawan.v3.OnboardingEntityType)
   - [Service `EndDeviceQRCodeGenerator`](#ttn.lorawan.v3.EndDeviceQRCodeGenerator)
   - [Service `QRCodeParser`](#ttn.lorawan.v3.QRCodeParser)
 - [File `lorawan-stack/api/regional.proto`](#lorawan-stack/api/regional.proto)
@@ -7949,18 +7951,26 @@ See https://lora-alliance.org/wp-content/uploads/2020/11/TR005_LoRaWAN_Device_Id
 | `serial_number` | [`string`](#string) |  |  |
 | `proprietary` | [`string`](#string) |  |  |
 
+### <a name="ttn.lorawan.v3.OnboardingEntityData">Message `OnboardingEntityData`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `la_tr005_end_device` | [`LoRaAllianceTR005EndDevice`](#ttn.lorawan.v3.LoRaAllianceTR005EndDevice) |  |  |
+
 ### <a name="ttn.lorawan.v3.ParseQRCodeRequest">Message `ParseQRCodeRequest`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `format_id` | [`string`](#string) |  | QR code format identifier. Enumerate available formats with rpc ListFormats in the EndDeviceQRCodeGenerator service. |
+| `entity_type` | [`OnboardingEntityType`](#ttn.lorawan.v3.OnboardingEntityType) |  | Entity type for which the QR Code is being generated. Ex: `enddevice`. |
 | `qr_code` | [`bytes`](#bytes) |  | Raw QR code contents. |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
-| `format_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+| `format_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9])$`</p> |
+| `entity_type` | <p>`enum.defined_only`: `true`</p> |
 | `qr_code` | <p>`bytes.min_len`: `0`</p><p>`bytes.max_len`: `1024`</p> |
 
 ### <a name="ttn.lorawan.v3.ParseQRCodeResponse">Message `ParseQRCodeResponse`</a>
@@ -7968,7 +7978,7 @@ See https://lora-alliance.org/wp-content/uploads/2020/11/TR005_LoRaWAN_Device_Id
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `format_id` | [`string`](#string) |  | QR code format identifier that was used to parse the QR Code. |
-| `la_tr005_end_device` | [`LoRaAllianceTR005EndDevice`](#ttn.lorawan.v3.LoRaAllianceTR005EndDevice) |  |  |
+| `onboarding_entity_data` | [`OnboardingEntityData`](#ttn.lorawan.v3.OnboardingEntityData) |  |  |
 
 ### <a name="ttn.lorawan.v3.QRCodeFormat">Message `QRCodeFormat`</a>
 
@@ -8004,6 +8014,14 @@ See https://lora-alliance.org/wp-content/uploads/2020/11/TR005_LoRaWAN_Device_Id
 | `key` | [`string`](#string) |  |  |
 | `value` | [`QRCodeFormat`](#ttn.lorawan.v3.QRCodeFormat) |  |  |
 
+### <a name="ttn.lorawan.v3.OnboardingEntityType">Enum `OnboardingEntityType`</a>
+
+The type of entity that's being onboarded.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `END_DEVICE` | 0 | LoRaWAN End Device. |
+
 ### <a name="ttn.lorawan.v3.EndDeviceQRCodeGenerator">Service `EndDeviceQRCodeGenerator`</a>
 
 | Method Name | Request Type | Response Type | Description |
@@ -8030,7 +8048,7 @@ See https://lora-alliance.org/wp-content/uploads/2020/11/TR005_LoRaWAN_Device_Id
 
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
-| `Parse` | `POST` | `/api/v3/qr-codes/format_id` | `*` |
+| `Parse` | `POST` | `/api/v3/qr-codes` | `*` |
 
 ## <a name="lorawan-stack/api/regional.proto">File `lorawan-stack/api/regional.proto`</a>
 

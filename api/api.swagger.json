@@ -8758,6 +8758,39 @@
         ]
       }
     },
+    "/qr-codes": {
+      "post": {
+        "summary": "Parse QR Codes of known formats and return the information contained within.",
+        "operationId": "QRCodeParser_Parse",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ParseQRCodeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ParseQRCodeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "QRCodeParser"
+        ]
+      }
+    },
     "/qr-codes/end-devices": {
       "post": {
         "summary": "Generates a QR code.",
@@ -8843,39 +8876,6 @@
         ],
         "tags": [
           "EndDeviceQRCodeGenerator"
-        ]
-      }
-    },
-    "/qr-codes/format_id": {
-      "post": {
-        "summary": "Parse QR Codes of known formats and return the information contained within.",
-        "operationId": "QRCodeParser_Parse",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v3ParseQRCodeResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/v3ParseQRCodeRequest"
-            }
-          }
-        ],
-        "tags": [
-          "QRCodeParser"
         ]
       }
     },
@@ -17196,6 +17196,22 @@
         }
       }
     },
+    "v3OnboardingEntityData": {
+      "type": "object",
+      "properties": {
+        "la_tr005_end_device": {
+          "$ref": "#/definitions/v3LoRaAllianceTR005EndDevice"
+        }
+      }
+    },
+    "v3OnboardingEntityType": {
+      "type": "string",
+      "enum": [
+        "END_DEVICE"
+      ],
+      "default": "END_DEVICE",
+      "description": "The type of entity that's being onboarded.\n\n - END_DEVICE: LoRaWAN End Device."
+    },
     "v3Organization": {
       "type": "object",
       "properties": {
@@ -17707,6 +17723,10 @@
           "type": "string",
           "description": "QR code format identifier. Enumerate available formats with rpc ListFormats in the EndDeviceQRCodeGenerator service."
         },
+        "entity_type": {
+          "$ref": "#/definitions/v3OnboardingEntityType",
+          "description": "Entity type for which the QR Code is being generated. Ex: `enddevice`."
+        },
         "qr_code": {
           "type": "string",
           "format": "byte",
@@ -17721,8 +17741,8 @@
           "type": "string",
           "description": "QR code format identifier that was used to parse the QR Code."
         },
-        "la_tr005_end_device": {
-          "$ref": "#/definitions/v3LoRaAllianceTR005EndDevice"
+        "onboarding_entity_data": {
+          "$ref": "#/definitions/v3OnboardingEntityData"
         }
       }
     },

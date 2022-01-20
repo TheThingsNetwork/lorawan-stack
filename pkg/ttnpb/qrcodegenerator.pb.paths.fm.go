@@ -541,33 +541,53 @@ var LoRaAllianceTR005EndDeviceFieldPathsTopLevel = []string{
 	"serial_number",
 	"vendor_id",
 }
+var OnboardingEntityDataFieldPathsNested = []string{
+	"data",
+	"data.la_tr005_end_device",
+	"data.la_tr005_end_device.checksum",
+	"data.la_tr005_end_device.dev_eui",
+	"data.la_tr005_end_device.join_eui",
+	"data.la_tr005_end_device.model_id",
+	"data.la_tr005_end_device.owner_token",
+	"data.la_tr005_end_device.proprietary",
+	"data.la_tr005_end_device.schema_id",
+	"data.la_tr005_end_device.serial_number",
+	"data.la_tr005_end_device.vendor_id",
+}
+
+var OnboardingEntityDataFieldPathsTopLevel = []string{
+	"data",
+}
 var ParseQRCodeRequestFieldPathsNested = []string{
+	"entity_type",
 	"format_id",
 	"qr_code",
 }
 
 var ParseQRCodeRequestFieldPathsTopLevel = []string{
+	"entity_type",
 	"format_id",
 	"qr_code",
 }
 var ParseQRCodeResponseFieldPathsNested = []string{
 	"format_id",
-	"onboardingdata",
-	"onboardingdata.la_tr005_end_device",
-	"onboardingdata.la_tr005_end_device.checksum",
-	"onboardingdata.la_tr005_end_device.dev_eui",
-	"onboardingdata.la_tr005_end_device.join_eui",
-	"onboardingdata.la_tr005_end_device.model_id",
-	"onboardingdata.la_tr005_end_device.owner_token",
-	"onboardingdata.la_tr005_end_device.proprietary",
-	"onboardingdata.la_tr005_end_device.schema_id",
-	"onboardingdata.la_tr005_end_device.serial_number",
-	"onboardingdata.la_tr005_end_device.vendor_id",
+	"onboarding_entity_data",
+	"onboarding_entity_data.data",
+	"onboarding_entity_data.data.la_tr005_end_device",
+	"onboarding_entity_data.data.la_tr005_end_device.checksum",
+	"onboarding_entity_data.data.la_tr005_end_device.dev_eui",
+	"onboarding_entity_data.data.la_tr005_end_device.join_eui",
+	"onboarding_entity_data.data.la_tr005_end_device.model_id",
+	"onboarding_entity_data.data.la_tr005_end_device.owner_token",
+	"onboarding_entity_data.data.la_tr005_end_device.proprietary",
+	"onboarding_entity_data.data.la_tr005_end_device.schema_id",
+	"onboarding_entity_data.data.la_tr005_end_device.serial_number",
+	"onboarding_entity_data.data.la_tr005_end_device.vendor_id",
 }
 
 var ParseQRCodeResponseFieldPathsTopLevel = []string{
 	"format_id",
-	"onboardingdata",
+	"onboarding_entity_data",
 }
 var GenerateEndDeviceQRCodeRequest_ImageFieldPathsNested = []string{
 	"image_size",

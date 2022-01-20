@@ -681,6 +681,120 @@ var _ interface {
 	ErrorName() string
 } = LoRaAllianceTR005EndDeviceValidationError{}
 
+// ValidateFields checks the field values on OnboardingEntityData with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *OnboardingEntityData) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = OnboardingEntityDataFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "data":
+			if m.Data == nil {
+				return OnboardingEntityDataValidationError{
+					field:  "data",
+					reason: "value is required",
+				}
+			}
+			if len(subs) == 0 {
+				subs = []string{
+					"la_tr005_end_device",
+				}
+			}
+			for name, subs := range _processPaths(subs) {
+				_ = subs
+				switch name {
+				case "la_tr005_end_device":
+					w, ok := m.Data.(*OnboardingEntityData_LaTr005EndDevice)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetLaTr005EndDevice()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return OnboardingEntityDataValidationError{
+								field:  "la_tr005_end_device",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				}
+			}
+		default:
+			return OnboardingEntityDataValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// OnboardingEntityDataValidationError is the validation error returned by
+// OnboardingEntityData.ValidateFields if the designated constraints aren't met.
+type OnboardingEntityDataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e OnboardingEntityDataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e OnboardingEntityDataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e OnboardingEntityDataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e OnboardingEntityDataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e OnboardingEntityDataValidationError) ErrorName() string {
+	return "OnboardingEntityDataValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e OnboardingEntityDataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sOnboardingEntityData.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = OnboardingEntityDataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = OnboardingEntityDataValidationError{}
+
 // ValidateFields checks the field values on ParseQRCodeRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -708,7 +822,16 @@ func (m *ParseQRCodeRequest) ValidateFields(paths ...string) error {
 			if !_ParseQRCodeRequest_FormatId_Pattern.MatchString(m.GetFormatId()) {
 				return ParseQRCodeRequestValidationError{
 					field:  "format_id",
-					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9])$\"",
+				}
+			}
+
+		case "entity_type":
+
+			if _, ok := OnboardingEntityType_name[int32(m.GetEntityType())]; !ok {
+				return ParseQRCodeRequestValidationError{
+					field:  "entity_type",
+					reason: "value must be one of the defined enum values",
 				}
 			}
 
@@ -787,7 +910,7 @@ var _ interface {
 	ErrorName() string
 } = ParseQRCodeRequestValidationError{}
 
-var _ParseQRCodeRequest_FormatId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+var _ParseQRCodeRequest_FormatId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9])$")
 
 // ValidateFields checks the field values on ParseQRCodeResponse with the rules
 // defined in the proto definition for this message. If any rules are
@@ -806,39 +929,18 @@ func (m *ParseQRCodeResponse) ValidateFields(paths ...string) error {
 		switch name {
 		case "format_id":
 			// no validation rules for FormatId
-		case "onboardingdata":
-			if m.Onboardingdata == nil {
-				return ParseQRCodeResponseValidationError{
-					field:  "onboardingdata",
-					reason: "value is required",
-				}
-			}
-			if len(subs) == 0 {
-				subs = []string{
-					"la_tr005_end_device",
-				}
-			}
-			for name, subs := range _processPaths(subs) {
-				_ = subs
-				switch name {
-				case "la_tr005_end_device":
-					w, ok := m.Onboardingdata.(*ParseQRCodeResponse_LaTr005EndDevice)
-					if !ok || w == nil {
-						continue
-					}
+		case "onboarding_entity_data":
 
-					if v, ok := interface{}(m.GetLaTr005EndDevice()).(interface{ ValidateFields(...string) error }); ok {
-						if err := v.ValidateFields(subs...); err != nil {
-							return ParseQRCodeResponseValidationError{
-								field:  "la_tr005_end_device",
-								reason: "embedded message failed validation",
-								cause:  err,
-							}
-						}
+			if v, ok := interface{}(m.GetOnboardingEntityData()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ParseQRCodeResponseValidationError{
+						field:  "onboarding_entity_data",
+						reason: "embedded message failed validation",
+						cause:  err,
 					}
-
 				}
 			}
+
 		default:
 			return ParseQRCodeResponseValidationError{
 				field:  name,

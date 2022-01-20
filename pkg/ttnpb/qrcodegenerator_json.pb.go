@@ -11,6 +11,46 @@ import (
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
 )
 
+// MarshalProtoJSON marshals the OnboardingEntityType to JSON.
+func (x OnboardingEntityType) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	s.WriteEnumString(int32(x), OnboardingEntityType_name)
+}
+
+// MarshalText marshals the OnboardingEntityType to text.
+func (x OnboardingEntityType) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), OnboardingEntityType_name)), nil
+}
+
+// MarshalJSON marshals the OnboardingEntityType to JSON.
+func (x OnboardingEntityType) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the OnboardingEntityType from JSON.
+func (x *OnboardingEntityType) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	v := s.ReadEnum(OnboardingEntityType_value)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read OnboardingEntityType enum: %v", err)
+		return
+	}
+	*x = OnboardingEntityType(v)
+}
+
+// UnmarshalText unmarshals the OnboardingEntityType from text.
+func (x *OnboardingEntityType) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), OnboardingEntityType_value)
+	if err != nil {
+		return err
+	}
+	*x = OnboardingEntityType(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the OnboardingEntityType from JSON.
+func (x *OnboardingEntityType) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the GenerateEndDeviceQRCodeRequest message to JSON.
 func (x *GenerateEndDeviceQRCodeRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -78,5 +118,63 @@ func (x *GenerateEndDeviceQRCodeRequest) UnmarshalProtoJSON(s *jsonplugin.Unmars
 
 // UnmarshalJSON unmarshals the GenerateEndDeviceQRCodeRequest from JSON.
 func (x *GenerateEndDeviceQRCodeRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ParseQRCodeRequest message to JSON.
+func (x *ParseQRCodeRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.FormatId != "" || s.HasField("format_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("format_id")
+		s.WriteString(x.FormatId)
+	}
+	if x.EntityType != 0 || s.HasField("entity_type") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("entity_type")
+		x.EntityType.MarshalProtoJSON(s)
+	}
+	if len(x.QrCode) > 0 || s.HasField("qr_code") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("qr_code")
+		s.WriteBytes(x.QrCode)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ParseQRCodeRequest to JSON.
+func (x ParseQRCodeRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
+// UnmarshalProtoJSON unmarshals the ParseQRCodeRequest message from JSON.
+func (x *ParseQRCodeRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "format_id", "formatId":
+			s.AddField("format_id")
+			x.FormatId = s.ReadString()
+		case "entity_type", "entityType":
+			s.AddField("entity_type")
+			x.EntityType.UnmarshalProtoJSON(s)
+		case "qr_code", "qrCode":
+			s.AddField("qr_code")
+			x.QrCode = s.ReadBytes()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ParseQRCodeRequest from JSON.
+func (x *ParseQRCodeRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

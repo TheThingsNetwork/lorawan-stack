@@ -298,6 +298,71 @@ func (dst *LoRaAllianceTR005EndDevice) SetFields(src *LoRaAllianceTR005EndDevice
 	return nil
 }
 
+func (dst *OnboardingEntityData) SetFields(src *OnboardingEntityData, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+
+		case "data":
+			if len(subs) == 0 && src == nil {
+				dst.Data = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.Data = src.Data
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "la_tr005_end_device":
+					_, srcOk := src.Data.(*OnboardingEntityData_LaTr005EndDevice)
+					if !srcOk && src.Data != nil {
+						return fmt.Errorf("attempt to set oneof 'la_tr005_end_device', while different oneof is set in source")
+					}
+					_, dstOk := dst.Data.(*OnboardingEntityData_LaTr005EndDevice)
+					if !dstOk && dst.Data != nil {
+						return fmt.Errorf("attempt to set oneof 'la_tr005_end_device', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *LoRaAllianceTR005EndDevice
+						if !srcOk && !dstOk {
+							continue
+						}
+						if srcOk {
+							newSrc = src.Data.(*OnboardingEntityData_LaTr005EndDevice).LaTr005EndDevice
+						}
+						if dstOk {
+							newDst = dst.Data.(*OnboardingEntityData_LaTr005EndDevice).LaTr005EndDevice
+						} else {
+							newDst = &LoRaAllianceTR005EndDevice{}
+							dst.Data = &OnboardingEntityData_LaTr005EndDevice{LaTr005EndDevice: newDst}
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Data = src.Data
+						} else {
+							dst.Data = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *ParseQRCodeRequest) SetFields(src *ParseQRCodeRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -310,6 +375,16 @@ func (dst *ParseQRCodeRequest) SetFields(src *ParseQRCodeRequest, paths ...strin
 			} else {
 				var zero string
 				dst.FormatId = zero
+			}
+		case "entity_type":
+			if len(subs) > 0 {
+				return fmt.Errorf("'entity_type' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.EntityType = src.EntityType
+			} else {
+				var zero OnboardingEntityType
+				dst.EntityType = zero
 			}
 		case "qr_code":
 			if len(subs) > 0 {
@@ -341,58 +416,29 @@ func (dst *ParseQRCodeResponse) SetFields(src *ParseQRCodeResponse, paths ...str
 				var zero string
 				dst.FormatId = zero
 			}
-
-		case "onboardingdata":
-			if len(subs) == 0 && src == nil {
-				dst.Onboardingdata = nil
-				continue
-			} else if len(subs) == 0 {
-				dst.Onboardingdata = src.Onboardingdata
-				continue
-			}
-
-			subPathMap := _processPaths(subs)
-			if len(subPathMap) > 1 {
-				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
-			}
-			for oneofName, oneofSubs := range subPathMap {
-				switch oneofName {
-				case "la_tr005_end_device":
-					_, srcOk := src.Onboardingdata.(*ParseQRCodeResponse_LaTr005EndDevice)
-					if !srcOk && src.Onboardingdata != nil {
-						return fmt.Errorf("attempt to set oneof 'la_tr005_end_device', while different oneof is set in source")
-					}
-					_, dstOk := dst.Onboardingdata.(*ParseQRCodeResponse_LaTr005EndDevice)
-					if !dstOk && dst.Onboardingdata != nil {
-						return fmt.Errorf("attempt to set oneof 'la_tr005_end_device', while different oneof is set in destination")
-					}
-					if len(oneofSubs) > 0 {
-						var newDst, newSrc *LoRaAllianceTR005EndDevice
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
-							newSrc = src.Onboardingdata.(*ParseQRCodeResponse_LaTr005EndDevice).LaTr005EndDevice
-						}
-						if dstOk {
-							newDst = dst.Onboardingdata.(*ParseQRCodeResponse_LaTr005EndDevice).LaTr005EndDevice
-						} else {
-							newDst = &LoRaAllianceTR005EndDevice{}
-							dst.Onboardingdata = &ParseQRCodeResponse_LaTr005EndDevice{LaTr005EndDevice: newDst}
-						}
-						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
-							return err
-						}
-					} else {
-						if src != nil {
-							dst.Onboardingdata = src.Onboardingdata
-						} else {
-							dst.Onboardingdata = nil
-						}
-					}
-
-				default:
-					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+		case "onboarding_entity_data":
+			if len(subs) > 0 {
+				var newDst, newSrc *OnboardingEntityData
+				if (src == nil || src.OnboardingEntityData == nil) && dst.OnboardingEntityData == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.OnboardingEntityData
+				}
+				if dst.OnboardingEntityData != nil {
+					newDst = dst.OnboardingEntityData
+				} else {
+					newDst = &OnboardingEntityData{}
+					dst.OnboardingEntityData = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.OnboardingEntityData = src.OnboardingEntityData
+				} else {
+					dst.OnboardingEntityData = nil
 				}
 			}
 
