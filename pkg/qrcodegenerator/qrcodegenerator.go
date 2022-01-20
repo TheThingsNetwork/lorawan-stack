@@ -28,13 +28,14 @@ import (
 
 // QRCodeGenerator implements the QR Code Generator component.
 //
-// The QR Code Generator exposes the EndDeviceQRCodeGenerator service.
+// The QR Code Generator exposes the EndDeviceQRCodeGenerator and QRCodeParser services.
 type QRCodeGenerator struct {
 	*component.Component
 	ctx context.Context
 
 	grpc struct {
 		endDeviceQRCodeGenerator *endDeviceQRCodeGeneratorServer
+		qrCodeParser             *qrCodeParserServer
 	}
 }
 
@@ -47,6 +48,7 @@ func New(c *component.Component, conf *Config) (*QRCodeGenerator, error) {
 		ctx:       log.NewContextWithField(c.Context(), "namespace", "qrcodegenerator"),
 	}
 	qrg.grpc.endDeviceQRCodeGenerator = &endDeviceQRCodeGeneratorServer{QRG: qrg}
+	qrg.grpc.qrCodeParser = &qrCodeParserServer{QRG: qrg}
 
 	c.RegisterGRPC(qrg)
 	return qrg, nil
@@ -65,9 +67,11 @@ func (qrg *QRCodeGenerator) Roles() []ttnpb.ClusterRole {
 // RegisterServices registers services provided by qrg at s.
 func (qrg *QRCodeGenerator) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterEndDeviceQRCodeGeneratorServer(s, qrg.grpc.endDeviceQRCodeGenerator)
+	ttnpb.RegisterQRCodeParserServer(s, qrg.grpc.qrCodeParser)
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (qrg *QRCodeGenerator) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterEndDeviceQRCodeGeneratorHandler(qrg.Context(), s, conn)
+	ttnpb.RegisterQRCodeParserHandler(qrg.Context(), s, conn)
 }
