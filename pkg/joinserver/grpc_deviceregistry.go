@@ -251,14 +251,14 @@ func (srv jsEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndD
 			); err != nil {
 				return nil, nil, errInvalidFieldMask.WithCause(err)
 			}
-			return &req.EndDevice, sets, nil
+			return req.EndDevice, sets, nil
 		}
 
 		evt = evtCreateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDevice.Ids, nil)
 		if req.EndDevice.Ids != nil && req.EndDevice.Ids.DevAddr != nil && !req.EndDevice.Ids.DevAddr.IsZero() {
 			return nil, nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
 		}
-		return &req.EndDevice, ttnpb.AddFields(sets,
+		return req.EndDevice, ttnpb.AddFields(sets,
 			"ids.application_ids",
 			"ids.dev_eui",
 			"ids.device_id",

@@ -920,7 +920,7 @@ func (as *ApplicationServer) saveActivationStatus(ctx context.Context, item inte
 	now := time.Now().UTC()
 	mask := []string{"activated_at"}
 	_, err = ttnpb.NewEndDeviceRegistryClient(cc).Update(ctx, &ttnpb.UpdateEndDeviceRequest{
-		EndDevice: ttnpb.EndDevice{
+		EndDevice: &ttnpb.EndDevice{
 			Ids:         ids,
 			ActivatedAt: ttnpb.ProtoTimePtr(now),
 		},

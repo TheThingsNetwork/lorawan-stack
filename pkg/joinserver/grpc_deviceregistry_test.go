@@ -482,7 +482,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: *CopyEndDevice(registeredDevice),
+				EndDevice: CopyEndDevice(registeredDevice),
 			},
 			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				test.MustTFromContext(ctx).Errorf("SetByIDFunc must not be called")
@@ -506,7 +506,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: ttnpb.EndDevice{
+				EndDevice: &ttnpb.EndDevice{
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{
 							ApplicationId: registeredApplicationID,
@@ -538,7 +538,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: ttnpb.EndDevice{
+				EndDevice: &ttnpb.EndDevice{
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{
 							ApplicationId: registeredApplicationID,
@@ -570,7 +570,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: ttnpb.EndDevice{
+				EndDevice: &ttnpb.EndDevice{
 					Ids: &ttnpb.EndDeviceIdentifiers{
 						ApplicationIds: &ttnpb.ApplicationIdentifiers{
 							ApplicationId: registeredApplicationID,
@@ -635,7 +635,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: *CopyEndDevice(&ttnpb.EndDevice{
+				EndDevice: CopyEndDevice(&ttnpb.EndDevice{
 					Ids:   registeredDevice.Ids,
 					NetId: &types.NetID{0x42, 0x00, 0x00},
 				}),
@@ -686,7 +686,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: *CopyEndDevice(registeredDevice),
+				EndDevice: CopyEndDevice(registeredDevice),
 				FieldMask: &pbtypes.FieldMask{
 					Paths: []string{"root_keys.app_key.key", "root_keys.nwk_key.key"},
 				},
@@ -714,7 +714,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 				})
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
-				EndDevice: *CopyEndDevice(&ttnpb.EndDevice{
+				EndDevice: CopyEndDevice(&ttnpb.EndDevice{
 					Ids: registeredDevice.Ids,
 					RootKeys: &ttnpb.RootKeys{
 						AppKey: &ttnpb.KeyEnvelope{

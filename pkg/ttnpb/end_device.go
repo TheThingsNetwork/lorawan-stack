@@ -1215,6 +1215,22 @@ func (m *ResetAndGetEndDeviceRequest) EntityType() string {
 	return m.GetEndDeviceIds().EntityType()
 }
 
+func (m *CreateEndDeviceRequest) EntityType() string {
+	return m.GetEndDevice().EntityType()
+}
+
+func (m *UpdateEndDeviceRequest) EntityType() string {
+	return m.GetEndDevice().EntityType()
+}
+
+func (m *SetEndDeviceRequest) EntityType() string {
+	return m.GetEndDevice().EntityType()
+}
+
+func (m *EndDeviceTemplate) EntityType() string {
+	return m.GetEndDevice().EntityType()
+}
+
 func (m *GetEndDeviceRequest) EntityType() string {
 	return m.GetEndDeviceIds().EntityType()
 }
@@ -1229,6 +1245,22 @@ func (m *ResetAndGetEndDeviceRequest) IDString() string {
 	return m.GetEndDeviceIds().IDString()
 }
 
+func (m *CreateEndDeviceRequest) IDString() string {
+	return m.GetEndDevice().IDString()
+}
+
+func (m *UpdateEndDeviceRequest) IDString() string {
+	return m.GetEndDevice().IDString()
+}
+
+func (m *SetEndDeviceRequest) IDString() string {
+	return m.GetEndDevice().IDString()
+}
+
+func (m *EndDeviceTemplate) IDString() string {
+	return m.GetEndDevice().IDString()
+}
+
 func (m *GetEndDeviceRequest) IDString() string {
 	return m.GetEndDeviceIds().IDString()
 }
@@ -1241,6 +1273,22 @@ func (m *EndDevice) IDString() string {
 
 func (m *ResetAndGetEndDeviceRequest) ExtractRequestFields(dst map[string]interface{}) {
 	m.GetEndDeviceIds().ExtractRequestFields(dst)
+}
+
+func (m *CreateEndDeviceRequest) ExtractRequestFields(dst map[string]interface{}) {
+	m.GetEndDevice().ExtractRequestFields(dst)
+}
+
+func (m *UpdateEndDeviceRequest) ExtractRequestFields(dst map[string]interface{}) {
+	m.GetEndDevice().ExtractRequestFields(dst)
+}
+
+func (m *SetEndDeviceRequest) ExtractRequestFields(dst map[string]interface{}) {
+	m.GetEndDevice().ExtractRequestFields(dst)
+}
+
+func (m *EndDeviceTemplate) ExtractRequestFields(dst map[string]interface{}) {
+	m.GetEndDevice().ExtractRequestFields(dst)
 }
 
 func (m *GetEndDeviceRequest) ExtractRequestFields(dst map[string]interface{}) {

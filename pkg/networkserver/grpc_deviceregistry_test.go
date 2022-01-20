@@ -888,7 +888,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					)
 
 					req := &ttnpb.SetEndDeviceRequest{
-						EndDevice: *tc.SetDevice.EndDevice,
+						EndDevice: tc.SetDevice.EndDevice,
 						FieldMask: &pbtypes.FieldMask{
 							Paths: tc.SetDevice.Paths,
 						},
@@ -940,7 +940,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 					now = clock.Add(time.Nanosecond)
 					dev, err, ok = env.AssertSetDevice(ctx, false, &ttnpb.SetEndDeviceRequest{
-						EndDevice: *expectedReturn,
+						EndDevice: expectedReturn,
 						FieldMask: &pbtypes.FieldMask{
 							Paths: tc.SetDevice.Paths,
 						},

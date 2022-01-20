@@ -233,7 +233,7 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 					"ids.dev_addr",
 				)
 			}
-			return &req.EndDevice, sets, nil
+			return req.EndDevice, sets, nil
 		}
 
 		evt = evtCreateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDevice.Ids, nil)
@@ -258,7 +258,7 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 				"ids.dev_eui",
 			)
 		}
-		return &req.EndDevice, sets, nil
+		return req.EndDevice, sets, nil
 	})
 	if err != nil {
 		return nil, err

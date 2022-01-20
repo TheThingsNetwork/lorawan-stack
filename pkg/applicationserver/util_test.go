@@ -176,14 +176,14 @@ func (m *mockISEndDeviceRegistry) Get(ctx context.Context, in *ttnpb.GetEndDevic
 func (m *mockISEndDeviceRegistry) Update(ctx context.Context, in *ttnpb.UpdateEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	m.endDevicesMu.Lock()
 	defer m.endDevicesMu.Unlock()
-	dev, ok := m.endDevices[unique.ID(ctx, in.Ids)]
+	dev, ok := m.endDevices[unique.ID(ctx, in.EndDevice.Ids)]
 	if !ok {
 		return nil, errNotFound.New()
 	}
-	if err := dev.SetFields(&in.EndDevice, in.GetFieldMask().GetPaths()...); err != nil {
+	if err := dev.SetFields(in.EndDevice, in.GetFieldMask().GetPaths()...); err != nil {
 		return nil, err
 	}
-	m.endDevices[unique.ID(ctx, in.Ids)] = dev
+	m.endDevices[unique.ID(ctx, in.EndDevice.Ids)] = dev
 	return dev, nil
 }
 

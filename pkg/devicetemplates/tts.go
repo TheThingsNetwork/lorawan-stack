@@ -49,10 +49,10 @@ func (t *tts) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDevi
 
 	dec := ttnio.NewJSONDecoder(r)
 	for {
-		dev := ttnpb.EndDevice{
+		dev := &ttnpb.EndDevice{
 			Ids: &ttnpb.EndDeviceIdentifiers{},
 		}
-		paths, err := dec.Decode(&dev)
+		paths, err := dec.Decode(dev)
 		if err != nil {
 			if err != io.EOF {
 				return err

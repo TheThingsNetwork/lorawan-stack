@@ -2340,10 +2340,18 @@ func (dst *CreateEndDeviceRequest) SetFields(src *CreateEndDeviceRequest, paths 
 		case "end_device":
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDevice
-				if src != nil {
-					newSrc = &src.EndDevice
+				if (src == nil || src.EndDevice == nil) && dst.EndDevice == nil {
+					continue
 				}
-				newDst = &dst.EndDevice
+				if src != nil {
+					newSrc = src.EndDevice
+				}
+				if dst.EndDevice != nil {
+					newDst = dst.EndDevice
+				} else {
+					newDst = &EndDevice{}
+					dst.EndDevice = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -2351,8 +2359,7 @@ func (dst *CreateEndDeviceRequest) SetFields(src *CreateEndDeviceRequest, paths 
 				if src != nil {
 					dst.EndDevice = src.EndDevice
 				} else {
-					var zero EndDevice
-					dst.EndDevice = zero
+					dst.EndDevice = nil
 				}
 			}
 
@@ -2369,10 +2376,18 @@ func (dst *UpdateEndDeviceRequest) SetFields(src *UpdateEndDeviceRequest, paths 
 		case "end_device":
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDevice
-				if src != nil {
-					newSrc = &src.EndDevice
+				if (src == nil || src.EndDevice == nil) && dst.EndDevice == nil {
+					continue
 				}
-				newDst = &dst.EndDevice
+				if src != nil {
+					newSrc = src.EndDevice
+				}
+				if dst.EndDevice != nil {
+					newDst = dst.EndDevice
+				} else {
+					newDst = &EndDevice{}
+					dst.EndDevice = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -2380,8 +2395,7 @@ func (dst *UpdateEndDeviceRequest) SetFields(src *UpdateEndDeviceRequest, paths 
 				if src != nil {
 					dst.EndDevice = src.EndDevice
 				} else {
-					var zero EndDevice
-					dst.EndDevice = zero
+					dst.EndDevice = nil
 				}
 			}
 		case "field_mask":
@@ -2558,10 +2572,18 @@ func (dst *SetEndDeviceRequest) SetFields(src *SetEndDeviceRequest, paths ...str
 		case "end_device":
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDevice
-				if src != nil {
-					newSrc = &src.EndDevice
+				if (src == nil || src.EndDevice == nil) && dst.EndDevice == nil {
+					continue
 				}
-				newDst = &dst.EndDevice
+				if src != nil {
+					newSrc = src.EndDevice
+				}
+				if dst.EndDevice != nil {
+					newDst = dst.EndDevice
+				} else {
+					newDst = &EndDevice{}
+					dst.EndDevice = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -2569,8 +2591,7 @@ func (dst *SetEndDeviceRequest) SetFields(src *SetEndDeviceRequest, paths ...str
 				if src != nil {
 					dst.EndDevice = src.EndDevice
 				} else {
-					var zero EndDevice
-					dst.EndDevice = zero
+					dst.EndDevice = nil
 				}
 			}
 		case "field_mask":
@@ -2641,10 +2662,18 @@ func (dst *EndDeviceTemplate) SetFields(src *EndDeviceTemplate, paths ...string)
 		case "end_device":
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDevice
-				if src != nil {
-					newSrc = &src.EndDevice
+				if (src == nil || src.EndDevice == nil) && dst.EndDevice == nil {
+					continue
 				}
-				newDst = &dst.EndDevice
+				if src != nil {
+					newSrc = src.EndDevice
+				}
+				if dst.EndDevice != nil {
+					newDst = dst.EndDevice
+				} else {
+					newDst = &EndDevice{}
+					dst.EndDevice = newDst
+				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
@@ -2652,8 +2681,7 @@ func (dst *EndDeviceTemplate) SetFields(src *EndDeviceTemplate, paths ...string)
 				if src != nil {
 					dst.EndDevice = src.EndDevice
 				} else {
-					var zero EndDevice
-					dst.EndDevice = zero
+					dst.EndDevice = nil
 				}
 			}
 		case "field_mask":

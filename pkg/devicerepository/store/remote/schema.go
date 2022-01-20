@@ -343,7 +343,7 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 		"lorawan_version",
 		"lorawan_phy_version",
 	}
-	dev := ttnpb.EndDevice{
+	dev := &ttnpb.EndDevice{
 		VersionIds:        ids,
 		SupportsJoin:      p.SupportsJoin,
 		SupportsClassB:    p.SupportsClassB,

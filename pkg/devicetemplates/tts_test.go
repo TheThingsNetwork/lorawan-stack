@@ -155,7 +155,7 @@ func validateTemplate(t *testing.T, tmpl *ttnpb.EndDeviceTemplate) {
 	}
 
 	var dev ttnpb.EndDevice
-	a.So(dev.SetFields(&tmpl.EndDevice, tmpl.FieldMask.GetPaths()...), should.BeNil)
+	a.So(dev.SetFields(tmpl.EndDevice, tmpl.FieldMask.GetPaths()...), should.BeNil)
 	a.So(dev, should.Resemble, tmpl.EndDevice)
 }
 

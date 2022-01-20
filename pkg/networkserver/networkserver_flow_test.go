@@ -141,7 +141,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		a.So(*ttnpb.StdTime(dev.CreatedAt), should.HappenAfter, start)
 		a.So(dev.UpdatedAt, should.Resemble, dev.CreatedAt)
 		a.So([]time.Time{start, *ttnpb.StdTime(dev.CreatedAt), time.Now()}, should.BeChronological)
-		a.So(dev, should.ResembleFields, &conf.CreateDevice.EndDevice, conf.CreateDevice.FieldMask.GetPaths())
+		a.So(dev, should.ResembleFields, conf.CreateDevice.EndDevice, conf.CreateDevice.FieldMask.GetPaths())
 
 		dev, ok = env.AssertJoin(ctx, JoinAssertionConfig{
 			Device:        dev,
@@ -314,7 +314,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 func makeClassAOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion, fpID string) func(context.Context, TestEnvironment) {
 	return makeOTAAFlowTest(OTAAFlowTestConfig{
 		CreateDevice: &ttnpb.SetEndDeviceRequest{
-			EndDevice: *MakeOTAAEndDevice(
+			EndDevice: MakeOTAAEndDevice(
 				EndDeviceOptions.WithFrequencyPlanId(fpID),
 				EndDeviceOptions.WithLorawanVersion(macVersion),
 				EndDeviceOptions.WithLorawanPhyVersion(phyVersion),
@@ -361,7 +361,7 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 	}
 	return makeOTAAFlowTest(OTAAFlowTestConfig{
 		CreateDevice: &ttnpb.SetEndDeviceRequest{
-			EndDevice: *MakeOTAAEndDevice(
+			EndDevice: MakeOTAAEndDevice(
 				EndDeviceOptions.WithFrequencyPlanId(fpID),
 				EndDeviceOptions.WithLorawanVersion(macVersion),
 				EndDeviceOptions.WithLorawanPhyVersion(phyVersion),
