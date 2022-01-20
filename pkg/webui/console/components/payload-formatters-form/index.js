@@ -25,6 +25,8 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import Input from '@ttn-lw/components/input'
 import CodeEditor from '@ttn-lw/components/code-editor'
+import Link from '@ttn-lw/components/link'
+import Notification from '@ttn-lw/components/notification'
 
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -43,9 +45,11 @@ const m = defineMessages({
   formatterType: 'Formatter type',
   formatterParameter: 'Formatter parameter',
   grpcFieldDescription: 'The address of the service to connect to',
-  appFormatter: 'Use application payload formatter',
+  appFormatter: 'Use application payload formatter  ',
   appFormatterWarning: 'This option will affect both uplink and downlink formatter',
   setupSubTitle: 'Setup',
+  defaultFormatter:
+    'Click <Link>here</Link> to modify the default payload formatter for this application. The payload formatter of this application is currently set to {formatter}',
 })
 
 const FIELD_NAMES = {
@@ -198,37 +202,40 @@ class PayloadFormattersForm extends React.Component {
   }
 
   get formatter() {
+    const { defaultType } = this.props
     const { type } = this.state
+    console.log(defaultType === 'FORMATTER_JAVASCRIPT')
+    console.log(defaultType)
 
-    switch (type) {
-      case TYPES.JAVASCRIPT:
-        return (
-          <Form.Field
-            required
-            component={CodeEditor}
-            name={FIELD_NAMES.JAVASCRIPT}
-            title={m.formatterParameter}
-            height="10rem"
-            minLines={15}
-            maxLines={15}
-          />
-        )
-      case TYPES.GRPC:
-        return (
-          <Form.Field
-            required
-            component={Input}
-            title={m.formatterParameter}
-            name={FIELD_NAMES.GRPC}
-            type="text"
-            placeholder={sharedMessages.addressPlaceholder}
-            description={m.grpcFieldDescription}
-            autoComplete="on"
-          />
-        )
-      default:
-        return null
+    if (type === TYPES.JAVASCRIPT || defaultType === 'FORMATTER_JAVASCRIPT') {
+      return (
+        <Form.Field
+          readOnly={defaultType === 'FORMATTER_JAVASCRIPT'}
+          required={!defaultType === 'FORMATTER_JAVASCRIPT'}
+          component={CodeEditor}
+          name={FIELD_NAMES.JAVASCRIPT}
+          title={m.formatterParameter}
+          height="10rem"
+          minLines={15}
+          maxLines={15}
+        />
+      )
+    } else if (type === TYPES.GRPC) {
+      return (
+        <Form.Field
+          required
+          component={Input}
+          title={m.formatterParameter}
+          name={FIELD_NAMES.GRPC}
+          type="text"
+          placeholder={sharedMessages.addressPlaceholder}
+          description={m.grpcFieldDescription}
+          autoComplete="on"
+        />
+      )
     }
+
+    return null
   }
 
   @bind
@@ -250,7 +257,9 @@ class PayloadFormattersForm extends React.Component {
   }
 
   render() {
-    const { initialType, initialParameter, uplink, allowReset } = this.props
+    const { initialType, initialParameter, uplink, allowReset, defaultType, appId, isDefaultType } =
+    this.props
+
     const { error, type, test } = this.state
 
     const initialValues = {
@@ -261,6 +270,7 @@ class PayloadFormattersForm extends React.Component {
         initialType === TYPES.GRPC ? initialParameter : getDefaultGrpcServiceFormatter(uplink),
     }
     const options = allowReset ? formatterOptionsWithReset : formatterOptions
+    const formatter = defaultType
 
     return (
       <Row>
@@ -286,6 +296,25 @@ class PayloadFormattersForm extends React.Component {
               inputWidth="m"
               required
             />
+            {isDefaultType && (
+              <Notification
+                small
+                info
+                content={m.defaultFormatter}
+                messageValues={{
+                  Link: msg => (
+                    <Link
+                      secondary
+                      key="manual-link"
+                      to={`/applications/${appId}/payload-formatters/uplink`}
+                    >
+                      {msg}
+                    </Link>
+                  ),
+                  formatter,
+                }}
+              />
+            )}
             {this.formatter}
             <SubmitBar>
               <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
@@ -312,6 +341,7 @@ class PayloadFormattersForm extends React.Component {
 PayloadFormattersForm.propTypes = {
   allowReset: PropTypes.bool,
   allowTest: PropTypes.bool,
+  appId: PropTypes.string,
   defaultParameter: PropTypes.string,
   defaultType: PropTypes.string,
   initialParameter: PropTypes.string,
@@ -319,6 +349,7 @@ PayloadFormattersForm.propTypes = {
   intl: PropTypes.shape({
     formatMessage: PropTypes.func.isRequired,
   }).isRequired,
+  isDefaultType: PropTypes.bool,
   onSubmit: PropTypes.func.isRequired,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
@@ -337,6 +368,8 @@ PayloadFormattersForm.defaultProps = {
   onTestSubmit: () => null,
   defaultType: TYPES.NONE,
   onTypeChange: () => null,
+  appId: undefined,
+  isDefaultType: undefined,
 }
 
 export default injectIntl(PayloadFormattersForm)

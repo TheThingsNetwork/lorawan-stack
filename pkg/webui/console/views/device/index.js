@@ -106,7 +106,7 @@ import style from './device.styl'
   }),
 )
 @withRequest(({ appId, devId, loadDeviceData, mayReadKeys, mayViewLink }) => {
-  const linkSelector = ['skip_payload_crypto']
+  const linkSelector = ['skip_payload_crypto', 'default_formatters']
   const deviceSelector = [
     'name',
     'description',

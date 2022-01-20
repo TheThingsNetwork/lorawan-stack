@@ -19,11 +19,9 @@ import { connect } from 'react-redux'
 import PAYLOAD_FORMATTER_TYPES from '@console/constants/formatter-types'
 import tts from '@console/api/tts'
 
-import Notification from '@ttn-lw/components/notification'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import toast from '@ttn-lw/components/toast'
-import Link from '@ttn-lw/components/link'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
@@ -46,8 +44,6 @@ import {
   selectSelectedDeviceFormatters,
   selectSelectedDevice,
 } from '@console/store/selectors/devices'
-
-import messages from './messages'
 
 @connect(
   state => ({
@@ -173,7 +169,6 @@ class DevicePayloadFormatters extends React.PureComponent {
     const { formatters, link, appId } = this.props
     const { type } = this.state
     const { default_formatters = {} } = link
-
     const formatterType = Boolean(formatters)
       ? formatters.up_formatter || PAYLOAD_FORMATTER_TYPES.NONE
       : PAYLOAD_FORMATTER_TYPES.DEFAULT
@@ -190,24 +185,6 @@ class DevicePayloadFormatters extends React.PureComponent {
     return (
       <React.Fragment>
         <IntlHelmet title={sharedMessages.payloadFormattersUplink} />
-        {isDefaultType && (
-          <Notification
-            small
-            info
-            content={messages.defaultFormatter}
-            messageValues={{
-              Link: msg => (
-                <Link
-                  secondary
-                  key="manual-link"
-                  to={`/applications/${appId}/payload-formatters/uplink`}
-                >
-                  {msg}
-                </Link>
-              ),
-            }}
-          />
-        )}
         <PayloadFormattersForm
           uplink
           linked
@@ -222,6 +199,8 @@ class DevicePayloadFormatters extends React.PureComponent {
           defaultType={appFormatterType}
           defaultParameter={appFormatterParameter}
           onTypeChange={this.onTypeChange}
+          isDefaultType={isDefaultType}
+          appId={appId}
         />
       </React.Fragment>
     )

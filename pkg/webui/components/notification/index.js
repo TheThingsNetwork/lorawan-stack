@@ -37,6 +37,7 @@ const Notification = ({
   success,
   messageValues = {},
   children,
+  convertBackticks,
   'data-test-id': dataTestId,
 }) => {
   const classname = classnames(style.notification, className, {
@@ -66,7 +67,7 @@ const Notification = ({
               content={content}
               values={messageValues}
               firstToUpper
-              convertBackticks={Boolean(error)}
+              convertBackticks={Boolean(error) || convertBackticks}
             />
             {children}
           </div>
@@ -81,6 +82,7 @@ Notification.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string,
   content: PropTypes.oneOfType([PropTypes.message, PropTypes.error, PropTypes.string]),
+  convertBackticks: PropTypes.bool,
   'data-test-id': PropTypes.string,
   details: PropTypes.error,
   error: PropTypes.bool,
@@ -105,6 +107,7 @@ Notification.defaultProps = {
   success: false,
   messageValues: undefined,
   details: undefined,
+  convertBackticks: false,
 }
 
 export default Notification
