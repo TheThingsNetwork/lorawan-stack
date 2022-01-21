@@ -17,6 +17,7 @@ package networkserver
 import (
 	"context"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -199,19 +200,22 @@ var nsMetrics = &messageMetrics{
 		},
 		nil,
 	),
-	micComputations: metrics.NewContextualCounterVec(
-		prometheus.CounterOpts{
+
+	matchCandidatesPerUplink: metrics.NewContextualHistogramVec(
+		prometheus.HistogramOpts{
 			Subsystem: subsystem,
-			Name:      "mic_compute_total",
-			Help:      "Total number of MIC computations",
+			Name:      "match_candidates_uplink_total",
+			Help:      "Histogram of device match candidates per data uplink",
+			Buckets:   []float64{0.0, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0},
 		},
 		nil,
 	),
-	micMismatches: metrics.NewContextualCounterVec(
-		prometheus.CounterOpts{
+	micComputationsPerUplink: metrics.NewContextualHistogramVec(
+		prometheus.HistogramOpts{
 			Subsystem: subsystem,
-			Name:      "mic_mismatch_total",
-			Help:      "Total number of MIC mismatches",
+			Name:      "mic_computations_uplink_total",
+			Help:      "Histogram of MIC computations per data uplink",
+			Buckets:   []float64{0.0, 1.0, 2.0, 4.0, 8.0, 16.0, 32.0},
 		},
 		nil,
 	),
@@ -246,8 +250,9 @@ type messageMetrics struct {
 	uplinkDropped     *metrics.ContextualCounterVec
 	uplinkGateways    *metrics.ContextualHistogramVec
 	gsNsUplinkLatency *metrics.ContextualHistogramVec
-	micComputations   *metrics.ContextualCounterVec
-	micMismatches     *metrics.ContextualCounterVec
+
+	matchCandidatesPerUplink *metrics.ContextualHistogramVec
+	micComputationsPerUplink *metrics.ContextualHistogramVec
 
 	downlinkAttempted *metrics.ContextualCounterVec
 	downlinkForwarded *metrics.ContextualCounterVec
@@ -261,8 +266,9 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.uplinkDropped.Describe(ch)
 	m.uplinkGateways.Describe(ch)
 	m.gsNsUplinkLatency.Describe(ch)
-	m.micComputations.Describe(ch)
-	m.micMismatches.Describe(ch)
+
+	m.matchCandidatesPerUplink.Describe(ch)
+	m.micComputationsPerUplink.Describe(ch)
 
 	m.downlinkAttempted.Describe(ch)
 	m.downlinkForwarded.Describe(ch)
@@ -276,8 +282,9 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.uplinkDropped.Collect(ch)
 	m.uplinkGateways.Collect(ch)
 	m.gsNsUplinkLatency.Collect(ch)
-	m.micComputations.Collect(ch)
-	m.micMismatches.Collect(ch)
+
+	m.matchCandidatesPerUplink.Collect(ch)
+	m.micComputationsPerUplink.Collect(ch)
 
 	m.downlinkAttempted.Collect(ch)
 	m.downlinkForwarded.Collect(ch)
@@ -328,12 +335,41 @@ func registerMergeMetadata(ctx context.Context, msg *ttnpb.UplinkMessage) {
 	nsMetrics.uplinkGateways.WithLabelValues(ctx).Observe(float64(gtwCount))
 }
 
-func registerMICComputation(ctx context.Context) {
-	nsMetrics.micComputations.WithLabelValues(ctx).Inc()
+type matchStatsKeyType struct{}
+
+var matchStatsKey matchStatsKeyType
+
+type matchStats struct {
+	matchCandidates int64
+	micComputations int64
 }
 
-func registerMICMismatch(ctx context.Context) {
-	nsMetrics.micMismatches.WithLabelValues(ctx).Inc()
+func newContextWithMatchStats(ctx context.Context) (context.Context, func()) {
+	stats := &matchStats{}
+	return context.WithValue(ctx, matchStatsKey, stats), func() {
+		nsMetrics.matchCandidatesPerUplink.WithLabelValues(ctx).Observe(float64(stats.matchCandidates))
+		nsMetrics.micComputationsPerUplink.WithLabelValues(ctx).Observe(float64(stats.micComputations))
+	}
+}
+
+func registerMatchStats(ctx context.Context, f func(*matchStats)) {
+	if stats, ok := ctx.Value(matchStatsKey).(*matchStats); ok {
+		f(stats)
+		return
+	}
+	panic("match stats not found in context")
+}
+
+func registerMatchCandidate(ctx context.Context) {
+	registerMatchStats(ctx, func(stats *matchStats) {
+		atomic.AddInt64(&stats.matchCandidates, 1)
+	})
+}
+
+func registerMICComputation(ctx context.Context) {
+	registerMatchStats(ctx, func(stats *matchStats) {
+		atomic.AddInt64(&stats.micComputations, 1)
+	})
 }
 
 var (

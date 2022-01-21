@@ -100,7 +100,6 @@ func matchCmacF(ctx context.Context, fNwkSIntKey types.AES128Key, macVersion ttn
 		micMatch = bytes.Equal(up.Payload.Mic[2:], cmacF[:2])
 	}
 	if !micMatch {
-		registerMICMismatch(ctx)
 		return [4]byte{}, false
 	}
 	return cmacF, true
@@ -630,7 +629,6 @@ macLoop:
 		}
 		if !bytes.Equal(up.Payload.Mic, fullMIC[:]) {
 			logger.Debug("Full MIC mismatch")
-			registerMICMismatch(ctx)
 			return nil, false, nil
 		}
 	}
@@ -765,6 +763,9 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		"uplink_f_cnt", pld.FHdr.FCnt,
 	))
 
+	ctx, flushMatchStats := newContextWithMatchStats(ctx)
+	defer flushMatchStats()
+
 	var (
 		matched *matchResult
 		ok      bool
@@ -772,6 +773,8 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	matchTTL := ns.collectionWindow(ctx)
 	if err := ns.devices.RangeByUplinkMatches(ctx, up, matchTTL,
 		func(ctx context.Context, match *UplinkMatch) (bool, error) {
+			registerMatchCandidate(ctx)
+
 			ctx = log.NewContextWithFields(ctx, log.Fields(
 				"mac_version", match.LoRaWANVersion,
 				"pending_session", match.IsPending,
