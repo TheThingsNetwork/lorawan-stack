@@ -821,16 +821,16 @@ func (m *ParseQRCodeRequest) ValidateFields(paths ...string) error {
 			if !_ParseQRCodeRequest_FormatId_Pattern.MatchString(m.GetFormatId()) {
 				return ParseQRCodeRequestValidationError{
 					field:  "format_id",
-					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9])$\"",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$\"",
 				}
 			}
 
 		case "qr_code":
 
-			if l := len(m.GetQrCode()); l < 0 || l > 1024 {
+			if l := len(m.GetQrCode()); l < 10 || l > 1024 {
 				return ParseQRCodeRequestValidationError{
 					field:  "qr_code",
-					reason: "value length must be between 0 and 1024 bytes, inclusive",
+					reason: "value length must be between 10 and 1024 bytes, inclusive",
 				}
 			}
 
@@ -900,7 +900,7 @@ var _ interface {
 	ErrorName() string
 } = ParseQRCodeRequestValidationError{}
 
-var _ParseQRCodeRequest_FormatId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9])$")
+var _ParseQRCodeRequest_FormatId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
 
 // ValidateFields checks the field values on ParseQRCodeResponse with the rules
 // defined in the proto definition for this message. If any rules are

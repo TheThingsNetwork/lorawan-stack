@@ -36631,7 +36631,7 @@
           "name": "EndDeviceOnboardingData",
           "longName": "EndDeviceOnboardingData",
           "fullName": "ttn.lorawan.v3.EndDeviceOnboardingData",
-          "description": "EndDeviceOnboardingData contains fields necessary for onboarding a LoRaWAN End Device.\nThe fields are a superset of the LoRa Alliance defined format in Technical Recommendation TR005.\nSee https://lora-alliance.org/wp-content/uploads/2020/11/TR005_LoRaWAN_Device_Identification_QR_Codes.pdf",
+          "description": "EndDeviceOnboardingData contains fields necessary for onboarding a LoRaWAN End Device.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
@@ -36976,14 +36976,14 @@
                   },
                   {
                     "name": "string.pattern",
-                    "value": "^[a-z0-9](?:[-]?[a-z0-9])$"
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$"
                   }
                 ]
               }
             },
             {
               "name": "qr_code",
-              "description": "Raw QR code contents.",
+              "description": "Raw QR code contents.\nThe miminum",
               "label": "",
               "type": "bytes",
               "longType": "bytes",
@@ -36996,7 +36996,7 @@
                 "validate.rules": [
                   {
                     "name": "bytes.min_len",
-                    "value": 0
+                    "value": 10
                   },
                   {
                     "name": "bytes.max_len",

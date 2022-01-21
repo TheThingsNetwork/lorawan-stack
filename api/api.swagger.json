@@ -15196,7 +15196,7 @@
           "type": "string"
         }
       },
-      "title": "EndDeviceOnboardingData contains fields necessary for onboarding a LoRaWAN End Device.\nThe fields are a superset of the LoRa Alliance defined format in Technical Recommendation TR005.\nSee https://lora-alliance.org/wp-content/uploads/2020/11/TR005_LoRaWAN_Device_Identification_QR_Codes.pdf"
+      "description": "EndDeviceOnboardingData contains fields necessary for onboarding a LoRaWAN End Device."
     },
     "v3EndDeviceTemplate": {
       "type": "object",
@@ -17758,7 +17758,7 @@
         "qr_code": {
           "type": "string",
           "format": "byte",
-          "description": "Raw QR code contents."
+          "title": "Raw QR code contents.\nThe miminum"
         }
       }
     },

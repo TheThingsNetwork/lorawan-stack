@@ -7890,8 +7890,6 @@ The Pba service allows clients to manage peering through Packet Broker.
 ### <a name="ttn.lorawan.v3.EndDeviceOnboardingData">Message `EndDeviceOnboardingData`</a>
 
 EndDeviceOnboardingData contains fields necessary for onboarding a LoRaWAN End Device.
-The fields are a superset of the LoRa Alliance defined format in Technical Recommendation TR005.
-See https://lora-alliance.org/wp-content/uploads/2020/11/TR005_LoRaWAN_Device_Identification_QR_Codes.pdf
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -7962,14 +7960,14 @@ See https://lora-alliance.org/wp-content/uploads/2020/11/TR005_LoRaWAN_Device_Id
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `format_id` | [`string`](#string) |  | QR code format identifier. Enumerate available formats with - End Devices: rpc `ListFormats` in the EndDeviceQRCodeGenerator service. If this field is not specified, the server will attempt to parse the data with each known format. |
-| `qr_code` | [`bytes`](#bytes) |  | Raw QR code contents. |
+| `qr_code` | [`bytes`](#bytes) |  | Raw QR code contents. The miminum |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
-| `format_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9])$`</p> |
-| `qr_code` | <p>`bytes.min_len`: `0`</p><p>`bytes.max_len`: `1024`</p> |
+| `format_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
+| `qr_code` | <p>`bytes.min_len`: `10`</p><p>`bytes.max_len`: `1024`</p> |
 
 ### <a name="ttn.lorawan.v3.ParseQRCodeResponse">Message `ParseQRCodeResponse`</a>
 
