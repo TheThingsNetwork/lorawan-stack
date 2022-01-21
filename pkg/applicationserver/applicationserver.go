@@ -1225,3 +1225,8 @@ func (as *ApplicationServer) GetMQTTConfig(ctx context.Context) (*config.MQTT, e
 func (as *ApplicationServer) RangeUplinks(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(ctx context.Context, up *ttnpb.ApplicationUplink) bool) error {
 	return as.appUpsRegistry.Range(ctx, ids, paths, f)
 }
+
+// GetEndDevice retrieves the end device associated with the provided identifiers from the end device registry.
+func (as *ApplicationServer) GetEndDevice(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error) {
+	return as.deviceRegistry.Get(ctx, ids, paths)
+}

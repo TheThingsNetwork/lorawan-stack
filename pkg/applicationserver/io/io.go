@@ -72,6 +72,14 @@ type Cluster interface {
 	GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (*grpc.ClientConn, error)
 }
 
+// EndDeviceRegistry represents the Application Server end device registry to application frontends.
+type EndDeviceRegistry interface {
+	// GetEndDevice retrieves the end device from the Application Server end device registry.
+	// This call will be delegated to the underlying end device registry, and should not be
+	// used on the hot path. It exists for provisioning purposes.
+	GetEndDevice(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string) (*ttnpb.EndDevice, error)
+}
+
 // Server represents the Application Server to application frontends.
 type Server interface {
 	task.Starter
@@ -80,6 +88,7 @@ type Server interface {
 	DownlinkQueueOperator
 	UplinkStorage
 	Cluster
+	EndDeviceRegistry
 	// FromRequestContext decouples the lifetime of the provided context from the values found in the context.
 	FromRequestContext(context.Context) context.Context
 	// GetBaseConfig returns the component configuration.

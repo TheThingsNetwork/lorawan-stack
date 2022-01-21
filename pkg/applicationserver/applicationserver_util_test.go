@@ -53,14 +53,6 @@ func (r MockDeviceRegistry) Range(ctx context.Context, paths []string, f func(co
 	return nil
 }
 
-// noopEndDeviceFetcher is a no-op.
-type noopEndDeviceFetcher struct{}
-
-// Get implements the EndDeviceFetcher interface.
-func (noopEndDeviceFetcher) Get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fieldMaskPaths ...string) (*ttnpb.EndDevice, error) {
-	return nil, errNotFound.New()
-}
-
 // MockLinkRegistry is a mock LinkRegistry used for testing.
 type MockLinkRegistry struct {
 	GetFunc   func(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error)
