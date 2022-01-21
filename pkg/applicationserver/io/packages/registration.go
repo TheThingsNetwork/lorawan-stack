@@ -17,20 +17,14 @@ package packages
 import (
 	"context"
 
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"google.golang.org/grpc"
 )
 
 // ApplicationPackageHandler handles upstream traffic from the Application Server.
 type ApplicationPackageHandler interface {
 	Package() *ttnpb.ApplicationPackage
-	RegisterServices(s *grpc.Server)
-	RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn)
 	HandleUp(context.Context, *ttnpb.ApplicationPackageDefaultAssociation, *ttnpb.ApplicationPackageAssociation, *ttnpb.ApplicationUp) error
 }
 
-var (
-	errNotImplemented = errors.DefineUnimplemented("package_not_implemented", "package `{name}` is not implemented")
-)
+var errNotImplemented = errors.DefineUnimplemented("package_not_implemented", "package `{name}` is not implemented")
