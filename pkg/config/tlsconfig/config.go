@@ -295,8 +295,8 @@ func (c *ClientAuth) ApplyTo(tlsConfig *tls.Config) error {
 		if c.KeyVault.ID == "" {
 			return errTLSKeyVaultID.New()
 		}
-		tlsConfig.GetClientCertificate = func(*tls.CertificateRequestInfo) (*tls.Certificate, error) {
-			return c.KeyVault.KeyVault.ExportCertificate(context.Background(), c.KeyVault.ID)
+		tlsConfig.GetClientCertificate = func(r *tls.CertificateRequestInfo) (*tls.Certificate, error) {
+			return c.KeyVault.KeyVault.ExportCertificate(r.Context(), c.KeyVault.ID)
 		}
 	default:
 		return errInvalidTLSConfigSource.WithAttributes("source", c.Source)
