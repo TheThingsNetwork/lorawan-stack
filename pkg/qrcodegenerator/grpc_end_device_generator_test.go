@@ -39,7 +39,8 @@ func TestGenerateEndDeviceQRCode(t *testing.T) {
 	c := componenttest.NewComponent(t, &component.Config{})
 	qrg, err := New(c, &Config{})
 	test.Must(qrg, err)
-	qrg.RegisterEndDeviceFormat("test", new(mockFormat))
+	testFormat := new(mockFormat)
+	qrg.RegisterEndDeviceFormat(testFormat.ID(), testFormat)
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 

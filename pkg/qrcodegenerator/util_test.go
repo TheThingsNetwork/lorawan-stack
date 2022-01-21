@@ -74,3 +74,7 @@ func (mockFormat) Format() *ttnpb.QRCodeFormat {
 func (mockFormat) New() qrcode.EndDeviceData {
 	return new(mock)
 }
+
+func (mockFormat) ID() string {
+	return "test"
+}
