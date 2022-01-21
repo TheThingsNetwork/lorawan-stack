@@ -145,9 +145,21 @@ func (m *LoRaAllianceTR005Draft3) UnmarshalText(text []byte) error {
 	return m.Validate()
 }
 
-// AuthenticatedEndDeviceIdentifiers implements the AuthenticatedEndDeviceIdentifiers interface.
-func (m *LoRaAllianceTR005Draft3) AuthenticatedEndDeviceIdentifiers() (joinEUI, devEUI types.EUI64, authenticationCode string) {
-	return m.JoinEUI, m.DevEUI, m.DeviceValidationCode
+// GetOnboardingEntityData implements the Data interface.
+func (m *LoRaAllianceTR005Draft3) GetOnboardingEntityData() *ttnpb.OnboardingEntityData {
+	return &ttnpb.OnboardingEntityData{
+		Data: &ttnpb.OnboardingEntityData_LaTr005EndDevice{
+			LaTr005EndDevice: &ttnpb.LoRaAllianceTR005EndDevice{
+				JoinEui:      &m.JoinEUI,
+				DevEui:       &m.DevEUI,
+				OwnerToken:   m.DeviceValidationCode,
+				VendorId:     m.VendorID[:],
+				ModelId:      m.ModelID[:],
+				SerialNumber: m.SerialNumber,
+				Proprietary:  m.Proprietary,
+			},
+		},
+	}
 }
 
 // LoRaAllianceTR005Draft3Format implements the LoRa Alliance TR005 Draft3 Format.

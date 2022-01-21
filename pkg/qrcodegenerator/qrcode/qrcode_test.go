@@ -59,18 +59,18 @@ func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 			qrCode.RegisterEndDeviceFormat("tr005draft2", new(enddevice.LoRaAllianceTR005Draft2Format))
 			qrCode.RegisterEndDeviceFormat("tr005draft3", new(enddevice.LoRaAllianceTR005Draft3Format))
 
-			d, _, err := qrCode.Parse("", "enddevice", tc.Data)
+			d, _, err := qrCode.Parse("", ttnpb.OnboardingEntityType_END_DEVICE, tc.Data)
 			data := test.Must(d, err).(Data)
 
-			intf, ok := data.(AuthenticatedEndDeviceIdentifiers)
-			if !ok {
-				t.Fatalf("Expected %T to implement AuthenticatedEndDeviceIdentifiers", data)
+			ed := data.GetOnboardingEntityData()
+			switch intf := ed.Data.(type) {
+			case *ttnpb.OnboardingEntityData_LaTr005EndDevice:
+				a.So(*intf.LaTr005EndDevice.JoinEui, should.Resemble, tc.ExpectedJoinEUI)
+				a.So(*intf.LaTr005EndDevice.DevEui, should.Resemble, tc.ExpectedDevEUI)
+				a.So(intf.LaTr005EndDevice.OwnerToken, should.Resemble, tc.ExpectedAuthenticationCode)
+			default:
+				t.Fatalf("Unexpected type %v", intf)
 			}
-
-			joinEUI, devEUI, authCode := intf.AuthenticatedEndDeviceIdentifiers()
-			a.So(joinEUI, should.Resemble, tc.ExpectedJoinEUI)
-			a.So(devEUI, should.Resemble, tc.ExpectedDevEUI)
-			a.So(authCode, should.Resemble, tc.ExpectedAuthenticationCode)
 		})
 	}
 }
@@ -78,10 +78,11 @@ func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 type mock struct {
 }
 
-func (mock) Validate() error                { return nil }
-func (*mock) Encode(*ttnpb.EndDevice) error { return nil }
-func (mock) MarshalText() ([]byte, error)   { return nil, nil }
-func (*mock) UnmarshalText([]byte) error    { return nil }
+func (mock) Validate() error                                       { return nil }
+func (*mock) Encode(*ttnpb.EndDevice) error                        { return nil }
+func (mock) MarshalText() ([]byte, error)                          { return nil, nil }
+func (*mock) UnmarshalText([]byte) error                           { return nil }
+func (*mock) GetOnboardingEntityData() *ttnpb.OnboardingEntityData { return nil }
 
 type mockFormat struct {
 }

@@ -22,7 +22,6 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // QRCode represents oboarding data from QR Code.
@@ -41,6 +40,7 @@ func New(ctx context.Context) *QRCode {
 // Data represents QR code data.
 type Data interface {
 	Validate() error
+	GetOnboardingEntityData() *ttnpb.OnboardingEntityData
 	encoding.TextMarshaler
 	encoding.TextUnmarshaler
 }
@@ -51,21 +51,16 @@ type EndDeviceData interface {
 	Encode(*ttnpb.EndDevice) error
 }
 
-// AuthenticatedEndDeviceIdentifiers defines end device identifiers with authentication code.
-type AuthenticatedEndDeviceIdentifiers interface {
-	AuthenticatedEndDeviceIdentifiers() (joinEUI, devEUI types.EUI64, authenticationCode string)
-}
-
 var (
 	errUnknownFormat     = errors.DefineInvalidArgument("unknown_format", "format `{format_id}` unknown")
 	errUnsupportedEntity = errors.DefineInvalidArgument("unsupported_entity", "entity `{entity}` unsupported")
 )
 
 // Parse attempts to parse the given QR code data.
-// It returns the parser and the format ID.
-func (c *QRCode) Parse(formatID string, entity string, data []byte) (Data, string, error) {
+// It returns the parser and the format ID that successfully parsed the QR code.
+func (c *QRCode) Parse(formatID string, entity ttnpb.OnboardingEntityType, data []byte) (Data, string, error) {
 	switch entity {
-	case "enddevice":
+	case ttnpb.OnboardingEntityType_END_DEVICE:
 		for id, format := range c.endDeviceFormats {
 			// If format ID is provided, use  only that.
 			if formatID != "" && formatID != id {
