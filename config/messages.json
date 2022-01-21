@@ -6083,6 +6083,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/joinserver:dev_nonce_limit_invalid": {
+    "translations": {
+      "en": "DevNonce limit can not be less than 1"
+    },
+    "description": {
+      "package": "pkg/joinserver",
+      "file": "errors.go"
+    }
+  },
   "error:pkg/joinserver:dev_nonce_too_small": {
     "translations": {
       "en": "DevNonce is too small"

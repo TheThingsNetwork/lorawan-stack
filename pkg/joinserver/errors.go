@@ -23,6 +23,7 @@ var (
 	errDeriveNwkSKeys                 = errors.Define("derive_nwk_s_keys", "failed to derive network session keys")
 	errDeviceNotFound                 = errors.DefineNotFound("device_not_found", "device not found")
 	errDevNonceTooSmall               = errors.DefineInvalidArgument("dev_nonce_too_small", "DevNonce is too small")
+	errDevNonceLimitInvalid           = errors.DefineInvalidArgument("dev_nonce_limit_invalid", "DevNonce limit can not be less than 1")
 	errDuplicateIdentifiers           = errors.DefineAlreadyExists("duplicate_identifiers", "a device identified by the identifiers already exists")
 	errEncodePayload                  = errors.DefineInvalidArgument("encode_payload", "failed to encode payload")
 	errEncryptPayload                 = errors.Define("encrypt_payload", "failed to encrypt JoinAccept")

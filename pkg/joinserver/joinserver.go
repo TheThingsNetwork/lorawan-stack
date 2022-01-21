@@ -20,7 +20,6 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/binary"
-	"sort"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -54,6 +53,7 @@ type JoinServer struct {
 
 	euiPrefixes    []types.EUI64Prefix
 	defaultJoinEUI types.EUI64
+	devNonceLimit  int
 
 	grpc struct {
 		nsJs                          nsJsServer
@@ -71,8 +71,18 @@ func (js *JoinServer) Context() context.Context {
 	return js.ctx
 }
 
+func validateConfig(conf *Config) error {
+	if conf.DevNonceLimit <= 0 {
+		return errDevNonceLimitInvalid.New()
+	}
+	return nil
+}
+
 // New returns new *JoinServer.
 func New(c *component.Component, conf *Config) (*JoinServer, error) {
+	if err := validateConfig(conf); err != nil {
+		return nil, err
+	}
 	js := &JoinServer{
 		Component: c,
 		ctx:       log.NewContextWithField(c.Context(), "namespace", "joinserver"),
@@ -83,6 +93,7 @@ func New(c *component.Component, conf *Config) (*JoinServer, error) {
 
 		euiPrefixes:    conf.JoinEUIPrefixes,
 		defaultJoinEUI: conf.DefaultJoinEUI,
+		devNonceLimit:  conf.DevNonceLimit,
 	}
 
 	js.grpc.applicationActivationSettings = applicationActivationSettingsRegistryServer{
@@ -322,19 +333,29 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			if req.SelectedMacVersion.IncrementDevNonce() {
 				if (dn != 0 || dev.LastDevNonce != 0 || dev.LastJoinNonce != 0) && !dev.ResetsJoinNonces {
 					if dn <= dev.LastDevNonce {
+						registerDevNonceTooSmall(ctx, req)
 						return nil, nil, errDevNonceTooSmall.New()
 					}
 				}
 				dev.LastDevNonce = dn
 				paths = append(paths, "last_dev_nonce")
 			} else {
-				i := sort.Search(len(dev.UsedDevNonces), func(i int) bool { return dev.UsedDevNonces[i] >= dn })
-				if i >= len(dev.UsedDevNonces) || dev.UsedDevNonces[i] != dn {
-					dev.UsedDevNonces = append(dev.UsedDevNonces, 0)
-					copy(dev.UsedDevNonces[i+1:], dev.UsedDevNonces[i:])
-					dev.UsedDevNonces[i] = dn
+				isReuse := false
+				for i := len(dev.UsedDevNonces) - 1; i >= 0; i-- {
+					if dev.UsedDevNonces[i] == dn {
+						isReuse = true
+						break
+					}
+				}
+
+				if !isReuse {
+					dev.UsedDevNonces = append(dev.UsedDevNonces, dn)
+					if n := len(dev.UsedDevNonces) - js.devNonceLimit; n > 0 {
+						dev.UsedDevNonces = dev.UsedDevNonces[n:]
+					}
 					paths = append(paths, "used_dev_nonces")
 				} else if !dev.ResetsJoinNonces {
+					registerDevNonceReuse(ctx, req)
 					return nil, nil, errReuseDevNonce.New()
 				}
 			}
