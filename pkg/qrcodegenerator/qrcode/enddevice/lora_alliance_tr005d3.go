@@ -145,18 +145,18 @@ func (m *LoRaAllianceTR005Draft3) UnmarshalText(text []byte) error {
 	return m.Validate()
 }
 
-// GetOnboardingEntityData implements the Data interface.
-func (m *LoRaAllianceTR005Draft3) GetOnboardingEntityData() *ttnpb.OnboardingEntityData {
-	return &ttnpb.OnboardingEntityData{
-		Data: &ttnpb.OnboardingEntityData_LaTr005EndDevice{
-			LaTr005EndDevice: &ttnpb.LoRaAllianceTR005EndDevice{
-				JoinEui:      &m.JoinEUI,
-				DevEui:       &m.DevEUI,
-				OwnerToken:   m.DeviceValidationCode,
-				VendorId:     m.VendorID[:],
-				ModelId:      m.ModelID[:],
-				SerialNumber: m.SerialNumber,
-				Proprietary:  m.Proprietary,
+// GetEntityOnboardingData implements the Data interface.
+func (m *LoRaAllianceTR005Draft3) GetEntityOnboardingData() *ttnpb.EntityOnboardingData {
+	return &ttnpb.EntityOnboardingData{
+		Data: &ttnpb.EntityOnboardingData_EndDeviceOnboardingData{
+			EndDeviceOnboardingData: &ttnpb.EndDeviceOnboardingData{
+				JoinEui:                 &m.JoinEUI,
+				DevEui:                  &m.DevEUI,
+				ClaimAuthenticationCode: m.DeviceValidationCode,
+				VendorId:                m.VendorID[:],
+				ModelId:                 m.ModelID[:],
+				SerialNumber:            m.SerialNumber,
+				Proprietary:             m.Proprietary,
 			},
 		},
 	}

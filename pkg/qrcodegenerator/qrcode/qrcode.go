@@ -40,7 +40,7 @@ func New(ctx context.Context) *QRCode {
 // Data represents QR code data.
 type Data interface {
 	Validate() error
-	GetOnboardingEntityData() *ttnpb.OnboardingEntityData
+	GetEntityOnboardingData() *ttnpb.EntityOnboardingData
 	encoding.TextMarshaler
 	encoding.TextUnmarshaler
 }
@@ -52,27 +52,21 @@ type EndDeviceData interface {
 }
 
 var (
-	errUnknownFormat     = errors.DefineInvalidArgument("unknown_format", "format `{format_id}` unknown")
-	errUnsupportedEntity = errors.DefineInvalidArgument("unsupported_entity", "entity `{entity}` unsupported")
+	errUnknownFormat = errors.DefineInvalidArgument("unknown_format", "format `{format_id}` unknown")
 )
 
 // Parse attempts to parse the given QR code data.
 // It returns the parser and the format ID that successfully parsed the QR code.
-func (c *QRCode) Parse(formatID string, entity ttnpb.OnboardingEntityType, data []byte) (Data, string, error) {
-	switch entity {
-	case ttnpb.OnboardingEntityType_END_DEVICE:
-		for id, format := range c.endDeviceFormats {
-			// If format ID is provided, use  only that.
-			if formatID != "" && formatID != id {
-				continue
-			}
-			edFormat := format.New()
-			if err := edFormat.UnmarshalText(data); err == nil {
-				return edFormat, id, nil
-			}
+func (c *QRCode) Parse(formatID string, data []byte) (Data, string, error) {
+	for id, format := range c.endDeviceFormats {
+		// If format ID is provided, use  only that.
+		if formatID != "" && formatID != id {
+			continue
 		}
-	default:
-		return nil, "", errUnsupportedEntity.WithAttributes("entity", entity)
+		edFormat := format.New()
+		if err := edFormat.UnmarshalText(data); err == nil {
+			return edFormat, id, nil
+		}
 	}
 	return nil, "", errUnknownFormat.WithAttributes("format_id", formatID)
 }

@@ -59,15 +59,15 @@ func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 			qrCode.RegisterEndDeviceFormat("tr005draft2", new(enddevice.LoRaAllianceTR005Draft2Format))
 			qrCode.RegisterEndDeviceFormat("tr005draft3", new(enddevice.LoRaAllianceTR005Draft3Format))
 
-			d, _, err := qrCode.Parse("", ttnpb.OnboardingEntityType_END_DEVICE, tc.Data)
+			d, _, err := qrCode.Parse("", tc.Data)
 			data := test.Must(d, err).(Data)
 
-			ed := data.GetOnboardingEntityData()
+			ed := data.GetEntityOnboardingData()
 			switch intf := ed.Data.(type) {
-			case *ttnpb.OnboardingEntityData_LaTr005EndDevice:
-				a.So(*intf.LaTr005EndDevice.JoinEui, should.Resemble, tc.ExpectedJoinEUI)
-				a.So(*intf.LaTr005EndDevice.DevEui, should.Resemble, tc.ExpectedDevEUI)
-				a.So(intf.LaTr005EndDevice.OwnerToken, should.Resemble, tc.ExpectedAuthenticationCode)
+			case *ttnpb.EntityOnboardingData_EndDeviceOnboardingData:
+				a.So(*intf.EndDeviceOnboardingData.JoinEui, should.Resemble, tc.ExpectedJoinEUI)
+				a.So(*intf.EndDeviceOnboardingData.DevEui, should.Resemble, tc.ExpectedDevEUI)
+				a.So(intf.EndDeviceOnboardingData.ClaimAuthenticationCode, should.Resemble, tc.ExpectedAuthenticationCode)
 			default:
 				t.Fatalf("Unexpected type %v", intf)
 			}
@@ -82,7 +82,7 @@ func (mock) Validate() error                                       { return nil 
 func (*mock) Encode(*ttnpb.EndDevice) error                        { return nil }
 func (mock) MarshalText() ([]byte, error)                          { return nil, nil }
 func (*mock) UnmarshalText([]byte) error                           { return nil }
-func (*mock) GetOnboardingEntityData() *ttnpb.OnboardingEntityData { return nil }
+func (*mock) GetEntityOnboardingData() *ttnpb.EntityOnboardingData { return nil }
 
 type mockFormat struct {
 }
