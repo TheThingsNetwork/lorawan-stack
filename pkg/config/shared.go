@@ -167,7 +167,7 @@ type KeyVault struct {
 }
 
 // KeyVault returns an initialized crypto.KeyVault based on the configuration.
-func (v KeyVault) KeyVault() (crypto.KeyVault, error) {
+func (v KeyVault) KeyVault(ctx context.Context, httpClientProvider httpclient.Provider) (crypto.KeyVault, error) {
 	vault := cryptoutil.EmptyKeyVault
 	switch v.Provider {
 	case "static":

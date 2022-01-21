@@ -143,11 +143,6 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 
 	ctx = log.NewContext(ctx, logger)
 
-	keyVault, err := config.KeyVault.KeyVault()
-	if err != nil {
-		return nil, err
-	}
-
 	c = &Component{
 		ctx:                ctx,
 		cancelCtx:          cancel,
@@ -160,9 +155,12 @@ func New(logger log.Stack, config *Config, opts ...Option) (c *Component, err er
 
 		tcpListeners: make(map[string]*listener),
 
-		KeyVault: keyVault,
-
 		taskStarter: task.StartTaskFunc(task.DefaultStartTask),
+	}
+
+	c.KeyVault, err = config.KeyVault.KeyVault(ctx, c)
+	if err != nil {
+		return nil, err
 	}
 
 	c.limiter, err = ratelimit.New(ctx, config.RateLimiting, config.Blob, c)
