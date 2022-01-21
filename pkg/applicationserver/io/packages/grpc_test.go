@@ -104,7 +104,7 @@ func TestAuthentication(t *testing.T) {
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	c.RegisterGRPC(srv)
+	c.RegisterGRPC(&grpcServiceRegistererWrapper{srv})
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 
@@ -190,7 +190,7 @@ func TestAssociations(t *testing.T) {
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	c.RegisterGRPC(srv)
+	c.RegisterGRPC(&grpcServiceRegistererWrapper{srv})
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 

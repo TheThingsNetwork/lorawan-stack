@@ -21,7 +21,6 @@ import (
 
 	"github.com/gogo/protobuf/types"
 	"github.com/golang/protobuf/proto"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3/api"
@@ -31,7 +30,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	urlutil "go.thethings.network/lorawan-stack/v3/pkg/util/url"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 )
 
@@ -43,12 +41,6 @@ type GeolocationPackage struct {
 	server   io.Server
 	registry packages.Registry
 }
-
-// RegisterServices implements packages.ApplicationPackageHandler.
-func (p *GeolocationPackage) RegisterServices(s *grpc.Server) {}
-
-// RegisterHandlers implements packages.ApplicationPackageHandler.
-func (p *GeolocationPackage) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {}
 
 var (
 	errLocationQuery = errors.DefineInternal("location_query", "location query")

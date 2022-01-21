@@ -263,11 +263,16 @@ func New(ctx context.Context, opts ...Option) *Server {
 	return server
 }
 
-// Registerer allows components to register their services to the gRPC server and the HTTP gateway
-type Registerer interface {
-	Roles() []ttnpb.ClusterRole
+// ServiceRegisterer allows components to register their services to the gRPC server and the HTTP gateway.
+type ServiceRegisterer interface {
 	RegisterServices(s *grpc.Server)
 	RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn)
+}
+
+// Registerer extends ServiceRegisterer with the cluster roles fulfilled by the component.
+type Registerer interface {
+	Roles() []ttnpb.ClusterRole
+	ServiceRegisterer
 }
 
 // Server wraps the gRPC server

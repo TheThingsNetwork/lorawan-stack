@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 	"google.golang.org/grpc"
 )
@@ -42,7 +43,8 @@ type server struct {
 
 // Server is an application packages frontend.
 type Server interface {
-	rpcserver.Registerer
+	rpcserver.ServiceRegisterer
+	web.Registerer
 }
 
 func createPackagePoolHandler(name string, handler ApplicationPackageHandler, timeout time.Duration) workerpool.Handler {
@@ -163,23 +165,31 @@ func (s *server) handleUp(ctx context.Context, msg *ttnpb.ApplicationUp) error {
 	return nil
 }
 
-// Roles implements the rpcserver.Registerer interface.
-func (s *server) Roles() []ttnpb.ClusterRole {
-	return nil
-}
-
-// RegisterServices registers the services of the registered application packages.
+// RegisterServices implements the rpcserver.ServiceRegisterer interface.
 func (s *server) RegisterServices(gs *grpc.Server) {
 	ttnpb.RegisterApplicationPackageRegistryServer(gs, s)
 	for _, subsystem := range s.handlers {
-		subsystem.RegisterServices(gs)
+		if subsystem, ok := subsystem.(rpcserver.ServiceRegisterer); ok {
+			subsystem.RegisterServices(gs)
+		}
 	}
 }
 
-// RegisterHandlers registers the handlers of the registered application packages.
+// RegisterHandlers implements the rpcserver.ServiceRegisterer interface.
 func (s *server) RegisterHandlers(rs *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterApplicationPackageRegistryHandler(s.ctx, rs, conn)
 	for _, subsystem := range s.handlers {
-		subsystem.RegisterHandlers(rs, conn)
+		if subsystem, ok := subsystem.(rpcserver.ServiceRegisterer); ok {
+			subsystem.RegisterHandlers(rs, conn)
+		}
+	}
+}
+
+// RegisterRoutes implements the web.Registerer interface.
+func (s *server) RegisterRoutes(ws *web.Server) {
+	for _, subsystem := range s.handlers {
+		if subsystem, ok := subsystem.(web.Registerer); ok {
+			subsystem.RegisterRoutes(ws)
+		}
 	}
 }

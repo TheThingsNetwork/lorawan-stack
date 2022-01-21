@@ -112,14 +112,6 @@ type mockPackageHandler struct {
 	HandleUpFunc func(context.Context, *ttnpb.ApplicationPackageDefaultAssociation, *ttnpb.ApplicationPackageAssociation, *ttnpb.ApplicationUp) error
 }
 
-func (h *mockPackageHandler) Roles() []ttnpb.ClusterRole {
-	return nil
-}
-
-func (h *mockPackageHandler) RegisterServices(s *grpc.Server) {}
-
-func (h *mockPackageHandler) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {}
-
 func (h *mockPackageHandler) HandleUp(ctx context.Context, defaultAssoc *ttnpb.ApplicationPackageDefaultAssociation, assoc *ttnpb.ApplicationPackageAssociation, up *ttnpb.ApplicationUp) error {
 	if h.HandleUpFunc == nil {
 		panic("HandleUp called but HandleUpFunc is nil")
@@ -147,4 +139,20 @@ func createMockPackageHandler(ch chan<- *handleUpRequest) *mockPackageHandler {
 			return nil
 		},
 	}
+}
+
+type grpcServiceRegistererWrapper struct {
+	rpcserver.ServiceRegisterer
+}
+
+func (*grpcServiceRegistererWrapper) Roles() []ttnpb.ClusterRole {
+	return nil
+}
+
+func (s *grpcServiceRegistererWrapper) RegisterServices(gs *grpc.Server) {
+	s.ServiceRegisterer.RegisterServices(gs)
+}
+
+func (s *grpcServiceRegistererWrapper) RegisterHandlers(sm *runtime.ServeMux, conn *grpc.ClientConn) {
+	s.ServiceRegisterer.RegisterHandlers(sm, conn)
 }

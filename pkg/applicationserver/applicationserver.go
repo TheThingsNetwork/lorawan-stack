@@ -31,7 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
 	_ "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider/mqtt" // The MQTT integration provider
 	_ "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider/nats" // The NATS integration provider
-	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
+	ioweb "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/metadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -50,6 +50,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 	"google.golang.org/grpc"
 )
@@ -68,8 +69,8 @@ type ApplicationServer struct {
 	appUpsRegistry   ApplicationUplinkRegistry
 	locationRegistry metadata.EndDeviceLocationRegistry
 	formatters       messageprocessors.MapPayloadProcessor
-	webhooks         web.Webhooks
-	webhookTemplates web.TemplateStore
+	webhooks         ioweb.Webhooks
+	webhookTemplates ioweb.TemplateStore
 	pubsub           *pubsub.PubSub
 	appPackages      packages.Server
 
@@ -231,11 +232,8 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		}
 	}
 
-	if webhooks, err := conf.Webhooks.NewWebhooks(ctx, as); err != nil {
+	if as.webhooks, err = conf.Webhooks.NewWebhooks(ctx, as); err != nil {
 		return nil, err
-	} else if webhooks != nil {
-		as.webhooks = webhooks
-		c.RegisterWeb(webhooks)
 	}
 
 	if as.webhookTemplates, err = conf.Webhooks.Templates.NewTemplateStore(ctx, as); err != nil {
@@ -248,13 +246,12 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 
 	if as.appPackages, err = conf.Packages.NewApplicationPackages(ctx, as); err != nil {
 		return nil, err
-	} else if as.appPackages != nil {
-		c.RegisterGRPC(as.appPackages)
 	}
 
 	hooks.RegisterUnaryHook("/ttn.lorawan.v3.NsAs", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	c.RegisterGRPC(as)
+	c.RegisterWeb(as)
 	return as, nil
 }
 
@@ -264,11 +261,14 @@ func (as *ApplicationServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterNsAsServer(s, as)
 	ttnpb.RegisterAsEndDeviceRegistryServer(s, as.grpc.asDevices)
 	ttnpb.RegisterAppAsServer(s, as.grpc.appAs)
-	if as.webhooks != nil {
-		ttnpb.RegisterApplicationWebhookRegistryServer(s, web.NewWebhookRegistryRPC(as.webhooks.Registry(), as.webhookTemplates))
+	if wh := as.webhooks; wh != nil {
+		ttnpb.RegisterApplicationWebhookRegistryServer(s, ioweb.NewWebhookRegistryRPC(wh.Registry(), as.webhookTemplates))
 	}
-	if as.pubsub != nil {
-		ttnpb.RegisterApplicationPubSubRegistryServer(s, as.pubsub)
+	if ps := as.pubsub; ps != nil {
+		ttnpb.RegisterApplicationPubSubRegistryServer(s, ps)
+	}
+	if packages := as.appPackages; packages != nil {
+		packages.RegisterServices(s)
 	}
 }
 
@@ -282,6 +282,19 @@ func (as *ApplicationServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Cl
 	}
 	if as.pubsub != nil {
 		ttnpb.RegisterApplicationPubSubRegistryHandler(as.Context(), s, conn)
+	}
+	if packages := as.appPackages; packages != nil {
+		packages.RegisterHandlers(s, conn)
+	}
+}
+
+// RegisterRoutes registers HTTP routes.
+func (as *ApplicationServer) RegisterRoutes(s *web.Server) {
+	if wh := as.webhooks; wh != nil {
+		wh.RegisterRoutes(s)
+	}
+	if packages := as.appPackages; packages != nil {
+		packages.RegisterRoutes(s)
 	}
 }
 
