@@ -393,6 +393,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 							return tc.GetByIDFunc(ctx, appID, devID, paths)
 						},
 					},
+					DevNonceLimit: defaultDevNonceLimit,
 				},
 			)).(*JoinServer)
 			js.KeyVault = keyVault
@@ -791,6 +792,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 							return tc.SetByIDFunc(ctx, appID, devID, paths, cb)
 						},
 					},
+					DevNonceLimit: defaultDevNonceLimit,
 				},
 			)).(*JoinServer)
 			js.KeyVault = keyVault
@@ -964,6 +966,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 							return tc.SetByIDFunc(ctx, appID, devID, paths, cb)
 						},
 					},
+					DevNonceLimit: defaultDevNonceLimit,
 				},
 			)).(*JoinServer)
 			js.KeyVault = keyVault

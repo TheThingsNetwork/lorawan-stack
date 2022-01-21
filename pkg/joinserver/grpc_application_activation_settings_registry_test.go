@@ -109,6 +109,7 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			&Config{
 				ApplicationActivationSettings: reg,
 				DeviceKEKLabel:                jsKEKLabel,
+				DevNonceLimit:                 defaultDevNonceLimit,
 			},
 		)).(*JoinServer)
 		js.KeyVault = keyVault

@@ -45,10 +45,11 @@ var (
 		{EUI64: types.EUI64{0x10, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}, Length: 12},
 		{EUI64: types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00}, Length: 56},
 	}
-	nwkKey = types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	appKey = types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
-	nsAddr = "ns.test.org:1234"
-	asAddr = "as.test.org:1234"
+	nwkKey               = types.AES128Key{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	appKey               = types.AES128Key{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+	nsAddr               = "ns.test.org:1234"
+	asAddr               = "as.test.org:1234"
+	defaultDevNonceLimit = 10
 )
 
 func eui64Ptr(eui types.EUI64) *types.EUI64 { return &eui }
@@ -162,6 +163,7 @@ func TestInvalidJoinRequests(t *testing.T) {
 						Devices:                       devReg,
 						Keys:                          keyReg,
 						JoinEUIPrefixes:               joinEUIPrefixes,
+						DevNonceLimit:                 defaultDevNonceLimit,
 					},
 				)).(*joinserver.JoinServer)
 				componenttest.StartComponent(t, c)
@@ -204,7 +206,6 @@ func TestInvalidJoinRequests(t *testing.T) {
 
 func TestHandleJoin(t *testing.T) {
 	_, ctx := test.New(t)
-
 	for _, tc := range []struct {
 		Name        string
 		ContextFunc func(context.Context) context.Context
@@ -1430,6 +1431,92 @@ func TestHandleJoin(t *testing.T) {
 			},
 			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{},
 			NextLastJoinNonce:             0x42fffe,
+			NextUsedDevNonces:             []uint32{23, 41, 42, 52, 0x2444, 0x2442},
+			JoinRequest: &ttnpb.JoinRequest{
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0,
+				RawPayload: []byte{
+					/* MHDR */
+					0x00,
+					/* MACPayload */
+					/** JoinEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
+					/** DevEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+					/** DevNonce **/
+					0x42, 0x24,
+					/* MIC */
+					0xed, 0x8b, 0xd2, 0x24,
+				},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				NetId:   types.NetID{0x42, 0xff, 0xff},
+				DownlinkSettings: &ttnpb.DLSettings{
+					OptNeg:      true,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
+				},
+				RxDelay: 0x42,
+			},
+			JoinResponse: &ttnpb.JoinResponse{
+				RawPayload: append([]byte{
+					/* MHDR */
+					0x20,
+				},
+					mustEncryptJoinAccept(appKey, []byte{
+						/* JoinNonce */
+						0xfe, 0xff, 0x42,
+						/* NetID */
+						0xff, 0xff, 0x42,
+						/* DevAddr */
+						0xff, 0xff, 0xff, 0x42,
+						/* DLSettings */
+						0xff,
+						/* RxDelay */
+						0x42,
+						/* MIC */
+						0xf8, 0x4a, 0x11, 0x8e,
+					})...),
+				SessionKeys: &ttnpb.SessionKeys{
+					FNwkSIntKey: &ttnpb.KeyEnvelope{
+						Key: keyPtr(crypto.DeriveLegacyNwkSKey(
+							appKey,
+							types.JoinNonce{0x42, 0xff, 0xfe},
+							types.NetID{0x42, 0xff, 0xff},
+							types.DevNonce{0x24, 0x42})),
+					},
+					AppSKey: &ttnpb.KeyEnvelope{
+						Key: keyPtr(crypto.DeriveLegacyAppSKey(
+							appKey,
+							types.JoinNonce{0x42, 0xff, 0xfe},
+							types.NetID{0x42, 0xff, 0xff},
+							types.DevNonce{0x24, 0x42})),
+					},
+				},
+			},
+		},
+		{
+			Name:           "1.0.0/cluster auth/existing device/nonce reuse",
+			ContextFunc:    func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
+			Authorizer:     joinserver.ClusterAuthorizer(ctx),
+			ErrorAssertion: errors.IsInvalidArgument,
+			Device: &ttnpb.EndDevice{
+				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442, 0x2444},
+				LastJoinNonce: 0x42fffd,
+				Ids: &ttnpb.EndDeviceIdentifiers{
+					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
+					DeviceId:       "test-dev",
+				},
+				RootKeys: &ttnpb.RootKeys{
+					AppKey: &ttnpb.KeyEnvelope{
+						Key: &appKey,
+					},
+				},
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0,
+				NetworkServerAddress: nsAddr,
+			},
+			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{},
+			NextLastJoinNonce:             0x42fffe,
 			NextUsedDevNonces:             []uint32{23, 41, 42, 52, 0x2442, 0x2444},
 			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0,
@@ -1493,11 +1580,11 @@ func TestHandleJoin(t *testing.T) {
 			},
 		},
 		{
-			Name:        "1.0.0/cluster auth/existing device/nonce reuse",
+			Name:        "1.0.0/cluster auth/existing device/dev nonce limit",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			Authorizer:  joinserver.ClusterAuthorizer(ctx),
 			Device: &ttnpb.EndDevice{
-				UsedDevNonces: []uint32{23, 41, 42, 52, 0x2442, 0x2444},
+				UsedDevNonces: []uint32{23, 41, 42, 52, 53, 54, 55, 56, 57, 0x2444},
 				LastJoinNonce: 0x42fffd,
 				Ids: &ttnpb.EndDeviceIdentifiers{
 					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -1512,11 +1599,10 @@ func TestHandleJoin(t *testing.T) {
 				},
 				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0,
 				NetworkServerAddress: nsAddr,
-				ResetsJoinNonces:     true,
 			},
 			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{},
 			NextLastJoinNonce:             0x42fffe,
-			NextUsedDevNonces:             []uint32{23, 41, 42, 52, 0x2442, 0x2444},
+			NextUsedDevNonces:             []uint32{41, 42, 52, 53, 54, 55, 56, 57, 0x2444, 0x2442},
 			JoinRequest: &ttnpb.JoinRequest{
 				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0,
 				RawPayload: []byte{
@@ -2167,6 +2253,7 @@ func TestHandleJoin(t *testing.T) {
 						Devices:                       devReg,
 						Keys:                          keyReg,
 						JoinEUIPrefixes:               joinEUIPrefixes,
+						DevNonceLimit:                 defaultDevNonceLimit,
 					},
 				)).(*joinserver.JoinServer)
 				componenttest.StartComponent(t, c)
@@ -2478,8 +2565,9 @@ func TestGetNwkSKeys(t *testing.T) {
 				js := test.Must(joinserver.New(
 					c,
 					&joinserver.Config{
-						Keys:    &joinserver.MockKeyRegistry{GetByIDFunc: tc.GetByID},
-						Devices: &joinserver.MockDeviceRegistry{},
+						Keys:          &joinserver.MockKeyRegistry{GetByIDFunc: tc.GetByID},
+						Devices:       &joinserver.MockDeviceRegistry{},
+						DevNonceLimit: defaultDevNonceLimit,
 					},
 				)).(*joinserver.JoinServer)
 				componenttest.StartComponent(t, c)
@@ -2889,8 +2977,9 @@ func TestGetAppSKey(t *testing.T) {
 				js := test.Must(joinserver.New(
 					componenttest.NewComponent(t, &component.Config{}),
 					&joinserver.Config{
-						Keys:    &joinserver.MockKeyRegistry{GetByIDFunc: tc.GetKeyByID},
-						Devices: &joinserver.MockDeviceRegistry{GetByEUIFunc: tc.GetDeviceByEUI},
+						Keys:          &joinserver.MockKeyRegistry{GetByIDFunc: tc.GetKeyByID},
+						Devices:       &joinserver.MockDeviceRegistry{GetByEUIFunc: tc.GetDeviceByEUI},
+						DevNonceLimit: defaultDevNonceLimit,
 					},
 				)).(*joinserver.JoinServer)
 				res, err := js.GetAppSKey(ctx, tc.KeyRequest, tc.Authorizer)
@@ -2991,6 +3080,7 @@ func TestGetHomeNetID(t *testing.T) {
 						Devices: &joinserver.MockDeviceRegistry{
 							GetByEUIFunc: tc.GetByEUI,
 						},
+						DevNonceLimit: defaultDevNonceLimit,
 					},
 				)).(*joinserver.JoinServer)
 				homeNetwork, err := js.GetHomeNetwork(ctx, tc.JoinEUI, tc.DevEUI, tc.Authorizer)
