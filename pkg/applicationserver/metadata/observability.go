@@ -28,7 +28,7 @@ const (
 )
 
 var metaMetrics = &metadataMetrics{
-	cacheHits: metrics.NewContextualCounterVec(
+	cacheHits: prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "cache_hits_total",
@@ -36,7 +36,7 @@ var metaMetrics = &metadataMetrics{
 		},
 		[]string{metadataLabel},
 	),
-	cacheMisses: metrics.NewContextualCounterVec(
+	cacheMisses: prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "cache_misses_total",
@@ -44,7 +44,7 @@ var metaMetrics = &metadataMetrics{
 		},
 		[]string{metadataLabel},
 	),
-	registryRetrievals: metrics.NewContextualCounterVec(
+	registryRetrievals: prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "registry_retrievals_total",
@@ -52,7 +52,7 @@ var metaMetrics = &metadataMetrics{
 		},
 		[]string{metadataLabel},
 	),
-	registryUpdates: metrics.NewContextualCounterVec(
+	registryUpdates: prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "registry_updates_total",
@@ -67,10 +67,10 @@ func init() {
 }
 
 type metadataMetrics struct {
-	cacheHits          *metrics.ContextualCounterVec
-	cacheMisses        *metrics.ContextualCounterVec
-	registryRetrievals *metrics.ContextualCounterVec
-	registryUpdates    *metrics.ContextualCounterVec
+	cacheHits          *prometheus.CounterVec
+	cacheMisses        *prometheus.CounterVec
+	registryRetrievals *prometheus.CounterVec
+	registryUpdates    *prometheus.CounterVec
 }
 
 func (m metadataMetrics) Describe(ch chan<- *prometheus.Desc) {
@@ -88,19 +88,19 @@ func (m metadataMetrics) Collect(ch chan<- prometheus.Metric) {
 }
 
 func registerMetadataCacheHit(ctx context.Context, metadata string) {
-	metaMetrics.cacheHits.WithLabelValues(ctx, metadata).Inc()
-	metaMetrics.cacheMisses.WithLabelValues(ctx, metadata)
+	metaMetrics.cacheHits.WithLabelValues(metadata).Inc()
+	metaMetrics.cacheMisses.WithLabelValues(metadata)
 }
 
 func registerMetadataCacheMiss(ctx context.Context, metadata string) {
-	metaMetrics.cacheHits.WithLabelValues(ctx, metadata)
-	metaMetrics.cacheMisses.WithLabelValues(ctx, metadata).Inc()
+	metaMetrics.cacheHits.WithLabelValues(metadata)
+	metaMetrics.cacheMisses.WithLabelValues(metadata).Inc()
 }
 
 func registerMetadataRegistryRetrieval(ctx context.Context, metadata string) {
-	metaMetrics.registryRetrievals.WithLabelValues(ctx, metadata).Inc()
+	metaMetrics.registryRetrievals.WithLabelValues(metadata).Inc()
 }
 
 func registerMetadataRegistryUpdate(ctx context.Context, metadata string) {
-	metaMetrics.registryUpdates.WithLabelValues(ctx, metadata).Inc()
+	metaMetrics.registryUpdates.WithLabelValues(metadata).Inc()
 }
