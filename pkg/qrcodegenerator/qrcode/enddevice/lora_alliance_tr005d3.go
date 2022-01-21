@@ -26,6 +26,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
+const formatIDLoRaAllianceTR005Draft3 = "tr005draft3"
+
 // LoRaAllianceTR005Draft3 is the LoRa Alliance defined format in Technical Recommendation TR005 Draft 3.
 type LoRaAllianceTR005Draft3 struct {
 	JoinEUI,
@@ -148,6 +150,7 @@ func (m *LoRaAllianceTR005Draft3) UnmarshalText(text []byte) error {
 // GetEntityOnboardingData implements the Data interface.
 func (m *LoRaAllianceTR005Draft3) GetEntityOnboardingData() *ttnpb.EntityOnboardingData {
 	return &ttnpb.EntityOnboardingData{
+		FormatId: formatIDLoRaAllianceTR005Draft3,
 		Data: &ttnpb.EntityOnboardingData_EndDeviceOnboardingData{
 			EndDeviceOnboardingData: &ttnpb.EndDeviceOnboardingData{
 				JoinEui:                 &m.JoinEUI,
@@ -178,6 +181,11 @@ func (LoRaAllianceTR005Draft3Format) Format() *ttnpb.QRCodeFormat {
 			},
 		},
 	}
+}
+
+// ID implements EndDeviceFormat.
+func (LoRaAllianceTR005Draft3Format) ID() string {
+	return formatIDLoRaAllianceTR005Draft3
 }
 
 // New implements EndDeviceFormat.

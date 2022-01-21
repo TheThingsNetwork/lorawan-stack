@@ -26,9 +26,11 @@ type qrCodeParserServer struct {
 
 // Parse implementes QRCodeParserServer.
 func (s *qrCodeParserServer) Parse(ctx context.Context, req *ttnpb.ParseQRCodeRequest) (*ttnpb.ParseQRCodeResponse, error) {
-	_, _, err := s.QRG.qrCode.Parse(req.FormatId, "type", req.QrCode)
+	data, err := s.QRG.qrCode.Parse(req.FormatId, req.QrCode)
 	if err != nil {
 		return nil, err
 	}
-	return nil, nil
+	return &ttnpb.ParseQRCodeResponse{
+		EntityOnboardingData: data.GetEntityOnboardingData(),
+	}, nil
 }

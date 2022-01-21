@@ -57,9 +57,15 @@ func New(c *component.Component, conf *Config) (*QRCodeGenerator, error) {
 
 	// Register known formats.
 	qrg.qrCode = qrcode.New(ctx)
-	qrg.qrCode.RegisterEndDeviceFormat("tr005", new(enddevice.LoRaAllianceTR005Format))
-	qrg.qrCode.RegisterEndDeviceFormat("tr005draft2", new(enddevice.LoRaAllianceTR005Draft2Format))
-	qrg.qrCode.RegisterEndDeviceFormat("tr005draft3", new(enddevice.LoRaAllianceTR005Draft3Format))
+
+	var formats []qrcode.EndDeviceFormat
+	formats = append(formats, new(enddevice.LoRaAllianceTR005Format))
+	formats = append(formats, new(enddevice.LoRaAllianceTR005Draft2Format))
+	formats = append(formats, new(enddevice.LoRaAllianceTR005Draft3Format))
+
+	for _, format := range formats {
+		qrg.qrCode.RegisterEndDeviceFormat(format.ID(), format)
+	}
 
 	c.RegisterGRPC(qrg)
 	return qrg, nil

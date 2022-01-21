@@ -57,7 +57,7 @@ var (
 
 // Parse attempts to parse the given QR code data.
 // It returns the parser and the format ID that successfully parsed the QR code.
-func (c *QRCode) Parse(formatID string, data []byte) (Data, string, error) {
+func (c *QRCode) Parse(formatID string, data []byte) (Data, error) {
 	for id, format := range c.endDeviceFormats {
 		// If format ID is provided, use  only that.
 		if formatID != "" && formatID != id {
@@ -65,16 +65,18 @@ func (c *QRCode) Parse(formatID string, data []byte) (Data, string, error) {
 		}
 		edFormat := format.New()
 		if err := edFormat.UnmarshalText(data); err == nil {
-			return edFormat, id, nil
+			return edFormat, nil
 		}
 	}
-	return nil, "", errUnknownFormat.WithAttributes("format_id", formatID)
+	return nil, errUnknownFormat.WithAttributes("format_id", formatID)
 }
 
 // EndDeviceFormat is a end device QR code format.
 type EndDeviceFormat interface {
 	Format() *ttnpb.QRCodeFormat
 	New() EndDeviceData
+	// Return the ID of this format as a string.
+	ID() string
 }
 
 // GetEndDeviceFormats returns the registered end device QR code formats.

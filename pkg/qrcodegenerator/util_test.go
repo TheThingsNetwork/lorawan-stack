@@ -51,6 +51,8 @@ func (m *mock) Encode(dev *ttnpb.EndDevice) error {
 	return nil
 }
 
+func (*mock) GetEntityOnboardingData() *ttnpb.EntityOnboardingData { return nil }
+
 func (m mock) MarshalText() ([]byte, error) {
 	return []byte(fmt.Sprintf("%s:%s", m.ids.JoinEui, m.ids.DevEui)), nil
 }

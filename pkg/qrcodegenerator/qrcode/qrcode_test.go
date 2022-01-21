@@ -59,7 +59,7 @@ func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 			qrCode.RegisterEndDeviceFormat("tr005draft2", new(enddevice.LoRaAllianceTR005Draft2Format))
 			qrCode.RegisterEndDeviceFormat("tr005draft3", new(enddevice.LoRaAllianceTR005Draft3Format))
 
-			d, _, err := qrCode.Parse("", tc.Data)
+			d, err := qrCode.Parse("", tc.Data)
 			data := test.Must(d, err).(Data)
 
 			ed := data.GetEntityOnboardingData()
@@ -100,13 +100,18 @@ func (mockFormat) New() EndDeviceData {
 	return new(mock)
 }
 
+func (mockFormat) ID() string {
+	return "mock"
+}
+
 func TestQRCodeFormats(t *testing.T) {
 	a := assertions.New(t)
 	qrCode := New(context.Background())
 
 	a.So(qrCode.GetEndDeviceFormat("mock"), should.BeNil)
 
-	qrCode.RegisterEndDeviceFormat("mock", new(mockFormat))
+	mockFormat := new(mockFormat)
+	qrCode.RegisterEndDeviceFormat(mockFormat.ID(), mockFormat)
 	f := qrCode.GetEndDeviceFormat("mock")
 	if !a.So(f, should.NotBeNil) {
 		t.FailNow()
