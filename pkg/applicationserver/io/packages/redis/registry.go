@@ -521,7 +521,7 @@ func (r ApplicationPackagesRegistry) WithPagination(ctx context.Context, limit, 
 }
 
 // EndDeviceTransaction implements applicationpackages.TransactionRegistry.
-func (r *ApplicationPackagesRegistry) EndDeviceTransaction(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fPort uint32, packageName string, fn func(ctx context.Context) error) error {
+func (r *ApplicationPackagesRegistry) EndDeviceTransaction(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, fPort uint32, packageName string, fn func(ctx context.Context) error) error {
 	k := r.transactionKey(unique.ID(ctx, ids), r.fPortStr(fPort), packageName)
 
 	lockerID, err := ttnredis.GenerateLockerID()

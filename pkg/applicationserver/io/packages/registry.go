@@ -46,7 +46,7 @@ type DefaultAssociationRegistry interface {
 
 // TransactionRegistry is a registry for application packages transactions.
 type TransactionRegistry interface {
-	EndDeviceTransaction(ctx context.Context, ids ttnpb.EndDeviceIdentifiers, fPort uint32, packageName string, fn func(ctx context.Context) error) error
+	EndDeviceTransaction(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, fPort uint32, packageName string, fn func(ctx context.Context) error) error
 }
 
 // Registry is a registry for application packages.
