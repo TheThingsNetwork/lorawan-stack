@@ -37,21 +37,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func TestJoinServerFQDN(t *testing.T) {
-	for _, tc := range []struct {
-		JoinEUI  types.EUI64
-		Expected string
-	}{
-		{
-			JoinEUI:  types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00},
-			Expected: "0.0.0.0.0.0.0.d.e.7.5.d.3.b.0.7.joineuis.lora-alliance.org",
-		},
-	} {
-		a := assertions.New(t)
-		a.So(JoinServerFQDN(tc.JoinEUI, LoRaAllianceJoinEUIDomain), should.Equal, tc.Expected)
-	}
-}
-
 func TestGetAppSKey(t *testing.T) {
 	makeSessionKeyRequest := func() *ttnpb.SessionKeyRequest {
 		return &ttnpb.SessionKeyRequest{

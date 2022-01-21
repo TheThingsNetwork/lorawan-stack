@@ -39,18 +39,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-const (
-	// loRaAllianceDomain is the domain of LoRa Alliance.
-	loRaAllianceDomain = "lora-alliance.org"
-
-	// LoRaAllianceJoinEUIDomain is the LoRa Alliance domain used for JoinEUI resolution.
-	LoRaAllianceJoinEUIDomain = "joineuis." + loRaAllianceDomain
-
-	// LoRaAllianceNetIDDomain is the LoRa Alliance domain used for NetID resolution.
-	LoRaAllianceNetIDDomain = "netids." + loRaAllianceDomain
-
-	defaultHTTPSPort = 443
-)
+const defaultHTTPSPort = 443
 
 type jsRPCPaths struct {
 	Join    string `yaml:"join"`
@@ -89,27 +78,6 @@ func newHTTPRequest(url string, pld interface{}, headers map[string]string) (*ht
 		req.Header.Set(k, v)
 	}
 	return req, nil
-}
-
-// JoinServerFQDN constructs Join Server FQDN using specified EUI under domain
-// according to LoRaWAN Backend Interfaces specification.
-// If domain is empty, LoRaAllianceJoinEUIDomain is used.
-func JoinServerFQDN(eui types.EUI64, domain string) string {
-	if domain == "" {
-		domain = LoRaAllianceJoinEUIDomain
-	}
-	return fmt.Sprintf(
-		"%01x.%01x.%01x.%01x.%01x.%01x.%01x.%01x.%01x.%01x.%01x.%01x.%01x.%01x.%01x.%01x.%s",
-		eui[7]&0x0f, eui[7]>>4,
-		eui[6]&0x0f, eui[6]>>4,
-		eui[5]&0x0f, eui[5]>>4,
-		eui[4]&0x0f, eui[4]>>4,
-		eui[3]&0x0f, eui[3]>>4,
-		eui[2]&0x0f, eui[2]>>4,
-		eui[1]&0x0f, eui[1]>>4,
-		eui[0]&0x0f, eui[0]>>4,
-		domain,
-	)
 }
 
 func httpExchange(ctx context.Context, httpReq *http.Request, res interface{}, do func(*http.Request) (*http.Response, error)) error {
@@ -278,14 +246,17 @@ func GeneratedSessionKeyID(id []byte) bool {
 	return bytes.HasPrefix(id, generatedSessionKeyIDPrefix)
 }
 
+var errDNSLookupNotSupported = errors.DefineFailedPrecondition("dns_lookup_not_supported", "DNS lookup is not supported")
+
 func makeJoinServerHTTPRequestFunc(scheme, dns, fqdn string, port uint32, rpcPaths jsRPCPaths, headers map[string]string) func(types.EUI64, func(jsRPCPaths) string, interface{}) (*http.Request, error) {
 	if port == 0 {
 		port = defaultHTTPSPort
 	}
 	return func(joinEUI types.EUI64, pathFunc func(jsRPCPaths) string, pld interface{}) (*http.Request, error) {
-		fqdn := fqdn
-		if fqdn == "" {
-			fqdn = JoinServerFQDN(joinEUI, dns)
+		if dns != "" || fqdn == "" {
+			// TODO: Support new LoRaWAN DNS for looking up Join Servers
+			// (https://github.com/TheThingsNetwork/lorawan-stack/issues/5130)
+			return nil, errDNSLookupNotSupported.New()
 		}
 		return newHTTPRequest(serverURL(scheme, fqdn, pathFunc(rpcPaths), port), pld, headers)
 	}
