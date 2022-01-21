@@ -15,16 +15,13 @@
 import React from 'react'
 import { withInfo } from '@storybook/addon-info'
 
-import LogoSVG from '@assets/static/logo.svg'
+import Logo from '@assets/static/logo.svg'
 
 import Icon from '@ttn-lw/components/icon'
-import Logo from '@ttn-lw/components/logo'
 
 import style from './story.styl'
 
 import Modal from '.'
-
-const StoryLogo = () => <Logo logo={{ src: LogoSVG, alt: 'Test' }} />
 
 const bottomLine = (
   <div>
@@ -65,7 +62,7 @@ export const OAuthAuthorizeExample = () => (
     bottomLine={bottomLine}
     buttonMessage="Allow"
     approval
-    logo={<StoryLogo />}
+    logo={Logo}
     inline
   >
     <div className={style.left}>

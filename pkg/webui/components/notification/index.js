@@ -15,7 +15,6 @@
 import React from 'react'
 import classnames from 'classnames'
 
-import Button from '@ttn-lw/components/button'
 import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -37,9 +36,7 @@ const Notification = ({
   small,
   success,
   messageValues = {},
-  action,
-  actionMessage,
-  buttonIcon,
+  children,
   'data-test-id': dataTestId,
 }) => {
   const classname = classnames(style.notification, className, {
@@ -71,15 +68,7 @@ const Notification = ({
               firstToUpper
               convertBackticks={Boolean(error)}
             />
-            {action && (
-              <Button
-                secondary
-                icon={buttonIcon}
-                onClick={action}
-                message={actionMessage}
-                type="button"
-              />
-            )}
+            {children}
           </div>
         </div>
       </div>
@@ -89,9 +78,7 @@ const Notification = ({
 }
 
 Notification.propTypes = {
-  action: PropTypes.func,
-  actionMessage: PropTypes.message,
-  buttonIcon: PropTypes.string,
+  children: PropTypes.node,
   className: PropTypes.string,
   content: PropTypes.oneOfType([PropTypes.message, PropTypes.error, PropTypes.string]),
   'data-test-id': PropTypes.string,
@@ -106,9 +93,7 @@ Notification.propTypes = {
 }
 
 Notification.defaultProps = {
-  action: undefined,
-  actionMessage: undefined,
-  buttonIcon: '',
+  children: undefined,
   className: undefined,
   content: undefined,
   'data-test-id': 'notification',

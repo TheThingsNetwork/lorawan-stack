@@ -31,7 +31,7 @@ const m = defineMessages({
   loggedInAs: 'Logged in as <b>{userId}</b>',
 })
 
-const MobileMenu = ({ className, children, user, onItemsClick, onLogout }) => {
+const MobileMenu = ({ className, children, user, onItemsClick, onLogout, bottomArea }) => {
   const handleLogoutClick = useCallback(() => {
     onItemsClick()
     onLogout()
@@ -47,34 +47,38 @@ const MobileMenu = ({ className, children, user, onItemsClick, onLogout }) => {
       >
         {children}
       </Dropdown>
-      {Boolean(user) && (
-        <div className={style.userHeader}>
-          <div className={style.userMessage}>
-            <ProfilePicture
-              profilePicture={user.profile_picture}
-              className={style.profilePictureMobile}
-            />
-            <Message
-              className={style.userMessage}
-              content={m.loggedInAs}
-              values={{ userId: user.ids.user_id, b: (...chunks) => <b key="1"> {chunks}</b> }}
-            />
+      <div className={style.bottom}>
+        <div className={style.deployment}>{bottomArea}</div>
+        {Boolean(user) && (
+          <div className={style.userHeader}>
+            <div className={style.userMessage}>
+              <ProfilePicture
+                profilePicture={user.profile_picture}
+                className={style.profilePictureMobile}
+              />
+              <Message
+                className={style.userMessage}
+                content={m.loggedInAs}
+                values={{ userId: user.ids.user_id, b: (...chunks) => <b key="1"> {chunks}</b> }}
+              />
+            </div>
+            <div>
+              <Button
+                message={sharedMessages.logout}
+                icon="logout"
+                onClick={handleLogoutClick}
+                naked
+              />
+            </div>
           </div>
-          <div>
-            <Button
-              message={sharedMessages.logout}
-              icon="logout"
-              onClick={handleLogoutClick}
-              naked
-            />
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
 
 MobileMenu.propTypes = {
+  bottomArea: PropTypes.node,
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
   onItemsClick: PropTypes.func.isRequired,
@@ -83,6 +87,7 @@ MobileMenu.propTypes = {
 }
 
 MobileMenu.defaultProps = {
+  bottomArea: null,
   className: undefined,
 }
 

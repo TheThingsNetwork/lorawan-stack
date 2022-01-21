@@ -180,6 +180,7 @@
   "console.components.events.messages.confirmedDownlink": "Confirmed downlink",
   "console.components.events.messages.confirmedUplink": "Confirmed uplink",
   "console.components.events.previews.shared.json-payload.index.invalid": "Invalid JSON",
+  "console.components.gateway-data-form.index.claimWarning": "It appears like you are trying to register a <b>The Things Indoor Gateway</b>. Such gateways are already preregistered and need to be claimed instead. <Link>Click here</Link> to go to gateway claiming.{br} See also <TTIDocLink>Claiming The Things Indoor Gateway</TTIDocLink> and <ClaimingDocLink>Gateway Claiming</ClaimingDocLink>.",
   "console.components.join-eui-prefixes-input.index.empty": "No prefix",
   "console.components.join-eui-prefixes-input.index.zeroInput": "Fill with zeros",
   "console.components.location-form.index.deleteAllLocations": "Delete all location data",

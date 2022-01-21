@@ -167,7 +167,7 @@ const Modal = props => {
                 <Message className={style.title} content={title} component="h1" />
                 {subtitle && <Message component="span" content={subtitle} />}
               </div>
-              {logo}
+              {Boolean(logo) && <img className={style.logo} src={logo} alt="Logo" />}
             </div>
           )}
           {title && <div className={style.line} />}

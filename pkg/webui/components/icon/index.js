@@ -24,6 +24,7 @@ const hardcoded = {
   access: 'lock',
   api_keys: 'vpn_key',
   application: 'web_asset',
+  cluster: 'language',
   collaborators: 'people',
   data: 'poll',
   develop: 'code',

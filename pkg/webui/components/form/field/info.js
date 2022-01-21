@@ -52,10 +52,12 @@ class InfoField extends React.Component {
 
     return (
       <div className={cls}>
-        <div className={style.label}>
-          <Message content={title} className={style.title} />
-          {tooltipId && <Tooltip id={tooltipId} glossaryTerm={title} />}
-        </div>
+        {title && (
+          <div className={style.label}>
+            <Message content={title} className={style.title} />
+            {tooltipId && <Tooltip id={tooltipId} glossaryTerm={title} />}
+          </div>
+        )}
         <div className={classnames(style.componentArea, style.infoArea)}>{children}</div>
       </div>
     )

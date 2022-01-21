@@ -22,17 +22,20 @@
   padding: 0 $cs.xl
 
   &:hover
-    background-color: $c-backdrop-lighter
+    area-hover()
 
   +focus-visible()
     background-color: $c-backdrop-lighter
 
   &:active, &:focus
-    background-color: $c-backdrop
+    area-active()
 
 .id
   one-liner()
   margin-right: $cs.xs
+
+  +media-query($bp.l)
+    display: none
 
 .dropdown
   top: $header-height
