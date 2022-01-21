@@ -202,18 +202,9 @@ func (dst *GenerateQRCodeResponse) SetFields(src *GenerateQRCodeResponse, paths 
 	return nil
 }
 
-func (dst *LoRaAllianceTR005EndDevice) SetFields(src *LoRaAllianceTR005EndDevice, paths ...string) error {
+func (dst *EndDeviceOnboardingData) SetFields(src *EndDeviceOnboardingData, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "schema_id":
-			if len(subs) > 0 {
-				return fmt.Errorf("'schema_id' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.SchemaId = src.SchemaId
-			} else {
-				dst.SchemaId = nil
-			}
 		case "join_eui":
 			if len(subs) > 0 {
 				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
@@ -231,6 +222,16 @@ func (dst *LoRaAllianceTR005EndDevice) SetFields(src *LoRaAllianceTR005EndDevice
 				dst.DevEui = src.DevEui
 			} else {
 				dst.DevEui = nil
+			}
+		case "claim_authentication_code":
+			if len(subs) > 0 {
+				return fmt.Errorf("'claim_authentication_code' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ClaimAuthenticationCode = src.ClaimAuthenticationCode
+			} else {
+				var zero string
+				dst.ClaimAuthenticationCode = zero
 			}
 		case "vendor_id":
 			if len(subs) > 0 {
@@ -260,16 +261,6 @@ func (dst *LoRaAllianceTR005EndDevice) SetFields(src *LoRaAllianceTR005EndDevice
 				var zero string
 				dst.Checksum = zero
 			}
-		case "owner_token":
-			if len(subs) > 0 {
-				return fmt.Errorf("'owner_token' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.OwnerToken = src.OwnerToken
-			} else {
-				var zero string
-				dst.OwnerToken = zero
-			}
 		case "serial_number":
 			if len(subs) > 0 {
 				return fmt.Errorf("'serial_number' has no subfields, but %s were specified", subs)
@@ -298,9 +289,19 @@ func (dst *LoRaAllianceTR005EndDevice) SetFields(src *LoRaAllianceTR005EndDevice
 	return nil
 }
 
-func (dst *OnboardingEntityData) SetFields(src *OnboardingEntityData, paths ...string) error {
+func (dst *EntityOnboardingData) SetFields(src *EntityOnboardingData, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
+		case "format_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'format_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FormatId = src.FormatId
+			} else {
+				var zero string
+				dst.FormatId = zero
+			}
 
 		case "data":
 			if len(subs) == 0 && src == nil {
@@ -317,28 +318,28 @@ func (dst *OnboardingEntityData) SetFields(src *OnboardingEntityData, paths ...s
 			}
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
-				case "la_tr005_end_device":
-					_, srcOk := src.Data.(*OnboardingEntityData_LaTr005EndDevice)
+				case "end_device_onboarding_data":
+					_, srcOk := src.Data.(*EntityOnboardingData_EndDeviceOnboardingData)
 					if !srcOk && src.Data != nil {
-						return fmt.Errorf("attempt to set oneof 'la_tr005_end_device', while different oneof is set in source")
+						return fmt.Errorf("attempt to set oneof 'end_device_onboarding_data', while different oneof is set in source")
 					}
-					_, dstOk := dst.Data.(*OnboardingEntityData_LaTr005EndDevice)
+					_, dstOk := dst.Data.(*EntityOnboardingData_EndDeviceOnboardingData)
 					if !dstOk && dst.Data != nil {
-						return fmt.Errorf("attempt to set oneof 'la_tr005_end_device', while different oneof is set in destination")
+						return fmt.Errorf("attempt to set oneof 'end_device_onboarding_data', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
-						var newDst, newSrc *LoRaAllianceTR005EndDevice
+						var newDst, newSrc *EndDeviceOnboardingData
 						if !srcOk && !dstOk {
 							continue
 						}
 						if srcOk {
-							newSrc = src.Data.(*OnboardingEntityData_LaTr005EndDevice).LaTr005EndDevice
+							newSrc = src.Data.(*EntityOnboardingData_EndDeviceOnboardingData).EndDeviceOnboardingData
 						}
 						if dstOk {
-							newDst = dst.Data.(*OnboardingEntityData_LaTr005EndDevice).LaTr005EndDevice
+							newDst = dst.Data.(*EntityOnboardingData_EndDeviceOnboardingData).EndDeviceOnboardingData
 						} else {
-							newDst = &LoRaAllianceTR005EndDevice{}
-							dst.Data = &OnboardingEntityData_LaTr005EndDevice{LaTr005EndDevice: newDst}
+							newDst = &EndDeviceOnboardingData{}
+							dst.Data = &EntityOnboardingData_EndDeviceOnboardingData{EndDeviceOnboardingData: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
@@ -376,16 +377,6 @@ func (dst *ParseQRCodeRequest) SetFields(src *ParseQRCodeRequest, paths ...strin
 				var zero string
 				dst.FormatId = zero
 			}
-		case "entity_type":
-			if len(subs) > 0 {
-				return fmt.Errorf("'entity_type' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.EntityType = src.EntityType
-			} else {
-				var zero OnboardingEntityType
-				dst.EntityType = zero
-			}
 		case "qr_code":
 			if len(subs) > 0 {
 				return fmt.Errorf("'qr_code' has no subfields, but %s were specified", subs)
@@ -406,39 +397,29 @@ func (dst *ParseQRCodeRequest) SetFields(src *ParseQRCodeRequest, paths ...strin
 func (dst *ParseQRCodeResponse) SetFields(src *ParseQRCodeResponse, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "format_id":
+		case "entity_onboarding_data":
 			if len(subs) > 0 {
-				return fmt.Errorf("'format_id' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.FormatId = src.FormatId
-			} else {
-				var zero string
-				dst.FormatId = zero
-			}
-		case "onboarding_entity_data":
-			if len(subs) > 0 {
-				var newDst, newSrc *OnboardingEntityData
-				if (src == nil || src.OnboardingEntityData == nil) && dst.OnboardingEntityData == nil {
+				var newDst, newSrc *EntityOnboardingData
+				if (src == nil || src.EntityOnboardingData == nil) && dst.EntityOnboardingData == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.OnboardingEntityData
+					newSrc = src.EntityOnboardingData
 				}
-				if dst.OnboardingEntityData != nil {
-					newDst = dst.OnboardingEntityData
+				if dst.EntityOnboardingData != nil {
+					newDst = dst.EntityOnboardingData
 				} else {
-					newDst = &OnboardingEntityData{}
-					dst.OnboardingEntityData = newDst
+					newDst = &EntityOnboardingData{}
+					dst.EntityOnboardingData = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.OnboardingEntityData = src.OnboardingEntityData
+					dst.EntityOnboardingData = src.EntityOnboardingData
 				} else {
-					dst.OnboardingEntityData = nil
+					dst.EntityOnboardingData = nil
 				}
 			}
 

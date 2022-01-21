@@ -581,41 +581,39 @@ var _ interface {
 	ErrorName() string
 } = GenerateQRCodeResponseValidationError{}
 
-// ValidateFields checks the field values on LoRaAllianceTR005EndDevice with
-// the rules defined in the proto definition for this message. If any rules
-// are violated, an error is returned.
-func (m *LoRaAllianceTR005EndDevice) ValidateFields(paths ...string) error {
+// ValidateFields checks the field values on EndDeviceOnboardingData with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *EndDeviceOnboardingData) ValidateFields(paths ...string) error {
 	if m == nil {
 		return nil
 	}
 
 	if len(paths) == 0 {
-		paths = LoRaAllianceTR005EndDeviceFieldPathsNested
+		paths = EndDeviceOnboardingDataFieldPathsNested
 	}
 
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "schema_id":
-			// no validation rules for SchemaId
 		case "join_eui":
 			// no validation rules for JoinEui
 		case "dev_eui":
 			// no validation rules for DevEui
+		case "claim_authentication_code":
+			// no validation rules for ClaimAuthenticationCode
 		case "vendor_id":
 			// no validation rules for VendorId
 		case "model_id":
 			// no validation rules for ModelId
 		case "checksum":
 			// no validation rules for Checksum
-		case "owner_token":
-			// no validation rules for OwnerToken
 		case "serial_number":
 			// no validation rules for SerialNumber
 		case "proprietary":
 			// no validation rules for Proprietary
 		default:
-			return LoRaAllianceTR005EndDeviceValidationError{
+			return EndDeviceOnboardingDataValidationError{
 				field:  name,
 				reason: "invalid field path",
 			}
@@ -624,10 +622,9 @@ func (m *LoRaAllianceTR005EndDevice) ValidateFields(paths ...string) error {
 	return nil
 }
 
-// LoRaAllianceTR005EndDeviceValidationError is the validation error returned
-// by LoRaAllianceTR005EndDevice.ValidateFields if the designated constraints
-// aren't met.
-type LoRaAllianceTR005EndDeviceValidationError struct {
+// EndDeviceOnboardingDataValidationError is the validation error returned by
+// EndDeviceOnboardingData.ValidateFields if the designated constraints aren't met.
+type EndDeviceOnboardingDataValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -635,24 +632,24 @@ type LoRaAllianceTR005EndDeviceValidationError struct {
 }
 
 // Field function returns field value.
-func (e LoRaAllianceTR005EndDeviceValidationError) Field() string { return e.field }
+func (e EndDeviceOnboardingDataValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e LoRaAllianceTR005EndDeviceValidationError) Reason() string { return e.reason }
+func (e EndDeviceOnboardingDataValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e LoRaAllianceTR005EndDeviceValidationError) Cause() error { return e.cause }
+func (e EndDeviceOnboardingDataValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e LoRaAllianceTR005EndDeviceValidationError) Key() bool { return e.key }
+func (e EndDeviceOnboardingDataValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e LoRaAllianceTR005EndDeviceValidationError) ErrorName() string {
-	return "LoRaAllianceTR005EndDeviceValidationError"
+func (e EndDeviceOnboardingDataValidationError) ErrorName() string {
+	return "EndDeviceOnboardingDataValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e LoRaAllianceTR005EndDeviceValidationError) Error() string {
+func (e EndDeviceOnboardingDataValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -664,14 +661,14 @@ func (e LoRaAllianceTR005EndDeviceValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sLoRaAllianceTR005EndDevice.%s: %s%s",
+		"invalid %sEndDeviceOnboardingData.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = LoRaAllianceTR005EndDeviceValidationError{}
+var _ error = EndDeviceOnboardingDataValidationError{}
 
 var _ interface {
 	Field() string
@@ -679,48 +676,50 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = LoRaAllianceTR005EndDeviceValidationError{}
+} = EndDeviceOnboardingDataValidationError{}
 
-// ValidateFields checks the field values on OnboardingEntityData with the
+// ValidateFields checks the field values on EntityOnboardingData with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
-func (m *OnboardingEntityData) ValidateFields(paths ...string) error {
+func (m *EntityOnboardingData) ValidateFields(paths ...string) error {
 	if m == nil {
 		return nil
 	}
 
 	if len(paths) == 0 {
-		paths = OnboardingEntityDataFieldPathsNested
+		paths = EntityOnboardingDataFieldPathsNested
 	}
 
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
+		case "format_id":
+			// no validation rules for FormatId
 		case "data":
 			if m.Data == nil {
-				return OnboardingEntityDataValidationError{
+				return EntityOnboardingDataValidationError{
 					field:  "data",
 					reason: "value is required",
 				}
 			}
 			if len(subs) == 0 {
 				subs = []string{
-					"la_tr005_end_device",
+					"end_device_onboarding_data",
 				}
 			}
 			for name, subs := range _processPaths(subs) {
 				_ = subs
 				switch name {
-				case "la_tr005_end_device":
-					w, ok := m.Data.(*OnboardingEntityData_LaTr005EndDevice)
+				case "end_device_onboarding_data":
+					w, ok := m.Data.(*EntityOnboardingData_EndDeviceOnboardingData)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetLaTr005EndDevice()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetEndDeviceOnboardingData()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
-							return OnboardingEntityDataValidationError{
-								field:  "la_tr005_end_device",
+							return EntityOnboardingDataValidationError{
+								field:  "end_device_onboarding_data",
 								reason: "embedded message failed validation",
 								cause:  err,
 							}
@@ -730,7 +729,7 @@ func (m *OnboardingEntityData) ValidateFields(paths ...string) error {
 				}
 			}
 		default:
-			return OnboardingEntityDataValidationError{
+			return EntityOnboardingDataValidationError{
 				field:  name,
 				reason: "invalid field path",
 			}
@@ -739,9 +738,9 @@ func (m *OnboardingEntityData) ValidateFields(paths ...string) error {
 	return nil
 }
 
-// OnboardingEntityDataValidationError is the validation error returned by
-// OnboardingEntityData.ValidateFields if the designated constraints aren't met.
-type OnboardingEntityDataValidationError struct {
+// EntityOnboardingDataValidationError is the validation error returned by
+// EntityOnboardingData.ValidateFields if the designated constraints aren't met.
+type EntityOnboardingDataValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -749,24 +748,24 @@ type OnboardingEntityDataValidationError struct {
 }
 
 // Field function returns field value.
-func (e OnboardingEntityDataValidationError) Field() string { return e.field }
+func (e EntityOnboardingDataValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e OnboardingEntityDataValidationError) Reason() string { return e.reason }
+func (e EntityOnboardingDataValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e OnboardingEntityDataValidationError) Cause() error { return e.cause }
+func (e EntityOnboardingDataValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e OnboardingEntityDataValidationError) Key() bool { return e.key }
+func (e EntityOnboardingDataValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e OnboardingEntityDataValidationError) ErrorName() string {
-	return "OnboardingEntityDataValidationError"
+func (e EntityOnboardingDataValidationError) ErrorName() string {
+	return "EntityOnboardingDataValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e OnboardingEntityDataValidationError) Error() string {
+func (e EntityOnboardingDataValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -778,14 +777,14 @@ func (e OnboardingEntityDataValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sOnboardingEntityData.%s: %s%s",
+		"invalid %sEntityOnboardingData.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = OnboardingEntityDataValidationError{}
+var _ error = EntityOnboardingDataValidationError{}
 
 var _ interface {
 	Field() string
@@ -793,7 +792,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = OnboardingEntityDataValidationError{}
+} = EntityOnboardingDataValidationError{}
 
 // ValidateFields checks the field values on ParseQRCodeRequest with the rules
 // defined in the proto definition for this message. If any rules are
@@ -823,15 +822,6 @@ func (m *ParseQRCodeRequest) ValidateFields(paths ...string) error {
 				return ParseQRCodeRequestValidationError{
 					field:  "format_id",
 					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9])$\"",
-				}
-			}
-
-		case "entity_type":
-
-			if _, ok := OnboardingEntityType_name[int32(m.GetEntityType())]; !ok {
-				return ParseQRCodeRequestValidationError{
-					field:  "entity_type",
-					reason: "value must be one of the defined enum values",
 				}
 			}
 
@@ -927,14 +917,12 @@ func (m *ParseQRCodeResponse) ValidateFields(paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
-		case "format_id":
-			// no validation rules for FormatId
-		case "onboarding_entity_data":
+		case "entity_onboarding_data":
 
-			if v, ok := interface{}(m.GetOnboardingEntityData()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetEntityOnboardingData()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ParseQRCodeResponseValidationError{
-						field:  "onboarding_entity_data",
+						field:  "entity_onboarding_data",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}

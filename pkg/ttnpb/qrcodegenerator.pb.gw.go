@@ -463,7 +463,7 @@ func RegisterQRCodeParserHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_QRCodeParser_Parse_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"qr-codes"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_QRCodeParser_Parse_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"qr-code"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

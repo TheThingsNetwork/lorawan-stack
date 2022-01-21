@@ -555,18 +555,17 @@
   - [Message `Picture.Embedded`](#ttn.lorawan.v3.Picture.Embedded)
   - [Message `Picture.SizesEntry`](#ttn.lorawan.v3.Picture.SizesEntry)
 - [File `lorawan-stack/api/qrcodegenerator.proto`](#lorawan-stack/api/qrcodegenerator.proto)
+  - [Message `EndDeviceOnboardingData`](#ttn.lorawan.v3.EndDeviceOnboardingData)
+  - [Message `EntityOnboardingData`](#ttn.lorawan.v3.EntityOnboardingData)
   - [Message `GenerateEndDeviceQRCodeRequest`](#ttn.lorawan.v3.GenerateEndDeviceQRCodeRequest)
   - [Message `GenerateEndDeviceQRCodeRequest.Image`](#ttn.lorawan.v3.GenerateEndDeviceQRCodeRequest.Image)
   - [Message `GenerateQRCodeResponse`](#ttn.lorawan.v3.GenerateQRCodeResponse)
   - [Message `GetQRCodeFormatRequest`](#ttn.lorawan.v3.GetQRCodeFormatRequest)
-  - [Message `LoRaAllianceTR005EndDevice`](#ttn.lorawan.v3.LoRaAllianceTR005EndDevice)
-  - [Message `OnboardingEntityData`](#ttn.lorawan.v3.OnboardingEntityData)
   - [Message `ParseQRCodeRequest`](#ttn.lorawan.v3.ParseQRCodeRequest)
   - [Message `ParseQRCodeResponse`](#ttn.lorawan.v3.ParseQRCodeResponse)
   - [Message `QRCodeFormat`](#ttn.lorawan.v3.QRCodeFormat)
   - [Message `QRCodeFormats`](#ttn.lorawan.v3.QRCodeFormats)
   - [Message `QRCodeFormats.FormatsEntry`](#ttn.lorawan.v3.QRCodeFormats.FormatsEntry)
-  - [Enum `OnboardingEntityType`](#ttn.lorawan.v3.OnboardingEntityType)
   - [Service `EndDeviceQRCodeGenerator`](#ttn.lorawan.v3.EndDeviceQRCodeGenerator)
   - [Service `QRCodeParser`](#ttn.lorawan.v3.QRCodeParser)
 - [File `lorawan-stack/api/regional.proto`](#lorawan-stack/api/regional.proto)
@@ -7888,6 +7887,30 @@ The Pba service allows clients to manage peering through Packet Broker.
 
 ## <a name="lorawan-stack/api/qrcodegenerator.proto">File `lorawan-stack/api/qrcodegenerator.proto`</a>
 
+### <a name="ttn.lorawan.v3.EndDeviceOnboardingData">Message `EndDeviceOnboardingData`</a>
+
+EndDeviceOnboardingData contains fields necessary for onboarding a LoRaWAN End Device.
+The fields are a superset of the LoRa Alliance defined format in Technical Recommendation TR005.
+See https://lora-alliance.org/wp-content/uploads/2020/11/TR005_LoRaWAN_Device_Identification_QR_Codes.pdf
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `join_eui` | [`bytes`](#bytes) |  |  |
+| `dev_eui` | [`bytes`](#bytes) |  |  |
+| `claim_authentication_code` | [`string`](#string) |  | claim_authentication_code ids referred to as; - Owner Token in LoRa Alliance TR005 specification. - Device Validation Code in the LoRa Alliance TR005 draft 2 and draft 3 specs. |
+| `vendor_id` | [`bytes`](#bytes) |  |  |
+| `model_id` | [`bytes`](#bytes) |  | model_id is referred to as VendorProfileID in LoRa Alliance TR005 specification. |
+| `checksum` | [`string`](#string) |  |  |
+| `serial_number` | [`string`](#string) |  |  |
+| `proprietary` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.EntityOnboardingData">Message `EntityOnboardingData`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `format_id` | [`string`](#string) |  | Identifier of the format used to successfully parse the QR code data. |
+| `end_device_onboarding_data` | [`EndDeviceOnboardingData`](#ttn.lorawan.v3.EndDeviceOnboardingData) |  |  |
+
 ### <a name="ttn.lorawan.v3.GenerateEndDeviceQRCodeRequest">Message `GenerateEndDeviceQRCodeRequest`</a>
 
 | Field | Type | Label | Description |
@@ -7934,35 +7957,11 @@ The Pba service allows clients to manage peering through Packet Broker.
 | ----- | ----------- |
 | `format_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
-### <a name="ttn.lorawan.v3.LoRaAllianceTR005EndDevice">Message `LoRaAllianceTR005EndDevice`</a>
-
-LoRaAllianceTR005 is the LoRa Alliance defined format in Technical Recommendation TR005.
-See https://lora-alliance.org/wp-content/uploads/2020/11/TR005_LoRaWAN_Device_Identification_QR_Codes.pdf
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `schema_id` | [`bytes`](#bytes) |  |  |
-| `join_eui` | [`bytes`](#bytes) |  |  |
-| `dev_eui` | [`bytes`](#bytes) |  |  |
-| `vendor_id` | [`bytes`](#bytes) |  |  |
-| `model_id` | [`bytes`](#bytes) |  | model_id is referred to as VendorProfileID in TR005. |
-| `checksum` | [`string`](#string) |  | The following are optional fields. |
-| `owner_token` | [`string`](#string) |  |  |
-| `serial_number` | [`string`](#string) |  |  |
-| `proprietary` | [`string`](#string) |  |  |
-
-### <a name="ttn.lorawan.v3.OnboardingEntityData">Message `OnboardingEntityData`</a>
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `la_tr005_end_device` | [`LoRaAllianceTR005EndDevice`](#ttn.lorawan.v3.LoRaAllianceTR005EndDevice) |  |  |
-
 ### <a name="ttn.lorawan.v3.ParseQRCodeRequest">Message `ParseQRCodeRequest`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `format_id` | [`string`](#string) |  | QR code format identifier. Enumerate available formats with rpc ListFormats in the EndDeviceQRCodeGenerator service. |
-| `entity_type` | [`OnboardingEntityType`](#ttn.lorawan.v3.OnboardingEntityType) |  | Entity type for which the QR Code is being generated. Ex: `enddevice`. |
+| `format_id` | [`string`](#string) |  | QR code format identifier. Enumerate available formats with - End Devices: rpc `ListFormats` in the EndDeviceQRCodeGenerator service. If this field is not specified, the server will attempt to parse the data with each known format. |
 | `qr_code` | [`bytes`](#bytes) |  | Raw QR code contents. |
 
 #### Field Rules
@@ -7970,15 +7969,13 @@ See https://lora-alliance.org/wp-content/uploads/2020/11/TR005_LoRaWAN_Device_Id
 | Field | Validations |
 | ----- | ----------- |
 | `format_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9])$`</p> |
-| `entity_type` | <p>`enum.defined_only`: `true`</p> |
 | `qr_code` | <p>`bytes.min_len`: `0`</p><p>`bytes.max_len`: `1024`</p> |
 
 ### <a name="ttn.lorawan.v3.ParseQRCodeResponse">Message `ParseQRCodeResponse`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `format_id` | [`string`](#string) |  | QR code format identifier that was used to parse the QR Code. |
-| `onboarding_entity_data` | [`OnboardingEntityData`](#ttn.lorawan.v3.OnboardingEntityData) |  |  |
+| `entity_onboarding_data` | [`EntityOnboardingData`](#ttn.lorawan.v3.EntityOnboardingData) |  |  |
 
 ### <a name="ttn.lorawan.v3.QRCodeFormat">Message `QRCodeFormat`</a>
 
@@ -8014,14 +8011,6 @@ See https://lora-alliance.org/wp-content/uploads/2020/11/TR005_LoRaWAN_Device_Id
 | `key` | [`string`](#string) |  |  |
 | `value` | [`QRCodeFormat`](#ttn.lorawan.v3.QRCodeFormat) |  |  |
 
-### <a name="ttn.lorawan.v3.OnboardingEntityType">Enum `OnboardingEntityType`</a>
-
-The type of entity that's being onboarded.
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| `END_DEVICE` | 0 | LoRaWAN End Device. |
-
 ### <a name="ttn.lorawan.v3.EndDeviceQRCodeGenerator">Service `EndDeviceQRCodeGenerator`</a>
 
 | Method Name | Request Type | Response Type | Description |
@@ -8048,7 +8037,7 @@ The type of entity that's being onboarded.
 
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
-| `Parse` | `POST` | `/api/v3/qr-codes` | `*` |
+| `Parse` | `POST` | `/api/v3/qr-code` | `*` |
 
 ## <a name="lorawan-stack/api/regional.proto">File `lorawan-stack/api/regional.proto`</a>
 

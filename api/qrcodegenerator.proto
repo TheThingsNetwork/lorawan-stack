@@ -15,7 +15,6 @@
 syntax = "proto3";
 
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
-import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
@@ -92,57 +91,51 @@ service EndDeviceQRCodeGenerator {
   };
 }
 
-// LoRaAllianceTR005 is the LoRa Alliance defined format in Technical Recommendation TR005.
+// EndDeviceOnboardingData contains fields necessary for onboarding a LoRaWAN End Device.
+// The fields are a superset of the LoRa Alliance defined format in Technical Recommendation TR005.
 // See https://lora-alliance.org/wp-content/uploads/2020/11/TR005_LoRaWAN_Device_Identification_QR_Codes.pdf
-message LoRaAllianceTR005EndDevice {
-  bytes schema_id = 1;
-	bytes join_eui = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
-  bytes dev_eui = 3 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
-	bytes vendor_id = 4 ;
-  // model_id is referred to as VendorProfileID in TR005.
-  bytes model_id = 5 ;
-  // The following are optional fields.
+message EndDeviceOnboardingData {
+	bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+  bytes dev_eui = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+  // claim_authentication_code ids referred to as;
+  // - Owner Token in LoRa Alliance TR005 specification.
+  // - Device Validation Code in the LoRa Alliance TR005 draft 2 and draft 3 specs.
+  string claim_authentication_code = 3;
+  bytes vendor_id = 4;
+  // model_id is referred to as VendorProfileID in LoRa Alliance TR005 specification.
+  bytes model_id = 5;
   string checksum = 6;
-  string owner_token = 7;
-  string serial_number = 8;
-  string proprietary = 9;
+  string serial_number = 7;
+  string proprietary = 8;
 }
 
-// The type of entity that's being onboarded.
-enum OnboardingEntityType {
-  option (thethings.json.enum) = { marshal_as_string: true};
-
-  // LoRaWAN End Device.
-  END_DEVICE = 0;
-}
-
-message OnboardingEntityData {
+message EntityOnboardingData {
+  // Identifier of the format used to successfully parse the QR code data.
+  string format_id = 1;
   oneof data {
     option (validate.required) = true;
-    LoRaAllianceTR005EndDevice la_tr005_end_device = 1;
+    EndDeviceOnboardingData end_device_onboarding_data = 2;
   }
 }
 
 message ParseQRCodeRequest {
-  // QR code format identifier. Enumerate available formats with rpc ListFormats in the EndDeviceQRCodeGenerator service.
+  // QR code format identifier. Enumerate available formats with 
+  // - End Devices: rpc `ListFormats` in the EndDeviceQRCodeGenerator service.
+  // If this field is not specified, the server will attempt to parse the data with each known format.
   string format_id = 1 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9])$", max_len: 36}];
-  // Entity type for which the QR Code is being generated. Ex: `enddevice`.
-  OnboardingEntityType entity_type = 2 [(validate.rules).enum.defined_only = true];
   // Raw QR code contents.
   bytes qr_code = 3 [(validate.rules).bytes = {min_len: 0, max_len: 1024}];
 }
 
 message ParseQRCodeResponse {
-  // QR code format identifier that was used to parse the QR Code.
-  string format_id = 1;
-  OnboardingEntityData onboarding_entity_data = 2;
+  EntityOnboardingData entity_onboarding_data = 1;
 }
 
 service QRCodeParser {
   // Parse QR Codes of known formats and return the information contained within.
   rpc Parse(ParseQRCodeRequest) returns (ParseQRCodeResponse){
     option (google.api.http) = {
-      post: "/qr-codes",
+      post: "/qr-code",
       body: "*"
     };
   }

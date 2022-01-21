@@ -518,76 +518,71 @@ var GenerateQRCodeResponseFieldPathsTopLevel = []string{
 	"image",
 	"text",
 }
-var LoRaAllianceTR005EndDeviceFieldPathsNested = []string{
+var EndDeviceOnboardingDataFieldPathsNested = []string{
 	"checksum",
+	"claim_authentication_code",
 	"dev_eui",
 	"join_eui",
 	"model_id",
-	"owner_token",
 	"proprietary",
-	"schema_id",
 	"serial_number",
 	"vendor_id",
 }
 
-var LoRaAllianceTR005EndDeviceFieldPathsTopLevel = []string{
+var EndDeviceOnboardingDataFieldPathsTopLevel = []string{
 	"checksum",
+	"claim_authentication_code",
 	"dev_eui",
 	"join_eui",
 	"model_id",
-	"owner_token",
 	"proprietary",
-	"schema_id",
 	"serial_number",
 	"vendor_id",
 }
-var OnboardingEntityDataFieldPathsNested = []string{
+var EntityOnboardingDataFieldPathsNested = []string{
 	"data",
-	"data.la_tr005_end_device",
-	"data.la_tr005_end_device.checksum",
-	"data.la_tr005_end_device.dev_eui",
-	"data.la_tr005_end_device.join_eui",
-	"data.la_tr005_end_device.model_id",
-	"data.la_tr005_end_device.owner_token",
-	"data.la_tr005_end_device.proprietary",
-	"data.la_tr005_end_device.schema_id",
-	"data.la_tr005_end_device.serial_number",
-	"data.la_tr005_end_device.vendor_id",
+	"data.end_device_onboarding_data",
+	"data.end_device_onboarding_data.checksum",
+	"data.end_device_onboarding_data.claim_authentication_code",
+	"data.end_device_onboarding_data.dev_eui",
+	"data.end_device_onboarding_data.join_eui",
+	"data.end_device_onboarding_data.model_id",
+	"data.end_device_onboarding_data.proprietary",
+	"data.end_device_onboarding_data.serial_number",
+	"data.end_device_onboarding_data.vendor_id",
+	"format_id",
 }
 
-var OnboardingEntityDataFieldPathsTopLevel = []string{
+var EntityOnboardingDataFieldPathsTopLevel = []string{
 	"data",
+	"format_id",
 }
 var ParseQRCodeRequestFieldPathsNested = []string{
-	"entity_type",
 	"format_id",
 	"qr_code",
 }
 
 var ParseQRCodeRequestFieldPathsTopLevel = []string{
-	"entity_type",
 	"format_id",
 	"qr_code",
 }
 var ParseQRCodeResponseFieldPathsNested = []string{
-	"format_id",
-	"onboarding_entity_data",
-	"onboarding_entity_data.data",
-	"onboarding_entity_data.data.la_tr005_end_device",
-	"onboarding_entity_data.data.la_tr005_end_device.checksum",
-	"onboarding_entity_data.data.la_tr005_end_device.dev_eui",
-	"onboarding_entity_data.data.la_tr005_end_device.join_eui",
-	"onboarding_entity_data.data.la_tr005_end_device.model_id",
-	"onboarding_entity_data.data.la_tr005_end_device.owner_token",
-	"onboarding_entity_data.data.la_tr005_end_device.proprietary",
-	"onboarding_entity_data.data.la_tr005_end_device.schema_id",
-	"onboarding_entity_data.data.la_tr005_end_device.serial_number",
-	"onboarding_entity_data.data.la_tr005_end_device.vendor_id",
+	"entity_onboarding_data",
+	"entity_onboarding_data.data",
+	"entity_onboarding_data.data.end_device_onboarding_data",
+	"entity_onboarding_data.data.end_device_onboarding_data.checksum",
+	"entity_onboarding_data.data.end_device_onboarding_data.claim_authentication_code",
+	"entity_onboarding_data.data.end_device_onboarding_data.dev_eui",
+	"entity_onboarding_data.data.end_device_onboarding_data.join_eui",
+	"entity_onboarding_data.data.end_device_onboarding_data.model_id",
+	"entity_onboarding_data.data.end_device_onboarding_data.proprietary",
+	"entity_onboarding_data.data.end_device_onboarding_data.serial_number",
+	"entity_onboarding_data.data.end_device_onboarding_data.vendor_id",
+	"entity_onboarding_data.format_id",
 }
 
 var ParseQRCodeResponseFieldPathsTopLevel = []string{
-	"format_id",
-	"onboarding_entity_data",
+	"entity_onboarding_data",
 }
 var GenerateEndDeviceQRCodeRequest_ImageFieldPathsNested = []string{
 	"image_size",
