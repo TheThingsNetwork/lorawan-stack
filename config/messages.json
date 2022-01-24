@@ -4904,15 +4904,6 @@
       "file": "store.go"
     }
   },
-  "error:pkg/identityserver/gormstore:eui_taken": {
-    "translations": {
-      "en": "EUI already taken"
-    },
-    "description": {
-      "package": "pkg/identityserver/gormstore",
-      "file": "store.go"
-    }
-  },
   "error:pkg/identityserver/gormstore:gateway_not_found": {
     "translations": {
       "en": "gateway `{gateway_id}` not found"
@@ -4929,15 +4920,6 @@
     "description": {
       "package": "pkg/identityserver/gormstore",
       "file": "eui_block_store.go"
-    }
-  },
-  "error:pkg/identityserver/gormstore:id_taken": {
-    "translations": {
-      "en": "ID already taken"
-    },
-    "description": {
-      "package": "pkg/identityserver/gormstore",
-      "file": "store.go"
     }
   },
   "error:pkg/identityserver/gormstore:invitation_already_accepted": {
@@ -5109,6 +5091,24 @@
     "description": {
       "package": "pkg/identityserver/picture",
       "file": "picture.go"
+    }
+  },
+  "error:pkg/identityserver/store:eui_taken": {
+    "translations": {
+      "en": "EUI already taken"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/identityserver/store:id_taken": {
+    "translations": {
+      "en": "ID already taken, choose a different one and try again"
+    },
+    "description": {
+      "package": "pkg/identityserver/store",
+      "file": "errors.go"
     }
   },
   "error:pkg/identityserver:access_token_mismatch": {
@@ -5320,7 +5320,7 @@
   },
   "error:pkg/identityserver:gateway_eui_taken": {
     "translations": {
-      "en": "a gateway with EUI `{gateway_eui}` is already registered as `{gateway_id}`"
+      "en": "a gateway with EUI `{gateway_eui}` is already registered (by you or someone else) as `{gateway_id}`"
     },
     "description": {
       "package": "pkg/identityserver",
