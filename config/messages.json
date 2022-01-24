@@ -8045,39 +8045,48 @@
       "file": "provisioning.go"
     }
   },
-  "error:pkg/qrcode:character": {
+  "error:pkg/qrcodegenerator/qrcode/enddevice:character": {
     "translations": {
       "en": "invalid character `{r}`"
     },
     "description": {
-      "package": "pkg/qrcode",
-      "file": "qrcode.go"
+      "package": "pkg/qrcodegenerator/qrcode/enddevice",
+      "file": "errors.go"
     }
   },
-  "error:pkg/qrcode:format": {
+  "error:pkg/qrcodegenerator/qrcode/enddevice:format": {
     "translations": {
       "en": "invalid format"
     },
     "description": {
-      "package": "pkg/qrcode",
-      "file": "qrcode.go"
+      "package": "pkg/qrcodegenerator/qrcode/enddevice",
+      "file": "errors.go"
     }
   },
-  "error:pkg/qrcode:no_dev_eui": {
+  "error:pkg/qrcodegenerator/qrcode/enddevice:no_dev_eui": {
     "translations": {
       "en": "no DevEUI"
     },
     "description": {
-      "package": "pkg/qrcode",
-      "file": "qrcode.go"
+      "package": "pkg/qrcodegenerator/qrcode/enddevice",
+      "file": "errors.go"
     }
   },
-  "error:pkg/qrcode:no_join_eui": {
+  "error:pkg/qrcodegenerator/qrcode/enddevice:no_join_eui": {
     "translations": {
       "en": "no JoinEUI"
     },
     "description": {
-      "package": "pkg/qrcode",
+      "package": "pkg/qrcodegenerator/qrcode/enddevice",
+      "file": "errors.go"
+    }
+  },
+  "error:pkg/qrcodegenerator/qrcode:unknown_format": {
+    "translations": {
+      "en": "format `{format_id}` unknown"
+    },
+    "description": {
+      "package": "pkg/qrcodegenerator/qrcode",
       "file": "qrcode.go"
     }
   },
