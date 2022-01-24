@@ -685,7 +685,7 @@
     "Frequency": 916600000
   },
   "BootDwellTime": {
-    "Uplinks": null,
-    "Downlinks": null
+    "Uplinks": true,
+    "Downlinks": false
   }
 }
