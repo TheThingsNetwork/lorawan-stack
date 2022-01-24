@@ -74,6 +74,8 @@ func (ns *NetworkServer) GetDefaultMACSettings(ctx context.Context, req *ttnpb.G
 		DesiredPingSlotFrequency:     &ttnpb.FrequencyValue{Value: mac.DeviceDesiredPingSlotFrequency(nil, phy, fp, ns.defaultMACSettings)},
 		DesiredBeaconFrequency:       ns.defaultMACSettings.GetBeaconFrequency(),
 		DesiredMaxEirp:               &ttnpb.DeviceEIRPValue{Value: lorawan.Float32ToDeviceEIRP(mac.DeviceDesiredMaxEIRP(nil, phy, fp, ns.defaultMACSettings))},
+		UplinkDwellTime:              mac.DeviceUplinkDwellTime(nil, phy, ns.defaultMACSettings),
+		DownlinkDwellTime:            mac.DeviceDownlinkDwellTime(nil, phy, ns.defaultMACSettings),
 	}
 	return settings, nil
 }

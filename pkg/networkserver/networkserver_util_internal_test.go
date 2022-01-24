@@ -1593,6 +1593,8 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					PingSlotFrequency:          mac.DeviceDefaultPingSlotFrequency(dev, phy, defaultMACSettings),
 					BeaconFrequency:            mac.DeviceDefaultBeaconFrequency(dev, defaultMACSettings),
 					Channels:                   mac.DeviceDefaultChannels(dev, phy, defaultMACSettings),
+					UplinkDwellTime:            mac.DeviceUplinkDwellTime(dev, phy, defaultMACSettings),
+					DownlinkDwellTime:          mac.DeviceDownlinkDwellTime(dev, phy, defaultMACSettings),
 					AdrAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: phy.ADRAckLimit},
 					AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: phy.ADRAckDelay},
 					PingSlotDataRateIndexValue: mac.DeviceDefaultPingSlotDataRateIndexValue(dev, phy, defaultMACSettings),

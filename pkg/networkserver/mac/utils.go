@@ -222,6 +222,32 @@ func DeviceDefaultPingSlotPeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSe
 	}
 }
 
+func DeviceUplinkDwellTime(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) *ttnpb.BoolValue {
+	switch {
+	case dev.GetMacSettings().GetUplinkDwellTime() != nil:
+		return &ttnpb.BoolValue{Value: dev.MacSettings.UplinkDwellTime.Value}
+	case defaults.UplinkDwellTime != nil:
+		return &ttnpb.BoolValue{Value: defaults.UplinkDwellTime.Value}
+	case phy.BootDwellTime.Uplinks != nil:
+		return &ttnpb.BoolValue{Value: *phy.BootDwellTime.Uplinks}
+	default:
+		return nil
+	}
+}
+
+func DeviceDownlinkDwellTime(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) *ttnpb.BoolValue {
+	switch {
+	case dev.GetMacSettings().GetDownlinkDwellTime() != nil:
+		return &ttnpb.BoolValue{Value: dev.MacSettings.DownlinkDwellTime.Value}
+	case defaults.DownlinkDwellTime != nil:
+		return &ttnpb.BoolValue{Value: defaults.DownlinkDwellTime.Value}
+	case phy.BootDwellTime.Downlinks != nil:
+		return &ttnpb.BoolValue{Value: *phy.BootDwellTime.Downlinks}
+	default:
+		return nil
+	}
+}
+
 func DeviceDesiredMaxEIRP(dev *ttnpb.EndDevice, phy *band.Band, fp *frequencyplans.FrequencyPlan, defaults ttnpb.MACSettings) float32 {
 	switch {
 	case dev.GetMacSettings().GetDesiredMaxEirp() != nil:
@@ -234,17 +260,21 @@ func DeviceDesiredMaxEIRP(dev *ttnpb.EndDevice, phy *band.Band, fp *frequencypla
 }
 
 func DeviceDesiredUplinkDwellTime(fp *frequencyplans.FrequencyPlan) *ttnpb.BoolValue {
-	if fp.DwellTime.Uplinks == nil {
+	switch {
+	case fp.DwellTime.Uplinks != nil:
+		return &ttnpb.BoolValue{Value: *fp.DwellTime.Uplinks}
+	default:
 		return nil
 	}
-	return &ttnpb.BoolValue{Value: *fp.DwellTime.Uplinks}
 }
 
 func DeviceDesiredDownlinkDwellTime(fp *frequencyplans.FrequencyPlan) *ttnpb.BoolValue {
-	if fp.DwellTime.Downlinks == nil {
+	switch {
+	case fp.DwellTime.Downlinks != nil:
+		return &ttnpb.BoolValue{Value: *fp.DwellTime.Downlinks}
+	default:
 		return nil
 	}
-	return &ttnpb.BoolValue{Value: *fp.DwellTime.Downlinks}
 }
 
 func DeviceDefaultRX1Delay(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) ttnpb.RxDelay {
@@ -607,6 +637,8 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MA
 		PingSlotFrequency:          DeviceDefaultPingSlotFrequency(dev, phy, defaults),
 		BeaconFrequency:            DeviceDefaultBeaconFrequency(dev, defaults),
 		Channels:                   DeviceDefaultChannels(dev, phy, defaults),
+		UplinkDwellTime:            DeviceUplinkDwellTime(dev, phy, defaults),
+		DownlinkDwellTime:          DeviceDownlinkDwellTime(dev, phy, defaults),
 		AdrAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: phy.ADRAckLimit},
 		AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: phy.ADRAckDelay},
 		PingSlotDataRateIndexValue: DeviceDefaultPingSlotDataRateIndexValue(dev, phy, defaults),

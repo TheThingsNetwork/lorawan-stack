@@ -100,6 +100,15 @@ type Band struct {
 
 	// DefaultRx2Parameters are the default parameters that determine the settings for a Tx sent during Rx2.
 	DefaultRx2Parameters Rx2Parameters
+
+	// BootDwellTime contains the dwell time values expected for a device on boot.
+	BootDwellTime DwellTime
+}
+
+// DwellTime contains the band dwell time settings.
+type DwellTime struct {
+	Uplinks   *bool
+	Downlinks *bool
 }
 
 // MaxTxPowerIndex returns the maximum TxPower index for the band.
