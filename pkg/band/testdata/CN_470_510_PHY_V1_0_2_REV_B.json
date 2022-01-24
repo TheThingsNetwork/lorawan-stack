@@ -1176,5 +1176,9 @@
   "DefaultRx2Parameters": {
     "DataRateIndex": 0,
     "Frequency": 505300000
+  },
+  "BootDwellTime": {
+    "Uplinks": null,
+    "Downlinks": null
   }
 }

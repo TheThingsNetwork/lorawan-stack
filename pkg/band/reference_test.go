@@ -127,6 +127,8 @@ type serializableBand struct {
 	Rx1DataRate map[string]ttnpb.DataRateIndex
 
 	DefaultRx2Parameters band.Rx2Parameters
+
+	BootDwellTime band.DwellTime
 }
 
 func makeRx1Channel(f func(uint8) (uint8, error)) map[uint8]uint8 {
@@ -216,6 +218,8 @@ func makeBand(b band.Band) serializableBand {
 		// Missing: ParseChMask
 
 		DefaultRx2Parameters: b.DefaultRx2Parameters,
+
+		BootDwellTime: b.BootDwellTime,
 	}
 }
 
