@@ -30,8 +30,8 @@ var (
 	defaultOAuthServerBaseAddress, _ = discover.DefaultURL(defaultClusterHost, discover.DefaultHTTPPorts[!defaultInsecure], !defaultInsecure)
 	defaultOAuthServerAddress        = defaultOAuthServerBaseAddress + "/oauth"
 	defaultRetryConfig               = RetryConfig{
-		Max:     5,
-		Timeout: 50 * time.Millisecond,
+		DefaultTimeout: 100 * time.Millisecond,
+		EnableMetatada: true,
 	}
 )
 
@@ -60,13 +60,15 @@ type Config struct {
 	CA                                 string      `name:"ca" yaml:"ca" description:"CA certificate file"`
 	DumpRequests                       bool        `name:"dump-requests" yaml:"dump-requests" description:"When log level is set to debug, also dump request payload as JSON"`
 	SkipVersionCheck                   bool        `name:"skip-version-check" yaml:"skip-version-check" description:"Do not perform version checks"`
-	Retry                              RetryConfig `name:"retry-config" yaml:"retry-config" description:"group of settings that describe the behaviour of the retry interceptor of the cli. If not specified the retry will only happen on the ResourceExhausted and Unavailable status codes"`
+	Retry                              RetryConfig `name:"retry-config" yaml:"retry-config"`
 }
 
 // RetryConfig defines the values for the retry behaviour in the cli
 type RetryConfig struct {
-	Max     uint          `name:"max" yaml:"max" description:"defines the amount of retries to be attempted when "`
-	Timeout time.Duration `name:"timeout" yaml:"timeout" description:"determines the default amount of time that the client will wait in between retry requests, the value will be used when the rate limit headers cannot be found in the request response"`
+	Max            uint          `name:"max" yaml:"max" description:"Maximum amount of times that a request can be reattempted"`
+	DefaultTimeout time.Duration `name:"default_timeout" yaml:"default_timeout" description:"Default timeout between retry attempts"`
+	EnableMetatada bool          `name:"enable_metadata" ymal:"enable_metadata" description:"Use request response metadata to dynamically calculate timeout between retry attempts"`
+	Jitter         float64       `name:"jitter" yaml:"jitter" description:"Fraction that creates a deviation of the timeout used between retry attempts"`
 }
 
 func (c Config) getHosts() []string {

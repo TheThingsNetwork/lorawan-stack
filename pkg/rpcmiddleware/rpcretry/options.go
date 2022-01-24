@@ -46,6 +46,7 @@ var (
 		timeout:        100 * time.Millisecond,
 		validators:     DefaultValidators,
 		enableMetadata: true,
+		jitter:         0.0,
 	}
 )
 

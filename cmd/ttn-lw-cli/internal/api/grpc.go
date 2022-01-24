@@ -28,19 +28,19 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpcretry"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials"
 )
 
 var (
-	withInsecure bool
-	tlsConfig    *tls.Config
-	auth         *rpcmetadata.MD
-	withDump     bool
-	retryMax     uint
-	retryTimeout time.Duration
-	retryCodes   []codes.Code
+	withInsecure        bool
+	tlsConfig           *tls.Config
+	auth                *rpcmetadata.MD
+	withDump            bool
+	retryMax            uint
+	retryDefaultTimeout time.Duration
+	retryEnableMetadata bool
+	retryJitter         float64
 )
 
 // SetLogger sets the default API logger
@@ -58,19 +58,24 @@ func SetDumpRequests(dump bool) {
 	withDump = dump
 }
 
-// SetRetryMax configures the amount of time the client will retry the request
+// SetRetryMax configures the amount of time the client will retry the request.
 func SetRetryMax(rm uint) {
 	retryMax = rm
 }
 
-// SetRetryTimeout configures the default timeout before making a retry in a failed request
-func SetRetryTimeout(rt time.Duration) {
-	retryTimeout = rt
+// SetRetryDefaultTimeout configures the default timeout before making a retry in a failed request.
+func SetRetryDefaultTimeout(t time.Duration) {
+	retryDefaultTimeout = t
 }
 
-// SetRetryCodes configures which response codes will trigger the retry
-func SetRetryCodes(rc ...codes.Code) {
-	retryCodes = rc
+// SetRetryEnableMetadata configures if the retry procedure will read the request's metadata or not.
+func SetRetryEnableMetadata(b bool) {
+	retryEnableMetadata = b
+}
+
+// SetRetryJitter configures the fraction to be used in the deviation procedure of the rpcretry timeout.
+func SetRetryJitter(f float64) {
+	retryJitter = f
 }
 
 // AddCA adds the CA certificate file.
@@ -128,11 +133,12 @@ func GetDialOptions() (opts []grpc.DialOption) {
 		opts = append(opts, grpc.WithChainUnaryInterceptor(requestInterceptor))
 	}
 
-	opts = append(opts, grpc.WithChainUnaryInterceptor(
-		rpcretry.UnaryClientInterceptor(
-			rpcretry.WithMax(retryMax),
-			rpcretry.WithDefaultTimeout(retryTimeout),
-		)))
+	opts = append(opts, grpc.WithChainUnaryInterceptor(rpcretry.UnaryClientInterceptor(
+		rpcretry.WithMax(retryMax),
+		rpcretry.WithDefaultTimeout(retryDefaultTimeout),
+		rpcretry.UseMetadata(retryEnableMetadata),
+		rpcretry.WithJitter(retryJitter),
+	)))
 	return
 }
 
