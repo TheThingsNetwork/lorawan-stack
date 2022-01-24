@@ -36,6 +36,7 @@ import {
   clearEvents,
   createClearEventsActionType,
   createSetEventsFilterActionType,
+  createGetEventMessageSuccessActionType,
   setEventsFilter,
 } from './events'
 
@@ -91,6 +92,8 @@ export const RESUME_DEVICE_EVENT_STREAM = createResumeEventsStreamActionType(SHA
 export const CLEAR_DEVICE_EVENTS = createClearEventsActionType(SHARED_NAME)
 
 export const SET_DEVICE_EVENTS_FILTER = createSetEventsFilterActionType(SHARED_NAME)
+
+export const GET_DEVICE_EVENT_MESSAGE_SUCCESS = createGetEventMessageSuccessActionType(SHARED_NAME)
 
 export const startDeviceEventsStream = startEventsStream(SHARED_NAME)
 
