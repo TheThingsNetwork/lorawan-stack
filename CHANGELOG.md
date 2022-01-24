@@ -10,7 +10,9 @@ For details about compatibility between different releases, see the **Commitment
 ## [Unreleased]
 
 ### Added
+
 - Add configurable storage limit to device's DevNonce in the JoinServer. Can be configured using the option `js.dev-nonce-limit`.
+- Attribute `administrative_contact` on "gateway eui taken" error to help users resolve gateway EUI conflicts.
 
 ### Changed
 
