@@ -31,7 +31,7 @@ const m = defineMessages({
   locationTitle: 'What should I enter here?',
   absenceTitle: 'What if I cannot find the correct value?',
   viewGlossaryPage: 'View glossary page',
-  additionalInfo: 'Additional information',
+  readMore: 'Read more',
 })
 
 const Content = props => {
@@ -44,7 +44,7 @@ const Content = props => {
   const hasGlossary = Boolean(glossaryId)
 
   return (
-    <div>
+    <div className={style.tooltipContent}>
       <Message className={style.tooltipTitle} content={m.descriptionTitle} component="h4" />
       <Message
         className={style.tooltipDescription}
@@ -82,6 +82,7 @@ const Content = props => {
               term={glossaryTerm}
               glossaryId={glossaryId}
               title={m.viewGlossaryPage}
+              primary
             />
           )}
         </div>
@@ -120,14 +121,14 @@ const FieldTooltip = React.memo(props => {
     const { documentationPath, externalUrl } = tooltipAdditionalLink
     if (documentationPath) {
       link = (
-        <Link.DocLink primary raw path={documentationPath} title={m.additionalInfo}>
-          <Message content={m.additionalInfo} />
+        <Link.DocLink primary path={documentationPath}>
+          <Message content={m.readMore} />
         </Link.DocLink>
       )
     } else if (externalUrl) {
       link = (
         <Link.Anchor primary href={externalUrl} target="_blank">
-          <Message content={m.additionalInfo} />
+          <Message content={m.readMore} />
         </Link.Anchor>
       )
     }

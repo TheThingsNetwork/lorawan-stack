@@ -60,7 +60,6 @@ class FormField extends React.Component {
   static contextType = FormContext
 
   static propTypes = {
-    autoWidth: PropTypes.bool,
     className: PropTypes.string,
     component: PropTypes.oneOfType([
       PropTypes.func,
@@ -98,7 +97,6 @@ class FormField extends React.Component {
   }
 
   static defaultProps = {
-    autoWidth: false,
     className: undefined,
     disabled: false,
     encode: value => value,
@@ -196,7 +194,6 @@ class FormField extends React.Component {
       required,
       readOnly,
       tooltipId,
-      autoWidth,
       component: Component,
     } = this.props
     const { disabled: formDisabled } = this.context
@@ -262,7 +259,6 @@ class FormField extends React.Component {
         required,
         readOnly,
         hasTooltip,
-        autoWidth,
       }),
     )
 
@@ -284,6 +280,7 @@ class FormField extends React.Component {
           <Component
             aria-invalid={showError}
             aria-describedby={describedBy}
+            children={!hasTitle && tooltipIcon}
             {...fieldComponentProps}
             {...getPassThroughProps(this.props, FormField.propTypes)}
           />
