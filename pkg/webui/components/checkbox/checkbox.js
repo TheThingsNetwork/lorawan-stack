@@ -31,6 +31,7 @@ class Checkbox extends React.PureComponent {
   static propTypes = {
     autoFocus: PropTypes.bool,
     checked: PropTypes.bool,
+    children: PropTypes.node,
     className: PropTypes.string,
     disabled: PropTypes.bool,
     id: PropTypes.string,
@@ -46,6 +47,7 @@ class Checkbox extends React.PureComponent {
 
   static defaultProps = {
     checked: false,
+    children: null,
     className: undefined,
     label: sharedMessages.enabled,
     disabled: false,
@@ -128,6 +130,7 @@ class Checkbox extends React.PureComponent {
       onFocus,
       indeterminate,
       id,
+      children,
       ...rest
     } = this.props
     const { checked } = this.state
@@ -171,6 +174,7 @@ class Checkbox extends React.PureComponent {
           <span className={style.checkmark} />
         </span>
         {label && <Message className={style.label} content={label} />}
+        {children}
       </label>
     )
   }
