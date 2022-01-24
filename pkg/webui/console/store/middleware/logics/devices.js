@@ -34,7 +34,7 @@ const getDeviceLogic = createRequestLogic({
     } = action
     const dev = await tts.Applications.Devices.getById(appId, deviceId, selector)
     dispatch(devices.startDeviceEventsStream(dev.ids))
-    return dev
+    return { ...dev, version_ids: dev.version_ids }
   },
 })
 

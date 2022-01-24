@@ -28,6 +28,7 @@ import {
   UPDATE_DEV_SUCCESS,
   RESET_DEV_SUCCESS,
   GET_DEVICE_EVENT_MESSAGE_SUCCESS,
+  GET_DEV_VERSION_IDS,
 } from '@console/store/actions/devices'
 import { GET_APP_EVENT_MESSAGE_SUCCESS } from '@console/store/actions/applications'
 
@@ -35,6 +36,7 @@ const defaultState = {
   entities: {},
   derived: {},
   selectedDevice: undefined,
+  version_ids: {},
 }
 const defaultDerived = {
   lastSeen: undefined,
@@ -66,10 +68,11 @@ const devices = (state = defaultState, { type, payload, event }) => {
       return {
         ...state,
         selectedDevice: combineDeviceIds(payload.appId, payload.deviceId),
+        version_ids: payload.version_ids,
       }
     case UPDATE_DEV_SUCCESS:
     case GET_DEV_SUCCESS:
-      const updatedState = { ...state }
+      const updatedState = { ...state, version_ids: payload.version_ids }
       const id = getCombinedDeviceId(payload)
       const lorawanVersion = getByPath(state.entities, `${id}.lorawan_version`)
 

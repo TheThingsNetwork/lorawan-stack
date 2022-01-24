@@ -22,7 +22,7 @@ import {
 } from '@ttn-lw/lib/store/selectors/pagination'
 import { selectAsConfig, selectJsConfig, selectNsConfig } from '@ttn-lw/lib/selectors/env'
 
-import { GET_DEV_BASE, GET_DEVICES_LIST_BASE } from '@console/store/actions/devices'
+import { GET_DEV_BASE, GET_DEVICES_LIST_BASE, GET_DEV_VERSION_IDS_BASE } from '@console/store/actions/devices'
 
 import {
   createEventsSelector,
@@ -60,6 +60,7 @@ export const isOtherClusterDevice = device => {
 
   return isOtherCluster
 }
+export const selectVersionIds = state => selectDeviceStore(state).version_ids
 
 // Derived.
 export const selectDeviceDerivedUplinkFrameCount = (state, appId, devId) => {

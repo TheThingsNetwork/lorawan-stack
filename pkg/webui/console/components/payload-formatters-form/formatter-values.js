@@ -40,61 +40,7 @@ function decodeDownlink(input) {
   }
 }`
 
-const REPOSITORY_UPLINK_FORMATTER = `// input = { fPort: 1, bytes: [1, 62] }
-function decodeUplink(input) {
-  switch (input.fPort) {
-  case 1:
-    return {
-      // Decoded data
-      data: {
-        direction: directions[input.bytes[0]],
-        speed: input.bytes[1]
-      }
-    }
-  default:
-    return {
-      errors: ["unknown FPort"]
-    }
-  }
-}`
-
-const REPOSITORY_DOWNLINK_FORMATTER = `// input = { data: { led: "green" } }
-function encodeDownlink(input) {
-  var i = colors.indexOf(input.data.led);
-  if (i === -1) {
-    return {
-      errors: ["invalid LED color"]
-    }
-  }
-  return {
-    // LoRaWAN FPort used for the downlink message
-    fPort: 2,
-    // Encoded bytes
-    bytes: [i]
-  }
-}
-
-// input = { fPort: 2, bytes: [1] }
-function decodeDownlink(input) {
-  switch (input.fPort) {
-  case 2:
-    return {
-      // Decoded downlink (must be symmetric with encodeDownlink)
-      data: {
-        led: colors[input.bytes[0]]
-      }
-    }
-  default:
-    return {
-      errors: ["invalid FPort"]
-    }
-  }
-}`
-
 export const getDefaultJavascriptFormatter = uplink =>
   uplink ? DEFAULT_UPLINK_JS_FORMATTER : DEFAULT_DOWNLINK_JS_FORMATTER
 
 export const getDefaultGrpcServiceFormatter = () => undefined
-
-export const getRepositoryJavascriptFormatter = uplink =>
-  uplink ? REPOSITORY_UPLINK_FORMATTER : REPOSITORY_DOWNLINK_FORMATTER
