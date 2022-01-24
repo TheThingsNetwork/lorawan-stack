@@ -38,7 +38,10 @@ var PublicEntityFields = []string{
 }
 
 // PublicApplicationFields are the Application's fields that are public.
-var PublicApplicationFields = append(PublicEntityFields)
+var PublicApplicationFields = append(PublicEntityFields,
+	"administrative_contact",
+	"technical_contact",
+)
 
 // PublicSafe returns a copy of the application with only the fields that are
 // safe to return to any audience.
@@ -63,6 +66,8 @@ var PublicClientFields = append(PublicEntityFields,
 	"endorsed",
 	"grants",
 	"rights",
+	"administrative_contact",
+	"technical_contact",
 )
 
 // PublicSafe returns a copy of the client with only the fields that are safe to
@@ -88,6 +93,8 @@ var PublicGatewayFields = append(PublicEntityFields,
 	"location_public",
 	"antennas", // only public if location_public=true
 	"lrfhss.supported",
+	"administrative_contact",
+	"technical_contact",
 )
 
 // PublicSafe returns a copy of the gateway with only the fields that are
@@ -113,6 +120,8 @@ func (g *Gateway) PublicSafe() *Gateway {
 // PublicOrganizationFields are the Organization's fields that are public.
 var PublicOrganizationFields = append(PublicEntityFields,
 	"name",
+	"administrative_contact",
+	"technical_contact",
 )
 
 // PublicSafe returns a copy of the organization with only the fields that are

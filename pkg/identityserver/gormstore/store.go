@@ -150,11 +150,6 @@ func (s *baseStore) purgeEntity(ctx context.Context, entityID ttnpb.IDStringer) 
 var (
 	errDatabase      = errors.DefineInternal("database", "database error")
 	errAlreadyExists = errors.DefineAlreadyExists("already_exists", "entity already exists")
-
-	// ErrIDTaken is returned when an entity can not be created because the ID is already taken.
-	ErrIDTaken = errors.DefineAlreadyExists("id_taken", "ID already taken")
-	// ErrEUITaken is returned when an entity can not be created because the EUI is already taken.
-	ErrEUITaken = errors.DefineAlreadyExists("eui_taken", "EUI already taken")
 )
 
 var uniqueViolationRegex = regexp.MustCompile(`duplicate key value( .+)? violates unique constraint "([a-z_]+)"`)
@@ -173,9 +168,9 @@ func convertError(err error) error {
 			if match := uniqueViolationRegex.FindStringSubmatch(pqErr.Message); match != nil {
 				switch {
 				case strings.HasSuffix(match[2], "_id_index"):
-					return ErrIDTaken.WithCause(err)
+					return store.ErrIDTaken.WithCause(err)
 				case strings.HasSuffix(match[2], "_eui_index"):
-					return ErrEUITaken.WithCause(err)
+					return store.ErrEUITaken.WithCause(err)
 				default:
 					return errAlreadyExists.WithCause(err).WithAttributes("index", match[2])
 				}
