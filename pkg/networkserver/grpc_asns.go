@@ -214,9 +214,10 @@ func matchQueuedApplicationDownlinks(ctx context.Context, dev *ttnpb.EndDevice, 
 	if err != nil {
 		return err
 	}
-	var maxDownLen uint16 = 0
+	var maxDownLen uint16
+	downDwellTime := downlinkDwellTime(dev, fp, phy)
 	for _, dr := range phy.DataRates {
-		if n := dr.MaxMACPayloadSize(fp.DwellTime.GetDownlinks()); n > maxDownLen {
+		if n := dr.MaxMACPayloadSize(downDwellTime); n > maxDownLen {
 			maxDownLen = n
 		}
 	}
