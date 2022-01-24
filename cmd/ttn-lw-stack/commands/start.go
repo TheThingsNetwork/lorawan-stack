@@ -31,6 +31,7 @@ import (
 	asredis "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/console"
+	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicetemplateconverter"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -76,7 +77,7 @@ func NewApplicationServerDeviceRegistryRedis(conf Config) *redis.Client {
 var errUnknownComponent = errors.DefineInvalidArgument("unknown_component", "unknown component `{component}`")
 
 var startCommand = &cobra.Command{
-	Use:   "start [is|gs|ns|as|js|console|gcs|dtc|qrg|pba|all]... [flags]",
+	Use:   "start [is|gs|ns|as|js|console|gcs|dtc|qrg|pba|dcs|all]... [flags]",
 	Short: "Start The Things Stack",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var start struct {
@@ -91,6 +92,7 @@ var startCommand = &cobra.Command{
 			QRCodeGenerator            bool
 			PacketBrokerAgent          bool
 			DeviceRepository           bool
+			DeviceClaimingServer       bool
 		}
 		startDefault := len(args) == 0
 		for _, arg := range args {
@@ -125,6 +127,8 @@ var startCommand = &cobra.Command{
 				start.PacketBrokerAgent = true
 			case "dr":
 				start.DeviceRepository = true
+			case "dcs":
+				start.DeviceClaimingServer = true
 			case "all":
 				start.IdentityServer = true
 				start.GatewayServer = true
@@ -137,6 +141,7 @@ var startCommand = &cobra.Command{
 				start.QRCodeGenerator = true
 				start.PacketBrokerAgent = true
 				start.DeviceRepository = true
+				start.DeviceClaimingServer = true
 			default:
 				return errUnknownComponent.WithAttributes("component", arg)
 			}
@@ -448,6 +453,17 @@ var startCommand = &cobra.Command{
 				return shared.ErrInitializeDeviceRepository.WithCause(err)
 			}
 			_ = dr
+		}
+
+		if start.DeviceClaimingServer {
+			logger.Info("Setting up Device Claiming Server")
+
+			dcs, err := deviceclaimingserver.New(c, &config.DCS, nil)
+			if err != nil {
+				return shared.ErrInitializeDeviceClaimingServer.WithCause(err)
+			}
+
+			_ = dcs
 		}
 
 		if rootRedirect != nil {

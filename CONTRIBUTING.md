@@ -71,6 +71,7 @@ The topic is typically a few characters long and should always be present. Accep
 - `cli`: Command-line Interface
 - `console`: The Console component including backend and frontend
 - `data`: Data from external repositories
+- `dcs`: The Device Claiming Server component
 - `dev`: Development tooling
 - `dtc`: The Device Template Converter component
 - `gcs`: The Gateway Configuration Server component
