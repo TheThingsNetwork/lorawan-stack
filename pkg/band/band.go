@@ -163,3 +163,5 @@ func (b Band) FindDownlinkDataRate(dr *ttnpb.DataRate) (ttnpb.DataRateIndex, Dat
 	}
 	return 0, DataRate{}, false
 }
+
+func boolPtr(v bool) *bool { return &v }
