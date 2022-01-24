@@ -66,7 +66,7 @@ var (
 
 var (
 	errAdminsCreateGateways    = errors.DefinePermissionDenied("admins_create_gateways", "gateways may only be created by admins, or in organizations")
-	errGatewayEUITaken         = errors.DefineAlreadyExists("gateway_eui_taken", "a gateway with EUI `{gateway_eui}` is already registered as `{gateway_id}`")
+	errGatewayEUITaken         = errors.DefineAlreadyExists("gateway_eui_taken", "a gateway with EUI `{gateway_eui}` is already registered (by you or someone else) as `{gateway_id}`", "administrative_contact")
 	errAdminsPurgeGateways     = errors.DefinePermissionDenied("admins_purge_gateways", "gateways may only be purged by admins")
 	errClaimAuthenticationCode = errors.DefineInvalidArgument("claim_authentication_code", "invalid claim authentication code")
 )
@@ -174,14 +174,22 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		return nil
 	})
 	if err != nil {
-		if errors.IsAlreadyExists(err) && errors.Resemble(err, gormstore.ErrEUITaken) {
-			if ids, err := is.getGatewayIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-				Eui: reqGtw.GetIds().GetEui(),
+		if errors.IsAlreadyExists(err) && errors.Resemble(err, store.ErrEUITaken) {
+			var existing *ttnpb.Gateway
+			if err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+				existing, err = gormstore.GetGatewayStore(db).GetGateway(ctx, &ttnpb.GatewayIdentifiers{
+					Eui: reqGtw.GetIds().GetEui(),
+				}, &pbtypes.FieldMask{Paths: []string{"ids.gateway_id", "ids.eui", "administrative_contact"}})
+				return err
 			}); err == nil {
-				return nil, errGatewayEUITaken.WithAttributes(
+				attributes := []interface{}{
 					"gateway_eui", reqGtw.GetIds().GetEui().String(),
-					"gateway_id", ids.GetGatewayId(),
-				)
+					"gateway_id", existing.GetIds().GetGatewayId(),
+				}
+				if existing.AdministrativeContact != nil {
+					attributes = append(attributes, "administrative_contact", existing.AdministrativeContact.IDString())
+				}
+				return nil, errGatewayEUITaken.WithAttributes(attributes...)
 			}
 		}
 		return nil, err

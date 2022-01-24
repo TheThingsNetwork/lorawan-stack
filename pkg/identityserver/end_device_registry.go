@@ -80,7 +80,7 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 		return nil
 	})
 	if err != nil {
-		if errors.IsAlreadyExists(err) && errors.Resemble(err, gormstore.ErrEUITaken) {
+		if errors.IsAlreadyExists(err) && errors.Resemble(err, store.ErrEUITaken) {
 			if ids, err := is.getEndDeviceIdentifiersForEUIs(ctx, &ttnpb.GetEndDeviceIdentifiersForEUIsRequest{
 				JoinEui: *req.EndDevice.Ids.JoinEui,
 				DevEui:  *req.EndDevice.Ids.DevEui,
