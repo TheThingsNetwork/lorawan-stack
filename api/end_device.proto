@@ -266,6 +266,13 @@ message MACSettings {
   DeviceEIRPValue desired_max_eirp = 30;
   // The minimum duration passed before a network-initiated(e.g. Class B or C) downlink following an arbitrary downlink.
   google.protobuf.Duration class_b_c_downlink_interval = 31;
+
+  // Whether uplink dwell time is set (400ms).
+  // If unset, the default value from Network Server configuration or regional parameters specification will be used.
+  BoolValue uplink_dwell_time = 32;
+  // Whether downlink dwell time is set (400ms).
+  // If unset, the default value from Network Server configuration or regional parameters specification will be used.
+  BoolValue downlink_dwell_time = 33;
 }
 
 // MACState represents the state of MAC layer of the device.
