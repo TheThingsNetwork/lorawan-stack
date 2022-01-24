@@ -5209,6 +5209,19 @@
       ]
     }
   },
+  "QRCodeParser": {
+    "Parse": {
+      "file": "lorawan-stack/api/qrcodegenerator.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/qr-code",
+          "body": "*",
+          "parameters": []
+        }
+      ]
+    }
+  },
   "EndDeviceRegistrySearch": {
     "SearchEndDevices": {
       "file": "lorawan-stack/api/search_services.proto",
