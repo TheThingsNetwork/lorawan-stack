@@ -10,7 +10,10 @@ For details about compatibility between different releases, see the **Commitment
 ## [Unreleased]
 
 ### Added
+
 - Add configurable storage limit to device's DevNonce in the JoinServer. Can be configured using the option `js.dev-nonce-limit`.
+- Fix copy button in API key modal in the Console.
+- Enable copying and format transformations of byte values in the event previews in the Console.
 
 ### Changed
 
