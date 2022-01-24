@@ -12,8 +12,6 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 - Add configurable storage limit to device's DevNonce in the JoinServer. Can be configured using the option `js.dev-nonce-limit`.
 
-- Boilerplate for the Device Claiming Server component.
-
 ### Changed
 
 - Webhook maximum header value length extended to 4096 characters.
