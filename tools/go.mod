@@ -66,7 +66,7 @@ require (
 	github.com/BurntSushi/toml v0.4.1 // indirect
 	github.com/RoaringBitmap/roaring v0.9.4 // indirect
 	github.com/TheThingsIndustries/mystique v0.0.0-20211230093812-d4088bd06959 // indirect
-	github.com/TheThingsIndustries/protoc-gen-go-json v1.3.0 // indirect
+	github.com/TheThingsIndustries/protoc-gen-go-json v1.3.1 // indirect
 	github.com/TheThingsNetwork/go-cayenne-lib v1.1.0 // indirect
 	github.com/aws/aws-sdk-go v1.42.25 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
