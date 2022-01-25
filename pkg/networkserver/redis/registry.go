@@ -15,6 +15,7 @@
 package redis
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"runtime/trace"
@@ -956,7 +957,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 					storedPendingMACState := stored.GetPendingMacState()
 					return false, false, storedPendingMACState == nil ||
 						updated.PendingMacState.LorawanVersion != storedPendingMACState.LorawanVersion ||
-						!proto.Equal(updated.PendingSession.Keys.FNwkSIntKey, storedPendingSession.Keys.FNwkSIntKey)
+						!equalKeys(updated.PendingSession.Keys.FNwkSIntKey, storedPendingSession.Keys.FNwkSIntKey)
 				}()
 				if removeStored {
 					removeAddrMapping(ctx, p, PendingAddrKey(r.addrKey(storedPendingSession.DevAddr)), uid)
@@ -993,7 +994,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 					storedMACSettings := stored.GetMacSettings()
 					return false, false, storedMACState == nil ||
 						updated.MacState.LorawanVersion != storedMACState.LorawanVersion ||
-						!proto.Equal(updated.Session.Keys.FNwkSIntKey, storedSession.Keys.FNwkSIntKey) ||
+						!equalKeys(updated.Session.Keys.FNwkSIntKey, storedSession.Keys.FNwkSIntKey) ||
 						!proto.Equal(updated.MacSettings.GetResetsFCnt(), storedMACSettings.GetResetsFCnt()) ||
 						!proto.Equal(updated.MacSettings.GetSupports_32BitFCnt(), storedMACSettings.GetSupports_32BitFCnt())
 				}()
@@ -1052,4 +1053,25 @@ func (r *DeviceRegistry) Range(ctx context.Context, paths []string, f func(conte
 		}
 		return true, nil
 	})
+}
+
+// TODO: Use proto.Equal instead.
+// https://github.com/TheThingsNetwork/lorawan-stack/issues/2798
+func equalKeys(a, b *ttnpb.KeyEnvelope) bool {
+	if a == b {
+		return true
+	}
+	if a == nil || b == nil {
+		return false
+	}
+	if !bytes.Equal(a.EncryptedKey, b.EncryptedKey) || a.KekLabel != b.KekLabel {
+		return false
+	}
+	if a.Key == b.Key {
+		return true
+	}
+	if a.Key == nil || b.Key == nil {
+		return false
+	}
+	return a.Key.Equal(*b.Key)
 }

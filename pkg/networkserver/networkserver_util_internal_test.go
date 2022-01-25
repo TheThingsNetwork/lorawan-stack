@@ -23,7 +23,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gogo/protobuf/proto"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
@@ -827,7 +826,7 @@ func (env TestEnvironment) AssertLegacyScheduleDownlink(ctx context.Context, pat
 					}
 					found := false
 					for _, expectedID := range expectedIDs {
-						if proto.Equal(expectedID, gtwIDs) {
+						if unique.ID(ctx, expectedID) == unique.ID(ctx, gtwIDs) {
 							found = true
 						}
 					}
@@ -1008,7 +1007,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 					}
 					found := false
 					for _, expectedID := range expectedIDs {
-						if proto.Equal(expectedID, gtwIDs) {
+						if unique.ID(ctx, expectedID) == unique.ID(ctx, gtwIDs) {
 							found = true
 						}
 					}
