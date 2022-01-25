@@ -214,7 +214,7 @@ export class SideNavigation extends Component {
             <img
               className={style.icon}
               src={header.icon}
-              alt={intl.formatMessage(header.iconAlt)}
+              alt={intl.formatMessage({ id: `${header.iconAlt}` })}
             />
             <Message className={style.message} content={header.title} />
           </div>
@@ -225,7 +225,7 @@ export class SideNavigation extends Component {
                   <img
                     className={style.icon}
                     src={header.icon}
-                    alt={intl.formatMessage(header.iconAlt)}
+                    alt={intl.formatMessage({ id: `${header.iconAlt}` })}
                   />
                   <Message className={style.message} content={header.title} />
                 </div>

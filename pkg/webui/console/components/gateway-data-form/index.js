@@ -43,7 +43,7 @@ import validationSchema from './validation-schema'
 
 const m = defineMessages({
   claimWarning:
-    'It appears like you are trying to register a <b>The Things Indoor Gateway</b>. Such gateways are already preregistered and need to be claimed instead. <Link>Click here</Link> to go to gateway claiming.{br} See also <TTIDocLink>Claiming The Things Indoor Gateway</TTIDocLink> and <ClaimingDocLink>Gateway Claiming</ClaimingDocLink>.',
+    'It appears like you are trying to register a <b>The Things Indoor Gateway</b>. Such gateways are already preregistered and need to be claimed instead. Claiming can only be performed on a deployment that supports gateway claiming.',
 })
 
 // This is the TrackNet prefix that all TTIGs use.
@@ -170,24 +170,7 @@ class GatewayDataForm extends React.Component {
         />
         {shouldDisplayClaimWarning && (
           <Form.InfoField>
-            <Notification
-              small
-              warning
-              content={m.claimWarning}
-              messageValues={{
-                br: <br />,
-                b: txt => <b>{txt}</b>,
-                Link: txt => <Link to="/gateways/claim">{txt}</Link>,
-                TTIDocLink: txt => (
-                  <Link.DocLink path="/gateways/thethingsindoorgateway/#claiming-the-things-indoor-gateway">
-                    {txt}
-                  </Link.DocLink>
-                ),
-                ClaimingDocLink: txt => (
-                  <Link.DocLink path="/gateways/gateway-claiming/">{txt}</Link.DocLink>
-                ),
-              }}
-            />
+            <Notification small warning content={m.claimWarning} messageValues={{ br: <br /> }} />
           </Form.InfoField>
         )}
         <Form.Field
