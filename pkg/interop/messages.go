@@ -83,10 +83,10 @@ type AsMessageHeader struct {
 // NsJsMessageHeader contains the message header for NS to JS messages.
 type NsJsMessageHeader struct {
 	MessageHeader
-	SenderID NetID
+	SenderID   NetID
+	SenderNSID *EUI64 `json:",omitempty"`
 	// ReceiverID is a JoinEUI.
 	ReceiverID EUI64
-	SenderNSID *EUI64 `json:",omitempty"`
 }
 
 // JsNsMessageHeader contains the message header for JS to NS messages.

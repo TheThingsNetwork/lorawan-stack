@@ -64,7 +64,7 @@ func serverURL(scheme, fqdn, path string, port uint32) string {
 	return fmt.Sprintf("%s://%s:%d%s", scheme, fqdn, port, path)
 }
 
-func newHTTPRequest(url string, pld interface{}, headers map[string]string) (*http.Request, error) {
+func newHTTPRequest(url string, pld interface{}, headers map[string]string, username, password string) (*http.Request, error) {
 	buf := &bytes.Buffer{}
 	if err := json.NewEncoder(buf).Encode(pld); err != nil {
 		return nil, err
@@ -76,6 +76,9 @@ func newHTTPRequest(url string, pld interface{}, headers map[string]string) (*ht
 	req.Header.Set("Content-Type", "application/json")
 	for k, v := range headers {
 		req.Header.Set(k, v)
+	}
+	if username != "" {
+		req.SetBasicAuth(username, password)
 	}
 	return req, nil
 }
@@ -110,17 +113,38 @@ func httpExchange(ctx context.Context, httpReq *http.Request, res interface{}, d
 }
 
 type joinServerHTTPClient struct {
-	Client         *http.Client
-	NewRequestFunc func(types.EUI64, func(jsRPCPaths) string, interface{}) (*http.Request, error)
-	Protocol       ProtocolVersion
+	clientProvider     httpclient.Provider
+	clientOpts         []httpclient.Option
+	protocol           ProtocolVersion
+	dnsSuffix, fqdn    string
+	port               uint32
+	paths              jsRPCPaths
+	headers            map[string]string
+	username, password string
+	senderNSID         *types.EUI64
 }
 
-func (cl joinServerHTTPClient) exchange(ctx context.Context, joinEUI types.EUI64, pathFunc func(jsRPCPaths) string, req, res interface{}) error {
-	httpReq, err := cl.NewRequestFunc(joinEUI, pathFunc, req)
+var errDNSLookupNotSupported = errors.DefineFailedPrecondition("dns_lookup_not_supported", "DNS lookup is not supported")
+
+func (cl joinServerHTTPClient) exchange(ctx context.Context, joinEUI types.EUI64, pathFunc func(jsRPCPaths) string, pld, res interface{}) error {
+	client, err := cl.clientProvider.HTTPClient(ctx, cl.clientOpts...)
 	if err != nil {
 		return err
 	}
-	return httpExchange(ctx, httpReq.WithContext(ctx), res, cl.Client.Do)
+	port := cl.port
+	if port == 0 {
+		port = defaultHTTPSPort
+	}
+	if cl.dnsSuffix != "" || cl.fqdn == "" {
+		return errDNSLookupNotSupported.New()
+	}
+	req, err := newHTTPRequest(
+		serverURL("https", cl.fqdn, pathFunc(cl.paths), port), pld, cl.headers, cl.username, cl.password,
+	)
+	if err != nil {
+		return err
+	}
+	return httpExchange(ctx, req.WithContext(ctx), res, client.Do)
 }
 
 func parseResult(r Result) error {
@@ -141,7 +165,7 @@ func (cl joinServerHTTPClient) GetAppSKey(ctx context.Context, asID string, req 
 	if err := cl.exchange(ctx, req.JoinEui, jsRPCPaths.appSKey, &AppSKeyReq{
 		AsJsMessageHeader: AsJsMessageHeader{
 			MessageHeader: MessageHeader{
-				ProtocolVersion: cl.Protocol,
+				ProtocolVersion: cl.protocol,
 				MessageType:     MessageTypeAppSKeyReq,
 			},
 			SenderID:   asID,
@@ -162,6 +186,8 @@ func (cl joinServerHTTPClient) GetAppSKey(ctx context.Context, asID string, req 
 }
 
 var (
+	errMissingNSID          = errors.DefineFailedPrecondition("missing_nsid", "missing NSID")
+	errNSIDNotSupported     = errors.DefineFailedPrecondition("nsid_not_supported", "NSID not supported")
 	errNoJoinRequestPayload = errors.DefineInvalidArgument("no_join_request_payload", "no join-request payload")
 	errGenerateSessionKeyID = errors.Define("generate_session_key_id", "failed to generate session key ID")
 
@@ -170,6 +196,13 @@ var (
 
 // HandleJoinRequest performs Join request according to LoRaWAN Backend Interfaces specification.
 func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID types.NetID, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
+	if cl.protocol.RequiresNSID() && cl.senderNSID == nil {
+		return nil, errMissingNSID.New()
+	}
+	if !cl.protocol.RequiresNSID() && cl.senderNSID != nil {
+		return nil, errNSIDNotSupported.New()
+	}
+
 	pld := req.Payload.GetJoinRequestPayload()
 	if pld == nil {
 		return nil, errNoJoinRequestPayload.New()
@@ -192,10 +225,11 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 	if err := cl.exchange(ctx, pld.JoinEui, jsRPCPaths.join, &JoinReq{
 		NsJsMessageHeader: NsJsMessageHeader{
 			MessageHeader: MessageHeader{
-				ProtocolVersion: cl.Protocol,
+				ProtocolVersion: cl.protocol,
 				MessageType:     MessageTypeJoinReq,
 			},
 			SenderID:   NetID(netID),
+			SenderNSID: (*EUI64)(cl.senderNSID),
 			ReceiverID: EUI64(pld.JoinEui),
 		},
 		MACVersion: MACVersion(req.SelectedMacVersion),
@@ -246,22 +280,6 @@ func GeneratedSessionKeyID(id []byte) bool {
 	return bytes.HasPrefix(id, generatedSessionKeyIDPrefix)
 }
 
-var errDNSLookupNotSupported = errors.DefineFailedPrecondition("dns_lookup_not_supported", "DNS lookup is not supported")
-
-func makeJoinServerHTTPRequestFunc(scheme, dns, fqdn string, port uint32, rpcPaths jsRPCPaths, headers map[string]string) func(types.EUI64, func(jsRPCPaths) string, interface{}) (*http.Request, error) {
-	if port == 0 {
-		port = defaultHTTPSPort
-	}
-	return func(joinEUI types.EUI64, pathFunc func(jsRPCPaths) string, pld interface{}) (*http.Request, error) {
-		if dns != "" || fqdn == "" {
-			// TODO: Support new LoRaWAN DNS for looking up Join Servers
-			// (https://github.com/TheThingsNetwork/lorawan-stack/issues/5130)
-			return nil, errDNSLookupNotSupported.New()
-		}
-		return newHTTPRequest(serverURL(scheme, fqdn, pathFunc(rpcPaths), port), pld, headers)
-	}
-}
-
 type joinServerClient interface {
 	HandleJoinRequest(ctx context.Context, netID types.NetID, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error)
 	GetAppSKey(ctx context.Context, asID string, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error)
@@ -276,11 +294,7 @@ type Client struct {
 	joinServers []prefixJoinServerClient // Sorted by JoinEUI prefix range length.
 }
 
-var (
-	errUnknownConfig    = errors.DefineNotFound("unknown_config", "configuration is unknown")
-	errMissingNSID      = errors.DefineFailedPrecondition("missing_nsid", "missing NSID")
-	errNSIDNotSupported = errors.DefineFailedPrecondition("nsid_not_supported", "NSID not supported")
-)
+var errUnknownConfig = errors.DefineNotFound("unknown_config", "configuration is unknown")
 
 // NewClient return new interop client.
 func NewClient(ctx context.Context, conf config.InteropClient, httpClientProvider httpclient.Provider) (*Client, error) {
@@ -307,65 +321,65 @@ func NewClient(ctx context.Context, conf config.InteropClient, httpClientProvide
 	}
 
 	type ComponentConfig struct {
-		DNS     string            `yaml:"dns"`
-		FQDN    string            `yaml:"fqdn"`
-		Port    uint32            `yaml:"port"`
-		Headers map[string]string `yaml:"headers"`
-		TLS     tlsConfig         `yaml:"tls"`
+		DNSSuffix string            `yaml:"dns"`
+		FQDN      string            `yaml:"fqdn"`
+		Port      uint32            `yaml:"port"`
+		Headers   map[string]string `yaml:"headers"`
+		BasicAuth struct {
+			Username string `yaml:"username"`
+			Password string `yaml:"password"`
+		} `yaml:"basic-auth"`
+		TLS tlsConfig `yaml:"tls"`
 	}
 
 	jss := make([]prefixJoinServerClient, 0, len(yamlConf.JoinServers))
-	for _, jsConf := range yamlConf.JoinServers {
-		jsConfEls := strings.Split(filepath.ToSlash(jsConf.File), "/")
-
-		fetcher := fetch.WithBasePath(fetcher, jsConfEls[:len(jsConfEls)-1]...)
-		jsFileBytes, err := fetcher.File(jsConfEls[len(jsConfEls)-1])
+	for _, jsEntry := range yamlConf.JoinServers {
+		fileParts := strings.Split(filepath.ToSlash(jsEntry.File), "/")
+		fetcher := fetch.WithBasePath(fetcher, fileParts[:len(fileParts)-1]...)
+		jsFileBytes, err := fetcher.File(fileParts[len(fileParts)-1])
 		if err != nil {
 			return nil, err
 		}
 
-		var yamlJSConf struct {
+		var jsConf struct {
 			ComponentConfig `yaml:",inline"`
 			Paths           jsRPCPaths      `yaml:"paths"`
 			Protocol        ProtocolVersion `yaml:"protocol"`
 			SenderNSID      *types.EUI64    `yaml:"sender-nsid,omitempty"`
 		}
-		if err := yaml.UnmarshalStrict(jsFileBytes, &yamlJSConf); err != nil {
+		if err := yaml.UnmarshalStrict(jsFileBytes, &jsConf); err != nil {
 			return nil, err
-		}
-		if yamlJSConf.Protocol.RequiresNSID() && yamlJSConf.SenderNSID == nil {
-			return nil, errMissingNSID.New()
-		}
-		if !yamlJSConf.Protocol.RequiresNSID() && yamlJSConf.SenderNSID != nil {
-			return nil, errNSIDNotSupported.New()
 		}
 
 		var js joinServerClient
-		switch yamlJSConf.Protocol {
+		switch jsConf.Protocol {
 		case ProtocolV1_0, ProtocolV1_1:
 			var opts []httpclient.Option
-			if !yamlJSConf.TLS.IsZero() {
-				tlsConf, err := yamlJSConf.TLS.TLSConfig(fetcher)
+			if !jsConf.TLS.IsZero() {
+				tlsConf, err := jsConf.TLS.TLSConfig(fetcher)
 				if err != nil {
 					return nil, err
 				}
 				opts = append(opts, httpclient.WithTLSConfig(tlsConf))
 			}
-
-			httpClient, err := httpClientProvider.HTTPClient(ctx, opts...)
-			if err != nil {
-				return nil, err
-			}
-
 			js = &joinServerHTTPClient{
-				Client:         httpClient,
-				NewRequestFunc: makeJoinServerHTTPRequestFunc("https", yamlJSConf.DNS, yamlJSConf.FQDN, yamlJSConf.Port, yamlJSConf.Paths, yamlJSConf.Headers),
-				Protocol:       yamlJSConf.Protocol,
+				clientProvider: httpClientProvider,
+				clientOpts:     opts,
+				protocol:       jsConf.Protocol,
+				senderNSID:     jsConf.SenderNSID,
+				scheme:         jsConf.Scheme,
+				dnsSuffix:      jsConf.DNSSuffix,
+				fqdn:           jsConf.FQDN,
+				port:           jsConf.Port,
+				paths:          jsConf.Paths,
+				headers:        jsConf.Headers,
+				username:       jsConf.BasicAuth.Username,
+				password:       jsConf.BasicAuth.Password,
 			}
 		default:
 			return nil, errUnknownProtocol.New()
 		}
-		for _, pre := range jsConf.JoinEUIs {
+		for _, pre := range jsEntry.JoinEUIs {
 			jss = append(jss, prefixJoinServerClient{
 				joinServerClient: js,
 				prefix:           pre,

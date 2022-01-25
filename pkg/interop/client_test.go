@@ -66,7 +66,6 @@ func TestGetAppSKey(t *testing.T) {
 					a.So(err, should.BeNil)
 					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.0","TransactionID":0,"MessageType":"AppSKeyReq","SenderID":"test-as","ReceiverID":"70B3D57ED0000000","DevEUI":"0102030405060708","SessionKeyID":"016BFA7BAD4756346A674981E75CDBDC"}
 `)
-					a.So(r.Body.Close(), should.BeNil)
 
 					_, err = w.Write([]byte(`{
   "Result": {
@@ -183,7 +182,6 @@ paths:
 					a.So(err, should.BeNil)
 					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"AppSKeyReq","SenderID":"test-as","ReceiverID":"70B3D57ED0000000","DevEUI":"0102030405060708","SessionKeyID":"016BFA7BAD4756346A674981E75CDBDC"}
 `)
-					a.So(r.Body.Close(), should.BeNil)
 
 					_, err = w.Write([]byte(`{
   "Result": {
@@ -300,7 +298,6 @@ paths:
 					a.So(err, should.BeNil)
 					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.0","TransactionID":0,"MessageType":"AppSKeyReq","SenderID":"test-as","ReceiverID":"70B3D57ED0000000","DevEUI":"0102030405060708","SessionKeyID":"016BFA7BAD4756346A674981E75CDBDC"}
 `)
-					a.So(r.Body.Close(), should.BeNil)
 
 					_, err = w.Write([]byte(`{
   "ProtocolVersion": "1.0",
@@ -434,7 +431,6 @@ paths:
 					a.So(err, should.BeNil)
 					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"AppSKeyReq","SenderID":"test-as","ReceiverID":"70B3D57ED0000000","DevEUI":"0102030405060708","SessionKeyID":"016BFA7BAD4756346A674981E75CDBDC"}
 `)
-					a.So(r.Body.Close(), should.BeNil)
 
 					_, err = w.Write([]byte(`{
   "ProtocolVersion": "1.1",
@@ -628,7 +624,6 @@ func TestHandleJoinRequest(t *testing.T) {
 					a.So(err, should.BeNil)
 					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.0","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
 `)
-					a.So(r.Body.Close(), should.BeNil)
 
 					_, err = w.Write([]byte(`{
   "Result": {
@@ -743,9 +738,8 @@ paths:
 
 					b, err := io.ReadAll(r.Body)
 					a.So(err, should.BeNil)
-					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
+					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","SenderNSID":"70B3D57ED0000001","ReceiverID":"70B3D57ED0000000","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
 `)
-					a.So(r.Body.Close(), should.BeNil)
 
 					_, err = w.Write([]byte(`{
   "Result": {
@@ -811,6 +805,7 @@ headers:
 				test.MustMultiple(os.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
 protocol: BI1.1
+sender-nsid: 70B3D57ED0000001
 paths:
    app-s-key: test-app-s-key-path
    home-ns: test-home-ns-path
@@ -862,7 +857,6 @@ paths:
 					a.So(err, should.BeNil)
 					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.0","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
 `)
-					a.So(r.Body.Close(), should.BeNil)
 
 					_, err = w.Write([]byte(`{
   "ProtocolVersion": "1.0",
@@ -1008,9 +1002,8 @@ paths:
 
 					b, err := io.ReadAll(r.Body)
 					a.So(err, should.BeNil)
-					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
+					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","SenderNSID":"70B3D57ED0000001","ReceiverID":"70B3D57ED0000000","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
 `)
-					a.So(r.Body.Close(), should.BeNil)
 
 					_, err = w.Write([]byte(`{
   "ProtocolVersion": "1.1",
@@ -1093,6 +1086,7 @@ headers:
 				test.MustMultiple(os.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
 protocol: BI1.1
+sender-nsid: 70B3D57ED0000001
 paths:
    app-s-key: test-app-s-key-path
    home-ns: test-home-ns-path
@@ -1156,9 +1150,8 @@ paths:
 
 					b, err := io.ReadAll(r.Body)
 					a.So(err, should.BeNil)
-					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","ReceiverID":"70B3D57ED0000000","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
+					a.So(string(b), should.Equal, `{"ProtocolVersion":"1.1","TransactionID":0,"MessageType":"JoinReq","SenderID":"42FFFF","SenderNSID":"70B3D57ED0000001","ReceiverID":"70B3D57ED0000000","MACVersion":"1.0.3","PHYPayload":"00000000D07ED5B370080706050403020100003851F0B6","DevEUI":"0102030405060708","DevAddr":"01020304","DLSettings":"00","RxDelay":5,"CFList":""}
 `)
-					a.So(r.Body.Close(), should.BeNil)
 
 					_, err = w.Write([]byte(`{
   "ProtocolVersion": "1.1",
@@ -1240,6 +1233,7 @@ headers:
 				test.MustMultiple(os.WriteFile(js2Path, []byte(fmt.Sprintf(`fqdn: %s
 port: %d
 protocol: BI1.1
+sender-nsid: 70B3D57ED0000001
 paths:
    app-s-key: test-app-s-key-path
    home-ns: test-home-ns-path
