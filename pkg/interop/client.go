@@ -276,7 +276,11 @@ type Client struct {
 	joinServers []prefixJoinServerClient // Sorted by JoinEUI prefix range length.
 }
 
-var errUnknownConfig = errors.DefineNotFound("unknown_config", "configuration is unknown")
+var (
+	errUnknownConfig    = errors.DefineNotFound("unknown_config", "configuration is unknown")
+	errMissingNSID      = errors.DefineFailedPrecondition("missing_nsid", "missing NSID")
+	errNSIDNotSupported = errors.DefineFailedPrecondition("nsid_not_supported", "NSID not supported")
+)
 
 // NewClient return new interop client.
 func NewClient(ctx context.Context, conf config.InteropClient, httpClientProvider httpclient.Provider) (*Client, error) {
@@ -324,9 +328,16 @@ func NewClient(ctx context.Context, conf config.InteropClient, httpClientProvide
 			ComponentConfig `yaml:",inline"`
 			Paths           jsRPCPaths      `yaml:"paths"`
 			Protocol        ProtocolVersion `yaml:"protocol"`
+			SenderNSID      *types.EUI64    `yaml:"sender-nsid,omitempty"`
 		}
 		if err := yaml.UnmarshalStrict(jsFileBytes, &yamlJSConf); err != nil {
 			return nil, err
+		}
+		if yamlJSConf.Protocol.RequiresNSID() && yamlJSConf.SenderNSID == nil {
+			return nil, errMissingNSID.New()
+		}
+		if !yamlJSConf.Protocol.RequiresNSID() && yamlJSConf.SenderNSID != nil {
+			return nil, errNSIDNotSupported.New()
 		}
 
 		var js joinServerClient

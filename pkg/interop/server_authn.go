@@ -105,7 +105,7 @@ func (s *Server) authenticateNS(ctx context.Context, r *http.Request, data []byt
 	if err := json.Unmarshal(data, &header); err != nil {
 		return nil, ErrMalformedMessage.WithCause(err)
 	}
-	if !header.ProtocolVersion.SupportsNSID() && header.SenderNSID != nil {
+	if header.ProtocolVersion.RequiresNSID() != (header.SenderNSID != nil) {
 		return nil, ErrMalformedMessage.New()
 	}
 

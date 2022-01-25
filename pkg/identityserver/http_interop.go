@@ -82,7 +82,7 @@ func (srv *interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSR
 		HNSAddress: dev.NetworkServerAddress,
 		HTenantID:  conf.Network.TenantID,
 	}
-	if in.ProtocolVersion.SupportsNSID() {
+	if in.ProtocolVersion.RequiresNSID() {
 		ans.HNSID = (*interop.EUI64)(hNSID)
 	}
 	return ans, nil
