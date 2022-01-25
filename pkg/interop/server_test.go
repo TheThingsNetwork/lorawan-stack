@@ -323,7 +323,7 @@ func TestServer(t *testing.T) {
 				s, err := interop.NewServer(&mockComponent{ctx}, nil, config.InteropServer{
 					SenderClientCA: config.SenderClientCA{
 						Source:    "directory",
-						Directory: "testdata",
+						Directory: "testdata/server",
 					},
 					PacketBroker: config.PacketBrokerInteropAuth{
 						Enabled:     true,
