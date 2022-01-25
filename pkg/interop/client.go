@@ -98,10 +98,17 @@ func httpExchange(ctx context.Context, httpReq *http.Request, res interface{}, d
 
 	b, err := io.ReadAll(httpRes.Body)
 	if err != nil {
-		if err == io.EOF && res == nil {
+		if res == nil {
 			return nil
 		}
 		logger.WithError(err).Warn("Failed to read HTTP response body")
+		return errors.FromHTTPStatusCode(httpRes.StatusCode)
+	}
+
+	// LoRaWAN Backend Interfaces messages are only sent with HTTP status code 200, including errors encoded in Result.
+	// Therefore, when the response status code is not 2xx, do not unmarshal the response content.
+	if httpRes.StatusCode < 200 || httpRes.StatusCode >= 300 {
+		logger.Info("Response status code does not indicate success")
 		return errors.FromHTTPStatusCode(httpRes.StatusCode)
 	}
 
