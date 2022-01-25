@@ -153,7 +153,6 @@ const DocLink = props => {
     primary,
     disabled,
     tabIndex,
-    to,
     raw,
     onClick,
   } = props
@@ -173,7 +172,6 @@ const DocLink = props => {
   return (
     <a
       className={classNames}
-      to={to}
       title={formattedTitle}
       id={id}
       href={link}
@@ -190,29 +188,36 @@ const DocLink = props => {
 }
 
 DocLink.propTypes = {
-  ...Link.propTypes,
+  children: PropTypes.node,
+  className: PropTypes.string,
+  disabled: PropTypes.bool,
+  id: PropTypes.string,
   name: PropTypes.string,
+  onClick: PropTypes.func,
   path: PropTypes.string.isRequired,
+  primary: PropTypes.bool,
   raw: PropTypes.bool,
+  secondary: PropTypes.bool,
   showVisited: PropTypes.bool,
-  to: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.shape({
-      pathname: PropTypes.string,
-      search: PropTypes.string,
-      hash: PropTypes.string,
-      state: PropTypes.shape({}),
-    }),
-  ]),
+  tabIndex: PropTypes.number,
+  title: PropTypes.message,
+  titleValues: PropTypes.shape({}),
 }
 
 DocLink.defaultProps = {
-  ...Link.defaultProps,
+  children: undefined,
+  className: undefined,
   disabled: false,
-  name: undefined,
+  id: undefined,
+  primary: false,
   showVisited: false,
-  to: undefined,
+  secondary: false,
+  tabIndex: undefined,
+  title: undefined,
+  titleValues: undefined,
+  name: undefined,
   raw: false,
+  onClick: () => null,
 }
 
 Link.DocLink = DocLink
