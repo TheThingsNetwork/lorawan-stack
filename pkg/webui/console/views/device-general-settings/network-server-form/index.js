@@ -488,7 +488,6 @@ const NetworkServerForm = React.memo(props => {
         <ModalButton
           type="button"
           warning
-          naked
           message={m.resetButtonTitle}
           modalData={{
             children: (
