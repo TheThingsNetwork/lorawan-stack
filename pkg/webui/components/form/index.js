@@ -80,7 +80,7 @@ class InnerForm extends React.PureComponent {
       const firstErrorNode = document.querySelectorAll('[data-needs-focus="true"]')[0]
       if (firstErrorNode) {
         scrollIntoView(firstErrorNode, { behavior: 'smooth' })
-        firstErrorNode.querySelector('input,textarea').focus({ preventScroll: true })
+        firstErrorNode.querySelector('input,textarea,canvas,video').focus({ preventScroll: true })
       }
     }
   }

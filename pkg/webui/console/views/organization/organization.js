@@ -15,6 +15,8 @@
 import React, { useEffect } from 'react'
 import { Switch, Route } from 'react-router-dom'
 
+import organizationIcon from '@assets/misc/organization.svg'
+
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
@@ -63,7 +65,12 @@ const Organization = props => {
       <Breadcrumbs />
       <IntlHelmet titleTemplate={`%s - ${organization.name || orgId} - ${siteName}`} />
       <SideNavigation
-        header={{ title: organization.name || orgId, icon: 'organization', to: matchedUrl }}
+        header={{
+          title: organization.name || orgId,
+          icon: organizationIcon,
+          iconAlt: sharedMessages.organization,
+          to: matchedUrl,
+        }}
       >
         {mayViewInformation && (
           <SideNavigation.Item

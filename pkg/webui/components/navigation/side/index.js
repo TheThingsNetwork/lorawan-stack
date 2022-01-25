@@ -16,7 +16,7 @@ import ReactDom from 'react-dom'
 import React, { Component } from 'react'
 import bind from 'autobind-decorator'
 import classnames from 'classnames'
-import { defineMessages } from 'react-intl'
+import { defineMessages, injectIntl } from 'react-intl'
 
 import LAYOUT from '@ttn-lw/constants/layout'
 
@@ -40,6 +40,8 @@ const getViewportWidth = () =>
 const m = defineMessages({
   hideSidebar: 'Hide sidebar',
 })
+
+@injectIntl
 export class SideNavigation extends Component {
   static propTypes = {
     appContainerId: PropTypes.string,
@@ -49,7 +51,11 @@ export class SideNavigation extends Component {
     header: PropTypes.shape({
       title: PropTypes.string.isRequired,
       icon: PropTypes.string.isRequired,
+      iconAlt: PropTypes.message.isRequired,
       to: PropTypes.string.isRequired,
+    }).isRequired,
+    intl: PropTypes.shape({
+      formatMessage: PropTypes.func,
     }).isRequired,
     modifyAppContainerClasses: PropTypes.bool,
   }
@@ -188,7 +194,7 @@ export class SideNavigation extends Component {
   }
 
   render() {
-    const { className, header, children } = this.props
+    const { className, header, children, intl } = this.props
     const { isMinimized, isDrawerOpen } = this.state
 
     const navigationClassNames = classnames(className, style.navigation, {
@@ -205,14 +211,22 @@ export class SideNavigation extends Component {
         <nav className={navigationClassNames} ref={this.ref} data-test-id="navigation-sidebar">
           <div className={style.mobileHeader} onClick={this.onDrawerExpandClick}>
             <Icon className={style.expandIcon} icon="more_vert" />
-            <Icon className={style.icon} icon={header.icon} />
+            <img
+              className={style.icon}
+              src={header.icon}
+              alt={intl.formatMessage({ id: `${header.iconAlt}` })}
+            />
             <Message className={style.message} content={header.title} />
           </div>
           <div>
             <div className={drawerClassNames}>
               <Link to={header.to}>
                 <div className={style.header}>
-                  <Icon className={style.icon} icon={header.icon} />
+                  <img
+                    className={style.icon}
+                    src={header.icon}
+                    alt={intl.formatMessage({ id: `${header.iconAlt}` })}
+                  />
                   <Message className={style.message} content={header.title} />
                 </div>
               </Link>

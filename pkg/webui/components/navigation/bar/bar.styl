@@ -22,6 +22,9 @@
 
   pseudo-border-animated(3px, $c-divider)
 
+  &:not(.link-active):hover
+    area-hover()
+
   & > .icon
     color: $c-icon-fill
 
@@ -29,6 +32,7 @@
     color: $tc-active
 
   &-active
+    area-active()
     $hover-color = $tc-active
 
     +pseudo-border(3px, $c-active-blue)

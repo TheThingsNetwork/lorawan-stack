@@ -20,6 +20,7 @@ import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
+import Button from '@ttn-lw/components/button'
 import Notification from '@ttn-lw/components/notification'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 import ModalButton from '@ttn-lw/components/button/modal-button'
@@ -309,10 +310,14 @@ export default class WebhookForm extends Component {
           <Notification
             warning
             content={m.suspendedWebhookMessage}
-            action={this.handleReactivate}
-            actionMessage={m.reactivateButtonMessage}
-            buttonIcon="refresh"
-            className={buttonStyle.activateWebhookButton}
+            children={
+              <Button
+                onClick={this.handleReactivate}
+                icon="refresh"
+                message={m.reactivateButtonMessage}
+                className={buttonStyle.activateWebhookButton}
+              />
+            }
             small
           />
         )}

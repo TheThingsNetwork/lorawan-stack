@@ -16,6 +16,8 @@ import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 import { connect } from 'react-redux'
 
+import gatewayIcon from '@assets/misc/gateway.svg'
+
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
@@ -154,7 +156,14 @@ export default class Gateway extends React.Component {
       <React.Fragment>
         <Breadcrumbs />
         <IntlHelmet titleTemplate={`%s - ${gateway.name || gtwId} - ${env.siteName}`} />
-        <SideNavigation header={{ icon: 'gateway', title: gateway.name || gtwId, to: matchedUrl }}>
+        <SideNavigation
+          header={{
+            icon: gatewayIcon,
+            iconAlt: sharedMessages.gateway,
+            title: gateway.name || gtwId,
+            to: matchedUrl,
+          }}
+        >
           {mayViewGatewayInfo.check(rights) && (
             <SideNavigation.Item
               title={sharedMessages.overview}

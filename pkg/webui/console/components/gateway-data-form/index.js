@@ -14,6 +14,7 @@
 
 import React from 'react'
 import bind from 'autobind-decorator'
+import { defineMessages } from 'react-intl'
 
 import delay from '@console/constants/delays'
 import frequencyPlans from '@console/constants/frequency-plans'
@@ -24,6 +25,7 @@ import Checkbox from '@ttn-lw/components/checkbox'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import UnitInput from '@ttn-lw/components/unit-input'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
+import Notification from '@ttn-lw/components/notification'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -37,6 +39,14 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { unit as unitRegexp, emptyDuration as emptyDurationRegexp } from '@console/lib/regexp'
 
 import validationSchema from './validation-schema'
+
+const m = defineMessages({
+  claimWarning:
+    'It appears like you are trying to register a <b>The Things Indoor Gateway</b>. Such gateways are already preregistered and need to be claimed instead. Claiming can only be performed on a deployment that supports gateway claiming.',
+})
+
+// This is the TrackNet prefix that all TTIGs use.
+const TRACKNET_PREFIX = '58A0CBFFFE'
 
 const isEmptyFrequencyPlan = value => value === frequencyPlans.EMPTY_FREQ_PLAN
 
@@ -59,9 +69,16 @@ class GatewayDataForm extends React.Component {
     super(props)
 
     this.state = {
+      shouldDisplayClaimWarning: false,
       shouldDisplayWarning: this.isNotValidDuration(props.initialValues.schedule_anytime_delay),
       showFrequencyPlanWarning: isEmptyFrequencyPlan(props.initialValues.frequency_plan_id),
     }
+  }
+
+  @bind
+  onDisplayClaimChange(evt) {
+    const eui = evt.target.value || ''
+    this.setState({ shouldDisplayClaimWarning: eui.startsWith(TRACKNET_PREFIX) })
   }
 
   @bind
@@ -119,7 +136,7 @@ class GatewayDataForm extends React.Component {
 
   render() {
     const { error, initialValues, children, gsEnabled } = this.props
-    const { shouldDisplayWarning, showFrequencyPlanWarning } = this.state
+    const { shouldDisplayWarning, showFrequencyPlanWarning, shouldDisplayClaimWarning } = this.state
 
     return (
       <Form
@@ -148,7 +165,13 @@ class GatewayDataForm extends React.Component {
           placeholder={sharedMessages.gatewayEUI}
           component={Input}
           tooltipId={tooltipIds.GATEWAY_EUI}
+          onBlur={this.onDisplayClaimChange}
         />
+        {shouldDisplayClaimWarning && (
+          <Form.InfoField>
+            <Notification small warning content={m.claimWarning} messageValues={{ br: <br /> }} />
+          </Form.InfoField>
+        )}
         <Form.Field
           title={sharedMessages.gatewayName}
           placeholder={sharedMessages.gatewayNamePlaceholder}

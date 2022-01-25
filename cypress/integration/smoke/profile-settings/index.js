@@ -36,9 +36,8 @@ const profileSettingsNavigation = defineSmokeTest('succeeds navigating to Accoun
 
     cy.get('@profileDropdown')
       .findByText(/Profile settings/)
+      .should('have.attr', 'href', '/oauth/profile-settings')
       .should('have.attr', 'target', '_blank')
-      .invoke('attr', 'href')
-      .then(href => expect(href.endsWith('/oauth/profile-settings')).to.be.true)
 
     cy.get('@profileDropdown')
       .findByText('Profile settings')
