@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name: "Backend Interfaces 1.0/UnknownDevEUI",
 			NewServer: func(t *testing.T) *httptest.Server {
-				return newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 					b := test.Must(io.ReadAll(r.Body)).([]byte)
@@ -87,7 +87,7 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name: "Backend Interfaces 1.1/UnknownDevEUI",
 			NewServer: func(t *testing.T) *httptest.Server {
-				return newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 					b := test.Must(io.ReadAll(r.Body)).([]byte)
@@ -130,7 +130,7 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name: "Backend Interfaces 1.0/Success",
 			NewServer: func(t *testing.T) *httptest.Server {
-				return newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 					b := test.Must(io.ReadAll(r.Body)).([]byte)
@@ -184,7 +184,7 @@ func TestGetAppSKey(t *testing.T) {
 		{
 			Name: "Backend Interfaces 1.1/Success",
 			NewServer: func(t *testing.T) *httptest.Server {
-				return newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 					b := test.Must(io.ReadAll(r.Body)).([]byte)
@@ -275,7 +275,7 @@ func TestHandleJoinRequest(t *testing.T) {
 		{
 			Name: "Backend Interfaces 1.0/MICFailed",
 			NewServer: func(t *testing.T) *httptest.Server {
-				return newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 					b := test.Must(io.ReadAll(r.Body)).([]byte)
@@ -333,7 +333,7 @@ func TestHandleJoinRequest(t *testing.T) {
 		{
 			Name: "Backend Interfaces 1.1/MICFailed",
 			NewServer: func(t *testing.T) *httptest.Server {
-				return newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 					b := test.Must(io.ReadAll(r.Body)).([]byte)
@@ -393,7 +393,7 @@ func TestHandleJoinRequest(t *testing.T) {
 		{
 			Name: "Backend Interfaces 1.0/Success",
 			NewServer: func(t *testing.T) *httptest.Server {
-				return newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 					b := test.Must(io.ReadAll(r.Body)).([]byte)
@@ -477,7 +477,7 @@ func TestHandleJoinRequest(t *testing.T) {
 		{
 			Name: "Backend Interfaces 1.1/Success/With Session Key ID",
 			NewServer: func(t *testing.T) *httptest.Server {
-				return newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 					b := test.Must(io.ReadAll(r.Body)).([]byte)
@@ -563,7 +563,7 @@ func TestHandleJoinRequest(t *testing.T) {
 		{
 			Name: "Backend Interfaces 1.1/Success/Without Session Key ID",
 			NewServer: func(t *testing.T) *httptest.Server {
-				return newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				return newTLSServer(9183, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					a := assertions.New(t)
 					a.So(r.Method, should.Equal, http.MethodPost)
 					b := test.Must(io.ReadAll(r.Body)).([]byte)

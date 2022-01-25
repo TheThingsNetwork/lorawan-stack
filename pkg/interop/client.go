@@ -113,10 +113,11 @@ func httpExchange(ctx context.Context, httpReq *http.Request, res interface{}, d
 }
 
 type joinServerHTTPClient struct {
-	clientProvider     httpclient.Provider
-	clientOpts         []httpclient.Option
-	protocol           ProtocolVersion
-	dnsSuffix, fqdn    string
+	clientProvider httpclient.Provider
+	clientOpts     []httpclient.Option
+	protocol       ProtocolVersion
+	scheme,
+	dnsSuffix, fqdn string
 	port               uint32
 	paths              jsRPCPaths
 	headers            map[string]string
@@ -131,6 +132,13 @@ func (cl joinServerHTTPClient) exchange(ctx context.Context, joinEUI types.EUI64
 	if err != nil {
 		return err
 	}
+	scheme := cl.scheme
+	if scheme == "" {
+		scheme = "https"
+	}
+	if scheme != "https" {
+		log.FromContext(ctx).WithField("scheme", scheme).Warn("Use non-https scheme for contacting interop Join Server")
+	}
 	port := cl.port
 	if port == 0 {
 		port = defaultHTTPSPort
@@ -139,7 +147,7 @@ func (cl joinServerHTTPClient) exchange(ctx context.Context, joinEUI types.EUI64
 		return errDNSLookupNotSupported.New()
 	}
 	req, err := newHTTPRequest(
-		serverURL("https", cl.fqdn, pathFunc(cl.paths), port), pld, cl.headers, cl.username, cl.password,
+		serverURL(scheme, cl.fqdn, pathFunc(cl.paths), port), pld, cl.headers, cl.username, cl.password,
 	)
 	if err != nil {
 		return err
@@ -322,6 +330,7 @@ func NewClient(ctx context.Context, conf config.InteropClient, httpClientProvide
 
 	type ComponentConfig struct {
 		DNSSuffix string            `yaml:"dns"`
+		Scheme    string            `yaml:"scheme"`
 		FQDN      string            `yaml:"fqdn"`
 		Port      uint32            `yaml:"port"`
 		Headers   map[string]string `yaml:"headers"`
