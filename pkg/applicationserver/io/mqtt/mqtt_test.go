@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -57,8 +58,9 @@ func TestAuthentication(t *testing.T) {
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	is, isAddr := startMockIS(ctx)
-	is.add(ctx, registeredApplicationID, registeredApplicationKey)
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
+	is.ApplicationRegistry().Add(ctx, registeredApplicationID, registeredApplicationKey, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -134,8 +136,9 @@ func TestTraffic(t *testing.T) {
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	is, isAddr := startMockIS(ctx)
-	is.add(ctx, registeredApplicationID, registeredApplicationKey)
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
+	is.ApplicationRegistry().Add(ctx, registeredApplicationID, registeredApplicationKey, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{

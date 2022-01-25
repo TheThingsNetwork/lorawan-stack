@@ -31,6 +31,7 @@ import (
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors"
 	"go.thethings.network/lorawan-stack/v3/pkg/messageprocessors/cayennelpp"
@@ -54,8 +55,9 @@ var (
 func TestAuthentication(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
-	is, isAddr := startMockIS(ctx)
-	is.add(ctx, registeredApplicationID, registeredApplicationKey)
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
+	is.ApplicationRegistry().Add(ctx, registeredApplicationID, registeredApplicationKey, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -140,8 +142,9 @@ func TestTraffic(t *testing.T) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	is, isAddr := startMockIS(ctx)
-	is.add(ctx, registeredApplicationID, registeredApplicationKey)
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
+	is.ApplicationRegistry().Add(ctx, registeredApplicationID, registeredApplicationKey, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -365,8 +368,9 @@ func TestMQTTConfig(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
-	is, isAddr := startMockIS(ctx)
-	is.add(ctx, registeredApplicationID, registeredApplicationKey)
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
+	is.ApplicationRegistry().Add(ctx, registeredApplicationID, registeredApplicationKey, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -415,8 +419,9 @@ func TestSimulateUplink(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
-	is, isAddr := startMockIS(ctx)
-	is.add(ctx, registeredApplicationID, registeredApplicationKey)
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
+	is.ApplicationRegistry().Add(ctx, registeredApplicationID, registeredApplicationKey, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -535,8 +540,9 @@ func TestMessageProcessors(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
-	is, isAddr := startMockIS(ctx)
-	is.add(ctx, registeredApplicationID, registeredApplicationKey)
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
+	is.ApplicationRegistry().Add(ctx, registeredApplicationID, registeredApplicationKey, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
