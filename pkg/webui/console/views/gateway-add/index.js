@@ -26,6 +26,7 @@ import FormSubmit from '@ttn-lw/components/form/submit'
 import SubmitButton from '@ttn-lw/components/submit-button'
 
 import { withEnv } from '@ttn-lw/lib/components/env'
+import withRequest from '@ttn-lw/lib/components/with-request'
 
 import GatewayDataForm from '@console/components/gateway-data-form'
 
@@ -38,6 +39,9 @@ import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
 import { mapFormValueToAttributes } from '@console/lib/attributes'
 import { mayCreateGateways } from '@console/lib/feature-checks'
 
+import { getOrganizationsList } from '@console/store/actions/organizations'
+
+import { selectOrganizationsFetching } from '@console/store/selectors/organizations'
 import { selectUserId } from '@console/store/selectors/user'
 
 const m = defineMessages({
@@ -45,18 +49,20 @@ const m = defineMessages({
 })
 
 @withEnv
+@withFeatureRequirement(mayCreateGateways, { redirect: '/gateways' })
 @connect(
   state => {
     const userId = selectUserId(state)
     const { enabled: gsEnabled } = selectGsConfig()
 
-    return { userId, gsEnabled }
+    return { userId, gsEnabled, fetching: selectOrganizationsFetching(state) }
   },
   dispatch => ({
     createSuccess: gtwId => dispatch(push(`/gateways/${gtwId}`)),
+    getOrganizationsList: () => dispatch(getOrganizationsList()),
   }),
 )
-@withFeatureRequirement(mayCreateGateways, { redirect: '/gateways' })
+@withRequest(({ getOrganizationsList }) => getOrganizationsList())
 export default class GatewayAdd extends React.Component {
   static propTypes = {
     createSuccess: PropTypes.func.isRequired,

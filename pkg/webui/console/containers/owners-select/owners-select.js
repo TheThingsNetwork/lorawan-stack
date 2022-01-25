@@ -31,7 +31,6 @@ const OwnersSelect = props => {
     autoFocus,
     error,
     fetching,
-    getOrganizationsList,
     menuPlacement,
     name,
     onChange,
@@ -39,10 +38,6 @@ const OwnersSelect = props => {
     required,
     user,
   } = props
-
-  React.useEffect(() => {
-    getOrganizationsList()
-  }, [getOrganizationsList])
 
   const options = React.useMemo(() => {
     const usrOption = { label: getUserId(user), value: getUserId(user) }
@@ -59,6 +54,11 @@ const OwnersSelect = props => {
     },
     [onChange, options],
   )
+
+  // Do not show the input when there are no alternative options.
+  if (options.length === 1) {
+    return null
+  }
 
   return (
     <Field
@@ -81,7 +81,6 @@ OwnersSelect.propTypes = {
   autoFocus: PropTypes.bool,
   error: PropTypes.error,
   fetching: PropTypes.bool,
-  getOrganizationsList: PropTypes.func.isRequired,
   menuPlacement: PropTypes.oneOf(['top', 'bottom', 'auto']),
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func,

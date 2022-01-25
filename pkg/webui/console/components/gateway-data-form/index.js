@@ -147,7 +147,7 @@ class GatewayDataForm extends React.Component {
         validationContext={{ gsEnabled }}
       >
         <Form.SubTitle title={sharedMessages.generalSettings} />
-        <OwnersSelect name="owner_id" required autoFocus />
+        <OwnersSelect name="owner_id" required />
         <Form.Field
           title={sharedMessages.gatewayID}
           name="ids.gateway_id"
@@ -155,6 +155,7 @@ class GatewayDataForm extends React.Component {
           required
           component={Input}
           tooltipId={tooltipIds.GATEWAY_ID}
+          autoFocus
         />
         <Form.Field
           title={sharedMessages.gatewayEUI}
@@ -229,7 +230,7 @@ class GatewayDataForm extends React.Component {
           description={sharedMessages.attributeDescription}
           tooltipId={tooltipIds.GATEWAY_ATTRIBUTES}
         />
-        <Message component="h4" content={sharedMessages.lorawanOptions} />
+        <Message component="h3" content={sharedMessages.lorawanOptions} />
         {gsEnabled && (
           <GsFrequencyPlansSelect
             name="frequency_plan_id"
@@ -258,8 +259,10 @@ class GatewayDataForm extends React.Component {
         <Form.Field
           title={sharedMessages.scheduleAnyTimeDelay}
           name="schedule_anytime_delay"
-          component={UnitInput}
-          inputWidth="s"
+          component={UnitInput.Duration}
+          unitSelector={['ms', 's']}
+          inputWidth="xxs"
+          selectWidth="s"
           description={{
             ...sharedMessages.scheduleAnyTimeDescription,
             values: {
@@ -267,13 +270,6 @@ class GatewayDataForm extends React.Component {
               defaultValue: delay.DEFAULT_GATEWAY_SCHEDULE_ANYTIME_DELAY,
             },
           }}
-          units={[
-            { label: sharedMessages.milliseconds, value: 'ms' },
-            { label: sharedMessages.seconds, value: 's' },
-            { label: sharedMessages.minutes, value: 'm' },
-            { label: sharedMessages.hours, value: 'h' },
-          ]}
-          onChange={this.onScheduleAnytimeDelayChange}
           warning={
             shouldDisplayWarning
               ? {
