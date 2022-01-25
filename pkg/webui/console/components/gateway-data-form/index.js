@@ -26,7 +26,6 @@ import SubmitBar from '@ttn-lw/components/submit-bar'
 import UnitInput from '@ttn-lw/components/unit-input'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 import Notification from '@ttn-lw/components/notification'
-import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 
