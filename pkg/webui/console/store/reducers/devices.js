@@ -27,6 +27,7 @@ import {
   GET_DEV_SUCCESS,
   UPDATE_DEV_SUCCESS,
   RESET_DEV_SUCCESS,
+  GET_DEVICE_EVENT_MESSAGE_SUCCESS,
 } from '@console/store/actions/devices'
 import { GET_APP_EVENT_MESSAGE_SUCCESS } from '@console/store/actions/applications'
 
@@ -163,28 +164,9 @@ const devices = (state = defaultState, { type, payload, event }) => {
         },
         { ...state },
       )
-    case GET_APP_EVENT_MESSAGE_SUCCESS:
-      // Detect heartbeat events to update last seen state.
-      if (heartbeatFilterRegExp.test(event.name)) {
-        const id = getCombinedDeviceId(event.identifiers[0].device_ids)
-        const receivedAt = getByPath(event, 'data.received_at')
-        if (receivedAt) {
-          const derived = {}
-          const currentDerived = state.derived[id]
-          if (currentDerived) {
-            // Only update if the event was actually more recent than the current value.
-            if (currentDerived.lastSeen && currentDerived.lastSeen < receivedAt) {
-              derived.lastSeen = receivedAt
-            }
-          } else {
-            derived.lastSeen = receivedAt
-          }
-          return mergeDerived(state, id, derived)
-        }
-      }
-
+    case GET_DEVICE_EVENT_MESSAGE_SUCCESS:
       // Detect uplink/downlink process events to update uplink/downlink frame count state.
-      else if (event.name === uplinkFrameCountEvent) {
+      if (event.name === uplinkFrameCountEvent) {
         return mergeDerived(state, getCombinedDeviceId(event.identifiers[0].device_ids), {
           uplinkFrameCount: getByPath(event, 'data.payload.mac_payload.full_f_cnt'),
         })
@@ -205,6 +187,27 @@ const devices = (state = defaultState, { type, payload, event }) => {
           return mergeDerived(state, combinedDeviceId, {
             downlinkFrameCount: getByPath(event, 'data.payload.mac_payload.full_f_cnt'),
           })
+        }
+      }
+
+      return state
+    case GET_APP_EVENT_MESSAGE_SUCCESS:
+      // Detect heartbeat events to update last seen state.
+      if (heartbeatFilterRegExp.test(event.name)) {
+        const id = getCombinedDeviceId(event.identifiers[0].device_ids)
+        const receivedAt = getByPath(event, 'data.received_at')
+        if (receivedAt) {
+          const derived = {}
+          const currentDerived = state.derived[id]
+          if (currentDerived) {
+            // Only update if the event was actually more recent than the current value.
+            if (currentDerived.lastSeen && currentDerived.lastSeen < receivedAt) {
+              derived.lastSeen = receivedAt
+            }
+          } else {
+            derived.lastSeen = receivedAt
+          }
+          return mergeDerived(state, id, derived)
         }
       }
 

@@ -202,11 +202,14 @@ func (ps *PubSub) Subscribe(ctx context.Context, names []string, ids []*ttnpb.En
 	ps.mu.Lock()
 	defer ps.mu.Unlock()
 
+	basicSub, err := basic.NewSubscription(ctx, names, ids, hdl)
+	if err != nil {
+		return err
+	}
+
 	sub := &subscription{
-		names:    names,
-		ids:      ids,
+		basicSub: basicSub,
 		patterns: ps.eventChannelPatterns(ctx, names, ids),
-		hdl:      hdl,
 	}
 
 	ps.PubSub.AddSubscription(sub)

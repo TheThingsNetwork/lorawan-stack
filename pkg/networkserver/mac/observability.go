@@ -86,6 +86,7 @@ func defineClassSwitchEvent(class rune) func() events.Builder {
 	return events.DefineFunc(
 		fmt.Sprintf("ns.class.switch.%c", class), fmt.Sprintf("switched to class %c", unicode.ToUpper(class)),
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithPropagateToParent(),
 	)
 }
 

@@ -65,6 +65,7 @@ var (
 		"ns.down.data.schedule.fail", "failed to schedule data downlink for transmission on Gateway Server",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
+		events.WithPropagateToParent(),
 	)
 	evtReceiveJoinRequest = events.Define(
 		"ns.up.join.receive", "receive join-request",
@@ -95,6 +96,7 @@ var (
 		"ns.up.join.cluster.fail", "join-request to cluster-local Join Server failed",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
+		events.WithPropagateToParent(),
 	)
 	evtInteropJoinAttempt = events.Define(
 		"ns.up.join.interop.attempt", "forward join-request to interoperability Join Server",
@@ -110,6 +112,7 @@ var (
 		"ns.up.join.interop.fail", "join-request to interoperability Join Server failed",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
+		events.WithPropagateToParent(),
 	)
 	evtForwardJoinAccept = events.Define(
 		"ns.up.join.accept.forward", "forward join-accept to Application Server",
@@ -132,6 +135,7 @@ var (
 		"ns.down.join.schedule.fail", "failed to schedule join-accept for transmission on Gateway Server",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
+		events.WithPropagateToParent(),
 	)
 )
 

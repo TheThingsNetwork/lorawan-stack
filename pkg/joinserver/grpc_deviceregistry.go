@@ -34,6 +34,7 @@ var (
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
+		events.WithPropagateToParent(),
 	)
 	evtUpdateEndDevice = events.Define(
 		"js.end_device.update", "update end device",
@@ -41,12 +42,14 @@ var (
 		events.WithUpdatedFieldsDataType(),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
+		events.WithPropagateToParent(),
 	)
 	evtDeleteEndDevice = events.Define(
 		"js.end_device.delete", "delete end device",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
+		events.WithPropagateToParent(),
 	)
 )
 

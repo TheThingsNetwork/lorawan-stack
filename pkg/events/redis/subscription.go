@@ -16,17 +16,15 @@ package redis
 
 import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/events/basic"
 )
 
 type subscription struct {
-	names    []string
-	ids      []*ttnpb.EntityIdentifiers
+	basicSub *basic.Subscription
 	patterns []string
-	hdl      events.Handler
 }
 
-func (s *subscription) Match(evt events.Event) bool {
+func (s *subscription) matchPattern(evt events.Event) bool {
 	if evt, ok := evt.(*patternEvent); ok {
 		for _, pattern := range s.patterns {
 			if pattern == evt.pattern {
@@ -37,9 +35,19 @@ func (s *subscription) Match(evt events.Event) bool {
 	return false
 }
 
+func (s *subscription) Match(evt events.Event) bool {
+	if s == nil {
+		return false
+	}
+	if !s.matchPattern(evt) {
+		return false
+	}
+	return s.basicSub.Match(evt)
+}
+
 func (s *subscription) Notify(evt events.Event) {
 	if s == nil {
 		return
 	}
-	s.hdl.Notify(evt)
+	s.basicSub.Notify(evt)
 }

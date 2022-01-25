@@ -69,7 +69,6 @@ var (
 	ErrApplicationDownlinkTooLong = errApplicationDownlinkTooLong
 	ErrDecodePayload              = errDecodePayload
 	ErrDeviceNotFound             = errDeviceNotFound
-	ErrDuplicate                  = errDuplicate
 	ErrInvalidAbsoluteTime        = errInvalidAbsoluteTime
 	ErrOutdatedData               = errOutdatedData
 	ErrRejoinRequest              = errRejoinRequest
@@ -1657,7 +1656,6 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 				for range ups[1:] {
 					evBuilders = append(evBuilders,
 						EvtReceiveJoinRequest,
-						EvtDropJoinRequest.With(events.WithData(ErrDuplicate)),
 					)
 				}
 				if conf.ClusterResponse != nil {
@@ -1805,7 +1803,6 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 					for range ups[1:] {
 						evBuilders = append(evBuilders,
 							EvtReceiveDataUplink,
-							EvtDropDataUplink.With(events.WithData(ErrDuplicate)),
 						)
 					}
 					return append(

@@ -29,10 +29,12 @@ var (
 		"js.join.reject", "reject join-request",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
 		events.WithErrorDataType(),
+		events.WithPropagateToParent(),
 	)
 	evtAcceptJoin = events.Define(
 		"js.join.accept", "accept join-request",
 		events.WithVisibility(ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ),
+		events.WithPropagateToParent(),
 	)
 )
 
