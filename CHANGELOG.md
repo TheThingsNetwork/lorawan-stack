@@ -20,6 +20,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Webhook maximum header value length extended to 4096 characters.
 - Limited the end device event types that are included in application event streams to only application layer events, errors and warnings. Other end device events can still be received when subscribing to end device device events.
+- Several small improvements to the styling, structuring and input logic of forms in the Console.
 
 ### Deprecated
 
