@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -147,8 +148,9 @@ func TestGRPC(t *testing.T) {
 		AuthValue:     unregisteredApplicationKey,
 		AllowInsecure: true,
 	})
-	mockIS, mockISAddr := startMockIS(test.Context())
-	mockIS.add(test.Context(), registeredApplicationID, registeredApplicationKey)
+	mockIS, mockISAddr, closeIS := mockis.New(test.Context())
+	defer closeIS()
+	mockIS.ApplicationRegistry().Add(test.Context(), registeredApplicationID, registeredApplicationKey, ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ)
 
 	componentConfig := &component.Config{
 		ServiceBase: config.ServiceBase{
