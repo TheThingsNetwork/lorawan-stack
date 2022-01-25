@@ -70,7 +70,14 @@ const Application = props => {
     <React.Fragment>
       <Breadcrumbs />
       <IntlHelmet titleTemplate={`%s - ${name} - ${siteName}`} />
-      <SideNavigation header={{ icon: 'application', title: name, to: matchedUrl }}>
+      <SideNavigation
+        header={{
+          icon: 'application',
+          title: name,
+          to: matchedUrl,
+          iconAlt: sharedMessages.application,
+        }}
+      >
         {mayViewApplicationInfo.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.overview}
