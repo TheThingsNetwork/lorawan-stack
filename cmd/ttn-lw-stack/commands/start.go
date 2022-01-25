@@ -458,7 +458,9 @@ var startCommand = &cobra.Command{
 		if start.DeviceClaimingServer {
 			logger.Info("Setting up Device Claiming Server")
 
-			dcs, err := deviceclaimingserver.New(c, &config.DCS, nil)
+			var opts []deviceclaimingserver.Option
+
+			dcs, err := deviceclaimingserver.New(c, &config.DCS, opts...)
 			if err != nil {
 				return shared.ErrInitializeDeviceClaimingServer.WithCause(err)
 			}
