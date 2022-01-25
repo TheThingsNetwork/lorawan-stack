@@ -1,0 +1,10 @@
+fqdn: test-js.fqdn
+port: 12345
+protocol: BI1.1
+tls:
+  root-ca: ../rootCA.pem
+  certificate: ../clientcert.pem
+  key: ../clientkey.pem
+headers:
+  SomeHeader: Some foo bar
+  TestHeader: baz

@@ -1,0 +1,18 @@
+join-servers:
+  - file: test-js-1.yml
+    join-euis:
+      - 0000000000000000/0
+      - 70b3d57ed0001000/52
+
+  - file: foo/test-js-2.yml
+    join-euis:
+      - 70b3d57ed0000000/40
+
+  - file: test-js-3.yml
+    join-euis:
+      - 70b3d57ed0000000/39
+      - 70b3d83ed0000000/30
+
+  - file: test-js-4.yml
+    join-euis:
+      - ec656e0000000000/24

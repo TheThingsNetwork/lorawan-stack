@@ -338,7 +338,7 @@ func TestServer(t *testing.T) {
 					s.RegisterJS(tc.JS)
 				}
 
-				srv := newTLSServer(s)
+				srv := newTLSServer(0, s)
 				defer srv.Close()
 
 				buf, err := json.Marshal(tc.RequestBody)
