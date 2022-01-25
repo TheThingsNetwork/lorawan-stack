@@ -12,15 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import EncodedUnitInput from './encoded'
-import FactoredUnitInput from './factored'
-import UnitInput from './unit-input'
-import HertzInput from './common/hertz'
-import DurationInput from './common/duration'
+import React from 'react'
 
-UnitInput.Encoded = EncodedUnitInput
-UnitInput.Factored = FactoredUnitInput
-UnitInput.Hertz = HertzInput
-UnitInput.Duration = DurationInput
+import FactoredUnitInput from '../factored'
 
-export default UnitInput
+const units = [
+  { label: 'Hz', value: 'hz', factor: 1 },
+  { label: 'kHz', value: 'khz', factor: 1000 },
+  { label: 'MHz', value: 'mhz', factor: 1000000 },
+]
+
+const HertzInput = props => (
+  <FactoredUnitInput
+    inputWidth="xs"
+    units={units}
+    baseUnit={units[0].value}
+    defaultUnit="mhz"
+    {...props}
+  />
+)
+
+export default HertzInput

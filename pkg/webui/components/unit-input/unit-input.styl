@@ -13,22 +13,16 @@
 // limitations under the License.
 
 .container
-  input-width-classes()
   flex-wrap: nowrap
   display: flex
 
   .select
-    flex-basis: 30%
-    flex-shrink: 0
-    min-width: 9rem
+    flex: 1 0
+    min-width: 4rem
 
   .number
-    flex-grow: 1
     padding-right $cs.xxs
-    min-width: 0
-
-  .select + .number
-    flex-basis: auto
+    min-width: 5rem
 
 .notification
   width: 100%
