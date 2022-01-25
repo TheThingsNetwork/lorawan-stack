@@ -824,8 +824,8 @@ go.packetbroker.org/api/routing v1.8.7-tts h1:QqgVg3xdV03k72R6/4iOz1NPTxy2rKvF1w
 go.packetbroker.org/api/routing v1.8.7-tts/go.mod h1:hD2i4Y286jNOKKYHIu3gieGvWRq6LAvhlGWx8BSPNSc=
 go.packetbroker.org/api/v3 v3.10.7-tts h1:g1WRUIUir1pnz8CAqbZIZ2FVApHeDvxCk4oB7KMrsfU=
 go.packetbroker.org/api/v3 v3.10.7-tts/go.mod h1:Jsk0l4KT3fTPxkCDqW6w71vpRB28bvrSnl6H3aA1TYY=
-go.thethings.network/lorawan-application-payload v0.0.0-20211109090704-a9a0a6022856 h1:gygFIWKiKvnMb7Jn+H+6NeSTDVGjk5TUqlcYX6sq514=
-go.thethings.network/lorawan-application-payload v0.0.0-20211109090704-a9a0a6022856/go.mod h1:7ng8MWsTHUl4WGuTR9dbklwdl8+MHNTGJgpjmY2YA+U=
+go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e h1:TWGQ3lh7gI2W5hnb6qPdpoAa0d7s/XPwvgf2VVCMJaY=
+go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e/go.mod h1:/smENFuESiJCyWRsHRLBjbZGMN889BORQXIPP6NlpZE=
 go.thethings.network/lorawan-stack-legacy/v2 v2.0.2 h1:AXv7hAtYj0dPocFF6rhWwW5WvOVSm/YNk3yihgNYcXE=
 go.thethings.network/lorawan-stack-legacy/v2 v2.0.2/go.mod h1:6ytuRb3k6/f/lJFvJpOaPS4abTDp2mdcE9EIZZV1v9U=
 go.uber.org/atomic v1.4.0/go.mod h1:gD2HeocX3+yG+ygLZcrzQJaqmWj9AIm7n08wl/qW/PE=
