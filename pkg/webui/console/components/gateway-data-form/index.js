@@ -261,8 +261,6 @@ class GatewayDataForm extends React.Component {
           name="schedule_anytime_delay"
           component={UnitInput.Duration}
           unitSelector={['ms', 's']}
-          inputWidth="xxs"
-          selectWidth="s"
           description={{
             ...sharedMessages.scheduleAnyTimeDescription,
             values: {

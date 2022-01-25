@@ -147,8 +147,8 @@ const LorawanSettingsForm = React.memo(props => {
       <Form.Field
         title={sharedMessages.scheduleAnyTimeDelay}
         name="schedule_anytime_delay"
-        inputWidth="s"
-        component={UnitInput}
+        component={UnitInput.Duration}
+        unitSelector={['ms', 's']}
         description={{
           ...sharedMessages.scheduleAnyTimeDescription,
           values: {
