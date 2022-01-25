@@ -35,7 +35,7 @@ export default class Require extends Component {
     otherwise: PropTypes.shape({
       redirect: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
       render: PropTypes.func,
-      message: PropTypes.string,
+      message: PropTypes.message,
     }),
   }
   static defaultProps = {
