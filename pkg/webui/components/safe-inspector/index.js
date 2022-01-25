@@ -195,7 +195,7 @@ export class SafeInspector extends Component {
     const { disableResize } = this.props
 
     if (this.copyElem && this.copyElem.current) {
-      new clipboard(this.copyElem.current)
+      new clipboard(this.copyElem.current, { container: this.containerElem.current })
     }
 
     if (!disableResize) {
@@ -236,6 +236,7 @@ export class SafeInspector extends Component {
   handleContainerClick(e) {
     // Prevent from opening links that the component might be wrapped in.
     e.preventDefault()
+    e.stopPropagation()
   }
 
   render() {

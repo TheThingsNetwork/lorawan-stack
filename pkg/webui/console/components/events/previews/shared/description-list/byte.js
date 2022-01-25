@@ -46,8 +46,6 @@ const DescriptionListByteItem = ({ title, data: rawData, convertToHex }) => {
           truncateAfter={8}
           initiallyVisible
           small
-          noCopy
-          noTransform
           disableResize
         />
       )}
