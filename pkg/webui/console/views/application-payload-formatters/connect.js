@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { connect } from 'react-redux'
+import { connect as withConnect } from 'react-redux'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
+
+import pipe from '@ttn-lw/lib/pipe'
 
 import {
   checkFromState,
@@ -46,12 +48,11 @@ const mapDispatchToProps = dispatch => ({
   getLink: (id, selector) => dispatch(getApplicationLink(id, selector)),
 })
 
-export default ApplicationPayloadFormatters =>
-  connect(
-    mapStateToProps,
-    mapDispatchToProps,
-  )(
-    withFeatureRequirement(maySetApplicationPayloadFormatters, {
-      redirect: ({ appId }) => `/applications/${appId}`,
-    })(ApplicationPayloadFormatters),
-  )
+const addHocs = pipe(
+  withConnect(mapStateToProps, mapDispatchToProps),
+  withFeatureRequirement(maySetApplicationPayloadFormatters, {
+    redirect: ({ appId }) => `/applications/${appId}`,
+  }),
+)
+
+export default ApplicationPayloadFormatters => addHocs(ApplicationPayloadFormatters)

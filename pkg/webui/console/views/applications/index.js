@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
@@ -29,23 +29,20 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { mayViewApplications } from '@console/lib/feature-checks'
 
-@withFeatureRequirement(mayViewApplications, { redirect: '/' })
-@withBreadcrumb('apps', () => (
-  <Breadcrumb path="/applications" content={sharedMessages.applications} />
-))
-export default class Applications extends React.Component {
-  static propTypes = {
-    match: PropTypes.match.isRequired,
-  }
+const Applications = props => {
+  const { path } = props.match
 
-  render() {
-    const { path } = this.props.match
-    return (
-      <Switch>
-        <Route exact path={`${path}`} component={ApplicationsList} />
-        <Route exact path={`${path}/add`} component={ApplicationAdd} />
-        <Route path={`${path}/:appId`} component={Application} />
-      </Switch>
-    )
-  }
+  useBreadcrumbs('apps', <Breadcrumb path="/applications" content={sharedMessages.applications} />)
+
+  return (
+    <Switch>
+      <Route exact path={`${path}`} component={ApplicationsList} />
+      <Route exact path={`${path}/add`} component={ApplicationAdd} />
+      <Route path={`${path}/:appId`} component={Application} />
+    </Switch>
+  )
 }
+Applications.propTypes = {
+  match: PropTypes.match.isRequired,
+}
+export default withFeatureRequirement(mayViewApplications, { redirect: '/' })(Applications)

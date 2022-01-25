@@ -13,32 +13,28 @@
 // limitations under the License.
 
 import { connect as withConnect } from 'react-redux'
+import { push } from 'connected-react-router'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
 import pipe from '@ttn-lw/lib/pipe'
 
-import { mayViewApplicationInfo } from '@console/lib/feature-checks'
+import { mayCreateApplications } from '@console/lib/feature-checks'
 
-import {
-  selectSelectedApplication,
-  selectSelectedApplicationId,
-} from '@console/store/selectors/applications'
+import { selectUserId, selectUserRights } from '@console/store/selectors/user'
 
-const mapStateToProps = state => {
-  const appId = selectSelectedApplicationId(state)
+const mapStateToProps = state => ({
+  userId: selectUserId(state),
+  rights: selectUserRights(state),
+})
 
-  return {
-    appId,
-    application: selectSelectedApplication(state),
-  }
-}
+const mapDispatchToProps = dispatch => ({
+  navigateToApplication: appId => dispatch(push(`/applications/${appId}`)),
+})
 
 const addHocs = pipe(
-  withConnect(mapStateToProps),
-  withFeatureRequirement(mayViewApplicationInfo, {
-    redirect: '/',
-  }),
+  withFeatureRequirement(mayCreateApplications, { redirect: '/applications' }),
+  withConnect(mapStateToProps, mapDispatchToProps),
 )
 
-export default ApplicationOverview => addHocs(ApplicationOverview)
+export default ApplicationAdd => addHocs(ApplicationAdd)
