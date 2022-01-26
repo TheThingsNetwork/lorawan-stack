@@ -296,7 +296,7 @@ const validationSchema = Yup.object()
             return Yup.number().min(100000, Yup.passValues(sharedMessages.validateNumberGte))
           }),
           ping_slot_frequency: Yup.lazy(frequency => {
-            if (!Boolean(frequency) || !isClassB || mode === ACTIVATION_MODES.OTAA) {
+            if (!isClassB || (mode === ACTIVATION_MODES.OTAA && !Boolean(frequency))) {
               return Yup.number().strip()
             }
 

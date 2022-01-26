@@ -245,10 +245,7 @@ const NetworkServerForm = React.memo(props => {
         context: validationContext,
         stripUnknown: true,
       })
-      // Make sure `ping_slot_frequency` makes it into patch.
-      if (values.mac_settings.ping_slot_frequency) {
-        castedValues.mac_settings.ping_slot_frequency = values.mac_settings.ping_slot_frequency
-      }
+
       const updatedValues = diff(device, castedValues, [
         '_activation_mode',
         '_device_classes',
@@ -264,7 +261,7 @@ const NetworkServerForm = React.memo(props => {
       const patch = updatedValues
       // Always submit current `mac_settings` values to avoid overwriting nested entries.
       patch.mac_settings = castedValues.mac_settings
-      
+
       const isOTAA = values._activation_mode === ACTIVATION_MODES.OTAA
       // Do not update session for joined OTAA end devices.
       if (!isOTAA && castedValues.session && castedValues.session.keys) {
