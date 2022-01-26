@@ -16,6 +16,8 @@ import React from 'react'
 import bind from 'autobind-decorator'
 import { action } from '@storybook/addon-actions'
 
+import Icon from '@ttn-lw/components/icon'
+
 import Button from '.'
 
 class Example extends React.Component {
@@ -90,15 +92,6 @@ export const Default = () => (
     <Button message="Default" busy />
     <br />
     <br />
-    <Button message="Default" large />
-    <br />
-    <br />
-    <Button message="Default" large disabled />
-    <br />
-    <br />
-    <Button message="Default" large busy />
-    <br />
-    <br />
     <Button.Link message="Router Link" to="/test" />
     <br />
     <br />
@@ -130,27 +123,15 @@ export const Danger = () => (
   </div>
 )
 
-export const Secondary = () => (
+export const Primary = () => (
   <div>
-    <Button secondary message="Secondary" />
+    <Button primary message="Primary" />
     <br />
     <br />
-    <Button secondary message="Secondary" disabled />
+    <Button primary message="Primary" disabled />
     <br />
     <br />
-    <Button secondary message="Secondary" busy />
-  </div>
-)
-
-export const Raw = () => (
-  <div>
-    <Button raw message="Raw" />
-    <br />
-    <br />
-    <Button raw message="Raw" disabled />
-    <br />
-    <br />
-    <Button raw message="Raw" busy />
+    <Button primary message="Primary" busy />
   </div>
 )
 
@@ -184,15 +165,6 @@ export const Naked = () => (
     <br />
     <br />
     <Button naked message="Naked" busy />
-    <br />
-    <br />
-    <Button naked secondary message="Naked Secondary" />
-    <br />
-    <br />
-    <Button naked secondary message="Naked Secondary" disabled />
-    <br />
-    <br />
-    <Button naked secondary message="Naked Secondary" busy />
   </div>
 )
 
@@ -224,19 +196,19 @@ export const CustomContent = () => (
   <div>
     <Button>
       Custom content
-      <Button.Icon icon="keyboard_arrow_right" type="right" />
+      <Icon icon="keyboard_arrow_right" />
     </Button>
     <br />
     <br />
     <Button disabled>
       Custom content
-      <Button.Icon icon="keyboard_arrow_right" type="right" />
+      <Icon icon="keyboard_arrow_right" />
     </Button>
     <br />
     <br />
     <Button busy>
       Custom content
-      <Button.Icon icon="keyboard_arrow_right" type="right" />
+      <Icon icon="keyboard_arrow_right" />
     </Button>
   </div>
 )

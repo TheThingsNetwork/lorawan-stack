@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,12 +18,11 @@ import { useIntl } from 'react-intl'
 
 import Link from '@ttn-lw/components/link'
 import Spinner from '@ttn-lw/components/spinner'
+import Icon from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
-
-import ButtonIcon from './button-icon'
 
 import style from './button.styl'
 
@@ -39,18 +38,14 @@ const assembleClassnames = ({
   message,
   danger,
   warning,
-  secondary,
+  primary,
   naked,
   unstyled,
   icon,
   busy,
-  large,
   className,
   error,
-  raw,
   disabled,
-  responsiveLabel,
-  noMargin,
 }) => {
   if (unstyled) {
     return className
@@ -58,17 +53,13 @@ const assembleClassnames = ({
   return classnames(style.button, className, {
     [style.danger]: danger,
     [style.warning]: warning,
-    [style.secondary]: secondary,
+    [style.primary]: primary,
     [style.naked]: naked,
     [style.busy]: busy,
     [style.withIcon]: icon !== undefined && message,
     [style.onlyIcon]: icon !== undefined && !message,
     [style.error]: error && !busy,
-    [style.large]: large,
-    [style.raw]: raw,
-    [style.disabled]: disabled,
-    [style.responsiveLabel]: responsiveLabel,
-    [style.noMargin]: noMargin,
+    [style.disabled]: disabled || busy,
   })
 }
 
@@ -79,16 +70,16 @@ const buttonChildren = props => {
     children
   ) : (
     <>
-      {icon ? <ButtonIcon icon={icon} type="left" /> : null}
+      {icon ? <Icon className={style.icon} icon={icon} /> : null}
       {message ? <Message content={message} className={style.linkButtonMessage} /> : null}
     </>
   )
 
   return (
-    <div className={style.content}>
-      {busy ? <Spinner className={style.spinner} small after={200} /> : null}
+    <>
       {content}
-    </div>
+      {busy ? <Spinner className={style.spinner} small after={200} /> : null}
+    </>
   )
 }
 
@@ -189,23 +180,15 @@ const commonPropTypes = {
    */
   warning: PropTypes.bool,
   /**
-   * A flag specifying whether the `secodnary` styling should applied to the
+   * A flag specifying whether the `primary` styling should applied to the
    * button.
    */
-  secondary: PropTypes.bool,
+  primary: PropTypes.bool,
   /**
    * A flag specifying whether the `naked` styling should applied to the
    * button.
    */
   naked: PropTypes.bool,
-  /**
-   * A flag specifying whether the `raw` styling should applied to the button.
-   */
-  raw: PropTypes.bool,
-  /**
-   * A flag specifying whether the `large` styling should applied to the button.
-   */
-  large: PropTypes.bool,
   /**
    * A flag specifying whether the `error` styling should applied to the button.
    */
@@ -237,8 +220,6 @@ const commonPropTypes = {
   autoFocus: PropTypes.bool,
   /** A message to be evaluated and passed to the <button /> element. */
   title: PropTypes.message,
-  /** A flag specifying whether the button `message` should be responsive. */
-  responsiveLabel: PropTypes.bool,
 }
 
 buttonChildren.propTypes = {
@@ -284,8 +265,5 @@ AnchorLinkButton.propTypes = {
 
 Button.AnchorLink = AnchorLinkButton
 Button.AnchorLink.displayName = 'Button.AnchorLink'
-
-Button.Icon = ButtonIcon
-Button.Icon.displayName = 'Button.Icon'
 
 export default Button

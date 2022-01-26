@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,148 +12,174 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-$button($color)
-  one-liner()
-  display: inline-flex
-  justify-content: center
-  align-items: center
-  text-align: center
-  border-radius: $br.s
-  height: $default-input-height
-  outline: 0
-  font-weight: $fw.bold
-  cursor: pointer
-  color: white
-
-  &.large
-    height: auto
-    padding: $cs.m
-    border-radius: $br.m
-    min-width: 6rem
-
-  &:not(.busy) span:last-child
-    vertical-align: middle
-
-  &:not(:last-child):not(.no-margin)
-    margin-right: $cs.s
-
-  &:not(.naked)
-    background: $color
-
-    &:hover
-      background-color: hoverize($color)
-
-    +focus-visible()
-      background-color: hoverize($color)
-
-    &:active
-      background-color: activize($color)
-      transition-duration: $ad.xs
-
-  &:disabled:not(.busy), &.disabled
-    opacity: .4
-    cursor: default
-
-    &:hover:not(.naked):not(.busy)
-      background: $color
-      cursor: default
-
-  &.raw:not(.busy)
-    border-dark()
-    color: $c-icon-fill
-
-  &.naked
-    transition: background-color $ad.s
-    background-color: transparent
-    font-weight: $fw.normal
-    border: 1px solid transparent
-
-    &:not(.busy)
-      color: $color
-
-    &:not(.busy):not(:active):not(:disabled)
-      &:hover
-        background-color: $c-backdrop
-      +focus-visible()
-        background-color: $c-backdrop
-
-  &.busy:not(.naked),
-  &.busy:disabled
-    position: relative
-    if ($color != transparent)
-      background: $c-backdrop
-      color: transparent
-
-      $s = lighter($color, 1)
-    else
-      $s = lighter($c-active-blue, 1)
-
-    svg
-      center-absolute()
-
-    stop
-      stop-color: $s
-
 .button
   reset-button()
-  font: inherit
-  font-size: 1rem
+  display: inline-flex
   transition: color $ad.s, background $ad.s, border $ad.s, opacity $ad.s
+  border-radius: $br.s
+  outline: 0
+  cursor: pointer
+  justify-content: center
+  align-items: center
+  height: $default-input-height
+  font-size: 1rem
   text-decoration: none
   padding: 0 $cs.s
 
-  $button($c-active-blue)
+  &.primary
+    color: white
+    background-color: $c-active-blue
+    padding: 0 $cs.s
+    font-weight: $fw.bold
 
-  &.danger
-    $button($c-error)
+    &.disabled
+      background-color: $c-backdrop
 
-  &.warning
-    &:not(.naked)
-      $button($c-warning)
-    &.naked
-      $button($tc-warning)
+    &:not(.disabled)
+      &:hover
+        background-color: hoverize($c-active-blue)
 
-  &.secondary
-    &:not(.naked)
-      $button($c-subtle-fill)
-    &.naked
-      $button($tc-subtle-gray)
+      +focus-visible()
+        background-color: hoverize($c-active-blue)
 
-  &.raw
-    $button(white)
+      &:active
+        transition-duration: $ad.xs
+        background-color: activize($c-active-blue)
 
-  &.error
-    animation: shake .15s 4 linear
+    &.warning
+      background-color: $c-warning
+
+      &:not(.disabled)
+        &:hover
+          background-color: hoverize($c-warning)
+
+        +focus-visible()
+          background-color: hoverize($c-warning)
+
+        &:active
+          background-color: activize($c-warning)
+
+    &.danger
+      background-color: $c-error
+
+      &:not(.disabled)
+        &:hover
+          background-color: hoverize($c-error)
+
+        +focus-visible()
+          background-color: hoverize($c-error)
+
+        &:active
+          background-color: activize($c-error)
+
+      &.disabled
+        background-color: transparentify($c-error, #fff, .25)
+
+  &.naked
+    transition: background-color color $ad.s
+    border: 1px solid transparent
+    background-color: transparent
+    font-weight: $fw.normal
+    color: $tc-subtle-gray
+
+    &.disabled
+      color: transparentify($tc-subtle-gray, #fff, .25)
+
+    &:not(.disabled)
+      &:hover
+        background-color: $c-backdrop
+
+      +focus-visible()
+        background-color: $c-backdrop
+
+      &:active
+        transition-duration: $ad.xs
+        background-color: $c-backdrop
+
+    &.warning
+      color: $tc-warning
+
+    &.danger
+      color: $tc-error
+
+  &:not(.primary):not(.naked)
+    border-dark()
+    border: 1px solid #d3d3d3
+    box-sizing: border-box
+    background-color: #fff
+    color: $tc-deep-gray
+
+    &:not(:active)
+      box-shadow: 0px 1px 1px #efefef, inset 0 1px 0 white
+
+    &.disabled
+      border-input()
+
+      &:not(.busy)
+        color: transparentify($tc-deep-gray, #fff, .1)
+
+    &:not(.disabled)
+      &:hover
+        background-color: #fafafa
+
+      +focus-visible()
+        border: 1px solid $c-active-blue
+        background-color: #fafafa
+
+      &:active
+        transition-duration: $ad.xs
+        background-color: #f6f6f6
+
+    &.warning
+      border-color: $tc-warning
+      color: $tc-warning
+
+      &:not(.disabled)
+        &:hover
+          color: hoverize($tc-warning)
+
+    &.danger
+      border-color: $tc-error
+      color: $tc-error
+
+      &:not(.disabled)
+        &:hover
+          color: hoverize($tc-error)
+
+  &.only-icon
+    .icon
+      margin-right: - $cs.xxs
 
   &.with-icon
-    padding-left: $cs.xs
-
-    span:first-child
+    .icon
       margin-right: $cs.xxs
-
-    &.large
-      padding-left: $cs.s
-
-      span:first-child
-        margin-right: $cs.xs
 
     &.responsive-label
       padding: $cs.xs
+
       +media-query($bp.xxs)
-        span:first-child
+        .icon
           margin-left: 0
           margin-right: 0
 
         .link-button-message
           display: none
 
-  &.only-icon
-    padding-left: $cs.xs
-    padding-right: $cs.xs
+  &.error
+    animation: shake .15s 4 linear
 
-    &.large
-      padding-left: $cs.s
-      padding-right: $cs.s
+  &.disabled
+    cursor: default
+
+  &.busy:not(.naked),
+  &.busy
+    color: transparent !important
+    position: relative
+    svg
+      center-absolute()
+
+    stop
+      stop-color: $s
 
 @keyframes shake
   0%
@@ -167,11 +193,38 @@ $button($color)
 
 .content
   position: relative
-  vertical-align: middle
 
 .spinner
   position: absolute
   top: 0
   bottom: 0
-  left: $cs.s * -1
-  right: $cs.s * -1
+  left: - $cs.s
+  right: - $cs.s
+
+.icon
+  margin-left: - $cs.xxs
+
+.button-group
+  display: flex
+  flex-direction: column
+  align-items: stretch
+
+  &.align-start
+    justify-content: flex-start
+
+  &.align-end
+    justify-content: flex-end
+
+  &.align-center
+    justify-content: center
+
+  +media-query-min($bp.s)
+    flex-direction: row
+    align-items: center
+
+  .button:not(:last-child)
+    margin-right: $cs.xs
+
+    +media-query($bp.s)
+      margin-bottom: $cs.s !important
+      margin-right: 0 !important
