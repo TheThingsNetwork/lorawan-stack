@@ -231,8 +231,7 @@ const validationSchema = Yup.object()
             if (
               !isClassB ||
               dataRate === '' ||
-              dataRate === undefined ||
-              mode === ACTIVATION_MODES.OTAA
+              (dataRate === undefined && mode === ACTIVATION_MODES.OTAA)
             ) {
               return Yup.number().strip()
             }
@@ -240,6 +239,7 @@ const validationSchema = Yup.object()
             return Yup.number()
               .min(0, Yup.passValues(sharedMessages.validateNumberGte))
               .max(15, Yup.passValues(sharedMessages.validateNumberLte))
+              .required(sharedMessages.validateRequired)
           }),
           desired_ping_slot_data_rate_index: Yup.lazy(dataRate => {
             if (!isClassB || dataRate === '' || dataRate === undefined) {
@@ -253,6 +253,13 @@ const validationSchema = Yup.object()
           rx2_data_rate_index: Yup.lazy(dataRate => {
             if (dataRate === '' || dataRate === undefined || mode === ACTIVATION_MODES.OTAA) {
               return Yup.number().strip()
+            }
+
+            if (mode === ACTIVATION_MODES.ABP) {
+              return Yup.number()
+                .min(0, Yup.passValues(sharedMessages.validateNumberGte))
+                .max(15, Yup.passValues(sharedMessages.validateNumberLte))
+                .required(sharedMessages.validateRequired)
             }
 
             return Yup.number()
@@ -300,7 +307,9 @@ const validationSchema = Yup.object()
               return Yup.number().strip()
             }
 
-            return Yup.number().min(100000, Yup.passValues(sharedMessages.validateNumberGte))
+            return Yup.number()
+              .min(100000, Yup.passValues(sharedMessages.validateNumberGte))
+              .required(sharedMessages.validateRequired)
           }),
           desired_ping_slot_frequency: Yup.lazy(frequency => {
             if (!Boolean(frequency) || !isClassB) {

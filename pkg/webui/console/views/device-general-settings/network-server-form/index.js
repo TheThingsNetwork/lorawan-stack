@@ -525,7 +525,6 @@ const NetworkServerForm = React.memo(props => {
         isClassB={isClassB}
         isClassC={isClassC}
         isUseAdr={initialUseAdr}
-        initialValues={initialValues}
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />

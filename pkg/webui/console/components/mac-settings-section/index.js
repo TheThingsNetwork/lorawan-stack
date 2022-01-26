@@ -125,14 +125,12 @@ const MacSettingsSection = props => {
     isClassB,
     isClassC,
     isUseAdr,
-    initialValues,
   } = props
 
   const isNewLorawanVersion = parseLorawanMacVersion(lorawanVersion) >= 110
   const isABP = activationMode === ACTIVATION_MODES.ABP
   const isMulticast = activationMode === ACTIVATION_MODES.MULTICAST
   const isOTAA = activationMode === ACTIVATION_MODES.OTAA
-  const toEnableClassB = isClassB && !initialValues.mac_settings.ping_slot_frequency
 
   const [resetsFCnt, setResetsFCnt] = React.useState(isABP && initialFCnt)
   const handleResetsFCntChange = React.useCallback(evt => {
@@ -392,7 +390,7 @@ const MacSettingsSection = props => {
             />
           </Form.FieldContainer>
           <Form.FieldContainer horizontal>
-            {(!isOTAA || toEnableClassB) && (
+            {(!isOTAA || isClassB) && (
               <Form.Field
                 type="number"
                 min={100000}
@@ -416,7 +414,7 @@ const MacSettingsSection = props => {
             />
           </Form.FieldContainer>
           <Form.FieldContainer horizontal>
-            {!isOTAA && (
+            {(!isOTAA || isClassB) && (
               <Form.Field
                 title={m.pingSlotDataRateTitle}
                 name="mac_settings.ping_slot_data_rate_index"
@@ -506,6 +504,7 @@ MacSettingsSection.propTypes = {
   initialValues: PropTypes.shape({
     mac_settings: PropTypes.shape({
       ping_slot_frequency: PropTypes.number,
+      ping_slot_data_rate_index: PropTypes.number,
     }),
   }),
   initiallyCollapsed: PropTypes.bool,
