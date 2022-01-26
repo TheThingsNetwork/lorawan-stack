@@ -20,7 +20,7 @@ import (
 	"strings"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -379,7 +379,7 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
-var defaultGatewayFieldMask = &pbtypes.FieldMask{}
+var defaultGatewayFieldMask store.FieldMask
 
 func init() {
 	paths := make([]string, 0, len(gatewayPBSetters))
@@ -388,7 +388,7 @@ func init() {
 			paths = append(paths, path)
 		}
 	}
-	defaultGatewayFieldMask.Paths = paths
+	defaultGatewayFieldMask = paths
 }
 
 // fieldmask path to column name in gateways table.
@@ -427,27 +427,27 @@ var gatewayColumnNames = map[string][]string{
 	technicalContactField:               {technicalContactField + "_id"},
 }
 
-func (gtw Gateway) toPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) {
+func (gtw Gateway) toPB(pb *ttnpb.Gateway, fieldMask store.FieldMask) {
 	pb.Ids = &ttnpb.GatewayIdentifiers{GatewayId: gtw.GatewayID}
 	pb.Ids.Eui = gtw.GatewayEUI.toPB() // Always present.
 	pb.CreatedAt = ttnpb.ProtoTimePtr(cleanTime(gtw.CreatedAt))
 	pb.UpdatedAt = ttnpb.ProtoTimePtr(cleanTime(gtw.UpdatedAt))
 	pb.DeletedAt = ttnpb.ProtoTime(cleanTimePtr(gtw.DeletedAt))
-	if len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask) == 0 {
 		fieldMask = defaultGatewayFieldMask
 	}
-	for _, path := range fieldMask.Paths {
+	for _, path := range fieldMask {
 		if setter, ok := gatewayPBSetters[path]; ok {
 			setter(pb, &gtw)
 		}
 	}
 }
 
-func (gtw *Gateway) fromPB(pb *ttnpb.Gateway, fieldMask *pbtypes.FieldMask) (columns []string) {
-	if len(fieldMask.GetPaths()) == 0 {
+func (gtw *Gateway) fromPB(pb *ttnpb.Gateway, fieldMask store.FieldMask) (columns []string) {
+	if len(fieldMask) == 0 {
 		fieldMask = defaultGatewayFieldMask
 	}
-	for _, path := range fieldMask.Paths {
+	for _, path := range fieldMask {
 		if setter, ok := gatewayModelSetters[path]; ok {
 			setter(gtw, pb)
 			if columnNames, ok := gatewayColumnNames[path]; ok {

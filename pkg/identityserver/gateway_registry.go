@@ -179,7 +179,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 			if err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 				existing, err = gormstore.GetGatewayStore(db).GetGateway(ctx, &ttnpb.GatewayIdentifiers{
 					Eui: reqGtw.GetIds().GetEui(),
-				}, &pbtypes.FieldMask{Paths: []string{"ids.gateway_id", "ids.eui", "administrative_contact"}})
+				}, []string{"ids.gateway_id", "ids.eui", "administrative_contact"})
 				return err
 			}); err == nil {
 				attributes := []interface{}{
@@ -226,7 +226,7 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		gtw, err = gormstore.GetGatewayStore(db).GetGateway(ctx, req.GetGatewayIds(), req.FieldMask)
+		gtw, err = gormstore.GetGatewayStore(db).GetGateway(ctx, req.GetGatewayIds(), req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -299,7 +299,7 @@ func (is *IdentityServer) getGatewayIdentifiersForEUI(ctx context.Context, req *
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
 		gtw, err := gormstore.GetGatewayStore(db).GetGateway(ctx, &ttnpb.GatewayIdentifiers{
 			Eui: req.Eui,
-		}, &pbtypes.FieldMask{Paths: []string{"ids.gateway_id", "ids.eui"}})
+		}, []string{"ids.gateway_id", "ids.eui"})
 		if err != nil {
 			return err
 		}
@@ -380,7 +380,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 				gtwIDs = append(gtwIDs, gtwID)
 			}
 		}
-		gtws.Gateways, err = gormstore.GetGatewayStore(db).FindGateways(ctx, gtwIDs, req.FieldMask)
+		gtws.Gateways, err = gormstore.GetGatewayStore(db).FindGateways(ctx, gtwIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -566,7 +566,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 		if err := validateContactIsCollaborator(ctx, db, req.Gateway.TechnicalContact, req.Gateway.GetEntityIdentifiers()); err != nil {
 			return err
 		}
-		gtw, err = gormstore.GetGatewayStore(db).UpdateGateway(ctx, reqGtw, req.FieldMask)
+		gtw, err = gormstore.GetGatewayStore(db).UpdateGateway(ctx, reqGtw, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}

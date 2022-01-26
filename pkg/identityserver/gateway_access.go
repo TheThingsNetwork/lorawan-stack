@@ -187,7 +187,7 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 			}
 		}
 
-		key, err = gormstore.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GetGatewayIds().GetEntityIdentifiers(), apiKey, req.FieldMask)
+		key, err = gormstore.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GetGatewayIds().GetEntityIdentifiers(), apiKey, req.FieldMask.GetPaths())
 		return err
 	})
 	if err != nil {

@@ -113,7 +113,7 @@ func (is *IdentityServer) getEndDevice(ctx context.Context, req *ttnpb.GetEndDev
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		dev, err = gormstore.GetEndDeviceStore(db).GetEndDevice(ctx, req.EndDeviceIds, req.FieldMask)
+		dev, err = gormstore.GetEndDeviceStore(db).GetEndDevice(ctx, req.EndDeviceIds, req.FieldMask.GetPaths())
 		return err
 	})
 	if err != nil {
@@ -130,7 +130,7 @@ func (is *IdentityServer) getEndDeviceIdentifiersForEUIs(ctx context.Context, re
 		dev, err := gormstore.GetEndDeviceStore(db).GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
 			JoinEui: &req.JoinEui,
 			DevEui:  &req.DevEui,
-		}, &pbtypes.FieldMask{Paths: []string{"ids.application_ids.application_id", "ids.device_id", "ids.join_eui", "ids.dev_eui"}})
+		}, []string{"ids.application_ids.application_id", "ids.device_id", "ids.join_eui", "ids.dev_eui"})
 		if err != nil {
 			return err
 		}
@@ -164,7 +164,7 @@ func (is *IdentityServer) listEndDevices(ctx context.Context, req *ttnpb.ListEnd
 	}()
 	devs = &ttnpb.EndDevices{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		devs.EndDevices, err = gormstore.GetEndDeviceStore(db).ListEndDevices(ctx, req.GetApplicationIds(), req.FieldMask)
+		devs.EndDevices, err = gormstore.GetEndDeviceStore(db).ListEndDevices(ctx, req.GetApplicationIds(), req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -220,7 +220,7 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		dev, err = gormstore.GetEndDeviceStore(db).UpdateEndDevice(ctx, req.EndDevice, req.FieldMask)
+		dev, err = gormstore.GetEndDeviceStore(db).UpdateEndDevice(ctx, req.EndDevice, req.FieldMask.GetPaths())
 		return err
 	})
 	if err != nil {

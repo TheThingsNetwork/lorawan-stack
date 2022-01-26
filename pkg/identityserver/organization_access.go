@@ -186,7 +186,7 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 			}
 		}
 
-		key, err = gormstore.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), req.ApiKey, req.FieldMask)
+		key, err = gormstore.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), req.ApiKey, req.FieldMask.GetPaths())
 		return err
 	})
 	if err != nil {

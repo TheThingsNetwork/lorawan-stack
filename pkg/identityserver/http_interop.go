@@ -17,7 +17,6 @@ package identityserver
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
@@ -45,9 +44,7 @@ func (srv *interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSR
 
 	var dev *ttnpb.EndDevice
 	err := srv.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		dev, err = store.GetEndDeviceStore(db).GetEndDevice(ctx, ids, &pbtypes.FieldMask{
-			Paths: []string{"network_server_address"},
-		})
+		dev, err = store.GetEndDeviceStore(db).GetEndDevice(ctx, ids, []string{"network_server_address"})
 		return err
 	})
 	if err != nil {

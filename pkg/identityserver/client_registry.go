@@ -183,7 +183,7 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 		defer func() { cli = cli.PublicSafe() }()
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		cli, err = gormstore.GetClientStore(db).GetClient(ctx, req.GetClientIds(), req.FieldMask)
+		cli, err = gormstore.GetClientStore(db).GetClient(ctx, req.GetClientIds(), req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -263,7 +263,7 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 				cliIDs = append(cliIDs, cliID)
 			}
 		}
-		clis.Clients, err = gormstore.GetClientStore(db).FindClients(ctx, cliIDs, req.FieldMask)
+		clis.Clients, err = gormstore.GetClientStore(db).FindClients(ctx, cliIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -324,7 +324,7 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 		if err := validateContactIsCollaborator(ctx, db, req.Client.TechnicalContact, req.Client.GetEntityIdentifiers()); err != nil {
 			return err
 		}
-		cli, err = gormstore.GetClientStore(db).UpdateClient(ctx, req.Client, req.FieldMask)
+		cli, err = gormstore.GetClientStore(db).UpdateClient(ctx, req.Client, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}

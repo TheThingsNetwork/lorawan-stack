@@ -15,8 +15,8 @@
 package store
 
 import (
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/lib/pq"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -123,7 +123,7 @@ var clientModelSetters = map[string]func(*Client, *ttnpb.Client){
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
-var defaultClientFieldMask = &pbtypes.FieldMask{}
+var defaultClientFieldMask store.FieldMask
 
 func init() {
 	paths := make([]string, 0, len(clientPBSetters))
@@ -132,7 +132,7 @@ func init() {
 			paths = append(paths, path)
 		}
 	}
-	defaultClientFieldMask.Paths = paths
+	defaultClientFieldMask = paths
 }
 
 // fieldmask path to column name in clients table.
@@ -154,26 +154,26 @@ var clientColumnNames = map[string][]string{
 	technicalContactField:      {technicalContactField + "_id"},
 }
 
-func (cli Client) toPB(pb *ttnpb.Client, fieldMask *pbtypes.FieldMask) {
+func (cli Client) toPB(pb *ttnpb.Client, fieldMask store.FieldMask) {
 	pb.Ids = &ttnpb.ClientIdentifiers{ClientId: cli.ClientID}
 	pb.CreatedAt = ttnpb.ProtoTimePtr(cleanTime(cli.CreatedAt))
 	pb.UpdatedAt = ttnpb.ProtoTimePtr(cleanTime(cli.UpdatedAt))
 	pb.DeletedAt = ttnpb.ProtoTime(cleanTimePtr(cli.DeletedAt))
-	if len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask) == 0 {
 		fieldMask = defaultClientFieldMask
 	}
-	for _, path := range fieldMask.Paths {
+	for _, path := range fieldMask {
 		if setter, ok := clientPBSetters[path]; ok {
 			setter(pb, &cli)
 		}
 	}
 }
 
-func (cli *Client) fromPB(pb *ttnpb.Client, fieldMask *pbtypes.FieldMask) (columns []string) {
-	if len(fieldMask.GetPaths()) == 0 {
+func (cli *Client) fromPB(pb *ttnpb.Client, fieldMask store.FieldMask) (columns []string) {
+	if len(fieldMask) == 0 {
 		fieldMask = defaultClientFieldMask
 	}
-	for _, path := range fieldMask.Paths {
+	for _, path := range fieldMask {
 		if setter, ok := clientModelSetters[path]; ok {
 			setter(cli, pb)
 			if columnNames, ok := clientColumnNames[path]; ok {

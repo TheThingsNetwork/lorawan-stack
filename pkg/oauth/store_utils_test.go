@@ -17,7 +17,6 @@ package oauth_test
 import (
 	"context"
 
-	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
@@ -28,7 +27,7 @@ type mockStoreContents struct {
 	calls []string
 	req   struct {
 		ctx               context.Context
-		fieldMask         *types.FieldMask
+		fieldMask         store.FieldMask
 		session           *ttnpb.UserSession
 		sessionID         string
 		userIDs           *ttnpb.UserIdentifiers
@@ -82,7 +81,7 @@ var (
 	mockErrNotFound        = grpc.Errorf(codes.NotFound, "NotFound")
 )
 
-func (s *mockStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fieldMask *types.FieldMask) (*ttnpb.User, error) {
+func (s *mockStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fieldMask store.FieldMask) (*ttnpb.User, error) {
 	s.req.ctx, s.req.userIDs, s.req.fieldMask = ctx, id, fieldMask
 	s.calls = append(s.calls, "GetUser")
 	return s.res.user, s.err.getUser
@@ -100,7 +99,7 @@ func (s *mockStore) DeleteSession(ctx context.Context, userIDs *ttnpb.UserIdenti
 	return s.err.deleteSession
 }
 
-func (s *mockStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers, fieldMask *types.FieldMask) (*ttnpb.Client, error) {
+func (s *mockStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers, fieldMask store.FieldMask) (*ttnpb.Client, error) {
 	s.req.ctx, s.req.clientIDs, s.req.fieldMask = ctx, id, fieldMask
 	s.calls = append(s.calls, "GetClient")
 	return s.res.client, s.err.getClient

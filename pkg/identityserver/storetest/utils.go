@@ -15,22 +15,17 @@
 package storetest
 
 import (
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-func fieldMask(paths ...string) *pbtypes.FieldMask {
-	return &pbtypes.FieldMask{Paths: ttnpb.ExcludeFields(
+func fieldMask(paths ...string) []string {
+	return ttnpb.ExcludeFields(
 		paths,
 		"ids",
 		"created_at",
 		"updated_at",
 		"deleted_at",
-	)}
-}
-
-func fieldMaskWith(mask *pbtypes.FieldMask, paths ...string) *pbtypes.FieldMask {
-	return &pbtypes.FieldMask{Paths: append(mask.Paths, paths...)}
+	)
 }
 
 var attributes = map[string]string{

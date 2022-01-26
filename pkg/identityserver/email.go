@@ -17,7 +17,6 @@ package identityserver
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/email/sendgrid"
@@ -78,9 +77,7 @@ func (is *IdentityServer) SendEmail(ctx context.Context, f func(emails.Data) ema
 func (is *IdentityServer) SendUserEmail(ctx context.Context, userIDs *ttnpb.UserIdentifiers, makeMessage func(emails.Data) email.MessageData) error {
 	var usr *ttnpb.User
 	err := is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		usr, err = store.GetUserStore(db).GetUser(ctx, userIDs, &pbtypes.FieldMask{
-			Paths: []string{"name", "primary_email_address"},
-		})
+		usr, err = store.GetUserStore(db).GetUser(ctx, userIDs, []string{"name", "primary_email_address"})
 		if err != nil {
 			return err
 		}
@@ -103,9 +100,7 @@ func (is *IdentityServer) SendUserEmail(ctx context.Context, userIDs *ttnpb.User
 func (is *IdentityServer) SendAdminsEmail(ctx context.Context, makeMessage func(emails.Data) email.MessageData) error {
 	var users []*ttnpb.User
 	err := is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		users, err = store.GetUserStore(db).ListAdmins(ctx, &pbtypes.FieldMask{
-			Paths: []string{"name", "primary_email_address"},
-		})
+		users, err = store.GetUserStore(db).ListAdmins(ctx, []string{"name", "primary_email_address"})
 		if err != nil {
 			return err
 		}

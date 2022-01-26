@@ -17,7 +17,7 @@ package store
 import (
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -168,7 +168,7 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
-var defaultEndDeviceFieldMask = &pbtypes.FieldMask{}
+var defaultEndDeviceFieldMask store.FieldMask
 
 func init() {
 	paths := make([]string, 0, len(devicePBSetters))
@@ -177,7 +177,7 @@ func init() {
 			paths = append(paths, path)
 		}
 	}
-	defaultEndDeviceFieldMask.Paths = paths
+	defaultEndDeviceFieldMask = paths
 }
 
 // fieldmask path to column name in devices table.
@@ -201,7 +201,7 @@ var deviceColumnNames = map[string][]string{
 	activatedAtField:              {activatedAtField},
 }
 
-func (dev EndDevice) toPB(pb *ttnpb.EndDevice, fieldMask *pbtypes.FieldMask) {
+func (dev EndDevice) toPB(pb *ttnpb.EndDevice, fieldMask store.FieldMask) {
 	if pb.Ids == nil {
 		pb.Ids = &ttnpb.EndDeviceIdentifiers{}
 	}
@@ -213,21 +213,21 @@ func (dev EndDevice) toPB(pb *ttnpb.EndDevice, fieldMask *pbtypes.FieldMask) {
 	pb.Ids.DevEui = dev.DevEUI.toPB()   // Always present.
 	pb.CreatedAt = ttnpb.ProtoTimePtr(cleanTime(dev.CreatedAt))
 	pb.UpdatedAt = ttnpb.ProtoTimePtr(cleanTime(dev.UpdatedAt))
-	if len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask) == 0 {
 		fieldMask = defaultEndDeviceFieldMask
 	}
-	for _, path := range fieldMask.Paths {
+	for _, path := range fieldMask {
 		if setter, ok := devicePBSetters[path]; ok {
 			setter(pb, &dev)
 		}
 	}
 }
 
-func (dev *EndDevice) fromPB(pb *ttnpb.EndDevice, fieldMask *pbtypes.FieldMask) (columns []string) {
-	if len(fieldMask.GetPaths()) == 0 {
+func (dev *EndDevice) fromPB(pb *ttnpb.EndDevice, fieldMask store.FieldMask) (columns []string) {
+	if len(fieldMask) == 0 {
 		fieldMask = defaultEndDeviceFieldMask
 	}
-	for _, path := range fieldMask.Paths {
+	for _, path := range fieldMask {
 		if setter, ok := deviceModelSetters[path]; ok {
 			setter(dev, pb)
 			if columnNames, ok := deviceColumnNames[path]; ok {

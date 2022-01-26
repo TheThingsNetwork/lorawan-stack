@@ -169,7 +169,7 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 			}
 		}
 
-		key, err = gormstore.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.UserIds.GetEntityIdentifiers(), req.ApiKey, req.FieldMask)
+		key, err = gormstore.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.UserIds.GetEntityIdentifiers(), req.ApiKey, req.FieldMask.GetPaths())
 		return err
 	})
 	if err != nil {
@@ -225,7 +225,7 @@ func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.Creat
 	if is.IsAdmin(ctx) {
 		canSkipEmail = true // Admin callers can skip sending emails.
 		err := is.withDatabase(ctx, func(db *gorm.DB) error {
-			usr, err := gormstore.GetUserStore(db).GetUser(ctx, req.GetUserIds(), &pbtypes.FieldMask{Paths: []string{"admin"}})
+			usr, err := gormstore.GetUserStore(db).GetUser(ctx, req.GetUserIds(), []string{"admin"})
 			if !usr.Admin {
 				canReturnToken = true // Admin callers can get login tokens for non-admin users.
 			}

@@ -17,7 +17,7 @@ package store
 import (
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -138,7 +138,7 @@ var userModelSetters = map[string]func(*User, *ttnpb.User){
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
-var defaultUserFieldMask = &pbtypes.FieldMask{}
+var defaultUserFieldMask store.FieldMask
 
 func init() {
 	paths := make([]string, 0, len(userPBSetters))
@@ -147,7 +147,7 @@ func init() {
 			paths = append(paths, path)
 		}
 	}
-	defaultUserFieldMask.Paths = paths
+	defaultUserFieldMask = paths
 }
 
 // fieldmask path to column name in users table.
@@ -169,26 +169,26 @@ var userColumnNames = map[string][]string{
 	temporaryPasswordExpiresAtField:     {temporaryPasswordExpiresAtField},
 }
 
-func (usr User) toPB(pb *ttnpb.User, fieldMask *pbtypes.FieldMask) {
+func (usr User) toPB(pb *ttnpb.User, fieldMask store.FieldMask) {
 	pb.Ids = &ttnpb.UserIdentifiers{UserId: usr.Account.UID}
 	pb.CreatedAt = ttnpb.ProtoTimePtr(cleanTime(usr.CreatedAt))
 	pb.UpdatedAt = ttnpb.ProtoTimePtr(cleanTime(usr.UpdatedAt))
 	pb.DeletedAt = ttnpb.ProtoTime(cleanTimePtr(usr.DeletedAt))
-	if len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask) == 0 {
 		fieldMask = defaultUserFieldMask
 	}
-	for _, path := range fieldMask.Paths {
+	for _, path := range fieldMask {
 		if setter, ok := userPBSetters[path]; ok {
 			setter(pb, &usr)
 		}
 	}
 }
 
-func (usr *User) fromPB(pb *ttnpb.User, fieldMask *pbtypes.FieldMask) (columns []string) {
-	if len(fieldMask.GetPaths()) == 0 {
+func (usr *User) fromPB(pb *ttnpb.User, fieldMask store.FieldMask) (columns []string) {
+	if len(fieldMask) == 0 {
 		fieldMask = defaultUserFieldMask
 	}
-	for _, path := range fieldMask.Paths {
+	for _, path := range fieldMask {
 		if setter, ok := userModelSetters[path]; ok {
 			setter(usr, pb)
 			if columnNames, ok := userColumnNames[path]; ok {
@@ -207,7 +207,7 @@ type userWithUID struct {
 
 func (userWithUID) TableName() string { return "users" }
 
-func (u userWithUID) toPB(pb *ttnpb.User, fieldMask *pbtypes.FieldMask) {
+func (u userWithUID) toPB(pb *ttnpb.User, fieldMask store.FieldMask) {
 	u.User.Account.UID = u.UID
 	u.User.toPB(pb, fieldMask)
 }

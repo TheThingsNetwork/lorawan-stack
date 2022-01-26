@@ -19,7 +19,6 @@ import (
 	"os"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/howeyc/gopass"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
@@ -83,14 +82,14 @@ var createAdminUserCommand = &cobra.Command{
 
 		now := time.Now()
 
-		usrFieldMask := &pbtypes.FieldMask{Paths: []string{
+		usrFieldMask := []string{
 			"primary_email_address",
 			"primary_email_address_validated_at",
 			"password",
 			"password_updated_at",
 			"state",
 			"admin",
-		}}
+		}
 		usr := &ttnpb.User{
 			Ids: &ttnpb.UserIdentifiers{UserId: userID},
 		}

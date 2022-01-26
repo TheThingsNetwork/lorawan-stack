@@ -15,7 +15,7 @@
 package store
 
 import (
-	pbtypes "github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -95,7 +95,7 @@ var applicationModelSetters = map[string]func(*Application, *ttnpb.Application){
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
-var defaultApplicationFieldMask = &pbtypes.FieldMask{}
+var defaultApplicationFieldMask store.FieldMask
 
 func init() {
 	paths := make([]string, 0, len(applicationPBSetters))
@@ -104,7 +104,7 @@ func init() {
 			paths = append(paths, path)
 		}
 	}
-	defaultApplicationFieldMask.Paths = paths
+	defaultApplicationFieldMask = paths
 }
 
 // fieldmask path to column name in applications table.
@@ -118,26 +118,26 @@ var applicationColumnNames = map[string][]string{
 	technicalContactField:      {technicalContactField + "_id"},
 }
 
-func (app Application) toPB(pb *ttnpb.Application, fieldMask *pbtypes.FieldMask) {
+func (app Application) toPB(pb *ttnpb.Application, fieldMask store.FieldMask) {
 	pb.Ids = &ttnpb.ApplicationIdentifiers{ApplicationId: app.ApplicationID}
 	pb.CreatedAt = ttnpb.ProtoTimePtr(cleanTime(app.CreatedAt))
 	pb.UpdatedAt = ttnpb.ProtoTimePtr(cleanTime(app.UpdatedAt))
 	pb.DeletedAt = ttnpb.ProtoTime(cleanTimePtr(app.DeletedAt))
-	if len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask) == 0 {
 		fieldMask = defaultApplicationFieldMask
 	}
-	for _, path := range fieldMask.GetPaths() {
+	for _, path := range fieldMask {
 		if setter, ok := applicationPBSetters[path]; ok {
 			setter(pb, &app)
 		}
 	}
 }
 
-func (app *Application) fromPB(pb *ttnpb.Application, fieldMask *pbtypes.FieldMask) (columns []string) {
-	if len(fieldMask.GetPaths()) == 0 {
+func (app *Application) fromPB(pb *ttnpb.Application, fieldMask store.FieldMask) (columns []string) {
+	if len(fieldMask) == 0 {
 		fieldMask = defaultApplicationFieldMask
 	}
-	for _, path := range fieldMask.GetPaths() {
+	for _, path := range fieldMask {
 		if setter, ok := applicationModelSetters[path]; ok {
 			setter(app, pb)
 			if columnNames, ok := applicationColumnNames[path]; ok {

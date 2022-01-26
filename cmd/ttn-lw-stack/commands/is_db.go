@@ -18,7 +18,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/cobra"
 	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
@@ -118,27 +117,27 @@ var (
 				return err
 			}
 			// Find expired applications.
-			expiredApplications, err := appStore.FindApplications(ctx, []*ttnpb.ApplicationIdentifiers{}, &types.FieldMask{Paths: []string{"ids", "deleted_at"}})
+			expiredApplications, err := appStore.FindApplications(ctx, []*ttnpb.ApplicationIdentifiers{}, []string{"ids", "deleted_at"})
 			if err != nil {
 				return err
 			}
 			// Find expired users.
-			expiredUsers, err := userStore.FindUsers(ctx, []*ttnpb.UserIdentifiers{}, &types.FieldMask{Paths: []string{"ids", "deleted_at"}})
+			expiredUsers, err := userStore.FindUsers(ctx, []*ttnpb.UserIdentifiers{}, []string{"ids", "deleted_at"})
 			if err != nil {
 				return err
 			}
 			// Find expired organizations.
-			expiredOrganizations, err := organizationStore.FindOrganizations(ctx, []*ttnpb.OrganizationIdentifiers{}, &types.FieldMask{Paths: []string{"ids", "deleted_at"}})
+			expiredOrganizations, err := organizationStore.FindOrganizations(ctx, []*ttnpb.OrganizationIdentifiers{}, []string{"ids", "deleted_at"})
 			if err != nil {
 				return err
 			}
 			// Find expired gateways.
-			expiredGateways, err := gatewayStore.FindGateways(ctx, []*ttnpb.GatewayIdentifiers{}, &types.FieldMask{Paths: []string{"ids", "deleted_at"}})
+			expiredGateways, err := gatewayStore.FindGateways(ctx, []*ttnpb.GatewayIdentifiers{}, []string{"ids", "deleted_at"})
 			if err != nil {
 				return err
 			}
 			// Find expired clients.
-			expiredClients, err := clientStore.FindClients(ctx, []*ttnpb.ClientIdentifiers{}, &types.FieldMask{Paths: []string{"ids", "deleted_at"}})
+			expiredClients, err := clientStore.FindClients(ctx, []*ttnpb.ClientIdentifiers{}, []string{"ids", "deleted_at"})
 			if err != nil {
 				return err
 			}

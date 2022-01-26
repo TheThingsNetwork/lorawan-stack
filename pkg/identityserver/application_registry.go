@@ -146,7 +146,7 @@ func (is *IdentityServer) getApplication(ctx context.Context, req *ttnpb.GetAppl
 		defer func() { app = app.PublicSafe() }()
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		app, err = gormstore.GetApplicationStore(db).GetApplication(ctx, req.GetApplicationIds(), req.FieldMask)
+		app, err = gormstore.GetApplicationStore(db).GetApplication(ctx, req.GetApplicationIds(), req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -241,7 +241,7 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 				appIDs = append(appIDs, appID)
 			}
 		}
-		apps.Applications, err = gormstore.GetApplicationStore(db).FindApplications(ctx, appIDs, req.FieldMask)
+		apps.Applications, err = gormstore.GetApplicationStore(db).FindApplications(ctx, appIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -282,7 +282,7 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 		if err := validateContactIsCollaborator(ctx, db, req.Application.TechnicalContact, req.Application.GetEntityIdentifiers()); err != nil {
 			return err
 		}
-		app, err = gormstore.GetApplicationStore(db).UpdateApplication(ctx, req.Application, req.FieldMask)
+		app, err = gormstore.GetApplicationStore(db).UpdateApplication(ctx, req.Application, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
