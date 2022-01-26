@@ -20,6 +20,7 @@ import { defineMessages } from 'react-intl'
 import api from '@account/api'
 
 import Button from '@ttn-lw/components/button'
+import ButtonGroup from '@ttn-lw/components/button/group'
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import SubmitButton from '@ttn-lw/components/submit-button'
@@ -143,22 +144,18 @@ const Login = () => {
           type="password"
           required
         />
-        <div className={style.buttons}>
+        <ButtonGroup>
           <Form.Submit
             component={SubmitButton}
             message={sharedMessages.login}
             className={style.submitButton}
+            error={Boolean(error)}
           />
           {enableUserRegistration && (
-            <Button.Link to={`/register${location.search}`} secondary message={m.createAccount} />
+            <Button.Link to={`/register${location.search}`} message={m.createAccount} />
           )}
-          <Button.Link
-            naked
-            secondary
-            message={m.forgotPassword}
-            to={`/forgot-password${location.search}`}
-          />
-        </div>
+          <Button.Link naked message={m.forgotPassword} to={`/forgot-password${location.search}`} />
+        </ButtonGroup>
       </Form>
     </div>
   )

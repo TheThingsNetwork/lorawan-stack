@@ -132,7 +132,6 @@ class KeyValueMap extends React.PureComponent {
             onClick={this.addEmptyEntry}
             disabled={disabled}
             icon="add"
-            secondary
           />
         </div>
       </div>

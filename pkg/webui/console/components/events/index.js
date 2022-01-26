@@ -96,27 +96,16 @@ const Events = React.memo(
                   onClick={onExport}
                   message={sharedMessages.exportJson}
                   naked
-                  secondary
                   icon="file_download"
-                  responsiveLabel
                 />
                 <Button
                   onClick={onPause}
                   message={paused ? sharedMessages.resume : sharedMessages.pause}
                   naked
-                  secondary={!paused}
                   warning={paused}
                   icon={paused ? 'play_arrow' : 'pause'}
-                  responsiveLabel
                 />
-                <Button
-                  onClick={onClear}
-                  message={sharedMessages.clear}
-                  naked
-                  secondary
-                  icon="delete"
-                  responsiveLabel
-                />
+                <Button onClick={onClear} message={sharedMessages.clear} naked icon="delete" />
               </div>
             </div>
           </div>

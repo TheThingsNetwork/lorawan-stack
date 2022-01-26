@@ -449,7 +449,7 @@ export default class DeviceImporter extends Component {
             onClick={hasErrored ? this.handleReset : redirectToList}
           />
           {status === 'processing' && step === 'creation' && (
-            <Button secondary message={m.abort} onClick={this.handleAbort} />
+            <Button message={m.abort} onClick={this.handleAbort} />
           )}
         </SubmitBar>
       </div>

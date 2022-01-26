@@ -351,6 +351,7 @@ class FetchTable extends Component {
                 {actionItems}
                 {mayAdd && (
                   <Button.Link
+                    primary
                     className={style.addButton}
                     message={addMessage}
                     icon="add"

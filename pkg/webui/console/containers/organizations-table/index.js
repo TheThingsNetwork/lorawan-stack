@@ -20,6 +20,7 @@ import { defineMessages } from 'react-intl'
 import toast from '@ttn-lw/components/toast'
 import Button from '@ttn-lw/components/button'
 import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
+import ButtonGroup from '@ttn-lw/components/button/group'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
@@ -146,8 +147,8 @@ const OrganizationsTable = props => {
           purge: handlePurge.bind(null, row.ids.organization_id),
         }),
         render: details => (
-          <>
-            <Button message={sharedMessages.restore} secondary onClick={details.restore} />
+          <ButtonGroup align="end">
+            <Button message={sharedMessages.restore} onClick={details.restore} />
             <DeleteModalButton
               entityId={details.id}
               entityName={name}
@@ -155,7 +156,7 @@ const OrganizationsTable = props => {
               onApprove={details.purge}
               onlyPurge
             />
-          </>
+          </ButtonGroup>
         ),
       })
     } else {

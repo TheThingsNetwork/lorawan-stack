@@ -156,7 +156,6 @@ export default class GatewayOverview extends React.Component {
           <Button
             type="button"
             icon="get_app"
-            secondary
             onClick={this.handleGlobalConfDownload}
             message={m.downloadGlobalConf}
           />

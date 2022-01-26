@@ -26,6 +26,7 @@ import Input from '@ttn-lw/components/input'
 import Form from '@ttn-lw/components/form'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import Spinner from '@ttn-lw/components/spinner'
+import ButtonGroup from '@ttn-lw/components/button/group'
 
 import Message from '@ttn-lw/lib/components/message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -190,19 +191,14 @@ const CreateAccount = ({ location }) => {
             autoComplete="new-password"
             component={Input}
           />
-          <div className={style.buttons}>
+          <ButtonGroup>
             <Form.Submit
               component={SubmitButton}
               message={m.createAccount}
               className={style.submitButton}
             />
-            <Button.Link
-              to={`/login${location.search}`}
-              naked
-              secondary
-              message={sharedMessages.login}
-            />
-          </div>
+            <Button.Link to={`/login${location.search}`} naked message={sharedMessages.login} />
+          </ButtonGroup>
         </Form>
       </div>
     </>

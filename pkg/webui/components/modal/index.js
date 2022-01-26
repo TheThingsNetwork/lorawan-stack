@@ -24,6 +24,8 @@ import Message from '@ttn-lw/lib/components/message'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
+import ButtonGroup from '../button/group'
+
 import style from './modal.styl'
 
 const Modal = props => {
@@ -110,6 +112,7 @@ const Modal = props => {
   let buttons = (
     <div>
       <Button
+        primary
         message={approveButtonMessage}
         onClick={handleApprove}
         icon="check"
@@ -121,9 +124,8 @@ const Modal = props => {
 
   if (approval) {
     buttons = (
-      <div>
+      <ButtonGroup>
         <Button
-          secondary
           message={cancelButtonMessage}
           onClick={handleCancel}
           name={formName}
@@ -133,6 +135,7 @@ const Modal = props => {
           {...cancelButtonProps}
         />
         <Button
+          primary
           message={approveButtonMessage}
           onClick={handleApprove}
           name={formName}
@@ -143,7 +146,7 @@ const Modal = props => {
           {...name}
           {...approveButtonProps}
         />
-      </div>
+      </ButtonGroup>
     )
   }
 

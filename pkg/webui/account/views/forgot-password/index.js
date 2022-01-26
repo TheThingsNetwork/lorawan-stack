@@ -23,6 +23,7 @@ import Button from '@ttn-lw/components/button'
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import SubmitButton from '@ttn-lw/components/submit-button'
+import ButtonGroup from '@ttn-lw/components/button/group'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import Message from '@ttn-lw/lib/components/message'
@@ -101,13 +102,10 @@ const ForgotPassword = ({ location }) => {
           autoFocus
           required
         />
-        <Form.Submit component={SubmitButton} message={m.send} className={style.submitButton} />
-        <Button.Link
-          naked
-          secondary
-          message={sharedMessages.cancel}
-          to={`/login${location.search}`}
-        />
+        <ButtonGroup>
+          <Form.Submit component={SubmitButton} message={m.send} className={style.submitButton} />
+          <Button.Link naked message={sharedMessages.cancel} to={`/login${location.search}`} />
+        </ButtonGroup>
       </Form>
     </div>
   )

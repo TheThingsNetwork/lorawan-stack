@@ -171,7 +171,7 @@ const TestForm = props => {
           <Form.Submit
             component={SubmitButton}
             message={uplink ? m.testDecoder : m.testEncoder}
-            secondary
+            primary={false}
           />
         </SubmitBar>
       </Form>

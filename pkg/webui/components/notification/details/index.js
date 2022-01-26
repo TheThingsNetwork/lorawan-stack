@@ -76,7 +76,6 @@ export default class Details extends React.PureComponent {
         <Button
           className={style.detailsButton}
           naked
-          secondary
           onClick={this.toggleDropdown}
           icon={buttonIcon}
           message={buttonText}

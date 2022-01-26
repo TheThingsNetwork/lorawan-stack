@@ -40,7 +40,7 @@ const WizardPrevButton = props => {
   const { title: prevMessage } = steps[currentStepIndex - 1] || { title: m.prev }
 
   return (
-    <Button className={style.button} secondary onClick={onPrevStep} type="button">
+    <Button className={style.button} onClick={onPrevStep} type="button">
       <Button.Icon icon="keyboard_arrow_left" type="left" />
       <Message className={style.messagePrev} content={prevMessage} />
     </Button>

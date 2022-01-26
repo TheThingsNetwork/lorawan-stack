@@ -41,8 +41,6 @@ import { mayViewMqttConnectionInfo } from '@console/lib/feature-checks'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
-import style from './application-integrations-mqtt.styl'
-
 const m = defineMessages({
   publicAddress: 'Public address',
   publicTlsAddress: 'Public TLS address',
@@ -152,16 +150,16 @@ export default class ApplicationMqtt extends React.Component {
       connectionData[0].items.push({
         key: sharedMessages.password,
         value: (
-          <React.Fragment>
+          <>
             <Button
-              className={style.generateApiKeyButton}
               message={m.generateApiKey}
               onClick={this.handleGeneratePasswordClick}
+              className="mr-cs-s"
             />
-            <Link to={`/applications/${appId}/api-keys`} secondary>
+            <Link to={`/applications/${appId}/api-keys`} naked secondary>
               <Message content={m.goToApiKeys} />
             </Link>
-          </React.Fragment>
+          </>
         ),
       })
     }
@@ -172,8 +170,8 @@ export default class ApplicationMqtt extends React.Component {
           <PageTitle title={sharedMessages.mqtt} />
           <Row>
             <Col lg={8} md={12}>
-              <Message component="p" content={m.mqttInfoText} className={style.info} />
-              <hr className={style.hRule} />
+              <Message component="p" content={m.mqttInfoText} className="mt-0" />
+              <hr className="mb-ls-s" />
               <DataSheet data={connectionData} />
             </Col>
           </Row>

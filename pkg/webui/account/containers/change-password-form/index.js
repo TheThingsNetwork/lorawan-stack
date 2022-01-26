@@ -125,7 +125,7 @@ const ChangePasswordForm = ({ userId, old, cancelRoute, onSubmitSuccess }) => {
       {usesTemporaryPw ? (
         <>
           <Form.Submit component={SubmitButton} message={sharedMessages.changePassword} />
-          <Button.Link to={cancelRoute} naked secondary message={sharedMessages.cancel} />
+          <Button.Link to={cancelRoute} naked message={sharedMessages.cancel} />
         </>
       ) : (
         <SubmitBar>

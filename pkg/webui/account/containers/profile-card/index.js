@@ -45,7 +45,7 @@ const ProfileCard = () => {
           <h3>{userName || userId}</h3>
           {Boolean(userName) && <span className={style.userId}>{userId}</span>}
         </div>
-        <Button.Link to="/profile-settings" secondary icon="edit" message={m.editProfileSettings} />
+        <Button.Link to="/profile-settings" icon="edit" message={m.editProfileSettings} />
       </div>
     </section>
   )
