@@ -5750,6 +5750,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/interop:dns_lookup_not_supported": {
+    "translations": {
+      "en": "DNS lookup is not supported"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "client.go"
+    }
+  },
   "error:pkg/interop:f_port": {
     "translations": {
       "en": "invalid FPort"
@@ -5849,6 +5858,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/interop:missing_nsid": {
+    "translations": {
+      "en": "missing NSID"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "client.go"
+    }
+  },
   "error:pkg/interop:no_action": {
     "translations": {
       "en": "no action"
@@ -5903,6 +5921,15 @@
       "file": "errors.go"
     }
   },
+  "error:pkg/interop:nsid_not_supported": {
+    "translations": {
+      "en": "NSID not supported"
+    },
+    "description": {
+      "package": "pkg/interop",
+      "file": "client.go"
+    }
+  },
   "error:pkg/interop:protocol_version": {
     "translations": {
       "en": "invalid protocol version"
@@ -5950,7 +5977,7 @@
   },
   "error:pkg/interop:unexpected_result": {
     "translations": {
-      "en": "unexpected result code {code}"
+      "en": "unexpected result code `{result_code}`"
     },
     "description": {
       "package": "pkg/interop",

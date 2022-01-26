@@ -166,12 +166,14 @@ func parseResult(r Result) error {
 	if r.ResultCode == ResultSuccess {
 		return nil
 	}
-
 	err, ok := resultErrors[r.ResultCode]
 	if ok {
-		return err
+		return err.WithAttributes("result_description", r.Description)
 	}
-	return errUnexpectedResult.WithAttributes("code", r.ResultCode)
+	return errUnexpectedResult.WithAttributes(
+		"result_code", r.ResultCode,
+		"result_description", r.Description,
+	)
 }
 
 // GetAppSKey performs AppSKey request according to LoRaWAN Backend Interfaces specification.
