@@ -15,6 +15,7 @@ For details about compatibility between different releases, see the **Commitment
 - Fix copy button in API key modal in the Console.
 - Enable copying and format transformations of byte values in the event previews in the Console.
 - Attribute `administrative_contact` on "gateway eui taken" error to help users resolve gateway EUI conflicts.
+- Add retry capability for cli requests. Can be configured with the options found in `retry-config`, some of the configuration options are `retry-config.max` and `retry-config.default-timeout`.
 
 ### Changed
 
