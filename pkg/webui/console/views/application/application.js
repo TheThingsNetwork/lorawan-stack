@@ -15,6 +15,8 @@
 import React, { useEffect } from 'react'
 import { Switch, Route } from 'react-router-dom'
 
+import applicationIcon from '@assets/misc/application.svg'
+
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import SideNavigation from '@ttn-lw/components/navigation/side'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -72,10 +74,10 @@ const Application = props => {
       <IntlHelmet titleTemplate={`%s - ${name} - ${siteName}`} />
       <SideNavigation
         header={{
-          icon: 'application',
+          icon: applicationIcon,
+          iconAlt: sharedMessages.application,
           title: name,
           to: matchedUrl,
-          iconAlt: sharedMessages.application,
         }}
       >
         {mayViewApplicationInfo.check(rights) && (
