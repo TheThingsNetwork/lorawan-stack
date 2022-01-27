@@ -149,7 +149,7 @@ func TestInteropTLS(t *testing.T) {
 			NsJsMessageHeader: interop.NsJsMessageHeader{
 				MessageHeader: interop.MessageHeader{
 					MessageType:     interop.MessageTypeJoinReq,
-					ProtocolVersion: "1.1",
+					ProtocolVersion: "1.0",
 				},
 				SenderID:   interop.NetID{0x0, 0x0, 0x1},
 				ReceiverID: interop.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
@@ -169,7 +169,7 @@ func TestInteropTLS(t *testing.T) {
 			NsJsMessageHeader: interop.NsJsMessageHeader{
 				MessageHeader: interop.MessageHeader{
 					MessageType:     interop.MessageTypeJoinReq,
-					ProtocolVersion: "1.1",
+					ProtocolVersion: "1.0",
 				},
 				SenderID:   interop.NetID{0x0, 0x0, 0x2},
 				ReceiverID: interop.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
