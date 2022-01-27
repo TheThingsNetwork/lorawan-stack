@@ -269,6 +269,10 @@
   - [Message `UpdateGatewayAPIKeyRequest`](#ttn.lorawan.v3.UpdateGatewayAPIKeyRequest)
   - [Message `UpdateGatewayRequest`](#ttn.lorawan.v3.UpdateGatewayRequest)
   - [Enum `GatewayAntennaPlacement`](#ttn.lorawan.v3.GatewayAntennaPlacement)
+- [File `lorawan-stack/api/gateway_configuration.proto`](#lorawan-stack/api/gateway_configuration.proto)
+  - [Message `GetGatewayConfigurationRequest`](#ttn.lorawan.v3.GetGatewayConfigurationRequest)
+  - [Message `GetGatewayConfigurationResponse`](#ttn.lorawan.v3.GetGatewayConfigurationResponse)
+  - [Service `GatewayConfigurationService`](#ttn.lorawan.v3.GatewayConfigurationService)
 - [File `lorawan-stack/api/gateway_services.proto`](#lorawan-stack/api/gateway_services.proto)
   - [Message `PullGatewayConfigurationRequest`](#ttn.lorawan.v3.PullGatewayConfigurationRequest)
   - [Service `GatewayAccess`](#ttn.lorawan.v3.GatewayAccess)
@@ -4181,6 +4185,46 @@ Identifies an end device model with version information.
 | `PLACEMENT_UNKNOWN` | 0 |  |
 | `INDOOR` | 1 |  |
 | `OUTDOOR` | 2 |  |
+
+## <a name="lorawan-stack/api/gateway_configuration.proto">File `lorawan-stack/api/gateway_configuration.proto`</a>
+
+### <a name="ttn.lorawan.v3.GetGatewayConfigurationRequest">Message `GetGatewayConfigurationRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gateway_ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
+| `format` | [`string`](#string) |  |  |
+| `type` | [`string`](#string) |  |  |
+| `filename` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `gateway_ids` | <p>`message.required`: `true`</p> |
+| `format` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
+| `type` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
+| `filename` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-._]?[a-z0-9]){2,}$|^$`</p> |
+
+### <a name="ttn.lorawan.v3.GetGatewayConfigurationResponse">Message `GetGatewayConfigurationResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `contents` | [`bytes`](#bytes) |  |  |
+
+### <a name="ttn.lorawan.v3.GatewayConfigurationService">Service `GatewayConfigurationService`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `GetGatewayConfiguration` | [`GetGatewayConfigurationRequest`](#ttn.lorawan.v3.GetGatewayConfigurationRequest) | [`GetGatewayConfigurationResponse`](#ttn.lorawan.v3.GetGatewayConfigurationResponse) |  |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `GetGatewayConfiguration` | `` | `/api/v3` |  |
+| `GetGatewayConfiguration` | `GET` | `/api/v3/gcs/gateways/configuration/{gateway_ids.gateway_id}/{format}/{filename}` |  |
+| `GetGatewayConfiguration` | `GET` | `/api/v3/gcs/gateways/configuration/{gateway_ids.gateway_id}/{format}/{type}/{filename}` |  |
 
 ## <a name="lorawan-stack/api/gateway_services.proto">File `lorawan-stack/api/gateway_services.proto`</a>
 

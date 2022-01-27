@@ -19009,6 +19009,187 @@
       "services": []
     },
     {
+      "name": "lorawan-stack/api/gateway_configuration.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "GetGatewayConfigurationRequest",
+          "longName": "GetGatewayConfigurationRequest",
+          "fullName": "ttn.lorawan.v3.GetGatewayConfigurationRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "gateway_ids",
+              "description": "",
+              "label": "",
+              "type": "GatewayIdentifiers",
+              "longType": "GatewayIdentifiers",
+              "fullType": "ttn.lorawan.v3.GatewayIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "format",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "type",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "filename",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-._]?[a-z0-9]){2,}$|^$"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GetGatewayConfigurationResponse",
+          "longName": "GetGatewayConfigurationResponse",
+          "fullName": "ttn.lorawan.v3.GetGatewayConfigurationResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "contents",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": [
+        {
+          "name": "GatewayConfigurationService",
+          "longName": "GatewayConfigurationService",
+          "fullName": "ttn.lorawan.v3.GatewayConfigurationService",
+          "description": "",
+          "methods": [
+            {
+              "name": "GetGatewayConfiguration",
+              "description": "",
+              "requestType": "GetGatewayConfigurationRequest",
+              "requestLongType": "GetGatewayConfigurationRequest",
+              "requestFullType": "ttn.lorawan.v3.GetGatewayConfigurationRequest",
+              "requestStreaming": false,
+              "responseType": "GetGatewayConfigurationResponse",
+              "responseLongType": "GetGatewayConfigurationResponse",
+              "responseFullType": "ttn.lorawan.v3.GetGatewayConfigurationResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "",
+                      "pattern": ""
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/gcs/gateways/configuration/{gateway_ids.gateway_id}/{format}/{filename}"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/gcs/gateways/configuration/{gateway_ids.gateway_id}/{format}/{type}/{filename}"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "lorawan-stack/api/gateway_services.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
