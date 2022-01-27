@@ -17,6 +17,7 @@ package commands
 import (
 	"os"
 
+	"github.com/gogo/protobuf/proto"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -292,11 +293,11 @@ var (
 				return errNoGatewayID.New()
 			}
 
-			var antenna *ttnpb.GatewayAntenna
+			antenna := &ttnpb.GatewayAntenna{}
 			if err = util.SetFields(antenna, setGatewayAntennaFlags, "antenna"); err != nil {
 				return err
 			}
-			if antenna != nil {
+			if !proto.Equal(antenna, &ttnpb.GatewayAntenna{}) {
 				gateway.Antennas = []*ttnpb.GatewayAntenna{antenna}
 			}
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
