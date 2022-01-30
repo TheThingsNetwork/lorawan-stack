@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.17.2] - 2022-01-30
+
+### Added
+
 - Add configurable storage limit to device's DevNonce in the JoinServer. Can be configured using the option `js.dev-nonce-limit`.
 - Fix copy button in API key modal in the Console.
 - Enable copying and format transformations of byte values in the event previews in the Console.
@@ -22,17 +36,11 @@ For details about compatibility between different releases, see the **Commitment
 - Webhook maximum header value length extended to 4096 characters.
 - Limited the end device event types that are included in application event streams to only application layer events, errors and warnings. Other end device events can still be received when subscribing to end device device events.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - CLI Completion and Documentation commands no longer try to make a server connection.
 - When an end device has both `NwkKey` and `AppKey` provisioned in the Join Server, `NwkKey` is used for MIC and session key derivation when activating the device in LoRaWAN 1.0.x. This is per LoRaWAN 1.1 specification.
 - Gateway Server will no longer report the gateways as being both connected and disconnected at the same time.
-
-### Security
 
 ## [3.17.1] - 2022-01-12
 
