@@ -10,18 +10,18 @@
 # Dependencies
 /go.mod @johanstokking @htdvisser
 /go.sum @johanstokking @htdvisser
-/package.json @bafonins @kschiffer @ryaplots
-/yarn.lock @bafonins @kschiffer @ryaplots
-/sdk/js/package.json @bafonins @kschiffer
-/sdk/js/yarn.lock @bafonins @kschiffer
+/package.json @kschiffer @ryaplots
+/yarn.lock @kschiffer @ryaplots
+/sdk/js/package.json @kschiffer @ryaplots
+/sdk/js/yarn.lock @kschiffer @ryaplots
 
 # Build pipeline and tooling
 /Makefile @htdvisser @adriansmares @michalborkowski96
 /tools @htdvisser @adriansmares @michalborkowski96
 /.github/workflows @htdvisser @adriansmares @michalborkowski96
-/config @bafonins @kschiffer
+/config @kschiffer @ryaplots
 /config/stack @benolayinka @KrishnaIyer
-/cypress @bafonins @kschiffer @ryaplots
+/cypress @kschiffer @ryaplots
 
 # API, configuration, CLI and storage compatibility
 /api @johanstokking @htdvisser
@@ -50,18 +50,18 @@
 /pkg/rpcmiddleware @htdvisser @johanstokking @adriansmares
 /pkg/rpcserver @htdvisser @johanstokking @adriansmares
 /pkg/types @johanstokking @htdvisser
-/pkg/web @bafonins @kschiffer
-/pkg/webmiddleware @htdvisser @bafonins @kschiffer
-/pkg/webui @bafonins @kschiffer @ryaplots
+/pkg/web @kschiffer @ryaplots
+/pkg/webmiddleware @htdvisser @kschiffer
+/pkg/webui @kschiffer @ryaplots
 /pkg/ratelimit @johanstokking @htdvisser @KrishnaIyer
 
 # Subsystems
 
-/pkg/identityserver @htdvisser @bafonins @kschiffer
-/pkg/email @htdvisser @bafonins @kschiffer
-/pkg/oauth @htdvisser @bafonins @kschiffer
-/pkg/account @htdvisser @bafonins @kschiffer
-/pkg/web/oauthclient @htdvisser @bafonins @kschiffer
+/pkg/identityserver @htdvisser @kschiffer
+/pkg/email @htdvisser @kschiffer
+/pkg/oauth @htdvisser @kschiffer
+/pkg/account @htdvisser @kschiffer
+/pkg/web/oauthclient @htdvisser @kschiffer
 
 /pkg/gatewayserver @johanstokking @KrishnaIyer @adriansmares
 /pkg/gatewayconfigurationserver @KrishnaIyer @htdvisser
@@ -77,7 +77,7 @@
 
 /pkg/joinserver @johanstokking @adriansmares
 
-/pkg/console @bafonins @kschiffer
+/pkg/console @kschiffer @ryaplots
 
 /pkg/packetbrokeragent @johanstokking @adriansmares
 
@@ -91,7 +91,7 @@
 /pkg/devicerepository @adriansmares @KrishnaIyer
 
 # SDKs
-/sdk/js @bafonins @kschiffer @ryaplots
+/sdk/js @kschiffer @ryaplots
 
 # Clear generated code
 /api/api.md
