@@ -12,14 +12,14 @@
 /go.sum @johanstokking @htdvisser
 /package.json @kschiffer @ryaplots
 /yarn.lock @kschiffer @ryaplots
-/sdk/js/package.json @kschiffer
-/sdk/js/yarn.lock @kschiffer
+/sdk/js/package.json @kschiffer @ryaplots
+/sdk/js/yarn.lock @kschiffer @ryaplots
 
 # Build pipeline and tooling
 /Makefile @htdvisser @adriansmares @michalborkowski96
 /tools @htdvisser @adriansmares @michalborkowski96
 /.github/workflows @htdvisser @adriansmares @michalborkowski96
-/config @kschiffer
+/config @kschiffer @ryaplots
 /config/stack @benolayinka @KrishnaIyer
 /cypress @kschiffer @ryaplots
 
@@ -50,7 +50,7 @@
 /pkg/rpcmiddleware @htdvisser @johanstokking @adriansmares
 /pkg/rpcserver @htdvisser @johanstokking @adriansmares
 /pkg/types @johanstokking @htdvisser
-/pkg/web @kschiffer
+/pkg/web @kschiffer @ryaplots
 /pkg/webmiddleware @htdvisser @kschiffer
 /pkg/webui @kschiffer @ryaplots
 /pkg/ratelimit @johanstokking @htdvisser @KrishnaIyer
@@ -77,7 +77,7 @@
 
 /pkg/joinserver @johanstokking @adriansmares
 
-/pkg/console @kschiffer
+/pkg/console @kschiffer @ryaplots
 
 /pkg/packetbrokeragent @johanstokking @adriansmares
 
