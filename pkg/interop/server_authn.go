@@ -94,9 +94,10 @@ type tokenVerifier interface {
 // authenticateNS authenticates the client as a Network Server.
 //
 // If the client presents a TLS client certificate, it is verified against the trusted CAs of the NetID.
-// Any DNS names in the X.509 Subject Alternative Names are taken as address patterns used to verify the NSID. If there
-// are no DNS names, the Common Name is used as the single address pattern.
-// If the TLS client certificate verification fails, this method returns an error.
+// Any DNS names in the X.509 Subject Alternative Names are taken as address patterns used to verify the component
+// address (e.g. NetworkServerAddress and ApplicationServerAddress of an EndDevice should match the pattern).
+// If there are no DNS names, the Common Name is used as the single address pattern.
+// If the TLS client certificate is presented but its verification fails, this method returns an error.
 //
 // If the client presents a Bearer token in the Authorization header of the HTTP request, it is verified as token issued
 // by Packet Broker.
@@ -105,7 +106,7 @@ func (s *Server) authenticateNS(ctx context.Context, r *http.Request, data []byt
 	if err := json.Unmarshal(data, &header); err != nil {
 		return nil, ErrMalformedMessage.WithCause(err)
 	}
-	if !header.ProtocolVersion.SupportsNSID() && header.SenderNSID != nil {
+	if header.ProtocolVersion.RequiresNSID() != (header.SenderNSID != nil) {
 		return nil, ErrMalformedMessage.New()
 	}
 

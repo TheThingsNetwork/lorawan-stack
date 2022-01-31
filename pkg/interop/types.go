@@ -54,8 +54,8 @@ func (p *ProtocolVersion) UnmarshalYAML(unmarshal func(interface{}) error) error
 	}
 }
 
-// SupportsNSID returns true if the protocol version supports Network Server IDs (NSID).
-func (p ProtocolVersion) SupportsNSID() bool {
+// RequiresNSID returns true if the protocol version supports Network Server IDs (NSID).
+func (p ProtocolVersion) RequiresNSID() bool {
 	switch p {
 	case ProtocolV1_1:
 		return true

@@ -1,0 +1,5 @@
+dns: invalid.dns
+protocol: BI1.0
+paths:
+  join: test-join-path
+  rejoin: test-rejoin-path

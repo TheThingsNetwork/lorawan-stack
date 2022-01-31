@@ -289,6 +289,7 @@ func TestServer(t *testing.T) {
 						ProtocolVersion: interop.ProtocolV1_1,
 					},
 					SenderID:   interop.NetID{0x0, 0x0, 0x0},
+					SenderNSID: &interop.EUI64{0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 					ReceiverID: interop.EUI64{0x42, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
 				},
 				DevEUI: interop.EUI64{0x42, 0xff, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0},
@@ -322,7 +323,7 @@ func TestServer(t *testing.T) {
 				s, err := interop.NewServer(&mockComponent{ctx}, nil, config.InteropServer{
 					SenderClientCA: config.SenderClientCA{
 						Source:    "directory",
-						Directory: "testdata",
+						Directory: "testdata/server",
 					},
 					PacketBroker: config.PacketBrokerInteropAuth{
 						Enabled:     true,
@@ -337,7 +338,7 @@ func TestServer(t *testing.T) {
 					s.RegisterJS(tc.JS)
 				}
 
-				srv := newTLSServer(s)
+				srv := newTLSServer(0, s)
 				defer srv.Close()
 
 				buf, err := json.Marshal(tc.RequestBody)

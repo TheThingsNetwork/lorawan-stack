@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Device activation flow with a LoRaWAN Backend Interfaces 1.1 capable Join Server.
+
 ### Security
 
 ## [3.17.2] - 2022-01-30

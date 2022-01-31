@@ -20,6 +20,8 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"fmt"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -88,8 +90,13 @@ func makeServerTLSConfig() *tls.Config {
 	}
 }
 
-func newTLSServer(hdl http.Handler) *httptest.Server {
+func newTLSServer(port int, hdl http.Handler) *httptest.Server {
+	lis, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", port))
+	if err != nil {
+		panic(err)
+	}
 	srv := httptest.NewUnstartedServer(hdl)
+	srv.Listener = lis
 	srv.TLS = makeServerTLSConfig()
 	srv.StartTLS()
 	return srv
