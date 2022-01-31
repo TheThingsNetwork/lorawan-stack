@@ -16,21 +16,16 @@ package pubsub_test
 
 import (
 	"context"
-	"fmt"
-	"net"
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 )
 
 var (
@@ -83,76 +78,4 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 		}
 	}
 	panic("could not connect to peer")
-}
-
-type mockIS struct {
-	ttnpb.ApplicationRegistryServer
-	ttnpb.ApplicationAccessServer
-	applications     map[string]*ttnpb.Application
-	applicationAuths map[string][]string
-}
-
-func startMockIS(ctx context.Context) (*mockIS, string) {
-	is := &mockIS{
-		applications:     make(map[string]*ttnpb.Application),
-		applicationAuths: make(map[string][]string),
-	}
-	srv := rpcserver.New(ctx)
-	ttnpb.RegisterApplicationRegistryServer(srv.Server, is)
-	ttnpb.RegisterApplicationAccessServer(srv.Server, is)
-	lis, err := net.Listen("tcp", ":0")
-	if err != nil {
-		panic(err)
-	}
-	go srv.Serve(lis)
-	return is, lis.Addr().String()
-}
-
-func (is *mockIS) add(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) {
-	uid := unique.ID(ctx, ids)
-	is.applications[uid] = &ttnpb.Application{
-		Ids: &ids,
-	}
-	if key != "" {
-		is.applicationAuths[uid] = []string{fmt.Sprintf("Bearer %v", key)}
-	}
-}
-
-var errNotFound = errors.DefineNotFound("not_found", "not found")
-
-func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetApplicationRequest) (*ttnpb.Application, error) {
-	uid := unique.ID(ctx, req.GetApplicationIds())
-	app, ok := is.applications[uid]
-	if !ok {
-		return nil, errNotFound.New()
-	}
-	return app, nil
-}
-
-func (is *mockIS) ListRights(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (res *ttnpb.Rights, err error) {
-	res = &ttnpb.Rights{}
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return
-	}
-	authorization, ok := md["authorization"]
-	if !ok || len(authorization) == 0 {
-		return
-	}
-	auths, ok := is.applicationAuths[unique.ID(ctx, *ids)]
-	if !ok {
-		return
-	}
-	for _, auth := range auths {
-		if auth == authorization[0] {
-			res.Rights = append(res.Rights,
-				ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
-				ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
-				ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
-				ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ,
-				ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE,
-			)
-		}
-	}
-	return
 }

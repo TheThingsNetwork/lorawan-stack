@@ -33,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -427,8 +428,14 @@ func TestWebhooks(t *testing.T) {
 	}
 
 	t.Run("Downstream", func(t *testing.T) {
-		is, isAddr := startMockIS(ctx)
-		is.add(ctx, registeredApplicationID, registeredApplicationKey)
+		is, isAddr, closeIS := mockis.New(ctx)
+		defer closeIS()
+		is.ApplicationRegistry().Add(ctx, registeredApplicationID, registeredApplicationKey,
+			ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
+			ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
+			ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+			ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_READ,
+			ttnpb.Right_RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE)
 		httpAddress := "0.0.0.0:8098"
 		conf := &component.Config{
 			ServiceBase: config.ServiceBase{

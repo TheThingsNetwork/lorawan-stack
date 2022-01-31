@@ -49,6 +49,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -147,13 +148,14 @@ func TestApplicationServer(t *testing.T) {
 		DevEui:         eui64Ptr(types.EUI64{0x24, 0x24, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 	}
 
-	is, isAddr := startMockIS(ctx)
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
 	js, jsAddr := startMockJS(ctx)
 	nsConnChan := make(chan *mockNSASConn)
 	ns, nsAddr := startMockNS(ctx, nsConnChan)
 
 	// Register the application in the Entity Registry.
-	is.add(ctx, registeredApplicationID, registeredApplicationKey)
+	is.ApplicationRegistry().Add(ctx, registeredApplicationID, registeredApplicationKey, testRights...)
 
 	// Register some sessions in the Join Server. Sometimes the keys are sent by the Network Server as part of the
 	// join-accept, and sometimes they are not sent by the Network Server so the Application Server gets them from the
@@ -2255,13 +2257,14 @@ func TestSkipPayloadCrypto(t *testing.T) {
 		},
 	}
 
-	is, isAddr := startMockIS(ctx)
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
 	js, jsAddr := startMockJS(ctx)
 	nsConnChan := make(chan *mockNSASConn)
 	ns, nsAddr := startMockNS(ctx, nsConnChan)
 
 	// Register the application in the Entity Registry.
-	is.add(ctx, registeredApplicationID, registeredApplicationKey)
+	is.ApplicationRegistry().Add(ctx, registeredApplicationID, registeredApplicationKey, testRights...)
 
 	// Register some sessions in the Join Server. Sometimes the keys are sent by the Network Server as part of the
 	// join-accept, and sometimes they are not sent by the Network Server so the Application Server gets them from the
@@ -2788,8 +2791,9 @@ func TestLocationFromPayload(t *testing.T) {
 		},
 	}
 
-	is, isAddr := startMockIS(ctx)
-	is.endDeviceRegistry.add(ctx, registeredDevice)
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
+	is.EndDeviceRegistry().Add(ctx, registeredDevice)
 
 	devsRedisClient, devsFlush := test.NewRedis(ctx, "applicationserver_test", "devices")
 	defer devsFlush()
@@ -2932,8 +2936,8 @@ func TestLocationFromPayload(t *testing.T) {
 
 	time.Sleep(Timeout)
 
-	dev, ok := is.endDeviceRegistry.get(ctx, registeredDevice.Ids)
-	if !a.So(ok, should.BeTrue) {
+	dev, ok := is.EndDeviceRegistry().Get(ctx, &ttnpb.GetEndDeviceRequest{EndDeviceIds: registeredDevice.Ids})
+	if !a.So(ok, should.BeNil) {
 		t.FailNow()
 	}
 

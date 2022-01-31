@@ -16,8 +16,6 @@ package metadata_test
 
 import (
 	"context"
-	"net"
-	"sync"
 	"testing"
 	"time"
 
@@ -27,84 +25,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
+	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
-
-type mockISEndDeviceRegistry struct {
-	ttnpb.EndDeviceRegistryServer
-
-	endDevicesMu sync.RWMutex
-	endDevices   map[string]*ttnpb.EndDevice
-}
-
-func (m *mockISEndDeviceRegistry) add(ctx context.Context, dev *ttnpb.EndDevice) {
-	m.endDevicesMu.Lock()
-	defer m.endDevicesMu.Unlock()
-	m.endDevices[unique.ID(ctx, dev.Ids)] = dev
-}
-
-func (m *mockISEndDeviceRegistry) get(ctx context.Context, ids ttnpb.EndDeviceIdentifiers) (*ttnpb.EndDevice, bool) {
-	m.endDevicesMu.RLock()
-	defer m.endDevicesMu.RUnlock()
-	dev, ok := m.endDevices[unique.ID(ctx, ids)]
-	return dev, ok
-}
-
-var errNotFound = errors.DefineNotFound("not_found", "not found")
-
-func (m *mockISEndDeviceRegistry) Get(ctx context.Context, in *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	m.endDevicesMu.RLock()
-	defer m.endDevicesMu.RUnlock()
-	if dev, ok := m.endDevices[unique.ID(ctx, in.EndDeviceIds)]; ok {
-		return dev, nil
-	}
-	return nil, errNotFound.New()
-}
-
-func (m *mockISEndDeviceRegistry) Update(ctx context.Context, in *ttnpb.UpdateEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	m.endDevicesMu.Lock()
-	defer m.endDevicesMu.Unlock()
-	dev, ok := m.endDevices[unique.ID(ctx, in.EndDevice.Ids)]
-	if !ok {
-		return nil, errNotFound.New()
-	}
-	if err := dev.SetFields(in.EndDevice, in.GetFieldMask().GetPaths()...); err != nil {
-		return nil, err
-	}
-	m.endDevices[unique.ID(ctx, in.EndDevice.Ids)] = dev
-	return dev, nil
-}
-
-type mockIS struct {
-	ttnpb.ApplicationRegistryServer
-	ttnpb.ApplicationAccessServer
-
-	endDeviceRegistry *mockISEndDeviceRegistry
-}
-
-func startMockIS(ctx context.Context) (*mockIS, string, func()) {
-	is := &mockIS{
-		endDeviceRegistry: &mockISEndDeviceRegistry{
-			endDevices: make(map[string]*ttnpb.EndDevice),
-		},
-	}
-	srv := rpcserver.New(ctx)
-	ttnpb.RegisterEndDeviceRegistryServer(srv.Server, is.endDeviceRegistry)
-	lis, err := net.Listen("tcp", ":0")
-	if err != nil {
-		panic(err)
-	}
-	go srv.Serve(lis)
-	return is, lis.Addr().String(), func() {
-		lis.Close()
-		srv.GracefulStop()
-	}
-}
 
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.ClusterRole) {
 	for i := 0; i < 20; i++ {
@@ -140,14 +65,14 @@ var (
 
 func TestClusterEndDeviceLocationRegistry(t *testing.T) {
 	a, ctx := test.New(t)
-	is, isAddr, closeIS := startMockIS(ctx)
+	is, isAddr, closeIS := mockis.New(ctx)
 	defer closeIS()
 
 	registeredEndDevice := ttnpb.EndDevice{
 		Ids:       registeredEndDeviceIDs,
 		Locations: originalLocations,
 	}
-	is.endDeviceRegistry.add(ctx, &registeredEndDevice)
+	is.EndDeviceRegistry().Add(ctx, &registeredEndDevice)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -207,14 +132,14 @@ func TestClusterEndDeviceLocationRegistry(t *testing.T) {
 
 func TestCachedEndDeviceLocationRegistry(t *testing.T) {
 	a, ctx := test.New(t)
-	is, isAddr, closeIS := startMockIS(ctx)
+	is, isAddr, closeIS := mockis.New(ctx)
 	defer closeIS()
 
 	registeredEndDevice := ttnpb.EndDevice{
 		Ids:       registeredEndDeviceIDs,
 		Locations: originalLocations,
 	}
-	is.endDeviceRegistry.add(ctx, &registeredEndDevice)
+	is.EndDeviceRegistry().Add(ctx, &registeredEndDevice)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{

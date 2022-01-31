@@ -17,23 +17,17 @@ package gatewayserver_test
 import (
 	"context"
 	"crypto/rand"
-	"fmt"
-	"net"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
-	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
-	"go.thethings.network/lorawan-stack/v3/pkg/rpcserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
-	"go.thethings.network/lorawan-stack/v3/pkg/unique"
-	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
-	"google.golang.org/grpc/metadata"
 )
+
+var testRights = []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_LINK, ttnpb.Right_RIGHT_GATEWAY_STATUS_READ}
 
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.ClusterRole) {
 	for i := 0; i < 20; i++ {
@@ -43,119 +37,6 @@ func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.Cluste
 		}
 	}
 	panic("could not connect to peer")
-}
-
-type mockIS struct {
-	ttnpb.GatewayRegistryServer
-	ttnpb.GatewayAccessServer
-	gateways     map[string]*ttnpb.Gateway
-	gatewayAuths map[string][]string
-}
-
-func startMockIS(ctx context.Context) (*mockIS, string) {
-	is := &mockIS{
-		gateways:     make(map[string]*ttnpb.Gateway),
-		gatewayAuths: make(map[string][]string),
-	}
-	srv := rpcserver.New(ctx)
-	ttnpb.RegisterGatewayRegistryServer(srv.Server, is)
-	ttnpb.RegisterGatewayAccessServer(srv.Server, is)
-	lis, err := net.Listen("tcp", ":0")
-	if err != nil {
-		panic(err)
-	}
-	go srv.Serve(lis)
-	return is, lis.Addr().String()
-}
-
-func (is *mockIS) add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string, locationPublic bool, updateLocationFromStatus bool) {
-	uid := unique.ID(ctx, ids)
-	is.gateways[uid] = &ttnpb.Gateway{
-		Ids:              &ids,
-		FrequencyPlanId:  test.EUFrequencyPlanID,
-		FrequencyPlanIds: []string{test.EUFrequencyPlanID},
-		Antennas: []*ttnpb.GatewayAntenna{
-			{
-				Location: &ttnpb.Location{
-					Source: ttnpb.LocationSource_SOURCE_REGISTRY,
-				},
-			},
-		},
-		LocationPublic:           locationPublic,
-		UpdateLocationFromStatus: updateLocationFromStatus,
-	}
-	if key != "" {
-		is.gatewayAuths[uid] = []string{fmt.Sprintf("Bearer %v", key)}
-	}
-}
-
-var (
-	errNotFound        = errors.DefineNotFound("not_found", "not found")
-	errNoGatewayRights = errors.DefinePermissionDenied("no_gateway_rights", "no gateway rights")
-)
-
-func (is *mockIS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
-	uid := unique.ID(ctx, req.GetGatewayIds())
-	gtw, ok := is.gateways[uid]
-	if !ok {
-		return nil, errNotFound.New()
-	}
-	if gtw == nil {
-		return nil, errNoGatewayRights.New() // This simulates the behaviour of the IS with a deleted gateway.
-	}
-	return gtw, nil
-}
-
-func (is *mockIS) Update(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
-	uid := unique.ID(ctx, req.Gateway.GetIds())
-	gtw, ok := is.gateways[uid]
-	if !ok {
-		return nil, errNotFound.New()
-	}
-	gtw.SetFields(req.Gateway, req.FieldMask.GetPaths()...)
-	return gtw, nil
-}
-
-func (is *mockIS) Delete(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*pbtypes.Empty, error) {
-	uid := unique.ID(ctx, ids)
-	_, ok := is.gateways[uid]
-	if !ok {
-		return nil, errNotFound.New()
-	}
-	is.gateways[uid] = nil
-	return nil, nil
-}
-
-func (is *mockIS) GetIdentifiersForEUI(ctx context.Context, req *ttnpb.GetGatewayIdentifiersForEUIRequest) (*ttnpb.GatewayIdentifiers, error) {
-	if req.Eui.Equal(registeredGatewayEUI) {
-		return &ttnpb.GatewayIdentifiers{
-			GatewayId: registeredGatewayID,
-			Eui:       &registeredGatewayEUI,
-		}, nil
-	}
-	return nil, errNotFound.New()
-}
-
-func (is *mockIS) ListRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (res *ttnpb.Rights, err error) {
-	res = &ttnpb.Rights{}
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return
-	}
-	authorization, ok := md["authorization"]
-	if !ok || len(authorization) == 0 {
-		return
-	}
-	auths, ok := is.gatewayAuths[unique.ID(ctx, *ids)]
-	if !ok {
-		return
-	}
-	for _, auth := range auths {
-		if auth == authorization[0] {
-			res.Rights = append(res.Rights, ttnpb.Right_RIGHT_GATEWAY_LINK, ttnpb.Right_RIGHT_GATEWAY_STATUS_READ)
-		}
-	}
-	return
 }
 
 func randomJoinRequestPayload(joinEUI, devEUI types.EUI64) []byte {

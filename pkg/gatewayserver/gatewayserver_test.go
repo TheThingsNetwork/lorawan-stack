@@ -47,6 +47,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/ws/lbslns"
 	gsredis "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/upstream/mock"
+	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -74,7 +75,7 @@ func TestGatewayServer(t *testing.T) {
 	for _, rtc := range []struct {
 		Name                   string
 		Setup                  func(context.Context, string, string) (*component.Component, *gatewayserver.GatewayServer, error)
-		PostSetup              func(context.Context, *component.Component, *mockIS)
+		PostSetup              func(context.Context, *component.Component, *mockis.MockDefinition)
 		SkipProtocols          func(string) bool
 		SupportsLocationUpdate bool
 	}{
@@ -137,14 +138,14 @@ func TestGatewayServer(t *testing.T) {
 				}
 				return c, gs, nil
 			},
-			PostSetup: func(ctx context.Context, c *component.Component, is *mockIS) {
+			PostSetup: func(ctx context.Context, c *component.Component, is *mockis.MockDefinition) {
 				mustHavePeer(ctx, c, ttnpb.ClusterRole_NETWORK_SERVER)
 				mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
-				is.add(ctx, ttnpb.GatewayIdentifiers{
+				is.GatewayRegistry().Add(ctx, ttnpb.GatewayIdentifiers{
 					GatewayId: registeredGatewayID,
 					Eui:       &registeredGatewayEUI,
-				}, registeredGatewayKey, true, true)
+				}, registeredGatewayKey, true, true, testRights...)
 			},
 			SkipProtocols: func(string) bool {
 				return false
@@ -155,7 +156,8 @@ func TestGatewayServer(t *testing.T) {
 		t.Run(rtc.Name, func(t *testing.T) {
 			a, ctx := test.New(t)
 
-			is, isAddr := startMockIS(ctx)
+			is, isAddr, closeIS := mockis.New(ctx)
+			defer closeIS()
 			ns, nsAddr := mock.StartNS(ctx)
 
 			c, gs, err := rtc.Setup(ctx, isAddr, nsAddr)
@@ -817,7 +819,7 @@ func TestGatewayServer(t *testing.T) {
 								t.Run(tc.Name, func(t *testing.T) {
 									a := assertions.New(t)
 
-									gtw, err := is.Get(ctx, &ttnpb.GetGatewayRequest{
+									gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{
 										GatewayIds: &ids,
 									})
 									a.So(err, should.BeNil)
@@ -826,7 +828,7 @@ func TestGatewayServer(t *testing.T) {
 										Source: ttnpb.LocationSource_SOURCE_GPS,
 									}
 									gtw.UpdateLocationFromStatus = tc.UpdateLocation
-									gtw, err = is.Update(ctx, &ttnpb.UpdateGatewayRequest{
+									gtw, err = is.GatewayRegistry().Update(ctx, &ttnpb.UpdateGatewayRequest{
 										Gateway: gtw,
 										FieldMask: &pbtypes.FieldMask{
 											Paths: []string{
@@ -857,7 +859,7 @@ func TestGatewayServer(t *testing.T) {
 									}
 
 									time.Sleep(timeout)
-									gtw, err = is.Get(ctx, &ttnpb.GetGatewayRequest{
+									gtw, err = is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{
 										GatewayIds: &ids,
 									})
 									a.So(err, should.BeNil)
@@ -913,16 +915,16 @@ func TestGatewayServer(t *testing.T) {
 							for _, locationPublic := range []bool{false, true} {
 								t.Run(fmt.Sprintf("LocationPublic=%v", locationPublic), func(t *testing.T) {
 									a := assertions.New(t)
-									is.add(ctx, ids, registeredGatewayKey, locationPublic, false)
+									is.GatewayRegistry().Add(ctx, ids, registeredGatewayKey, locationPublic, false, testRights...)
 
-									gtw, err := is.Get(ctx, &ttnpb.GetGatewayRequest{
+									gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{
 										GatewayIds: &ids,
 									})
 									a.So(err, should.BeNil)
 									a.So(gtw.LocationPublic, should.Equal, locationPublic)
 									gtw.LocationPublic = locationPublic
 									gtw.Antennas[0].Location = location
-									gtw, err = is.Get(ctx, &ttnpb.GetGatewayRequest{
+									gtw, err = is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{
 										GatewayIds: &ids,
 									})
 									a.So(err, should.BeNil)
@@ -1001,7 +1003,7 @@ func TestGatewayServer(t *testing.T) {
 					// Expected location for RxMetadata
 					var location *ttnpb.Location
 					if rtc.SupportsLocationUpdate {
-						gtw, err := is.Get(ctx, &ttnpb.GetGatewayRequest{
+						gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{
 							GatewayIds: &ids,
 						})
 						a.So(err, should.BeNil)
@@ -1769,7 +1771,12 @@ func TestUpdateVersionInfo(t *testing.T) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	is, isAddr := startMockIS(ctx)
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
+	is.GatewayRegistry().SetRegisteredGateway(&ttnpb.GatewayIdentifiers{
+		GatewayId: registeredGatewayID,
+		Eui:       &registeredGatewayEUI,
+	})
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -1820,7 +1827,7 @@ func TestUpdateVersionInfo(t *testing.T) {
 		Eui:       &registeredGatewayEUI,
 	}
 
-	is.add(ctx, gtwIDs, registeredGatewayKey, true, true)
+	is.GatewayRegistry().Add(ctx, gtwIDs, registeredGatewayKey, true, true, testRights...)
 	time.Sleep(timeout) // Wait for setup to be completed.
 
 	linkFn := func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, statCh <-chan *ttnpbv2.StatusMessage) error {
@@ -1905,7 +1912,7 @@ func TestUpdateVersionInfo(t *testing.T) {
 				t.Fatalf("Failed to send status message to upstream channel")
 			}
 			time.Sleep(timeout)
-			gtw, err := is.Get(ctx, &ttnpb.GetGatewayRequest{
+			gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{
 				GatewayIds: &ids,
 			})
 			a.So(err, should.BeNil)
@@ -1932,7 +1939,7 @@ func TestUpdateVersionInfo(t *testing.T) {
 	a.So(stat, should.NotBeNil)
 
 	// Delete and wait for fetch interval.
-	is.Delete(ctx, &gtwIDs)
+	is.GatewayRegistry().Delete(ctx, &gtwIDs)
 	time.Sleep(gatewayFetchInterval << 7)
 
 	stat, err = statsClient.GetGatewayConnectionStats(statsCtx, &gtwIDs)
