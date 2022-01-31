@@ -12,10 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const mapWebhookMessageTypeToFormValue = messageType =>
-  (messageType && { enabled: true, value: messageType.path }) || { enabled: false, value: '' }
+export const decodeMessageType = messageType => {
+  if (messageType && (messageType.enabled || messageType.path)) {
+    return { enabled: true, value: messageType.path }
+  }
 
-const mapWebhookHeadersTypeToFormValue = headersType =>
+  return { enabled: false, value: '' }
+}
+
+export const encodeMessageType = formValue => {
+  if (formValue && formValue.enabled) {
+    return { enabled: true, path: formValue.value }
+  }
+  return { enabled: false, path: '' }
+}
+
+export const decodeHeaders = headersType =>
   (headersType &&
     Object.keys(headersType).reduce(
       (result, key) =>
@@ -27,119 +39,7 @@ const mapWebhookHeadersTypeToFormValue = headersType =>
     )) ||
   []
 
-// Encode and decode basic auth header.
-let currentHeaders
-
-export const mapBasicAuthHeaderToBoolean = value => {
-  currentHeaders = value
-  const useBasicAuth =
-    value?.some(header => header.key === 'Authorization') &&
-    value?.some(header => header.value.startsWith('Basic'))
-  return useBasicAuth
-}
-
-export const mapBooleanToBasicAuthHeader = value => {
-  if (value) {
-    return [...currentHeaders, ...{ key: 'Authorization', value: 'Basic' }]
-  }
-  return currentHeaders.filter(
-    header => header.key !== 'Authorizarion' && !header.value.startsWith('Basic'),
-  )
-}
-
-export const mapBasicAuthHeaderToUsername = value => {
-  const basicAuth = value.filter(
-    header => header.key === 'Authorization' && header.value.startsWith('Basic'),
-  )
-  const encodedCredentials = basicAuth[0]?.value.split('Basic')[1]
-  if (encodedCredentials) {
-    const decodedCredentials = atob(encodedCredentials)
-    const decodedUsername = decodedCredentials.slice(0, decodedCredentials.indexOf(':'))
-    return decodedUsername
-  }
-
-  return ''
-}
-
-const createCredentialsToAuthHeaderMapper = forUsername => fieldValue => {
-  const updatedHeaders = currentHeaders?.map(({ key, value }) => {
-    if (key === 'Authorization' && value.startsWith('Basic')) {
-      const encodedCredentials = value.split('Basic')[1]
-
-      if (encodedCredentials) {
-        const decodedCredentials = atob(encodedCredentials)
-        const username = decodedCredentials.slice(0, decodedCredentials.indexOf(':'))
-        const password = decodedCredentials.slice(
-          decodedCredentials.indexOf(':') + 1,
-          decodedCredentials.length,
-        )
-        if (forUsername) {
-          return {
-            key: 'Authorization',
-            value: `Basic ${btoa(`${fieldValue}:${password}`)}`,
-          }
-        }
-        return {
-          key: 'Authorization',
-          value: `Basic ${btoa(`${username}:${fieldValue}`)}`,
-        }
-      }
-      if (forUsername) {
-        return { key: 'Authorization', value: `Basic ${btoa(`${fieldValue}:`)}` }
-      }
-
-      return { key: 'Authorization', value: `Basic ${btoa(`:${fieldValue}`)}` }
-    }
-
-    return { key, value }
-  })
-
-  currentHeaders = updatedHeaders
-  return currentHeaders
-}
-
-export const mapBasicAuthHeaderToPassword = value => {
-  const basicAuth = value.filter(
-    header => header.key === 'Authorization' && header.value.startsWith('Basic'),
-  )
-  const encodedCredentials = basicAuth[0]?.value.split('Basic')[1]
-  if (encodedCredentials) {
-    const decodedCredentials = atob(encodedCredentials)
-    const decodedPassword = decodedCredentials.slice(
-      decodedCredentials.indexOf(':') + 1,
-      decodedCredentials.length,
-    )
-    return decodedPassword
-  }
-
-  return ''
-}
-
-export const mapCredentialsToPassword = createCredentialsToAuthHeaderMapper(true)
-export const mapCredentialsToUsername = createCredentialsToAuthHeaderMapper(false)
-
-export const mapWebhookToFormValues = webhook => ({
-  webhook_id: webhook.ids.webhook_id,
-  base_url: webhook.base_url,
-  format: webhook.format,
-  headers: mapWebhookHeadersTypeToFormValue(webhook.headers),
-  downlink_api_key: webhook.downlink_api_key,
-  uplink_message: mapWebhookMessageTypeToFormValue(webhook.uplink_message),
-  join_accept: mapWebhookMessageTypeToFormValue(webhook.join_accept),
-  downlink_ack: mapWebhookMessageTypeToFormValue(webhook.downlink_ack),
-  downlink_nack: mapWebhookMessageTypeToFormValue(webhook.downlink_nack),
-  downlink_sent: mapWebhookMessageTypeToFormValue(webhook.downlink_sent),
-  downlink_failed: mapWebhookMessageTypeToFormValue(webhook.downlink_failed),
-  downlink_queued: mapWebhookMessageTypeToFormValue(webhook.downlink_queued),
-  downlink_queue_invalidated: mapWebhookMessageTypeToFormValue(webhook.downlink_queue_invalidated),
-  location_solved: mapWebhookMessageTypeToFormValue(webhook.location_solved),
-  service_data: mapWebhookMessageTypeToFormValue(webhook.service_data),
-})
-
-const mapMessageTypeFormValueToWebhookMessageType = formValue =>
-  (formValue.enabled && { path: formValue.value }) || null
-
-const mapHeadersTypeFormValueToWebhookHeadersType = formValue =>
+export const encodeHeaders = formValue =>
   (formValue &&
     formValue.reduce(
       (result, { key, value }) => ({
@@ -150,33 +50,104 @@ const mapHeadersTypeFormValueToWebhookHeadersType = formValue =>
     )) ||
   null
 
-export const mapFormValuesToWebhook = (values, appId) => ({
-  ids: {
-    application_ids: {
-      application_id: appId,
-    },
-    webhook_id: values.webhook_id,
-  },
-  base_url: values.base_url,
-  format: values.format,
-  headers: mapHeadersTypeFormValueToWebhookHeadersType(values.headers),
-  downlink_api_key: values.downlink_api_key,
-  uplink_message: mapMessageTypeFormValueToWebhookMessageType(values.uplink_message),
-  join_accept: mapMessageTypeFormValueToWebhookMessageType(values.join_accept),
-  downlink_ack: mapMessageTypeFormValueToWebhookMessageType(values.downlink_ack),
-  downlink_nack: mapMessageTypeFormValueToWebhookMessageType(values.downlink_nack),
-  downlink_sent: mapMessageTypeFormValueToWebhookMessageType(values.downlink_sent),
-  downlink_failed: mapMessageTypeFormValueToWebhookMessageType(values.downlink_failed),
-  downlink_queued: mapMessageTypeFormValueToWebhookMessageType(values.downlink_queued),
-  downlink_queue_invalidated: mapMessageTypeFormValueToWebhookMessageType(
-    values.downlink_queue_invalidated,
-  ),
-  location_solved: mapMessageTypeFormValueToWebhookMessageType(values.location_solved),
-  service_data: mapMessageTypeFormValueToWebhookMessageType(values.service_data),
-})
+// Encode and decode basic auth header.
+let currentHeaders
+
+export const decodeBasicAuthRequest = value => {
+  currentHeaders = value
+  const useBasicAuth = value?.Authorization?.startsWith('Basic')
+  return useBasicAuth
+}
+
+export const encodeBasicAuthRequest = value => {
+  if (value) {
+    return { ...currentHeaders, Authorization: 'Basic' }
+  }
+
+  return currentHeaders
+}
+
+export const decodeBasicAuthHeaderUsername = value => {
+  const basicAuth = value.Authorization
+
+  if (basicAuth) {
+    const encodedCredentials = basicAuth.split('Basic')[1]
+    if (encodedCredentials) {
+      const decodedCredentials = atob(encodedCredentials)
+      const decodedUsername = decodedCredentials.slice(0, decodedCredentials.indexOf(':'))
+      return decodedUsername
+    }
+  }
+
+  return ''
+}
+
+export const mapCredentialsToAuthHeader = (forUsername, fieldValue) => {
+  if (currentHeaders.Authorization && currentHeaders.Authorization.startsWith('Basic')) {
+    const encodedCredentials = currentHeaders.Authorization.split('Basic')[1]
+
+    if (encodedCredentials) {
+      const decodedCredentials = atob(encodedCredentials)
+      const username = decodedCredentials.slice(0, decodedCredentials.indexOf(':'))
+      const password = decodedCredentials.slice(
+        decodedCredentials.indexOf(':') + 1,
+        decodedCredentials.length,
+      )
+      if (forUsername) {
+        return {
+          ...currentHeaders,
+          Authorization: `Basic ${btoa(`${fieldValue}:${password}`)}`,
+        }
+      }
+      return {
+        ...currentHeaders,
+        Authorization: `Basic ${btoa(`${username}:${fieldValue}`)}`,
+      }
+    }
+
+    // If there is no password/username yet.
+    if (forUsername) {
+      return {
+        ...currentHeaders,
+        Authorization: `Basic ${btoa(`${fieldValue}:`)}`,
+      }
+    }
+
+    return {
+      ...currentHeaders,
+      Authorization: `Basic ${btoa(`:${fieldValue}`)}`,
+    }
+  }
+}
+
+export const decodeBasicAuthHeaderPassword = value => {
+  const basicAuth = value.Authorization
+
+  if (basicAuth) {
+    const encodedCredentials = basicAuth.split('Basic')[1]
+    if (encodedCredentials) {
+      const decodedCredentials = atob(encodedCredentials)
+      const decodedPassword = decodedCredentials.slice(
+        decodedCredentials.indexOf(':') + 1,
+        decodedCredentials.length,
+      )
+      return decodedPassword
+    }
+  }
+
+  return ''
+}
+
+export const createbasicAuthEncoder = forPassword => value =>
+  mapCredentialsToAuthHeader(forPassword, value)
+
+export const encodeBasicAuthUsername = createbasicAuthEncoder(true)
+export const encodeBasicAuthPassword = createbasicAuthEncoder(false)
 
 export const blankValues = {
-  webhook_id: undefined,
+  ids: {
+    webhook_id: undefined,
+  },
   base_url: undefined,
   format: undefined,
   downlink_api_key: '',

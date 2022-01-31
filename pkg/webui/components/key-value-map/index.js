@@ -110,21 +110,24 @@ class KeyValueMap extends React.PureComponent {
       <div data-test-id={'key-value-map'} className={classnames(className, style.container)}>
         <div>
           {value &&
-            value.map((value, index) => (
-              <Entry
-                key={`${name}[${index}]`}
-                name={name}
-                value={value}
-                keyPlaceholder={keyPlaceholder}
-                valuePlaceholder={valuePlaceholder}
-                index={index}
-                onRemoveButtonClick={this.removeEntry}
-                onChange={this.handleEntryChange}
-                onBlur={onBlur}
-                indexAsKey={indexAsKey}
-                readOnly={isReadOnly(value)}
-              />
-            ))}
+            value.map((value, index) => {
+              const readOnly = isReadOnly(value)
+              return (
+                <Entry
+                  key={`${name}[${index}]`}
+                  name={name}
+                  value={value}
+                  keyPlaceholder={keyPlaceholder}
+                  valuePlaceholder={valuePlaceholder}
+                  index={index}
+                  onRemoveButtonClick={this.removeEntry}
+                  onChange={this.handleEntryChange}
+                  onBlur={onBlur}
+                  indexAsKey={indexAsKey}
+                  readOnly={readOnly}
+                />
+              )
+            })}
         </div>
         <div>
           <Button

@@ -40,15 +40,17 @@ import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import { apiKey as webhookAPIKeyRegexp } from '@console/lib/regexp'
 
 import {
-  mapWebhookToFormValues,
-  mapFormValuesToWebhook,
   blankValues,
-  mapBasicAuthHeaderToBoolean,
-  mapBooleanToBasicAuthHeader,
-  mapBasicAuthHeaderToUsername,
-  mapBasicAuthHeaderToPassword,
-  mapCredentialsToPassword,
-  mapCredentialsToUsername,
+  encodeBasicAuthRequest,
+  decodeBasicAuthRequest,
+  decodeBasicAuthHeaderUsername,
+  decodeBasicAuthHeaderPassword,
+  encodeBasicAuthUsername,
+  encodeBasicAuthPassword,
+  encodeHeaders,
+  decodeHeaders,
+  decodeMessageType,
+  encodeMessageType,
 } from './mapping'
 
 const pathPlaceholder = '/path/to/webhook'
@@ -84,7 +86,7 @@ const m = defineMessages({
 })
 
 const headerCheck = headers =>
-  headers.length === 0 || headers.every(({ value, key }) => value !== '' && key !== '')
+  !headers[''] && Object.values(headers).every(value => value !== null || value !== '')
 const messageCheck = message => {
   if (message && message.enabled) {
     const { value } = message
@@ -94,23 +96,24 @@ const messageCheck = message => {
 
   return true
 }
+const hasAuthorizationBasic = header => {
+  if (header.key === 'Authorization' && header.value?.startsWith('Basic')) {
+    return true
+  }
+}
 
 const validationSchema = Yup.object().shape({
-  webhook_id: Yup.string()
-    .min(3, Yup.passValues(sharedMessages.validateTooShort))
-    .max(36, Yup.passValues(sharedMessages.validateTooLong))
-    .matches(webhookIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
-    .required(sharedMessages.validateRequired),
+  ids: Yup.object().shape({
+    webhook_id: Yup.string()
+      .min(3, Yup.passValues(sharedMessages.validateTooShort))
+      .max(36, Yup.passValues(sharedMessages.validateTooLong))
+      .matches(webhookIdRegexp, Yup.passValues(sharedMessages.validateIdFormat))
+      .required(sharedMessages.validateRequired),
+  }),
   format: Yup.string().required(sharedMessages.validateRequired),
-  headers: Yup.array()
-    .of(
-      Yup.object({
-        key: Yup.string().default(''),
-        value: Yup.string().default(''),
-      }),
-    )
+  headers: Yup.object()
     .test('has no empty string values', m.headersValidateRequired, headerCheck)
-    .default([]),
+    .default({}),
   base_url: Yup.string()
     .matches(urlRegexp, Yup.passValues(sharedMessages.validateUrl))
     .required(sharedMessages.validateRequired),
@@ -121,7 +124,7 @@ const validationSchema = Yup.object().shape({
   uplink_message: Yup.object()
     .shape({
       enabled: Yup.boolean(),
-      value: Yup.string(),
+      path: Yup.string(),
     })
     .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
   join_accept: Yup.object()
@@ -182,7 +185,6 @@ const validationSchema = Yup.object().shape({
 
 export default class WebhookForm extends Component {
   static propTypes = {
-    appId: PropTypes.string,
     buttonStyle: PropTypes.shape({ activateWebhookButton: PropTypes.shape({}) }),
     existCheck: PropTypes.func,
     initialWebhookValue: PropTypes.shape({
@@ -209,7 +211,6 @@ export default class WebhookForm extends Component {
   }
 
   static defaultProps = {
-    appId: undefined,
     initialWebhookValue: undefined,
     onReactivate: () => null,
     onReactivateSuccess: () => null,
@@ -244,13 +245,13 @@ export default class WebhookForm extends Component {
 
   @bind
   async handleSubmit(values, { resetForm }) {
-    const { appId, onSubmit, onSubmitSuccess, onSubmitFailure, existCheck, update } = this.props
-    const webhook = mapFormValuesToWebhook(values, appId)
+    const { onSubmit, onSubmitSuccess, onSubmitFailure, existCheck, update } = this.props
+    const castedWebhookValues = validationSchema.cast(values)
     await this.setState({ error: '' })
 
     try {
       if (!update) {
-        const webhookId = webhook.ids.webhook_id
+        const webhookId = castedWebhookValues.ids.webhook_id
         const exists = await existCheck(webhookId)
         if (exists) {
           this.setState({ displayOverwriteModal: true, existingId: webhookId })
@@ -260,9 +261,9 @@ export default class WebhookForm extends Component {
           })
         }
       }
-      const result = await onSubmit(webhook)
+      const result = await onSubmit(castedWebhookValues)
 
-      resetForm({ values })
+      resetForm({ values: castedWebhookValues })
       await onSubmitSuccess(result)
     } catch (error) {
       resetForm({ values })
@@ -314,21 +315,10 @@ export default class WebhookForm extends Component {
     this.setState({ shouldShowCredentialsInput: event.target.checked })
   }
 
-  @bind
-  hasAuthorizationBasic(header) {
-    if (header?.key === 'Authorization' && header.value?.startsWith('Basic')) {
-      this.setState({ shouldShowCredentialsInput: true })
-      return true
-    }
-  }
-
   render() {
     const { update, initialWebhookValue, webhookTemplate, buttonStyle } = this.props
     const { error, displayOverwriteModal, existingId } = this.state
-    let initialValues = blankValues
-    if (update && initialWebhookValue) {
-      initialValues = mapWebhookToFormValues(initialWebhookValue)
-    }
+    const initialValues = initialWebhookValue || blankValues
 
     const mayReactivate =
       update &&
@@ -382,7 +372,7 @@ export default class WebhookForm extends Component {
         >
           <Form.SubTitle title={sharedMessages.generalSettings} />
           <Form.Field
-            name="webhook_id"
+            name="ids.webhook_id"
             title={sharedMessages.webhookId}
             placeholder={m.idPlaceholder}
             component={Input}
@@ -411,8 +401,8 @@ export default class WebhookForm extends Component {
             name="headers"
             label={m.basicAuthCheckbox}
             onChange={this.handleRequestAuthenticationChange}
-            decode={mapBasicAuthHeaderToBoolean}
-            encode={mapBooleanToBasicAuthHeader}
+            decode={decodeBasicAuthRequest}
+            encode={encodeBasicAuthRequest}
             component={Checkbox}
             tooltipId={tooltipIds.BASIC_AUTH}
           />
@@ -422,16 +412,16 @@ export default class WebhookForm extends Component {
                 required
                 title={sharedMessages.username}
                 name="headers"
-                decode={mapBasicAuthHeaderToUsername}
-                encode={mapCredentialsToUsername}
+                decode={decodeBasicAuthHeaderUsername}
+                encode={encodeBasicAuthUsername}
                 component={Input}
               />
               <Form.Field
                 required
                 title={sharedMessages.password}
                 name="headers"
-                decode={mapBasicAuthHeaderToPassword}
-                encode={mapCredentialsToPassword}
+                decode={decodeBasicAuthHeaderPassword}
+                encode={encodeBasicAuthPassword}
                 component={Input}
                 sensitive
               />
@@ -442,9 +432,11 @@ export default class WebhookForm extends Component {
             title={m.additionalHeaders}
             keyPlaceholder={m.headersKeyPlaceholder}
             valuePlaceholder={m.headersValuePlaceholder}
+            encode={encodeHeaders}
+            decode={decodeHeaders}
             addMessage={m.headersAdd}
             component={KeyValueMap}
-            isReadOnly={this.hasAuthorizationBasic}
+            isReadOnly={hasAuthorizationBasic}
           />
           <Form.SubTitle title={m.enabledMessages} />
           <Notification info content={m.messageInfo} small />
@@ -453,6 +445,8 @@ export default class WebhookForm extends Component {
             type="toggled-input"
             title={sharedMessages.uplinkMessage}
             placeholder={pathPlaceholder}
+            decode={decodeMessageType}
+            encode={encodeMessageType}
             component={Input.Toggled}
           />
           <Form.Field
@@ -460,6 +454,8 @@ export default class WebhookForm extends Component {
             type="toggled-input"
             title={sharedMessages.joinAccept}
             placeholder={pathPlaceholder}
+            decode={decodeMessageType}
+            encode={encodeMessageType}
             component={Input.Toggled}
           />
           <Form.Field
@@ -467,6 +463,8 @@ export default class WebhookForm extends Component {
             type="toggled-input"
             title={sharedMessages.downlinkAck}
             placeholder={pathPlaceholder}
+            decode={decodeMessageType}
+            encode={encodeMessageType}
             component={Input.Toggled}
           />
           <Form.Field
@@ -474,6 +472,8 @@ export default class WebhookForm extends Component {
             type="toggled-input"
             title={sharedMessages.downlinkNack}
             placeholder={pathPlaceholder}
+            decode={decodeMessageType}
+            encode={encodeMessageType}
             component={Input.Toggled}
           />
           <Form.Field
@@ -481,6 +481,8 @@ export default class WebhookForm extends Component {
             type="toggled-input"
             title={sharedMessages.downlinkSent}
             placeholder={pathPlaceholder}
+            decode={decodeMessageType}
+            encode={encodeMessageType}
             component={Input.Toggled}
           />
           <Form.Field
@@ -488,6 +490,8 @@ export default class WebhookForm extends Component {
             type="toggled-input"
             title={sharedMessages.downlinkFailed}
             placeholder={pathPlaceholder}
+            decode={decodeMessageType}
+            encode={encodeMessageType}
             component={Input.Toggled}
           />
           <Form.Field
@@ -495,6 +499,8 @@ export default class WebhookForm extends Component {
             type="toggled-input"
             title={sharedMessages.downlinkQueued}
             placeholder={pathPlaceholder}
+            decode={decodeMessageType}
+            encode={encodeMessageType}
             component={Input.Toggled}
           />
           <Form.Field
@@ -502,6 +508,8 @@ export default class WebhookForm extends Component {
             type="toggled-input"
             title={sharedMessages.downlinkQueueInvalidated}
             placeholder={pathPlaceholder}
+            decode={decodeMessageType}
+            encode={encodeMessageType}
             component={Input.Toggled}
           />
           <Form.Field
@@ -509,6 +517,8 @@ export default class WebhookForm extends Component {
             type="toggled-input"
             title={sharedMessages.locationSolved}
             placeholder={pathPlaceholder}
+            decode={decodeMessageType}
+            encode={encodeMessageType}
             component={Input.Toggled}
           />
           <Form.Field
@@ -516,6 +526,8 @@ export default class WebhookForm extends Component {
             type="toggled-input"
             title={sharedMessages.serviceData}
             placeholder={pathPlaceholder}
+            decode={decodeMessageType}
+            encode={encodeMessageType}
             component={Input.Toggled}
           />
           <SubmitBar>
