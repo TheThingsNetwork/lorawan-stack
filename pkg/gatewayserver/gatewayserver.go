@@ -78,8 +78,7 @@ type GatewayServer struct {
 
 	connections sync.Map // string to connectionEntry
 
-	statsRegistry                     GatewayConnectionStatsRegistry
-	updateConnectionStatsDebounceTime time.Duration
+	statsRegistry GatewayConnectionStatsRegistry
 }
 
 // Option configures GatewayServer.
@@ -123,15 +122,14 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 	ctx := log.NewContextWithField(c.Context(), "namespace", "gatewayserver")
 
 	gs = &GatewayServer{
-		Component:                         c,
-		ctx:                               ctx,
-		config:                            conf,
-		requireRegisteredGateways:         conf.RequireRegisteredGateways,
-		forward:                           forward,
-		upstreamHandlers:                  make(map[string]upstream.Handler),
-		statsRegistry:                     conf.Stats,
-		updateConnectionStatsDebounceTime: conf.UpdateConnectionStatsDebounceTime,
-		entityRegistry:                    NewIS(c),
+		Component:                 c,
+		ctx:                       ctx,
+		config:                    conf,
+		requireRegisteredGateways: conf.RequireRegisteredGateways,
+		forward:                   forward,
+		upstreamHandlers:          make(map[string]upstream.Handler),
+		statsRegistry:             conf.Stats,
+		entityRegistry:            NewIS(c),
 	}
 	for _, opt := range opts {
 		opt(gs)
@@ -910,12 +908,6 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 		stats, paths := conn.Stats()
 		if err := gs.statsRegistry.Set(decoupledCtx, *ids, stats, paths, 0); err != nil {
 			logger.WithError(err).Warn("Failed to update connection stats")
-		}
-		timeout := time.After(gs.updateConnectionStatsDebounceTime)
-		select {
-		case <-ctx.Done():
-			return
-		case <-timeout:
 		}
 	}
 }

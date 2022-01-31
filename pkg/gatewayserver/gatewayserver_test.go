@@ -126,7 +126,6 @@ func TestGatewayServer(t *testing.T) {
 							AllowUnauthenticated: true,
 						},
 					},
-					UpdateConnectionStatsDebounceTime: 0,
 				}
 
 				er := gatewayserver.NewIS(c)
