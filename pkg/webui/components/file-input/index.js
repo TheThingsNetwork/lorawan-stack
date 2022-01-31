@@ -24,7 +24,7 @@ import Notification from '@ttn-lw/components/notification'
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
-import humanFileSize from '@ttn-lw/lib/utils/human-file-size'
+import humanFileSize from '@ttn-lw/lib/human-file-size'
 
 import style from './file-input.styl'
 
