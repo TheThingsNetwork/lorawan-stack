@@ -20,7 +20,6 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
@@ -379,12 +378,10 @@ func publishEvents(ctx context.Context, evs ...events.Event) {
 	events.Publish(evs...)
 }
 
-func uplinkDwellTime(dev *ttnpb.EndDevice, fp *frequencyplans.FrequencyPlan, phy *band.Band) bool {
+func uplinkDwellTime(macState *ttnpb.MACState, phy *band.Band) bool {
 	switch {
-	case dev.GetMacState().GetCurrentParameters().GetUplinkDwellTime() != nil:
-		return dev.MacState.CurrentParameters.UplinkDwellTime.Value
-	case fp.DwellTime.Uplinks != nil:
-		return *fp.DwellTime.Uplinks
+	case macState.GetCurrentParameters().GetUplinkDwellTime() != nil:
+		return macState.CurrentParameters.UplinkDwellTime.Value
 	case phy.BootDwellTime.Uplinks != nil:
 		return *phy.BootDwellTime.Uplinks
 	default:
@@ -392,12 +389,10 @@ func uplinkDwellTime(dev *ttnpb.EndDevice, fp *frequencyplans.FrequencyPlan, phy
 	}
 }
 
-func downlinkDwellTime(dev *ttnpb.EndDevice, fp *frequencyplans.FrequencyPlan, phy *band.Band) bool {
+func downlinkDwellTime(macState *ttnpb.MACState, phy *band.Band) bool {
 	switch {
-	case dev.GetMacState().GetCurrentParameters().GetDownlinkDwellTime() != nil:
-		return dev.MacState.CurrentParameters.DownlinkDwellTime.Value
-	case fp.DwellTime.Downlinks != nil:
-		return *fp.DwellTime.Downlinks
+	case macState.GetCurrentParameters().GetDownlinkDwellTime() != nil:
+		return macState.CurrentParameters.DownlinkDwellTime.Value
 	case phy.BootDwellTime.Downlinks != nil:
 		return *phy.BootDwellTime.Downlinks
 	default:
