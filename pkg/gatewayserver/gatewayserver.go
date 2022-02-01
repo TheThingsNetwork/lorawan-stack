@@ -880,9 +880,11 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 		ConnectedAt: ttnpb.ProtoTimePtr(connectTime),
 		Protocol:    conn.Connection.Frontend().Protocol(),
 	}
+	refreshTTLTimer := time.NewTicker(gs.config.ConnectionStatsTTL / 2)
+	defer refreshTTLTimer.Stop()
 
 	// Initial update, so that the gateway appears connected.
-	if err := gs.statsRegistry.Set(decoupledCtx, *ids, stats, ttnpb.GatewayConnectionStatsFieldPathsTopLevel, 0); err != nil {
+	if err := gs.statsRegistry.Set(decoupledCtx, *ids, stats, ttnpb.GatewayConnectionStatsFieldPathsTopLevel, gs.config.ConnectionStatsTTL); err != nil {
 		logger.WithError(err).Warn("Failed to initialize connection stats")
 	}
 
@@ -904,9 +906,10 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 		case <-ctx.Done():
 			return
 		case <-conn.StatsChanged():
+		case <-refreshTTLTimer.C:
 		}
 		stats, paths := conn.Stats()
-		if err := gs.statsRegistry.Set(decoupledCtx, *ids, stats, paths, 0); err != nil {
+		if err := gs.statsRegistry.Set(decoupledCtx, *ids, stats, paths, gs.config.ConnectionStatsTTL); err != nil {
 			logger.WithError(err).Warn("Failed to update connection stats")
 		}
 	}
