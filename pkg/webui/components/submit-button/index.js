@@ -42,6 +42,7 @@ class SubmitButton extends React.PureComponent {
 
     return (
       <Button
+        primary
         {...rest}
         type="submit"
         icon={icon}

@@ -20,6 +20,7 @@ import { bindActionCreators } from 'redux'
 import Status from '@ttn-lw/components/status'
 import toast from '@ttn-lw/components/toast'
 import Button from '@ttn-lw/components/button'
+import ButtonGroup from '@ttn-lw/components/button/group'
 import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 import SafeInspector from '@ttn-lw/components/safe-inspector'
 
@@ -158,8 +159,8 @@ const GatewaysTable = props => {
           purge: handlePurge.bind(null, row.ids.gateway_id),
         }),
         render: details => (
-          <>
-            <Button message={sharedMessages.restore} secondary onClick={details.restore} />
+          <ButtonGroup align="end">
+            <Button message={sharedMessages.restore} onClick={details.restore} />
             <DeleteModalButton
               entityId={details.id}
               entityName={name}
@@ -167,7 +168,7 @@ const GatewaysTable = props => {
               onApprove={details.purge}
               onlyPurge
             />
-          </>
+          </ButtonGroup>
         ),
       })
     } else {

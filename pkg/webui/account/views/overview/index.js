@@ -74,7 +74,7 @@ const Overview = () => {
             }}
           />
           <Message component="p" content={m.accountAppConsoleInfo} />
-          <Button.AnchorLink href={consoleUrl} message={m.goToConsole} />
+          <Button.AnchorLink primary href={consoleUrl} message={m.goToConsole} />
         </Col>
       </Row>
     </Container>

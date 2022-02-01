@@ -287,7 +287,6 @@ class Input extends React.Component {
                 icon={hidden ? 'visibility' : 'visibility_off'}
                 className={style.hideToggle}
                 onClick={this.handleHideToggleClick}
-                secondary
                 naked
                 type="button"
               />

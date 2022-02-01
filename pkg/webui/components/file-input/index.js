@@ -26,6 +26,8 @@ import Message from '@ttn-lw/lib/components/message'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import humanFileSize from '@ttn-lw/lib/human-file-size'
 
+import ButtonGroup from '../button/group'
+
 import style from './file-input.styl'
 
 const m = defineMessages({
@@ -160,7 +162,7 @@ export default class FileInput extends Component {
           {hasInitialValue ? <Message content={providedMessage} /> : filename}
           {mayRemove && (
             <Button
-              className={style.removeButton}
+              className="ml-cs-s"
               message={m.remove}
               onClick={this.handleRemoveClick}
               type="button"
@@ -173,7 +175,7 @@ export default class FileInput extends Component {
       )
     }
 
-    return <Message className={style.noFile} content={m.noFileSelected} />
+    return <Message className="tc-subtle-gray" content={m.noFileSelected} />
   }
 
   render() {
@@ -213,16 +215,18 @@ export default class FileInput extends Component {
               ref={this.imageRef}
             />
           )}
-          <Button
-            type="button"
-            aria-controls="fileupload"
-            onClick={this.handleChooseClick}
-            disabled={disabled}
-            message={!value ? message : changeMessage}
-            icon="attachment"
-            secondary
-          />
-          <span className={style.status}>{this.statusMessage}</span>
+          <ButtonGroup>
+            <Button
+              type="button"
+              aria-controls="fileupload"
+              onClick={this.handleChooseClick}
+              disabled={disabled}
+              message={!value ? message : changeMessage}
+              icon="attachment"
+              className="mr-cs-s"
+            />
+            {this.statusMessage}
+          </ButtonGroup>
           <input
             name={name}
             id={id}

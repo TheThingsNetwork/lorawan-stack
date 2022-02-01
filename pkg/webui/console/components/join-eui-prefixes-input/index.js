@@ -208,7 +208,6 @@ class JoinEUIPrefixesInput extends React.PureComponent {
             onBlur: this.handleBlur,
             name: this._getFillButtonName(),
             message: m.zeroInput,
-            secondary: true,
           }}
           {...rest}
         />

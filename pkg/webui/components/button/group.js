@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,35 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import classNames from 'classnames'
 import React from 'react'
-import classnames from 'classnames'
-
-import Icon from '@ttn-lw/components/icon'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import style from './icon.styl'
+import style from './button.styl'
 
-const ButtonIcon = props => {
-  const { className, icon, type, ...rest } = props
+const ButtonGroup = ({ className, children, align }) => (
+  <div className={classNames(style.buttonGroup, className, [style[`align-${align}`]])}>
+    {children}
+  </div>
+)
 
-  const cls = classnames(className, style.icon, {
-    [style.left]: type === 'left',
-    [style.right]: type === 'right',
-  })
-
-  return <Icon className={cls} icon={icon} {...rest} />
-}
-
-ButtonIcon.propTypes = {
+ButtonGroup.propTypes = {
+  align: PropTypes.oneOf('start', 'end', 'center'),
+  children: PropTypes.node.isRequired,
   className: PropTypes.string,
-  icon: PropTypes.string.isRequired,
-  type: PropTypes.oneOf(['left', 'right']),
 }
 
-ButtonIcon.defaultProps = {
+ButtonGroup.defaultProps = {
+  align: 'start',
   className: undefined,
-  type: 'left',
 }
 
-export default ButtonIcon
+export default ButtonGroup

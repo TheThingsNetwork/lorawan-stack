@@ -53,19 +53,13 @@ const FooterSection = ({ className, action, link, children, primary, safe }) => 
         {children}
       </a>
     ) : (
-      <Button.AnchorLink
-        className={style.footerSectionButton}
-        href={link}
-        secondary
-        unstyled
-        target="blank"
-      >
+      <Button.AnchorLink className={style.footerSectionButton} href={link} unstyled target="blank">
         {children}
       </Button.AnchorLink>
     )
   } else if (Boolean(action)) {
     content = (
-      <Button className={style.footerSectionButton} onClick={action} unstyled responsiveLabel>
+      <Button className={style.footerSectionButton} onClick={action} unstyled>
         {children}
       </Button>
     )

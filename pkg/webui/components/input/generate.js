@@ -45,7 +45,6 @@ const GenerateInput = props => {
       disabled: !mayGenerateValue,
       onClick: handleGenerateValue,
       message: m.generate,
-      secondary: true,
       ...action,
     }),
     [action, generateTitle, handleGenerateValue, mayGenerateValue],
