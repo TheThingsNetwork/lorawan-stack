@@ -890,11 +890,11 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 
 	defer func() {
 		logger.Debug("Delete connection stats")
-		stats.ConnectedAt = nil
-		stats.DisconnectedAt = ttnpb.ProtoTimePtr(time.Now())
-
 		if err := gs.statsRegistry.Set(
-			decoupledCtx, *ids, stats,
+			decoupledCtx, *ids, &ttnpb.GatewayConnectionStats{
+				ConnectedAt:    nil,
+				DisconnectedAt: ttnpb.ProtoTimePtr(time.Now()),
+			},
 			[]string{"connected_at", "disconnected_at"},
 			gs.config.ConnectionStatsDisconnectTTL,
 		); err != nil {
