@@ -228,8 +228,6 @@ func DeviceUplinkDwellTime(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.
 		return &ttnpb.BoolValue{Value: dev.MacSettings.UplinkDwellTime.Value}
 	case defaults.UplinkDwellTime != nil:
 		return &ttnpb.BoolValue{Value: defaults.UplinkDwellTime.Value}
-	case phy.BootDwellTime.Uplinks != nil:
-		return &ttnpb.BoolValue{Value: *phy.BootDwellTime.Uplinks}
 	default:
 		return nil
 	}
@@ -241,8 +239,6 @@ func DeviceDownlinkDwellTime(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnp
 		return &ttnpb.BoolValue{Value: dev.MacSettings.DownlinkDwellTime.Value}
 	case defaults.DownlinkDwellTime != nil:
 		return &ttnpb.BoolValue{Value: defaults.DownlinkDwellTime.Value}
-	case phy.BootDwellTime.Downlinks != nil:
-		return &ttnpb.BoolValue{Value: *phy.BootDwellTime.Downlinks}
 	default:
 		return nil
 	}
@@ -674,4 +670,26 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MA
 		CurrentParameters:   current,
 		DesiredParameters:   desired,
 	}, nil
+}
+
+func DeviceExpectedUplinkDwellTime(macState *ttnpb.MACState, phy *band.Band) bool {
+	switch {
+	case macState.GetCurrentParameters().GetUplinkDwellTime() != nil:
+		return macState.CurrentParameters.UplinkDwellTime.Value
+	case phy.BootDwellTime.Uplinks != nil:
+		return *phy.BootDwellTime.Uplinks
+	default:
+		return false
+	}
+}
+
+func DeviceExpectedDownlinkDwellTime(macState *ttnpb.MACState, phy *band.Band) bool {
+	switch {
+	case macState.GetCurrentParameters().GetDownlinkDwellTime() != nil:
+		return macState.CurrentParameters.DownlinkDwellTime.Value
+	case phy.BootDwellTime.Downlinks != nil:
+		return *phy.BootDwellTime.Downlinks
+	default:
+		return true
+	}
 }

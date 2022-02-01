@@ -378,28 +378,6 @@ func publishEvents(ctx context.Context, evs ...events.Event) {
 	events.Publish(evs...)
 }
 
-func uplinkDwellTime(macState *ttnpb.MACState, phy *band.Band) bool {
-	switch {
-	case macState.GetCurrentParameters().GetUplinkDwellTime() != nil:
-		return macState.CurrentParameters.UplinkDwellTime.Value
-	case phy.BootDwellTime.Uplinks != nil:
-		return *phy.BootDwellTime.Uplinks
-	default:
-		return false
-	}
-}
-
-func downlinkDwellTime(macState *ttnpb.MACState, phy *band.Band) bool {
-	switch {
-	case macState.GetCurrentParameters().GetDownlinkDwellTime() != nil:
-		return macState.CurrentParameters.DownlinkDwellTime.Value
-	case phy.BootDwellTime.Downlinks != nil:
-		return *phy.BootDwellTime.Downlinks
-	default:
-		return false
-	}
-}
-
 func (ns *NetworkServer) enqueueApplicationUplinks(ctx context.Context, ups ...*ttnpb.ApplicationUp) {
 	log.FromContext(ctx).Debug("Enqueue application uplinks for sending to Application Server")
 	if err := ns.applicationUplinks.Add(ctx, ups...); err != nil {

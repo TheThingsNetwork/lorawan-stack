@@ -1079,7 +1079,7 @@ func rx1Parameters(phy *band.Band, macState *ttnpb.MACState, up *ttnpb.UplinkMes
 	if !ok {
 		return 0, 0, band.DataRate{}, errDataRateNotFound.New()
 	}
-	drIdx, err = phy.Rx1DataRate(drIdx, macState.CurrentParameters.Rx1DataRateOffset, downlinkDwellTime(macState, phy))
+	drIdx, err = phy.Rx1DataRate(drIdx, macState.CurrentParameters.Rx1DataRateOffset, mac.DeviceExpectedDownlinkDwellTime(macState, phy))
 	if err != nil {
 		return 0, 0, band.DataRate{}, err
 	}
@@ -1114,7 +1114,7 @@ loop:
 	if !ok {
 		return 0, errDataRateIndexNotFound.WithAttributes("index", maxUpDRIdx)
 	}
-	return dr.MaxMACPayloadSize(uplinkDwellTime(dev.MacState, phy)), nil
+	return dr.MaxMACPayloadSize(mac.DeviceExpectedUplinkDwellTime(dev.MacState, phy)), nil
 }
 
 // downlinkRetryInterval is the time interval, which defines the interval between downlink task retries.
@@ -1246,7 +1246,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		transmitAt = slot.RX2()
 		maxDR = rx2DR
 	}
-	downDwellTime := downlinkDwellTime(dev.MacState, phy)
+	downDwellTime := mac.DeviceExpectedDownlinkDwellTime(dev.MacState, phy)
 
 	genDown, genState, err := ns.generateDataDownlink(ctx, dev, phy, ttnpb.Class_CLASS_A, transmitAt,
 		maxDR.MaxMACPayloadSize(downDwellTime),
@@ -1399,7 +1399,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 	}
 
 	genDown, genState, err := ns.generateDataDownlink(ctx, dev, phy, slot.Class, latestTime(slot.Time, time.Now()),
-		dr.MaxMACPayloadSize(downlinkDwellTime(dev.MacState, phy)),
+		dr.MaxMACPayloadSize(mac.DeviceExpectedDownlinkDwellTime(dev.MacState, phy)),
 		maxUpLength,
 	)
 	var sets []string

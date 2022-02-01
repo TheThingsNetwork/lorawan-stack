@@ -1083,7 +1083,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 										rx1DRIdx := test.Must(phy.Rx1DataRate(
 											drIdx,
 											conf.MACState.CurrentParameters.Rx1DataRateOffset,
-											conf.MACState.CurrentParameters.DownlinkDwellTime.GetValue()),
+											mac.DeviceExpectedDownlinkDwellTime(conf.MACState, phy)),
 										).(ttnpb.DataRateIndex)
 										rx1DR := phy.DataRates[rx1DRIdx]
 										txReq.Rx1DataRate = rx1DR.Rate
