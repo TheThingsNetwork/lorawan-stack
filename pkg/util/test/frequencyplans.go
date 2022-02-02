@@ -264,7 +264,10 @@ clock-source: 1`
 sub-bands:
 - min-frequency: 915000000
   max-frequency: 928000000
-  max-eirp: 30
+dwell-time:
+  uplinks: false
+  downlinks: false
+max-eirp: 30
 uplink-channels:
 - frequency: 923200000
   min-data-rate: 0
