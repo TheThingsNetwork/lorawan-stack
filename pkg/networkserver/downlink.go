@@ -1091,7 +1091,7 @@ func rx1Parameters(phy *band.Band, fp *frequencyplans.FrequencyPlan, macState *t
 }
 
 // maximumUplinkLength returns the maximum length of the next uplink after ups.
-func maximumUplinkLength(dev *ttnpb.EndDevice, fp *frequencyplans.FrequencyPlan, phy *band.Band, ups ...*ttnpb.UplinkMessage) (uint16, error) {
+func maximumUplinkLength(macState *ttnpb.MACState, fp *frequencyplans.FrequencyPlan, phy *band.Band, ups ...*ttnpb.UplinkMessage) (uint16, error) {
 	// NOTE: If no data uplink is found, we assume ADR is off on the device and, hence, data rate index 0 is used in computation.
 	maxUpDRIdx := ttnpb.DataRateIndex_DATA_RATE_0
 loop:
@@ -1114,7 +1114,7 @@ loop:
 	if !ok {
 		return 0, errDataRateIndexNotFound.WithAttributes("index", maxUpDRIdx)
 	}
-	return dr.MaxMACPayloadSize(mac.DeviceExpectedUplinkDwellTime(dev.MacState, fp, phy)), nil
+	return dr.MaxMACPayloadSize(mac.DeviceExpectedUplinkDwellTime(macState, fp, phy)), nil
 }
 
 // downlinkRetryInterval is the time interval, which defines the interval between downlink task retries.
@@ -1837,7 +1837,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 
 				var maxUpLength uint16 = math.MaxUint16
 				if !dev.Multicast && dev.MacState.LorawanVersion == ttnpb.MACVersion_MAC_V1_1 {
-					maxUpLength, err = maximumUplinkLength(dev, fp, phy, dev.MacState.RecentUplinks...)
+					maxUpLength, err = maximumUplinkLength(dev.MacState, fp, phy, dev.MacState.RecentUplinks...)
 					if err != nil {
 						logger.WithError(err).Error("Failed to determine maximum uplink length")
 						return dev, nil, nil

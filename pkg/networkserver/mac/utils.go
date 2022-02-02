@@ -224,6 +224,8 @@ func DeviceDefaultPingSlotPeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSe
 
 func DeviceUplinkDwellTime(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) *ttnpb.BoolValue {
 	switch {
+	case !phy.TxParamSetupReqSupport:
+		return nil
 	case dev.GetMacSettings().GetUplinkDwellTime() != nil:
 		return &ttnpb.BoolValue{Value: dev.MacSettings.UplinkDwellTime.Value}
 	case defaults.UplinkDwellTime != nil:
@@ -235,6 +237,8 @@ func DeviceUplinkDwellTime(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.
 
 func DeviceDownlinkDwellTime(dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) *ttnpb.BoolValue {
 	switch {
+	case !phy.TxParamSetupReqSupport:
+		return nil
 	case dev.GetMacSettings().GetDownlinkDwellTime() != nil:
 		return &ttnpb.BoolValue{Value: dev.MacSettings.DownlinkDwellTime.Value}
 	case defaults.DownlinkDwellTime != nil:
@@ -255,8 +259,10 @@ func DeviceDesiredMaxEIRP(dev *ttnpb.EndDevice, phy *band.Band, fp *frequencypla
 	}
 }
 
-func DeviceDesiredUplinkDwellTime(fp *frequencyplans.FrequencyPlan) *ttnpb.BoolValue {
+func DeviceDesiredUplinkDwellTime(phy *band.Band, fp *frequencyplans.FrequencyPlan) *ttnpb.BoolValue {
 	switch {
+	case !phy.TxParamSetupReqSupport:
+		return nil
 	case fp.DwellTime.Uplinks != nil:
 		return &ttnpb.BoolValue{Value: *fp.DwellTime.Uplinks}
 	default:
@@ -264,8 +270,10 @@ func DeviceDesiredUplinkDwellTime(fp *frequencyplans.FrequencyPlan) *ttnpb.BoolV
 	}
 }
 
-func DeviceDesiredDownlinkDwellTime(fp *frequencyplans.FrequencyPlan) *ttnpb.BoolValue {
+func DeviceDesiredDownlinkDwellTime(phy *band.Band, fp *frequencyplans.FrequencyPlan) *ttnpb.BoolValue {
 	switch {
+	case !phy.TxParamSetupReqSupport:
+		return nil
 	case fp.DwellTime.Downlinks != nil:
 		return &ttnpb.BoolValue{Value: *fp.DwellTime.Downlinks}
 	default:
@@ -655,8 +663,8 @@ func NewState(dev *ttnpb.EndDevice, fps *frequencyplans.Store, defaults ttnpb.MA
 			PingSlotFrequency:          DeviceDesiredPingSlotFrequency(dev, phy, fp, defaults),
 			BeaconFrequency:            DeviceDesiredBeaconFrequency(dev, defaults),
 			Channels:                   DeviceDesiredChannels(dev, phy, fp, defaults),
-			UplinkDwellTime:            DeviceDesiredUplinkDwellTime(fp),
-			DownlinkDwellTime:          DeviceDesiredDownlinkDwellTime(fp),
+			UplinkDwellTime:            DeviceDesiredUplinkDwellTime(phy, fp),
+			DownlinkDwellTime:          DeviceDesiredDownlinkDwellTime(phy, fp),
 			AdrAckLimitExponent:        DeviceDesiredADRAckLimitExponent(dev, phy, defaults),
 			AdrAckDelayExponent:        DeviceDesiredADRAckDelayExponent(dev, phy, defaults),
 			PingSlotDataRateIndexValue: DeviceDesiredPingSlotDataRateIndexValue(dev, phy, fp, defaults),
