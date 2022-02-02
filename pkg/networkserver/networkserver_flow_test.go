@@ -76,8 +76,8 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 			default:
 				return false
 			}
-		}
-		if !otaa || beforeRP001_V1_0_3_REV_A(phyVersion) {
+		}(phyVersion)
+		if !otaa || beforeRP001_V1_0_3_REV_A {
 			linkADRReqs = append([]MACCommander{
 				&ttnpb.MACCommand_LinkADRReq{
 					ChannelMask:        []bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
@@ -100,20 +100,38 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 			Frequency:        924600000,
 			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 		}
-		linkADRReq := &ttnpb.MACCommand_LinkADRReq{
-			ChannelMask:   []bool{true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false},
-			DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
-			TxPowerIndex:  1,
-			NbTrans:       1,
-		}
 		macCommanders := []MACCommander{newChannelReq}
 		evBuilders := []events.Builder{mac.EvtEnqueueNewChannelRequest.With(events.WithData(newChannelReq))}
+
 		fPending := true
+		// The boot time settings of RP001-1.0.2B devices enable downlink dwell time, which limits the number
+		// of MAC commands that can be part of the downlink. As such, the LinkADRReq is not sent as part of
+		// the initial downlink on this version.
 		if phyVersion != ttnpb.PHYVersion_PHY_V1_0_2_REV_B {
+			linkADRReq := &ttnpb.MACCommand_LinkADRReq{
+				ChannelMask:   []bool{true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false},
+				DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+				TxPowerIndex:  1,
+				NbTrans:       1,
+			}
+
 			macCommanders = append(macCommanders, linkADRReq)
 			evBuilders = append(evBuilders, mac.EvtEnqueueLinkADRRequest.With(events.WithData(linkADRReq)))
 			fPending = false
 		}
+
+		var maxEIRPIndex = ttnpb.DeviceEIRP(5)
+		// The maximum EIRP in the RP001-1.0.2A version is 14 dB only, while the other versions use 16 dB.
+		if phyVersion == ttnpb.PHYVersion_PHY_V1_0_2_REV_A {
+			maxEIRPIndex = ttnpb.DeviceEIRP(4)
+		}
+		txParamSetupReq := &ttnpb.MACCommand_TxParamSetupReq{
+			MaxEirpIndex:      maxEIRPIndex,
+			DownlinkDwellTime: false,
+			UplinkDwellTime:   false,
+		}
+		macCommanders = append(macCommanders, txParamSetupReq)
+		evBuilders = append(evBuilders, mac.EvtEnqueueTxParamSetupRequest.With(events.WithData(txParamSetupReq)))
 		return macCommanders, evBuilders, fPending
 	default:
 		panic(fmt.Errorf("unknown LinkADRReqs for %s frequency plan", fpID))

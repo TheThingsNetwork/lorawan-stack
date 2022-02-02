@@ -260,7 +260,7 @@ func DeviceDesiredUplinkDwellTime(fp *frequencyplans.FrequencyPlan) *ttnpb.BoolV
 	case fp.DwellTime.Uplinks != nil:
 		return &ttnpb.BoolValue{Value: *fp.DwellTime.Uplinks}
 	default:
-		return nil
+		return &ttnpb.BoolValue{Value: true}
 	}
 }
 
@@ -269,7 +269,7 @@ func DeviceDesiredDownlinkDwellTime(fp *frequencyplans.FrequencyPlan) *ttnpb.Boo
 	case fp.DwellTime.Downlinks != nil:
 		return &ttnpb.BoolValue{Value: *fp.DwellTime.Downlinks}
 	default:
-		return nil
+		return &ttnpb.BoolValue{Value: true}
 	}
 }
 
