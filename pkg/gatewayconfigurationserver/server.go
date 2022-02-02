@@ -23,11 +23,14 @@ import (
 	"github.com/gogo/protobuf/types"
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	gcsv2 "go.thethings.network/lorawan-stack/v3/pkg/gatewayconfigurationserver/v2"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/cpf"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/semtechudp"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
@@ -108,10 +111,14 @@ func (s *Server) Roles() []ttnpb.ClusterRole {
 }
 
 // RegisterServices registers services provided by gcs at s.
-func (s *Server) RegisterServices(_ *grpc.Server) {}
+func (s *Server) RegisterServices(grpcServer *grpc.Server) {
+	ttnpb.RegisterGatewayConfigurationServiceServer(grpcServer, s)
+}
 
 // RegisterHandlers registers gRPC handlers.
-func (s *Server) RegisterHandlers(_ *runtime.ServeMux, _ *grpc.ClientConn) {}
+func (s *Server) RegisterHandlers(mux *runtime.ServeMux, conn *grpc.ClientConn) {
+	ttnpb.RegisterGatewayConfigurationServiceHandler(s.Context(), mux, conn)
+}
 
 // RegisterRoutes registers the web frontend routes.
 func (s *Server) RegisterRoutes(server *web.Server) {
@@ -165,6 +172,9 @@ func New(c *component.Component, conf *Config) (*Server, error) {
 
 	v2GCS := gcsv2.New(c, gcsv2.WithTheThingsGatewayConfig(conf.TheThingsGateway))
 	_ = v2GCS
+
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GatewayConfigurationService", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("gatewayconfigurationserver"))
+	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GatewayConfigurationService", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	c.RegisterGRPC(gcs)
 	c.RegisterWeb(gcs)
