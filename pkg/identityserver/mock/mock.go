@@ -38,7 +38,7 @@ func New(ctx context.Context) (*MockDefinition, string, closeMock) {
 		applicationRegistry: &mockISApplicationRegistry{
 			applications:      make(map[string]*ttnpb.Application),
 			applicationAuths:  make(map[string][]string),
-			applicationRights: make(map[string][]ttnpb.Right),
+			applicationRights: make(map[string]authKeyToRights),
 		},
 		gatewayRegistry: &mockISGatewayRegistry{
 			gateways:      make(map[string]*ttnpb.Gateway),

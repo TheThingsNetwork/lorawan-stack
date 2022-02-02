@@ -23,13 +23,14 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+type authKeyToRights map[string][]ttnpb.Right
 type mockISApplicationRegistry struct {
 	ttnpb.ApplicationRegistryServer
 	ttnpb.ApplicationAccessServer
 
 	applications      map[string]*ttnpb.Application
 	applicationAuths  map[string][]string
-	applicationRights map[string][]ttnpb.Right
+	applicationRights map[string]authKeyToRights
 }
 
 func (is *mockISApplicationRegistry) Add(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string, rights ...ttnpb.Right) {
@@ -37,10 +38,17 @@ func (is *mockISApplicationRegistry) Add(ctx context.Context, ids ttnpb.Applicat
 	is.applications[uid] = &ttnpb.Application{
 		Ids: &ids,
 	}
+
+	var bearerKey string
 	if key != "" {
-		is.applicationAuths[uid] = []string{fmt.Sprintf("Bearer %v", key)}
+		bearerKey = fmt.Sprintf("Bearer %v", key)
+		is.applicationAuths[uid] = append(is.applicationAuths[uid], bearerKey)
 	}
-	is.applicationRights[uid] = rights
+
+	if is.applicationRights[uid] == nil {
+		is.applicationRights[uid] = make(authKeyToRights)
+	}
+	is.applicationRights[uid][bearerKey] = rights
 }
 
 func (is *mockISApplicationRegistry) Get(ctx context.Context, req *ttnpb.GetApplicationRequest) (*ttnpb.Application, error) {
@@ -69,8 +77,8 @@ func (is *mockISApplicationRegistry) ListRights(ctx context.Context, ids *ttnpb.
 		return
 	}
 	for _, auth := range auths {
-		if auth == authorization[0] {
-			res.Rights = append(res.Rights, is.applicationRights[uid]...)
+		if auth == authorization[0] && is.applicationRights[uid] != nil {
+			res.Rights = append(res.Rights, is.applicationRights[uid][auth]...)
 		}
 	}
 	return
