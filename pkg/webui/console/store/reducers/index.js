@@ -31,6 +31,7 @@ import { createNamedPaginationReducer } from '@ttn-lw/lib/store/reducers/paginat
 import fetching from '@ttn-lw/lib/store/reducers/ui/fetching'
 import error from '@ttn-lw/lib/store/reducers/ui/error'
 import status from '@ttn-lw/lib/store/reducers/status'
+import init from '@ttn-lw/lib/store/reducers/init'
 
 import { SHARED_NAME as API_KEYS_SHARED_NAME } from '@console/store/actions/api-keys'
 import { SHARED_NAME as COLLABORATORS_SHARED_NAME } from '@console/store/actions/collaborators'
@@ -38,7 +39,6 @@ import { SHARED_NAME as PACKET_BROKER_NETWORKS_SHARED_NAME } from '@console/stor
 
 import user from './user'
 import users from './users'
-import init from './init'
 import applications from './applications'
 import devices from './devices'
 import gateways from './gateways'

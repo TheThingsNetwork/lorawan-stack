@@ -29,8 +29,13 @@ import LAYOUT from '@ttn-lw/constants/layout'
 import Spinner from '@ttn-lw/components/spinner'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { initialize } from '@ttn-lw/lib/store/actions/init'
+import {
+  selectInitError,
+  selectInitFetching,
+  selectIsInitialized,
+} from '@ttn-lw/lib/store/selectors/init'
 
-import ErrorMessage from './error-message'
 import Message from './message'
 
 import '@ttn-lw/styles/main.styl'
@@ -67,11 +72,11 @@ setConfiguration({
 
 @connect(
   state => ({
-    initialized: state.init.initialized,
-    error: state.init.error,
+    initialized: !selectInitFetching(state) && selectIsInitialized(state),
+    error: selectInitError(state),
   }),
   dispatch => ({
-    initialize: () => dispatch({ type: 'INITIALIZE_REQUEST' }),
+    initialize: () => dispatch(initialize()),
   }),
 )
 export default class Init extends React.PureComponent {
@@ -107,7 +112,7 @@ export default class Init extends React.PureComponent {
     const { initialized, error } = this.props
 
     if (error) {
-      return <ErrorMessage content={error} />
+      throw error
     }
 
     if (!initialized) {

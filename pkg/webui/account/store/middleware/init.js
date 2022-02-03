@@ -16,11 +16,11 @@ import { createLogic } from 'redux-logic'
 
 import api from '@account/api'
 
-import { isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
+import * as init from '@ttn-lw/lib/store/actions/init'
+import { isPermissionDeniedError, isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
 import { promisifyDispatch } from '@ttn-lw/lib/store/middleware/request-promise-middleware'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import * as init from '@account/store/actions/init'
 import * as user from '@account/store/actions/user'
 
 const accountAppInitLogic = createLogic({
@@ -28,30 +28,27 @@ const accountAppInitLogic = createLogic({
   process: async (_, dispatch, done) => {
     try {
       const meResult = await api.account.me()
-      try {
-        // Using `store.dispatch` since redux logic's dispatch won't return
-        // the (promisified) action result like regular dispatch does.
-        await promisifyDispatch(dispatch)(
-          attachPromise(
-            user.getUser(meResult.data.user.ids.user_id, [
-              'profile_picture',
-              'name',
-              'description',
-              'primary_email_address',
-              'admin',
-            ]),
-          ),
-        )
-      } catch (error) {
-        // An error here means that the user is logged out. This does not
-        // need to be handled or result in the initialization to fail.
-      }
+      // Using `store.dispatch` since redux logic's dispatch won't return
+      // the (promisified) action result like regular dispatch does.
+      await promisifyDispatch(dispatch)(
+        attachPromise(
+          user.getUser(meResult.data.user.ids.user_id, [
+            'profile_picture',
+            'name',
+            'description',
+            'primary_email_address',
+            'admin',
+          ]),
+        ),
+      )
     } catch (error) {
-      if (!isUnauthenticatedError(error)) {
-        const initError = error.data ? error.data : error
+      if (!isUnauthenticatedError(error) && !isPermissionDeniedError(error)) {
+        const initError = error?.data || error
         dispatch(init.initializeFailure(initError))
         return done()
       }
+      // Unauthenticated or forbidden errors mean that the user is logged out.
+      // This is expected and should not make the initialization fail.
     }
 
     // eslint-disable-next-line no-console

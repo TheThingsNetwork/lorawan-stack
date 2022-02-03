@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable import/prefer-default-export */
-
 import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
 
+export const INITIALIZE_BASE = 'INITIALIZE'
 export const [
   { request: INITIALIZE, success: INITIALIZE_SUCCESS, failure: INITIALIZE_FAILURE },
   { request: initialize, success: initializeSuccess, failure: initializeFailure },
-] = createRequestActions('INITIALIZE')
+] = createRequestActions(INITIALIZE_BASE)

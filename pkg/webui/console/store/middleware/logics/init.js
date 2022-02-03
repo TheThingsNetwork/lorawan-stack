@@ -16,9 +16,9 @@ import tts from '@console/api/tts'
 
 import { clear as clearAccessToken } from '@ttn-lw/lib/access-token'
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+import * as init from '@ttn-lw/lib/store/actions/init'
 
 import * as user from '@console/store/actions/user'
-import * as init from '@console/store/actions/init'
 
 const consoleAppLogic = createRequestLogic({
   type: init.INITIALIZE,
