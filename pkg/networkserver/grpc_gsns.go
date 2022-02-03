@@ -130,7 +130,7 @@ func makeDeferredMACHandler(dev *ttnpb.EndDevice, f macHandler) macHandler {
 		case n == queuedLength:
 			return f(ctx, dev, up)
 		default:
-			tail := append(dev.MacState.QueuedResponses[queuedLength:0:0], dev.MacState.QueuedResponses[queuedLength:]...)
+			tail := append(dev.MacState.QueuedResponses[:0:0], dev.MacState.QueuedResponses[queuedLength:]...)
 			dev.MacState.QueuedResponses = dev.MacState.QueuedResponses[:queuedLength]
 			evs, err := f(ctx, dev, up)
 			dev.MacState.QueuedResponses = append(dev.MacState.QueuedResponses, tail...)
