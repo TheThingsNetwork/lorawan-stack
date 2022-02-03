@@ -21,19 +21,21 @@ import {
   isNetworkError,
   isTimeoutError,
   ingestError,
+  isPermissionDeniedError,
 } from '@ttn-lw/lib/errors/utils'
 import { clear as clearAccessToken } from '@ttn-lw/lib/access-token'
 import {
   setLoginStatus,
   setStatusChecking,
-  attemptReconnect,
   ATTEMPT_RECONNECT,
 } from '@ttn-lw/lib/store/actions/status'
 import { promisifyDispatch } from '@ttn-lw/lib/store/middleware/request-promise-middleware'
 import attachPromise, { getResultActionFromType } from '@ttn-lw/lib/store/actions/attach-promise'
 import { selectIsCheckingStatus } from '@ttn-lw/lib/store/selectors/status'
+import { TokenError } from '@ttn-lw/lib/errors/custom-errors'
 
 let connectionChecking = null
+let lastError
 
 /**
  * Logic creator for request logics, it will handle promise resolution, as well
@@ -92,26 +94,32 @@ const createRequestLogic = (
       }
 
       let success = false
+      let connectionCheckResult = null
       while (!success) {
         try {
           // Check if the internet connection is currently (deemed) interrupted.
           if (connectionChecking) {
-            // Trigger an immediate reconnection attempt.
-            dispatch(attemptReconnect())
-
             const cancellation = new Promise((resolve, reject) => {
               cancelled$.subscribe({ next: reject, complete: resolve })
             })
             try {
               // Wait until the connection has been re-established or the
               // request has been aborted, e.g. due to a route change.
-              await Promise.race([connectionChecking, cancellation])
+              connectionCheckResult = await Promise.race([connectionChecking, cancellation])
             } catch (error) {
               // The request was cancelled, so we cancel
               // further request execution.
               break
             }
+
             connectionChecking = null
+
+            // Avoid request loops when connection check detected no connection loss.
+            // Rather bubble up the error so it can stop the request action and be
+            // handled by consuming logic.
+            if (connectionCheckResult?.falseAlert) {
+              throw lastError
+            }
           }
 
           // Run the logic process.
@@ -129,6 +137,7 @@ const createRequestLogic = (
             _resolve(res)
           }
         } catch (e) {
+          lastError = e
           ingestError(
             e,
             { ingestedBy: 'createReqestLogic', requestAction: action },
@@ -137,14 +146,20 @@ const createRequestLogic = (
 
           // If there was an unauthenticated error, the access token is not
           // valid and we can delete it. A "Log back in"-modal will then pop up.
-          if (isUnauthenticatedError(e)) {
+          if (
+            isUnauthenticatedError(e) ||
+            (e instanceof TokenError && isPermissionDeniedError(e?.cause))
+          ) {
             clearAccessToken()
             dispatch(setLoginStatus())
             break
             // If there was a network error, it could mean that the network
             // connection is currently interrupted. Setting the online state to
             // `checking` will trigger respective connection management logics.
-          } else if (isNetworkError(e) || isTimeoutError(e)) {
+          } else if (
+            (isNetworkError(e) || isTimeoutError(e)) &&
+            !connectionCheckResult?.falseAlert
+          ) {
             // We only need to set the status and trigger the connection checks
             // if the online status was `online` previously.
             if (!selectIsCheckingStatus(getState()) && action.type !== ATTEMPT_RECONNECT) {

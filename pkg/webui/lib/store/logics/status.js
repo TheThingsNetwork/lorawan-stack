@@ -22,7 +22,7 @@ import { isNetworkError, isTimeoutError } from '@ttn-lw/lib/errors/utils'
 import * as status from '@ttn-lw/lib/store/actions/status'
 import { selectIsOfflineStatus } from '@ttn-lw/lib/store/selectors/status'
 
-const isRoot = selectIsConfig().base_url
+const probeUrl = `${selectIsConfig().base_url}/auth_info`
 
 const initialInterval = 5000
 let interval = initialInterval
@@ -33,6 +33,7 @@ const connectionCheck = (dispatch, done) => () => {
 
 let periodicCheck
 let connectionCheckResolve
+let falseAlert = false
 
 const connectionManagementLogic = createLogic({
   type: status.SET_CONNECTION_STATUS,
@@ -45,7 +46,8 @@ const connectionManagementLogic = createLogic({
       }
       try {
         // Make a simple GET request to the auth_info endpoint.
-        await axios.get(`${isRoot}/auth_info`, { timeout: 5000 })
+        await axios.get(probeUrl, { timeout: 5000 })
+        falseAlert = true
         dispatch(status.setStatusOnline())
       } catch (error) {
         // If this one fails with a network error, we can be sufficiently
@@ -64,7 +66,8 @@ const connectionManagementLogic = createLogic({
       typeof connectionCheckResolve === 'function'
     ) {
       // Resolve the connection check promise.
-      connectionCheckResolve()
+      connectionCheckResolve({ falseAlert })
+      falseAlert = false
     }
 
     done()
@@ -89,7 +92,7 @@ const connectionCheckLogic = createLogic({
   },
   process: async (_, dispatch, done) => {
     try {
-      await axios.get(`${isRoot}/auth_info`, { timeout: 4500 })
+      await axios.get(probeUrl, { timeout: 4500 })
       dispatch(status.setStatusOnline())
       dispatch(status.attemptReconnectSuccess())
       interval = initialInterval
