@@ -54,6 +54,7 @@ const handleMessage = (message, type) => {
 
 const OfflineStatus = ({ showOfflineOnly, showWarnings, onlineStatus }) => {
   const initialUpdate = useRef(true)
+  const wasOffline = useRef(false)
   const isOnline = onlineStatus === ONLINE_STATUS.ONLINE
   const isOffline = onlineStatus === ONLINE_STATUS.OFFLINE
   const isChecking = onlineStatus === ONLINE_STATUS.CHECKING
@@ -64,12 +65,12 @@ const OfflineStatus = ({ showOfflineOnly, showWarnings, onlineStatus }) => {
       return
     }
     if (showWarnings) {
-      if (isOnline) {
+      if (isOnline && wasOffline.current) {
         handleMessage(m.online, toast.types.INFO)
-      } else if (isChecking) {
-        handleMessage(m.checking, toast.types.WARNING)
+        wasOffline.current = false
       } else if (isOffline) {
         handleMessage(m.offline, toast.types.ERROR)
+        wasOffline.current = true
       }
     }
   }, [showWarnings, isOnline, isChecking, isOffline])
