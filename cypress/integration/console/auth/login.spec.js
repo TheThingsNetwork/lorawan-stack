@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const user = {
+  ids: { user_id: 'test-user' },
+  primary_email_address: 'test-user@example.com',
+  password: 'ABCDefg123!',
+  password_confirm: 'ABCDefg123!',
+}
+
 describe('Account App login', () => {
   before(() => {
     cy.dropAndSeedDatabase()
+    cy.createUser(user)
   })
 
   it('displays UI elements in place', () => {
@@ -50,33 +58,66 @@ describe('Account App login', () => {
     cy.location('pathname').should('eq', `${Cypress.config('accountAppRootPath')}/login`)
   })
 
-  it('succeeds logging in when using valid credentials', () => {
-    const user = {
-      ids: { user_id: 'test-user' },
-      primary_email_address: 'test-user@example.com',
-      password: 'ABCDefg123!',
-      password_confirm: 'ABCDefg123!',
-    }
-    cy.createUser(user)
-    cy.visit(Cypress.config('accountAppRootPath'))
+  it('succeeds logging in with valid credentials', () => {
+    const location = `${Cypress.config('consoleRootPath')}/applications/`
+    cy.visit(location)
 
     cy.findByLabelText('User ID').type(user.ids.user_id)
     cy.findByLabelText('Password').type(`${user.password}{enter}`)
 
-    cy.location('pathname').should('eq', `${Cypress.config('accountAppRootPath')}/`)
+    cy.location('pathname').should('eq', location)
+    cy.findByText(/Applications \(0\)/).should('be.visible')
     cy.findByTestId('full-error-view').should('not.exist')
   })
 
   it('displays an error when using invalid credentials', () => {
-    const user = { user_id: 'userwrong', password: 'userWr0ng!' }
-    cy.visit(Cypress.config('accountAppRootPath'))
+    const usr = { user_id: 'does-not-exist-usr', password: '12345QWERTY!' }
+    cy.visit(Cypress.config('consoleRootPath'))
 
-    cy.findByLabelText('User ID').type(user.user_id)
-    cy.findByLabelText('Password').type(`${user.password}{enter}`)
+    cy.findByLabelText('User ID').type(usr.user_id)
+    cy.findByLabelText('Password').type(`${usr.password}{enter}`)
 
+    cy.location('pathname').should('include', Cypress.config('accountAppRootPath'))
     cy.findByTestId('error-notification')
       .should('be.visible')
       .contains('incorrect password or user ID')
-    cy.location('pathname').should('eq', `${Cypress.config('accountAppRootPath')}/login`)
+  })
+
+  it('applies the Console logout route when logging out', () => {
+    const logout = userName => {
+      cy.get('header').within(() => {
+        cy.findByTestId('profile-dropdown').should('contain', userName).as('profileDropdown')
+
+        cy.get('@profileDropdown').click()
+        cy.get('@profileDropdown').findByText('Logout').click()
+      })
+    }
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(Cypress.config('consoleRootPath'))
+    logout(user.ids.user_id)
+
+    cy.findByLabelText('User ID').type(user.ids.user_id)
+    cy.findByLabelText('Password').type(`${user.password}{enter}`)
+
+    cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/`)
+    cy.findByText('Welcome to the Console!').should('be.visible')
+    cy.findByTestId('full-error-view').should('not.exist')
+  })
+
+  it('displays an error when the token cannot be retrieved during initialization', () => {
+    cy.on('uncaught:exception', err => {
+      expect(err.name).to.equal('TokenError')
+      return false
+    })
+
+    const location = `${Cypress.config('consoleRootPath')}/`
+    cy.visit(location)
+
+    cy.findByText('Login')
+    cy.intercept('/console/api/auth/token', { statusCode: 500 })
+    cy.findByLabelText('User ID').type(user.ids.user_id)
+    cy.findByLabelText('Password').type(`${user.password}{enter}`)
+    cy.findByText('TokenError').should('be.visible')
+    cy.findByTestId('full-error-view').should('be.visible')
   })
 })
