@@ -245,7 +245,6 @@ const NetworkServerForm = React.memo(props => {
         context: validationContext,
         stripUnknown: true,
       })
-
       const updatedValues = diff(device, castedValues, [
         '_activation_mode',
         '_device_classes',

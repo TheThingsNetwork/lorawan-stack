@@ -392,6 +392,7 @@ const MacSettingsSection = props => {
           <Form.FieldContainer horizontal>
             {(!isOTAA || isClassB) && (
               <Form.Field
+                required={!isOTAA || isClassB}
                 type="number"
                 min={100000}
                 step={100}
@@ -416,6 +417,7 @@ const MacSettingsSection = props => {
           <Form.FieldContainer horizontal>
             {(!isOTAA || isClassB) && (
               <Form.Field
+                required={!isOTAA || isClassB}
                 title={m.pingSlotDataRateTitle}
                 name="mac_settings.ping_slot_data_rate_index"
                 tooltipId={tooltipIds.PING_SLOT_DATA_RATE_INDEX}
