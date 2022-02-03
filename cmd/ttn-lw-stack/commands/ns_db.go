@@ -524,9 +524,9 @@ var (
 func init() {
 	Root.AddCommand(nsDBCommand)
 	nsDBCommand.AddCommand(nsDBPruneCommand)
+	nsDBMigrateCommand.Flags().Bool("force", false, "Force perform database migrations")
 	nsDBCommand.AddCommand(nsDBMigrateCommand)
 	nsDBCleanupCommand.Flags().Bool("dry-run", false, "Dry run")
 	nsDBCleanupCommand.Flags().Duration("pagination-delay", 100, "Delay between batch requests")
 	nsDBCommand.AddCommand(nsDBCleanupCommand)
-	nsDBMigrateCommand.Flags().Bool("force", false, "Force perform database migrations")
 }
