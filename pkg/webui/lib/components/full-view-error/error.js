@@ -78,6 +78,7 @@ const FullViewErrorInner = ({ error, safe }) => {
   const isNotFound = isNotFoundError(error)
   const isFrontend = isFrontendError(error)
   const isBackend = isBackendError(error)
+  const isErrorObject = error instanceof Error
   const isOAuthCallback = /oauth.*\/callback$/.test(window.location.pathname)
 
   const errorId = getBackendErrorId(error) || 'n/a'
@@ -132,7 +133,8 @@ const FullViewErrorInner = ({ error, safe }) => {
   }, [])
 
   const errorDetails = JSON.stringify(error, undefined, 2)
-  const hasErrorDetails = !isNotFound && Boolean(error) && errorDetails.length > 2
+  const hasErrorDetails =
+    (!isNotFound && Boolean(error) && errorDetails.length > 2) || (isFrontend && error.errorCode)
   const buttonClasses = classnames(buttonStyle.button, buttonStyle.primary, style.actionButton)
 
   return (
@@ -200,26 +202,36 @@ const FullViewErrorInner = ({ error, safe }) => {
             </div>
             {hasErrorDetails && (
               <>
+                {isErrorObject && (
+                  <>
+                    <hr />
+                    <div className={style.detailColophon}>
+                      <span>
+                        Error Type: <code>{error.name}</code>
+                      </span>
+                    </div>
+                  </>
+                )}
+                {isFrontend && (
+                  <>
+                    <hr />
+                    <div className={style.detailColophon}>
+                      <span>
+                        Frontend Error ID: <code>{error.errorCode}</code>
+                      </span>
+                    </div>
+                  </>
+                )}
                 {isBackend && (
                   <>
                     <hr />
                     <div className={style.detailColophon}>
-                      <Message
-                        component="span"
-                        content={errorMessages.errorId}
-                        values={{
-                          errorId,
-                          code: msg => <code>{msg}</code>,
-                        }}
-                      />
-                      <Message
-                        component="span"
-                        content={errorMessages.correlationId}
-                        values={{
-                          correlationId,
-                          code: msg => <code>{msg}</code>,
-                        }}
-                      />
+                      <span>
+                        Error ID: <code>{errorId}</code>
+                      </span>
+                      <span>
+                        Correlation ID: <code>{correlationId}</code>
+                      </span>
                     </div>
                   </>
                 )}
