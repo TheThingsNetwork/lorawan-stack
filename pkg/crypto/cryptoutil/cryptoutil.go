@@ -123,25 +123,25 @@ func UnwrapSelectedSessionKeys(ctx context.Context, keyVault crypto.KeyVault, sk
 
 		err error
 	)
-	if ttnpb.HasAnyField(paths, pathWithPrefix(prefix, "app_s_key.key")) && sk.AppSKey != nil {
+	if ttnpb.HasAnyField(paths, pathWithPrefix(prefix, "app_s_key.key")) && sk.GetAppSKey() != nil {
 		appSKeyEnvelope, err = UnwrapKeyEnvelope(ctx, sk.AppSKey, keyVault)
 		if err != nil {
 			return nil, err
 		}
 	}
-	if ttnpb.HasAnyField(paths, pathWithPrefix(prefix, "f_nwk_s_int_key.key")) && sk.FNwkSIntKey != nil {
+	if ttnpb.HasAnyField(paths, pathWithPrefix(prefix, "f_nwk_s_int_key.key")) && sk.GetFNwkSIntKey() != nil {
 		fNwkSIntKeyEnvelope, err = UnwrapKeyEnvelope(ctx, sk.FNwkSIntKey, keyVault)
 		if err != nil {
 			return nil, err
 		}
 	}
-	if ttnpb.HasAnyField(paths, pathWithPrefix(prefix, "nwk_s_enc_key.key")) && sk.NwkSEncKey != nil {
+	if ttnpb.HasAnyField(paths, pathWithPrefix(prefix, "nwk_s_enc_key.key")) && sk.GetNwkSEncKey() != nil {
 		nwkSEncKeyEnvelope, err = UnwrapKeyEnvelope(ctx, sk.NwkSEncKey, keyVault)
 		if err != nil {
 			return nil, err
 		}
 	}
-	if ttnpb.HasAnyField(paths, pathWithPrefix(prefix, "s_nwk_s_int_key.key")) && sk.SNwkSIntKey != nil {
+	if ttnpb.HasAnyField(paths, pathWithPrefix(prefix, "s_nwk_s_int_key.key")) && sk.GetSNwkSIntKey() != nil {
 		sNwkSIntKeyEnvelope, err = UnwrapKeyEnvelope(ctx, sk.SNwkSIntKey, keyVault)
 		if err != nil {
 			return nil, err
