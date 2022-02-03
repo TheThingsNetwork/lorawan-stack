@@ -55,6 +55,7 @@ func (is *mockISGatewayRegistry) Add(ctx context.Context, ids ttnpb.GatewayIdent
 				},
 			},
 		},
+		GatewayServerAddress:     "mockgatewayserver",
 		LocationPublic:           locationPublic,
 		UpdateLocationFromStatus: updateLocationFromStatus,
 	}
