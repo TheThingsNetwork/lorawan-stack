@@ -1641,7 +1641,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	if st.Device.Session != nil {
 		for p, isZero := range map[string]func() bool{
 			"session.dev_addr":                 st.Device.Session.DevAddr.IsZero,
-			"session.keys.f_nwk_s_int_key.key": st.Device.Session.Keys.FNwkSIntKey.IsZero,
+			"session.keys.f_nwk_s_int_key.key": st.Device.Session.Keys.GetFNwkSIntKey().IsZero,
 			"session.keys.nwk_s_enc_key.key": func() bool {
 				return st.Device.Session.Keys.NwkSEncKey != nil && st.Device.Session.Keys.NwkSEncKey.IsZero()
 			},
