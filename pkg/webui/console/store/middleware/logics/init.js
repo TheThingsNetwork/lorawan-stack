@@ -17,6 +17,8 @@ import tts from '@console/api/tts'
 import { clear as clearAccessToken } from '@ttn-lw/lib/access-token'
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 import * as init from '@ttn-lw/lib/store/actions/init'
+import { TokenError } from '@ttn-lw/lib/errors/custom-errors'
+import { isPermissionDeniedError, isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
 
 import * as user from '@console/store/actions/user'
 
@@ -36,11 +38,17 @@ const consoleAppLogic = createRequestLogic({
       rights = info.oauth_access_token.rights
       dispatch(user.getUserRightsSuccess(rights))
     } catch (error) {
-      if (error.code === 16) {
-        // The access token was not found, so we can delete it from local
-        // storage to obtain a new one.
-        clearAccessToken()
+      if (
+        error instanceof TokenError
+          ? !isUnauthenticatedError(error?.cause) && !isPermissionDeniedError(error?.cause)
+          : !isUnauthenticatedError(error)
+      ) {
+        throw error
       }
+
+      // Clear existing access token since it does
+      // not appear to be valid anymore.
+      clearAccessToken()
       dispatch(user.getUserRightsFailure())
       info = undefined
     }
