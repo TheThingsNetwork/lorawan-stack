@@ -23,7 +23,6 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-type authKeyToRights map[string][]ttnpb.Right
 type mockISApplicationRegistry struct {
 	ttnpb.ApplicationRegistryServer
 	ttnpb.ApplicationAccessServer

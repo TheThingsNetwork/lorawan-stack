@@ -25,6 +25,7 @@ import (
 
 var errNotFound = errors.DefineNotFound("not_found", "not found")
 
+type authKeyToRights map[string][]ttnpb.Right
 type MockDefinition struct {
 	applicationRegistry *mockISApplicationRegistry
 	gatewayRegistry     *mockISGatewayRegistry
@@ -43,7 +44,7 @@ func New(ctx context.Context) (*MockDefinition, string, closeMock) {
 		gatewayRegistry: &mockISGatewayRegistry{
 			gateways:      make(map[string]*ttnpb.Gateway),
 			gatewayAuths:  make(map[string][]string),
-			gatewayRights: make(map[string][]ttnpb.Right),
+			gatewayRights: make(map[string]authKeyToRights),
 		},
 		endDeviceRegistry: &mockISEndDeviceRegistry{
 			endDevices: make(map[string]*ttnpb.EndDevice),
