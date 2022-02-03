@@ -24,5 +24,6 @@ var DefaultJoinServerConfig = joinserver.Config{
 	JoinEUIPrefixes: []types.EUI64Prefix{
 		{},
 	},
-	DevNonceLimit: 10,
+	DevNonceLimit:   10,
+	SessionKeyLimit: 10,
 }

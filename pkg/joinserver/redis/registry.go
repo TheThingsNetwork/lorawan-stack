@@ -40,6 +40,9 @@ var (
 	errProvisionerNotFound  = errors.DefineNotFound("provisioner_not_found", "provisioner `{id}` not found")
 )
 
+// SchemaVersion is the Network Server database schema version. Bump when a migration is required.
+const SchemaVersion = 1
+
 // DeviceRegistry is an implementation of joinserver.DeviceRegistry.
 type DeviceRegistry struct {
 	Redis   *ttnredis.Client
@@ -415,6 +418,8 @@ func (r *DeviceRegistry) RangeByID(ctx context.Context, paths []string, f func(c
 type KeyRegistry struct {
 	Redis   *ttnredis.Client
 	LockTTL time.Duration
+	// Limit is the maximum number of session keys to store per JoinEUI and DevEUI combination.
+	Limit int
 }
 
 // Init initializes the KeyRegistry.
@@ -425,8 +430,16 @@ func (r *KeyRegistry) Init(ctx context.Context) error {
 	return nil
 }
 
-func (r *KeyRegistry) idKey(joinEUI, devEUI types.EUI64, id []byte) string {
-	return r.Redis.Key("id", joinEUI.String(), devEUI.String(), base64.RawStdEncoding.EncodeToString(id))
+func (r *KeyRegistry) idValue(id []byte) string {
+	return base64.RawStdEncoding.EncodeToString(id)
+}
+
+func (r *KeyRegistry) idKey(joinEUI, devEUI types.EUI64, id string) string {
+	return r.Redis.Key("id", joinEUI.String(), devEUI.String(), id)
+}
+
+func (r *KeyRegistry) idSetKey(joinEUI, devEUI types.EUI64) string {
+	return r.Redis.Key("ids", joinEUI.String(), devEUI.String())
 }
 
 // GetByID gets session keys by joinEUI, devEUI, id.
@@ -438,7 +451,7 @@ func (r *KeyRegistry) GetByID(ctx context.Context, joinEUI, devEUI types.EUI64, 
 	defer trace.StartRegion(ctx, "get session keys").End()
 
 	pb := &ttnpb.SessionKeys{}
-	if err := ttnredis.GetProto(ctx, r.Redis, r.idKey(joinEUI, devEUI, id)).ScanProto(pb); err != nil {
+	if err := ttnredis.GetProto(ctx, r.Redis, r.idKey(joinEUI, devEUI, r.idValue(id))).ScanProto(pb); err != nil {
 		return nil, err
 	}
 	return ttnpb.FilterGetSessionKeys(pb, paths...)
@@ -449,7 +462,7 @@ func (r *KeyRegistry) SetByID(ctx context.Context, joinEUI, devEUI types.EUI64, 
 	if devEUI.IsZero() || len(id) == 0 {
 		return nil, errInvalidIdentifiers.New()
 	}
-	ik := r.idKey(joinEUI, devEUI, id)
+	ik, sk := r.idKey(joinEUI, devEUI, r.idValue(id)), r.idSetKey(joinEUI, devEUI)
 
 	lockerID, err := ttnredis.GenerateLockerID()
 	if err != nil {
@@ -459,7 +472,7 @@ func (r *KeyRegistry) SetByID(ctx context.Context, joinEUI, devEUI types.EUI64, 
 	defer trace.StartRegion(ctx, "set session keys").End()
 
 	var pb *ttnpb.SessionKeys
-	err = ttnredis.LockedWatch(ctx, r.Redis, ik, lockerID, r.LockTTL, func(tx *redis.Tx) error {
+	err = ttnredis.LockedWatch(ctx, r.Redis, sk, lockerID, r.LockTTL, func(tx *redis.Tx) error {
 		cmd := ttnredis.GetProto(ctx, tx, ik)
 		stored := &ttnpb.SessionKeys{}
 		if err := cmd.ScanProto(stored); errors.IsNotFound(err) {
@@ -493,62 +506,79 @@ func (r *KeyRegistry) SetByID(ctx context.Context, joinEUI, devEUI types.EUI64, 
 			return err
 		}
 
-		var pipelined func(redis.Pipeliner) error
 		if pb == nil && len(sets) == 0 {
-			pipelined = func(p redis.Pipeliner) error {
+			_, err = tx.TxPipelined(ctx, func(p redis.Pipeliner) error {
 				p.Del(ctx, ik)
+				p.LRem(ctx, sk, 0, r.idValue(id))
 				return nil
-			}
-		} else {
-			if pb == nil {
-				pb = &ttnpb.SessionKeys{}
-			}
-
-			updated := &ttnpb.SessionKeys{}
-			if stored == nil {
-				if err := ttnpb.RequireFields(sets,
-					"session_key_id",
-				); err != nil {
-					return errInvalidFieldmask.WithCause(err)
-				}
-				updated, err = ttnpb.ApplySessionKeysFieldMask(updated, pb, sets...)
-				if err != nil {
-					return err
-				}
-				if !bytes.Equal(updated.SessionKeyId, id) {
-					return errInvalidIdentifiers.New()
-				}
-			} else {
-				if err := ttnpb.ProhibitFields(sets,
-					"session_key_id",
-				); err != nil {
-					return errInvalidFieldmask.WithCause(err)
-				}
-				if err := cmd.ScanProto(updated); err != nil {
-					return err
-				}
-				updated, err = ttnpb.ApplySessionKeysFieldMask(updated, pb, sets...)
-				if err != nil {
-					return err
-				}
-			}
-			if err := updated.ValidateFields(sets...); err != nil {
+			})
+			if err != nil {
 				return err
 			}
+			return nil
+		}
 
-			pipelined = func(p redis.Pipeliner) error {
-				_, err := ttnredis.SetProto(ctx, p, ik, updated, 0)
+		if pb == nil {
+			pb = &ttnpb.SessionKeys{}
+		}
+
+		updated := &ttnpb.SessionKeys{}
+		if stored == nil {
+			if err := ttnpb.RequireFields(sets,
+				"session_key_id",
+			); err != nil {
+				return errInvalidFieldmask.WithCause(err)
+			}
+			updated, err = ttnpb.ApplySessionKeysFieldMask(updated, pb, sets...)
+			if err != nil {
+				return err
+			}
+			if !bytes.Equal(updated.SessionKeyId, id) {
+				return errInvalidIdentifiers.New()
+			}
+			if r.Limit > 0 {
+				count, err := tx.RPush(ctx, sk, r.idValue(id)).Result()
 				if err != nil {
 					return err
 				}
-				return nil
+				if d := int(count) - r.Limit; d > 0 {
+					oldIDs, err := tx.LPopCount(ctx, sk, d).Result()
+					if err != nil {
+						return err
+					}
+					if _, err := tx.Pipelined(ctx, func(p redis.Pipeliner) error {
+						for _, oldID := range oldIDs {
+							p.Del(ctx, r.idKey(joinEUI, devEUI, oldID))
+						}
+						return nil
+					}); err != nil {
+						return err
+					}
+				}
 			}
-			pb, err = ttnpb.FilterGetSessionKeys(updated, gets...)
+		} else {
+			if err := ttnpb.ProhibitFields(sets,
+				"session_key_id",
+			); err != nil {
+				return errInvalidFieldmask.WithCause(err)
+			}
+			if err := cmd.ScanProto(updated); err != nil {
+				return err
+			}
+			updated, err = ttnpb.ApplySessionKeysFieldMask(updated, pb, sets...)
 			if err != nil {
 				return err
 			}
 		}
-		_, err = tx.TxPipelined(ctx, pipelined)
+		if err := updated.ValidateFields(sets...); err != nil {
+			return err
+		}
+
+		pb, err = ttnpb.FilterGetSessionKeys(updated, gets...)
+		if err != nil {
+			return err
+		}
+		_, err = ttnredis.SetProto(ctx, tx, ik, updated, 0)
 		if err != nil {
 			return err
 		}
@@ -710,7 +740,7 @@ func (r *ApplicationActivationSettingRegistry) SetByID(ctx context.Context, appI
 	return pb, nil
 }
 
-var uniqueIDPattern = regexp.MustCompile("(.*)\\:(.*)")
+var uniqueIDPattern = regexp.MustCompile(`(.*)\:(.*)`)
 
 func (r *ApplicationActivationSettingRegistry) Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationActivationSettings) bool) error {
 	appKeyRegex, err := ttnredis.EntityRegex((r.uidKey(unique.GenericID(ctx, "*"))))
