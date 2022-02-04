@@ -25,6 +25,8 @@ var (
 	AS_923_2_RP2_v1_0_3 = as923RP2102Band(AS_923_2, as923Group2Offset)
 	// AS_923_3_RP2_v1_0_3 is the band definition for AS923 Group 3 in the RP002-1.0.3 specification.
 	AS_923_3_RP2_v1_0_3 = as923RP2102Band(AS_923_3, as923Group3Offset)
+	// AS_923_4_RP2_v1_0_3 is the band definition for AS923 Group 4 in the RP002-1.0.3 specification.
+	AS_923_4_RP2_v1_0_3 = as923RP2102Band(AS_923_4, as923Group4Offset)
 )
 
 var as923RP2103Band = func(id string, offset as923GroupOffset) Band {

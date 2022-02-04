@@ -145,6 +145,12 @@ func TestGetPhyVersions(t *testing.T) {
 						},
 					},
 					{
+						BandId: "AS_923_4",
+						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
+						},
+					},
+					{
 						BandId: "AU_915_928",
 						PhyVersions: []ttnpb.PHYVersion{
 							ttnpb.PHYVersion_RP002_V1_0_3,

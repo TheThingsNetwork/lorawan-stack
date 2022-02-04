@@ -48,6 +48,7 @@ var toPBRegion = map[string]packetbroker.Region{
 	band.AS_923:     packetbroker.Region_AS_923,
 	band.AS_923_2:   packetbroker.Region_AS_923_2,
 	band.AS_923_3:   packetbroker.Region_AS_923_3,
+	band.AS_923_4:   packetbroker.Region_AS_923_4,
 	band.KR_920_923: packetbroker.Region_KR_920_923,
 	band.IN_865_867: packetbroker.Region_IN_865_867,
 	band.RU_864_870: packetbroker.Region_RU_864_870,

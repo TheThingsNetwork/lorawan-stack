@@ -32,6 +32,7 @@ var regionToBandID = map[string]string{
 	"AS923":     band.AS_923,
 	"AS923-2":   band.AS_923_2,
 	"AS923-3":   band.AS_923_3,
+	"AS923-4":   band.AS_923_4,
 	"KR920-923": band.KR_920_923,
 	"IN865-867": band.IN_865_867,
 	"RU864-870": band.RU_864_870,
