@@ -627,10 +627,7 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 						}
 						field.Set(reflect.ValueOf(*ttnpb.ProtoTimePtr(t)))
 					case "Duration":
-						d, err := time.ParseDuration(v.String())
-						if err != nil {
-							return err
-						}
+						d := v.Interface().(time.Duration)
 						field.Set(reflect.ValueOf(*ttnpb.ProtoDurationPtr(d)))
 					}
 				case ft.PkgPath() == "go.thethings.network/lorawan-stack/v3/pkg/ttnpb":
