@@ -5858,7 +5858,7 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/interop:missing_nsid": {
+  "error:pkg/interop:missing_ns_id": {
     "translations": {
       "en": "missing NSID"
     },
@@ -5921,7 +5921,7 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/interop:nsid_not_supported": {
+  "error:pkg/interop:ns_id_not_supported": {
     "translations": {
       "en": "NSID not supported"
     },
