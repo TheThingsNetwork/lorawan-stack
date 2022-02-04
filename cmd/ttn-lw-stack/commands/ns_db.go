@@ -96,11 +96,11 @@ var (
 			cl := NewNetworkServerDeviceRegistryRedis(*config)
 
 			if force, _ := cmd.Flags().GetBool("force"); !force {
-				needMigration, err := checkLatestSchemaVersion(cl, nsredis.SchemaVersion)
+				schemaVersion, err := getSchemaVersion(cl)
 				if err != nil {
 					return err
 				}
-				if !needMigration {
+				if schemaVersion >= nsredis.SchemaVersion {
 					logger.Info("Database schema version is already in latest version")
 					return nil
 				}

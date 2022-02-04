@@ -45,11 +45,11 @@ var (
 			cl := ttnredis.New(config.Redis.WithNamespace("as"))
 
 			if force, _ := cmd.Flags().GetBool("force"); !force {
-				needMigration, err := checkLatestSchemaVersion(cl, asredis.SchemaVersion)
+				schemaVersion, err := getSchemaVersion(cl)
 				if err != nil {
 					return err
 				}
-				if !needMigration {
+				if schemaVersion >= asredis.SchemaVersion {
 					logger.Info("Database schema version is already in latest version")
 					return nil
 				}

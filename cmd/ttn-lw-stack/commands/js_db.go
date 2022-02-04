@@ -78,12 +78,12 @@ var (
 			devicesCl := NewJoinServerDeviceRegistryRedis(*config)
 			keysCl := NewJoinServerSessionKeyRegistryRedis(*config)
 
+			schemaVersion, err := getSchemaVersion(keysCl)
+			if err != nil {
+				return err
+			}
 			if force, _ := cmd.Flags().GetBool("force"); !force {
-				needMigration, err := checkLatestSchemaVersion(keysCl, jsredis.SchemaVersion)
-				if err != nil {
-					return err
-				}
-				if !needMigration {
+				if schemaVersion >= jsredis.SchemaVersion {
 					logger.Info("Database schema version is already in latest version")
 					return nil
 				}
