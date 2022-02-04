@@ -12,6 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { isPlainObject } from 'lodash'
+
+export const isBasicAuth = header =>
+  isPlainObject(header) && header.key === 'Authorization' && header.value?.startsWith('Basic ')
+export const hasBasicAuth = headers =>
+  headers instanceof Array && headers.findIndex(isBasicAuth) !== -1
+export const getBasicAuthValue = headers => headers.find(isBasicAuth).value.split('Basic ')[1]
+
 export const decodeMessageType = messageType => {
   if (messageType && (messageType.enabled || messageType.path)) {
     return { enabled: true, value: messageType.path }
@@ -51,27 +59,24 @@ export const encodeHeaders = formValue =>
   null
 
 // Encode and decode basic auth header.
-let currentHeaders
 
-export const decodeBasicAuthRequest = value => {
-  currentHeaders = value
-  const useBasicAuth = value?.Authorization?.startsWith('Basic')
-  return useBasicAuth
-}
+export const decodeBasicAuthRequest = value => hasBasicAuth(value)
 
-export const encodeBasicAuthRequest = value => {
+export const encodeBasicAuthRequest = (value, fieldValue) => {
   if (value) {
-    return { ...currentHeaders, Authorization: 'Basic' }
+    return [...(fieldValue || []), { key: 'Authorization', value: 'Basic ' }]
   }
 
-  return currentHeaders
+  if (hasBasicAuth(fieldValue)) {
+    return fieldValue.filter(h => !isBasicAuth(h))
+  }
+
+  return fieldValue
 }
 
 export const decodeBasicAuthHeaderUsername = value => {
-  const basicAuth = value.Authorization
-
-  if (basicAuth) {
-    const encodedCredentials = basicAuth.split('Basic')[1]
+  if (hasBasicAuth(value)) {
+    const encodedCredentials = getBasicAuthValue(value)
     if (encodedCredentials) {
       const decodedCredentials = atob(encodedCredentials)
       const decodedUsername = decodedCredentials.slice(0, decodedCredentials.indexOf(':'))
@@ -82,49 +87,34 @@ export const decodeBasicAuthHeaderUsername = value => {
   return ''
 }
 
-export const mapCredentialsToAuthHeader = (forUsername, fieldValue) => {
-  if (currentHeaders.Authorization && currentHeaders.Authorization.startsWith('Basic')) {
-    const encodedCredentials = currentHeaders.Authorization.split('Basic')[1]
-
-    if (encodedCredentials) {
+export const mapCredentialsToAuthHeader = (forUsername, value, currentHeaders) => {
+  const basicAuthIndex = currentHeaders.findIndex(isBasicAuth)
+  if (basicAuthIndex !== -1) {
+    const encodedCredentials = getBasicAuthValue(currentHeaders)
+    if (encodedCredentials !== undefined) {
       const decodedCredentials = atob(encodedCredentials)
       const username = decodedCredentials.slice(0, decodedCredentials.indexOf(':'))
       const password = decodedCredentials.slice(
         decodedCredentials.indexOf(':') + 1,
         decodedCredentials.length,
       )
-      if (forUsername) {
-        return {
-          ...currentHeaders,
-          Authorization: `Basic ${btoa(`${fieldValue}:${password}`)}`,
-        }
+      const newHeaders = [...currentHeaders]
+      if (forUsername && (value !== '' || password !== '')) {
+        newHeaders[basicAuthIndex].value = `Basic ${btoa(`${value}:${password}`)}`
+      } else if (!forUsername && (value !== '' || username !== '')) {
+        newHeaders[basicAuthIndex].value = `Basic ${btoa(`${username}:${value}`)}`
+      } else {
+        newHeaders[basicAuthIndex].value = 'Basic '
       }
-      return {
-        ...currentHeaders,
-        Authorization: `Basic ${btoa(`${username}:${fieldValue}`)}`,
-      }
-    }
-
-    // If there is no password/username yet.
-    if (forUsername) {
-      return {
-        ...currentHeaders,
-        Authorization: `Basic ${btoa(`${fieldValue}:`)}`,
-      }
-    }
-
-    return {
-      ...currentHeaders,
-      Authorization: `Basic ${btoa(`:${fieldValue}`)}`,
+      return newHeaders
     }
   }
+  return currentHeaders
 }
 
 export const decodeBasicAuthHeaderPassword = value => {
-  const basicAuth = value.Authorization
-
-  if (basicAuth) {
-    const encodedCredentials = basicAuth.split('Basic')[1]
+  if (hasBasicAuth(value)) {
+    const encodedCredentials = getBasicAuthValue(value)
     if (encodedCredentials) {
       const decodedCredentials = atob(encodedCredentials)
       const decodedPassword = decodedCredentials.slice(
@@ -138,11 +128,11 @@ export const decodeBasicAuthHeaderPassword = value => {
   return ''
 }
 
-export const createbasicAuthEncoder = forPassword => value =>
-  mapCredentialsToAuthHeader(forPassword, value)
+export const createBasicAuthEncoder = forPassword => (value, fieldValue) =>
+  mapCredentialsToAuthHeader(forPassword, value, fieldValue)
 
-export const encodeBasicAuthUsername = createbasicAuthEncoder(true)
-export const encodeBasicAuthPassword = createbasicAuthEncoder(false)
+export const encodeBasicAuthUsername = createBasicAuthEncoder(true)
+export const encodeBasicAuthPassword = createBasicAuthEncoder(false)
 
 export const blankValues = {
   ids: {

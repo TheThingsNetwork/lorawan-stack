@@ -51,6 +51,8 @@ import {
   decodeHeaders,
   decodeMessageType,
   encodeMessageType,
+  hasBasicAuth,
+  isBasicAuth,
 } from './mapping'
 
 const pathPlaceholder = '/path/to/webhook'
@@ -66,7 +68,6 @@ const m = defineMessages({
   headersKeyPlaceholder: 'Authorization',
   headersValuePlaceholder: 'Bearer my-auth-token',
   headersAdd: 'Add header entry',
-  headersValidateRequired: 'All header entry values are required. Please remove empty entries.',
   downlinkAPIKey: 'Downlink API key',
   downlinkAPIKeyDesc:
     'The API key will be provided to the endpoint using the "X-Downlink-Apikey" header',
@@ -85,8 +86,6 @@ const m = defineMessages({
   requestBasicAuth: 'Request authentication',
 })
 
-const headerCheck = headers =>
-  !headers[''] && Object.values(headers).every(value => value !== null || value !== '')
 const messageCheck = message => {
   if (message && message.enabled) {
     const { value } = message
@@ -95,11 +94,6 @@ const messageCheck = message => {
   }
 
   return true
-}
-const hasAuthorizationBasic = header => {
-  if (header.key === 'Authorization' && header.value?.startsWith('Basic')) {
-    return true
-  }
 }
 
 const validationSchema = Yup.object().shape({
@@ -111,9 +105,14 @@ const validationSchema = Yup.object().shape({
       .required(sharedMessages.validateRequired),
   }),
   format: Yup.string().required(sharedMessages.validateRequired),
-  headers: Yup.object()
-    .test('has no empty string values', m.headersValidateRequired, headerCheck)
-    .default({}),
+  _headers: Yup.array()
+    .of(
+      Yup.object({
+        value: Yup.string(),
+        key: Yup.string(),
+      }),
+    )
+    .default([]),
   base_url: Yup.string()
     .matches(urlRegexp, Yup.passValues(sharedMessages.validateUrl))
     .required(sharedMessages.validateRequired),
@@ -185,7 +184,6 @@ const validationSchema = Yup.object().shape({
 
 export default class WebhookForm extends Component {
   static propTypes = {
-    buttonStyle: PropTypes.shape({ activateWebhookButton: PropTypes.shape({}) }),
     existCheck: PropTypes.func,
     initialWebhookValue: PropTypes.shape({
       ids: PropTypes.shape({
@@ -220,7 +218,6 @@ export default class WebhookForm extends Component {
     onDelete: () => null,
     webhookTemplate: undefined,
     existCheck: () => false,
-    buttonStyle: undefined,
   }
 
   form = React.createRef()
@@ -235,11 +232,9 @@ export default class WebhookForm extends Component {
       error: undefined,
       displayOverwriteModal: false,
       existingId: undefined,
-      shouldShowCredentialsInput:
-        initialWebhookValue &&
-        initialWebhookValue.headers &&
-        initialWebhookValue.headers.Authorization &&
-        initialWebhookValue.headers.Authorization.startsWith('Basic'),
+      shouldShowCredentialsInput: Boolean(
+        initialWebhookValue?.headers?.Authorization?.startsWith('Basic '),
+      ),
     }
   }
 
@@ -247,6 +242,9 @@ export default class WebhookForm extends Component {
   async handleSubmit(values, { resetForm }) {
     const { onSubmit, onSubmitSuccess, onSubmitFailure, existCheck, update } = this.props
     const castedWebhookValues = validationSchema.cast(values)
+    castedWebhookValues.headers = encodeHeaders(castedWebhookValues._headers)
+    const { _headers, ...submitValues } = castedWebhookValues
+
     await this.setState({ error: '' })
 
     try {
@@ -261,7 +259,7 @@ export default class WebhookForm extends Component {
           })
         }
       }
-      const result = await onSubmit(castedWebhookValues)
+      const result = await onSubmit(submitValues)
 
       resetForm({ values: castedWebhookValues })
       await onSubmitSuccess(result)
@@ -315,10 +313,16 @@ export default class WebhookForm extends Component {
     this.setState({ shouldShowCredentialsInput: event.target.checked })
   }
 
+  @bind
+  handleHeadersChange(headers) {
+    this.setState({ shouldShowCredentialsInput: hasBasicAuth(headers) })
+  }
+
   render() {
-    const { update, initialWebhookValue, webhookTemplate, buttonStyle } = this.props
+    const { update, initialWebhookValue, webhookTemplate } = this.props
     const { error, displayOverwriteModal, existingId } = this.state
     const initialValues = initialWebhookValue || blankValues
+    initialValues._headers = decodeHeaders(initialValues.headers)
 
     const mayReactivate =
       update &&
@@ -343,7 +347,7 @@ export default class WebhookForm extends Component {
                 onClick={this.handleReactivate}
                 icon="refresh"
                 message={m.reactivateButtonMessage}
-                className={buttonStyle.activateWebhookButton}
+                className="mt-cs-m"
               />
             }
             small
@@ -387,6 +391,7 @@ export default class WebhookForm extends Component {
             title={sharedMessages.webhookBaseUrl}
             placeholder="https://example.com/webhooks"
             component={Input}
+            required
           />
           <Form.Field
             name="downlink_api_key"
@@ -398,7 +403,7 @@ export default class WebhookForm extends Component {
           />
           <Form.Field
             title={m.requestBasicAuth}
-            name="headers"
+            name="_headers"
             label={m.basicAuthCheckbox}
             onChange={this.handleRequestAuthenticationChange}
             decode={decodeBasicAuthRequest}
@@ -411,7 +416,7 @@ export default class WebhookForm extends Component {
               <Form.Field
                 required
                 title={sharedMessages.username}
-                name="headers"
+                name="_headers"
                 decode={decodeBasicAuthHeaderUsername}
                 encode={encodeBasicAuthUsername}
                 component={Input}
@@ -419,7 +424,7 @@ export default class WebhookForm extends Component {
               <Form.Field
                 required
                 title={sharedMessages.password}
-                name="headers"
+                name="_headers"
                 decode={decodeBasicAuthHeaderPassword}
                 encode={encodeBasicAuthPassword}
                 component={Input}
@@ -428,15 +433,14 @@ export default class WebhookForm extends Component {
             </Form.FieldContainer>
           )}
           <Form.Field
-            name="headers"
+            name="_headers"
             title={m.additionalHeaders}
             keyPlaceholder={m.headersKeyPlaceholder}
             valuePlaceholder={m.headersValuePlaceholder}
-            encode={encodeHeaders}
-            decode={decodeHeaders}
             addMessage={m.headersAdd}
             component={KeyValueMap}
-            isReadOnly={hasAuthorizationBasic}
+            isReadOnly={isBasicAuth}
+            onChange={this.handleHeadersChange}
           />
           <Form.SubTitle title={m.enabledMessages} />
           <Notification info content={m.messageInfo} small />
