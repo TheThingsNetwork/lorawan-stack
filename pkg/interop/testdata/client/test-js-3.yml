@@ -1,4 +1,4 @@
-dns: invalid.dns
+fqdn: localhost
 protocol: BI1.0
 paths:
   join: test-join-path

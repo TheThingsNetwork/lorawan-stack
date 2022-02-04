@@ -1,6 +1,7 @@
 fqdn: test-js.fqdn
 port: 12345
 protocol: BI1.1
+sender-ns-id: '1122334455667788'
 tls:
   root-ca: ../rootCA.pem
   certificate: ../clientcert.pem

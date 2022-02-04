@@ -132,8 +132,6 @@ type joinServerHTTPClient struct {
 	senderNSID         *types.EUI64
 }
 
-var errDNSLookupNotSupported = errors.DefineFailedPrecondition("dns_lookup_not_supported", "DNS lookup is not supported")
-
 func (cl joinServerHTTPClient) exchange(ctx context.Context, joinEUI types.EUI64, pathFunc func(jsRPCPaths) string, pld, res interface{}) error {
 	client, err := cl.clientProvider.HTTPClient(ctx, cl.clientOpts...)
 	if err != nil {
@@ -149,9 +147,6 @@ func (cl joinServerHTTPClient) exchange(ctx context.Context, joinEUI types.EUI64
 	port := cl.port
 	if port == 0 {
 		port = defaultHTTPSPort
-	}
-	if cl.dnsSuffix != "" || cl.fqdn == "" {
-		return errDNSLookupNotSupported.New()
 	}
 	req, err := newHTTPRequest(
 		serverURL(scheme, cl.fqdn, pathFunc(cl.paths), port), pld, cl.headers, cl.username, cl.password,
@@ -203,8 +198,6 @@ func (cl joinServerHTTPClient) GetAppSKey(ctx context.Context, asID string, req 
 }
 
 var (
-	errMissingNSID          = errors.DefineFailedPrecondition("missing_nsid", "missing NSID")
-	errNSIDNotSupported     = errors.DefineFailedPrecondition("nsid_not_supported", "NSID not supported")
 	errNoJoinRequestPayload = errors.DefineInvalidArgument("no_join_request_payload", "no join-request payload")
 	errGenerateSessionKeyID = errors.Define("generate_session_key_id", "failed to generate session key ID")
 
@@ -213,13 +206,6 @@ var (
 
 // HandleJoinRequest performs Join request according to LoRaWAN Backend Interfaces specification.
 func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID types.NetID, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
-	if cl.protocol.RequiresNSID() && cl.senderNSID == nil {
-		return nil, errMissingNSID.New()
-	}
-	if !cl.protocol.RequiresNSID() && cl.senderNSID != nil {
-		return nil, errNSIDNotSupported.New()
-	}
-
 	pld := req.Payload.GetJoinRequestPayload()
 	if pld == nil {
 		return nil, errNoJoinRequestPayload.New()
@@ -311,7 +297,12 @@ type Client struct {
 	joinServers []prefixJoinServerClient // Sorted by JoinEUI prefix range length.
 }
 
-var errUnknownConfig = errors.DefineNotFound("unknown_config", "configuration is unknown")
+var (
+	errUnknownConfig         = errors.DefineNotFound("unknown_config", "configuration is unknown")
+	errDNSLookupNotSupported = errors.DefineFailedPrecondition("dns_lookup_not_supported", "DNS lookup is not supported")
+	errMissingNSID           = errors.DefineFailedPrecondition("missing_ns_id", "missing NSID")
+	errNSIDNotSupported      = errors.DefineFailedPrecondition("ns_id_not_supported", "NSID not supported")
+)
 
 // NewClient return new interop client.
 func NewClient(ctx context.Context, conf config.InteropClient, httpClientProvider httpclient.Provider) (*Client, error) {
@@ -363,7 +354,7 @@ func NewClient(ctx context.Context, conf config.InteropClient, httpClientProvide
 			ComponentConfig `yaml:",inline"`
 			Paths           jsRPCPaths      `yaml:"paths"`
 			Protocol        ProtocolVersion `yaml:"protocol"`
-			SenderNSID      *types.EUI64    `yaml:"sender-nsid,omitempty"`
+			SenderNSID      *types.EUI64    `yaml:"sender-ns-id,omitempty"`
 		}
 		if err := yaml.UnmarshalStrict(jsFileBytes, &jsConf); err != nil {
 			return nil, err
@@ -379,6 +370,15 @@ func NewClient(ctx context.Context, conf config.InteropClient, httpClientProvide
 					return nil, err
 				}
 				opts = append(opts, httpclient.WithTLSConfig(tlsConf))
+			}
+			if jsConf.Protocol.RequiresNSID() && jsConf.SenderNSID == nil {
+				return nil, errMissingNSID.New()
+			}
+			if !jsConf.Protocol.RequiresNSID() && jsConf.SenderNSID != nil {
+				return nil, errNSIDNotSupported.New()
+			}
+			if jsConf.DNSSuffix != "" || jsConf.FQDN == "" {
+				return nil, errDNSLookupNotSupported.New()
 			}
 			js = &joinServerHTTPClient{
 				clientProvider: httpClientProvider,
