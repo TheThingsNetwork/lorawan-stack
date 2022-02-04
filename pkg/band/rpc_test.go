@@ -49,6 +49,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "EU_863_870",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
 							ttnpb.PHYVersion_RP002_V1_0_0,
@@ -72,6 +73,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "AU_915_928",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
 							ttnpb.PHYVersion_RP002_V1_0_0,
@@ -94,6 +96,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "AS_923",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
 							ttnpb.PHYVersion_RP002_V1_0_0,
@@ -114,6 +117,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "AS_923",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
 							ttnpb.PHYVersion_RP002_V1_0_0,
@@ -127,6 +131,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "AS_923_2",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
 						},
@@ -134,6 +139,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "AS_923_3",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
 						},
@@ -141,6 +147,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "AU_915_928",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
 							ttnpb.PHYVersion_RP002_V1_0_0,
@@ -166,6 +173,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "CN_470_510_20_A",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
 							ttnpb.PHYVersion_RP002_V1_0_0,
@@ -174,6 +182,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "CN_470_510_20_B",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
 							ttnpb.PHYVersion_RP002_V1_0_0,
@@ -182,6 +191,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "CN_470_510_26_A",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
 							ttnpb.PHYVersion_RP002_V1_0_0,
@@ -190,6 +200,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "CN_470_510_26_B",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
 							ttnpb.PHYVersion_RP002_V1_0_0,
@@ -198,6 +209,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "CN_779_787",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
 							ttnpb.PHYVersion_RP002_V1_0_0,
@@ -213,6 +225,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "EU_433",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
 							ttnpb.PHYVersion_RP002_V1_0_0,
@@ -228,6 +241,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "EU_863_870",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
 							ttnpb.PHYVersion_RP002_V1_0_0,
@@ -243,6 +257,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "IN_865_867",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
 							ttnpb.PHYVersion_RP002_V1_0_0,
@@ -255,6 +270,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "ISM_2400",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
 							ttnpb.PHYVersion_RP002_V1_0_0,
@@ -270,6 +286,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "KR_920_923",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
 							ttnpb.PHYVersion_RP002_V1_0_0,
@@ -283,6 +300,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "RU_864_870",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
 							ttnpb.PHYVersion_RP002_V1_0_0,
@@ -294,6 +312,7 @@ func TestGetPhyVersions(t *testing.T) {
 					{
 						BandId: "US_902_928",
 						PhyVersions: []ttnpb.PHYVersion{
+							ttnpb.PHYVersion_RP002_V1_0_3,
 							ttnpb.PHYVersion_RP002_V1_0_2,
 							ttnpb.PHYVersion_RP002_V1_0_1,
 							ttnpb.PHYVersion_RP002_V1_0_0,

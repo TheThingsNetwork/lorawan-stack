@@ -30,14 +30,17 @@ var (
 			ttnpb.PHYVersion_RP002_V1_0_0:       AS_923_RP2_v1_0_0,
 			ttnpb.PHYVersion_RP002_V1_0_1:       AS_923_RP2_v1_0_1,
 			ttnpb.PHYVersion_RP002_V1_0_2:       AS_923_RP2_v1_0_2,
+			ttnpb.PHYVersion_RP002_V1_0_3:       AS_923_RP2_v1_0_3,
 		},
 		AS_923_2: {
 			ttnpb.PHYVersion_RP002_V1_0_1: AS_923_2_RP2_v1_0_1,
 			ttnpb.PHYVersion_RP002_V1_0_2: AS_923_2_RP2_v1_0_2,
+			ttnpb.PHYVersion_RP002_V1_0_3: AS_923_2_RP2_v1_0_3,
 		},
 		AS_923_3: {
 			ttnpb.PHYVersion_RP002_V1_0_1: AS_923_3_RP2_v1_0_1,
 			ttnpb.PHYVersion_RP002_V1_0_2: AS_923_3_RP2_v1_0_2,
+			ttnpb.PHYVersion_RP002_V1_0_3: AS_923_3_RP2_v1_0_3,
 		},
 		AU_915_928: {
 			ttnpb.PHYVersion_TS001_V1_0_1:       AU_915_928_TS1_v1_0_1,
@@ -49,6 +52,7 @@ var (
 			ttnpb.PHYVersion_RP002_V1_0_0:       AU_915_928_RP2_v1_0_0,
 			ttnpb.PHYVersion_RP002_V1_0_1:       AU_915_928_RP2_v1_0_1,
 			ttnpb.PHYVersion_RP002_V1_0_2:       AU_915_928_RP2_v1_0_2,
+			ttnpb.PHYVersion_RP002_V1_0_3:       AU_915_928_RP2_v1_0_3,
 		},
 		CN_470_510: {
 			ttnpb.PHYVersion_TS001_V1_0_1:       CN_470_510_TS1_v1_0_1,
@@ -62,21 +66,25 @@ var (
 			ttnpb.PHYVersion_RP002_V1_0_0: CN_470_510_20_A_RP2_v1_0_0,
 			ttnpb.PHYVersion_RP002_V1_0_1: CN_470_510_20_A_RP2_v1_0_1,
 			ttnpb.PHYVersion_RP002_V1_0_2: CN_470_510_20_A_RP2_v1_0_2,
+			ttnpb.PHYVersion_RP002_V1_0_3: CN_470_510_20_A_RP2_v1_0_3,
 		},
 		CN_470_510_20_B: {
 			ttnpb.PHYVersion_RP002_V1_0_0: CN_470_510_20_B_RP2_v1_0_0,
 			ttnpb.PHYVersion_RP002_V1_0_1: CN_470_510_20_B_RP2_v1_0_1,
 			ttnpb.PHYVersion_RP002_V1_0_2: CN_470_510_20_B_RP2_v1_0_2,
+			ttnpb.PHYVersion_RP002_V1_0_3: CN_470_510_20_B_RP2_v1_0_3,
 		},
 		CN_470_510_26_A: {
 			ttnpb.PHYVersion_RP002_V1_0_0: CN_470_510_26_A_RP2_v1_0_0,
 			ttnpb.PHYVersion_RP002_V1_0_1: CN_470_510_26_A_RP2_v1_0_1,
 			ttnpb.PHYVersion_RP002_V1_0_2: CN_470_510_26_A_RP2_v1_0_2,
+			ttnpb.PHYVersion_RP002_V1_0_3: CN_470_510_26_A_RP2_v1_0_3,
 		},
 		CN_470_510_26_B: {
 			ttnpb.PHYVersion_RP002_V1_0_0: CN_470_510_26_B_RP2_v1_0_0,
 			ttnpb.PHYVersion_RP002_V1_0_1: CN_470_510_26_B_RP2_v1_0_1,
 			ttnpb.PHYVersion_RP002_V1_0_2: CN_470_510_26_B_RP2_v1_0_2,
+			ttnpb.PHYVersion_RP002_V1_0_3: CN_470_510_26_B_RP2_v1_0_3,
 		},
 		CN_779_787: {
 			ttnpb.PHYVersion_TS001_V1_0:         CN_779_787_RP1_V1_0,
@@ -89,6 +97,7 @@ var (
 			ttnpb.PHYVersion_RP002_V1_0_0:       CN_779_787_RP2_V1_0_0,
 			ttnpb.PHYVersion_RP002_V1_0_1:       CN_779_787_RP2_V1_0_1,
 			ttnpb.PHYVersion_RP002_V1_0_2:       CN_779_787_RP2_V1_0_2,
+			ttnpb.PHYVersion_RP002_V1_0_3:       CN_779_787_RP2_V1_0_3,
 		},
 		EU_433: {
 			ttnpb.PHYVersion_TS001_V1_0:         EU_433_TS1_V1_0,
@@ -101,6 +110,7 @@ var (
 			ttnpb.PHYVersion_RP002_V1_0_0:       EU_433_RP2_V1_0_0,
 			ttnpb.PHYVersion_RP002_V1_0_1:       EU_433_RP2_V1_0_1,
 			ttnpb.PHYVersion_RP002_V1_0_2:       EU_433_RP2_V1_0_2,
+			ttnpb.PHYVersion_RP002_V1_0_3:       EU_433_RP2_V1_0_3,
 		},
 		EU_863_870: {
 			ttnpb.PHYVersion_TS001_V1_0:         EU_863_870_TS1_V1_0,
@@ -113,6 +123,7 @@ var (
 			ttnpb.PHYVersion_RP002_V1_0_0:       EU_863_870_RP2_V1_0_0,
 			ttnpb.PHYVersion_RP002_V1_0_1:       EU_863_870_RP2_V1_0_1,
 			ttnpb.PHYVersion_RP002_V1_0_2:       EU_863_870_RP2_V1_0_2,
+			ttnpb.PHYVersion_RP002_V1_0_3:       EU_863_870_RP2_V1_0_3,
 		},
 		IN_865_867: {
 			ttnpb.PHYVersion_RP001_V1_0_2_REV_B: IN_865_867_RP1_V1_0_2_Rev_B,
@@ -122,6 +133,7 @@ var (
 			ttnpb.PHYVersion_RP002_V1_0_0:       IN_865_867_RP2_V1_0_0,
 			ttnpb.PHYVersion_RP002_V1_0_1:       IN_865_867_RP2_V1_0_1,
 			ttnpb.PHYVersion_RP002_V1_0_2:       IN_865_867_RP2_V1_0_2,
+			ttnpb.PHYVersion_RP002_V1_0_3:       IN_865_867_RP2_V1_0_3,
 		},
 		ISM_2400: {
 			ttnpb.PHYVersion_TS001_V1_0:         ISM_2400_Universal,
@@ -134,6 +146,7 @@ var (
 			ttnpb.PHYVersion_RP002_V1_0_0:       ISM_2400_Universal,
 			ttnpb.PHYVersion_RP002_V1_0_1:       ISM_2400_Universal,
 			ttnpb.PHYVersion_RP002_V1_0_2:       ISM_2400_Universal,
+			ttnpb.PHYVersion_RP002_V1_0_3:       ISM_2400_Universal,
 		},
 		KR_920_923: {
 			ttnpb.PHYVersion_RP001_V1_0_2:       KR_920_923_RP1_V1_0_2,
@@ -144,6 +157,7 @@ var (
 			ttnpb.PHYVersion_RP002_V1_0_0:       KR_920_923_RP2_V1_0_0,
 			ttnpb.PHYVersion_RP002_V1_0_1:       KR_920_923_RP2_V1_0_1,
 			ttnpb.PHYVersion_RP002_V1_0_2:       KR_920_923_RP2_V1_0_2,
+			ttnpb.PHYVersion_RP002_V1_0_3:       KR_920_923_RP2_V1_0_3,
 		},
 		RU_864_870: {
 			ttnpb.PHYVersion_RP001_V1_0_3_REV_A: RU_864_870_RP1_V1_0_3_Rev_A,
@@ -152,6 +166,7 @@ var (
 			ttnpb.PHYVersion_RP002_V1_0_0:       RU_864_870_RP2_V1_0_0,
 			ttnpb.PHYVersion_RP002_V1_0_1:       RU_864_870_RP2_V1_0_1,
 			ttnpb.PHYVersion_RP002_V1_0_2:       RU_864_870_RP2_V1_0_2,
+			ttnpb.PHYVersion_RP002_V1_0_3:       RU_864_870_RP2_V1_0_3,
 		},
 		US_902_928: {
 			ttnpb.PHYVersion_TS001_V1_0:         US_902_928_TS1_V1_0,
@@ -164,28 +179,29 @@ var (
 			ttnpb.PHYVersion_RP002_V1_0_0:       US_902_928_RP2_V1_0_0,
 			ttnpb.PHYVersion_RP002_V1_0_1:       US_902_928_RP2_V1_0_1,
 			ttnpb.PHYVersion_RP002_V1_0_2:       US_902_928_RP2_V1_0_2,
+			ttnpb.PHYVersion_RP002_V1_0_3:       US_902_928_RP2_V1_0_3,
 		},
 	}
 
 	// LatestVersion contains the latest version of each band.
 	LatestVersion = map[string]ttnpb.PHYVersion{
-		AS_923:          ttnpb.PHYVersion_RP002_V1_0_2,
-		AS_923_2:        ttnpb.PHYVersion_RP002_V1_0_2,
-		AS_923_3:        ttnpb.PHYVersion_RP002_V1_0_2,
-		AU_915_928:      ttnpb.PHYVersion_RP002_V1_0_2,
+		AS_923:          ttnpb.PHYVersion_RP002_V1_0_3,
+		AS_923_2:        ttnpb.PHYVersion_RP002_V1_0_3,
+		AS_923_3:        ttnpb.PHYVersion_RP002_V1_0_3,
+		AU_915_928:      ttnpb.PHYVersion_RP002_V1_0_3,
 		CN_470_510:      ttnpb.PHYVersion_RP001_V1_1_REV_B,
-		CN_470_510_20_A: ttnpb.PHYVersion_RP002_V1_0_2,
-		CN_470_510_20_B: ttnpb.PHYVersion_RP002_V1_0_2,
-		CN_470_510_26_A: ttnpb.PHYVersion_RP002_V1_0_2,
-		CN_470_510_26_B: ttnpb.PHYVersion_RP002_V1_0_2,
-		CN_779_787:      ttnpb.PHYVersion_RP002_V1_0_2,
-		EU_433:          ttnpb.PHYVersion_RP002_V1_0_2,
-		EU_863_870:      ttnpb.PHYVersion_RP002_V1_0_2,
-		IN_865_867:      ttnpb.PHYVersion_RP002_V1_0_2,
-		ISM_2400:        ttnpb.PHYVersion_RP002_V1_0_2,
-		KR_920_923:      ttnpb.PHYVersion_RP002_V1_0_2,
-		RU_864_870:      ttnpb.PHYVersion_RP002_V1_0_2,
-		US_902_928:      ttnpb.PHYVersion_RP002_V1_0_2,
+		CN_470_510_20_A: ttnpb.PHYVersion_RP002_V1_0_3,
+		CN_470_510_20_B: ttnpb.PHYVersion_RP002_V1_0_3,
+		CN_470_510_26_A: ttnpb.PHYVersion_RP002_V1_0_3,
+		CN_470_510_26_B: ttnpb.PHYVersion_RP002_V1_0_3,
+		CN_779_787:      ttnpb.PHYVersion_RP002_V1_0_3,
+		EU_433:          ttnpb.PHYVersion_RP002_V1_0_3,
+		EU_863_870:      ttnpb.PHYVersion_RP002_V1_0_3,
+		IN_865_867:      ttnpb.PHYVersion_RP002_V1_0_3,
+		ISM_2400:        ttnpb.PHYVersion_RP002_V1_0_3,
+		KR_920_923:      ttnpb.PHYVersion_RP002_V1_0_3,
+		RU_864_870:      ttnpb.PHYVersion_RP002_V1_0_3,
+		US_902_928:      ttnpb.PHYVersion_RP002_V1_0_3,
 	}
 )
 
