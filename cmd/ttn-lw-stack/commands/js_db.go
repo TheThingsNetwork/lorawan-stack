@@ -82,7 +82,8 @@ var (
 			if err != nil {
 				return err
 			}
-			if force, _ := cmd.Flags().GetBool("force"); !force {
+			force, _ := cmd.Flags().GetBool("force")
+			if !force {
 				if schemaVersion >= jsredis.SchemaVersion {
 					logger.Info("Database schema version is already in latest version")
 					return nil
@@ -100,63 +101,69 @@ var (
 			euiRegexp := regexp.MustCompile(devicesCl.Key("eui", euiRegexpStr, euiRegexpStr+"$"))
 			sessionKeyIDRegexp := regexp.MustCompile(keysCl.Key("id", euiRegexpStr, euiRegexpStr, sessionKeyIDStr+"$"))
 
-			err := ttnredis.RangeRedisKeys(ctx, devicesCl, devicesCl.Key("*"), ttnredis.DefaultRangeCount, func(k string) (bool, error) {
+			err = ttnredis.RangeRedisKeys(ctx, devicesCl, devicesCl.Key("*"), ttnredis.DefaultRangeCount, func(k string) (bool, error) {
 				logger := logger.WithField("key", k)
-				if match := euiRegexp.FindSubmatch([]byte(k)); len(match) > 0 && config.JS.SessionKeyLimit > 0 {
-					var joinEUI, devEUI types.EUI64
-					if err := joinEUI.UnmarshalText(match[1]); err != nil {
-						logger.WithError(err).Error("Failed to parse JoinEUI")
-						return true, nil
-					}
-					if err := devEUI.UnmarshalText(match[2]); err != nil {
-						logger.WithError(err).Error("Failed to parse DevEUI")
-						return true, nil
-					}
-					var sids [][]byte
-					err := ttnredis.RangeRedisKeys(ctx, keysCl, keysCl.Key("id", joinEUI.String(), devEUI.String(), "*"), ttnredis.DefaultRangeCount, func(k string) (bool, error) {
-						match := sessionKeyIDRegexp.FindStringSubmatch(k)
-						if len(match) == 0 {
-							logger.WithField("key", k).Error("Failed to parse session key ID key")
+
+				if match := euiRegexp.FindSubmatch([]byte(k)); len(match) > 0 {
+					// Before schema version 1, all session keys were persisted. This migration puts the recent session keys in
+					// a set per end device. This migration should not have to run on schema versions 1 and later and is therefore
+					// only ran when forcing the migration.
+					if (schemaVersion < 1 || force) && config.JS.SessionKeyLimit > 0 {
+						var joinEUI, devEUI types.EUI64
+						if err := joinEUI.UnmarshalText(match[1]); err != nil {
+							logger.WithError(err).Error("Failed to parse JoinEUI")
 							return true, nil
 						}
-						sid, err := base64.RawStdEncoding.DecodeString(match[3])
-						if err != nil {
-							logger.WithError(err).Error("Failed to parse base64 session key ID")
+						if err := devEUI.UnmarshalText(match[2]); err != nil {
+							logger.WithError(err).Error("Failed to parse DevEUI")
 							return true, nil
 						}
-						sids = append(sids, sid)
-						return true, nil
-					})
-					if err != nil {
-						logger.WithError(err).Error("Failed to range session keys")
-						return true, nil
-					}
-					logger.WithField("count", len(sids)).Debug("Retrieved session keys")
-					sort.Slice(sids, func(i, j int) bool { return bytes.Compare(sids[i], sids[j]) < 0 })
-					if d := len(sids) - config.JS.SessionKeyLimit; d > 0 {
-						for _, sid := range sids[:d] {
-							sidKey := keysCl.Key("id", joinEUI.String(), devEUI.String(), base64.RawStdEncoding.EncodeToString(sid))
-							logger := logger.WithField("key", sidKey)
-							if err := keysCl.Del(ctx, sidKey).Err(); err != nil {
-								logger.WithError(err).Error("Failed to delete session key")
-								continue
+						var sids [][]byte
+						err := ttnredis.RangeRedisKeys(ctx, keysCl, keysCl.Key("id", joinEUI.String(), devEUI.String(), "*"), ttnredis.DefaultRangeCount, func(k string) (bool, error) {
+							match := sessionKeyIDRegexp.FindStringSubmatch(k)
+							if len(match) == 0 {
+								logger.WithField("key", k).Error("Failed to parse session key ID key")
+								return true, nil
 							}
-							logger.Debug("Deleted old session key")
+							sid, err := base64.RawStdEncoding.DecodeString(match[3])
+							if err != nil {
+								logger.WithError(err).Error("Failed to parse base64 session key ID")
+								return true, nil
+							}
+							sids = append(sids, sid)
+							return true, nil
+						})
+						if err != nil {
+							logger.WithError(err).Error("Failed to range session keys")
+							return true, nil
 						}
-						sids = sids[d:]
-					}
-					sidVals := make([]interface{}, len(sids))
-					for i := range sids {
-						sidVals[i] = base64.RawStdEncoding.EncodeToString(sids[i])
-					}
-					sidsKey := keysCl.Key("ids", joinEUI.String(), devEUI.String())
-					if err := keysCl.Del(ctx, sidsKey).Err(); err != nil {
-						logger.WithError(err).Error("Failed to delete existing recent session key IDs")
-						return true, nil
-					}
-					if err := keysCl.RPush(ctx, sidsKey, sidVals...).Err(); err != nil {
-						logger.WithError(err).Error("Failed to store recent session key IDs")
-						return true, nil
+						logger.WithField("count", len(sids)).Debug("Retrieved session keys")
+						sort.Slice(sids, func(i, j int) bool { return bytes.Compare(sids[i], sids[j]) < 0 })
+						if d := len(sids) - config.JS.SessionKeyLimit; d > 0 {
+							for _, sid := range sids[:d] {
+								sidKey := keysCl.Key("id", joinEUI.String(), devEUI.String(), base64.RawStdEncoding.EncodeToString(sid))
+								logger := logger.WithField("key", sidKey)
+								if err := keysCl.Del(ctx, sidKey).Err(); err != nil {
+									logger.WithError(err).Error("Failed to delete session key")
+									continue
+								}
+								logger.Debug("Deleted old session key")
+							}
+							sids = sids[d:]
+						}
+						sidVals := make([]interface{}, len(sids))
+						for i := range sids {
+							sidVals[i] = base64.RawStdEncoding.EncodeToString(sids[i])
+						}
+						sidsKey := keysCl.Key("ids", joinEUI.String(), devEUI.String())
+						if err := keysCl.Del(ctx, sidsKey).Err(); err != nil {
+							logger.WithError(err).Error("Failed to delete existing recent session key IDs")
+							return true, nil
+						}
+						if err := keysCl.RPush(ctx, sidsKey, sidVals...).Err(); err != nil {
+							logger.WithError(err).Error("Failed to store recent session key IDs")
+							return true, nil
+						}
 					}
 				} else {
 					logger.Debug("Skip unmatched key")
