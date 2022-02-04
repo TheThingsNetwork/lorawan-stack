@@ -23,6 +23,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Device activation flow with a LoRaWAN Backend Interfaces 1.1 capable Join Server.
+  - Join Servers using Backend Interfaces 1.1 (protocol `BI1.1`) must be configured with a `sender-ns-id` containing the EUI of the Network Server.
 - Fix `time.Duration` flags in CLI.
 
 ### Security
