@@ -112,4 +112,9 @@ var US_902_928_TS1_V1_0_1 = Band{
 		CodingRate:       "4/5",
 		ComputeFrequency: makeBeaconFrequencyFunc(usAuBeaconFrequencies),
 	},
+
+	BootDwellTime: DwellTime{
+		Uplinks:   boolPtr(true),
+		Downlinks: boolPtr(false),
+	},
 }

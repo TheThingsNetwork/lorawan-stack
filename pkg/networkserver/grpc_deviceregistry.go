@@ -1184,6 +1184,8 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		"mac_settings.desired_rx2_data_rate_index.value",
 		"mac_settings.ping_slot_data_rate_index.value",
 		"mac_settings.desired_ping_slot_data_rate_index.value",
+		"mac_settings.uplink_dwell_time.value",
+		"mac_settings.downlink_dwell_time.value",
 		"mac_state.current_parameters.adr_data_rate_index",
 		"mac_state.current_parameters.adr_tx_power_index",
 		"mac_state.current_parameters.channels",
@@ -1343,6 +1345,48 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				})
 			},
 				"mac_settings.desired_ping_slot_data_rate_index.value",
+			); err != nil {
+				return nil, err
+			}
+		}
+		if st.HasSetField(
+			"frequency_plan_id",
+			"lorawan_phy_version",
+			"mac_settings.uplink_dwell_time.value",
+		) {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, fp *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetUplinkDwellTime() == nil {
+						return nil
+					}
+					if !phy.TxParamSetupReqSupport {
+						return newInvalidFieldValueError("mac_settings.uplink_dwell_time.value")
+					}
+					return nil
+				})
+			},
+				"mac_settings.uplink_dwell_time.value",
+			); err != nil {
+				return nil, err
+			}
+		}
+		if st.HasSetField(
+			"frequency_plan_id",
+			"lorawan_phy_version",
+			"mac_settings.downlink_dwell_time.value",
+		) {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, fp *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetDownlinkDwellTime() == nil {
+						return nil
+					}
+					if !phy.TxParamSetupReqSupport {
+						return newInvalidFieldValueError("mac_settings.downlink_dwell_time.value")
+					}
+					return nil
+				})
+			},
+				"mac_settings.downlink_dwell_time.value",
 			); err != nil {
 				return nil, err
 			}

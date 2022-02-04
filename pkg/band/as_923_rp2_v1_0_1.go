@@ -118,5 +118,13 @@ var as923RP2101Band = func(id string, offset as923GroupOffset) Band {
 		PingSlotFrequency: uint64Ptr(as923BeaconFrequency(offset)),
 
 		TxParamSetupReqSupport: true,
+
+		// Based on LoRaMac-node 4.6.0.
+		// https://github.com/Lora-net/LoRaMac-node/blob/fe8247e2b84101fe701531a5f9ef14f035743af4/src/mac/region/RegionAS923.h#L161-L164
+		// https://github.com/Lora-net/LoRaMac-node/blob/fe8247e2b84101fe701531a5f9ef14f035743af4/src/mac/region/RegionCommon.h#L97-L100
+		BootDwellTime: DwellTime{
+			Uplinks:   boolPtr(true),
+			Downlinks: boolPtr(false),
+		},
 	}
 }

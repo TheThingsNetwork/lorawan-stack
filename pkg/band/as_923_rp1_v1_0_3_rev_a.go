@@ -116,4 +116,12 @@ var AS_923_RP1_v1_0_3_RevA = Band{
 	PingSlotFrequency: uint64Ptr(as923BeaconFrequency(as923Group1Offset)),
 
 	TxParamSetupReqSupport: true,
+
+	// Based on LoRaMac-node 4.4.7.
+	// https://github.com/Lora-net/LoRaMac-node/blob/e54d3ecf3407c2b9a0abe86ce406de76b2b5a180/src/mac/region/RegionAS923.h#L142-L145
+	// https://github.com/Lora-net/LoRaMac-node/blob/e54d3ecf3407c2b9a0abe86ce406de76b2b5a180/src/mac/region/RegionCommon.h#L102-L105
+	BootDwellTime: DwellTime{
+		Uplinks:   boolPtr(true),
+		Downlinks: boolPtr(false),
+	},
 }

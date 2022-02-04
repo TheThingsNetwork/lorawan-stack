@@ -14812,6 +14812,30 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "uplink_dwell_time",
+              "description": "Whether uplink dwell time is set (400ms).\nIf unset, the default value from Network Server configuration or regional parameters specification will be used.",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "BoolValue",
+              "fullType": "ttn.lorawan.v3.BoolValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "downlink_dwell_time",
+              "description": "Whether downlink dwell time is set (400ms).\nIf unset, the default value from Network Server configuration or regional parameters specification will be used.",
+              "label": "",
+              "type": "BoolValue",
+              "longType": "BoolValue",
+              "fullType": "ttn.lorawan.v3.BoolValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },

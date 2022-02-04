@@ -187,6 +187,14 @@ func (v *MACSettings) FieldIsZero(p string) bool {
 		return v.UseAdr == nil
 	case "use_adr.value":
 		return v.UseAdr.FieldIsZero("value")
+	case "uplink_dwell_time":
+		return v.UplinkDwellTime == nil
+	case "uplink_dwell_time.value":
+		return v.UplinkDwellTime.FieldIsZero("value")
+	case "downlink_dwell_time":
+		return v.DownlinkDwellTime == nil
+	case "downlink_dwell_time.value":
+		return v.DownlinkDwellTime.FieldIsZero("value")
 	}
 	panic(fmt.Sprintf("unknown path '%s'", p))
 }
@@ -993,6 +1001,14 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return v.MacSettings.FieldIsZero("use_adr")
 	case "mac_settings.use_adr.value":
 		return v.MacSettings.FieldIsZero("use_adr.value")
+	case "mac_settings.uplink_dwell_time":
+		return v.MacSettings.FieldIsZero("uplink_dwell_time")
+	case "mac_settings.uplink_dwell_time.value":
+		return v.MacSettings.FieldIsZero("uplink_dwell_time.value")
+	case "mac_settings.downlink_dwell_time":
+		return v.MacSettings.FieldIsZero("downlink_dwell_time")
+	case "mac_settings.downlink_dwell_time.value":
+		return v.MacSettings.FieldIsZero("downlink_dwell_time.value")
 	case "mac_state":
 		return v.MacState == nil
 	case "max_frequency":

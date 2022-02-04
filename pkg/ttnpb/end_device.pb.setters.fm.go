@@ -1263,6 +1263,56 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 			} else {
 				dst.ClassBCDownlinkInterval = nil
 			}
+		case "uplink_dwell_time":
+			if len(subs) > 0 {
+				var newDst, newSrc *BoolValue
+				if (src == nil || src.UplinkDwellTime == nil) && dst.UplinkDwellTime == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.UplinkDwellTime
+				}
+				if dst.UplinkDwellTime != nil {
+					newDst = dst.UplinkDwellTime
+				} else {
+					newDst = &BoolValue{}
+					dst.UplinkDwellTime = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.UplinkDwellTime = src.UplinkDwellTime
+				} else {
+					dst.UplinkDwellTime = nil
+				}
+			}
+		case "downlink_dwell_time":
+			if len(subs) > 0 {
+				var newDst, newSrc *BoolValue
+				if (src == nil || src.DownlinkDwellTime == nil) && dst.DownlinkDwellTime == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.DownlinkDwellTime
+				}
+				if dst.DownlinkDwellTime != nil {
+					newDst = dst.DownlinkDwellTime
+				} else {
+					newDst = &BoolValue{}
+					dst.DownlinkDwellTime = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.DownlinkDwellTime = src.DownlinkDwellTime
+				} else {
+					dst.DownlinkDwellTime = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

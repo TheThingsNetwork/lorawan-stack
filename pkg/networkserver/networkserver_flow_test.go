@@ -39,7 +39,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion, fpID string, otaa bool) ([]MACCommander, []events.Builder) {
+// frequencyPlanMACCommands generates the MAC command and event builders that are expected
+// for a particular MAC and PHY version pair, in the provided frequency plan, if OTAA is enabled.
+// The returned bool value represents the FPending flag, which may be set for pairs where
+// the MAC commands do not fit a singular transmission.
+func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion, fpID string, otaa bool) ([]MACCommander, []events.Builder, bool) {
 	switch fpID {
 	case test.EUFrequencyPlanID:
 		linkADRReq := &ttnpb.MACCommand_LinkADRReq{
@@ -52,7 +56,7 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 				linkADRReq,
 			}, []events.Builder{
 				mac.EvtEnqueueLinkADRRequest.With(events.WithData(linkADRReq)),
-			}
+			}, false
 	case test.USFrequencyPlanID:
 		linkADRReqs := []MACCommander{
 			&ttnpb.MACCommand_LinkADRReq{
@@ -72,8 +76,8 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 			default:
 				return false
 			}
-		}
-		if !otaa || beforeRP001_V1_0_3_REV_A(phyVersion) {
+		}(phyVersion)
+		if !otaa || beforeRP001_V1_0_3_REV_A {
 			linkADRReqs = append([]MACCommander{
 				&ttnpb.MACCommand_LinkADRReq{
 					ChannelMask:        []bool{false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false},
@@ -89,26 +93,46 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 			req := req
 			evBuilders = append(evBuilders, mac.EvtEnqueueLinkADRRequest.With(events.WithData(req)))
 		}
-		return linkADRReqs, evBuilders
+		return linkADRReqs, evBuilders, false
 	case test.ASAUFrequencyPlanID:
 		newChannelReq := &ttnpb.MACCommand_NewChannelReq{
 			ChannelIndex:     7,
 			Frequency:        924600000,
 			MaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
 		}
-		linkADRReq := &ttnpb.MACCommand_LinkADRReq{
-			ChannelMask:   []bool{true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false},
-			DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
-			TxPowerIndex:  1,
-			NbTrans:       1,
-		}
-		return []MACCommander{
-				newChannelReq,
-				linkADRReq,
-			}, []events.Builder{
-				mac.EvtEnqueueNewChannelRequest.With(events.WithData(newChannelReq)),
-				mac.EvtEnqueueLinkADRRequest.With(events.WithData(linkADRReq)),
+		macCommanders := []MACCommander{newChannelReq}
+		evBuilders := []events.Builder{mac.EvtEnqueueNewChannelRequest.With(events.WithData(newChannelReq))}
+
+		fPending := true
+		// The boot time settings of RP001-1.0.2B devices enable downlink dwell time, which limits the number
+		// of MAC commands that can be part of the downlink. As such, the LinkADRReq is not sent as part of
+		// the initial downlink on this version.
+		if phyVersion != ttnpb.PHYVersion_PHY_V1_0_2_REV_B {
+			linkADRReq := &ttnpb.MACCommand_LinkADRReq{
+				ChannelMask:   []bool{true, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false},
+				DataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+				TxPowerIndex:  1,
+				NbTrans:       1,
 			}
+
+			macCommanders = append(macCommanders, linkADRReq)
+			evBuilders = append(evBuilders, mac.EvtEnqueueLinkADRRequest.With(events.WithData(linkADRReq)))
+			fPending = false
+		}
+
+		var maxEIRPIndex = ttnpb.DeviceEIRP(5)
+		// The maximum EIRP in the RP001-1.0.2A version is 14 dB only, while the other versions use 16 dB.
+		if phyVersion == ttnpb.PHYVersion_PHY_V1_0_2_REV_A {
+			maxEIRPIndex = ttnpb.DeviceEIRP(4)
+		}
+		txParamSetupReq := &ttnpb.MACCommand_TxParamSetupReq{
+			MaxEirpIndex:      maxEIRPIndex,
+			DownlinkDwellTime: false,
+			UplinkDwellTime:   false,
+		}
+		macCommanders = append(macCommanders, txParamSetupReq)
+		evBuilders = append(evBuilders, mac.EvtEnqueueTxParamSetupRequest.With(events.WithData(txParamSetupReq)))
+		return macCommanders, evBuilders, fPending
 	default:
 		panic(fmt.Errorf("unknown LinkADRReqs for %s frequency plan", fpID))
 	}
@@ -231,7 +255,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			return
 		}
 
-		fpCmders, fpEvBuilders := frequencyPlanMACCommands(dev.MacState.LorawanVersion, dev.LorawanPhyVersion, dev.FrequencyPlanId, true)
+		fpCmders, fpEvBuilders, fPending := frequencyPlanMACCommands(dev.MacState.LorawanVersion, dev.LorawanPhyVersion, dev.FrequencyPlanId, true)
 		downEvBuilders := append(conf.DownlinkEventBuilders, fpEvBuilders...)
 		downCmders = append(downCmders, conf.DownlinkMACCommanders...)
 		downCmders = append(downCmders, fpCmders...)
@@ -250,6 +274,8 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			FCtrl: &ttnpb.FCtrl{
 				Adr: true,
 				Ack: true,
+
+				FPending: fPending,
 			},
 			FRMPayload:  frmPayload,
 			FOpts:       fOpts,

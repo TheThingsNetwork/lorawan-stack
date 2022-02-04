@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
+	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
@@ -214,9 +215,10 @@ func matchQueuedApplicationDownlinks(ctx context.Context, dev *ttnpb.EndDevice, 
 	if err != nil {
 		return err
 	}
-	var maxDownLen uint16 = 0
+	var maxDownLen uint16
+	downDwellTime := mac.DeviceExpectedDownlinkDwellTime(dev.MacState, fp, phy)
 	for _, dr := range phy.DataRates {
-		if n := dr.MaxMACPayloadSize(fp.DwellTime.GetDownlinks()); n > maxDownLen {
+		if n := dr.MaxMACPayloadSize(downDwellTime); n > maxDownLen {
 			maxDownLen = n
 		}
 	}

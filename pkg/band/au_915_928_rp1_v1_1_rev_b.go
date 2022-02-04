@@ -114,4 +114,9 @@ var AU_915_928_RP1_v1_1_RevB = Band{
 	},
 
 	TxParamSetupReqSupport: true,
+
+	BootDwellTime: DwellTime{
+		Uplinks:   boolPtr(true),
+		Downlinks: boolPtr(false),
+	},
 }

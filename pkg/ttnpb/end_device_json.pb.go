@@ -898,6 +898,16 @@ func (x *MACSettings) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 			gogo.MarshalDuration(s, x.ClassBCDownlinkInterval)
 		}
 	}
+	if x.UplinkDwellTime != nil || s.HasField("uplink_dwell_time") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("uplink_dwell_time")
+		x.UplinkDwellTime.MarshalProtoJSON(s.WithField("uplink_dwell_time"))
+	}
+	if x.DownlinkDwellTime != nil || s.HasField("downlink_dwell_time") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("downlink_dwell_time")
+		x.DownlinkDwellTime.MarshalProtoJSON(s.WithField("downlink_dwell_time"))
+	}
 	s.WriteObjectEnd()
 }
 
@@ -1172,6 +1182,22 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				return
 			}
 			x.ClassBCDownlinkInterval = v
+		case "uplink_dwell_time", "uplinkDwellTime":
+			s.AddField("uplink_dwell_time")
+			if s.ReadNil() {
+				x.UplinkDwellTime = nil
+				return
+			}
+			x.UplinkDwellTime = &BoolValue{}
+			x.UplinkDwellTime.UnmarshalProtoJSON(s.WithField("uplink_dwell_time", false))
+		case "downlink_dwell_time", "downlinkDwellTime":
+			s.AddField("downlink_dwell_time")
+			if s.ReadNil() {
+				x.DownlinkDwellTime = nil
+				return
+			}
+			x.DownlinkDwellTime = &BoolValue{}
+			x.DownlinkDwellTime.UnmarshalProtoJSON(s.WithField("downlink_dwell_time", false))
 		}
 	})
 }

@@ -1083,7 +1083,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 										rx1DRIdx := test.Must(phy.Rx1DataRate(
 											drIdx,
 											conf.MACState.CurrentParameters.Rx1DataRateOffset,
-											conf.MACState.CurrentParameters.DownlinkDwellTime.GetValue()),
+											mac.DeviceExpectedDownlinkDwellTime(conf.MACState, fp, phy)),
 										).(ttnpb.DataRateIndex)
 										rx1DR := phy.DataRates[rx1DRIdx]
 										txReq.Rx1DataRate = rx1DR.Rate
@@ -1593,6 +1593,8 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					PingSlotFrequency:          mac.DeviceDefaultPingSlotFrequency(dev, phy, defaultMACSettings),
 					BeaconFrequency:            mac.DeviceDefaultBeaconFrequency(dev, defaultMACSettings),
 					Channels:                   mac.DeviceDefaultChannels(dev, phy, defaultMACSettings),
+					UplinkDwellTime:            mac.DeviceUplinkDwellTime(dev, phy, defaultMACSettings),
+					DownlinkDwellTime:          mac.DeviceDownlinkDwellTime(dev, phy, defaultMACSettings),
 					AdrAckLimitExponent:        &ttnpb.ADRAckLimitExponentValue{Value: phy.ADRAckLimit},
 					AdrAckDelayExponent:        &ttnpb.ADRAckDelayExponentValue{Value: phy.ADRAckDelay},
 					PingSlotDataRateIndexValue: mac.DeviceDefaultPingSlotDataRateIndexValue(dev, phy, defaultMACSettings),
@@ -1611,8 +1613,8 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					PingSlotFrequency:          mac.DeviceDesiredPingSlotFrequency(dev, phy, fp, defaultMACSettings),
 					BeaconFrequency:            mac.DeviceDesiredBeaconFrequency(dev, defaultMACSettings),
 					Channels:                   mac.DeviceDesiredChannels(dev, phy, fp, defaultMACSettings),
-					UplinkDwellTime:            mac.DeviceDesiredUplinkDwellTime(fp),
-					DownlinkDwellTime:          mac.DeviceDesiredDownlinkDwellTime(fp),
+					UplinkDwellTime:            mac.DeviceDesiredUplinkDwellTime(phy, fp),
+					DownlinkDwellTime:          mac.DeviceDesiredDownlinkDwellTime(phy, fp),
 					AdrAckLimitExponent:        mac.DeviceDesiredADRAckLimitExponent(dev, phy, defaultMACSettings),
 					AdrAckDelayExponent:        mac.DeviceDesiredADRAckDelayExponent(dev, phy, defaultMACSettings),
 					PingSlotDataRateIndexValue: mac.DeviceDesiredPingSlotDataRateIndexValue(dev, phy, fp, defaultMACSettings),

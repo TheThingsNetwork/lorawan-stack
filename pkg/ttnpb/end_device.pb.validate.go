@@ -1081,6 +1081,30 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "uplink_dwell_time":
+
+			if v, ok := interface{}(m.GetUplinkDwellTime()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACSettingsValidationError{
+						field:  "uplink_dwell_time",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "downlink_dwell_time":
+
+			if v, ok := interface{}(m.GetDownlinkDwellTime()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACSettingsValidationError{
+						field:  "downlink_dwell_time",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return MACSettingsValidationError{
 				field:  name,

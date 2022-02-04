@@ -15920,6 +15920,14 @@
         "class_b_c_downlink_interval": {
           "type": "string",
           "description": "The minimum duration passed before a network-initiated(e.g. Class B or C) downlink following an arbitrary downlink."
+        },
+        "uplink_dwell_time": {
+          "$ref": "#/definitions/lorawanv3BoolValue",
+          "description": "Whether uplink dwell time is set (400ms).\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
+        },
+        "downlink_dwell_time": {
+          "$ref": "#/definitions/lorawanv3BoolValue",
+          "description": "Whether downlink dwell time is set (400ms).\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
         }
       }
     },

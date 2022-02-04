@@ -1052,7 +1052,7 @@ func appendRecentDownlink(recent []*ttnpb.DownlinkMessage, down *ttnpb.DownlinkM
 	return recent
 }
 
-func rx1Parameters(phy *band.Band, macState *ttnpb.MACState, up *ttnpb.UplinkMessage) (uint64, ttnpb.DataRateIndex, band.DataRate, error) {
+func rx1Parameters(phy *band.Band, fp *frequencyplans.FrequencyPlan, macState *ttnpb.MACState, up *ttnpb.UplinkMessage) (uint64, ttnpb.DataRateIndex, band.DataRate, error) {
 	if up.DeviceChannelIndex > math.MaxUint8 {
 		return 0, 0, band.DataRate{}, errInvalidChannelIndex.New()
 	}
@@ -1079,7 +1079,7 @@ func rx1Parameters(phy *band.Band, macState *ttnpb.MACState, up *ttnpb.UplinkMes
 	if !ok {
 		return 0, 0, band.DataRate{}, errDataRateNotFound.New()
 	}
-	drIdx, err = phy.Rx1DataRate(drIdx, macState.CurrentParameters.Rx1DataRateOffset, macState.CurrentParameters.DownlinkDwellTime.GetValue())
+	drIdx, err = phy.Rx1DataRate(drIdx, macState.CurrentParameters.Rx1DataRateOffset, mac.DeviceExpectedDownlinkDwellTime(macState, fp, phy))
 	if err != nil {
 		return 0, 0, band.DataRate{}, err
 	}
@@ -1091,7 +1091,7 @@ func rx1Parameters(phy *band.Band, macState *ttnpb.MACState, up *ttnpb.UplinkMes
 }
 
 // maximumUplinkLength returns the maximum length of the next uplink after ups.
-func maximumUplinkLength(fp *frequencyplans.FrequencyPlan, phy *band.Band, ups ...*ttnpb.UplinkMessage) (uint16, error) {
+func maximumUplinkLength(macState *ttnpb.MACState, fp *frequencyplans.FrequencyPlan, phy *band.Band, ups ...*ttnpb.UplinkMessage) (uint16, error) {
 	// NOTE: If no data uplink is found, we assume ADR is off on the device and, hence, data rate index 0 is used in computation.
 	maxUpDRIdx := ttnpb.DataRateIndex_DATA_RATE_0
 loop:
@@ -1114,7 +1114,7 @@ loop:
 	if !ok {
 		return 0, errDataRateIndexNotFound.WithAttributes("index", maxUpDRIdx)
 	}
-	return dr.MaxMACPayloadSize(fp.DwellTime.GetUplinks()), nil
+	return dr.MaxMACPayloadSize(mac.DeviceExpectedUplinkDwellTime(macState, fp, phy)), nil
 }
 
 // downlinkRetryInterval is the time interval, which defines the interval between downlink task retries.
@@ -1207,7 +1207,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		attemptRX2 bool
 	)
 	if !slot.RX1().Before(now) {
-		freq, drIdx, dr, err := rx1Parameters(phy, dev.MacState, slot.Uplink)
+		freq, drIdx, dr, err := rx1Parameters(phy, fp, dev.MacState, slot.Uplink)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Error("Failed to compute RX1 parameters")
 		} else {
@@ -1246,7 +1246,7 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		transmitAt = slot.RX2()
 		maxDR = rx2DR
 	}
-	downDwellTime := fp.DwellTime.GetDownlinks()
+	downDwellTime := mac.DeviceExpectedDownlinkDwellTime(dev.MacState, fp, phy)
 
 	genDown, genState, err := ns.generateDataDownlink(ctx, dev, phy, ttnpb.Class_CLASS_A, transmitAt,
 		maxDR.MaxMACPayloadSize(downDwellTime),
@@ -1399,7 +1399,7 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 	}
 
 	genDown, genState, err := ns.generateDataDownlink(ctx, dev, phy, slot.Class, latestTime(slot.Time, time.Now()),
-		dr.MaxMACPayloadSize(fp.DwellTime.GetDownlinks()),
+		dr.MaxMACPayloadSize(mac.DeviceExpectedDownlinkDwellTime(dev.MacState, fp, phy)),
 		maxUpLength,
 	)
 	var sets []string
@@ -1690,7 +1690,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 						attemptRX2 bool
 					)
 					if !rx1.Before(now) {
-						freq, _, dr, err := rx1Parameters(phy, dev.PendingMacState, up)
+						freq, _, dr, err := rx1Parameters(phy, fp, dev.PendingMacState, up)
 						if err != nil {
 							log.FromContext(ctx).WithError(err).Error("Failed to compute RX1 parameters")
 						} else {
@@ -1837,7 +1837,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 
 				var maxUpLength uint16 = math.MaxUint16
 				if !dev.Multicast && dev.MacState.LorawanVersion == ttnpb.MACVersion_MAC_V1_1 {
-					maxUpLength, err = maximumUplinkLength(fp, phy, dev.MacState.RecentUplinks...)
+					maxUpLength, err = maximumUplinkLength(dev.MacState, fp, phy, dev.MacState.RecentUplinks...)
 					if err != nil {
 						logger.WithError(err).Error("Failed to determine maximum uplink length")
 						return dev, nil, nil
