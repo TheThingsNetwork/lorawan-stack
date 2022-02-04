@@ -865,12 +865,13 @@ func TestDeviceRegistryDelete(t *testing.T) {
 		},
 	}
 	for _, tc := range []struct {
-		Name           string
-		ContextFunc    func(context.Context) context.Context
-		SetByIDFunc    func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
-		DeviceRequest  *ttnpb.EndDeviceIdentifiers
-		ErrorAssertion func(*testing.T, error) bool
-		SetByIDCalls   uint64
+		Name            string
+		ContextFunc     func(context.Context) context.Context
+		SetByIDFunc     func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error)
+		DeviceRequest   *ttnpb.EndDeviceIdentifiers
+		ErrorAssertion  func(*testing.T, error) bool
+		SetByIDCalls    uint64
+		DeleteKeysCalls uint64
 	}{
 		{
 			Name: "Permission denied",
@@ -924,7 +925,8 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				a := assertions.New(t)
 				return a.So(errors.IsNotFound(err), should.BeTrue)
 			},
-			SetByIDCalls: 1,
+			SetByIDCalls:    1,
+			DeleteKeysCalls: 0,
 		},
 
 		{
@@ -949,13 +951,17 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				dev, _, err := cb(CopyEndDevice(registeredDevice))
 				return dev, err
 			},
-			SetByIDCalls: 1,
+			SetByIDCalls:    1,
+			DeleteKeysCalls: 1,
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			var setByIDCalls uint64
+			var (
+				setByIDCalls    uint64
+				deleteKeysCalls uint64
+			)
 
 			js := test.Must(New(
 				componenttest.NewComponent(t, &component.Config{}),
@@ -964,6 +970,12 @@ func TestDeviceRegistryDelete(t *testing.T) {
 						SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 							atomic.AddUint64(&setByIDCalls, 1)
 							return tc.SetByIDFunc(ctx, appID, devID, paths, cb)
+						},
+					},
+					Keys: &MockKeyRegistry{
+						DeleteFunc: func(c context.Context, e1, e2 types.EUI64) error {
+							atomic.AddUint64(&deleteKeysCalls, 1)
+							return nil
 						},
 					},
 					DevNonceLimit: defaultDevNonceLimit,
@@ -988,6 +1000,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 
 			_, err := ttnpb.NewJsEndDeviceRegistryClient(js.LoopbackConn()).Delete(ctx, req)
 			a.So(setByIDCalls, should.Equal, tc.SetByIDCalls)
+			a.So(deleteKeysCalls, should.Equal, tc.DeleteKeysCalls)
 			if tc.ErrorAssertion != nil {
 				a.So(tc.ErrorAssertion(t, err), should.BeTrue)
 			} else {

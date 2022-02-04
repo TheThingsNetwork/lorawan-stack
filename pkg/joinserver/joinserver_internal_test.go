@@ -86,6 +86,7 @@ func (m MockDeviceRegistry) RangeByID(ctx context.Context, paths []string, f fun
 type MockKeyRegistry struct {
 	GetByIDFunc func(context.Context, types.EUI64, types.EUI64, []byte, []string) (*ttnpb.SessionKeys, error)
 	SetByIDFunc func(context.Context, types.EUI64, types.EUI64, []byte, []string, func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error)
+	DeleteFunc  func(context.Context, types.EUI64, types.EUI64) error
 }
 
 // GetByID calls GetByIDFunc if set and panics otherwise.
@@ -102,4 +103,11 @@ func (m MockKeyRegistry) SetByID(ctx context.Context, joinEUI, devEUI types.EUI6
 		panic("SetByID called, but not set")
 	}
 	return m.SetByIDFunc(ctx, joinEUI, devEUI, id, paths, f)
+}
+
+func (m MockKeyRegistry) Delete(ctx context.Context, joinEUI, devEUI types.EUI64) error {
+	if m.DeleteFunc == nil {
+		panic("Delete called, but not set")
+	}
+	return m.DeleteFunc(ctx, joinEUI, devEUI)
 }

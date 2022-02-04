@@ -413,6 +413,18 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 			}
 		}
 	}
+
+	// Delete all the session keys of the given device.
+	err = reg.Delete(ctx, joinEUI, devEUI)
+	if !a.So(err, should.BeNil) {
+		t.Fatalf("Error received: %v", err)
+	}
+	for i := byte(0); i < 20; i++ {
+		_, err := reg.GetByID(ctx, joinEUI, devEUI, bytes.Repeat([]byte{i}, 4), ttnpb.SessionKeysFieldPathsTopLevel)
+		if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
+			t.Fatalf("Error received: %v", err)
+		}
+	}
 }
 
 func TestSessionKeyRegistries(t *testing.T) {

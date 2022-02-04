@@ -590,6 +590,39 @@ func (r *KeyRegistry) SetByID(ctx context.Context, joinEUI, devEUI types.EUI64, 
 	return pb, nil
 }
 
+func (r *KeyRegistry) Delete(ctx context.Context, joinEUI, devEUI types.EUI64) error {
+	if devEUI.IsZero() {
+		return errInvalidIdentifiers.New()
+	}
+	sk := r.idSetKey(joinEUI, devEUI)
+
+	lockerID, err := ttnredis.GenerateLockerID()
+	if err != nil {
+		return err
+	}
+
+	defer trace.StartRegion(ctx, "delete session keys").End()
+
+	err = ttnredis.LockedWatch(ctx, r.Redis, sk, lockerID, r.LockTTL, func(tx *redis.Tx) error {
+		sids, err := tx.LRange(ctx, sk, 0, 1<<24).Result()
+		if err != nil {
+			return err
+		}
+		_, err = tx.Pipelined(ctx, func(p redis.Pipeliner) error {
+			for _, sid := range sids {
+				p.Del(ctx, r.idKey(joinEUI, devEUI, sid))
+			}
+			p.Del(ctx, sk)
+			return nil
+		})
+		return err
+	})
+	if err != nil {
+		return ttnredis.ConvertError(err)
+	}
+	return nil
+}
+
 // applyApplicationActivationSettingsFieldMask applies fields specified by paths from src to dst and returns the result.
 // If dst is nil, a new ApplicationActivationSettings is created.
 func applyApplicationActivationSettingsFieldMask(dst, src *ttnpb.ApplicationActivationSettings, paths ...string) (*ttnpb.ApplicationActivationSettings, error) {
