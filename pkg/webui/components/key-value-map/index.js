@@ -87,7 +87,7 @@ class KeyValueMap extends React.PureComponent {
   @bind
   addEmptyEntry() {
     const { onChange, value, indexAsKey } = this.props
-    const entry = indexAsKey ? undefined : { key: '', value: undefined }
+    const entry = indexAsKey ? '' : { key: '', value: '' }
 
     onChange([...value, entry])
   }
