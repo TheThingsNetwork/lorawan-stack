@@ -1,19 +1,23 @@
-name: Snapshot release
+name: Release-candidate release
 
 on:
-  push:
-    branches:
-      - 'v3.*'
+  workflow_dispatch:
+    inputs:
+      rc_version:
+        description: RC version (integer)
+        required: true
 
 env:
   NODE_ENV: production
 
 jobs:
   release:
-    name: Snapshot release
+    name: Release-candidate release
     runs-on: ubuntu-20.04
     timeout-minutes: 30
     steps:
+      - name: Check branch
+        run: echo "${{ github.ref_name }}" | grep -Pq '^release/v3\.\d+\.\d+$'
       - name: Check out code
         uses: actions/checkout@v2
         with:
@@ -134,12 +138,14 @@ jobs:
           SIGN_KEY_NAME: ${{ secrets.SIGN_KEY_NAME }}
       - name: Tag and Push Docker images
         run: |
-          docker tag lorawan-stack-dev:${{ github.sha }}-amd64 ${DOCKER_PREFIX}/lorawan-stack-dev:${{ github.sha }}-amd64
-          docker tag lorawan-stack-dev:${{ github.sha }}-arm64 ${DOCKER_PREFIX}/lorawan-stack-dev:${{ github.sha }}-arm64
-          docker push ${DOCKER_PREFIX}/lorawan-stack-dev:${{ github.sha }}-amd64
-          docker push ${DOCKER_PREFIX}/lorawan-stack-dev:${{ github.sha }}-arm64
-          docker manifest create ${DOCKER_PREFIX}/lorawan-stack-dev:${{ github.sha }} ${DOCKER_PREFIX}/lorawan-stack-dev:${{ github.sha }}-amd64 ${DOCKER_PREFIX}/lorawan-stack-dev:${{ github.sha }}-arm64
-          docker manifest push ${DOCKER_PREFIX}/lorawan-stack-dev:${{ github.sha }}
+          export RC_VERSION=${{ format('{0}-rc{1}', github.ref_name, github.event.inputs.rc_version) }}
+          export RC_VERSION=${RC_VERSION#release/}
+          docker tag lorawan-stack-dev:${{ github.sha }}-amd64 ${DOCKER_PREFIX}/lorawan-stack-dev:${RC_VERSION}-amd64
+          docker tag lorawan-stack-dev:${{ github.sha }}-arm64 ${DOCKER_PREFIX}/lorawan-stack-dev:${RC_VERSION}-arm64
+          docker push ${DOCKER_PREFIX}/lorawan-stack-dev:${RC_VERSION}-amd64
+          docker push ${DOCKER_PREFIX}/lorawan-stack-dev:${RC_VERSION}-arm64
+          docker manifest create ${DOCKER_PREFIX}/lorawan-stack-dev:${RC_VERSION} ${DOCKER_PREFIX}/lorawan-stack-dev:${RC_VERSION}-amd64 ${DOCKER_PREFIX}/lorawan-stack-dev:${RC_VERSION}-arm64
+          docker manifest push ${DOCKER_PREFIX}/lorawan-stack-dev:${RC_VERSION}
         env:
           DOCKER_CLI_EXPERIMENTAL: enabled
           DOCKER_PREFIX: thethingsnetwork

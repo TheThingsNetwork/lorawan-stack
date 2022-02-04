@@ -15,12 +15,11 @@
 package ttnmage
 
 import (
+	"bufio"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 
-	"github.com/TheThingsIndustries/magepkg/git"
 	"github.com/blang/semver"
 	"github.com/magefile/mage/mg"
 )
@@ -36,49 +35,28 @@ package version
 var TTN = "%s-dev"
 `
 
-var currentVersion string
-
-func (Version) getCurrent() error {
-	_, _, tag, err := git.Info()
-	if err != nil {
-		return err
-	}
-	currentVersion = tag
-	return nil
-}
-
-// Current returns the current version.
-func (Version) Current() error {
-	mg.Deps(Version.getCurrent)
-	fmt.Println(currentVersion)
-	return nil
-}
-
-// MajorMinor returns the current major.minor version.
-func (Version) MajorMinor() error {
-	mg.Deps(Version.getCurrent)
-	version, err := semver.Parse(strings.TrimPrefix(currentVersion, "v"))
-	if err != nil {
-		return err
-	}
-	fmt.Printf("v%d.%d\n", version.Major, version.Minor)
-	return nil
-}
-
 const (
 	goVersionFilePath = "pkg/version/ttn.go"
 )
 
 var packageJSONFilePaths = []string{"package.json", "sdk/js/package.json"}
 
-// Files writes the current version to files that contain version info and adds them to the Git index.
+// Files writes given version to files that contain version info
 func (Version) Files() error {
 	if mg.Verbose() {
-		fmt.Println("Writing version files")
+		fmt.Println("Enter new version")
 	}
-	mg.Deps(Version.getCurrent, Js.Deps)
-	version := strings.TrimPrefix(currentVersion, "v")
-	err := os.WriteFile(goVersionFilePath, []byte(fmt.Sprintf(goVersionFile, version)), 0644)
+	reader := bufio.NewReader(os.Stdin)
+	version, err := reader.ReadString('\n')
+	if err != nil {
+		return err
+	}
+	version = strings.TrimPrefix(strings.TrimSpace(version), "v")
+	_, err = semver.Parse(version)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(goVersionFilePath, []byte(fmt.Sprintf(goVersionFile, version)), 0644)
 	if err != nil {
 		return err
 	}
@@ -91,97 +69,5 @@ func (Version) Files() error {
 			return err
 		}
 	}
-	return git.Add(append(packageJSONFilePaths, goVersionFilePath)...)
-}
-
-func bumpVersion(bump string) error {
-	mg.Deps(Version.getCurrent)
-	version, err := semver.Parse(strings.TrimPrefix(currentVersion, "v"))
-	if err != nil {
-		return err
-	}
-	var newVersion semver.Version
-	switch bump {
-	case "release":
-		newVersion.Major = version.Major
-		newVersion.Minor = version.Minor
-		newVersion.Patch = version.Patch
-		newVersion.Pre = nil
-	case "major":
-		newVersion.Major = version.Major + 1
-	case "minor":
-		newVersion.Major = version.Major
-		newVersion.Minor = version.Minor + 1
-	case "patch":
-		newVersion.Major = version.Major
-		newVersion.Minor = version.Minor
-		newVersion.Patch = version.Patch + 1
-	case "rc":
-		newVersion.Major = version.Major
-		newVersion.Minor = version.Minor
-		newVersion.Patch = version.Patch
-		rc := 0
-		if len(version.Pre) > 0 {
-			rc, err = strconv.Atoi(strings.TrimPrefix(version.Pre[0].VersionStr, "rc"))
-			if err != nil {
-				return err
-			}
-		}
-		pre, err := semver.NewPRVersion(fmt.Sprintf("rc%d", rc+1))
-		if err != nil {
-			return err
-		}
-		newVersion.Pre = []semver.PRVersion{pre}
-	}
-	if mg.Verbose() {
-		fmt.Printf("Bumping version from %s to %s", version, newVersion)
-	}
-	currentVersion = fmt.Sprintf("v%s", newVersion)
 	return nil
-}
-
-// BumpRelease bumps a pre-release to a release version.
-func (Version) BumpRelease() error { return bumpVersion("release") }
-
-// BumpMajor bumps a major version.
-func (Version) BumpMajor() error { return bumpVersion("major") }
-
-// BumpMinor bumps a minor version.
-func (Version) BumpMinor() error { return bumpVersion("minor") }
-
-// BumpPatch bumps a patch version.
-func (Version) BumpPatch() error { return bumpVersion("patch") }
-
-// BumpRC bumps a release candidate version.
-func (Version) BumpRC() error { return bumpVersion("rc") }
-
-// CommitBump creates a git commit for the version bump.
-func (Version) CommitBump() error {
-	mg.Deps(Version.getCurrent)
-	if mg.Verbose() {
-		fmt.Println("Creating version bump commit")
-	}
-	return git.Commit(fmt.Sprintf("all: Bump to version %s", strings.TrimPrefix(currentVersion, "v")))
-}
-
-// Tag creates a git tag for the current version.
-func (Version) Tag() error {
-	mg.Deps(Version.getCurrent)
-	if mg.Verbose() {
-		fmt.Println("Creating version tag")
-	}
-	version, err := semver.Parse(strings.TrimPrefix(currentVersion, "v"))
-	if err != nil {
-		return err
-	}
-	versionType := "Release version"
-	if len(version.Pre) > 0 {
-		pre := version.Pre[0].VersionStr
-		versionType = "Pre-release for version"
-		if strings.HasPrefix(pre, "rc") {
-			versionType = fmt.Sprintf("Release candidate %s for version", strings.TrimPrefix(pre, "rc"))
-		}
-		version.Pre = nil
-	}
-	return git.Tag(currentVersion, fmt.Sprintf("%s %s", versionType, version))
 }
