@@ -319,7 +319,6 @@
   "console.components.webhook-form.index.headersKeyPlaceholder": "Authorization",
   "console.components.webhook-form.index.headersValuePlaceholder": "Bearer my-auth-token",
   "console.components.webhook-form.index.headersAdd": "Add header entry",
-  "console.components.webhook-form.index.headersValidateRequired": "All header entry values are required. Please remove empty entries.",
   "console.components.webhook-form.index.downlinkAPIKey": "Downlink API key",
   "console.components.webhook-form.index.downlinkAPIKeyDesc": "The API key will be provided to the endpoint using the \"X-Downlink-Apikey\" header",
   "console.components.webhook-form.index.templateInformation": "Template information",
