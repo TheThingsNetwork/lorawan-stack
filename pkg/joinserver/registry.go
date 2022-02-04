@@ -42,6 +42,7 @@ func DeleteDevice(ctx context.Context, r DeviceRegistry, appID *ttnpb.Applicatio
 type KeyRegistry interface {
 	GetByID(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string) (*ttnpb.SessionKeys, error)
 	SetByID(ctx context.Context, joinEUI, devEUI types.EUI64, id []byte, paths []string, f func(*ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error)) (*ttnpb.SessionKeys, error)
+	Delete(ctx context.Context, joinEUI, devEUI types.EUI64) error
 }
 
 // DeleteKeys deletes session keys identified by devEUI, id pair from r.

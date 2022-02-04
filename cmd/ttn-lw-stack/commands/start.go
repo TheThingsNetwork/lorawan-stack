@@ -74,6 +74,14 @@ func NewApplicationServerDeviceRegistryRedis(conf Config) *redis.Client {
 	return NewComponentDeviceRegistryRedis(conf, "as")
 }
 
+func NewJoinServerDeviceRegistryRedis(conf Config) *redis.Client {
+	return NewComponentDeviceRegistryRedis(conf, "js")
+}
+
+func NewJoinServerSessionKeyRegistryRedis(conf Config) *redis.Client {
+	return redis.New(conf.Redis.WithNamespace("js", "keys"))
+}
+
 var errUnknownComponent = errors.DefineInvalidArgument("unknown_component", "unknown component `{component}`")
 
 var startCommand = &cobra.Command{
@@ -357,7 +365,7 @@ var startCommand = &cobra.Command{
 		if start.JoinServer {
 			logger.Info("Setting up Join Server")
 			deviceRegistry := &jsredis.DeviceRegistry{
-				Redis:   NewComponentDeviceRegistryRedis(*config, "js"),
+				Redis:   NewJoinServerDeviceRegistryRedis(*config),
 				LockTTL: defaultLockTTL,
 			}
 			if err := deviceRegistry.Init(ctx); err != nil {
@@ -365,8 +373,9 @@ var startCommand = &cobra.Command{
 			}
 			config.JS.Devices = deviceRegistry
 			keyRegistry := &jsredis.KeyRegistry{
-				Redis:   redis.New(config.Redis.WithNamespace("js", "keys")),
+				Redis:   NewJoinServerSessionKeyRegistryRedis(*config),
 				LockTTL: defaultLockTTL,
+				Limit:   config.JS.SessionKeyLimit,
 			}
 			if err := keyRegistry.Init(ctx); err != nil {
 				return shared.ErrInitializeJoinServer.WithCause(err)

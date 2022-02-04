@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 var (
@@ -291,16 +292,26 @@ func (srv jsEndDeviceRegistryServer) Delete(ctx context.Context, ids *ttnpb.EndD
 	if err := rights.RequireApplication(ctx, *ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
-	var evt events.Event
+	var (
+		evt             events.Event
+		joinEUI, devEUI *types.EUI64
+	)
 	_, err := srv.JS.devices.SetByID(ctx, ids.ApplicationIds, ids.DeviceId, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 		if dev == nil {
 			return nil, nil, errDeviceNotFound.New()
 		}
 		evt = evtDeleteEndDevice.NewWithIdentifiersAndData(ctx, ids, nil)
+		joinEUI, devEUI = dev.Ids.JoinEui, dev.Ids.DevEui
 		return nil, nil, nil
 	})
 	if err != nil {
 		return nil, err
+	}
+	// Try deleting the session keys. This is best effort as it's housekeeping really.
+	if joinEUI != nil && devEUI != nil {
+		if err := srv.JS.keys.Delete(ctx, *joinEUI, *devEUI); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to delete session keys")
+		}
 	}
 	if evt != nil {
 		events.Publish(evt)

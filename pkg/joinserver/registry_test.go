@@ -15,6 +15,7 @@
 package joinserver_test
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"testing"
@@ -368,6 +369,62 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 		t.Fatalf("Error received: %v", err)
 	}
 	a.So(ret, should.BeNil)
+
+	// Check number of retained session keys. Only the last 10 should be kept.
+	for i := byte(0); i < 20; i++ {
+		sid := bytes.Repeat([]byte{i}, 4)
+		_, err := reg.SetByID(ctx, joinEUI, devEUI, sid, []string{
+			"app_s_key",
+			"f_nwk_s_int_key",
+			"nwk_s_enc_key",
+			"s_nwk_s_int_key",
+		},
+			func(stored *ttnpb.SessionKeys) (*ttnpb.SessionKeys, []string, error) {
+				if !a.So(stored, should.BeNil) {
+					t.Fatal("Registry is not empty")
+				}
+				return &ttnpb.SessionKeys{
+						SessionKeyId: sid,
+						FNwkSIntKey:  test.DefaultFNwkSIntKeyEnvelope,
+						SNwkSIntKey:  test.DefaultSNwkSIntKeyEnvelope,
+						NwkSEncKey:   test.DefaultNwkSEncKeyEnvelope,
+						AppSKey:      test.DefaultAppSKeyEnvelope,
+					}, []string{
+						"app_s_key",
+						"f_nwk_s_int_key",
+						"nwk_s_enc_key",
+						"s_nwk_s_int_key",
+						"session_key_id",
+					}, nil
+			})
+		if !a.So(err, should.BeNil) {
+			t.Fatalf("Error received: %v", err)
+		}
+	}
+	for i := byte(0); i < 20; i++ {
+		_, err := reg.GetByID(ctx, joinEUI, devEUI, bytes.Repeat([]byte{i}, 4), ttnpb.SessionKeysFieldPathsTopLevel)
+		if i < 10 {
+			if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
+				t.Fatalf("Error received: %v", err)
+			}
+		} else {
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+		}
+	}
+
+	// Delete all the session keys of the given device.
+	err = reg.Delete(ctx, joinEUI, devEUI)
+	if !a.So(err, should.BeNil) {
+		t.Fatalf("Error received: %v", err)
+	}
+	for i := byte(0); i < 20; i++ {
+		_, err := reg.GetByID(ctx, joinEUI, devEUI, bytes.Repeat([]byte{i}, 4), ttnpb.SessionKeysFieldPathsTopLevel)
+		if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
+			t.Fatalf("Error received: %v", err)
+		}
+	}
 }
 
 func TestSessionKeyRegistries(t *testing.T) {
@@ -389,6 +446,7 @@ func TestSessionKeyRegistries(t *testing.T) {
 				keyReg := &redis.KeyRegistry{
 					Redis:   cl,
 					LockTTL: test.Delay << 10,
+					Limit:   10,
 				}
 				if err := keyReg.Init(ctx); err != nil {
 					return nil, nil, err
