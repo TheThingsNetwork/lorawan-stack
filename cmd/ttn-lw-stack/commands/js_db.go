@@ -18,10 +18,12 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"errors"
 	"regexp"
 	"sort"
 	"time"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/shared"
 	"go.thethings.network/lorawan-stack/v3/pkg/cleanup"
@@ -169,6 +171,47 @@ var (
 					logger.Debug("Skip unmatched key")
 					return true, nil
 				}
+				migrated++
+				return true, nil
+			})
+			if err != nil {
+				return err
+			}
+
+			err = ttnredis.RangeRedisKeys(ctx, keysCl, keysCl.Key("*"), ttnredis.DefaultRangeCount, func(k string) (bool, error) {
+				logger := logger.WithField("key", k)
+
+				if match := sessionKeyIDRegexp.FindSubmatch([]byte(k)); len(match) > 0 {
+					// Check that the session key exists in the concerning list. If not, it's an orphan session key and it should
+					// be deleted.
+					if config.JS.SessionKeyLimit > 0 {
+						var joinEUI, devEUI types.EUI64
+						if err := joinEUI.UnmarshalText(match[1]); err != nil {
+							logger.WithError(err).Error("Failed to parse JoinEUI")
+							return true, nil
+						}
+						if err := devEUI.UnmarshalText(match[2]); err != nil {
+							logger.WithError(err).Error("Failed to parse DevEUI")
+							return true, nil
+						}
+						_, err := keysCl.LPos(ctx, keysCl.Key("ids", joinEUI.String(), devEUI.String()), string(match[3]), redis.LPosArgs{}).Result()
+						if err != nil {
+							if !errors.Is(err, redis.Nil) {
+								logger.WithError(err).Error("Failed to get position of session key ID in set")
+								return true, nil
+							}
+							if _, err := keysCl.Del(ctx, k).Result(); err != nil {
+								logger.WithError(err).Error("Failed to delete orphan session key")
+								return true, nil
+							}
+							logger.Debug("Deleted orphan session key")
+						}
+					}
+				} else {
+					logger.Debug("Skip unmatched key")
+					return true, nil
+				}
+
 				migrated++
 				return true, nil
 			})
