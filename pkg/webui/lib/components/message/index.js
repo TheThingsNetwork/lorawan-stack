@@ -165,7 +165,7 @@ Message.defaultProps = {
   capitalize: false,
   className: undefined,
   component: undefined,
-  convertBackticks: false,
+  convertBackticks: true,
   firstToLower: false,
   firstToUpper: false,
   lowercase: false,

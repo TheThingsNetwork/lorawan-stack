@@ -14,6 +14,7 @@
 
 import tts from '@console/api/tts'
 
+import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as repository from '@console/store/actions/device-repository'
@@ -84,10 +85,48 @@ const getTemplateLogic = createRequestLogic({
   },
 })
 
+const getRepositoryPayloadFormattersLogic = createRequestLogic({
+  type: repository.GET_REPO_PF,
+  process: async ({ action }) => {
+    const {
+      payload: { appId, version },
+    } = action
+
+    let repositoryPayloadFormatters
+    try {
+      const uplinkDecoder = await tts.Applications.Devices.Repository.getUplinkDecoder(
+        appId,
+        version,
+      )
+      const downlinkDecoder = await tts.Applications.Devices.Repository.getDownlinkDecoder(
+        appId,
+        version,
+      )
+      const downlinkEncoder = await tts.Applications.Devices.Repository.getDownlinkEncoder(
+        appId,
+        version,
+      )
+      repositoryPayloadFormatters = {
+        ...uplinkDecoder,
+        ...downlinkDecoder,
+        ...downlinkEncoder,
+      }
+      return repositoryPayloadFormatters
+    } catch (error) {
+      if (isNotFoundError(error) && typeof repositoryPayloadFormatters !== 'undefined') {
+        return repositoryPayloadFormatters
+      }
+
+      throw error
+    }
+  },
+})
+
 export default [
   listDeviceBrandsLogic,
   getDeviceBrandLogic,
   listDeviceModelsLogic,
   getDeviceModelLogic,
   getTemplateLogic,
+  getRepositoryPayloadFormattersLogic,
 ]

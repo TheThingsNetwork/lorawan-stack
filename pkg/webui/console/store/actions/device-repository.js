@@ -59,3 +59,13 @@ export const [
   { request: GET_TEMPLATE, success: GET_TEMPLATE_SUCCESS, failure: GET_TEMPLATE_FAILURE },
   { request: getTemplate, success: getTemplateSuccess, failure: getTemplateFailure },
 ] = createRequestActions(GET_TEMPLATE_BASE, (appId, version) => ({ appId, version }))
+
+export const GET_REPO_PF_BASE = 'GET_REPOSITORY_PAYLOAD_FORMATTERS'
+export const [
+  { request: GET_REPO_PF, success: GET_REPO_PF_SUCCESS, failure: GET_REPO_PF_FAILURE },
+  {
+    request: getRepositoryPayloadFormatters,
+    success: getRepositoryPayloadFormattersSuccess,
+    failure: getRepositoryPayloadFormattersFailure,
+  },
+] = createRequestActions(GET_REPO_PF_BASE, (appId, version) => ({ appId, version }))
