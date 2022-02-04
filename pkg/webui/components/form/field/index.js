@@ -146,7 +146,8 @@ class FormField extends React.Component {
     const { name, onChange, encode } = this.props
     const { setFieldValue, setFieldTouched } = this.context
 
-    const newValue = encode(this.extractValue(value))
+    const fieldValue = getIn(this.context.values, name)
+    const newValue = encode(this.extractValue(value), fieldValue)
     let isSyntheticEvent = false
 
     if (typeof value === 'object' && value !== null) {
@@ -166,7 +167,7 @@ class FormField extends React.Component {
       setFieldTouched(name)
     }
 
-    onChange(isSyntheticEvent ? value : encode(value))
+    onChange(isSyntheticEvent ? value : encode(value, fieldValue))
   }
 
   @bind
