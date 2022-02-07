@@ -476,11 +476,21 @@ var (
 					if device.ProvisionerId != "" {
 						return errEndDeviceKeysWithProvisioner.New()
 					}
-					// TODO: Set JoinEUI and DevEUI (https://github.com/TheThingsNetwork/lorawan-stack/issues/47).
 					device.RootKeys = &ttnpb.RootKeys{
 						RootKeyId: "ttn-lw-cli-generated",
 						AppKey:    &ttnpb.KeyEnvelope{Key: generateKey()},
-						NwkKey:    &ttnpb.KeyEnvelope{Key: generateKey()},
+					}
+					if s, err := setEndDeviceFlags.GetString("lorawan_version"); err == nil && s != "" {
+						var macVersion ttnpb.MACVersion
+						if err := macVersion.UnmarshalText([]byte(s)); err != nil {
+							return errInvalidMACVersion.WithCause(err)
+						}
+						if err := macVersion.Validate(); err != nil {
+							return errInvalidMACVersion.WithCause(err)
+						}
+						if macVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
+							device.RootKeys.NwkKey = &ttnpb.KeyEnvelope{Key: generateKey()}
+						}
 					}
 					paths = append(paths,
 						"root_keys.root_key_id",
