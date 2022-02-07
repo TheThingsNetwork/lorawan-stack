@@ -412,19 +412,23 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 
 			// The root keys are used according to the following table:
 			//
-			//  Has NwkKey | Activation | Network uses | Application uses
-			//  ---------- | ---------- | ------------ | ----------------
-			//  No         | 1.0.x      | AppKey       | AppKey
-			//  Yes        | 1.0.x      | NwkKey       | NwkKey
-			//  No         | 1.1.x      | ERROR        | ERROR
-			//  Yes        | 1.1.x      | NwkKey       | AppKey
+			//  Has NwkKey | Activation | Root Key Source | Network uses | Application uses
+			//  ---------- | ---------- | --------------- | ------------ | ----------------
+			//  No         | 1.0.x      | Any             | AppKey       | AppKey
+			//  Yes        | 1.0.x      | CLI             | AppKey       | AppKey
+			//  Yes        | 1.0.x      | Other           | NwkKey       | NwkKey
+			//  No         | 1.1.x      | Any             | ERROR        | ERROR
+			//  Yes        | 1.1.x      | Any             | NwkKey       | AppKey
 			//
 			// See LoRaWAN 1.1 section 6.1.1.3.
+			// The Things Stack CLI used to generate both NwkKey and AppKey, regardless of LoRaWAN version. In that case,
+			// before 3.17.2, AppKey was used and after NwkKey is used. This broke activation. Therefore, when the CLI
+			// generated the root keys, AppKey is used even if NwkKey is present.
 			var (
 				networkCryptoService     cryptoservices.Network
 				applicationCryptoService cryptoservices.Application
 			)
-			if dev.RootKeys != nil && dev.RootKeys.NwkKey != nil {
+			if dev.RootKeys != nil && dev.RootKeys.NwkKey != nil && dev.RootKeys.RootKeyId != "ttn-lw-cli-generated" {
 				// If a NwkKey is set, assume that the end device is capable of LoRaWAN 1.1.
 				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.RootKeys.NwkKey, js.KeyVault)
 				if err != nil {
