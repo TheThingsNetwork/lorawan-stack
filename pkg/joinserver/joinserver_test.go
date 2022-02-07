@@ -1077,6 +1077,93 @@ func TestHandleJoin(t *testing.T) {
 			},
 		},
 		{
+			Name:        "1.0.3/cluster auth/new device/provisioned via CLI",
+			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
+			Authorizer:  joinserver.ClusterAuthorizer(ctx),
+			Device: &ttnpb.EndDevice{
+				Ids: &ttnpb.EndDeviceIdentifiers{
+					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
+					DeviceId:       "test-dev",
+				},
+				RootKeys: &ttnpb.RootKeys{
+					RootKeyId: "ttn-lw-cli-generated",
+					NwkKey: &ttnpb.KeyEnvelope{
+						Key: &nwkKey,
+					},
+					AppKey: &ttnpb.KeyEnvelope{
+						Key: &appKey,
+					},
+				},
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_0_3,
+				NetworkServerAddress: nsAddr,
+			},
+			ApplicationActivationSettings: &ttnpb.ApplicationActivationSettings{},
+			NextLastJoinNonce:             1,
+			NextUsedDevNonces:             []uint32{1},
+			JoinRequest: &ttnpb.JoinRequest{
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0_3,
+				RawPayload: []byte{
+					/* MHDR */
+					0x00,
+					/* MACPayload */
+					/** JoinEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
+					/** DevEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+					/** DevNonce **/
+					0x01, 0x00,
+					/* MIC */
+					0xc4, 0x8, 0x50, 0xcf,
+				},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				NetId:   types.NetID{0x42, 0xff, 0xff},
+				DownlinkSettings: &ttnpb.DLSettings{
+					OptNeg:      true,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
+				},
+				RxDelay: 0x42,
+			},
+			JoinResponse: &ttnpb.JoinResponse{
+				RawPayload: append([]byte{
+					/* MHDR */
+					0x20,
+				},
+					mustEncryptJoinAccept(appKey, []byte{
+						/* JoinNonce */
+						0x01, 0x00, 0x00,
+						/* NetID */
+						0xff, 0xff, 0x42,
+						/* DevAddr */
+						0xff, 0xff, 0xff, 0x42,
+						/* DLSettings */
+						0xff,
+						/* RxDelay */
+						0x42,
+						/* MIC */
+						0xc9, 0x7a, 0x61, 0x04,
+					})...),
+				SessionKeys: &ttnpb.SessionKeys{
+					FNwkSIntKey: &ttnpb.KeyEnvelope{
+						Key: keyPtr(crypto.DeriveLegacyNwkSKey(
+							appKey,
+							types.JoinNonce{0x00, 0x00, 0x01},
+							types.NetID{0x42, 0xff, 0xff},
+							types.DevNonce{0x00, 0x01})),
+					},
+					AppSKey: &ttnpb.KeyEnvelope{
+						Key: keyPtr(crypto.DeriveLegacyAppSKey(
+							appKey,
+							types.JoinNonce{0x00, 0x00, 0x01},
+							types.NetID{0x42, 0xff, 0xff},
+							types.DevNonce{0x00, 0x01})),
+					},
+				},
+			},
+		},
+		{
 			Name:        "1.0.3/cluster auth/new device/provisioned without NwkKey",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			Authorizer:  joinserver.ClusterAuthorizer(ctx),
