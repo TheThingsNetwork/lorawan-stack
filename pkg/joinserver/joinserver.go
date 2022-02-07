@@ -428,7 +428,8 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				networkCryptoService     cryptoservices.Network
 				applicationCryptoService cryptoservices.Application
 			)
-			if dev.RootKeys != nil && dev.RootKeys.NwkKey != nil && dev.RootKeys.RootKeyId != "ttn-lw-cli-generated" {
+			if dev.RootKeys != nil && dev.RootKeys.NwkKey != nil &&
+				(req.SelectedMacVersion.UseNwkKey() || dev.RootKeys.RootKeyId != "ttn-lw-cli-generated") {
 				// If a NwkKey is set, assume that the end device is capable of LoRaWAN 1.1.
 				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.RootKeys.NwkKey, js.KeyVault)
 				if err != nil {

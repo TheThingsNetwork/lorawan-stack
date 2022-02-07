@@ -369,6 +369,105 @@ func TestHandleJoin(t *testing.T) {
 			},
 		},
 		{
+			Name:        "1.1.0/cluster auth/new device/unwrapped keys provisioned via CLI",
+			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
+			Authorizer:  joinserver.ClusterAuthorizer(ctx),
+			Device: &ttnpb.EndDevice{
+				Ids: &ttnpb.EndDeviceIdentifiers{
+					DevEui:         &types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					JoinEui:        &types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"},
+					DeviceId:       "test-dev",
+				},
+				RootKeys: &ttnpb.RootKeys{
+					RootKeyId: "ttn-lw-cli-generated",
+					AppKey: &ttnpb.KeyEnvelope{
+						Key: &appKey,
+					},
+					NwkKey: &ttnpb.KeyEnvelope{
+						Key: &nwkKey,
+					},
+				},
+				LorawanVersion:       ttnpb.MACVersion_MAC_V1_1,
+				NetworkServerAddress: nsAddr,
+			},
+			NextLastJoinNonce: 1,
+			JoinRequest: &ttnpb.JoinRequest{
+				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_1,
+				RawPayload: []byte{
+					/* MHDR */
+					0x00,
+					/* MACPayload */
+					/** JoinEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42,
+					/** DevEUI **/
+					0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x42, 0x42,
+					/** DevNonce **/
+					0x00, 0x00,
+					/* MIC */
+					0x55, 0x17, 0x54, 0x8e,
+				},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				NetId:   types.NetID{0x42, 0xff, 0xff},
+				DownlinkSettings: &ttnpb.DLSettings{
+					OptNeg:      true,
+					Rx1DrOffset: 0x7,
+					Rx2Dr:       0xf,
+				},
+				RxDelay: 0x42,
+			},
+			JoinResponse: &ttnpb.JoinResponse{
+				RawPayload: append([]byte{
+					/* MHDR */
+					0x20,
+				},
+					mustEncryptJoinAccept(nwkKey, []byte{
+						/* JoinNonce */
+						0x01, 0x00, 0x00,
+						/* NetID */
+						0xff, 0xff, 0x42,
+						/* DevAddr */
+						0xff, 0xff, 0xff, 0x42,
+						/* DLSettings */
+						0xff,
+						/* RxDelay */
+						0x42,
+						/* MIC */
+						0xeb, 0xcd, 0x74, 0x59,
+					})...),
+				SessionKeys: &ttnpb.SessionKeys{
+					AppSKey: &ttnpb.KeyEnvelope{
+						Key: keyPtr(crypto.DeriveAppSKey(
+							appKey,
+							types.JoinNonce{0x00, 0x00, 0x01},
+							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+							types.DevNonce{0x00, 0x00})),
+					},
+					SNwkSIntKey: &ttnpb.KeyEnvelope{
+						Key: keyPtr(crypto.DeriveSNwkSIntKey(
+							nwkKey,
+							types.JoinNonce{0x00, 0x00, 0x01},
+							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+							types.DevNonce{0x00, 0x00})),
+					},
+					FNwkSIntKey: &ttnpb.KeyEnvelope{
+						Key: keyPtr(crypto.DeriveFNwkSIntKey(
+							nwkKey,
+							types.JoinNonce{0x00, 0x00, 0x01},
+							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+							types.DevNonce{0x00, 0x00})),
+					},
+					NwkSEncKey: &ttnpb.KeyEnvelope{
+						Key: keyPtr(crypto.DeriveNwkSEncKey(
+							nwkKey,
+							types.JoinNonce{0x00, 0x00, 0x01},
+							types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
+							types.DevNonce{0x00, 0x00})),
+					},
+				},
+			},
+		},
+		{
 			Name:        "1.1.0/cluster auth/new device/wrapped keys/addr KEKs",
 			ContextFunc: func(ctx context.Context) context.Context { return clusterauth.NewContext(ctx, nil) },
 			Authorizer:  joinserver.ClusterAuthorizer(ctx),
