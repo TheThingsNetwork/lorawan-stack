@@ -73,3 +73,14 @@ export const isDeviceJoined = device =>
   Boolean(device.session.dev_addr) &&
   Boolean(device.session.keys) &&
   Boolean(Object.keys(device.session.keys).length)
+
+export const stripZeroValues = macSettings =>
+  Object.keys(macSettings).reduce((acc, key) => {
+    let val = macSettings[key]
+    if (key.endsWith('_frequency') && val === '0') {
+      val = ''
+    }
+    acc[key] = val
+
+    return acc
+  }, {})

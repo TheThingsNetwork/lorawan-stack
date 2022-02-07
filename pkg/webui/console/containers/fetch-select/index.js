@@ -81,7 +81,7 @@ export default ({
     handleChange(value) {
       const { onChange, options } = this.props
 
-      onChange(options.find(e => e.value === value))
+      return onChange(options.find(e => e.value === value))
     }
 
     render() {

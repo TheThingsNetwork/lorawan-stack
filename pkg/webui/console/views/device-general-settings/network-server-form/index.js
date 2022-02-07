@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useRef } from 'react'
 import { defineMessages } from 'react-intl'
 
 import Link from '@ttn-lw/components/link'
@@ -24,6 +24,7 @@ import Radio from '@ttn-lw/components/radio-button'
 import Form from '@ttn-lw/components/form'
 import Notification from '@ttn-lw/components/notification'
 import Checkbox from '@ttn-lw/components/checkbox'
+import PortalledModal from '@ttn-lw/components/modal/portalled'
 import toast from '@ttn-lw/components/toast'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -54,6 +55,7 @@ import {
   hasExternalJs,
   isDeviceJoined,
   isDeviceOTAA,
+  stripZeroValues,
 } from '../utils'
 
 import validationSchema from './validation-schema'
@@ -65,6 +67,10 @@ const m = defineMessages({
   resetFailure: 'There was an error and the end device session and MAC state could not be reset',
   modalMessage:
     'Are you sure you want to reset the session context and MAC state of this end device?{break}{break}This will have the following consequences:<ul><li>For <OTAADocLink>OTAA</OTAADocLink>-activated end devices <b>all session and MAC data is wiped and the end device MUST rejoin</b></li><li>For <ABPDocLink>ABP</ABPDocLink>-activated end devices, session keys, device address and downlink queue are preserved, while <b>the MAC state is reset</b></li></ul>',
+  freqPlansChangeWarning:
+    'Changing the frequency plan of an end device also changes applicable MAC settings. Therefore, the currently configured settings will be overwritten with the defaults for the selected frequency plan (band).',
+  freqPlansChangeModalTitle: 'MAC settings reset',
+  changeFreqPlan: 'Change frequency plan',
 })
 
 const defaultValues = {
@@ -97,20 +103,21 @@ const NetworkServerForm = React.memo(props => {
   const isJoinedOTAA = isDeviceOTAA(device) && isDeviceJoined(device)
   const bandId = version_ids.band_id
 
+  const formRef = React.useRef(null)
+
+  const [macSettings, setMacSettings] = React.useState({})
+
   const validationContext = React.useMemo(
     () => ({
       mayEditKeys,
       mayReadKeys,
       isJoined: isDeviceOTAA(device) && isDeviceJoined(device),
       externalJs: hasExternalJs(device),
+      defaultMacSettings: macSettings,
     }),
-    [device, mayEditKeys, mayReadKeys],
+    [device, mayEditKeys, mayReadKeys, macSettings],
   )
-
-  const formRef = React.useRef(null)
-
-  const [macSettings, setMacSettings] = React.useState({})
-
+  console.log(macSettings)
   const [phyVersion, setPhyVersion] = React.useState(device.lorawan_phy_version)
   const phyVersionRef = React.useRef()
   const handlePhyVersionChange = React.useCallback(setPhyVersion, [])
@@ -122,9 +129,18 @@ const NetworkServerForm = React.memo(props => {
 
   const freqPlanRef = React.useRef(device.frequency_plan_id)
   const [freqPlan, setFreqPlan] = React.useState(device.frequency_plan_id)
-  const handleFreqPlanChange = React.useCallback(plan => {
-    setFreqPlan(plan.value)
+  const handleFreqPlanChange = React.useCallback(async plan => {
+    setShowFreqChangeModal(true)
+    const approved = await new Promise(res => (freqPlanModalPromiseResolver.current = res))
+    if (approved) {
+      setFreqPlan(plan.value)
+    } else {
+      // Prevent update.
+      return false
+    }
   }, [])
+  const freqPlanModalPromiseResolver = useRef()
+  const [showFreqChangeModal, setShowFreqChangeModal] = React.useState(false)
 
   const [isClassB, setClassB] = React.useState(supports_class_b)
   const handleClassBChange = React.useCallback(evt => {
@@ -142,7 +158,7 @@ const NetworkServerForm = React.memo(props => {
   React.useEffect(() => {
     const getMacSettings = async (freqPlan, phyVersion) => {
       try {
-        const settings = await getDefaultMacSettings(freqPlan, phyVersion)
+        const settings = stripZeroValues(await getDefaultMacSettings(freqPlan, phyVersion))
         setMacSettings(settings)
         if (formRef.current) {
           const { setValues, values } = formRef.current
@@ -152,8 +168,8 @@ const NetworkServerForm = React.memo(props => {
               {
                 ...values,
                 mac_settings: {
-                  ...settings,
                   ...values.mac_settings,
+                  ...settings,
                 },
               },
               { context: validationContext },
@@ -292,6 +308,16 @@ const NetworkServerForm = React.memo(props => {
     [device, onSubmit, onSubmitSuccess, validationContext],
   )
 
+  const handleFreqPlanChangeModalComplete = React.useCallback(
+    approved => {
+      if (typeof freqPlanModalPromiseResolver.current === 'function') {
+        freqPlanModalPromiseResolver.current(approved)
+      }
+      setShowFreqChangeModal(false)
+    },
+    [freqPlanModalPromiseResolver, setShowFreqChangeModal],
+  )
+
   const handleDeviceClassChange = React.useCallback(
     deviceClasses => {
       const { setValues, values } = formRef.current
@@ -315,7 +341,7 @@ const NetworkServerForm = React.memo(props => {
   )
 
   const handleVersionChange = React.useCallback(
-    version => {
+    async version => {
       const isABP = initialValues._activation_mode === ACTIVATION_MODES.ABP
       const lwVersion = parseLorawanMacVersion(version)
       setLorawanVersion(version)
@@ -371,6 +397,14 @@ const NetworkServerForm = React.memo(props => {
       error={error}
       formikRef={formRef}
     >
+      <PortalledModal
+        message={m.freqPlansChangeWarning}
+        title={m.freqPlansChangeModalTitle}
+        approval
+        onComplete={handleFreqPlanChangeModalComplete}
+        visible={showFreqChangeModal}
+        approveButtonProps={{ message: m.changeFreqPlan }}
+      />
       <FreqPlansSelect
         name="frequency_plan_id"
         required

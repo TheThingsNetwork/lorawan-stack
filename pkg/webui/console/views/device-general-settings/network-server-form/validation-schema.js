@@ -128,8 +128,14 @@ const validationSchema = Yup.object()
       },
     ),
     mac_settings: Yup.object().when(
-      ['_activation_mode', 'supports_class_b', 'supports_class_c', 'lorawan_version'],
-      (mode, isClassB, isClassC, version, schema) => {
+      [
+        '_activation_mode',
+        'supports_class_b',
+        'supports_class_c',
+        'lorawan_version',
+        '$defaultMacSettings',
+      ],
+      (mode, isClassB, isClassC, version, defaultMacSettings, schema) => {
         const isNewVersion = parseLorawanMacVersion(version) >= 110
 
         return schema.shape({
@@ -229,9 +235,10 @@ const validationSchema = Yup.object()
           }),
           ping_slot_data_rate_index: Yup.lazy(dataRate => {
             if (
-              !isClassB ||
-              dataRate === '' ||
-              (dataRate === undefined && mode === ACTIVATION_MODES.OTAA)
+              dataRate === '' &&
+              (!isClassB ||
+                (mode === ACTIVATION_MODES.OTAA &&
+                  Boolean(defaultMacSettings?.ping_slot_data_rate_index !== '')))
             ) {
               return Yup.number().strip()
             }
@@ -303,7 +310,12 @@ const validationSchema = Yup.object()
             return Yup.number().min(100000, Yup.passValues(sharedMessages.validateNumberGte))
           }),
           ping_slot_frequency: Yup.lazy(frequency => {
-            if (!isClassB || (mode === ACTIVATION_MODES.OTAA && !Boolean(frequency))) {
+            if (
+              frequency === '' &&
+              (!isClassB ||
+                (mode === ACTIVATION_MODES.OTAA &&
+                  Boolean(defaultMacSettings?.ping_slot_frequency !== '')))
+            ) {
               return Yup.number().strip()
             }
 
