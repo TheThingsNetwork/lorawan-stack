@@ -33,7 +33,7 @@ type mockISGatewayRegistry struct {
 	ttnpb.GatewayAccessServer
 	gateways      map[string]*ttnpb.Gateway
 	gatewayAuths  map[string][]string
-	gatewayRights map[string][]ttnpb.Right
+	gatewayRights map[string]authKeyToRights
 
 	registeredGateway *ttnpb.GatewayIdentifiers
 }
@@ -55,13 +55,20 @@ func (is *mockISGatewayRegistry) Add(ctx context.Context, ids ttnpb.GatewayIdent
 				},
 			},
 		},
+		GatewayServerAddress:     "mockgatewayserver",
 		LocationPublic:           locationPublic,
 		UpdateLocationFromStatus: updateLocationFromStatus,
 	}
+
+	var bearerKey string
 	if key != "" {
-		is.gatewayAuths[uid] = []string{fmt.Sprintf("Bearer %v", key)}
+		bearerKey = fmt.Sprintf("Bearer %v", key)
+		is.gatewayAuths[uid] = []string{bearerKey}
 	}
-	is.gatewayRights[uid] = rights
+	if is.gatewayRights[uid] == nil {
+		is.gatewayRights[uid] = make(authKeyToRights)
+	}
+	is.gatewayRights[uid][bearerKey] = rights
 }
 
 func (is *mockISGatewayRegistry) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
@@ -113,8 +120,8 @@ func (is *mockISGatewayRegistry) ListRights(ctx context.Context, ids *ttnpb.Gate
 		return
 	}
 	for _, auth := range auths {
-		if auth == authorization[0] {
-			res.Rights = append(res.Rights, is.gatewayRights[uid]...)
+		if auth == authorization[0] && is.gatewayRights[uid] != nil {
+			res.Rights = append(res.Rights, is.gatewayRights[uid][auth]...)
 		}
 	}
 	return

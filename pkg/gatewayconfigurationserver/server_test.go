@@ -35,6 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayconfigurationserver"
+	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/cpf"
 	"go.thethings.network/lorawan-stack/v3/pkg/pfconfig/semtechudp"
@@ -71,15 +72,14 @@ func TestGatewayConfigurationServer(t *testing.T) {
 func TestWeb(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
-	is, isAddr := startMockIS(ctx)
-	is.res.Get = &ttnpb.Gateway{
-		Ids:                  &registeredGatewayID,
-		FrequencyPlanId:      "EU_863_870",
-		GatewayServerAddress: "localhost",
-	}
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
+
+	is.GatewayRegistry().Add(ctx, registeredGatewayID, registeredGatewayKey, false, false, ttnpb.Right_RIGHT_GATEWAY_INFO)
 
 	fpConf := config.FrequencyPlansConfig{
-		URL: "https://raw.githubusercontent.com/TheThingsNetwork/lorawan-frequency-plans/master",
+		ConfigSource: "static",
+		Static:       test.StaticFrequencyPlans,
 	}
 	fps := frequencyplans.NewStore(test.Must(fpConf.Fetcher(ctx, config.BlobConfig{}, test.HTTPClientProvider)).(fetch.Interface))
 
@@ -175,7 +175,10 @@ func TestWeb(t *testing.T) {
 						if err != nil {
 							t.Fatalf("Failed to read response body: %s", err)
 						}
-						a.So(string(b), should.Equal, semtechUDPConfig(is.res.Get)+"\n")
+						gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{GatewayIds: &tc.ID})
+						a.So(err, should.BeNil)
+
+						a.So(string(b), should.Equal, semtechUDPConfig(gtw)+"\n")
 					}
 				})
 				t.Run("cpf/lorad/lorad.json", func(t *testing.T) {
@@ -201,7 +204,9 @@ func TestWeb(t *testing.T) {
 						if err != nil {
 							t.Fatalf("Failed to read response body: %s", err)
 						}
-						a.So(string(b), should.Equal, cpfLoradConfig(is.res.Get)+"\n")
+						gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{GatewayIds: &tc.ID})
+						a.So(err, should.BeNil)
+						a.So(string(b), should.Equal, cpfLoradConfig(gtw)+"\n")
 					}
 				})
 				t.Run("cpf/lorafwd/lorafwd.toml", func(t *testing.T) {
@@ -227,7 +232,9 @@ func TestWeb(t *testing.T) {
 						if err != nil {
 							t.Fatalf("Failed to read response body: %s", err)
 						}
-						a.So(string(b), should.Equal, cpfLorafwdConfig(is.res.Get))
+						gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{GatewayIds: &tc.ID})
+						a.So(err, should.BeNil)
+						a.So(string(b), should.Equal, cpfLorafwdConfig(gtw))
 					}
 				})
 			})
