@@ -153,7 +153,19 @@
     browserslist "^4.17.5"
     semver "^6.3.0"
 
-"@babel/helper-create-class-features-plugin@^7.16.0", "@babel/helper-create-class-features-plugin@^7.16.7":
+"@babel/helper-create-class-features-plugin@^7.16.0":
+  version "7.16.0"
+  resolved "https://registry.yarnpkg.com/@babel/helper-create-class-features-plugin/-/helper-create-class-features-plugin-7.16.0.tgz#090d4d166b342a03a9fec37ef4fd5aeb9c7c6a4b"
+  integrity sha512-XLwWvqEaq19zFlF5PTgOod4bUA+XbkR4WLQBct1bkzmxJGB0ZEJaoKF4c8cgH9oBtCDuYJ8BP5NB9uFiEgO5QA==
+  dependencies:
+    "@babel/helper-annotate-as-pure" "^7.16.0"
+    "@babel/helper-function-name" "^7.16.0"
+    "@babel/helper-member-expression-to-functions" "^7.16.0"
+    "@babel/helper-optimise-call-expression" "^7.16.0"
+    "@babel/helper-replace-supers" "^7.16.0"
+    "@babel/helper-split-export-declaration" "^7.16.0"
+
+"@babel/helper-create-class-features-plugin@^7.16.7":
   version "7.16.7"
   resolved "https://registry.yarnpkg.com/@babel/helper-create-class-features-plugin/-/helper-create-class-features-plugin-7.16.7.tgz#9c5b34b53a01f2097daf10678d65135c1b9f84ba"
   integrity sha512-kIFozAvVfK05DM4EVQYKK+zteWvY85BFdGBRQBytRyY3y+6PX0DkDOn/CZ3lEuczCfrCxEzwt0YtP/87YPTWSw==
@@ -511,14 +523,14 @@
     "@babel/helper-plugin-utils" "^7.16.7"
     "@babel/plugin-syntax-class-static-block" "^7.14.5"
 
-"@babel/plugin-proposal-decorators@^7.12.12", "@babel/plugin-proposal-decorators@^7.16.7":
-  version "7.16.7"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-decorators/-/plugin-proposal-decorators-7.16.7.tgz#922907d2e3e327f5b07d2246bcfc0bd438f360d2"
-  integrity sha512-DoEpnuXK14XV9btI1k8tzNGCutMclpj4yru8aXKoHlVmbO1s+2A+g2+h4JhcjrxkFJqzbymnLG6j/niOf3iFXQ==
+"@babel/plugin-proposal-decorators@^7.12.12", "@babel/plugin-proposal-decorators@^7.15.4":
+  version "7.16.4"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-decorators/-/plugin-proposal-decorators-7.16.4.tgz#9b35ce0716425a93b978e79099e5f7ba217c1364"
+  integrity sha512-RESBNX16eNqnBeEVR5sCJpnW0mHiNLNNvGA8PrRuK/4ZJ4TO+6bHleRUuGQYDERVySOKtOhSya/C4MIhwAMAgg==
   dependencies:
-    "@babel/helper-create-class-features-plugin" "^7.16.7"
-    "@babel/helper-plugin-utils" "^7.16.7"
-    "@babel/plugin-syntax-decorators" "^7.16.7"
+    "@babel/helper-create-class-features-plugin" "^7.16.0"
+    "@babel/helper-plugin-utils" "^7.14.5"
+    "@babel/plugin-syntax-decorators" "^7.16.0"
 
 "@babel/plugin-proposal-dynamic-import@^7.16.7":
   version "7.16.7"
@@ -667,12 +679,12 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.14.5"
 
-"@babel/plugin-syntax-decorators@^7.16.7":
-  version "7.16.7"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-syntax-decorators/-/plugin-syntax-decorators-7.16.7.tgz#f66a0199f16de7c1ef5192160ccf5d069739e3d3"
-  integrity sha512-vQ+PxL+srA7g6Rx6I1e15m55gftknl2X8GCUW1JTlkTaXZLJOS0UcaY0eK9jYT7IYf4awn6qwyghVHLDz1WyMw==
+"@babel/plugin-syntax-decorators@^7.16.0":
+  version "7.16.0"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-syntax-decorators/-/plugin-syntax-decorators-7.16.0.tgz#eb8d811cdd1060f6ac3c00956bf3f6335505a32f"
+  integrity sha512-nxnnngZClvlY13nHJAIDow0S7Qzhq64fQ/NlqS+VER3kjW/4F0jLhXjeL8jcwSwz6Ca3rotT5NJD2T9I7lcv7g==
   dependencies:
-    "@babel/helper-plugin-utils" "^7.16.7"
+    "@babel/helper-plugin-utils" "^7.14.5"
 
 "@babel/plugin-syntax-dynamic-import@^7.8.3":
   version "7.8.3"
@@ -4880,9 +4892,9 @@ cache-base@^1.0.1:
     unset-value "^1.0.0"
 
 cached-path-relative@^1.0.0, cached-path-relative@^1.0.2:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/cached-path-relative/-/cached-path-relative-1.1.0.tgz#865576dfef39c0d6a7defde794d078f5308e3ef3"
-  integrity sha512-WF0LihfemtesFcJgO7xfOoOcnWzY/QHR4qeDqV44jPU3HTI54+LnfXK3SA27AVVGCdZFgjjFFaqUA9Jx7dMJZA==
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/cached-path-relative/-/cached-path-relative-1.0.2.tgz#a13df4196d26776220cc3356eb147a52dba2c6db"
+  integrity sha512-5r2GqsoEb4qMTTN9J+WzXfjov+hjxT+j3u5K+kIVNIwAd99DLCJE9pBIMP1qVeybV6JiijL385Oz0DcYxfbOIg==
 
 cachedir@^2.3.0:
   version "2.3.0"
@@ -10635,9 +10647,9 @@ nanoclone@^0.2.1:
   integrity sha512-wynEP02LmIbLpcYw8uBKpcfF6dmg2vcpKqxeH5UcoKEYdExslsdUA4ugFauuaeYdTB76ez6gJW8XAZ6CgkXYxA==
 
 nanoid@^3.1.30:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.2.0.tgz#62667522da6673971cca916a6d3eff3f415ff80c"
-  integrity sha512-fmsZYa9lpn69Ad5eDn7FMcnnSR+8R34W9qJEijxYhTbfOWzr22n1QxCMzXLK+ODyW2973V3Fux959iQoUxzUIA==
+  version "3.1.30"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.30.tgz#63f93cc548d2a113dc5dfbc63bfa09e2b9b64362"
+  integrity sha512-zJpuPDwOv8D2zq2WRoMe1HsfZthVewpel9CAvTfc/2mBD1uUT/agc5f7GHGWXlYkFvi1mVxe4IjvP2HNrop7nQ==
 
 nanomatch@^1.2.9:
   version "1.2.13"
