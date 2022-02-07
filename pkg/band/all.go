@@ -191,6 +191,7 @@ var (
 		AS_923:          ttnpb.PHYVersion_RP002_V1_0_3,
 		AS_923_2:        ttnpb.PHYVersion_RP002_V1_0_3,
 		AS_923_3:        ttnpb.PHYVersion_RP002_V1_0_3,
+		AS_923_4:        ttnpb.PHYVersion_RP002_V1_0_3,
 		AU_915_928:      ttnpb.PHYVersion_RP002_V1_0_3,
 		CN_470_510:      ttnpb.PHYVersion_RP001_V1_1_REV_B,
 		CN_470_510_20_A: ttnpb.PHYVersion_RP002_V1_0_3,
