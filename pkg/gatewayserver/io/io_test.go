@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
+	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -46,6 +47,8 @@ func assertStatsIncludePaths(a *assertions.Assertion, conn *io.Connection, paths
 func TestFlow(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+	is, _, closeIS := mockis.New(ctx)
+	defer closeIS()
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -55,7 +58,7 @@ func TestFlow(t *testing.T) {
 			},
 		},
 	})
-	gs := mock.NewServer(c)
+	gs := mock.NewServer(c, is)
 
 	ids := ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}
 	antennaGain := float32(3)
@@ -527,6 +530,8 @@ func TestFlow(t *testing.T) {
 func TestSubBandEIRPOverride(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+	is, _, closeIS := mockis.New(ctx)
+	defer closeIS()
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -536,7 +541,8 @@ func TestSubBandEIRPOverride(t *testing.T) {
 			},
 		},
 	})
-	gs := mock.NewServer(c)
+
+	gs := mock.NewServer(c, is)
 
 	ids := ttnpb.GatewayIdentifiers{GatewayId: "bar-gateway"}
 	antennaGain := float32(3)

@@ -31,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
 	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
+	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	encoding "go.thethings.network/lorawan-stack/v3/pkg/ttnpb/udp"
@@ -60,6 +61,9 @@ func TestConnection(t *testing.T) {
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
+	is, _, closeIS := mockis.New(ctx)
+	defer closeIS()
+
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			FrequencyPlans: config.FrequencyPlansConfig{
@@ -71,7 +75,7 @@ func TestConnection(t *testing.T) {
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 
-	gs := mock.NewServer(c)
+	gs := mock.NewServer(c, is)
 	addr, _ := net.ResolveUDPAddr("udp", ":0")
 	lis, err := net.ListenUDP("udp", addr)
 	if !a.So(err, should.BeNil) {
@@ -206,6 +210,9 @@ func TestTraffic(t *testing.T) {
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
+	is, _, closeIS := mockis.New(ctx)
+	defer closeIS()
+
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
 			FrequencyPlans: config.FrequencyPlansConfig{
@@ -217,7 +224,7 @@ func TestTraffic(t *testing.T) {
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 
-	gs := mock.NewServer(c)
+	gs := mock.NewServer(c, is)
 	addr, _ := net.ResolveUDPAddr("udp", ":0")
 	lis, err := net.ListenUDP("udp", addr)
 	if !a.So(err, should.BeNil) {

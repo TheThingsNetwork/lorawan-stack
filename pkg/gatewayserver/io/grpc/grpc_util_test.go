@@ -24,6 +24,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+var testRights = []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO, ttnpb.Right_RIGHT_GATEWAY_LINK}
+
 type mockRegisterer struct {
 	context.Context
 	ttnpb.GtwGsServer

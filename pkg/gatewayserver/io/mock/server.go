@@ -153,7 +153,7 @@ func (s *server) RegisterGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 	}
 
 	gtwRights := []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO, ttnpb.Right_RIGHT_GATEWAY_LINK}
-	s.identityStore.GatewayRegistry().Add(ctx, ids, "default-key", gateway, true, true, gtwRights...)
+	s.identityStore.GatewayRegistry().Add(ctx, ids, "default-key", gateway, gtwRights...)
 }
 
 func (s *server) GetConnection(ctx context.Context, ids ttnpb.GatewayIdentifiers) *io.Connection {
