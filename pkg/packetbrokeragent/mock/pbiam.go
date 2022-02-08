@@ -43,6 +43,7 @@ type PBIAM struct {
 	Catalog struct {
 		ListNetworksHandler     func(ctx context.Context, req *iampbv2.ListNetworksRequest) (*iampbv2.ListNetworksResponse, error)
 		ListHomeNetworksHandler func(ctx context.Context, req *iampbv2.ListNetworksRequest) (*iampbv2.ListNetworksResponse, error)
+		ListJoinServersHandler  func(ctx context.Context, req *iampbv2.ListJoinServersRequest) (*iampbv2.ListJoinServersResponse, error)
 	}
 }
 
@@ -152,4 +153,11 @@ func (s *pbIAMCatalog) ListHomeNetworks(ctx context.Context, req *iampbv2.ListNe
 		panic("ListHomeNetworks called but not set")
 	}
 	return s.Catalog.ListHomeNetworksHandler(ctx, req)
+}
+
+func (s *pbIAMCatalog) ListJoinServers(ctx context.Context, req *iampbv2.ListJoinServersRequest) (*iampbv2.ListJoinServersResponse, error) {
+	if s.Catalog.ListJoinServersHandler == nil {
+		panic("ListJoinServers called but not set")
+	}
+	return s.Catalog.ListJoinServersHandler(ctx, req)
 }
