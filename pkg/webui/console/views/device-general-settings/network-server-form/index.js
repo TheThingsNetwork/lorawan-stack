@@ -71,6 +71,14 @@ const m = defineMessages({
     'Changing the frequency plan of an end device also changes applicable MAC settings. Therefore, the currently configured settings will be overwritten with the defaults for the selected frequency plan (band).',
   freqPlansChangeModalTitle: 'MAC settings reset',
   changeFreqPlan: 'Change frequency plan',
+  phyVersionChangeWarning:
+    'Changing the Regional Parameters version of an end device also changes applicable MAC settings. Therefore, the currently configured settings will be overwritten with the defaults for the selected Regional Parameters version.',
+  phyVersionChangeModalTitle: 'MAC settings reset',
+  changePhyVersion: 'Change Regional Parameters version',
+  lwVersionChangeWarning:
+    'Changing the LoRaWAN version of an end device also changes applicable MAC settings. Therefore, the currently configured settings will be overwritten with the defaults for the selected LoRaWAN version.',
+  lwVersionChangeModalTitle: 'MAC settings reset',
+  changeLwVersion: 'Change LoRaWAN version',
 })
 
 const defaultValues = {
@@ -117,10 +125,20 @@ const NetworkServerForm = React.memo(props => {
     }),
     [device, mayEditKeys, mayReadKeys, macSettings],
   )
-  console.log(macSettings)
-  const [phyVersion, setPhyVersion] = React.useState(device.lorawan_phy_version)
   const phyVersionRef = React.useRef()
-  const handlePhyVersionChange = React.useCallback(setPhyVersion, [])
+  const [phyVersion, setPhyVersion] = React.useState(device.lorawan_phy_version)
+  const handlePhyVersionChange = React.useCallback(async phyVersion => {
+    setShowPhyVersionChangeModal(true)
+    const approved = await new Promise(res => (phyVersionModalPromiseResolver.current = res))
+    if (approved) {
+      setPhyVersion(phyVersion.value)
+    } else {
+      // Prevent update.
+      return false
+    }
+  }, [])
+  const phyVersionModalPromiseResolver = useRef()
+  const [showPhyVersionChangeModal, setShowPhyVersionChangeModal] = React.useState(false)
 
   const [error, setError] = React.useState('')
 
@@ -158,6 +176,7 @@ const NetworkServerForm = React.memo(props => {
   React.useEffect(() => {
     const getMacSettings = async (freqPlan, phyVersion) => {
       try {
+        setShowPhyVersionChangeModal(false)
         const settings = stripZeroValues(await getDefaultMacSettings(freqPlan, phyVersion))
         setMacSettings(settings)
         if (formRef.current) {
@@ -318,6 +337,16 @@ const NetworkServerForm = React.memo(props => {
     [freqPlanModalPromiseResolver, setShowFreqChangeModal],
   )
 
+  const handlePhyVersionChangeModalComplete = React.useCallback(
+    approved => {
+      if (typeof phyVersionModalPromiseResolver.current === 'function') {
+        phyVersionModalPromiseResolver.current(approved)
+      }
+      setShowPhyVersionChangeModal(false)
+    },
+    [phyVersionModalPromiseResolver, setShowPhyVersionChangeModal],
+  )
+
   const handleDeviceClassChange = React.useCallback(
     deviceClasses => {
       const { setValues, values } = formRef.current
@@ -342,46 +371,64 @@ const NetworkServerForm = React.memo(props => {
 
   const handleVersionChange = React.useCallback(
     async version => {
-      const isABP = initialValues._activation_mode === ACTIVATION_MODES.ABP
-      const lwVersion = parseLorawanMacVersion(version)
-      setLorawanVersion(version)
-      const { setValues, values: formValues } = formRef.current
-      const { session = {} } = formValues
-      const { session: initialSession } = initialValues
-      if (lwVersion >= 110) {
-        const updatedSession = isABP
-          ? {
-              dev_addr: session.dev_addr,
-              keys: {
-                ...session.keys,
-                s_nwk_s_int_key:
-                  session.keys.s_nwk_s_int_key || initialSession.keys.s_nwk_s_int_key,
-                nwk_s_enc_key: session.keys.nwk_s_enc_key || initialSession.keys.nwk_s_enc_key,
-              },
-            }
-          : session
-        setValues({
-          ...formValues,
-          lorawan_version: version,
-          session: updatedSession,
-        })
-      } else {
-        const updatedSession = isABP
-          ? {
-              dev_addr: session.dev_addr,
-              keys: {
-                f_nwk_s_int_key: session.keys.f_nwk_s_int_key,
-              },
-            }
-          : session
-        setValues({
-          ...formValues,
-          lorawan_version: version,
-          session: updatedSession,
-        })
+      setShowLwVersionChangeModal(true)
+      const approved = await new Promise(res => (lwVersionModalPromiseResolver.current = res))
+      if (approved) {
+        const isABP = initialValues._activation_mode === ACTIVATION_MODES.ABP
+        const lwVersion = parseLorawanMacVersion(version)
+        setLorawanVersion(version)
+        const { setValues, values: formValues } = formRef.current
+        const { session = {} } = formValues
+        const { session: initialSession } = initialValues
+        if (lwVersion >= 110) {
+          const updatedSession = isABP
+            ? {
+                dev_addr: session.dev_addr,
+                keys: {
+                  ...session.keys,
+                  s_nwk_s_int_key:
+                    session.keys.s_nwk_s_int_key || initialSession.keys.s_nwk_s_int_key,
+                  nwk_s_enc_key: session.keys.nwk_s_enc_key || initialSession.keys.nwk_s_enc_key,
+                },
+              }
+            : session
+          setValues({
+            ...formValues,
+            lorawan_version: version,
+            session: updatedSession,
+          })
+          setShowPhyVersionChangeModal(false)
+        } else {
+          const updatedSession = isABP
+            ? {
+                dev_addr: session.dev_addr,
+                keys: {
+                  f_nwk_s_int_key: session.keys.f_nwk_s_int_key,
+                },
+              }
+            : session
+          setValues({
+            ...formValues,
+            lorawan_version: version,
+            session: updatedSession,
+          })
+          setShowPhyVersionChangeModal(false)
+        }
       }
     },
     [initialValues],
+  )
+  const lwVersionModalPromiseResolver = useRef()
+  const [showLwVersionChangeModal, setShowLwVersionChangeModal] = React.useState(false)
+
+  const handleLwVersionChangeModalComplete = React.useCallback(
+    approved => {
+      if (typeof lwVersionModalPromiseResolver.current === 'function') {
+        lwVersionModalPromiseResolver.current(approved)
+      }
+      setShowLwVersionChangeModal(false)
+    },
+    [lwVersionModalPromiseResolver, setShowLwVersionChangeModal],
   )
 
   // Notify the user that the session keys might be there, but since there are
@@ -404,6 +451,22 @@ const NetworkServerForm = React.memo(props => {
         onComplete={handleFreqPlanChangeModalComplete}
         visible={showFreqChangeModal}
         approveButtonProps={{ message: m.changeFreqPlan }}
+      />
+      <PortalledModal
+        message={m.phyVersionChangeWarning}
+        title={m.phyVersionChangeModalTitle}
+        approval
+        onComplete={handlePhyVersionChangeModalComplete}
+        visible={showPhyVersionChangeModal}
+        approveButtonProps={{ message: m.changePhyVersion }}
+      />
+      <PortalledModal
+        message={m.lwVersionChangeWarning}
+        title={m.lwVersionChangeModalTitle}
+        approval
+        onComplete={handleLwVersionChangeModalComplete}
+        visible={showLwVersionChangeModal}
+        approveButtonProps={{ message: m.changeLwVersion }}
       />
       <FreqPlansSelect
         name="frequency_plan_id"

@@ -160,12 +160,10 @@ class FormField extends React.Component {
       }
     }
 
-    await setFieldValue(name, newValue)
     const mayChange = (await onChange(isSyntheticEvent ? value : encode(value))) !== false
-
+    // Allow aborting the change if the change handler returned `false`.
     if (mayChange) {
       await setFieldValue(name, newValue)
-      onChange(isSyntheticEvent ? value : encode(value))
       if (enforceValidation) {
         setFieldTouched(name)
       }
