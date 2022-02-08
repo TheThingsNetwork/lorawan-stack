@@ -195,11 +195,11 @@ require (
 	github.com/zmap/zlint v0.0.0-20190806154020-fd021b4cfbeb // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.opencensus.io v0.23.0 // indirect
-	go.packetbroker.org/api/iam v1.5.16-tts // indirect
-	go.packetbroker.org/api/iam/v2 v2.6.16-tts // indirect
-	go.packetbroker.org/api/mapping/v2 v2.1.14-tts // indirect
-	go.packetbroker.org/api/routing v1.8.7-tts // indirect
-	go.packetbroker.org/api/v3 v3.10.7-tts // indirect
+	go.packetbroker.org/api/iam v1.5.26-tts // indirect
+	go.packetbroker.org/api/iam/v2 v2.7.7-tts // indirect
+	go.packetbroker.org/api/mapping/v2 v2.1.26-tts // indirect
+	go.packetbroker.org/api/routing v1.8.17-tts // indirect
+	go.packetbroker.org/api/v3 v3.12.3-tts // indirect
 	go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e // indirect
 	go.thethings.network/lorawan-stack-legacy/v2 v2.0.2 // indirect
 	go.uber.org/atomic v1.9.0 // indirect

@@ -29,10 +29,13 @@ const (
 	AS_923_2 = "AS_923_2"
 	// AS_923_3 is the ID of the Asian 923Mhz Group 3 band
 	AS_923_3 = "AS_923_3"
+	// AS_923_4 is the ID of the Asian 923Mhz Group 4 band
+	AS_923_4 = "AS_923_4"
 
 	as923Group1Offset as923GroupOffset = 0
 	as923Group2Offset as923GroupOffset = -1.8 * 1e6
 	as923Group3Offset as923GroupOffset = -6.6 * 1e6
+	as923Group4Offset as923GroupOffset = -5.9 * 1e6
 )
 
 var (
@@ -69,6 +72,9 @@ var (
 		case as923Group3Offset:
 			minFrequency = 916500000
 			maxFrequency = 917000000
+		case as923Group4Offset:
+			minFrequency = 917300000
+			maxFrequency = 917500000
 		default:
 			panic(fmt.Sprintf("unknown offset %v", offset))
 		}

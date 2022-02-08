@@ -258,3 +258,21 @@ func TestBandDefinitions(t *testing.T) {
 		}
 	}
 }
+
+func TestLatest(t *testing.T) {
+	for name := range band.All {
+		t.Run(name, func(t *testing.T) {
+			if _, ok := band.LatestVersion[name]; !ok {
+				t.Fatal("Band not found in the latest version map")
+			}
+		})
+	}
+
+	for name := range band.LatestVersion {
+		t.Run(name, func(t *testing.T) {
+			if _, ok := band.All[name]; !ok {
+				t.Fatal("Band not found in the all map")
+			}
+		})
+	}
+}

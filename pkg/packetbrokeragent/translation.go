@@ -37,21 +37,24 @@ import (
 )
 
 var toPBRegion = map[string]packetbroker.Region{
-	band.EU_863_870: packetbroker.Region_EU_863_870,
-	band.US_902_928: packetbroker.Region_US_902_928,
-	band.CN_779_787: packetbroker.Region_CN_779_787,
-	band.EU_433:     packetbroker.Region_EU_433,
-	band.AU_915_928: packetbroker.Region_AU_915_928,
-	band.CN_470_510: packetbroker.Region_CN_470_510,
-	// TODO: Add CN_470_510_* regions.
-	// https://github.com/TheThingsNetwork/lorawan-stack/issues/3513
-	band.AS_923:     packetbroker.Region_AS_923,
-	band.AS_923_2:   packetbroker.Region_AS_923_2,
-	band.AS_923_3:   packetbroker.Region_AS_923_3,
-	band.KR_920_923: packetbroker.Region_KR_920_923,
-	band.IN_865_867: packetbroker.Region_IN_865_867,
-	band.RU_864_870: packetbroker.Region_RU_864_870,
-	band.ISM_2400:   packetbroker.Region_WW_2G4,
+	band.EU_863_870:      packetbroker.Region_EU_863_870,
+	band.US_902_928:      packetbroker.Region_US_902_928,
+	band.CN_779_787:      packetbroker.Region_CN_779_787,
+	band.EU_433:          packetbroker.Region_EU_433,
+	band.AU_915_928:      packetbroker.Region_AU_915_928,
+	band.CN_470_510:      packetbroker.Region_CN_470_510,
+	band.CN_470_510_20_A: packetbroker.Region_CN_470_510_20_A,
+	band.CN_470_510_20_B: packetbroker.Region_CN_470_510_20_B,
+	band.CN_470_510_26_A: packetbroker.Region_CN_470_510_26_A,
+	band.CN_470_510_26_B: packetbroker.Region_CN_470_510_26_B,
+	band.AS_923:          packetbroker.Region_AS_923,
+	band.AS_923_2:        packetbroker.Region_AS_923_2,
+	band.AS_923_3:        packetbroker.Region_AS_923_3,
+	band.AS_923_4:        packetbroker.Region_AS_923_4,
+	band.KR_920_923:      packetbroker.Region_KR_920_923,
+	band.IN_865_867:      packetbroker.Region_IN_865_867,
+	band.RU_864_870:      packetbroker.Region_RU_864_870,
+	band.ISM_2400:        packetbroker.Region_WW_2G4,
 }
 
 func fromPBDataRate(dataRate *packetbroker.DataRate) (dr *ttnpb.DataRate, codingRate string, ok bool) {
