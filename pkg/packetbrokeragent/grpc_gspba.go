@@ -119,8 +119,9 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "location_public") {
 		updateReq.GatewayLocation = &packetbroker.GatewayLocationValue{}
+		var val *packetbroker.GatewayLocation_Terrestrial
 		if req.Gateway.LocationPublic && ttnpb.HasAnyField(req.FieldMask.GetPaths(), "antennas") && len(req.Gateway.Antennas) > 0 {
-			val := &packetbroker.GatewayLocation_Terrestrial{
+			val = &packetbroker.GatewayLocation_Terrestrial{
 				AntennaCount: &pbtypes.UInt32Value{
 					Value: uint32(len(req.Gateway.Antennas)),
 				},
@@ -129,11 +130,15 @@ func (s *gsPbaServer) UpdateGateway(ctx context.Context, req *ttnpb.UpdatePacket
 			if loc := req.Gateway.Antennas[0].Location; loc != nil {
 				val.Location = toPBLocation(loc)
 			}
-			updateReq.GatewayLocation.Location = &packetbroker.GatewayLocation{
-				Value: &packetbroker.GatewayLocation_Terrestrial_{
-					Terrestrial: val,
-				},
+		} else {
+			val = &packetbroker.GatewayLocation_Terrestrial{
+				AntennaCount: &pbtypes.UInt32Value{Value: 0},
 			}
+		}
+		updateReq.GatewayLocation.Location = &packetbroker.GatewayLocation{
+			Value: &packetbroker.GatewayLocation_Terrestrial_{
+				Terrestrial: val,
+			},
 		}
 	}
 
