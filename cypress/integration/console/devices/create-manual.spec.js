@@ -117,6 +117,8 @@ describe('End device manual create', () => {
           frequency_plan_id: '863-870 MHz',
           app_key: generateHexValue(32),
           class_b_timeout: 10,
+          ping_slot_frequency: 869525000,
+          ping_slot_data_rate_index: 3,
         }
 
         cy.findByLabelText('Frequency plan').selectOption(device.frequency_plan_id)
@@ -125,6 +127,8 @@ describe('End device manual create', () => {
         cy.findByLabelText('Additional LoRaWAN class capabilities').selectOption('class-b')
         cy.findByLabelText('Network defaults').uncheck()
         cy.findByLabelText('Class B timeout').type(device.class_b_timeout)
+        cy.findByLabelText('Ping slot frequency').type(device.ping_slot_frequency)
+        cy.findByLabelText('Ping slot data rate').type(device.ping_slot_data_rate_index)
         cy.findByLabelText('DevEUI').type(device.dev_eui)
         cy.findByLabelText('AppEUI').type(device.app_eui)
         cy.findByLabelText('AppKey').type(device.app_key)
