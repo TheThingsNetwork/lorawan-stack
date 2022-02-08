@@ -74,14 +74,14 @@ var (
 func TestGatewayServer(t *testing.T) {
 	for _, rtc := range []struct {
 		Name                   string
-		Setup                  func(context.Context, string, string) (*component.Component, *gatewayserver.GatewayServer, error)
+		Setup                  func(context.Context, string, string, gatewayserver.GatewayConnectionStatsRegistry) (*component.Component, *gatewayserver.GatewayServer, error)
 		PostSetup              func(context.Context, *component.Component, *mockis.MockDefinition)
 		SkipProtocols          func(string) bool
 		SupportsLocationUpdate bool
 	}{
 		{
 			Name: "IdentityServer",
-			Setup: func(ctx context.Context, isAddr string, nsAddr string) (*component.Component, *gatewayserver.GatewayServer, error) {
+			Setup: func(ctx context.Context, isAddr string, nsAddr string, statsRegistry gatewayserver.GatewayConnectionStatsRegistry) (*component.Component, *gatewayserver.GatewayServer, error) {
 				c := componenttest.NewComponent(t, &component.Config{
 					ServiceBase: config.ServiceBase{
 						GRPC: config.GRPC{
@@ -101,6 +101,9 @@ func TestGatewayServer(t *testing.T) {
 				gsConfig := &gatewayserver.Config{
 					RequireRegisteredGateways:         false,
 					UpdateGatewayLocationDebounceTime: 0,
+					ConnectionStatsTTL:                (1 << 3) * test.Delay,
+					ConnectionStatsDisconnectTTL:      (1 << 3) * test.Delay,
+					Stats:                             statsRegistry,
 					FetchGatewayInterval:              time.Minute,
 					FetchGatewayJitter:                1,
 					MQTT: config.MQTT{
@@ -126,7 +129,6 @@ func TestGatewayServer(t *testing.T) {
 							AllowUnauthenticated: true,
 						},
 					},
-					UpdateConnectionStatsDebounceTime: 0,
 				}
 
 				er := gatewayserver.NewIS(c)
@@ -160,7 +162,22 @@ func TestGatewayServer(t *testing.T) {
 			defer closeIS()
 			ns, nsAddr := mock.StartNS(ctx)
 
-			c, gs, err := rtc.Setup(ctx, isAddr, nsAddr)
+			var statsRegistry gatewayserver.GatewayConnectionStatsRegistry
+			if os.Getenv("TEST_REDIS") == "1" {
+				statsRedisClient, statsFlush := test.NewRedis(ctx, "gatewayserver_test")
+				defer statsFlush()
+				defer statsRedisClient.Close()
+				registry := &gsredis.GatewayConnectionStatsRegistry{
+					Redis:   statsRedisClient,
+					LockTTL: test.Delay << 10,
+				}
+				if err := registry.Init(ctx); !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				statsRegistry = registry
+			}
+
+			c, gs, err := rtc.Setup(ctx, isAddr, nsAddr, statsRegistry)
 			if !a.So(err, should.BeNil) {
 				t.Fatalf("Failed to setup server :%v", err)
 			}
@@ -169,20 +186,8 @@ func TestGatewayServer(t *testing.T) {
 			a.So(roles[0], should.Equal, ttnpb.ClusterRole_GATEWAY_SERVER)
 
 			config, err := gs.GetConfig(ctx)
-			a.So(err, should.BeNil)
-
-			if os.Getenv("TEST_REDIS") == "1" {
-				statsRedisClient, statsFlush := test.NewRedis(ctx, "gatewayserver_test")
-				defer statsFlush()
-				defer statsRedisClient.Close()
-				statsRegistry := &gsredis.GatewayConnectionStatsRegistry{
-					Redis:   statsRedisClient,
-					LockTTL: test.Delay << 10,
-				}
-				if err := statsRegistry.Init(ctx); !a.So(err, should.BeNil) {
-					t.FailNow()
-				}
-				config.Stats = statsRegistry
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
 			}
 
 			componenttest.StartComponent(t, c)
@@ -1403,8 +1408,8 @@ func TestGatewayServer(t *testing.T) {
 
 								stats, paths := conn.Stats()
 								a.So(stats, should.NotBeNil)
-								if config.Stats != nil {
-									a.So(config.Stats.Set(conn.Context(), ids, stats, paths, 0), should.BeNil)
+								if statsRegistry != nil {
+									a.So(statsRegistry.Set(conn.Context(), ids, stats, paths, 0), should.BeNil)
 								}
 
 								stats, err := statsClient.GetGatewayConnectionStats(statsCtx, &ids)
@@ -1749,7 +1754,7 @@ func TestGatewayServer(t *testing.T) {
 					}
 
 					// Wait for disconnection to be processed.
-					time.Sleep(timeout)
+					time.Sleep(2 * config.ConnectionStatsDisconnectTTL)
 
 					// After canceling the context and awaiting the link, the connection should be gone.
 					t.Run("Disconnected", func(t *testing.T) {
@@ -1760,7 +1765,39 @@ func TestGatewayServer(t *testing.T) {
 					})
 				})
 			}
-			c.Close()
+
+			t.Run("Shutdown", func(t *testing.T) {
+				if statsRegistry == nil {
+					t.Skip("Stats registry disabled")
+				}
+
+				ids := &ttnpb.GatewayIdentifiers{
+					GatewayId: registeredGatewayID,
+					Eui:       &registeredGatewayEUI,
+				}
+
+				conn, err := grpc.Dial(":9187", append(rpcclient.DefaultDialOptions(ctx), grpc.WithInsecure(), grpc.WithBlock())...)
+				if !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+				defer conn.Close()
+				md := rpcmetadata.MD{
+					ID:            ids.GatewayId,
+					AuthType:      "Bearer",
+					AuthValue:     registeredGatewayKey,
+					AllowInsecure: true,
+				}
+				_, err = ttnpb.NewGtwGsClient(conn).LinkGateway(ctx, grpc.PerRPCCredentials(md))
+				if !a.So(err, should.BeNil) {
+					t.FailNow()
+				}
+
+				gs.Close()
+				time.Sleep(2 * config.ConnectionStatsTTL)
+
+				_, err = statsRegistry.Get(ctx, *ids)
+				a.So(errors.IsNotFound(err), should.BeTrue)
+			})
 		})
 	}
 }

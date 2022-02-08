@@ -13,10 +13,12 @@ For details about compatibility between different releases, see the **Commitment
 
 - Retain at most 10 recent session keys in the Join Server. This avoids a slowly growing number of session keys in the Join Server's database.
   - This requires a database migration (`ttn-lw-stack js-db migrate`).
+- Add TTL for gateway connection stats. Can be configured with the option `gs.connection-stats-ttl`.
 
 ### Changed
 
 ### Deprecated
+- Gateway Server setting `gs.update-connection-stats-debounce-time` is no longer valid.
 
 ### Removed
 
@@ -25,6 +27,7 @@ For details about compatibility between different releases, see the **Commitment
 - Device activation flow with a LoRaWAN Backend Interfaces 1.1 capable Join Server.
   - Join Servers using Backend Interfaces 1.1 (protocol `BI1.1`) must be configured with a `sender-ns-id` containing the EUI of the Network Server.
 - Fix `time.Duration` flags in CLI.
+- Gateway Server will no longer leave permanent gateway connection stats data on the registry when crashing.
 
 ### Security
 
