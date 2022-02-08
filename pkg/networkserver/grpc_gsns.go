@@ -632,7 +632,12 @@ macLoop:
 			return nil, false, nil
 		}
 	}
-	dev.MacState.RxWindowsAvailable = true
+	if isLRFHSS := up.GetSettings().GetDataRate().GetLrfhss() != nil; isLRFHSS {
+		dev.MacState.RxWindowsAvailable = false
+		dev.MacState.QueuedResponses = nil
+	} else {
+		dev.MacState.RxWindowsAvailable = true
+	}
 	dev.Session.LastFCntUp = cmacFMatchResult.FullFCnt
 
 	var queuedApplicationUplinks []*ttnpb.ApplicationUp
@@ -1294,6 +1299,12 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 		logger = logger.WithFields(log.Fields(
 			"bandwidth", dr.Lora.GetBandwidth(),
 			"spreading_factor", dr.Lora.GetSpreadingFactor(),
+		))
+	case *ttnpb.DataRate_Lrfhss:
+		logger = logger.WithFields(log.Fields(
+			"modulation_type", dr.Lrfhss.GetModulationType(),
+			"coding_rate", dr.Lrfhss.GetCodingRate(),
+			"ocw", dr.Lrfhss.GetOperatingChannelWidth(),
 		))
 	default:
 		return nil, errDataRateNotFound.New()
