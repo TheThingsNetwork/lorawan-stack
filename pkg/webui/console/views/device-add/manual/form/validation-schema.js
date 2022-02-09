@@ -303,14 +303,14 @@ const macSettingsSchema = Yup.object({
         ping_slot_frequency: Yup.lazy(frequency => {
           if (
             !isClassB ||
-            ((frequency === undefined || frequency === '') && !hasPingSlotFrequency)
+            ((frequency === undefined || frequency === '') && hasPingSlotFrequency)
           ) {
             return Yup.number().strip()
           }
 
           const schema = Yup.number().min(100000, Yup.passValues(sharedMessages.validateNumberGte))
 
-          if (hasPingSlotFrequency) {
+          if (!hasPingSlotFrequency) {
             return schema.required(sharedMessages.validateRequired)
           }
 
@@ -334,7 +334,7 @@ const macSettingsSchema = Yup.object({
         ping_slot_data_rate_index: Yup.lazy(dataRate => {
           if (
             !isClassB ||
-            ((dataRate === '' || dataRate === undefined) && !hasPingSlotDataRateIndex)
+            ((dataRate === '' || dataRate === undefined) && hasPingSlotDataRateIndex)
           ) {
             return Yup.number().strip()
           }
@@ -343,7 +343,7 @@ const macSettingsSchema = Yup.object({
             .min(0, Yup.passValues(sharedMessages.validateNumberGte))
             .max(15, Yup.passValues(sharedMessages.validateNumberLte))
 
-          if (hasPingSlotDataRateIndex) {
+          if (!hasPingSlotDataRateIndex) {
             return schema.required(sharedMessages.validateRequired)
           }
 
@@ -365,22 +365,22 @@ const macSettingsSchema = Yup.object({
           return Yup.string().strip()
         }),
         class_b_timeout: Yup.lazy(value => {
-          if (!isClassB || (!Boolean(value) && !hasClassBTimeout)) {
+          if (!isClassB || (!Boolean(value) && hasClassBTimeout)) {
             return Yup.string().strip()
           }
 
-          if (hasClassBTimeout) {
+          if (!hasClassBTimeout) {
             return Yup.string().required(sharedMessages.validateRequired)
           }
 
           return Yup.string()
         }),
         class_c_timeout: Yup.lazy(value => {
-          if (!isClassC || (!Boolean(value) && !hasClassCTimeout)) {
+          if (!isClassC || (!Boolean(value) && hasClassCTimeout)) {
             return Yup.string().strip()
           }
 
-          if (hasClassBTimeout) {
+          if (!hasClassBTimeout) {
             return Yup.string().required(sharedMessages.validateRequired)
           }
 
