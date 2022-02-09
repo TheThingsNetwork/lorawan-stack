@@ -125,6 +125,7 @@ const MacSettingsSection = props => {
     isClassB,
     isClassC,
     isUseAdr,
+    defaultMacSettings,
   } = props
 
   const isNewLorawanVersion = parseLorawanMacVersion(lorawanVersion) >= 110
@@ -172,6 +173,15 @@ const MacSettingsSection = props => {
       setUseAdr(isUseAdr)
     }
   }, [isUseAdr])
+
+  const pingSlotDataRateIsRequired =
+    isClassB &&
+    (defaultMacSettings.ping_slot_frequency !== '' ||
+      defaultMacSettings.ping_slot_frequency !== undefined)
+  const pingSlotFrequencyIsRequired =
+    isClassB &&
+    (defaultMacSettings.ping_slot_data_rate_index !== '' ||
+      defaultMacSettings.ping_slot_data_rate_index !== undefined)
 
   return (
     <Form.CollapseSection
@@ -390,9 +400,8 @@ const MacSettingsSection = props => {
             />
           </Form.FieldContainer>
           <Form.FieldContainer horizontal>
-            {(!isOTAA || isClassB) && (
+            {(!isOTAA || pingSlotFrequencyIsRequired) && (
               <Form.Field
-                required={!isOTAA || isClassB}
                 type="number"
                 min={100000}
                 step={100}
@@ -415,9 +424,8 @@ const MacSettingsSection = props => {
             />
           </Form.FieldContainer>
           <Form.FieldContainer horizontal>
-            {(!isOTAA || isClassB) && (
+            {(!isOTAA || pingSlotDataRateIsRequired) && (
               <Form.Field
-                required={!isOTAA || isClassB}
                 title={m.pingSlotDataRateTitle}
                 name="mac_settings.ping_slot_data_rate_index"
                 tooltipId={tooltipIds.PING_SLOT_DATA_RATE_INDEX}
@@ -503,11 +511,9 @@ const MacSettingsSection = props => {
 
 MacSettingsSection.propTypes = {
   activationMode: PropTypes.oneOf(Object.values(ACTIVATION_MODES)).isRequired,
-  initialValues: PropTypes.shape({
-    mac_settings: PropTypes.shape({
-      ping_slot_frequency: PropTypes.number,
-      ping_slot_data_rate_index: PropTypes.number,
-    }),
+  defaultMacSettings: PropTypes.shape({
+    ping_slot_frequency: PropTypes.string,
+    ping_slot_data_rate_index: PropTypes.number,
   }),
   initiallyCollapsed: PropTypes.bool,
   isClassB: PropTypes.bool,
@@ -523,7 +529,7 @@ MacSettingsSection.defaultProps = {
   isClassB: false,
   isClassC: false,
   isUseAdr: false,
-  initialValues: undefined,
+  defaultMacSettings: undefined,
 }
 
 export default MacSettingsSection
