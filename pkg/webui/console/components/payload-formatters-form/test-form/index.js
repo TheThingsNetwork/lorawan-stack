@@ -14,21 +14,24 @@
 
 import React from 'react'
 import classnames from 'classnames'
-import { defineMessages } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 
 import Form from '@ttn-lw/components/form'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import CodeEditor from '@ttn-lw/components/code-editor'
 import Icon from '@ttn-lw/components/icon'
 import Input from '@ttn-lw/components/input'
-import SubmitBar from '@ttn-lw/components/submit-bar'
+import SafeInspector from '@ttn-lw/components/safe-inspector'
 
 import Message from '@ttn-lw/lib/components/message'
 import ErrorMessage from '@ttn-lw/lib/components/error-message'
 
+import { isBackend, getBackendErrorName, toMessageProps } from '@ttn-lw/lib/errors/utils'
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { base64ToHex } from '@console/lib/bytes'
 
 import style from './test-form.styl'
 
@@ -38,8 +41,16 @@ const m = defineMessages({
   testDecoder: 'Test decoder',
   testEncoder: 'Test encoder',
   testSubTitle: 'Test',
+  testFatalError: 'An error occurred while interpreting the formatter code',
+  testError: 'Test result contains user-defined error(s)',
+  testWarning: 'Test result contains user-defined warning(s)',
   bytePayload: 'Byte payload',
   jsonPayload: 'JSON payload',
+  emptyPayload: 'The returned payload was empty',
+  decodedPayload: 'Decoded test payload',
+  completeUplink: 'Complete uplink data',
+  testResult: 'Test result',
+  errorInformation: 'Error information',
 })
 
 const validationSchema = Yup.object({
@@ -66,8 +77,22 @@ const validationSchema = Yup.object({
   }),
 })
 
+const isOutputError = error => isBackend(error) && getBackendErrorName(error) === 'output_errors'
+
 const TestForm = props => {
-  const { className, onSubmit, uplink, payload, warning, error } = props
+  const {
+    className,
+    onSubmit,
+    uplink,
+    testResult,
+    testResult: {
+      decoded_payload: payload,
+      decoded_payload_warnings: warnings,
+      frm_payload: framePayload,
+    },
+  } = props
+
+  const { formatMessage } = useIntl()
 
   const initialValues = React.useMemo(() => ({ payload: '', f_port: 1 }), [])
   const validationContext = React.useMemo(
@@ -77,22 +102,38 @@ const TestForm = props => {
     [uplink],
   )
 
-  const hasTestError = Boolean(error)
-  const hasTestWarning = Boolean(warning)
-  const hasPayload = Boolean(payload)
+  const hasTestError = isBackend(testResult)
+  const hasFatalError = !isOutputError(testResult)
+  const hasTestWarning = warnings instanceof Array && warnings.length !== 0
+  const hasPayload = payload !== undefined
 
   const showTestError = hasTestError
   const showTestWarning = !hasTestError && hasTestWarning
   const showTestValid = !hasTestError && !hasTestWarning && hasPayload
-
+  let testOutput
+  if (uplink) {
+    if (showTestError) {
+      const errorMessage = toMessageProps(testResult)
+      testOutput = formatMessage(errorMessage.content, errorMessage.values)
+    } else {
+      testOutput = showTestWarning || hasPayload ? JSON.stringify(testResult, null, 2) : ''
+    }
+  } else {
+    testOutput =
+      showTestError || showTestWarning
+        ? JSON.stringify(testResult, null, 2)
+        : 'decoded_payload' in testResult && !('frm_payload' in testResult)
+        ? formatMessage(m.emptyPayload)
+        : ''
+  }
   let infoIcon = 'info'
   let infoMessage = m.noResult
   if (showTestError) {
     infoIcon = 'error'
-    infoMessage = error
+    infoMessage = hasFatalError ? m.testFatalError : m.testError
   } else if (showTestWarning) {
     infoIcon = 'warning'
-    infoMessage = warning
+    infoMessage = m.testWarning
   } else if (showTestValid) {
     infoIcon = 'valid'
     infoMessage = m.validResult
@@ -107,7 +148,7 @@ const TestForm = props => {
         validationContext={validationContext}
       >
         <Form.SubTitle title={m.testSubTitle} />
-        <Form.FieldContainer horizontal>
+        <Form.FieldContainer horizontal className={style.topRow}>
           {uplink ? (
             <Form.Field
               title={m.bytePayload}
@@ -119,17 +160,17 @@ const TestForm = props => {
             />
           ) : (
             <Form.Field
+              className={style.payload}
               title={m.jsonPayload}
               language="json"
               name="payload"
               component={CodeEditor}
-              minLines={14}
-              maxLines={14}
+              minLines={15}
+              maxLines={15}
             />
           )}
           <Form.Field
             className={style.fPort}
-            inputWidth="xxs"
             title="FPort"
             name="f_port"
             type="number"
@@ -137,8 +178,71 @@ const TestForm = props => {
             min={1}
             max={223}
           />
+          {uplink && (
+            <Form.Submit
+              className={style.submitButton}
+              component={SubmitButton}
+              message={uplink ? m.testDecoder : m.testEncoder}
+              primary={false}
+            />
+          )}
         </Form.FieldContainer>
-        <hr className={style.hRule} />
+        {!uplink && (
+          <Form.Submit
+            className="mb-cs-m"
+            component={SubmitButton}
+            message={uplink ? m.testDecoder : m.testEncoder}
+            primary={false}
+          />
+        )}
+        {uplink ? (
+          <>
+            {!showTestError && (
+              <Form.InfoField title={m.decodedPayload}>
+                <CodeEditor
+                  value={JSON.stringify(payload, null, 2)}
+                  language="json"
+                  name="test_result"
+                  minLines={12}
+                  maxLines={12}
+                  readOnly
+                  showGutter={false}
+                />
+              </Form.InfoField>
+            )}
+            <Form.InfoField title={showTestError ? m.errorInformation : m.completeUplink}>
+              <CodeEditor
+                value={testOutput}
+                language="json"
+                name="test_result"
+                minLines={11}
+                maxLines={11}
+                readOnly
+                showGutter={false}
+              />
+            </Form.InfoField>
+          </>
+        ) : (
+          <Form.InfoField title={showTestError ? m.errorInformation : m.testResult}>
+            {!showTestError && (
+              <SafeInspector
+                data={framePayload !== undefined ? base64ToHex(framePayload) : ''}
+                initiallyVisible
+                className="mb-cs-m"
+                hideable={false}
+              />
+            )}
+            <CodeEditor
+              value={testOutput}
+              language="json"
+              name="test_result"
+              minLines={showTestError ? 9 : 6}
+              maxLines={showTestError ? 9 : 6}
+              readOnly
+              showGutter={false}
+            />
+          </Form.InfoField>
+        )}
         <div
           className={classnames(style.infoSection, {
             [style.infoSectionError]: showTestError,
@@ -146,33 +250,19 @@ const TestForm = props => {
             [style.infoSectionValid]: showTestValid,
           })}
         >
-          <Icon className={style.icon} icon={infoIcon} nudgeUp />
-          {showTestError ? (
-            <ErrorMessage className={style.message} content={infoMessage} />
-          ) : (
-            <Message className={style.message} content={infoMessage} />
+          {showTestError && (
+            <>
+              <Icon className={style.icon} icon={infoIcon} nudgeUp />
+              <ErrorMessage className={style.message} content={infoMessage} />
+            </>
+          )}
+          {(showTestValid || showTestWarning) && (
+            <>
+              <Icon className={style.icon} icon={infoIcon} nudgeUp />
+              <Message className={style.message} content={infoMessage} />
+            </>
           )}
         </div>
-        {uplink ? (
-          <CodeEditor
-            value={hasPayload ? JSON.stringify(payload, null, 2) : undefined}
-            language="json"
-            name="test_result"
-            minLines={14}
-            maxLines={14}
-            readOnly
-            showGutter={false}
-          />
-        ) : (
-          <Input value={hasPayload ? payload : undefined} type="byte" unbounded readOnly />
-        )}
-        <SubmitBar>
-          <Form.Submit
-            component={SubmitButton}
-            message={uplink ? m.testDecoder : m.testEncoder}
-            primary={false}
-          />
-        </SubmitBar>
       </Form>
     </div>
   )
@@ -180,16 +270,15 @@ const TestForm = props => {
 
 TestForm.propTypes = {
   className: PropTypes.string,
-  error: PropTypes.error,
   onSubmit: PropTypes.func.isRequired,
-  payload: PropTypes.oneOfType([PropTypes.string, PropTypes.shape({})]),
+  testResult: PropTypes.shape({
+    decoded_payload: PropTypes.PropTypes.shape({}),
+    decoded_payload_warnings: PropTypes.arrayOf(PropTypes.message),
+    frm_payload: PropTypes.string,
+  }).isRequired,
   uplink: PropTypes.bool.isRequired,
-  warning: PropTypes.message,
 }
 TestForm.defaultProps = {
-  payload: undefined,
-  error: undefined,
-  warning: undefined,
   className: undefined,
 }
 

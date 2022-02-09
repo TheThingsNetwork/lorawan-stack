@@ -32,8 +32,6 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { base64ToHex } from '@console/lib/bytes'
-
 import { updateDevice } from '@console/store/actions/devices'
 import { getRepositoryPayloadFormatters } from '@console/store/actions/device-repository'
 
@@ -165,10 +163,7 @@ class DevicePayloadFormatters extends React.PureComponent {
       parameter,
     })
 
-    return {
-      payload: base64ToHex(downlink.frm_payload || ''),
-      warnings: downlink.decoded_payload_warnings,
-    }
+    return downlink
   }
 
   @bind

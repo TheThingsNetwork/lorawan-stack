@@ -167,10 +167,7 @@ class DevicePayloadFormatters extends React.PureComponent {
       parameter,
     })
 
-    return {
-      payload: uplink.decoded_payload,
-      warnings: uplink.decoded_payload_warnings,
-    }
+    return uplink
   }
 
   @bind
