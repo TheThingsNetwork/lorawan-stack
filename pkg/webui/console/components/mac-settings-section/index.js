@@ -21,6 +21,7 @@ import Checkbox from '@ttn-lw/components/checkbox'
 import Input from '@ttn-lw/components/input'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
 import Radio from '@ttn-lw/components/radio-button'
+import UnitInput from '@ttn-lw/components/unit-input'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -36,8 +37,6 @@ import {
   parseLorawanMacVersion,
 } from '@console/lib/device-utils'
 
-import style from './mac-settings-section.styl'
-
 const m = defineMessages({
   delayValue: '{count, plural, one {{count} second} other {{count} seconds}}',
   factoryPresetFreqDescription: 'List of factory-preset frequencies. Note: order is respected.',
@@ -50,7 +49,7 @@ const m = defineMessages({
   pingSlotPeriodicityDescription: 'Periodicity of the class B ping slot',
   pingSlotPeriodicityTitle: 'Ping slot periodicity',
   pingSlotPeriodicityValue: '{count, plural, one {every second} other {every {count} seconds}}',
-  pingSlotDataRateTitle: 'Ping slot data rate',
+  pingSlotDataRateTitle: 'Ping slot data rate index',
   desiredPingSlotDataRateTitle: 'Desired ping slot data rate',
   resetWarning: 'Resetting is insecure and makes your device susceptible for replay attacks',
   resetsFCnt: 'Resets frame counters',
@@ -69,7 +68,7 @@ const m = defineMessages({
   classCTimeout: 'Class C timeout',
   maxDutyCycle: 'Maximum duty cycle',
   desiredMaxDutyCycle: 'Desired maximum duty cycle',
-  useAdr: 'Use ADR',
+  useAdr: 'Use adaptive data rate (ADR)',
   adrMargin: 'ADR margin',
   desiredAdrAckLimit: 'Desired ADR ack limit',
   desiredAdrAckDelay: 'Desired ADR ack delay',
@@ -77,9 +76,6 @@ const m = defineMessages({
   statusCountPeriodicity: 'Status count periodicity',
   statusTimePeriodicity: 'Status time periodicity',
 })
-
-const timeoutEncode = value => (Boolean(value) ? `${value}s` : value)
-const timeoutDecode = value => (Boolean(value) ? RegExp(/\d+/).exec(value)[0] : value)
 
 // 0...7
 const pingSlotPeriodicityOptions = Array.from({ length: 8 }, (_, index) => {
@@ -188,6 +184,7 @@ const MacSettingsSection = props => {
         encode={fCntWidthEncode}
         decode={fCntWidthDecode}
         tooltipId={tooltipIds.FRAME_COUNTER_WIDTH}
+        horizontal
       >
         <Radio label={sharedMessages['16Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_16_BIT} />
         <Radio label={sharedMessages['32Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_32_BIT} />
@@ -200,22 +197,26 @@ const MacSettingsSection = props => {
                 title={m.rx1DelayTitle}
                 type="number"
                 tooltipId={tooltipIds.RX1_DELAY}
+                append={<Message content={sharedMessages.secondsAbbreviated} />}
                 name="mac_settings.rx1_delay"
                 component={Input}
                 min={1}
                 max={15}
-                inputWidth="xxs"
+                inputWidth="xs"
+                fieldWidth="xs"
               />
             )}
             <Form.Field
               title={m.desiredRx1DelayTitle}
               type="number"
               name="mac_settings.desired_rx1_delay"
+              append={<Message content={sharedMessages.secondsAbbreviated} />}
               tooltipId={tooltipIds.RX1_DELAY}
               component={Input}
               min={1}
               max={15}
-              inputWidth="xxs"
+              inputWidth="xs"
+              fieldWidth="xs"
             />
           </Form.FieldContainer>
           <Form.FieldContainer horizontal>
@@ -225,6 +226,7 @@ const MacSettingsSection = props => {
                 type="number"
                 name="mac_settings.rx1_data_rate_offset"
                 inputWidth="xxs"
+                fieldWidth="xs"
                 component={Input}
                 min={0}
                 max={7}
@@ -235,6 +237,7 @@ const MacSettingsSection = props => {
               title={m.desiredRx1DataRateOffsetTitle}
               type="number"
               inputWidth="xxs"
+              fieldWidth="xs"
               name="mac_settings.desired_rx1_data_rate_offset"
               component={Input}
               min={0}
@@ -244,7 +247,7 @@ const MacSettingsSection = props => {
           </Form.FieldContainer>
           {!isOTAA && (
             <Form.Field
-              title={sharedMessages.resetsFCnt}
+              label={sharedMessages.resetsFCnt}
               onChange={handleResetsFCntChange}
               warning={resetsFCnt ? m.resetWarning : undefined}
               name="mac_settings.resets_f_cnt"
@@ -265,6 +268,7 @@ const MacSettingsSection = props => {
             max={15}
             tooltipId={tooltipIds.RX2_DATA_RATE_INDEX}
             inputWidth="xxs"
+            fieldWidth="xs"
           />
         )}
         <Form.Field
@@ -276,6 +280,7 @@ const MacSettingsSection = props => {
           max={15}
           inputWidth="xxs"
           tooltipId={tooltipIds.RX2_DATA_RATE_INDEX}
+          fieldWidth="xs"
         />
       </Form.FieldContainer>
       <Form.FieldContainer horizontal>
@@ -285,10 +290,10 @@ const MacSettingsSection = props => {
             min={100000}
             step={100}
             title={m.rx2FrequencyTitle}
-            placeholder={m.frequencyPlaceholder}
             name="mac_settings.rx2_frequency"
-            component={Input}
+            component={UnitInput.Hertz}
             tooltipId={tooltipIds.RX2_FREQUENCY}
+            fieldWidth="xs"
           />
         )}
         <Form.Field
@@ -296,10 +301,10 @@ const MacSettingsSection = props => {
           min={100000}
           step={100}
           title={m.desiredRx2FrequencyTitle}
-          placeholder={m.frequencyPlaceholder}
           name="mac_settings.desired_rx2_frequency"
-          component={Input}
+          component={UnitInput.Hertz}
           tooltipId={tooltipIds.RX2_FREQUENCY}
+          fieldWidth="xs"
         />
       </Form.FieldContainer>
       <Form.FieldContainer horizontal>
@@ -309,7 +314,7 @@ const MacSettingsSection = props => {
             name="mac_settings.max_duty_cycle"
             component={Select}
             options={maxDutyCycleOptions}
-            inputWidth="xs"
+            fieldWidth="xs"
             tooltipId={tooltipIds.MAX_DUTY_CYCLE}
           />
         )}
@@ -318,7 +323,7 @@ const MacSettingsSection = props => {
           name="mac_settings.desired_max_duty_cycle"
           component={Select}
           options={maxDutyCycleOptions}
-          inputWidth="xs"
+          fieldWidth="xs"
           tooltipId={tooltipIds.MAX_DUTY_CYCLE}
         />
       </Form.FieldContainer>
@@ -334,29 +339,25 @@ const MacSettingsSection = props => {
       />
       {isClassC && (
         <Form.Field
-          className={style.smallField}
           title={m.classCTimeout}
           name="mac_settings.class_c_timeout"
           tooltipId={tooltipIds.CLASS_C_TIMEOUT}
-          encode={timeoutEncode}
-          decode={timeoutDecode}
-          component={Input}
+          component={UnitInput.Duration}
+          unitSelector={['ms', 's']}
           type="number"
-          inputWidth="xxs"
+          fieldWidth="xs"
         />
       )}
       {(isClassB || isMulticast) && (
         <>
           <Form.Field
-            className={style.smallField}
             title={m.classBTimeout}
             name="mac_settings.class_b_timeout"
             tooltipId={tooltipIds.CLASS_B_TIMEOUT}
-            encode={timeoutEncode}
-            decode={timeoutDecode}
-            component={Input}
+            component={UnitInput.Duration}
+            unitSelector={['ms', 's']}
             type="number"
-            inputWidth="xxs"
+            fieldWidth="xs"
           />
           <Form.Field
             title={m.pingSlotPeriodicityTitle}
@@ -366,6 +367,7 @@ const MacSettingsSection = props => {
             options={pingSlotPeriodicityOptions}
             required={pingPeriodicityRequired}
             menuPlacement="top"
+            fieldWidth="xs"
           />
           <Form.FieldContainer horizontal>
             {!isOTAA && (
@@ -376,7 +378,8 @@ const MacSettingsSection = props => {
                 placeholder={m.frequencyPlaceholder}
                 name="mac_settings.beacon_frequency"
                 tooltipId={tooltipIds.BEACON_FREQUENCY}
-                component={Input}
+                component={UnitInput.Hertz}
+                fieldWidth="xs"
               />
             )}
             <Form.Field
@@ -386,7 +389,8 @@ const MacSettingsSection = props => {
               placeholder={m.frequencyPlaceholder}
               name="mac_settings.desired_beacon_frequency"
               tooltipId={tooltipIds.BEACON_FREQUENCY}
-              component={Input}
+              component={UnitInput.Hertz}
+              fieldWidth="xs"
             />
           </Form.FieldContainer>
           <Form.FieldContainer horizontal>
@@ -399,7 +403,8 @@ const MacSettingsSection = props => {
                 placeholder={m.frequencyPlaceholder}
                 name="mac_settings.ping_slot_frequency"
                 tooltipId={tooltipIds.PING_SLOT_FREQUENCY}
-                component={Input}
+                component={UnitInput.Hertz}
+                fieldWidth="xs"
               />
             )}
             <Form.Field
@@ -410,7 +415,8 @@ const MacSettingsSection = props => {
               placeholder={m.frequencyPlaceholder}
               name="mac_settings.desired_ping_slot_frequency"
               tooltipId={tooltipIds.PING_SLOT_FREQUENCY}
-              component={Input}
+              component={UnitInput.Hertz}
+              fieldWidth="xs"
             />
           </Form.FieldContainer>
           <Form.FieldContainer horizontal>
@@ -421,6 +427,8 @@ const MacSettingsSection = props => {
                 tooltipId={tooltipIds.PING_SLOT_DATA_RATE_INDEX}
                 component={Input}
                 type="number"
+                inputWidth="xxs"
+                fieldWidth="xs"
                 min={0}
                 max={15}
               />
@@ -431,6 +439,8 @@ const MacSettingsSection = props => {
               tooltipId={tooltipIds.PING_SLOT_DATA_RATE_INDEX}
               component={Input}
               type="number"
+              fieldWidth="xs"
+              inputWidth="xxs"
               min={0}
               max={15}
             />
@@ -439,24 +449,23 @@ const MacSettingsSection = props => {
       )}
       <Form.FieldContainer horizontal>
         <Form.Field
-          className={style.smallField}
           title={m.statusCountPeriodicity}
           name="mac_settings.status_count_periodicity"
           component={Input}
+          append={<Message content={sharedMessages.messages} />}
           type="number"
-          inputWidth="xxs"
+          inputWidth="s"
+          fieldWidth="xs"
           tooltipId={tooltipIds.STATUS_COUNT_PERIODICITY}
         />
         <Form.Field
-          className={style.smallField}
           title={m.statusTimePeriodicity}
           name="mac_settings.status_time_periodicity"
-          encode={timeoutEncode}
-          decode={timeoutDecode}
-          component={Input}
+          component={UnitInput.Duration}
+          unitSelector={['ms', 's']}
           type="number"
-          inputWidth="xxs"
           tooltipId={tooltipIds.STATUS_TIME_PERIODICITY}
+          fieldWidth="xs"
         />
       </Form.FieldContainer>
       <Form.Field
@@ -474,6 +483,8 @@ const MacSettingsSection = props => {
             component={Input}
             type="number"
             tooltipId={tooltipIds.ADR_MARGIN}
+            inputWidth="xs"
+            append="dB"
           />
           {isNewLorawanVersion && (
             <>
@@ -483,6 +494,7 @@ const MacSettingsSection = props => {
                 component={Select}
                 options={adrAckLimitOptions}
                 tooltipId={tooltipIds.ADR_ACK_LIMIT}
+                fieldWidth="xs"
               />
               <Form.Field
                 title={m.desiredAdrAckDelay}
@@ -490,6 +502,7 @@ const MacSettingsSection = props => {
                 component={Select}
                 options={adrAckDelayOptions}
                 tooltipId={tooltipIds.ADR_ACK_DELAY}
+                fieldWidth="xs"
               />
             </>
           )}

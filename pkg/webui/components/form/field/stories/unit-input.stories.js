@@ -37,51 +37,19 @@ export const Default = () => (
       disabled: '530ms',
     }}
   >
-    <Form.Field
-      name="default"
-      title="Default"
-      units={[
-        { label: 'miliseconds', value: 'ms' },
-        { label: 'seconds', value: 's' },
-        { label: 'minutes', value: 'm' },
-        { label: 'hours', value: 'h' },
-      ]}
-      component={UnitInput}
-    />
+    <Form.Field name="default" title="Default" component={UnitInput.Duration} />
     <Form.Field
       name="description"
       title="Description"
-      units={[
-        { label: 'miliseconds', value: 'ms' },
-        { label: 'seconds', value: 's' },
-        { label: 'minutes', value: 'm' },
-        { label: 'hours', value: 'h' },
-      ]}
-      component={UnitInput}
+      component={UnitInput.Duration}
       description="The unit input"
     />
     <Form.Field
       name="warning"
       title="Warning"
-      units={[
-        { label: 'miliseconds', value: 'ms' },
-        { label: 'seconds', value: 's' },
-        { label: 'minutes', value: 'm' },
-        { label: 'hours', value: 'h' },
-      ]}
-      component={UnitInput}
+      component={UnitInput.Duration}
       warning="The unit input"
     />
-    <Form.Field
-      name="error"
-      title="Error"
-      units={[
-        { label: 'miliseconds', value: 'ms' },
-        { label: 'seconds', value: 's' },
-        { label: 'minutes', value: 'm' },
-        { label: 'hours', value: 'h' },
-      ]}
-      component={UnitInput}
-    />
+    <Form.Field name="error" title="Error" component={UnitInput.Duration} />
   </FieldsWrapperExample>
 )

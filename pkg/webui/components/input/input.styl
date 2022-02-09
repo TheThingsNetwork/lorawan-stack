@@ -82,6 +82,7 @@
   flex-grow: 2
   z-index: $zi.slight
   height: $default-input-height
+  width: 100%
 
   &[type='password']
     letter-spacing: 1px
@@ -153,3 +154,12 @@ textarea.input
 
   .hide-toggle
     margin-left: -2.5rem
+
+.append
+  border-input('left')
+  padding: $cs.xxs $cs.xs
+  height: 100%
+  font-weight: $fw.bold
+  display: flex
+  align-items: center
+  justify-content: center

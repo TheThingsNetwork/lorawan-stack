@@ -181,6 +181,14 @@ const ApplicationGeneralSettings = props => {
               name="description"
               component={Input}
             />
+            {mayViewLink && (
+              <Form.Field
+                title={sharedMessages.skipCryptoTitle}
+                name="skip_payload_crypto"
+                description={sharedMessages.skipCryptoDescription}
+                component={Checkbox}
+              />
+            )}
             <Form.Field
               name="attributes"
               title={sharedMessages.attributes}
@@ -190,15 +198,6 @@ const ApplicationGeneralSettings = props => {
               component={KeyValueMap}
               description={sharedMessages.attributeDescription}
             />
-            {mayViewLink && (
-              <Form.Field
-                autoFocus
-                title={sharedMessages.skipCryptoTitle}
-                name="skip_payload_crypto"
-                description={sharedMessages.skipCryptoDescription}
-                component={Checkbox}
-              />
-            )}
             <SubmitBar>
               <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
               <Require featureCheck={mayDeleteApplication}>

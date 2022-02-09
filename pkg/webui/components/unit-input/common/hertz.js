@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,6 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.small-field
-  width: 12rem
-  align-content: flex-start
+import React from 'react'
+
+import FactoredUnitInput from '../factored'
+
+const units = [
+  { label: 'Hz', value: 'hz', factor: 1 },
+  { label: 'kHz', value: 'khz', factor: 1000 },
+  { label: 'MHz', value: 'mhz', factor: 1000000 },
+]
+
+const HertzInput = props => (
+  <FactoredUnitInput
+    inputWidth="xs"
+    units={units}
+    baseUnit={units[0].value}
+    defaultUnit="mhz"
+    {...props}
+  />
+)
+
+export default HertzInput

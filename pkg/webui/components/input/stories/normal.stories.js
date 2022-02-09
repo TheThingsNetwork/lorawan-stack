@@ -38,6 +38,7 @@ export const Default = () => (
 
 export const WithPlaceholder = () => <Example placeholder="Placeholder..." />
 export const WithIcon = () => <Example icon="search" />
+export const WithAppend = () => <Example error append="test" />
 
 WithIcon.story = {
   name: 'With icon',

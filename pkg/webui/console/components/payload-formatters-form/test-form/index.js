@@ -136,7 +136,6 @@ const TestForm = props => {
             component={Input}
             min={1}
             max={223}
-            autoWidth
           />
         </Form.FieldContainer>
         <hr className={style.hRule} />

@@ -45,6 +45,7 @@ class Input extends React.Component {
       ...Button.propTypes,
     }),
     actionDisable: PropTypes.bool,
+    append: PropTypes.node,
     autoComplete: PropTypes.oneOf([
       'current-password',
       'email',
@@ -89,6 +90,7 @@ class Input extends React.Component {
   static defaultProps = {
     action: undefined,
     actionDisable: false,
+    append: null,
     autoComplete: 'off',
     children: undefined,
     className: undefined,
@@ -176,6 +178,7 @@ class Input extends React.Component {
     const {
       action,
       actionDisable,
+      append,
       autoComplete,
       children,
       className,
@@ -292,6 +295,7 @@ class Input extends React.Component {
               />
             </Tooltip>
           )}
+          {append && <div className={style.append}>{append}</div>}
         </div>
         {hasAction && (
           <div className={style.actions}>

@@ -44,30 +44,39 @@
 
   &.field-width-xxs
     width: $ffw.xxs
+    flex-basis: $ffw.xxs
 
   &.field-width-xs
     width: $ffw.xs
+    flex-basis: $ffw.xs
 
   &.field-width-s
     width: $ffw.s
+    flex-basis: $ffw.s
 
   &.field-width-m
     width: $ffw.m
+    flex-basis: $ffw.m
 
   &.field-width-l
     width: $ffw.l
+    flex-basis: $ffw.l
 
   &.field-width-full
     width: $ffw.full
+    flex-basis: $ffw.full
 
   &.field-width-half
     width: $ffw.half
+    flex-basis: $ffw.half
 
   &.field-width-third
     width: $ffw.third
+    flex-basis: $ffw.third
 
   &.field-width-quarter
     width: $ffw.quarter
+    flex-basis: $ffw.quarter
 
 .field-container
   display: flex
@@ -81,11 +90,11 @@
     flex-direction: row
 
     .field
+      width: auto
       margin-bottom: 0
-
-      &.auto-width
-        width: auto
-        align-content: flex-start
+      align-content: flex-start
+      flex-grow: 0
+      flex-shrink: 0
 
       &:not(:last-child)
         margin-right: $ls.xxs
@@ -102,26 +111,29 @@
   .title
     display: inline-block
 
-  .tooltip
-    display: inline-block
+.tooltip
+  display: inline-block
 
-    &-icon
-      nudge('up', 1px)
-      color: $tc-subtle-gray
-      padding: .1rem
-      height: 1rem
-      width: 1rem
-      font-size: 1rem
-      line-height: 1
+  &-icon
+    nudge('up', 1px)
+    color: $tc-subtle-gray
+    padding: .1rem
+    height: 1rem
+    width: 1rem
+    font-size: 1rem
+    line-height: 1
 
-    &-title
-      h4()
+  &-content
+    .tooltip-title
       margin: 0
 
-    &-description
-      margin: 0 0 $cs.s 0
+    .tooltip-description
+      margin: 0
 
-    &-links
+      &:not(:last-child)
+        margin: 0 0 $cs.s 0
+  
+    .tooltip-links
       display: flex
       justify-content: space-between
 

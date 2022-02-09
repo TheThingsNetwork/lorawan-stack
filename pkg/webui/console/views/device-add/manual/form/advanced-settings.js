@@ -22,6 +22,7 @@ import Select from '@ttn-lw/components/select'
 import Checkbox from '@ttn-lw/components/checkbox'
 import Input from '@ttn-lw/components/input'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
+import UnitInput from '@ttn-lw/components/unit-input'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -58,9 +59,6 @@ const pingSlotPeriodicityOptions = Array.from({ length: 8 }, (_, index) => {
     label: <Message content={messages.pingSlotPeriodicityValue} values={{ count: value }} />,
   }
 })
-
-const timeoutEncode = value => (Boolean(value) ? `${value}s` : value)
-const timeoutDecode = value => (Boolean(value) ? RegExp(/\d+/).exec(value)[0] : value)
 
 const allClassOptions = [
   { label: m.classA, value: DEVICE_CLASS_MAP.CLASS_A },
@@ -163,7 +161,6 @@ const AdvancedSettingsSection = props => {
             <>
               <Form.FieldContainer horizontal>
                 <Form.Field
-                  className={style.smallField}
                   required={!isUndefined(defaultMacSettings.rx1_data_rate_offset)}
                   title={messages.rx1DataRateOffsetTitle}
                   type="number"
@@ -173,6 +170,7 @@ const AdvancedSettingsSection = props => {
                   max={7}
                   tooltipId={tooltipIds.DATA_RATE_OFFSET}
                   inputWidth="xxs"
+                  fieldWidth="xs"
                   titleChildren={
                     <WarningTooltip
                       desiredValue={defaultMacSettings.desired_rx1_data_rate_offset}
@@ -185,12 +183,13 @@ const AdvancedSettingsSection = props => {
                   type="number"
                   required={!isUndefined(defaultMacSettings.rx1_delay)}
                   name="mac_settings.rx1_delay"
+                  append={<Message content={sharedMessages.secondsAbbreviated} />}
                   tooltipId={tooltipIds.RX1_DELAY}
                   component={Input}
                   min={1}
                   max={15}
-                  inputWidth="xxs"
-                  autoWidth
+                  inputWidth="xs"
+                  fieldWidth={isClassB ? 'xs' : 'xxs'}
                   titleChildren={
                     <WarningTooltip
                       desiredValue={defaultMacSettings.desired_rx1_delay}
@@ -212,16 +211,14 @@ const AdvancedSettingsSection = props => {
             <>
               <Form.FieldContainer horizontal>
                 <Form.Field
-                  className={style.smallField}
                   required={!isUndefined(defaultMacSettings.class_b_timeout)}
                   title={messages.classBTimeout}
                   name="mac_settings.class_b_timeout"
                   tooltipId={tooltipIds.CLASS_B_TIMEOUT}
-                  encode={timeoutEncode}
-                  decode={timeoutDecode}
-                  component={Input}
+                  component={UnitInput.Duration}
+                  unitSelector={['ms', 's']}
                   type="number"
-                  inputWidth="xxs"
+                  fieldWidth="xs"
                   titleChildren={
                     <WarningTooltip
                       desiredValue={defaultMacSettings.desired_class_b_timeout}
@@ -237,7 +234,7 @@ const AdvancedSettingsSection = props => {
                   options={pingSlotPeriodicityOptions}
                   required={isClassB && (isMulticast || isABP)}
                   menuPlacement="top"
-                  autoWidth
+                  fieldWidth="xs"
                 />
                 <Form.Field
                   title={messages.pingSlotDataRateTitle}
@@ -248,7 +245,7 @@ const AdvancedSettingsSection = props => {
                   type="number"
                   min={0}
                   max={15}
-                  autoWidth
+                  inputWidth="xxs"
                   titleChildren={
                     <WarningTooltip
                       desiredValue={defaultMacSettings.desired_ping_slot_data_rate_index}
@@ -266,8 +263,8 @@ const AdvancedSettingsSection = props => {
                   placeholder={messages.frequencyPlaceholder}
                   name="mac_settings.beacon_frequency"
                   tooltipId={tooltipIds.BEACON_FREQUENCY}
-                  component={Input}
-                  autoWidth
+                  component={UnitInput.Hertz}
+                  fieldWidth="xs"
                   titleChildren={
                     <WarningTooltip
                       desiredValue={defaultMacSettings.desired_beacon_frequency}
@@ -283,8 +280,8 @@ const AdvancedSettingsSection = props => {
                   placeholder={messages.frequencyPlaceholder}
                   name="mac_settings.ping_slot_frequency"
                   tooltipId={tooltipIds.PING_SLOT_FREQUENCY}
-                  component={Input}
-                  autoWidth
+                  component={UnitInput.Hertz}
+                  fieldWidth="xs"
                   titleChildren={
                     <WarningTooltip
                       desiredValue={defaultMacSettings.desired_ping_slot_frequency}
@@ -298,15 +295,14 @@ const AdvancedSettingsSection = props => {
           <Form.FieldContainer horizontal>
             {isClassC && (
               <Form.Field
-                className={style.smallField}
                 required={!isUndefined(defaultMacSettings.class_c_timeout)}
                 title={messages.classCTimeout}
                 name="mac_settings.class_c_timeout"
-                encode={timeoutEncode}
-                decode={timeoutDecode}
                 tooltipId={tooltipIds.CLASS_C_TIMEOUT}
-                component={Input}
+                component={UnitInput.Duration}
+                unitSelector={['ms', 's']}
                 type="number"
+                fieldWidth="xs"
                 inputWidth="xxs"
                 titleChildren={
                   <WarningTooltip
@@ -317,7 +313,6 @@ const AdvancedSettingsSection = props => {
               />
             )}
             <Form.Field
-              className={style.smallField}
               title={messages.rx2DataRateIndexTitle}
               type="number"
               name="mac_settings.rx2_data_rate_index"
@@ -326,6 +321,8 @@ const AdvancedSettingsSection = props => {
               component={Input}
               min={0}
               max={15}
+              inputWidth="xxs"
+              fieldWidth={!isClassC || isMulticast ? 'xs' : 'xxs'}
               titleChildren={
                 <WarningTooltip
                   desiredValue={defaultMacSettings.desired_rx2_data_rate_index}
@@ -342,8 +339,8 @@ const AdvancedSettingsSection = props => {
               placeholder={messages.frequencyPlaceholder}
               name="mac_settings.rx2_frequency"
               tooltipId={tooltipIds.RX2_FREQUENCY}
-              component={Input}
-              autoWidth
+              component={UnitInput.Hertz}
+              fieldWidth="xs"
               titleChildren={
                 <WarningTooltip
                   desiredValue={defaultMacSettings.desired_rx2_frequency}

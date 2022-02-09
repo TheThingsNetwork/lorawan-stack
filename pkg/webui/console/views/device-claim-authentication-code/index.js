@@ -24,7 +24,9 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 import Notification from '@ttn-lw/components/notification'
 import toast from '@ttn-lw/components/toast'
+import Link from '@ttn-lw/components/link'
 
+import Message from '@ttn-lw/lib/components/message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import Yup from '@ttn-lw/lib/yup'
@@ -47,6 +49,8 @@ const m = defineMessages({
   deleteSuccess: 'Claim authentication deleted',
   updateSuccess: 'Claim authentication updated',
   validateCode: 'Claim authentication code must consist only of numbers and letters',
+  claimingInfo:
+    'To set your end device up for <Link>Device Claiming</Link>, you can set a claim authentication code.',
 })
 
 const validationSchema = Yup.object({
@@ -144,9 +148,21 @@ const DeviceClaimAuthenticationCode = props => {
 
   return (
     <Container>
-      <IntlHelmet title={sharedMessages.location} />
+      <IntlHelmet title={sharedMessages.claiming} />
       <Row>
         <Col lg={8} md={12}>
+          <div className="mb-ls-xxs">
+            <Message
+              content={m.claimingInfo}
+              values={{
+                Link: val => (
+                  <Link.DocLink path="/devices/device-claiming" primary>
+                    {val}
+                  </Link.DocLink>
+                ),
+              }}
+            />
+          </div>
           {!entryExists && <Notification content={m.noCodeSet} info small />}
           <Form
             validateOnChange

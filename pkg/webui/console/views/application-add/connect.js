@@ -15,26 +15,34 @@
 import { connect as withConnect } from 'react-redux'
 import { push } from 'connected-react-router'
 
+import withRequest from '@ttn-lw/lib/components/with-request'
+
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
 import pipe from '@ttn-lw/lib/pipe'
 
 import { mayCreateApplications } from '@console/lib/feature-checks'
 
+import { getOrganizationsList } from '@console/store/actions/organizations'
+
 import { selectUserId, selectUserRights } from '@console/store/selectors/user'
+import { selectOrganizationFetching } from '@console/store/selectors/organizations'
 
 const mapStateToProps = state => ({
   userId: selectUserId(state),
   rights: selectUserRights(state),
+  fetching: selectOrganizationFetching(state),
 })
 
 const mapDispatchToProps = dispatch => ({
   navigateToApplication: appId => dispatch(push(`/applications/${appId}`)),
+  getOrganizationsList: () => dispatch(getOrganizationsList()),
 })
 
 const addHocs = pipe(
   withFeatureRequirement(mayCreateApplications, { redirect: '/applications' }),
   withConnect(mapStateToProps, mapDispatchToProps),
+  withRequest(({ getOrganizationsList }) => getOrganizationsList()),
 )
 
 export default ApplicationAdd => addHocs(ApplicationAdd)

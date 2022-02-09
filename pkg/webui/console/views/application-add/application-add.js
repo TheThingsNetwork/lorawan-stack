@@ -106,13 +106,14 @@ const ApplicationAdd = props => {
             initialValues={initialValues}
             validationSchema={validationSchema}
           >
-            <OwnersSelect name="owner_id" required autoFocus />
+            <OwnersSelect name="owner_id" required />
             <Form.Field
               title={sharedMessages.appId}
               name="application_id"
               placeholder={m.appIdPlaceholder}
               required
               component={Input}
+              autoFocus
             />
             <Form.Field
               title={m.applicationName}

@@ -30,7 +30,7 @@
 
   :global(.select__control)
     width: 100%
-    min-height: 2.2rem
+    min-height: $default-input-height
     border-radius: $br.s
   :global(.select__menu)
     z-index: $zi.dropdown
@@ -39,6 +39,9 @@
   :global(.select__value-container)
     padding: 0 8px
     white-space: nowrap
+
+    div:last-child
+      padding:0 !important
 
   &.error
     :global(.select__control)

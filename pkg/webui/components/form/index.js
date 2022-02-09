@@ -17,7 +17,6 @@ import React from 'react'
 import { Formik, yupToFormErrors, useFormikContext, validateYupSchema } from 'formik'
 import bind from 'autobind-decorator'
 import scrollIntoView from 'scroll-into-view-if-needed'
-import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
 
 import Notification from '@ttn-lw/components/notification'
@@ -32,8 +31,6 @@ import FormSubmit from './submit'
 import FormCollapseSection from './section'
 import FormSubTitle from './sub-title'
 import FormFieldContainer from './field/container'
-
-import style from './form.styl'
 
 const m = defineMessages({
   submitFailed: 'Submit failed',
@@ -98,7 +95,7 @@ class InnerForm extends React.PureComponent {
     } = this.props
 
     return (
-      <form className={classnames(style.container, className)} onSubmit={handleSubmit}>
+      <form className={className} onSubmit={handleSubmit}>
         {(formError || formInfo) && (
           <div style={{ outline: 'none' }} ref={this.notificationRef} tabIndex="-1">
             {formError && <ErrorNotification content={formError} title={formErrorTitle} small />}
@@ -107,6 +104,7 @@ class InnerForm extends React.PureComponent {
         )}
         <FormContext.Provider
           value={{
+            formError,
             ...rest,
           }}
         >

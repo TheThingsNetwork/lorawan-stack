@@ -265,6 +265,7 @@ const validationSchema = Yup.object()
             }
 
             return Yup.number()
+              .nullable()
               .min(0, Yup.passValues(sharedMessages.validateNumberGte))
               .max(15, Yup.passValues(sharedMessages.validateNumberLte))
           }),
