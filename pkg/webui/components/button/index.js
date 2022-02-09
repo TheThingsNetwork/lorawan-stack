@@ -94,6 +94,7 @@ const Button = forwardRef((props, ref) => {
     busy,
     onBlur,
     onClick,
+    form,
     ...rest
   } = props
 
@@ -117,7 +118,7 @@ const Button = forwardRef((props, ref) => {
     title = intl.formatMessage(title)
   }
 
-  const htmlProps = { autoFocus, name, type, value, title, onBlur, ...dataProps }
+  const htmlProps = { autoFocus, name, type, value, title, onBlur, form, ...dataProps }
   const buttonClassNames = assembleClassnames(props)
   return (
     <button
