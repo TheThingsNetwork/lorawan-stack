@@ -77,6 +77,7 @@ func (oc *OAuthClient) HandleLogout(w http.ResponseWriter, r *http.Request) {
 		}{
 			OpLogoutURI: u.String(),
 		})
+		return
 	}
 
 	// Otherwise, delete the access token in the OAuth server.
