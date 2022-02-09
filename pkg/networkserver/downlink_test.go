@@ -257,7 +257,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 	if !ok {
 		t.Fatal("Failed to compute ping slot")
 	}
-	now := pingAt.Add(-DefaultEU868RX1Delay.Duration()/2 - 2*NSScheduleWindow())
+	now := pingAt.Add(-AbsoluteTimeSchedulingDelay/2 - 2*NSScheduleWindow())
 	clock := test.NewMockClock(now)
 	defer SetMockClock(clock)()
 
@@ -1988,7 +1988,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								AbsoluteTime: ttnpb.ProtoTimePtr(now.Add(DefaultEU868RX1Delay.Duration())),
+								AbsoluteTime: ttnpb.ProtoTimePtr(now.Add(AbsoluteTimeSchedulingDelay)),
 							},
 						},
 					},
@@ -2036,7 +2036,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Class:           ttnpb.Class_CLASS_C,
 							DownlinkPaths:   paths,
 							Priority:        ttnpb.TxSchedulePriority_HIGH,
-							AbsoluteTime:    ttnpb.ProtoTimePtr(now.Add(DefaultEU868RX1Delay.Duration())),
+							AbsoluteTime:    ttnpb.ProtoTimePtr(now.Add(AbsoluteTimeSchedulingDelay)),
 							Rx2DataRate:     rx2DataRateFromIndex(dev, a, t),
 							Rx2Frequency:    dev.MacState.CurrentParameters.Rx2Frequency,
 							FrequencyPlanId: dev.FrequencyPlanId,

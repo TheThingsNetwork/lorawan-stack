@@ -1871,15 +1871,15 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 							taskUpdateStrategy = nextDownlinkTask
 							return dev, nil, nil
 
-						case time.Until(slot.Time) > dev.MacState.CurrentParameters.Rx1Delay.Duration()+2*nsScheduleWindow():
+						case time.Until(slot.Time) > absoluteTimeSchedulingDelay+2*nsScheduleWindow():
 							logger.WithFields(log.Fields(
 								"slot_start", slot.Time,
 							)).Info("Class B/C downlink scheduling attempt performed too soon, retry attempt")
 							taskUpdateStrategy = nextDownlinkTask
 							return dev, nil, nil
 
-						case !slot.IsApplicationTime && slot.Class == ttnpb.Class_CLASS_B && time.Until(slot.Time) < dev.MacState.CurrentParameters.Rx1Delay.Duration()/2:
-							earliestAt = time.Now().Add(dev.MacState.CurrentParameters.Rx1Delay.Duration() / 2)
+						case !slot.IsApplicationTime && slot.Class == ttnpb.Class_CLASS_B && time.Until(slot.Time) < absoluteTimeSchedulingDelay/2:
+							earliestAt = time.Now().Add(absoluteTimeSchedulingDelay / 2)
 							continue
 						}
 						a := ns.attemptNetworkInitiatedDataDownlink(ctx, dev, phy, fp, slot, maxUpLength)
