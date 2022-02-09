@@ -12,36 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { INITIALIZE, INITIALIZE_SUCCESS, INITIALIZE_FAILURE } from '@account/store/actions/init'
+import { INITIALIZE_SUCCESS } from '@ttn-lw/lib/store/actions/init'
 
 const defaultState = {
   initialized: false,
-  error: undefined,
 }
 
-const init = (state = defaultState, action) => {
+const app = (state = defaultState, action) => {
   switch (action.type) {
-    case INITIALIZE:
-      return {
-        ...state,
-        error: undefined,
-        initialized: false,
-      }
     case INITIALIZE_SUCCESS:
       return {
-        ...state,
-        error: undefined,
         initialized: true,
-      }
-    case INITIALIZE_FAILURE:
-      return {
-        ...state,
-        error: action.error,
-        initialized: false,
       }
     default:
       return state
   }
 }
 
-export default init
+export default app

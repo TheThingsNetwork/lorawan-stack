@@ -15,9 +15,11 @@
 import { combineReducers } from 'redux'
 import { connectRouter } from 'connected-react-router'
 
+import init from '@ttn-lw/lib/store/reducers/init'
 import status from '@ttn-lw/lib/store/reducers/status'
+import fetching from '@ttn-lw/lib/store/reducers/ui/fetching'
+import error from '@ttn-lw/lib/store/reducers/ui/error'
 
-import init from './init'
 import user from './user'
 import is from './identity-server'
 
@@ -26,6 +28,10 @@ export default history =>
     init,
     user,
     is,
+    ui: combineReducers({
+      fetching,
+      error,
+    }),
     status,
     router: connectRouter(history),
   })
