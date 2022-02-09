@@ -40,6 +40,7 @@ class InnerForm extends React.PureComponent {
   static propTypes = {
     children: PropTypes.node.isRequired,
     className: PropTypes.string,
+    id: PropTypes.string,
     formError: PropTypes.error,
     formErrorTitle: PropTypes.message,
     formInfo: PropTypes.message,
@@ -51,6 +52,7 @@ class InnerForm extends React.PureComponent {
 
   static defaultProps = {
     className: undefined,
+    id: undefined,
     formInfo: undefined,
     formInfoTitle: undefined,
     formError: undefined,
@@ -91,11 +93,12 @@ class InnerForm extends React.PureComponent {
       formInfo,
       formInfoTitle,
       handleSubmit,
+      id,
       ...rest
     } = this.props
 
     return (
-      <form className={className} onSubmit={handleSubmit}>
+      <form className={className} onSubmit={handleSubmit} id={id}>
         {(formError || formInfo) && (
           <div style={{ outline: 'none' }} ref={this.notificationRef} tabIndex="-1">
             {formError && <ErrorNotification content={formError} title={formErrorTitle} small />}
@@ -118,7 +121,7 @@ class InnerForm extends React.PureComponent {
 const formRenderer =
   ({ children, ...rest }) =>
   renderProps => {
-    const { className, error, errorTitle, info, infoTitle, disabled } = rest
+    const { className, error, errorTitle, info, infoTitle, disabled, id } = rest
     const { handleSubmit, ...restFormikProps } = renderProps
 
     return (
@@ -130,6 +133,7 @@ const formRenderer =
         formInfoTitle={infoTitle}
         handleSubmit={handleSubmit}
         disabled={disabled}
+        id={id}
         {...restFormikProps}
       >
         {children}
