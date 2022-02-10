@@ -32,6 +32,7 @@ import Button from '@ttn-lw/components/button'
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import FORMATTER_NAMES from '@ttn-lw//lib/payload-formatter-messages'
 
 import { address as addressRegexp } from '@console/lib/regexp'
 
@@ -70,6 +71,7 @@ const formatterOptionsWithReset = [
   { label: 'CayenneLPP', value: TYPES.CAYENNELPP },
   { label: m.repository, value: TYPES.REPOSITORY },
 ]
+
 const formatterOptions = formatterOptionsWithReset.slice(1, formatterOptionsWithReset.length)
 
 const validationSchema = Yup.object().shape({
@@ -205,21 +207,18 @@ class PayloadFormattersForm extends React.Component {
   }
 
   @bind
-  pastePayloadFormatter(app) {
-    const { defaultParameter, uplink, repoFormatters } = this.props
-    const applicationFormatter = defaultParameter
-      ? defaultParameter
-      : getDefaultJavascriptFormatter(uplink)
-    if (app && this.formRef !== null) {
-      return () =>
-        this.formRef?.current?.setFieldValue(FIELD_NAMES.JAVASCRIPT, applicationFormatter)
-    }
+  pasteAppPayloadFormatter() {
+    const { defaultParameter, uplink } = this.props
+    this.formRef?.current?.setFieldValue(
+      FIELD_NAMES.JAVASCRIPT,
+      defaultParameter || getDefaultJavascriptFormatter(uplink),
+    )
+  }
 
-    return () =>
-      this.formRef?.current?.setFieldValue(
-        FIELD_NAMES.JAVASCRIPT,
-        repoFormatters.formatter_parameter,
-      )
+  @bind
+  pasteRepoPayloadFormatters() {
+    const { repoFormatters } = this.props
+    this.formRef?.current?.setFieldValue(FIELD_NAMES.JAVASCRIPT, repoFormatters.formatter_parameter)
   }
 
   get formatter() {
@@ -231,13 +230,9 @@ class PayloadFormattersForm extends React.Component {
     const showRepositoryParameter =
       (type === TYPES.REPOSITORY && Boolean(repoFormatters)) ||
       (type === TYPES.DEFAULT && defaultType === 'FORMATTER_REPOSITORY')
-    const isReadOnly =
-      (type === TYPES.DEFAULT && defaultType === 'FORMATTER_JAVASCRIPT') ||
-      type === TYPES.REPOSITORY ||
-      (type === TYPES.DEFAULT && defaultType === 'FORMATTER_REPOSITORY')
-    const showButton = type === TYPES.JAVASCRIPT && defaultType === 'FORMATTER_NONE'
-    const pasteApplicationFormatter = this.pastePayloadFormatter(true)
-    const pasteRepositoryFormatter = this.pastePayloadFormatter(false)
+    const isReadOnly = type !== TYPES.JAVASCRIPT
+    const showPasteRepoButton =
+      repoFormatters !== undefined && Object.keys(repoFormatters).length !== 0
 
     if (showParameter) {
       return (
@@ -252,20 +247,22 @@ class PayloadFormattersForm extends React.Component {
             minLines={15}
             maxLines={15}
           />
-          {showButton && (
+          {type === TYPES.JAVASCRIPT && (
             <>
-              <Button
-                type="button"
-                message={m.pasteApplicationFormatter}
-                secondary
-                onClick={pasteApplicationFormatter}
-              />
-              {Boolean(repoFormatters) && (
+              {defaultType !== 'FORMATTER_NONE' && (
+                <Button
+                  type="button"
+                  message={m.pasteApplicationFormatter}
+                  secondary
+                  onClick={this.pasteAppPayloadFormatter}
+                />
+              )}
+              {showPasteRepoButton && (
                 <Button
                   type="button"
                   message={m.pasteRepositoryFormatter}
                   secondary
-                  onClick={pasteRepositoryFormatter}
+                  onClick={this.pasteRepoPayloadFormatter}
                 />
               )}
             </>
@@ -336,7 +333,7 @@ class PayloadFormattersForm extends React.Component {
         initialType === TYPES.GRPC ? initialParameter : getDefaultGrpcServiceFormatter(uplink),
     }
     const options = allowReset ? formatterOptionsWithReset : formatterOptions
-    const defaultFormatter = defaultType.replace('FORMATTER_', '').toLowerCase()
+    const defaultFormatter = FORMATTER_NAMES[defaultType].defaultMessage
 
     return (
       <Row>
@@ -368,7 +365,6 @@ class PayloadFormattersForm extends React.Component {
                 small
                 info
                 content={m.defaultFormatter}
-                convertBackticks
                 messageValues={{
                   Link: msg => (
                     <Link

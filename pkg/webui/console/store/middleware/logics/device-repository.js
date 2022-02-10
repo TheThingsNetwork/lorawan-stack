@@ -92,32 +92,28 @@ const getRepositoryPayloadFormattersLogic = createRequestLogic({
       payload: { appId, version },
     } = action
 
-    let repositoryPayloadFormatters
-    try {
-      const uplinkDecoder = await tts.Applications.Devices.Repository.getUplinkDecoder(
-        appId,
-        version,
-      )
-      const downlinkDecoder = await tts.Applications.Devices.Repository.getDownlinkDecoder(
-        appId,
-        version,
-      )
-      const downlinkEncoder = await tts.Applications.Devices.Repository.getDownlinkEncoder(
-        appId,
-        version,
-      )
-      repositoryPayloadFormatters = {
-        ...uplinkDecoder,
-        ...downlinkDecoder,
-        ...downlinkEncoder,
-      }
-      return repositoryPayloadFormatters
-    } catch (error) {
-      if (isNotFoundError(error) && typeof repositoryPayloadFormatters !== 'undefined') {
-        return repositoryPayloadFormatters
+    const ignoreNotFound = async (action, ...params) => {
+      try {
+        return await action(...params)
+      } catch (e) {
+        if (!isNotFoundError(e)) {
+          throw e
+        }
       }
 
-      throw error
+      return undefined
+    }
+
+    const repositoryPayloadFormatters = Promise.all([
+      ignoreNotFound(tts.Applications.Devices.Repository.getUplinkDecoder, { appId, version }),
+      ignoreNotFound(tts.Applications.Devices.Repository.getDownlinkDecoder, { appId, version }),
+      ignoreNotFound(tts.Applications.Devices.Repository.getDownlinkEncoder, { appId, version }),
+    ])
+
+    return {
+      ...repositoryPayloadFormatters[0],
+      ...repositoryPayloadFormatters[1],
+      ...repositoryPayloadFormatters[2],
     }
   },
 })
