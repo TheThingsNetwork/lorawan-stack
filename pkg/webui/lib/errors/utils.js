@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import * as Sentry from '@sentry/browser'
-import { isPlainObject } from 'lodash'
+import { isPlainObject, isObject } from 'lodash'
 
 import { error as errorLog, warn } from '@ttn-lw/lib/log'
 import interpolate from '@ttn-lw/lib/interpolate'
@@ -119,6 +119,8 @@ export const httpStatusCode = error => {
     statusCode = error.statusCode
   } else if (Boolean(error.response) && Boolean(error.response.status)) {
     statusCode = error.response.status
+  } else if (isObject(error) && error.cause) {
+    return httpStatusCode(error.cause)
   }
 
   return Boolean(statusCode) ? parseInt(statusCode) : undefined

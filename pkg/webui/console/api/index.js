@@ -20,23 +20,12 @@ import tokenCreator from '@ttn-lw/lib/access-token'
 const appRoot = selectApplicationRootPath()
 
 const csrf = selectCSRFToken()
-const instance = axios.create()
 
-instance.interceptors.response.use(
-  response => response,
-  error => {
-    if ('response' in error && error.response && 'data' in error.response) {
-      throw error.response.data
-    }
-    throw error
-  },
-)
-
-const token = tokenCreator(() => instance.get(`${appRoot}/api/auth/token`))
+const token = tokenCreator(() => axios.get(`${appRoot}/api/auth/token`))
 
 export default {
   console: {
-    token: () => instance.get(`${appRoot}/api/auth/token`),
+    token: () => axios.get(`${appRoot}/api/auth/token`),
     logout: async () => {
       const headers = token => ({
         headers: { 'X-CSRF-Token': token },
