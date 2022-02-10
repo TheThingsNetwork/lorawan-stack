@@ -190,7 +190,7 @@ func matchApplicationDownlinks(session *ttnpb.Session, macState *ttnpb.MACState,
 		case multicast && len(down.GetClassBC().GetGateways()) == 0:
 			return unmatched, errNoPath.New()
 
-		case down.GetClassBC().GetAbsoluteTime() != nil && ttnpb.StdTime(down.GetClassBC().GetAbsoluteTime()).Before(time.Now().Add(macState.CurrentParameters.Rx1Delay.Duration()/2)):
+		case down.GetClassBC().GetAbsoluteTime() != nil && ttnpb.StdTime(down.GetClassBC().GetAbsoluteTime()).Before(time.Now().Add(absoluteTimeSchedulingDelay/2)):
 			return unmatched, errExpiredDownlink.New()
 		}
 		minFCnt = down.FCnt + 1
