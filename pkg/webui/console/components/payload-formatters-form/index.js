@@ -218,21 +218,24 @@ class PayloadFormattersForm extends React.Component {
   @bind
   pasteRepoPayloadFormatters() {
     const { repoFormatters } = this.props
-    this.formRef?.current?.setFieldValue(FIELD_NAMES.JAVASCRIPT, repoFormatters.formatter_parameter)
+    this.formRef?.current?.setFieldValue(
+      FIELD_NAMES.JAVASCRIPT,
+      repoFormatters?.formatter_parameter,
+    )
   }
 
   get formatter() {
     const { defaultType, repoFormatters } = this.props
     const { type } = this.state
+    const hasRepoFormatter =
+      repoFormatters !== undefined && Object.keys(repoFormatters).length !== 0
     const showParameter =
       type === TYPES.JAVASCRIPT ||
       (type === TYPES.DEFAULT && defaultType === 'FORMATTER_JAVASCRIPT')
     const showRepositoryParameter =
-      (type === TYPES.REPOSITORY && Boolean(repoFormatters)) ||
+      (type === TYPES.REPOSITORY && hasRepoFormatter) ||
       (type === TYPES.DEFAULT && defaultType === 'FORMATTER_REPOSITORY')
     const isReadOnly = type !== TYPES.JAVASCRIPT
-    const showPasteRepoButton =
-      repoFormatters !== undefined && Object.keys(repoFormatters).length !== 0
 
     if (showParameter) {
       return (
@@ -257,12 +260,12 @@ class PayloadFormattersForm extends React.Component {
                   onClick={this.pasteAppPayloadFormatter}
                 />
               )}
-              {showPasteRepoButton && (
+              {hasRepoFormatter && (
                 <Button
                   type="button"
                   message={m.pasteRepositoryFormatter}
                   secondary
-                  onClick={this.pasteRepoPayloadFormatter}
+                  onClick={this.pasteRepoPayloadFormatters}
                 />
               )}
             </>
@@ -285,7 +288,7 @@ class PayloadFormattersForm extends React.Component {
     } else if (showRepositoryParameter) {
       return (
         <Form.Field
-          readOnly={isReadOnly}
+          readOnly
           component={CodeEditor}
           title={m.formatterParameter}
           name={FIELD_NAMES.REPOSITORY}

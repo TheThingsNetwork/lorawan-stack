@@ -172,13 +172,7 @@ class DevicesTable extends React.Component {
       getDevicesList(
         props.appId,
         filters,
-        [
-          'name',
-          'application_server_address',
-          'network_server_address',
-          'join_server_address',
-          'version_ids',
-        ],
+        ['name', 'application_server_address', 'network_server_address', 'join_server_address'],
         { withLastSeen: true, withStatus: true },
       )
   }

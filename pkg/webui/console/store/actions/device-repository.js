@@ -68,4 +68,4 @@ export const [
     success: getRepositoryPayloadFormattersSuccess,
     failure: getRepositoryPayloadFormattersFailure,
   },
-] = createRequestActions(GET_REPO_PF_BASE, (appId, version) => ({ appId, version }))
+] = createRequestActions(GET_REPO_PF_BASE, (appId, version_ids) => ({ appId, version_ids }))

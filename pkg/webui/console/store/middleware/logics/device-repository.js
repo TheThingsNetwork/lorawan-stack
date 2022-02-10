@@ -19,6 +19,18 @@ import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as repository from '@console/store/actions/device-repository'
 
+const ignoreNotFound = async (action, appId, version_ids) => {
+  try {
+    return await action(appId, version_ids)
+  } catch (e) {
+    if (!isNotFoundError(e)) {
+      throw e
+    }
+  }
+
+  return undefined
+}
+
 const listDeviceBrandsLogic = createRequestLogic({
   type: repository.LIST_BRANDS,
   process: async ({ action }) => {
@@ -89,25 +101,13 @@ const getRepositoryPayloadFormattersLogic = createRequestLogic({
   type: repository.GET_REPO_PF,
   process: async ({ action }) => {
     const {
-      payload: { appId, version },
+      payload: { appId, version_ids },
     } = action
 
-    const ignoreNotFound = async (action, ...params) => {
-      try {
-        return await action(...params)
-      } catch (e) {
-        if (!isNotFoundError(e)) {
-          throw e
-        }
-      }
-
-      return undefined
-    }
-
-    const repositoryPayloadFormatters = Promise.all([
-      ignoreNotFound(tts.Applications.Devices.Repository.getUplinkDecoder, { appId, version }),
-      ignoreNotFound(tts.Applications.Devices.Repository.getDownlinkDecoder, { appId, version }),
-      ignoreNotFound(tts.Applications.Devices.Repository.getDownlinkEncoder, { appId, version }),
+    const repositoryPayloadFormatters = await Promise.all([
+      ignoreNotFound(tts.Applications.Devices.Repository.getUplinkDecoder, appId, version_ids),
+      ignoreNotFound(tts.Applications.Devices.Repository.getDownlinkDecoder, appId, version_ids),
+      ignoreNotFound(tts.Applications.Devices.Repository.getDownlinkEncoder, appId, version_ids),
     ])
 
     return {
