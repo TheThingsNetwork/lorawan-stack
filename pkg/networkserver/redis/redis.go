@@ -17,10 +17,10 @@ package redis
 
 import (
 	"encoding/base64"
+	"hash/fnv"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
-	"golang.org/x/crypto/sha3"
 )
 
 type keyer interface {
@@ -38,7 +38,7 @@ func uidLastInvalidationKey(r keyer, uid string) string {
 var keyEncoding = base64.RawStdEncoding
 
 func uplinkPayloadHash(b []byte) string {
-	h := sha3.New224()
+	h := fnv.New64a()
 	_, _ = h.Write(b)
 	return keyEncoding.EncodeToString(h.Sum(nil))
 }
