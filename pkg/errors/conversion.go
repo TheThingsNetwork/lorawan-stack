@@ -34,7 +34,9 @@ var (
 	errRequest = Define("request", "request to `{url}` failed", "op")
 	errURL     = DefineInvalidArgument("url", "invalid url `{url}`", "op")
 
-	errX509UnknownAuthority = DefineUnavailable("x509_unknown_authority", "unknown certificate authority")
+	errX509UnknownAuthority   = DefineUnavailable("x509_unknown_authority", "unknown certificate authority")
+	errX509Hostname           = DefineUnavailable("x509_hostname", "certificate authorized names do not match the requested name", "host")
+	errX509CertificateInvalid = DefineUnavailable("x509_certificate_invalid", "certificate invalid", "detail", "reason")
 
 	errContextCancelled        = DefineCanceled("context_canceled", "context canceled")
 	errContextDeadlineExceeded = DefineDeadlineExceeded("context_deadline_exceeded", "context deadline exceeded")
@@ -115,7 +117,7 @@ func From(err error) (out *Error, ok bool) {
 			e = e.WithAttributes("source", err.Source.String())
 		}
 		if err.Err != nil {
-			e = e.WithAttributes("message", err.Error())
+			e = e.WithCause(err.Err)
 		}
 		return e, true
 	case *url.Error:
@@ -131,8 +133,17 @@ func From(err error) (out *Error, ok bool) {
 			e = e.WithCause(err.Err)
 		}
 		return e, true
-	case x509.UnknownAuthorityError, *x509.UnknownAuthorityError:
+	case x509.CertificateInvalidError:
+		return build(errX509CertificateInvalid, 0).WithAttributes(
+			"detail", err.Detail,
+			"reason", err.Reason,
+		), true
+	case x509.UnknownAuthorityError:
 		return build(errX509UnknownAuthority, 0), true
+	case x509.HostnameError:
+		return build(errX509Hostname, 0).WithAttributes(
+			"host", err.Host,
+		), true
 	}
 	return nil, false
 }

@@ -212,7 +212,6 @@ func TestNetErrors(t *testing.T) {
 				a.So(e.FullName(), should.Equal, "pkg/errors:net_operation")
 				a.So(errors.IsUnavailable(e), should.BeTrue)
 				a.So(e.PublicAttributes(), should.Resemble, map[string]interface{}{
-					"message":   err.Error(),
 					"temporary": false,
 					"timeout":   false,
 					"address":   "1.1.1.1",
@@ -220,6 +219,7 @@ func TestNetErrors(t *testing.T) {
 					"net":       "0.0.0.0",
 					"op":        "read",
 				})
+				a.So(e.Cause(), should.Resemble, fmt.Errorf("dummy"))
 			},
 		},
 	} {
