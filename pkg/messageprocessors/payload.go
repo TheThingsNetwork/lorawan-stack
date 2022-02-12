@@ -28,6 +28,16 @@ type PayloadEncodeDecoder interface {
 	DecodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, parameter string) error
 }
 
+// CompilablePayloadEncoderDecoder extends PayloadEncodeDecoder with the ability
+// to compile the parameters ahead of time.
+type CompilablePayloadEncoderDecoder interface {
+	PayloadEncodeDecoder
+
+	CompileDownlinkEncoder(ctx context.Context, parameter string) (func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDeviceVersionIdentifiers, *ttnpb.ApplicationDownlink) error, error)
+	CompileUplinkDecoder(ctx context.Context, parameter string) (func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDeviceVersionIdentifiers, *ttnpb.ApplicationUplink) error, error)
+	CompileDownlinkDecoder(ctx context.Context, parameter string) (func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDeviceVersionIdentifiers, *ttnpb.ApplicationDownlink) error, error)
+}
+
 // PayloadProcessor provides an interface to processing payloads of multiple formats.
 type PayloadProcessor interface {
 	EncodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink, formatter ttnpb.PayloadFormatter, parameter string) error
