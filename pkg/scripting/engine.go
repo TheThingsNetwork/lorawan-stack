@@ -22,3 +22,10 @@ import (
 type Engine interface {
 	Run(ctx context.Context, script, fn string, params ...interface{}) (func(target interface{}) error, error)
 }
+
+// AheadOfTimeEngine extends Engine with the capability of compiling the script ahead of time.
+type AheadOfTimeEngine interface {
+	Engine
+
+	Compile(ctx context.Context, script string) (run func(context.Context, string, ...interface{}) (func(interface{}) error, error), err error)
+}
