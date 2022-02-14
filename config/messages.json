@@ -3941,6 +3941,24 @@
       "file": "validation.go"
     }
   },
+  "error:pkg/errors:x509_certificate_invalid": {
+    "translations": {
+      "en": "certificate invalid"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "conversion.go"
+    }
+  },
+  "error:pkg/errors:x509_hostname": {
+    "translations": {
+      "en": "certificate authorized names do not match the requested name"
+    },
+    "description": {
+      "package": "pkg/errors",
+      "file": "conversion.go"
+    }
+  },
   "error:pkg/errors:x509_unknown_authority": {
     "translations": {
       "en": "unknown certificate authority"
