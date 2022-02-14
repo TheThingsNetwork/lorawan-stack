@@ -41,7 +41,7 @@ const (
 	// cacheErrorTTL is the TTL for cached payload formatters, when there was an error retrieving them.
 	cacheErrorTTL = 5 * time.Minute
 	// cacheSize is the cache size.
-	cacheSize = 500
+	cacheSize = 4096
 )
 
 type PayloadFormatter interface {
