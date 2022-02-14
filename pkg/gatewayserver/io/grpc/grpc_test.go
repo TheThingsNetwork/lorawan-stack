@@ -31,6 +31,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/grpc"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
+	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -54,8 +55,10 @@ func TestAuthentication(t *testing.T) {
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	is, isAddr := mock.NewIS(ctx)
-	is.Add(ctx, registeredGatewayID, registeredGatewayKey)
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
+	testGtw := mockis.DefaultGateway(registeredGatewayID, false, false)
+	is.GatewayRegistry().Add(ctx, registeredGatewayID, registeredGatewayKey, testGtw, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -72,7 +75,7 @@ func TestAuthentication(t *testing.T) {
 			},
 		},
 	})
-	gs := mock.NewServer(c)
+	gs := mock.NewServer(c, is)
 	srv := New(gs)
 	c.RegisterGRPC(&mockRegisterer{ctx, srv})
 	componenttest.StartComponent(t, c)
@@ -155,8 +158,10 @@ func TestTraffic(t *testing.T) {
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	is, isAddr := mock.NewIS(ctx)
-	is.Add(ctx, registeredGatewayID, registeredGatewayKey)
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
+	testGtw := mockis.DefaultGateway(registeredGatewayID, false, false)
+	is.GatewayRegistry().Add(ctx, registeredGatewayID, registeredGatewayKey, testGtw, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -173,7 +178,7 @@ func TestTraffic(t *testing.T) {
 			},
 		},
 	})
-	gs := mock.NewServer(c)
+	gs := mock.NewServer(c, is)
 	srv := New(gs)
 	c.RegisterGRPC(&mockRegisterer{ctx, srv})
 	componenttest.StartComponent(t, c)
@@ -593,8 +598,10 @@ func TestConcentratorConfig(t *testing.T) {
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	is, isAddr := mock.NewIS(ctx)
-	is.Add(ctx, registeredGatewayID, registeredGatewayKey)
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
+	testGtw := mockis.DefaultGateway(registeredGatewayID, false, false)
+	is.GatewayRegistry().Add(ctx, registeredGatewayID, registeredGatewayKey, testGtw, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -611,7 +618,7 @@ func TestConcentratorConfig(t *testing.T) {
 			},
 		},
 	})
-	gs := mock.NewServer(c)
+	gs := mock.NewServer(c, is)
 	srv := New(gs)
 	c.RegisterGRPC(&mockRegisterer{ctx, srv})
 	componenttest.StartComponent(t, c)
@@ -649,8 +656,10 @@ func TestMQTTConfig(t *testing.T) {
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	is, isAddr := mock.NewIS(ctx)
-	is.Add(ctx, registeredGatewayID, registeredGatewayKey)
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
+	testGtw := mockis.DefaultGateway(registeredGatewayID, false, false)
+	is.GatewayRegistry().Add(ctx, registeredGatewayID, registeredGatewayKey, testGtw, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -667,7 +676,7 @@ func TestMQTTConfig(t *testing.T) {
 			},
 		},
 	})
-	gs := mock.NewServer(c)
+	gs := mock.NewServer(c, is)
 	srv := New(gs,
 		WithMQTTConfigProvider(&mockMQTTConfigProvider{
 			MQTT: config.MQTT{

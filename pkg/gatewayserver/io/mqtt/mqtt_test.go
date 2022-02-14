@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
 	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mqtt"
+	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -54,8 +55,10 @@ func TestAuthentication(t *testing.T) {
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	is, isAddr := mock.NewIS(ctx)
-	is.Add(ctx, registeredGatewayID, registeredGatewayKey)
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
+	testGtw := mockis.DefaultGateway(registeredGatewayID, false, false)
+	is.GatewayRegistry().Add(ctx, registeredGatewayID, registeredGatewayKey, testGtw, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -76,7 +79,7 @@ func TestAuthentication(t *testing.T) {
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
-	gs := mock.NewServer(c)
+	gs := mock.NewServer(c, is)
 	lis, err := net.Listen("tcp", ":0")
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
@@ -135,8 +138,10 @@ func TestTraffic(t *testing.T) {
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	is, isAddr := mock.NewIS(ctx)
-	is.Add(ctx, registeredGatewayID, registeredGatewayKey)
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
+	testGtw := mockis.DefaultGateway(registeredGatewayID, false, false)
+	is.GatewayRegistry().Add(ctx, registeredGatewayID, registeredGatewayKey, testGtw, testRights...)
 
 	c := componenttest.NewComponent(t, &component.Config{
 		ServiceBase: config.ServiceBase{
@@ -157,7 +162,7 @@ func TestTraffic(t *testing.T) {
 	defer c.Close()
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
-	gs := mock.NewServer(c)
+	gs := mock.NewServer(c, is)
 	lis, err := net.Listen("tcp", ":0")
 	if !a.So(err, should.BeNil) {
 		t.FailNow()

@@ -37,6 +37,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
+var testRights = []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO, ttnpb.Right_RIGHT_GATEWAY_LINK}
+
 func generatePushData(eui types.EUI64, status bool, timestamps ...time.Duration) encoding.Packet {
 	packet := encoding.Packet{
 		GatewayEUI:      &eui,

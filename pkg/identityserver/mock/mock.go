@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package mockis provides a mock structure to the Identity Server.
 package mockis
 
 import (
@@ -26,6 +27,9 @@ import (
 var errNotFound = errors.DefineNotFound("not_found", "not found")
 
 type authKeyToRights map[string][]ttnpb.Right
+
+// MockDefinition contains the structure that is returned by the New(ctx) method of the package, might be used to
+// specify IS mock in test cases definitons.
 type MockDefinition struct {
 	applicationRegistry *mockISApplicationRegistry
 	gatewayRegistry     *mockISGatewayRegistry
@@ -34,6 +38,7 @@ type MockDefinition struct {
 
 type closeMock func()
 
+// New returns a identityserver mock along side its address and closing function.
 func New(ctx context.Context) (*MockDefinition, string, closeMock) {
 	is := &MockDefinition{
 		applicationRegistry: &mockISApplicationRegistry{
@@ -71,14 +76,17 @@ func New(ctx context.Context) (*MockDefinition, string, closeMock) {
 	}
 }
 
+// EndDeviceRegistry returns the methods related to the device registry.
 func (m *MockDefinition) EndDeviceRegistry() *mockISEndDeviceRegistry {
 	return m.endDeviceRegistry
 }
 
+// ApplicationRegistry returns the methods related to the application registry.
 func (m *MockDefinition) ApplicationRegistry() *mockISApplicationRegistry {
 	return m.applicationRegistry
 }
 
+// GatewayRegistry returns the methods related to the gateway registry.
 func (m *MockDefinition) GatewayRegistry() *mockISGatewayRegistry {
 	return m.gatewayRegistry
 }

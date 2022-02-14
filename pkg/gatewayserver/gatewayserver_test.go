@@ -144,10 +144,12 @@ func TestGatewayServer(t *testing.T) {
 				mustHavePeer(ctx, c, ttnpb.ClusterRole_NETWORK_SERVER)
 				mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
-				is.GatewayRegistry().Add(ctx, ttnpb.GatewayIdentifiers{
+				ids := ttnpb.GatewayIdentifiers{
 					GatewayId: registeredGatewayID,
 					Eui:       &registeredGatewayEUI,
-				}, registeredGatewayKey, true, true, testRights...)
+				}
+				gtw := mockis.DefaultGateway(ids, true, true)
+				is.GatewayRegistry().Add(ctx, ids, registeredGatewayKey, gtw, testRights...)
 			},
 			SkipProtocols: func(string) bool {
 				return false
@@ -920,7 +922,9 @@ func TestGatewayServer(t *testing.T) {
 							for _, locationPublic := range []bool{false, true} {
 								t.Run(fmt.Sprintf("LocationPublic=%v", locationPublic), func(t *testing.T) {
 									a := assertions.New(t)
-									is.GatewayRegistry().Add(ctx, ids, registeredGatewayKey, locationPublic, false, testRights...)
+									mockGtw := mockis.DefaultGateway(ids, false, false)
+									mockGtw.LocationPublic = locationPublic
+									is.GatewayRegistry().Add(ctx, ids, registeredGatewayKey, mockGtw, testRights...)
 
 									gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{
 										GatewayIds: &ids,
@@ -1864,7 +1868,8 @@ func TestUpdateVersionInfo(t *testing.T) {
 		Eui:       &registeredGatewayEUI,
 	}
 
-	is.GatewayRegistry().Add(ctx, gtwIDs, registeredGatewayKey, true, true, testRights...)
+	mockGtw := mockis.DefaultGateway(gtwIDs, true, true)
+	is.GatewayRegistry().Add(ctx, gtwIDs, registeredGatewayKey, mockGtw, testRights...)
 	time.Sleep(timeout) // Wait for setup to be completed.
 
 	linkFn := func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, statCh <-chan *ttnpbv2.StatusMessage) error {

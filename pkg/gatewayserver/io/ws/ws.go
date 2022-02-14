@@ -134,7 +134,6 @@ func (s *srv) handleConnectionInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	logger.Debug("Sent connection info response message")
-	return
 }
 
 var euiHexPattern = regexp.MustCompile("^eui-([a-f0-9A-F]{16})$")
