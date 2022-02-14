@@ -21,23 +21,44 @@ import (
 
 const subsystem = "javascript"
 
-var runs = metrics.NewCounterVec(
-	prometheus.CounterOpts{
-		Subsystem: subsystem,
-		Name:      "runs_total",
-		Help:      "JavaScript runs",
-	},
-	[]string{"result"},
-)
-
-var runLatency = metrics.NewHistogram(
-	prometheus.HistogramOpts{
-		Subsystem: subsystem,
-		Name:      "run_latency_seconds",
-		Help:      "Histogram of latency (seconds) of JavaScript runs",
-	},
+var (
+	compilations = metrics.NewCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "compilations_total",
+			Help:      "JavaScript compilations",
+		},
+		[]string{"result"},
+	)
+	compilationsLatency = metrics.NewHistogram(
+		prometheus.HistogramOpts{
+			Subsystem: subsystem,
+			Name:      "compilations_latency_seconds",
+			Help:      "Histogram of latency (seconds) of JavaScript compilations",
+		},
+	)
+	runs = metrics.NewCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "runs_total",
+			Help:      "JavaScript runs",
+		},
+		[]string{"result"},
+	)
+	runLatency = metrics.NewHistogram(
+		prometheus.HistogramOpts{
+			Subsystem: subsystem,
+			Name:      "run_latency_seconds",
+			Help:      "Histogram of latency (seconds) of JavaScript runs",
+		},
+	)
 )
 
 func init() {
-	metrics.MustRegister(runs, runLatency)
+	metrics.MustRegister(
+		compilations,
+		compilationsLatency,
+		runs,
+		runLatency,
+	)
 }

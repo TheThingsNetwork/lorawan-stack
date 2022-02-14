@@ -30,11 +30,11 @@ import (
 )
 
 type host struct {
-	engine scripting.Engine
+	engine scripting.AheadOfTimeEngine
 }
 
 // New creates and returns a new Javascript payload encoder and decoder.
-func New() messageprocessors.PayloadEncodeDecoder {
+func New() messageprocessors.CompilablePayloadEncoderDecoder {
 	return &host{
 		engine: js.New(scripting.DefaultOptions),
 	}
@@ -58,8 +58,46 @@ var (
 	errOutputErrors = errors.DefineAborted("output_errors", "{errors}")
 )
 
+func wrapDownlinkEncoderScript(script string) string {
+	// Fallback to legacy Encoder() function for backwards compatibility with The Things Network Stack V2 payload functions.
+	return fmt.Sprintf(`
+		%s
+
+		function main(input) {
+			if (typeof encodeDownlink === 'function') {
+				return encodeDownlink(input);
+			}
+			return {
+				bytes: Encoder(input.data, input.fPort),
+				fPort: input.fPort
+			}
+		}
+	`, script)
+}
+
+// CompileDownlinkEncoder generates a downlink encoder from the provided script.
+func (h *host) CompileDownlinkEncoder(ctx context.Context, script string) (func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDeviceVersionIdentifiers, *ttnpb.ApplicationDownlink) error, error) {
+	defer trace.StartRegion(ctx, "compile downlink encoder").End()
+
+	run, err := h.engine.Compile(ctx, wrapDownlinkEncoderScript(script))
+	if err != nil {
+		return nil, err
+	}
+
+	return func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink) error {
+		return h.encodeDownlink(ctx, ids, version, msg, run)
+	}, nil
+}
+
 // EncodeDownlink encodes the message's DecodedPayload to FRMPayload using the given script.
 func (h *host) EncodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
+	run := func(ctx context.Context, fn string, params ...interface{}) (func(interface{}) error, error) {
+		return h.engine.Run(ctx, wrapDownlinkEncoderScript(script), fn, params...)
+	}
+	return h.encodeDownlink(ctx, ids, version, msg, run)
+}
+
+func (h *host) encodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, run func(context.Context, string, ...interface{}) (func(interface{}) error, error)) error {
 	defer trace.StartRegion(ctx, "encode downlink message").End()
 
 	decoded := msg.DecodedPayload
@@ -76,21 +114,7 @@ func (h *host) EncodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifie
 		FPort: &fPort,
 	}
 
-	// Fallback to legacy Encoder() function for backwards compatibility with The Things Network Stack V2 payload functions.
-	script = fmt.Sprintf(`
-		%s
-
-		function main(input) {
-			if (typeof encodeDownlink === 'function') {
-				return encodeDownlink(input);
-			}
-			return {
-				bytes: Encoder(input.data, input.fPort),
-				fPort: input.fPort
-			}
-		}
-	`, script)
-	valueAs, err := h.engine.Run(ctx, script, "main", input)
+	valueAs, err := run(ctx, "main", input)
 	if err != nil {
 		return err
 	}
@@ -126,17 +150,9 @@ type decodeUplinkOutput struct {
 	Errors   []string               `json:"errors"`
 }
 
-// DecodeUplink decodes the message's FRMPayload to DecodedPayload using the given script.
-func (h *host) DecodeUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, script string) error {
-	defer trace.StartRegion(ctx, "decode uplink message").End()
-
-	input := decodeUplinkInput{
-		Bytes: msg.FrmPayload,
-		FPort: uint8(msg.FPort),
-	}
-
+func wrapUplinkDecoderScript(script string) string {
 	// Fallback to legacy Decoder() function for backwards compatibility with The Things Network Stack V2 payload functions.
-	script = fmt.Sprintf(`
+	return fmt.Sprintf(`
 		%s
 
 		function main(input) {
@@ -152,7 +168,39 @@ func (h *host) DecodeUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers
 			}
 		}
 	`, script)
-	valueAs, err := h.engine.Run(ctx, script, "main", input)
+}
+
+// CompileUplinkDecoder generates an uplink decoder from the provided script.
+func (h *host) CompileUplinkDecoder(ctx context.Context, script string) (func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDeviceVersionIdentifiers, *ttnpb.ApplicationUplink) error, error) {
+	defer trace.StartRegion(ctx, "compile uplink decoder").End()
+
+	run, err := h.engine.Compile(ctx, wrapUplinkDecoderScript(script))
+	if err != nil {
+		return nil, err
+	}
+
+	return func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink) error {
+		return h.decodeUplink(ctx, ids, version, msg, run)
+	}, nil
+}
+
+// DecodeUplink decodes the message's FRMPayload to DecodedPayload using the given script.
+func (h *host) DecodeUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, script string) error {
+	run := func(ctx context.Context, fn string, params ...interface{}) (func(interface{}) error, error) {
+		return h.engine.Run(ctx, wrapUplinkDecoderScript(script), fn, params...)
+	}
+	return h.decodeUplink(ctx, ids, version, msg, run)
+}
+
+func (h *host) decodeUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationUplink, run func(context.Context, string, ...interface{}) (func(interface{}) error, error)) error {
+	defer trace.StartRegion(ctx, "decode uplink message").End()
+
+	input := decodeUplinkInput{
+		Bytes: msg.FrmPayload,
+		FPort: uint8(msg.FPort),
+	}
+
+	valueAs, err := run(ctx, "main", input)
 	if err != nil {
 		return err
 	}
@@ -186,16 +234,8 @@ type decodeDownlinkOutput struct {
 	Errors   []string               `json:"errors"`
 }
 
-// DecodeUplink decodes the message's FRMPayload to DecodedPayload using the given script.
-func (h *host) DecodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
-	defer trace.StartRegion(ctx, "decode downlink message").End()
-
-	input := decodeDownlinkInput{
-		Bytes: msg.FrmPayload,
-		FPort: uint8(msg.FPort),
-	}
-
-	script = fmt.Sprintf(`
+func wrapDownlinkDecoderScript(script string) string {
+	return fmt.Sprintf(`
 		%s
 
 		function main(input) {
@@ -206,7 +246,39 @@ func (h *host) DecodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifie
 			return decodeDownlink(input);
 		}
 	`, script)
-	valueAs, err := h.engine.Run(ctx, script, "main", input)
+}
+
+// CompileDownlinkDecoder generates a downlink decoder from the provided script.
+func (h *host) CompileDownlinkDecoder(ctx context.Context, script string) (func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDeviceVersionIdentifiers, *ttnpb.ApplicationDownlink) error, error) {
+	defer trace.StartRegion(ctx, "compile downlink decoder").End()
+
+	run, err := h.engine.Compile(ctx, wrapDownlinkDecoderScript(script))
+	if err != nil {
+		return nil, err
+	}
+
+	return func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink) error {
+		return h.decodeDownlink(ctx, ids, version, msg, run)
+	}, nil
+}
+
+// DecodeUplink decodes the message's FRMPayload to DecodedPayload using the given script.
+func (h *host) DecodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, script string) error {
+	run := func(ctx context.Context, fn string, params ...interface{}) (func(interface{}) error, error) {
+		return h.engine.Run(ctx, wrapDownlinkDecoderScript(script), fn, params...)
+	}
+	return h.decodeDownlink(ctx, ids, version, msg, run)
+}
+
+func (h *host) decodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, msg *ttnpb.ApplicationDownlink, run func(context.Context, string, ...interface{}) (func(interface{}) error, error)) error {
+	defer trace.StartRegion(ctx, "decode downlink message").End()
+
+	input := decodeDownlinkInput{
+		Bytes: msg.FrmPayload,
+		FPort: uint8(msg.FPort),
+	}
+
+	valueAs, err := run(ctx, "main", input)
 	if err != nil {
 		return err
 	}

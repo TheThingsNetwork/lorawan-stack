@@ -30,7 +30,7 @@ type js struct {
 }
 
 // New returns a new Javascript scripting engine.
-func New(options scripting.Options) scripting.Engine {
+func New(options scripting.Options) scripting.AheadOfTimeEngine {
 	return &js{options}
 }
 
@@ -60,8 +60,42 @@ func convertError(err error) error {
 	}
 }
 
-// Run executes the Javascript script in the environment env and returns the output.
+// Run executes the Javascript script and returns the output.
 func (j *js) Run(ctx context.Context, script, fn string, params ...interface{}) (as func(target interface{}) error, err error) {
+	run := func(vm *goja.Runtime) (goja.Value, error) {
+		return vm.RunString(script)
+	}
+	return j.run(ctx, run, fn, params...)
+}
+
+// Compile compiles the Javascript script and returns the compiled program.
+func (j *js) Compile(ctx context.Context, script string) (run func(context.Context, string, ...interface{}) (func(interface{}) error, error), err error) {
+	defer trace.StartRegion(ctx, "compile javascript").End()
+
+	start := time.Now()
+	defer func() {
+		compilationsLatency.Observe(time.Since(start).Seconds())
+		if err != nil {
+			compilations.WithLabelValues("error").Inc()
+		} else {
+			compilations.WithLabelValues("ok").Inc()
+		}
+	}()
+
+	program, err := goja.Compile("", script, false)
+	if err != nil {
+		return nil, err
+	}
+
+	return func(ctx context.Context, fn string, params ...interface{}) (func(interface{}) error, error) {
+		run := func(vm *goja.Runtime) (goja.Value, error) {
+			return vm.RunProgram(program)
+		}
+		return j.run(ctx, run, fn, params...)
+	}, nil
+}
+
+func (j *js) run(ctx context.Context, f func(*goja.Runtime) (goja.Value, error), fn string, params ...interface{}) (as func(target interface{}) error, err error) {
 	defer trace.StartRegion(ctx, "run javascript").End()
 
 	start := time.Now()
@@ -94,7 +128,7 @@ func (j *js) Run(ctx context.Context, script, fn string, params ...interface{}) 
 		}
 	}()
 
-	_, err = vm.RunString(script)
+	_, err = f(vm)
 	if err != nil {
 		return nil, convertError(err)
 	}

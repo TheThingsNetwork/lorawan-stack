@@ -41,13 +41,8 @@ const (
 	// cacheErrorTTL is the TTL for cached payload formatters, when there was an error retrieving them.
 	cacheErrorTTL = 5 * time.Minute
 	// cacheSize is the cache size.
-	cacheSize = 500
+	cacheSize = 4096
 )
-
-type PayloadFormatter interface {
-	GetFormatter() ttnpb.PayloadFormatter
-	GetFormatterParameter() string
-}
 
 // Cluster represents the interface the cluster.
 type Cluster interface {
@@ -55,28 +50,40 @@ type Cluster interface {
 	WithClusterAuth() grpc.CallOption
 }
 
-// cacheItem stores the payload formatter as well as the error response.
+// PayloadEncoderDecoderProvider provides a messageprocessors.PayloadEncoderDecoder
+// for the provided formatter.
+type PayloadEncoderDecoderProvider interface {
+	GetPayloadEncoderDecoder(ctx context.Context, formatter ttnpb.PayloadFormatter) (messageprocessors.PayloadEncoderDecoder, error)
+}
+
+// cacheProcessors stores the payload processors.
+type cacheProcessors struct {
+	uplinkProcessor   func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDeviceVersionIdentifiers, *ttnpb.ApplicationUplink) error
+	downlinkProcessor func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDeviceVersionIdentifiers, *ttnpb.ApplicationDownlink) error
+}
+
+// cacheItem stores the payload processors as well as the error response.
 type cacheItem struct {
-	formatter PayloadFormatter
-	err       error
+	processors *cacheProcessors
+	err        error
 }
 
 type host struct {
 	ctx context.Context
 
-	cluster   Cluster
-	processor messageprocessors.PayloadProcessor
+	cluster  Cluster
+	provider PayloadEncoderDecoderProvider
 
 	singleflight singleflight.Group
 	cache        gcache.Cache
 }
 
-// New creates a new PayloadEncodeDecoder that retrieves codecs from the Device Repository
-// and uses an underlying PayloadEncodeDecoder to execute them.
-func New(processor messageprocessors.PayloadProcessor, cluster Cluster) messageprocessors.PayloadEncodeDecoder {
+// New creates a new PayloadEncoderDecoder that retrieves codecs from the Device Repository
+// and uses an underlying PayloadEncoderDecoder to execute them.
+func New(provider PayloadEncoderDecoderProvider, cluster Cluster) messageprocessors.PayloadEncoderDecoder {
 	return &host{
-		cluster:   cluster,
-		processor: processor,
+		cluster:  cluster,
+		provider: provider,
 
 		cache: gcache.New(cacheSize).LFU().Build(),
 	}
@@ -88,14 +95,14 @@ func cacheKey(codec codecType, version *ttnpb.EndDeviceVersionIdentifiers) strin
 
 var errNoVersionIdentifiers = errors.DefineInvalidArgument("no_version_identifiers", "no version identifiers for device")
 
-func (h *host) retrieve(ctx context.Context, codec codecType, ids *ttnpb.ApplicationIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers) (PayloadFormatter, error) {
+func (h *host) retrieve(ctx context.Context, codec codecType, ids *ttnpb.ApplicationIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers) (*cacheProcessors, error) {
 	if version == nil {
 		return nil, errNoVersionIdentifiers.New()
 	}
 	key := cacheKey(codec, version)
 	if cachedInterface, err := h.cache.Get(key); err == nil {
-		cached := cachedInterface.(cacheItem)
-		return cached.formatter, cached.err
+		cached := cachedInterface.(*cacheItem)
+		return cached.processors, cached.err
 	}
 	cc, err := h.cluster.GetPeerConn(ctx, ttnpb.ClusterRole_DEVICE_REPOSITORY, nil)
 	if err != nil {
@@ -103,8 +110,11 @@ func (h *host) retrieve(ctx context.Context, codec codecType, ids *ttnpb.Applica
 	}
 	result, err, _ := h.singleflight.Do(key, func() (interface{}, error) {
 		var (
-			formatter PayloadFormatter
-			err       error
+			formatter interface {
+				GetFormatter() ttnpb.PayloadFormatter
+				GetFormatterParameter() string
+			}
+			err error
 		)
 		req := &ttnpb.GetPayloadFormatterRequest{
 			ApplicationIds: ids,
@@ -121,20 +131,84 @@ func (h *host) retrieve(ctx context.Context, codec codecType, ids *ttnpb.Applica
 		default:
 			panic(fmt.Sprintf("Invalid codec type: %v", codec))
 		}
-
+		var cachedProcessors *cacheProcessors
+		if err == nil {
+			cachedProcessors, err = h.compileProcessor(ctx, codec, formatter.GetFormatter(), formatter.GetFormatterParameter())
+		}
 		expire := cacheTTL
 		if err != nil {
 			expire = cacheErrorTTL
 		}
-		if err := h.cache.SetWithExpire(key, cacheItem{formatter, err}, expire); err != nil {
+		if err := h.cache.SetWithExpire(key, &cacheItem{cachedProcessors, err}, expire); err != nil {
 			log.FromContext(h.ctx).WithError(err).Error("Failed to cache payload formatter")
 		}
-		return formatter, err
+		return cachedProcessors, err
 	})
 	if err != nil {
 		return nil, err
 	}
-	return result.(PayloadFormatter), nil
+	return result.(*cacheProcessors), nil
+}
+
+func (h *host) compileProcessor(ctx context.Context, codec codecType, formatter ttnpb.PayloadFormatter, parameter string) (*cacheProcessors, error) {
+	encoderDecoder, err := h.provider.GetPayloadEncoderDecoder(ctx, formatter)
+	if err != nil {
+		return nil, err
+	}
+
+	if compilableEncoderDecoder, canCompile := encoderDecoder.(messageprocessors.CompilablePayloadEncoderDecoder); canCompile {
+		switch codec {
+		case downlinkDecoder:
+			run, err := compilableEncoderDecoder.CompileDownlinkDecoder(ctx, parameter)
+			if err != nil {
+				return nil, err
+			}
+			return &cacheProcessors{
+				downlinkProcessor: run,
+			}, nil
+		case downlinkEncoder:
+			run, err := compilableEncoderDecoder.CompileDownlinkEncoder(ctx, parameter)
+			if err != nil {
+				return nil, err
+			}
+			return &cacheProcessors{
+				downlinkProcessor: run,
+			}, nil
+		case uplinkDecoder:
+			run, err := compilableEncoderDecoder.CompileUplinkDecoder(ctx, parameter)
+			if err != nil {
+				return nil, err
+			}
+			return &cacheProcessors{
+				uplinkProcessor: run,
+			}, nil
+		default:
+			panic(fmt.Sprintf("Invalid codec type: %v", codec))
+		}
+	}
+
+	switch codec {
+	case downlinkDecoder:
+		return &cacheProcessors{
+			downlinkProcessor: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink) error {
+				return encoderDecoder.DecodeDownlink(ctx, ids, version, message, parameter)
+			},
+		}, nil
+	case downlinkEncoder:
+		return &cacheProcessors{
+			downlinkProcessor: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationDownlink) error {
+				return encoderDecoder.EncodeDownlink(ctx, ids, version, message, parameter)
+			},
+		}, nil
+	case uplinkDecoder:
+		return &cacheProcessors{
+			uplinkProcessor: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, version *ttnpb.EndDeviceVersionIdentifiers, message *ttnpb.ApplicationUplink) error {
+				return encoderDecoder.DecodeUplink(ctx, ids, version, message, parameter)
+			},
+		}, nil
+	default:
+		panic(fmt.Sprintf("Invalid codec type: %v", codec))
+	}
 }
 
 // EncodeDownlink encodes a downlink message.
@@ -143,7 +217,7 @@ func (h *host) EncodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifie
 	if err != nil {
 		return err
 	}
-	return h.processor.EncodeDownlink(ctx, ids, version, message, res.GetFormatter(), res.GetFormatterParameter())
+	return res.downlinkProcessor(ctx, ids, version, message)
 }
 
 // DecodeUplink decodes an uplink message.
@@ -152,7 +226,7 @@ func (h *host) DecodeUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers
 	if err != nil {
 		return err
 	}
-	return h.processor.DecodeUplink(ctx, ids, version, message, res.GetFormatter(), res.GetFormatterParameter())
+	return res.uplinkProcessor(ctx, ids, version, message)
 }
 
 // DecodeDownlink decodes a downlink message.
@@ -161,5 +235,5 @@ func (h *host) DecodeDownlink(ctx context.Context, ids *ttnpb.EndDeviceIdentifie
 	if err != nil {
 		return err
 	}
-	return h.processor.DecodeDownlink(ctx, ids, version, message, res.GetFormatter(), res.GetFormatterParameter())
+	return res.downlinkProcessor(ctx, ids, version, message)
 }
