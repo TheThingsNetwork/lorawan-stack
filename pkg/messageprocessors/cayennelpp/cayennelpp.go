@@ -32,7 +32,7 @@ type host struct{}
 type decodedMap map[string]interface{}
 
 // New creates and returns a new CayenneLPP payload encoder and decoder.
-func New() messageprocessors.PayloadEncodeDecoder {
+func New() messageprocessors.PayloadEncoderDecoder {
 	return &host{}
 }
 
