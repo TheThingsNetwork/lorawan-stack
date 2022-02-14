@@ -14,6 +14,17 @@
 
 package ttnpb
 
+var (
+	_ interface {
+		IDStringer
+		ExtractRequestFields(dst map[string]interface{})
+	} = (*GetStoredApplicationUpRequest)(nil)
+	_ interface {
+		IDStringer
+		ExtractRequestFields(dst map[string]interface{})
+	} = (*GetStoredApplicationUpCountRequest)(nil)
+)
+
 // StoredApplicationUpTypes is a list of available ApplicationUp message types.
 var StoredApplicationUpTypes = map[string]struct{}{
 	"":                           {},
@@ -41,6 +52,31 @@ func (m *GetStoredApplicationUpRequest) WithApplicationIds(ids *ApplicationIdent
 	return m
 }
 
+// EntityType implements IDStringer.
+func (m *GetStoredApplicationUpRequest) EntityType() string {
+	if ids := m.GetEndDeviceIds(); !ids.IsZero() {
+		return ids.EntityType()
+	}
+	return m.GetApplicationIds().EntityType()
+}
+
+// IDString implements IDStringer.
+func (m *GetStoredApplicationUpRequest) IDString() string {
+	if ids := m.GetEndDeviceIds(); !ids.IsZero() {
+		return ids.IDString()
+	}
+	return m.GetApplicationIds().IDString()
+}
+
+// ExtractRequestFields is used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
+func (m *GetStoredApplicationUpRequest) ExtractRequestFields(dst map[string]interface{}) {
+	if ids := m.GetEndDeviceIds(); !ids.IsZero() {
+		ids.ExtractRequestFields(dst)
+		return
+	}
+	m.GetApplicationIds().ExtractRequestFields(dst)
+}
+
 // WithEndDeviceIds returns the request with set EndDeviceIdentifiers.
 func (m *GetStoredApplicationUpCountRequest) WithEndDeviceIds(ids *EndDeviceIdentifiers) *GetStoredApplicationUpCountRequest {
 	m.EndDeviceIds = ids
@@ -51,4 +87,29 @@ func (m *GetStoredApplicationUpCountRequest) WithEndDeviceIds(ids *EndDeviceIden
 func (m *GetStoredApplicationUpCountRequest) WithApplicationIds(ids *ApplicationIdentifiers) *GetStoredApplicationUpCountRequest {
 	m.ApplicationIds = ids
 	return m
+}
+
+// EntityType implements IDStringer.
+func (m *GetStoredApplicationUpCountRequest) EntityType() string {
+	if ids := m.GetEndDeviceIds(); !ids.IsZero() {
+		return ids.EntityType()
+	}
+	return m.GetApplicationIds().EntityType()
+}
+
+// IDString implements IDStringer.
+func (m *GetStoredApplicationUpCountRequest) IDString() string {
+	if ids := m.GetEndDeviceIds(); !ids.IsZero() {
+		return ids.IDString()
+	}
+	return m.GetApplicationIds().IDString()
+}
+
+// ExtractRequestFields is used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
+func (m *GetStoredApplicationUpCountRequest) ExtractRequestFields(dst map[string]interface{}) {
+	if ids := m.GetEndDeviceIds(); !ids.IsZero() {
+		ids.ExtractRequestFields(dst)
+		return
+	}
+	m.GetApplicationIds().ExtractRequestFields(dst)
 }
