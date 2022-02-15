@@ -17,6 +17,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- The minimum required Redis version is now 6.2.
+
 ### Deprecated
 - Gateway Server setting `gs.update-connection-stats-debounce-time` is no longer valid.
 
