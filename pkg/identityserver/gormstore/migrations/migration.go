@@ -60,3 +60,10 @@ func Apply(ctx context.Context, transact func(context.Context, func(*gorm.DB) er
 
 // All is a list of all database migrations.
 var All []Migration
+
+func init() {
+	All = append(All,
+		EntityContacts{},
+		EUIBlocksIndex{},
+	)
+}

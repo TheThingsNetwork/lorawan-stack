@@ -38,7 +38,3 @@ func (m EUIBlocksIndex) Apply(ctx context.Context, db *gorm.DB) error {
 func (m EUIBlocksIndex) Rollback(ctx context.Context, db *gorm.DB) error {
 	return db.Model(store.EUIBlock{}).AddUniqueIndex("eui_block_index", "type").Error
 }
-
-func init() {
-	All = append(All, EUIBlocksIndex{})
-}

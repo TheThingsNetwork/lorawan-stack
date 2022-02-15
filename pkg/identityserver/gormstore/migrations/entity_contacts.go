@@ -93,7 +93,3 @@ func (m EntityContacts) Apply(ctx context.Context, db *gorm.DB) error {
 func (m EntityContacts) Rollback(ctx context.Context, db *gorm.DB) error {
 	return nil
 }
-
-func init() {
-	All = append(All, EntityContacts{})
-}
