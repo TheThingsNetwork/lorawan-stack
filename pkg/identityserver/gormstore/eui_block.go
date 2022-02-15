@@ -18,7 +18,7 @@ package store
 type EUIBlock struct {
 	Model
 
-	Type           string `gorm:"unique_index:eui_block_index;type:VARCHAR(10);"`
+	Type           string `gorm:"type:VARCHAR(10);"`
 	StartEUI       EUI64  `gorm:"type:VARCHAR(16);column:start_eui"`
 	MaxCounter     int64  `gorm:"type:BIGINT;column:end_counter"`
 	CurrentCounter int64  `gorm:"type:BIGINT;column:current_counter"`

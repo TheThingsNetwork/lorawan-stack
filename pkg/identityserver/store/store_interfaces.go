@@ -19,6 +19,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	ttntypes "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
@@ -219,6 +220,6 @@ type ContactInfoStore interface {
 
 // EUIStore interface for assigning DevEUI blocks and addresses
 type EUIStore interface {
-	CreateEUIBlock(ctx context.Context, euiType string, block ttntypes.EUI64Prefix, initCounterValue int64) (err error)
+	CreateEUIBlock(ctx context.Context, configPrefix types.EUI64Prefix, initCounter int64, euiType string) error
 	IssueDevEUIForApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers, applicationLimit int) (*ttntypes.EUI64, error)
 }

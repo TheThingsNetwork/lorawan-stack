@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore/migrations"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	ttntypes "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 var (
@@ -291,6 +292,52 @@ var (
 			return nil
 		},
 	}
+	isDBEUIBlockCreationCommand = &cobra.Command{
+		Use:   "create-eui-block",
+		Short: "Create an EUI block in IS db (currently only DevEUI block supported)",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			logger.Info("Connecting to Identity Server database...")
+			db, err := gormstore.Open(ctx, config.IS.DatabaseURI)
+			if err != nil {
+				return err
+			}
+			defer db.Close()
+			useConfig, err := cmd.Flags().GetBool("use-config")
+			if err != nil {
+				return err
+			}
+			if useConfig {
+				logger.Info("Using config values...")
+				return gormstore.GetEUIStore(db).CreateEUIBlock(ctx, config.IS.DevEUIBlock.Prefix, config.IS.DevEUIBlock.InitCounter, "dev_eui")
+			}
+			prefix, err := cmd.Flags().GetString("prefix")
+			if err != nil {
+				return err
+			}
+			euiPrefix := &ttntypes.EUI64Prefix{}
+			if err := euiPrefix.UnmarshalConfigString(prefix); err != nil {
+				return err
+			}
+			counter, err := cmd.Flags().GetInt64("init-counter")
+			if err != nil {
+				return err
+			}
+			euiType, err := cmd.Flags().GetString("eui-type")
+			if err != nil {
+				return err
+			}
+			switch euiType {
+			case "dev_eui":
+				if err := gormstore.GetEUIStore(db).CreateEUIBlock(ctx, *euiPrefix, counter, euiType); err != nil {
+					return err
+				}
+				logger.Info("Block created successfully")
+			default:
+				logger.Error("Unsupported eui type")
+			}
+			return nil
+		},
+	}
 )
 
 func init() {
@@ -299,4 +346,9 @@ func init() {
 	isDBCommand.AddCommand(isDBMigrateCommand)
 	isDBCleanupCommand.Flags().Bool("dry-run", false, "Dry run")
 	isDBCommand.AddCommand(isDBCleanupCommand)
+	isDBEUIBlockCreationCommand.Flags().Bool("use-config", false, "Create block using values from config")
+	isDBEUIBlockCreationCommand.Flags().String("eui-type", "dev_eui", "EUI block type")
+	isDBEUIBlockCreationCommand.Flags().String("prefix", "", "Block prefix (format: 1234567800000000/32)")
+	isDBEUIBlockCreationCommand.Flags().Int64("init-counter", 0, "Initial counter (determines first address to be issued from block)")
+	isDBCommand.AddCommand(isDBEUIBlockCreationCommand)
 }

@@ -73,27 +73,30 @@ func (s *euiStore) incrementApplicationDevEUICounter(ctx context.Context, ids *t
 	return nil
 }
 
+const atomicReadAndUpdateDevEUI = `
+UPDATE "eui_blocks" SET "current_counter" = "current_counter" + 1
+WHERE "start_eui" = (
+	SELECT "start_eui"
+	FROM "eui_blocks"
+	WHERE "current_counter"<="end_counter" AND "type"='dev_eui'
+	LIMIT 1
+) RETURNING "start_eui","current_counter"`
+
 func (s *euiStore) issueDevEUIAddressFromBlock(ctx context.Context) (*types.EUI64, error) {
-	var devEUIResult types.EUI64
-	var euiBlock EUIBlock
+	var euiResult []struct {
+		StartEui       EUI64
+		CurrentCounter int64
+	}
 	for {
-		// Get current value from DevEUI db.
-		query := s.query(ctx, EUIBlock{}).Where(EUIBlock{Type: "dev_eui"})
-		if err := query.First(&euiBlock).Error; err != nil {
+		// Atomically update valid block and return the values.
+		if err := s.query(ctx, EUIBlock{}).Raw(atomicReadAndUpdateDevEUI).Scan(&euiResult).Error; err != nil {
 			return nil, err
 		}
-		// Check if DevEUI block limit exists.
-		result := s.query(ctx, EUIBlock{}).
-			Where(`"eui_blocks"."type"='dev_eui' AND "eui_blocks"."current_counter" <= "eui_blocks"."end_counter"`).
-			Update("current_counter", gorm.Expr("current_counter + ?", 1))
-		if err := result.Error; err != nil {
-			return nil, err
-		}
-		if result.RowsAffected == 0 {
+		if len(euiResult) == 0 {
 			return nil, errMaxGlobalEUILimitReached.New()
 		}
-
-		devEUIResult.UnmarshalNumber(euiBlock.StartEUI.toPB().MarshalNumber() | uint64(euiBlock.CurrentCounter))
+		var devEUIResult types.EUI64
+		devEUIResult.UnmarshalNumber(euiResult[0].StartEui.toPB().MarshalNumber() | uint64(euiResult[0].CurrentCounter-1))
 		deviceQuery := s.query(ctx, EndDevice{}).Where(EndDevice{
 			DevEUI: eui(&devEUIResult),
 		})
@@ -107,41 +110,29 @@ func (s *euiStore) issueDevEUIAddressFromBlock(ctx context.Context) (*types.EUI6
 	}
 }
 
-// CreateEUIBlock configures the identity server with a new block of EUI addresses to be issued.
-func (s *euiStore) CreateEUIBlock(ctx context.Context, euiType string, block types.EUI64Prefix, initCounterValue int64) (err error) {
+// CreateUIBlock creates the block of appropriate type in IS db.
+func (s *euiStore) CreateEUIBlock(ctx context.Context, prefix types.EUI64Prefix, initCounter int64, euiType string) error {
 	defer trace.StartRegion(ctx, "create eui block").End()
-
-	var currentAddressBlock EUIBlock
-	query := s.query(ctx, EUIBlock{}).Where(EUIBlock{Type: euiType})
-	// Check if there is already an address block of same EUI type configured.
-	err = query.First(&currentAddressBlock).Error
-	if err == nil {
-		// If same address block already configured, skip initialization.
-		if block.EUI64.Equal(*currentAddressBlock.StartEUI.toPB()) {
-			return nil
-		}
-		// If a different block configured, update the block in the database.
-		return query.Select("start_eui", "end_counter", "current_counter").Save(
-			&EUIBlock{
-				StartEUI:       *eui(&block.EUI64),
-				MaxCounter:     getMaxCounter(block),
-				CurrentCounter: initCounterValue,
-			},
-		).Error
-	} else if gorm.IsRecordNotFoundError(err) {
-		// If no block found, create a new block in the database.
-		return s.query(ctx, EUIBlock{}).Save(
-			&EUIBlock{
+	var block EUIBlock
+	if err := s.query(ctx, EUIBlock{}).
+		Where(EUIBlock{Type: "dev_eui", StartEUI: *eui(&prefix.EUI64)}).
+		First(&block).Error; err != nil {
+		// If block is not found, create it
+		if gorm.IsRecordNotFoundError(err) {
+			euiBlock := &EUIBlock{
 				Type:           euiType,
-				StartEUI:       *eui(&block.EUI64),
-				MaxCounter:     getMaxCounter(block),
-				CurrentCounter: initCounterValue,
-			},
-		).Error
+				StartEUI:       *eui(&prefix.EUI64),
+				MaxCounter:     getMaxCounter(prefix),
+				CurrentCounter: initCounter,
+			}
+			return s.query(ctx, EUIBlock{}).Create(&euiBlock).Error
+		}
+		return err
 	}
-	return err
+	return nil
 }
 
+// IssueDevEUIForApplication issues DevEUI address from the configured DevEUI block.
 func (s *euiStore) IssueDevEUIForApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, applicationLimit int) (*types.EUI64, error) {
 	defer trace.StartRegion(ctx, "assign DevEUI address to application").End()
 	// Check if max DevEUI per application reached.
