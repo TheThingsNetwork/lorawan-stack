@@ -5,20 +5,20 @@ concurrency:
 on:
   pull_request:
     paths:
-      - '*.go'
-      - 'go.mod'
-      - 'go.sum'
-      - 'pkg/**'
-      - 'tools/**'
-      - 'config/**'
-      - '!config/stack/ttn-lw-stack.yml'
-      - 'package.json'
-      - 'pkg/webui/**'
-      - 'sdk/js/**'
-      - 'yarn.lock'
-      - 'cypress/**'
-      - 'docker-compose.yml'
-      - '.github/workflows/e2e.yml'
+      - "*.go"
+      - "go.mod"
+      - "go.sum"
+      - "pkg/**"
+      - "tools/**"
+      - "config/**"
+      - "!config/stack/ttn-lw-stack.yml"
+      - "package.json"
+      - "pkg/webui/**"
+      - "sdk/js/**"
+      - "yarn.lock"
+      - "cypress/**"
+      - "docker-compose.yml"
+      - ".github/workflows/e2e.yml"
 env:
   TTN_LW_LOG_LEVEL: debug
   CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
@@ -88,7 +88,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
-          go-version: '~1.17'
+          go-version: "~1.17"
       - name: Initialize Go module cache
         uses: actions/cache@v2
         with:
@@ -187,7 +187,7 @@ jobs:
       - uses: actions/download-artifact@v2
         name: Download build artifacts
         with:
-          name: 'build-files'
+          name: "build-files"
       - name: Download last failed spec
         uses: dawidd6/action-download-artifact@v2
         continue-on-error: true
@@ -279,7 +279,7 @@ jobs:
       - uses: actions/download-artifact@v2
         name: Download build artifacts
         with:
-          name: 'build-files'
+          name: "build-files"
       - name: Unzip build artifacts
         run: unzip -o build.zip
       - name: Initialize Yarn module cache
