@@ -28,7 +28,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc"
 )
@@ -344,10 +343,7 @@ func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
 	conf.UserRights.CreateGateways = true
 	conf.UserRights.CreateOrganizations = true
 	conf.AdminRights.All = true
-	var euiBlock types.EUI64Prefix
-	euiBlock.UnmarshalConfigString("70B3D57ED0000000/36")
 	conf.DevEUIBlock.Enabled = true
-	conf.DevEUIBlock.Prefix = euiBlock
 	conf.DevEUIBlock.ApplicationLimit = 3
 	conf.Network.NetID = test.DefaultNetID
 	conf.Network.TenantID = "test"

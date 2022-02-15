@@ -253,6 +253,9 @@ func (p *Populator) Populate(ctx context.Context, db *gorm.DB) (err error) {
 	if err = p.populateEndDevices(ctx, tx); err != nil {
 		return fmt.Errorf("failed to populate end devices: %w", err)
 	}
+	if err = p.populateDevEUIBlock(ctx, tx); err != nil {
+		return fmt.Errorf("failed to populate DevEUI block: %w", err)
+	}
 	return nil
 }
 
@@ -374,5 +377,12 @@ func (p *Populator) populateEndDevices(ctx context.Context, db *gorm.DB) (err er
 			return err
 		}
 	}
+	return nil
+}
+
+func (p *Populator) populateDevEUIBlock(ctx context.Context, db *gorm.DB) (err error) {
+	var euiBlock types.EUI64Prefix
+	euiBlock.UnmarshalConfigString("70B3D57ED0000000/36")
+	GetEUIStore(db).CreateEUIBlock(ctx, euiBlock, 0, "dev_eui")
 	return nil
 }
