@@ -28,7 +28,7 @@ const (
 )
 
 var metaMetrics = &metadataMetrics{
-	cacheHits: prometheus.NewCounterVec(
+	cacheHits: metrics.NewCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "cache_hits_total",
@@ -36,7 +36,7 @@ var metaMetrics = &metadataMetrics{
 		},
 		[]string{metadataLabel},
 	),
-	cacheMisses: prometheus.NewCounterVec(
+	cacheMisses: metrics.NewCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "cache_misses_total",
@@ -44,7 +44,7 @@ var metaMetrics = &metadataMetrics{
 		},
 		[]string{metadataLabel},
 	),
-	registryRetrievals: prometheus.NewCounterVec(
+	registryRetrievals: metrics.NewCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "registry_retrievals_total",
@@ -52,7 +52,7 @@ var metaMetrics = &metadataMetrics{
 		},
 		[]string{metadataLabel},
 	),
-	registryUpdates: prometheus.NewCounterVec(
+	registryUpdates: metrics.NewCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
 			Name:      "registry_updates_total",
