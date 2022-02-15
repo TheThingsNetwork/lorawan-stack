@@ -20,6 +20,7 @@ replace (
 	github.com/golang/protobuf => github.com/golang/protobuf v1.3.5
 	github.com/googleapis/gax-go/v2 => github.com/googleapis/gax-go/v2 v2.0.5
 	github.com/onsi/gomega => github.com/onsi/gomega v1.10.0
+	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.11.0
 	github.com/spf13/cobra => github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper => github.com/spf13/viper v1.8.1
 	gocloud.dev => gocloud.dev v0.19.0
@@ -37,21 +38,21 @@ require (
 	contrib.go.opencensus.io/exporter/prometheus v0.4.0
 	// NOTE: github.com/Azure/azure-storage-blob-go is actually a different version (see above).
 	github.com/Azure/azure-storage-blob-go v0.10.0
-	github.com/Azure/go-autorest/autorest v0.11.23
+	github.com/Azure/go-autorest/autorest v0.11.24
 	github.com/Azure/go-autorest/autorest/adal v0.9.18
 	github.com/TheThingsIndustries/mystique v0.0.0-20211230093812-d4088bd06959
 	github.com/TheThingsIndustries/protoc-gen-go-json v1.3.1
 	github.com/TheThingsNetwork/go-cayenne-lib v1.1.0
-	github.com/aws/aws-sdk-go v1.42.25
+	github.com/aws/aws-sdk-go v1.42.53
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/blevesearch/bleve v1.0.14
 	github.com/bluele/gcache v0.0.2
 	github.com/disintegration/imaging v1.6.2
-	github.com/dop251/goja v0.0.0-20211217115348-3f9136fa235d
+	github.com/dop251/goja v0.0.0-20220214123719-b09a6bfa842f
 	github.com/dustin/go-humanize v1.0.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/emersion/go-smtp v0.15.0
-	github.com/envoyproxy/protoc-gen-validate v0.6.2
+	github.com/envoyproxy/protoc-gen-validate v0.6.3
 	github.com/felixge/httpsnoop v1.0.2
 	github.com/getsentry/sentry-go v0.12.0
 	github.com/go-redis/redis/v8 v8.11.4
@@ -59,7 +60,7 @@ require (
 	github.com/golang/gddo v0.0.0-20210115222349-20d68f94ee1f
 	// NOTE: github.com/golang/protobuf is actually a different version (see above).
 	github.com/golang/protobuf v1.5.2
-	github.com/google/go-cmp v0.5.6
+	github.com/google/go-cmp v0.5.7
 	github.com/gorilla/csrf v1.7.1
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
@@ -83,15 +84,15 @@ require (
 	github.com/lib/pq v1.10.4
 	github.com/mitchellh/mapstructure v1.4.3
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	github.com/nats-io/nats-server/v2 v2.6.6
-	github.com/nats-io/nats.go v1.13.1-0.20211122170419-d7c1d78a50fc
+	github.com/nats-io/nats-server/v2 v2.7.2
+	github.com/nats-io/nats.go v1.13.1-0.20220121202836-972a071d373d
 	github.com/oklog/ulid/v2 v2.0.2
 	github.com/openshift/osin v1.0.1
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.11.0
 	github.com/satori/go.uuid v1.2.0
-	github.com/sendgrid/sendgrid-go v3.10.4+incompatible
+	github.com/sendgrid/sendgrid-go v3.11.0+incompatible
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/smartystreets/assertions v1.2.1
 	github.com/spf13/cast v1.4.1
@@ -111,13 +112,13 @@ require (
 	go.packetbroker.org/api/v3 v3.12.3-tts
 	go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e
 	go.thethings.network/lorawan-stack-legacy/v2 v2.0.2
-	go.uber.org/zap v1.19.1
+	go.uber.org/zap v1.21.0
 	// NOTE: gocloud.dev is actually a different version (see above).
 	gocloud.dev v0.20.0
 	// NOTE: gocloud.dev/pubsub/natspubsub is actually a different version (see above).
 	gocloud.dev/pubsub/natspubsub v0.19.0
-	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3
-	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f
+	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
+	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	// NOTE: google.golang.org/genproto is actually a different version (see above).
@@ -162,7 +163,7 @@ require (
 	github.com/go-kit/log v0.2.0 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
-	github.com/golang-jwt/jwt/v4 v4.2.0 // indirect
+	github.com/golang-jwt/jwt/v4 v4.3.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/uuid v1.3.0
@@ -181,17 +182,17 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/jstemmer/go-junit-report v0.9.1 // indirect
-	github.com/klauspost/compress v1.13.6 // indirect
+	github.com/klauspost/compress v1.14.2 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
-	github.com/mattn/go-ieproxy v0.0.1 // indirect
+	github.com/mattn/go-ieproxy v0.0.3 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/minio/highwayhash v1.0.2 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
-	github.com/nats-io/jwt/v2 v2.2.0 // indirect
+	github.com/nats-io/jwt/v2 v2.2.1-0.20220113022732-58e87895b296 // indirect
 	github.com/nats-io/nkeys v0.3.0 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
@@ -205,8 +206,8 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/sendgrid/rest v2.6.6+incompatible // indirect
-	github.com/spf13/afero v1.7.1 // indirect
+	github.com/sendgrid/rest v2.6.8+incompatible // indirect
+	github.com/spf13/afero v1.8.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/steveyen/gtreap v0.1.0 // indirect
@@ -219,11 +220,11 @@ require (
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410 // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
 	golang.org/x/mod v0.5.1 // indirect
-	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
+	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/time v0.0.0-20211116232009-f0f3c7e86c11 // indirect
-	golang.org/x/tools v0.1.8 // indirect
+	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8 // indirect
+	golang.org/x/tools v0.1.9 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/api v0.61.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
@@ -231,5 +232,5 @@ require (
 	// NOTE: gopkg.in/DATA-DOG/go-sqlmock.v1 is actually a different version (see above).
 	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.0.0-00010101000000-000000000000 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
-	gopkg.in/ini.v1 v1.66.2 // indirect
+	gopkg.in/ini.v1 v1.66.4 // indirect
 )
