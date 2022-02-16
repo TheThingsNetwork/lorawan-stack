@@ -841,68 +841,6 @@ func LockedWatch(ctx context.Context, r WatchCmdable, k, id string, expiration t
 	return nil
 }
 
-// XAutoClaim provides a Lua implementation of `XAUTOCLAIM` command introduced in Redis 6.2.0.
-func XAutoClaim(ctx context.Context, r Scripter, stream, group, id string, minIdle time.Duration, start string, count int64) ([]redis.XMessage, string, error) {
-	var (
-		vs  []interface{}
-		err error
-	)
-	vs, err = RunInterfaceSliceScript(ctx, r, xAutoClaimScript, []string{stream}, group, id, minIdle.Milliseconds(), start, count).Result()
-	if err != nil {
-		if err == redis.Nil {
-			return nil, "", nil
-		}
-		return nil, "", ConvertError(err)
-	}
-
-	lastID, ok := vs[0].(string)
-	if !ok {
-		panic(fmt.Sprintf("invalid type of entry at index %d of result returned by Redis xautoclaim script: %T", 0, vs[0]))
-	}
-
-	xis, ok := vs[1].([]interface{})
-	if !ok {
-		panic(fmt.Sprintf("invalid type of entry at index %d of result returned by Redis xautoclaim script: %T", 1, vs[1]))
-	}
-	if len(xis) == 0 {
-		return nil, "", nil
-	}
-
-	xs := make([]redis.XMessage, 0, len(xis))
-	for i, xi := range xis {
-		xvs, ok := xi.([]interface{})
-		if !ok {
-			panic(fmt.Sprintf("invalid type of xmessage at index %d of result returned by Redis xautoclaim script: %T", i, xi))
-		}
-
-		id, ok := xvs[0].(string)
-		if !ok {
-			panic(fmt.Sprintf("invalid type of ID field of xmessage at index %d of result returned by Redis xautoclaim script: %T", i, xvs[0]))
-		}
-
-		ss, ok := xvs[1].([]interface{})
-		if !ok {
-			panic(fmt.Sprintf("invalid type of value field of xmessage at index %d of result returned by Redis xautoclaim script: %T", i, xvs[1]))
-		}
-		if n := len(ss); n%2 != 0 {
-			panic(fmt.Sprintf("invalid length of value field of xmessage at index %d of result returned by Redis xautoclaim script: %d", i, n))
-		}
-		values := make(map[string]interface{}, len(ss))
-		for j := 0; j < len(ss); j += 2 {
-			k, ok := ss[j].(string)
-			if !ok {
-				panic(fmt.Sprintf("invalid type of key field value field of xmessage at index %d of result returned by Redis xautoclaim script: %T", i, ss[0]))
-			}
-			values[k] = ss[j+1]
-		}
-		xs = append(xs, redis.XMessage{
-			ID:     id,
-			Values: values,
-		})
-	}
-	return xs, lastID, nil
-}
-
 // RangeStreams sequentially iterates over all non-acknowledged messages in streams calling f with at most count messages.
 // RangeStreams assumes that within its lifetime it is the only consumer within group group using ID id.
 // RangeStreams iterates over all pending messages, which have been idle for at least minIdle milliseconds first.
@@ -927,7 +865,14 @@ func RangeStreams(ctx context.Context, r redis.Cmdable, group, id string, count 
 
 	for _, stream := range streams {
 		for start := "-"; ; {
-			msgs, lastID, err := XAutoClaim(ctx, r, stream, group, id, minIdle, start, count)
+			msgs, lastID, err := r.XAutoClaim(ctx, &redis.XAutoClaimArgs{
+				Stream:   stream,
+				Group:    group,
+				Consumer: id,
+				MinIdle:  minIdle,
+				Start:    start,
+				Count:    count,
+			}).Result()
 			if err != nil {
 				return err
 			}

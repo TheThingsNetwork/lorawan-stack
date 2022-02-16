@@ -64,19 +64,15 @@ if gt > 0 then
   table.insert(to_scan, 5)
 end
 if pivot > 0 or gt > 0 then
-  -- TODO: Use COPY once Redis is updated to 6.2.0 (https://github.com/TheThingsNetwork/lorawan-stack/issues/3592)
-  -- redis.call('copy', KEYS[3], KEYS[6])
-  -- redis.call('pexpire', KEYS[6], ARGV[2])
-  redis.call('restore', KEYS[6], ARGV[2], redis.call('dump', KEYS[3]))
+  redis.call('copy', KEYS[3], KEYS[6])
+  redis.call('pexpire', KEYS[6], ARGV[2])
 end
 
 if #KEYS == 10 and redis.call('sort', KEYS[7], 'by', 'nosort', 'store', KEYS[9]) > 0 then
   redis.call('pexpire', KEYS[9], ARGV[2])
   table.insert(to_scan, 9)
-  -- TODO: Use COPY once Redis is updated to 6.2.0 (https://github.com/TheThingsNetwork/lorawan-stack/issues/3592)
-  -- redis.call('copy', KEYS[8], KEYS[10])
-  -- redis.call('pexpire', KEYS[10], ARGV[2])
-  redis.call('restore', KEYS[10], ARGV[2], redis.call('dump', KEYS[8]))
+  redis.call('copy', KEYS[8], KEYS[10])
+  redis.call('pexpire', KEYS[10], ARGV[2])
 end
 
 if #to_scan > 1 then
