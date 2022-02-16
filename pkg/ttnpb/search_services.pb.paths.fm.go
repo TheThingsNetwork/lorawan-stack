@@ -12,6 +12,7 @@ var SearchApplicationsRequestFieldPathsNested = []string{
 	"name_contains",
 	"order",
 	"page",
+	"query",
 }
 
 var SearchApplicationsRequestFieldPathsTopLevel = []string{
@@ -24,6 +25,7 @@ var SearchApplicationsRequestFieldPathsTopLevel = []string{
 	"name_contains",
 	"order",
 	"page",
+	"query",
 }
 var SearchClientsRequestFieldPathsNested = []string{
 	"attributes_contain",
@@ -35,6 +37,7 @@ var SearchClientsRequestFieldPathsNested = []string{
 	"name_contains",
 	"order",
 	"page",
+	"query",
 	"state",
 }
 
@@ -48,6 +51,7 @@ var SearchClientsRequestFieldPathsTopLevel = []string{
 	"name_contains",
 	"order",
 	"page",
+	"query",
 	"state",
 }
 var SearchGatewaysRequestFieldPathsNested = []string{
@@ -61,6 +65,7 @@ var SearchGatewaysRequestFieldPathsNested = []string{
 	"name_contains",
 	"order",
 	"page",
+	"query",
 }
 
 var SearchGatewaysRequestFieldPathsTopLevel = []string{
@@ -74,6 +79,7 @@ var SearchGatewaysRequestFieldPathsTopLevel = []string{
 	"name_contains",
 	"order",
 	"page",
+	"query",
 }
 var SearchOrganizationsRequestFieldPathsNested = []string{
 	"attributes_contain",
@@ -85,6 +91,7 @@ var SearchOrganizationsRequestFieldPathsNested = []string{
 	"name_contains",
 	"order",
 	"page",
+	"query",
 }
 
 var SearchOrganizationsRequestFieldPathsTopLevel = []string{
@@ -97,6 +104,7 @@ var SearchOrganizationsRequestFieldPathsTopLevel = []string{
 	"name_contains",
 	"order",
 	"page",
+	"query",
 }
 var SearchUsersRequestFieldPathsNested = []string{
 	"attributes_contain",
@@ -108,6 +116,7 @@ var SearchUsersRequestFieldPathsNested = []string{
 	"name_contains",
 	"order",
 	"page",
+	"query",
 	"state",
 }
 
@@ -121,6 +130,7 @@ var SearchUsersRequestFieldPathsTopLevel = []string{
 	"name_contains",
 	"order",
 	"page",
+	"query",
 	"state",
 }
 var SearchEndDevicesRequestFieldPathsNested = []string{
@@ -137,6 +147,7 @@ var SearchEndDevicesRequestFieldPathsNested = []string{
 	"name_contains",
 	"order",
 	"page",
+	"query",
 }
 
 var SearchEndDevicesRequestFieldPathsTopLevel = []string{
@@ -152,4 +163,5 @@ var SearchEndDevicesRequestFieldPathsTopLevel = []string{
 	"name_contains",
 	"order",
 	"page",
+	"query",
 }

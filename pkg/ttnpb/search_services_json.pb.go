@@ -19,6 +19,11 @@ func (x *SearchClientsRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
+	if x.Query != "" || s.HasField("query") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("query")
+		s.WriteString(x.Query)
+	}
 	if x.IdContains != "" || s.HasField("id_contains") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("id_contains")
@@ -103,6 +108,9 @@ func (x *SearchClientsRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 		switch key {
 		default:
 			s.ReadAny() // ignore unknown field
+		case "query":
+			s.AddField("query")
+			x.Query = s.ReadString()
 		case "id_contains", "idContains":
 			s.AddField("id_contains")
 			x.IdContains = s.ReadString()
@@ -173,6 +181,11 @@ func (x *SearchUsersRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	}
 	s.WriteObjectStart()
 	var wroteField bool
+	if x.Query != "" || s.HasField("query") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("query")
+		s.WriteString(x.Query)
+	}
 	if x.IdContains != "" || s.HasField("id_contains") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("id_contains")
@@ -257,6 +270,9 @@ func (x *SearchUsersRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 		switch key {
 		default:
 			s.ReadAny() // ignore unknown field
+		case "query":
+			s.AddField("query")
+			x.Query = s.ReadString()
 		case "id_contains", "idContains":
 			s.AddField("id_contains")
 			x.IdContains = s.ReadString()

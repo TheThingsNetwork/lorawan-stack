@@ -36,6 +36,11 @@ option (gogoproto.goproto_registration) = true;
 
 // This message is used for finding applications in the EntityRegistrySearch service.
 message SearchApplicationsRequest {
+  // Find applications where the ID, name or description contains this substring.
+  string query = 11 [
+    (validate.rules).string.max_len = 50
+  ];
+
   // Find applications where the ID contains this substring.
   string id_contains = 1 [
     (validate.rules).string.max_len = 50
@@ -68,10 +73,17 @@ message SearchApplicationsRequest {
   uint32 page = 9;
   // Only return recently deleted applications.
   bool deleted = 10;
+
+  // next: 12
 }
 
 // This message is used for finding OAuth clients in the EntityRegistrySearch service.
 message SearchClientsRequest {
+  // Find OAuth clients where the ID, name or description contains this substring.
+  string query = 11 [
+    (validate.rules).string.max_len = 50
+  ];
+
   // Find OAuth clients where the ID contains this substring.
   string id_contains = 1 [
     (validate.rules).string.max_len = 50
@@ -110,10 +122,17 @@ message SearchClientsRequest {
   uint32 page = 9;
   // Only return recently deleted OAuth clients.
   bool deleted = 10;
+
+  // next: 12
 }
 
 // This message is used for finding gateways in the EntityRegistrySearch service.
 message SearchGatewaysRequest {
+  // Find gateways where the ID, name, description or EUI contains this substring.
+  string query = 11 [
+    (validate.rules).string.max_len = 50
+  ];
+
   // Find gateways where the ID contains this substring.
   string id_contains = 1 [
     (validate.rules).string.max_len = 50
@@ -149,10 +168,17 @@ message SearchGatewaysRequest {
   uint32 page = 9;
   // Only return recently deleted gateways.
   bool deleted = 10;
+
+  // next: 12
 }
 
 // This message is used for finding organizations in the EntityRegistrySearch service.
 message SearchOrganizationsRequest {
+  // Find organizations where the ID, name or description contains this substring.
+  string query = 11 [
+    (validate.rules).string.max_len = 50
+  ];
+
   // Find organizations where the ID contains this substring.
   string id_contains = 1 [
     (validate.rules).string.max_len = 50
@@ -185,10 +211,17 @@ message SearchOrganizationsRequest {
   uint32 page = 9;
   // Only return recently deleted organizations.
   bool deleted = 10;
+
+  // next: 12
 }
 
 // This message is used for finding users in the EntityRegistrySearch service.
 message SearchUsersRequest {
+  // Find users where the ID, name or description contains this substring.
+  string query = 11 [
+    (validate.rules).string.max_len = 50
+  ];
+
   // Find users where the ID contains this substring.
   string id_contains = 1 [
     (validate.rules).string.max_len = 50
@@ -277,6 +310,11 @@ service EntityRegistrySearch {
 message SearchEndDevicesRequest {
   ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
 
+  // Find end devices where the ID, name, description or EUI contains this substring.
+  string query = 13 [
+    (validate.rules).string.max_len = 50
+  ];
+
   // Find end devices where the ID contains this substring.
   string id_contains = 2 [
     (validate.rules).string.max_len = 50
@@ -318,6 +356,8 @@ message SearchEndDevicesRequest {
   uint32 limit = 11 [(validate.rules).uint32.lte = 1000];
   // Page number for pagination. 0 is interpreted as 1.
   uint32 page = 12;
+
+  // next: 14
 }
 
 // The EndDeviceRegistrySearch service indexes devices in the EndDeviceRegistry

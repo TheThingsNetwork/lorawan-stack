@@ -7,6 +7,16 @@ import fmt "fmt"
 func (dst *SearchApplicationsRequest) SetFields(src *SearchApplicationsRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
+		case "query":
+			if len(subs) > 0 {
+				return fmt.Errorf("'query' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Query = src.Query
+			} else {
+				var zero string
+				dst.Query = zero
+			}
 		case "id_contains":
 			if len(subs) > 0 {
 				return fmt.Errorf("'id_contains' has no subfields, but %s were specified", subs)
@@ -106,6 +116,16 @@ func (dst *SearchApplicationsRequest) SetFields(src *SearchApplicationsRequest, 
 func (dst *SearchClientsRequest) SetFields(src *SearchClientsRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
+		case "query":
+			if len(subs) > 0 {
+				return fmt.Errorf("'query' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Query = src.Query
+			} else {
+				var zero string
+				dst.Query = zero
+			}
 		case "id_contains":
 			if len(subs) > 0 {
 				return fmt.Errorf("'id_contains' has no subfields, but %s were specified", subs)
@@ -214,6 +234,16 @@ func (dst *SearchClientsRequest) SetFields(src *SearchClientsRequest, paths ...s
 func (dst *SearchGatewaysRequest) SetFields(src *SearchGatewaysRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
+		case "query":
+			if len(subs) > 0 {
+				return fmt.Errorf("'query' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Query = src.Query
+			} else {
+				var zero string
+				dst.Query = zero
+			}
 		case "id_contains":
 			if len(subs) > 0 {
 				return fmt.Errorf("'id_contains' has no subfields, but %s were specified", subs)
@@ -323,6 +353,16 @@ func (dst *SearchGatewaysRequest) SetFields(src *SearchGatewaysRequest, paths ..
 func (dst *SearchOrganizationsRequest) SetFields(src *SearchOrganizationsRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
+		case "query":
+			if len(subs) > 0 {
+				return fmt.Errorf("'query' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Query = src.Query
+			} else {
+				var zero string
+				dst.Query = zero
+			}
 		case "id_contains":
 			if len(subs) > 0 {
 				return fmt.Errorf("'id_contains' has no subfields, but %s were specified", subs)
@@ -422,6 +462,16 @@ func (dst *SearchOrganizationsRequest) SetFields(src *SearchOrganizationsRequest
 func (dst *SearchUsersRequest) SetFields(src *SearchUsersRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
+		case "query":
+			if len(subs) > 0 {
+				return fmt.Errorf("'query' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Query = src.Query
+			} else {
+				var zero string
+				dst.Query = zero
+			}
 		case "id_contains":
 			if len(subs) > 0 {
 				return fmt.Errorf("'id_contains' has no subfields, but %s were specified", subs)
@@ -554,6 +604,16 @@ func (dst *SearchEndDevicesRequest) SetFields(src *SearchEndDevicesRequest, path
 				} else {
 					dst.ApplicationIds = nil
 				}
+			}
+		case "query":
+			if len(subs) > 0 {
+				return fmt.Errorf("'query' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Query = src.Query
+			} else {
+				var zero string
+				dst.Query = zero
 			}
 		case "id_contains":
 			if len(subs) > 0 {

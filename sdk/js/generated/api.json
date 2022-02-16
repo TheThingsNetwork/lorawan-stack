@@ -36371,6 +36371,26 @@
           "extensions": [],
           "fields": [
             {
+              "name": "query",
+              "description": "Find applications where the ID, name or description contains this substring.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
+            },
+            {
               "name": "id_contains",
               "description": "Find applications where the ID contains this substring.",
               "label": "",
@@ -36594,6 +36614,26 @@
           "hasOneofs": false,
           "extensions": [],
           "fields": [
+            {
+              "name": "query",
+              "description": "Find OAuth clients where the ID, name or description contains this substring.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
+            },
             {
               "name": "id_contains",
               "description": "Find OAuth clients where the ID contains this substring.",
@@ -36858,6 +36898,26 @@
                   {
                     "name": "message.required",
                     "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "query",
+              "description": "Find end devices where the ID, name, description or EUI contains this substring.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
                   }
                 ]
               }
@@ -37141,6 +37201,26 @@
           "extensions": [],
           "fields": [
             {
+              "name": "query",
+              "description": "Find gateways where the ID, name, description or EUI contains this substring.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
+            },
+            {
               "name": "id_contains",
               "description": "Find gateways where the ID contains this substring.",
               "label": "",
@@ -37387,6 +37467,26 @@
           "extensions": [],
           "fields": [
             {
+              "name": "query",
+              "description": "Find organizations where the ID, name or description contains this substring.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
+            },
+            {
               "name": "id_contains",
               "description": "Find organizations where the ID contains this substring.",
               "label": "",
@@ -37610,6 +37710,26 @@
           "hasOneofs": false,
           "extensions": [],
           "fields": [
+            {
+              "name": "query",
+              "description": "Find users where the ID, name or description contains this substring.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 50
+                  }
+                ]
+              }
+            },
             {
               "name": "id_contains",
               "description": "Find users where the ID contains this substring.",

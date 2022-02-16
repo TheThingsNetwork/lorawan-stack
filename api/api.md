@@ -7832,6 +7832,7 @@ This message is used for finding applications in the EntityRegistrySearch servic
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| `query` | [`string`](#string) |  | Find applications where the ID, name or description contains this substring. |
 | `id_contains` | [`string`](#string) |  | Find applications where the ID contains this substring. |
 | `name_contains` | [`string`](#string) |  | Find applications where the name contains this substring. |
 | `description_contains` | [`string`](#string) |  | Find applications where the description contains this substring. |
@@ -7846,6 +7847,7 @@ This message is used for finding applications in the EntityRegistrySearch servic
 
 | Field | Validations |
 | ----- | ----------- |
+| `query` | <p>`string.max_len`: `50`</p> |
 | `id_contains` | <p>`string.max_len`: `50`</p> |
 | `name_contains` | <p>`string.max_len`: `50`</p> |
 | `description_contains` | <p>`string.max_len`: `50`</p> |
@@ -7866,6 +7868,7 @@ This message is used for finding OAuth clients in the EntityRegistrySearch servi
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| `query` | [`string`](#string) |  | Find OAuth clients where the ID, name or description contains this substring. |
 | `id_contains` | [`string`](#string) |  | Find OAuth clients where the ID contains this substring. |
 | `name_contains` | [`string`](#string) |  | Find OAuth clients where the name contains this substring. |
 | `description_contains` | [`string`](#string) |  | Find OAuth clients where the description contains this substring. |
@@ -7881,6 +7884,7 @@ This message is used for finding OAuth clients in the EntityRegistrySearch servi
 
 | Field | Validations |
 | ----- | ----------- |
+| `query` | <p>`string.max_len`: `50`</p> |
 | `id_contains` | <p>`string.max_len`: `50`</p> |
 | `name_contains` | <p>`string.max_len`: `50`</p> |
 | `description_contains` | <p>`string.max_len`: `50`</p> |
@@ -7901,6 +7905,7 @@ This message is used for finding OAuth clients in the EntityRegistrySearch servi
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `query` | [`string`](#string) |  | Find end devices where the ID, name, description or EUI contains this substring. |
 | `id_contains` | [`string`](#string) |  | Find end devices where the ID contains this substring. |
 | `name_contains` | [`string`](#string) |  | Find end devices where the name contains this substring. |
 | `description_contains` | [`string`](#string) |  | Find end devices where the description contains this substring. |
@@ -7918,6 +7923,7 @@ This message is used for finding OAuth clients in the EntityRegistrySearch servi
 | Field | Validations |
 | ----- | ----------- |
 | `application_ids` | <p>`message.required`: `true`</p> |
+| `query` | <p>`string.max_len`: `50`</p> |
 | `id_contains` | <p>`string.max_len`: `50`</p> |
 | `name_contains` | <p>`string.max_len`: `50`</p> |
 | `description_contains` | <p>`string.max_len`: `50`</p> |
@@ -7941,6 +7947,7 @@ This message is used for finding gateways in the EntityRegistrySearch service.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| `query` | [`string`](#string) |  | Find gateways where the ID, name, description or EUI contains this substring. |
 | `id_contains` | [`string`](#string) |  | Find gateways where the ID contains this substring. |
 | `name_contains` | [`string`](#string) |  | Find gateways where the name contains this substring. |
 | `description_contains` | [`string`](#string) |  | Find gateways where the description contains this substring. |
@@ -7956,6 +7963,7 @@ This message is used for finding gateways in the EntityRegistrySearch service.
 
 | Field | Validations |
 | ----- | ----------- |
+| `query` | <p>`string.max_len`: `50`</p> |
 | `id_contains` | <p>`string.max_len`: `50`</p> |
 | `name_contains` | <p>`string.max_len`: `50`</p> |
 | `description_contains` | <p>`string.max_len`: `50`</p> |
@@ -7977,6 +7985,7 @@ This message is used for finding organizations in the EntityRegistrySearch servi
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| `query` | [`string`](#string) |  | Find organizations where the ID, name or description contains this substring. |
 | `id_contains` | [`string`](#string) |  | Find organizations where the ID contains this substring. |
 | `name_contains` | [`string`](#string) |  | Find organizations where the name contains this substring. |
 | `description_contains` | [`string`](#string) |  | Find organizations where the description contains this substring. |
@@ -7991,6 +8000,7 @@ This message is used for finding organizations in the EntityRegistrySearch servi
 
 | Field | Validations |
 | ----- | ----------- |
+| `query` | <p>`string.max_len`: `50`</p> |
 | `id_contains` | <p>`string.max_len`: `50`</p> |
 | `name_contains` | <p>`string.max_len`: `50`</p> |
 | `description_contains` | <p>`string.max_len`: `50`</p> |
@@ -8011,6 +8021,7 @@ This message is used for finding users in the EntityRegistrySearch service.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| `query` | [`string`](#string) |  | Find users where the ID, name or description contains this substring. |
 | `id_contains` | [`string`](#string) |  | Find users where the ID contains this substring. |
 | `name_contains` | [`string`](#string) |  | Find users where the name contains this substring. |
 | `description_contains` | [`string`](#string) |  | Find users where the description contains this substring. |
@@ -8026,6 +8037,7 @@ This message is used for finding users in the EntityRegistrySearch service.
 
 | Field | Validations |
 | ----- | ----------- |
+| `query` | <p>`string.max_len`: `50`</p> |
 | `id_contains` | <p>`string.max_len`: `50`</p> |
 | `name_contains` | <p>`string.max_len`: `50`</p> |
 | `description_contains` | <p>`string.max_len`: `50`</p> |
