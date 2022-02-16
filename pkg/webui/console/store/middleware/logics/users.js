@@ -72,7 +72,7 @@ const getUsersLogic = createRequestLogic({
           {
             page,
             limit,
-            id_contains: query,
+            query,
             order,
           },
           selectors,

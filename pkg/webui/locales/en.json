@@ -1220,7 +1220,7 @@
   "lib.shared-messages.scheduleAnyTimeDelay": "Schedule any time delay",
   "lib.shared-messages.scheduleAnyTimeDescription": "Configure gateway delay (minimum: {minimumValue}ms, default: {defaultValue}ms)",
   "lib.shared-messages.scheduleDownlinkLateDescription": "Enable server-side buffer of downlink messages",
-  "lib.shared-messages.searchById": "Search by ID",
+  "lib.shared-messages.search": "Search",
   "lib.shared-messages.seconds": "seconds",
   "lib.shared-messages.secondsAbbreviated": "sec",
   "lib.shared-messages.secure": "Secure",

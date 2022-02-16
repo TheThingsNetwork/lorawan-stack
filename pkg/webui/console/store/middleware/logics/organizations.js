@@ -49,7 +49,7 @@ const getOrganizationsLogic = createRequestLogic({
           {
             page,
             limit,
-            id_contains: query,
+            query,
             deleted,
           },
           selectors,
