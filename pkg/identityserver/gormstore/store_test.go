@@ -197,4 +197,5 @@ func TestEntitySearch(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestEntitySearch(t)
+	st.TestEntitySearchPagination(t)
 }
