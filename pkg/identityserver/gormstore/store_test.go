@@ -134,6 +134,7 @@ func TestUserSessionStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestUserSessionStore(t)
+	st.TestUserSessionStorePagination(t)
 }
 
 func TestAPIKeyStore(t *testing.T) {

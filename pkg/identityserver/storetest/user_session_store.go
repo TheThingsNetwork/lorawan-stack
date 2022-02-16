@@ -15,10 +15,12 @@
 package storetest
 
 import (
+	"fmt"
 	. "testing"
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -170,6 +172,59 @@ func (st *StoreTest) TestUserSessionStore(t *T) {
 		_, err = s.GetSessionByID(ctx, created.SessionId)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
+	})
+}
+
+func (st *StoreTest) TestUserSessionStorePagination(t *T) {
+	a, ctx := test.New(t)
+
+	usr1 := st.population.NewUser()
+
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+		is.UserSessionStore
+	})
+	defer st.DestroyDB(t, false)
+	defer s.Close()
+	if !ok {
+		t.Fatal("Store does not implement UserSessionStore")
+	}
+
+	var sessions []*ttnpb.UserSession
+	for i := 0; i < 7; i++ {
+		created, err := s.CreateSession(ctx, &ttnpb.UserSession{
+			UserIds:   usr1.GetIds(),
+			SessionId: fmt.Sprintf("SESS%d", i+1),
+		})
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		sessions = append(sessions, created)
+
+		time.Sleep(test.Delay) // The tests depend on sorting by created_at, so we don't want multiple sessions with the same time.
+	}
+
+	t.Run("FindSessions_Paginated", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		for _, page := range []uint32{1, 2, 3, 4} {
+			paginateCtx := store.WithPagination(store.WithOrder(ctx, "created_at"), 2, page, &total)
+
+			got, err := s.FindSessions(paginateCtx, usr1.GetIds())
+			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+				if page == 4 {
+					a.So(got, should.HaveLength, 1)
+				} else {
+					a.So(got, should.HaveLength, 2)
+				}
+				for i, e := range got {
+					a.So(e, should.Resemble, sessions[i+2*int(page-1)])
+				}
+			}
+
+			a.So(total, should.Equal, 7)
 		}
 	})
 }
