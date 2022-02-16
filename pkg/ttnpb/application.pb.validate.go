@@ -206,6 +206,33 @@ func (m *Application) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "network_server_address":
+
+			if !_Application_NetworkServerAddress_Pattern.MatchString(m.GetNetworkServerAddress()) {
+				return ApplicationValidationError{
+					field:  "network_server_address",
+					reason: "value does not match regex pattern \"^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\\\-]*[a-zA-Z0-9])\\\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$\"",
+				}
+			}
+
+		case "application_server_address":
+
+			if !_Application_ApplicationServerAddress_Pattern.MatchString(m.GetApplicationServerAddress()) {
+				return ApplicationValidationError{
+					field:  "application_server_address",
+					reason: "value does not match regex pattern \"^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\\\-]*[a-zA-Z0-9])\\\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$\"",
+				}
+			}
+
+		case "join_server_address":
+
+			if !_Application_JoinServerAddress_Pattern.MatchString(m.GetJoinServerAddress()) {
+				return ApplicationValidationError{
+					field:  "join_server_address",
+					reason: "value does not match regex pattern \"^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\\\-]*[a-zA-Z0-9])\\\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$\"",
+				}
+			}
+
 		case "dev_eui_counter":
 			// no validation rules for DevEuiCounter
 		default:
@@ -273,6 +300,12 @@ var _ interface {
 } = ApplicationValidationError{}
 
 var _Application_Attributes_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
+var _Application_NetworkServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
+
+var _Application_ApplicationServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
+
+var _Application_JoinServerAddress_Pattern = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
 
 // ValidateFields checks the field values on Applications with the rules
 // defined in the proto definition for this message. If any rules are

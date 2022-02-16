@@ -208,6 +208,66 @@
               "defaultValue": ""
             },
             {
+              "name": "network_server_address",
+              "description": "The address of the Network Server where this application is supposed to be registered.\nIf set, this fields indicates where end devices for this application should be registered.\n\nStored in Entity Registry.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nThe connection shall be established with transport layer security (TLS).\nCustom certificate authorities may be configured out-of-band.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "application_server_address",
+              "description": "The address of the Application Server where this application is supposed to be registered.\nIf set, this fields indicates where end devices for this application should be registered.\n\nStored in Entity Registry.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nThe connection shall be established with transport layer security (TLS).\nCustom certificate authorities may be configured out-of-band.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "join_server_address",
+              "description": "The address of the Join Server where this application is supposed to be registered.\nIf set, this fields indicates where end devices for this application should be registered.\n\nStored in Entity Registry.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nThe connection shall be established with transport layer security (TLS).\nCustom certificate authorities may be configured out-of-band.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                  }
+                ]
+              }
+            },
+            {
               "name": "dev_eui_counter",
               "description": "",
               "label": "",

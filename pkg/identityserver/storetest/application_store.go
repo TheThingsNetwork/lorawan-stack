@@ -50,12 +50,15 @@ func (st *StoreTest) TestApplicationStoreCRUD(t *T) {
 		start := time.Now().Truncate(time.Second)
 
 		created, err = s.CreateApplication(ctx, &ttnpb.Application{
-			Ids:                   &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
-			Name:                  "Foo Name",
-			Description:           "Foo Description",
-			Attributes:            attributes,
-			AdministrativeContact: usr1.GetOrganizationOrUserIdentifiers(),
-			TechnicalContact:      org1.GetOrganizationOrUserIdentifiers(),
+			Ids:                      &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
+			Name:                     "Foo Name",
+			Description:              "Foo Description",
+			Attributes:               attributes,
+			AdministrativeContact:    usr1.GetOrganizationOrUserIdentifiers(),
+			TechnicalContact:         org1.GetOrganizationOrUserIdentifiers(),
+			NetworkServerAddress:     "ns.example.com",
+			ApplicationServerAddress: "as.example.com",
+			JoinServerAddress:        "js.example.com",
 		})
 
 		if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
@@ -65,6 +68,9 @@ func (st *StoreTest) TestApplicationStoreCRUD(t *T) {
 			a.So(created.Attributes, should.Resemble, attributes)
 			a.So(created.AdministrativeContact, should.Resemble, usr1.GetOrganizationOrUserIdentifiers())
 			a.So(created.TechnicalContact, should.Resemble, org1.GetOrganizationOrUserIdentifiers())
+			a.So(created.NetworkServerAddress, should.Equal, "ns.example.com")
+			a.So(created.ApplicationServerAddress, should.Equal, "as.example.com")
+			a.So(created.JoinServerAddress, should.Equal, "js.example.com")
 			a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenWithin, 5*time.Second, start)
 			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenWithin, 5*time.Second, start)
 		}
@@ -117,12 +123,15 @@ func (st *StoreTest) TestApplicationStoreCRUD(t *T) {
 		start := time.Now().Truncate(time.Second)
 
 		updated, err = s.UpdateApplication(ctx, &ttnpb.Application{
-			Ids:                   &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
-			Name:                  "New Foo Name",
-			Description:           "New Foo Description",
-			Attributes:            updatedAttributes,
-			AdministrativeContact: org1.GetOrganizationOrUserIdentifiers(),
-			TechnicalContact:      usr1.GetOrganizationOrUserIdentifiers(),
+			Ids:                      &ttnpb.ApplicationIdentifiers{ApplicationId: "foo"},
+			Name:                     "New Foo Name",
+			Description:              "New Foo Description",
+			Attributes:               updatedAttributes,
+			AdministrativeContact:    org1.GetOrganizationOrUserIdentifiers(),
+			TechnicalContact:         usr1.GetOrganizationOrUserIdentifiers(),
+			NetworkServerAddress:     "other-ns.example.com",
+			ApplicationServerAddress: "other-as.example.com",
+			JoinServerAddress:        "other-js.example.com",
 		}, mask)
 		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.GetIds().GetApplicationId(), should.Equal, "foo")
@@ -131,6 +140,9 @@ func (st *StoreTest) TestApplicationStoreCRUD(t *T) {
 			a.So(updated.Attributes, should.Resemble, updatedAttributes)
 			a.So(updated.AdministrativeContact, should.Resemble, org1.GetOrganizationOrUserIdentifiers())
 			a.So(updated.TechnicalContact, should.Resemble, usr1.GetOrganizationOrUserIdentifiers())
+			a.So(updated.NetworkServerAddress, should.Equal, "other-ns.example.com")
+			a.So(updated.ApplicationServerAddress, should.Equal, "other-as.example.com")
+			a.So(updated.JoinServerAddress, should.Equal, "other-js.example.com")
 			a.So(*ttnpb.StdTime(updated.CreatedAt), should.Equal, *ttnpb.StdTime(created.CreatedAt))
 			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenWithin, 5*time.Second, start)
 		}

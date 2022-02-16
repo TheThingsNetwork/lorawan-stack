@@ -14,6 +14,8 @@ For details about compatibility between different releases, see the **Commitment
 - Status page references in the Console.
 - Notification Service API that will allow users to receive notifications about their registered entities.
   - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added tables.
+- Add `network_server_address`, `application_server_address` and `join_server_address` to applications.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
 
 ### Changed
 

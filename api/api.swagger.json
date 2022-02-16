@@ -12721,6 +12721,18 @@
         "technical_contact": {
           "$ref": "#/definitions/v3OrganizationOrUserIdentifiers"
         },
+        "network_server_address": {
+          "type": "string",
+          "description": "The address of the Network Server where this application is supposed to be registered.\nIf set, this fields indicates where end devices for this application should be registered.\n\nStored in Entity Registry.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nThe connection shall be established with transport layer security (TLS).\nCustom certificate authorities may be configured out-of-band."
+        },
+        "application_server_address": {
+          "type": "string",
+          "description": "The address of the Application Server where this application is supposed to be registered.\nIf set, this fields indicates where end devices for this application should be registered.\n\nStored in Entity Registry.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nThe connection shall be established with transport layer security (TLS).\nCustom certificate authorities may be configured out-of-band."
+        },
+        "join_server_address": {
+          "type": "string",
+          "description": "The address of the Join Server where this application is supposed to be registered.\nIf set, this fields indicates where end devices for this application should be registered.\n\nStored in Entity Registry.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nThe connection shall be established with transport layer security (TLS).\nCustom certificate authorities may be configured out-of-band."
+        },
         "dev_eui_counter": {
           "type": "integer",
           "format": "int64"

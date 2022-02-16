@@ -61,9 +61,39 @@ message Application {
   OrganizationOrUserIdentifiers administrative_contact = 10;
   OrganizationOrUserIdentifiers technical_contact = 11;
 
+  // The address of the Network Server where this application is supposed to be registered.
+  // If set, this fields indicates where end devices for this application should be registered.
+  //
+  // Stored in Entity Registry.
+  // The typical format of the address is "host:port". If the port is omitted,
+  // the normal port inference (with DNS lookup, otherwise defaults) is used.
+  // The connection shall be established with transport layer security (TLS).
+  // Custom certificate authorities may be configured out-of-band.
+  string network_server_address = 12 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
+
+  // The address of the Application Server where this application is supposed to be registered.
+  // If set, this fields indicates where end devices for this application should be registered.
+  //
+  // Stored in Entity Registry.
+  // The typical format of the address is "host:port". If the port is omitted,
+  // the normal port inference (with DNS lookup, otherwise defaults) is used.
+  // The connection shall be established with transport layer security (TLS).
+  // Custom certificate authorities may be configured out-of-band.
+  string application_server_address = 13 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
+
+  // The address of the Join Server where this application is supposed to be registered.
+  // If set, this fields indicates where end devices for this application should be registered.
+  //
+  // Stored in Entity Registry.
+  // The typical format of the address is "host:port". If the port is omitted,
+  // the normal port inference (with DNS lookup, otherwise defaults) is used.
+  // The connection shall be established with transport layer security (TLS).
+  // Custom certificate authorities may be configured out-of-band.
+  string join_server_address = 14 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
+
   uint32 dev_eui_counter = 9;
 
-  // next: 12
+  // next: 15
 }
 
 message Applications {
