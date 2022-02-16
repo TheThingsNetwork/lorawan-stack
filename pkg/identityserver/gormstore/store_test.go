@@ -164,6 +164,7 @@ func TestInvitationStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestInvitationStore(t)
+	st.TestInvitationStorePagination(t)
 }
 
 func TestLoginTokenStore(t *testing.T) {

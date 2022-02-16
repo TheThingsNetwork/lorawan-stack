@@ -15,10 +15,12 @@
 package storetest
 
 import (
+	"fmt"
 	. "testing"
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -213,4 +215,53 @@ func (st *StoreTest) TestInvitationStore(t *T) {
 	})
 }
 
-// TODO: Test Pagination (https://github.com/TheThingsNetwork/lorawan-stack/issues/5047).
+func (st *StoreTest) TestInvitationStorePagination(t *T) {
+	a, ctx := test.New(t)
+	start := time.Now().Truncate(time.Second)
+
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+		is.InvitationStore
+	})
+	defer st.DestroyDB(t, false)
+	defer s.Close()
+	if !ok {
+		t.Fatal("Store does not implement InvitationStore")
+	}
+
+	var all []*ttnpb.Invitation
+	for i := 0; i < 7; i++ {
+		created, err := s.CreateInvitation(ctx, &ttnpb.Invitation{
+			Email:     fmt.Sprintf("user%d@example.com", i+1),
+			Token:     fmt.Sprintf("TOKEN%d", i+1),
+			ExpiresAt: ttnpb.ProtoTimePtr(start.Add(time.Minute)),
+		})
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		all = append(all, created)
+	}
+
+	t.Run("FindInvitations_Paginated", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		for _, page := range []uint32{1, 2, 3, 4} {
+			paginateCtx := store.WithPagination(store.WithOrder(ctx, "email"), 2, page, &total)
+
+			got, err := s.FindInvitations(paginateCtx)
+			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+				if page == 4 {
+					a.So(got, should.HaveLength, 1)
+				} else {
+					a.So(got, should.HaveLength, 2)
+				}
+				for i, e := range got {
+					a.So(e, should.Resemble, all[i+2*int(page-1)])
+				}
+			}
+
+			a.So(total, should.Equal, 7)
+		}
+	})
+}
