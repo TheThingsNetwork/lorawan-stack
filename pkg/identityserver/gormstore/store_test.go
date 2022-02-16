@@ -86,6 +86,7 @@ func TestApplicationStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestApplicationStoreCRUD(t)
+	st.TestApplicationStorePagination(t)
 }
 
 func TestClientStore(t *testing.T) {
@@ -93,6 +94,7 @@ func TestClientStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestClientStoreCRUD(t)
+	st.TestClientStorePagination(t)
 }
 
 func TestEndDeviceStore(t *testing.T) {
@@ -107,6 +109,7 @@ func TestGatewayStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestGatewayStoreCRUD(t)
+	st.TestGatewayStorePagination(t)
 }
 
 func TestOrganizationStore(t *testing.T) {
@@ -114,6 +117,7 @@ func TestOrganizationStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestOrganizationStoreCRUD(t)
+	st.TestOrganizationStorePagination(t)
 }
 
 func TestUserStore(t *testing.T) {
@@ -121,6 +125,7 @@ func TestUserStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestUserStoreCRUD(t)
+	st.TestUserStorePagination(t)
 }
 
 func TestUserSessionStore(t *testing.T) {
