@@ -67,7 +67,7 @@
     "wait-on": "^6.0.0",
     "webpack": "^4.46.0",
     "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3.11.0",
+    "webpack-dev-server": "^4.7.4",
     "webpack-plugin-hash-output": "^3.1.0",
     "webpack-shell-plugin": "https://github.com/cdeutsch/webpack-shell-plugin.git#bee537d",
     "yargs": "^17.3.1"
