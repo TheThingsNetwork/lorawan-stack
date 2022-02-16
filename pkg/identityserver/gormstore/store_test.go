@@ -141,6 +141,7 @@ func TestAPIKeyStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestAPIKeyStoreCRUD(t)
+	st.TestAPIKeyStorePagination(t)
 }
 
 func TestMembershipStore(t *testing.T) {

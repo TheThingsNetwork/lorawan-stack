@@ -16,16 +16,24 @@ package storetest
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 	. "testing"
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
+
+type apiKeysByID []*ttnpb.APIKey
+
+func (a apiKeysByID) Len() int           { return len(a) }
+func (a apiKeysByID) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a apiKeysByID) Less(i, j int) bool { return a[i].Id < a[j].Id }
 
 func (st *StoreTest) TestAPIKeyStoreCRUD(t *T) {
 	app1 := st.population.NewApplication(nil)
@@ -197,4 +205,49 @@ func (st *StoreTest) TestAPIKeyStoreCRUD(t *T) {
 	}
 }
 
-// TODO: Test Pagination (https://github.com/TheThingsNetwork/lorawan-stack/issues/5047).
+func (st *StoreTest) TestAPIKeyStorePagination(t *T) {
+	app1 := st.population.NewApplication(nil)
+
+	var all []*ttnpb.APIKey
+	for i := 0; i < 7; i++ {
+		_, key := st.population.NewAPIKey(app1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_APPLICATION_ALL)
+		key.Name = fmt.Sprintf("Key %d", i)
+		all = append(all, key)
+	}
+
+	sort.Sort(apiKeysByID(all))
+
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+
+		is.APIKeyStore
+	})
+	defer st.DestroyDB(t, false)
+	defer s.Close()
+	if !ok {
+		t.Fatal("Store does not implement APIKeyStore")
+	}
+
+	t.Run("FindAPIKeys_Paginated", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		for _, page := range []uint32{1, 2, 3, 4} {
+			paginateCtx := store.WithPagination(ctx, 2, page, &total)
+
+			got, err := s.FindAPIKeys(paginateCtx, app1.GetEntityIdentifiers())
+			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+				if page == 4 {
+					a.So(got, should.HaveLength, 1)
+				} else {
+					a.So(got, should.HaveLength, 2)
+				}
+				for i, e := range got {
+					a.So(e.Name, should.Equal, all[i+2*int(page-1)].Name)
+				}
+			}
+
+			a.So(total, should.Equal, 7)
+		}
+	})
+}
