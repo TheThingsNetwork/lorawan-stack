@@ -180,6 +180,7 @@ func TestOAuthStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestOAuthStore(t)
+	st.TestOAuthStorePagination(t)
 }
 
 func TestEUIStore(t *testing.T) {
