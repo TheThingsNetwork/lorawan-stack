@@ -25,7 +25,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
 // nsScheduleWindow returns minimum time.Duration between downlink being added to the queue and it being sent to GS for transmission.
@@ -379,39 +378,13 @@ func publishEvents(ctx context.Context, evs ...events.Event) {
 }
 
 func (ns *NetworkServer) enqueueApplicationUplinks(ctx context.Context, ups ...*ttnpb.ApplicationUp) {
-	log.FromContext(ctx).Debug("Enqueue application uplinks for sending to Application Server")
-	if err := ns.applicationUplinks.Add(ctx, ups...); err != nil {
-		log.FromContext(ctx).WithError(err).Warn("Failed to enqueue application uplinks for sending to Application Server")
-	}
-}
-
-func (ns *NetworkServer) submitApplicationUplinks(ctx context.Context, ups ...*ttnpb.ApplicationUp) {
 	n := len(ups)
 	if n == 0 {
 		return
 	}
-	ctx = log.NewContextWithFields(ctx, log.Fields(
-		"device_uid", unique.ID(ctx, ups[0].EndDeviceIds),
-		"uplink_count", n,
-	))
-	if err := ns.uplinkSubmissionPool.Publish(ctx, ups); err != nil {
-		log.FromContext(ctx).WithError(err).Warn("Failed to enqueue application uplinks in submission pool")
-		ns.enqueueApplicationUplinks(ctx, ups...)
-		return
-	}
-}
-
-func (ns *NetworkServer) handleUplinkSubmission(ctx context.Context, item interface{}) {
-	ups := item.([]*ttnpb.ApplicationUp)
-	conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, nil)
-	if err != nil {
-		log.FromContext(ctx).WithError(err).Warn("Failed to get Application Server peer")
-		ns.enqueueApplicationUplinks(ctx, ups...)
-		return
-	}
-	if err := ns.sendApplicationUplinks(ctx, ttnpb.NewNsAsClient(conn), ups...); err != nil {
-		log.FromContext(ctx).WithError(err).Warn("Failed to send application uplinks to Application Server")
-		ns.enqueueApplicationUplinks(ctx, ups...)
-		return
+	ctx = log.NewContextWithField(ctx, "uplink_count", n)
+	log.FromContext(ctx).Debug("Enqueue application uplinks for sending to Application Server")
+	if err := ns.applicationUplinks.Add(ctx, ups...); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to enqueue application uplinks for sending to Application Server")
 	}
 }
