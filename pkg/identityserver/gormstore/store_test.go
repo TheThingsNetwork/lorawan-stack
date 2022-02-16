@@ -149,6 +149,7 @@ func TestMembershipStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestMembershipStoreCRUD(t)
+	st.TestMembershipStorePagination(t)
 }
 
 func TestContactInfoStore(t *testing.T) {

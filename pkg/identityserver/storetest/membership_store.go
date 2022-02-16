@@ -15,14 +15,24 @@
 package storetest
 
 import (
+	"sort"
 	. "testing"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
+
+type organizationOrUserIdentifiersByID []*ttnpb.OrganizationOrUserIdentifiers
+
+func (a organizationOrUserIdentifiersByID) Len() int      { return len(a) }
+func (a organizationOrUserIdentifiersByID) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a organizationOrUserIdentifiersByID) Less(i, j int) bool {
+	return a[i].IDString() < a[j].IDString()
+}
 
 func (st *StoreTest) TestMembershipStoreCRUD(t *T) {
 	a, ctx := test.New(t)
@@ -240,4 +250,83 @@ func (st *StoreTest) TestMembershipStoreCRUD(t *T) {
 	}
 }
 
-// TODO: Test Pagination (https://github.com/TheThingsNetwork/lorawan-stack/issues/5047).
+func (st *StoreTest) TestMembershipStorePagination(t *T) {
+	var apps []*ttnpb.Application
+	for i := 0; i < 7; i++ {
+		apps = append(apps, st.population.NewApplication(nil))
+	}
+
+	var memberIDs []*ttnpb.OrganizationOrUserIdentifiers
+	for i := 0; i < 7; i++ {
+		ids := st.population.NewUser().GetOrganizationOrUserIdentifiers()
+		memberIDs = append(memberIDs, ids)
+		st.population.NewMembership(ids, apps[0].GetEntityIdentifiers(), ttnpb.Right_RIGHT_APPLICATION_ALL)
+	}
+
+	for i := 1; i < 7; i++ {
+		st.population.NewMembership(memberIDs[0], apps[i].GetEntityIdentifiers(), ttnpb.Right_RIGHT_APPLICATION_ALL)
+	}
+
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+
+		is.MembershipStore
+	})
+	defer st.DestroyDB(t, false)
+	defer s.Close()
+	if !ok {
+		t.Fatal("Store does not implement MembershipStore")
+	}
+
+	t.Run("FindMembers_Paginated", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		for _, page := range []uint32{1, 2, 3, 4} {
+			paginateCtx := store.WithPagination(ctx, 2, page, &total)
+
+			got, err := s.FindMembers(paginateCtx, apps[0].GetEntityIdentifiers())
+			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+				if page == 4 {
+					a.So(got, should.HaveLength, 1)
+				} else {
+					a.So(got, should.HaveLength, 2)
+				}
+				gotIDs := make([]*ttnpb.OrganizationOrUserIdentifiers, 0, len(got))
+				for ids := range got {
+					gotIDs = append(gotIDs, ids)
+				}
+				sort.Sort(organizationOrUserIdentifiersByID(gotIDs))
+				for i, ids := range gotIDs {
+					a.So(ids, should.Resemble, memberIDs[i+2*int(page-1)])
+				}
+			}
+
+			a.So(total, should.Equal, 7)
+		}
+	})
+
+	t.Run("FindMemberships_Paginated", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		for _, page := range []uint32{1, 2, 3, 4} {
+			paginateCtx := store.WithPagination(ctx, 2, page, &total)
+
+			got, err := s.FindMemberships(paginateCtx, memberIDs[0], "application", false)
+			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+				if page == 4 {
+					a.So(got, should.HaveLength, 1)
+				} else {
+					a.So(got, should.HaveLength, 2)
+				}
+
+				for i, ids := range got {
+					a.So(ids.GetApplicationIds(), should.Resemble, apps[i+2*int(page-1)].GetIds())
+				}
+			}
+
+			a.So(total, should.Equal, 7)
+		}
+	})
+}
