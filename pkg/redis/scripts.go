@@ -24,8 +24,4 @@ var (
 	//go:embed lua/popTask.lua
 	popTaskScriptSource string
 	popTaskScript       = redis.NewScript(popTaskScriptSource)
-
-	//go:embed lua/xAutoClaim.lua
-	xAutoClaimScriptSource string
-	xAutoClaimScript       = redis.NewScript(xAutoClaimScriptSource)
 )
