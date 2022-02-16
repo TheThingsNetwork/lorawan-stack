@@ -1,90 +1,90 @@
 c/identity server:
-- pkg/identityserver/*
-- pkg/identityserver/**/*
-- pkg/account/*
-- pkg/account/**/*
-- pkg/oauth/*
-- pkg/oauth/**/*
+  - pkg/identityserver/*
+  - pkg/identityserver/**/*
+  - pkg/account/*
+  - pkg/account/**/*
+  - pkg/oauth/*
+  - pkg/oauth/**/*
 
 c/gateway server:
-- pkg/gatewayserver/*
-- pkg/gatewayserver/**/*
-- pkg/basicstation/*
+  - pkg/gatewayserver/*
+  - pkg/gatewayserver/**/*
+  - pkg/basicstation/*
 
 c/gateway conf server:
-- pkg/gatewayconfigurationserver/*
-- pkg/gatewayconfigurationserver/**/*
-- pkg/basicstation/*
-- pkg/basicstation/cups/*
-- pkg/pfconfig/*
-- pkg/pfconfig/**/*
+  - pkg/gatewayconfigurationserver/*
+  - pkg/gatewayconfigurationserver/**/*
+  - pkg/basicstation/*
+  - pkg/basicstation/cups/*
+  - pkg/pfconfig/*
+  - pkg/pfconfig/**/*
 
 c/network server:
-- pkg/networkserver/*
-- pkg/networkserver/**/*
+  - pkg/networkserver/*
+  - pkg/networkserver/**/*
 
 c/device converter:
-- pkg/devicetemplateconverter/*
-- pkg/devicetemplates/*
+  - pkg/devicetemplateconverter/*
+  - pkg/devicetemplates/*
 
 c/application server:
-- pkg/applicationserver/*
-- pkg/applicationserver/**/*
-- pkg/messageprocessors/*
-- pkg/messageprocessors/**/*
-- pkg/scripting/*
-- pkg/scripting/**/*
+  - pkg/applicationserver/*
+  - pkg/applicationserver/**/*
+  - pkg/messageprocessors/*
+  - pkg/messageprocessors/**/*
+  - pkg/scripting/*
+  - pkg/scripting/**/*
 
 c/join server:
-- pkg/joinserver/*
-- pkg/joinserver/**/*
+  - pkg/joinserver/*
+  - pkg/joinserver/**/*
 
 c/console:
-- pkg/console/*
-- pkg/console/**/*
+  - pkg/console/*
+  - pkg/console/**/*
 
 c/packet broker agent:
-- pkg/packetbrokeragent/*
-- pkg/packetbrokeragent/**/*
+  - pkg/packetbrokeragent/*
+  - pkg/packetbrokeragent/**/*
 
 compat/api:
-- api/*.proto
+  - api/*.proto
 
 compat/config:
-- cmd/**/config.go
-- cmd/**/config.*.go
-- pkg/**/config.go
-- pkg/**/config.*.go
-- pkg/config/*.go
-- pkg/config/**/*.go
+  - cmd/**/config.go
+  - cmd/**/config.*.go
+  - pkg/**/config.go
+  - pkg/**/config.*.go
+  - pkg/config/*.go
+  - pkg/config/**/*.go
 
 compat/db:
-- pkg/identityserver/store/*.go
-- pkg/identityserver/store/**/*.go
-- pkg/**/redis/*.go
-- pkg/**/redis/**/*.go
+  - pkg/identityserver/store/*.go
+  - pkg/identityserver/store/**/*.go
+  - pkg/**/redis/*.go
+  - pkg/**/redis/**/*.go
 
 security:
-- pkg/crypto/*
-- pkg/crypto/**/*
+  - pkg/crypto/*
+  - pkg/crypto/**/*
 
 # NOTE: We're not assigning bump/minor because that is a choice for the maintainer.
 
 dependencies:
-- go.mod
-- go.sum
-- yarn.lock
-- sdk/js/yarn.lock
+  - go.mod
+  - go.sum
+  - yarn.lock
+  - sdk/js/yarn.lock
 
 ui/cli:
-- cmd/ttn-lw-cli/*
-- cmd/ttn-lw-cli/**/*
+  - cmd/ttn-lw-cli/*
+  - cmd/ttn-lw-cli/**/*
 
 ui/web:
-- pkg/webui/*
-- pkg/webui/**/*
-- pkg/web/oauthclient/*
+  - pkg/webui/*
+  - pkg/webui/**/*
+  - pkg/web/oauthclient/*
 
 tooling:
-- tools/*
-- tools/**/*
+  - tools/*
+  - tools/**/*

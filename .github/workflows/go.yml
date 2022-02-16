@@ -3,17 +3,17 @@ name: Go Code
 on:
   pull_request:
     paths:
-    - '.github/workflows/go.yml'
-    - '*.go'
-    - '.revive.toml'
-    - 'cmd/**'
-    - 'go.mod'
-    - 'go.sum'
-    - 'Makefile'
-    - 'pkg/**'
-    - '!pkg/webui/**'
-    - 'pkg/webui/**.go'
-    - 'tools/**'
+      - ".github/workflows/go.yml"
+      - "*.go"
+      - ".revive.toml"
+      - "cmd/**"
+      - "go.mod"
+      - "go.sum"
+      - "Makefile"
+      - "pkg/**"
+      - "!pkg/webui/**"
+      - "pkg/webui/**.go"
+      - "tools/**"
 
 jobs:
   quality:
@@ -21,42 +21,42 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 15
     steps:
-    - name: Check out code
-      uses: actions/checkout@v2
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: '~1.17'
-    - name: Initialize Go module cache
-      uses: actions/cache@v2
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
-    - name: Download Go tool dependencies
-      run: |
-        cd tools
-        go mod download
-    - name: Initialize tool binary cache
-      id: tools-cache
-      uses: actions/cache@v2
-      with:
-        path: tools/bin
-        key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
-    - name: Make Mage
-      run: make tools/bin/mage
-      if: steps.tools-cache.outputs.cache-hit != 'true'
-    - name: Format code
-      run: tools/bin/mage go:fmt
-    - name: Lint code
-      run: tools/bin/mage go:lint
-    - name: Generate i18n messages
-      run: tools/bin/mage go:messages
-    - name: Generate allowed fieldmask paths
-      run: tools/bin/mage jsSDK:allowedFieldMaskPaths
-    - name: Check for diff
-      run: tools/bin/mage git:diff
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "~1.17"
+      - name: Initialize Go module cache
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Download Go tool dependencies
+        run: |
+          cd tools
+          go mod download
+      - name: Initialize tool binary cache
+        id: tools-cache
+        uses: actions/cache@v2
+        with:
+          path: tools/bin
+          key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
+      - name: Make Mage
+        run: make tools/bin/mage
+        if: steps.tools-cache.outputs.cache-hit != 'true'
+      - name: Format code
+        run: tools/bin/mage go:fmt
+      - name: Lint code
+        run: tools/bin/mage go:lint
+      - name: Generate i18n messages
+        run: tools/bin/mage go:messages
+      - name: Generate allowed fieldmask paths
+        run: tools/bin/mage jsSDK:allowedFieldMaskPaths
+      - name: Check for diff
+        run: tools/bin/mage git:diff
 
   test:
     name: Tests
@@ -65,7 +65,7 @@ jobs:
       postgres:
         image: postgres
         ports:
-        - '5432/tcp'
+          - "5432/tcp"
         env:
           POSTGRES_USER: root
           POSTGRES_PASSWORD: root
@@ -73,75 +73,75 @@ jobs:
       redis:
         image: redis
         ports:
-          - '6379/tcp'
+          - "6379/tcp"
     timeout-minutes: 15
     steps:
-    - name: Create ttn_lorawan_is_test DB
-      uses: docker://postgres
-      env:
-        PGPASSWORD: root
-      with:
-        entrypoint: /usr/bin/createdb
-        args: -h postgres -U root ttn_lorawan_is_test
-    - name: Create ttn_lorawan_is_store_test DB
-      uses: docker://postgres
-      env:
-        PGPASSWORD: root
-      with:
-        entrypoint: /usr/bin/createdb
-        args: -h postgres -U root ttn_lorawan_is_store_test
-    - name: Check out code
-      uses: actions/checkout@v2
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: '~1.17'
-    - name: Initialize Go module cache
-      uses: actions/cache@v2
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
-    - name: Download Go dependencies
-      run: go mod download
-    - name: Download Go tool dependencies
-      run: |
-        cd tools
-        go mod download
-    - name: Initialize Go build cache
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/go-build
-        # NOTE: head_ref only works on pull_request.
-        key: ${{ runner.os }}-go-build-refs/heads/${{ github.head_ref }}
-        # NOTE: base_ref only works on pull_request.
-        restore-keys: |
-          ${{ runner.os }}-go-build-refs/heads/${{ github.base_ref }}
-          ${{ runner.os }}-go-build-refs/heads/v
-    - name: Initialize tool binary cache
-      id: tools-cache
-      uses: actions/cache@v2
-      with:
-        path: tools/bin
-        key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
-    - name: Make Mage
-      run: make tools/bin/mage
-      if: steps.tools-cache.outputs.cache-hit != 'true'
-    - name: Test binary execution
-      run: tools/bin/mage go:testBinaries
-    - name: Test code
-      env:
-        SQL_DB_ADDRESS: localhost:${{ job.services.postgres.ports['5432'] }}
-        SQL_DB_AUTH: 'root:root'
-        REDIS_ADDRESS: localhost:${{ job.services.redis.ports['6379'] }}
-        TEST_REDIS: '1'
-        TEST_SLOWDOWN: '8'
-        AWS_REGION: ${{ secrets.AWS_REGION }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_TEST_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_TEST_SECRET_ACCESS_KEY }}
-        GCP_CREDENTIALS: ${{ secrets.GCP_TEST_CREDENTIALS }}
-        TEST_BUCKET: lorawan-stack-test-bucket
-      run: tools/bin/mage go:test
-    - name: Check for diff
-      run: tools/bin/mage git:diff
+      - name: Create ttn_lorawan_is_test DB
+        uses: docker://postgres
+        env:
+          PGPASSWORD: root
+        with:
+          entrypoint: /usr/bin/createdb
+          args: -h postgres -U root ttn_lorawan_is_test
+      - name: Create ttn_lorawan_is_store_test DB
+        uses: docker://postgres
+        env:
+          PGPASSWORD: root
+        with:
+          entrypoint: /usr/bin/createdb
+          args: -h postgres -U root ttn_lorawan_is_store_test
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "~1.17"
+      - name: Initialize Go module cache
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Download Go dependencies
+        run: go mod download
+      - name: Download Go tool dependencies
+        run: |
+          cd tools
+          go mod download
+      - name: Initialize Go build cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/go-build
+          # NOTE: head_ref only works on pull_request.
+          key: ${{ runner.os }}-go-build-refs/heads/${{ github.head_ref }}
+          # NOTE: base_ref only works on pull_request.
+          restore-keys: |
+            ${{ runner.os }}-go-build-refs/heads/${{ github.base_ref }}
+            ${{ runner.os }}-go-build-refs/heads/v
+      - name: Initialize tool binary cache
+        id: tools-cache
+        uses: actions/cache@v2
+        with:
+          path: tools/bin
+          key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
+      - name: Make Mage
+        run: make tools/bin/mage
+        if: steps.tools-cache.outputs.cache-hit != 'true'
+      - name: Test binary execution
+        run: tools/bin/mage go:testBinaries
+      - name: Test code
+        env:
+          SQL_DB_ADDRESS: localhost:${{ job.services.postgres.ports['5432'] }}
+          SQL_DB_AUTH: "root:root"
+          REDIS_ADDRESS: localhost:${{ job.services.redis.ports['6379'] }}
+          TEST_REDIS: "1"
+          TEST_SLOWDOWN: "8"
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_TEST_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_TEST_SECRET_ACCESS_KEY }}
+          GCP_CREDENTIALS: ${{ secrets.GCP_TEST_CREDENTIALS }}
+          TEST_BUCKET: lorawan-stack-test-bucket
+        run: tools/bin/mage go:test
+      - name: Check for diff
+        run: tools/bin/mage git:diff

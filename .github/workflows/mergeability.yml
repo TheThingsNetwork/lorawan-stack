@@ -6,7 +6,6 @@ on:
       - "v3.*"
 
 jobs:
-
   # IMPORTANT: THIS JOB USES AN UNTRUSTED CHECKOUT!
   # DO NOT RUN ANY CODE FROM THE REPOSITORY!
   check_mergeability:

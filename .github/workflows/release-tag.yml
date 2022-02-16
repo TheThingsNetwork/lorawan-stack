@@ -3,7 +3,7 @@ name: Tag release
 on:
   push:
     tags:
-      - 'v3.[0-9]+.[0-9]+'
+      - "v3.[0-9]+.[0-9]+"
 
 env:
   NODE_ENV: production
@@ -14,122 +14,153 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
-    - name: Check out code
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        submodules: true
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v1
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
-    - name: Login to Docker Hub
-      uses: docker/login-action@v1
-      with:
-        username: '${{ secrets.DOCKERHUB_USERNAME }}'
-        password: '${{ secrets.DOCKERHUB_PASSWORD }}'
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v1
-      with:
-        registry: ghcr.io
-        username: '${{ secrets.GHCR_USERNAME }}'
-        password: '${{ secrets.GHCR_PASSWORD }}'
-    - name: Update APT
-      run: sudo apt-get -yq update
-    - name: Install Snapcraft
-      run: sudo apt-get -yq --no-install-suggests --no-install-recommends install snapcraft
-    - name: Login to Snapcraft
-      env:
-        SNAPCRAFT_LOGIN: ${{ secrets.SNAPCRAFT_LOGIN }}
-      run: snapcraft login --with <(printf "$SNAPCRAFT_LOGIN")
-    - name: Set up Node
-      uses: actions/setup-node@v2-beta
-      with:
-        node-version: '~14'
-    - name: Set up Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: '~1.17'
-    - name: Initialize Go module cache
-      uses: actions/cache@v2
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
-    - name: Download Go dependencies
-      run: go mod download
-    - name: Download Go tool dependencies
-      run: |
-        cd tools
-        go mod download
-    - name: Initialize Go build cache
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/go-build
-        key: ${{ runner.os }}-go-build-${{ github.ref }}
-        restore-keys: |
-          ${{ runner.os }}-go-build-refs/heads/v
-    - name: Initialize tool binary cache
-      id: tools-cache
-      uses: actions/cache@v2
-      with:
-        path: tools/bin
-        key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
-    - name: Make Mage
-      run: make tools/bin/mage
-      if: steps.tools-cache.outputs.cache-hit != 'true'
-    - name: Initialize device repository index cache
-      id: dr-index-cache
-      uses: actions/cache@v2
-      with:
-        path: data/lorawan-devices-index
-        key: dr-index-cache-${{ hashFiles('data/lorawan-devices') }}
-    - name: Create device repository index
-      run: tools/bin/mage dev:initDeviceRepo
-      if: steps.dr-index-cache.outputs.cache-hit != 'true'
-    - name: Auto-completion scripts
-      run: tools/bin/mage cli:autocomplete
-      timeout-minutes: 5
-    - name: Build frontend
-      run: tools/bin/mage js:clean js:buildDll js:build
-      env:
-        WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS: 'true'
-    - name: File versioning
-      run: tools/bin/mage version:files
-    - name: Check for diff
-      run: tools/bin/mage git:diff
-    - name: Determine date
-      id: date
-      run: echo "::set-output name=value::$(date +%Y-%m-%d)"
-    - name: Get version from tag
-      id: version
-      uses: actions/github-script@v3
-      with:
-        script: |
-          const tag = context.ref.slice("refs/tags/".length);
-          const majorMinorPatchRegex = /^v([0-9]+)\.([0-9]+)\.([0-9]+)$/;
-          const majorMinorPatch = tag.match(majorMinorPatchRegex);
-          if (!majorMinorPatch) {
-            throw `invalid version tag: ${tag}`;
-          }
-          return majorMinorPatch[0].slice(1);
-        result-encoding: string
-    - name: Generate Release Notes
-      run: |
-        awk '/^## \[${{ steps.version.outputs.result }}\]/{flag=1;next} /^## \[/{flag=0} flag' CHANGELOG.md > /tmp/release-notes.md
-    - name: Import the signing key
-      run: |
-        printf '%s' '${{ secrets.SIGNATURE_PASSPHRASE }}' >/tmp/gpg_passphrase
-        cat /tmp/gpg_passphrase | gpg --passphrase-fd 0 --no-tty --batch --import gpg_signing_key
-    - name: Run Goreleaser
-      uses: goreleaser/goreleaser-action@v2
-      with:
-        version: 'v1.2.5'
-        args: release --config .goreleaser.release.yml --release-notes /tmp/release-notes.md --timeout 120m
-      env:
-        AWS_REGION: ${{ secrets.AWS_REGION }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        SIGN_KEY_NAME: ${{ secrets.SIGN_KEY_NAME }}
+      - name: Check branch
+        run: echo '${{ github.event.base_ref }}' | grep -Fxq 'refs/heads/release/${{ github.ref_name }}'
+      - name: Check out code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: true
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: "${{ secrets.DOCKERHUB_USERNAME }}"
+          password: "${{ secrets.DOCKERHUB_PASSWORD }}"
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: "${{ secrets.GHCR_USERNAME }}"
+          password: "${{ secrets.GHCR_PASSWORD }}"
+      - name: Update APT
+        run: sudo apt-get -yq update
+      - name: Install Snapcraft
+        run: sudo apt-get -yq --no-install-suggests --no-install-recommends install snapcraft
+      - name: Login to Snapcraft
+        env:
+          SNAPCRAFT_LOGIN: ${{ secrets.SNAPCRAFT_LOGIN }}
+        run: snapcraft login --with <(printf "$SNAPCRAFT_LOGIN")
+      - name: Set up Node
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: "~14"
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "~1.17"
+      - name: Initialize Go module cache
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Download Go dependencies
+        run: go mod download
+      - name: Download Go tool dependencies
+        run: |
+          cd tools
+          go mod download
+      - name: Initialize Go build cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/go-build
+          key: ${{ runner.os }}-go-build-${{ github.ref }}
+          restore-keys: |
+            ${{ runner.os }}-go-build-refs/heads/v
+      - name: Initialize tool binary cache
+        id: tools-cache
+        uses: actions/cache@v2
+        with:
+          path: tools/bin
+          key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
+      - name: Make Mage
+        run: make tools/bin/mage
+        if: steps.tools-cache.outputs.cache-hit != 'true'
+      - name: Initialize device repository index cache
+        id: dr-index-cache
+        uses: actions/cache@v2
+        with:
+          path: data/lorawan-devices-index
+          key: dr-index-cache-${{ hashFiles('data/lorawan-devices') }}
+      - name: Create device repository index
+        run: tools/bin/mage dev:initDeviceRepo
+        if: steps.dr-index-cache.outputs.cache-hit != 'true'
+      - name: Auto-completion scripts
+        run: tools/bin/mage cli:autocomplete
+        timeout-minutes: 5
+      - name: Build frontend
+        run: tools/bin/mage js:clean js:buildDll js:build
+        env:
+          WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS: "true"
+      - name: Check for diff
+        run: tools/bin/mage git:diff
+      - name: Get version from tag
+        id: version
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const tag = context.ref.slice("refs/tags/".length);
+            const majorMinorPatchRegex = /^v([0-9]+)\.([0-9]+)\.([0-9]+)$/;
+            const majorMinorPatch = tag.match(majorMinorPatchRegex);
+            if (!majorMinorPatch) {
+              throw `invalid version tag: ${tag}`;
+            }
+            return majorMinorPatch[0].slice(1);
+          result-encoding: string
+      - name: Generate Release Notes
+        run: |
+          awk '/^## \[${{ steps.version.outputs.result }}\]/{flag=1;next} /^## \[/{flag=0} flag' CHANGELOG.md > /tmp/release-notes.md
+      - name: Import the signing key
+        run: |
+          printf '%s' '${{ secrets.SIGNATURE_PASSPHRASE }}' >/tmp/gpg_passphrase
+          cat /tmp/gpg_passphrase | gpg --passphrase-fd 0 --no-tty --batch --import gpg_signing_key
+      - name: Run Goreleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: "v1.2.5"
+          args: release --config .goreleaser.release.yml --release-notes /tmp/release-notes.md --timeout 120m
+        env:
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          SIGN_KEY_NAME: ${{ secrets.SIGN_KEY_NAME }}
+      - name: Determine if released version is latest
+        id: latest-version
+        run: |
+          export LATEST_TAG=$(git tag | grep -P '^v3.\d+\.\d+$' | sort -V | tail -n 1)
+          set +e
+          test "$LATEST_TAG" != '${{ github.ref_name }}'
+          echo "::set-output name=latest::$?"
+      - name: Tag latest
+        if: steps.latest-version.outputs.latest == '1'
+        run: |
+          export VERSION=$(echo ${{ github.ref_name }} | grep -Po '3\.\d+')
+          docker tag ${DOCKER_PREFIX}/lorawan-stack:${VERSION}-amd64 ${DOCKER_PREFIX}/lorawan-stack:latest-amd64
+          docker tag ${DOCKER_PREFIX}/lorawan-stack:${VERSION}-arm64 ${DOCKER_PREFIX}/lorawan-stack:latest-arm64
+          docker tag ${DOCKER_PREFIX}/lorawan-stack:${VERSION}-armv7 ${DOCKER_PREFIX}/lorawan-stack:latest-armv7
+          docker push ${DOCKER_PREFIX}/lorawan-stack:latest-amd64
+          docker push ${DOCKER_PREFIX}/lorawan-stack:latest-arm64
+          docker push ${DOCKER_PREFIX}/lorawan-stack:latest-armv7
+          docker manifest create ${DOCKER_PREFIX}/lorawan-stack:latest ${DOCKER_PREFIX}/lorawan-stack:latest-amd64 ${DOCKER_PREFIX}/lorawan-stack:latest-arm64 ${DOCKER_PREFIX}/lorawan-stack:latest-armv7
+          docker manifest push ${DOCKER_PREFIX}/lorawan-stack:latest
+        env:
+          DOCKER_CLI_EXPERIMENTAL: enabled
+          DOCKER_PREFIX: thethingsnetwork
+      - name: Prepare merge PR
+        run: |
+          gh pr create \
+              --assignee '${{ github.actor }}' \
+              --base "$(echo ${{ github.ref_name }} | grep -Po 'v3\.\d+')" \
+              --head '${{ github.event.base_ref }}' \
+              --body "This pull request merges back changes from the ${{ github.ref_name }} release." \
+              --label "release" \
+              --milestone "${{ github.ref_name }}" \
+              --title "Release ${{ github.ref_name }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
