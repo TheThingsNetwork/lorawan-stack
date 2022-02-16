@@ -179,4 +179,6 @@ func (s *StoreTest) DestroyDB(t *testing.T, assertClean bool, exceptions ...stri
 	}
 
 	t.Logf("Destroyed schema %s in %s", schemaName, time.Since(start))
+
+	s.population = &Population{}
 }
