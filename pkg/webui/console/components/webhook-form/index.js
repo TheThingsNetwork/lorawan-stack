@@ -206,6 +206,7 @@ const validationSchema = Yup.object().shape({
 export default class WebhookForm extends Component {
   static propTypes = {
     existCheck: PropTypes.func,
+    healthStatusEnabled: PropTypes.bool,
     initialWebhookValue: PropTypes.shape({
       ids: PropTypes.shape({
         webhook_id: PropTypes.string,
@@ -239,6 +240,7 @@ export default class WebhookForm extends Component {
     onDelete: () => null,
     webhookTemplate: undefined,
     existCheck: () => false,
+    healthStatusEnabled: false,
   }
 
   form = React.createRef()
@@ -345,7 +347,7 @@ export default class WebhookForm extends Component {
   }
 
   render() {
-    const { update, initialWebhookValue, webhookTemplate } = this.props
+    const { update, initialWebhookValue, webhookTemplate, healthStatusEnabled } = this.props
     const { error, displayOverwriteModal, existingId } = this.state
     let initialValues = blankValues
     if (update && initialWebhookValue) {
@@ -359,6 +361,7 @@ export default class WebhookForm extends Component {
       initialWebhookValue.health_status.unhealthy
 
     const isPending =
+      healthStatusEnabled &&
       update &&
       initialWebhookValue &&
       (initialWebhookValue.health_status === null ||

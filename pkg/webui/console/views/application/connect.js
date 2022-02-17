@@ -16,7 +16,7 @@ import { connect as withConnect } from 'react-redux'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
-import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
+import { selectApplicationSiteName, selectAsConfig } from '@ttn-lw/lib/selectors/env'
 import pipe from '@ttn-lw/lib/pipe'
 
 import {
@@ -24,6 +24,7 @@ import {
   stopApplicationEventsStream,
   getApplicationsRightsList,
 } from '@console/store/actions/applications'
+import { getAsConfiguration } from '@console/store/actions/application-server'
 
 import {
   selectSelectedApplication,
@@ -48,6 +49,9 @@ const mapDispatchToProps = dispatch => ({
   loadData: id => {
     dispatch(getApplication(id, 'name,description,attributes,dev_eui_counter'))
     dispatch(getApplicationsRightsList(id))
+    if (selectAsConfig().enabled) {
+      dispatch(getAsConfiguration())
+    }
   },
 })
 
