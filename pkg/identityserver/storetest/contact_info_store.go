@@ -239,5 +239,3 @@ func (st *StoreTest) TestContactInfoStoreCRUD(t *T) {
 		})
 	}
 }
-
-// TODO: Test Pagination (https://github.com/TheThingsNetwork/lorawan-stack/issues/5047).

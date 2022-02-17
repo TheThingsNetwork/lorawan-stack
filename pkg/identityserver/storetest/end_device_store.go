@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -413,6 +414,49 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		got, err := s.FindEndDevices(ctx, nil, mask)
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 			a.So(got, should.BeEmpty)
+		}
+	})
+}
+
+func (st *StoreTest) TestEndDeviceStorePagination(t *T) {
+	usr1 := st.population.NewUser()
+	app1 := st.population.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+
+	var all []*ttnpb.EndDevice
+	for i := 0; i < 7; i++ {
+		all = append(all, st.population.NewEndDevice(app1.GetIds()))
+	}
+
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+		is.EndDeviceStore
+	})
+	defer st.DestroyDB(t, false)
+	defer s.Close()
+	if !ok {
+		t.Fatal("Store does not implement EndDeviceStore")
+	}
+
+	t.Run("ListEndDevices_Paginated", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		for _, page := range []uint32{1, 2, 3, 4} {
+			paginateCtx := store.WithPagination(ctx, 2, page, &total)
+
+			got, err := s.ListEndDevices(paginateCtx, app1.GetIds(), fieldMask(ttnpb.EndDeviceFieldPathsTopLevel...))
+			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+				if page == 4 {
+					a.So(got, should.HaveLength, 1)
+				} else {
+					a.So(got, should.HaveLength, 2)
+				}
+				for i, e := range got {
+					a.So(e, should.Resemble, all[i+2*int(page-1)])
+				}
+			}
+
+			a.So(total, should.Equal, 7)
 		}
 	})
 }

@@ -17,6 +17,7 @@ package storetest
 import (
 	. "testing"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	is "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -446,4 +447,181 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 	})
 }
 
-// TODO: Test Pagination (https://github.com/TheThingsNetwork/lorawan-stack/issues/5047).
+func (st *StoreTest) TestEntitySearchPagination(t *T) {
+	var users []*ttnpb.User
+	for i := 0; i < 7; i++ {
+		users = append(users, st.population.NewUser())
+	}
+
+	var applications []*ttnpb.Application
+	for i := 0; i < 7; i++ {
+		applications = append(applications, st.population.NewApplication(users[0].GetOrganizationOrUserIdentifiers()))
+	}
+	var clients []*ttnpb.Client
+	for i := 0; i < 7; i++ {
+		clients = append(clients, st.population.NewClient(users[0].GetOrganizationOrUserIdentifiers()))
+	}
+	var gateways []*ttnpb.Gateway
+	for i := 0; i < 7; i++ {
+		gateways = append(gateways, st.population.NewGateway(users[0].GetOrganizationOrUserIdentifiers()))
+	}
+	var organizations []*ttnpb.Organization
+	for i := 0; i < 7; i++ {
+		organizations = append(organizations, st.population.NewOrganization(users[0].GetOrganizationOrUserIdentifiers()))
+	}
+
+	var endDevices []*ttnpb.EndDevice
+	for i := 0; i < 7; i++ {
+		endDevices = append(endDevices, st.population.NewEndDevice(applications[0].GetIds()))
+	}
+
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+		is.EntitySearch
+	})
+	defer st.DestroyDB(t, false)
+	defer s.Close()
+	if !ok {
+		t.Fatal("Store does not implement EntitySearch")
+	}
+
+	t.Run("Applications_Paginated", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		for _, page := range []uint32{1, 2, 3, 4} {
+			paginateCtx := store.WithPagination(ctx, 2, page, &total)
+
+			got, err := s.SearchApplications(paginateCtx, nil, &ttnpb.SearchApplicationsRequest{})
+			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+				if page == 4 {
+					a.So(got, should.HaveLength, 1)
+				} else {
+					a.So(got, should.HaveLength, 2)
+				}
+				for i, e := range got {
+					a.So(e, should.Resemble, applications[i+2*int(page-1)].Ids)
+				}
+			}
+
+			a.So(total, should.Equal, 7)
+		}
+	})
+
+	t.Run("Clients_Paginated", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		for _, page := range []uint32{1, 2, 3, 4} {
+			paginateCtx := store.WithPagination(ctx, 2, page, &total)
+
+			got, err := s.SearchClients(paginateCtx, nil, &ttnpb.SearchClientsRequest{})
+			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+				if page == 4 {
+					a.So(got, should.HaveLength, 1)
+				} else {
+					a.So(got, should.HaveLength, 2)
+				}
+				for i, e := range got {
+					a.So(e, should.Resemble, clients[i+2*int(page-1)].Ids)
+				}
+			}
+
+			a.So(total, should.Equal, 7)
+		}
+	})
+
+	t.Run("EndDevices_Paginated", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		for _, page := range []uint32{1, 2, 3, 4} {
+			paginateCtx := store.WithPagination(ctx, 2, page, &total)
+
+			got, err := s.SearchEndDevices(paginateCtx, &ttnpb.SearchEndDevicesRequest{
+				ApplicationIds: applications[0].GetIds(),
+			})
+			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+				if page == 4 {
+					a.So(got, should.HaveLength, 1)
+				} else {
+					a.So(got, should.HaveLength, 2)
+				}
+				for i, e := range got {
+					a.So(e, should.Resemble, endDevices[i+2*int(page-1)].Ids)
+				}
+			}
+
+			a.So(total, should.Equal, 7)
+		}
+	})
+
+	t.Run("Gateways_Paginated", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		for _, page := range []uint32{1, 2, 3, 4} {
+			paginateCtx := store.WithPagination(ctx, 2, page, &total)
+
+			got, err := s.SearchGateways(paginateCtx, nil, &ttnpb.SearchGatewaysRequest{})
+			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+				if page == 4 {
+					a.So(got, should.HaveLength, 1)
+				} else {
+					a.So(got, should.HaveLength, 2)
+				}
+				for i, e := range got {
+					a.So(e, should.Resemble, gateways[i+2*int(page-1)].Ids)
+				}
+			}
+
+			a.So(total, should.Equal, 7)
+		}
+	})
+
+	t.Run("Organizations_Paginated", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		for _, page := range []uint32{1, 2, 3, 4} {
+			paginateCtx := store.WithPagination(ctx, 2, page, &total)
+
+			got, err := s.SearchOrganizations(paginateCtx, nil, &ttnpb.SearchOrganizationsRequest{})
+			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+				if page == 4 {
+					a.So(got, should.HaveLength, 1)
+				} else {
+					a.So(got, should.HaveLength, 2)
+				}
+				for i, e := range got {
+					a.So(e, should.Resemble, organizations[i+2*int(page-1)].Ids)
+				}
+			}
+
+			a.So(total, should.Equal, 7)
+		}
+	})
+
+	t.Run("Users_Paginated", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		for _, page := range []uint32{1, 2, 3, 4} {
+			paginateCtx := store.WithPagination(ctx, 2, page, &total)
+
+			got, err := s.SearchUsers(paginateCtx, &ttnpb.SearchUsersRequest{})
+			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+				if page == 4 {
+					a.So(got, should.HaveLength, 1)
+				} else {
+					a.So(got, should.HaveLength, 2)
+				}
+				for i, e := range got {
+					a.So(e, should.Resemble, users[i+2*int(page-1)].Ids)
+				}
+			}
+
+			a.So(total, should.Equal, 7)
+		}
+	})
+}

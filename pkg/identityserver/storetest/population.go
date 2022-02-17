@@ -56,7 +56,7 @@ var now = time.Now()
 
 // NewAPIKey adds a new API key to the population and returns it.
 // The returned API key can not be modified and will not have its CreatedAt/UpdatedAt fields populated.
-func (p *Population) NewAPIKey(entityID *ttnpb.EntityIdentifiers, rights ...ttnpb.Right) *ttnpb.APIKey {
+func (p *Population) NewAPIKey(entityID *ttnpb.EntityIdentifiers, rights ...ttnpb.Right) (original, stored *ttnpb.APIKey) {
 	token, err := auth.APIKey.Generate(context.Background(), "")
 	if err != nil {
 		panic(err)
@@ -65,25 +65,27 @@ func (p *Population) NewAPIKey(entityID *ttnpb.EntityIdentifiers, rights ...ttnp
 	if err != nil {
 		panic(err)
 	}
+	original = &ttnpb.APIKey{
+		Id:     generatedID,
+		Key:    token,
+		Rights: rights,
+	}
 	hashValidator := pbkdf2.Default()
 	hashValidator.Iterations = 10
 	hashedKey, err := auth.Hash(auth.NewContextWithHashValidator(context.Background(), hashValidator), generatedKey)
 	if err != nil {
 		panic(err)
 	}
-	p.APIKeys = append(p.APIKeys, &EntityAPIKey{
-		EntityIdentifiers: entityID,
-		APIKey: &ttnpb.APIKey{
-			Id:     generatedID,
-			Key:    hashedKey,
-			Rights: rights,
-		},
-	})
-	return &ttnpb.APIKey{
+	stored = &ttnpb.APIKey{
 		Id:     generatedID,
-		Key:    token,
+		Key:    hashedKey,
 		Rights: rights,
 	}
+	p.APIKeys = append(p.APIKeys, &EntityAPIKey{
+		EntityIdentifiers: entityID,
+		APIKey:            stored,
+	})
+	return original, stored
 }
 
 // NewMembership adds a new membership to the population.

@@ -86,6 +86,7 @@ func TestApplicationStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestApplicationStoreCRUD(t)
+	st.TestApplicationStorePagination(t)
 }
 
 func TestClientStore(t *testing.T) {
@@ -93,6 +94,7 @@ func TestClientStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestClientStoreCRUD(t)
+	st.TestClientStorePagination(t)
 }
 
 func TestEndDeviceStore(t *testing.T) {
@@ -100,6 +102,7 @@ func TestEndDeviceStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestEndDeviceStoreCRUD(t)
+	st.TestEndDeviceStorePagination(t)
 }
 
 func TestGatewayStore(t *testing.T) {
@@ -107,6 +110,7 @@ func TestGatewayStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestGatewayStoreCRUD(t)
+	st.TestGatewayStorePagination(t)
 }
 
 func TestOrganizationStore(t *testing.T) {
@@ -114,6 +118,7 @@ func TestOrganizationStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestOrganizationStoreCRUD(t)
+	st.TestOrganizationStorePagination(t)
 }
 
 func TestUserStore(t *testing.T) {
@@ -121,6 +126,7 @@ func TestUserStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestUserStoreCRUD(t)
+	st.TestUserStorePagination(t)
 }
 
 func TestUserSessionStore(t *testing.T) {
@@ -128,6 +134,7 @@ func TestUserSessionStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestUserSessionStore(t)
+	st.TestUserSessionStorePagination(t)
 }
 
 func TestAPIKeyStore(t *testing.T) {
@@ -135,6 +142,7 @@ func TestAPIKeyStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestAPIKeyStoreCRUD(t)
+	st.TestAPIKeyStorePagination(t)
 }
 
 func TestMembershipStore(t *testing.T) {
@@ -142,6 +150,7 @@ func TestMembershipStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestMembershipStoreCRUD(t)
+	st.TestMembershipStorePagination(t)
 }
 
 func TestContactInfoStore(t *testing.T) {
@@ -156,6 +165,7 @@ func TestInvitationStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestInvitationStore(t)
+	st.TestInvitationStorePagination(t)
 }
 
 func TestLoginTokenStore(t *testing.T) {
@@ -170,6 +180,7 @@ func TestOAuthStore(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestOAuthStore(t)
+	st.TestOAuthStorePagination(t)
 }
 
 func TestEUIStore(t *testing.T) {
@@ -191,4 +202,5 @@ func TestEntitySearch(t *testing.T) {
 
 	st := storetest.New(t, newTestStore)
 	st.TestEntitySearch(t)
+	st.TestEntitySearchPagination(t)
 }
