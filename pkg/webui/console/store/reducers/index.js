@@ -59,6 +59,7 @@ import organizations from './organizations'
 import js from './join-server'
 import gatewayStatus from './gateway-status'
 import is from './identity-server'
+import as from './application-server'
 import deviceRepository from './device-repository'
 import packetBroker from './packet-broker'
 
@@ -116,6 +117,7 @@ export default history =>
     js,
     gatewayStatus,
     is,
+    as,
     deviceRepository,
     packetBroker,
   })
