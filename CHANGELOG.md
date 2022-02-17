@@ -19,14 +19,17 @@ For details about compatibility between different releases, see the **Commitment
 
 - The minimum required Redis version is now 6.2.
 - The custom webhook option is now shown at the top of the list in the Console when adding new webhooks.
+- Wording around webhook statuses to `Healthy`, `Requests failing` and `Pending`.
 
 ### Deprecated
+
 - Gateway Server setting `gs.update-connection-stats-debounce-time` is no longer valid.
 
 ### Removed
 
 ### Fixed
 
+- Webhook statuses being shown as pending regardless of their actual condition.
 - Device activation flow with a LoRaWAN Backend Interfaces 1.1 capable Join Server.
   - Join Servers using Backend Interfaces 1.1 (protocol `BI1.1`) must be configured with a `sender-ns-id` containing the EUI of the Network Server.
 - Fix `time.Duration` flags in CLI.
