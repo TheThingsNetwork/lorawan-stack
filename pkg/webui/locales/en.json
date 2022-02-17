@@ -1182,6 +1182,7 @@
   "lib.shared-messages.provider": "Provider",
   "lib.shared-messages.provisionedOnExternalJoinServer": "Provisioned on external Join Server",
   "lib.shared-messages.public": "Make location public",
+  "lib.shared-messages.publicStatus": "Make status public",
   "lib.shared-messages.pubsubBaseTopic": "Base topic",
   "lib.shared-messages.pubsubFormat": "Pub/Sub format",
   "lib.shared-messages.pubsubId": "Pub/Sub ID",
