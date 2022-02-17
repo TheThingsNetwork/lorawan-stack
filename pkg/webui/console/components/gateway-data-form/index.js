@@ -208,7 +208,7 @@ class GatewayDataForm extends React.Component {
           title={sharedMessages.gatewayStatus}
           name="status_public"
           component={Checkbox}
-          label={sharedMessages.public}
+          label={sharedMessages.publicStatus}
           description={sharedMessages.statusDescription}
           tooltipId={tooltipIds.GATEWAY_STATUS}
         />

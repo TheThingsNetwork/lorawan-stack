@@ -317,6 +317,7 @@ export default defineMessages({
   provider: 'Provider',
   provisionedOnExternalJoinServer: 'Provisioned on external Join Server',
   public: 'Make location public',
+  publicStatus: 'Make status public',
   pubsubBaseTopic: 'Base topic',
   pubsubFormat: 'Pub/Sub format',
   pubsubId: 'Pub/Sub ID',
