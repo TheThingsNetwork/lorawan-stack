@@ -20,6 +20,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"io"
 	"strings"
 
@@ -33,8 +34,9 @@ type Decoder interface {
 }
 
 type jsonDecoder struct {
-	rd  *bufio.Reader
-	dec *json.Decoder
+	rd   *bufio.Reader
+	dec  *json.Decoder
+	objs []json.RawMessage
 }
 
 // NewJSONDecoder returns a new Decoder on top of r, and that uses the common JSON
@@ -42,16 +44,45 @@ type jsonDecoder struct {
 func NewJSONDecoder(r io.Reader) Decoder {
 	rd := bufio.NewReader(r)
 	return &jsonDecoder{
-		rd:  rd,
-		dec: json.NewDecoder(rd),
+		rd:   rd,
+		dec:  json.NewDecoder(rd),
+		objs: []json.RawMessage{},
 	}
 }
 
 func (r *jsonDecoder) Decode(data interface{}) (paths []string, err error) {
+	if len(r.objs) > 0 {
+		obj := r.objs[0]
+		var m map[string]interface{}
+		if err = json.Unmarshal(obj, &m); err != nil {
+			return nil, err
+		}
+		paths = fieldPaths(m, "")
+		b := bytes.NewBuffer(obj)
+		if err = jsonpb.TTN().NewDecoder(b).Decode(data); err != nil {
+			return nil, err
+		}
+		r.objs = r.objs[1:]
+		return paths, nil
+	}
 	t, _, err := r.rd.ReadRune()
 	if err != nil {
 		return nil, err
 	}
+
+	if t == '[' {
+		if err := r.rd.UnreadRune(); err != nil {
+			return nil, err
+		}
+		if err := r.dec.Decode(&r.objs); err != nil {
+			return nil, err
+		}
+		fmt.Println(r.objs)
+		r.rd = bufio.NewReader(io.MultiReader(r.dec.Buffered(), r.rd))
+		r.dec = json.NewDecoder(r.rd)
+		return r.Decode(data)
+	}
+
 	if t == '{' {
 		if err := r.rd.UnreadRune(); err != nil {
 			return nil, err
