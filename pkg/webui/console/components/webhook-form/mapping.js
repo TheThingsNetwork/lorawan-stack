@@ -94,7 +94,7 @@ export const decodeValues = backendValues => {
     formValues._basic_auth_password = ''
   }
 
-  formValues._headers = decodeHeaders(backendValues.headers)
+  formValues._headers = decodeHeaders(backendValues?.headers)
   if (hasBasicAuth(formValues._headers)) {
     formValues._headers.find(isBasicAuth).readOnly = true
   }
