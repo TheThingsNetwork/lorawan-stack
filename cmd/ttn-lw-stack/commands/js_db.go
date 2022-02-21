@@ -18,9 +18,10 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"errors"
+	"fmt"
 	"regexp"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -29,9 +30,9 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/cleanup"
 	js "go.thethings.network/lorawan-stack/v3/pkg/joinserver"
 	jsredis "go.thethings.network/lorawan-stack/v3/pkg/joinserver/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
@@ -100,123 +101,97 @@ var (
 				sessionKeyIDStr = "([A-Za-z0-9+/]+)"
 			)
 
-			euiRegexp := regexp.MustCompile(devicesCl.Key("eui", euiRegexpStr, euiRegexpStr+"$"))
 			sessionKeyIDRegexp := regexp.MustCompile(keysCl.Key("id", euiRegexpStr, euiRegexpStr, sessionKeyIDStr+"$"))
 
-			err = ttnredis.RangeRedisKeys(ctx, devicesCl, devicesCl.Key("*"), ttnredis.DefaultRangeCount, func(k string) (bool, error) {
-				logger := logger.WithField("key", k)
+			// Delete session keys that are not belonging to an existing device (orphan session key) and session keys that are
+			// older than the configured limit.
+			if (schemaVersion < 1 || force) && config.JS.SessionKeyLimit > 0 {
+				sessionKeyIDs := make(map[string][][]byte)
+				sessionKeyIDCount := 0
 
-				if match := euiRegexp.FindSubmatch([]byte(k)); len(match) > 0 {
-					// Before schema version 1, all session keys were persisted. This migration puts the recent session keys in
-					// a set per end device. This migration should not have to run on schema versions 1 and later and is therefore
-					// only ran when forcing the migration.
-					if (schemaVersion < 1 || force) && config.JS.SessionKeyLimit > 0 {
-						var joinEUI, devEUI types.EUI64
-						if err := joinEUI.UnmarshalText(match[1]); err != nil {
-							logger.WithError(err).Error("Failed to parse JoinEUI")
+				// Load all session keys in memory and put them in a set for each end device.
+				err = ttnredis.RangeRedisKeys(ctx, keysCl, keysCl.Key("*"), ttnredis.DefaultRangeCount, func(k string) (bool, error) {
+					logger := logger.WithField("key", k)
+					if match := sessionKeyIDRegexp.FindStringSubmatch(k); len(match) > 0 {
+						sid, err := base64.RawStdEncoding.DecodeString(match[3])
+						if err != nil {
+							logger.WithError(err).Error("Failed to parse base64 session key ID")
 							return true, nil
 						}
-						if err := devEUI.UnmarshalText(match[2]); err != nil {
-							logger.WithError(err).Error("Failed to parse DevEUI")
-							return true, nil
-						}
-						var sids [][]byte
-						err := ttnredis.RangeRedisKeys(ctx, keysCl, keysCl.Key("id", joinEUI.String(), devEUI.String(), "*"), ttnredis.DefaultRangeCount, func(k string) (bool, error) {
-							match := sessionKeyIDRegexp.FindStringSubmatch(k)
-							if len(match) == 0 {
-								logger.WithField("key", k).Error("Failed to parse session key ID key")
-								return true, nil
+						k := fmt.Sprintf("%s:%s", match[1], match[2])
+						sessionKeyIDs[k] = append(sessionKeyIDs[k], sid)
+						sessionKeyIDCount++
+					} else {
+						logger.Debug("Skip unmatched key")
+						return true, nil
+					}
+					migrated++
+					return true, nil
+				})
+				if err != nil {
+					return err
+				}
+				logger.WithFields(log.Fields(
+					"end_device_count", len(sessionKeyIDs),
+					"session_key_count", sessionKeyIDCount,
+				)).Debug("Found session keys")
+
+				// Check whether the end device exists. If not, delete the session keys. Otherwise, delete the old session keys.
+				for k, sids := range sessionKeyIDs {
+					parts := strings.SplitN(k, ":", 2)
+					joinEUI, devEUI := parts[0], parts[1]
+					logger := logger.WithFields(log.Fields(
+						"join_eui", joinEUI,
+						"dev_eui", devEUI,
+					))
+					exists, err := devicesCl.Exists(ctx, devicesCl.Key("eui", joinEUI, devEUI)).Result()
+					if err != nil {
+						return err
+					}
+					if exists == 0 {
+						_, err := keysCl.Pipelined(ctx, func(p redis.Pipeliner) error {
+							for _, sid := range sids {
+								p.Del(ctx, keysCl.Key("id", joinEUI, devEUI, base64.RawStdEncoding.EncodeToString(sid)))
 							}
-							sid, err := base64.RawStdEncoding.DecodeString(match[3])
-							if err != nil {
-								logger.WithError(err).Error("Failed to parse base64 session key ID")
-								return true, nil
-							}
-							sids = append(sids, sid)
-							return true, nil
+							return nil
 						})
 						if err != nil {
-							logger.WithError(err).Error("Failed to range session keys")
-							return true, nil
+							logger.WithError(err).Error("Failed to delete orphan session key(s)")
+							return err
 						}
-						logger.WithField("count", len(sids)).Debug("Retrieved session keys")
+						logger.WithField("count", len(sids)).Debug("Deleted orphan session keys")
+					} else {
 						sort.Slice(sids, func(i, j int) bool { return bytes.Compare(sids[i], sids[j]) < 0 })
 						if d := len(sids) - config.JS.SessionKeyLimit; d > 0 {
-							for _, sid := range sids[:d] {
-								sidKey := keysCl.Key("id", joinEUI.String(), devEUI.String(), base64.RawStdEncoding.EncodeToString(sid))
-								logger := logger.WithField("key", sidKey)
-								if err := keysCl.Del(ctx, sidKey).Err(); err != nil {
-									logger.WithError(err).Error("Failed to delete session key")
-									continue
+							_, err := keysCl.Pipelined(ctx, func(p redis.Pipeliner) error {
+								for _, sid := range sids[:d] {
+									p.Del(ctx, keysCl.Key("id", joinEUI, devEUI, base64.RawStdEncoding.EncodeToString(sid)))
 								}
-								logger.Debug("Deleted old session key")
+								return nil
+							})
+							if err != nil {
+								logger.WithError(err).Error("Failed to delete old session key(s)")
+								continue
 							}
+							logger.WithField("count", len(sids[:d])).Debug("Deleted old session keys")
 							sids = sids[d:]
 						}
 						sidVals := make([]interface{}, len(sids))
 						for i := range sids {
 							sidVals[i] = base64.RawStdEncoding.EncodeToString(sids[i])
 						}
-						sidsKey := keysCl.Key("ids", joinEUI.String(), devEUI.String())
+						sidsKey := keysCl.Key("ids", joinEUI, devEUI)
 						if err := keysCl.Del(ctx, sidsKey).Err(); err != nil {
 							logger.WithError(err).Error("Failed to delete existing recent session key IDs")
-							return true, nil
+							return err
 						}
 						if err := keysCl.RPush(ctx, sidsKey, sidVals...).Err(); err != nil {
 							logger.WithError(err).Error("Failed to store recent session key IDs")
-							return true, nil
+							return err
 						}
+						logger.WithField("count", len(sidVals)).Debug("Stored recent session key IDs")
 					}
-				} else {
-					logger.Debug("Skip unmatched key")
-					return true, nil
 				}
-				migrated++
-				return true, nil
-			})
-			if err != nil {
-				return err
-			}
-
-			err = ttnredis.RangeRedisKeys(ctx, keysCl, keysCl.Key("*"), ttnredis.DefaultRangeCount, func(k string) (bool, error) {
-				logger := logger.WithField("key", k)
-
-				if match := sessionKeyIDRegexp.FindSubmatch([]byte(k)); len(match) > 0 {
-					// Check that the session key exists in the concerning list. If not, it's an orphan session key and it should
-					// be deleted.
-					if config.JS.SessionKeyLimit > 0 {
-						var joinEUI, devEUI types.EUI64
-						if err := joinEUI.UnmarshalText(match[1]); err != nil {
-							logger.WithError(err).Error("Failed to parse JoinEUI")
-							return true, nil
-						}
-						if err := devEUI.UnmarshalText(match[2]); err != nil {
-							logger.WithError(err).Error("Failed to parse DevEUI")
-							return true, nil
-						}
-						_, err := keysCl.LPos(ctx, keysCl.Key("ids", joinEUI.String(), devEUI.String()), string(match[3]), redis.LPosArgs{}).Result()
-						if err != nil {
-							if !errors.Is(err, redis.Nil) {
-								logger.WithError(err).Error("Failed to get position of session key ID in set")
-								return true, nil
-							}
-							if _, err := keysCl.Del(ctx, k).Result(); err != nil {
-								logger.WithError(err).Error("Failed to delete orphan session key")
-								return true, nil
-							}
-							logger.Debug("Deleted orphan session key")
-						}
-					}
-				} else {
-					logger.Debug("Skip unmatched key")
-					return true, nil
-				}
-
-				migrated++
-				return true, nil
-			})
-			if err != nil {
-				return err
 			}
 
 			return recordSchemaVersion(keysCl, jsredis.SchemaVersion)
