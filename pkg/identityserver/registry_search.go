@@ -93,7 +93,7 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 			}
 		}
 		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindApplications).
-		res.Applications, err = gormstore.GetApplicationStore(db).FindApplications(ctx, entityIDs, req.FieldMask)
+		res.Applications, err = gormstore.GetApplicationStore(db).FindApplications(ctx, entityIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -178,7 +178,7 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchCl
 			}
 		}
 		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindClients).
-		res.Clients, err = gormstore.GetClientStore(db).FindClients(ctx, entityIDs, req.FieldMask)
+		res.Clients, err = gormstore.GetClientStore(db).FindClients(ctx, entityIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -266,7 +266,7 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchG
 			}
 		}
 		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindGateways).
-		res.Gateways, err = gormstore.GetGatewayStore(db).FindGateways(ctx, entityIDs, req.FieldMask)
+		res.Gateways, err = gormstore.GetGatewayStore(db).FindGateways(ctx, entityIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -357,7 +357,7 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 			}
 		}
 		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindOrganizations).
-		res.Organizations, err = gormstore.GetOrganizationStore(db).FindOrganizations(ctx, entityIDs, req.FieldMask)
+		res.Organizations, err = gormstore.GetOrganizationStore(db).FindOrganizations(ctx, entityIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -436,7 +436,7 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUser
 			return nil
 		}
 		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindUsers).
-		res.Users, err = gormstore.GetUserStore(db).FindUsers(ctx, ids, req.FieldMask)
+		res.Users, err = gormstore.GetUserStore(db).FindUsers(ctx, ids, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -487,7 +487,7 @@ func (rs *registrySearch) SearchEndDevices(ctx context.Context, req *ttnpb.Searc
 			return nil
 		}
 		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindEndDevices).
-		res.EndDevices, err = gormstore.GetEndDeviceStore(db).FindEndDevices(ctx, ids, req.FieldMask)
+		res.EndDevices, err = gormstore.GetEndDeviceStore(db).FindEndDevices(ctx, ids, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}

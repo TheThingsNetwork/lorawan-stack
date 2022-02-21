@@ -17,7 +17,6 @@ package identityserver
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
@@ -105,7 +104,7 @@ func (is *IdentityServer) ApplicationRights(ctx context.Context, appIDs ttnpb.Ap
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		_, err := store.GetApplicationStore(db).GetApplication(ctx, &appIDs, &pbtypes.FieldMask{Paths: []string{"ids"}})
+		_, err := store.GetApplicationStore(db).GetApplication(ctx, &appIDs, []string{"ids"})
 		return err
 	})
 	if errors.IsNotFound(err) {
@@ -126,7 +125,7 @@ func (is *IdentityServer) ClientRights(ctx context.Context, cliIDs ttnpb.ClientI
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		_, err := store.GetClientStore(db).GetClient(ctx, &cliIDs, &pbtypes.FieldMask{Paths: []string{"ids"}})
+		_, err := store.GetClientStore(db).GetClient(ctx, &cliIDs, []string{"ids"})
 		return err
 	})
 	if errors.IsNotFound(err) {
@@ -149,9 +148,9 @@ func (is *IdentityServer) GatewayRights(ctx context.Context, gtwIDs ttnpb.Gatewa
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		gtw, err := store.GetGatewayStore(db).GetGateway(ctx, &gtwIDs, &pbtypes.FieldMask{Paths: []string{
+		gtw, err := store.GetGatewayStore(db).GetGateway(ctx, &gtwIDs, []string{
 			"ids", "status_public", "location_public",
-		}})
+		})
 		if err != nil {
 			return err
 		}
@@ -181,7 +180,7 @@ func (is *IdentityServer) OrganizationRights(ctx context.Context, orgIDs ttnpb.O
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		_, err := store.GetOrganizationStore(db).GetOrganization(ctx, &orgIDs, &pbtypes.FieldMask{Paths: []string{"ids"}})
+		_, err := store.GetOrganizationStore(db).GetOrganization(ctx, &orgIDs, []string{"ids"})
 		return err
 	})
 	if errors.IsNotFound(err) {
@@ -202,7 +201,7 @@ func (is *IdentityServer) UserRights(ctx context.Context, userIDs ttnpb.UserIden
 		return nil, err
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		_, err := store.GetUserStore(db).GetUser(ctx, &userIDs, &pbtypes.FieldMask{Paths: []string{"ids"}})
+		_, err := store.GetUserStore(db).GetUser(ctx, &userIDs, []string{"ids"})
 		return err
 	})
 	if errors.IsNotFound(err) {

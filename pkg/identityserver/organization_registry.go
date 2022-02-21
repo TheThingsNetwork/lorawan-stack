@@ -139,7 +139,7 @@ func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrg
 		defer func() { org = org.PublicSafe() }()
 	}
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		org, err = gormstore.GetOrganizationStore(db).GetOrganization(ctx, req.GetOrganizationIds(), req.FieldMask)
+		org, err = gormstore.GetOrganizationStore(db).GetOrganization(ctx, req.GetOrganizationIds(), req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -215,7 +215,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 				orgIDs = append(orgIDs, orgID)
 			}
 		}
-		orgs.Organizations, err = gormstore.GetOrganizationStore(db).FindOrganizations(ctx, orgIDs, req.FieldMask)
+		orgs.Organizations, err = gormstore.GetOrganizationStore(db).FindOrganizations(ctx, orgIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -256,7 +256,7 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 		if err := validateContactIsCollaborator(ctx, db, req.Organization.TechnicalContact, req.Organization.GetEntityIdentifiers()); err != nil {
 			return err
 		}
-		org, err = gormstore.GetOrganizationStore(db).UpdateOrganization(ctx, req.Organization, req.FieldMask)
+		org, err = gormstore.GetOrganizationStore(db).UpdateOrganization(ctx, req.Organization, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}

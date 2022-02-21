@@ -20,7 +20,6 @@ import (
 	"runtime/trace"
 	"strings"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
@@ -37,11 +36,11 @@ type apiKeyStore struct {
 	*baseStore
 }
 
-func selectAPIKeyFields(ctx context.Context, query *gorm.DB, fieldMask *pbtypes.FieldMask) *gorm.DB {
+func selectAPIKeyFields(ctx context.Context, query *gorm.DB, fieldMask store.FieldMask) *gorm.DB {
 	var apiKeyColumns []string
 	var notFoundPaths []string
 
-	for _, path := range ttnpb.TopLevelFields(fieldMask.GetPaths()) {
+	for _, path := range ttnpb.TopLevelFields(fieldMask) {
 		switch path {
 		case "updated_at", "entity_id", "entity_type", "id":
 			// always selected
@@ -138,7 +137,7 @@ func (s *apiKeyStore) GetAPIKey(ctx context.Context, id string) (*ttnpb.EntityId
 	return ids, keyModel.toPB(), nil
 }
 
-func (s *apiKeyStore) UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey, fieldMask *pbtypes.FieldMask) (*ttnpb.APIKey, error) {
+func (s *apiKeyStore) UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey, fieldMask store.FieldMask) (*ttnpb.APIKey, error) {
 	defer trace.StartRegion(ctx, "update api key").End()
 	entity, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
@@ -158,17 +157,17 @@ func (s *apiKeyStore) UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityId
 		return nil, err
 	}
 	// If empty rights are passed and rights are in the fieldmask, delete the key.
-	if len(key.Rights) == 0 && ttnpb.HasAnyField(fieldMask.GetPaths(), "rights") {
+	if len(key.Rights) == 0 && ttnpb.HasAnyField(fieldMask, "rights") {
 		return nil, query.Delete(&keyModel).Error
 	}
 	query = selectAPIKeyFields(ctx, query, fieldMask)
-	if ttnpb.HasAnyField(fieldMask.GetPaths(), "rights") {
+	if ttnpb.HasAnyField(fieldMask, "rights") {
 		keyModel.Rights = Rights{Rights: key.Rights}
 	}
-	if ttnpb.HasAnyField(fieldMask.GetPaths(), "expires_at") {
+	if ttnpb.HasAnyField(fieldMask, "expires_at") {
 		keyModel.ExpiresAt = ttnpb.StdTime(key.ExpiresAt)
 	}
-	if ttnpb.HasAnyField(fieldMask.GetPaths(), "name") {
+	if ttnpb.HasAnyField(fieldMask, "name") {
 		keyModel.Name = key.Name
 	}
 	if err = query.Save(&keyModel).Error; err != nil {

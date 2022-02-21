@@ -20,7 +20,6 @@ import (
 	"runtime/trace"
 	"time"
 
-	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -152,7 +151,7 @@ func (s *Session) DoLogin(ctx context.Context, userID, password string) error {
 	user, err := s.Store.GetUser(
 		ctx,
 		ids,
-		&types.FieldMask{Paths: []string{"password"}},
+		[]string{"password"},
 	)
 	if err != nil {
 		if errors.IsNotFound(err) {

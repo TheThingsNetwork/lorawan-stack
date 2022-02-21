@@ -18,7 +18,6 @@ import (
 	"context"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/jinzhu/gorm"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
@@ -92,7 +91,7 @@ var createOAuthClient = &cobra.Command{
 			return err
 		}
 
-		cliFieldMask := &pbtypes.FieldMask{Paths: []string{
+		cliFieldMask := []string{
 			"name",
 			"secret",
 			"redirect_uris",
@@ -102,7 +101,7 @@ var createOAuthClient = &cobra.Command{
 			"endorsed",
 			"grants",
 			"rights",
-		}}
+		}
 		cli := &ttnpb.Client{
 			Ids: &ttnpb.ClientIdentifiers{ClientId: clientID},
 		}

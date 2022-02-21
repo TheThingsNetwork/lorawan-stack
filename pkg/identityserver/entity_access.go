@@ -98,8 +98,8 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 
 	var fetch func(db *gorm.DB) error
 	res := &ttnpb.AuthInfoResponse{}
-	userFieldMask := &pbtypes.FieldMask{Paths: []string{"admin", "state", "state_description", "primary_email_address_validated_at"}}
-	clientFieldMask := &pbtypes.FieldMask{Paths: []string{"state", "state_description"}}
+	userFieldMask := []string{"admin", "state", "state_description", "primary_email_address_validated_at"}
+	clientFieldMask := []string{"state", "state_description"}
 	var user *ttnpb.User
 	var userRights *ttnpb.Rights
 
@@ -321,9 +321,7 @@ func (is *IdentityServer) RequireAuthenticated(ctx context.Context) error {
 
 	if userID := authInfo.GetEntityIdentifiers().GetUserIds(); userID != nil {
 		err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-			user, err := store.GetUserStore(db).GetUser(ctx, userID, &pbtypes.FieldMask{Paths: []string{
-				"state",
-			}})
+			user, err := store.GetUserStore(db).GetUser(ctx, userID, []string{"state"})
 			if err != nil {
 				return err
 			}

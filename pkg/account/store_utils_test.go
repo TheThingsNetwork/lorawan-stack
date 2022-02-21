@@ -17,7 +17,6 @@ package account_test
 import (
 	"context"
 
-	"github.com/gogo/protobuf/types"
 	account_store "go.thethings.network/lorawan-stack/v3/pkg/account/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -29,7 +28,7 @@ type mockStoreContents struct {
 	calls []string
 	req   struct {
 		ctx       context.Context
-		fieldMask *types.FieldMask
+		fieldMask store.FieldMask
 		session   *ttnpb.UserSession
 		sessionID string
 		userIDs   *ttnpb.UserIdentifiers
@@ -66,7 +65,7 @@ var (
 	mockErrNotFound        = grpc.Errorf(codes.NotFound, "NotFound")
 )
 
-func (s *mockStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fieldMask *types.FieldMask) (*ttnpb.User, error) {
+func (s *mockStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fieldMask store.FieldMask) (*ttnpb.User, error) {
 	s.req.ctx, s.req.userIDs, s.req.fieldMask = ctx, id, fieldMask
 	s.calls = append(s.calls, "GetUser")
 	return s.res.user, s.err.getUser

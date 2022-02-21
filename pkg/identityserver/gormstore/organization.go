@@ -15,7 +15,7 @@
 package store
 
 import (
-	pbtypes "github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -93,7 +93,7 @@ var organizationModelSetters = map[string]func(*Organization, *ttnpb.Organizatio
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
-var defaultOrganizationFieldMask = &pbtypes.FieldMask{}
+var defaultOrganizationFieldMask store.FieldMask
 
 func init() {
 	paths := make([]string, 0, len(organizationPBSetters))
@@ -102,7 +102,7 @@ func init() {
 			paths = append(paths, path)
 		}
 	}
-	defaultOrganizationFieldMask.Paths = paths
+	defaultOrganizationFieldMask = paths
 }
 
 // fieldmask path to column name in organizations table.
@@ -115,26 +115,26 @@ var organizationColumnNames = map[string][]string{
 	technicalContactField:      {technicalContactField + "_id"},
 }
 
-func (org Organization) toPB(pb *ttnpb.Organization, fieldMask *pbtypes.FieldMask) {
+func (org Organization) toPB(pb *ttnpb.Organization, fieldMask store.FieldMask) {
 	pb.Ids = &ttnpb.OrganizationIdentifiers{OrganizationId: org.Account.UID}
 	pb.CreatedAt = ttnpb.ProtoTimePtr(cleanTime(org.CreatedAt))
 	pb.UpdatedAt = ttnpb.ProtoTimePtr(cleanTime(org.UpdatedAt))
 	pb.DeletedAt = ttnpb.ProtoTime(cleanTimePtr(org.DeletedAt))
-	if len(fieldMask.GetPaths()) == 0 {
+	if len(fieldMask) == 0 {
 		fieldMask = defaultOrganizationFieldMask
 	}
-	for _, path := range fieldMask.Paths {
+	for _, path := range fieldMask {
 		if setter, ok := organizationPBSetters[path]; ok {
 			setter(pb, &org)
 		}
 	}
 }
 
-func (org *Organization) fromPB(pb *ttnpb.Organization, fieldMask *pbtypes.FieldMask) (columns []string) {
-	if len(fieldMask.GetPaths()) == 0 {
+func (org *Organization) fromPB(pb *ttnpb.Organization, fieldMask store.FieldMask) (columns []string) {
+	if len(fieldMask) == 0 {
 		fieldMask = defaultOrganizationFieldMask
 	}
-	for _, path := range fieldMask.Paths {
+	for _, path := range fieldMask {
 		if setter, ok := organizationModelSetters[path]; ok {
 			setter(org, pb)
 			if columnNames, ok := organizationColumnNames[path]; ok {
@@ -153,7 +153,7 @@ type organizationWithUID struct {
 
 func (organizationWithUID) TableName() string { return "organizations" }
 
-func (u organizationWithUID) toPB(pb *ttnpb.Organization, fieldMask *pbtypes.FieldMask) {
+func (u organizationWithUID) toPB(pb *ttnpb.Organization, fieldMask store.FieldMask) {
 	u.Organization.Account.UID = u.UID
 	u.Organization.toPB(pb, fieldMask)
 }

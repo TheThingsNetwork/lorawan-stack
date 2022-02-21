@@ -18,7 +18,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/gogo/protobuf/types"
 	osin "github.com/openshift/osin"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -50,7 +49,7 @@ func (s *server) ClientLogout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if at != nil {
-		client, err := s.store.GetClient(ctx, at.ClientIds, &types.FieldMask{Paths: []string{"logout_redirect_uris"}})
+		client, err := s.store.GetClient(ctx, at.ClientIds, []string{"logout_redirect_uris"})
 		if err != nil {
 			webhandlers.Error(w, r, err)
 			return

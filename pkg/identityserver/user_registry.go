@@ -334,7 +334,7 @@ func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest
 	}
 
 	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		usr, err = gormstore.GetUserStore(db).GetUser(ctx, req.GetUserIds(), req.FieldMask)
+		usr, err = gormstore.GetUserStore(db).GetUser(ctx, req.GetUserIds(), req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -370,7 +370,7 @@ func (is *IdentityServer) listUsers(ctx context.Context, req *ttnpb.ListUsersReq
 	}()
 	users = &ttnpb.Users{}
 	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		users.Users, err = gormstore.GetUserStore(db).FindUsers(paginateCtx, nil, req.FieldMask)
+		users.Users, err = gormstore.GetUserStore(db).FindUsers(paginateCtx, nil, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -500,7 +500,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 				}
 			}
 		}
-		usr, err = gormstore.GetUserStore(db).UpdateUser(ctx, req.User, req.FieldMask)
+		usr, err = gormstore.GetUserStore(db).UpdateUser(ctx, req.User, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -539,16 +539,16 @@ var (
 )
 
 var (
-	updatePasswordFieldMask = &pbtypes.FieldMask{Paths: []string{
+	updatePasswordFieldMask = []string{
 		"password", "password_updated_at", "require_password_update",
-	}}
-	temporaryPasswordFieldMask = &pbtypes.FieldMask{Paths: []string{
+	}
+	temporaryPasswordFieldMask = []string{
 		"password", "password_updated_at", "require_password_update",
 		"temporary_password", "temporary_password_created_at", "temporary_password_expires_at",
-	}}
-	updateTemporaryPasswordFieldMask = &pbtypes.FieldMask{Paths: []string{
+	}
+	updateTemporaryPasswordFieldMask = []string{
 		"temporary_password", "temporary_password_created_at", "temporary_password_expires_at",
-	}}
+	}
 )
 
 func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.UpdateUserPasswordRequest) (*pbtypes.Empty, error) {

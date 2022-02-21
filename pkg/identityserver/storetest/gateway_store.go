@@ -247,7 +247,7 @@ func (st *StoreTest) TestGatewayStoreCRUD(t *T) {
 			RequireAuthenticatedConnection: false,
 			Lrfhss:                         &ttnpb.Gateway_LRFHSS{Supported: false},
 			DisablePacketBrokerForwarding:  false,
-		}, fieldMaskWith(mask, "ids.eui"))
+		}, append(mask, "ids.eui"))
 		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.GetIds().GetGatewayId(), should.Equal, "foo")
 			a.So(updated.GetIds().GetEui(), should.Resemble, updatedEUI)
