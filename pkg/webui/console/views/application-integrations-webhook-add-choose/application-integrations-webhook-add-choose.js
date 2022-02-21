@@ -70,13 +70,13 @@ const WebhookChooser = props => {
         </Col>
       </Row>
       <Row gutterWidth={15} className={style.tileRow}>
-        {webhookTemplates.map(WebhookTile)}
         <WebhookTile
           ids={{ template_id: 'custom' }}
           name="Custom webhook"
           description={m.customTileDescription}
           logo_url={BlankWebhookImg}
         />
+        {webhookTemplates.map(WebhookTile)}
       </Row>
     </Container>
   )

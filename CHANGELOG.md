@@ -18,6 +18,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - The minimum required Redis version is now 6.2.
+- The custom webhook option is now shown at the top of the list in the Console when adding new webhooks.
 
 ### Deprecated
 - Gateway Server setting `gs.update-connection-stats-debounce-time` is no longer valid.
