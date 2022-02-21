@@ -1687,10 +1687,10 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"session.dev_addr":                 st.Device.Session.DevAddr.IsZero,
 			"session.keys.f_nwk_s_int_key.key": st.Device.Session.Keys.GetFNwkSIntKey().IsZero,
 			"session.keys.nwk_s_enc_key.key": func() bool {
-				return st.Device.Session.Keys.NwkSEncKey != nil && st.Device.Session.Keys.NwkSEncKey.IsZero()
+				return st.Device.Session.Keys.GetNwkSEncKey() != nil && st.Device.Session.Keys.NwkSEncKey.IsZero()
 			},
 			"session.keys.s_nwk_s_int_key.key": func() bool {
-				return st.Device.Session.Keys.SNwkSIntKey != nil && st.Device.Session.Keys.SNwkSIntKey.IsZero()
+				return st.Device.Session.Keys.GetSNwkSIntKey() != nil && st.Device.Session.Keys.SNwkSIntKey.IsZero()
 			},
 		} {
 			if err := st.ValidateSetField(func() bool { return !isZero() }, p); err != nil {
@@ -1714,7 +1714,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				}
 			})
 		}
-		if k := st.Device.Session.Keys.NwkSEncKey.GetKey(); k != nil && st.HasSetField("session.keys.nwk_s_enc_key.key") {
+		if k := st.Device.Session.Keys.GetNwkSEncKey().GetKey(); k != nil && st.HasSetField("session.keys.nwk_s_enc_key.key") {
 			nwkSEncKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
@@ -1730,7 +1730,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				}
 			})
 		}
-		if k := st.Device.Session.Keys.SNwkSIntKey.GetKey(); k != nil && st.HasSetField("session.keys.s_nwk_s_int_key.key") {
+		if k := st.Device.Session.Keys.GetSNwkSIntKey().GetKey(); k != nil && st.HasSetField("session.keys.s_nwk_s_int_key.key") {
 			sNwkSIntKey, err := cryptoutil.WrapAES128Key(ctx, *k, ns.deviceKEKLabel, ns.KeyVault)
 			if err != nil {
 				return nil, err
@@ -1750,11 +1750,11 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	if st.Device.PendingSession != nil {
 		for p, isZero := range map[string]func() bool{
 			"pending_session.dev_addr":                 st.Device.PendingSession.DevAddr.IsZero,
-			"pending_session.keys.f_nwk_s_int_key.key": st.Device.PendingSession.Keys.FNwkSIntKey.IsZero,
-			"pending_session.keys.nwk_s_enc_key.key":   st.Device.PendingSession.Keys.NwkSEncKey.IsZero,
-			"pending_session.keys.s_nwk_s_int_key.key": st.Device.PendingSession.Keys.SNwkSIntKey.IsZero,
+			"pending_session.keys.f_nwk_s_int_key.key": st.Device.PendingSession.Keys.GetFNwkSIntKey().IsZero,
+			"pending_session.keys.nwk_s_enc_key.key":   st.Device.PendingSession.Keys.GetNwkSEncKey().IsZero,
+			"pending_session.keys.s_nwk_s_int_key.key": st.Device.PendingSession.Keys.GetSNwkSIntKey().IsZero,
 			"pending_session.keys.session_key_id": func() bool {
-				return len(st.Device.PendingSession.Keys.SessionKeyId) == 0
+				return len(st.Device.PendingSession.Keys.GetSessionKeyId()) == 0
 			},
 		} {
 			if err := st.ValidateSetField(func() bool { return !isZero() }, p); err != nil {
@@ -1815,10 +1815,10 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	}
 	if st.Device.PendingMacState.GetQueuedJoinAccept() != nil {
 		for p, isZero := range map[string]func() bool{
-			"pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key": st.Device.PendingMacState.QueuedJoinAccept.Keys.FNwkSIntKey.IsZero,
-			"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key":   st.Device.PendingMacState.QueuedJoinAccept.Keys.NwkSEncKey.IsZero,
-			"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key": st.Device.PendingMacState.QueuedJoinAccept.Keys.SNwkSIntKey.IsZero,
-			"pending_mac_state.queued_join_accept.keys.session_key_id":      func() bool { return len(st.Device.PendingMacState.QueuedJoinAccept.Keys.SessionKeyId) == 0 },
+			"pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key": st.Device.PendingMacState.QueuedJoinAccept.Keys.GetFNwkSIntKey().IsZero,
+			"pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key":   st.Device.PendingMacState.QueuedJoinAccept.Keys.GetNwkSEncKey().IsZero,
+			"pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key": st.Device.PendingMacState.QueuedJoinAccept.Keys.GetSNwkSIntKey().IsZero,
+			"pending_mac_state.queued_join_accept.keys.session_key_id":      func() bool { return len(st.Device.PendingMacState.QueuedJoinAccept.Keys.GetSessionKeyId()) == 0 },
 			"pending_mac_state.queued_join_accept.payload":                  func() bool { return len(st.Device.PendingMacState.QueuedJoinAccept.Payload) == 0 },
 			"pending_mac_state.queued_join_accept.dev_addr":                 st.Device.PendingMacState.QueuedJoinAccept.DevAddr.IsZero,
 		} {
