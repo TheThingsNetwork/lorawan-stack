@@ -225,3 +225,29 @@ type EUIStore interface {
 	CreateEUIBlock(ctx context.Context, configPrefix types.EUI64Prefix, initCounter int64, euiType string) error
 	IssueDevEUIForApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers, applicationLimit int) (*ttntypes.EUI64, error)
 }
+
+// Store interface combines the interfaces of all individual stores.
+type Store interface {
+	ApplicationStore
+	ClientStore
+	EndDeviceStore
+	GatewayStore
+	OrganizationStore
+	UserStore
+	UserSessionStore
+	MembershipStore
+	APIKeyStore
+	OAuthStore
+	InvitationStore
+	LoginTokenStore
+	ContactInfoStore
+	EUIStore
+	EntitySearch
+}
+
+// TransactionalStore is Store, but with a method that uses a transaction.
+type TransactionalStore interface {
+	Store
+
+	Transact(ctx context.Context, fc func(context.Context, Store) error) error
+}

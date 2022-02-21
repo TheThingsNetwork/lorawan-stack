@@ -18,7 +18,6 @@ import (
 	"context"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -66,8 +65,8 @@ func (is *IdentityServer) getClientCollaborator(ctx context.Context, req *ttnpb.
 	res := &ttnpb.GetCollaboratorResponse{
 		Ids: req.GetCollaborator(),
 	}
-	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		rights, err := is.getMembershipStore(ctx, db).GetMember(
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		rights, err := st.GetMember(
 			ctx,
 			req.GetCollaborator(),
 			req.GetClientIds().GetEntityIdentifiers(),
@@ -92,10 +91,8 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 		return nil, err
 	}
 
-	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		store := is.getMembershipStore(ctx, db)
-
-		existingRights, err := store.GetMember(
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		existingRights, err := st.GetMember(
 			ctx,
 			req.GetCollaborator().GetIds(),
 			req.GetClientIds().GetEntityIdentifiers(),
@@ -123,7 +120,7 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 		}
 
 		if removedRights.IncludesAll(ttnpb.Right_RIGHT_CLIENT_ALL) {
-			memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.GetClientIds().GetEntityIdentifiers())
+			memberRights, err := st.FindMembers(ctx, req.GetClientIds().GetEntityIdentifiers())
 			if err != nil {
 				return err
 			}
@@ -142,7 +139,7 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 			}
 		}
 
-		return store.SetMember(
+		return st.SetMember(
 			ctx,
 			req.GetCollaborator().GetIds(),
 			req.GetClientIds().GetEntityIdentifiers(),
@@ -181,8 +178,8 @@ func (is *IdentityServer) listClientCollaborators(ctx context.Context, req *ttnp
 			setTotalHeader(ctx, total)
 		}
 	}()
-	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.GetClientIds().GetEntityIdentifiers())
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		memberRights, err := st.FindMembers(ctx, req.GetClientIds().GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

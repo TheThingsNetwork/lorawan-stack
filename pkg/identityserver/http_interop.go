@@ -17,9 +17,8 @@ package identityserver
 import (
 	"context"
 
-	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -43,8 +42,8 @@ func (srv *interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSR
 	}
 
 	var dev *ttnpb.EndDevice
-	err := srv.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		dev, err = store.GetEndDeviceStore(db).GetEndDevice(ctx, ids, []string{"network_server_address"})
+	err := srv.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		dev, err = st.GetEndDevice(ctx, ids, []string{"network_server_address"})
 		return err
 	})
 	if err != nil {

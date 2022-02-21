@@ -17,9 +17,8 @@ package identityserver
 import (
 	"context"
 
-	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -78,8 +77,8 @@ func (is *IdentityServer) getRights(ctx context.Context, entityID *ttnpb.EntityI
 		return nil, universalRights, nil
 	}
 
-	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		membershipChains, err := is.getMembershipStore(ctx, db).FindAccountMembershipChains(ctx, ouID, entityID.EntityType(), entityID.IDString())
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		membershipChains, err := st.FindAccountMembershipChains(ctx, ouID, entityID.EntityType(), entityID.IDString())
 		if err != nil {
 			return err
 		}
@@ -103,8 +102,8 @@ func (is *IdentityServer) ApplicationRights(ctx context.Context, appIDs ttnpb.Ap
 	if err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		_, err := store.GetApplicationStore(db).GetApplication(ctx, &appIDs, []string{"ids"})
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		_, err := st.GetApplication(ctx, &appIDs, []string{"ids"})
 		return err
 	})
 	if errors.IsNotFound(err) {
@@ -124,8 +123,8 @@ func (is *IdentityServer) ClientRights(ctx context.Context, cliIDs ttnpb.ClientI
 	if err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		_, err := store.GetClientStore(db).GetClient(ctx, &cliIDs, []string{"ids"})
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		_, err := st.GetClient(ctx, &cliIDs, []string{"ids"})
 		return err
 	})
 	if errors.IsNotFound(err) {
@@ -147,10 +146,8 @@ func (is *IdentityServer) GatewayRights(ctx context.Context, gtwIDs ttnpb.Gatewa
 	if err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		gtw, err := store.GetGatewayStore(db).GetGateway(ctx, &gtwIDs, []string{
-			"ids", "status_public", "location_public",
-		})
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		gtw, err := st.GetGateway(ctx, &gtwIDs, []string{"ids", "status_public", "location_public"})
 		if err != nil {
 			return err
 		}
@@ -179,8 +176,8 @@ func (is *IdentityServer) OrganizationRights(ctx context.Context, orgIDs ttnpb.O
 	if err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		_, err := store.GetOrganizationStore(db).GetOrganization(ctx, &orgIDs, []string{"ids"})
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		_, err := st.GetOrganization(ctx, &orgIDs, []string{"ids"})
 		return err
 	})
 	if errors.IsNotFound(err) {
@@ -200,8 +197,8 @@ func (is *IdentityServer) UserRights(ctx context.Context, userIDs ttnpb.UserIden
 	if err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		_, err := store.GetUserStore(db).GetUser(ctx, &userIDs, []string{"ids"})
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		_, err := st.GetUser(ctx, &userIDs, []string{"ids"})
 		return err
 	})
 	if errors.IsNotFound(err) {

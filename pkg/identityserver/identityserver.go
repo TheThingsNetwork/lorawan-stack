@@ -47,9 +47,12 @@ import (
 // OAuth clients, Gateways, Organizations and Users.
 type IdentityServer struct {
 	*component.Component
-	ctx            context.Context
-	config         *Config
-	db             *gorm.DB
+	ctx    context.Context
+	config *Config
+	db     *gorm.DB
+
+	store store.TransactionalStore
+
 	redis          *redis.Client
 	emailTemplates *email.TemplateRegistry
 	account        account.Server
@@ -112,33 +115,12 @@ func GenerateCSPString(config *oauth.Config, nonce string) string {
 }
 
 type accountAppStore struct {
-	db *gorm.DB
-
-	store.UserStore
-	store.LoginTokenStore
-	store.UserSessionStore
-}
-
-// WithSoftDeleted implements account_store.Interface.
-func (as *accountAppStore) WithSoftDeleted(ctx context.Context, onlyDeleted bool) context.Context {
-	return store.WithSoftDeleted(ctx, onlyDeleted)
+	store.TransactionalStore
 }
 
 // Transact implements account_store.Interface.
 func (as *accountAppStore) Transact(ctx context.Context, f func(context.Context, account_store.Interface) error) error {
-	return gormstore.Transact(ctx, as.db, func(db *gorm.DB) error {
-		return f(ctx, createAccountAppStore(db))
-	})
-}
-
-func createAccountAppStore(db *gorm.DB) account_store.Interface {
-	return &accountAppStore{
-		db: db,
-
-		UserStore:        gormstore.GetUserStore(db),
-		LoginTokenStore:  gormstore.GetLoginTokenStore(db),
-		UserSessionStore: gormstore.GetUserSessionStore(db),
-	}
+	return as.TransactionalStore.Transact(ctx, func(ctx context.Context, st store.Store) error { return f(ctx, st) })
 }
 
 var errDBNeedsMigration = errors.Define("db_needs_migration", "the database needs to be migrated")
@@ -160,6 +142,8 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 	if err = gormstore.Check(is.db); err != nil {
 		return nil, errDBNeedsMigration.WithCause(err)
 	}
+	st := gormstore.NewCombinedStore(is.db)
+	is.store = st
 	go func() {
 		<-is.Context().Done()
 		is.db.Close()
@@ -184,7 +168,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		OAuthStore:       gormstore.GetOAuthStore(is.db),
 	}, is.config.OAuth, GenerateCSPString)
 
-	is.account, err = account.NewServer(c, createAccountAppStore(is.db), is.config.OAuth, GenerateCSPString)
+	is.account, err = account.NewServer(c, &accountAppStore{is.store}, is.config.OAuth, GenerateCSPString)
 	if err != nil {
 		return nil, err
 	}
@@ -227,10 +211,6 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 	c.RegisterInterop(is)
 
 	return is, nil
-}
-
-func (is *IdentityServer) withDatabase(ctx context.Context, f func(*gorm.DB) error) error {
-	return gormstore.Transact(ctx, is.db, f)
 }
 
 // RegisterServices registers services provided by is at s.
@@ -287,16 +267,6 @@ func (is *IdentityServer) RegisterInterop(srv *interop.Server) {
 // Roles returns the roles that the Identity Server fulfills.
 func (is *IdentityServer) Roles() []ttnpb.ClusterRole {
 	return []ttnpb.ClusterRole{ttnpb.ClusterRole_ACCESS, ttnpb.ClusterRole_ENTITY_REGISTRY}
-}
-
-func (is *IdentityServer) getMembershipStore(ctx context.Context, db *gorm.DB) store.MembershipStore {
-	s := gormstore.GetMembershipStore(db)
-	if is.redis != nil {
-		if membershipTTL := is.configFromContext(ctx).AuthCache.MembershipTTL; membershipTTL > 0 {
-			s = gormstore.GetMembershipCache(s, is.redis, membershipTTL)
-		}
-	}
-	return s
 }
 
 var softDeleteFieldMask = []string{"deleted_at"}

@@ -22,11 +22,10 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
@@ -96,7 +95,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 		return nil, err
 	}
 
-	var fetch func(db *gorm.DB) error
+	var fetch func(ctx context.Context, st store.Store) error
 	res := &ttnpb.AuthInfoResponse{}
 	userFieldMask := []string{"admin", "state", "state_description", "primary_email_address_validated_at"}
 	clientFieldMask := []string{"state", "state_description"}
@@ -105,8 +104,8 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 
 	switch tokenType {
 	case auth.APIKey:
-		fetch = func(db *gorm.DB) error {
-			ids, apiKey, err := store.GetAPIKeyStore(db).GetAPIKey(ctx, tokenID)
+		fetch = func(ctx context.Context, st store.Store) error {
+			ids, apiKey, err := st.GetAPIKey(ctx, tokenID)
 			if err != nil {
 				if errors.IsNotFound(err) {
 					return errAPIKeyNotFound.WithCause(err)
@@ -134,7 +133,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 				},
 			}
 			if ids.EntityType() == "user" {
-				user, err = store.GetUserStore(db).GetUser(ctx, ids.GetUserIds(), userFieldMask)
+				user, err = st.GetUser(ctx, ids.GetUserIds(), userFieldMask)
 				if err != nil {
 					if errors.IsNotFound(err) {
 						return errAPIKeyNotFound.WithCause(err)
@@ -146,8 +145,8 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			return nil
 		}
 	case auth.AccessToken:
-		fetch = func(db *gorm.DB) error {
-			accessToken, err := store.GetOAuthStore(db).GetAccessToken(ctx, tokenID)
+		fetch = func(ctx context.Context, st store.Store) error {
+			accessToken, err := st.GetAccessToken(ctx, tokenID)
 			if err != nil {
 				if errors.IsNotFound(err) {
 					return errTokenNotFound.WithCause(err)
@@ -171,14 +170,14 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			res.AccessMethod = &ttnpb.AuthInfoResponse_OauthAccessToken{
 				OauthAccessToken: accessToken,
 			}
-			user, err = store.GetUserStore(db).GetUser(ctx, accessToken.UserIds, userFieldMask)
+			user, err = st.GetUser(ctx, accessToken.UserIds, userFieldMask)
 			if err != nil {
 				if errors.IsNotFound(err) {
 					return errTokenNotFound.WithCause(err)
 				}
 				return err
 			}
-			client, err := store.GetClientStore(db).GetClient(ctx, accessToken.ClientIds, clientFieldMask)
+			client, err := st.GetClient(ctx, accessToken.ClientIds, clientFieldMask)
 			if err != nil {
 				if errors.IsNotFound(err) {
 					return errTokenNotFound.WithCause(err)
@@ -209,8 +208,8 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			return nil
 		}
 	case auth.SessionToken:
-		fetch = func(db *gorm.DB) error {
-			session, err := store.GetUserSessionStore(db).GetSessionByID(ctx, tokenID)
+		fetch = func(ctx context.Context, st store.Store) error {
+			session, err := st.GetSessionByID(ctx, tokenID)
 			if err != nil {
 				if errors.IsNotFound(err) {
 					return errTokenNotFound.WithCause(err)
@@ -233,7 +232,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			res.AccessMethod = &ttnpb.AuthInfoResponse_UserSession{
 				UserSession: session,
 			}
-			user, err = store.GetUserStore(db).GetUser(ctx, session.GetUserIds(), userFieldMask)
+			user, err = st.GetUser(ctx, session.GetUserIds(), userFieldMask)
 			if err != nil {
 				if errors.IsNotFound(err) {
 					return errTokenNotFound.WithCause(err)
@@ -252,7 +251,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 		return nil, errUnsupportedAuthorization.New()
 	}
 
-	if err = is.withDatabase(ctx, fetch); err != nil {
+	if err = is.store.Transact(ctx, fetch); err != nil {
 		return nil, err
 	}
 
@@ -320,8 +319,8 @@ func (is *IdentityServer) RequireAuthenticated(ctx context.Context) error {
 	}
 
 	if userID := authInfo.GetEntityIdentifiers().GetUserIds(); userID != nil {
-		err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-			user, err := store.GetUserStore(db).GetUser(ctx, userID, []string{"state"})
+		err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+			user, err := st.GetUser(ctx, userID, []string{"state"})
 			if err != nil {
 				return err
 			}

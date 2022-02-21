@@ -16,6 +16,7 @@ package store
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"net/url"
 	"os"
@@ -395,4 +396,88 @@ func cleanFields(fields ...string) []string {
 		out = append(out, field)
 	}
 	return out
+}
+
+// NewCombinedStore returns a new store that implements store.TransactionalStore.
+func NewCombinedStore(db *gorm.DB) *CombinedStore {
+	baseStore := &baseStore{DB: db}
+	return &CombinedStore{
+		db:                db,
+		baseStore:         baseStore,
+		applicationStore:  applicationStore{baseStore: baseStore},
+		clientStore:       clientStore{baseStore: baseStore},
+		deviceStore:       deviceStore{baseStore: baseStore},
+		gatewayStore:      gatewayStore{baseStore: baseStore},
+		organizationStore: organizationStore{baseStore: baseStore},
+		userStore:         userStore{baseStore: baseStore},
+		userSessionStore:  userSessionStore{baseStore: baseStore},
+		membershipStore:   membershipStore{baseStore: baseStore},
+		apiKeyStore:       apiKeyStore{baseStore: baseStore},
+		oauthStore:        oauthStore{baseStore: baseStore},
+		invitationStore:   invitationStore{baseStore: baseStore},
+		loginTokenStore:   loginTokenStore{baseStore: baseStore},
+		entitySearch:      entitySearch{baseStore: baseStore},
+		contactInfoStore:  contactInfoStore{baseStore: baseStore},
+		euiStore:          euiStore{baseStore: baseStore},
+		migrationStore:    migrationStore{baseStore: baseStore},
+	}
+}
+
+// CombinedStore combines all stores to implement the store.TransactionalStore interface.
+type CombinedStore struct {
+	TxOptions sql.TxOptions
+
+	db *gorm.DB
+	*baseStore
+
+	applicationStore
+	clientStore
+	deviceStore
+	gatewayStore
+	organizationStore
+	userStore
+	userSessionStore
+	membershipStore
+	apiKeyStore
+	oauthStore
+	invitationStore
+	loginTokenStore
+	entitySearch
+	contactInfoStore
+	euiStore
+	migrationStore
+}
+
+// Transact implements the store.TransactionalStore interface.
+func (s *CombinedStore) Transact(ctx context.Context, fc func(context.Context, store.Store) error) (err error) {
+	defer trace.StartRegion(ctx, "database transaction").End()
+	tx := s.db.BeginTx(ctx, &s.TxOptions)
+	if tx.Error != nil {
+		return convertError(tx.Error)
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			fmt.Fprintln(os.Stderr, p)
+			os.Stderr.Write(debug.Stack())
+			if pErr, ok := p.(error); ok {
+				switch pErr {
+				case context.Canceled, context.DeadlineExceeded:
+					err = pErr
+				default:
+					err = ErrTransactionRecovered.WithCause(pErr)
+				}
+			} else {
+				err = ErrTransactionRecovered.WithAttributes("panic", p)
+			}
+			log.FromContext(ctx).WithError(err).Error("Transaction panicked")
+		}
+		if err != nil {
+			tx.Rollback()
+		} else {
+			err = tx.Commit().Error
+		}
+		err = convertError(err)
+	}()
+	SetLogger(tx, log.FromContext(ctx).WithField("namespace", "db"))
+	return fc(ctx, NewCombinedStore(tx))
 }

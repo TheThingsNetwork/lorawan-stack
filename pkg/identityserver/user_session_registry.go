@@ -18,9 +18,7 @@ import (
 	"context"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
-	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -38,8 +36,8 @@ func (is *IdentityServer) listUserSessions(ctx context.Context, req *ttnpb.ListU
 		}
 	}()
 	sessions = &ttnpb.UserSessions{}
-	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		sessions.Sessions, err = gormstore.GetUserSessionStore(db).FindSessions(paginateCtx, req.GetUserIds())
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		sessions.Sessions, err = st.FindSessions(paginateCtx, req.GetUserIds())
 		if err != nil {
 			return err
 		}
@@ -59,8 +57,8 @@ func (is *IdentityServer) deleteUserSession(ctx context.Context, req *ttnpb.User
 	if err := rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.Right_RIGHT_USER_ALL); err != nil {
 		return nil, err
 	}
-	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		return gormstore.GetUserSessionStore(db).DeleteSession(ctx, req.GetUserIds(), req.GetSessionId())
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		return st.DeleteSession(ctx, req.GetUserIds(), req.GetSessionId())
 	})
 	if err != nil {
 		return nil, err

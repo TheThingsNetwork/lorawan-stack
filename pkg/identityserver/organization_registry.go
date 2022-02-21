@@ -19,12 +19,10 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blacklist"
-	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -98,12 +96,12 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 		return nil, err
 	}
 
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		org, err = gormstore.GetOrganizationStore(db).CreateOrganization(ctx, req.Organization)
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		org, err = st.CreateOrganization(ctx, req.Organization)
 		if err != nil {
 			return err
 		}
-		if err = is.getMembershipStore(ctx, db).SetMember(
+		if err = st.SetMember(
 			ctx,
 			req.GetCollaborator(),
 			org.GetIds().GetEntityIdentifiers(),
@@ -113,7 +111,7 @@ func (is *IdentityServer) createOrganization(ctx context.Context, req *ttnpb.Cre
 		}
 		if len(req.Organization.ContactInfo) > 0 {
 			cleanContactInfo(req.Organization.ContactInfo)
-			org.ContactInfo, err = gormstore.GetContactInfoStore(db).SetContactInfo(ctx, org.GetIds(), req.Organization.ContactInfo)
+			org.ContactInfo, err = st.SetContactInfo(ctx, org.GetIds(), req.Organization.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -138,13 +136,13 @@ func (is *IdentityServer) getOrganization(ctx context.Context, req *ttnpb.GetOrg
 		}
 		defer func() { org = org.PublicSafe() }()
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		org, err = gormstore.GetOrganizationStore(db).GetOrganization(ctx, req.GetOrganizationIds(), req.FieldMask.GetPaths())
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		org, err = st.GetOrganization(ctx, req.GetOrganizationIds(), req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-			org.ContactInfo, err = gormstore.GetContactInfoStore(db).GetContactInfo(ctx, org.GetIds())
+			org.ContactInfo, err = st.GetContactInfo(ctx, org.GetIds())
 			if err != nil {
 				return err
 			}
@@ -196,16 +194,15 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 	orgs = &ttnpb.Organizations{}
 	var callerMemberships store.MembershipChains
 
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		membershipStore := is.getMembershipStore(ctx, db)
-		ids, err := membershipStore.FindMemberships(paginateCtx, req.Collaborator, "organization", false)
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		ids, err := st.FindMemberships(paginateCtx, req.Collaborator, "organization", false)
 		if err != nil {
 			return err
 		}
 		if len(ids) == 0 {
 			return nil
 		}
-		callerMemberships, err = membershipStore.FindAccountMembershipChains(ctx, callerAccountID, "organization", idStrings(ids...)...)
+		callerMemberships, err = st.FindAccountMembershipChains(ctx, callerAccountID, "organization", idStrings(ids...)...)
 		if err != nil {
 			return err
 		}
@@ -215,7 +212,7 @@ func (is *IdentityServer) listOrganizations(ctx context.Context, req *ttnpb.List
 				orgIDs = append(orgIDs, orgID)
 			}
 		}
-		orgs.Organizations, err = gormstore.GetOrganizationStore(db).FindOrganizations(ctx, orgIDs, req.FieldMask.GetPaths())
+		orgs.Organizations, err = st.FindOrganizations(ctx, orgIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -249,20 +246,20 @@ func (is *IdentityServer) updateOrganization(ctx context.Context, req *ttnpb.Upd
 		}
 	}
 	req.FieldMask.Paths = ttnpb.FlattenPaths(req.FieldMask.Paths, []string{"administrative_contact", "technical_contact"})
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		if err := validateContactIsCollaborator(ctx, db, req.Organization.AdministrativeContact, req.Organization.GetEntityIdentifiers()); err != nil {
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		if err := validateContactIsCollaborator(ctx, st, req.Organization.AdministrativeContact, req.Organization.GetEntityIdentifiers()); err != nil {
 			return err
 		}
-		if err := validateContactIsCollaborator(ctx, db, req.Organization.TechnicalContact, req.Organization.GetEntityIdentifiers()); err != nil {
+		if err := validateContactIsCollaborator(ctx, st, req.Organization.TechnicalContact, req.Organization.GetEntityIdentifiers()); err != nil {
 			return err
 		}
-		org, err = gormstore.GetOrganizationStore(db).UpdateOrganization(ctx, req.Organization, req.FieldMask.GetPaths())
+		org, err = st.UpdateOrganization(ctx, req.Organization, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
 			cleanContactInfo(req.Organization.ContactInfo)
-			org.ContactInfo, err = gormstore.GetContactInfoStore(db).SetContactInfo(ctx, org.Ids, req.Organization.ContactInfo)
+			org.ContactInfo, err = st.SetContactInfo(ctx, org.Ids, req.Organization.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -280,8 +277,8 @@ func (is *IdentityServer) deleteOrganization(ctx context.Context, ids *ttnpb.Org
 	if err := rights.RequireOrganization(ctx, *ids, ttnpb.Right_RIGHT_ORGANIZATION_DELETE); err != nil {
 		return nil, err
 	}
-	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		return gormstore.GetOrganizationStore(db).DeleteOrganization(ctx, ids)
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		return st.DeleteOrganization(ctx, ids)
 	})
 	if err != nil {
 		return nil, err
@@ -294,9 +291,8 @@ func (is *IdentityServer) restoreOrganization(ctx context.Context, ids *ttnpb.Or
 	if err := rights.RequireOrganization(store.WithSoftDeleted(ctx, false), *ids, ttnpb.Right_RIGHT_ORGANIZATION_DELETE); err != nil {
 		return nil, err
 	}
-	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		orgStore := gormstore.GetOrganizationStore(db)
-		org, err := orgStore.GetOrganization(store.WithSoftDeleted(ctx, true), ids, softDeleteFieldMask)
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		org, err := st.GetOrganization(store.WithSoftDeleted(ctx, true), ids, softDeleteFieldMask)
 		if err != nil {
 			return err
 		}
@@ -307,7 +303,7 @@ func (is *IdentityServer) restoreOrganization(ctx context.Context, ids *ttnpb.Or
 		if time.Since(*deletedAt) > is.configFromContext(ctx).Delete.Restore {
 			return errRestoreWindowExpired.New()
 		}
-		return orgStore.RestoreOrganization(ctx, ids)
+		return st.RestoreOrganization(ctx, ids)
 	})
 	if err != nil {
 		return nil, err
@@ -320,21 +316,21 @@ func (is *IdentityServer) purgeOrganization(ctx context.Context, ids *ttnpb.Orga
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeOrganizations.New()
 	}
-	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		err := gormstore.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids)
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		err := st.DeleteEntityContactInfo(ctx, ids)
 		if err != nil {
 			return err
 		}
 		// Delete related API keys before purging the organization.
-		err = gormstore.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())
+		err = st.DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}
-		err = gormstore.GetMembershipStore(db).DeleteAccountMembers(ctx, ids.GetOrganizationOrUserIdentifiers())
+		err = st.DeleteAccountMembers(ctx, ids.GetOrganizationOrUserIdentifiers())
 		if err != nil {
 			return err
 		}
-		return gormstore.GetOrganizationStore(db).PurgeOrganization(ctx, ids)
+		return st.PurgeOrganization(ctx, ids)
 	})
 	if err != nil {
 		return nil, err
