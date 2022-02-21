@@ -347,7 +347,10 @@ export default class WebhookForm extends Component {
   render() {
     const { update, initialWebhookValue, webhookTemplate } = this.props
     const { error, displayOverwriteModal, existingId } = this.state
-    const initialValues = initialWebhookValue ? decodeValues(initialWebhookValue) : blankValues
+    let initialValues = blankValues
+    if (update && initialWebhookValue) {
+      initialValues = decodeValues(initialWebhookValue)
+    }
 
     const mayReactivate =
       update &&
