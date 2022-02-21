@@ -23,66 +23,12 @@ describe('Payload formatters', () => {
     password_confirm: 'ABCDefg123!',
   }
 
-  const ns = {
-    end_device: {
-      frequency_plan_id: 'EU_863_870_TTN',
-      lorawan_phy_version: 'PHY_V1_0_2_REV_A',
-      multicast: false,
-      supports_join: true,
-      lorawan_version: 'MAC_V1_0_2',
-      ids: {
-        device_id: 'device-all-component',
-        dev_eui: '70B3D57ED8000014',
-        join_eui: '0000000000000005',
-      },
-      supports_class_c: false,
-      supports_class_b: false,
-      mac_settings: {
-        rx2_data_rate_index: 0,
-        rx2_frequency: 869525000,
-        rx1_delay: 1,
-        rx1_data_rate_offset: 0,
-        resets_f_cnt: false,
-      },
-    },
-    field_mask: {
-      paths: [
-        'frequency_plan_id',
-        'lorawan_phy_version',
-        'multicast',
-        'supports_join',
-        'lorawan_version',
-        'ids.device_id',
-        'ids.dev_eui',
-        'ids.join_eui',
-        'supports_class_c',
-        'supports_class_b',
-      ],
-    },
-  }
-
-  const is = {
-    end_device: {
-      ids: {
-        dev_eui: '70B3D57ED8000014',
-        join_eui: '0000000000000005',
-        device_id: 'device-all-components',
-      },
-      network_server_address: 'localhost',
-      application_server_address: 'localhost',
-      join_server_address: 'localhost',
-    },
-    field_mask: {
-      paths: ['network_server_address', 'application_server_address', 'join_server_address'],
-    },
-  }
-
   let endDeviceId
   before(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
     cy.createApplication(application, userId)
-    cy.createMockDeviceAllComponents(applicationId, undefined, { ns, is }).then(body => {
+    cy.createMockDeviceAllComponents(applicationId).then(body => {
       endDeviceId = body.end_device.ids.device_id
     })
   })
