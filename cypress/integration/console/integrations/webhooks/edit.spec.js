@@ -112,11 +112,11 @@ describe('Application Webhook', () => {
   it('succeeds adding basic authorization header', () => {
     cy.findByLabelText('Request authentication').check()
 
-    cy.findByTestId('_headers[1].key')
+    cy.findByTestId('_headers[0].key')
       .should('have.attr', 'value', 'Authorization')
       .and('have.attr', 'readonly')
-    cy.findByTestId('_headers[1].value')
-      .should('have.attr', 'value', 'Basic ')
+    cy.findByTestId('_headers[0].value')
+      .should('have.attr', 'value', 'Basic ...')
       .and('have.attr', 'readonly')
 
     cy.findByTestId('basic-auth-username').should('be.visible').type('test-user')
