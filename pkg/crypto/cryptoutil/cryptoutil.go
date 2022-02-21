@@ -148,7 +148,7 @@ func UnwrapSelectedSessionKeys(ctx context.Context, keyVault crypto.KeyVault, sk
 		}
 	}
 	return &ttnpb.SessionKeys{
-		SessionKeyId: sk.SessionKeyId,
+		SessionKeyId: sk.GetSessionKeyId(),
 		FNwkSIntKey:  fNwkSIntKeyEnvelope,
 		NwkSEncKey:   nwkSEncKeyEnvelope,
 		SNwkSIntKey:  sNwkSIntKeyEnvelope,
