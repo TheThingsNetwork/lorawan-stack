@@ -29,8 +29,6 @@ import diff from '@ttn-lw/lib/diff'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import style from './application-integration-webhook-edit.styl'
-
 const m = defineMessages({
   editWebhook: 'Edit webhook',
   updateSuccess: 'Webhook updated',
@@ -60,7 +58,11 @@ const ApplicationWebhookEdit = props => {
         patch.headers = updatedWebhook.headers
       }
 
-      await updateWebhook(patch)
+      if (Object.keys(patch).length === 0) {
+        await updateWebhook(updatedWebhook)
+      } else {
+        await updateWebhook(patch)
+      }
     },
     [updateWebhook, webhook],
   )
@@ -114,9 +116,6 @@ const ApplicationWebhookEdit = props => {
             onDeleteSuccess={handleDeleteSuccess}
             onReactivate={handleReactivate}
             onReactivateSuccess={handleReactivateSuccess}
-            reactivateButtonMessage={m.reactivateButton}
-            suspendedWebhookMessage={m.suspendedWebhookMessage}
-            buttonStyle={style}
           />
         </Col>
       </Row>

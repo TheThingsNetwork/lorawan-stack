@@ -74,13 +74,22 @@ describe('Application Webhook', () => {
       .should('be.visible')
       .findByText(`Webhook updated`)
       .should('be.visible')
+    cy.findByLabelText('Base URL')
+      .should('be.visible')
+      .and('have.attr', 'value')
+      .and('eq', webhook.url)
+    cy.get('#uplink_message_checkbox').should('have.attr', 'value', 'true')
+    cy.findByLabelText('Uplink message')
+      .should('be.visible')
+      .and('have.attr', 'value')
+      .and('eq', webhook.path)
   })
 
-  it('succeeds adding application attributes', () => {
+  it('succeeds adding headers', () => {
     cy.findByRole('button', { name: /Add header entry/ }).click()
 
-    cy.findByTestId('headers[0].key').type('webhook-test-key')
-    cy.findByTestId('headers[0].value').type('webhook-test-value')
+    cy.findByTestId('_headers[0].key').type('webhook-test-key')
+    cy.findByTestId('_headers[0].value').type('webhook-test-value')
 
     cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -89,6 +98,47 @@ describe('Application Webhook', () => {
       .should('be.visible')
       .findByText(`Webhook updated`)
       .should('be.visible')
+
+    cy.findByTestId('_headers[0].key')
+      .should('be.visible')
+      .and('have.attr', 'value')
+      .and('eq', 'webhook-test-key')
+    cy.findByTestId('_headers[0].value')
+      .should('be.visible')
+      .and('have.attr', 'value')
+      .and('eq', 'webhook-test-value')
+  })
+
+  it('succeeds adding basic authorization header', () => {
+    cy.findByLabelText('Request authentication').check()
+
+    cy.findByTestId('_headers[0].key')
+      .should('have.attr', 'value', 'Authorization')
+      .and('have.attr', 'readonly')
+    cy.findByTestId('_headers[0].value')
+      .should('have.attr', 'value', 'Basic ...')
+      .and('have.attr', 'readonly')
+
+    cy.findByTestId('basic-auth-username').should('be.visible').type('test-user')
+    cy.findByTestId('basic-auth-password').should('be.visible').type('1234QUERTY!')
+
+    cy.findByRole('button', { name: 'Save changes' }).click()
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification')
+      .should('be.visible')
+      .findByText(`Webhook updated`)
+      .should('be.visible')
+
+    cy.findByLabelText('Request authentication').should('have.attr', 'value', 'true')
+    cy.findByTestId('basic-auth-username')
+      .should('be.visible')
+      .and('have.attr', 'value')
+      .and('eq', 'test-user')
+    cy.findByTestId('basic-auth-password')
+      .should('be.visible')
+      .and('have.attr', 'value')
+      .and('eq', '1234QUERTY!')
   })
 
   it('succeeds deleting webhook', () => {
