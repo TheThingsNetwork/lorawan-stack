@@ -35,6 +35,7 @@ class KeyValueMap extends React.PureComponent {
     className: PropTypes.string,
     disabled: PropTypes.bool,
     indexAsKey: PropTypes.bool,
+    isReadOnly: PropTypes.func,
     keyPlaceholder: PropTypes.message,
     name: PropTypes.string.isRequired,
     onBlur: PropTypes.func,
@@ -60,12 +61,12 @@ class KeyValueMap extends React.PureComponent {
     indexAsKey: false,
     keyPlaceholder: '',
     disabled: false,
+    isReadOnly: () => null,
   }
 
   @bind
   handleEntryChange(index, newValues) {
     const { onChange, value, indexAsKey } = this.props
-
     onChange(
       value.map((val, idx) => {
         if (index !== idx) {
@@ -80,14 +81,13 @@ class KeyValueMap extends React.PureComponent {
   @bind
   removeEntry(index) {
     const { onChange, value } = this.props
-
     onChange(value.filter((_, i) => i !== index) || [], true)
   }
 
   @bind
   addEmptyEntry() {
     const { onChange, value, indexAsKey } = this.props
-    const entry = indexAsKey ? undefined : { key: '', value: undefined }
+    const entry = indexAsKey ? '' : { key: '', value: '' }
 
     onChange([...value, entry])
   }
@@ -103,6 +103,7 @@ class KeyValueMap extends React.PureComponent {
       onBlur,
       indexAsKey,
       disabled,
+      isReadOnly,
     } = this.props
 
     return (
@@ -121,6 +122,7 @@ class KeyValueMap extends React.PureComponent {
                 onChange={this.handleEntryChange}
                 onBlur={onBlur}
                 indexAsKey={indexAsKey}
+                readOnly={isReadOnly(value)}
               />
             ))}
         </div>

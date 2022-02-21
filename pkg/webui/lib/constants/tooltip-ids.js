@@ -20,6 +20,7 @@ export default Object.freeze({
   ADR_USE: 'adr-use',
   APP_KEY: 'appkey',
   APP_SESSION_KEY: 'application-session-key',
+  BASIC_AUTH: 'basic-auth',
   BEACON_FREQUENCY: 'beacon-frequency',
   CLASS_B_TIMEOUT: 'class-b-timeout',
   CLASS_C_TIMEOUT: 'class-c-timeout',

@@ -136,5 +136,19 @@ describe('Application Webhook create without template', () => {
     cy.findByTestId('error-notification').should('not.exist')
     cy.findByTestId('full-error-view').should('not.exist')
     cy.findByText('my-new-webhook').should('be.visible')
+
+    // Displays saved created webhook settings
+    cy.visit(
+      `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/webhooks/${
+        webhook.id
+      }`,
+    )
+
+    cy.findByRole('heading', { name: 'Edit webhook' }).should('be.visible')
+    cy.findByLabelText('Webhook ID')
+      .should('be.disabled')
+      .and('have.attr', 'value')
+      .and('eq', webhook.id)
+    cy.findByLabelText('Base URL').and('have.attr', 'value').and('eq', webhook.baseUrl)
   })
 })
