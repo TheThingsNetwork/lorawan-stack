@@ -44,8 +44,9 @@ jobs:
         run: |
           conflicts=$(comm -23 <(git diff --name-only --diff-filter=U | sort) <(echo "$MERGE_CONFLICTS_IGNORE" | sort))
           if [[ ! -z "$conflicts" ]]; then
-            echo "Merge conflicts in the following files:"
-            echo "$conflicts"
+            echo "Merge conflicts detected."
+            echo ""
+            echo "$conflicts" | awk '{ print "::warning file=" $0 "::" $0 " has a conflict when merging TheThingsNetwork/lorawan-stack:${{ github.event.pull_request.base.ref }}."}'
             false
           fi
       - name: Merge TheThingsIndustries/lorawan-stack:${{ github.event.pull_request.base.ref }}
@@ -57,7 +58,8 @@ jobs:
         run: |
           conflicts=$(comm -23 <(git diff --name-only --diff-filter=U | sort) <(echo "$MERGE_CONFLICTS_IGNORE" | sort))
           if [[ ! -z "$conflicts" ]]; then
-            echo "Merge conflicts in the following files:"
-            echo "$conflicts"
+            echo "Merge conflicts detected."
+            echo ""
+            echo "$conflicts" | awk '{ print "::warning file=" $0 "::" $0 " has a conflict when merging TheThingsIndustries/lorawan-stack:${{ github.event.pull_request.base.ref }}."}'
             false
           fi
