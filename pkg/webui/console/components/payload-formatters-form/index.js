@@ -351,7 +351,6 @@ class PayloadFormattersForm extends React.Component {
           >
             <Form.SubTitle title={m.setupSubTitle} />
             <Form.Field
-              disabled={type === TYPES.DEFAULT && defaultType === 'FORMATTER_REPOSITORY'}
               name={FIELD_NAMES.SELECT}
               title={m.formatterType}
               component={Select}
