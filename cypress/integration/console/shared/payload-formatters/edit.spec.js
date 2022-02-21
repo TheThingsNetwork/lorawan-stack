@@ -264,33 +264,15 @@ describe('Payload formatters', () => {
       })
 
       it('succeeds showing repository formatter button for formatter type Javascript', () => {
-        const versionIdsResponseBody = {
-          ids: {
-            device_id: 'device-all-components',
-            application_ids: {
-              application_id: 'test-application-payload-formatters',
-            },
-            dev_eui: '70B3D57ED8000010',
-            join_eui: '0000000000000000',
-          },
-          created_at: '2022-02-14T14:34:33.233Z',
-          updated_at: '2022-02-14T14:34:33.233Z',
-          version_ids: {
-            brand_id: 'the-things-products',
-            model_id: 'the-things-uno',
-            hardware_version: '1.0',
-            firmware_version: 'quickstart',
-            band_id: 'US_902_928',
-          },
-          network_server_address: 'localhost',
-          application_server_address: 'localhost',
-          join_server_address: 'localhost',
+        const repositoryFormatter = {
+          formatter_parameter: 'Test formatter parameter',
         }
         cy.intercept(
           'GET',
-          `/api/v3/applications/${applicationId}/devices/${endDeviceId}?field_mask=name,description,version_ids,network_server_address,application_server_address,join_server_address,locations,attributes`,
-          versionIdsResponseBody,
+          `/api/v3/dr/applications/test-application-payload-formatters/**`,
+          repositoryFormatter,
         )
+
         cy.visit(
           `${Cypress.config(
             'consoleRootPath',
@@ -372,33 +354,15 @@ describe('Payload formatters', () => {
       })
 
       it('succeeds showing code editor when there is a default formatter for type Repository', () => {
-        const versionIdsResponseBody = {
-          ids: {
-            device_id: 'device-all-components',
-            application_ids: {
-              application_id: 'test-application-payload-formatters',
-            },
-            dev_eui: '70B3D57ED8000010',
-            join_eui: '0000000000000000',
-          },
-          created_at: '2022-02-14T14:34:33.233Z',
-          updated_at: '2022-02-14T14:34:33.233Z',
-          version_ids: {
-            brand_id: 'the-things-products',
-            model_id: 'the-things-uno',
-            hardware_version: '1.0',
-            firmware_version: 'quickstart',
-            band_id: 'US_902_928',
-          },
-          network_server_address: 'localhost',
-          application_server_address: 'localhost',
-          join_server_address: 'localhost',
+        const repositoryFormatter = {
+          formatter_parameter: 'Test formatter parameter',
         }
         cy.intercept(
           'GET',
-          `/api/v3/applications/${applicationId}/devices/${endDeviceId}?field_mask=name,description,version_ids,network_server_address,application_server_address,join_server_address,locations,attributes`,
-          versionIdsResponseBody,
+          `/api/v3/dr/applications/test-application-payload-formatters/**`,
+          repositoryFormatter,
         )
+
         cy.visit(
           `${Cypress.config(
             'consoleRootPath',
@@ -484,33 +448,15 @@ describe('Payload formatters', () => {
       })
 
       it('succeeds showing repository formatter button for formatter type Javascript', () => {
-        const versionIdsResponseBody = {
-          ids: {
-            device_id: 'device-all-components',
-            application_ids: {
-              application_id: 'test-application-payload-formatters',
-            },
-            dev_eui: '70B3D57ED8000010',
-            join_eui: '0000000000000000',
-          },
-          created_at: '2022-02-14T14:34:33.233Z',
-          updated_at: '2022-02-14T14:34:33.233Z',
-          version_ids: {
-            brand_id: 'the-things-products',
-            model_id: 'the-things-uno',
-            hardware_version: '1.0',
-            firmware_version: 'quickstart',
-            band_id: 'US_902_928',
-          },
-          network_server_address: 'localhost',
-          application_server_address: 'localhost',
-          join_server_address: 'localhost',
+        const repositoryFormatter = {
+          formatter_parameter: 'Test formatter parameter',
         }
         cy.intercept(
           'GET',
-          `/api/v3/applications/${applicationId}/devices/${endDeviceId}?field_mask=name,description,version_ids,network_server_address,application_server_address,join_server_address,locations,attributes`,
-          versionIdsResponseBody,
+          `/api/v3/dr/applications/test-application-payload-formatters/**`,
+          repositoryFormatter,
         )
+
         cy.visit(
           `${Cypress.config(
             'consoleRootPath',
@@ -591,33 +537,15 @@ describe('Payload formatters', () => {
       })
 
       it('succeeds showing code editor when there is a default formatter for type Repository', () => {
-        const versionIdsResponseBody = {
-          ids: {
-            device_id: 'device-all-components',
-            application_ids: {
-              application_id: 'test-application-payload-formatters',
-            },
-            dev_eui: '70B3D57ED8000010',
-            join_eui: '0000000000000000',
-          },
-          created_at: '2022-02-14T14:34:33.233Z',
-          updated_at: '2022-02-14T14:34:33.233Z',
-          version_ids: {
-            brand_id: 'the-things-products',
-            model_id: 'the-things-uno',
-            hardware_version: '1.0',
-            firmware_version: 'quickstart',
-            band_id: 'US_902_928',
-          },
-          network_server_address: 'localhost',
-          application_server_address: 'localhost',
-          join_server_address: 'localhost',
+        const repositoryFormatter = {
+          formatter_parameter: 'Test formatter parameter',
         }
         cy.intercept(
           'GET',
-          `/api/v3/applications/${applicationId}/devices/${endDeviceId}?field_mask=name,description,version_ids,network_server_address,application_server_address,join_server_address,locations,attributes`,
-          versionIdsResponseBody,
+          `/api/v3/dr/applications/test-application-payload-formatters/**`,
+          repositoryFormatter,
         )
+
         cy.visit(
           `${Cypress.config(
             'consoleRootPath',
