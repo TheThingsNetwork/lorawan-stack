@@ -14,6 +14,8 @@ For details about compatibility between different releases, see the **Commitment
 - Retain at most 10 recent session keys in the Join Server. This avoids a slowly growing number of session keys in the Join Server's database.
   - This requires a database migration (`ttn-lw-stack js-db migrate`).
 - Add TTL for gateway connection stats. Can be configured with the option `gs.connection-stats-ttl`.
+- Add `Basic Authorization` header configuration to webhooks.
+- Add formatter options (paste button and formatter vizualization) for devices with a repository formatter.
 
 ### Changed
 
