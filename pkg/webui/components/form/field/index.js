@@ -247,6 +247,7 @@ class FormField extends React.Component {
       disabled: fieldDisabled,
       onChange: this.handleChange,
       onBlur: this.handleBlur,
+      readOnly,
     }
 
     const cls = classnames(

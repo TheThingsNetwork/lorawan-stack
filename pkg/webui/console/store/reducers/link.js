@@ -37,9 +37,8 @@ const getLinkFailure = (state, { payload }) => ({
   link: payload.link || {},
 })
 
-const updateLinkSuccess = (state, { link }) => {
-  const newLink = { ...state.link, ...link }
-
+const updateLinkSuccess = (state, link) => {
+  const newLink = { ...state.link, ...link.payload }
   return {
     ...state,
     link: newLink,

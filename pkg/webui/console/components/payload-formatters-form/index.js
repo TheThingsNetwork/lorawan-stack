@@ -25,10 +25,14 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import Input from '@ttn-lw/components/input'
 import CodeEditor from '@ttn-lw/components/code-editor'
+import Link from '@ttn-lw/components/link'
+import Notification from '@ttn-lw/components/notification'
+import Button from '@ttn-lw/components/button'
 
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import FORMATTER_NAMES from '@ttn-lw//lib/payload-formatter-messages'
 
 import { address as addressRegexp } from '@console/lib/regexp'
 
@@ -46,12 +50,17 @@ const m = defineMessages({
   appFormatter: 'Use application payload formatter',
   appFormatterWarning: 'This option will affect both uplink and downlink formatter',
   setupSubTitle: 'Setup',
+  defaultFormatter:
+    'Click <Link>here</Link> to modify the default payload formatter for this application. The payload formatter of this application is currently set to `{defaultFormatter}`',
+  pasteRepositoryFormatter: 'Paste repository formatter',
+  pasteApplicationFormatter: 'Paste application formatter',
 })
 
 const FIELD_NAMES = {
   SELECT: 'types-select',
   JAVASCRIPT: 'javascript-formatter',
   GRPC: 'grpc-formatter',
+  REPOSITORY: 'repository-formatter',
 }
 
 const formatterOptionsWithReset = [
@@ -62,6 +71,7 @@ const formatterOptionsWithReset = [
   { label: 'CayenneLPP', value: TYPES.CAYENNELPP },
   { label: m.repository, value: TYPES.REPOSITORY },
 ]
+
 const formatterOptions = formatterOptionsWithReset.slice(1, formatterOptionsWithReset.length)
 
 const validationSchema = Yup.object().shape({
@@ -89,7 +99,6 @@ const validationSchema = Yup.object().shape({
 class PayloadFormattersForm extends React.Component {
   constructor(props) {
     super(props)
-
     this.state = {
       type: props.initialType,
       error: undefined,
@@ -197,13 +206,42 @@ class PayloadFormattersForm extends React.Component {
     }
   }
 
-  get formatter() {
-    const { type } = this.state
+  @bind
+  pasteAppPayloadFormatter() {
+    const { defaultParameter, uplink } = this.props
+    this.formRef?.current?.setFieldValue(
+      FIELD_NAMES.JAVASCRIPT,
+      defaultParameter || getDefaultJavascriptFormatter(uplink),
+    )
+  }
 
-    switch (type) {
-      case TYPES.JAVASCRIPT:
-        return (
+  @bind
+  pasteRepoPayloadFormatters() {
+    const { repoFormatters } = this.props
+    this.formRef?.current?.setFieldValue(
+      FIELD_NAMES.JAVASCRIPT,
+      repoFormatters?.formatter_parameter,
+    )
+  }
+
+  get formatter() {
+    const { defaultType, repoFormatters } = this.props
+    const { type } = this.state
+    const hasRepoFormatter =
+      repoFormatters !== undefined && Object.keys(repoFormatters).length !== 0
+    const showParameter =
+      type === TYPES.JAVASCRIPT ||
+      (type === TYPES.DEFAULT && defaultType === 'FORMATTER_JAVASCRIPT')
+    const showRepositoryParameter =
+      (type === TYPES.REPOSITORY && hasRepoFormatter) ||
+      (type === TYPES.DEFAULT && defaultType === 'FORMATTER_REPOSITORY')
+    const isReadOnly = type !== TYPES.JAVASCRIPT
+
+    if (showParameter) {
+      return (
+        <>
           <Form.Field
+            readOnly={isReadOnly}
             required
             component={CodeEditor}
             name={FIELD_NAMES.JAVASCRIPT}
@@ -212,23 +250,60 @@ class PayloadFormattersForm extends React.Component {
             minLines={15}
             maxLines={15}
           />
-        )
-      case TYPES.GRPC:
-        return (
-          <Form.Field
-            required
-            component={Input}
-            title={m.formatterParameter}
-            name={FIELD_NAMES.GRPC}
-            type="text"
-            placeholder={sharedMessages.addressPlaceholder}
-            description={m.grpcFieldDescription}
-            autoComplete="on"
-          />
-        )
-      default:
-        return null
+          {type === TYPES.JAVASCRIPT && (
+            <>
+              {defaultType !== 'FORMATTER_NONE' && (
+                <Button
+                  type="button"
+                  className={style.pasteButton}
+                  message={m.pasteApplicationFormatter}
+                  secondary
+                  onClick={this.pasteAppPayloadFormatter}
+                />
+              )}
+              {hasRepoFormatter && (
+                <Button
+                  type="button"
+                  className={style.pasteButton}
+                  message={m.pasteRepositoryFormatter}
+                  secondary
+                  onClick={this.pasteRepoPayloadFormatters}
+                />
+              )}
+            </>
+          )}
+        </>
+      )
+    } else if (type === TYPES.GRPC) {
+      return (
+        <Form.Field
+          required
+          component={Input}
+          title={m.formatterParameter}
+          name={FIELD_NAMES.GRPC}
+          type="text"
+          placeholder={sharedMessages.addressPlaceholder}
+          description={m.grpcFieldDescription}
+          autoComplete="on"
+        />
+      )
+    } else if (showRepositoryParameter) {
+      return (
+        <Form.Field
+          readOnly
+          component={CodeEditor}
+          title={m.formatterParameter}
+          name={FIELD_NAMES.REPOSITORY}
+          type="text"
+          height="10rem"
+          minLines={15}
+          maxLines={15}
+          value={repoFormatters?.formatter_parameter}
+        />
+      )
     }
+
+    return null
   }
 
   @bind
@@ -250,7 +325,9 @@ class PayloadFormattersForm extends React.Component {
   }
 
   render() {
-    const { initialType, initialParameter, uplink, allowReset } = this.props
+    const { initialType, initialParameter, uplink, allowReset, defaultType, appId, isDefaultType } =
+      this.props
+
     const { error, type, test } = this.state
 
     const initialValues = {
@@ -261,6 +338,7 @@ class PayloadFormattersForm extends React.Component {
         initialType === TYPES.GRPC ? initialParameter : getDefaultGrpcServiceFormatter(uplink),
     }
     const options = allowReset ? formatterOptionsWithReset : formatterOptions
+    const defaultFormatter = FORMATTER_NAMES[defaultType].defaultMessage
 
     return (
       <Row>
@@ -286,6 +364,25 @@ class PayloadFormattersForm extends React.Component {
               inputWidth="m"
               required
             />
+            {isDefaultType && (
+              <Notification
+                small
+                info
+                content={m.defaultFormatter}
+                messageValues={{
+                  Link: msg => (
+                    <Link
+                      secondary
+                      key="manual-link"
+                      to={`/applications/${appId}/payload-formatters/uplink`}
+                    >
+                      {msg}
+                    </Link>
+                  ),
+                  defaultFormatter,
+                }}
+              />
+            )}
             {this.formatter}
             <SubmitBar>
               <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
@@ -312,6 +409,7 @@ class PayloadFormattersForm extends React.Component {
 PayloadFormattersForm.propTypes = {
   allowReset: PropTypes.bool,
   allowTest: PropTypes.bool,
+  appId: PropTypes.string,
   defaultParameter: PropTypes.string,
   defaultType: PropTypes.string,
   initialParameter: PropTypes.string,
@@ -319,11 +417,15 @@ PayloadFormattersForm.propTypes = {
   intl: PropTypes.shape({
     formatMessage: PropTypes.func.isRequired,
   }).isRequired,
+  isDefaultType: PropTypes.bool,
   onSubmit: PropTypes.func.isRequired,
   onSubmitFailure: PropTypes.func,
   onSubmitSuccess: PropTypes.func,
   onTestSubmit: PropTypes.func,
   onTypeChange: PropTypes.func,
+  repoFormatters: PropTypes.shape({
+    formatter_parameter: PropTypes.string,
+  }),
   uplink: PropTypes.bool.isRequired,
 }
 
@@ -337,6 +439,9 @@ PayloadFormattersForm.defaultProps = {
   onTestSubmit: () => null,
   defaultType: TYPES.NONE,
   onTypeChange: () => null,
+  appId: undefined,
+  isDefaultType: undefined,
+  repoFormatters: undefined,
 }
 
 export default injectIntl(PayloadFormattersForm)

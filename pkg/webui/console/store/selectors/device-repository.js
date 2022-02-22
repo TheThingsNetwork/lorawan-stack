@@ -65,3 +65,6 @@ export const selectDeviceModelFirmwareVersions = (state, brandId, modelId) => {
 export const selectDeviceTemplate = state => selectDRStore(state).template
 export const selectDeviceTemplateFetching = createFetchingSelector(GET_TEMPLATE_BASE)
 export const selectDeviceTemplateError = createErrorSelector(GET_TEMPLATE_BASE)
+
+export const selectDeviceRepoPayloadFromatters = state =>
+  selectDRStore(state).repo_payload_formatters

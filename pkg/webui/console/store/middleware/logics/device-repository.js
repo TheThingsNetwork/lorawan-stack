@@ -14,9 +14,22 @@
 
 import tts from '@console/api/tts'
 
+import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as repository from '@console/store/actions/device-repository'
+
+const ignoreNotFound = async (action, appId, version_ids) => {
+  try {
+    return await action(appId, version_ids)
+  } catch (e) {
+    if (!isNotFoundError(e)) {
+      throw e
+    }
+  }
+
+  return undefined
+}
 
 const listDeviceBrandsLogic = createRequestLogic({
   type: repository.LIST_BRANDS,
@@ -84,10 +97,32 @@ const getTemplateLogic = createRequestLogic({
   },
 })
 
+const getRepositoryPayloadFormattersLogic = createRequestLogic({
+  type: repository.GET_REPO_PF,
+  process: async ({ action }) => {
+    const {
+      payload: { appId, version_ids },
+    } = action
+
+    const repositoryPayloadFormatters = await Promise.all([
+      ignoreNotFound(tts.Applications.Devices.Repository.getUplinkDecoder, appId, version_ids),
+      ignoreNotFound(tts.Applications.Devices.Repository.getDownlinkDecoder, appId, version_ids),
+      ignoreNotFound(tts.Applications.Devices.Repository.getDownlinkEncoder, appId, version_ids),
+    ])
+
+    return {
+      ...repositoryPayloadFormatters[0],
+      ...repositoryPayloadFormatters[1],
+      ...repositoryPayloadFormatters[2],
+    }
+  },
+})
+
 export default [
   listDeviceBrandsLogic,
   getDeviceBrandLogic,
   listDeviceModelsLogic,
   getDeviceModelLogic,
   getTemplateLogic,
+  getRepositoryPayloadFormattersLogic,
 ]

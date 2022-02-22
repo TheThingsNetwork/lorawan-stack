@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,9 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-.test-form
-  +media-query($bp.m)
-    margin-top: $ls.s
+import { defineMessages } from 'react-intl'
 
-.paste-button
-  margin-right: $cs.s
+import TYPES from '@console/constants/formatter-types'
+
+const m = defineMessages({
+  grpc: 'GRPC service',
+  repository: 'Repository',
+  javascript: 'Javascript',
+  none: 'None',
+  cayennelpp: 'CayenneLPP',
+})
+
+export default Object.freeze({
+  [TYPES.JAVASCRIPT]: m.javascript,
+  [TYPES.REPOSITORY]: m.repository,
+  [TYPES.NONE]: m.none,
+  [TYPES.GRPC]: m.grpc,
+  [TYPES.CAYENNELPP]: m.cayennelpp,
+})

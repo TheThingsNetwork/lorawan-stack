@@ -23,38 +23,74 @@ describe('Payload formatters', () => {
     password_confirm: 'ABCDefg123!',
   }
 
-  const endDeviceId = 'device-all-components'
+  const ns = {
+    end_device: {
+      frequency_plan_id: 'EU_863_870_TTN',
+      lorawan_phy_version: 'PHY_V1_0_2_REV_A',
+      multicast: false,
+      supports_join: true,
+      lorawan_version: 'MAC_V1_0_2',
+      ids: {
+        device_id: 'device-all-components',
+        dev_eui: '70B3D57ED8000013',
+        join_eui: '0000000000000006',
+      },
+      supports_class_c: false,
+      supports_class_b: false,
+      mac_settings: {
+        rx2_data_rate_index: 0,
+        rx2_frequency: 869525000,
+        rx1_delay: 1,
+        rx1_data_rate_offset: 0,
+        resets_f_cnt: false,
+      },
+    },
+    field_mask: {
+      paths: [
+        'frequency_plan_id',
+        'lorawan_phy_version',
+        'multicast',
+        'supports_join',
+        'lorawan_version',
+        'ids.device_id',
+        'ids.dev_eui',
+        'ids.join_eui',
+        'supports_class_c',
+        'supports_class_b',
+      ],
+    },
+  }
 
+  const is = {
+    end_device: {
+      ids: {
+        dev_eui: '70B3D57ED8000013',
+        join_eui: '0000000000000006',
+        device_id: 'device-all-components',
+      },
+      network_server_address: 'localhost',
+      application_server_address: 'localhost',
+      join_server_address: 'localhost',
+    },
+    field_mask: {
+      paths: ['network_server_address', 'application_server_address', 'join_server_address'],
+    },
+  }
+
+  let endDeviceId
   before(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
     cy.createApplication(application, userId)
-    cy.createMockDeviceAllComponents(applicationId)
+    cy.createMockDeviceAllComponents(applicationId, undefined, { ns, is }).then(body => {
+      endDeviceId = body.end_device.ids.device_id
+    })
   })
 
   describe('Application', () => {
     describe('Uplink', () => {
       beforeEach(() => {
         cy.loginConsole({ user_id: userId, password: user.password })
-      })
-
-      it('succeeds changing formatter type to Javascript', () => {
-        cy.visit(
-          `${Cypress.config(
-            'consoleRootPath',
-          )}/applications/${applicationId}/payload-formatters/uplink`,
-        )
-
-        cy.findByLabelText('Formatter type').selectOption('javascript')
-        cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
-
-        cy.findByRole('button', { name: 'Save changes' }).click()
-
-        cy.findByTestId('error-notification').should('not.exist')
-        cy.findByTestId('toast-notification')
-          .should('be.visible')
-          .findByText('Payload formatter updated')
-          .should('be.visible')
       })
 
       it('succeeds changing formatter type to GRPC service', () => {
@@ -123,6 +159,25 @@ describe('Payload formatters', () => {
 
         cy.findByLabelText('Formatter type').selectOption('none')
         cy.findByLabelText('Formatter parameter').should('not.exist')
+
+        cy.findByRole('button', { name: 'Save changes' }).click()
+
+        cy.findByTestId('error-notification').should('not.exist')
+        cy.findByTestId('toast-notification')
+          .should('be.visible')
+          .findByText('Payload formatter updated')
+          .should('be.visible')
+      })
+
+      it('succeeds changing formatter type to Javascript', () => {
+        cy.visit(
+          `${Cypress.config(
+            'consoleRootPath',
+          )}/applications/${applicationId}/payload-formatters/uplink`,
+        )
+
+        cy.findByLabelText('Formatter type').selectOption('javascript')
+        cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -139,25 +194,6 @@ describe('Payload formatters', () => {
         cy.loginConsole({ user_id: userId, password: user.password })
       })
 
-      it('succeeds changing formatter type to Javascript', () => {
-        cy.visit(
-          `${Cypress.config(
-            'consoleRootPath',
-          )}/applications/${applicationId}/payload-formatters/downlink`,
-        )
-
-        cy.findByLabelText('Formatter type').selectOption('javascript')
-        cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
-
-        cy.findByRole('button', { name: 'Save changes' }).click()
-
-        cy.findByTestId('error-notification').should('not.exist')
-        cy.findByTestId('toast-notification')
-          .should('be.visible')
-          .findByText('Payload formatter updated')
-          .should('be.visible')
-      })
-
       it('succeeds changing formatter type to GRPC service', () => {
         cy.visit(
           `${Cypress.config(
@@ -224,6 +260,25 @@ describe('Payload formatters', () => {
 
         cy.findByLabelText('Formatter type').selectOption('none')
         cy.findByLabelText('Formatter parameter').should('not.exist')
+
+        cy.findByRole('button', { name: 'Save changes' }).click()
+
+        cy.findByTestId('error-notification').should('not.exist')
+        cy.findByTestId('toast-notification')
+          .should('be.visible')
+          .findByText('Payload formatter updated')
+          .should('be.visible')
+      })
+
+      it('succeeds changing formatter type to Javascript', () => {
+        cy.visit(
+          `${Cypress.config(
+            'consoleRootPath',
+          )}/applications/${applicationId}/payload-formatters/downlink`,
+        )
+
+        cy.findByLabelText('Formatter type').selectOption('javascript')
+        cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -261,6 +316,45 @@ describe('Payload formatters', () => {
           .should('be.visible')
       })
 
+      it('provides formatter options for devices with a repository formatter', () => {
+        const repositoryFormatter = {
+          formatter_parameter: 'Test formatter parameter',
+        }
+        cy.intercept(
+          'GET',
+          `/api/v3/dr/applications/test-application-payload-formatters/**`,
+          repositoryFormatter,
+        )
+
+        cy.visit(
+          `${Cypress.config(
+            'consoleRootPath',
+          )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/uplink`,
+        )
+
+        cy.findByLabelText('Formatter type').selectOption('javascript')
+        cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
+        cy.findByRole('button', { name: 'Paste repository formatter' }).should('be.visible')
+        cy.findByLabelText('Formatter type').selectOption('repository')
+        cy.findByTestId('code-editor-repository-formatter').should('be.visible')
+      })
+
+      it('provides formatter options for devices of applications with application payload formatter', () => {
+        cy.visit(
+          `${Cypress.config(
+            'consoleRootPath',
+          )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/uplink`,
+        )
+
+        cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
+        cy.findByLabelText('Formatter type').selectOption('javascript')
+        cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
+        cy.findByRole('button', { name: 'Paste repository formatter' }).should('not.exist')
+        cy.findByRole('button', { name: 'Paste application formatter' }).should('be.visible')
+        cy.findByLabelText('Formatter type').selectOption('repository')
+        cy.findByTestId('code-editor-repository-formatter').should('not.exist')
+      })
+
       it('succeeds changing formatter type to GRPC service', () => {
         cy.visit(
           `${Cypress.config(
@@ -307,7 +401,7 @@ describe('Payload formatters', () => {
         )
 
         cy.findByLabelText('Formatter type').selectOption('repository')
-        cy.findByLabelText('Formatter parameter').should('not.exist')
+        cy.findByTestId('code-editor-repository-formatter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -380,6 +474,43 @@ describe('Payload formatters', () => {
           .should('be.visible')
       })
 
+      it('provides formatter options for devices with a repository formatter', () => {
+        const repositoryFormatter = {
+          formatter_parameter: 'Test formatter parameter',
+        }
+        cy.intercept(
+          'GET',
+          `/api/v3/dr/applications/test-application-payload-formatters/**`,
+          repositoryFormatter,
+        )
+
+        cy.visit(
+          `${Cypress.config(
+            'consoleRootPath',
+          )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/uplink`,
+        )
+
+        cy.findByLabelText('Formatter type').selectOption('javascript')
+        cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
+        cy.findByRole('button', { name: 'Paste repository formatter' }).should('be.visible')
+        cy.findByLabelText('Formatter type').selectOption('repository')
+        cy.findByTestId('code-editor-repository-formatter').should('be.visible')
+      })
+
+      it('provides formatter options for devices of applications with application payload formatter', () => {
+        cy.visit(
+          `${Cypress.config(
+            'consoleRootPath',
+          )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/uplink`,
+        )
+
+        cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
+        cy.findByLabelText('Formatter type').selectOption('javascript')
+        cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
+        cy.findByRole('button', { name: 'Paste repository formatter' }).should('not.exist')
+        cy.findByRole('button', { name: 'Paste application formatter' }).should('be.visible')
+      })
+
       it('succeeds changing formatter type to GRPC service', () => {
         cy.visit(
           `${Cypress.config(
@@ -426,7 +557,6 @@ describe('Payload formatters', () => {
         )
 
         cy.findByLabelText('Formatter type').selectOption('repository')
-        cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
