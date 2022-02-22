@@ -255,6 +255,7 @@ class PayloadFormattersForm extends React.Component {
               {defaultType !== 'FORMATTER_NONE' && (
                 <Button
                   type="button"
+                  className={style.pasteButton}
                   message={m.pasteApplicationFormatter}
                   secondary
                   onClick={this.pasteAppPayloadFormatter}
@@ -263,6 +264,7 @@ class PayloadFormattersForm extends React.Component {
               {hasRepoFormatter && (
                 <Button
                   type="button"
+                  className={style.pasteButton}
                   message={m.pasteRepositoryFormatter}
                   secondary
                   onClick={this.pasteRepoPayloadFormatters}
