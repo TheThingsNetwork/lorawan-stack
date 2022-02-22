@@ -791,6 +791,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	matchTTL := ns.collectionWindow(ctx)
 	if err := ns.devices.RangeByUplinkMatches(ctx, up, matchTTL,
 		func(ctx context.Context, match *UplinkMatch) (bool, error) {
+			defer trace.StartRegion(ctx, "iterate uplink match").End()
 			registerMatchCandidate(ctx)
 
 			ctx = log.NewContextWithFields(ctx, log.Fields(
@@ -903,6 +904,8 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 
 	stored, _, err := ns.devices.SetByID(ctx, matched.Device.Ids.ApplicationIds, matched.Device.Ids.DeviceId, handleDataUplinkGetPaths[:],
 		func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			defer trace.StartRegion(ctx, "update stored device").End()
+
 			if stored == nil {
 				log.FromContext(ctx).Warn("Device deleted during uplink handling, drop")
 				return nil, nil, errOutdatedData.New()
