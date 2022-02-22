@@ -26,10 +26,13 @@ For details about compatibility between different releases, see the **Commitment
 - When Application Server forwards downlink messages to Network Server, the event payload now contains the encrypted LoRaWAN `FRMPayload`.
 - The Network Server will now match downlink acknowledgements on the `cache` redis cluster (previously the `general` cluster was used).
 - Gateway Connection statistics updates are now debounced. The debounce period occurs before the statistics are stored, and can be configured using the `gs.update-connection-stats-debounce-time` setting (default 5 seconds).
+- Payload formatter form layout in the Console.
 
 ### Deprecated
 
 ### Removed
+
+- Ability to select the `Repository` payload formatter type for end devices that have no Device Repository association or have no associated repository payload formatter.
 
 ### Fixed
 
