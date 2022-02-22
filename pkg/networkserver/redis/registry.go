@@ -70,6 +70,8 @@ func (r *DeviceRegistry) euiKey(joinEUI, devEUI types.EUI64) string {
 
 // GetByID gets device by appID, devID.
 func (r *DeviceRegistry) GetByID(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string) (*ttnpb.EndDevice, context.Context, error) {
+	defer trace.StartRegion(ctx, "get end device by id").End()
+
 	ids := ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: appID,
 		DeviceId:       devID,
@@ -77,8 +79,6 @@ func (r *DeviceRegistry) GetByID(ctx context.Context, appID *ttnpb.ApplicationId
 	if err := ids.ValidateContext(ctx); err != nil {
 		return nil, ctx, err
 	}
-
-	defer trace.StartRegion(ctx, "get end device by id").End()
 
 	pb := &ttnpb.EndDevice{}
 	if err := ttnredis.GetProto(ctx, r.Redis, r.uidKey(unique.ID(ctx, ids))).ScanProto(pb); err != nil {
@@ -469,7 +469,7 @@ var (
 
 // RangeByUplinkMatches ranges over devices matching the uplink.
 func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.UplinkMessage, cacheTTL time.Duration, f func(context.Context, *networkserver.UplinkMatch) (bool, error)) error {
-	defer trace.StartRegion(ctx, "range end devices by dev_addr").End()
+	defer trace.StartRegion(ctx, "range end devices by uplink matches").End()
 
 	pld := up.Payload.GetMacPayload()
 	lsb := uint16(pld.FHdr.FCnt)
@@ -516,6 +516,8 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			matchFieldKeyPending,
 		}
 	}
+
+	trace.Log(ctx, "ns:redis", "run deviceMatchScript")
 	vs, err := ttnredis.RunInterfaceSliceScript(ctx, r.Redis, deviceMatchScript, matchKeys, lsb, cacheTTL.Milliseconds()).Result()
 	if err != nil {
 		if err == redis.Nil {
@@ -531,6 +533,8 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 		panic(fmt.Sprintf("expected first match script return value element to be a string, got '%v'(%T)", vs[0], vs[0]))
 	}
 	processResult := func(ctx context.Context, s string) error {
+		defer trace.StartRegion(ctx, "process result").End()
+
 		if s == string(noUplinkMatchMarker) {
 			return errNoUplinkMatch.WithCause(errNoMatchMarker)
 		}
@@ -629,6 +633,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 					} else {
 						args = []interface{}{ackArg}
 					}
+					trace.Log(ctx, "ns:redis", "run deviceMatchScanGTScript")
 					vs, err := ttnredis.RunInterfaceSliceScript(ctx, r.Redis, deviceMatchScanGTScript, []string{matchUIDKey, matchFieldKey}, args...).Result()
 					if err != nil {
 						return "", "", err
@@ -649,6 +654,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			case uid == "":
 				uid, err = r.Redis.LIndex(ctx, matchUIDKey, -1).Result()
 			default:
+				trace.Log(ctx, "ns:redis", "run deviceMatchScanScript")
 				uid, err = deviceMatchScanScript.Run(ctx, r.Redis, []string{matchUIDKey, matchFieldKey}, uid).Text()
 			}
 			if err != nil {
@@ -867,6 +873,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 		}
 		_, err = tx.TxPipelined(ctx, func(p redis.Pipeliner) error {
 			if pb == nil && len(sets) == 0 {
+				trace.Log(ctx, "ns:redis", "delete end device")
 				p.Del(ctx, uk)
 				p.Del(ctx, uidLastInvalidationKey(r.Redis, uid))
 				if stored.Ids.JoinEui != nil && stored.Ids.DevEui != nil {
@@ -885,6 +892,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 				return err
 			}
 			if stored == nil {
+				trace.Log(ctx, "ns:redis", "create end device")
 				if err := ttnpb.RequireFields(sets,
 					"ids.application_ids",
 					"ids.device_id",
