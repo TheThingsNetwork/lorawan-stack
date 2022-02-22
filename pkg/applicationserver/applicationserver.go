@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"runtime/trace"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -340,6 +341,8 @@ func (as *ApplicationServer) processUpAsync(ctx context.Context, item interface{
 }
 
 func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) error {
+	defer trace.StartRegion(ctx, "process up").End()
+
 	ctx = log.NewContextWithField(ctx, "device_uid", unique.ID(ctx, up.EndDeviceIds))
 	ctx = events.ContextWithCorrelationID(ctx, append(up.CorrelationIds, fmt.Sprintf("as:up:%s", events.NewCorrelationID()))...)
 	up.CorrelationIds = events.CorrelationIDsFromContext(ctx)
@@ -368,6 +371,8 @@ func (as *ApplicationServer) processUp(ctx context.Context, up *ttnpb.Applicatio
 }
 
 func (as *ApplicationServer) publishUp(ctx context.Context, up *ttnpb.ApplicationUp) error {
+	defer trace.StartRegion(ctx, "publish up").End()
+
 	if err := as.localDistributor.Publish(ctx, up); err != nil {
 		return err
 	}
@@ -411,6 +416,8 @@ var (
 // details found in the provided error. This may mutate the session, pending session and device address.
 // If the sessions cannot be rebuilt from the provided error, the error itself is returned.
 func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *ttnpb.EndDevice, err error) ([]string, error) {
+	defer trace.StartRegion(ctx, "rebuild sessions from error").End()
+
 	reconstructSession := func(sessionKeyID []byte, devAddr *types.DevAddr, minFCntDown uint32) (*ttnpb.Session, error) {
 		appSKey, err := as.fetchAppSKey(ctx, dev.Ids, sessionKeyID)
 		if err != nil {
@@ -514,6 +521,8 @@ func (d downlinkQueueOperation) shouldSkip(sessionKeyID []byte) bool {
 const maxDownlinkQueueOperationAttempts = 50
 
 func (as *ApplicationServer) attemptDownlinkQueueOp(ctx context.Context, dev *ttnpb.EndDevice, link *ttnpb.ApplicationLink, peer cluster.Peer, op downlinkQueueOperation) (mask []string, err error) {
+	defer trace.StartRegion(ctx, "attempt downlink queue operation").End()
+
 	var encryptedItems []*ttnpb.ApplicationDownlink
 	if op.ResultFunc != nil {
 		defer func() {
@@ -695,6 +704,8 @@ var (
 )
 
 func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, sessionKeyID []byte) (ttnpb.KeyEnvelope, error) {
+	defer trace.StartRegion(ctx, "fetch AppSKey").End()
+
 	if ids == nil || ids.DevEui == nil {
 		return ttnpb.KeyEnvelope{}, errNoDevEUI.New()
 	}
@@ -776,6 +787,8 @@ var errFetchAppSKey = errors.Define("app_s_key", "failed to get AppSKey")
 // If the application or device is not configured to skip application crypto, the InvalidatedDownlinks and the AppSKey
 // in the given join-accept message is reset.
 func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, joinAccept *ttnpb.ApplicationJoinAccept, link *ttnpb.ApplicationLink) error {
+	defer trace.StartRegion(ctx, "handle join accept").End()
+
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"join_eui", ids.JoinEui,
 		"dev_eui", ids.DevEui,
@@ -941,6 +954,8 @@ func (as *ApplicationServer) storeUplink(ctx context.Context, ids *ttnpb.EndDevi
 // If the update succeeds, the end device will be updated in the Application Server end device registry
 // in order to avoid subsequent calls.
 func (as *ApplicationServer) saveActivationStatus(ctx context.Context, item interface{}) {
+	defer trace.StartRegion(ctx, "save activation status").End()
+
 	cc, err := as.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to get Entity Registry peer")
@@ -977,6 +992,8 @@ func (as *ApplicationServer) saveActivationStatus(ctx context.Context, item inte
 }
 
 func (as *ApplicationServer) handleUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) error {
+	defer trace.StartRegion(ctx, "handle uplink").End()
+
 	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyId)
 	if uplink.ReceivedAt == nil {
 		panic("no NS timestamp in ApplicationUplink")
@@ -1060,6 +1077,8 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids *ttnpb.EndDev
 }
 
 func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) error {
+	defer trace.StartRegion(ctx, "handle simulated uplink").End()
+
 	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyId)
 	dev, err := as.deviceRegistry.Get(ctx, ids,
 		[]string{
@@ -1081,6 +1100,8 @@ func (as *ApplicationServer) handleSimulatedUplink(ctx context.Context, ids *ttn
 }
 
 func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, invalid *ttnpb.ApplicationInvalidatedDownlinks, link *ttnpb.ApplicationLink) (pass bool, err error) {
+	defer trace.StartRegion(ctx, "handle downlink queue invalidated").End()
+
 	peer, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, nil)
 	if err != nil {
 		return false, err
@@ -1149,6 +1170,8 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 }
 
 func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, link *ttnpb.ApplicationLink) error {
+	defer trace.StartRegion(ctx, "handle downlink nack").End()
+
 	peer, err := as.GetPeer(ctx, ttnpb.ClusterRole_NETWORK_SERVER, nil)
 	if err != nil {
 		return err
@@ -1206,6 +1229,8 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids *ttnpb.
 // handleLocationSolved saves the provided *ttnpb.ApplicationLocation in the Entity Registry as part of the device locations.
 // Locations provided by other services will be maintained.
 func (as *ApplicationServer) handleLocationSolved(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationLocation, link *ttnpb.ApplicationLink) error {
+	defer trace.StartRegion(ctx, "handle location solved").End()
+
 	if _, err := as.locationRegistry.Merge(ctx, ids, map[string]*ttnpb.Location{
 		msg.Service: msg.Location,
 	}); err != nil {
@@ -1217,6 +1242,8 @@ func (as *ApplicationServer) handleLocationSolved(ctx context.Context, ids *ttnp
 // decryptDownlinkMessage decrypts the downlink message.
 // If application payload crypto is skipped, this method returns nil.
 func (as *ApplicationServer) decryptDownlinkMessage(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, msg *ttnpb.ApplicationDownlink, link *ttnpb.ApplicationLink) error {
+	defer trace.StartRegion(ctx, "decrypt downlink message").End()
+
 	dev, err := as.deviceRegistry.Get(ctx, ids, []string{
 		"formatters",
 		"pending_session",
