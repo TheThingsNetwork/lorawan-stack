@@ -15,7 +15,7 @@ For details about compatibility between different releases, see the **Commitment
   - This requires a database migration (`ttn-lw-stack js-db migrate`).
 - Add TTL for gateway connection stats. Can be configured with the option `gs.connection-stats-ttl`.
 - Add `Basic Authorization` header configuration to the webhooks form in the Console.
-- Add formatter options (paste button and formatter vizualization) for devices with a repository formatter.
+- Show repository formatter code in the payload formatter form in the Console and allow pasting the application and payload formatter code when using the JavaScript option.
 
 ### Changed
 
