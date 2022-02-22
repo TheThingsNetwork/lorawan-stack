@@ -17,6 +17,7 @@ package redis
 import (
 	"context"
 	"fmt"
+	"runtime/trace"
 	"strconv"
 
 	"github.com/go-redis/redis/v8"
@@ -74,18 +75,21 @@ func rangeStringsBindFunc(f func(string) (bool, error)) func(ss ...string) (bool
 const DefaultRangeCount = 1024
 
 func RangeRedisKeys(ctx context.Context, r redis.Cmdable, match string, count int64, f func(k string) (bool, error)) error {
+	defer trace.StartRegion(ctx, "range keys").End()
 	return rangeScan(func(cursor uint64) *redis.ScanCmd {
 		return r.Scan(ctx, cursor, match, count)
 	}, rangeStringsBindFunc(f))
 }
 
 func RangeRedisSet(ctx context.Context, r redis.Cmdable, scanKey, match string, count int64, f func(v string) (bool, error)) error {
+	defer trace.StartRegion(ctx, "range set").End()
 	return rangeScan(func(cursor uint64) *redis.ScanCmd {
 		return r.SScan(ctx, scanKey, cursor, match, count)
 	}, rangeStringsBindFunc(f))
 }
 
 func RangeRedisZSet(ctx context.Context, r redis.Cmdable, scanKey, match string, count int64, f func(k string, v float64) (bool, error)) error {
+	defer trace.StartRegion(ctx, "range zset").End()
 	return rangeScan(func(cursor uint64) *redis.ScanCmd {
 		return r.ZScan(ctx, scanKey, cursor, match, count)
 	}, func(ss ...string) (bool, error) {
@@ -110,6 +114,7 @@ func RangeRedisZSet(ctx context.Context, r redis.Cmdable, scanKey, match string,
 }
 
 func RangeRedisHMap(ctx context.Context, r redis.Cmdable, scanKey, match string, count int64, f func(k string, v string) (bool, error)) error {
+	defer trace.StartRegion(ctx, "range hmap").End()
 	return rangeScan(func(cursor uint64) *redis.ScanCmd {
 		return r.HScan(ctx, scanKey, cursor, match, count)
 	}, func(ss ...string) (bool, error) {
