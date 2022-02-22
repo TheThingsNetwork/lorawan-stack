@@ -73,7 +73,7 @@ const m = defineMessages({
   suspendedWebhookMessage:
     'This webhook has been deactivated due to several unsuccessful forwarding attempts. It will be automatically reactivated after 24 hours. If you wish to reactivate right away, you can use the button below.',
   pendingInfo:
-    'This webhook is currently pending until attempting its first regular request attempt. Note that webhooks can be deactivated if they encounter too many request failures.',
+    'This webhook is currently pending until attempting its first regular request attempt. Note that webhooks can be restricted if they encounter too many request failures.',
   messagePathValidateTooLong: 'Enabled message path must be at most 64 characters',
   basicAuthCheckbox: 'Use basic access authentication (basic auth)',
   requestBasicAuth: 'Request authentication',
@@ -206,6 +206,7 @@ const validationSchema = Yup.object().shape({
 export default class WebhookForm extends Component {
   static propTypes = {
     existCheck: PropTypes.func,
+    healthStatusEnabled: PropTypes.bool,
     initialWebhookValue: PropTypes.shape({
       ids: PropTypes.shape({
         webhook_id: PropTypes.string,
@@ -239,6 +240,7 @@ export default class WebhookForm extends Component {
     onDelete: () => null,
     webhookTemplate: undefined,
     existCheck: () => false,
+    healthStatusEnabled: false,
   }
 
   form = React.createRef()
@@ -345,7 +347,7 @@ export default class WebhookForm extends Component {
   }
 
   render() {
-    const { update, initialWebhookValue, webhookTemplate } = this.props
+    const { update, initialWebhookValue, webhookTemplate, healthStatusEnabled } = this.props
     const { error, displayOverwriteModal, existingId } = this.state
     let initialValues = blankValues
     if (update && initialWebhookValue) {
@@ -359,6 +361,7 @@ export default class WebhookForm extends Component {
       initialWebhookValue.health_status.unhealthy
 
     const isPending =
+      healthStatusEnabled &&
       update &&
       initialWebhookValue &&
       (initialWebhookValue.health_status === null ||

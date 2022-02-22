@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 
 import Status from '@ttn-lw/components/status'
@@ -26,6 +27,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { getWebhooksList } from '@console/store/actions/webhooks'
 
+import { selectWebhooksHealthStatusEnabled } from '@console/store/selectors/application-server'
 import {
   selectWebhooks,
   selectWebhooksTotalCount,
@@ -38,60 +40,18 @@ const m = defineMessages({
   templateId: 'Template ID',
   format: 'Format',
   baseUrl: 'Base URL',
-  active: 'Active',
-  suspended: 'Suspended',
+  healthy: 'Healthy',
   pending: 'Pending',
+  requestsFailing: 'Requests failing',
 })
 
-const headers = [
-  {
-    name: 'ids.webhook_id',
-    displayName: sharedMessages.id,
-    width: 40,
-  },
-  {
-    name: 'base_url',
-    displayName: m.baseUrl,
-    width: 37,
-  },
-  {
-    name: 'template_ids.template_id',
-    displayName: m.templateId,
-    width: 15,
-    render: value => value || <Message className={style.none} content={sharedMessages.none} />,
-  },
-  {
-    name: 'format',
-    displayName: m.format,
-    width: 6,
-  },
-  {
-    name: 'health_status',
-    displayName: sharedMessages.status,
-    width: 10,
-    render: value => {
-      let indicator = 'unknown'
-      let label = sharedMessages.unknown
-
-      if (value && value.healthy) {
-        indicator = 'good'
-        label = m.active
-      } else if (value && value.unhealthy) {
-        indicator = 'bad'
-        label = m.suspended
-      } else {
-        indicator = 'mediocre'
-        label = m.pending
-      }
-
-      return <Status status={indicator} label={label} />
-    },
-  },
-]
-
+@connect(state => ({
+  healthStatusEnabled: selectWebhooksHealthStatusEnabled(state),
+}))
 export default class WebhooksTable extends React.Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
+    healthStatusEnabled: PropTypes.bool.isRequired,
   }
 
   constructor(props) {
@@ -110,6 +70,57 @@ export default class WebhooksTable extends React.Component {
   }
 
   render() {
+    const { healthStatusEnabled } = this.props
+
+    const headers = [
+      {
+        name: 'ids.webhook_id',
+        displayName: sharedMessages.id,
+        width: 40,
+      },
+      {
+        name: 'base_url',
+        displayName: m.baseUrl,
+        width: 37,
+      },
+      {
+        name: 'template_ids.template_id',
+        displayName: m.templateId,
+        width: 15,
+        render: value => value || <Message className={style.none} content={sharedMessages.none} />,
+      },
+      {
+        name: 'format',
+        displayName: m.format,
+        width: 6,
+      },
+    ]
+
+    if (healthStatusEnabled) {
+      headers.push({
+        name: 'health_status',
+        displayName: sharedMessages.status,
+        width: 10,
+        render: value => {
+          let indicator = 'unknown'
+          let label = sharedMessages.unknown
+
+          if (value && value.healthy) {
+            indicator = 'good'
+            label = m.healthy
+          } else if (value && value.unhealthy) {
+            indicator = 'bad'
+            label = m.requestsFailing
+          } else {
+            indicator = 'mediocre'
+            label = m.pending
+          }
+
+          return <Status status={indicator} label={label} pulse={false} />
+        },
+      })
+    }
+
     return (
       <FetchTable
         entity="webhooks"

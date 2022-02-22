@@ -29,6 +29,7 @@ import webhooks from './webhooks'
 import pubsubs from './pubsubs'
 import applicationPackages from './application-packages'
 import is from './identity-server'
+import as from './application-server'
 import deviceRepository from './device-repository'
 import packetBroker from './packet-broker'
 
@@ -49,6 +50,7 @@ export default [
   ...pubsubs,
   ...applicationPackages,
   ...is,
+  ...as,
   ...deviceRepository,
   ...packetBroker,
 ]

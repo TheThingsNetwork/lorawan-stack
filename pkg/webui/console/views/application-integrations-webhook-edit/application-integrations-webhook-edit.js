@@ -37,7 +37,15 @@ const m = defineMessages({
 })
 
 const ApplicationWebhookEdit = props => {
-  const { webhook, appId, webhookTemplate, updateWebhook, match, navigateToList } = props
+  const {
+    webhook,
+    appId,
+    webhookTemplate,
+    updateWebhook,
+    match,
+    navigateToList,
+    healthStatusEnabled,
+  } = props
   const { webhookId } = match.params
 
   useBreadcrumbs(
@@ -116,6 +124,7 @@ const ApplicationWebhookEdit = props => {
             onDeleteSuccess={handleDeleteSuccess}
             onReactivate={handleReactivate}
             onReactivateSuccess={handleReactivateSuccess}
+            healthStatusEnabled={healthStatusEnabled}
           />
         </Col>
       </Row>
@@ -125,6 +134,7 @@ const ApplicationWebhookEdit = props => {
 
 ApplicationWebhookEdit.propTypes = {
   appId: PropTypes.string.isRequired,
+  healthStatusEnabled: PropTypes.bool.isRequired,
   match: PropTypes.match.isRequired,
   navigateToList: PropTypes.func.isRequired,
   updateWebhook: PropTypes.func.isRequired,

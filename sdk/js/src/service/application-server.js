@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,8 +22,14 @@ class As {
     autoBind(this)
   }
 
+  async getConfiguration() {
+    const result = await this._api.As.GetConfiguration()
+
+    return Marshaler.payloadSingleResponse(result)
+  }
+
   async encodeDownlink(appId, deviceId, data) {
-    const result = await this._api.EncodeDownlink(
+    const result = await this._api.AppAs.EncodeDownlink(
       {
         routeParams: {
           'end_device_ids.application_ids.application_id': appId,
@@ -37,7 +43,7 @@ class As {
   }
 
   async decodeDownlink(appId, deviceId, data) {
-    const result = await this._api.DecodeDownlink(
+    const result = await this._api.AppAs.DecodeDownlink(
       {
         routeParams: {
           'end_device_ids.application_ids.application_id': appId,
@@ -51,7 +57,7 @@ class As {
   }
 
   async decodeUplink(appId, deviceId, data) {
-    const result = await this._api.DecodeUplink(
+    const result = await this._api.AppAs.DecodeUplink(
       {
         routeParams: {
           'end_device_ids.application_ids.application_id': appId,
