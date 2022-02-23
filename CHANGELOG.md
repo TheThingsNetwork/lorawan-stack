@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.18.0] - 2022-02-18
+
+### Added
+
 - Retain at most 10 recent session keys in the Join Server. This avoids a slowly growing number of session keys in the Join Server's database.
   - This requires a database migration (`ttn-lw-stack js-db migrate`).
 - Add TTL for gateway connection stats. Can be configured with the option `gs.connection-stats-ttl`.
@@ -27,8 +41,6 @@ For details about compatibility between different releases, see the **Commitment
 
 - Gateway Server setting `gs.update-connection-stats-debounce-time` is no longer valid.
 
-### Removed
-
 ### Fixed
 
 - Webhook statuses being shown as pending regardless of their actual condition.
@@ -36,8 +48,6 @@ For details about compatibility between different releases, see the **Commitment
   - Join Servers using Backend Interfaces 1.1 (protocol `BI1.1`) must be configured with a `sender-ns-id` containing the EUI of the Network Server.
 - Fix `time.Duration` flags in CLI.
 - Gateway Server will no longer leave permanent gateway connection stats data on the registry when crashing.
-
-### Security
 
 ## [3.17.2] - 2022-01-30
 
@@ -2012,7 +2022,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.17.1...v3.17
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.18.0...v3.18
+[3.18.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.17.1...v3.18.0
 [3.17.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.17.0...v3.17.1
 [3.17.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.2...v3.17.0
 [3.16.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.1...v3.16.2
