@@ -499,6 +499,7 @@ type downlinkQueueOperation struct {
 	Items             []*ttnpb.ApplicationDownlink
 	Operation         func(ttnpb.AsNsClient, context.Context, *ttnpb.DownlinkQueueRequest, ...grpc.CallOption) (*pbtypes.Empty, error)
 	SkipSessionKeyIDs [][]byte
+	ResultFunc        func(decrypted, encrypted []*ttnpb.ApplicationDownlink, err error)
 }
 
 func (d downlinkQueueOperation) shouldSkip(sessionKeyID []byte) bool {
@@ -512,12 +513,19 @@ func (d downlinkQueueOperation) shouldSkip(sessionKeyID []byte) bool {
 
 const maxDownlinkQueueOperationAttempts = 50
 
-func (as *ApplicationServer) attemptDownlinkQueueOp(ctx context.Context, dev *ttnpb.EndDevice, link *ttnpb.ApplicationLink, peer cluster.Peer, op downlinkQueueOperation) ([]string, error) {
+func (as *ApplicationServer) attemptDownlinkQueueOp(ctx context.Context, dev *ttnpb.EndDevice, link *ttnpb.ApplicationLink, peer cluster.Peer, op downlinkQueueOperation) (mask []string, err error) {
+	var encryptedItems []*ttnpb.ApplicationDownlink
+	if op.ResultFunc != nil {
+		defer func() {
+			op.ResultFunc(op.Items, encryptedItems, err)
+		}()
+	}
+
 	pc, err := peer.Conn()
 	if err != nil {
 		return nil, err
 	}
-	mask := make([]string, 0, 2)
+	mask = make([]string, 0, 2)
 	attempt := 1
 	for {
 		ctx := log.NewContextWithField(ctx, "attempt", attempt)
@@ -536,11 +544,11 @@ func (as *ApplicationServer) attemptDownlinkQueueOp(ctx context.Context, dev *tt
 		if len(sessions) == 0 {
 			return nil, errNoDeviceSession.New()
 		}
-
-		encryptedItems, err := as.encodeAndEncryptDownlinks(ctx, dev, link, op.Items, sessions)
+		encryptedItems, err = as.encryptDownlinks(ctx, dev, link, op.Items, sessions)
 		if err != nil {
 			return nil, err
 		}
+
 		_, err = op.Operation(ttnpb.NewAsNsClient(pc), ctx, &ttnpb.DownlinkQueueRequest{
 			EndDeviceIds: dev.Ids,
 			Downlinks:    encryptedItems,
@@ -575,7 +583,6 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.End
 	for _, item := range items {
 		item.CorrelationIds = append(item.CorrelationIds, events.CorrelationIDsFromContext(ctx)...)
 	}
-	registerReceiveDownlinks(ctx, ids, items)
 	_, err = as.deviceRegistry.Set(ctx, ids,
 		[]string{
 			"formatters",
@@ -588,9 +595,20 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.End
 			if dev == nil {
 				return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
 			}
+			if err := as.encodeDownlinks(ctx, dev, link, items); err != nil {
+				return nil, nil, err
+			}
+			registerReceiveDownlinks(ctx, ids, items)
 			mask, err := as.attemptDownlinkQueueOp(ctx, dev, link, peer, downlinkQueueOperation{
 				Items:     items,
 				Operation: op,
+				ResultFunc: func(decrypted, encrypted []*ttnpb.ApplicationDownlink, err error) {
+					if err != nil {
+						as.registerDropDownlinks(ctx, ids, decrypted, err)
+					} else {
+						as.registerForwardDownlinks(ctx, ids, decrypted, encrypted, peer.Name())
+					}
+				},
 			})
 			if err != nil {
 				return nil, nil, err
@@ -598,12 +616,7 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.End
 			return dev, mask, nil
 		},
 	)
-	if err != nil {
-		as.registerDropDownlinks(ctx, ids, items, err)
-		return err
-	}
-	as.registerForwardDownlinks(ctx, ids, items, peer.Name())
-	return nil
+	return err
 }
 
 // DownlinkQueuePush pushes the given downlink messages to the end device's application downlink queue.
@@ -840,9 +853,13 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids *ttnpb.En
 				// The session from which the downlinks originate already contains them. As such
 				// we don't need to push them there.
 				SkipSessionKeyIDs: [][]byte{items[0].SessionKeyId},
+				ResultFunc: func(decrypted, _ []*ttnpb.ApplicationDownlink, err error) {
+					if err != nil {
+						as.registerDropDownlinks(ctx, ids, decrypted, err)
+					}
+				},
 			})
 			if err != nil {
-				as.registerDropDownlinks(ctx, ids, items, err)
 				return nil, nil, err
 			}
 			mask = ttnpb.AddFields(mask, pushMask...)
@@ -1114,9 +1131,13 @@ func (as *ApplicationServer) handleDownlinkQueueInvalidated(ctx context.Context,
 			pushMask, err := as.attemptDownlinkQueueOp(ctx, dev, link, peer, downlinkQueueOperation{
 				Items:     items,
 				Operation: ttnpb.AsNsClient.DownlinkQueuePush,
+				ResultFunc: func(decrypted, _ []*ttnpb.ApplicationDownlink, err error) {
+					if err != nil {
+						as.registerDropDownlinks(ctx, ids, decrypted, err)
+					}
+				},
 			})
 			if err != nil {
-				as.registerDropDownlinks(ctx, ids, items, err)
 				return nil, nil, err
 			}
 			mask = ttnpb.AddFields(mask, pushMask...)
@@ -1165,9 +1186,13 @@ func (as *ApplicationServer) handleDownlinkNack(ctx context.Context, ids *ttnpb.
 			pushMask, err := as.attemptDownlinkQueueOp(ctx, dev, link, peer, downlinkQueueOperation{
 				Items:     items,
 				Operation: ttnpb.AsNsClient.DownlinkQueuePush,
+				ResultFunc: func(decrypted, _ []*ttnpb.ApplicationDownlink, err error) {
+					if err != nil {
+						as.registerDropDownlinks(ctx, ids, decrypted, err)
+					}
+				},
 			})
 			if err != nil {
-				as.registerDropDownlinks(ctx, ids, items, err)
 				return nil, nil, err
 			}
 			mask := ttnpb.AddFields(matchMask, pushMask...)

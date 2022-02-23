@@ -2050,12 +2050,6 @@ func TestApplicationServer(t *testing.T) {
 					default:
 						t.Fatal("Expected downlink error")
 					}
-					select {
-					case up := <-chs.up:
-						a.So(up.Up, should.HaveSameTypeAs, &ttnpb.ApplicationUp_DownlinkFailed{})
-					default:
-						t.Fatal("Expected upstream event")
-					}
 				})
 				t.Run("RegisteredDevice/Push", func(t *testing.T) {
 					a := assertions.New(t)
