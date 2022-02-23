@@ -65,13 +65,13 @@ local zs = redis.call('zrangebyscore', KEYS[3], '-inf', ARGV[3], 'withscores')
 if #zs > 0 then
   local members = {}
   for i=1,#zs,2 do
-    local member = zs[i]
-    members[#members+1] = member
-    redis.call('xadd', KEYS[1], 'maxlen', '~', ARGV[4],'*', 'payload', member, 'start_at', zs[i+1])
     if #members > max_unpack then
       redis.call('zrem', KEYS[3], unpack(members))
       members = {}
     end
+    local member = zs[i]
+    members[#members+1] = member
+    redis.call('xadd', KEYS[1], 'maxlen', '~', ARGV[4],'*', 'payload', member, 'start_at', zs[i+1])
   end
   redis.call('zrem', KEYS[3], unpack(members))
   return format_ready(redis.call('xreadgroup', 'group', ARGV[1], ARGV[2], 'count', 1, 'streams', KEYS[1], '>'))
