@@ -24,6 +24,11 @@
 -- KEYS[2] - input task key
 -- KEYS[3] - waiting task key
 
+-- The "unpack" Lua function may not unpack more elements than the max stack length.
+-- In order to avoid this natural limitation, we will periodically flush the waiting keys
+-- as they are moved into the ready stream.
+local max_unpack = 512
+
 local function format_ready(xs)
   local ret = { 'ready', 'id', xs[1][2][1][1] }
   for i, v in ipairs(xs[1][2][1][2]) do
@@ -63,6 +68,10 @@ if #zs > 0 then
     local member = zs[i]
     members[#members+1] = member
     redis.call('xadd', KEYS[1], 'maxlen', '~', ARGV[4],'*', 'payload', member, 'start_at', zs[i+1])
+    if #members > max_unpack then
+      redis.call('zrem', KEYS[3], unpack(members))
+      members = {}
+    end
   end
   redis.call('zrem', KEYS[3], unpack(members))
   return format_ready(redis.call('xreadgroup', 'group', ARGV[1], ARGV[2], 'count', 1, 'streams', KEYS[1], '>'))
