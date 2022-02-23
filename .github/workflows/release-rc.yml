@@ -94,7 +94,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: public
-          key: public-cache-${{ hashFiles('pkg/webui/**', 'sdk/js/**/*.js', 'sdk/js/generated/*.json', 'config/webpack.config.babel.js', 'yarn.lock', 'sdk/js/yarn.lock')}}
+          key: public-cache-${{ hashFiles('pkg/webui/**', 'sdk/js/**/*.js', 'sdk/js/generated/*.json', 'config/webpack.config.babel.js', 'package.json', 'yarn.lock', 'sdk/js/yarn.lock')}}
       - name: Initialize dll cache
         if: steps.public-cache.outputs.cache-hit != 'true'
         id: dll-cache
