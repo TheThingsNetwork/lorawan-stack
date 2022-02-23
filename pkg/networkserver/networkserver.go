@@ -35,6 +35,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 	"google.golang.org/grpc"
 )
 
@@ -131,6 +132,8 @@ type NetworkServer struct {
 	downlinkQueueCapacity int
 
 	scheduledDownlinkMatcher ScheduledDownlinkMatcher
+
+	uplinkSubmissionPool workerpool.WorkerPool
 }
 
 // Option configures the NetworkServer.
@@ -228,6 +231,12 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		downlinkQueueCapacity:    conf.DownlinkQueueCapacity,
 		scheduledDownlinkMatcher: conf.ScheduledDownlinkMatcher,
 	}
+	ns.uplinkSubmissionPool = workerpool.NewWorkerPool(workerpool.Config{
+		Component: c,
+		Context:   ctx,
+		Name:      "uplink_submission",
+		Handler:   ns.handleUplinkSubmission,
+	})
 	ctx = ns.Context()
 
 	if len(opts) == 0 {
