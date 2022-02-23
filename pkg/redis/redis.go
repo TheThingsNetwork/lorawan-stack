@@ -526,19 +526,9 @@ func popTask(ctx context.Context, r redis.Cmdable, group, id string, maxLen int6
 		switch typ {
 		case "ready":
 		case "waiting":
-			xs, err := r.XPendingExt(ctx, &redis.XPendingExtArgs{
-				Stream: readyStream,
-				Group:  group,
-				Start:  "-",
-				End:    "+",
-				Count:  1,
-			}).Result()
-			if err != nil && err != redis.Nil {
-				return ConvertError(err)
-			}
-			if len(xs) > 0 {
-				// TODO: XCLAIM and handle (https://github.com/TheThingsNetwork/lorawan-stack/issues/44)
-			}
+			// TODO: XPENDING, then XCLAIM and handle (https://github.com/TheThingsNetwork/lorawan-stack/issues/44)
+			// Do not use XAUTOCLAIM - the retry counter is not available following auto claim, so it can be
+			// the case that the retries are infinite.
 
 			var block time.Duration
 			if s, ok := fields[nextAtKey]; ok {
