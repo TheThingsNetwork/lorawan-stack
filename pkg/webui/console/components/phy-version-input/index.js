@@ -28,6 +28,10 @@ import {
   PHY_V1_0_3_REV_A,
   PHY_V1_1_REV_B,
   PHY_V1_1_REV_A,
+  RP002_V1_0_0,
+  RP002_V1_0_1,
+  RP002_V1_0_2,
+  RP002_V1_0_3,
 } from '@console/lib/device-utils'
 
 const lorawanVersionPairs = {
@@ -36,7 +40,7 @@ const lorawanVersionPairs = {
   102: [PHY_V1_0_2_REV_A, PHY_V1_0_2_REV_B],
   103: [PHY_V1_0_3_REV_A],
   104: LORAWAN_PHY_VERSIONS,
-  110: [PHY_V1_1_REV_A, PHY_V1_1_REV_B],
+  110: [PHY_V1_1_REV_A, PHY_V1_1_REV_B, RP002_V1_0_0, RP002_V1_0_1, RP002_V1_0_2, RP002_V1_0_3],
   0: LORAWAN_PHY_VERSIONS,
 }
 

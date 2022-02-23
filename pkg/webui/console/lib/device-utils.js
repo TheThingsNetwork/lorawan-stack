@@ -27,13 +27,32 @@ export const DEVICE_CLASSES = Object.freeze({
   CLASS_C: 'c',
 })
 
-export const PHY_V1_0 = { value: 'PHY_V1_0', label: 'PHY V1.0' }
-export const PHY_V1_0_1 = { value: 'PHY_V1_0_1', label: 'PHY V1.0.1' }
-export const PHY_V1_0_2_REV_A = { value: 'PHY_V1_0_2_REV_A', label: 'PHY V1.0.2 REV A' }
-export const PHY_V1_0_2_REV_B = { value: 'PHY_V1_0_2_REV_B', label: 'PHY V1.0.2 REV B' }
-export const PHY_V1_0_3_REV_A = { value: 'PHY_V1_0_3_REV_A', label: 'PHY V1.0.3 REV A' }
-export const PHY_V1_1_REV_A = { value: 'PHY_V1_1_REV_A', label: 'PHY V1.1 REV A' }
-export const PHY_V1_1_REV_B = { value: 'PHY_V1_1_REV_B', label: 'PHY V1.1 REV B' }
+export const PHY_V1_0 = { value: 'PHY_V1_0', label: 'TS001 Technical Specification 1.0.0' }
+export const PHY_V1_0_1 = { value: 'PHY_V1_0_1', label: 'TS001 Technical Specification 1.0.1' }
+export const PHY_V1_0_2_REV_A = {
+  value: 'PHY_V1_0_2_REV_A',
+  label: 'RP001 Regional Parameters 1.0.2',
+}
+export const PHY_V1_0_2_REV_B = {
+  value: 'PHY_V1_0_2_REV_B',
+  label: 'RP001 Regional Parameters 1.0.2 revision B',
+}
+export const PHY_V1_0_3_REV_A = {
+  value: 'PHY_V1_0_3_REV_A',
+  label: 'RP001 Regional Parameters 1.0.3 revision A',
+}
+export const PHY_V1_1_REV_A = {
+  value: 'PHY_V1_1_REV_A',
+  label: 'RP001 Regional Parameters 1.1 revision A',
+}
+export const PHY_V1_1_REV_B = {
+  value: 'PHY_V1_1_REV_B',
+  label: 'RP001 Regional Parameters 1.1 revision B',
+}
+export const RP002_V1_0_0 = { value: 'RP002_V1_0_0', label: 'RP002 Regional Parameters 1.0.0' }
+export const RP002_V1_0_1 = { value: 'RP002_V1_0_1', label: 'RP002 Regional Parameters 1.0.1' }
+export const RP002_V1_0_2 = { value: 'RP002_V1_0_2', label: 'RP002 Regional Parameters 1.0.2' }
+export const RP002_V1_0_3 = { value: 'RP002_V1_0_3', label: 'RP002 Regional Parameters 1.0.3' }
 
 export const LORAWAN_PHY_VERSIONS = Object.freeze([
   PHY_V1_0,
@@ -43,14 +62,18 @@ export const LORAWAN_PHY_VERSIONS = Object.freeze([
   PHY_V1_0_3_REV_A,
   PHY_V1_1_REV_A,
   PHY_V1_1_REV_B,
+  RP002_V1_0_0,
+  RP002_V1_0_1,
+  RP002_V1_0_2,
+  RP002_V1_0_3,
 ])
 
-export const MAC_V1_0 = { value: 'MAC_V1_0', label: 'MAC V1.0' }
-export const MAC_V1_0_1 = { value: 'MAC_V1_0_1', label: 'MAC V1.0.1' }
-export const MAC_V1_0_2 = { value: 'MAC_V1_0_2', label: 'MAC V1.0.2' }
-export const MAC_V1_0_3 = { value: 'MAC_V1_0_3', label: 'MAC V1.0.3' }
-export const MAC_V1_0_4 = { value: 'MAC_V1_0_4', label: 'MAC V1.0.4' }
-export const MAC_V1_1 = { value: 'MAC_V1_1', label: 'MAC V1.1' }
+export const MAC_V1_0 = { value: 'MAC_V1_0', label: 'LoRaWAN Specification 1.0.0' }
+export const MAC_V1_0_1 = { value: 'MAC_V1_0_1', label: 'LoRaWAN Specification 1.0.1' }
+export const MAC_V1_0_2 = { value: 'MAC_V1_0_2', label: 'LoRaWAN Specification 1.0.2' }
+export const MAC_V1_0_3 = { value: 'MAC_V1_0_3', label: 'LoRaWAN Specification 1.0.3' }
+export const MAC_V1_0_4 = { value: 'MAC_V1_0_4', label: 'LoRaWAN Specification 1.0.4' }
+export const MAC_V1_1 = { value: 'MAC_V1_1', label: 'LoRaWAN Specification 1.1.0' }
 
 export const LORAWAN_VERSIONS = Object.freeze([
   MAC_V1_0,
