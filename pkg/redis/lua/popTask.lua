@@ -19,6 +19,7 @@
 -- ARGV[2] - consumer ID
 -- ARGV[3] - pivot - current time, expressed as nanoseconds elapsed since Unix epoch
 -- ARGV[4] - approximate maximum length of ready task stream
+-- ARGV[5] - minimum idle time in milliseconds for automatic claiming of elements from the ready stream
 --
 -- KEYS[1] - ready task key
 -- KEYS[2] - input task key
@@ -35,6 +36,15 @@ end
 local xs = redis.call('xreadgroup', 'group', ARGV[1], ARGV[2], 'count', 1, 'streams', KEYS[1], '>')
 if xs then
   return format_ready(xs)
+end
+
+local xs = redis.call('xautoclaim', KEYS[1], ARGV[1], ARGV[2], ARGV[5], '-', 'count', 1)
+if #xs[2] > 0 then
+  local ret = { 'ready', 'id', xs[2][1][1] }
+  for i, v in ipairs(xs[2][1][2]) do
+    ret[i+3] = v
+  end
+  return ret
 end
 
 xs = redis.call('xreadgroup', 'group', ARGV[1], ARGV[2], 'noack', 'streams', KEYS[2], '>')

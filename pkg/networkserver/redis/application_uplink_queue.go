@@ -44,10 +44,11 @@ const (
 func NewApplicationUplinkQueue(cl *ttnredis.Client, maxLen int64, group string, minIdle time.Duration) *ApplicationUplinkQueue {
 	return &ApplicationUplinkQueue{
 		applicationQueue: &ttnredis.TaskQueue{
-			Redis:  cl,
-			MaxLen: maxLen,
-			Group:  group,
-			Key:    cl.Key("application"),
+			Redis:   cl,
+			MaxLen:  maxLen,
+			Group:   group,
+			MinIdle: minIdle,
+			Key:     cl.Key("application"),
 		},
 		redis:   cl,
 		maxLen:  maxLen,

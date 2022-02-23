@@ -272,7 +272,7 @@ var startCommand = &cobra.Command{
 			}
 			downlinkTasks := nsredis.NewDownlinkTaskQueue(
 				NewNetworkServerDownlinkTaskRedis(*config),
-				100000, redisConsumerGroup,
+				100000, redisConsumerGroup, time.Minute,
 			)
 			if err := downlinkTasks.Init(ctx); err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)

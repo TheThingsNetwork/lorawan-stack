@@ -492,14 +492,14 @@ func parseTime(s string) (time.Time, error) {
 // k is the keys to pop from.
 // Pipeline is executed even if f returns an error.
 // Tasks are acked only if f returns without error.
-func popTask(ctx context.Context, r redis.Cmdable, group, id string, maxLen int64, f func(p redis.Pipeliner, payload string, startAt time.Time) error, k string) (err error) {
+func popTask(ctx context.Context, r redis.Cmdable, group, id string, maxLen int64, minIdle time.Duration, f func(p redis.Pipeliner, payload string, startAt time.Time) error, k string) (err error) {
 	var (
 		readyStream   = ReadyTaskKey(k)
 		inputStream   = InputTaskKey(k)
 		waitingStream = WaitingTaskKey(k)
 	)
 	for {
-		vs, err := RunInterfaceSliceScript(ctx, r, popTaskScript, []string{readyStream, inputStream, waitingStream}, group, id, time.Now().UnixNano(), maxLen).Result()
+		vs, err := RunInterfaceSliceScript(ctx, r, popTaskScript, []string{readyStream, inputStream, waitingStream}, group, id, time.Now().UnixNano(), maxLen, minIdle.Milliseconds()).Result()
 		if err != nil && err != redis.Nil {
 			return ConvertError(err)
 		}
@@ -526,20 +526,6 @@ func popTask(ctx context.Context, r redis.Cmdable, group, id string, maxLen int6
 		switch typ {
 		case "ready":
 		case "waiting":
-			xs, err := r.XPendingExt(ctx, &redis.XPendingExtArgs{
-				Stream: readyStream,
-				Group:  group,
-				Start:  "-",
-				End:    "+",
-				Count:  1,
-			}).Result()
-			if err != nil && err != redis.Nil {
-				return ConvertError(err)
-			}
-			if len(xs) > 0 {
-				// TODO: XCLAIM and handle (https://github.com/TheThingsNetwork/lorawan-stack/issues/44)
-			}
-
 			var block time.Duration
 			if s, ok := fields[nextAtKey]; ok {
 				nextAt, err := parseTime(s)
@@ -604,10 +590,11 @@ func popTask(ctx context.Context, r redis.Cmdable, group, id string, maxLen int6
 
 // TaskQueue is a task queue.
 type TaskQueue struct {
-	Redis  WatchCmdable
-	MaxLen int64
-	Group  string
-	Key    string
+	Redis   WatchCmdable
+	MaxLen  int64
+	Group   string
+	Key     string
+	MinIdle time.Duration
 
 	consumerIDs sync.Map // map[string]struct{} of all used consumer ids
 }
@@ -648,7 +635,7 @@ func (q *TaskQueue) Pop(ctx context.Context, consumerID string, r redis.Cmdable,
 	if r == nil {
 		r = q.Redis
 	}
-	return popTask(ctx, r, q.Group, consumerID, q.MaxLen, f, q.Key)
+	return popTask(ctx, r, q.Group, consumerID, q.MaxLen, q.MinIdle, f, q.Key)
 }
 
 // Scripter is redis.scripter.

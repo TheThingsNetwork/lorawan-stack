@@ -170,7 +170,7 @@ func TestPopTask(t *testing.T) {
 		var called bool
 		errCh := make(chan error, 1)
 		go func() {
-			errCh <- PopTask(ctx, cl.Client, testGroup, "testID", 10, func(p redis.Pipeliner, payload string, startAt time.Time) error {
+			errCh <- PopTask(ctx, cl.Client, testGroup, "testID", 10, time.Minute, func(p redis.Pipeliner, payload string, startAt time.Time) error {
 				p.Ping(ctx)
 				if !test.AllTrue(
 					a.So(called, should.BeFalse),
@@ -215,7 +215,7 @@ func TestPopTask(t *testing.T) {
 		timeout := (1 << 5) * test.Delay
 
 		timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
-		err = PopTask(timeoutCtx, cl.Client, testGroup, "testID", 10, func(redis.Pipeliner, string, time.Time) error {
+		err = PopTask(timeoutCtx, cl.Client, testGroup, "testID", 10, time.Minute, func(redis.Pipeliner, string, time.Time) error {
 			panic("must not be called")
 		}, k)
 		cancel()
@@ -227,7 +227,7 @@ func TestPopTask(t *testing.T) {
 
 		cancelCtx, cancel := context.WithCancel(ctx)
 		time.AfterFunc(timeout, cancel)
-		err = PopTask(cancelCtx, cl.Client, testGroup, "testID", 10, func(redis.Pipeliner, string, time.Time) error {
+		err = PopTask(cancelCtx, cl.Client, testGroup, "testID", 10, time.Minute, func(redis.Pipeliner, string, time.Time) error {
 			panic("must not be called")
 		}, k)
 		cancel()
@@ -327,10 +327,11 @@ func TestTaskQueue(t *testing.T) {
 	defer cl.Close()
 
 	q := &TaskQueue{
-		Redis:  cl,
-		MaxLen: 42,
-		Group:  "testGroup",
-		Key:    cl.Key("test"),
+		Redis:   cl,
+		MaxLen:  42,
+		Group:   "testGroup",
+		MinIdle: time.Minute,
+		Key:     cl.Key("test"),
 	}
 
 	err := q.Init(ctx)
@@ -393,6 +394,46 @@ func TestTaskQueue(t *testing.T) {
 		!a.So(assertPop(ctx, nil, "test2", time.Unix(0, 43).UTC()), should.BeTrue),
 		!a.So(assertPop(ctx, nil, "test2", time.Unix(0, 41).UTC()), should.BeTrue):
 	}
+}
+
+func TestTaskQueueRetry(t *testing.T) {
+	a, ctx := test.New(t)
+
+	cl, flush := test.NewRedis(ctx, "redis_test")
+	defer flush()
+	defer cl.Close()
+
+	q := &TaskQueue{
+		Redis:   cl,
+		MaxLen:  42,
+		Group:   "testGroup",
+		MinIdle: 1 * time.Second,
+		Key:     cl.Key("test"),
+	}
+
+	err := q.Init(ctx)
+	a.So(err, should.BeNil)
+	defer func() {
+		err := q.Close(ctx)
+		a.So(err, should.BeNil)
+	}()
+
+	a.So(q.Add(ctx, nil, "testPayload", time.Unix(1, 1), false), should.BeNil)
+
+	expectedErr := fmt.Errorf("failed to process")
+	a.So(q.Pop(ctx, "testID", nil, func(p redis.Pipeliner, payload string, startsAt time.Time) error {
+		a.So(payload, should.Equal, "testPayload")
+		a.So(startsAt, should.Equal, time.Unix(1, 1).UTC())
+		return expectedErr
+	}), should.Resemble, expectedErr)
+
+	time.Sleep(time.Second)
+
+	a.So(q.Pop(ctx, "testID", nil, func(p redis.Pipeliner, payload string, startsAt time.Time) error {
+		a.So(payload, should.Equal, "testPayload")
+		a.So(startsAt, should.Equal, time.Unix(1, 1).UTC())
+		return nil
+	}), should.BeNil)
 }
 
 func TestProtoDeduplicator(t *testing.T) {
