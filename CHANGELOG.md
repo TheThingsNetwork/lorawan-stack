@@ -707,6 +707,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - `temp` field of the UDP stats message is now type `float32` (pointer).
+- The uplink event preview in the Console now shows the highest SNR.
 
 ### Fixed
 
