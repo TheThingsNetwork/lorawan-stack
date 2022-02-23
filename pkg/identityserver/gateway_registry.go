@@ -19,12 +19,10 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blacklist"
-	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -151,12 +149,12 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		reqGtw.ClaimAuthenticationCode.Secret.Value = value
 		reqGtw.ClaimAuthenticationCode.Secret.KeyId = is.config.Gateways.EncryptionKeyID
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		gtw, err = gormstore.GetGatewayStore(db).CreateGateway(ctx, reqGtw)
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		gtw, err = st.CreateGateway(ctx, reqGtw)
 		if err != nil {
 			return err
 		}
-		if err = is.getMembershipStore(ctx, db).SetMember(
+		if err = st.SetMember(
 			ctx,
 			req.Collaborator,
 			gtw.GetIds().GetEntityIdentifiers(),
@@ -166,7 +164,7 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 		}
 		if len(reqGtw.ContactInfo) > 0 {
 			cleanContactInfo(reqGtw.ContactInfo)
-			gtw.ContactInfo, err = gormstore.GetContactInfoStore(db).SetContactInfo(ctx, gtw.GetIds(), reqGtw.ContactInfo)
+			gtw.ContactInfo, err = st.SetContactInfo(ctx, gtw.GetIds(), reqGtw.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -176,8 +174,8 @@ func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGa
 	if err != nil {
 		if errors.IsAlreadyExists(err) && errors.Resemble(err, store.ErrEUITaken) {
 			var existing *ttnpb.Gateway
-			if err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-				existing, err = gormstore.GetGatewayStore(db).GetGateway(ctx, &ttnpb.GatewayIdentifiers{
+			if err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+				existing, err = st.GetGateway(ctx, &ttnpb.GatewayIdentifiers{
 					Eui: reqGtw.GetIds().GetEui(),
 				}, []string{"ids.gateway_id", "ids.eui", "administrative_contact"})
 				return err
@@ -225,13 +223,13 @@ func (is *IdentityServer) getGateway(ctx context.Context, req *ttnpb.GetGatewayR
 		}
 	}
 
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		gtw, err = gormstore.GetGatewayStore(db).GetGateway(ctx, req.GetGatewayIds(), req.FieldMask.GetPaths())
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		gtw, err = st.GetGateway(ctx, req.GetGatewayIds(), req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
-			gtw.ContactInfo, err = gormstore.GetContactInfoStore(db).GetContactInfo(ctx, gtw.GetIds())
+			gtw.ContactInfo, err = st.GetContactInfo(ctx, gtw.GetIds())
 			if err != nil {
 				return err
 			}
@@ -296,8 +294,8 @@ func (is *IdentityServer) getGatewayIdentifiersForEUI(ctx context.Context, req *
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		gtw, err := gormstore.GetGatewayStore(db).GetGateway(ctx, &ttnpb.GatewayIdentifiers{
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		gtw, err := st.GetGateway(ctx, &ttnpb.GatewayIdentifiers{
 			Eui: req.Eui,
 		}, []string{"ids.gateway_id", "ids.eui"})
 		if err != nil {
@@ -361,16 +359,15 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 	gtws = &ttnpb.Gateways{}
 	var callerMemberships store.MembershipChains
 
-	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		membershipStore := is.getMembershipStore(ctx, db)
-		ids, err := membershipStore.FindMemberships(paginateCtx, req.Collaborator, "gateway", includeIndirect)
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		ids, err := st.FindMemberships(paginateCtx, req.Collaborator, "gateway", includeIndirect)
 		if err != nil {
 			return err
 		}
 		if len(ids) == 0 {
 			return nil
 		}
-		callerMemberships, err = membershipStore.FindAccountMembershipChains(ctx, callerAccountID, "gateway", idStrings(ids...)...)
+		callerMemberships, err = st.FindAccountMembershipChains(ctx, callerAccountID, "gateway", idStrings(ids...)...)
 		if err != nil {
 			return err
 		}
@@ -380,7 +377,7 @@ func (is *IdentityServer) listGateways(ctx context.Context, req *ttnpb.ListGatew
 				gtwIDs = append(gtwIDs, gtwID)
 			}
 		}
-		gtws.Gateways, err = gormstore.GetGatewayStore(db).FindGateways(ctx, gtwIDs, req.FieldMask.GetPaths())
+		gtws.Gateways, err = st.FindGateways(ctx, gtwIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -559,20 +556,20 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 		}
 	}
 
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		if err := validateContactIsCollaborator(ctx, db, req.Gateway.AdministrativeContact, req.Gateway.GetEntityIdentifiers()); err != nil {
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		if err := validateContactIsCollaborator(ctx, st, req.Gateway.AdministrativeContact, req.Gateway.GetEntityIdentifiers()); err != nil {
 			return err
 		}
-		if err := validateContactIsCollaborator(ctx, db, req.Gateway.TechnicalContact, req.Gateway.GetEntityIdentifiers()); err != nil {
+		if err := validateContactIsCollaborator(ctx, st, req.Gateway.TechnicalContact, req.Gateway.GetEntityIdentifiers()); err != nil {
 			return err
 		}
-		gtw, err = gormstore.GetGatewayStore(db).UpdateGateway(ctx, reqGtw, req.FieldMask.GetPaths())
+		gtw, err = st.UpdateGateway(ctx, reqGtw, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
 		if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
 			cleanContactInfo(reqGtw.ContactInfo)
-			gtw.ContactInfo, err = gormstore.GetContactInfoStore(db).SetContactInfo(ctx, gtw.GetIds(), reqGtw.ContactInfo)
+			gtw.ContactInfo, err = st.SetContactInfo(ctx, gtw.GetIds(), reqGtw.ContactInfo)
 			if err != nil {
 				return err
 			}
@@ -601,8 +598,8 @@ func (is *IdentityServer) deleteGateway(ctx context.Context, ids *ttnpb.GatewayI
 	if err := rights.RequireGateway(ctx, *ids, ttnpb.Right_RIGHT_GATEWAY_DELETE); err != nil {
 		return nil, err
 	}
-	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		return gormstore.GetGatewayStore(db).DeleteGateway(ctx, ids)
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		return st.DeleteGateway(ctx, ids)
 	})
 	if err != nil {
 		return nil, err
@@ -615,9 +612,8 @@ func (is *IdentityServer) restoreGateway(ctx context.Context, ids *ttnpb.Gateway
 	if err := rights.RequireGateway(store.WithSoftDeleted(ctx, false), *ids, ttnpb.Right_RIGHT_GATEWAY_DELETE); err != nil {
 		return nil, err
 	}
-	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		gtwStore := gormstore.GetGatewayStore(db)
-		gtw, err := gtwStore.GetGateway(store.WithSoftDeleted(ctx, true), ids, softDeleteFieldMask)
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		gtw, err := st.GetGateway(store.WithSoftDeleted(ctx, true), ids, softDeleteFieldMask)
 		if err != nil {
 			return err
 		}
@@ -628,7 +624,7 @@ func (is *IdentityServer) restoreGateway(ctx context.Context, ids *ttnpb.Gateway
 		if time.Since(*deletedAt) > is.configFromContext(ctx).Delete.Restore {
 			return errRestoreWindowExpired.New()
 		}
-		return gtwStore.RestoreGateway(ctx, ids)
+		return st.RestoreGateway(ctx, ids)
 	})
 	if err != nil {
 		return nil, err
@@ -641,23 +637,23 @@ func (is *IdentityServer) purgeGateway(ctx context.Context, ids *ttnpb.GatewayId
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeGateways.New()
 	}
-	err := is.withDatabase(ctx, func(db *gorm.DB) error {
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		// delete related API keys before purging the gateway
-		err := gormstore.GetAPIKeyStore(db).DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())
+		err := st.DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}
 		// delete related memberships before purging the gateway
-		err = gormstore.GetMembershipStore(db).DeleteEntityMembers(ctx, ids.GetEntityIdentifiers())
+		err = st.DeleteEntityMembers(ctx, ids.GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}
 		// delete related contact info before purging the gateway
-		err = gormstore.GetContactInfoStore(db).DeleteEntityContactInfo(ctx, ids)
+		err = st.DeleteEntityContactInfo(ctx, ids)
 		if err != nil {
 			return err
 		}
-		return gormstore.GetGatewayStore(db).PurgeGateway(ctx, ids)
+		return st.PurgeGateway(ctx, ids)
 	})
 	if err != nil {
 		return nil, err

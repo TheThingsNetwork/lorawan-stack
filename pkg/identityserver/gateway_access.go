@@ -18,13 +18,11 @@ import (
 	"context"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
-	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -91,8 +89,8 @@ func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.Cr
 	if err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		key, err = gormstore.GetAPIKeyStore(db).CreateAPIKey(ctx, req.GetGatewayIds().GetEntityIdentifiers(), key)
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		key, err = st.CreateAPIKey(ctx, req.GetGatewayIds().GetEntityIdentifiers(), key)
 		return err
 	})
 	if err != nil {
@@ -122,8 +120,8 @@ func (is *IdentityServer) listGatewayAPIKeys(ctx context.Context, req *ttnpb.Lis
 		}
 	}()
 	keys = &ttnpb.APIKeys{}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keys.ApiKeys, err = gormstore.GetAPIKeyStore(db).FindAPIKeys(ctx, req.GetGatewayIds().GetEntityIdentifiers())
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		keys.ApiKeys, err = st.FindAPIKeys(ctx, req.GetGatewayIds().GetEntityIdentifiers())
 		return err
 	})
 	if err != nil {
@@ -140,8 +138,8 @@ func (is *IdentityServer) getGatewayAPIKey(ctx context.Context, req *ttnpb.GetGa
 		return nil, err
 	}
 
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		_, key, err = gormstore.GetAPIKeyStore(db).GetAPIKey(ctx, req.KeyId)
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		_, key, err = st.GetAPIKey(ctx, req.KeyId)
 		if err != nil {
 			return err
 		}
@@ -167,9 +165,9 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 	}
 
 	apiKey := req.GetApiKey()
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		if len(apiKey.Rights) > 0 {
-			_, key, err := gormstore.GetAPIKeyStore(db).GetAPIKey(ctx, apiKey.Id)
+			_, key, err := st.GetAPIKey(ctx, apiKey.Id)
 			if err != nil {
 				return err
 			}
@@ -187,7 +185,7 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 			}
 		}
 
-		key, err = gormstore.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GetGatewayIds().GetEntityIdentifiers(), apiKey, req.FieldMask.GetPaths())
+		key, err = st.UpdateAPIKey(ctx, req.GetGatewayIds().GetEntityIdentifiers(), apiKey, req.FieldMask.GetPaths())
 		return err
 	})
 	if err != nil {
@@ -217,8 +215,8 @@ func (is *IdentityServer) getGatewayCollaborator(ctx context.Context, req *ttnpb
 	res := &ttnpb.GetCollaboratorResponse{
 		Ids: req.GetCollaborator(),
 	}
-	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		rights, err := is.getMembershipStore(ctx, db).GetMember(
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		rights, err := st.GetMember(
 			ctx,
 			req.GetCollaborator(),
 			req.GetGatewayIds().GetEntityIdentifiers(),
@@ -242,10 +240,8 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 	if err := rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
-	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		store := is.getMembershipStore(ctx, db)
-
-		existingRights, err := store.GetMember(
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		existingRights, err := st.GetMember(
 			ctx,
 			req.GetCollaborator().GetIds(),
 			req.GetGatewayIds().GetEntityIdentifiers(),
@@ -273,7 +269,7 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 		}
 
 		if removedRights.IncludesAll(ttnpb.Right_RIGHT_GATEWAY_ALL) {
-			memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.GetGatewayIds().GetEntityIdentifiers())
+			memberRights, err := st.FindMembers(ctx, req.GetGatewayIds().GetEntityIdentifiers())
 			if err != nil {
 				return err
 			}
@@ -292,7 +288,7 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 			}
 		}
 
-		return store.SetMember(
+		return st.SetMember(
 			ctx,
 			req.GetCollaborator().GetIds(),
 			req.GetGatewayIds().GetEntityIdentifiers(),
@@ -331,8 +327,8 @@ func (is *IdentityServer) listGatewayCollaborators(ctx context.Context, req *ttn
 			setTotalHeader(ctx, total)
 		}
 	}()
-	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.GetGatewayIds().GetEntityIdentifiers())
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		memberRights, err := st.FindMembers(ctx, req.GetGatewayIds().GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

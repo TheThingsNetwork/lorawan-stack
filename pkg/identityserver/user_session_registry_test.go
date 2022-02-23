@@ -15,13 +15,13 @@
 package identityserver
 
 import (
+	"context"
 	"testing"
 
-	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc"
@@ -70,8 +70,8 @@ func TestUserSessionsRegistry(t *testing.T) {
 
 		var created *ttnpb.UserSession
 
-		err = is.withDatabase(ctx, func(db *gorm.DB) error {
-			created, err = store.GetUserSessionStore(db).CreateSession(ctx, &ttnpb.UserSession{
+		err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+			created, err = st.CreateSession(ctx, &ttnpb.UserSession{
 				UserIds:   user.GetIds(),
 				SessionId: randomUUID,
 			})

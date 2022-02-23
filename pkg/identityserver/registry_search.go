@@ -17,10 +17,8 @@ package identityserver
 import (
 	"context"
 
-	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -74,8 +72,8 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 	res := &ttnpb.Applications{}
 	var callerMemberships store.MembershipChains
 
-	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := gormstore.GetEntitySearch(db).SearchApplications(ctx, member, req)
+	err = rs.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		entityIDs, err := st.SearchApplications(ctx, member, req)
 		if err != nil {
 			return err
 		}
@@ -87,13 +85,13 @@ func (rs *registrySearch) SearchApplications(ctx context.Context, req *ttnpb.Sea
 			for i, entityID := range entityIDs {
 				idStrings[i] = entityID.IDString()
 			}
-			callerMemberships, err = rs.getMembershipStore(ctx, db).FindAccountMembershipChains(ctx, member, "application", idStrings...)
+			callerMemberships, err = st.FindAccountMembershipChains(ctx, member, "application", idStrings...)
 			if err != nil {
 				return err
 			}
 		}
 		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindApplications).
-		res.Applications, err = gormstore.GetApplicationStore(db).FindApplications(ctx, entityIDs, req.FieldMask.GetPaths())
+		res.Applications, err = st.FindApplications(ctx, entityIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -159,8 +157,8 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchCl
 	res := &ttnpb.Clients{}
 	var callerMemberships store.MembershipChains
 
-	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := gormstore.GetEntitySearch(db).SearchClients(ctx, member, req)
+	err = rs.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		entityIDs, err := st.SearchClients(ctx, member, req)
 		if err != nil {
 			return err
 		}
@@ -172,13 +170,13 @@ func (rs *registrySearch) SearchClients(ctx context.Context, req *ttnpb.SearchCl
 			for i, entityID := range entityIDs {
 				idStrings[i] = entityID.IDString()
 			}
-			callerMemberships, err = rs.getMembershipStore(ctx, db).FindAccountMembershipChains(ctx, member, "client", idStrings...)
+			callerMemberships, err = st.FindAccountMembershipChains(ctx, member, "client", idStrings...)
 			if err != nil {
 				return err
 			}
 		}
 		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindClients).
-		res.Clients, err = gormstore.GetClientStore(db).FindClients(ctx, entityIDs, req.FieldMask.GetPaths())
+		res.Clients, err = st.FindClients(ctx, entityIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -247,8 +245,8 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchG
 	res := &ttnpb.Gateways{}
 	var callerMemberships store.MembershipChains
 
-	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := gormstore.GetEntitySearch(db).SearchGateways(ctx, member, req)
+	err = rs.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		entityIDs, err := st.SearchGateways(ctx, member, req)
 		if err != nil {
 			return err
 		}
@@ -260,13 +258,13 @@ func (rs *registrySearch) SearchGateways(ctx context.Context, req *ttnpb.SearchG
 			for i, entityID := range entityIDs {
 				idStrings[i] = entityID.IDString()
 			}
-			callerMemberships, err = rs.getMembershipStore(ctx, db).FindAccountMembershipChains(ctx, member, "gateway", idStrings...)
+			callerMemberships, err = st.FindAccountMembershipChains(ctx, member, "gateway", idStrings...)
 			if err != nil {
 				return err
 			}
 		}
 		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindGateways).
-		res.Gateways, err = gormstore.GetGatewayStore(db).FindGateways(ctx, entityIDs, req.FieldMask.GetPaths())
+		res.Gateways, err = st.FindGateways(ctx, entityIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -338,8 +336,8 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 	res := &ttnpb.Organizations{}
 	var callerMemberships store.MembershipChains
 
-	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := gormstore.GetEntitySearch(db).SearchOrganizations(ctx, member, req)
+	err = rs.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		entityIDs, err := st.SearchOrganizations(ctx, member, req)
 		if err != nil {
 			return err
 		}
@@ -351,13 +349,13 @@ func (rs *registrySearch) SearchOrganizations(ctx context.Context, req *ttnpb.Se
 			for i, entityID := range entityIDs {
 				idStrings[i] = entityID.IDString()
 			}
-			callerMemberships, err = rs.getMembershipStore(ctx, db).FindAccountMembershipChains(ctx, member, "organization", idStrings...)
+			callerMemberships, err = st.FindAccountMembershipChains(ctx, member, "organization", idStrings...)
 			if err != nil {
 				return err
 			}
 		}
 		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindOrganizations).
-		res.Organizations, err = gormstore.GetOrganizationStore(db).FindOrganizations(ctx, entityIDs, req.FieldMask.GetPaths())
+		res.Organizations, err = st.FindOrganizations(ctx, entityIDs, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -420,8 +418,8 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUser
 
 	res := &ttnpb.Users{}
 
-	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
-		entityIDs, err := gormstore.GetEntitySearch(db).SearchUsers(ctx, req)
+	err = rs.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		entityIDs, err := st.SearchUsers(ctx, req)
 		if err != nil {
 			return err
 		}
@@ -436,7 +434,7 @@ func (rs *registrySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUser
 			return nil
 		}
 		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindUsers).
-		res.Users, err = gormstore.GetUserStore(db).FindUsers(ctx, ids, req.FieldMask.GetPaths())
+		res.Users, err = st.FindUsers(ctx, ids, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -478,8 +476,8 @@ func (rs *registrySearch) SearchEndDevices(ctx context.Context, req *ttnpb.Searc
 	}()
 
 	res := &ttnpb.EndDevices{}
-	err = rs.withDatabase(ctx, func(db *gorm.DB) error {
-		ids, err := gormstore.GetEntitySearch(db).SearchEndDevices(ctx, req)
+	err = rs.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		ids, err := st.SearchEndDevices(ctx, req)
 		if err != nil {
 			return err
 		}
@@ -487,7 +485,7 @@ func (rs *registrySearch) SearchEndDevices(ctx context.Context, req *ttnpb.Searc
 			return nil
 		}
 		ctx = store.WithPagination(ctx, 0, 0, nil) // Reset pagination (already done in EntitySearch.FindEndDevices).
-		res.EndDevices, err = gormstore.GetEndDeviceStore(db).FindEndDevices(ctx, ids, req.FieldMask.GetPaths())
+		res.EndDevices, err = st.FindEndDevices(ctx, ids, req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}

@@ -19,13 +19,12 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -61,8 +60,8 @@ func (is *IdentityServer) sendInvitation(ctx context.Context, in *ttnpb.SendInvi
 		Token:     token,
 		ExpiresAt: ttnpb.ProtoTimePtr(expires),
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		invitation, err = store.GetInvitationStore(db).CreateInvitation(ctx, invitation)
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		invitation, err = st.CreateInvitation(ctx, invitation)
 		return err
 	})
 	if err != nil {
@@ -92,8 +91,8 @@ func (is *IdentityServer) listInvitations(ctx context.Context, req *ttnpb.ListIn
 		return nil, errNoInviteRights.New()
 	}
 	invitations = &ttnpb.Invitations{}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		invitations.Invitations, err = store.GetInvitationStore(db).FindInvitations(ctx)
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		invitations.Invitations, err = st.FindInvitations(ctx)
 		return err
 	})
 	if err != nil {
@@ -110,8 +109,8 @@ func (is *IdentityServer) deleteInvitation(ctx context.Context, in *ttnpb.Delete
 	if !authInfo.GetUniversalRights().IncludesAll(ttnpb.Right_RIGHT_SEND_INVITES) {
 		return nil, errNoInviteRights.New()
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) error {
-		return store.GetInvitationStore(db).DeleteInvitation(ctx, in.Email)
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		return st.DeleteInvitation(ctx, in.Email)
 	})
 	if err != nil {
 		return nil, err

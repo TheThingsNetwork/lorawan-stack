@@ -18,10 +18,8 @@ import (
 	"context"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -39,8 +37,8 @@ func (is *IdentityServer) listOAuthClientAuthorizations(ctx context.Context, req
 		}
 	}()
 	authorizations = &ttnpb.OAuthClientAuthorizations{}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		authorizations.Authorizations, err = gormstore.GetOAuthStore(db).ListAuthorizations(ctx, req.UserIds)
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		authorizations.Authorizations, err = st.ListAuthorizations(ctx, req.UserIds)
 		return err
 	})
 	if err != nil {
@@ -69,8 +67,8 @@ func (is *IdentityServer) listOAuthAccessTokens(ctx context.Context, req *ttnpb.
 		}
 	}()
 	tokens = &ttnpb.OAuthAccessTokens{}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		tokens.Tokens, err = gormstore.GetOAuthStore(db).ListAccessTokens(ctx, req.UserIds, req.ClientIds)
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		tokens.Tokens, err = st.ListAccessTokens(ctx, req.UserIds, req.ClientIds)
 		return err
 	})
 	for _, token := range tokens.Tokens {
@@ -86,8 +84,8 @@ func (is *IdentityServer) deleteOAuthAuthorization(ctx context.Context, req *ttn
 	if err := rights.RequireUser(ctx, *req.UserIds, ttnpb.Right_RIGHT_USER_AUTHORIZED_CLIENTS); err != nil {
 		return nil, err
 	}
-	err := is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		return gormstore.GetOAuthStore(db).DeleteAuthorization(ctx, req.UserIds, req.ClientIds)
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		return st.DeleteAuthorization(ctx, req.UserIds, req.ClientIds)
 	})
 	if err != nil {
 		return nil, err
@@ -108,10 +106,9 @@ func (is *IdentityServer) deleteOAuthAccessToken(ctx context.Context, req *ttnpb
 			return nil, err
 		}
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		oauthStore := gormstore.GetOAuthStore(db)
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		if accessToken != nil && accessToken.Id != req.Id {
-			accessToken, err := oauthStore.GetAccessToken(ctx, req.Id)
+			accessToken, err := st.GetAccessToken(ctx, req.Id)
 			if err != nil {
 				return err
 			}
@@ -119,7 +116,7 @@ func (is *IdentityServer) deleteOAuthAccessToken(ctx context.Context, req *ttnpb
 				return errAccessTokenMismatch.New()
 			}
 		}
-		return oauthStore.DeleteAccessToken(ctx, req.Id)
+		return st.DeleteAccessToken(ctx, req.Id)
 	})
 	if err != nil {
 		return nil, err

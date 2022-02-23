@@ -18,7 +18,6 @@ import (
 	"testing"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -46,15 +45,14 @@ func TestInteropServer(t *testing.T) {
 			DevEui:   &devEUI,
 		}
 
-		store := store.GetEndDeviceStore(is.db)
-		_, err := store.CreateEndDevice(ctx, &ttnpb.EndDevice{
+		_, err := is.store.CreateEndDevice(ctx, &ttnpb.EndDevice{
 			Ids:                  id,
 			NetworkServerAddress: "thethings.example.com",
 		})
 		if !a.So(err, should.BeNil) {
 			t.FailNow()
 		}
-		defer store.DeleteEndDevice(ctx, id)
+		defer is.store.DeleteEndDevice(ctx, id)
 
 		ctx := interop.NewContextWithNetworkServerAuthInfo(ctx, &interop.NetworkServerAuthInfo{
 			NetID:     types.NetID{0x0, 0x0, 0x0},

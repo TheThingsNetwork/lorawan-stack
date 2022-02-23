@@ -19,13 +19,12 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -46,11 +45,11 @@ func validateCollaboratorEqualsContact(collaborator, contact *ttnpb.Organization
 	return nil
 }
 
-func validateContactIsCollaborator(ctx context.Context, db *gorm.DB, contact *ttnpb.OrganizationOrUserIdentifiers, entity *ttnpb.EntityIdentifiers) error {
+func validateContactIsCollaborator(ctx context.Context, st store.Store, contact *ttnpb.OrganizationOrUserIdentifiers, entity *ttnpb.EntityIdentifiers) error {
 	if contact == nil {
 		return nil
 	}
-	_, err := store.GetMembershipStore(db).GetMember(ctx, contact, entity)
+	_, err := st.GetMember(ctx, contact, entity)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			return errContactNoCollaborator.WithAttributes("contact", contact.IDString())
@@ -67,8 +66,8 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 		return nil, err
 	}
 	var contactInfo []*ttnpb.ContactInfo
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		contactInfo, err = store.GetContactInfoStore(db).GetContactInfo(ctx, ids)
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		contactInfo, err = st.GetContactInfo(ctx, ids)
 		return err
 	})
 	if err != nil {
@@ -102,9 +101,9 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 		return nil, errNoValidationNeeded.New()
 	}
 
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		for email, validation := range emailValidations {
-			validation, err = store.GetContactInfoStore(db).CreateValidation(ctx, validation)
+			validation, err = st.CreateValidation(ctx, validation)
 			if err != nil {
 				if errors.IsAlreadyExists(err) {
 					delete(emailValidations, email)
@@ -155,8 +154,8 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 }
 
 func (is *IdentityServer) validateContactInfo(ctx context.Context, req *ttnpb.ContactInfoValidation) (*pbtypes.Empty, error) {
-	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		return store.GetContactInfoStore(db).Validate(ctx, req)
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		return st.Validate(ctx, req)
 	})
 	if err != nil {
 		return nil, err

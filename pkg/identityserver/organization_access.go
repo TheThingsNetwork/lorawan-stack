@@ -18,13 +18,11 @@ import (
 	"context"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
-	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -91,8 +89,8 @@ func (is *IdentityServer) createOrganizationAPIKey(ctx context.Context, req *ttn
 	if err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		key, err = gormstore.GetAPIKeyStore(db).CreateAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), key)
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		key, err = st.CreateAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), key)
 		return err
 	})
 	if err != nil {
@@ -122,8 +120,8 @@ func (is *IdentityServer) listOrganizationAPIKeys(ctx context.Context, req *ttnp
 		}
 	}()
 	keys = &ttnpb.APIKeys{}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		keys.ApiKeys, err = gormstore.GetAPIKeyStore(db).FindAPIKeys(ctx, req.GetOrganizationIds().GetEntityIdentifiers())
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		keys.ApiKeys, err = st.FindAPIKeys(ctx, req.GetOrganizationIds().GetEntityIdentifiers())
 		return err
 	})
 	if err != nil {
@@ -140,8 +138,8 @@ func (is *IdentityServer) getOrganizationAPIKey(ctx context.Context, req *ttnpb.
 		return nil, err
 	}
 
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		_, key, err = gormstore.GetAPIKeyStore(db).GetAPIKey(ctx, req.KeyId)
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		_, key, err = st.GetAPIKey(ctx, req.KeyId)
 		if err != nil {
 			return err
 		}
@@ -166,9 +164,9 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 		req.FieldMask = &pbtypes.FieldMask{Paths: []string{"rights", "name"}}
 	}
 
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		if len(req.ApiKey.Rights) > 0 {
-			_, key, err := gormstore.GetAPIKeyStore(db).GetAPIKey(ctx, req.ApiKey.Id)
+			_, key, err := st.GetAPIKey(ctx, req.ApiKey.Id)
 			if err != nil {
 				return err
 			}
@@ -186,7 +184,7 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 			}
 		}
 
-		key, err = gormstore.GetAPIKeyStore(db).UpdateAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), req.ApiKey, req.FieldMask.GetPaths())
+		key, err = st.UpdateAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), req.ApiKey, req.FieldMask.GetPaths())
 		return err
 	})
 	if err != nil {
@@ -216,8 +214,8 @@ func (is *IdentityServer) getOrganizationCollaborator(ctx context.Context, req *
 	res := &ttnpb.GetCollaboratorResponse{
 		Ids: req.GetCollaborator(),
 	}
-	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		rights, err := is.getMembershipStore(ctx, db).GetMember(
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		rights, err := st.GetMember(
 			ctx,
 			req.GetCollaborator(),
 			req.GetOrganizationIds().GetEntityIdentifiers(),
@@ -242,10 +240,8 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 		return nil, err
 	}
 
-	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		store := is.getMembershipStore(ctx, db)
-
-		existingRights, err := store.GetMember(
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		existingRights, err := st.GetMember(
 			ctx,
 			req.GetCollaborator().GetIds(),
 			req.GetOrganizationIds().GetEntityIdentifiers(),
@@ -273,7 +269,7 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 		}
 
 		if removedRights.IncludesAll(ttnpb.Right_RIGHT_ORGANIZATION_ALL) {
-			memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.GetOrganizationIds().GetEntityIdentifiers())
+			memberRights, err := st.FindMembers(ctx, req.GetOrganizationIds().GetEntityIdentifiers())
 			if err != nil {
 				return err
 			}
@@ -292,7 +288,7 @@ func (is *IdentityServer) setOrganizationCollaborator(ctx context.Context, req *
 			}
 		}
 
-		return store.SetMember(
+		return st.SetMember(
 			ctx,
 			req.GetCollaborator().GetIds(),
 			req.GetOrganizationIds().GetEntityIdentifiers(),
@@ -331,8 +327,8 @@ func (is *IdentityServer) listOrganizationCollaborators(ctx context.Context, req
 			setTotalHeader(ctx, total)
 		}
 	}()
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		memberRights, err := is.getMembershipStore(ctx, db).FindMembers(ctx, req.GetOrganizationIds().GetEntityIdentifiers())
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		memberRights, err := st.FindMembers(ctx, req.GetOrganizationIds().GetEntityIdentifiers())
 		if err != nil {
 			return err
 		}

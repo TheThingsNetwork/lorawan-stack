@@ -19,13 +19,11 @@ import (
 	"strings"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/jinzhu/gorm"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blacklist"
-	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -75,8 +73,8 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 	}
 	defer func() { is.setFullEndDevicePictureURL(ctx, dev) }()
 
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		dev, err = gormstore.GetEndDeviceStore(db).CreateEndDevice(ctx, req.EndDevice)
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		dev, err = st.CreateEndDevice(ctx, req.EndDevice)
 		if err != nil {
 			return err
 		}
@@ -112,8 +110,8 @@ func (is *IdentityServer) getEndDevice(ctx context.Context, req *ttnpb.GetEndDev
 		defer func() { is.setFullEndDevicePictureURL(ctx, dev) }()
 	}
 
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		dev, err = gormstore.GetEndDeviceStore(db).GetEndDevice(ctx, req.EndDeviceIds, req.FieldMask.GetPaths())
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		dev, err = st.GetEndDevice(ctx, req.EndDeviceIds, req.FieldMask.GetPaths())
 		return err
 	})
 	if err != nil {
@@ -126,8 +124,8 @@ func (is *IdentityServer) getEndDeviceIdentifiersForEUIs(ctx context.Context, re
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		dev, err := gormstore.GetEndDeviceStore(db).GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		dev, err := st.GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
 			JoinEui: &req.JoinEui,
 			DevEui:  &req.DevEui,
 		}, []string{"ids.application_ids.application_id", "ids.device_id", "ids.join_eui", "ids.dev_eui"})
@@ -163,8 +161,8 @@ func (is *IdentityServer) listEndDevices(ctx context.Context, req *ttnpb.ListEnd
 		}
 	}()
 	devs = &ttnpb.EndDevices{}
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		devs.EndDevices, err = gormstore.GetEndDeviceStore(db).ListEndDevices(ctx, req.GetApplicationIds(), req.FieldMask.GetPaths())
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		devs.EndDevices, err = st.ListEndDevices(ctx, req.GetApplicationIds(), req.FieldMask.GetPaths())
 		if err != nil {
 			return err
 		}
@@ -219,8 +217,8 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 		defer func() { is.setFullEndDevicePictureURL(ctx, dev) }()
 	}
 
-	err = is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		dev, err = gormstore.GetEndDeviceStore(db).UpdateEndDevice(ctx, req.EndDevice, req.FieldMask.GetPaths())
+	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		dev, err = st.UpdateEndDevice(ctx, req.EndDevice, req.FieldMask.GetPaths())
 		return err
 	})
 	if err != nil {
@@ -234,8 +232,8 @@ func (is *IdentityServer) deleteEndDevice(ctx context.Context, ids *ttnpb.EndDev
 	if err := rights.RequireApplication(ctx, *ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
-	err := is.withDatabase(ctx, func(db *gorm.DB) error {
-		return gormstore.GetEndDeviceStore(db).DeleteEndDevice(ctx, ids)
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
+		return st.DeleteEndDevice(ctx, ids)
 	})
 	if err != nil {
 		return nil, err

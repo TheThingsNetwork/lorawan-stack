@@ -26,10 +26,15 @@ type Interface interface {
 	store.UserStore
 	store.LoginTokenStore
 	store.UserSessionStore
+}
 
-	// WithSoftDeleted returns a context that tells the store to include (only) deleted entities.
-	WithSoftDeleted(context.Context, bool) context.Context
+// TransactionalStore is Interface, but with a method that uses a transaction.
+type TransactionalInterface interface {
+	Interface
 
 	// Transact runs a transaction using the store.
 	Transact(context.Context, func(context.Context, Interface) error) error
 }
+
+// WithSoftDeleted returns a context that tells the store to include (only) deleted entities.
+var WithSoftDeleted = store.WithSoftDeleted

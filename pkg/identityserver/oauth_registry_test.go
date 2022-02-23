@@ -19,7 +19,6 @@ import (
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc"
@@ -30,11 +29,10 @@ func TestOAuthRegistry(t *testing.T) {
 	a := assertions.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		oauthStore := store.GetOAuthStore(is.db)
 		user, creds := defaultUser, userCreds(defaultUserIdx)
 		client := population.Clients[0]
 
-		_, err := oauthStore.Authorize(ctx, &ttnpb.OAuthClientAuthorization{
+		_, err := is.store.Authorize(ctx, &ttnpb.OAuthClientAuthorization{
 			UserIds:   user.GetIds(),
 			ClientIds: client.GetIds(),
 			Rights:    client.Rights,
@@ -43,7 +41,7 @@ func TestOAuthRegistry(t *testing.T) {
 			panic(err)
 		}
 
-		_, err = oauthStore.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
+		_, err = is.store.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
 			UserIds:       user.GetIds(),
 			ClientIds:     client.GetIds(),
 			UserSessionId: "12345678-1234-5678-1234-567812345678",

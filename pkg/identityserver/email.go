@@ -17,12 +17,11 @@ package identityserver
 import (
 	"context"
 
-	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/email/sendgrid"
 	"go.thethings.network/lorawan-stack/v3/pkg/email/smtp"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -76,8 +75,8 @@ func (is *IdentityServer) SendEmail(ctx context.Context, f func(emails.Data) ema
 // SendUserEmail sends an email to the given user.
 func (is *IdentityServer) SendUserEmail(ctx context.Context, userIDs *ttnpb.UserIdentifiers, makeMessage func(emails.Data) email.MessageData) error {
 	var usr *ttnpb.User
-	err := is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		usr, err = store.GetUserStore(db).GetUser(ctx, userIDs, []string{"name", "primary_email_address"})
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		usr, err = st.GetUser(ctx, userIDs, []string{"name", "primary_email_address"})
 		if err != nil {
 			return err
 		}
@@ -99,8 +98,8 @@ func (is *IdentityServer) SendUserEmail(ctx context.Context, userIDs *ttnpb.User
 // SendAdminsEmail sends an email to the admins of the network.
 func (is *IdentityServer) SendAdminsEmail(ctx context.Context, makeMessage func(emails.Data) email.MessageData) error {
 	var users []*ttnpb.User
-	err := is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		users, err = store.GetUserStore(db).ListAdmins(ctx, []string{"name", "primary_email_address"})
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		users, err = st.ListAdmins(ctx, []string{"name", "primary_email_address"})
 		if err != nil {
 			return err
 		}
@@ -124,8 +123,8 @@ func (is *IdentityServer) SendAdminsEmail(ctx context.Context, makeMessage func(
 // SendContactsEmail sends an email to the contacts of the given entity.
 func (is *IdentityServer) SendContactsEmail(ctx context.Context, ids ttnpb.IDStringer, makeMessage func(emails.Data) email.MessageData) error {
 	var contacts []*ttnpb.ContactInfo
-	err := is.withDatabase(ctx, func(db *gorm.DB) (err error) {
-		contacts, err = store.GetContactInfoStore(db).GetContactInfo(ctx, ids)
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		contacts, err = st.GetContactInfo(ctx, ids)
 		return err
 	})
 	if err != nil {
