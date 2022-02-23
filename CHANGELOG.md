@@ -16,7 +16,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 - The custom webhook option is now shown at the top of the list in the Console when adding new webhooks.
 - Wording around webhook statuses to `Healthy`, `Requests failing` and `Pending`.
-
+- The uplink event preview in the Console now shows the highest SNR.
 ### Deprecated
 
 ### Removed
@@ -717,7 +717,6 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - `temp` field of the UDP stats message is now type `float32` (pointer).
-- The uplink event preview in the Console now shows the highest SNR.
 
 ### Fixed
 
