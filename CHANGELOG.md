@@ -10,6 +10,24 @@ For details about compatibility between different releases, see the **Commitment
 ## [Unreleased]
 
 ### Added
+- Add `Basic Authorization` header configuration to the webhooks form in the Console.
+- Show repository formatter code in the payload formatter form in the Console and allow pasting the application and payload formatter code when using the JavaScript option.
+
+### Changed
+- The custom webhook option is now shown at the top of the list in the Console when adding new webhooks.
+- Wording around webhook statuses to `Healthy`, `Requests failing` and `Pending`.
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.18.0] - 2022-02-23
+
+### Added
 
 ### Changed
 
@@ -28,14 +46,10 @@ For details about compatibility between different releases, see the **Commitment
 - Retain at most 10 recent session keys in the Join Server. This avoids a slowly growing number of session keys in the Join Server's database.
   - This requires a database migration (`ttn-lw-stack js-db migrate`).
 - Add TTL for gateway connection stats. Can be configured with the option `gs.connection-stats-ttl`.
-- Add `Basic Authorization` header configuration to the webhooks form in the Console.
-- Show repository formatter code in the payload formatter form in the Console and allow pasting the application and payload formatter code when using the JavaScript option.
 
 ### Changed
 
 - The minimum required Redis version is now 6.2.
-- The custom webhook option is now shown at the top of the list in the Console when adding new webhooks.
-- Wording around webhook statuses to `Healthy`, `Requests failing` and `Pending`.
 
 ### Deprecated
 
