@@ -15,6 +15,7 @@ For details about compatibility between different releases, see the **Commitment
 - Show repository formatter code in the payload formatter form in the Console and allow pasting the application and payload formatter code when using the JavaScript option.
 - gRPC service to Gateway Configuration Server so that gateway configurations can be obtained via gRPC requests.
 - The option to configure the Redis idle connection pool timeout, using the `redis.idle-timeout` setting.
+- New RP002 regional parameters as options during device registration in the Console.
 
 ### Changed
 
