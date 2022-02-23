@@ -10,18 +10,23 @@ For details about compatibility between different releases, see the **Commitment
 ## [Unreleased]
 
 ### Added
+
 - Add `Basic Authorization` header configuration to the webhooks form in the Console.
 - Show repository formatter code in the payload formatter form in the Console and allow pasting the application and payload formatter code when using the JavaScript option.
 
 ### Changed
+
 - The custom webhook option is now shown at the top of the list in the Console when adding new webhooks.
 - Wording around webhook statuses to `Healthy`, `Requests failing` and `Pending`.
 - The uplink event preview in the Console now shows the highest SNR.
+
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- Consistent ordering of entities with equal values for the sort field.
 
 ### Security
 

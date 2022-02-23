@@ -96,7 +96,11 @@ func OrderFromContext(ctx context.Context, table, defaultTableField, defaultOrde
 			table = "accounts"
 			opts.field = "uid"
 		}
-		return fmt.Sprintf(`"%s"."%s" %s`, table, opts.field, order)
+		tableField := fmt.Sprintf(`"%s"."%s"`, table, opts.field)
+		if tableField != defaultTableField && opts.field != defaultTableField {
+			return fmt.Sprintf(`%s %s, %s %s`, tableField, order, defaultTableField, order)
+		}
+		return fmt.Sprintf(`%s %s`, tableField, order)
 	}
 	return fmt.Sprintf("%s %s", defaultTableField, defaultOrder)
 }
