@@ -882,7 +882,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	}
 
 	var queuedApplicationUplinks []*ttnpb.ApplicationUp
-	defer func() { ns.enqueueApplicationUplinks(ctx, queuedApplicationUplinks...) }()
+	defer func() { ns.submitApplicationUplinks(ctx, queuedApplicationUplinks...) }()
 
 	stored, _, err := ns.devices.SetByID(ctx, matched.Device.Ids.ApplicationIds, matched.Device.Ids.DeviceId, handleDataUplinkGetPaths[:],
 		func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
@@ -1371,6 +1371,6 @@ func (ns *NetworkServer) ReportTxAcknowledgment(ctx context.Context, txAck *ttnp
 			},
 		}
 	}
-	ns.enqueueApplicationUplinks(ctx, appUp)
+	ns.submitApplicationUplinks(ctx, appUp)
 	return ttnpb.Empty, nil
 }

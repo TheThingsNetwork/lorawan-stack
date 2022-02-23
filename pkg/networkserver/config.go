@@ -29,6 +29,9 @@ type ApplicationUplinkQueueConfig struct {
 	Queue        ApplicationUplinkQueue `name:"-"`
 	BufferSize   uint64                 `name:"buffer-size"`
 	NumConsumers uint64                 `name:"num-consumers"`
+
+	FastBufferSize   uint64 `name:"fast-buffer-size"`
+	FastNumConsumers uint64 `name:"fast-num-consumers"`
 }
 
 // ApplicationUplinkQueueConfig defines downlink task queue configuration.
@@ -143,6 +146,9 @@ var DefaultConfig = Config{
 	ApplicationUplinkQueue: ApplicationUplinkQueueConfig{
 		BufferSize:   1000,
 		NumConsumers: 1,
+
+		FastBufferSize:   16384,
+		FastNumConsumers: 16,
 	},
 	DownlinkTaskQueue: DownlinkTaskQueueConfig{
 		NumConsumers: 1,
