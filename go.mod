@@ -34,6 +34,9 @@ replace (
 // See https://github.com/heptiolabs/healthcheck/issues/23.
 replace gopkg.in/DATA-DOG/go-sqlmock.v1 => gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
 
+// See https://github.com/mattn/go-ieproxy/issues/31
+replace github.com/mattn/go-ieproxy => github.com/mattn/go-ieproxy v0.0.1
+
 require (
 	contrib.go.opencensus.io/exporter/prometheus v0.4.0
 	// NOTE: github.com/Azure/azure-storage-blob-go is actually a different version (see above).
