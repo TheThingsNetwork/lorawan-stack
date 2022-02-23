@@ -14,6 +14,8 @@
 
 import React from 'react'
 
+import { getGatewayWithHighestSNR } from '@console/components/events/utils'
+
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import getByPath from '@ttn-lw/lib/get-by-path'
@@ -29,8 +31,14 @@ const ApplicationUplinkPreview = React.memo(({ event }) => {
   let snr, rssi
 
   if ('rx_metadata' in data) {
-    snr = data.rx_metadata[0].snr
-    rssi = data.rx_metadata[0].rssi
+    if (data.rx_metadata.length > 1) {
+      const gatewayWithHighestSNR = getGatewayWithHighestSNR(data.rx_metadata)
+      snr = gatewayWithHighestSNR.snr
+      rssi = gatewayWithHighestSNR.rssi
+    } else {
+      snr = data.rx_metadata[0].snr
+      rssi = data.rx_metadata[0].rssi
+    }
   }
 
   const bandwidth = getByPath(data, 'settings.data_rate.lora.bandwidth')

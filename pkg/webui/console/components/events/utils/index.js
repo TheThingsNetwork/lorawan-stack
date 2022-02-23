@@ -90,3 +90,6 @@ export const getPreviewComponentByApplicationUpMessage = message => {
 
   return messageType in dataTypeMap ? dataTypeMap[messageType] : DefaultPreview
 }
+
+export const getGatewayWithHighestSNR = gateways =>
+  gateways.reduce((prev, current) => (prev.snr >= current.snr ? prev : current))
