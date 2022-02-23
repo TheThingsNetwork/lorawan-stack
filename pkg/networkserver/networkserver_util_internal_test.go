@@ -1802,11 +1802,6 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 					evBuilders := []events.Builder{
 						EvtReceiveDataUplink,
 					}
-					for range ups[1:] {
-						evBuilders = append(evBuilders,
-							EvtReceiveDataUplink,
-						)
-					}
 					return append(
 						append(
 							evBuilders,
