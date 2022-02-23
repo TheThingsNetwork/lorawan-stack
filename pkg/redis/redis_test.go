@@ -328,7 +328,7 @@ func TestTaskQueue(t *testing.T) {
 
 	q := &TaskQueue{
 		Redis:  cl,
-		MaxLen: 42,
+		MaxLen: 16384,
 		Group:  "testGroup",
 		Key:    cl.Key("test"),
 	}
@@ -392,6 +392,40 @@ func TestTaskQueue(t *testing.T) {
 		!a.So(q.Add(ctx, nil, "test2", time.Unix(0, 41), true), should.BeNil),
 		!a.So(assertPop(ctx, nil, "test2", time.Unix(0, 43).UTC()), should.BeTrue),
 		!a.So(assertPop(ctx, nil, "test2", time.Unix(0, 41).UTC()), should.BeTrue):
+	}
+
+	// The Lua stack limit is 8000. See https://www.lua.org/source/5.1/luaconf.h.html
+	// specifically LUAI_MAXCSTACK.
+	const batchSize = 8192
+
+	p = cl.Pipeline()
+	for i := 0; i < batchSize; i++ {
+		a.So(q.Add(ctx, p, fmt.Sprintf("test%d", i), time.Unix(int64(i), 0), false), should.BeNil)
+	}
+	a.So(func() error {
+		_, err := p.Exec(ctx)
+		return err
+	}(), should.BeNil)
+
+	times := make(map[string]time.Time)
+	for i := 0; i < batchSize; i++ {
+		a.So(q.Pop(ctx, "testID", cl, func(p redis.Pipeliner, payload string, startAt time.Time) error {
+			p.Ping(ctx)
+
+			_, ok := times[payload]
+			a.So(ok, should.BeFalse)
+			times[payload] = startAt
+
+			return nil
+		}), should.BeNil)
+	}
+	a.So(times, should.HaveLength, batchSize)
+	for i := 0; i < batchSize; i++ {
+		k := fmt.Sprintf("test%d", i)
+
+		t, ok := times[k]
+		a.So(ok, should.BeTrue)
+		a.So(t, should.Equal, time.Unix(int64(i), 0).UTC())
 	}
 }
 
