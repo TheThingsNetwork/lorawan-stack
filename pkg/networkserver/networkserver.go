@@ -232,10 +232,13 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		scheduledDownlinkMatcher: conf.ScheduledDownlinkMatcher,
 	}
 	ns.uplinkSubmissionPool = workerpool.NewWorkerPool(workerpool.Config{
-		Component: c,
-		Context:   ctx,
-		Name:      "uplink_submission",
-		Handler:   ns.handleUplinkSubmission,
+		Component:  c,
+		Context:    ctx,
+		Name:       "uplink_submission",
+		Handler:    ns.handleUplinkSubmission,
+		QueueSize:  int(conf.ApplicationUplinkQueue.FastBufferSize),
+		MinWorkers: int(conf.ApplicationUplinkQueue.FastNumConsumers),
+		MaxWorkers: int(conf.ApplicationUplinkQueue.FastNumConsumers),
 	})
 	ctx = ns.Context()
 
