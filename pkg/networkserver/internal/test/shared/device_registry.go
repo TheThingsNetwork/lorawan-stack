@@ -101,7 +101,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		}
 		var matched bool
 		var attempts []*UplinkMatch
-		err := reg.RangeByUplinkMatches(ctx, up, CacheTTL, func(storedCtx context.Context, match *UplinkMatch) (bool, error) {
+		err := reg.RangeByUplinkMatches(ctx, up, func(storedCtx context.Context, match *UplinkMatch) (bool, error) {
 			attempts = append(attempts, match)
 			a.So(matched, should.BeFalse)
 			a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
@@ -133,7 +133,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		t.Helper()
 
 		var attempts []*UplinkMatch
-		err := reg.RangeByUplinkMatches(ctx, up, CacheTTL, func(storedCtx context.Context, match *UplinkMatch) (bool, error) {
+		err := reg.RangeByUplinkMatches(ctx, up, func(storedCtx context.Context, match *UplinkMatch) (bool, error) {
 			attempts = append(attempts, match)
 			a.So(storedCtx, should.HaveParentContextOrEqual, ctx)
 			return false, nil
@@ -374,28 +374,6 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 	), should.BeTrue) {
 		t.Fatal("pbOther current session uplink matching assertion failed")
 	}
-	if !a.So(assertUplinkMatch(ctx, pbCurrentUp, 1,
-		uplinkMatch{
-			EndDevice: pb,
-		},
-	), should.BeTrue) {
-		t.Fatal("cached pb current session uplink matching assertion failed")
-	}
-	if !a.So(assertUplinkMatch(ctx, pbPendingUp, 1,
-		uplinkMatch{
-			EndDevice: pb,
-			IsPending: true,
-		},
-	), should.BeTrue) {
-		t.Fatal("cached pb pending session uplink matching assertion failed")
-	}
-	if !a.So(assertUplinkMatch(ctx, pbOtherCurrentUp, 1,
-		uplinkMatch{
-			EndDevice: pbOther,
-		},
-	), should.BeTrue) {
-		t.Fatal("cached pbOther current session uplink matching assertion failed")
-	}
 
 	err := DeleteDevice(ctx, reg, pb.Ids.ApplicationIds, pb.Ids.DeviceId)
 	if !a.So(err, should.BeNil) {
@@ -421,30 +399,6 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 
 	if !a.So(assertNoDevice(ctx, pbOther), should.BeTrue) {
 		t.Fatalf("Failed to assert registry emptiness after pbOther deletion")
-	}
-
-	// NOTE: Even though devices are deleted, the matching results are still cached (within TTL) and matched here. That is expected.
-	if !a.So(assertUplinkMatch(ctx, pbCurrentUp, 1,
-		uplinkMatch{
-			EndDevice: pb,
-		},
-	), should.BeTrue) {
-		t.Fatal("cached pb current session uplink matching assertion failed after device deletion")
-	}
-	if !a.So(assertUplinkMatch(ctx, pbPendingUp, 1,
-		uplinkMatch{
-			EndDevice: pb,
-			IsPending: true,
-		},
-	), should.BeTrue) {
-		t.Fatal("cached pb pending session uplink matching assertion failed after device deletion")
-	}
-	if !a.So(assertUplinkMatch(ctx, pbOtherCurrentUp, 1,
-		uplinkMatch{
-			EndDevice: pbOther,
-		},
-	), should.BeTrue) {
-		t.Fatal("pbOther current session uplink matching assertion failed after device deletion")
 	}
 }
 

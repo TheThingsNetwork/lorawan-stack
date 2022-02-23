@@ -6749,15 +6749,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/networkserver/redis:candidate": {
-    "translations": {
-      "en": "candidate failed matching"
-    },
-    "description": {
-      "package": "pkg/networkserver/redis",
-      "file": "registry.go"
-    }
-  },
   "error:pkg/networkserver/redis:database_corruption": {
     "translations": {
       "en": "database is corrupted"
@@ -6794,15 +6785,6 @@
       "file": "registry.go"
     }
   },
-  "error:pkg/networkserver/redis:found_no_match_marker": {
-    "translations": {
-      "en": "found no match marker"
-    },
-    "description": {
-      "package": "pkg/networkserver/redis",
-      "file": "registry.go"
-    }
-  },
   "error:pkg/networkserver/redis:invalid_device": {
     "translations": {
       "en": "device is invalid"
@@ -6824,6 +6806,15 @@
   "error:pkg/networkserver/redis:invalid_identifiers": {
     "translations": {
       "en": "invalid identifiers"
+    },
+    "description": {
+      "package": "pkg/networkserver/redis",
+      "file": "registry.go"
+    }
+  },
+  "error:pkg/networkserver/redis:invalid_member_type": {
+    "translations": {
+      "en": "invalid member type"
     },
     "description": {
       "package": "pkg/networkserver/redis",
@@ -6857,18 +6848,9 @@
       "file": "application_uplink_queue.go"
     }
   },
-  "error:pkg/networkserver/redis:no_candidate_match": {
+  "error:pkg/networkserver/redis:missing_session_data": {
     "translations": {
-      "en": "no candidate matches uplink"
-    },
-    "description": {
-      "package": "pkg/networkserver/redis",
-      "file": "registry.go"
-    }
-  },
-  "error:pkg/networkserver/redis:no_candidates": {
-    "translations": {
-      "en": "no device candidates found"
+      "en": "missing session data"
     },
     "description": {
       "package": "pkg/networkserver/redis",

@@ -796,8 +796,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	defer flushMatchStats()
 
 	var matched *matchResult
-	matchTTL := ns.collectionWindow(ctx)
-	if err := ns.devices.RangeByUplinkMatches(ctx, up, matchTTL,
+	if err := ns.devices.RangeByUplinkMatches(ctx, up,
 		func(ctx context.Context, match *UplinkMatch) (bool, error) {
 			defer trace.StartRegion(ctx, "iterate uplink match").End()
 			registerMatchCandidate(ctx)
