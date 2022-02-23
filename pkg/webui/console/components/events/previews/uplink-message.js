@@ -16,11 +16,11 @@ import React from 'react'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import { getGatewayWithHighestSNR } from '@console/components/events/utils'
+
 import PropTypes from '@ttn-lw/lib/prop-types'
 import getByPath from '@ttn-lw/lib/get-by-path'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-
-import getGatewayWithHighestSNR from '@console/components/events/utils/uplink-metadata'
 
 import messages from '../messages'
 
