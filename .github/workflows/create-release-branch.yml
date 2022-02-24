@@ -52,15 +52,6 @@ jobs:
         run: tools/bin/mage js:deps
       - name: Update version information
         run: echo "${RELEASE_VERSION}" | tools/bin/mage version:files
-      - name: Update changelog
-        run: 'cat CHANGELOG.md | tr ''\n'' ''\000'' |
-          sed ''s/## [A-Z][a-z]*\x00\x00#/\x01\x00#/g''|
-          sed ''s/## \[Unreleased\]/## \[Unreleased\]\x00\x00### Added\x00\x00### Changed\x00\x00### Deprecated\x00\x00### Removed\x00\x00### Fixed\x00\x00### Security\x00\x00''"## \\[${RELEASE_VERSION#v}\\] - $(date +%Y-%m-%d)"''/'' |
-          tr ''\000'' ''\n'' |
-          sed ''/\x01/d'' |
-          sed "s/\[unreleased\]: https:\/\/github.com\/$(echo "${GITHUB_REPOSITORY}" | sed ''s/\//\\\//g'')\/compare\/\(v3\.[0-9][0-9]*\.[0-9][0-9]*\)\.\.\.\(v3\.[0-9][0-9]*\)/[unreleased]: https:\/\/github.com\/$(echo "${GITHUB_REPOSITORY}" | sed ''s/\//\\\//g'')\/compare\/${RELEASE_VERSION}...${GITHUB_REF_NAME}\n[${RELEASE_VERSION#v}]: https:\/\/github.com\/$(echo "${GITHUB_REPOSITORY}" | sed ''s/\//\\\//g'')\/compare\/\1...${RELEASE_VERSION}/" > CHANGELOG2.md
-          && mv -f CHANGELOG2.md CHANGELOG.md
-          && git add CHANGELOG.md'
       - name: Update submodules
         id: update_submodules
         run: |
