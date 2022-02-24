@@ -137,7 +137,7 @@ func ConcentratorTimeToXTime(id int32, t scheduling.ConcentratorTime) int64 {
 // with the provided XTime.
 func ConcentratorTimeFromXTime(xTime int64) scheduling.ConcentratorTime {
 	// The Basic Station epoch is the 48 LSB.
-	return scheduling.ConcentratorTime(time.Duration(xTime&0xFFFFFFFFFF) * time.Microsecond)
+	return scheduling.ConcentratorTime(time.Duration(xTime&0xFFFFFFFFFFFF) * time.Microsecond)
 }
 
 // TimestampFromXTime constructs the concentrator timestamp associated with the

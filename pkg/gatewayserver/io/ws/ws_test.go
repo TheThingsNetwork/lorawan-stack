@@ -1120,7 +1120,7 @@ func TestTraffic(t *testing.T) {
 					}
 
 				case lbslns.UplinkDataFrame:
-					now := time.Now()
+					now := time.Unix(time.Now().Unix(), 0)
 					v.UpInfo.XTime = upXTime
 					v.UpInfo.RxTime = float64(now.Unix())
 					req, err := json.Marshal(v)
@@ -1146,17 +1146,15 @@ func TestTraffic(t *testing.T) {
 						// Set the correct xtime and timestamps for the assertion.
 						expectedUp.RxMetadata[0].Timestamp = timestamp
 						expectedUp.RxMetadata[0].Time = ttnpb.ProtoTime(&now)
-						expectedUp.RxMetadata[0].Time.Nanos = 0
 						expectedUp.Settings.Timestamp = timestamp
 						expectedUp.Settings.Time = ttnpb.ProtoTime(&now)
-						expectedUp.Settings.Time.Nanos = 0
 
 						a.So(up.Message, should.Resemble, &expectedUp)
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")
 					}
 				case lbslns.JoinRequest:
-					now := time.Now()
+					now := time.Unix(time.Now().Unix(), 0)
 					v.UpInfo.XTime = upXTime
 					v.UpInfo.RxTime = float64(now.Unix())
 					req, err := json.Marshal(v)
@@ -1182,10 +1180,8 @@ func TestTraffic(t *testing.T) {
 						// Set the correct xtime and timestamps for the assertion.
 						expectedUp.RxMetadata[0].Timestamp = timestamp
 						expectedUp.RxMetadata[0].Time = ttnpb.ProtoTime(&now)
-						expectedUp.RxMetadata[0].Time.Nanos = 0
 						expectedUp.Settings.Timestamp = timestamp
 						expectedUp.Settings.Time = ttnpb.ProtoTime(&now)
-						expectedUp.Settings.Time.Nanos = 0
 
 						a.So(up.Message, should.Resemble, &expectedUp)
 					case <-time.After(timeout):
