@@ -41,6 +41,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Consistent ordering of entities with equal values for the sort field.
+- Fix `xtime` sent to LBS gateways for Class C downlinks.
 
 ### Security
 
@@ -68,7 +69,6 @@ For details about compatibility between different releases, see the **Commitment
   - Join Servers using Backend Interfaces 1.1 (protocol `BI1.1`) must be configured with a `sender-ns-id` containing the EUI of the Network Server.
 - Fix `time.Duration` flags in CLI.
 - Gateway Server will no longer leave permanent gateway connection stats data on the registry when crashing.
-- Fix `xtime` sent to LBS gateways for Class C downlinks.
 
 ## [3.17.2] - 2022-01-30
 
