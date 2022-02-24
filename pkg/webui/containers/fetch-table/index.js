@@ -134,7 +134,7 @@ class FetchTable extends Component {
     itemPathPrefix: '',
     mayAdd: false,
     searchable: false,
-    searchPlaceholderMessage: sharedMessages.searchById,
+    searchPlaceholderMessage: sharedMessages.search,
     searchQueryMaxLength: 50,
     handlesPagination: false,
     fetching: false,

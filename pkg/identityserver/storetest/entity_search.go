@@ -89,6 +89,15 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 			}
 		})
 
+		t.Run("Query", func(t *T) {
+			a, ctx := test.New(t)
+			ids, err := s.SearchApplications(ctx, nil, &ttnpb.SearchApplicationsRequest{
+				Query: "-01",
+			})
+			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
+				a.So(ids[0], should.Resemble, app1.GetIds())
+			}
+		})
 		t.Run("ID", func(t *T) {
 			a, ctx := test.New(t)
 			ids, err := s.SearchApplications(ctx, nil, &ttnpb.SearchApplicationsRequest{
@@ -144,6 +153,15 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 			}
 		})
 
+		t.Run("Query", func(t *T) {
+			a, ctx := test.New(t)
+			ids, err := s.SearchClients(ctx, nil, &ttnpb.SearchClientsRequest{
+				Query: "-01",
+			})
+			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
+				a.So(ids[0], should.Resemble, cli1.GetIds())
+			}
+		})
 		t.Run("ID", func(t *T) {
 			a, ctx := test.New(t)
 			ids, err := s.SearchClients(ctx, nil, &ttnpb.SearchClientsRequest{
@@ -215,6 +233,16 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 			}
 		})
 
+		t.Run("Query", func(t *T) {
+			a, ctx := test.New(t)
+			ids, err := s.SearchEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
+				ApplicationIds: app1.GetIds(),
+				Query:          "01",
+			})
+			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
+				a.So(ids[0], should.Resemble, dev1ID)
+			}
+		})
 		t.Run("ID", func(t *T) {
 			a, ctx := test.New(t)
 			ids, err := s.SearchEndDevices(ctx, &ttnpb.SearchEndDevicesRequest{
@@ -296,6 +324,15 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 			}
 		})
 
+		t.Run("Query", func(t *T) {
+			a, ctx := test.New(t)
+			ids, err := s.SearchGateways(ctx, nil, &ttnpb.SearchGatewaysRequest{
+				Query: "-01",
+			})
+			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
+				a.So(ids[0], should.Resemble, gtw1ID)
+			}
+		})
 		t.Run("ID", func(t *T) {
 			a, ctx := test.New(t)
 			ids, err := s.SearchGateways(ctx, nil, &ttnpb.SearchGatewaysRequest{
@@ -360,6 +397,15 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 			}
 		})
 
+		t.Run("Query", func(t *T) {
+			a, ctx := test.New(t)
+			ids, err := s.SearchOrganizations(ctx, nil, &ttnpb.SearchOrganizationsRequest{
+				Query: "-01",
+			})
+			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
+				a.So(ids[0], should.Resemble, org1.GetIds())
+			}
+		})
 		t.Run("ID", func(t *T) {
 			a, ctx := test.New(t)
 			ids, err := s.SearchOrganizations(ctx, nil, &ttnpb.SearchOrganizationsRequest{
@@ -399,6 +445,15 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 	})
 
 	t.Run("Users", func(t *T) {
+		t.Run("Query", func(t *T) {
+			a, ctx := test.New(t)
+			ids, err := s.SearchUsers(ctx, &ttnpb.SearchUsersRequest{
+				Query: "-01",
+			})
+			if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) && a.So(ids, should.HaveLength, 1) {
+				a.So(ids[0], should.Resemble, usr1.GetIds())
+			}
+		})
 		t.Run("ID", func(t *T) {
 			a, ctx := test.New(t)
 			ids, err := s.SearchUsers(ctx, &ttnpb.SearchUsersRequest{

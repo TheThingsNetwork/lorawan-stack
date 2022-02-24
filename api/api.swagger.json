@@ -8509,6 +8509,13 @@
         },
         "parameters": [
           {
+            "name": "query",
+            "description": "Find applications where the ID, name or description contains this substring.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "id_contains",
             "description": "Find applications where the ID contains this substring.",
             "in": "query",
@@ -8599,6 +8606,13 @@
             "name": "application_ids.application_id",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "query",
+            "description": "Find end devices where the ID, name, description or EUI contains this substring.",
+            "in": "query",
+            "required": false,
             "type": "string"
           },
           {
@@ -8702,6 +8716,13 @@
           }
         },
         "parameters": [
+          {
+            "name": "query",
+            "description": "Find OAuth clients where the ID, name or description contains this substring.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
           {
             "name": "id_contains",
             "description": "Find OAuth clients where the ID contains this substring.",
@@ -8808,6 +8829,13 @@
         },
         "parameters": [
           {
+            "name": "query",
+            "description": "Find gateways where the ID, name, description or EUI contains this substring.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "id_contains",
             "description": "Find gateways where the ID contains this substring.",
             "in": "query",
@@ -8902,6 +8930,13 @@
         },
         "parameters": [
           {
+            "name": "query",
+            "description": "Find organizations where the ID, name or description contains this substring.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "id_contains",
             "description": "Find organizations where the ID contains this substring.",
             "in": "query",
@@ -8988,6 +9023,13 @@
           }
         },
         "parameters": [
+          {
+            "name": "query",
+            "description": "Find users where the ID, name or description contains this substring.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
           {
             "name": "id_contains",
             "description": "Find users where the ID contains this substring.",

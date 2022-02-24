@@ -344,7 +344,7 @@ export default defineMessages({
   scheduleAnyTimeDescription:
     'Configure gateway delay (minimum: {minimumValue}ms, default: {defaultValue}ms)',
   scheduleDownlinkLateDescription: 'Enable server-side buffer of downlink messages',
-  searchById: 'Search by ID',
+  search: 'Search',
   seconds: 'seconds',
   secondsAbbreviated: 'sec',
   secure: 'Secure',

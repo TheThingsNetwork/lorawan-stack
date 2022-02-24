@@ -50,6 +50,15 @@ func (m *SearchApplicationsRequest) ValidateFields(paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
+		case "query":
+
+			if utf8.RuneCountInString(m.GetQuery()) > 50 {
+				return SearchApplicationsRequestValidationError{
+					field:  "query",
+					reason: "value length must be at most 50 runes",
+				}
+			}
+
 		case "id_contains":
 
 			if utf8.RuneCountInString(m.GetIdContains()) > 50 {
@@ -240,6 +249,15 @@ func (m *SearchClientsRequest) ValidateFields(paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
+		case "query":
+
+			if utf8.RuneCountInString(m.GetQuery()) > 50 {
+				return SearchClientsRequestValidationError{
+					field:  "query",
+					reason: "value length must be at most 50 runes",
+				}
+			}
+
 		case "id_contains":
 
 			if utf8.RuneCountInString(m.GetIdContains()) > 50 {
@@ -454,6 +472,15 @@ func (m *SearchGatewaysRequest) ValidateFields(paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
+		case "query":
+
+			if utf8.RuneCountInString(m.GetQuery()) > 50 {
+				return SearchGatewaysRequestValidationError{
+					field:  "query",
+					reason: "value length must be at most 50 runes",
+				}
+			}
+
 		case "id_contains":
 
 			if utf8.RuneCountInString(m.GetIdContains()) > 50 {
@@ -654,6 +681,15 @@ func (m *SearchOrganizationsRequest) ValidateFields(paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
+		case "query":
+
+			if utf8.RuneCountInString(m.GetQuery()) > 50 {
+				return SearchOrganizationsRequestValidationError{
+					field:  "query",
+					reason: "value length must be at most 50 runes",
+				}
+			}
+
 		case "id_contains":
 
 			if utf8.RuneCountInString(m.GetIdContains()) > 50 {
@@ -844,6 +880,15 @@ func (m *SearchUsersRequest) ValidateFields(paths ...string) error {
 	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
 		_ = subs
 		switch name {
+		case "query":
+
+			if utf8.RuneCountInString(m.GetQuery()) > 50 {
+				return SearchUsersRequestValidationError{
+					field:  "query",
+					reason: "value length must be at most 50 runes",
+				}
+			}
+
 		case "id_contains":
 
 			if utf8.RuneCountInString(m.GetIdContains()) > 50 {
@@ -1080,6 +1125,15 @@ func (m *SearchEndDevicesRequest) ValidateFields(paths ...string) error {
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
+				}
+			}
+
+		case "query":
+
+			if utf8.RuneCountInString(m.GetQuery()) > 50 {
+				return SearchEndDevicesRequestValidationError{
+					field:  "query",
+					reason: "value length must be at most 50 runes",
 				}
 			}
 
