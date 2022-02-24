@@ -52,7 +52,7 @@ export default class FileInput extends Component {
     id: PropTypes.string.isRequired,
     image: PropTypes.bool,
     imageClassName: PropTypes.string,
-    largeFileWarningMessage: PropTypes.string,
+    largeFileWarningMessage: PropTypes.message,
     maxSize: PropTypes.number,
     mayRemove: PropTypes.bool,
     message: PropTypes.message,
