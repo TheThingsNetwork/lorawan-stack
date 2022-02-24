@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,17 +33,54 @@ type JoinNonce [3]byte
 // IsZero returns true iff the type is zero.
 func (jn JoinNonce) IsZero() bool { return jn == [3]byte{} }
 
-// String implements the Stringer interface.
 func (jn JoinNonce) String() string { return strings.ToUpper(hex.EncodeToString(jn[:])) }
 
-// GoString implements the GoStringer interface.
 func (jn JoinNonce) GoString() string { return jn.String() }
 
-// Size implements the Sizer interface.
-func (jn JoinNonce) Size() int { return 3 }
+func (jn JoinNonce) Bytes() []byte {
+	b := make([]byte, 3)
+	copy(b, jn[:])
+	return b
+}
+
+// GetJoinNonce gets a typed JoinNonce from the bytes.
+// It returns nil, nil if b is nil.
+// It returns an error if unmarshaling fails.
+func GetJoinNonce(b []byte) (*JoinNonce, error) {
+	if b == nil {
+		return nil, nil
+	}
+	var t JoinNonce
+	if err := t.UnmarshalBinary(b); err != nil {
+		return nil, err
+	}
+	return &t, nil
+}
+
+// MustJoinNonce returns a typed JoinNonce from the bytes.
+// It returns nil, nil if b is nil.
+// It panics if unmarshaling results in an error.
+func MustJoinNonce(b []byte) *JoinNonce {
+	t, err := GetJoinNonce(b)
+	if err != nil {
+		panic(err)
+	}
+	return t
+}
+
+// OrZero returns the nonce value, or a zero value if the nonce was nil.
+func (jn *JoinNonce) OrZero() JoinNonce {
+	if jn != nil {
+		return *jn
+	}
+	return JoinNonce{}
+}
 
 // Equal returns true iff nonces are equal.
 func (jn JoinNonce) Equal(other JoinNonce) bool { return jn == other }
+
+// Size implements the Sizer interface.
+func (jn JoinNonce) Size() int { return 3 }
 
 // Marshal implements the proto.Marshaler interface.
 func (jn JoinNonce) Marshal() ([]byte, error) { return jn.MarshalBinary() }

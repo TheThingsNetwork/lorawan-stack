@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,17 +34,54 @@ type NetID [3]byte
 // IsZero returns true iff the type is zero.
 func (id NetID) IsZero() bool { return id == [3]byte{} }
 
-// String implements the Stringer interface.
 func (id NetID) String() string { return strings.ToUpper(hex.EncodeToString(id[:])) }
 
-// GoString implements the GoStringer interface.
 func (id NetID) GoString() string { return id.String() }
 
-// Size implements the Sizer interface.
-func (id NetID) Size() int { return 3 }
+func (id NetID) Bytes() []byte {
+	b := make([]byte, 3)
+	copy(b, id[:])
+	return b
+}
+
+// GetNetID gets a typed NetID from the bytes.
+// It returns nil, nil if b is nil.
+// It returns an error if unmarshaling fails.
+func GetNetID(b []byte) (*NetID, error) {
+	if b == nil {
+		return nil, nil
+	}
+	var t NetID
+	if err := t.UnmarshalBinary(b); err != nil {
+		return nil, err
+	}
+	return &t, nil
+}
+
+// MustNetID returns a typed NetID from the bytes.
+// It returns nil if the bytes are empty.
+// It panics if unmarshaling results in an error.
+func MustNetID(b []byte) *NetID {
+	t, err := GetNetID(b)
+	if err != nil {
+		panic(err)
+	}
+	return t
+}
+
+// OrZero returns the NetID value, or a zero value if the NetID was nil.
+func (id *NetID) OrZero() NetID {
+	if id != nil {
+		return *id
+	}
+	return NetID{}
+}
 
 // Equal returns true iff IDs are equal.
 func (id NetID) Equal(other NetID) bool { return id == other }
+
+// Size implements the Sizer interface.
+func (id NetID) Size() int { return 3 }
 
 // Marshal implements the proto.Marshaler interface.
 func (id NetID) Marshal() ([]byte, error) { return id.MarshalBinary() }
