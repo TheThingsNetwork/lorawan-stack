@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayconfigurationserver"
@@ -44,6 +45,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -238,6 +240,202 @@ func TestWeb(t *testing.T) {
 						a.So(string(b), should.Equal, cpfLorafwdConfig(gtw))
 					}
 				})
+			})
+		}
+	})
+}
+
+func TestGRPC(t *testing.T) {
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+	is, isAddr, closeIS := mockis.New(ctx)
+	defer closeIS()
+
+	testGtw := mockis.DefaultGateway(registeredGatewayID, false, false)
+	is.GatewayRegistry().Add(ctx, registeredGatewayID, registeredGatewayKey, testGtw, ttnpb.Right_RIGHT_GATEWAY_INFO)
+
+	fpConf := config.FrequencyPlansConfig{
+		ConfigSource: "static",
+		Static:       test.StaticFrequencyPlans,
+	}
+	fps := frequencyplans.NewStore(test.Must(fpConf.Fetcher(ctx, config.BlobConfig{}, test.HTTPClientProvider)).(fetch.Interface))
+
+	conf := &component.Config{
+		ServiceBase: config.ServiceBase{
+			HTTP: config.HTTP{
+				Listen: ":0",
+			},
+			FrequencyPlans: fpConf,
+			Cluster: cluster.Config{
+				IdentityServer: isAddr,
+			},
+		},
+	}
+	c := componenttest.NewComponent(t, conf)
+	c.AddContextFiller(func(ctx context.Context) context.Context {
+		ctx = newContextWithRightsFetcher(ctx)
+		return ctx
+	})
+
+	test.Must(New(c, testConfig))
+	componenttest.StartComponent(t, c)
+	defer c.Close()
+
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
+
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
+	t.Run("Authorization", func(t *testing.T) {
+		a := assertions.New(t)
+		for _, tc := range []struct {
+			Name         string
+			ID           *ttnpb.GatewayIdentifiers
+			Key          string
+			ErrAssertion func(error) bool
+		}{
+			{
+				Name: "Valid",
+				ID:   &registeredGatewayID,
+				Key:  registeredGatewayKey,
+			},
+			{
+				Name:         "InvalidKey",
+				ID:           &registeredGatewayID,
+				Key:          "invalid key",
+				ErrAssertion: errors.IsPermissionDenied,
+			},
+			{
+				Name:         "InvalidIDAndKey",
+				ID:           &ttnpb.GatewayIdentifiers{GatewayId: "--invalid-id"},
+				Key:          "invalid key",
+				ErrAssertion: errors.IsInvalidArgument,
+			},
+		} {
+			t.Run(tc.Name, func(t *testing.T) {
+				creds := grpc.PerRPCCredentials(rpcmetadata.MD{
+					AuthType:      "Bearer",
+					AuthValue:     tc.Key,
+					AllowInsecure: true,
+				})
+				client := ttnpb.NewGatewayConfigurationServiceClient(c.LoopbackConn())
+				a.So(client, should.NotBeNil)
+
+				_, err := client.GetGatewayConfiguration(ctx, &ttnpb.GetGatewayConfigurationRequest{
+					GatewayIds: tc.ID,
+					Format:     "semtechudp",
+					Filename:   "global_conf.json",
+				}, creds)
+				if tc.ErrAssertion != nil {
+					a.So(tc.ErrAssertion(err), should.BeTrue)
+				} else {
+					a.So(err, should.BeNil)
+				}
+			})
+		}
+	})
+
+	mustMarshal := func(b []byte, err error) []byte { return test.Must(b, err).([]byte) }
+	marshalJSON := func(v interface{}) string {
+		return string(mustMarshal(json.Marshal(v)))
+	}
+	marshalText := func(v encoding.TextMarshaler) string {
+		return string(mustMarshal(v.MarshalText()))
+	}
+	semtechUDPConfig := func(gtw *ttnpb.Gateway) string {
+		return marshalJSON(test.Must(semtechudp.Build(gtw, fps)).(*semtechudp.Config))
+	}
+	cpfLoradConfig := func(gtw *ttnpb.Gateway) string {
+		return marshalJSON(test.Must(cpf.BuildLorad(gtw, fps)).(*cpf.LoradConfig))
+	}
+	cpfLorafwdConfig := func(gtw *ttnpb.Gateway) string {
+		return marshalText(test.Must(cpf.BuildLorafwd(gtw)).(*cpf.LorafwdConfig))
+	}
+
+	t.Run("Request", func(t *testing.T) {
+		a := assertions.New(t)
+		creds := grpc.PerRPCCredentials(rpcmetadata.MD{
+			AuthType:      "Bearer",
+			AuthValue:     registeredGatewayKey,
+			AllowInsecure: true,
+		})
+		client := ttnpb.NewGatewayConfigurationServiceClient(c.LoopbackConn())
+		a.So(client, should.NotBeNil)
+		for _, tc := range []struct {
+			Name          string
+			Req           *ttnpb.GetGatewayConfigurationRequest
+			ErrAssertion  func(error) bool
+			RespAssertion func(*ttnpb.GetGatewayConfigurationResponse) bool
+		}{
+			{
+				Name: "invalid format",
+				Req: &ttnpb.GetGatewayConfigurationRequest{
+					GatewayIds: &registeredGatewayID,
+					Format:     "invalid",
+				},
+				ErrAssertion: errors.IsInvalidArgument,
+			},
+			{
+				Name: "invalid type",
+				Req: &ttnpb.GetGatewayConfigurationRequest{
+					GatewayIds: &registeredGatewayID,
+					Format:     "kerlink-cpf",
+					Type:       "invalid",
+				},
+				ErrAssertion: errors.IsInvalidArgument,
+			},
+			{
+				Name: "invalid filename",
+				Req: &ttnpb.GetGatewayConfigurationRequest{
+					GatewayIds: &registeredGatewayID,
+					Format:     "semtechudp",
+					Filename:   "invalid",
+				},
+				ErrAssertion: errors.IsInvalidArgument,
+			},
+			{
+				Name: "semtechudp",
+				Req: &ttnpb.GetGatewayConfigurationRequest{
+					GatewayIds: &registeredGatewayID,
+					Format:     "semtechudp",
+					Filename:   "global_conf.json",
+				},
+				RespAssertion: func(resp *ttnpb.GetGatewayConfigurationResponse) bool {
+					return a.So(string(resp.Contents), should.Equal, semtechUDPConfig(testGtw))
+				},
+			},
+			{
+				Name: "kerlink-cpf/lorad",
+				Req: &ttnpb.GetGatewayConfigurationRequest{
+					GatewayIds: &registeredGatewayID,
+					Format:     "kerlink-cpf",
+					Type:       "lorad",
+					Filename:   "lorad.json",
+				},
+				RespAssertion: func(resp *ttnpb.GetGatewayConfigurationResponse) bool {
+					return a.So(string(resp.Contents), should.Equal, cpfLoradConfig(testGtw))
+				},
+			},
+			{
+				Name: "kerlink-cpf/lorafwd",
+				Req: &ttnpb.GetGatewayConfigurationRequest{
+					GatewayIds: &registeredGatewayID,
+					Format:     "kerlink-cpf",
+					Type:       "lorafwd",
+					Filename:   "lorafwd.toml",
+				},
+				RespAssertion: func(resp *ttnpb.GetGatewayConfigurationResponse) bool {
+					return a.So(string(resp.Contents), should.Equal, cpfLorafwdConfig(testGtw))
+				},
+			},
+		} {
+			t.Run(tc.Name, func(t *testing.T) {
+				resp, err := client.GetGatewayConfiguration(ctx, tc.Req, creds)
+				if tc.ErrAssertion != nil {
+					a.So(tc.ErrAssertion(err), should.BeTrue)
+				} else {
+					a.So(err, should.BeNil)
+					if tc.RespAssertion != nil {
+						a.So(tc.RespAssertion(resp), should.BeTrue)
+					}
+				}
 			})
 		}
 	})
