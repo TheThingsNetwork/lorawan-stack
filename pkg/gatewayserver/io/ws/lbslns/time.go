@@ -127,14 +127,14 @@ func TimePtrToUpInfoTime(t *time.Time) (float64, int64) {
 
 // ConcentratorTimeToXTime contructs the XTime associated with the provided
 // session ID and concentrator timestamp.
+// Bytes 0-5 (6 bytes = 48 bits) are used for the timestamp.
+// Bytes 6-8 are returned unmodified to the gateway from the xtime read on the latest uplink.
 func ConcentratorTimeToXTime(id int32, t scheduling.ConcentratorTime) int64 {
 	return int64(id)<<48 | (int64(t) / int64(time.Microsecond) & 0xFFFFFFFFFFFF)
 }
 
 // ConcentratorTimeFromXTime constructs the scheduling.ConcentratorTime associated
 // with the provided XTime.
-// Bytes 0-5 (6 bytes = 48 bits) are used for the timestamp.
-// Byte 6-8 is returned unmodified to the gateway from the xtime read on the latest uplink.
 func ConcentratorTimeFromXTime(xTime int64) scheduling.ConcentratorTime {
 	// The Basic Station epoch is the 48 LSB.
 	return scheduling.ConcentratorTime(time.Duration(xTime&0xFFFFFFFFFF) * time.Microsecond)
