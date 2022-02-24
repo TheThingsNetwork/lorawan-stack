@@ -17920,6 +17920,11 @@
         "downlink": {
           "$ref": "#/definitions/TxSettingsDownlink",
           "description": "Transmission settings for downlink."
+        },
+        "concentrator_timestamp": {
+          "type": "string",
+          "format": "uint64",
+          "description": "Concentrator timestamp for the downlink as calculated by the Gateway Server scheduler.\nThis value takes into account necessary offsets such as the RTT (Round Trip Time) and TOA (Time Of Arrival).\nThis field is set and used only by the Gateway Server."
         }
       },
       "description": "TxSettings contains the settings for a transmission.\nThis message is used on both uplink and downlink.\nOn downlink, this is a scheduled transmission."
