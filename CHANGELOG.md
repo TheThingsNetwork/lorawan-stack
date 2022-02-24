@@ -11,7 +11,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Add `Basic Authorization` header configuration to the webhooks form in the Console.
+- Add HTTP basic authentication configuration to the webhooks form in the Console.
 - Show repository formatter code in the payload formatter form in the Console and allow pasting the application and payload formatter code when using the JavaScript option.
 
 ### Changed
@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 - The custom webhook option is now shown at the top of the list in the Console when adding new webhooks.
 - Wording around webhook statuses to `Healthy`, `Requests failing` and `Pending`.
 - The uplink event preview in the Console now shows the highest SNR.
+- When scheduling downlink messages with decoded payload, the downlink queued event now contains the encoded, plain binary payload.
+- When Application Server forwards downlink messages to Network Server, the event payload now contains the encrypted LoRaWAN `FRMPayload`.
 
 ### Deprecated
 
