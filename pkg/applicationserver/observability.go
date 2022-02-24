@@ -347,8 +347,8 @@ func (as *ApplicationServer) registerDropDownlinks(ctx context.Context, ids *ttn
 	}
 }
 
-func (as *ApplicationServer) registerForwardDownlinks(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, items []*ttnpb.ApplicationDownlink, peerName string) {
-	for _, item := range items {
+func (as *ApplicationServer) registerForwardDownlinks(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, decrypted, encrypted []*ttnpb.ApplicationDownlink, peerName string) {
+	for _, item := range decrypted {
 		if err := as.publishUp(ctx, &ttnpb.ApplicationUp{
 			EndDeviceIds:   ids,
 			CorrelationIds: item.CorrelationIds,
@@ -358,6 +358,8 @@ func (as *ApplicationServer) registerForwardDownlinks(ctx context.Context, ids *
 		}); err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to send upstream message")
 		}
+	}
+	for _, item := range encrypted {
 		registerForwardDownlink(ctx, ids, item, peerName)
 	}
 }
