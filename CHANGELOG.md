@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 - Add HTTP basic authentication configuration to the webhooks form in the Console.
 - Show repository formatter code in the payload formatter form in the Console and allow pasting the application and payload formatter code when using the JavaScript option.
+- gRPC service to Gateway Configuration Server so that gateway configurations can be obtained via gRPC requests.
+
 
 ### Changed
 
