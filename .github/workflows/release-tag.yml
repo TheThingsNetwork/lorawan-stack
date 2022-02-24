@@ -14,6 +14,19 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
+      - name: Get version from tag
+        id: version
+        uses: actions/github-script@v3
+        with:
+          script: |
+            const tag = context.ref.slice("refs/tags/".length);
+            const majorMinorPatchRegex = /^v([0-9]+)\.([0-9]+)\.([0-9]+)$/;
+            const majorMinorPatch = tag.match(majorMinorPatchRegex);
+            if (!majorMinorPatch) {
+              throw `invalid version tag: ${tag}`;
+            }
+            return majorMinorPatch[0].slice(1);
+          result-encoding: string
       - name: Check branch
         run: echo '${{ github.event.base_ref }}' | grep -Fxq 'refs/heads/release/${{ github.ref_name }}'
       - name: Check out code
@@ -21,6 +34,21 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
+          ref: ${{ github.event.base_ref }}
+      - name: Insert release date into the changelog
+        run: |
+          sed -i "s/^\(## \[.*\] - \)\(unreleased\)$/\1$(date +%Y-%m-%d)/" CHANGELOG.md
+          set +e
+          git diff --exit-code --quiet CHANGELOG.md
+          R=$?
+          set -e
+          git config user.name "The Things Bot"
+          git config user.email "github@thethingsindustries.com"
+          if [ $R -eq 1 ]; then
+            git add CHANGELOG.md
+            git commit -m "all: Enter release date of version ${{ steps.version.outputs.result }} into the changelog"
+            git push
+          fi
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -99,19 +127,6 @@ jobs:
           WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS: "true"
       - name: Check for diff
         run: tools/bin/mage git:diff
-      - name: Get version from tag
-        id: version
-        uses: actions/github-script@v3
-        with:
-          script: |
-            const tag = context.ref.slice("refs/tags/".length);
-            const majorMinorPatchRegex = /^v([0-9]+)\.([0-9]+)\.([0-9]+)$/;
-            const majorMinorPatch = tag.match(majorMinorPatchRegex);
-            if (!majorMinorPatch) {
-              throw `invalid version tag: ${tag}`;
-            }
-            return majorMinorPatch[0].slice(1);
-          result-encoding: string
       - name: Generate Release Notes
         run: |
           awk '/^## \[${{ steps.version.outputs.result }}\]/{flag=1;next} /^## \[/{flag=0} flag' CHANGELOG.md > /tmp/release-notes.md
