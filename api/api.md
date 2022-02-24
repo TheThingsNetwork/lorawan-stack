@@ -5857,7 +5857,7 @@ On downlink, this is a scheduled transmission.
 | `timestamp` | [`uint32`](#uint32) |  | Timestamp of the gateway concentrator when the uplink message was received, or when the downlink message should be transmitted (microseconds). On downlink, set timestamp to 0 and time to null to use immediate scheduling. |
 | `time` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Time of the gateway when the uplink message was received, or when the downlink message should be transmitted. For downlink, this requires the gateway to have GPS time synchronization. |
 | `downlink` | [`TxSettings.Downlink`](#ttn.lorawan.v3.TxSettings.Downlink) |  | Transmission settings for downlink. |
-| `concentrator_timestamp` | [`uint64`](#uint64) |  | Concentrator timestamp for the downlink as calculated by the Gateway Server scheduler. This value takes into account necessary offsets such as the RTT (Round Trip Time) and TOA (Time Of Arrival). This field is set and used only by the Gateway Server. |
+| `concentrator_timestamp` | [`int64`](#int64) |  | Concentrator timestamp for the downlink as calculated by the Gateway Server scheduler. This value takes into account necessary offsets such as the RTT (Round Trip Time) and TOA (Time Of Arrival). This field is set and used only by the Gateway Server. |
 
 #### Field Rules
 

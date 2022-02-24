@@ -318,7 +318,7 @@ message TxSettings {
   // Concentrator timestamp for the downlink as calculated by the Gateway Server scheduler.
   // This value takes into account necessary offsets such as the RTT (Round Trip Time) and TOA (Time Of Arrival).
   // This field is set and used only by the Gateway Server.
-  uint64 concentrator_timestamp = 9;
+  int64 concentrator_timestamp = 9;
 }
 
 message GatewayAntennaIdentifiers {

@@ -1061,7 +1061,7 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 			if src != nil {
 				dst.ConcentratorTimestamp = src.ConcentratorTimestamp
 			} else {
-				var zero uint64
+				var zero int64
 				dst.ConcentratorTimestamp = zero
 			}
 

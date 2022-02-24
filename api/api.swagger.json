@@ -17923,7 +17923,7 @@
         },
         "concentrator_timestamp": {
           "type": "string",
-          "format": "uint64",
+          "format": "int64",
           "description": "Concentrator timestamp for the downlink as calculated by the Gateway Server scheduler.\nThis value takes into account necessary offsets such as the RTT (Round Trip Time) and TOA (Time Of Arrival).\nThis field is set and used only by the Gateway Server."
         }
       },
