@@ -19,13 +19,18 @@ import bind from 'autobind-decorator'
 import Form from '@ttn-lw/components/form'
 import FileInput from '@ttn-lw/components/file-input'
 import Checkbox from '@ttn-lw/components/checkbox'
+import Notification from '@ttn-lw/components/notification'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
 
+import PhyVersionInput from '@console/components/phy-version-input'
+import LorawanVersionInput from '@console/components/lorawan-version-input'
+
 import DeviceTemplateFormatSelect from '@console/containers/device-template-format-select'
+import { NsFrequencyPlansSelect } from '@console/containers/freq-plans-select'
 
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import Yup from '@ttn-lw/lib/yup'
@@ -45,12 +50,17 @@ const m = defineMessages({
   advancedSectionTitle: 'Advanced end device claiming settings',
   infoText:
     'You can use the import functionality to register multiple end devices at once by uploading a file containing the registration information in one of the available formats. For more information, see also our documentation on <DocLink>Importing End Devices</DocLink>.',
+  fallbackValuesImport:
+    'These values will be used in case your file does not provide them. They are not required, although if not provided here or in the imported file, the import of the end device will not be successful',
 })
 
 const validationSchema = Yup.object({
   format_id: Yup.string().required(sharedMessages.validateRequired),
   data: Yup.string().required(m.selectAFile),
   set_claim_auth_code: Yup.boolean(),
+  frequency_plan_id: Yup.string(),
+  lorawan_version: Yup.string(),
+  lorawan_phy_version: Yup.string(),
 })
 
 export default class DeviceBulkCreateForm extends Component {
@@ -59,9 +69,12 @@ export default class DeviceBulkCreateForm extends Component {
       format_id: PropTypes.string,
       data: PropTypes.string,
       set_claim_auth_code: PropTypes.bool,
+      frequency_plan_id: PropTypes.string,
+      lorawan_version: PropTypes.string,
+      lorawan_phy_version: PropTypes.string,
     }).isRequired,
     jsEnabled: PropTypes.bool.isRequired,
-    largeFileWarningMessage: PropTypes.string,
+    largeFileWarningMessage: PropTypes.message,
     onSubmit: PropTypes.func.isRequired,
     warningSize: PropTypes.number,
   }
@@ -75,6 +88,8 @@ export default class DeviceBulkCreateForm extends Component {
     allowedFileExtensions: undefined,
     formatDescription: undefined,
     formatSelected: false,
+    lorawanVersion: '',
+    freqPlan: '',
   }
 
   @bind
@@ -89,9 +104,21 @@ export default class DeviceBulkCreateForm extends Component {
     this.setState(newState)
   }
 
+  @bind
+  handleFreqPlanChange(option) {
+    const { value: freqPlan } = option
+    this.setState({ freqPlan })
+  }
+
+  @bind
+  handleLorawanVersionChange(version) {
+    this.setState({ lorawanVersion: version })
+  }
+
   render() {
     const { initialValues, onSubmit, jsEnabled, warningSize, largeFileWarningMessage } = this.props
-    const { allowedFileExtensions, formatSelected, formatDescription } = this.state
+    const { allowedFileExtensions, formatSelected, formatDescription, freqPlan, lorawanVersion } =
+      this.state
     let passedInitialValues = initialValues
     if (!jsEnabled && initialValues.set_claim_auth_code) {
       passedInitialValues = { ...initialValues, set_claim_auth_code: false }
@@ -129,6 +156,29 @@ export default class DeviceBulkCreateForm extends Component {
               warningSize={warningSize}
               name="data"
               required
+            />
+            <Form.SubTitle title="Fallback values" />
+            <Notification small info content={m.fallbackValuesImport} />
+            <NsFrequencyPlansSelect
+              tooltipId={tooltipIds.FREQUENCY_PLAN}
+              name="frequency_plan_id"
+              onChange={this.handleFreqPlanChange}
+            />
+            <Form.Field
+              title={sharedMessages.macVersion}
+              name="lorawan_version"
+              component={LorawanVersionInput}
+              tooltipId={tooltipIds.LORAWAN_VERSION}
+              onChange={this.handleLorawanVersionChange}
+              frequencyPlan={freqPlan}
+            />
+            <Form.Field
+              title={sharedMessages.phyVersion}
+              name="lorawan_phy_version"
+              component={PhyVersionInput}
+              tooltipId={tooltipIds.REGIONAL_PARAMETERS}
+              onChange={this.handlePhyVersionChange}
+              lorawanVersion={lorawanVersion}
             />
             <Form.CollapseSection id="advanced-settings" title={m.advancedSectionTitle}>
               <Form.Field
