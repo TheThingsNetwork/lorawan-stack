@@ -602,6 +602,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		} else {
 			settings.Timestamp = 0
 		}
+		settings.ConcentratorTimestamp = uint64(em.Starts())
 		msg.Settings = &ttnpb.DownlinkMessage_Scheduled{
 			Scheduled: &settings,
 		}
