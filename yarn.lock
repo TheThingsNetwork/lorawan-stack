@@ -11855,9 +11855,9 @@ pretty-hrtime@^1.0.3:
   integrity sha1-t+PqQkNaTJsnWdmeDyAesZWALuE=
 
 prismjs@^1.21.0, prismjs@^1.25.0, prismjs@^1.8.4, prismjs@~1.17.0, prismjs@~1.25.0:
-  version "1.25.0"
-  resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.25.0.tgz#6f822df1bdad965734b310b315a23315cf999756"
-  integrity sha512-WCjJHl1KEWbnkQom1+SzftbtXMKQoezOCYs5rECqMN+jP+apI7ftoflyqigqzopSO3hMhTEb0mFClA8lkolgEg==
+  version "1.27.0"
+  resolved "https://registry.yarnpkg.com/prismjs/-/prismjs-1.27.0.tgz#bb6ee3138a0b438a3653dd4d6ce0cc6510a45057"
+  integrity sha512-t13BGPUlFDR7wRB5kQDG4jjl7XeuH6jbJGt11JHPL96qwsEHNX2+68tFXqc1/k+/jALsbSWJKUOT/hcYAZ5LkA==
 
 process-nextick-args@~2.0.0:
   version "2.0.1"
@@ -14661,7 +14661,7 @@ tsutils@^3.21.0:
     tslib "^1.8.1"
 
 "ttn-lw@file:sdk/js":
-  version "3.17.2"
+  version "3.18.0"
   dependencies:
     arraybuffer-to-string "^1.0.2"
     auto-bind "^5.0.1"
