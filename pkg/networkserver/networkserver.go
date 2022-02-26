@@ -237,7 +237,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		Name:       "uplink_submission",
 		Handler:    ns.handleUplinkSubmission,
 		QueueSize:  int(conf.ApplicationUplinkQueue.FastBufferSize),
-		MinWorkers: int(conf.ApplicationUplinkQueue.FastNumConsumers),
 		MaxWorkers: int(conf.ApplicationUplinkQueue.FastNumConsumers),
 	})
 	ctx = ns.Context()
