@@ -280,7 +280,7 @@ var startCommand = &cobra.Command{
 			defer downlinkTasks.Close(ctx)
 			config.NS.DownlinkTaskQueue.Queue = downlinkTasks
 			config.NS.ScheduledDownlinkMatcher = &nsredis.ScheduledDownlinkMatcher{
-				Redis: redis.New(config.Redis.WithNamespace("ns", "scheduled-downlinks")),
+				Redis: redis.New(config.Cache.Redis.WithNamespace("ns", "scheduled-downlinks")),
 			}
 			ns, err := networkserver.New(c, &config.NS)
 			if err != nil {
