@@ -263,22 +263,23 @@ func (ps *PubSub) Close(ctx context.Context) error {
 }
 
 // Publish an event to Redis.
-func (ps *PubSub) Publish(evt events.Event) {
+func (ps *PubSub) Publish(evs ...events.Event) {
 	logger := log.FromContext(ps.ctx)
 
-	b, err := encodeEventData(evt)
-	if err != nil {
-		logger.WithError(err).Warn("Failed to encode event")
-		return
-	}
-
-	_, err = ps.client.Pipelined(ps.ctx, func(tx redis.Pipeliner) error {
-		ids := evt.Identifiers()
-		if len(ids) == 0 {
-			tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), nil), b)
-		}
-		for _, id := range ids {
-			tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), id), b)
+	_, err := ps.client.TxPipelined(ps.ctx, func(tx redis.Pipeliner) error {
+		for _, evt := range evs {
+			b, err := encodeEventData(evt)
+			if err != nil {
+				logger.WithError(err).Warn("Failed to encode event")
+				continue
+			}
+			ids := evt.Identifiers()
+			if len(ids) == 0 {
+				tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), nil), b)
+			}
+			for _, id := range ids {
+				tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), id), b)
+			}
 		}
 		return nil
 	})

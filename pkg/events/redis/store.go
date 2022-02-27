@@ -60,22 +60,19 @@ func (ps *PubSubStore) eventStream(ctx context.Context, ids *ttnpb.EntityIdentif
 	return ps.client.Key("event_stream", ids.EntityType(), unique.ID(ctx, ids))
 }
 
-func (ps *PubSubStore) storeEvent(ctx context.Context, evt events.Event) error {
+func (ps *PubSubStore) storeEvent(ctx context.Context, tx redis.Cmdable, evt events.Event) error {
 	b, err := encodeEventData(evt)
 	if err != nil {
 		return err
 	}
-	_, err = ps.client.TxPipelined(ctx, func(tx redis.Pipeliner) error {
-		tx.Set(ps.ctx, ps.eventDataKey(evt.Context(), evt.UniqueID()), b, ps.historyTTL)
-		for _, cid := range evt.CorrelationIDs() {
-			key := ps.eventIndexKey(evt.Context(), cid)
-			tx.LPush(ps.ctx, key, evt.UniqueID())
-			tx.LTrim(ps.ctx, key, 0, int64(ps.correlationIDHistoryCount))
-			tx.Expire(ps.ctx, key, ps.historyTTL)
-		}
-		return nil
-	})
-	return ttnredis.ConvertError(err)
+	tx.Set(ps.ctx, ps.eventDataKey(evt.Context(), evt.UniqueID()), b, ps.historyTTL)
+	for _, cid := range evt.CorrelationIDs() {
+		key := ps.eventIndexKey(evt.Context(), cid)
+		tx.LPush(ps.ctx, key, evt.UniqueID())
+		tx.LTrim(ps.ctx, key, 0, int64(ps.correlationIDHistoryCount))
+		tx.Expire(ps.ctx, key, ps.historyTTL)
+	}
+	return nil
 }
 
 // loadEventData loads event data for every event in evts (by UniqueID)
@@ -368,46 +365,48 @@ func (ps *PubSubStore) FindRelated(ctx context.Context, correlationID string) ([
 }
 
 // Publish an event to Redis.
-func (ps *PubSubStore) Publish(evt events.Event) {
+func (ps *PubSubStore) Publish(evs ...events.Event) {
 	logger := log.FromContext(ps.ctx)
 
-	if err := ps.storeEvent(ps.ctx, evt); err != nil {
-		logger.WithError(err).Warn("Failed to store event")
-		return
-	}
-
-	m := metaEncodingPrefix + strings.Join([]string{
-		evt.UniqueID(),
-	}, " ")
-
-	_, err := ps.client.Pipelined(ps.ctx, func(tx redis.Pipeliner) error {
-		ids := evt.Identifiers()
-		if len(ids) == 0 {
-			tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), nil), m)
-		}
-		definition := events.GetDefinition(evt)
-		for _, id := range ids {
-			tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), id), m)
-			streamValues, err := encodeEventMeta(evt, id)
-			if err != nil {
-				logger.WithError(err).Warn("Failed to encode event")
+	_, err := ps.client.TxPipelined(ps.ctx, func(tx redis.Pipeliner) error {
+		for _, evt := range evs {
+			if err := ps.storeEvent(ps.ctx, tx, evt); err != nil {
+				logger.WithError(err).Warn("Failed to store event")
 				continue
 			}
-			eventStream := ps.eventStream(evt.Context(), id)
-			tx.XAdd(ps.ctx, &redis.XAddArgs{
-				Stream:       eventStream,
-				MaxLenApprox: int64(ps.entityHistoryCount),
-				Values:       streamValues,
-			})
-			tx.Expire(ps.ctx, eventStream, ps.entityHistoryTTL)
-			if devID := id.GetDeviceIds(); devID != nil && definition != nil && definition.PropagateToParent() {
-				eventStream := ps.eventStream(evt.Context(), devID.ApplicationIds.GetEntityIdentifiers())
+
+			m := metaEncodingPrefix + strings.Join([]string{
+				evt.UniqueID(),
+			}, " ")
+
+			ids := evt.Identifiers()
+			if len(ids) == 0 {
+				tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), nil), m)
+			}
+			definition := events.GetDefinition(evt)
+			for _, id := range ids {
+				tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), id), m)
+				streamValues, err := encodeEventMeta(evt, id)
+				if err != nil {
+					logger.WithError(err).Warn("Failed to encode event")
+					continue
+				}
+				eventStream := ps.eventStream(evt.Context(), id)
 				tx.XAdd(ps.ctx, &redis.XAddArgs{
 					Stream:       eventStream,
 					MaxLenApprox: int64(ps.entityHistoryCount),
 					Values:       streamValues,
 				})
 				tx.Expire(ps.ctx, eventStream, ps.entityHistoryTTL)
+				if devID := id.GetDeviceIds(); devID != nil && definition != nil && definition.PropagateToParent() {
+					eventStream := ps.eventStream(evt.Context(), devID.ApplicationIds.GetEntityIdentifiers())
+					tx.XAdd(ps.ctx, &redis.XAddArgs{
+						Stream:       eventStream,
+						MaxLenApprox: int64(ps.entityHistoryCount),
+						Values:       streamValues,
+					})
+					tx.Expire(ps.ctx, eventStream, ps.entityHistoryTTL)
+				}
 			}
 		}
 		return nil

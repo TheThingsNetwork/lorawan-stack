@@ -67,14 +67,15 @@ func (ns *NetworkServer) sendApplicationUplinks(ctx context.Context, cl ttnpb.Ns
 		log.FromContext(ctx).WithError(err).Warn("Failed to send application uplinks")
 		return err
 	}
+	evs := make([]events.Event, 0, len(ups))
 	for _, up := range ups {
 		ctx := events.ContextWithCorrelationID(ctx, up.CorrelationIds...)
 		switch pld := up.Up.(type) {
 		case *ttnpb.ApplicationUp_UplinkMessage:
 			registerForwardDataUplink(ctx, pld.UplinkMessage)
-			events.Publish(evtForwardDataUplink.NewWithIdentifiersAndData(ctx, up.EndDeviceIds, up))
+			evs = append(evs, evtForwardDataUplink.NewWithIdentifiersAndData(ctx, up.EndDeviceIds, up))
 		case *ttnpb.ApplicationUp_JoinAccept:
-			events.Publish(evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, up.EndDeviceIds, &ttnpb.ApplicationUp{
+			evs = append(evs, evtForwardJoinAccept.NewWithIdentifiersAndData(ctx, up.EndDeviceIds, &ttnpb.ApplicationUp{
 				EndDeviceIds:   up.EndDeviceIds,
 				CorrelationIds: up.CorrelationIds,
 				Up: &ttnpb.ApplicationUp_JoinAccept{
@@ -83,6 +84,7 @@ func (ns *NetworkServer) sendApplicationUplinks(ctx context.Context, cl ttnpb.Ns
 			}))
 		}
 	}
+	events.Publish(evs...)
 	return nil
 }
 

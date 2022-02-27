@@ -29,7 +29,7 @@ type PubSub interface {
 // Publisher interface lets you publish events.
 type Publisher interface {
 	// Publish emits an event on the default event pubsub.
-	Publish(evt Event)
+	Publish(evs ...Event)
 }
 
 // Subscriber interface lets you subscribe to events.

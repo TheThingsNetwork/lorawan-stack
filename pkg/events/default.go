@@ -22,7 +22,7 @@ import (
 
 type noopPubSub struct{}
 
-func (noopPubSub) Publish(Event) {}
+func (noopPubSub) Publish(...Event) {}
 
 func (noopPubSub) Subscribe(context.Context, []string, []*ttnpb.EntityIdentifiers, Handler) error {
 	return nil
@@ -46,9 +46,14 @@ func Subscribe(ctx context.Context, names []string, ids []*ttnpb.EntityIdentifie
 }
 
 // Publish emits events on the default event pubsub.
-func Publish(evts ...Event) {
-	for _, evt := range evts {
-		defaultPubSub.Publish(local(evt).withCaller())
+func Publish(evs ...Event) {
+	if len(evs) == 0 {
+		return
+	}
+	evs = append(evs[:0:0], evs...)
+	for i, evt := range evs {
+		evs[i] = local(evt).withCaller()
 		publishes.WithLabelValues(evt.Name()).Inc()
 	}
+	defaultPubSub.Publish(evs...)
 }
