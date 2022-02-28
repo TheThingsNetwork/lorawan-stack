@@ -17,6 +17,7 @@ package cryptoutil
 import (
 	"context"
 	"fmt"
+	"runtime/trace"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -33,6 +34,7 @@ var (
 // WrapAES128Key performs the RFC 3394 Wrap algorithm on the given key using the given key vault and KEK label.
 // If the KEK label is empty, the key will be returned in the clear.
 func WrapAES128Key(ctx context.Context, key types.AES128Key, kekLabel string, v crypto.KeyVault) (*ttnpb.KeyEnvelope, error) {
+	defer trace.StartRegion(ctx, "wrap AES-128 key").End()
 	if kekLabel == "" {
 		return &ttnpb.KeyEnvelope{
 			EncryptedKey: key[:],
@@ -50,6 +52,7 @@ func WrapAES128Key(ctx context.Context, key types.AES128Key, kekLabel string, v 
 
 // WrapAES128KeyWithKEK is like WrapAES128Key, but takes a KEK instead of key vault.
 func WrapAES128KeyWithKEK(ctx context.Context, key types.AES128Key, kekLabel string, kek types.AES128Key) (*ttnpb.KeyEnvelope, error) {
+	defer trace.StartRegion(ctx, "wrap AES-128 key").End()
 	if kekLabel == "" {
 		return &ttnpb.KeyEnvelope{
 			EncryptedKey: key[:],
@@ -70,6 +73,7 @@ var errInvalidLength = errors.DefineInvalidArgument("invalid_length", "invalid s
 // UnwrapAES128Key performs the RFC 3394 Unwrap algorithm on the given key envelope using the given key vault.
 // If the KEK label is empty, the key is assumed to be stored in the clear.
 func UnwrapAES128Key(ctx context.Context, wrapped *ttnpb.KeyEnvelope, v crypto.KeyVault) (key types.AES128Key, err error) {
+	defer trace.StartRegion(ctx, "unwrap AES-128 key").End()
 	if wrapped.Key != nil {
 		return *wrapped.Key, nil
 	}

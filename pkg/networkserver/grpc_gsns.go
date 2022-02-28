@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"runtime/trace"
 
 	"github.com/gogo/protobuf/proto"
 	pbtypes "github.com/gogo/protobuf/types"
@@ -87,6 +88,7 @@ func maxRetransmissionDelay(rxDelay ttnpb.RxDelay) time.Duration {
 }
 
 func matchCmacF(ctx context.Context, fNwkSIntKey types.AES128Key, macVersion ttnpb.MACVersion, fCnt uint32, up *ttnpb.UplinkMessage) ([4]byte, bool) {
+	trace.Log(ctx, "ns", "compute mic")
 	registerMICComputation(ctx)
 	cmacF, err := crypto.ComputeLegacyUplinkMIC(fNwkSIntKey, up.Payload.GetMacPayload().FHdr.DevAddr, fCnt, up.RawPayload[:len(up.RawPayload)-4])
 	if err != nil {
@@ -192,6 +194,8 @@ func applyCFList(cfList *ttnpb.CFList, phy *band.Band, chs ...*ttnpb.MACParamete
 
 // matchAndHandleDataUplink handles and matches a device prematched by CMACF check.
 func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnpb.EndDevice, up *ttnpb.UplinkMessage, deduplicated bool, cmacFMatchResult cmacFMatchingResult) (*matchResult, bool, error) {
+	defer trace.StartRegion(ctx, "match and handle data uplink").End()
+
 	fps, err := ns.FrequencyPlansStore(ctx)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to get frequency plans store")
@@ -262,6 +266,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			dev.MacState = dev.PendingMacState
 			dev.PendingSession.StartedAt = up.ReceivedAt
 
+			trace.Log(ctx, "ns", "pending session match")
 			matchType = pendingMatch
 		}
 	}
@@ -301,6 +306,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 				dev.MacState = macState
 				dev.Session.StartedAt = up.ReceivedAt
 
+				trace.Log(ctx, "ns", "current session match with reset")
 				matchType = currentResetMatch
 
 			case cmacFMatchResult.FullFCnt > dev.Session.LastFCntUp,
@@ -317,6 +323,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 					return nil, false, nil
 				}
 
+				trace.Log(ctx, "ns", "current session match")
 				matchType = currentOriginalMatch
 
 			default: // cmacFMatchResult.FullFCnt == dev.Session.LastFCntUp
@@ -373,6 +380,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 					return nil, false, nil
 				}
 
+				trace.Log(ctx, "ns", "current session match with retransmission")
 				matchType = currentRetransmissionMatch
 			}
 		} else {
@@ -444,6 +452,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		cmds = append(cmds, cmd)
 	}
 	logger = logger.WithField("mac_count", len(cmds))
+	trace.Logf(ctx, "ns", "read %d MAC commands", len(cmds))
 	ctx = log.NewContext(ctx, logger)
 
 	var queuedEventBuilders []events.Builder
@@ -612,6 +621,7 @@ macLoop:
 		if pld.FHdr.FCtrl.Ack {
 			confFCnt = dev.Session.LastConfFCntDown
 		}
+		trace.Log(ctx, "ns", "compute mic")
 		registerMICComputation(ctx)
 		fullMIC, err := crypto.ComputeUplinkMICFromLegacy(
 			cmacFMatchResult.CmacF,
@@ -628,6 +638,7 @@ macLoop:
 			return nil, false, nil
 		}
 		if !bytes.Equal(up.Payload.Mic, fullMIC[:]) {
+			trace.Log(ctx, "ns", "no mic match")
 			logger.Debug("Full MIC mismatch")
 			return nil, false, nil
 		}
@@ -753,6 +764,8 @@ func (ns *NetworkServer) filterMetadata(ctx context.Context, up *ttnpb.UplinkMes
 }
 
 func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkMessage) (err error) {
+	defer trace.StartRegion(ctx, "handle data uplink").End()
+
 	if len(up.RawPayload) < 4 {
 		return errRawPayloadTooShort.New()
 	}
@@ -778,6 +791,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	matchTTL := ns.collectionWindow(ctx)
 	if err := ns.devices.RangeByUplinkMatches(ctx, up, matchTTL,
 		func(ctx context.Context, match *UplinkMatch) (bool, error) {
+			defer trace.StartRegion(ctx, "iterate uplink match").End()
 			registerMatchCandidate(ctx)
 
 			ctx = log.NewContextWithFields(ctx, log.Fields(
@@ -808,8 +822,10 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				cmacF, ok = matchCmacF(ctx, fNwkSIntKey, match.LoRaWANVersion, fCnt, up)
 			}
 			if !ok {
+				trace.Log(ctx, "ns", "no mic match")
 				return false, nil
 			}
+			trace.Log(ctx, "ns", "mic match")
 
 			ctx = log.NewContextWithField(ctx, "full_f_cnt_up", fCnt)
 			dev, ctx, err := ns.devices.GetByID(ctx, match.ApplicationIdentifiers, match.DeviceID, handleDataUplinkGetPaths[:])
@@ -857,9 +873,11 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		return err
 	}
 	if !ok {
+		trace.Log(ctx, "ns", "message is duplicate")
 		registerReceiveDuplicateUplink(ctx, up)
 		return nil
 	}
+	trace.Log(ctx, "ns", "message is original")
 
 	publishEvents(ctx, queuedEvents...)
 	queuedEvents = nil
@@ -886,6 +904,8 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 
 	stored, _, err := ns.devices.SetByID(ctx, matched.Device.Ids.ApplicationIds, matched.Device.Ids.DeviceId, handleDataUplinkGetPaths[:],
 		func(ctx context.Context, stored *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+			defer trace.StartRegion(ctx, "update stored device").End()
+
 			if stored == nil {
 				log.FromContext(ctx).Warn("Device deleted during uplink handling, drop")
 				return nil, nil, errOutdatedData.New()
@@ -1007,6 +1027,8 @@ func joinResponseWithoutKeys(resp *ttnpb.JoinResponse) *ttnpb.JoinResponse {
 }
 
 func (ns *NetworkServer) sendJoinRequest(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, []events.Event, error) {
+	defer trace.StartRegion(ctx, "send join request").End()
+
 	var queuedEvents []events.Event
 	logger := log.FromContext(ctx)
 	cc, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_JOIN_SERVER, nil)
@@ -1052,6 +1074,8 @@ func (ns *NetworkServer) deduplicationDone(ctx context.Context, up *ttnpb.Uplink
 }
 
 func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.UplinkMessage) (err error) {
+	defer trace.StartRegion(ctx, "handle join request").End()
+
 	pld := up.Payload.GetJoinRequestPayload()
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"dev_eui", pld.DevEui,
@@ -1125,9 +1149,11 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		return err
 	}
 	if !ok {
+		trace.Log(ctx, "ns", "message is duplicate")
 		registerReceiveDuplicateUplink(ctx, up)
 		return nil
 	}
+	trace.Log(ctx, "ns", "message is original")
 
 	devAddr := ns.newDevAddr(ctx, matched)
 	const maxDevAddrGenerationRetries = 5
@@ -1248,6 +1274,8 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 var errRejoinRequest = errors.DefineUnimplemented("rejoin_request", "rejoin-request handling is not implemented")
 
 func (ns *NetworkServer) handleRejoinRequest(ctx context.Context, up *ttnpb.UplinkMessage) error {
+	defer trace.StartRegion(ctx, "handle rejoin request").End()
+
 	// TODO: Implement https://github.com/TheThingsNetwork/lorawan-stack/issues/8
 	return errRejoinRequest.New()
 }

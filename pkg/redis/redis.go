@@ -22,6 +22,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net"
+	"runtime/trace"
 	"strconv"
 	"strings"
 	"sync"
@@ -162,6 +163,7 @@ func (c Config) makeDialer() func(ctx context.Context, network, addr string) (ne
 		tlsConfigErr = c.TLS.Client.ApplyTo(tlsConfig)
 	}
 	return func(ctx context.Context, network, addr string) (net.Conn, error) {
+		defer trace.StartRegion(ctx, "dial redis").End()
 		var dialer interface {
 			DialContext(ctx context.Context, network, addr string) (net.Conn, error)
 		} = &net.Dialer{}
@@ -242,6 +244,7 @@ func (cmd ProtoCmd) ScanProto(pb proto.Message) error {
 // GetProto unmarshals protocol buffer message stored under key k in r into pb.
 // Note, that GetProto passes k verbatim to the underlying store and hence, k must represent the full key(including namespace etc.).
 func GetProto(ctx context.Context, r redis.Cmdable, k string) *ProtoCmd {
+	trace.Logf(ctx, "redis", "get proto from %s", k)
 	return &ProtoCmd{r.Get(ctx, k).Result}
 }
 
@@ -252,14 +255,17 @@ func SetProto(ctx context.Context, r redis.Cmdable, k string, pb proto.Message, 
 	if err != nil {
 		return nil, err
 	}
+	trace.Logf(ctx, "redis", "set proto to %q", k)
 	return r.Set(ctx, k, s, expiration), nil
 }
 
 // FindProto finds the protocol buffer stored under the key stored under k.
 // The external key is constructed using keyCmd.
 func FindProto(ctx context.Context, r WatchCmdable, k string, keyCmd func(string) (string, error)) *ProtoCmd {
+	defer trace.StartRegion(ctx, "find proto").End()
 	var result func() (string, error)
 	if err := r.Watch(ctx, func(tx *redis.Tx) error {
+		trace.Logf(ctx, "redis", "get key reference from %q", k)
 		id, err := tx.Get(ctx, k).Result()
 		if err != nil {
 			return err
@@ -268,6 +274,7 @@ func FindProto(ctx context.Context, r WatchCmdable, k string, keyCmd func(string
 		if err != nil {
 			return err
 		}
+		trace.Logf(ctx, "redis", "get proto from %q", ik)
 		result = tx.Get(ctx, ik).Result
 		return nil
 	}, k); err != nil {
@@ -372,13 +379,15 @@ func FindProtosWithOffsetAndCount(offset, count int64) FindProtosOption {
 }
 
 func findProtos(ctx context.Context, r redis.Cmdable, k string, keyCmd func(string) string, opts ...FindProtosOption) stringSliceCmd {
+	getPattern := keyCmd("*")
 	s := &redis.Sort{
-		Get: []string{keyCmd("*")},
+		Get: []string{getPattern},
 		By:  "nosort", // see https://redis.io/commands/sort#skip-sorting-the-elements
 	}
 	for _, opt := range opts {
 		opt(redisSort{s})
 	}
+	trace.Logf(ctx, "redis", "find %q protos from %q", getPattern, k)
 	return stringSliceCmd{
 		result: r.Sort(ctx, k, s).Result,
 	}
@@ -396,6 +405,7 @@ func FindProtosWithKeys(ctx context.Context, r redis.Cmdable, k string, keyCmd f
 
 // ListProtos gets list of protos stored under key k.
 func ListProtos(ctx context.Context, r redis.Cmdable, k string) ProtosCmd {
+	trace.Logf(ctx, "redis", "list protos from %q", k)
 	return ProtosCmd{
 		result: r.LRange(ctx, k, 0, -1).Result,
 	}
@@ -418,6 +428,7 @@ func (cmd InterfaceSliceCmd) Result() ([]interface{}, error) {
 }
 
 func RunInterfaceSliceScript(ctx context.Context, r Scripter, s *redis.Script, keys []string, args ...interface{}) *InterfaceSliceCmd {
+	trace.Logf(ctx, "redis", "run script with hash %q", s.Hash())
 	return &InterfaceSliceCmd{s.Run(ctx, r, keys, args...)}
 }
 
@@ -736,6 +747,8 @@ return redis.status_reply('OK')`)
 // LockMutex locks the value stored at k with a mutex with identifier id.
 // It stores the lock at LockKey(k) and list at ListKey(k).
 func LockMutex(ctx context.Context, r redis.Cmdable, k, id string, expiration time.Duration) error {
+	defer trace.StartRegion(ctx, "lock mutex").End()
+
 	var hasDeadline bool
 	dl, ok := ctx.Deadline()
 	if ok {
@@ -797,6 +810,7 @@ func LockMutex(ctx context.Context, r redis.Cmdable, k, id string, expiration ti
 
 // UnlockMutex unlocks the key k with identifier id.
 func UnlockMutex(ctx context.Context, r Scripter, k, id string, expiration time.Duration) error {
+	defer trace.StartRegion(ctx, "unlock mutex").End()
 	if err := unlockMutexScript.Run(ctx, r, []string{LockKey(k), ListKey(k)}, id, milliseconds(expiration)).Err(); err != nil {
 		return ConvertError(err)
 	}
@@ -821,6 +835,7 @@ func InitMutex(ctx context.Context, r Scripter) error {
 // LockedWatch locks the key k with a mutex, watches key k and executes f in a transaction.
 // k is unlocked after f returns.
 func LockedWatch(ctx context.Context, r WatchCmdable, k, id string, expiration time.Duration, f func(*redis.Tx) error) error {
+	defer trace.StartRegion(ctx, "locked watch").End()
 	if err := LockMutex(ctx, r, k, id, expiration); err != nil {
 		return err
 	}
