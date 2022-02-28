@@ -38,7 +38,7 @@ const m = defineMessages({
 })
 
 const ApplicationWebhookAddForm = props => {
-  const { templateId, isCustom, webhookTemplate, appId, navigateToList } = props
+  const { templateId, isCustom, webhookTemplate, appId, navigateToList, getApplicationApiKeys } = props
 
   let breadcrumbContent = m.customWebhook
   if (!templateId) {
@@ -117,6 +117,7 @@ const ApplicationWebhookAddForm = props => {
               onSubmit={handleSubmit}
               onSubmitSuccess={handleSubmitSuccess}
               webhookTemplate={webhookTemplate}
+              getApplicationApiKeys={getApplicationApiKeys}
               existCheck={existCheck}
             />
           )}

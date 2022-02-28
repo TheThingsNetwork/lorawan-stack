@@ -16,6 +16,7 @@ import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
 import { getWebhookTemplate } from '@console/store/actions/webhook-templates'
+import { getApplicationApiKeys } from '@console/store/actions/api-keys'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import { selectWebhookTemplateById } from '@console/store/selectors/webhook-templates'
@@ -35,6 +36,7 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = dispatch => ({
   getWebhookTemplate: (templateId, selector) => dispatch(getWebhookTemplate(templateId, selector)),
   navigateToList: appId => dispatch(push(`/applications/${appId}/integrations/webhooks`)),
+  getApplicationApiKeys: (appId, key) => dispatch(getApplicationApiKeys(appId, key)),
 })
 
 export default ApplicationWebhookAddForm =>
