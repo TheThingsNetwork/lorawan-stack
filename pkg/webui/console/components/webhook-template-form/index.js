@@ -18,6 +18,7 @@ import bind from 'autobind-decorator'
 import urlTemplate from 'url-template'
 
 import tts from '@console/api/tts'
+import { getApplicationApiKeys } from '@console/store/actions/api-keys'
 
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
@@ -31,6 +32,7 @@ import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { id as webhookIdRegexp } from '@ttn-lw/lib/regexp'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 const m = defineMessages({
   createTemplate: 'Create {template} webhook',
@@ -62,7 +64,7 @@ export default class WebhookTemplateForm extends Component {
 
   @bind
   async convertTemplateToWebhook(values) {
-    const { webhookTemplate: template, appId } = this.props
+    const { webhookTemplate: template, appId, dispatch } = this.props
     const { webhook_id, ...fields } = values
 
     const headers = Object.keys(template.headers || {}).reduce((acc, key) => {
@@ -94,13 +96,16 @@ export default class WebhookTemplateForm extends Component {
       location_solved: pathExpand(template.location_solved, fields),
       service_data: pathExpand(template.service_data, fields),
     }
-
+    console.log(template.create_downlink_api_key)
     if (template.create_downlink_api_key) {
       const key = {
         name: `${webhook_id} downlink API key`,
         rights: ['RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE'],
       }
-      const { key: downlink_api_key } = await tts.Applications.ApiKeys.create(appId, key)
+      const { key: downlink_api_key } = await dispatch(
+        attachPromise(getApplicationApiKeys(appId, key)),
+      )
+      console.log(downlink_api_key)
       webhook.downlink_api_key = downlink_api_key
     }
 
