@@ -88,6 +88,7 @@ type Config struct {
 	Database      int            `name:"database" description:"Redis database to use"`
 	RootNamespace []string       `name:"namespace" description:"Namespace for Redis keys"`
 	PoolSize      int            `name:"pool-size" description:"The maximum number of database connections"`
+	IdleTimeout   time.Duration  `name:"idle-timeout" description:"Idle connection timeout"`
 	Failover      FailoverConfig `name:"failover" description:"Redis failover configuration"`
 	TLS           struct {
 		Require          bool `name:"require" description:"Require TLS"`
@@ -115,6 +116,7 @@ func (c Config) Equals(other Config) bool {
 		c.Database == other.Database &&
 		equalsStringSlice(c.RootNamespace, other.RootNamespace) &&
 		c.PoolSize == other.PoolSize &&
+		c.IdleTimeout == other.IdleTimeout &&
 		c.Failover.Equals(other.Failover) &&
 		c.TLS.Require == other.TLS.Require &&
 		c.TLS.Client.Equals(other.TLS.Client)
@@ -197,14 +199,16 @@ func newRedisClient(conf *Config) *redis.Client {
 			Password:      conf.Password,
 			DB:            conf.Database,
 			PoolSize:      conf.PoolSize,
+			IdleTimeout:   conf.IdleTimeout,
 		})
 	}
 	return redis.NewClient(&redis.Options{
-		Dialer:   conf.makeDialer(),
-		Addr:     conf.Address,
-		Password: conf.Password,
-		DB:       conf.Database,
-		PoolSize: conf.PoolSize,
+		Dialer:      conf.makeDialer(),
+		Addr:        conf.Address,
+		Password:    conf.Password,
+		DB:          conf.Database,
+		PoolSize:    conf.PoolSize,
+		IdleTimeout: conf.IdleTimeout,
 	})
 }
 
