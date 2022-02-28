@@ -44,6 +44,7 @@ export default class WebhookTemplateForm extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
     existCheck: PropTypes.func.isRequired,
+    getApplicationApiKeys: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     onSubmitSuccess: PropTypes.func.isRequired,
     templateId: PropTypes.string.isRequired,
