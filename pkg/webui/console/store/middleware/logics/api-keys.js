@@ -56,4 +56,13 @@ const getApiKeyLogic = createRequestLogic({
   },
 })
 
-export default [getApiKeyLogic, getApiKeysLogic]
+const getApplicationApiKeyLogic = createRequestLogic({
+  type: apiKeys.GET_APP_API_KEYS,
+  process: async ({ action }) => {
+    const { appId, key } = action.payload
+    console.log(action.payload)
+    return tts.Applications.ApiKeys.create(appId, key)
+  },
+})
+
+export default [getApiKeyLogic, getApiKeysLogic, getApplicationApiKeyLogic]

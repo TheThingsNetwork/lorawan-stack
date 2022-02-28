@@ -36,3 +36,17 @@ export const [
   },
   { request: getApiKeysList, success: getApiKeysListSuccess, failure: getApiKeysListFailure },
 ] = createPaginationByParentRequestActions(SHARED_NAME)
+
+export const GET_APP_API_KEYS_BASE = 'GET_APP_API_KEYS'
+export const [
+  {
+    request: GET_APP_API_KEYS,
+    success: GET_APP_API_KEYS_SUCCESS,
+    failure: GET_APP_API_KEYS_FAILURE,
+  },
+  {
+    request: getApplicationApiKeys,
+    success: getApplicationApiKeysSuccess,
+    failure: getApplicationApiKeysFailure,
+  },
+] = createRequestActions(GET_APP_API_KEYS_BASE, (id, key) => ({ id, key }))
