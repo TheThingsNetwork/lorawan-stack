@@ -4202,6 +4202,33 @@
       "file": "http_gateway.go"
     }
   },
+  "error:pkg/gatewayconfigurationserver:unsupported_configuration_filename": {
+    "translations": {
+      "en": "configuration filename `{filename}` for type `{type}` is not supported"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver",
+      "file": "grpc.go"
+    }
+  },
+  "error:pkg/gatewayconfigurationserver:unsupported_configuration_format": {
+    "translations": {
+      "en": "configuration format `{format}` is not supported"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver",
+      "file": "grpc.go"
+    }
+  },
+  "error:pkg/gatewayconfigurationserver:unsupported_configuration_type": {
+    "translations": {
+      "en": "configuration type `{type}` is not supported"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver",
+      "file": "grpc.go"
+    }
+  },
   "error:pkg/gatewayserver/io/grpc:connect": {
     "translations": {
       "en": "failed to connect gateway `{gateway_uid}`"

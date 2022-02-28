@@ -5558,6 +5558,118 @@
         ]
       }
     },
+    "/gcs/gateways/configuration/{gateway_ids.gateway_id}/{format}/{filename}": {
+      "get": {
+        "operationId": "GatewayConfigurationService_GetGatewayConfiguration",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetGatewayConfigurationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "format",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "GatewayConfigurationService"
+        ]
+      }
+    },
+    "/gcs/gateways/configuration/{gateway_ids.gateway_id}/{format}/{type}/{filename}": {
+      "get": {
+        "operationId": "GatewayConfigurationService_GetGatewayConfiguration2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetGatewayConfigurationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "gateway_ids.gateway_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "format",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "type",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "filename",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "gateway_ids.eui",
+            "description": "Secondary identifier, which can only be used in specific requests.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          }
+        ],
+        "tags": [
+          "GatewayConfigurationService"
+        ]
+      }
+    },
     "/gs/gateways/{gateway_id}/connection/stats": {
       "get": {
         "summary": "Get statistics about the current gateway connection to the Gateway Server.\nThis is not persisted between reconnects.",
@@ -15237,6 +15349,15 @@
       "type": "object",
       "properties": {
         "join_eui": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "v3GetGatewayConfigurationResponse": {
+      "type": "object",
+      "properties": {
+        "contents": {
           "type": "string",
           "format": "byte"
         }

@@ -2610,6 +2610,37 @@
       ]
     }
   },
+  "GatewayConfigurationService": {
+    "GetGatewayConfiguration": {
+      "file": "lorawan-stack/api/gateway_configuration.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "get",
+          "pattern": "/gcs/gateways/configuration/{gateway_ids.gateway_id}/{format}/{filename}",
+          "parameters": [
+            "gateway_ids.gateway_id",
+            "format",
+            "filename"
+          ]
+        },
+        {
+          "method": "get",
+          "pattern": "/gcs/gateways/configuration/{gateway_ids.gateway_id}/{format}/{type}/{filename}",
+          "parameters": [
+            "gateway_ids.gateway_id",
+            "format",
+            "type",
+            "filename"
+          ]
+        }
+      ]
+    }
+  },
   "GatewayAccess": {
     "ListRights": {
       "file": "lorawan-stack/api/gateway_services.proto",
