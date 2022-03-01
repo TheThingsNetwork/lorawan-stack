@@ -56,8 +56,8 @@ const getApiKeyLogic = createRequestLogic({
   },
 })
 
-const getApplicationApiKeyLogic = createRequestLogic({
-  type: apiKeys.GET_APP_API_KEYS,
+const createApplicationApiKeyLogic = createRequestLogic({
+  type: apiKeys.CREATE_APP_API_KEY,
   process: async ({ action }) => {
     const { id, key } = action.payload
 
@@ -65,4 +65,4 @@ const getApplicationApiKeyLogic = createRequestLogic({
   },
 })
 
-export default [getApiKeyLogic, getApiKeysLogic, getApplicationApiKeyLogic]
+export default [getApiKeyLogic, getApiKeysLogic, createApplicationApiKeyLogic]

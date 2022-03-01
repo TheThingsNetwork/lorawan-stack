@@ -206,6 +206,7 @@ const validationSchema = Yup.object().shape({
 export default class WebhookForm extends Component {
   static propTypes = {
     existCheck: PropTypes.func,
+    handleReplaceModalDecision: PropTypes.func.isRequired,
     healthStatusEnabled: PropTypes.bool,
     initialWebhookValue: PropTypes.shape({
       ids: PropTypes.shape({
@@ -306,16 +307,6 @@ export default class WebhookForm extends Component {
   }
 
   @bind
-  handleReplaceModalDecision(mayReplace) {
-    if (mayReplace) {
-      this.modalResolve()
-    } else {
-      this.modalReject()
-    }
-    this.setState({ displayOverwriteModal: false })
-  }
-
-  @bind
   async handleReactivate() {
     const { onReactivate, onReactivateSuccess } = this.props
     const healthStatus = {
@@ -347,7 +338,13 @@ export default class WebhookForm extends Component {
   }
 
   render() {
-    const { update, initialWebhookValue, webhookTemplate, healthStatusEnabled } = this.props
+    const {
+      update,
+      initialWebhookValue,
+      webhookTemplate,
+      healthStatusEnabled,
+      handleReplaceModalDecision,
+    } = this.props
     const { error, displayOverwriteModal, existingId } = this.state
     let initialValues = blankValues
     if (update && initialWebhookValue) {
@@ -392,7 +389,7 @@ export default class WebhookForm extends Component {
             values: { id: existingId },
           }}
           buttonMessage={sharedMessages.replaceWebhook}
-          onComplete={this.handleReplaceModalDecision}
+          onComplete={handleReplaceModalDecision}
           approval
           visible={displayOverwriteModal}
         />

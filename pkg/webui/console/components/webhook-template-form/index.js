@@ -14,8 +14,6 @@
 
 import React, { Component } from 'react'
 import { defineMessages } from 'react-intl'
-import bind from 'autobind-decorator'
-import urlTemplate from 'url-template'
 
 
 import Form from '@ttn-lw/components/form'
@@ -37,22 +35,13 @@ const m = defineMessages({
   templateSettings: 'Template settings',
 })
 
-const pathExpand = (url, fields) =>
-  Boolean(url) && url.path ? { path: urlTemplate.parse(url.path).expand(fields) } : url
-
 export default class WebhookTemplateForm extends Component {
   static propTypes = {
-    appId: PropTypes.string.isRequired,
-    existCheck: PropTypes.func.isRequired,
-    getApplicationApiKeys: PropTypes.func.isRequired,
+    handleReplaceModalDecision: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
-    onSubmitSuccess: PropTypes.func.isRequired,
     templateId: PropTypes.string.isRequired,
     webhookTemplate: PropTypes.webhookTemplate.isRequired,
   }
-
-  modalResolve = () => null
-  modalReject = () => null
 
   state = {
     error: undefined,
@@ -60,92 +49,8 @@ export default class WebhookTemplateForm extends Component {
     existingId: undefined,
   }
 
-  @bind
-  async convertTemplateToWebhook(values) {
-    const { webhookTemplate: template, appId, getApplicationApiKeys } = this.props
-    const { webhook_id, ...fields } = values
-
-    const headers = Object.keys(template.headers || {}).reduce((acc, key) => {
-      const val = template.headers[key]
-      const headerValue = val.replace(/{([a-z0-9_-]+)}/i, (_, field) => values[field])
-      if (headerValue !== '') {
-        acc[key] = headerValue
-      }
-      return acc
-    }, {})
-
-    const webhook = {
-      ids: {
-        webhook_id: values.webhook_id,
-      },
-      template_ids: template.ids,
-      format: template.format,
-      headers,
-      template_fields: fields,
-      base_url: urlTemplate.parse(template.base_url).expand(fields),
-      uplink_message: pathExpand(template.uplink_message, fields),
-      join_accept: pathExpand(template.join_accept, fields),
-      downlink_ack: pathExpand(template.downlink_ack, fields),
-      downlink_nack: pathExpand(template.downlink_nack, fields),
-      downlink_sent: pathExpand(template.downlink_sent, fields),
-      downlink_failed: pathExpand(template.downlink_failed, fields),
-      downlink_queued: pathExpand(template.downlink_queued, fields),
-      downlink_queue_invalidated: pathExpand(template.downlink_queue_invalidated, fields),
-      location_solved: pathExpand(template.location_solved, fields),
-      service_data: pathExpand(template.service_data, fields),
-    }
-
-    if (template.create_downlink_api_key) {
-      const key = {
-        name: `${webhook_id} downlink API key`,
-        rights: ['RIGHT_APPLICATION_TRAFFIC_DOWN_WRITE'],
-      }
-      const { key: downlink_api_key } = await getApplicationApiKeys(appId, key)
-      webhook.downlink_api_key = downlink_api_key
-    }
-
-    return webhook
-  }
-
-  @bind
-  async handleSubmit(values, { setSubmitting, resetForm }) {
-    const { onSubmit, onSubmitSuccess, existCheck } = this.props
-
-    await this.setState({ error: '' })
-    try {
-      const webhook = await this.convertTemplateToWebhook(values)
-
-      const webhookId = webhook.ids.webhook_id
-      const exists = await existCheck(webhookId)
-      if (exists) {
-        this.setState({ displayOverwriteModal: true, existingId: webhookId })
-        await new Promise((resolve, reject) => {
-          this.modalResolve = resolve
-          this.modalReject = reject
-        })
-      }
-
-      const result = await onSubmit(webhook)
-      resetForm({ values })
-      onSubmitSuccess(result)
-    } catch (error) {
-      setSubmitting(false)
-      await this.setState({ error })
-    }
-  }
-
-  @bind
-  handleReplaceModalDecision(mayReplace) {
-    if (mayReplace) {
-      this.modalResolve()
-    } else {
-      this.modalReject()
-    }
-    this.setState({ displayOverwriteModal: false })
-  }
-
   render() {
-    const { templateId, webhookTemplate } = this.props
+    const { templateId, webhookTemplate, onSubmit, handleReplaceModalDecision } = this.props
     const { name, fields = [] } = webhookTemplate
     const { error, displayOverwriteModal, existingId } = this.state
     const validationSchema = Yup.object({
@@ -181,13 +86,13 @@ export default class WebhookTemplateForm extends Component {
             values: { id: existingId },
           }}
           buttonMessage={sharedMessages.replaceWebhook}
-          onComplete={this.handleReplaceModalDecision}
+          onComplete={handleReplaceModalDecision}
           approval
           visible={displayOverwriteModal}
         />
         <WebhookTemplateInfo webhookTemplate={webhookTemplate} />
         <Form
-          onSubmit={this.handleSubmit}
+          onSubmit={onSubmit}
           validationSchema={validationSchema}
           initialValues={initialValues}
           error={error}
