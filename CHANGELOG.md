@@ -23,6 +23,7 @@ For details about compatibility between different releases, see the **Commitment
 - The uplink event preview in the Console now shows the highest SNR.
 - When scheduling downlink messages with decoded payload, the downlink queued event now contains the encoded, plain binary payload.
 - When Application Server forwards downlink messages to Network Server, the event payload now contains the encrypted LoRaWAN `FRMPayload`.
+- The Network Server will now match downlink acknowledgements on the `cache` redis cluster (previously the `general` cluster was used).
 
 ### Deprecated
 
