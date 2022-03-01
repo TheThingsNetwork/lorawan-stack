@@ -86,7 +86,7 @@ jobs:
             .env/admin_api_key.txt
           key: db-cache-${{ hashFiles('pkg/identityserver/store/**/*.go', 'cmd/ttn-lw-stack/commands/is-db.go', '.github/workflows/e2e.yml') }}
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: "~1.17"
       - name: Initialize Go module cache
