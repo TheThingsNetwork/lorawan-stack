@@ -148,7 +148,7 @@ var DefaultConfig = Config{
 		NumConsumers: 1,
 
 		FastBufferSize:   16384,
-		FastNumConsumers: 16,
+		FastNumConsumers: 128,
 	},
 	DownlinkTaskQueue: DownlinkTaskQueueConfig{
 		NumConsumers: 1,
