@@ -37,7 +37,7 @@ const (
 
 // Component contains a minimal component.Component definition.
 type Component interface {
-	StartTask(*task.Config)
+	task.Starter
 	FromRequestContext(context.Context) context.Context
 }
 

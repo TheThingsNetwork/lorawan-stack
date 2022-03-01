@@ -28,17 +28,23 @@ import (
 	_ "gocloud.dev/pubsub/gcppubsub" // GCP backend for PubSub.
 )
 
+// Component contains a minimal component.Component definition.
+type Component interface {
+	task.Starter
+	FromRequestContext(context.Context) context.Context
+}
+
 // InitializeEvents initializes the event system.
-func InitializeEvents(ctx context.Context, taskStarter task.Starter, conf config.ServiceBase) error {
+func InitializeEvents(ctx context.Context, component Component, conf config.ServiceBase) error {
 	switch conf.Events.Backend {
 	case "internal":
 		events.SetDefaultPubSub(basic.NewPubSub())
 		return nil
 	case "redis":
-		events.SetDefaultPubSub(redis.NewPubSub(ctx, taskStarter, conf.Events.Redis))
+		events.SetDefaultPubSub(redis.NewPubSub(ctx, component, conf.Events.Redis))
 		return nil
 	case "cloud":
-		ps, err := cloud.NewPubSub(ctx, taskStarter, conf.Events.Cloud.PublishURL, conf.Events.Cloud.SubscribeURL)
+		ps, err := cloud.NewPubSub(ctx, component, conf.Events.Cloud.PublishURL, conf.Events.Cloud.SubscribeURL)
 		if err != nil {
 			return err
 		}

@@ -32,10 +32,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 )
 
 // NewPubSub creates a new PubSub that publishes and subscribes to Redis.
-func NewPubSub(ctx context.Context, taskStarter task.Starter, conf config.RedisEvents) events.PubSub {
+func NewPubSub(ctx context.Context, component workerpool.Component, conf config.RedisEvents) events.PubSub {
 	ttnRedisClient := ttnredis.New(&conf.Config)
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"namespace", "events/redis",
@@ -57,7 +58,7 @@ func NewPubSub(ctx context.Context, taskStarter task.Starter, conf config.RedisE
 	}
 
 	for i := 0; i < workers; i++ {
-		taskStarter.StartTask(&task.Config{
+		component.StartTask(&task.Config{
 			Context: ps.ctx,
 			ID:      fmt.Sprintf("events_redis_subscribe_%02d", i),
 			Func:    ps.subscribeTask,

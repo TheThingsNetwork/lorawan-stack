@@ -53,11 +53,19 @@ var redisConfig = func() ttnredis.Config {
 	return config
 }()
 
+type mockComponent struct {
+	task.Starter
+}
+
+func (m mockComponent) FromRequestContext(ctx context.Context) context.Context {
+	return ctx
+}
+
 func Example() {
 	// The task starter is used for automatic re-subscription on failure.
 	taskStarter := task.StartTaskFunc(task.DefaultStartTask)
 
-	redisPubSub := redis.NewPubSub(context.TODO(), taskStarter, config.RedisEvents{
+	redisPubSub := redis.NewPubSub(context.TODO(), mockComponent{taskStarter}, config.RedisEvents{
 		// Config here...
 	})
 
@@ -77,7 +85,7 @@ func TestRedisPubSub(t *testing.T) {
 			config := config.RedisEvents{
 				Config: redisConfig,
 			}
-			pubsub := redis.NewPubSub(ctx, taskStarter, config)
+			pubsub := redis.NewPubSub(ctx, mockComponent{taskStarter}, config)
 			defer pubsub.(*redis.PubSub).Close(ctx)
 
 			time.Sleep(timeout / 10)
@@ -98,7 +106,7 @@ func TestRedisPubSubStore(t *testing.T) {
 				Config: redisConfig,
 			}
 			config.Store.Enable = true
-			pubsub := redis.NewPubSub(ctx, taskStarter, config)
+			pubsub := redis.NewPubSub(ctx, mockComponent{taskStarter}, config)
 			defer pubsub.(*redis.PubSubStore).Close(ctx)
 
 			time.Sleep(timeout / 10)
