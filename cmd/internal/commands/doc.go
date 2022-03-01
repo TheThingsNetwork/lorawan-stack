@@ -62,7 +62,6 @@ func GenManPages(root *cobra.Command) *cobra.Command {
 const MDDocFrontmatterTemplate = `---
 title: "%s"
 slug: %s
-type: "commands"
 ---
 
 `
