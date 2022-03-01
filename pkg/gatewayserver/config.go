@@ -55,7 +55,7 @@ type Config struct {
 	FetchGatewayJitter   float64       `name:"fetch-gateway-jitter" description:"Jitter (fraction) to apply to the get interval to randomize intervals"`
 
 	UpdateGatewayLocationDebounceTime time.Duration `name:"update-gateway-location-debounce-time" description:"Debounce time for gateway location updates from status messages"`
-	UpdateConnectionStatsDebounceTime time.Duration `name:"update-connection-stats-debounce-time" description:"DEPRECATED: Time before repeated refresh of the gateway connection stats"`
+	UpdateConnectionStatsDebounceTime time.Duration `name:"update-connection-stats-debounce-time" description:"Time before repeated refresh of the gateway connection stats"`
 	ConnectionStatsTTL                time.Duration `name:"connection-stats-ttl" description:"Time to live of the gateway connection stats. Periodically refreshed by the GatewayServer but works as an expiration date on the data in case of crashes"`
 	ConnectionStatsDisconnectTTL      time.Duration `name:"connection-stats-disconnect-ttl" description:"Time to live of the gateway connection stats after disconnecting"`
 

@@ -906,6 +906,16 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 		case <-ctx.Done():
 			return
 		case <-conn.StatsChanged():
+			if duration := gs.config.UpdateConnectionStatsDebounceTime; duration > 0 {
+				// We debounce the updates before the actual write to the store in order
+				// to de-correlate updates over time.
+				duration := random.Jitter(duration, debounceJitter)
+				select {
+				case <-ctx.Done():
+					return
+				case <-time.After(duration):
+				}
+			}
 		case <-refreshTTLTimer.C:
 		}
 		stats, paths := conn.Stats()
@@ -917,6 +927,7 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 
 const (
 	allowedLocationDelta = 0.00001
+	debounceJitter       = 0.25
 )
 
 func sameLocation(a, b ttnpb.Location) bool {
@@ -1000,11 +1011,13 @@ func (gs *GatewayServer) handleLocationUpdates(ctx context.Context, conn connect
 				}
 			}
 
-			timeout := time.After(gs.config.UpdateGatewayLocationDebounceTime)
-			select {
-			case <-ctx.Done():
-				return
-			case <-timeout:
+			if duration := gs.config.UpdateGatewayLocationDebounceTime; duration > 0 {
+				duration := random.Jitter(duration, debounceJitter)
+				select {
+				case <-ctx.Done():
+					return
+				case <-time.After(duration):
+				}
 			}
 		}
 	}
