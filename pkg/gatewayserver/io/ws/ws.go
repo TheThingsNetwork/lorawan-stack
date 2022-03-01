@@ -237,7 +237,6 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 	defer pingTicker.Stop()
 
 	ws.SetPingHandler(func(data string) error {
-		logger.Debug("Received ping from gateway, send pong")
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
@@ -249,7 +248,6 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 	// Not all gateways support pongs to the server's pings.
 	ws.SetPongHandler(func(data string) error {
 		atomic.StoreInt64(&missedPongs, 0)
-		logger.Debug("Received pong from gateway")
 		return nil
 	})
 
