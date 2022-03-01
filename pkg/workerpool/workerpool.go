@@ -69,8 +69,9 @@ type WorkerPool interface {
 }
 
 type contextualItem struct {
-	ctx  context.Context
-	item interface{}
+	ctx      context.Context
+	item     interface{}
+	queuedAt time.Time
 }
 
 type workerPool struct {
@@ -139,7 +140,7 @@ func (wp *workerPool) workerBody(initialWork *contextualItem) func(context.Conte
 				wp.handle(item)
 
 			case item := <-wp.mainQueue:
-				registerWorkDequeued(wp.Name)
+				registerWorkDequeued(wp.Name, item.queuedAt)
 				wp.handle(item)
 			}
 		}
@@ -222,8 +223,9 @@ func (wp *workerPool) enqueueSpawn(ctx context.Context, it *contextualItem) erro
 // Publish implements WorkerPool.
 func (wp *workerPool) Publish(ctx context.Context, item interface{}) error {
 	return wp.enqueueSpawn(ctx, &contextualItem{
-		ctx:  wp.FromRequestContext(ctx),
-		item: item,
+		ctx:      wp.FromRequestContext(ctx),
+		item:     item,
+		queuedAt: time.Now(),
 	})
 }
 

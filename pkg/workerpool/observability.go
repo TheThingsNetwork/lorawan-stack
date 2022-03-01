@@ -35,6 +35,7 @@ type workPoolMetrics struct {
 	workProcessed  *metrics.ContextualCounterVec
 	workDropped    *metrics.ContextualCounterVec
 	workLatency    *prometheus.HistogramVec
+	queueLatency   *prometheus.HistogramVec
 }
 
 func (m workPoolMetrics) Describe(ch chan<- *prometheus.Desc) {
@@ -45,6 +46,7 @@ func (m workPoolMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.workProcessed.Describe(ch)
 	m.workDropped.Describe(ch)
 	m.workLatency.Describe(ch)
+	m.queueLatency.Describe(ch)
 }
 
 func (m workPoolMetrics) Collect(ch chan<- prometheus.Metric) {
@@ -55,6 +57,7 @@ func (m workPoolMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.workProcessed.Collect(ch)
 	m.workDropped.Collect(ch)
 	m.workLatency.Collect(ch)
+	m.queueLatency.Collect(ch)
 }
 
 var poolMetrics = &workPoolMetrics{
@@ -115,6 +118,15 @@ var poolMetrics = &workPoolMetrics{
 		},
 		[]string{poolLabel},
 	),
+	queueLatency: metrics.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Subsystem: subsystem,
+			Name:      "queue_latency_seconds",
+			Help:      "Histogram of time spent by items in queue (seconds)",
+			Buckets:   []float64{0.005, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0},
+		},
+		[]string{poolLabel},
+	),
 }
 
 func init() {
@@ -143,8 +155,9 @@ func registerWorkEnqueued(name string) {
 	poolMetrics.workQueueSize.WithLabelValues(name).Inc()
 }
 
-func registerWorkDequeued(name string) {
+func registerWorkDequeued(name string, start time.Time) {
 	poolMetrics.workQueueSize.WithLabelValues(name).Dec()
+	poolMetrics.queueLatency.WithLabelValues(name).Observe(time.Since(start).Seconds())
 }
 
 func registerWorkProcessed(ctx context.Context, name string) {
