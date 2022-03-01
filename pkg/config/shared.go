@@ -137,6 +137,10 @@ type RedisEvents struct {
 		CorrelationIDCount int           `name:"correlation-id-count" description:"How many events are indexed for a correlation ID"`
 	} `name:"store"`
 	Workers int `name:"workers"`
+	Publish struct {
+		QueueSize  int `name:"queue-size" description:"The maximum number of events which may be queued for publication"`
+		MaxWorkers int `name:"max-workers" description:"The maximum number of workers which may publish events asynchronously"`
+	} `name:"publish"`
 }
 
 // Events represents configuration for the events system.

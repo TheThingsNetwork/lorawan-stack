@@ -368,50 +368,50 @@ func (ps *PubSubStore) FindRelated(ctx context.Context, correlationID string) ([
 func (ps *PubSubStore) Publish(evs ...events.Event) {
 	logger := log.FromContext(ps.ctx)
 
-	_, err := ps.client.TxPipelined(ps.ctx, func(tx redis.Pipeliner) error {
-		for _, evt := range evs {
-			if err := ps.storeEvent(ps.ctx, tx, evt); err != nil {
-				logger.WithError(err).Warn("Failed to store event")
+	tx := ps.client.TxPipeline()
+
+	for _, evt := range evs {
+		if err := ps.storeEvent(ps.ctx, tx, evt); err != nil {
+			logger.WithError(err).Warn("Failed to store event")
+			continue
+		}
+
+		m := metaEncodingPrefix + strings.Join([]string{
+			evt.UniqueID(),
+		}, " ")
+
+		ids := evt.Identifiers()
+		if len(ids) == 0 {
+			tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), nil), m)
+		}
+		definition := events.GetDefinition(evt)
+		for _, id := range ids {
+			tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), id), m)
+			streamValues, err := encodeEventMeta(evt, id)
+			if err != nil {
+				logger.WithError(err).Warn("Failed to encode event")
 				continue
 			}
-
-			m := metaEncodingPrefix + strings.Join([]string{
-				evt.UniqueID(),
-			}, " ")
-
-			ids := evt.Identifiers()
-			if len(ids) == 0 {
-				tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), nil), m)
-			}
-			definition := events.GetDefinition(evt)
-			for _, id := range ids {
-				tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), id), m)
-				streamValues, err := encodeEventMeta(evt, id)
-				if err != nil {
-					logger.WithError(err).Warn("Failed to encode event")
-					continue
-				}
-				eventStream := ps.eventStream(evt.Context(), id)
+			eventStream := ps.eventStream(evt.Context(), id)
+			tx.XAdd(ps.ctx, &redis.XAddArgs{
+				Stream:       eventStream,
+				MaxLenApprox: int64(ps.entityHistoryCount),
+				Values:       streamValues,
+			})
+			tx.Expire(ps.ctx, eventStream, ps.entityHistoryTTL)
+			if devID := id.GetDeviceIds(); devID != nil && definition != nil && definition.PropagateToParent() {
+				eventStream := ps.eventStream(evt.Context(), devID.ApplicationIds.GetEntityIdentifiers())
 				tx.XAdd(ps.ctx, &redis.XAddArgs{
 					Stream:       eventStream,
 					MaxLenApprox: int64(ps.entityHistoryCount),
 					Values:       streamValues,
 				})
 				tx.Expire(ps.ctx, eventStream, ps.entityHistoryTTL)
-				if devID := id.GetDeviceIds(); devID != nil && definition != nil && definition.PropagateToParent() {
-					eventStream := ps.eventStream(evt.Context(), devID.ApplicationIds.GetEntityIdentifiers())
-					tx.XAdd(ps.ctx, &redis.XAddArgs{
-						Stream:       eventStream,
-						MaxLenApprox: int64(ps.entityHistoryCount),
-						Values:       streamValues,
-					})
-					tx.Expire(ps.ctx, eventStream, ps.entityHistoryTTL)
-				}
 			}
 		}
-		return nil
-	})
-	if err != nil {
-		logger.WithError(err).Warn("Failed to publish event")
+	}
+
+	if err := ps.transactionPool.Publish(ps.ctx, tx); err != nil {
+		logger.WithError(err).Warn("Failed to publish transaction")
 	}
 }

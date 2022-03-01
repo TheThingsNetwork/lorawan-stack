@@ -74,6 +74,9 @@ func TestBackend(ctx context.Context, t *testing.T, a *assertions.Assertion, bac
 
 	backend.Publish(events.New(ctx, "test.some.evt1", "test event 1", events.WithIdentifiers(&appID)))
 
+	runtime.Gosched()
+	time.Sleep(timeout)
+
 	if store, ok := backend.(events.Store); ok {
 		chx := make(events.Channel, 10)
 		histSubCtx, cancel := context.WithCancel(subCtx)

@@ -67,6 +67,15 @@ func NewPubSub(ctx context.Context, component workerpool.Component, conf config.
 		})
 	}
 
+	ps.transactionPool = workerpool.NewWorkerPool(workerpool.Config{
+		Component:  component,
+		Context:    ctx,
+		Name:       "redis_events_transactions",
+		Handler:    ps.runTransaction,
+		MaxWorkers: conf.Publish.MaxWorkers,
+		QueueSize:  conf.Publish.QueueSize,
+	})
+
 	if !conf.Store.Enable {
 		return ps
 	}
@@ -97,12 +106,13 @@ func NewPubSub(ctx context.Context, component workerpool.Component, conf config.
 // PubSub with Redis backend.
 type PubSub struct {
 	*basic.PubSub
-	ctx           context.Context
-	cancel        context.CancelFunc
-	client        *ttnredis.Client
-	mu            sync.RWMutex
-	sub           *redis.PubSub
-	subscriptions map[string]int
+	ctx             context.Context
+	cancel          context.CancelFunc
+	client          *ttnredis.Client
+	mu              sync.RWMutex
+	sub             *redis.PubSub
+	subscriptions   map[string]int
+	transactionPool workerpool.WorkerPool
 }
 
 func (ps *PubSub) eventChannel(ctx context.Context, name string, ids *ttnpb.EntityIdentifiers) string {
@@ -267,24 +277,35 @@ func (ps *PubSub) Close(ctx context.Context) error {
 func (ps *PubSub) Publish(evs ...events.Event) {
 	logger := log.FromContext(ps.ctx)
 
-	_, err := ps.client.TxPipelined(ps.ctx, func(tx redis.Pipeliner) error {
-		for _, evt := range evs {
-			b, err := encodeEventData(evt)
-			if err != nil {
-				logger.WithError(err).Warn("Failed to encode event")
-				continue
-			}
-			ids := evt.Identifiers()
-			if len(ids) == 0 {
-				tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), nil), b)
-			}
-			for _, id := range ids {
-				tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), id), b)
-			}
+	tx := ps.client.TxPipeline()
+
+	for _, evt := range evs {
+		b, err := encodeEventData(evt)
+		if err != nil {
+			logger.WithError(err).Warn("Failed to encode event")
+			continue
 		}
-		return nil
-	})
-	if err != nil {
-		logger.WithError(err).Warn("Failed to publish event")
+		ids := evt.Identifiers()
+		if len(ids) == 0 {
+			tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), nil), b)
+		}
+		for _, id := range ids {
+			tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), id), b)
+		}
+	}
+
+	if err := ps.transactionPool.Publish(ps.ctx, tx); err != nil {
+		logger.WithError(err).Warn("Failed to publish transaction")
+	}
+}
+
+func (ps *PubSub) runTransaction(ctx context.Context, item interface{}) {
+	logger := log.FromContext(ctx)
+	tx := item.(redis.Pipeliner)
+	if _, err := tx.Exec(ctx); err != nil {
+		logger.WithError(err).Warn("Failed to run transaction")
+	}
+	if err := tx.Close(); err != nil {
+		logger.WithError(err).Warn("Failed to close transaction")
 	}
 }
