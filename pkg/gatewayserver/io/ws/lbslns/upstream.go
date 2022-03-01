@@ -525,9 +525,11 @@ func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIden
 			return nil
 		}
 		return &io.FrontendClockSynchronization{
-			Timestamp:        TimestampFromXTime(xTime),
-			ServerTime:       receivedAt,
-			GatewayTime:      TimePtrFromUpInfo(gpsTime, rxTime, receivedAt),
+			Timestamp:  TimestampFromXTime(xTime),
+			ServerTime: receivedAt,
+			// RxTime is an undocumented field with unspecified precision.
+			// Using 0.0 for RxTime here means that the GatewayTime is nil and is not used for syncing the gateway clock.
+			GatewayTime:      TimePtrFromUpInfo(gpsTime, 0.0, receivedAt),
 			ConcentratorTime: ConcentratorTimeFromXTime(xTime),
 		}
 	}
