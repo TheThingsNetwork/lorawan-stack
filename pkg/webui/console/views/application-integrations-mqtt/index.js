@@ -47,9 +47,13 @@ const m = defineMessages({
   generateApiKey: 'Generate new API key',
   goToApiKeys: 'Go to API keys',
   mqttInfoText:
-    'The Application Server exposes an MQTT server to work with streaming events. In order to use the MQTT server you need to create a new API key, which will function as connection password. You can also use an existing API key, as long as it has the necessary rights granted. Use the connection information below to connect.',
+    'MQTT is a publish/subscribe messaging protocol designed for IoT. Every application on TTS automatically exposes an MQTT endpoint. In order to connect to the MQTT server you need to create a new API key, which will function as connection password. You can also use an existing API key, as long as it has the necessary rights granted.',
   connectionCredentials: 'Connection credentials',
   mqttIntegrations: 'MQTT integrations',
+  officialMqttWebsite: 'Official MQTT website',
+  mqttServer: 'MQTT server',
+  host: 'MQTT server host',
+  connectionInfo: 'Connection information',
 })
 
 @connect(state => ({
@@ -98,7 +102,10 @@ export default class ApplicationMqtt extends React.Component {
   render() {
     const { appId } = this.props
     const { connectionInfo, key } = this.state
-    const connectionData = [{ header: m.connectionCredentials, items: [] }]
+    const connectionData = [
+      { header: m.host, items: [] },
+      { header: m.connectionCredentials, items: [] },
+    ]
     const fetchingMessage = <Message content={sharedMessages.fetching} />
 
     if (connectionInfo) {
@@ -116,6 +123,8 @@ export default class ApplicationMqtt extends React.Component {
           sensitive: false,
           value: public_tls_address,
         },
+      ]
+      connectionData[1].items = [
         {
           key: sharedMessages.username,
           type: 'code',
@@ -133,6 +142,8 @@ export default class ApplicationMqtt extends React.Component {
           key: m.publicTlsAddress,
           value: fetchingMessage,
         },
+      ]
+      connectionData[1].items = [
         {
           key: sharedMessages.username,
           value: fetchingMessage,
@@ -141,13 +152,13 @@ export default class ApplicationMqtt extends React.Component {
     }
 
     if (key) {
-      connectionData[0].items.push({
+      connectionData[1].items.push({
         key: sharedMessages.password,
         type: 'code',
         value: key.key,
       })
     } else {
-      connectionData[0].items.push({
+      connectionData[1].items.push({
         key: sharedMessages.password,
         value: (
           <>
@@ -170,8 +181,23 @@ export default class ApplicationMqtt extends React.Component {
           <PageTitle title={sharedMessages.mqtt} />
           <Row>
             <Col lg={8} md={12}>
-              <Message component="p" content={m.mqttInfoText} className="mt-0" />
+              <Message content={m.mqttInfoText} className="mt-0" />
+              <div>
+                <Message
+                  component="h4"
+                  content={sharedMessages.furtherResources}
+                  className="mb-cs-xxs"
+                />
+                <Link.DocLink path="/integrations/mqtt" secondary>
+                  <Message content={m.mqttServer} />
+                </Link.DocLink>
+                {' | '}
+                <Link.Anchor href="https://www.mqtt.org" external secondary>
+                  <Message content={m.officialMqttWebsite} />
+                </Link.Anchor>
+              </div>
               <hr className="mb-ls-s" />
+              <Message content={m.connectionInfo} component="h3" />
               <DataSheet data={connectionData} />
             </Col>
           </Row>
