@@ -28,6 +28,9 @@ import CodeEditor from '@ttn-lw/components/code-editor'
 import Link from '@ttn-lw/components/link'
 import Notification from '@ttn-lw/components/notification'
 import Button from '@ttn-lw/components/button'
+import ButtonGroup from '@ttn-lw/components/button/group'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -43,9 +46,12 @@ import style from './payload-formatters-form.styl'
 
 const m = defineMessages({
   grpc: 'GRPC service',
-  repository: 'Repository',
+  repository: 'Use Device Repository formatters',
+  customJavascipt: 'Custom Javascript formatter',
   formatterType: 'Formatter type',
-  formatterParameter: 'Formatter parameter',
+  formatterCode: 'Formatter code',
+  formatterCodeReadOnly: 'Formatter code (read only)',
+  grpcHost: 'GRPC host',
   grpcFieldDescription: 'The address of the service to connect to',
   appFormatter: 'Use application payload formatter',
   appFormatterWarning: 'This option will affect both uplink and downlink formatter',
@@ -54,6 +60,9 @@ const m = defineMessages({
     'Click <Link>here</Link> to modify the default payload formatter for this application. The payload formatter of this application is currently set to `{defaultFormatter}`',
   pasteRepositoryFormatter: 'Paste repository formatter',
   pasteApplicationFormatter: 'Paste application formatter',
+  learnMoreAboutDeviceRepo: 'What is the Device Repository formatter option?',
+  learnMoreAboutPayloadFormatters: 'Learn more about payload formatters',
+  learnMoreAboutCayenne: 'What is CayenneLPP?',
 })
 
 const FIELD_NAMES = {
@@ -63,16 +72,14 @@ const FIELD_NAMES = {
   REPOSITORY: 'repository-formatter',
 }
 
-const formatterOptionsWithReset = [
+const formatterOptions = [
   { label: m.appFormatter, value: TYPES.DEFAULT },
-  { label: sharedMessages.none, value: TYPES.NONE },
-  { label: 'Javascript', value: TYPES.JAVASCRIPT },
+  { label: m.repository, value: TYPES.REPOSITORY },
+  { label: m.customJavascipt, value: TYPES.JAVASCRIPT },
   { label: m.grpc, value: TYPES.GRPC },
   { label: 'CayenneLPP', value: TYPES.CAYENNELPP },
-  { label: m.repository, value: TYPES.REPOSITORY },
+  { label: sharedMessages.none, value: TYPES.NONE },
 ]
-
-const formatterOptions = formatterOptionsWithReset.slice(1, formatterOptionsWithReset.length)
 
 const validationSchema = Yup.object().shape({
   [FIELD_NAMES.SELECT]: Yup.string()
@@ -101,12 +108,9 @@ class PayloadFormattersForm extends React.Component {
     super(props)
     this.state = {
       type: props.initialType,
+      isSubmitting: false,
       error: undefined,
-      test: {
-        result: undefined,
-        warning: undefined,
-        error: undefined,
-      },
+      testResult: {},
     }
 
     this.formRef = React.createRef(null)
@@ -123,7 +127,7 @@ class PayloadFormattersForm extends React.Component {
   async handleSubmit(values, { resetForm }) {
     const { onSubmit, onSubmitSuccess, onSubmitFailure, uplink } = this.props
 
-    this.setState({ error: undefined })
+    this.setState({ error: undefined, isSubmitting: true })
 
     const {
       [FIELD_NAMES.SELECT]: type,
@@ -132,7 +136,6 @@ class PayloadFormattersForm extends React.Component {
     } = values
 
     const resetValues = {
-      test: values.test,
       [FIELD_NAMES.SELECT]: type,
     }
 
@@ -157,11 +160,12 @@ class PayloadFormattersForm extends React.Component {
     try {
       const result = await onSubmit({ type, parameter })
       resetForm({ values: resetValues })
+      this.setState({ isSubmitting: false })
       await onSubmitSuccess(result)
     } catch (error) {
       resetForm({ values: resetValues })
 
-      this.setState({ error })
+      this.setState({ error, isSubmitting: false })
       await onSubmitFailure(error)
     }
   }
@@ -194,15 +198,15 @@ class PayloadFormattersForm extends React.Component {
     }
 
     try {
-      const { payload: decodedPayload, warnings = [] } = await onTestSubmit({
+      const testResult = await onTestSubmit({
         f_port,
         payload,
         parameter,
         formatter,
       })
-      this.setState({ test: { result: decodedPayload, warning: warnings[0], error: undefined } })
+      this.setState({ testResult })
     } catch (error) {
-      this.setState({ test: { result: undefined, warning: undefined, error } })
+      this.setState({ testResult: error })
     }
   }
 
@@ -235,27 +239,24 @@ class PayloadFormattersForm extends React.Component {
     const showRepositoryParameter =
       (type === TYPES.REPOSITORY && hasRepoFormatter) ||
       (type === TYPES.DEFAULT && defaultType === 'FORMATTER_REPOSITORY')
-    const isReadOnly = type !== TYPES.JAVASCRIPT
 
     if (showParameter) {
       return (
         <>
           <Form.Field
-            readOnly={isReadOnly}
             required
             component={CodeEditor}
             name={FIELD_NAMES.JAVASCRIPT}
-            title={m.formatterParameter}
+            title={m.formatterCode}
             height="10rem"
-            minLines={15}
-            maxLines={15}
+            minLines={25}
+            maxLines={25}
           />
           {type === TYPES.JAVASCRIPT && (
-            <>
+            <ButtonGroup>
               {defaultType !== 'FORMATTER_NONE' && (
                 <Button
                   type="button"
-                  className={style.pasteButton}
                   message={m.pasteApplicationFormatter}
                   secondary
                   onClick={this.pasteAppPayloadFormatter}
@@ -264,13 +265,12 @@ class PayloadFormattersForm extends React.Component {
               {hasRepoFormatter && (
                 <Button
                   type="button"
-                  className={style.pasteButton}
                   message={m.pasteRepositoryFormatter}
                   secondary
                   onClick={this.pasteRepoPayloadFormatters}
                 />
               )}
-            </>
+            </ButtonGroup>
           )}
         </>
       )
@@ -279,7 +279,7 @@ class PayloadFormattersForm extends React.Component {
         <Form.Field
           required
           component={Input}
-          title={m.formatterParameter}
+          title={m.grpcHost}
           name={FIELD_NAMES.GRPC}
           type="text"
           placeholder={sharedMessages.addressPlaceholder}
@@ -287,19 +287,30 @@ class PayloadFormattersForm extends React.Component {
           autoComplete="on"
         />
       )
+    } else if (type === TYPES.CAYENNELPP) {
+      return (
+        <Link.DocLink path="/integrations/payload-formatters/device-repo/cayenne" secondary>
+          <Message content={m.learnMoreAboutCayenne} />
+        </Link.DocLink>
+      )
     } else if (showRepositoryParameter) {
       return (
-        <Form.Field
-          readOnly
-          component={CodeEditor}
-          title={m.formatterParameter}
-          name={FIELD_NAMES.REPOSITORY}
-          type="text"
-          height="10rem"
-          minLines={15}
-          maxLines={15}
-          value={repoFormatters?.formatter_parameter}
-        />
+        <>
+          <Form.Field
+            readOnly
+            component={CodeEditor}
+            title={m.formatterCodeReadOnly}
+            name={FIELD_NAMES.REPOSITORY}
+            type="text"
+            height="10rem"
+            minLines={25}
+            maxLines={25}
+            value={repoFormatters?.formatter_parameter}
+          />
+          <Link.DocLink path="/integrations/payload-formatters/device-repo/" secondary>
+            <Message content={m.learnMoreAboutDeviceRepo} />
+          </Link.DocLink>
+        </>
       )
     }
 
@@ -325,10 +336,18 @@ class PayloadFormattersForm extends React.Component {
   }
 
   render() {
-    const { initialType, initialParameter, uplink, allowReset, defaultType, appId, isDefaultType } =
-      this.props
+    const {
+      initialType,
+      initialParameter,
+      uplink,
+      allowReset,
+      defaultType,
+      appId,
+      isDefaultType,
+      repoFormatters,
+    } = this.props
 
-    const { error, type, test } = this.state
+    const { error, type, testResult, isSubmitting } = this.state
 
     const initialValues = {
       [FIELD_NAMES.SELECT]: type,
@@ -337,71 +356,91 @@ class PayloadFormattersForm extends React.Component {
       [FIELD_NAMES.GRPC]:
         initialType === TYPES.GRPC ? initialParameter : getDefaultGrpcServiceFormatter(uplink),
     }
-    const options = allowReset ? formatterOptionsWithReset : formatterOptions
+    const hasRepoFormatter =
+      repoFormatters !== undefined && Object.keys(repoFormatters).length !== 0
+    let options = allowReset
+      ? formatterOptions
+      : formatterOptions.filter(o => o.value !== TYPES.DEFAULT)
+    if (!hasRepoFormatter && allowReset) {
+      options = options.filter(o => o.value !== TYPES.REPOSITORY)
+    }
     const defaultFormatter = FORMATTER_NAMES[defaultType].defaultMessage
 
     return (
-      <Row>
-        <Col sm={12} lg={this._showTestSection() ? 6 : 12}>
-          <Form
-            submitEnabledWhenInvalid
-            onSubmit={this.handleSubmit}
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-            error={error}
-            formikRef={this.formRef}
-          >
-            <Form.SubTitle title={m.setupSubTitle} />
-            <Form.Field
-              name={FIELD_NAMES.SELECT}
-              title={m.formatterType}
-              component={Select}
-              options={options}
-              onChange={this.onTypeChange}
-              warning={
-                type === TYPES.DEFAULT || type === TYPES.NONE ? m.appFormatterWarning : undefined
-              }
-              inputWidth="m"
-              required
-            />
-            {isDefaultType && (
-              <Notification
-                small
-                info
-                content={m.defaultFormatter}
-                messageValues={{
-                  Link: msg => (
-                    <Link
-                      secondary
-                      key="manual-link"
-                      to={`/applications/${appId}/payload-formatters/uplink`}
-                    >
-                      {msg}
-                    </Link>
-                  ),
-                  defaultFormatter,
-                }}
+      <>
+        <Row>
+          <Col sm={12} lg={this._showTestSection() ? 6 : 12}>
+            <Form
+              onSubmit={this.handleSubmit}
+              initialValues={initialValues}
+              validationSchema={validationSchema}
+              error={error}
+              formikRef={this.formRef}
+              id="payload-formatter-form"
+            >
+              <Form.SubTitle title={m.setupSubTitle} />
+              <Form.Field
+                name={FIELD_NAMES.SELECT}
+                title={m.formatterType}
+                component={Select}
+                options={options}
+                onChange={this.onTypeChange}
+                warning={
+                  type === TYPES.DEFAULT || type === TYPES.NONE ? m.appFormatterWarning : undefined
+                }
+                inputWidth="m"
+                required
               />
-            )}
-            {this.formatter}
-            <SubmitBar>
-              <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
-            </SubmitBar>
-          </Form>
-        </Col>
-        {this._showTestSection() && (
-          <Col sm={12} lg={6}>
-            <TestForm
-              className={style.testForm}
-              onSubmit={this.handleTestSubmit}
-              uplink={uplink}
-              payload={test.result}
-              warning={test.warning}
-              error={test.error}
-            />
+              {isDefaultType && (
+                <Notification
+                  small
+                  info
+                  content={m.defaultFormatter}
+                  convertBackticks
+                  messageValues={{
+                    Link: msg => (
+                      <Link
+                        secondary
+                        key="manual-link"
+                        to={`/applications/${appId}/payload-formatters/uplink`}
+                      >
+                        {msg}
+                      </Link>
+                    ),
+                    defaultFormatter,
+                  }}
+                />
+              )}
+              {this.formatter}
+            </Form>
           </Col>
-        )}
-      </Row>
+          {this._showTestSection() && (
+            <Col sm={12} lg={6}>
+              <TestForm
+                className={style.testForm}
+                onSubmit={this.handleTestSubmit}
+                uplink={uplink}
+                testResult={testResult}
+              />
+              <Link.DocLink path="/integrations/payload-formatters" secondary>
+                <Message content={m.learnMoreAboutPayloadFormatters} />
+              </Link.DocLink>
+            </Col>
+          )}
+        </Row>
+        <Row>
+          <Col sm={12}>
+            <SubmitBar>
+              <SubmitButton
+                message={sharedMessages.saveChanges}
+                form="payload-formatter-form"
+                isSubmitting={isSubmitting}
+                isValidating={false}
+              />
+            </SubmitBar>
+          </Col>
+        </Row>
+      </>
     )
   }
 }

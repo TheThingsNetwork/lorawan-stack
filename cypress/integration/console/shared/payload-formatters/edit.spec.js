@@ -101,7 +101,7 @@ describe('Payload formatters', () => {
         )
 
         cy.findByLabelText('Formatter type').selectOption('grpc')
-        cy.findByLabelText('Formatter parameter').type('localhost')
+        cy.findByLabelText('GRPC host').type('localhost')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -120,7 +120,6 @@ describe('Payload formatters', () => {
         )
 
         cy.findByLabelText('Formatter type').selectOption('cayennelpp')
-        cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -139,7 +138,6 @@ describe('Payload formatters', () => {
         )
 
         cy.findByLabelText('Formatter type').selectOption('repository')
-        cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -158,7 +156,6 @@ describe('Payload formatters', () => {
         )
 
         cy.findByLabelText('Formatter type').selectOption('none')
-        cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -202,7 +199,7 @@ describe('Payload formatters', () => {
         )
 
         cy.findByLabelText('Formatter type').selectOption('grpc')
-        cy.findByLabelText('Formatter parameter').type('localhost')
+        cy.findByLabelText('GRPC host').type('localhost')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -221,7 +218,6 @@ describe('Payload formatters', () => {
         )
 
         cy.findByLabelText('Formatter type').selectOption('cayennelpp')
-        cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -240,7 +236,6 @@ describe('Payload formatters', () => {
         )
 
         cy.findByLabelText('Formatter type').selectOption('repository')
-        cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -259,7 +254,6 @@ describe('Payload formatters', () => {
         )
 
         cy.findByLabelText('Formatter type').selectOption('none')
-        cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -351,7 +345,7 @@ describe('Payload formatters', () => {
         cy.findByTestId('code-editor-javascript-formatter').should('be.visible')
         cy.findByRole('button', { name: 'Paste repository formatter' }).should('not.exist')
         cy.findByRole('button', { name: 'Paste application formatter' }).should('be.visible')
-        cy.findByLabelText('Formatter type').selectOption('repository')
+        cy.findByLabelText('Formatter type').selectOption('application')
         cy.findByTestId('code-editor-repository-formatter').should('not.exist')
       })
 
@@ -363,7 +357,7 @@ describe('Payload formatters', () => {
         )
 
         cy.findByLabelText('Formatter type').selectOption('grpc')
-        cy.findByLabelText('Formatter parameter').type('localhost')
+        cy.findByLabelText('GRPC host').type('localhost')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -382,26 +376,6 @@ describe('Payload formatters', () => {
         )
 
         cy.findByLabelText('Formatter type').selectOption('cayennelpp')
-        cy.findByLabelText('Formatter parameter').should('not.exist')
-
-        cy.findByRole('button', { name: 'Save changes' }).click()
-
-        cy.findByTestId('error-notification').should('not.exist')
-        cy.findByTestId('toast-notification')
-          .should('be.visible')
-          .findByText('Payload formatter updated')
-          .should('be.visible')
-      })
-
-      it('succeeds changing formatter type to Repository', () => {
-        cy.visit(
-          `${Cypress.config(
-            'consoleRootPath',
-          )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/uplink`,
-        )
-
-        cy.findByLabelText('Formatter type').selectOption('repository')
-        cy.findByTestId('code-editor-repository-formatter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -420,7 +394,6 @@ describe('Payload formatters', () => {
         )
 
         cy.findByLabelText('Formatter type').selectOption('none')
-        cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -519,7 +492,7 @@ describe('Payload formatters', () => {
         )
 
         cy.findByLabelText('Formatter type').selectOption('grpc')
-        cy.findByLabelText('Formatter parameter').type('localhost')
+        cy.findByLabelText('GRPC host').type('localhost')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -538,25 +511,6 @@ describe('Payload formatters', () => {
         )
 
         cy.findByLabelText('Formatter type').selectOption('cayennelpp')
-        cy.findByLabelText('Formatter parameter').should('not.exist')
-
-        cy.findByRole('button', { name: 'Save changes' }).click()
-
-        cy.findByTestId('error-notification').should('not.exist')
-        cy.findByTestId('toast-notification')
-          .should('be.visible')
-          .findByText('Payload formatter updated')
-          .should('be.visible')
-      })
-
-      it('succeeds changing formatter type to Repository', () => {
-        cy.visit(
-          `${Cypress.config(
-            'consoleRootPath',
-          )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/downlink`,
-        )
-
-        cy.findByLabelText('Formatter type').selectOption('repository')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
@@ -575,7 +529,6 @@ describe('Payload formatters', () => {
         )
 
         cy.findByLabelText('Formatter type').selectOption('none')
-        cy.findByLabelText('Formatter parameter').should('not.exist')
 
         cy.findByRole('button', { name: 'Save changes' }).click()
 
