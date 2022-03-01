@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Get version from tag
         id: version
-        uses: actions/github-script@v3
+        uses: actions/github-script@v6
         with:
           script: |
             const tag = context.ref.slice("refs/tags/".length);
@@ -73,11 +73,11 @@ jobs:
           SNAPCRAFT_LOGIN: ${{ secrets.SNAPCRAFT_LOGIN }}
         run: snapcraft login --with <(printf "$SNAPCRAFT_LOGIN")
       - name: Set up Node
-        uses: actions/setup-node@v2-beta
+        uses: actions/setup-node@v3
         with:
-          node-version: "~14"
+          node-version: "~16"
       - name: Set up Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: "~1.17"
       - name: Initialize Go module cache
