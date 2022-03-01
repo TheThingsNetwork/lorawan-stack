@@ -639,14 +639,18 @@ func TestGatewayServer(t *testing.T) {
 								upEvents[event] = make(events.Channel, 5)
 							}
 							defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
-								PublishFunc: func(ev events.Event) {
-									switch name := ev.Name(); name {
-									case "gs.gateway.connect":
-										go func() {
-											upEvents[name] <- ev
-										}()
-									default:
-										t.Logf("%s event published", name)
+								PublishFunc: func(evs ...events.Event) {
+									for _, ev := range evs {
+										ev := ev
+
+										switch name := ev.Name(); name {
+										case "gs.gateway.connect":
+											go func() {
+												upEvents[name] <- ev
+											}()
+										default:
+											t.Logf("%s event published", name)
+										}
 									}
 								},
 							})()
@@ -1302,14 +1306,18 @@ func TestGatewayServer(t *testing.T) {
 									upEvents[event] = make(events.Channel, 5)
 								}
 								defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{
-									PublishFunc: func(ev events.Event) {
-										switch name := ev.Name(); name {
-										case "gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive", "gs.io.up.repeat":
-											go func() {
-												upEvents[name] <- ev
-											}()
-										default:
-											t.Logf("%s event published", name)
+									PublishFunc: func(evs ...events.Event) {
+										for _, ev := range evs {
+											ev := ev
+
+											switch name := ev.Name(); name {
+											case "gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive", "gs.io.up.repeat":
+												go func() {
+													upEvents[name] <- ev
+												}()
+											default:
+												t.Logf("%s event published", name)
+											}
 										}
 									},
 								})()

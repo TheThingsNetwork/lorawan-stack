@@ -175,31 +175,35 @@ func (ps *PubSub) getMetadata(evt events.Event) map[string]string {
 }
 
 // Publish an event to Go Cloud.
-func (ps *PubSub) Publish(evt events.Event) {
+func (ps *PubSub) Publish(evs ...events.Event) {
 	logger := log.FromContext(ps.ctx)
-	var body []byte
-	switch ps.contentType {
-	case "application/protobuf":
-		evtpb, err := events.Proto(evt)
-		if err != nil {
-			logger.WithError(err).Warn("Failed to marshal event to protobuf")
-			return
+	for _, evt := range evs {
+		var body []byte
+		switch ps.contentType {
+		case "application/protobuf":
+			evtpb, err := events.Proto(evt)
+			if err != nil {
+				logger.WithError(err).Warn("Failed to marshal event to protobuf")
+				continue
+			}
+			body, err = proto.Marshal(evtpb)
+			if err != nil {
+				logger.WithError(err).Warn("Failed to marshal event to binary")
+				continue
+			}
+		case "application/json":
+			var err error
+			body, err = json.Marshal(evt)
+			if err != nil {
+				logger.WithError(err).Warn("Failed to marshal event to JSON")
+				continue
+			}
 		}
-		body, err = proto.Marshal(evtpb)
-		if err != nil {
-			logger.WithError(err).Warn("Failed to marshal event to binary")
-			return
-		}
-	case "application/json":
-		var err error
-		body, err = json.Marshal(evt)
-		if err != nil {
-			logger.WithError(err).Warn("Failed to marshal event to JSON")
-			return
+		if err := ps.topic.Send(evt.Context(), &pubsub.Message{
+			Metadata: ps.getMetadata(evt),
+			Body:     body,
+		}); err != nil {
+			logger.WithError(err).Warn("Failed to send event")
 		}
 	}
-	ps.topic.Send(evt.Context(), &pubsub.Message{
-		Metadata: ps.getMetadata(evt),
-		Body:     body,
-	})
 }

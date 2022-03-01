@@ -27,6 +27,10 @@ For details about compatibility between different releases, see the **Commitment
 - The Network Server will now match downlink acknowledgements on the `cache` redis cluster (previously the `general` cluster was used).
 - Gateway Connection statistics updates are now debounced. The debounce period occurs before the statistics are stored, and can be configured using the `gs.update-connection-stats-debounce-time` setting (default 5 seconds).
 - Payload formatter form layout in the Console.
+- Event publication when the Redis backend is used may no longer block the hot path. Instead, the events are now asynchronously published, which may render their ordering to change.
+  - The events are queued and published using the worker pool mechanism, under the `redis_events_transactions` pool.
+  - The length of the queue used by the pool may be configured using the `events.redis.publish.queue-size` setting.
+  - The maximum worker count used by the pool may be configured using the `events.redis.publish.max-workers` setting.
 
 ### Deprecated
 

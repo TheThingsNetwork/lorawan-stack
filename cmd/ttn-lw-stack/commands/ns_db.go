@@ -164,6 +164,7 @@ var (
 								return err
 							}
 							p := tx.TxPipeline()
+							defer p.Close()
 							if dev.Session != nil && dev.Session.DevAddr.Equal(devAddr) {
 								if dev.MacState == nil {
 									logger.Error("Device is missing MAC state, skip migrating current session")
@@ -267,6 +268,7 @@ var (
 					score := float64(time.Now().UnixNano())
 					if err := cl.Watch(ctx, func(tx *redis.Tx) error {
 						p := tx.TxPipeline()
+						defer p.Close()
 						if err := ttnredis.RangeRedisSet(ctx, tx, k, "*", ttnredis.DefaultRangeCount, func(uid string) (bool, error) {
 							logger := logger.WithField("uid", uid)
 							uk := nsredis.UIDKey(cl, uid)

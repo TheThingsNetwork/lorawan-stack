@@ -60,22 +60,19 @@ func (ps *PubSubStore) eventStream(ctx context.Context, ids *ttnpb.EntityIdentif
 	return ps.client.Key("event_stream", ids.EntityType(), unique.ID(ctx, ids))
 }
 
-func (ps *PubSubStore) storeEvent(ctx context.Context, evt events.Event) error {
+func (ps *PubSubStore) storeEvent(ctx context.Context, tx redis.Cmdable, evt events.Event) error {
 	b, err := encodeEventData(evt)
 	if err != nil {
 		return err
 	}
-	_, err = ps.client.TxPipelined(ctx, func(tx redis.Pipeliner) error {
-		tx.Set(ps.ctx, ps.eventDataKey(evt.Context(), evt.UniqueID()), b, ps.historyTTL)
-		for _, cid := range evt.CorrelationIDs() {
-			key := ps.eventIndexKey(evt.Context(), cid)
-			tx.LPush(ps.ctx, key, evt.UniqueID())
-			tx.LTrim(ps.ctx, key, 0, int64(ps.correlationIDHistoryCount))
-			tx.Expire(ps.ctx, key, ps.historyTTL)
-		}
-		return nil
-	})
-	return ttnredis.ConvertError(err)
+	tx.Set(ps.ctx, ps.eventDataKey(evt.Context(), evt.UniqueID()), b, ps.historyTTL)
+	for _, cid := range evt.CorrelationIDs() {
+		key := ps.eventIndexKey(evt.Context(), cid)
+		tx.LPush(ps.ctx, key, evt.UniqueID())
+		tx.LTrim(ps.ctx, key, 0, int64(ps.correlationIDHistoryCount))
+		tx.Expire(ps.ctx, key, ps.historyTTL)
+	}
+	return nil
 }
 
 // loadEventData loads event data for every event in evts (by UniqueID)
@@ -368,19 +365,21 @@ func (ps *PubSubStore) FindRelated(ctx context.Context, correlationID string) ([
 }
 
 // Publish an event to Redis.
-func (ps *PubSubStore) Publish(evt events.Event) {
+func (ps *PubSubStore) Publish(evs ...events.Event) {
 	logger := log.FromContext(ps.ctx)
 
-	if err := ps.storeEvent(ps.ctx, evt); err != nil {
-		logger.WithError(err).Warn("Failed to store event")
-		return
-	}
+	tx := ps.client.TxPipeline()
 
-	m := metaEncodingPrefix + strings.Join([]string{
-		evt.UniqueID(),
-	}, " ")
+	for _, evt := range evs {
+		if err := ps.storeEvent(ps.ctx, tx, evt); err != nil {
+			logger.WithError(err).Warn("Failed to store event")
+			continue
+		}
 
-	_, err := ps.client.Pipelined(ps.ctx, func(tx redis.Pipeliner) error {
+		m := metaEncodingPrefix + strings.Join([]string{
+			evt.UniqueID(),
+		}, " ")
+
 		ids := evt.Identifiers()
 		if len(ids) == 0 {
 			tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), nil), m)
@@ -410,9 +409,9 @@ func (ps *PubSubStore) Publish(evt events.Event) {
 				tx.Expire(ps.ctx, eventStream, ps.entityHistoryTTL)
 			}
 		}
-		return nil
-	})
-	if err != nil {
-		logger.WithError(err).Warn("Failed to publish event")
+	}
+
+	if err := ps.transactionPool.Publish(ps.ctx, tx); err != nil {
+		logger.WithError(err).Warn("Failed to publish transaction")
 	}
 }

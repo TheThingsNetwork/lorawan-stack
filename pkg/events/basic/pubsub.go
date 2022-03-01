@@ -79,14 +79,17 @@ func (e *PubSub) RemoveSubscription(s events.Subscription) {
 }
 
 // Publish publishes an event, which will notify all matching subscriptions.
-func (e *PubSub) Publish(evt events.Event) {
-	defer trace.StartRegion(evt.Context(), "publish event").End()
+func (e *PubSub) Publish(evs ...events.Event) {
 	e.mu.RLock()
 	subscriptions := e.subscriptions
 	e.mu.RUnlock()
-	for _, sub := range subscriptions {
-		if sub.Match(evt) {
-			sub.Notify(evt)
-		}
+	for _, evt := range evs {
+		trace.WithRegion(evt.Context(), "publish event", func() {
+			for _, sub := range subscriptions {
+				if sub.Match(evt) {
+					sub.Notify(evt)
+				}
+			}
+		})
 	}
 }

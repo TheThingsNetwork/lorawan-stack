@@ -32,10 +32,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
+	"go.thethings.network/lorawan-stack/v3/pkg/workerpool"
 )
 
 // NewPubSub creates a new PubSub that publishes and subscribes to Redis.
-func NewPubSub(ctx context.Context, taskStarter task.Starter, conf config.RedisEvents) events.PubSub {
+func NewPubSub(ctx context.Context, component workerpool.Component, conf config.RedisEvents) events.PubSub {
 	ttnRedisClient := ttnredis.New(&conf.Config)
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"namespace", "events/redis",
@@ -57,7 +58,7 @@ func NewPubSub(ctx context.Context, taskStarter task.Starter, conf config.RedisE
 	}
 
 	for i := 0; i < workers; i++ {
-		taskStarter.StartTask(&task.Config{
+		component.StartTask(&task.Config{
 			Context: ps.ctx,
 			ID:      fmt.Sprintf("events_redis_subscribe_%02d", i),
 			Func:    ps.subscribeTask,
@@ -65,6 +66,15 @@ func NewPubSub(ctx context.Context, taskStarter task.Starter, conf config.RedisE
 			Backoff: task.DefaultBackoffConfig,
 		})
 	}
+
+	ps.transactionPool = workerpool.NewWorkerPool(workerpool.Config{
+		Component:  component,
+		Context:    ctx,
+		Name:       "redis_events_transactions",
+		Handler:    ps.runTransaction,
+		MaxWorkers: conf.Publish.MaxWorkers,
+		QueueSize:  conf.Publish.QueueSize,
+	})
 
 	if !conf.Store.Enable {
 		return ps
@@ -96,12 +106,13 @@ func NewPubSub(ctx context.Context, taskStarter task.Starter, conf config.RedisE
 // PubSub with Redis backend.
 type PubSub struct {
 	*basic.PubSub
-	ctx           context.Context
-	cancel        context.CancelFunc
-	client        *ttnredis.Client
-	mu            sync.RWMutex
-	sub           *redis.PubSub
-	subscriptions map[string]int
+	ctx             context.Context
+	cancel          context.CancelFunc
+	client          *ttnredis.Client
+	mu              sync.RWMutex
+	sub             *redis.PubSub
+	subscriptions   map[string]int
+	transactionPool workerpool.WorkerPool
 }
 
 func (ps *PubSub) eventChannel(ctx context.Context, name string, ids *ttnpb.EntityIdentifiers) string {
@@ -263,16 +274,17 @@ func (ps *PubSub) Close(ctx context.Context) error {
 }
 
 // Publish an event to Redis.
-func (ps *PubSub) Publish(evt events.Event) {
+func (ps *PubSub) Publish(evs ...events.Event) {
 	logger := log.FromContext(ps.ctx)
 
-	b, err := encodeEventData(evt)
-	if err != nil {
-		logger.WithError(err).Warn("Failed to encode event")
-		return
-	}
+	tx := ps.client.TxPipeline()
 
-	_, err = ps.client.Pipelined(ps.ctx, func(tx redis.Pipeliner) error {
+	for _, evt := range evs {
+		b, err := encodeEventData(evt)
+		if err != nil {
+			logger.WithError(err).Warn("Failed to encode event")
+			continue
+		}
 		ids := evt.Identifiers()
 		if len(ids) == 0 {
 			tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), nil), b)
@@ -280,9 +292,20 @@ func (ps *PubSub) Publish(evt events.Event) {
 		for _, id := range ids {
 			tx.Publish(ps.ctx, ps.eventChannel(evt.Context(), evt.Name(), id), b)
 		}
-		return nil
-	})
-	if err != nil {
-		logger.WithError(err).Warn("Failed to publish event")
+	}
+
+	if err := ps.transactionPool.Publish(ps.ctx, tx); err != nil {
+		logger.WithError(err).Warn("Failed to publish transaction")
+	}
+}
+
+func (ps *PubSub) runTransaction(ctx context.Context, item interface{}) {
+	logger := log.FromContext(ctx)
+	tx := item.(redis.Pipeliner)
+	if _, err := tx.Exec(ctx); err != nil {
+		logger.WithError(err).Warn("Failed to run transaction")
+	}
+	if err := tx.Close(); err != nil {
+		logger.WithError(err).Warn("Failed to close transaction")
 	}
 }

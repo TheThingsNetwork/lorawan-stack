@@ -25,16 +25,16 @@ import (
 )
 
 type MockEventPubSub struct {
-	PublishFunc   func(events.Event)
+	PublishFunc   func(...events.Event)
 	SubscribeFunc func(context.Context, []string, []*ttnpb.EntityIdentifiers, events.Handler) error
 }
 
 // Publish calls PublishFunc if set and panics otherwise.
-func (m MockEventPubSub) Publish(ev events.Event) {
+func (m MockEventPubSub) Publish(evs ...events.Event) {
 	if m.PublishFunc == nil {
 		panic("Publish called, but not set")
 	}
-	m.PublishFunc(ev)
+	m.PublishFunc(evs...)
 }
 
 // Subscribe calls SubscribeFunc if set and panics otherwise.
@@ -50,14 +50,16 @@ type EventPubSubPublishRequest struct {
 	Response chan<- struct{}
 }
 
-func MakeEventPubSubPublishChFunc(reqCh chan<- EventPubSubPublishRequest) func(events.Event) {
-	return func(ev events.Event) {
-		respCh := make(chan struct{})
-		reqCh <- EventPubSubPublishRequest{
-			Event:    ev,
-			Response: respCh,
+func MakeEventPubSubPublishChFunc(reqCh chan<- EventPubSubPublishRequest) func(...events.Event) {
+	return func(evs ...events.Event) {
+		for _, ev := range evs {
+			respCh := make(chan struct{})
+			reqCh <- EventPubSubPublishRequest{
+				Event:    ev,
+				Response: respCh,
+			}
+			<-respCh
 		}
-		<-respCh
 	}
 }
 
@@ -210,15 +212,15 @@ func EventBuilderEqual(a, b events.Builder) bool {
 var (
 	eventsPubSubMu               = &sync.RWMutex{}
 	eventsPubSub   events.PubSub = &MockEventPubSub{
-		PublishFunc:   func(events.Event) {},
+		PublishFunc:   func(...events.Event) {},
 		SubscribeFunc: func(context.Context, []string, []*ttnpb.EntityIdentifiers, events.Handler) error { return nil },
 	}
 )
 
 func init() {
 	events.SetDefaultPubSub(&MockEventPubSub{
-		PublishFunc: func(ev events.Event) {
-			eventsPubSub.Publish(ev)
+		PublishFunc: func(evs ...events.Event) {
+			eventsPubSub.Publish(evs...)
 		},
 		SubscribeFunc: func(ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, hdl events.Handler) error {
 			return eventsPubSub.Subscribe(ctx, names, ids, hdl)
@@ -243,7 +245,7 @@ func SetDefaultEventsPubSub(ps events.PubSub) func() {
 func CollectEvents(f func()) []events.Event {
 	var evs []events.Event
 	defer SetDefaultEventsPubSub(&MockEventPubSub{
-		PublishFunc: func(ev events.Event) { evs = append(evs, ev) },
+		PublishFunc: func(evts ...events.Event) { evs = append(evs, evts...) },
 	})()
 	f()
 	return evs
@@ -253,7 +255,11 @@ func CollectEvents(f func()) []events.Event {
 // provided channel until the returned function is called.
 func RedirectEvents(ch chan events.Event) func() {
 	return SetDefaultEventsPubSub(&MockEventPubSub{
-		PublishFunc: func(ev events.Event) { ch <- ev },
+		PublishFunc: func(evs ...events.Event) {
+			for _, ev := range evs {
+				ch <- ev
+			}
+		},
 		SubscribeFunc: func(ctx context.Context, names []string, ids []*ttnpb.EntityIdentifiers, hdl events.Handler) error {
 			return nil
 		},
