@@ -1802,11 +1802,6 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 					evBuilders := []events.Builder{
 						EvtReceiveDataUplink,
 					}
-					for range ups[1:] {
-						evBuilders = append(evBuilders,
-							EvtReceiveDataUplink,
-						)
-					}
 					return append(
 						append(
 							evBuilders,
@@ -2446,7 +2441,7 @@ func (m MockDeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.Applicatio
 }
 
 // RangeByUplinkMatches panics.
-func (m MockDeviceRegistry) RangeByUplinkMatches(context.Context, *ttnpb.UplinkMessage, time.Duration, func(context.Context, *UplinkMatch) (bool, error)) error {
+func (m MockDeviceRegistry) RangeByUplinkMatches(context.Context, *ttnpb.UplinkMessage, func(context.Context, *UplinkMatch) (bool, error)) error {
 	panic("RangeByUplinkMatches must not be called")
 }
 

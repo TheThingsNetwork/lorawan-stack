@@ -17,7 +17,6 @@ package redis
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"runtime/trace"
 
 	"github.com/go-redis/redis/v8"
@@ -461,17 +460,74 @@ const noUplinkMatchMarker = '-'
 var (
 	errNoUplinkMatch = errors.DefineNotFound("no_uplink_match", "no device matches uplink")
 
-	errNoCandidates       = errors.DefineNotFound("no_candidates", "no device candidates found")
-	errNoMatchMarker      = errors.DefineNotFound("found_no_match_marker", "found no match marker")
-	errCandidate          = errors.DefineNotFound("candidate", "candidate failed matching")
-	errNoCandidateMatched = errors.DefineNotFound("no_candidate_match", "no candidate matches uplink")
+	errInvalidMemberType  = errors.DefineInvalidArgument("invalid_member_type", "invalid member type", "uid")
+	errMissingSessionData = errors.DefineInvalidArgument("missing_session_data", "missing session data", "uid")
 )
 
 // RangeByUplinkMatches ranges over devices matching the uplink.
-func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.UplinkMessage, cacheTTL time.Duration, f func(context.Context, *networkserver.UplinkMatch) (bool, error)) error {
+func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.UplinkMessage, f func(context.Context, *networkserver.UplinkMatch) (bool, error)) error {
 	defer trace.StartRegion(ctx, "range end devices by uplink matches").End()
 
+	type sessionEntry struct {
+		UID     string
+		Session string
+	}
+	buildSortedSessionSet := func(scoresCmd *redis.ZSliceCmd, mappingCmd *redis.StringStringMapCmd, usePivot bool, pivot uint16) ([]sessionEntry, error) {
+		scores, err := scoresCmd.Result()
+		if err != nil {
+			if err != redis.Nil {
+				return nil, ttnredis.ConvertError(err)
+			}
+			scores = nil
+		}
+		mapping, err := mappingCmd.Result()
+		if err != nil {
+			if err != redis.Nil {
+				return nil, ttnredis.ConvertError(err)
+			}
+			mapping = nil
+		}
+
+		floatPivot := float64(pivot)
+		head := make([]sessionEntry, 0, len(scores)) // The elements smaller or equal to the pivot, in descending order.
+		tail := make([]sessionEntry, 0, len(scores)) // The elements greater than the pivot, in descending order.
+		current := tail
+		for _, z := range scores {
+			uid, ok := z.Member.(string)
+			if !ok {
+				return nil, errDatabaseCorruption.WithCause(errInvalidMemberType.WithAttributes("uid", uid))
+			}
+			session, ok := mapping[uid]
+			if !ok {
+				return nil, errDatabaseCorruption.WithCause(errMissingSessionData.WithAttributes("uid", uid))
+			}
+
+			if usePivot && z.Score <= floatPivot {
+				tail = current   // Save the tail with appended items.
+				current = head   // Start appending to the head slice.
+				usePivot = false // Avoid switching slices from this point forward.
+			}
+
+			current = append(current, sessionEntry{
+				UID:     uid,
+				Session: session,
+			})
+		}
+
+		return append(current, tail...), nil
+	}
+	ZRangeArgsWithScores := func(ctx context.Context, p redis.Pipeliner, key string) *redis.ZSliceCmd {
+		return p.ZRangeArgsWithScores(ctx, redis.ZRangeArgs{
+			Key:     key,
+			Start:   "-inf",
+			Stop:    "inf",
+			ByScore: true,
+			Rev:     true,
+		})
+	}
+
 	pld := up.Payload.GetMacPayload()
+	ackFlag := pld.FHdr.FCtrl.Ack
 	lsb := uint16(pld.FHdr.FCnt)
 
 	addrKey := r.addrKey(pld.FHdr.DevAddr)
@@ -480,305 +536,110 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 	fieldKeyCurrent := FieldKey(addrKeyCurrent)
 	fieldKeyPending := FieldKey(addrKeyPending)
 
-	payloadHash := uplinkPayloadHash(up.RawPayload)
-
-	matchResultKey := ttnredis.Key(addrKey, "up", payloadHash, "result")
-	matchUIDKeyCurrentLE := ttnredis.Key(addrKeyCurrent, "up", payloadHash, "le")
-	matchUIDKeyCurrentGT := ttnredis.Key(addrKeyCurrent, "up", payloadHash, "gt")
-	matchUIDKeyPending := ttnredis.Key(addrKeyPending, "up", payloadHash)
-	matchFieldKeyCurrent := ttnredis.Key(fieldKeyCurrent, "up", payloadHash)
-	matchFieldKeyPending := ttnredis.Key(fieldKeyPending, "up", payloadHash)
-
-	var matchKeys []string
-	if pld.FHdr.FCtrl.Ack {
-		matchKeys = []string{
-			matchResultKey,
-
-			addrKeyCurrent,
-			fieldKeyCurrent,
-			matchUIDKeyCurrentLE,
-			matchUIDKeyCurrentGT,
-			matchFieldKeyCurrent,
-		}
-	} else {
-		matchKeys = []string{
-			matchResultKey,
-
-			addrKeyCurrent,
-			fieldKeyCurrent,
-			matchUIDKeyCurrentLE,
-			matchUIDKeyCurrentGT,
-			matchFieldKeyCurrent,
-
-			addrKeyPending,
-			fieldKeyPending,
-			matchUIDKeyPending,
-			matchFieldKeyPending,
-		}
-	}
-
-	trace.Log(ctx, "ns:redis", "run deviceMatchScript")
-	vs, err := ttnredis.RunInterfaceSliceScript(ctx, r.Redis, deviceMatchScript, matchKeys, lsb, cacheTTL.Milliseconds()).Result()
-	if err != nil {
-		if err == redis.Nil {
-			return errNoUplinkMatch.WithCause(errNoCandidates)
-		}
-		return ttnredis.ConvertError(err)
-	}
-	if len(vs) < 1 {
-		panic("empty match script return value")
-	}
-	matchType, ok := vs[0].(string)
-	if !ok {
-		panic(fmt.Sprintf("expected first match script return value element to be a string, got '%v'(%T)", vs[0], vs[0]))
-	}
-	processResult := func(ctx context.Context, s string) error {
-		defer trace.StartRegion(ctx, "process result").End()
-
-		if s == string(noUplinkMatchMarker) {
-			return errNoUplinkMatch.WithCause(errNoMatchMarker)
-		}
-		ctx = log.NewContextWithField(ctx, "match_key", matchResultKey)
-		res := &UplinkMatchResult{}
-		if err := msgpack.Unmarshal([]byte(s), res); err != nil {
-			log.FromContext(ctx).WithError(err).Error("Failed to unmarshal match result")
-			return errDatabaseCorruption.WithCause(err)
-		}
-		ctx = log.NewContextWithField(ctx, "device_uid", res.UID)
-		ids, err := unique.ToDeviceID(res.UID)
-		if err != nil {
-			log.FromContext(ctx).WithError(err).Error("Failed to parse match result UID as device identifiers")
-			return errDatabaseCorruption.WithCause(err)
-		}
-		ok, err = f(ctx, &networkserver.UplinkMatch{
-			ApplicationIdentifiers: ids.ApplicationIds,
-			DeviceID:               ids.DeviceId,
-			LoRaWANVersion:         res.LoRaWANVersion,
-			FNwkSIntKey:            res.FNwkSIntKey,
-			LastFCnt:               res.LastFCnt,
-			IsPending:              res.IsPending,
-			ResetsFCnt:             res.ResetsFCnt,
-			Supports32BitFCnt:      res.Supports32BitFCnt,
-		})
-		if err != nil {
-			return errNoUplinkMatch.WithCause(err)
-		}
-		if _, err := r.Redis.TxPipelined(ctx, func(p redis.Pipeliner) error {
-			if !ok {
-				p.SetNX(ctx, matchResultKey, []byte{noUplinkMatchMarker}, cacheTTL)
-			}
-			p.Expire(ctx, matchResultKey, cacheTTL)
-			return nil
-		}); err != nil {
-			return ttnredis.ConvertError(err)
-		}
-		if !ok {
-			return errNoUplinkMatch.WithCause(errCandidate)
-		}
-		return nil
-	}
-	if matchType == "result" {
-		if len(vs) != 2 {
-			panic(fmt.Sprintf("expected match script return value of `result` type to contain 2 elements, got %d", len(vs)))
-		}
-		s, ok := vs[1].(string)
-		if !ok {
-			panic(fmt.Sprintf("expected second element of match script return value of `result` type to be a string, got '%v'(%T)", vs[1], vs[1]))
-		}
-		return processResult(ctx, s)
-	}
-
-	// NOTE(1): Indexes must be consistent with lua/deviceMatch.lua.
-	// NOTE(2): Lua indexing starts from 1.
-	const (
-		currentLEIdx = 4
-		currentGTIdx = 5
-		pendingIdx   = 9
+	var (
+		currentSessionScoresCmd  *redis.ZSliceCmd
+		currentSessionMappingCmd *redis.StringStringMapCmd
+		pendingSessionScoresCmd  *redis.ZSliceCmd
+		pendingSessionMappingCmd *redis.StringStringMapCmd
 	)
-	for _, v := range vs[1:] {
-		idx, ok := v.(int64)
-		if !ok {
-			panic(fmt.Sprintf("expected match script `continue` type return value to be int64, got '%v'(%T)", v, v))
-		}
-		var (
-			matchUIDKey   string
-			matchFieldKey string
-		)
-		switch idx {
-		case currentLEIdx:
-			matchUIDKey = matchUIDKeyCurrentLE
-			matchFieldKey = matchFieldKeyCurrent
-		case currentGTIdx:
-			matchUIDKey = matchUIDKeyCurrentGT
-			matchFieldKey = matchFieldKeyCurrent
-		case pendingIdx:
-			matchUIDKey = matchUIDKeyPending
-			matchFieldKey = matchFieldKeyPending
-		default:
-			panic(fmt.Sprintf("invalid index returned by match script with `continue` type: %d", idx))
-		}
-		var uid string
-		for {
-			var s string
-			switch {
-			case idx == currentGTIdx:
-				uid, s, err = func() (string, string, error) {
-					var ackArg uint8
-					if pld.FHdr.FCtrl.Ack {
-						ackArg = 1
-					}
-					var args []interface{}
-					if uid != "" {
-						args = []interface{}{ackArg, uid}
-					} else {
-						args = []interface{}{ackArg}
-					}
-					trace.Log(ctx, "ns:redis", "run deviceMatchScanGTScript")
-					vs, err := ttnredis.RunInterfaceSliceScript(ctx, r.Redis, deviceMatchScanGTScript, []string{matchUIDKey, matchFieldKey}, args...).Result()
-					if err != nil {
-						return "", "", err
-					}
-					if len(vs) < 1 {
-						panic("empty match scan script return value")
-					}
-					uid, ok := vs[0].(string)
-					if !ok {
-						panic(fmt.Sprintf("expected first match scan script return value to be a string, got '%v'(%T)", vs[0], vs[0]))
-					}
-					s, ok := vs[1].(string)
-					if !ok {
-						panic(fmt.Sprintf("expected second match scan script return value to be a string, got '%v'(%T)", vs[1], vs[1]))
-					}
-					return uid, s, nil
-				}()
-			case uid == "":
-				uid, err = r.Redis.LIndex(ctx, matchUIDKey, -1).Result()
-			default:
-				trace.Log(ctx, "ns:redis", "run deviceMatchScanScript")
-				uid, err = deviceMatchScanScript.Run(ctx, r.Redis, []string{matchUIDKey, matchFieldKey}, uid).Text()
-			}
-			if err != nil {
-				if err == redis.Nil {
-					break
-				}
-				log.FromContext(ctx).WithField("key", matchUIDKey).WithError(err).Error("Failed to scan UID")
-				return ttnredis.ConvertError(err)
-			}
-			ctx := log.NewContextWithFields(ctx, log.Fields(
-				"device_uid", uid,
-				"match_key", matchUIDKey,
-			))
-			ids, err := unique.ToDeviceID(uid)
-			if err != nil {
-				log.FromContext(ctx).WithError(err).Error("Failed to parse UID as device identifiers")
-				return errDatabaseCorruption.WithCause(err)
-			}
-
-			if s == "" {
-				s, err = r.Redis.HGet(ctx, matchFieldKey, uid).Result()
-				if err != nil {
-					if err == redis.Nil {
-						// Another client already processed this entry
-						uid = ""
-						log.FromContext(ctx).Debug("Another client has already processed this UID")
-						continue
-					}
-					log.FromContext(ctx).WithField("key", matchFieldKey).WithError(err).Error("Failed to get device session")
-					return ttnredis.ConvertError(err)
-				}
-			}
-			var m *networkserver.UplinkMatch
-			if idx == pendingIdx {
-				ses := &UplinkMatchPendingSession{}
-				err = msgpack.Unmarshal([]byte(s), ses)
-				if err == nil {
-					m = &networkserver.UplinkMatch{
-						ApplicationIdentifiers: ids.ApplicationIds,
-						DeviceID:               ids.DeviceId,
-						LoRaWANVersion:         ses.LoRaWANVersion,
-						FNwkSIntKey:            ses.FNwkSIntKey,
-						IsPending:              true,
-					}
-				}
-			} else {
-				ses := &UplinkMatchSession{}
-				err = msgpack.Unmarshal([]byte(s), ses)
-				if err == nil {
-					m = &networkserver.UplinkMatch{
-						ApplicationIdentifiers: ids.ApplicationIds,
-						DeviceID:               ids.DeviceId,
-						LoRaWANVersion:         ses.LoRaWANVersion,
-						FNwkSIntKey:            ses.FNwkSIntKey,
-						LastFCnt:               ses.LastFCnt,
-						ResetsFCnt:             ses.ResetsFCnt,
-						Supports32BitFCnt:      ses.Supports32BitFCnt,
-					}
-				}
-			}
-			if err != nil {
-				log.FromContext(ctx).WithError(err).Error("Failed to unmarshal device session")
-				return err
-			}
-			ok, err := f(ctx, m)
-			if err != nil {
-				return errNoUplinkMatch.WithCause(err)
-			}
-			if ok {
-				b, err := msgpack.Marshal(UplinkMatchResult{
-					UID:               uid,
-					LoRaWANVersion:    m.LoRaWANVersion,
-					FNwkSIntKey:       m.FNwkSIntKey,
-					LastFCnt:          m.LastFCnt,
-					ResetsFCnt:        m.ResetsFCnt,
-					Supports32BitFCnt: m.Supports32BitFCnt,
-					IsPending:         m.IsPending,
-				})
-				if err != nil {
-					return err
-				}
-				_, err = r.Redis.Pipelined(ctx, func(p redis.Pipeliner) error {
-					p.Set(ctx, matchResultKey, b, cacheTTL)
-					p.Del(ctx,
-						matchUIDKeyCurrentLE,
-						matchUIDKeyCurrentGT,
-						matchUIDKeyPending,
-						matchFieldKeyCurrent,
-						matchFieldKeyPending,
-					)
-					return nil
-				})
-				if err != nil {
-					return ttnredis.ConvertError(err)
-				}
-				return nil
-			}
-		}
-	}
-
-	var setNXCmd *redis.BoolCmd
-	var getCmd *redis.StringCmd
 	if _, err := r.Redis.TxPipelined(ctx, func(p redis.Pipeliner) error {
-		setNXCmd = p.SetNX(ctx, matchResultKey, []byte{noUplinkMatchMarker}, cacheTTL)
-		getCmd = p.Get(ctx, matchResultKey)
+		currentSessionScoresCmd = ZRangeArgsWithScores(ctx, p, addrKeyCurrent)
+		currentSessionMappingCmd = p.HGetAll(ctx, fieldKeyCurrent)
+		if !ackFlag {
+			pendingSessionScoresCmd = ZRangeArgsWithScores(ctx, p, addrKeyPending)
+			pendingSessionMappingCmd = p.HGetAll(ctx, fieldKeyPending)
+		}
 		return nil
 	}); err != nil {
 		return ttnredis.ConvertError(err)
 	}
 
-	ok, err = setNXCmd.Result()
+	var (
+		currentSessionSet []sessionEntry
+		pendingSessionSet []sessionEntry
+		err               error
+	)
+	currentSessionSet, err = buildSortedSessionSet(currentSessionScoresCmd, currentSessionMappingCmd, true, lsb)
 	if err != nil {
-		return ttnredis.ConvertError(err)
+		return err
 	}
-	if ok {
-		return errNoUplinkMatch.WithCause(errNoCandidateMatched)
+	if !ackFlag {
+		pendingSessionSet, err = buildSortedSessionSet(pendingSessionScoresCmd, pendingSessionMappingCmd, false, 0)
+		if err != nil {
+			return err
+		}
 	}
 
-	// Another instance set the result, while this goroutine was busy with processing.
-	s, err := getCmd.Result()
-	if err != nil {
-		return ttnredis.ConvertError(err)
+	fillContext := func(ctx context.Context, uid string) (context.Context, *ttnpb.EndDeviceIdentifiers, error) {
+		ids, err := unique.ToDeviceID(uid)
+		if err != nil {
+			log.FromContext(ctx).WithError(err).Error("Failed to parse UID as device identifiers")
+			return ctx, nil, errDatabaseCorruption.WithCause(err)
+		}
+		return ctx, &ids, nil
 	}
-	return processResult(ctx, s)
+
+	for _, session := range currentSessionSet {
+		ctx, ids, err := fillContext(ctx, session.UID)
+		if err != nil {
+			return err
+		}
+		if ids == nil {
+			continue
+		}
+
+		ses := &UplinkMatchSession{}
+		err = msgpack.Unmarshal([]byte(session.Session), ses)
+		if err != nil {
+			continue
+		}
+
+		if uint16(ses.LastFCnt) > lsb {
+			if ses.Supports32BitFCnt != nil && !ses.Supports32BitFCnt.Value && (ackFlag || ses.ResetsFCnt == nil || !ses.ResetsFCnt.Value) {
+				continue
+			}
+		}
+
+		stop, err := f(ctx, &networkserver.UplinkMatch{
+			ApplicationIdentifiers: ids.ApplicationIds,
+			DeviceID:               ids.DeviceId,
+			LoRaWANVersion:         ses.LoRaWANVersion,
+			FNwkSIntKey:            ses.FNwkSIntKey,
+			LastFCnt:               ses.LastFCnt,
+			ResetsFCnt:             ses.ResetsFCnt,
+			Supports32BitFCnt:      ses.Supports32BitFCnt,
+		})
+		if err != nil || stop {
+			return err
+		}
+	}
+	for _, session := range pendingSessionSet {
+		ctx, ids, err := fillContext(ctx, session.UID)
+		if err != nil {
+			return err
+		}
+		if ids == nil {
+			continue
+		}
+
+		ses := &UplinkMatchPendingSession{}
+		err = msgpack.Unmarshal([]byte(session.Session), ses)
+		if err != nil {
+			continue
+		}
+		stop, err := f(ctx, &networkserver.UplinkMatch{
+			ApplicationIdentifiers: ids.ApplicationIds,
+			DeviceID:               ids.DeviceId,
+			LoRaWANVersion:         ses.LoRaWANVersion,
+			FNwkSIntKey:            ses.FNwkSIntKey,
+			IsPending:              true,
+		})
+		if err != nil || stop {
+			return err
+		}
+	}
+
+	return errNoUplinkMatch.New()
 }
 
 func equalEUI64(x, y *types.EUI64) bool {
