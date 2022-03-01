@@ -62,8 +62,9 @@ var (
 
 	testTrafficEndPoint = "/traffic/eui-0101010101010101"
 
-	timeout       = (1 << 7) * test.Delay
-	defaultConfig = Config{
+	timeout             = (1 << 7) * test.Delay
+	trafficTestWaitTime = (1 << 7) * test.Delay
+	defaultConfig       = Config{
 		WSPingInterval:       (1 << 3) * test.Delay,
 		AllowUnauthenticated: true,
 		UseTrafficTLSAddress: false,
@@ -1120,9 +1121,10 @@ func TestTraffic(t *testing.T) {
 					}
 
 				case lbslns.UplinkDataFrame:
-					now := time.Unix(time.Now().Unix(), 0)
+					now := time.Now()
 					v.UpInfo.XTime = upXTime
 					v.UpInfo.RxTime = float64(now.Unix())
+					v.UpInfo.GPSTime = int64(gpstime.ToGPS(now) / time.Microsecond)
 					req, err := json.Marshal(v)
 					if err != nil {
 						panic(err)
@@ -1148,15 +1150,15 @@ func TestTraffic(t *testing.T) {
 						expectedUp.RxMetadata[0].Time = ttnpb.ProtoTime(&now)
 						expectedUp.Settings.Timestamp = timestamp
 						expectedUp.Settings.Time = ttnpb.ProtoTime(&now)
-
 						a.So(up.Message, should.Resemble, &expectedUp)
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")
 					}
 				case lbslns.JoinRequest:
-					now := time.Unix(time.Now().Unix(), 0)
+					now := time.Now()
 					v.UpInfo.XTime = upXTime
 					v.UpInfo.RxTime = float64(now.Unix())
+					v.UpInfo.GPSTime = int64(gpstime.ToGPS(now) / time.Microsecond)
 					req, err := json.Marshal(v)
 					if err != nil {
 						panic(err)
@@ -1182,7 +1184,6 @@ func TestTraffic(t *testing.T) {
 						expectedUp.RxMetadata[0].Time = ttnpb.ProtoTime(&now)
 						expectedUp.Settings.Timestamp = timestamp
 						expectedUp.Settings.Time = ttnpb.ProtoTime(&now)
-
 						a.So(up.Message, should.Resemble, &expectedUp)
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")
@@ -1296,8 +1297,14 @@ func TestTraffic(t *testing.T) {
 						} else {
 							expected.XTime = clock.GetXTimeForTime(dlTime)
 							diff := expected.XTime - msg.XTime
-							if !a.So(diff, should.BeGreaterThanOrEqualTo, 0) && !a.So(diff, should.BeLessThan, 20000000) { //  Tolerance of 2s
-								t.Fatalf("Downlink xtime has larger deviation than expected: %d", diff)
+							// The expected difference in XTime is the sum of the following values
+							// 1. Rx1Delay field of the downlink; hardcoded to 1 second.
+							// 2. TOA offset for the payload and the frequency plan used; 51456 microseconds.
+							// Note: If the payload or the frequency plan is changed in the test, adjust the TOA value.
+							expectedDiff := 1*time.Second + 51456*time.Microsecond
+
+							if !a.So(diff, should.BeGreaterThanOrEqualTo, 0) && !a.So(diff, should.BeBetween, (expectedDiff-5*time.Microsecond), (expectedDiff+5*time.Microsecond)) {
+								t.Fatalf("Downlink xtime has larger deviation than expected: %d", diff-int64(expectedDiff))
 							}
 							msg.XTime = expected.XTime
 						}
@@ -1313,6 +1320,7 @@ func TestTraffic(t *testing.T) {
 					t.Fatalf("Failed to read message: %v", readErr)
 				}
 			}
+			time.Sleep(trafficTestWaitTime)
 		})
 	}
 }
