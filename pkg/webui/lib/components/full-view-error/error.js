@@ -135,13 +135,13 @@ const FullViewErrorInner = ({ error, safe }) => {
   const errorDetails = JSON.stringify(error, undefined, 2)
   const hasErrorDetails =
     (!isNotFound && Boolean(error) && errorDetails.length > 2) || (isFrontend && error.errorCode)
-  const buttonClasses = classnames(buttonStyle.button, buttonStyle.primary, style.actionButton)
+  const buttonClasses = classnames(buttonStyle.button, style.actionButton)
 
   return (
     <div className={style.fullViewError} data-test-id="full-error-view">
       <Container>
         <Row>
-          <Col xl={6} lg={8} md={10} sm={12}>
+          <Col xl={7} lg={8} md={10} sm={12}>
             {safe ? (
               <Helmet titleTemplate={`%s - ${siteTitle ? `${siteTitle} - ` : ''}${siteName}`}>
                 <title>Error</title>
@@ -189,7 +189,11 @@ const FullViewErrorInner = ({ error, safe }) => {
                   <a
                     href={supportLink}
                     target="_blank"
-                    className={classnames(buttonStyle.button, style.actionButton)}
+                    className={classnames(
+                      buttonStyle.button,
+                      buttonStyle.primary,
+                      style.actionButton,
+                    )}
                   >
                     <Icon icon="contact_support" textPaddedRight nudgeDown />
                     <Message content={sharedMessages.getSupport} />
