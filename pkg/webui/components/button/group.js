@@ -26,7 +26,7 @@ const ButtonGroup = ({ className, children, align }) => (
 )
 
 ButtonGroup.propTypes = {
-  align: PropTypes.oneOf('start', 'end', 'center'),
+  align: PropTypes.oneOf(['start', 'end', 'center']),
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
 }
