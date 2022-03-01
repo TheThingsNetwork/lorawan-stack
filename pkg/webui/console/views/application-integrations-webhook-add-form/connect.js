@@ -14,9 +14,10 @@
 
 import { connect } from 'react-redux'
 
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+
 import { getWebhookTemplate } from '@console/store/actions/webhook-templates'
 import { getWebhook } from '@console/store/actions/webhooks'
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import { selectWebhookTemplateById } from '@console/store/selectors/webhook-templates'

@@ -15,7 +15,6 @@
 import React, { Component } from 'react'
 import { defineMessages } from 'react-intl'
 
-
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import SubmitBar from '@ttn-lw/components/submit-bar'

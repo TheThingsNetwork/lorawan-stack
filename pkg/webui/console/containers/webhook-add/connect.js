@@ -15,19 +15,20 @@
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
-import { selectSelectedApplicationId } from '@console/store/selectors/applications'
-
-import { createApplicationApiKeys } from '@console/store/actions/api-keys'
-import { createWebhook } from '@console/store/actions/webhooks'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+
+import { createApplicationApiKey } from '@console/store/actions/api-keys'
+import { createWebhook } from '@console/store/actions/webhooks'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 const mapStateToProps = state => ({
   appId: selectSelectedApplicationId(state),
 })
 
 const mapDispatchToProps = dispatch => ({
-  createApplicationApiKeys: (appId, key) =>
-    dispatch(attachPromise(createApplicationApiKeys(appId, key))),
+  createApplicationApiKey: (appId, key) =>
+    dispatch(attachPromise(createApplicationApiKey(appId, key))),
   navigateToList: appId => dispatch(push(`/applications/${appId}/integrations/webhooks`)),
   createWebhook: (appId, webhook) => dispatch(attachPromise(createWebhook(appId, webhook))),
 })
