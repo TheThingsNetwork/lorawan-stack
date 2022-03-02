@@ -581,103 +581,6 @@ var _ interface {
 	ErrorName() string
 } = GenerateQRCodeResponseValidationError{}
 
-// ValidateFields checks the field values on EndDeviceOnboardingData with the
-// rules defined in the proto definition for this message. If any rules are
-// violated, an error is returned.
-func (m *EndDeviceOnboardingData) ValidateFields(paths ...string) error {
-	if m == nil {
-		return nil
-	}
-
-	if len(paths) == 0 {
-		paths = EndDeviceOnboardingDataFieldPathsNested
-	}
-
-	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
-		_ = subs
-		switch name {
-		case "join_eui":
-			// no validation rules for JoinEui
-		case "dev_eui":
-			// no validation rules for DevEui
-		case "claim_authentication_code":
-			// no validation rules for ClaimAuthenticationCode
-		case "vendor_id":
-			// no validation rules for VendorId
-		case "model_id":
-			// no validation rules for ModelId
-		case "checksum":
-			// no validation rules for Checksum
-		case "serial_number":
-			// no validation rules for SerialNumber
-		case "proprietary":
-			// no validation rules for Proprietary
-		default:
-			return EndDeviceOnboardingDataValidationError{
-				field:  name,
-				reason: "invalid field path",
-			}
-		}
-	}
-	return nil
-}
-
-// EndDeviceOnboardingDataValidationError is the validation error returned by
-// EndDeviceOnboardingData.ValidateFields if the designated constraints aren't met.
-type EndDeviceOnboardingDataValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e EndDeviceOnboardingDataValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e EndDeviceOnboardingDataValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e EndDeviceOnboardingDataValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e EndDeviceOnboardingDataValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e EndDeviceOnboardingDataValidationError) ErrorName() string {
-	return "EndDeviceOnboardingDataValidationError"
-}
-
-// Error satisfies the builtin error interface
-func (e EndDeviceOnboardingDataValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sEndDeviceOnboardingData.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = EndDeviceOnboardingDataValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = EndDeviceOnboardingDataValidationError{}
-
 // ValidateFields checks the field values on EntityOnboardingData with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -704,22 +607,22 @@ func (m *EntityOnboardingData) ValidateFields(paths ...string) error {
 			}
 			if len(subs) == 0 {
 				subs = []string{
-					"end_device_onboarding_data",
+					"end_device_tempate",
 				}
 			}
 			for name, subs := range _processPaths(subs) {
 				_ = subs
 				switch name {
-				case "end_device_onboarding_data":
-					w, ok := m.Data.(*EntityOnboardingData_EndDeviceOnboardingData)
+				case "end_device_tempate":
+					w, ok := m.Data.(*EntityOnboardingData_EndDeviceTempate)
 					if !ok || w == nil {
 						continue
 					}
 
-					if v, ok := interface{}(m.GetEndDeviceOnboardingData()).(interface{ ValidateFields(...string) error }); ok {
+					if v, ok := interface{}(m.GetEndDeviceTempate()).(interface{ ValidateFields(...string) error }); ok {
 						if err := v.ValidateFields(subs...); err != nil {
 							return EntityOnboardingDataValidationError{
-								field:  "end_device_onboarding_data",
+								field:  "end_device_tempate",
 								reason: "embedded message failed validation",
 								cause:  err,
 							}

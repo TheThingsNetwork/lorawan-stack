@@ -202,93 +202,6 @@ func (dst *GenerateQRCodeResponse) SetFields(src *GenerateQRCodeResponse, paths 
 	return nil
 }
 
-func (dst *EndDeviceOnboardingData) SetFields(src *EndDeviceOnboardingData, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
-		switch name {
-		case "join_eui":
-			if len(subs) > 0 {
-				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.JoinEui = src.JoinEui
-			} else {
-				dst.JoinEui = nil
-			}
-		case "dev_eui":
-			if len(subs) > 0 {
-				return fmt.Errorf("'dev_eui' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.DevEui = src.DevEui
-			} else {
-				dst.DevEui = nil
-			}
-		case "claim_authentication_code":
-			if len(subs) > 0 {
-				return fmt.Errorf("'claim_authentication_code' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.ClaimAuthenticationCode = src.ClaimAuthenticationCode
-			} else {
-				var zero string
-				dst.ClaimAuthenticationCode = zero
-			}
-		case "vendor_id":
-			if len(subs) > 0 {
-				return fmt.Errorf("'vendor_id' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.VendorId = src.VendorId
-			} else {
-				dst.VendorId = nil
-			}
-		case "model_id":
-			if len(subs) > 0 {
-				return fmt.Errorf("'model_id' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.ModelId = src.ModelId
-			} else {
-				dst.ModelId = nil
-			}
-		case "checksum":
-			if len(subs) > 0 {
-				return fmt.Errorf("'checksum' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Checksum = src.Checksum
-			} else {
-				var zero string
-				dst.Checksum = zero
-			}
-		case "serial_number":
-			if len(subs) > 0 {
-				return fmt.Errorf("'serial_number' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.SerialNumber = src.SerialNumber
-			} else {
-				var zero string
-				dst.SerialNumber = zero
-			}
-		case "proprietary":
-			if len(subs) > 0 {
-				return fmt.Errorf("'proprietary' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.Proprietary = src.Proprietary
-			} else {
-				var zero string
-				dst.Proprietary = zero
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
 func (dst *EntityOnboardingData) SetFields(src *EntityOnboardingData, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -318,28 +231,28 @@ func (dst *EntityOnboardingData) SetFields(src *EntityOnboardingData, paths ...s
 			}
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
-				case "end_device_onboarding_data":
-					_, srcOk := src.Data.(*EntityOnboardingData_EndDeviceOnboardingData)
+				case "end_device_tempate":
+					_, srcOk := src.Data.(*EntityOnboardingData_EndDeviceTempate)
 					if !srcOk && src.Data != nil {
-						return fmt.Errorf("attempt to set oneof 'end_device_onboarding_data', while different oneof is set in source")
+						return fmt.Errorf("attempt to set oneof 'end_device_tempate', while different oneof is set in source")
 					}
-					_, dstOk := dst.Data.(*EntityOnboardingData_EndDeviceOnboardingData)
+					_, dstOk := dst.Data.(*EntityOnboardingData_EndDeviceTempate)
 					if !dstOk && dst.Data != nil {
-						return fmt.Errorf("attempt to set oneof 'end_device_onboarding_data', while different oneof is set in destination")
+						return fmt.Errorf("attempt to set oneof 'end_device_tempate', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
-						var newDst, newSrc *EndDeviceOnboardingData
+						var newDst, newSrc *EndDeviceTemplate
 						if !srcOk && !dstOk {
 							continue
 						}
 						if srcOk {
-							newSrc = src.Data.(*EntityOnboardingData_EndDeviceOnboardingData).EndDeviceOnboardingData
+							newSrc = src.Data.(*EntityOnboardingData_EndDeviceTempate).EndDeviceTempate
 						}
 						if dstOk {
-							newDst = dst.Data.(*EntityOnboardingData_EndDeviceOnboardingData).EndDeviceOnboardingData
+							newDst = dst.Data.(*EntityOnboardingData_EndDeviceTempate).EndDeviceTempate
 						} else {
-							newDst = &EndDeviceOnboardingData{}
-							dst.Data = &EntityOnboardingData_EndDeviceOnboardingData{EndDeviceOnboardingData: newDst}
+							newDst = &EndDeviceTemplate{}
+							dst.Data = &EntityOnboardingData_EndDeviceTempate{EndDeviceTempate: newDst}
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err

@@ -8758,7 +8758,7 @@
         ]
       }
     },
-    "/qr-code": {
+    "/qr-code/parse": {
       "post": {
         "summary": "Parse QR Codes of known formats and return the information contained within.",
         "operationId": "QRCodeParser_Parse",
@@ -15162,42 +15162,6 @@
         }
       }
     },
-    "v3EndDeviceOnboardingData": {
-      "type": "object",
-      "properties": {
-        "join_eui": {
-          "type": "string",
-          "format": "byte"
-        },
-        "dev_eui": {
-          "type": "string",
-          "format": "byte"
-        },
-        "claim_authentication_code": {
-          "type": "string",
-          "description": "claim_authentication_code ids referred to as;\n- Owner Token in LoRa Alliance TR005 specification.\n- Device Validation Code in the LoRa Alliance TR005 draft 2 and draft 3 specs."
-        },
-        "vendor_id": {
-          "type": "string",
-          "format": "byte"
-        },
-        "model_id": {
-          "type": "string",
-          "format": "byte",
-          "description": "model_id is referred to as VendorProfileID in LoRa Alliance TR005 specification."
-        },
-        "checksum": {
-          "type": "string"
-        },
-        "serial_number": {
-          "type": "string"
-        },
-        "proprietary": {
-          "type": "string"
-        }
-      },
-      "description": "EndDeviceOnboardingData contains fields necessary for onboarding a LoRaWAN End Device."
-    },
     "v3EndDeviceTemplate": {
       "type": "object",
       "properties": {
@@ -15303,8 +15267,8 @@
           "type": "string",
           "description": "Identifier of the format used to successfully parse the QR code data."
         },
-        "end_device_onboarding_data": {
-          "$ref": "#/definitions/v3EndDeviceOnboardingData"
+        "end_device_tempate": {
+          "$ref": "#/definitions/v3EndDeviceTemplate"
         }
       }
     },
@@ -17758,7 +17722,7 @@
         "qr_code": {
           "type": "string",
           "format": "byte",
-          "title": "Raw QR code contents.\nThe miminum"
+          "description": "Raw QR code contents."
         }
       }
     },

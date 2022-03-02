@@ -36628,114 +36628,6 @@
       "extensions": [],
       "messages": [
         {
-          "name": "EndDeviceOnboardingData",
-          "longName": "EndDeviceOnboardingData",
-          "fullName": "ttn.lorawan.v3.EndDeviceOnboardingData",
-          "description": "EndDeviceOnboardingData contains fields necessary for onboarding a LoRaWAN End Device.",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "join_eui",
-              "description": "",
-              "label": "",
-              "type": "bytes",
-              "longType": "bytes",
-              "fullType": "bytes",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "dev_eui",
-              "description": "",
-              "label": "",
-              "type": "bytes",
-              "longType": "bytes",
-              "fullType": "bytes",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "claim_authentication_code",
-              "description": "claim_authentication_code ids referred to as;\n- Owner Token in LoRa Alliance TR005 specification.\n- Device Validation Code in the LoRa Alliance TR005 draft 2 and draft 3 specs.",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "vendor_id",
-              "description": "",
-              "label": "",
-              "type": "bytes",
-              "longType": "bytes",
-              "fullType": "bytes",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "model_id",
-              "description": "model_id is referred to as VendorProfileID in LoRa Alliance TR005 specification.",
-              "label": "",
-              "type": "bytes",
-              "longType": "bytes",
-              "fullType": "bytes",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "checksum",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "serial_number",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "proprietary",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
           "name": "EntityOnboardingData",
           "longName": "EntityOnboardingData",
           "fullName": "ttn.lorawan.v3.EntityOnboardingData",
@@ -36758,12 +36650,12 @@
               "defaultValue": ""
             },
             {
-              "name": "end_device_onboarding_data",
+              "name": "end_device_tempate",
               "description": "",
               "label": "",
-              "type": "EndDeviceOnboardingData",
-              "longType": "EndDeviceOnboardingData",
-              "fullType": "ttn.lorawan.v3.EndDeviceOnboardingData",
+              "type": "EndDeviceTemplate",
+              "longType": "EndDeviceTemplate",
+              "fullType": "ttn.lorawan.v3.EndDeviceTemplate",
               "ismap": false,
               "isoneof": true,
               "oneofdecl": "data",
@@ -36983,7 +36875,7 @@
             },
             {
               "name": "qr_code",
-              "description": "Raw QR code contents.\nThe miminum",
+              "description": "Raw QR code contents.",
               "label": "",
               "type": "bytes",
               "longType": "bytes",
@@ -37266,7 +37158,7 @@
                   "rules": [
                     {
                       "method": "POST",
-                      "pattern": "/qr-code",
+                      "pattern": "/qr-code/parse",
                       "body": "*"
                     }
                   ]
