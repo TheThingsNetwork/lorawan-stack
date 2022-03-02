@@ -2,15 +2,12 @@
   {
     "ids": {
       "device_id": "migration-test-device",
-      "application_ids": {
-        "application_id": "conference-demo"
-      },
       "dev_eui": "008BFC3FD4445B19",
       "join_eui": "70B3D57ED0042F52"
     },
     "created_at": "0001-01-01T00:00:00Z",
     "updated_at": "0001-01-01T00:00:00Z",
-    "name": "migration-test-device",
+    "name": "Test Device",
     "lorawan_version": "MAC_V1_0_2",
     "lorawan_phy_version": "PHY_V1_0_2_REV_B",
     "frequency_plan_id": "EU_863_870_TTN",

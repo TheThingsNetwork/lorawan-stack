@@ -53,8 +53,6 @@ For details about compatibility between different releases, see the **Commitment
   - This requires a database migration (`ttn-lw-stack js-db migrate`).
 - Add TTL for gateway connection stats. Can be configured with the option `gs.connection-stats-ttl`.
 - Add `query` field to search requests, allowing to search for a string in any of ID, Name, Description and EUI (for entities that have EUIs).
-- Add `Basic Authorization` header configuration to the webhooks form in the Console.
-- Show repository formatter code in the payload formatter form in the Console and allow pasting the application and payload formatter code when using the JavaScript option.
 - Added fallback values for end device import in the Console.
 
 ### Changed

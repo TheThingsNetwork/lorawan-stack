@@ -55,9 +55,9 @@ describe('End device messaging', () => {
       `${Cypress.config('consoleRootPath')}/applications/${appId}/devices`,
     )
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByRole('rowgroup').within(() => {
-      cy.findAllByRole('row').should('have.length', 3)
-    })
+    cy.findByText('migration-test-device').should('be.visible')
+    cy.findByText('some-nice-id').should('be.visible')
+    cy.findByText('this-is-test-id').should('be.visible')
   })
 
   it('fails adding devices with existant ids', () => {
@@ -79,12 +79,14 @@ describe('End device messaging', () => {
         cy.findByText(/ID already taken/).should('be.visible')
         cy.findByText(/an end device with/, /is already registered/).should('be.visible')
       })
+    cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices`)
+    cy.findByText('some-fail-id').should('not.exist')
   })
 
   it('succeeds setting lorawan_version, lorawan_phy_version and frequency_plan_id from fallback values', () => {
     const devicesFile = 'freqId-version-phy-device.json'
     const fallbackValues = {
-      lorawan_version: 'MAC_V1_0',
+      lorawan_version: 'MAC V1.0',
       frequency_plan_id: '863-870 MHz',
     }
     cy.findByLabelText('File format').selectOption('The Things Stack JSON')
@@ -104,9 +106,35 @@ describe('End device messaging', () => {
       `${Cypress.config('consoleRootPath')}/applications/${appId}/devices`,
     )
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByRole('rowgroup').within(() => {
-      cy.findAllByRole('row').should('have.length', 7)
-    })
+    cy.visit(
+      `${Cypress.config(
+        'consoleRootPath',
+      )}/applications/${appId}/devices/fallback-test-device/general-settings`,
+    )
+
+    cy.findByText('Network layer', { selector: 'h3' })
+      .closest('[data-test-id="collapsible-section"]')
+      .within(() => {
+        cy.findByRole('button', { name: 'Expand' }).click()
+        cy.findByLabelText('Frequency plan').should('be.visible')
+        cy.findByText(/863-870 MHz/).should('be.visible')
+        cy.findByLabelText('LoRaWAN version').should('be.visible')
+        cy.findByText(fallbackValues.lorawan_version).should('be.visible')
+      })
+    cy.visit(
+      `${Cypress.config(
+        'consoleRootPath',
+      )}/applications/${appId}/devices/fallback-test-nice-id/general-settings`,
+    )
+    cy.findByText('Network layer', { selector: 'h3' })
+      .closest('[data-test-id="collapsible-section"]')
+      .within(() => {
+        cy.findByRole('button', { name: 'Expand' }).click()
+        cy.findByLabelText('Frequency plan').should('be.visible')
+        cy.findByText('Europe 863-870 MHz (SF12 for RX2)').should('not.exist')
+        cy.findByLabelText('LoRaWAN version').should('be.visible')
+        cy.findByText(fallbackValues.lorawan_version).should('not.exist')
+      })
   })
 
   it('fails importing device without lorawan_version, lorawan_phy_version and frequency_plan_id', () => {

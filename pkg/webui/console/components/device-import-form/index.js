@@ -51,7 +51,7 @@ const m = defineMessages({
   infoText:
     'You can use the import functionality to register multiple end devices at once by uploading a file containing the registration information in one of the available formats. For more information, see also our documentation on <DocLink>Importing End Devices</DocLink>.',
   fallbackValuesImport:
-    'These values will be used in case your file does not provide them. They are not required, although if not provided here or in the imported file, the import of the end device will not be successful',
+    'These values will be used in case the imported file does not provide them. They are not required, although if not provided here or in the imported file, the import of the end device will not be successful.',
 })
 
 const validationSchema = Yup.object({

@@ -7,7 +7,7 @@
     },
     "created_at": "0001-01-01T00:00:00Z",
     "updated_at": "0001-01-01T00:00:00Z",
-    "name": "migration-test-device",
+    "name": "Test device",
     "supports_join": true,
     "root_keys": {
       "app_key": {
