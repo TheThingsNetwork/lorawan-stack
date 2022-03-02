@@ -26,7 +26,12 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
-const formatIDLoRaAllianceTR005 = "tr005"
+const (
+	formatIDLoRaAllianceTR005 = "tr005"
+	serialNumberAttribute     = "serial-number"
+	vendorIDAttribute         = "vendor-id"
+	profileIDAttribute        = "profile-id"
+)
 
 // LoRaAllianceTR005 is the LoRa Alliance defined format in Technical Recommendation TR005.
 // See https://lora-alliance.org/wp-content/uploads/2020/11/TR005_LoRaWAN_Device_Identification_QR_Codes.pdf
@@ -148,18 +153,40 @@ func (m *LoRaAllianceTR005) UnmarshalText(text []byte) error {
 
 // GetEntityOnboardingData implements the Data interface.
 func (m *LoRaAllianceTR005) GetEntityOnboardingData() *ttnpb.EntityOnboardingData {
+	paths := []string{
+		"ids",
+		"claim_authentication_code",
+	}
+	attributes := make(map[string]string)
+	if m.SerialNumber != "" {
+		attributes[serialNumberAttribute] = m.SerialNumber
+	}
+	if m.VendorID != [2]byte{} {
+		attributes[vendorIDAttribute] = strings.ToUpper(hex.EncodeToString(m.VendorID[:]))
+	}
+	if m.ModelID != [2]byte{} {
+		attributes[profileIDAttribute] = strings.ToUpper(hex.EncodeToString(m.ModelID[:]))
+	}
+	if len(attributes) > 0 {
+		paths = append(paths, "attributes")
+	}
 	return &ttnpb.EntityOnboardingData{
 		FormatId: formatIDLoRaAllianceTR005,
-		Data: &ttnpb.EntityOnboardingData_EndDeviceOnboardingData{
-			EndDeviceOnboardingData: &ttnpb.EndDeviceOnboardingData{
-				JoinEui:                 &m.JoinEUI,
-				DevEui:                  &m.DevEUI,
-				ClaimAuthenticationCode: m.OwnerToken,
-				Checksum:                m.Checksum,
-				VendorId:                m.VendorID[:],
-				ModelId:                 m.ModelID[:],
-				SerialNumber:            m.SerialNumber,
-				Proprietary:             m.Proprietary,
+		Data: &ttnpb.EntityOnboardingData_EndDeviceTempate{
+			EndDeviceTempate: &ttnpb.EndDeviceTemplate{
+				EndDevice: &ttnpb.EndDevice{
+					Ids: &ttnpb.EndDeviceIdentifiers{
+						DevEui:  &m.DevEUI,
+						JoinEui: &m.JoinEUI,
+					},
+					ClaimAuthenticationCode: &ttnpb.EndDeviceAuthenticationCode{
+						Value: m.OwnerToken,
+					},
+					Attributes: attributes,
+				},
+				FieldMask: &pbtypes.FieldMask{
+					Paths: paths,
+				},
 			},
 		},
 	}

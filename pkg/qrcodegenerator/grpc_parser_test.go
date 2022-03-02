@@ -110,7 +110,7 @@ func TestQRCodeParser(t *testing.T) {
 		{
 			Name: "ValidBytes",
 			GetQRData: func() []byte {
-				return []byte(`LW:D0:1111111111111111:2222222222222222:00000001:O123456`)
+				return []byte(`LW:D0:1111111111111111:2222222222222222:AABB1122:O123456`)
 			},
 			Assertion: func(a *assertions.Assertion, resp *ttnpb.ParseQRCodeResponse, err error) bool {
 				if !a.So(resp, should.NotBeNil) {
@@ -120,9 +120,55 @@ func TestQRCodeParser(t *testing.T) {
 					return false
 				}
 				a.So(resp.EntityOnboardingData.FormatId, should.Equal, laTr005.ID())
-				a.So(*resp.EntityOnboardingData.GetEndDeviceOnboardingData().JoinEui, should.Equal, types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11})
-				a.So(*resp.EntityOnboardingData.GetEndDeviceOnboardingData().DevEui, should.Equal, types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22})
-				a.So(resp.EntityOnboardingData.GetEndDeviceOnboardingData().ModelId, should.Resemble, []byte{0x00, 0x01})
+				endDeviceTemplate := resp.EntityOnboardingData.GetEndDeviceTempate()
+				a.So(endDeviceTemplate, should.NotBeNil)
+				endDevice := endDeviceTemplate.EndDevice
+				a.So(endDevice, should.NotBeNil)
+
+				endDeviceIDs := endDevice.Ids.GetEntityIdentifiers().GetDeviceIds()
+				a.So(endDeviceIDs, should.NotBeNil)
+				a.So(*endDeviceIDs.JoinEui, should.Equal, types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11})
+				a.So(*endDeviceIDs.DevEui, should.Equal, types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22})
+
+				a.So(endDevice.ClaimAuthenticationCode, should.NotBeNil)
+				a.So(endDevice.ClaimAuthenticationCode.Value, should.Equal, "123456")
+				attributes := endDevice.Attributes
+				a.So(len(attributes), should.Equal, 2)
+				a.So(attributes["vendor-id"], should.Equal, "AABB")
+				a.So(attributes["profile-id"], should.Equal, "1122")
+				return true
+			},
+		},
+		{
+			Name: "ValidBytesWithSerialNumber",
+			GetQRData: func() []byte {
+				return []byte(`LW:D0:1111111111111111:2222222222222222:00010001:O123456:S12345678`)
+			},
+			Assertion: func(a *assertions.Assertion, resp *ttnpb.ParseQRCodeResponse, err error) bool {
+				if !a.So(resp, should.NotBeNil) {
+					return false
+				}
+				if !a.So(err, should.BeNil) {
+					return false
+				}
+				a.So(resp.EntityOnboardingData.FormatId, should.Equal, laTr005.ID())
+				endDeviceTemplate := resp.EntityOnboardingData.GetEndDeviceTempate()
+				a.So(endDeviceTemplate, should.NotBeNil)
+				endDevice := endDeviceTemplate.GetEndDevice()
+				a.So(endDevice, should.NotBeNil)
+
+				endDeviceIDs := endDevice.GetIds()
+				a.So(endDeviceIDs, should.NotBeNil)
+				a.So(*endDeviceIDs.JoinEui, should.Equal, types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11})
+				a.So(*endDeviceIDs.DevEui, should.Equal, types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22})
+
+				a.So(endDevice.ClaimAuthenticationCode, should.NotBeNil)
+				a.So(endDevice.ClaimAuthenticationCode.Value, should.Equal, "123456")
+				attributes := endDevice.Attributes
+				a.So(len(attributes), should.Equal, 3)
+				a.So(attributes["serial-number"], should.Equal, "12345678")
+				a.So(attributes["vendor-id"], should.Equal, "0001")
+				a.So(attributes["profile-id"], should.Equal, "0001")
 				return true
 			},
 		},
@@ -158,8 +204,20 @@ func TestQRCodeParser(t *testing.T) {
 					return false
 				}
 				a.So(resp.EntityOnboardingData.FormatId, should.Equal, laTr005.ID())
-				a.So(*resp.EntityOnboardingData.GetEndDeviceOnboardingData().JoinEui, should.Equal, types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11})
-				a.So(*resp.EntityOnboardingData.GetEndDeviceOnboardingData().DevEui, should.Equal, types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22})
+				endDeviceTemplate := resp.EntityOnboardingData.GetEndDeviceTempate()
+				a.So(endDeviceTemplate, should.NotBeNil)
+				endDevice := endDeviceTemplate.GetEndDevice()
+				a.So(endDevice, should.NotBeNil)
+
+				endDeviceIDs := endDevice.GetIds()
+				a.So(endDeviceIDs, should.NotBeNil)
+				a.So(*endDeviceIDs.JoinEui, should.Equal, types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11})
+				a.So(*endDeviceIDs.DevEui, should.Equal, types.EUI64{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22})
+
+				a.So(endDevice.ClaimAuthenticationCode, should.NotBeNil)
+				a.So(endDevice.ClaimAuthenticationCode.Value, should.Equal, "123456")
+				attributes := endDevice.Attributes
+				a.So(len(attributes), should.Equal, 0)
 				return true
 			},
 		},

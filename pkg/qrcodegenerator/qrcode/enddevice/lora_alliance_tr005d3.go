@@ -149,17 +149,40 @@ func (m *LoRaAllianceTR005Draft3) UnmarshalText(text []byte) error {
 
 // GetEntityOnboardingData implements the Data interface.
 func (m *LoRaAllianceTR005Draft3) GetEntityOnboardingData() *ttnpb.EntityOnboardingData {
+	paths := []string{
+		"ids",
+		"claim_authentication_code",
+	}
+	attributes := make(map[string]string)
+	if m.SerialNumber != "" {
+		attributes[serialNumberAttribute] = m.SerialNumber
+	}
+	if m.VendorID != [2]byte{} {
+		attributes[vendorIDAttribute] = strings.ToUpper(hex.EncodeToString(m.VendorID[:]))
+	}
+	if m.ModelID != [2]byte{} {
+		attributes[profileIDAttribute] = strings.ToUpper(hex.EncodeToString(m.ModelID[:]))
+	}
+	if len(attributes) > 0 {
+		paths = append(paths, "attributes")
+	}
 	return &ttnpb.EntityOnboardingData{
 		FormatId: formatIDLoRaAllianceTR005Draft3,
-		Data: &ttnpb.EntityOnboardingData_EndDeviceOnboardingData{
-			EndDeviceOnboardingData: &ttnpb.EndDeviceOnboardingData{
-				JoinEui:                 &m.JoinEUI,
-				DevEui:                  &m.DevEUI,
-				ClaimAuthenticationCode: m.DeviceValidationCode,
-				VendorId:                m.VendorID[:],
-				ModelId:                 m.ModelID[:],
-				SerialNumber:            m.SerialNumber,
-				Proprietary:             m.Proprietary,
+		Data: &ttnpb.EntityOnboardingData_EndDeviceTempate{
+			EndDeviceTempate: &ttnpb.EndDeviceTemplate{
+				EndDevice: &ttnpb.EndDevice{
+					Ids: &ttnpb.EndDeviceIdentifiers{
+						DevEui:  &m.DevEUI,
+						JoinEui: &m.JoinEUI,
+					},
+					ClaimAuthenticationCode: &ttnpb.EndDeviceAuthenticationCode{
+						Value: m.DeviceValidationCode,
+					},
+					Attributes: attributes,
+				},
+				FieldMask: &pbtypes.FieldMask{
+					Paths: paths,
+				},
 			},
 		},
 	}

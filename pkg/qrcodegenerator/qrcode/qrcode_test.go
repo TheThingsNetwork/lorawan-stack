@@ -64,10 +64,16 @@ func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 
 			ed := data.GetEntityOnboardingData()
 			switch intf := ed.Data.(type) {
-			case *ttnpb.EntityOnboardingData_EndDeviceOnboardingData:
-				a.So(*intf.EndDeviceOnboardingData.JoinEui, should.Resemble, tc.ExpectedJoinEUI)
-				a.So(*intf.EndDeviceOnboardingData.DevEui, should.Resemble, tc.ExpectedDevEUI)
-				a.So(intf.EndDeviceOnboardingData.ClaimAuthenticationCode, should.Resemble, tc.ExpectedAuthenticationCode)
+			case *ttnpb.EntityOnboardingData_EndDeviceTempate:
+
+				endDevice := intf.EndDeviceTempate.GetEndDevice()
+				a.So(endDevice, should.NotBeEmpty)
+				ids := endDevice.GetIds()
+				a.So(ids, should.NotBeEmpty)
+				a.So(*ids.JoinEui, should.Resemble, tc.ExpectedJoinEUI)
+				a.So(*ids.DevEui, should.Resemble, tc.ExpectedDevEUI)
+				a.So(endDevice.ClaimAuthenticationCode, should.NotBeEmpty)
+				a.So(endDevice.ClaimAuthenticationCode.Value, should.Resemble, tc.ExpectedAuthenticationCode)
 			default:
 				t.Fatalf("Unexpected type %v", intf)
 			}

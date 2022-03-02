@@ -101,8 +101,8 @@ func (srv *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.ClaimE
 			if err != nil {
 				return nil, errParseQRCode.WithCause(err)
 			}
-			if onboardingData := data.EntityOnboardingData.GetEndDeviceOnboardingData(); onboardingData != nil && onboardingData.JoinEui != nil {
-				joinEUI = *onboardingData.JoinEui
+			if edTemplate := data.EntityOnboardingData.GetEndDeviceTempate(); edTemplate != nil && edTemplate.GetEndDevice().Ids != nil && edTemplate.GetEndDevice().Ids.JoinEui != nil {
+				joinEUI = *edTemplate.GetEndDevice().Ids.JoinEui
 			} else {
 				return nil, errQRCodeData.New()
 			}
