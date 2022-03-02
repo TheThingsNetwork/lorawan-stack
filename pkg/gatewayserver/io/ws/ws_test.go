@@ -812,7 +812,7 @@ func TestTraffic(t *testing.T) {
 	}
 
 	clock := mockClock{}
-	clock.Start(ctx, time.Now())
+	clock.Start(ctx, time.Now().UTC())
 
 	for _, tc := range []struct {
 		Name                    string
@@ -1121,7 +1121,7 @@ func TestTraffic(t *testing.T) {
 					}
 
 				case lbslns.UplinkDataFrame:
-					now := time.Now()
+					now := time.Unix(time.Now().UTC().Unix(), 0)
 					v.UpInfo.XTime = upXTime
 					v.UpInfo.RxTime = float64(now.Unix())
 					v.UpInfo.GPSTime = int64(gpstime.ToGPS(now) / time.Microsecond)
@@ -1155,7 +1155,7 @@ func TestTraffic(t *testing.T) {
 						t.Fatalf("Read message timeout")
 					}
 				case lbslns.JoinRequest:
-					now := time.Now()
+					now := time.Unix(time.Now().UTC().Unix(), 0)
 					v.UpInfo.XTime = upXTime
 					v.UpInfo.RxTime = float64(now.Unix())
 					v.UpInfo.GPSTime = int64(gpstime.ToGPS(now) / time.Microsecond)
@@ -1236,7 +1236,7 @@ func TestTraffic(t *testing.T) {
 				var (
 					downlinkPath *ttnpb.DownlinkPath
 					down         = tc.InputNetworkDownstream
-					now          = time.Now().UTC()
+					now          = time.Unix(time.Now().UTC().Unix(), 0)
 					dlTime       = now.Add(2 * time.Second)
 					timeStamp    = clock.GetTimestamp()
 					dlClass      = down.GetRequest().Class

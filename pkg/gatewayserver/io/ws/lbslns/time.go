@@ -22,6 +22,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gpstime"
 )
 
+const (
+	// XTime48BitLSBMask is the mask used to extract the lower 48 bits of the XTime.
+	XTime48BitLSBMask = 0xFFFFFFFFFFFF
+)
+
 // TimeFromUnixSeconds constructs a time.Time from the provided UNIX fractional timestamp.
 func TimeFromUnixSeconds(tf float64) time.Time {
 	sec, nsec := math.Modf(tf)
@@ -130,14 +135,14 @@ func TimePtrToUpInfoTime(t *time.Time) (float64, int64) {
 // Bytes 0-5 (6 bytes = 48 bits) are used for the timestamp.
 // Bytes 6-8 are returned unmodified to the gateway from the xtime read on the latest uplink.
 func ConcentratorTimeToXTime(id int32, t scheduling.ConcentratorTime) int64 {
-	return int64(id)<<48 | (int64(t) / int64(time.Microsecond) & 0xFFFFFFFFFFFF)
+	return int64(id)<<48 | (int64(t) / int64(time.Microsecond) & XTime48BitLSBMask)
 }
 
 // ConcentratorTimeFromXTime constructs the scheduling.ConcentratorTime associated
 // with the provided XTime.
 func ConcentratorTimeFromXTime(xTime int64) scheduling.ConcentratorTime {
 	// The Basic Station epoch is the 48 LSB.
-	return scheduling.ConcentratorTime(time.Duration(xTime&0xFFFFFFFFFFFF) * time.Microsecond)
+	return scheduling.ConcentratorTime(time.Duration(xTime&XTime48BitLSBMask) * time.Microsecond)
 }
 
 // TimestampFromXTime constructs the concentrator timestamp associated with the
