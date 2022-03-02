@@ -234,7 +234,7 @@ const GlossaryLink = ({ title, glossaryId, term, primary, secondary, className }
       path={`/reference/glossary#${glossaryId}`}
       title={hasTerm ? m.glossaryTitle : m.defaultGlossaryTitle}
       titleValues={hasTerm ? { term: formatTitle(term, undefined, formatMessage) } : undefined}
-      tabIndex="-1"
+      tabIndex={-1}
       external
     >
       <Message content={title} />

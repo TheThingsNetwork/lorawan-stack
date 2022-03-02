@@ -52,7 +52,6 @@ const m = defineMessages({
   loraCloudInfoText:
     'Lora Cloud provides value added APIs that enable simple solutions for common tasks related to LoRaWAN networks and LoRa-based devices. You can setup our LoRaCloud integrations below.',
   officialLoRaCloudDocumentation: 'Official LoRa Cloud documentation',
-  furtherResources: 'Further resources',
   setToken: 'Set LoRa Cloud token',
   dasDescription:
     'With the LoRa Cloud Device & Application Services protocol, you can manage common device functionality at the application layer for LoRaWAN-enabled devices.',
@@ -85,7 +84,7 @@ const LoRaCloud = () => {
                 <div>
                   <Message
                     component="h4"
-                    content={m.furtherResources}
+                    content={sharedMessages.furtherResources}
                     className={style.furtherResources}
                   />
                   <Link.DocLink

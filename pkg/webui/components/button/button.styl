@@ -33,7 +33,7 @@
     font-weight: $fw.bold
 
     &.disabled
-      background-color: $c-backdrop
+      background-color: $c-divider-dark
 
     &:not(.disabled)
       &:hover
@@ -113,10 +113,10 @@
       box-shadow: 0px 1px 1px #efefef, inset 0 1px 0 white
 
     &.disabled
-      border-input()
+      border-color: transparentify(#d3d3d3, #fff, .1)
 
       &:not(.busy)
-        color: transparentify($tc-deep-gray, #fff, .1)
+        color: transparentify($tc-deep-gray, #fff, .25)
 
     &:not(.disabled)
       &:hover
