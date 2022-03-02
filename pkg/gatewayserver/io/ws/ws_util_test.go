@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"math/rand"
 	"net"
 	"net/http"
 	"sync"
@@ -37,6 +38,38 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
+
+// mockClock is a mock gateway clock.
+// It rolls over every 32 bits, approximately every 72 minutes.
+type mockClock struct {
+	sessionID      uint16
+	startTimeStamp uint32
+	startTime      time.Time
+}
+
+// Start starts the gateway clock.
+func (c *mockClock) Start(ctx context.Context, now time.Time) {
+	// Set the clock to a random value on every start.
+	c.startTimeStamp = rand.Uint32()
+	c.sessionID = uint16(rand.Uint32())
+	c.startTime = now
+}
+
+// GetTimestamp returns the current timestamp.
+func (c *mockClock) GetTimestamp() uint32 {
+	return uint32(int64(c.startTimeStamp) + time.Since(c.startTime).Microseconds())
+}
+
+// GetXTime returns the timestamp in the LoRa Basics Station `xtime` format for the given time.
+func (c *mockClock) GetXTimeForTime(t time.Time) int64 {
+	ts := uint32(int64(c.startTimeStamp) + t.Sub(c.startTime).Microseconds())
+	return int64(c.sessionID)<<48 | int64(ts)&lbslns.XTime48BitLSBMask
+}
+
+// GetXTime returns the timestamp in the LoRa Basics Station `xtime` format for the given timestamp.
+func (c *mockClock) GetXTimeForTimestamp(ts uint32) int64 {
+	return int64(c.sessionID)<<48 | int64(ts)&lbslns.XTime48BitLSBMask
+}
 
 var testRights = []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO, ttnpb.Right_RIGHT_GATEWAY_LINK}
 

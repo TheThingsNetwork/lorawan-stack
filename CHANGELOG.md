@@ -41,6 +41,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Consistent ordering of entities with equal values for the sort field.
+- Fix `xtime` sent to LBS gateways for Class C downlinks.
 
 ### Security
 

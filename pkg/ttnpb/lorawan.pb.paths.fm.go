@@ -238,6 +238,7 @@ var DataRateFieldPathsTopLevel = []string{
 }
 var TxSettingsFieldPathsNested = []string{
 	"coding_rate",
+	"concentrator_timestamp",
 	"data_rate",
 	"data_rate.modulation",
 	"data_rate.modulation.fsk",
@@ -261,6 +262,7 @@ var TxSettingsFieldPathsNested = []string{
 
 var TxSettingsFieldPathsTopLevel = []string{
 	"coding_rate",
+	"concentrator_timestamp",
 	"data_rate",
 	"downlink",
 	"enable_crc",

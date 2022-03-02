@@ -1612,6 +1612,8 @@ func (m *TxSettings) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "concentrator_timestamp":
+			// no validation rules for ConcentratorTimestamp
 		default:
 			return TxSettingsValidationError{
 				field:  name,

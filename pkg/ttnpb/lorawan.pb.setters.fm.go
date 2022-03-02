@@ -1054,6 +1054,16 @@ func (dst *TxSettings) SetFields(src *TxSettings, paths ...string) error {
 					dst.Downlink = nil
 				}
 			}
+		case "concentrator_timestamp":
+			if len(subs) > 0 {
+				return fmt.Errorf("'concentrator_timestamp' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ConcentratorTimestamp = src.ConcentratorTimestamp
+			} else {
+				var zero int64
+				dst.ConcentratorTimestamp = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

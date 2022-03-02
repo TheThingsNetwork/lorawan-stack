@@ -62,8 +62,9 @@ var (
 
 	testTrafficEndPoint = "/traffic/eui-0101010101010101"
 
-	timeout       = (1 << 7) * test.Delay
-	defaultConfig = Config{
+	timeout             = (1 << 7) * test.Delay
+	trafficTestWaitTime = (1 << 7) * test.Delay
+	defaultConfig       = Config{
 		WSPingInterval:       (1 << 3) * test.Delay,
 		AllowUnauthenticated: true,
 		UseTrafficTLSAddress: false,
@@ -810,11 +811,13 @@ func TestTraffic(t *testing.T) {
 		t.Fatal("Connection timeout")
 	}
 
+	clock := mockClock{}
+	clock.Start(ctx, time.Now().UTC())
+
 	for _, tc := range []struct {
 		Name                    string
 		InputBSUpstream         interface{}
 		InputNetworkDownstream  *ttnpb.DownlinkMessage
-		InputDownlinkPath       *ttnpb.DownlinkPath
 		ExpectedBSDownstream    interface{}
 		ExpectedNetworkUpstream interface{}
 	}{
@@ -830,10 +833,8 @@ func TestTraffic(t *testing.T) {
 					DataRate:  1,
 					Frequency: 868300000,
 					UpInfo: lbslns.UpInfo{
-						RxTime: 1548059982,
-						XTime:  12666373963464220,
-						RSSI:   89,
-						SNR:    9.25,
+						RSSI: 89,
+						SNR:  9.25,
 					},
 				},
 			},
@@ -852,8 +853,6 @@ func TestTraffic(t *testing.T) {
 						GatewayId: "eui-0101010101010101",
 						Eui:       &types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01},
 					},
-					Time:        ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
-					Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
 					Rssi:        89,
 					ChannelRssi: 89,
 					Snr:         9.25,
@@ -861,8 +860,6 @@ func TestTraffic(t *testing.T) {
 				Settings: &ttnpb.TxSettings{
 					Frequency:  868300000,
 					CodingRate: "4/5",
-					Time:       ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
-					Timestamp:  (uint32)(12666373963464220 & 0xFFFFFFFF),
 					DataRate: &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
 						SpreadingFactor: 11,
 						Bandwidth:       125000,
@@ -886,7 +883,6 @@ func TestTraffic(t *testing.T) {
 					Frequency: 868300000,
 					UpInfo: lbslns.UpInfo{
 						RxTime: 1548059982,
-						XTime:  12666373963464220,
 						RSSI:   89,
 						SNR:    9.25,
 					},
@@ -974,18 +970,6 @@ func TestTraffic(t *testing.T) {
 				},
 				CorrelationIds: []string{"correlation1", "correlation2"},
 			},
-
-			InputDownlinkPath: &ttnpb.DownlinkPath{
-				Path: &ttnpb.DownlinkPath_UplinkToken{
-					UplinkToken: io.MustUplinkToken(
-						&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &registeredGatewayID},
-						1553759666,
-						1553759666000,
-						time.Unix(0, 1553759666*1000),
-						nil,
-					),
-				},
-			},
 			ExpectedBSDownstream: lbslns.DownlinkMessage{
 				DevEUI:      "00-00-00-00-00-00-00-01",
 				DeviceClass: 0,
@@ -994,7 +978,6 @@ func TestTraffic(t *testing.T) {
 				RxDelay:     1,
 				Rx1Freq:     868100000,
 				Rx1DR:       5,
-				XTime:       12666375505739186,
 				Priority:    25,
 				MuxTime:     1554300787.123456,
 			},
@@ -1061,12 +1044,57 @@ func TestTraffic(t *testing.T) {
 			},
 			ExpectedNetworkUpstream: ttnpb.TxAcknowledgment{},
 		},
+		{
+			Name: "AbsoluteTimeDownlink",
+			InputNetworkDownstream: &ttnpb.DownlinkMessage{
+				RawPayload: []byte("Ymxhamthc25kJ3M=="),
+				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
+					DeviceId: "testdevice",
+					DevEui:   eui64Ptr(types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}),
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{
+						ApplicationId: "testapp",
+					},
+				},
+				Settings: &ttnpb.DownlinkMessage_Request{
+					Request: &ttnpb.TxRequest{
+						Class:    ttnpb.Class_CLASS_C,
+						Priority: ttnpb.TxSchedulePriority_NORMAL,
+						Rx1Delay: ttnpb.RxDelay_RX_DELAY_1,
+						Rx1DataRate: &ttnpb.DataRate{
+							Modulation: &ttnpb.DataRate_Lora{
+								Lora: &ttnpb.LoRaDataRate{
+									SpreadingFactor: 7,
+									Bandwidth:       125000,
+								},
+							},
+						},
+						Rx1Frequency:    868100000,
+						FrequencyPlanId: test.EUFrequencyPlanID,
+					},
+				},
+				CorrelationIds: []string{"correlation1", "correlation2"},
+			},
+			ExpectedBSDownstream: lbslns.DownlinkMessage{
+				DevEUI:      "00-00-00-00-00-00-00-01",
+				DeviceClass: 0,
+				Pdu:         "596d7868616d74686332356b4a334d3d3d",
+				Diid:        2,
+				RxDelay:     1,
+				Rx1Freq:     868100000,
+				Rx1DR:       5,
+				Priority:    25,
+				MuxTime:     1554300787.123456,
+			},
+		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 			if tc.InputBSUpstream != nil {
+				timestamp := clock.GetTimestamp()
+				upXTime := clock.GetXTimeForTimestamp(timestamp)
 				switch v := tc.InputBSUpstream.(type) {
 				case lbslns.TxConfirmation:
+					v.XTime = upXTime
 					req, err := json.Marshal(v)
 					if err != nil {
 						panic(err)
@@ -1092,7 +1120,11 @@ func TestTraffic(t *testing.T) {
 						}
 					}
 
-				case lbslns.UplinkDataFrame, lbslns.JoinRequest:
+				case lbslns.UplinkDataFrame:
+					now := time.Unix(time.Now().UTC().Unix(), 0)
+					v.UpInfo.XTime = upXTime
+					v.UpInfo.RxTime = float64(now.Unix())
+					v.UpInfo.GPSTime = int64(gpstime.ToGPS(now) / time.Microsecond)
 					req, err := json.Marshal(v)
 					if err != nil {
 						panic(err)
@@ -1112,6 +1144,46 @@ func TestTraffic(t *testing.T) {
 						up.Message.RawPayload = nil
 						up.Message.RxMetadata[0].UplinkToken = nil
 						expectedUp := tc.ExpectedNetworkUpstream.(ttnpb.UplinkMessage)
+
+						// Set the correct xtime and timestamps for the assertion.
+						expectedUp.RxMetadata[0].Timestamp = timestamp
+						expectedUp.RxMetadata[0].Time = ttnpb.ProtoTime(&now)
+						expectedUp.Settings.Timestamp = timestamp
+						expectedUp.Settings.Time = ttnpb.ProtoTime(&now)
+						a.So(up.Message, should.Resemble, &expectedUp)
+					case <-time.After(timeout):
+						t.Fatalf("Read message timeout")
+					}
+				case lbslns.JoinRequest:
+					now := time.Unix(time.Now().UTC().Unix(), 0)
+					v.UpInfo.XTime = upXTime
+					v.UpInfo.RxTime = float64(now.Unix())
+					v.UpInfo.GPSTime = int64(gpstime.ToGPS(now) / time.Microsecond)
+					req, err := json.Marshal(v)
+					if err != nil {
+						panic(err)
+					}
+					if err := wsConn.WriteMessage(websocket.TextMessage, req); err != nil {
+						t.Fatalf("Failed to write message: %v", err)
+					}
+					select {
+					case up := <-gsConn.Up():
+						a.So(time.Since(*ttnpb.StdTime(up.Message.ReceivedAt)), should.BeLessThan, timeout)
+						up.Message.ReceivedAt = nil
+						var payload ttnpb.Message
+						a.So(lorawan.UnmarshalMessage(up.Message.RawPayload, &payload), should.BeNil)
+						if !a.So(&payload, should.Resemble, up.Message.Payload) {
+							t.Fatalf("Invalid RawPayload: %v", up.Message.RawPayload)
+						}
+						up.Message.RawPayload = nil
+						up.Message.RxMetadata[0].UplinkToken = nil
+						expectedUp := tc.ExpectedNetworkUpstream.(ttnpb.UplinkMessage)
+
+						// Set the correct xtime and timestamps for the assertion.
+						expectedUp.RxMetadata[0].Timestamp = timestamp
+						expectedUp.RxMetadata[0].Time = ttnpb.ProtoTime(&now)
+						expectedUp.Settings.Timestamp = timestamp
+						expectedUp.Settings.Time = ttnpb.ProtoTime(&now)
 						a.So(up.Message, should.Resemble, &expectedUp)
 					case <-time.After(timeout):
 						t.Fatalf("Read message timeout")
@@ -1161,7 +1233,39 @@ func TestTraffic(t *testing.T) {
 			}
 
 			if tc.InputNetworkDownstream != nil {
-				if _, _, _, err := gsConn.ScheduleDown(tc.InputDownlinkPath, tc.InputNetworkDownstream); err != nil {
+				var (
+					downlinkPath *ttnpb.DownlinkPath
+					down         = tc.InputNetworkDownstream
+					now          = time.Unix(time.Now().UTC().Unix(), 0)
+					dlTime       = now.Add(2 * time.Second)
+					timeStamp    = clock.GetTimestamp()
+					dlClass      = down.GetRequest().Class
+				)
+				if dlClass == ttnpb.Class_CLASS_A {
+					downlinkPath = &ttnpb.DownlinkPath{
+						Path: &ttnpb.DownlinkPath_UplinkToken{
+							UplinkToken: io.MustUplinkToken(
+								&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &registeredGatewayID},
+								timeStamp,
+								0,
+								now,
+								nil,
+							),
+						},
+					}
+				} else {
+					downlinkPath = &ttnpb.DownlinkPath{
+						Path: &ttnpb.DownlinkPath_Fixed{
+							Fixed: &ttnpb.GatewayAntennaIdentifiers{
+								GatewayIds: &registeredGatewayID,
+							},
+						},
+					}
+					request := down.GetRequest()
+					request.AbsoluteTime = ttnpb.ProtoTimePtr(dlTime)
+				}
+
+				if _, _, _, err := gsConn.ScheduleDown(downlinkPath, down); err != nil {
 					t.Fatalf("Failed to send downlink: %v", err)
 				}
 
@@ -1186,8 +1290,25 @@ func TestTraffic(t *testing.T) {
 						if err := json.Unmarshal(res, &msg); err != nil {
 							t.Fatalf("Failed to unmarshal response `%s`: %v", string(res), err)
 						}
-						msg.MuxTime = tc.ExpectedBSDownstream.(lbslns.DownlinkMessage).MuxTime
-						if !a.So(msg, should.Resemble, tc.ExpectedBSDownstream.(lbslns.DownlinkMessage)) {
+						expected := tc.ExpectedBSDownstream.(lbslns.DownlinkMessage)
+						msg.MuxTime = expected.MuxTime
+						if dlClass == ttnpb.Class_CLASS_A {
+							expected.XTime = clock.GetXTimeForTimestamp(timeStamp)
+						} else {
+							expected.XTime = clock.GetXTimeForTime(dlTime)
+							diff := expected.XTime - msg.XTime
+							// The expected difference in XTime is the sum of the following values
+							// 1. Rx1Delay field of the downlink; hardcoded to 1 second.
+							// 2. TOA offset for the payload and the frequency plan used; 51456 microseconds.
+							// Note: If the payload or the frequency plan is changed in the test, adjust the TOA value.
+							expectedDiff := 1*time.Second + 51456*time.Microsecond
+
+							if !a.So(diff, should.BeGreaterThanOrEqualTo, 0) && !a.So(diff, should.BeBetween, (expectedDiff-5*time.Microsecond), (expectedDiff+5*time.Microsecond)) {
+								t.Fatalf("Downlink xtime has larger deviation than expected: %d", diff-int64(expectedDiff))
+							}
+							msg.XTime = expected.XTime
+						}
+						if !a.So(msg, should.Resemble, expected) {
 							t.Fatalf("Incorrect Downlink received: %s", string(res))
 						}
 					}
@@ -1199,6 +1320,7 @@ func TestTraffic(t *testing.T) {
 					t.Fatalf("Failed to read message: %v", readErr)
 				}
 			}
+			time.Sleep(trafficTestWaitTime)
 		})
 	}
 }

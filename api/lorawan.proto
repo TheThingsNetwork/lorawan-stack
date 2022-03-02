@@ -315,6 +315,10 @@ message TxSettings {
   google.protobuf.Timestamp time = 7;
   // Transmission settings for downlink.
   Downlink downlink = 8;
+  // Concentrator timestamp for the downlink as calculated by the Gateway Server scheduler.
+  // This value takes into account necessary offsets such as the RTT (Round Trip Time) and TOA (Time Of Arrival).
+  // This field is set and used only by the Gateway Server.
+  int64 concentrator_timestamp = 9;
 }
 
 message GatewayAntennaIdentifiers {
