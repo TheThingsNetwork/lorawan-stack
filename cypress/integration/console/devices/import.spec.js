@@ -86,7 +86,7 @@ describe('End device messaging', () => {
   it('succeeds setting lorawan_version, lorawan_phy_version and frequency_plan_id from fallback values', () => {
     const devicesFile = 'freqId-version-phy-device.json'
     const fallbackValues = {
-      lorawan_version: 'MAC V1.0',
+      lorawan_version: 'MAC_V1_0',
       frequency_plan_id: '863-870 MHz',
     }
     cy.findByLabelText('File format').selectOption('The Things Stack JSON')
@@ -116,10 +116,8 @@ describe('End device messaging', () => {
       .closest('[data-test-id="collapsible-section"]')
       .within(() => {
         cy.findByRole('button', { name: 'Expand' }).click()
-        cy.findByLabelText('Frequency plan').should('be.visible')
-        cy.findByText(/863-870 MHz/).should('be.visible')
-        cy.findByLabelText('LoRaWAN version').should('be.visible')
-        cy.findByText(fallbackValues.lorawan_version).should('be.visible')
+        cy.findByText('Europe 863-870 MHz (SF12 for RX2)').should('be.visible')
+        cy.findByText('LoRaWAN Specification 1.0.0').should('be.visible')
       })
     cy.visit(
       `${Cypress.config(
@@ -130,10 +128,8 @@ describe('End device messaging', () => {
       .closest('[data-test-id="collapsible-section"]')
       .within(() => {
         cy.findByRole('button', { name: 'Expand' }).click()
-        cy.findByLabelText('Frequency plan').should('be.visible')
-        cy.findByText('Europe 863-870 MHz (SF12 for RX2)').should('not.exist')
-        cy.findByLabelText('LoRaWAN version').should('be.visible')
-        cy.findByText(fallbackValues.lorawan_version).should('not.exist')
+        cy.findByText('Europe 863-870 MHz (SF9 for RX2 - recommended)').should('be.visible')
+        cy.findByText('LoRaWAN Specification 1.0.3').should('be.visible')
       })
   })
 
