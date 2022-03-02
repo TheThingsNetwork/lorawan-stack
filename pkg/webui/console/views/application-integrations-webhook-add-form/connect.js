@@ -14,11 +14,6 @@
 
 import { connect } from 'react-redux'
 
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-
-import { getWebhookTemplate } from '@console/store/actions/webhook-templates'
-import { getWebhook } from '@console/store/actions/webhooks'
-
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 import { selectWebhookTemplateById } from '@console/store/selectors/webhook-templates'
 
@@ -34,11 +29,4 @@ const mapStateToProps = (state, props) => {
   }
 }
 
-const mapDispatchToProps = dispatch => ({
-  getWebhookTemplate: (templateId, selector) => dispatch(getWebhookTemplate(templateId, selector)),
-  getWebhook: (appId, webhookId, selector) =>
-    dispatch(attachPromise(getWebhook(appId, webhookId, selector))),
-})
-
-export default ApplicationWebhookAddForm =>
-  connect(mapStateToProps, mapDispatchToProps)(ApplicationWebhookAddForm)
+export default ApplicationWebhookAddForm => connect(mapStateToProps)(ApplicationWebhookAddForm)

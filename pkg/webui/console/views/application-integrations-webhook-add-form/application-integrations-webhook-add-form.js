@@ -24,7 +24,6 @@ import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
 import WebhookAdd from '@console/containers/webhook-add'
 
-import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -35,7 +34,7 @@ const m = defineMessages({
 })
 
 const ApplicationWebhookAddForm = props => {
-  const { templateId, isCustom, webhookTemplate, appId, getWebhook } = props
+  const { templateId, isCustom, webhookTemplate, appId } = props
 
   let breadcrumbContent = m.customWebhook
   if (!templateId) {
@@ -64,22 +63,6 @@ const ApplicationWebhookAddForm = props => {
     }
   }
 
-  const existCheck = React.useCallback(
-    async webhookId => {
-      try {
-        await getWebhook(appId, webhookId, [])
-        return true
-      } catch (error) {
-        if (isNotFoundError(error)) {
-          return false
-        }
-
-        throw error
-      }
-    },
-    [appId, getWebhook],
-  )
-
   // Render Not Found error when the template was not found.
   if (!isCustom && templateId && !webhookTemplate) {
     return <NotFoundRoute />
@@ -90,13 +73,7 @@ const ApplicationWebhookAddForm = props => {
       <PageTitle title={pageTitle} />
       <Row>
         <Col lg={8} md={12}>
-          <WebhookAdd
-            appId={appId}
-            existCheck={existCheck}
-            isCustom={isCustom}
-            templateId={templateId}
-            webhookTemplate={webhookTemplate}
-          />
+          <WebhookAdd appId={appId} templateId={templateId} webhookTemplate={webhookTemplate} />
         </Col>
       </Row>
     </Container>
@@ -105,7 +82,6 @@ const ApplicationWebhookAddForm = props => {
 
 ApplicationWebhookAddForm.propTypes = {
   appId: PropTypes.string.isRequired,
-  getWebhook: PropTypes.func.isRequired,
   isCustom: PropTypes.bool.isRequired,
   templateId: PropTypes.string,
   webhookTemplate: PropTypes.webhookTemplate,

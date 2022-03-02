@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import urlTemplate from 'url-template'
 import WebhookForm from '@console/components/webhook-form'
 import WebhookTemplateForm from '@console/components/webhook-template-form'
 
+import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 const pathExpand = (url, fields) =>
@@ -30,10 +31,14 @@ export default class WebhookAdd extends Component {
     createApplicationApiKey: PropTypes.func.isRequired,
     createWebhook: PropTypes.func.isRequired,
     existCheck: PropTypes.func.isRequired,
-    isCustom: PropTypes.bool.isRequired,
+    getWebhook: PropTypes.func.isRequired,
     navigateToList: PropTypes.func.isRequired,
     templateId: PropTypes.string.isRequired,
-    webhookTemplate: PropTypes.webhookTemplate.isRequired,
+    webhookTemplate: PropTypes.webhookTemplate,
+  }
+
+  static defaultProps = {
+    webhookTemplate: undefined,
   }
 
   modalResolve = () => null
@@ -93,6 +98,22 @@ export default class WebhookAdd extends Component {
   }
 
   @bind
+  async existCheck(webhookId) {
+    const { appId, getWebhook } = this.props
+
+    try {
+      await getWebhook(appId, webhookId, [])
+      return true
+    } catch (error) {
+      if (isNotFoundError(error)) {
+        return false
+      }
+
+      throw error
+    }
+  }
+
+  @bind
   async handleSubmit(webhook) {
     const { appId, createWebhook } = this.props
 
@@ -143,9 +164,9 @@ export default class WebhookAdd extends Component {
   }
 
   render() {
-    const { appId, templateId, webhookTemplate, existCheck, isCustom } = this.props
+    const { appId, templateId, webhookTemplate, existCheck } = this.props
 
-    if (isCustom) {
+    if (Boolean(webhookTemplate)) {
       return (
         <WebhookForm
           update={false}
