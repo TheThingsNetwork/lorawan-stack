@@ -1,16 +1,13 @@
 [
   {
     "ids": {
-      "device_id": "migration-test-device",
-      "dev_eui": "008BFC3FD4445B19",
-      "join_eui": "70B3D57ED0042F52"
+      "device_id": "no-fallback-test-device",
+      "dev_eui": "008BFC3FD4445B23",
+      "join_eui": "70B3D57ED0042F43"
     },
     "created_at": "0001-01-01T00:00:00Z",
     "updated_at": "0001-01-01T00:00:00Z",
-    "name": "Test Device",
-    "lorawan_version": "MAC_V1_0_2",
-    "lorawan_phy_version": "PHY_V1_0_2_REV_B",
-    "frequency_plan_id": "EU_863_870_TTN",
+    "name": "migration-test-device",
     "supports_join": true,
     "root_keys": {
       "app_key": {
@@ -165,9 +162,9 @@
   },
   {
     "ids": {
-      "device_id": "some-nice-id",
-      "dev_eui": "008BFC3FD4445B10",
-      "join_eui": "70B3D57ED0042F53"
+      "device_id": "no-fallback-test-nice-id",
+      "dev_eui": "008BFC3FD4445B24",
+      "join_eui": "70B3D57ED0042F45"
     },
     "name": "LoRa Device",
     "lorawan_version": "MAC_V1_0_3",
@@ -198,9 +195,9 @@
   },
   {
     "ids": {
-      "device_id": "this-is-test-id",
-      "dev_eui": "0000000000000001",
-      "join_eui": "0000000000000000"
+      "device_id": "this-is-no-fallback-test-id",
+      "dev_eui": "0000000000000010",
+      "join_eui": "0000000000000011"
     },
     "name": "Test Device",
     "lorawan_version": "MAC_V1_0_3",

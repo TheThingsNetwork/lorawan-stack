@@ -55,9 +55,9 @@ describe('End device messaging', () => {
       `${Cypress.config('consoleRootPath')}/applications/${appId}/devices`,
     )
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByRole('rowgroup').within(() => {
-      cy.findAllByRole('row').should('have.length', 3)
-    })
+    cy.findByText('migration-test-device').should('be.visible')
+    cy.findByText('some-nice-id').should('be.visible')
+    cy.findByText('this-is-test-id').should('be.visible')
   })
 
   it('fails adding devices with existant ids', () => {
@@ -78,6 +78,77 @@ describe('End device messaging', () => {
       .within(() => {
         cy.findByText(/ID already taken/).should('be.visible')
         cy.findByText(/an end device with/, /is already registered/).should('be.visible')
+      })
+    cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices`)
+    cy.findByText('some-fail-id').should('not.exist')
+  })
+
+  it('succeeds setting lorawan_version, lorawan_phy_version and frequency_plan_id from fallback values', () => {
+    const devicesFile = 'freqId-version-phy-device.json'
+    const fallbackValues = {
+      lorawan_version: 'MAC_V1_0',
+      frequency_plan_id: '863-870 MHz',
+    }
+    cy.findByLabelText('File format').selectOption('The Things Stack JSON')
+    cy.findByLabelText('File').attachFile(devicesFile)
+    cy.findByLabelText('Frequency plan').selectOption(fallbackValues.frequency_plan_id)
+    cy.findByLabelText('LoRaWAN version').selectOption(fallbackValues.lorawan_version)
+
+    cy.findByRole('button', { name: 'Import end devices' }).click()
+    cy.findByText('Operation finished').should('be.visible')
+    cy.findByText('3 of 3 (100.00% finished)').should('be.visible')
+    cy.findByTestId('notification')
+      .findByText('All end devices imported successfully')
+      .should('be.visible')
+    cy.findByRole('button', { name: 'Proceed to end device list' }).click()
+    cy.location('pathname').should(
+      'eq',
+      `${Cypress.config('consoleRootPath')}/applications/${appId}/devices`,
+    )
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.visit(
+      `${Cypress.config(
+        'consoleRootPath',
+      )}/applications/${appId}/devices/fallback-test-device/general-settings`,
+    )
+
+    cy.findByText('Network layer', { selector: 'h3' })
+      .closest('[data-test-id="collapsible-section"]')
+      .within(() => {
+        cy.findByRole('button', { name: 'Expand' }).click()
+        cy.findByText('Europe 863-870 MHz (SF12 for RX2)').should('be.visible')
+        cy.findByText('LoRaWAN Specification 1.0.0').should('be.visible')
+      })
+    cy.visit(
+      `${Cypress.config(
+        'consoleRootPath',
+      )}/applications/${appId}/devices/fallback-test-nice-id/general-settings`,
+    )
+    cy.findByText('Network layer', { selector: 'h3' })
+      .closest('[data-test-id="collapsible-section"]')
+      .within(() => {
+        cy.findByRole('button', { name: 'Expand' }).click()
+        cy.findByText('Europe 863-870 MHz (SF9 for RX2 - recommended)').should('be.visible')
+        cy.findByText('LoRaWAN Specification 1.0.3').should('be.visible')
+      })
+  })
+
+  it('fails importing device without lorawan_version, lorawan_phy_version and frequency_plan_id', () => {
+    const devicesFile = 'no-freqId-version-phy-device.json'
+    cy.findByLabelText('File format').selectOption('The Things Stack JSON')
+    cy.findByLabelText('File').attachFile(devicesFile)
+    cy.findByRole('button', { name: 'Import end devices' }).click()
+    cy.findByText('Operation finished').should('be.visible')
+    cy.findByText('3 of 3 (100.00% finished)').should('be.visible')
+    cy.findByText('Successfully converted 2 of 3 end devices').should('be.visible')
+    cy.findByTestId('notification')
+      .findByText('Not all devices imported successfully')
+      .should('be.visible')
+    cy.findByText('The registration of the following end device failed:')
+      .should('be.visible')
+      .closest('div')
+      .within(() => {
+        cy.findByText('frequency plan `` not found').should('be.visible')
       })
   })
 })

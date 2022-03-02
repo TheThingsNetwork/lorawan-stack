@@ -53,6 +53,7 @@ For details about compatibility between different releases, see the **Commitment
   - This requires a database migration (`ttn-lw-stack js-db migrate`).
 - Add TTL for gateway connection stats. Can be configured with the option `gs.connection-stats-ttl`.
 - Add `query` field to search requests, allowing to search for a string in any of ID, Name, Description and EUI (for entities that have EUIs).
+- Added fallback values for end device import in the Console.
 
 ### Changed
 

@@ -215,7 +215,14 @@ export default class DeviceImporter extends Component {
   @bind
   async handleSubmit(values) {
     const { appId, jsConfig, nsConfig, asConfig } = this.props
-    const { format_id, data, set_claim_auth_code } = values
+    const {
+      format_id,
+      data,
+      set_claim_auth_code,
+      frequency_plan_id,
+      lorawan_version,
+      lorawan_phy_version,
+    } = values
 
     let devices = []
 
@@ -242,7 +249,6 @@ export default class DeviceImporter extends Component {
       }
 
       await this.setState({ convertedDevices: devices })
-
       // Apply default values.
       for (const deviceAndFieldMask of devices) {
         const { end_device: device, field_mask } = deviceAndFieldMask
@@ -261,6 +267,18 @@ export default class DeviceImporter extends Component {
         if (!device.network_server_address && nsConfig.enabled) {
           device.network_server_address = new URL(nsConfig.base_url).hostname
           field_mask.paths.push('network_server_address')
+        }
+        if (!device.frequency_plan_id && frequency_plan_id !== undefined) {
+          device.frequency_plan_id = frequency_plan_id
+          field_mask.paths.push('frequency_plan_id')
+        }
+        if (!device.lorawan_version && lorawan_version !== undefined) {
+          device.lorawan_version = lorawan_version
+          field_mask.paths.push('lorawan_version')
+        }
+        if (!device.lorawan_phy_version && lorawan_phy_version !== undefined) {
+          device.lorawan_phy_version = lorawan_phy_version
+          field_mask.paths.push('lorawan_phy_version')
         }
       }
     } catch (error) {
