@@ -162,11 +162,15 @@ export default class WebhookAdd extends Component {
   render() {
     const { appId, templateId, webhookTemplate } = this.props
 
-    if (Boolean(webhookTemplate)) {
+    if (!Boolean(webhookTemplate)) {
       return (
         <WebhookForm
+          update={false}
           onSubmit={this.handleWebhookSubmit}
           handleReplaceModalDecision={this.handleReplaceModalDecision}
+          displayOverwriteModal={this.state.displayOverwriteModal}
+          existingId={this.state.existingId}
+          error={this.state.error}
         />
       )
     }
@@ -179,6 +183,9 @@ export default class WebhookAdd extends Component {
         webhookTemplate={webhookTemplate}
         handleReplaceModalDecision={this.handleReplaceModalDecision}
         convertTemplateToWebhook={this.convertTemplateToWebhook}
+        displayOverwriteModal={this.state.displayOverwriteModal}
+        existingId={this.state.existingId}
+        error={this.state.error}
       />
     )
   }

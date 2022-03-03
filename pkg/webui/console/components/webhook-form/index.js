@@ -205,7 +205,10 @@ const validationSchema = Yup.object().shape({
 
 export default class WebhookForm extends Component {
   static propTypes = {
-    handleReplaceModalDecision: PropTypes.func.isRequired,
+    displayOverwriteModal: PropTypes.bool,
+    error: PropTypes.string,
+    existingId: PropTypes.string,
+    handleReplaceModalDecision: PropTypes.func,
     healthStatusEnabled: PropTypes.bool,
     initialWebhookValue: PropTypes.shape({
       ids: PropTypes.shape({
@@ -237,6 +240,10 @@ export default class WebhookForm extends Component {
     onDelete: () => null,
     webhookTemplate: undefined,
     healthStatusEnabled: false,
+    error: undefined,
+    existingId: undefined,
+    displayOverwriteModal: false,
+    handleReplaceModalDecision: () => null,
   }
 
   form = React.createRef()
@@ -246,9 +253,6 @@ export default class WebhookForm extends Component {
     const { initialWebhookValue } = this.props
 
     this.state = {
-      error: undefined,
-      displayOverwriteModal: false,
-      existingId: undefined,
       shouldShowCredentialsInput: Boolean(
         initialWebhookValue?.headers?.Authorization?.startsWith('Basic '),
       ),
@@ -256,11 +260,11 @@ export default class WebhookForm extends Component {
   }
 
   @bind
-  async handleSubmit(values) {
-    const { onSubmit, update } = this.props
+  async handleSubmit(values, { setSubmitting, resetForm }) {
+    const { onSubmit } = this.props
     const castedWebhookValues = validationSchema.cast(values)
     const encodedValues = encodeValues(castedWebhookValues)
-    await onSubmit(castedWebhookValues, encodedValues)
+    await onSubmit(castedWebhookValues, encodedValues, { setSubmitting, resetForm })
   }
 
   @bind
@@ -314,8 +318,10 @@ export default class WebhookForm extends Component {
       webhookTemplate,
       healthStatusEnabled,
       handleReplaceModalDecision,
+      displayOverwriteModal,
+      existingId,
+      error,
     } = this.props
-    const { error, displayOverwriteModal, existingId } = this.state
     let initialValues = blankValues
     if (update && initialWebhookValue) {
       initialValues = decodeValues({ ...blankValues, ...initialWebhookValue })

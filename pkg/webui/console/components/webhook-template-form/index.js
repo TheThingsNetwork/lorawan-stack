@@ -14,6 +14,7 @@
 
 import React, { Component } from 'react'
 import { defineMessages } from 'react-intl'
+import bind from 'autobind-decorator'
 
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
@@ -27,7 +28,6 @@ import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { id as webhookIdRegexp } from '@ttn-lw/lib/regexp'
-import { bind } from 'lodash'
 
 const m = defineMessages({
   createTemplate: 'Create {template} webhook',
@@ -38,29 +38,38 @@ const m = defineMessages({
 export default class WebhookTemplateForm extends Component {
   static propTypes = {
     convertTemplateToWebhook: PropTypes.func.isRequired,
+    displayOverwriteModal: PropTypes.bool.isRequired,
+    error: PropTypes.string,
+    existingId: PropTypes.string,
     handleReplaceModalDecision: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     templateId: PropTypes.string.isRequired,
     webhookTemplate: PropTypes.webhookTemplate.isRequired,
   }
 
-  state = {
+  static defaultProps = {
     error: undefined,
-    displayOverwriteModal: false,
     existingId: undefined,
   }
 
   @bind
-  async handleSubmit(values) {
+  async handleSubmit(values, { setSubmitting, resetForm }) {
     const { onSubmit, convertTemplateToWebhook } = this.props
     const webhook = await convertTemplateToWebhook(values)
-    await onSubmit(values, webhook)
+    await onSubmit(values, webhook, { setSubmitting, resetForm })
   }
 
   render() {
-    const { templateId, webhookTemplate, handleReplaceModalDecision, onSubmit } = this.props
+    const {
+      templateId,
+      webhookTemplate,
+      handleReplaceModalDecision,
+      displayOverwriteModal,
+      existingId,
+      error,
+    } = this.props
     const { name, fields = [] } = webhookTemplate
-    const { error, displayOverwriteModal, existingId } = this.state
+
     const validationSchema = Yup.object({
       ...fields.reduce(
         (acc, field) => ({
@@ -100,7 +109,7 @@ export default class WebhookTemplateForm extends Component {
         />
         <WebhookTemplateInfo webhookTemplate={webhookTemplate} />
         <Form
-          onSubmit={onSubmit}
+          onSubmit={this.handleSubmit}
           validationSchema={validationSchema}
           initialValues={initialValues}
           error={error}
