@@ -82,6 +82,7 @@ describe('Payload formatters', () => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
     cy.createApplication(application, userId)
+    cy.setApplicationPayloadFormatter(applicationId)
     cy.createMockDeviceAllComponents(applicationId, undefined, { ns, is }).then(body => {
       endDeviceId = body.end_device.ids.device_id
     })
@@ -460,7 +461,7 @@ describe('Payload formatters', () => {
         cy.visit(
           `${Cypress.config(
             'consoleRootPath',
-          )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/uplink`,
+          )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/downlink`,
         )
 
         cy.findByLabelText('Formatter type').selectOption('javascript')
@@ -474,7 +475,7 @@ describe('Payload formatters', () => {
         cy.visit(
           `${Cypress.config(
             'consoleRootPath',
-          )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/uplink`,
+          )}/applications/${applicationId}/devices/${endDeviceId}/payload-formatters/downlink`,
         )
 
         cy.findByTestId('code-editor-javascript-formatter').should('be.visible')

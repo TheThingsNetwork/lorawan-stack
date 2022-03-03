@@ -63,6 +63,8 @@ const m = defineMessages({
   learnMoreAboutDeviceRepo: 'What is the Device Repository formatter option?',
   learnMoreAboutPayloadFormatters: 'Learn more about payload formatters',
   learnMoreAboutCayenne: 'What is CayenneLPP?',
+  noRepositoryWarning:
+    'The application formatter is set to `Repository` but this device does not have an associated formatter in the LoRaWAN Device repository. Messages for this end device will hence not be formatted.',
 })
 
 const FIELD_NAMES = {
@@ -294,6 +296,9 @@ class PayloadFormattersForm extends React.Component {
         </Link.DocLink>
       )
     } else if (showRepositoryParameter) {
+      if (!hasRepoFormatter) {
+        return <Notification warning content={m.noRepositoryWarning} small />
+      }
       return (
         <>
           <Form.Field
@@ -385,9 +390,7 @@ class PayloadFormattersForm extends React.Component {
                 component={Select}
                 options={options}
                 onChange={this.onTypeChange}
-                warning={
-                  type === TYPES.DEFAULT || type === TYPES.NONE ? m.appFormatterWarning : undefined
-                }
+                warning={type === TYPES.DEFAULT ? m.appFormatterWarning : undefined}
                 inputWidth="m"
                 required
               />

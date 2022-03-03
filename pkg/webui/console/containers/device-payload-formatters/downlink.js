@@ -60,11 +60,10 @@ import { selectDeviceRepoPayloadFromatters } from '@console/store/selectors/devi
       repositoryPayloadFormatters: selectDeviceRepoPayloadFromatters(state),
     }
   },
-  dispatch => ({
+  {
     updateDevice: attachPromise(updateDevice),
-    getRepositoryPayloadFormatters: (appId, versionIds) =>
-      dispatch(getRepositoryPayloadFormatters(appId, versionIds)),
-  }),
+    getRepositoryPayloadFormatters,
+  },
 )
 @withRequest(({ appId, device, getRepositoryPayloadFormatters }) =>
   getRepositoryPayloadFormatters(appId, device.version_ids),
