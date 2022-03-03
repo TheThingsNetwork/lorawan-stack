@@ -24,6 +24,7 @@ import (
 	"regexp"
 	"runtime/debug"
 	"runtime/trace"
+	"strconv"
 	"strings"
 	"time"
 
@@ -207,6 +208,23 @@ func Open(ctx context.Context, dsn string) (*gorm.DB, error) {
 		db = db.Set("db:kind", "CockroachDB")
 	case strings.Contains(dbVersion, "PostgreSQL"):
 		db = db.Set("db:kind", "PostgreSQL")
+	}
+	err = db.Raw("SHOW server_version").Row().Scan(&dbVersion)
+	if err != nil {
+		return nil, err
+	}
+	switch majorMinorPatch := strings.SplitN(dbVersion, ".", 3); len(majorMinorPatch) {
+	case 3:
+		patch, _ := strconv.Atoi(majorMinorPatch[2])
+		db = db.Set("db:version:patch", patch)
+		fallthrough
+	case 2:
+		minor, _ := strconv.Atoi(majorMinorPatch[1])
+		db = db.Set("db:version:minor", minor)
+		fallthrough
+	case 1:
+		major, _ := strconv.Atoi(majorMinorPatch[0])
+		db = db.Set("db:version:major", major)
 	}
 	SetLogger(db, log.FromContext(ctx))
 	return db, nil

@@ -44,7 +44,10 @@ func likePattern(v string) string { return "%" + v + "%" }
 
 func ftsQuery(query *gorm.DB, field string) string {
 	if dbKind, ok := query.Get("db:kind"); ok && dbKind == "PostgreSQL" {
-		return fmt.Sprintf("to_tsvector('english', %s) @@ websearch_to_tsquery('english', ?)", field)
+		if dbMajor, ok := query.Get("db:version:major"); ok && dbMajor.(int) >= 11 {
+			return fmt.Sprintf("to_tsvector('english', %s) @@ websearch_to_tsquery('english', ?)", field)
+		}
+		return fmt.Sprintf("to_tsvector('english', %s) @@ to_tsquery('english', ?)", field)
 	}
 	return fmt.Sprintf("%s ILIKE '%%' || ? || '%%'", field)
 }
