@@ -24,7 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-// QRCode represents oboarding data from QR Code.
+// QRCode is a QR Code used for entity onboarding.
 type QRCode struct {
 	endDeviceFormats   map[string]EndDeviceFormat
 	endDeviceFormatsMu sync.RWMutex

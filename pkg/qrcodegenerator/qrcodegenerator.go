@@ -76,7 +76,7 @@ func (qrg *QRCodeGenerator) Context() context.Context {
 	return qrg.ctx
 }
 
-// RegisterEndDeviceFormat registers a new end device format.
+// RegisterEndDeviceFormat registers a new EndDeviceFormat.
 func (qrg *QRCodeGenerator) RegisterEndDeviceFormat(id string, f qrcode.EndDeviceFormat) {
 	qrg.qrCode.RegisterEndDeviceFormat(id, f)
 }
