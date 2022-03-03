@@ -27,6 +27,7 @@ import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { id as webhookIdRegexp } from '@ttn-lw/lib/regexp'
+import { bind } from 'lodash'
 
 const m = defineMessages({
   createTemplate: 'Create {template} webhook',
@@ -36,6 +37,7 @@ const m = defineMessages({
 
 export default class WebhookTemplateForm extends Component {
   static propTypes = {
+    convertTemplateToWebhook: PropTypes.func.isRequired,
     handleReplaceModalDecision: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     templateId: PropTypes.string.isRequired,
@@ -48,8 +50,15 @@ export default class WebhookTemplateForm extends Component {
     existingId: undefined,
   }
 
+  @bind
+  async handleSubmit(values) {
+    const { onSubmit, convertTemplateToWebhook } = this.props
+    const webhook = await convertTemplateToWebhook(values)
+    await onSubmit(values, webhook)
+  }
+
   render() {
-    const { templateId, webhookTemplate, onSubmit, handleReplaceModalDecision } = this.props
+    const { templateId, webhookTemplate, handleReplaceModalDecision, onSubmit } = this.props
     const { name, fields = [] } = webhookTemplate
     const { error, displayOverwriteModal, existingId } = this.state
     const validationSchema = Yup.object({

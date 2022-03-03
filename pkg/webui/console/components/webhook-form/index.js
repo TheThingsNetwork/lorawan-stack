@@ -205,7 +205,6 @@ const validationSchema = Yup.object().shape({
 
 export default class WebhookForm extends Component {
   static propTypes = {
-    existCheck: PropTypes.func,
     handleReplaceModalDecision: PropTypes.func.isRequired,
     healthStatusEnabled: PropTypes.bool,
     initialWebhookValue: PropTypes.shape({
@@ -225,8 +224,6 @@ export default class WebhookForm extends Component {
     onReactivate: PropTypes.func,
     onReactivateSuccess: PropTypes.func,
     onSubmit: PropTypes.func.isRequired,
-    onSubmitFailure: PropTypes.func,
-    onSubmitSuccess: PropTypes.func.isRequired,
     update: PropTypes.bool.isRequired,
     webhookTemplate: PropTypes.webhookTemplate,
   }
@@ -235,18 +232,14 @@ export default class WebhookForm extends Component {
     initialWebhookValue: undefined,
     onReactivate: () => null,
     onReactivateSuccess: () => null,
-    onSubmitFailure: () => null,
     onDeleteFailure: () => null,
     onDeleteSuccess: () => null,
     onDelete: () => null,
     webhookTemplate: undefined,
-    existCheck: () => false,
     healthStatusEnabled: false,
   }
 
   form = React.createRef()
-  modalResolve = () => null
-  modalReject = () => null
 
   constructor(props) {
     super(props)
@@ -263,34 +256,11 @@ export default class WebhookForm extends Component {
   }
 
   @bind
-  async handleSubmit(values, { resetForm }) {
-    const { onSubmit, onSubmitSuccess, onSubmitFailure, existCheck, update } = this.props
+  async handleSubmit(values) {
+    const { onSubmit, update } = this.props
     const castedWebhookValues = validationSchema.cast(values)
     const encodedValues = encodeValues(castedWebhookValues)
-
-    await this.setState({ error: '' })
-
-    try {
-      if (!update) {
-        const webhookId = encodedValues.ids.webhook_id
-        const exists = await existCheck(webhookId)
-        if (exists) {
-          this.setState({ displayOverwriteModal: true, existingId: webhookId })
-          await new Promise((resolve, reject) => {
-            this.modalResolve = resolve
-            this.modalReject = reject
-          })
-        }
-      }
-      const result = await onSubmit(encodedValues)
-
-      resetForm({ values: castedWebhookValues })
-      await onSubmitSuccess(result)
-    } catch (error) {
-      resetForm({ values })
-      await this.setState({ error })
-      await onSubmitFailure(error)
-    }
+    await onSubmit(castedWebhookValues, encodedValues)
   }
 
   @bind

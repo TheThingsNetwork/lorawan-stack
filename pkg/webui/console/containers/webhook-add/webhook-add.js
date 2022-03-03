@@ -30,7 +30,6 @@ export default class WebhookAdd extends Component {
     appId: PropTypes.string.isRequired,
     createApplicationApiKey: PropTypes.func.isRequired,
     createWebhook: PropTypes.func.isRequired,
-    existCheck: PropTypes.func.isRequired,
     getWebhook: PropTypes.func.isRequired,
     navigateToList: PropTypes.func.isRequired,
     templateId: PropTypes.string.isRequired,
@@ -128,14 +127,11 @@ export default class WebhookAdd extends Component {
   }
 
   @bind
-  async handleTemplateSubmit(values, { setSubmitting, resetForm }) {
-    const { existCheck } = this.props
-
+  async handleWebhookSubmit(values, webhook, { setSubmitting, resetForm }) {
     await this.setState({ error: '' })
     try {
-      const webhook = await this.convertTemplateToWebhook(values)
       const webhookId = webhook.ids.webhook_id
-      const exists = await existCheck(webhookId)
+      const exists = await this.existCheck(webhookId)
       if (exists) {
         this.setState({ displayOverwriteModal: true, existingId: webhookId })
         await new Promise((resolve, reject) => {
@@ -143,8 +139,8 @@ export default class WebhookAdd extends Component {
           this.modalReject = reject
         })
       }
-
       const result = await this.handleSubmit(webhook)
+
       resetForm({ values })
       this.handleSubmitSuccess(result)
     } catch (error) {
@@ -164,16 +160,13 @@ export default class WebhookAdd extends Component {
   }
 
   render() {
-    const { appId, templateId, webhookTemplate, existCheck } = this.props
+    const { appId, templateId, webhookTemplate } = this.props
 
     if (Boolean(webhookTemplate)) {
       return (
         <WebhookForm
-          update={false}
-          onSubmit={this.handleSubmit}
-          onSubmitSuccess={this.handleSubmitSuccess}
+          onSubmit={this.handleWebhookSubmit}
           handleReplaceModalDecision={this.handleReplaceModalDecision}
-          existCheck={existCheck}
         />
       )
     }
@@ -182,9 +175,10 @@ export default class WebhookAdd extends Component {
       <WebhookTemplateForm
         appId={appId}
         templateId={templateId}
-        onSubmit={this.handleTemplateSubmit}
+        onSubmit={this.handleWebhookSubmit}
         webhookTemplate={webhookTemplate}
         handleReplaceModalDecision={this.handleReplaceModalDecision}
+        convertTemplateToWebhook={this.convertTemplateToWebhook}
       />
     )
   }
