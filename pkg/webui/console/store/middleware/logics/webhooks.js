@@ -98,5 +98,4 @@ export default [
   getWebhookTemplateLogic,
   getWebhookTemplatesLogic,
   createWebhookLogic,
-  deleteWebhookLogic,
 ]

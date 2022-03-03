@@ -17,9 +17,8 @@ import { push } from 'connected-react-router'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { getWebhook } from '@console/store/actions/webhooks'
+import { getWebhook, createWebhook } from '@console/store/actions/webhooks'
 import { createApplicationApiKey } from '@console/store/actions/api-keys'
-import { createWebhook } from '@console/store/actions/webhooks'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
