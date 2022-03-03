@@ -214,6 +214,39 @@ Cypress.Commands.add('setApplicationCollaborator', (applicationId, collaboratorI
   })
 })
 
+// Helper function to create a new application payload formatter programmatically.
+Cypress.Commands.add('setApplicationPayloadFormatter', (appId, formatter) => {
+  const baseUrl = Cypress.config('baseUrl')
+  const adminApiKey = Cypress.config('adminApiKey')
+  cy.request({
+    url: `${baseUrl}/api/v3/as/applications/${appId}/link`,
+    method: 'PUT',
+    body: {
+      link: {
+        default_formatters: {
+          down_formatter: 'FORMATTER_JAVASCRIPT',
+          down_formatter_parameter:
+            formatter ||
+            'function encodeDownlink(input) {\n  return {\n    bytes: [],\n    fPort: 1,\n    warnings: [],\n    errors: []\n  };\n}\n\nfunction decodeDownlink(input) {\n  return {\n    data: {\n      bytes: input.bytes\n    },\n    warnings: [],\n    errors: []\n  }\n}',
+          up_formatter: 'FORMATTER_JAVASCRIPT',
+          up_formatter_parameter:
+            formatter ||
+            'function decodeUplink(input) {\n  return {\n    data: {\n      bytes: input.bytes\n    },\n    warnings: [],\n    errors: []\n  };\n}',
+        },
+      },
+      field_mask: {
+        paths: [
+          'default_formatters.down_formatter',
+          'default_formatters.down_formatter_parameter',
+          'default_formatters.up_formatter',
+          'default_formatters.up_formatter_parameter',
+        ],
+      },
+    },
+    headers: { Authorization: `Bearer ${adminApiKey}` },
+  })
+})
+
 // Helper function to create a new gateway programmatically.
 Cypress.Commands.add('createGateway', (gateway, userId) => {
   const baseUrl = Cypress.config('baseUrl')
