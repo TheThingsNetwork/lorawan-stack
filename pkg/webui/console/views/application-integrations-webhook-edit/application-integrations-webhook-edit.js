@@ -16,16 +16,12 @@ import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
-import tts from '@console/api/tts'
-
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-import toast from '@ttn-lw/components/toast'
 
-import WebhookForm from '@console/components/webhook-form'
+import WebhookEdit from '@console/containers/webhook-edit'
 
-import diff from '@ttn-lw/lib/diff'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -37,17 +33,8 @@ const m = defineMessages({
 })
 
 const ApplicationWebhookEdit = props => {
-  const {
-    webhook,
-    appId,
-    webhookTemplate,
-    updateWebhook,
-    match,
-    navigateToList,
-    healthStatusEnabled,
-  } = props
+  const { webhook, appId, webhookTemplate, match, healthStatusEnabled } = props
   const { webhookId } = match.params
-
   useBreadcrumbs(
     'apps.single.integrations.webhooks.edit',
     <Breadcrumb
@@ -56,74 +43,17 @@ const ApplicationWebhookEdit = props => {
     />,
   )
 
-  const handleSubmit = React.useCallback(
-    async updatedWebhook => {
-      const patch = diff(webhook, updatedWebhook, ['ids'])
-
-      // Ensure that the header prop is always patched fully, otherwise we loose
-      // old header entries.
-      if ('headers' in patch) {
-        patch.headers = updatedWebhook.headers
-      }
-
-      if (Object.keys(patch).length === 0) {
-        await updateWebhook(updatedWebhook)
-      } else {
-        await updateWebhook(patch)
-      }
-    },
-    [updateWebhook, webhook],
-  )
-  const handleSubmitSuccess = React.useCallback(() => {
-    toast({
-      message: m.updateSuccess,
-      type: toast.types.SUCCESS,
-    })
-  }, [])
-
-  const handleDelete = React.useCallback(async () => {
-    await tts.Applications.Webhooks.deleteById(appId, webhookId)
-  }, [appId, webhookId])
-  const handleDeleteSuccess = React.useCallback(() => {
-    toast({
-      message: m.deleteSuccess,
-      type: toast.types.SUCCESS,
-    })
-
-    navigateToList()
-  }, [navigateToList])
-
-  const handleReactivateSuccess = React.useCallback(() => {
-    toast({
-      message: m.reactivateSuccess,
-      type: toast.types.SUCCESS,
-    })
-  }, [])
-  const handleReactivate = React.useCallback(
-    async updatedHealthStatus => {
-      await tts.Applications.Webhooks.updateById(appId, webhookId, updatedHealthStatus, [
-        'health_status',
-      ])
-    },
-    [appId, webhookId],
-  )
-
   return (
     <Container>
       <PageTitle title={m.editWebhook} />
       <Row>
         <Col lg={8} md={12}>
-          <WebhookForm
+          <WebhookEdit
             update
             appId={appId}
-            initialWebhookValue={webhook}
+            selectedWebhook={webhook}
+            webhookId={webhookId}
             webhookTemplate={webhookTemplate}
-            onSubmit={handleSubmit}
-            onSubmitSuccess={handleSubmitSuccess}
-            onDelete={handleDelete}
-            onDeleteSuccess={handleDeleteSuccess}
-            onReactivate={handleReactivate}
-            onReactivateSuccess={handleReactivateSuccess}
             healthStatusEnabled={healthStatusEnabled}
           />
         </Col>
@@ -136,8 +66,6 @@ ApplicationWebhookEdit.propTypes = {
   appId: PropTypes.string.isRequired,
   healthStatusEnabled: PropTypes.bool.isRequired,
   match: PropTypes.match.isRequired,
-  navigateToList: PropTypes.func.isRequired,
-  updateWebhook: PropTypes.func.isRequired,
   webhook: PropTypes.webhook.isRequired,
   webhookTemplate: PropTypes.webhookTemplate,
 }

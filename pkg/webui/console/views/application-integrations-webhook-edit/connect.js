@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import { connect } from 'react-redux'
-import { replace } from 'connected-react-router'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
@@ -67,13 +66,10 @@ const mapStateToProps = state => {
   }
 }
 
-const promisifiedUpdateWebhook = attachPromise(updateWebhook)
 const mapDispatchToProps = (dispatch, { match }) => {
   const { appId, webhookId } = match.params
   return {
     getWebhook: () => dispatch(getWebhook(appId, webhookId, webhookEntitySelector)),
-    navigateToList: () => dispatch(replace(`/applications/${appId}/integrations/webhooks`)),
-    updateWebhook: patch => dispatch(promisifiedUpdateWebhook(appId, webhookId, patch)),
   }
 }
 
