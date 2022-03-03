@@ -5215,7 +5215,7 @@
       "http": [
         {
           "method": "post",
-          "pattern": "/qr-code",
+          "pattern": "/qr-code/parse",
           "body": "*",
           "parameters": []
         }
