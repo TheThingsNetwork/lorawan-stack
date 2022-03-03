@@ -53,3 +53,9 @@ export const [
   { request: CREATE_WEBHOOK, success: CREATE_WEBHOOK_SUCCESS, failure: CREATE_WEBHOOK_FAILURE },
   { request: createWebhook, success: createWebhookSuccess, failure: createWebhookFailure },
 ] = createRequestActions(CREATE_WEBHOOK_BASE, (appId, webhook) => ({ appId, webhook }))
+
+export const DELETE_WEBHOOK_BASE = 'DELETE_WEBHOOK'
+export const [
+  { request: DELETE_WEBHOOK, success: DELETE_WEBHOOK_SUCCESS, failure: DELETE_WEBHOOK_FAILURE },
+  { request: deleteWebhook, success: deleteWebhookSuccess, failure: deleteWebhookFailure },
+] = createRequestActions(CREATE_WEBHOOK_BASE, (appId, webhookId) => ({ appId, webhookId }))

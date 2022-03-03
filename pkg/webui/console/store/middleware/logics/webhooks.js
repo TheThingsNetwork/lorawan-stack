@@ -90,6 +90,15 @@ const createWebhookLogic = createRequestLogic({
   },
 })
 
+const deleteWebhookLogic = createRequestLogic({
+  type: webhooks.DELETE_WEBHOOK,
+  process: async ({ action }) => {
+    const { appId, webhookId } = action.payload
+
+    return await tts.Applications.Webhooks.deleteById(appId, webhookId)
+  },
+})
+
 export default [
   getWebhookLogic,
   getWebhooksLogic,
@@ -98,4 +107,5 @@ export default [
   getWebhookTemplateLogic,
   getWebhookTemplatesLogic,
   createWebhookLogic,
+  deleteWebhookLogic,
 ]
