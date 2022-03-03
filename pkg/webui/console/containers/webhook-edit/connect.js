@@ -17,15 +17,15 @@ import { replace } from 'connected-react-router'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { updateWebhook, deleteWebhook } from '@console/store/actions/webhooks'
+import { updateWebhook } from '@console/store/actions/webhooks'
 
 const mapDispatchToProps = (dispatch, props) => {
   const { webhookId, appId } = props
   return {
     navigateToList: () => dispatch(replace(`/applications/${appId}/integrations/webhooks`)),
-    updateWebhook: (patch, selector) =>
-      dispatch(attachPromise(updateWebhook(appId, webhookId, patch, selector))),
-    deleteWebhook: (appId, webhookId) => dispatch(attachPromise(deleteWebhook(appId, webhookId)))
+    updateWebhook: patch => dispatch(attachPromise(updateWebhook(appId, webhookId, patch))),
+    updateHealthStatus: (updatedHealthStatus, selector) =>
+      dispatch(attachPromise(updateWebhook(appId, webhookId, updatedHealthStatus, selector))),
   }
 }
 

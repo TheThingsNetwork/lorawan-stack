@@ -15,6 +15,8 @@
 import React, { useState } from 'react'
 import { defineMessages } from 'react-intl'
 
+import tts from '@console/api/tts'
+
 import toast from '@ttn-lw/components/toast'
 
 import WebhookForm from '@console/components/webhook-form'
@@ -38,7 +40,7 @@ const WebhookEdit = props => {
     navigateToList,
     healthStatusEnabled,
     webhookId,
-    deleteWebhook,
+    updateHealthStatus,
   } = props
 
   const handleUpdateWebhook = React.useCallback(
@@ -52,9 +54,9 @@ const WebhookEdit = props => {
       }
 
       if (Object.keys(patch).length === 0) {
-        await updateWebhook(updatedWebhook, null)
+        await updateWebhook(updatedWebhook)
       } else {
-        await updateWebhook(patch, null)
+        await updateWebhook(patch)
       }
     },
     [updateWebhook, selectedWebhook],
@@ -83,8 +85,8 @@ const WebhookEdit = props => {
   )
 
   const handleDelete = React.useCallback(async () => {
-    await deleteWebhook(appId, webhookId)
-  }, [appId, webhookId, deleteWebhook])
+    await tts.Applications.Webhooks.deleteById(appId, webhookId)
+  }, [appId, webhookId])
   const handleDeleteSuccess = React.useCallback(() => {
     toast({
       message: m.deleteSuccess,
@@ -102,9 +104,9 @@ const WebhookEdit = props => {
   }, [])
   const handleReactivate = React.useCallback(
     async updatedHealthStatus => {
-      await updateWebhook(appId, webhookId, updatedHealthStatus, ['health_status'])
+      await updateHealthStatus(appId, webhookId, updatedHealthStatus, ['health_status'])
     },
-    [appId, webhookId, updateWebhook],
+    [appId, webhookId, updateHealthStatus],
   )
 
   return (
@@ -126,10 +128,10 @@ const WebhookEdit = props => {
 
 WebhookEdit.propTypes = {
   appId: PropTypes.string.isRequired,
-  deleteWebhook: PropTypes.func.isRequired,
   healthStatusEnabled: PropTypes.bool.isRequired,
   navigateToList: PropTypes.func.isRequired,
   selectedWebhook: PropTypes.webhook.isRequired,
+  updateHealthStatus: PropTypes.func.isRequired,
   updateWebhook: PropTypes.func.isRequired,
   webhookId: PropTypes.string.isRequired,
   webhookTemplate: PropTypes.webhookTemplate,
