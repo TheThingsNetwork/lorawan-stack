@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.18.1] - unreleased
+
+### Added
+
 - Add HTTP basic authentication configuration to the webhooks form in the Console.
 - Show repository formatter code in the payload formatter form in the Console and allow pasting the application and payload formatter code when using the JavaScript option.
 - gRPC service to Gateway Configuration Server so that gateway configurations can be obtained via gRPC requests.
@@ -32,8 +46,6 @@ For details about compatibility between different releases, see the **Commitment
   - The length of the queue used by the pool may be configured using the `events.redis.publish.queue-size` setting.
   - The maximum worker count used by the pool may be configured using the `events.redis.publish.max-workers` setting.
 
-### Deprecated
-
 ### Removed
 
 - Ability to select the `Repository` payload formatter type for end devices that have no Device Repository association or have no associated repository payload formatter.
@@ -42,8 +54,6 @@ For details about compatibility between different releases, see the **Commitment
 
 - Consistent ordering of entities with equal values for the sort field.
 - Fix `xtime` sent to LBS gateways for Class C downlinks.
-
-### Security
 
 ## [3.18.0] - 2022-02-23
 
@@ -2043,7 +2053,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.18.0...v3.18
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.18.1...v3.18
+[3.18.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.18.0...v3.18.1
 [3.18.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.17.1...v3.18.0
 [3.17.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.17.0...v3.17.1
 [3.17.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.16.2...v3.17.0
