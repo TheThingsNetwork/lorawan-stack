@@ -88,13 +88,13 @@ var AU_915_928_TS1_v1_0_1 = Band{
 
 	Rx1Channel: channelIndexModulo(8),
 	Rx1DataRate: func(idx ttnpb.DataRateIndex, offset ttnpb.DataRateOffset, _ bool) (ttnpb.DataRateIndex, error) {
-		if idx > ttnpb.DataRateIndex_DATA_RATE_6 {
-			return 0, errDataRateIndexTooHigh.WithAttributes("max", 6)
+		if idx > ttnpb.DataRateIndex_DATA_RATE_4 {
+			return 0, errDataRateIndexTooHigh.WithAttributes("max", 4)
 		}
-		if offset > 5 {
-			return 0, errDataRateOffsetTooHigh.WithAttributes("max", 5)
+		if offset > 3 {
+			return 0, errDataRateOffsetTooHigh.WithAttributes("max", 3)
 		}
-		return au915928DownlinkDRTable[idx][offset], nil
+		return au915928DownlinkDRTableLegacy[idx][offset], nil
 	},
 
 	GenerateChMasks: makeGenerateChMask72(false),

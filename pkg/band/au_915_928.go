@@ -22,6 +22,14 @@ const (
 )
 
 var (
+	au915928DownlinkDRTableLegacy = [7][6]ttnpb.DataRateIndex{
+		{10, 9, 8, 8},
+		{11, 10, 9, 8},
+		{12, 11, 10, 9},
+		{13, 12, 11, 10},
+		{13, 13, 12, 11},
+	}
+
 	au915928DownlinkDRTable = [7][6]ttnpb.DataRateIndex{
 		{8, 8, 8, 8, 8, 8},
 		{9, 8, 8, 8, 8, 8},
