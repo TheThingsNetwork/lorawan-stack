@@ -8045,49 +8045,49 @@
       "file": "provisioning.go"
     }
   },
-  "error:pkg/qrcodegenerator/qrcode/enddevice:character": {
+  "error:pkg/qrcodegenerator/qrcode/enddevices:character": {
     "translations": {
       "en": "invalid character `{r}`"
     },
     "description": {
-      "package": "pkg/qrcodegenerator/qrcode/enddevice",
-      "file": "errors.go"
+      "package": "pkg/qrcodegenerator/qrcode/enddevices",
+      "file": "enddevices.go"
     }
   },
-  "error:pkg/qrcodegenerator/qrcode/enddevice:format": {
+  "error:pkg/qrcodegenerator/qrcode/enddevices:format": {
     "translations": {
       "en": "invalid format"
     },
     "description": {
-      "package": "pkg/qrcodegenerator/qrcode/enddevice",
-      "file": "errors.go"
+      "package": "pkg/qrcodegenerator/qrcode/enddevices",
+      "file": "enddevices.go"
     }
   },
-  "error:pkg/qrcodegenerator/qrcode/enddevice:no_dev_eui": {
+  "error:pkg/qrcodegenerator/qrcode/enddevices:no_dev_eui": {
     "translations": {
       "en": "no DevEUI"
     },
     "description": {
-      "package": "pkg/qrcodegenerator/qrcode/enddevice",
-      "file": "errors.go"
+      "package": "pkg/qrcodegenerator/qrcode/enddevices",
+      "file": "enddevices.go"
     }
   },
-  "error:pkg/qrcodegenerator/qrcode/enddevice:no_join_eui": {
+  "error:pkg/qrcodegenerator/qrcode/enddevices:no_join_eui": {
     "translations": {
       "en": "no JoinEUI"
     },
     "description": {
-      "package": "pkg/qrcodegenerator/qrcode/enddevice",
-      "file": "errors.go"
+      "package": "pkg/qrcodegenerator/qrcode/enddevices",
+      "file": "enddevices.go"
     }
   },
-  "error:pkg/qrcodegenerator/qrcode:unknown_format": {
+  "error:pkg/qrcodegenerator/qrcode/enddevices:unknown_format": {
     "translations": {
       "en": "format `{format_id}` unknown"
     },
     "description": {
-      "package": "pkg/qrcodegenerator/qrcode",
-      "file": "qrcode.go"
+      "package": "pkg/qrcodegenerator/qrcode/enddevices",
+      "file": "enddevices.go"
     }
   },
   "error:pkg/qrcodegenerator:format_not_found": {
