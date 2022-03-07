@@ -137,36 +137,42 @@ var (
 		{
 			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-1"},
 			Snr:                    -9,
+			ChannelRssi:            -99,
 			UplinkToken:            []byte("token-gtw-1"),
 			DownlinkPathConstraint: ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NONE,
 		},
 		{
 			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-3"},
 			Snr:                    -5.3,
+			ChannelRssi:            -95.3,
 			UplinkToken:            []byte("token-gtw-3"),
 			DownlinkPathConstraint: ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
 		},
 		{
 			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-5"},
 			Snr:                    12,
+			ChannelRssi:            -22,
 			UplinkToken:            []byte("token-gtw-5"),
 			DownlinkPathConstraint: ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER,
 		},
 		{
 			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-0"},
 			Snr:                    5.2,
+			ChannelRssi:            -15.2,
 			UplinkToken:            []byte("token-gtw-0"),
 			DownlinkPathConstraint: ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NONE,
 		},
 		{
 			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-2"},
 			Snr:                    6.3,
+			ChannelRssi:            -16.3,
 			UplinkToken:            []byte("token-gtw-2"),
 			DownlinkPathConstraint: ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
 		},
 		{
 			GatewayIds:             &ttnpb.GatewayIdentifiers{GatewayId: "gateway-test-4"},
 			Snr:                    -7,
+			ChannelRssi:            -17,
 			UplinkToken:            []byte("token-gtw-4"),
 			DownlinkPathConstraint: ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_PREFER_OTHER,
 		},
@@ -175,6 +181,7 @@ var (
 		{
 			GatewayIds:  &ttnpb.GatewayIdentifiers{GatewayId: cluster.PacketBrokerGatewayID.GatewayId},
 			Snr:         4.2,
+			ChannelRssi: -14.2,
 			UplinkToken: []byte("token-pb-1"),
 			PacketBroker: &ttnpb.PacketBrokerMetadata{
 				ForwarderNetId:     test.DefaultNetID,
@@ -185,6 +192,7 @@ var (
 		{
 			GatewayIds:  &ttnpb.GatewayIdentifiers{GatewayId: cluster.PacketBrokerGatewayID.GatewayId},
 			Snr:         1.8,
+			ChannelRssi: -21.8,
 			UplinkToken: []byte("token-pb-2"),
 			PacketBroker: &ttnpb.PacketBrokerMetadata{
 				ForwarderNetId:     test.DefaultNetID,

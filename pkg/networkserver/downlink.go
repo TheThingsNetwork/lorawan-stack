@@ -28,7 +28,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
@@ -654,12 +653,6 @@ func computeWantedRSSI(snr float32, channelRSSI float32) float32 {
 	return wantedRSSI
 }
 
-func snrMetadataComparator(mds []*ttnpb.RxMetadata) func(int, int) bool {
-	return func(i, j int) bool {
-		return mds[i].Snr >= mds[j].Snr
-	}
-}
-
 func wantedRSSIMetadataComparator(mds []*ttnpb.RxMetadata) func(int, int) bool {
 	wantedRSSI := func(k int) float32 { return computeWantedRSSI(mds[k].Snr, mds[k].ChannelRssi) }
 	return func(i, j int) bool {
@@ -667,27 +660,16 @@ func wantedRSSIMetadataComparator(mds []*ttnpb.RxMetadata) func(int, int) bool {
 	}
 }
 
-var (
-	ignoreInvalidMDFeatureFlag = experimental.DefineFeature("ns.down.path.ignore_invalid_metadata", false)
-	useWantedRSSIFeatureFlag   = experimental.DefineFeature("ns.down.path.use_wanted_rssi", false)
-)
-
 func buildMetadataComparator(ctx context.Context, mds []*ttnpb.RxMetadata) func(int, int) bool {
-	comparator := snrMetadataComparator(mds)
-	if useWantedRSSIFeatureFlag.GetValue(ctx) {
-		comparator = wantedRSSIMetadataComparator(mds)
-	}
-	if ignoreInvalidMDFeatureFlag.GetValue(ctx) {
-		invalidMD := func(k int) bool { return mds[k].Snr == 0.0 || mds[k].ChannelRssi == 0.0 }
-		return func(i, j int) bool {
-			lhsInvalid, rhsInvalid := invalidMD(i), invalidMD(j)
-			if lhsInvalid {
-				return lhsInvalid == rhsInvalid
-			}
-			return comparator(i, j)
+	comparator := wantedRSSIMetadataComparator(mds)
+	invalidMD := func(k int) bool { return mds[k].Snr == 0.0 || mds[k].ChannelRssi == 0.0 }
+	return func(i, j int) bool {
+		lhsInvalid, rhsInvalid := invalidMD(i), invalidMD(j)
+		if lhsInvalid {
+			return lhsInvalid == rhsInvalid
 		}
+		return comparator(i, j)
 	}
-	return comparator
 }
 
 func downlinkPathsFromMetadata(ctx context.Context, mds ...*ttnpb.RxMetadata) []downlinkPath {
