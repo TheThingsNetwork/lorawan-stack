@@ -437,6 +437,7 @@ func NewCombinedStore(db *gorm.DB) *CombinedStore {
 		entitySearch:      entitySearch{baseStore: baseStore},
 		contactInfoStore:  contactInfoStore{baseStore: baseStore},
 		euiStore:          euiStore{baseStore: baseStore},
+		notificationStore: notificationStore{baseStore: baseStore},
 		migrationStore:    migrationStore{baseStore: baseStore},
 	}
 }
@@ -463,6 +464,7 @@ type CombinedStore struct {
 	entitySearch
 	contactInfoStore
 	euiStore
+	notificationStore
 	migrationStore
 }
 
