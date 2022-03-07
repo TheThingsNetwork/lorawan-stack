@@ -36628,42 +36628,6 @@
       "extensions": [],
       "messages": [
         {
-          "name": "EntityOnboardingData",
-          "longName": "EntityOnboardingData",
-          "fullName": "ttn.lorawan.v3.EntityOnboardingData",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": true,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "format_id",
-              "description": "Identifier of the format used to successfully parse the QR code data.",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "end_device_tempate",
-              "description": "",
-              "label": "",
-              "type": "EndDeviceTemplate",
-              "longType": "EndDeviceTemplate",
-              "fullType": "ttn.lorawan.v3.EndDeviceTemplate",
-              "ismap": false,
-              "isoneof": true,
-              "oneofdecl": "data",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
           "name": "GenerateEndDeviceQRCodeRequest",
           "longName": "GenerateEndDeviceQRCodeRequest",
           "fullName": "ttn.lorawan.v3.GenerateEndDeviceQRCodeRequest",
@@ -36840,9 +36804,9 @@
           ]
         },
         {
-          "name": "ParseQRCodeRequest",
-          "longName": "ParseQRCodeRequest",
-          "fullName": "ttn.lorawan.v3.ParseQRCodeRequest",
+          "name": "ParseEndDeviceQRCodeRequest",
+          "longName": "ParseEndDeviceQRCodeRequest",
+          "fullName": "ttn.lorawan.v3.ParseEndDeviceQRCodeRequest",
           "description": "",
           "hasExtensions": false,
           "hasFields": true,
@@ -36851,7 +36815,7 @@
           "fields": [
             {
               "name": "format_id",
-              "description": "QR code format identifier. Enumerate available formats with \n- End Devices: rpc `ListFormats` in the EndDeviceQRCodeGenerator service.\nIf this field is not specified, the server will attempt to parse the data with each known format.",
+              "description": "QR code format identifier.\nEnumerate available formats with the rpc `ListFormats`.\nIf this field is not specified, the server will attempt to parse the data with each known format.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -36900,9 +36864,9 @@
           ]
         },
         {
-          "name": "ParseQRCodeResponse",
-          "longName": "ParseQRCodeResponse",
-          "fullName": "ttn.lorawan.v3.ParseQRCodeResponse",
+          "name": "ParseEndDeviceQRCodeResponse",
+          "longName": "ParseEndDeviceQRCodeResponse",
+          "fullName": "ttn.lorawan.v3.ParseEndDeviceQRCodeResponse",
           "description": "",
           "hasExtensions": false,
           "hasFields": true,
@@ -36910,12 +36874,24 @@
           "extensions": [],
           "fields": [
             {
-              "name": "entity_onboarding_data",
+              "name": "format_id",
+              "description": "Identifier of the format used to successfully parse the QR code data.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "end_device_tempate",
               "description": "",
               "label": "",
-              "type": "EntityOnboardingData",
-              "longType": "EntityOnboardingData",
-              "fullType": "ttn.lorawan.v3.EntityOnboardingData",
+              "type": "EndDeviceTemplate",
+              "longType": "EndDeviceTemplate",
+              "fullType": "ttn.lorawan.v3.EndDeviceTemplate",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -37133,32 +37109,29 @@
                   ]
                 }
               }
-            }
-          ]
-        },
-        {
-          "name": "QRCodeParser",
-          "longName": "QRCodeParser",
-          "fullName": "ttn.lorawan.v3.QRCodeParser",
-          "description": "",
-          "methods": [
+            },
             {
               "name": "Parse",
               "description": "Parse QR Codes of known formats and return the information contained within.",
-              "requestType": "ParseQRCodeRequest",
-              "requestLongType": "ParseQRCodeRequest",
-              "requestFullType": "ttn.lorawan.v3.ParseQRCodeRequest",
+              "requestType": "ParseEndDeviceQRCodeRequest",
+              "requestLongType": "ParseEndDeviceQRCodeRequest",
+              "requestFullType": "ttn.lorawan.v3.ParseEndDeviceQRCodeRequest",
               "requestStreaming": false,
-              "responseType": "ParseQRCodeResponse",
-              "responseLongType": "ParseQRCodeResponse",
-              "responseFullType": "ttn.lorawan.v3.ParseQRCodeResponse",
+              "responseType": "ParseEndDeviceQRCodeResponse",
+              "responseLongType": "ParseEndDeviceQRCodeResponse",
+              "responseFullType": "ttn.lorawan.v3.ParseEndDeviceQRCodeResponse",
               "responseStreaming": false,
               "options": {
                 "google.api.http": {
                   "rules": [
                     {
                       "method": "POST",
-                      "pattern": "/qr-code/parse",
+                      "pattern": "/qr-code/end-devices/parse",
+                      "body": "*"
+                    },
+                    {
+                      "method": "POST",
+                      "pattern": "/qr-code/end-devices/{format_id}/parse",
                       "body": "*"
                     }
                   ]

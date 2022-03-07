@@ -81,8 +81,8 @@ func (x *GenerateEndDeviceQRCodeRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
-// MarshalProtoJSON marshals the EntityOnboardingData message to JSON.
-func (x *EntityOnboardingData) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+// MarshalProtoJSON marshals the ParseEndDeviceQRCodeResponse message to JSON.
+func (x *ParseEndDeviceQRCodeResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
 		s.WriteNil()
 		return
@@ -94,24 +94,21 @@ func (x *EntityOnboardingData) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("format_id")
 		s.WriteString(x.FormatId)
 	}
-	if x.Data != nil {
-		switch ov := x.Data.(type) {
-		case *EntityOnboardingData_EndDeviceTempate:
-			s.WriteMoreIf(&wroteField)
-			s.WriteObjectField("end_device_tempate")
-			ov.EndDeviceTempate.MarshalProtoJSON(s.WithField("end_device_tempate"))
-		}
+	if x.EndDeviceTempate != nil || s.HasField("end_device_tempate") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("end_device_tempate")
+		x.EndDeviceTempate.MarshalProtoJSON(s.WithField("end_device_tempate"))
 	}
 	s.WriteObjectEnd()
 }
 
-// MarshalJSON marshals the EntityOnboardingData to JSON.
-func (x EntityOnboardingData) MarshalJSON() ([]byte, error) {
+// MarshalJSON marshals the ParseEndDeviceQRCodeResponse to JSON.
+func (x ParseEndDeviceQRCodeResponse) MarshalJSON() ([]byte, error) {
 	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
 }
 
-// UnmarshalProtoJSON unmarshals the EntityOnboardingData message from JSON.
-func (x *EntityOnboardingData) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+// UnmarshalProtoJSON unmarshals the ParseEndDeviceQRCodeResponse message from JSON.
+func (x *ParseEndDeviceQRCodeResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 	if s.ReadNil() {
 		return
 	}
@@ -123,65 +120,17 @@ func (x *EntityOnboardingData) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) 
 			s.AddField("format_id")
 			x.FormatId = s.ReadString()
 		case "end_device_tempate", "endDeviceTempate":
-			ov := &EntityOnboardingData_EndDeviceTempate{}
-			x.Data = ov
 			if s.ReadNil() {
-				ov.EndDeviceTempate = nil
+				x.EndDeviceTempate = nil
 				return
 			}
-			ov.EndDeviceTempate = &EndDeviceTemplate{}
-			ov.EndDeviceTempate.UnmarshalProtoJSON(s.WithField("end_device_tempate", true))
+			x.EndDeviceTempate = &EndDeviceTemplate{}
+			x.EndDeviceTempate.UnmarshalProtoJSON(s.WithField("end_device_tempate", true))
 		}
 	})
 }
 
-// UnmarshalJSON unmarshals the EntityOnboardingData from JSON.
-func (x *EntityOnboardingData) UnmarshalJSON(b []byte) error {
-	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
-}
-
-// MarshalProtoJSON marshals the ParseQRCodeResponse message to JSON.
-func (x *ParseQRCodeResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
-	if x == nil {
-		s.WriteNil()
-		return
-	}
-	s.WriteObjectStart()
-	var wroteField bool
-	if x.EntityOnboardingData != nil || s.HasField("entity_onboarding_data") {
-		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("entity_onboarding_data")
-		x.EntityOnboardingData.MarshalProtoJSON(s.WithField("entity_onboarding_data"))
-	}
-	s.WriteObjectEnd()
-}
-
-// MarshalJSON marshals the ParseQRCodeResponse to JSON.
-func (x ParseQRCodeResponse) MarshalJSON() ([]byte, error) {
-	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
-}
-
-// UnmarshalProtoJSON unmarshals the ParseQRCodeResponse message from JSON.
-func (x *ParseQRCodeResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
-	if s.ReadNil() {
-		return
-	}
-	s.ReadObject(func(key string) {
-		switch key {
-		default:
-			s.ReadAny() // ignore unknown field
-		case "entity_onboarding_data", "entityOnboardingData":
-			if s.ReadNil() {
-				x.EntityOnboardingData = nil
-				return
-			}
-			x.EntityOnboardingData = &EntityOnboardingData{}
-			x.EntityOnboardingData.UnmarshalProtoJSON(s.WithField("entity_onboarding_data", true))
-		}
-	})
-}
-
-// UnmarshalJSON unmarshals the ParseQRCodeResponse from JSON.
-func (x *ParseQRCodeResponse) UnmarshalJSON(b []byte) error {
+// UnmarshalJSON unmarshals the ParseEndDeviceQRCodeResponse from JSON.
+func (x *ParseEndDeviceQRCodeResponse) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }

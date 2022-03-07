@@ -8758,15 +8758,15 @@
         ]
       }
     },
-    "/qr-code/parse": {
+    "/qr-code/end-devices/parse": {
       "post": {
         "summary": "Parse QR Codes of known formats and return the information contained within.",
-        "operationId": "QRCodeParser_Parse",
+        "operationId": "EndDeviceQRCodeGenerator_Parse",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v3ParseQRCodeResponse"
+              "$ref": "#/definitions/v3ParseEndDeviceQRCodeResponse"
             }
           },
           "default": {
@@ -8782,12 +8782,52 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v3ParseQRCodeRequest"
+              "$ref": "#/definitions/v3ParseEndDeviceQRCodeRequest"
             }
           }
         ],
         "tags": [
-          "QRCodeParser"
+          "EndDeviceQRCodeGenerator"
+        ]
+      }
+    },
+    "/qr-code/end-devices/{format_id}/parse": {
+      "post": {
+        "summary": "Parse QR Codes of known formats and return the information contained within.",
+        "operationId": "EndDeviceQRCodeGenerator_Parse2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ParseEndDeviceQRCodeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "format_id",
+            "description": "QR code format identifier.\nEnumerate available formats with the rpc `ListFormats`.\nIf this field is not specified, the server will attempt to parse the data with each known format.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ParseEndDeviceQRCodeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EndDeviceQRCodeGenerator"
         ]
       }
     },
@@ -15260,18 +15300,6 @@
       },
       "description": "EntityIdentifiers contains one of the possible entity identifiers."
     },
-    "v3EntityOnboardingData": {
-      "type": "object",
-      "properties": {
-        "format_id": {
-          "type": "string",
-          "description": "Identifier of the format used to successfully parse the QR code data."
-        },
-        "end_device_tempate": {
-          "$ref": "#/definitions/v3EndDeviceTemplate"
-        }
-      }
-    },
     "v3ErrorDetails": {
       "type": "object",
       "properties": {
@@ -17712,12 +17740,12 @@
         }
       }
     },
-    "v3ParseQRCodeRequest": {
+    "v3ParseEndDeviceQRCodeRequest": {
       "type": "object",
       "properties": {
         "format_id": {
           "type": "string",
-          "description": "QR code format identifier. Enumerate available formats with \n- End Devices: rpc `ListFormats` in the EndDeviceQRCodeGenerator service.\nIf this field is not specified, the server will attempt to parse the data with each known format."
+          "description": "QR code format identifier.\nEnumerate available formats with the rpc `ListFormats`.\nIf this field is not specified, the server will attempt to parse the data with each known format."
         },
         "qr_code": {
           "type": "string",
@@ -17726,11 +17754,15 @@
         }
       }
     },
-    "v3ParseQRCodeResponse": {
+    "v3ParseEndDeviceQRCodeResponse": {
       "type": "object",
       "properties": {
-        "entity_onboarding_data": {
-          "$ref": "#/definitions/v3EntityOnboardingData"
+        "format_id": {
+          "type": "string",
+          "description": "Identifier of the format used to successfully parse the QR code data."
+        },
+        "end_device_tempate": {
+          "$ref": "#/definitions/v3EndDeviceTemplate"
         }
       }
     },

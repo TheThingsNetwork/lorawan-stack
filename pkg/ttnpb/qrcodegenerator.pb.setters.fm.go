@@ -202,82 +202,7 @@ func (dst *GenerateQRCodeResponse) SetFields(src *GenerateQRCodeResponse, paths 
 	return nil
 }
 
-func (dst *EntityOnboardingData) SetFields(src *EntityOnboardingData, paths ...string) error {
-	for name, subs := range _processPaths(paths) {
-		switch name {
-		case "format_id":
-			if len(subs) > 0 {
-				return fmt.Errorf("'format_id' has no subfields, but %s were specified", subs)
-			}
-			if src != nil {
-				dst.FormatId = src.FormatId
-			} else {
-				var zero string
-				dst.FormatId = zero
-			}
-
-		case "data":
-			if len(subs) == 0 && src == nil {
-				dst.Data = nil
-				continue
-			} else if len(subs) == 0 {
-				dst.Data = src.Data
-				continue
-			}
-
-			subPathMap := _processPaths(subs)
-			if len(subPathMap) > 1 {
-				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
-			}
-			for oneofName, oneofSubs := range subPathMap {
-				switch oneofName {
-				case "end_device_tempate":
-					_, srcOk := src.Data.(*EntityOnboardingData_EndDeviceTempate)
-					if !srcOk && src.Data != nil {
-						return fmt.Errorf("attempt to set oneof 'end_device_tempate', while different oneof is set in source")
-					}
-					_, dstOk := dst.Data.(*EntityOnboardingData_EndDeviceTempate)
-					if !dstOk && dst.Data != nil {
-						return fmt.Errorf("attempt to set oneof 'end_device_tempate', while different oneof is set in destination")
-					}
-					if len(oneofSubs) > 0 {
-						var newDst, newSrc *EndDeviceTemplate
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
-							newSrc = src.Data.(*EntityOnboardingData_EndDeviceTempate).EndDeviceTempate
-						}
-						if dstOk {
-							newDst = dst.Data.(*EntityOnboardingData_EndDeviceTempate).EndDeviceTempate
-						} else {
-							newDst = &EndDeviceTemplate{}
-							dst.Data = &EntityOnboardingData_EndDeviceTempate{EndDeviceTempate: newDst}
-						}
-						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
-							return err
-						}
-					} else {
-						if src != nil {
-							dst.Data = src.Data
-						} else {
-							dst.Data = nil
-						}
-					}
-
-				default:
-					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
-				}
-			}
-
-		default:
-			return fmt.Errorf("invalid field: '%s'", name)
-		}
-	}
-	return nil
-}
-
-func (dst *ParseQRCodeRequest) SetFields(src *ParseQRCodeRequest, paths ...string) error {
+func (dst *ParseEndDeviceQRCodeRequest) SetFields(src *ParseEndDeviceQRCodeRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
 		case "format_id":
@@ -307,32 +232,42 @@ func (dst *ParseQRCodeRequest) SetFields(src *ParseQRCodeRequest, paths ...strin
 	return nil
 }
 
-func (dst *ParseQRCodeResponse) SetFields(src *ParseQRCodeResponse, paths ...string) error {
+func (dst *ParseEndDeviceQRCodeResponse) SetFields(src *ParseEndDeviceQRCodeResponse, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
-		case "entity_onboarding_data":
+		case "format_id":
 			if len(subs) > 0 {
-				var newDst, newSrc *EntityOnboardingData
-				if (src == nil || src.EntityOnboardingData == nil) && dst.EntityOnboardingData == nil {
+				return fmt.Errorf("'format_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FormatId = src.FormatId
+			} else {
+				var zero string
+				dst.FormatId = zero
+			}
+		case "end_device_tempate":
+			if len(subs) > 0 {
+				var newDst, newSrc *EndDeviceTemplate
+				if (src == nil || src.EndDeviceTempate == nil) && dst.EndDeviceTempate == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.EntityOnboardingData
+					newSrc = src.EndDeviceTempate
 				}
-				if dst.EntityOnboardingData != nil {
-					newDst = dst.EntityOnboardingData
+				if dst.EndDeviceTempate != nil {
+					newDst = dst.EndDeviceTempate
 				} else {
-					newDst = &EntityOnboardingData{}
-					dst.EntityOnboardingData = newDst
+					newDst = &EndDeviceTemplate{}
+					dst.EndDeviceTempate = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.EntityOnboardingData = src.EntityOnboardingData
+					dst.EndDeviceTempate = src.EndDeviceTempate
 				} else {
-					dst.EntityOnboardingData = nil
+					dst.EndDeviceTempate = nil
 				}
 			}
 
