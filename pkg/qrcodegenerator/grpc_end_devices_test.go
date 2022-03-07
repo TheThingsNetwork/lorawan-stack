@@ -245,8 +245,7 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 			},
 		},
 		{
-			Name:     "ValidGenerated",
-			FormatID: laTr005.ID(),
+			Name: "ValidGenerated",
 			GetQRData: func() []byte {
 				resp, err := genClient.Generate(ctx, &ttnpb.GenerateEndDeviceQRCodeRequest{
 					FormatId: laTr005.ID(),

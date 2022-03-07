@@ -29,7 +29,7 @@ import (
 
 // QRCodeGenerator implements the QR Code Generator component.
 //
-// The QR Code Generator exposes the EndDeviceQRCodeGenerator.
+// The QR Code Generator exposes the EndDeviceQRCodeGenerator service.
 type QRCodeGenerator struct {
 	*component.Component
 	ctx context.Context
@@ -54,10 +54,11 @@ func New(c *component.Component, conf *Config) (*QRCodeGenerator, error) {
 
 	// Register known end device formats.
 	qrg.endDevices = enddevices.New(ctx)
-	var formats []enddevices.Format
-	formats = append(formats, new(enddevices.LoRaAllianceTR005Format))
-	formats = append(formats, new(enddevices.LoRaAllianceTR005Draft2Format))
-	formats = append(formats, new(enddevices.LoRaAllianceTR005Draft3Format))
+	formats := []enddevices.Format{
+		new(enddevices.LoRaAllianceTR005Format),
+		new(enddevices.LoRaAllianceTR005Draft2Format),
+		new(enddevices.LoRaAllianceTR005Draft3Format),
+	}
 	for _, format := range formats {
 		qrg.endDevices.RegisterEndDeviceFormat(format.ID(), format)
 	}

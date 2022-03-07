@@ -165,7 +165,7 @@ func (m *LoRaAllianceTR005Draft3) EndDeviceInfo() (string, *ttnpb.EndDeviceTempl
 	if len(attributes) > 0 {
 		paths = append(paths, "attributes")
 	}
-	return formatIDLoRaAllianceTR005, &ttnpb.EndDeviceTemplate{
+	return formatIDLoRaAllianceTR005Draft3, &ttnpb.EndDeviceTemplate{
 		EndDevice: &ttnpb.EndDevice{
 			Ids: &ttnpb.EndDeviceIdentifiers{
 				DevEui:  &m.DevEUI,

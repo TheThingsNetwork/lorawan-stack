@@ -50,44 +50,39 @@ type Data interface {
 	Encode(*ttnpb.EndDevice) error
 }
 
-// Server provides methods for end device onboarding.
+// Server provides methods for end device QR codes.
 type Server struct {
-	endDeviceFormats   map[string]Format
-	endDeviceFormatsMu sync.RWMutex
+	endDeviceFormats sync.Map
 }
 
 // New returns a new Server.
 func New(ctx context.Context) *Server {
-	return &Server{
-		endDeviceFormats: make(map[string]Format),
-	}
+	return &Server{}
 }
 
 // GetEndDeviceFormats returns the registered end device QR code formats.
 func (s *Server) GetEndDeviceFormats() map[string]Format {
 	res := make(map[string]Format)
-	s.endDeviceFormatsMu.RLock()
-	for k, v := range s.endDeviceFormats {
-		res[k] = v
-	}
-	s.endDeviceFormatsMu.RUnlock()
+	s.endDeviceFormats.Range(func(key, value interface{}) bool {
+		res[key.(string)] = value.(Format)
+		return true
+	})
 	return res
 }
 
 // GetEndDeviceFormat returns the converter by ID.
 func (s *Server) GetEndDeviceFormat(id string) Format {
-	s.endDeviceFormatsMu.RLock()
-	res := s.endDeviceFormats[id]
-	s.endDeviceFormatsMu.RUnlock()
-	return res
+	res, ok := s.endDeviceFormats.Load(id)
+	if !ok {
+		return nil
+	}
+	return res.(Format)
 }
 
 // RegisterEndDeviceFormat registers the given end device QR code format.
 // Existing registrations with the same ID will be overwritten.
 func (s *Server) RegisterEndDeviceFormat(id string, f Format) {
-	s.endDeviceFormatsMu.Lock()
-	s.endDeviceFormats[id] = f
-	s.endDeviceFormatsMu.Unlock()
+	s.endDeviceFormats.Store(id, f)
 }
 
 var (
@@ -96,18 +91,25 @@ var (
 
 // Parse attempts to parse the given QR code data.
 // It returns the parser and the format ID that successfully parsed the QR code.
-func (s *Server) Parse(formatID string, data []byte) (Data, error) {
-	for id, format := range s.endDeviceFormats {
+func (s *Server) Parse(formatID string, data []byte) (ret Data, err error) {
+	s.endDeviceFormats.Range(func(key, value interface{}) bool {
+		id := key.(string)
 		// If format ID is provided, use only that.
 		if formatID != "" && formatID != id {
-			continue
+			return true
 		}
-		edFormat := format.New()
-		if err := edFormat.UnmarshalText(data); err == nil {
-			return edFormat, nil
+		f := value.(Format).New()
+		if err = f.UnmarshalText(data); err == nil {
+			ret = f
+			return false
 		} else if formatID == id {
-			return nil, err
+			// Return the unmarshaling error since this was the requested format.
+			return false
 		}
+		return true
+	})
+	if ret == nil && err == nil {
+		return nil, errUnknownFormat.WithAttributes("format_id", formatID)
 	}
-	return nil, errUnknownFormat.WithAttributes("format_id", formatID)
+	return
 }
