@@ -74,7 +74,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ needs.determine-if-required.outputs.yarn-cache-dir-path }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock', 'sdk/js/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Initialize SQL dump cache
@@ -93,7 +93,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          key: ${{ runner.os }}-go-${{ hashFiles('go.sum', 'tools/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
       - name: Download Go tool dependencies
@@ -211,7 +211,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ needs.determine-if-required.outputs.yarn-cache-dir-path }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock', 'sdk/js/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Generate certs
@@ -287,7 +287,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ needs.determine-if-required.outputs.yarn-cache-dir-path }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock', 'sdk/js/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Install FF 78 ESR
