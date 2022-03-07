@@ -116,6 +116,7 @@ func init() {
 	defineEnum(Right_RIGHT_USER_CLIENTS_CREATE, "create an OAuth client under the user account")
 	defineEnum(Right_RIGHT_USER_ORGANIZATIONS_LIST, "list organizations the user is a member of")
 	defineEnum(Right_RIGHT_USER_ORGANIZATIONS_CREATE, "create an organization under the user account")
+	defineEnum(Right_RIGHT_USER_NOTIFICATIONS_READ, "read user notifications")
 	defineEnum(Right_RIGHT_USER_ALL, "all user rights")
 
 	defineEnum(Right_RIGHT_APPLICATION_INFO, "view application information")

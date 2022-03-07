@@ -41,6 +41,7 @@ var Right_customvalue = map[string]int32{
 	"USER_CLIENTS_CREATE":                11,
 	"USER_ORGANIZATIONS_LIST":            12,
 	"USER_ORGANIZATIONS_CREATE":          13,
+	"USER_NOTIFICATIONS_READ":            59,
 	"USER_ALL":                           14,
 	"APPLICATION_INFO":                   15,
 	"APPLICATION_SETTINGS_BASIC":         16,

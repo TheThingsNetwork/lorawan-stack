@@ -4466,6 +4466,42 @@
       ]
     }
   },
+  "NotificationService": {
+    "Create": {
+      "file": "lorawan-stack/api/notification_service.proto",
+      "http": []
+    },
+    "List": {
+      "file": "lorawan-stack/api/notification_service.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "get",
+          "pattern": "/users/{receiver_ids.user_id}/notifications",
+          "parameters": [
+            "receiver_ids.user_id"
+          ]
+        }
+      ]
+    },
+    "UpdateStatus": {
+      "file": "lorawan-stack/api/notification_service.proto",
+      "http": [
+        {
+          "method": "patch",
+          "pattern": "/users/{receiver_ids.user_id}/notifications",
+          "body": "*",
+          "parameters": [
+            "receiver_ids.user_id"
+          ]
+        }
+      ]
+    }
+  },
   "OAuthAuthorizationRegistry": {
     "List": {
       "file": "lorawan-stack/api/oauth_services.proto",

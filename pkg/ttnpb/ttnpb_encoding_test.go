@@ -17,6 +17,7 @@ package ttnpb_test
 import (
 	"encoding"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -33,7 +34,15 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
+var writeGolden = flag.Bool("write-golden", false, "Write golden files")
+
 func TestMarshalers(t *testing.T) {
+	defer func() {
+		if t.Failed() {
+			t.Log("NOTE: If you encounter a diff, you may have to run this test with the -write-golden flag.")
+		}
+	}()
+
 	var vals [][]interface{}
 
 	vals = append(vals, []interface{}{
@@ -456,7 +465,7 @@ func TestMarshalers(t *testing.T) {
 		strings.Join(outLines, "\n"),
 	)
 	goldenPath := filepath.Join("testdata", "ttnpb_encoding_golden.md")
-	if os.Getenv("TEST_WRITE_GOLDEN") == "1" {
+	if *writeGolden {
 		if err := os.WriteFile(goldenPath, []byte(out), 0o644); err != nil {
 			t.Fatalf("Failed to write golden file: %s", err)
 		}

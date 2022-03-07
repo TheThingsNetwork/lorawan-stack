@@ -935,6 +935,15 @@
       "file": "i18n.go"
     }
   },
+  "enum:RIGHT_USER_NOTIFICATIONS_READ": {
+    "translations": {
+      "en": "read user notifications"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
   "enum:RIGHT_USER_ORGANIZATIONS_CREATE": {
     "translations": {
       "en": "create an organization under the user account"
