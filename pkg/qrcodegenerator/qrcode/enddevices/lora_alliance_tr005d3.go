@@ -185,7 +185,7 @@ func (m *LoRaAllianceTR005Draft3) EndDeviceInfo() (string, *ttnpb.EndDeviceTempl
 // LoRaAllianceTR005Draft3Format implements the LoRa Alliance TR005 Draft3 Format.
 type LoRaAllianceTR005Draft3Format struct{}
 
-// Format implements EndDeviceFormat.
+// Format implements the Format interface.
 func (LoRaAllianceTR005Draft3Format) Format() *ttnpb.QRCodeFormat {
 	return &ttnpb.QRCodeFormat{
 		Name:        "LoRa Alliance TR005 Draft 3 (DEPRECATED)",

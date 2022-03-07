@@ -29,12 +29,12 @@ import (
 
 // QRCodeGenerator implements the QR Code Generator component.
 //
-// The QR Code Generator exposes the EndDeviceQRCodeGenerator and QRCodeParser services.
+// The QR Code Generator exposes the EndDeviceQRCodeGenerator.
 type QRCodeGenerator struct {
 	*component.Component
 	ctx context.Context
 
-	qrCode *enddevices.QRCode
+	endDevices *enddevices.Server
 
 	grpc struct {
 		endDeviceQRCodeGenerator *endDeviceQRCodeGeneratorServer
@@ -52,16 +52,14 @@ func New(c *component.Component, conf *Config) (*QRCodeGenerator, error) {
 	}
 	qrg.grpc.endDeviceQRCodeGenerator = &endDeviceQRCodeGeneratorServer{QRG: qrg}
 
-	// Register known formats.
-	qrg.qrCode = enddevices.New(ctx)
-
+	// Register known end device formats.
+	qrg.endDevices = enddevices.New(ctx)
 	var formats []enddevices.Format
 	formats = append(formats, new(enddevices.LoRaAllianceTR005Format))
 	formats = append(formats, new(enddevices.LoRaAllianceTR005Draft2Format))
 	formats = append(formats, new(enddevices.LoRaAllianceTR005Draft3Format))
-
 	for _, format := range formats {
-		qrg.qrCode.RegisterEndDeviceFormat(format.ID(), format)
+		qrg.endDevices.RegisterEndDeviceFormat(format.ID(), format)
 	}
 
 	c.RegisterGRPC(qrg)
@@ -73,9 +71,9 @@ func (qrg *QRCodeGenerator) Context() context.Context {
 	return qrg.ctx
 }
 
-// RegisterEndDeviceFormat registers a new EndDeviceFormat.
+// RegisterEndDeviceFormat registers a new enddevices.Format.
 func (qrg *QRCodeGenerator) RegisterEndDeviceFormat(id string, f enddevices.Format) {
-	qrg.qrCode.RegisterEndDeviceFormat(id, f)
+	qrg.endDevices.RegisterEndDeviceFormat(id, f)
 }
 
 // Roles returns the roles that the QR Code Generator fulfills.

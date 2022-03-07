@@ -16,12 +16,17 @@ package enddevices
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+)
+
+const (
+	serialNumberAttribute = "serial-number"
+	vendorIDAttribute     = "vendor-id"
+	profileIDAttribute    = "profile-id"
 )
 
 var (
@@ -45,44 +50,44 @@ type Data interface {
 	Encode(*ttnpb.EndDevice) error
 }
 
+// Server provides methods for end device onboarding.
+type Server struct {
+	endDeviceFormats   map[string]Format
+	endDeviceFormatsMu sync.RWMutex
+}
+
+// New returns a new Server.
+func New(ctx context.Context) *Server {
+	return &Server{
+		endDeviceFormats: make(map[string]Format),
+	}
+}
+
 // GetEndDeviceFormats returns the registered end device QR code formats.
-func (c *QRCode) GetEndDeviceFormats() map[string]Format {
+func (s *Server) GetEndDeviceFormats() map[string]Format {
 	res := make(map[string]Format)
-	c.endDeviceFormatsMu.RLock()
-	for k, v := range c.endDeviceFormats {
+	s.endDeviceFormatsMu.RLock()
+	for k, v := range s.endDeviceFormats {
 		res[k] = v
 	}
-	c.endDeviceFormatsMu.RUnlock()
+	s.endDeviceFormatsMu.RUnlock()
 	return res
 }
 
 // GetEndDeviceFormat returns the converter by ID.
-func (c *QRCode) GetEndDeviceFormat(id string) Format {
-	c.endDeviceFormatsMu.RLock()
-	res := c.endDeviceFormats[id]
-	c.endDeviceFormatsMu.RUnlock()
+func (s *Server) GetEndDeviceFormat(id string) Format {
+	s.endDeviceFormatsMu.RLock()
+	res := s.endDeviceFormats[id]
+	s.endDeviceFormatsMu.RUnlock()
 	return res
 }
 
 // RegisterEndDeviceFormat registers the given end device QR code format.
 // Existing registrations with the same ID will be overwritten.
-func (c *QRCode) RegisterEndDeviceFormat(id string, f Format) {
-	c.endDeviceFormatsMu.Lock()
-	c.endDeviceFormats[id] = f
-	c.endDeviceFormatsMu.Unlock()
-}
-
-// QRCode is a QR Code used for entity onboarding.
-type QRCode struct {
-	endDeviceFormats   map[string]Format
-	endDeviceFormatsMu sync.RWMutex
-}
-
-// New returns a QRCode.
-func New(ctx context.Context) *QRCode {
-	return &QRCode{
-		endDeviceFormats: make(map[string]Format),
-	}
+func (s *Server) RegisterEndDeviceFormat(id string, f Format) {
+	s.endDeviceFormatsMu.Lock()
+	s.endDeviceFormats[id] = f
+	s.endDeviceFormatsMu.Unlock()
 }
 
 var (
@@ -91,18 +96,16 @@ var (
 
 // Parse attempts to parse the given QR code data.
 // It returns the parser and the format ID that successfully parsed the QR code.
-func (c *QRCode) Parse(formatID string, data []byte) (Data, error) {
-	for id, format := range c.endDeviceFormats {
-		// If format ID is provided, use  only that.
+func (s *Server) Parse(formatID string, data []byte) (Data, error) {
+	for id, format := range s.endDeviceFormats {
+		// If format ID is provided, use only that.
 		if formatID != "" && formatID != id {
 			continue
 		}
 		edFormat := format.New()
-		fmt.Println(id, formatID)
 		if err := edFormat.UnmarshalText(data); err == nil {
 			return edFormat, nil
 		} else if formatID == id {
-			// Return the parsing error is format was specified.
 			return nil, err
 		}
 	}

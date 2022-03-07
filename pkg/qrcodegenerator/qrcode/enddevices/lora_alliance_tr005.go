@@ -27,9 +27,6 @@ import (
 
 const (
 	formatIDLoRaAllianceTR005 = "tr005"
-	serialNumberAttribute     = "serial-number"
-	vendorIDAttribute         = "vendor-id"
-	profileIDAttribute        = "profile-id"
 )
 
 // LoRaAllianceTR005 is the LoRa Alliance defined format in Technical Recommendation TR005.
@@ -189,7 +186,7 @@ func (m *LoRaAllianceTR005) EndDeviceInfo() (string, *ttnpb.EndDeviceTemplate) {
 // LoRaAllianceTR005Format implements the LoRa Alliance TR005 Format.
 type LoRaAllianceTR005Format struct{}
 
-// Format implements EndDeviceFormat.
+// Format implements the Format interface.
 func (LoRaAllianceTR005Format) Format() *ttnpb.QRCodeFormat {
 	return &ttnpb.QRCodeFormat{
 		Name:        "LoRa Alliance TR005",
@@ -204,12 +201,12 @@ func (LoRaAllianceTR005Format) Format() *ttnpb.QRCodeFormat {
 	}
 }
 
-// ID implements EndDeviceFormat.
+// ID implements the Format interface.
 func (LoRaAllianceTR005Format) ID() string {
 	return formatIDLoRaAllianceTR005
 }
 
-// New implements EndDeviceFormat.
+// New implements the Format interface.
 func (LoRaAllianceTR005Format) New() Data {
 	return new(LoRaAllianceTR005)
 }
