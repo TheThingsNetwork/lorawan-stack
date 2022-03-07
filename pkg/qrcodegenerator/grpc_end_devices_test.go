@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,29 +15,100 @@
 package qrcodegenerator_test
 
 import (
+	"bytes"
+	"image"
+	"image/png"
 	"testing"
 
+	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator"
-	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode/enddevice"
+	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode/enddevices"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func TestQRCodeParser(t *testing.T) {
+func TestGenerateEndDeviceQRCode(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
 	c := componenttest.NewComponent(t, &component.Config{})
 	qrg, err := New(c, &Config{})
 	test.Must(qrg, err)
-	laTr005 := new(enddevice.LoRaAllianceTR005Format)
+	testFormat := new(mockFormat)
+	qrg.RegisterEndDeviceFormat(testFormat.ID(), testFormat)
+	componenttest.StartComponent(t, c)
+	defer c.Close()
+
+	mustHavePeer(ctx, c, ttnpb.ClusterRole_QR_CODE_GENERATOR)
+
+	client := ttnpb.NewEndDeviceQRCodeGeneratorClient(c.LoopbackConn())
+
+	format, err := client.GetFormat(ctx, &ttnpb.GetQRCodeFormatRequest{
+		FormatId: "test",
+	})
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(format.Name, should.Equal, "Test")
+
+	formats, err := client.ListFormats(ctx, ttnpb.Empty)
+	a.So(err, should.BeNil)
+	a.So(formats.Formats["test"], should.Resemble, &ttnpb.QRCodeFormat{
+		Name:        "Test",
+		Description: "Test",
+		FieldMask: &pbtypes.FieldMask{
+			Paths: []string{"ids"},
+		},
+	})
+
+	dev := &ttnpb.EndDevice{
+		Ids: &ttnpb.EndDeviceIdentifiers{
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{
+				ApplicationId: "test",
+			},
+			DeviceId: "test",
+			JoinEui:  eui64Ptr(types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00}),
+			DevEui:   eui64Ptr(types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}),
+		},
+	}
+
+	res, err := client.Generate(ctx, &ttnpb.GenerateEndDeviceQRCodeRequest{
+		FormatId:  "test",
+		EndDevice: dev,
+		Image: &ttnpb.GenerateEndDeviceQRCodeRequest_Image{
+			ImageSize: 100,
+		},
+	})
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(res.Text, should.Equal, "70B3D57ED0000000:0102030405060708")
+	if !a.So(res.Image.GetEmbedded(), should.NotBeNil) {
+		t.FailNow()
+	}
+	a.So(res.Image.Embedded.MimeType, should.Equal, "image/png")
+	img, err := png.Decode(bytes.NewReader(res.Image.Embedded.Data))
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(img.Bounds(), should.Resemble, image.Rectangle{Max: image.Point{100, 100}})
+}
+
+func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
+	a := assertions.New(t)
+	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+
+	c := componenttest.NewComponent(t, &component.Config{})
+	qrg, err := New(c, &Config{})
+	test.Must(qrg, err)
+	laTr005 := new(enddevices.LoRaAllianceTR005Format)
 	qrg.RegisterEndDeviceFormat(laTr005.ID(), laTr005)
 	componenttest.StartComponent(t, c)
 	defer c.Close()
@@ -45,7 +116,6 @@ func TestQRCodeParser(t *testing.T) {
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_QR_CODE_GENERATOR)
 
 	genClient := ttnpb.NewEndDeviceQRCodeGeneratorClient(c.LoopbackConn())
-	parserClient := ttnpb.NewQRCodeParserClient(c.LoopbackConn())
 	format, err := genClient.GetFormat(ctx, &ttnpb.GetQRCodeFormatRequest{
 		FormatId: laTr005.ID(),
 	})
@@ -58,14 +128,14 @@ func TestQRCodeParser(t *testing.T) {
 		Name      string
 		FormatID  string
 		GetQRData func() []byte
-		Assertion func(*assertions.Assertion, *ttnpb.ParseQRCodeResponse, error) bool
+		Assertion func(*assertions.Assertion, *ttnpb.ParseEndDeviceQRCodeResponse, error) bool
 	}{
 		{
 			Name: "EmptyData",
 			GetQRData: func() []byte {
 				return []byte{}
 			},
-			Assertion: func(a *assertions.Assertion, resp *ttnpb.ParseQRCodeResponse, err error) bool {
+			Assertion: func(a *assertions.Assertion, resp *ttnpb.ParseEndDeviceQRCodeResponse, err error) bool {
 				if !a.So(resp, should.BeNil) {
 					return false
 				}
@@ -81,7 +151,7 @@ func TestQRCodeParser(t *testing.T) {
 			GetQRData: func() []byte {
 				return []byte(`LW:D0:1111111111111111:2222222222222222:00000000:O123456`)
 			},
-			Assertion: func(a *assertions.Assertion, resp *ttnpb.ParseQRCodeResponse, err error) bool {
+			Assertion: func(a *assertions.Assertion, resp *ttnpb.ParseEndDeviceQRCodeResponse, err error) bool {
 				if !a.So(resp, should.BeNil) {
 					return false
 				}
@@ -97,7 +167,7 @@ func TestQRCodeParser(t *testing.T) {
 			GetQRData: func() []byte {
 				return []byte(`LW:D0:1111111111111111:222222222222222:00000000:O123456`)
 			},
-			Assertion: func(a *assertions.Assertion, resp *ttnpb.ParseQRCodeResponse, err error) bool {
+			Assertion: func(a *assertions.Assertion, resp *ttnpb.ParseEndDeviceQRCodeResponse, err error) bool {
 				if !a.So(resp, should.BeNil) {
 					return false
 				}
@@ -108,19 +178,20 @@ func TestQRCodeParser(t *testing.T) {
 			},
 		},
 		{
-			Name: "ValidBytes",
+			Name:     "ValidBytes",
+			FormatID: laTr005.ID(),
 			GetQRData: func() []byte {
 				return []byte(`LW:D0:1111111111111111:2222222222222222:AABB1122:O123456`)
 			},
-			Assertion: func(a *assertions.Assertion, resp *ttnpb.ParseQRCodeResponse, err error) bool {
+			Assertion: func(a *assertions.Assertion, resp *ttnpb.ParseEndDeviceQRCodeResponse, err error) bool {
 				if !a.So(resp, should.NotBeNil) {
 					return false
 				}
 				if !a.So(err, should.BeNil) {
 					return false
 				}
-				a.So(resp.EntityOnboardingData.FormatId, should.Equal, laTr005.ID())
-				endDeviceTemplate := resp.EntityOnboardingData.GetEndDeviceTempate()
+				a.So(resp.FormatId, should.Equal, laTr005.ID())
+				endDeviceTemplate := resp.GetEndDeviceTempate()
 				a.So(endDeviceTemplate, should.NotBeNil)
 				endDevice := endDeviceTemplate.EndDevice
 				a.So(endDevice, should.NotBeNil)
@@ -140,19 +211,20 @@ func TestQRCodeParser(t *testing.T) {
 			},
 		},
 		{
-			Name: "ValidBytesWithSerialNumber",
+			Name:     "ValidBytesWithSerialNumber",
+			FormatID: laTr005.ID(),
 			GetQRData: func() []byte {
 				return []byte(`LW:D0:1111111111111111:2222222222222222:00010001:O123456:S12345678`)
 			},
-			Assertion: func(a *assertions.Assertion, resp *ttnpb.ParseQRCodeResponse, err error) bool {
+			Assertion: func(a *assertions.Assertion, resp *ttnpb.ParseEndDeviceQRCodeResponse, err error) bool {
 				if !a.So(resp, should.NotBeNil) {
 					return false
 				}
 				if !a.So(err, should.BeNil) {
 					return false
 				}
-				a.So(resp.EntityOnboardingData.FormatId, should.Equal, laTr005.ID())
-				endDeviceTemplate := resp.EntityOnboardingData.GetEndDeviceTempate()
+				a.So(resp.FormatId, should.Equal, laTr005.ID())
+				endDeviceTemplate := resp.GetEndDeviceTempate()
 				a.So(endDeviceTemplate, should.NotBeNil)
 				endDevice := endDeviceTemplate.GetEndDevice()
 				a.So(endDevice, should.NotBeNil)
@@ -173,7 +245,8 @@ func TestQRCodeParser(t *testing.T) {
 			},
 		},
 		{
-			Name: "ValidGenerated",
+			Name:     "ValidGenerated",
+			FormatID: laTr005.ID(),
 			GetQRData: func() []byte {
 				resp, err := genClient.Generate(ctx, &ttnpb.GenerateEndDeviceQRCodeRequest{
 					FormatId: laTr005.ID(),
@@ -196,15 +269,15 @@ func TestQRCodeParser(t *testing.T) {
 				}
 				return []byte(resp.Text)
 			},
-			Assertion: func(a *assertions.Assertion, resp *ttnpb.ParseQRCodeResponse, err error) bool {
+			Assertion: func(a *assertions.Assertion, resp *ttnpb.ParseEndDeviceQRCodeResponse, err error) bool {
 				if !a.So(resp, should.NotBeNil) {
 					return false
 				}
 				if !a.So(err, should.BeNil) {
 					return false
 				}
-				a.So(resp.EntityOnboardingData.FormatId, should.Equal, laTr005.ID())
-				endDeviceTemplate := resp.EntityOnboardingData.GetEndDeviceTempate()
+				a.So(resp.FormatId, should.Equal, laTr005.ID())
+				endDeviceTemplate := resp.GetEndDeviceTempate()
 				a.So(endDeviceTemplate, should.NotBeNil)
 				endDevice := endDeviceTemplate.GetEndDevice()
 				a.So(endDevice, should.NotBeNil)
@@ -223,7 +296,7 @@ func TestQRCodeParser(t *testing.T) {
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
-			resp, err := parserClient.Parse(ctx, &ttnpb.ParseQRCodeRequest{
+			resp, err := genClient.Parse(ctx, &ttnpb.ParseEndDeviceQRCodeRequest{
 				FormatId: tc.FormatID,
 				QrCode:   tc.GetQRData(),
 			})

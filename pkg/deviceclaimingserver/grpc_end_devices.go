@@ -94,14 +94,14 @@ func (srv *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.ClaimE
 			if err != nil {
 				return nil, err
 			}
-			client := ttnpb.NewQRCodeParserClient(conn)
-			data, err := client.Parse(ctx, &ttnpb.ParseQRCodeRequest{
+			client := ttnpb.NewEndDeviceQRCodeGeneratorClient(conn)
+			data, err := client.Parse(ctx, &ttnpb.ParseEndDeviceQRCodeRequest{
 				QrCode: qrCode,
 			})
 			if err != nil {
 				return nil, errParseQRCode.WithCause(err)
 			}
-			if edTemplate := data.EntityOnboardingData.GetEndDeviceTempate(); edTemplate != nil && edTemplate.GetEndDevice().Ids != nil && edTemplate.GetEndDevice().Ids.JoinEui != nil {
+			if edTemplate := data.GetEndDeviceTempate(); edTemplate != nil && edTemplate.GetEndDevice().Ids != nil && edTemplate.GetEndDevice().Ids.JoinEui != nil {
 				joinEUI = *edTemplate.GetEndDevice().Ids.JoinEui
 			} else {
 				return nil, errQRCodeData.New()

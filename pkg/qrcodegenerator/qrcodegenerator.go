@@ -22,8 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode"
-	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode/enddevice"
+	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode/enddevices"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
 )
@@ -35,11 +34,10 @@ type QRCodeGenerator struct {
 	*component.Component
 	ctx context.Context
 
-	qrCode *qrcode.QRCode
+	qrCode *enddevices.QRCode
 
 	grpc struct {
 		endDeviceQRCodeGenerator *endDeviceQRCodeGeneratorServer
-		qrCodeParser             *qrCodeParserServer
 	}
 }
 
@@ -53,15 +51,14 @@ func New(c *component.Component, conf *Config) (*QRCodeGenerator, error) {
 		ctx:       ctx,
 	}
 	qrg.grpc.endDeviceQRCodeGenerator = &endDeviceQRCodeGeneratorServer{QRG: qrg}
-	qrg.grpc.qrCodeParser = &qrCodeParserServer{QRG: qrg}
 
 	// Register known formats.
-	qrg.qrCode = qrcode.New(ctx)
+	qrg.qrCode = enddevices.New(ctx)
 
-	var formats []qrcode.EndDeviceFormat
-	formats = append(formats, new(enddevice.LoRaAllianceTR005Format))
-	formats = append(formats, new(enddevice.LoRaAllianceTR005Draft2Format))
-	formats = append(formats, new(enddevice.LoRaAllianceTR005Draft3Format))
+	var formats []enddevices.Format
+	formats = append(formats, new(enddevices.LoRaAllianceTR005Format))
+	formats = append(formats, new(enddevices.LoRaAllianceTR005Draft2Format))
+	formats = append(formats, new(enddevices.LoRaAllianceTR005Draft3Format))
 
 	for _, format := range formats {
 		qrg.qrCode.RegisterEndDeviceFormat(format.ID(), format)
@@ -77,7 +74,7 @@ func (qrg *QRCodeGenerator) Context() context.Context {
 }
 
 // RegisterEndDeviceFormat registers a new EndDeviceFormat.
-func (qrg *QRCodeGenerator) RegisterEndDeviceFormat(id string, f qrcode.EndDeviceFormat) {
+func (qrg *QRCodeGenerator) RegisterEndDeviceFormat(id string, f enddevices.Format) {
 	qrg.qrCode.RegisterEndDeviceFormat(id, f)
 }
 
@@ -89,11 +86,9 @@ func (qrg *QRCodeGenerator) Roles() []ttnpb.ClusterRole {
 // RegisterServices registers services provided by qrg at s.
 func (qrg *QRCodeGenerator) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterEndDeviceQRCodeGeneratorServer(s, qrg.grpc.endDeviceQRCodeGenerator)
-	ttnpb.RegisterQRCodeParserServer(s, qrg.grpc.qrCodeParser)
 }
 
 // RegisterHandlers registers gRPC handlers.
 func (qrg *QRCodeGenerator) RegisterHandlers(s *runtime.ServeMux, conn *grpc.ClientConn) {
 	ttnpb.RegisterEndDeviceQRCodeGeneratorHandler(qrg.Context(), s, conn)
-	ttnpb.RegisterQRCodeParserHandler(qrg.Context(), s, conn)
 }

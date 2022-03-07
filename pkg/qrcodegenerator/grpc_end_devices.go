@@ -26,6 +26,7 @@ type endDeviceQRCodeGeneratorServer struct {
 	QRG *QRCodeGenerator
 }
 
+// GetFormat implements EndDeviceQRCodeGenerator.
 func (s *endDeviceQRCodeGeneratorServer) GetFormat(ctx context.Context, req *ttnpb.GetQRCodeFormatRequest) (*ttnpb.QRCodeFormat, error) {
 	format := s.QRG.qrCode.GetEndDeviceFormat(req.FormatId)
 	if format == nil {
@@ -34,6 +35,7 @@ func (s *endDeviceQRCodeGeneratorServer) GetFormat(ctx context.Context, req *ttn
 	return format.Format(), nil
 }
 
+// ListFormats implements EndDeviceQRCodeGenerator.
 func (s *endDeviceQRCodeGeneratorServer) ListFormats(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.QRCodeFormats, error) {
 	res := &ttnpb.QRCodeFormats{
 		Formats: make(map[string]*ttnpb.QRCodeFormat),
@@ -44,6 +46,7 @@ func (s *endDeviceQRCodeGeneratorServer) ListFormats(ctx context.Context, _ *pbt
 	return res, nil
 }
 
+// Generate implements EndDeviceQRCodeGenerator.
 func (s *endDeviceQRCodeGeneratorServer) Generate(ctx context.Context, req *ttnpb.GenerateEndDeviceQRCodeRequest) (*ttnpb.GenerateQRCodeResponse, error) {
 	formatter := s.QRG.qrCode.GetEndDeviceFormat(req.FormatId)
 	if formatter == nil {
@@ -80,4 +83,17 @@ func (s *endDeviceQRCodeGeneratorServer) Generate(ctx context.Context, req *ttnp
 		}
 	}
 	return res, nil
+}
+
+// Parse implements EndDeviceQRCodeGenerator.
+func (s *endDeviceQRCodeGeneratorServer) Parse(ctx context.Context, req *ttnpb.ParseEndDeviceQRCodeRequest) (*ttnpb.ParseEndDeviceQRCodeResponse, error) {
+	data, err := s.QRG.qrCode.Parse(req.FormatId, req.QrCode)
+	if err != nil {
+		return nil, err
+	}
+	id, edt := data.EndDeviceInfo()
+	return &ttnpb.ParseEndDeviceQRCodeResponse{
+		FormatId:         id,
+		EndDeviceTempate: edt,
+	}, nil
 }

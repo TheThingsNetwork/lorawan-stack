@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package enddevice
+package enddevices
 
 import (
 	"bytes"
@@ -21,7 +21,6 @@ import (
 	"strings"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -151,8 +150,8 @@ func (m *LoRaAllianceTR005) UnmarshalText(text []byte) error {
 	return m.Validate()
 }
 
-// GetEntityOnboardingData implements the Data interface.
-func (m *LoRaAllianceTR005) GetEntityOnboardingData() *ttnpb.EntityOnboardingData {
+// EndDeviceInfo implements the Data interface.
+func (m *LoRaAllianceTR005) EndDeviceInfo() (string, *ttnpb.EndDeviceTemplate) {
 	paths := []string{
 		"ids",
 		"claim_authentication_code",
@@ -170,24 +169,19 @@ func (m *LoRaAllianceTR005) GetEntityOnboardingData() *ttnpb.EntityOnboardingDat
 	if len(attributes) > 0 {
 		paths = append(paths, "attributes")
 	}
-	return &ttnpb.EntityOnboardingData{
-		FormatId: formatIDLoRaAllianceTR005,
-		Data: &ttnpb.EntityOnboardingData_EndDeviceTempate{
-			EndDeviceTempate: &ttnpb.EndDeviceTemplate{
-				EndDevice: &ttnpb.EndDevice{
-					Ids: &ttnpb.EndDeviceIdentifiers{
-						DevEui:  &m.DevEUI,
-						JoinEui: &m.JoinEUI,
-					},
-					ClaimAuthenticationCode: &ttnpb.EndDeviceAuthenticationCode{
-						Value: m.OwnerToken,
-					},
-					Attributes: attributes,
-				},
-				FieldMask: &pbtypes.FieldMask{
-					Paths: paths,
-				},
+	return formatIDLoRaAllianceTR005, &ttnpb.EndDeviceTemplate{
+		EndDevice: &ttnpb.EndDevice{
+			Ids: &ttnpb.EndDeviceIdentifiers{
+				DevEui:  &m.DevEUI,
+				JoinEui: &m.JoinEUI,
 			},
+			ClaimAuthenticationCode: &ttnpb.EndDeviceAuthenticationCode{
+				Value: m.OwnerToken,
+			},
+			Attributes: attributes,
+		},
+		FieldMask: &pbtypes.FieldMask{
+			Paths: paths,
 		},
 	}
 }
@@ -216,6 +210,6 @@ func (LoRaAllianceTR005Format) ID() string {
 }
 
 // New implements EndDeviceFormat.
-func (LoRaAllianceTR005Format) New() qrcode.EndDeviceData {
+func (LoRaAllianceTR005Format) New() Data {
 	return new(LoRaAllianceTR005)
 }
