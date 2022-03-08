@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,11 +28,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
-func New(t *testing.T, newStore func(t *testing.T, dsn *url.URL) Store) *StoreTest {
+func GetDSN(defaultDB string) *url.URL {
 	dsn := url.URL{
 		Scheme: "postgresql",
 		Host:   "localhost:5432",
-		Path:   "ttn_lorawan_is_store_test",
+		Path:   defaultDB,
 	}
 	dsn.User = url.UserPassword("root", "root")
 	query := make(url.Values)
@@ -54,10 +54,41 @@ func New(t *testing.T, newStore func(t *testing.T, dsn *url.URL) Store) *StoreTe
 		dsn.User = url.UserPassword(username, password)
 	}
 	dsn.RawQuery = query.Encode()
+	return &dsn
+}
 
+func GetSchemaDSN(base *url.URL, schemaName string) *url.URL {
+	dsn := *base
+	query := dsn.Query()
+	query.Add("search_path", schemaName)
+	dsn.RawQuery = query.Encode()
+	return &dsn
+}
+
+func CreateSchema(db *sql.DB, schemaName string) error {
+	_, err := db.Exec(fmt.Sprintf("DROP SCHEMA IF EXISTS %s CASCADE;", schemaName))
+	if err != nil {
+		return fmt.Errorf("failed to drop old schema: %w", err)
+	}
+	_, err = db.Exec(fmt.Sprintf("CREATE SCHEMA %s", schemaName))
+	if err != nil {
+		return fmt.Errorf("failed to create schema: %w", err)
+	}
+	return nil
+}
+
+func DropSchema(db *sql.DB, schemaName string) error {
+	_, err := db.Exec(fmt.Sprintf("DROP SCHEMA %s CASCADE;", schemaName))
+	if err != nil {
+		return fmt.Errorf("failed to drop old schema: %w", err)
+	}
+	return nil
+}
+
+func New(t *testing.T, newStore func(t *testing.T, dsn *url.URL) Store) *StoreTest {
 	return &StoreTest{
 		t:          t,
-		dsn:        dsn,
+		dsn:        GetDSN("ttn_lorawan_is_store_test"),
 		newStore:   newStore,
 		population: &Population{},
 	}
@@ -70,17 +101,9 @@ type Store interface {
 
 type StoreTest struct {
 	t          *testing.T
-	dsn        url.URL
+	dsn        *url.URL
 	newStore   func(t *testing.T, dsn *url.URL) Store
 	population *Population
-}
-
-func (s *StoreTest) schemaDSN(schemaName string) *url.URL {
-	dsn := s.dsn
-	query := dsn.Query()
-	query.Add("search_path", schemaName)
-	dsn.RawQuery = query.Encode()
-	return &dsn
 }
 
 func (s *StoreTest) PrepareDB(t *testing.T) Store {
@@ -96,17 +119,11 @@ func (s *StoreTest) PrepareDB(t *testing.T) Store {
 
 	schemaName := strcase.ToSnake(t.Name())
 
-	_, err = db.Exec(fmt.Sprintf("DROP SCHEMA IF EXISTS %s CASCADE;", schemaName))
-	if err != nil {
+	if err = CreateSchema(db, schemaName); err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = db.Exec(fmt.Sprintf("CREATE SCHEMA %s", schemaName))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	store := s.newStore(t, s.schemaDSN(schemaName))
+	store := s.newStore(t, GetSchemaDSN(s.dsn, schemaName))
 
 	if err := store.Init(); err != nil {
 		t.Fatal(err)
@@ -125,7 +142,7 @@ func (s *StoreTest) DestroyDB(t *testing.T, assertClean bool, exceptions ...stri
 	schemaName := strcase.ToSnake(t.Name())
 
 	if t.Failed() {
-		t.Logf("Keeping database to help debugging: %q", s.schemaDSN(schemaName).String())
+		t.Logf("Keeping database to help debugging: %q", GetSchemaDSN(s.dsn, schemaName))
 		return
 	}
 
@@ -172,13 +189,11 @@ func (s *StoreTest) DestroyDB(t *testing.T, assertClean bool, exceptions ...stri
 	}
 
 	if totalRowCount == 0 {
-		_, err = db.Exec(fmt.Sprintf("DROP SCHEMA %s CASCADE", schemaName))
-		if err != nil {
+		if err = DropSchema(db, schemaName); err != nil {
 			t.Fatal(err)
 		}
+		t.Logf("Destroyed schema %s in %s", schemaName, time.Since(start))
 	}
-
-	t.Logf("Destroyed schema %s in %s", schemaName, time.Since(start))
 
 	s.population = &Population{}
 }
