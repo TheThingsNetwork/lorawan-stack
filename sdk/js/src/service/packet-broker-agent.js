@@ -142,6 +142,27 @@ class PacketBrokerAgent {
 
     return response
   }
+
+  async getHomeNetworkDefaultGatewayVisibility() {
+    const result = await this._api.GetHomeNetworkDefaultGatewayVisibility()
+
+    return Marshaler.payloadSingleResponse(result)
+  }
+
+  async setHomeNetworkDefaultGatewayVisibility(gatewayVisibility) {
+    const result = await this._api.SetHomeNetworkDefaultGatewayVisibility(
+      undefined,
+      gatewayVisibility,
+    )
+
+    return Marshaler.payloadSingleResponse(result)
+  }
+
+  async deleteHomeNetworkDefaultGatewayVisibility() {
+    const result = await this._api.DeleteHomeNetworkDefaultGatewayVisibility()
+
+    return Marshaler.payloadSingleResponse(result)
+  }
 }
 
 export default PacketBrokerAgent

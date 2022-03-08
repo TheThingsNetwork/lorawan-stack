@@ -45,6 +45,9 @@ export const selectListed = state => selectPacketBrokerStore(state).listed
 export const selectHomeNetworkDefaultRoutingPolicy = state =>
   selectPacketBrokerStore(state).defaultHomeNetworkRoutingPolicy
 
+export const selectHomeNetworkDefaultGatewayVisibility = state =>
+  selectPacketBrokerStore(state).defaultHomeNetworkGatewayVisibility
+
 // Network.
 export const selectPacketBrokerNetworkEntitiesStore = state =>
   selectPacketBrokerStore(state).networks.entities

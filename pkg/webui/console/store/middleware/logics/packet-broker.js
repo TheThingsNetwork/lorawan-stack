@@ -285,6 +285,50 @@ const deletePacketBrokerHomeNetworkPolicyLogic = createRequestLogic({
   },
 })
 
+const getDefaultGatewayVisibilityLogic = createRequestLogic({
+  type: packetBroker.GET_HOME_NETWORK_GATEWAY_VISIBILITY,
+  process: async () => {
+    try {
+      const result = await tts.PacketBrokerAgent.getHomeNetworkDefaultGatewayVisibility()
+
+      return result
+    } catch (error) {
+      // Not found error means that no policy is set.
+      if (isNotFoundError(error)) {
+        return {}
+      }
+
+      throw error
+    }
+  },
+})
+
+const setDefaultGatewayVisibilityLogic = createRequestLogic({
+  type: packetBroker.SET_HOME_NETWORK_GATEWAY_VISIBILITY,
+  process: async ({ action }) => {
+    const { payload } = action
+
+    await tts.PacketBrokerAgent.setHomeNetworkDefaultGatewayVisibility(payload)
+
+    return payload
+  },
+})
+
+const deleteDefaultGatewayVisibilityLogic = createRequestLogic({
+  type: packetBroker.DELETE_HOME_NETWORK_GATEWAY_VISIBILITY,
+  process: async () => {
+    try {
+      await tts.PacketBrokerAgent.deleteHomeNetworkDefaultGatewayVisibility()
+    } catch (error) {
+      // We can ignore not found errors, meaning that the
+      // policy was already deleted or never existed.
+      if (!isNotFoundError(error)) {
+        throw error
+      }
+    }
+  },
+})
+
 export default [
   getPacketBrokerInfoLogic,
   registerPacketBrokerLogic,
@@ -298,4 +342,7 @@ export default [
   getPacketBrokerHomeNetworkPoliciesLogic,
   setPacketBrokerHomeNetworkPolicyLogic,
   deletePacketBrokerHomeNetworkPolicyLogic,
+  getDefaultGatewayVisibilityLogic,
+  setDefaultGatewayVisibilityLogic,
+  deleteDefaultGatewayVisibilityLogic,
 ]
