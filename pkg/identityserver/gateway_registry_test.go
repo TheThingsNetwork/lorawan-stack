@@ -20,6 +20,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -53,27 +54,30 @@ func init() {
 }
 
 func TestGatewaysPermissionDenied(t *testing.T) {
+	p := &storetest.Population{}
+	usr1 := p.NewUser()
+	gtw1 := p.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
+
+	t.Parallel()
 	a, ctx := test.New(t)
 
-	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewGatewayRegistryClient(cc)
 
 		_, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
 			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{GatewayId: "foo-gtw"},
 			},
-			Collaborator: ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
 		_, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
-			GatewayIds: &ttnpb.GatewayIdentifiers{GatewayId: "foo-gtw"},
+			GatewayIds: gtw1.GetIds(),
 			FieldMask:  &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsUnauthenticated(err), should.BeTrue)
 		}
@@ -81,39 +85,35 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 		listRes, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		a.So(err, should.BeNil)
 		if a.So(listRes, should.NotBeNil) {
 			a.So(listRes.Gateways, should.BeEmpty)
 		}
 
 		_, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
-			Collaborator: ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
 		_, err = reg.Update(ctx, &ttnpb.UpdateGatewayRequest{
 			Gateway: &ttnpb.Gateway{
-				Ids:  &ttnpb.GatewayIdentifiers{GatewayId: "foo-gtw"},
+				Ids:  gtw1.GetIds(),
 				Name: "Updated Name",
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
-		_, err = reg.Delete(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "foo-gtw"})
-
+		_, err = reg.Delete(ctx, gtw1.GetIds())
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-	})
+	}, withPrivateTestDatabase(p))
 }
 
 func TestGatewaysCRUD(t *testing.T) {

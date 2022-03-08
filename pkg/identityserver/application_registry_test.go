@@ -20,6 +20,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc"
@@ -51,27 +52,30 @@ func init() {
 }
 
 func TestApplicationsPermissionDenied(t *testing.T) {
+	p := &storetest.Population{}
+	usr1 := p.NewUser()
+	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+
+	t.Parallel()
 	a, ctx := test.New(t)
 
-	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewApplicationRegistryClient(cc)
 
 		_, err := reg.Create(ctx, &ttnpb.CreateApplicationRequest{
 			Application: &ttnpb.Application{
 				Ids: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
 			},
-			Collaborator: ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
 		_, err = reg.Get(ctx, &ttnpb.GetApplicationRequest{
-			ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
+			ApplicationIds: app1.GetIds(),
 			FieldMask:      &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsUnauthenticated(err), should.BeTrue)
 		}
@@ -79,39 +83,35 @@ func TestApplicationsPermissionDenied(t *testing.T) {
 		listRes, err := reg.List(ctx, &ttnpb.ListApplicationsRequest{
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		a.So(err, should.BeNil)
 		if a.So(listRes, should.NotBeNil) {
 			a.So(listRes.Applications, should.BeEmpty)
 		}
 
 		_, err = reg.List(ctx, &ttnpb.ListApplicationsRequest{
-			Collaborator: ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
 		_, err = reg.Update(ctx, &ttnpb.UpdateApplicationRequest{
 			Application: &ttnpb.Application{
-				Ids:  &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
+				Ids:  app1.GetIds(),
 				Name: "Updated Name",
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
-		_, err = reg.Delete(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"})
-
+		_, err = reg.Delete(ctx, app1.GetIds())
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-	})
+	}, withPrivateTestDatabase(p))
 }
 
 func TestApplicationsCRUD(t *testing.T) {

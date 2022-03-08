@@ -20,6 +20,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc"
@@ -51,27 +52,30 @@ func init() {
 }
 
 func TestClientsPermissionDenied(t *testing.T) {
+	p := &storetest.Population{}
+	usr1 := p.NewUser()
+	cli1 := p.NewClient(usr1.GetOrganizationOrUserIdentifiers())
+
+	t.Parallel()
 	a, ctx := test.New(t)
 
-	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewClientRegistryClient(cc)
 
 		_, err := reg.Create(ctx, &ttnpb.CreateClientRequest{
 			Client: &ttnpb.Client{
 				Ids: &ttnpb.ClientIdentifiers{ClientId: "foo-cli"},
 			},
-			Collaborator: ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
 		_, err = reg.Get(ctx, &ttnpb.GetClientRequest{
-			ClientIds: &ttnpb.ClientIdentifiers{ClientId: "foo-cli"},
+			ClientIds: cli1.GetIds(),
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsUnauthenticated(err), should.BeTrue)
 		}
@@ -79,39 +83,35 @@ func TestClientsPermissionDenied(t *testing.T) {
 		listRes, err := reg.List(ctx, &ttnpb.ListClientsRequest{
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		a.So(err, should.BeNil)
 		if a.So(listRes, should.NotBeNil) {
 			a.So(listRes.Clients, should.BeEmpty)
 		}
 
 		_, err = reg.List(ctx, &ttnpb.ListClientsRequest{
-			Collaborator: ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
 		_, err = reg.Update(ctx, &ttnpb.UpdateClientRequest{
 			Client: &ttnpb.Client{
-				Ids:  &ttnpb.ClientIdentifiers{ClientId: "foo-cli"},
+				Ids:  cli1.GetIds(),
 				Name: "Updated Name",
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
-		_, err = reg.Delete(ctx, &ttnpb.ClientIdentifiers{ClientId: "foo-cli"})
-
+		_, err = reg.Delete(ctx, cli1.GetIds())
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-	})
+	}, withPrivateTestDatabase(p))
 }
 
 func TestClientsCRUD(t *testing.T) {

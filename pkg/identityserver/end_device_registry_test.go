@@ -20,6 +20,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -28,9 +29,15 @@ import (
 )
 
 func TestEndDevicesPermissionDenied(t *testing.T) {
+	p := &storetest.Population{}
+	usr1 := p.NewUser()
+	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+	dev1 := p.NewEndDevice(app1.GetIds())
+
+	t.Parallel()
 	a, ctx := test.New(t)
 
-	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewEndDeviceRegistryClient(cc)
 
 		joinEUI := types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
@@ -39,28 +46,19 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 		_, err := reg.Create(ctx, &ttnpb.CreateEndDeviceRequest{
 			EndDevice: &ttnpb.EndDevice{
 				Ids: &ttnpb.EndDeviceIdentifiers{
-					DeviceId: "test-device-id",
-					ApplicationIds: &ttnpb.ApplicationIdentifiers{
-						ApplicationId: "test-app-id",
-					},
+					DeviceId:       "test-device-id",
+					ApplicationIds: app1.GetIds(),
 				},
 			},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
 		_, err = reg.Get(ctx, &ttnpb.GetEndDeviceRequest{
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
-			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-				DeviceId: "test-device-id",
-				ApplicationIds: &ttnpb.ApplicationIdentifiers{
-					ApplicationId: "test-app-id",
-				},
-			},
+			EndDeviceIds: dev1.GetIds(),
+			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
@@ -69,49 +67,34 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 			JoinEui: joinEUI,
 			DevEui:  devEUI,
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsUnauthenticated(err), should.BeTrue)
 		}
 
 		_, err = reg.List(ctx, &ttnpb.ListEndDevicesRequest{
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
-			ApplicationIds: &ttnpb.ApplicationIdentifiers{
-				ApplicationId: "test-app-id",
-			},
+			ApplicationIds: app1.GetIds(),
+			FieldMask:      &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
 		_, err = reg.Update(ctx, &ttnpb.UpdateEndDeviceRequest{
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 			EndDevice: &ttnpb.EndDevice{
-				Ids: &ttnpb.EndDeviceIdentifiers{
-					DeviceId: "test-device-id",
-					ApplicationIds: &ttnpb.ApplicationIdentifiers{
-						ApplicationId: "test-app-id",
-					},
-				},
+				Ids:  dev1.GetIds(),
+				Name: "Updated Name",
 			},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
-		_, err = reg.Delete(ctx, &ttnpb.EndDeviceIdentifiers{
-			DeviceId: "test-device-id",
-			ApplicationIds: &ttnpb.ApplicationIdentifiers{
-				ApplicationId: "test-app-id",
-			},
-		})
-
+		_, err = reg.Delete(ctx, dev1.GetIds())
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-	})
+	}, withPrivateTestDatabase(p))
 }
 
 func TestEndDevicesCRUD(t *testing.T) {
