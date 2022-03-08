@@ -19,7 +19,6 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -54,8 +53,7 @@ func init() {
 }
 
 func TestGatewaysPermissionDenied(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewGatewayRegistryClient(cc)
@@ -119,8 +117,7 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 }
 
 func TestGatewaysCRUD(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewGatewayRegistryClient(cc)
@@ -308,7 +305,7 @@ func TestGatewaysCRUD(t *testing.T) {
 }
 
 func TestGatewaysPagination(t *testing.T) {
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := paginationUser.GetIds()
@@ -316,7 +313,7 @@ func TestGatewaysPagination(t *testing.T) {
 
 		reg := ttnpb.NewGatewayRegistryClient(cc)
 
-		list, err := reg.List(test.Context(), &ttnpb.ListGatewaysRequest{
+		list, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 			Limit:        2,
@@ -328,7 +325,7 @@ func TestGatewaysPagination(t *testing.T) {
 			a.So(list.Gateways, should.HaveLength, 2)
 		}
 
-		list, err = reg.List(test.Context(), &ttnpb.ListGatewaysRequest{
+		list, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 			Limit:        2,
@@ -340,7 +337,7 @@ func TestGatewaysPagination(t *testing.T) {
 			a.So(list.Gateways, should.HaveLength, 1)
 		}
 
-		list, err = reg.List(test.Context(), &ttnpb.ListGatewaysRequest{
+		list, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 			Limit:        2,
@@ -355,8 +352,7 @@ func TestGatewaysPagination(t *testing.T) {
 }
 
 func TestGatewaysSecrets(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewGatewayRegistryClient(cc)

@@ -18,7 +18,6 @@ import (
 	"testing"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -52,8 +51,7 @@ func init() {
 }
 
 func TestApplicationsPermissionDenied(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewApplicationRegistryClient(cc)
@@ -117,8 +115,7 @@ func TestApplicationsPermissionDenied(t *testing.T) {
 }
 
 func TestApplicationsCRUD(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewApplicationRegistryClient(cc)
@@ -242,7 +239,7 @@ func TestApplicationsCRUD(t *testing.T) {
 }
 
 func TestApplicationsPagination(t *testing.T) {
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := paginationUser.GetIds()
@@ -250,7 +247,7 @@ func TestApplicationsPagination(t *testing.T) {
 
 		reg := ttnpb.NewApplicationRegistryClient(cc)
 
-		list, err := reg.List(test.Context(), &ttnpb.ListApplicationsRequest{
+		list, err := reg.List(ctx, &ttnpb.ListApplicationsRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.GetOrganizationOrUserIdentifiers(),
 			Limit:        2,
@@ -262,7 +259,7 @@ func TestApplicationsPagination(t *testing.T) {
 			a.So(list.Applications, should.HaveLength, 2)
 		}
 
-		list, err = reg.List(test.Context(), &ttnpb.ListApplicationsRequest{
+		list, err = reg.List(ctx, &ttnpb.ListApplicationsRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 			Limit:        2,
@@ -274,7 +271,7 @@ func TestApplicationsPagination(t *testing.T) {
 			a.So(list.Applications, should.HaveLength, 1)
 		}
 
-		list, err = reg.List(test.Context(), &ttnpb.ListApplicationsRequest{
+		list, err = reg.List(ctx, &ttnpb.ListApplicationsRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 			Limit:        2,

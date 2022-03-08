@@ -20,7 +20,6 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -37,8 +36,7 @@ func init() {
 }
 
 func TestUserAccessNotFound(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, creds := population.Users[defaultUserIdx].GetIds(), userCreds(defaultUserIdx)
@@ -74,8 +72,7 @@ func TestUserAccessNotFound(t *testing.T) {
 }
 
 func TestUserAccessRightsPermissionDenied(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, creds := userAccessUser.GetIds(), userCreds(userAccessUserIdx)
@@ -110,8 +107,7 @@ func TestUserAccessRightsPermissionDenied(t *testing.T) {
 }
 
 func TestUserAccessPermissionDenied(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := population.Users[defaultUserIdx].GetIds()
@@ -172,8 +168,7 @@ func TestUserAccessPermissionDenied(t *testing.T) {
 }
 
 func TestUserAccessClusterAuth(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := population.Users[defaultUserIdx].GetIds()
@@ -189,8 +184,7 @@ func TestUserAccessClusterAuth(t *testing.T) {
 }
 
 func TestUserAccessCRUD(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		user, creds := population.Users[defaultUserIdx], userCreds(defaultUserIdx)

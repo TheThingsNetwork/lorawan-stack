@@ -18,7 +18,6 @@ import (
 	"testing"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -48,8 +47,7 @@ func init() {
 }
 
 func TestGatewayAccessNotFound(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, creds := defaultUser.GetIds(), userCreds(defaultUserIdx)
@@ -98,8 +96,7 @@ func TestGatewayAccessNotFound(t *testing.T) {
 }
 
 func TestGatewayAccessRightsPermissionDenied(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, creds := gatewayAccessUser.GetIds(), userCreds(gatewayAccessUserIdx)
@@ -154,8 +151,7 @@ func TestGatewayAccessRightsPermissionDenied(t *testing.T) {
 }
 
 func TestGatewayAccessPermissionDenied(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := defaultUser.GetIds()
@@ -240,8 +236,7 @@ func TestGatewayAccessPermissionDenied(t *testing.T) {
 }
 
 func TestGatewayAccessClusterAuth(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := defaultUser.GetIds()
@@ -259,8 +254,7 @@ func TestGatewayAccessClusterAuth(t *testing.T) {
 }
 
 func TestGatewayAccessCRUD(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, creds := defaultUser.GetIds(), userCreds(defaultUserIdx)
@@ -387,8 +381,7 @@ func TestGatewayAccessCRUD(t *testing.T) {
 }
 
 func TestGatewayAccessRights(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, usrCreds := defaultUser.GetIds(), userCreds(defaultUserIdx)

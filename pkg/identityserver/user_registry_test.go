@@ -21,7 +21,6 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -47,7 +46,7 @@ func TestValidatePasswordStrength(t *testing.T) {
 		"āaaAAA123 ": true,
 	} {
 		t.Run(p, func(t *testing.T) {
-			a := assertions.New(t)
+			a, ctx := test.New(t)
 
 			testWithIdentityServer(t, func(is *IdentityServer, _ *grpc.ClientConn) {
 				conf := *is.config
@@ -58,7 +57,7 @@ func TestValidatePasswordStrength(t *testing.T) {
 				conf.UserRegistration.PasswordRequirements.MinSpecial = 1
 				conf.UserRegistration.PasswordRequirements.RejectUserID = true
 				conf.UserRegistration.PasswordRequirements.RejectCommon = true
-				ctx := context.WithValue(is.Context(), ctxKey, &conf)
+				ctx := context.WithValue(ctx, ctxKey, &conf)
 
 				err := is.validatePasswordStrength(ctx, "username", p)
 				if ok {
@@ -72,8 +71,7 @@ func TestValidatePasswordStrength(t *testing.T) {
 }
 
 func TestTemporaryValidPassword(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := population.Users[userTestUserIdx].GetIds()
@@ -97,8 +95,7 @@ func TestTemporaryValidPassword(t *testing.T) {
 }
 
 func TestUserCreate(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		is.config.UserRegistration.Enabled = false
@@ -148,8 +145,7 @@ func TestUserCreate(t *testing.T) {
 }
 
 func TestUserUpdateInvalidPassword(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := population.Users[userTestUserIdx].GetIds()
@@ -219,8 +215,7 @@ func TestUserUpdateInvalidPassword(t *testing.T) {
 // }
 
 func TestUsersWeakPassword(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewUserRegistryClient(cc)
@@ -266,8 +261,7 @@ func TestUsersWeakPassword(t *testing.T) {
 }
 
 func TestUsersCRUD(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewUserRegistryClient(cc)

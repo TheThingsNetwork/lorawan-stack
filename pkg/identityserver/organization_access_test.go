@@ -18,7 +18,6 @@ import (
 	"testing"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -47,8 +46,7 @@ func init() {
 }
 
 func TestOrganizationAccessNotFound(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, creds := defaultUser.GetIds(), userCreds(defaultUserIdx)
@@ -85,8 +83,7 @@ func TestOrganizationAccessNotFound(t *testing.T) {
 }
 
 func TestOrganizationAccessRightsPermissionDenied(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, creds := organizationAccessUser.GetIds(), userCreds(organizationAccessUserIdx)
@@ -141,8 +138,7 @@ func TestOrganizationAccessRightsPermissionDenied(t *testing.T) {
 }
 
 func TestOrganizationAccessPermissionDenied(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := defaultUser.GetIds()
@@ -227,8 +223,7 @@ func TestOrganizationAccessPermissionDenied(t *testing.T) {
 }
 
 func TestOrganizationAccessClusterAuth(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := defaultUser.GetIds()
@@ -246,8 +241,7 @@ func TestOrganizationAccessClusterAuth(t *testing.T) {
 }
 
 func TestOrganizationAccessCRUD(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, creds := defaultUser.GetIds(), userCreds(defaultUserIdx)
@@ -374,8 +368,7 @@ func TestOrganizationAccessCRUD(t *testing.T) {
 }
 
 func TestOrganizationAccessRights(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID, usrCreds := defaultUser.GetIds(), userCreds(defaultUserIdx)

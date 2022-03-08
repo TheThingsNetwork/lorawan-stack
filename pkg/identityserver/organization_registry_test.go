@@ -18,7 +18,6 @@ import (
 	"testing"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -54,8 +53,7 @@ func init() {
 }
 
 func TestOrganizationsNestedError(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := defaultUser.GetIds()
@@ -87,8 +85,7 @@ func TestOrganizationsNestedError(t *testing.T) {
 }
 
 func TestOrganizationsPermissionDenied(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewOrganizationRegistryClient(cc)
@@ -152,8 +149,7 @@ func TestOrganizationsPermissionDenied(t *testing.T) {
 }
 
 func TestOrganizationsCRUD(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewOrganizationRegistryClient(cc)
@@ -260,7 +256,7 @@ func TestOrganizationsCRUD(t *testing.T) {
 }
 
 func TestOrganizationsPagination(t *testing.T) {
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := paginationUser.GetIds()
@@ -268,7 +264,7 @@ func TestOrganizationsPagination(t *testing.T) {
 
 		reg := ttnpb.NewOrganizationRegistryClient(cc)
 
-		list, err := reg.List(test.Context(), &ttnpb.ListOrganizationsRequest{
+		list, err := reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 			Limit:        2,
@@ -280,7 +276,7 @@ func TestOrganizationsPagination(t *testing.T) {
 			a.So(list.Organizations, should.HaveLength, 2)
 		}
 
-		list, err = reg.List(test.Context(), &ttnpb.ListOrganizationsRequest{
+		list, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 			Limit:        2,
@@ -292,7 +288,7 @@ func TestOrganizationsPagination(t *testing.T) {
 			a.So(list.Organizations, should.HaveLength, 1)
 		}
 
-		list, err = reg.List(test.Context(), &ttnpb.ListOrganizationsRequest{
+		list, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 			Collaborator: userID.OrganizationOrUserIdentifiers(),
 			Limit:        2,
