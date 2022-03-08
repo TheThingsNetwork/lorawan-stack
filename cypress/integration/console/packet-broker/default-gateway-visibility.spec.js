@@ -21,7 +21,6 @@ describe('Packet Broker routing policies', () => {
   it('succeeds showing UI elements in place', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker/default-gateway-visibility`)
 
-    cy.findByText(/default gateway visibility configuration/).should('be.visible')
     cy.findByLabelText('Location').should('be.visible')
     cy.findByLabelText('Antenna placement').should('be.visible')
     cy.findByLabelText('Antenna count').should('be.visible')

@@ -18,9 +18,6 @@ import { isBadRequestError, getBackendErrorDetails } from '@ttn-lw/lib/errors/ut
 
 export const isValidPolicy = policy => Boolean(isObject(policy) && policy.uplink && policy.downlink)
 
-export const hasSetGatewayVisibility = gatewayVisibility =>
-  Boolean(isObject(gatewayVisibility) && gatewayVisibility.visibility)
-
 export const isNotEnabledError = error =>
   isBadRequestError(error) &&
   'details' in error &&

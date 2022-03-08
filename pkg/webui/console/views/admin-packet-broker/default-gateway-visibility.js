@@ -24,12 +24,7 @@ import GatewayVisibilityForm from '@console/components/gateway-visibility-form'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { hasSetGatewayVisibility } from '@console/lib/packet-broker/utils'
-
-import {
-  setHomeNetworkGatewayVisibility,
-  deleteHomeNetworkGatewayVisibility,
-} from '@console/store/actions/packet-broker'
+import { setHomeNetworkDefaultGatewayVisibility } from '@console/store/actions/packet-broker'
 
 import { selectHomeNetworkDefaultGatewayVisibility } from '@console/store/selectors/packet-broker'
 
@@ -41,16 +36,13 @@ const DefaultGatewayVisibilityView = () => {
   const dispatch = useDispatch()
   const defaultGatewayVisibility = useSelector(selectHomeNetworkDefaultGatewayVisibility)
   const initialValues = {
-    _use_default_gateway_visibility: hasSetGatewayVisibility(defaultGatewayVisibility),
+    visibility: defaultGatewayVisibility.visibility || {},
   }
-  initialValues.visibility = initialValues._use_default_gateway_visibility
-    ? defaultGatewayVisibility.visibility
-    : {}
   const [formError, setFormError] = useState(undefined)
   const handleDefaultGatewayVisibilitySubmit = useCallback(
     async ({ visibility }) => {
       try {
-        await dispatch(attachPromise(setHomeNetworkGatewayVisibility(visibility)))
+        await dispatch(attachPromise(setHomeNetworkDefaultGatewayVisibility(visibility)))
         toast({
           message: m.defaultGatewayVisibilitySet,
           type: toast.types.SUCCESS,

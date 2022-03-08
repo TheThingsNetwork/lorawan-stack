@@ -286,7 +286,7 @@ const deletePacketBrokerHomeNetworkPolicyLogic = createRequestLogic({
 })
 
 const getDefaultGatewayVisibilityLogic = createRequestLogic({
-  type: packetBroker.GET_HOME_NETWORK_GATEWAY_VISIBILITY,
+  type: packetBroker.GET_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY,
   process: async () => {
     try {
       const result = await tts.PacketBrokerAgent.getHomeNetworkDefaultGatewayVisibility()
@@ -304,7 +304,7 @@ const getDefaultGatewayVisibilityLogic = createRequestLogic({
 })
 
 const setDefaultGatewayVisibilityLogic = createRequestLogic({
-  type: packetBroker.SET_HOME_NETWORK_GATEWAY_VISIBILITY,
+  type: packetBroker.SET_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY,
   process: async ({ action }) => {
     const { payload } = action
 
@@ -315,7 +315,7 @@ const setDefaultGatewayVisibilityLogic = createRequestLogic({
 })
 
 const deleteDefaultGatewayVisibilityLogic = createRequestLogic({
-  type: packetBroker.DELETE_HOME_NETWORK_GATEWAY_VISIBILITY,
+  type: packetBroker.DELETE_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY,
   process: async () => {
     try {
       await tts.PacketBrokerAgent.deleteHomeNetworkDefaultGatewayVisibility()

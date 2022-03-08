@@ -34,9 +34,8 @@ import {
   GET_PACKET_BROKER_NETWORK_SUCCESS,
   SET_HOME_NETWORK_ROUTING_POLICY_SUCCESS,
   DELETE_HOME_NETWORK_ROUTING_POLICY_SUCCESS,
-  GET_HOME_NETWORK_GATEWAY_VISIBILITY_SUCCESS,
-  SET_HOME_NETWORK_GATEWAY_VISIBILITY_SUCCESS,
-  DELETE_HOME_NETWORK_GATEWAY_VISIBILITY_SUCCESS,
+  GET_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY_SUCCESS,
+  SET_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY_SUCCESS,
 } from '@console/store/actions/packet-broker'
 
 const defaultState = {
@@ -90,10 +89,10 @@ export default handleActions(
       ...state,
       defaultHomeNetworkRoutingPolicy: payload,
     }),
-    [SET_HOME_NETWORK_DEFAULT_ROUTING_POLICY_SUCCESS]: (state, { payload }) => {
-      console.log(payload)
-      return { ...state, defaultHomeNetworkRoutingPolicy: payload }
-    },
+    [SET_HOME_NETWORK_DEFAULT_ROUTING_POLICY_SUCCESS]: (state, { payload }) => ({
+      ...state,
+      defaultHomeNetworkRoutingPolicy: payload,
+    }),
     [combineActions(
       DELETE_HOME_NETWORK_DEFAULT_ROUTING_POLICY_SUCCESS,
       DEREGISTER_PACKET_BROKER_SUCCESS,
@@ -101,17 +100,13 @@ export default handleActions(
       ...state,
       defaultHomeNetworkRoutingPolicy: defaultState.defaultHomeNetworkRoutingPolicy,
     }),
-    [GET_HOME_NETWORK_GATEWAY_VISIBILITY_SUCCESS]: (state, { payload }) => {
-      console.log(payload)
-      return { ...state, defaultHomeNetworkGatewayVisibility: payload }
-    },
-    [SET_HOME_NETWORK_GATEWAY_VISIBILITY_SUCCESS]: (state, { payload }) => {
-      console.log(payload)
-      return { ...state, defaultHomeNetworkGatewayVisibility: payload }
-    },
-    [DELETE_HOME_NETWORK_GATEWAY_VISIBILITY_SUCCESS]: state => ({
+    [GET_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY_SUCCESS]: (state, { payload }) => ({
       ...state,
-      defaultHomeNetworkGatewayVisibility: defaultState.defaultHomeNetworkGatewayVisibility,
+      defaultHomeNetworkGatewayVisibility: payload,
+    }),
+    [SET_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY_SUCCESS]: (state, { payload }) => ({
+      ...state,
+      defaultHomeNetworkGatewayVisibility: payload,
     }),
     [GET_PACKET_BROKER_NETWORK_SUCCESS]: (state, { payload }) => {
       const id = getPacketBrokerNetworkId(payload)

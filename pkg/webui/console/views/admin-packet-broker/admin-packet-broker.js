@@ -42,7 +42,7 @@ import {
   registerPacketBroker,
   deregisterPacketBroker,
   getHomeNetworkDefaultRoutingPolicy,
-  getHomeNetworkGatewayVisibility,
+  getHomeNetworkDefaultGatewayVisibility,
 } from '@console/store/actions/packet-broker'
 
 import {
@@ -282,7 +282,7 @@ const PacketBroker = ({ match }) => {
               <RequireRequest
                 requestAction={[
                   getHomeNetworkDefaultRoutingPolicy(),
-                  getHomeNetworkGatewayVisibility(),
+                  getHomeNetworkDefaultGatewayVisibility(),
                 ]}
               >
                 <RouteSwitch>

@@ -224,46 +224,49 @@ export const [
   },
 ] = createRequestActions(GET_HOME_NETWORK_ROUTING_POLICIES_BASE)
 
-export const GET_HOME_NETWORK_GATEWAY_VISIBILITY_BASE = 'GET_HOME_NETWORK_GATEWAY_VISIBILITY'
+export const GET_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY_BASE =
+  'GET_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY'
 export const [
   {
-    request: GET_HOME_NETWORK_GATEWAY_VISIBILITY,
-    success: GET_HOME_NETWORK_GATEWAY_VISIBILITY_SUCCESS,
-    failure: GET_HOME_NETWORK_GATEWAY_VISIBILITY_FAILURE,
+    request: GET_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY,
+    success: GET_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY_SUCCESS,
+    failure: GET_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY_FAILURE,
   },
   {
-    request: getHomeNetworkGatewayVisibility,
-    success: getHomeNetworkGatewayVisibilitySuccess,
-    failure: getHomeNetworkGatewayVisibilityFailure,
+    request: getHomeNetworkDefaultGatewayVisibility,
+    success: getHomeNetworkDefaultGatewayVisibilitySuccess,
+    failure: getHomeNetworkDefaultGatewayVisibilityFailure,
   },
-] = createRequestActions(GET_HOME_NETWORK_GATEWAY_VISIBILITY_BASE)
+] = createRequestActions(GET_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY_BASE)
 
-export const SET_HOME_NETWORK_GATEWAY_VISIBILITY_BASE = 'SET_HOME_NETWORK_GATEWAY_VISIBILITY'
+export const SET_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY_BASE =
+  'SET_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY'
 export const [
   {
-    request: SET_HOME_NETWORK_GATEWAY_VISIBILITY,
-    success: SET_HOME_NETWORK_GATEWAY_VISIBILITY_SUCCESS,
-    failure: SET_HOME_NETWORK_GATEWAY_VISIBILITY_FAILURE,
+    request: SET_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY,
+    success: SET_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY_SUCCESS,
+    failure: SET_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY_FAILURE,
   },
   {
-    request: setHomeNetworkGatewayVisibility,
-    success: setHomeNetworkGatewayVisibilitySuccess,
-    failure: setHomeNetworkGatewayVisibilityFailure,
+    request: setHomeNetworkDefaultGatewayVisibility,
+    success: setHomeNetworkDefaultGatewayVisibilitySuccess,
+    failure: setHomeNetworkDefaultGatewayVisibilityFailure,
   },
-] = createRequestActions(SET_HOME_NETWORK_GATEWAY_VISIBILITY_BASE, visibility => ({
+] = createRequestActions(SET_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY_BASE, visibility => ({
   visibility,
 }))
 
-export const DELETE_HOME_NETWORK_GATEWAY_VISIBILITY_BASE = 'DELETE_HOME_NETWORK_GATEWAY_VISIBILITY'
+export const DELETE_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY_BASE =
+  'DELETE_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY'
 export const [
   {
-    request: DELETE_HOME_NETWORK_GATEWAY_VISIBILITY,
-    success: DELETE_HOME_NETWORK_GATEWAY_VISIBILITY_SUCCESS,
-    failure: DELETE_HOME_NETWORK_GATEWAY_VISIBILITY_FAILURE,
+    request: DELETE_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY,
+    success: DELETE_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY_SUCCESS,
+    failure: DELETE_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY_FAILURE,
   },
   {
-    request: deleteHomeNetworkGatewayVisibility,
-    success: deleteHomeNetworkGatewayVisibilitySuccess,
-    failure: deleteHomeNetworkGatewayVisibilityFailure,
+    request: deleteHomeNetworkDefaultGatewayVisibility,
+    success: deleteHomeNetworkDefaultGatewayVisibilitySuccess,
+    failure: deleteHomeNetworkDefaultGatewayVisibilityFailure,
   },
-] = createRequestActions(DELETE_HOME_NETWORK_GATEWAY_VISIBILITY_BASE)
+] = createRequestActions(DELETE_HOME_NETWORK_DEFAULT_GATEWAY_VISIBILITY_BASE)
