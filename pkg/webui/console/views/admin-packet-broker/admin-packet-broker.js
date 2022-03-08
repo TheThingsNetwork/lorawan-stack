@@ -42,6 +42,7 @@ import {
   registerPacketBroker,
   deregisterPacketBroker,
   getHomeNetworkDefaultRoutingPolicy,
+  getHomeNetworkGatewayVisibility,
 } from '@console/store/actions/packet-broker'
 
 import {
@@ -55,6 +56,7 @@ import {
 
 import DefaultRoutingPolicyView from './default-routing-policy'
 import NetworkRoutingPoliciesView from './network-routing-policies'
+import DefaultGatewayVisibilityView from './default-gateway-visibility'
 import m from './messages'
 
 import style from './admin-packet-broker.styl'
@@ -112,6 +114,11 @@ const PacketBroker = ({ match }) => {
   const tabs = React.useMemo(
     () => [
       { title: m.defaultRoutingPolicy, link: url, name: 'default' },
+      {
+        title: m.defaultGatewayVisibility,
+        link: `${url}/default-gateway-visibility`,
+        name: 'default-gateway-visibility',
+      },
       { title: sharedMessages.networks, link: `${url}/networks`, name: 'networks', exact: false },
     ],
     [url],
@@ -272,9 +279,19 @@ const PacketBroker = ({ match }) => {
             </Col>
             <Col md={12}>
               <Tabs tabs={tabs} active={activeTab} onTabChange={setActiveTab} divider />
-              <RequireRequest requestAction={getHomeNetworkDefaultRoutingPolicy()}>
+              <RequireRequest
+                requestAction={[
+                  getHomeNetworkDefaultRoutingPolicy(),
+                  getHomeNetworkGatewayVisibility(),
+                ]}
+              >
                 <RouteSwitch>
                   <Route path={url} exact component={DefaultRoutingPolicyView} />
+                  <Route
+                    path={`${url}/default-gateway-visibility`}
+                    exact
+                    component={DefaultGatewayVisibilityView}
+                  />
                   <Route path={`${url}/networks`} exact component={NetworkRoutingPoliciesView} />
                   <NotFoundRoute />
                 </RouteSwitch>
