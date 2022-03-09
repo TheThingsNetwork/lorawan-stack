@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/iancoleman/strcase"
+	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -148,6 +149,14 @@ func userCreds(idx int, preferredNames ...string) grpc.CallOption {
 		}
 	}
 	return nil
+}
+
+func rpcCreds(key *ttnpb.APIKey) grpc.CallOption {
+	return grpc.PerRPCCredentials(rpcmetadata.MD{
+		AuthType:      "bearer",
+		AuthValue:     key.Key,
+		AllowInsecure: true,
+	})
 }
 
 func userAPIKeys(userID *ttnpb.UserIdentifiers) ttnpb.APIKeys {
@@ -305,6 +314,11 @@ func defaultTestOptions() *testOptions {
 			Base: config.Base{
 				Log: config.Log{
 					Level: log.DebugLevel,
+				},
+			},
+			Cluster: cluster.Config{
+				Keys: []string{
+					"11111111111111111111111111111111",
 				},
 			},
 			KeyVault: config.KeyVault{

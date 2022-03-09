@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -149,13 +149,33 @@ func TestOrganizationsPermissionDenied(t *testing.T) {
 }
 
 func TestOrganizationsCRUD(t *testing.T) {
+	p := &storetest.Population{}
+
+	adminUsr := p.NewUser()
+	adminUsr.Admin = true
+	adminKey, _ := p.NewAPIKey(adminUsr.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	adminCreds := rpcCreds(adminKey)
+
+	usr1 := p.NewUser()
+	for i := 0; i < 5; i++ {
+		p.NewOrganization(usr1.GetOrganizationOrUserIdentifiers())
+	}
+
+	usr2 := p.NewUser()
+	for i := 0; i < 5; i++ {
+		p.NewOrganization(usr2.GetOrganizationOrUserIdentifiers())
+	}
+
+	key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	creds := rpcCreds(key)
+	keyWithoutRights, _ := p.NewAPIKey(usr1.GetEntityIdentifiers())
+	credsWithoutRights := rpcCreds(keyWithoutRights)
+
+	t.Parallel()
 	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewOrganizationRegistryClient(cc)
-
-		userID, creds := population.Users[defaultUserIdx].GetIds(), userCreds(defaultUserIdx)
-		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
 
 		is.config.UserRights.CreateOrganizations = false
 
@@ -164,8 +184,11 @@ func TestOrganizationsCRUD(t *testing.T) {
 				Ids:  &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
 				Name: "Foo Organization",
 			},
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 		}, creds)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
 
 		is.config.UserRights.CreateOrganizations = true
 
@@ -174,11 +197,9 @@ func TestOrganizationsCRUD(t *testing.T) {
 				Ids:  &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
 				Name: "Foo Organization",
 			},
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(created, should.NotBeNil) {
+		if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
 			a.So(created.Name, should.Equal, "Foo Organization")
 		}
 
@@ -186,9 +207,7 @@ func TestOrganizationsCRUD(t *testing.T) {
 			OrganizationIds: created.GetIds(),
 			FieldMask:       &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(got, should.NotBeNil) {
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 			a.So(got.Name, should.Equal, created.Name)
 		}
 
@@ -196,14 +215,12 @@ func TestOrganizationsCRUD(t *testing.T) {
 			OrganizationIds: created.GetIds(),
 			FieldMask:       &pbtypes.FieldMask{Paths: []string{"ids"}},
 		}, credsWithoutRights)
-
 		a.So(err, should.BeNil)
 
 		got, err = reg.Get(ctx, &ttnpb.GetOrganizationRequest{
 			OrganizationIds: created.GetIds(),
 			FieldMask:       &pbtypes.FieldMask{Paths: []string{"attributes"}},
 		}, credsWithoutRights)
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
@@ -215,20 +232,16 @@ func TestOrganizationsCRUD(t *testing.T) {
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(updated, should.NotBeNil) {
+		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.Name, should.Equal, "Updated Name")
 		}
 
-		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, userID.OrganizationOrUserIdentifiers()} {
+		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, usr1.GetOrganizationOrUserIdentifiers()} {
 			list, err := reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 				FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 				Collaborator: collaborator,
 			}, creds)
-
-			a.So(err, should.BeNil)
-			if a.So(list, should.NotBeNil) && a.So(list.Organizations, should.NotBeEmpty) {
+			if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) && a.So(list.Organizations, should.HaveLength, 6) {
 				var found bool
 				for _, item := range list.Organizations {
 					if item.GetIds().GetOrganizationId() == created.GetIds().GetOrganizationId() {
@@ -241,18 +254,16 @@ func TestOrganizationsCRUD(t *testing.T) {
 		}
 
 		_, err = reg.Delete(ctx, created.GetIds(), creds)
-
 		a.So(err, should.BeNil)
 
 		_, err = reg.Purge(ctx, created.GetIds(), creds)
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-		_, err = reg.Purge(ctx, created.GetIds(), userCreds(adminUserIdx))
 
+		_, err = reg.Purge(ctx, created.GetIds(), adminCreds)
 		a.So(err, should.BeNil)
-	})
+	}, withPrivateTestDatabase(p))
 }
 
 func TestOrganizationsPagination(t *testing.T) {

@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -117,13 +117,33 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 }
 
 func TestGatewaysCRUD(t *testing.T) {
+	p := &storetest.Population{}
+
+	adminUsr := p.NewUser()
+	adminUsr.Admin = true
+	adminKey, _ := p.NewAPIKey(adminUsr.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	adminCreds := rpcCreds(adminKey)
+
+	usr1 := p.NewUser()
+	for i := 0; i < 5; i++ {
+		p.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
+	}
+
+	usr2 := p.NewUser()
+	for i := 0; i < 5; i++ {
+		p.NewGateway(usr2.GetOrganizationOrUserIdentifiers())
+	}
+
+	key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	creds := rpcCreds(key)
+	keyWithoutRights, _ := p.NewAPIKey(usr1.GetEntityIdentifiers())
+	credsWithoutRights := rpcCreds(keyWithoutRights)
+
+	t.Parallel()
 	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewGatewayRegistryClient(cc)
-
-		userID, creds := population.Users[defaultUserIdx].GetIds(), userCreds(defaultUserIdx)
-		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
 
 		eui := &types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
 
@@ -137,50 +157,12 @@ func TestGatewaysCRUD(t *testing.T) {
 				},
 				Name: "Foo Gateway",
 			},
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 		}, creds)
-
 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 		is.config.UserRights.CreateGateways = true
 
-		// Attempt to Create Empty
-		_, err = reg.Create(ctx, &ttnpb.CreateGatewayRequest{
-			Gateway:      nil,
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
-		}, creds)
-
-		a.So(errors.IsInvalidArgument(err), should.BeTrue)
-
-		// Nil Collaborator
-		_, err = reg.Create(ctx, &ttnpb.CreateGatewayRequest{
-			Gateway: &ttnpb.Gateway{
-				Ids: &ttnpb.GatewayIdentifiers{
-					GatewayId: "foo",
-					Eui:       eui,
-				},
-				Name: "Foo Gateway",
-			},
-			Collaborator: nil,
-		}, creds)
-
-		a.So(errors.IsInvalidArgument(err), should.BeTrue)
-
-		// Credentials without rights.
-		_, err = reg.Create(ctx, &ttnpb.CreateGatewayRequest{
-			Gateway: &ttnpb.Gateway{
-				Ids: &ttnpb.GatewayIdentifiers{
-					GatewayId: "foo",
-					Eui:       eui,
-				},
-				Name: "Foo Gateway",
-			},
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
-		}, credsWithoutRights)
-
-		a.So(errors.IsPermissionDenied(err), should.BeTrue)
-
-		// Valid request
 		created, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
 			Gateway: &ttnpb.Gateway{
 				Ids: &ttnpb.GatewayIdentifiers{
@@ -189,11 +171,10 @@ func TestGatewaysCRUD(t *testing.T) {
 				},
 				Name: "Foo Gateway",
 			},
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(created, should.NotBeNil) {
+		if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
+			a.So(created.GetIds().GetEui(), should.Resemble, eui)
 			a.So(created.Name, should.Equal, "Foo Gateway")
 		}
 
@@ -201,21 +182,15 @@ func TestGatewaysCRUD(t *testing.T) {
 			GatewayIds: created.GetIds(),
 			FieldMask:  &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(got, should.NotBeNil) {
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got.GetIds().GetEui(), should.Resemble, created.Ids.Eui)
 			a.So(got.Name, should.Equal, created.Name)
-			if a.So(got.GetIds().GetEui(), should.NotBeNil) {
-				a.So(got.GetIds().GetEui(), should.Resemble, eui)
-			}
 		}
 
 		ids, err := reg.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
 			Eui: eui,
 		}, credsWithoutRights)
-
-		a.So(err, should.BeNil)
-		if a.So(ids, should.NotBeNil) {
+		if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) {
 			a.So(ids.GetGatewayId(), should.Equal, created.GetIds().GetGatewayId())
 		}
 
@@ -227,9 +202,8 @@ func TestGatewaysCRUD(t *testing.T) {
 				},
 				Name: "Bar Gateway",
 			},
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 		}, creds)
-
 		if a.So(err, should.NotBeNil) {
 			a.So(err, should.HaveSameErrorDefinitionAs, errGatewayEUITaken)
 		}
@@ -238,55 +212,33 @@ func TestGatewaysCRUD(t *testing.T) {
 			GatewayIds: created.GetIds(),
 			FieldMask:  &pbtypes.FieldMask{Paths: []string{"ids"}},
 		}, credsWithoutRights)
-
 		a.So(err, should.BeNil)
 
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIds: created.GetIds(),
 			FieldMask:  &pbtypes.FieldMask{Paths: []string{"attributes"}},
 		}, credsWithoutRights)
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-
-		// Update with nil gateway
-		_, err = reg.Update(ctx, &ttnpb.UpdateGatewayRequest{
-			Gateway:   nil,
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"name", "version_ids.firmware_version"}},
-		}, creds)
-
-		a.So(errors.IsInvalidArgument(err), should.BeTrue)
 
 		updated, err := reg.Update(ctx, &ttnpb.UpdateGatewayRequest{
 			Gateway: &ttnpb.Gateway{
 				Ids:  created.GetIds(),
 				Name: "Updated Name",
-				VersionIds: &ttnpb.GatewayVersionIdentifiers{
-					FirmwareVersion: "1.0.0",
-				},
 			},
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"name", "version_ids.firmware_version"}},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(updated, should.NotBeNil) {
+		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.Name, should.Equal, "Updated Name")
-			a.So(updated.VersionIds, should.NotBeNil)
-			a.So(updated.VersionIds.FirmwareVersion, should.Equal, "1.0.0")
-			a.So(updated.VersionIds.BrandId, should.BeEmpty)
-			a.So(updated.VersionIds.ModelId, should.BeEmpty)
-			a.So(updated.VersionIds.HardwareVersion, should.BeEmpty)
 		}
 
-		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, userID.OrganizationOrUserIdentifiers()} {
+		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, usr1.GetOrganizationOrUserIdentifiers()} {
 			list, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
 				FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 				Collaborator: collaborator,
 			}, creds)
-
-			a.So(err, should.BeNil)
-			if a.So(list, should.NotBeNil) && a.So(list.Gateways, should.NotBeEmpty) {
+			if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) && a.So(list.Gateways, should.HaveLength, 6) {
 				var found bool
 				for _, item := range list.Gateways {
 					if item.GetIds().GetGatewayId() == created.GetIds().GetGatewayId() {
@@ -299,9 +251,16 @@ func TestGatewaysCRUD(t *testing.T) {
 		}
 
 		_, err = reg.Delete(ctx, created.GetIds(), creds)
-
 		a.So(err, should.BeNil)
-	})
+
+		_, err = reg.Purge(ctx, created.GetIds(), creds)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
+
+		_, err = reg.Purge(ctx, created.GetIds(), adminCreds)
+		a.So(err, should.BeNil)
+	}, withPrivateTestDatabase(p))
 }
 
 func TestGatewaysPagination(t *testing.T) {
