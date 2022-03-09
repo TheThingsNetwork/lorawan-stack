@@ -15,25 +15,18 @@
 describe('Packet Broker routing policies', () => {
   before(() => {
     cy.dropAndSeedDatabase()
+  })
+
+  beforeEach(() => {
+    cy.fixture('console/packet-broker/policies-home-network.json').as('homeNetworkPolicies')
+
+    cy.intercept('/api/v3/pba/info', { fixture: 'console/packet-broker/info-registered.json' })
+
     cy.loginConsole({ user_id: 'admin', password: 'admin' })
   })
 
-  it('succeeds showing UI elements in place', () => {
-    cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker/default-gateway-visibility`)
-
-    cy.findByLabelText('Location').should('be.visible')
-    cy.findByLabelText('Antenna placement').should('be.visible')
-    cy.findByLabelText('Antenna count').should('be.visible')
-    cy.findByLabelText('Fine timestamps').should('be.visible')
-    cy.findByLabelText('Contact information').should('be.visible')
-    cy.findByLabelText('Status').should('be.visible')
-    cy.findByLabelText('Frequecy plan').should('be.visible')
-    cy.findByLabelText('Packet rates').should('be.visible')
-
-    cy.findByRole('button', { name: 'Save default gateway visibility' }).should('be.visible')
-  })
-
   it('succeeds setting default gateway visibility configuration', () => {
+    cy.intercept('PUT', '/api/v3/pba/home-networks/gateway-visibilities/default', {})
     cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker/default-gateway-visibility`)
 
     cy.findByLabelText('Location').check()
@@ -47,14 +40,13 @@ describe('Packet Broker routing policies', () => {
     cy.findByTestId('toast-notification')
       .findByText('Default gateway visibility set')
       .should('be.visible')
-
-    cy.findByLabelText('Location').should('have.attr', 'checked')
-    cy.findByLabelText('Antenna placement').should('have.attr', 'checked')
-    cy.findByLabelText('Antenna count').should('have.attr', 'checked')
-    cy.findByLabelText('Fine timestamps').should('have.attr', 'checked')
   })
 
   it('succeeds unsetting default gateway visibility configuration', () => {
+    cy.intercept('GET', '/api/v3/pba/home-networks/gateway-visibilities/default', {
+      fixture: 'console/packet-broker/default-gateway-visibility.json',
+    })
+    cy.intercept('PUT', '/api/v3/pba/home-networks/gateway-visibilities/default', {})
     cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker/default-gateway-visibility`)
 
     cy.findByLabelText('Location').uncheck()
@@ -68,10 +60,5 @@ describe('Packet Broker routing policies', () => {
     cy.findByTestId('toast-notification')
       .findByText('Default gateway visibility set')
       .should('be.visible')
-
-    cy.findByLabelText('Location').should('not.have.attr', 'checked')
-    cy.findByLabelText('Antenna placement').should('not.have.attr', 'checked')
-    cy.findByLabelText('Antenna count').should('not.have.attr', 'checked')
-    cy.findByLabelText('Fine timestamps').should('not.have.attr', 'checked')
   })
 })

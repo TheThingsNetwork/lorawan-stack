@@ -293,7 +293,7 @@ const getDefaultGatewayVisibilityLogic = createRequestLogic({
 
       return result
     } catch (error) {
-      // Not found error means that no policy is set.
+      // Not found error means that no gateway visibility is set.
       if (isNotFoundError(error)) {
         return {}
       }
@@ -321,7 +321,7 @@ const deleteDefaultGatewayVisibilityLogic = createRequestLogic({
       await tts.PacketBrokerAgent.deleteHomeNetworkDefaultGatewayVisibility()
     } catch (error) {
       // We can ignore not found errors, meaning that the
-      // policy was already deleted or never existed.
+      // gateway visibility was already deleted or never existed.
       if (!isNotFoundError(error)) {
         throw error
       }
