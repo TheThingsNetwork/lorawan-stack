@@ -198,6 +198,8 @@ func (cl joinServerHTTPClient) GetAppSKey(ctx context.Context, asID string, req 
 }
 
 var (
+	errMissingNSID          = errors.DefineFailedPrecondition("missing_ns_id", "missing NSID")
+	errNSIDNotSupported     = errors.DefineFailedPrecondition("ns_id_not_supported", "NSID not supported")
 	errNoJoinRequestPayload = errors.DefineInvalidArgument("no_join_request_payload", "no join-request payload")
 	errGenerateSessionKeyID = errors.Define("generate_session_key_id", "failed to generate session key ID")
 
@@ -206,6 +208,13 @@ var (
 
 // HandleJoinRequest performs Join request according to LoRaWAN Backend Interfaces specification.
 func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID types.NetID, req *ttnpb.JoinRequest) (*ttnpb.JoinResponse, error) {
+	if cl.protocol.RequiresNSID() && cl.senderNSID == nil {
+		return nil, errMissingNSID.New()
+	}
+	if !cl.protocol.RequiresNSID() && cl.senderNSID != nil {
+		return nil, errNSIDNotSupported.New()
+	}
+
 	pld := req.Payload.GetJoinRequestPayload()
 	if pld == nil {
 		return nil, errNoJoinRequestPayload.New()
@@ -300,8 +309,6 @@ type Client struct {
 var (
 	errUnknownConfig         = errors.DefineNotFound("unknown_config", "configuration is unknown")
 	errDNSLookupNotSupported = errors.DefineFailedPrecondition("dns_lookup_not_supported", "DNS lookup is not supported")
-	errMissingNSID           = errors.DefineFailedPrecondition("missing_ns_id", "missing NSID")
-	errNSIDNotSupported      = errors.DefineFailedPrecondition("ns_id_not_supported", "NSID not supported")
 )
 
 // NewClient return new interop client.
@@ -370,12 +377,6 @@ func NewClient(ctx context.Context, conf config.InteropClient, httpClientProvide
 					return nil, err
 				}
 				opts = append(opts, httpclient.WithTLSConfig(tlsConf))
-			}
-			if jsConf.Protocol.RequiresNSID() && jsConf.SenderNSID == nil {
-				return nil, errMissingNSID.New()
-			}
-			if !jsConf.Protocol.RequiresNSID() && jsConf.SenderNSID != nil {
-				return nil, errNSIDNotSupported.New()
 			}
 			if jsConf.DNSSuffix != "" || jsConf.FQDN == "" {
 				return nil, errDNSLookupNotSupported.New()
