@@ -405,6 +405,8 @@ func testWithIdentityServer(t *testing.T, f func(*IdentityServer, *grpc.ClientCo
 
 	f(is, is.LoopbackConn())
 
+	is.Close()
+
 	if testOptions.privateDatabase {
 		if t.Failed() {
 			t.Logf("Keeping database %q", schemaDSN)
