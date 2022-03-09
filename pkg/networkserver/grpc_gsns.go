@@ -733,6 +733,10 @@ func (ns *NetworkServer) mergeMetadata(ctx context.Context, up *ttnpb.UplinkMess
 		log.FromContext(ctx).WithError(err).Error("Failed to merge metadata")
 		return
 	}
+	if len(mds) == 0 {
+		log.FromContext(ctx).Warn("No metadata to merge, keep uplink message metadata")
+		return
+	}
 	up.RxMetadata = mds
 	log.FromContext(ctx).WithField("metadata_count", len(up.RxMetadata)).Debug("Merged metadata")
 	registerMergeMetadata(ctx, up)
