@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Join-accept scheduling if it took more than ~1.2 seconds to process the device activation with default configuration. These slow device activations can be observed when using external Join Servers.
+
 ### Security
 
 ## [3.18.1] - 2022-03-09

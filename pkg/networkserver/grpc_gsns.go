@@ -60,8 +60,8 @@ type UplinkDeduplicator interface {
 	AccumulatedMetadata(context.Context, *ttnpb.UplinkMessage) ([]*ttnpb.RxMetadata, error)
 }
 
-func (ns *NetworkServer) deduplicateUplink(ctx context.Context, up *ttnpb.UplinkMessage) (bool, error) {
-	ok, err := ns.uplinkDeduplicator.DeduplicateUplink(ctx, up, ns.collectionWindow(ctx))
+func (ns *NetworkServer) deduplicateUplink(ctx context.Context, up *ttnpb.UplinkMessage, window time.Duration) (bool, error) {
+	ok, err := ns.uplinkDeduplicator.DeduplicateUplink(ctx, up, window)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to deduplicate uplink")
 		return false, err
@@ -733,6 +733,10 @@ func (ns *NetworkServer) mergeMetadata(ctx context.Context, up *ttnpb.UplinkMess
 		log.FromContext(ctx).WithError(err).Error("Failed to merge metadata")
 		return
 	}
+	if len(mds) == 0 {
+		log.FromContext(ctx).Warn("No metadata to merge, keep uplink message metadata")
+		return
+	}
 	up.RxMetadata = mds
 	log.FromContext(ctx).WithField("metadata_count", len(up.RxMetadata)).Debug("Merged metadata")
 	registerMergeMetadata(ctx, up)
@@ -781,7 +785,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		"uplink_f_cnt", pld.FHdr.FCnt,
 	))
 
-	ok, err := ns.deduplicateUplink(ctx, up)
+	ok, err := ns.deduplicateUplink(ctx, up, ns.collectionWindow(ctx))
 	if err != nil {
 		return err
 	}
@@ -1140,7 +1144,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		"device_channel_index", chIdx,
 	)
 
-	ok, err := ns.deduplicateUplink(ctx, up)
+	ok, err := ns.deduplicateUplink(ctx, up, phy.JoinAcceptDelay2)
 	if err != nil {
 		return err
 	}
