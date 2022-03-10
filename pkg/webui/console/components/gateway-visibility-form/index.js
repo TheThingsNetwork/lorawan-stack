@@ -34,7 +34,7 @@ const validationSchema = Yup.object({
   visibility: Yup.object({}),
 })
 
-const GatewayVisibilityForm = ({ onSubmit, initialValues, error, submitMessage }) => {
+const GatewayVisibilityForm = ({ onSubmit, initialValues, error }) => {
   const handleSubmit = useCallback(values => onSubmit(validationSchema.cast(values)), [onSubmit])
 
   return (
@@ -96,7 +96,7 @@ const GatewayVisibilityForm = ({ onSubmit, initialValues, error, submitMessage }
         </Col>
       </Row>
       <SubmitBar>
-        <Form.Submit component={SubmitButton} message={ m.saveDefaultGatewayVisibility } />
+        <Form.Submit component={SubmitButton} message={m.saveDefaultGatewayVisibility} />
       </SubmitBar>
     </Form>
   )
