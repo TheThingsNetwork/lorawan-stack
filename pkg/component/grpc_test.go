@@ -27,7 +27,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -98,12 +97,12 @@ func TestHooks(t *testing.T) {
 		t.FailNow()
 	}
 	s := grpc.NewServer(
-		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(errors.UnaryServerInterceptor(), hooks.UnaryServerInterceptor())),
-		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(errors.StreamServerInterceptor(), hooks.StreamServerInterceptor())),
+		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(errors.UnaryServerInterceptor(), c.GRPC.UnaryServerInterceptor())),
+		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(errors.StreamServerInterceptor(), c.GRPC.StreamServerInterceptor())),
 	)
 
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.Gs", cluster.HookName, c.ClusterAuthUnaryHook())
-	hooks.RegisterStreamHook("/ttn.lorawan.v3.AppAs", cluster.HookName, c.ClusterAuthStreamHook())
+	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.Gs", cluster.HookName, c.ClusterAuthUnaryHook())
+	c.GRPC.RegisterStreamHook("/ttn.lorawan.v3.AppAs", cluster.HookName, c.ClusterAuthStreamHook())
 
 	as := &asImplementation{
 		Component: c,
