@@ -87,12 +87,12 @@ const m = defineMessages({
 const isReadOnly = value => value.readOnly
 
 const messageCheck = message => {
-  if (message && message.enabled) {
-    const { value } = message
-
-    return value ? value.length <= 64 : true
+  if (message && 'path' in message) {
+    if (message.path === undefined) {
+      return true
+    }
+    return message.path.length <= 64
   }
-
   return true
 }
 
@@ -143,64 +143,64 @@ const validationSchema = Yup.object().shape({
   ),
   uplink_message: Yup.object()
     .shape({
-      enabled: Yup.boolean(),
       path: Yup.string(),
     })
-    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck)
+    .nullable(),
   join_accept: Yup.object()
     .shape({
-      enabled: Yup.boolean(),
-      value: Yup.string(),
+      path: Yup.string(),
     })
-    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck)
+    .nullable(),
   downlink_ack: Yup.object()
     .shape({
-      enabled: Yup.boolean(),
-      value: Yup.string(),
+      path: Yup.string(),
     })
-    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck)
+    .nullable(),
   downlink_nack: Yup.object()
     .shape({
-      enabled: Yup.boolean(),
-      value: Yup.string(),
+      path: Yup.string(),
     })
-    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck)
+    .nullable(),
   downlink_sent: Yup.object()
     .shape({
-      enabled: Yup.boolean(),
-      value: Yup.string(),
+      path: Yup.string(),
     })
-    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck)
+    .nullable(),
   downlink_failed: Yup.object()
     .shape({
-      enabled: Yup.boolean(),
-      value: Yup.string(),
+      path: Yup.string(),
     })
-    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck)
+    .nullable(),
   downlink_queued: Yup.object()
     .shape({
-      enabled: Yup.boolean(),
-      value: Yup.string(),
+      path: Yup.string(),
     })
-    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck)
+    .nullable(),
   downlink_queue_invalidated: Yup.object()
     .shape({
-      enabled: Yup.boolean(),
-      value: Yup.string(),
+      path: Yup.string(),
     })
-    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck)
+    .nullable(),
   location_solved: Yup.object()
     .shape({
-      enabled: Yup.boolean(),
-      value: Yup.string(),
+      path: Yup.string(),
     })
-    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck)
+    .nullable(),
   service_data: Yup.object()
     .shape({
-      enabled: Yup.boolean(),
-      value: Yup.string(),
+      path: Yup.string(),
     })
-    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck),
+    .test('has path length at most 64 characters', m.messagePathValidateTooLong, messageCheck)
+    .nullable(),
 })
 
 export default class WebhookForm extends Component {
@@ -351,7 +351,7 @@ export default class WebhookForm extends Component {
     const { error, displayOverwriteModal, existingId } = this.state
     let initialValues = blankValues
     if (update && initialWebhookValue) {
-      initialValues = decodeValues(initialWebhookValue)
+      initialValues = decodeValues({ ...blankValues, ...initialWebhookValue })
     }
 
     const mayReactivate =
