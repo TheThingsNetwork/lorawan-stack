@@ -48,6 +48,10 @@ jobs:
             git add CHANGELOG.md
             git commit -m "all: Enter release date of version ${{ steps.version.outputs.result }} into the changelog"
             git push
+            git tag -d ${{ github.ref_name }}
+            git tag ${{ github.ref_name }}
+            git push -d origin ${{ github.ref_name }}
+            git push origin ${{ github.ref_name }}
           fi
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
