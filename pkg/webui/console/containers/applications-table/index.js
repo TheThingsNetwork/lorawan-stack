@@ -176,7 +176,7 @@ const ApplicationsTable = props => {
         ...app,
         otherCluster: isOtherClusterApp(app),
         _meta: {
-          clickable: !isOtherClusterApp(app),
+          hide: isOtherClusterApp(app),
         },
       })
     }

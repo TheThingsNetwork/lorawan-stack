@@ -69,15 +69,7 @@ const ApplicationAdd = props => {
 
   const handleSubmit = useCallback(
     async (values, { setSubmitting }) => {
-      const {
-        owner_id,
-        application_id,
-        name,
-        description,
-        network_server_address,
-        application_server_address,
-        join_server_address,
-      } = values
+      const { owner_id, application_id, name, description } = values
       setError(undefined)
 
       try {
@@ -87,9 +79,9 @@ const ApplicationAdd = props => {
             ids: { application_id },
             name,
             description,
-            network_server_address,
-            application_server_address,
-            join_server_address,
+            network_server_address: nsHost,
+            application_server_address: asHost,
+            join_server_address: jsHost,
           },
           userId === owner_id,
         )
@@ -102,7 +94,7 @@ const ApplicationAdd = props => {
         setError(error)
       }
     },
-    [navigateToApplication, userId],
+    [navigateToApplication, userId, nsHost, asHost, jsHost],
   )
 
   const initialValues = {
@@ -110,9 +102,6 @@ const ApplicationAdd = props => {
     name: '',
     description: '',
     owner_id: userId,
-    network_server_address: nsHost,
-    application_server_address: asHost,
-    join_server_address: jsHost,
   }
 
   return (
@@ -147,22 +136,6 @@ const ApplicationAdd = props => {
               name="description"
               placeholder={m.appDescPlaceholder}
               description={m.appDescDescription}
-              component={Input}
-            />
-            <Form.SubTitle title="Advanced network settings" />
-            <Form.Field
-              title={sharedMessages.networkServerAddress}
-              name="network_server_address"
-              component={Input}
-            />
-            <Form.Field
-              title={sharedMessages.joinServerAddress}
-              name="join_server_address"
-              component={Input}
-            />
-            <Form.Field
-              title={sharedMessages.applicationServerAddress}
-              name="application_server_address"
               component={Input}
             />
             <SubmitBar>
