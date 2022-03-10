@@ -58,26 +58,23 @@ export default defineMessages({
   downlinkPolicies: 'This bottom row shows the downlink policies of this network',
 
   gatewayLocationLabel: 'Location',
-  gatewayLocationDescription: 'Show location',
 
   gatewayAntennaPlacementLabel: 'Antenna placement',
   gatewayAntennaPlacementDescription: 'Show antenna placement (indoor/outdoor)',
 
   gatewayAntennaCountLabel: 'Antenna count',
-  gatewayAntennaCountDescription: 'Show antenna count',
 
   gatewayFineTimestampsLabel: 'Fine timestamps',
-  gatewayFineTimestampsDescription: 'Show whether the gateway produces fine timestamps',
+  gatewayFineTimestampsDescription: 'Whether the gateway produces fine timestamps',
 
   gatewayContactInfoLabel: 'Contact information',
-  gatewayContactInfoDescription: 'Show contact information',
+  gatewayContactInfoDescription: 'Show means to contact the gateway owner or operator',
 
   gatewayStatusLabel: 'Status',
-  gatewayStatusDescription: 'Show status (online/offline)',
+  gatewayStatusDescription: 'Show whether the gateway is online or offline',
 
   gatewayFreqPlanLabel: 'Frequency plan',
-  gatewayFreqPlanDescription: 'Show frequency plan',
 
   gatewayPacketRatesLabel: 'Packet rates',
-  gatewayPacketRatesDescription: 'Show receive and transmission packet rates',
+  gatewayPacketRatesDescription: 'Receive and transmission packet rates',
 })

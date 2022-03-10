@@ -50,7 +50,6 @@ const GatewayVisibilityForm = ({ onSubmit, initialValues, error, submitMessage }
             name="visibility.location"
             component={Checkbox}
             label={gatewayVisibilityMessages.gatewayLocationLabel}
-            description={gatewayVisibilityMessages.gatewayLocationDescription}
           />
           <Form.Field
             name="visibility.antenna_placement"
@@ -62,7 +61,6 @@ const GatewayVisibilityForm = ({ onSubmit, initialValues, error, submitMessage }
             name="visibility.antenna_count"
             component={Checkbox}
             label={gatewayVisibilityMessages.gatewayAntennaCountLabel}
-            description={gatewayVisibilityMessages.gatewayAntennaCountDescription}
           />
           <Form.Field
             name="visibility.fine_timestamps"
@@ -88,7 +86,6 @@ const GatewayVisibilityForm = ({ onSubmit, initialValues, error, submitMessage }
             name="visibility.frequency_plan"
             component={Checkbox}
             label={gatewayVisibilityMessages.gatewayFreqPlanLabel}
-            description={gatewayVisibilityMessages.gatewayFreqPlanDescription}
           />
           <Form.Field
             name="visibility.packet_rates"
@@ -99,7 +96,7 @@ const GatewayVisibilityForm = ({ onSubmit, initialValues, error, submitMessage }
         </Col>
       </Row>
       <SubmitBar>
-        <Form.Submit component={SubmitButton} message={submitMessage} />
+        <Form.Submit component={SubmitButton} message={ m.saveDefaultGatewayVisibility } />
       </SubmitBar>
     </Form>
   )
@@ -111,12 +108,10 @@ GatewayVisibilityForm.propTypes = {
     visibility: PropTypes.shape({}),
   }),
   onSubmit: PropTypes.func.isRequired,
-  submitMessage: PropTypes.message,
 }
 
 GatewayVisibilityForm.defaultProps = {
   error: undefined,
-  submitMessage: m.saveDefaultGatewayVisibility,
   initialValues: {
     visibility: {
       location: false,
