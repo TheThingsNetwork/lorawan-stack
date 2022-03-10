@@ -16,6 +16,7 @@ import { connect as withConnect } from 'react-redux'
 import { push } from 'connected-react-router'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
+import { selectNsConfig, selectAsConfig, selectJsConfig } from '@ttn-lw/lib/selectors/env'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
@@ -32,6 +33,9 @@ const mapStateToProps = state => ({
   userId: selectUserId(state),
   rights: selectUserRights(state),
   fetching: selectOrganizationFetching(state),
+  jsConfig: selectJsConfig(),
+  nsConfig: selectNsConfig(),
+  asConfig: selectAsConfig(),
 })
 
 const mapDispatchToProps = dispatch => ({

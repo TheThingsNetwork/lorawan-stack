@@ -31,6 +31,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { getApplicationId } from '@ttn-lw/lib/selectors/id'
 import { id as applicationIdRegexp } from '@ttn-lw/lib/regexp'
+import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 
 const m = defineMessages({
   applicationName: 'Application name',
@@ -53,17 +54,30 @@ const validationSchema = Yup.object().shape({
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(2000, Yup.passValues(sharedMessages.validateTooLong)),
   description: Yup.string(),
+  network_server_address: Yup.string(),
+  application_server_address: Yup.string(),
+  join_server_address: Yup.string(),
 })
 
 const ApplicationAdd = props => {
-  const { userId, navigateToApplication } = props
+  const { userId, navigateToApplication, asConfig, jsConfig, nsConfig } = props
+  const jsHost = getHostFromUrl(jsConfig.base_url)
+  const nsHost = getHostFromUrl(nsConfig.base_url)
+  const asHost = getHostFromUrl(asConfig.base_url)
 
   const [error, setError] = useState()
 
   const handleSubmit = useCallback(
     async (values, { setSubmitting }) => {
-      const { owner_id, application_id, name, description } = values
-
+      const {
+        owner_id,
+        application_id,
+        name,
+        description,
+        network_server_address,
+        application_server_address,
+        join_server_address,
+      } = values
       setError(undefined)
 
       try {
@@ -73,6 +87,9 @@ const ApplicationAdd = props => {
             ids: { application_id },
             name,
             description,
+            network_server_address,
+            application_server_address,
+            join_server_address,
           },
           userId === owner_id,
         )
@@ -93,6 +110,9 @@ const ApplicationAdd = props => {
     name: '',
     description: '',
     owner_id: userId,
+    network_server_address: nsHost,
+    application_server_address: asHost,
+    join_server_address: jsHost,
   }
 
   return (
@@ -129,6 +149,22 @@ const ApplicationAdd = props => {
               description={m.appDescDescription}
               component={Input}
             />
+            <Form.SubTitle title="Advanced network settings" />
+            <Form.Field
+              title={sharedMessages.networkServerAddress}
+              name="network_server_address"
+              component={Input}
+            />
+            <Form.Field
+              title={sharedMessages.joinServerAddress}
+              name="join_server_address"
+              component={Input}
+            />
+            <Form.Field
+              title={sharedMessages.applicationServerAddress}
+              name="application_server_address"
+              component={Input}
+            />
             <SubmitBar>
               <Form.Submit message={m.createApplication} component={SubmitButton} />
             </SubmitBar>
@@ -140,8 +176,29 @@ const ApplicationAdd = props => {
 }
 
 ApplicationAdd.propTypes = {
+  asConfig: PropTypes.shape({
+    base_url: PropTypes.string,
+  }),
+  jsConfig: PropTypes.shape({
+    base_url: PropTypes.string,
+  }),
   navigateToApplication: PropTypes.func.isRequired,
+  nsConfig: PropTypes.shape({
+    base_url: PropTypes.string,
+  }),
   userId: PropTypes.string.isRequired,
+}
+
+ApplicationAdd.defaultProps = {
+  asConfig: {
+    base_url: undefined,
+  },
+  nsConfig: {
+    base_url: undefined,
+  },
+  jsConfig: {
+    base_url: undefined,
+  },
 }
 
 export default ApplicationAdd
