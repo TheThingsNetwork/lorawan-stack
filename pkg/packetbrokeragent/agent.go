@@ -63,8 +63,15 @@ type RegistrationInfo struct {
 	Listed        bool
 }
 
+// PacketBrokerClusterBuilder builds a Packet Broker Cluster ID from a The Things Stack Cluster ID.
+type PacketBrokerClusterIDBuilder func(clusterID string) (string, error)
+
+func literalClusterID(clusterID string) (string, error) {
+	return clusterID, nil
+}
+
 // RegistrationInfoExtractor extracts registration information from the context.
-type RegistrationInfoExtractor func(ctx context.Context, homeNetworkClusterID string) (*RegistrationInfo, error)
+type RegistrationInfoExtractor func(ctx context.Context, homeNetworkClusterID string, clusterIDBuilder PacketBrokerClusterIDBuilder) (*RegistrationInfo, error)
 
 type uplinkMessage struct {
 	context.Context
@@ -89,7 +96,8 @@ type Agent struct {
 	netID            types.NetID
 	subscriptionTenantID,
 	clusterID,
-	homeNetworkClusterID,
+	homeNetworkClusterID string
+	clusterIDBuilder  PacketBrokerClusterIDBuilder
 	subscriptionGroup string
 	authenticator     authenticator
 	forwarderConfig   ForwarderConfig
@@ -177,22 +185,34 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		)
 	}
 
+	clusterIDBuilder := literalClusterID
+	clusterID, err := clusterIDBuilder(conf.ClusterID)
+	if err != nil {
+		return nil, err
+	}
 	homeNetworkClusterID := conf.HomeNetworkClusterID
 	if homeNetworkClusterID == "" {
 		homeNetworkClusterID = conf.ClusterID
 	}
+	homeNetworkClusterID, err = clusterIDBuilder(homeNetworkClusterID)
+	if err != nil {
+		return nil, err
+	}
+
 	subscriptionGroup := conf.ClusterID
 	if subscriptionGroup == "" {
 		subscriptionGroup = "default"
 	}
+
 	a := &Agent{
 		Component:            c,
 		ctx:                  ctx,
 		dataPlaneAddress:     conf.DataPlaneAddress,
 		netID:                conf.NetID,
 		subscriptionTenantID: conf.TenantID,
-		clusterID:            conf.ClusterID,
+		clusterID:            clusterID,
 		homeNetworkClusterID: homeNetworkClusterID,
+		clusterIDBuilder:     clusterIDBuilder,
 		subscriptionGroup:    subscriptionGroup,
 		authenticator:        authenticator,
 		forwarderConfig:      conf.Forwarder,
@@ -201,7 +221,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*Agent, error) {
 		tenantIDExtractor: func(_ context.Context) string {
 			return conf.TenantID
 		},
-		registrationInfoExtractor: func(_ context.Context, homeNetworkClusterID string) (*RegistrationInfo, error) {
+		registrationInfoExtractor: func(_ context.Context, homeNetworkClusterID string, _ PacketBrokerClusterIDBuilder) (*RegistrationInfo, error) {
 			blocks := make([]*ttnpb.PacketBrokerDevAddrBlock, len(devAddrPrefixes))
 			for i, p := range devAddrPrefixes {
 				blocks[i] = &ttnpb.PacketBrokerDevAddrBlock{

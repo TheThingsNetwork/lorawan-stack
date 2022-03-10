@@ -129,7 +129,7 @@ func (s *pbaServer) Register(ctx context.Context, req *ttnpb.PacketBrokerRegiste
 		create = true
 	}
 
-	registration, err := s.registrationInfoExtractor(ctx, s.homeNetworkClusterID)
+	registration, err := s.registrationInfoExtractor(ctx, s.homeNetworkClusterID, s.clusterIDBuilder)
 	if err != nil {
 		return nil, errRegistration.WithCause(err)
 	}
