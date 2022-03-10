@@ -155,6 +155,9 @@ var ListEndDeviceModelsRequestFieldPathsTopLevel = []string{
 var GetTemplateRequestFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",
+	"end_device_profile_ids",
+	"end_device_profile_ids.vendor_id",
+	"end_device_profile_ids.vendor_profile_id",
 	"version_ids",
 	"version_ids.band_id",
 	"version_ids.brand_id",
@@ -165,6 +168,7 @@ var GetTemplateRequestFieldPathsNested = []string{
 
 var GetTemplateRequestFieldPathsTopLevel = []string{
 	"application_ids",
+	"end_device_profile_ids",
 	"version_ids",
 }
 var GetPayloadFormatterRequestFieldPathsNested = []string{
@@ -379,6 +383,15 @@ var EndDeviceModel_Compliances_ComplianceFieldPathsTopLevel = []string{
 	"norm",
 	"standard",
 	"version",
+}
+var GetTemplateRequest_EndDeviceProfileIdentifiersFieldPathsNested = []string{
+	"vendor_id",
+	"vendor_profile_id",
+}
+
+var GetTemplateRequest_EndDeviceProfileIdentifiersFieldPathsTopLevel = []string{
+	"vendor_id",
+	"vendor_profile_id",
 }
 var MessagePayloadDecoder_ExampleFieldPathsNested = []string{
 	"description",

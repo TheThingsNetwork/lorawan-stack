@@ -751,6 +751,31 @@ func (dst *GetTemplateRequest) SetFields(src *GetTemplateRequest, paths ...strin
 					dst.VersionIds = nil
 				}
 			}
+		case "end_device_profile_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *GetTemplateRequest_EndDeviceProfileIdentifiers
+				if (src == nil || src.EndDeviceProfileIds == nil) && dst.EndDeviceProfileIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.EndDeviceProfileIds
+				}
+				if dst.EndDeviceProfileIds != nil {
+					newDst = dst.EndDeviceProfileIds
+				} else {
+					newDst = &GetTemplateRequest_EndDeviceProfileIdentifiers{}
+					dst.EndDeviceProfileIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceProfileIds = src.EndDeviceProfileIds
+				} else {
+					dst.EndDeviceProfileIds = nil
+				}
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -1534,6 +1559,37 @@ func (dst *EndDeviceModel_Compliances_Compliance) SetFields(src *EndDeviceModel_
 			} else {
 				var zero string
 				dst.Version = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GetTemplateRequest_EndDeviceProfileIdentifiers) SetFields(src *GetTemplateRequest_EndDeviceProfileIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "vendor_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'vendor_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.VendorId = src.VendorId
+			} else {
+				var zero uint32
+				dst.VendorId = zero
+			}
+		case "vendor_profile_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'vendor_profile_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.VendorProfileId = src.VendorProfileId
+			} else {
+				var zero uint32
+				dst.VendorProfileId = zero
 			}
 
 		default:

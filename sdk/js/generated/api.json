@@ -11630,11 +11630,59 @@
             },
             {
               "name": "version_ids",
-              "description": "End device version information.",
+              "description": "End device version information.\nIf EndDeviceProfileIdentifiers is not present in the request,\nthe End Device Template is constructed from the End Device Profile that matches the BandID within EndDeviceVersionIdentifiers.",
               "label": "",
               "type": "EndDeviceVersionIdentifiers",
               "longType": "EndDeviceVersionIdentifiers",
               "fullType": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "end_device_profile_ids",
+              "description": "(Optional) End Device Profile identifiers.\nIf specified, these identifiers will be directly to used to fetch the End Device Profile (if found)",
+              "label": "",
+              "type": "EndDeviceProfileIdentifiers",
+              "longType": "GetTemplateRequest.EndDeviceProfileIdentifiers",
+              "fullType": "ttn.lorawan.v3.GetTemplateRequest.EndDeviceProfileIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "EndDeviceProfileIdentifiers",
+          "longName": "GetTemplateRequest.EndDeviceProfileIdentifiers",
+          "fullName": "ttn.lorawan.v3.GetTemplateRequest.EndDeviceProfileIdentifiers",
+          "description": "Identifiers to uniquely identify a LoRaWAN End Device Profile.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "vendor_id",
+              "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "vendor_profile_id",
+              "description": "ID of the LoRAWAN device profile. The name of this field follows the TR005 specification.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -12365,6 +12413,10 @@
                     {
                       "method": "GET",
                       "pattern": "/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/template"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/dr/applications/{application_ids.application_id}/vendor-id/{end_device_profile_ids.vendor_id}/vendor-profile-id/{end_device_profile_ids.vendor_profile_id}/template"
                     }
                   ]
                 }
