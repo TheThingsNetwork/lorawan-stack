@@ -27,31 +27,6 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-func init() {
-	// remove clients assigned to the user by the populator
-	userID := paginationUser.GetIds()
-	for _, client := range population.Clients {
-		for id, collaborators := range population.Memberships {
-			if client.IDString() == id.IDString() {
-				for i, collaborator := range collaborators {
-					if collaborator.IDString() == userID.GetUserId() {
-						collaborators = collaborators[:i+copy(collaborators[i:], collaborators[i+1:])]
-					}
-				}
-			}
-		}
-	}
-
-	// add deterministic number of clients
-	for i := 0; i < 3; i++ {
-		clientID := population.Clients[i].GetEntityIdentifiers()
-		population.Memberships[clientID] = append(population.Memberships[clientID], &ttnpb.Collaborator{
-			Ids:    paginationUser.OrganizationOrUserIdentifiers(),
-			Rights: []ttnpb.Right{ttnpb.Right_RIGHT_CLIENT_ALL},
-		})
-	}
-}
-
 func TestClientsPermissionDenied(t *testing.T) {
 	p := &storetest.Population{}
 	usr1 := p.NewUser()

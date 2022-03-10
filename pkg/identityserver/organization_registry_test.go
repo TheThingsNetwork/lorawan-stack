@@ -27,33 +27,6 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-func init() {
-	userID := paginationUser.GetIds()
-
-	// remove organizations assigned to the user by the populator
-	for _, organization := range population.Organizations {
-		for id, collaborators := range population.Memberships {
-			if organization.IDString() == id.IDString() {
-				for i, collaborator := range collaborators {
-					if collaborator.IDString() == userID.GetUserId() {
-						population.Memberships[id] = collaborators[:i+copy(collaborators[i:], collaborators[i+1:])]
-					}
-				}
-			}
-		}
-	}
-
-	// add deterministic number of organizations
-	for i := 0; i < 3; i++ {
-		organizationID := population.Organizations[i].GetEntityIdentifiers()
-		ouID := paginationUser.OrganizationOrUserIdentifiers()
-		population.Memberships[organizationID] = append(population.Memberships[organizationID], &ttnpb.Collaborator{
-			Ids:    ouID,
-			Rights: []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL, ttnpb.Right_RIGHT_CLIENT_ALL, ttnpb.Right_RIGHT_GATEWAY_ALL, ttnpb.Right_RIGHT_ORGANIZATION_ALL},
-		})
-	}
-}
-
 func TestOrganizationsNestedError(t *testing.T) {
 	a, ctx := test.New(t)
 

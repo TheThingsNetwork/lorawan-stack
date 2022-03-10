@@ -27,31 +27,6 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-func init() {
-	// remove applications assigned to the user by the populator
-	userID := paginationUser.GetIds()
-	for _, app := range population.Applications {
-		for id, collaborators := range population.Memberships {
-			if app.IDString() == id.IDString() {
-				for i, collaborator := range collaborators {
-					if collaborator.IDString() == userID.GetUserId() {
-						collaborators = collaborators[:i+copy(collaborators[i:], collaborators[i+1:])]
-					}
-				}
-			}
-		}
-	}
-
-	// add deterministic number of applications
-	for i := 0; i < 3; i++ {
-		applicationID := population.Applications[i].GetEntityIdentifiers()
-		population.Memberships[applicationID] = append(population.Memberships[applicationID], &ttnpb.Collaborator{
-			Ids:    paginationUser.OrganizationOrUserIdentifiers(),
-			Rights: []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL},
-		})
-	}
-}
-
 func TestApplicationsPermissionDenied(t *testing.T) {
 	p := &storetest.Population{}
 	usr1 := p.NewUser()

@@ -16,7 +16,6 @@ package identityserver
 
 import (
 	"testing"
-	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -28,31 +27,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
-
-func init() {
-	// remove gateways assigned to the user by the populator
-	userID := paginationUser.GetIds()
-	for _, gw := range population.Gateways {
-		for id, collaborators := range population.Memberships {
-			if gw.IDString() == id.IDString() {
-				for i, collaborator := range collaborators {
-					if collaborator.IDString() == userID.GetUserId() {
-						collaborators = collaborators[:i+copy(collaborators[i:], collaborators[i+1:])]
-					}
-				}
-			}
-		}
-	}
-
-	// add deterministic number of gateways
-	for i := 0; i < 3; i++ {
-		gatewayID := population.Gateways[i].GetEntityIdentifiers()
-		population.Memberships[gatewayID] = append(population.Memberships[gatewayID], &ttnpb.Collaborator{
-			Ids:    paginationUser.OrganizationOrUserIdentifiers(),
-			Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_ALL},
-		})
-	}
-}
 
 func TestGatewaysPermissionDenied(t *testing.T) {
 	p := &storetest.Population{}
