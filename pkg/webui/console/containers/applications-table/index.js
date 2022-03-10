@@ -43,6 +43,7 @@ import {
   selectApplications,
   selectApplicationsTotalCount,
   selectApplicationsFetching,
+  isOtherClusterApp,
 } from '@console/store/selectors/applications'
 
 const m = defineMessages({
@@ -69,7 +70,7 @@ const tabs = [
 ]
 
 const ApplicationsTable = props => {
-  const { isAdmin, restoreApplication, purgeApplication, ...rest } = props
+  const { isAdmin, restoreApplication, purgeApplication, isOtherClusterDevice, ...rest } = props
 
   const [tab, setTab] = React.useState(OWNED_TAB)
   const isDeletedTab = tab === DELETED_TAB
@@ -166,15 +167,27 @@ const ApplicationsTable = props => {
     return baseHeaders
   }, [handlePurge, handleRestore, tab])
 
-  const baseDataSelector = React.useCallback(
-    state => ({
-      applications: selectApplications(state),
+  const baseDataSelector = React.useCallback(state => {
+    const applications = selectApplications(state)
+    const decoratedApplications = []
+
+    for (const app of applications) {
+      decoratedApplications.push({
+        ...app,
+        otherCluster: isOtherClusterApp(app),
+        _meta: {
+          clickable: !isOtherClusterApp(app),
+        },
+      })
+    }
+
+    return {
+      applications: decoratedApplications,
       totalCount: selectApplicationsTotalCount(state),
       fetching: selectApplicationsFetching(state),
       mayAdd: checkFromState(mayCreateApplications, state),
-    }),
-    [],
-  )
+    }
+  }, [])
 
   const getApplications = React.useCallback(filters => {
     const { tab, query } = filters
@@ -182,9 +195,19 @@ const ApplicationsTable = props => {
 
     setTab(tab)
 
-    return getApplicationsList({ ...filters, deleted: isDeletedTab }, ['name', 'description'], {
-      isSearch: tab === ALL_TAB || isDeletedTab || query.length > 0,
-    })
+    return getApplicationsList(
+      { ...filters, deleted: isDeletedTab },
+      [
+        'name',
+        'description',
+        'network_server_address',
+        'application_server_address',
+        'join_server_address',
+      ],
+      {
+        isSearch: tab === ALL_TAB || isDeletedTab || query.length > 0,
+      },
+    )
   }, [])
 
   return (

@@ -18,6 +18,8 @@ import {
 } from '@ttn-lw/lib/store/selectors/pagination'
 import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
+import { selectAsConfig, selectJsConfig, selectNsConfig } from '@ttn-lw/lib/selectors/env'
+import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 
 import { GET_APP_LINK_BASE } from '@console/store/actions/link'
 import {
@@ -74,6 +76,15 @@ export const selectApplications = state =>
 export const selectApplicationsTotalCount = state => selectAppsTotalCount(state)
 export const selectApplicationsFetching = state => selectAppsFetching(state)
 export const selectApplicationsError = state => selectAppsError(state)
+
+export const isOtherClusterApp = app => {
+  const isOtherCluster =
+    getHostnameFromUrl(selectAsConfig().base_url) !== app.application_server_address &&
+    getHostnameFromUrl(selectNsConfig().base_url) !== app.network_server_address &&
+    getHostnameFromUrl(selectJsConfig().base_url) !== app.join_server_address
+
+  return isOtherCluster
+}
 
 // Events.
 export const selectApplicationEvents = createEventsSelector(ENTITY)
