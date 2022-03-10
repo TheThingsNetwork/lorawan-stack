@@ -36,7 +36,7 @@ func (c *Component) initGRPC() {
 	}
 	rpclog.ReplaceGrpcLogger(c.grpcLogger)
 
-	c.grpc = rpcserver.New(
+	c.GRPC = rpcserver.New(
 		c.ctx,
 		rpcserver.WithContextFiller(c.FillContext),
 		rpcserver.WithTrustedProxies(c.config.GRPC.TrustedProxies...),
@@ -47,12 +47,12 @@ func (c *Component) initGRPC() {
 
 func (c *Component) setupGRPC() (err error) {
 	for _, sub := range c.grpcSubsystems {
-		sub.RegisterServices(c.grpc.Server)
+		sub.RegisterServices(c.GRPC.Server)
 	}
-	metrics.InitializeServerMetrics(c.grpc.Server)
+	metrics.InitializeServerMetrics(c.GRPC.Server)
 	c.logger.Debug("Starting loopback connection")
 	c.loopback, err = rpcserver.StartLoopback(
-		c.ctx, c.grpc.Server,
+		c.ctx, c.GRPC.Server,
 		rpcclient.DefaultDialOptions(
 			// Suppress loopback client logs, because we already have server logs.
 			log.NewContext(c.ctx, log.Noop),
@@ -63,7 +63,7 @@ func (c *Component) setupGRPC() (err error) {
 	}
 	c.logger.Debug("Setting up gRPC gateway")
 	for _, sub := range c.grpcSubsystems {
-		sub.RegisterHandlers(c.grpc.ServeMux, c.loopback)
+		sub.RegisterHandlers(c.GRPC.ServeMux, c.loopback)
 	}
 	return nil
 }
@@ -75,7 +75,7 @@ func (c *Component) LoopbackConn() *grpc.ClientConn {
 }
 
 func (c *Component) serveGRPC(lis net.Listener) error {
-	return c.grpc.Serve(lis)
+	return c.GRPC.Serve(lis)
 }
 
 func (c *Component) grpcEndpoints() []Endpoint {
@@ -91,7 +91,7 @@ func (c *Component) listenGRPC() (err error) {
 
 // RegisterGRPC registers a gRPC subsystem to the component.
 func (c *Component) RegisterGRPC(s rpcserver.Registerer) {
-	if c.grpc == nil {
+	if c.GRPC == nil {
 		c.initGRPC()
 	}
 	c.grpcSubsystems = append(c.grpcSubsystems, s)

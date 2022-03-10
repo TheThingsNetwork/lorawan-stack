@@ -65,7 +65,7 @@ type Component struct {
 	cluster    cluster.Cluster
 	clusterNew func(ctx context.Context, config *cluster.Config, options ...cluster.Option) (cluster.Cluster, error)
 
-	grpc           *rpcserver.Server
+	GRPC           *rpcserver.Server
 	grpcLogger     log.Interface
 	grpcSubsystems []rpcserver.Registerer
 
@@ -270,12 +270,12 @@ func (c *Component) FrequencyPlansStore(ctx context.Context) (*frequencyplans.St
 
 // Start starts the component.
 func (c *Component) Start() (err error) {
-	if c.grpc != nil {
+	if c.GRPC != nil {
 		c.logger.Debug("Initializing gRPC server...")
 		if err = c.setupGRPC(); err != nil {
 			return err
 		}
-		serviceInfo := c.grpc.Server.GetServiceInfo()
+		serviceInfo := c.GRPC.Server.GetServiceInfo()
 		services := make([]string, 0, len(serviceInfo))
 		for service := range serviceInfo {
 			services = append(services, service)
@@ -303,13 +303,13 @@ func (c *Component) Start() (err error) {
 		sub.RegisterInterop(c.interop)
 	}
 
-	if c.grpc != nil {
+	if c.GRPC != nil {
 		c.logger.Debug("Starting gRPC server...")
 		if err = c.listenGRPC(); err != nil {
 			c.logger.WithError(err).Error("Could not start gRPC server")
 			return err
 		}
-		c.web.Prefix(ttnpb.HTTPAPIPrefix + "/").Handler(http.StripPrefix(ttnpb.HTTPAPIPrefix, c.grpc))
+		c.web.Prefix(ttnpb.HTTPAPIPrefix + "/").Handler(http.StripPrefix(ttnpb.HTTPAPIPrefix, c.GRPC))
 		c.logger.Debug("Started gRPC server")
 	}
 
@@ -380,9 +380,9 @@ func (c *Component) Close() {
 		c.logger.Debugf("Stopped listening on %s", l.Addr())
 	}
 
-	if c.grpc != nil {
+	if c.GRPC != nil {
 		c.logger.Debug("Stopping gRPC server...")
-		c.grpc.Stop()
+		c.GRPC.Stop()
 		c.logger.Debug("Stopped gRPC server")
 	}
 }
@@ -398,7 +398,7 @@ func (c *Component) AllowInsecureForCredentials() bool {
 // Otherwise, the request is routed to the default web server.
 func (c *Component) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.ProtoMajor == 2 && strings.Contains(r.Header.Get("Content-Type"), "application/grpc") {
-		c.grpc.Server.ServeHTTP(w, r)
+		c.GRPC.Server.ServeHTTP(w, r)
 	} else {
 		c.web.ServeHTTP(w, r)
 	}

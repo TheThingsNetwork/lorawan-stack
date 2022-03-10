@@ -27,24 +27,6 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-func ExampleRegisterUnaryHook_service() {
-	RegisterUnaryHook("/ttn.lorawan.v3.ExampleService", "add-magic", func(h grpc.UnaryHandler) grpc.UnaryHandler {
-		return func(ctx context.Context, req interface{}) (interface{}, error) {
-			ctx = context.WithValue(ctx, "magic", 42)
-			return h(ctx, req)
-		}
-	})
-}
-
-func ExampleRegisterUnaryHook_method() {
-	RegisterUnaryHook("/ttn.lorawan.v3.ExampleService/Get", "add-magic", func(h grpc.UnaryHandler) grpc.UnaryHandler {
-		return func(ctx context.Context, req interface{}) (interface{}, error) {
-			ctx = context.WithValue(ctx, "magic", 42)
-			return h(ctx, req)
-		}
-	})
-}
-
 func newCallbackUnaryHook(name string, callback func(string)) func(h grpc.UnaryHandler) grpc.UnaryHandler {
 	return func(h grpc.UnaryHandler) grpc.UnaryHandler {
 		return func(ctx context.Context, req interface{}) (interface{}, error) {
@@ -91,14 +73,16 @@ func (s *mockStream) SetTrailer(metadata.MD)       {}
 func TestRegistration(t *testing.T) {
 	a := assertions.New(t)
 
+	h := &Hooks{}
+
 	ctx := test.Context()
-	unaryInterceptor := UnaryServerInterceptor()
+	unaryInterceptor := h.UnaryServerInterceptor()
 	callUnary := func(fullMethod string) {
 		unaryInterceptor(ctx, "test", &grpc.UnaryServerInfo{
 			FullMethod: fullMethod,
 		}, noopUnaryHandler)
 	}
-	streamInterceptor := StreamServerInterceptor()
+	streamInterceptor := h.StreamServerInterceptor()
 	callStream := func(fullMethod string) {
 		streamInterceptor(nil, &mockStream{ctx}, &grpc.StreamServerInfo{
 			FullMethod: fullMethod,
@@ -113,12 +97,12 @@ func TestRegistration(t *testing.T) {
 	counterStreamHook := newCallbackStreamHook("", count)
 	expected := 0
 
-	RegisterUnaryHook("/ttn.lorawan.v3.TestService", "hook1", counterUnaryHook)
-	RegisterUnaryHook("/ttn.lorawan.v3.TestService", "hook2", counterUnaryHook)
-	RegisterUnaryHook("/ttn.lorawan.v3.TestService", "hook2", counterUnaryHook) // overwrite hook2
-	RegisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook3", counterUnaryHook)
-	RegisterStreamHook("/ttn.lorawan.v3.TestService", "hook4", counterStreamHook)
-	RegisterStreamHook("/ttn.lorawan.v3.TestService/FooStream", "hook5", counterStreamHook)
+	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService", "hook1", counterUnaryHook)
+	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService", "hook2", counterUnaryHook)
+	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService", "hook2", counterUnaryHook) // overwrite hook2
+	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook3", counterUnaryHook)
+	h.RegisterStreamHook("/ttn.lorawan.v3.TestService", "hook4", counterStreamHook)
+	h.RegisterStreamHook("/ttn.lorawan.v3.TestService/FooStream", "hook5", counterStreamHook)
 
 	callUnary("/ttn.lorawan.v3.TestService/Foo")
 	expected += 3 // hook1, hook2, hook3
@@ -136,11 +120,11 @@ func TestRegistration(t *testing.T) {
 	expected += 0
 	a.So(actual, should.Equal, expected)
 
-	UnregisterUnaryHook("/ttn.lorawan.v3.TestService", "hook1")
-	UnregisterUnaryHook("/ttn.lorawan.v3.TestService", "hook2")
-	UnregisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook3")
-	UnregisterStreamHook("/ttn.lorawan.v3.TestService", "hook4")
-	UnregisterStreamHook("/ttn.lorawan.v3.TestService/FooStream", "hook5")
+	h.UnregisterUnaryHook("/ttn.lorawan.v3.TestService", "hook1")
+	h.UnregisterUnaryHook("/ttn.lorawan.v3.TestService", "hook2")
+	h.UnregisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook3")
+	h.UnregisterStreamHook("/ttn.lorawan.v3.TestService", "hook4")
+	h.UnregisterStreamHook("/ttn.lorawan.v3.TestService/FooStream", "hook5")
 
 	callUnary("/ttn.lorawan.v3.TestService/Foo")
 	expected += 0
@@ -150,8 +134,10 @@ func TestRegistration(t *testing.T) {
 func TestErrorHook(t *testing.T) {
 	a := assertions.New(t)
 
+	h := &Hooks{}
+
 	ctx := test.Context()
-	interceptor := UnaryServerInterceptor()
+	interceptor := h.UnaryServerInterceptor()
 	call := func(fullMethod string) error {
 		_, err := interceptor(ctx, "test", &grpc.UnaryServerInfo{
 			FullMethod: fullMethod,
@@ -164,24 +150,26 @@ func TestErrorHook(t *testing.T) {
 		actual = append(actual, id)
 	}
 
-	RegisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook1", newCallbackUnaryHook("hook1", callback))
-	RegisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook2", errorHook)
-	RegisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook3", newCallbackUnaryHook("hook3", callback))
+	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook1", newCallbackUnaryHook("hook1", callback))
+	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook2", errorHook)
+	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook3", newCallbackUnaryHook("hook3", callback))
 
 	err := call("/ttn.lorawan.v3.TestService/Foo")
 	a.So(err, should.NotBeNil)
 	a.So(actual, should.Resemble, []string{"hook1"})
 
-	UnregisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook1")
-	UnregisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook2")
-	UnregisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook3")
+	h.UnregisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook1")
+	h.UnregisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook2")
+	h.UnregisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook3")
 }
 
 func TestOrder(t *testing.T) {
 	a := assertions.New(t)
 
+	h := &Hooks{}
+
 	ctx := test.Context()
-	interceptor := UnaryServerInterceptor()
+	interceptor := h.UnaryServerInterceptor()
 	call := func(fullMethod string) error {
 		_, err := interceptor(ctx, "test", &grpc.UnaryServerInfo{
 			FullMethod: fullMethod,
@@ -194,25 +182,27 @@ func TestOrder(t *testing.T) {
 		actual = append(actual, id)
 	}
 
-	RegisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook3", newCallbackUnaryHook("hook3", callback))
-	RegisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook4", newCallbackUnaryHook("hook4", callback))
-	RegisterUnaryHook("/ttn.lorawan.v3.TestService", "hook1", newCallbackUnaryHook("hook1", callback)) // service hooks go first
-	RegisterUnaryHook("/ttn.lorawan.v3.TestService", "hook2", newCallbackUnaryHook("hook2", callback))
+	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook3", newCallbackUnaryHook("hook3", callback))
+	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook4", newCallbackUnaryHook("hook4", callback))
+	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService", "hook1", newCallbackUnaryHook("hook1", callback)) // service hooks go first
+	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService", "hook2", newCallbackUnaryHook("hook2", callback))
 
 	call("/ttn.lorawan.v3.TestService/Foo")
 	a.So(actual, should.Resemble, []string{"hook1", "hook2", "hook3", "hook4"})
 
-	UnregisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook3")
-	UnregisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook4")
-	UnregisterUnaryHook("/ttn.lorawan.v3.TestService", "hook1")
-	UnregisterUnaryHook("/ttn.lorawan.v3.TestService", "hook2")
+	h.UnregisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook3")
+	h.UnregisterUnaryHook("/ttn.lorawan.v3.TestService/Foo", "hook4")
+	h.UnregisterUnaryHook("/ttn.lorawan.v3.TestService", "hook1")
+	h.UnregisterUnaryHook("/ttn.lorawan.v3.TestService", "hook2")
 }
 
 func TestHookContext(t *testing.T) {
 	a := assertions.New(t)
 
+	h := &Hooks{}
+
 	ctx := context.WithValue(test.Context(), "global-value", 1337)
-	interceptor := UnaryServerInterceptor()
+	interceptor := h.UnaryServerInterceptor()
 	call := func(fullMethod string) error {
 		_, err := interceptor(ctx, "test", &grpc.UnaryServerInfo{
 			FullMethod: fullMethod,
@@ -220,14 +210,14 @@ func TestHookContext(t *testing.T) {
 		return err
 	}
 
-	RegisterUnaryHook("/ttn.lorawan.v3.TestService", "producer", func(h grpc.UnaryHandler) grpc.UnaryHandler {
+	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService", "producer", func(h grpc.UnaryHandler) grpc.UnaryHandler {
 		return func(ctx context.Context, req interface{}) (interface{}, error) {
 			ctx = context.WithValue(ctx, "produced-value", 42)
 			return h(ctx, req)
 		}
 	})
 
-	RegisterUnaryHook("/ttn.lorawan.v3.TestService", "consumer", func(h grpc.UnaryHandler) grpc.UnaryHandler {
+	h.RegisterUnaryHook("/ttn.lorawan.v3.TestService", "consumer", func(h grpc.UnaryHandler) grpc.UnaryHandler {
 		return func(ctx context.Context, req interface{}) (interface{}, error) {
 			a.So(ctx.Value("global-value"), should.Equal, 1337)
 			a.So(ctx.Value("produced-value"), should.Equal, 42)
@@ -237,6 +227,6 @@ func TestHookContext(t *testing.T) {
 
 	call("/ttn.lorawan.v3.TestService/Test")
 
-	UnregisterUnaryHook("/ttn.lorawan.v3.TestService", "producer")
-	UnregisterUnaryHook("/ttn.lorawan.v3.TestService", "consumer")
+	h.UnregisterUnaryHook("/ttn.lorawan.v3.TestService", "producer")
+	h.UnregisterUnaryHook("/ttn.lorawan.v3.TestService", "consumer")
 }

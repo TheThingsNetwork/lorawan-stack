@@ -19,7 +19,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	gcsv2 "go.thethings.network/lorawan-stack/v3/pkg/gatewayconfigurationserver/v2"
-	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/hooks"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
@@ -59,8 +58,8 @@ func New(c *component.Component, conf *Config) (*Server, error) {
 	v2GCS := gcsv2.New(c, gcsv2.WithTheThingsGatewayConfig(conf.TheThingsGateway))
 	_ = v2GCS
 
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GatewayConfigurationService", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("gatewayconfigurationserver"))
-	hooks.RegisterUnaryHook("/ttn.lorawan.v3.GatewayConfigurationService", cluster.HookName, c.ClusterAuthUnaryHook())
+	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.GatewayConfigurationService", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("gatewayconfigurationserver"))
+	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.GatewayConfigurationService", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	c.RegisterGRPC(gcs)
 	c.RegisterWeb(gcs)

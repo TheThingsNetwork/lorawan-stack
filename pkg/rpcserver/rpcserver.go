@@ -134,7 +134,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 	for _, opt := range opts {
 		opt(options)
 	}
-	server := &Server{ctx: ctx}
+	server := &Server{ctx: ctx, Hooks: &hooks.Hooks{}}
 	ctxtagsOpts := []grpc_ctxtags.Option{
 		grpc_ctxtags.WithFieldExtractor(grpc_ctxtags.CodeGenRequestFieldExtractor),
 	}
@@ -168,7 +168,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		grpc_recovery.StreamServerInterceptor(recoveryOpts...),
 		validator.StreamServerInterceptor(),
 		ratelimit.StreamServerInterceptor(options.limiter),
-		hooks.StreamServerInterceptor(),
+		server.Hooks.StreamServerInterceptor(),
 	}
 
 	unaryInterceptors := []grpc.UnaryServerInterceptor{
@@ -186,7 +186,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 		grpc_recovery.UnaryServerInterceptor(recoveryOpts...),
 		validator.UnaryServerInterceptor(),
 		ratelimit.UnaryServerInterceptor(options.limiter),
-		hooks.UnaryServerInterceptor(),
+		server.Hooks.UnaryServerInterceptor(),
 	}
 
 	baseOptions := []grpc.ServerOption{
@@ -279,6 +279,7 @@ type Registerer interface {
 type Server struct {
 	ctx context.Context
 	*grpc.Server
+	*hooks.Hooks
 	*runtime.ServeMux
 }
 

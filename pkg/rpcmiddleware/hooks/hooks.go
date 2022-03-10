@@ -36,71 +36,73 @@ type UnaryHandlerMiddleware func(grpc.UnaryHandler) grpc.UnaryHandler
 // StreamHandlerMiddleware wraps grpc.StreamHandler.
 type StreamHandlerMiddleware func(grpc.StreamHandler) grpc.StreamHandler
 
-var unaryHooks sync.Map
-var streamHooks sync.Map
-
-type hooks struct {
-	mu   sync.Mutex
-	list []struct {
-		name string
-		f    interface{}
-	}
+type unaryHook struct {
+	name string
+	f    UnaryHandlerMiddleware
+}
+type streamHook struct {
+	name string
+	f    StreamHandlerMiddleware
 }
 
-func registerHook(hooksMap *sync.Map, filter, name string, f interface{}) {
-	val, _ := hooksMap.LoadOrStore(filter, &hooks{})
-	hooks := val.(*hooks)
-	hooks.mu.Lock()
-	defer hooks.mu.Unlock()
-	for i := 0; i < len(hooks.list); i++ {
-		if hooks.list[i].name == name {
-			hooks.list[i].f = f
+type Hooks struct {
+	mu     sync.RWMutex
+	unary  map[string][]*unaryHook
+	stream map[string][]*streamHook
+}
+
+func (h *Hooks) RegisterUnaryHook(filter, name string, f UnaryHandlerMiddleware) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if h.unary == nil {
+		h.unary = make(map[string][]*unaryHook)
+	}
+	for _, hook := range h.unary[filter] {
+		if hook.name == name {
+			hook.f = f
 			return
 		}
 	}
-	hooks.list = append(hooks.list, struct {
-		name string
-		f    interface{}
-	}{name, f})
+	h.unary[filter] = append(h.unary[filter], &unaryHook{name: name, f: f})
 }
 
-func unregisterHook(hooksMap *sync.Map, filter, name string) bool {
-	val, ok := hooksMap.Load(filter)
-	if !ok {
-		return false
+func (h *Hooks) RegisterStreamHook(filter, name string, f StreamHandlerMiddleware) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if h.stream == nil {
+		h.stream = make(map[string][]*streamHook)
 	}
-	hooks := val.(*hooks)
-	hooks.mu.Lock()
-	defer hooks.mu.Unlock()
-	for i := 0; i < len(hooks.list); i++ {
-		if hooks.list[i].name == name {
-			hooks.list = append(hooks.list[:i], hooks.list[i+1:]...)
+	for _, hook := range h.stream[filter] {
+		if hook.name == name {
+			hook.f = f
+			return
+		}
+	}
+	h.stream[filter] = append(h.stream[filter], &streamHook{name: name, f: f})
+}
+
+func (h *Hooks) UnregisterUnaryHook(filter, name string) bool {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	for i, hook := range h.unary[filter] {
+		if hook.name == name {
+			h.unary[filter] = append(h.unary[filter][:i], h.unary[filter][i+1:]...)
 			return true
 		}
 	}
 	return false
 }
 
-// RegisterUnaryHook registers a new hook with the specified filter and name.
-func RegisterUnaryHook(filter, name string, f UnaryHandlerMiddleware) {
-	registerHook(&unaryHooks, filter, name, f)
-}
-
-// UnregisterUnaryHook unregisters the unary hook with the specified filter and name and returns
-// true on success.
-func UnregisterUnaryHook(filter, name string) bool {
-	return unregisterHook(&unaryHooks, filter, name)
-}
-
-// RegisterStreamHook registers a new hook with the specified filter and name.
-func RegisterStreamHook(filter, name string, f StreamHandlerMiddleware) {
-	registerHook(&streamHooks, filter, name, f)
-}
-
-// UnregisterStreamHook unregisters the Stream hook with the specified filter and name and returns
-// true on success.
-func UnregisterStreamHook(filter, name string) bool {
-	return unregisterHook(&streamHooks, filter, name)
+func (h *Hooks) UnregisterStreamHook(filter, name string) bool {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	for i, hook := range h.stream[filter] {
+		if hook.name == name {
+			h.stream[filter] = append(h.stream[filter][:i], h.stream[filter][i+1:]...)
+			return true
+		}
+	}
+	return false
 }
 
 // createFilters splits the package.service part from the full method, i.e.,
@@ -111,21 +113,16 @@ func createFilters(fullMethod string) []string {
 }
 
 // UnaryServerInterceptor returns a new unary server interceptor that executes registered hooks.
-func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
+func (h *Hooks) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (res interface{}, err error) {
 		var middleware []UnaryHandlerMiddleware
+		h.mu.RLock()
 		for _, filter := range createFilters(info.FullMethod) {
-			val, ok := unaryHooks.Load(filter)
-			if !ok {
-				continue
+			for _, hook := range h.unary[filter] {
+				middleware = append(middleware, hook.f)
 			}
-			hooks := val.(*hooks)
-			hooks.mu.Lock()
-			for _, hook := range hooks.list {
-				middleware = append(middleware, hook.f.(UnaryHandlerMiddleware))
-			}
-			hooks.mu.Unlock()
 		}
+		h.mu.RUnlock()
 		for i := len(middleware) - 1; i >= 0; i-- {
 			handler = middleware[i](handler)
 		}
@@ -134,21 +131,16 @@ func UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 }
 
 // StreamServerInterceptor returns a new stream server interceptor that executes registered hooks.
-func StreamServerInterceptor() grpc.StreamServerInterceptor {
+func (h *Hooks) StreamServerInterceptor() grpc.StreamServerInterceptor {
 	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) (err error) {
 		var middleware []StreamHandlerMiddleware
+		h.mu.RLock()
 		for _, filter := range createFilters(info.FullMethod) {
-			val, ok := streamHooks.Load(filter)
-			if !ok {
-				continue
+			for _, hook := range h.stream[filter] {
+				middleware = append(middleware, hook.f)
 			}
-			hooks := val.(*hooks)
-			hooks.mu.Lock()
-			for _, hook := range hooks.list {
-				middleware = append(middleware, hook.f.(StreamHandlerMiddleware))
-			}
-			hooks.mu.Unlock()
 		}
+		h.mu.RUnlock()
 		for i := len(middleware) - 1; i >= 0; i-- {
 			handler = middleware[i](handler)
 		}
