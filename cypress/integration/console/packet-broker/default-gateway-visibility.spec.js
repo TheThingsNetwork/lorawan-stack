@@ -26,7 +26,7 @@ describe('Packet Broker routing policies', () => {
   })
 
   it('succeeds setting default gateway visibility configuration', () => {
-    cy.intercept('PUT', '/api/v3/pba/home-networks/gateway-visibilities/default', {})
+    cy.intercept('PUT', '/api/v3/pba/home-networks/gateway-visibilities/default', {}).as('putCall')
     cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker/default-gateway-visibility`)
 
     cy.findByLabelText('Location').check()
@@ -40,13 +40,14 @@ describe('Packet Broker routing policies', () => {
     cy.findByTestId('toast-notification')
       .findByText('Default gateway visibility set')
       .should('be.visible')
+    cy.get('@putCall').should('have.property', 'state', 'Complete')
   })
 
   it('succeeds unsetting default gateway visibility configuration', () => {
     cy.intercept('GET', '/api/v3/pba/home-networks/gateway-visibilities/default', {
       fixture: 'console/packet-broker/default-gateway-visibility.json',
     })
-    cy.intercept('PUT', '/api/v3/pba/home-networks/gateway-visibilities/default', {})
+    cy.intercept('PUT', '/api/v3/pba/home-networks/gateway-visibilities/default', {}).as('putCall')
     cy.visit(`${Cypress.config('consoleRootPath')}/admin/packet-broker/default-gateway-visibility`)
 
     cy.findByLabelText('Location').uncheck()
@@ -60,5 +61,6 @@ describe('Packet Broker routing policies', () => {
     cy.findByTestId('toast-notification')
       .findByText('Default gateway visibility set')
       .should('be.visible')
+    cy.get('@putCall').should('have.property', 'state', 'Complete')
   })
 })
