@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 func init() {
@@ -264,50 +265,55 @@ func TestGatewaysCRUD(t *testing.T) {
 }
 
 func TestGatewaysPagination(t *testing.T) {
+	p := &storetest.Population{}
+
+	usr1 := p.NewUser()
+	for i := 0; i < 3; i++ {
+		p.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
+	}
+
+	key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	creds := rpcCreds(key)
+
+	t.Parallel()
 	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := paginationUser.GetIds()
-		creds := userCreds(paginationUserIdx)
-
 		reg := ttnpb.NewGatewayRegistryClient(cc)
+
+		var md metadata.MD
 
 		list, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         1,
-		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(list, should.NotBeNil) {
+		}, creds, grpc.Header(&md))
+		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
 			a.So(list.Gateways, should.HaveLength, 2)
+			a.So(md.Get("x-total-count"), should.Resemble, []string{"3"})
 		}
 
 		list, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         2,
 		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(list, should.NotBeNil) {
+		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
 			a.So(list.Gateways, should.HaveLength, 1)
 		}
 
 		list, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         3,
 		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(list, should.NotBeNil) {
+		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
 			a.So(list.Gateways, should.BeEmpty)
 		}
-	})
+	}, withPrivateTestDatabase(p))
 }
 
 func TestGatewaysSecrets(t *testing.T) {

@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 func init() {
@@ -266,48 +267,53 @@ func TestClientsCRUD(t *testing.T) {
 }
 
 func TestClientsPagination(t *testing.T) {
+	p := &storetest.Population{}
+
+	usr1 := p.NewUser()
+	for i := 0; i < 3; i++ {
+		p.NewClient(usr1.GetOrganizationOrUserIdentifiers())
+	}
+
+	key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	creds := rpcCreds(key)
+
+	t.Parallel()
 	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := paginationUser.GetIds()
-		creds := userCreds(paginationUserIdx)
-
 		reg := ttnpb.NewClientRegistryClient(cc)
+
+		var md metadata.MD
 
 		list, err := reg.List(ctx, &ttnpb.ListClientsRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         1,
-		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(list, should.NotBeNil) {
+		}, creds, grpc.Header(&md))
+		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
 			a.So(list.Clients, should.HaveLength, 2)
+			a.So(md.Get("x-total-count"), should.Resemble, []string{"3"})
 		}
 
 		list, err = reg.List(ctx, &ttnpb.ListClientsRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         2,
 		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(list, should.NotBeNil) {
+		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
 			a.So(list.Clients, should.HaveLength, 1)
 		}
 
 		list, err = reg.List(ctx, &ttnpb.ListClientsRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         3,
 		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(list, should.NotBeNil) {
+		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
 			a.So(list.Clients, should.BeEmpty)
 		}
-	})
+	}, withPrivateTestDatabase(p))
 }
