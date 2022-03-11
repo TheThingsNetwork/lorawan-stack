@@ -99,6 +99,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - The minimum required Redis version is now 6.2.
+- Applications on other cluster will be hidden in Applications list in the Console.
 
 ### Deprecated
 
