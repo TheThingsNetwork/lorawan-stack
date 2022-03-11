@@ -23,14 +23,13 @@ import Radio from '@ttn-lw/components/radio-button'
 
 import withComputedProps from '@ttn-lw/lib/components/with-computed-props'
 
-import { m } from '@ttn-lw/lib/field-description-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { RIGHT_ALL } from '@console/lib/rights'
 
 import style from './rights-group.styl'
 
-const message = defineMessages({
+const m = defineMessages({
   selectAll: 'Select all',
   outOfOwnScopeRights:
     'This {entityType} has more rights than you have. These rights can not be modified.',
@@ -39,6 +38,8 @@ const message = defineMessages({
   grantType: 'Grant type',
   allCurrentAndFutureRights: 'Grant all current and future rights',
   selectIndividualRights: 'Grant individual rights',
+  RIGHT_APPLICATION_LINK_DESCRIPTION:
+    'This implicitly includes the rights to view application information, read application traffic and write downlinks',
 })
 
 const computeProps = props => {
@@ -224,7 +225,7 @@ class RightsGroup extends React.Component {
     const allDisabled = grantType === 'pseudo' || disabled || hasOutOfOwnScopePseudoRight
 
     let selectAllName = 'select-all'
-    let selectAllTitle = message.selectAll
+    let selectAllTitle = m.selectAll
     if (Boolean(derivedPseudoRight) && !Array.isArray(derivedPseudoRight)) {
       selectAllName = derivedPseudoRight
       selectAllTitle = { id: `enum:${derivedPseudoRight}` }
@@ -244,7 +245,7 @@ class RightsGroup extends React.Component {
         name={right}
         disabled={outOfOwnScopeIndividualRights.includes(right)}
         label={{ id: `enum:${right}` }}
-        fieldDescription={m[`_DESCRIPTION_${right}`] || undefined}
+        fieldDescription={m[`${right}_DESCRIPTION`]}
       />
     ))
 
@@ -254,7 +255,7 @@ class RightsGroup extends React.Component {
           <Notification
             small
             warning
-            content={message.outOfOwnScopePseudoRight}
+            content={m.outOfOwnScopePseudoRight}
             messageValues={{ entityType: intl.formatMessage(entityTypeMessage).toLowerCase() }}
           />
         )}
@@ -265,8 +266,8 @@ class RightsGroup extends React.Component {
           onChange={this.handleGrantTypeChange}
           disabled={derivedPseudoRight.length === 0}
         >
-          <Radio label={message.allCurrentAndFutureRights} value="pseudo" />
-          <Radio label={message.selectIndividualRights} value="individual" />
+          <Radio label={m.allCurrentAndFutureRights} value="pseudo" />
+          <Radio label={m.selectIndividualRights} value="individual" />
         </Radio.Group>
         <Checkbox
           className={classnames(style.selectAll, style.rightLabel)}

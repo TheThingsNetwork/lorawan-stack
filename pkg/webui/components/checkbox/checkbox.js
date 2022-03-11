@@ -160,7 +160,7 @@ class Checkbox extends React.PureComponent {
     })
 
     return (
-      <React.Fragment>
+      <>
         <label className={cls}>
           <span className={style.checkbox}>
             <input
@@ -181,7 +181,7 @@ class Checkbox extends React.PureComponent {
           {children}
         </label>
         {fieldDescription && <Message className={style.description} content={fieldDescription} />}
-      </React.Fragment>
+      </>
     )
   }
 }
