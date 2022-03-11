@@ -23,13 +23,14 @@ import Radio from '@ttn-lw/components/radio-button'
 
 import withComputedProps from '@ttn-lw/lib/components/with-computed-props'
 
+import { m } from '@ttn-lw/lib/field-description-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { RIGHT_ALL } from '@console/lib/rights'
 
 import style from './rights-group.styl'
 
-const m = defineMessages({
+const message = defineMessages({
   selectAll: 'Select all',
   outOfOwnScopeRights:
     'This {entityType} has more rights than you have. These rights can not be modified.',
@@ -223,7 +224,7 @@ class RightsGroup extends React.Component {
     const allDisabled = grantType === 'pseudo' || disabled || hasOutOfOwnScopePseudoRight
 
     let selectAllName = 'select-all'
-    let selectAllTitle = m.selectAll
+    let selectAllTitle = message.selectAll
     if (Boolean(derivedPseudoRight) && !Array.isArray(derivedPseudoRight)) {
       selectAllName = derivedPseudoRight
       selectAllTitle = { id: `enum:${derivedPseudoRight}` }
@@ -243,6 +244,7 @@ class RightsGroup extends React.Component {
         name={right}
         disabled={outOfOwnScopeIndividualRights.includes(right)}
         label={{ id: `enum:${right}` }}
+        fieldDescription={m[`_DESCRIPTION_${right}`] || undefined}
       />
     ))
 
@@ -252,7 +254,7 @@ class RightsGroup extends React.Component {
           <Notification
             small
             warning
-            content={m.outOfOwnScopePseudoRight}
+            content={message.outOfOwnScopePseudoRight}
             messageValues={{ entityType: intl.formatMessage(entityTypeMessage).toLowerCase() }}
           />
         )}
@@ -263,8 +265,8 @@ class RightsGroup extends React.Component {
           onChange={this.handleGrantTypeChange}
           disabled={derivedPseudoRight.length === 0}
         >
-          <Radio label={m.allCurrentAndFutureRights} value="pseudo" />
-          <Radio label={m.selectIndividualRights} value="individual" />
+          <Radio label={message.allCurrentAndFutureRights} value="pseudo" />
+          <Radio label={message.selectIndividualRights} value="individual" />
         </Radio.Group>
         <Checkbox
           className={classnames(style.selectAll, style.rightLabel)}

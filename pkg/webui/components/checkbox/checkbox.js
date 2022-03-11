@@ -34,6 +34,7 @@ class Checkbox extends React.PureComponent {
     children: PropTypes.node,
     className: PropTypes.string,
     disabled: PropTypes.bool,
+    fieldDescription: PropTypes.message,
     id: PropTypes.string,
     indeterminate: PropTypes.bool,
     label: PropTypes.message,
@@ -59,6 +60,7 @@ class Checkbox extends React.PureComponent {
     onFocus: () => null,
     indeterminate: false,
     value: false,
+    fieldDescription: undefined,
   }
 
   constructor(props) {
@@ -130,6 +132,7 @@ class Checkbox extends React.PureComponent {
       onFocus,
       indeterminate,
       id,
+      fieldDescription,
       children,
       ...rest
     } = this.props
@@ -157,25 +160,28 @@ class Checkbox extends React.PureComponent {
     })
 
     return (
-      <label className={cls}>
-        <span className={style.checkbox}>
-          <input
-            type="checkbox"
-            ref={this.input}
-            name={name}
-            readOnly={readOnly}
-            autoFocus={autoFocus}
-            onChange={this.handleChange}
-            id={id}
-            aria-describedby={rest['aria-describedby']}
-            aria-invalid={rest['aria-invalid']}
-            {...checkboxProps}
-          />
-          <span className={style.checkmark} />
-        </span>
-        {label && <Message className={style.label} content={label} />}
-        {children}
-      </label>
+      <React.Fragment>
+        <label className={cls}>
+          <span className={style.checkbox}>
+            <input
+              type="checkbox"
+              ref={this.input}
+              name={name}
+              readOnly={readOnly}
+              autoFocus={autoFocus}
+              onChange={this.handleChange}
+              id={id}
+              aria-describedby={rest['aria-describedby']}
+              aria-invalid={rest['aria-invalid']}
+              {...checkboxProps}
+            />
+            <span className={style.checkmark} />
+          </span>
+          {label && <Message className={style.label} content={label} />}
+          {children}
+        </label>
+        {fieldDescription && <Message className={style.description} content={fieldDescription} />}
+      </React.Fragment>
     )
   }
 }
