@@ -66,6 +66,6 @@ export default defineMessages({
     'Traffic may still be forwarded to your network based on default routing policies configured by forwarders.',
   defaultGatewayVisibility: 'Default gateway visibility',
   gatewayVisibilityInformation:
-    'You can use the checkboxes below to control what information your gateways will expose when interacting with other registered networks.',
+    'You can use the checkboxes to control what information of your gateways will be visible. Note that this information will be visible to the public and not only to registered networks.',
   defaultGatewayVisibilitySet: 'Default gateway visibility set',
 })

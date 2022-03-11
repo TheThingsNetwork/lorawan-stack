@@ -593,7 +593,7 @@
   "console.views.admin-packet-broker.messages.confirmDeregister": "Confirm deregistration",
   "console.views.admin-packet-broker.messages.Are you sure you want to deregister your network from Packet Broker?{lineBreak}This will <b>permanently delete<.b> all routing policies and may stop traffic from flowing.{lineBreak}Traffic may still be forwarded to your network based on default routing policies configured by forwarders.": "Are you sure you want to deregister your network from Packet Broker?{lineBreak}This will <b>permanently delete</b> all routing policies and may stop traffic from flowing.{lineBreak}Traffic may still be forwarded to your network based on default routing policies configured by forwarders.",
   "console.views.admin-packet-broker.messages.defaultGatewayVisibility": "Default gateway visibility",
-  "console.views.admin-packet-broker.messages.gatewayVisibilityInformation": "You can use the checkboxes below to control what information your gateways will expose when interacting with other registered networks.",
+  "console.views.admin-packet-broker.messages.gatewayVisibilityInformation": "You can use the checkboxes to control what information of your gateways will be visible. Note that this information will be visible to the public and not only to registered networks.",
   "console.views.admin-packet-broker.messages.defaultGatewayVisibilitySet": "Default gateway visibility set",
   "console.views.admin-user-management-edit.index.updateSuccess": "User updated",
   "console.views.admin-user-management-edit.index.deleteSuccess": "User deleted",
