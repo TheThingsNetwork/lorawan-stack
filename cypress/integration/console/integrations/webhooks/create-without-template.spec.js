@@ -121,10 +121,13 @@ describe('Application Webhook create without template', () => {
       id: 'my-new-webhook',
       format: 'JSON',
       baseUrl: 'https://example.com/webhooks',
+      path: '/path/to/webhook',
     }
     cy.findByLabelText('Webhook ID').type(webhook.id)
     cy.findByLabelText('Webhook format').selectOption(webhook.format)
     cy.findByLabelText('Base URL').type(webhook.baseUrl)
+    cy.get('#uplink_message_checkbox').check()
+    cy.findByLabelText('Uplink message').type(webhook.path)
 
     cy.findByRole('button', { name: 'Add webhook' }).click()
 
@@ -150,5 +153,7 @@ describe('Application Webhook create without template', () => {
       .and('have.attr', 'value')
       .and('eq', webhook.id)
     cy.findByLabelText('Base URL').and('have.attr', 'value').and('eq', webhook.baseUrl)
+    cy.findByLabelText('Uplink message').should('have.attr', 'value', webhook.path)
+    cy.get('#uplink_message_checkbox').should('be.checked')
   })
 })

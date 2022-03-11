@@ -70,19 +70,27 @@ describe('Application Webhook', () => {
     cy.findByRole('button', { name: 'Save changes' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
-      .should('be.visible')
-      .findByText(`Webhook updated`)
-      .should('be.visible')
-    cy.findByLabelText('Base URL')
-      .should('be.visible')
-      .and('have.attr', 'value')
-      .and('eq', webhook.url)
-    cy.get('#uplink_message_checkbox').should('have.attr', 'value', 'true')
-    cy.findByLabelText('Uplink message')
-      .should('be.visible')
-      .and('have.attr', 'value')
-      .and('eq', webhook.path)
+    cy.findByTestId('toast-notification').findByText(`Webhook updated`).should('be.visible')
+
+    cy.reload()
+    cy.findByLabelText('Base URL').should('have.attr', 'value', webhook.url)
+    cy.findByLabelText('Uplink message').should('have.attr', 'value', webhook.path)
+    cy.get('#join_accept_checkbox').should('not.be.checked')
+    cy.findByLabelText('Uplink message').clear()
+    cy.findByRole('button', { name: 'Save changes' }).click()
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification').findByText(`Webhook updated`).should('be.visible')
+
+    cy.reload()
+    cy.findByLabelText('Uplink message').should('have.attr', 'value', '')
+    cy.get('#uplink_message_checkbox').should('be.checked')
+    cy.get('#uplink_message_checkbox').uncheck()
+    cy.findByRole('button', { name: 'Save changes' }).click()
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification').findByText(`Webhook updated`).should('be.visible')
+
+    cy.reload()
+    cy.get('#uplink_message_checkbox').should('not.be.checked')
   })
 
   it('succeeds adding headers', () => {
@@ -98,6 +106,8 @@ describe('Application Webhook', () => {
       .should('be.visible')
       .findByText(`Webhook updated`)
       .should('be.visible')
+
+    cy.reload()
 
     cy.findByTestId('_headers[0].key')
       .should('be.visible')
@@ -129,6 +139,8 @@ describe('Application Webhook', () => {
       .should('be.visible')
       .findByText(`Webhook updated`)
       .should('be.visible')
+
+    cy.reload()
 
     cy.findByLabelText('Request authentication').should('have.attr', 'value', 'true')
     cy.findByTestId('basic-auth-username')

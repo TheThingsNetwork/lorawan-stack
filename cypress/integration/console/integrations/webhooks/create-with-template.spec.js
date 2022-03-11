@@ -103,6 +103,8 @@ describe('Application Webhook create', () => {
 
     cy.findByTestId('error-notification').should('not.exist')
     cy.findByTestId('full-error-view').should('not.exist')
-    cy.findByText('my-new-akenza-webhook').should('be.visible')
+    cy.findByText('my-new-akenza-webhook').should('be.visible').click()
+
+    cy.findByLabelText('Webhook ID').should('have.attr', 'value', webhook.id)
   })
 })

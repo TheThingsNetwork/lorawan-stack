@@ -19,8 +19,12 @@ const isBasicAuth = header =>
 const hasBasicAuth = headers => headers instanceof Array && headers.findIndex(isBasicAuth) !== -1
 
 export const decodeMessageType = messageType => {
-  if (messageType && (messageType.enabled || messageType.path)) {
-    return { enabled: true, value: messageType.path }
+  if (isPlainObject(messageType)) {
+    if ('path' in messageType) {
+      return { enabled: true, value: messageType.path }
+    }
+
+    return { enabled: true, value: '' }
   }
 
   return { enabled: false, value: '' }
@@ -28,10 +32,10 @@ export const decodeMessageType = messageType => {
 
 export const encodeMessageType = formValue => {
   if (formValue && formValue.enabled) {
-    return { enabled: true, path: formValue.value }
+    return { path: formValue.value }
   }
 
-  return { enabled: false, path: '' }
+  return null
 }
 
 const decodeHeaders = headersType =>
@@ -109,16 +113,16 @@ export const blankValues = {
   base_url: undefined,
   format: undefined,
   downlink_api_key: '',
-  uplink_message: { enabled: false, value: '' },
-  join_accept: { enabled: false, value: '' },
-  downlink_ack: { enabled: false, value: '' },
-  downlink_nack: { enabled: false, value: '' },
-  downlink_sent: { enabled: false, value: '' },
-  downlink_failed: { enabled: false, value: '' },
-  downlink_queued: { enabled: false, value: '' },
-  downlink_queue_invalidated: { enabled: false, value: '' },
-  location_solved: { enabled: false, value: '' },
-  service_data: { enabled: false, value: '' },
+  uplink_message: null,
+  join_accept: null,
+  downlink_ack: null,
+  downlink_nack: null,
+  downlink_sent: null,
+  downlink_failed: null,
+  downlink_queued: null,
+  downlink_queue_invalidated: null,
+  location_solved: null,
+  service_data: null,
   _basic_auth_enabled: false,
   _basic_auth_username: '',
   _basic_auth_password: '',

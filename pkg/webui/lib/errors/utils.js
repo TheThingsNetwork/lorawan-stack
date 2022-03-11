@@ -409,7 +409,7 @@ export const getBackendErrorRootCause = error => {
  * @returns {string} The attributes or undefined.
  */
 export const getBackendErrorMessageAttributes = error =>
-  isBackend(error) ? error.details[0].attributes : undefined
+  hasValidDetails(error) ? error.details[0].attributes : undefined
 
 /**
  * Returns the correlation ID of the backend error message if present,
@@ -419,7 +419,7 @@ export const getBackendErrorMessageAttributes = error =>
  * @returns {string} The correlation ID.
  */
 export const getCorrelationId = error =>
-  isBackend(error) ? error.details[0].correlation_id : undefined
+  hasValidDetails(error) ? error.details[0].correlation_id : undefined
 
 /**
  * Adapts the error object to props of message object, if possible.
