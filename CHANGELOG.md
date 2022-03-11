@@ -20,6 +20,8 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Join-accept scheduling if it took more than ~1.2 seconds to process the device activation with default configuration. These slow device activations can be observed when using external Join Servers.
+- Fix issues in the webhook forms causing webhooks to be created with all message types enabled and no way of deactivating message types.
+- Fix validation issue in the webhook form not detecting message type paths with more than 64 characters.
 
 ### Security
 
