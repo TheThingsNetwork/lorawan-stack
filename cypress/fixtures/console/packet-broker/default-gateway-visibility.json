@@ -1,0 +1,8 @@
+{
+    "visibility": {
+      "location": true,
+      "antenna_placement": true,
+      "antenna_count": true,
+      "fine_timestamps": true
+    }
+}

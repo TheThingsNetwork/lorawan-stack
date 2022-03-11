@@ -64,4 +64,8 @@ export default defineMessages({
     'Are you sure you want to deregister your network from Packet Broker?{lineBreak}' +
     'This will <b>permanently delete</b> all routing policies and may stop traffic from flowing.{lineBreak}' +
     'Traffic may still be forwarded to your network based on default routing policies configured by forwarders.',
+  defaultGatewayVisibility: 'Default gateway visibility',
+  gatewayVisibilityInformation:
+    'You can use the checkboxes to control what information of your gateways will be visible. Note that this information will be visible to the public and not only to registered networks.',
+  defaultGatewayVisibilitySet: 'Default gateway visibility set',
 })
