@@ -257,6 +257,9 @@ const m = defineMessages({
 
   basicAuthDescription:
     'To increase access security, you can choose to generate a "basic auth" authorization header to be attached to the webhook requests, if the target server requires doing so. This will authenticate the webhook requests with the defined credentials.',
+
+  _DESCRIPTION_RIGHT_APPLICATION_LINK:
+    'This implicitly includes the rights to view application information, read application traffic and write downlinks',
 })
 
 const descriptions = Object.freeze({
@@ -535,4 +538,4 @@ const links = Object.freeze({
   },
 })
 
-export { descriptions, links }
+export { m, descriptions, links }
