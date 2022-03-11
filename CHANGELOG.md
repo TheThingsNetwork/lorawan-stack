@@ -30,7 +30,7 @@ For details about compatibility between different releases, see the **Commitment
 - gRPC service to Gateway Configuration Server so that gateway configurations can be obtained via gRPC requests.
 - The option to configure the Redis idle connection pool timeout, using the `redis.idle-timeout` setting.
 - New RP002 regional parameters as options during device registration in the Console.
-- Default gateway visibility configuration in packet broker agent in the Console.
+- Default gateway visibility configuration in Packet Broker agent in the Console.
 
 ### Changed
 
