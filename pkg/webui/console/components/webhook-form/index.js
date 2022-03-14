@@ -205,10 +205,7 @@ const validationSchema = Yup.object().shape({
 
 export default class WebhookForm extends Component {
   static propTypes = {
-    displayOverwriteModal: PropTypes.bool,
     error: PropTypes.string,
-    existingId: PropTypes.string,
-    handleReplaceModalDecision: PropTypes.func,
     healthStatusEnabled: PropTypes.bool,
     initialWebhookValue: PropTypes.shape({
       ids: PropTypes.shape({
@@ -241,22 +238,35 @@ export default class WebhookForm extends Component {
     webhookTemplate: undefined,
     healthStatusEnabled: false,
     error: undefined,
-    existingId: undefined,
-    displayOverwriteModal: false,
-    handleReplaceModalDecision: () => null,
   }
 
   form = React.createRef()
 
+  modalResolve = () => null
+  modalReject = () => null
+
   constructor(props) {
     super(props)
-    const { initialWebhookValue } = this.props
+    const { initialWebhookValue, error } = this.props
 
     this.state = {
       shouldShowCredentialsInput: Boolean(
         initialWebhookValue?.headers?.Authorization?.startsWith('Basic '),
       ),
+      displayOverwriteModal: false,
+      existingId: undefined,
+      error,
     }
+  }
+
+  @bind
+  handleReplaceModalDecision(mayReplace) {
+    if (mayReplace) {
+      this.modalResolve()
+    } else {
+      this.modalReject()
+    }
+    this.setState({ displayOverwriteModal: false })
   }
 
   @bind
@@ -275,7 +285,7 @@ export default class WebhookForm extends Component {
       this.form.current.resetForm()
       onDeleteSuccess()
     } catch (error) {
-      await this.setState({ error })
+      this.setState({ error })
       onDeleteFailure()
     }
   }
@@ -312,16 +322,7 @@ export default class WebhookForm extends Component {
   }
 
   render() {
-    const {
-      update,
-      initialWebhookValue,
-      webhookTemplate,
-      healthStatusEnabled,
-      handleReplaceModalDecision,
-      displayOverwriteModal,
-      existingId,
-      error,
-    } = this.props
+    const { update, initialWebhookValue, webhookTemplate, healthStatusEnabled } = this.props
     let initialValues = blankValues
     if (update && initialWebhookValue) {
       initialValues = decodeValues({ ...blankValues, ...initialWebhookValue })
@@ -362,19 +363,19 @@ export default class WebhookForm extends Component {
           title={sharedMessages.idAlreadyExists}
           message={{
             ...sharedMessages.webhookAlreadyExistsModalMessage,
-            values: { id: existingId },
+            values: { id: this.state.existingId },
           }}
           buttonMessage={sharedMessages.replaceWebhook}
-          onComplete={handleReplaceModalDecision}
+          onComplete={this.handleReplaceModalDecision}
           approval
-          visible={displayOverwriteModal}
+          visible={this.state.displayOverwriteModal}
         />
         {Boolean(webhookTemplate) && <WebhookTemplateInfo webhookTemplate={webhookTemplate} />}
         <Form
           onSubmit={this.handleSubmit}
           validationSchema={validationSchema}
           initialValues={initialValues}
-          error={error}
+          error={this.state.error}
           errorTitle={update ? m.updateErrorTitle : m.createErrorTitle}
           formikRef={this.form}
         >

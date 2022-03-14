@@ -40,13 +40,8 @@ export default class WebhookAdd extends Component {
     webhookTemplate: undefined,
   }
 
-  modalResolve = () => null
-  modalReject = () => null
-
   state = {
     error: undefined,
-    displayOverwriteModal: false,
-    existingId: undefined,
   }
 
   @bind
@@ -128,35 +123,16 @@ export default class WebhookAdd extends Component {
 
   @bind
   async handleWebhookSubmit(values, webhook, { setSubmitting, resetForm }) {
-    await this.setState({ error: '' })
+    this.setState({ error: undefined })
     try {
-      const webhookId = webhook.ids.webhook_id
-      const exists = await this.existCheck(webhookId)
-      if (exists) {
-        this.setState({ displayOverwriteModal: true, existingId: webhookId })
-        await new Promise((resolve, reject) => {
-          this.modalResolve = resolve
-          this.modalReject = reject
-        })
-      }
       const result = await this.handleSubmit(webhook)
 
       resetForm({ values })
       this.handleSubmitSuccess(result)
     } catch (error) {
       setSubmitting(false)
-      await this.setState({ error })
+      this.setState({ error })
     }
-  }
-
-  @bind
-  handleReplaceModalDecision(mayReplace) {
-    if (mayReplace) {
-      this.modalResolve()
-    } else {
-      this.modalReject()
-    }
-    this.setState({ displayOverwriteModal: false })
   }
 
   render() {
@@ -167,9 +143,7 @@ export default class WebhookAdd extends Component {
         <WebhookForm
           update={false}
           onSubmit={this.handleWebhookSubmit}
-          handleReplaceModalDecision={this.handleReplaceModalDecision}
-          displayOverwriteModal={this.state.displayOverwriteModal}
-          existingId={this.state.existingId}
+          existCheck={this.existCheck}
           error={this.state.error}
         />
       )
@@ -181,10 +155,8 @@ export default class WebhookAdd extends Component {
         templateId={templateId}
         onSubmit={this.handleWebhookSubmit}
         webhookTemplate={webhookTemplate}
-        handleReplaceModalDecision={this.handleReplaceModalDecision}
         convertTemplateToWebhook={this.convertTemplateToWebhook}
-        displayOverwriteModal={this.state.displayOverwriteModal}
-        existingId={this.state.existingId}
+        existCheck={this.existCheck}
         error={this.state.error}
       />
     )

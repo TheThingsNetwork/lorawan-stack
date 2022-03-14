@@ -38,10 +38,8 @@ const m = defineMessages({
 export default class WebhookTemplateForm extends Component {
   static propTypes = {
     convertTemplateToWebhook: PropTypes.func.isRequired,
-    displayOverwriteModal: PropTypes.bool.isRequired,
     error: PropTypes.string,
-    existingId: PropTypes.string,
-    handleReplaceModalDecision: PropTypes.func.isRequired,
+    existCheck: PropTypes.func.isRequired,
     onSubmit: PropTypes.func.isRequired,
     templateId: PropTypes.string.isRequired,
     webhookTemplate: PropTypes.webhookTemplate.isRequired,
@@ -49,25 +47,44 @@ export default class WebhookTemplateForm extends Component {
 
   static defaultProps = {
     error: undefined,
+  }
+
+  modalResolve = () => null
+  modalReject = () => null
+
+  state = {
+    displayOverwriteModal: false,
     existingId: undefined,
   }
 
   @bind
+  handleReplaceModalDecision(mayReplace) {
+    if (mayReplace) {
+      this.modalResolve()
+    } else {
+      this.modalReject()
+    }
+    this.setState({ displayOverwriteModal: false })
+  }
+
+  @bind
   async handleSubmit(values, { setSubmitting, resetForm }) {
-    const { onSubmit, convertTemplateToWebhook } = this.props
+    const { onSubmit, convertTemplateToWebhook, existCheck } = this.props
     const webhook = await convertTemplateToWebhook(values)
+    const webhookId = webhook.ids.webhook_id
+    const exists = await existCheck(webhookId)
+    if (exists) {
+      this.setState({ displayOverwriteModal: true, existingId: webhookId })
+      await new Promise((resolve, reject) => {
+        this.modalResolve = resolve
+        this.modalReject = reject
+      })
+    }
     await onSubmit(values, webhook, { setSubmitting, resetForm })
   }
 
   render() {
-    const {
-      templateId,
-      webhookTemplate,
-      handleReplaceModalDecision,
-      displayOverwriteModal,
-      existingId,
-      error,
-    } = this.props
+    const { templateId, webhookTemplate, error } = this.props
     const { name, fields = [] } = webhookTemplate
 
     const validationSchema = Yup.object({
@@ -100,12 +117,12 @@ export default class WebhookTemplateForm extends Component {
           title={sharedMessages.idAlreadyExists}
           message={{
             ...sharedMessages.webhookAlreadyExistsModalMessage,
-            values: { id: existingId },
+            values: { id: this.state.existingId },
           }}
           buttonMessage={sharedMessages.replaceWebhook}
-          onComplete={handleReplaceModalDecision}
+          onComplete={this.handleReplaceModalDecision}
           approval
-          visible={displayOverwriteModal}
+          visible={this.state.displayOverwriteModal}
         />
         <WebhookTemplateInfo webhookTemplate={webhookTemplate} />
         <Form
