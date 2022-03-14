@@ -71,14 +71,14 @@ const WebhookEdit = props => {
   const [error, setError] = useState()
   const handleWebhookSubmit = React.useCallback(
     async (values, newWebhook, { resetForm }) => {
-      await setError('')
+      setError(undefined)
       try {
         const result = await handleUpdateWebhook(newWebhook)
         resetForm({ values })
-        await showSuccessToast(result)
+        showSuccessToast(result)
       } catch (error) {
         resetForm({ values })
-        await setError(error)
+        setError(error)
       }
     },
     [handleUpdateWebhook, showSuccessToast],
