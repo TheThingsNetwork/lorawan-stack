@@ -1,9 +1,6 @@
 name: Tag release
 
-on:
-  push:
-    tags:
-      - "v3.[0-9]+.[0-9]+"
+on: workflow_dispatch
 
 env:
   NODE_ENV: production
@@ -14,27 +11,18 @@ jobs:
     runs-on: ubuntu-20.04
     timeout-minutes: 60
     steps:
-      - name: Get version from tag
-        id: version
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const tag = context.ref.slice("refs/tags/".length);
-            const majorMinorPatchRegex = /^v([0-9]+)\.([0-9]+)\.([0-9]+)$/;
-            const majorMinorPatch = tag.match(majorMinorPatchRegex);
-            if (!majorMinorPatch) {
-              throw `invalid version tag: ${tag}`;
-            }
-            return majorMinorPatch[0].slice(1);
-          result-encoding: string
       - name: Check branch
-        run: echo '${{ github.event.base_ref }}' | grep -Fxq 'refs/heads/release/${{ github.ref_name }}'
+        run: echo "${{ github.ref_name }}" | grep -Pq '^release/v3\.\d+\.\d+$'
+      - name: Get version
+        id: version
+        run: |
+          export VERSION=$(echo ${{ github.ref_name }} | grep -Po '3\.\d+.\d+')
+          echo "::set-output name=result::$VERSION"
       - name: Check out code
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
           submodules: true
-          ref: ${{ github.event.base_ref }}
       - name: Insert release date into the changelog
         run: |
           sed -i "s/^\(## \[.*\] - \)\(unreleased\)$/\1$(date +%Y-%m-%d)/" CHANGELOG.md
@@ -48,10 +36,8 @@ jobs:
             git add CHANGELOG.md
             git commit -m "all: Enter release date of version ${{ steps.version.outputs.result }} into the changelog"
             git push
-            git tag -d ${{ github.ref_name }}
-            git tag ${{ github.ref_name }}
-            git push -d origin ${{ github.ref_name }}
-            git push origin ${{ github.ref_name }}
+            git tag v${{ steps.version.outputs.result }}
+            git push origin v${{ steps.version.outputs.result }}
           fi
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -154,12 +140,12 @@ jobs:
         run: |
           export LATEST_TAG=$(git tag | grep -P '^v3.\d+\.\d+$' | sort -V | tail -n 1)
           set +e
-          test "$LATEST_TAG" != '${{ github.ref_name }}'
+          test "$LATEST_TAG" != 'v${{ steps.version.outputs.result }}'
           echo "::set-output name=latest::$?"
       - name: Tag latest
         if: steps.latest-version.outputs.latest == '1'
         run: |
-          export VERSION=$(echo ${{ github.ref_name }} | grep -Po '3\.\d+')
+          export VERSION=$(echo ${{ steps.version.outputs.result }} | grep -Po '3\.\d+')
           docker tag ${DOCKER_PREFIX}/lorawan-stack:${VERSION}-amd64 ${DOCKER_PREFIX}/lorawan-stack:latest-amd64
           docker tag ${DOCKER_PREFIX}/lorawan-stack:${VERSION}-arm64 ${DOCKER_PREFIX}/lorawan-stack:latest-arm64
           docker tag ${DOCKER_PREFIX}/lorawan-stack:${VERSION}-armv7 ${DOCKER_PREFIX}/lorawan-stack:latest-armv7
@@ -175,11 +161,10 @@ jobs:
         run: |
           gh pr create \
               --assignee '${{ github.actor }}' \
-              --base "$(echo ${{ github.ref_name }} | grep -Po 'v3\.\d+')" \
-              --head '${{ github.event.base_ref }}' \
-              --body "This pull request merges back changes from the ${{ github.ref_name }} release." \
+              --base "$(echo ${{ steps.version.outputs.result }} | grep -Po 'v3\.\d+')" \
+              --body "This pull request merges back changes from the v${{ steps.version.outputs.result }} release." \
               --label "release" \
-              --milestone "${{ github.ref_name }}" \
-              --title "Release ${{ github.ref_name }}"
+              --milestone "v${{ steps.version.outputs.result }}" \
+              --title "Release v${{ steps.version.outputs.result }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
