@@ -53,6 +53,30 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		t, a := test.MustNewTFromContext(ctx)
 		t.Helper()
 
+		dispatchErrCh := make(chan error, len(consumerIDs))
+
+		dispatchCtx, cancelDispatchCtx := context.WithCancel(ctx)
+		defer cancelDispatchCtx()
+		for _, consumerID := range consumerIDs {
+			go func(consumerID string) {
+				select {
+				case <-ctx.Done():
+				case dispatchErrCh <- q.Dispatch(dispatchCtx, consumerID):
+				}
+			}(consumerID)
+		}
+		defer func() {
+			cancelDispatchCtx()
+
+			for range consumerIDs {
+				select {
+				case <-ctx.Done():
+				case err := <-dispatchErrCh:
+					a.So(errors.IsCanceled(err), should.BeTrue)
+				}
+			}
+		}()
+
 		type popFuncReq struct {
 			Context                context.Context
 			ApplicationIdentifiers ttnpb.ApplicationIdentifiers
@@ -67,14 +91,22 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 			go func(consumerID string) {
 				errCh <- q.Pop(popCtx, consumerID, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f ApplicationUplinkQueueDrainFunc) (time.Time, error) {
 					respCh := make(chan TaskPopFuncResponse, 1)
-					reqCh <- popFuncReq{
+					select {
+					case <-popCtx.Done():
+						return time.Time{}, popCtx.Err()
+					case reqCh <- popFuncReq{
 						Context:                ctx,
 						ApplicationIdentifiers: appID,
 						Func:                   f,
 						Response:               respCh,
+					}:
 					}
-					resp := <-respCh
-					return resp.Time, resp.Error
+					select {
+					case <-popCtx.Done():
+						return time.Time{}, popCtx.Err()
+					case resp := <-respCh:
+						return resp.Time, resp.Error
+					}
 				})
 			}(consumerID)
 		}

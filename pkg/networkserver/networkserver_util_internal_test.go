@@ -2391,8 +2391,9 @@ var _ DownlinkTaskQueue = MockDownlinkTaskQueue{}
 
 // MockDownlinkTaskQueue is a mock DownlinkTaskQueue used for testing.
 type MockDownlinkTaskQueue struct {
-	AddFunc func(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error
-	PopFunc func(ctx context.Context, f func(context.Context, *ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error
+	AddFunc      func(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers, t time.Time, replace bool) error
+	DispatchFunc func(ctx context.Context, consumerID string) error
+	PopFunc      func(ctx context.Context, f func(context.Context, *ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error
 }
 
 // Add calls AddFunc if set and panics otherwise.
@@ -2401,6 +2402,14 @@ func (m MockDownlinkTaskQueue) Add(ctx context.Context, devID *ttnpb.EndDeviceId
 		panic("Add called, but not set")
 	}
 	return m.AddFunc(ctx, devID, t, replace)
+}
+
+// Dispatch calls DispatchFunc if set and panics otherwise.
+func (m MockDownlinkTaskQueue) Dispatch(ctx context.Context, consumerID string) error {
+	if m.DispatchFunc == nil {
+		panic("Dispatch called, but not set")
+	}
+	return m.DispatchFunc(ctx, consumerID)
 }
 
 // Pop calls PopFunc if set and panics otherwise.

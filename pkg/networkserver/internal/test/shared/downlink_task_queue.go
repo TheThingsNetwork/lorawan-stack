@@ -68,6 +68,7 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue, consu
 	}
 	slotCh := make(chan slot)
 	errCh := make(chan error)
+	dispatchErrCh := make(chan error, len(consumerIDs))
 	for _, consumerID := range consumerIDs {
 		go func(consumerID string) {
 			for {
@@ -92,6 +93,13 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue, consu
 					return resp.Time, resp.Error
 				}):
 				}
+			}
+		}(consumerID)
+		go func(consumerID string) {
+			select {
+			case <-ctx.Done():
+				return
+			case dispatchErrCh <- q.Dispatch(popCtx, consumerID):
 			}
 		}(consumerID)
 	}
@@ -229,6 +237,14 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue, consu
 	for range consumerIDs {
 		select {
 		case err := <-errCh:
+			a.So(errors.IsCanceled(err), should.BeTrue)
+		case <-ctx.Done():
+		}
+	}
+
+	for range consumerIDs {
+		select {
+		case err := <-dispatchErrCh:
 			a.So(errors.IsCanceled(err), should.BeTrue)
 		case <-ctx.Done():
 		}

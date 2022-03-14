@@ -314,6 +314,29 @@ func TestPopTask(t *testing.T) {
 		}
 	}
 
+	for _, k := range testKeys {
+		errCh := make(chan error, 1)
+
+		cancelCtx, cancel := context.WithCancel(ctx)
+		inputKey := k
+		go func() {
+			errCh <- DispatchTask(cancelCtx, cl.Client, testGroup, "testID", 10, inputKey)
+		}()
+
+		defer func() {
+			cancel()
+
+			select {
+			case <-ctx.Done():
+				t.Error("Timed out while waiting for Dispatch to finish running")
+			case err := <-errCh:
+				if !a.So(errors.IsCanceled(err), should.BeTrue) {
+					t.Errorf("DispatchTask failed with: %s", test.FormatError(err))
+				}
+			}
+		}()
+	}
+
 	a.So(assertPop(ctx, testKeys[0], payloads[2], time.Unix(0, 0).UTC()), should.BeTrue)
 	a.So(assertPop(ctx, testKeys[0], payloads[0], time.Unix(0, 42).UTC()), should.BeTrue)
 	a.So(assertPop(ctx, testKeys[1], payloads[0], time.Unix(0, 66).UTC()), should.BeTrue)
@@ -340,7 +363,25 @@ func TestTaskQueue(t *testing.T) {
 		a.So(err, should.BeNil)
 	}()
 
-	assertPop := func(ctx context.Context, r redis.Cmdable, expectedPayload string, expectedStartAt time.Time) bool {
+	errCh := make(chan error, 1)
+	cancelCtx, cancel := context.WithCancel(ctx)
+	go func() {
+		errCh <- q.Dispatch(cancelCtx, "testID", nil)
+	}()
+	defer func() {
+		cancel()
+
+		select {
+		case <-ctx.Done():
+			t.Error("Timed out while waiting for Dispatch to finish running")
+		case err := <-errCh:
+			if !a.So(errors.IsCanceled(err), should.BeTrue) {
+				t.Errorf("DispatchTask failed with: %s", test.FormatError(err))
+			}
+		}
+	}()
+
+	assertPop := func(ctx context.Context, expectedPayload string, expectedStartAt time.Time) bool {
 		t, a := test.MustNewTFromContext(ctx)
 		t.Helper()
 
@@ -354,7 +395,7 @@ func TestTaskQueue(t *testing.T) {
 		var called bool
 		errCh := make(chan error, 1)
 		go func() {
-			errCh <- q.Pop(ctx, "testID", r, func(p redis.Pipeliner, payload string, startAt time.Time) error {
+			errCh <- q.Pop(ctx, "testID", nil, func(p redis.Pipeliner, payload string, startAt time.Time) error {
 				p.Ping(ctx)
 				a.So(called, should.BeFalse)
 				a.So(payload, should.Equal, expectedPayload)
@@ -377,26 +418,23 @@ func TestTaskQueue(t *testing.T) {
 		}
 	}
 
-	p := cl.Pipeline()
 	switch {
-	case !a.So(q.Add(ctx, nil, "test", time.Now(), true), should.BeNil),
-		!a.So(q.Add(ctx, p, "test", time.Unix(0, 42), true), should.BeNil),
+	case
+		// We use a relative timestamp in order to ensure that the message is not immediately dispatched.
+		// This allows us to test task replacement.
+		!a.So(q.Add(ctx, nil, "test", time.Now().Add(time.Minute), true), should.BeNil),
 		!a.So(q.Add(ctx, nil, "test", time.Unix(0, 24), false), should.BeNil),
-		!a.So(q.Add(ctx, p, "test2", time.Unix(0, 43), false), should.BeNil),
-		!a.So(q.Add(ctx, p, "test", time.Unix(0, 420), false), should.BeNil),
-		!a.So(func() error {
-			_, err := p.Exec(ctx)
-			return err
-		}(), should.BeNil),
-		!a.So(assertPop(ctx, nil, "test", time.Unix(0, 42).UTC()), should.BeTrue),
+		!a.So(q.Add(ctx, nil, "test", time.Unix(0, 42), true), should.BeNil),
+		!a.So(assertPop(ctx, "test", time.Unix(0, 42).UTC()), should.BeTrue),
 		!a.So(q.Add(ctx, nil, "test2", time.Unix(0, 41), true), should.BeNil),
-		!a.So(assertPop(ctx, nil, "test2", time.Unix(0, 43).UTC()), should.BeTrue),
-		!a.So(assertPop(ctx, nil, "test2", time.Unix(0, 41).UTC()), should.BeTrue):
+		!a.So(assertPop(ctx, "test2", time.Unix(0, 41).UTC()), should.BeTrue),
+		!a.So(q.Add(ctx, nil, "test2", time.Unix(0, 43), false), should.BeNil),
+		!a.So(assertPop(ctx, "test2", time.Unix(0, 43).UTC()), should.BeTrue):
 	}
 
 	// The Lua stack limit is 8000. See https://www.lua.org/source/5.1/luaconf.h.html
 	// specifically LUAI_MAXCSTACK.
-	for _, batchSize := range []int{512 + 1*1, 512*2 + 2*1, 8192} {
+	for _, batchSize := range []int{512 + 1, (512 + 1) * 2, 8192} {
 		p := cl.Pipeline()
 		for i := 0; i < batchSize; i++ {
 			a.So(q.Add(ctx, p, fmt.Sprintf("test%d", i), time.Unix(int64(i), 0), false), should.BeNil)
@@ -408,7 +446,7 @@ func TestTaskQueue(t *testing.T) {
 
 		times := make(map[string]time.Time)
 		for i := 0; i < batchSize; i++ {
-			a.So(q.Pop(ctx, "testID", cl, func(p redis.Pipeliner, payload string, startAt time.Time) error {
+			a.So(q.Pop(ctx, "testID", nil, func(p redis.Pipeliner, payload string, startAt time.Time) error {
 				p.Ping(ctx)
 
 				_, ok := times[payload]

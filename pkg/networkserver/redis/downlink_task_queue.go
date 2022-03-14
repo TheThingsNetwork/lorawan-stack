@@ -60,6 +60,11 @@ func (q *DownlinkTaskQueue) Add(ctx context.Context, devID *ttnpb.EndDeviceIdent
 	return q.queue.Add(ctx, nil, unique.ID(ctx, devID), startAt, replace)
 }
 
+// Dispatch dispatches the tasks in the queue.
+func (q *DownlinkTaskQueue) Dispatch(ctx context.Context, consumerID string) error {
+	return q.queue.Dispatch(ctx, consumerID, nil)
+}
+
 // Pop calls f on the earliest downlink task in the schedule, for which timestamp is in range [0, time.Now()],
 // if such is available, otherwise it blocks until it is.
 func (q *DownlinkTaskQueue) Pop(ctx context.Context, consumerID string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, time.Time) (time.Time, error)) error {

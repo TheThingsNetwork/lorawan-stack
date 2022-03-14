@@ -21,7 +21,7 @@ import (
 )
 
 var (
-	//go:embed lua/popTask.lua
-	popTaskScriptSource string
-	popTaskScript       = redis.NewScript(popTaskScriptSource)
+	//go:embed lua/dispatchTask.lua
+	dispatchTaskScriptSource string
+	dispatchTaskScript       = redis.NewScript(dispatchTaskScriptSource)
 )

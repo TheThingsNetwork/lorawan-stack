@@ -20,5 +20,6 @@ var (
 
 	InitTaskGroup = initTaskGroup
 	AddTask       = addTask
+	DispatchTask  = dispatchTask
 	PopTask       = popTask
 )

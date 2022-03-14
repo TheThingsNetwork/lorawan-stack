@@ -411,33 +411,11 @@ func ListProtos(ctx context.Context, r redis.Cmdable, k string) ProtosCmd {
 	}
 }
 
-type InterfaceSliceCmd struct {
-	*redis.Cmd
-}
-
-func (cmd InterfaceSliceCmd) Result() ([]interface{}, error) {
-	v, err := cmd.Cmd.Result()
-	if err != nil {
-		return nil, err
-	}
-	vs, ok := v.([]interface{})
-	if !ok {
-		return nil, errDecode.New()
-	}
-	return vs, nil
-}
-
-func RunInterfaceSliceScript(ctx context.Context, r Scripter, s *redis.Script, keys []string, args ...interface{}) *InterfaceSliceCmd {
-	trace.Logf(ctx, "redis", "run script with hash %q", s.Hash())
-	return &InterfaceSliceCmd{s.Run(ctx, r, keys, args...)}
-}
-
 const (
 	payloadKey = "payload"
 	replaceKey = "replace"
 	startAtKey = "start_at"
 	nextAtKey  = "next_at"
-	lastIDKey  = "last_id"
 )
 
 // InputTaskKey returns the subkey of k, where input tasks are stored.
@@ -500,86 +478,76 @@ func parseTime(s string) (time.Time, error) {
 	return time.Unix(0, int64(nsec)).UTC(), nil
 }
 
-// popTask calls f on the most recent task in the queue, for which timestamp is in range [0, time.Now()] or blocks until such is available or context is done.
-// If there are no tasks available for immediate processing, popTask lazily dispatches available tasks for itself and all other callers of popTask.
+// dispatchTask dispatches tasks for the callers of popTask. At least one dispatcher is required in order to use popTask.
+// The tasks are moved from InputTaskKey(k) to WaitingTaskKey(k). Once the task should be dispatched, it is moved form WaitingTaskKey(k) to ReadyTaskKey(k).
 // group is the consumer group name.
-// id is the consumer group ID.
-// k is the keys to pop from.
-// Pipeline is executed even if f returns an error.
-// Tasks are acked only if f returns without error.
-func popTask(ctx context.Context, r redis.Cmdable, group, id string, maxLen int64, f func(p redis.Pipeliner, payload string, startAt time.Time) error, k string) (err error) {
+// consumer is the consumer ID.
+// maxLen represents the maximum size of the streams used for dispatching.
+// minIdleTime is used for automatic task reclaiming. Only tasks older than minIdleTime will be redispatched from the input stream to the waiting stream.
+func dispatchTask(ctx context.Context, r redis.Cmdable, group, consumer string, maxLen int64, k string) error {
 	var (
 		readyStream   = ReadyTaskKey(k)
 		inputStream   = InputTaskKey(k)
 		waitingStream = WaitingTaskKey(k)
 	)
 	for {
-		vs, err := RunInterfaceSliceScript(ctx, r, popTaskScript, []string{readyStream, inputStream, waitingStream}, group, id, time.Now().UnixNano(), maxLen).Result()
+		ret, err := dispatchTaskScript.Run(ctx, r, []string{readyStream, inputStream, waitingStream}, group, consumer, time.Now().UnixNano(), maxLen).Result()
 		if err != nil && err != redis.Nil {
 			return ConvertError(err)
 		}
-		typ, ok := vs[0].(string)
-		if !ok {
-			panic(fmt.Sprintf("invalid type of entry at index %d of result returned by Redis task pop script: %T", 0, vs[0]))
-		}
-		var fields map[string]string
-		if len(vs) > 1 {
-			fields = make(map[string]string, (len(vs)-1)/2)
-			for i := 1; i < len(vs); i += 2 {
-				k, ok := vs[i].(string)
-				if !ok {
-					panic(fmt.Sprintf("invalid type of entry at index %d of result returned by Redis task pop script: %T", i, vs[i]))
-				}
-				v, ok := vs[i+1].(string)
-				if !ok {
-					panic(fmt.Sprintf("invalid type of entry at index %d of result returned by Redis task pop script: %T", i+1, vs[i+1]))
-				}
-				fields[k] = v
-			}
-		}
 
-		switch typ {
-		case "ready":
-		case "waiting":
-			// TODO: XPENDING, then XCLAIM and handle (https://github.com/TheThingsNetwork/lorawan-stack/issues/44)
-			// Do not use XAUTOCLAIM - the retry counter is not available following auto claim, so it can be
-			// the case that the retries are infinite.
-
-			var block time.Duration
-			if s, ok := fields[nextAtKey]; ok {
-				nextAt, err := parseTime(s)
-				if err != nil {
-					return errInvalidKeyValueType.WithAttributes("key", nextAtKey).WithCause(err)
-				}
-				if nextAt.IsZero() {
-					block = -1
-				} else {
-					now := time.Now()
-					if nextAt.Before(now) {
-						continue
-					} else {
-						block = nextAt.Sub(now)
-					}
-				}
+		var block time.Duration
+		if ret != nil {
+			s, ok := ret.(string)
+			if !ok {
+				return errInvalidKeyValueType.WithAttributes("key", nextAtKey).WithCause(err)
 			}
-			var id string
-			if s, ok := fields[lastIDKey]; ok {
-				id = s
+			nextAt, err := parseTime(s)
+			if err != nil {
+				return errInvalidKeyValueType.WithAttributes("key", nextAtKey).WithCause(err)
+			}
+			if nextAt.IsZero() {
+				block = -1
 			} else {
-				id = "0-0"
+				now := time.Now()
+				if nextAt.Before(now) {
+					continue
+				} else {
+					block = nextAt.Sub(now)
+				}
 			}
-			_, err = r.XRead(ctx, &redis.XReadArgs{
-				Streams: []string{inputStream, id},
-				Count:   1,
-				Block:   block,
-			}).Result()
-			if err != nil && err != redis.Nil {
-				return ConvertError(err)
-			}
-			continue
+		}
 
-		default:
-			panic(fmt.Sprintf("unknown result type received `%s`", typ))
+		_, err = r.XReadGroup(ctx, &redis.XReadGroupArgs{
+			Group:    group,
+			Consumer: consumer,
+			Streams:  []string{inputStream, ">"},
+			Count:    1,
+			Block:    block,
+		}).Result()
+		if err != nil && err != redis.Nil {
+			return ConvertError(err)
+		}
+	}
+}
+
+// popTask calls f on the most recent task in the queue, for which timestamp is in range [0, time.Now()] or blocks until such is available or context is done.
+// group is the consumer group name.
+// consumer is the consumer group ID.
+// ReadyTaskKey(k) is the keys to pop from.
+// Pipeline is executed even if f returns an error.
+// Tasks are acked only if f returns without error.
+func popTask(ctx context.Context, r redis.Cmdable, group, consumer string, maxLen int64, f func(p redis.Pipeliner, payload string, startAt time.Time) error, k string) (err error) {
+	var readyStream = ReadyTaskKey(k)
+
+	processMessage := func(message redis.XMessage) error {
+		fields := make(map[string]string, len(message.Values))
+		for k, v := range message.Values {
+			val, ok := v.(string)
+			if !ok {
+				panic(fmt.Sprintf("invalid field type %T", v))
+			}
+			fields[k] = val
 		}
 
 		var startAt time.Time
@@ -597,14 +565,39 @@ func popTask(ctx context.Context, r redis.Cmdable, group, id string, maxLen int6
 			if err == nil && pErr != nil {
 				err = ConvertError(pErr)
 			}
+			p.Close()
 		}()
-		if err = f(p, fields["payload"], startAt); err != nil {
+
+		if err = f(p, fields[payloadKey], startAt); err != nil {
 			return err
 		}
-		p.XAck(ctx, readyStream, group, fields["id"])
-		p.XDel(ctx, readyStream, fields["id"])
+
+		p.XAck(ctx, readyStream, group, message.ID)
+		p.XDel(ctx, readyStream, message.ID)
+
 		return nil
 	}
+
+	xs, err := r.XReadGroup(ctx, &redis.XReadGroupArgs{
+		Group:    group,
+		Consumer: consumer,
+		Streams:  []string{readyStream, ">"},
+		Count:    1,
+		Block:    0,
+	}).Result()
+	if err != nil && err != redis.Nil {
+		return ConvertError(err)
+	}
+
+	for _, x := range xs {
+		for _, message := range x.Messages {
+			if err := processMessage(message); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 // TaskQueue is a task queue.
@@ -642,6 +635,16 @@ func (q *TaskQueue) Add(ctx context.Context, r redis.Cmdable, s string, startAt 
 		r = q.Redis
 	}
 	return addTask(ctx, r, q.Key, q.MaxLen, s, startAt, replace)
+}
+
+// Dispatch dispatches the tasks of the queue. It will continue to run until the context is done.
+// consumerID is used to identify the consumer and should be unique for all concurrent calls to Dispatch.
+func (q *TaskQueue) Dispatch(ctx context.Context, consumerID string, r redis.Cmdable) error {
+	q.consumerIDs.LoadOrStore(consumerID, struct{}{})
+	if r == nil {
+		r = q.Redis
+	}
+	return dispatchTask(ctx, r, q.Group, consumerID, q.MaxLen, q.Key)
 }
 
 // Pop calls f on the most recent task in the queue, for which timestamp is in range [0, time.Now()],
