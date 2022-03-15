@@ -136,6 +136,10 @@ var (
 	errMissingPayload = errors.DefineDataLoss("missing_payload", "missing payload")
 )
 
+func (q *ApplicationUplinkQueue) Dispatch(ctx context.Context, consumerID string) error {
+	return q.applicationQueue.Dispatch(ctx, consumerID, nil)
+}
+
 func (q *ApplicationUplinkQueue) Pop(ctx context.Context, consumerID string, f func(context.Context, ttnpb.ApplicationIdentifiers, networkserver.ApplicationUplinkQueueDrainFunc) (time.Time, error)) error {
 	return q.applicationQueue.Pop(ctx, consumerID, nil, func(p redis.Pipeliner, uid string, _ time.Time) error {
 		appID, err := unique.ToApplicationID(uid)

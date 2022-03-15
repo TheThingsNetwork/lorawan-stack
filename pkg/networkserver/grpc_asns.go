@@ -39,6 +39,9 @@ type ApplicationUplinkQueue interface {
 	// Implementations must ensure that Add returns fast.
 	Add(ctx context.Context, ups ...*ttnpb.ApplicationUp) error
 
+	// Dispatch dispatches the tasks in the queue.
+	Dispatch(ctx context.Context, consumerID string) error
+
 	// PopApplication calls f on the most recent application uplink task in the schedule, for which timestamp is in range [0, time.Now()],
 	// if such is available, otherwise it blocks until it is.
 	// Context passed to f must be derived from ctx.
