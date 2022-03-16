@@ -547,12 +547,12 @@ func newSetDeviceState(dev *ttnpb.EndDevice, paths ...string) *setDeviceState {
 
 func setKeyIsZero(m map[string]*ttnpb.EndDevice, get func(*ttnpb.EndDevice) *ttnpb.KeyEnvelope, path string) bool {
 	if dev, ok := m[path+".key"]; ok {
-		if ke := get(dev); !ke.Key.IsZero() {
+		if ke := get(dev); !ke.GetKey().IsZero() {
 			return false
 		}
 	}
 	if dev, ok := m[path+".encrypted_key"]; ok {
-		if ke := get(dev); len(ke.EncryptedKey) != 0 {
+		if ke := get(dev); len(ke.GetEncryptedKey()) != 0 {
 			return false
 		}
 	}
