@@ -20,6 +20,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/blevesearch/bleve"
@@ -34,14 +35,16 @@ import (
 )
 
 const (
-	indexPath         = "index.bleve"
-	brandDocumentType = "brand"
-	modelDocumentType = "model"
+	indexPath           = "index.bleve"
+	brandDocumentType   = "brand"
+	modelDocumentType   = "model"
+	profileDocumentType = "profile"
 )
 
 type indexableBrand struct {
-	Brand  *ttnpb.EndDeviceBrand
-	Models []*ttnpb.EndDeviceModel
+	Brand    *ttnpb.EndDeviceBrand
+	Models   []*ttnpb.EndDeviceModel
+	Profiles []*store.EndDeviceProfile
 
 	BrandJSON          string // *ttnpb.EndDeviceBrand marshaled into string
 	BrandID, BrandName string // stored separately to support queries
@@ -57,6 +60,16 @@ type indexableModel struct {
 	BrandID, ModelID string // stored separately to support queries.
 
 	Type string // Index document type, always modelDocumentType
+}
+
+type indexableProfile struct {
+	Brand   *ttnpb.EndDeviceBrand
+	Profile *store.EndDeviceProfile
+
+	ProfileJSON                        string // *store.EndDeviceProfile marshaled into string.
+	BrandID, VendorID, VendorProfileID string // stored separately to support queries.
+
+	Type string // Index document type, always profileDocumentType
 }
 
 func newIndex(path string, overwrite bool, keywords ...string) (bleve.Index, error) {
@@ -129,15 +142,23 @@ func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overw
 				return err
 			}
 		}
+		profiles, err := s.GetLoRaWANDeviceProfiles(store.GetLoRaWANDeviceProfilesRequest{
+			BrandID: brand.BrandId,
+		})
+		if err != nil {
+			return err
+		}
 		brandJSON, err := jsonpb.TTN().Marshal(brand)
 		if err != nil {
 			return err
 		}
+
 		b := indexableBrand{
 			Type:      brandDocumentType,
 			BrandJSON: string(brandJSON),
 			Brand:     brand,
 			Models:    models.Models,
+			Profiles:  profiles.Profiles,
 			BrandID:   brand.BrandId,
 			BrandName: brand.Name,
 		}
@@ -161,6 +182,31 @@ func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overw
 				return err
 			}
 		}
+		// Add the LoRaWAN Device Profiles to the index.
+		for _, profile := range profiles.Profiles {
+			profileJSON, err := jsonpb.TTN().Marshal(profile)
+			if err != nil {
+				return err
+			}
+			if err != nil {
+				return err
+			}
+			vendorProfileID := strconv.Itoa(int(profile.VendorProfileID))
+			vendorID := strconv.Itoa(int(brand.LoraAllianceVendorId))
+			p := indexableProfile{
+				Type:            profileDocumentType,
+				ProfileJSON:     string(profileJSON),
+				Brand:           brand,
+				Profile:         profile,
+				BrandID:         brand.BrandId,
+				VendorID:        vendorID,
+				VendorProfileID: vendorProfileID,
+			}
+			if err := batch.Index(fmt.Sprintf("%s:%s", vendorID, vendorProfileID), p); err != nil {
+				return err
+			}
+		}
+
 		log.FromContext(ctx).WithField("brand_id", brand.BrandId).Debug("Adding brand to index")
 		if err := index.Batch(batch); err != nil {
 			return err
