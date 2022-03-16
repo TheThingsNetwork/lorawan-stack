@@ -153,6 +153,10 @@ const getPacketBrokerNetworkLogic = createRequestLogic({
       (result, acc) => Boolean(acc),
     )
 
+    if (!network) {
+      throw { statusCode: 404 }
+    }
+
     if (network && fetchPolicies) {
       const fetchHomeNetworkRoutingPolicy = async () => {
         try {

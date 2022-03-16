@@ -19,6 +19,7 @@ import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
 import ErrorView from '@ttn-lw/lib/components/error-view'
+import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
 import UserApiKeyEdit from '@console/views/user-api-key-edit'
 import UserApiKeyAdd from '@console/views/user-api-key-add'
@@ -28,12 +29,15 @@ import UserApiKeysList from '@console/views/user-api-keys-list'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import { apiKeyPath as apiKeyPathRegexp } from '@console/lib/regexp'
+
 const UserApiKeys = ({ match }) => (
   <ErrorView errorRender={SubViewError}>
     <Switch>
       <Route exact path={match.path} component={UserApiKeysList} />
       <Route exact path={`${match.path}/add`} component={UserApiKeyAdd} />
-      <Route path={`${match.path}/:apiKeyId`} component={UserApiKeyEdit} />
+      <Route path={`${match.path}/:apiKeyId${apiKeyPathRegexp}`} component={UserApiKeyEdit} />
+      <NotFoundRoute />
     </Switch>
   </ErrorView>
 )

@@ -16,7 +16,7 @@ import { hot } from 'react-hot-loader/root'
 import React from 'react'
 import { connect } from 'react-redux'
 import { ConnectedRouter } from 'connected-react-router'
-import { Route, Switch } from 'react-router-dom'
+import { Route, Switch, Redirect } from 'react-router-dom'
 import classnames from 'classnames'
 import bind from 'autobind-decorator'
 
@@ -83,6 +83,9 @@ class ConsoleApp extends React.PureComponent {
     history: PropTypes.shape({
       push: PropTypes.func,
       replace: PropTypes.func,
+      location: PropTypes.shape({
+        pathname: PropTypes.string.isRequired,
+      }).isRequired,
     }).isRequired,
     isAdmin: PropTypes.bool,
     rights: PropTypes.rights,
@@ -123,6 +126,9 @@ class ConsoleApp extends React.PureComponent {
       rights,
       isAdmin,
       history,
+      history: {
+        location: { pathname },
+      },
       env: {
         siteTitle,
         pageData,
@@ -169,6 +175,7 @@ class ConsoleApp extends React.PureComponent {
                     <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
                     <div className={style.stage} id="stage">
                       <Switch>
+                        <Redirect from="/:url*(/+)" to={pathname.slice(0, -1)} />
                         <Route exact path="/" component={Overview} />
                         <Route path="/applications" component={Applications} />
                         <Route path="/gateways" component={Gateways} />

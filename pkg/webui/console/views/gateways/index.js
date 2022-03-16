@@ -26,6 +26,7 @@ import GatewaysList from '@console/views/gateways-list'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { mayViewGateways } from '@console/lib/feature-checks'
 
@@ -43,7 +44,7 @@ export default class Gateways extends React.Component {
       <Switch>
         <Route exact path={`${path}`} component={GatewaysList} />
         <Route exact path={`${path}/add`} component={GatewayAdd} />
-        <Route path={`${path}/:gtwId`} component={Gateway} />
+        <Route path={`${path}/:gtwId${pathIdRegexp}`} component={Gateway} />
       </Switch>
     )
   }

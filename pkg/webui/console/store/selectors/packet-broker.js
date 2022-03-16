@@ -23,6 +23,7 @@ import { combinePacketBrokerIds } from '@ttn-lw/lib/selectors/id'
 import {
   GET_PACKET_BROKER_INFO_BASE,
   GET_PACKET_BROKER_NETWORKS_LIST_BASE,
+  GET_PACKET_BROKER_NETWORK_BASE,
 } from '@console/store/actions/packet-broker'
 
 const ENTITY = 'packetBrokerNetworks'
@@ -53,6 +54,7 @@ export const selectPacketBrokerNetworkEntitiesStore = state =>
   selectPacketBrokerStore(state).networks.entities
 export const selectPacketBrokerNetworkById = (state, combinedId) =>
   selectPacketBrokerNetworkEntitiesStore(state)[combinedId]
+export const selectPacketBrokerNetworkError = createErrorSelector(GET_PACKET_BROKER_NETWORK_BASE)
 
 // Networks.
 const selectPBNetworksIds = createPaginationIdsSelectorByEntity(ENTITY)

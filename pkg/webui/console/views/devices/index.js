@@ -19,6 +19,8 @@ import { connect } from 'react-redux'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
+import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
 import Device from '@console/views/device'
@@ -28,6 +30,7 @@ import DeviceList from '@console/views/device-list'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { mayViewApplicationDevices } from '@console/lib/feature-checks'
 
@@ -51,8 +54,9 @@ export default class Devices extends React.Component {
       <Switch>
         <Route path={`${path}/add`} component={DeviceAdd} />
         <Route path={`${path}/import`} component={DeviceImport} />
-        <Route path={`${path}/:devId`} component={Device} />
-        <Route path={`${path}`} component={DeviceList} />
+        <Route path={`${path}/:devId${pathIdRegexp}`} component={Device} />
+        <Route path={`${path}`} component={DeviceList} exact />
+        <NotFoundRoute />
       </Switch>
     )
   }

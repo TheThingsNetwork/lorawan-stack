@@ -28,6 +28,7 @@ import SubViewError from '@console/views/sub-view-error'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 
 const ApplicationWebhooks = props => {
   const { match, appId } = props
@@ -45,7 +46,11 @@ const ApplicationWebhooks = props => {
       <Switch>
         <Route exact path={`${match.path}`} component={ApplicationWebhooksList} />
         <Route exact path={`${match.path}/add`} component={ApplicationWebhookAdd} />
-        <Route exact path={`${match.path}/:webhookId`} component={ApplicationWebhookEdit} />
+        <Route
+          exact
+          path={`${match.path}/:webhookId${pathIdRegexp}`}
+          component={ApplicationWebhookEdit}
+        />
         <Route path={`${match.path}/add/template`} component={ApplicationWebhookChoose} />
       </Switch>
     </ErrorView>

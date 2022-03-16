@@ -29,6 +29,7 @@ import UserEdit from '@console/views/admin-user-management-edit'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { mayManageUsers } from '@console/lib/feature-checks'
 
@@ -51,7 +52,7 @@ export default class UserManagementRouter extends Component {
         <Switch>
           <Route exact path={`${match.path}`} component={UserManagement} />
           <Route path={`${match.path}/add`} component={UserAdd} />
-          <Route path={`${match.path}/:userId`} component={UserEdit} />
+          <Route path={`${match.path}/:userId${pathIdRegexp}`} component={UserEdit} />
           <NotFoundRoute />
         </Switch>
       </React.Fragment>
