@@ -93,11 +93,11 @@ func adrLossRate(ups ...*ttnpb.UplinkMessage) float32 {
 		return 0
 	}
 
-	min := ups[0].Payload.GetMacPayload().FullFCnt
+	min := ups[0].GetPayload().GetMacPayload().GetFullFCnt()
 	lastFCnt := min
 	var lost uint32
 	for i, up := range ups[1:] {
-		fCnt := up.Payload.GetMacPayload().FullFCnt
+		fCnt := up.GetPayload().GetMacPayload().GetFullFCnt()
 		switch {
 		case fCnt < lastFCnt:
 			return adrLossRate(ups[1+i:]...)
@@ -106,7 +106,7 @@ func adrLossRate(ups ...*ttnpb.UplinkMessage) float32 {
 		}
 		lastFCnt = fCnt
 	}
-	return float32(lost) / float32(1+internal.LastUplink(ups...).Payload.GetMacPayload().FullFCnt-min)
+	return float32(lost) / float32(1+internal.LastUplink(ups...).GetPayload().GetMacPayload().GetFullFCnt()-min)
 }
 
 func maxSNRFromMetadata(mds ...*ttnpb.RxMetadata) (float32, bool) {
