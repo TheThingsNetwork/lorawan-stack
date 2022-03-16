@@ -405,6 +405,7 @@
   "console.containers.device-importer.index.abortWarningMessage": "The end device import was aborted and the remaining {count} {count, plural, one {end device} other {end devices}} have not been imported",
   "console.containers.device-importer.index.largeFileWarningMessage": "Providing files larger than {warningThreshold} can cause issues during the import process. We recommend you to split such files up into multiple smaller files and importing them one by one.",
   "console.containers.device-payload-formatters.messages.defaultFormatter": "Click <Link>here</Link> to modify the default payload formatter for this application",
+  "console.containers.device-payload-formatters.messages.mayNotViewLink": "You are not allowed to view link information of this application. This includes seeing the default payload formatter of this application.",
   "console.containers.device-template-format-select.index.title": "File format",
   "console.containers.device-template-format-select.index.warning": "End device template formats unavailable",
   "console.containers.device-title-section.device-title-section.uplinkDownlinkTooltip": "The number of sent uplinks and received downlinks of this end device since the last frame counter reset.",

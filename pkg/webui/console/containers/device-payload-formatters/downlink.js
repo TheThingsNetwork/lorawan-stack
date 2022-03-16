@@ -22,6 +22,7 @@ import tts from '@console/api/tts'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import toast from '@ttn-lw/components/toast'
+import Notification from '@ttn-lw/components/notification'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import withRequest from '@ttn-lw/lib/components/with-request'
@@ -31,6 +32,9 @@ import PayloadFormattersForm from '@console/components/payload-formatters-form'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+
+import { checkFromState } from '@account/lib/feature-checks'
+import { mayViewApplicationLink } from '@console/lib/feature-checks'
 
 import { updateDevice } from '@console/store/actions/devices'
 import { getRepositoryPayloadFormatters } from '@console/store/actions/device-repository'
@@ -46,20 +50,19 @@ import {
 } from '@console/store/selectors/devices'
 import { selectDeviceRepoPayloadFromatters } from '@console/store/selectors/device-repository'
 
-@connect(
-  state => {
-    const formatters = selectSelectedDeviceFormatters(state)
+import m from './messages'
 
-    return {
-      appId: selectSelectedApplicationId(state),
-      devId: selectSelectedDeviceId(state),
-      device: selectSelectedDevice(state),
-      link: selectApplicationLink(state),
-      formatters,
-      encodeDownlink: tts.As.encodeDownlink,
-      repositoryPayloadFormatters: selectDeviceRepoPayloadFromatters(state),
-    }
-  },
+@connect(
+  state => ({
+    appId: selectSelectedApplicationId(state),
+    devId: selectSelectedDeviceId(state),
+    device: selectSelectedDevice(state),
+    mayViewLink: checkFromState(mayViewApplicationLink, state),
+    link: selectApplicationLink(state),
+    formatters: selectSelectedDeviceFormatters(state),
+    encodeDownlink: tts.As.encodeDownlink,
+    repositoryPayloadFormatters: selectDeviceRepoPayloadFromatters(state),
+  }),
   {
     updateDevice: attachPromise(updateDevice),
     getRepositoryPayloadFormatters,
@@ -90,7 +93,8 @@ class DevicePayloadFormatters extends React.PureComponent {
         down_formatter: PropTypes.string,
         down_formatter_parameter: PropTypes.string,
       }),
-    }).isRequired,
+    }),
+    mayViewLink: PropTypes.bool.isRequired,
     repositoryPayloadFormatters: PropTypes.shape({
       formatter_parameter: PropTypes.string,
     }),
@@ -100,6 +104,7 @@ class DevicePayloadFormatters extends React.PureComponent {
   static defaultProps = {
     formatters: undefined,
     repositoryPayloadFormatters: undefined,
+    link: {},
   }
 
   constructor(props) {
@@ -171,19 +176,19 @@ class DevicePayloadFormatters extends React.PureComponent {
   }
 
   render() {
-    const { formatters, link, repositoryPayloadFormatters } = this.props
+    const { formatters, link, repositoryPayloadFormatters, mayViewLink } = this.props
     const { type } = this.state
-    const { default_formatters = {} } = link
 
+    const defaultFormatters = link?.default_formatters || {}
     const formatterType = Boolean(formatters)
       ? formatters.down_formatter || PAYLOAD_FORMATTER_TYPES.NONE
       : PAYLOAD_FORMATTER_TYPES.DEFAULT
     const formatterParameter = Boolean(formatters) ? formatters.down_formatter_parameter : undefined
-    const appFormatterType = Boolean(default_formatters.down_formatter)
-      ? default_formatters.down_formatter
+    const appFormatterType = Boolean(defaultFormatters.down_formatter)
+      ? defaultFormatters.down_formatter
       : PAYLOAD_FORMATTER_TYPES.NONE
-    const appFormatterParameter = Boolean(default_formatters.down_formatter_parameter)
-      ? default_formatters.down_formatter_parameter
+    const appFormatterParameter = Boolean(defaultFormatters.down_formatter_parameter)
+      ? defaultFormatters.down_formatter_parameter
       : undefined
 
     const isDefaultType = type === PAYLOAD_FORMATTER_TYPES.DEFAULT
@@ -191,9 +196,9 @@ class DevicePayloadFormatters extends React.PureComponent {
     return (
       <React.Fragment>
         <IntlHelmet title={sharedMessages.payloadFormattersDownlink} />
+        {!mayViewLink && <Notification content={m.mayNotViewLink} small warning />}
         <PayloadFormattersForm
           uplink={false}
-          linked
           allowReset
           allowTest
           onSubmit={this.onSubmit}

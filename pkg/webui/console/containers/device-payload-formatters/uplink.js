@@ -22,6 +22,7 @@ import tts from '@console/api/tts'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 import toast from '@ttn-lw/components/toast'
+import Notification from '@ttn-lw/components/notification'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import withRequest from '@ttn-lw/lib/components/with-request'
@@ -33,6 +34,8 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { hexToBase64 } from '@console/lib/bytes'
+import { mayViewApplicationLink } from '@console/lib/feature-checks'
+import { checkFromState } from '@account/lib/feature-checks'
 
 import { updateDevice } from '@console/store/actions/devices'
 import { getRepositoryPayloadFormatters } from '@console/store/actions/device-repository'
@@ -48,11 +51,14 @@ import {
 } from '@console/store/selectors/devices'
 import { selectDeviceRepoPayloadFromatters } from '@console/store/selectors/device-repository'
 
+import m from './messages'
+
 @connect(
   state => ({
     appId: selectSelectedApplicationId(state),
     device: selectSelectedDevice(state),
     devId: selectSelectedDeviceId(state),
+    mayViewLink: checkFromState(mayViewApplicationLink, state),
     link: selectApplicationLink(state),
     formatters: selectSelectedDeviceFormatters(state),
     decodeUplink: tts.As.decodeUplink,
@@ -88,7 +94,8 @@ class DevicePayloadFormatters extends React.PureComponent {
         up_formatter: PropTypes.string,
         up_formatter_parameter: PropTypes.string,
       }),
-    }).isRequired,
+    }),
+    mayViewLink: PropTypes.bool.isRequired,
     repositoryPayloadFormatters: PropTypes.shape({
       formatter_parameter: PropTypes.string,
     }),
@@ -98,6 +105,7 @@ class DevicePayloadFormatters extends React.PureComponent {
   static defaultProps = {
     formatters: undefined,
     repositoryPayloadFormatters: undefined,
+    link: {},
   }
 
   constructor(props) {
@@ -175,19 +183,19 @@ class DevicePayloadFormatters extends React.PureComponent {
   }
 
   render() {
-    const { formatters, link, repositoryPayloadFormatters } = this.props
+    const { formatters, mayViewLink, link, repositoryPayloadFormatters } = this.props
     const { type } = this.state
-    const { default_formatters = {} } = link
 
+    const defaultFormatters = link?.default_formatters || {}
     const formatterType = Boolean(formatters)
       ? formatters.up_formatter || PAYLOAD_FORMATTER_TYPES.NONE
       : PAYLOAD_FORMATTER_TYPES.DEFAULT
     const formatterParameter = Boolean(formatters) ? formatters.up_formatter_parameter : undefined
-    const appFormatterType = Boolean(default_formatters.up_formatter)
-      ? default_formatters.up_formatter
+    const appFormatterType = Boolean(defaultFormatters.up_formatter)
+      ? defaultFormatters.up_formatter
       : PAYLOAD_FORMATTER_TYPES.NONE
-    const appFormatterParameter = Boolean(default_formatters.up_formatter_parameter)
-      ? default_formatters.up_formatter_parameter
+    const appFormatterParameter = Boolean(defaultFormatters.up_formatter_parameter)
+      ? defaultFormatters.up_formatter_parameter
       : undefined
 
     const isDefaultType = type === PAYLOAD_FORMATTER_TYPES.DEFAULT
@@ -195,9 +203,9 @@ class DevicePayloadFormatters extends React.PureComponent {
     return (
       <React.Fragment>
         <IntlHelmet title={sharedMessages.payloadFormattersUplink} />
+        {!mayViewLink && <Notification content={m.mayNotViewLink} small warning />}
         <PayloadFormattersForm
           uplink
-          linked
           allowReset
           allowTest
           onSubmit={this.onSubmit}

@@ -14,6 +14,8 @@
 
 import { connect as withConnect } from 'react-redux'
 
+import withRequest from '@ttn-lw/lib/components/with-request'
+
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
 import pipe from '@ttn-lw/lib/pipe'
@@ -52,6 +54,11 @@ const addHocs = pipe(
   withConnect(mapStateToProps, mapDispatchToProps),
   withFeatureRequirement(maySetApplicationPayloadFormatters, {
     redirect: ({ appId }) => `/applications/${appId}`,
+  }),
+  withRequest(({ appId, getLink, mayViewLink }) => {
+    if (mayViewLink) {
+      getLink(appId, ['default_formatters'])
+    }
   }),
 )
 

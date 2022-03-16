@@ -33,10 +33,8 @@ const ApplicationPayloadFormatters = props => {
   const {
     appId,
     fetching,
-    getLink,
     match,
     match: { url },
-    mayViewLink,
   } = props
 
   useBreadcrumbs(
@@ -46,12 +44,6 @@ const ApplicationPayloadFormatters = props => {
       content={sharedMessages.payloadFormatters}
     />,
   )
-
-  React.useEffect(() => {
-    if (mayViewLink) {
-      getLink(appId, ['default_formatters'])
-    }
-  }, [appId, getLink, mayViewLink])
 
   if (fetching) {
     return (
@@ -83,9 +75,7 @@ const ApplicationPayloadFormatters = props => {
 ApplicationPayloadFormatters.propTypes = {
   appId: PropTypes.string.isRequired,
   fetching: PropTypes.bool.isRequired,
-  getLink: PropTypes.func.isRequired,
   match: PropTypes.match.isRequired,
-  mayViewLink: PropTypes.bool.isRequired,
 }
 
 export default ApplicationPayloadFormatters
