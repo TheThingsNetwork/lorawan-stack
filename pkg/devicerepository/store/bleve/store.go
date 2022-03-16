@@ -15,6 +15,8 @@
 package bleve
 
 import (
+	"strconv"
+
 	"github.com/blevesearch/bleve"
 	"github.com/blevesearch/bleve/search"
 	"github.com/blevesearch/bleve/search/query"
@@ -26,7 +28,8 @@ import (
 )
 
 var (
-	errCorruptedIndex = errors.DefineCorruption("corrupted_index", "corrupted index file")
+	errCorruptedIndex          = errors.DefineCorruption("corrupted_index", "corrupted index file")
+	errInvalidNumberOfProfiles = errors.DefineCorruption("invalid_number_of_profiles", "invalid number of profiles returned")
 )
 
 // retrieve returns the resulting document from the cache, if available. Otherwise,
@@ -170,6 +173,7 @@ func (s *bleveStore) GetModels(req store.GetModelsRequest) (*store.GetModelsResp
 		}
 		models = append(models, pb)
 	}
+
 	return &store.GetModelsResponse{
 		Count:  uint32(len(result.Hits)),
 		Total:  uint32(result.Total),
@@ -179,8 +183,44 @@ func (s *bleveStore) GetModels(req store.GetModelsRequest) (*store.GetModelsResp
 }
 
 // GetTemplate retrieves an end device template for an end device definition.
-func (s *bleveStore) GetTemplate(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.EndDeviceTemplate, error) {
-	return s.store.GetTemplate(ids)
+func (s *bleveStore) GetTemplate(req *ttnpb.GetTemplateRequest, _ *store.EndDeviceProfile) (*ttnpb.EndDeviceTemplate, error) {
+	var (
+		profile             *store.EndDeviceProfile
+		endDeviceProfileIds = req.GetEndDeviceProfileIds()
+	)
+	// Fetch the Profile from the store indices and forward it if available.
+	if endDeviceProfileIds != nil {
+		documentTypeQuery := bleve.NewTermQuery(profileDocumentType)
+		documentTypeQuery.SetField("Type")
+		queries := []query.Query{documentTypeQuery}
+		if q := endDeviceProfileIds.VendorId; q != 0 {
+			query := bleve.NewTermQuery(strconv.Itoa(int(q)))
+			query.SetField("VendorID")
+			queries = append(queries, query)
+		}
+		query := bleve.NewTermQuery(strconv.Itoa(int(endDeviceProfileIds.VendorProfileId)))
+		query.SetField("VendorProfileID")
+		queries = append(queries, query)
+
+		searchRequest := bleve.NewSearchRequest(bleve.NewConjunctionQuery(queries...))
+		searchRequest.Fields = []string{"ProfileJSON"}
+		result, err := s.index.Search(searchRequest)
+		if err != nil {
+			return nil, err
+		}
+		if len(result.Hits) != 1 {
+			// There can only be one profile for a given tuple.
+			return nil, errInvalidNumberOfProfiles.New()
+		}
+
+		model, err := s.retrieve(result.Hits[0], "ProfileJSON", func() interface{} { return &store.EndDeviceProfile{} })
+		if err != nil {
+			return nil, err
+		}
+		profile = model.(*store.EndDeviceProfile)
+	}
+
+	return s.store.GetTemplate(req, profile)
 }
 
 // GetUplinkDecoder retrieves the codec for decoding uplink messages.
@@ -196,6 +236,11 @@ func (s *bleveStore) GetDownlinkDecoder(req store.GetCodecRequest) (*ttnpb.Messa
 // GetDownlinkEncoder retrieves the codec for encoding downlink messages.
 func (s *bleveStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadEncoder, error) {
 	return s.store.GetDownlinkEncoder(req)
+}
+
+// GetLoRaWANDeviceProfiles retrieves an end device template for an end device definition.
+func (s *bleveStore) GetLoRaWANDeviceProfiles(req store.GetLoRaWANDeviceProfilesRequest) (*store.GetLoRaWANDeviceProfilesResponse, error) {
+	return s.store.GetLoRaWANDeviceProfiles(req)
 }
 
 // Close closes the store.

@@ -16,7 +16,6 @@ package remote
 
 import (
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // regionToBandID maps LoRaWAN schema regions to TTS Band IDs.
@@ -42,32 +41,6 @@ var regionToBandID = map[string]string{
 
 // bandIDToRegion is the inverse mapping of regionToBandID.
 var bandIDToRegion map[string]string
-
-// regionalParametersToPB maps LoRaWAN schema regional parameters to ttnpb.PHYVersion enum values.
-var regionalParametersToPB = map[string]ttnpb.PHYVersion{
-	"TS001-1.0":        ttnpb.PHYVersion_TS001_V1_0,
-	"TS001-1.0.1":      ttnpb.PHYVersion_TS001_V1_0_1,
-	"RP001-1.0.2":      ttnpb.PHYVersion_RP001_V1_0_2,
-	"RP001-1.0.2-RevB": ttnpb.PHYVersion_RP001_V1_0_2_REV_B,
-	"RP001-1.0.3-RevA": ttnpb.PHYVersion_RP001_V1_0_3_REV_A,
-	"RP001-1.1-RevA":   ttnpb.PHYVersion_RP001_V1_1_REV_A,
-	"RP001-1.1-RevB":   ttnpb.PHYVersion_RP001_V1_1_REV_B,
-	"RP002-1.0.0":      ttnpb.PHYVersion_RP002_V1_0_0,
-	"RP002-1.0.1":      ttnpb.PHYVersion_RP002_V1_0_1,
-	"RP002-1.0.2":      ttnpb.PHYVersion_RP002_V1_0_2,
-}
-
-// pingSlotPeriodToPB maps LoRaWAN schema ping slot period to ttnpb.PingSlotPeriod enum values.
-var pingSlotPeriodToPB = map[uint32]ttnpb.PingSlotPeriod{
-	1:   ttnpb.PingSlotPeriod_PING_EVERY_1S,
-	2:   ttnpb.PingSlotPeriod_PING_EVERY_2S,
-	4:   ttnpb.PingSlotPeriod_PING_EVERY_4S,
-	8:   ttnpb.PingSlotPeriod_PING_EVERY_8S,
-	16:  ttnpb.PingSlotPeriod_PING_EVERY_16S,
-	32:  ttnpb.PingSlotPeriod_PING_EVERY_32S,
-	64:  ttnpb.PingSlotPeriod_PING_EVERY_64S,
-	128: ttnpb.PingSlotPeriod_PING_EVERY_128S,
-}
 
 func init() {
 	bandIDToRegion = make(map[string]string, len(regionToBandID))

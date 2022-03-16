@@ -22,43 +22,13 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"gopkg.in/yaml.v2"
 )
 
 func durationPtr(t time.Duration) *time.Duration { return &t }
-
-func TestDutyCycleFromFloat(t *testing.T) {
-	for _, tc := range []struct {
-		Float float64
-		Enum  ttnpb.AggregatedDutyCycle
-	}{
-		{
-			Float: 1.0,
-			Enum:  ttnpb.AggregatedDutyCycle_DUTY_CYCLE_1,
-		},
-		{
-			Float: 0.5,
-			Enum:  ttnpb.AggregatedDutyCycle_DUTY_CYCLE_2,
-		},
-		{
-			Float: 0.25,
-			Enum:  ttnpb.AggregatedDutyCycle_DUTY_CYCLE_4,
-		},
-		{
-			Float: 0.14,
-			Enum:  ttnpb.AggregatedDutyCycle_DUTY_CYCLE_8,
-		},
-		{
-			Float: 1 / (2 << 20),
-			Enum:  ttnpb.AggregatedDutyCycle_DUTY_CYCLE_32768,
-		},
-	} {
-		a := assertions.New(t)
-		a.So(dutyCycleFromFloat(tc.Float), should.Equal, tc.Enum)
-	}
-}
 
 func TestProfile(t *testing.T) {
 	for _, tc := range []struct {
@@ -208,7 +178,7 @@ func TestProfile(t *testing.T) {
 				t.FailNow()
 			}
 
-			profile := &EndDeviceProfile{}
+			profile := &store.EndDeviceProfile{}
 			err = yaml.UnmarshalStrict(b, profile)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
