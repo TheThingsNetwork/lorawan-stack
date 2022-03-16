@@ -300,6 +300,11 @@ var (
 			if !proto.Equal(antenna, &ttnpb.GatewayAntenna{}) {
 				gateway.Antennas = []*ttnpb.GatewayAntenna{antenna}
 			}
+
+			if gateway.FrequencyPlanId == "" && len(gateway.FrequencyPlanIds) == 0 {
+				logger.Warn("Frequency plan not set. Without choosing a frequency plan, packets from the gateway will not be correctly processed")
+			}
+
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
