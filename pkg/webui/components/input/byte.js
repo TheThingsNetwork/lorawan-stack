@@ -52,7 +52,8 @@ const mask = (min, max, showPerChar = false) => {
 
 const upper = str => str.toUpperCase()
 
-const clean = str => str.replace(new RegExp(`[ ${PLACEHOLDER_CHAR}]`, 'g'), '')
+const clean = str =>
+  typeof str === 'string' ? str.replace(new RegExp(`[ ${PLACEHOLDER_CHAR}]`, 'g'), '') : str
 
 export default class ByteInput extends React.Component {
   static propTypes = {
