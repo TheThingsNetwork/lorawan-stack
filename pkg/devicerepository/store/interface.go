@@ -16,6 +16,7 @@ package store
 
 import (
 	pbtypes "github.com/gogo/protobuf/types"
+
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -48,6 +49,25 @@ type GetModelsRequest struct {
 	Search  string
 }
 
+// GetLoRaWANDeviceProfilesRequest is a request to list available LoRaWAN device profile definitions.
+type GetLoRaWANDeviceProfilesRequest struct {
+	BrandID,
+	ModelID string
+	Limit,
+	Page uint32
+	OrderBy string
+	Paths   []string
+	Search  string
+}
+
+// GetLoRaWANDeviceProfilesResponse returns available LoRaWAN device profile definitions.
+type GetLoRaWANDeviceProfilesResponse struct {
+	Count,
+	Offset,
+	Total uint32
+	Profiles []*EndDeviceProfile
+}
+
 // GetModelsResponse is a list of models, along with model information
 type GetModelsResponse struct {
 	Count,
@@ -68,8 +88,11 @@ type Store interface {
 	GetBrands(GetBrandsRequest) (*GetBrandsResponse, error)
 	// GetModels lists available end device definitions.
 	GetModels(GetModelsRequest) (*GetModelsResponse, error)
+	// GetLoRaWANDeviceProfiles lists available LoRaWAN device profile definitions.
+	GetLoRaWANDeviceProfiles(GetLoRaWANDeviceProfilesRequest) (*GetLoRaWANDeviceProfilesResponse, error)
 	// GetTemplate retrieves an end device template for an end device definition.
-	GetTemplate(*ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.EndDeviceTemplate, error)
+	// If the EndDeviceProfile is not present, the profile based on the BandID is chosen.
+	GetTemplate(*ttnpb.GetTemplateRequest, *EndDeviceProfile) (*ttnpb.EndDeviceTemplate, error)
 	// GetUplinkDecoder retrieves the codec for decoding uplink messages.
 	GetUplinkDecoder(GetCodecRequest) (*ttnpb.MessagePayloadDecoder, error)
 	// GetDownlinkDecoder retrieves the codec for decoding downlink messages.
