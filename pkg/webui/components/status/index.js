@@ -27,6 +27,7 @@ const m = defineMessages({
   bad: 'bad',
   mediocre: 'mediocre',
   unknown: 'unknown',
+  none: 'none',
 })
 
 const Status = React.forwardRef(
@@ -54,6 +55,7 @@ const Status = React.forwardRef(
       [style.statusBad]: status === 'bad',
       [style.statusMediocre]: status === 'mediocre',
       [style.statusUnknown]: status === 'unknown',
+      [style.statusNone]: status === 'none',
       [style[`${status}-pulse`]]: typeof pulse === 'boolean' ? pulse : status === 'good',
       [style.flipped]: flipped,
       [style[`triggered-${status}-pulse`]]: animate,
@@ -110,7 +112,7 @@ Status.propTypes = {
     PropTypes.number,
     PropTypes.instanceOf(Date),
   ]),
-  status: PropTypes.oneOf(['good', 'bad', 'mediocre', 'unknown']),
+  status: PropTypes.oneOf(['good', 'bad', 'mediocre', 'unknown', 'none']),
   title: PropTypes.message,
 }
 

@@ -33,6 +33,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import style from './fetch-table.styl'
+import { action } from '@storybook/addon-actions'
 
 const DEFAULT_PAGE = 1
 
@@ -270,7 +271,7 @@ class FetchTable extends Component {
     if (Boolean(getItemPathPrefix)) {
       entityPath = getItemPathPrefix(item)
     } else {
-      const item_id = item.id || item.ids[`${entitySingle}_id`]
+      const item_id = item.id || item[`${entitySingle}_id`] || item.ids[`${entitySingle}_id`]
       entityPath = `${itemPathPrefix}/${item_id}`
     }
 
@@ -312,7 +313,8 @@ class FetchTable extends Component {
     const filtersCls = classnames(style.filters, {
       [style.topRule]: tabs.length > 0,
     })
-
+    console.log(actionItems)
+    console.log(mayAdd)
     return (
       <div data-test-id={`${entity}-table`}>
         <div className={filtersCls}>
