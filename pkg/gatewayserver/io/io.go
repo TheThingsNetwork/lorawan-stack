@@ -556,7 +556,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		case *ttnpb.DataRate_Lrfhss:
 			settings.CodingRate = mod.Lrfhss.CodingRate
 		}
-		var f func(context.Context, scheduling.Options) (scheduling.Emission, error)
+		var f func(context.Context, scheduling.Options) (scheduling.Emission, scheduling.ConcentratorTime, error)
 		switch request.Class {
 		case ttnpb.Class_CLASS_A:
 			f = c.scheduler.ScheduleAt
@@ -584,7 +584,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		default:
 			panic(fmt.Sprintf("proto: unexpected class %v in oneof", request.Class))
 		}
-		em, err := f(c.ctx, scheduling.Options{
+		em, now, err := f(c.ctx, scheduling.Options{
 			PayloadSize: len(msg.RawPayload),
 			TxSettings:  settings,
 			RTTs:        c.rtts,
@@ -609,14 +609,12 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		rx1 = i == 0
 		rx2 = i == 1
 		rxErrs = nil
-		if now, ok := c.scheduler.Now(); ok {
-			logger = logger.WithField("now", now)
-			delay = time.Duration(em.Starts() - now)
-		}
+		delay = time.Duration(em.Starts() - now)
 		logger.WithFields(log.Fields(
 			"rx_window", i+1,
 			"starts", em.Starts(),
 			"duration", em.Duration(),
+			"now", now,
 			"delay", delay,
 		)).Debug("Scheduled downlink")
 		break

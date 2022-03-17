@@ -211,7 +211,7 @@ func (s *Scheduler) gc(ctx context.Context) error {
 			return ctx.Err()
 		case <-ticker.C:
 			s.mu.RLock()
-			serverTime, ok := s.clock.FromServerTime(time.Now())
+			serverTime, ok := s.clock.FromServerTime(s.timeSource.Now())
 			s.mu.RUnlock()
 			if !ok {
 				continue
@@ -280,7 +280,7 @@ type Options struct {
 
 // ScheduleAt attempts to schedule the given Tx settings with the given priority.
 // If there are round-trip times available, the nth percentile (n = scheduleLateRTTPercentile) value will be used instead of ScheduleTimeShort.
-func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (Emission, error) {
+func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (res Emission, now ConcentratorTime, err error) {
 	defer trace.StartRegion(ctx, "schedule transmission").End()
 
 	s.mu.Lock()
@@ -289,7 +289,7 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (Emission, err
 		s.syncWithUplinkToken(opts.UplinkToken)
 	}
 	if !s.clock.IsSynced() {
-		return Emission{}, errNoClockSync.New()
+		return Emission{}, 0, errNoClockSync.New()
 	}
 	minScheduleTime := ScheduleTimeShort
 	var medianRTT *time.Duration
@@ -305,6 +305,9 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (Emission, err
 	)).Debug("Computed scheduling delays")
 	var starts ConcentratorTime
 	now, ok := s.clock.FromServerTime(s.timeSource.Now())
+	if !ok {
+		panic("clock is synced without server time")
+	}
 	if opts.Time != nil {
 		var ok bool
 		starts, ok = s.clock.FromGatewayTime(*ttnpb.StdTime(opts.Time))
@@ -312,17 +315,17 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (Emission, err
 			if medianRTT != nil {
 				serverTime, ok := s.clock.FromServerTime(*ttnpb.StdTime(opts.Time))
 				if !ok {
-					return Emission{}, errNoServerTime.New()
+					return Emission{}, 0, errNoServerTime.New()
 				}
 				starts = serverTime - ConcentratorTime(*medianRTT/2)
 			} else {
-				return Emission{}, errNoAbsoluteGatewayTime.New()
+				return Emission{}, 0, errNoAbsoluteGatewayTime.New()
 			}
 		}
 		// Assume that the absolute time is the time of arrival, not time of transmission.
 		toa, err := toa.Compute(opts.PayloadSize, opts.TxSettings)
 		if err != nil {
-			return Emission{}, err
+			return Emission{}, 0, err
 		}
 		log.FromContext(ctx).WithFields(log.Fields(
 			"toa", toa,
@@ -332,38 +335,36 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (Emission, err
 	} else {
 		starts = s.clock.FromTimestampTime(opts.Timestamp)
 	}
-	if ok {
-		if delta := time.Duration(starts - now); delta < minScheduleTime {
-			return Emission{}, errTooLate.WithAttributes(
-				"delta", delta,
-				"min", minScheduleTime,
-			)
-		} else {
-			log.FromContext(ctx).WithFields(log.Fields(
-				"now", now,
-				"starts", starts,
-				"delta", delta,
-			)).Debug("Computed downlink start timestamp")
-		}
+	delay := time.Duration(starts - now)
+	if delay < minScheduleTime {
+		return Emission{}, 0, errTooLate.WithAttributes(
+			"delay", delay,
+			"min", minScheduleTime,
+		)
 	}
+	log.FromContext(ctx).WithFields(log.Fields(
+		"now", now,
+		"starts", starts,
+		"delay", delay,
+	)).Debug("Computed downlink start timestamp")
 	sb, err := s.findSubBand(opts.Frequency)
 	if err != nil {
-		return Emission{}, err
+		return Emission{}, 0, err
 	}
 	em, err := s.newEmission(opts.PayloadSize, opts.TxSettings, starts)
 	if err != nil {
-		return Emission{}, err
+		return Emission{}, 0, err
 	}
 	for _, other := range s.emissions {
 		if em.OverlapsWithOffAir(other, s.timeOffAir) {
-			return Emission{}, errConflict.New()
+			return Emission{}, 0, errConflict.New()
 		}
 	}
 	if err := sb.Schedule(em, opts.Priority); err != nil {
-		return Emission{}, err
+		return Emission{}, 0, err
 	}
 	s.emissions = s.emissions.Insert(em)
-	return em, nil
+	return em, now, nil
 }
 
 // ScheduleAnytime attempts to schedule the given Tx settings with the given priority from the time in the settings.
@@ -374,7 +375,7 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (Emission, err
 // immediately. The reason for this is that this scheduler cannot determine conflicts or enforce duty-cycle when the
 // emission time is unknown. Therefore, when the time is set to Immediate, the estimated current concentrator time plus
 // ScheduleDelayLong will be used.
-func (s *Scheduler) ScheduleAnytime(ctx context.Context, opts Options) (Emission, error) {
+func (s *Scheduler) ScheduleAnytime(ctx context.Context, opts Options) (res Emission, now ConcentratorTime, err error) {
 	defer trace.StartRegion(ctx, "schedule transmission at any time").End()
 
 	s.mu.Lock()
@@ -383,7 +384,7 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, opts Options) (Emission
 		s.syncWithUplinkToken(opts.UplinkToken)
 	}
 	if !s.clock.IsSynced() {
-		return Emission{}, errNoClockSync.New()
+		return Emission{}, 0, errNoClockSync.New()
 	}
 	minScheduleTime := ScheduleTimeShort
 	if opts.RTTs != nil {
@@ -394,7 +395,7 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, opts Options) (Emission
 	var starts ConcentratorTime
 	now, ok := s.clock.FromServerTime(s.timeSource.Now())
 	if !ok {
-		return Emission{}, errNoServerTime.New()
+		panic("clock is synced without server time")
 	}
 	if opts.Timestamp == 0 {
 		starts = now + ConcentratorTime(s.scheduleAnytimeDelay)
@@ -408,11 +409,11 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, opts Options) (Emission
 	}
 	sb, err := s.findSubBand(opts.Frequency)
 	if err != nil {
-		return Emission{}, err
+		return Emission{}, 0, err
 	}
 	em, err := s.newEmission(opts.PayloadSize, opts.TxSettings, starts)
 	if err != nil {
-		return Emission{}, err
+		return Emission{}, 0, err
 	}
 	i := 0
 	next := func() ConcentratorTime {
@@ -446,10 +447,10 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, opts Options) (Emission
 	}
 	em, err = sb.ScheduleAnytime(em.d, next, opts.Priority)
 	if err != nil {
-		return Emission{}, err
+		return Emission{}, 0, err
 	}
 	s.emissions = s.emissions.Insert(em)
-	return em, nil
+	return em, now, nil
 }
 
 // Sync synchronizes the clock with the given concentrator time v and the server time.

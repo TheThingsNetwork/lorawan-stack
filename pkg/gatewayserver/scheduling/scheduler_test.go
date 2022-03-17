@@ -323,7 +323,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 				rtts.Median = *tc.MedianRTT
 				rtts.Count = 10
 			}
-			em, err := scheduler.ScheduleAt(ctx, scheduling.Options{
+			em, _, err := scheduler.ScheduleAt(ctx, scheduling.Options{
 				PayloadSize: tc.PayloadSize,
 				TxSettings:  tc.Settings,
 				RTTs:        rtts,
@@ -417,7 +417,7 @@ func TestScheduleAtWithFrequencyPlanDutyCycle(t *testing.T) {
 				rtts.Median = *tc.MedianRTT
 				rtts.Count = 1
 			}
-			em, err := scheduler.ScheduleAt(ctx, scheduling.Options{
+			em, _, err := scheduler.ScheduleAt(ctx, scheduling.Options{
 				PayloadSize: tc.PayloadSize,
 				TxSettings:  tc.Settings,
 				RTTs:        rtts,
@@ -471,7 +471,7 @@ func TestScheduleAnytime(t *testing.T) {
 	// Time-on-air is 41216 us, time-off-air is 1000000 us.
 	// 1: [1000000, 2041216]
 	// 2: [4000000, 5041216]
-	_, err = scheduler.ScheduleAt(ctx, scheduling.Options{
+	_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 		PayloadSize: 10,
 		TxSettings:  settingsAt(869525000, 7, 1000000),
 		Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -479,7 +479,7 @@ func TestScheduleAnytime(t *testing.T) {
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	_, err = scheduler.ScheduleAt(ctx, scheduling.Options{
+	_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 		PayloadSize: 10,
 		TxSettings:  settingsAt(869525000, 7, 4000000),
 		Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -494,7 +494,7 @@ func TestScheduleAnytime(t *testing.T) {
 	// 1: [1000000, 2041216]
 	// 3: [2041216, 3082432]
 	// 2: [4000000, 5041216]
-	em, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
+	em, _, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
 		PayloadSize: 10,
 		TxSettings:  settingsAt(869525000, 7, 1000000),
 		Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -510,7 +510,7 @@ func TestScheduleAnytime(t *testing.T) {
 	// 3: [2041216, 3082432]
 	// 2: [4000000, 5041216]
 	// 4: [5041216, 5082432]
-	em, err = scheduler.ScheduleAnytime(ctx, scheduling.Options{
+	em, _, err = scheduler.ScheduleAnytime(ctx, scheduling.Options{
 		PayloadSize: 10,
 		TxSettings:  settingsAt(869525000, 7, 1000000),
 		Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -528,7 +528,7 @@ func TestScheduleAnytime(t *testing.T) {
 	// 2: [4000000, 5041216]
 	// 4: [5041216, 5082432]
 	// 5: [14091200, 15082432]
-	em, err = scheduler.ScheduleAnytime(ctx, scheduling.Options{
+	em, _, err = scheduler.ScheduleAnytime(ctx, scheduling.Options{
 		PayloadSize: 10,
 		TxSettings:  settingsAt(869525000, 12, 1000000),
 		Priority:    ttnpb.TxSchedulePriority_HIGHEST,
@@ -540,7 +540,7 @@ func TestScheduleAnytime(t *testing.T) {
 	// Try schedule another transmission from 1000000 us.
 	// Time-on-air is 991232 us, time-off-air is 1000000 us.
 	// It's 9.91% in a 1% duty-cycle sub-band, so it hits the duty-cycle limitation.
-	_, err = scheduler.ScheduleAnytime(ctx, scheduling.Options{
+	_, _, err = scheduler.ScheduleAnytime(ctx, scheduling.Options{
 		PayloadSize: 10,
 		TxSettings:  settingsAt(868100000, 12, 1000000),
 		Priority:    ttnpb.TxSchedulePriority_HIGHEST,
@@ -587,7 +587,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		scheduler, err := scheduling.NewScheduler(ctx, fps, true, nil, timeSource)
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
-		em, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
+		em, _, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
 			PayloadSize: 10,
 			TxSettings:  settingsAt(869525000, 7, nil, 0),
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -605,7 +605,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		scheduler, err := scheduling.NewScheduler(ctx, fps, true, &scheduleAnytimeDelay, timeSource)
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
-		em, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
+		em, _, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
 			PayloadSize: 10,
 			TxSettings:  settingsAt(869525000, 7, nil, 0),
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -623,7 +623,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		scheduler, err := scheduling.NewScheduler(ctx, fps, true, &scheduleAnytimeDelay, timeSource)
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
-		em, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
+		em, _, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
 			PayloadSize: 10,
 			TxSettings:  settingsAt(869525000, 7, nil, 0),
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -641,7 +641,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		scheduler, err := scheduling.NewScheduler(ctx, fps, true, &scheduleAnytimeDelay, timeSource)
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
-		em, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
+		em, _, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
 			PayloadSize: 10,
 			TxSettings:  settingsAt(869525000, 7, nil, 0),
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -662,7 +662,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 			Max:   40 * time.Millisecond,
 			Count: 1,
 		}
-		em, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
+		em, _, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
 			PayloadSize: 10,
 			TxSettings:  settingsAt(869525000, 7, nil, 0),
 			RTTs:        rtts,
@@ -680,7 +680,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		scheduler, err := scheduling.NewScheduler(ctx, fps, true, nil, timeSource)
 		a.So(err, should.BeNil)
 		scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
-		em, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
+		em, _, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
 			PayloadSize: 10,
 			TxSettings:  settingsAt(869525000, 7, nil, 100*1000),
 			Priority:    ttnpb.TxSchedulePriority_NORMAL,
@@ -701,7 +701,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 			NPercentile: 40 * time.Millisecond,
 			Count:       3,
 		}
-		em, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
+		em, _, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
 			PayloadSize: 10,
 			TxSettings:  settingsAt(869525000, 7, nil, 10*1000),
 			RTTs:        rtts,
@@ -723,7 +723,7 @@ func TestScheduleAnytimeShort(t *testing.T) {
 			NPercentile: 40 * time.Millisecond,
 			Count:       20,
 		}
-		em, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
+		em, _, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
 			PayloadSize: 10,
 			TxSettings:  settingsAt(869525000, 7, nil, 10*1000),
 			RTTs:        rtts,
@@ -756,7 +756,7 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 	scheduler.Sync(0, timeSource.Time)
 
 	// Schedule a join-accept.
-	_, err = scheduler.ScheduleAt(ctx, scheduling.Options{
+	_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 		PayloadSize: 10,
 		TxSettings: ttnpb.TxSettings{
 			DataRate: &ttnpb.DataRate{
@@ -778,7 +778,7 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 	}
 
 	// Schedule another class A transmission after.
-	_, err = scheduler.ScheduleAt(ctx, scheduling.Options{
+	_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 		PayloadSize: 10,
 		TxSettings: ttnpb.TxSettings{
 			DataRate: &ttnpb.DataRate{
@@ -804,7 +804,7 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 	scheduler.Sync(9000000, timeSource.Time)
 
 	// Schedule any time.
-	em, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
+	em, _, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
 		PayloadSize: 10,
 		TxSettings: ttnpb.TxSettings{
 			DataRate: &ttnpb.DataRate{
@@ -1052,7 +1052,7 @@ func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
 	scheduler.Sync(0, timeSource.Time)
 
 	// Schedule a join-accept.
-	_, err = scheduler.ScheduleAt(ctx, scheduling.Options{
+	_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 		PayloadSize: 10,
 		TxSettings: ttnpb.TxSettings{
 			DataRate: &ttnpb.DataRate{
@@ -1074,7 +1074,7 @@ func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
 	}
 
 	// Schedule another class A transmission after.
-	_, err = scheduler.ScheduleAt(ctx, scheduling.Options{
+	_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 		PayloadSize: 10,
 		TxSettings: ttnpb.TxSettings{
 			DataRate: &ttnpb.DataRate{
@@ -1100,7 +1100,7 @@ func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
 	scheduler.Sync(9000000, timeSource.Time)
 
 	// Schedule any time.
-	em, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
+	em, _, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
 		PayloadSize: 10,
 		TxSettings: ttnpb.TxSettings{
 			DataRate: &ttnpb.DataRate{
@@ -1141,7 +1141,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 		}
 		scheduler, err := scheduling.NewScheduler(ctx, fps, true, nil, timeSource)
 		a.So(err, should.BeNil)
-		_, err = scheduler.ScheduleAt(ctx, scheduling.Options{
+		_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 			PayloadSize: 10,
 			TxSettings: ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
@@ -1168,7 +1168,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 		scheduler, err := scheduling.NewScheduler(ctx, fps, true, nil, timeSource)
 		a.So(err, should.BeNil)
 		t := time.Unix(10, 0)
-		_, err = scheduler.ScheduleAt(ctx, scheduling.Options{
+		_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 			PayloadSize: 10,
 			TxSettings: ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
@@ -1201,7 +1201,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 		scheduler, err := scheduling.NewScheduler(ctx, fps, true, nil, timeSource)
 		a.So(err, should.BeNil)
 		t := time.Unix(10, 0)
-		_, err = scheduler.ScheduleAt(ctx, scheduling.Options{
+		_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 			PayloadSize: 10,
 			TxSettings: ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
