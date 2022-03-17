@@ -42,9 +42,8 @@ const (
 )
 
 type indexableBrand struct {
-	Brand    *ttnpb.EndDeviceBrand
-	Models   []*ttnpb.EndDeviceModel
-	Profiles []*store.EndDeviceProfile
+	Brand  *ttnpb.EndDeviceBrand
+	Models []*ttnpb.EndDeviceModel
 
 	BrandJSON          string // *ttnpb.EndDeviceBrand marshaled into string
 	BrandID, BrandName string // stored separately to support queries
@@ -145,7 +144,7 @@ func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overw
 		profiles, err := s.GetLoRaWANDeviceProfiles(store.GetLoRaWANDeviceProfilesRequest{
 			BrandID: brand.BrandId,
 		})
-		if err != nil {
+		if err != nil && !errors.IsNotFound(err) {
 			return err
 		}
 		brandJSON, err := jsonpb.TTN().Marshal(brand)
@@ -158,7 +157,6 @@ func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overw
 			BrandJSON: string(brandJSON),
 			Brand:     brand,
 			Models:    models.Models,
-			Profiles:  profiles.Profiles,
 			BrandID:   brand.BrandId,
 			BrandName: brand.Name,
 		}
@@ -183,27 +181,26 @@ func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overw
 			}
 		}
 		// Add the LoRaWAN Device Profiles to the index.
-		for _, profile := range profiles.Profiles {
-			profileJSON, err := jsonpb.TTN().Marshal(profile)
-			if err != nil {
-				return err
-			}
-			if err != nil {
-				return err
-			}
-			vendorProfileID := strconv.Itoa(int(profile.VendorProfileID))
-			vendorID := strconv.Itoa(int(brand.LoraAllianceVendorId))
-			p := indexableProfile{
-				Type:            profileDocumentType,
-				ProfileJSON:     string(profileJSON),
-				Brand:           brand,
-				Profile:         profile,
-				BrandID:         brand.BrandId,
-				VendorID:        vendorID,
-				VendorProfileID: vendorProfileID,
-			}
-			if err := batch.Index(fmt.Sprintf("%s:%s", vendorID, vendorProfileID), p); err != nil {
-				return err
+		if profiles != nil {
+			for _, profile := range profiles.Profiles {
+				profileJSON, err := jsonpb.TTN().Marshal(profile)
+				if err != nil {
+					return err
+				}
+				vendorProfileID := strconv.Itoa(int(profile.VendorProfileID))
+				vendorID := strconv.Itoa(int(brand.LoraAllianceVendorId))
+				p := indexableProfile{
+					Type:            profileDocumentType,
+					ProfileJSON:     string(profileJSON),
+					Brand:           brand,
+					Profile:         profile,
+					BrandID:         brand.BrandId,
+					VendorID:        vendorID,
+					VendorProfileID: vendorProfileID,
+				}
+				if err := batch.Index(fmt.Sprintf("%s:%s", vendorID, vendorProfileID), p); err != nil {
+					return err
+				}
 			}
 		}
 
