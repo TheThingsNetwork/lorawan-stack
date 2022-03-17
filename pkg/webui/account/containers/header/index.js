@@ -50,6 +50,12 @@ const Header = ({ handleSearchRequest, searchable }) => {
       path: '/profile-settings',
       exact: true,
     },
+    {
+      title: 'Sessions',
+      icon: 'vpn_key',
+      path: '/session-management',
+      exact: true,
+    },
   ]
 
   const navigationEntries = (
