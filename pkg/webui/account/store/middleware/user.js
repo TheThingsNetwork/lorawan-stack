@@ -92,4 +92,32 @@ const deleteUserLogic = createRequestLogic({
   },
 })
 
-export default [logoutLogic, getUserLogic, updateUserLogic, deleteUserLogic]
+const getUserSessionsLogic = createRequestLogic({
+  type: user.GET_USER_SESSIONS_LIST,
+  process: async ({ action }) => {
+    const { parentId } = action.payload
+
+    const result = await tts.Users.getAllSessions(parentId)
+
+    return { sessions: result.sessions, sessionsTotalCount: result.sessions.length }
+  },
+})
+
+const deleteUserSessionLogic = createRequestLogic({
+  type: user.DELETE_USER_SESSION,
+  process: async ({ action }) => {
+    const { userId, sessionId } = action.payload
+    const result = await tts.Users.deleteSession(userId, sessionId)
+
+    return result
+  },
+})
+
+export default [
+  logoutLogic,
+  getUserLogic,
+  updateUserLogic,
+  deleteUserLogic,
+  getUserSessionsLogic,
+  deleteUserSessionLogic,
+]

@@ -166,6 +166,22 @@ class Users {
       },
     })
   }
+
+  async getAllSessions(userId) {
+    const result = await this._api.UserSessionRegistry.List({
+      routeParams: { 'user_ids.user_id': userId },
+    })
+
+    return Marshaler.unwrapUser(result)
+  }
+
+  async deleteSession(userId, session_id) {
+    const result = await this._api.UserSessionRegistry.Delete({
+      routeParams: { 'user_ids.user_id': userId, session_id },
+    })
+
+    return Marshaler.unwrapUser(result)
+  }
 }
 
 export default Users

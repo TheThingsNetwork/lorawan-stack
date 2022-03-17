@@ -18,6 +18,9 @@ import {
   GET_USER_FAILURE,
   UPDATE_USER_SUCCESS,
   LOGOUT_FAILURE,
+  GET_USER_SESSIONS_LIST,
+  GET_USER_SESSIONS_LIST_SUCCESS,
+  GET_USER_SESSIONS_LIST_FAILURE,
 } from '@account/store/actions/user'
 
 const defaultState = {
@@ -59,6 +62,29 @@ const user = (state = defaultState, { type, payload }) => {
     case LOGOUT_FAILURE:
       return {
         ...state,
+        fetching: false,
+        error: payload,
+      }
+    case GET_USER_SESSIONS_LIST:
+      return {
+        ...state,
+        fetching: true,
+        user: state.user,
+        error: false,
+      }
+    case GET_USER_SESSIONS_LIST_SUCCESS:
+      return {
+        ...state,
+        user: {
+          ...state.user,
+          ...payload,
+        },
+        error: false,
+      }
+    case GET_USER_SESSIONS_LIST_FAILURE:
+      return {
+        ...state,
+        user: state.user,
         fetching: false,
         error: payload,
       }
