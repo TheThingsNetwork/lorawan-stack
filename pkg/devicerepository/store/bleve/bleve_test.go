@@ -388,7 +388,9 @@ func TestBleve(t *testing.T) {
 					BandId:          "unknown-band",
 				},
 			} {
-				tmpl, err := s.GetTemplate(&ids)
+				tmpl, err := s.GetTemplate(&ttnpb.GetTemplateRequest{
+					VersionIds: &ids,
+				}, nil)
 				a.So(errors.IsNotFound(err), should.BeTrue)
 				a.So(tmpl, should.BeNil)
 			}
@@ -396,13 +398,15 @@ func TestBleve(t *testing.T) {
 
 		t.Run("Success", func(t *testing.T) {
 			a := assertions.New(t)
-			tmpl, err := s.GetTemplate(&ttnpb.EndDeviceVersionIdentifiers{
-				BrandId:         "foo-vendor",
-				ModelId:         "dev2",
-				FirmwareVersion: "1.1",
-				HardwareVersion: "2.0",
-				BandId:          "EU_433",
-			})
+			tmpl, err := s.GetTemplate(&ttnpb.GetTemplateRequest{
+				VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
+					BrandId:         "foo-vendor",
+					ModelId:         "dev2",
+					FirmwareVersion: "1.1",
+					HardwareVersion: "2.0",
+					BandId:          "EU_433",
+				},
+			}, nil)
 			a.So(err, should.BeNil)
 			a.So(tmpl, should.NotBeNil)
 		})

@@ -203,7 +203,7 @@ func (s *bleveStore) GetTemplate(req *ttnpb.GetTemplateRequest, _ *store.EndDevi
 		queries = append(queries, query)
 
 		searchRequest := bleve.NewSearchRequest(bleve.NewConjunctionQuery(queries...))
-		searchRequest.Fields = []string{"ProfileJSON"}
+		searchRequest.Fields = []string{"ProfileJSON", "BrandID"}
 		result, err := s.index.Search(searchRequest)
 		if err != nil {
 			return nil, err
@@ -211,6 +211,15 @@ func (s *bleveStore) GetTemplate(req *ttnpb.GetTemplateRequest, _ *store.EndDevi
 		if len(result.Hits) != 1 {
 			// There can only be one profile for a given tuple.
 			return nil, errInvalidNumberOfProfiles.New()
+		}
+
+		brandID, ok := result.Hits[0].Fields["BrandID"].(string)
+		if !ok {
+			return nil, errCorruptedIndex.New()
+		}
+		// Set the Brand ID.
+		req.VersionIds = &ttnpb.EndDeviceVersionIdentifiers{
+			BrandId: brandID,
 		}
 
 		model, err := s.retrieve(result.Hits[0], "ProfileJSON", func() interface{} { return &store.EndDeviceProfile{} })
