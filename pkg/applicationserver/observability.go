@@ -88,6 +88,7 @@ var (
 		events.WithDataType(&ttnpb.ApplicationDownlink{}),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
+		events.WithPropagateToParent(),
 	)
 	evtDropDataDown = events.Define(
 		"as.down.data.drop", "drop downlink data message",
@@ -101,7 +102,6 @@ var (
 		events.WithDataType(&ttnpb.ApplicationDownlink{}),
 		events.WithAuthFromContext(),
 		events.WithClientInfoFromContext(),
-		events.WithPropagateToParent(),
 	)
 	evtEncodeFailDataDown = events.Define(
 		"as.down.data.encode.fail", "encode downlink data message failure",

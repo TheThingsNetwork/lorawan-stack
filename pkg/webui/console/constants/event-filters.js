@@ -16,7 +16,7 @@ import { APPLICATION, END_DEVICE, GATEWAY } from '@console/constants/entities'
 
 export const END_DEVICE_EVENTS_VERBOSE_FILTERS = [
   'as.*.drop',
-  'as.down.data.forward',
+  'as.down.data.receive',
   'as.up.*.forward',
   'js.join.accept',
   'js.join.reject',
