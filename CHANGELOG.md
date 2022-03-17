@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Support for importing end devices using a CSV file. See [documentation](https://www.thethingsindustries.com/docs/getting-started/migrating/import-devices/).
+
 ### Changed
 
 ### Deprecated
