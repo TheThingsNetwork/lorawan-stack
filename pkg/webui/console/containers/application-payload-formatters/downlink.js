@@ -25,17 +25,20 @@ import PageTitle from '@ttn-lw/components/page-title'
 import toast from '@ttn-lw/components/toast'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
+import ErrorNotification from '@ttn-lw/components/error-notification'
 
 import PayloadFormattersForm from '@console/components/payload-formatters-form'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
 
 import { checkFromState, mayViewApplicationLink } from '@console/lib/feature-checks'
 
 import { updateApplicationLinkSuccess } from '@console/store/actions/link'
 
 import {
+  selectApplicationLinkError,
   selectApplicationLinkFormatters,
   selectSelectedApplicationId,
 } from '@console/store/selectors/applications'
@@ -53,11 +56,13 @@ const m = defineMessages({
   state => {
     const formatters = selectApplicationLinkFormatters(state) || {}
     const mayViewLink = checkFromState(mayViewApplicationLink, state)
+    const linkError = selectApplicationLinkError(state)
 
     return {
       appId: selectSelectedApplicationId(state),
       formatters,
       mayViewLink,
+      linkError,
     }
   },
   { updateLinkSuccess: updateApplicationLinkSuccess },
@@ -76,8 +81,13 @@ class ApplicationPayloadFormatters extends React.PureComponent {
   static propTypes = {
     appId: PropTypes.string.isRequired,
     formatters: PropTypes.formatters.isRequired,
+    linkError: PropTypes.error,
     mayViewLink: PropTypes.bool.isRequired,
     updateLinkSuccess: PropTypes.func.isRequired,
+  }
+
+  static defaultProps = {
+    linkError: undefined,
   }
 
   constructor(props) {
@@ -121,14 +131,16 @@ class ApplicationPayloadFormatters extends React.PureComponent {
   }
 
   render() {
-    const { formatters, mayViewLink } = this.props
+    const { formatters, mayViewLink, linkError } = this.props
     const { type } = this.state
 
     const isNoneType = type === PAYLOAD_FORMATTER_TYPES.NONE
+    const hasError = Boolean(linkError) && !isNotFoundError(linkError)
 
     return (
       <React.Fragment>
         <PageTitle title={m.title} />
+        {hasError && <ErrorNotification content={linkError} small />}
         {!isNoneType && (
           <Notification className={style.notification} small info content={m.infoText} />
         )}
