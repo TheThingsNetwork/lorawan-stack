@@ -232,6 +232,15 @@ func TestTTSConverter(t *testing.T) {
 			nExpect:        1,
 		},
 		{
+			name:   "OneWithSessionOneWithout",
+			reader: bytes.NewBufferString(otaaWithSession + "\n\n" + abpDeviceWithoutSession),
+			validateError: func(t *testing.T, err error) {
+				assertions.New(t).So(err, should.BeNil)
+			},
+			validateResult: validateTemplates,
+			nExpect:        2,
+		},
+		{
 			name:   "RemovesDevAddrFromRoot",
 			reader: bytes.NewBufferString(devWithDevAddr),
 			validateError: func(t *testing.T, err error) {
