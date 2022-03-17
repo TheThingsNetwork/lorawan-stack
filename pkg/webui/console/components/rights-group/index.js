@@ -22,6 +22,7 @@ import Notification from '@ttn-lw/components/notification'
 import Radio from '@ttn-lw/components/radio-button'
 
 import withComputedProps from '@ttn-lw/lib/components/with-computed-props'
+import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -245,7 +246,7 @@ class RightsGroup extends React.Component {
         name={right}
         disabled={outOfOwnScopeIndividualRights.includes(right)}
         label={{ id: `enum:${right}` }}
-        fieldDescription={m[`${right}_DESCRIPTION`]}
+        children={<Message className={style.description} content={m[`${right}_DESCRIPTION`]} />}
       />
     ))
 
