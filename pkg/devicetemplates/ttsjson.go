@@ -24,13 +24,13 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
-// TTS is the device template converter id.
-const TTS = "the-things-stack"
+// TTSJSON is the device template converter ID.
+const TTSJSON = "the-things-stack"
 
-type tts struct{}
+type ttsJSON struct{}
 
 // Format implements the devicetemplates.Converter interface.
-func (t *tts) Format() *ttnpb.EndDeviceTemplateFormat {
+func (t *ttsJSON) Format() *ttnpb.EndDeviceTemplateFormat {
 	return &ttnpb.EndDeviceTemplateFormat{
 		Name:           "The Things Stack JSON",
 		Description:    "File containing end devices in The Things Stack JSON format.",
@@ -39,7 +39,7 @@ func (t *tts) Format() *ttnpb.EndDeviceTemplateFormat {
 }
 
 // Convert implements the devicetemplates.Converter interface.
-func (t *tts) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDeviceTemplate) error {
+func (t *ttsJSON) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDeviceTemplate) error {
 	defer close(ch)
 
 	r, err := charset.NewReader(r, "application/json")
@@ -92,5 +92,5 @@ func (t *tts) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndDevi
 }
 
 func init() {
-	RegisterConverter(TTS, &tts{})
+	RegisterConverter(TTSJSON, &ttsJSON{})
 }

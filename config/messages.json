@@ -3608,6 +3608,15 @@
       "file": "devicetemplateconverter.go"
     }
   },
+  "error:pkg/devicetemplates:csv_header": {
+    "translations": {
+      "en": "no known columns in CSV header"
+    },
+    "description": {
+      "package": "pkg/devicetemplates",
+      "file": "ttscsv.go"
+    }
+  },
   "error:pkg/devicetemplates:microchip_certificate_san": {
     "translations": {
       "en": "invalid Microchip certificate Subject Alternate Name"
@@ -3651,6 +3660,15 @@
     "description": {
       "package": "pkg/devicetemplates",
       "file": "microchip.go"
+    }
+  },
+  "error:pkg/devicetemplates:parse_csv": {
+    "translations": {
+      "en": "parse CSV at line `{line}` column `{column}`: {message}"
+    },
+    "description": {
+      "package": "pkg/devicetemplates",
+      "file": "ttscsv.go"
     }
   },
   "error:pkg/email/sendgrid:email_not_sent": {

@@ -148,30 +148,7 @@ const (
 	}`
 )
 
-func validateTemplate(t *testing.T, tmpl *ttnpb.EndDeviceTemplate) {
-	a := assertions.New(t)
-	if !a.So(tmpl, should.NotBeNil) {
-		t.FailNow()
-	}
-
-	var dev ttnpb.EndDevice
-	a.So(dev.SetFields(tmpl.EndDevice, tmpl.FieldMask.GetPaths()...), should.BeNil)
-	a.So(dev, should.Resemble, tmpl.EndDevice)
-}
-
-func validateTemplates(t *testing.T, templates []*ttnpb.EndDeviceTemplate, count int) {
-	a := assertions.New(t)
-
-	if !a.So(len(templates), should.Equal, count) {
-		t.FailNow()
-	}
-
-	for _, template := range templates {
-		validateTemplate(t, template)
-	}
-}
-
-func TestTTSConverter(t *testing.T) {
+func TestTTSJSONConverter(t *testing.T) {
 	tts := GetConverter("the-things-stack")
 	a := assertions.New(t)
 	if !a.So(tts, should.NotBeNil) {
@@ -230,6 +207,15 @@ func TestTTSConverter(t *testing.T) {
 			},
 			validateResult: validateTemplates,
 			nExpect:        1,
+		},
+		{
+			name:   "OneWithSessionOneWithout",
+			reader: bytes.NewBufferString(otaaWithSession + "\n\n" + abpDeviceWithoutSession),
+			validateError: func(t *testing.T, err error) {
+				assertions.New(t).So(err, should.BeNil)
+			},
+			validateResult: validateTemplates,
+			nExpect:        2,
 		},
 		{
 			name:   "RemovesDevAddrFromRoot",

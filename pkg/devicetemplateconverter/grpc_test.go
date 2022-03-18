@@ -85,7 +85,8 @@ func TestConvertEndDeviceTemplate(t *testing.T) {
 			Name:        "Test",
 			Description: "Test",
 		},
-		devicetemplates.TTS: devicetemplates.GetConverter(devicetemplates.TTS).Format(),
+		devicetemplates.TTSJSON: devicetemplates.GetConverter(devicetemplates.TTSJSON).Format(),
+		devicetemplates.TTSCSV:  devicetemplates.GetConverter(devicetemplates.TTSCSV).Format(),
 	})
 
 	stream, err := client.Convert(ctx, &ttnpb.ConvertEndDeviceTemplateRequest{

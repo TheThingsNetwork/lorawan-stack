@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Support for importing end devices using a CSV file. See [documentation](https://www.thethingsindustries.com/docs/reference/data-formats/#csv) for the data format.
+
 ### Changed
 
 - Replace `as.down.data.forward` to `as.down.data.receive` in default event filter, so that decrypted and decoded dowlink payload can be examined in the Console.
