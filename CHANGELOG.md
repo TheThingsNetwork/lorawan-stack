@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Replace `as.down.data.forward` to `as.down.data.receive` in default event filter, so that decrypted and decoded dowlink payload can be examined in the Console.
+
 ### Deprecated
 
 ### Removed
