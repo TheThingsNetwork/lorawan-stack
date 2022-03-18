@@ -40,14 +40,14 @@ if #streams > 0 then
     for i, xs in ipairs(streams) do
         for j, x in ipairs(xs[2]) do
             local start_at, payload, replace
-            for j = 1, #x[2], 2 do
-                local name = x[2][j]
+            for k = 1, #x[2], 2 do
+                local name = x[2][k]
                 if name == 'start_at' then
-                    start_at = x[2][j + 1]
+                    start_at = x[2][k + 1]
                 elseif name == 'payload' then
-                    payload = x[2][j + 1]
+                    payload = x[2][k + 1]
                 elseif name == 'replace' then
-                    replace = x[2][j + 1]
+                    replace = x[2][k + 1]
                 end
             end
             if replace then
