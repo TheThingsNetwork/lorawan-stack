@@ -19,6 +19,7 @@ import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import ErrorView from '@ttn-lw/lib/components/error-view'
+import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
 import GatewayApiKeyEdit from '@console/views/gateway-api-key-edit'
 import GatewayApiKeyAdd from '@console/views/gateway-api-key-add'
@@ -27,6 +28,8 @@ import SubViewError from '@console/views/sub-view-error'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { apiKeyPath as apiKeyPathRegexp } from '@console/lib/regexp'
 
 const GatewayApiKeys = props => {
   const { gtwId, match } = props
@@ -41,7 +44,8 @@ const GatewayApiKeys = props => {
       <Switch>
         <Route exact path={`${match.path}`} component={GatewayApiKeysList} />
         <Route exact path={`${match.path}/add`} component={GatewayApiKeyAdd} />
-        <Route path={`${match.path}/:apiKeyId`} component={GatewayApiKeyEdit} />
+        <Route path={`${match.path}/:apiKeyId${apiKeyPathRegexp}`} component={GatewayApiKeyEdit} />
+        <NotFoundRoute />
       </Switch>
     </ErrorView>
   )

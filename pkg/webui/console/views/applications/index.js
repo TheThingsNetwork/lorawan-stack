@@ -18,6 +18,8 @@ import { Switch, Route } from 'react-router-dom'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
+import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
 import Application from '@console/views/application'
@@ -26,6 +28,7 @@ import ApplicationAdd from '@console/views/application-add'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { mayViewApplications } from '@console/lib/feature-checks'
 
@@ -38,7 +41,8 @@ const Applications = props => {
     <Switch>
       <Route exact path={`${path}`} component={ApplicationsList} />
       <Route exact path={`${path}/add`} component={ApplicationAdd} />
-      <Route path={`${path}/:appId`} component={Application} />
+      <Route path={`${path}/:appId${pathIdRegexp}`} component={Application} />
+      <NotFoundRoute />
     </Switch>
   )
 }

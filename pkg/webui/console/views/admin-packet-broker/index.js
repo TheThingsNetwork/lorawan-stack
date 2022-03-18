@@ -19,13 +19,13 @@ import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 
-import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import Require from '@console/lib/components/require'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { mayConfigurePacketBroker } from '@console/lib/feature-checks'
 
@@ -46,11 +46,11 @@ const PacketBrokerRouter = ({ match }) => {
         <Breadcrumbs />
         <Switch>
           <Route
-            path={`${match.path}/networks/:netId/:tenantId?`}
+            exact
+            path={`${match.path}/networks/:netId([0-9]+)/:tenantId${pathIdRegexp}?`}
             component={NetworkRoutingPolicy}
           />
           <Route path={`${match.path}`} component={PacketBroker} />
-          <NotFoundRoute />
         </Switch>
       </RequireRequest>
     </Require>

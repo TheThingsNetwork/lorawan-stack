@@ -20,6 +20,7 @@ import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { withBreadcrumb } from '@ttn-lw/components/breadcrumbs/context'
 
 import ErrorView from '@ttn-lw/lib/components/error-view'
+import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
@@ -30,6 +31,7 @@ import SubViewError from '@console/views/sub-view-error'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { mayViewApplicationEvents } from '@console/lib/feature-checks'
 
@@ -58,7 +60,11 @@ export default class ApplicationPubsubs extends React.Component {
         <Switch>
           <Route exact path={`${match.path}`} component={ApplicationPubsubsList} />
           <Route exact path={`${match.path}/add`} component={ApplicationPubsubAdd} />
-          <Route path={`${match.path}/:pubsubId`} component={ApplicationPubsubEdit} />
+          <Route
+            path={`${match.path}/:pubsubId${pathIdRegexp}`}
+            component={ApplicationPubsubEdit}
+          />
+          <NotFoundRoute />
         </Switch>
       </ErrorView>
     )

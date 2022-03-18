@@ -18,6 +18,8 @@ import { Switch, Route } from 'react-router-dom'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
+import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
+
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
 import Organization from '@console/views/organization'
@@ -26,6 +28,7 @@ import OrganizationsList from '@console/views/organizations-list'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { mayViewOrganizationsOfUser } from '@console/lib/feature-checks'
 
@@ -41,7 +44,8 @@ const Organizations = props => {
     <Switch>
       <Route exact path={`${match.path}`} component={OrganizationsList} />
       <Route exact path={`${match.path}/add`} component={OrganizationAdd} />
-      <Route path={`${match.path}/:orgId`} component={Organization} />
+      <Route path={`${match.path}/:orgId${pathIdRegexp}`} component={Organization} />
+      <NotFoundRoute />
     </Switch>
   )
 }

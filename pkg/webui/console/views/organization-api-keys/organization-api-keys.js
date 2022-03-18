@@ -19,6 +19,7 @@ import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import ErrorView from '@ttn-lw/lib/components/error-view'
+import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
 import SubViewError from '@console/views/sub-view-error'
 import OrganizationApiKeysList from '@console/views/organization-api-keys-list'
@@ -27,6 +28,8 @@ import OrganizationApiKeyEdit from '@console/views/organization-api-key-edit'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+
+import { apiKeyPath as apiKeyPathRegexp } from '@console/lib/regexp'
 
 const OrganizationApiKeys = props => {
   const { orgId, match } = props
@@ -41,7 +44,11 @@ const OrganizationApiKeys = props => {
       <Switch>
         <Route exact path={`${match.path}`} component={OrganizationApiKeysList} />
         <Route exact path={`${match.path}/add`} component={OrganizationApiKeyAdd} />
-        <Route path={`${match.path}/:apiKeyId`} component={OrganizationApiKeyEdit} />
+        <Route
+          path={`${match.path}/:apiKeyId${apiKeyPathRegexp}`}
+          component={OrganizationApiKeyEdit}
+        />
+        <NotFoundRoute />
       </Switch>
     </ErrorView>
   )
