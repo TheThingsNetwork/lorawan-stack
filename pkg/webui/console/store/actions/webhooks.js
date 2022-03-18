@@ -47,3 +47,9 @@ export const [
   webhookId,
   patch,
 }))
+
+export const CREATE_WEBHOOK_BASE = 'CREATE_WEBHOOK'
+export const [
+  { request: CREATE_WEBHOOK, success: CREATE_WEBHOOK_SUCCESS, failure: CREATE_WEBHOOK_FAILURE },
+  { request: createWebhook, success: createWebhookSuccess, failure: createWebhookFailure },
+] = createRequestActions(CREATE_WEBHOOK_BASE, (appId, webhook) => ({ appId, webhook }))

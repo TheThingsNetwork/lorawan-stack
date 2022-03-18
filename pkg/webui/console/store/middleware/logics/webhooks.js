@@ -81,6 +81,15 @@ const getWebhookTemplatesLogic = createRequestLogic({
   },
 })
 
+const createWebhookLogic = createRequestLogic({
+  type: webhooks.CREATE_WEBHOOK,
+  process: async ({ action }) => {
+    const { appId, webhook } = action.payload
+
+    return await tts.Applications.Webhooks.create(appId, webhook)
+  },
+})
+
 export default [
   getWebhookLogic,
   getWebhooksLogic,
@@ -88,4 +97,5 @@ export default [
   getWebhookFormatsLogic,
   getWebhookTemplateLogic,
   getWebhookTemplatesLogic,
+  createWebhookLogic,
 ]

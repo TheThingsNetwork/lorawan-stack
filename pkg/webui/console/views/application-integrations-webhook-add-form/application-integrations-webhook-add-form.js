@@ -16,18 +16,14 @@ import React from 'react'
 import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
-import tts from '@console/api/tts'
-
 import PageTitle from '@ttn-lw/components/page-title'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
-import WebhookForm from '@console/components/webhook-form'
-import WebhookTemplateForm from '@console/components/webhook-template-form'
+import WebhookAdd from '@console/containers/webhook-add'
 
-import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -38,7 +34,7 @@ const m = defineMessages({
 })
 
 const ApplicationWebhookAddForm = props => {
-  const { templateId, isCustom, webhookTemplate, appId, navigateToList } = props
+  const { templateId, isCustom, webhookTemplate, appId } = props
 
   let breadcrumbContent = m.customWebhook
   if (!templateId) {
@@ -67,32 +63,6 @@ const ApplicationWebhookAddForm = props => {
     }
   }
 
-  const handleSubmit = React.useCallback(
-    async webhook => {
-      await tts.Applications.Webhooks.create(appId, webhook)
-    },
-    [appId],
-  )
-  const handleSubmitSuccess = React.useCallback(() => {
-    navigateToList(appId)
-  }, [appId, navigateToList])
-
-  const existCheck = React.useCallback(
-    async webhookId => {
-      try {
-        await tts.Applications.Webhooks.getById(appId, webhookId, [])
-        return true
-      } catch (error) {
-        if (isNotFoundError(error)) {
-          return false
-        }
-
-        throw error
-      }
-    },
-    [appId],
-  )
-
   // Render Not Found error when the template was not found.
   if (!isCustom && templateId && !webhookTemplate) {
     return <NotFoundRoute />
@@ -103,23 +73,7 @@ const ApplicationWebhookAddForm = props => {
       <PageTitle title={pageTitle} />
       <Row>
         <Col lg={8} md={12}>
-          {isCustom ? (
-            <WebhookForm
-              update={false}
-              onSubmit={handleSubmit}
-              onSubmitSuccess={handleSubmitSuccess}
-              existCheck={existCheck}
-            />
-          ) : (
-            <WebhookTemplateForm
-              appId={appId}
-              templateId={templateId}
-              onSubmit={handleSubmit}
-              onSubmitSuccess={handleSubmitSuccess}
-              webhookTemplate={webhookTemplate}
-              existCheck={existCheck}
-            />
-          )}
+          <WebhookAdd appId={appId} templateId={templateId} webhookTemplate={webhookTemplate} />
         </Col>
       </Row>
     </Container>
@@ -129,7 +83,6 @@ const ApplicationWebhookAddForm = props => {
 ApplicationWebhookAddForm.propTypes = {
   appId: PropTypes.string.isRequired,
   isCustom: PropTypes.bool.isRequired,
-  navigateToList: PropTypes.func.isRequired,
   templateId: PropTypes.string,
   webhookTemplate: PropTypes.webhookTemplate,
 }

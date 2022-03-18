@@ -13,20 +13,20 @@
 // limitations under the License.
 
 import { connect } from 'react-redux'
+import { replace } from 'connected-react-router'
 
-import { selectSelectedApplicationId } from '@console/store/selectors/applications'
-import { selectWebhookTemplateById } from '@console/store/selectors/webhook-templates'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-const mapStateToProps = (state, props) => {
-  const templateId = props.match.params.templateId
+import { updateWebhook } from '@console/store/actions/webhooks'
 
+const mapDispatchToProps = (dispatch, props) => {
+  const { webhookId, appId } = props
   return {
-    appId: selectSelectedApplicationId(state),
-    templateId,
-    isCustom: !templateId || templateId === 'custom',
-    isSimpleAdd: !templateId,
-    webhookTemplate: selectWebhookTemplateById(state, templateId),
+    navigateToList: () => dispatch(replace(`/applications/${appId}/integrations/webhooks`)),
+    updateWebhook: patch => dispatch(attachPromise(updateWebhook(appId, webhookId, patch))),
+    updateHealthStatus: (updatedHealthStatus, selector) =>
+      dispatch(attachPromise(updateWebhook(appId, webhookId, updatedHealthStatus, selector))),
   }
 }
 
-export default ApplicationWebhookAddForm => connect(mapStateToProps)(ApplicationWebhookAddForm)
+export default WebhookEdit => connect(null, mapDispatchToProps)(WebhookEdit)

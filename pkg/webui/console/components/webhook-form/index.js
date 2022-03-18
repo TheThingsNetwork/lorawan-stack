@@ -205,6 +205,7 @@ const validationSchema = Yup.object().shape({
 
 export default class WebhookForm extends Component {
   static propTypes = {
+    error: PropTypes.string,
     existCheck: PropTypes.func,
     healthStatusEnabled: PropTypes.bool,
     initialWebhookValue: PropTypes.shape({
@@ -224,8 +225,6 @@ export default class WebhookForm extends Component {
     onReactivate: PropTypes.func,
     onReactivateSuccess: PropTypes.func,
     onSubmit: PropTypes.func.isRequired,
-    onSubmitFailure: PropTypes.func,
-    onSubmitSuccess: PropTypes.func.isRequired,
     update: PropTypes.bool.isRequired,
     webhookTemplate: PropTypes.webhookTemplate,
   }
@@ -234,74 +233,31 @@ export default class WebhookForm extends Component {
     initialWebhookValue: undefined,
     onReactivate: () => null,
     onReactivateSuccess: () => null,
-    onSubmitFailure: () => null,
     onDeleteFailure: () => null,
     onDeleteSuccess: () => null,
     onDelete: () => null,
     webhookTemplate: undefined,
-    existCheck: () => false,
     healthStatusEnabled: false,
+    error: undefined,
+    existCheck: () => null,
   }
 
   form = React.createRef()
+
   modalResolve = () => null
   modalReject = () => null
 
   constructor(props) {
     super(props)
-    const { initialWebhookValue } = this.props
+    const { initialWebhookValue, error } = this.props
 
     this.state = {
-      error: undefined,
-      displayOverwriteModal: false,
-      existingId: undefined,
       shouldShowCredentialsInput: Boolean(
         initialWebhookValue?.headers?.Authorization?.startsWith('Basic '),
       ),
-    }
-  }
-
-  @bind
-  async handleSubmit(values, { resetForm }) {
-    const { onSubmit, onSubmitSuccess, onSubmitFailure, existCheck, update } = this.props
-    const castedWebhookValues = validationSchema.cast(values)
-    const encodedValues = encodeValues(castedWebhookValues)
-
-    await this.setState({ error: '' })
-
-    try {
-      if (!update) {
-        const webhookId = encodedValues.ids.webhook_id
-        const exists = await existCheck(webhookId)
-        if (exists) {
-          this.setState({ displayOverwriteModal: true, existingId: webhookId })
-          await new Promise((resolve, reject) => {
-            this.modalResolve = resolve
-            this.modalReject = reject
-          })
-        }
-      }
-      const result = await onSubmit(encodedValues)
-
-      resetForm({ values: castedWebhookValues })
-      await onSubmitSuccess(result)
-    } catch (error) {
-      resetForm({ values })
-      await this.setState({ error })
-      await onSubmitFailure(error)
-    }
-  }
-
-  @bind
-  async handleDelete() {
-    const { onDelete, onDeleteSuccess, onDeleteFailure } = this.props
-    try {
-      await onDelete()
-      this.form.current.resetForm()
-      onDeleteSuccess()
-    } catch (error) {
-      await this.setState({ error })
-      onDeleteFailure()
+      displayOverwriteModal: false,
+      existingId: undefined,
+      error,
     }
   }
 
@@ -313,6 +269,36 @@ export default class WebhookForm extends Component {
       this.modalReject()
     }
     this.setState({ displayOverwriteModal: false })
+  }
+
+  @bind
+  async handleSubmit(values, { setSubmitting, resetForm }) {
+    const { onSubmit, existCheck } = this.props
+    const castedWebhookValues = validationSchema.cast(values)
+    const encodedValues = encodeValues(castedWebhookValues)
+    const webhookId = encodedValues.ids.webhook_id
+    const exists = await existCheck(webhookId)
+    if (exists) {
+      this.setState({ displayOverwriteModal: true, existingId: webhookId })
+      await new Promise((resolve, reject) => {
+        this.modalResolve = resolve
+        this.modalReject = reject
+      })
+    }
+    await onSubmit(castedWebhookValues, encodedValues, { setSubmitting, resetForm })
+  }
+
+  @bind
+  async handleDelete() {
+    const { onDelete, onDeleteSuccess, onDeleteFailure } = this.props
+    try {
+      await onDelete()
+      this.form.current.resetForm()
+      onDeleteSuccess()
+    } catch (error) {
+      this.setState({ error })
+      onDeleteFailure()
+    }
   }
 
   @bind
@@ -348,7 +334,6 @@ export default class WebhookForm extends Component {
 
   render() {
     const { update, initialWebhookValue, webhookTemplate, healthStatusEnabled } = this.props
-    const { error, displayOverwriteModal, existingId } = this.state
     let initialValues = blankValues
     if (update && initialWebhookValue) {
       initialValues = decodeValues({ ...blankValues, ...initialWebhookValue })
@@ -389,19 +374,19 @@ export default class WebhookForm extends Component {
           title={sharedMessages.idAlreadyExists}
           message={{
             ...sharedMessages.webhookAlreadyExistsModalMessage,
-            values: { id: existingId },
+            values: { id: this.state.existingId },
           }}
           buttonMessage={sharedMessages.replaceWebhook}
           onComplete={this.handleReplaceModalDecision}
           approval
-          visible={displayOverwriteModal}
+          visible={this.state.displayOverwriteModal}
         />
         {Boolean(webhookTemplate) && <WebhookTemplateInfo webhookTemplate={webhookTemplate} />}
         <Form
           onSubmit={this.handleSubmit}
           validationSchema={validationSchema}
           initialValues={initialValues}
-          error={error}
+          error={this.state.error}
           errorTitle={update ? m.updateErrorTitle : m.createErrorTitle}
           formikRef={this.form}
         >
