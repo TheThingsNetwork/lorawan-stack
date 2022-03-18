@@ -71,7 +71,6 @@ class Tabular extends React.Component {
       orderBy,
       totalCount,
       pageSize,
-      initialPage,
       paginated,
       data,
       headers,
@@ -145,7 +144,6 @@ class Tabular extends React.Component {
           <Pagination
             className={style.pagination}
             pageCount={Math.ceil(totalCount / pageSize) || 1}
-            initialPage={initialPage}
             onPageChange={this.onPageChange}
             disableInitialCallback
             pageRangeDisplayed={2}
@@ -204,8 +202,6 @@ Tabular.propTypes = {
       width: PropTypes.number,
     }),
   ).isRequired,
-  /** The initial page of pagination. */
-  initialPage: PropTypes.number,
   /** A flag specifying whether the table should covered with the loading overlay. */
   loading: PropTypes.bool,
   /**
@@ -252,7 +248,6 @@ Tabular.defaultProps = {
   small: false,
   order: undefined,
   orderBy: undefined,
-  initialPage: 1,
   paginated: false,
   totalCount: 0,
   page: 0,

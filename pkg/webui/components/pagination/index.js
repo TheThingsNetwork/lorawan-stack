@@ -31,10 +31,6 @@ class Pagination extends React.PureComponent {
      * only one page.
      */
     hideIfOnlyOnePage: PropTypes.bool,
-    /** The initial page number to be selected when the component
-     * gets rendered for the first time. Is 1-based.
-     */
-    initialPage: PropTypes.number,
     /**
      * The number of pages to be displayed in the beginning/end of
      * the component. For example, marginPagesDisplayed = 2, then the
@@ -58,7 +54,6 @@ class Pagination extends React.PureComponent {
     className: undefined,
     forcePage: 1,
     hideIfOnlyOnePage: true,
-    initialPage: 1,
     marginPagesDisplayed: 1,
     onPageChange: () => null,
     pageRangeDisplayed: 1,
@@ -73,7 +68,6 @@ class Pagination extends React.PureComponent {
     const {
       className,
       forcePage,
-      initialPage,
       pageRangeDisplayed,
       marginPagesDisplayed,
       hideIfOnlyOnePage,
@@ -107,7 +101,6 @@ class Pagination extends React.PureComponent {
         disabledClassName={style.itemDisabled}
         activeClassName={style.itemActive}
         forcePage={forcePage - 1}
-        initialPage={initialPage - 1}
         pageRangeDisplayed={pageRangeDisplayed}
         marginPagesDisplayed={marginPagesDisplayed}
         onPageChange={this.onPageChange}
