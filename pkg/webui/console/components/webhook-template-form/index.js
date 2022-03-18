@@ -39,7 +39,7 @@ export default class WebhookTemplateForm extends Component {
   static propTypes = {
     convertTemplateToWebhook: PropTypes.func.isRequired,
     error: PropTypes.string,
-    existCheck: PropTypes.func.isRequired,
+    existCheck: PropTypes.func,
     onSubmit: PropTypes.func.isRequired,
     templateId: PropTypes.string.isRequired,
     webhookTemplate: PropTypes.webhookTemplate.isRequired,
@@ -47,6 +47,7 @@ export default class WebhookTemplateForm extends Component {
 
   static defaultProps = {
     error: undefined,
+    existCheck: () => null,
   }
 
   modalResolve = () => null

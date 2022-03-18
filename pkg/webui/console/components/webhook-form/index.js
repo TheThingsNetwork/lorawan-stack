@@ -206,6 +206,7 @@ const validationSchema = Yup.object().shape({
 export default class WebhookForm extends Component {
   static propTypes = {
     error: PropTypes.string,
+    existCheck: PropTypes.func,
     healthStatusEnabled: PropTypes.bool,
     initialWebhookValue: PropTypes.shape({
       ids: PropTypes.shape({
@@ -238,6 +239,7 @@ export default class WebhookForm extends Component {
     webhookTemplate: undefined,
     healthStatusEnabled: false,
     error: undefined,
+    existCheck: () => null,
   }
 
   form = React.createRef()
@@ -271,9 +273,18 @@ export default class WebhookForm extends Component {
 
   @bind
   async handleSubmit(values, { setSubmitting, resetForm }) {
-    const { onSubmit } = this.props
+    const { onSubmit, existCheck } = this.props
     const castedWebhookValues = validationSchema.cast(values)
     const encodedValues = encodeValues(castedWebhookValues)
+    const webhookId = encodedValues.ids.webhook_id
+    const exists = await existCheck(webhookId)
+    if (exists) {
+      this.setState({ displayOverwriteModal: true, existingId: webhookId })
+      await new Promise((resolve, reject) => {
+        this.modalResolve = resolve
+        this.modalReject = reject
+      })
+    }
     await onSubmit(castedWebhookValues, encodedValues, { setSubmitting, resetForm })
   }
 
