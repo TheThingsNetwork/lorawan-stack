@@ -20,6 +20,8 @@ import interpolate from '@ttn-lw/lib/interpolate'
 
 import errorMessages from './error-messages'
 import grpcErrToHttpErr from './grpc-error-map'
+import { TokenError } from './custom-errors'
+import sentryFilters from './sentry-filters'
 
 /**
  * Returns whether the given object has a valid `details` prop.
@@ -74,7 +76,8 @@ export const isBackendErrorDetails = details =>
  * @param {object} error - The error to be tested.
  * @returns {boolean} `true` if `error` is not of a well known shape.
  */
-export const isUnknown = error => !isBackend(error) && !isFrontend(error)
+export const isUnknown = error =>
+  !isBackend(error) && !isFrontend(error) && !isTimeoutError(error) && !isNetworkError(error)
 
 /**
  * Returns a frontend error object, to be passed to error components.
@@ -254,16 +257,35 @@ export const isOAuthClientRefusedError = error =>
  * @returns {boolean} `true` if `error` should be forwarded to Sentry,
  * `false` otherwise.
  */
-export const isSentryWorthy = error =>
-  (isUnknown(error) &&
-    httpStatusCode(error) === undefined &&
-    !isNetworkError(error) &&
-    !isTimeoutError(error)) ||
-  isInvalidArgumentError(error) ||
-  isInternalError(error) ||
-  httpStatusCode(error) >= 500 || // Server errors.
-  httpStatusCode(error) === 400 // Bad request.
+export const isSentryWorthy = error => {
+  const statusCode = httpStatusCode(error)
+  // Forward all server and bad request errors.
+  if (statusCode >= 500 || statusCode === 400) {
+    if (isBackend(error)) {
+      return !sentryFilters.includes(getBackendErrorId(error))
+    }
 
+    return true
+  }
+
+  // Forward token errors that are not network related.
+  if (error instanceof TokenError) {
+    if (isNetworkError(error.cause) || isTimeoutError(error.cause)) {
+      return false
+    }
+
+    return true
+  }
+
+  // Forward any other unknown errors without relevant status code,
+  // that are not network related.
+  if (isUnknown(error) && statusCode === undefined) {
+    return true
+  }
+
+  // Discard all other errors.
+  return false
+}
 /**
  * Returns an appropriate error title that can be used for Sentry.
  *
@@ -371,7 +393,7 @@ export const getBackendErrorName = error =>
 export const getBackendErrorDefaultMessage = error =>
   hasValidDetails(error)
     ? error.details[0].message_format || error.details[0].message
-    : error.message.replace(/^.*\s/, '')
+    : error.message.replace(/^error:[a-z0-9-_.:/]*\s/, '')
 
 /**
  * Returns whether the error has one or more cause properties.

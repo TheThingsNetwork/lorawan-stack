@@ -16,6 +16,7 @@ import { withScope, captureException } from '@sentry/browser'
 
 import { getSentryErrorTitle, createFrontendError, ingestError, toMessageProps } from './utils'
 import errorMessages from './error-messages'
+import { TokenError } from './custom-errors'
 
 jest.mock('@sentry/browser')
 jest.mock('@ttn-lw/lib/log')
@@ -131,6 +132,21 @@ const conflictBackendError = {
   ],
 }
 
+const loginFailedBackendError = {
+  code: 3,
+  message: 'error:pkg/account/session:no_user_id_password_match (incorrect password or user ID)',
+  details: [
+    {
+      '@type': 'type.googleapis.com/ttn.lorawan.v3.ErrorDetails',
+      namespace: 'pkg/account/session',
+      name: 'no_user_id_password_match',
+      message_format: 'incorrect password or user ID',
+      correlation_id: '689aabd7985b4027871581d7b04d7b97',
+      code: 3,
+    },
+  ],
+}
+
 const frontendError = createFrontendError(
   errorMessages.unknownErrorTitle,
   errorMessages.genericError,
@@ -143,6 +159,11 @@ const statusCodeError = { statusCode: 404 }
 const emptyError = {}
 const undefinedError = undefined
 const errorInstance = new Error('There was an unknown error')
+const networkError = new Error('Network Error')
+const timeoutError = { code: 'ECONNABORTED' }
+const tokenTimeoutError = new TokenError('Could not fetch token', timeoutError)
+const tokenNetworkError = new TokenError('Could not fetch token', networkError)
+const tokenError = new TokenError('Token error', backendErrorWithDetails)
 
 describe('Get Sentry error title', () => {
   it('retrieves the right error title', () => {
@@ -179,8 +200,9 @@ describe('Ingest error', () => {
       )
     })
 
-    it('correctly discards sentry-unworthy errors (e.g. 409 conflict)', () => {
+    it('correctly discards sentry-unworthy errors', () => {
       ingestError(conflictBackendError)
+      ingestError(loginFailedBackendError)
       expect(withScope).not.toHaveBeenCalled()
       expect(captureException).not.toHaveBeenCalled()
     })
@@ -228,10 +250,33 @@ describe('Ingest error', () => {
     expect(captureException.mock.calls[0][0].toString()).toBe(errorInstance.toString())
   })
 
-  it('correctly discards errors irrelevant status code', () => {
+  it('correctly discards errors with irrelevant status code', () => {
     ingestError(statusCodeError)
     expect(withScope).not.toHaveBeenCalled()
     expect(captureException).not.toHaveBeenCalled()
+  })
+
+  it('correctly discards network and timeout errors', () => {
+    ingestError(networkError)
+    ingestError(timeoutError)
+    ingestError(tokenNetworkError)
+    ingestError(tokenTimeoutError)
+    expect(withScope).not.toHaveBeenCalled()
+    expect(captureException).not.toHaveBeenCalled()
+  })
+
+  it('correctly forwards token errors', () => {
+    ingestError(tokenError)
+    expect(withScope).toHaveBeenCalledTimes(1)
+    expect(setTags).toHaveBeenCalledTimes(1)
+    expect(setTags.mock.calls[0][0]).toHaveProperty('frontendOrigin', true)
+    expect(setExtras).toHaveBeenCalledTimes(1)
+    expect(Object.keys(setExtras.mock.calls[0][0])).toHaveLength(1)
+    expect(setFingerprint).toHaveBeenCalledTimes(1)
+    expect(setFingerprint.mock.calls[0][0]).toBe(tokenError)
+    expect(captureException).toHaveBeenCalledTimes(1)
+    expect(captureException.mock.calls[0][0] instanceof Error).toBe(true)
+    expect(captureException.mock.calls[0][0].toString()).toBe('TokenError: Token error')
   })
 
   // Empty or otherwise malformed objects as errors should not occur, but if
