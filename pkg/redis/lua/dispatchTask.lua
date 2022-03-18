@@ -11,7 +11,7 @@
 -- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
-
+--
 -- The following script drains KEYS[2] and adds read entries to KEYS[3].
 -- If, in result, there are tasks in KEYS[3] with timestamp less than or equal to ARGV[3], it moves all those tasks to KEYS[1].
 -- It returns the dispatch time of the earliest undispatched task, if such exist.
@@ -24,7 +24,7 @@
 -- KEYS[1] - ready task key
 -- KEYS[2] - input task key
 -- KEYS[3] - waiting task key
-
+--
 -- The "unpack" Lua function may not unpack more elements than the max stack length.
 -- In order to avoid this natural limitation, we will periodically flush the waiting keys
 -- as they are moved into the ready stream.
@@ -37,46 +37,49 @@ redis.call('xautoclaim', KEYS[2], ARGV[1], ARGV[2], '0', '0-0', 'justid')
 -- We drain both our pending entries (using the 0-0 message ID), and any newer entries (using the > message ID).
 local streams = redis.call('xreadgroup', 'group', ARGV[1], ARGV[2], 'noack', 'streams', KEYS[2], KEYS[2], '0-0', '>')
 if #streams > 0 then
-  for i, xs in ipairs(streams) do
-    for j, x in ipairs(xs[2]) do
-      local start_at, payload, replace
-      for j = 1, #x[2], 2 do
-        local name = x[2][j]
-        if     name == 'start_at' then start_at = x[2][j+1]
-        elseif name == 'payload'  then payload  = x[2][j+1]
-        elseif name == 'replace'  then replace  = x[2][j+1]
-        end
-      end
-      if replace then
-        redis.call('zadd', KEYS[3], start_at, payload)
-      else
-        redis.call('zadd', KEYS[3], 'nx', start_at, payload)
-      end
+    for i, xs in ipairs(streams) do
+        for j, x in ipairs(xs[2]) do
+            local start_at, payload, replace
+            for j = 1, #x[2], 2 do
+                local name = x[2][j]
+                if name == 'start_at' then
+                    start_at = x[2][j + 1]
+                elseif name == 'payload' then
+                    payload = x[2][j + 1]
+                elseif name == 'replace' then
+                    replace = x[2][j + 1]
+                end
+            end
+            if replace then
+                redis.call('zadd', KEYS[3], start_at, payload)
+            else
+                redis.call('zadd', KEYS[3], 'nx', start_at, payload)
+            end
 
-      -- NOACK affects only messages which are not already in the pending entries list.
-      -- As such, we need to manually acknowledge these messages.
-      if i == 1 then
-        redis.call('xack', KEYS[2], ARGV[1], x[1])
-      end
+            -- NOACK affects only messages which are not already in the pending entries list.
+            -- As such, we need to manually acknowledge these messages.
+            if i == 1 then
+                redis.call('xack', KEYS[2], ARGV[1], x[1])
+            end
+        end
     end
-  end
 end
 
 -- Find the tasks whose score is smaller or equal to the pivot, which now must be dispatched (moved to the ready stream, KEYS[1]).
 local zs = redis.call('zrange', KEYS[3], '-inf', ARGV[3], 'withscores', 'byscore')
 if #zs > 0 then
-  local members = {}
-  for i=1,#zs,2 do
-    if #members > max_unpack then
-      redis.call('zrem', KEYS[3], unpack(members))
-      members = {}
-    end
+    local members = {}
+    for i = 1, #zs, 2 do
+        if #members > max_unpack then
+            redis.call('zrem', KEYS[3], unpack(members))
+            members = {}
+        end
 
-    local member = zs[i]
-    members[#members+1] = member
-    redis.call('xadd', KEYS[1], 'maxlen', '~', ARGV[4], '*', 'payload', member, 'start_at', zs[i+1])
-  end
-  redis.call('zrem', KEYS[3], unpack(members))
+        local member = zs[i]
+        members[#members + 1] = member
+        redis.call('xadd', KEYS[1], 'maxlen', '~', ARGV[4], '*', 'payload', member, 'start_at', zs[i + 1])
+    end
+    redis.call('zrem', KEYS[3], unpack(members))
 end
 
 -- Find the earliest task which may be dispatched in the future.
@@ -84,5 +87,5 @@ end
 -- or for the time until the next task to pass.
 zs = redis.call('zrange', KEYS[3], '-inf', '+inf', 'withscores', 'byscore', 'limit', 0, 1)
 if #zs > 0 then
-  return zs[2]
+    return zs[2]
 end
