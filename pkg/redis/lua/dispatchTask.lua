@@ -38,22 +38,30 @@ redis.call('xautoclaim', KEYS[2], ARGV[1], ARGV[2], '0', '0-0', 'justid')
 local streams = redis.call('xreadgroup', 'group', ARGV[1], ARGV[2], 'noack', 'streams', KEYS[2], KEYS[2], '0-0', '>')
 if #streams > 0 then
     for i, xs in ipairs(streams) do
-        for j, x in ipairs(xs[2]) do
-            local start_at, payload, replace
-            for k = 1, #x[2], 2 do
-                local name = x[2][k]
-                if name == 'start_at' then
-                    start_at = x[2][k + 1]
-                elseif name == 'payload' then
-                    payload = x[2][k + 1]
-                elseif name == 'replace' then
-                    replace = x[2][k + 1]
+        local messages = xs[2]
+        for j, x in ipairs(messages) do
+            -- We need to explicitly check if the fields of the message exist, since XAUTOCLAIM
+            -- may have claimed deleted messages.
+            -- TODO: Starting with Redis 7.0, XAUTOCLAIM will automatically skip these messages.
+            -- Remove the nil check (https://github.com/TheThingsNetwork/lorawan-stack/issues/5269).
+            local fields = x[2]
+            if fields ~= nil then
+                local start_at, payload, replace
+                for k = 1, #fields, 2 do
+                    local name = fields[k]
+                    if name == 'start_at' then
+                        start_at = fields[k + 1]
+                    elseif name == 'payload' then
+                        payload = fields[k + 1]
+                    elseif name == 'replace' then
+                        replace = fields[k + 1]
+                    end
                 end
-            end
-            if replace then
-                redis.call('zadd', KEYS[3], start_at, payload)
-            else
-                redis.call('zadd', KEYS[3], 'nx', start_at, payload)
+                if replace then
+                    redis.call('zadd', KEYS[3], start_at, payload)
+                else
+                    redis.call('zadd', KEYS[3], 'nx', start_at, payload)
+                end
             end
 
             -- NOACK affects only messages which are not already in the pending entries list.
