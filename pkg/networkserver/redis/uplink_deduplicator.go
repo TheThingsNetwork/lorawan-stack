@@ -36,7 +36,7 @@ func NewUplinkDeduplicator(cl *ttnredis.Client) *UplinkDeduplicator {
 	}
 }
 
-func uplinkHash(ctx context.Context, up *ttnpb.UplinkMessage) (string, error) {
+func uplinkHash(ctx context.Context, up *ttnpb.UplinkMessage, round uint64) (string, error) {
 	drBytes, err := proto.Marshal(up.Settings.DataRate)
 	if err != nil {
 		return "", err
@@ -46,12 +46,13 @@ func uplinkHash(ctx context.Context, up *ttnpb.UplinkMessage) (string, error) {
 		// NOTE: Data rate and frequency are included in the key to support retransmissions.
 		strconv.FormatUint(up.Settings.Frequency, 32),
 		keyEncoding.EncodeToString(drBytes),
+		strconv.FormatUint(round, 32),
 	), nil
 }
 
-// DeduplicateUplink deduplicates up for window. Since highest precision allowed by Redis is millisecondsm, window is truncated to milliseconds.
-func (d *UplinkDeduplicator) DeduplicateUplink(ctx context.Context, up *ttnpb.UplinkMessage, window time.Duration) (bool, error) {
-	h, err := uplinkHash(ctx, up)
+// DeduplicateUplink deduplicates up for window. Since highest precision allowed by Redis is milliseconds, window is truncated to milliseconds.
+func (d *UplinkDeduplicator) DeduplicateUplink(ctx context.Context, up *ttnpb.UplinkMessage, window time.Duration, round uint64) (bool, error) {
+	h, err := uplinkHash(ctx, up, round)
 	if err != nil {
 		return false, err
 	}
@@ -62,9 +63,9 @@ func (d *UplinkDeduplicator) DeduplicateUplink(ctx context.Context, up *ttnpb.Up
 	return ttnredis.DeduplicateProtos(ctx, d.Redis, d.Redis.Key(h), window, msgs...)
 }
 
-// DeduplicateUplink returns accumulated metadata for up.
-func (d *UplinkDeduplicator) AccumulatedMetadata(ctx context.Context, up *ttnpb.UplinkMessage) ([]*ttnpb.RxMetadata, error) {
-	h, err := uplinkHash(ctx, up)
+// AccumulatedMetadata returns accumulated metadata for up.
+func (d *UplinkDeduplicator) AccumulatedMetadata(ctx context.Context, up *ttnpb.UplinkMessage, round uint64) ([]*ttnpb.RxMetadata, error) {
+	h, err := uplinkHash(ctx, up, round)
 	if err != nil {
 		return nil, err
 	}
