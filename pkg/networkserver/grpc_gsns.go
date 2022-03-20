@@ -785,21 +785,13 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		"uplink_f_cnt", pld.FHdr.FCnt,
 	))
 
-	ok, err := ns.deduplicateUplink(ctx, up, ns.collectionWindow(ctx))
-	if err != nil {
-		return err
-	}
-	if !ok {
-		trace.Log(ctx, "ns", "message is duplicate")
-		registerReceiveDuplicateUplink(ctx, up)
-		return nil
-	}
-	trace.Log(ctx, "ns", "message is original")
-
 	ctx, flushMatchStats := newContextWithMatchStats(ctx)
 	defer flushMatchStats()
 
-	var matched *matchResult
+	var (
+		matched *matchResult
+		ok      bool
+	)
 	if err := ns.devices.RangeByUplinkMatches(ctx, up,
 		func(ctx context.Context, match *UplinkMatch) (bool, error) {
 			defer trace.StartRegion(ctx, "iterate uplink match").End()
@@ -868,6 +860,17 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 	pld.FullFCnt = matched.FullFCnt
 	up.DeviceChannelIndex = uint32(matched.ChannelIndex)
 	ctx = matched.Context
+
+	ok, err = ns.deduplicateUplink(ctx, up, ns.collectionWindow(ctx))
+	if err != nil {
+		return err
+	}
+	if !ok {
+		trace.Log(ctx, "ns", "message is duplicate")
+		registerReceiveDuplicateUplink(ctx, up)
+		return nil
+	}
+	trace.Log(ctx, "ns", "message is original")
 
 	queuedEvents := []events.Event{
 		evtReceiveDataUplink.NewWithIdentifiersAndData(ctx, matched.Device.Ids, up),
