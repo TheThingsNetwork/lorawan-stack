@@ -9590,6 +9590,170 @@
               }
             }
           ]
+        },
+        {
+          "name": "GetClaimStatusResponse",
+          "longName": "GetClaimStatusResponse",
+          "fullName": "ttn.lorawan.v3.GetClaimStatusResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "end_device_ids",
+              "description": "",
+              "label": "",
+              "type": "EndDeviceIdentifiers",
+              "longType": "EndDeviceIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "home_net_id",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "home_ns_id",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "vendor_specific",
+              "description": "",
+              "label": "",
+              "type": "VendorSpecific",
+              "longType": "GetClaimStatusResponse.VendorSpecific",
+              "fullType": "ttn.lorawan.v3.GetClaimStatusResponse.VendorSpecific",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "VendorSpecific",
+          "longName": "GetClaimStatusResponse.VendorSpecific",
+          "fullName": "ttn.lorawan.v3.GetClaimStatusResponse.VendorSpecific",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "organization_unique_identifier",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data",
+              "description": "Vendor Specific data in JSON format.",
+              "label": "",
+              "type": "Struct",
+              "longType": "google.protobuf.Struct",
+              "fullType": "google.protobuf.Struct",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GetInfoByJoinEUIRequest",
+          "longName": "GetInfoByJoinEUIRequest",
+          "fullName": "ttn.lorawan.v3.GetInfoByJoinEUIRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "join_eui",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GetInfoByJoinEUIResponse",
+          "longName": "GetInfoByJoinEUIResponse",
+          "fullName": "ttn.lorawan.v3.GetInfoByJoinEUIResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "join_eui",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "supports_claiming",
+              "description": "If set, this Join EUI is available for claiming on one of the configured Join Servers.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
         }
       ],
       "services": [
@@ -9601,7 +9765,7 @@
           "methods": [
             {
               "name": "Claim",
-              "description": "Claims the end device by claim authentication code or QR code and transfers the device to the target application.",
+              "description": "Claims the end device on a Join Server by claim authentication code or QR code.",
               "requestType": "ClaimEndDeviceRequest",
               "requestLongType": "ClaimEndDeviceRequest",
               "requestFullType": "ttn.lorawan.v3.ClaimEndDeviceRequest",
@@ -9617,6 +9781,73 @@
                       "method": "POST",
                       "pattern": "/edcs/claim",
                       "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Unclaim",
+              "description": "Unclaims the end device on a Join Server.",
+              "requestType": "EndDeviceIdentifiers",
+              "requestLongType": "EndDeviceIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/edcs/claim/{application_ids.application_id}/devices/{device_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetInfoByJoinEUI",
+              "description": "Return whether claiming is available for a given JoinEUI.",
+              "requestType": "GetInfoByJoinEUIRequest",
+              "requestLongType": "GetInfoByJoinEUIRequest",
+              "requestFullType": "ttn.lorawan.v3.GetInfoByJoinEUIRequest",
+              "requestStreaming": false,
+              "responseType": "GetInfoByJoinEUIResponse",
+              "responseLongType": "GetInfoByJoinEUIResponse",
+              "responseFullType": "ttn.lorawan.v3.GetInfoByJoinEUIResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/edcs/claim/info",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetClaimStatus",
+              "description": "Gets the claim status of an end device.",
+              "requestType": "EndDeviceIdentifiers",
+              "requestLongType": "EndDeviceIdentifiers",
+              "requestFullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "requestStreaming": false,
+              "responseType": "GetClaimStatusResponse",
+              "responseLongType": "GetClaimStatusResponse",
+              "responseFullType": "ttn.lorawan.v3.GetClaimStatusResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/edcs/claim/{application_ids.application_id}/devices/{device_id}"
                     }
                   ]
                 }

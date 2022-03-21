@@ -2114,6 +2114,43 @@
         }
       ]
     },
+    "Unclaim": {
+      "file": "lorawan-stack/api/deviceclaimingserver.proto",
+      "http": [
+        {
+          "method": "delete",
+          "pattern": "/edcs/claim/{application_ids.application_id}/devices/{device_id}",
+          "parameters": [
+            "application_ids.application_id",
+            "device_id"
+          ]
+        }
+      ]
+    },
+    "GetInfoByJoinEUI": {
+      "file": "lorawan-stack/api/deviceclaimingserver.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/edcs/claim/info",
+          "body": "*",
+          "parameters": []
+        }
+      ]
+    },
+    "GetClaimStatus": {
+      "file": "lorawan-stack/api/deviceclaimingserver.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/edcs/claim/{application_ids.application_id}/devices/{device_id}",
+          "parameters": [
+            "application_ids.application_id",
+            "device_id"
+          ]
+        }
+      ]
+    },
     "AuthorizeApplication": {
       "file": "lorawan-stack/api/deviceclaimingserver.proto",
       "http": [

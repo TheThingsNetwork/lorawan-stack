@@ -153,6 +153,10 @@
   - [Message `ClaimEndDeviceRequest.AuthenticatedIdentifiers`](#ttn.lorawan.v3.ClaimEndDeviceRequest.AuthenticatedIdentifiers)
   - [Message `ClaimGatewayRequest`](#ttn.lorawan.v3.ClaimGatewayRequest)
   - [Message `ClaimGatewayRequest.AuthenticatedIdentifiers`](#ttn.lorawan.v3.ClaimGatewayRequest.AuthenticatedIdentifiers)
+  - [Message `GetClaimStatusResponse`](#ttn.lorawan.v3.GetClaimStatusResponse)
+  - [Message `GetClaimStatusResponse.VendorSpecific`](#ttn.lorawan.v3.GetClaimStatusResponse.VendorSpecific)
+  - [Message `GetInfoByJoinEUIRequest`](#ttn.lorawan.v3.GetInfoByJoinEUIRequest)
+  - [Message `GetInfoByJoinEUIResponse`](#ttn.lorawan.v3.GetInfoByJoinEUIResponse)
   - [Service `EndDeviceClaimingServer`](#ttn.lorawan.v3.EndDeviceClaimingServer)
   - [Service `GatewayClaimingServer`](#ttn.lorawan.v3.GatewayClaimingServer)
 - [File `lorawan-stack/api/devicerepository.proto`](#lorawan-stack/api/devicerepository.proto)
@@ -2511,6 +2515,41 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 | ----- | ----------- |
 | `authentication_code` | <p>`bytes.max_len`: `2048`</p> |
 
+### <a name="ttn.lorawan.v3.GetClaimStatusResponse">Message `GetClaimStatusResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
+| `home_net_id` | [`bytes`](#bytes) |  |  |
+| `home_ns_id` | [`bytes`](#bytes) |  |  |
+| `vendor_specific` | [`GetClaimStatusResponse.VendorSpecific`](#ttn.lorawan.v3.GetClaimStatusResponse.VendorSpecific) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `end_device_ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.GetClaimStatusResponse.VendorSpecific">Message `GetClaimStatusResponse.VendorSpecific`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `organization_unique_identifier` | [`uint32`](#uint32) |  |  |
+| `data` | [`google.protobuf.Struct`](#google.protobuf.Struct) |  | Vendor Specific data in JSON format. |
+
+### <a name="ttn.lorawan.v3.GetInfoByJoinEUIRequest">Message `GetInfoByJoinEUIRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `join_eui` | [`bytes`](#bytes) |  |  |
+
+### <a name="ttn.lorawan.v3.GetInfoByJoinEUIResponse">Message `GetInfoByJoinEUIResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `join_eui` | [`bytes`](#bytes) |  |  |
+| `supports_claiming` | [`bool`](#bool) |  | If set, this Join EUI is available for claiming on one of the configured Join Servers. |
+
 ### <a name="ttn.lorawan.v3.EndDeviceClaimingServer">Service `EndDeviceClaimingServer`</a>
 
 The EndDeviceClaimingServer service configures authorization to claim end devices registered in an application,
@@ -2518,7 +2557,10 @@ and allows clients to claim end devices.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| `Claim` | [`ClaimEndDeviceRequest`](#ttn.lorawan.v3.ClaimEndDeviceRequest) | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | Claims the end device by claim authentication code or QR code and transfers the device to the target application. |
+| `Claim` | [`ClaimEndDeviceRequest`](#ttn.lorawan.v3.ClaimEndDeviceRequest) | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | Claims the end device on a Join Server by claim authentication code or QR code. |
+| `Unclaim` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Unclaims the end device on a Join Server. |
+| `GetInfoByJoinEUI` | [`GetInfoByJoinEUIRequest`](#ttn.lorawan.v3.GetInfoByJoinEUIRequest) | [`GetInfoByJoinEUIResponse`](#ttn.lorawan.v3.GetInfoByJoinEUIResponse) | Return whether claiming is available for a given JoinEUI. |
+| `GetClaimStatus` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`GetClaimStatusResponse`](#ttn.lorawan.v3.GetClaimStatusResponse) | Gets the claim status of an end device. |
 | `AuthorizeApplication` | [`AuthorizeApplicationRequest`](#ttn.lorawan.v3.AuthorizeApplicationRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Authorize the End Device Claiming Server to claim devices registered in the given application. The application identifiers are the source application, where the devices are registered before they are claimed. The API key is used to access the application, find the device, verify the claim request and delete the end device from the source application. |
 | `UnauthorizeApplication` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Unauthorize the End Device Claiming Server to claim devices in the given application. This reverts the authorization given with rpc AuthorizeApplication. |
 
@@ -2527,6 +2569,9 @@ and allows clients to claim end devices.
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `Claim` | `POST` | `/api/v3/edcs/claim` | `*` |
+| `Unclaim` | `DELETE` | `/api/v3/edcs/claim/{application_ids.application_id}/devices/{device_id}` |  |
+| `GetInfoByJoinEUI` | `POST` | `/api/v3/edcs/claim/info` | `*` |
+| `GetClaimStatus` | `GET` | `/api/v3/edcs/claim/{application_ids.application_id}/devices/{device_id}` |  |
 | `AuthorizeApplication` | `POST` | `/api/v3/edcs/applications/{application_ids.application_id}/authorize` | `*` |
 | `UnauthorizeApplication` | `DELETE` | `/api/v3/edcs/applications/{application_id}/authorize` |  |
 
