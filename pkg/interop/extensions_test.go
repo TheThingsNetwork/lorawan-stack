@@ -44,8 +44,10 @@ func TestExtensions(t *testing.T) {
 			HNSID:  &EUI64{0x42, 0x42, 0x42, 0x42, 0x0, 0x0, 0x0, 0x0},
 			HNetID: NetID{0x42, 0x42, 0x0},
 		},
-		HTenantID:  "foo-tenant",
-		HNSAddress: "thethings.example.com",
+		TTIVSExtension: TTIVSExtension{
+			HTenantID:  "foo-tenant",
+			HNSAddress: "thethings.example.com",
+		},
 	}
 
 	buf := bytes.NewBuffer(nil)
