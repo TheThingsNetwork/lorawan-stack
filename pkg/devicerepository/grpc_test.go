@@ -89,8 +89,8 @@ func (s *mockStore) GetModels(req store.GetModelsRequest) (*store.GetModelsRespo
 	}, nil
 }
 
-// GetLoRaWANDeviceProfiles implements store.
-func (s *mockStore) GetLoRaWANDeviceProfiles(req store.GetLoRaWANDeviceProfilesRequest) (*store.GetLoRaWANDeviceProfilesResponse, error) {
+// GetEndDeviceProfiles implements store.
+func (s *mockStore) GetEndDeviceProfiles(req store.GetEndDeviceProfilesRequest) (*store.GetEndDeviceProfilesResponse, error) {
 	return nil, nil
 }
 
@@ -649,7 +649,7 @@ func TestGRPC(t *testing.T) {
 		})
 	})
 
-	t.Run("GetTemplateByID", func(t *testing.T) {
+	t.Run("GetTemplateByNumericIDs", func(t *testing.T) {
 		profileIDs := &ttnpb.GetTemplateRequest_EndDeviceProfileIdentifiers{
 			VendorId:        1,
 			VendorProfileId: 0,

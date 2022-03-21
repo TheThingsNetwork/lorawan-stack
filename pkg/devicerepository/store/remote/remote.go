@@ -286,7 +286,6 @@ func (s *remoteStore) GetTemplate(req *ttnpb.GetTemplateRequest, profile *store.
 		if _, ok := bandIDToRegion[ids.BandId]; !ok {
 			return nil, errBandNotFound.WithAttributes("unknown_band", ids.BandId)
 		}
-
 		profileInfo, ok := ver.Profiles[ids.BandId]
 		if !ok {
 			return nil, errNoProfileForBand.WithAttributes(
