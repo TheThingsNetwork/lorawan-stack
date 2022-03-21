@@ -3644,6 +3644,24 @@
       "file": "store.go"
     }
   },
+  "error:pkg/devicerepository/store/bleve:end_device_profile_not_found": {
+    "translations": {
+      "en": "end device profile not found for vendor ID `{vendor_id}` and vendor profile ID `{vendor_profile_id}`"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store/bleve",
+      "file": "store.go"
+    }
+  },
+  "error:pkg/devicerepository/store/bleve:invalid_number_of_profiles": {
+    "translations": {
+      "en": "invalid number of profiles returned"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store/bleve",
+      "file": "store.go"
+    }
+  },
   "error:pkg/devicerepository/store/remote:band_not_found": {
     "translations": {
       "en": "band `{band_id}` not found"
@@ -3716,15 +3734,6 @@
       "file": "remote.go"
     }
   },
-  "error:pkg/devicerepository/store/remote:regional_parameters_version": {
-    "translations": {
-      "en": "unknown Regional Parameters version `{phy_version}`"
-    },
-    "description": {
-      "package": "pkg/devicerepository/store/remote",
-      "file": "schema.go"
-    }
-  },
   "error:pkg/devicerepository/store:not_found": {
     "translations": {
       "en": "not found"
@@ -3732,6 +3741,15 @@
     "description": {
       "package": "pkg/devicerepository/store",
       "file": "noop.go"
+    }
+  },
+  "error:pkg/devicerepository/store:regional_parameters_version": {
+    "translations": {
+      "en": "unknown Regional Parameters version `{phy_version}`"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store",
+      "file": "profiles.go"
     }
   },
   "error:pkg/devicerepository:brand_not_found": {
