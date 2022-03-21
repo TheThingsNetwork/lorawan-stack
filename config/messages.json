@@ -1340,6 +1340,24 @@
       "file": "packetbroker.go"
     }
   },
+  "error:cmd/ttn-lw-cli/commands:end_device_claim": {
+    "translations": {
+      "en": "could not claim end device"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:end_device_claim_info": {
+    "translations": {
+      "en": "could not get end device claim info from DCS"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
   "error:cmd/ttn-lw-cli/commands:end_device_eui_update": {
     "translations": {
       "en": "end device EUIs can not be updated"
@@ -1361,6 +1379,15 @@
   "error:cmd/ttn-lw-cli/commands:end_device_server_address_mismatch": {
     "translations": {
       "en": "Network/Application/Join Server address mismatch"
+    },
+    "description": {
+      "package": "cmd/ttn-lw-cli/commands",
+      "file": "end_devices.go"
+    }
+  },
+  "error:cmd/ttn-lw-cli/commands:end_device_unclaim": {
+    "translations": {
+      "en": "could not unclaim end device"
     },
     "description": {
       "package": "cmd/ttn-lw-cli/commands",
@@ -3428,36 +3455,153 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/deviceclaimingserver:method_unavailable": {
+  "error:pkg/deviceclaimingserver/enddevices/ttjs:device_access_denied": {
     "translations": {
-      "en": "method available"
+      "en": "access to device with `{dev_eui}` denied. Either device is already claimed or owner token is invalid"
     },
     "description": {
-      "package": "pkg/deviceclaimingserver",
-      "file": "grpc_end_devices.go"
+      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
+      "file": "ttjs.go"
     }
   },
-  "error:pkg/deviceclaimingserver:no_join_eui": {
+  "error:pkg/deviceclaimingserver/enddevices/ttjs:device_not_claimed": {
+    "translations": {
+      "en": "device with EUI `{dev_eui}` not claimed"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
+      "file": "ttjs.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/enddevices/ttjs:device_not_provisioned": {
+    "translations": {
+      "en": "device with EUI `{dev_eui}` not provisioned"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
+      "file": "ttjs.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/enddevices/ttjs:invalid_oui": {
+    "translations": {
+      "en": "invalid OUI `{oui}`"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
+      "file": "messages.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/enddevices/ttjs:invalid_oui_length": {
+    "translations": {
+      "en": "invalid length for OUI `{oui}`"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
+      "file": "messages.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/enddevices/ttjs:no_home_ns_id": {
+    "translations": {
+      "en": "no HomeNSID configured for network server address `{address}`"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
+      "file": "ttjs.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/enddevices/ttjs:no_join_eui": {
     "translations": {
       "en": "failed to extract JoinEUI from request"
     },
     "description": {
-      "package": "pkg/deviceclaimingserver",
-      "file": "grpc_end_devices.go"
+      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
+      "file": "ttjs.go"
     }
   },
-  "error:pkg/deviceclaimingserver:parse_qr_code": {
+  "error:pkg/deviceclaimingserver/enddevices/ttjs:parse_qr_code": {
     "translations": {
       "en": "parse QR code failed"
     },
     "description": {
-      "package": "pkg/deviceclaimingserver",
-      "file": "grpc_end_devices.go"
+      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
+      "file": "ttjs.go"
     }
   },
-  "error:pkg/deviceclaimingserver:qr_code_data": {
+  "error:pkg/deviceclaimingserver/enddevices/ttjs:qr_code_data": {
     "translations": {
       "en": "invalid QR code data"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
+      "file": "ttjs.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/enddevices/ttjs:unauthorized": {
+    "translations": {
+      "en": "client API Key missing or invalid"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
+      "file": "ttjs.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/enddevices:claiming_not_supported": {
+    "translations": {
+      "en": "claiming not supported for JoinEUI `{eui}`"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/enddevices",
+      "file": "enddevices.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/enddevices:invalid_upstream": {
+    "translations": {
+      "en": "upstream `{type}` is invalid"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/enddevices",
+      "file": "enddevices.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/enddevices:no_eui": {
+    "translations": {
+      "en": "DevEUI/JoinEUI not found in request"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/enddevices",
+      "file": "enddevices.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/enddevices:no_join_eui": {
+    "translations": {
+      "en": "failed to extract JoinEUI from request"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/enddevices",
+      "file": "enddevices.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/enddevices:parse_qr_code": {
+    "translations": {
+      "en": "parse QR code failed"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/enddevices",
+      "file": "enddevices.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/enddevices:qr_code_data": {
+    "translations": {
+      "en": "invalid QR code data"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/enddevices",
+      "file": "enddevices.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:method_unavailable": {
+    "translations": {
+      "en": "method available"
     },
     "description": {
       "package": "pkg/deviceclaimingserver",

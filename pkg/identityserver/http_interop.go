@@ -75,8 +75,10 @@ func (srv *interopServer) HomeNSRequest(ctx context.Context, in *interop.HomeNSR
 			},
 			HNetID: interop.NetID(conf.Network.NetID),
 		},
-		HNSAddress: dev.NetworkServerAddress,
-		HTenantID:  conf.Network.TenantID,
+		TTIVSExtension: interop.TTIVSExtension{
+			HNSAddress: dev.NetworkServerAddress,
+			HTenantID:  conf.Network.TenantID,
+		},
 	}
 	if in.ProtocolVersion.RequiresNSID() {
 		ans.HNSID = (*interop.EUI64)(hNSID)
