@@ -28,8 +28,9 @@ import (
 )
 
 var (
-	errCorruptedIndex          = errors.DefineCorruption("corrupted_index", "corrupted index file")
-	errInvalidNumberOfProfiles = errors.DefineCorruption("invalid_number_of_profiles", "invalid number of profiles returned")
+	errCorruptedIndex           = errors.DefineCorruption("corrupted_index", "corrupted index file")
+	errInvalidNumberOfProfiles  = errors.DefineCorruption("invalid_number_of_profiles", "invalid number of profiles returned")
+	errEndDeviceProfileNotFound = errors.DefineNotFound("end_device_profile_not_found", "end device profile not found for vendor ID `{vendor_id}` and vendor profile ID `{vendor_profile_id}`")
 )
 
 // retrieve returns the resulting document from the cache, if available. Otherwise,
@@ -208,6 +209,13 @@ func (s *bleveStore) GetTemplate(req *ttnpb.GetTemplateRequest, _ *store.EndDevi
 		if err != nil {
 			return nil, err
 		}
+
+		if len(result.Hits) == 0 {
+			return nil, errEndDeviceProfileNotFound.WithAttributes(
+				"vendor_id", endDeviceProfileIds.VendorId,
+				"vendor_profile_id", endDeviceProfileIds.VendorProfileId)
+		}
+
 		if len(result.Hits) != 1 {
 			// There can only be one profile for a given tuple.
 			return nil, errInvalidNumberOfProfiles.New()
