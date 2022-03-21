@@ -5,3 +5,4 @@ regionalParametersVersion: RP001-1.0.3-RevA
 supportsJoin: true
 maxEIRP: 27
 supports32bitFCnt: true
+vendorProfileID: 3
