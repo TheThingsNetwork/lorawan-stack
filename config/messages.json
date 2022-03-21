@@ -3734,15 +3734,6 @@
       "file": "remote.go"
     }
   },
-  "error:pkg/devicerepository/store:not_found": {
-    "translations": {
-      "en": "not found"
-    },
-    "description": {
-      "package": "pkg/devicerepository/store",
-      "file": "noop.go"
-    }
-  },
   "error:pkg/devicerepository/store:regional_parameters_version": {
     "translations": {
       "en": "unknown Regional Parameters version `{phy_version}`"
