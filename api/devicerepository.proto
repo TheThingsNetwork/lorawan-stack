@@ -301,7 +301,7 @@ message GetTemplateRequest {
   // Identifiers to uniquely identify a LoRaWAN End Device Profile.
   message EndDeviceProfileIdentifiers {
     // VendorID managed by the LoRa Alliance, as defined in TR005.
-    uint32 vendor_id = 1;
+    uint32 vendor_id = 1 [(validate.rules).uint32 = {gte: 1}];
 
     // ID of the LoRAWAN device profile. The name of this field follows the TR005 specification.
     uint32 vendor_profile_id = 2;

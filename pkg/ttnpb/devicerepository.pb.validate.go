@@ -3522,7 +3522,14 @@ func (m *GetTemplateRequest_EndDeviceProfileIdentifiers) ValidateFields(paths ..
 		_ = subs
 		switch name {
 		case "vendor_id":
-			// no validation rules for VendorId
+
+			if m.GetVendorId() < 1 {
+				return GetTemplateRequest_EndDeviceProfileIdentifiersValidationError{
+					field:  "vendor_id",
+					reason: "value must be greater than or equal to 1",
+				}
+			}
+
 		case "vendor_profile_id":
 			// no validation rules for VendorProfileId
 		default:
