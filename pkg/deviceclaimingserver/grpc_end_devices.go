@@ -19,13 +19,22 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/qrcode"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 )
 
 var errMethodUnavailable = errors.DefineUnimplemented("method_unavailable", "method available")
+
+// Fallback defines methods for the fallback server.
+// TODO: Remove this interface (https://github.com/TheThingsIndustries/lorawan-stack/issues/3036).
+type Fallback interface {
+	web.Registerer
+	Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest) (ids *ttnpb.EndDeviceIdentifiers, err error)
+	AuthorizeApplication(context.Context, *ttnpb.AuthorizeApplicationRequest) (*pbtypes.Empty, error)
+	UnauthorizeApplication(context.Context, *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error)
+}
 
 // noopEDCS is a no-op EDCS.
 type noopEDCS struct {
@@ -45,6 +54,21 @@ func (noopEDCS) Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest) (id
 	return nil, errMethodUnavailable.New()
 }
 
+// Unclaim implements EndDeviceClaimingServer.
+func (noopEDCS) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+	return nil, errMethodUnavailable.New()
+}
+
+// GetInfoByJoinEUI implements EndDeviceClaimingServer.
+func (noopEDCS) GetInfoByJoinEUI(ctx context.Context, in *ttnpb.GetInfoByJoinEUIRequest) (*ttnpb.GetInfoByJoinEUIResponse, error) {
+	return nil, errMethodUnavailable.New()
+}
+
+// GetClaimStatus implements EndDeviceClaimingServer.
+func (noopEDCS) GetClaimStatus(ctx context.Context, in *ttnpb.EndDeviceIdentifiers) (*ttnpb.GetClaimStatusResponse, error) {
+	return nil, errMethodUnavailable.New()
+}
+
 // AuthorizeApplication implements EndDeviceClaimingServer.
 func (noopEDCS) AuthorizeApplication(ctx context.Context, req *ttnpb.AuthorizeApplicationRequest) (*pbtypes.Empty, error) {
 	return nil, errMethodUnavailable.New()
@@ -60,46 +84,40 @@ type endDeviceClaimingServer struct {
 	DCS *DeviceClaimingServer
 }
 
-var (
-	errParseQRCode = errors.Define("parse_qr_code", "parse QR code failed")
-	errQRCodeData  = errors.DefineInvalidArgument("qr_code_data", "invalid QR code data")
-	errNoJoinEUI   = errors.DefineInvalidArgument("no_join_eui", "failed to extract JoinEUI from request")
-)
-
 // Claim implements EndDeviceClaimingServer.
-func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest) (ids *ttnpb.EndDeviceIdentifiers, err error) {
-	for _, edcs := range edcs.DCS.endDeviceClaimingUpstreams {
-		var joinEUI types.EUI64
-		if authenticatedIDs := req.GetAuthenticatedIdentifiers(); authenticatedIDs != nil {
-			joinEUI = req.GetAuthenticatedIdentifiers().JoinEui
-		} else if qrCode := req.GetQrCode(); qrCode != nil {
-			data, err := qrcode.Parse(qrCode)
-			if err != nil {
-				return nil, errParseQRCode.WithCause(err)
-			}
-			authIDs, ok := data.(qrcode.AuthenticatedEndDeviceIdentifiers)
-			if !ok {
-				return nil, errQRCodeData.New()
-			}
-			joinEUI, _, _ = authIDs.AuthenticatedEndDeviceIdentifiers()
-		} else {
-			return nil, errNoJoinEUI.New()
+func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest) (*ttnpb.EndDeviceIdentifiers, error) {
+	ids, err := edcs.DCS.endDeviceClaimingUpstream.Claim(ctx, req)
+	if err != nil {
+		if errors.IsAborted(err) {
+			log.FromContext(ctx).Warn("No upstream supports JoinEUI, use fallback")
+			return edcs.DCS.endDeviceClaimingFallback.Claim(ctx, req)
 		}
-		if edcs.SupportsJoinEUI(joinEUI) {
-			return edcs.Claim(ctx, req)
-		}
+		return nil, err
 	}
-	// Use default if no EDCS supports this EUI.
-	// TODO: Remove this option and return JoinEUI not provisioned error (https://github.com/TheThingsIndustries/lorawan-stack/issues/3036).
-	return edcs.DCS.endDeviceClaimingUpstreams[defaultType].Claim(ctx, req)
+	return ids, nil
+}
+
+// Unclaim implements EndDeviceClaimingServer.
+func (edcs *endDeviceClaimingServer) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+	return edcs.DCS.endDeviceClaimingUpstream.Unclaim(ctx, in)
+}
+
+// GetInfoByJoinEUI implements EndDeviceClaimingServer.
+func (edcs *endDeviceClaimingServer) GetInfoByJoinEUI(ctx context.Context, in *ttnpb.GetInfoByJoinEUIRequest) (*ttnpb.GetInfoByJoinEUIResponse, error) {
+	return edcs.DCS.endDeviceClaimingUpstream.GetInfoByJoinEUI(ctx, in)
+}
+
+// GetClaimStatus implements EndDeviceClaimingServer.
+func (edcs *endDeviceClaimingServer) GetClaimStatus(ctx context.Context, in *ttnpb.EndDeviceIdentifiers) (*ttnpb.GetClaimStatusResponse, error) {
+	return edcs.DCS.endDeviceClaimingUpstream.GetClaimStatus(ctx, in)
 }
 
 // AuthorizeApplication implements EndDeviceClaimingServer.
 func (edcs *endDeviceClaimingServer) AuthorizeApplication(ctx context.Context, req *ttnpb.AuthorizeApplicationRequest) (*pbtypes.Empty, error) {
-	return edcs.DCS.endDeviceClaimingUpstreams[defaultType].AuthorizeApplication(ctx, req)
+	return edcs.DCS.endDeviceClaimingFallback.AuthorizeApplication(ctx, req)
 }
 
 // UnauthorizeApplication implements EndDeviceClaimingServer.
 func (edcs *endDeviceClaimingServer) UnauthorizeApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
-	return edcs.DCS.endDeviceClaimingUpstreams[defaultType].UnauthorizeApplication(ctx, ids)
+	return edcs.DCS.endDeviceClaimingFallback.UnauthorizeApplication(ctx, ids)
 }
