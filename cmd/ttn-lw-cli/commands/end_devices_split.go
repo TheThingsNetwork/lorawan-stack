@@ -287,7 +287,7 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 	return &res, ctx.Err()
 }
 
-func deleteEndDevice(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers) error {
+func deleteEndDevice(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers, skipClusterJS bool) error {
 	if config.ApplicationServerEnabled {
 		as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 		if err != nil {
@@ -314,7 +314,7 @@ func deleteEndDevice(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers) err
 		}
 	}
 
-	if config.JoinServerEnabled {
+	if config.JoinServerEnabled && !skipClusterJS {
 		if devID.JoinEui != nil && devID.DevEui != nil {
 			js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
 			if err != nil {
