@@ -2390,6 +2390,15 @@
             "version_ids.firmware_version",
             "version_ids.band_id"
           ]
+        },
+        {
+          "method": "get",
+          "pattern": "/dr/applications/{application_ids.application_id}/vendor-id/{end_device_profile_ids.vendor_id}/vendor-profile-id/{end_device_profile_ids.vendor_profile_id}/template",
+          "parameters": [
+            "application_ids.application_id",
+            "end_device_profile_ids.vendor_id",
+            "end_device_profile_ids.vendor_profile_id"
+          ]
         }
       ]
     },

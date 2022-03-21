@@ -2874,8 +2874,8 @@ and allows clients to claim end devices.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  | Application identifiers. |
-| `version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | End device version information. If EndDeviceProfileIdentifiers is not present in the request, the End Device Template is constructed from the End Device Profile that matches the BandID within EndDeviceVersionIdentifiers. |
-| `end_device_profile_ids` | [`GetTemplateRequest.EndDeviceProfileIdentifiers`](#ttn.lorawan.v3.GetTemplateRequest.EndDeviceProfileIdentifiers) |  | (Optional) End Device Profile identifiers. If specified, these identifiers will be directly to used to fetch the End Device Profile (if found) |
+| `version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | End device version information. EndDeviceProfileIdentifiers take precedence over this field if both are specified. |
+| `end_device_profile_ids` | [`GetTemplateRequest.EndDeviceProfileIdentifiers`](#ttn.lorawan.v3.GetTemplateRequest.EndDeviceProfileIdentifiers) |  | End device profile identifiers. |
 
 #### Field Rules
 
@@ -2885,12 +2885,12 @@ and allows clients to claim end devices.
 
 ### <a name="ttn.lorawan.v3.GetTemplateRequest.EndDeviceProfileIdentifiers">Message `GetTemplateRequest.EndDeviceProfileIdentifiers`</a>
 
-Identifiers to uniquely identify a LoRaWAN End Device Profile.
+Identifiers to uniquely identify a LoRaWAN end device profile.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `vendor_id` | [`uint32`](#uint32) |  | VendorID managed by the LoRa Alliance, as defined in TR005. |
-| `vendor_profile_id` | [`uint32`](#uint32) |  | ID of the LoRAWAN device profile. The name of this field follows the TR005 specification. |
+| `vendor_profile_id` | [`uint32`](#uint32) |  | ID of the LoRaWAN end device profile. The naming of this field follows the TR005 specification. |
 
 #### Field Rules
 

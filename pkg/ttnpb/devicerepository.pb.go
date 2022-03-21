@@ -1396,11 +1396,9 @@ type GetTemplateRequest struct {
 	// Application identifiers.
 	ApplicationIds *ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3" json:"application_ids,omitempty"`
 	// End device version information.
-	// If EndDeviceProfileIdentifiers is not present in the request,
-	// the End Device Template is constructed from the End Device Profile that matches the BandID within EndDeviceVersionIdentifiers.
+	// EndDeviceProfileIdentifiers take precedence over this field if both are specified.
 	VersionIds *EndDeviceVersionIdentifiers `protobuf:"bytes,2,opt,name=version_ids,json=versionIds,proto3" json:"version_ids,omitempty"`
-	// (Optional) End Device Profile identifiers.
-	// If specified, these identifiers will be directly to used to fetch the End Device Profile (if found)
+	// End device profile identifiers.
 	EndDeviceProfileIds  *GetTemplateRequest_EndDeviceProfileIdentifiers `protobuf:"bytes,3,opt,name=end_device_profile_ids,json=endDeviceProfileIds,proto3" json:"end_device_profile_ids,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                                        `json:"-"`
 	XXX_unrecognized     []byte                                          `json:"-"`
@@ -1452,11 +1450,11 @@ func (m *GetTemplateRequest) GetEndDeviceProfileIds() *GetTemplateRequest_EndDev
 	return nil
 }
 
-// Identifiers to uniquely identify a LoRaWAN End Device Profile.
+// Identifiers to uniquely identify a LoRaWAN end device profile.
 type GetTemplateRequest_EndDeviceProfileIdentifiers struct {
 	// VendorID managed by the LoRa Alliance, as defined in TR005.
 	VendorId uint32 `protobuf:"varint,1,opt,name=vendor_id,json=vendorId,proto3" json:"vendor_id,omitempty"`
-	// ID of the LoRAWAN device profile. The name of this field follows the TR005 specification.
+	// ID of the LoRaWAN end device profile. The naming of this field follows the TR005 specification.
 	VendorProfileId      uint32   `protobuf:"varint,2,opt,name=vendor_profile_id,json=vendorProfileId,proto3" json:"vendor_profile_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

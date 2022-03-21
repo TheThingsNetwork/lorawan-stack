@@ -174,7 +174,6 @@ func (s *bleveStore) GetModels(req store.GetModelsRequest) (*store.GetModelsResp
 		}
 		models = append(models, pb)
 	}
-
 	return &store.GetModelsResponse{
 		Count:  uint32(len(result.Hits)),
 		Total:  uint32(result.Total),
@@ -189,7 +188,7 @@ func (s *bleveStore) GetTemplate(req *ttnpb.GetTemplateRequest, _ *store.EndDevi
 		profile             *store.EndDeviceProfile
 		endDeviceProfileIds = req.GetEndDeviceProfileIds()
 	)
-	// Fetch the Profile from the store indices and forward it if available.
+	// Attempt to fetch the end device profile that matches the identifiers.
 	if endDeviceProfileIds != nil {
 		documentTypeQuery := bleve.NewTermQuery(profileDocumentType)
 		documentTypeQuery.SetField("Type")
@@ -255,9 +254,9 @@ func (s *bleveStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.Messa
 	return s.store.GetDownlinkEncoder(req)
 }
 
-// GetLoRaWANDeviceProfiles retrieves an end device template for an end device definition.
-func (s *bleveStore) GetLoRaWANDeviceProfiles(req store.GetLoRaWANDeviceProfilesRequest) (*store.GetLoRaWANDeviceProfilesResponse, error) {
-	return s.store.GetLoRaWANDeviceProfiles(req)
+// GetEndDeviceProfiles implements store.
+func (s *bleveStore) GetEndDeviceProfiles(req store.GetEndDeviceProfilesRequest) (*store.GetEndDeviceProfilesResponse, error) {
+	return s.store.GetEndDeviceProfiles(req)
 }
 
 // Close closes the store.

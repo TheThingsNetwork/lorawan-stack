@@ -4412,7 +4412,7 @@
           },
           {
             "name": "end_device_profile_ids.vendor_profile_id",
-            "description": "ID of the LoRAWAN device profile. The name of this field follows the TR005 specification.",
+            "description": "ID of the LoRaWAN end device profile. The naming of this field follows the TR005 specification.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -4536,7 +4536,7 @@
           },
           {
             "name": "end_device_profile_ids.vendor_profile_id",
-            "description": "ID of the LoRAWAN device profile. The name of this field follows the TR005 specification.",
+            "description": "ID of the LoRaWAN end device profile. The naming of this field follows the TR005 specification.",
             "in": "path",
             "required": true,
             "type": "integer",
@@ -11532,10 +11532,10 @@
         "vendor_profile_id": {
           "type": "integer",
           "format": "int64",
-          "description": "ID of the LoRAWAN device profile. The name of this field follows the TR005 specification."
+          "description": "ID of the LoRaWAN end device profile. The naming of this field follows the TR005 specification."
         }
       },
-      "description": "Identifiers to uniquely identify a LoRaWAN End Device Profile."
+      "description": "Identifiers to uniquely identify a LoRaWAN end device profile."
     },
     "IsConfigurationAdminRights": {
       "type": "object",

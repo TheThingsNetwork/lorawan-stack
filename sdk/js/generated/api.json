@@ -11630,7 +11630,7 @@
             },
             {
               "name": "version_ids",
-              "description": "End device version information.\nIf EndDeviceProfileIdentifiers is not present in the request,\nthe End Device Template is constructed from the End Device Profile that matches the BandID within EndDeviceVersionIdentifiers.",
+              "description": "End device version information.\nEndDeviceProfileIdentifiers take precedence over this field if both are specified.",
               "label": "",
               "type": "EndDeviceVersionIdentifiers",
               "longType": "EndDeviceVersionIdentifiers",
@@ -11642,7 +11642,7 @@
             },
             {
               "name": "end_device_profile_ids",
-              "description": "(Optional) End Device Profile identifiers.\nIf specified, these identifiers will be directly to used to fetch the End Device Profile (if found)",
+              "description": "End device profile identifiers.",
               "label": "",
               "type": "EndDeviceProfileIdentifiers",
               "longType": "GetTemplateRequest.EndDeviceProfileIdentifiers",
@@ -11658,7 +11658,7 @@
           "name": "EndDeviceProfileIdentifiers",
           "longName": "GetTemplateRequest.EndDeviceProfileIdentifiers",
           "fullName": "ttn.lorawan.v3.GetTemplateRequest.EndDeviceProfileIdentifiers",
-          "description": "Identifiers to uniquely identify a LoRaWAN End Device Profile.",
+          "description": "Identifiers to uniquely identify a LoRaWAN end device profile.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
@@ -11686,7 +11686,7 @@
             },
             {
               "name": "vendor_profile_id",
-              "description": "ID of the LoRAWAN device profile. The name of this field follows the TR005 specification.",
+              "description": "ID of the LoRaWAN end device profile. The naming of this field follows the TR005 specification.",
               "label": "",
               "type": "uint32",
               "longType": "uint32",

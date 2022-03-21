@@ -298,12 +298,12 @@ message ListEndDeviceModelsRequest {
 }
 
 message GetTemplateRequest {
-  // Identifiers to uniquely identify a LoRaWAN End Device Profile.
+  // Identifiers to uniquely identify a LoRaWAN end device profile.
   message EndDeviceProfileIdentifiers {
     // VendorID managed by the LoRa Alliance, as defined in TR005.
     uint32 vendor_id = 1 [(validate.rules).uint32 = {gte: 1}];
 
-    // ID of the LoRAWAN device profile. The name of this field follows the TR005 specification.
+    // ID of the LoRaWAN end device profile. The naming of this field follows the TR005 specification.
     uint32 vendor_profile_id = 2;
     }
 
@@ -311,12 +311,10 @@ message GetTemplateRequest {
   ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
 
   // End device version information.
-  // If EndDeviceProfileIdentifiers is not present in the request,
-  // the End Device Template is constructed from the End Device Profile that matches the BandID within EndDeviceVersionIdentifiers.
+  // EndDeviceProfileIdentifiers take precedence over this field if both are specified.
   EndDeviceVersionIdentifiers version_ids = 2;
 
-  // (Optional) End Device Profile identifiers.
-  // If specified, these identifiers will be directly to used to fetch the End Device Profile (if found)
+  // End device profile identifiers.
   EndDeviceProfileIdentifiers end_device_profile_ids = 3;
 }
 

@@ -162,8 +162,8 @@ func (s *remoteStore) GetModels(req store.GetModelsRequest) (*store.GetModelsRes
 	}, nil
 }
 
-// getLoRaWANDeviceProfilesByBrand lists the available LoRaWAN Device Profiles by a single brand.
-func (s *remoteStore) getLoRaWANDeviceProfilesByBrand(req store.GetLoRaWANDeviceProfilesRequest) (*store.GetLoRaWANDeviceProfilesResponse, error) {
+// getEndDeviceProfilesByBrand lists the available LoRaWAN end device profiles by a single brand.
+func (s *remoteStore) getEndDeviceProfilesByBrand(req store.GetEndDeviceProfilesRequest) (*store.GetEndDeviceProfilesResponse, error) {
 	b, err := s.fetcher.File("vendor", req.BrandID, "index.yaml")
 	if err != nil {
 		return nil, errBrandNotFound.WithAttributes("brand_id", req.BrandID)
@@ -205,7 +205,7 @@ func (s *remoteStore) getLoRaWANDeviceProfilesByBrand(req store.GetLoRaWANDevice
 			}
 		}
 	}
-	return &store.GetLoRaWANDeviceProfilesResponse{
+	return &store.GetEndDeviceProfilesResponse{
 		Count:    end - start,
 		Offset:   start,
 		Total:    uint32(len(index.EndDevices)),
@@ -213,12 +213,12 @@ func (s *remoteStore) getLoRaWANDeviceProfilesByBrand(req store.GetLoRaWANDevice
 	}, nil
 }
 
-// GetLoRaWANDeviceProfiles lists available LoRaWAN Device Profiles per brand.
+// GetEndDeviceProfiles lists available LoRaWAN end device profiles per brand.
 // Note that this can be very slow, and does not support searching/sorting.
 // This function is primarily intended to be used for creating the bleve index.
-func (s *remoteStore) GetLoRaWANDeviceProfiles(req store.GetLoRaWANDeviceProfilesRequest) (*store.GetLoRaWANDeviceProfilesResponse, error) {
+func (s *remoteStore) GetEndDeviceProfiles(req store.GetEndDeviceProfilesRequest) (*store.GetEndDeviceProfilesResponse, error) {
 	if req.BrandID != "" {
-		return s.getLoRaWANDeviceProfilesByBrand(req)
+		return s.getEndDeviceProfilesByBrand(req)
 	}
 	all := []*store.EndDeviceProfile{}
 	brands, err := s.GetBrands(store.GetBrandsRequest{
@@ -228,7 +228,7 @@ func (s *remoteStore) GetLoRaWANDeviceProfiles(req store.GetLoRaWANDeviceProfile
 		return nil, err
 	}
 	for _, brand := range brands.Brands {
-		profiles, err := s.GetLoRaWANDeviceProfiles(store.GetLoRaWANDeviceProfilesRequest{
+		profiles, err := s.GetEndDeviceProfiles(store.GetEndDeviceProfilesRequest{
 			BrandID: brand.BrandId,
 		})
 		if errors.IsNotFound(err) {
@@ -241,7 +241,7 @@ func (s *remoteStore) GetLoRaWANDeviceProfiles(req store.GetLoRaWANDeviceProfile
 	}
 
 	start, end := paginate(len(all), req.Limit, req.Page)
-	return &store.GetLoRaWANDeviceProfilesResponse{
+	return &store.GetEndDeviceProfilesResponse{
 		Count:    end - start,
 		Offset:   start,
 		Total:    uint32(len(all)),

@@ -141,7 +141,7 @@ func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overw
 				return err
 			}
 		}
-		profiles, err := s.GetLoRaWANDeviceProfiles(store.GetLoRaWANDeviceProfilesRequest{
+		profiles, err := s.GetEndDeviceProfiles(store.GetEndDeviceProfilesRequest{
 			BrandID: brand.BrandId,
 		})
 		if err != nil && !errors.IsNotFound(err) {
@@ -151,7 +151,6 @@ func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overw
 		if err != nil {
 			return err
 		}
-
 		b := indexableBrand{
 			Type:      brandDocumentType,
 			BrandJSON: string(brandJSON),
@@ -180,7 +179,7 @@ func (c Config) Initialize(ctx context.Context, lorawanDevicesPath string, overw
 				return err
 			}
 		}
-		// Add the LoRaWAN Device Profiles to the index.
+		// Add the end device profiles to the index.
 		if profiles != nil {
 			for _, profile := range profiles.Profiles {
 				profileJSON, err := jsonpb.TTN().Marshal(profile)
