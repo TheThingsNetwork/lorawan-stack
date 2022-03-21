@@ -462,6 +462,86 @@
       "ns",
       "ns"
     ],
+    "adr": {
+      "_root": [
+        "ns",
+        "ns"
+      ],
+      "mode": {
+        "_root": [
+          "ns",
+          "ns"
+        ],
+        "disabled": [
+          "ns",
+          "ns"
+        ],
+        "dynamic": {
+          "_root": [
+            "ns",
+            "ns"
+          ],
+          "margin": [
+            "ns",
+            "ns"
+          ],
+          "max_data_rate_index": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "value": [
+              "ns",
+              "ns"
+            ]
+          },
+          "max_nb_trans": [
+            "ns",
+            "ns"
+          ],
+          "max_tx_power_index": [
+            "ns",
+            "ns"
+          ],
+          "min_data_rate_index": {
+            "_root": [
+              "ns",
+              "ns"
+            ],
+            "value": [
+              "ns",
+              "ns"
+            ]
+          },
+          "min_nb_trans": [
+            "ns",
+            "ns"
+          ],
+          "min_tx_power_index": [
+            "ns",
+            "ns"
+          ]
+        },
+        "static": {
+          "_root": [
+            "ns",
+            "ns"
+          ],
+          "data_rate_index": [
+            "ns",
+            "ns"
+          ],
+          "nb_trans": [
+            "ns",
+            "ns"
+          ],
+          "tx_power_index": [
+            "ns",
+            "ns"
+          ]
+        }
+      }
+    },
     "adr_margin": [
       "ns",
       "ns"

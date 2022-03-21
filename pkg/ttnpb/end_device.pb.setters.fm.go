@@ -622,6 +622,137 @@ func (dst *EndDeviceVersion) SetFields(src *EndDeviceVersion, paths ...string) e
 	return nil
 }
 
+func (dst *ADRSettings) SetFields(src *ADRSettings, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+
+		case "mode":
+			if len(subs) == 0 && src == nil {
+				dst.Mode = nil
+				continue
+			} else if len(subs) == 0 {
+				dst.Mode = src.Mode
+				continue
+			}
+
+			subPathMap := _processPaths(subs)
+			if len(subPathMap) > 1 {
+				return fmt.Errorf("more than one field specified for oneof field '%s'", name)
+			}
+			for oneofName, oneofSubs := range subPathMap {
+				switch oneofName {
+				case "static":
+					_, srcOk := src.Mode.(*ADRSettings_Static)
+					if !srcOk && src.Mode != nil {
+						return fmt.Errorf("attempt to set oneof 'static', while different oneof is set in source")
+					}
+					_, dstOk := dst.Mode.(*ADRSettings_Static)
+					if !dstOk && dst.Mode != nil {
+						return fmt.Errorf("attempt to set oneof 'static', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ADRSettings_StaticMode
+						if !srcOk && !dstOk {
+							continue
+						}
+						if srcOk {
+							newSrc = src.Mode.(*ADRSettings_Static).Static
+						}
+						if dstOk {
+							newDst = dst.Mode.(*ADRSettings_Static).Static
+						} else {
+							newDst = &ADRSettings_StaticMode{}
+							dst.Mode = &ADRSettings_Static{Static: newDst}
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Mode = src.Mode
+						} else {
+							dst.Mode = nil
+						}
+					}
+				case "dynamic":
+					_, srcOk := src.Mode.(*ADRSettings_Dynamic)
+					if !srcOk && src.Mode != nil {
+						return fmt.Errorf("attempt to set oneof 'dynamic', while different oneof is set in source")
+					}
+					_, dstOk := dst.Mode.(*ADRSettings_Dynamic)
+					if !dstOk && dst.Mode != nil {
+						return fmt.Errorf("attempt to set oneof 'dynamic', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ADRSettings_DynamicMode
+						if !srcOk && !dstOk {
+							continue
+						}
+						if srcOk {
+							newSrc = src.Mode.(*ADRSettings_Dynamic).Dynamic
+						}
+						if dstOk {
+							newDst = dst.Mode.(*ADRSettings_Dynamic).Dynamic
+						} else {
+							newDst = &ADRSettings_DynamicMode{}
+							dst.Mode = &ADRSettings_Dynamic{Dynamic: newDst}
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Mode = src.Mode
+						} else {
+							dst.Mode = nil
+						}
+					}
+				case "disabled":
+					_, srcOk := src.Mode.(*ADRSettings_Disabled)
+					if !srcOk && src.Mode != nil {
+						return fmt.Errorf("attempt to set oneof 'disabled', while different oneof is set in source")
+					}
+					_, dstOk := dst.Mode.(*ADRSettings_Disabled)
+					if !dstOk && dst.Mode != nil {
+						return fmt.Errorf("attempt to set oneof 'disabled', while different oneof is set in destination")
+					}
+					if len(oneofSubs) > 0 {
+						var newDst, newSrc *ADRSettings_DisabledMode
+						if !srcOk && !dstOk {
+							continue
+						}
+						if srcOk {
+							newSrc = src.Mode.(*ADRSettings_Disabled).Disabled
+						}
+						if dstOk {
+							newDst = dst.Mode.(*ADRSettings_Disabled).Disabled
+						} else {
+							newDst = &ADRSettings_DisabledMode{}
+							dst.Mode = &ADRSettings_Disabled{Disabled: newDst}
+						}
+						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
+							return err
+						}
+					} else {
+						if src != nil {
+							dst.Mode = src.Mode
+						} else {
+							dst.Mode = nil
+						}
+					}
+
+				default:
+					return fmt.Errorf("invalid oneof field: '%s.%s'", name, oneofName)
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -1311,6 +1442,31 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 					dst.DownlinkDwellTime = src.DownlinkDwellTime
 				} else {
 					dst.DownlinkDwellTime = nil
+				}
+			}
+		case "adr":
+			if len(subs) > 0 {
+				var newDst, newSrc *ADRSettings
+				if (src == nil || src.Adr == nil) && dst.Adr == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Adr
+				}
+				if dst.Adr != nil {
+					newDst = dst.Adr
+				} else {
+					newDst = &ADRSettings{}
+					dst.Adr = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Adr = src.Adr
+				} else {
+					dst.Adr = nil
 				}
 			}
 
@@ -2908,6 +3064,163 @@ func (dst *MACParameters_Channel) SetFields(src *MACParameters_Channel, paths ..
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
 		}
+	}
+	return nil
+}
+
+func (dst *ADRSettings_StaticMode) SetFields(src *ADRSettings_StaticMode, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "data_rate_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'data_rate_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DataRateIndex = src.DataRateIndex
+			} else {
+				var zero DataRateIndex
+				dst.DataRateIndex = zero
+			}
+		case "tx_power_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'tx_power_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TxPowerIndex = src.TxPowerIndex
+			} else {
+				var zero uint32
+				dst.TxPowerIndex = zero
+			}
+		case "nb_trans":
+			if len(subs) > 0 {
+				return fmt.Errorf("'nb_trans' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NbTrans = src.NbTrans
+			} else {
+				var zero uint32
+				dst.NbTrans = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ADRSettings_DynamicMode) SetFields(src *ADRSettings_DynamicMode, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "margin":
+			if len(subs) > 0 {
+				return fmt.Errorf("'margin' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Margin = src.Margin
+			} else {
+				dst.Margin = nil
+			}
+		case "min_data_rate_index":
+			if len(subs) > 0 {
+				var newDst, newSrc *DataRateIndexValue
+				if (src == nil || src.MinDataRateIndex == nil) && dst.MinDataRateIndex == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.MinDataRateIndex
+				}
+				if dst.MinDataRateIndex != nil {
+					newDst = dst.MinDataRateIndex
+				} else {
+					newDst = &DataRateIndexValue{}
+					dst.MinDataRateIndex = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.MinDataRateIndex = src.MinDataRateIndex
+				} else {
+					dst.MinDataRateIndex = nil
+				}
+			}
+		case "max_data_rate_index":
+			if len(subs) > 0 {
+				var newDst, newSrc *DataRateIndexValue
+				if (src == nil || src.MaxDataRateIndex == nil) && dst.MaxDataRateIndex == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.MaxDataRateIndex
+				}
+				if dst.MaxDataRateIndex != nil {
+					newDst = dst.MaxDataRateIndex
+				} else {
+					newDst = &DataRateIndexValue{}
+					dst.MaxDataRateIndex = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.MaxDataRateIndex = src.MaxDataRateIndex
+				} else {
+					dst.MaxDataRateIndex = nil
+				}
+			}
+		case "min_tx_power_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'min_tx_power_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinTxPowerIndex = src.MinTxPowerIndex
+			} else {
+				dst.MinTxPowerIndex = nil
+			}
+		case "max_tx_power_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_tx_power_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxTxPowerIndex = src.MaxTxPowerIndex
+			} else {
+				dst.MaxTxPowerIndex = nil
+			}
+		case "min_nb_trans":
+			if len(subs) > 0 {
+				return fmt.Errorf("'min_nb_trans' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MinNbTrans = src.MinNbTrans
+			} else {
+				dst.MinNbTrans = nil
+			}
+		case "max_nb_trans":
+			if len(subs) > 0 {
+				return fmt.Errorf("'max_nb_trans' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.MaxNbTrans = src.MaxNbTrans
+			} else {
+				dst.MaxNbTrans = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ADRSettings_DisabledMode) SetFields(src *ADRSettings_DisabledMode, paths ...string) error {
+	if len(paths) != 0 {
+		return fmt.Errorf("message ADRSettings_DisabledMode has no fields, but paths %s were specified", paths)
+	}
+	if src != nil {
+		*dst = *src
 	}
 	return nil
 }

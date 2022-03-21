@@ -12536,6 +12536,273 @@
       "extensions": [],
       "messages": [
         {
+          "name": "ADRSettings",
+          "longName": "ADRSettings",
+          "fullName": "ttn.lorawan.v3.ADRSettings",
+          "description": "Adaptive Data Rate settings.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "static",
+              "description": "",
+              "label": "",
+              "type": "StaticMode",
+              "longType": "ADRSettings.StaticMode",
+              "fullType": "ttn.lorawan.v3.ADRSettings.StaticMode",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            },
+            {
+              "name": "dynamic",
+              "description": "",
+              "label": "",
+              "type": "DynamicMode",
+              "longType": "ADRSettings.DynamicMode",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            },
+            {
+              "name": "disabled",
+              "description": "",
+              "label": "",
+              "type": "DisabledMode",
+              "longType": "ADRSettings.DisabledMode",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DisabledMode",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DisabledMode",
+          "longName": "ADRSettings.DisabledMode",
+          "fullName": "ttn.lorawan.v3.ADRSettings.DisabledMode",
+          "description": "Configuration options for cases in which ADR is to be disabled\ncompletely.",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "DynamicMode",
+          "longName": "ADRSettings.DynamicMode",
+          "fullName": "ttn.lorawan.v3.ADRSettings.DynamicMode",
+          "description": "Configuration options for dynamic ADR.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "margin",
+              "description": "The ADR margin (dB) tells the network server how much margin it should add in ADR requests.\nA bigger margin is less efficient, but gives a better chance of successful reception.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "FloatValue",
+              "longType": "google.protobuf.FloatValue",
+              "fullType": "google.protobuf.FloatValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "min_data_rate_index",
+              "description": "Minimum data rate index.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "DataRateIndexValue",
+              "longType": "DataRateIndexValue",
+              "fullType": "ttn.lorawan.v3.DataRateIndexValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_data_rate_index",
+              "description": "Maximum data rate index.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "DataRateIndexValue",
+              "longType": "DataRateIndexValue",
+              "fullType": "ttn.lorawan.v3.DataRateIndexValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "min_tx_power_index",
+              "description": "Minimum transmission power index.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 15
+                  }
+                ]
+              }
+            },
+            {
+              "name": "max_tx_power_index",
+              "description": "Maximum transmission power index.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 15
+                  }
+                ]
+              }
+            },
+            {
+              "name": "min_nb_trans",
+              "description": "Minimum number of retransmissions.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 3
+                  },
+                  {
+                    "name": "uint32.gte",
+                    "value": 1
+                  }
+                ]
+              }
+            },
+            {
+              "name": "max_nb_trans",
+              "description": "Maximum number of retransmissions.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 3
+                  },
+                  {
+                    "name": "uint32.gte",
+                    "value": 1
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "StaticMode",
+          "longName": "ADRSettings.StaticMode",
+          "fullName": "ttn.lorawan.v3.ADRSettings.StaticMode",
+          "description": "Configuration options for static ADR.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "data_rate_index",
+              "description": "Data rate index to use.",
+              "label": "",
+              "type": "DataRateIndex",
+              "longType": "DataRateIndex",
+              "fullType": "ttn.lorawan.v3.DataRateIndex",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "tx_power_index",
+              "description": "Transmission power index to use.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 15
+                  }
+                ]
+              }
+            },
+            {
+              "name": "nb_trans",
+              "description": "Number of retransmissions.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 15
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "BoolValue",
           "longName": "BoolValue",
           "fullName": "ttn.lorawan.v3.BoolValue",
@@ -14902,7 +15169,7 @@
             },
             {
               "name": "use_adr",
-              "description": "Whether the Network Server should use ADR for the device.\nIf unset, the default value from Network Server configuration will be used.",
+              "description": "Whether the Network Server should use ADR for the device.\nThis field is deprecated, use adr_settings instead.",
               "label": "",
               "type": "BoolValue",
               "longType": "BoolValue",
@@ -14910,11 +15177,14 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "deprecated": true
+              }
             },
             {
               "name": "adr_margin",
-              "description": "The ADR margin tells the network server how much margin it should add in ADR requests.\nA bigger margin is less efficient, but gives a better chance of successful reception.\nIf unset, the default value from Network Server configuration will be used.",
+              "description": "The ADR margin (dB) tells the network server how much margin it should add in ADR requests.\nA bigger margin is less efficient, but gives a better chance of successful reception.\nThis field is deprecated, use adr_settings.dynamic.margin instead.",
               "label": "",
               "type": "FloatValue",
               "longType": "google.protobuf.FloatValue",
@@ -14922,7 +15192,10 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "deprecated": true
+              }
             },
             {
               "name": "resets_f_cnt",
@@ -15123,6 +15396,18 @@
               "type": "BoolValue",
               "longType": "BoolValue",
               "fullType": "ttn.lorawan.v3.BoolValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "adr",
+              "description": "Adaptive Data Rate settings.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used.",
+              "label": "",
+              "type": "ADRSettings",
+              "longType": "ADRSettings",
+              "fullType": "ttn.lorawan.v3.ADRSettings",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",

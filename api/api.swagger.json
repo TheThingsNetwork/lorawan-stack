@@ -10935,6 +10935,69 @@
     }
   },
   "definitions": {
+    "ADRSettingsDisabledMode": {
+      "type": "object",
+      "description": "Configuration options for cases in which ADR is to be disabled\ncompletely."
+    },
+    "ADRSettingsDynamicMode": {
+      "type": "object",
+      "properties": {
+        "margin": {
+          "type": "number",
+          "format": "float",
+          "description": "The ADR margin (dB) tells the network server how much margin it should add in ADR requests.\nA bigger margin is less efficient, but gives a better chance of successful reception.\nIf unset, the default value from Network Server configuration will be used."
+        },
+        "min_data_rate_index": {
+          "$ref": "#/definitions/v3DataRateIndexValue",
+          "description": "Minimum data rate index.\nIf unset, the default value from Network Server configuration will be used."
+        },
+        "max_data_rate_index": {
+          "$ref": "#/definitions/v3DataRateIndexValue",
+          "description": "Maximum data rate index.\nIf unset, the default value from Network Server configuration will be used."
+        },
+        "min_tx_power_index": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Minimum transmission power index.\nIf unset, the default value from Network Server configuration will be used."
+        },
+        "max_tx_power_index": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Maximum transmission power index.\nIf unset, the default value from Network Server configuration will be used."
+        },
+        "min_nb_trans": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Minimum number of retransmissions.\nIf unset, the default value from Network Server configuration will be used."
+        },
+        "max_nb_trans": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Maximum number of retransmissions.\nIf unset, the default value from Network Server configuration will be used."
+        }
+      },
+      "description": "Configuration options for dynamic ADR."
+    },
+    "ADRSettingsStaticMode": {
+      "type": "object",
+      "properties": {
+        "data_rate_index": {
+          "$ref": "#/definitions/v3DataRateIndex",
+          "description": "Data rate index to use."
+        },
+        "tx_power_index": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Transmission power index to use."
+        },
+        "nb_trans": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of retransmissions."
+        }
+      },
+      "description": "Configuration options for static ADR."
+    },
     "AWSIoTProviderAccessKey": {
       "type": "object",
       "properties": {
@@ -12475,6 +12538,21 @@
           "$ref": "#/definitions/v3ADRAckLimitExponent"
         }
       }
+    },
+    "v3ADRSettings": {
+      "type": "object",
+      "properties": {
+        "static": {
+          "$ref": "#/definitions/ADRSettingsStaticMode"
+        },
+        "dynamic": {
+          "$ref": "#/definitions/ADRSettingsDynamicMode"
+        },
+        "disabled": {
+          "$ref": "#/definitions/ADRSettingsDisabledMode"
+        }
+      },
+      "description": "Adaptive Data Rate settings."
     },
     "v3APIKey": {
       "type": "object",
@@ -16331,12 +16409,12 @@
         },
         "use_adr": {
           "$ref": "#/definitions/lorawanv3BoolValue",
-          "description": "Whether the Network Server should use ADR for the device.\nIf unset, the default value from Network Server configuration will be used."
+          "description": "Whether the Network Server should use ADR for the device.\nThis field is deprecated, use adr_settings instead."
         },
         "adr_margin": {
           "type": "number",
           "format": "float",
-          "description": "The ADR margin tells the network server how much margin it should add in ADR requests.\nA bigger margin is less efficient, but gives a better chance of successful reception.\nIf unset, the default value from Network Server configuration will be used."
+          "description": "The ADR margin (dB) tells the network server how much margin it should add in ADR requests.\nA bigger margin is less efficient, but gives a better chance of successful reception.\nThis field is deprecated, use adr_settings.dynamic.margin instead."
         },
         "resets_f_cnt": {
           "$ref": "#/definitions/lorawanv3BoolValue",
@@ -16406,6 +16484,10 @@
         "downlink_dwell_time": {
           "$ref": "#/definitions/lorawanv3BoolValue",
           "description": "Whether downlink dwell time is set (400ms).\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
+        },
+        "adr": {
+          "$ref": "#/definitions/v3ADRSettings",
+          "description": "Adaptive Data Rate settings.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used."
         }
       }
     },
