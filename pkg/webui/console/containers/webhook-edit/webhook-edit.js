@@ -23,6 +23,7 @@ import WebhookForm from '@console/components/webhook-form'
 
 import diff from '@ttn-lw/lib/diff'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { update } from 'lodash'
 
 const m = defineMessages({
   editWebhook: 'Edit webhook',
@@ -104,9 +105,9 @@ const WebhookEdit = props => {
   }, [])
   const handleReactivate = React.useCallback(
     async updatedHealthStatus => {
-      await updateHealthStatus(appId, webhookId, updatedHealthStatus, ['health_status'])
+      await updateHealthStatus(updatedHealthStatus, ['health_status'])
     },
-    [appId, webhookId, updateHealthStatus],
+    [updateHealthStatus],
   )
 
   return (

@@ -24,8 +24,8 @@ const mapDispatchToProps = (dispatch, props) => {
   return {
     navigateToList: () => dispatch(replace(`/applications/${appId}/integrations/webhooks`)),
     updateWebhook: patch => dispatch(attachPromise(updateWebhook(appId, webhookId, patch))),
-    updateHealthStatus: (updatedHealthStatus, selector) =>
-      dispatch(attachPromise(updateWebhook(appId, webhookId, updatedHealthStatus, selector))),
+    updateHealthStatus: (patch, selector) =>
+      dispatch(attachPromise(updateWebhook(appId, webhookId, patch, selector))),
   }
 }
 
