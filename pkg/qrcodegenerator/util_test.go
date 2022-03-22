@@ -51,7 +51,11 @@ func (m *mock) Encode(dev *ttnpb.EndDevice) error {
 	return nil
 }
 
-func (*mock) EndDeviceInfo() (string, *ttnpb.EndDeviceTemplate) { return "", nil }
+func (*mock) EndDeviceTemplate() *ttnpb.EndDeviceTemplate { return nil }
+
+func (*mock) FormatID() string {
+	return "test"
+}
 
 func (m mock) MarshalText() ([]byte, error) {
 	return []byte(fmt.Sprintf("%s:%s", m.ids.JoinEui, m.ids.DevEui)), nil
@@ -73,8 +77,4 @@ func (mockFormat) Format() *ttnpb.QRCodeFormat {
 
 func (mockFormat) New() enddevices.Data {
 	return new(mock)
-}
-
-func (mockFormat) ID() string {
-	return "test"
 }

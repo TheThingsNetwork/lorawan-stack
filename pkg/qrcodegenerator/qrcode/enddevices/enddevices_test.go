@@ -37,7 +37,7 @@ func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 		ExpectedAuthenticationCode string
 	}{
 		{
-			FormatID:                   "tr005",
+			FormatID:                   "tr005draft3",
 			Data:                       []byte("URN:DEV:LW:42FFFFFFFFFFFFFF_4242FFFFFFFFFFFF_42FFFF42_V0102"),
 			ExpectedJoinEUI:            types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ExpectedDevEUI:             types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -55,15 +55,13 @@ func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 			a := assertions.New(t)
 
 			qrCode := New(context.Background())
-			qrCode.RegisterEndDeviceFormat("tr005", new(LoRaAllianceTR005Format))
-			qrCode.RegisterEndDeviceFormat("tr005draft2", new(LoRaAllianceTR005Draft2Format))
-			qrCode.RegisterEndDeviceFormat("tr005draft3", new(LoRaAllianceTR005Draft3Format))
 
 			d, err := qrCode.Parse("", tc.Data)
 			data := test.Must(d, err).(Data)
 
-			formatID, edt := data.EndDeviceInfo()
-			a.So(formatID, should.Equal, tc.FormatID)
+			edt := data.EndDeviceTemplate()
+			a.So(edt, should.NotBeNil)
+			a.So(data.FormatID(), should.Equal, tc.FormatID)
 			endDevice := edt.GetEndDevice()
 
 			a.So(endDevice, should.NotBeEmpty)
@@ -81,11 +79,12 @@ func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 type mock struct {
 }
 
-func (mock) Validate() error                                    { return nil }
-func (*mock) Encode(*ttnpb.EndDevice) error                     { return nil }
-func (mock) MarshalText() ([]byte, error)                       { return nil, nil }
-func (*mock) UnmarshalText([]byte) error                        { return nil }
-func (*mock) EndDeviceInfo() (string, *ttnpb.EndDeviceTemplate) { return "", nil }
+func (mock) Validate() error                              { return nil }
+func (*mock) Encode(*ttnpb.EndDevice) error               { return nil }
+func (mock) MarshalText() ([]byte, error)                 { return nil, nil }
+func (*mock) UnmarshalText([]byte) error                  { return nil }
+func (*mock) EndDeviceTemplate() *ttnpb.EndDeviceTemplate { return nil }
+func (*mock) FormatID() string                            { return "mock" }
 
 type mockFormat struct {
 }

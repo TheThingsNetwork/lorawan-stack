@@ -40,14 +40,16 @@ var (
 type Format interface {
 	Format() *ttnpb.QRCodeFormat
 	New() Data
-	// Return the ID of this format as a string.
-	ID() string
 }
 
 // Data represents end device QR code data.
 type Data interface {
 	qrcode.Data
 	Encode(*ttnpb.EndDevice) error
+	// FormatID returns the ID of the format used to parse the QR Code data.
+	FormatID() string
+	// EndDeviceTemplate returns the End Device Template corresponding to the QR code data.
+	EndDeviceTemplate() *ttnpb.EndDeviceTemplate
 }
 
 // Server provides methods for end device QR codes.
@@ -57,7 +59,13 @@ type Server struct {
 
 // New returns a new Server.
 func New(ctx context.Context) *Server {
-	return &Server{}
+	s := &Server{}
+
+	// Register known formats.
+	s.endDeviceFormats.Store(formatIDLoRaAllianceTR005, new(LoRaAllianceTR005Format))
+	s.endDeviceFormats.Store(formatIDLoRaAllianceTR005Draft2, new(LoRaAllianceTR005Draft2Format))
+	s.endDeviceFormats.Store(formatIDLoRaAllianceTR005Draft3, new(LoRaAllianceTR005Draft3Format))
+	return s
 }
 
 // GetEndDeviceFormats returns the registered end device QR code formats.

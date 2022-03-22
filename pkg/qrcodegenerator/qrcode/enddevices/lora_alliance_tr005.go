@@ -147,8 +147,13 @@ func (m *LoRaAllianceTR005) UnmarshalText(text []byte) error {
 	return m.Validate()
 }
 
-// EndDeviceInfo implements the Data interface.
-func (m *LoRaAllianceTR005) EndDeviceInfo() (string, *ttnpb.EndDeviceTemplate) {
+// FormatID implements the Data interface.
+func (m *LoRaAllianceTR005) FormatID() string {
+	return formatIDLoRaAllianceTR005
+}
+
+// EndDeviceTemplate implements the Data interface.
+func (m *LoRaAllianceTR005) EndDeviceTemplate() *ttnpb.EndDeviceTemplate {
 	paths := []string{
 		"ids",
 		"claim_authentication_code",
@@ -166,7 +171,7 @@ func (m *LoRaAllianceTR005) EndDeviceInfo() (string, *ttnpb.EndDeviceTemplate) {
 	if len(attributes) > 0 {
 		paths = append(paths, "attributes")
 	}
-	return formatIDLoRaAllianceTR005, &ttnpb.EndDeviceTemplate{
+	return &ttnpb.EndDeviceTemplate{
 		EndDevice: &ttnpb.EndDevice{
 			Ids: &ttnpb.EndDeviceIdentifiers{
 				DevEui:  &m.DevEUI,

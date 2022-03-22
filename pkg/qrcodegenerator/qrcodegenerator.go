@@ -51,17 +51,7 @@ func New(c *component.Component, conf *Config) (*QRCodeGenerator, error) {
 		ctx:       ctx,
 	}
 	qrg.grpc.endDeviceQRCodeGenerator = &endDeviceQRCodeGeneratorServer{QRG: qrg}
-
-	// Register known end device formats.
 	qrg.endDevices = enddevices.New(ctx)
-	formats := []enddevices.Format{
-		new(enddevices.LoRaAllianceTR005Format),
-		new(enddevices.LoRaAllianceTR005Draft2Format),
-		new(enddevices.LoRaAllianceTR005Draft3Format),
-	}
-	for _, format := range formats {
-		qrg.endDevices.RegisterEndDeviceFormat(format.ID(), format)
-	}
 
 	c.RegisterGRPC(qrg)
 	return qrg, nil

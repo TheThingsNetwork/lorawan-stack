@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,15 +17,11 @@ package qrcode
 
 import (
 	"encoding"
-
-	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 // Data represents QR code data.
 type Data interface {
 	Validate() error
-	// EndDeviceInfo returns the format ID as a string and the End Device Template corresponding to the QR code data.
-	EndDeviceInfo() (string, *ttnpb.EndDeviceTemplate)
 	encoding.TextMarshaler
 	encoding.TextUnmarshaler
 }
