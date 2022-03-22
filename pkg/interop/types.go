@@ -307,6 +307,11 @@ func (v *VendorID) UnmarshalText(data []byte) error {
 	return nil
 }
 
+// MarshalNumber returns the numeric value.
+func (v VendorID) MarshalNumber() uint32 {
+	return uint32(v[0])<<16 | uint32(v[1])<<8 | uint32(v[2])
+}
+
 // KeyEnvelope contains a (encrypted) key.
 type KeyEnvelope ttnpb.KeyEnvelope
 

@@ -17,27 +17,14 @@ package deviceclaimingserver
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
+	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/enddevices"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 	"google.golang.org/grpc"
 )
-
-// EndDeviceClaimingUpstream provides upstream methods.
-type EndDeviceClaimingUpstream interface {
-	// SupportsJoinEUI returns whether this EndDeviceClaimingServer is configured to a Join Server that supports this Join EUI.
-	SupportsJoinEUI(types.EUI64) bool
-	// RegisterRoutes registers web routes.
-	RegisterRoutes(server *web.Server)
-
-	Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest) (ids *ttnpb.EndDeviceIdentifiers, err error)
-	AuthorizeApplication(ctx context.Context, req *ttnpb.AuthorizeApplicationRequest) (*pbtypes.Empty, error)
-	UnauthorizeApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error)
-}
 
 // DeviceClaimingServer is the Device Claiming Server.
 type DeviceClaimingServer struct {
@@ -46,7 +33,9 @@ type DeviceClaimingServer struct {
 
 	config Config
 
-	endDeviceClaimingUpstreams    map[string]EndDeviceClaimingUpstream
+	endDeviceClaimingUpstream *enddevices.Upstream
+	endDeviceClaimingFallback Fallback
+
 	gatewayClaimingServerUpstream ttnpb.GatewayClaimingServerServer
 
 	grpc struct {
@@ -64,24 +53,27 @@ func New(c *component.Component, conf *Config, opts ...Option) (*DeviceClaimingS
 	ctx := log.NewContextWithField(c.Context(), "namespace", "deviceclaimingserver")
 
 	dcs := &DeviceClaimingServer{
-		Component:                  c,
-		ctx:                        ctx,
-		config:                     *conf,
-		endDeviceClaimingUpstreams: make(map[string]EndDeviceClaimingUpstream),
+		Component: c,
+		ctx:       ctx,
+		config:    *conf,
 	}
 	for _, opt := range opts {
 		opt(dcs)
 	}
 
-	dcs.endDeviceClaimingUpstreams[defaultType] = noopEDCS{}
 	dcs.gatewayClaimingServerUpstream = noopGCLS{}
 
-	// TODO: Implement JS Clients (https://github.com/TheThingsNetwork/lorawan-stack/issues/4841#issuecomment-998294988)
-	// Switch on the API type defined for a Join EUI and instantiate clients and add to `dcs.endDeviceClaimingUpstreams`.
+	upstream, err := enddevices.NewUpstream(ctx, conf.EndDeviceClaimingServerConfig, c)
+	if err != nil {
+		return nil, err
+	}
+	dcs.endDeviceClaimingFallback = noopEDCS{}
+	dcs.endDeviceClaimingUpstream = upstream
 
 	dcs.grpc.endDeviceClaimingServer = &endDeviceClaimingServer{
 		DCS: dcs,
 	}
+
 	dcs.grpc.gatewayClaimingServer = &gatewayClaimingServer{
 		DCS: dcs,
 	}
@@ -118,7 +110,5 @@ func (dcs *DeviceClaimingServer) RegisterHandlers(s *runtime.ServeMux, conn *grp
 
 // RegisterRoutes implements web.Registerer. It registers the Device Claiming Server to the web server.
 func (dcs *DeviceClaimingServer) RegisterRoutes(server *web.Server) {
-	for _, edcs := range dcs.endDeviceClaimingUpstreams {
-		edcs.RegisterRoutes(server)
-	}
+	dcs.endDeviceClaimingFallback.RegisterRoutes(server)
 }

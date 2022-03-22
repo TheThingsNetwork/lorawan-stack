@@ -4558,7 +4558,7 @@
     },
     "/edcs/claim": {
       "post": {
-        "summary": "Claims the end device by claim authentication code or QR code and transfers the device to the target application.",
+        "summary": "Claims the end device on a Join Server by claim authentication code or QR code.",
         "operationId": "EndDeviceClaimingServer_Claim",
         "responses": {
           "200": {
@@ -4582,6 +4582,159 @@
             "schema": {
               "$ref": "#/definitions/v3ClaimEndDeviceRequest"
             }
+          }
+        ],
+        "tags": [
+          "EndDeviceClaimingServer"
+        ]
+      }
+    },
+    "/edcs/claim/info": {
+      "post": {
+        "summary": "Return whether claiming is available for a given JoinEUI.",
+        "operationId": "EndDeviceClaimingServer_GetInfoByJoinEUI",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetInfoByJoinEUIResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3GetInfoByJoinEUIRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EndDeviceClaimingServer"
+        ]
+      }
+    },
+    "/edcs/claim/{application_ids.application_id}/devices/{device_id}": {
+      "get": {
+        "summary": "Gets the claim status of an end device.",
+        "operationId": "EndDeviceClaimingServer_GetClaimStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3GetClaimStatusResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          }
+        ],
+        "tags": [
+          "EndDeviceClaimingServer"
+        ]
+      },
+      "delete": {
+        "summary": "Unclaims the end device on a Join Server.",
+        "operationId": "EndDeviceClaimingServer_Unclaim",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "dev_eui",
+            "description": "The LoRaWAN DevEUI.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "join_eui",
+            "description": "The LoRaWAN JoinEUI (AppEUI until LoRaWAN 1.0.3 end devices).",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
+          },
+          {
+            "name": "dev_addr",
+            "description": "The LoRaWAN DevAddr.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "byte"
           }
         ],
         "tags": [
@@ -11249,6 +11402,19 @@
         }
       }
     },
+    "GetClaimStatusResponseVendorSpecific": {
+      "type": "object",
+      "properties": {
+        "organization_unique_identifier": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "data": {
+          "type": "object",
+          "description": "Vendor Specific data in JSON format."
+        }
+      }
+    },
     "GetPhyVersionsResponseVersionInfo": {
       "type": "object",
       "properties": {
@@ -15331,6 +15497,25 @@
         }
       }
     },
+    "v3GetClaimStatusResponse": {
+      "type": "object",
+      "properties": {
+        "end_device_ids": {
+          "$ref": "#/definitions/v3EndDeviceIdentifiers"
+        },
+        "home_net_id": {
+          "type": "string",
+          "format": "byte"
+        },
+        "home_ns_id": {
+          "type": "string",
+          "format": "byte"
+        },
+        "vendor_specific": {
+          "$ref": "#/definitions/GetClaimStatusResponseVendorSpecific"
+        }
+      }
+    },
     "v3GetCollaboratorResponse": {
       "type": "object",
       "properties": {
@@ -15360,6 +15545,28 @@
         "contents": {
           "type": "string",
           "format": "byte"
+        }
+      }
+    },
+    "v3GetInfoByJoinEUIRequest": {
+      "type": "object",
+      "properties": {
+        "join_eui": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "v3GetInfoByJoinEUIResponse": {
+      "type": "object",
+      "properties": {
+        "join_eui": {
+          "type": "string",
+          "format": "byte"
+        },
+        "supports_claiming": {
+          "type": "boolean",
+          "description": "If set, this Join EUI is available for claiming on one of the configured Join Servers."
         }
       }
     },

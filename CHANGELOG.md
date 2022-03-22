@@ -12,6 +12,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Support for importing end devices using a CSV file. See [documentation](https://www.thethingsindustries.com/docs/reference/data-formats/#csv) for the data format.
+- Support claiming end devices in an external Join Server (ex: The Things Join Server).
 
 ### Changed
 

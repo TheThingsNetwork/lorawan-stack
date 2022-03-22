@@ -19,47 +19,50 @@ import (
 	"encoding/json"
 )
 
-var tti = VendorID{0xec, 0x65, 0x6e}
+// TTIVendorID is the vendor ID of The Things Industries.
+var TTIVendorID = VendorID{0xec, 0x65, 0x6e}
 
-// IsTheThingsIndustries returns true if the vendor ID is The Things Industries.
-func (v VendorID) IsTheThingsIndustries() bool {
-	return bytes.Equal(v[:], tti[:])
-}
-
-type TTIVendorID VendorID
+// TTIVendorIDType is the custom type for The Things Industries vendor ID.
+type TTIVendorIDType VendorID
 
 // MarshalText returns the vendor ID of The Things Industries.
-func (v TTIVendorID) MarshalText() ([]byte, error) {
-	return tti.MarshalText()
+func (v TTIVendorIDType) MarshalText() ([]byte, error) {
+	return TTIVendorID.MarshalText()
 }
 
 // UnmarshalText returns an error if the vendor ID is not of The Things Industries.
-func (v *TTIVendorID) UnmarshalText(data []byte) error {
+func (v *TTIVendorIDType) UnmarshalText(data []byte) error {
 	var vid VendorID
 	if err := vid.UnmarshalText(data); err != nil {
 		return err
 	}
-	if !vid.IsTheThingsIndustries() {
+	if !bytes.Equal(vid[:], TTIVendorID[:]) {
 		return errInvalidVendorID.New()
 	}
-	*v = TTIVendorID(vid)
+	*v = TTIVendorIDType(vid)
 	return nil
 }
 
-// TTIHomeNSAns is HomeNSAns with vendor extension of The Things Industries.
-type TTIHomeNSAns struct {
-	HomeNSAns
+// TTIVSExtension is vendor extension of The Things Industries.
+type TTIVSExtension struct {
 	// HTenantID is the Tenant ID within a host HNetID.
 	HTenantID string
 	// HNSAddress is the Home Network Server address.
 	HNSAddress string
 }
 
+// TTIHomeNSAns is HomeNSAns with vendor extension of The Things Industries.
+type TTIHomeNSAns struct {
+	HomeNSAns
+	TTIVSExtension
+}
+
+// MarshalJSON implements json.Unmarshaler.
 func (m TTIHomeNSAns) MarshalJSON() ([]byte, error) {
 	aux := struct {
 		HomeNSAns
 		VSExtension struct {
-			VendorID TTIVendorID
+			VendorID TTIVendorIDType
 			Object   struct {
 				TTSV3 struct {
 					HTenantID  string `json:",omitempty"`
@@ -75,11 +78,12 @@ func (m TTIHomeNSAns) MarshalJSON() ([]byte, error) {
 	return json.Marshal(aux)
 }
 
+// UnmarshalJSON implements json.Unmarshaler.
 func (m *TTIHomeNSAns) UnmarshalJSON(data []byte) error {
 	var aux struct {
 		HomeNSAns
 		VSExtension struct {
-			VendorID TTIVendorID
+			VendorID TTIVendorIDType
 			Object   struct {
 				TTSV3 struct {
 					HTenantID  string `json:",omitempty"`
@@ -92,9 +96,11 @@ func (m *TTIHomeNSAns) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	*m = TTIHomeNSAns{
-		HomeNSAns:  aux.HomeNSAns,
-		HTenantID:  aux.VSExtension.Object.TTSV3.HTenantID,
-		HNSAddress: aux.VSExtension.Object.TTSV3.HNSAddress,
+		HomeNSAns: aux.HomeNSAns,
+		TTIVSExtension: TTIVSExtension{
+			HTenantID:  aux.VSExtension.Object.TTSV3.HTenantID,
+			HNSAddress: aux.VSExtension.Object.TTSV3.HNSAddress,
+		},
 	}
 	return nil
 }

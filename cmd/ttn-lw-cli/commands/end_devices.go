@@ -154,6 +154,9 @@ func generateKey() *types.AES128Key {
 var (
 	errJoinServerDisabled    = errors.DefineFailedPrecondition("join_server_disabled", "Join Server is disabled")
 	errNetworkServerDisabled = errors.DefineFailedPrecondition("network_server_disabled", "Network Server is disabled")
+	errEndDeviceClaimInfo    = errors.DefineFailedPrecondition("end_device_claim_info", "could not get end device claim info from DCS")
+	errEndDeviceClaim        = errors.DefineFailedPrecondition("end_device_claim", "could not claim end device")
+	errEndDeviceUnclaim      = errors.DefineFailedPrecondition("end_device_unclaim", "could not unclaim end device")
 )
 
 var searchEndDevicesFlags = func() *pflag.FlagSet {
@@ -307,7 +310,7 @@ var (
 			}
 
 			if len(jsPaths) > 0 && device.JoinServerAddress == "" {
-				logger.WithField("paths", jsPaths).Debug("No registered Join Server address, deselecting Join Server paths")
+				logger.WithField("paths", jsPaths).Debug("End Device uses external Join Server, deselecting Join Server paths")
 				jsPaths = nil
 			}
 
@@ -455,8 +458,8 @@ var (
 						paths = append(paths,
 							"join_server_address",
 						)
-						if devID.JoinEui == nil {
-							// Get the default JoinEUI for JS.
+						if device.Ids.JoinEui == nil {
+							// Get the default JoinEUI for Join Server.
 							logger.WithField("join_server_address", config.JoinServerGRPCAddress).Info("JoinEUI empty but defaults flag is set, fetch default JoinEUI of the Join Server")
 							js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
 							if err != nil {
@@ -505,6 +508,9 @@ var (
 				}
 				paths = append(paths, "claim_authentication_code")
 			}
+
+			claimOnExternalJS := len(device.ClaimAuthenticationCode.GetValue()) > 0
+
 			if hasUpdateDeviceLocationFlags(cmd.Flags()) {
 				updateDeviceLocation(device, cmd.Flags())
 				paths = append(paths, "locations")
@@ -559,6 +565,45 @@ var (
 
 			isPaths, nsPaths, asPaths, jsPaths := splitEndDeviceSetPaths(device.SupportsJoin, paths...)
 
+			// If CAC is set, attempt to claim the End Device via the DCS instead of registering on the Join Server.
+			if claimOnExternalJS {
+				dcs, err := api.Dial(ctx, config.DeviceClaimingServerGRPCAddress)
+				if err != nil {
+					return err
+				}
+				claimInfoResp, err := ttnpb.NewEndDeviceClaimingServerClient(dcs).GetInfoByJoinEUI(ctx, &ttnpb.GetInfoByJoinEUIRequest{
+					JoinEui: device.Ids.JoinEui,
+				})
+				if err != nil {
+					return errEndDeviceClaimInfo.WithCause(err)
+				}
+				if claimInfoResp.SupportsClaiming {
+					_, err = ttnpb.NewEndDeviceClaimingServerClient(dcs).Claim(ctx, &ttnpb.ClaimEndDeviceRequest{
+						TargetApplicationIds: device.Ids.ApplicationIds,
+						TargetDeviceId:       device.Ids.DeviceId,
+						SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
+							AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
+								JoinEui:            *device.Ids.JoinEui,
+								DevEui:             *device.Ids.DevEui,
+								AuthenticationCode: device.ClaimAuthenticationCode.Value,
+							},
+						},
+						TargetNetworkServerAddress: device.NetworkServerAddress,
+					})
+					if err != nil {
+						return errEndDeviceClaim.WithCause(err)
+					}
+					logger.Info("Device successfully claimed, skip registering on the cluster Join Server")
+					// Remove Cluster Join Server related paths.
+					jsPaths = []string{}
+					isPaths = ttnpb.ExcludeFields(isPaths, "join_server_address")
+					device.JoinServerAddress = ""
+				} else {
+					// TODO: Remove this path once the legacy DCS is deprecated (https://github.com/TheThingsIndustries/lorawan-stack/issues/3036).
+					logger.Info("Device not configured for claiming, register in the cluster Join Server")
+				}
+			}
+
 			// Require EUIs for devices that need to be added to the Join Server.
 			if len(jsPaths) > 0 && (device.Ids.JoinEui == nil || device.Ids.DevEui == nil) {
 				return errNoEndDeviceEUI.New()
@@ -578,7 +623,7 @@ var (
 			res, err := setEndDevice(device, nil, nsPaths, asPaths, jsPaths, nil, true, false)
 			if err != nil {
 				logger.WithError(err).Error("Could not create end device, rolling back...")
-				if err := deleteEndDevice(context.Background(), device.Ids); err != nil {
+				if err := deleteEndDevice(context.Background(), device.Ids, claimOnExternalJS); err != nil {
 					logger.WithError(err).Error("Could not roll back end device creation")
 				}
 				return err
@@ -673,9 +718,12 @@ var (
 				return err
 			}
 			logger.WithField("paths", isPaths).Debug("Get end device from Identity Server")
+
+			// Always get the join server address to determine if the device uses an external Join Server.
+			isGetPaths := ttnpb.AddFields(isPaths, "join_server_address")
 			existingDevice, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: devID,
-				FieldMask:    &pbtypes.FieldMask{Paths: ttnpb.ExcludeFields(isPaths, unsetPaths...)},
+				FieldMask:    &pbtypes.FieldMask{Paths: ttnpb.ExcludeFields(isGetPaths, unsetPaths...)},
 			})
 			if err != nil {
 				return err
@@ -701,8 +749,18 @@ var (
 			if len(jsPaths) > 0 && (device.Ids.JoinEui == nil || device.Ids.DevEui == nil) {
 				return errNoEndDeviceEUI.New()
 			}
+			nsMismatch, asMismatch, jsMismatch := compareServerAddressesEndDevice(existingDevice, config)
 
-			if nsMismatch, asMismatch, jsMismatch := compareServerAddressesEndDevice(existingDevice, config); nsMismatch || asMismatch || jsMismatch {
+			if nsMismatch || asMismatch {
+				return errAddressMismatchEndDevice.New()
+			}
+
+			if len(jsPaths) > 0 && existingDevice.JoinServerAddress == "" {
+				// End Device uses external Join Server. Disable dialing cluster Join Server.
+				// If End Device claim needs to be updated, add those fields here and dial the DCS.
+				logger.WithField("paths", jsPaths).Debug("End Device uses external Join Server, deselecting Join Server paths")
+				jsPaths = []string{}
+			} else if jsMismatch {
 				return errAddressMismatchEndDevice.New()
 			}
 
@@ -909,11 +967,39 @@ var (
 				devID.DevEui = existingDevice.Ids.DevEui
 			}
 
-			if nsMismatch, asMismatch, jsMismatch := compareServerAddressesEndDevice(existingDevice, config); nsMismatch || asMismatch || jsMismatch {
+			var skipClusterJS bool
+			nsMismatch, asMismatch, jsMismatch := compareServerAddressesEndDevice(existingDevice, config)
+
+			if nsMismatch || asMismatch {
 				return errAddressMismatchEndDevice.New()
 			}
 
-			return deleteEndDevice(ctx, devID)
+			if existingDevice.JoinServerAddress == "" {
+				// Attempt to unclaim device via the DCS.
+				dcs, err := api.Dial(ctx, config.DeviceClaimingServerGRPCAddress)
+				if err != nil {
+					return err
+				}
+				claimInfoResp, err := ttnpb.NewEndDeviceClaimingServerClient(dcs).GetInfoByJoinEUI(ctx, &ttnpb.GetInfoByJoinEUIRequest{
+					JoinEui: devID.JoinEui,
+				})
+				if err != nil {
+					return errEndDeviceClaimInfo.WithCause(err)
+				}
+				if claimInfoResp.SupportsClaiming {
+					_, err = ttnpb.NewEndDeviceClaimingServerClient(dcs).Unclaim(ctx, devID)
+					if err != nil {
+						return errEndDeviceUnclaim.WithCause(err)
+					}
+					logger.Info("Device successfully unclaimed")
+					skipClusterJS = true
+				}
+			} else if jsMismatch {
+				// Check if there's an address mismatch only if using the cluster Join Server.
+				return errAddressMismatchEndDevice.New()
+			}
+
+			return deleteEndDevice(ctx, devID, skipClusterJS)
 		},
 	}
 	endDevicesClaimCommand = &cobra.Command{

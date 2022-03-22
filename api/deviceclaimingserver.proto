@@ -17,6 +17,7 @@ syntax = "proto3";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
 import "google/protobuf/empty.proto";
 import "lorawan-stack/api/identifiers.proto";
 
@@ -79,14 +80,60 @@ message AuthorizeApplicationRequest {
   ];
 }
 
+message GetInfoByJoinEUIRequest {
+  bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+}
+
+message GetInfoByJoinEUIResponse {
+  bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+  // If set, this Join EUI is available for claiming on one of the configured Join Servers.
+  bool supports_claiming = 2;
+}
+
+message GetClaimStatusResponse {
+  EndDeviceIdentifiers end_device_ids = 1 [(validate.rules).message.required = true];
+  bytes home_net_id = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
+  bytes home_ns_id = 3 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+
+  message VendorSpecific{
+    uint32 organization_unique_identifier = 1;
+    // Vendor Specific data in JSON format.
+    google.protobuf.Struct data = 2;
+  }
+
+  VendorSpecific vendor_specific = 4;
+}
+
 // The EndDeviceClaimingServer service configures authorization to claim end devices registered in an application,
 // and allows clients to claim end devices.
 service EndDeviceClaimingServer {
-  // Claims the end device by claim authentication code or QR code and transfers the device to the target application.
+  // Claims the end device on a Join Server by claim authentication code or QR code.
   rpc Claim(ClaimEndDeviceRequest) returns (EndDeviceIdentifiers) {
     option (google.api.http) = {
       post: "/edcs/claim",
       body: "*"
+    };
+  };
+
+  // Unclaims the end device on a Join Server.
+  rpc Unclaim(EndDeviceIdentifiers) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/edcs/claim/{application_ids.application_id}/devices/{device_id}",
+    };
+  };
+
+  // Return whether claiming is available for a given JoinEUI.
+  rpc GetInfoByJoinEUI(GetInfoByJoinEUIRequest) returns (GetInfoByJoinEUIResponse) {
+    option (google.api.http) = {
+      post: "/edcs/claim/info",
+      body: "*"
+    };
+  };
+
+  // Gets the claim status of an end device.
+  rpc GetClaimStatus(EndDeviceIdentifiers) returns (GetClaimStatusResponse) {
+    option (google.api.http) = {
+      get: "/edcs/claim/{application_ids.application_id}/devices/{device_id}",
     };
   };
 

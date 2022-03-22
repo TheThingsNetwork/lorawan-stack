@@ -492,8 +492,10 @@ func TestInteropHomeNSRequest(t *testing.T) {
 					HNetID: interop.NetID{0x42, 0xff, 0xff},
 					// NOTE: HNSID is not returned as the field is not supported in LoRaWAN Backend Interfaces 1.0.
 				},
-				HTenantID:  "foo-tenant",
-				HNSAddress: "thethings.example.com",
+				TTIVSExtension: interop.TTIVSExtension{
+					HTenantID:  "foo-tenant",
+					HNSAddress: "thethings.example.com",
+				},
 			},
 		},
 		{

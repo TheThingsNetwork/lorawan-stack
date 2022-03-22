@@ -43,6 +43,43 @@ var AuthorizeApplicationRequestFieldPathsTopLevel = []string{
 	"api_key",
 	"application_ids",
 }
+var GetInfoByJoinEUIRequestFieldPathsNested = []string{
+	"join_eui",
+}
+
+var GetInfoByJoinEUIRequestFieldPathsTopLevel = []string{
+	"join_eui",
+}
+var GetInfoByJoinEUIResponseFieldPathsNested = []string{
+	"join_eui",
+	"supports_claiming",
+}
+
+var GetInfoByJoinEUIResponseFieldPathsTopLevel = []string{
+	"join_eui",
+	"supports_claiming",
+}
+var GetClaimStatusResponseFieldPathsNested = []string{
+	"end_device_ids",
+	"end_device_ids.application_ids",
+	"end_device_ids.application_ids.application_id",
+	"end_device_ids.dev_addr",
+	"end_device_ids.dev_eui",
+	"end_device_ids.device_id",
+	"end_device_ids.join_eui",
+	"home_net_id",
+	"home_ns_id",
+	"vendor_specific",
+	"vendor_specific.data",
+	"vendor_specific.organization_unique_identifier",
+}
+
+var GetClaimStatusResponseFieldPathsTopLevel = []string{
+	"end_device_ids",
+	"home_net_id",
+	"home_ns_id",
+	"vendor_specific",
+}
 var CUPSRedirectionFieldPathsNested = []string{
 	"current_gateway_key",
 	"gateway_credentials",
@@ -116,6 +153,15 @@ var ClaimEndDeviceRequest_AuthenticatedIdentifiersFieldPathsTopLevel = []string{
 	"authentication_code",
 	"dev_eui",
 	"join_eui",
+}
+var GetClaimStatusResponse_VendorSpecificFieldPathsNested = []string{
+	"data",
+	"organization_unique_identifier",
+}
+
+var GetClaimStatusResponse_VendorSpecificFieldPathsTopLevel = []string{
+	"data",
+	"organization_unique_identifier",
 }
 var CUPSRedirection_ClientTLSFieldPathsNested = []string{
 	"cert",

@@ -239,6 +239,135 @@ func (dst *AuthorizeApplicationRequest) SetFields(src *AuthorizeApplicationReque
 	return nil
 }
 
+func (dst *GetInfoByJoinEUIRequest) SetFields(src *GetInfoByJoinEUIRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "join_eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.JoinEui = src.JoinEui
+			} else {
+				dst.JoinEui = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GetInfoByJoinEUIResponse) SetFields(src *GetInfoByJoinEUIResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "join_eui":
+			if len(subs) > 0 {
+				return fmt.Errorf("'join_eui' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.JoinEui = src.JoinEui
+			} else {
+				dst.JoinEui = nil
+			}
+		case "supports_claiming":
+			if len(subs) > 0 {
+				return fmt.Errorf("'supports_claiming' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SupportsClaiming = src.SupportsClaiming
+			} else {
+				var zero bool
+				dst.SupportsClaiming = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GetClaimStatusResponse) SetFields(src *GetClaimStatusResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "end_device_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EndDeviceIdentifiers
+				if (src == nil || src.EndDeviceIds == nil) && dst.EndDeviceIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.EndDeviceIds
+				}
+				if dst.EndDeviceIds != nil {
+					newDst = dst.EndDeviceIds
+				} else {
+					newDst = &EndDeviceIdentifiers{}
+					dst.EndDeviceIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EndDeviceIds = src.EndDeviceIds
+				} else {
+					dst.EndDeviceIds = nil
+				}
+			}
+		case "home_net_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'home_net_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.HomeNetId = src.HomeNetId
+			} else {
+				dst.HomeNetId = nil
+			}
+		case "home_ns_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'home_ns_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.HomeNsId = src.HomeNsId
+			} else {
+				dst.HomeNsId = nil
+			}
+		case "vendor_specific":
+			if len(subs) > 0 {
+				var newDst, newSrc *GetClaimStatusResponse_VendorSpecific
+				if (src == nil || src.VendorSpecific == nil) && dst.VendorSpecific == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.VendorSpecific
+				}
+				if dst.VendorSpecific != nil {
+					newDst = dst.VendorSpecific
+				} else {
+					newDst = &GetClaimStatusResponse_VendorSpecific{}
+					dst.VendorSpecific = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.VendorSpecific = src.VendorSpecific
+				} else {
+					dst.VendorSpecific = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *CUPSRedirection) SetFields(src *CUPSRedirection, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -590,6 +719,36 @@ func (dst *ClaimEndDeviceRequest_AuthenticatedIdentifiers) SetFields(src *ClaimE
 			} else {
 				var zero string
 				dst.AuthenticationCode = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *GetClaimStatusResponse_VendorSpecific) SetFields(src *GetClaimStatusResponse_VendorSpecific, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "organization_unique_identifier":
+			if len(subs) > 0 {
+				return fmt.Errorf("'organization_unique_identifier' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.OrganizationUniqueIdentifier = src.OrganizationUniqueIdentifier
+			} else {
+				var zero uint32
+				dst.OrganizationUniqueIdentifier = zero
+			}
+		case "data":
+			if len(subs) > 0 {
+				return fmt.Errorf("'data' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Data = src.Data
+			} else {
+				dst.Data = nil
 			}
 
 		default:
