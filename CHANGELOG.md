@@ -28,6 +28,7 @@ For details about compatibility between different releases, see the **Commitment
 - Fix issues in the webhook forms causing webhooks to be created with all message types enabled and no way of deactivating message types.
 - Fix validation issue in the webhook form not detecting message type paths with more than 64 characters.
 - Fix "reactivate"-webhook button in the Console.
+- Port returned by the LBS LNS discovery message if standard 80/443 ports are used.
 
 ### Security
 
