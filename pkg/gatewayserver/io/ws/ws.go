@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"net"
 	"net/http"
 	"regexp"
 	"strings"
@@ -129,14 +130,18 @@ func (s *srv) handleConnectionInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// If port is retrievable from the host, use it.
-	address := strings.Split(r.Host, ":")
-	if len(address) == 2 {
-		port = address[1]
+	host, p, err := net.SplitHostPort(r.Host)
+	if err == nil {
+		// Both `host` and `p` are valid, since we have no error.
+		port = p
+	} else {
+		// `host` and `p` are unknown/empty. Reset `host` to `r.Host` since it does not contain the port.
+		host = r.Host
 	}
 
 	info := ServerInfo{
 		Scheme:  scheme,
-		Address: fmt.Sprintf("%s:%s", address[0], port),
+		Address: net.JoinHostPort(host, port),
 	}
 
 	resp := s.formatter.HandleConnectionInfo(ctx, data, s.server, info, time.Now())
