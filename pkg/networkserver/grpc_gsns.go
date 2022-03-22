@@ -53,15 +53,15 @@ const (
 
 // UplinkDeduplicator represents an entity, that deduplicates uplinks and accumulates metadata.
 type UplinkDeduplicator interface {
-	// DeduplicateUplink deduplicates an uplink message for specified time.Duration.
+	// DeduplicateUplink deduplicates an uplink message for specified time.Duration, in the provided round.
 	// DeduplicateUplink returns true if the uplink is not a duplicate or false and error, if any, otherwise.
-	DeduplicateUplink(context.Context, *ttnpb.UplinkMessage, time.Duration) (bool, error)
-	// AccumulatedMetadata returns accumulated metadata for specified uplink message and error, if any.
-	AccumulatedMetadata(context.Context, *ttnpb.UplinkMessage) ([]*ttnpb.RxMetadata, error)
+	DeduplicateUplink(ctx context.Context, up *ttnpb.UplinkMessage, window time.Duration, round uint64) (first bool, err error)
+	// AccumulatedMetadata returns accumulated metadata for specified uplink message in the provided round and error, if any.
+	AccumulatedMetadata(ctx context.Context, up *ttnpb.UplinkMessage, round uint64) (mds []*ttnpb.RxMetadata, err error)
 }
 
-func (ns *NetworkServer) deduplicateUplink(ctx context.Context, up *ttnpb.UplinkMessage, window time.Duration) (bool, error) {
-	ok, err := ns.uplinkDeduplicator.DeduplicateUplink(ctx, up, window)
+func (ns *NetworkServer) deduplicateUplink(ctx context.Context, up *ttnpb.UplinkMessage, window time.Duration, round uint64) (bool, error) {
+	ok, err := ns.uplinkDeduplicator.DeduplicateUplink(ctx, up, window, round)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to deduplicate uplink")
 		return false, err
@@ -727,8 +727,8 @@ var handleDataUplinkGetPaths = [...]string{
 
 // mergeMetadata merges the metadata collected for up.
 // mergeMetadata mutates up.RxMetadata.
-func (ns *NetworkServer) mergeMetadata(ctx context.Context, up *ttnpb.UplinkMessage) {
-	mds, err := ns.uplinkDeduplicator.AccumulatedMetadata(ctx, up)
+func (ns *NetworkServer) mergeMetadata(ctx context.Context, up *ttnpb.UplinkMessage, round uint64) {
+	mds, err := ns.uplinkDeduplicator.AccumulatedMetadata(ctx, up, round)
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Error("Failed to merge metadata")
 		return
@@ -767,6 +767,10 @@ func (ns *NetworkServer) filterMetadata(ctx context.Context, up *ttnpb.UplinkMes
 	}
 }
 
+const (
+	initialDeduplicationRound = iota
+)
+
 func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkMessage) (err error) {
 	defer trace.StartRegion(ctx, "handle data uplink").End()
 
@@ -785,16 +789,16 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		"uplink_f_cnt", pld.FHdr.FCnt,
 	))
 
-	ok, err := ns.deduplicateUplink(ctx, up, ns.collectionWindow(ctx))
+	ok, err := ns.deduplicateUplink(ctx, up, ns.collectionWindow(ctx), initialDeduplicationRound)
 	if err != nil {
 		return err
 	}
 	if !ok {
-		trace.Log(ctx, "ns", "message is duplicate")
+		trace.Log(ctx, "ns", "message is duplicate (initial round)")
 		registerReceiveDuplicateUplink(ctx, up)
 		return nil
 	}
-	trace.Log(ctx, "ns", "message is original")
+	trace.Log(ctx, "ns", "message is original (initial round)")
 
 	ctx, flushMatchStats := newContextWithMatchStats(ctx)
 	defer flushMatchStats()
@@ -887,7 +891,7 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 		return ctx.Err()
 	case <-ns.deduplicationDone(ctx, up):
 	}
-	ns.mergeMetadata(ctx, up)
+	ns.mergeMetadata(ctx, up, initialDeduplicationRound)
 	ns.filterMetadata(ctx, up)
 
 	for _, f := range matched.DeferredMACHandlers {
@@ -1144,7 +1148,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		"device_channel_index", chIdx,
 	)
 
-	ok, err := ns.deduplicateUplink(ctx, up, phy.JoinAcceptDelay2)
+	ok, err := ns.deduplicateUplink(ctx, up, phy.JoinAcceptDelay2, initialDeduplicationRound)
 	if err != nil {
 		return err
 	}
@@ -1219,7 +1223,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		return ctx.Err()
 	case <-ns.deduplicationDone(ctx, up):
 	}
-	ns.mergeMetadata(ctx, up)
+	ns.mergeMetadata(ctx, up, initialDeduplicationRound)
 	ns.filterMetadata(ctx, up)
 	macState.RecentUplinks = []*ttnpb.UplinkMessage{{
 		Payload:            up.Payload,
