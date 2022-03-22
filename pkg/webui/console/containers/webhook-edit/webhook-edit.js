@@ -104,9 +104,9 @@ const WebhookEdit = props => {
   }, [])
   const handleReactivate = React.useCallback(
     async updatedHealthStatus => {
-      await updateHealthStatus(appId, webhookId, updatedHealthStatus, ['health_status'])
+      await updateHealthStatus(updatedHealthStatus)
     },
-    [appId, webhookId, updateHealthStatus],
+    [updateHealthStatus],
   )
 
   return (
