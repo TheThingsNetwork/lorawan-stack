@@ -72,7 +72,6 @@ var (
 	ErrInvalidAbsoluteTime        = errInvalidAbsoluteTime
 	ErrOutdatedData               = errOutdatedData
 	ErrRejoinRequest              = errRejoinRequest
-	ErrUnsupportedLoRaWANVersion  = errUnsupportedLoRaWANVersion
 
 	EvtClusterJoinAttempt          = evtClusterJoinAttempt
 	EvtClusterJoinFail             = evtClusterJoinFail

@@ -7397,15 +7397,6 @@
       "file": "errors.go"
     }
   },
-  "error:pkg/networkserver:unsupported_lorawan_version": {
-    "translations": {
-      "en": "unsupported LoRaWAN version: `{version}`"
-    },
-    "description": {
-      "package": "pkg/networkserver",
-      "file": "errors.go"
-    }
-  },
   "error:pkg/networkserver:uplink_channel_not_found": {
     "translations": {
       "en": "uplink channel not found"

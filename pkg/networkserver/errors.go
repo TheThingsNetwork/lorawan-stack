@@ -51,6 +51,5 @@ var (
 	errUnknownNwkSEncKey                  = errors.DefineNotFound("unknown_nwk_s_enc_key", "NwkSEncKey is unknown")
 	errUnknownSession                     = errors.DefineNotFound("unknown_session", "unknown session")
 	errUnknownSNwkSIntKey                 = errors.DefineNotFound("unknown_s_nwk_s_int_key", "SNwkSIntKey is unknown")
-	errUnsupportedLoRaWANVersion          = errors.DefineInvalidArgument("unsupported_lorawan_version", "unsupported LoRaWAN version: `{version}`", "version")
 	errUplinkChannelNotFound              = errors.DefineNotFound("uplink_channel_not_found", "uplink channel not found")
 )

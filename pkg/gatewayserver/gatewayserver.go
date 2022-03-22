@@ -830,6 +830,10 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 					continue
 				}
 			}
+			if err := msg.Message.Payload.ValidateFields(); err != nil {
+				registerDropUplink(ctx, gtw, msg, "validation", err)
+				continue
+			}
 			val = msg
 			registerReceiveUplink(ctx, gtw, msg.Message, protocol)
 		case msg := <-conn.Status():

@@ -1299,17 +1299,15 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	if err := lorawan.UnmarshalMessage(up.RawPayload, up.Payload); err != nil {
 		return nil, errDecodePayload.WithCause(err)
 	}
+	if err := up.Payload.ValidateFields(); err != nil {
+		return nil, errDecodePayload.WithCause(err)
+	}
 	registerReceiveUplink(ctx, up)
 	defer func() {
 		if err != nil {
 			registerDropUplink(ctx, up, err)
 		}
 	}()
-	if up.Payload.MHdr.Major != ttnpb.Major_LORAWAN_R1 {
-		return nil, errUnsupportedLoRaWANVersion.WithAttributes(
-			"version", up.Payload.MHdr.Major,
-		)
-	}
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"m_type", up.Payload.MHdr.MType,
