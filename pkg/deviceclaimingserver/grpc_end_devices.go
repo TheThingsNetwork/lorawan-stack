@@ -19,6 +19,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
@@ -84,47 +85,39 @@ type endDeviceClaimingServer struct {
 }
 
 // Claim implements EndDeviceClaimingServer.
-func (srv *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest) (ids *ttnpb.EndDeviceIdentifiers, err error) {
-	for _, edcs := range srv.DCS.endDeviceClaimingUpstreams {
-		var joinEUI types.EUI64
-		if authenticatedIDs := req.GetAuthenticatedIdentifiers(); authenticatedIDs != nil {
-			joinEUI = req.GetAuthenticatedIdentifiers().JoinEui
-		} else if qrCode := req.GetQrCode(); qrCode != nil {
-			conn, err := srv.DCS.GetPeerConn(ctx, ttnpb.ClusterRole_QR_CODE_GENERATOR, nil)
-			if err != nil {
-				return nil, err
-			}
-			client := ttnpb.NewEndDeviceQRCodeGeneratorClient(conn)
-			data, err := client.Parse(ctx, &ttnpb.ParseEndDeviceQRCodeRequest{
-				QrCode: qrCode,
-			})
-			if err != nil {
-				return nil, errParseQRCode.WithCause(err)
-			}
-			if edTemplate := data.GetEndDeviceTempate(); edTemplate != nil && edTemplate.GetEndDevice().GetIds().JoinEui != nil {
-				joinEUI = *edTemplate.GetEndDevice().GetIds().JoinEui
-			} else {
-				return nil, errQRCodeData.New()
-			}
-		} else {
-			return nil, errNoJoinEUI.New()
-		}
-		if edcs.SupportsJoinEUI(joinEUI) {
-			return edcs.Claim(ctx, req)
+func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest) (*ttnpb.EndDeviceIdentifiers, error) {
+	ids, err := edcs.DCS.endDeviceClaimingUpstream.Claim(ctx, req)
+	if err != nil {
+		if errors.IsAborted(err) {
+			log.FromContext(ctx).Warn("No upstream supports JoinEUI, use fallback")
+			return edcs.DCS.endDeviceClaimingFallback.Claim(ctx, req)
 		}
 		return nil, err
 	}
-	// Use default if no EDCS supports this EUI.
-	// TODO: Remove this option and return JoinEUI not provisioned error (https://github.com/TheThingsIndustries/lorawan-stack/issues/3036).
-	return srv.DCS.endDeviceClaimingUpstreams[defaultType].Claim(ctx, req)
+	return ids, nil
+}
+
+// Unclaim implements EndDeviceClaimingServer.
+func (edcs *endDeviceClaimingServer) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
+	return edcs.DCS.endDeviceClaimingUpstream.Unclaim(ctx, in)
+}
+
+// GetInfoByJoinEUI implements EndDeviceClaimingServer.
+func (edcs *endDeviceClaimingServer) GetInfoByJoinEUI(ctx context.Context, in *ttnpb.GetInfoByJoinEUIRequest) (*ttnpb.GetInfoByJoinEUIResponse, error) {
+	return edcs.DCS.endDeviceClaimingUpstream.GetInfoByJoinEUI(ctx, in)
+}
+
+// GetClaimStatus implements EndDeviceClaimingServer.
+func (edcs *endDeviceClaimingServer) GetClaimStatus(ctx context.Context, in *ttnpb.EndDeviceIdentifiers) (*ttnpb.GetClaimStatusResponse, error) {
+	return edcs.DCS.endDeviceClaimingUpstream.GetClaimStatus(ctx, in)
 }
 
 // AuthorizeApplication implements EndDeviceClaimingServer.
-func (srv *endDeviceClaimingServer) AuthorizeApplication(ctx context.Context, req *ttnpb.AuthorizeApplicationRequest) (*pbtypes.Empty, error) {
-	return srv.DCS.endDeviceClaimingUpstreams[defaultType].AuthorizeApplication(ctx, req)
+func (edcs *endDeviceClaimingServer) AuthorizeApplication(ctx context.Context, req *ttnpb.AuthorizeApplicationRequest) (*pbtypes.Empty, error) {
+	return edcs.DCS.endDeviceClaimingFallback.AuthorizeApplication(ctx, req)
 }
 
 // UnauthorizeApplication implements EndDeviceClaimingServer.
-func (srv *endDeviceClaimingServer) UnauthorizeApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
-	return srv.DCS.endDeviceClaimingUpstreams[defaultType].UnauthorizeApplication(ctx, ids)
+func (edcs *endDeviceClaimingServer) UnauthorizeApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
+	return edcs.DCS.endDeviceClaimingFallback.UnauthorizeApplication(ctx, ids)
 }
