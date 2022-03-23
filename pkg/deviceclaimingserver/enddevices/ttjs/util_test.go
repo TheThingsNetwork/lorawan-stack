@@ -23,8 +23,30 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"google.golang.org/grpc"
 )
+
+type mockQRGClient struct {
+	ttnpb.EndDeviceQRCodeGeneratorClient
+}
+
+func (mockQRGClient) Parse(context.Context, *ttnpb.ParseEndDeviceQRCodeRequest, ...grpc.CallOption) (*ttnpb.ParseEndDeviceQRCodeResponse, error) {
+	return &ttnpb.ParseEndDeviceQRCodeResponse{
+		EndDeviceTempate: &ttnpb.EndDeviceTemplate{
+			EndDevice: &ttnpb.EndDevice{
+				Ids: &ttnpb.EndDeviceIdentifiers{
+					DevEui:  &devEUI,
+					JoinEui: &supportedJoinEUI,
+				},
+				ClaimAuthenticationCode: &ttnpb.EndDeviceAuthenticationCode{
+					Value: claimAuthenticationCode,
+				},
+			},
+		},
+	}, nil
+}
 
 type device struct {
 	claimData

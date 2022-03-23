@@ -168,7 +168,7 @@ func TestTTJS(t *testing.T) {
 
 	// With Valid Key
 	ttJSConfig.Password = password
-	client, err := ttJSConfig.NewClient(ctx, c)
+	client, err := ttJSConfig.NewClient(ctx, c, WithQRGeneratorClient(mockQRGClient{}))
 	test.Must(client, err)
 
 	// Check JoinEUI support.

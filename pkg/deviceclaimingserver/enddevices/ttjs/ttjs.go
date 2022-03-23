@@ -65,6 +65,8 @@ type Component interface {
 // TTJS is a client that claims end devices on a The Things Join Server.
 type TTJS struct {
 	Component
+	qrg ttnpb.EndDeviceQRCodeGeneratorClient
+
 	hsNSIDs     map[string]types.EUI64
 	httpClient  *http.Client
 	baseURL     *url.URL
@@ -72,8 +74,18 @@ type TTJS struct {
 	ttiVendorID OUI
 }
 
+// Option configures TTJS.
+type Option func(*TTJS)
+
+// WithQRGeneratorClient overrides the QRGeneratorClient of TTJS.
+func WithQRGeneratorClient(qrg ttnpb.EndDeviceQRCodeGeneratorClient) Option {
+	return func(ttjs *TTJS) {
+		ttjs.qrg = qrg
+	}
+}
+
 // NewClient applies the config and returns a new TTJS client.
-func (config Config) NewClient(ctx context.Context, c Component) (*TTJS, error) {
+func (config Config) NewClient(ctx context.Context, c Component, opts ...Option) (*TTJS, error) {
 	httpClient, err := c.HTTPClient(ctx)
 	if err != nil {
 		return nil, err
@@ -92,14 +104,19 @@ func (config Config) NewClient(ctx context.Context, c Component) (*TTJS, error) 
 		}
 		res[nsAddress] = nsID
 	}
-	return &TTJS{
+	ttjs := &TTJS{
 		config:      config,
 		httpClient:  httpClient,
 		baseURL:     baseURL,
 		Component:   c,
 		hsNSIDs:     res,
 		ttiVendorID: OUI(interop.TTIVendorID.MarshalNumber()),
-	}, nil
+	}
+	for _, opt := range opts {
+		opt(ttjs)
+	}
+
+	return ttjs, nil
 }
 
 // SupportsJoinEUI implements EndDeviceClaimer.
@@ -123,6 +140,17 @@ var (
 	errNoJoinEUI            = errors.DefineInvalidArgument("no_join_eui", "failed to extract JoinEUI from request")
 )
 
+func (client *TTJS) getQRGeneratorClient(ctx context.Context) (ttnpb.EndDeviceQRCodeGeneratorClient, error) {
+	if client.qrg != nil {
+		return client.qrg, nil
+	}
+	conn, err := client.Component.GetPeerConn(ctx, ttnpb.ClusterRole_QR_CODE_GENERATOR, nil)
+	if err != nil {
+		return nil, err
+	}
+	return ttnpb.NewEndDeviceQRCodeGeneratorClient(conn), nil
+}
+
 // Claim implements EndDeviceClaimer.
 func (client *TTJS) Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest) (*ttnpb.EndDeviceIdentifiers, error) {
 	htenantID := client.config.TenantID
@@ -136,11 +164,10 @@ func (client *TTJS) Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest)
 		devEUI = authenticatedIDs.DevEui
 		ownerToken = authenticatedIDs.AuthenticationCode
 	} else if qrCode := req.GetQrCode(); qrCode != nil {
-		conn, err := client.Component.GetPeerConn(ctx, ttnpb.ClusterRole_QR_CODE_GENERATOR, nil)
+		qrg, err := client.getQRGeneratorClient(ctx)
 		if err != nil {
 			return nil, err
 		}
-		qrg := ttnpb.NewEndDeviceQRCodeGeneratorClient(conn)
 		data, err := qrg.Parse(ctx, &ttnpb.ParseEndDeviceQRCodeRequest{
 			QrCode: qrCode,
 		})
