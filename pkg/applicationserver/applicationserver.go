@@ -529,6 +529,12 @@ func (as *ApplicationServer) attemptDownlinkQueueOp(ctx context.Context, dev *tt
 		}()
 	}
 
+	for _, down := range op.Items {
+		if down.FPort == 0 {
+			return nil, errNoFPort.New()
+		}
+	}
+
 	pc, err := peer.Conn()
 	if err != nil {
 		return nil, err

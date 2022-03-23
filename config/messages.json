@@ -2717,6 +2717,15 @@
       "file": "applicationserver.go"
     }
   },
+  "error:pkg/applicationserver:no_f_port": {
+    "translations": {
+      "en": "no FPort"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "payload.go"
+    }
+  },
   "error:pkg/applicationserver:no_join_eui": {
     "translations": {
       "en": "no join EUI provided"
