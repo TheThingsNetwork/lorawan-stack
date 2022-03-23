@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/hex"
 	"fmt"
+	"net"
 	"net/http"
 	"regexp"
 	"strings"
@@ -119,14 +120,28 @@ func (s *srv) handleConnectionInfo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	scheme := "ws"
+	var (
+		scheme = "ws"
+		port   = "80"
+	)
 	if r.TLS != nil || s.cfg.UseTrafficTLSAddress {
 		scheme = "wss"
+		port = "443"
+	}
+
+	// If port is retrievable from the host, use it.
+	host, p, err := net.SplitHostPort(r.Host)
+	if err == nil {
+		// Both `host` and `p` are valid, since we have no error.
+		port = p
+	} else {
+		// `host` and `p` are unknown/empty. Reset `host` to `r.Host` since it does not contain the port.
+		host = r.Host
 	}
 
 	info := ServerInfo{
 		Scheme:  scheme,
-		Address: r.Host,
+		Address: net.JoinHostPort(host, port),
 	}
 
 	resp := s.formatter.HandleConnectionInfo(ctx, data, s.server, info, time.Now())
