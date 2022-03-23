@@ -68,4 +68,5 @@ export default defineMessages({
   gatewayVisibilityInformation:
     'You can use the checkboxes to control what information of your gateways will be visible. Note that this information will be visible to the public and not only to registered networks.',
   defaultGatewayVisibilitySet: 'Default gateway visibility set',
+  packetBrokerStatusPage: 'Packet Broker Status Page',
 })

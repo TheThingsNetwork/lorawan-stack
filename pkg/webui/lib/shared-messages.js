@@ -366,6 +366,7 @@ export default defineMessages({
   status: 'Status',
   statusDescription: 'The status of this gateway may be visible to other users',
   statusUnknown: 'Status unknown',
+  statusPage: 'Status Page',
   success: 'Success',
   supportsClassB: 'Supports class B',
   supportsClassC: 'Supports class C',

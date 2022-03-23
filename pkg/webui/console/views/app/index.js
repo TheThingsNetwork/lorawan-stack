@@ -133,7 +133,7 @@ class ConsoleApp extends React.PureComponent {
         siteTitle,
         pageData,
         siteName,
-        config: { supportLink, documentationBaseUrl },
+        config: { supportLink, documentationBaseUrl, pageStatusBaseUrl },
       },
       status,
     } = this.props
@@ -192,6 +192,7 @@ class ConsoleApp extends React.PureComponent {
                 className={style.footer}
                 supportLink={supportLink}
                 documentationLink={documentationBaseUrl}
+                statusPageLink={pageStatusBaseUrl}
               />
             </div>
           </ErrorView>

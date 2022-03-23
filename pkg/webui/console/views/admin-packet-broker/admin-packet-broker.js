@@ -148,6 +148,10 @@ const PacketBroker = ({ match }) => {
             <Link.Anchor href="https://www.packetbroker.net" external secondary>
               <Message content={m.packetBrokerWebsite} />
             </Link.Anchor>
+            {' | '}
+            <Link.Anchor href="https://status.packetbroker.net" external secondary>
+              <Message content={m.packetBrokerStatusPage} />
+            </Link.Anchor>
           </div>
           <hr className={style.hRule} />
           <Message content={m.registrationStatus} component="h3" />
