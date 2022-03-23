@@ -28551,10 +28551,6 @@
                     "value": 255
                   },
                   {
-                    "name": "uint32.gte",
-                    "value": 1
-                  },
-                  {
                     "name": "uint32.not_in",
                     "value": [
                       224
