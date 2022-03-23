@@ -14255,7 +14255,7 @@
         },
         "tie_access_to_session": {
           "type": "boolean",
-          "description": "If set, access will cease when the connected user session has ended.\nThis information is public and can be seen by any authenticated user in the network.\nThis field can only be modified by admins."
+          "description": "If set, access will cease when the connected user session has ended.\nThis information is public and can be seen by any authenticated user in the network."
         }
       },
       "description": "An OAuth client on the network."

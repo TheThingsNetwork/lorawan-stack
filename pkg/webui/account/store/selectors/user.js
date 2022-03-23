@@ -21,8 +21,6 @@ const selectUserStore = state => state.user
 
 export const selectUser = state => selectUserStore(state).user
 
-export const selectSessionId = state => selectUserStore(state).sessionId
-
 export const selectUserId = state => {
   const user = selectUser(state)
 

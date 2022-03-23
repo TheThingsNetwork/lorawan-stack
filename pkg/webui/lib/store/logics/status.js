@@ -21,6 +21,8 @@ import { selectIsConfig } from '@ttn-lw/lib/selectors/env'
 import { isNetworkError, isTimeoutError } from '@ttn-lw/lib/errors/utils'
 import * as status from '@ttn-lw/lib/store/actions/status'
 import { selectIsOfflineStatus } from '@ttn-lw/lib/store/selectors/status'
+import { SET_LOGIN_STATUS, setLoginStatus } from '@ttn-lw/lib/store/actions/status'
+import { clear as clearAccessToken } from '@ttn-lw/lib/access-token'
 
 const probeUrl = `${selectIsConfig().base_url}/auth_info`
 
@@ -115,4 +117,34 @@ const connectionCheckFailLogic = createLogic({
   },
 })
 
-export default [connectionManagementLogic, connectionCheckLogic, connectionCheckFailLogic]
+const loginStatusLogic = createLogic({
+  type: SET_LOGIN_STATUS,
+  process: ({ action }, dispatch, done) => {
+    const { isLoggedIn, sessionExpiresAt } = action.payload
+    if (!isLoggedIn || !Boolean(sessionExpiresAt)) {
+      done()
+      return
+    }
+
+    const expiryDate = new Date(sessionExpiresAt)
+    const expiryDuration = expiryDate - new Date()
+
+    // Set a timer to show the "Log back in"-modal if the session ends within 24h.
+    if (expiryDuration >= 0 && expiryDuration < 60 * 60 * 24 * 1000) {
+      setTimeout(() => {
+        dispatch(setLoginStatus(false, undefined, sessionExpiresAt))
+        clearAccessToken()
+        done()
+      }, expiryDuration)
+    } else {
+      done()
+    }
+  },
+})
+
+export default [
+  connectionManagementLogic,
+  connectionCheckLogic,
+  connectionCheckFailLogic,
+  loginStatusLogic,
+]

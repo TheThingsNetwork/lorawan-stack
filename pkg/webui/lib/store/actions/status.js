@@ -29,9 +29,14 @@ export const setStatusChecking = createAction(SET_CONNECTION_STATUS, () => ({
 
 export const SET_LOGIN_STATUS = 'SET_LOGIN_STATUS'
 
-export const setLoginStatus = createAction(SET_LOGIN_STATUS, () => ({
-  isLoginRequired: status.isLoginRequired,
-}))
+export const setLoginStatus = createAction(
+  SET_LOGIN_STATUS,
+  (isLoggedIn, sessionId, sessionExpiresAt) => ({
+    isLoggedIn,
+    sessionId,
+    sessionExpiresAt,
+  }),
+)
 
 export const ATTEMPT_RECONNECT = 'ATTEMPT_RECONNECT'
 export const attemptReconnect = createAction(ATTEMPT_RECONNECT)

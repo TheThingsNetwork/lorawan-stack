@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { INITIALIZE_SUCCESS } from '@ttn-lw/lib/store/actions/init'
-
 import {
   GET_USER_SUCCESS,
   UPDATE_USER_SUCCESS,
@@ -22,7 +20,6 @@ import {
 
 const defaultState = {
   user: undefined,
-  sessionId: undefined,
   rights: {
     regular: [],
     pseudo: [],
@@ -31,15 +28,6 @@ const defaultState = {
 
 const user = (state = defaultState, { type, payload }) => {
   switch (type) {
-    case INITIALIZE_SUCCESS:
-      if (typeof payload !== 'string') {
-        return state
-      }
-
-      return {
-        ...state,
-        sessionId: payload,
-      }
     case GET_USER_SUCCESS:
       return {
         ...state,

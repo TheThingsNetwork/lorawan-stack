@@ -146,7 +146,7 @@ const createRequestLogic = (
             (e instanceof TokenError && isPermissionDeniedError(e?.cause))
           ) {
             clearAccessToken()
-            dispatch(setLoginStatus())
+            dispatch(setLoginStatus(false))
             break
             // If there was a network error, it could mean that the network
             // connection is currently interrupted. Setting the online state to

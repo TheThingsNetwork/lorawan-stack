@@ -23,6 +23,7 @@ import { ToastContainer } from '@ttn-lw/components/toast'
 import sidebarStyle from '@ttn-lw/components/navigation/side/side.styl'
 
 import Footer from '@ttn-lw/containers/footer'
+import LogBackInModal from '@ttn-lw/containers/log-back-in-modal'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import { withEnv } from '@ttn-lw/lib/components/env'
@@ -32,7 +33,6 @@ import WithAuth from '@ttn-lw/lib/components/with-auth'
 import FullViewError, { FullViewErrorInner } from '@ttn-lw/lib/components/full-view-error'
 
 import Header from '@console/containers/header'
-import LogBackInModal from '@console/containers/log-back-in-modal'
 
 import Overview from '@console/views/overview'
 import Applications from '@console/views/applications'
@@ -43,7 +43,7 @@ import User from '@console/views/user'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { setStatusOnline } from '@ttn-lw/lib/store/actions/status'
-import { selectStatusStore } from '@ttn-lw/lib/store/selectors/status'
+import { selectIsLoggedIn, selectOnlineStatus } from '@ttn-lw/lib/store/selectors/status'
 
 import {
   selectUser,
@@ -66,7 +66,8 @@ const errorRender = error => <FullViewError error={error} header={<Header />} />
     error: selectUserError(state),
     rights: selectUserRights(state),
     isAdmin: selectUserIsAdmin(state),
-    status: selectStatusStore(state),
+    isLoggedIn: selectIsLoggedIn(state),
+    onlineStatus: selectOnlineStatus(state),
   }),
   {
     setStatusOnline,
@@ -85,9 +86,9 @@ class ConsoleApp extends React.PureComponent {
       }).isRequired,
     }).isRequired,
     isAdmin: PropTypes.bool,
+    isLoggedIn: PropTypes.bool.isRequired,
     rights: PropTypes.rights,
     setStatusOnline: PropTypes.func.isRequired,
-    status: PropTypes.shape({ onlineStatus: PropTypes.string, isLoginRequired: PropTypes.bool }),
     user: PropTypes.user,
   }
   static defaultProps = {
@@ -95,7 +96,6 @@ class ConsoleApp extends React.PureComponent {
     error: undefined,
     isAdmin: undefined,
     rights: undefined,
-    status: {},
   }
 
   @bind
@@ -127,7 +127,7 @@ class ConsoleApp extends React.PureComponent {
         location: { pathname },
       },
       env: { siteTitle, pageData, siteName },
-      status,
+      isLoggedIn,
     } = this.props
 
     if (pageData && pageData.error) {
@@ -140,7 +140,6 @@ class ConsoleApp extends React.PureComponent {
 
     return (
       <React.Fragment>
-        {status.isLoginRequired && <LogBackInModal />}
         <ToastContainer />
         <ConnectedRouter history={history}>
           <ScrollToTop />
@@ -161,6 +160,7 @@ class ConsoleApp extends React.PureComponent {
                   rights={rights}
                   isAdmin={isAdmin}
                 >
+                  {!isLoggedIn && <LogBackInModal />}
                   <div className={classnames('breadcrumbs', style.mobileBreadcrumbs)} />
                   <div id="sidebar" className={sidebarStyle.container} />
                   <div className={style.content}>

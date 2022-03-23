@@ -101,14 +101,16 @@ func TestAuthentication(t *testing.T) {
 			},
 		},
 	})
-	s, err := account.NewServer(c, store, oauth.Config{
-		Mount:       "/oauth",
-		CSRFAuthKey: []byte("12345678123456781234567812345678"),
-		UI: oauth.UIConfig{
-			TemplateData: webui.TemplateData{
-				SiteName:     "The Things Network",
-				Title:        "Account",
-				CanonicalURL: "https://example.com/oauth",
+	s, err := account.NewServer(c, store, account.Config{
+		OAuth: oauth.Config{
+			Mount:       "/oauth",
+			CSRFAuthKey: []byte("12345678123456781234567812345678"),
+			UI: oauth.UIConfig{
+				TemplateData: webui.TemplateData{
+					SiteName:     "The Things Network",
+					Title:        "Account",
+					CanonicalURL: "https://example.com/oauth",
+				},
 			},
 		},
 		Session: session.Config{

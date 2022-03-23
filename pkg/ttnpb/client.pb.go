@@ -121,7 +121,6 @@ type Client struct {
 	Rights []Right `protobuf:"varint,14,rep,packed,name=rights,proto3,enum=ttn.lorawan.v3.Right" json:"rights,omitempty"`
 	// If set, access will cease when the connected user session has ended.
 	// This information is public and can be seen by any authenticated user in the network.
-	// This field can only be modified by admins.
 	TieAccessToSession   bool     `protobuf:"varint,20,opt,name=tie_access_to_session,json=tieAccessToSession,proto3" json:"tie_access_to_session,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

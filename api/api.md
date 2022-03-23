@@ -2066,7 +2066,7 @@ An OAuth client on the network.
 | `endorsed` | [`bool`](#bool) |  | If set, the authorization page will show endorsement. This information is public and can be seen by any authenticated user in the network. This field can only be modified by admins. |
 | `grants` | [`GrantType`](#ttn.lorawan.v3.GrantType) | repeated | OAuth flows that can be used for the client to get a token. This information is public and can be seen by any authenticated user in the network. After a client is created, this field can only be modified by admins. |
 | `rights` | [`Right`](#ttn.lorawan.v3.Right) | repeated | Rights denotes what rights the client will have access to. This information is public and can be seen by any authenticated user in the network. Users that previously authorized this client will have to re-authorize the client after rights are added to this list. |
-| `tie_access_to_session` | [`bool`](#bool) |  | If set, access will cease when the connected user session has ended. This information is public and can be seen by any authenticated user in the network. This field can only be modified by admins. |
+| `tie_access_to_session` | [`bool`](#bool) |  | If set, access will cease when the connected user session has ended. This information is public and can be seen by any authenticated user in the network. |
 
 #### Field Rules
 

@@ -1931,6 +1931,7 @@
         "technical_contact.ids.user_ids",
         "technical_contact.ids.user_ids.email",
         "technical_contact.ids.user_ids.user_id",
+        "tie_access_to_session",
         "updated_at"
       ]
     },
@@ -1988,6 +1989,7 @@
         "technical_contact.ids.user_ids",
         "technical_contact.ids.user_ids.email",
         "technical_contact.ids.user_ids.user_id",
+        "tie_access_to_session",
         "updated_at"
       ]
     },
@@ -2035,6 +2037,7 @@
         "technical_contact.ids.user_ids",
         "technical_contact.ids.user_ids.email",
         "technical_contact.ids.user_ids.user_id",
+        "tie_access_to_session",
         "updated_at"
       ]
     },
@@ -5355,6 +5358,7 @@
         "technical_contact.ids.user_ids",
         "technical_contact.ids.user_ids.email",
         "technical_contact.ids.user_ids.user_id",
+        "tie_access_to_session",
         "updated_at"
       ]
     },

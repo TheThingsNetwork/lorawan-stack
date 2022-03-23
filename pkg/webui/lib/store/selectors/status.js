@@ -16,6 +16,8 @@ import ONLINE_STATUS from '@ttn-lw/constants/online-status'
 
 export const selectStatusStore = state => state.status
 
+export const selectIsLoggedIn = state => selectStatusStore(state).isLoggedIn
+
 export const selectOnlineStatus = state => selectStatusStore(state).onlineStatus
 
 export const selectIsOnlineStatus = state =>
@@ -26,3 +28,5 @@ export const selectIsOfflineStatus = state =>
 
 export const selectIsCheckingStatus = state =>
   selectStatusStore(state).onlineStatus === ONLINE_STATUS.CHECKING
+
+export const selectSessionId = state => selectStatusStore(state).sessionId

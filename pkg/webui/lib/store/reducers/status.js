@@ -18,7 +18,9 @@ import { SET_CONNECTION_STATUS, SET_LOGIN_STATUS } from '@ttn-lw/lib/store/actio
 
 const defaultState = {
   onlineStatus: ONLINE_STATUS.ONLINE,
-  isLoginRequired: false,
+  isLoggedIn: false,
+  sessionId: undefined,
+  sessionExpiresAt: undefined,
 }
 
 const status = (state = defaultState, { type, payload }) => {
@@ -31,7 +33,9 @@ const status = (state = defaultState, { type, payload }) => {
     case SET_LOGIN_STATUS:
       return {
         ...state,
-        isLoginRequired: true,
+        isLoggedIn: payload.isLoggedIn,
+        sessionId: payload.sessionId,
+        sessionExpiresAt: payload.sessionExpiresAt,
       }
     default:
       return state

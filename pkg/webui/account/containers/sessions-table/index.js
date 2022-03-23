@@ -25,13 +25,14 @@ import FetchTable from '@ttn-lw/containers/fetch-table'
 import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
 
+import { selectSessionId } from '@ttn-lw/lib/store/selectors/status'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { getUserSessionsList, deleteUserSession } from '@account/store/actions/sessions'
 
-import { selectUserId, selectSessionId } from '@account/store/selectors/user'
+import { selectUserId } from '@account/store/selectors/user'
 import {
   selectUserSessions,
   selectUserSessionsTotalCount,

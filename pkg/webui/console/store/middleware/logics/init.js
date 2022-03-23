@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 import * as init from '@ttn-lw/lib/store/actions/init'
 import { TokenError } from '@ttn-lw/lib/errors/custom-errors'
 import { isPermissionDeniedError, isUnauthenticatedError } from '@ttn-lw/lib/errors/utils'
+import { setLoginStatus } from '@ttn-lw/lib/store/actions/status'
 
 import * as user from '@console/store/actions/user'
 
@@ -68,6 +69,12 @@ const consoleAppLogic = createRequestLogic({
       } catch (error) {
         dispatch(user.getUserMeFailure(error))
       }
+
+      // Set a timer to automatically show the login modal if the
+      // session expires within 24 hours.
+      const expiry = info.oauth_access_token.session_expires_at
+      const sessionId = info.oauth_access_token.session_id
+      dispatch(setLoginStatus(true, sessionId, expiry))
     }
 
     // eslint-disable-next-line no-console

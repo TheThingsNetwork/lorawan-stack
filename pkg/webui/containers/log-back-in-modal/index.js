@@ -19,8 +19,7 @@ import Modal from '@ttn-lw/components/modal'
 
 const m = defineMessages({
   modalTitle: 'Please sign in again',
-  modalMessage:
-    "You were signed out of the Console. You can press 'Reload' to log back into the Console again.",
+  modalMessage: "You were signed out. You can press 'Reload' to log back in.",
   buttonMessage: 'Reload',
 })
 
