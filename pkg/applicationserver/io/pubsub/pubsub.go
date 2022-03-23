@@ -190,6 +190,10 @@ func (i *integration) handleDown(ctx context.Context, op func(io.Server, context
 			logger.WithError(err).Warn("Failed to decode downlink queue operation")
 			continue
 		}
+		if err := operation.ValidateFields(); err != nil {
+			logger.WithError(err).Warn("Failed to validate downlink queue operation")
+			continue
+		}
 		if err := operation.EndDeviceIds.ValidateContext(ctx); err != nil {
 			logger.WithError(err).Warn("Failed to validate downlink queue operation")
 			continue
