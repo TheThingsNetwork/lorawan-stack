@@ -56,6 +56,7 @@ func (st *StoreTest) TestClientStoreCRUD(t *T) {
 			Attributes:            attributes,
 			AdministrativeContact: usr1.GetOrganizationOrUserIdentifiers(),
 			TechnicalContact:      org1.GetOrganizationOrUserIdentifiers(),
+			TieAccessToSession:    true,
 		})
 
 		if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
@@ -65,6 +66,7 @@ func (st *StoreTest) TestClientStoreCRUD(t *T) {
 			a.So(created.Attributes, should.Resemble, attributes)
 			a.So(created.AdministrativeContact, should.Resemble, usr1.GetOrganizationOrUserIdentifiers())
 			a.So(created.TechnicalContact, should.Resemble, org1.GetOrganizationOrUserIdentifiers())
+			a.So(created.TieAccessToSession, should.Equal, true)
 			a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenWithin, 5*time.Second, start)
 			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenWithin, 5*time.Second, start)
 		}
@@ -123,6 +125,7 @@ func (st *StoreTest) TestClientStoreCRUD(t *T) {
 			Attributes:            updatedAttributes,
 			AdministrativeContact: org1.GetOrganizationOrUserIdentifiers(),
 			TechnicalContact:      usr1.GetOrganizationOrUserIdentifiers(),
+			TieAccessToSession:    false,
 		}, mask)
 		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.GetIds().GetClientId(), should.Equal, "foo")
@@ -131,6 +134,7 @@ func (st *StoreTest) TestClientStoreCRUD(t *T) {
 			a.So(updated.Attributes, should.Resemble, updatedAttributes)
 			a.So(updated.AdministrativeContact, should.Resemble, org1.GetOrganizationOrUserIdentifiers())
 			a.So(updated.TechnicalContact, should.Resemble, usr1.GetOrganizationOrUserIdentifiers())
+			a.So(updated.TieAccessToSession, should.Equal, false)
 			a.So(*ttnpb.StdTime(updated.CreatedAt), should.Equal, *ttnpb.StdTime(created.CreatedAt))
 			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenWithin, 5*time.Second, start)
 		}

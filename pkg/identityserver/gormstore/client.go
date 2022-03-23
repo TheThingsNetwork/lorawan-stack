@@ -52,6 +52,8 @@ type Client struct {
 
 	Grants Grants `gorm:"type:INT ARRAY"`
 	Rights Rights `gorm:"type:INT ARRAY"`
+
+	TieAccessToSession bool `gorm:"not null;default:false"`
 }
 
 func init() {
@@ -105,6 +107,9 @@ var clientPBSetters = map[string]func(*ttnpb.Client, *Client){
 	},
 	rightsField: func(pb *ttnpb.Client, cli *Client) {
 		pb.Rights = cli.Rights.Rights
+	},
+	tieAccessToSessionField: func(pb *ttnpb.Client, cli *Client) {
+		pb.TieAccessToSession = cli.TieAccessToSession
 	},
 }
 
@@ -166,6 +171,9 @@ var clientModelSetters = map[string]func(*Client, *ttnpb.Client){
 	rightsField: func(cli *Client, pb *ttnpb.Client) {
 		cli.Rights = Rights{Rights: pb.Rights}
 	},
+	tieAccessToSessionField: func(cli *Client, pb *ttnpb.Client) {
+		cli.TieAccessToSession = pb.TieAccessToSession
+	},
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
@@ -198,6 +206,7 @@ var clientColumnNames = map[string][]string{
 	rightsField:                {rightsField},
 	administrativeContactField: {administrativeContactField + "_id"},
 	technicalContactField:      {technicalContactField + "_id"},
+	tieAccessToSessionField:    {tieAccessToSessionField},
 }
 
 func (cli Client) toPB(pb *ttnpb.Client, fieldMask store.FieldMask) {

@@ -340,7 +340,8 @@ CREATE TABLE clients (
   skip_authorization boolean NOT NULL,
   endorsed boolean NOT NULL,
   grants integer [],
-  rights integer []
+  rights integer [],
+  tie_access_to_session boolean NOT NULL
 );
 
 CREATE INDEX idx_clients_deleted_at ON clients USING btree (deleted_at);

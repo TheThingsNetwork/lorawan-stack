@@ -21,6 +21,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/schema"
 	"github.com/openshift/osin"
@@ -289,6 +290,29 @@ func (s *server) Token(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			ar.Authorized = true
+		}
+	}
+	if client.TieAccessToSession {
+		session, err := s.store.GetSession(
+			r.Context(),
+			&ttnpb.UserIdentifiers{UserId: userIDs.UserId},
+			ar.UserData.(userData).UserSessionIdentifiers.GetSessionId(),
+		)
+		if err != nil {
+			webhandlers.Error(w, r, err)
+			return
+		}
+		if session == nil {
+			ar.Authorized = false
+		} else {
+			timeUntilExpiry := time.Until(*ttnpb.StdTime(session.ExpiresAt))
+			timeUntilAccessExpiry := time.Duration(s.osinConfig.AccessExpiration) * time.Second
+			if timeUntilExpiry <= 0 {
+				ar.Authorized = false
+			}
+			if timeUntilExpiry < timeUntilAccessExpiry {
+				ar.Expiration = int32(timeUntilExpiry.Seconds())
+			}
 		}
 	}
 	if ar.Authorized {

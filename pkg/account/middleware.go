@@ -44,7 +44,7 @@ func (s *server) redirectToNext(next http.Handler) http.Handler {
 		if err == nil {
 			next := r.URL.Query().Get(nextKey)
 			if next == "" {
-				next = s.config.Mount
+				next = s.config.OAuth.Mount
 			}
 			url, err := url.Parse(next)
 			if err != nil {

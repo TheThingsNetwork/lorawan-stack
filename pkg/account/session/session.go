@@ -34,7 +34,8 @@ var errIncorrectPasswordOrUserID = errors.DefineInvalidArgument("no_user_id_pass
 
 // Session is the session helper.
 type Session struct {
-	Store Store
+	Store  Store
+	Config Config
 }
 
 // Store used by the account app server.
@@ -49,6 +50,7 @@ func (s *Session) authCookie() *cookie.Cookie {
 		Name:     authCookieName,
 		Path:     "/",
 		HTTPOnly: true,
+		MaxAge:   s.Config.Duration,
 	}
 }
 

@@ -158,7 +158,14 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		OAuthStore:       gormstore.GetOAuthStore(is.db),
 	}, is.config.OAuth, GenerateCSPString)
 
-	is.account, err = account.NewServer(c, &accountAppStore{is.store}, is.config.OAuth, GenerateCSPString)
+	is.account, err = account.NewServer(
+		c, 
+	  &accountAppStore{is.store},
+		account.Config{
+			OAuth: is.config.OAuth, Session: is.config.UserSession,
+		}, 
+		GenerateCSPString,
+	)
 	if err != nil {
 		return nil, err
 	}

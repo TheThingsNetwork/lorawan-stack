@@ -50,7 +50,7 @@ type Component interface {
 
 type server struct {
 	c             Component
-	config        oauth.Config
+	config        Config
 	store         account_store.TransactionalInterface
 	session       sess.Session
 	generateCSP   func(config *oauth.Config, nonce string) string
@@ -58,19 +58,24 @@ type server struct {
 }
 
 // NewServer returns a new account app on top of the given store.
-func NewServer(c *component.Component, store account_store.TransactionalInterface, config oauth.Config, cspFunc func(config *oauth.Config, nonce string) string) (Server, error) {
+func NewServer(
+	c *component.Component,
+	store account_store.TransactionalInterface,
+	config Config,
+	cspFunc func(config *oauth.Config, nonce string) string,
+) (Server, error) {
 	s := &server{
 		c:             c,
 		config:        config,
 		store:         store,
-		session:       sess.Session{Store: store},
+		session:       sess.Session{Store: store, Config: config.Session},
 		generateCSP:   cspFunc,
 		schemaDecoder: schema.NewDecoder(),
 	}
 	s.schemaDecoder.IgnoreUnknownKeys(true)
 
-	if s.config.Mount == "" {
-		s.config.Mount = s.config.UI.MountPath()
+	if s.config.OAuth.Mount == "" {
+		s.config.OAuth.Mount = s.config.OAuth.UI.MountPath()
 	}
 
 	return s, nil
@@ -80,8 +85,8 @@ type ctxKeyType struct{}
 
 var ctxKey ctxKeyType
 
-func (s *server) configFromContext(ctx context.Context) *oauth.Config {
-	if config, ok := ctx.Value(ctxKey).(*oauth.Config); ok {
+func (s *server) configFromContext(ctx context.Context) *Config {
+	if config, ok := ctx.Value(ctxKey).(*Config); ok {
 		return config
 	}
 	return &s.config
@@ -93,17 +98,17 @@ func (s *server) Printf(format string, v ...interface{}) {
 
 func (s *server) RegisterRoutes(server *web.Server) {
 	csrfMiddleware := webmiddleware.CSRF(
-		s.config.CSRFAuthKey,
+		s.config.OAuth.CSRFAuthKey,
 		csrf.CookieName("_csrf"),
 		csrf.FieldName("_csrf"),
 		csrf.Path("/"),
 	)
-	router := server.PrefixWithRedirect(s.config.Mount).Subrouter()
+	router := server.PrefixWithRedirect(s.config.OAuth.Mount).Subrouter()
 	router.Use(
 		func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				r, nonce := webui.WithNonce(r)
-				cspString := s.generateCSP(s.configFromContext(r.Context()), nonce)
+				cspString := s.generateCSP(&s.configFromContext(r.Context()).OAuth, nonce)
 				w.Header().Set("Content-Security-Policy", cspString)
 				next.ServeHTTP(w, r)
 			})
@@ -111,7 +116,7 @@ func (s *server) RegisterRoutes(server *web.Server) {
 		ratelimit.HTTPMiddleware(s.c.RateLimiter(), "http:account"),
 		func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				config := s.configFromContext(r.Context())
+				config := s.configFromContext(r.Context()).OAuth
 				r = webui.WithTemplateData(r, config.UI.TemplateData)
 				frontendConfig := config.UI.FrontendConfig
 				frontendConfig.Language = config.UI.TemplateData.Language

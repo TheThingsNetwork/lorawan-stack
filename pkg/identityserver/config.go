@@ -20,6 +20,7 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/account/session"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/email/sendgrid"
@@ -108,6 +109,7 @@ type Config struct {
 		NetID    ttntypes.NetID `name:"net-id" description:"NetID of this network"`
 		TenantID string         `name:"tenant-id" description:"Tenant ID in the host NetID"`
 	} `name:"network"`
+	UserSession session.Config `name:"user-session"`
 }
 
 type emailTemplatesConfig struct {

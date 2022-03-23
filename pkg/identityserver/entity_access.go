@@ -167,6 +167,10 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			}
 			accessToken.AccessToken, accessToken.RefreshToken = "", ""
 			accessToken.Rights = ttnpb.RightsFrom(accessToken.Rights...).Implied().GetRights()
+			session, err := st.GetSessionByID(ctx, accessToken.UserSessionId)
+			if err == nil && session != nil {
+				accessToken.SessionExpiresAt = session.ExpiresAt
+			}
 			res.AccessMethod = &ttnpb.AuthInfoResponse_OauthAccessToken{
 				OauthAccessToken: accessToken,
 			}

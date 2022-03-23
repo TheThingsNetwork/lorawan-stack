@@ -29,6 +29,7 @@ import (
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/account"
+	"go.thethings.network/lorawan-stack/v3/pkg/account/session"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -109,6 +110,9 @@ func TestAuthentication(t *testing.T) {
 				Title:        "Account",
 				CanonicalURL: "https://example.com/oauth",
 			},
+		},
+		Session: session.Config{
+			Duration: time.Hour,
 		},
 	}, identityserver.GenerateCSPString)
 	if err != nil {

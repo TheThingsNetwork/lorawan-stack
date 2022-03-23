@@ -56,13 +56,15 @@ func (s *server) CurrentUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	webhandlers.JSON(w, r, struct {
-		User       json.RawMessage `json:"user"`
-		LoggedInAt *time.Time      `json:"logged_in_at"`
-		SessionId  string          `json:"session_id"`
+		User             json.RawMessage `json:"user"`
+		LoggedInAt       *time.Time      `json:"logged_in_at"`
+		SessionId        string          `json:"session_id"`
+		SessionExpiresAt *time.Time      `json:"session_expires_at"`
 	}{
-		User:       userJSON,
-		LoggedInAt: ttnpb.StdTime(session.CreatedAt),
-		SessionId:  session.SessionId,
+		User:             userJSON,
+		LoggedInAt:       ttnpb.StdTime(session.CreatedAt),
+		SessionId:        session.SessionId,
+		SessionExpiresAt: ttnpb.StdTime(session.ExpiresAt),
 	})
 }
 
@@ -188,6 +190,7 @@ func (s *server) CreateUserSession(w http.ResponseWriter, r *http.Request, userI
 	session, err := s.store.CreateSession(ctx, &ttnpb.UserSession{
 		UserIds:       userIDs,
 		SessionSecret: hashedSecret,
+		ExpiresAt:     ttnpb.ProtoTimePtr(time.Now().Add(s.config.Session.Duration)),
 	})
 	if err != nil {
 		return err

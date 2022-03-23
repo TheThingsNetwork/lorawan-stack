@@ -73,6 +73,7 @@ const (
 	temporaryPasswordCreatedAtField     = "temporary_password_created_at"
 	temporaryPasswordExpiresAtField     = "temporary_password_expires_at"
 	temporaryPasswordField              = "temporary_password"
+	tieAccessToSessionField             = "tie_access_to_session"
 	updateChannelField                  = "update_channel"
 	updateLocationFromStatusField       = "update_location_from_status"
 	versionIDsField                     = "version_ids"
