@@ -360,6 +360,7 @@ var (
 	errWebhookNotFound = errors.DefineNotFound("webhook_not_found", "webhook not found")
 	errReadBody        = errors.DefineCanceled("read_body", "read body")
 	errDecodeBody      = errors.DefineInvalidArgument("decode_body", "decode body")
+	errValidateBody    = errors.DefineInvalidArgument("validate_body", "validate body")
 )
 
 func (w *webhooks) handleDown(op func(io.Server, context.Context, *ttnpb.EndDeviceIdentifiers, []*ttnpb.ApplicationDownlink) error) http.Handler {
@@ -395,6 +396,10 @@ func (w *webhooks) handleDown(op func(io.Server, context.Context, *ttnpb.EndDevi
 		items, err := format.ToDownlinks(body)
 		if err != nil {
 			webhandlers.Error(res, req, errDecodeBody.WithCause(err))
+			return
+		}
+		if err := items.ValidateFields(); err != nil {
+			webhandlers.Error(res, req, errValidateBody.WithCause(err))
 			return
 		}
 		logger.Debug("Perform downlink queue operation")

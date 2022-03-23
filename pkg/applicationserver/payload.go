@@ -28,7 +28,10 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-var errNoPayload = errors.DefineInvalidArgument("no_payload", "no payload")
+var (
+	errNoPayload = errors.DefineInvalidArgument("no_payload", "no payload")
+	errNoFPort   = errors.DefineInvalidArgument("no_f_port", "no FPort")
+)
 
 func (as *ApplicationServer) encodeDownlinks(ctx context.Context, dev *ttnpb.EndDevice, link *ttnpb.ApplicationLink, items []*ttnpb.ApplicationDownlink) error {
 	for _, item := range items {

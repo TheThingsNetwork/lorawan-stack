@@ -2510,6 +2510,15 @@
       "file": "templates.go"
     }
   },
+  "error:pkg/applicationserver/io/web:validate_body": {
+    "translations": {
+      "en": "validate body"
+    },
+    "description": {
+      "package": "pkg/applicationserver/io/web",
+      "file": "webhooks.go"
+    }
+  },
   "error:pkg/applicationserver/io/web:webhook_disabled": {
     "translations": {
       "en": "webhook disabled"
@@ -2706,6 +2715,15 @@
     "description": {
       "package": "pkg/applicationserver",
       "file": "applicationserver.go"
+    }
+  },
+  "error:pkg/applicationserver:no_f_port": {
+    "translations": {
+      "en": "no FPort"
+    },
+    "description": {
+      "package": "pkg/applicationserver",
+      "file": "payload.go"
     }
   },
   "error:pkg/applicationserver:no_join_eui": {

@@ -264,6 +264,10 @@ func (c *connection) deliver(pkt *packet.PublishPacket) {
 		logger.WithError(err).Warn("Failed to decode downlink messages")
 		return
 	}
+	if err := items.ValidateFields(); err != nil {
+		logger.WithError(err).Warn("Failed to validate downlink messages")
+		return
+	}
 	ids := &ttnpb.EndDeviceIdentifiers{
 		ApplicationIds: c.io.ApplicationIDs(),
 		DeviceId:       deviceID,
