@@ -922,6 +922,43 @@ var (
 		"mac_state.rejected_frequencies",
 		"mac_state.rx_windows_available",
 	}
+
+	legacyADRSettingsFields = []string{
+		"mac_settings.adr_margin",
+		"mac_settings.use_adr",
+		"mac_settings.use_adr.value",
+	}
+
+	adrSettingsFields = []string{
+		"mac_settings.adr",
+		"mac_settings.adr.mode",
+		"mac_settings.adr.mode.disabled",
+		"mac_settings.adr.mode.dynamic",
+		"mac_settings.adr.mode.dynamic.margin",
+		"mac_settings.adr.mode.dynamic.max_data_rate_index",
+		"mac_settings.adr.mode.dynamic.max_data_rate_index.value",
+		"mac_settings.adr.mode.dynamic.max_nb_trans",
+		"mac_settings.adr.mode.dynamic.max_tx_power_index",
+		"mac_settings.adr.mode.dynamic.min_data_rate_index",
+		"mac_settings.adr.mode.dynamic.min_data_rate_index.value",
+		"mac_settings.adr.mode.dynamic.min_nb_trans",
+		"mac_settings.adr.mode.dynamic.min_tx_power_index",
+		"mac_settings.adr.mode.static",
+		"mac_settings.adr.mode.static.data_rate_index",
+		"mac_settings.adr.mode.static.nb_trans",
+		"mac_settings.adr.mode.static.tx_power_index",
+	}
+
+	dynamicADRSettingsFields = []string{
+		"mac_settings.adr.mode.dynamic",
+		"mac_settings.adr.mode.dynamic.margin",
+		"mac_settings.adr.mode.dynamic.max_data_rate_index.value",
+		"mac_settings.adr.mode.dynamic.max_nb_trans",
+		"mac_settings.adr.mode.dynamic.max_tx_power_index",
+		"mac_settings.adr.mode.dynamic.min_data_rate_index.value",
+		"mac_settings.adr.mode.dynamic.min_nb_trans",
+		"mac_settings.adr.mode.dynamic.min_tx_power_index",
+	}
 )
 
 // Set implements NsEndDeviceRegistryServer.
@@ -1177,6 +1214,23 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	if st.HasSetField(
 		"frequency_plan_id",
 		"lorawan_phy_version",
+		"mac_settings.adr",
+		"mac_settings.adr.mode",
+		"mac_settings.adr.mode.disabled",
+		"mac_settings.adr.mode.dynamic",
+		"mac_settings.adr.mode.dynamic.margin",
+		"mac_settings.adr.mode.dynamic.max_data_rate_index",
+		"mac_settings.adr.mode.dynamic.max_data_rate_index.value",
+		"mac_settings.adr.mode.dynamic.max_nb_trans",
+		"mac_settings.adr.mode.dynamic.max_tx_power_index",
+		"mac_settings.adr.mode.dynamic.min_data_rate_index",
+		"mac_settings.adr.mode.dynamic.min_data_rate_index.value",
+		"mac_settings.adr.mode.dynamic.min_nb_trans",
+		"mac_settings.adr.mode.dynamic.min_tx_power_index",
+		"mac_settings.adr.mode.static",
+		"mac_settings.adr.mode.static.data_rate_index",
+		"mac_settings.adr.mode.static.nb_trans",
+		"mac_settings.adr.mode.static.tx_power_index",
 		"mac_settings.factory_preset_frequencies",
 		"mac_settings.ping_slot_frequency.value",
 		"mac_settings.use_adr.value",
@@ -1241,6 +1295,34 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			return nil, err
 		}
 
+		hasPHYUpdate := st.HasSetField(
+			"frequency_plan_id",
+			"lorawan_phy_version",
+		)
+
+		hasSetFieldWithFallback := func(field, fallbackField string) (fieldToRetrieve string, validate bool) {
+			if st.HasSetField(field) {
+				return field, true
+			}
+			return fallbackField, hasPHYUpdate
+		}
+		hasSetField := func(field string) (fieldToRetrieve string, validate bool) {
+			return hasSetFieldWithFallback(field, field)
+		}
+		hasSetADRField := func(field string) (fieldToRetrieve string, validate bool) {
+			return hasSetFieldWithFallback(field, "mac_settings.adr.mode")
+		}
+
+		setFields := func(fields ...string) []string {
+			setFields := make([]string, 0, len(fields))
+			for _, field := range fields {
+				if st.HasSetField(field) {
+					setFields = append(setFields, field)
+				}
+			}
+			return setFields
+		}
+
 		if st.HasSetField(
 			"frequency_plan_id",
 			"version_ids.band_id",
@@ -1261,163 +1343,259 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
-		if st.HasSetField(
-			"frequency_plan_id",
-			"lorawan_phy_version",
-			"mac_settings.rx2_data_rate_index.value",
-		) {
+		if field, validate := hasSetField("mac_settings.rx2_data_rate_index.value"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
-				return withPHY(func(phy *band.Band, fp *frequencyplans.FrequencyPlan) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if dev.GetMacSettings().GetRx2DataRateIndex() == nil {
 						return nil
 					}
 					_, ok := phy.DataRates[dev.MacSettings.Rx2DataRateIndex.Value]
 					if !ok {
-						return newInvalidFieldValueError("mac_settings.rx2_data_rate_index.value")
+						return newInvalidFieldValueError(field)
 					}
 					return nil
 				})
 			},
-				"mac_settings.rx2_data_rate_index.value",
+				field,
 			); err != nil {
 				return nil, err
 			}
 		}
-		if st.HasSetField(
-			"frequency_plan_id",
-			"lorawan_phy_version",
-			"mac_settings.desired_rx2_data_rate_index.value",
-		) {
+		if field, validate := hasSetField("mac_settings.desired_rx2_data_rate_index.value"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
-				return withPHY(func(phy *band.Band, fp *frequencyplans.FrequencyPlan) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if dev.GetMacSettings().GetDesiredRx2DataRateIndex() == nil {
 						return nil
 					}
 					_, ok := phy.DataRates[dev.MacSettings.DesiredRx2DataRateIndex.Value]
 					if !ok {
-						return newInvalidFieldValueError("mac_settings.desired_rx2_data_rate_index.value")
+						return newInvalidFieldValueError(field)
 					}
 					return nil
 				})
 			},
-				"mac_settings.desired_rx2_data_rate_index.value",
+				field,
 			); err != nil {
 				return nil, err
 			}
 		}
-		if st.HasSetField(
-			"frequency_plan_id",
-			"lorawan_phy_version",
-			"mac_settings.ping_slot_data_rate_index.value",
-		) {
+		if field, validate := hasSetField("mac_settings.ping_slot_data_rate_index.value"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
-				return withPHY(func(phy *band.Band, fp *frequencyplans.FrequencyPlan) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if dev.GetMacSettings().GetPingSlotDataRateIndex() == nil {
 						return nil
 					}
 					_, ok := phy.DataRates[dev.MacSettings.PingSlotDataRateIndex.Value]
 					if !ok {
-						return newInvalidFieldValueError("mac_settings.ping_slot_data_rate_index.value")
+						return newInvalidFieldValueError(field)
 					}
 					return nil
 				})
 			},
-				"mac_settings.ping_slot_data_rate_index.value",
+				field,
 			); err != nil {
 				return nil, err
 			}
 		}
-		if st.HasSetField(
-			"frequency_plan_id",
-			"lorawan_phy_version",
-			"mac_settings.desired_ping_slot_data_rate_index.value",
-		) {
+		if field, validate := hasSetField("mac_settings.desired_ping_slot_data_rate_index.value"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
-				return withPHY(func(phy *band.Band, fp *frequencyplans.FrequencyPlan) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if dev.GetMacSettings().GetDesiredPingSlotDataRateIndex() == nil {
 						return nil
 					}
 					_, ok := phy.DataRates[dev.MacSettings.DesiredPingSlotDataRateIndex.Value]
 					if !ok {
-						return newInvalidFieldValueError("mac_settings.desired_ping_slot_data_rate_index.value")
+						return newInvalidFieldValueError(field)
 					}
 					return nil
 				})
 			},
-				"mac_settings.desired_ping_slot_data_rate_index.value",
+				field,
 			); err != nil {
 				return nil, err
 			}
 		}
-		if st.HasSetField(
-			"frequency_plan_id",
-			"lorawan_phy_version",
-			"mac_settings.uplink_dwell_time.value",
-		) {
+		if field, validate := hasSetADRField("mac_settings.adr.mode.dynamic.max_data_rate_index.value"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
-				return withPHY(func(phy *band.Band, fp *frequencyplans.FrequencyPlan) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetAdr().GetDynamic().GetMaxDataRateIndex() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacSettings.Adr.GetDynamic().MaxDataRateIndex.Value]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetADRField("mac_settings.adr.mode.dynamic.min_data_rate_index.value"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetAdr().GetDynamic().GetMinDataRateIndex() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacSettings.Adr.GetDynamic().MinDataRateIndex.Value]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetADRField("mac_settings.adr.mode.dynamic.max_tx_power_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetAdr().GetDynamic().GetMaxTxPowerIndex() == nil {
+						return nil
+					}
+					if dev.MacSettings.Adr.GetDynamic().MaxTxPowerIndex.Value > uint32(phy.MaxTxPowerIndex()) {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetADRField("mac_settings.adr.mode.dynamic.min_tx_power_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetAdr().GetDynamic().GetMinTxPowerIndex() == nil {
+						return nil
+					}
+					if dev.MacSettings.Adr.GetDynamic().MinTxPowerIndex.Value > uint32(phy.MaxTxPowerIndex()) {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if setFields := setFields(dynamicADRSettingsFields...); hasPHYUpdate || len(setFields) > 0 {
+			fields := setFields
+			if hasPHYUpdate {
+				fields = append(fields, "mac_settings.adr.mode")
+			}
+			if err := st.WithFields(func(m map[string]*ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if phy.EnableADR {
+						return nil
+					}
+					for _, field := range fields {
+						if m[field].GetMacSettings().GetAdr().GetDynamic() != nil {
+							return newInvalidFieldValueError(field)
+						}
+					}
+					return nil
+				})
+			},
+				fields...,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetADRField("mac_settings.adr.mode.static.data_rate_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetAdr().GetStatic() == nil {
+						return nil
+					}
+					_, ok := phy.DataRates[dev.MacSettings.Adr.GetStatic().DataRateIndex]
+					if !ok {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetADRField("mac_settings.adr.mode.static.tx_power_index"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
+					if dev.GetMacSettings().GetAdr().GetStatic() == nil {
+						return nil
+					}
+					if dev.MacSettings.Adr.GetStatic().TxPowerIndex > uint32(phy.MaxTxPowerIndex()) {
+						return newInvalidFieldValueError(field)
+					}
+					return nil
+				})
+			},
+				field,
+			); err != nil {
+				return nil, err
+			}
+		}
+		if field, validate := hasSetField("mac_settings.uplink_dwell_time.value"); validate {
+			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if dev.GetMacSettings().GetUplinkDwellTime() == nil {
 						return nil
 					}
 					if !phy.TxParamSetupReqSupport {
-						return newInvalidFieldValueError("mac_settings.uplink_dwell_time.value")
+						return newInvalidFieldValueError(field)
 					}
 					return nil
 				})
 			},
-				"mac_settings.uplink_dwell_time.value",
+				field,
 			); err != nil {
 				return nil, err
 			}
 		}
-		if st.HasSetField(
-			"frequency_plan_id",
-			"lorawan_phy_version",
-			"mac_settings.downlink_dwell_time.value",
-		) {
+		if field, validate := hasSetField("mac_settings.downlink_dwell_time.value"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
-				return withPHY(func(phy *band.Band, fp *frequencyplans.FrequencyPlan) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if dev.GetMacSettings().GetDownlinkDwellTime() == nil {
 						return nil
 					}
 					if !phy.TxParamSetupReqSupport {
-						return newInvalidFieldValueError("mac_settings.downlink_dwell_time.value")
+						return newInvalidFieldValueError(field)
 					}
 					return nil
 				})
 			},
-				"mac_settings.downlink_dwell_time.value",
+				field,
 			); err != nil {
 				return nil, err
 			}
 		}
-		if st.HasSetField(
-			"frequency_plan_id",
-			"lorawan_phy_version",
-			"mac_state.current_parameters.rx2_data_rate_index",
-		) {
+		if field, validate := hasSetField("mac_state.current_parameters.rx2_data_rate_index"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				if dev.GetMacState() == nil {
 					return nil
 				}
-				return withPHY(func(phy *band.Band, fp *frequencyplans.FrequencyPlan) error {
+				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.MacState.CurrentParameters.Rx2DataRateIndex]
 					if !ok {
-						return newInvalidFieldValueError("mac_state.current_parameters.rx2_data_rate_index")
+						return newInvalidFieldValueError(field)
 					}
 					return nil
 				})
 			},
-				"mac_state.current_parameters.rx2_data_rate_index",
+				field,
 			); err != nil {
 				return nil, err
 			}
 		}
-		if st.HasSetField(
-			"frequency_plan_id",
-			"lorawan_phy_version",
-			"mac_state.desired_parameters.rx2_data_rate_index",
-		) {
+		if field, validate := hasSetField("mac_state.desired_parameters.rx2_data_rate_index"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				if dev.GetMacState() == nil {
 					return nil
@@ -1425,22 +1603,17 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.MacState.DesiredParameters.Rx2DataRateIndex]
 					if !ok {
-						return newInvalidFieldValueError("mac_state.desired_parameters.rx2_data_rate_index")
+						return newInvalidFieldValueError(field)
 					}
 					return nil
 				})
 			},
-				"mac_state.desired_parameters.rx2_data_rate_index",
+				field,
 			); err != nil {
 				return nil, err
 			}
 		}
-
-		if st.HasSetField(
-			"frequency_plan_id",
-			"lorawan_phy_version",
-			"pending_mac_state.current_parameters.rx2_data_rate_index",
-		) {
+		if field, validate := hasSetField("pending_mac_state.current_parameters.rx2_data_rate_index"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				if dev.GetPendingMacState() == nil {
 					return nil
@@ -1448,21 +1621,17 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.PendingMacState.CurrentParameters.Rx2DataRateIndex]
 					if !ok {
-						return newInvalidFieldValueError("pending_mac_state.current_parameters.rx2_data_rate_index")
+						return newInvalidFieldValueError(field)
 					}
 					return nil
 				})
 			},
-				"pending_mac_state.current_parameters.rx2_data_rate_index",
+				field,
 			); err != nil {
 				return nil, err
 			}
 		}
-		if st.HasSetField(
-			"frequency_plan_id",
-			"lorawan_phy_version",
-			"pending_mac_state.desired_parameters.rx2_data_rate_index",
-		) {
+		if field, validate := hasSetField("pending_mac_state.desired_parameters.rx2_data_rate_index"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				if dev.GetPendingMacState() == nil {
 					return nil
@@ -1470,22 +1639,17 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.PendingMacState.DesiredParameters.Rx2DataRateIndex]
 					if !ok {
-						return newInvalidFieldValueError("pending_mac_state.desired_parameters.rx2_data_rate_index")
+						return newInvalidFieldValueError(field)
 					}
 					return nil
 				})
 			},
-				"pending_mac_state.desired_parameters.rx2_data_rate_index",
+				field,
 			); err != nil {
 				return nil, err
 			}
 		}
-
-		if st.HasSetField(
-			"frequency_plan_id",
-			"lorawan_phy_version",
-			"mac_state.current_parameters.ping_slot_data_rate_index_value.value",
-		) {
+		if field, validate := hasSetField("mac_state.current_parameters.ping_slot_data_rate_index_value.value"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				if dev.GetMacState() == nil || dev.MacState.CurrentParameters.PingSlotDataRateIndexValue == nil {
 					return nil
@@ -1493,21 +1657,17 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.MacState.CurrentParameters.PingSlotDataRateIndexValue.Value]
 					if !ok {
-						return newInvalidFieldValueError("mac_state.current_parameters.ping_slot_data_rate_index_value.value")
+						return newInvalidFieldValueError(field)
 					}
 					return nil
 				})
 			},
-				"mac_state.current_parameters.ping_slot_data_rate_index_value",
+				field,
 			); err != nil {
 				return nil, err
 			}
 		}
-		if st.HasSetField(
-			"frequency_plan_id",
-			"lorawan_phy_version",
-			"mac_state.desired_parameters.ping_slot_data_rate_index_value.value",
-		) {
+		if field, validate := hasSetField("mac_state.desired_parameters.ping_slot_data_rate_index_value.value"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				if dev.GetMacState() == nil || dev.MacState.DesiredParameters.PingSlotDataRateIndexValue == nil {
 					return nil
@@ -1515,22 +1675,18 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.MacState.DesiredParameters.PingSlotDataRateIndexValue.Value]
 					if !ok {
-						return newInvalidFieldValueError("mac_state.desired_parameters.ping_slot_data_rate_index_value.value")
+						return newInvalidFieldValueError(field)
 					}
 					return nil
 				})
 			},
-				"mac_state.desired_parameters.ping_slot_data_rate_index_value",
+				field,
 			); err != nil {
 				return nil, err
 			}
 		}
 
-		if st.HasSetField(
-			"frequency_plan_id",
-			"lorawan_phy_version",
-			"pending_mac_state.current_parameters.ping_slot_data_rate_index_value.value",
-		) {
+		if field, validate := hasSetField("pending_mac_state.current_parameters.ping_slot_data_rate_index_value.value"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				if dev.GetPendingMacState() == nil || dev.PendingMacState.CurrentParameters.PingSlotDataRateIndexValue == nil {
 					return nil
@@ -1538,21 +1694,17 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.PendingMacState.CurrentParameters.PingSlotDataRateIndexValue.Value]
 					if !ok {
-						return newInvalidFieldValueError("pending_mac_state.current_parameters.ping_slot_data_rate_index_value.value")
+						return newInvalidFieldValueError(field)
 					}
 					return nil
 				})
 			},
-				"pending_mac_state.current_parameters.ping_slot_data_rate_index_value",
+				field,
 			); err != nil {
 				return nil, err
 			}
 		}
-		if st.HasSetField(
-			"frequency_plan_id",
-			"lorawan_phy_version",
-			"pending_mac_state.desired_parameters.ping_slot_data_rate_index_value.value",
-		) {
+		if field, validate := hasSetField("pending_mac_state.desired_parameters.ping_slot_data_rate_index_value.value"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				if dev.GetPendingMacState() == nil || dev.PendingMacState.DesiredParameters.PingSlotDataRateIndexValue == nil {
 					return nil
@@ -1560,22 +1712,18 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					_, ok := phy.DataRates[dev.PendingMacState.DesiredParameters.PingSlotDataRateIndexValue.Value]
 					if !ok {
-						return newInvalidFieldValueError("pending_mac_state.desired_parameters.ping_slot_data_rate_index_value.value")
+						return newInvalidFieldValueError(field)
 					}
 					return nil
 				})
 			},
-				"pending_mac_state.desired_parameters.ping_slot_data_rate_index_value",
+				field,
 			); err != nil {
 				return nil, err
 			}
 		}
 
-		if st.HasSetField(
-			"frequency_plan_id",
-			"lorawan_phy_version",
-			"mac_settings.factory_preset_frequencies",
-		) {
+		if field, validate := hasSetField("mac_settings.factory_preset_frequencies"); validate {
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				if dev.GetMacSettings() == nil || len(dev.MacSettings.FactoryPresetFrequencies) == 0 {
 					return nil
@@ -1583,20 +1731,18 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if phy.MaxUplinkChannels != phy.MaxDownlinkChannels {
 						// TODO: Allow this (https://github.com/TheThingsNetwork/lorawan-stack/issues/2269).
-						return newInvalidFieldValueError("mac_settings.factory_preset_frequencies")
+						return newInvalidFieldValueError(field)
 					}
 					return nil
 				})
 			},
-				"mac_settings.factory_preset_frequencies",
+				field,
 			); err != nil {
 				return nil, err
 			}
 		}
 
-		if st.HasSetField(
-			"frequency_plan_id",
-			"lorawan_phy_version",
+		if hasPHYUpdate || st.HasSetField(
 			"mac_settings.ping_slot_frequency.value",
 			"supports_class_b",
 		) {
@@ -1660,11 +1806,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return len(dev.GetPendingMacState().GetDesiredParameters().GetChannels()) <= int(phy.MaxUplinkChannels)
 			},
 		} {
-			if !st.HasSetField(
-				p,
-				"frequency_plan_id",
-				"lorawan_phy_version",
-			) {
+			if !hasPHYUpdate && !st.HasSetField(p) {
 				continue
 			}
 			p := p
@@ -1679,6 +1821,45 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 		}
+	}
+
+	// Ensure ADR dynamic parameters are monotonic.
+	// If one of the extrema is missing, the other extrema is considered to be valid.
+	if err := st.ValidateSetFields(func(m map[string]*ttnpb.EndDevice) (bool, string) {
+		{
+			min := m["mac_settings.adr.mode.dynamic.min_data_rate_index.value"].GetMacSettings().GetAdr().GetDynamic().GetMinDataRateIndex()
+			max := m["mac_settings.adr.mode.dynamic.max_data_rate_index.value"].GetMacSettings().GetAdr().GetDynamic().GetMaxDataRateIndex()
+
+			if min != nil && max != nil && max.Value < min.Value {
+				return false, "mac_settings.adr.mode.dynamic.max_data_rate_index.value"
+			}
+		}
+		{
+			min := m["mac_settings.adr.mode.dynamic.min_tx_power_index"].GetMacSettings().GetAdr().GetDynamic().GetMinTxPowerIndex()
+			max := m["mac_settings.adr.mode.dynamic.max_tx_power_index"].GetMacSettings().GetAdr().GetDynamic().GetMaxTxPowerIndex()
+
+			if min != nil && max != nil && max.Value < min.Value {
+				return false, "mac_settings.adr.mode.dynamic.max_tx_power_index"
+			}
+		}
+		{
+			min := m["mac_settings.adr.mode.dynamic.min_nb_trans"].GetMacSettings().GetAdr().GetDynamic().GetMinNbTrans()
+			max := m["mac_settings.adr.mode.dynamic.max_nb_trans"].GetMacSettings().GetAdr().GetDynamic().GetMaxNbTrans()
+
+			if min != nil && max != nil && max.Value < min.Value {
+				return false, "mac_settings.adr.mode.dynamic.max_nb_trans"
+			}
+		}
+		return true, ""
+	},
+		"mac_settings.adr.mode.dynamic.max_data_rate_index.value",
+		"mac_settings.adr.mode.dynamic.max_nb_trans",
+		"mac_settings.adr.mode.dynamic.max_tx_power_index",
+		"mac_settings.adr.mode.dynamic.min_data_rate_index.value",
+		"mac_settings.adr.mode.dynamic.min_nb_trans",
+		"mac_settings.adr.mode.dynamic.min_tx_power_index",
+	); err != nil {
+		return nil, err
 	}
 
 	var getTransforms []func(*ttnpb.EndDevice)
@@ -2578,4 +2759,16 @@ func (ns *NetworkServer) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentif
 		events.Publish(evt)
 	}
 	return ttnpb.Empty, nil
+}
+
+func init() {
+	// The legacy and modern ADR fields should be mutually exclusive.
+	// As such, specifying one of the fields means that every other field of the opposite
+	// type should be zero.
+	for _, field := range adrSettingsFields {
+		ifNotZeroThenZeroFields[field] = append(ifNotZeroThenZeroFields[field], legacyADRSettingsFields...)
+	}
+	for _, field := range legacyADRSettingsFields {
+		ifNotZeroThenZeroFields[field] = append(ifNotZeroThenNotZeroFields[field], "mac_settings.adr")
+	}
 }
