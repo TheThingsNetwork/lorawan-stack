@@ -32,6 +32,7 @@ func AddSelectFlagsForClient(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("endorsed", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("endorsed", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("grants", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("grants", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("rights", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("rights", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("tie-access-to-session", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("tie-access-to-session", prefix), false), flagsplugin.WithHidden(hidden)))
 }
 
 // SelectFromFlags outputs the fieldmask paths forClient message from select flags.
@@ -126,6 +127,11 @@ func PathsFromSelectFlagsForClient(flags *pflag.FlagSet, prefix string) (paths [
 	} else if selected && val {
 		paths = append(paths, flagsplugin.Prefix("rights", prefix))
 	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("tie_access_to_session", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("tie_access_to_session", prefix))
+	}
 	return paths, nil
 }
 
@@ -147,6 +153,7 @@ func AddSetFlagsForClient(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("endorsed", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewStringSliceFlag(flagsplugin.Prefix("grants", prefix), flagsplugin.EnumValueDesc(GrantType_value), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewStringSliceFlag(flagsplugin.Prefix("rights", prefix), flagsplugin.EnumValueDesc(Right_value), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("tie-access-to-session", prefix), "", flagsplugin.WithHidden(hidden)))
 }
 
 // SetFromFlags sets the Client message from flags.
@@ -271,6 +278,12 @@ func (m *Client) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []stri
 			m.Rights[i] = Right(enumValue)
 		}
 		paths = append(paths, flagsplugin.Prefix("rights", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("tie_access_to_session", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.TieAccessToSession = val
+		paths = append(paths, flagsplugin.Prefix("tie_access_to_session", prefix))
 	}
 	return paths, nil
 }

@@ -431,6 +431,15 @@ func (x *OAuthAccessToken) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 			gogo.MarshalTimestamp(s, x.ExpiresAt)
 		}
 	}
+	if x.SessionExpiresAt != nil || s.HasField("session_expires_at") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("session_expires_at")
+		if x.SessionExpiresAt == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalTimestamp(s, x.SessionExpiresAt)
+		}
+	}
 	s.WriteObjectEnd()
 }
 
@@ -513,6 +522,17 @@ func (x *OAuthAccessToken) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				return
 			}
 			x.ExpiresAt = v
+		case "session_expires_at", "sessionExpiresAt":
+			s.AddField("session_expires_at")
+			if s.ReadNil() {
+				x.SessionExpiresAt = nil
+				return
+			}
+			v := gogo.UnmarshalTimestamp(s)
+			if s.Err() != nil {
+				return
+			}
+			x.SessionExpiresAt = v
 		}
 	})
 }

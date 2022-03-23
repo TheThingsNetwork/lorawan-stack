@@ -911,6 +911,18 @@ func (m *OAuthAccessToken) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "session_expires_at":
+
+			if v, ok := interface{}(m.GetSessionExpiresAt()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return OAuthAccessTokenValidationError{
+						field:  "session_expires_at",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return OAuthAccessTokenValidationError{
 				field:  name,

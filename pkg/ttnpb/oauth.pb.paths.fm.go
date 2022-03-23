@@ -103,6 +103,7 @@ var OAuthAccessTokenFieldPathsNested = []string{
 	"id",
 	"refresh_token",
 	"rights",
+	"session_expires_at",
 	"user_ids",
 	"user_ids.email",
 	"user_ids.user_id",
@@ -117,6 +118,7 @@ var OAuthAccessTokenFieldPathsTopLevel = []string{
 	"id",
 	"refresh_token",
 	"rights",
+	"session_expires_at",
 	"user_ids",
 	"user_session_id",
 }

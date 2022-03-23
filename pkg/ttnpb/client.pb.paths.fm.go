@@ -34,6 +34,7 @@ var ClientFieldPathsNested = []string{
 	"technical_contact.ids.user_ids",
 	"technical_contact.ids.user_ids.email",
 	"technical_contact.ids.user_ids.user_id",
+	"tie_access_to_session",
 	"updated_at",
 }
 
@@ -56,6 +57,7 @@ var ClientFieldPathsTopLevel = []string{
 	"state",
 	"state_description",
 	"technical_contact",
+	"tie_access_to_session",
 	"updated_at",
 }
 var ClientsFieldPathsNested = []string{
@@ -131,6 +133,7 @@ var CreateClientRequestFieldPathsNested = []string{
 	"client.technical_contact.ids.user_ids",
 	"client.technical_contact.ids.user_ids.email",
 	"client.technical_contact.ids.user_ids.user_id",
+	"client.tie_access_to_session",
 	"client.updated_at",
 	"collaborator",
 	"collaborator.ids",
@@ -178,6 +181,7 @@ var UpdateClientRequestFieldPathsNested = []string{
 	"client.technical_contact.ids.user_ids",
 	"client.technical_contact.ids.user_ids.email",
 	"client.technical_contact.ids.user_ids.user_id",
+	"client.tie_access_to_session",
 	"client.updated_at",
 	"field_mask",
 }

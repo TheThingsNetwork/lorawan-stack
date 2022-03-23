@@ -201,6 +201,11 @@ func (x *Client) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		}
 		s.WriteArrayEnd()
 	}
+	if x.TieAccessToSession || s.HasField("tie_access_to_session") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("tie_access_to_session")
+		s.WriteBool(x.TieAccessToSession)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -366,6 +371,9 @@ func (x *Client) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				v.UnmarshalProtoJSON(s)
 				x.Rights = append(x.Rights, v)
 			})
+		case "tie_access_to_session", "tieAccessToSession":
+			s.AddField("tie_access_to_session")
+			x.TieAccessToSession = s.ReadBool()
 		}
 	})
 }

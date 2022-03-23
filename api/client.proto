@@ -136,7 +136,12 @@ message Client {
   // client after rights are added to this list.
   repeated Right rights = 14 [(validate.rules).repeated.items.enum.defined_only = true];
 
-  // next: 20
+  // If set, access will cease when the connected user session has ended.
+  // This information is public and can be seen by any authenticated user in the network.
+  // This field can only be modified by admins.
+  bool tie_access_to_session = 20;
+
+  // next: 21
 }
 
 message Clients {

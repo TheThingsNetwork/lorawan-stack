@@ -233,6 +233,16 @@ func (dst *Client) SetFields(src *Client, paths ...string) error {
 			} else {
 				dst.Rights = nil
 			}
+		case "tie_access_to_session":
+			if len(subs) > 0 {
+				return fmt.Errorf("'tie_access_to_session' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TieAccessToSession = src.TieAccessToSession
+			} else {
+				var zero bool
+				dst.TieAccessToSession = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

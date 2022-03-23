@@ -85,6 +85,10 @@ message OAuthAccessToken {
   repeated Right rights = 6;
   google.protobuf.Timestamp created_at = 7;
   google.protobuf.Timestamp expires_at = 8;
+  // Access tokens can be attached to a user session, in which case
+  // the access token's validity is tied to the session which can
+  // expire at a different time than the token itself.
+  google.protobuf.Timestamp session_expires_at = 10;
 }
 
 message OAuthAccessTokens {

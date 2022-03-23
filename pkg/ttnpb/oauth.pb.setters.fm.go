@@ -558,6 +558,15 @@ func (dst *OAuthAccessToken) SetFields(src *OAuthAccessToken, paths ...string) e
 			} else {
 				dst.ExpiresAt = nil
 			}
+		case "session_expires_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'session_expires_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.SessionExpiresAt = src.SessionExpiresAt
+			} else {
+				dst.SessionExpiresAt = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

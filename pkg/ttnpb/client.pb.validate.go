@@ -307,6 +307,8 @@ func (m *Client) ValidateFields(paths ...string) error {
 
 			}
 
+		case "tie_access_to_session":
+			// no validation rules for TieAccessToSession
 		default:
 			return ClientValidationError{
 				field:  name,

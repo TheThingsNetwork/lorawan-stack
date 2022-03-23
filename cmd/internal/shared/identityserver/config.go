@@ -76,4 +76,5 @@ func init() {
 	DefaultIdentityServerConfig.UserRights.CreateOrganizations = true
 	DefaultIdentityServerConfig.LoginTokens.TokenTTL = time.Hour
 	DefaultIdentityServerConfig.Delete.Restore = 24 * time.Hour
+	DefaultIdentityServerConfig.UserSession.Duration = 365 * 24 * time.Hour
 }

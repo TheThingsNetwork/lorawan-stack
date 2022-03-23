@@ -7482,6 +7482,18 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "tie_access_to_session",
+              "description": "If set, access will cease when the connected user session has ended.\nThis information is public and can be seen by any authenticated user in the network.\nThis field can only be modified by admins.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -33143,6 +33155,18 @@
             {
               "name": "expires_at",
               "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "session_expires_at",
+              "description": "Access tokens can be attached to a user session, in which case\nthe access token's validity is tied to the session which can\nexpire at a different time than the token itself.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",

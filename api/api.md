@@ -2066,6 +2066,7 @@ An OAuth client on the network.
 | `endorsed` | [`bool`](#bool) |  | If set, the authorization page will show endorsement. This information is public and can be seen by any authenticated user in the network. This field can only be modified by admins. |
 | `grants` | [`GrantType`](#ttn.lorawan.v3.GrantType) | repeated | OAuth flows that can be used for the client to get a token. This information is public and can be seen by any authenticated user in the network. After a client is created, this field can only be modified by admins. |
 | `rights` | [`Right`](#ttn.lorawan.v3.Right) | repeated | Rights denotes what rights the client will have access to. This information is public and can be seen by any authenticated user in the network. Users that previously authorized this client will have to re-authorize the client after rights are added to this list. |
+| `tie_access_to_session` | [`bool`](#bool) |  | If set, access will cease when the connected user session has ended. This information is public and can be seen by any authenticated user in the network. This field can only be modified by admins. |
 
 #### Field Rules
 
@@ -7223,6 +7224,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | `rights` | [`Right`](#ttn.lorawan.v3.Right) | repeated |  |
 | `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `expires_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+| `session_expires_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Access tokens can be attached to a user session, in which case the access token's validity is tied to the session which can expire at a different time than the token itself. |
 
 #### Field Rules
 
