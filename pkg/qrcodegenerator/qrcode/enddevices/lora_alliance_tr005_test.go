@@ -26,8 +26,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func eui64Ptr(v types.EUI64) *types.EUI64 { return &v }
-
 func TestLoRaAllianceTR005(t *testing.T) {
 	t.Run("Encode", func(t *testing.T) {
 		for _, tc := range []struct {

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package qrcode implements working with QR codes.
+// Package qrcode provides generic interfaces to work with QR codes.
 package qrcode
 
 import (

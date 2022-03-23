@@ -149,7 +149,7 @@ func (client *TTJS) Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest)
 		}
 
 		dev := data.GetEndDeviceTempate().GetEndDevice()
-		if dev == nil {
+		if dev == nil || dev.ClaimAuthenticationCode == nil {
 			return nil, errParseQRCode.New()
 		}
 		joinEUI = *dev.GetIds().JoinEui

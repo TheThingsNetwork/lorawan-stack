@@ -206,7 +206,7 @@ func (LoRaAllianceTR005Format) Format() *ttnpb.QRCodeFormat {
 	}
 }
 
-// ID implements the Format interface.
+// ID is the identifier of the format as a string.
 func (LoRaAllianceTR005Format) ID() string {
 	return formatIDLoRaAllianceTR005
 }

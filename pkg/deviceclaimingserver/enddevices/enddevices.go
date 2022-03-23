@@ -29,7 +29,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	"go.thethings.network/lorawan-stack/v3/pkg/qrcode"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -179,15 +178,19 @@ func (upstream *Upstream) Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRe
 	if authenticatedIDs := req.GetAuthenticatedIdentifiers(); authenticatedIDs != nil {
 		joinEUI = req.GetAuthenticatedIdentifiers().JoinEui
 	} else if qrCode := req.GetQrCode(); qrCode != nil {
-		data, err := qrcode.Parse(qrCode)
+		conn, err := upstream.Component.GetPeerConn(ctx, ttnpb.ClusterRole_QR_CODE_GENERATOR, nil)
 		if err != nil {
-			return nil, errParseQRCode.WithCause(err)
+			return nil, err
 		}
-		authIDs, ok := data.(qrcode.AuthenticatedEndDeviceIdentifiers)
-		if !ok {
-			return nil, errQRCodeData.New()
+		qrg := ttnpb.NewEndDeviceQRCodeGeneratorClient(conn)
+		data, err := qrg.Parse(ctx, &ttnpb.ParseEndDeviceQRCodeRequest{
+			QrCode: qrCode,
+		})
+		dev := data.GetEndDeviceTempate().GetEndDevice()
+		if dev == nil {
+			return nil, errParseQRCode.New()
 		}
-		joinEUI, _, _ = authIDs.AuthenticatedEndDeviceIdentifiers()
+		joinEUI = *dev.GetIds().JoinEui
 	} else {
 		return nil, errNoJoinEUI.New()
 	}
