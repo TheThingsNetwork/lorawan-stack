@@ -26,8 +26,9 @@ import * as user from '@account/store/actions/user'
 const accountAppInitLogic = createLogic({
   type: init.INITIALIZE,
   process: async (_, dispatch, done) => {
+    let meResult
     try {
-      const meResult = await api.account.me()
+      meResult = await api.account.me()
       // Using `store.dispatch` since redux logic's dispatch won't return
       // the (promisified) action result like regular dispatch does.
       await promisifyDispatch(dispatch)(
@@ -54,7 +55,7 @@ const accountAppInitLogic = createLogic({
     // eslint-disable-next-line no-console
     console.log('Account app initialization successful!')
     dispatch(init.initializeSuccess())
-    done()
+    return meResult.data.session_id
   },
 })
 

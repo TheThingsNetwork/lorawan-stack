@@ -22,15 +22,23 @@ import {
   GET_USER_SESSIONS_LIST_SUCCESS,
   GET_USER_SESSIONS_LIST_FAILURE,
 } from '@account/store/actions/user'
+import { INITIALIZE } from '@ttn-lw/lib/store/actions/init'
 
 const defaultState = {
   fetching: false,
   user: undefined,
   error: false,
+  session_id: undefined,
 }
 
 const user = (state = defaultState, { type, payload }) => {
+  console.log(payload)
   switch (type) {
+    case INITIALIZE:
+      return {
+        ...state,
+        session_id: payload,
+      }
     case GET_USER:
       return {
         ...state,
