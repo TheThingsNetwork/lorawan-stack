@@ -57,6 +57,7 @@ var now = time.Now()
 // NewAPIKey adds a new API key to the population and returns it.
 // The returned API key can not be modified and will not have its CreatedAt/UpdatedAt fields populated.
 func (p *Population) NewAPIKey(entityID *ttnpb.EntityIdentifiers, rights ...ttnpb.Right) (original, stored *ttnpb.APIKey) {
+	i := len(p.APIKeys) + 1
 	token, err := auth.APIKey.Generate(context.Background(), "")
 	if err != nil {
 		panic(err)
@@ -68,6 +69,7 @@ func (p *Population) NewAPIKey(entityID *ttnpb.EntityIdentifiers, rights ...ttnp
 	original = &ttnpb.APIKey{
 		Id:     generatedID,
 		Key:    token,
+		Name:   fmt.Sprintf("Key %02d", i),
 		Rights: rights,
 	}
 	hashValidator := pbkdf2.Default()
@@ -79,6 +81,7 @@ func (p *Population) NewAPIKey(entityID *ttnpb.EntityIdentifiers, rights ...ttnp
 	stored = &ttnpb.APIKey{
 		Id:     generatedID,
 		Key:    hashedKey,
+		Name:   fmt.Sprintf("Key %02d", i),
 		Rights: rights,
 	}
 	p.APIKeys = append(p.APIKeys, &EntityAPIKey{
