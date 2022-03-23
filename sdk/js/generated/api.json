@@ -12424,7 +12424,7 @@
                     },
                     {
                       "method": "GET",
-                      "pattern": "/dr/applications/{application_ids.application_id}/vendor-id/{end_device_profile_ids.vendor_id}/vendor-profile-id/{end_device_profile_ids.vendor_profile_id}/template"
+                      "pattern": "/dr/applications/{application_ids.application_id}/vendors/{end_device_profile_ids.vendor_id}/profiles/{end_device_profile_ids.vendor_profile_id}/template"
                     }
                   ]
                 }

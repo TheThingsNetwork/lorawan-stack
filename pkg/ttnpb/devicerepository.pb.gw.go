@@ -1730,7 +1730,7 @@ var (
 
 	pattern_DeviceRepository_GetTemplate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 2, 9}, []string{"dr", "applications", "application_ids.application_id", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "template"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_DeviceRepository_GetTemplate_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"dr", "applications", "application_ids.application_id", "vendor-id", "end_device_profile_ids.vendor_id", "vendor-profile-id", "end_device_profile_ids.vendor_profile_id", "template"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_DeviceRepository_GetTemplate_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"dr", "applications", "application_ids.application_id", "vendors", "end_device_profile_ids.vendor_id", "profiles", "end_device_profile_ids.vendor_profile_id", "template"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_DeviceRepository_GetUplinkDecoder_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 2, 9, 2, 10, 2, 11}, []string{"dr", "applications", "application_ids.application_id", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "formatters", "uplink", "decoder"}, "", runtime.AssumeColonVerbOpt(true)))
 

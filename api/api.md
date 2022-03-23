@@ -3055,7 +3055,7 @@ Identifiers to uniquely identify a LoRaWAN end device profile.
 | `ListModels` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/models` |  |
 | `GetModel` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands/{brand_id}/models/{model_id}` |  |
 | `GetTemplate` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/template` |  |
-| `GetTemplate` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/vendor-id/{end_device_profile_ids.vendor_id}/vendor-profile-id/{end_device_profile_ids.vendor_profile_id}/template` |  |
+| `GetTemplate` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/vendors/{end_device_profile_ids.vendor_id}/profiles/{end_device_profile_ids.vendor_profile_id}/template` |  |
 | `GetUplinkDecoder` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/uplink/decoder` |  |
 | `GetDownlinkDecoder` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/decoder` |  |
 | `GetDownlinkEncoder` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/encoder` |  |
