@@ -53,10 +53,6 @@ const validationSchema = Yup.object().shape({
   name: Yup.string()
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(2000, Yup.passValues(sharedMessages.validateTooLong)),
-  description: Yup.string(),
-  network_server_address: Yup.string(),
-  application_server_address: Yup.string(),
-  join_server_address: Yup.string(),
 })
 
 const ApplicationAdd = props => {

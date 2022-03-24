@@ -70,7 +70,7 @@ const tabs = [
 ]
 
 const ApplicationsTable = props => {
-  const { isAdmin, restoreApplication, purgeApplication, isOtherClusterDevice, ...rest } = props
+  const { isAdmin, restoreApplication, purgeApplication, ...rest } = props
 
   const [tab, setTab] = React.useState(OWNED_TAB)
   const isDeletedTab = tab === DELETED_TAB
@@ -228,6 +228,7 @@ const ApplicationsTable = props => {
 
 ApplicationsTable.propTypes = {
   isAdmin: PropTypes.bool.isRequired,
+  isOtherClusterApp: PropTypes.func.isRequired,
   purgeApplication: PropTypes.func.isRequired,
   restoreApplication: PropTypes.func.isRequired,
 }
