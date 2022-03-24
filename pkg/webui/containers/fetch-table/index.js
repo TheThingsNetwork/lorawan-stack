@@ -33,7 +33,6 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import style from './fetch-table.styl'
-import { action } from '@storybook/addon-actions'
 
 const DEFAULT_PAGE = 1
 
@@ -73,6 +72,7 @@ const m = defineMessages({
     fetchingSearch: base.fetchingSearch,
     pathname: state.router.location.pathname,
     mayAdd: 'mayAdd' in base ? base.mayAdd : true,
+    mayLink: 'mayLink' in base ? base.mayLink : true,
     error: base.error,
   }
 })
@@ -108,6 +108,7 @@ class FetchTable extends Component {
       }),
     ),
     mayAdd: PropTypes.bool,
+    mayLink: PropTypes.bool,
     pageSize: PropTypes.number,
     pathname: PropTypes.string.isRequired,
     rowKeySelector: PropTypes.func,
@@ -134,6 +135,7 @@ class FetchTable extends Component {
     filterValidator,
     itemPathPrefix: '',
     mayAdd: false,
+    mayLink: false,
     searchable: false,
     searchPlaceholderMessage: sharedMessages.search,
     searchQueryMaxLength: 50,
@@ -285,6 +287,7 @@ class FetchTable extends Component {
       fetching,
       fetchingSearch,
       mayAdd,
+      mayLink,
       pageSize,
       addMessage,
       tableTitle,
@@ -313,8 +316,7 @@ class FetchTable extends Component {
     const filtersCls = classnames(style.filters, {
       [style.topRule]: tabs.length > 0,
     })
-    console.log(actionItems)
-    console.log(mayAdd)
+
     return (
       <div data-test-id={`${entity}-table`}>
         <div className={filtersCls}>
@@ -382,7 +384,7 @@ class FetchTable extends Component {
             loading={fetching}
             headers={headers}
             rowKeySelector={rowKeySelector}
-            rowHrefSelector={this.rowHrefSelector}
+            rowHrefSelector={mayLink ? this.rowHrefSelector : undefined}
             data={initialFetch ? [] : items}
             emptyMessage={sharedMessages.noMatch}
             handlesPagination={handlesPagination}
