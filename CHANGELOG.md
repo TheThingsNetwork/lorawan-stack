@@ -11,16 +11,26 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.18.2] - unreleased
+
+### Added
+
 - Support for importing end devices using a CSV file. See [documentation](https://www.thethingsindustries.com/docs/reference/data-formats/#csv) for the data format.
 - Support claiming end devices in an external Join Server (ex: The Things Join Server).
 
 ### Changed
 
 - Replace `as.down.data.forward` to `as.down.data.receive` in default event filter, so that decrypted and decoded dowlink payload can be examined in the Console.
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 
@@ -29,8 +39,6 @@ For details about compatibility between different releases, see the **Commitment
 - Fix validation issue in the webhook form not detecting message type paths with more than 64 characters.
 - Fix "reactivate"-webhook button in the Console.
 - Port returned by the LBS LNS discovery message if standard 80/443 ports are used.
-
-### Security
 
 ## [3.18.1] - 2022-03-09
 
@@ -2065,7 +2073,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.18.1...v3.18
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.18.2...v3.18
+[3.18.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.18.1...v3.18.2
 [3.18.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.18.0...v3.18.1
 [3.18.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.17.1...v3.18.0
 [3.17.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.17.0...v3.17.1
