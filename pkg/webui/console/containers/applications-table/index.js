@@ -228,7 +228,6 @@ const ApplicationsTable = props => {
 
 ApplicationsTable.propTypes = {
   isAdmin: PropTypes.bool.isRequired,
-  isOtherClusterApp: PropTypes.func.isRequired,
   purgeApplication: PropTypes.func.isRequired,
   restoreApplication: PropTypes.func.isRequired,
 }
