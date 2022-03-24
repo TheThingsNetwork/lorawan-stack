@@ -545,11 +545,11 @@ func (as *ApplicationServer) attemptDownlinkQueueOp(ctx context.Context, dev *tt
 		ctx := log.NewContextWithField(ctx, "attempt", attempt)
 
 		sessions := make([]*ttnpb.Session, 0, 2)
-		if dev.Session != nil && !op.shouldSkip(dev.Session.Keys.SessionKeyId) {
+		if dev.Session != nil && !op.shouldSkip(dev.Session.GetKeys().GetSessionKeyId()) {
 			sessions = append(sessions, dev.Session)
 			mask = ttnpb.AddFields(mask, "session.last_a_f_cnt_down")
 		}
-		if dev.PendingSession != nil && !op.shouldSkip(dev.PendingSession.Keys.SessionKeyId) {
+		if dev.PendingSession != nil && !op.shouldSkip(dev.PendingSession.GetKeys().GetSessionKeyId()) {
 			// Downlink can be encrypted with the pending session while the device first joined but not confirmed the
 			// session by sending an uplink.
 			sessions = append(sessions, dev.PendingSession)
