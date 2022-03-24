@@ -107,6 +107,17 @@ nextPath:
 	return res
 }
 
+// NonZeroFields returns the fields which are not zero in the provided message.
+func NonZeroFields(msg interface{ FieldIsZero(string) bool }, fields ...string) []string {
+	nonZeroFields := make([]string, 0, len(fields))
+	for _, field := range fields {
+		if !msg.FieldIsZero(field) {
+			nonZeroFields = append(nonZeroFields, field)
+		}
+	}
+	return nonZeroFields
+}
+
 var errMissingField = errors.Define("missing_field", "field `{field}` is missing")
 
 // RequireFields returns nil if the given requested paths contain all of the given fields and error otherwise.
@@ -169,6 +180,20 @@ outer:
 		}
 	}
 	return selectedPaths
+}
+
+// AllowedReachableBottomLevelFields returns the reachable bottom level paths from the given paths that are in the allowed paths.
+// Reachability in this context means that all of the intermediary paths between the given paths and the bottom level paths
+// are not zero. Using only reachable paths ensures that no redundant bottom level paths are included.
+func AllowedReachableBottomLevelFields(paths, allowedPaths []string, isZero func(string) bool) []string {
+	nonZeroAllowedPaths := make([]string, 0, len(allowedPaths))
+	for _, allowedPath := range allowedPaths {
+		if isZero(allowedPath) {
+			continue
+		}
+		nonZeroAllowedPaths = append(nonZeroAllowedPaths, allowedPath)
+	}
+	return AllowedBottomLevelFields(paths, nonZeroAllowedPaths)
 }
 
 // ExcludeFields returns the given paths without the given search paths to exclude.
