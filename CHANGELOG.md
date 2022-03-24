@@ -10,6 +10,7 @@ For details about compatibility between different releases, see the **Commitment
 ## [Unreleased]
 
 ### Added
+- Session management page in Account App.
 
 - Status page references in the Console.
 - Notification Service API that will allow users to receive notifications about their registered entities.
