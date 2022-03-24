@@ -95,9 +95,12 @@ const deleteUserLogic = createRequestLogic({
 const getUserSessionsLogic = createRequestLogic({
   type: user.GET_USER_SESSIONS_LIST,
   process: async ({ action }) => {
-    const { parentId } = action.payload
-
-    const result = await tts.Users.getAllSessions(parentId)
+    const { parentId, parentType } = action.payload
+    let user = parentId
+    if (!parentId) {
+      user = parentType
+    }
+    const result = await tts.Users.getAllSessions(user)
 
     return { sessions: result.sessions, sessionsTotalCount: result.sessions.length }
   },

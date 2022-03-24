@@ -13,85 +13,180 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
+import { defineMessages } from 'react-intl'
 
 import Button from '@ttn-lw/components/button'
+import Status from '@ttn-lw/components/status'
+import toast from '@ttn-lw/components/toast'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
 import Message from '@ttn-lw/lib/components/message'
+
 import LastSeen from '@console/components/last-seen'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { getUserSessionsList } from '@account/store/actions/user'
+import { getUserSessionsList, deleteUserSession } from '@account/store/actions/user'
 
 import {
   selectUserId,
   selectUserSessions,
   selectUserSessionsTotalCount,
   selectUserSessionsFetching,
+  selectSessionId,
 } from '@account/store/selectors/user'
 
-const headers = [
-  {
-    name: 'session_id',
-    displayName: 'ID',
-    width: 24,
-    sortable: true,
-  },
-  {
-    name: 'updated_at',
-    displayName: 'Last seen',
-    width: 22,
-    sortable: true,
-    render: updated_at => <LastSeen status="none" lastSeen={updated_at} short />,
-  },
-  {
-    name: 'created_at',
-    displayName: '',
-    width: 22,
-    render: () => (
-      <Button type="button" message="Remove this session" icon="delete" title={'Delete'} />
-    ),
-  },
-]
+const m = defineMessages({
+  deleteSessionSuccess: 'Session deleted successfully',
+  deleteSession: 'Delete session',
+  deleteSessionError: 'There was an error and this session could not be deleted',
+  sessionsTableTitle: 'Sessions',
+  removeButtonMessage: 'Remove this session',
+})
 
 const UserSessionsTable = props => {
-  const { selectTableData, pageSize, user } = props
+  const { selectTableData, pageSize, user, handleDeleteSession } = props
+  const dispatch = useDispatch()
 
   const getSessions = React.useCallback(filters => getUserSessionsList(filters, user), [user])
+
+  const onDeleteSuccess = React.useCallback(() => {
+    toast({
+      title: m.deleteSession,
+      message: m.deleteSessionSuccess,
+      type: toast.types.SUCCESS,
+    })
+
+    dispatch(getUserSessionsList(user))
+  }, [user, dispatch])
+
+  const deleteSession = React.useCallback(
+    async session_id => {
+      try {
+        const result = await handleDeleteSession(user, session_id)
+        onDeleteSuccess(result)
+      } catch {
+        toast({
+          title: m.deleteSession,
+          message: m.deleteSessionError,
+          type: toast.types.ERROR,
+        })
+      }
+    },
+    [user, handleDeleteSession, onDeleteSuccess],
+  )
+
+  const makeHeaders = React.useMemo(() => {
+    const onDelete = session_id => () => deleteSession(session_id)
+
+    const baseHeaders = [
+      {
+        name: 'session_id',
+        displayName: 'ID',
+        width: 5,
+        sortable: true,
+      },
+      {
+        name: 'status',
+        displayName: '',
+        width: 40,
+        render: status => {
+          if (status.currentSession) {
+            return <Status flipped status="good" label="Current session" />
+          }
+        },
+      },
+      {
+        name: 'updated_at',
+        displayName: 'Last activity',
+        width: 4,
+        sortable: true,
+        render: updated_at => <LastSeen status="none" lastSeen={updated_at} short />,
+      },
+      {
+        name: 'status',
+        displayName: '',
+        width: 10,
+        render: status => {
+          const handleDeleteSession = onDelete(status._session_id)
+          if (status.currentSession) {
+            return null
+          }
+
+          return (
+            <Button
+              type="button"
+              onClick={handleDeleteSession}
+              message={m.removeButtonMessage}
+              icon="delete"
+            />
+          )
+        },
+      },
+    ]
+
+    return baseHeaders
+  }, [deleteSession])
 
   return (
     <FetchTable
       entity="sessions"
-      headers={headers}
+      headers={makeHeaders}
       getItemsAction={getSessions}
       baseDataSelector={selectTableData}
-      tableTitle={<Message content={'Sessions'} />}
+      tableTitle={<Message content={m.sessionsTableTitle} />}
       pageSize={pageSize}
     />
   )
 }
 
 UserSessionsTable.propTypes = {
+  handleDeleteSession: PropTypes.func.isRequired,
   pageSize: PropTypes.number.isRequired,
   selectTableData: PropTypes.func.isRequired,
+  user: PropTypes.string.isRequired,
 }
 
 export default connect(
   state => ({
     user: selectUserId(state),
+    sessionId: selectSessionId(state),
   }),
-  null,
+  dispatch => ({
+    handleDeleteSession: (user, session_id) =>
+      dispatch(attachPromise(deleteUserSession(user, session_id))),
+  }),
   (stateProps, dispatchProps, ownProps) => ({
     ...stateProps,
     ...dispatchProps,
     ...ownProps,
-    selectTableData: state => ({
-      sessions: selectUserSessions(state),
-      totalCount: selectUserSessionsTotalCount(state),
-      fetching: selectUserSessionsFetching(state),
-    }),
+    selectTableData: state => {
+      const sessions = selectUserSessions(state)
+      const decoratedSessions = []
+
+      if (sessions !== undefined) {
+        for (const session of sessions) {
+          decoratedSessions.push({
+            ...session,
+            id: session.session_id,
+            status: {
+              currentSession: session.session_id === stateProps.sessionId,
+              _session_id: session.session_id,
+            },
+          })
+        }
+      }
+
+      return {
+        sessions: decoratedSessions,
+        totalCount: selectUserSessionsTotalCount(state),
+        fetching: selectUserSessionsFetching(state),
+        mayAdd: false,
+        mayLink: false,
+      }
+    },
   }),
 )(UserSessionsTable)

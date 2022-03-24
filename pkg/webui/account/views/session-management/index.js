@@ -17,14 +17,11 @@ import { Container, Col, Row } from 'react-grid-system'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
-import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-
 import UserSessionsTable from '@account/containers/sessions-table'
 
 const SessionManagement = () => (
   <Container>
     <Row>
-      <IntlHelmet title={'Sessions'} />
       <Col>
         <UserSessionsTable pageSize={PAGE_SIZES.REGULAR} />
       </Col>
