@@ -55,7 +55,8 @@ const accountAppInitLogic = createLogic({
     // eslint-disable-next-line no-console
     console.log('Account app initialization successful!')
     dispatch(init.initializeSuccess())
-    return meResult.data.session_id
+    dispatch(init.getSessionIdSuccess(meResult.data.session_id))
+    done()
   },
 })
 

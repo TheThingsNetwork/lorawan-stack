@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { GET_SESSION_ID_SUCCESS } from '@ttn-lw/lib/store/actions/init'
+
 import {
   GET_USER,
   GET_USER_SUCCESS,
@@ -22,7 +24,6 @@ import {
   GET_USER_SESSIONS_LIST_SUCCESS,
   GET_USER_SESSIONS_LIST_FAILURE,
 } from '@account/store/actions/user'
-import { INITIALIZE } from '@ttn-lw/lib/store/actions/init'
 
 const defaultState = {
   fetching: false,
@@ -32,9 +33,8 @@ const defaultState = {
 }
 
 const user = (state = defaultState, { type, payload }) => {
-  console.log(payload)
   switch (type) {
-    case INITIALIZE:
+    case GET_SESSION_ID_SUCCESS:
       return {
         ...state,
         session_id: payload,
