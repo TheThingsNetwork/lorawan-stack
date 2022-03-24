@@ -147,11 +147,13 @@ var (
 func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []string) (*ttnpb.EntityIdentifiers, error)) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "contact-info",
-		Short: fmt.Sprintf("Manage %s contact info", entity),
+		Short: fmt.Sprintf("Manage %[1]s contact info (DEPRECATED. Instead, use administrative_contact and technical_contact fields of %[1]s)", entity),
 	}
 	list := &cobra.Command{
 		Use:     fmt.Sprintf("list [%s-id]", entity),
 		Aliases: []string{"ls", "get"},
+		Short:   fmt.Sprintf("List %[1]s contact info (DEPRECATED. Instead, select administrative_contact and technical_contact fields of %[1]s)", entity),
+		Hidden:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			id, err := getID(cmd, args)
 			if err != nil {
@@ -167,6 +169,8 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []st
 	add := &cobra.Command{
 		Use:     fmt.Sprintf("create [%s-id]", entity),
 		Aliases: []string{"add", "register"},
+		Short:   fmt.Sprintf("Add %[1]s contact info (DEPRECATED. Instead, set administrative_contact and technical_contact fields of %[1]s)", entity),
+		Hidden:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			id, err := getID(cmd, args)
 			if err != nil {
@@ -193,6 +197,8 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []st
 	remove := &cobra.Command{
 		Use:     fmt.Sprintf("delete [%s-id]", entity),
 		Aliases: []string{"del", "remove", "rm"},
+		Short:   fmt.Sprintf("Remove %[1]s contact info (DEPRECATED. Instead, unset administrative_contact and technical_contact fields of %[1]s)", entity),
+		Hidden:  true,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			id, err := getID(cmd, args)
 			if err != nil {
