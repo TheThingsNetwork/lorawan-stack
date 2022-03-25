@@ -28,7 +28,7 @@ For details about compatibility between different releases, see the **Commitment
   - Join Servers using Backend Interfaces 1.1 (protocol `BI1.1`) must be configured with a `sender-ns-id` containing the EUI of the Network Server.
 - Fix `time.Duration` flags in CLI.
 - Gateway Server will no longer leave permanent gateway connection stats data on the registry when crashing.
-- Fix incorrect handling of gateway_server_address in the console when it contains a scheme or port
+- Console determining gateways as "Other cluster" even though using the same host if server addresses not matching exactly (e.g. due to using different host or scheme)
 
 ### Security
 
