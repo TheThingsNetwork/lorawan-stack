@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,8 +23,7 @@ import toast from '@ttn-lw/components/toast'
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
 import Message from '@ttn-lw/lib/components/message'
-
-import LastSeen from '@console/components/last-seen'
+import DateTime from '@ttn-lw/lib/components/date-time'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
@@ -45,6 +44,9 @@ const m = defineMessages({
   deleteSessionError: 'There was an error and this session could not be deleted',
   sessionsTableTitle: 'Sessions',
   removeButtonMessage: 'Remove this session',
+  noExpiryDate: 'No expiry date',
+  endSession: 'Logout to end this session',
+  currentSession: '(this is the current session)',
 })
 
 const UserSessionsTable = props => {
@@ -85,35 +87,59 @@ const UserSessionsTable = props => {
     const baseHeaders = [
       {
         name: 'session_id',
-        displayName: 'ID',
-        width: 5,
-        sortable: true,
+        displayName: 'Session ID',
+        width: 9,
       },
       {
         name: 'status',
         displayName: '',
-        width: 40,
+        width: 17,
         render: status => {
           if (status.currentSession) {
-            return <Status flipped status="good" label="Current session" />
+            return <Status status="none" label={m.currentSession} />
           }
         },
       },
       {
-        name: 'updated_at',
-        displayName: 'Last activity',
-        width: 4,
-        sortable: true,
-        render: updated_at => <LastSeen status="none" lastSeen={updated_at} short />,
+        name: 'created_at',
+        displayName: 'Session start',
+        width: 25,
+        render: created_at => (
+          <>
+            <DateTime value={created_at} />
+            {' ('}
+            <DateTime.Relative value={created_at} />
+            {') '}
+          </>
+        ),
       },
       {
         name: 'status',
-        displayName: '',
-        width: 10,
+        displayName: 'Expiry',
+        width: 20,
+        render: status => {
+          if (!status._expiry) {
+            return <Message content={m.noExpiryDate} />
+          }
+
+          return (
+            <>
+              <DateTime value={status._expiry} />
+              {' ('}
+              <DateTime.Relative value={status._expiry} />
+              {') '}
+            </>
+          )
+        },
+      },
+      {
+        name: 'status',
+        displayName: 'Action',
+        width: 20,
         render: status => {
           const handleDeleteSession = onDelete(status._session_id)
           if (status.currentSession) {
-            return null
+            return <Message content={m.endSession} />
           }
 
           return (
@@ -167,7 +193,7 @@ export default connect(
       const sessions = selectUserSessions(state)
       const decoratedSessions = []
 
-      if (sessions !== undefined) {
+      if (sessions) {
         for (const session of sessions) {
           decoratedSessions.push({
             ...session,
@@ -175,6 +201,7 @@ export default connect(
             status: {
               currentSession: session.session_id === stateProps.sessionId,
               _session_id: session.session_id,
+              _expiry: session.expires_at,
             },
           })
         }
