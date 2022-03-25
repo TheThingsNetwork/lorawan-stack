@@ -39,8 +39,7 @@ import {
 } from '@account/store/selectors/user'
 
 const m = defineMessages({
-  deleteSessionSuccess: 'Session deleted successfully',
-  deleteSession: 'Delete session',
+  deleteSessionSuccess: 'Session removed successfully',
   deleteSessionError: 'There was an error and this session could not be deleted',
   sessionsTableTitle: 'Sessions',
   removeButtonMessage: 'Remove this session',
@@ -57,7 +56,6 @@ const UserSessionsTable = props => {
 
   const onDeleteSuccess = React.useCallback(() => {
     toast({
-      title: m.deleteSession,
       message: m.deleteSessionSuccess,
       type: toast.types.SUCCESS,
     })
@@ -72,7 +70,6 @@ const UserSessionsTable = props => {
         onDeleteSuccess(result)
       } catch {
         toast({
-          title: m.deleteSession,
           message: m.deleteSessionError,
           type: toast.types.ERROR,
         })
