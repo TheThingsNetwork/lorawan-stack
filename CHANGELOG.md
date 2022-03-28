@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Console determining gateways as "Other cluster" even though using the same host if server addresses not matching exactly (e.g. due to using different host or scheme).
+
 ### Security
 
 ## [3.18.2] - unreleased
@@ -100,7 +102,6 @@ For details about compatibility between different releases, see the **Commitment
   - Join Servers using Backend Interfaces 1.1 (protocol `BI1.1`) must be configured with a `sender-ns-id` containing the EUI of the Network Server.
 - Fix `time.Duration` flags in CLI.
 - Gateway Server will no longer leave permanent gateway connection stats data on the registry when crashing.
-- Console determining gateways as "Other cluster" even though using the same host if server addresses not matching exactly (e.g. due to using different host or scheme)
 
 ## [3.17.2] - 2022-01-30
 
