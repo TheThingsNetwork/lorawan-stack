@@ -13,11 +13,13 @@
 // limitations under the License.
 
 import React from 'react'
+import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
 import DataSheet from '@ttn-lw/components/data-sheet'
+import Button from '@ttn-lw/components/button'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import Message from '@ttn-lw/lib/components/message'
@@ -31,6 +33,7 @@ import Require from '@console/lib/components/require'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
 
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
@@ -65,6 +68,17 @@ class DeviceOverview extends React.Component {
 
   static defaultProps = {
     shouldRedirect: false,
+  }
+
+  @bind
+  onExport() {
+    const { ids, mac_state, mac_settings } = this.props.device
+    const toExport = { mac_state, mac_settings }
+    const toExportData = composeDataUri(JSON.stringify(toExport, undefined, 2))
+    downloadDataUriAsFile(
+      toExportData,
+      `${ids.device_id}_mac_settings_mac_state_${Date.now()}.json`,
+    )
   }
 
   get deviceInfo() {
@@ -222,6 +236,25 @@ class DeviceOverview extends React.Component {
     }
 
     sheetData.push(sessionInfoData)
+
+    const macStateAndSettings = {
+      header: 'Export end device MAC state and MAC settings',
+      items: [],
+    }
+
+    if (Object.keys(sessionKeys).length > 0) {
+      macStateAndSettings.items.push({
+        value: (
+          <Button
+            onClick={this.onExport}
+            message={sharedMessages.exportJson}
+            icon="file_download"
+          />
+        ),
+      })
+    }
+
+    sheetData.push(macStateAndSettings)
 
     return (
       <div className={style.overviewInfo}>

@@ -112,9 +112,11 @@ const DataSheetRow = ({ item, sub }) => {
 
   return (
     <tr className={rowStyle}>
-      <th>
-        <Message content={item.key} />
-      </th>
+      {item.key && (
+        <th>
+          <Message content={item.key} />
+        </th>
+      )}
       <td>
         {item.value && isSafeInspector ? (
           <SafeInspector
