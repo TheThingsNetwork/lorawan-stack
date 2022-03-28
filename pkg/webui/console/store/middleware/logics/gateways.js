@@ -111,9 +111,9 @@ const getGatewaysLogic = createRequestLogic({
 
       entities = await Promise.all(
         data.gateways.map(gateway => {
-          const gatewayServerAddress = gateway.gateway_server_address
+          const gatewayServerAddress = getHostFromUrl(gateway.gateway_server_address)
 
-          if (!Boolean(gateway.gateway_server_address)) {
+          if (!Boolean(gatewayServerAddress)) {
             return Promise.resolve({ ...gateway, status: 'unknown' })
           }
 
@@ -185,14 +185,13 @@ const startGatewayStatisticsLogic = createLogic({
     let gtwGsAddress
     let consoleGsAddress
     try {
-      const gtwAddress = gtw.gateway_server_address
+      gtwGsAddress = getHostFromUrl(gtw.gateway_server_address)
 
-      if (!Boolean(gtwAddress)) {
+      if (!Boolean(gtwGsAddress)) {
         throw new Error()
       }
 
-      gtwGsAddress = gtwAddress.split(':')[0]
-      consoleGsAddress = new URL(gsConfig.base_url).hostname
+      consoleGsAddress = getHostFromUrl(gsConfig.base_url)
     } catch (error) {
       dispatch(
         gateways.startGatewayStatisticsFailure({

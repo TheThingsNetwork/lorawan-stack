@@ -40,7 +40,7 @@ export default GatewayConnection =>
       const gateway = selectGatewayById(state, ownProps.gtwId)
       const gsConfig = selectGsConfig()
       const consoleGsAddress = getHostFromUrl(gsConfig.base_url)
-      const gatewayServerAddress = gateway.gateway_server_address
+      const gatewayServerAddress = getHostFromUrl(gateway.gateway_server_address)
 
       return {
         statistics: selectGatewayStatistics(state, ownProps),
