@@ -51,7 +51,7 @@ const Header = ({ handleSearchRequest, searchable }) => {
       exact: true,
     },
     {
-      title: 'Sessions',
+      title: sharedMessages.sessions,
       icon: 'vpn_key',
       path: '/session-management',
       exact: true,

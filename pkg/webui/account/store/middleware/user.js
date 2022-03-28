@@ -102,7 +102,7 @@ const getUserSessionsLogic = createRequestLogic({
     }
     const result = await tts.Users.getAllSessions(user)
 
-    return { sessions: result.sessions, sessionsTotalCount: result.sessions.length }
+    return { sessions: result.sessions, sessionsTotalCount: result.totalCount }
   },
 })
 

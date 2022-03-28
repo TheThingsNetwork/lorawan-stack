@@ -26,6 +26,7 @@ import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { getUserSessionsList, deleteUserSession } from '@account/store/actions/user'
@@ -84,7 +85,7 @@ const UserSessionsTable = props => {
     const baseHeaders = [
       {
         name: 'session_id',
-        displayName: 'Session ID',
+        displayName: sharedMessages.id,
         width: 9,
       },
       {
@@ -99,7 +100,7 @@ const UserSessionsTable = props => {
       },
       {
         name: 'created_at',
-        displayName: 'Session start',
+        displayName: sharedMessages.createdAt,
         width: 25,
         render: created_at => (
           <>
@@ -111,31 +112,35 @@ const UserSessionsTable = props => {
         ),
       },
       {
-        name: 'status',
-        displayName: 'Expiry',
+        name: 'expires_at',
+        displayName: sharedMessages.expiry,
         width: 20,
-        render: status => {
-          if (!status._expiry) {
+        render: expires_at => {
+          if (expires_at === undefined) {
             return <Message content={m.noExpiryDate} />
           }
 
           return (
             <>
-              <DateTime value={status._expiry} />
+              <DateTime value={expires_at} />
               {' ('}
-              <DateTime.Relative value={status._expiry} />
+              <DateTime.Relative value={expires_at} />
               {') '}
             </>
           )
         },
       },
       {
-        name: 'status',
-        displayName: 'Action',
+        name: 'actions',
+        displayName: sharedMessages.actions,
         width: 20,
-        render: status => {
-          const handleDeleteSession = onDelete(status._session_id)
-          if (status.currentSession) {
+        getValue: row => ({
+          id: row.session_id,
+          status: row.status,
+        }),
+        render: details => {
+          const handleDeleteSession = onDelete(details.id)
+          if (details.status.currentSession) {
             return <Message content={m.endSession} />
           }
 
@@ -197,8 +202,6 @@ export default connect(
             id: session.session_id,
             status: {
               currentSession: session.session_id === stateProps.sessionId,
-              _session_id: session.session_id,
-              _expiry: session.expires_at,
             },
           })
         }

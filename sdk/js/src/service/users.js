@@ -171,8 +171,9 @@ class Users {
     const result = await this._api.UserSessionRegistry.List({
       routeParams: { 'user_ids.user_id': userId },
     })
+    const sessions = Marshaler.payloadListResponse('sessions', result)
 
-    return Marshaler.unwrapUser(result)
+    return sessions
   }
 
   async deleteSession(userId, session_id) {
@@ -180,7 +181,7 @@ class Users {
       routeParams: { 'user_ids.user_id': userId, session_id },
     })
 
-    return Marshaler.unwrapUser(result)
+    return Marshaler.payloadListResponse(result)
   }
 }
 
