@@ -15,6 +15,7 @@
 package identityserver
 
 import (
+	"context"
 	"database/sql"
 	"strings"
 	"sync"
@@ -22,6 +23,7 @@ import (
 	"time"
 
 	"github.com/iancoleman/strcase"
+	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
@@ -33,12 +35,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc"
-)
-
-var (
-	setup        sync.Once
-	dbConnString string
-	population   = store.NewPopulator(16, 42)
 )
 
 var (
@@ -350,63 +346,85 @@ func defaultTestOptions() *testOptions {
 	return testOptions
 }
 
+var (
+	population = store.NewPopulator(16, 42)
+	baseDSN    = storetest.GetDSN("ttn_lorawan_is_test")
+	baseDB     = func() *sql.DB {
+		baseDB, err := sql.Open("postgres", baseDSN.String())
+		if err != nil {
+			panic(err)
+		}
+		return baseDB
+	}()
+	setupBaseDBOnce sync.Once
+	setupBaseDBErr  error
+)
+
 func testWithIdentityServer(t *testing.T, f func(*IdentityServer, *grpc.ClientConn), options ...TestOption) {
 	testOptions := defaultTestOptions()
 	for _, option := range options {
 		option(testOptions)
 	}
 
-	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	var err error
-	baseDSN := storetest.GetDSN("ttn_lorawan_is_test")
+	setupBaseDBOnce.Do(func() {
+		var db *gorm.DB
+		db, setupBaseDBErr = store.Open(context.Background(), baseDSN.String())
+		if setupBaseDBErr != nil {
+			return
+		}
+		defer db.Close()
+		if setupBaseDBErr = store.Initialize(db); setupBaseDBErr != nil {
+			return
+		}
+		if setupBaseDBErr = store.AutoMigrate(db).Error; setupBaseDBErr != nil {
+			return
+		}
+	})
+	if setupBaseDBErr != nil {
+		t.Fatal(setupBaseDBErr)
+	}
+
 	testName := t.Name()
 	if i := strings.IndexRune(testName, '/'); i != -1 {
 		testName = testName[:i]
 	}
 	schemaName := strcase.ToSnake(testName)
 	schemaDSN := baseDSN
-	setup := &setup
 
-	var baseDB *sql.DB
 	if testOptions.privateDatabase {
-		baseDB, err = sql.Open("postgres", baseDSN.String())
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer baseDB.Close()
-		if err = storetest.CreateSchema(baseDB, schemaName); err != nil {
+		if err := storetest.CreateSchema(baseDB, schemaName); err != nil {
 			t.Fatal(err)
 		}
 		schemaDSN = storetest.GetSchemaDSN(baseDSN, schemaName)
-		setup = &sync.Once{}
 	}
 
-	setup.Do(func() {
-		db, err := store.Open(ctx, schemaDSN.String())
-		if err != nil {
-			panic(err)
-		}
-		defer db.Close()
+	db, err := store.Open(context.Background(), schemaDSN.String())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+
+	if testOptions.privateDatabase {
 		if err = store.Initialize(db); err != nil {
-			panic(err)
+			t.Fatal(err)
 		}
 		if err = store.AutoMigrate(db).Error; err != nil {
-			panic(err)
+			t.Fatal(err)
 		}
-		if !testOptions.privateDatabase {
-			if err = store.Clear(db); err != nil {
-				panic(err)
-			}
-			if err = population.Populate(test.Context(), db); err != nil {
-				panic(err)
-			}
+	} else {
+		if err = store.Clear(db); err != nil {
+			t.Fatal(err)
 		}
-		if testOptions.population != nil {
-			if err = testOptions.population.Populate(test.Context(), store.NewCombinedStore(db)); err != nil {
-				t.Fatal(err)
-			}
+		if err = population.Populate(test.Context(), db); err != nil {
+			t.Fatal(err)
 		}
-	})
+	}
+
+	if testOptions.population != nil {
+		if err = testOptions.population.Populate(test.Context(), store.NewCombinedStore(db)); err != nil {
+			t.Fatal(err)
+		}
+	}
 
 	c := componenttest.NewComponent(t, testOptions.componentConfig)
 	testOptions.isConfig.DatabaseURI = schemaDSN.String()
