@@ -47,6 +47,7 @@ func (s *notificationStore) CreateNotification(ctx context.Context, pb *ttnpb.No
 		Notification: Notification{
 			EntityType:       entityTypeForID(pb.EntityIds),
 			EntityID:         entityModel.PrimaryKey(),
+			EntityUID:        pb.GetEntityIds().IDString(),
 			NotificationType: pb.NotificationType,
 		},
 		Status: int32(pb.Status),
@@ -67,6 +68,7 @@ func (s *notificationStore) CreateNotification(ctx context.Context, pb *ttnpb.No
 		}
 		pk := senderModel.PrimaryKey()
 		model.SenderID = &pk
+		model.SenderUID = pb.SenderIds.IDString()
 	}
 
 	model.Receivers = make(pq.Int32Array, len(pb.Receivers))
@@ -149,22 +151,7 @@ func (s *notificationStore) ListNotifications(ctx context.Context, receiverIDs *
 			"notifications.*",
 			"notification_receivers.status",
 			"notification_receivers.status_updated_at",
-			"sender.uid AS friendly_sender_id",
-			"app.application_id AS friendly_application_id",
-			"dev.device_id AS friendly_end_device_id",
-			"dev.application_id AS friendly_end_device_application_id",
-			"cli.client_id AS friendly_client_id",
-			"gtw.gateway_id AS friendly_gateway_id",
-			"org.uid AS friendly_organization_id",
-			"usr.uid AS friendly_user_id",
 		}).
-		Joins("LEFT JOIN accounts AS sender ON sender.account_type = 'user' AND sender.account_id = notifications.sender_id").
-		Joins("LEFT JOIN applications AS app ON notifications.entity_type = 'application' AND app.id = notifications.entity_id").
-		Joins("LEFT JOIN clients AS cli ON notifications.entity_type = 'client' AND cli.id = notifications.entity_id").
-		Joins("LEFT JOIN end_devices AS dev ON notifications.entity_type = 'end_device' AND dev.id = notifications.entity_id").
-		Joins("LEFT JOIN gateways AS gtw ON notifications.entity_type = 'gateway' AND gtw.id = notifications.entity_id").
-		Joins("LEFT JOIN accounts AS org ON notifications.entity_type = 'organization' AND org.account_type = 'organization' AND org.account_id = notifications.entity_id").
-		Joins("LEFT JOIN accounts AS usr ON notifications.entity_type = 'user' AND usr.account_type = 'user' AND usr.account_id = notifications.entity_id").
 		Order("notifications.created_at DESC")
 
 	var notificationModels []notificationWithStatus

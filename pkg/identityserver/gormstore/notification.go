@@ -30,13 +30,14 @@ type Notification struct {
 
 	EntityID   string `gorm:"type:UUID;index:notification_entity_index;not null"`
 	EntityType string `gorm:"type:VARCHAR(32);index:notification_entity_index;not null"`
+	EntityUID  string `gorm:"type:VARCHAR(36);not null"` // Copy of the human-readable entity ID, so that we can keep notifications for deleted entities.
 
 	NotificationType string `gorm:"not null"`
 
 	Data postgres.Jsonb `gorm:"type:JSONB"`
 
-	Sender   *User
-	SenderID *string `gorm:"type:UUID;index:notification_sender_index"`
+	SenderID  *string `gorm:"type:UUID;index:notification_sender_index"`
+	SenderUID string  `gorm:"type:VARCHAR(36);not null"` // Copy of the human-readable sender ID, so that we can keep notifications for deleted senders.
 
 	Receivers pq.Int32Array `gorm:"type:INT ARRAY"`
 }
@@ -60,16 +61,6 @@ func init() {
 type notificationWithStatus struct {
 	Notification
 
-	FriendlyApplicationID          string
-	FriendlyClientID               string
-	FriendlyEndDeviceID            string
-	FriendlyEndDeviceApplicationID string
-	FriendlyGatewayID              string
-	FriendlyOrganizationID         string
-	FriendlyUserID                 string
-
-	FriendlySenderID string
-
 	Status          int32
 	StatusUpdatedAt time.Time
 }
@@ -78,35 +69,7 @@ func (n notificationWithStatus) toPB(pb *ttnpb.Notification) error {
 	pb.Id = n.ID
 	pb.CreatedAt = ttnpb.ProtoTimePtr(cleanTime(n.CreatedAt))
 	if pb.EntityIds == nil {
-		switch n.EntityType {
-		case "application":
-			pb.EntityIds = (&ttnpb.ApplicationIdentifiers{
-				ApplicationId: n.FriendlyApplicationID,
-			}).GetEntityIdentifiers()
-		case "client":
-			pb.EntityIds = (&ttnpb.ClientIdentifiers{
-				ClientId: n.FriendlyClientID,
-			}).GetEntityIdentifiers()
-		case "end_device":
-			pb.EntityIds = (&ttnpb.EndDeviceIdentifiers{
-				ApplicationIds: &ttnpb.ApplicationIdentifiers{
-					ApplicationId: n.FriendlyEndDeviceApplicationID,
-				},
-				DeviceId: n.FriendlyEndDeviceID,
-			}).GetEntityIdentifiers()
-		case "gateway":
-			pb.EntityIds = (&ttnpb.GatewayIdentifiers{
-				GatewayId: n.FriendlyGatewayID,
-			}).GetEntityIdentifiers()
-		case "organization":
-			pb.EntityIds = (&ttnpb.OrganizationIdentifiers{
-				OrganizationId: n.FriendlyOrganizationID,
-			}).GetEntityIdentifiers()
-		case "user":
-			pb.EntityIds = (&ttnpb.UserIdentifiers{
-				UserId: n.FriendlyUserID,
-			}).GetEntityIdentifiers()
-		}
+		pb.EntityIds = buildIdentifiers(n.EntityType, n.EntityUID)
 	}
 	pb.NotificationType = n.NotificationType
 	if len(n.Data.RawMessage) > 0 && pb.Data == nil {
@@ -117,10 +80,8 @@ func (n notificationWithStatus) toPB(pb *ttnpb.Notification) error {
 		}
 		pb.Data = &anyPB
 	}
-	if n.FriendlySenderID != "" {
-		pb.SenderIds = &ttnpb.UserIdentifiers{UserId: n.FriendlySenderID}
-	} else if n.Sender != nil {
-		pb.SenderIds = &ttnpb.UserIdentifiers{UserId: n.Sender.Account.UID}
+	if n.SenderUID != "" {
+		pb.SenderIds = &ttnpb.UserIdentifiers{UserId: n.SenderUID}
 	}
 	pb.Receivers = make([]ttnpb.NotificationReceiver, len(n.Receivers))
 	for i, receiver := range n.Receivers {

@@ -16,6 +16,7 @@ package store
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/jinzhu/gorm"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -89,6 +90,14 @@ func buildIdentifiers(entityType, id string) *ttnpb.EntityIdentifiers {
 		return (&ttnpb.ApplicationIdentifiers{ApplicationId: id}).GetEntityIdentifiers()
 	case "client":
 		return (&ttnpb.ClientIdentifiers{ClientId: id}).GetEntityIdentifiers()
+	case "end_device", "end device":
+		parts := strings.SplitN(id, ".", 2)
+		return (&ttnpb.EndDeviceIdentifiers{
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{
+				ApplicationId: parts[0],
+			},
+			DeviceId: parts[1],
+		}).GetEntityIdentifiers()
 	case "gateway":
 		return (&ttnpb.GatewayIdentifiers{GatewayId: id}).GetEntityIdentifiers()
 	case "organization":
