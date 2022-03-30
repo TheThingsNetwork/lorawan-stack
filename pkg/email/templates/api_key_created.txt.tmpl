@@ -1,0 +1,16 @@
+Dear {{ .ReceiverName }},
+
+A new API key has been created for your {{ .Notification.EntityIds.EntityType }} "{{ .Notification.EntityIds.IDString }}" on {{ .Network.Name }}.
+
+API Key ID: {{ .APIKey.Id }}
+{{- with .APIKey.Name }}
+API Key Name: {{ . }}
+{{- end }}
+
+Rights:
+{{ range .Rights }}
+- {{ . }} {{- with enumDesc . }}: {{ . }}{{ end }}
+{{- end }}
+
+You can go to {{ .ConsoleURL }} to view and edit this API key in the Console.
+

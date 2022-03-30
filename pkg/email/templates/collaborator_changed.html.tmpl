@@ -1,0 +1,30 @@
+{{- define "title" -}}
+Collaborator Changed
+{{- end -}}
+
+{{- define "preview" -}}
+A collaborator of your {{ .Notification.EntityIds.EntityType }} "{{ .Notification.EntityIds.IDString }}" has been added or updated.
+{{- end -}}
+
+{{- define "body" -}}
+<p>
+Dear {{ .ReceiverName }},
+</p>
+<p>
+A collaborator of your {{ .Notification.EntityIds.EntityType }} <code>{{ .Notification.EntityIds.IDString }}</code> on <b>{{ .Network.Name }}</b> has been added or updated.
+</p>
+<p>
+<b>Collaborator:</b> {{ .Collaborator.EntityType }} <code>{{ .Collaborator.IDString }}</code>
+</p>
+<p>
+<b>Rights:</b>
+<ul>
+{{ range .Rights }}
+<li><code>{{ . }}</code> {{- with enumDesc . }}<br> <em>{{ . }}</em>{{ end }}</li>
+{{- end }}
+</ul>
+</p>
+<p>
+You can view and edit this collaborator <a href="{{ .ConsoleURL }}">in the Console</a>.
+</p>
+{{- end -}}

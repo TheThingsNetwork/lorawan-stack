@@ -1,0 +1,14 @@
+<mj-section full-width="full-width" padding-bottom="0">
+  <mj-column width="100%">
+    <mj-text color="#292929" font-size="11px" font-weight="bold" align="center">
+      {{ .Network.Name }} is powered by <a class="footer-link" href="https://www.thethingsindustries.com/stack/">The&nbsp;Things&nbsp;Stack</a>
+    </mj-text>
+    <mj-text color="#292929" font-size="11px" align="center">
+      <a class="footer-link" href="{{ .Network.ConsoleURL }}">Console</a>
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      <a class="footer-link" href="{{ .Network.IdentityServerURL }}">Account</a>
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      <a class="footer-link" href="https://www.thethingsindustries.com/docs/">Documentation</a>
+    </mj-text>
+  </mj-column>
+</mj-section>

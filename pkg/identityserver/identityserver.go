@@ -26,7 +26,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
-	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	gormstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
@@ -53,10 +52,9 @@ type IdentityServer struct {
 
 	store store.TransactionalStore
 
-	redis          *redis.Client
-	emailTemplates *email.TemplateRegistry
-	account        account.Server
-	oauth          oauth.Server
+	redis   *redis.Client
+	account account.Server
+	oauth   oauth.Server
 }
 
 // Context returns the context of the Identity Server.
@@ -144,11 +142,6 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 	}
 	st := gormstore.NewCombinedStore(is.db)
 	is.store = st
-
-	is.emailTemplates, err = is.initEmailTemplates(is.Context())
-	if err != nil {
-		return nil, err
-	}
 
 	is.config.OAuth.CSRFAuthKey = is.GetBaseConfig(is.Context()).HTTP.Cookie.HashKey
 	is.config.OAuth.UI.FrontendConfig.EnableUserRegistration = is.config.UserRegistration.Enabled

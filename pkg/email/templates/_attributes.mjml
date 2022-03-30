@@ -1,0 +1,31 @@
+<mj-font name="Lato" href="https://fonts.googleapis.com/css?family=Lato" />
+<mj-attributes>
+  <mj-all font-family="Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif"></mj-all>
+  <mj-text font-weight="400" font-size="16px" color="#000000" line-height="24px" font-family="Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif"></mj-text>
+</mj-attributes>
+<mj-style inline="inline">
+  .header-image {
+  height: 100px;
+  }
+</mj-style>
+<mj-style inline="inline">
+  .body-section {
+  -webkit-box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15);
+  box-shadow: 1px 4px 11px 0px rgba(0, 0, 0, 0.15);
+  }
+</mj-style>
+<mj-style inline="inline">
+  .footer-link {
+  color: #292929;
+  }
+</mj-style>
+<mj-style>
+code {
+  padding: .2em .4em;
+  margin: 0;
+  font-size: 85%;
+  background-color: #E7E7E7;
+  border-radius: 6px;
+}
+</mj-style>

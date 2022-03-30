@@ -1,0 +1,5 @@
+{{ template "header.txt" . }}
+
+{{ block "body" . }}{{ end }}
+
+{{ template "footer.txt" . }}

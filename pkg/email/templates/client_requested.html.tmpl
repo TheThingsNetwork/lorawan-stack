@@ -1,0 +1,91 @@
+{{- define "title" -}}
+Client Requested
+{{- end -}}
+
+{{- define "preview" -}}
+Your review is required for a newly registered OAuth client.
+{{- end -}}
+
+{{- define "body" -}}
+<p>
+Dear {{ .ReceiverName }},
+</p>
+<p>
+User <code>{{ .Notification.SenderIds.IDString }}</code> just registered a new OAuth client under {{ .Collaborator.EntityType }} <code>{{ .Collaborator.IDString }}</code> on <b>{{ .Network.Name }}</b>.
+Since user <code>{{ .Notification.SenderIds.IDString }}</code> is not an admin, you need to approve this client before it can be used.
+</p>
+
+<p>
+<b>Client ID:</b> <code>{{ .Client.Ids.IDString }}</code>
+</p>
+<p>
+<b>Name:</b> {{ with .Client.Name }}{{ . }}{{ else }}<i>none</i>{{ end }}
+</p>
+<p>
+<b>Description:</b> {{ with .Client.Description }}{{ . }}{{ else }}<i>none</i>{{ end }}
+</p>
+
+<p>
+<b>Grants:</b>
+{{- with .Client.Grants }}
+<ul>
+{{ range . }}
+<li><code>{{ . }}</code> {{- with enumDesc . }}<br> <em>{{ . }}</em>{{ end }}</li>
+{{- end }}
+</ul>
+{{- else }} <i>none</i>
+{{- end }}
+</p>
+
+<p>
+<b>Rights:</b>
+{{- with .Client.Rights }}
+<ul>
+{{ range . }}
+<li><code>{{ . }}</code> {{- with enumDesc . }}<br> <em>{{ . }}</em>{{ end }}</li>
+{{- end }}
+</ul>
+{{- else }} <i>none</i>
+{{- end }}
+</p>
+
+<p>
+<b>Redirect URIs:</b>
+{{- with .Client.RedirectUris }}
+<ul>
+{{ range . }}
+<li><code>{{ . }}</code></li>
+{{- end }}
+</ul>
+{{- else }} <i>none</i>
+{{- end }}
+</p>
+
+<p>
+<b>Logout Redirect URIs:</b>
+{{- with .Client.LogoutRedirectUris }}
+<ul>
+{{ range . }}
+<li><code>{{ . }}</code></li>
+{{- end }}
+</ul>
+{{- else }} <i>none</i>
+{{- end }}
+</p>
+
+<p>
+You can use the command-line interface to approve (or reject) the OAuth client:
+</p>
+<p>
+<pre>
+<code>
+$ ttn-lw-cli clients set {{ .Client.Ids.IDString }} \
+  --state APPROVED (or REJECTED) \
+  --state-description "..."
+</code>
+</pre>
+</p>
+<p>
+For more information on how to use the command-line interface, please refer to <a href="{{ documentation_url "/getting-started/cli/" }}">the documentation</a>.
+</p>
+{{- end -}}

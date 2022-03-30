@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,23 +20,21 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/email/sendgrid"
 	"go.thethings.network/lorawan-stack/v3/pkg/email/smtp"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
+	_ "go.thethings.network/lorawan-stack/v3/pkg/email/templates" // Register all email templates.
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"golang.org/x/sync/errgroup"
 )
 
-func (is *IdentityServer) initEmailTemplates(ctx context.Context) (*email.TemplateRegistry, error) {
-	config := is.configFromContext(ctx).Email.Templates
-	fetcher, err := config.Fetcher(ctx, is.Component.GetBaseConfig(ctx).Blob, is)
-	if err != nil {
-		return nil, err
-	}
-	return email.NewTemplateRegistry(fetcher, config.Includes...)
-}
-
 // SendEmail sends an email.
-func (is *IdentityServer) SendEmail(ctx context.Context, f func(emails.Data) email.MessageData) (err error) {
+func (is *IdentityServer) SendEmail(ctx context.Context, message *email.Message) (err error) {
+	logger := log.FromContext(ctx).WithFields(log.Fields(
+		"to", message.RecipientAddress,
+		"subject", message.Subject,
+		"template_name", message.TemplateName,
+		"body", message.TextBody,
+	))
 	isConfig := is.configFromContext(ctx)
 	var sender email.Sender
 	switch isConfig.Email.Provider {
@@ -45,103 +43,97 @@ func (is *IdentityServer) SendEmail(ctx context.Context, f func(emails.Data) ema
 	case "smtp":
 		sender, err = smtp.New(ctx, isConfig.Email.Config, isConfig.Email.SMTP)
 	}
-	if err != nil {
-		return err
-	}
-	var data emails.Data
-	data.Network.Name = isConfig.Email.Network.Name
-	data.Network.IdentityServerURL = isConfig.Email.Network.IdentityServerURL
-	data.Network.ConsoleURL = isConfig.Email.Network.ConsoleURL
-	messageData := f(data)
-	if messageData == nil {
-		return nil
-	}
-
-	message, err := is.emailTemplates.Render(messageData)
-	if err != nil {
-		return err
-	}
 	if sender == nil {
-		log.FromContext(ctx).WithFields(log.Fields(
-			"to", message.RecipientAddress,
-			"subject", message.Subject,
-			"body", message.TextBody,
-		)).Warn("Could not send email without email provider")
+		logger.Warn("Could not send email without email provider")
 		return nil
 	}
-	return sender.Send(message)
-}
-
-// SendUserEmail sends an email to the given user.
-func (is *IdentityServer) SendUserEmail(ctx context.Context, userIDs *ttnpb.UserIdentifiers, makeMessage func(emails.Data) email.MessageData) error {
-	var usr *ttnpb.User
-	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
-		usr, err = st.GetUser(ctx, userIDs, []string{"name", "primary_email_address"})
-		if err != nil {
-			return err
-		}
-		return err
-	})
+	err = sender.Send(message)
 	if err != nil {
-		return err
-	}
-	err = is.SendEmail(ctx, func(data emails.Data) email.MessageData {
-		data.SetUser(usr)
-		return makeMessage(data)
-	})
-	if err != nil {
+		logger.WithError(err).Warn("Failed to send email")
 		return err
 	}
 	return nil
 }
 
-// SendAdminsEmail sends an email to the admins of the network.
-func (is *IdentityServer) SendAdminsEmail(ctx context.Context, makeMessage func(emails.Data) email.MessageData) error {
-	var users []*ttnpb.User
-	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
-		users, err = st.ListAdmins(ctx, []string{"name", "primary_email_address"})
-		if err != nil {
-			return err
-		}
-		return err
-	})
-	if err != nil {
-		return err
-	}
-	for _, usr := range users {
-		err = is.SendEmail(ctx, func(data emails.Data) email.MessageData {
-			data.SetUser(usr)
-			return makeMessage(data)
+// SendTemplateEmailToUsers sends an email to users.
+func (is *IdentityServer) SendTemplateEmailToUsers(ctx context.Context, templateName string, dataBuilder email.TemplateDataBuilder, receivers ...*ttnpb.User) error {
+	networkConfig := is.configFromContext(ctx).Email.Network
+	emailTemplate := email.GetTemplate(ctx, templateName)
+
+	var wg errgroup.Group
+	for _, receiver := range receivers {
+		receiver := receiver // shadow range variable.
+		wg.Go(func() error {
+			templateData, err := dataBuilder(
+				ctx,
+				email.NewTemplateData(&networkConfig, receiver),
+			)
+			if err != nil {
+				return err
+			}
+			message, err := emailTemplate.Execute(templateData)
+			if err != nil {
+				return err
+			}
+			return is.SendEmail(ctx, message)
 		})
-		if err != nil {
-			return err
-		}
 	}
-	return nil
+	return wg.Wait()
 }
 
-// SendContactsEmail sends an email to the contacts of the given entity.
-func (is *IdentityServer) SendContactsEmail(ctx context.Context, ids ttnpb.IDStringer, makeMessage func(emails.Data) email.MessageData) error {
-	var contacts []*ttnpb.ContactInfo
+// SendNotificationEmailToUsers sends a notification email to users.
+func (is *IdentityServer) SendNotificationEmailToUsers(ctx context.Context, notification *ttnpb.Notification, receivers ...*ttnpb.User) error {
+	networkConfig := is.configFromContext(ctx).Email.Network
+	emailNotification := email.GetNotification(ctx, notification.GetNotificationType())
+	emailTemplate := email.GetTemplate(ctx, emailNotification.EmailTemplateName)
+
+	var wg errgroup.Group
+	for _, receiver := range receivers {
+		receiver := receiver // shadow range variable.
+		wg.Go(func() error {
+			templateData, err := emailNotification.DataBuilder(
+				ctx,
+				email.NewNotificationTemplateData(email.NewTemplateData(&networkConfig, receiver), notification),
+			)
+			if err != nil {
+				return err
+			}
+			message, err := emailTemplate.Execute(templateData)
+			if err != nil {
+				return err
+			}
+			return is.SendEmail(ctx, message)
+		})
+	}
+	return wg.Wait()
+}
+
+var emailUserFields = store.FieldMask{"ids", "name", "primary_email_address"}
+
+// SendTemplateEmailToUserIDs looks up the users and sends them an email.
+func (is *IdentityServer) SendTemplateEmailToUserIDs(ctx context.Context, templateName string, dataBuilder email.TemplateDataBuilder, receiverIDs ...*ttnpb.UserIdentifiers) error {
+	var receivers []*ttnpb.User
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
-		contacts, err = st.GetContactInfo(ctx, ids)
+		receivers, err = st.FindUsers(ctx, receiverIDs, emailUserFields)
 		return err
 	})
 	if err != nil {
 		return err
 	}
-	for _, contactInfo := range contacts {
-		if contactInfo.ContactMethod != ttnpb.ContactMethod_CONTACT_METHOD_EMAIL {
-			continue
-		}
-		err := is.SendEmail(ctx, func(data emails.Data) email.MessageData {
-			data.SetEntity(ids)
-			data.SetContact(contactInfo)
-			return makeMessage(data)
-		})
-		if err != nil {
-			return err
-		}
+	return is.SendTemplateEmailToUsers(ctx, templateName, dataBuilder, receivers...)
+}
+
+var notificationEmailUserFields = store.FieldMask{"ids", "name", "primary_email_address", "admin"}
+
+// SendNotificationEmailToUserIDs looks up the users and sends them a notification email.
+func (is *IdentityServer) SendNotificationEmailToUserIDs(ctx context.Context, notification *ttnpb.Notification, receiverIDs ...*ttnpb.UserIdentifiers) error {
+	var receivers []*ttnpb.User
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		receivers, err = st.FindUsers(ctx, receiverIDs, notificationEmailUserFields)
+		return err
+	})
+	if err != nil {
+		return err
 	}
-	return nil
+	return is.SendNotificationEmailToUsers(ctx, notification, receivers...)
 }

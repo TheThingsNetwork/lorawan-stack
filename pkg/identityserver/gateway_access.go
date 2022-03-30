@@ -19,12 +19,9 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
-	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
@@ -96,15 +93,18 @@ func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.Cr
 	if err != nil {
 		return nil, err
 	}
-	key.Key = token
-	events.Publish(evtCreateGatewayAPIKey.NewWithIdentifiersAndData(ctx, req.GetGatewayIds(), nil))
-	err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
-		data.SetEntity(req)
-		return &emails.APIKeyCreated{Data: data, Key: key, Rights: key.Rights}
+	key.Key = ""
+
+	events.Publish(evtCreateGatewayAPIKey.NewWithIdentifiersAndData(ctx, req.GetGatewayIds(), key))
+	go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
+		EntityIds:        req.GetGatewayIds().GetEntityIdentifiers(),
+		NotificationType: "api_key_created",
+		Data:             ttnpb.MustMarshalAny(key),
+		Receivers:        []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT},
+		Email:            true,
 	})
-	if err != nil {
-		log.FromContext(ctx).WithError(err).Error("Could not send API key creation notification email")
-	}
+
+	key.Key = token
 	return key, nil
 }
 
@@ -196,14 +196,15 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 		return &ttnpb.APIKey{}, nil
 	}
 	key.Key = ""
-	events.Publish(evtUpdateGatewayAPIKey.NewWithIdentifiersAndData(ctx, req.GetGatewayIds(), nil))
-	err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
-		data.SetEntity(req)
-		return &emails.APIKeyChanged{Data: data, Key: key, Rights: key.Rights}
+
+	events.Publish(evtUpdateGatewayAPIKey.NewWithIdentifiersAndData(ctx, req.GetGatewayIds(), key))
+	go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
+		EntityIds:        req.GetGatewayIds().GetEntityIdentifiers(),
+		NotificationType: "api_key_changed",
+		Data:             ttnpb.MustMarshalAny(key),
+		Receivers:        []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT},
+		Email:            true,
 	})
-	if err != nil {
-		log.FromContext(ctx).WithError(err).Error("Could not send API key update notification email")
-	}
 
 	return key, nil
 }
@@ -299,14 +300,14 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 		return nil, err
 	}
 	if len(req.GetCollaborator().GetRights()) > 0 {
-		events.Publish(evtUpdateGatewayCollaborator.New(ctx, events.WithIdentifiers(req.GetGatewayIds(), req.GetCollaborator().GetIds())))
-		err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
-			data.SetEntity(req)
-			return &emails.CollaboratorChanged{Data: data, Collaborator: *req.GetCollaborator()}
+		events.Publish(evtUpdateGatewayCollaborator.New(ctx, events.WithIdentifiers(req.GetGatewayIds(), req.GetCollaborator().GetIds()), events.WithData(req.GetCollaborator())))
+		go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
+			EntityIds:        req.GetGatewayIds().GetEntityIdentifiers(),
+			NotificationType: "collaborator_changed",
+			Data:             ttnpb.MustMarshalAny(req.GetCollaborator()),
+			Receivers:        []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT},
+			Email:            true,
 		})
-		if err != nil {
-			log.FromContext(ctx).WithError(err).Error("Could not send collaborator updated notification email")
-		}
 	} else {
 		events.Publish(evtDeleteGatewayCollaborator.New(ctx, events.WithIdentifiers(req.GetGatewayIds(), req.GetCollaborator().GetIds())))
 	}

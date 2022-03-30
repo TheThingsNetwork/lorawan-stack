@@ -1,0 +1,46 @@
+Dear {{ .ReceiverName }},
+
+User "{{ .Notification.SenderIds.IDString }}" just registered a new OAuth client under {{ .Collaborator.EntityType }} "{{ .Collaborator.IDString }}" on {{ .Network.Name }}.
+Since user "{{ .Notification.SenderIds.IDString }}" is not an admin, you need to approve this client before it can be used.
+
+Client ID: {{ .Client.Ids.IDString }}
+Name: {{ with .Client.Name }}{{ . }}{{ else }}(none){{ end }}
+Description: {{ with .Client.Description }}{{ . }}{{ else }}(none){{ end }}
+
+Grants:
+{{- with .Client.Grants }}
+{{- range . }}
+- {{ . }}
+{{- end }}
+{{- else }} (none)
+{{- end }}
+
+Rights:
+{{- with .Client.Rights }}
+{{- range . }}
+- {{ . }}
+{{- end }}
+{{- else }} (none)
+{{- end }}
+
+Redirect URIs:
+{{- with .Client.RedirectUris }}
+{{- range . }}
+- {{ . }}
+{{- end }}
+{{- else }} (none)
+{{- end }}
+
+Logout Redirect URIs:
+{{- with .Client.LogoutRedirectUris }}
+{{- range . }}
+- {{ . }}
+{{- end }}
+{{- else }} (none)
+{{- end }}
+
+You can use the command-line interface to approve (or reject) the OAuth client:
+
+ttn-lw-cli clients set {{ .Client.Ids.IDString }} --state APPROVED (or REJECTED) --state-description "..."
+
+For more information on how to use the command-line interface, please refer to the documentation: {{ documentation_url "/getting-started/cli/" }}.

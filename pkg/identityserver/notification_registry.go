@@ -20,7 +20,9 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
+	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
@@ -59,11 +61,18 @@ func filterUserIdentifiers(ids []*ttnpb.OrganizationOrUserIdentifiers) []*ttnpb.
 	return out
 }
 
-func (is *IdentityServer) createNotification(ctx context.Context, req *ttnpb.CreateNotificationRequest) (*ttnpb.CreateNotificationResponse, error) {
-	if err := clusterauth.Authorized(ctx); err != nil {
-		return nil, err
+func (is *IdentityServer) notifyInternal(ctx context.Context, req *ttnpb.CreateNotificationRequest) error {
+	ctx = is.FromRequestContext(ctx)
+	if authInfo, err := is.authInfo(ctx); err == nil {
+		if userIDs := authInfo.GetEntityIdentifiers().GetUserIds(); userIDs != nil {
+			req.SenderIds = userIDs
+		}
 	}
+	_, err := is.createNotification(clusterauth.NewContext(ctx, nil), req) // just call the RPC with cluster auth.
+	return err
+}
 
+func (is *IdentityServer) lookupNotificationReceivers(ctx context.Context, req *ttnpb.CreateNotificationRequest) ([]*ttnpb.UserIdentifiers, error) {
 	var receiverIDs []*ttnpb.OrganizationOrUserIdentifiers
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		// Collect user ID for user notifications.
@@ -146,12 +155,19 @@ func (is *IdentityServer) createNotification(ctx context.Context, req *ttnpb.Cre
 
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	// Filter only user identifiers and remove duplicates.
 	receiverUserIDs := filterUserIdentifiers(uniqueOrganizationOrUserIdentifiers(ctx, receiverIDs))
 
+	return receiverUserIDs, nil
+}
+
+func (is *IdentityServer) storeNotification(ctx context.Context, req *ttnpb.CreateNotificationRequest, receiverUserIDs ...*ttnpb.UserIdentifiers) (*ttnpb.Notification, error) {
 	var notification *ttnpb.Notification
-	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		notification, err = st.CreateNotification(ctx, &ttnpb.Notification{
 			EntityIds:        req.EntityIds,
 			NotificationType: req.NotificationType,
@@ -164,10 +180,80 @@ func (is *IdentityServer) createNotification(ctx context.Context, req *ttnpb.Cre
 	if err != nil {
 		return nil, err
 	}
+	return notification, nil
+}
+
+func (is *IdentityServer) createNotification(ctx context.Context, req *ttnpb.CreateNotificationRequest) (*ttnpb.CreateNotificationResponse, error) {
+	if err := clusterauth.Authorized(ctx); err != nil {
+		return nil, err
+	}
+
+	if req.Email && email.GetNotification(ctx, req.GetNotificationType()) == nil {
+		log.FromContext(ctx).WithField("notification_type", req.GetNotificationType()).Warn("email template for notification not registered")
+		req.Email = false
+	}
+
+	receiverUserIDs, err := is.lookupNotificationReceivers(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	notification, err := is.storeNotification(ctx, req, receiverUserIDs...)
+	if err != nil {
+		return nil, err
+	}
+
+	if req.Email {
+		if err := is.SendNotificationEmailToUserIDs(ctx, notification, receiverUserIDs...); err != nil {
+			return nil, err
+		}
+	}
 
 	return &ttnpb.CreateNotificationResponse{
 		Id: notification.Id,
 	}, nil
+}
+
+func (is *IdentityServer) notifyAdminsInternal(ctx context.Context, req *ttnpb.CreateNotificationRequest) error {
+	ctx = is.FromRequestContext(ctx)
+
+	if authInfo, err := is.authInfo(ctx); err == nil {
+		if userIDs := authInfo.GetEntityIdentifiers().GetUserIds(); userIDs != nil {
+			req.SenderIds = userIDs
+		}
+	}
+
+	if req.Email && email.GetNotification(ctx, req.GetNotificationType()) == nil {
+		log.FromContext(ctx).WithField("notification_type", req.GetNotificationType()).Warn("email template for notification not registered")
+		req.Email = false
+	}
+
+	var receivers []*ttnpb.User
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		receivers, err = st.ListAdmins(ctx, notificationEmailUserFields)
+		return err
+	})
+	if err != nil {
+		return err
+	}
+
+	receiverUserIDs := make([]*ttnpb.UserIdentifiers, len(receivers))
+	for i, receiver := range receivers {
+		receiverUserIDs[i] = receiver.Ids
+	}
+
+	notification, err := is.storeNotification(ctx, req, receiverUserIDs...)
+	if err != nil {
+		return err
+	}
+
+	if req.Email {
+		if err := is.SendNotificationEmailToUsers(ctx, notification, receivers...); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (is *IdentityServer) listNotifications(ctx context.Context, req *ttnpb.ListNotificationsRequest) (*ttnpb.ListNotificationsResponse, error) {

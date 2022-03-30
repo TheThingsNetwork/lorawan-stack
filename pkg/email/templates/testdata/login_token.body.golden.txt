@@ -1,0 +1,8 @@
+Dear John Doe,
+
+A login token was requested for your user "john-doe" on The Things Network.
+
+You can now go to https://eu1.cloud.thethings.network/oauth/token-login?token=TOKEN to log in.
+Alternatively, you can use the login token "TOKEN" directly.
+
+Your login token expires an hour from now, so if you don't log in before then, you'll have to request a new token if you still want to log in.

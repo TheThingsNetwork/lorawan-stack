@@ -25,10 +25,10 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
+	"go.thethings.network/lorawan-stack/v3/pkg/email/templates"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blacklist"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -282,15 +282,12 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	}
 
 	if usr.State == ttnpb.State_STATE_REQUESTED {
-		err = is.SendAdminsEmail(ctx, func(data emails.Data) email.MessageData {
-			data.Entity.Type, data.Entity.ID = "user", usr.GetIds().GetUserId()
-			return &emails.UserRequested{
-				Data: data,
-			}
+		go is.notifyAdminsInternal(ctx, &ttnpb.CreateNotificationRequest{
+			EntityIds:        req.GetUser().GetIds().GetEntityIdentifiers(),
+			NotificationType: "user_requested",
+			Data:             ttnpb.MustMarshalAny(req),
+			Email:            true,
 		})
-		if err != nil {
-			log.FromContext(ctx).WithError(err).Error("Could not send user requested email")
-		}
 	}
 
 	// TODO: Send welcome email (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
@@ -515,17 +512,15 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	// TODO: Send emails (https://github.com/TheThingsNetwork/lorawan-stack/issues/72).
 	// - If primary email address changed
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "state") {
-		err = is.SendUserEmail(ctx, req.User.GetIds(), func(data emails.Data) email.MessageData {
-			data.SetEntity(req)
-			return &emails.EntityStateChanged{
-				Data:             data,
-				State:            strings.ToLower(strings.TrimPrefix(usr.State.String(), "STATE_")),
+		go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
+			EntityIds:        usr.GetIds().GetEntityIdentifiers(),
+			NotificationType: "entity_state_changed",
+			Data: ttnpb.MustMarshalAny(&ttnpb.EntityStateChangedNotification{
+				State:            usr.State,
 				StateDescription: usr.StateDescription,
-			}
+			}),
+			Email: true,
 		})
-		if err != nil {
-			log.FromContext(ctx).WithError(err).Error("Could not send state change notification email")
-		}
 	}
 
 	return usr, nil
@@ -636,12 +631,11 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 		return nil, err
 	}
 	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, req.GetUserIds(), updateMask))
-	err = is.SendUserEmail(ctx, req.GetUserIds(), func(data emails.Data) email.MessageData {
-		return &emails.PasswordChanged{Data: data}
+	go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
+		EntityIds:        req.GetUserIds().GetEntityIdentifiers(),
+		NotificationType: "password_changed",
+		Email:            true,
 	})
-	if err != nil {
-		log.FromContext(ctx).WithError(err).Error("Could not send password change notification email")
-	}
 	return ttnpb.Empty, nil
 }
 
@@ -675,21 +669,20 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 	if err != nil {
 		return nil, err
 	}
+
 	log.FromContext(ctx).WithFields(log.Fields(
 		"user_uid", unique.ID(ctx, req.GetUserIds()),
 		"temporary_password", temporaryPassword,
 	)).Info("Created temporary password")
 	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, req.GetUserIds(), updateTemporaryPasswordFieldMask))
-	err = is.SendUserEmail(ctx, req.GetUserIds(), func(data emails.Data) email.MessageData {
-		return &emails.TemporaryPassword{
-			Data:              data,
+	go is.SendTemplateEmailToUserIDs(is.FromRequestContext(ctx), "temporary_password", func(ctx context.Context, data email.TemplateData) (email.TemplateData, error) {
+		return &templates.TemporaryPasswordData{
+			TemplateData:      data,
 			TemporaryPassword: temporaryPassword,
 			TTL:               ttl,
-		}
-	})
-	if err != nil {
-		log.FromContext(ctx).WithError(err).Error("Could not send temporary password email")
-	}
+		}, nil
+	}, req.GetUserIds())
+
 	return ttnpb.Empty, nil
 }
 

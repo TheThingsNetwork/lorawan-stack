@@ -21,11 +21,10 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
+	"go.thethings.network/lorawan-stack/v3/pkg/email/templates"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -78,15 +77,18 @@ func (is *IdentityServer) createUserAPIKey(ctx context.Context, req *ttnpb.Creat
 	if err != nil {
 		return nil, err
 	}
-	key.Key = token
-	events.Publish(evtCreateUserAPIKey.NewWithIdentifiersAndData(ctx, req.GetUserIds(), nil))
-	err = is.SendUserEmail(ctx, req.GetUserIds(), func(data emails.Data) email.MessageData {
-		data.SetEntity(req)
-		return &emails.APIKeyCreated{Data: data, Key: key, Rights: key.Rights}
+	key.Key = ""
+
+	events.Publish(evtCreateUserAPIKey.NewWithIdentifiersAndData(ctx, req.GetUserIds(), key))
+	go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
+		EntityIds:        req.GetUserIds().GetEntityIdentifiers(),
+		NotificationType: "api_key_created",
+		Data:             ttnpb.MustMarshalAny(key),
+		Receivers:        []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT},
+		Email:            true,
 	})
-	if err != nil {
-		log.FromContext(ctx).WithError(err).Error("Could not send API key created notification email")
-	}
+
+	key.Key = token
 	return key, nil
 }
 
@@ -177,14 +179,15 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 		return &ttnpb.APIKey{}, nil
 	}
 	key.Key = ""
-	events.Publish(evtUpdateUserAPIKey.NewWithIdentifiersAndData(ctx, req.GetUserIds(), nil))
-	err = is.SendUserEmail(ctx, req.GetUserIds(), func(data emails.Data) email.MessageData {
-		data.SetEntity(req)
-		return &emails.APIKeyChanged{Data: data, Key: key, Rights: key.Rights}
+
+	events.Publish(evtUpdateUserAPIKey.NewWithIdentifiersAndData(ctx, req.GetUserIds(), key))
+	go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
+		EntityIds:        req.GetUserIds().GetEntityIdentifiers(),
+		NotificationType: "api_key_changed",
+		Data:             ttnpb.MustMarshalAny(key),
+		Receivers:        []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT},
+		Email:            true,
 	})
-	if err != nil {
-		log.FromContext(ctx).WithError(err).Error("Could not send API key update notification email")
-	}
 
 	return key, nil
 }
@@ -248,12 +251,13 @@ func (is *IdentityServer) createLoginToken(ctx context.Context, req *ttnpb.Creat
 	})
 
 	if !(canSkipEmail && req.SkipEmail) {
-		err = is.SendUserEmail(ctx, req.GetUserIds(), func(data emails.Data) email.MessageData {
-			return &emails.LoginToken{Data: data, LoginToken: token, TTL: loginTokenConfig.TokenTTL}
-		})
-		if err != nil {
-			log.FromContext(ctx).WithError(err).Error("Could not send API key created notification email")
-		}
+		go is.SendTemplateEmailToUserIDs(is.FromRequestContext(ctx), "login_token", func(ctx context.Context, data email.TemplateData) (email.TemplateData, error) {
+			return &templates.LoginTokenData{
+				TemplateData: data,
+				LoginToken:   token,
+				TTL:          loginTokenConfig.TokenTTL,
+			}, nil
+		}, req.GetUserIds())
 	}
 	if !canReturnToken {
 		token = ""
