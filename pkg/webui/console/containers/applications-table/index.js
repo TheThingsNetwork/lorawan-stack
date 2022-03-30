@@ -190,6 +190,7 @@ const ApplicationsTable = props => {
   return (
     <FetchTable
       entity="applications"
+      defaultOrder="application_id"
       headers={headers}
       addMessage={sharedMessages.addApplication}
       tableTitle={<Message content={sharedMessages.applications} />}

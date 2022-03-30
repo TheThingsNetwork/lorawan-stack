@@ -80,6 +80,7 @@ class FetchTable extends Component {
     actionItems: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
     addMessage: PropTypes.message,
     clickable: PropTypes.bool,
+    defaultOrder: PropTypes.string,
     dispatch: PropTypes.func.isRequired,
     entity: PropTypes.string.isRequired,
     fetching: PropTypes.bool,
@@ -148,18 +149,19 @@ class FetchTable extends Component {
     tabs: [],
     actionItems: null,
     clickable: true,
+    defaultOrder: undefined,
   }
 
   constructor(props) {
     super(props)
 
-    const { tabs } = props
+    const { tabs, defaultOrder } = props
 
     this.state = {
       query: '',
       page: 1,
       tab: tabs.length > 0 ? tabs[0].name : undefined,
-      order: undefined,
+      order: defaultOrder,
       initialFetch: true,
     }
 
@@ -302,7 +304,6 @@ class FetchTable extends Component {
     } = this.props
     const { page, query, tab, order, initialFetch, error } = this.state
     let orderDirection, orderBy
-
     // Parse order string.
     if (typeof order === 'string') {
       orderDirection = typeof order === 'string' && order[0] === '-' ? 'desc' : 'asc'

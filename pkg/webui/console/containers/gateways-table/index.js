@@ -231,6 +231,7 @@ const GatewaysTable = props => {
   return (
     <FetchTable
       entity="gateways"
+      defaultOrder="gateway_id"
       addMessage={sharedMessages.addGateway}
       headers={headers}
       getItemsAction={getGateways}

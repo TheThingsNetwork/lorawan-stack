@@ -194,6 +194,7 @@ const OrganizationsTable = props => {
   return (
     <FetchTable
       entity="organizations"
+      defaultOrder="organization_id"
       headers={headers}
       addMessage={sharedMessages.addOrganization}
       tableTitle={<Message content={sharedMessages.organizations} />}
