@@ -1396,7 +1396,7 @@ type GetTemplateRequest struct {
 	// Application identifiers.
 	ApplicationIds *ApplicationIdentifiers `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3" json:"application_ids,omitempty"`
 	// End device version information.
-	// EndDeviceProfileIdentifiers take precedence over this field if both are specified.
+	// Use either EndDeviceVersionIdentifiers or EndDeviceProfileIdentifiers.
 	VersionIds *EndDeviceVersionIdentifiers `protobuf:"bytes,2,opt,name=version_ids,json=versionIds,proto3" json:"version_ids,omitempty"`
 	// End device profile identifiers.
 	EndDeviceProfileIds  *GetTemplateRequest_EndDeviceProfileIdentifiers `protobuf:"bytes,3,opt,name=end_device_profile_ids,json=endDeviceProfileIds,proto3" json:"end_device_profile_ids,omitempty"`
@@ -1454,7 +1454,7 @@ func (m *GetTemplateRequest) GetEndDeviceProfileIds() *GetTemplateRequest_EndDev
 type GetTemplateRequest_EndDeviceProfileIdentifiers struct {
 	// VendorID managed by the LoRa Alliance, as defined in TR005.
 	VendorId uint32 `protobuf:"varint,1,opt,name=vendor_id,json=vendorId,proto3" json:"vendor_id,omitempty"`
-	// ID of the LoRaWAN end device profile. The naming of this field follows the TR005 specification.
+	// ID of the LoRaWAN end device profile assigned by the vendor.
 	VendorProfileId      uint32   `protobuf:"varint,2,opt,name=vendor_profile_id,json=vendorProfileId,proto3" json:"vendor_profile_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

@@ -311,7 +311,7 @@ message GetTemplateRequest {
   ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
 
   // End device version information.
-  // EndDeviceProfileIdentifiers take precedence over this field if both are specified.
+  // Use either EndDeviceVersionIdentifiers or EndDeviceProfileIdentifiers.
   EndDeviceVersionIdentifiers version_ids = 2;
 
   // End device profile identifiers.

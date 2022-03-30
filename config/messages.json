@@ -3662,6 +3662,15 @@
       "file": "store.go"
     }
   },
+  "error:pkg/devicerepository/store/bleve:multiple_identifiers": {
+    "translations": {
+      "en": "multiple identifiers found in the request. Use either EndDeviceVersionIdentifiers or EndDeviceProfileIdentifiers"
+    },
+    "description": {
+      "package": "pkg/devicerepository/store/bleve",
+      "file": "store.go"
+    }
+  },
   "error:pkg/devicerepository/store/remote:band_not_found": {
     "translations": {
       "en": "band `{band_id}` not found"

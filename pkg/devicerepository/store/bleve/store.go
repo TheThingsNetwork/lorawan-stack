@@ -30,6 +30,7 @@ import (
 var (
 	errCorruptedIndex           = errors.DefineCorruption("corrupted_index", "corrupted index file")
 	errInvalidNumberOfProfiles  = errors.DefineCorruption("invalid_number_of_profiles", "invalid number of profiles returned")
+	errMultipleIdentifiers      = errors.DefineCorruption("multiple_identifiers", "multiple identifiers found in the request. Use either EndDeviceVersionIdentifiers or EndDeviceProfileIdentifiers")
 	errEndDeviceProfileNotFound = errors.DefineNotFound("end_device_profile_not_found", "end device profile not found for vendor ID `{vendor_id}` and vendor profile ID `{vendor_profile_id}`")
 )
 
@@ -188,6 +189,9 @@ func (s *bleveStore) GetTemplate(req *ttnpb.GetTemplateRequest, _ *store.EndDevi
 		profile             *store.EndDeviceProfile
 		endDeviceProfileIds = req.GetEndDeviceProfileIds()
 	)
+	if endDeviceProfileIds != nil && req.VersionIds != nil {
+		return nil, errMultipleIdentifiers.New()
+	}
 	// Attempt to fetch the end device profile that matches the identifiers.
 	if endDeviceProfileIds != nil {
 		documentTypeQuery := bleve.NewTermQuery(profileDocumentType)

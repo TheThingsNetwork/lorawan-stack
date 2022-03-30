@@ -11630,7 +11630,7 @@
             },
             {
               "name": "version_ids",
-              "description": "End device version information.\nEndDeviceProfileIdentifiers take precedence over this field if both are specified.",
+              "description": "End device version information.\nUse either EndDeviceVersionIdentifiers or EndDeviceProfileIdentifiers.",
               "label": "",
               "type": "EndDeviceVersionIdentifiers",
               "longType": "EndDeviceVersionIdentifiers",

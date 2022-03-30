@@ -2874,7 +2874,7 @@ and allows clients to claim end devices.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  | Application identifiers. |
-| `version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | End device version information. EndDeviceProfileIdentifiers take precedence over this field if both are specified. |
+| `version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | End device version information. Use either EndDeviceVersionIdentifiers or EndDeviceProfileIdentifiers. |
 | `end_device_profile_ids` | [`GetTemplateRequest.EndDeviceProfileIdentifiers`](#ttn.lorawan.v3.GetTemplateRequest.EndDeviceProfileIdentifiers) |  | End device profile identifiers. |
 
 #### Field Rules
