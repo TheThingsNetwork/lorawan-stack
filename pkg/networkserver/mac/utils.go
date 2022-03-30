@@ -145,22 +145,6 @@ func NextPingSlotAt(ctx context.Context, dev *ttnpb.EndDevice, earliestAt time.T
 	return time.Time{}, false
 }
 
-func DeviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy *band.Band) bool {
-	if !phy.EnableADR {
-		return false
-	}
-	if dev.GetMulticast() {
-		return false
-	}
-	if v := dev.GetMacSettings().GetUseAdr(); v != nil {
-		return v.Value
-	}
-	if defaults.UseAdr != nil {
-		return defaults.UseAdr.Value
-	}
-	return true
-}
-
 func DeviceResetsFCnt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) bool {
 	switch {
 	case dev.GetMacSettings().GetResetsFCnt() != nil:
