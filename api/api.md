@@ -2890,7 +2890,7 @@ Identifiers to uniquely identify a LoRaWAN end device profile.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `vendor_id` | [`uint32`](#uint32) |  | VendorID managed by the LoRa Alliance, as defined in TR005. |
-| `vendor_profile_id` | [`uint32`](#uint32) |  | ID of the LoRaWAN end device profile. The naming of this field follows the TR005 specification. |
+| `vendor_profile_id` | [`uint32`](#uint32) |  | ID of the LoRaWAN end device profile assigned by the vendor. |
 
 #### Field Rules
 

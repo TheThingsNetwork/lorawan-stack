@@ -303,9 +303,9 @@ message GetTemplateRequest {
     // VendorID managed by the LoRa Alliance, as defined in TR005.
     uint32 vendor_id = 1 [(validate.rules).uint32 = {gte: 1}];
 
-    // ID of the LoRaWAN end device profile. The naming of this field follows the TR005 specification.
+    // ID of the LoRaWAN end device profile assigned by the vendor.
     uint32 vendor_profile_id = 2;
-    }
+  }
 
   // Application identifiers.
   ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];

@@ -11686,7 +11686,7 @@
             },
             {
               "name": "vendor_profile_id",
-              "description": "ID of the LoRaWAN end device profile. The naming of this field follows the TR005 specification.",
+              "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
               "label": "",
               "type": "uint32",
               "longType": "uint32",
