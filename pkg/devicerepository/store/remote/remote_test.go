@@ -351,6 +351,94 @@ func TestRemoteStore(t *testing.T) {
 		})
 	})
 
+	t.Run("TestGetTemplate", func(t *testing.T) {
+		t.Run("ByEndDeviceVersionIdentifiers", func(t *testing.T) {
+			template, err := s.GetTemplate(&ttnpb.GetTemplateRequest{
+				VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
+					BrandId:         "foo-vendor",
+					ModelId:         "dev1",
+					FirmwareVersion: "1.0",
+					BandId:          "EU_863_870",
+				},
+			}, nil)
+			a.So(err, should.BeNil)
+			a.So(template, should.Resemble, &ttnpb.EndDeviceTemplate{
+				EndDevice: &ttnpb.EndDevice{
+					VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
+						BrandId:         "foo-vendor",
+						ModelId:         "dev1",
+						FirmwareVersion: "1.0",
+						BandId:          "EU_863_870",
+					},
+					LorawanPhyVersion: ttnpb.PHYVersion_PHY_V1_0_3_REV_A,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_3,
+					SupportsJoin:      true,
+					MacSettings: &ttnpb.MACSettings{
+						Supports_32BitFCnt: &ttnpb.BoolValue{
+							Value: true,
+						},
+					},
+				},
+				FieldMask: &pbtypes.FieldMask{
+					Paths: []string{
+						"version_ids",
+						"supports_join",
+						"supports_class_b",
+						"supports_class_c",
+						"lorawan_version",
+						"lorawan_phy_version",
+						"mac_settings.supports_32_bit_f_cnt",
+					},
+				},
+			})
+		})
+
+		t.Run("ByProfile", func(t *testing.T) {
+			template, err := s.GetTemplate(&ttnpb.GetTemplateRequest{
+				VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
+					BrandId: "foo-vendor",
+				},
+				EndDeviceProfileIds: &ttnpb.GetTemplateRequest_EndDeviceProfileIdentifiers{
+					VendorId:        42,
+					VendorProfileId: 0,
+				},
+			}, &store.EndDeviceProfile{
+				VendorProfileID:           0,
+				RegionalParametersVersion: "RP001-1.0.3-RevA",
+				MACVersion:                ttnpb.MACVersion_MAC_V1_0_3,
+				SupportsJoin:              true,
+				Supports32BitFCnt:         true,
+			})
+			a.So(err, should.BeNil)
+			a.So(template, should.Resemble, &ttnpb.EndDeviceTemplate{
+				EndDevice: &ttnpb.EndDevice{
+					VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
+						BrandId: "foo-vendor",
+					},
+					LorawanPhyVersion: ttnpb.PHYVersion_PHY_V1_0_3_REV_A,
+					LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_3,
+					SupportsJoin:      true,
+					MacSettings: &ttnpb.MACSettings{
+						Supports_32BitFCnt: &ttnpb.BoolValue{
+							Value: true,
+						},
+					},
+				},
+				FieldMask: &pbtypes.FieldMask{
+					Paths: []string{
+						"version_ids",
+						"supports_join",
+						"supports_class_b",
+						"supports_class_c",
+						"lorawan_version",
+						"lorawan_phy_version",
+						"mac_settings.supports_32_bit_f_cnt",
+					},
+				},
+			})
+		})
+	})
+
 	t.Run("TestGetCodecs", func(t *testing.T) {
 		t.Run("Missing", func(t *testing.T) {
 			a := assertions.New(t)

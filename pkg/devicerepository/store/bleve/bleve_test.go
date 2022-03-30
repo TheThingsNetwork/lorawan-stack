@@ -18,6 +18,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store/bleve"
@@ -388,7 +389,9 @@ func TestBleve(t *testing.T) {
 					BandId:          "unknown-band",
 				},
 			} {
-				tmpl, err := s.GetTemplate(&ids)
+				tmpl, err := s.GetTemplate(&ttnpb.GetTemplateRequest{
+					VersionIds: &ids,
+				}, nil)
 				a.So(errors.IsNotFound(err), should.BeTrue)
 				a.So(tmpl, should.BeNil)
 			}
@@ -396,16 +399,138 @@ func TestBleve(t *testing.T) {
 
 		t.Run("Success", func(t *testing.T) {
 			a := assertions.New(t)
-			tmpl, err := s.GetTemplate(&ttnpb.EndDeviceVersionIdentifiers{
-				BrandId:         "foo-vendor",
-				ModelId:         "dev2",
-				FirmwareVersion: "1.1",
-				HardwareVersion: "2.0",
-				BandId:          "EU_433",
-			})
+			tmpl, err := s.GetTemplate(&ttnpb.GetTemplateRequest{
+				VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
+					BrandId:         "foo-vendor",
+					ModelId:         "dev2",
+					FirmwareVersion: "1.1",
+					HardwareVersion: "2.0",
+					BandId:          "EU_433",
+				},
+			}, nil)
 			a.So(err, should.BeNil)
 			a.So(tmpl, should.NotBeNil)
 		})
+	})
+
+	t.Run("GetTemplateByNumericIDs", func(t *testing.T) {
+		for _, tc := range []struct {
+			Name             string
+			Req              *ttnpb.GetTemplateRequest
+			EndDeviceProfile *store.EndDeviceProfile
+			Resp             *ttnpb.EndDeviceTemplate
+			Assertion        func(t *ttnpb.EndDeviceTemplate, err error) bool
+		}{
+			{
+				Name: "UnknownVendorID",
+				Req: &ttnpb.GetTemplateRequest{
+					EndDeviceProfileIds: &ttnpb.GetTemplateRequest_EndDeviceProfileIdentifiers{
+						VendorId: 2,
+					},
+				},
+				Assertion: func(t *ttnpb.EndDeviceTemplate, err error) bool {
+					return a.So(errors.IsNotFound(err), should.BeTrue) && a.So(t, should.BeNil)
+				},
+			},
+			{
+				Name: "UnknownBrandID",
+				Req: &ttnpb.GetTemplateRequest{
+					EndDeviceProfileIds: &ttnpb.GetTemplateRequest_EndDeviceProfileIdentifiers{
+						VendorId:        42,
+						VendorProfileId: 1,
+					},
+				},
+				Assertion: func(t *ttnpb.EndDeviceTemplate, err error) bool {
+					return a.So(errors.IsNotFound(err), should.BeTrue) && a.So(t, should.BeNil)
+				},
+			},
+			{
+				Name: "ZeroProfileID",
+				Req: &ttnpb.GetTemplateRequest{
+					EndDeviceProfileIds: &ttnpb.GetTemplateRequest_EndDeviceProfileIdentifiers{
+						VendorId: 42,
+					},
+				},
+				Assertion: func(t *ttnpb.EndDeviceTemplate, err error) bool {
+					if !(a.So(t, should.NotBeNil) && a.So(err, should.BeNil)) {
+						return false
+					}
+					return a.So(t, should.Resemble, &ttnpb.EndDeviceTemplate{
+						EndDevice: &ttnpb.EndDevice{
+							VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
+								BrandId: "foo-vendor",
+							},
+							LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_2,
+							LorawanPhyVersion: ttnpb.PHYVersion_PHY_V1_0_2_REV_B,
+							SupportsJoin:      true,
+							MacSettings: &ttnpb.MACSettings{
+								Supports_32BitFCnt: &ttnpb.BoolValue{
+									Value: true,
+								},
+							},
+						},
+						FieldMask: &types.FieldMask{
+							Paths: []string{
+								"version_ids",
+								"supports_join",
+								"supports_class_b",
+								"supports_class_c",
+								"lorawan_version",
+								"lorawan_phy_version",
+								"mac_settings.supports_32_bit_f_cnt",
+							},
+						},
+					})
+				},
+			},
+			{
+				Name: "SuccessfulFetch",
+				Req: &ttnpb.GetTemplateRequest{
+					EndDeviceProfileIds: &ttnpb.GetTemplateRequest_EndDeviceProfileIdentifiers{
+						VendorId:        42,
+						VendorProfileId: 3,
+					},
+				},
+				Assertion: func(t *ttnpb.EndDeviceTemplate, err error) bool {
+					if !(a.So(t, should.NotBeNil) && a.So(err, should.BeNil)) {
+						return false
+					}
+					return a.So(t, should.Resemble, &ttnpb.EndDeviceTemplate{
+						EndDevice: &ttnpb.EndDevice{
+							VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
+								BrandId: "foo-vendor",
+							},
+							LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_3,
+							LorawanPhyVersion: ttnpb.PHYVersion_PHY_V1_0_3_REV_A,
+							SupportsJoin:      true,
+							MacSettings: &ttnpb.MACSettings{
+								Supports_32BitFCnt: &ttnpb.BoolValue{
+									Value: true,
+								},
+							},
+						},
+						FieldMask: &types.FieldMask{
+							Paths: []string{
+								"version_ids",
+								"supports_join",
+								"supports_class_b",
+								"supports_class_c",
+								"lorawan_version",
+								"lorawan_phy_version",
+								"mac_settings.supports_32_bit_f_cnt",
+							},
+						},
+					})
+				},
+			},
+		} {
+			t.Run(tc.Name, func(t *testing.T) {
+				tmpl, err := s.GetTemplate(tc.Req, tc.EndDeviceProfile)
+				if !a.So(tc.Assertion(tmpl, err), should.BeTrue) {
+					t.FailNow()
+				}
+			})
+		}
 	})
 
 	t.Run("TestGetCodecs", func(t *testing.T) {

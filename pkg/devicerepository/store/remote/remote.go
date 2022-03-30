@@ -162,6 +162,93 @@ func (s *remoteStore) GetModels(req store.GetModelsRequest) (*store.GetModelsRes
 	}, nil
 }
 
+// getEndDeviceProfilesByBrand lists the available LoRaWAN end device profiles by a single brand.
+func (s *remoteStore) getEndDeviceProfilesByBrand(req store.GetEndDeviceProfilesRequest) (*store.GetEndDeviceProfilesResponse, error) {
+	b, err := s.fetcher.File("vendor", req.BrandID, "index.yaml")
+	if err != nil {
+		return nil, errBrandNotFound.WithAttributes("brand_id", req.BrandID)
+	}
+	index := VendorEndDevicesIndex{}
+	if err := yaml.Unmarshal(b, &index); err != nil {
+		return nil, err
+	}
+	start, end := paginate(len(index.EndDevices), req.Limit, req.Page)
+
+	profiles := make([]*store.EndDeviceProfile, 0, end-start)
+
+	for idx := start; idx < end; idx++ {
+		modelID := index.EndDevices[idx]
+		if req.ModelID != "" && modelID != req.ModelID {
+			continue
+		}
+		b, err := s.fetcher.File("vendor", req.BrandID, modelID+".yaml")
+		if err != nil {
+			return nil, err
+		}
+		model := EndDeviceModel{}
+		if err := yaml.Unmarshal(b, &model); err != nil {
+			return nil, err
+		}
+
+		// For each profile ID, get the profile.
+		for _, fwVersion := range model.FirmwareVersions {
+			for _, profile := range fwVersion.Profiles {
+				p, err := s.fetcher.File("vendor", req.BrandID, profile.ID+".yaml")
+				if err != nil {
+					return nil, err
+				}
+				profile := store.EndDeviceProfile{}
+				if err := yaml.Unmarshal(p, &profile); err != nil {
+					return nil, err
+				}
+				profiles = append(profiles, &profile)
+			}
+		}
+	}
+	return &store.GetEndDeviceProfilesResponse{
+		Count:    end - start,
+		Offset:   start,
+		Total:    uint32(len(index.EndDevices)),
+		Profiles: profiles,
+	}, nil
+}
+
+// GetEndDeviceProfiles lists available LoRaWAN end device profiles per brand.
+// Note that this can be very slow, and does not support searching/sorting.
+// This function is primarily intended to be used for creating the bleve index.
+func (s *remoteStore) GetEndDeviceProfiles(req store.GetEndDeviceProfilesRequest) (*store.GetEndDeviceProfilesResponse, error) {
+	if req.BrandID != "" {
+		return s.getEndDeviceProfilesByBrand(req)
+	}
+	all := []*store.EndDeviceProfile{}
+	brands, err := s.GetBrands(store.GetBrandsRequest{
+		Paths: []string{"brand_id"},
+	})
+	if err != nil {
+		return nil, err
+	}
+	for _, brand := range brands.Brands {
+		profiles, err := s.GetEndDeviceProfiles(store.GetEndDeviceProfilesRequest{
+			BrandID: brand.BrandId,
+		})
+		if errors.IsNotFound(err) {
+			// Skip vendors without any profiles.
+			continue
+		} else if err != nil {
+			return nil, err
+		}
+		all = append(all, profiles.Profiles...)
+	}
+
+	start, end := paginate(len(all), req.Limit, req.Page)
+	return &store.GetEndDeviceProfilesResponse{
+		Count:    end - start,
+		Offset:   start,
+		Total:    uint32(len(all)),
+		Profiles: all[start:end],
+	}, nil
+}
+
 var (
 	errModelNotFound           = errors.DefineNotFound("model_not_found", "model `{brand_id}/{model_id}` not found")
 	errBandNotFound            = errors.DefineNotFound("band_not_found", "band `{band_id}` not found")
@@ -170,7 +257,13 @@ var (
 )
 
 // GetTemplate retrieves an end device template for an end device definition.
-func (s *remoteStore) GetTemplate(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.EndDeviceTemplate, error) {
+func (s *remoteStore) GetTemplate(req *ttnpb.GetTemplateRequest, profile *store.EndDeviceProfile) (*ttnpb.EndDeviceTemplate, error) {
+	ids := req.GetVersionIds()
+	if profile != nil {
+		return profile.ToTemplatePB(ids, nil)
+	}
+
+	// Parse the models and return the End Device Profile that corresponds to the Band ID.
 	models, err := s.GetModels(store.GetModelsRequest{
 		BrandID: ids.BrandId,
 		ModelID: ids.ModelId,
@@ -208,7 +301,7 @@ func (s *remoteStore) GetTemplate(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnp
 		if err != nil {
 			return nil, err
 		}
-		profile := EndDeviceProfile{}
+		profile := store.EndDeviceProfile{}
 		if err := yaml.Unmarshal(b, &profile); err != nil {
 			return nil, err
 		}

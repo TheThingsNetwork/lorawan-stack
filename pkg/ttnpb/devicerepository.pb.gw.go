@@ -642,6 +642,122 @@ func local_request_DeviceRepository_GetTemplate_0(ctx context.Context, marshaler
 }
 
 var (
+	filter_DeviceRepository_GetTemplate_1 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "end_device_profile_ids": 2, "vendor_id": 3, "vendor_profile_id": 4}, Base: []int{1, 1, 1, 1, 2, 3, 0, 0, 0}, Check: []int{0, 1, 2, 1, 4, 4, 3, 5, 6}}
+)
+
+func request_DeviceRepository_GetTemplate_1(ctx context.Context, marshaler runtime.Marshaler, client DeviceRepositoryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetTemplateRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["application_ids.application_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_ids.application_id")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
+	}
+
+	val, ok = pathParams["end_device_profile_ids.vendor_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "end_device_profile_ids.vendor_id")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_profile_ids.vendor_id", val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_profile_ids.vendor_id", err)
+	}
+
+	val, ok = pathParams["end_device_profile_ids.vendor_profile_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "end_device_profile_ids.vendor_profile_id")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_profile_ids.vendor_profile_id", val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_profile_ids.vendor_profile_id", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_DeviceRepository_GetTemplate_1); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.GetTemplate(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_DeviceRepository_GetTemplate_1(ctx context.Context, marshaler runtime.Marshaler, server DeviceRepositoryServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq GetTemplateRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["application_ids.application_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "application_ids.application_id")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "application_ids.application_id", val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "application_ids.application_id", err)
+	}
+
+	val, ok = pathParams["end_device_profile_ids.vendor_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "end_device_profile_ids.vendor_id")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_profile_ids.vendor_id", val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_profile_ids.vendor_id", err)
+	}
+
+	val, ok = pathParams["end_device_profile_ids.vendor_profile_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "end_device_profile_ids.vendor_profile_id")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "end_device_profile_ids.vendor_profile_id", val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "end_device_profile_ids.vendor_profile_id", err)
+	}
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_DeviceRepository_GetTemplate_1); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := server.GetTemplate(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+var (
 	filter_DeviceRepository_GetUplinkDecoder_0 = &utilities.DoubleArray{Encoding: map[string]int{"application_ids": 0, "application_id": 1, "version_ids": 2, "brand_id": 3, "model_id": 4, "firmware_version": 5, "band_id": 6}, Base: []int{1, 1, 1, 1, 2, 3, 4, 5, 0, 0, 0, 0, 0}, Check: []int{0, 1, 2, 1, 4, 4, 4, 4, 3, 5, 6, 7, 8}}
 )
 
@@ -1265,6 +1381,29 @@ func RegisterDeviceRepositoryHandlerServer(ctx context.Context, mux *runtime.Ser
 
 	})
 
+	mux.Handle("GET", pattern_DeviceRepository_GetTemplate_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_DeviceRepository_GetTemplate_1(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_DeviceRepository_GetTemplate_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("GET", pattern_DeviceRepository_GetUplinkDecoder_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1495,6 +1634,26 @@ func RegisterDeviceRepositoryHandlerClient(ctx context.Context, mux *runtime.Ser
 
 	})
 
+	mux.Handle("GET", pattern_DeviceRepository_GetTemplate_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_DeviceRepository_GetTemplate_1(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_DeviceRepository_GetTemplate_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("GET", pattern_DeviceRepository_GetUplinkDecoder_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1571,6 +1730,8 @@ var (
 
 	pattern_DeviceRepository_GetTemplate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 2, 9}, []string{"dr", "applications", "application_ids.application_id", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "template"}, "", runtime.AssumeColonVerbOpt(true)))
 
+	pattern_DeviceRepository_GetTemplate_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 2, 7}, []string{"dr", "applications", "application_ids.application_id", "vendors", "end_device_profile_ids.vendor_id", "profiles", "end_device_profile_ids.vendor_profile_id", "template"}, "", runtime.AssumeColonVerbOpt(true)))
+
 	pattern_DeviceRepository_GetUplinkDecoder_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 2, 9, 2, 10, 2, 11}, []string{"dr", "applications", "application_ids.application_id", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "formatters", "uplink", "decoder"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_DeviceRepository_GetDownlinkDecoder_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 2, 9, 2, 10, 2, 11}, []string{"dr", "applications", "application_ids.application_id", "brands", "version_ids.brand_id", "models", "version_ids.model_id", "version_ids.firmware_version", "version_ids.band_id", "formatters", "downlink", "decoder"}, "", runtime.AssumeColonVerbOpt(true)))
@@ -1590,6 +1751,8 @@ var (
 	forward_DeviceRepository_GetModel_0 = runtime.ForwardResponseMessage
 
 	forward_DeviceRepository_GetTemplate_0 = runtime.ForwardResponseMessage
+
+	forward_DeviceRepository_GetTemplate_1 = runtime.ForwardResponseMessage
 
 	forward_DeviceRepository_GetUplinkDecoder_0 = runtime.ForwardResponseMessage
 

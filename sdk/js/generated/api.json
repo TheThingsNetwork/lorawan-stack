@@ -11630,11 +11630,67 @@
             },
             {
               "name": "version_ids",
-              "description": "End device version information.",
+              "description": "End device version information.\nUse either EndDeviceVersionIdentifiers or EndDeviceProfileIdentifiers.",
               "label": "",
               "type": "EndDeviceVersionIdentifiers",
               "longType": "EndDeviceVersionIdentifiers",
               "fullType": "ttn.lorawan.v3.EndDeviceVersionIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "end_device_profile_ids",
+              "description": "End device profile identifiers.",
+              "label": "",
+              "type": "EndDeviceProfileIdentifiers",
+              "longType": "GetTemplateRequest.EndDeviceProfileIdentifiers",
+              "fullType": "ttn.lorawan.v3.GetTemplateRequest.EndDeviceProfileIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "EndDeviceProfileIdentifiers",
+          "longName": "GetTemplateRequest.EndDeviceProfileIdentifiers",
+          "fullName": "ttn.lorawan.v3.GetTemplateRequest.EndDeviceProfileIdentifiers",
+          "description": "Identifiers to uniquely identify a LoRaWAN end device profile.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "vendor_id",
+              "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.gte",
+                    "value": 1
+                  }
+                ]
+              }
+            },
+            {
+              "name": "vendor_profile_id",
+              "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -12365,6 +12421,10 @@
                     {
                       "method": "GET",
                       "pattern": "/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/template"
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/dr/applications/{application_ids.application_id}/vendors/{end_device_profile_ids.vendor_id}/profiles/{end_device_profile_ids.vendor_profile_id}/template"
                     }
                   ]
                 }

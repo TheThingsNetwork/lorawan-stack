@@ -298,11 +298,24 @@ message ListEndDeviceModelsRequest {
 }
 
 message GetTemplateRequest {
+  // Identifiers to uniquely identify a LoRaWAN end device profile.
+  message EndDeviceProfileIdentifiers {
+    // VendorID managed by the LoRa Alliance, as defined in TR005.
+    uint32 vendor_id = 1 [(validate.rules).uint32 = {gte: 1}];
+
+    // ID of the LoRaWAN end device profile assigned by the vendor.
+    uint32 vendor_profile_id = 2;
+  }
+
   // Application identifiers.
   ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
 
   // End device version information.
+  // Use either EndDeviceVersionIdentifiers or EndDeviceProfileIdentifiers.
   EndDeviceVersionIdentifiers version_ids = 2;
+
+  // End device profile identifiers.
+  EndDeviceProfileIdentifiers end_device_profile_ids = 3;
 }
 
 message GetPayloadFormatterRequest {
@@ -400,6 +413,9 @@ service DeviceRepository {
   rpc GetTemplate(GetTemplateRequest) returns (EndDeviceTemplate) {
     option (google.api.http) = {
       get: "/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/template"
+      additional_bindings {
+        get: "/dr/applications/{application_ids.application_id}/vendors/{end_device_profile_ids.vendor_id}/profiles/{end_device_profile_ids.vendor_profile_id}/template"
+      }
     };
   };
 

@@ -89,9 +89,20 @@ func (s *mockStore) GetModels(req store.GetModelsRequest) (*store.GetModelsRespo
 	}, nil
 }
 
+// GetEndDeviceProfiles implements store.
+func (s *mockStore) GetEndDeviceProfiles(req store.GetEndDeviceProfilesRequest) (*store.GetEndDeviceProfilesResponse, error) {
+	return nil, nil
+}
+
 // GetTemplate retrieves an end device template for an end device definition.
-func (s *mockStore) GetTemplate(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.EndDeviceTemplate, error) {
-	s.lastVersionIDs = ids
+func (s *mockStore) GetTemplate(req *ttnpb.GetTemplateRequest, _ *store.EndDeviceProfile) (*ttnpb.EndDeviceTemplate, error) {
+	s.lastVersionIDs = req.GetVersionIds()
+	profileIDs := req.GetEndDeviceProfileIds()
+	if profileIDs != nil {
+		s.lastVersionIDs = &ttnpb.EndDeviceVersionIdentifiers{
+			BrandId: "test-brand",
+		}
+	}
 	return s.template, s.err
 }
 
@@ -632,6 +643,58 @@ func TestGRPC(t *testing.T) {
 			template, err := cl.GetTemplate(test.Context(), &ttnpb.GetTemplateRequest{
 				ApplicationIds: &registeredApplicationID,
 				VersionIds:     ids,
+			}, creds)
+			a.So(err, should.BeNil)
+			a.So(template, should.Resemble, st.template)
+		})
+	})
+
+	t.Run("GetTemplateByNumericIDs", func(t *testing.T) {
+		profileIDs := &ttnpb.GetTemplateRequest_EndDeviceProfileIdentifiers{
+			VendorId:        1,
+			VendorProfileId: 0,
+		}
+		st.template = &ttnpb.EndDeviceTemplate{
+			EndDevice: &ttnpb.EndDevice{
+				VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
+					BrandId: "test-brand",
+				},
+			},
+			FieldMask: &types.FieldMask{
+				Paths: []string{"version_ids"},
+			},
+		}
+
+		t.Run("Request", func(t *testing.T) {
+			a := assertions.New(t)
+			_, err := cl.GetTemplate(test.Context(), &ttnpb.GetTemplateRequest{
+				ApplicationIds:      &registeredApplicationID,
+				EndDeviceProfileIds: profileIDs,
+			}, creds)
+			a.So(err, should.BeNil)
+			a.So(st.lastVersionIDs, should.Resemble, &ttnpb.EndDeviceVersionIdentifiers{
+				BrandId: "test-brand",
+			})
+		})
+
+		t.Run("StoreError", func(t *testing.T) {
+			a := assertions.New(t)
+			st.err = fmt.Errorf("store error")
+			models, err := cl.GetTemplate(test.Context(), &ttnpb.GetTemplateRequest{
+				ApplicationIds:      &registeredApplicationID,
+				EndDeviceProfileIds: profileIDs,
+			}, creds)
+			a.So(models, should.BeNil)
+			a.So(err.Error(), should.ContainSubstring, st.err.Error())
+		})
+
+		t.Run("Success", func(t *testing.T) {
+			a := assertions.New(t)
+			st.err = nil
+
+			template, err := cl.GetTemplate(test.Context(), &ttnpb.GetTemplateRequest{
+				ApplicationIds:      &registeredApplicationID,
+				EndDeviceProfileIds: profileIDs,
 			}, creds)
 			a.So(err, should.BeNil)
 			a.So(template, should.Resemble, st.template)

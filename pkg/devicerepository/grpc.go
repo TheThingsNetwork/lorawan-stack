@@ -169,7 +169,7 @@ func (dr *DeviceRepository) GetTemplate(ctx context.Context, req *ttnpb.GetTempl
 	if err := requireApplication(ctx, req.GetApplicationIds()); err != nil {
 		return nil, err
 	}
-	return dr.store.GetTemplate(req.VersionIds)
+	return dr.store.GetTemplate(req, nil)
 }
 
 func getDecoder(ctx context.Context, req *ttnpb.GetPayloadFormatterRequest, f func(store.GetCodecRequest) (*ttnpb.MessagePayloadDecoder, error)) (*ttnpb.MessagePayloadDecoder, error) {

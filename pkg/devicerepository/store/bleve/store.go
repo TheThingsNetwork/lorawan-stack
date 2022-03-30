@@ -15,6 +15,8 @@
 package bleve
 
 import (
+	"strconv"
+
 	"github.com/blevesearch/bleve"
 	"github.com/blevesearch/bleve/search"
 	"github.com/blevesearch/bleve/search/query"
@@ -26,7 +28,10 @@ import (
 )
 
 var (
-	errCorruptedIndex = errors.DefineCorruption("corrupted_index", "corrupted index file")
+	errCorruptedIndex           = errors.DefineCorruption("corrupted_index", "corrupted index file")
+	errInvalidNumberOfProfiles  = errors.DefineCorruption("invalid_number_of_profiles", "invalid number of profiles returned")
+	errMultipleIdentifiers      = errors.DefineCorruption("multiple_identifiers", "multiple identifiers found in the request. Use either EndDeviceVersionIdentifiers or EndDeviceProfileIdentifiers")
+	errEndDeviceProfileNotFound = errors.DefineNotFound("end_device_profile_not_found", "end device profile not found for vendor ID `{vendor_id}` and vendor profile ID `{vendor_profile_id}`")
 )
 
 // retrieve returns the resulting document from the cache, if available. Otherwise,
@@ -179,8 +184,63 @@ func (s *bleveStore) GetModels(req store.GetModelsRequest) (*store.GetModelsResp
 }
 
 // GetTemplate retrieves an end device template for an end device definition.
-func (s *bleveStore) GetTemplate(ids *ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.EndDeviceTemplate, error) {
-	return s.store.GetTemplate(ids)
+func (s *bleveStore) GetTemplate(req *ttnpb.GetTemplateRequest, _ *store.EndDeviceProfile) (*ttnpb.EndDeviceTemplate, error) {
+	var (
+		profile             *store.EndDeviceProfile
+		endDeviceProfileIds = req.GetEndDeviceProfileIds()
+	)
+	if endDeviceProfileIds != nil && req.VersionIds != nil {
+		return nil, errMultipleIdentifiers.New()
+	}
+	// Attempt to fetch the end device profile that matches the identifiers.
+	if endDeviceProfileIds != nil {
+		documentTypeQuery := bleve.NewTermQuery(profileDocumentType)
+		documentTypeQuery.SetField("Type")
+		queries := []query.Query{documentTypeQuery}
+		if q := endDeviceProfileIds.VendorId; q != 0 {
+			query := bleve.NewTermQuery(strconv.Itoa(int(q)))
+			query.SetField("VendorID")
+			queries = append(queries, query)
+		}
+		query := bleve.NewTermQuery(strconv.Itoa(int(endDeviceProfileIds.VendorProfileId)))
+		query.SetField("VendorProfileID")
+		queries = append(queries, query)
+
+		searchRequest := bleve.NewSearchRequest(bleve.NewConjunctionQuery(queries...))
+		searchRequest.Fields = []string{"ProfileJSON", "BrandID"}
+		result, err := s.index.Search(searchRequest)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(result.Hits) == 0 {
+			return nil, errEndDeviceProfileNotFound.WithAttributes(
+				"vendor_id", endDeviceProfileIds.VendorId,
+				"vendor_profile_id", endDeviceProfileIds.VendorProfileId)
+		}
+
+		if len(result.Hits) != 1 {
+			// There can only be one profile for a given tuple.
+			return nil, errInvalidNumberOfProfiles.New()
+		}
+
+		brandID, ok := result.Hits[0].Fields["BrandID"].(string)
+		if !ok {
+			return nil, errCorruptedIndex.New()
+		}
+		// Set the Brand ID.
+		req.VersionIds = &ttnpb.EndDeviceVersionIdentifiers{
+			BrandId: brandID,
+		}
+
+		model, err := s.retrieve(result.Hits[0], "ProfileJSON", func() interface{} { return &store.EndDeviceProfile{} })
+		if err != nil {
+			return nil, err
+		}
+		profile = model.(*store.EndDeviceProfile)
+	}
+
+	return s.store.GetTemplate(req, profile)
 }
 
 // GetUplinkDecoder retrieves the codec for decoding uplink messages.
@@ -196,6 +256,11 @@ func (s *bleveStore) GetDownlinkDecoder(req store.GetCodecRequest) (*ttnpb.Messa
 // GetDownlinkEncoder retrieves the codec for encoding downlink messages.
 func (s *bleveStore) GetDownlinkEncoder(req store.GetCodecRequest) (*ttnpb.MessagePayloadEncoder, error) {
 	return s.store.GetDownlinkEncoder(req)
+}
+
+// GetEndDeviceProfiles implements store.
+func (s *bleveStore) GetEndDeviceProfiles(req store.GetEndDeviceProfilesRequest) (*store.GetEndDeviceProfilesResponse, error) {
+	return s.store.GetEndDeviceProfiles(req)
 }
 
 // Close closes the store.

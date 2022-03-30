@@ -48,6 +48,25 @@ type GetModelsRequest struct {
 	Search  string
 }
 
+// GetEndDeviceProfilesRequest is a request to list available LoRaWAN end device profile definitions.
+type GetEndDeviceProfilesRequest struct {
+	BrandID,
+	ModelID string
+	Limit,
+	Page uint32
+	OrderBy string
+	Paths   []string
+	Search  string
+}
+
+// GetEndDeviceProfilesResponse returns available LoRaWAN end device profile definitions.
+type GetEndDeviceProfilesResponse struct {
+	Count,
+	Offset,
+	Total uint32
+	Profiles []*EndDeviceProfile
+}
+
 // GetModelsResponse is a list of models, along with model information
 type GetModelsResponse struct {
 	Count,
@@ -68,8 +87,10 @@ type Store interface {
 	GetBrands(GetBrandsRequest) (*GetBrandsResponse, error)
 	// GetModels lists available end device definitions.
 	GetModels(GetModelsRequest) (*GetModelsResponse, error)
+	// GetEndDeviceProfiles lists available LoRaWAN end device profile definitions.
+	GetEndDeviceProfiles(GetEndDeviceProfilesRequest) (*GetEndDeviceProfilesResponse, error)
 	// GetTemplate retrieves an end device template for an end device definition.
-	GetTemplate(*ttnpb.EndDeviceVersionIdentifiers) (*ttnpb.EndDeviceTemplate, error)
+	GetTemplate(*ttnpb.GetTemplateRequest, *EndDeviceProfile) (*ttnpb.EndDeviceTemplate, error)
 	// GetUplinkDecoder retrieves the codec for decoding uplink messages.
 	GetUplinkDecoder(GetCodecRequest) (*ttnpb.MessagePayloadDecoder, error)
 	// GetDownlinkDecoder retrieves the codec for decoding downlink messages.

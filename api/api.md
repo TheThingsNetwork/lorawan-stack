@@ -181,6 +181,7 @@
   - [Message `GetEndDeviceModelRequest`](#ttn.lorawan.v3.GetEndDeviceModelRequest)
   - [Message `GetPayloadFormatterRequest`](#ttn.lorawan.v3.GetPayloadFormatterRequest)
   - [Message `GetTemplateRequest`](#ttn.lorawan.v3.GetTemplateRequest)
+  - [Message `GetTemplateRequest.EndDeviceProfileIdentifiers`](#ttn.lorawan.v3.GetTemplateRequest.EndDeviceProfileIdentifiers)
   - [Message `ListEndDeviceBrandsRequest`](#ttn.lorawan.v3.ListEndDeviceBrandsRequest)
   - [Message `ListEndDeviceBrandsResponse`](#ttn.lorawan.v3.ListEndDeviceBrandsResponse)
   - [Message `ListEndDeviceModelsRequest`](#ttn.lorawan.v3.ListEndDeviceModelsRequest)
@@ -2873,13 +2874,29 @@ and allows clients to claim end devices.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  | Application identifiers. |
-| `version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | End device version information. |
+| `version_ids` | [`EndDeviceVersionIdentifiers`](#ttn.lorawan.v3.EndDeviceVersionIdentifiers) |  | End device version information. Use either EndDeviceVersionIdentifiers or EndDeviceProfileIdentifiers. |
+| `end_device_profile_ids` | [`GetTemplateRequest.EndDeviceProfileIdentifiers`](#ttn.lorawan.v3.GetTemplateRequest.EndDeviceProfileIdentifiers) |  | End device profile identifiers. |
 
 #### Field Rules
 
 | Field | Validations |
 | ----- | ----------- |
 | `application_ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.GetTemplateRequest.EndDeviceProfileIdentifiers">Message `GetTemplateRequest.EndDeviceProfileIdentifiers`</a>
+
+Identifiers to uniquely identify a LoRaWAN end device profile.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `vendor_id` | [`uint32`](#uint32) |  | VendorID managed by the LoRa Alliance, as defined in TR005. |
+| `vendor_profile_id` | [`uint32`](#uint32) |  | ID of the LoRaWAN end device profile assigned by the vendor. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `vendor_id` | <p>`uint32.gte`: `1`</p> |
 
 ### <a name="ttn.lorawan.v3.ListEndDeviceBrandsRequest">Message `ListEndDeviceBrandsRequest`</a>
 
@@ -3038,6 +3055,7 @@ and allows clients to claim end devices.
 | `ListModels` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/models` |  |
 | `GetModel` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands/{brand_id}/models/{model_id}` |  |
 | `GetTemplate` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/template` |  |
+| `GetTemplate` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/vendors/{end_device_profile_ids.vendor_id}/profiles/{end_device_profile_ids.vendor_profile_id}/template` |  |
 | `GetUplinkDecoder` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/uplink/decoder` |  |
 | `GetDownlinkDecoder` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/decoder` |  |
 | `GetDownlinkEncoder` | `GET` | `/api/v3/dr/applications/{application_ids.application_id}/brands/{version_ids.brand_id}/models/{version_ids.model_id}/{version_ids.firmware_version}/{version_ids.band_id}/formatters/downlink/encoder` |  |

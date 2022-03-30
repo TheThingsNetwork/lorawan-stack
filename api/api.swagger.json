@@ -4401,6 +4401,22 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "end_device_profile_ids.vendor_id",
+            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "end_device_profile_ids.vendor_profile_id",
+            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
           }
         ],
         "tags": [
@@ -4479,6 +4495,82 @@
               "type": "string"
             },
             "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "DeviceRepository"
+        ]
+      }
+    },
+    "/dr/applications/{application_ids.application_id}/vendors/{end_device_profile_ids.vendor_id}/profiles/{end_device_profile_ids.vendor_profile_id}/template": {
+      "get": {
+        "operationId": "DeviceRepository_GetTemplate2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3EndDeviceTemplate"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_device_profile_ids.vendor_id",
+            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "end_device_profile_ids.vendor_profile_id",
+            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "version_ids.brand_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "version_ids.model_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "version_ids.hardware_version",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "version_ids.firmware_version",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "version_ids.band_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -11428,6 +11520,22 @@
           }
         }
       }
+    },
+    "GetTemplateRequestEndDeviceProfileIdentifiers": {
+      "type": "object",
+      "properties": {
+        "vendor_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "VendorID managed by the LoRa Alliance, as defined in TR005."
+        },
+        "vendor_profile_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID of the LoRaWAN end device profile assigned by the vendor."
+        }
+      },
+      "description": "Identifiers to uniquely identify a LoRaWAN end device profile."
     },
     "IsConfigurationAdminRights": {
       "type": "object",
