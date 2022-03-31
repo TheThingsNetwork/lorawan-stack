@@ -91,6 +91,8 @@ class DeviceOverview extends React.Component {
       created_at,
       lorawan_version,
       supports_join,
+      mac_state,
+      mac_settings,
     } = this.props.device
 
     // Get session keys.
@@ -242,7 +244,7 @@ class DeviceOverview extends React.Component {
       items: [],
     }
 
-    if (Object.keys(sessionKeys).length > 0) {
+    if (Object.keys(mac_state).length > 0 && Object.keys(mac_settings).length > 0) {
       macStateAndSettings.items.push({
         value: (
           <Button
