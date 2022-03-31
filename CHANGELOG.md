@@ -12,6 +12,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - New event type `gs.gateway.connection.stats` with connection statistics. A new event is sent at most every `gs.update-connection-stats-debounce-time` time.
+- Button to export as JSON end device `mac-settings` and `mac-state` in the Console.
 
 ### Changed
 
