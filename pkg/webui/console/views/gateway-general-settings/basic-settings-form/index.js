@@ -34,6 +34,22 @@ import m from '../messages'
 
 import validationSchema from './validation-schema'
 
+const decodeSecret = value => {
+  if (Boolean(value)) {
+    return atob(value)
+  }
+
+  return ''
+}
+
+const encodeSecret = value => {
+  if (Boolean(value)) {
+    return btoa(value)
+  }
+
+  return ''
+}
+
 const BasicSettingsForm = React.memo(props => {
   const {
     gateway,
@@ -72,21 +88,14 @@ const BasicSettingsForm = React.memo(props => {
       attributes: mapAttributesToFormValue(gateway.attributes),
     }
 
-    if (Boolean(initialValues.lbs_lns_secret) && initialValues.lbs_lns_secret.value !== undefined) {
-      try {
-        initialValues.lbs_lns_secret.value = atob(initialValues.lbs_lns_secret.value)
-      } catch (e) {
-        initialValues.lbs_lns_secret.value = ''
-      }
-    }
     return validationSchema.cast(initialValues)
   }, [gateway])
 
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
       const castedValues = validationSchema.cast(values)
-      if (Boolean(castedValues.lbs_lns_secret) && castedValues.lbs_lns_secret.value !== undefined) {
-        castedValues.lbs_lns_secret.value = btoa(castedValues.lbs_lns_secret.value)
+      if (castedValues.lbs_lns_secret.value === '') {
+        castedValues.lbs_lns_secret = null
       }
       setError(undefined)
       try {
@@ -163,6 +172,8 @@ const BasicSettingsForm = React.memo(props => {
         title={sharedMessages.lbsLNSSecret}
         description={sharedMessages.lbsLNSSecretDescription}
         name="lbs_lns_secret.value"
+        decode={decodeSecret}
+        encode={encodeSecret}
         component={Input}
         disabled={!mayEditSecrets}
         sensitive
