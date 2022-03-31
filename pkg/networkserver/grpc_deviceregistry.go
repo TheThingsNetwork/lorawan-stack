@@ -293,18 +293,22 @@ type setDeviceState struct {
 	onGet     []func(*ttnpb.EndDevice) error
 }
 
+// hasAnyField caches the result of ttnpb.HasAnyField in the provided cache map
+// in order to avoid redundant lookups.
+//
+// NOTE: If the search paths are not bottom level fields, hasAnyField may have unexpected
+// results, as ttnpb.HasAnyField does not consider lower search paths as being part of
+// the requested paths - i.e ttnpb.HasAnyField([]string{"a.b"}, "a") == false.
 func hasAnyField(fs []string, cache map[string]bool, paths ...string) bool {
-outer:
 	for _, p := range paths {
-		i := len(p)
-		for ; i > 0; i = strings.LastIndex(p[:i], ".") {
+		for i := len(p); i > 0; i = strings.LastIndex(p[:i], ".") {
 			p := p[:i]
 			v, ok := cache[p]
 			if !ok {
 				continue
 			}
 			if !v {
-				continue outer
+				continue
 			}
 			return true
 		}
@@ -418,6 +422,7 @@ func (st *setDeviceState) ValidateFieldIsZero(path string) error {
 	v, ok := st.zeroPaths[path]
 	if !ok {
 		st.zeroPaths[path] = true
+		st.AddGetFields(path)
 		return nil
 	}
 	if !v {
@@ -439,6 +444,7 @@ func (st *setDeviceState) ValidateFieldIsNotZero(path string) error {
 	v, ok := st.zeroPaths[path]
 	if !ok {
 		st.zeroPaths[path] = false
+		st.AddGetFields(path)
 		return nil
 	}
 	if v {
@@ -1809,7 +1815,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			if !hasPHYUpdate && !st.HasSetField(p) {
 				continue
 			}
-			p := p
+			p, isValid := p, isValid
 			if err := st.WithField(func(dev *ttnpb.EndDevice) error {
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
 					if !isValid(dev, phy) {
@@ -1874,6 +1880,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return st.Device.Session.Keys.GetSNwkSIntKey() != nil && st.Device.Session.Keys.SNwkSIntKey.IsZero()
 			},
 		} {
+			p, isZero := p, isZero
 			if err := st.ValidateSetField(func() bool { return !isZero() }, p); err != nil {
 				return nil, err
 			}
@@ -1938,6 +1945,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return len(st.Device.PendingSession.Keys.GetSessionKeyId()) == 0
 			},
 		} {
+			p, isZero := p, isZero
 			if err := st.ValidateSetField(func() bool { return !isZero() }, p); err != nil {
 				return nil, err
 			}
@@ -2003,6 +2011,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			"pending_mac_state.queued_join_accept.payload":                  func() bool { return len(st.Device.PendingMacState.QueuedJoinAccept.Payload) == 0 },
 			"pending_mac_state.queued_join_accept.dev_addr":                 st.Device.PendingMacState.QueuedJoinAccept.DevAddr.IsZero,
 		} {
+			p, isZero := p, isZero
 			if err := st.ValidateSetField(func() bool { return !isZero() }, p); err != nil {
 				return nil, err
 			}

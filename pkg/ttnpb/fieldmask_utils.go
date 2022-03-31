@@ -72,6 +72,9 @@ nextRequested:
 
 // HasAnyField returns whether the given requested paths contain any of the given fields.
 // The requested fields (i.e. `a.b`) may be of a higher level than the search path (i.e. `a.b.c`).
+//
+// Note that this function may have unexpected results when non bottom search fields are used,
+// as HasAnyField([]string{"a.b"}, "a") is false.
 func HasAnyField(requested []string, search ...string) bool {
 	for _, requested := range requested {
 		for _, search := range search {
