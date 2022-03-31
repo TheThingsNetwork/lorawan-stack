@@ -20,7 +20,6 @@ import WebhookTemplateForm from '@console/components/webhook-template-form'
 
 import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
 import PropTypes from '@ttn-lw/lib/prop-types'
-import ConsoleApp from '@console/views/app'
 
 const pathExpand = (url, fields) =>
   Boolean(url) && url.path ? { path: urlTemplate.parse(url.path).expand(fields) } : url
