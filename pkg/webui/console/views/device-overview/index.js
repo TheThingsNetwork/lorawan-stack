@@ -244,7 +244,7 @@ class DeviceOverview extends React.Component {
       items: [],
     }
 
-    if (Object.keys(mac_state).length > 0 && Object.keys(mac_settings).length > 0) {
+    if (Boolean(mac_state) && Boolean(mac_settings)) {
       macStateAndSettings.items.push({
         value: (
           <Button
