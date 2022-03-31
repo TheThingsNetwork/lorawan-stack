@@ -587,6 +587,9 @@ var ApplicationUplinkFieldPathsNested = []string{
 	"version_ids.firmware_version",
 	"version_ids.hardware_version",
 	"version_ids.model_id",
+	"version_ids.serial_number",
+	"version_ids.vendor_id",
+	"version_ids.vendor_profile_id",
 }
 
 var ApplicationUplinkFieldPathsTopLevel = []string{
@@ -914,6 +917,9 @@ var ApplicationUpFieldPathsNested = []string{
 	"up.uplink_message.version_ids.firmware_version",
 	"up.uplink_message.version_ids.hardware_version",
 	"up.uplink_message.version_ids.model_id",
+	"up.uplink_message.version_ids.serial_number",
+	"up.uplink_message.version_ids.vendor_id",
+	"up.uplink_message.version_ids.vendor_profile_id",
 }
 
 var ApplicationUpFieldPathsTopLevel = []string{

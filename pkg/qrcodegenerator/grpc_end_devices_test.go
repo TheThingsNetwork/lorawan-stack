@@ -203,10 +203,11 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 
 				a.So(endDevice.ClaimAuthenticationCode, should.NotBeNil)
 				a.So(endDevice.ClaimAuthenticationCode.Value, should.Equal, "123456")
-				attributes := endDevice.Attributes
-				a.So(len(attributes), should.Equal, 2)
-				a.So(attributes["vendor-id"], should.Equal, "AABB")
-				a.So(attributes["profile-id"], should.Equal, "1122")
+
+				versionIDs := endDevice.GetVersionIds()
+				a.So(versionIDs, should.NotBeNil)
+				a.So(versionIDs.VendorId, should.Equal, 0xAABB)
+				a.So(versionIDs.VendorProfileId, should.Equal, 0x1122)
 				return true
 			},
 		},
@@ -214,7 +215,7 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 			Name:     "ValidBytesWithSerialNumber",
 			FormatID: laTr005.ID(),
 			GetQRData: func() []byte {
-				return []byte(`LW:D0:1111111111111111:2222222222222222:00010001:O123456:S12345678`)
+				return []byte(`LW:D0:1111111111111111:2222222222222222:ABCDABCD:O123456:S12345678`)
 			},
 			Assertion: func(a *assertions.Assertion, resp *ttnpb.ParseEndDeviceQRCodeResponse, err error) bool {
 				if !a.So(resp, should.NotBeNil) {
@@ -236,11 +237,11 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 
 				a.So(endDevice.ClaimAuthenticationCode, should.NotBeNil)
 				a.So(endDevice.ClaimAuthenticationCode.Value, should.Equal, "123456")
-				attributes := endDevice.Attributes
-				a.So(len(attributes), should.Equal, 3)
-				a.So(attributes["serial-number"], should.Equal, "12345678")
-				a.So(attributes["vendor-id"], should.Equal, "0001")
-				a.So(attributes["profile-id"], should.Equal, "0001")
+				versionIDs := endDevice.GetVersionIds()
+				a.So(versionIDs, should.NotBeNil)
+				a.So(versionIDs.SerialNumber, should.Equal, "12345678")
+				a.So(versionIDs.VendorId, should.Equal, 0xABCD)
+				a.So(versionIDs.VendorProfileId, should.Equal, 0xABCD)
 				return true
 			},
 		},
@@ -288,8 +289,6 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 
 				a.So(endDevice.ClaimAuthenticationCode, should.NotBeNil)
 				a.So(endDevice.ClaimAuthenticationCode.Value, should.Equal, "123456")
-				attributes := endDevice.Attributes
-				a.So(len(attributes), should.Equal, 0)
 				return true
 			},
 		},

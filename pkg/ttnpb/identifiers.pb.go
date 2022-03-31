@@ -490,11 +490,16 @@ func (*EntityIdentifiers) XXX_OneofWrappers() []interface{} {
 
 // Identifies an end device model with version information.
 type EndDeviceVersionIdentifiers struct {
-	BrandId              string   `protobuf:"bytes,1,opt,name=brand_id,json=brandId,proto3" json:"brand_id,omitempty"`
-	ModelId              string   `protobuf:"bytes,2,opt,name=model_id,json=modelId,proto3" json:"model_id,omitempty"`
-	HardwareVersion      string   `protobuf:"bytes,3,opt,name=hardware_version,json=hardwareVersion,proto3" json:"hardware_version,omitempty"`
-	FirmwareVersion      string   `protobuf:"bytes,4,opt,name=firmware_version,json=firmwareVersion,proto3" json:"firmware_version,omitempty"`
-	BandId               string   `protobuf:"bytes,5,opt,name=band_id,json=bandId,proto3" json:"band_id,omitempty"`
+	BrandId         string `protobuf:"bytes,1,opt,name=brand_id,json=brandId,proto3" json:"brand_id,omitempty"`
+	ModelId         string `protobuf:"bytes,2,opt,name=model_id,json=modelId,proto3" json:"model_id,omitempty"`
+	HardwareVersion string `protobuf:"bytes,3,opt,name=hardware_version,json=hardwareVersion,proto3" json:"hardware_version,omitempty"`
+	FirmwareVersion string `protobuf:"bytes,4,opt,name=firmware_version,json=firmwareVersion,proto3" json:"firmware_version,omitempty"`
+	BandId          string `protobuf:"bytes,5,opt,name=band_id,json=bandId,proto3" json:"band_id,omitempty"`
+	// VendorID managed by the LoRa Alliance, as defined in TR005.
+	VendorId uint32 `protobuf:"varint,6,opt,name=vendor_id,json=vendorId,proto3" json:"vendor_id,omitempty"`
+	// ID of the LoRaWAN end device profile assigned by the vendor.
+	VendorProfileId      uint32   `protobuf:"varint,7,opt,name=vendor_profile_id,json=vendorProfileId,proto3" json:"vendor_profile_id,omitempty"`
+	SerialNumber         string   `protobuf:"bytes,8,opt,name=serial_number,json=serialNumber,proto3" json:"serial_number,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -555,6 +560,27 @@ func (m *EndDeviceVersionIdentifiers) GetFirmwareVersion() string {
 func (m *EndDeviceVersionIdentifiers) GetBandId() string {
 	if m != nil {
 		return m.BandId
+	}
+	return ""
+}
+
+func (m *EndDeviceVersionIdentifiers) GetVendorId() uint32 {
+	if m != nil {
+		return m.VendorId
+	}
+	return 0
+}
+
+func (m *EndDeviceVersionIdentifiers) GetVendorProfileId() uint32 {
+	if m != nil {
+		return m.VendorProfileId
+	}
+	return 0
+}
+
+func (m *EndDeviceVersionIdentifiers) GetSerialNumber() string {
+	if m != nil {
+		return m.SerialNumber
 	}
 	return ""
 }

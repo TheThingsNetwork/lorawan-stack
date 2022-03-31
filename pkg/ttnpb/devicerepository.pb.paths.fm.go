@@ -164,6 +164,9 @@ var GetTemplateRequestFieldPathsNested = []string{
 	"version_ids.firmware_version",
 	"version_ids.hardware_version",
 	"version_ids.model_id",
+	"version_ids.serial_number",
+	"version_ids.vendor_id",
+	"version_ids.vendor_profile_id",
 }
 
 var GetTemplateRequestFieldPathsTopLevel = []string{
@@ -181,6 +184,9 @@ var GetPayloadFormatterRequestFieldPathsNested = []string{
 	"version_ids.firmware_version",
 	"version_ids.hardware_version",
 	"version_ids.model_id",
+	"version_ids.serial_number",
+	"version_ids.vendor_id",
+	"version_ids.vendor_profile_id",
 }
 
 var GetPayloadFormatterRequestFieldPathsTopLevel = []string{

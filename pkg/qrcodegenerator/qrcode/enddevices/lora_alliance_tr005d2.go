@@ -16,6 +16,7 @@ package enddevices
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"strings"
@@ -157,18 +158,14 @@ func (m *LoRaAllianceTR005Draft2) EndDeviceTemplate() *ttnpb.EndDeviceTemplate {
 		"ids",
 		"claim_authentication_code",
 	}
-	attributes := make(map[string]string)
-	if m.SerialNumber != "" {
-		attributes[serialNumberAttribute] = m.SerialNumber
-	}
+	var (
+		vendorID, vendorProfileID uint16
+	)
 	if m.VendorID != [2]byte{} {
-		attributes[vendorIDAttribute] = strings.ToUpper(hex.EncodeToString(m.VendorID[:]))
+		vendorID = binary.BigEndian.Uint16(m.VendorID[:])
 	}
 	if m.ModelID != [2]byte{} {
-		attributes[profileIDAttribute] = strings.ToUpper(hex.EncodeToString(m.ModelID[:]))
-	}
-	if len(attributes) > 0 {
-		paths = append(paths, "attributes")
+		vendorProfileID = binary.BigEndian.Uint16(m.ModelID[:])
 	}
 	return &ttnpb.EndDeviceTemplate{
 		EndDevice: &ttnpb.EndDevice{
@@ -179,7 +176,11 @@ func (m *LoRaAllianceTR005Draft2) EndDeviceTemplate() *ttnpb.EndDeviceTemplate {
 			ClaimAuthenticationCode: &ttnpb.EndDeviceAuthenticationCode{
 				Value: m.DeviceValidationCode,
 			},
-			Attributes: attributes,
+			VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
+				VendorId:        uint32(vendorID),
+				VendorProfileId: uint32(vendorProfileID),
+				SerialNumber:    m.SerialNumber,
+			},
 		},
 		FieldMask: &pbtypes.FieldMask{
 			Paths: paths,

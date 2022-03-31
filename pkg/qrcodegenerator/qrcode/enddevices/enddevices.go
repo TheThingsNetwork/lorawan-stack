@@ -23,12 +23,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-const (
-	serialNumberAttribute = "serial-number"
-	vendorIDAttribute     = "vendor-id"
-	profileIDAttribute    = "profile-id"
-)
-
 var (
 	errCharacter = errors.DefineInvalidArgument("character", "invalid character `{r}`")
 	errNoJoinEUI = errors.DefineFailedPrecondition("no_join_eui", "no JoinEUI")

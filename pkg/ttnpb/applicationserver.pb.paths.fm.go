@@ -126,6 +126,9 @@ var EncodeDownlinkRequestFieldPathsNested = []string{
 	"version_ids.firmware_version",
 	"version_ids.hardware_version",
 	"version_ids.model_id",
+	"version_ids.serial_number",
+	"version_ids.vendor_id",
+	"version_ids.vendor_profile_id",
 }
 
 var EncodeDownlinkRequestFieldPathsTopLevel = []string{
@@ -215,12 +218,18 @@ var DecodeUplinkRequestFieldPathsNested = []string{
 	"uplink.version_ids.firmware_version",
 	"uplink.version_ids.hardware_version",
 	"uplink.version_ids.model_id",
+	"uplink.version_ids.serial_number",
+	"uplink.version_ids.vendor_id",
+	"uplink.version_ids.vendor_profile_id",
 	"version_ids",
 	"version_ids.band_id",
 	"version_ids.brand_id",
 	"version_ids.firmware_version",
 	"version_ids.hardware_version",
 	"version_ids.model_id",
+	"version_ids.serial_number",
+	"version_ids.vendor_id",
+	"version_ids.vendor_profile_id",
 }
 
 var DecodeUplinkRequestFieldPathsTopLevel = []string{
@@ -282,6 +291,9 @@ var DecodeUplinkResponseFieldPathsNested = []string{
 	"uplink.version_ids.firmware_version",
 	"uplink.version_ids.hardware_version",
 	"uplink.version_ids.model_id",
+	"uplink.version_ids.serial_number",
+	"uplink.version_ids.vendor_id",
+	"uplink.version_ids.vendor_profile_id",
 }
 
 var DecodeUplinkResponseFieldPathsTopLevel = []string{
@@ -316,6 +328,9 @@ var DecodeDownlinkRequestFieldPathsNested = []string{
 	"version_ids.firmware_version",
 	"version_ids.hardware_version",
 	"version_ids.model_id",
+	"version_ids.serial_number",
+	"version_ids.vendor_id",
+	"version_ids.vendor_profile_id",
 }
 
 var DecodeDownlinkRequestFieldPathsTopLevel = []string{
