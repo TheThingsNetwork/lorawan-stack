@@ -77,6 +77,9 @@ func addDeprecatedDeviceFlags(flagSet *pflag.FlagSet) {
 	util.DeprecateFlag(flagSet, "pending_session.keys.nwk_s_key", "pending_session.keys.f_nwk_s_int_key")
 	util.DeprecateFlag(flagSet, "session.keys.nwk_s_key.key", "session.keys.f_nwk_s_int_key.key")
 	util.DeprecateFlag(flagSet, "pending_session.keys.nwk_s_key.key", "pending_session.keys.f_nwk_s_int_key.key")
+
+	util.HideFlag(flagSet, "mac_settings.use_adr")
+	util.HideFlag(flagSet, "mac_settings.adr_margin")
 }
 
 func forwardDeprecatedDeviceFlags(flagSet *pflag.FlagSet) {
