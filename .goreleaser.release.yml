@@ -1,8 +1,5 @@
 project_name: lorawan-stack
 
-changelog:
-  skip: true
-
 release:
   prerelease: auto
 
