@@ -1132,6 +1132,62 @@ func (dst *GatewayAntennaIdentifiers) SetFields(src *GatewayAntennaIdentifiers, 
 	return nil
 }
 
+func (dst *ClassBCGatewayIdentifiers) SetFields(src *ClassBCGatewayIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "gateway_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *GatewayIdentifiers
+				if (src == nil || src.GatewayIds == nil) && dst.GatewayIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.GatewayIds
+				}
+				if dst.GatewayIds != nil {
+					newDst = dst.GatewayIds
+				} else {
+					newDst = &GatewayIdentifiers{}
+					dst.GatewayIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.GatewayIds = src.GatewayIds
+				} else {
+					dst.GatewayIds = nil
+				}
+			}
+		case "antenna_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'antenna_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.AntennaIndex = src.AntennaIndex
+			} else {
+				var zero uint32
+				dst.AntennaIndex = zero
+			}
+		case "group_index":
+			if len(subs) > 0 {
+				return fmt.Errorf("'group_index' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.GroupIndex = src.GroupIndex
+			} else {
+				var zero uint32
+				dst.GroupIndex = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *UplinkToken) SetFields(src *UplinkToken, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

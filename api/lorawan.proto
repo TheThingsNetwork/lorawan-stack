@@ -339,6 +339,12 @@ message GatewayAntennaIdentifiers {
   uint32 antenna_index = 2;
 }
 
+message ClassBCGatewayIdentifiers {
+  GatewayIdentifiers gateway_ids = 1 [(validate.rules).message.required = true];
+  uint32 antenna_index = 2;
+  uint32 group_index = 3;
+}
+
 message UplinkToken {
   GatewayAntennaIdentifiers ids = 1 [(validate.rules).message.required = true];
   uint32 timestamp = 2;

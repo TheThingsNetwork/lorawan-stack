@@ -11333,9 +11333,9 @@
         "gateways": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v3GatewayAntennaIdentifiers"
+            "$ref": "#/definitions/v3ClassBCGatewayIdentifiers"
           },
-          "description": "Possible gateway identifiers and antenna index to use for this downlink message.\nThe Network Server selects one of these gateways for downlink, based on connectivity, signal quality, channel utilization and an available slot.\nIf none of the gateways can be selected, the downlink message fails.\nIf empty, a gateway and antenna is selected automatically from the gateways seen in recent uplinks."
+          "description": "Possible gateway identifiers, antenna index, and group index to use for this downlink message.\nThe Network Server selects one of these gateways for downlink, based on connectivity, signal quality, channel utilization and an available slot.\nIf none of the gateways can be selected, the downlink message fails.\nIf empty, a gateway and antenna is selected automatically from the gateways seen in recent uplinks.\nIf group index is set, gateways will be grouped by the index for the Network Server to select one gateway per group."
         },
         "absolute_time": {
           "type": "string",
@@ -14110,6 +14110,22 @@
         "CLASS_C"
       ],
       "default": "CLASS_A"
+    },
+    "v3ClassBCGatewayIdentifiers": {
+      "type": "object",
+      "properties": {
+        "gateway_ids": {
+          "$ref": "#/definitions/lorawanv3GatewayIdentifiers"
+        },
+        "antenna_index": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "group_index": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
     },
     "v3Client": {
       "type": "object",
