@@ -281,6 +281,19 @@ var GatewayAntennaIdentifiersFieldPathsTopLevel = []string{
 	"antenna_index",
 	"gateway_ids",
 }
+var ClassBCGatewayIdentifiersFieldPathsNested = []string{
+	"antenna_index",
+	"gateway_ids",
+	"gateway_ids.eui",
+	"gateway_ids.gateway_id",
+	"group_index",
+}
+
+var ClassBCGatewayIdentifiersFieldPathsTopLevel = []string{
+	"antenna_index",
+	"gateway_ids",
+	"group_index",
+}
 var UplinkTokenFieldPathsNested = []string{
 	"concentrator_time",
 	"gateway_time",
