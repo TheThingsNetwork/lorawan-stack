@@ -458,7 +458,7 @@ var (
 						paths = append(paths,
 							"join_server_address",
 						)
-						if device.Ids.JoinEui == nil {
+						if device.Ids.JoinEui == nil && (devID == nil || devID.JoinEui == nil) {
 							// Get the default JoinEUI for Join Server.
 							logger.WithField("join_server_address", config.JoinServerGRPCAddress).Info("JoinEUI empty but defaults flag is set, fetch default JoinEUI of the Join Server")
 							js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
