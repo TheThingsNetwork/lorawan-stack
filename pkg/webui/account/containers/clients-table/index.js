@@ -14,7 +14,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { defineMessages } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import { bindActionCreators } from 'redux'
 
 import toast from '@ttn-lw/components/toast'
@@ -32,11 +32,7 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { checkFromState, mayPerformAdminActions } from '@account/lib/feature-checks'
 
-import {
-  deleteClient,
-  restoreClient,
-  getClientsList,
-} from '@account/store/actions/clients'
+import { deleteClient, restoreClient, getClientsList } from '@account/store/actions/clients'
 
 import { selectUserIsAdmin } from '@account/store/selectors/user'
 import {
@@ -68,8 +64,11 @@ const tabs = [
   { title: sharedMessages.deleted, name: DELETED_TAB },
 ]
 
+const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
+
 const ClientsTable = props => {
   const { isAdmin, restoreClient, purgeClient, ...rest } = props
+  const { formatMessage } = useIntl()
 
   const [tab, setTab] = React.useState(OWNED_TAB)
   const isDeletedTab = tab === DELETED_TAB
@@ -118,16 +117,21 @@ const ClientsTable = props => {
     const baseHeaders = [
       {
         name: 'ids.client_id',
-        displayName: 'ID',
+        displayName: sharedMessages.id,
         width: 25,
         sortable: true,
         sortKey: 'client_id',
       },
       {
         name: 'name',
-        displayName: 'Name',
+        displayName: sharedMessages.name,
         width: 25,
         sortable: true,
+      },
+      {
+        name: 'description',
+        displayName: sharedMessages.description,
+        width: 50,
       },
     ]
 
@@ -157,14 +161,15 @@ const ClientsTable = props => {
       })
     } else {
       baseHeaders.push({
-        name: 'description',
-        displayName: 'Description',
+        name: 'state',
+        displayName: sharedMessages.state,
         width: 50,
+        render: state => capitalize(formatMessage({ id: `enum:${state}` })),
       })
     }
 
     return baseHeaders
-  }, [tab, handlePurge, handleRestore])
+  }, [tab, handlePurge, handleRestore, formatMessage])
 
   const baseDataSelector = React.useCallback(
     state => ({
@@ -181,7 +186,7 @@ const ClientsTable = props => {
     const isDeletedTab = tab === DELETED_TAB
 
     setTab(tab)
-    return getClientsList({ ...filters, deleted: isDeletedTab }, ['name', 'description'], {
+    return getClientsList({ ...filters, deleted: isDeletedTab }, ['name', 'description', 'state'], {
       isSearch: tab === ALL_TAB || isDeletedTab || query.length > 0,
     })
   }, [])
@@ -200,6 +205,12 @@ const ClientsTable = props => {
       {...rest}
     />
   )
+}
+
+ClientsTable.propTypes = {
+  isAdmin: PropTypes.bool.isRequired,
+  purgeClient: PropTypes.func.isRequired,
+  restoreClient: PropTypes.func.isRequired,
 }
 
 export default connect(

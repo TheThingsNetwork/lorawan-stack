@@ -111,7 +111,7 @@ class Marshaler {
   }
 
   static unwrapClients(result) {
-    return this.payloadListResponse('clients', result)
+    return this.payloadSingleResponse(result)
   }
 
   static unwrapPacketBrokerNetworks(result) {

@@ -42,22 +42,40 @@ class Clients {
     autoBind(this)
   }
 
+  _addState(fieldMask, clients) {
+    // Ensure to set STATE_REQUESTED if needed, which gets stripped as null
+    // value from the backend response.
+    if (fieldMask && fieldMask.field_mask.paths.includes('state') && !('state' in clients)) {
+      clients.state = 'STATE_REQUESTED'
+    }
+
+    return clients
+  }
+
   async getAll(params, selector) {
+    const fieldMask = Marshaler.selectorToFieldMask(selector)
     const response = await this._api.ClientRegistry.List(undefined, {
       ...params,
-      ...Marshaler.selectorToFieldMask(selector),
+      ...fieldMask,
     })
 
-    return Marshaler.unwrapClients(response)
+    const clients = Marshaler.payloadListResponse('clients', response)
+    clients.clients.map(clients => this._addState(fieldMask, clients))
+
+    return clients
   }
 
   async search(params, selector) {
+    const fieldMask = Marshaler.selectorToFieldMask(selector)
     const response = await this._api.EntityRegistrySearch.SearchClients(undefined, {
       ...params,
-      ...Marshaler.selectorToFieldMask(selector),
+      ...fieldMask,
     })
 
-    return Marshaler.unwrapClients(response)
+    const clients = Marshaler.payloadListResponse('clients', response)
+    clients.clients.map(clients => this._addState(fieldMask, clients))
+
+    return clients
   }
 
   async getById(id, selector) {
@@ -69,7 +87,9 @@ class Clients {
       fieldMask,
     )
 
-    return Marshaler.unwrapClients(response)
+    const client = this._addState(fieldMask, Marshaler.payloadSingleResponse(response))
+
+    return client
   }
 
   async create(ownerId = this._defaultUserId, client, isUserOwner = true) {
