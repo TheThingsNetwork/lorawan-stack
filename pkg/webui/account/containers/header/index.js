@@ -53,6 +53,12 @@ const Header = ({ handleSearchRequest, searchable }) => {
       icon: 'vpn_key',
       path: '/session-management',
     },
+    {
+      title: 'OAuth Clients',
+      icon: 'user',
+      path: '/oauth-clients',
+      exact: true,
+    },
   ]
 
   const navigationEntries = (

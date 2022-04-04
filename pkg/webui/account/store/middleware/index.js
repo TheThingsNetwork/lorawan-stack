@@ -18,5 +18,6 @@ import init from './init'
 import user from './user'
 import identityServer from './identity-server'
 import sessions from './sessions'
+import clients from './clients'
 
-export default [...status, ...init, ...user, ...identityServer, ...sessions]
+export default [...status, ...init, ...user, ...identityServer, ...sessions, ...clients]

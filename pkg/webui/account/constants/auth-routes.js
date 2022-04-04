@@ -17,6 +17,7 @@ import ProfileSettings from '@account/views/profile-settings'
 import Code from '@account/views/code'
 import SessionManagement from '@account/views/session-management'
 import { ValidateWithAuth } from '@account/views/validate'
+import ClientsList from '@account/views/clients'
 
 export default [
   {
@@ -43,5 +44,10 @@ export default [
     path: '/validate',
     exact: true,
     component: ValidateWithAuth,
+  },
+  {
+    path: '/oauth-clients',
+    exact: true,
+    component: ClientsList,
   },
 ]

@@ -23,10 +23,12 @@ import error from '@ttn-lw/lib/store/reducers/ui/error'
 import user from './user'
 import is from './identity-server'
 import session from './sessions'
+import clients from './clients'
 
 export default history =>
   combineReducers({
     init,
+    clients,
     user,
     session,
     is,
