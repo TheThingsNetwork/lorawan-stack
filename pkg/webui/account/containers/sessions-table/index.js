@@ -15,6 +15,7 @@
 import React from 'react'
 import { connect, useDispatch } from 'react-redux'
 import { defineMessages } from 'react-intl'
+import { bindActionCreators } from 'redux'
 
 import Button from '@ttn-lw/components/button'
 import Status from '@ttn-lw/components/status'
@@ -55,20 +56,15 @@ const UserSessionsTable = props => {
 
   const getSessions = React.useCallback(filters => getUserSessionsList(filters, user), [user])
 
-  const onDeleteSuccess = React.useCallback(() => {
-    toast({
-      message: m.deleteSessionSuccess,
-      type: toast.types.SUCCESS,
-    })
-
-    dispatch(getUserSessionsList(user))
-  }, [user, dispatch])
-
   const deleteSession = React.useCallback(
     async session_id => {
       try {
-        const result = await handleDeleteSession(user, session_id)
-        onDeleteSuccess(result)
+        await handleDeleteSession(session_id)
+        toast({
+          message: m.deleteSessionSuccess,
+          type: toast.types.SUCCESS,
+        })
+        dispatch(getUserSessionsList(user))
       } catch {
         toast({
           message: m.deleteSessionError,
@@ -76,12 +72,10 @@ const UserSessionsTable = props => {
         })
       }
     },
-    [user, handleDeleteSession, onDeleteSuccess],
+    [user, handleDeleteSession, dispatch],
   )
 
   const makeHeaders = React.useMemo(() => {
-    const onDelete = session_id => () => deleteSession(session_id)
-
     const baseHeaders = [
       {
         name: 'session_id',
@@ -137,9 +131,9 @@ const UserSessionsTable = props => {
         getValue: row => ({
           id: row.session_id,
           status: row.status,
+          delete: deleteSession.bind(null, row.session_id),
         }),
         render: details => {
-          const handleDeleteSession = onDelete(details.id)
           if (details.status.currentSession) {
             return <Message content={m.endSession} />
           }
@@ -147,7 +141,7 @@ const UserSessionsTable = props => {
           return (
             <Button
               type="button"
-              onClick={handleDeleteSession}
+              onClick={details.delete}
               message={m.removeButtonMessage}
               icon="delete"
             />
@@ -184,8 +178,12 @@ export default connect(
     sessionId: selectSessionId(state),
   }),
   dispatch => ({
-    handleDeleteSession: (user, session_id) =>
-      dispatch(attachPromise(deleteUserSession(user, session_id))),
+    ...bindActionCreators(
+      {
+        handleDeleteSession: attachPromise(deleteUserSession),
+      },
+      dispatch,
+    ),
   }),
   (stateProps, dispatchProps, ownProps) => ({
     ...stateProps,
@@ -215,5 +213,7 @@ export default connect(
         mayLink: false,
       }
     },
+    handleDeleteSession: deleteSessionId =>
+      dispatchProps.handleDeleteSession(stateProps.user, deleteSessionId),
   }),
 )(UserSessionsTable)

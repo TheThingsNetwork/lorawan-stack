@@ -181,7 +181,7 @@ class Users {
       routeParams: { 'user_ids.user_id': userId, session_id },
     })
 
-    return Marshaler.payloadListResponse(result)
+    return Marshaler.payloadListResponse('sessions', result)
   }
 }
 

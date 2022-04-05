@@ -109,8 +109,8 @@ const getUserSessionsLogic = createRequestLogic({
 const deleteUserSessionLogic = createRequestLogic({
   type: user.DELETE_USER_SESSION,
   process: async ({ action }) => {
-    const { userId, sessionId } = action.payload
-    const result = await tts.Users.deleteSession(userId, sessionId)
+    const { id, targetId } = action.payload
+    const result = await tts.Users.deleteSession(id, targetId)
 
     return result
   },
