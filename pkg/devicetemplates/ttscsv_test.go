@@ -132,7 +132,7 @@ func TestTTSCSVConverter(t *testing.T) {
 					t.FailNow()
 				}
 				dev := templates[0]
-				a.So(dev.EndDevice.Ids.DeviceId, should.Equal, "1111111111111111")
+				a.So(dev.EndDevice.Ids.DeviceId, should.Equal, "111111111111111a")
 			},
 			nExpect: 1,
 		},
