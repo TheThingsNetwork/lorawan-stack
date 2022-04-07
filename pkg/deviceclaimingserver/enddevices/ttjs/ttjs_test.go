@@ -141,18 +141,7 @@ func TestTTJS(t *testing.T) {
 	// Invalid client API key.
 	unauthenticatedClient, err := ttJSConfig.NewClient(ctx, c)
 	test.Must(unauthenticatedClient, err)
-	_, err = unauthenticatedClient.Claim(ctx, &ttnpb.ClaimEndDeviceRequest{
-		SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
-			AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
-				JoinEui:            supportedJoinEUI,
-				DevEui:             devEUI,
-				AuthenticationCode: claimAuthenticationCode,
-			},
-		},
-		TargetNetworkServerAddress: nsAddress,
-		TargetApplicationIds:       targetAppIDs,
-		TargetDeviceId:             targetDeviceID,
-	})
+	err = unauthenticatedClient.Claim(ctx, &supportedJoinEUI, &devEUI, claimAuthenticationCode, nsAddress)
 	a.So(errors.IsUnauthenticated(err), should.BeTrue)
 	err = unauthenticatedClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
 		DevEui:  &devEUI,
@@ -178,110 +167,61 @@ func TestTTJS(t *testing.T) {
 	// Test Claiming
 	for _, tc := range []struct {
 		Name               string
-		Req                *ttnpb.ClaimEndDeviceRequest
-		AuthenticationCode []byte
+		DevEUI             *types.EUI64
+		JoinEUI            *types.EUI64
+		AuthenticationCode string
+		HNSAddress         string
 		ErrorAssertion     func(err error) bool
 	}{
 		{
-			Name: "EmptyCAC",
-			Req: &ttnpb.ClaimEndDeviceRequest{
-				SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
-					AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
-						JoinEui:            supportedJoinEUI,
-						DevEui:             devEUI,
-						AuthenticationCode: "invalid",
-					},
-				},
-				TargetNetworkServerAddress: nsAddress,
-				TargetApplicationIds:       targetAppIDs,
-				TargetDeviceId:             targetDeviceID,
-			},
+			Name:               "EmptyCAC",
+			DevEUI:             &devEUI,
+			JoinEUI:            &supportedJoinEUI,
+			AuthenticationCode: "",
+			HNSAddress:         nsAddress,
 			ErrorAssertion: func(err error) bool {
 				return errors.IsUnauthenticated(err)
 			},
 		},
 		{
-			Name: "InvalidCAC",
-			Req: &ttnpb.ClaimEndDeviceRequest{
-				SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
-					AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
-						JoinEui:            supportedJoinEUI,
-						DevEui:             devEUI,
-						AuthenticationCode: "invalid",
-					},
-				},
-				TargetNetworkServerAddress: nsAddress,
-				TargetApplicationIds:       targetAppIDs,
-				TargetDeviceId:             targetDeviceID,
-			},
+			Name:               "InvalidCAC",
+			DevEUI:             &devEUI,
+			JoinEUI:            &supportedJoinEUI,
+			AuthenticationCode: "invalid",
+			HNSAddress:         nsAddress,
 			ErrorAssertion: func(err error) bool {
 				return errors.IsUnauthenticated(err)
 			},
 		},
 		{
-			Name: "NoTargetNSID",
-			Req: &ttnpb.ClaimEndDeviceRequest{
-				SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
-					AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
-						JoinEui:            supportedJoinEUI,
-						DevEui:             devEUI,
-						AuthenticationCode: claimAuthenticationCode,
-					},
-				},
-				TargetApplicationIds: targetAppIDs,
-				TargetDeviceId:       targetDeviceID,
-			},
+			Name:               "NoTargetNSID",
+			DevEUI:             &devEUI,
+			JoinEUI:            &supportedJoinEUI,
+			AuthenticationCode: claimAuthenticationCode,
 			ErrorAssertion: func(err error) bool {
 				return errors.IsInvalidArgument(err)
 			},
 		},
 		{
-			Name: "NotProvisoned",
-			Req: &ttnpb.ClaimEndDeviceRequest{
-				SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
-					AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
-						JoinEui:            supportedJoinEUI,
-						DevEui:             types.EUI64{},
-						AuthenticationCode: claimAuthenticationCode,
-					},
-				},
-				TargetNetworkServerAddress: nsAddress,
-				TargetApplicationIds:       targetAppIDs,
-				TargetDeviceId:             targetDeviceID,
-			},
+			Name:               "NotProvisoned",
+			DevEUI:             &types.EUI64{},
+			JoinEUI:            &supportedJoinEUI,
+			AuthenticationCode: claimAuthenticationCode,
+			HNSAddress:         nsAddress,
 			ErrorAssertion: func(err error) bool {
 				return errors.IsNotFound(err)
 			},
 		},
 		{
-			Name: "SuccessfulClaim",
-			Req: &ttnpb.ClaimEndDeviceRequest{
-				SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
-					AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
-						JoinEui:            supportedJoinEUI,
-						DevEui:             devEUI,
-						AuthenticationCode: claimAuthenticationCode,
-					},
-				},
-				TargetNetworkServerAddress: nsAddress,
-				TargetApplicationIds:       targetAppIDs,
-				TargetDeviceId:             targetDeviceID,
-			},
-		},
-		{
-			Name: "SuccessfulClaimWithQRCode",
-			Req: &ttnpb.ClaimEndDeviceRequest{
-				SourceDevice: &ttnpb.ClaimEndDeviceRequest_QrCode{
-					QrCode: []byte("LW:D0:800000000000000C:0004A30B001C0530:42FFFF42:OSECRET"),
-				},
-				TargetNetworkServerAddress: nsAddress,
-				TargetApplicationIds:       targetAppIDs,
-				TargetDeviceId:             targetDeviceID,
-			},
+			Name:               "SuccessfulClaim",
+			DevEUI:             &devEUI,
+			JoinEUI:            &supportedJoinEUI,
+			AuthenticationCode: claimAuthenticationCode,
+			HNSAddress:         nsAddress,
 		},
 	} {
 		t.Run(fmt.Sprintf("Claim/%s", tc.Name), func(t *testing.T) {
-			_, err := client.Claim(ctx, tc.Req)
+			err := client.Claim(ctx, tc.JoinEUI, tc.DevEUI, tc.AuthenticationCode, tc.HNSAddress)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -310,18 +250,7 @@ func TestTTJS(t *testing.T) {
 	}
 	otherClient, err := otherClientConfig.NewClient(ctx, c)
 	test.Must(otherClient, err)
-	_, err = otherClient.Claim(ctx, &ttnpb.ClaimEndDeviceRequest{
-		SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
-			AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
-				JoinEui:            supportedJoinEUI,
-				DevEui:             devEUI,
-				AuthenticationCode: claimAuthenticationCode,
-			},
-		},
-		TargetNetworkServerAddress: nsAddress,
-		TargetApplicationIds:       targetAppIDs,
-		TargetDeviceId:             targetDeviceID,
-	})
+	err = otherClient.Claim(ctx, &supportedJoinEUI, &devEUI, claimAuthenticationCode, nsAddress)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	ret, err = otherClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
 		DevEui:  &devEUI,
@@ -355,20 +284,8 @@ func TestTTJS(t *testing.T) {
 	a.So(errors.IsNotFound(err), should.BeTrue)
 
 	// Try to claim
-	ids, err := client.Claim(ctx, &ttnpb.ClaimEndDeviceRequest{
-		SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
-			AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
-				JoinEui:            supportedJoinEUI,
-				DevEui:             devEUI,
-				AuthenticationCode: claimAuthenticationCode,
-			},
-		},
-		TargetNetworkServerAddress: nsAddress,
-		TargetApplicationIds:       targetAppIDs,
-		TargetDeviceId:             targetDeviceID,
-	})
+	err = client.Claim(ctx, &supportedJoinEUI, &devEUI, claimAuthenticationCode, nsAddress)
 	a.So(err, should.BeNil)
-	a.So(ids, should.NotBeNil)
 
 	// Get valid status
 	ret, err = client.GetClaimStatus(ctx, validEndDeviceIds)

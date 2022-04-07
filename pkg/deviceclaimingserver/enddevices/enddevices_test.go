@@ -55,20 +55,8 @@ func TestUpstream(t *testing.T) {
 	ctx = rights.NewContextWithFetcher(ctx, mock)
 
 	// Invalid JoinEUI.
-	ids, err := upstream.Claim(ctx, &ttnpb.ClaimEndDeviceRequest{
-		SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
-			AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
-				JoinEui:            *unsupportedJoinEUI,
-				DevEui:             types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30},
-				AuthenticationCode: "secret",
-			},
-		},
-		TargetApplicationIds: &ttnpb.ApplicationIdentifiers{
-			ApplicationId: "test-app",
-		},
-	})
+	err = upstream.Claim(ctx, unsupportedJoinEUI, &types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}, "secret", "")
 	a.So(errors.IsAborted(err), should.BeTrue)
-	a.So(ids, should.BeNil)
 
 	_, err = upstream.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
 		DeviceId: "test-dev",
@@ -94,18 +82,7 @@ func TestUpstream(t *testing.T) {
 	a.So(inf.JoinEui, should.Resemble, supportedJoinEUI)
 	a.So(inf.SupportsClaiming, should.BeTrue)
 
-	ids, err = upstream.Claim(ctx, &ttnpb.ClaimEndDeviceRequest{
-		SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
-			AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
-				JoinEui:            *supportedJoinEUI,
-				DevEui:             types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30},
-				AuthenticationCode: "secret",
-			},
-		},
-		TargetApplicationIds: &ttnpb.ApplicationIdentifiers{
-			ApplicationId: "test-app",
-		},
-	})
+	err = upstream.Claim(ctx, supportedJoinEUI, &types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}, "secret", "")
 	a.So(!errors.IsUnimplemented(err), should.BeTrue)
 
 	_, err = upstream.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{

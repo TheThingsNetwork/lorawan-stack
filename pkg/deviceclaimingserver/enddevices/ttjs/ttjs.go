@@ -21,7 +21,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"net/url"
 
@@ -152,54 +151,16 @@ func (client *TTJS) getQRGeneratorClient(ctx context.Context) (ttnpb.EndDeviceQR
 }
 
 // Claim implements EndDeviceClaimer.
-func (client *TTJS) Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest) (*ttnpb.EndDeviceIdentifiers, error) {
+func (client *TTJS) Claim(ctx context.Context, joinEUI *types.EUI64, devEUI *types.EUI64, cac string, hNSAddress string) error {
 	htenantID := client.config.TenantID
-
-	var (
-		joinEUI, devEUI        types.EUI64
-		hNSAddress, ownerToken string
-	)
-	if authenticatedIDs := req.GetAuthenticatedIdentifiers(); authenticatedIDs != nil {
-		joinEUI = authenticatedIDs.JoinEui
-		devEUI = authenticatedIDs.DevEui
-		ownerToken = authenticatedIDs.AuthenticationCode
-	} else if qrCode := req.GetQrCode(); qrCode != nil {
-		qrg, err := client.getQRGeneratorClient(ctx)
-		if err != nil {
-			return nil, err
-		}
-		data, err := qrg.Parse(ctx, &ttnpb.ParseEndDeviceQRCodeRequest{
-			QrCode: qrCode,
-		})
-		if err != nil {
-			return nil, errParseQRCode.WithCause(err)
-		}
-
-		dev := data.GetEndDeviceTempate().GetEndDevice()
-		if dev == nil || dev.ClaimAuthenticationCode == nil {
-			return nil, errParseQRCode.New()
-		}
-		joinEUI = *dev.GetIds().JoinEui
-		devEUI = *dev.GetIds().DevEui
-		ownerToken = dev.ClaimAuthenticationCode.Value
-	} else {
-		return nil, errNoJoinEUI.New()
-	}
-
-	hNSAddress, _, err := net.SplitHostPort(req.TargetNetworkServerAddress)
-	if err != nil {
-		// TargetNetworkServerAddress is already validated by the API.
-		// An error here means that it does not contain a port, so we use it directly.
-		hNSAddress = req.TargetNetworkServerAddress
-	}
 
 	hNSID, ok := client.hsNSIDs[hNSAddress]
 	if !ok {
-		return nil, errNoHomeNSID.WithAttributes("address", hNSAddress)
+		return errNoHomeNSID.WithAttributes("address", hNSAddress)
 	}
 
 	claimReq := &claimRequest{
-		OwnerToken: ownerToken,
+		OwnerToken: cac,
 		claimData: claimData{
 			HomeNetID: client.config.NetID.String(),
 			HomeNSID:  hNSID.String(),
@@ -217,44 +178,39 @@ func (client *TTJS) Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest)
 	}
 
 	var buf bytes.Buffer
-	err = json.NewEncoder(&buf).Encode(claimReq)
+	err := json.NewEncoder(&buf).Encode(claimReq)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	path := fmt.Sprintf("%s/%s/claim/%s", client.baseURL.String(), client.config.ClaimingAPIVersion, devEUI.String())
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"dev_eui", devEUI,
+		"join_eui", joinEUI,
 		"path", path,
 	))
 
 	logger.Debug("Claim end device")
 	request, err := http.NewRequestWithContext(ctx, http.MethodPost, path, &buf)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	request.SetBasicAuth(client.config.BasicAuth.Username, client.config.BasicAuth.Password)
 	request.Header.Set("Content-Type", "application/json")
 
 	resp, err := client.httpClient.Do(request)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer resp.Body.Close()
 
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if isSuccess(resp.StatusCode) {
-		// Echo values from the Request
-		return &ttnpb.EndDeviceIdentifiers{
-			DeviceId:       req.TargetDeviceId,
-			ApplicationIds: req.TargetApplicationIds,
-			DevEui:         &devEUI,
-			JoinEui:        &joinEUI,
-		}, nil
+		return nil
 	}
 
 	// Unmarshal and log the error body.
@@ -268,13 +224,13 @@ func (client *TTJS) Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest)
 
 	switch resp.StatusCode {
 	case http.StatusNotFound:
-		return nil, errDeviceNotProvisioned.WithAttributes("dev_eui", devEUI)
+		return errDeviceNotProvisioned.WithAttributes("dev_eui", devEUI)
 	case http.StatusForbidden:
-		return nil, errDeviceAccessDenied.WithAttributes("dev_eui", devEUI)
+		return errDeviceAccessDenied.WithAttributes("dev_eui", devEUI)
 	case http.StatusUnauthorized:
-		return nil, errUnauthorized.New()
+		return errUnauthorized.New()
 	default:
-		return nil, errors.FromHTTPStatusCode(resp.StatusCode)
+		return errors.FromHTTPStatusCode(resp.StatusCode)
 	}
 }
 
@@ -284,6 +240,7 @@ func (client *TTJS) Unclaim(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers
 	path := fmt.Sprintf("%s/%s/claim/%s", client.baseURL.String(), client.config.ClaimingAPIVersion, devEUI.String())
 	logger := log.FromContext(ctx).WithFields(log.Fields(
 		"dev_eui", devEUI,
+		"join_eui", ids.JoinEui,
 		"join_server_address", client.baseURL.Host,
 		"path", path,
 	))

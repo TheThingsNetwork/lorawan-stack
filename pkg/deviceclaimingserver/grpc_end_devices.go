@@ -16,8 +16,10 @@ package deviceclaimingserver
 
 import (
 	"context"
+	"net"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -25,7 +27,12 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 )
 
-var errMethodUnavailable = errors.DefineUnimplemented("method_unavailable", "method available")
+var (
+	errParseQRCode       = errors.Define("parse_qr_code", "parse QR code failed")
+	errQRCodeData        = errors.DefineInvalidArgument("qr_code_data", "invalid QR code data")
+	errNoJoinEUI         = errors.DefineInvalidArgument("no_join_eui", "failed to extract JoinEUI from request")
+	errMethodUnavailable = errors.DefineUnimplemented("method_unavailable", "method available")
+)
 
 // Fallback defines methods for the fallback server.
 // TODO: Remove this interface (https://github.com/TheThingsIndustries/lorawan-stack/issues/3036).
@@ -86,7 +93,52 @@ type endDeviceClaimingServer struct {
 
 // Claim implements EndDeviceClaimingServer.
 func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest) (*ttnpb.EndDeviceIdentifiers, error) {
-	ids, err := edcs.DCS.endDeviceClaimingUpstream.Claim(ctx, req)
+	// Check that the collaborator has necessary rights before attempting to claim it on an upstream.
+	// Since this is part of the create device flow, we check that the collaborator has the rights to create devices in the application.
+	targetAppID := req.GetTargetApplicationIds()
+	if err := rights.RequireApplication(ctx, *targetAppID,
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+	); err != nil {
+		return nil, err
+	}
+
+	var (
+		joinEUI *types.EUI64
+		devEUI  *types.EUI64
+		cac     string
+	)
+	if authenticatedIDs := req.GetAuthenticatedIdentifiers(); authenticatedIDs != nil {
+		joinEUI = &req.GetAuthenticatedIdentifiers().JoinEui
+		devEUI = &req.GetAuthenticatedIdentifiers().DevEui
+		cac = req.GetAuthenticatedIdentifiers().AuthenticationCode
+	} else if qrCode := req.GetQrCode(); qrCode != nil {
+		conn, err := edcs.DCS.GetPeerConn(ctx, ttnpb.ClusterRole_QR_CODE_GENERATOR, nil)
+		if err != nil {
+			return nil, err
+		}
+		qrg := ttnpb.NewEndDeviceQRCodeGeneratorClient(conn)
+		data, err := qrg.Parse(ctx, &ttnpb.ParseEndDeviceQRCodeRequest{
+			QrCode: qrCode,
+		})
+		dev := data.GetEndDeviceTempate().GetEndDevice()
+		if dev == nil {
+			return nil, errParseQRCode.New()
+		}
+		joinEUI = dev.GetIds().JoinEui
+		devEUI = dev.GetIds().DevEui
+		cac = dev.ClaimAuthenticationCode.Value
+	} else {
+		return nil, errNoJoinEUI.New()
+	}
+
+	hNSAddress, _, err := net.SplitHostPort(req.TargetNetworkServerAddress)
+	if err != nil {
+		// TargetNetworkServerAddress is already validated by the API.
+		// An error here means that it does not contain a port, so we use it directly.
+		hNSAddress = req.TargetNetworkServerAddress
+	}
+
+	err = edcs.DCS.endDeviceClaimingUpstream.Claim(ctx, joinEUI, devEUI, cac, hNSAddress)
 	if err != nil {
 		if errors.IsAborted(err) {
 			log.FromContext(ctx).Warn("No upstream supports JoinEUI, use fallback")
@@ -94,7 +146,14 @@ func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.Claim
 		}
 		return nil, err
 	}
-	return ids, nil
+
+	// Echo identifiers from the request.
+	return &ttnpb.EndDeviceIdentifiers{
+		DeviceId:       req.TargetDeviceId,
+		ApplicationIds: req.TargetApplicationIds,
+		DevEui:         devEUI,
+		JoinEui:        joinEUI,
+	}, nil
 }
 
 // Unclaim implements EndDeviceClaimingServer.
