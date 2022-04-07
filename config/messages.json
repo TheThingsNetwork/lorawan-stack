@@ -3599,36 +3599,36 @@
       "file": "enddevices.go"
     }
   },
-  "error:pkg/deviceclaimingserver/enddevices:no_join_eui": {
+  "error:pkg/deviceclaimingserver:method_unavailable": {
+    "translations": {
+      "en": "method available"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_end_devices.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:no_join_eui": {
     "translations": {
       "en": "failed to extract JoinEUI from request"
     },
     "description": {
-      "package": "pkg/deviceclaimingserver/enddevices",
-      "file": "enddevices.go"
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_end_devices.go"
     }
   },
-  "error:pkg/deviceclaimingserver/enddevices:parse_qr_code": {
+  "error:pkg/deviceclaimingserver:parse_qr_code": {
     "translations": {
       "en": "parse QR code failed"
     },
     "description": {
-      "package": "pkg/deviceclaimingserver/enddevices",
-      "file": "enddevices.go"
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_end_devices.go"
     }
   },
-  "error:pkg/deviceclaimingserver/enddevices:qr_code_data": {
+  "error:pkg/deviceclaimingserver:qr_code_data": {
     "translations": {
       "en": "invalid QR code data"
-    },
-    "description": {
-      "package": "pkg/deviceclaimingserver/enddevices",
-      "file": "enddevices.go"
-    }
-  },
-  "error:pkg/deviceclaimingserver:method_unavailable": {
-    "translations": {
-      "en": "method available"
     },
     "description": {
       "package": "pkg/deviceclaimingserver",
