@@ -17,6 +17,8 @@ import { Row, Col, Container } from 'react-grid-system'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
+import PageTitle from '@ttn-lw/components/page-title'
+
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import ClientsTable from '@account/containers/clients-table'
@@ -24,8 +26,9 @@ import ClientsTable from '@account/containers/clients-table'
 const ClientsList = () => (
   <Container>
     <Row>
-      <IntlHelmet title={'Clients'} />
+      <IntlHelmet title={'OAuth Clients'} />
       <Col>
+        <PageTitle title={'OAuth Clients'} hideHeading />
         <ClientsTable pageSize={PAGE_SIZES.REGULAR} />
       </Col>
     </Row>
