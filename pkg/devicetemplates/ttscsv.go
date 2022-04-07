@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/csv"
 	"io"
+	"strings"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -228,7 +229,7 @@ func (t *ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndD
 			paths = ttnpb.AddFields(paths, fieldPaths...)
 		}
 		if !ttnpb.HasAnyField(paths, "ids.device_id") && ttnpb.HasAnyField(paths, "ids.dev_eui") {
-			dev.Ids.DeviceId = dev.Ids.DevEui.String()
+			dev.Ids.DeviceId = strings.ToLower(dev.Ids.DevEui.String())
 			paths = ttnpb.AddFields(paths, "ids.device_id")
 		}
 
