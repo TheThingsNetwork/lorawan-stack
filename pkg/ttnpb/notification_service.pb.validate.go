@@ -104,6 +104,8 @@ func (m *Notification) ValidateFields(paths ...string) error {
 
 		case "receivers":
 
+		case "email":
+			// no validation rules for Email
 		case "status":
 			// no validation rules for Status
 		case "status_updated_at":
@@ -281,6 +283,8 @@ func (m *CreateNotificationRequest) ValidateFields(paths ...string) error {
 
 			}
 
+		case "email":
+			// no validation rules for Email
 		default:
 			return CreateNotificationRequestValidationError{
 				field:  name,

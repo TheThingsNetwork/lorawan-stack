@@ -31462,6 +31462,18 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "email",
+              "description": "Whether an email should be sent for the notification.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -31690,6 +31702,18 @@
               "type": "NotificationReceiver",
               "longType": "NotificationReceiver",
               "fullType": "ttn.lorawan.v3.NotificationReceiver",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "email",
+              "description": "Whether an email was sent for the notification.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",

@@ -16908,6 +16908,10 @@
           },
           "description": "Relation of the notification receiver to the entity."
         },
+        "email": {
+          "type": "boolean",
+          "description": "Whether an email was sent for the notification."
+        },
         "status": {
           "$ref": "#/definitions/v3NotificationStatus",
           "description": "The status of the notification."

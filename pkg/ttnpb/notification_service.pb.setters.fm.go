@@ -104,6 +104,16 @@ func (dst *Notification) SetFields(src *Notification, paths ...string) error {
 			} else {
 				dst.Receivers = nil
 			}
+		case "email":
+			if len(subs) > 0 {
+				return fmt.Errorf("'email' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Email = src.Email
+			} else {
+				var zero bool
+				dst.Email = zero
+			}
 		case "status":
 			if len(subs) > 0 {
 				return fmt.Errorf("'status' has no subfields, but %s were specified", subs)
@@ -211,6 +221,16 @@ func (dst *CreateNotificationRequest) SetFields(src *CreateNotificationRequest, 
 				dst.Receivers = src.Receivers
 			} else {
 				dst.Receivers = nil
+			}
+		case "email":
+			if len(subs) > 0 {
+				return fmt.Errorf("'email' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Email = src.Email
+			} else {
+				var zero bool
+				dst.Email = zero
 			}
 
 		default:

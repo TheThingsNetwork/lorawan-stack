@@ -165,6 +165,11 @@ func (x *Notification) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		}
 		s.WriteArrayEnd()
 	}
+	if x.Email || s.HasField("email") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("email")
+		s.WriteBool(x.Email)
+	}
 	if x.Status != 0 || s.HasField("status") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("status")
@@ -255,6 +260,9 @@ func (x *Notification) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				v.UnmarshalProtoJSON(s)
 				x.Receivers = append(x.Receivers, v)
 			})
+		case "email":
+			s.AddField("email")
+			x.Email = s.ReadBool()
 		case "status":
 			s.AddField("status")
 			x.Status.UnmarshalProtoJSON(s)
@@ -323,6 +331,11 @@ func (x *CreateNotificationRequest) MarshalProtoJSON(s *jsonplugin.MarshalState)
 		}
 		s.WriteArrayEnd()
 	}
+	if x.Email || s.HasField("email") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("email")
+		s.WriteBool(x.Email)
+	}
 	s.WriteObjectEnd()
 }
 
@@ -385,6 +398,9 @@ func (x *CreateNotificationRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSt
 				v.UnmarshalProtoJSON(s)
 				x.Receivers = append(x.Receivers, v)
 			})
+		case "email":
+			s.AddField("email")
+			x.Email = s.ReadBool()
 		}
 	})
 }

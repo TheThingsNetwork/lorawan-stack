@@ -6858,6 +6858,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | `data` | [`google.protobuf.Any`](#google.protobuf.Any) |  | The data related to the notification. |
 | `sender_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  | If the notification was triggered by a user action, this contains the identifiers of the user that triggered the notification. |
 | `receivers` | [`NotificationReceiver`](#ttn.lorawan.v3.NotificationReceiver) | repeated | Receivers of the notification. |
+| `email` | [`bool`](#bool) |  | Whether an email should be sent for the notification. |
 
 #### Field Rules
 
@@ -6907,6 +6908,7 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | `data` | [`google.protobuf.Any`](#google.protobuf.Any) |  | The data related to the notification. |
 | `sender_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  | If the notification was triggered by a user action, this contains the identifiers of the user that triggered the notification. |
 | `receivers` | [`NotificationReceiver`](#ttn.lorawan.v3.NotificationReceiver) | repeated | Relation of the notification receiver to the entity. |
+| `email` | [`bool`](#bool) |  | Whether an email was sent for the notification. |
 | `status` | [`NotificationStatus`](#ttn.lorawan.v3.NotificationStatus) |  | The status of the notification. |
 | `status_updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | The time when the notification status was updated. |
 

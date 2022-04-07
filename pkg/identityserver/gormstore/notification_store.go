@@ -49,6 +49,7 @@ func (s *notificationStore) CreateNotification(ctx context.Context, pb *ttnpb.No
 			EntityID:         entityModel.PrimaryKey(),
 			EntityUID:        pb.GetEntityIds().IDString(),
 			NotificationType: pb.NotificationType,
+			Email:            pb.Email,
 		},
 		Status: int32(pb.Status),
 	}

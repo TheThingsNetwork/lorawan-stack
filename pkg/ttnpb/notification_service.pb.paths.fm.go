@@ -5,6 +5,7 @@ package ttnpb
 var NotificationFieldPathsNested = []string{
 	"created_at",
 	"data",
+	"email",
 	"entity_ids",
 	"entity_ids.ids",
 	"entity_ids.ids.application_ids",
@@ -39,6 +40,7 @@ var NotificationFieldPathsNested = []string{
 var NotificationFieldPathsTopLevel = []string{
 	"created_at",
 	"data",
+	"email",
 	"entity_ids",
 	"id",
 	"notification_type",
@@ -49,6 +51,7 @@ var NotificationFieldPathsTopLevel = []string{
 }
 var CreateNotificationRequestFieldPathsNested = []string{
 	"data",
+	"email",
 	"entity_ids",
 	"entity_ids.ids",
 	"entity_ids.ids.application_ids",
@@ -79,6 +82,7 @@ var CreateNotificationRequestFieldPathsNested = []string{
 
 var CreateNotificationRequestFieldPathsTopLevel = []string{
 	"data",
+	"email",
 	"entity_ids",
 	"notification_type",
 	"receivers",

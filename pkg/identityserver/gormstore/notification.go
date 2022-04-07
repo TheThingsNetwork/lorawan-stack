@@ -40,6 +40,8 @@ type Notification struct {
 	SenderUID string  `gorm:"type:VARCHAR(36);not null"` // Copy of the human-readable sender ID, so that we can keep notifications for deleted senders.
 
 	Receivers pq.Int32Array `gorm:"type:INT ARRAY"`
+
+	Email bool `gorm:"not null"`
 }
 
 // NotificationReceiver model.
@@ -87,6 +89,7 @@ func (n notificationWithStatus) toPB(pb *ttnpb.Notification) error {
 	for i, receiver := range n.Receivers {
 		pb.Receivers[i] = ttnpb.NotificationReceiver(receiver)
 	}
+	pb.Email = n.Email
 	pb.Status = ttnpb.NotificationStatus(n.Status)
 	pb.StatusUpdatedAt = ttnpb.ProtoTimePtr(cleanTime(n.StatusUpdatedAt))
 	return nil

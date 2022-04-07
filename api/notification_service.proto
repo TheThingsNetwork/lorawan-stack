@@ -56,11 +56,14 @@ message Notification {
   // Relation of the notification receiver to the entity.
   repeated NotificationReceiver receivers = 8;
 
+  // Whether an email was sent for the notification.
+  bool email = 9;
+
   // The status of the notification.
-  NotificationStatus status = 9;
+  NotificationStatus status = 10;
 
   // The time when the notification status was updated.
-  google.protobuf.Timestamp status_updated_at = 10;
+  google.protobuf.Timestamp status_updated_at = 11;
 }
 
 enum NotificationReceiver {
@@ -115,6 +118,9 @@ message CreateNotificationRequest {
       items: { enum: { defined_only: true } }
     }
   ];
+
+  // Whether an email should be sent for the notification.
+  bool email = 6;
 }
 
 message CreateNotificationResponse {
