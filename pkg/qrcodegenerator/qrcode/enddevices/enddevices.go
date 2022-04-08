@@ -16,7 +16,6 @@ package enddevices
 
 import (
 	"context"
-	"sync"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode"
@@ -48,43 +47,40 @@ type Data interface {
 
 // Server provides methods for end device QR codes.
 type Server struct {
-	endDeviceFormats sync.Map
+	endDeviceFormats map[string]Format
 }
 
 // New returns a new Server.
 func New(ctx context.Context) *Server {
-	s := &Server{}
+	s := &Server{
+		endDeviceFormats: make(map[string]Format),
+	}
 
 	// Register known formats.
-	s.endDeviceFormats.Store(formatIDLoRaAllianceTR005, new(LoRaAllianceTR005Format))
-	s.endDeviceFormats.Store(formatIDLoRaAllianceTR005Draft2, new(LoRaAllianceTR005Draft2Format))
-	s.endDeviceFormats.Store(formatIDLoRaAllianceTR005Draft3, new(LoRaAllianceTR005Draft3Format))
+	s.endDeviceFormats[formatIDLoRaAllianceTR005] = new(LoRaAllianceTR005Format)
+	s.endDeviceFormats[formatIDLoRaAllianceTR005Draft2] = new(LoRaAllianceTR005Draft2Format)
+	s.endDeviceFormats[formatIDLoRaAllianceTR005Draft3] = new(LoRaAllianceTR005Draft3Format)
 	return s
 }
 
 // GetEndDeviceFormats returns the registered end device QR code formats.
 func (s *Server) GetEndDeviceFormats() map[string]Format {
-	res := make(map[string]Format)
-	s.endDeviceFormats.Range(func(key, value interface{}) bool {
-		res[key.(string)] = value.(Format)
-		return true
-	})
-	return res
+	return s.endDeviceFormats
 }
 
 // GetEndDeviceFormat returns the converter by ID.
 func (s *Server) GetEndDeviceFormat(id string) Format {
-	res, ok := s.endDeviceFormats.Load(id)
+	res, ok := s.endDeviceFormats[id]
 	if !ok {
 		return nil
 	}
-	return res.(Format)
+	return res
 }
 
 // RegisterEndDeviceFormat registers the given end device QR code format.
 // Existing registrations with the same ID will be overwritten.
 func (s *Server) RegisterEndDeviceFormat(id string, f Format) {
-	s.endDeviceFormats.Store(id, f)
+	s.endDeviceFormats[id] = f
 }
 
 var (
@@ -94,24 +90,17 @@ var (
 // Parse attempts to parse the given QR code data.
 // It returns the parser and the format ID that successfully parsed the QR code.
 func (s *Server) Parse(formatID string, data []byte) (ret Data, err error) {
-	s.endDeviceFormats.Range(func(key, value interface{}) bool {
-		id := key.(string)
+	for id, format := range s.endDeviceFormats {
 		// If format ID is provided, use only that.
 		if formatID != "" && formatID != id {
-			return true
+			continue
 		}
-		f := value.(Format).New()
-		if err = f.UnmarshalText(data); err == nil {
-			ret = f
-			return false
+		edFormat := format.New()
+		if err := edFormat.UnmarshalText(data); err == nil {
+			return edFormat, nil
 		} else if formatID == id {
-			// Return the unmarshaling error since this was the requested format.
-			return false
+			return nil, err
 		}
-		return true
-	})
-	if ret == nil && err == nil {
-		return nil, errUnknownFormat.WithAttributes("format_id", formatID)
 	}
-	return
+	return nil, errUnknownFormat.WithAttributes("format_id", formatID)
 }

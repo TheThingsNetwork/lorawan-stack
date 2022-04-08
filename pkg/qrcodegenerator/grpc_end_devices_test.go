@@ -52,13 +52,13 @@ func TestGenerateEndDeviceQRCode(t *testing.T) {
 
 	format, err := client.GetFormat(ctx, &ttnpb.GetQRCodeFormatRequest{
 		FormatId: "test",
-	})
+	}, c.WithClusterAuth())
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
 	a.So(format.Name, should.Equal, "Test")
 
-	formats, err := client.ListFormats(ctx, ttnpb.Empty)
+	formats, err := client.ListFormats(ctx, ttnpb.Empty, c.WithClusterAuth())
 	a.So(err, should.BeNil)
 	a.So(formats.Formats["test"], should.Resemble, &ttnpb.QRCodeFormat{
 		Name:        "Test",
@@ -85,7 +85,7 @@ func TestGenerateEndDeviceQRCode(t *testing.T) {
 		Image: &ttnpb.GenerateEndDeviceQRCodeRequest_Image{
 			ImageSize: 100,
 		},
-	})
+	}, c.WithClusterAuth())
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -118,7 +118,7 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 	genClient := ttnpb.NewEndDeviceQRCodeGeneratorClient(c.LoopbackConn())
 	format, err := genClient.GetFormat(ctx, &ttnpb.GetQRCodeFormatRequest{
 		FormatId: laTr005.ID(),
-	})
+	}, c.WithClusterAuth())
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -263,7 +263,7 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 							Value: "123456",
 						},
 					},
-				})
+				}, c.WithClusterAuth())
 				if !a.So(err, should.BeNil) {
 					panic("could not generate QR Code")
 				}
@@ -297,7 +297,7 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 			resp, err := genClient.Parse(ctx, &ttnpb.ParseEndDeviceQRCodeRequest{
 				FormatId: tc.FormatID,
 				QrCode:   tc.GetQRData(),
-			})
+			}, c.WithClusterAuth())
 			if !a.So(tc.Assertion(a, resp, err), should.BeTrue) {
 				t.FailNow()
 			}
