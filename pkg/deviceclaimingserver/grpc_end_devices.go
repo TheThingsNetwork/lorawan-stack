@@ -119,7 +119,7 @@ func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.Claim
 		qrg := ttnpb.NewEndDeviceQRCodeGeneratorClient(conn)
 		data, err := qrg.Parse(ctx, &ttnpb.ParseEndDeviceQRCodeRequest{
 			QrCode: qrCode,
-		})
+		}, edcs.DCS.WithClusterAuth())
 		dev := data.GetEndDeviceTempate().GetEndDevice()
 		if dev == nil {
 			return nil, errParseQRCode.New()

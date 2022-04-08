@@ -19,8 +19,13 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	qrcodegen "github.com/skip2/go-qrcode"
+	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
+	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
+
+var errUnauthenticated = errors.DefineUnauthenticated("unauthenticated", "call was not authenticated")
 
 type endDeviceQRCodeGeneratorServer struct {
 	QRG *QRCodeGenerator
@@ -28,6 +33,14 @@ type endDeviceQRCodeGeneratorServer struct {
 
 // GetFormat implements EndDeviceQRCodeGenerator.
 func (s *endDeviceQRCodeGeneratorServer) GetFormat(ctx context.Context, req *ttnpb.GetQRCodeFormatRequest) (*ttnpb.QRCodeFormat, error) {
+	_, err := rpcmetadata.WithForwardedAuth(ctx, s.QRG.AllowInsecureForCredentials())
+	if errors.IsUnauthenticated(err) {
+		if clusterauth.Authorized(ctx) != nil {
+			return nil, errUnauthenticated.New()
+		}
+	} else if err != nil {
+		return nil, err
+	}
 	format := s.QRG.endDevices.GetEndDeviceFormat(req.FormatId)
 	if format == nil {
 		return nil, errFormatNotFound.New()
@@ -37,6 +50,14 @@ func (s *endDeviceQRCodeGeneratorServer) GetFormat(ctx context.Context, req *ttn
 
 // ListFormats implements EndDeviceQRCodeGenerator.
 func (s *endDeviceQRCodeGeneratorServer) ListFormats(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.QRCodeFormats, error) {
+	_, err := rpcmetadata.WithForwardedAuth(ctx, s.QRG.AllowInsecureForCredentials())
+	if errors.IsUnauthenticated(err) {
+		if clusterauth.Authorized(ctx) != nil {
+			return nil, errUnauthenticated.New()
+		}
+	} else if err != nil {
+		return nil, err
+	}
 	res := &ttnpb.QRCodeFormats{
 		Formats: make(map[string]*ttnpb.QRCodeFormat),
 	}
@@ -48,6 +69,14 @@ func (s *endDeviceQRCodeGeneratorServer) ListFormats(ctx context.Context, _ *pbt
 
 // Generate implements EndDeviceQRCodeGenerator.
 func (s *endDeviceQRCodeGeneratorServer) Generate(ctx context.Context, req *ttnpb.GenerateEndDeviceQRCodeRequest) (*ttnpb.GenerateQRCodeResponse, error) {
+	_, err := rpcmetadata.WithForwardedAuth(ctx, s.QRG.AllowInsecureForCredentials())
+	if errors.IsUnauthenticated(err) {
+		if clusterauth.Authorized(ctx) != nil {
+			return nil, errUnauthenticated.New()
+		}
+	} else if err != nil {
+		return nil, err
+	}
 	formatter := s.QRG.endDevices.GetEndDeviceFormat(req.FormatId)
 	if formatter == nil {
 		return nil, errFormatNotFound.New()
@@ -87,6 +116,14 @@ func (s *endDeviceQRCodeGeneratorServer) Generate(ctx context.Context, req *ttnp
 
 // Parse implements EndDeviceQRCodeGenerator.
 func (s *endDeviceQRCodeGeneratorServer) Parse(ctx context.Context, req *ttnpb.ParseEndDeviceQRCodeRequest) (*ttnpb.ParseEndDeviceQRCodeResponse, error) {
+	_, err := rpcmetadata.WithForwardedAuth(ctx, s.QRG.AllowInsecureForCredentials())
+	if errors.IsUnauthenticated(err) {
+		if clusterauth.Authorized(ctx) != nil {
+			return nil, errUnauthenticated.New()
+		}
+	} else if err != nil {
+		return nil, err
+	}
 	data, err := s.QRG.endDevices.Parse(req.FormatId, req.QrCode)
 	if err != nil {
 		return nil, err
