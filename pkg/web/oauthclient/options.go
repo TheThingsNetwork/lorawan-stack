@@ -15,6 +15,7 @@
 package oauthclient
 
 import (
+	"context"
 	"net/http"
 
 	"golang.org/x/oauth2"
@@ -24,7 +25,7 @@ import (
 type Option func(*OAuthClient)
 
 // OAuth2ConfigProvider provides an OAuth2 client config based on the context.
-type OAuth2ConfigProvider func(w http.ResponseWriter, r *http.Request) (*oauth2.Config, error)
+type OAuth2ConfigProvider func(context.Context) (*oauth2.Config, error)
 
 // WithOAuth2ConfigProvider overrides the default OAuth2 configuration provider.
 func WithOAuth2ConfigProvider(provider OAuth2ConfigProvider) Option {
@@ -54,7 +55,7 @@ func WithCallback(cb Callback) Option {
 
 // OAuth2AuthCodeURLOptionsProvider provides OAuth2 authorization URL options
 // based on the context.
-type OAuth2AuthCodeURLOptionsProvider func(w http.ResponseWriter, r *http.Request) ([]oauth2.AuthCodeOption, error)
+type OAuth2AuthCodeURLOptionsProvider func(context.Context) ([]oauth2.AuthCodeOption, error)
 
 // WithAuthCodeURLOptions changes the OAuth2 authorization URL options provided to the
 // oauth2 package.

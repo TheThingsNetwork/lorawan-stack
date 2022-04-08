@@ -37,12 +37,12 @@ func (oc *OAuthClient) HandleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	conf, err := oc.oauth(w, r)
+	conf, err := oc.oauth(r.Context())
 	if err != nil {
 		webhandlers.Error(w, r, err)
 		return
 	}
-	opts, err := oc.authCodeURLOpts(w, r)
+	opts, err := oc.authCodeURLOpts(r.Context())
 	if err != nil {
 		webhandlers.Error(w, r, err)
 		return

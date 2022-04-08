@@ -42,7 +42,7 @@ func (oc *OAuthClient) freshToken(w http.ResponseWriter, r *http.Request) (*oaut
 	if err != nil {
 		return nil, err
 	}
-	conf, err := oc.oauth(w, r)
+	conf, err := oc.oauth(r.Context())
 	if err != nil {
 		return nil, err
 	}

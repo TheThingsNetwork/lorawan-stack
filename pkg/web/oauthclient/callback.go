@@ -102,7 +102,7 @@ func (oc *OAuthClient) HandleCallback(w http.ResponseWriter, r *http.Request) {
 		webhandlers.Error(w, r, err)
 		return
 	}
-	conf, err := oc.oauth(w, r)
+	conf, err := oc.oauth(r.Context())
 	if err != nil {
 		webhandlers.Error(w, r, err)
 		return
@@ -145,6 +145,6 @@ func (oc *OAuthClient) defaultCallback(w http.ResponseWriter, r *http.Request, _
 	return nil
 }
 
-func (oc *OAuthClient) defaultAuthCodeURLOptions(w http.ResponseWriter, r *http.Request) ([]oauth2.AuthCodeOption, error) {
+func (oc *OAuthClient) defaultAuthCodeURLOptions(ctx context.Context) ([]oauth2.AuthCodeOption, error) {
 	return nil, nil
 }
