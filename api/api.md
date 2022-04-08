@@ -1524,7 +1524,7 @@ The ApplicationUpStorage service can be used to query stored application upstrea
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `stack_name` | [`string`](#string) |  | The stack name that is associated with the CloudFormation deployment of The Things Enterprise Stack integration. |
+| `stack_name` | [`string`](#string) |  | The stack name that is associated with the CloudFormation deployment of The Things Stack Enterprise integration. |
 
 #### Field Rules
 

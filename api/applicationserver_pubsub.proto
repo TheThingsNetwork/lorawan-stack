@@ -106,7 +106,7 @@ message ApplicationPubSub {
     string endpoint_address = 4 [(validate.rules).string = {pattern: "^((([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])|)$", max_len: 128}];
 
     message DefaultIntegration {
-      // The stack name that is associated with the CloudFormation deployment of The Things Enterprise Stack integration.
+      // The stack name that is associated with the CloudFormation deployment of The Things Stack Enterprise integration.
       string stack_name = 1 [(validate.rules).string = {pattern: "^[A-Za-z][A-Za-z0-9\\-]*$", max_len: 128}];
     }
 

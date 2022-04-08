@@ -10968,7 +10968,7 @@
       "properties": {
         "stack_name": {
           "type": "string",
-          "description": "The stack name that is associated with the CloudFormation deployment of The Things Enterprise Stack integration."
+          "description": "The stack name that is associated with the CloudFormation deployment of The Things Stack Enterprise integration."
         }
       }
     },

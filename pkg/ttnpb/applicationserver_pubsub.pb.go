@@ -719,7 +719,7 @@ func (m *ApplicationPubSub_AWSIoTProvider_AssumeRole) GetSessionDuration() *type
 }
 
 type ApplicationPubSub_AWSIoTProvider_DefaultIntegration struct {
-	// The stack name that is associated with the CloudFormation deployment of The Things Enterprise Stack integration.
+	// The stack name that is associated with the CloudFormation deployment of The Things Stack Enterprise integration.
 	StackName            string   `protobuf:"bytes,1,opt,name=stack_name,json=stackName,proto3" json:"stack_name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
