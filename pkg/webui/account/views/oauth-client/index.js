@@ -30,25 +30,21 @@ import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
-import ApplicationOverview from '@console/views/application-overview'
-import ApplicationGeneralSettings from '@console/views/application-general-settings'
-import ApplicationCollaborators from '@console/views/application-collaborators'
+import OAuthClientOverview from '@account/views/oauth-client-overview'
+/* import ApplicationGeneralSettings from '@console/views/application-general-settings'
+import ApplicationCollaborators from '@console/views/application-collaborators' */
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import {
-  mayViewApplicationInfo,
-  mayEditBasicApplicationInfo,
-  mayViewOrEditApplicationCollaborators,
-} from '@console/lib/feature-checks'
+import { mayPerformAdminActions } from '@account/lib/feature-checks'
+
 
 const OAuthClient = props => {
   const {
     appId,
     match: { url: matchedUrl, path },
     application,
-    rights,
     siteName,
   } = props
 
@@ -68,7 +64,7 @@ const OAuthClient = props => {
           to: matchedUrl,
         }}
       >
-        {mayViewApplicationInfo.check(rights) && (
+        {mayPerformAdminActions && (
           <SideNavigation.Item
             title={sharedMessages.overview}
             path={matchedUrl}
@@ -76,14 +72,14 @@ const OAuthClient = props => {
             exact
           />
         )}
-        {mayViewOrEditApplicationCollaborators.check(rights) && (
+        {mayPerformAdminActions && (
           <SideNavigation.Item
             title={sharedMessages.collaborators}
             path={`${matchedUrl}/collaborators`}
             icon="organization"
           />
         )}
-        {mayEditBasicApplicationInfo.check(rights) && (
+        {mayPerformAdminActions && (
           <SideNavigation.Item
             title={sharedMessages.generalSettings}
             path={`${matchedUrl}/general-settings`}
@@ -105,7 +101,6 @@ OAuthClient.propTypes = {
   appId: PropTypes.string.isRequired,
   application: PropTypes.application.isRequired,
   match: PropTypes.match.isRequired,
-  rights: PropTypes.rights.isRequired,
   siteName: PropTypes.string.isRequired,
 }
 
@@ -115,13 +110,11 @@ export default connect(
     fetching: selectApplicationFetching(state) || selectApplicationRightsFetching(state),
     oauthClient: selectSelectedApplication(state),
     error: selectApplicationError(state) || selectApplicationRightsError(state),
-    rights: selectApplicationRights(state),
     siteName: selectApplicationSiteName(),
   }),
   dispatch => ({
     loadData: id => {
       dispatch(getOAuthClient(id, 'name,description,secret,state,state_description'))
-      dispatch(getUsersRights(id))
     },
   }),
 )(
