@@ -97,7 +97,7 @@
     "intl": "^1.2.5",
     "leaflet": "^1.7.1",
     "lodash": "^4.17.21",
-    "lottie-web": "^5.9.1",
+    "lottie-web": "^5.9.2",
     "md5": "^2.3.0",
     "prop-types": "^15.8.1",
     "query-string": "^7.1.1",
