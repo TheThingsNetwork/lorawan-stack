@@ -102,7 +102,7 @@ func (oc *OAuthClient) HandleCallback(w http.ResponseWriter, r *http.Request) {
 		webhandlers.Error(w, r, err)
 		return
 	}
-	conf, err := oc.oauth(r.Context())
+	conf, err := oc.oauthConfig(r.Context())
 	if err != nil {
 		webhandlers.Error(w, r, err)
 		return

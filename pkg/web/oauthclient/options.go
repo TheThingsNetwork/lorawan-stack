@@ -31,7 +31,7 @@ type OAuth2ConfigProvider func(context.Context) (*oauth2.Config, error)
 func WithOAuth2ConfigProvider(provider OAuth2ConfigProvider) Option {
 	return func(o *OAuthClient) {
 		o.config.customProvider = true
-		o.oauth = provider
+		o.oauthConfig = provider
 	}
 }
 

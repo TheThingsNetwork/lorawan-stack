@@ -30,7 +30,7 @@ import (
 type OAuthClient struct {
 	component       *component.Component
 	config          Config
-	oauth           OAuth2ConfigProvider
+	oauthConfig     OAuth2ConfigProvider
 	nextKey         string
 	callback        Callback
 	authCodeURLOpts OAuth2AuthCodeURLOptionsProvider
@@ -74,7 +74,7 @@ func New(c *component.Component, config Config, opts ...Option) (*OAuthClient, e
 	oc.schemaDecoder.IgnoreUnknownKeys(true)
 
 	oc.callback = oc.defaultCallback
-	oc.oauth = oc.defaultOAuth
+	oc.oauthConfig = oc.defaultOAuthConfig
 	oc.authCodeURLOpts = oc.defaultAuthCodeURLOptions
 
 	for _, opt := range opts {
@@ -98,7 +98,7 @@ func (oc *OAuthClient) configFromContext(ctx context.Context) *Config {
 	return &oc.config
 }
 
-func (oc *OAuthClient) defaultOAuth(ctx context.Context) (*oauth2.Config, error) {
+func (oc *OAuthClient) defaultOAuthConfig(ctx context.Context) (*oauth2.Config, error) {
 	config := oc.configFromContext(ctx)
 
 	authorizeURL := config.AuthorizeURL
