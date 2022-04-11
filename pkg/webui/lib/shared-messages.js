@@ -301,6 +301,7 @@ export default defineMessages({
   nwkSEncKey: 'NwkSEncKey',
   nwkSEncKeyDescription: 'Network session encryption key',
   nwkSKey: 'NwkSKey',
+  oauthClientId: 'OAuth Client ID',
   offline: 'Offline',
   ok: 'Ok',
   online: 'Online',

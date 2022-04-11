@@ -15,8 +15,10 @@
 import { combineReducers } from 'redux'
 import { connectRouter } from 'connected-react-router'
 
+import { getClientId } from '@ttn-lw/lib/selectors/id'
 import init from '@ttn-lw/lib/store/reducers/init'
 import status from '@ttn-lw/lib/store/reducers/status'
+import { createNamedPaginationReducer } from '@ttn-lw/lib/store/reducers/pagination'
 import fetching from '@ttn-lw/lib/store/reducers/ui/fetching'
 import error from '@ttn-lw/lib/store/reducers/ui/error'
 
@@ -35,6 +37,9 @@ export default history =>
     ui: combineReducers({
       fetching,
       error,
+    }),
+    pagination: combineReducers({
+      clients: createNamedPaginationReducer('CLIENTS', getClientId),
     }),
     status,
     router: connectRouter(history),

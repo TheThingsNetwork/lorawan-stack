@@ -13,26 +13,25 @@
 // limitations under the License.
 
 import React from 'react'
+import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 
 import DataSheet from '@ttn-lw/components/data-sheet'
 
 import DateTime from '@ttn-lw/lib/components/date-time'
-import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-
-import ApplicationTitleSection from '@console/containers/application-title-section'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import style from './application-overview.styl'
+import { selectSelectedClient, selectSelectedClientId } from '@account/store/selectors/clients'
 
 const OAuthClientOverview = props => {
   const {
     oauthClientId,
     oauthClient: { created_at, updated_at },
   } = props
-
+  console.log(oauthClientId)
+  console.log(created_at)
   const sheetData = [
     {
       header: sharedMessages.generalInformation,
@@ -46,7 +45,7 @@ const OAuthClientOverview = props => {
 
   return (
     <>
-      <div className={style.titleSection}>
+      {/* <div className={style.titleSection}>
         <Container>
           <IntlHelmet title={sharedMessages.overview} />
           <Row>
@@ -55,11 +54,11 @@ const OAuthClientOverview = props => {
             </Col>
           </Row>
         </Container>
-      </div>
+      </div> */}
       <Container>
         <Row>
           <Col sm={12} lg={6}>
-            <DataSheet data={sheetData} className={style.generalInformation} />
+            <DataSheet data={sheetData} />
           </Col>
         </Row>
       </Container>
@@ -68,15 +67,14 @@ const OAuthClientOverview = props => {
 }
 
 OAuthClientOverview.propTypes = {
-  oauthClient: PropTypes.application.isRequired,
   oauthClientId: PropTypes.string.isRequired,
 }
 
 export default connect(state => {
-  const appId = selectSelectedApplicationId(state)
+  const oauthClientId = selectSelectedClientId(state)
 
   return {
-    appId,
-    application: selectSelectedApplication(state),
+    oauthClientId,
+    oauthClient: selectSelectedClient(state),
   }
 })(OAuthClientOverview)

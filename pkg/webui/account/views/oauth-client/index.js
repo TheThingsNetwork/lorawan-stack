@@ -18,43 +18,49 @@ import { Switch, Route } from 'react-router-dom'
 
 import applicationIcon from '@assets/misc/application.svg'
 
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-
-import withRequest from '@ttn-lw/lib/components/with-request'
-
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import SideNavigation from '@ttn-lw/components/navigation/side'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 
+import withRequest from '@ttn-lw/lib/components/with-request'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
 import OAuthClientOverview from '@account/views/oauth-client-overview'
-/* import ApplicationGeneralSettings from '@console/views/application-general-settings'
-import ApplicationCollaborators from '@console/views/application-collaborators' */
 
+import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { mayPerformAdminActions } from '@account/lib/feature-checks'
 
+import { getClient } from '@account/store/actions/clients'
+
+import {
+  selectClientFetching,
+  selectClientById,
+  selectClientError,
+} from '@account/store/selectors/clients'
 
 const OAuthClient = props => {
   const {
-    appId,
+    oauthClientId,
     match: { url: matchedUrl, path },
-    application,
+    oauthClient,
     siteName,
   } = props
+  console.log(oauthClientId)
+  console.log(oauthClient)
+  const name = oauthClient.name || oauthClientId
 
-  const name = application.name || appId
-
-  useBreadcrumbs('apps.single', <Breadcrumb path={`/applications/${appId}`} content={name} />)
+  useBreadcrumbs(
+    'clients.single',
+    <Breadcrumb path={`/oauth-clients/${oauthClientId}`} content={name} />,
+  )
 
   return (
     <React.Fragment>
-      <Breadcrumbs />
       <IntlHelmet titleTemplate={`%s - ${name} - ${siteName}`} />
       <SideNavigation
         header={{
@@ -88,9 +94,7 @@ const OAuthClient = props => {
         )}
       </SideNavigation>
       <Switch>
-        <Route exact path={`${path}`} component={ApplicationOverview} />
-        <Route path={`${path}/general-settings`} component={ApplicationGeneralSettings} />
-        <Route path={`${path}/collaborators`} component={ApplicationCollaborators} />
+        <Route exact path={`${path}`} component={OAuthClientOverview} />
         <NotFoundRoute />
       </Switch>
     </React.Fragment>
@@ -98,28 +102,21 @@ const OAuthClient = props => {
 }
 
 OAuthClient.propTypes = {
-  appId: PropTypes.string.isRequired,
-  application: PropTypes.application.isRequired,
   match: PropTypes.match.isRequired,
-  siteName: PropTypes.string.isRequired,
+  oauthClientId: PropTypes.string.isRequired,
 }
 
 export default connect(
-  state => ({
-    oauthClientId: props.match.params.appId,
-    fetching: selectApplicationFetching(state) || selectApplicationRightsFetching(state),
-    oauthClient: selectSelectedApplication(state),
-    error: selectApplicationError(state) || selectApplicationRightsError(state),
+  (state, props) => ({
+    oauthClientId: props.match.params.id,
+    fetching: selectClientFetching(state),
+    oauthClient: selectClientById(state, props.match.params.id),
+    error: selectClientError(state),
     siteName: selectApplicationSiteName(),
   }),
   dispatch => ({
     loadData: id => {
-      dispatch(getOAuthClient(id, 'name,description,secret,state,state_description'))
+      dispatch(getClient(id, ['name', 'description', 'state', 'state_description']))
     },
   }),
-)(
-  withRequest(
-    ({ oauthClientId, loadData }) => loadData(oauthClientId),
-    ({ fetching, oauthClient }) => fetching || !Boolean(oauthClient),
-  )(OAuthClient),
-)
+)(withRequest(({ oauthClientId, loadData }) => loadData(oauthClientId))(OAuthClient))

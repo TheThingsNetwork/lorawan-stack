@@ -12,26 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP } from '@console/constants/event-filters'
-
-import getByPath from '@ttn-lw/lib/get-by-path'
-
 import {
   GET_CLIENT,
   GET_CLIENT_SUCCESS,
   GET_CLIENTS_LIST,
   GET_CLIENTS_LIST_SUCCESS,
   UPDATE_CLIENT_SUCCESS,
-  DELETE_CLIENT_SUCCESS,
 } from '@account/store/actions/clients'
 
 const defaultState = {
   fetching: false,
-  clients_list: undefined,
+  entities: undefined,
   totalCount: null,
   selectedClient: null,
   error: false,
 }
+
+const client = (state = {}, client) => ({
+  ...state,
+  ...client,
+})
 
 const clients = (state = defaultState, { type, payload }) => {
   switch (type) {
@@ -44,16 +44,37 @@ const clients = (state = defaultState, { type, payload }) => {
       return {
         ...state,
         fetching: true,
-        clients_list: undefined,
+        entities: undefined,
         error: false,
       }
     case GET_CLIENTS_LIST_SUCCESS:
+      const clients = payload.entities.reduce(
+        (acc, c) => {
+          const id = c.ids.client_id
+
+          acc[id] = client(acc[id], c)
+          return acc
+        },
+        { ...state.entities },
+      )
+
       return {
         ...state,
         fetching: false,
-        clients_list: [...payload.entities],
+        entities: clients,
         totalCount: payload.totalCount,
         error: false,
+      }
+    case GET_CLIENT_SUCCESS:
+    case UPDATE_CLIENT_SUCCESS:
+      const id = payload.ids.client_id
+
+      return {
+        ...state,
+        entities: {
+          ...state.entities,
+          [id]: client(state.entities[id], payload),
+        },
       }
     default:
       return state

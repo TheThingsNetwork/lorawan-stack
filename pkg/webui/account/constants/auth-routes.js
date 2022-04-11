@@ -19,6 +19,7 @@ import SessionManagement from '@account/views/session-management'
 import { ValidateWithAuth } from '@account/views/validate'
 import ClientsList from '@account/views/clients'
 import OAuthClientAdd from '@account/views/oauth-client-add'
+import OAuthClient from '@account/views/oauth-client'
 
 export default [
   {
@@ -55,5 +56,10 @@ export default [
     path: '/oauth-clients/add',
     exact: true,
     component: OAuthClientAdd,
+  },
+  {
+    path: '/oauth-clients/console',
+    exact: true,
+    component: OAuthClient,
   },
 ]

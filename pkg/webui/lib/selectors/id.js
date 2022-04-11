@@ -110,3 +110,5 @@ export const getPacketBrokerForwarderId = (policy = {}) =>
   combinePacketBrokerIds(policy.forwarder_id)
 export const getPacketBrokerHomeNewtorkId = (policy = {}) =>
   combinePacketBrokerIds(policy.home_network_id)
+
+export const getClientId = (client = {}) => getByPath(client, 'ids.client_id')
