@@ -10,7 +10,7 @@ For details about compatibility between different releases, see the **Commitment
 ## [Unreleased]
 
 ### Added
-
+- Status page references in the Console.
 ### Changed
 
 ### Deprecated

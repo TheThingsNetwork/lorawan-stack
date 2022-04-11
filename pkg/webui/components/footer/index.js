@@ -97,6 +97,7 @@ const Footer = ({
   documentationLink,
   links,
   supportLink,
+  statusPageLink,
   onlineStatus,
   transparent,
   safe,
@@ -208,6 +209,11 @@ const Footer = ({
             <Message content={sharedMessages.getSupport} />
           </FooterSection>
         )}
+        {statusPageLink && (
+          <FooterSection link={statusPageLink} safe={safe} primary>
+            <Message content={sharedMessages.statusPage} />
+          </FooterSection>
+        )}
       </div>
     </footer>
   )
@@ -236,6 +242,7 @@ Footer.propTypes = {
    * independent of contexts.
    */
   safe: PropTypes.bool,
+  statusPageLink: PropTypes.string,
   /** Optional link for a support button. */
   supportLink: PropTypes.string,
   /** Whether transparent styling should be applied. */
@@ -248,6 +255,7 @@ Footer.defaultProps = {
   links: [],
   onlineStatus: undefined,
   supportLink: undefined,
+  statusPageLink: undefined,
   transparent: false,
   safe: false,
 }
