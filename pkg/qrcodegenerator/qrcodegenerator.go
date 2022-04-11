@@ -44,7 +44,7 @@ type QRCodeGenerator struct {
 var errFormatNotFound = errors.DefineNotFound("format_not_found", "format `{id}` not found")
 
 // New returns a new *QRCodeGenerator.
-func New(c *component.Component, conf *Config) (*QRCodeGenerator, error) {
+func New(c *component.Component, conf *Config, opts ...Option) (*QRCodeGenerator, error) {
 	ctx := log.NewContextWithField(c.Context(), "namespace", "qrcodegenerator")
 	qrg := &QRCodeGenerator{
 		Component: c,
@@ -54,17 +54,27 @@ func New(c *component.Component, conf *Config) (*QRCodeGenerator, error) {
 	qrg.endDevices = enddevices.New(ctx)
 
 	c.RegisterGRPC(qrg)
+
+	for _, opt := range opts {
+		opt(qrg)
+	}
+
 	return qrg, nil
+}
+
+// Option configures QRCodeGenerator.
+type Option func(*QRCodeGenerator)
+
+// WithEndDeviceFormat configures QRCodeGenerator with an EndDeviceFormat.
+func WithEndDeviceFormat(id string, f enddevices.Format) Option {
+	return func(qrg *QRCodeGenerator) {
+		qrg.endDevices.RegisterEndDeviceFormat(id, f)
+	}
 }
 
 // Context returns the context of the QR Code Generator.
 func (qrg *QRCodeGenerator) Context() context.Context {
 	return qrg.ctx
-}
-
-// RegisterEndDeviceFormat registers a new enddevices.Format.
-func (qrg *QRCodeGenerator) RegisterEndDeviceFormat(id string, f enddevices.Format) {
-	qrg.endDevices.RegisterEndDeviceFormat(id, f)
 }
 
 // Roles returns the roles that the QR Code Generator fulfills.

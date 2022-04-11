@@ -39,10 +39,9 @@ func TestGenerateEndDeviceQRCode(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
 	c := componenttest.NewComponent(t, &component.Config{})
-	qrg, err := New(c, &Config{})
-	test.Must(qrg, err)
 	testFormat := new(mockFormat)
-	qrg.RegisterEndDeviceFormat("test", testFormat)
+	qrg, err := New(c, &Config{}, WithEndDeviceFormat("test", testFormat))
+	test.Must(qrg, err)
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 
@@ -106,10 +105,9 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 
 	c := componenttest.NewComponent(t, &component.Config{})
-	qrg, err := New(c, &Config{})
-	test.Must(qrg, err)
 	laTr005 := new(enddevices.LoRaAllianceTR005Format)
-	qrg.RegisterEndDeviceFormat(laTr005.ID(), laTr005)
+	qrg, err := New(c, &Config{}, WithEndDeviceFormat(laTr005.ID(), laTr005))
+	test.Must(qrg, err)
 	componenttest.StartComponent(t, c)
 	defer c.Close()
 
