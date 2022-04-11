@@ -36934,7 +36934,7 @@
               "defaultValue": ""
             },
             {
-              "name": "end_device_tempate",
+              "name": "end_device_template",
               "description": "",
               "label": "",
               "type": "EndDeviceTemplate",

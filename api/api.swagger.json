@@ -17884,7 +17884,7 @@
           "type": "string",
           "description": "Identifier of the format used to successfully parse the QR code data."
         },
-        "end_device_tempate": {
+        "end_device_template": {
           "$ref": "#/definitions/v3EndDeviceTemplate"
         }
       }

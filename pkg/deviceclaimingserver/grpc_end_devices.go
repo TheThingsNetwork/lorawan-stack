@@ -120,7 +120,7 @@ func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.Claim
 		data, err := qrg.Parse(ctx, &ttnpb.ParseEndDeviceQRCodeRequest{
 			QrCode: qrCode,
 		}, edcs.DCS.WithClusterAuth())
-		dev := data.GetEndDeviceTempate().GetEndDevice()
+		dev := data.GetEndDeviceTemplate().GetEndDevice()
 		if dev == nil {
 			return nil, errParseQRCode.New()
 		}

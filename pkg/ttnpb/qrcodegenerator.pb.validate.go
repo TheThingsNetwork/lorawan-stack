@@ -707,12 +707,12 @@ func (m *ParseEndDeviceQRCodeResponse) ValidateFields(paths ...string) error {
 		switch name {
 		case "format_id":
 			// no validation rules for FormatId
-		case "end_device_tempate":
+		case "end_device_template":
 
-			if v, ok := interface{}(m.GetEndDeviceTempate()).(interface{ ValidateFields(...string) error }); ok {
+			if v, ok := interface{}(m.GetEndDeviceTemplate()).(interface{ ValidateFields(...string) error }); ok {
 				if err := v.ValidateFields(subs...); err != nil {
 					return ParseEndDeviceQRCodeResponseValidationError{
-						field:  "end_device_tempate",
+						field:  "end_device_template",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}

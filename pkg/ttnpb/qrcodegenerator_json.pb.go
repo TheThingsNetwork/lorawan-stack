@@ -94,10 +94,10 @@ func (x *ParseEndDeviceQRCodeResponse) MarshalProtoJSON(s *jsonplugin.MarshalSta
 		s.WriteObjectField("format_id")
 		s.WriteString(x.FormatId)
 	}
-	if x.EndDeviceTempate != nil || s.HasField("end_device_tempate") {
+	if x.EndDeviceTemplate != nil || s.HasField("end_device_template") {
 		s.WriteMoreIf(&wroteField)
-		s.WriteObjectField("end_device_tempate")
-		x.EndDeviceTempate.MarshalProtoJSON(s.WithField("end_device_tempate"))
+		s.WriteObjectField("end_device_template")
+		x.EndDeviceTemplate.MarshalProtoJSON(s.WithField("end_device_template"))
 	}
 	s.WriteObjectEnd()
 }
@@ -119,13 +119,13 @@ func (x *ParseEndDeviceQRCodeResponse) UnmarshalProtoJSON(s *jsonplugin.Unmarsha
 		case "format_id", "formatId":
 			s.AddField("format_id")
 			x.FormatId = s.ReadString()
-		case "end_device_tempate", "endDeviceTempate":
+		case "end_device_template", "endDeviceTemplate":
 			if s.ReadNil() {
-				x.EndDeviceTempate = nil
+				x.EndDeviceTemplate = nil
 				return
 			}
-			x.EndDeviceTempate = &EndDeviceTemplate{}
-			x.EndDeviceTempate.UnmarshalProtoJSON(s.WithField("end_device_tempate", true))
+			x.EndDeviceTemplate = &EndDeviceTemplate{}
+			x.EndDeviceTemplate.UnmarshalProtoJSON(s.WithField("end_device_template", true))
 		}
 	})
 }

@@ -7953,7 +7953,7 @@ The Pba service allows clients to manage peering through Packet Broker.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `format_id` | [`string`](#string) |  | Identifier of the format used to successfully parse the QR code data. |
-| `end_device_tempate` | [`EndDeviceTemplate`](#ttn.lorawan.v3.EndDeviceTemplate) |  |  |
+| `end_device_template` | [`EndDeviceTemplate`](#ttn.lorawan.v3.EndDeviceTemplate) |  |  |
 
 ### <a name="ttn.lorawan.v3.QRCodeFormat">Message `QRCodeFormat`</a>
 

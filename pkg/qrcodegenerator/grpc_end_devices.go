@@ -129,7 +129,7 @@ func (s *endDeviceQRCodeGeneratorServer) Parse(ctx context.Context, req *ttnpb.P
 		return nil, err
 	}
 	return &ttnpb.ParseEndDeviceQRCodeResponse{
-		FormatId:         data.FormatID(),
-		EndDeviceTempate: data.EndDeviceTemplate(),
+		FormatId:          data.FormatID(),
+		EndDeviceTemplate: data.EndDeviceTemplate(),
 	}, nil
 }

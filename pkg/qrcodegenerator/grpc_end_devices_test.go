@@ -189,7 +189,7 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 					return false
 				}
 				a.So(resp.FormatId, should.Equal, laTr005.ID())
-				endDeviceTemplate := resp.GetEndDeviceTempate()
+				endDeviceTemplate := resp.GetEndDeviceTemplate()
 				a.So(endDeviceTemplate, should.NotBeNil)
 				endDevice := endDeviceTemplate.EndDevice
 				a.So(endDevice, should.NotBeNil)
@@ -223,7 +223,7 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 					return false
 				}
 				a.So(resp.FormatId, should.Equal, laTr005.ID())
-				endDeviceTemplate := resp.GetEndDeviceTempate()
+				endDeviceTemplate := resp.GetEndDeviceTemplate()
 				a.So(endDeviceTemplate, should.NotBeNil)
 				endDevice := endDeviceTemplate.GetEndDevice()
 				a.So(endDevice, should.NotBeNil)
@@ -275,7 +275,7 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 					return false
 				}
 				a.So(resp.FormatId, should.Equal, laTr005.ID())
-				endDeviceTemplate := resp.GetEndDeviceTempate()
+				endDeviceTemplate := resp.GetEndDeviceTemplate()
 				a.So(endDeviceTemplate, should.NotBeNil)
 				endDevice := endDeviceTemplate.GetEndDevice()
 				a.So(endDevice, should.NotBeNil)

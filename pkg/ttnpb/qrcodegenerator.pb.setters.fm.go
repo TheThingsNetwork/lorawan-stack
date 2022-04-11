@@ -245,29 +245,29 @@ func (dst *ParseEndDeviceQRCodeResponse) SetFields(src *ParseEndDeviceQRCodeResp
 				var zero string
 				dst.FormatId = zero
 			}
-		case "end_device_tempate":
+		case "end_device_template":
 			if len(subs) > 0 {
 				var newDst, newSrc *EndDeviceTemplate
-				if (src == nil || src.EndDeviceTempate == nil) && dst.EndDeviceTempate == nil {
+				if (src == nil || src.EndDeviceTemplate == nil) && dst.EndDeviceTemplate == nil {
 					continue
 				}
 				if src != nil {
-					newSrc = src.EndDeviceTempate
+					newSrc = src.EndDeviceTemplate
 				}
-				if dst.EndDeviceTempate != nil {
-					newDst = dst.EndDeviceTempate
+				if dst.EndDeviceTemplate != nil {
+					newDst = dst.EndDeviceTemplate
 				} else {
 					newDst = &EndDeviceTemplate{}
-					dst.EndDeviceTempate = newDst
+					dst.EndDeviceTemplate = newDst
 				}
 				if err := newDst.SetFields(newSrc, subs...); err != nil {
 					return err
 				}
 			} else {
 				if src != nil {
-					dst.EndDeviceTempate = src.EndDeviceTempate
+					dst.EndDeviceTemplate = src.EndDeviceTemplate
 				} else {
-					dst.EndDeviceTempate = nil
+					dst.EndDeviceTemplate = nil
 				}
 			}
 

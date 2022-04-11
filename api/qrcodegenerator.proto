@@ -79,7 +79,7 @@ message ParseEndDeviceQRCodeRequest {
 message ParseEndDeviceQRCodeResponse {
   // Identifier of the format used to successfully parse the QR code data.
   string format_id = 1;
-  EndDeviceTemplate end_device_tempate = 2;
+  EndDeviceTemplate end_device_template = 2;
 }
 
 service EndDeviceQRCodeGenerator {
