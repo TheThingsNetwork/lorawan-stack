@@ -64,7 +64,6 @@ type Component interface {
 // TTJS is a client that claims end devices on a The Things Join Server.
 type TTJS struct {
 	Component
-	qrg ttnpb.EndDeviceQRCodeGeneratorClient
 
 	hsNSIDs     map[string]types.EUI64
 	httpClient  *http.Client
@@ -73,18 +72,8 @@ type TTJS struct {
 	ttiVendorID OUI
 }
 
-// Option configures TTJS.
-type Option func(*TTJS)
-
-// WithQRGeneratorClient overrides the QRGeneratorClient of TTJS.
-func WithQRGeneratorClient(qrg ttnpb.EndDeviceQRCodeGeneratorClient) Option {
-	return func(ttjs *TTJS) {
-		ttjs.qrg = qrg
-	}
-}
-
 // NewClient applies the config and returns a new TTJS client.
-func (config Config) NewClient(ctx context.Context, c Component, opts ...Option) (*TTJS, error) {
+func (config Config) NewClient(ctx context.Context, c Component) (*TTJS, error) {
 	httpClient, err := c.HTTPClient(ctx)
 	if err != nil {
 		return nil, err
@@ -103,19 +92,14 @@ func (config Config) NewClient(ctx context.Context, c Component, opts ...Option)
 		}
 		res[nsAddress] = nsID
 	}
-	ttjs := &TTJS{
+	return &TTJS{
 		config:      config,
 		httpClient:  httpClient,
 		baseURL:     baseURL,
 		Component:   c,
 		hsNSIDs:     res,
 		ttiVendorID: OUI(interop.TTIVendorID.MarshalNumber()),
-	}
-	for _, opt := range opts {
-		opt(ttjs)
-	}
-
-	return ttjs, nil
+	}, nil
 }
 
 // SupportsJoinEUI implements EndDeviceClaimer.
@@ -134,21 +118,7 @@ var (
 	errDeviceAccessDenied   = errors.DefinePermissionDenied("device_access_denied", "access to device with `{dev_eui}` denied. Either device is already claimed or owner token is invalid")
 	errUnauthorized         = errors.DefineUnauthenticated("unauthorized", "client API Key missing or invalid")
 	errNoHomeNSID           = errors.DefineInvalidArgument("no_home_ns_id", "no HomeNSID configured for network server address `{address}`")
-	errParseQRCode          = errors.Define("parse_qr_code", "parse QR code failed")
-	errQRCodeData           = errors.DefineInvalidArgument("qr_code_data", "invalid QR code data")
-	errNoJoinEUI            = errors.DefineInvalidArgument("no_join_eui", "failed to extract JoinEUI from request")
 )
-
-func (client *TTJS) getQRGeneratorClient(ctx context.Context) (ttnpb.EndDeviceQRCodeGeneratorClient, error) {
-	if client.qrg != nil {
-		return client.qrg, nil
-	}
-	conn, err := client.Component.GetPeerConn(ctx, ttnpb.ClusterRole_QR_CODE_GENERATOR, nil)
-	if err != nil {
-		return nil, err
-	}
-	return ttnpb.NewEndDeviceQRCodeGeneratorClient(conn), nil
-}
 
 // Claim implements EndDeviceClaimer.
 func (client *TTJS) Claim(ctx context.Context, joinEUI *types.EUI64, devEUI *types.EUI64, cac string, hNSAddress string) error {
