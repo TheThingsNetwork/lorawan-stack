@@ -144,10 +144,6 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 	}
 	st := gormstore.NewCombinedStore(is.db)
 	is.store = st
-	go func() {
-		<-is.Context().Done()
-		is.db.Close()
-	}()
 
 	is.emailTemplates, err = is.initEmailTemplates(is.Context())
 	if err != nil {
@@ -272,3 +268,8 @@ func (is *IdentityServer) Roles() []ttnpb.ClusterRole {
 var softDeleteFieldMask = []string{"deleted_at"}
 
 var errRestoreWindowExpired = errors.DefineFailedPrecondition("restore_window_expired", "this entity can no longer be restored")
+
+func (is *IdentityServer) Close() {
+	is.db.DB().Close()
+	is.Component.Close()
+}

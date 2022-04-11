@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,44 +18,17 @@ import (
 	"testing"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
-func init() {
-	userID := paginationUser.GetIds()
-
-	// remove organizations assigned to the user by the populator
-	for _, organization := range population.Organizations {
-		for id, collaborators := range population.Memberships {
-			if organization.IDString() == id.IDString() {
-				for i, collaborator := range collaborators {
-					if collaborator.IDString() == userID.GetUserId() {
-						population.Memberships[id] = collaborators[:i+copy(collaborators[i:], collaborators[i+1:])]
-					}
-				}
-			}
-		}
-	}
-
-	// add deterministic number of organizations
-	for i := 0; i < 3; i++ {
-		organizationID := population.Organizations[i].GetEntityIdentifiers()
-		ouID := paginationUser.OrganizationOrUserIdentifiers()
-		population.Memberships[organizationID] = append(population.Memberships[organizationID], &ttnpb.Collaborator{
-			Ids:    ouID,
-			Rights: []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL, ttnpb.Right_RIGHT_CLIENT_ALL, ttnpb.Right_RIGHT_GATEWAY_ALL, ttnpb.Right_RIGHT_ORGANIZATION_ALL},
-		})
-	}
-}
-
 func TestOrganizationsNestedError(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		userID := defaultUser.GetIds()
@@ -87,28 +60,30 @@ func TestOrganizationsNestedError(t *testing.T) {
 }
 
 func TestOrganizationsPermissionDenied(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	p := &storetest.Population{}
+	usr1 := p.NewUser()
+	org1 := p.NewOrganization(usr1.GetOrganizationOrUserIdentifiers())
 
-	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewOrganizationRegistryClient(cc)
 
 		_, err := reg.Create(ctx, &ttnpb.CreateOrganizationRequest{
 			Organization: &ttnpb.Organization{
 				Ids: &ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
 			},
-			Collaborator: ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
 		_, err = reg.Get(ctx, &ttnpb.GetOrganizationRequest{
-			OrganizationIds: &ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
+			OrganizationIds: org1.GetIds(),
 			FieldMask:       &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsUnauthenticated(err), should.BeTrue)
 		}
@@ -116,35 +91,31 @@ func TestOrganizationsPermissionDenied(t *testing.T) {
 		listRes, err := reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		a.So(err, should.BeNil)
 		if a.So(listRes, should.NotBeNil) {
 			a.So(listRes.Organizations, should.BeEmpty)
 		}
 
 		_, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
-			Collaborator: ttnpb.UserIdentifiers{UserId: "foo-usr"}.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
 		_, err = reg.Update(ctx, &ttnpb.UpdateOrganizationRequest{
 			Organization: &ttnpb.Organization{
-				Ids:  &ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
+				Ids:  org1.GetIds(),
 				Name: "Updated Name",
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
-		_, err = reg.Delete(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"})
-
+		_, err = reg.Delete(ctx, org1.GetIds())
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
@@ -152,14 +123,33 @@ func TestOrganizationsPermissionDenied(t *testing.T) {
 }
 
 func TestOrganizationsCRUD(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	p := &storetest.Population{}
+
+	adminUsr := p.NewUser()
+	adminUsr.Admin = true
+	adminKey, _ := p.NewAPIKey(adminUsr.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	adminCreds := rpcCreds(adminKey)
+
+	usr1 := p.NewUser()
+	for i := 0; i < 5; i++ {
+		p.NewOrganization(usr1.GetOrganizationOrUserIdentifiers())
+	}
+
+	usr2 := p.NewUser()
+	for i := 0; i < 5; i++ {
+		p.NewOrganization(usr2.GetOrganizationOrUserIdentifiers())
+	}
+
+	key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	creds := rpcCreds(key)
+	keyWithoutRights, _ := p.NewAPIKey(usr1.GetEntityIdentifiers())
+	credsWithoutRights := rpcCreds(keyWithoutRights)
+
+	t.Parallel()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewOrganizationRegistryClient(cc)
-
-		userID, creds := population.Users[defaultUserIdx].GetIds(), userCreds(defaultUserIdx)
-		credsWithoutRights := userCreds(defaultUserIdx, "key without rights")
 
 		is.config.UserRights.CreateOrganizations = false
 
@@ -168,8 +158,11 @@ func TestOrganizationsCRUD(t *testing.T) {
 				Ids:  &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
 				Name: "Foo Organization",
 			},
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 		}, creds)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
 
 		is.config.UserRights.CreateOrganizations = true
 
@@ -178,11 +171,9 @@ func TestOrganizationsCRUD(t *testing.T) {
 				Ids:  &ttnpb.OrganizationIdentifiers{OrganizationId: "foo"},
 				Name: "Foo Organization",
 			},
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
 		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(created, should.NotBeNil) {
+		if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
 			a.So(created.Name, should.Equal, "Foo Organization")
 		}
 
@@ -190,9 +181,7 @@ func TestOrganizationsCRUD(t *testing.T) {
 			OrganizationIds: created.GetIds(),
 			FieldMask:       &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(got, should.NotBeNil) {
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 			a.So(got.Name, should.Equal, created.Name)
 		}
 
@@ -200,14 +189,12 @@ func TestOrganizationsCRUD(t *testing.T) {
 			OrganizationIds: created.GetIds(),
 			FieldMask:       &pbtypes.FieldMask{Paths: []string{"ids"}},
 		}, credsWithoutRights)
-
 		a.So(err, should.BeNil)
 
 		got, err = reg.Get(ctx, &ttnpb.GetOrganizationRequest{
 			OrganizationIds: created.GetIds(),
 			FieldMask:       &pbtypes.FieldMask{Paths: []string{"attributes"}},
 		}, credsWithoutRights)
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
@@ -219,20 +206,16 @@ func TestOrganizationsCRUD(t *testing.T) {
 			},
 			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(updated, should.NotBeNil) {
+		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.Name, should.Equal, "Updated Name")
 		}
 
-		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, userID.OrganizationOrUserIdentifiers()} {
+		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, usr1.GetOrganizationOrUserIdentifiers()} {
 			list, err := reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 				FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 				Collaborator: collaborator,
 			}, creds)
-
-			a.So(err, should.BeNil)
-			if a.So(list, should.NotBeNil) && a.So(list.Organizations, should.NotBeEmpty) {
+			if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) && a.So(list.Organizations, should.HaveLength, 6) {
 				var found bool
 				for _, item := range list.Organizations {
 					if item.GetIds().GetOrganizationId() == created.GetIds().GetOrganizationId() {
@@ -245,63 +228,66 @@ func TestOrganizationsCRUD(t *testing.T) {
 		}
 
 		_, err = reg.Delete(ctx, created.GetIds(), creds)
-
 		a.So(err, should.BeNil)
 
 		_, err = reg.Purge(ctx, created.GetIds(), creds)
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-		_, err = reg.Purge(ctx, created.GetIds(), userCreds(adminUserIdx))
 
+		_, err = reg.Purge(ctx, created.GetIds(), adminCreds)
 		a.So(err, should.BeNil)
-	})
+	}, withPrivateTestDatabase(p))
 }
 
 func TestOrganizationsPagination(t *testing.T) {
-	a := assertions.New(t)
+	p := &storetest.Population{}
+
+	usr1 := p.NewUser()
+	for i := 0; i < 3; i++ {
+		p.NewOrganization(usr1.GetOrganizationOrUserIdentifiers())
+	}
+
+	key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	creds := rpcCreds(key)
+
+	t.Parallel()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := paginationUser.GetIds()
-		creds := userCreds(paginationUserIdx)
-
 		reg := ttnpb.NewOrganizationRegistryClient(cc)
 
-		list, err := reg.List(test.Context(), &ttnpb.ListOrganizationsRequest{
+		var md metadata.MD
+
+		list, err := reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         1,
-		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(list, should.NotBeNil) {
+		}, creds, grpc.Header(&md))
+		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
 			a.So(list.Organizations, should.HaveLength, 2)
+			a.So(md.Get("x-total-count"), should.Resemble, []string{"3"})
 		}
 
-		list, err = reg.List(test.Context(), &ttnpb.ListOrganizationsRequest{
+		list, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         2,
 		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(list, should.NotBeNil) {
+		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
 			a.So(list.Organizations, should.HaveLength, 1)
 		}
 
-		list, err = reg.List(test.Context(), &ttnpb.ListOrganizationsRequest{
+		list, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
-			Collaborator: userID.OrganizationOrUserIdentifiers(),
+			Collaborator: usr1.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         3,
 		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(list, should.NotBeNil) {
+		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
 			a.So(list.Organizations, should.BeEmpty)
 		}
-	})
+	}, withPrivateTestDatabase(p))
 }

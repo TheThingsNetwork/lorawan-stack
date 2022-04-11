@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,571 +18,451 @@ import (
 	"testing"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc"
 )
 
-func init() {
-	applicationAccessUser.Admin = false
-	applicationAccessUser.State = ttnpb.State_STATE_APPROVED
-	for _, apiKey := range userAPIKeys(applicationAccessUser.GetIds()).ApiKeys {
-		apiKey.Rights = []ttnpb.Right{
-			ttnpb.Right_RIGHT_APPLICATION_LINK,
-			ttnpb.Right_RIGHT_APPLICATION_SETTINGS_API_KEYS,
-			ttnpb.Right_RIGHT_APPLICATION_SETTINGS_COLLABORATORS,
-		}
-	}
-	appAccessCollaboratorUser.Admin = false
-	appAccessCollaboratorUser.State = ttnpb.State_STATE_APPROVED
-	for _, apiKey := range userAPIKeys(appAccessCollaboratorUser.GetIds()).ApiKeys {
-		apiKey.Rights = []ttnpb.Right{
-			ttnpb.Right_RIGHT_APPLICATION_ALL,
-		}
-	}
-}
+func TestApplicationAPIKeys(t *testing.T) {
+	p := &storetest.Population{}
 
-func TestApplicationAccessNotFound(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	admin := p.NewUser()
+	admin.Admin = true
+	adminKey, _ := p.NewAPIKey(admin.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	adminCreds := rpcCreds(adminKey)
+
+	usr1 := p.NewUser()
+	usr1Key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	usr1Creds := rpcCreds(usr1Key)
+
+	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+	limitedKey, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_APPLICATION_INFO,
+		ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
+		ttnpb.Right_RIGHT_APPLICATION_SETTINGS_API_KEYS,
+	)
+	limitedCreds := rpcCreds(limitedKey)
+
+	appKey, _ := p.NewAPIKey(app1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_APPLICATION_INFO,
+		ttnpb.Right_RIGHT_APPLICATION_LINK,
+	)
+	appCreds := rpcCreds(appKey)
+
+	t.Parallel()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, creds := defaultUser.GetIds(), userCreds(defaultUserIdx)
-		applicationID := userApplications(userID).Applications[0].GetIds()
+		is.config.AdminRights.All = true
 
 		reg := ttnpb.NewApplicationAccessClient(cc)
 
-		apiKey := ttnpb.APIKey{
-			Id:   "does-not-exist-id",
-			Name: "test-application-api-key-name",
-		}
-
+		// GetAPIKey that doesn't exist.
 		got, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
-			ApplicationIds: applicationID,
-			KeyId:          apiKey.Id,
-		}, creds)
-
+			ApplicationIds: app1.GetIds(),
+			KeyId:          "does-not-exist",
+		}, limitedCreds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 		a.So(got, should.BeNil)
 
+		// UpdateAPIKey that doesn't exist.
 		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
-			ApplicationIds: applicationID,
-			ApiKey:         &apiKey,
-			FieldMask:      &pbtypes.FieldMask{Paths: []string{"rights", "name"}},
-		}, creds)
-
+			ApplicationIds: app1.GetIds(),
+			ApiKey: &ttnpb.APIKey{
+				Id: "does-not-exist",
+			},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
+		}, limitedCreds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
 		a.So(updated, should.BeNil)
-	})
-}
 
-func TestApplicationAccessRightsPermissionDenied(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
-
-	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, creds := applicationAccessUser.GetIds(), userCreds(applicationAccessUserIdx)
-		applicationID := userApplications(userID).Applications[0].GetIds()
-		collaboratorID := collaboratorUser.GetIds().OrganizationOrUserIdentifiers()
-
-		reg := ttnpb.NewApplicationAccessClient(cc)
-
-		apiKeyName := "test-application-api-key-name"
+		// CreateAPIKey with rights that caller doesn't have.
 		apiKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
-			ApplicationIds: applicationID,
-			Name:           apiKeyName,
+			ApplicationIds: app1.GetIds(),
+			Name:           "api-key-name",
 			Rights:         []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL},
-		}, creds)
-
+		}, limitedCreds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 		a.So(apiKey, should.BeNil)
 
-		// Choose right that the user does not have and hence cannot add
-		right := ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC
-		apiKey = applicationAPIKeys(applicationID).ApiKeys[0]
-
-		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
-			ApplicationIds: applicationID,
+		// UpdateAPIKey adding rights that caller doesn't have.
+		updated, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
+			ApplicationIds: app1.GetIds(),
 			ApiKey: &ttnpb.APIKey{
-				Id:     apiKey.Id,
-				Name:   apiKey.Name,
-				Rights: []ttnpb.Right{right},
+				Id: appKey.GetId(),
+				Rights: []ttnpb.Right{
+					ttnpb.Right_RIGHT_APPLICATION_INFO,
+					ttnpb.Right_RIGHT_APPLICATION_LINK,
+					ttnpb.Right_RIGHT_APPLICATION_DELETE,
+				},
 			},
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights", "name"}},
-		}, creds)
-
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
+		}, limitedCreds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 		a.So(updated, should.BeNil)
 
-		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
-			ApplicationIds: applicationID,
-			Collaborator: &ttnpb.Collaborator{
-				Ids:    collaboratorID,
-				Rights: []ttnpb.Right{right},
+		// UpdateAPIKey removing rights that caller doesn't have.
+		updated, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
+			ApplicationIds: app1.GetIds(),
+			ApiKey: &ttnpb.APIKey{
+				Id: appKey.GetId(),
+				Rights: []ttnpb.Right{
+					ttnpb.Right_RIGHT_APPLICATION_INFO,
+				},
 			},
-		}, creds)
-
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
-	})
-}
-
-func TestApplicationAccessPermissionDenied(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
-
-	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := defaultUser.GetIds()
-		applicationID := userApplications(userID).Applications[0].GetIds()
-		collaboratorID := collaboratorUser.GetIds().OrganizationOrUserIdentifiers()
-		apiKeyID := applicationAPIKeys(applicationID).ApiKeys[0].Id
-
-		reg := ttnpb.NewApplicationAccessClient(cc)
-
-		rights, err := reg.ListRights(ctx, applicationID)
-
-		a.So(err, should.BeNil)
-		if a.So(rights, should.NotBeNil) {
-			a.So(rights.Rights, should.BeEmpty)
-		}
-
-		apiKey, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
-			ApplicationIds: applicationID,
-			KeyId:          apiKeyID,
-		})
-
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
-		a.So(apiKey, should.BeNil)
-
-		apiKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListApplicationAPIKeysRequest{
-			ApplicationIds: applicationID,
-		})
-
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
-		a.So(apiKeys, should.BeNil)
-
-		collaborators, err := reg.ListCollaborators(ctx, &ttnpb.ListApplicationCollaboratorsRequest{
-			ApplicationIds: applicationID,
-		})
-
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsUnauthenticated(err), should.BeTrue)
-		}
-		a.So(collaborators, should.BeNil)
-
-		apiKeyName := "test-application-api-key-name"
-		apiKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
-			ApplicationIds: applicationID,
-			Name:           apiKeyName,
-			Rights:         []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL},
-		})
-
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
-		a.So(apiKey, should.BeNil)
-
-		apiKey = applicationAPIKeys(applicationID).ApiKeys[0]
-
-		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
-			ApplicationIds: applicationID,
-			ApiKey:         apiKey,
-			FieldMask:      &pbtypes.FieldMask{Paths: []string{"name", "rights"}},
-		})
-
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
+		}, limitedCreds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 		a.So(updated, should.BeNil)
 
-		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
-			ApplicationIds: applicationID,
-			Collaborator: &ttnpb.Collaborator{
-				Ids:    collaboratorID,
-				Rights: []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL},
+		// UpdateAPIKey removing rights that caller has and adding rights that caller has.
+		updated, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
+			ApplicationIds: app1.GetIds(),
+			ApiKey: &ttnpb.APIKey{
+				Id: appKey.GetId(),
+				Rights: []ttnpb.Right{
+					ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
+					ttnpb.Right_RIGHT_APPLICATION_LINK,
+				},
 			},
-		})
-
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
-	})
-}
-
-func TestApplicationAccessClusterAuth(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
-
-	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := defaultUser.GetIds()
-		applicationID := userApplications(userID).Applications[0].GetIds()
-
-		reg := ttnpb.NewApplicationAccessClient(cc)
-
-		rights, err := reg.ListRights(ctx, applicationID, is.WithClusterAuth())
-
-		a.So(err, should.BeNil)
-		if a.So(rights, should.NotBeNil) {
-			a.So(ttnpb.AllClusterRights.Intersect(ttnpb.AllApplicationRights).Sub(rights).Rights, should.BeEmpty)
-		}
-	})
-}
-
-func TestApplicationAccessCRUD(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
-
-	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, creds := defaultUser.GetIds(), userCreds(defaultUserIdx)
-		applicationID := userApplications(userID).Applications[0].GetIds()
-		collaboratorID := collaboratorUser.GetIds().OrganizationOrUserIdentifiers()
-
-		reg := ttnpb.NewApplicationAccessClient(cc)
-
-		rights, err := reg.ListRights(ctx, applicationID, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(rights, should.NotBeNil) {
-			a.So(rights.Rights, should.Contain, ttnpb.Right_RIGHT_APPLICATION_ALL)
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
+		}, limitedCreds)
+		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
+			a.So(updated.Rights, should.Resemble, []ttnpb.Right{
+				ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
+				ttnpb.Right_RIGHT_APPLICATION_LINK,
+			})
 		}
 
-		modifiedApplicationID := &ttnpb.ApplicationIdentifiers{ApplicationId: reverse(applicationID.GetApplicationId())}
+		// API Key CRUD with different invalid credentials.
+		for _, opts := range [][]grpc.CallOption{nil, {appCreds}} {
+			created, err := reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
+				ApplicationIds: app1.GetIds(),
+				Name:           "api-key-name",
+				Rights:         []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_INFO},
+			}, opts...)
+			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+				a.So(created, should.BeNil)
+			}
 
-		rights, err = reg.ListRights(ctx, modifiedApplicationID, creds)
+			list, err := reg.ListAPIKeys(ctx, &ttnpb.ListApplicationAPIKeysRequest{
+				ApplicationIds: app1.GetIds(),
+			}, opts...)
+			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+				a.So(list, should.BeNil)
+			}
 
-		a.So(err, should.BeNil)
-		if a.So(rights, should.NotBeNil) {
-			a.So(rights.Rights, should.BeEmpty)
-		}
+			got, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
+				ApplicationIds: app1.GetIds(),
+				KeyId:          appKey.GetId(),
+			}, opts...)
+			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+				a.So(got, should.BeNil)
+			}
 
-		applicationAPIKeys := applicationAPIKeys(applicationID)
-		applicationKey := applicationAPIKeys.ApiKeys[0]
-
-		apiKey, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
-			ApplicationIds: applicationID,
-			KeyId:          applicationKey.Id,
-		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(apiKey, should.NotBeNil) {
-			a.So(apiKey.Id, should.Equal, applicationKey.Id)
-			a.So(apiKey.Key, should.BeEmpty)
-		}
-
-		apiKeys, err := reg.ListAPIKeys(ctx, &ttnpb.ListApplicationAPIKeysRequest{
-			ApplicationIds: applicationID,
-		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(apiKeys, should.NotBeNil) {
-			a.So(len(apiKeys.ApiKeys), should.Equal, len(applicationAPIKeys.ApiKeys))
-			for i, APIkey := range apiKeys.ApiKeys {
-				a.So(APIkey.Name, should.Equal, applicationAPIKeys.ApiKeys[i].Name)
-				a.So(APIkey.Id, should.Equal, applicationAPIKeys.ApiKeys[i].Id)
+			updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
+				ApplicationIds: app1.GetIds(),
+				ApiKey: &ttnpb.APIKey{
+					Id:   appKey.GetId(),
+					Name: "api-key-name-updated",
+				},
+				FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
+			}, opts...)
+			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+				a.So(updated, should.BeNil)
 			}
 		}
 
-		collaborators, err := reg.ListCollaborators(ctx, &ttnpb.ListApplicationCollaboratorsRequest{
-			ApplicationIds: applicationID,
-		}, creds)
+		// API Key CRUD with different valid credentials.
+		for _, opts := range [][]grpc.CallOption{{adminCreds}, {usr1Creds}, {limitedCreds}} {
+			created, err := reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
+				ApplicationIds: app1.GetIds(),
+				Name:           "api-key-name",
+				Rights:         []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_INFO},
+			}, opts...)
+			if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
+				a.So(created.Name, should.Equal, "api-key-name")
+				a.So(created.Rights, should.Resemble, []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_INFO})
+			}
 
-		a.So(err, should.BeNil)
-		if a.So(collaborators, should.NotBeNil) {
-			a.So(collaborators.Collaborators, should.NotBeEmpty)
+			list, err := reg.ListAPIKeys(ctx, &ttnpb.ListApplicationAPIKeysRequest{
+				ApplicationIds: app1.GetIds(),
+			}, opts...)
+			if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) && a.So(list.ApiKeys, should.HaveLength, 2) {
+				for _, k := range list.ApiKeys {
+					if k.Id == created.Id {
+						a.So(k.Name, should.Resemble, created.Name)
+					}
+				}
+			}
+
+			got, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
+				ApplicationIds: app1.GetIds(),
+				KeyId:          created.GetId(),
+			}, opts...)
+			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+				a.So(got.Name, should.Equal, created.Name)
+			}
+
+			updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
+				ApplicationIds: app1.GetIds(),
+				ApiKey: &ttnpb.APIKey{
+					Id:   created.GetId(),
+					Name: "api-key-name-updated",
+				},
+				FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
+			}, opts...)
+			if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
+				a.So(updated.Name, should.Equal, "api-key-name-updated")
+			}
+
+			deleted, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
+				ApplicationIds: app1.GetIds(),
+				ApiKey: &ttnpb.APIKey{
+					Id: created.GetId(),
+				},
+				FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
+			}, opts...)
+			if a.So(err, should.BeNil) && a.So(deleted, should.NotBeNil) {
+				a.So(deleted.Rights, should.BeNil)
+			}
+
+			got, err = reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
+				ApplicationIds: app1.GetIds(),
+				KeyId:          created.GetId(),
+			}, opts...)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsNotFound(err), should.BeTrue)
+			}
+			a.So(got, should.BeNil)
 		}
-
-		apiKeyName := "test-application-api-key-name"
-		apiKey, err = reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
-			ApplicationIds: applicationID,
-			Name:           apiKeyName,
-			Rights:         []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL},
-		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(apiKey, should.NotBeNil) {
-			a.So(apiKey.Name, should.Equal, apiKeyName)
-		}
-
-		newAPIKeyName := "test-new-api-key"
-		apiKey.Name = newAPIKeyName
-		updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
-			ApplicationIds: applicationID,
-			ApiKey:         apiKey,
-			FieldMask:      &pbtypes.FieldMask{Paths: []string{"name"}},
-		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(updated, should.NotBeNil) {
-			a.So(updated.Name, should.Equal, newAPIKeyName)
-		}
-
-		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
-			ApplicationIds: applicationID,
-			Collaborator: &ttnpb.Collaborator{
-				Ids:    collaboratorID,
-				Rights: []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL},
-			},
-		}, creds)
-
-		a.So(err, should.BeNil)
-
-		res, err := reg.GetCollaborator(ctx, &ttnpb.GetApplicationCollaboratorRequest{
-			ApplicationIds: applicationID,
-			Collaborator:   collaboratorID,
-		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(res, should.NotBeNil) {
-			a.So(res.Rights, should.Resemble, []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL})
-		}
-
-		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
-			ApplicationIds: applicationID,
-			Collaborator: &ttnpb.Collaborator{
-				Ids: collaboratorID,
-			},
-		}, creds)
-
-		a.So(err, should.BeNil)
-
-		res, err = reg.GetCollaborator(ctx, &ttnpb.GetApplicationCollaboratorRequest{
-			ApplicationIds: applicationID,
-			Collaborator:   collaboratorID,
-		}, creds)
-
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsNotFound(err), should.BeTrue)
-		}
-	})
+	}, withPrivateTestDatabase(p))
 }
 
-func TestApplicationAccessRights(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+func TestApplicationCollaborators(t *testing.T) {
+	p := &storetest.Population{}
+
+	admin := p.NewUser()
+	admin.Admin = true
+	adminKey, _ := p.NewAPIKey(admin.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	adminCreds := rpcCreds(adminKey)
+
+	usr1 := p.NewUser()
+	usr1Key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	usr1Creds := rpcCreds(usr1Key)
+
+	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+
+	limitedKey, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_APPLICATION_INFO,
+		ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
+		ttnpb.Right_RIGHT_APPLICATION_SETTINGS_COLLABORATORS,
+	)
+	limitedCreds := rpcCreds(limitedKey)
+
+	appKey, _ := p.NewAPIKey(app1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_APPLICATION_INFO,
+		ttnpb.Right_RIGHT_APPLICATION_LINK,
+	)
+	appCreds := rpcCreds(appKey)
+
+	usr2 := p.NewUser()
+	p.NewMembership(
+		usr2.GetOrganizationOrUserIdentifiers(),
+		app1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_APPLICATION_INFO,
+		ttnpb.Right_RIGHT_APPLICATION_LINK,
+	)
+
+	usr3 := p.NewUser()
+
+	t.Parallel()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID, usrCreds := defaultUser.GetIds(), userCreds(defaultUserIdx)
-		applicationID := userApplications(userID).Applications[0].GetIds()
-		collaboratorID := applicationAccessUser.GetIds().OrganizationOrUserIdentifiers()
-		collaboratorCreds := userCreds(applicationAccessUserIdx)
-		removedCollaboratorID := appAccessCollaboratorUser.GetIds().OrganizationOrUserIdentifiers()
+		is.config.AdminRights.All = true
 
 		reg := ttnpb.NewApplicationAccessClient(cc)
 
-		_, err := reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
-			ApplicationIds: applicationID,
-			Collaborator: &ttnpb.Collaborator{
-				Ids: collaboratorID,
-				Rights: []ttnpb.Right{
-					ttnpb.Right_RIGHT_APPLICATION_LINK,
-					ttnpb.Right_RIGHT_APPLICATION_SETTINGS_API_KEYS,
-					ttnpb.Right_RIGHT_APPLICATION_SETTINGS_COLLABORATORS,
-				},
-			},
-		}, usrCreds)
-
-		a.So(err, should.BeNil)
-
-		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
-			ApplicationIds: applicationID,
-			Collaborator: &ttnpb.Collaborator{
-				Ids: removedCollaboratorID,
-				Rights: []ttnpb.Right{
-					ttnpb.Right_RIGHT_APPLICATION_ALL,
-				},
-			},
-		}, usrCreds)
-
-		a.So(err, should.BeNil)
-
-		apiKey, err := reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
-			ApplicationIds: applicationID,
-			Rights:         []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL},
-		}, usrCreds)
-
-		a.So(err, should.BeNil)
-		if a.So(apiKey, should.NotBeNil) && a.So(apiKey.Rights, should.NotBeNil) {
-			a.So(apiKey.Rights, should.Resemble, []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_ALL})
-		}
-
-		// Try revoking rights for the collaborator with RIGHT_APPLICATION_ALL without having it
-		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
-			ApplicationIds: applicationID,
-			Collaborator: &ttnpb.Collaborator{
-				Ids: removedCollaboratorID,
-				Rights: []ttnpb.Right{
-					ttnpb.Right_RIGHT_APPLICATION_LINK,
-					ttnpb.Right_RIGHT_APPLICATION_SETTINGS_API_KEYS,
-					ttnpb.Right_RIGHT_APPLICATION_SETTINGS_COLLABORATORS,
-				},
-			},
-		}, collaboratorCreds)
-
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
-
-		// Try revoking rights for the api key with RIGHT_APPLICATION_ALL without having it
-		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
-			ApplicationIds: applicationID,
-			ApiKey: &ttnpb.APIKey{
-				Id: apiKey.Id,
-				Rights: []ttnpb.Right{
-					ttnpb.Right_RIGHT_APPLICATION_LINK,
-					ttnpb.Right_RIGHT_APPLICATION_SETTINGS_API_KEYS,
-					ttnpb.Right_RIGHT_APPLICATION_SETTINGS_COLLABORATORS,
-				},
-			},
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
-		}, collaboratorCreds)
-
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
-
-		// Remove RIGHT_APPLICATION_ALL from collaborator to be removed
-		newRights := ttnpb.AllApplicationRights.Sub(ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_ALL))
-		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
-			ApplicationIds: applicationID,
-			Collaborator: &ttnpb.Collaborator{
-				Ids:    removedCollaboratorID,
-				Rights: newRights.Rights,
-			},
-		}, usrCreds)
-
-		a.So(err, should.BeNil)
-
-		// Remove RIGHT_APPLICATION_ALL from api key to be removed
-		key, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
-			ApplicationIds: applicationID,
-			ApiKey: &ttnpb.APIKey{
-				Id:     apiKey.Id,
-				Rights: newRights.Rights,
-			},
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
-		}, usrCreds)
-
-		a.So(err, should.BeNil)
-		if a.So(key, should.NotBeNil) && a.So(key.Rights, should.NotBeNil) {
-			a.So(key.Rights, should.Resemble, newRights.Rights)
-		}
-
-		newRights = newRights.Sub(ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_LINK))
-		key, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
-			ApplicationIds: applicationID,
-			ApiKey: &ttnpb.APIKey{
-				Id:     apiKey.Id,
-				Rights: newRights.Rights,
-			},
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
-		}, collaboratorCreds)
-
-		a.So(err, should.BeNil)
-		if a.So(key, should.NotBeNil) && a.So(key.Rights, should.NotBeNil) {
-			a.So(key.Rights, should.Resemble, newRights.Rights)
-		}
-
-		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
-			ApplicationIds: applicationID,
-			Collaborator: &ttnpb.Collaborator{
-				Ids:    removedCollaboratorID,
-				Rights: newRights.Rights,
-			},
-		}, collaboratorCreds)
-
-		a.So(err, should.BeNil)
-
-		// Try revoking RIGHT_APPLICATION_DELETE from collaborator without having it
-		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
-			ApplicationIds: applicationID,
-			Collaborator: &ttnpb.Collaborator{
-				Ids:    removedCollaboratorID,
-				Rights: newRights.Sub(ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_DELETE)).Rights,
-			},
-		}, collaboratorCreds)
-
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
-
-		// Try revoking RIGHT_APPLICATION_DELETE from api key without having it
-		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
-			ApplicationIds: applicationID,
-			ApiKey: &ttnpb.APIKey{
-				Id:     apiKey.Id,
-				Rights: newRights.Sub(ttnpb.RightsFrom(ttnpb.Right_RIGHT_APPLICATION_DELETE)).Rights,
-			},
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
-		}, collaboratorCreds)
-
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
-
-		res, err := reg.GetCollaborator(ctx, &ttnpb.GetApplicationCollaboratorRequest{
-			ApplicationIds: applicationID,
-			Collaborator:   removedCollaboratorID,
-		}, collaboratorCreds)
-
-		if a.So(err, should.BeNil) {
-			a.So(res.Rights, should.Resemble, newRights.Rights)
-		}
-
-		// Delete collaborator with more rights
-		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
-			ApplicationIds: applicationID,
-			Collaborator: &ttnpb.Collaborator{
-				Ids:    removedCollaboratorID,
-				Rights: []ttnpb.Right{},
-			},
-		}, collaboratorCreds)
-
-		a.So(err, should.BeNil)
-
-		_, err = reg.GetCollaborator(ctx, &ttnpb.GetApplicationCollaboratorRequest{
-			ApplicationIds: applicationID,
-			Collaborator:   removedCollaboratorID,
-		}, collaboratorCreds)
-
+		// GetCollaborator that doesn't exist.
+		got, err := reg.GetCollaborator(ctx, &ttnpb.GetApplicationCollaboratorRequest{
+			ApplicationIds: app1.GetIds(),
+			Collaborator:   usr3.GetOrganizationOrUserIdentifiers(),
+		}, adminCreds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
 		}
+		a.So(got, should.BeNil)
 
-		// Delete api key with more rights
-		_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
-			ApplicationIds: applicationID,
-			ApiKey: &ttnpb.APIKey{
-				Id:     apiKey.Id,
-				Rights: []ttnpb.Right{},
+		// SetCollaborator adding rights that caller doesn't have.
+		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
+			ApplicationIds: app1.GetIds(),
+			Collaborator: &ttnpb.Collaborator{
+				Ids: usr2.GetOrganizationOrUserIdentifiers(),
+				Rights: []ttnpb.Right{
+					ttnpb.Right_RIGHT_APPLICATION_INFO,
+					ttnpb.Right_RIGHT_APPLICATION_LINK,
+					ttnpb.Right_RIGHT_APPLICATION_DELETE,
+				},
 			},
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
-		}, collaboratorCreds)
+		}, limitedCreds)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
 
+		// SetCollaborator removing rights that caller doesn't have.
+		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
+			ApplicationIds: app1.GetIds(),
+			Collaborator: &ttnpb.Collaborator{
+				Ids: usr2.GetOrganizationOrUserIdentifiers(),
+				Rights: []ttnpb.Right{
+					ttnpb.Right_RIGHT_APPLICATION_INFO,
+				},
+			},
+		}, limitedCreds)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
+
+		// SetCollaborator removing rights that caller has and adding rights that caller has.
+		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
+			ApplicationIds: app1.GetIds(),
+			Collaborator: &ttnpb.Collaborator{
+				Ids: usr2.GetOrganizationOrUserIdentifiers(),
+				Rights: []ttnpb.Right{
+					ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC,
+					ttnpb.Right_RIGHT_APPLICATION_LINK,
+				},
+			},
+		}, limitedCreds)
 		a.So(err, should.BeNil)
 
-		_, err = reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
-			ApplicationIds: applicationID,
-			KeyId:          apiKey.Id,
-		}, collaboratorCreds)
+		// Collaborator CRUD with different invalid credentials.
+		for _, opts := range [][]grpc.CallOption{nil, {appCreds}} {
+			_, err := reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
+				ApplicationIds: app1.GetIds(),
+				Collaborator: &ttnpb.Collaborator{
+					Ids: usr2.GetOrganizationOrUserIdentifiers(),
+					Rights: []ttnpb.Right{
+						ttnpb.Right_RIGHT_APPLICATION_INFO,
+					},
+				},
+			}, opts...)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
 
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsNotFound(err), should.BeTrue)
+			got, err := reg.GetCollaborator(ctx, &ttnpb.GetApplicationCollaboratorRequest{
+				ApplicationIds: app1.GetIds(),
+				Collaborator:   usr2.GetOrganizationOrUserIdentifiers(),
+			}, opts...)
+			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+				a.So(got, should.BeNil)
+			}
 		}
-	})
+
+		// ListCollaborators without credentials.
+		list, err := reg.ListCollaborators(ctx, &ttnpb.ListApplicationCollaboratorsRequest{
+			ApplicationIds: app1.GetIds(),
+		})
+		if a.So(err, should.NotBeNil) && a.So(errors.IsUnauthenticated(err), should.BeTrue) {
+			a.So(list, should.BeNil)
+		}
+
+		// Collaborator CRUD with different valid credentials.
+		for _, opts := range [][]grpc.CallOption{{adminCreds}, {usr1Creds}, {limitedCreds}} {
+			_, err := reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
+				ApplicationIds: app1.GetIds(),
+				Collaborator: &ttnpb.Collaborator{
+					Ids: usr3.GetOrganizationOrUserIdentifiers(),
+					Rights: []ttnpb.Right{
+						ttnpb.Right_RIGHT_APPLICATION_INFO,
+					},
+				},
+			}, opts...)
+			a.So(err, should.BeNil)
+
+			list, err := reg.ListCollaborators(ctx, &ttnpb.ListApplicationCollaboratorsRequest{
+				ApplicationIds: app1.GetIds(),
+			}, opts...)
+			if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) && a.So(list.Collaborators, should.HaveLength, 3) {
+				for _, k := range list.Collaborators {
+					if unique.ID(ctx, k.GetIds()) == unique.ID(ctx, usr3.GetIds()) {
+						a.So(k.Rights, should.Resemble, []ttnpb.Right{
+							ttnpb.Right_RIGHT_APPLICATION_INFO,
+						})
+					}
+				}
+			}
+
+			got, err := reg.GetCollaborator(ctx, &ttnpb.GetApplicationCollaboratorRequest{
+				ApplicationIds: app1.GetIds(),
+				Collaborator:   usr3.GetOrganizationOrUserIdentifiers(),
+			}, opts...)
+			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+				a.So(got.Rights, should.Resemble, []ttnpb.Right{
+					ttnpb.Right_RIGHT_APPLICATION_INFO,
+				})
+			}
+
+			_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
+				ApplicationIds: app1.GetIds(),
+				Collaborator: &ttnpb.Collaborator{
+					Ids: usr3.GetOrganizationOrUserIdentifiers(),
+				},
+			}, opts...)
+			a.So(err, should.BeNil)
+
+			got, err = reg.GetCollaborator(ctx, &ttnpb.GetApplicationCollaboratorRequest{
+				ApplicationIds: app1.GetIds(),
+				Collaborator:   usr3.GetOrganizationOrUserIdentifiers(),
+			}, opts...)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsNotFound(err), should.BeTrue)
+			}
+			a.So(got, should.BeNil)
+		}
+
+		// Try removing the only collaborator with _ALL rights.
+		_, err = reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
+			ApplicationIds: app1.GetIds(),
+			Collaborator: &ttnpb.Collaborator{
+				Ids: usr1.GetOrganizationOrUserIdentifiers(),
+			},
+		}, usr1Creds)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsFailedPrecondition(err), should.BeTrue)
+		}
+	}, withPrivateTestDatabase(p))
+}
+
+func TestApplicationAccessClusterAuth(t *testing.T) {
+	p := &storetest.Population{}
+	app1 := p.NewApplication(nil)
+
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		reg := ttnpb.NewApplicationAccessClient(cc)
+
+		rights, err := reg.ListRights(ctx, app1.GetIds(), is.WithClusterAuth())
+		if a.So(err, should.BeNil) && a.So(rights, should.NotBeNil) {
+			a.So(ttnpb.AllClusterRights.Intersect(ttnpb.AllApplicationRights).Sub(rights).Rights, should.BeEmpty)
+		}
+	}, withPrivateTestDatabase(p))
 }

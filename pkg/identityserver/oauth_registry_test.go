@@ -17,7 +17,6 @@ package identityserver
 import (
 	"testing"
 
-	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -25,8 +24,7 @@ import (
 )
 
 func TestOAuthRegistry(t *testing.T) {
-	ctx := test.Context()
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		user, creds := defaultUser, userCreds(defaultUserIdx)

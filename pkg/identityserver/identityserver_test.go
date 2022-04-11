@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,27 +15,26 @@
 package identityserver
 
 import (
-	"fmt"
-	"os"
+	"context"
+	"database/sql"
+	"strings"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/iancoleman/strcase"
+	"github.com/jinzhu/gorm"
+	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc"
-)
-
-var (
-	setup        sync.Once
-	dbConnString string
-	population   = store.NewPopulator(16, 42)
 )
 
 var (
@@ -146,6 +145,14 @@ func userCreds(idx int, preferredNames ...string) grpc.CallOption {
 		}
 	}
 	return nil
+}
+
+func rpcCreds(key *ttnpb.APIKey) grpc.CallOption {
+	return grpc.PerRPCCredentials(rpcmetadata.MD{
+		AuthType:      "bearer",
+		AuthValue:     key.Key,
+		AllowInsecure: true,
+	})
 }
 
 func userAPIKeys(userID *ttnpb.UserIdentifiers) ttnpb.APIKeys {
@@ -280,83 +287,167 @@ func userOrganizations(userID *ttnpb.UserIdentifiers) ttnpb.Organizations {
 	}
 }
 
-func getIdentityServer(t *testing.T) (*IdentityServer, *grpc.ClientConn) {
-	ctx := log.NewContext(test.Context(), test.GetLogger(t))
-	setup.Do(func() {
-		dbAddress := os.Getenv("SQL_DB_ADDRESS")
-		if dbAddress == "" {
-			dbAddress = "localhost:5432"
-		}
-		dbName := os.Getenv("TEST_DATABASE_NAME")
-		if dbName == "" {
-			dbName = "ttn_lorawan_is_test"
-		}
-		dbAuth := os.Getenv("SQL_DB_AUTH")
-		if dbAuth == "" {
-			dbAuth = "root:root"
-		}
-		dbConnString = fmt.Sprintf("postgresql://%s@%s/%s?sslmode=disable", dbAuth, dbAddress, dbName)
-		db, err := store.Open(ctx, dbConnString)
-		if err != nil {
-			panic(err)
-		}
-		defer db.Close()
-		if err = store.Initialize(db); err != nil {
-			panic(err)
-		}
-		if err = store.AutoMigrate(db).Error; err != nil {
-			panic(err)
-		}
-		if err = store.Clear(db); err != nil {
-			panic(err)
-		}
-		if err = population.Populate(test.Context(), db); err != nil {
-			panic(err)
-		}
-	})
-	c := componenttest.NewComponent(t, &component.Config{ServiceBase: config.ServiceBase{
-		Base: config.Base{
-			Log: config.Log{
-				Level: log.DebugLevel,
-			},
-		},
-		KeyVault: config.KeyVault{
-			Provider: "static",
-			Static: map[string][]byte{
-				"is-test": {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F},
-			},
-		},
-	}})
-	conf := &Config{
-		DatabaseURI: dbConnString,
+type testOptions struct {
+	privateDatabase bool
+	population      *storetest.Population
+	componentConfig *component.Config
+	isConfig        *Config
+}
+
+type TestOption func(*testOptions)
+
+func withPrivateTestDatabase(p *storetest.Population) TestOption {
+	return func(opts *testOptions) {
+		opts.privateDatabase = true
+		opts.population = p
 	}
-	conf.UserRegistration.Enabled = true
-	conf.UserRegistration.PasswordRequirements.MinLength = 10
-	conf.UserRegistration.PasswordRequirements.MaxLength = 1000
-	conf.Email.Templates.Static = map[string][]byte{
+}
+
+func defaultTestOptions() *testOptions {
+	testOptions := &testOptions{}
+	testOptions.componentConfig = &component.Config{
+		ServiceBase: config.ServiceBase{
+			Base: config.Base{
+				Log: config.Log{
+					Level: log.DebugLevel,
+				},
+			},
+			Cluster: cluster.Config{
+				Keys: []string{
+					"11111111111111111111111111111111",
+				},
+			},
+			KeyVault: config.KeyVault{
+				Provider: "static",
+				Static: map[string][]byte{
+					"is-test": {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F},
+				},
+			},
+		},
+	}
+	testOptions.isConfig = &Config{}
+	testOptions.isConfig.UserRegistration.Enabled = true
+	testOptions.isConfig.UserRegistration.PasswordRequirements.MinLength = 10
+	testOptions.isConfig.UserRegistration.PasswordRequirements.MaxLength = 1000
+	testOptions.isConfig.Email.Templates.Static = map[string][]byte{
 		"overridden.subject.txt": []byte("Overridden subject {{.User.Name}}"),
 		"overridden.html":        []byte("Overridden HTML {{.User.Name}} {{.User.Email}}"),
 		"overridden.txt":         []byte("Overridden text {{.User.Name}} {{.User.Email}}"),
 	}
-	conf.UserRights.CreateApplications = true
-	conf.UserRights.CreateClients = true
-	conf.UserRights.CreateGateways = true
-	conf.UserRights.CreateOrganizations = true
-	conf.AdminRights.All = true
-	conf.DevEUIBlock.Enabled = true
-	conf.DevEUIBlock.ApplicationLimit = 3
-	conf.Network.NetID = test.DefaultNetID
-	conf.Network.TenantID = "test"
-	is, err := New(c, conf)
+	testOptions.isConfig.UserRights.CreateApplications = true
+	testOptions.isConfig.UserRights.CreateClients = true
+	testOptions.isConfig.UserRights.CreateGateways = true
+	testOptions.isConfig.UserRights.CreateOrganizations = true
+	testOptions.isConfig.AdminRights.All = true
+	testOptions.isConfig.DevEUIBlock.Enabled = true
+	testOptions.isConfig.DevEUIBlock.ApplicationLimit = 3
+	testOptions.isConfig.Network.NetID = test.DefaultNetID
+	testOptions.isConfig.Network.TenantID = "test"
+	return testOptions
+}
+
+var (
+	population = store.NewPopulator(16, 42)
+	baseDSN    = storetest.GetDSN("ttn_lorawan_is_test")
+	baseDB     = func() *sql.DB {
+		baseDB, err := sql.Open("postgres", baseDSN.String())
+		if err != nil {
+			panic(err)
+		}
+		return baseDB
+	}()
+	setupBaseDBOnce sync.Once
+	setupBaseDBErr  error
+)
+
+func testWithIdentityServer(t *testing.T, f func(*IdentityServer, *grpc.ClientConn), options ...TestOption) {
+	testOptions := defaultTestOptions()
+	for _, option := range options {
+		option(testOptions)
+	}
+
+	setupBaseDBOnce.Do(func() {
+		var db *gorm.DB
+		db, setupBaseDBErr = store.Open(context.Background(), baseDSN.String())
+		if setupBaseDBErr != nil {
+			return
+		}
+		defer db.Close()
+		if setupBaseDBErr = store.Initialize(db); setupBaseDBErr != nil {
+			return
+		}
+		if setupBaseDBErr = store.AutoMigrate(db).Error; setupBaseDBErr != nil {
+			return
+		}
+	})
+	if setupBaseDBErr != nil {
+		t.Fatal(setupBaseDBErr)
+	}
+
+	testName := t.Name()
+	if i := strings.IndexRune(testName, '/'); i != -1 {
+		testName = testName[:i]
+	}
+	schemaName := strcase.ToSnake(testName)
+	schemaDSN := baseDSN
+
+	if testOptions.privateDatabase {
+		if err := storetest.CreateSchema(baseDB, schemaName); err != nil {
+			t.Fatal(err)
+		}
+		schemaDSN = storetest.GetSchemaDSN(baseDSN, schemaName)
+	}
+
+	db, err := store.Open(context.Background(), schemaDSN.String())
 	if err != nil {
 		t.Fatal(err)
 	}
-	componenttest.StartComponent(t, c)
-	return is, is.LoopbackConn()
-}
+	defer db.Close()
 
-func testWithIdentityServer(t *testing.T, f func(is *IdentityServer, cc *grpc.ClientConn)) {
-	f(getIdentityServer(t))
+	if testOptions.privateDatabase {
+		if err = store.Initialize(db); err != nil {
+			t.Fatal(err)
+		}
+		if err = store.AutoMigrate(db).Error; err != nil {
+			t.Fatal(err)
+		}
+	} else {
+		if err = store.Clear(db); err != nil {
+			t.Fatal(err)
+		}
+		if err = population.Populate(test.Context(), db); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	if testOptions.population != nil {
+		if err = testOptions.population.Populate(test.Context(), store.NewCombinedStore(db)); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	c := componenttest.NewComponent(t, testOptions.componentConfig)
+	testOptions.isConfig.DatabaseURI = schemaDSN.String()
+	is, err := New(c, testOptions.isConfig)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	componenttest.StartComponent(t, c)
+
+	f(is, is.LoopbackConn())
+
+	is.Close()
+
+	if testOptions.privateDatabase {
+		if t.Failed() {
+			t.Logf("Keeping database %q", schemaDSN)
+		} else {
+			if err = storetest.DropSchema(baseDB, schemaName); err != nil {
+				t.Fatal(err)
+			}
+		}
+	}
 }
 
 func reverse(s string) string {

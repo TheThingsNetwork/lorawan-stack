@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,236 +16,202 @@ package identityserver
 
 import (
 	"testing"
-	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
-	"github.com/smartystreets/assertions"
+	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
-	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 func TestEndDevicesPermissionDenied(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	p := &storetest.Population{}
+	usr1 := p.NewUser()
+	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+	dev1 := p.NewEndDevice(app1.GetIds())
 
-	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewEndDeviceRegistryClient(cc)
-
-		joinEUI := types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
-		devEUI := types.EUI64{8, 7, 6, 5, 4, 3, 2, 1}
 
 		_, err := reg.Create(ctx, &ttnpb.CreateEndDeviceRequest{
 			EndDevice: &ttnpb.EndDevice{
 				Ids: &ttnpb.EndDeviceIdentifiers{
-					DeviceId: "test-device-id",
-					ApplicationIds: &ttnpb.ApplicationIdentifiers{
-						ApplicationId: "test-app-id",
-					},
+					ApplicationIds: app1.GetIds(),
+					DeviceId:       "foo-dev",
 				},
 			},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
 		_, err = reg.Get(ctx, &ttnpb.GetEndDeviceRequest{
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
-			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-				DeviceId: "test-device-id",
-				ApplicationIds: &ttnpb.ApplicationIdentifiers{
-					ApplicationId: "test-app-id",
-				},
-			},
+			EndDeviceIds: dev1.GetIds(),
+			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
-		_, err = reg.GetIdentifiersForEUIs(ctx, &ttnpb.GetEndDeviceIdentifiersForEUIsRequest{
-			JoinEui: joinEUI,
-			DevEui:  devEUI,
-		})
-
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsUnauthenticated(err), should.BeTrue)
-		}
-
 		_, err = reg.List(ctx, &ttnpb.ListEndDevicesRequest{
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
-			ApplicationIds: &ttnpb.ApplicationIdentifiers{
-				ApplicationId: "test-app-id",
-			},
+			ApplicationIds: app1.GetIds(),
+			FieldMask:      &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
 		_, err = reg.Update(ctx, &ttnpb.UpdateEndDeviceRequest{
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 			EndDevice: &ttnpb.EndDevice{
-				Ids: &ttnpb.EndDeviceIdentifiers{
-					DeviceId: "test-device-id",
-					ApplicationIds: &ttnpb.ApplicationIdentifiers{
-						ApplicationId: "test-app-id",
-					},
-				},
+				Ids:  dev1.GetIds(),
+				Name: "Updated Name",
 			},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		})
-
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
 
-		_, err = reg.Delete(ctx, &ttnpb.EndDeviceIdentifiers{
-			DeviceId: "test-device-id",
-			ApplicationIds: &ttnpb.ApplicationIdentifiers{
-				ApplicationId: "test-app-id",
-			},
-		})
-
+		_, err = reg.Delete(ctx, dev1.GetIds())
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-	})
+	}, withPrivateTestDatabase(p))
 }
 
 func TestEndDevicesCRUD(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	p := &storetest.Population{}
+
+	usr1 := p.NewUser()
+	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+	for i := 0; i < 5; i++ {
+		p.NewEndDevice(app1.GetIds())
+	}
+
+	key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	creds := rpcCreds(key)
+
+	t.Parallel()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewEndDeviceRegistryClient(cc)
 
-		userID := defaultUser.GetIds()
-		creds := userCreds(defaultUserIdx)
-		app := userApplications(userID).Applications[0]
-
-		joinEUI := types.EUI64{1, 2, 3, 4, 5, 6, 7, 8}
-		devEUI := types.EUI64{8, 7, 6, 5, 4, 3, 2, 1}
-
-		start := time.Now()
-
+		// Test batch fetch with cluster authorization
 		list, err := reg.List(ctx, &ttnpb.ListEndDevicesRequest{
-			FieldMask:      &pbtypes.FieldMask{Paths: []string{"ids"}},
-			ApplicationIds: nil,
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"ids"}},
 		}, is.WithClusterAuth())
-
-		a.So(err, should.BeNil)
-		a.So(list.EndDevices, should.HaveLength, 16)
+		if a.So(err, should.BeNil) {
+			a.So(list.EndDevices, should.HaveLength, 5)
+		}
 
 		created, err := reg.Create(ctx, &ttnpb.CreateEndDeviceRequest{
 			EndDevice: &ttnpb.EndDevice{
 				Ids: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:       "test-device-id",
-					ApplicationIds: app.GetIds(),
-					JoinEui:        &joinEUI,
-					DevEui:         &devEUI,
+					ApplicationIds: app1.GetIds(),
+					DeviceId:       "foo",
 				},
-				Name: "test-device-name",
+				Name: "Foo Device",
 			},
 		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(created, should.NotBeNil) {
-			a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenAfter, start)
-			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenAfter, start)
-			a.So(created.Name, should.Equal, "test-device-name")
+		if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
+			a.So(created.Name, should.Equal, "Foo Device")
 		}
 
 		got, err := reg.Get(ctx, &ttnpb.GetEndDeviceRequest{
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
-			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-				DeviceId:       "test-device-id",
-				ApplicationIds: app.GetIds(),
-			},
+			EndDeviceIds: created.GetIds(),
+			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(got, should.NotBeNil) {
-			a.So(got.Name, should.Equal, "test-device-name")
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got.Name, should.Equal, created.Name)
 		}
 
-		ids, err := reg.GetIdentifiersForEUIs(ctx, &ttnpb.GetEndDeviceIdentifiersForEUIsRequest{
-			JoinEui: joinEUI,
-			DevEui:  devEUI,
-		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(ids, should.NotBeNil) {
-			a.So(*ids, should.Resemble, created.Ids)
-		}
-
-		_, err = reg.Create(ctx, &ttnpb.CreateEndDeviceRequest{
+		updated, err := reg.Update(ctx, &ttnpb.UpdateEndDeviceRequest{
 			EndDevice: &ttnpb.EndDevice{
-				Ids: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:       "other-test-device-id",
-					ApplicationIds: app.GetIds(),
-					JoinEui:        &joinEUI,
-					DevEui:         &devEUI,
-				},
-				Name: "test-device-name",
+				Ids:  created.GetIds(),
+				Name: "Updated Name",
 			},
+			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
 		}, creds)
-
-		if a.So(err, should.NotBeNil) {
-			a.So(err, should.HaveSameErrorDefinitionAs, errEndDeviceEUIsTaken)
+		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
+			a.So(updated.Name, should.Equal, "Updated Name")
 		}
 
 		list, err = reg.List(ctx, &ttnpb.ListEndDevicesRequest{
+			ApplicationIds: app1.GetIds(),
 			FieldMask:      &pbtypes.FieldMask{Paths: []string{"name"}},
-			ApplicationIds: app.GetIds(),
 		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(list, should.NotBeNil) && a.So(list.EndDevices, should.HaveLength, 2) {
-			if a.So(list.EndDevices[1], should.NotBeNil) {
-				a.So(list.EndDevices[1].Name, should.Equal, "test-device-name")
+		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) && a.So(list.EndDevices, should.HaveLength, 6) {
+			var found bool
+			for _, item := range list.EndDevices {
+				if item.GetIds().GetDeviceId() == created.GetIds().GetDeviceId() {
+					found = true
+					a.So(item.Name, should.Equal, updated.Name)
+				}
 			}
+			a.So(found, should.BeTrue)
 		}
 
-		start = time.Now()
-
-		updated, err := reg.Update(ctx, &ttnpb.UpdateEndDeviceRequest{
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
-			EndDevice: &ttnpb.EndDevice{
-				Ids: &ttnpb.EndDeviceIdentifiers{
-					DeviceId:       "test-device-id",
-					ApplicationIds: app.GetIds(),
-				},
-				Name: "test-device-name-new",
-			},
-		}, creds)
-
+		_, err = reg.Delete(ctx, created.GetIds(), creds)
 		a.So(err, should.BeNil)
-		if a.So(updated, should.NotBeNil) {
-			a.So(updated.Name, should.Equal, "test-device-name-new")
-			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenAfter, start)
+	}, withPrivateTestDatabase(p))
+}
+
+func TestEndDevicesPagination(t *testing.T) {
+	p := &storetest.Population{}
+
+	usr1 := p.NewUser()
+	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+	for i := 0; i < 3; i++ {
+		p.NewEndDevice(app1.GetIds())
+	}
+
+	key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	creds := rpcCreds(key)
+
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		reg := ttnpb.NewEndDeviceRegistryClient(cc)
+
+		var md metadata.MD
+
+		list, err := reg.List(ctx, &ttnpb.ListEndDevicesRequest{
+			ApplicationIds: app1.GetIds(),
+			FieldMask:      &pbtypes.FieldMask{Paths: []string{"name"}},
+			Limit:          2,
+			Page:           1,
+		}, creds, grpc.Header(&md))
+		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
+			a.So(list.EndDevices, should.HaveLength, 2)
+			a.So(md.Get("x-total-count"), should.Resemble, []string{"3"})
 		}
 
-		_, err = reg.Delete(ctx, &ttnpb.EndDeviceIdentifiers{
-			DeviceId:       "test-device-id",
-			ApplicationIds: app.GetIds(),
+		list, err = reg.List(ctx, &ttnpb.ListEndDevicesRequest{
+			ApplicationIds: app1.GetIds(),
+			FieldMask:      &pbtypes.FieldMask{Paths: []string{"name"}},
+			Limit:          2,
+			Page:           2,
 		}, creds)
-
-		a.So(err, should.BeNil)
-
-		_, err = reg.Get(ctx, &ttnpb.GetEndDeviceRequest{
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
-			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-				DeviceId:       "test-device-id",
-				ApplicationIds: app.GetIds(),
-			},
-		}, creds)
-
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsNotFound(err), should.BeTrue)
+		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
+			a.So(list.EndDevices, should.HaveLength, 1)
 		}
-	})
+
+		list, err = reg.List(ctx, &ttnpb.ListEndDevicesRequest{
+			ApplicationIds: app1.GetIds(),
+			FieldMask:      &pbtypes.FieldMask{Paths: []string{"name"}},
+			Limit:          2,
+			Page:           3,
+		}, creds)
+		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) {
+			a.So(list.EndDevices, should.BeEmpty)
+		}
+	}, withPrivateTestDatabase(p))
 }
