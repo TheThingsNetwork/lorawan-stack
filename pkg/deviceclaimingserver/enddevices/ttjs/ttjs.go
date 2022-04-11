@@ -219,7 +219,7 @@ func (client *TTJS) Claim(ctx context.Context, joinEUI *types.EUI64, devEUI *typ
 	if err != nil {
 		logger.WithError(err).Warn("Failed to decode error message")
 	} else {
-		logger.WithField("error", errResp.Message).Warn("Failed to unclaim end device")
+		logger.WithField("error", errResp.Message).Warn("Failed to claim end device")
 	}
 
 	switch resp.StatusCode {
@@ -350,7 +350,7 @@ func (client *TTJS) GetClaimStatus(ctx context.Context, ids *ttnpb.EndDeviceIden
 	if err != nil {
 		logger.WithError(err).Warn("Failed to decode error message")
 	} else {
-		logger.WithField("error", errResp.Message).Warn("Failed to unclaim end device")
+		logger.WithField("error", errResp.Message).Warn("Failed to get claim status")
 	}
 
 	switch resp.StatusCode {
