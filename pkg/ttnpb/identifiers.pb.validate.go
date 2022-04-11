@@ -1064,14 +1064,7 @@ func (m *EndDeviceVersionIdentifiers) ValidateFields(paths ...string) error {
 			}
 
 		case "vendor_id":
-
-			if m.GetVendorId() < 1 {
-				return EndDeviceVersionIdentifiersValidationError{
-					field:  "vendor_id",
-					reason: "value must be greater than or equal to 1",
-				}
-			}
-
+			// no validation rules for VendorId
 		case "vendor_profile_id":
 			// no validation rules for VendorProfileId
 		case "serial_number":

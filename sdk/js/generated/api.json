@@ -20980,15 +20980,7 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": "",
-              "options": {
-                "validate.rules": [
-                  {
-                    "name": "uint32.gte",
-                    "value": 1
-                  }
-                ]
-              }
+              "defaultValue": ""
             },
             {
               "name": "vendor_profile_id",

@@ -4622,7 +4622,6 @@ Identifies an end device model with version information.
 | `hardware_version` | <p>`string.max_len`: `32`</p> |
 | `firmware_version` | <p>`string.max_len`: `32`</p> |
 | `band_id` | <p>`string.max_len`: `32`</p> |
-| `vendor_id` | <p>`uint32.gte`: `1`</p> |
 | `serial_number` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.EntityIdentifiers">Message `EntityIdentifiers`</a>
