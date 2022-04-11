@@ -21,16 +21,20 @@ import pipe from '@ttn-lw/lib/pipe'
 import { mayViewApplicationInfo } from '@console/lib/feature-checks'
 
 import {
+  isOtherClusterApp,
   selectSelectedApplication,
   selectSelectedApplicationId,
 } from '@console/store/selectors/applications'
 
 const mapStateToProps = state => {
   const appId = selectSelectedApplicationId(state)
+  const application = selectSelectedApplication(state)
+  const shouldRedirect = isOtherClusterApp(application)
 
   return {
     appId,
-    application: selectSelectedApplication(state),
+    application,
+    shouldRedirect,
   }
 }
 

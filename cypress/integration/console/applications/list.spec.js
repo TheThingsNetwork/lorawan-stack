@@ -70,6 +70,7 @@ describe('Applications list', () => {
     cy.createApplication(applications[0], userId)
     cy.createApplication(applications[1], userId)
     cy.createApplication(applications[2], userId)
+    cy.createApplication(applications[3], userId)
   })
 
   beforeEach(() => {
@@ -79,11 +80,12 @@ describe('Applications list', () => {
 
   it('succeeds searching by application id', () => {
     cy.findByRole('rowgroup').within(() => {
-      cy.findAllByRole('row').should('have.length', 3)
+      cy.findAllByRole('row').should('have.length', 4)
     })
     cy.findByRole('cell', { name: applications[0].ids.application_id }).should('be.visible')
     cy.findByRole('cell', { name: applications[1].ids.application_id }).should('be.visible')
     cy.findByRole('cell', { name: applications[2].ids.application_id }).should('be.visible')
+    cy.findByRole('cell', { name: applications[3].ids.application_id }).should('be.visible')
 
     cy.findByTestId('search-input').as('searchInput')
     cy.get('@searchInput').type('xyz')
@@ -94,6 +96,7 @@ describe('Applications list', () => {
     cy.findByRole('cell', { name: applications[0].ids.application_id }).should('be.visible')
     cy.findByRole('cell', { name: applications[1].ids.application_id }).should('not.exist')
     cy.findByRole('cell', { name: applications[2].ids.application_id }).should('not.exist')
+    cy.findByRole('cell', { name: applications[3].ids.application_id }).should('not.exist')
 
     cy.get('@searchInput').clear()
     cy.get('@searchInput').type('some')
@@ -104,22 +107,43 @@ describe('Applications list', () => {
     cy.findByRole('cell', { name: applications[0].ids.application_id }).should('not.exist')
     cy.findByRole('cell', { name: applications[1].ids.application_id }).should('be.visible')
     cy.findByRole('cell', { name: applications[2].ids.application_id }).should('not.exist')
+    cy.findByRole('cell', { name: applications[3].ids.application_id }).should('not.exist')
 
     cy.get('@searchInput').clear()
     cy.get('@searchInput').type('test-app')
 
     cy.findByRole('rowgroup').within(() => {
-      cy.findAllByRole('row').should('have.length', 3)
+      cy.findAllByRole('row').should('have.length', 4)
     })
     cy.findByRole('cell', { name: applications[0].ids.application_id }).should('be.visible')
     cy.findByRole('cell', { name: applications[1].ids.application_id }).should('be.visible')
     cy.findByRole('cell', { name: applications[2].ids.application_id }).should('be.visible')
+    cy.findByRole('cell', { name: applications[3].ids.application_id }).should('be.visible')
   })
 
-  it('succeeds not showing application on other cluster', () => {
-    cy.findByRole('rowgroup').within(() => {
-      cy.findAllByRole('row').should('have.length', 3)
-    })
-    cy.findByRole('cell', { name: applications[3].ids.application_id }).should('not.exist')
+  it('succeeds disabling click on applications that are on another cluster', () => {
+    cy.findByText(applications[3].ids.application_id).click()
+    cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/applications`)
+    cy.findByTestId('full-error-view').should('not.exist')
+  })
+
+  it('succeeds showing "Other cluster" status on applications that are on another cluster', () => {
+    cy.findByText(applications[3].ids.application_id)
+      .closest('[role="row"]')
+      .within(() => {
+        cy.findByText('Other cluster').should('be.visible')
+      })
+  })
+
+  it('succeeds redirecting when manually accessing devices that are on another cluster', () => {
+    cy.visit(
+      `${Cypress.config('consoleRootPath')}/applications/${applications[3].ids.application_id}`,
+    )
+
+    cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/applications`)
+    cy.findByTestId('full-error-view').should('not.exist')
+    cy.findByText(
+      'The application you attempted to visit is registered on a different cluster and needs to be accessed using its host Console.',
+    )
   })
 })

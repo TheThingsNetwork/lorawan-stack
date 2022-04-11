@@ -114,9 +114,6 @@ class Tabular extends React.Component {
     const rows = paginatedData.map((row, rowIndex) => {
       // If the whole table is disabled each row should be as well.
       const rowClickable = !clickable ? false : row._meta?.clickable ?? clickable
-      if (row._meta?.hide) {
-        return null
-      }
 
       return (
         <Table.Row

@@ -17,10 +17,13 @@ import { connect } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { bindActionCreators } from 'redux'
 
-import toast from '@ttn-lw/components/toast'
+import Icon from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import ButtonGroup from '@ttn-lw/components/button/group'
 import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
+import DocTooltip from '@ttn-lw/components/tooltip/doc'
+import Status from '@ttn-lw/components/status'
+import toast from '@ttn-lw/components/toast'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
@@ -52,6 +55,8 @@ const m = defineMessages({
   restoreFail: 'There was an error and application could not be restored',
   purgeSuccess: 'Application purged',
   purgeFail: 'There was an error and the application could not be purged',
+  otherClusterTooltip:
+    'This application is registered on a different cluster (`{host}`). To access this application, use the Console of the cluster that this application was registered on.',
 })
 
 const OWNED_TAB = 'owned'
@@ -157,11 +162,44 @@ const ApplicationsTable = props => {
         ),
       })
     } else {
-      baseHeaders.push({
-        name: 'description',
-        displayName: sharedMessages.description,
-        width: 50,
-      })
+      baseHeaders.push(
+        {
+          name: 'description',
+          displayName: sharedMessages.description,
+          width: 50,
+        },
+        {
+          name: 'status',
+          displayName: '',
+          width: 20,
+          render: status => {
+            if (status.otherCluster) {
+              const host = status.host
+              return (
+                <DocTooltip
+                  docPath="/getting-started/cloud-hosted"
+                  content={
+                    <Message content={m.otherClusterTooltip} values={{ host }} convertBackticks />
+                  }
+                  placement="top-end"
+                >
+                  <Status status="unknown" label={sharedMessages.otherCluster}>
+                    <Icon
+                      icon="help_outline"
+                      textPaddedLeft
+                      small
+                      nudgeUp
+                      className="tc-subtle-gray"
+                    />
+                  </Status>
+                </DocTooltip>
+              )
+            }
+
+            return null
+          },
+        },
+      )
     }
 
     return baseHeaders
@@ -174,9 +212,13 @@ const ApplicationsTable = props => {
     for (const app of applications) {
       decoratedApplications.push({
         ...app,
-        otherCluster: isOtherClusterApp(app),
+        status: {
+          otherCluster: isOtherClusterApp(app),
+          host:
+            app.application_server_address || app.network_server_address || app.join_server_address,
+        },
         _meta: {
-          hide: isOtherClusterApp(app),
+          clickable: !isOtherClusterApp(app),
         },
       })
     }
