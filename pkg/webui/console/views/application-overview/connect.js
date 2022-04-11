@@ -19,9 +19,9 @@ import withFeatureRequirement from '@console/lib/components/with-feature-require
 import pipe from '@ttn-lw/lib/pipe'
 
 import { mayViewApplicationInfo } from '@console/lib/feature-checks'
+import isOtherClusterApp from '@console/lib/application-utils'
 
 import {
-  isOtherClusterApp,
   selectSelectedApplication,
   selectSelectedApplicationId,
 } from '@console/store/selectors/applications'

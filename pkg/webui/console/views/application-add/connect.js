@@ -19,7 +19,6 @@ import withRequest from '@ttn-lw/lib/components/with-request'
 
 import withFeatureRequirement from '@console/lib/components/with-feature-requirement'
 
-import { selectNsConfig, selectAsConfig, selectJsConfig } from '@ttn-lw/lib/selectors/env'
 import pipe from '@ttn-lw/lib/pipe'
 
 import { mayCreateApplications } from '@console/lib/feature-checks'
@@ -33,9 +32,6 @@ const mapStateToProps = state => ({
   userId: selectUserId(state),
   rights: selectUserRights(state),
   fetching: selectOrganizationFetching(state),
-  jsConfig: selectJsConfig(),
-  nsConfig: selectNsConfig(),
-  asConfig: selectAsConfig(),
 })
 
 const mapDispatchToProps = dispatch => ({

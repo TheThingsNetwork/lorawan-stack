@@ -26,6 +26,7 @@ import SubmitBar from '@ttn-lw/components/submit-bar'
 
 import OwnersSelect from '@console/containers/owners-select'
 
+import { selectNsConfig, selectAsConfig, selectJsConfig } from '@ttn-lw/lib/selectors/env'
 import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -56,16 +57,17 @@ const validationSchema = Yup.object().shape({
 })
 
 const ApplicationAdd = props => {
-  const { userId, navigateToApplication, asConfig, jsConfig, nsConfig } = props
-  const jsHost = getHostFromUrl(jsConfig.base_url)
-  const nsHost = getHostFromUrl(nsConfig.base_url)
-  const asHost = getHostFromUrl(asConfig.base_url)
+  const { userId, navigateToApplication } = props
+  const jsHost = getHostFromUrl(selectJsConfig().base_url)
+  const nsHost = getHostFromUrl(selectNsConfig().base_url)
+  const asHost = getHostFromUrl(selectAsConfig().base_url)
 
   const [error, setError] = useState()
 
   const handleSubmit = useCallback(
     async (values, { setSubmitting }) => {
       const { owner_id, application_id, name, description } = values
+
       setError(undefined)
 
       try {
@@ -145,29 +147,8 @@ const ApplicationAdd = props => {
 }
 
 ApplicationAdd.propTypes = {
-  asConfig: PropTypes.shape({
-    base_url: PropTypes.string,
-  }),
-  jsConfig: PropTypes.shape({
-    base_url: PropTypes.string,
-  }),
   navigateToApplication: PropTypes.func.isRequired,
-  nsConfig: PropTypes.shape({
-    base_url: PropTypes.string,
-  }),
   userId: PropTypes.string.isRequired,
-}
-
-ApplicationAdd.defaultProps = {
-  asConfig: {
-    base_url: undefined,
-  },
-  nsConfig: {
-    base_url: undefined,
-  },
-  jsConfig: {
-    base_url: undefined,
-  },
 }
 
 export default ApplicationAdd
