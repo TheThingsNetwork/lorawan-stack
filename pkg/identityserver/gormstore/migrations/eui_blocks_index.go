@@ -18,7 +18,6 @@ import (
 	"context"
 
 	"github.com/jinzhu/gorm"
-	store "go.thethings.network/lorawan-stack/v3/pkg/identityserver/gormstore"
 )
 
 // EUIBlocksIndex removes the unique index constraint from `type` field.
@@ -29,12 +28,38 @@ func (EUIBlocksIndex) Name() string {
 	return "eui_blocks_index"
 }
 
+func (EUIBlocksIndex) table() string {
+	return "eui_blocks"
+}
+
 // Apply implements Migration.
 func (m EUIBlocksIndex) Apply(ctx context.Context, db *gorm.DB) error {
-	return db.Model(store.EUIBlock{}).RemoveIndex("eui_block_index").Error
+	db = db.Table(m.table())
+	for _, indexName := range []string{
+		"eui_block_index", // The (type) unique index.
+	} {
+		if !db.Dialect().HasIndex(m.table(), indexName) {
+			continue
+		}
+		if err := db.RemoveIndex(indexName).Error; err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // Rollback implements migration. It recreates the removed "eui_block_index".
 func (m EUIBlocksIndex) Rollback(ctx context.Context, db *gorm.DB) error {
-	return db.Model(store.EUIBlock{}).AddUniqueIndex("eui_block_index", "type").Error
+	db = db.Table(m.table())
+	for indexName, columns := range map[string][]string{
+		"eui_block_index": {"type"},
+	} {
+		if db.Dialect().HasIndex(m.table(), indexName) {
+			continue
+		}
+		if err := db.AddUniqueIndex(indexName, columns...).Error; err != nil {
+			return err
+		}
+	}
+	return nil
 }
