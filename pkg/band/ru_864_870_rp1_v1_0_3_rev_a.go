@@ -20,7 +20,7 @@ import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 var RU_864_870_RP1_V1_0_3_Rev_A = Band{
 	ID: RU_864_870,
 
-	EnableADR: true,
+	SupportsDynamicADR: true,
 
 	MaxUplinkChannels: 16,
 	UplinkChannels:    ru864870DefaultChannels,

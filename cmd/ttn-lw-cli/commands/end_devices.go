@@ -77,6 +77,9 @@ func addDeprecatedDeviceFlags(flagSet *pflag.FlagSet) {
 	util.DeprecateFlag(flagSet, "pending_session.keys.nwk_s_key", "pending_session.keys.f_nwk_s_int_key")
 	util.DeprecateFlag(flagSet, "session.keys.nwk_s_key.key", "session.keys.f_nwk_s_int_key.key")
 	util.DeprecateFlag(flagSet, "pending_session.keys.nwk_s_key.key", "pending_session.keys.f_nwk_s_int_key.key")
+
+	util.HideFlag(flagSet, "mac_settings.use_adr")
+	util.HideFlag(flagSet, "mac_settings.adr_margin")
 }
 
 func forwardDeprecatedDeviceFlags(flagSet *pflag.FlagSet) {
@@ -333,8 +336,12 @@ var (
 				return err
 			}
 
-			device.SetFields(res, "ids.dev_addr")
-			device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...)
+			if err := device.SetFields(res, "ids.dev_addr"); err != nil {
+				return err
+			}
+			if err := device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...); err != nil {
+				return err
+			}
 			if device.CreatedAt == nil || (res.CreatedAt != nil && ttnpb.StdTime(res.CreatedAt).Before(*ttnpb.StdTime(device.CreatedAt))) {
 				device.CreatedAt = res.CreatedAt
 			}
@@ -516,7 +523,7 @@ var (
 				paths = append(paths, "locations")
 			}
 
-			if err = util.SetFields(device, setEndDeviceFlags); err != nil {
+			if err := util.SetFields(device, setEndDeviceFlags); err != nil {
 				return err
 			}
 
@@ -625,7 +632,9 @@ var (
 			}
 			isDevice := &ttnpb.EndDevice{}
 			logger.WithField("paths", isPaths).Debug("Create end device on Identity Server")
-			isDevice.SetFields(device, append(isPaths, "ids")...)
+			if err := isDevice.SetFields(device, append(isPaths, "ids")...); err != nil {
+				return err
+			}
 			isRes, err := ttnpb.NewEndDeviceRegistryClient(is).Create(ctx, &ttnpb.CreateEndDeviceRequest{
 				EndDevice: isDevice,
 			})
@@ -633,7 +642,9 @@ var (
 				return err
 			}
 
-			device.SetFields(isRes, append(isPaths, "created_at", "updated_at")...)
+			if err := device.SetFields(isRes, append(isPaths, "created_at", "updated_at")...); err != nil {
+				return err
+			}
 
 			res, err := setEndDevice(device, nil, nsPaths, asPaths, jsPaths, nil, true, false)
 			if err != nil {
@@ -644,7 +655,9 @@ var (
 				return err
 			}
 
-			device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...)
+			if err := device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...); err != nil {
+				return err
+			}
 			if device.CreatedAt == nil || (res.CreatedAt != nil && ttnpb.StdTime(res.CreatedAt).Before(*ttnpb.StdTime(device.CreatedAt))) {
 				device.CreatedAt = res.CreatedAt
 			}
@@ -780,7 +793,9 @@ var (
 			}
 
 			if hasUpdateDeviceLocationFlags(cmd.Flags()) {
-				device.SetFields(existingDevice, "locations")
+				if err := device.SetFields(existingDevice, "locations"); err != nil {
+					return err
+				}
 				updateDeviceLocation(device, cmd.Flags())
 			}
 
@@ -929,8 +944,12 @@ var (
 			if err != nil {
 				return err
 			}
-			device.SetFields(nsDevice, "ids.dev_addr")
-			device.SetFields(nsDevice, ttnpb.AllowedBottomLevelFields(nsPaths, getEndDeviceFromNS)...)
+			if err := device.SetFields(nsDevice, "ids.dev_addr"); err != nil {
+				return err
+			}
+			if err := device.SetFields(nsDevice, ttnpb.AllowedBottomLevelFields(nsPaths, getEndDeviceFromNS)...); err != nil {
+				return err
+			}
 			if device.CreatedAt == nil || (nsDevice.CreatedAt != nil && ttnpb.StdTime(nsDevice.CreatedAt).Before(*ttnpb.StdTime(device.CreatedAt))) {
 				device.CreatedAt = nsDevice.CreatedAt
 			}
@@ -1234,7 +1253,9 @@ This command may take end device identifiers from stdin.`,
 			if err != nil {
 				return err
 			}
-			device.SetFields(dev, append(append(nsPaths, asPaths...), jsPaths...)...)
+			if err := device.SetFields(dev, append(append(nsPaths, asPaths...), jsPaths...)...); err != nil {
+				return err
+			}
 
 			size, _ := cmd.Flags().GetUint32("size")
 			res, err := client.Generate(ctx, &ttnpb.GenerateEndDeviceQRCodeRequest{

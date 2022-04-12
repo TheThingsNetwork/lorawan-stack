@@ -72,6 +72,12 @@ nextRequested:
 
 // HasAnyField returns whether the given requested paths contain any of the given fields.
 // The requested fields (i.e. `a.b`) may be of a higher level than the search path (i.e. `a.b.c`).
+//
+// Note that this function may have unexpected results when non bottom search fields are used,
+// as HasAnyField([]string{"a.b"}, "a") is false.
+//
+// If all possibilities are `[a, a.b, a.c]`, and we have `[a.b]`, then requesting `[a]`
+// should be false because if it would be true, then `a.c` can be expected.
 func HasAnyField(requested []string, search ...string) bool {
 	for _, requested := range requested {
 		for _, search := range search {
@@ -105,6 +111,17 @@ nextPath:
 		}
 	}
 	return res
+}
+
+// NonZeroFields returns the fields which are not zero in the provided message.
+func NonZeroFields(msg interface{ FieldIsZero(string) bool }, fields ...string) []string {
+	nonZeroFields := make([]string, 0, len(fields))
+	for _, field := range fields {
+		if !msg.FieldIsZero(field) {
+			nonZeroFields = append(nonZeroFields, field)
+		}
+	}
+	return nonZeroFields
 }
 
 var errMissingField = errors.Define("missing_field", "field `{field}` is missing")
@@ -169,6 +186,20 @@ outer:
 		}
 	}
 	return selectedPaths
+}
+
+// AllowedReachableBottomLevelFields returns the reachable bottom level paths from the given paths that are in the allowed paths.
+// Reachability in this context means that all of the intermediary paths between the given paths and the bottom level paths
+// are not zero. Using only reachable paths ensures that no redundant bottom level paths are included.
+func AllowedReachableBottomLevelFields(paths, allowedPaths []string, isZero func(string) bool) []string {
+	nonZeroAllowedPaths := make([]string, 0, len(allowedPaths))
+	for _, allowedPath := range allowedPaths {
+		if isZero(allowedPath) {
+			continue
+		}
+		nonZeroAllowedPaths = append(nonZeroAllowedPaths, allowedPath)
+	}
+	return AllowedBottomLevelFields(paths, nonZeroAllowedPaths)
 }
 
 // ExcludeFields returns the given paths without the given search paths to exclude.

@@ -94,7 +94,9 @@ func getEndDevice(ids *ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []s
 					}
 					logger.WithError(err).Error("Could not get end device from Join Server")
 				} else {
-					res.SetFields(jsRes, ttnpb.AllowedBottomLevelFields(jsPaths, getEndDeviceFromJS)...)
+					if err := res.SetFields(jsRes, ttnpb.AllowedReachableBottomLevelFields(jsPaths, getEndDeviceFromJS, jsRes.FieldIsZero)...); err != nil {
+						return nil, err
+					}
 					if res.CreatedAt == nil || (jsRes.CreatedAt != nil && ttnpb.StdTime(jsRes.CreatedAt).Before(*ttnpb.StdTime(res.CreatedAt))) {
 						res.CreatedAt = jsRes.CreatedAt
 					}
@@ -128,7 +130,9 @@ func getEndDevice(ids *ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []s
 					}
 					logger.WithError(err).Error("Could not get end device from Application Server")
 				} else {
-					res.SetFields(asRes, ttnpb.AllowedBottomLevelFields(asPaths, getEndDeviceFromAS)...)
+					if err := res.SetFields(asRes, ttnpb.AllowedReachableBottomLevelFields(asPaths, getEndDeviceFromAS, asRes.FieldIsZero)...); err != nil {
+						return nil, err
+					}
 					if res.CreatedAt == nil || (asRes.CreatedAt != nil && ttnpb.StdTime(asRes.CreatedAt).Before(*ttnpb.StdTime(res.CreatedAt))) {
 						res.CreatedAt = asRes.CreatedAt
 					}
@@ -162,8 +166,12 @@ func getEndDevice(ids *ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []s
 					}
 					logger.WithError(err).Error("Could not get end device from Network Server")
 				} else {
-					res.SetFields(nsRes, "ids.dev_addr")
-					res.SetFields(nsRes, ttnpb.AllowedBottomLevelFields(nsPaths, getEndDeviceFromNS)...)
+					if err := res.SetFields(nsRes, "ids.dev_addr"); err != nil {
+						return nil, err
+					}
+					if err := res.SetFields(nsRes, ttnpb.AllowedReachableBottomLevelFields(nsPaths, getEndDeviceFromNS, nsRes.FieldIsZero)...); err != nil {
+						return nil, err
+					}
 					if res.CreatedAt == nil || (nsRes.CreatedAt != nil && ttnpb.StdTime(nsRes.CreatedAt).Before(*ttnpb.StdTime(res.CreatedAt))) {
 						res.CreatedAt = nsRes.CreatedAt
 					}
@@ -180,7 +188,9 @@ func getEndDevice(ids *ttnpb.EndDeviceIdentifiers, nsPaths, asPaths, jsPaths []s
 
 func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, unsetPaths []string, isCreate, touch bool) (*ttnpb.EndDevice, error) {
 	var res ttnpb.EndDevice
-	res.SetFields(device, "ids", "created_at", "updated_at")
+	if err := res.SetFields(device, "ids", "created_at", "updated_at"); err != nil {
+		return nil, err
+	}
 
 	if len(isPaths) > 0 && !isCreate {
 		is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -197,7 +207,9 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 		if err != nil {
 			return nil, err
 		}
-		res.SetFields(isRes, isPaths...)
+		if err := res.SetFields(isRes, isPaths...); err != nil {
+			return nil, err
+		}
 		if res.CreatedAt == nil || (isRes.CreatedAt != nil && ttnpb.StdTime(isRes.CreatedAt).Before(*ttnpb.StdTime(res.CreatedAt))) {
 			res.CreatedAt = isRes.CreatedAt
 		}
@@ -215,7 +227,9 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 		}
 		jsDevice := &ttnpb.EndDevice{}
 		logger.WithField("paths", jsPaths).Debug("Set end device on Join Server")
-		jsDevice.SetFields(device, append(ttnpb.ExcludeFields(jsPaths, unsetPaths...), "ids")...)
+		if err := jsDevice.SetFields(device, append(ttnpb.ExcludeFields(jsPaths, unsetPaths...), "ids")...); err != nil {
+			return nil, err
+		}
 		jsRes, err := ttnpb.NewJsEndDeviceRegistryClient(js).Set(ctx, &ttnpb.SetEndDeviceRequest{
 			EndDevice: jsDevice,
 			FieldMask: &pbtypes.FieldMask{Paths: jsPaths},
@@ -223,7 +237,9 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 		if err != nil {
 			return nil, err
 		}
-		res.SetFields(jsRes, jsPaths...)
+		if err := res.SetFields(jsRes, jsPaths...); err != nil {
+			return nil, err
+		}
 		if res.CreatedAt == nil || (jsRes.CreatedAt != nil && ttnpb.StdTime(jsRes.CreatedAt).Before(*ttnpb.StdTime(res.CreatedAt))) {
 			res.CreatedAt = jsRes.CreatedAt
 		}
@@ -241,7 +257,9 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 		}
 		nsDevice := &ttnpb.EndDevice{}
 		logger.WithField("paths", nsPaths).Debug("Set end device on Network Server")
-		nsDevice.SetFields(device, append(ttnpb.ExcludeFields(nsPaths, unsetPaths...), "ids")...)
+		if err := nsDevice.SetFields(device, append(ttnpb.ExcludeFields(nsPaths, unsetPaths...), "ids")...); err != nil {
+			return nil, err
+		}
 		nsRes, err := ttnpb.NewNsEndDeviceRegistryClient(ns).Set(ctx, &ttnpb.SetEndDeviceRequest{
 			EndDevice: nsDevice,
 			FieldMask: &pbtypes.FieldMask{Paths: nsPaths},
@@ -249,7 +267,9 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 		if err != nil {
 			return nil, err
 		}
-		res.SetFields(nsRes, nsPaths...)
+		if err := res.SetFields(nsRes, nsPaths...); err != nil {
+			return nil, err
+		}
 		if res.CreatedAt == nil || (nsRes.CreatedAt != nil && ttnpb.StdTime(nsRes.CreatedAt).Before(*ttnpb.StdTime(res.CreatedAt))) {
 			res.CreatedAt = nsRes.CreatedAt
 		}
@@ -267,7 +287,9 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 		}
 		asDevice := &ttnpb.EndDevice{}
 		logger.WithField("paths", asPaths).Debug("Set end device on Application Server")
-		asDevice.SetFields(device, append(ttnpb.ExcludeFields(asPaths, unsetPaths...), "ids")...)
+		if err := asDevice.SetFields(device, append(ttnpb.ExcludeFields(asPaths, unsetPaths...), "ids")...); err != nil {
+			return nil, err
+		}
 		asRes, err := ttnpb.NewAsEndDeviceRegistryClient(as).Set(ctx, &ttnpb.SetEndDeviceRequest{
 			EndDevice: asDevice,
 			FieldMask: &pbtypes.FieldMask{Paths: asPaths},
@@ -275,7 +297,9 @@ func setEndDevice(device *ttnpb.EndDevice, isPaths, nsPaths, asPaths, jsPaths, u
 		if err != nil {
 			return nil, err
 		}
-		res.SetFields(asRes, asPaths...)
+		if err := res.SetFields(asRes, asPaths...); err != nil {
+			return nil, err
+		}
 		if res.CreatedAt == nil || (asRes.CreatedAt != nil && ttnpb.StdTime(asRes.CreatedAt).Before(*ttnpb.StdTime(res.CreatedAt))) {
 			res.CreatedAt = asRes.CreatedAt
 		}

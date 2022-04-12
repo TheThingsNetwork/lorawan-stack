@@ -20,7 +20,7 @@ import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 var CN_779_787_RP1_V1_0_1 = Band{
 	ID: CN_779_787,
 
-	EnableADR: true,
+	SupportsDynamicADR: true,
 
 	MaxUplinkChannels: 16,
 	UplinkChannels:    cn779787DefaultChannels,

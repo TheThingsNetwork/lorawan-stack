@@ -108,7 +108,7 @@ type serializableBand struct {
 	JoinAcceptDelay2 time.Duration
 	MaxFCntGap       uint
 
-	EnableADR            bool
+	SupportsDynamicADR   bool
 	ADRAckLimit          ttnpb.ADRAckLimitExponent
 	ADRAckDelay          ttnpb.ADRAckDelayExponent
 	MinRetransmitTimeout time.Duration
@@ -196,7 +196,7 @@ func makeBand(b band.Band) serializableBand {
 		JoinAcceptDelay2: b.JoinAcceptDelay2,
 		MaxFCntGap:       b.MaxFCntGap,
 
-		EnableADR:            b.EnableADR,
+		SupportsDynamicADR:   b.SupportsDynamicADR,
 		ADRAckLimit:          b.ADRAckLimit,
 		ADRAckDelay:          b.ADRAckDelay,
 		MinRetransmitTimeout: b.MinRetransmitTimeout,

@@ -33,7 +33,7 @@ var as923RP2103Band = func(id string, offset as923GroupOffset) Band {
 	return Band{
 		ID: id,
 
-		EnableADR: true,
+		SupportsDynamicADR: true,
 
 		MaxUplinkChannels: 16,
 		UplinkChannels:    as923DefaultChannels(offset),
