@@ -59,6 +59,8 @@ enum Right {
   RIGHT_USER_ORGANIZATIONS_LIST = 12;
   // The right to create an organization under the user account.
   RIGHT_USER_ORGANIZATIONS_CREATE = 13;
+  // The right to read notifications sent to the user.
+  RIGHT_USER_NOTIFICATIONS_READ = 59;
   // The pseudo-right for all (current and future) user rights.
   RIGHT_USER_ALL = 14;
 
@@ -166,7 +168,7 @@ enum Right {
   // The pseudo-right for all (current and future) possible rights.
   RIGHT_ALL = 55;
 
-  // Next value: 59
+  // Next value: 60
 }
 
 message Rights {

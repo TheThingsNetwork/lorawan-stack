@@ -116,7 +116,11 @@ func (p *Population) NewApplication(owner *ttnpb.OrganizationOrUserIdentifiers) 
 		Name: fmt.Sprintf("Application %02d", i),
 	}
 	p.Applications = append(p.Applications, app)
-	p.NewMembership(owner, app.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	if owner != nil {
+		app.AdministrativeContact = owner
+		app.TechnicalContact = owner
+		p.NewMembership(owner, app.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	}
 	return app
 }
 
@@ -132,7 +136,11 @@ func (p *Population) NewClient(owner *ttnpb.OrganizationOrUserIdentifiers) *ttnp
 		State: ttnpb.State_STATE_APPROVED,
 	}
 	p.Clients = append(p.Clients, cli)
-	p.NewMembership(owner, cli.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	if owner != nil {
+		cli.AdministrativeContact = owner
+		cli.TechnicalContact = owner
+		p.NewMembership(owner, cli.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	}
 	return cli
 }
 
@@ -162,7 +170,11 @@ func (p *Population) NewGateway(owner *ttnpb.OrganizationOrUserIdentifiers) *ttn
 		Name: fmt.Sprintf("Gateway %02d", i),
 	}
 	p.Gateways = append(p.Gateways, gtw)
-	p.NewMembership(owner, gtw.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	if owner != nil {
+		gtw.AdministrativeContact = owner
+		gtw.TechnicalContact = owner
+		p.NewMembership(owner, gtw.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	}
 	return gtw
 }
 
@@ -177,7 +189,11 @@ func (p *Population) NewOrganization(owner *ttnpb.OrganizationOrUserIdentifiers)
 		Name: fmt.Sprintf("Organization %02d", i),
 	}
 	p.Organizations = append(p.Organizations, org)
-	p.NewMembership(owner, org.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	if owner != nil {
+		org.AdministrativeContact = owner
+		org.TechnicalContact = owner
+		p.NewMembership(owner, org.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	}
 	return org
 }
 
@@ -227,56 +243,17 @@ func (p *Population) NewUserSession(user *ttnpb.UserIdentifiers) *ttnpb.UserSess
 // Populate creates the population in the database.
 // After calling Populate, the entities in the population should no longer be modified.
 func (p *Population) Populate(ctx context.Context, st interface{}) error {
-	if len(p.Applications) > 0 {
-		s, ok := st.(store.ApplicationStore)
+	if len(p.Users) > 0 {
+		s, ok := st.(store.UserStore)
 		if !ok {
-			return fmt.Errorf("store of type %T does not implement ApplicationStore", st)
+			return fmt.Errorf("store of type %T does not implement UserStore", st)
 		}
-		for _, app := range p.Applications {
-			created, err := s.CreateApplication(ctx, app)
+		for _, usr := range p.Users {
+			created, err := s.CreateUser(ctx, usr)
 			if err != nil {
 				return err
 			}
-			*app = *created
-		}
-	}
-	if len(p.Clients) > 0 {
-		s, ok := st.(store.ClientStore)
-		if !ok {
-			return fmt.Errorf("store of type %T does not implement ClientStore", st)
-		}
-		for _, cli := range p.Clients {
-			created, err := s.CreateClient(ctx, cli)
-			if err != nil {
-				return err
-			}
-			*cli = *created
-		}
-	}
-	if len(p.EndDevices) > 0 {
-		s, ok := st.(store.EndDeviceStore)
-		if !ok {
-			return fmt.Errorf("store of type %T does not implement EndDeviceStore", st)
-		}
-		for _, dev := range p.EndDevices {
-			created, err := s.CreateEndDevice(ctx, dev)
-			if err != nil {
-				return err
-			}
-			*dev = *created
-		}
-	}
-	if len(p.Gateways) > 0 {
-		s, ok := st.(store.GatewayStore)
-		if !ok {
-			return fmt.Errorf("store of type %T does not implement GatewayStore", st)
-		}
-		for _, gtw := range p.Gateways {
-			created, err := s.CreateGateway(ctx, gtw)
-			if err != nil {
-				return err
-			}
-			*gtw = *created
+			*usr = *created
 		}
 	}
 	if len(p.Organizations) > 0 {
@@ -292,17 +269,58 @@ func (p *Population) Populate(ctx context.Context, st interface{}) error {
 			*org = *created
 		}
 	}
-	if len(p.Users) > 0 {
-		s, ok := st.(store.UserStore)
+
+	if len(p.Applications) > 0 {
+		s, ok := st.(store.ApplicationStore)
 		if !ok {
-			return fmt.Errorf("store of type %T does not implement UserStore", st)
+			return fmt.Errorf("store of type %T does not implement ApplicationStore", st)
 		}
-		for _, usr := range p.Users {
-			created, err := s.CreateUser(ctx, usr)
+		for _, app := range p.Applications {
+			created, err := s.CreateApplication(ctx, app)
 			if err != nil {
 				return err
 			}
-			*usr = *created
+			*app = *created
+		}
+	}
+	if len(p.EndDevices) > 0 {
+		s, ok := st.(store.EndDeviceStore)
+		if !ok {
+			return fmt.Errorf("store of type %T does not implement EndDeviceStore", st)
+		}
+		for _, dev := range p.EndDevices {
+			created, err := s.CreateEndDevice(ctx, dev)
+			if err != nil {
+				return err
+			}
+			*dev = *created
+		}
+	}
+
+	if len(p.Clients) > 0 {
+		s, ok := st.(store.ClientStore)
+		if !ok {
+			return fmt.Errorf("store of type %T does not implement ClientStore", st)
+		}
+		for _, cli := range p.Clients {
+			created, err := s.CreateClient(ctx, cli)
+			if err != nil {
+				return err
+			}
+			*cli = *created
+		}
+	}
+	if len(p.Gateways) > 0 {
+		s, ok := st.(store.GatewayStore)
+		if !ok {
+			return fmt.Errorf("store of type %T does not implement GatewayStore", st)
+		}
+		for _, gtw := range p.Gateways {
+			created, err := s.CreateGateway(ctx, gtw)
+			if err != nil {
+				return err
+			}
+			*gtw = *created
 		}
 	}
 	if len(p.UserSessions) > 0 {

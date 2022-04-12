@@ -196,6 +196,7 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.UserRegistry", hook.name, hook.middleware)
 		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.UserAccess", hook.name, hook.middleware)
 		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.UserSessionRegistry", hook.name, hook.middleware)
+		c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NotificationService", hook.name, hook.middleware)
 	}
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.EntityAccess", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("identityserver"))
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.EntityAccess", cluster.HookName, c.ClusterAuthUnaryHook())
@@ -230,6 +231,7 @@ func (is *IdentityServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterEndDeviceRegistrySearchServer(s, &registrySearch{IdentityServer: is})
 	ttnpb.RegisterOAuthAuthorizationRegistryServer(s, &oauthRegistry{IdentityServer: is})
 	ttnpb.RegisterContactInfoRegistryServer(s, &contactInfoRegistry{IdentityServer: is})
+	ttnpb.RegisterNotificationServiceServer(s, &notificationRegistry{IdentityServer: is})
 }
 
 // RegisterHandlers registers gRPC handlers.
@@ -253,6 +255,7 @@ func (is *IdentityServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Clien
 	ttnpb.RegisterEndDeviceRegistrySearchHandler(is.Context(), s, conn)
 	ttnpb.RegisterOAuthAuthorizationRegistryHandler(is.Context(), s, conn)
 	ttnpb.RegisterContactInfoRegistryHandler(is.Context(), s, conn)
+	ttnpb.RegisterNotificationServiceHandler(is.Context(), s, conn)
 }
 
 // RegisterInterop registers the LoRaWAN Backend Interfaces interoperability services.
