@@ -194,6 +194,10 @@
   - [Enum `KeySecurity`](#ttn.lorawan.v3.KeySecurity)
   - [Service `DeviceRepository`](#ttn.lorawan.v3.DeviceRepository)
 - [File `lorawan-stack/api/end_device.proto`](#lorawan-stack/api/end_device.proto)
+  - [Message `ADRSettings`](#ttn.lorawan.v3.ADRSettings)
+  - [Message `ADRSettings.DisabledMode`](#ttn.lorawan.v3.ADRSettings.DisabledMode)
+  - [Message `ADRSettings.DynamicMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode)
+  - [Message `ADRSettings.StaticMode`](#ttn.lorawan.v3.ADRSettings.StaticMode)
   - [Message `BoolValue`](#ttn.lorawan.v3.BoolValue)
   - [Message `ConvertEndDeviceTemplateRequest`](#ttn.lorawan.v3.ConvertEndDeviceTemplateRequest)
   - [Message `CreateEndDeviceRequest`](#ttn.lorawan.v3.CreateEndDeviceRequest)
@@ -3072,6 +3076,62 @@ Identifiers to uniquely identify a LoRaWAN end device profile.
 
 ## <a name="lorawan-stack/api/end_device.proto">File `lorawan-stack/api/end_device.proto`</a>
 
+### <a name="ttn.lorawan.v3.ADRSettings">Message `ADRSettings`</a>
+
+Adaptive Data Rate settings.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `static` | [`ADRSettings.StaticMode`](#ttn.lorawan.v3.ADRSettings.StaticMode) |  |  |
+| `dynamic` | [`ADRSettings.DynamicMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode) |  |  |
+| `disabled` | [`ADRSettings.DisabledMode`](#ttn.lorawan.v3.ADRSettings.DisabledMode) |  |  |
+
+### <a name="ttn.lorawan.v3.ADRSettings.DisabledMode">Message `ADRSettings.DisabledMode`</a>
+
+Configuration options for cases in which ADR is to be disabled
+completely.
+
+### <a name="ttn.lorawan.v3.ADRSettings.DynamicMode">Message `ADRSettings.DynamicMode`</a>
+
+Configuration options for dynamic ADR.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `margin` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | The ADR margin (dB) tells the network server how much margin it should add in ADR requests. A bigger margin is less efficient, but gives a better chance of successful reception. If unset, the default value from Network Server configuration will be used. |
+| `min_data_rate_index` | [`DataRateIndexValue`](#ttn.lorawan.v3.DataRateIndexValue) |  | Minimum data rate index. If unset, the default value from Network Server configuration will be used. |
+| `max_data_rate_index` | [`DataRateIndexValue`](#ttn.lorawan.v3.DataRateIndexValue) |  | Maximum data rate index. If unset, the default value from Network Server configuration will be used. |
+| `min_tx_power_index` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Minimum transmission power index. If unset, the default value from Network Server configuration will be used. |
+| `max_tx_power_index` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Maximum transmission power index. If unset, the default value from Network Server configuration will be used. |
+| `min_nb_trans` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Minimum number of retransmissions. If unset, the default value from Network Server configuration will be used. |
+| `max_nb_trans` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Maximum number of retransmissions. If unset, the default value from Network Server configuration will be used. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `min_tx_power_index` | <p>`uint32.lte`: `15`</p> |
+| `max_tx_power_index` | <p>`uint32.lte`: `15`</p> |
+| `min_nb_trans` | <p>`uint32.lte`: `3`</p><p>`uint32.gte`: `1`</p> |
+| `max_nb_trans` | <p>`uint32.lte`: `3`</p><p>`uint32.gte`: `1`</p> |
+
+### <a name="ttn.lorawan.v3.ADRSettings.StaticMode">Message `ADRSettings.StaticMode`</a>
+
+Configuration options for static ADR.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  | Data rate index to use. |
+| `tx_power_index` | [`uint32`](#uint32) |  | Transmission power index to use. |
+| `nb_trans` | [`uint32`](#uint32) |  | Number of retransmissions. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `data_rate_index` | <p>`enum.defined_only`: `true`</p> |
+| `tx_power_index` | <p>`uint32.lte`: `15`</p> |
+| `nb_trans` | <p>`uint32.lte`: `15`</p> |
+
 ### <a name="ttn.lorawan.v3.BoolValue">Message `BoolValue`</a>
 
 | Field | Type | Label | Description |
@@ -3430,8 +3490,8 @@ This is used internally by the Network Server.
 | `factory_preset_frequencies` | [`uint64`](#uint64) | repeated | List of factory-preset frequencies. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `max_duty_cycle` | [`AggregatedDutyCycleValue`](#ttn.lorawan.v3.AggregatedDutyCycleValue) |  | Maximum uplink duty cycle (of all channels). |
 | `supports_32_bit_f_cnt` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether the device supports 32-bit frame counters. If unset, the default value from Network Server configuration will be used. |
-| `use_adr` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether the Network Server should use ADR for the device. If unset, the default value from Network Server configuration will be used. |
-| `adr_margin` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | The ADR margin tells the network server how much margin it should add in ADR requests. A bigger margin is less efficient, but gives a better chance of successful reception. If unset, the default value from Network Server configuration will be used. |
+| `use_adr` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether the Network Server should use ADR for the device. This field is deprecated, use adr_settings instead. |
+| `adr_margin` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | The ADR margin (dB) tells the network server how much margin it should add in ADR requests. A bigger margin is less efficient, but gives a better chance of successful reception. This field is deprecated, use adr_settings.dynamic.margin instead. |
 | `resets_f_cnt` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether the device resets the frame counters (not LoRaWAN compliant). If unset, the default value from Network Server configuration will be used. |
 | `status_time_periodicity` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | The interval after which a DevStatusReq MACCommand shall be sent. If unset, the default value from Network Server configuration will be used. |
 | `status_count_periodicity` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Number of uplink messages after which a DevStatusReq MACCommand shall be sent. If unset, the default value from Network Server configuration will be used. |
@@ -3449,6 +3509,7 @@ This is used internally by the Network Server.
 | `class_b_c_downlink_interval` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | The minimum duration passed before a network-initiated(e.g. Class B or C) downlink following an arbitrary downlink. |
 | `uplink_dwell_time` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether uplink dwell time is set (400ms). If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `downlink_dwell_time` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether downlink dwell time is set (400ms). If unset, the default value from Network Server configuration or regional parameters specification will be used. |
+| `adr` | [`ADRSettings`](#ttn.lorawan.v3.ADRSettings) |  | Adaptive Data Rate settings. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 
 #### Field Rules
 
