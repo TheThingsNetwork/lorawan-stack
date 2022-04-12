@@ -539,6 +539,21 @@ var (
 			if err != nil {
 				return err
 			}
+
+			application, err := ttnpb.NewApplicationRegistryClient(is).Get(ctx, &ttnpb.GetApplicationRequest{
+				ApplicationIds: devID.ApplicationIds,
+				FieldMask: &pbtypes.FieldMask{Paths: []string{
+					"network_server_address",
+					"application_server_address",
+					"join_server_address",
+				}},
+			})
+			if err != nil {
+				return err
+			}
+
+			compareServerAddressesApplication(application, config)
+
 			requestDevEUI, _ := cmd.Flags().GetBool("request-dev-eui")
 			if requestDevEUI {
 				logger.Debug("request-dev-eui flag set, requesting a DevEUI")
@@ -1457,21 +1472,21 @@ func compareServerAddressesEndDevice(device *ttnpb.EndDevice, config *Config) (n
 		logger.WithFields(log.Fields(
 			"configured", nsHost,
 			"registered", host,
-		)).Warn("Registered Network Server address does not match CLI configuration")
+		)).Warnf("Registered Network Server address of end device %q does not match CLI configuration", device.GetIds().GetDeviceId())
 	}
 	if host := getHost(device.ApplicationServerAddress); config.ApplicationServerEnabled && host != "" && host != asHost {
 		asMismatch = true
 		logger.WithFields(log.Fields(
 			"configured", asHost,
 			"registered", host,
-		)).Warn("Registered Application Server address does not match CLI configuration")
+		)).Warnf("Registered Application Server address of end device %q does not match CLI configuration", device.GetIds().GetDeviceId())
 	}
 	if host := getHost(device.JoinServerAddress); config.JoinServerEnabled && host != "" && host != jsHost {
 		jsMismatch = true
 		logger.WithFields(log.Fields(
 			"configured", jsHost,
 			"registered", host,
-		)).Warn("Registered Join Server address does not match CLI configuration")
+		)).Warnf("Registered Join Server address of end device %q does not match CLI configuration", device.GetIds().GetDeviceId())
 	}
 	return
 }

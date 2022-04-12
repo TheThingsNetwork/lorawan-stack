@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
 )
@@ -189,6 +190,16 @@ var (
 			}
 			if application.GetIds().GetApplicationId() == "" {
 				return errNoApplicationID.New()
+			}
+
+			if application.NetworkServerAddress == "" {
+				application.NetworkServerAddress = getHost(config.NetworkServerGRPCAddress)
+			}
+			if application.ApplicationServerAddress == "" {
+				application.ApplicationServerAddress = getHost(config.ApplicationServerGRPCAddress)
+			}
+			if application.JoinServerAddress == "" {
+				application.JoinServerAddress = getHost(config.JoinServerGRPCAddress)
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -386,4 +397,30 @@ func init() {
 	applicationsIssueNewDevEUICommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationsCommand.AddCommand(applicationsIssueNewDevEUICommand)
 	Root.AddCommand(applicationsCommand)
+}
+
+func compareServerAddressesApplication(application *ttnpb.Application, config *Config) (nsMismatch, asMismatch, jsMismatch bool) {
+	nsHost, asHost, jsHost := getHost(config.NetworkServerGRPCAddress), getHost(config.ApplicationServerGRPCAddress), getHost(config.JoinServerGRPCAddress)
+	if host := getHost(application.NetworkServerAddress); config.NetworkServerEnabled && host != "" && host != nsHost {
+		nsMismatch = true
+		logger.WithFields(log.Fields(
+			"configured", nsHost,
+			"registered", host,
+		)).Warnf("Registered Network Server address of Application %q does not match CLI configuration", application.GetIds().GetApplicationId())
+	}
+	if host := getHost(application.ApplicationServerAddress); config.ApplicationServerEnabled && host != "" && host != asHost {
+		asMismatch = true
+		logger.WithFields(log.Fields(
+			"configured", asHost,
+			"registered", host,
+		)).Warnf("Registered Application Server address of Application %q does not match CLI configuration", application.GetIds().GetApplicationId())
+	}
+	if host := getHost(application.JoinServerAddress); config.JoinServerEnabled && host != "" && host != jsHost {
+		jsMismatch = true
+		logger.WithFields(log.Fields(
+			"configured", jsHost,
+			"registered", host,
+		)).Warnf("Registered Join Server address of Application %q does not match CLI configuration", application.GetIds().GetApplicationId())
+	}
+	return
 }

@@ -645,6 +645,15 @@ Application is the message that defines an Application in the network.
 | `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application. This field is deprecated. Use administrative_contact and technical_contact instead. |
 | `administrative_contact` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
 | `technical_contact` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+| `network_server_address` | [`string`](#string) |  | The address of the Network Server where this application is supposed to be registered. If set, this fields indicates where end devices for this application should be registered.
+
+Stored in Entity Registry. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
+| `application_server_address` | [`string`](#string) |  | The address of the Application Server where this application is supposed to be registered. If set, this fields indicates where end devices for this application should be registered.
+
+Stored in Entity Registry. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
+| `join_server_address` | [`string`](#string) |  | The address of the Join Server where this application is supposed to be registered. If set, this fields indicates where end devices for this application should be registered.
+
+Stored in Entity Registry. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
 | `dev_eui_counter` | [`uint32`](#uint32) |  |  |
 
 #### Field Rules
@@ -656,6 +665,9 @@ Application is the message that defines an Application in the network.
 | `description` | <p>`string.max_len`: `2000`</p> |
 | `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
 | `contact_info` | <p>`repeated.max_items`: `10`</p> |
+| `network_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
+| `application_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
+| `join_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
 
 ### <a name="ttn.lorawan.v3.Application.AttributesEntry">Message `Application.AttributesEntry`</a>
 

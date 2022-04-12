@@ -150,6 +150,36 @@ func (dst *Application) SetFields(src *Application, paths ...string) error {
 					dst.TechnicalContact = nil
 				}
 			}
+		case "network_server_address":
+			if len(subs) > 0 {
+				return fmt.Errorf("'network_server_address' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.NetworkServerAddress = src.NetworkServerAddress
+			} else {
+				var zero string
+				dst.NetworkServerAddress = zero
+			}
+		case "application_server_address":
+			if len(subs) > 0 {
+				return fmt.Errorf("'application_server_address' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ApplicationServerAddress = src.ApplicationServerAddress
+			} else {
+				var zero string
+				dst.ApplicationServerAddress = zero
+			}
+		case "join_server_address":
+			if len(subs) > 0 {
+				return fmt.Errorf("'join_server_address' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.JoinServerAddress = src.JoinServerAddress
+			} else {
+				var zero string
+				dst.JoinServerAddress = zero
+			}
 		case "dev_eui_counter":
 			if len(subs) > 0 {
 				return fmt.Errorf("'dev_eui_counter' has no subfields, but %s were specified", subs)

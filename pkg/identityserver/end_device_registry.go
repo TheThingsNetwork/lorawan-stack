@@ -16,6 +16,8 @@ package identityserver
 
 import (
 	"context"
+	"net"
+	"net/url"
 	"strings"
 
 	pbtypes "github.com/gogo/protobuf/types"
@@ -58,11 +60,85 @@ var errEndDeviceEUIsTaken = errors.DefineAlreadyExists(
 	"an end device with JoinEUI `{join_eui}` and DevEUI `{dev_eui}` is already registered as `{device_id}` in application `{application_id}`",
 )
 
+func getHost(address string) string {
+	if strings.Contains(address, "://") {
+		url, err := url.Parse(address)
+		if err == nil {
+			address = url.Host
+		}
+	}
+	if strings.Contains(address, ":") {
+		host, _, err := net.SplitHostPort(address)
+		if err == nil {
+			return host
+		}
+	}
+	return address
+}
+
+var (
+	errNetworkServerAddressMismatch = errors.DefineInvalidArgument(
+		"network_server_address_mismatch",
+		"network server address `{address}` does not match `{expected}`",
+	)
+	errApplicationServerAddressMismatch = errors.DefineInvalidArgument(
+		"application_server_address_mismatch",
+		"application server address `{address}` does not match `{expected}`",
+	)
+	errJoinServerAddressMismatch = errors.DefineInvalidArgument(
+		"join_server_address_mismatch",
+		"join server address `{address}` does not match `{expected}`",
+	)
+)
+
+func (is *IdentityServer) validateEndDeviceServerAddressMatch(ctx context.Context, dev *ttnpb.EndDevice) error {
+	if dev.NetworkServerAddress == "" && dev.ApplicationServerAddress == "" && dev.JoinServerAddress == "" {
+		return nil
+	}
+	app, err := is.getApplication(ctx, &ttnpb.GetApplicationRequest{
+		ApplicationIds: dev.Ids.ApplicationIds,
+		FieldMask: &pbtypes.FieldMask{Paths: []string{
+			"network_server_address",
+			"application_server_address",
+			"join_server_address",
+		}},
+	})
+	if err != nil {
+		return err
+	}
+	if app.NetworkServerAddress != "" && dev.NetworkServerAddress != "" &&
+		getHost(app.NetworkServerAddress) != getHost(dev.NetworkServerAddress) {
+		return errNetworkServerAddressMismatch.WithAttributes(
+			"address", dev.NetworkServerAddress,
+			"expected", app.NetworkServerAddress,
+		)
+	}
+	if app.ApplicationServerAddress != "" && dev.ApplicationServerAddress != "" &&
+		getHost(app.ApplicationServerAddress) != getHost(dev.ApplicationServerAddress) {
+		return errApplicationServerAddressMismatch.WithAttributes(
+			"address", dev.ApplicationServerAddress,
+			"expected", app.ApplicationServerAddress,
+		)
+	}
+	if app.JoinServerAddress != "" && dev.JoinServerAddress != "" &&
+		getHost(app.JoinServerAddress) != getHost(dev.JoinServerAddress) {
+		return errJoinServerAddressMismatch.WithAttributes(
+			"address", dev.JoinServerAddress,
+			"expected", app.JoinServerAddress,
+		)
+	}
+	return nil
+}
+
 func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.CreateEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
 	if err = rights.RequireApplication(ctx, *req.EndDevice.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	if err = blacklist.Check(ctx, req.EndDevice.Ids.DeviceId); err != nil {
+		return nil, err
+	}
+
+	if err := is.validateEndDeviceServerAddressMatch(ctx, req.EndDevice); err != nil {
 		return nil, err
 	}
 

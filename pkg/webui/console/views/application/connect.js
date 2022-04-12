@@ -47,7 +47,12 @@ const mapStateToProps = (state, props) => ({
 const mapDispatchToProps = dispatch => ({
   stopStream: id => dispatch(stopApplicationEventsStream(id)),
   loadData: id => {
-    dispatch(getApplication(id, 'name,description,attributes,dev_eui_counter'))
+    dispatch(
+      getApplication(
+        id,
+        'name,description,attributes,dev_eui_counter,network_server_address,application_server_address,join_server_address',
+      ),
+    )
     dispatch(getApplicationsRightsList(id))
     if (selectAsConfig().enabled) {
       dispatch(getAsConfiguration())

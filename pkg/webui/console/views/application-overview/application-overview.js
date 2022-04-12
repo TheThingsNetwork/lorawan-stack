@@ -14,6 +14,7 @@
 
 import React from 'react'
 import { Col, Row, Container } from 'react-grid-system'
+import { defineMessages } from 'react-intl'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
@@ -26,15 +27,23 @@ import DevicesTable from '@console/containers/devices-table'
 import ApplicationEvents from '@console/containers/application-events'
 import ApplicationTitleSection from '@console/containers/application-title-section'
 
+import Require from '@console/lib/components/require'
+
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import style from './application-overview.styl'
 
+const m = defineMessages({
+  failedAccessOtherHostApplication:
+    'The application you attempted to visit is registered on a different cluster and needs to be accessed using its host Console.',
+})
+
 const ApplicationOverview = props => {
   const {
     appId,
     application: { created_at, updated_at },
+    shouldRedirect,
   } = props
 
   const sheetData = [
@@ -48,8 +57,13 @@ const ApplicationOverview = props => {
     },
   ]
 
+  const otherwise = {
+    redirect: '/applications',
+    message: m.failedAccessOtherHostApplication,
+  }
+
   return (
-    <>
+    <Require condition={!shouldRedirect} otherwise={otherwise}>
       <div className={style.titleSection}>
         <Container>
           <IntlHelmet title={sharedMessages.overview} />
@@ -75,13 +89,18 @@ const ApplicationOverview = props => {
           </Col>
         </Row>
       </Container>
-    </>
+    </Require>
   )
 }
 
 ApplicationOverview.propTypes = {
   appId: PropTypes.string.isRequired,
   application: PropTypes.application.isRequired,
+  shouldRedirect: PropTypes.bool,
+}
+
+ApplicationOverview.defaultProps = {
+  shouldRedirect: false,
 }
 
 export default ApplicationOverview
