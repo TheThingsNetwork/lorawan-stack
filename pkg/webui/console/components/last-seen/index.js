@@ -77,7 +77,7 @@ LastSeen.propTypes = {
   message: PropTypes.message,
   noTitle: PropTypes.bool,
   short: PropTypes.bool,
-  status: PropTypes.oneOf(['good', 'bad', 'mediocre', 'unknown', 'none']),
+  status: PropTypes.oneOf(['good', 'bad', 'mediocre', 'unknown']),
   updateIntervalInSeconds: PropTypes.number,
 }
 

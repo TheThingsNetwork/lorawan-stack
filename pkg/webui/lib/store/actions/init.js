@@ -19,9 +19,3 @@ export const [
   { request: INITIALIZE, success: INITIALIZE_SUCCESS, failure: INITIALIZE_FAILURE },
   { request: initialize, success: initializeSuccess, failure: initializeFailure },
 ] = createRequestActions(INITIALIZE_BASE)
-
-export const GET_SESSION_ID_BASE = 'GET_SESSION_ID'
-export const [
-  { request: GET_SESSION_ID, success: GET_SESSION_ID_SUCCESS, failure: GET_SESSION_ID_FAILURE },
-  { request: getSessionId, success: getSessionIdSuccess, failure: getSessionIdFailure },
-] = createRequestActions(GET_SESSION_ID_BASE, session_id => ({ session_id }))

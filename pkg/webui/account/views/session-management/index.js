@@ -23,14 +23,14 @@ import PageTitle from '@ttn-lw/components/page-title'
 import UserSessionsTable from '@account/containers/sessions-table'
 
 const m = defineMessages({
-  sessions: 'Session management',
+  sessionManagement: 'Session management',
 })
 
 const SessionManagement = () => (
   <Container>
     <Row>
       <Col>
-        <PageTitle title={m.sessions} hideHeading />
+        <PageTitle title={m.sessionManagement} hideHeading />
         <UserSessionsTable pageSize={PAGE_SIZES.REGULAR} />
       </Col>
     </Row>

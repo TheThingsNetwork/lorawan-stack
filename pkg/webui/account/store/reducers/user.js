@@ -23,15 +23,19 @@ import {
 
 const defaultState = {
   user: undefined,
-  session_id: undefined,
+  sessionId: undefined,
 }
 
 const user = (state = defaultState, { type, payload }) => {
   switch (type) {
     case INITIALIZE_SUCCESS:
+      if (typeof payload !== 'string') {
+        return state
+      }
+
       return {
         ...state,
-        session_id: payload,
+        sessionId: payload,
       }
     case GET_USER:
       return {

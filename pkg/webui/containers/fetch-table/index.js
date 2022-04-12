@@ -273,7 +273,7 @@ class FetchTable extends Component {
     if (Boolean(getItemPathPrefix)) {
       entityPath = getItemPathPrefix(item)
     } else {
-      const item_id = item.id || item[`${entitySingle}_id`] || item.ids[`${entitySingle}_id`]
+      const item_id = item.id || item.ids[`${entitySingle}_id`]
       entityPath = `${itemPathPrefix}/${item_id}`
     }
 
