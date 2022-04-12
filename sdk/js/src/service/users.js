@@ -166,23 +166,6 @@ class Users {
       },
     })
   }
-
-  async getAllSessions(userId) {
-    const result = await this._api.UserSessionRegistry.List({
-      routeParams: { 'user_ids.user_id': userId },
-    })
-    const sessions = Marshaler.payloadListResponse('sessions', result)
-
-    return sessions
-  }
-
-  async deleteSession(userId, session_id) {
-    const result = await this._api.UserSessionRegistry.Delete({
-      routeParams: { 'user_ids.user_id': userId, session_id },
-    })
-
-    return Marshaler.payloadListResponse('sessions', result)
-  }
 }
 
 export default Users

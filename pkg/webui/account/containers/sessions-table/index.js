@@ -18,7 +18,6 @@ import { defineMessages } from 'react-intl'
 import { bindActionCreators } from 'redux'
 
 import Button from '@ttn-lw/components/button'
-import Status from '@ttn-lw/components/status'
 import toast from '@ttn-lw/components/toast'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
@@ -30,28 +29,29 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { getUserSessionsList, deleteUserSession } from '@account/store/actions/user'
+import { getUserSessionsList, deleteUserSession } from '@account/store/actions/sessions'
 
+import { selectUserId, selectSessionId } from '@account/store/selectors/user'
 import {
-  selectUserId,
   selectUserSessions,
   selectUserSessionsTotalCount,
   selectUserSessionsFetching,
-  selectSessionId,
-} from '@account/store/selectors/user'
+} from '@account/store/selectors/sessions'
 
 const m = defineMessages({
   deleteSessionSuccess: 'Session removed successfully',
-  deleteSessionError: 'There was an error and this session could not be deleted',
+  deleteSessionError: 'There was an error and the session could not be deleted',
   sessionsTableTitle: 'Sessions',
   removeButtonMessage: 'Remove this session',
   noExpiryDate: 'No expiry date',
   endSession: 'Logout to end this session',
-  currentSession: '(this is the current session)',
+  currentSession: '(This is the current session)',
 })
 
+const getItemPathPrefix = item => `/${item.ids.client_id}`
+
 const UserSessionsTable = props => {
-  const { selectTableData, pageSize, user, handleDeleteSession } = props
+  const { pageSize, user, handleDeleteSession, sessionId } = props
   const dispatch = useDispatch()
 
   const getSessions = React.useCallback(filters => getUserSessionsList(filters, user), [user])
@@ -75,22 +75,50 @@ const UserSessionsTable = props => {
     [user, handleDeleteSession, dispatch],
   )
 
+  const baseDataSelector = React.useCallback(
+    state => {
+      const sessions = selectUserSessions(state)
+      const decoratedSessions = []
+
+      if (sessions) {
+        for (const session of sessions) {
+          decoratedSessions.push({
+            ...session,
+            id: session.session_id,
+            status: {
+              currentSession: session.session_id === sessionId,
+            },
+          })
+        }
+      }
+
+      return {
+        sessions: decoratedSessions,
+        totalCount: selectUserSessionsTotalCount(state),
+        fetching: selectUserSessionsFetching(state),
+        mayAdd: false,
+        mayLink: false,
+      }
+    },
+    [sessionId],
+  )
+
   const makeHeaders = React.useMemo(() => {
     const baseHeaders = [
       {
         name: 'session_id',
         displayName: sharedMessages.id,
-        width: 9,
-      },
-      {
-        name: 'status',
-        displayName: '',
-        width: 17,
-        render: status => {
-          if (status.currentSession) {
-            return <Status status="none" label={m.currentSession} />
-          }
-        },
+        width: 25,
+        getValue: row => ({
+          id: row.session_id,
+          status: row.status,
+        }),
+        render: details => (
+          <>
+            {`${details.id.substr(0, 12)}... `}
+            {details.status.currentSession && <Message content={m.currentSession} />}
+          </>
+        ),
       },
       {
         name: 'created_at',
@@ -101,7 +129,7 @@ const UserSessionsTable = props => {
             <DateTime value={created_at} />
             {' ('}
             <DateTime.Relative value={created_at} />
-            {') '}
+            {')'}
           </>
         ),
       },
@@ -111,7 +139,7 @@ const UserSessionsTable = props => {
         width: 20,
         render: expires_at => {
           if (expires_at === undefined) {
-            return <Message content={m.noExpiryDate} />
+            return <Message content={m.noExpiryDate} className="tc-subtle-gray" />
           }
 
           return (
@@ -119,7 +147,7 @@ const UserSessionsTable = props => {
               <DateTime value={expires_at} />
               {' ('}
               <DateTime.Relative value={expires_at} />
-              {') '}
+              {')'}
             </>
           )
         },
@@ -144,6 +172,7 @@ const UserSessionsTable = props => {
               onClick={details.delete}
               message={m.removeButtonMessage}
               icon="delete"
+              danger
             />
           )
         },
@@ -158,8 +187,9 @@ const UserSessionsTable = props => {
       entity="sessions"
       headers={makeHeaders}
       getItemsAction={getSessions}
-      baseDataSelector={selectTableData}
+      baseDataSelector={baseDataSelector}
       tableTitle={<Message content={m.sessionsTableTitle} />}
+      getItemPathPrefix={getItemPathPrefix}
       pageSize={pageSize}
     />
   )
@@ -168,7 +198,7 @@ const UserSessionsTable = props => {
 UserSessionsTable.propTypes = {
   handleDeleteSession: PropTypes.func.isRequired,
   pageSize: PropTypes.number.isRequired,
-  selectTableData: PropTypes.func.isRequired,
+  sessionId: PropTypes.string.isRequired,
   user: PropTypes.string.isRequired,
 }
 
@@ -189,30 +219,6 @@ export default connect(
     ...stateProps,
     ...dispatchProps,
     ...ownProps,
-    selectTableData: state => {
-      const sessions = selectUserSessions(state)
-      const decoratedSessions = []
-
-      if (sessions) {
-        for (const session of sessions) {
-          decoratedSessions.push({
-            ...session,
-            id: session.session_id,
-            status: {
-              currentSession: session.session_id === stateProps.sessionId,
-            },
-          })
-        }
-      }
-
-      return {
-        sessions: decoratedSessions,
-        totalCount: selectUserSessionsTotalCount(state),
-        fetching: selectUserSessionsFetching(state),
-        mayAdd: false,
-        mayLink: false,
-      }
-    },
     handleDeleteSession: deleteSessionId =>
       dispatchProps.handleDeleteSession(stateProps.user, deleteSessionId),
   }),
