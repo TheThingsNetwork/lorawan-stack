@@ -22,7 +22,7 @@ import (
 var AS_923_RP2_v1_0_0 = Band{
 	ID: AS_923,
 
-	EnableADR: true,
+	SupportsDynamicADR: true,
 
 	MaxUplinkChannels: 16,
 	UplinkChannels:    as923DefaultChannels(as923Group1Offset),

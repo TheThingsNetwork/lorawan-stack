@@ -20,7 +20,7 @@ import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 var KR_920_923_RP1_V1_0_3_Rev_A = Band{
 	ID: KR_920_923,
 
-	EnableADR: true,
+	SupportsDynamicADR: true,
 
 	MaxUplinkChannels: 16,
 	UplinkChannels:    kr920923DefaultChannels,

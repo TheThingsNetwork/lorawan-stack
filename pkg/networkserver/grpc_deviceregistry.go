@@ -1498,7 +1498,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			}
 			if err := st.WithFields(func(m map[string]*ttnpb.EndDevice) error {
 				return withPHY(func(phy *band.Band, _ *frequencyplans.FrequencyPlan) error {
-					if phy.EnableADR {
+					if phy.SupportsDynamicADR {
 						return nil
 					}
 					for _, field := range fields {
@@ -1773,7 +1773,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 
 		for p, isValid := range map[string]func(*ttnpb.EndDevice, *band.Band) bool{
 			"mac_settings.use_adr.value": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
-				return !dev.GetMacSettings().GetUseAdr().GetValue() || phy.EnableADR
+				return !dev.GetMacSettings().GetUseAdr().GetValue() || phy.SupportsDynamicADR
 			},
 			"mac_state.current_parameters.adr_data_rate_index": func(dev *ttnpb.EndDevice, phy *band.Band) bool {
 				return dev.GetMacState().GetCurrentParameters().GetAdrDataRateIndex() <= phy.MaxADRDataRateIndex

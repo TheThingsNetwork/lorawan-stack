@@ -93,7 +93,7 @@ func deviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy *band.Ba
 	case defaults.Adr.GetStatic() != nil:
 		return true
 
-	case !phy.EnableADR:
+	case !phy.SupportsDynamicADR:
 		return false
 
 	case dev.GetMacSettings().GetAdr().GetDynamic() != nil:
@@ -130,7 +130,7 @@ func deviceShouldAdaptDataRate(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings,
 	case defaults.Adr.GetStatic() != nil:
 		return false, false, defaults.Adr.GetStatic()
 
-	case !phy.EnableADR:
+	case !phy.SupportsDynamicADR:
 		return false, true, nil
 
 	case dev.GetMacSettings().GetAdr().GetDynamic() != nil:

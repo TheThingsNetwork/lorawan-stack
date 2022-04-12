@@ -21,7 +21,7 @@ import (
 
 func legacyDeviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy *band.Band) bool {
 	switch {
-	case !phy.EnableADR:
+	case !phy.SupportsDynamicADR:
 		return false
 	case dev.GetMulticast():
 		return false

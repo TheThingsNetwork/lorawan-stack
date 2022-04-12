@@ -20,7 +20,7 @@ import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 var CN_470_510_20_B_RP2_v1_0_1 = Band{
 	ID: CN_470_510_20_B,
 
-	EnableADR: true,
+	SupportsDynamicADR: true,
 
 	MaxUplinkChannels: 64,
 	UplinkChannels:    cn47051020BUplinkChannels,
