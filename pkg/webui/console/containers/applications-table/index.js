@@ -34,7 +34,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { checkFromState, mayCreateApplications } from '@console/lib/feature-checks'
-import isOtherClusterApp from '@console/lib/application-utils'
+import { isOtherClusterApp } from '@console/lib/application-utils'
 
 import {
   deleteApplication,

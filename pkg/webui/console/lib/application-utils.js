@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable import/prefer-default-export */
+
 import { selectAsConfig, selectJsConfig, selectNsConfig } from '@ttn-lw/lib/selectors/env'
 import getHostnameFromUrl from '@ttn-lw/lib/host-from-url'
 
-export default app => {
+export const isOtherClusterApp = app => {
   let isOtherCluster
   if (app.application_server_address || app.network_server_address || app.join_server_address) {
     isOtherCluster =
