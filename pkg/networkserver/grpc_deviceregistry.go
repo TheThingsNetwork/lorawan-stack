@@ -297,7 +297,7 @@ type setDeviceState struct {
 // in order to avoid redundant lookups.
 //
 // NOTE: If the search paths are not bottom level fields, hasAnyField may have unexpected
-// results, as ttnpb.HasAnyField does not consider lower search paths as being part of
+// results, as ttnpb.HasAnyField does not consider higher search paths as being part of
 // the requested paths - i.e ttnpb.HasAnyField([]string{"a.b"}, "a") == false.
 func hasAnyField(fs []string, cache map[string]bool, paths ...string) bool {
 	for _, p := range paths {

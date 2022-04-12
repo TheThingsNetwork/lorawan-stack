@@ -75,6 +75,9 @@ nextRequested:
 //
 // Note that this function may have unexpected results when non bottom search fields are used,
 // as HasAnyField([]string{"a.b"}, "a") is false.
+//
+// If all possibilities are `[a, a.b, a.c]`, and we have `[a.b]`, then requesting `[a]`
+// should be false because if it would be true, then `a.c` can be expected.
 func HasAnyField(requested []string, search ...string) bool {
 	for _, requested := range requested {
 		for _, search := range search {
