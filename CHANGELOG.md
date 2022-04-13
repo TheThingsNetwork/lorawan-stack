@@ -42,6 +42,7 @@ For details about compatibility between different releases, see the **Commitment
 - Generating device ID from a DevEUI when importing a CSV file.
 - The `is-db migrate` command that failed when running on databases created by `v3.18`.
 - Some error messages being displayed as `error:undefined:undefined` in the Console, e.g. in the live data view.
+- Missing `query` flag on CLI search commands.
 
 ### Security
 
