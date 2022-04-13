@@ -20,7 +20,7 @@ import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 var EU_433_RP2_V1_0_3 = Band{
 	ID: EU_433,
 
-	EnableADR: true,
+	SupportsDynamicADR: true,
 
 	MaxUplinkChannels: 16,
 	UplinkChannels:    eu433DefaultChannels,

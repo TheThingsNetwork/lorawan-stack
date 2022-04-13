@@ -60,8 +60,8 @@ type Band struct {
 	// MaxFCntGap
 	MaxFCntGap uint
 
-	// EnableADR determines whether ADR should be enabled.
-	EnableADR bool
+	// SupportsDynamicADR determines whether the Adaptive Data Rate algorithm is supported.
+	SupportsDynamicADR bool
 	// ADRAckLimit
 	ADRAckLimit ttnpb.ADRAckLimitExponent
 	// ADRAckDelay

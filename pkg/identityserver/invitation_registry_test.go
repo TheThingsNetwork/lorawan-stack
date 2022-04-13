@@ -17,7 +17,6 @@ package identityserver
 import (
 	"testing"
 
-	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -26,8 +25,7 @@ import (
 )
 
 func TestInvitationsPermissionDenied(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewUserInvitationRegistryClient(cc)
@@ -57,8 +55,7 @@ func TestInvitationsPermissionDenied(t *testing.T) {
 }
 
 func TestInvitationsCRUD(t *testing.T) {
-	a := assertions.New(t)
-	ctx := test.Context()
+	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		creds := userCreds(adminUserIdx)

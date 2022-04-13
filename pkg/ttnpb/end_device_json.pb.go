@@ -716,6 +716,305 @@ func (x *EndDeviceVersion) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the ADRSettings_StaticMode message to JSON.
+func (x *ADRSettings_StaticMode) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.DataRateIndex != 0 || s.HasField("data_rate_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("data_rate_index")
+		x.DataRateIndex.MarshalProtoJSON(s)
+	}
+	if x.TxPowerIndex != 0 || s.HasField("tx_power_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("tx_power_index")
+		s.WriteUint32(x.TxPowerIndex)
+	}
+	if x.NbTrans != 0 || s.HasField("nb_trans") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("nb_trans")
+		s.WriteUint32(x.NbTrans)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ADRSettings_StaticMode to JSON.
+func (x ADRSettings_StaticMode) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
+// UnmarshalProtoJSON unmarshals the ADRSettings_StaticMode message from JSON.
+func (x *ADRSettings_StaticMode) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "data_rate_index", "dataRateIndex":
+			s.AddField("data_rate_index")
+			x.DataRateIndex.UnmarshalProtoJSON(s)
+		case "tx_power_index", "txPowerIndex":
+			s.AddField("tx_power_index")
+			x.TxPowerIndex = s.ReadUint32()
+		case "nb_trans", "nbTrans":
+			s.AddField("nb_trans")
+			x.NbTrans = s.ReadUint32()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ADRSettings_StaticMode from JSON.
+func (x *ADRSettings_StaticMode) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ADRSettings_DynamicMode message to JSON.
+func (x *ADRSettings_DynamicMode) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Margin != nil || s.HasField("margin") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("margin")
+		if x.Margin == nil {
+			s.WriteNil()
+		} else {
+			s.WriteFloat32(x.Margin.Value)
+		}
+	}
+	if x.MinDataRateIndex != nil || s.HasField("min_data_rate_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("min_data_rate_index")
+		x.MinDataRateIndex.MarshalProtoJSON(s.WithField("min_data_rate_index"))
+	}
+	if x.MaxDataRateIndex != nil || s.HasField("max_data_rate_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("max_data_rate_index")
+		x.MaxDataRateIndex.MarshalProtoJSON(s.WithField("max_data_rate_index"))
+	}
+	if x.MinTxPowerIndex != nil || s.HasField("min_tx_power_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("min_tx_power_index")
+		if x.MinTxPowerIndex == nil {
+			s.WriteNil()
+		} else {
+			s.WriteUint32(x.MinTxPowerIndex.Value)
+		}
+	}
+	if x.MaxTxPowerIndex != nil || s.HasField("max_tx_power_index") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("max_tx_power_index")
+		if x.MaxTxPowerIndex == nil {
+			s.WriteNil()
+		} else {
+			s.WriteUint32(x.MaxTxPowerIndex.Value)
+		}
+	}
+	if x.MinNbTrans != nil || s.HasField("min_nb_trans") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("min_nb_trans")
+		if x.MinNbTrans == nil {
+			s.WriteNil()
+		} else {
+			s.WriteUint32(x.MinNbTrans.Value)
+		}
+	}
+	if x.MaxNbTrans != nil || s.HasField("max_nb_trans") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("max_nb_trans")
+		if x.MaxNbTrans == nil {
+			s.WriteNil()
+		} else {
+			s.WriteUint32(x.MaxNbTrans.Value)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ADRSettings_DynamicMode to JSON.
+func (x ADRSettings_DynamicMode) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
+// UnmarshalProtoJSON unmarshals the ADRSettings_DynamicMode message from JSON.
+func (x *ADRSettings_DynamicMode) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "margin":
+			s.AddField("margin")
+			if s.ReadNil() {
+				x.Margin = nil
+				return
+			}
+			v := s.ReadFloat32()
+			if s.Err() != nil {
+				return
+			}
+			x.Margin = &types.FloatValue{Value: v}
+		case "min_data_rate_index", "minDataRateIndex":
+			s.AddField("min_data_rate_index")
+			if s.ReadNil() {
+				x.MinDataRateIndex = nil
+				return
+			}
+			x.MinDataRateIndex = &DataRateIndexValue{}
+			x.MinDataRateIndex.UnmarshalProtoJSON(s.WithField("min_data_rate_index", false))
+		case "max_data_rate_index", "maxDataRateIndex":
+			s.AddField("max_data_rate_index")
+			if s.ReadNil() {
+				x.MaxDataRateIndex = nil
+				return
+			}
+			x.MaxDataRateIndex = &DataRateIndexValue{}
+			x.MaxDataRateIndex.UnmarshalProtoJSON(s.WithField("max_data_rate_index", false))
+		case "min_tx_power_index", "minTxPowerIndex":
+			s.AddField("min_tx_power_index")
+			if s.ReadNil() {
+				x.MinTxPowerIndex = nil
+				return
+			}
+			v := s.ReadUint32()
+			if s.Err() != nil {
+				return
+			}
+			x.MinTxPowerIndex = &types.UInt32Value{Value: v}
+		case "max_tx_power_index", "maxTxPowerIndex":
+			s.AddField("max_tx_power_index")
+			if s.ReadNil() {
+				x.MaxTxPowerIndex = nil
+				return
+			}
+			v := s.ReadUint32()
+			if s.Err() != nil {
+				return
+			}
+			x.MaxTxPowerIndex = &types.UInt32Value{Value: v}
+		case "min_nb_trans", "minNbTrans":
+			s.AddField("min_nb_trans")
+			if s.ReadNil() {
+				x.MinNbTrans = nil
+				return
+			}
+			v := s.ReadUint32()
+			if s.Err() != nil {
+				return
+			}
+			x.MinNbTrans = &types.UInt32Value{Value: v}
+		case "max_nb_trans", "maxNbTrans":
+			s.AddField("max_nb_trans")
+			if s.ReadNil() {
+				x.MaxNbTrans = nil
+				return
+			}
+			v := s.ReadUint32()
+			if s.Err() != nil {
+				return
+			}
+			x.MaxNbTrans = &types.UInt32Value{Value: v}
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ADRSettings_DynamicMode from JSON.
+func (x *ADRSettings_DynamicMode) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the ADRSettings message to JSON.
+func (x *ADRSettings) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Mode != nil {
+		switch ov := x.Mode.(type) {
+		case *ADRSettings_Static:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("static")
+			ov.Static.MarshalProtoJSON(s.WithField("static"))
+		case *ADRSettings_Dynamic:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("dynamic")
+			ov.Dynamic.MarshalProtoJSON(s.WithField("dynamic"))
+		case *ADRSettings_Disabled:
+			s.WriteMoreIf(&wroteField)
+			s.WriteObjectField("disabled")
+			// NOTE: ADRSettings_DisabledMode does not seem to implement MarshalProtoJSON.
+			gogo.MarshalMessage(s, ov.Disabled)
+		}
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ADRSettings to JSON.
+func (x ADRSettings) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
+// UnmarshalProtoJSON unmarshals the ADRSettings message from JSON.
+func (x *ADRSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "static":
+			ov := &ADRSettings_Static{}
+			x.Mode = ov
+			if s.ReadNil() {
+				ov.Static = nil
+				return
+			}
+			ov.Static = &ADRSettings_StaticMode{}
+			ov.Static.UnmarshalProtoJSON(s.WithField("static", true))
+		case "dynamic":
+			ov := &ADRSettings_Dynamic{}
+			x.Mode = ov
+			if s.ReadNil() {
+				ov.Dynamic = nil
+				return
+			}
+			ov.Dynamic = &ADRSettings_DynamicMode{}
+			ov.Dynamic.UnmarshalProtoJSON(s.WithField("dynamic", true))
+		case "disabled":
+			s.AddField("disabled")
+			ov := &ADRSettings_Disabled{}
+			x.Mode = ov
+			if s.ReadNil() {
+				ov.Disabled = nil
+				return
+			}
+			// NOTE: ADRSettings_DisabledMode does not seem to implement UnmarshalProtoJSON.
+			var v ADRSettings_DisabledMode
+			gogo.UnmarshalMessage(s, &v)
+			ov.Disabled = &v
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ADRSettings from JSON.
+func (x *ADRSettings) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the MACSettings message to JSON.
 func (x *MACSettings) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {
@@ -907,6 +1206,11 @@ func (x *MACSettings) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("downlink_dwell_time")
 		x.DownlinkDwellTime.MarshalProtoJSON(s.WithField("downlink_dwell_time"))
+	}
+	if x.Adr != nil || s.HasField("adr") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("adr")
+		x.Adr.MarshalProtoJSON(s.WithField("adr"))
 	}
 	s.WriteObjectEnd()
 }
@@ -1198,6 +1502,13 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			}
 			x.DownlinkDwellTime = &BoolValue{}
 			x.DownlinkDwellTime.UnmarshalProtoJSON(s.WithField("downlink_dwell_time", false))
+		case "adr":
+			if s.ReadNil() {
+				x.Adr = nil
+				return
+			}
+			x.Adr = &ADRSettings{}
+			x.Adr.UnmarshalProtoJSON(s.WithField("adr", true))
 		}
 	})
 }

@@ -97,6 +97,21 @@ func (x *Application) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		// NOTE: OrganizationOrUserIdentifiers does not seem to implement MarshalProtoJSON.
 		gogo.MarshalMessage(s, x.TechnicalContact)
 	}
+	if x.NetworkServerAddress != "" || s.HasField("network_server_address") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("network_server_address")
+		s.WriteString(x.NetworkServerAddress)
+	}
+	if x.ApplicationServerAddress != "" || s.HasField("application_server_address") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("application_server_address")
+		s.WriteString(x.ApplicationServerAddress)
+	}
+	if x.JoinServerAddress != "" || s.HasField("join_server_address") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("join_server_address")
+		s.WriteString(x.JoinServerAddress)
+	}
 	if x.DevEuiCounter != 0 || s.HasField("dev_eui_counter") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("dev_eui_counter")
@@ -216,6 +231,15 @@ func (x *Application) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			var v OrganizationOrUserIdentifiers
 			gogo.UnmarshalMessage(s, &v)
 			x.TechnicalContact = &v
+		case "network_server_address", "networkServerAddress":
+			s.AddField("network_server_address")
+			x.NetworkServerAddress = s.ReadString()
+		case "application_server_address", "applicationServerAddress":
+			s.AddField("application_server_address")
+			x.ApplicationServerAddress = s.ReadString()
+		case "join_server_address", "joinServerAddress":
+			s.AddField("join_server_address")
+			x.JoinServerAddress = s.ReadString()
 		case "dev_eui_counter", "devEuiCounter":
 			s.AddField("dev_eui_counter")
 			x.DevEuiCounter = s.ReadUint32()

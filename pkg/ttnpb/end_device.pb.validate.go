@@ -709,6 +709,144 @@ var _ interface {
 	ErrorName() string
 } = EndDeviceVersionValidationError{}
 
+// ValidateFields checks the field values on ADRSettings with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *ADRSettings) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ADRSettingsFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "mode":
+			if len(subs) == 0 {
+				subs = []string{
+					"static", "dynamic", "disabled",
+				}
+			}
+			for name, subs := range _processPaths(subs) {
+				_ = subs
+				switch name {
+				case "static":
+					w, ok := m.Mode.(*ADRSettings_Static)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetStatic()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return ADRSettingsValidationError{
+								field:  "static",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				case "dynamic":
+					w, ok := m.Mode.(*ADRSettings_Dynamic)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetDynamic()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return ADRSettingsValidationError{
+								field:  "dynamic",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				case "disabled":
+					w, ok := m.Mode.(*ADRSettings_Disabled)
+					if !ok || w == nil {
+						continue
+					}
+
+					if v, ok := interface{}(m.GetDisabled()).(interface{ ValidateFields(...string) error }); ok {
+						if err := v.ValidateFields(subs...); err != nil {
+							return ADRSettingsValidationError{
+								field:  "disabled",
+								reason: "embedded message failed validation",
+								cause:  err,
+							}
+						}
+					}
+
+				}
+			}
+		default:
+			return ADRSettingsValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ADRSettingsValidationError is the validation error returned by
+// ADRSettings.ValidateFields if the designated constraints aren't met.
+type ADRSettingsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ADRSettingsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ADRSettingsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ADRSettingsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ADRSettingsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ADRSettingsValidationError) ErrorName() string { return "ADRSettingsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ADRSettingsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sADRSettings.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ADRSettingsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ADRSettingsValidationError{}
+
 // ValidateFields checks the field values on MACSettings with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.
@@ -1099,6 +1237,18 @@ func (m *MACSettings) ValidateFields(paths ...string) error {
 				if err := v.ValidateFields(subs...); err != nil {
 					return MACSettingsValidationError{
 						field:  "downlink_dwell_time",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "adr":
+
+			if v, ok := interface{}(m.GetAdr()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACSettingsValidationError{
+						field:  "adr",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}
@@ -3759,6 +3909,350 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = MACParameters_ChannelValidationError{}
+
+// ValidateFields checks the field values on ADRSettings_StaticMode with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ADRSettings_StaticMode) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ADRSettings_StaticModeFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "data_rate_index":
+
+			if _, ok := DataRateIndex_name[int32(m.GetDataRateIndex())]; !ok {
+				return ADRSettings_StaticModeValidationError{
+					field:  "data_rate_index",
+					reason: "value must be one of the defined enum values",
+				}
+			}
+
+		case "tx_power_index":
+
+			if m.GetTxPowerIndex() > 15 {
+				return ADRSettings_StaticModeValidationError{
+					field:  "tx_power_index",
+					reason: "value must be less than or equal to 15",
+				}
+			}
+
+		case "nb_trans":
+
+			if m.GetNbTrans() > 15 {
+				return ADRSettings_StaticModeValidationError{
+					field:  "nb_trans",
+					reason: "value must be less than or equal to 15",
+				}
+			}
+
+		default:
+			return ADRSettings_StaticModeValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ADRSettings_StaticModeValidationError is the validation error returned by
+// ADRSettings_StaticMode.ValidateFields if the designated constraints aren't met.
+type ADRSettings_StaticModeValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ADRSettings_StaticModeValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ADRSettings_StaticModeValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ADRSettings_StaticModeValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ADRSettings_StaticModeValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ADRSettings_StaticModeValidationError) ErrorName() string {
+	return "ADRSettings_StaticModeValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ADRSettings_StaticModeValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sADRSettings_StaticMode.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ADRSettings_StaticModeValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ADRSettings_StaticModeValidationError{}
+
+// ValidateFields checks the field values on ADRSettings_DynamicMode with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ADRSettings_DynamicMode) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ADRSettings_DynamicModeFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "margin":
+
+			if v, ok := interface{}(m.GetMargin()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicModeValidationError{
+						field:  "margin",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "min_data_rate_index":
+
+			if v, ok := interface{}(m.GetMinDataRateIndex()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicModeValidationError{
+						field:  "min_data_rate_index",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "max_data_rate_index":
+
+			if v, ok := interface{}(m.GetMaxDataRateIndex()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ADRSettings_DynamicModeValidationError{
+						field:  "max_data_rate_index",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "min_tx_power_index":
+
+			if wrapper := m.GetMinTxPowerIndex(); wrapper != nil {
+
+				if wrapper.GetValue() > 15 {
+					return ADRSettings_DynamicModeValidationError{
+						field:  "min_tx_power_index",
+						reason: "value must be less than or equal to 15",
+					}
+				}
+
+			}
+
+		case "max_tx_power_index":
+
+			if wrapper := m.GetMaxTxPowerIndex(); wrapper != nil {
+
+				if wrapper.GetValue() > 15 {
+					return ADRSettings_DynamicModeValidationError{
+						field:  "max_tx_power_index",
+						reason: "value must be less than or equal to 15",
+					}
+				}
+
+			}
+
+		case "min_nb_trans":
+
+			if wrapper := m.GetMinNbTrans(); wrapper != nil {
+
+				if val := wrapper.GetValue(); val < 1 || val > 3 {
+					return ADRSettings_DynamicModeValidationError{
+						field:  "min_nb_trans",
+						reason: "value must be inside range [1, 3]",
+					}
+				}
+
+			}
+
+		case "max_nb_trans":
+
+			if wrapper := m.GetMaxNbTrans(); wrapper != nil {
+
+				if val := wrapper.GetValue(); val < 1 || val > 3 {
+					return ADRSettings_DynamicModeValidationError{
+						field:  "max_nb_trans",
+						reason: "value must be inside range [1, 3]",
+					}
+				}
+
+			}
+
+		default:
+			return ADRSettings_DynamicModeValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ADRSettings_DynamicModeValidationError is the validation error returned by
+// ADRSettings_DynamicMode.ValidateFields if the designated constraints aren't met.
+type ADRSettings_DynamicModeValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ADRSettings_DynamicModeValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ADRSettings_DynamicModeValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ADRSettings_DynamicModeValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ADRSettings_DynamicModeValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ADRSettings_DynamicModeValidationError) ErrorName() string {
+	return "ADRSettings_DynamicModeValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ADRSettings_DynamicModeValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sADRSettings_DynamicMode.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ADRSettings_DynamicModeValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ADRSettings_DynamicModeValidationError{}
+
+// ValidateFields checks the field values on ADRSettings_DisabledMode with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ADRSettings_DisabledMode) ValidateFields(paths ...string) error {
+	if len(paths) > 0 {
+		return fmt.Errorf("message ADRSettings_DisabledMode has no fields, but paths %s were specified", paths)
+	}
+	return nil
+}
+
+// ADRSettings_DisabledModeValidationError is the validation error returned by
+// ADRSettings_DisabledMode.ValidateFields if the designated constraints
+// aren't met.
+type ADRSettings_DisabledModeValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ADRSettings_DisabledModeValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ADRSettings_DisabledModeValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ADRSettings_DisabledModeValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ADRSettings_DisabledModeValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ADRSettings_DisabledModeValidationError) ErrorName() string {
+	return "ADRSettings_DisabledModeValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ADRSettings_DisabledModeValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sADRSettings_DisabledMode.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ADRSettings_DisabledModeValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ADRSettings_DisabledModeValidationError{}
 
 // ValidateFields checks the field values on MACState_JoinRequest with the
 // rules defined in the proto definition for this message. If any rules are

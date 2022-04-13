@@ -129,12 +129,7 @@ class ConsoleApp extends React.PureComponent {
       history: {
         location: { pathname },
       },
-      env: {
-        siteTitle,
-        pageData,
-        siteName,
-        config: { supportLink, documentationBaseUrl },
-      },
+      env: { siteTitle, pageData, siteName },
       status,
     } = this.props
 
@@ -188,11 +183,7 @@ class ConsoleApp extends React.PureComponent {
                   </div>
                 </WithAuth>
               </main>
-              <Footer
-                className={style.footer}
-                supportLink={supportLink}
-                documentationLink={documentationBaseUrl}
-              />
+              <Footer className={style.footer} />
             </div>
           </ErrorView>
         </ConnectedRouter>

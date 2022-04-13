@@ -380,6 +380,12 @@ func (c *Component) Close() {
 		c.logger.Debugf("Stopped listening on %s", l.Addr())
 	}
 
+	if c.loopback != nil {
+		c.logger.Debug("Stopping gRPC client...")
+		c.loopback.Close()
+		c.logger.Debug("Stopped gRPC client")
+	}
+
 	if c.GRPC != nil {
 		c.logger.Debug("Stopping gRPC server...")
 		c.GRPC.Stop()

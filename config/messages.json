@@ -935,6 +935,15 @@
       "file": "i18n.go"
     }
   },
+  "enum:RIGHT_USER_NOTIFICATIONS_READ": {
+    "translations": {
+      "en": "read user notifications"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
   "enum:RIGHT_USER_ORGANIZATIONS_CREATE": {
     "translations": {
       "en": "create an organization under the user account"
@@ -5525,6 +5534,15 @@
       "file": "application_access.go"
     }
   },
+  "error:pkg/identityserver:application_server_address_mismatch": {
+    "translations": {
+      "en": "application server address `{address}` does not match `{expected}`"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "end_device_registry.go"
+    }
+  },
   "error:pkg/identityserver:claim_authentication_code": {
     "translations": {
       "en": "invalid claim authentication code"
@@ -5651,6 +5669,15 @@
       "file": "user_registry.go"
     }
   },
+  "error:pkg/identityserver:join_server_address_mismatch": {
+    "translations": {
+      "en": "join server address `{address}` does not match `{expected}`"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "end_device_registry.go"
+    }
+  },
   "error:pkg/identityserver:login_tokens_disabled": {
     "translations": {
       "en": "login tokens are disabled"
@@ -5676,6 +5703,15 @@
     "description": {
       "package": "pkg/identityserver",
       "file": "organization_registry.go"
+    }
+  },
+  "error:pkg/identityserver:network_server_address_mismatch": {
+    "translations": {
+      "en": "network server address `{address}` does not match `{expected}`"
+    },
+    "description": {
+      "package": "pkg/identityserver",
+      "file": "end_device_registry.go"
     }
   },
   "error:pkg/identityserver:no_contact_info": {

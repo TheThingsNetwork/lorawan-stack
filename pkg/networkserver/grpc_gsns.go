@@ -957,18 +957,25 @@ func (ns *NetworkServer) handleDataUplink(ctx context.Context, up *ttnpb.UplinkM
 				"mac_state.current_parameters.adr_data_rate_index",
 			)
 
-			useADR := mac.DeviceUseADR(stored, ns.defaultMACSettings, matched.phy)
-			if useADR {
+			adaptDataRate, resetDesiredParameters, staticADRSettings := mac.DeviceShouldAdaptDataRate(stored, ns.defaultMACSettings, matched.phy)
+			if resetDesiredParameters || staticADRSettings != nil {
 				paths = ttnpb.AddFields(paths,
 					"mac_state.desired_parameters.adr_data_rate_index",
 					"mac_state.desired_parameters.adr_nb_trans",
 					"mac_state.desired_parameters.adr_tx_power_index",
 				)
-				stored.MacState.DesiredParameters.AdrDataRateIndex = stored.MacState.CurrentParameters.AdrDataRateIndex
-				stored.MacState.DesiredParameters.AdrTxPowerIndex = stored.MacState.CurrentParameters.AdrTxPowerIndex
-				stored.MacState.DesiredParameters.AdrNbTrans = stored.MacState.CurrentParameters.AdrNbTrans
 			}
-			if !pld.FHdr.FCtrl.Adr || !useADR {
+			if currentParameters, desiredParameters := stored.MacState.CurrentParameters, stored.MacState.DesiredParameters; resetDesiredParameters {
+				desiredParameters.AdrDataRateIndex = currentParameters.AdrDataRateIndex
+				desiredParameters.AdrTxPowerIndex = currentParameters.AdrTxPowerIndex
+				desiredParameters.AdrNbTrans = currentParameters.AdrNbTrans
+			}
+			if desiredParameters := stored.MacState.DesiredParameters; staticADRSettings != nil {
+				desiredParameters.AdrDataRateIndex = staticADRSettings.DataRateIndex
+				desiredParameters.AdrTxPowerIndex = staticADRSettings.TxPowerIndex
+				desiredParameters.AdrNbTrans = staticADRSettings.NbTrans
+			}
+			if !pld.FHdr.FCtrl.Adr || !adaptDataRate {
 				return stored, paths, nil
 			}
 			if err := mac.AdaptDataRate(ctx, stored, matched.phy, ns.defaultMACSettings); err != nil {

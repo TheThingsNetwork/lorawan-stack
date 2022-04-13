@@ -155,7 +155,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
-	github.com/nats-io/nats.go v1.13.1-0.20220121202836-972a071d373d // indirect
+	github.com/nats-io/nats.go v1.13.1-0.20220308171302-2f2f6968e98d // indirect
 	github.com/nats-io/nkeys v0.3.0 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/oklog/ulid/v2 v2.0.2 // indirect

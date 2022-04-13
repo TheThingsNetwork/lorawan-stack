@@ -77,6 +77,9 @@ func addDeprecatedDeviceFlags(flagSet *pflag.FlagSet) {
 	util.DeprecateFlag(flagSet, "pending_session.keys.nwk_s_key", "pending_session.keys.f_nwk_s_int_key")
 	util.DeprecateFlag(flagSet, "session.keys.nwk_s_key.key", "session.keys.f_nwk_s_int_key.key")
 	util.DeprecateFlag(flagSet, "pending_session.keys.nwk_s_key.key", "pending_session.keys.f_nwk_s_int_key.key")
+
+	util.HideFlag(flagSet, "mac_settings.use_adr")
+	util.HideFlag(flagSet, "mac_settings.adr_margin")
 }
 
 func forwardDeprecatedDeviceFlags(flagSet *pflag.FlagSet) {
@@ -333,8 +336,12 @@ var (
 				return err
 			}
 
-			device.SetFields(res, "ids.dev_addr")
-			device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...)
+			if err := device.SetFields(res, "ids.dev_addr"); err != nil {
+				return err
+			}
+			if err := device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...); err != nil {
+				return err
+			}
 			if device.CreatedAt == nil || (res.CreatedAt != nil && ttnpb.StdTime(res.CreatedAt).Before(*ttnpb.StdTime(device.CreatedAt))) {
 				device.CreatedAt = res.CreatedAt
 			}
@@ -458,7 +465,7 @@ var (
 						paths = append(paths,
 							"join_server_address",
 						)
-						if device.Ids.JoinEui == nil {
+						if device.Ids.JoinEui == nil && (devID == nil || devID.JoinEui == nil) {
 							// Get the default JoinEUI for Join Server.
 							logger.WithField("join_server_address", config.JoinServerGRPCAddress).Info("JoinEUI empty but defaults flag is set, fetch default JoinEUI of the Join Server")
 							js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
@@ -516,7 +523,7 @@ var (
 				paths = append(paths, "locations")
 			}
 
-			if err = util.SetFields(device, setEndDeviceFlags); err != nil {
+			if err := util.SetFields(device, setEndDeviceFlags); err != nil {
 				return err
 			}
 
@@ -539,6 +546,21 @@ var (
 			if err != nil {
 				return err
 			}
+
+			application, err := ttnpb.NewApplicationRegistryClient(is).Get(ctx, &ttnpb.GetApplicationRequest{
+				ApplicationIds: devID.ApplicationIds,
+				FieldMask: &pbtypes.FieldMask{Paths: []string{
+					"network_server_address",
+					"application_server_address",
+					"join_server_address",
+				}},
+			})
+			if err != nil {
+				return err
+			}
+
+			compareServerAddressesApplication(application, config)
+
 			requestDevEUI, _ := cmd.Flags().GetBool("request-dev-eui")
 			if requestDevEUI {
 				logger.Debug("request-dev-eui flag set, requesting a DevEUI")
@@ -610,7 +632,9 @@ var (
 			}
 			isDevice := &ttnpb.EndDevice{}
 			logger.WithField("paths", isPaths).Debug("Create end device on Identity Server")
-			isDevice.SetFields(device, append(isPaths, "ids")...)
+			if err := isDevice.SetFields(device, append(isPaths, "ids")...); err != nil {
+				return err
+			}
 			isRes, err := ttnpb.NewEndDeviceRegistryClient(is).Create(ctx, &ttnpb.CreateEndDeviceRequest{
 				EndDevice: isDevice,
 			})
@@ -618,7 +642,9 @@ var (
 				return err
 			}
 
-			device.SetFields(isRes, append(isPaths, "created_at", "updated_at")...)
+			if err := device.SetFields(isRes, append(isPaths, "created_at", "updated_at")...); err != nil {
+				return err
+			}
 
 			res, err := setEndDevice(device, nil, nsPaths, asPaths, jsPaths, nil, true, false)
 			if err != nil {
@@ -629,7 +655,9 @@ var (
 				return err
 			}
 
-			device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...)
+			if err := device.SetFields(res, append(append(nsPaths, asPaths...), jsPaths...)...); err != nil {
+				return err
+			}
 			if device.CreatedAt == nil || (res.CreatedAt != nil && ttnpb.StdTime(res.CreatedAt).Before(*ttnpb.StdTime(device.CreatedAt))) {
 				device.CreatedAt = res.CreatedAt
 			}
@@ -765,7 +793,9 @@ var (
 			}
 
 			if hasUpdateDeviceLocationFlags(cmd.Flags()) {
-				device.SetFields(existingDevice, "locations")
+				if err := device.SetFields(existingDevice, "locations"); err != nil {
+					return err
+				}
 				updateDeviceLocation(device, cmd.Flags())
 			}
 
@@ -914,8 +944,12 @@ var (
 			if err != nil {
 				return err
 			}
-			device.SetFields(nsDevice, "ids.dev_addr")
-			device.SetFields(nsDevice, ttnpb.AllowedBottomLevelFields(nsPaths, getEndDeviceFromNS)...)
+			if err := device.SetFields(nsDevice, "ids.dev_addr"); err != nil {
+				return err
+			}
+			if err := device.SetFields(nsDevice, ttnpb.AllowedBottomLevelFields(nsPaths, getEndDeviceFromNS)...); err != nil {
+				return err
+			}
 			if device.CreatedAt == nil || (nsDevice.CreatedAt != nil && ttnpb.StdTime(nsDevice.CreatedAt).Before(*ttnpb.StdTime(device.CreatedAt))) {
 				device.CreatedAt = nsDevice.CreatedAt
 			}
@@ -1219,7 +1253,9 @@ This command may take end device identifiers from stdin.`,
 			if err != nil {
 				return err
 			}
-			device.SetFields(dev, append(append(nsPaths, asPaths...), jsPaths...)...)
+			if err := device.SetFields(dev, append(append(nsPaths, asPaths...), jsPaths...)...); err != nil {
+				return err
+			}
 
 			size, _ := cmd.Flags().GetUint32("size")
 			res, err := client.Generate(ctx, &ttnpb.GenerateEndDeviceQRCodeRequest{
@@ -1457,21 +1493,21 @@ func compareServerAddressesEndDevice(device *ttnpb.EndDevice, config *Config) (n
 		logger.WithFields(log.Fields(
 			"configured", nsHost,
 			"registered", host,
-		)).Warn("Registered Network Server address does not match CLI configuration")
+		)).Warnf("Registered Network Server address of end device %q does not match CLI configuration", device.GetIds().GetDeviceId())
 	}
 	if host := getHost(device.ApplicationServerAddress); config.ApplicationServerEnabled && host != "" && host != asHost {
 		asMismatch = true
 		logger.WithFields(log.Fields(
 			"configured", asHost,
 			"registered", host,
-		)).Warn("Registered Application Server address does not match CLI configuration")
+		)).Warnf("Registered Application Server address of end device %q does not match CLI configuration", device.GetIds().GetDeviceId())
 	}
 	if host := getHost(device.JoinServerAddress); config.JoinServerEnabled && host != "" && host != jsHost {
 		jsMismatch = true
 		logger.WithFields(log.Fields(
 			"configured", jsHost,
 			"registered", host,
-		)).Warn("Registered Join Server address does not match CLI configuration")
+		)).Warnf("Registered Join Server address of end device %q does not match CLI configuration", device.GetIds().GetDeviceId())
 	}
 	return
 }

@@ -166,6 +166,7 @@
         "administrative_contact.ids.user_ids",
         "administrative_contact.ids.user_ids.email",
         "administrative_contact.ids.user_ids.user_id",
+        "application_server_address",
         "attributes",
         "contact_info",
         "created_at",
@@ -174,7 +175,9 @@
         "dev_eui_counter",
         "ids",
         "ids.application_id",
+        "join_server_address",
         "name",
+        "network_server_address",
         "technical_contact",
         "technical_contact.ids",
         "technical_contact.ids.organization_ids",
@@ -216,6 +219,7 @@
         "administrative_contact.ids.user_ids",
         "administrative_contact.ids.user_ids.email",
         "administrative_contact.ids.user_ids.user_id",
+        "application_server_address",
         "attributes",
         "contact_info",
         "created_at",
@@ -224,7 +228,9 @@
         "dev_eui_counter",
         "ids",
         "ids.application_id",
+        "join_server_address",
         "name",
+        "network_server_address",
         "technical_contact",
         "technical_contact.ids",
         "technical_contact.ids.organization_ids",
@@ -255,6 +261,7 @@
         "administrative_contact.ids.user_ids",
         "administrative_contact.ids.user_ids.email",
         "administrative_contact.ids.user_ids.user_id",
+        "application_server_address",
         "attributes",
         "contact_info",
         "created_at",
@@ -262,7 +269,9 @@
         "description",
         "ids",
         "ids.application_id",
+        "join_server_address",
         "name",
+        "network_server_address",
         "technical_contact",
         "technical_contact.ids",
         "technical_contact.ids.organization_ids",
@@ -3547,6 +3556,23 @@
         "lorawan_phy_version",
         "lorawan_version",
         "mac_settings",
+        "mac_settings.adr",
+        "mac_settings.adr.mode",
+        "mac_settings.adr.mode.disabled",
+        "mac_settings.adr.mode.dynamic",
+        "mac_settings.adr.mode.dynamic.margin",
+        "mac_settings.adr.mode.dynamic.max_data_rate_index",
+        "mac_settings.adr.mode.dynamic.max_data_rate_index.value",
+        "mac_settings.adr.mode.dynamic.max_nb_trans",
+        "mac_settings.adr.mode.dynamic.max_tx_power_index",
+        "mac_settings.adr.mode.dynamic.min_data_rate_index",
+        "mac_settings.adr.mode.dynamic.min_data_rate_index.value",
+        "mac_settings.adr.mode.dynamic.min_nb_trans",
+        "mac_settings.adr.mode.dynamic.min_tx_power_index",
+        "mac_settings.adr.mode.static",
+        "mac_settings.adr.mode.static.data_rate_index",
+        "mac_settings.adr.mode.static.nb_trans",
+        "mac_settings.adr.mode.static.tx_power_index",
         "mac_settings.adr_margin",
         "mac_settings.beacon_frequency",
         "mac_settings.beacon_frequency.value",
@@ -3863,6 +3889,23 @@
         "lorawan_phy_version",
         "lorawan_version",
         "mac_settings",
+        "mac_settings.adr",
+        "mac_settings.adr.mode",
+        "mac_settings.adr.mode.disabled",
+        "mac_settings.adr.mode.dynamic",
+        "mac_settings.adr.mode.dynamic.margin",
+        "mac_settings.adr.mode.dynamic.max_data_rate_index",
+        "mac_settings.adr.mode.dynamic.max_data_rate_index.value",
+        "mac_settings.adr.mode.dynamic.max_nb_trans",
+        "mac_settings.adr.mode.dynamic.max_tx_power_index",
+        "mac_settings.adr.mode.dynamic.min_data_rate_index",
+        "mac_settings.adr.mode.dynamic.min_data_rate_index.value",
+        "mac_settings.adr.mode.dynamic.min_nb_trans",
+        "mac_settings.adr.mode.dynamic.min_tx_power_index",
+        "mac_settings.adr.mode.static",
+        "mac_settings.adr.mode.static.data_rate_index",
+        "mac_settings.adr.mode.static.nb_trans",
+        "mac_settings.adr.mode.static.tx_power_index",
         "mac_settings.adr_margin",
         "mac_settings.beacon_frequency",
         "mac_settings.beacon_frequency.value",
@@ -4171,6 +4214,23 @@
         "lorawan_phy_version",
         "lorawan_version",
         "mac_settings",
+        "mac_settings.adr",
+        "mac_settings.adr.mode",
+        "mac_settings.adr.mode.disabled",
+        "mac_settings.adr.mode.dynamic",
+        "mac_settings.adr.mode.dynamic.margin",
+        "mac_settings.adr.mode.dynamic.max_data_rate_index",
+        "mac_settings.adr.mode.dynamic.max_data_rate_index.value",
+        "mac_settings.adr.mode.dynamic.max_nb_trans",
+        "mac_settings.adr.mode.dynamic.max_tx_power_index",
+        "mac_settings.adr.mode.dynamic.min_data_rate_index",
+        "mac_settings.adr.mode.dynamic.min_data_rate_index.value",
+        "mac_settings.adr.mode.dynamic.min_nb_trans",
+        "mac_settings.adr.mode.dynamic.min_tx_power_index",
+        "mac_settings.adr.mode.static",
+        "mac_settings.adr.mode.static.data_rate_index",
+        "mac_settings.adr.mode.static.nb_trans",
+        "mac_settings.adr.mode.static.tx_power_index",
         "mac_settings.adr_margin",
         "mac_settings.beacon_frequency",
         "mac_settings.beacon_frequency.value",
@@ -4461,6 +4521,42 @@
           "parameters": [
             "application_ids.application_id",
             "device_id"
+          ]
+        }
+      ]
+    }
+  },
+  "NotificationService": {
+    "Create": {
+      "file": "lorawan-stack/api/notification_service.proto",
+      "http": []
+    },
+    "List": {
+      "file": "lorawan-stack/api/notification_service.proto",
+      "http": [
+        {
+          "method": "",
+          "pattern": "",
+          "parameters": []
+        },
+        {
+          "method": "get",
+          "pattern": "/users/{receiver_ids.user_id}/notifications",
+          "parameters": [
+            "receiver_ids.user_id"
+          ]
+        }
+      ]
+    },
+    "UpdateStatus": {
+      "file": "lorawan-stack/api/notification_service.proto",
+      "http": [
+        {
+          "method": "patch",
+          "pattern": "/users/{receiver_ids.user_id}/notifications",
+          "body": "*",
+          "parameters": [
+            "receiver_ids.user_id"
           ]
         }
       ]
@@ -5160,6 +5256,7 @@
         "administrative_contact.ids.user_ids",
         "administrative_contact.ids.user_ids.email",
         "administrative_contact.ids.user_ids.user_id",
+        "application_server_address",
         "attributes",
         "contact_info",
         "created_at",
@@ -5168,7 +5265,9 @@
         "dev_eui_counter",
         "ids",
         "ids.application_id",
+        "join_server_address",
         "name",
+        "network_server_address",
         "technical_contact",
         "technical_contact.ids",
         "technical_contact.ids.organization_ids",

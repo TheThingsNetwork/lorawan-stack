@@ -20,7 +20,7 @@ import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 var US_902_928_TS1_V1_0_1 = Band{
 	ID: US_902_928,
 
-	EnableADR: true,
+	SupportsDynamicADR: true,
 
 	MaxUplinkChannels: 72,
 	UplinkChannels:    us902928UplinkChannels,

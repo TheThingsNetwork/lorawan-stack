@@ -61,6 +61,8 @@ compat/config:
 compat/db:
   - pkg/identityserver/store/*.go
   - pkg/identityserver/store/**/*.go
+  - pkg/identityserver/gormstore/*.go
+  - pkg/identityserver/gormstore/**/*.go
   - pkg/**/redis/*.go
   - pkg/**/redis/**/*.go
 

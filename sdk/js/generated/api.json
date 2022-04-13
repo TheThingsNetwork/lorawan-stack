@@ -208,6 +208,66 @@
               "defaultValue": ""
             },
             {
+              "name": "network_server_address",
+              "description": "The address of the Network Server where this application is supposed to be registered.\nIf set, this fields indicates where end devices for this application should be registered.\n\nStored in Entity Registry.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nThe connection shall be established with transport layer security (TLS).\nCustom certificate authorities may be configured out-of-band.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "application_server_address",
+              "description": "The address of the Application Server where this application is supposed to be registered.\nIf set, this fields indicates where end devices for this application should be registered.\n\nStored in Entity Registry.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nThe connection shall be established with transport layer security (TLS).\nCustom certificate authorities may be configured out-of-band.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "join_server_address",
+              "description": "The address of the Join Server where this application is supposed to be registered.\nIf set, this fields indicates where end devices for this application should be registered.\n\nStored in Entity Registry.\nThe typical format of the address is \"host:port\". If the port is omitted,\nthe normal port inference (with DNS lookup, otherwise defaults) is used.\nThe connection shall be established with transport layer security (TLS).\nCustom certificate authorities may be configured out-of-band.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.pattern",
+                    "value": "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"
+                  }
+                ]
+              }
+            },
+            {
               "name": "dev_eui_counter",
               "description": "",
               "label": "",
@@ -4641,7 +4701,7 @@
           "fields": [
             {
               "name": "stack_name",
-              "description": "The stack name that is associated with the CloudFormation deployment of The Things Enterprise Stack integration.",
+              "description": "The stack name that is associated with the CloudFormation deployment of The Things Stack Enterprise integration.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -12536,6 +12596,273 @@
       "extensions": [],
       "messages": [
         {
+          "name": "ADRSettings",
+          "longName": "ADRSettings",
+          "fullName": "ttn.lorawan.v3.ADRSettings",
+          "description": "Adaptive Data Rate settings.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": true,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "static",
+              "description": "",
+              "label": "",
+              "type": "StaticMode",
+              "longType": "ADRSettings.StaticMode",
+              "fullType": "ttn.lorawan.v3.ADRSettings.StaticMode",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            },
+            {
+              "name": "dynamic",
+              "description": "",
+              "label": "",
+              "type": "DynamicMode",
+              "longType": "ADRSettings.DynamicMode",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DynamicMode",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            },
+            {
+              "name": "disabled",
+              "description": "",
+              "label": "",
+              "type": "DisabledMode",
+              "longType": "ADRSettings.DisabledMode",
+              "fullType": "ttn.lorawan.v3.ADRSettings.DisabledMode",
+              "ismap": false,
+              "isoneof": true,
+              "oneofdecl": "mode",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DisabledMode",
+          "longName": "ADRSettings.DisabledMode",
+          "fullName": "ttn.lorawan.v3.ADRSettings.DisabledMode",
+          "description": "Configuration options for cases in which ADR is to be disabled\ncompletely.",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "DynamicMode",
+          "longName": "ADRSettings.DynamicMode",
+          "fullName": "ttn.lorawan.v3.ADRSettings.DynamicMode",
+          "description": "Configuration options for dynamic ADR.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "margin",
+              "description": "The ADR margin (dB) tells the network server how much margin it should add in ADR requests.\nA bigger margin is less efficient, but gives a better chance of successful reception.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "FloatValue",
+              "longType": "google.protobuf.FloatValue",
+              "fullType": "google.protobuf.FloatValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "min_data_rate_index",
+              "description": "Minimum data rate index.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "DataRateIndexValue",
+              "longType": "DataRateIndexValue",
+              "fullType": "ttn.lorawan.v3.DataRateIndexValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_data_rate_index",
+              "description": "Maximum data rate index.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "DataRateIndexValue",
+              "longType": "DataRateIndexValue",
+              "fullType": "ttn.lorawan.v3.DataRateIndexValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "min_tx_power_index",
+              "description": "Minimum transmission power index.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 15
+                  }
+                ]
+              }
+            },
+            {
+              "name": "max_tx_power_index",
+              "description": "Maximum transmission power index.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 15
+                  }
+                ]
+              }
+            },
+            {
+              "name": "min_nb_trans",
+              "description": "Minimum number of retransmissions.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 3
+                  },
+                  {
+                    "name": "uint32.gte",
+                    "value": 1
+                  }
+                ]
+              }
+            },
+            {
+              "name": "max_nb_trans",
+              "description": "Maximum number of retransmissions.\nIf unset, the default value from Network Server configuration will be used.",
+              "label": "",
+              "type": "UInt32Value",
+              "longType": "google.protobuf.UInt32Value",
+              "fullType": "google.protobuf.UInt32Value",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 3
+                  },
+                  {
+                    "name": "uint32.gte",
+                    "value": 1
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "StaticMode",
+          "longName": "ADRSettings.StaticMode",
+          "fullName": "ttn.lorawan.v3.ADRSettings.StaticMode",
+          "description": "Configuration options for static ADR.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "data_rate_index",
+              "description": "Data rate index to use.",
+              "label": "",
+              "type": "DataRateIndex",
+              "longType": "DataRateIndex",
+              "fullType": "ttn.lorawan.v3.DataRateIndex",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "tx_power_index",
+              "description": "Transmission power index to use.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 15
+                  }
+                ]
+              }
+            },
+            {
+              "name": "nb_trans",
+              "description": "Number of retransmissions.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 15
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "BoolValue",
           "longName": "BoolValue",
           "fullName": "ttn.lorawan.v3.BoolValue",
@@ -14902,7 +15229,7 @@
             },
             {
               "name": "use_adr",
-              "description": "Whether the Network Server should use ADR for the device.\nIf unset, the default value from Network Server configuration will be used.",
+              "description": "Whether the Network Server should use ADR for the device.\nThis field is deprecated, use adr_settings instead.",
               "label": "",
               "type": "BoolValue",
               "longType": "BoolValue",
@@ -14910,11 +15237,14 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "deprecated": true
+              }
             },
             {
               "name": "adr_margin",
-              "description": "The ADR margin tells the network server how much margin it should add in ADR requests.\nA bigger margin is less efficient, but gives a better chance of successful reception.\nIf unset, the default value from Network Server configuration will be used.",
+              "description": "The ADR margin (dB) tells the network server how much margin it should add in ADR requests.\nA bigger margin is less efficient, but gives a better chance of successful reception.\nThis field is deprecated, use adr_settings.dynamic.margin instead.",
               "label": "",
               "type": "FloatValue",
               "longType": "google.protobuf.FloatValue",
@@ -14922,7 +15252,10 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "deprecated": true
+              }
             },
             {
               "name": "resets_f_cnt",
@@ -15123,6 +15456,18 @@
               "type": "BoolValue",
               "longType": "BoolValue",
               "fullType": "ttn.lorawan.v3.BoolValue",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "adr",
+              "description": "Adaptive Data Rate settings.\nIf unset, the default value from Network Server configuration or regional parameters specification will be used.",
+              "label": "",
+              "type": "ADRSettings",
+              "longType": "ADRSettings",
+              "fullType": "ttn.lorawan.v3.ADRSettings",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -31295,6 +31640,614 @@
       ]
     },
     {
+      "name": "lorawan-stack/api/notification_service.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": true,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": true,
+      "enums": [
+        {
+          "name": "NotificationReceiver",
+          "longName": "NotificationReceiver",
+          "fullName": "ttn.lorawan.v3.NotificationReceiver",
+          "description": "",
+          "values": [
+            {
+              "name": "NOTIFICATION_RECEIVER_UNKNOWN",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "NOTIFICATION_RECEIVER_COLLABORATOR",
+              "number": "1",
+              "description": "Notification is received by collaborators of the entity.\nIf the collaborator is an organization, the notification is received by organization members."
+            },
+            {
+              "name": "NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT",
+              "number": "3",
+              "description": "Notification is received by administrative contact of the entity.\nIf this is an organization, the notification is received by organization members."
+            },
+            {
+              "name": "NOTIFICATION_RECEIVER_TECHNICAL_CONTACT",
+              "number": "4",
+              "description": "Notification is received by technical contact of the entity.\nIf this is an organization, the notification is received by organization members."
+            }
+          ]
+        },
+        {
+          "name": "NotificationStatus",
+          "longName": "NotificationStatus",
+          "fullName": "ttn.lorawan.v3.NotificationStatus",
+          "description": "",
+          "values": [
+            {
+              "name": "NOTIFICATION_STATUS_UNSEEN",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "NOTIFICATION_STATUS_SEEN",
+              "number": "1",
+              "description": ""
+            },
+            {
+              "name": "NOTIFICATION_STATUS_ARCHIVED",
+              "number": "2",
+              "description": ""
+            }
+          ]
+        }
+      ],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "CreateNotificationRequest",
+          "longName": "CreateNotificationRequest",
+          "fullName": "ttn.lorawan.v3.CreateNotificationRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "entity_ids",
+              "description": "The entity this notification is about.",
+              "label": "",
+              "type": "EntityIdentifiers",
+              "longType": "EntityIdentifiers",
+              "fullType": "ttn.lorawan.v3.EntityIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "notification_type",
+              "description": "The type of this notification.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.min_len",
+                    "value": 1
+                  },
+                  {
+                    "name": "string.max_len",
+                    "value": 100
+                  }
+                ]
+              }
+            },
+            {
+              "name": "data",
+              "description": "The data related to the notification.",
+              "label": "",
+              "type": "Any",
+              "longType": "google.protobuf.Any",
+              "fullType": "google.protobuf.Any",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "sender_ids",
+              "description": "If the notification was triggered by a user action, this contains the identifiers of the user that triggered the notification.",
+              "label": "",
+              "type": "UserIdentifiers",
+              "longType": "UserIdentifiers",
+              "fullType": "ttn.lorawan.v3.UserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "receivers",
+              "description": "Receivers of the notification.",
+              "label": "repeated",
+              "type": "NotificationReceiver",
+              "longType": "NotificationReceiver",
+              "fullType": "ttn.lorawan.v3.NotificationReceiver",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  },
+                  {
+                    "name": "repeated.unique",
+                    "value": true
+                  },
+                  {
+                    "name": "repeated.items.enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "email",
+              "description": "Whether an email should be sent for the notification.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "CreateNotificationResponse",
+          "longName": "CreateNotificationResponse",
+          "fullName": "ttn.lorawan.v3.CreateNotificationResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ListNotificationsRequest",
+          "longName": "ListNotificationsRequest",
+          "fullName": "ttn.lorawan.v3.ListNotificationsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "receiver_ids",
+              "description": "The IDs of the receiving user.",
+              "label": "",
+              "type": "UserIdentifiers",
+              "longType": "UserIdentifiers",
+              "fullType": "ttn.lorawan.v3.UserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "status",
+              "description": "Select notifications with these statuses.\nAn empty list is interpreted as \"all\".",
+              "label": "repeated",
+              "type": "NotificationStatus",
+              "longType": "NotificationStatus",
+              "fullType": "ttn.lorawan.v3.NotificationStatus",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.unique",
+                    "value": true
+                  },
+                  {
+                    "name": "repeated.items.enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "limit",
+              "description": "Limit the number of results per page.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
+            },
+            {
+              "name": "page",
+              "description": "Page number for pagination. 0 is interpreted as 1.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ListNotificationsResponse",
+          "longName": "ListNotificationsResponse",
+          "fullName": "ttn.lorawan.v3.ListNotificationsResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "notifications",
+              "description": "",
+              "label": "repeated",
+              "type": "Notification",
+              "longType": "Notification",
+              "fullType": "ttn.lorawan.v3.Notification",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Notification",
+          "longName": "Notification",
+          "fullName": "ttn.lorawan.v3.Notification",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "The immutable ID of the notification. Generated by the server.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "created_at",
+              "description": "The time when the notification was triggered.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "entity_ids",
+              "description": "The entity this notification is about.",
+              "label": "",
+              "type": "EntityIdentifiers",
+              "longType": "EntityIdentifiers",
+              "fullType": "ttn.lorawan.v3.EntityIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "notification_type",
+              "description": "The type of this notification.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data",
+              "description": "The data related to the notification.",
+              "label": "",
+              "type": "Any",
+              "longType": "google.protobuf.Any",
+              "fullType": "google.protobuf.Any",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "sender_ids",
+              "description": "If the notification was triggered by a user action, this contains the identifiers of the user that triggered the notification.",
+              "label": "",
+              "type": "UserIdentifiers",
+              "longType": "UserIdentifiers",
+              "fullType": "ttn.lorawan.v3.UserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "receivers",
+              "description": "Relation of the notification receiver to the entity.",
+              "label": "repeated",
+              "type": "NotificationReceiver",
+              "longType": "NotificationReceiver",
+              "fullType": "ttn.lorawan.v3.NotificationReceiver",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "email",
+              "description": "Whether an email was sent for the notification.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "status",
+              "description": "The status of the notification.",
+              "label": "",
+              "type": "NotificationStatus",
+              "longType": "NotificationStatus",
+              "fullType": "ttn.lorawan.v3.NotificationStatus",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "status_updated_at",
+              "description": "The time when the notification status was updated.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "UpdateNotificationStatusRequest",
+          "longName": "UpdateNotificationStatusRequest",
+          "fullName": "ttn.lorawan.v3.UpdateNotificationStatusRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "receiver_ids",
+              "description": "The IDs of the receiving user.",
+              "label": "",
+              "type": "UserIdentifiers",
+              "longType": "UserIdentifiers",
+              "fullType": "ttn.lorawan.v3.UserIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "ids",
+              "description": "The IDs of the notifications to update the status of.",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.min_items",
+                    "value": 1
+                  },
+                  {
+                    "name": "repeated.max_items",
+                    "value": 1000
+                  },
+                  {
+                    "name": "repeated.unique",
+                    "value": true
+                  },
+                  {
+                    "name": "repeated.items.string.len",
+                    "value": 36
+                  }
+                ]
+              }
+            },
+            {
+              "name": "status",
+              "description": "The status to set on the notifications.",
+              "label": "",
+              "type": "NotificationStatus",
+              "longType": "NotificationStatus",
+              "fullType": "ttn.lorawan.v3.NotificationStatus",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "services": [
+        {
+          "name": "NotificationService",
+          "longName": "NotificationService",
+          "fullName": "ttn.lorawan.v3.NotificationService",
+          "description": "",
+          "methods": [
+            {
+              "name": "Create",
+              "description": "Create a new notification. Can only be called by internal services using cluster auth.",
+              "requestType": "CreateNotificationRequest",
+              "requestLongType": "CreateNotificationRequest",
+              "requestFullType": "ttn.lorawan.v3.CreateNotificationRequest",
+              "requestStreaming": false,
+              "responseType": "CreateNotificationResponse",
+              "responseLongType": "CreateNotificationResponse",
+              "responseFullType": "ttn.lorawan.v3.CreateNotificationResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "List",
+              "description": "List the notifications for a user or an organization.\nWhen called with user credentials and empty receiver_ids, this will list\nnotifications for the current user and its organizations.",
+              "requestType": "ListNotificationsRequest",
+              "requestLongType": "ListNotificationsRequest",
+              "requestFullType": "ttn.lorawan.v3.ListNotificationsRequest",
+              "requestStreaming": false,
+              "responseType": "ListNotificationsResponse",
+              "responseLongType": "ListNotificationsResponse",
+              "responseFullType": "ttn.lorawan.v3.ListNotificationsResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "",
+                      "pattern": ""
+                    },
+                    {
+                      "method": "GET",
+                      "pattern": "/users/{receiver_ids.user_id}/notifications"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "UpdateStatus",
+              "description": "Batch-update multiple notifications to the same status.",
+              "requestType": "UpdateNotificationStatusRequest",
+              "requestLongType": "UpdateNotificationStatusRequest",
+              "requestFullType": "ttn.lorawan.v3.UpdateNotificationStatusRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PATCH",
+                      "pattern": "/users/{receiver_ids.user_id}/notifications",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "lorawan-stack/api/oauth.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
@@ -36307,6 +37260,11 @@
               "name": "RIGHT_USER_ORGANIZATIONS_CREATE",
               "number": "13",
               "description": "The right to create an organization under the user account."
+            },
+            {
+              "name": "RIGHT_USER_NOTIFICATIONS_READ",
+              "number": "59",
+              "description": "The right to read notifications sent to the user."
             },
             {
               "name": "RIGHT_USER_ALL",

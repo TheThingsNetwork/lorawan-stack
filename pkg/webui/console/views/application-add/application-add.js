@@ -26,11 +26,13 @@ import SubmitBar from '@ttn-lw/components/submit-bar'
 
 import OwnersSelect from '@console/containers/owners-select'
 
+import { selectNsConfig, selectAsConfig, selectJsConfig } from '@ttn-lw/lib/selectors/env'
 import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { getApplicationId } from '@ttn-lw/lib/selectors/id'
 import { id as applicationIdRegexp } from '@ttn-lw/lib/regexp'
+import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 
 const m = defineMessages({
   applicationName: 'Application name',
@@ -52,11 +54,13 @@ const validationSchema = Yup.object().shape({
   name: Yup.string()
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(2000, Yup.passValues(sharedMessages.validateTooLong)),
-  description: Yup.string(),
 })
 
 const ApplicationAdd = props => {
   const { userId, navigateToApplication } = props
+  const jsHost = getHostFromUrl(selectJsConfig().base_url)
+  const nsHost = getHostFromUrl(selectNsConfig().base_url)
+  const asHost = getHostFromUrl(selectAsConfig().base_url)
 
   const [error, setError] = useState()
 
@@ -73,6 +77,9 @@ const ApplicationAdd = props => {
             ids: { application_id },
             name,
             description,
+            network_server_address: nsHost,
+            application_server_address: asHost,
+            join_server_address: jsHost,
           },
           userId === owner_id,
         )
@@ -85,7 +92,7 @@ const ApplicationAdd = props => {
         setError(error)
       }
     },
-    [navigateToApplication, userId],
+    [navigateToApplication, userId, nsHost, asHost, jsHost],
   )
 
   const initialValues = {

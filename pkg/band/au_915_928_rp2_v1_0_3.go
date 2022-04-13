@@ -20,7 +20,7 @@ import "go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 var AU_915_928_RP2_v1_0_3 = Band{
 	ID: AU_915_928,
 
-	EnableADR: true,
+	SupportsDynamicADR: true,
 
 	MaxUplinkChannels: 72,
 	UplinkChannels:    au915928UplinkChannels(0),

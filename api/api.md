@@ -194,6 +194,10 @@
   - [Enum `KeySecurity`](#ttn.lorawan.v3.KeySecurity)
   - [Service `DeviceRepository`](#ttn.lorawan.v3.DeviceRepository)
 - [File `lorawan-stack/api/end_device.proto`](#lorawan-stack/api/end_device.proto)
+  - [Message `ADRSettings`](#ttn.lorawan.v3.ADRSettings)
+  - [Message `ADRSettings.DisabledMode`](#ttn.lorawan.v3.ADRSettings.DisabledMode)
+  - [Message `ADRSettings.DynamicMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode)
+  - [Message `ADRSettings.StaticMode`](#ttn.lorawan.v3.ADRSettings.StaticMode)
   - [Message `BoolValue`](#ttn.lorawan.v3.BoolValue)
   - [Message `ConvertEndDeviceTemplateRequest`](#ttn.lorawan.v3.ConvertEndDeviceTemplateRequest)
   - [Message `CreateEndDeviceRequest`](#ttn.lorawan.v3.CreateEndDeviceRequest)
@@ -476,6 +480,16 @@
   - [Service `GsNs`](#ttn.lorawan.v3.GsNs)
   - [Service `Ns`](#ttn.lorawan.v3.Ns)
   - [Service `NsEndDeviceRegistry`](#ttn.lorawan.v3.NsEndDeviceRegistry)
+- [File `lorawan-stack/api/notification_service.proto`](#lorawan-stack/api/notification_service.proto)
+  - [Message `CreateNotificationRequest`](#ttn.lorawan.v3.CreateNotificationRequest)
+  - [Message `CreateNotificationResponse`](#ttn.lorawan.v3.CreateNotificationResponse)
+  - [Message `ListNotificationsRequest`](#ttn.lorawan.v3.ListNotificationsRequest)
+  - [Message `ListNotificationsResponse`](#ttn.lorawan.v3.ListNotificationsResponse)
+  - [Message `Notification`](#ttn.lorawan.v3.Notification)
+  - [Message `UpdateNotificationStatusRequest`](#ttn.lorawan.v3.UpdateNotificationStatusRequest)
+  - [Enum `NotificationReceiver`](#ttn.lorawan.v3.NotificationReceiver)
+  - [Enum `NotificationStatus`](#ttn.lorawan.v3.NotificationStatus)
+  - [Service `NotificationService`](#ttn.lorawan.v3.NotificationService)
 - [File `lorawan-stack/api/oauth.proto`](#lorawan-stack/api/oauth.proto)
   - [Message `ListOAuthAccessTokensRequest`](#ttn.lorawan.v3.ListOAuthAccessTokensRequest)
   - [Message `ListOAuthClientAuthorizationsRequest`](#ttn.lorawan.v3.ListOAuthClientAuthorizationsRequest)
@@ -631,6 +645,15 @@ Application is the message that defines an Application in the network.
 | `contact_info` | [`ContactInfo`](#ttn.lorawan.v3.ContactInfo) | repeated | Contact information for this application. Typically used to indicate who to contact with technical/security questions about the application. This field is deprecated. Use administrative_contact and technical_contact instead. |
 | `administrative_contact` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
 | `technical_contact` | [`OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers) |  |  |
+| `network_server_address` | [`string`](#string) |  | The address of the Network Server where this application is supposed to be registered. If set, this fields indicates where end devices for this application should be registered.
+
+Stored in Entity Registry. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
+| `application_server_address` | [`string`](#string) |  | The address of the Application Server where this application is supposed to be registered. If set, this fields indicates where end devices for this application should be registered.
+
+Stored in Entity Registry. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
+| `join_server_address` | [`string`](#string) |  | The address of the Join Server where this application is supposed to be registered. If set, this fields indicates where end devices for this application should be registered.
+
+Stored in Entity Registry. The typical format of the address is "host:port". If the port is omitted, the normal port inference (with DNS lookup, otherwise defaults) is used. The connection shall be established with transport layer security (TLS). Custom certificate authorities may be configured out-of-band. |
 | `dev_eui_counter` | [`uint32`](#uint32) |  |  |
 
 #### Field Rules
@@ -642,6 +665,9 @@ Application is the message that defines an Application in the network.
 | `description` | <p>`string.max_len`: `2000`</p> |
 | `attributes` | <p>`map.max_pairs`: `10`</p><p>`map.keys.string.max_len`: `36`</p><p>`map.keys.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p><p>`map.values.string.max_len`: `200`</p> |
 | `contact_info` | <p>`repeated.max_items`: `10`</p> |
+| `network_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
+| `application_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
+| `join_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
 
 ### <a name="ttn.lorawan.v3.Application.AttributesEntry">Message `Application.AttributesEntry`</a>
 
@@ -1524,7 +1550,7 @@ The ApplicationUpStorage service can be used to query stored application upstrea
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `stack_name` | [`string`](#string) |  | The stack name that is associated with the CloudFormation deployment of The Things Enterprise Stack integration. |
+| `stack_name` | [`string`](#string) |  | The stack name that is associated with the CloudFormation deployment of The Things Stack Enterprise integration. |
 
 #### Field Rules
 
@@ -3062,6 +3088,62 @@ Identifiers to uniquely identify a LoRaWAN end device profile.
 
 ## <a name="lorawan-stack/api/end_device.proto">File `lorawan-stack/api/end_device.proto`</a>
 
+### <a name="ttn.lorawan.v3.ADRSettings">Message `ADRSettings`</a>
+
+Adaptive Data Rate settings.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `static` | [`ADRSettings.StaticMode`](#ttn.lorawan.v3.ADRSettings.StaticMode) |  |  |
+| `dynamic` | [`ADRSettings.DynamicMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode) |  |  |
+| `disabled` | [`ADRSettings.DisabledMode`](#ttn.lorawan.v3.ADRSettings.DisabledMode) |  |  |
+
+### <a name="ttn.lorawan.v3.ADRSettings.DisabledMode">Message `ADRSettings.DisabledMode`</a>
+
+Configuration options for cases in which ADR is to be disabled
+completely.
+
+### <a name="ttn.lorawan.v3.ADRSettings.DynamicMode">Message `ADRSettings.DynamicMode`</a>
+
+Configuration options for dynamic ADR.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `margin` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | The ADR margin (dB) tells the network server how much margin it should add in ADR requests. A bigger margin is less efficient, but gives a better chance of successful reception. If unset, the default value from Network Server configuration will be used. |
+| `min_data_rate_index` | [`DataRateIndexValue`](#ttn.lorawan.v3.DataRateIndexValue) |  | Minimum data rate index. If unset, the default value from Network Server configuration will be used. |
+| `max_data_rate_index` | [`DataRateIndexValue`](#ttn.lorawan.v3.DataRateIndexValue) |  | Maximum data rate index. If unset, the default value from Network Server configuration will be used. |
+| `min_tx_power_index` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Minimum transmission power index. If unset, the default value from Network Server configuration will be used. |
+| `max_tx_power_index` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Maximum transmission power index. If unset, the default value from Network Server configuration will be used. |
+| `min_nb_trans` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Minimum number of retransmissions. If unset, the default value from Network Server configuration will be used. |
+| `max_nb_trans` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Maximum number of retransmissions. If unset, the default value from Network Server configuration will be used. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `min_tx_power_index` | <p>`uint32.lte`: `15`</p> |
+| `max_tx_power_index` | <p>`uint32.lte`: `15`</p> |
+| `min_nb_trans` | <p>`uint32.lte`: `3`</p><p>`uint32.gte`: `1`</p> |
+| `max_nb_trans` | <p>`uint32.lte`: `3`</p><p>`uint32.gte`: `1`</p> |
+
+### <a name="ttn.lorawan.v3.ADRSettings.StaticMode">Message `ADRSettings.StaticMode`</a>
+
+Configuration options for static ADR.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `data_rate_index` | [`DataRateIndex`](#ttn.lorawan.v3.DataRateIndex) |  | Data rate index to use. |
+| `tx_power_index` | [`uint32`](#uint32) |  | Transmission power index to use. |
+| `nb_trans` | [`uint32`](#uint32) |  | Number of retransmissions. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `data_rate_index` | <p>`enum.defined_only`: `true`</p> |
+| `tx_power_index` | <p>`uint32.lte`: `15`</p> |
+| `nb_trans` | <p>`uint32.lte`: `15`</p> |
+
 ### <a name="ttn.lorawan.v3.BoolValue">Message `BoolValue`</a>
 
 | Field | Type | Label | Description |
@@ -3420,8 +3502,8 @@ This is used internally by the Network Server.
 | `factory_preset_frequencies` | [`uint64`](#uint64) | repeated | List of factory-preset frequencies. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `max_duty_cycle` | [`AggregatedDutyCycleValue`](#ttn.lorawan.v3.AggregatedDutyCycleValue) |  | Maximum uplink duty cycle (of all channels). |
 | `supports_32_bit_f_cnt` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether the device supports 32-bit frame counters. If unset, the default value from Network Server configuration will be used. |
-| `use_adr` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether the Network Server should use ADR for the device. If unset, the default value from Network Server configuration will be used. |
-| `adr_margin` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | The ADR margin tells the network server how much margin it should add in ADR requests. A bigger margin is less efficient, but gives a better chance of successful reception. If unset, the default value from Network Server configuration will be used. |
+| `use_adr` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether the Network Server should use ADR for the device. This field is deprecated, use adr_settings instead. |
+| `adr_margin` | [`google.protobuf.FloatValue`](#google.protobuf.FloatValue) |  | The ADR margin (dB) tells the network server how much margin it should add in ADR requests. A bigger margin is less efficient, but gives a better chance of successful reception. This field is deprecated, use adr_settings.dynamic.margin instead. |
 | `resets_f_cnt` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether the device resets the frame counters (not LoRaWAN compliant). If unset, the default value from Network Server configuration will be used. |
 | `status_time_periodicity` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | The interval after which a DevStatusReq MACCommand shall be sent. If unset, the default value from Network Server configuration will be used. |
 | `status_count_periodicity` | [`google.protobuf.UInt32Value`](#google.protobuf.UInt32Value) |  | Number of uplink messages after which a DevStatusReq MACCommand shall be sent. If unset, the default value from Network Server configuration will be used. |
@@ -3439,6 +3521,7 @@ This is used internally by the Network Server.
 | `class_b_c_downlink_interval` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  | The minimum duration passed before a network-initiated(e.g. Class B or C) downlink following an arbitrary downlink. |
 | `uplink_dwell_time` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether uplink dwell time is set (400ms). If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 | `downlink_dwell_time` | [`BoolValue`](#ttn.lorawan.v3.BoolValue) |  | Whether downlink dwell time is set (400ms). If unset, the default value from Network Server configuration or regional parameters specification will be used. |
+| `adr` | [`ADRSettings`](#ttn.lorawan.v3.ADRSettings) |  | Adaptive Data Rate settings. If unset, the default value from Network Server configuration or regional parameters specification will be used. |
 
 #### Field Rules
 
@@ -6837,6 +6920,120 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | `ResetFactoryDefaults` | `PATCH` | `/api/v3/ns/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}` | `*` |
 | `Delete` | `DELETE` | `/api/v3/ns/applications/{application_ids.application_id}/devices/{device_id}` |  |
 
+## <a name="lorawan-stack/api/notification_service.proto">File `lorawan-stack/api/notification_service.proto`</a>
+
+### <a name="ttn.lorawan.v3.CreateNotificationRequest">Message `CreateNotificationRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `entity_ids` | [`EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers) |  | The entity this notification is about. |
+| `notification_type` | [`string`](#string) |  | The type of this notification. |
+| `data` | [`google.protobuf.Any`](#google.protobuf.Any) |  | The data related to the notification. |
+| `sender_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  | If the notification was triggered by a user action, this contains the identifiers of the user that triggered the notification. |
+| `receivers` | [`NotificationReceiver`](#ttn.lorawan.v3.NotificationReceiver) | repeated | Receivers of the notification. |
+| `email` | [`bool`](#bool) |  | Whether an email should be sent for the notification. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `entity_ids` | <p>`message.required`: `true`</p> |
+| `notification_type` | <p>`string.min_len`: `1`</p><p>`string.max_len`: `100`</p> |
+| `receivers` | <p>`repeated.min_items`: `1`</p><p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.CreateNotificationResponse">Message `CreateNotificationResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.ListNotificationsRequest">Message `ListNotificationsRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `receiver_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  | The IDs of the receiving user. |
+| `status` | [`NotificationStatus`](#ttn.lorawan.v3.NotificationStatus) | repeated | Select notifications with these statuses. An empty list is interpreted as "all". |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `receiver_ids` | <p>`message.required`: `true`</p> |
+| `status` | <p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
+
+### <a name="ttn.lorawan.v3.ListNotificationsResponse">Message `ListNotificationsResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `notifications` | [`Notification`](#ttn.lorawan.v3.Notification) | repeated |  |
+
+### <a name="ttn.lorawan.v3.Notification">Message `Notification`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [`string`](#string) |  | The immutable ID of the notification. Generated by the server. |
+| `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | The time when the notification was triggered. |
+| `entity_ids` | [`EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers) |  | The entity this notification is about. |
+| `notification_type` | [`string`](#string) |  | The type of this notification. |
+| `data` | [`google.protobuf.Any`](#google.protobuf.Any) |  | The data related to the notification. |
+| `sender_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  | If the notification was triggered by a user action, this contains the identifiers of the user that triggered the notification. |
+| `receivers` | [`NotificationReceiver`](#ttn.lorawan.v3.NotificationReceiver) | repeated | Relation of the notification receiver to the entity. |
+| `email` | [`bool`](#bool) |  | Whether an email was sent for the notification. |
+| `status` | [`NotificationStatus`](#ttn.lorawan.v3.NotificationStatus) |  | The status of the notification. |
+| `status_updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | The time when the notification status was updated. |
+
+### <a name="ttn.lorawan.v3.UpdateNotificationStatusRequest">Message `UpdateNotificationStatusRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `receiver_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  | The IDs of the receiving user. |
+| `ids` | [`string`](#string) | repeated | The IDs of the notifications to update the status of. |
+| `status` | [`NotificationStatus`](#ttn.lorawan.v3.NotificationStatus) |  | The status to set on the notifications. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `receiver_ids` | <p>`message.required`: `true`</p> |
+| `ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `1000`</p><p>`repeated.unique`: `true`</p><p>`repeated.items.string.len`: `36`</p> |
+| `status` | <p>`enum.defined_only`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.NotificationReceiver">Enum `NotificationReceiver`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `NOTIFICATION_RECEIVER_UNKNOWN` | 0 |  |
+| `NOTIFICATION_RECEIVER_COLLABORATOR` | 1 | Notification is received by collaborators of the entity. If the collaborator is an organization, the notification is received by organization members. |
+| `NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT` | 3 | Notification is received by administrative contact of the entity. If this is an organization, the notification is received by organization members. |
+| `NOTIFICATION_RECEIVER_TECHNICAL_CONTACT` | 4 | Notification is received by technical contact of the entity. If this is an organization, the notification is received by organization members. |
+
+### <a name="ttn.lorawan.v3.NotificationStatus">Enum `NotificationStatus`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `NOTIFICATION_STATUS_UNSEEN` | 0 |  |
+| `NOTIFICATION_STATUS_SEEN` | 1 |  |
+| `NOTIFICATION_STATUS_ARCHIVED` | 2 |  |
+
+### <a name="ttn.lorawan.v3.NotificationService">Service `NotificationService`</a>
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Create` | [`CreateNotificationRequest`](#ttn.lorawan.v3.CreateNotificationRequest) | [`CreateNotificationResponse`](#ttn.lorawan.v3.CreateNotificationResponse) | Create a new notification. Can only be called by internal services using cluster auth. |
+| `List` | [`ListNotificationsRequest`](#ttn.lorawan.v3.ListNotificationsRequest) | [`ListNotificationsResponse`](#ttn.lorawan.v3.ListNotificationsResponse) | List the notifications for a user or an organization. When called with user credentials and empty receiver_ids, this will list notifications for the current user and its organizations. |
+| `UpdateStatus` | [`UpdateNotificationStatusRequest`](#ttn.lorawan.v3.UpdateNotificationStatusRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Batch-update multiple notifications to the same status. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `List` | `` | `/api/v3` |  |
+| `List` | `GET` | `/api/v3/users/{receiver_ids.user_id}/notifications` |  |
+| `UpdateStatus` | `PATCH` | `/api/v3/users/{receiver_ids.user_id}/notifications` | `*` |
+
 ## <a name="lorawan-stack/api/oauth.proto">File `lorawan-stack/api/oauth.proto`</a>
 
 ### <a name="ttn.lorawan.v3.ListOAuthAccessTokensRequest">Message `ListOAuthAccessTokensRequest`</a>
@@ -7886,6 +8083,7 @@ Right is the enum that defines all the different rights to do something in the n
 | `RIGHT_USER_CLIENTS_CREATE` | 11 | The right to create an OAuth client under the account of the user. |
 | `RIGHT_USER_ORGANIZATIONS_LIST` | 12 | The right to list organizations the user is a member of. |
 | `RIGHT_USER_ORGANIZATIONS_CREATE` | 13 | The right to create an organization under the user account. |
+| `RIGHT_USER_NOTIFICATIONS_READ` | 59 | The right to read notifications sent to the user. |
 | `RIGHT_USER_ALL` | 14 | The pseudo-right for all (current and future) user rights. |
 | `RIGHT_APPLICATION_INFO` | 15 | The right to view application information. |
 | `RIGHT_APPLICATION_SETTINGS_BASIC` | 16 | The right to edit basic application settings. |

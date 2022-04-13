@@ -193,6 +193,22 @@ func isAtomicType(t reflect.Type, maskOnly bool) bool {
 	return false
 }
 
+// isStandaloneType returns if the provided type has represents a value
+// just by being present. This property usually applies to oneof fields.
+func isStandaloneType(t reflect.Type) bool {
+	switch t.PkgPath() {
+	case "go.thethings.network/lorawan-stack/v3/pkg/ttnpb":
+		switch t.Name() {
+		case
+			"ADRSettings_DisabledMode",
+			"ADRSettings_StaticMode",
+			"ADRSettings_DynamicMode":
+			return true
+		}
+	}
+	return false
+}
+
 func isSelectableField(name string) bool {
 	switch name {
 	case "created_at", "updated_at", "ids":
@@ -246,6 +262,12 @@ func AddField(fs *pflag.FlagSet, name string, t reflect.Type, maskOnly bool) {
 		fs.Bool(name, false, fmt.Sprintf("select the %s field", name))
 		return
 	}
+
+	if isStandaloneType(t) {
+		fs.Bool(name, false, "")
+		return
+	}
+
 	if t.Kind() == reflect.Struct && !isAtomicType(t, maskOnly) {
 		return
 	}
@@ -443,13 +465,17 @@ func fieldMaskFlags(prefix []string, t reflect.Type, maskOnly bool) *pflag.FlagS
 		if oneofProp.Prop.Tag == 0 {
 			continue
 		}
-		t := oneofProp.Type
-		if t.Kind() == reflect.Ptr {
-			t = t.Elem()
+
+		fieldType := oneofProp.Type
+		if fieldType.Kind() == reflect.Ptr {
+			fieldType = fieldType.Elem()
 		}
 
 		path := append(prefix, props.Prop[oneofProp.Field].OrigName)
-		flagSet.AddFlagSet(fieldMaskFlags(path, t, maskOnly))
+
+		if fieldType.Kind() == reflect.Struct && !isAtomicType(fieldType, maskOnly) {
+			flagSet.AddFlagSet(fieldMaskFlags(path, fieldType, maskOnly))
+		}
 	}
 	for _, prop := range props.Prop {
 		if prop.Tag == 0 {
@@ -725,6 +751,15 @@ func setField(rv reflect.Value, path []string, v reflect.Value) error {
 							break
 						}
 						return fmt.Errorf(`invalid value "%s" for %s`, v.String(), typeName)
+					case "ADRSettings_DisabledMode":
+						field.Set(reflect.ValueOf(ttnpb.ADRSettings_DisabledMode{}))
+						break
+					case "ADRSettings_StaticMode":
+						field.Set(reflect.ValueOf(ttnpb.ADRSettings_StaticMode{}))
+						break
+					case "ADRSettings_DynamicMode":
+						field.Set(reflect.ValueOf(ttnpb.ADRSettings_DynamicMode{}))
+						break
 					}
 				case ft.Kind() == reflect.Slice && ft.Elem().Kind() == reflect.Uint8 && vt.Kind() == reflect.String:
 					s := strings.TrimPrefix(v.String(), "0x")

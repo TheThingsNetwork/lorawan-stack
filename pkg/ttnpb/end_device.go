@@ -76,11 +76,191 @@ func (v *EndDeviceAuthenticationCode) FieldIsZero(p string) bool {
 }
 
 // FieldIsZero returns whether path p is zero.
+func (v *ADRSettings_StaticMode) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "data_rate_index":
+		return v.DataRateIndex == 0
+	case "tx_power_index":
+		return v.TxPowerIndex == 0
+	case "nb_trans":
+		return v.NbTrans == 0
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *ADRSettings_Static) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "static":
+		return v.Static == nil
+	case "static.data_rate_index":
+		return v.Static.FieldIsZero("data_rate_index")
+	case "static.tx_power_index":
+		return v.Static.FieldIsZero("tx_power_index")
+	case "static.nb_trans":
+		return v.Static.FieldIsZero("nb_trans")
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *ADRSettings_DynamicMode) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "margin":
+		return v.Margin == nil
+	case "min_data_rate_index":
+		return v.MinDataRateIndex == nil
+	case "min_data_rate_index.value":
+		return v.MinDataRateIndex.FieldIsZero("value")
+	case "max_data_rate_index":
+		return v.MaxDataRateIndex == nil
+	case "max_data_rate_index.value":
+		return v.MaxDataRateIndex.FieldIsZero("value")
+	case "min_tx_power_index":
+		return v.MinTxPowerIndex == nil
+	case "max_tx_power_index":
+		return v.MaxTxPowerIndex == nil
+	case "min_nb_trans":
+		return v.MinNbTrans == nil
+	case "max_nb_trans":
+		return v.MaxNbTrans == nil
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *ADRSettings_Dynamic) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "dynamic":
+		return v.Dynamic == nil
+	case "dynamic.margin":
+		return v.Dynamic.FieldIsZero("margin")
+	case "dynamic.min_data_rate_index":
+		return v.Dynamic.FieldIsZero("min_data_rate_index")
+	case "dynamic.min_data_rate_index.value":
+		return v.Dynamic.FieldIsZero("min_data_rate_index.value")
+	case "dynamic.max_data_rate_index":
+		return v.Dynamic.FieldIsZero("max_data_rate_index")
+	case "dynamic.max_data_rate_index.value":
+		return v.Dynamic.FieldIsZero("max_data_rate_index.value")
+	case "dynamic.min_tx_power_index":
+		return v.Dynamic.FieldIsZero("min_tx_power_index")
+	case "dynamic.max_tx_power_index":
+		return v.Dynamic.FieldIsZero("max_tx_power_index")
+	case "dynamic.min_nb_trans":
+		return v.Dynamic.FieldIsZero("min_nb_trans")
+	case "dynamic.max_nb_trans":
+		return v.Dynamic.FieldIsZero("max_nb_trans")
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *ADRSettings_Disabled) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "disabled":
+		return v.Disabled == nil
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
+func (v *ADRSettings) FieldIsZero(p string) bool {
+	if v == nil {
+		return true
+	}
+	switch p {
+	case "mode":
+		return v.Mode == nil
+	case "mode.static":
+		return v.GetStatic() == nil
+	case "mode.static.data_rate_index":
+		return v.GetStatic().FieldIsZero("data_rate_index")
+	case "mode.static.tx_power_index":
+		return v.GetStatic().FieldIsZero("tx_power_index")
+	case "mode.static.nb_trans":
+		return v.GetStatic().FieldIsZero("nb_trans")
+	case "mode.dynamic":
+		return v.GetDynamic() == nil
+	case "mode.dynamic.margin":
+		return v.GetDynamic().FieldIsZero("margin")
+	case "mode.dynamic.min_data_rate_index":
+		return v.GetDynamic().FieldIsZero("min_data_rate_index")
+	case "mode.dynamic.min_data_rate_index.value":
+		return v.GetDynamic().FieldIsZero("min_data_rate_index.value")
+	case "mode.dynamic.max_data_rate_index":
+		return v.GetDynamic().FieldIsZero("max_data_rate_index")
+	case "mode.dynamic.max_data_rate_index.value":
+		return v.GetDynamic().FieldIsZero("max_data_rate_index.value")
+	case "mode.dynamic.min_tx_power_index":
+		return v.GetDynamic().FieldIsZero("min_tx_power_index")
+	case "mode.dynamic.max_tx_power_index":
+		return v.GetDynamic().FieldIsZero("max_tx_power_index")
+	case "mode.dynamic.min_nb_trans":
+		return v.GetDynamic().FieldIsZero("min_nb_trans")
+	case "mode.dynamic.max_nb_trans":
+		return v.GetDynamic().FieldIsZero("max_nb_trans")
+	case "mode.disabled":
+		return v.GetDisabled() == nil
+	}
+	panic(fmt.Sprintf("unknown path '%s'", p))
+}
+
+// FieldIsZero returns whether path p is zero.
 func (v *MACSettings) FieldIsZero(p string) bool {
 	if v == nil {
 		return true
 	}
 	switch p {
+	case "adr":
+		return v.Adr == nil
+	case "adr.mode":
+		return v.Adr.FieldIsZero("mode")
+	case "adr.mode.static":
+		return v.Adr.FieldIsZero("mode.static")
+	case "adr.mode.static.data_rate_index":
+		return v.Adr.FieldIsZero("mode.static.data_rate_index")
+	case "adr.mode.static.tx_power_index":
+		return v.Adr.FieldIsZero("mode.static.tx_power_index")
+	case "adr.mode.static.nb_trans":
+		return v.Adr.FieldIsZero("mode.static.nb_trans")
+	case "adr.mode.dynamic":
+		return v.Adr.FieldIsZero("mode.dynamic")
+	case "adr.mode.dynamic.margin":
+		return v.Adr.FieldIsZero("mode.dynamic.margin")
+	case "adr.mode.dynamic.min_data_rate_index":
+		return v.Adr.FieldIsZero("mode.dynamic.min_data_rate_index")
+	case "adr.mode.dynamic.min_data_rate_index.value":
+		return v.Adr.FieldIsZero("mode.dynamic.min_data_rate_index.value")
+	case "adr.mode.dynamic.max_data_rate_index":
+		return v.Adr.FieldIsZero("mode.dynamic.max_data_rate_index")
+	case "adr.mode.dynamic.max_data_rate_index.value":
+		return v.Adr.FieldIsZero("mode.dynamic.max_data_rate_index.value")
+	case "adr.mode.dynamic.min_tx_power_index":
+		return v.Adr.FieldIsZero("mode.dynamic.min_tx_power_index")
+	case "adr.mode.dynamic.max_tx_power_index":
+		return v.Adr.FieldIsZero("mode.dynamic.max_tx_power_index")
+	case "adr.mode.dynamic.min_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.min_nb_trans")
+	case "adr.mode.dynamic.max_nb_trans":
+		return v.Adr.FieldIsZero("mode.dynamic.max_nb_trans")
+	case "adr.mode.disabled":
+		return v.Adr.FieldIsZero("mode.disabled")
 	case "adr_margin":
 		return v.AdrMargin == nil
 	case "beacon_frequency":
@@ -895,6 +1075,40 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return v.LorawanVersion == 0
 	case "mac_settings":
 		return v.MacSettings == nil
+	case "mac_settings.adr":
+		return v.MacSettings.FieldIsZero("adr")
+	case "mac_settings.adr.mode":
+		return v.MacSettings.FieldIsZero("adr.mode")
+	case "mac_settings.adr.mode.static":
+		return v.MacSettings.FieldIsZero("adr.mode.static")
+	case "mac_settings.adr.mode.static.data_rate_index":
+		return v.MacSettings.FieldIsZero("adr.mode.static.data_rate_index")
+	case "mac_settings.adr.mode.static.tx_power_index":
+		return v.MacSettings.FieldIsZero("adr.mode.static.tx_power_index")
+	case "mac_settings.adr.mode.static.nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.static.nb_trans")
+	case "mac_settings.adr.mode.dynamic":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic")
+	case "mac_settings.adr.mode.dynamic.margin":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.margin")
+	case "mac_settings.adr.mode.dynamic.min_data_rate_index":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.min_data_rate_index")
+	case "mac_settings.adr.mode.dynamic.min_data_rate_index.value":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.min_data_rate_index.value")
+	case "mac_settings.adr.mode.dynamic.max_data_rate_index":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.max_data_rate_index")
+	case "mac_settings.adr.mode.dynamic.max_data_rate_index.value":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.max_data_rate_index.value")
+	case "mac_settings.adr.mode.dynamic.min_tx_power_index":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.min_tx_power_index")
+	case "mac_settings.adr.mode.dynamic.max_tx_power_index":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.max_tx_power_index")
+	case "mac_settings.adr.mode.dynamic.min_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.min_nb_trans")
+	case "mac_settings.adr.mode.dynamic.max_nb_trans":
+		return v.MacSettings.FieldIsZero("adr.mode.dynamic.max_nb_trans")
+	case "mac_settings.adr.mode.disabled":
+		return v.MacSettings.FieldIsZero("adr.mode.disabled")
 	case "mac_settings.adr_margin":
 		return v.MacSettings.FieldIsZero("adr_margin")
 	case "mac_settings.beacon_frequency":

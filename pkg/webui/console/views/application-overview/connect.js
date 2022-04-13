@@ -19,6 +19,7 @@ import withFeatureRequirement from '@console/lib/components/with-feature-require
 import pipe from '@ttn-lw/lib/pipe'
 
 import { mayViewApplicationInfo } from '@console/lib/feature-checks'
+import { isOtherClusterApp } from '@console/lib/application-utils'
 
 import {
   selectSelectedApplication,
@@ -27,10 +28,13 @@ import {
 
 const mapStateToProps = state => {
   const appId = selectSelectedApplicationId(state)
+  const application = selectSelectedApplication(state)
+  const shouldRedirect = isOtherClusterApp(application)
 
   return {
     appId,
-    application: selectSelectedApplication(state),
+    application,
+    shouldRedirect,
   }
 }
 

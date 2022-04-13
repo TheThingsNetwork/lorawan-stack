@@ -233,7 +233,7 @@
   "JoinAcceptDelay1": 5000000000,
   "JoinAcceptDelay2": 6000000000,
   "MaxFCntGap": 16384,
-  "EnableADR": true,
+  "SupportsDynamicADR": true,
   "ADRAckLimit": "ADR_ACK_LIMIT_64",
   "ADRAckDelay": "ADR_ACK_DELAY_32",
   "MinRetransmitTimeout": 1000000000,

@@ -17,7 +17,6 @@ package identityserver
 import (
 	"testing"
 
-	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -27,15 +26,13 @@ import (
 )
 
 func TestEntityAccess(t *testing.T) {
-	ctx := test.Context()
-
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		is.config.UserRegistration.ContactInfoValidation.Required = true
 
 		cli := ttnpb.NewEntityAccessClient(cc)
 
 		t.Run("New User", func(t *testing.T) {
-			a := assertions.New(t)
+			a, ctx := test.New(t)
 			var md metadata.MD
 			authInfo, err := cli.AuthInfo(ctx, ttnpb.Empty, userCreds(newUserIdx), grpc.Header(&md))
 
@@ -49,7 +46,7 @@ func TestEntityAccess(t *testing.T) {
 		})
 
 		t.Run("Rejected User", func(t *testing.T) {
-			a := assertions.New(t)
+			a, ctx := test.New(t)
 			var md metadata.MD
 			authInfo, err := cli.AuthInfo(ctx, ttnpb.Empty, userCreds(rejectedUserIdx), grpc.Header(&md))
 
@@ -64,7 +61,7 @@ func TestEntityAccess(t *testing.T) {
 		})
 
 		t.Run("Suspended User", func(t *testing.T) {
-			a := assertions.New(t)
+			a, ctx := test.New(t)
 			var md metadata.MD
 			authInfo, err := cli.AuthInfo(ctx, ttnpb.Empty, userCreds(suspendedUserIdx), grpc.Header(&md))
 
@@ -79,7 +76,7 @@ func TestEntityAccess(t *testing.T) {
 		})
 
 		t.Run("Admin User", func(t *testing.T) {
-			a := assertions.New(t)
+			a, ctx := test.New(t)
 			var md metadata.MD
 			authInfo, err := cli.AuthInfo(ctx, ttnpb.Empty, userCreds(adminUserIdx), grpc.Header(&md))
 
@@ -88,7 +85,7 @@ func TestEntityAccess(t *testing.T) {
 		})
 
 		t.Run("Cluster Peer", func(t *testing.T) {
-			a := assertions.New(t)
+			a, ctx := test.New(t)
 			var md metadata.MD
 			authInfo, err := cli.AuthInfo(ctx, ttnpb.Empty, is.WithClusterAuth(), grpc.Header(&md))
 
@@ -97,7 +94,7 @@ func TestEntityAccess(t *testing.T) {
 		})
 
 		t.Run("Expired API Key User", func(t *testing.T) {
-			a := assertions.New(t)
+			a, ctx := test.New(t)
 			var md metadata.MD
 			_, err := cli.AuthInfo(ctx, ttnpb.Empty, userCreds(defaultUserIdx, "expired key"), grpc.Header(&md))
 

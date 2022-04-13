@@ -11,6 +11,21 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Status page references in the Console.
+- Notification Service API that will allow users to receive notifications about their registered entities.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added tables.
+- Add `network_server_address`, `application_server_address` and `join_server_address` to applications.
+  - This requires a database schema migration (`ttn-lw-stack is-db migrate`) because of the added columns.
+- New ADR settings API, which allows stronger control over the ADR algorithm.
+  - The new settings fields can be found under `mac-settings.adr`, and are mutually exclusive with `use-adr` and `adr-margin`. The legacy settings need to be unset before the new API options may be used.
+  - `mac-settings.adr.mode.disabled` completely disables the ADR algorithm.
+  - `mac-settings.adr.mode.static.data-rate-index`, `mac-settings.adr.mode.static.nb-trans`, `mac-settings.adr.mode.static.tx-power-index` allow the user to provide static ADR parameters to be negotiated with the end device. These options persist over multiple sessions and do not require a session reset in order to be propagated to the current session.
+  - `mac-settings.adr.mode.dynamic.min-data-rate-index` and `mac-settings.adr.mode.dynamic.max-data-rate-index` control the data rate index range which the Network Server will attempt to negotiate with the end device. Note that if the provided interval is disjoint with the available data rate indices, no negotiation will take place.
+  - `mac-settings.adr.mode.dynamic.min-tx-power-index` and `mac-settings.adr.mode.dynamic.max-tx-power-index` have similar behavior, but for transmission power indices.
+  - `mac-settings.adr.mode.dynamic.min-nb-trans` and `mac-settings.adr.mode.dynamic.max-nb-trans` have similar behavior, but for NbTrans.
+  - `mac-settings.adr.mode.dynamic.margin` may be used to provide the margin of the ADR algorithm. It replaces the old `adr-margin` setting.
+  - `use-adr` and `adr-margin` are still supported, but deprecated. Any future API usage should instead use the `mac-settings.adr` settings.
+
 ### Changed
 
 ### Deprecated
@@ -20,7 +35,10 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Console determining gateways as "Other cluster" even though using the same host if server addresses not matching exactly (e.g. due to using different host or scheme).
-- Inconsistency in setting gateway's LNS Auth key.
+- Inconsistency in setting gateway's LNS Auth key in the Console.
+- CLI no longer informs the user that is using the default JoinEUI when passing its value via flags.
+- Generating device ID from a DevEUI when importing a CSV file.
+- The `is-db migrate` command that failed when running on databases created by `v3.18`.
 
 ### Security
 
@@ -92,6 +110,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Changed
 
 - The minimum required Redis version is now 6.2.
+- Applications on other cluster will be hidden in Applications list in the Console.
 
 ### Deprecated
 

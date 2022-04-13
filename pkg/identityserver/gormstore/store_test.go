@@ -40,6 +40,7 @@ type testStore struct {
 	oauthStore
 	euiStore
 	entitySearch
+	notificationStore
 }
 
 func (t testStore) Init() error {
@@ -78,6 +79,7 @@ func newTestStore(t *testing.T, dsn *url.URL) storetest.Store {
 		oauthStore:        oauthStore{baseStore: &baseStore},
 		euiStore:          euiStore{baseStore: &baseStore},
 		entitySearch:      entitySearch{baseStore: &baseStore},
+		notificationStore: notificationStore{baseStore: &baseStore},
 	}
 }
 
@@ -203,4 +205,11 @@ func TestEntitySearch(t *testing.T) {
 	st := storetest.New(t, newTestStore)
 	st.TestEntitySearch(t)
 	st.TestEntitySearchPagination(t)
+}
+
+func TestNotificationStore(t *testing.T) {
+	t.Parallel()
+
+	st := storetest.New(t, newTestStore)
+	st.TestNotificationStore(t)
 }

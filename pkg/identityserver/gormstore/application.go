@@ -40,6 +40,10 @@ type Application struct {
 	TechnicalContact   *Account `gorm:"save_associations:false"`
 	// END common fields
 
+	NetworkServerAddress     string `gorm:"type:VARCHAR"`
+	ApplicationServerAddress string `gorm:"type:VARCHAR"`
+	JoinServerAddress        string `gorm:"type:VARCHAR"`
+
 	DevEUICounter int `gorm:"<-:create;type:INT;default:'0';column:dev_eui_counter"`
 }
 
@@ -62,6 +66,15 @@ var applicationPBSetters = map[string]func(*ttnpb.Application, *Application){
 			pb.TechnicalContact = app.TechnicalContact.OrganizationOrUserIdentifiers()
 		}
 	},
+	networkServerAddressField: func(pb *ttnpb.Application, app *Application) {
+		pb.NetworkServerAddress = app.NetworkServerAddress
+	},
+	applicationServerAddressField: func(pb *ttnpb.Application, app *Application) {
+		pb.ApplicationServerAddress = app.ApplicationServerAddress
+	},
+	joinServerAddressField: func(pb *ttnpb.Application, app *Application) {
+		pb.JoinServerAddress = app.JoinServerAddress
+	},
 	devEuiCounterField: func(pb *ttnpb.Application, app *Application) { pb.DevEuiCounter = uint32(app.DevEUICounter) },
 }
 
@@ -69,6 +82,9 @@ var applicationPBSetters = map[string]func(*ttnpb.Application, *Application){
 var applicationModelSetters = map[string]func(*Application, *ttnpb.Application){
 	nameField:        func(app *Application, pb *ttnpb.Application) { app.Name = pb.Name },
 	descriptionField: func(app *Application, pb *ttnpb.Application) { app.Description = pb.Description },
+	attributesField: func(app *Application, pb *ttnpb.Application) {
+		app.Attributes = attributes(app.Attributes).updateFromMap(pb.Attributes)
+	},
 	administrativeContactField: func(app *Application, pb *ttnpb.Application) {
 		if pb.AdministrativeContact == nil {
 			app.AdministrativeContact = nil
@@ -89,8 +105,14 @@ var applicationModelSetters = map[string]func(*Application, *ttnpb.Application){
 			UID:         pb.TechnicalContact.IDString(),
 		}
 	},
-	attributesField: func(app *Application, pb *ttnpb.Application) {
-		app.Attributes = attributes(app.Attributes).updateFromMap(pb.Attributes)
+	networkServerAddressField: func(app *Application, pb *ttnpb.Application) {
+		app.NetworkServerAddress = pb.NetworkServerAddress
+	},
+	applicationServerAddressField: func(app *Application, pb *ttnpb.Application) {
+		app.ApplicationServerAddress = pb.ApplicationServerAddress
+	},
+	joinServerAddressField: func(app *Application, pb *ttnpb.Application) {
+		app.JoinServerAddress = pb.JoinServerAddress
 	},
 }
 
@@ -109,13 +131,16 @@ func init() {
 
 // fieldmask path to column name in applications table.
 var applicationColumnNames = map[string][]string{
-	attributesField:            {},
-	contactInfoField:           {},
-	nameField:                  {nameField},
-	descriptionField:           {descriptionField},
-	devEuiCounterField:         {devEuiCounterField},
-	administrativeContactField: {administrativeContactField + "_id"},
-	technicalContactField:      {technicalContactField + "_id"},
+	attributesField:               {},
+	contactInfoField:              {},
+	nameField:                     {nameField},
+	descriptionField:              {descriptionField},
+	devEuiCounterField:            {devEuiCounterField},
+	administrativeContactField:    {administrativeContactField + "_id"},
+	technicalContactField:         {technicalContactField + "_id"},
+	networkServerAddressField:     {networkServerAddressField},
+	applicationServerAddressField: {applicationServerAddressField},
+	joinServerAddressField:        {joinServerAddressField},
 }
 
 func (app Application) toPB(pb *ttnpb.Application, fieldMask store.FieldMask) {

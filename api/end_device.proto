@@ -167,6 +167,59 @@ message EndDeviceVersion {
   MessagePayloadFormatters default_formatters = 13 [(validate.rules).message.required = true];
 }
 
+// Adaptive Data Rate settings.
+message ADRSettings {
+  // Configuration options for static ADR.
+  message StaticMode {
+    // Data rate index to use.
+    DataRateIndex data_rate_index = 1 [(validate.rules).enum.defined_only = true];
+    // Transmission power index to use.
+    uint32 tx_power_index = 2 [(validate.rules).uint32.lte = 15];
+    // Number of retransmissions.
+    uint32 nb_trans = 3 [(validate.rules).uint32.lte = 15];
+  }
+
+  // Configuration options for dynamic ADR.
+  message DynamicMode {
+    // The ADR margin (dB) tells the network server how much margin it should add in ADR requests.
+    // A bigger margin is less efficient, but gives a better chance of successful reception.
+    // If unset, the default value from Network Server configuration will be used.
+    google.protobuf.FloatValue margin = 1;
+
+    // Minimum data rate index.
+    // If unset, the default value from Network Server configuration will be used.
+    DataRateIndexValue min_data_rate_index = 2;
+    // Maximum data rate index.
+    // If unset, the default value from Network Server configuration will be used.
+    DataRateIndexValue max_data_rate_index = 3;
+
+    // Minimum transmission power index.
+    // If unset, the default value from Network Server configuration will be used.
+    google.protobuf.UInt32Value min_tx_power_index = 4 [(validate.rules).uint32.lte = 15];
+    // Maximum transmission power index.
+    // If unset, the default value from Network Server configuration will be used.
+    google.protobuf.UInt32Value max_tx_power_index = 5 [(validate.rules).uint32.lte = 15];
+
+    // Minimum number of retransmissions.
+    // If unset, the default value from Network Server configuration will be used.
+    google.protobuf.UInt32Value min_nb_trans = 6 [(validate.rules).uint32 = {gte: 1, lte: 3}];
+    // Maximum number of retransmissions.
+    // If unset, the default value from Network Server configuration will be used.
+    google.protobuf.UInt32Value max_nb_trans = 7 [(validate.rules).uint32 = {gte: 1, lte: 3}];
+  }
+
+  // Configuration options for cases in which ADR is to be disabled
+  // completely.
+  message DisabledMode {
+  }
+
+  oneof mode {
+    StaticMode static = 1;
+    DynamicMode dynamic = 2;
+    DisabledMode disabled = 3;
+  }
+}
+
 message MACSettings {
   // Maximum delay for the device to answer a MAC request or a confirmed downlink frame.
   // If unset, the default value from Network Server configuration will be used.
@@ -212,12 +265,12 @@ message MACSettings {
   BoolValue supports_32_bit_f_cnt = 12;
 
   // Whether the Network Server should use ADR for the device.
-  // If unset, the default value from Network Server configuration will be used.
-  BoolValue use_adr = 13;
-  // The ADR margin tells the network server how much margin it should add in ADR requests.
+  // This field is deprecated, use adr_settings instead.
+  BoolValue use_adr = 13 [deprecated = true];
+  // The ADR margin (dB) tells the network server how much margin it should add in ADR requests.
   // A bigger margin is less efficient, but gives a better chance of successful reception.
-  // If unset, the default value from Network Server configuration will be used.
-  google.protobuf.FloatValue adr_margin = 14;
+  // This field is deprecated, use adr_settings.dynamic.margin instead.
+  google.protobuf.FloatValue adr_margin = 14 [deprecated = true];
   // Whether the device resets the frame counters (not LoRaWAN compliant).
   // If unset, the default value from Network Server configuration will be used.
   BoolValue resets_f_cnt = 15;
@@ -273,6 +326,10 @@ message MACSettings {
   // Whether downlink dwell time is set (400ms).
   // If unset, the default value from Network Server configuration or regional parameters specification will be used.
   BoolValue downlink_dwell_time = 33;
+
+  // Adaptive Data Rate settings.
+  // If unset, the default value from Network Server configuration or regional parameters specification will be used.
+  ADRSettings adr = 34;
 }
 
 // MACState represents the state of MAC layer of the device.

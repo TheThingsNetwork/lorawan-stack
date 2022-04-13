@@ -57,6 +57,8 @@ export const selectSupportLinkConfig = () => selectApplicationConfig().support_l
 
 export const selectDocumentationUrlConfig = () => selectApplicationConfig().documentation_base_url
 
+export const selectPageStatusBaseUrlConfig = () => selectApplicationConfig().status_page_base_url
+
 export const selectEnableUserRegistration = () => selectApplicationConfig().enable_user_registration
 
 export const selectPageData = () => configSelector().PAGE_DATA
