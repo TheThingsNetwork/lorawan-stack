@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,11 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import status from '@ttn-lw/lib/store/logics/status'
+import { GET_USER_SESSIONS_LIST_SUCCESS } from '@account/store/actions/sessions'
 
-import init from './init'
-import user from './user'
-import identityServer from './identity-server'
-import sessions from './sessions'
+const defaultState = {
+  sessions: undefined,
+  totalCount: undefined,
+}
 
-export default [...status, ...init, ...user, ...identityServer, ...sessions]
+const session = (state = defaultState, { type, payload }) => {
+  switch (type) {
+    case GET_USER_SESSIONS_LIST_SUCCESS:
+      return {
+        ...state,
+        sessions: payload.sessions,
+        totalCount: payload.sessionsTotalCount,
+      }
+    default:
+      return state
+  }
+}
+
+export default session

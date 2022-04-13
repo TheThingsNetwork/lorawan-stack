@@ -26,6 +26,7 @@ import * as user from '@account/store/actions/user'
 const accountAppInitLogic = createLogic({
   type: init.INITIALIZE,
   process: async (_, dispatch, done) => {
+    let session_id
     try {
       const meResult = await api.account.me()
       // Using `store.dispatch` since redux logic's dispatch won't return
@@ -41,6 +42,7 @@ const accountAppInitLogic = createLogic({
           ]),
         ),
       )
+      session_id = meResult.data.session_id
     } catch (error) {
       if (!isUnauthenticatedError(error) && !isPermissionDeniedError(error)) {
         const initError = error?.data || error
@@ -53,7 +55,7 @@ const accountAppInitLogic = createLogic({
 
     // eslint-disable-next-line no-console
     console.log('Account app initialization successful!')
-    dispatch(init.initializeSuccess())
+    dispatch(init.initializeSuccess(session_id))
     done()
   },
 })

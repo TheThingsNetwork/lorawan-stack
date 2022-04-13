@@ -15,6 +15,7 @@
 import Overview from '@account/views/overview'
 import ProfileSettings from '@account/views/profile-settings'
 import Code from '@account/views/code'
+import SessionManagement from '@account/views/session-management'
 
 export default [
   {
@@ -31,5 +32,10 @@ export default [
     path: '/code',
     exact: true,
     component: Code,
+  },
+  {
+    path: '/session-management',
+    exact: true,
+    component: SessionManagement,
   },
 ]

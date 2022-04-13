@@ -12,41 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  GET_USER,
-  GET_USER_SUCCESS,
-  GET_USER_FAILURE,
-  UPDATE_USER_SUCCESS,
-  LOGOUT_FAILURE,
-} from '@account/store/actions/user'
+import { INITIALIZE_SUCCESS } from '@ttn-lw/lib/store/actions/init'
+
+import { GET_USER_SUCCESS, UPDATE_USER_SUCCESS } from '@account/store/actions/user'
 
 const defaultState = {
-  fetching: false,
   user: undefined,
-  error: false,
+  sessionId: undefined,
 }
 
 const user = (state = defaultState, { type, payload }) => {
   switch (type) {
-    case GET_USER:
+    case INITIALIZE_SUCCESS:
+      if (typeof payload !== 'string') {
+        return state
+      }
+
       return {
         ...state,
-        fetching: true,
-        user: undefined,
-        error: false,
+        sessionId: payload,
       }
     case GET_USER_SUCCESS:
       return {
         ...state,
         user: payload,
-        error: false,
-      }
-    case GET_USER_FAILURE:
-      return {
-        ...state,
-        fetching: false,
-        user: undefined,
-        error: payload,
       }
     case UPDATE_USER_SUCCESS:
       return {
@@ -55,12 +44,6 @@ const user = (state = defaultState, { type, payload }) => {
           ...state.user,
           ...payload,
         },
-      }
-    case LOGOUT_FAILURE:
-      return {
-        ...state,
-        fetching: false,
-        error: payload,
       }
     default:
       return state

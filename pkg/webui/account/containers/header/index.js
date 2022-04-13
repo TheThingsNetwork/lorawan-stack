@@ -41,14 +41,17 @@ const Header = ({ handleSearchRequest, searchable }) => {
       title: sharedMessages.overview,
       icon: 'overview',
       path: '/',
-      exact: true,
       hidden: false,
     },
     {
       title: sharedMessages.profileSettings,
       icon: 'user',
       path: '/profile-settings',
-      exact: true,
+    },
+    {
+      title: sharedMessages.sessions,
+      icon: 'vpn_key',
+      path: '/session-management',
     },
   ]
 

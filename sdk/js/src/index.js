@@ -23,6 +23,7 @@ import As from './service/application-server'
 import Organizations from './service/organizations'
 import Users from './service/users'
 import Auth from './service/auth'
+import Sessions from './service/sessions'
 import ContactInfo from './service/contact-info'
 import PacketBrokerAgent from './service/packet-broker-agent'
 import EventHandler from './util/events'
@@ -52,6 +53,7 @@ class TTS {
     this.Organizations = new Organizations(this.api)
     this.Users = new Users(this.api)
     this.Auth = new Auth(this.api.EntityAccess)
+    this.Sessions = new Sessions(this.api)
     this.ContactInfo = new ContactInfo(this.api.ContactInfoRegistry)
     this.PacketBrokerAgent = new PacketBrokerAgent(this.api.Pba)
 

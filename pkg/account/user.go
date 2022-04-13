@@ -58,9 +58,11 @@ func (s *server) CurrentUser(w http.ResponseWriter, r *http.Request) {
 	webhandlers.JSON(w, r, struct {
 		User       json.RawMessage `json:"user"`
 		LoggedInAt *time.Time      `json:"logged_in_at"`
+		SessionId  string          `json:"session_id"`
 	}{
 		User:       userJSON,
 		LoggedInAt: ttnpb.StdTime(session.CreatedAt),
+		SessionId:  session.SessionId,
 	})
 }
 
