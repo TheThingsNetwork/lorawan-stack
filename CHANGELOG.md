@@ -13,6 +13,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 - Sortable tables are now sorted by default in the Console
+
 ### Deprecated
 
 ### Removed
