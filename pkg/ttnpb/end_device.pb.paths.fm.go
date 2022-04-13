@@ -550,6 +550,7 @@ var EndDeviceFieldPathsNested = []string{
 	"last_join_nonce",
 	"last_rj_count_0",
 	"last_rj_count_1",
+	"last_seen_at",
 	"locations",
 	"lorawan_phy_version",
 	"lorawan_version",
@@ -1005,6 +1006,7 @@ var EndDeviceFieldPathsTopLevel = []string{
 	"last_join_nonce",
 	"last_rj_count_0",
 	"last_rj_count_1",
+	"last_seen_at",
 	"locations",
 	"lorawan_phy_version",
 	"lorawan_version",
@@ -1087,6 +1089,7 @@ var CreateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.last_join_nonce",
 	"end_device.last_rj_count_0",
 	"end_device.last_rj_count_1",
+	"end_device.last_seen_at",
 	"end_device.locations",
 	"end_device.lorawan_phy_version",
 	"end_device.lorawan_version",
@@ -1559,6 +1562,7 @@ var UpdateEndDeviceRequestFieldPathsNested = []string{
 	"end_device.last_join_nonce",
 	"end_device.last_rj_count_0",
 	"end_device.last_rj_count_1",
+	"end_device.last_seen_at",
 	"end_device.locations",
 	"end_device.lorawan_phy_version",
 	"end_device.lorawan_version",
@@ -1999,6 +2003,13 @@ var UpdateEndDeviceRequestFieldPathsTopLevel = []string{
 	"end_device",
 	"field_mask",
 }
+var BatchUpdateEndDeviceLastSeenRequestFieldPathsNested = []string{
+	"updates",
+}
+
+var BatchUpdateEndDeviceLastSeenRequestFieldPathsTopLevel = []string{
+	"updates",
+}
 var GetEndDeviceRequestFieldPathsNested = []string{
 	"end_device_ids",
 	"end_device_ids.application_ids",
@@ -2073,6 +2084,7 @@ var SetEndDeviceRequestFieldPathsNested = []string{
 	"end_device.last_join_nonce",
 	"end_device.last_rj_count_0",
 	"end_device.last_rj_count_1",
+	"end_device.last_seen_at",
 	"end_device.locations",
 	"end_device.lorawan_phy_version",
 	"end_device.lorawan_version",
@@ -2562,6 +2574,7 @@ var EndDeviceTemplateFieldPathsNested = []string{
 	"end_device.last_join_nonce",
 	"end_device.last_rj_count_0",
 	"end_device.last_rj_count_1",
+	"end_device.last_seen_at",
 	"end_device.locations",
 	"end_device.lorawan_phy_version",
 	"end_device.lorawan_version",
@@ -3155,4 +3168,19 @@ var MACState_DataRateRangesFieldPathsNested = []string{
 
 var MACState_DataRateRangesFieldPathsTopLevel = []string{
 	"ranges",
+}
+var BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdateFieldPathsNested = []string{
+	"ids",
+	"ids.application_ids",
+	"ids.application_ids.application_id",
+	"ids.dev_addr",
+	"ids.dev_eui",
+	"ids.device_id",
+	"ids.join_eui",
+	"last_seen_at",
+}
+
+var BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdateFieldPathsTopLevel = []string{
+	"ids",
+	"last_seen_at",
 }

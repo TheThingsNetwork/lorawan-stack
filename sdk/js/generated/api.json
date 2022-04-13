@@ -12863,6 +12863,74 @@
           ]
         },
         {
+          "name": "BatchUpdateEndDeviceLastSeenRequest",
+          "longName": "BatchUpdateEndDeviceLastSeenRequest",
+          "fullName": "ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "updates",
+              "description": "The last seen timestamp needs to be set per end device.",
+              "label": "repeated",
+              "type": "EndDeviceLastSeenUpdate",
+              "longType": "BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate",
+              "fullType": "ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "EndDeviceLastSeenUpdate",
+          "longName": "BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate",
+          "fullName": "ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ids",
+              "description": "",
+              "label": "",
+              "type": "EndDeviceIdentifiers",
+              "longType": "EndDeviceIdentifiers",
+              "fullType": "ttn.lorawan.v3.EndDeviceIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "last_seen_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "BoolValue",
           "longName": "BoolValue",
           "fullName": "ttn.lorawan.v3.BoolValue",
@@ -13771,6 +13839,18 @@
             {
               "name": "activated_at",
               "description": "Timestamp when the device has been activated. Stored in the Entity Registry.\nThis field is set by the Application Server when an end device sends\nits first uplink.\nThe Application Server will use the field in order to avoid repeated\ncalls to the Entity Registry.\nThe field cannot be unset once set.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "last_seen_at",
+              "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server.",
               "label": "",
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
@@ -16489,6 +16569,18 @@
                   ]
                 }
               }
+            },
+            {
+              "name": "BatchUpdateLastSeen",
+              "description": "Update the last seen timestamp for a batch of end devices.",
+              "requestType": "BatchUpdateEndDeviceLastSeenRequest",
+              "requestLongType": "BatchUpdateEndDeviceLastSeenRequest",
+              "requestFullType": "ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest",
+              "requestStreaming": false,
+              "responseType": "Empty",
+              "responseLongType": ".google.protobuf.Empty",
+              "responseFullType": "google.protobuf.Empty",
+              "responseStreaming": false
             },
             {
               "name": "Delete",

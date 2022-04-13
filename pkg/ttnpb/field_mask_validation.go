@@ -52,6 +52,7 @@ var isEndDeviceReadFieldPaths = []string{
 	"version_ids.hardware_version",
 	"version_ids.model_id",
 	"picture",
+	"last_seen_at",
 }
 
 var isEndDeviceWriteFieldPaths = []string{
@@ -71,6 +72,7 @@ var isEndDeviceWriteFieldPaths = []string{
 	"version_ids.hardware_version",
 	"version_ids.model_id",
 	"picture",
+	"last_seen_at",
 }
 
 var nsEndDeviceReadFieldPaths = [...]string{

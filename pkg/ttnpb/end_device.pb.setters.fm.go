@@ -2488,6 +2488,15 @@ func (dst *EndDevice) SetFields(src *EndDevice, paths ...string) error {
 			} else {
 				dst.ActivatedAt = nil
 			}
+		case "last_seen_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_seen_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastSeenAt = src.LastSeenAt
+			} else {
+				dst.LastSeenAt = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
@@ -2618,6 +2627,26 @@ func (dst *UpdateEndDeviceRequest) SetFields(src *UpdateEndDeviceRequest, paths 
 				dst.FieldMask = src.FieldMask
 			} else {
 				dst.FieldMask = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *BatchUpdateEndDeviceLastSeenRequest) SetFields(src *BatchUpdateEndDeviceLastSeenRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "updates":
+			if len(subs) > 0 {
+				return fmt.Errorf("'updates' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Updates = src.Updates
+			} else {
+				dst.Updates = nil
 			}
 
 		default:
@@ -3443,6 +3472,51 @@ func (dst *MACState_DataRateRanges) SetFields(src *MACState_DataRateRanges, path
 				dst.Ranges = src.Ranges
 			} else {
 				dst.Ranges = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate) SetFields(src *BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *EndDeviceIdentifiers
+				if (src == nil || src.Ids == nil) && dst.Ids == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Ids
+				}
+				if dst.Ids != nil {
+					newDst = dst.Ids
+				} else {
+					newDst = &EndDeviceIdentifiers{}
+					dst.Ids = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Ids = src.Ids
+				} else {
+					dst.Ids = nil
+				}
+			}
+		case "last_seen_at":
+			if len(subs) > 0 {
+				return fmt.Errorf("'last_seen_at' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.LastSeenAt = src.LastSeenAt
+			} else {
+				dst.LastSeenAt = nil
 			}
 
 		default:
