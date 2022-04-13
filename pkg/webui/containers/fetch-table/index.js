@@ -304,6 +304,7 @@ class FetchTable extends Component {
     } = this.props
     const { page, query, tab, order, initialFetch, error } = this.state
     let orderDirection, orderBy
+
     // Parse order string.
     if (typeof order === 'string') {
       orderDirection = typeof order === 'string' && order[0] === '-' ? 'desc' : 'asc'
