@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- User session expiry can now be configured via `is.user-session.duration`. The new default session duration is 365 days.
+
 ### Changed
 
 - In AS923 frequency plans, the Network Server will skip the RX1 window if the data rate is ambiguous.
