@@ -25,17 +25,26 @@ import DateTime from '@ttn-lw/lib/components/date-time'
 
 import EntityTitleSection from '@console/components/entity-title-section'
 
+import { mayPerformAdminActions } from '@account/lib/feature-checks'
+
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { selectSelectedClient, selectSelectedClientId } from '@account/store/selectors/clients'
+import {
+  selectSelectedClient,
+  selectSelectedClientId,
+  selectClientFetching,
+} from '@account/store/selectors/clients'
 
 import style from './oauth-client-overview.styl'
+
+const { Content } = EntityTitleSection
 
 const OAuthClientOverview = props => {
   const {
     oauthClientId,
     oauthClient: { created_at, updated_at },
+    fetching,
   } = props
   console.log(oauthClientId)
   console.log(created_at)
@@ -50,6 +59,20 @@ const OAuthClientOverview = props => {
     },
   ]
 
+  const bottomBarRight = (
+    <>
+      {mayPerformAdminActions && (
+        <Content.EntityCount
+          icon="collaborators"
+          value={'10'}
+          keyMessage={sharedMessages.collaboratorCounted}
+          errored={false}
+          toAllUrl={`/applications/${oauthClientId}/collaborators`}
+        />
+      )}
+    </>
+  )
+
   return (
     <>
       <div className={style.titleSection}>
@@ -61,7 +84,12 @@ const OAuthClientOverview = props => {
                 id={oauthClientId}
                 icon={applicationIcon}
                 iconAlt={sharedMessages.overview}
-              />
+              >
+                <Content
+                  fetching={fetching}
+                  bottomBarRight={bottomBarRight}
+                />
+              </EntityTitleSection>
             </Col>
           </Row>
         </Container>
@@ -87,5 +115,6 @@ export default connect(state => {
   return {
     oauthClientId,
     oauthClient: selectSelectedClient(state),
+    fetching: selectClientFetching(state),
   }
 })(OAuthClientOverview)
