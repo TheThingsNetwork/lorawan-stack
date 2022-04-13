@@ -35,6 +35,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Console determining gateways as "Other cluster" even though using the same host if server addresses not matching exactly (e.g. due to using different host or scheme).
+- Inconsistency in setting gateway's LNS Auth key in the Console.
 - CLI no longer informs the user that is using the default JoinEUI when passing its value via flags.
 - Generating device ID from a DevEUI when importing a CSV file.
 - The `is-db migrate` command that failed when running on databases created by `v3.18`.
