@@ -33,6 +33,7 @@ import (
 	_ "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider/mqtt" // The MQTT integration provider
 	_ "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider/nats" // The NATS integration provider
 	ioweb "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/lastseen"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/metadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -64,15 +65,16 @@ type ApplicationServer struct {
 
 	config *Config
 
-	linkRegistry     LinkRegistry
-	deviceRegistry   DeviceRegistry
-	appUpsRegistry   ApplicationUplinkRegistry
-	locationRegistry metadata.EndDeviceLocationRegistry
-	formatters       messageprocessors.MapPayloadProcessor
-	webhooks         ioweb.Webhooks
-	webhookTemplates ioweb.TemplateStore
-	pubsub           *pubsub.PubSub
-	appPackages      packages.Server
+	linkRegistry           LinkRegistry
+	deviceRegistry         DeviceRegistry
+	appUpsRegistry         ApplicationUplinkRegistry
+	locationRegistry       metadata.EndDeviceLocationRegistry
+	formatters             messageprocessors.MapPayloadProcessor
+	webhooks               ioweb.Webhooks
+	webhookTemplates       ioweb.TemplateStore
+	pubsub                 *pubsub.PubSub
+	appPackages            packages.Server
+	deviceLastSeenProvider lastseen.LastSeenProvider
 
 	clusterDistributor distribution.Distributor
 	localDistributor   distribution.Distributor
@@ -85,8 +87,9 @@ type ApplicationServer struct {
 	interopClient InteropClient
 	interopID     string
 
-	activationPool workerpool.WorkerPool
-	processingPool workerpool.WorkerPool
+	activationPool     workerpool.WorkerPool
+	processingPool     workerpool.WorkerPool
+	deviceLastSeenPool workerpool.WorkerPool
 }
 
 // Context returns the context of the Application Server.
@@ -154,6 +157,14 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		Name:      "process_application_uplinks",
 		Handler:   as.processUpAsync,
 	})
+
+	as.deviceLastSeenPool = workerpool.NewWorkerPool(workerpool.Config{
+		Component: c,
+		Context:   ctx,
+		Name:      "save_device_last_seen_from_uplink",
+		Handler:   as.processDeviceLastSeenAsync,
+	})
+
 	as.formatters[ttnpb.PayloadFormatter_FORMATTER_REPOSITORY] = devicerepository.New(as.formatters, as)
 
 	as.grpc.asDevices = asEndDeviceRegistryServer{
@@ -248,6 +259,10 @@ func New(c *component.Component, conf *Config) (as *ApplicationServer, err error
 		return nil, err
 	}
 
+	if as.deviceLastSeenProvider, err = conf.DeviceLastSeen.NewLastSeen(ctx, c); err != nil {
+		return nil, err
+	}
+
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.NsAs", cluster.HookName, c.ClusterAuthUnaryHook())
 
 	c.RegisterGRPC(as)
@@ -335,6 +350,20 @@ func (as *ApplicationServer) processUpAsync(ctx context.Context, item interface{
 	}
 	if err := as.processUp(ctx, up, link); err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to process application uplink")
+		return
+	}
+}
+
+// lastSeenAtInfo holds the information needed for a worker to store entry in the LastSeen map.
+type lastSeenAtInfo struct {
+	ids        *ttnpb.EndDeviceIdentifiers
+	lastSeenAt *pbtypes.Timestamp
+}
+
+func (as *ApplicationServer) processDeviceLastSeenAsync(ctx context.Context, item interface{}) {
+	lastSeenEntry := item.(lastSeenAtInfo)
+	if err := as.deviceLastSeenProvider.PushLastSeenFromUplink(ctx, lastSeenEntry.ids, lastSeenEntry.lastSeenAt); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to update device last seen timestamp")
 		return
 	}
 }
@@ -791,7 +820,7 @@ var errFetchAppSKey = errors.Define("app_s_key", "failed to get AppSKey")
 // handleJoinAccept handles a join-accept message.
 // If the application or device is not configured to skip application crypto, the InvalidatedDownlinks and the AppSKey
 // in the given join-accept message is reset.
-func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, joinAccept *ttnpb.ApplicationJoinAccept, link *ttnpb.ApplicationLink) error {
+func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, joinAccept *ttnpb.ApplicationJoinAccept, link *ttnpb.ApplicationLink) (err error) {
 	defer trace.StartRegion(ctx, "handle join accept").End()
 
 	logger := log.FromContext(ctx).WithFields(log.Fields(
@@ -885,6 +914,9 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids *ttnpb.En
 			return dev, mask, nil
 		},
 	)
+	if err == nil {
+		as.deviceLastSeenPool.Publish(ctx, lastSeenAtInfo{ids: ids, lastSeenAt: joinAccept.ReceivedAt})
+	}
 	return err
 }
 
@@ -996,7 +1028,7 @@ func (as *ApplicationServer) saveActivationStatus(ctx context.Context, item inte
 	}
 }
 
-func (as *ApplicationServer) handleUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) error {
+func (as *ApplicationServer) handleUplink(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, uplink *ttnpb.ApplicationUplink, link *ttnpb.ApplicationLink) (err error) {
 	defer trace.StartRegion(ctx, "handle uplink").End()
 
 	ctx = log.NewContextWithField(ctx, "session_key_id", uplink.SessionKeyId)
@@ -1076,6 +1108,10 @@ func (as *ApplicationServer) handleUplink(ctx context.Context, ids *ttnpb.EndDev
 
 	if dev.ActivatedAt == nil {
 		as.activationPool.Publish(ctx, ids)
+	}
+
+	if err == nil {
+		as.deviceLastSeenPool.Publish(ctx, lastSeenAtInfo{ids: ids, lastSeenAt: uplink.ReceivedAt})
 	}
 
 	return nil
