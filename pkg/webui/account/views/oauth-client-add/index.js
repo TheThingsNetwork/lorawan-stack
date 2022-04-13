@@ -16,15 +16,15 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Container, Col, Row } from 'react-grid-system'
 
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-
-import withRequest from '@ttn-lw/lib/components/with-request'
-
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
+import withRequest from '@ttn-lw/lib/components/with-request'
+
 import OAuthClientForm from '@account/containers/oauth-client-form'
+
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 

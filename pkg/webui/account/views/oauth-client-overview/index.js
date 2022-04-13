@@ -16,14 +16,21 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 
+import applicationIcon from '@assets/misc/application.svg'
+
 import DataSheet from '@ttn-lw/components/data-sheet'
 
+import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import DateTime from '@ttn-lw/lib/components/date-time'
+
+import EntityTitleSection from '@console/components/entity-title-section'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { selectSelectedClient, selectSelectedClientId } from '@account/store/selectors/clients'
+
+import style from './oauth-client-overview.styl'
 
 const OAuthClientOverview = props => {
   const {
@@ -45,16 +52,20 @@ const OAuthClientOverview = props => {
 
   return (
     <>
-      {/* <div className={style.titleSection}>
+      <div className={style.titleSection}>
         <Container>
           <IntlHelmet title={sharedMessages.overview} />
           <Row>
             <Col sm={12}>
-              <ApplicationTitleSection appId={oauthClientId} />
+              <EntityTitleSection
+                id={oauthClientId}
+                icon={applicationIcon}
+                iconAlt={sharedMessages.overview}
+              />
             </Col>
           </Row>
         </Container>
-      </div> */}
+      </div>
       <Container>
         <Row>
           <Col sm={12} lg={6}>

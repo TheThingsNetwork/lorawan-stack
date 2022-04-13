@@ -29,6 +29,20 @@
   +media-query($bp.s)
     min-height: "calc(100vh - %s - %s)" % ($header-height-mobile $footer-height)
 
+:global(.with-sidebar) .main
+  +media-query-min($bp.s)
+    padding-left: $sidebar-width
+  +media-query-between($bp.s, $bp.m)
+    padding-left: $sidebar-width-minimized
+
+:global(.sidebar-minimized) .main
+  +media-query-min($bp.s)
+    padding-left: $sidebar-width-minimized
+
+:global(.sidebar-transitioned) .main
+  +media-query-min($bp.s)
+    sidebar-transition(padding-left)
+
 .stage
   flex: 1
   padding-bottom: $ls.xxs

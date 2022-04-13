@@ -37,6 +37,20 @@
   align-items: center
   padding: $ls.s
 
+:global(.with-sidebar) .main
+  +media-query-min($bp.s)
+    padding-left: $sidebar-width
+  +media-query-between($bp.s, $bp.m)
+    padding-left: $sidebar-width-minimized
+
+:global(.sidebar-minimized) .main
+  +media-query-min($bp.s)
+    padding-left: $sidebar-width-minimized
+
+:global(.sidebar-transitioned) .main
+  +media-query-min($bp.s)
+    sidebar-transition(padding-left)
+
 .visual
   height: 100%
   width: 50%

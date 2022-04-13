@@ -18,10 +18,7 @@ import { Switch, Route } from 'react-router-dom'
 
 import applicationIcon from '@assets/misc/application.svg'
 
-import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import SideNavigation from '@ttn-lw/components/navigation/side'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -44,6 +41,7 @@ import {
 } from '@account/store/selectors/clients'
 
 const OAuthClient = props => {
+  console.log(props)
   const {
     oauthClientId,
     match: { url: matchedUrl, path },
@@ -53,11 +51,6 @@ const OAuthClient = props => {
   console.log(oauthClientId)
   console.log(oauthClient)
   const name = oauthClient.name || oauthClientId
-
-  useBreadcrumbs(
-    'clients.single',
-    <Breadcrumb path={`/oauth-clients/${oauthClientId}`} content={name} />,
-  )
 
   return (
     <React.Fragment>

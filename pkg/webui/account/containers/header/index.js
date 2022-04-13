@@ -57,7 +57,6 @@ const Header = ({ handleSearchRequest, searchable }) => {
       title: 'OAuth Clients',
       icon: 'user',
       path: '/oauth-clients',
-      exact: true,
     },
   ]
 

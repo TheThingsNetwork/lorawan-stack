@@ -17,6 +17,8 @@ import { Switch, Route } from 'react-router-dom'
 
 import authRoutes from '@account/constants/auth-routes'
 
+import sidebarStyle from '@ttn-lw/components/navigation/side/side.styl'
+
 import Footer from '@ttn-lw/containers/footer'
 
 import { FullViewErrorInner } from '@ttn-lw/lib/components/full-view-error'
@@ -32,6 +34,7 @@ const Landing = () => (
     <Header />
     <main className={style.main}>
       <div className={style.stage} id="stage">
+        <div id="sidebar" className={sidebarStyle.container} />
         <Switch>
           {authRoutes.map(route => (
             <Route {...route} key={route.path} />
