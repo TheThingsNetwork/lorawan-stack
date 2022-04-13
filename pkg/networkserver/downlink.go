@@ -1432,7 +1432,10 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 				GatewayIdentifiers: fixedPaths[i].GatewayIds,
 				DownlinkPath: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_Fixed{
-						Fixed: fixedPaths[i],
+						Fixed: &ttnpb.GatewayAntennaIdentifiers{
+							GatewayIds:   fixedPaths[i].GatewayIds,
+							AntennaIndex: fixedPaths[i].AntennaIndex,
+						},
 					},
 				},
 			})

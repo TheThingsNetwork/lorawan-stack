@@ -98,13 +98,16 @@ func TestProcessDownlinkTask(t *testing.T) {
 		if !fixedPaths {
 			downlinkPaths = DownlinkPathsFromMetadata(ctx, DefaultRxMetadata[:]...)
 		} else {
-			for i, ids := range DefaultGatewayAntennaIdentifiers {
+			for i, ids := range DefaultClassBCGatewayIdentifiers {
 				ids := ids
 				downlinkPaths = append(downlinkPaths, DownlinkPath{
 					GatewayIdentifiers: ids.GatewayIds,
 					DownlinkPath: &ttnpb.DownlinkPath{
 						Path: &ttnpb.DownlinkPath_Fixed{
-							Fixed: DefaultGatewayAntennaIdentifiers[i],
+							Fixed: &ttnpb.GatewayAntennaIdentifiers{
+								GatewayIds:   DefaultClassBCGatewayIdentifiers[i].GatewayIds,
+								AntennaIndex: DefaultClassBCGatewayIdentifiers[i].AntennaIndex,
+							},
 						},
 					},
 				})
@@ -2149,7 +2152,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 							Priority:       ttnpb.TxSchedulePriority_HIGHEST,
 							SessionKeyId:   []byte{0x11, 0x22, 0x33, 0x44},
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
-								Gateways: DefaultGatewayAntennaIdentifiers[:],
+								Gateways: DefaultClassBCGatewayIdentifiers[:],
 							},
 						},
 					},
