@@ -27,6 +27,7 @@ For details about compatibility between different releases, see the **Commitment
   - `use-adr` and `adr-margin` are still supported, but deprecated. Any future API usage should instead use the `mac-settings.adr` settings.
 
 ### Changed
+- Sortable tables are now sorted by default in the Console
 
 ### Deprecated
 

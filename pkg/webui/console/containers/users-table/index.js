@@ -149,6 +149,7 @@ export default class UsersTable extends Component {
     return (
       <FetchTable
         entity="users"
+        defaultOrder="user_id"
         headers={this.headers}
         addMessage={sharedMessages.userAdd}
         tableTitle={<Message content={sharedMessages.users} />}
