@@ -134,7 +134,10 @@ func (oc *OAuthClient) HandleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := oc.callback(w, r, token, stateCookie.Next); err != nil {
-		webhandlers.Error(w, r, errExchange.WithCause(err))
+		if _, ok := errors.From(err); !ok {
+			err = errExchange.WithCause(err)
+		}
+		webhandlers.Error(w, r, err)
 		return
 	}
 }
