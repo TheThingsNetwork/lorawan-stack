@@ -182,6 +182,7 @@ func getAPIKeyFields(flagSet *pflag.FlagSet) ([]ttnpb.Right, *time.Time, []strin
 var searchFlags = func() *pflag.FlagSet {
 	flagSet := &pflag.FlagSet{}
 	// NOTE: These flags need to be named with underscores, not dashes!
+	flagSet.String("query", "", "")
 	flagSet.String("id_contains", "", "")
 	flagSet.String("name_contains", "", "")
 	flagSet.String("description_contains", "", "")
