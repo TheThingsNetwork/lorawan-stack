@@ -105,6 +105,7 @@ func TestEndDeviceStore(t *testing.T) {
 	st := storetest.New(t, newTestStore)
 	st.TestEndDeviceStoreCRUD(t)
 	st.TestEndDeviceStorePagination(t)
+	st.TestEndDeviceBatchUpdate(t)
 }
 
 func TestGatewayStore(t *testing.T) {

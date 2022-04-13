@@ -267,7 +267,7 @@ func (is *IdentityServer) setFullEndDevicePictureURL(ctx context.Context, dev *t
 
 func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.UpdateEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
 	if clusterauth.Authorized(ctx) == nil {
-		req.FieldMask = cleanFieldMaskPaths([]string{"activated_at", "locations"}, req.FieldMask, nil, getPaths)
+		req.FieldMask = cleanFieldMaskPaths([]string{"activated_at", "locations", "last_seen_at"}, req.FieldMask, nil, getPaths)
 	} else if err = rights.RequireApplication(ctx, *req.EndDevice.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
@@ -302,6 +302,22 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 	}
 	events.Publish(evtUpdateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDevice.Ids, req.FieldMask.GetPaths()))
 	return dev, nil
+}
+
+func (is *IdentityServer) batchUpdateEndDeviceLastSeen(ctx context.Context, req *ttnpb.BatchUpdateEndDeviceLastSeenRequest) (*pbtypes.Empty, error) {
+	if err := clusterauth.Authorized(ctx); err != nil {
+		return nil, err
+	}
+	if len(req.Updates) == 0 {
+		return ttnpb.Empty, nil
+	}
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		return st.BatchUpdateEndDeviceLastSeen(ctx, req.Updates)
+	})
+	if err != nil {
+		return nil, err
+	}
+	return ttnpb.Empty, nil
 }
 
 func (is *IdentityServer) deleteEndDevice(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
@@ -340,6 +356,10 @@ func (dr *endDeviceRegistry) List(ctx context.Context, req *ttnpb.ListEndDevices
 
 func (dr *endDeviceRegistry) Update(ctx context.Context, req *ttnpb.UpdateEndDeviceRequest) (*ttnpb.EndDevice, error) {
 	return dr.updateEndDevice(ctx, req)
+}
+
+func (dr *endDeviceRegistry) BatchUpdateLastSeen(ctx context.Context, req *ttnpb.BatchUpdateEndDeviceLastSeenRequest) (*pbtypes.Empty, error) {
+	return dr.batchUpdateEndDeviceLastSeen(ctx, req)
 }
 
 func (dr *endDeviceRegistry) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
