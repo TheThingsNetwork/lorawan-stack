@@ -11295,6 +11295,18 @@
         }
       }
     },
+    "BatchUpdateEndDeviceLastSeenRequestEndDeviceLastSeenUpdate": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "$ref": "#/definitions/v3EndDeviceIdentifiers"
+        },
+        "last_seen_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "CUPSRedirectionClientTLS": {
       "type": "object",
       "properties": {
@@ -14915,6 +14927,11 @@
           "type": "string",
           "format": "date-time",
           "description": "Timestamp when the device has been activated. Stored in the Entity Registry.\nThis field is set by the Application Server when an end device sends\nits first uplink.\nThe Application Server will use the field in order to avoid repeated\ncalls to the Entity Registry.\nThe field cannot be unset once set."
+        },
+        "last_seen_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when a device uplink has been last observed.\nThis field is set by the Application Server and stored in the Identity Server."
         }
       },
       "description": "Defines an End Device registration and its state on the network.\nThe persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.\nSDKs are responsible for combining (if desired) the three."

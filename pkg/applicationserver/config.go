@@ -25,6 +25,7 @@ import (
 	loracloudgeolocationv3 "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/packages/loragls/v3"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/lastseen"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/metadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -106,6 +107,7 @@ type Config struct {
 	Packages                 ApplicationPackagesConfig      `name:"packages" description:"Application packages configuration"`
 	Interop                  InteropConfig                  `name:"interop" description:"Interop client configuration"`
 	DeviceKEKLabel           string                         `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
+	DeviceLastSeen           LastSeenConfig                 `name:"device-last-seen" description:"End Device last seen batch update configuration"`
 }
 
 func (c Config) toProto() *ttnpb.AsConfiguration {
@@ -308,4 +310,18 @@ func (c EndDeviceLocationStorageConfig) NewRegistry(ctx context.Context, comp *c
 		registry = metadata.NewCachedEndDeviceLocationRegistry(ctx, comp, registry, cache, c.Cache.MinRefreshInterval, c.Cache.MaxRefreshInterval, c.Cache.TTL)
 	}
 	return registry, nil
+}
+
+// LastSeenConfig defines configuration for the device last seen map which stores timestamps for batch updates.
+type LastSeenConfig struct {
+	BatchSize     int           `name:"batch-size" description:"Maximum number of end device last seen timestamps to store for batch update"`
+	FlushInterval time.Duration `name:"flush-interval" description:"Interval at which last seen timestamps are updated in batches"`
+}
+
+// NewLastSeen defines a new batch update map.
+func (c LastSeenConfig) NewLastSeen(ctx context.Context, comp *component.Component) (lastseen.LastSeenProvider, error) {
+	if c.FlushInterval <= 0 {
+		return lastseen.NewNoopLastSeenProvider()
+	}
+	return lastseen.NewBatchLastSeen(ctx, c.BatchSize, time.NewTicker(c.FlushInterval).C, comp)
 }

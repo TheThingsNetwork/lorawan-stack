@@ -1067,6 +1067,8 @@ func (v *EndDevice) FieldIsZero(p string) bool {
 		return v.LastRjCount_0 == 0
 	case "last_rj_count_1":
 		return v.LastRjCount_1 == 0
+	case "last_seen_at":
+		return v.LastSeenAt == nil
 	case "locations":
 		return v.Locations == nil
 	case "lorawan_phy_version":

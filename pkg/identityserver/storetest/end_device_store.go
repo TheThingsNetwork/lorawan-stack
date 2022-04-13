@@ -51,7 +51,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 	mask := fieldMask(
 		"name", "description", "attributes", "version_ids",
 		"network_server_address", "application_server_address", "join_server_address",
-		"service_profile_id", "locations", "picture", "activated_at",
+		"service_profile_id", "locations", "picture", "activated_at", "last_seen_at",
 	)
 
 	location := &ttnpb.Location{
@@ -284,6 +284,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			},
 			Picture:     updatedPicture,
 			ActivatedAt: ttnpb.ProtoTimePtr(stamp),
+			LastSeenAt:  ttnpb.ProtoTimePtr(stamp),
 		}, mask)
 		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.GetIds().GetDeviceId(), should.Equal, "foo")
@@ -307,6 +308,7 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 			})
 			a.So(updated.Picture, should.Resemble, updatedPicture)
 			a.So(*ttnpb.StdTime(updated.ActivatedAt), should.Equal, stamp)
+			a.So(*ttnpb.StdTime(updated.LastSeenAt), should.Equal, stamp)
 			a.So(*ttnpb.StdTime(updated.CreatedAt), should.Equal, *ttnpb.StdTime(created.CreatedAt))
 			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenWithin, 5*time.Second, start)
 		}
@@ -457,6 +459,106 @@ func (st *StoreTest) TestEndDeviceStorePagination(t *T) {
 			}
 
 			a.So(total, should.Equal, 7)
+		}
+	})
+}
+
+func (st *StoreTest) TestEndDeviceBatchUpdate(t *T) {
+	usr1 := st.population.NewUser()
+	app1 := st.population.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+
+	var all []*ttnpb.EndDevice
+	for i := 0; i < 3; i++ {
+		all = append(all, st.population.NewEndDevice(app1.GetIds()))
+	}
+
+	dev1 := all[0]
+	dev2 := all[1]
+	dev3 := all[2]
+
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+		is.EndDeviceStore
+	})
+	defer st.DestroyDB(t, false)
+	defer s.Close()
+	if !ok {
+		t.Fatal("Store does not implement EndDeviceStore")
+	}
+
+	t.Run("BatchUpdateEndDeviceLastSeen", func(t *T) {
+		a, ctx := test.New(t)
+
+		validDevTime := time.Now().Truncate(time.Millisecond)
+		dev1.LastSeenAt = ttnpb.ProtoTimePtr(validDevTime)
+		dev2.LastSeenAt = ttnpb.ProtoTimePtr(validDevTime)
+		dev3.LastSeenAt = ttnpb.ProtoTimePtr(validDevTime.Add(10 * time.Second))
+
+		batch := []*ttnpb.BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate{
+			{Ids: dev1.Ids, LastSeenAt: dev1.LastSeenAt},
+			{Ids: dev2.Ids, LastSeenAt: dev2.LastSeenAt},
+			{Ids: dev3.Ids, LastSeenAt: dev3.LastSeenAt},
+		}
+
+		err := s.BatchUpdateEndDeviceLastSeen(ctx, batch)
+		a.So(err, should.BeNil)
+
+		got, err := s.ListEndDevices(ctx, app1.GetIds(), []string{"last_seen_at"})
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) && a.So(got, should.HaveLength, 3) {
+			for _, dev := range got {
+				a.So(dev.LastSeenAt, should.NotBeNil)
+				if dev.Ids.DeviceId == dev1.Ids.DeviceId {
+					a.So(dev.LastSeenAt, should.Resemble, ttnpb.ProtoTimePtr(validDevTime))
+				} else if dev.Ids.DeviceId == dev2.Ids.DeviceId {
+					a.So(dev.LastSeenAt, should.Resemble, ttnpb.ProtoTimePtr(validDevTime))
+				} else if dev.Ids.DeviceId == dev3.Ids.DeviceId {
+					a.So(dev.LastSeenAt, should.Resemble, ttnpb.ProtoTimePtr(validDevTime.Add(10*time.Second)))
+				}
+			}
+		}
+
+		invalidDev1Time := ttnpb.ProtoTimePtr(time.Now().Add(-10 * time.Minute).Truncate(time.Millisecond))
+		invalidDev2Time := ttnpb.ProtoTimePtr(time.Now().Add(-5 * time.Minute).Truncate(time.Millisecond))
+		invalidDev3Time := ttnpb.ProtoTimePtr(time.Now().Add(-1 * time.Minute).Truncate(time.Millisecond))
+		dev1.LastSeenAt = invalidDev1Time
+		dev2.LastSeenAt = invalidDev2Time
+		dev3.LastSeenAt = invalidDev3Time
+
+		batch = []*ttnpb.BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate{
+			{Ids: dev1.Ids, LastSeenAt: dev1.LastSeenAt},
+			{Ids: dev2.Ids, LastSeenAt: dev2.LastSeenAt},
+			{Ids: dev3.Ids, LastSeenAt: dev3.LastSeenAt},
+		}
+
+		err = s.BatchUpdateEndDeviceLastSeen(ctx, batch)
+		a.So(err, should.BeNil)
+		got, err = s.ListEndDevices(ctx, app1.GetIds(), []string{"last_seen_at"})
+
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) && a.So(got, should.HaveLength, 3) {
+			for _, dev := range got {
+				a.So(dev.LastSeenAt, should.NotBeNil)
+				if dev.Ids.DeviceId == dev1.Ids.DeviceId {
+					a.So(dev.LastSeenAt, should.Resemble, ttnpb.ProtoTimePtr(validDevTime))
+				} else if dev.Ids.DeviceId == dev2.Ids.DeviceId {
+					a.So(dev.LastSeenAt, should.Resemble, ttnpb.ProtoTimePtr(validDevTime))
+				} else if dev.Ids.DeviceId == dev3.Ids.DeviceId {
+					a.So(dev.LastSeenAt, should.Resemble, ttnpb.ProtoTimePtr(validDevTime.Add(10*time.Second)))
+				}
+			}
+		}
+
+		// Test duplicates in batch update call.
+		batch = []*ttnpb.BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate{
+			{Ids: dev1.Ids, LastSeenAt: dev1.LastSeenAt},
+			{Ids: dev1.Ids, LastSeenAt: ttnpb.ProtoTimePtr(validDevTime.Add(10 * time.Second))},
+		}
+
+		err = s.BatchUpdateEndDeviceLastSeen(ctx, batch)
+		a.So(err, should.BeNil)
+
+		dev, err := s.GetEndDevice(ctx, dev1.Ids, []string{"last_seen_at"})
+		if a.So(err, should.BeNil) && a.So(dev, should.NotBeNil) && a.So(dev.LastSeenAt, should.NotBeNil) {
+			a.So(dev.LastSeenAt, should.Resemble, ttnpb.ProtoTimePtr(validDevTime.Add(10*time.Second)))
 		}
 	})
 }

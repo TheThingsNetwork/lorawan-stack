@@ -96,4 +96,8 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 	Formatters: applicationserver.FormattersConfig{
 		MaxParameterLength: 40960,
 	},
+	DeviceLastSeen: applicationserver.LastSeenConfig{
+		BatchSize:     1000,
+		FlushInterval: 10 * time.Second,
+	},
 }

@@ -2528,7 +2528,8 @@
         "version_ids.firmware_version",
         "version_ids.hardware_version",
         "version_ids.model_id",
-        "picture"
+        "picture",
+        "last_seen_at"
       ]
     },
     "GetIdentifiersForEUIs": {
@@ -2570,7 +2571,8 @@
         "version_ids.firmware_version",
         "version_ids.hardware_version",
         "version_ids.model_id",
-        "picture"
+        "picture",
+        "last_seen_at"
       ]
     },
     "Update": {
@@ -2602,8 +2604,13 @@
         "version_ids.firmware_version",
         "version_ids.hardware_version",
         "version_ids.model_id",
-        "picture"
+        "picture",
+        "last_seen_at"
       ]
+    },
+    "BatchUpdateLastSeen": {
+      "file": "lorawan-stack/api/end_device_services.proto",
+      "http": []
     },
     "Delete": {
       "file": "lorawan-stack/api/end_device_services.proto",
@@ -5234,7 +5241,8 @@
         "version_ids.firmware_version",
         "version_ids.hardware_version",
         "version_ids.model_id",
-        "picture"
+        "picture",
+        "last_seen_at"
       ]
     }
   },

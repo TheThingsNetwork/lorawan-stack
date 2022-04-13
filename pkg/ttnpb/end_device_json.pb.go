@@ -2499,6 +2499,15 @@ func (x *EndDevice) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 			gogo.MarshalTimestamp(s, x.ActivatedAt)
 		}
 	}
+	if x.LastSeenAt != nil || s.HasField("last_seen_at") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("last_seen_at")
+		if x.LastSeenAt == nil {
+			s.WriteNil()
+		} else {
+			gogo.MarshalTimestamp(s, x.LastSeenAt)
+		}
+	}
 	s.WriteObjectEnd()
 }
 
@@ -2821,6 +2830,17 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				return
 			}
 			x.ActivatedAt = v
+		case "last_seen_at", "lastSeenAt":
+			s.AddField("last_seen_at")
+			if s.ReadNil() {
+				x.LastSeenAt = nil
+				return
+			}
+			v := gogo.UnmarshalTimestamp(s)
+			if s.Err() != nil {
+				return
+			}
+			x.LastSeenAt = v
 		}
 	})
 }

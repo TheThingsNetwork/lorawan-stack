@@ -80,6 +80,9 @@ service EndDeviceRegistry {
     };
   };
 
+  // Update the last seen timestamp for a batch of end devices.
+  rpc BatchUpdateLastSeen(BatchUpdateEndDeviceLastSeenRequest) returns (google.protobuf.Empty);
+
   // Delete the end device with the given IDs.
   //
   // Before deleting an end device it first needs to be deleted from the

@@ -198,6 +198,8 @@
   - [Message `ADRSettings.DisabledMode`](#ttn.lorawan.v3.ADRSettings.DisabledMode)
   - [Message `ADRSettings.DynamicMode`](#ttn.lorawan.v3.ADRSettings.DynamicMode)
   - [Message `ADRSettings.StaticMode`](#ttn.lorawan.v3.ADRSettings.StaticMode)
+  - [Message `BatchUpdateEndDeviceLastSeenRequest`](#ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest)
+  - [Message `BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate`](#ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate)
   - [Message `BoolValue`](#ttn.lorawan.v3.BoolValue)
   - [Message `ConvertEndDeviceTemplateRequest`](#ttn.lorawan.v3.ConvertEndDeviceTemplateRequest)
   - [Message `CreateEndDeviceRequest`](#ttn.lorawan.v3.CreateEndDeviceRequest)
@@ -3144,6 +3146,25 @@ Configuration options for static ADR.
 | `tx_power_index` | <p>`uint32.lte`: `15`</p> |
 | `nb_trans` | <p>`uint32.lte`: `15`</p> |
 
+### <a name="ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest">Message `BatchUpdateEndDeviceLastSeenRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `updates` | [`BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate`](#ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate) | repeated | The last seen timestamp needs to be set per end device. |
+
+### <a name="ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate">Message `BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) |  |  |
+| `last_seen_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ids` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.BoolValue">Message `BoolValue`</a>
 
 | Field | Type | Label | Description |
@@ -3240,6 +3261,7 @@ SDKs are responsible for combining (if desired) the three.
 | `skip_payload_crypto` | [`bool`](#bool) |  | Skip decryption of uplink payloads and encryption of downlink payloads. This field is deprecated, use skip_payload_crypto_override instead. |
 | `skip_payload_crypto_override` | [`google.protobuf.BoolValue`](#google.protobuf.BoolValue) |  | Skip decryption of uplink payloads and encryption of downlink payloads. This field overrides the application-level setting. |
 | `activated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Timestamp when the device has been activated. Stored in the Entity Registry. This field is set by the Application Server when an end device sends its first uplink. The Application Server will use the field in order to avoid repeated calls to the Entity Registry. The field cannot be unset once set. |
+| `last_seen_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | Timestamp when a device uplink has been last observed. This field is set by the Application Server and stored in the Identity Server. |
 
 #### Field Rules
 
@@ -3732,6 +3754,7 @@ After registering an end device, it also needs to be registered in the NsEndDevi
 | `GetIdentifiersForEUIs` | [`GetEndDeviceIdentifiersForEUIsRequest`](#ttn.lorawan.v3.GetEndDeviceIdentifiersForEUIsRequest) | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | Get the identifiers of the end device that has the given EUIs registered. |
 | `List` | [`ListEndDevicesRequest`](#ttn.lorawan.v3.ListEndDevicesRequest) | [`EndDevices`](#ttn.lorawan.v3.EndDevices) | List end devices in the given application. Similar to Get, this selects the fields given by the field mask. More or less fields may be returned, depending on the rights of the caller. |
 | `Update` | [`UpdateEndDeviceRequest`](#ttn.lorawan.v3.UpdateEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Update the end device, changing the fields specified by the field mask to the provided values. |
+| `BatchUpdateLastSeen` | [`BatchUpdateEndDeviceLastSeenRequest`](#ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Update the last seen timestamp for a batch of end devices. |
 | `Delete` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the end device with the given IDs.
 
 Before deleting an end device it first needs to be deleted from the NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry. This is NOT done automatically. |

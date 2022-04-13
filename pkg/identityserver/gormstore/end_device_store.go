@@ -217,3 +217,29 @@ func (s *deviceStore) DeleteEndDevice(ctx context.Context, id *ttnpb.EndDeviceId
 	defer trace.StartRegion(ctx, "delete end device").End()
 	return s.deleteEntity(ctx, id)
 }
+
+func batchUpdateLastSeenAtQuery(placeholders []string) string {
+	return fmt.Sprintf(`
+	WITH updates (application_id, device_id, last_seen_at) AS (VALUES %s)
+	UPDATE end_devices AS end_device
+	SET last_seen_at = updates.last_seen_at
+	FROM updates
+	WHERE end_device.application_id = updates.application_id
+	AND end_device.device_id = updates.device_id
+	AND (end_device.last_seen_at IS NULL OR end_device.last_seen_at < updates.last_seen_at)
+	`, strings.Join(placeholders, ","))
+}
+
+func (s *deviceStore) BatchUpdateEndDeviceLastSeen(ctx context.Context, devsLastSeen []*ttnpb.BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate) error {
+	defer trace.StartRegion(ctx, "batch update end devices").End()
+
+	valueStrings := []string{}
+	valueArgs := []interface{}{}
+
+	for _, dev := range devsLastSeen {
+		valueStrings = append(valueStrings, "(?, ?, ?::timestamptz)")
+		valueArgs = append(valueArgs, dev.Ids.ApplicationIds.ApplicationId, dev.Ids.DeviceId, ttnpb.StdTime(dev.LastSeenAt))
+	}
+
+	return s.query(ctx, EndDevice{}).Exec(batchUpdateLastSeenAtQuery(valueStrings), valueArgs...).Error
+}

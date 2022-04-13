@@ -39,6 +39,7 @@ const (
 	grantsField                         = "grants"
 	hardwareVersionField                = "version_ids.hardware_version"
 	joinServerAddressField              = "join_server_address"
+	lastSeenAtField                     = "last_seen_at"
 	lbsLNSSecretField                   = "lbs_lns_secret"
 	locationPublicField                 = "location_public"
 	locationsField                      = "locations"

@@ -61,6 +61,7 @@ var GenerateEndDeviceQRCodeRequestFieldPathsNested = []string{
 	"end_device.last_join_nonce",
 	"end_device.last_rj_count_0",
 	"end_device.last_rj_count_1",
+	"end_device.last_seen_at",
 	"end_device.locations",
 	"end_device.lorawan_phy_version",
 	"end_device.lorawan_version",
