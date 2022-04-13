@@ -117,6 +117,24 @@ const backendErrorDetailsWithPathErrors = {
   ],
 }
 
+const backendErrorWithUnknownDetailStructure = {
+  '@type': 'type.googleapis.com/ttn.lorawan.v3.ErrorDetails',
+  namespace: 'pkg/applicationserver/io/packages/loradms/v1/api',
+  name: 'request',
+  message_format: 'LoRaCloud DMS request',
+  correlation_id: 'b0de67a448334364a53df8cbd9f9b429',
+  code: 14,
+  details: [
+    {
+      '@type': 'type.googleapis.com/google.protobuf.Struct',
+      value: {
+        body: 'Unauthorized status',
+        status_code: 401,
+      },
+    },
+  ],
+}
+
 const conflictBackendError = {
   code: 6,
   message: 'error:pkg/identityserver/store:id_taken (ID already taken)',
@@ -405,6 +423,18 @@ describe('Converting errors to message props', () => {
       values: {
         message:
           '`` is not a valid ID. Must be at least 2 and at most 36 characters long and may consist of only letters, numbers and dashes. It may not start or end with a dash',
+      },
+    })
+  })
+
+  it('correctly extracts from error details with unknown detail structure', () => {
+    const messageProps = toMessageProps(backendErrorWithUnknownDetailStructure, true)
+    expect(messageProps).toBeInstanceOf(Array)
+    expect(messageProps).toHaveLength(1)
+    expect(messageProps[0]).toMatchObject({
+      content: {
+        id: 'error:pkg/applicationserver/io/packages/loradms/v1/api:request',
+        defaultMessage: 'LoRaCloud DMS request',
       },
     })
   })

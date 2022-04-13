@@ -67,8 +67,7 @@ export const isBackendErrorDetails = details =>
   Boolean(details) &&
   Boolean(details.namespace) &&
   Boolean(details.name) &&
-  Boolean(details.message_format) &&
-  Boolean(details.code)
+  Boolean(details.message_format)
 
 /**
  * Returns whether the error has a shape that is not well-known.
@@ -301,15 +300,17 @@ export const getSentryErrorTitle = error => {
   }
 
   if (isBackend(error)) {
-    const title = error.message
+    const title = error.message || error.message_format
     if (hasValidDetails(error) && hasCauses(getBackendErrorDetails(error))) {
       const rootCause = getBackendErrorRootCause(getBackendErrorDetails(error))
-      const message =
-        'attributes' in rootCause
-          ? interpolate(rootCause.message_format, rootCause.attributes)
-          : rootCause.message_format
+      if (isBackendErrorDetails(rootCause)) {
+        const message =
+          'attributes' in rootCause
+            ? interpolate(rootCause.message_format, rootCause.attributes)
+            : rootCause.message_format
 
-      return `${title}; error:${rootCause.namespace}:${rootCause.name} (${message})`
+        return `${title}; error:${rootCause.namespace}:${rootCause.name} (${message})`
+      }
     }
     return title
   } else if (isFrontend(error)) {
@@ -458,10 +459,14 @@ export const toMessageProps = (error, each = false) => {
   if (isBackendErrorDetails(error) || isBackend(error)) {
     const pathErrors = getBackendErrorDetailsPathError(error)
     let errorDetails
-    if (hasValidDetails(error) || isBackendErrorDetails(error)) {
+
+    if (
+      (hasValidDetails(error) && isBackendErrorDetails(error.details[0])) ||
+      isBackendErrorDetails(error)
+    ) {
       if (isBackendErrorDetails(pathErrors)) {
         errorDetails = pathErrors
-      } else if ('details' in error) {
+      } else if ('details' in error && isBackendErrorDetails(error.details[0])) {
         errorDetails = error.details[0]
       } else {
         errorDetails = error
@@ -502,7 +507,9 @@ export const toMessageProps = (error, each = false) => {
   } else if (isTranslated(error)) {
     // Fall back to normal message.
     props.push({ content: error })
-  } else if (props.length === 0) {
+  }
+
+  if (props.length === 0) {
     // Fall back to generic error message.
     props.push({ content: errorMessages.genericError })
   }
