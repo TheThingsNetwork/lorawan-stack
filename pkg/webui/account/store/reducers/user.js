@@ -14,12 +14,7 @@
 
 import { INITIALIZE_SUCCESS } from '@ttn-lw/lib/store/actions/init'
 
-import {
-  GET_USER,
-  GET_USER_SUCCESS,
-  GET_USER_FAILURE,
-  UPDATE_USER_SUCCESS,
-} from '@account/store/actions/user'
+import { GET_USER_SUCCESS, UPDATE_USER_SUCCESS } from '@account/store/actions/user'
 
 const defaultState = {
   user: undefined,
@@ -37,20 +32,10 @@ const user = (state = defaultState, { type, payload }) => {
         ...state,
         sessionId: payload,
       }
-    case GET_USER:
-      return {
-        ...state,
-        user: undefined,
-      }
     case GET_USER_SUCCESS:
       return {
         ...state,
         user: payload,
-      }
-    case GET_USER_FAILURE:
-      return {
-        ...state,
-        user: undefined,
       }
     case UPDATE_USER_SUCCESS:
       return {
