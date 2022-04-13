@@ -56,6 +56,7 @@ type EndDevice struct {
 	PictureID *string `gorm:"type:UUID;index:end_device_picture_index"`
 
 	ActivatedAt *time.Time `gorm:"default:null"`
+	LastSeenAt  *time.Time `gorm:"default:null"`
 }
 
 func init() {
@@ -123,6 +124,7 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 		}
 	},
 	activatedAtField: func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.ActivatedAt = ttnpb.ProtoTime(dev.ActivatedAt) },
+	lastSeenAtField:  func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.LastSeenAt = ttnpb.ProtoTime(dev.LastSeenAt) },
 }
 
 // functions to set fields from the device proto into the device model.
@@ -165,6 +167,7 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 		}
 	},
 	activatedAtField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.ActivatedAt = ttnpb.StdTime(pb.ActivatedAt) },
+	lastSeenAtField:  func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.LastSeenAt = ttnpb.StdTime(pb.LastSeenAt) },
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
@@ -199,6 +202,7 @@ var deviceColumnNames = map[string][]string{
 	serviceProfileIDField:         {serviceProfileIDField},
 	locationsField:                {},
 	activatedAtField:              {activatedAtField},
+	lastSeenAtField:               {lastSeenAtField},
 }
 
 func (dev EndDevice) toPB(pb *ttnpb.EndDevice, fieldMask store.FieldMask) {

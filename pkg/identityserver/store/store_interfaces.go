@@ -65,6 +65,7 @@ type EndDeviceStore interface {
 	GetEndDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifiers, fieldMask FieldMask) (*ttnpb.EndDevice, error)
 	UpdateEndDevice(ctx context.Context, dev *ttnpb.EndDevice, fieldMask FieldMask) (*ttnpb.EndDevice, error)
 	DeleteEndDevice(ctx context.Context, id *ttnpb.EndDeviceIdentifiers) error
+	BatchUpdateEndDeviceLastSeen(ctx context.Context, devsLastSeen []*ttnpb.BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate) error
 }
 
 // GatewayStore interface for storing Gateways.
