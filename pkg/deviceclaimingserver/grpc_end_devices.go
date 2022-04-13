@@ -103,14 +103,14 @@ func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.Claim
 	}
 
 	var (
-		joinEUI *types.EUI64
-		devEUI  *types.EUI64
-		cac     string
+		joinEUI                 *types.EUI64
+		devEUI                  *types.EUI64
+		claimAuthenticationCode string
 	)
 	if authenticatedIDs := req.GetAuthenticatedIdentifiers(); authenticatedIDs != nil {
 		joinEUI = &req.GetAuthenticatedIdentifiers().JoinEui
 		devEUI = &req.GetAuthenticatedIdentifiers().DevEui
-		cac = req.GetAuthenticatedIdentifiers().AuthenticationCode
+		claimAuthenticationCode = req.GetAuthenticatedIdentifiers().AuthenticationCode
 	} else if qrCode := req.GetQrCode(); qrCode != nil {
 		conn, err := edcs.DCS.GetPeerConn(ctx, ttnpb.ClusterRole_QR_CODE_GENERATOR, nil)
 		if err != nil {
@@ -126,19 +126,19 @@ func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.Claim
 		}
 		joinEUI = dev.GetIds().JoinEui
 		devEUI = dev.GetIds().DevEui
-		cac = dev.ClaimAuthenticationCode.Value
+		claimAuthenticationCode = dev.ClaimAuthenticationCode.Value
 	} else {
 		return nil, errNoJoinEUI.New()
 	}
 
-	hNSAddress, _, err := net.SplitHostPort(req.TargetNetworkServerAddress)
+	networkServerAddress, _, err := net.SplitHostPort(req.TargetNetworkServerAddress)
 	if err != nil {
 		// TargetNetworkServerAddress is already validated by the API.
 		// An error here means that it does not contain a port, so we use it directly.
-		hNSAddress = req.TargetNetworkServerAddress
+		networkServerAddress = req.TargetNetworkServerAddress
 	}
 
-	err = edcs.DCS.endDeviceClaimingUpstream.Claim(ctx, joinEUI, devEUI, cac, hNSAddress)
+	err = edcs.DCS.endDeviceClaimingUpstream.Claim(ctx, joinEUI, devEUI, claimAuthenticationCode, networkServerAddress)
 	if err != nil {
 		if errors.IsAborted(err) {
 			log.FromContext(ctx).Warn("No upstream supports JoinEUI, use fallback")

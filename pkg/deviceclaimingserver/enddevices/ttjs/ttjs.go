@@ -121,16 +121,16 @@ var (
 )
 
 // Claim implements EndDeviceClaimer.
-func (client *TTJS) Claim(ctx context.Context, joinEUI *types.EUI64, devEUI *types.EUI64, cac string, hNSAddress string) error {
+func (client *TTJS) Claim(ctx context.Context, joinEUI *types.EUI64, devEUI *types.EUI64, claimAuthenticationCode string, networkServerAddress string) error {
 	htenantID := client.config.TenantID
 
-	hNSID, ok := client.hsNSIDs[hNSAddress]
+	hNSID, ok := client.hsNSIDs[networkServerAddress]
 	if !ok {
-		return errNoHomeNSID.WithAttributes("address", hNSAddress)
+		return errNoHomeNSID.WithAttributes("address", networkServerAddress)
 	}
 
 	claimReq := &claimRequest{
-		OwnerToken: cac,
+		OwnerToken: claimAuthenticationCode,
 		claimData: claimData{
 			HomeNetID: client.config.NetID.String(),
 			HomeNSID:  hNSID.String(),
@@ -141,7 +141,7 @@ func (client *TTJS) Claim(ctx context.Context, joinEUI *types.EUI64, devEUI *typ
 					HNSAddress string
 				}{
 					HTenantID:  htenantID,
-					HNSAddress: hNSAddress,
+					HNSAddress: networkServerAddress,
 				},
 			},
 		},
