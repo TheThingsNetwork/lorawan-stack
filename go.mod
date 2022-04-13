@@ -37,6 +37,9 @@ replace gopkg.in/DATA-DOG/go-sqlmock.v1 => gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.
 // See https://github.com/mattn/go-ieproxy/issues/31
 replace github.com/mattn/go-ieproxy => github.com/mattn/go-ieproxy v0.0.1
 
+// See https://github.com/mitchellh/mapstructure/pull/278
+replace github.com/mitchellh/mapstructure v1.4.3 => github.com/TheThingsIndustries/mapstructure v0.0.0-20220329135826-c42f9f170b2a
+
 require (
 	contrib.go.opencensus.io/exporter/prometheus v0.4.0
 	// NOTE: github.com/Azure/azure-storage-blob-go is actually a different version (see above).

@@ -77,6 +77,8 @@ github.com/TheThingsIndustries/gogoprotobuf v1.3.1 h1:bjjlt2OLpIpUxinNSvZH/0wQxz
 github.com/TheThingsIndustries/gogoprotobuf v1.3.1/go.mod h1:SlYgWuQ5SjCEi6WLHjHCa1yvBfUnHcTbrrZtXPKa29o=
 github.com/TheThingsIndustries/grpc-gateway v1.15.2-gogo h1:rWB4sbEKoL7xUC9ixUkJOBlPOeF0hcwzXHTISXZM7eA=
 github.com/TheThingsIndustries/grpc-gateway v1.15.2-gogo/go.mod h1:fU1VeKM8T+38FAMQNH0zO2BT6grnMyphff4CD9w1DTM=
+github.com/TheThingsIndustries/mapstructure v0.0.0-20220329135826-c42f9f170b2a h1:b/0P0Ria7uJgfGnk6dgPdarnaYR/KGV92Dr7mxejME8=
+github.com/TheThingsIndustries/mapstructure v0.0.0-20220329135826-c42f9f170b2a/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
 github.com/TheThingsIndustries/mystique v0.0.0-20211230093812-d4088bd06959 h1:YRyHofsKjSff/aofUxYl0PuSibYaYZMXGrOGD4w1ayE=
 github.com/TheThingsIndustries/mystique v0.0.0-20211230093812-d4088bd06959/go.mod h1:zJmv+zv/E4SFsThOS+ExjtJf3M1x2MOziwyHI7l5zZo=
 github.com/TheThingsIndustries/protoc-gen-go-json v1.3.1 h1:17cc7BIOP+gxnQiWKWchjtefcz1daA2O5wZKM/3n2xw=
@@ -510,8 +512,6 @@ github.com/mitchellh/mapstructure v0.0.0-20160808181253-ca63d7c062ee/go.mod h1:F
 github.com/mitchellh/mapstructure v0.0.0-20170523030023-d0303fe80992/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
 github.com/mitchellh/mapstructure v1.1.2/go.mod h1:FVVH3fgwuzCH5S8UJGiWEs2h04kUh9fWfEaFds41c1Y=
 github.com/mitchellh/mapstructure v1.4.1/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
-github.com/mitchellh/mapstructure v1.4.3 h1:OVowDSCllw/YjdLkam3/sm7wEtOy59d8ndGgCcyj8cs=
-github.com/mitchellh/mapstructure v1.4.3/go.mod h1:bFUtVrKA4DC2yAKiSyO/QUcy7e+RRV2QTWOzhPopBRo=
 github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
 github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd h1:TRLaZ9cD/w8PVh93nsPXa1VrQ6jlwL5oN8l14QlcNfg=
 github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
