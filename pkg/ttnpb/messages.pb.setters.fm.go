@@ -217,66 +217,70 @@ func (dst *DownlinkMessage) SetFields(src *DownlinkMessage, paths ...string) err
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "request":
-					_, srcOk := src.Settings.(*DownlinkMessage_Request)
-					if !srcOk && src.Settings != nil {
+					_, srcTypeOk := src.Settings.(*DownlinkMessage_Request)
+					srcValid := srcTypeOk || src.Settings == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'request', while different oneof is set in source")
 					}
-					_, dstOk := dst.Settings.(*DownlinkMessage_Request)
-					if !dstOk && dst.Settings != nil {
+					_, dstTypeOk := dst.Settings.(*DownlinkMessage_Request)
+					dstValid := dstTypeOk || dst.Settings == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'request', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *TxRequest
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Settings.(*DownlinkMessage_Request).Request
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Settings.(*DownlinkMessage_Request).Request
-						} else {
+						} else if srcTypeOk {
 							newDst = &TxRequest{}
 							dst.Settings = &DownlinkMessage_Request{Request: newDst}
+						} else {
+							dst.Settings = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Settings = src.Settings
 						} else {
 							dst.Settings = nil
 						}
 					}
 				case "scheduled":
-					_, srcOk := src.Settings.(*DownlinkMessage_Scheduled)
-					if !srcOk && src.Settings != nil {
+					_, srcTypeOk := src.Settings.(*DownlinkMessage_Scheduled)
+					srcValid := srcTypeOk || src.Settings == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'scheduled', while different oneof is set in source")
 					}
-					_, dstOk := dst.Settings.(*DownlinkMessage_Scheduled)
-					if !dstOk && dst.Settings != nil {
+					_, dstTypeOk := dst.Settings.(*DownlinkMessage_Scheduled)
+					dstValid := dstTypeOk || dst.Settings == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'scheduled', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *TxSettings
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Settings.(*DownlinkMessage_Scheduled).Scheduled
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Settings.(*DownlinkMessage_Scheduled).Scheduled
-						} else {
+						} else if srcTypeOk {
 							newDst = &TxSettings{}
 							dst.Settings = &DownlinkMessage_Scheduled{Scheduled: newDst}
+						} else {
+							dst.Settings = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Settings = src.Settings
 						} else {
 							dst.Settings = nil
@@ -1219,330 +1223,350 @@ func (dst *ApplicationUp) SetFields(src *ApplicationUp, paths ...string) error {
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "uplink_message":
-					_, srcOk := src.Up.(*ApplicationUp_UplinkMessage)
-					if !srcOk && src.Up != nil {
+					_, srcTypeOk := src.Up.(*ApplicationUp_UplinkMessage)
+					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'uplink_message', while different oneof is set in source")
 					}
-					_, dstOk := dst.Up.(*ApplicationUp_UplinkMessage)
-					if !dstOk && dst.Up != nil {
+					_, dstTypeOk := dst.Up.(*ApplicationUp_UplinkMessage)
+					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'uplink_message', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ApplicationUplink
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Up.(*ApplicationUp_UplinkMessage).UplinkMessage
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Up.(*ApplicationUp_UplinkMessage).UplinkMessage
-						} else {
+						} else if srcTypeOk {
 							newDst = &ApplicationUplink{}
 							dst.Up = &ApplicationUp_UplinkMessage{UplinkMessage: newDst}
+						} else {
+							dst.Up = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Up = src.Up
 						} else {
 							dst.Up = nil
 						}
 					}
 				case "join_accept":
-					_, srcOk := src.Up.(*ApplicationUp_JoinAccept)
-					if !srcOk && src.Up != nil {
+					_, srcTypeOk := src.Up.(*ApplicationUp_JoinAccept)
+					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'join_accept', while different oneof is set in source")
 					}
-					_, dstOk := dst.Up.(*ApplicationUp_JoinAccept)
-					if !dstOk && dst.Up != nil {
+					_, dstTypeOk := dst.Up.(*ApplicationUp_JoinAccept)
+					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'join_accept', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ApplicationJoinAccept
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Up.(*ApplicationUp_JoinAccept).JoinAccept
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Up.(*ApplicationUp_JoinAccept).JoinAccept
-						} else {
+						} else if srcTypeOk {
 							newDst = &ApplicationJoinAccept{}
 							dst.Up = &ApplicationUp_JoinAccept{JoinAccept: newDst}
+						} else {
+							dst.Up = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Up = src.Up
 						} else {
 							dst.Up = nil
 						}
 					}
 				case "downlink_ack":
-					_, srcOk := src.Up.(*ApplicationUp_DownlinkAck)
-					if !srcOk && src.Up != nil {
+					_, srcTypeOk := src.Up.(*ApplicationUp_DownlinkAck)
+					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_ack', while different oneof is set in source")
 					}
-					_, dstOk := dst.Up.(*ApplicationUp_DownlinkAck)
-					if !dstOk && dst.Up != nil {
+					_, dstTypeOk := dst.Up.(*ApplicationUp_DownlinkAck)
+					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_ack', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ApplicationDownlink
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Up.(*ApplicationUp_DownlinkAck).DownlinkAck
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Up.(*ApplicationUp_DownlinkAck).DownlinkAck
-						} else {
+						} else if srcTypeOk {
 							newDst = &ApplicationDownlink{}
 							dst.Up = &ApplicationUp_DownlinkAck{DownlinkAck: newDst}
+						} else {
+							dst.Up = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Up = src.Up
 						} else {
 							dst.Up = nil
 						}
 					}
 				case "downlink_nack":
-					_, srcOk := src.Up.(*ApplicationUp_DownlinkNack)
-					if !srcOk && src.Up != nil {
+					_, srcTypeOk := src.Up.(*ApplicationUp_DownlinkNack)
+					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_nack', while different oneof is set in source")
 					}
-					_, dstOk := dst.Up.(*ApplicationUp_DownlinkNack)
-					if !dstOk && dst.Up != nil {
+					_, dstTypeOk := dst.Up.(*ApplicationUp_DownlinkNack)
+					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_nack', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ApplicationDownlink
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Up.(*ApplicationUp_DownlinkNack).DownlinkNack
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Up.(*ApplicationUp_DownlinkNack).DownlinkNack
-						} else {
+						} else if srcTypeOk {
 							newDst = &ApplicationDownlink{}
 							dst.Up = &ApplicationUp_DownlinkNack{DownlinkNack: newDst}
+						} else {
+							dst.Up = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Up = src.Up
 						} else {
 							dst.Up = nil
 						}
 					}
 				case "downlink_sent":
-					_, srcOk := src.Up.(*ApplicationUp_DownlinkSent)
-					if !srcOk && src.Up != nil {
+					_, srcTypeOk := src.Up.(*ApplicationUp_DownlinkSent)
+					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_sent', while different oneof is set in source")
 					}
-					_, dstOk := dst.Up.(*ApplicationUp_DownlinkSent)
-					if !dstOk && dst.Up != nil {
+					_, dstTypeOk := dst.Up.(*ApplicationUp_DownlinkSent)
+					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_sent', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ApplicationDownlink
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Up.(*ApplicationUp_DownlinkSent).DownlinkSent
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Up.(*ApplicationUp_DownlinkSent).DownlinkSent
-						} else {
+						} else if srcTypeOk {
 							newDst = &ApplicationDownlink{}
 							dst.Up = &ApplicationUp_DownlinkSent{DownlinkSent: newDst}
+						} else {
+							dst.Up = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Up = src.Up
 						} else {
 							dst.Up = nil
 						}
 					}
 				case "downlink_failed":
-					_, srcOk := src.Up.(*ApplicationUp_DownlinkFailed)
-					if !srcOk && src.Up != nil {
+					_, srcTypeOk := src.Up.(*ApplicationUp_DownlinkFailed)
+					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_failed', while different oneof is set in source")
 					}
-					_, dstOk := dst.Up.(*ApplicationUp_DownlinkFailed)
-					if !dstOk && dst.Up != nil {
+					_, dstTypeOk := dst.Up.(*ApplicationUp_DownlinkFailed)
+					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_failed', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ApplicationDownlinkFailed
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Up.(*ApplicationUp_DownlinkFailed).DownlinkFailed
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Up.(*ApplicationUp_DownlinkFailed).DownlinkFailed
-						} else {
+						} else if srcTypeOk {
 							newDst = &ApplicationDownlinkFailed{}
 							dst.Up = &ApplicationUp_DownlinkFailed{DownlinkFailed: newDst}
+						} else {
+							dst.Up = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Up = src.Up
 						} else {
 							dst.Up = nil
 						}
 					}
 				case "downlink_queued":
-					_, srcOk := src.Up.(*ApplicationUp_DownlinkQueued)
-					if !srcOk && src.Up != nil {
+					_, srcTypeOk := src.Up.(*ApplicationUp_DownlinkQueued)
+					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_queued', while different oneof is set in source")
 					}
-					_, dstOk := dst.Up.(*ApplicationUp_DownlinkQueued)
-					if !dstOk && dst.Up != nil {
+					_, dstTypeOk := dst.Up.(*ApplicationUp_DownlinkQueued)
+					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_queued', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ApplicationDownlink
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Up.(*ApplicationUp_DownlinkQueued).DownlinkQueued
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Up.(*ApplicationUp_DownlinkQueued).DownlinkQueued
-						} else {
+						} else if srcTypeOk {
 							newDst = &ApplicationDownlink{}
 							dst.Up = &ApplicationUp_DownlinkQueued{DownlinkQueued: newDst}
+						} else {
+							dst.Up = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Up = src.Up
 						} else {
 							dst.Up = nil
 						}
 					}
 				case "downlink_queue_invalidated":
-					_, srcOk := src.Up.(*ApplicationUp_DownlinkQueueInvalidated)
-					if !srcOk && src.Up != nil {
+					_, srcTypeOk := src.Up.(*ApplicationUp_DownlinkQueueInvalidated)
+					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_queue_invalidated', while different oneof is set in source")
 					}
-					_, dstOk := dst.Up.(*ApplicationUp_DownlinkQueueInvalidated)
-					if !dstOk && dst.Up != nil {
+					_, dstTypeOk := dst.Up.(*ApplicationUp_DownlinkQueueInvalidated)
+					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'downlink_queue_invalidated', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ApplicationInvalidatedDownlinks
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Up.(*ApplicationUp_DownlinkQueueInvalidated).DownlinkQueueInvalidated
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Up.(*ApplicationUp_DownlinkQueueInvalidated).DownlinkQueueInvalidated
-						} else {
+						} else if srcTypeOk {
 							newDst = &ApplicationInvalidatedDownlinks{}
 							dst.Up = &ApplicationUp_DownlinkQueueInvalidated{DownlinkQueueInvalidated: newDst}
+						} else {
+							dst.Up = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Up = src.Up
 						} else {
 							dst.Up = nil
 						}
 					}
 				case "location_solved":
-					_, srcOk := src.Up.(*ApplicationUp_LocationSolved)
-					if !srcOk && src.Up != nil {
+					_, srcTypeOk := src.Up.(*ApplicationUp_LocationSolved)
+					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'location_solved', while different oneof is set in source")
 					}
-					_, dstOk := dst.Up.(*ApplicationUp_LocationSolved)
-					if !dstOk && dst.Up != nil {
+					_, dstTypeOk := dst.Up.(*ApplicationUp_LocationSolved)
+					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'location_solved', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ApplicationLocation
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Up.(*ApplicationUp_LocationSolved).LocationSolved
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Up.(*ApplicationUp_LocationSolved).LocationSolved
-						} else {
+						} else if srcTypeOk {
 							newDst = &ApplicationLocation{}
 							dst.Up = &ApplicationUp_LocationSolved{LocationSolved: newDst}
+						} else {
+							dst.Up = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Up = src.Up
 						} else {
 							dst.Up = nil
 						}
 					}
 				case "service_data":
-					_, srcOk := src.Up.(*ApplicationUp_ServiceData)
-					if !srcOk && src.Up != nil {
+					_, srcTypeOk := src.Up.(*ApplicationUp_ServiceData)
+					srcValid := srcTypeOk || src.Up == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'service_data', while different oneof is set in source")
 					}
-					_, dstOk := dst.Up.(*ApplicationUp_ServiceData)
-					if !dstOk && dst.Up != nil {
+					_, dstTypeOk := dst.Up.(*ApplicationUp_ServiceData)
+					dstValid := dstTypeOk || dst.Up == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'service_data', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ApplicationServiceData
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Up.(*ApplicationUp_ServiceData).ServiceData
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Up.(*ApplicationUp_ServiceData).ServiceData
-						} else {
+						} else if srcTypeOk {
 							newDst = &ApplicationServiceData{}
 							dst.Up = &ApplicationUp_ServiceData{ServiceData: newDst}
+						} else {
+							dst.Up = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Up = src.Up
 						} else {
 							dst.Up = nil

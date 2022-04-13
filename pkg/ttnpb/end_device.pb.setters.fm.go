@@ -642,99 +642,105 @@ func (dst *ADRSettings) SetFields(src *ADRSettings, paths ...string) error {
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "static":
-					_, srcOk := src.Mode.(*ADRSettings_Static)
-					if !srcOk && src.Mode != nil {
+					_, srcTypeOk := src.Mode.(*ADRSettings_Static)
+					srcValid := srcTypeOk || src.Mode == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'static', while different oneof is set in source")
 					}
-					_, dstOk := dst.Mode.(*ADRSettings_Static)
-					if !dstOk && dst.Mode != nil {
+					_, dstTypeOk := dst.Mode.(*ADRSettings_Static)
+					dstValid := dstTypeOk || dst.Mode == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'static', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ADRSettings_StaticMode
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Mode.(*ADRSettings_Static).Static
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Mode.(*ADRSettings_Static).Static
-						} else {
+						} else if srcTypeOk {
 							newDst = &ADRSettings_StaticMode{}
 							dst.Mode = &ADRSettings_Static{Static: newDst}
+						} else {
+							dst.Mode = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Mode = src.Mode
 						} else {
 							dst.Mode = nil
 						}
 					}
 				case "dynamic":
-					_, srcOk := src.Mode.(*ADRSettings_Dynamic)
-					if !srcOk && src.Mode != nil {
+					_, srcTypeOk := src.Mode.(*ADRSettings_Dynamic)
+					srcValid := srcTypeOk || src.Mode == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'dynamic', while different oneof is set in source")
 					}
-					_, dstOk := dst.Mode.(*ADRSettings_Dynamic)
-					if !dstOk && dst.Mode != nil {
+					_, dstTypeOk := dst.Mode.(*ADRSettings_Dynamic)
+					dstValid := dstTypeOk || dst.Mode == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'dynamic', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ADRSettings_DynamicMode
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Mode.(*ADRSettings_Dynamic).Dynamic
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Mode.(*ADRSettings_Dynamic).Dynamic
-						} else {
+						} else if srcTypeOk {
 							newDst = &ADRSettings_DynamicMode{}
 							dst.Mode = &ADRSettings_Dynamic{Dynamic: newDst}
+						} else {
+							dst.Mode = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Mode = src.Mode
 						} else {
 							dst.Mode = nil
 						}
 					}
 				case "disabled":
-					_, srcOk := src.Mode.(*ADRSettings_Disabled)
-					if !srcOk && src.Mode != nil {
+					_, srcTypeOk := src.Mode.(*ADRSettings_Disabled)
+					srcValid := srcTypeOk || src.Mode == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'disabled', while different oneof is set in source")
 					}
-					_, dstOk := dst.Mode.(*ADRSettings_Disabled)
-					if !dstOk && dst.Mode != nil {
+					_, dstTypeOk := dst.Mode.(*ADRSettings_Disabled)
+					dstValid := dstTypeOk || dst.Mode == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'disabled', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ADRSettings_DisabledMode
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Mode.(*ADRSettings_Disabled).Disabled
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Mode.(*ADRSettings_Disabled).Disabled
-						} else {
+						} else if srcTypeOk {
 							newDst = &ADRSettings_DisabledMode{}
 							dst.Mode = &ADRSettings_Disabled{Disabled: newDst}
+						} else {
+							dst.Mode = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Mode = src.Mode
 						} else {
 							dst.Mode = nil

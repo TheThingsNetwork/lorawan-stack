@@ -433,99 +433,105 @@ func (dst *ApplicationPubSub) SetFields(src *ApplicationPubSub, paths ...string)
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "nats":
-					_, srcOk := src.Provider.(*ApplicationPubSub_Nats)
-					if !srcOk && src.Provider != nil {
+					_, srcTypeOk := src.Provider.(*ApplicationPubSub_Nats)
+					srcValid := srcTypeOk || src.Provider == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'nats', while different oneof is set in source")
 					}
-					_, dstOk := dst.Provider.(*ApplicationPubSub_Nats)
-					if !dstOk && dst.Provider != nil {
+					_, dstTypeOk := dst.Provider.(*ApplicationPubSub_Nats)
+					dstValid := dstTypeOk || dst.Provider == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'nats', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ApplicationPubSub_NATSProvider
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Provider.(*ApplicationPubSub_Nats).Nats
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Provider.(*ApplicationPubSub_Nats).Nats
-						} else {
+						} else if srcTypeOk {
 							newDst = &ApplicationPubSub_NATSProvider{}
 							dst.Provider = &ApplicationPubSub_Nats{Nats: newDst}
+						} else {
+							dst.Provider = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Provider = src.Provider
 						} else {
 							dst.Provider = nil
 						}
 					}
 				case "mqtt":
-					_, srcOk := src.Provider.(*ApplicationPubSub_Mqtt)
-					if !srcOk && src.Provider != nil {
+					_, srcTypeOk := src.Provider.(*ApplicationPubSub_Mqtt)
+					srcValid := srcTypeOk || src.Provider == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'mqtt', while different oneof is set in source")
 					}
-					_, dstOk := dst.Provider.(*ApplicationPubSub_Mqtt)
-					if !dstOk && dst.Provider != nil {
+					_, dstTypeOk := dst.Provider.(*ApplicationPubSub_Mqtt)
+					dstValid := dstTypeOk || dst.Provider == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'mqtt', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ApplicationPubSub_MQTTProvider
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Provider.(*ApplicationPubSub_Mqtt).Mqtt
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Provider.(*ApplicationPubSub_Mqtt).Mqtt
-						} else {
+						} else if srcTypeOk {
 							newDst = &ApplicationPubSub_MQTTProvider{}
 							dst.Provider = &ApplicationPubSub_Mqtt{Mqtt: newDst}
+						} else {
+							dst.Provider = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Provider = src.Provider
 						} else {
 							dst.Provider = nil
 						}
 					}
 				case "aws_iot":
-					_, srcOk := src.Provider.(*ApplicationPubSub_AwsIot)
-					if !srcOk && src.Provider != nil {
+					_, srcTypeOk := src.Provider.(*ApplicationPubSub_AwsIot)
+					srcValid := srcTypeOk || src.Provider == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'aws_iot', while different oneof is set in source")
 					}
-					_, dstOk := dst.Provider.(*ApplicationPubSub_AwsIot)
-					if !dstOk && dst.Provider != nil {
+					_, dstTypeOk := dst.Provider.(*ApplicationPubSub_AwsIot)
+					dstValid := dstTypeOk || dst.Provider == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'aws_iot', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ApplicationPubSub_AWSIoTProvider
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Provider.(*ApplicationPubSub_AwsIot).AwsIot
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Provider.(*ApplicationPubSub_AwsIot).AwsIot
-						} else {
+						} else if srcTypeOk {
 							newDst = &ApplicationPubSub_AWSIoTProvider{}
 							dst.Provider = &ApplicationPubSub_AwsIot{AwsIot: newDst}
+						} else {
+							dst.Provider = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Provider = src.Provider
 						} else {
 							dst.Provider = nil
@@ -947,33 +953,35 @@ func (dst *ApplicationPubSub_AWSIoTProvider) SetFields(src *ApplicationPubSub_AW
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "default":
-					_, srcOk := src.Deployment.(*ApplicationPubSub_AWSIoTProvider_Default)
-					if !srcOk && src.Deployment != nil {
+					_, srcTypeOk := src.Deployment.(*ApplicationPubSub_AWSIoTProvider_Default)
+					srcValid := srcTypeOk || src.Deployment == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'default', while different oneof is set in source")
 					}
-					_, dstOk := dst.Deployment.(*ApplicationPubSub_AWSIoTProvider_Default)
-					if !dstOk && dst.Deployment != nil {
+					_, dstTypeOk := dst.Deployment.(*ApplicationPubSub_AWSIoTProvider_Default)
+					dstValid := dstTypeOk || dst.Deployment == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'default', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ApplicationPubSub_AWSIoTProvider_DefaultIntegration
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Deployment.(*ApplicationPubSub_AWSIoTProvider_Default).Default
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Deployment.(*ApplicationPubSub_AWSIoTProvider_Default).Default
-						} else {
+						} else if srcTypeOk {
 							newDst = &ApplicationPubSub_AWSIoTProvider_DefaultIntegration{}
 							dst.Deployment = &ApplicationPubSub_AWSIoTProvider_Default{Default: newDst}
+						} else {
+							dst.Deployment = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Deployment = src.Deployment
 						} else {
 							dst.Deployment = nil

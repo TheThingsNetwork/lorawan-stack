@@ -59,99 +59,105 @@ func (dst *AuthInfoResponse) SetFields(src *AuthInfoResponse, paths ...string) e
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "api_key":
-					_, srcOk := src.AccessMethod.(*AuthInfoResponse_ApiKey)
-					if !srcOk && src.AccessMethod != nil {
+					_, srcTypeOk := src.AccessMethod.(*AuthInfoResponse_ApiKey)
+					srcValid := srcTypeOk || src.AccessMethod == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'api_key', while different oneof is set in source")
 					}
-					_, dstOk := dst.AccessMethod.(*AuthInfoResponse_ApiKey)
-					if !dstOk && dst.AccessMethod != nil {
+					_, dstTypeOk := dst.AccessMethod.(*AuthInfoResponse_ApiKey)
+					dstValid := dstTypeOk || dst.AccessMethod == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'api_key', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *AuthInfoResponse_APIKeyAccess
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.AccessMethod.(*AuthInfoResponse_ApiKey).ApiKey
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.AccessMethod.(*AuthInfoResponse_ApiKey).ApiKey
-						} else {
+						} else if srcTypeOk {
 							newDst = &AuthInfoResponse_APIKeyAccess{}
 							dst.AccessMethod = &AuthInfoResponse_ApiKey{ApiKey: newDst}
+						} else {
+							dst.AccessMethod = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.AccessMethod = src.AccessMethod
 						} else {
 							dst.AccessMethod = nil
 						}
 					}
 				case "oauth_access_token":
-					_, srcOk := src.AccessMethod.(*AuthInfoResponse_OauthAccessToken)
-					if !srcOk && src.AccessMethod != nil {
+					_, srcTypeOk := src.AccessMethod.(*AuthInfoResponse_OauthAccessToken)
+					srcValid := srcTypeOk || src.AccessMethod == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'oauth_access_token', while different oneof is set in source")
 					}
-					_, dstOk := dst.AccessMethod.(*AuthInfoResponse_OauthAccessToken)
-					if !dstOk && dst.AccessMethod != nil {
+					_, dstTypeOk := dst.AccessMethod.(*AuthInfoResponse_OauthAccessToken)
+					dstValid := dstTypeOk || dst.AccessMethod == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'oauth_access_token', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *OAuthAccessToken
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.AccessMethod.(*AuthInfoResponse_OauthAccessToken).OauthAccessToken
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.AccessMethod.(*AuthInfoResponse_OauthAccessToken).OauthAccessToken
-						} else {
+						} else if srcTypeOk {
 							newDst = &OAuthAccessToken{}
 							dst.AccessMethod = &AuthInfoResponse_OauthAccessToken{OauthAccessToken: newDst}
+						} else {
+							dst.AccessMethod = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.AccessMethod = src.AccessMethod
 						} else {
 							dst.AccessMethod = nil
 						}
 					}
 				case "user_session":
-					_, srcOk := src.AccessMethod.(*AuthInfoResponse_UserSession)
-					if !srcOk && src.AccessMethod != nil {
+					_, srcTypeOk := src.AccessMethod.(*AuthInfoResponse_UserSession)
+					srcValid := srcTypeOk || src.AccessMethod == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'user_session', while different oneof is set in source")
 					}
-					_, dstOk := dst.AccessMethod.(*AuthInfoResponse_UserSession)
-					if !dstOk && dst.AccessMethod != nil {
+					_, dstTypeOk := dst.AccessMethod.(*AuthInfoResponse_UserSession)
+					dstValid := dstTypeOk || dst.AccessMethod == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'user_session', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *UserSession
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.AccessMethod.(*AuthInfoResponse_UserSession).UserSession
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.AccessMethod.(*AuthInfoResponse_UserSession).UserSession
-						} else {
+						} else if srcTypeOk {
 							newDst = &UserSession{}
 							dst.AccessMethod = &AuthInfoResponse_UserSession{UserSession: newDst}
+						} else {
+							dst.AccessMethod = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.AccessMethod = src.AccessMethod
 						} else {
 							dst.AccessMethod = nil
