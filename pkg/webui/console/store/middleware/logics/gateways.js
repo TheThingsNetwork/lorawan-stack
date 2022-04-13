@@ -111,7 +111,7 @@ const getGatewaysLogic = createRequestLogic({
 
       entities = await Promise.all(
         data.gateways.map(gateway => {
-          const gatewayServerAddress = getHostFromUrl(gateway.gateway_server_address)
+          const gatewayServerAddress = gateway.gateway_server_address
 
           if (!Boolean(gatewayServerAddress)) {
             return Promise.resolve({ ...gateway, status: 'unknown' })
