@@ -533,99 +533,105 @@ func (dst *ProvisionEndDevicesRequest) SetFields(src *ProvisionEndDevicesRequest
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "list":
-					_, srcOk := src.EndDevices.(*ProvisionEndDevicesRequest_List)
-					if !srcOk && src.EndDevices != nil {
+					_, srcTypeOk := src.EndDevices.(*ProvisionEndDevicesRequest_List)
+					srcValid := srcTypeOk || src.EndDevices == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'list', while different oneof is set in source")
 					}
-					_, dstOk := dst.EndDevices.(*ProvisionEndDevicesRequest_List)
-					if !dstOk && dst.EndDevices != nil {
+					_, dstTypeOk := dst.EndDevices.(*ProvisionEndDevicesRequest_List)
+					dstValid := dstTypeOk || dst.EndDevices == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'list', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ProvisionEndDevicesRequest_IdentifiersList
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.EndDevices.(*ProvisionEndDevicesRequest_List).List
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.EndDevices.(*ProvisionEndDevicesRequest_List).List
-						} else {
+						} else if srcTypeOk {
 							newDst = &ProvisionEndDevicesRequest_IdentifiersList{}
 							dst.EndDevices = &ProvisionEndDevicesRequest_List{List: newDst}
+						} else {
+							dst.EndDevices = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.EndDevices = src.EndDevices
 						} else {
 							dst.EndDevices = nil
 						}
 					}
 				case "range":
-					_, srcOk := src.EndDevices.(*ProvisionEndDevicesRequest_Range)
-					if !srcOk && src.EndDevices != nil {
+					_, srcTypeOk := src.EndDevices.(*ProvisionEndDevicesRequest_Range)
+					srcValid := srcTypeOk || src.EndDevices == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'range', while different oneof is set in source")
 					}
-					_, dstOk := dst.EndDevices.(*ProvisionEndDevicesRequest_Range)
-					if !dstOk && dst.EndDevices != nil {
+					_, dstTypeOk := dst.EndDevices.(*ProvisionEndDevicesRequest_Range)
+					dstValid := dstTypeOk || dst.EndDevices == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'range', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ProvisionEndDevicesRequest_IdentifiersRange
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.EndDevices.(*ProvisionEndDevicesRequest_Range).Range
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.EndDevices.(*ProvisionEndDevicesRequest_Range).Range
-						} else {
+						} else if srcTypeOk {
 							newDst = &ProvisionEndDevicesRequest_IdentifiersRange{}
 							dst.EndDevices = &ProvisionEndDevicesRequest_Range{Range: newDst}
+						} else {
+							dst.EndDevices = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.EndDevices = src.EndDevices
 						} else {
 							dst.EndDevices = nil
 						}
 					}
 				case "from_data":
-					_, srcOk := src.EndDevices.(*ProvisionEndDevicesRequest_FromData)
-					if !srcOk && src.EndDevices != nil {
+					_, srcTypeOk := src.EndDevices.(*ProvisionEndDevicesRequest_FromData)
+					srcValid := srcTypeOk || src.EndDevices == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'from_data', while different oneof is set in source")
 					}
-					_, dstOk := dst.EndDevices.(*ProvisionEndDevicesRequest_FromData)
-					if !dstOk && dst.EndDevices != nil {
+					_, dstTypeOk := dst.EndDevices.(*ProvisionEndDevicesRequest_FromData)
+					dstValid := dstTypeOk || dst.EndDevices == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'from_data', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ProvisionEndDevicesRequest_IdentifiersFromData
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.EndDevices.(*ProvisionEndDevicesRequest_FromData).FromData
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.EndDevices.(*ProvisionEndDevicesRequest_FromData).FromData
-						} else {
+						} else if srcTypeOk {
 							newDst = &ProvisionEndDevicesRequest_IdentifiersFromData{}
 							dst.EndDevices = &ProvisionEndDevicesRequest_FromData{FromData: newDst}
+						} else {
+							dst.EndDevices = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.EndDevices = src.EndDevices
 						} else {
 							dst.EndDevices = nil

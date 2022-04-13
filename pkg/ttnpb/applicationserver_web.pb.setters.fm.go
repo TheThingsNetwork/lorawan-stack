@@ -566,66 +566,70 @@ func (dst *ApplicationWebhookHealth) SetFields(src *ApplicationWebhookHealth, pa
 			for oneofName, oneofSubs := range subPathMap {
 				switch oneofName {
 				case "healthy":
-					_, srcOk := src.Status.(*ApplicationWebhookHealth_Healthy)
-					if !srcOk && src.Status != nil {
+					_, srcTypeOk := src.Status.(*ApplicationWebhookHealth_Healthy)
+					srcValid := srcTypeOk || src.Status == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'healthy', while different oneof is set in source")
 					}
-					_, dstOk := dst.Status.(*ApplicationWebhookHealth_Healthy)
-					if !dstOk && dst.Status != nil {
+					_, dstTypeOk := dst.Status.(*ApplicationWebhookHealth_Healthy)
+					dstValid := dstTypeOk || dst.Status == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'healthy', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ApplicationWebhookHealth_WebhookHealthStatusHealthy
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Status.(*ApplicationWebhookHealth_Healthy).Healthy
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Status.(*ApplicationWebhookHealth_Healthy).Healthy
-						} else {
+						} else if srcTypeOk {
 							newDst = &ApplicationWebhookHealth_WebhookHealthStatusHealthy{}
 							dst.Status = &ApplicationWebhookHealth_Healthy{Healthy: newDst}
+						} else {
+							dst.Status = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Status = src.Status
 						} else {
 							dst.Status = nil
 						}
 					}
 				case "unhealthy":
-					_, srcOk := src.Status.(*ApplicationWebhookHealth_Unhealthy)
-					if !srcOk && src.Status != nil {
+					_, srcTypeOk := src.Status.(*ApplicationWebhookHealth_Unhealthy)
+					srcValid := srcTypeOk || src.Status == nil || len(oneofSubs) == 0
+					if !srcValid {
 						return fmt.Errorf("attempt to set oneof 'unhealthy', while different oneof is set in source")
 					}
-					_, dstOk := dst.Status.(*ApplicationWebhookHealth_Unhealthy)
-					if !dstOk && dst.Status != nil {
+					_, dstTypeOk := dst.Status.(*ApplicationWebhookHealth_Unhealthy)
+					dstValid := dstTypeOk || dst.Status == nil || len(oneofSubs) == 0
+					if !dstValid {
 						return fmt.Errorf("attempt to set oneof 'unhealthy', while different oneof is set in destination")
 					}
 					if len(oneofSubs) > 0 {
 						var newDst, newSrc *ApplicationWebhookHealth_WebhookHealthStatusUnhealthy
-						if !srcOk && !dstOk {
-							continue
-						}
-						if srcOk {
+						if srcTypeOk {
 							newSrc = src.Status.(*ApplicationWebhookHealth_Unhealthy).Unhealthy
 						}
-						if dstOk {
+						if dstTypeOk {
 							newDst = dst.Status.(*ApplicationWebhookHealth_Unhealthy).Unhealthy
-						} else {
+						} else if srcTypeOk {
 							newDst = &ApplicationWebhookHealth_WebhookHealthStatusUnhealthy{}
 							dst.Status = &ApplicationWebhookHealth_Unhealthy{Unhealthy: newDst}
+						} else {
+							dst.Status = nil
+							continue
 						}
 						if err := newDst.SetFields(newSrc, oneofSubs...); err != nil {
 							return err
 						}
 					} else {
-						if src != nil {
+						if srcTypeOk {
 							dst.Status = src.Status
 						} else {
 							dst.Status = nil
