@@ -138,11 +138,6 @@ const createRequestLogic = (
           }
         } catch (e) {
           lastError = e
-          ingestError(
-            e,
-            { ingestedBy: 'createReqestLogic', requestAction: action },
-            { requestAction: action.type },
-          )
 
           // If there was an unauthenticated error, the access token is not
           // valid and we can delete it. A "Log back in"-modal will then pop up.
@@ -172,6 +167,13 @@ const createRequestLogic = (
             // Trigger a retry once the app is back online.
             continue
           }
+
+          // Pass relevant errors to Sentry.
+          ingestError(
+            e,
+            { ingestedBy: 'createReqestLogic', requestAction: action },
+            { requestAction: action.type },
+          )
 
           // Dispatch the failure action and reject the promise, if attached.
           dispatch(failAction(e))
