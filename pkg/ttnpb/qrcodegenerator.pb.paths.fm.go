@@ -565,6 +565,7 @@ var ParseEndDeviceQRCodeResponseFieldPathsNested = []string{
 	"end_device_template.end_device.last_join_nonce",
 	"end_device_template.end_device.last_rj_count_0",
 	"end_device_template.end_device.last_rj_count_1",
+	"end_device_template.end_device.last_seen_at",
 	"end_device_template.end_device.locations",
 	"end_device_template.end_device.lorawan_phy_version",
 	"end_device_template.end_device.lorawan_version",

@@ -31,7 +31,7 @@ var (
 	errParseQRCode       = errors.Define("parse_qr_code", "parse QR code failed")
 	errQRCodeData        = errors.DefineInvalidArgument("qr_code_data", "invalid QR code data")
 	errNoJoinEUI         = errors.DefineInvalidArgument("no_join_eui", "failed to extract JoinEUI from request")
-	errMethodUnavailable = errors.DefineUnimplemented("method_unavailable", "method available")
+	errMethodUnavailable = errors.DefineUnimplemented("method_unavailable", "method unavailable")
 )
 
 // Fallback defines methods for the fallback server.

@@ -3574,7 +3574,7 @@
   },
   "error:pkg/deviceclaimingserver:method_unavailable": {
     "translations": {
-      "en": "method available"
+      "en": "method unavailable"
     },
     "description": {
       "package": "pkg/deviceclaimingserver",

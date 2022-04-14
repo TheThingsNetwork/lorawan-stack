@@ -31,7 +31,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var errMethodUnavailable = errors.DefineUnimplemented("method_unavailable", "method available")
+var errMethodUnavailable = errors.DefineUnimplemented("method_unavailable", "method unavailable")
 
 type mockEDCS struct {
 	rights.EntityFetcher
