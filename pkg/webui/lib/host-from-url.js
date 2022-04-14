@@ -20,8 +20,12 @@
  */
 export default url => {
   try {
-    return new URL(url).hostname
+    if (url.match(/^[a-zA-Z0-9]+:\/\/.*/)) {
+      return new URL(url).hostname
+    }
+
+    return new URL(`http://${url}`).hostname
   } catch (error) {
-    return undefined
+    return url
   }
 }
