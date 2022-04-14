@@ -247,11 +247,13 @@ class RightsGroup extends React.Component {
         disabled={outOfOwnScopeIndividualRights.includes(right)}
         label={{ id: `enum:${right}` }}
         children={
-          <Message
-            className={style.description}
-            component="div"
-            content={m[`${right}_DESCRIPTION`]}
-          />
+          Boolean(m[`${right}_DESCRIPTION`]) && (
+            <Message
+              className={style.description}
+              component="div"
+              content={m[`${right}_DESCRIPTION`]}
+            />
+          )
         }
       />
     ))
