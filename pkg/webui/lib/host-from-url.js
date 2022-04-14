@@ -26,6 +26,6 @@ export default url => {
 
     return new URL(`http://${url}`).hostname
   } catch (error) {
-    return undefined
+    return url
   }
 }
