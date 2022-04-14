@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.19.0] - unreleased
+
+### Added
+
 - Session management page in Account App.
 - Status page references in the Console.
 - Notification Service API that will allow users to receive notifications about their registered entities.
@@ -28,11 +42,8 @@ For details about compatibility between different releases, see the **Commitment
   - `use-adr` and `adr-margin` are still supported, but deprecated. Any future API usage should instead use the `mac-settings.adr` settings.
 
 ### Changed
+
 - Sortable tables are now sorted by default in the Console
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 
@@ -43,8 +54,6 @@ For details about compatibility between different releases, see the **Commitment
 - The `is-db migrate` command that failed when running on databases created by `v3.18`.
 - Some error messages being displayed as `error:undefined:undefined` in the Console, e.g. in the live data view.
 - Missing `query` flag on CLI search commands.
-
-### Security
 
 ## [3.18.2] - 2022-03-29
 
@@ -2100,7 +2109,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.18.2...v3.18
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.19.0...v3.19
+[3.19.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.18.2...v3.19.0
 [3.18.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.18.1...v3.18.2
 [3.18.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.18.0...v3.18.1
 [3.18.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.17.1...v3.18.0
