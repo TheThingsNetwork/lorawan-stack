@@ -50,6 +50,7 @@ const ApplicationWebhooks = props => {
           exact
           path={`${match.path}/:webhookId${pathIdRegexp}`}
           component={ApplicationWebhookEdit}
+          sensitive
         />
         <Route path={`${match.path}/add/template`} component={ApplicationWebhookChoose} />
       </Switch>

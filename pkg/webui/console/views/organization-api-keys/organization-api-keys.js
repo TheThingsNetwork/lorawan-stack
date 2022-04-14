@@ -47,6 +47,7 @@ const OrganizationApiKeys = props => {
         <Route
           path={`${match.path}/:apiKeyId${apiKeyPathRegexp}`}
           component={OrganizationApiKeyEdit}
+          sensitive
         />
         <NotFoundRoute />
       </Switch>

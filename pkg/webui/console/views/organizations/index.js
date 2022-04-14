@@ -44,7 +44,7 @@ const Organizations = props => {
     <Switch>
       <Route exact path={`${match.path}`} component={OrganizationsList} />
       <Route exact path={`${match.path}/add`} component={OrganizationAdd} />
-      <Route path={`${match.path}/:orgId${pathIdRegexp}`} component={Organization} />
+      <Route path={`${match.path}/:orgId${pathIdRegexp}`} component={Organization} sensitive />
       <NotFoundRoute />
     </Switch>
   )

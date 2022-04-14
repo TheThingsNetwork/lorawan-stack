@@ -49,6 +49,7 @@ const ApplicationCollaborators = props => {
         <Route
           path={`${match.path}/:collaboratorType(user|organization)/:collaboratorId${pathIdRegexp}`}
           component={ApplicationCollaboratorEdit}
+          sensitive
         />
         <NotFoundRoute />
       </Switch>
