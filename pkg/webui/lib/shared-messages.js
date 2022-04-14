@@ -374,6 +374,7 @@ export default defineMessages({
   source: 'Source',
   stable: 'Stable',
   state: 'State',
+  stateDescription: 'State description',
   stateApproved: 'Approved',
   stateFlagged: 'Flagged',
   stateRejected: 'Rejected',

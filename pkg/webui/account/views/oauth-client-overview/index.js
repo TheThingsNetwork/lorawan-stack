@@ -14,6 +14,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
+import { useIntl } from 'react-intl'
 import { Col, Row, Container } from 'react-grid-system'
 
 import applicationIcon from '@assets/misc/application.svg'
@@ -40,12 +41,15 @@ import style from './oauth-client-overview.styl'
 
 const { Content } = EntityTitleSection
 
+const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
+
 const OAuthClientOverview = props => {
   const {
     oauthClientId,
-    oauthClient: { created_at, updated_at },
+    oauthClient: { created_at, updated_at, state, state_description },
     fetching,
   } = props
+  const { formatMessage } = useIntl()
   console.log(oauthClientId)
   console.log(created_at)
   const sheetData = [
@@ -55,6 +59,11 @@ const OAuthClientOverview = props => {
         { key: sharedMessages.oauthClientId, value: oauthClientId, type: 'code', sensitive: false },
         { key: sharedMessages.createdAt, value: <DateTime value={created_at} /> },
         { key: sharedMessages.updatedAt, value: <DateTime value={updated_at} /> },
+        { key: sharedMessages.state, value: capitalize(formatMessage({ id: `enum:${state}` })) },
+        {
+          key: sharedMessages.stateDescription,
+          value: state_description,
+        },
       ],
     },
   ]
@@ -85,10 +94,7 @@ const OAuthClientOverview = props => {
                 icon={applicationIcon}
                 iconAlt={sharedMessages.overview}
               >
-                <Content
-                  fetching={fetching}
-                  bottomBarRight={bottomBarRight}
-                />
+                <Content fetching={fetching} bottomBarRight={bottomBarRight} />
               </EntityTitleSection>
             </Col>
           </Row>
