@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- End devices frame counts being displayed as `n/a` when event stream contained historical data message events.
+
 ### Security
 
 ## [3.19.0] - unreleased
