@@ -14,6 +14,7 @@
 
 syntax = "proto3";
 
+import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
@@ -37,6 +38,7 @@ option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 option (gogoproto.goproto_registration) = true;
 
 message Session {
+  option (thethings.flags.message) = { select: true, set: true };
   reserved 1; // RFU: Session ID
 
   // Device Address, issued by the Network Server or chosen by device manufacturer in case of testing range (beginning with 00-03).
@@ -58,6 +60,7 @@ message Session {
 }
 
 message BoolValue {
+  option (thethings.flags.message) = { select: true, set: true, wrapper: true };
   option (thethings.json.message) = { wrapper: true };
   bool value = 1;
 }
@@ -65,6 +68,7 @@ message BoolValue {
 // MACParameters represent the parameters of the device's MAC layer (active or desired).
 // This is used internally by the Network Server.
 message MACParameters {
+  option (thethings.flags.message) = { select: true, set: true };
   // Maximum EIRP (dBm).
   float max_eirp = 1;
   reserved 2; // Deprecated: uplink_dwell_time
@@ -104,7 +108,8 @@ message MACParameters {
   uint64 beacon_frequency = 18 [(validate.rules).uint64 = {lte: 0, gte: 100000}];
 
   message Channel {
-      // Uplink frequency of the channel (Hz).
+    option (thethings.flags.message) = { select: true, set: true };
+    // Uplink frequency of the channel (Hz).
     uint64 uplink_frequency = 1 [(validate.rules).uint64 = {lte: 0, gte: 100000}];
     // Downlink frequency of the channel (Hz).
     uint64 downlink_frequency = 2 [(validate.rules).uint64.gte = 100000];
@@ -221,6 +226,7 @@ message ADRSettings {
 }
 
 message MACSettings {
+  option (thethings.flags.message) = { select: true, set: true };
   // Maximum delay for the device to answer a MAC request or a confirmed downlink frame.
   // If unset, the default value from Network Server configuration will be used.
   google.protobuf.Duration class_b_timeout = 1;
@@ -336,6 +342,7 @@ message MACSettings {
 // MACState is reset on each join for OTAA or ResetInd for ABP devices.
 // This is used internally by the Network Server.
 message MACState {
+  option (thethings.flags.message) = { select: true, set: true };
   // Current LoRaWAN MAC parameters.
   MACParameters current_parameters = 1 [(validate.rules).message.required = true];
   // Desired LoRaWAN MAC parameters.
@@ -364,12 +371,14 @@ message MACState {
   repeated MACCommand pending_requests = 10;
 
   message JoinRequest {
+    option (thethings.flags.message) = { select: true, set: true };
     reserved 1,2,3,4,5,9,10; // deprecated JoinRequest fields.
     DLSettings downlink_settings = 6 [(validate.rules).message.required = true];
     RxDelay rx_delay = 7 [(validate.rules).enum.defined_only = true];
     CFList cf_list = 8;
   }
   message JoinAccept {
+    option (thethings.flags.message) = { select: true, set: true };
     // Payload of the join-accept received from Join Server.
     bytes payload = 1 [(validate.rules).bytes = {min_len: 17, max_len: 33}];
     JoinRequest request = 2 [(validate.rules).message.required = true];
@@ -417,10 +426,12 @@ message MACState {
   google.protobuf.Timestamp last_downlink_at = 20;
 
   message DataRateRange {
+    option (thethings.flags.message) = { select: true, set: true };
     DataRateIndex min_data_rate_index = 1 [(validate.rules).enum.defined_only = true];
     DataRateIndex max_data_rate_index = 2 [(validate.rules).enum.defined_only = true];
   }
   message DataRateRanges {
+    option (thethings.flags.message) = { select: true, set: true };
     repeated DataRateRange ranges = 1 [(validate.rules).repeated = { min_items: 1 }];
   }
   // Data rate ranges rejected by the device per frequency.
@@ -440,6 +451,7 @@ enum PowerState {
 
 // Authentication code for end devices.
 message EndDeviceAuthenticationCode {
+  option (thethings.flags.message) = { select: true, set: true };
   string value = 1 [(validate.rules).string.pattern = "^[A-Z0-9]{1,32}$"];
   google.protobuf.Timestamp valid_from = 2;
   google.protobuf.Timestamp valid_to = 3;
@@ -449,9 +461,17 @@ message EndDeviceAuthenticationCode {
 // The persistence of the EndDevice is divided between the Network Server, Application Server and Join Server.
 // SDKs are responsible for combining (if desired) the three.
 message EndDevice {
-  EndDeviceIdentifiers ids = 1 [(validate.rules).message.required = true];
-  google.protobuf.Timestamp created_at = 2;
-  google.protobuf.Timestamp updated_at = 3;
+  option (thethings.flags.message) = { select: true, set: true };
+  EndDeviceIdentifiers ids = 1 [
+    (validate.rules).message.required = true,
+    (thethings.flags.field) = { select: false, hidden: true }
+  ];
+  google.protobuf.Timestamp created_at = 2 [
+    (thethings.flags.field) = { select: false, set: false }
+  ];
+  google.protobuf.Timestamp updated_at = 3 [
+    (thethings.flags.field) = { select: false, set: false }
+  ];
 
   // Friendly name of the device. Stored in Entity Registry.
   string name = 4 [(validate.rules).string.max_len = 50];
@@ -542,7 +562,13 @@ message EndDevice {
   RootKeys root_keys = 22;
 
   // Home NetID. Stored in Join Server.
-  bytes net_id = 23 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
+  bytes net_id = 23 [
+    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID",
+    (thethings.flags.field) = {
+      set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New3BytesFlag",
+      set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+    }
+  ];
   // Settings for how the Network Server handles MAC layer for this device. Stored in Network Server.
   MACSettings mac_settings = 24;
   // MAC state of the device. Stored in Network Server.
@@ -578,7 +604,10 @@ message EndDevice {
   // The power state of the device; whether it is battery-powered or connected to an external power source.
   // Received via the DevStatus MAC command at status_received_at.
   // Stored in Network Server.
-  PowerState power_state = 34 [(validate.rules).enum.defined_only = true];
+  PowerState power_state = 34 [
+    (validate.rules).enum.defined_only = true,
+    (thethings.flags.field) = { set: false }
+  ];
   // Latest-known battery percentage of the device.
   // Received via the DevStatus MAC command at last_dev_status_received_at or earlier.
   // Stored in Network Server.

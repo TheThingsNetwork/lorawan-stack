@@ -16,6 +16,7 @@ syntax = "proto3";
 
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 import "lorawan-stack/api/contact_info.proto";
@@ -31,14 +32,24 @@ option (gogoproto.goproto_registration) = true;
 
 // Application is the message that defines an Application in the network.
 message Application {
+  option (thethings.flags.message) = { select: true, set: true };
   // The identifiers of the application. These are public and can be seen by any authenticated user in the network.
-  ApplicationIdentifiers ids = 1 [(validate.rules).message.required = true];
+  ApplicationIdentifiers ids = 1 [
+    (validate.rules).message.required = true,
+    (thethings.flags.field) = { select: false, hidden: true }
+  ];
   // When the application was created. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp created_at = 2 [
+    (thethings.flags.field) = { select: false, set: false }
+  ];
   // When the application was last updated. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.Timestamp updated_at = 3 [
+    (thethings.flags.field) = { select: false, set: false }
+  ];
   // When the application was deleted. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp deleted_at = 8;
+  google.protobuf.Timestamp deleted_at = 8 [
+    (thethings.flags.field) = { select: true, set: false }
+  ];
 
   // The name of the application.
   string name = 4 [(validate.rules).string.max_len = 50];
@@ -91,7 +102,7 @@ message Application {
   // Custom certificate authorities may be configured out-of-band.
   string join_server_address = 14 [(validate.rules).string.pattern = "^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$"];
 
-  uint32 dev_eui_counter = 9;
+  uint32 dev_eui_counter = 9 [(thethings.flags.field) = { select: true, set: false }];
 
   // next: 15
 }
@@ -111,10 +122,13 @@ message GetApplicationRequest {
 }
 
 message ListApplicationsRequest {
+  option (thethings.flags.message) = { select: false, set: true };
   // By default we list all applications the caller has rights on.
   // Set the user or the organization (not both) to instead list the applications
   // where the user or organization is collaborator on.
-  OrganizationOrUserIdentifiers collaborator = 1;
+  OrganizationOrUserIdentifiers collaborator = 1 [
+    (thethings.flags.field) = { hidden: true }
+  ];
   // The names of the application fields that should be returned.
   google.protobuf.FieldMask field_mask = 2;
   // Order the results by this field path (must be present in the field mask).

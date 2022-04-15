@@ -17,6 +17,7 @@ syntax = "proto3";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
+import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
@@ -184,6 +185,7 @@ message GatewayUplinkMessage {
 }
 
 message ApplicationUplink {
+  option (thethings.flags.message) = { select: true, set: false };
   // Join Server issued identifier for the session keys used by this uplink.
   bytes session_key_id = 1 [(validate.rules).bytes.max_len = 2048];
   uint32 f_port = 2 [(validate.rules).uint32 = {lte: 255, not_in: [224]}];
@@ -236,6 +238,7 @@ message ApplicationUplink {
 }
 
 message ApplicationLocation {
+  option (thethings.flags.message) = { select: true, set: false };
   string service = 1;
   Location location = 2 [(validate.rules).message.required = true];
   map<string,string> attributes = 3 [
@@ -248,6 +251,7 @@ message ApplicationLocation {
 }
 
 message ApplicationJoinAccept {
+  option (thethings.flags.message) = { select: true, set: false };
   // Join Server issued identifier for the session keys negotiated in this join.
   bytes session_key_id = 1 [(validate.rules).bytes.max_len = 2048];
   // Encrypted Application Session Key (if Join Server sent it to Network Server).
@@ -262,15 +266,27 @@ message ApplicationJoinAccept {
 }
 
 message ApplicationDownlink {
+  option (thethings.flags.message) = { select: true, set: true };
   // Join Server issued identifier for the session keys used by this downlink.
-  bytes session_key_id = 1 [(validate.rules).bytes.max_len = 2048];
+  bytes session_key_id = 1 [
+    (validate.rules).bytes.max_len = 2048,
+    (thethings.flags.field) = {
+      set_flag_new_func: "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin.NewHexBytesFlag",
+      set_flag_getter_func: "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin.GetBytes"
+    }
+    ];
   uint32 f_port = 2 [(validate.rules).uint32 = {lte: 255, not_in: [224]}];
   uint32 f_cnt = 3;
 
   // The frame payload of the downlink message.
   // The payload is encrypted if the skip_payload_crypto field of the EndDevice
   // is true.
-  bytes frm_payload = 4;
+  bytes frm_payload = 4 [
+    (thethings.flags.field) = {
+      set_flag_new_func: "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin.NewHexBytesFlag",
+      set_flag_getter_func: "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin.GetBytes"
+    }
+  ];
 
   // The decoded frame payload of the downlink message.
   // When scheduling downlink with a message processor configured for the end device (see formatters) or application (see default_formatters),
@@ -283,6 +299,7 @@ message ApplicationDownlink {
   bool confirmed = 6;
 
   message ClassBC {
+    option (thethings.flags.message) = { select: true, set: true };
     // Possible gateway identifiers and antenna index to use for this downlink message.
     // The Network Server selects one of these gateways for downlink, based on connectivity, signal quality, channel utilization and an available slot.
     // If none of the gateways can be selected, the downlink message fails.
@@ -311,11 +328,13 @@ message ApplicationDownlinks {
 }
 
 message ApplicationDownlinkFailed {
+  option (thethings.flags.message) = { select: true, set: false };
   ApplicationDownlink downlink = 1 [(validate.rules).message.required = true];
   ErrorDetails error = 2 [(validate.rules).message.required = true];
 }
 
 message ApplicationInvalidatedDownlinks {
+  option (thethings.flags.message) = { select: true, set: false };
   repeated ApplicationDownlink downlinks = 1;
   uint32 last_f_cnt_down = 2;
   bytes session_key_id = 3 [(validate.rules).bytes.max_len = 2048];
@@ -332,12 +351,14 @@ message DownlinkQueueOperationErrorDetails {
 }
 
 message ApplicationServiceData {
+  option (thethings.flags.message) = { select: true, set: false };
   string service = 1;
   google.protobuf.Struct data = 2;
 }
 
 // Application uplink message.
 message ApplicationUp {
+  option (thethings.flags.message) = { select: true, set: false };
   EndDeviceIdentifiers end_device_ids = 1 [(validate.rules).message.required = true];
   repeated string correlation_ids = 2 [(validate.rules).repeated.items.string.max_len = 100];
   // Server time when the Application Server received the message.
@@ -379,6 +400,7 @@ enum PayloadFormatter {
 }
 
 message MessagePayloadFormatters {
+  option (thethings.flags.message) = { select: true, set: true };
   // Payload formatter for uplink messages, must be set together with its parameter.
   PayloadFormatter up_formatter = 1 [(validate.rules).enum.defined_only = true];
   // Parameter for the up_formatter, must be set together. The API enforces a maximum length of 16KB, but the size may be restricted further by deployment configuration.

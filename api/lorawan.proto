@@ -14,6 +14,7 @@
 
 syntax = "proto3";
 
+import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
@@ -69,6 +70,7 @@ enum Major {
 
 enum MACVersion {
   option (thethings.json.enum) = { marshal_as_string: true, prefix: "MAC" };
+  option (thethings.flags.enum) = { alias_map: "go.thethings.network/lorawan-stack/v3/pkg/ttnpb.MACVersion_customvalue" };
 
   MAC_UNKNOWN = 0 [(thethings.json.enum_value) = { aliases: ["unknown"] }];
   MAC_V1_0 = 1 [(thethings.json.enum_value) = { aliases: ["1.0", "1.0.0"] }];
@@ -82,6 +84,7 @@ enum MACVersion {
 enum PHYVersion {
   option allow_alias = true;
   option (thethings.json.enum) = { marshal_as_string: true };
+  option (thethings.flags.enum) = { alias_map: "go.thethings.network/lorawan-stack/v3/pkg/ttnpb.PHYVersion_customvalue" };
 
   PHY_UNKNOWN = 0 [(thethings.json.enum_value) = { aliases: ["unknown"] }];
 
@@ -109,6 +112,7 @@ enum PHYVersion {
 
 enum DataRateIndex {
   option (thethings.json.enum) = { marshal_as_number: true, prefix: "DATA_RATE" };
+  option (thethings.flags.enum) = { alias_map: "go.thethings.network/lorawan-stack/v3/pkg/ttnpb.DataRateIndex_customvalue" };
 
   DATA_RATE_0 = 0;
   DATA_RATE_1 = 1;
@@ -130,6 +134,7 @@ enum DataRateIndex {
 
 enum DataRateOffset {
   option (thethings.json.enum) = { marshal_as_number: true, prefix: "DATA_RATE_OFFSET" };
+  option (thethings.flags.enum) = { alias_map: "go.thethings.network/lorawan-stack/v3/pkg/ttnpb.DataRateOffset_customvalue" };
 
   DATA_RATE_OFFSET_0 = 0;
   DATA_RATE_OFFSET_1 = 1;
@@ -212,6 +217,7 @@ message JoinAcceptPayload {
 }
 
 message DLSettings {
+  option (thethings.flags.message) = { select: true, set: true };
   DataRateOffset rx1_dr_offset = 1 [(validate.rules).enum.defined_only = true];
   DataRateIndex rx2_dr = 2 [(validate.rules).enum.defined_only = true];
   // OptNeg is set if Network Server implements LoRaWAN 1.1 or greater.
@@ -226,6 +232,7 @@ enum CFListType {
 }
 
 message CFList {
+  option (thethings.flags.message) = { select: true, set: true };
   CFListType type = 1 [(validate.rules).enum.defined_only = true];
   // Frequencies to be broadcasted, in hecto-Hz.
   // These values are broadcasted as 24 bits unsigned integers.
@@ -257,17 +264,20 @@ enum TxSchedulePriority {
 }
 
 message LoRaDataRate {
+  option (thethings.flags.message) = { select: true, set: false };
   // Bandwidth (Hz).
   uint32 bandwidth = 1;
   uint32 spreading_factor = 2;
 }
 
 message FSKDataRate {
+  option (thethings.flags.message) = { select: true, set: false };
   // Bit rate (bps).
   uint32 bit_rate = 1;
 }
 
 message LRFHSSDataRate {
+  option (thethings.flags.message) = { select: true, set: false };
   uint32 modulation_type = 1;
   // Operating Channel Width (kHz).
   uint32 operating_channel_width = 2;
@@ -275,6 +285,7 @@ message LRFHSSDataRate {
 }
 
 message DataRate {
+  option (thethings.flags.message) = { select: true, set: false };
   oneof modulation {
     option (validate.required) = true;
 
@@ -288,8 +299,10 @@ message DataRate {
 // This message is used on both uplink and downlink.
 // On downlink, this is a scheduled transmission.
 message TxSettings {
+  option (thethings.flags.message) = { select: true, set: false };
   // Transmission settings for downlink.
   message Downlink{
+    option (thethings.flags.message) = { select: true, set: false };
     // Index of the antenna on which the uplink was received and/or downlink must be sent.
     uint32 antenna_index = 1;
       // Transmission power (dBm). Only on downlink.
@@ -743,6 +756,7 @@ enum ADRAckDelayExponent {
 
 enum RxDelay {
   option (thethings.json.enum) = { marshal_as_number: true, prefix: "RX_DELAY" };
+  option (thethings.flags.enum) = { alias_map: "go.thethings.network/lorawan-stack/v3/pkg/ttnpb.RxDelay_customvalue" };
 
   RX_DELAY_0 = 0;   // 1 second.
   RX_DELAY_1 = 1;   // 1 second.
@@ -784,40 +798,49 @@ enum Minor {
 }
 
 message FrequencyValue {
+  option (thethings.flags.message) = { select: true, set: true, wrapper: true };
   option (thethings.json.message) = { wrapper: true };
   uint64 value = 1 [(validate.rules).uint64.gte = 100000];
 }
 message DataRateOffsetValue {
+  option (thethings.flags.message) = { select: true, set: true, wrapper: true };
   option (thethings.json.message) = { wrapper: true };
   DataRateOffset value = 1 [(validate.rules).enum.defined_only = true];
 }
 message DataRateIndexValue {
+  option (thethings.flags.message) = { select: true, set: true, wrapper: true };
   option (thethings.json.message) = { wrapper: true };
   DataRateIndex value = 1 [(validate.rules).enum.defined_only = true];
 }
 message PingSlotPeriodValue {
+  option (thethings.flags.message) = { select: true, set: true, wrapper: true };
   option (thethings.json.message) = { wrapper: true };
   PingSlotPeriod value = 1 [(validate.rules).enum.defined_only = true];
 }
 message AggregatedDutyCycleValue {
+  option (thethings.flags.message) = { select: true, set: true, wrapper: true };
   option (thethings.json.message) = { wrapper: true };
   AggregatedDutyCycle value = 1 [(validate.rules).enum.defined_only = true];
 }
 message RxDelayValue {
+  option (thethings.flags.message) = { select: true, set: true, wrapper: true };
   option (thethings.json.message) = { wrapper: true };
   RxDelay value = 1 [(validate.rules).enum.defined_only = true];
 }
 message ADRAckLimitExponentValue {
+  option (thethings.flags.message) = { select: true, set: true, wrapper: true };
   option (thethings.json.message) = { wrapper: true };
 
   ADRAckLimitExponent value = 1 [(validate.rules).enum.defined_only = true];
 }
 message ADRAckDelayExponentValue {
+  option (thethings.flags.message) = { select: true, set: true, wrapper: true };
   option (thethings.json.message) = { wrapper: true };
 
   ADRAckDelayExponent value = 1 [(validate.rules).enum.defined_only = true];
 }
 message DeviceEIRPValue {
+  option (thethings.flags.message) = { select: true, set: true, wrapper: true };
   option (thethings.json.message) = { wrapper: true };
   DeviceEIRP value = 1 [(validate.rules).enum.defined_only = true];
 }

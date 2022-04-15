@@ -16,6 +16,7 @@ syntax = "proto3";
 
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
 
 package ttn.lorawan.v3;
 
@@ -25,16 +26,30 @@ option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 option (gogoproto.goproto_registration) = true;
 
 message KeyEnvelope {
+  option (thethings.flags.message) = { select: true, set: true };
   // The unencrypted AES key.
-  bytes key = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.AES128Key"];
+  bytes key = 1 [
+    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.AES128Key",
+    (thethings.flags.field) = {
+      set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New16BytesFlag",
+      set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+    }
+  ];
   // The label of the RFC 3394 key-encryption-key (KEK) that was used to encrypt the key.
   string kek_label = 2 [(validate.rules).string.max_len = 2048];
-  bytes encrypted_key = 3 [(validate.rules).bytes.max_len = 1024];
+  bytes encrypted_key = 3 [
+    (validate.rules).bytes.max_len = 1024,
+    (thethings.flags.field) = {
+      set_flag_new_func: "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin.NewHexBytesFlag",
+      set_flag_getter_func: "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin.GetBytes"
+    }
+  ];
 }
 
 // Root keys for a LoRaWAN device.
 // These are stored on the Join Server.
 message RootKeys {
+  option (thethings.flags.message) = { select: true, set: true };
   // Join Server issued identifier for the root keys.
   string root_key_id = 1 [(validate.rules).string.max_len = 2048];
   // The (encrypted) Application Key.
@@ -46,6 +61,7 @@ message RootKeys {
 // Session keys for a LoRaWAN session.
 // Only the components for which the keys were meant, will have the key-encryption-key (KEK) to decrypt the individual keys.
 message SessionKeys {
+  option (thethings.flags.message) = { select: true, set: true };
   // Join Server issued identifier for the session keys.
   // This ID can be used to request the keys from the Join Server in case the are lost.
   bytes session_key_id = 1 [(validate.rules).bytes.max_len = 2048];

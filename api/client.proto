@@ -14,6 +14,7 @@
 
 syntax = "proto3";
 
+import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
@@ -45,14 +46,24 @@ enum GrantType {
 
 // An OAuth client on the network.
 message Client {
+  option (thethings.flags.message) = { select: true, set: true };
   // The identifiers of the OAuth client. These are public and can be seen by any authenticated user in the network.
-  ClientIdentifiers ids = 1 [(validate.rules).message.required = true];
+  ClientIdentifiers ids = 1 [
+    (validate.rules).message.required = true,
+    (thethings.flags.field) = { select: false, hidden: true }
+  ];
   // When the OAuth client was created. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp created_at = 2 [
+    (thethings.flags.field) = { select: false, set: false }
+  ];
   // When the OAuth client was last updated. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.Timestamp updated_at = 3 [
+    (thethings.flags.field) = { select: false, set: false }
+  ];
   // When the OAuth client was deleted. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp deleted_at = 16;
+  google.protobuf.Timestamp deleted_at = 16 [
+    (thethings.flags.field) = { select: true, set: false }
+  ];
 
   // The name of the OAuth client. This information is public and can be seen by any authenticated user in the network.
   string name = 4 [(validate.rules).string.max_len = 50];
@@ -139,10 +150,13 @@ message GetClientRequest {
 }
 
 message ListClientsRequest {
+  option (thethings.flags.message) = { select: false, set: true };
   // By default we list all OAuth clients the caller has rights on.
   // Set the user or the organization (not both) to instead list the OAuth clients
   // where the user or organization is collaborator on.
-  OrganizationOrUserIdentifiers collaborator = 1;
+  OrganizationOrUserIdentifiers collaborator = 1 [
+    (thethings.flags.field) = { hidden: true }
+  ];
   // The names of the client fields that should be returned.
   google.protobuf.FieldMask field_mask = 2;
   // Order the results by this field path (must be present in the field mask).
