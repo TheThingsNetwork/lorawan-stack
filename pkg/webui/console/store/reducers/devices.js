@@ -167,26 +167,35 @@ const devices = (state = defaultState, { type, payload, event }) => {
     case GET_DEVICE_EVENT_MESSAGE_SUCCESS:
       // Detect uplink/downlink process events to update uplink/downlink frame count state.
       if (event.name === uplinkFrameCountEvent) {
-        return mergeDerived(state, getCombinedDeviceId(event.identifiers[0].device_ids), {
-          uplinkFrameCount: getByPath(event, 'data.payload.mac_payload.full_f_cnt'),
-        })
+        const uplinkFrameCount = getByPath(event, 'data.payload.mac_payload.full_f_cnt')
+        if (typeof uplinkFrameCount === 'number') {
+          return mergeDerived(state, getCombinedDeviceId(event.identifiers[0].device_ids), {
+            uplinkFrameCount,
+          })
+        }
       } else if (event.name === downlinkFrameCountEvent) {
         const combinedDeviceId = getCombinedDeviceId(event.identifiers[0].device_ids)
         const lorawanVersion = getByPath(state.entities, `${combinedDeviceId}.lorawan_version`)
 
         if (parseLorawanMacVersion(lorawanVersion) < 110) {
-          return mergeDerived(state, combinedDeviceId, {
-            downlinkFrameCount: getByPath(event, 'data.payload.mac_payload.full_f_cnt'),
-          })
+          const downlinkFrameCount = getByPath(event, 'data.payload.mac_payload.full_f_cnt')
+          if (typeof downlinkFrameCount === 'number') {
+            return mergeDerived(state, combinedDeviceId, {
+              downlinkFrameCount,
+            })
+          }
         }
 
         // For 1.1+ end devices there are two frame counters. If `f_port` is equal to 0 - then it's the "network" frame counter,
         // otherwise it's the "application" frame counter. Currently, we display only the application counter.
         // Also, see https://github.com/TheThingsNetwork/lorawan-stack/issues/2740.
         if (getByPath(event, 'data.payload.f_port') > 0) {
-          return mergeDerived(state, combinedDeviceId, {
-            downlinkFrameCount: getByPath(event, 'data.payload.mac_payload.full_f_cnt'),
-          })
+          const downlinkFrameCount = getByPath(event, 'data.payload.mac_payload.full_f_cnt')
+          if (typeof downlinkFrameCount === 'number') {
+            return mergeDerived(state, combinedDeviceId, {
+              downlinkFrameCount,
+            })
+          }
         }
       }
 
