@@ -18,6 +18,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -29,8 +30,7 @@ import (
 )
 
 var (
-	selectApplicationWebhookFlags = util.FieldMaskFlags(&ttnpb.ApplicationWebhook{})
-	setApplicationWebhookFlags    = util.FieldFlags(&ttnpb.ApplicationWebhook{})
+	selectApplicationWebhookFlags = &pflag.FlagSet{}
 
 	selectAllApplicationWebhookFlags = util.SelectAllFlagSet("application webhook")
 )
@@ -69,12 +69,6 @@ func getApplicationWebhookID(flagSet *pflag.FlagSet, args []string) (*ttnpb.Appl
 		ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: applicationID},
 		WebhookId:      webhookID,
 	}, nil
-}
-
-func headersFlags() *pflag.FlagSet {
-	flagSet := &pflag.FlagSet{}
-	flagSet.StringSlice("headers", nil, "key=value")
-	return flagSet
 }
 
 var (
@@ -171,18 +165,15 @@ var (
 		Aliases: []string{"update"},
 		Short:   "Set the properties of an application webhook",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			webhook := &ttnpb.ApplicationWebhook{}
+			paths, err := webhook.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
+				return err
+			}
 			webhookID, err := getApplicationWebhookID(cmd.Flags(), args)
 			if err != nil {
 				return err
 			}
-			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationWebhookFlags, headersFlags())
-
-			webhook := &ttnpb.ApplicationWebhook{}
-			if err = util.SetFields(webhook, setApplicationWebhookFlags); err != nil {
-				return err
-			}
-			headers, _ := cmd.Flags().GetStringSlice("headers")
-			webhook.Headers = mergeKV(webhook.Headers, headers)
 			webhook.Ids = webhookID
 
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
@@ -225,6 +216,7 @@ var (
 )
 
 func init() {
+	ttnpb.AddSelectFlagsForApplicationWebhook(selectApplicationWebhookFlags, "", false)
 	applicationsWebhooksCommand.AddCommand(applicationsWebhooksGetFormatsCommand)
 	applicationsWebhooksGetCommand.Flags().AddFlagSet(applicationWebhookIDFlags())
 	applicationsWebhooksGetCommand.Flags().AddFlagSet(selectApplicationWebhookFlags)
@@ -234,9 +226,9 @@ func init() {
 	applicationsWebhooksListCommand.Flags().AddFlagSet(selectApplicationWebhookFlags)
 	applicationsWebhooksListCommand.Flags().AddFlagSet(selectAllApplicationWebhookFlags)
 	applicationsWebhooksCommand.AddCommand(applicationsWebhooksListCommand)
-	applicationsWebhooksSetCommand.Flags().AddFlagSet(applicationWebhookIDFlags())
-	applicationsWebhooksSetCommand.Flags().AddFlagSet(setApplicationWebhookFlags)
-	applicationsWebhooksSetCommand.Flags().AddFlagSet(headersFlags())
+	ttnpb.AddSetFlagsForApplicationWebhook(applicationsWebhooksSetCommand.Flags(), "", false)
+	flagsplugin.AddAlias(applicationsWebhooksSetCommand.Flags(), "ids.application-ids.application-id", "application-id", flagsplugin.WithHidden(false))
+	flagsplugin.AddAlias(applicationsWebhooksSetCommand.Flags(), "ids.webhook-id", "webhook-id", flagsplugin.WithHidden(false))
 	applicationsWebhooksCommand.AddCommand(applicationsWebhooksSetCommand)
 	applicationsWebhooksDeleteCommand.Flags().AddFlagSet(applicationWebhookIDFlags())
 	applicationsWebhooksCommand.AddCommand(applicationsWebhooksDeleteCommand)

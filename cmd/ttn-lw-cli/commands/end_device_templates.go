@@ -73,7 +73,7 @@ var (
 		PersistentPreRunE: preRun(),
 		RunE: asBulk(func(cmd *cobra.Command, args []string) error {
 			forwardDeprecatedDeviceFlags(cmd.Flags())
-			paths := util.UpdateFieldMask(cmd.Flags(), setEndDeviceFlags, attributesFlags())
+			paths := util.UpdateFieldMask(cmd.Flags(), setEndDeviceFlags)
 
 			var res ttnpb.EndDeviceTemplate
 			if inputDecoder != nil {
@@ -87,7 +87,8 @@ var (
 			if mappingKey, _ := cmd.Flags().GetString("mapping-key"); mappingKey != "" {
 				res.MappingKey = mappingKey
 			}
-			if err := util.SetFields(&res.EndDevice, setEndDeviceFlags); err != nil {
+			_, err := res.EndDevice.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
 				return err
 			}
 			res.EndDevice.Attributes = mergeAttributes(res.EndDevice.Attributes, cmd.Flags())
@@ -182,7 +183,8 @@ This command takes end device templates from stdin.`,
 
 			var device ttnpb.EndDevice
 			device.SetFields(input.EndDevice, input.FieldMask.GetPaths()...)
-			if err := util.SetFields(&device, setEndDeviceFlags); err != nil {
+			_, err = device.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
 				return err
 			}
 
@@ -441,7 +443,6 @@ command to assign EUIs to map to end device templates.`,
 )
 
 func init() {
-	endDeviceTemplatesExtendCommand.Flags().AddFlagSet(attributesFlags())
 	endDeviceTemplatesExtendCommand.Flags().String("mapping-key", "", "")
 	endDeviceTemplatesCommand.AddCommand(endDeviceTemplatesExtendCommand)
 	endDeviceTemplatesCreateCommand.Flags().AddFlagSet(selectEndDeviceIDFlags())

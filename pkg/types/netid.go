@@ -19,7 +19,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	"github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
+	"github.com/spf13/pflag"
+	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
@@ -192,4 +195,19 @@ func NewNetID(typ byte, id []byte) (netID NetID, err error) {
 	copy(netID[:], id)
 	netID[0] = netID[0]&0x1f | typ<<5
 	return netID, nil
+}
+
+func GetNetID(fs *pflag.FlagSet, name string) (value NetID, set bool, err error) {
+	flag := fs.Lookup(name)
+	if flag == nil {
+		return NetID{}, false, &flagsplugin.ErrFlagNotFound{FlagName: name}
+	}
+	var netID NetID
+	if !flag.Changed {
+		return netID, flag.Changed, nil
+	}
+	if err := netID.Unmarshal(flag.Value.(*customflags.ExactBytesValue).Value); err != nil {
+		return netID, false, err
+	}
+	return netID, flag.Changed, nil
 }

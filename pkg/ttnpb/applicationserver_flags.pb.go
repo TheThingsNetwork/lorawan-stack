@@ -42,7 +42,7 @@ func PathsFromSelectFlagsForApplicationLink(flags *pflag.FlagSet, prefix string)
 // AddSetFlagsForApplicationLink adds flags to select fields in ApplicationLink.
 func AddSetFlagsForApplicationLink(flags *pflag.FlagSet, prefix string, hidden bool) {
 	AddSetFlagsForMessagePayloadFormatters(flags, flagsplugin.Prefix("default-formatters", prefix), hidden)
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("skip-payload-crypto", prefix), "", flagsplugin.WithHidden(true)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("skip-payload-crypto", prefix), "", flagsplugin.WithHidden(hidden)))
 }
 
 // SetFromFlags sets the ApplicationLink message from flags.

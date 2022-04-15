@@ -45,10 +45,13 @@ var (
 	setEndDeviceFlags          = &pflag.FlagSet{}
 	endDeviceFlattenPaths      = []string{"provisioning_data"}
 	endDevicePictureFlags      = &pflag.FlagSet{}
-	endDeviceLocationFlags     = util.FieldFlags(&ttnpb.Location{}, "location")
-	getDefaultMACSettingsFlags = util.FieldFlags(&ttnpb.GetDefaultMACSettingsRequest{})
+	endDeviceLocationFlags     = &pflag.FlagSet{}
+	getDefaultMACSettingsFlags = &pflag.FlagSet{}
+	allEndDeviceSetFlags       = &pflag.FlagSet{}
+	allEndDeviceSelectFlags    = &pflag.FlagSet{}
 
 	selectAllEndDeviceFlags = util.SelectAllFlagSet("end devices")
+	toUnderscore            = strings.NewReplacer("-", "_")
 )
 
 func selectEndDeviceIDFlags() *pflag.FlagSet {
@@ -162,17 +165,6 @@ var (
 	errEndDeviceUnclaim      = errors.DefineFailedPrecondition("end_device_unclaim", "could not unclaim end device")
 )
 
-var searchEndDevicesFlags = func() *pflag.FlagSet {
-	flagSet := &pflag.FlagSet{}
-	flagSet.AddFlagSet(searchFlags)
-	// NOTE: These flags need to be named with underscores, not dashes!
-	flagSet.String("dev_eui_contains", "", "")
-	flagSet.String("join_eui_contains", "", "")
-	flagSet.String("dev_addr_contains", "", "")
-	flagSet.Lookup("dev_addr_contains").Hidden = true // Part of the API but not actually supported.
-	return flagSet
-}()
-
 var (
 	endDevicesCommand = &cobra.Command{
 		Use:     "end-devices",
@@ -250,7 +242,8 @@ var (
 			paths := util.SelectFieldMask(cmd.Flags(), selectEndDeviceListFlags)
 
 			req := &ttnpb.SearchEndDevicesRequest{}
-			if err := util.SetFields(req, searchEndDevicesFlags); err != nil {
+			_, err := req.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
 				return err
 			}
 			var (
@@ -363,7 +356,7 @@ var (
 			if err != nil {
 				return err
 			}
-			paths := util.UpdateFieldMask(cmd.Flags(), setEndDeviceFlags, attributesFlags())
+			paths := util.UpdateFieldMask(cmd.Flags(), setEndDeviceFlags)
 
 			abp, _ := cmd.Flags().GetBool("abp")
 			multicast, _ := cmd.Flags().GetBool("multicast")
@@ -523,7 +516,8 @@ var (
 				paths = append(paths, "locations")
 			}
 
-			if err := util.SetFields(device, setEndDeviceFlags); err != nil {
+			_, err = device.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
 				return err
 			}
 
@@ -679,7 +673,7 @@ var (
 			if err != nil {
 				return err
 			}
-			paths := util.UpdateFieldMask(cmd.Flags(), setEndDeviceFlags, attributesFlags(), endDevicePictureFlags)
+			paths := util.UpdateFieldMask(cmd.Flags(), setEndDeviceFlags, endDevicePictureFlags)
 			rawUnsetPaths, _ := cmd.Flags().GetStringSlice("unset")
 			unsetPaths := util.NormalizePaths(rawUnsetPaths)
 
@@ -701,7 +695,8 @@ var (
 			if ttnpb.HasAnyField(paths, setEndDeviceToJS...) || ttnpb.HasAnyField(unsetPaths, setEndDeviceToJS...) {
 				device.SupportsJoin = true
 			}
-			if err = util.SetFields(device, setEndDeviceFlags); err != nil {
+			_, err = device.SetFromFlags(setEndDeviceFlags, "")
+			if err != nil {
 				return err
 			}
 			newPaths, err := parsePayloadFormatterParameterFlags("formatters", device.Formatters, cmd.Flags())
@@ -1357,7 +1352,8 @@ This command may take end device identifiers from stdin.`,
 			}
 
 			req := &ttnpb.GetDefaultMACSettingsRequest{}
-			if err := util.SetFields(req, getDefaultMACSettingsFlags); err != nil {
+			_, err := req.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
 				return err
 			}
 			ns, err := api.Dial(ctx, config.NetworkServerGRPCAddress)
@@ -1374,13 +1370,19 @@ This command may take end device identifiers from stdin.`,
 )
 
 func init() {
-	util.FieldMaskFlags(&ttnpb.EndDevice{}).VisitAll(func(flag *pflag.Flag) {
-		if ttnpb.ContainsField(flag.Name, getEndDeviceFromIS) {
+	ttnpb.AddSetFlagsForLocation(endDeviceLocationFlags, "location", false)
+	ttnpb.AddSetFlagsForGetDefaultMACSettingsRequest(getDefaultMACSettingsFlags, "", false)
+	ttnpb.AddSelectFlagsForEndDevice(allEndDeviceSelectFlags, "", false)
+	ttnpb.AddSetFlagsForEndDevice(allEndDeviceSetFlags, "", false)
+
+	allEndDeviceSelectFlags.VisitAll(func(flag *pflag.Flag) {
+		fieldName := toUnderscore.Replace(flag.Name)
+		if ttnpb.ContainsField(fieldName, getEndDeviceFromIS) {
 			selectEndDeviceListFlags.AddFlag(flag)
 			selectEndDeviceFlags.AddFlag(flag)
-		} else if ttnpb.ContainsField(flag.Name, getEndDeviceFromNS) ||
-			ttnpb.ContainsField(flag.Name, getEndDeviceFromAS) ||
-			ttnpb.ContainsField(flag.Name, getEndDeviceFromJS) {
+		} else if ttnpb.ContainsField(fieldName, getEndDeviceFromNS) ||
+			ttnpb.ContainsField(fieldName, getEndDeviceFromAS) ||
+			ttnpb.ContainsField(fieldName, getEndDeviceFromJS) {
 			selectEndDeviceFlags.AddFlag(flag)
 		}
 	})
@@ -1388,11 +1390,12 @@ func init() {
 	addDeprecatedDeviceFlags(selectEndDeviceListFlags)
 	addDeprecatedDeviceFlags(selectEndDeviceFlags)
 
-	util.FieldFlags(&ttnpb.EndDevice{}).VisitAll(func(flag *pflag.Flag) {
-		if ttnpb.ContainsField(flag.Name, setEndDeviceToIS) ||
-			ttnpb.ContainsField(flag.Name, setEndDeviceToNS) ||
-			ttnpb.ContainsField(flag.Name, setEndDeviceToAS) ||
-			ttnpb.ContainsField(flag.Name, setEndDeviceToJS) {
+	allEndDeviceSetFlags.VisitAll(func(flag *pflag.Flag) {
+		fieldName := toUnderscore.Replace(flag.Name)
+		if ttnpb.ContainsField(fieldName, setEndDeviceToIS) ||
+			ttnpb.ContainsField(fieldName, setEndDeviceToNS) ||
+			ttnpb.ContainsField(fieldName, setEndDeviceToAS) ||
+			ttnpb.ContainsField(fieldName, setEndDeviceToJS) {
 			setEndDeviceFlags.AddFlag(flag)
 		}
 	})
@@ -1409,9 +1412,8 @@ func init() {
 	endDevicesListCommand.Flags().AddFlagSet(paginationFlags())
 	endDevicesListCommand.Flags().AddFlagSet(orderFlags())
 	endDevicesCommand.AddCommand(endDevicesListCommand)
-	endDevicesSearchCommand.Flags().AddFlagSet(applicationIDFlags())
-	endDevicesSearchCommand.Flags().AddFlagSet(searchEndDevicesFlags)
-	endDevicesSearchCommand.Flags().AddFlagSet(selectApplicationFlags)
+	ttnpb.AddSetFlagsForSearchEndDevicesRequest(endDevicesSearchCommand.Flags(), "", false)
+	endDevicesSearchCommand.Flags().AddFlagSet(selectEndDeviceFlags)
 	endDevicesSearchCommand.Flags().AddFlagSet(selectAllEndDeviceFlags)
 	endDevicesCommand.AddCommand(endDevicesSearchCommand)
 	endDevicesGetCommand.Flags().AddFlagSet(endDeviceIDFlags())
@@ -1420,7 +1422,6 @@ func init() {
 	endDevicesCommand.AddCommand(endDevicesGetCommand)
 	endDevicesCreateCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	endDevicesCreateCommand.Flags().AddFlagSet(setEndDeviceFlags)
-	endDevicesCreateCommand.Flags().AddFlagSet(attributesFlags())
 	endDevicesCreateCommand.Flags().AddFlagSet(payloadFormatterParameterFlags("formatters"))
 	endDevicesCreateCommand.Flags().Bool("defaults", true, "configure end device with defaults")
 	endDevicesCreateCommand.Flags().Bool("with-root-keys", false, "generate OTAA root keys")
@@ -1433,7 +1434,6 @@ func init() {
 	endDevicesCommand.AddCommand(endDevicesCreateCommand)
 	endDevicesSetCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	endDevicesSetCommand.Flags().AddFlagSet(setEndDeviceFlags)
-	endDevicesSetCommand.Flags().AddFlagSet(attributesFlags())
 	endDevicesSetCommand.Flags().AddFlagSet(payloadFormatterParameterFlags("formatters"))
 	endDevicesSetCommand.Flags().Bool("touch", false, "set in all registries even if no fields are specified")
 	endDevicesSetCommand.Flags().AddFlagSet(endDevicePictureFlags)

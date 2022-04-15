@@ -21,7 +21,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	"github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
+	"github.com/spf13/pflag"
+	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
@@ -451,4 +454,35 @@ func (prefix DevAddrPrefix) Matches(addr DevAddr) bool {
 func (addr DevAddr) Copy(x *DevAddr) *DevAddr {
 	copy(x[:], addr[:])
 	return x
+}
+
+func GetDevAddr(fs *pflag.FlagSet, name string) (value DevAddr, set bool, err error) {
+	flag := fs.Lookup(name)
+	var devAddr DevAddr
+	if flag == nil {
+		return devAddr, false, &flagsplugin.ErrFlagNotFound{FlagName: name}
+	}
+	if !flag.Changed {
+		return devAddr, flag.Changed, nil
+	}
+	if err := devAddr.Unmarshal(flag.Value.(*customflags.ExactBytesValue).Value); err != nil {
+		return devAddr, false, err
+	}
+	return devAddr, flag.Changed, nil
+}
+
+func GetDevAddrPrefixSlice(fs *pflag.FlagSet, name string) (value []DevAddrPrefix, set bool, err error) {
+	flag := fs.Lookup(name)
+	if flag == nil {
+		return nil, false, &flagsplugin.ErrFlagNotFound{FlagName: name}
+	}
+	value = make([]DevAddrPrefix, len(flag.Value.(*flagsplugin.StringSliceValue).Values))
+	for i, v := range flag.Value.(*flagsplugin.StringSliceValue).Values {
+		var prefix DevAddrPrefix
+		if err := prefix.UnmarshalText([]byte(v.Value)); err != nil {
+			return nil, false, err
+		}
+		value[i] = prefix
+	}
+	return value, flag.Changed, nil
 }

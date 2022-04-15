@@ -21,7 +21,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	"github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
+	"github.com/spf13/pflag"
+	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
@@ -298,4 +301,51 @@ func (prefix EUI64Prefix) Matches(eui EUI64) bool {
 func (eui EUI64) Copy(x *EUI64) *EUI64 {
 	copy(x[:], eui[:])
 	return x
+}
+
+func GetEUI64(fs *pflag.FlagSet, name string) (value EUI64, set bool, err error) {
+	flag := fs.Lookup(name)
+	if flag == nil {
+		return EUI64{}, false, &flagsplugin.ErrFlagNotFound{FlagName: name}
+	}
+	var eui64 EUI64
+	if !flag.Changed {
+		return eui64, flag.Changed, nil
+	}
+	if err := eui64.Unmarshal(flag.Value.(*customflags.ExactBytesValue).Value); err != nil {
+		return eui64, false, err
+	}
+	return eui64, flag.Changed, nil
+}
+
+func GetEUI64Slice(fs *pflag.FlagSet, name string) (value []EUI64, set bool, err error) {
+	flag := fs.Lookup(name)
+	if flag == nil {
+		return nil, false, &flagsplugin.ErrFlagNotFound{FlagName: name}
+	}
+	value = make([]EUI64, len(flag.Value.(*customflags.ExactBytesSliceValue).Values))
+	for i, v := range flag.Value.(*customflags.ExactBytesSliceValue).Values {
+		var eui64 EUI64
+		if err := eui64.Unmarshal(v.Value); err != nil {
+			return nil, false, err
+		}
+		value[i] = eui64
+	}
+	return value, flag.Changed, nil
+}
+
+func GetEUI64PrefixSlice(fs *pflag.FlagSet, name string) (value []EUI64Prefix, set bool, err error) {
+	flag := fs.Lookup(name)
+	if flag == nil {
+		return nil, false, &flagsplugin.ErrFlagNotFound{FlagName: name}
+	}
+	value = make([]EUI64Prefix, len(flag.Value.(*flagsplugin.StringSliceValue).Values))
+	for i, v := range flag.Value.(*flagsplugin.StringSliceValue).Values {
+		var prefix EUI64Prefix
+		if err := prefix.UnmarshalText([]byte(v.Value)); err != nil {
+			return nil, false, err
+		}
+		value[i] = prefix
+	}
+	return value, flag.Changed, nil
 }

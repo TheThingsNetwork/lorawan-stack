@@ -96,7 +96,7 @@ func SelectFieldMask(cmdFlags *pflag.FlagSet, fieldMaskFlags ...*pflag.FlagSet) 
 	cmdFlags.Visit(func(flag *pflag.Flag) {
 		flagName := toUnderscore.Replace(flag.Name)
 		for _, fieldMaskFlags := range fieldMaskFlags {
-			if b, err := fieldMaskFlags.GetBool(flagName); err == nil && b {
+			if b, err := fieldMaskFlags.GetBool(flag.Name); err == nil && b {
 				paths = append(paths, flagName)
 				return
 			}

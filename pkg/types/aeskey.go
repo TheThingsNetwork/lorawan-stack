@@ -18,7 +18,10 @@ import (
 	"encoding/hex"
 	"strings"
 
+	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
+	"github.com/spf13/pflag"
 	"github.com/vmihailenco/msgpack/v5"
+	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
@@ -107,4 +110,19 @@ func (key *AES128Key) DecodeMsgpack(dec *msgpack.Decoder) error {
 	}
 	copy(key[:], b[:])
 	return nil
+}
+
+func GetAES128Key(fs *pflag.FlagSet, name string) (value AES128Key, set bool, err error) {
+	flag := fs.Lookup(name)
+	if flag == nil {
+		return AES128Key{}, false, &flagsplugin.ErrFlagNotFound{FlagName: name}
+	}
+	var aes AES128Key
+	if !flag.Changed {
+		return aes, flag.Changed, nil
+	}
+	if err := aes.Unmarshal(flag.Value.(*customflags.ExactBytesValue).Value); err != nil {
+		return aes, false, err
+	}
+	return aes, flag.Changed, nil
 }

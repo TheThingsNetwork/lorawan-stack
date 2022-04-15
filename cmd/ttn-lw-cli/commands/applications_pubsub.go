@@ -19,6 +19,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -30,12 +31,13 @@ import (
 )
 
 var (
-	selectApplicationPubSubFlags         = util.FieldMaskFlags(&ttnpb.ApplicationPubSub{})
-	setApplicationPubSubFlags            = util.FieldFlags(&ttnpb.ApplicationPubSub{})
-	natsProviderApplicationPubSubFlags   = util.HideFlagSet(util.FieldFlags(&ttnpb.ApplicationPubSub_NATSProvider{}, "nats"))
-	mqttProviderApplicationPubSubFlags   = util.HideFlagSet(util.FieldFlags(&ttnpb.ApplicationPubSub_MQTTProvider{}, "mqtt"))
-	awsiotProviderApplicationPubSubFlags = util.HideFlagSet(util.FieldFlags(&ttnpb.ApplicationPubSub_AWSIoTProvider{}, "aws_iot"))
-	awsiotDefaultIntegrationPubSubFlags  = util.HideFlagSet(util.FieldFlags(&ttnpb.ApplicationPubSub_AWSIoTProvider_DefaultIntegration{}, "aws_iot", "deployment", "default"))
+	selectApplicationPubSubFlags = &pflag.FlagSet{}
+	setApplicationPubSubFlags    = &pflag.FlagSet{}
+
+	natsProviderApplicationPubSubFlags   = &pflag.FlagSet{}
+	mqttProviderApplicationPubSubFlags   = &pflag.FlagSet{}
+	awsiotProviderApplicationPubSubFlags = &pflag.FlagSet{}
+	awsiotDefaultIntegrationPubSubFlags  = &pflag.FlagSet{}
 
 	selectAllApplicationPubSubFlags = util.SelectAllFlagSet("application pub/sub")
 )
@@ -221,8 +223,8 @@ var (
 			if pubsub == nil {
 				pubsub = &ttnpb.ApplicationPubSub{Ids: pubsubID}
 			}
-
-			if err = util.SetFields(pubsub, setApplicationPubSubFlags); err != nil {
+			_, err = pubsub.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
 				return err
 			}
 
@@ -237,7 +239,8 @@ var (
 					providerPaths = ttnpb.FieldsWithPrefix("provider", providerPaths...)
 					paths = append(paths, providerPaths...)
 				}
-				if err = util.SetFields(pubsub.GetNats(), natsProviderApplicationPubSubFlags, "nats"); err != nil {
+				_, err = pubsub.GetNats().SetFromFlags(cmd.Flags(), "nats")
+				if err != nil {
 					return err
 				}
 			}
@@ -269,7 +272,8 @@ var (
 						}
 					}
 				}
-				if err = util.SetFields(pubsub.GetMqtt(), mqttProviderApplicationPubSubFlags, "mqtt"); err != nil {
+				_, err := pubsub.GetMqtt().SetFromFlags(cmd.Flags(), "mqtt")
+				if err != nil {
 					return err
 				}
 			}
@@ -285,7 +289,8 @@ var (
 					providerPaths = ttnpb.FieldsWithPrefix("provider", providerPaths...)
 					paths = append(paths, providerPaths...)
 				}
-				if err = util.SetFields(pubsub.GetAwsIot(), awsiotProviderApplicationPubSubFlags, "aws_iot"); err != nil {
+				_, err = pubsub.GetAwsIot().SetFromFlags(cmd.Flags(), "aws-iot")
+				if err != nil {
 					return err
 				}
 				if defaultStackName, _ := cmd.Flags().GetString("aws-iot.deployment.default.stack-name"); defaultStackName != "" {
@@ -293,7 +298,8 @@ var (
 					defaultPaths = ttnpb.FieldsWithPrefix("provider", defaultPaths...)
 					paths = append(paths, defaultPaths...)
 					defaultIntegration := &ttnpb.ApplicationPubSub_AWSIoTProvider_DefaultIntegration{}
-					if err = util.SetFields(defaultIntegration, awsiotDefaultIntegrationPubSubFlags, "aws_iot", "deployment", "default"); err != nil {
+					_, err = defaultIntegration.SetFromFlags(cmd.Flags(), "aws-iot.deployment.default")
+					if err != nil {
 						return err
 					}
 					pubsub.GetAwsIot().Deployment = &ttnpb.ApplicationPubSub_AWSIoTProvider_Default{
@@ -338,8 +344,16 @@ var (
 )
 
 func init() {
+	ttnpb.AddSetFlagsForApplicationPubSub_NATSProvider(natsProviderApplicationPubSubFlags, "nats", true)
+	ttnpb.AddSetFlagsForApplicationPubSub_MQTTProvider(mqttProviderApplicationPubSubFlags, "mqtt", true)
+	ttnpb.AddSetFlagsForApplicationPubSub_AWSIoTProvider(awsiotProviderApplicationPubSubFlags, "aws-iot", true)
+	ttnpb.AddSetFlagsForApplicationPubSub_AWSIoTProvider_DefaultIntegration(awsiotDefaultIntegrationPubSubFlags, "aws-iot.deployment.default", true)
+	ttnpb.AddSetFlagsForApplicationPubSub(setApplicationPubSubFlags, "", false)
+	ttnpb.AddSelectFlagsForApplicationPubSub(selectApplicationPubSubFlags, "", false)
 	applicationsPubSubsCommand.AddCommand(applicationsPubSubsGetFormatsCommand)
-	applicationsPubSubsGetCommand.Flags().AddFlagSet(applicationPubSubIDFlags())
+	ttnpb.AddSetFlagsForApplicationPubSubIdentifiers(applicationsPubSubsGetCommand.Flags(), "", true)
+	flagsplugin.AddAlias(applicationsPubSubsGetCommand.Flags(), "application-ids.application-id", "application-id", flagsplugin.WithHidden(false))
+	flagsplugin.AddAlias(applicationsPubSubsGetCommand.Flags(), "pub-sub-id", "pubsub-id", flagsplugin.WithHidden(false))
 	applicationsPubSubsGetCommand.Flags().AddFlagSet(selectApplicationPubSubFlags)
 	applicationsPubSubsGetCommand.Flags().AddFlagSet(selectAllApplicationPubSubFlags)
 	applicationsPubSubsCommand.AddCommand(applicationsPubSubsGetCommand)

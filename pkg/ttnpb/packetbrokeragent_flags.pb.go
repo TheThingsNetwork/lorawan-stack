@@ -14,7 +14,7 @@ import (
 
 // AddSetFlagsForPacketBrokerRegisterRequest adds flags to select fields in PacketBrokerRegisterRequest.
 func AddSetFlagsForPacketBrokerRegisterRequest(flags *pflag.FlagSet, prefix string, hidden bool) {
-	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("listed", prefix), "", flagsplugin.WithHidden(true)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("listed", prefix), "", flagsplugin.WithHidden(hidden)))
 }
 
 // SetFromFlags sets the PacketBrokerRegisterRequest message from flags.
