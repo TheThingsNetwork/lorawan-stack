@@ -240,3 +240,10 @@ require (
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 )
+
+require github.com/TheThingsIndustries/protoc-gen-go-flags v1.0.0
+
+require (
+	github.com/go-sql-driver/mysql v1.6.0 // indirect
+	github.com/mattn/go-sqlite3 v1.14.7 // indirect
+)
