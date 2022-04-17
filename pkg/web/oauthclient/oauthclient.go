@@ -17,7 +17,6 @@ package oauthclient
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"net/url"
 	"strings"
 
@@ -30,9 +29,8 @@ import (
 // OAuthClient is the OAuth client component.
 type OAuthClient struct {
 	component       *component.Component
-	rootURL         string
 	config          Config
-	oauth           OAuth2ConfigProvider
+	oauthConfig     OAuth2ConfigProvider
 	nextKey         string
 	callback        Callback
 	authCodeURLOpts OAuth2AuthCodeURLOptionsProvider
@@ -76,7 +74,7 @@ func New(c *component.Component, config Config, opts ...Option) (*OAuthClient, e
 	oc.schemaDecoder.IgnoreUnknownKeys(true)
 
 	oc.callback = oc.defaultCallback
-	oc.oauth = oc.defaultOAuth
+	oc.oauthConfig = oc.defaultOAuthConfig
 	oc.authCodeURLOpts = oc.defaultAuthCodeURLOptions
 
 	for _, opt := range opts {
@@ -100,8 +98,8 @@ func (oc *OAuthClient) configFromContext(ctx context.Context) *Config {
 	return &oc.config
 }
 
-func (oc *OAuthClient) defaultOAuth(w http.ResponseWriter, r *http.Request) (*oauth2.Config, error) {
-	config := oc.configFromContext(r.Context())
+func (oc *OAuthClient) defaultOAuthConfig(ctx context.Context) (*oauth2.Config, error) {
+	config := oc.configFromContext(ctx)
 
 	authorizeURL := config.AuthorizeURL
 	redirectURL := fmt.Sprintf("%s/oauth/callback", strings.TrimSuffix(config.RootURL, "/"))

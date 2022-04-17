@@ -15,6 +15,7 @@
 package oauthclient
 
 import (
+	"context"
 	stderrors "errors"
 	"net/http"
 	"time"
@@ -26,23 +27,14 @@ import (
 
 var errRefresh = errors.DefinePermissionDenied("refresh", "token refresh refused")
 
-func (oc *OAuthClient) freshToken(w http.ResponseWriter, r *http.Request) (*oauth2.Token, error) {
-	value, err := oc.getAuthCookie(w, r)
+// Token returns the OAuth 2.0 token.
+// If the given token is about to expire, this method refreshes the token and returns the new token.
+func (oc *OAuthClient) Token(ctx context.Context, token *oauth2.Token) (*oauth2.Token, error) {
+	conf, err := oc.oauthConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	token := &oauth2.Token{
-		AccessToken:  value.AccessToken,
-		RefreshToken: value.RefreshToken,
-		Expiry:       time.Now(),
-	}
-
-	ctx, err := oc.withHTTPClient(r.Context())
-	if err != nil {
-		return nil, err
-	}
-	conf, err := oc.oauth(w, r)
+	ctx, err = oc.withHTTPClient(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -57,36 +49,48 @@ func (oc *OAuthClient) freshToken(w http.ResponseWriter, r *http.Request) (*oaut
 		}
 		return nil, errRefresh.WithCause(err)
 	}
+	return freshToken, nil
+}
 
-	if freshToken.AccessToken != token.AccessToken {
+// HandleToken is a handler that returns a valid OAuth token.
+// It reads the token from the authorization cookie and refreshes it if needed.
+// If the authorization cookie is not there, it returns a 401 Unauthorized error.
+func (oc *OAuthClient) HandleToken(w http.ResponseWriter, r *http.Request) {
+	value, err := oc.getAuthCookie(w, r)
+	if err != nil {
+		webhandlers.Error(w, r, err)
+		return
+	}
+
+	currentToken := &oauth2.Token{
+		AccessToken:  value.AccessToken,
+		RefreshToken: value.RefreshToken,
+		Expiry:       time.Now(),
+	}
+
+	freshToken, err := oc.Token(r.Context(), currentToken)
+	if err != nil {
+		webhandlers.Error(w, r, err)
+		return
+	}
+
+	if freshToken != currentToken {
 		err = oc.setAuthCookie(w, r, authCookie{
 			AccessToken:  freshToken.AccessToken,
 			RefreshToken: freshToken.RefreshToken,
 			Expiry:       freshToken.Expiry,
 		})
 		if err != nil {
-			return nil, err
+			webhandlers.Error(w, r, err)
+			return
 		}
-	}
-
-	return freshToken, nil
-}
-
-// HandleToken is a handler that returns a valid OAuth token.
-// It reads the token from the authorization cookie and refreshes it if needed.
-// If the cookie is not there, it returns a 401 Unauthorized error.
-func (oc *OAuthClient) HandleToken(w http.ResponseWriter, r *http.Request) {
-	token, err := oc.freshToken(w, r)
-	if err != nil {
-		webhandlers.Error(w, r, err)
-		return
 	}
 
 	webhandlers.JSON(w, r, struct {
 		AccessToken string    `json:"access_token"`
 		Expiry      time.Time `json:"expiry"`
 	}{
-		AccessToken: token.AccessToken,
-		Expiry:      token.Expiry,
+		AccessToken: freshToken.AccessToken,
+		Expiry:      freshToken.Expiry,
 	})
 }

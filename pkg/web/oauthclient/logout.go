@@ -15,69 +15,56 @@
 package oauthclient
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
+	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
 )
 
-func stripCommonRoot(URL string, rootURL string) string {
+func stripCommonRoot(targetURL string, rootURL string) string {
 	trimmedURL := strings.TrimSuffix(rootURL, "/")
 	if rootURL, err := url.Parse(rootURL); err == nil {
 		rootURLSchemeHost := (&url.URL{Scheme: rootURL.Scheme, Host: rootURL.Host}).String()
-		if strings.HasPrefix(URL, rootURLSchemeHost) {
+		if strings.HasPrefix(targetURL, rootURLSchemeHost) {
 			return strings.TrimPrefix(trimmedURL, rootURLSchemeHost)
 		}
 	}
 	return trimmedURL
 }
 
-// HandleLogout invalidates the user's authorization, removes the auth
-// cookie and provides a URL to logout of the OAuth provider as well.
-func (oc *OAuthClient) HandleLogout(w http.ResponseWriter, r *http.Request) {
-	token, err := oc.freshToken(w, r)
-	if err != nil {
-		webhandlers.Error(w, r, err)
-		return
-	}
-
-	config := oc.configFromContext(r.Context())
-
-	u, err := url.Parse(config.LogoutURL)
-	if err != nil {
-		webhandlers.Error(w, r, err)
-		return
-	}
-	logoutURL := config.LogoutURL
+// Logout initiates the logout.
+// Based on configuration, this method either returns a logout URL to redirect the user to complete the logout,
+// or this method deletes the access token from the OAuth server.
+func (oc *OAuthClient) Logout(ctx context.Context, token *oauth2.Token) (logoutURL string, err error) {
+	config := oc.configFromContext(ctx)
 
 	// If a logout URL is configured, return a decorated logout URI so the client
 	// can decide to additionally logout of the OAuth server itself.
-	if logoutURL != "" {
+	if config.LogoutURL != "" {
+		logoutURL, err := url.Parse(config.LogoutURL)
+		if err != nil {
+			return "", err
+		}
 		_, tokenID, _, err := auth.SplitToken(token.AccessToken)
 		if err != nil {
-			webhandlers.Error(w, r, err)
-			return
+			return "", err
 		}
-		redirectURL := stripCommonRoot(logoutURL, config.RootURL)
+		redirectURL := stripCommonRoot(config.LogoutURL, config.RootURL)
 		query := url.Values{
 			"access_token_id":          []string{tokenID},
 			"post_logout_redirect_uri": []string{redirectURL},
 		}
-		u.RawQuery = query.Encode()
-		oc.removeAuthCookie(w, r)
-
-		webhandlers.JSON(w, r, struct {
-			OpLogoutURI string `json:"op_logout_uri"`
-		}{
-			OpLogoutURI: u.String(),
-		})
-		return
+		logoutURL.RawQuery = query.Encode()
+		return logoutURL.String(), nil
 	}
 
 	// Otherwise, delete the access token in the OAuth server.
@@ -86,9 +73,6 @@ func (oc *OAuthClient) HandleLogout(w http.ResponseWriter, r *http.Request) {
 		AuthValue:     token.AccessToken,
 		AllowInsecure: oc.component.AllowInsecureForCredentials(),
 	})
-
-	ctx := r.Context()
-
 	if cc, err := oc.component.GetPeerConn(ctx, ttnpb.ClusterRole_ACCESS, nil); err == nil {
 		if res, err := ttnpb.NewEntityAccessClient(cc).AuthInfo(ctx, ttnpb.Empty, creds); err == nil {
 			if tokenInfo := res.GetOauthAccessToken(); tokenInfo != nil {
@@ -99,10 +83,47 @@ func (oc *OAuthClient) HandleLogout(w http.ResponseWriter, r *http.Request) {
 				}, creds)
 				if err != nil {
 					log.FromContext(ctx).WithError(err).Error("Could not invalidate access token")
+					return "", nil
 				}
 			}
 		}
 	}
+	return "", nil
+}
+
+// HandleLogout invalidates the user's authorization, removes the auth
+// cookie and may provide a URL to logout of the OAuth provider as well.
+func (oc *OAuthClient) HandleLogout(w http.ResponseWriter, r *http.Request) {
+	value, err := oc.getAuthCookie(w, r)
+	if err != nil {
+		webhandlers.Error(w, r, err)
+		return
+	}
 	oc.removeAuthCookie(w, r)
-	w.WriteHeader(http.StatusNoContent)
+
+	token, err := oc.Token(r.Context(), &oauth2.Token{
+		AccessToken:  value.AccessToken,
+		RefreshToken: value.RefreshToken,
+		Expiry:       time.Now(),
+	})
+	if err != nil {
+		webhandlers.Error(w, r, err)
+		return
+	}
+
+	logoutURL, err := oc.Logout(r.Context(), token)
+	if err != nil {
+		webhandlers.Error(w, r, err)
+		return
+	}
+
+	if logoutURL != "" {
+		webhandlers.JSON(w, r, struct {
+			OpLogoutURI string `json:"op_logout_uri"`
+		}{
+			OpLogoutURI: logoutURL,
+		})
+	} else {
+		w.WriteHeader(http.StatusNoContent)
+	}
 }
