@@ -755,7 +755,7 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 			codes.Unimplemented, codes.Unavailable:
 			drop(ids, errHostHandle.WithCause(err).WithAttributes("host", host.name))
 		default:
-			registerForwardUplink(ctx, gtw, msg.Message, host.name)
+			registerForwardUplink(ctx, gtw, msg, host.name)
 		}
 	case *ttnpb.GatewayStatus:
 		if err := host.handler.HandleStatus(ctx, *gtw.Ids, msg); err != nil {
@@ -832,7 +832,7 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 				continue
 			}
 			val = msg
-			registerReceiveUplink(ctx, gtw, msg.Message, protocol)
+			registerReceiveUplink(ctx, gtw, msg, protocol)
 		case msg := <-conn.Status():
 			ctx = events.ContextWithCorrelationID(ctx, fmt.Sprintf("gs:status:%s", events.NewCorrelationID()))
 			val = msg

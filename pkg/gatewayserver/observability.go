@@ -63,7 +63,7 @@ var (
 	evtReceiveUp = events.Define(
 		"gs.up.receive", "receive uplink message",
 		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ),
-		events.WithDataType(&ttnpb.UplinkMessage{}),
+		events.WithDataType(&ttnpb.GatewayUplinkMessage{}),
 	)
 	evtDropUp = events.Define(
 		"gs.up.drop", "drop uplink message",
@@ -303,12 +303,12 @@ func registerDropStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.G
 	gsMetrics.statusDropped.WithLabelValues(ctx, host, errorLabel).Inc()
 }
 
-func registerReceiveUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, protocol string) {
+func registerReceiveUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.GatewayUplinkMessage, protocol string) {
 	events.Publish(evtReceiveUp.NewWithIdentifiersAndData(ctx, gtw, msg))
 	gsMetrics.uplinkReceived.WithLabelValues(ctx, protocol).Inc()
 }
 
-func registerForwardUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, host string) {
+func registerForwardUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.GatewayUplinkMessage, host string) {
 	events.Publish(evtForwardUp.NewWithIdentifiersAndData(ctx, gtw, host))
 	gsMetrics.uplinkForwarded.WithLabelValues(ctx, host).Inc()
 }
