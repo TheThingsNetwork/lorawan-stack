@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"reflect"
 	"runtime/trace"
+	"sort"
 	"strings"
 
 	"github.com/jinzhu/gorm"
@@ -232,6 +233,10 @@ func batchUpdateLastSeenAtQuery(placeholders []string) string {
 
 func (s *deviceStore) BatchUpdateEndDeviceLastSeen(ctx context.Context, devsLastSeen []*ttnpb.BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate) error {
 	defer trace.StartRegion(ctx, "batch update end devices").End()
+
+	sort.Slice(devsLastSeen, func(i, j int) bool {
+		return devsLastSeen[i].Ids.IDString() < devsLastSeen[j].Ids.IDString()
+	})
 
 	valueStrings := []string{}
 	valueArgs := []interface{}{}
