@@ -25,6 +25,7 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
 import OAuthClientOverview from '@account/views/oauth-client-overview'
+import OAuthClientGeneralSettings from '@account/views/oauth-client-general-settings'
 
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -41,15 +42,14 @@ import {
 } from '@account/store/selectors/clients'
 
 const OAuthClient = props => {
-  console.log(props)
   const {
     oauthClientId,
     match: { url: matchedUrl, path },
     oauthClient,
     siteName,
   } = props
-  console.log(oauthClientId)
-  console.log(oauthClient)
+  console.log(matchedUrl)
+  console.log(path)
   const name = oauthClient.name || oauthClientId
 
   return (
@@ -88,6 +88,7 @@ const OAuthClient = props => {
       </SideNavigation>
       <Switch>
         <Route exact path={`${path}`} component={OAuthClientOverview} />
+        <Route exact path={`${path}/general-settings`} component={OAuthClientGeneralSettings} />
         <NotFoundRoute />
       </Switch>
     </React.Fragment>
@@ -109,7 +110,20 @@ export default connect(
   }),
   dispatch => ({
     loadData: id => {
-      dispatch(getClient(id, ['name', 'description', 'state', 'state_description']))
+      dispatch(
+        getClient(id, [
+          'name',
+          'description',
+          'state',
+          'state_description',
+          'redirect_uris',
+          'logout_redirect_uris',
+          'skip_authorization',
+          'endorsed',
+          'grants',
+          'rights',
+        ]),
+      )
     },
   }),
 )(withRequest(({ oauthClientId, loadData }) => loadData(oauthClientId))(OAuthClient))

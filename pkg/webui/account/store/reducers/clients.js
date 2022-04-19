@@ -21,11 +21,9 @@ import {
 } from '@account/store/actions/clients'
 
 const defaultState = {
-  fetching: false,
   entities: undefined,
   totalCount: null,
   selectedClient: null,
-  error: false,
 }
 
 const client = (state = {}, client) => ({
@@ -43,9 +41,7 @@ const clients = (state = defaultState, { type, payload }) => {
     case GET_CLIENTS_LIST:
       return {
         ...state,
-        fetching: true,
         entities: undefined,
-        error: false,
       }
     case GET_CLIENTS_LIST_SUCCESS:
       const clients = payload.entities.reduce(
@@ -60,10 +56,8 @@ const clients = (state = defaultState, { type, payload }) => {
 
       return {
         ...state,
-        fetching: false,
         entities: clients,
         totalCount: payload.totalCount,
-        error: false,
       }
     case GET_CLIENT_SUCCESS:
     case UPDATE_CLIENT_SUCCESS:

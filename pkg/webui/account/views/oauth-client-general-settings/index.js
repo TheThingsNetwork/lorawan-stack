@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,22 +14,19 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { Container, Col, Row } from 'react-grid-system'
-
+import { Col, Row, Container } from 'react-grid-system'
+import { defineMessages } from 'react-intl'
 import PageTitle from '@ttn-lw/components/page-title'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
 import OAuthClientForm from '@account/containers/oauth-client-form'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { getUserRights } from '@account/store/actions/user'
-
 import {
   selectUserIsAdmin,
   selectUserId,
@@ -39,20 +36,23 @@ import {
   selectUserRightsFetching,
   selectUserRightsError,
 } from '@account/store/selectors/user'
+import { selectSelectedClient } from '@account/store/selectors/clients'
 
-const OAuthClientAdd = props => {
-  const { userId, pseudoRights, isAdmin, regularRights } = props
+const OAuthClientGeneralSettings = props => {
+  const { userId, pseudoRights, isAdmin, regularRights, oauthClient } = props
 
   return (
     <Container>
-      <PageTitle title={'Add OAuth Client'} />
+      <PageTitle title={sharedMessages.generalSettings} />
       <Row>
         <Col lg={8} md={12}>
           <OAuthClientForm
+            initialValues={oauthClient}
             isAdmin={isAdmin}
             userId={userId}
             rights={regularRights}
             pseudoRights={pseudoRights}
+            update
           />
         </Col>
       </Row>
@@ -60,10 +60,10 @@ const OAuthClientAdd = props => {
   )
 }
 
-OAuthClientAdd.propTypes = {
+OAuthClientGeneralSettings.propTypes = {
   isAdmin: PropTypes.bool.isRequired,
   pseudoRights: PropTypes.rights.isRequired,
-  rights: PropTypes.rights.isRequired,
+  regularRights: PropTypes.rights.isRequired,
   userId: PropTypes.string.isRequired,
 }
 
@@ -76,6 +76,7 @@ export default connect(
     rights: selectUserRights(state),
     regularRights: selectUserRegularRights(state),
     pseudoRights: selectUserPseudoRights(state),
+    oauthClient: selectSelectedClient(state),
   }),
   dispatch => ({
     getUsersRightsList: userId => dispatch(attachPromise(getUserRights(userId))),
@@ -84,5 +85,5 @@ export default connect(
   withRequest(
     ({ getUsersRightsList, userId }) => getUsersRightsList(userId),
     ({ fetching, rights }) => fetching || rights.length === 0,
-  )(OAuthClientAdd),
+  )(OAuthClientGeneralSettings),
 )

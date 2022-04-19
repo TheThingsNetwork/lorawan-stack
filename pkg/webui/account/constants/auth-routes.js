@@ -20,6 +20,7 @@ import { ValidateWithAuth } from '@account/views/validate'
 import ClientsList from '@account/views/oauth-clients-list'
 import OAuthClientAdd from '@account/views/oauth-client-add'
 import OAuthClient from '@account/views/oauth-client'
+import OAuthClientGeneralSettings from '@account/views/oauth-client-general-settings'
 
 export default [
   {
@@ -61,5 +62,10 @@ export default [
     path: '/oauth-clients/:id',
     exact: true,
     component: OAuthClient,
+  },
+  {
+    path: '/oauth-clients/:id/general-settings',
+    exact: true,
+    component: OAuthClientGeneralSettings,
   },
 ]
