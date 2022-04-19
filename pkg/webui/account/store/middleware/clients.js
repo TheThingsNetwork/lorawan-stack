@@ -92,10 +92,21 @@ const getClientsLogic = createRequestLogic({
   },
 })
 
+const getClientRightsLogic = createRequestLogic({
+  type: clients.GET_CLIENT_RIGHTS,
+  process: async ({ action }) => {
+    const { id } = action.payload
+    const result = await tts.Clients.getRightsById(id)
+
+    return result.rights.sort()
+  },
+})
+
 export default [
   getClientLogic,
   updateClientLogic,
   deleteClientLogic,
   restoreClientLogic,
   getClientsLogic,
+  getClientRightsLogic,
 ]

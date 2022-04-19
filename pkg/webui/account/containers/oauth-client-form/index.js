@@ -15,7 +15,7 @@
 import React, { useState, useCallback } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
+import { push, replace } from 'connected-react-router'
 
 import tts from '@account/api/tts'
 
@@ -27,14 +27,18 @@ import Select from '@ttn-lw/components/select'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
+import toast from '@ttn-lw/components/toast'
 
 import RightsGroup from '@console/components/rights-group'
 
 import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 /* import { getApplicationId } from '@ttn-lw/lib/selectors/id'
 import { id as applicationIdRegexp } from '@ttn-lw/lib/regexp' */
+
+import { deleteClient } from '@account/store/actions/clients'
 
 const m = defineMessages({
   clientName: 'OAuth Client name',
@@ -46,10 +50,11 @@ const m = defineMessages({
   createClient: 'Create OAuth Client',
   deleteTitle: 'Are you sure you want to delete this account?',
   deleteWarning:
-    "This will <strong>PERMANENTLY DELETE THIS ACCOUNT</strong> and <strong>LOCK THE USER ID AND EMAIL FOR RE-REGISTRATION</strong>. Associated entities (e.g. gateways, applications and end devices) owned by this user that do not have any other collaborators will become <strong>UNACCESSIBLE</strong> and it will <strong>NOT BE POSSIBLE TO REGISTER ENTITIES WITH THE SAME ID OR EUI's AGAIN</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.",
+    'This will <strong>PERMANENTLY DELETE THIS OAUTH CLIENT</strong> and <strong>LOCK THE USER ID AND EMAIL FOR RE-REGISTRATION</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.',
   purgeWarning:
-    "This will <strong>PERMANENTLY DELETE THIS ACCOUNT</strong>. Associated entities (e.g. gateways, applications and end devices) owned by this user that do not have any other collaborators will become <strong>UNACCESSIBLE</strong> and it will <strong>NOT BE POSSIBLE TO REGISTER ENTITIES WITH THE SAME ID OR EUI's AGAIN</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.",
-  deleteConfirmMessage: "Please type in this user's user ID to confirm.",
+    'This will <strong>PERMANENTLY DELETE THIS OAUTH CLIENT</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.',
+  deleteSuccess: 'OAuth client deleted',
+  deleteFail: 'There was an error and the OAuth client could not be deleted',
 })
 
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
@@ -120,9 +125,10 @@ const OAuthClientForm = props => {
     navigateToOAuthClient,
     update,
     initialValues: values,
+    deleteOAuthClient,
+    onDeleteSuccess,
   } = props
   const { formatMessage } = useIntl()
-  console.log(values)
 
   const approvalStateOptions = approvalStates.map(state => ({
     value: state,
@@ -132,7 +138,7 @@ const OAuthClientForm = props => {
   const [error, setError] = useState()
   const handleSubmit = useCallback(
     async (values, { setSubmitting }) => {
-      const { owner_id, client_id } = values
+      const { owner_id, ids } = values
 
       setError(undefined)
 
@@ -144,7 +150,8 @@ const OAuthClientForm = props => {
           },
           userId === owner_id,
         )
-        navigateToOAuthClient(client_id)
+
+        navigateToOAuthClient(ids.client_id)
       } catch (error) {
         setSubmitting(false)
         setError(error)
@@ -153,9 +160,31 @@ const OAuthClientForm = props => {
     [userId, navigateToOAuthClient],
   )
 
-  const handleDelete = useCallback(() => {
-    console.log('deleted')
-  }, [])
+  const handleDelete = useCallback(
+    async shouldPurge => {
+      const clientId = values.ids.client_id
+      setError(undefined)
+
+      try {
+        await deleteOAuthClient(clientId, shouldPurge)
+        onDeleteSuccess()
+        toast({
+          title: clientId,
+          message: m.deleteSuccess,
+          type: toast.types.SUCCESS,
+        })
+      } catch (error) {
+        setError(error)
+
+        toast({
+          title: clientId,
+          message: m.deleteFail,
+          type: toast.types.ERROR,
+        })
+      }
+    },
+    [deleteOAuthClient, onDeleteSuccess, values.ids.client_id],
+  )
 
   const initialValues = {
     owner_id: userId,
@@ -273,11 +302,9 @@ const OAuthClientForm = props => {
             entityId={initialValues.ids.client_id}
             entityName={initialValues.name}
             title={m.deleteTitle}
-            confirmMessage={m.deleteConfirmMessage}
             defaultMessage={m.deleteWarning}
             onApprove={handleDelete}
-            shouldConfirm
-            mayPurge
+            mayPurge={isAdmin}
           />
         )}
       </SubmitBar>
@@ -286,7 +313,9 @@ const OAuthClientForm = props => {
 }
 
 OAuthClientForm.propTypes = {
+  deleteOAuthClient: PropTypes.func.isRequired,
   initialValues: PropTypes.shape({
+    owner_id: PropTypes.string,
     ids: PropTypes.shape({
       client_id: PropTypes.string,
     }).isRequired,
@@ -295,6 +324,7 @@ OAuthClientForm.propTypes = {
   }),
   isAdmin: PropTypes.bool.isRequired,
   navigateToOAuthClient: PropTypes.func.isRequired,
+  onDeleteSuccess: PropTypes.func.isRequired,
   pseudoRights: PropTypes.rights.isRequired,
   rights: PropTypes.rights.isRequired,
   update: PropTypes.bool,
@@ -319,6 +349,8 @@ OAuthClientForm.defaultProps = {
   update: false,
 }
 
-export default connect(dispatch => ({
+export default connect(null, dispatch => ({
   navigateToOAuthClient: clientId => dispatch(push(`/oauth-clients/${clientId}`)),
+  deleteOAuthClient: (id, shouldPurge) => dispatch(attachPromise(deleteClient(id, shouldPurge))),
+  onDeleteSuccess: () => dispatch(replace(`/oauth-clients`)),
 }))(OAuthClientForm)

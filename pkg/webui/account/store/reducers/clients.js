@@ -15,15 +15,19 @@
 import {
   GET_CLIENT,
   GET_CLIENT_SUCCESS,
-  GET_CLIENTS_LIST,
   GET_CLIENTS_LIST_SUCCESS,
   UPDATE_CLIENT_SUCCESS,
+  GET_CLIENT_RIGHTS_SUCCESS,
 } from '@account/store/actions/clients'
 
 const defaultState = {
-  entities: undefined,
+  entities: {},
   totalCount: null,
   selectedClient: null,
+  rights: {
+    regular: [],
+    pseudo: [],
+  },
 }
 
 const client = (state = {}, client) => ({
@@ -37,11 +41,6 @@ const clients = (state = defaultState, { type, payload }) => {
       return {
         ...state,
         selectedClient: payload.id,
-      }
-    case GET_CLIENTS_LIST:
-      return {
-        ...state,
-        entities: undefined,
       }
     case GET_CLIENTS_LIST_SUCCESS:
       const clients = payload.entities.reduce(
@@ -68,6 +67,14 @@ const clients = (state = defaultState, { type, payload }) => {
         entities: {
           ...state.entities,
           [id]: client(state.entities[id], payload),
+        },
+      }
+    case GET_CLIENT_RIGHTS_SUCCESS:
+      return {
+        ...state,
+        rights: {
+          regular: payload.filter(right => !right.endsWith('_ALL')),
+          pseudo: payload.filter(right => right.endsWith('_ALL')),
         },
       }
     default:

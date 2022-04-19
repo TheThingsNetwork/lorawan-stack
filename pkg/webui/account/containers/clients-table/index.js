@@ -141,10 +141,10 @@ const ClientsTable = props => {
         displayName: sharedMessages.actions,
         width: 50,
         getValue: row => ({
-          id: row.ids.application_id,
+          id: row.ids.client_id,
           name: row.name,
-          restore: handleRestore.bind(null, row.ids.application_id),
-          purge: handlePurge.bind(null, row.ids.application_id),
+          restore: handleRestore.bind(null, row.ids.client_id),
+          purge: handlePurge.bind(null, row.ids.client_id),
         }),
         render: details => (
           <ButtonGroup align="end">
@@ -194,6 +194,7 @@ const ClientsTable = props => {
   return (
     <FetchTable
       entity="clients"
+      defaultOrder="client_id"
       addMessage={'Add OAuth Client'}
       headers={headers}
       getItemsAction={getItems}

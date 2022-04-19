@@ -40,7 +40,7 @@ export const DELETE_CLIENT_BASE = 'DELETE_CLIENT'
 export const [
   { request: DELETE_CLIENT, success: DELETE_CLIENT_SUCCESS, failure: DELETE_CLIENT_FAILURE },
   { request: deleteClient, success: deleteClientSuccess, failure: deleteClientFailure },
-] = createPaginationDeleteActions('CLIENTS', id => ({ id }))
+] = createPaginationDeleteActions('CLIENTS', (id, options) => ({ id, options }))
 
 export const RESTORE_CLIENT_BASE = 'RESTORE_CLIENT'
 export const [
@@ -57,3 +57,13 @@ export const [
   },
   { request: getClientsList, success: getClientsSuccess, failure: getClientsFailure },
 ] = createPaginationRequestActions('CLIENTS')
+
+export const GET_CLIENT_RIGHTS_BASE = 'GET_CLIENT_RIGHTS'
+export const [
+  {
+    request: GET_CLIENT_RIGHTS,
+    success: GET_CLIENT_RIGHTS_SUCCESS,
+    failure: GET_CLIENT_RIGHTS_FAILURE,
+  },
+  { request: getClientRights, success: getClientRightsSuccess, failure: getClientRightsFailure },
+] = createRequestActions(GET_CLIENT_RIGHTS_BASE, id => ({ id }))

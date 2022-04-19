@@ -21,6 +21,9 @@ import ClientsList from '@account/views/oauth-clients-list'
 import OAuthClientAdd from '@account/views/oauth-client-add'
 import OAuthClient from '@account/views/oauth-client'
 import OAuthClientGeneralSettings from '@account/views/oauth-client-general-settings'
+import OAuthClientCollaboratorsList from '@account/views/oauth-client-collaborators-list'
+import OAuthClientCollaboratorAdd from '@account/views/oauth-client-collaborator-add'
+import OAuthClientCollaboratorEdit from '@account/views/oauth-client-collaborator-edit'
 
 export default [
   {
@@ -67,5 +70,20 @@ export default [
     path: '/oauth-clients/:id/general-settings',
     exact: true,
     component: OAuthClientGeneralSettings,
+  },
+  {
+    path: '/oauth-clients/:id/collaborators',
+    exact: true,
+    component: OAuthClientCollaboratorsList,
+  },
+  {
+    path: '/oauth-clients/:id/collaborators/add',
+    exact: true,
+    component: OAuthClientCollaboratorAdd,
+  },
+  {
+    path: '/oauth-clients/:id/collaborators/:collaboratorType(user|organization)/:collaboratorId',
+    exact: true,
+    component: OAuthClientCollaboratorEdit,
   },
 ]

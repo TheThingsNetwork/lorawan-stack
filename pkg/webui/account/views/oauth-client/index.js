@@ -31,7 +31,7 @@ import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { mayPerformAdminActions } from '@account/lib/feature-checks'
+import { mayPerformAdminActions, mayPerformAllClientActions } from '@account/lib/feature-checks'
 
 import { getClient } from '@account/store/actions/clients'
 
@@ -48,8 +48,7 @@ const OAuthClient = props => {
     oauthClient,
     siteName,
   } = props
-  console.log(matchedUrl)
-  console.log(path)
+
   const name = oauthClient.name || oauthClientId
 
   return (
@@ -63,7 +62,7 @@ const OAuthClient = props => {
           to: matchedUrl,
         }}
       >
-        {mayPerformAdminActions && (
+        {mayPerformAllClientActions && (
           <SideNavigation.Item
             title={sharedMessages.overview}
             path={matchedUrl}
@@ -71,14 +70,14 @@ const OAuthClient = props => {
             exact
           />
         )}
-        {mayPerformAdminActions && (
+        {mayPerformAllClientActions && (
           <SideNavigation.Item
             title={sharedMessages.collaborators}
             path={`${matchedUrl}/collaborators`}
             icon="organization"
           />
         )}
-        {mayPerformAdminActions && (
+        {mayPerformAllClientActions && (
           <SideNavigation.Item
             title={sharedMessages.generalSettings}
             path={`${matchedUrl}/general-settings`}

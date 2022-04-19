@@ -16,7 +16,11 @@ import { createPaginationIdsSelectorByEntity } from '@ttn-lw/lib/store/selectors
 import { createFetchingSelector } from '@ttn-lw/lib/store/selectors/fetching'
 import { createErrorSelector } from '@ttn-lw/lib/store/selectors/error'
 
-import { GET_CLIENT_BASE, GET_CLIENTS_LIST_BASE } from '@account/store/actions/clients'
+import {
+  GET_CLIENT_BASE,
+  GET_CLIENTS_LIST_BASE,
+  GET_CLIENT_RIGHTS_BASE,
+} from '@account/store/actions/clients'
 
 const selectClientsStore = state => state.clients
 
@@ -36,3 +40,10 @@ export const selectOAuthClients = state =>
 export const selectOAuthClientsTotalCount = state => selectClientsStore(state).totalCount
 export const selectOAuthClientsFetching = state => selectClientsFetching(state)
 export const selectOAuthClientsError = state => selectClientsError(state)
+
+// Rights.
+export const selectClientRights = state => selectClientsStore(state).rights
+export const selectClientRegularRights = state => selectClientsStore(state).rights?.regular
+export const selectClientPseudoRights = state => selectClientsStore(state).rights?.pseudo
+export const selectClientRightsError = createErrorSelector(GET_CLIENT_RIGHTS_BASE)
+export const selectClientRightsFetching = createFetchingSelector(GET_CLIENT_RIGHTS_BASE)
