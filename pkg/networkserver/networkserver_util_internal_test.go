@@ -1540,11 +1540,12 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					},
 					func(ctx, reqCtx context.Context, req *ttnpb.JoinRequest) bool {
 						joinReq = req
+						netID, netIDOK := req.DevAddr.NetID()
 						return test.AllTrue(
 							a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
 							a.So(req.DevAddr, should.NotBeEmpty),
-							a.So(req.DevAddr.NwkID(), should.Resemble, env.Config.NetID.ID()),
-							a.So(req.DevAddr.NetIDType(), should.Equal, env.Config.NetID.Type()),
+							a.So(netIDOK, should.BeTrue),
+							a.So(netID, should.Resemble, env.Config.NetID),
 							a.So(req.CorrelationIds, should.BeProperSupersetOfElementsFunc, test.StringEqual, ups[0].CorrelationIds),
 							a.So(req, should.Resemble, MakeNsJsJoinRequest(NsJsJoinRequestConfig{
 								JoinEUI:            *conf.Device.Ids.JoinEui,
