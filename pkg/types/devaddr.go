@@ -131,65 +131,71 @@ func (addr *DevAddr) UnmarshalNumber(n uint32) {
 	binary.BigEndian.PutUint32(addr[:], n)
 }
 
-// HasValidNetIDType returns true if the DevAddr has NetID type, which is valid and compliant with LoRaWAN specification.
-func (addr DevAddr) HasValidNetIDType() bool {
-	return addr[0] != 0xff
-}
-
 // NetIDType returns the NetID type of the DevAddr.
-func (addr DevAddr) NetIDType() byte {
-	for i := uint(7); i >= 0; i-- {
-		if addr[0]&(1<<i) == 0 {
-			return byte(7 - i)
+func (addr DevAddr) NetIDType() (byte, bool) {
+	const prefix = 0b11111110
+	for i := byte(0); i <= 7; i++ {
+		prefixLength := i + 1
+		typePrefix := byte(prefix << (7 - i))
+		if addr[0]>>(8-prefixLength) == typePrefix>>(8-prefixLength) {
+			return i, true
 		}
 	}
-	panic(unmatchedNetID)
+	return 0, false
 }
 
 // NwkAddr returns NwkAddr of the DevAddr.
-func (addr DevAddr) NwkAddr() []byte {
-	switch addr.NetIDType() {
-	case 0:
-		return []byte{addr[0] & 0x01, addr[1], addr[2], addr[3]}
-	case 1:
-		return []byte{addr[1], addr[2], addr[3]}
-	case 2:
-		return []byte{addr[1] & 0x0f, addr[2], addr[3]}
-	case 3:
-		return []byte{addr[1] & 0x01, addr[2], addr[3]}
-	case 4:
-		return []byte{addr[2] & 0x7f, addr[3]}
-	case 5:
-		return []byte{addr[2] & 0x1f, addr[3]}
-	case 6:
-		return []byte{addr[2] & 0x03, addr[3]}
-	case 7:
-		return []byte{addr[3] & 0x7f}
+func (addr DevAddr) NwkAddr() ([]byte, bool) {
+	netIDType, ok := addr.NetIDType()
+	if !ok {
+		return nil, false
 	}
-	panic(unmatchedNetID)
+	switch netIDType {
+	case 0:
+		return []byte{addr[0] & 0x01, addr[1], addr[2], addr[3]}, true
+	case 1:
+		return []byte{addr[1], addr[2], addr[3]}, true
+	case 2:
+		return []byte{addr[1] & 0x0f, addr[2], addr[3]}, true
+	case 3:
+		return []byte{addr[1] & 0x01, addr[2], addr[3]}, true
+	case 4:
+		return []byte{addr[2] & 0x7f, addr[3]}, true
+	case 5:
+		return []byte{addr[2] & 0x1f, addr[3]}, true
+	case 6:
+		return []byte{addr[2] & 0x03, addr[3]}, true
+	case 7:
+		return []byte{addr[3] & 0x7f}, true
+	}
+	panic("unreachable")
 }
 
-// NwkID returns NwkID of the DevAddr.
-func (addr DevAddr) NwkID() []byte {
-	switch addr.NetIDType() {
-	case 0:
-		return []byte{(addr[0] & 0x7f) >> 1}
-	case 1:
-		return []byte{addr[0] & 0x3f}
-	case 2:
-		return []byte{(addr[0] & 0x1f) >> 4, (addr[0] << 4) | (addr[1] >> 4)}
-	case 3:
-		return []byte{(addr[0] >> 1) & 0x07, (addr[0] << 7) | (addr[1] >> 1)}
-	case 4:
-		return []byte{((addr[0] & 0x07) << 1) | (addr[1] >> 7), (addr[1] << 1) | (addr[2] >> 7)}
-	case 5:
-		return []byte{((addr[0] & 0x03) << 3) | (addr[1] >> 5), (addr[1] << 3) | (addr[2] >> 5)}
-	case 6:
-		return []byte{((addr[0] & 0x01) << 6) | (addr[1] >> 2), (addr[1] << 6) | (addr[2] >> 2)}
-	case 7:
-		return []byte{addr[1] >> 7, (addr[1] << 1) | (addr[2] >> 7), (addr[2] << 1) | (addr[3] >> 7)}
+// NetID returns NetID of the DevAddr.
+func (addr DevAddr) NetID() (NetID, bool) {
+	netIDType, ok := addr.NetIDType()
+	if !ok {
+		return NetID{}, false
 	}
-	panic(unmatchedNetID)
+	switch netIDType {
+	case 0:
+		return NetID{0b000_00000, 0x0, (addr[0] & 0x7f) >> 1}, true
+	case 1:
+		return NetID{0b001_00000, 0x0, addr[0] & 0x3f}, true
+	case 2:
+		return NetID{0b010_00000, (addr[0] & 0x1f) >> 4, (addr[0] << 4) | (addr[1] >> 4)}, true
+	case 3:
+		return NetID{0b011_00000, (addr[0] >> 1) & 0x07, (addr[0] << 7) | (addr[1] >> 1)}, true
+	case 4:
+		return NetID{0b100_00000, ((addr[0] & 0x07) << 1) | (addr[1] >> 7), (addr[1] << 1) | (addr[2] >> 7)}, true
+	case 5:
+		return NetID{0b101_00000, ((addr[0] & 0x03) << 3) | (addr[1] >> 5), (addr[1] << 3) | (addr[2] >> 5)}, true
+	case 6:
+		return NetID{0b110_00000, ((addr[0] & 0x01) << 6) | (addr[1] >> 2), (addr[1] << 6) | (addr[2] >> 2)}, true
+	case 7:
+		return NetID{0b111_00000 | addr[1]>>7, (addr[1] << 1) | (addr[2] >> 7), (addr[2] << 1) | (addr[3] >> 7)}, true
+	}
+	panic("unreachable")
 }
 
 // NwkAddrBits returns the length of NwkAddr field of netID in bits.
@@ -212,7 +218,7 @@ func NwkAddrBits(netID NetID) uint {
 	case 7:
 		return 7
 	}
-	panic(unmatchedNetID)
+	panic("unreachable")
 }
 
 // NwkAddrLength returns the length of NwkAddr field of netID in bytes.
