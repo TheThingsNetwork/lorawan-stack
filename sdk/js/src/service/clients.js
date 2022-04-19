@@ -16,20 +16,11 @@ import autoBind from 'auto-bind'
 
 import Marshaler from '../util/marshaler'
 
-import ApiKeys from './api-keys'
 import Collaborators from './collaborators'
 
 class Clients {
   constructor(registry) {
     this._api = registry
-
-    this.ApiKeys = new ApiKeys(registry.ClientAccess, {
-      parentRoutes: {
-        get: 'client_ids.client_id',
-        list: 'client_ids.client_id',
-        set: 'client_ids.client_id',
-      },
-    })
 
     this.Collaborators = new Collaborators(registry.ClientAccess, {
       parentRoutes: {

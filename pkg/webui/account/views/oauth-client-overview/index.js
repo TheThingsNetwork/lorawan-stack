@@ -50,8 +50,7 @@ const OAuthClientOverview = props => {
     fetching,
   } = props
   const { formatMessage } = useIntl()
-  console.log(oauthClientId)
-  console.log(created_at)
+
   const sheetData = [
     {
       header: sharedMessages.generalInformation,

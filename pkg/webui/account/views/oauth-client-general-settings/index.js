@@ -15,7 +15,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
-import { defineMessages } from 'react-intl'
 import PageTitle from '@ttn-lw/components/page-title'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
@@ -62,6 +61,7 @@ const OAuthClientGeneralSettings = props => {
 
 OAuthClientGeneralSettings.propTypes = {
   isAdmin: PropTypes.bool.isRequired,
+  oauthClient: PropTypes.shape({}).isRequired,
   pseudoRights: PropTypes.rights.isRequired,
   regularRights: PropTypes.rights.isRequired,
   userId: PropTypes.string.isRequired,
