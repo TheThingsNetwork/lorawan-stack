@@ -23,8 +23,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
-const unmatchedNetID = "unmatched NetID type"
-
 var errInvalidNetID = errors.DefineInvalidArgument("invalid_net_id", "invalid NetID")
 
 // NetID is issued by the LoRa Alliance.
@@ -151,7 +149,7 @@ func (id NetID) ID() []byte {
 		// 21 LSB
 		return []byte{id[0] & 0x1f, id[1], id[2]}
 	default:
-		panic(unmatchedNetID)
+		panic("unreachable")
 	}
 }
 
@@ -165,7 +163,7 @@ func (id NetID) IDBits() uint {
 	case 3, 4, 5, 6, 7:
 		return 21
 	}
-	panic(unmatchedNetID)
+	panic("unreachable")
 }
 
 // Copy stores a copy of id in x and returns it.

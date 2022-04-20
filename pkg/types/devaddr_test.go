@@ -32,7 +32,7 @@ func TestDevAddr(t *testing.T) {
 	for _, tc := range []struct {
 		DevAddr       DevAddr
 		NetIDType     byte
-		NwkID         []byte
+		NetID         NetID
 		NwkAddr       []byte
 		NwkAddrBits   uint
 		NwkAddrLength int
@@ -40,7 +40,7 @@ func TestDevAddr(t *testing.T) {
 		{
 			DevAddr{0x3e, 0xff, 0xff, 0x42},
 			0,
-			[]byte{0x1f},
+			NetID{0x00, 0x00, 0x1f},
 			[]byte{0x00, 0xff, 0xff, 0x42},
 			25,
 			4,
@@ -48,7 +48,7 @@ func TestDevAddr(t *testing.T) {
 		{
 			DevAddr{0x9f, 0xff, 0xff, 0x42},
 			1,
-			[]byte{0x1f},
+			NetID{0x20, 0x00, 0x1f},
 			[]byte{0xff, 0xff, 0x42},
 			24,
 			3,
@@ -56,7 +56,7 @@ func TestDevAddr(t *testing.T) {
 		{
 			DevAddr{0xcf, 0xff, 0xff, 0x42},
 			2,
-			[]byte{0x00, 0xff},
+			NetID{0x40, 0x00, 0xff},
 			[]byte{0x0f, 0xff, 0x42},
 			20,
 			3,
@@ -64,7 +64,7 @@ func TestDevAddr(t *testing.T) {
 		{
 			DevAddr{0xe3, 0xfc, 0xff, 0x42},
 			3,
-			[]byte{0x01, 0xfe},
+			NetID{0x60, 0x01, 0xfe},
 			[]byte{0x00, 0xff, 0x42},
 			17,
 			3,
@@ -72,7 +72,7 @@ func TestDevAddr(t *testing.T) {
 		{
 			DevAddr{0xf0, 0xff, 0xff, 0x42},
 			4,
-			[]byte{0x01, 0xff},
+			NetID{0x80, 0x01, 0xff},
 			[]byte{0x7f, 0x42},
 			15,
 			2,
@@ -80,7 +80,7 @@ func TestDevAddr(t *testing.T) {
 		{
 			DevAddr{0xf8, 0x1f, 0xff, 0x42},
 			5,
-			[]byte{0x00, 0xff},
+			NetID{0xa0, 0x00, 0xff},
 			[]byte{0x1f, 0x42},
 			13,
 			2,
@@ -88,7 +88,7 @@ func TestDevAddr(t *testing.T) {
 		{
 			DevAddr{0xfc, 0x03, 0xff, 0x42},
 			6,
-			[]byte{0x00, 0xff},
+			NetID{0xc0, 0x00, 0xff},
 			[]byte{0x03, 0x42},
 			10,
 			2,
@@ -96,7 +96,7 @@ func TestDevAddr(t *testing.T) {
 		{
 			DevAddr{0xfe, 0xff, 0xff, 0xc2},
 			7,
-			[]byte{0x01, 0xff, 0xff},
+			NetID{0xe1, 0xff, 0xff},
 			[]byte{0x42},
 			7,
 			1,
@@ -105,11 +105,9 @@ func TestDevAddr(t *testing.T) {
 		t.Run(string(tc.NetIDType+'0'), func(t *testing.T) {
 			a := assertions.New(t)
 
-			netID, err := NewNetID(tc.NetIDType, tc.NwkID)
-			if !a.So(err, should.BeNil) {
-				return
-			}
-
+			netID, ok := tc.DevAddr.NetID()
+			a.So(ok, should.BeTrue)
+			a.So(netID, should.Resemble, tc.NetID)
 			a.So(NwkAddrBits(netID), should.Equal, tc.NwkAddrBits)
 			a.So(NwkAddrLength(netID), should.Equal, tc.NwkAddrLength)
 
@@ -119,9 +117,12 @@ func TestDevAddr(t *testing.T) {
 				return
 			}
 
-			a.So(devAddr.NetIDType(), should.Equal, tc.NetIDType)
-			a.So(devAddr.NwkID(), should.Resemble, tc.NwkID)
-			a.So(devAddr.NwkAddr(), should.Resemble, tc.NwkAddr)
+			netIDType, ok := devAddr.NetIDType()
+			a.So(ok, should.BeTrue)
+			a.So(netIDType, should.Equal, tc.NetIDType)
+			nwkAddr, ok := devAddr.NwkAddr()
+			a.So(ok, should.BeTrue)
+			a.So(nwkAddr, should.Resemble, tc.NwkAddr)
 		})
 	}
 }
@@ -198,10 +199,13 @@ func ExampleDevAddr_Mask() {
 	// Output: true
 }
 
-func ExampleDevAddr_NwkID() {
+func ExampleDevAddr_NetID() {
 	devAddr := DevAddr{0x26, 0x01, 0x26, 0xB4}
-	fmt.Printf("%#x", devAddr.NwkID())
-	// Output: 0x13
+	netID, ok := devAddr.NetID()
+	if ok {
+		fmt.Printf("%#x", netID[:])
+	}
+	// Output: 0x000013
 }
 
 func ExampleDevAddrPrefix_Matches() {
