@@ -41,6 +41,7 @@ const Header = ({ handleSearchRequest, searchable }) => {
       title: sharedMessages.overview,
       icon: 'overview',
       path: '/',
+      exact: true,
       hidden: false,
     },
     {
