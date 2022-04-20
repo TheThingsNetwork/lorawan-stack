@@ -17,13 +17,7 @@ import ProfileSettings from '@account/views/profile-settings'
 import Code from '@account/views/code'
 import SessionManagement from '@account/views/session-management'
 import { ValidateWithAuth } from '@account/views/validate'
-import ClientsList from '@account/views/oauth-clients-list'
-import OAuthClientAdd from '@account/views/oauth-client-add'
-import OAuthClient from '@account/views/oauth-client'
-import OAuthClientGeneralSettings from '@account/views/oauth-client-general-settings'
-import OAuthClientCollaboratorsList from '@account/views/oauth-client-collaborators-list'
-import OAuthClientCollaboratorAdd from '@account/views/oauth-client-collaborator-add'
-import OAuthClientCollaboratorEdit from '@account/views/oauth-client-collaborator-edit'
+import OAuthClients from '@account/views/oauth-clients'
 
 export default [
   {
@@ -53,37 +47,6 @@ export default [
   },
   {
     path: '/oauth-clients',
-    exact: true,
-    component: ClientsList,
-  },
-  {
-    path: '/oauth-clients/add',
-    exact: true,
-    component: OAuthClientAdd,
-  },
-  {
-    path: '/oauth-clients/:id',
-    exact: true,
-    component: OAuthClient,
-  },
-  {
-    path: '/oauth-clients/:id/general-settings',
-    exact: true,
-    component: OAuthClientGeneralSettings,
-  },
-  {
-    path: '/oauth-clients/:id/collaborators',
-    exact: true,
-    component: OAuthClientCollaboratorsList,
-  },
-  {
-    path: '/oauth-clients/:id/collaborators/add',
-    exact: true,
-    component: OAuthClientCollaboratorAdd,
-  },
-  {
-    path: '/oauth-clients/:id/collaborators/:collaboratorType(user|organization)/:collaboratorId',
-    exact: true,
-    component: OAuthClientCollaboratorEdit,
+    component: OAuthClients,
   },
 ]

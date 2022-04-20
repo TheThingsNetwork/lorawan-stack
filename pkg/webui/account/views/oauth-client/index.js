@@ -26,12 +26,16 @@ import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
 import OAuthClientOverview from '@account/views/oauth-client-overview'
 import OAuthClientGeneralSettings from '@account/views/oauth-client-general-settings'
+import OAuthClientCollaboratorsList from '@account/views/oauth-client-collaborators-list'
+import OAuthClientCollaboratorAdd from '@account/views/oauth-client-collaborator-add'
+import OAuthClientCollaboratorEdit from '@account/views/oauth-client-collaborator-edit'
 
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 
-import { mayPerformAdminActions, mayPerformAllClientActions } from '@account/lib/feature-checks'
+import { mayPerformAllClientActions } from '@account/lib/feature-checks'
 
 import { getClient } from '@account/store/actions/clients'
 
@@ -43,13 +47,13 @@ import {
 
 const OAuthClient = props => {
   const {
-    oauthClientId,
+    clientId,
     match: { url: matchedUrl, path },
     oauthClient,
     siteName,
   } = props
 
-  const name = oauthClient.name || oauthClientId
+  const name = oauthClient.name || clientId
 
   return (
     <React.Fragment>
@@ -87,6 +91,12 @@ const OAuthClient = props => {
       </SideNavigation>
       <Switch>
         <Route exact path={`${path}`} component={OAuthClientOverview} />
+        <Route exact path={`${path}/collaborators`} component={OAuthClientCollaboratorsList} />
+        <Route exact path={`${path}/collaborators/add`} component={OAuthClientCollaboratorAdd} />
+        <Route
+          path={`${path}/collaborators/:collaboratorType/:collaboratorId${pathIdRegexp}`}
+          component={OAuthClientCollaboratorEdit}
+        />
         <Route exact path={`${path}/general-settings`} component={OAuthClientGeneralSettings} />
         <NotFoundRoute />
       </Switch>
@@ -95,15 +105,15 @@ const OAuthClient = props => {
 }
 
 OAuthClient.propTypes = {
+  clientId: PropTypes.string.isRequired,
   match: PropTypes.match.isRequired,
-  oauthClientId: PropTypes.string.isRequired,
 }
 
 export default connect(
   (state, props) => ({
-    oauthClientId: props.match.params.id,
+    clientId: props.match.params.clientId,
     fetching: selectClientFetching(state),
-    oauthClient: selectClientById(state, props.match.params.id),
+    oauthClient: selectClientById(state, props.match.params.clientId),
     error: selectClientError(state),
     siteName: selectApplicationSiteName(),
   }),
@@ -125,4 +135,4 @@ export default connect(
       )
     },
   }),
-)(withRequest(({ oauthClientId, loadData }) => loadData(oauthClientId))(OAuthClient))
+)(withRequest(({ clientId, loadData }) => loadData(clientId))(OAuthClient))
