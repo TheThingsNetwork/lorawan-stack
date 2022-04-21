@@ -32163,6 +32163,58 @@
           ]
         },
         {
+          "name": "EntityStateChangedNotification",
+          "longName": "EntityStateChangedNotification",
+          "fullName": "ttn.lorawan.v3.EntityStateChangedNotification",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "state",
+              "description": "",
+              "label": "",
+              "type": "State",
+              "longType": "State",
+              "fullType": "ttn.lorawan.v3.State",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "enum.defined_only",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "state_description",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 128
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "ListNotificationsRequest",
           "longName": "ListNotificationsRequest",
           "fullName": "ttn.lorawan.v3.ListNotificationsRequest",

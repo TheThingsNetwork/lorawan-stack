@@ -485,6 +485,7 @@
 - [File `lorawan-stack/api/notification_service.proto`](#lorawan-stack/api/notification_service.proto)
   - [Message `CreateNotificationRequest`](#ttn.lorawan.v3.CreateNotificationRequest)
   - [Message `CreateNotificationResponse`](#ttn.lorawan.v3.CreateNotificationResponse)
+  - [Message `EntityStateChangedNotification`](#ttn.lorawan.v3.EntityStateChangedNotification)
   - [Message `ListNotificationsRequest`](#ttn.lorawan.v3.ListNotificationsRequest)
   - [Message `ListNotificationsResponse`](#ttn.lorawan.v3.ListNotificationsResponse)
   - [Message `Notification`](#ttn.lorawan.v3.Notification)
@@ -7026,6 +7027,20 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `id` | [`string`](#string) |  |  |
+
+### <a name="ttn.lorawan.v3.EntityStateChangedNotification">Message `EntityStateChangedNotification`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `state` | [`State`](#ttn.lorawan.v3.State) |  |  |
+| `state_description` | [`string`](#string) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `state` | <p>`enum.defined_only`: `true`</p> |
+| `state_description` | <p>`string.max_len`: `128`</p> |
 
 ### <a name="ttn.lorawan.v3.ListNotificationsRequest">Message `ListNotificationsRequest`</a>
 

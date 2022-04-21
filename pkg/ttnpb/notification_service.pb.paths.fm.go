@@ -130,3 +130,12 @@ var UpdateNotificationStatusRequestFieldPathsTopLevel = []string{
 	"receiver_ids",
 	"status",
 }
+var EntityStateChangedNotificationFieldPathsNested = []string{
+	"state",
+	"state_description",
+}
+
+var EntityStateChangedNotificationFieldPathsTopLevel = []string{
+	"state",
+	"state_description",
+}

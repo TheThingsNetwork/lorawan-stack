@@ -630,3 +630,53 @@ func (x *UpdateNotificationStatusRequest) UnmarshalProtoJSON(s *jsonplugin.Unmar
 func (x *UpdateNotificationStatusRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
+
+// MarshalProtoJSON marshals the EntityStateChangedNotification message to JSON.
+func (x *EntityStateChangedNotification) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.State != 0 || s.HasField("state") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("state")
+		x.State.MarshalProtoJSON(s)
+	}
+	if x.StateDescription != "" || s.HasField("state_description") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("state_description")
+		s.WriteString(x.StateDescription)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the EntityStateChangedNotification to JSON.
+func (x EntityStateChangedNotification) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
+// UnmarshalProtoJSON unmarshals the EntityStateChangedNotification message from JSON.
+func (x *EntityStateChangedNotification) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "state":
+			s.AddField("state")
+			x.State.UnmarshalProtoJSON(s)
+		case "state_description", "stateDescription":
+			s.AddField("state_description")
+			x.StateDescription = s.ReadString()
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the EntityStateChangedNotification from JSON.
+func (x *EntityStateChangedNotification) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
