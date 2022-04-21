@@ -196,7 +196,10 @@ func (hcs *healthCheckSink) executeAndRecord(r *http.Request, healthy bool) erro
 			},
 		}, nil
 	}
-	return hcs.registry.Set(r, f)
+	if err := hcs.registry.Set(r, f); err != nil {
+		return err
+	}
+	return sinkErr
 }
 
 // NewHealthCheckSink creates a Sink that records the health status of the webhooks and stops them from executing if
