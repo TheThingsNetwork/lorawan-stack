@@ -96,22 +96,15 @@ class Clients {
     return Marshaler.unwrapClients(response)
   }
 
-  async updateById(
-    id,
-    patch,
-    mask = Marshaler.fieldMaskFromPatch(
-      patch,
-      this._api.ClientRegistry.UpdateAllowedFieldMaskPaths,
-    ),
-  ) {
+  async updateById(id, patch, mask = Marshaler.fieldMaskFromPatch(patch)) {
     const response = await this._api.ClientRegistry.Update(
       {
         routeParams: {
-          'client_ids.client_id': id,
+          'client.ids.client_id': id,
         },
       },
       {
-        application: patch,
+        client: patch,
         field_mask: Marshaler.fieldMask(mask),
       },
     )

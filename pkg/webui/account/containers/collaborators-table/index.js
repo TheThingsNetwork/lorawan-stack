@@ -40,6 +40,7 @@ import style from './collaborators-table.styl'
 
 const m = defineMessages({
   id: 'User / Organization ID',
+  addCollaborator: 'Add collaborator',
 })
 
 const CollaboratorsTable = props => {
@@ -131,10 +132,10 @@ const CollaboratorsTable = props => {
       headers={headers}
       rowKeySelector={rowKeySelector}
       getItemPathPrefix={getCollaboratorPathPrefix}
-      addMessage={'Add collaborator'}
+      addMessage={m.addCollaborator}
       getItemsAction={getItems}
       baseDataSelector={baseDataSelector}
-      tableTitle={<Message content={'Collaborators'} />}
+      tableTitle={<Message content={sharedMessages.collaborator} />}
       {...rest}
     />
   )

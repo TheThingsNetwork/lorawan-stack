@@ -61,8 +61,9 @@ const getCollaboratorsLogic = createRequestLogic({
   type: collaborators.GET_COLLABORATORS_LIST,
   process: async ({ action }) => {
     const { parentType, parentId, params } = action.payload
-    const res = await tts[entitySdkServiceMap[parentType]].Collaborators.getAll(parentId, params)
-    return { entities: res.collaborators, totalCount: res.totalCount }
+    const result = await tts[entitySdkServiceMap[parentType]].Collaborators.getAll(parentId, params)
+
+    return { entities: result.collaborators, totalCount: result.totalCount }
   },
 })
 

@@ -55,8 +55,8 @@ const Header = ({ handleSearchRequest, searchable }) => {
       path: '/session-management',
     },
     {
-      title: 'OAuth Clients',
-      icon: 'user',
+      title: sharedMessages.oauthClients,
+      icon: 'recent_actors',
       path: '/oauth-clients',
     },
   ]

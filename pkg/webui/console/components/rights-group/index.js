@@ -39,6 +39,8 @@ const m = defineMessages({
   grantType: 'Grant type',
   allCurrentAndFutureRights: 'Grant all current and future rights',
   selectIndividualRights: 'Grant individual rights',
+  rightsWarning:
+    'Note that only the minimum set of rights needed to provide the functionality of the application should be requested',
   RIGHT_APPLICATION_LINK_DESCRIPTION:
     'This implicitly includes the rights to view application information, read application traffic and write downlinks',
 })
@@ -135,6 +137,8 @@ class RightsGroup extends React.Component {
     outOfOwnScopeIndividualRights: PropTypes.rights.isRequired,
     /** The pseudo right literal comprising all other rights. */
     pseudoRight: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+    /** The warning regarding choice of rights */
+    rightsWarning: PropTypes.bool,
     /** The rights value. */
     value: PropTypes.rights.isRequired,
   }
@@ -146,6 +150,7 @@ class RightsGroup extends React.Component {
     onChange: () => null,
     pseudoRight: undefined,
     derivedPseudoRight: undefined,
+    rightsWarning: false,
   }
 
   state = {
@@ -213,6 +218,7 @@ class RightsGroup extends React.Component {
       grantType,
       derivedPseudoRight,
       derivedRights,
+      rightsWarning,
     } = this.props
     const { individualRightValue } = this.state
 
@@ -268,6 +274,7 @@ class RightsGroup extends React.Component {
             messageValues={{ entityType: intl.formatMessage(entityTypeMessage).toLowerCase() }}
           />
         )}
+        {rightsWarning && <Notification small warning content={m.rightsWarning} />}
         <Radio.Group
           className={style.grantType}
           name="grant_type"

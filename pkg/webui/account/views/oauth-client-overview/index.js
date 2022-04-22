@@ -21,8 +21,10 @@ import applicationIcon from '@assets/misc/application.svg'
 
 import DataSheet from '@ttn-lw/components/data-sheet'
 
+import Message from '@ttn-lw/lib/components/message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import DateTime from '@ttn-lw/lib/components/date-time'
+import withRequest from '@ttn-lw/lib/components/with-request'
 
 import EntityTitleSection from '@console/components/entity-title-section'
 
@@ -36,6 +38,8 @@ import {
   selectSelectedClientId,
   selectClientFetching,
 } from '@account/store/selectors/clients'
+import { selectCollaboratorsTotalCount } from '@account/store/selectors/collaborators'
+import { getCollaboratorsList } from '@account/store/actions/collaborators'
 
 import style from './oauth-client-overview.styl'
 
@@ -46,8 +50,9 @@ const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
 const OAuthClientOverview = props => {
   const {
     oauthClientId,
-    oauthClient: { created_at, updated_at, state, state_description },
+    oauthClient: { created_at, updated_at, state, state_description, secret },
     fetching,
+    collaboratorsTotalCount,
   } = props
   const { formatMessage } = useIntl()
 
@@ -67,15 +72,26 @@ const OAuthClientOverview = props => {
     },
   ]
 
-  const bottomBarRight = (
+  // Add secret, if it is available.
+  if (secret) {
+    sheetData[0].items.push({
+      key: sharedMessages.secret,
+      value: secret,
+      type: 'byte',
+      sensitive: true,
+      enableUint32: true,
+    })
+  }
+
+  const bottomBarLeft = (
     <>
       {mayPerformAdminActions && (
         <Content.EntityCount
           icon="collaborators"
-          value={'10'}
+          value={collaboratorsTotalCount}
           keyMessage={sharedMessages.collaboratorCounted}
           errored={false}
-          toAllUrl={`/applications/${oauthClientId}/collaborators`}
+          toAllUrl={`/oauth-clients/${oauthClientId}/collaborators`}
         />
       )}
     </>
@@ -93,7 +109,7 @@ const OAuthClientOverview = props => {
                 icon={applicationIcon}
                 iconAlt={sharedMessages.overview}
               >
-                <Content fetching={fetching} bottomBarRight={bottomBarRight} />
+                <Content fetching={fetching} bottomBarLeft={bottomBarLeft} />
               </EntityTitleSection>
             </Col>
           </Row>
@@ -111,15 +127,47 @@ const OAuthClientOverview = props => {
 }
 
 OAuthClientOverview.propTypes = {
+  collaboratorsTotalCount: PropTypes.number,
+  fetching: PropTypes.bool.isRequired,
+  oauthClient: PropTypes.shape({
+    created_at: PropTypes.string,
+    updated_at: PropTypes.string,
+    state: PropTypes.string,
+    state_description: PropTypes.string,
+    secret: PropTypes.string,
+  }).isRequired,
   oauthClientId: PropTypes.string.isRequired,
 }
 
-export default connect(state => {
-  const oauthClientId = selectSelectedClientId(state)
+OAuthClientOverview.defaultProps = {
+  collaboratorsTotalCount: undefined,
+}
 
-  return {
-    oauthClientId,
-    oauthClient: selectSelectedClient(state),
-    fetching: selectClientFetching(state),
-  }
-})(OAuthClientOverview)
+export default connect(
+  state => {
+    const oauthClientId = selectSelectedClientId(state)
+
+    return {
+      oauthClientId,
+      oauthClient: selectSelectedClient(state),
+      fetching: selectClientFetching(state),
+      collaboratorsTotalCount: selectCollaboratorsTotalCount(state),
+    }
+  },
+  dispatch => ({
+    loadData: oauthClientId => {
+      dispatch(getCollaboratorsList('client', oauthClientId))
+    },
+  }),
+  (stateProps, dispatchProps, ownProps) => ({
+    ...stateProps,
+    ...dispatchProps,
+    ...ownProps,
+    loadData: id => dispatchProps.loadData(id),
+  }),
+)(
+  withRequest(
+    ({ oauthClientId, loadData }) => loadData(oauthClientId),
+    () => false,
+  )(OAuthClientOverview),
+)

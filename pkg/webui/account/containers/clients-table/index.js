@@ -47,6 +47,7 @@ const m = defineMessages({
   restoreFail: 'There was an error and OAuth client could not be restored',
   purgeSuccess: 'OAuth client purged',
   purgeFail: 'There was an error and the OAuth client could not be purged',
+  addClient: 'Add OAuth Client',
 })
 
 const OWNED_TAB = 'owned'
@@ -195,11 +196,11 @@ const ClientsTable = props => {
     <FetchTable
       entity="clients"
       defaultOrder="client_id"
-      addMessage={'Add OAuth Client'}
+      addMessage={m.addClient}
       headers={headers}
       getItemsAction={getItems}
       baseDataSelector={baseDataSelector}
-      tableTitle={<Message content={'OAuth Clients'} />}
+      tableTitle={<Message content={sharedMessages.oauthClients} />}
       searchable
       clickable={!isDeletedTab}
       tabs={isAdmin ? tabs : []}

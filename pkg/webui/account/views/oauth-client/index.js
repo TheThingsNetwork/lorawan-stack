@@ -70,7 +70,7 @@ const OAuthClient = props => {
       <SideNavigation
         header={{
           icon: applicationIcon,
-          iconAlt: sharedMessages.application,
+          iconAlt: sharedMessages.client,
           title: name,
           to: matchedUrl,
         }}
@@ -116,6 +116,9 @@ const OAuthClient = props => {
 OAuthClient.propTypes = {
   clientId: PropTypes.string.isRequired,
   match: PropTypes.match.isRequired,
+  oauthClient: PropTypes.shape({
+    name: PropTypes.string,
+  }).isRequired,
 }
 
 export default connect(

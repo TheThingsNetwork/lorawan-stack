@@ -23,6 +23,7 @@ import {
 const defaultState = {
   entities: {},
   selectedCollaborator: null,
+  totalCount: null,
 }
 
 const collaborator = (state = {}, collaborator) => ({
@@ -59,6 +60,7 @@ const collaborators = (state = defaultState, { type, payload }) => {
             { ...state.entities },
           ),
         },
+        totalCount: payload.totalCount,
       }
     default:
       return state
