@@ -45,42 +45,65 @@ type Data interface {
 	EndDeviceTemplate() *ttnpb.EndDeviceTemplate
 }
 
+type endDeviceFormat struct {
+	id     string
+	format Format
+}
+
 // Server provides methods for end device QR codes.
 type Server struct {
-	endDeviceFormats map[string]Format
+	endDeviceFormats []endDeviceFormat
 }
 
 // New returns a new Server.
 func New(ctx context.Context) *Server {
 	s := &Server{
-		endDeviceFormats: make(map[string]Format),
+		// Newer formats should be added to this slice first to preferentially match with those first.
+		endDeviceFormats: []endDeviceFormat{
+			{
+				id:     formatIDLoRaAllianceTR005,
+				format: new(LoRaAllianceTR005Format),
+			},
+			{
+				id:     formatIDLoRaAllianceTR005Draft2,
+				format: new(LoRaAllianceTR005Draft2Format),
+			},
+			{
+				id:     formatIDLoRaAllianceTR005Draft3,
+				format: new(LoRaAllianceTR005Draft3Format),
+			},
+		},
 	}
-
-	// Register known formats.
-	s.endDeviceFormats[formatIDLoRaAllianceTR005] = new(LoRaAllianceTR005Format)
-	s.endDeviceFormats[formatIDLoRaAllianceTR005Draft2] = new(LoRaAllianceTR005Draft2Format)
-	s.endDeviceFormats[formatIDLoRaAllianceTR005Draft3] = new(LoRaAllianceTR005Draft3Format)
 	return s
 }
 
 // GetEndDeviceFormats returns the registered end device QR code formats.
 func (s *Server) GetEndDeviceFormats() map[string]Format {
-	return s.endDeviceFormats
+	ret := make(map[string]Format)
+	for _, edFormat := range s.endDeviceFormats {
+		ret[edFormat.id] = edFormat.format
+	}
+	return ret
 }
 
 // GetEndDeviceFormat returns the converter by ID.
 func (s *Server) GetEndDeviceFormat(id string) Format {
-	res, ok := s.endDeviceFormats[id]
-	if !ok {
-		return nil
+	for _, edFormat := range s.endDeviceFormats {
+		if edFormat.id == id {
+			return edFormat.format
+		}
 	}
-	return res
+	return nil
 }
 
 // RegisterEndDeviceFormat registers the given end device QR code format.
-// Existing registrations with the same ID will be overwritten.
+// Existing registrations with the same ID will not be overwritten.
+// While matching, the slice will be traversed in a FIFO manner.
 func (s *Server) RegisterEndDeviceFormat(id string, f Format) {
-	s.endDeviceFormats[id] = f
+	s.endDeviceFormats = append(s.endDeviceFormats, endDeviceFormat{
+		id:     id,
+		format: f,
+	})
 }
 
 var (
@@ -90,15 +113,15 @@ var (
 // Parse attempts to parse the given QR code data.
 // It returns the parser and the format ID that successfully parsed the QR code.
 func (s *Server) Parse(formatID string, data []byte) (ret Data, err error) {
-	for id, format := range s.endDeviceFormats {
+	for _, edFormat := range s.endDeviceFormats {
 		// If format ID is provided, use only that.
-		if formatID != "" && formatID != id {
+		if formatID != "" && formatID != edFormat.id {
 			continue
 		}
-		edFormat := format.New()
-		if err := edFormat.UnmarshalText(data); err == nil {
-			return edFormat, nil
-		} else if formatID == id {
+		f := edFormat.format.New()
+		if err := f.UnmarshalText(data); err == nil {
+			return f, nil
+		} else if formatID == edFormat.id {
 			return nil, err
 		}
 	}
