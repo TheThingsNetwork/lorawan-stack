@@ -36,6 +36,7 @@ const (
 	grpcGatewayProtoImage = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-1.16.0"
 	swaggerProtoImage     = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-1.16.0"
 	docProtoImage         = "ghcr.io/thethingsindustries/protoc:gen-doc-1.4.1"
+	flagProtoImage        = "ghcr.io/thethingsindustries/protoc:3.9.1-gen-go-flags-1.0.0"
 )
 
 // Proto namespace.
@@ -124,6 +125,19 @@ func (p Proto) json(context.Context) error {
 	})
 }
 
+func (p Proto) flags(context.Context) error {
+	return withProtoc(flagProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
+		if err := protoc(
+			"--go-flags_opt=lang=gogo",
+			fmt.Sprintf("--go-flags_out=%s:%s", strings.Join(jsonConvs, ","), protocOut),
+			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
+		); err != nil {
+			return fmt.Errorf("failed to generate protos: %w", err)
+		}
+		return nil
+	})
+}
+
 func (p Proto) fieldMask(context.Context) error {
 	return withProtoc(fieldMaskProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
@@ -158,7 +172,7 @@ func (p Proto) grpcGateway(context.Context) error {
 
 // Go generates Go protos.
 func (p Proto) Go(context.Context) error {
-	mg.Deps(p.gogo, p.fieldMask, p.grpcGateway, p.json)
+	mg.Deps(p.gogo, p.fieldMask, p.grpcGateway, p.json, p.flags)
 
 	ttnpb, err := filepath.Abs(filepath.Join("pkg", "ttnpb"))
 	if err != nil {
