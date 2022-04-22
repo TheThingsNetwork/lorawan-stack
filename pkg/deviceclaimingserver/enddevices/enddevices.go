@@ -41,7 +41,7 @@ type EndDeviceClaimer interface {
 	// SupportsJoinEUI returns whether the Join Server supports this JoinEUI.
 	SupportsJoinEUI(joinEUI types.EUI64) bool
 	// Claim claims an End Device.
-	Claim(ctx context.Context, joinEUI *types.EUI64, devEUI *types.EUI64, claimAuthenticationCode string, networkServerAddress string) error
+	Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode, networkServerAddress string) error
 	// GetClaimStatus returns the claim status an End Device.
 	GetClaimStatus(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*ttnpb.GetClaimStatusResponse, error)
 	// Unclaim releases the claim on an End Device.
@@ -161,8 +161,8 @@ func (upstream *Upstream) joinEUIClaimer(ctx context.Context, joinEUI types.EUI6
 }
 
 // Claim implements EndDeviceClaimingServer.
-func (upstream *Upstream) Claim(ctx context.Context, joinEUI *types.EUI64, devEUI *types.EUI64, claimAuthenticationCode string, networkServerAddress string) error {
-	claimer := upstream.joinEUIClaimer(ctx, *joinEUI)
+func (upstream *Upstream) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode, networkServerAddress string) error {
+	claimer := upstream.joinEUIClaimer(ctx, joinEUI)
 	if claimer == nil {
 		return errClaimingNotSupported.WithAttributes("eui", joinEUI)
 	}

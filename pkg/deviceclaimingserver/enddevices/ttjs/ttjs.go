@@ -121,7 +121,7 @@ var (
 )
 
 // Claim implements EndDeviceClaimer.
-func (client *TTJS) Claim(ctx context.Context, joinEUI *types.EUI64, devEUI *types.EUI64, claimAuthenticationCode string, networkServerAddress string) error {
+func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode, networkServerAddress string) error {
 	htenantID := client.config.TenantID
 
 	hNSID, ok := client.hsNSIDs[networkServerAddress]

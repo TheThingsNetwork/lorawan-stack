@@ -8056,7 +8056,7 @@
   },
   "error:pkg/qrcodegenerator/qrcode/enddevices:unknown_format": {
     "translations": {
-      "en": "format `{format_id}` unknown"
+      "en": "format unknown"
     },
     "description": {
       "package": "pkg/qrcodegenerator/qrcode/enddevices",

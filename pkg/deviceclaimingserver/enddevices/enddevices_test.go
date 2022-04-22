@@ -55,7 +55,7 @@ func TestUpstream(t *testing.T) {
 	ctx = rights.NewContextWithFetcher(ctx, mock)
 
 	// Invalid JoinEUI.
-	err = upstream.Claim(ctx, unsupportedJoinEUI, &types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}, "secret", "")
+	err = upstream.Claim(ctx, *unsupportedJoinEUI, types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}, "secret", "")
 	a.So(errors.IsAborted(err), should.BeTrue)
 
 	_, err = upstream.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
@@ -82,7 +82,7 @@ func TestUpstream(t *testing.T) {
 	a.So(inf.JoinEui, should.Resemble, supportedJoinEUI)
 	a.So(inf.SupportsClaiming, should.BeTrue)
 
-	err = upstream.Claim(ctx, supportedJoinEUI, &types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}, "secret", "")
+	err = upstream.Claim(ctx, *supportedJoinEUI, types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}, "secret", "")
 	a.So(!errors.IsUnimplemented(err), should.BeTrue)
 
 	_, err = upstream.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{

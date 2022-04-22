@@ -103,13 +103,12 @@ func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.Claim
 	}
 
 	var (
-		joinEUI                 *types.EUI64
-		devEUI                  *types.EUI64
+		joinEUI, devEUI         types.EUI64
 		claimAuthenticationCode string
 	)
 	if authenticatedIDs := req.GetAuthenticatedIdentifiers(); authenticatedIDs != nil {
-		joinEUI = &req.GetAuthenticatedIdentifiers().JoinEui
-		devEUI = &req.GetAuthenticatedIdentifiers().DevEui
+		joinEUI = req.GetAuthenticatedIdentifiers().JoinEui
+		devEUI = req.GetAuthenticatedIdentifiers().DevEui
 		claimAuthenticationCode = req.GetAuthenticatedIdentifiers().AuthenticationCode
 	} else if qrCode := req.GetQrCode(); qrCode != nil {
 		conn, err := edcs.DCS.GetPeerConn(ctx, ttnpb.ClusterRole_QR_CODE_GENERATOR, nil)
@@ -124,13 +123,14 @@ func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.Claim
 		if dev == nil {
 			return nil, errParseQRCode.New()
 		}
-		joinEUI = dev.GetIds().JoinEui
-		devEUI = dev.GetIds().DevEui
+		joinEUI = *dev.GetIds().JoinEui
+		devEUI = *dev.GetIds().DevEui
 		claimAuthenticationCode = dev.ClaimAuthenticationCode.Value
 	} else {
 		return nil, errNoJoinEUI.New()
 	}
 
+	// External services, including Join Servers, typically identify Network Servers by host instead of by host and port.
 	networkServerAddress, _, err := net.SplitHostPort(req.TargetNetworkServerAddress)
 	if err != nil {
 		// TargetNetworkServerAddress is already validated by the API.
@@ -151,8 +151,8 @@ func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.Claim
 	return &ttnpb.EndDeviceIdentifiers{
 		DeviceId:       req.TargetDeviceId,
 		ApplicationIds: req.TargetApplicationIds,
-		DevEui:         devEUI,
-		JoinEui:        joinEUI,
+		DevEui:         &devEUI,
+		JoinEui:        &joinEUI,
 	}, nil
 }
 

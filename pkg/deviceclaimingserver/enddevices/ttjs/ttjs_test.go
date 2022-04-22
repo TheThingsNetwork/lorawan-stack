@@ -141,7 +141,7 @@ func TestTTJS(t *testing.T) {
 	// Invalid client API key.
 	unauthenticatedClient, err := ttJSConfig.NewClient(ctx, c)
 	test.Must(unauthenticatedClient, err)
-	err = unauthenticatedClient.Claim(ctx, &supportedJoinEUI, &devEUI, claimAuthenticationCode, nsAddress)
+	err = unauthenticatedClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode, nsAddress)
 	a.So(errors.IsUnauthenticated(err), should.BeTrue)
 	err = unauthenticatedClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
 		DevEui:  &devEUI,
@@ -167,16 +167,16 @@ func TestTTJS(t *testing.T) {
 	// Test Claiming
 	for _, tc := range []struct {
 		Name               string
-		DevEUI             *types.EUI64
-		JoinEUI            *types.EUI64
+		DevEUI             types.EUI64
+		JoinEUI            types.EUI64
 		AuthenticationCode string
 		HNSAddress         string
 		ErrorAssertion     func(err error) bool
 	}{
 		{
 			Name:               "EmptyCAC",
-			DevEUI:             &devEUI,
-			JoinEUI:            &supportedJoinEUI,
+			DevEUI:             devEUI,
+			JoinEUI:            supportedJoinEUI,
 			AuthenticationCode: "",
 			HNSAddress:         nsAddress,
 			ErrorAssertion: func(err error) bool {
@@ -185,8 +185,8 @@ func TestTTJS(t *testing.T) {
 		},
 		{
 			Name:               "InvalidCAC",
-			DevEUI:             &devEUI,
-			JoinEUI:            &supportedJoinEUI,
+			DevEUI:             devEUI,
+			JoinEUI:            supportedJoinEUI,
 			AuthenticationCode: "invalid",
 			HNSAddress:         nsAddress,
 			ErrorAssertion: func(err error) bool {
@@ -195,8 +195,8 @@ func TestTTJS(t *testing.T) {
 		},
 		{
 			Name:               "NoTargetNSID",
-			DevEUI:             &devEUI,
-			JoinEUI:            &supportedJoinEUI,
+			DevEUI:             devEUI,
+			JoinEUI:            supportedJoinEUI,
 			AuthenticationCode: claimAuthenticationCode,
 			ErrorAssertion: func(err error) bool {
 				return errors.IsInvalidArgument(err)
@@ -204,8 +204,8 @@ func TestTTJS(t *testing.T) {
 		},
 		{
 			Name:               "NotProvisoned",
-			DevEUI:             &types.EUI64{},
-			JoinEUI:            &supportedJoinEUI,
+			DevEUI:             types.EUI64{},
+			JoinEUI:            supportedJoinEUI,
 			AuthenticationCode: claimAuthenticationCode,
 			HNSAddress:         nsAddress,
 			ErrorAssertion: func(err error) bool {
@@ -214,8 +214,8 @@ func TestTTJS(t *testing.T) {
 		},
 		{
 			Name:               "SuccessfulClaim",
-			DevEUI:             &devEUI,
-			JoinEUI:            &supportedJoinEUI,
+			DevEUI:             devEUI,
+			JoinEUI:            supportedJoinEUI,
 			AuthenticationCode: claimAuthenticationCode,
 			HNSAddress:         nsAddress,
 		},
@@ -250,7 +250,7 @@ func TestTTJS(t *testing.T) {
 	}
 	otherClient, err := otherClientConfig.NewClient(ctx, c)
 	test.Must(otherClient, err)
-	err = otherClient.Claim(ctx, &supportedJoinEUI, &devEUI, claimAuthenticationCode, nsAddress)
+	err = otherClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode, nsAddress)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	ret, err = otherClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
 		DevEui:  &devEUI,
@@ -284,7 +284,7 @@ func TestTTJS(t *testing.T) {
 	a.So(errors.IsNotFound(err), should.BeTrue)
 
 	// Try to claim
-	err = client.Claim(ctx, &supportedJoinEUI, &devEUI, claimAuthenticationCode, nsAddress)
+	err = client.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode, nsAddress)
 	a.So(err, should.BeNil)
 
 	// Get valid status
