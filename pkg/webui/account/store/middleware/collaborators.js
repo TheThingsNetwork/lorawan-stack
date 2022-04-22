@@ -37,7 +37,7 @@ const getCollaboratorLogic = createRequestLogic({
   validate: parentTypeValidator,
   process: async ({ action }, dispatch) => {
     const { parentType, parentId, collaboratorId, isUser } = action.payload
-    console.log(action.payload)
+
     if (isUser) {
       // Also retrieve the user to be able to determine whether
       // it is an admin user.

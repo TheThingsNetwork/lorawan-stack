@@ -14,24 +14,48 @@
 
 import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
+import { connect } from 'react-redux'
+
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import CollaboratorsTable from '@account/containers/collaborators-table'
 
-import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { selectSelectedClientId } from '@account/store/selectors/clients'
 
-const OAuthClientCollaboratorsList = () => (
-  <Container>
-    <Row>
-      <IntlHelmet title={sharedMessages.collaborators} />
-      <Col>
-        <CollaboratorsTable pageSize={PAGE_SIZES.REGULAR} />
-      </Col>
-    </Row>
-  </Container>
-)
+const OAuthClientCollaboratorsList = props => {
+  const { clientId } = props
 
-export default OAuthClientCollaboratorsList
+  useBreadcrumbs(
+    'clients.single.collaborators',
+    <Breadcrumb
+      path={`/oauth-clients/${clientId}/collaborators`}
+      content={sharedMessages.collaborators}
+    />,
+  )
+
+  return (
+    <Container>
+      <Row>
+        <IntlHelmet title={sharedMessages.collaborators} />
+        <Col>
+          <CollaboratorsTable pageSize={PAGE_SIZES.REGULAR} />
+        </Col>
+      </Row>
+    </Container>
+  )
+}
+
+OAuthClientCollaboratorsList.propTypes = {
+  clientId: PropTypes.string.isRequired,
+}
+
+export default connect(state => ({
+  clientId: selectSelectedClientId(state),
+}))(OAuthClientCollaboratorsList)

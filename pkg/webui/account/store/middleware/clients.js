@@ -18,6 +18,16 @@ import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as clients from '@account/store/actions/clients'
 
+const createClientLogic = createRequestLogic({
+  type: clients.CREATE_CLIENT,
+  process: async ({ action }) => {
+    const { ownerId, client, isUserOwner } = action.payload
+    const oauthClient = await tts.Clients.create(ownerId, client, isUserOwner)
+
+    return oauthClient
+  },
+})
+
 const getClientLogic = createRequestLogic({
   type: clients.GET_CLIENT,
   process: async ({ action }) => {
@@ -26,6 +36,7 @@ const getClientLogic = createRequestLogic({
       meta: { selector },
     } = action
     const client = await tts.Clients.getById(id, selector)
+
     return client
   },
 })
@@ -88,6 +99,7 @@ const getClientsLogic = createRequestLogic({
           selectors,
         )
       : await tts.Clients.getAll({ page, limit, order }, selectors)
+
     return { entities: result.clients, totalCount: result.totalCount }
   },
 })
@@ -103,6 +115,7 @@ const getClientRightsLogic = createRequestLogic({
 })
 
 export default [
+  createClientLogic,
   getClientLogic,
   updateClientLogic,
   deleteClientLogic,

@@ -16,6 +16,7 @@ import {
   GET_CLIENT,
   GET_CLIENT_SUCCESS,
   GET_CLIENTS_LIST_SUCCESS,
+  CREATE_CLIENT_SUCCESS,
   UPDATE_CLIENT_SUCCESS,
   GET_CLIENT_RIGHTS_SUCCESS,
 } from '@account/store/actions/clients'
@@ -60,6 +61,7 @@ const clients = (state = defaultState, { type, payload }) => {
       }
     case GET_CLIENT_SUCCESS:
     case UPDATE_CLIENT_SUCCESS:
+    case CREATE_CLIENT_SUCCESS:
       const id = payload.ids.client_id
 
       return {

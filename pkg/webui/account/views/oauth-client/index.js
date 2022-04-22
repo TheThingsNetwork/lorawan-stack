@@ -18,7 +18,10 @@ import { Switch, Route } from 'react-router-dom'
 
 import applicationIcon from '@assets/misc/application.svg'
 
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import SideNavigation from '@ttn-lw/components/navigation/side'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import Breadcrumbs from '@ttn-lw/components/breadcrumbs'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -55,8 +58,14 @@ const OAuthClient = props => {
 
   const name = oauthClient.name || clientId
 
+  useBreadcrumbs(
+    'clients.single',
+    <Breadcrumb path={`/oauth-clients/${clientId}`} content={name} />,
+  )
+
   return (
     <React.Fragment>
+      <Breadcrumbs />
       <IntlHelmet titleTemplate={`%s - ${name} - ${siteName}`} />
       <SideNavigation
         header={{

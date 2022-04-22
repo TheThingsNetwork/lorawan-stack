@@ -15,14 +15,13 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Container, Col, Row } from 'react-grid-system'
+import { defineMessages } from 'react-intl'
 
 import PageTitle from '@ttn-lw/components/page-title'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
-import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
-import OAuthClientForm from '@account/containers/oauth-client-form'
+import ClientAdd from '@account/containers/oauth-client-add'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
@@ -40,15 +39,19 @@ import {
   selectUserRightsError,
 } from '@account/store/selectors/user'
 
+const m = defineMessages({
+  addClient: 'Add OAuth Client',
+})
+
 const OAuthClientAdd = props => {
   const { userId, pseudoRights, isAdmin, regularRights } = props
 
   return (
     <Container>
-      <PageTitle title={'Add OAuth Client'} />
+      <PageTitle tall title={m.addClient} />
       <Row>
         <Col lg={8} md={12}>
-          <OAuthClientForm
+          <ClientAdd
             isAdmin={isAdmin}
             userId={userId}
             rights={regularRights}
@@ -63,7 +66,7 @@ const OAuthClientAdd = props => {
 OAuthClientAdd.propTypes = {
   isAdmin: PropTypes.bool.isRequired,
   pseudoRights: PropTypes.rights.isRequired,
-  rights: PropTypes.rights.isRequired,
+  regularRights: PropTypes.rights.isRequired,
   userId: PropTypes.string.isRequired,
 }
 

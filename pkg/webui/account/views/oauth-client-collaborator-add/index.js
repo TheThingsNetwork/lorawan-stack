@@ -19,6 +19,8 @@ import { connect } from 'react-redux'
 
 import tts from '@account/api/tts'
 
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import PageTitle from '@ttn-lw/components/page-title'
 
 import CollaboratorForm from '@account/components/collaborator-form'
@@ -39,9 +41,17 @@ import { selectCollaborators } from '@account/store/selectors/collaborators'
 import { getClientRights } from '@account/store/actions/clients'
 
 const OAuthClientCollaboratorAdd = props => {
-  const { rights, pseudoRights, redirectToList, addCollaborator, error } = props
+  const { rights, pseudoRights, redirectToList, addCollaborator, error, clientId } = props
 
   const handleSubmit = useCallback(collaborator => addCollaborator(collaborator), [addCollaborator])
+
+  useBreadcrumbs(
+    'clients.single.collaborators.add',
+    <Breadcrumb
+      path={`/oauth-clients/${clientId}/collaborators/add`}
+      content={sharedMessages.add}
+    />,
+  )
 
   return (
     <Container>
@@ -63,6 +73,7 @@ const OAuthClientCollaboratorAdd = props => {
 
 OAuthClientCollaboratorAdd.propTypes = {
   addCollaborator: PropTypes.func.isRequired,
+  clientId: PropTypes.string.isRequired,
   error: PropTypes.error,
   pseudoRights: PropTypes.rights.isRequired,
   redirectToList: PropTypes.func.isRequired,

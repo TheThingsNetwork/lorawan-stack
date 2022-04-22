@@ -14,6 +14,7 @@
 
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
+import classnames from 'classnames'
 
 import authRoutes from '@account/constants/auth-routes'
 
@@ -35,6 +36,7 @@ const Landing = () => (
     <main className={style.main}>
       <div className={style.stage} id="stage">
         <div id="sidebar" className={sidebarStyle.container} />
+        <div className={classnames('breadcrumbs', style.desktopBreadcrumbs)} />
         <Switch>
           {authRoutes.map(route => (
             <Route {...route} key={route.path} />

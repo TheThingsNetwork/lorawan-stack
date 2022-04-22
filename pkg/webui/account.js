@@ -20,6 +20,7 @@ import * as Sentry from '@sentry/browser'
 import sentryConfig from '@ttn-lw/constants/sentry'
 import store, { history } from '@account/store'
 
+import { BreadcrumbsProvider } from '@ttn-lw/components/breadcrumbs/context'
 import Header from '@ttn-lw/components/header'
 
 import WithLocale from '@ttn-lw/lib/components/with-locale'
@@ -54,7 +55,9 @@ const render = () => {
         <WithLocale>
           <div id="modal-container" />
           <Init>
-            <App history={history} />
+            <BreadcrumbsProvider>
+              <App history={history} />
+            </BreadcrumbsProvider>
           </Init>
         </WithLocale>
       </Provider>

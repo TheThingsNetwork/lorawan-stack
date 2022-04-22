@@ -19,7 +19,7 @@ import PageTitle from '@ttn-lw/components/page-title'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
-import OAuthClientForm from '@account/containers/oauth-client-form'
+import OAuthClientEdit from '@account/containers/oauth-client-edit'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -45,7 +45,7 @@ const OAuthClientGeneralSettings = props => {
       <PageTitle title={sharedMessages.generalSettings} />
       <Row>
         <Col lg={8} md={12}>
-          <OAuthClientForm
+          <OAuthClientEdit
             initialValues={oauthClient}
             isAdmin={isAdmin}
             userId={userId}

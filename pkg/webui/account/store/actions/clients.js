@@ -20,6 +20,16 @@ import {
   createPaginationBaseActionType,
 } from '@ttn-lw/lib/store/actions/pagination'
 
+export const CREATE_CLIENT_BASE = 'CREATE_CLIENT'
+export const [
+  { request: CREATE_CLIENT, success: CREATE_CLIENT_SUCCESS, failure: CREATE_CLIENT_FAILURE },
+  { request: createClient, success: createClientSuccess, failure: createClientFailure },
+] = createRequestActions(CREATE_CLIENT_BASE, (ownerId, client, isUserOwner) => ({
+  ownerId,
+  client,
+  isUserOwner,
+}))
+
 export const GET_CLIENT_BASE = 'GET_CLIENT'
 export const [
   { request: GET_CLIENT, success: GET_CLIENT_SUCCESS, failure: GET_CLIENT_FAILURE },

@@ -12,13 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useState, useCallback } from 'react'
+import React, { useCallback } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { connect } from 'react-redux'
-import { push, replace } from 'connected-react-router'
 
-import tts from '@account/api/tts'
-
+import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 import Checkbox from '@ttn-lw/components/checkbox'
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
@@ -26,19 +23,12 @@ import KeyValueMap from '@ttn-lw/components/key-value-map'
 import Select from '@ttn-lw/components/select'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
-import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
-import toast from '@ttn-lw/components/toast'
 
 import RightsGroup from '@console/components/rights-group'
 
 import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-/* import { getApplicationId } from '@ttn-lw/lib/selectors/id'
-import { id as applicationIdRegexp } from '@ttn-lw/lib/regexp' */
-
-import { deleteClient } from '@account/store/actions/clients'
 
 const m = defineMessages({
   clientName: 'OAuth Client name',
@@ -53,8 +43,25 @@ const m = defineMessages({
     'This will <strong>PERMANENTLY DELETE THIS OAUTH CLIENT</strong> and <strong>LOCK THE USER ID AND EMAIL FOR RE-REGISTRATION</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.',
   purgeWarning:
     'This will <strong>PERMANENTLY DELETE THIS OAUTH CLIENT</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.',
-  deleteSuccess: 'OAuth client deleted',
-  deleteFail: 'There was an error and the OAuth client could not be deleted',
+  redirectUrls: 'Redirect URLs',
+  addRedirectUri: 'Add redirect URL',
+  addLogoutRedirectUri: 'Add logout redirect URL',
+  redirectUrlDescription:
+    'The allowed redirect URIs against which authorization requests are checked',
+  logoutRedirectUrls: 'Logout redirect URLs',
+  logoutRedirectUrlsDescription:
+    'The allowed logout redirect URIs against which client initiated logout requests are checked',
+  skipAuthorization: 'Skip Authorization',
+  skipAuthorizationDesc: 'If set, the authorization page will be skipped',
+  endorsed: 'Endorsed',
+  endorsedDesc: 'If set, the authorization page will show endorsement',
+  grants: 'Grants',
+  grantsDesc: 'OAuth flows that can be used for the client to get a token',
+  grantAuthorizationLabel: 'Grant authorization code',
+  grantRefreshTokenLabel: 'Grant refresh token',
+  grantPasswordLabel: 'Grant password',
+  deleteClient: 'Delete OAuth Client',
+  urlsPlaceholder: 'https://example.com/',
 })
 
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
@@ -76,7 +83,7 @@ const encodeGrants = value => {
     return null
   })
 
-  return grants
+  return grants.filter(Boolean)
 }
 
 const decodeGrants = value => {
@@ -94,7 +101,6 @@ const validationSchema = Yup.object().shape({
     client_id: Yup.string()
       .min(2, Yup.passValues(sharedMessages.validateTooShort))
       .max(36, Yup.passValues(sharedMessages.validateTooLong))
-      /* .matches(userIdRegexp, Yup.passValues(sharedMessages.validateIdFormat)) */
       .required(sharedMessages.validateRequired),
   }),
   name: Yup.string()
@@ -122,11 +128,11 @@ const OAuthClientForm = props => {
     userId,
     rights,
     pseudoRights,
-    navigateToOAuthClient,
+    error,
     update,
     initialValues: values,
-    deleteOAuthClient,
-    onDeleteSuccess,
+    onSubmit,
+    onDelete,
   } = props
   const { formatMessage } = useIntl()
 
@@ -135,55 +141,18 @@ const OAuthClientForm = props => {
     label: capitalize(formatMessage({ id: `enum:${state}` })),
   }))
 
-  const [error, setError] = useState()
   const handleSubmit = useCallback(
-    async (values, { setSubmitting }) => {
-      const { owner_id, ids } = values
-
-      setError(undefined)
-
-      try {
-        await tts.Clients.create(
-          owner_id,
-          {
-            ...values,
-          },
-          userId === owner_id,
-        )
-
-        navigateToOAuthClient(ids.client_id)
-      } catch (error) {
-        setSubmitting(false)
-        setError(error)
-      }
+    async (values, { resetForm, setSubmitting }) => {
+      await onSubmit(values, resetForm, setSubmitting)
     },
-    [userId, navigateToOAuthClient],
+    [onSubmit],
   )
 
   const handleDelete = useCallback(
     async shouldPurge => {
-      const clientId = values.ids.client_id
-      setError(undefined)
-
-      try {
-        await deleteOAuthClient(clientId, shouldPurge)
-        onDeleteSuccess()
-        toast({
-          title: clientId,
-          message: m.deleteSuccess,
-          type: toast.types.SUCCESS,
-        })
-      } catch (error) {
-        setError(error)
-
-        toast({
-          title: clientId,
-          message: m.deleteFail,
-          type: toast.types.ERROR,
-        })
-      }
+      await onDelete(shouldPurge, values.ids.client_id)
     },
-    [deleteOAuthClient, onDeleteSuccess, values.ids.client_id],
+    [onDelete, values.ids.client_id],
   )
 
   const initialValues = {
@@ -200,7 +169,7 @@ const OAuthClientForm = props => {
       validationSchema={validationSchema}
     >
       <Form.Field
-        title={'OAuth Client'}
+        title={sharedMessages.oauthClientId}
         name="ids.client_id"
         placeholder={m.clientIdPlaceholder}
         component={Input}
@@ -224,23 +193,21 @@ const OAuthClientForm = props => {
       />
       <Form.Field
         name="redirect_uris"
-        title={'Redirect URLs'}
-        valuePlaceholder={'https://example.com/'}
-        addMessage={'Add redirect URL'}
+        title={m.redirectUrls}
+        valuePlaceholder={m.urlsPlaceholder}
+        addMessage={m.addRedirectUri}
         component={KeyValueMap}
         indexAsKey
-        description={'The allowed redirect URIs against which authorization requests are checked'}
+        description={m.redirectUrlDescription}
       />
       <Form.Field
         name="logout_redirect_uris"
-        title={'Logout redirect URLs'}
-        valuePlaceholder={'https://example.com/'}
-        addMessage={'Add logout redirect URL'}
+        title={m.logoutRedirectUrls}
+        valuePlaceholder={m.urlsPlaceholder}
+        addMessage={m.addLogoutRedirectUri}
         component={KeyValueMap}
+        description={m.logoutRedirectUrlsDescription}
         indexAsKey
-        description={
-          'The allowed logout redirect URIs against which client initiated logout requests are checked'
-        }
       />
       {isAdmin && (
         <>
@@ -257,31 +224,33 @@ const OAuthClientForm = props => {
             type="textarea"
             placeholder={m.userDescPlaceholder}
           />
-          <Form.Field
-            title={'Skip Authorization'}
-            name="skip_authorization"
-            component={Checkbox}
-            description={'If set, the authorization page will be skipped'}
-          />
-          <Form.Field
-            title={'Endorsed'}
-            name="endorsed"
-            component={Checkbox}
-            description={'If set, the authorization page will show endorsement'}
-          />
         </>
       )}
       <Form.Field
-        title={'Grants'}
+        title={m.skipAuthorization}
+        name="skip_authorization"
+        component={Checkbox}
+        description={m.skipAuthorizationDesc}
+        disabled={!isAdmin}
+      />
+      <Form.Field
+        title={m.endorsed}
+        name="endorsed"
+        component={Checkbox}
+        description={m.endorsedDesc}
+        disabled={!isAdmin}
+      />
+      <Form.Field
+        title={m.grants}
         name="grants"
         encode={encodeGrants}
         decode={decodeGrants}
         component={Checkbox.Group}
-        description={'OAuth flows that can be used for the client to get a token'}
+        description={m.grantsDesc}
       >
-        <Checkbox name="GRANT_AUTHORIZATION_CODE" label={'Grant authorization code'} />
-        <Checkbox name="GRANT_PASSWORD" label={'Grant refresh token'} />
-        {isAdmin && <Checkbox name="GRANT_REFRESH_TOKEN" label={'Grant password'} />}
+        <Checkbox name="GRANT_AUTHORIZATION_CODE" label={m.grantAuthorizationLabel} />
+        <Checkbox name="GRANT_REFRESH_TOKEN" label={m.grantRefreshTokenLabel} />
+        {isAdmin && <Checkbox name="GRANT_PASSWORD" label={m.grantPasswordLabel} />}
       </Form.Field>
       <Form.Field
         name="rights"
@@ -289,7 +258,8 @@ const OAuthClientForm = props => {
         component={RightsGroup}
         rights={rights}
         pseudoRight={pseudoRights}
-        entityTypeMessage={'OAuth Client'}
+        entityTypeMessage={sharedMessages.client}
+        rightsWarning
       />
       <SubmitBar>
         <Form.Submit
@@ -298,7 +268,7 @@ const OAuthClientForm = props => {
         />
         {update && (
           <DeleteModalButton
-            message={'Delete OAuth Client'}
+            message={m.deleteClient}
             entityId={initialValues.ids.client_id}
             entityName={initialValues.name}
             title={m.deleteTitle}
@@ -313,7 +283,7 @@ const OAuthClientForm = props => {
 }
 
 OAuthClientForm.propTypes = {
-  deleteOAuthClient: PropTypes.func.isRequired,
+  error: PropTypes.string,
   initialValues: PropTypes.shape({
     owner_id: PropTypes.string,
     ids: PropTypes.shape({
@@ -323,10 +293,10 @@ OAuthClientForm.propTypes = {
     description: PropTypes.string,
   }),
   isAdmin: PropTypes.bool.isRequired,
-  navigateToOAuthClient: PropTypes.func.isRequired,
-  onDeleteSuccess: PropTypes.func.isRequired,
+  onDelete: PropTypes.func,
+  onSubmit: PropTypes.func.isRequired,
   pseudoRights: PropTypes.rights.isRequired,
-  rights: PropTypes.rights.isRequired,
+  rights: PropTypes.rights,
   update: PropTypes.bool,
   userId: PropTypes.string.isRequired,
 }
@@ -347,10 +317,9 @@ OAuthClientForm.defaultProps = {
     state_description: '',
   },
   update: false,
+  rights: undefined,
+  error: undefined,
+  onDelete: () => null,
 }
 
-export default connect(null, dispatch => ({
-  navigateToOAuthClient: clientId => dispatch(push(`/oauth-clients/${clientId}`)),
-  deleteOAuthClient: (id, shouldPurge) => dispatch(attachPromise(deleteClient(id, shouldPurge))),
-  onDeleteSuccess: () => dispatch(replace(`/oauth-clients`)),
-}))(OAuthClientForm)
+export default OAuthClientForm

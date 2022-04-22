@@ -15,6 +15,9 @@
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+
 import NotFoundRoute from '@ttn-lw/lib/components/not-found-route'
 
 import OAuthClient from '@account/views/oauth-client'
@@ -22,10 +25,16 @@ import ClientsList from '@account/views/oauth-clients-list'
 import OAuthClientAdd from '@account/views/oauth-client-add'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 
 const OAuthClients = props => {
   const { path } = props.match
+
+  useBreadcrumbs(
+    'clients',
+    <Breadcrumb path="/oauth-clients" content={sharedMessages.oauthClients} />,
+  )
 
   return (
     <Switch>

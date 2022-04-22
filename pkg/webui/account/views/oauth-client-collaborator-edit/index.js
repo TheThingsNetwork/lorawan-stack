@@ -32,6 +32,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { getCollaborator } from '@account/store/actions/collaborators'
+import { getClientRights } from '@account/store/actions/clients'
 import {
   selectClientPseudoRights,
   selectClientRegularRights,
@@ -65,6 +66,14 @@ const OAuthClientCollaboratorEdit = props => {
     redirectToList,
     collaboratorType,
   } = props
+
+  useBreadcrumbs(
+    'clients.single.collaborators.edit',
+    <Breadcrumb
+      path={`/oauth-clients/${clientId}/collaborators/${collaboratorType}/${collaboratorId}`}
+      content={sharedMessages.edit}
+    />,
+  )
 
   const [error, setError] = useState(undefined)
 
@@ -119,14 +128,20 @@ const OAuthClientCollaboratorEdit = props => {
 
 OAuthClientCollaboratorEdit.propTypes = {
   clientId: PropTypes.string.isRequired,
-  collaborator: PropTypes.collaborator.isRequired,
+  collaborator: PropTypes.collaborator,
   collaboratorId: PropTypes.string.isRequired,
   collaboratorType: PropTypes.oneOf(['collaborator', 'user']).isRequired,
-  pseudoRights: PropTypes.rights.isRequired,
+  pseudoRights: PropTypes.rights,
   redirectToList: PropTypes.func.isRequired,
   removeCollaborator: PropTypes.func.isRequired,
-  rights: PropTypes.rights.isRequired,
+  rights: PropTypes.rights,
   updateCollaborator: PropTypes.func.isRequired,
+}
+
+OAuthClientCollaboratorEdit.defaultProps = {
+  collaborator: undefined,
+  pseudoRights: [],
+  rights: [],
 }
 
 export default connect(
@@ -156,6 +171,7 @@ export default connect(
   dispatch => ({
     getCollaborator: (clientId, collaboratorId, isUser) => {
       dispatch(getCollaborator('client', clientId, collaboratorId, isUser))
+      dispatch(attachPromise(getClientRights(clientId)))
     },
     redirectToList: clientId => {
       dispatch(replace(`/oauth-clients/${clientId}/collaborators`))

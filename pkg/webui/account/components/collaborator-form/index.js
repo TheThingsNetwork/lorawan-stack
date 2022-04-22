@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback, useState } from 'react'
+import { connect } from 'react-redux'
 
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
@@ -29,6 +30,11 @@ import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { userId as collaboratorIdRegexp } from '@ttn-lw/lib/regexp'
+import { getCollaboratorId } from '@ttn-lw/lib/selectors/id'
+
+import { selectUserId, selectUserIsAdmin } from '@account/store/selectors/user'
+
+const isCollaboratorUser = collaborator => collaborator.ids && 'user_ids' in collaborator.ids
 
 const validationSchema = Yup.object().shape({
   collaborator_id: Yup.string()
@@ -144,9 +150,6 @@ const CollaboratorForm = props => {
     }
   }
 
-  console.log(rights)
-  console.log(pseudoRights)
-
   return (
     <Form
       error={error}
@@ -245,4 +248,17 @@ CollaboratorForm.defaultProps = {
   collaboratorId: undefined,
 }
 
-export default CollaboratorForm
+export default connect((state, { collaborator, update = false }) => {
+  const collaboratorId = getCollaboratorId(collaborator)
+  const isUser = update && isCollaboratorUser(collaborator)
+  const isAdmin = selectUserIsAdmin(state)
+  const isCurrentUser = isUser && selectUserId(state) === collaboratorId
+
+  return {
+    collaboratorId,
+    isCollaboratorUser: isUser,
+    isCollaboratorAdmin: isAdmin,
+    isCollaboratorCurrentUser: isCurrentUser,
+    currentUserId: selectUserId(state),
+  }
+})(CollaboratorForm)
