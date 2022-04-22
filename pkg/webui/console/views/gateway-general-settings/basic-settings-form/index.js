@@ -94,7 +94,7 @@ const BasicSettingsForm = React.memo(props => {
   const onFormSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
       const castedValues = validationSchema.cast(values)
-      if (castedValues.lbs_lns_secret.value === '') {
+      if (castedValues?.lbs_lns_secret?.value === '') {
         castedValues.lbs_lns_secret = null
       }
       setError(undefined)
