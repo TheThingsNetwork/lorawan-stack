@@ -153,7 +153,7 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 			NotificationType: "collaborator_changed",
 			Data:             ttnpb.MustMarshalAny(req.GetCollaborator()),
 			Receivers:        []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT},
-			Email:            true,
+			Email:            false,
 		})
 	} else {
 		events.Publish(evtDeleteClientCollaborator.New(ctx, events.WithIdentifiers(req.GetClientIds(), req.GetCollaborator().GetIds())))
