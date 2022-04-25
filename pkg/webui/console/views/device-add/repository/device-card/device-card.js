@@ -103,12 +103,15 @@ const DeviceCard = props => {
         {hasLinks && (
           <div className={style.links}>
             {product_url && (
-              <Link.Anchor href={product_url} external>
+              <Link.Anchor secondary href={product_url} external>
                 <Message content={m.productWebsite} />
               </Link.Anchor>
             )}
+            {product_url && datasheet_url && (
+              <span className="tc-subtle-gray ml-cs-xxs mr-cs-xs">|</span>
+            )}
             {datasheet_url && (
-              <Link.Anchor href={datasheet_url} external>
+              <Link.Anchor secondary href={datasheet_url} external>
                 <Message content={m.dataSheet} />
               </Link.Anchor>
             )}
