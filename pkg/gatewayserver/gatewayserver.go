@@ -887,6 +887,7 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 	defer refreshTTLTimer.Stop()
 
 	// Initial update, so that the gateway appears connected.
+	registerGatewayConnectionStats(ctx, *ids, stats)
 	if err := gs.statsRegistry.Set(decoupledCtx, *ids, stats, ttnpb.GatewayConnectionStatsFieldPathsTopLevel, gs.config.ConnectionStatsTTL); err != nil {
 		logger.WithError(err).Warn("Failed to initialize connection stats")
 	}
@@ -910,8 +911,7 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 			return
 		case <-conn.StatsChanged():
 			if duration := gs.config.UpdateConnectionStatsDebounceTime; duration > 0 {
-				// We debounce the updates before the actual write to the store in order
-				// to de-correlate updates over time.
+				// Debounce the updates before the actual write to the store in order to spread updates over time.
 				duration := random.Jitter(duration, debounceJitter)
 				select {
 				case <-ctx.Done():
@@ -922,6 +922,7 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 		case <-refreshTTLTimer.C:
 		}
 		stats, paths := conn.Stats()
+		registerGatewayConnectionStats(decoupledCtx, *ids, stats)
 		if err := gs.statsRegistry.Set(decoupledCtx, *ids, stats, paths, gs.config.ConnectionStatsTTL); err != nil {
 			logger.WithError(err).Warn("Failed to update connection stats")
 		}
