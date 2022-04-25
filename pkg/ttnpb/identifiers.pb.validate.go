@@ -1176,6 +1176,24 @@ func (m *NetworkIdentifiers) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "cluster_address":
+
+			if utf8.RuneCountInString(m.GetClusterAddress()) > 256 {
+				return NetworkIdentifiersValidationError{
+					field:  "cluster_address",
+					reason: "value length must be at most 256 runes",
+				}
+			}
+
+		case "tenant_address":
+
+			if utf8.RuneCountInString(m.GetTenantAddress()) > 256 {
+				return NetworkIdentifiersValidationError{
+					field:  "tenant_address",
+					reason: "value length must be at most 256 runes",
+				}
+			}
+
 		default:
 			return NetworkIdentifiersValidationError{
 				field:  name,

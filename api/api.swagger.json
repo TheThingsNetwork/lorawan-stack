@@ -16980,6 +16980,14 @@
         "cluster_id": {
           "type": "string",
           "description": "Cluster identifier of the Network Server."
+        },
+        "cluster_address": {
+          "type": "string",
+          "description": "Cluster address of the Network Server."
+        },
+        "tenant_address": {
+          "type": "string",
+          "description": "Optional tenant address for multi-tenant deployments."
         }
       },
       "description": "Identifies a Network Server."

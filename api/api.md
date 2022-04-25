@@ -4653,6 +4653,8 @@ Identifies a Network Server.
 | `net_id` | [`bytes`](#bytes) |  | LoRa Alliance NetID. |
 | `tenant_id` | [`string`](#string) |  | Optional tenant identifier for multi-tenant deployments. |
 | `cluster_id` | [`string`](#string) |  | Cluster identifier of the Network Server. |
+| `cluster_address` | [`string`](#string) |  | Cluster address of the Network Server. |
+| `tenant_address` | [`string`](#string) |  | Optional tenant address for multi-tenant deployments. |
 
 #### Field Rules
 
@@ -4660,6 +4662,8 @@ Identifies a Network Server.
 | ----- | ----------- |
 | `tenant_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
 | `cluster_id` | <p>`string.max_len`: `64`</p> |
+| `cluster_address` | <p>`string.max_len`: `256`</p> |
+| `tenant_address` | <p>`string.max_len`: `256`</p> |
 
 ### <a name="ttn.lorawan.v3.OrganizationIdentifiers">Message `OrganizationIdentifiers`</a>
 
