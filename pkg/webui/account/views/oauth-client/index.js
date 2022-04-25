@@ -31,12 +31,10 @@ import OAuthClientOverview from '@account/views/oauth-client-overview'
 import OAuthClientGeneralSettings from '@account/views/oauth-client-general-settings'
 import OAuthClientCollaboratorsList from '@account/views/oauth-client-collaborators-list'
 import OAuthClientCollaboratorAdd from '@account/views/oauth-client-collaborator-add'
-import OAuthClientCollaboratorEdit from '@account/views/oauth-client-collaborator-edit'
 
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { pathId as pathIdRegexp } from '@ttn-lw/lib/regexp'
 
 import { mayPerformAllClientActions } from '@account/lib/feature-checks'
 
@@ -102,10 +100,6 @@ const OAuthClient = props => {
         <Route exact path={`${path}`} component={OAuthClientOverview} />
         <Route exact path={`${path}/collaborators`} component={OAuthClientCollaboratorsList} />
         <Route exact path={`${path}/collaborators/add`} component={OAuthClientCollaboratorAdd} />
-        <Route
-          path={`${path}/collaborators/:collaboratorType/:collaboratorId${pathIdRegexp}`}
-          component={OAuthClientCollaboratorEdit}
-        />
         <Route exact path={`${path}/general-settings`} component={OAuthClientGeneralSettings} />
         <NotFoundRoute />
       </Switch>
@@ -119,6 +113,7 @@ OAuthClient.propTypes = {
   oauthClient: PropTypes.shape({
     name: PropTypes.string,
   }).isRequired,
+  siteName: PropTypes.string.isRequired,
 }
 
 export default connect(

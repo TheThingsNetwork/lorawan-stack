@@ -15,6 +15,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
+
 import PageTitle from '@ttn-lw/components/page-title'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
@@ -26,6 +27,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { getUserRights } from '@account/store/actions/user'
+
 import {
   selectUserIsAdmin,
   selectUserId,

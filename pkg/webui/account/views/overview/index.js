@@ -13,8 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect } from 'react-redux'
-import { useSelector } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 

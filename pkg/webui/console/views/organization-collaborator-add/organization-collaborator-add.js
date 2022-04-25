@@ -18,7 +18,6 @@ import { Container, Col, Row } from 'react-grid-system'
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
-
 import CollaboratorForm from '@ttn-lw/components/collaborator-form'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'

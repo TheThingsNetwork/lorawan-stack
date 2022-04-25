@@ -24,7 +24,6 @@ import withRequest from '@ttn-lw/lib/components/with-request'
 import ClientAdd from '@account/containers/oauth-client-add'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { getUserRights } from '@account/store/actions/user'

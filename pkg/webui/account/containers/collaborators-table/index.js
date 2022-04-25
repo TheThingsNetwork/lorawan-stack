@@ -27,6 +27,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { getCollaboratorsList } from '@account/store/actions/collaborators'
+
 import { selectUserId } from '@account/store/selectors/user'
 import {
   selectCollaborators,
@@ -104,6 +105,7 @@ const CollaboratorsTable = props => {
       totalCount: selectCollaboratorsTotalCount(state, clientId),
       fetching: selectCollaboratorsFetching(state),
       error: selectCollaboratorsError(state),
+      mayLink: false,
     }),
     [clientId],
   )

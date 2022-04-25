@@ -23,6 +23,7 @@ import OAuthClientForm from '@account/components/oauth-client-form'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+
 import { createClient } from '@account/store/actions/clients'
 
 const m = defineMessages({

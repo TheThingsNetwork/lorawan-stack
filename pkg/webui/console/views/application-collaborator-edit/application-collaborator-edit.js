@@ -19,7 +19,6 @@ import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import toast from '@ttn-lw/components/toast'
-
 import CollaboratorForm from '@ttn-lw/components/collaborator-form'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'

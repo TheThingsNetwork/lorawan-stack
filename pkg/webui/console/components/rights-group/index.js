@@ -137,7 +137,7 @@ class RightsGroup extends React.Component {
     outOfOwnScopeIndividualRights: PropTypes.rights.isRequired,
     /** The pseudo right literal comprising all other rights. */
     pseudoRight: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
-    /** The warning regarding choice of rights */
+    /** The warning regarding choice of rights. */
     rightsWarning: PropTypes.bool,
     /** The rights value. */
     value: PropTypes.rights.isRequired,

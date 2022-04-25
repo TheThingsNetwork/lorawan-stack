@@ -21,17 +21,18 @@ import applicationIcon from '@assets/misc/application.svg'
 
 import DataSheet from '@ttn-lw/components/data-sheet'
 
-import Message from '@ttn-lw/lib/components/message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import DateTime from '@ttn-lw/lib/components/date-time'
 import withRequest from '@ttn-lw/lib/components/with-request'
 
 import EntityTitleSection from '@console/components/entity-title-section'
 
-import { mayPerformAdminActions } from '@account/lib/feature-checks'
-
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { mayPerformAdminActions } from '@account/lib/feature-checks'
+
+import { getCollaboratorsList } from '@account/store/actions/collaborators'
 
 import {
   selectSelectedClient,
@@ -39,7 +40,6 @@ import {
   selectClientFetching,
 } from '@account/store/selectors/clients'
 import { selectCollaboratorsTotalCount } from '@account/store/selectors/collaborators'
-import { getCollaboratorsList } from '@account/store/actions/collaborators'
 
 import style from './oauth-client-overview.styl'
 

@@ -16,16 +16,17 @@ import React from 'react'
 import { Container, Row, Col } from 'react-grid-system'
 import { connect } from 'react-redux'
 
+import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
+
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
-import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
-
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
-import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 
 import CollaboratorsTable from '@account/containers/collaborators-table'
+
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { selectSelectedClientId } from '@account/store/selectors/clients'
 
