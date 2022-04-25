@@ -22,14 +22,14 @@ import tts from '@account/api/tts'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import PageTitle from '@ttn-lw/components/page-title'
-
-import CollaboratorForm from '@account/components/collaborator-form'
+import CollaboratorForm from '@ttn-lw/components/collaborator-form'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import withRequest from '@ttn-lw/lib/components/with-request'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
+import { selectUserIsAdmin } from '@account/store/selectors/user'
 import {
   selectSelectedClientId,
   selectClientRegularRights,
@@ -41,7 +41,7 @@ import { selectCollaborators } from '@account/store/selectors/collaborators'
 import { getClientRights } from '@account/store/actions/clients'
 
 const OAuthClientCollaboratorAdd = props => {
-  const { rights, pseudoRights, redirectToList, addCollaborator, error, clientId } = props
+  const { rights, pseudoRights, redirectToList, addCollaborator, error, clientId, isAdmin } = props
 
   const handleSubmit = useCallback(collaborator => addCollaborator(collaborator), [addCollaborator])
 
@@ -59,6 +59,7 @@ const OAuthClientCollaboratorAdd = props => {
       <Row>
         <Col lg={8} md={12}>
           <CollaboratorForm
+            isAdmin={isAdmin}
             error={error}
             onSubmit={handleSubmit}
             onSubmitSuccess={redirectToList}
@@ -75,6 +76,7 @@ OAuthClientCollaboratorAdd.propTypes = {
   addCollaborator: PropTypes.func.isRequired,
   clientId: PropTypes.string.isRequired,
   error: PropTypes.error,
+  isAdmin: PropTypes.bool.isRequired,
   pseudoRights: PropTypes.rights.isRequired,
   redirectToList: PropTypes.func.isRequired,
   rights: PropTypes.rights.isRequired,
@@ -92,6 +94,7 @@ export default connect(
     pseudoRights: selectClientPseudoRights(state),
     fetching: selectClientRightsFetching(state),
     error: selectClientRightsError(state),
+    isAdmin: selectUserIsAdmin(state),
   }),
   dispatch => ({
     redirectToList: clientId => dispatch(push(`/oauth-clients/${clientId}/collaborators`)),
