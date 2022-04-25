@@ -36,6 +36,10 @@ export const selectWebhooksConfiguration = state => selectAsConfiguration(state)
 export const selectWebhooksHealthStatusEnabled = state => {
   const webhooksConfig = selectWebhooksConfiguration(state)
 
+  if (!webhooksConfig) {
+    return false
+  }
+
   return (
     webhooksConfig.unhealthy_retry_interval !== '0s' ||
     'unhealthy_attempts_threshold' in webhooksConfig
