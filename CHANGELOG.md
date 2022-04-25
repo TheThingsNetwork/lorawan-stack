@@ -20,6 +20,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - End devices frame counts being displayed as `n/a` when event stream contained historical data message events.
+- Gateway general settings (Basic settings) not saving changes in some cases.
 
 ### Security
 

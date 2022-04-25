@@ -124,7 +124,80 @@ describe('Gateway general settings', () => {
       .and('have.attr', 'value', '0.523')
   })
 
-  it('shows warning modal on click delete button', () => {
+  it('succeeds changing gateway information', () => {
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(
+      `${Cypress.config('consoleRootPath')}/gateways/${gateway.ids.gateway_id}/general-settings`,
+    )
+
+    const newGatewayName = 'New Gateway Name'
+    const newGatewayDesc = 'New Gateway Desc'
+    const newFrequencyPlan = 'Europe 863-870 MHz (SF12 for RX2)'
+    const address = 'otherhost'
+    const lnsKey = '1234'
+
+    cy.findByLabelText('Gateway name').clear().type(newGatewayName)
+    cy.findByLabelText('Gateway description').clear().type(newGatewayDesc)
+    cy.findByLabelText('Gateway Server address').clear().type(address)
+    cy.findByLabelText('Require authenticated connection').check()
+    cy.findByLabelText('LoRa Basics Station LNS Authentication Key').type(lnsKey)
+    cy.findByLabelText('Gateway status').check()
+    cy.findByLabelText('Gateway location').check()
+    cy.findByPlaceholderText('key').type('-changed')
+    cy.findByPlaceholderText('value').type('-changed')
+    cy.findByLabelText('Automatic updates').check()
+    cy.findByLabelText('Channel').type('test')
+    cy.findByLabelText('Packet Broker').check()
+
+    cy.findByLabelText('Require authenticated connection').check()
+    cy.findByRole('button', { name: 'Save changes' }).click()
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification').findByText('Gateway updated').should('be.visible')
+    cy.reload()
+
+    cy.findByLabelText('Gateway name').should('have.value', newGatewayName)
+    cy.findByLabelText('Gateway description').should('have.value', newGatewayDesc)
+    cy.findByLabelText('Gateway Server address').should('have.value', address)
+    cy.findByLabelText('Require authenticated connection').should('have.attr', 'checked')
+    cy.findByLabelText('LoRa Basics Station LNS Authentication Key')
+      .should('have.attr', 'value')
+      .and('eq', lnsKey)
+    cy.findByLabelText('Gateway status').should('have.attr', 'checked')
+    cy.findByLabelText('Gateway location').should('have.attr', 'checked')
+    cy.findByPlaceholderText('key').should('have.value', 'key-changed')
+    cy.findByPlaceholderText('value').should('have.value', 'value-changed')
+    cy.findByLabelText('Automatic updates').should('have.attr', 'checked')
+    cy.findByLabelText('Channel').should('have.value', 'test')
+    cy.findByLabelText('Packet Broker').should('have.attr', 'checked')
+
+    cy.findByText('LoRaWAN options', { selector: 'h3' })
+      .closest('[data-test-id="collapsible-section"]')
+      .within(() => {
+        cy.findByRole('button', { name: 'Expand' }).click()
+        cy.findByLabelText('Schedule downlink late').check()
+        cy.findByLabelText(/Enforce duty cycle/).uncheck()
+        cy.findByLabelText('Schedule any time delay').clear().type('1')
+        cy.findByLabelText('Frequency plan').type(`${newFrequencyPlan}{enter}`)
+        cy.findByRole('button', { name: 'Save changes' }).click()
+      })
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification').findByText('Gateway updated').should('be.visible')
+    cy.reload()
+
+    cy.findByText('LoRaWAN options', { selector: 'h3' })
+      .closest('[data-test-id="collapsible-section"]')
+      .within(() => {
+        cy.findByRole('button', { name: 'Expand' }).click()
+        cy.findByText(newFrequencyPlan)
+        cy.findByLabelText('Schedule downlink late').should('have.attr', 'checked')
+        cy.findByLabelText(/Enforce duty cycle/).should('not.have.attr', 'checked')
+        cy.findByLabelText('Schedule any time delay').should('have.value', '1')
+      })
+  })
+
+  it('succeeds deleting the gateway', () => {
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.visit(
       `${Cypress.config('consoleRootPath')}/gateways/${gateway.ids.gateway_id}/general-settings`,
@@ -136,7 +209,15 @@ describe('Gateway general settings', () => {
         cy.findByText('Confirm deletion', { selector: 'h1' }).should('be.visible')
 
         cy.findByRole('button', { name: /Cancel/ }).should('be.visible')
-        cy.findByRole('button', { name: /Delete gateway/ }).should('be.visible')
+        cy.findByRole('button', { name: /Delete gateway/ })
+          .should('be.visible')
+          .click()
       })
+
+    cy.findByTestId('error-notification').should('not.exist')
+
+    cy.location('pathname').should('eq', `${Cypress.config('consoleRootPath')}/gateways`)
+
+    cy.findByRole('cell', { name: gateway.ids.gateway_id }).should('not.exist')
   })
 })
