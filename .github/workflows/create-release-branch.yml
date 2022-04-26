@@ -28,21 +28,10 @@ jobs:
           fetch-depth: 0
           submodules: true
           ref: ${{ github.event.inputs.commit_hash }}
-      - name: Set up Go
-        uses: actions/setup-go@v3
+      - name: Install Go and Dependencies
+        uses: ./.github/actions/install-go-and-deps
         with:
           go-version: "~1.17"
-      - name: Download Go tool dependencies
-        run: |
-          cd tools
-          go mod download
-      - name: Initialize Go build cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/go-build
-          key: ${{ runner.os }}-go-build-${{ github.ref }}
-          restore-keys: |
-            ${{ runner.os }}-go-build-refs/heads/v
       - name: Initialize tool binary cache
         id: tools-cache
         uses: actions/cache@v2
