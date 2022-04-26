@@ -34,7 +34,7 @@ const m = defineMessages({
   updateFailure: 'There was an error updating this client',
 })
 
-const checkUrisInChanged = (changed, values) => {
+const checkChanged = (changed, values) => {
   if ('redirect_uris' in changed) {
     return {
       ...changed,
@@ -44,6 +44,11 @@ const checkUrisInChanged = (changed, values) => {
     return {
       ...changed,
       logout_redirect_uris: values.logout_redirect_uris,
+    }
+  } else if ('grants' in changed) {
+    return {
+      ...changed,
+      grants: values.grants,
     }
   }
 
@@ -71,11 +76,9 @@ const ClientAdd = props => {
 
       const changed = diff(initialValues, values)
 
-      // Include all grants.
-      changed.grants = values.grants
-      // If there is a change in `redirect_uris` and `logout_redirect_uris`, copy all uris
-      // so they don't get overwritten.
-      const update = checkUrisInChanged(changed, values)
+      // If there is a change in `redirect_uris`, `logout_redirect_uris` or `grants`,
+      // copy all values so they don't get overwritten.
+      const update = checkChanged(changed, values)
 
       const { owner_id, ...newClient } = update
 
@@ -143,7 +146,9 @@ const ClientAdd = props => {
 
 ClientAdd.propTypes = {
   deleteOAuthClient: PropTypes.func.isRequired,
-  initialValues: PropTypes.shape({}).isRequired,
+  initialValues: PropTypes.shape({
+    grants: PropTypes.arrayOf(PropTypes.string),
+  }).isRequired,
   isAdmin: PropTypes.bool.isRequired,
   navigateToOAuthClient: PropTypes.func.isRequired,
   onDeleteSuccess: PropTypes.func.isRequired,

@@ -67,4 +67,15 @@ const getCollaboratorsLogic = createRequestLogic({
   },
 })
 
-export default [getCollaboratorLogic, getCollaboratorsLogic]
+const deleteCollaboratorLogic = createRequestLogic({
+  type: collaborators.DELETE_COLLABORATOR,
+  process: async ({ action }) => {
+    const { parentType, parentId } = action.payload
+
+    const result = await tts.Clients.Collaborators.update(parentType, parentId)
+
+    return result
+  },
+})
+
+export default [getCollaboratorLogic, getCollaboratorsLogic, deleteCollaboratorLogic]

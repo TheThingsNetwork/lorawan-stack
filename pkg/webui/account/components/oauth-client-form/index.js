@@ -20,6 +20,7 @@ import Checkbox from '@ttn-lw/components/checkbox'
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
+import Notification from '@ttn-lw/components/notification'
 import Select from '@ttn-lw/components/select'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
@@ -31,7 +32,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 const m = defineMessages({
-  clientName: 'OAuth Client name',
   clientIdPlaceholder: 'my-new-oauth-client',
   clientNamePlaceholder: 'My new OAuth Client',
   clientDescPlaceholder: 'Description for my new OAuth Client',
@@ -62,6 +62,10 @@ const m = defineMessages({
   grantPasswordLabel: 'Grant password',
   deleteClient: 'Delete OAuth Client',
   urlsPlaceholder: 'https://example.com/',
+  rightsWarning:
+    'Note that only the minimum set of rights needed to provide the functionality of the application should be requested',
+  updateWarning:
+    'Note that the OAuth Client will have to de re-authorized before the chosen rights are granted',
 })
 
 const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
@@ -115,10 +119,20 @@ const validationSchema = Yup.object().shape({
   skip_authorization: Yup.bool(),
   endorsed: Yup.bool(),
   grants: Yup.array().max(3, Yup.passValues(sharedMessages.attributesValidateTooMany)),
-  state: Yup.string()
-    .oneOf(approvalStates, sharedMessages.validateRequired)
-    .required(sharedMessages.validateRequired),
-  state_description: Yup.string(),
+  state: Yup.lazy(value => {
+    if (value === '') {
+      return Yup.string().strip()
+    }
+
+    return Yup.string().oneOf(approvalStates, sharedMessages.validateRequired)
+  }),
+  state_description: Yup.lazy(value => {
+    if (value === '') {
+      return Yup.string().strip()
+    }
+
+    return Yup.string()
+  }),
   rights: Yup.array().min(1, sharedMessages.validateRights),
 })
 
@@ -143,7 +157,8 @@ const OAuthClientForm = props => {
 
   const handleSubmit = useCallback(
     async (values, { resetForm, setSubmitting }) => {
-      await onSubmit(values, resetForm, setSubmitting)
+      const castedValues = validationSchema.cast(values)
+      await onSubmit(castedValues, resetForm, setSubmitting)
     },
     [onSubmit],
   )
@@ -178,7 +193,7 @@ const OAuthClientForm = props => {
         required
       />
       <Form.Field
-        title={m.clientName}
+        title={sharedMessages.name}
         name="name"
         placeholder={m.clientNamePlaceholder}
         component={Input}
@@ -224,34 +239,37 @@ const OAuthClientForm = props => {
             type="textarea"
             placeholder={m.userDescPlaceholder}
           />
+          <Form.Field
+            title={m.skipAuthorization}
+            name="skip_authorization"
+            component={Checkbox}
+            description={m.skipAuthorizationDesc}
+            disabled={!isAdmin}
+          />
+          <Form.Field
+            title={m.endorsed}
+            name="endorsed"
+            component={Checkbox}
+            description={m.endorsedDesc}
+            disabled={!isAdmin}
+          />
         </>
       )}
-      <Form.Field
-        title={m.skipAuthorization}
-        name="skip_authorization"
-        component={Checkbox}
-        description={m.skipAuthorizationDesc}
-        disabled={!isAdmin}
-      />
-      <Form.Field
-        title={m.endorsed}
-        name="endorsed"
-        component={Checkbox}
-        description={m.endorsedDesc}
-        disabled={!isAdmin}
-      />
-      <Form.Field
-        title={m.grants}
-        name="grants"
-        encode={encodeGrants}
-        decode={decodeGrants}
-        component={Checkbox.Group}
-        description={m.grantsDesc}
-      >
-        <Checkbox name="GRANT_AUTHORIZATION_CODE" label={m.grantAuthorizationLabel} />
-        <Checkbox name="GRANT_REFRESH_TOKEN" label={m.grantRefreshTokenLabel} />
-        {isAdmin && <Checkbox name="GRANT_PASSWORD" label={m.grantPasswordLabel} />}
-      </Form.Field>
+      {((isAdmin && update) || !update) && (
+        <Form.Field
+          title={m.grants}
+          name="grants"
+          encode={encodeGrants}
+          decode={decodeGrants}
+          component={Checkbox.Group}
+          description={m.grantsDesc}
+        >
+          <Checkbox name="GRANT_AUTHORIZATION_CODE" label={m.grantAuthorizationLabel} />
+          <Checkbox name="GRANT_REFRESH_TOKEN" label={m.grantRefreshTokenLabel} />
+          <Checkbox name="GRANT_PASSWORD" label={m.grantPasswordLabel} disabled={!isAdmin} />
+        </Form.Field>
+      )}
+      <Notification small warning content={update ? m.updateWarning : m.rightsWarning} />
       <Form.Field
         name="rights"
         title={sharedMessages.rights}
@@ -259,7 +277,6 @@ const OAuthClientForm = props => {
         rights={rights}
         pseudoRight={pseudoRights}
         entityTypeMessage={sharedMessages.client}
-        rightsWarning
       />
       <SubmitBar>
         <Form.Submit

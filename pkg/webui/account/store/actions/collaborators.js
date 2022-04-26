@@ -49,3 +49,24 @@ export const [
     failure: getCollaboratorsListFailure,
   },
 ] = createPaginationByParentRequestActions(SHARED_NAME)
+
+export const DELETE_COLLABORATOR_BASE = 'DELETE_COLLABORATOR'
+export const [
+  {
+    request: DELETE_COLLABORATOR,
+    success: DELETE_COLLABORATOR_SUCCESS,
+    failure: DELETE_COLLABORATOR_FAILURE,
+  },
+  {
+    request: deleteCollaborator,
+    success: deleteCollaboratorSuccess,
+    failure: deleteCollaboratorFailure,
+  },
+] = createRequestActions(
+  DELETE_COLLABORATOR_BASE,
+  (parentType, parentId) => ({
+    parentType,
+    parentId,
+  }),
+  (parentType, parentId, selector) => ({ selector }),
+)

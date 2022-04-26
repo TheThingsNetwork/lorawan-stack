@@ -152,6 +152,20 @@ Cypress.Commands.add('createUser', user => {
   cy.clearLocalStorage()
 })
 
+// Helper function to create a new client programmatically.
+Cypress.Commands.add('createClient', (client, userId) => {
+  const baseUrl = Cypress.config('baseUrl')
+  const adminApiKey = Cypress.config('adminApiKey')
+  cy.request({
+    method: 'POST',
+    url: `${baseUrl}/api/v3/users/${userId}/clients`,
+    body: { client },
+    headers: {
+      Authorization: `Bearer ${adminApiKey}`,
+    },
+  })
+})
+
 // Helper function to create a new application programmatically.
 Cypress.Commands.add('createApplication', (application, userId) => {
   const baseUrl = Cypress.config('baseUrl')

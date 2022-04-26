@@ -13,10 +13,13 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 import { defineMessages } from 'react-intl'
+import { bindActionCreators } from 'redux'
 
 import Icon from '@ttn-lw/components/icon'
+import Button from '@ttn-lw/components/button'
+import toast from '@ttn-lw/components/toast'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
@@ -25,8 +28,9 @@ import Message from '@ttn-lw/lib/components/message'
 import { getCollaboratorId } from '@ttn-lw/lib/selectors/id'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
-import { getCollaboratorsList } from '@account/store/actions/collaborators'
+import { getCollaboratorsList, deleteCollaborator } from '@account/store/actions/collaborators'
 
 import { selectUserId } from '@account/store/selectors/user'
 import {
@@ -42,10 +46,47 @@ import style from './collaborators-table.styl'
 const m = defineMessages({
   id: 'User / Organization ID',
   addCollaborator: 'Add collaborator',
+  deleteCollaboratorError: 'There was an error and the collaborator could not be deleted',
+  deleteOnlyCollaboratorError:
+    'This collaborator could not be deleted because every client needs at least one collaborator with all rights',
+  removeButtonMessage: 'Remove this collaborator',
+  removeYourselfMessage: 'Remove yourself as a collaborator',
 })
 
 const CollaboratorsTable = props => {
-  const { clientId, currentUserId, ...rest } = props
+  const { clientId, currentUserId, handleDeleteCollaborator, ...rest } = props
+  const dispatch = useDispatch()
+
+  const deleteCollaborator = React.useCallback(
+    async ids => {
+      const collaboratorType = 'user_ids' in ids ? 'user' : 'organization'
+      const collaborator_ids = {
+        [`${collaboratorType}_ids`]: {
+          [`${collaboratorType}_id`]: getCollaboratorId({ ids }),
+        },
+      }
+      const updatedCollaborator = {
+        ids: collaborator_ids,
+      }
+
+      try {
+        await handleDeleteCollaborator(updatedCollaborator)
+        toast({
+          message: sharedMessages.collaboratorDeleteSuccess,
+          type: toast.types.SUCCESS,
+        })
+        dispatch(getCollaboratorsList('client', clientId))
+      } catch (error) {
+        const isOnlyCollaborator = error.details[0].name === 'client_needs_collaborator'
+
+        toast({
+          message: isOnlyCollaborator ? m.deleteOnlyCollaboratorError : m.deleteCollaboratorError,
+          type: toast.types.ERROR,
+        })
+      }
+    },
+    [clientId, dispatch, handleDeleteCollaborator],
+  )
 
   const headers = React.useMemo(() => {
     const baseHeaders = [
@@ -94,10 +135,33 @@ const CollaboratorsTable = props => {
           return <span>{rights.length}</span>
         },
       },
+      {
+        name: 'actions',
+        displayName: sharedMessages.actions,
+        getValue: row => ({
+          id: row.ids,
+          delete: deleteCollaborator.bind(null, row.ids),
+        }),
+        render: details => {
+          const isUser = 'user_ids' in details.id
+          const collaboratorId = getCollaboratorId({ ids: details.id })
+          const isYou = isUser && collaboratorId === currentUserId
+
+          return (
+            <Button
+              type="button"
+              onClick={details.delete}
+              message={isYou ? m.removeYourselfMessage : m.removeButtonMessage}
+              icon="delete"
+              danger
+            />
+          )
+        },
+      },
     ]
 
     return baseHeaders
-  }, [currentUserId])
+  }, [currentUserId, deleteCollaborator])
 
   const baseDataSelector = React.useCallback(
     state => ({
@@ -146,9 +210,27 @@ const CollaboratorsTable = props => {
 CollaboratorsTable.propTypes = {
   clientId: PropTypes.string.isRequired,
   currentUserId: PropTypes.string.isRequired,
+  handleDeleteCollaborator: PropTypes.func.isRequired,
 }
 
-export default connect(state => ({
-  clientId: selectSelectedClientId(state),
-  currentUserId: selectUserId(state),
-}))(CollaboratorsTable)
+export default connect(
+  state => ({
+    clientId: selectSelectedClientId(state),
+    currentUserId: selectUserId(state),
+  }),
+  dispatch => ({
+    ...bindActionCreators(
+      {
+        handleDeleteCollaborator: attachPromise(deleteCollaborator),
+      },
+      dispatch,
+    ),
+  }),
+  (stateProps, dispatchProps, ownProps) => ({
+    ...stateProps,
+    ...dispatchProps,
+    ...ownProps,
+    handleDeleteCollaborator: patch =>
+      dispatchProps.handleDeleteCollaborator(stateProps.clientId, patch),
+  }),
+)(CollaboratorsTable)

@@ -62,7 +62,7 @@ const ClientAdd = props => {
         toast({
           title: ids.client_id,
           message: m.createFailure,
-          type: toast.types.SUCCESS,
+          type: toast.types.ERROR,
         })
       }
     },

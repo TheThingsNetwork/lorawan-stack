@@ -35,7 +35,7 @@ export const selectUserId = state => {
 
 export const selectUserIsAdmin = state => {
   const user = selectUser(state)
-  return user.admin
+  return user.admin || false
 }
 
 export const selectUserName = state => selectUser(state).name
