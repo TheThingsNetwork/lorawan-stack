@@ -64,8 +64,6 @@ jobs:
         run: snapcraft login --with <(printf "$SNAPCRAFT_LOGIN")
       - name: Install Go and Dependencies
         uses: ./.github/actions/install-go-and-deps
-        with:
-          go-version: "~1.17"
       - name: Build Mage
         uses: ./.github/actions/build-mage
       - name: Install Node and Dependencies
