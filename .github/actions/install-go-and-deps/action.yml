@@ -1,0 +1,44 @@
+name: Install Go and Dependencies
+description: Install Go and Go Dependencies
+inputs:
+  go-version:
+    description: Go Version
+    required: true
+    default: '~1.17'
+runs:
+  using: composite
+  steps:
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: ${{ inputs.go-version }}
+    - name: Initialize Go module cache
+      uses: actions/cache@v3
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('go.sum', 'tools/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+    - name: Download Go dependencies
+      shell: bash
+      run: |
+        go mod download
+        pushd tools
+        go mod download
+        popd
+    - name: Initialize Go build cache for pull requests
+      if: ${{ github.event_name == 'pull_request' }}
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/go-build
+        key: ${{ runner.os }}-go-build-refs/heads/${{ github.head_ref }}
+        restore-keys: |
+          ${{ runner.os }}-go-build-refs/heads/${{ github.base_ref }}
+          ${{ runner.os }}-go-build-refs/heads/v
+    - name: Initialize Go build cache
+      if: ${{ github.event_name != 'pull_request' }}
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/go-build
+        key: ${{ runner.os }}-go-build-${{ github.ref }}
+        restore-keys: ${{ runner.os }}-go-build-refs/heads/v
