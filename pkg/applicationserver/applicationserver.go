@@ -638,8 +638,17 @@ func (as *ApplicationServer) downlinkQueueOp(ctx context.Context, ids *ttnpb.End
 			if dev == nil {
 				return nil, nil, errDeviceNotFound.WithAttributes("device_uid", unique.ID(ctx, ids))
 			}
-			if err := as.encodeDownlinks(ctx, dev, link, items); err != nil {
-				return nil, nil, err
+			for _, item := range items {
+				var err error
+				if item.FrmPayload != nil && item.DecodedPayload == nil {
+					err = as.decodeDownlink(ctx, dev, item, link.DefaultFormatters)
+				} else {
+					err = as.encodeDownlink(ctx, dev, item, link.DefaultFormatters)
+				}
+				if err != nil {
+					log.FromContext(ctx).WithError(err).Warn("Encoding or decoding downlink message failed")
+					return nil, nil, err
+				}
 			}
 			registerReceiveDownlinks(ctx, ids, items)
 			mask, err := as.attemptDownlinkQueueOp(ctx, dev, link, peer, downlinkQueueOperation{
