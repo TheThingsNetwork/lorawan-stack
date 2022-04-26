@@ -415,3 +415,12 @@ func (ns *NetworkServer) handleUplinkSubmission(ctx context.Context, item interf
 		return
 	}
 }
+
+func (ns *NetworkServer) networkIdentifiers(ctx context.Context) *ttnpb.NetworkIdentifiers {
+	clusterID := ns.clusterID
+	networkIDs := &ttnpb.NetworkIdentifiers{
+		NetId:     &ns.netID,
+		ClusterId: clusterID,
+	}
+	return networkIDs
+}

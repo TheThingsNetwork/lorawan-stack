@@ -21169,6 +21169,46 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "cluster_address",
+              "description": "Cluster address of the Network Server.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 256
+                  }
+                ]
+              }
+            },
+            {
+              "name": "tenant_address",
+              "description": "Optional tenant address for multi-tenant deployments.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 256
+                  }
+                ]
+              }
             }
           ]
         },

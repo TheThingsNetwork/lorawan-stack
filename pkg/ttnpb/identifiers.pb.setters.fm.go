@@ -638,6 +638,26 @@ func (dst *NetworkIdentifiers) SetFields(src *NetworkIdentifiers, paths ...strin
 				var zero string
 				dst.ClusterId = zero
 			}
+		case "cluster_address":
+			if len(subs) > 0 {
+				return fmt.Errorf("'cluster_address' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ClusterAddress = src.ClusterAddress
+			} else {
+				var zero string
+				dst.ClusterAddress = zero
+			}
+		case "tenant_address":
+			if len(subs) > 0 {
+				return fmt.Errorf("'tenant_address' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.TenantAddress = src.TenantAddress
+			} else {
+				var zero string
+				dst.TenantAddress = zero
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
