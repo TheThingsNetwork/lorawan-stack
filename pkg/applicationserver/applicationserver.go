@@ -787,8 +787,6 @@ func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.Application
 		return true, as.handleUplink(ctx, up.EndDeviceIds, p.UplinkMessage, link)
 	case *ttnpb.ApplicationUp_DownlinkQueueInvalidated:
 		return as.handleDownlinkQueueInvalidated(ctx, up.EndDeviceIds, p.DownlinkQueueInvalidated, link)
-	case *ttnpb.ApplicationUp_DownlinkQueued:
-		return true, as.decryptDownlinkMessage(ctx, up.EndDeviceIds, p.DownlinkQueued, link)
 	case *ttnpb.ApplicationUp_DownlinkSent:
 		return true, as.decryptDownlinkMessage(ctx, up.EndDeviceIds, p.DownlinkSent, link)
 	case *ttnpb.ApplicationUp_DownlinkFailed:
