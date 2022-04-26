@@ -27,15 +27,8 @@ jobs:
         uses: ./.github/actions/install-go-and-deps
         with:
           go-version: "~1.17"
-      - name: Initialize tool binary cache
-        id: tools-cache
-        uses: actions/cache@v2
-        with:
-          path: tools/bin
-          key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
-      - name: Make Mage
-        run: make tools/bin/mage
-        if: steps.tools-cache.outputs.cache-hit != 'true'
+      - name: Build Mage
+        uses: ./.github/actions/build-mage
       - name: Format code
         run: tools/bin/mage go:fmt
       - name: Lint code
@@ -85,15 +78,8 @@ jobs:
         uses: ./.github/actions/install-go-and-deps
         with:
           go-version: "~1.17"
-      - name: Initialize tool binary cache
-        id: tools-cache
-        uses: actions/cache@v2
-        with:
-          path: tools/bin
-          key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
-      - name: Make Mage
-        run: make tools/bin/mage
-        if: steps.tools-cache.outputs.cache-hit != 'true'
+      - name: Build Mage
+        uses: ./.github/actions/build-mage
       - name: Test binary execution
         run: tools/bin/mage go:testBinaries
       - name: Test code
