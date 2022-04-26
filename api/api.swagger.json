@@ -4190,6 +4190,28 @@
             "type": "string"
           },
           {
+            "name": "version_ids.vendor_id",
+            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "version_ids.vendor_profile_id",
+            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "version_ids.serial_number",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "field_mask.paths",
             "description": "The set of field mask paths.",
             "in": "query",
@@ -4256,6 +4278,28 @@
           },
           {
             "name": "version_ids.hardware_version",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "version_ids.vendor_id",
+            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "version_ids.vendor_profile_id",
+            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "version_ids.serial_number",
             "in": "query",
             "required": false,
             "type": "string"
@@ -4332,6 +4376,28 @@
             "type": "string"
           },
           {
+            "name": "version_ids.vendor_id",
+            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "version_ids.vendor_profile_id",
+            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "version_ids.serial_number",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "field_mask.paths",
             "description": "The set of field mask paths.",
             "in": "query",
@@ -4398,6 +4464,28 @@
           },
           {
             "name": "version_ids.hardware_version",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "version_ids.vendor_id",
+            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "version_ids.vendor_profile_id",
+            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "version_ids.serial_number",
             "in": "query",
             "required": false,
             "type": "string"
@@ -4568,6 +4656,28 @@
           },
           {
             "name": "version_ids.band_id",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "version_ids.vendor_id",
+            "description": "VendorID managed by the LoRa Alliance, as defined in TR005.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "version_ids.vendor_profile_id",
+            "description": "ID of the LoRaWAN end device profile assigned by the vendor.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "version_ids.serial_number",
             "in": "query",
             "required": false,
             "type": "string"
@@ -8755,6 +8865,79 @@
         ],
         "tags": [
           "Pba"
+        ]
+      }
+    },
+    "/qr-code/end-devices/parse": {
+      "post": {
+        "summary": "Parse QR Codes of known formats and return the information contained within.",
+        "operationId": "EndDeviceQRCodeGenerator_Parse",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ParseEndDeviceQRCodeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ParseEndDeviceQRCodeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EndDeviceQRCodeGenerator"
+        ]
+      }
+    },
+    "/qr-code/end-devices/{format_id}/parse": {
+      "post": {
+        "summary": "Parse QR Codes of known formats and return the information contained within.",
+        "operationId": "EndDeviceQRCodeGenerator_Parse2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3ParseEndDeviceQRCodeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "format_id",
+            "description": "QR code format identifier.\nEnumerate available formats with the rpc `ListFormats`.\nIf this field is not specified, the server will attempt to parse the data with each known format.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v3ParseEndDeviceQRCodeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "EndDeviceQRCodeGenerator"
         ]
       }
     },
@@ -15188,6 +15371,19 @@
         },
         "band_id": {
           "type": "string"
+        },
+        "vendor_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "VendorID managed by the LoRa Alliance, as defined in TR005."
+        },
+        "vendor_profile_id": {
+          "type": "integer",
+          "format": "int64",
+          "description": "ID of the LoRaWAN end device profile assigned by the vendor."
+        },
+        "serial_number": {
+          "type": "string"
         }
       },
       "description": "Identifies an end device model with version information."
@@ -17664,6 +17860,32 @@
         "localization": {
           "type": "boolean",
           "description": "Forward gateway location, RSSI, SNR and fine timestamp."
+        }
+      }
+    },
+    "v3ParseEndDeviceQRCodeRequest": {
+      "type": "object",
+      "properties": {
+        "format_id": {
+          "type": "string",
+          "description": "QR code format identifier.\nEnumerate available formats with the rpc `ListFormats`.\nIf this field is not specified, the server will attempt to parse the data with each known format."
+        },
+        "qr_code": {
+          "type": "string",
+          "format": "byte",
+          "description": "Raw QR code contents."
+        }
+      }
+    },
+    "v3ParseEndDeviceQRCodeResponse": {
+      "type": "object",
+      "properties": {
+        "format_id": {
+          "type": "string",
+          "description": "Identifier of the format used to successfully parse the QR code data."
+        },
+        "end_device_template": {
+          "$ref": "#/definitions/v3EndDeviceTemplate"
         }
       }
     },

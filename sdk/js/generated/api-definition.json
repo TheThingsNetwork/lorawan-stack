@@ -839,6 +839,9 @@
         "up.uplink_message.version_ids.firmware_version",
         "up.uplink_message.version_ids.hardware_version",
         "up.uplink_message.version_ids.model_id",
+        "up.uplink_message.version_ids.serial_number",
+        "up.uplink_message.version_ids.vendor_id",
+        "up.uplink_message.version_ids.vendor_profile_id",
         "up.uplink_message.app_s_key",
         "up.uplink_message.app_s_key.encrypted_key",
         "up.uplink_message.app_s_key.kek_label",
@@ -889,6 +892,9 @@
         "up.uplink_message.version_ids.firmware_version",
         "up.uplink_message.version_ids.hardware_version",
         "up.uplink_message.version_ids.model_id",
+        "up.uplink_message.version_ids.serial_number",
+        "up.uplink_message.version_ids.vendor_id",
+        "up.uplink_message.version_ids.vendor_profile_id",
         "up.join_accept.app_s_key",
         "up.join_accept.app_s_key.encrypted_key",
         "up.join_accept.app_s_key.kek_label",
@@ -5205,6 +5211,25 @@
           "pattern": "/qr-codes/end-devices",
           "body": "*",
           "parameters": []
+        }
+      ]
+    },
+    "Parse": {
+      "file": "lorawan-stack/api/qrcodegenerator.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/qr-code/end-devices/parse",
+          "body": "*",
+          "parameters": []
+        },
+        {
+          "method": "post",
+          "pattern": "/qr-code/end-devices/{format_id}/parse",
+          "body": "*",
+          "parameters": [
+            "format_id"
+          ]
         }
       ]
     }

@@ -45,6 +45,7 @@ For details about compatibility between different releases, see the **Commitment
   - `mac-settings.adr.mode.dynamic.min-nb-trans` and `mac-settings.adr.mode.dynamic.max-nb-trans` have similar behavior, but for NbTrans.
   - `mac-settings.adr.mode.dynamic.margin` may be used to provide the margin of the ADR algorithm. It replaces the old `adr-margin` setting.
   - `use-adr` and `adr-margin` are still supported, but deprecated. Any future API usage should instead use the `mac-settings.adr` settings.
+- Service to parse QR codes and return the data within.
 
 ### Changed
 

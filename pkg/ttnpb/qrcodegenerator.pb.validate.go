@@ -581,6 +581,211 @@ var _ interface {
 	ErrorName() string
 } = GenerateQRCodeResponseValidationError{}
 
+// ValidateFields checks the field values on ParseEndDeviceQRCodeRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *ParseEndDeviceQRCodeRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ParseEndDeviceQRCodeRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "format_id":
+
+			if utf8.RuneCountInString(m.GetFormatId()) > 36 {
+				return ParseEndDeviceQRCodeRequestValidationError{
+					field:  "format_id",
+					reason: "value length must be at most 36 runes",
+				}
+			}
+
+			if !_ParseEndDeviceQRCodeRequest_FormatId_Pattern.MatchString(m.GetFormatId()) {
+				return ParseEndDeviceQRCodeRequestValidationError{
+					field:  "format_id",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$\"",
+				}
+			}
+
+		case "qr_code":
+
+			if l := len(m.GetQrCode()); l < 10 || l > 1024 {
+				return ParseEndDeviceQRCodeRequestValidationError{
+					field:  "qr_code",
+					reason: "value length must be between 10 and 1024 bytes, inclusive",
+				}
+			}
+
+		default:
+			return ParseEndDeviceQRCodeRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ParseEndDeviceQRCodeRequestValidationError is the validation error returned
+// by ParseEndDeviceQRCodeRequest.ValidateFields if the designated constraints
+// aren't met.
+type ParseEndDeviceQRCodeRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ParseEndDeviceQRCodeRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ParseEndDeviceQRCodeRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ParseEndDeviceQRCodeRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ParseEndDeviceQRCodeRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ParseEndDeviceQRCodeRequestValidationError) ErrorName() string {
+	return "ParseEndDeviceQRCodeRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ParseEndDeviceQRCodeRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sParseEndDeviceQRCodeRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ParseEndDeviceQRCodeRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ParseEndDeviceQRCodeRequestValidationError{}
+
+var _ParseEndDeviceQRCodeRequest_FormatId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$")
+
+// ValidateFields checks the field values on ParseEndDeviceQRCodeResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *ParseEndDeviceQRCodeResponse) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ParseEndDeviceQRCodeResponseFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "format_id":
+			// no validation rules for FormatId
+		case "end_device_template":
+
+			if v, ok := interface{}(m.GetEndDeviceTemplate()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ParseEndDeviceQRCodeResponseValidationError{
+						field:  "end_device_template",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return ParseEndDeviceQRCodeResponseValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ParseEndDeviceQRCodeResponseValidationError is the validation error returned
+// by ParseEndDeviceQRCodeResponse.ValidateFields if the designated
+// constraints aren't met.
+type ParseEndDeviceQRCodeResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ParseEndDeviceQRCodeResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ParseEndDeviceQRCodeResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ParseEndDeviceQRCodeResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ParseEndDeviceQRCodeResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ParseEndDeviceQRCodeResponseValidationError) ErrorName() string {
+	return "ParseEndDeviceQRCodeResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ParseEndDeviceQRCodeResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sParseEndDeviceQRCodeResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ParseEndDeviceQRCodeResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ParseEndDeviceQRCodeResponseValidationError{}
+
 // ValidateFields checks the field values on
 // GenerateEndDeviceQRCodeRequest_Image with the rules defined in the proto
 // definition for this message. If any rules are violated, an error is returned.

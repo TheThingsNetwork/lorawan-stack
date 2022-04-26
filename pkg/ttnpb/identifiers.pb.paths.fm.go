@@ -101,6 +101,9 @@ var EndDeviceVersionIdentifiersFieldPathsNested = []string{
 	"firmware_version",
 	"hardware_version",
 	"model_id",
+	"serial_number",
+	"vendor_id",
+	"vendor_profile_id",
 }
 
 var EndDeviceVersionIdentifiersFieldPathsTopLevel = []string{
@@ -109,6 +112,9 @@ var EndDeviceVersionIdentifiersFieldPathsTopLevel = []string{
 	"firmware_version",
 	"hardware_version",
 	"model_id",
+	"serial_number",
+	"vendor_id",
+	"vendor_profile_id",
 }
 var NetworkIdentifiersFieldPathsNested = []string{
 	"cluster_address",

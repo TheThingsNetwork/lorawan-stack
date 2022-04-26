@@ -3536,33 +3536,6 @@
       "file": "ttjs.go"
     }
   },
-  "error:pkg/deviceclaimingserver/enddevices/ttjs:no_join_eui": {
-    "translations": {
-      "en": "failed to extract JoinEUI from request"
-    },
-    "description": {
-      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
-      "file": "ttjs.go"
-    }
-  },
-  "error:pkg/deviceclaimingserver/enddevices/ttjs:parse_qr_code": {
-    "translations": {
-      "en": "parse QR code failed"
-    },
-    "description": {
-      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
-      "file": "ttjs.go"
-    }
-  },
-  "error:pkg/deviceclaimingserver/enddevices/ttjs:qr_code_data": {
-    "translations": {
-      "en": "invalid QR code data"
-    },
-    "description": {
-      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
-      "file": "ttjs.go"
-    }
-  },
   "error:pkg/deviceclaimingserver/enddevices/ttjs:unauthorized": {
     "translations": {
       "en": "client API Key missing or invalid"
@@ -3599,36 +3572,36 @@
       "file": "enddevices.go"
     }
   },
-  "error:pkg/deviceclaimingserver/enddevices:no_join_eui": {
+  "error:pkg/deviceclaimingserver:method_unavailable": {
+    "translations": {
+      "en": "method unavailable"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_end_devices.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:no_join_eui": {
     "translations": {
       "en": "failed to extract JoinEUI from request"
     },
     "description": {
-      "package": "pkg/deviceclaimingserver/enddevices",
-      "file": "enddevices.go"
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_end_devices.go"
     }
   },
-  "error:pkg/deviceclaimingserver/enddevices:parse_qr_code": {
+  "error:pkg/deviceclaimingserver:parse_qr_code": {
     "translations": {
       "en": "parse QR code failed"
     },
     "description": {
-      "package": "pkg/deviceclaimingserver/enddevices",
-      "file": "enddevices.go"
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_end_devices.go"
     }
   },
-  "error:pkg/deviceclaimingserver/enddevices:qr_code_data": {
+  "error:pkg/deviceclaimingserver:qr_code_data": {
     "translations": {
       "en": "invalid QR code data"
-    },
-    "description": {
-      "package": "pkg/deviceclaimingserver/enddevices",
-      "file": "enddevices.go"
-    }
-  },
-  "error:pkg/deviceclaimingserver:method_unavailable": {
-    "translations": {
-      "en": "method available"
     },
     "description": {
       "package": "pkg/deviceclaimingserver",
@@ -8045,40 +8018,49 @@
       "file": "provisioning.go"
     }
   },
-  "error:pkg/qrcode:character": {
+  "error:pkg/qrcodegenerator/qrcode/enddevices:character": {
     "translations": {
       "en": "invalid character `{r}`"
     },
     "description": {
-      "package": "pkg/qrcode",
-      "file": "qrcode.go"
+      "package": "pkg/qrcodegenerator/qrcode/enddevices",
+      "file": "enddevices.go"
     }
   },
-  "error:pkg/qrcode:format": {
+  "error:pkg/qrcodegenerator/qrcode/enddevices:format": {
     "translations": {
       "en": "invalid format"
     },
     "description": {
-      "package": "pkg/qrcode",
-      "file": "qrcode.go"
+      "package": "pkg/qrcodegenerator/qrcode/enddevices",
+      "file": "enddevices.go"
     }
   },
-  "error:pkg/qrcode:no_dev_eui": {
+  "error:pkg/qrcodegenerator/qrcode/enddevices:no_dev_eui": {
     "translations": {
       "en": "no DevEUI"
     },
     "description": {
-      "package": "pkg/qrcode",
-      "file": "qrcode.go"
+      "package": "pkg/qrcodegenerator/qrcode/enddevices",
+      "file": "enddevices.go"
     }
   },
-  "error:pkg/qrcode:no_join_eui": {
+  "error:pkg/qrcodegenerator/qrcode/enddevices:no_join_eui": {
     "translations": {
       "en": "no JoinEUI"
     },
     "description": {
-      "package": "pkg/qrcode",
-      "file": "qrcode.go"
+      "package": "pkg/qrcodegenerator/qrcode/enddevices",
+      "file": "enddevices.go"
+    }
+  },
+  "error:pkg/qrcodegenerator/qrcode/enddevices:unknown_format": {
+    "translations": {
+      "en": "format unknown"
+    },
+    "description": {
+      "package": "pkg/qrcodegenerator/qrcode/enddevices",
+      "file": "enddevices.go"
     }
   },
   "error:pkg/qrcodegenerator:format_not_found": {
@@ -8088,6 +8070,15 @@
     "description": {
       "package": "pkg/qrcodegenerator",
       "file": "qrcodegenerator.go"
+    }
+  },
+  "error:pkg/qrcodegenerator:unauthenticated": {
+    "translations": {
+      "en": "call was not authenticated"
+    },
+    "description": {
+      "package": "pkg/qrcodegenerator",
+      "file": "grpc_end_devices.go"
     }
   },
   "error:pkg/ratelimit:invalid_rate": {

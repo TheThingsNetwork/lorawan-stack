@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode/enddevices"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
 )
@@ -33,6 +34,8 @@ type QRCodeGenerator struct {
 	*component.Component
 	ctx context.Context
 
+	endDevices *enddevices.Server
+
 	grpc struct {
 		endDeviceQRCodeGenerator *endDeviceQRCodeGeneratorServer
 	}
@@ -41,15 +44,32 @@ type QRCodeGenerator struct {
 var errFormatNotFound = errors.DefineNotFound("format_not_found", "format `{id}` not found")
 
 // New returns a new *QRCodeGenerator.
-func New(c *component.Component, conf *Config) (*QRCodeGenerator, error) {
+func New(c *component.Component, conf *Config, opts ...Option) (*QRCodeGenerator, error) {
+	ctx := log.NewContextWithField(c.Context(), "namespace", "qrcodegenerator")
 	qrg := &QRCodeGenerator{
 		Component: c,
-		ctx:       log.NewContextWithField(c.Context(), "namespace", "qrcodegenerator"),
+		ctx:       ctx,
 	}
 	qrg.grpc.endDeviceQRCodeGenerator = &endDeviceQRCodeGeneratorServer{QRG: qrg}
+	qrg.endDevices = enddevices.New(ctx)
 
 	c.RegisterGRPC(qrg)
+
+	for _, opt := range opts {
+		opt(qrg)
+	}
+
 	return qrg, nil
+}
+
+// Option configures QRCodeGenerator.
+type Option func(*QRCodeGenerator)
+
+// WithEndDeviceFormat configures QRCodeGenerator with an EndDeviceFormat.
+func WithEndDeviceFormat(id string, f enddevices.Format) Option {
+	return func(qrg *QRCodeGenerator) {
+		qrg.endDevices.RegisterEndDeviceFormat(id, f)
+	}
 }
 
 // Context returns the context of the QR Code Generator.

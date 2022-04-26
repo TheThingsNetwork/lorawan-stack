@@ -29,7 +29,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	"go.thethings.network/lorawan-stack/v3/pkg/qrcode"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -42,7 +41,7 @@ type EndDeviceClaimer interface {
 	// SupportsJoinEUI returns whether the Join Server supports this JoinEUI.
 	SupportsJoinEUI(joinEUI types.EUI64) bool
 	// Claim claims an End Device.
-	Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest) (*ttnpb.EndDeviceIdentifiers, error)
+	Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode, networkServerAddress string) error
 	// GetClaimStatus returns the claim status an End Device.
 	GetClaimStatus(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*ttnpb.GetClaimStatusResponse, error)
 	// Unclaim releases the claim on an End Device.
@@ -143,9 +142,6 @@ func WithDeviceRegistry(reg ttnpb.EndDeviceRegistryClient) Option {
 }
 
 var (
-	errParseQRCode          = errors.Define("parse_qr_code", "parse QR code failed")
-	errQRCodeData           = errors.DefineInvalidArgument("qr_code_data", "invalid QR code data")
-	errNoJoinEUI            = errors.DefineInvalidArgument("no_join_eui", "failed to extract JoinEUI from request")
 	errNoEUI                = errors.DefineInvalidArgument("no_eui", "DevEUI/JoinEUI not found in request")
 	errClaimingNotSupported = errors.DefineAborted("claiming_not_supported", "claiming not supported for JoinEUI `{eui}`")
 )
@@ -165,38 +161,12 @@ func (upstream *Upstream) joinEUIClaimer(ctx context.Context, joinEUI types.EUI6
 }
 
 // Claim implements EndDeviceClaimingServer.
-func (upstream *Upstream) Claim(ctx context.Context, req *ttnpb.ClaimEndDeviceRequest) (ids *ttnpb.EndDeviceIdentifiers, err error) {
-	// Check that the collaborator has necessary rights before attempting to claim it on an upstream.
-	// Since this is part of the create device flow, we check that the collaborator has the rights to create devices in the application.
-	targetAppID := req.GetTargetApplicationIds()
-	if err := rights.RequireApplication(ctx, *targetAppID,
-		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
-	); err != nil {
-		return nil, err
-	}
-
-	var joinEUI types.EUI64
-	if authenticatedIDs := req.GetAuthenticatedIdentifiers(); authenticatedIDs != nil {
-		joinEUI = req.GetAuthenticatedIdentifiers().JoinEui
-	} else if qrCode := req.GetQrCode(); qrCode != nil {
-		data, err := qrcode.Parse(qrCode)
-		if err != nil {
-			return nil, errParseQRCode.WithCause(err)
-		}
-		authIDs, ok := data.(qrcode.AuthenticatedEndDeviceIdentifiers)
-		if !ok {
-			return nil, errQRCodeData.New()
-		}
-		joinEUI, _, _ = authIDs.AuthenticatedEndDeviceIdentifiers()
-	} else {
-		return nil, errNoJoinEUI.New()
-	}
-
+func (upstream *Upstream) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode, networkServerAddress string) error {
 	claimer := upstream.joinEUIClaimer(ctx, joinEUI)
 	if claimer == nil {
-		return nil, errClaimingNotSupported.WithAttributes("eui", joinEUI)
+		return errClaimingNotSupported.WithAttributes("eui", joinEUI)
 	}
-	return claimer.Claim(ctx, req)
+	return claimer.Claim(ctx, joinEUI, devEUI, claimAuthenticationCode, networkServerAddress)
 }
 
 // Unclaim implements EndDeviceClaimingServer.

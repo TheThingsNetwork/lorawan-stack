@@ -559,6 +559,8 @@
   - [Message `GenerateEndDeviceQRCodeRequest.Image`](#ttn.lorawan.v3.GenerateEndDeviceQRCodeRequest.Image)
   - [Message `GenerateQRCodeResponse`](#ttn.lorawan.v3.GenerateQRCodeResponse)
   - [Message `GetQRCodeFormatRequest`](#ttn.lorawan.v3.GetQRCodeFormatRequest)
+  - [Message `ParseEndDeviceQRCodeRequest`](#ttn.lorawan.v3.ParseEndDeviceQRCodeRequest)
+  - [Message `ParseEndDeviceQRCodeResponse`](#ttn.lorawan.v3.ParseEndDeviceQRCodeResponse)
   - [Message `QRCodeFormat`](#ttn.lorawan.v3.QRCodeFormat)
   - [Message `QRCodeFormats`](#ttn.lorawan.v3.QRCodeFormats)
   - [Message `QRCodeFormats.FormatsEntry`](#ttn.lorawan.v3.QRCodeFormats.FormatsEntry)
@@ -4607,6 +4609,9 @@ Identifies an end device model with version information.
 | `hardware_version` | [`string`](#string) |  |  |
 | `firmware_version` | [`string`](#string) |  |  |
 | `band_id` | [`string`](#string) |  |  |
+| `vendor_id` | [`uint32`](#uint32) |  | VendorID managed by the LoRa Alliance, as defined in TR005. |
+| `vendor_profile_id` | [`uint32`](#uint32) |  | ID of the LoRaWAN end device profile assigned by the vendor. |
+| `serial_number` | [`string`](#string) |  |  |
 
 #### Field Rules
 
@@ -4617,6 +4622,7 @@ Identifies an end device model with version information.
 | `hardware_version` | <p>`string.max_len`: `32`</p> |
 | `firmware_version` | <p>`string.max_len`: `32`</p> |
 | `band_id` | <p>`string.max_len`: `32`</p> |
+| `serial_number` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.EntityIdentifiers">Message `EntityIdentifiers`</a>
 
@@ -7928,6 +7934,27 @@ The Pba service allows clients to manage peering through Packet Broker.
 | ----- | ----------- |
 | `format_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
+### <a name="ttn.lorawan.v3.ParseEndDeviceQRCodeRequest">Message `ParseEndDeviceQRCodeRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `format_id` | [`string`](#string) |  | QR code format identifier. Enumerate available formats with the rpc `ListFormats`. If this field is not specified, the server will attempt to parse the data with each known format. |
+| `qr_code` | [`bytes`](#bytes) |  | Raw QR code contents. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `format_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
+| `qr_code` | <p>`bytes.min_len`: `10`</p><p>`bytes.max_len`: `1024`</p> |
+
+### <a name="ttn.lorawan.v3.ParseEndDeviceQRCodeResponse">Message `ParseEndDeviceQRCodeResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `format_id` | [`string`](#string) |  | Identifier of the format used to successfully parse the QR code data. |
+| `end_device_template` | [`EndDeviceTemplate`](#ttn.lorawan.v3.EndDeviceTemplate) |  |  |
+
 ### <a name="ttn.lorawan.v3.QRCodeFormat">Message `QRCodeFormat`</a>
 
 | Field | Type | Label | Description |
@@ -7969,6 +7996,7 @@ The Pba service allows clients to manage peering through Packet Broker.
 | `GetFormat` | [`GetQRCodeFormatRequest`](#ttn.lorawan.v3.GetQRCodeFormatRequest) | [`QRCodeFormat`](#ttn.lorawan.v3.QRCodeFormat) | Return the QR code format. |
 | `ListFormats` | [`.google.protobuf.Empty`](#google.protobuf.Empty) | [`QRCodeFormats`](#ttn.lorawan.v3.QRCodeFormats) | Returns the supported formats. |
 | `Generate` | [`GenerateEndDeviceQRCodeRequest`](#ttn.lorawan.v3.GenerateEndDeviceQRCodeRequest) | [`GenerateQRCodeResponse`](#ttn.lorawan.v3.GenerateQRCodeResponse) | Generates a QR code. |
+| `Parse` | [`ParseEndDeviceQRCodeRequest`](#ttn.lorawan.v3.ParseEndDeviceQRCodeRequest) | [`ParseEndDeviceQRCodeResponse`](#ttn.lorawan.v3.ParseEndDeviceQRCodeResponse) | Parse QR Codes of known formats and return the information contained within. |
 
 #### HTTP bindings
 
@@ -7977,6 +8005,8 @@ The Pba service allows clients to manage peering through Packet Broker.
 | `GetFormat` | `GET` | `/api/v3/qr-codes/end-devices/formats/{format_id}` |  |
 | `ListFormats` | `GET` | `/api/v3/qr-codes/end-devices/formats` |  |
 | `Generate` | `POST` | `/api/v3/qr-codes/end-devices` | `*` |
+| `Parse` | `POST` | `/api/v3/qr-code/end-devices/parse` | `*` |
+| `Parse` | `POST` | `/api/v3/qr-code/end-devices/{format_id}/parse` | `*` |
 
 ## <a name="lorawan-stack/api/regional.proto">File `lorawan-stack/api/regional.proto`</a>
 

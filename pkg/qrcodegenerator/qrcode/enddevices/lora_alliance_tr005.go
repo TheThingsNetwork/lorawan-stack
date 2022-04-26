@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package qrcode
+package enddevices
 
 import (
 	"bytes"
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"strings"
@@ -23,6 +24,10 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+)
+
+const (
+	formatIDLoRaAllianceTR005 = "tr005"
 )
 
 // LoRaAllianceTR005 is the LoRa Alliance defined format in Technical Recommendation TR005.
@@ -143,14 +148,52 @@ func (m *LoRaAllianceTR005) UnmarshalText(text []byte) error {
 	return m.Validate()
 }
 
-// AuthenticatedEndDeviceIdentifiers implements the AuthenticatedEndDeviceIdentifiers interface.
-func (m *LoRaAllianceTR005) AuthenticatedEndDeviceIdentifiers() (joinEUI, devEUI types.EUI64, authenticationCode string) {
-	return m.JoinEUI, m.DevEUI, m.OwnerToken
+// FormatID implements the Data interface.
+func (m *LoRaAllianceTR005) FormatID() string {
+	return formatIDLoRaAllianceTR005
 }
 
-type loRaAllianceTR005Format struct{}
+// EndDeviceTemplate implements the Data interface.
+func (m *LoRaAllianceTR005) EndDeviceTemplate() *ttnpb.EndDeviceTemplate {
+	paths := []string{
+		"ids",
+		"claim_authentication_code",
+	}
+	var (
+		vendorID, vendorProfileID uint16
+	)
+	if m.VendorID != [2]byte{} {
+		vendorID = binary.BigEndian.Uint16(m.VendorID[:])
+	}
+	if m.ModelID != [2]byte{} {
+		vendorProfileID = binary.BigEndian.Uint16(m.ModelID[:])
+	}
+	return &ttnpb.EndDeviceTemplate{
+		EndDevice: &ttnpb.EndDevice{
+			Ids: &ttnpb.EndDeviceIdentifiers{
+				DevEui:  &m.DevEUI,
+				JoinEui: &m.JoinEUI,
+			},
+			ClaimAuthenticationCode: &ttnpb.EndDeviceAuthenticationCode{
+				Value: m.OwnerToken,
+			},
+			VersionIds: &ttnpb.EndDeviceVersionIdentifiers{
+				VendorId:        uint32(vendorID),
+				VendorProfileId: uint32(vendorProfileID),
+				SerialNumber:    m.SerialNumber,
+			},
+		},
+		FieldMask: &pbtypes.FieldMask{
+			Paths: paths,
+		},
+	}
+}
 
-func (loRaAllianceTR005Format) Format() *ttnpb.QRCodeFormat {
+// LoRaAllianceTR005Format implements the LoRa Alliance TR005 Format.
+type LoRaAllianceTR005Format struct{}
+
+// Format implements the Format interface.
+func (LoRaAllianceTR005Format) Format() *ttnpb.QRCodeFormat {
 	return &ttnpb.QRCodeFormat{
 		Name:        "LoRa Alliance TR005",
 		Description: "Standard QR code format defined by LoRa Alliance.",
@@ -164,10 +207,12 @@ func (loRaAllianceTR005Format) Format() *ttnpb.QRCodeFormat {
 	}
 }
 
-func (loRaAllianceTR005Format) New() EndDeviceData {
-	return new(LoRaAllianceTR005)
+// ID is the identifier of the format as a string.
+func (LoRaAllianceTR005Format) ID() string {
+	return formatIDLoRaAllianceTR005
 }
 
-func init() {
-	RegisterEndDeviceFormat("tr005", new(loRaAllianceTR005Format))
+// New implements the Format interface.
+func (LoRaAllianceTR005Format) New() Data {
+	return new(LoRaAllianceTR005)
 }

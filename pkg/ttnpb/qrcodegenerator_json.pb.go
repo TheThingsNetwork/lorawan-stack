@@ -80,3 +80,57 @@ func (x *GenerateEndDeviceQRCodeRequest) UnmarshalProtoJSON(s *jsonplugin.Unmars
 func (x *GenerateEndDeviceQRCodeRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
+
+// MarshalProtoJSON marshals the ParseEndDeviceQRCodeResponse message to JSON.
+func (x *ParseEndDeviceQRCodeResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.FormatId != "" || s.HasField("format_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("format_id")
+		s.WriteString(x.FormatId)
+	}
+	if x.EndDeviceTemplate != nil || s.HasField("end_device_template") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("end_device_template")
+		x.EndDeviceTemplate.MarshalProtoJSON(s.WithField("end_device_template"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the ParseEndDeviceQRCodeResponse to JSON.
+func (x ParseEndDeviceQRCodeResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
+// UnmarshalProtoJSON unmarshals the ParseEndDeviceQRCodeResponse message from JSON.
+func (x *ParseEndDeviceQRCodeResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "format_id", "formatId":
+			s.AddField("format_id")
+			x.FormatId = s.ReadString()
+		case "end_device_template", "endDeviceTemplate":
+			if s.ReadNil() {
+				x.EndDeviceTemplate = nil
+				return
+			}
+			x.EndDeviceTemplate = &EndDeviceTemplate{}
+			x.EndDeviceTemplate.UnmarshalProtoJSON(s.WithField("end_device_template", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the ParseEndDeviceQRCodeResponse from JSON.
+func (x *ParseEndDeviceQRCodeResponse) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}

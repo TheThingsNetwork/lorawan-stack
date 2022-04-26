@@ -21,7 +21,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
-	"go.thethings.network/lorawan-stack/v3/pkg/qrcode"
+	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode/enddevices"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -51,6 +51,12 @@ func (m *mock) Encode(dev *ttnpb.EndDevice) error {
 	return nil
 }
 
+func (*mock) EndDeviceTemplate() *ttnpb.EndDeviceTemplate { return nil }
+
+func (*mock) FormatID() string {
+	return "test"
+}
+
 func (m mock) MarshalText() ([]byte, error) {
 	return []byte(fmt.Sprintf("%s:%s", m.ids.JoinEui, m.ids.DevEui)), nil
 }
@@ -69,6 +75,6 @@ func (mockFormat) Format() *ttnpb.QRCodeFormat {
 	}
 }
 
-func (mockFormat) New() qrcode.EndDeviceData {
+func (mockFormat) New() enddevices.Data {
 	return new(mock)
 }

@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package qrcode_test
+package enddevices_test
 
 import (
+	"context"
 	"strconv"
 	"testing"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
-	. "go.thethings.network/lorawan-stack/v3/pkg/qrcode"
+	. "go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode/enddevices"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -31,18 +32,21 @@ func eui64Ptr(v types.EUI64) *types.EUI64 { return &v }
 
 func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 	for i, tc := range []struct {
-		Data []byte
+		FormatID string
+		Data     []byte
 		ExpectedJoinEUI,
 		ExpectedDevEUI types.EUI64
 		ExpectedAuthenticationCode string
 	}{
 		{
+			FormatID:                   "tr005draft3",
 			Data:                       []byte("URN:DEV:LW:42FFFFFFFFFFFFFF_4242FFFFFFFFFFFF_42FFFF42_V0102"),
 			ExpectedJoinEUI:            types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ExpectedDevEUI:             types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ExpectedAuthenticationCode: "0102",
 		},
 		{
+			FormatID:                   "tr005draft2",
 			Data:                       []byte("URN:LW:DP:42FFFFFFFFFFFFFF:4242FFFFFFFFFFFF:42FFFF42:%V0102"),
 			ExpectedJoinEUI:            types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
 			ExpectedDevEUI:             types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
@@ -52,16 +56,24 @@ func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			a := assertions.New(t)
 
-			data := test.Must(Parse(tc.Data)).(Data)
-			intf, ok := data.(AuthenticatedEndDeviceIdentifiers)
-			if !ok {
-				t.Fatalf("Expected %T to implement AuthenticatedEndDeviceIdentifiers", data)
-			}
+			qrCode := New(context.Background())
 
-			joinEUI, devEUI, authCode := intf.AuthenticatedEndDeviceIdentifiers()
-			a.So(joinEUI, should.Resemble, tc.ExpectedJoinEUI)
-			a.So(devEUI, should.Resemble, tc.ExpectedDevEUI)
-			a.So(authCode, should.Resemble, tc.ExpectedAuthenticationCode)
+			d, err := qrCode.Parse("", tc.Data)
+			data := test.Must(d, err).(Data)
+
+			edt := data.EndDeviceTemplate()
+			a.So(edt, should.NotBeNil)
+			a.So(data.FormatID(), should.Equal, tc.FormatID)
+			endDevice := edt.GetEndDevice()
+
+			a.So(endDevice, should.NotBeEmpty)
+			ids := endDevice.GetIds()
+			a.So(ids, should.NotBeEmpty)
+			a.So(*ids.JoinEui, should.Resemble, tc.ExpectedJoinEUI)
+			a.So(*ids.DevEui, should.Resemble, tc.ExpectedDevEUI)
+			a.So(endDevice.ClaimAuthenticationCode, should.NotBeEmpty)
+			a.So(endDevice.ClaimAuthenticationCode.Value, should.Resemble, tc.ExpectedAuthenticationCode)
+
 		})
 	}
 }
@@ -69,10 +81,12 @@ func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 type mock struct {
 }
 
-func (mock) Validate() error                { return nil }
-func (*mock) Encode(*ttnpb.EndDevice) error { return nil }
-func (mock) MarshalText() ([]byte, error)   { return nil, nil }
-func (*mock) UnmarshalText([]byte) error    { return nil }
+func (mock) Validate() error                              { return nil }
+func (*mock) Encode(*ttnpb.EndDevice) error               { return nil }
+func (mock) MarshalText() ([]byte, error)                 { return nil, nil }
+func (*mock) UnmarshalText([]byte) error                  { return nil }
+func (*mock) EndDeviceTemplate() *ttnpb.EndDeviceTemplate { return nil }
+func (*mock) FormatID() string                            { return "mock" }
 
 type mockFormat struct {
 }
@@ -86,22 +100,28 @@ func (mockFormat) Format() *ttnpb.QRCodeFormat {
 	}
 }
 
-func (mockFormat) New() EndDeviceData {
+func (mockFormat) New() Data {
 	return new(mock)
+}
+
+func (mockFormat) ID() string {
+	return "mock"
 }
 
 func TestQRCodeFormats(t *testing.T) {
 	a := assertions.New(t)
+	qrCode := New(context.Background())
 
-	a.So(GetEndDeviceFormat("mock"), should.BeNil)
+	a.So(qrCode.GetEndDeviceFormat("mock"), should.BeNil)
 
-	RegisterEndDeviceFormat("mock", new(mockFormat))
-	f := GetEndDeviceFormat("mock")
+	mockFormat := new(mockFormat)
+	qrCode.RegisterEndDeviceFormat(mockFormat.ID(), mockFormat)
+	f := qrCode.GetEndDeviceFormat("mock")
 	if !a.So(f, should.NotBeNil) {
 		t.FailNow()
 	}
 	a.So(f.Format().Name, should.Equal, "test")
 
-	fs := GetEndDeviceFormats()
+	fs := qrCode.GetEndDeviceFormats()
 	a.So(fs["mock"], should.Equal, f)
 }
