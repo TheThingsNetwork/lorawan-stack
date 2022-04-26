@@ -33,16 +33,6 @@ var (
 	errNoFPort   = errors.DefineInvalidArgument("no_f_port", "no FPort")
 )
 
-func (as *ApplicationServer) encodeDownlinks(ctx context.Context, dev *ttnpb.EndDevice, link *ttnpb.ApplicationLink, items []*ttnpb.ApplicationDownlink) error {
-	for _, item := range items {
-		if err := as.encodeDownlink(ctx, dev, item, link.DefaultFormatters); err != nil {
-			log.FromContext(ctx).WithError(err).Warn("Encoding and encryption of downlink message failed; drop item")
-			return err
-		}
-	}
-	return nil
-}
-
 func (as *ApplicationServer) encodeDownlink(ctx context.Context, dev *ttnpb.EndDevice, downlink *ttnpb.ApplicationDownlink, defaultFormatters *ttnpb.MessagePayloadFormatters) error {
 	if downlink.FrmPayload == nil && downlink.DecodedPayload == nil {
 		return errNoPayload.New()

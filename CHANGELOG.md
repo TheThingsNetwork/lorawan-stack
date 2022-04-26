@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- Application Server now decodes downlink if a downlink decoder is present and binary payload is scheduled.
+
 ### Deprecated
 
 ### Removed

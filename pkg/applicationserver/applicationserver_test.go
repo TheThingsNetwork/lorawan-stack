@@ -1234,46 +1234,6 @@ func TestApplicationServer(t *testing.T) {
 						},
 					},
 					{
-						Name: "RegisteredDevice/DownlinkMessage/Queued",
-						IDs:  registeredDevice.Ids,
-						Message: &ttnpb.ApplicationUp{
-							EndDeviceIds: withDevAddr(registeredDevice.Ids, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
-							Up: &ttnpb.ApplicationUp_DownlinkQueued{
-								DownlinkQueued: &ttnpb.ApplicationDownlink{
-									SessionKeyId: []byte{0x33},
-									FPort:        42,
-									FCnt:         42,
-									FrmPayload:   []byte{0x50, 0xd, 0x40, 0xd5},
-								},
-							},
-						},
-						AssertUp: func(t *testing.T, up *ttnpb.ApplicationUp) {
-							a := assertions.New(t)
-							a.So(up, should.Resemble, &ttnpb.ApplicationUp{
-								EndDeviceIds: withDevAddr(registeredDevice.Ids, types.DevAddr{0x33, 0x33, 0x33, 0x33}),
-								Up: &ttnpb.ApplicationUp_DownlinkQueued{
-									DownlinkQueued: &ttnpb.ApplicationDownlink{
-										SessionKeyId: []byte{0x33},
-										FPort:        42,
-										FCnt:         42,
-										FrmPayload:   []byte{0x1, 0x1, 0x1, 0x1},
-										DecodedPayload: &pbtypes.Struct{
-											Fields: map[string]*pbtypes.Value{
-												"sum": {
-													Kind: &pbtypes.Value_NumberValue{
-														NumberValue: 4, // Payload formatter sums the bytes in FRMPayload.
-													},
-												},
-											},
-										},
-									},
-								},
-								CorrelationIds: up.CorrelationIds,
-								ReceivedAt:     up.ReceivedAt,
-							})
-						},
-					},
-					{
 						Name: "RegisteredDevice/DownlinkMessage/QueueInvalidated",
 						IDs:  registeredDevice.Ids,
 						Message: &ttnpb.ApplicationUp{
