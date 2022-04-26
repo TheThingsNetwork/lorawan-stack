@@ -55,12 +55,6 @@ jobs:
         uses: ./.github/actions/build-mage
       - name: Install Node and Dependencies
         uses: ./.github/actions/install-node-and-deps
-      - name: Initialize public folder cache
-        id: public-cache
-        uses: actions/cache@v2
-        with:
-          path: public
-          key: public-cache-${{ hashFiles('pkg/webui/**') }}-${{ hashFiles('sdk/js/**/*.js', 'sdk/js/generated/*.json') }}-${{ hashFiles('config/webpack.config.babel.js') }}-${{ hashFiles('yarn.lock', 'sdk/js/yarn.lock')}}
       - name: Test JS SDK code
         run: tools/bin/mage jsSDK:test
       - name: Test frontend code

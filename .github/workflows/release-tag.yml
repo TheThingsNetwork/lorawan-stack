@@ -80,10 +80,10 @@ jobs:
       - name: Auto-completion scripts
         run: tools/bin/mage cli:autocomplete
         timeout-minutes: 5
-      - name: Build frontend
-        run: tools/bin/mage js:clean js:buildDll js:build
-        env:
-          WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS: "true"
+      - name: Build Frontend
+        uses: ./.github/actions/build-frontend
+        with:
+          production-sourcemaps: 'true'
       - name: Check for diff
         run: tools/bin/mage git:diff
       - name: Generate Release Notes

@@ -43,40 +43,10 @@ jobs:
       - name: Create device repository index
         run: tools/bin/mage dev:initDeviceRepo
         if: steps.dr-index-cache.outputs.cache-hit != 'true'
-      - name: Initialize public folder cache
-        id: public-cache
-        uses: actions/cache@v2
+      - name: Build Frontend
+        uses: ./.github/actions/build-frontend
         with:
-          path: public
-          key: public-cache-${{ hashFiles('pkg/webui/**', 'sdk/js/**/*.js', 'sdk/js/generated/*.json', 'config/webpack.config.babel.js', 'package.json', 'yarn.lock', 'sdk/js/yarn.lock')}}
-      - name: Initialize dll cache
-        if: steps.public-cache.outputs.cache-hit != 'true'
-        id: dll-cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            public/libs.*.bundle.js
-            .cache/dll.json
-          key: dll-cache-${{ hashFiles('yarn.lock') }}
-      - name: Initialize babel cache
-        id: babel-cache
-        uses: actions/cache@v2
-        if: steps.public-cache.outputs.cache-hit != 'true'
-        with:
-          path: .cache/babel
-          key: ${{ runner.os }}-babel-cache-${{ hashFiles('config/babel.config.json', 'config/webpack.config.babel.js') }}
-          restore-keys: |
-            ${{ runner.os }}-babel-cache-
-      - name: Build DLLs
-        if: steps.dll-cache.outputs.cache-hit != 'true'
-        run: tools/bin/mage js:buildDll
-        env:
-          WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS: "true"
-      - name: Build frontend
-        run: tools/bin/mage js:build
-        if: steps.public-cache.outputs.cache-hit != 'true'
-        env:
-          WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS: "true"
+          production-sourcemaps: 'true'
       - name: Check for diff
         run: tools/bin/mage git:diff
       - name: Import the signing key
