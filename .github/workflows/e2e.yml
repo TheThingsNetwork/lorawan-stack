@@ -87,8 +87,6 @@ jobs:
           key: db-cache-${{ hashFiles('pkg/identityserver/store/**/*.go', 'cmd/ttn-lw-stack/commands/is-db.go', '.github/workflows/e2e.yml') }}
       - name: Install Go and Dependencies
         uses: ./.github/actions/install-go-and-deps
-        with:
-          go-version: "~1.17"
       - name: Build Mage
         uses: ./.github/actions/build-mage
       - name: Initialize device repository index cache
