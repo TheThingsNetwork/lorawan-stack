@@ -28,27 +28,14 @@ jobs:
         with:
           username: "${{ secrets.DOCKERHUB_USERNAME }}"
           password: "${{ secrets.DOCKERHUB_PASSWORD }}"
-      - name: Set up Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: "~16"
-      - name: Get Yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(npx yarn cache dir)"
-      - name: Initialize Yarn module cache
-        id: yarn-cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
       - name: Install Go and Dependencies
         uses: ./.github/actions/install-go-and-deps
         with:
           go-version: "~1.17"
       - name: Build Mage
         uses: ./.github/actions/build-mage
+      - name: Install Node and Dependencies
+        uses: ./.github/actions/install-node-and-deps
       - name: Initialize device repository index cache
         id: dr-index-cache
         uses: actions/cache@v2

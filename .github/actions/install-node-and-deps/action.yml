@@ -1,0 +1,21 @@
+name: Install Node and Dependencies
+description: Install Node and Node Dependencies
+inputs:
+  node-version:
+    description: Node Version
+    required: true
+    default: '~16'
+runs:
+  using: composite
+  steps:
+    - name: Set up Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: yarn
+        cache-dependency-path: '**/yarn.lock'
+    - name: Download Node dependencies
+      shell: bash
+      run: |
+        tools/bin/mage jsSDK:deps
+        tools/bin/mage js:deps
