@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
+	"go.thethings.network/lorawan-stack/v3/pkg/email/dir"
 	"go.thethings.network/lorawan-stack/v3/pkg/email/sendgrid"
 	"go.thethings.network/lorawan-stack/v3/pkg/email/smtp"
 	_ "go.thethings.network/lorawan-stack/v3/pkg/email/templates" // Register all email templates.
@@ -42,6 +43,12 @@ func (is *IdentityServer) SendEmail(ctx context.Context, message *email.Message)
 		sender, err = sendgrid.New(ctx, isConfig.Email.Config, isConfig.Email.SendGrid)
 	case "smtp":
 		sender, err = smtp.New(ctx, isConfig.Email.Config, isConfig.Email.SMTP)
+	case "dir":
+		sender, err = dir.New(ctx, isConfig.Email.Config, isConfig.Email.Dir)
+	}
+	if err != nil {
+		logger.WithError(err).Warn("Could not send email without email provider")
+		return err
 	}
 	if sender == nil {
 		logger.Warn("Could not send email without email provider")
