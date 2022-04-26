@@ -91,12 +91,16 @@ const encodeGrants = value => {
 }
 
 const decodeGrants = value => {
-  const grants = value.reduce((g, i) => {
-    g[i] = true
-    return g
-  }, {})
+  if (value) {
+    const grants = value.reduce((g, i) => {
+      g[i] = true
+      return g
+    }, {})
 
-  return grants
+    return grants
+  }
+
+  return null
 }
 
 const validationSchema = Yup.object().shape({
