@@ -1,0 +1,15 @@
+name: Build Mage
+description: Build Mage
+runs:
+  using: composite
+  steps:
+    - name: Initialize Mage binary cache
+      id: mage-cache
+      uses: actions/cache@v3
+      with:
+        path: tools/bin/mage
+        key: ${{ runner.os }}-mage-${{ hashFiles('tools/**') }}
+    - name: Make Mage
+      if: steps.mage-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: make tools/bin/mage

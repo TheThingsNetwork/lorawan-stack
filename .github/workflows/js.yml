@@ -42,15 +42,8 @@ jobs:
         uses: ./.github/actions/install-go-and-deps
         with:
           go-version: "~1.17"
-      - name: Initialize tool binary cache
-        id: tools-cache
-        uses: actions/cache@v2
-        with:
-          path: tools/bin
-          key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
-      - name: Make Mage
-        run: make tools/bin/mage
-        if: steps.tools-cache.outputs.cache-hit != 'true'
+      - name: Build Mage
+        uses: ./.github/actions/build-mage
       - name: Install JS SDK dependencies
         run: tools/bin/mage jsSDK:deps
       - name: Generate JS SDK allowed field masks
@@ -100,15 +93,8 @@ jobs:
         with:
           path: public
           key: public-cache-${{ hashFiles('pkg/webui/**') }}-${{ hashFiles('sdk/js/**/*.js', 'sdk/js/generated/*.json') }}-${{ hashFiles('config/webpack.config.babel.js') }}-${{ hashFiles('yarn.lock', 'sdk/js/yarn.lock')}}
-      - name: Initialize tool binary cache
-        id: tools-cache
-        uses: actions/cache@v2
-        with:
-          path: tools/bin
-          key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
-      - name: Make Mage
-        run: make tools/bin/mage
-        if: steps.tools-cache.outputs.cache-hit != 'true'
+      - name: Build Mage
+        uses: ./.github/actions/build-mage
       - name: Install JS SDK dependencies
         run: tools/bin/mage jsSDK:deps
       - name: Install JS dependencies
