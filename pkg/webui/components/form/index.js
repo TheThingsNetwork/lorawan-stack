@@ -23,6 +23,7 @@ import Notification from '@ttn-lw/components/notification'
 import ErrorNotification from '@ttn-lw/components/error-notification'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { ingestError } from '@ttn-lw/lib/errors/utils'
 
 import FormContext from './context'
 import FormField from './field'
@@ -171,6 +172,20 @@ class Form extends React.PureComponent {
   }
 
   @bind
+  async handleSubmit(...args) {
+    const { onSubmit } = this.props
+
+    try {
+      return await onSubmit(...args)
+    } catch (error) {
+      // Make sure all unhandled exceptions during submit are ingested.
+      ingestError(error, { ingestedBy: 'FormSubmit' })
+
+      throw error
+    }
+  }
+
+  @bind
   validate(values) {
     const { validationSchema, validationContext, validateSync } = this.props
 
@@ -212,7 +227,6 @@ class Form extends React.PureComponent {
 
   render() {
     const {
-      onSubmit,
       onReset,
       initialValues,
       validateOnBlur,
@@ -229,7 +243,7 @@ class Form extends React.PureComponent {
       <Formik
         innerRef={formikRef}
         validate={this.validate}
-        onSubmit={onSubmit}
+        onSubmit={this.handleSubmit}
         onReset={onReset}
         validateOnMount={validateOnMount}
         initialValues={initialValues}
