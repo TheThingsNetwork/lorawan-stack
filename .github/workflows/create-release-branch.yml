@@ -34,8 +34,8 @@ jobs:
           go-version: "~1.17"
       - name: Build Mage
         uses: ./.github/actions/build-mage
-      - name: Install JS dependencies
-        run: tools/bin/mage js:deps
+      - name: Install Node and Dependencies
+        uses: ./.github/actions/install-node-and-deps
       - name: Update version information
         run: echo "${RELEASE_VERSION}" | tools/bin/mage version:files
       - name: Update submodules
