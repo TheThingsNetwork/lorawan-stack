@@ -281,6 +281,9 @@ PropTypes.history = PropTypes.shape({
   listen: PropTypes.func,
 })
 
+PropTypes.right = PropTypes.string
+PropTypes.rights = PropTypes.arrayOf(PropTypes.right)
+
 PropTypes.collaborator = PropTypes.shape({
   rights: PropTypes.rights,
 })
@@ -289,9 +292,6 @@ PropTypes.apiKey = PropTypes.shape({
   id: PropTypes.string.isRequired,
   rights: PropTypes.rights,
 })
-
-PropTypes.right = PropTypes.string
-PropTypes.rights = PropTypes.arrayOf(PropTypes.right)
 
 PropTypes.component = PropTypes.oneOf(components)
 PropTypes.components = PropTypes.arrayOf(PropTypes.component)

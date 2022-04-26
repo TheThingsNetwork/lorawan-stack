@@ -63,6 +63,7 @@ export default class ApplicationPubsubs extends React.Component {
           <Route
             path={`${match.path}/:pubsubId${pathIdRegexp}`}
             component={ApplicationPubsubEdit}
+            sensitive
           />
           <NotFoundRoute />
         </Switch>

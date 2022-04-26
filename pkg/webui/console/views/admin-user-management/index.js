@@ -52,7 +52,7 @@ export default class UserManagementRouter extends Component {
         <Switch>
           <Route exact path={`${match.path}`} component={UserManagement} />
           <Route path={`${match.path}/add`} component={UserAdd} />
-          <Route path={`${match.path}/:userId${pathIdRegexp}`} component={UserEdit} />
+          <Route path={`${match.path}/:userId${pathIdRegexp}`} component={UserEdit} sensitive />
           <NotFoundRoute />
         </Switch>
       </React.Fragment>

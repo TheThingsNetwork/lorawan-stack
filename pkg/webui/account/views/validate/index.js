@@ -15,6 +15,7 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { defineMessages } from 'react-intl'
 import queryString from 'query-string'
+import { Redirect } from 'react-router-dom'
 
 import tts from '@account/api/tts'
 
@@ -65,18 +66,20 @@ const Validate = ({ location }) => {
 
   useEffect(() => {
     const makeRequest = async () => {
-      const validationData = queryString.parse(location.search)
-      try {
-        await tts.ContactInfo.validate({
-          token: validationData.token,
-          id: validationData.reference,
-        })
-        handleSuccess()
-      } catch (error) {
-        if (isNotFoundError(error)) {
-          handleError(createFrontendError(m.tokenNotFoundTitle, m.tokenNotFoundMessage))
-        } else {
-          handleError(error)
+      const { token, reference } = queryString.parse(location.search)
+      if (token && reference) {
+        try {
+          await tts.ContactInfo.validate({
+            token,
+            id: reference,
+          })
+          handleSuccess()
+        } catch (error) {
+          if (isNotFoundError(error)) {
+            handleError(createFrontendError(m.tokenNotFoundTitle, m.tokenNotFoundMessage))
+          } else {
+            handleError(error)
+          }
         }
       }
     }
@@ -84,6 +87,10 @@ const Validate = ({ location }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const { token, reference } = queryString.parse(location.search)
+  if (!token || !reference) {
+    return <Redirect to="/" />
+  }
   return (
     <div className={style.form}>
       <IntlHelmet title={m.contactInfoValidation} />

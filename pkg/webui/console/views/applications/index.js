@@ -41,7 +41,7 @@ const Applications = props => {
     <Switch>
       <Route exact path={`${path}`} component={ApplicationsList} />
       <Route exact path={`${path}/add`} component={ApplicationAdd} />
-      <Route path={`${path}/:appId${pathIdRegexp}`} component={Application} />
+      <Route path={`${path}/:appId${pathIdRegexp}`} component={Application} sensitive />
       <NotFoundRoute />
     </Switch>
   )

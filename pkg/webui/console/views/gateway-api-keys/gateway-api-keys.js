@@ -44,7 +44,11 @@ const GatewayApiKeys = props => {
       <Switch>
         <Route exact path={`${match.path}`} component={GatewayApiKeysList} />
         <Route exact path={`${match.path}/add`} component={GatewayApiKeyAdd} />
-        <Route path={`${match.path}/:apiKeyId${apiKeyPathRegexp}`} component={GatewayApiKeyEdit} />
+        <Route
+          path={`${match.path}/:apiKeyId${apiKeyPathRegexp}`}
+          component={GatewayApiKeyEdit}
+          sensitive
+        />
         <NotFoundRoute />
       </Switch>
     </ErrorView>

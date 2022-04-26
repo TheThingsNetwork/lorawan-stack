@@ -54,7 +54,7 @@ export default class Devices extends React.Component {
       <Switch>
         <Route path={`${path}/add`} component={DeviceAdd} />
         <Route path={`${path}/import`} component={DeviceImport} />
-        <Route path={`${path}/:devId${pathIdRegexp}`} component={Device} />
+        <Route path={`${path}/:devId${pathIdRegexp}`} component={Device} sensitive />
         <Route path={`${path}`} component={DeviceList} exact />
         <NotFoundRoute />
       </Switch>

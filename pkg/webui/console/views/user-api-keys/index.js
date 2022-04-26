@@ -36,7 +36,11 @@ const UserApiKeys = ({ match }) => (
     <Switch>
       <Route exact path={match.path} component={UserApiKeysList} />
       <Route exact path={`${match.path}/add`} component={UserApiKeyAdd} />
-      <Route path={`${match.path}/:apiKeyId${apiKeyPathRegexp}`} component={UserApiKeyEdit} />
+      <Route
+        path={`${match.path}/:apiKeyId${apiKeyPathRegexp}`}
+        component={UserApiKeyEdit}
+        sensitive
+      />
       <NotFoundRoute />
     </Switch>
   </ErrorView>

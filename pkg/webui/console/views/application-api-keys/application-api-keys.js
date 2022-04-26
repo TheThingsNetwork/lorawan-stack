@@ -47,6 +47,7 @@ const ApplicationApiKeys = props => {
         <Route
           path={`${match.path}/:apiKeyId${apiKeyPathRegexp}`}
           component={ApplicationApiKeyEdit}
+          sensitive
         />
         <NotFoundRoute />
       </Switch>
