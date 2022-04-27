@@ -33,6 +33,7 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -229,60 +230,52 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		dev.MacState.PendingRequests = dev.MacState.PendingRequests[:0]
 
 		enqueuers := make([]func(context.Context, *ttnpb.EndDevice, uint16, uint16) mac.EnqueueState, 0, 13)
-		if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_0) >= 0 {
-			enqueuers = append(enqueuers,
-				mac.EnqueueDutyCycleReq,
-				mac.EnqueueRxParamSetupReq,
-				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
-					return mac.EnqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings, transmitAt)
-				},
-				mac.EnqueueNewChannelReq,
-				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
-					// NOTE: LinkADRReq must be enqueued after NewChannelReq.
-					st, err := mac.EnqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, phy)
-					if err != nil {
-						logger.WithError(err).Error("Failed to enqueue LinkADRReq")
-						return mac.EnqueueState{
-							MaxDownLen: maxDownLen,
-							MaxUpLen:   maxUpLen,
-						}
+		enqueuers = append(enqueuers,
+			mac.EnqueueDutyCycleReq,
+			mac.EnqueueRxParamSetupReq,
+			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
+				return mac.EnqueueDevStatusReq(ctx, dev, maxDownLen, maxUpLen, ns.defaultMACSettings, transmitAt)
+			},
+			mac.EnqueueNewChannelReq,
+			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
+				// NOTE: LinkADRReq must be enqueued after NewChannelReq.
+				st, err := mac.EnqueueLinkADRReq(ctx, dev, maxDownLen, maxUpLen, phy)
+				if err != nil {
+					logger.WithError(err).Error("Failed to enqueue LinkADRReq")
+					return mac.EnqueueState{
+						MaxDownLen: maxDownLen,
+						MaxUpLen:   maxUpLen,
 					}
-					return st
-				},
-				mac.EnqueueRxTimingSetupReq,
-			)
-			if dev.MacState.DeviceClass == ttnpb.Class_CLASS_B {
-				if class == ttnpb.Class_CLASS_A {
-					enqueuers = append(enqueuers,
-						mac.EnqueuePingSlotChannelReq,
-					)
 				}
+				return st
+			},
+			mac.EnqueueRxTimingSetupReq,
+		)
+		if dev.MacState.DeviceClass == ttnpb.Class_CLASS_B {
+			if class == ttnpb.Class_CLASS_A {
 				enqueuers = append(enqueuers,
-					mac.EnqueueBeaconFreqReq,
-				)
-			}
-		}
-		if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_0_2) >= 0 {
-			if phy.TxParamSetupReqSupport {
-				enqueuers = append(enqueuers,
-					func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
-						return mac.EnqueueTxParamSetupReq(ctx, dev, maxDownLen, maxUpLen, phy)
-					},
+					mac.EnqueuePingSlotChannelReq,
 				)
 			}
 			enqueuers = append(enqueuers,
-				mac.EnqueueDLChannelReq,
+				mac.EnqueueBeaconFreqReq,
 			)
 		}
-		if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
+		if phy.TxParamSetupReqSupport {
 			enqueuers = append(enqueuers,
 				func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
-					return mac.EnqueueADRParamSetupReq(ctx, dev, maxDownLen, maxUpLen, phy)
+					return mac.EnqueueTxParamSetupReq(ctx, dev, maxDownLen, maxUpLen, phy)
 				},
-				mac.EnqueueForceRejoinReq,
-				mac.EnqueueRejoinParamSetupReq,
 			)
 		}
+		enqueuers = append(enqueuers,
+			mac.EnqueueDLChannelReq,
+			func(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen uint16, maxUpLen uint16) mac.EnqueueState {
+				return mac.EnqueueADRParamSetupReq(ctx, dev, maxDownLen, maxUpLen, phy)
+			},
+			mac.EnqueueForceRejoinReq,
+			mac.EnqueueRejoinParamSetupReq,
+		)
 
 		for _, f := range enqueuers {
 			st := f(ctx, dev, maxDownLen, maxUpLen)
@@ -376,7 +369,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 					})
 				}
 
-			case down.FCnt <= dev.Session.LastNFCntDown && dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0:
+			case down.FCnt <= dev.Session.LastNFCntDown && macspec.UseSharedFCntDown(dev.MacState.LorawanVersion):
 				logger.WithField("last_f_cnt_down", dev.Session.LastNFCntDown).Debug("Drop application downlink with too low FCnt")
 				genState.baseApplicationUps = append(genState.baseApplicationUps, &ttnpb.ApplicationUp{
 					EndDeviceIds:   dev.Ids,
@@ -510,7 +503,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	))
 	ctx = log.NewContext(ctx, logger)
 
-	if len(cmdBuf) > 0 && (!cmdsInFOpts || dev.MacState.LorawanVersion.EncryptFOpts()) {
+	if len(cmdBuf) > 0 && (!cmdsInFOpts || macspec.EncryptFOpts(dev.MacState.LorawanVersion)) {
 		if len(dev.GetSession().GetKeys().GetNwkSEncKey().GetKey()) == 0 {
 			return nil, genState, errUnknownNwkSEncKey.New()
 		}
@@ -519,11 +512,11 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			logger.WithField("kek_label", dev.Session.Keys.NwkSEncKey.KekLabel).WithError(err).Warn("Failed to unwrap NwkSEncKey")
 			return nil, genState, err
 		}
+		// pld.FullFCnt is either application downlink frame counter (AFCntDown),
+		// or the network downlink frame counter (NFCntDown), based on the (presence of the) FPort.
 		fCnt := pld.FullFCnt
-		if pld.FPort != 0 {
-			fCnt = dev.Session.LastNFCntDown
-		}
-		cmdBuf, err = crypto.EncryptDownlink(key, types.MustDevAddr(dev.Session.DevAddr).OrZero(), fCnt, cmdBuf, cmdsInFOpts)
+		encOpts := macspec.EncryptionOptions(dev.MacState.LorawanVersion, macspec.DownlinkFrame, pld.FPort, cmdsInFOpts)
+		cmdBuf, err = crypto.EncryptDownlink(key, types.MustDevAddr(dev.Session.DevAddr).OrZero(), fCnt, cmdBuf, encOpts...)
 		if err != nil {
 			return nil, genState, errEncryptMAC.WithCause(err)
 		}
@@ -533,7 +526,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	} else {
 		pld.FrmPayload = cmdBuf
 	}
-	if pld.FPort == 0 && dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
+	if pld.FPort == 0 && macspec.UseSharedFCntDown(dev.MacState.LorawanVersion) {
 		genState.ifScheduledApplicationUps = append(genState.ifScheduledApplicationUps, &ttnpb.ApplicationUp{
 			EndDeviceIds:   dev.Ids,
 			CorrelationIds: events.CorrelationIDsFromContext(ctx),
@@ -592,7 +585,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	}
 
 	var mic [4]byte
-	if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
+	if macspec.UseLegacyMIC(dev.MacState.LorawanVersion) {
 		mic, err = crypto.ComputeLegacyDownlinkMIC(
 			key,
 			types.MustDevAddr(dev.Session.DevAddr).OrZero(),
@@ -1112,7 +1105,7 @@ func recordDataDownlink(dev *ttnpb.EndDevice, genState generateDownlinkState, ne
 	if macPayload == nil {
 		panic("invalid downlink")
 	}
-	if genState.ApplicationDownlink == nil || dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 && macPayload.FullFCnt > dev.Session.LastNFCntDown {
+	if genState.ApplicationDownlink == nil || macspec.UseSharedFCntDown(dev.MacState.LorawanVersion) && macPayload.FullFCnt > dev.Session.LastNFCntDown {
 		dev.Session.LastNFCntDown = macPayload.FullFCnt
 	}
 	dev.MacState.LastDownlinkAt = ttnpb.ProtoTimePtr(down.TransmitAt)
@@ -1823,7 +1816,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 				ctx = log.NewContext(ctx, logger)
 
 				var maxUpLength uint16 = math.MaxUint16
-				if !dev.Multicast && dev.MacState.LorawanVersion == ttnpb.MACVersion_MAC_V1_1 {
+				if !dev.Multicast && macspec.ValidateUplinkPayloadSize(dev.MacState.LorawanVersion) {
 					maxUpLength, err = maximumUplinkLength(dev.MacState, fp, phy, dev.MacState.RecentUplinks...)
 					if err != nil {
 						logger.WithError(err).Error("Failed to determine maximum uplink length")

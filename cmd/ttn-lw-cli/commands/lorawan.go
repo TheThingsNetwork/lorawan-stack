@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -50,11 +51,10 @@ type lorawanConfig struct {
 }
 
 func (c *lorawanConfig) getJoinAcceptDecodeKey() (types.AES128Key, string) {
-	if c.MACVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
-		return c.AppKey, "AppKey"
-	} else {
+	if macspec.UseNwkKey(c.MACVersion) {
 		return c.NwkKey, "NwkKey"
 	}
+	return c.AppKey, "AppKey"
 }
 
 func getMacBuffer(p *ttnpb.MACPayload) []byte {
@@ -81,14 +81,16 @@ func decodeJoinRequest(msg ttnpb.Message, config lorawanConfig) (*lorawanDecoded
 func decodeUplink(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedFrame, error) {
 	pld := msg.GetMacPayload()
 	macBuf := getMacBuffer(pld)
-	if len(macBuf) > 0 && (len(pld.FHdr.FOpts) == 0 || config.MACVersion.EncryptFOpts()) {
+	cmdsInFOpts := len(pld.FHdr.FOpts) > 0
+	if len(macBuf) > 0 && (!cmdsInFOpts || macspec.EncryptFOpts(config.MACVersion)) {
 		if config.NwkSEncKey.IsZero() {
 			logger.Warn("No NwkSEncKey provided, skipping decryption of MAC buffer")
 		} else {
 			logger.Debug("Decrypting MAC buffer")
+			encOpts := macspec.EncryptionOptions(config.MACVersion, macspec.UplinkFrame, pld.FPort, cmdsInFOpts)
 			for msb := uint32(0); msb < 0xff; msb++ {
 				fCnt := msb<<8 | pld.FHdr.FCnt
-				macBuf, err := crypto.DecryptUplink(config.NwkSEncKey, pld.FHdr.DevAddr, fCnt, macBuf, pld.FPort != 0)
+				macBuf, err := crypto.DecryptUplink(config.NwkSEncKey, pld.FHdr.DevAddr, fCnt, macBuf, encOpts...)
 				if err == nil {
 					setMacBuffer(pld, macBuf)
 					break
@@ -111,7 +113,7 @@ func decodeUplink(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedFrame
 			logger.Warn("No AppSKey provided, skipping application payload decryption")
 		} else {
 			logger.Debug("Decrypting application payload")
-			buf, err := crypto.DecryptUplink(config.AppSKey, pld.FHdr.DevAddr, pld.FHdr.FCnt, pld.FrmPayload, false)
+			buf, err := crypto.DecryptUplink(config.AppSKey, pld.FHdr.DevAddr, pld.FHdr.FCnt, pld.FrmPayload)
 			if err != nil {
 				logger.WithField("f_cnt", pld.FHdr.FCnt).Debug("Failed attempt to decrypt FrmPayload")
 			} else {
@@ -163,13 +165,14 @@ func decodeJoinAccept(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedF
 
 func decodeDownlink(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedFrame, error) {
 	pld := msg.GetMacPayload()
-
 	macBuf := getMacBuffer(pld)
-	if len(macBuf) > 0 && (len(pld.FHdr.FOpts) == 0 || config.MACVersion.EncryptFOpts()) && !config.NwkSKey.IsZero() {
+	cmdsInFOpts := len(pld.FHdr.FOpts) > 0
+	if len(macBuf) > 0 && (!cmdsInFOpts || macspec.EncryptFOpts(config.MACVersion)) && !config.NwkSKey.IsZero() {
 		logger.Debug("Decrypting MAC buffer")
+		encOpts := macspec.EncryptionOptions(config.MACVersion, macspec.DownlinkFrame, pld.FPort, cmdsInFOpts)
 		for msb := uint32(0); msb < 0xffff; msb++ {
 			fCnt := msb<<16 | pld.FHdr.FCnt
-			macBuf, err := crypto.DecryptDownlink(config.NwkSKey, pld.FHdr.DevAddr, fCnt, macBuf, pld.FPort != 0)
+			macBuf, err := crypto.DecryptDownlink(config.NwkSKey, pld.FHdr.DevAddr, fCnt, macBuf, encOpts...)
 			if err == nil {
 				setMacBuffer(pld, macBuf)
 				break
@@ -191,7 +194,7 @@ func decodeDownlink(msg ttnpb.Message, config lorawanConfig) (*lorawanDecodedFra
 			logger.Warn("No AppSKey provided, skipping application payload decryption")
 		} else {
 			logger.Debug("Decrypting application payload")
-			buf, err := crypto.DecryptDownlink(config.AppSKey, pld.FHdr.DevAddr, pld.FHdr.FCnt, pld.FrmPayload, false)
+			buf, err := crypto.DecryptDownlink(config.AppSKey, pld.FHdr.DevAddr, pld.FHdr.FCnt, pld.FrmPayload)
 			if err != nil {
 				logger.WithField("f_cnt", pld.FHdr.FCnt).Debug("Failed attempt to decrypt FrmPayload")
 			} else {
@@ -291,7 +294,7 @@ var (
 				}
 			}
 
-			if lorawanConfig.MACVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
+			if !macspec.UseNwkKey(lorawanConfig.MACVersion) {
 				for _, key := range []*types.AES128Key{&lorawanConfig.FNwkSIntKey, &lorawanConfig.SNwkSIntKey, &lorawanConfig.NwkSEncKey} {
 					if key.IsZero() {
 						*key = lorawanConfig.NwkSKey

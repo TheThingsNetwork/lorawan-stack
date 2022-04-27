@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -172,7 +173,7 @@ var errClassAMulticast = errors.DefineInvalidArgument("class_a_multicast", "mult
 
 func DeviceDefaultClass(dev *ttnpb.EndDevice) (ttnpb.Class, error) {
 	switch {
-	case dev.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 && dev.SupportsClassC:
+	case !macspec.UseDeviceModeInd(dev.LorawanVersion) && dev.SupportsClassC:
 		return ttnpb.Class_CLASS_C, nil
 	case !dev.Multicast:
 		return ttnpb.Class_CLASS_A, nil
@@ -189,8 +190,8 @@ func DeviceDefaultLoRaWANVersion(dev *ttnpb.EndDevice) ttnpb.MACVersion {
 	switch {
 	case dev.Multicast:
 		return dev.LorawanVersion
-	case dev.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0:
-		return ttnpb.MACVersion_MAC_V1_1
+	case macspec.UseRekeyInd(dev.LorawanVersion):
+		return macspec.RekeyPeriodVersion(dev.LorawanVersion)
 	default:
 		return dev.LorawanVersion
 	}

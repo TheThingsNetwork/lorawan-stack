@@ -105,7 +105,7 @@ func (as *ApplicationServer) encryptDownlink(ctx context.Context, dev *ttnpb.End
 	if err != nil {
 		return err
 	}
-	frmPayload, err := crypto.EncryptDownlink(appSKey, types.MustDevAddr(session.DevAddr).OrZero(), downlink.FCnt, downlink.FrmPayload, false)
+	frmPayload, err := crypto.EncryptDownlink(appSKey, types.MustDevAddr(session.DevAddr).OrZero(), downlink.FCnt, downlink.FrmPayload)
 	if err != nil {
 		return err
 	}
@@ -128,7 +128,7 @@ func (as *ApplicationServer) decryptUplink(ctx context.Context, dev *ttnpb.EndDe
 	if err != nil {
 		return err
 	}
-	frmPayload, err := crypto.DecryptUplink(appSKey, types.MustDevAddr(dev.Session.DevAddr).OrZero(), uplink.FCnt, uplink.FrmPayload, false)
+	frmPayload, err := crypto.DecryptUplink(appSKey, types.MustDevAddr(dev.Session.DevAddr).OrZero(), uplink.FCnt, uplink.FrmPayload)
 	if err != nil {
 		return err
 	}
@@ -184,7 +184,7 @@ func (as *ApplicationServer) decryptDownlink(ctx context.Context, dev *ttnpb.End
 	if err != nil {
 		return err
 	}
-	frmPayload, err := crypto.DecryptDownlink(appSKey, types.MustDevAddr(session.DevAddr).OrZero(), downlink.FCnt, downlink.FrmPayload, false)
+	frmPayload, err := crypto.DecryptDownlink(appSKey, types.MustDevAddr(session.DevAddr).OrZero(), downlink.FCnt, downlink.FrmPayload)
 	if err != nil {
 		return err
 	}

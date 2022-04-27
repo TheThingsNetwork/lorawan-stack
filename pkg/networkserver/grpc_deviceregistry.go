@@ -33,6 +33,7 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -719,7 +720,7 @@ var (
 					if m["lorawan_version"].GetLorawanVersion() == ttnpb.MACVersion_MAC_UNKNOWN {
 						return false, "lorawan_version"
 					}
-					if m["lorawan_version"].LorawanVersion.RequireDevEUIForABP() && !m["multicast"].GetMulticast() {
+					if macspec.RequireDevEUIForABP(m["lorawan_version"].LorawanVersion) && !m["multicast"].GetMulticast() {
 						return false, "ids.dev_eui"
 					}
 					return true, ""
@@ -2149,7 +2150,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			NwkSEncKey:  setKeyIsZero(m, getNwkSEncKey, "session.keys.nwk_s_enc_key"),
 			SNwkSIntKey: setKeyIsZero(m, getSNwkSIntKey, "session.keys.s_nwk_s_int_key"),
 		}
-		if macVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
+		if macspec.UseNwkKey(macVersion) {
 			if isZero.NwkSEncKey {
 				return false, "session.keys.nwk_s_enc_key.key"
 			}
@@ -2302,7 +2303,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		} else {
 			macVersion = dev.PendingMacState.LorawanVersion
 		}
-		supports1_1 := macVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0
+		useNwkKey := macspec.UseNwkKey(macVersion)
 
 		if hasPendingSession {
 			// NOTE: PendingMACState may be set before PendingSession is set by downlink routine.
@@ -2328,7 +2329,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			if setKeyIsZero(m, getSNwkSIntKey, "pending_session.keys.s_nwk_s_int_key") {
 				return false, "pending_session.keys.s_nwk_s_int_key.key"
 			}
-			if !supports1_1 {
+			if !useNwkKey {
 				if !setKeyEqual(m, getFNwkSIntKey, getNwkSEncKey, "pending_session.keys.f_nwk_s_int_key", "pending_session.keys.nwk_s_enc_key") {
 					return false, "pending_session.keys.nwk_s_enc_key.key"
 				}
@@ -2366,7 +2367,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return false, "pending_mac_state.queued_join_accept.keys.s_nwk_s_int_key.key"
 			}
 
-			if !supports1_1 {
+			if !useNwkKey {
 				if !setKeyEqual(m, getFNwkSIntKey, getNwkSEncKey, "pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key", "pending_mac_state.queued_join_accept.keys.nwk_s_enc_key") {
 					return false, "pending_mac_state.queued_join_accept.keys.nwk_s_enc_key.key"
 				}
@@ -2577,7 +2578,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				macVersion = st.Device.MacState.LorawanVersion
 			}
 
-			if st.HasSetField("session.keys.f_nwk_s_int_key.key") && macVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
+			if st.HasSetField("session.keys.f_nwk_s_int_key.key") && !macspec.UseNwkKey(macVersion) {
 				st.Device.Session.Keys.NwkSEncKey = st.Device.Session.Keys.FNwkSIntKey
 				st.Device.Session.Keys.SNwkSIntKey = st.Device.Session.Keys.FNwkSIntKey
 				st.AddSetFields(
@@ -2606,8 +2607,8 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				macVersion = stored.GetPendingMacState().GetLorawanVersion()
 			}
 
-			supports1_1 := macVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0
-			if st.HasSetField("pending_session.keys.f_nwk_s_int_key.key") && !supports1_1 {
+			useNwkKey := macspec.UseNwkKey(macVersion)
+			if st.HasSetField("pending_session.keys.f_nwk_s_int_key.key") && !useNwkKey {
 				st.Device.PendingSession.Keys.NwkSEncKey = st.Device.PendingSession.Keys.FNwkSIntKey
 				st.Device.PendingSession.Keys.SNwkSIntKey = st.Device.PendingSession.Keys.FNwkSIntKey
 				st.AddSetFields(
@@ -2619,7 +2620,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 					"pending_session.keys.s_nwk_s_int_key.key",
 				)
 			}
-			if st.HasSetField("pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key") && hasQueuedJoinAccept && !supports1_1 {
+			if st.HasSetField("pending_mac_state.queued_join_accept.keys.f_nwk_s_int_key.key") && hasQueuedJoinAccept && !useNwkKey {
 				st.Device.PendingMacState.QueuedJoinAccept.Keys.NwkSEncKey = st.Device.PendingMacState.QueuedJoinAccept.Keys.FNwkSIntKey
 				st.Device.PendingMacState.QueuedJoinAccept.Keys.SNwkSIntKey = st.Device.PendingMacState.QueuedJoinAccept.Keys.FNwkSIntKey
 				st.AddSetFields(

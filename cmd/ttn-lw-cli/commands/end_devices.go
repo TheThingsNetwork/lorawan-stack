@@ -33,6 +33,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/grpc"
@@ -437,7 +438,7 @@ var (
 					if err := macVersion.Validate(); err != nil {
 						return errInvalidMACVersion.WithCause(err)
 					}
-					if macVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
+					if macspec.UseNwkKey(macVersion) {
 						device.Session.Keys.SNwkSIntKey = &ttnpb.KeyEnvelope{Key: generateKey()}
 						device.Session.Keys.NwkSEncKey = &ttnpb.KeyEnvelope{Key: generateKey()}
 						paths = append(paths,
@@ -490,7 +491,7 @@ var (
 						if err := macVersion.Validate(); err != nil {
 							return errInvalidMACVersion.WithCause(err)
 						}
-						if macVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
+						if macspec.UseNwkKey(macVersion) {
 							device.RootKeys.NwkKey = &ttnpb.KeyEnvelope{Key: generateKey()}
 						}
 					}

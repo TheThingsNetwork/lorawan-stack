@@ -18,6 +18,7 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -48,14 +49,13 @@ func HandleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 		dev.Ids.DevAddr = types.MustDevAddr(dev.PendingSession.DevAddr)
 		dev.Session = dev.PendingSession
 	}
-	dev.MacState.LorawanVersion = ttnpb.MACVersion_MAC_V1_1
+
+	conf := &ttnpb.MACCommand_RekeyConf{}
+	dev.MacState.LorawanVersion, conf.MinorVersion = macspec.NegotiatedVersion(dev.LorawanVersion, pld.MinorVersion)
 	dev.MacState.PendingJoinRequest = nil
 	dev.PendingMacState = nil
 	dev.PendingSession = nil
 
-	conf := &ttnpb.MACCommand_RekeyConf{
-		MinorVersion: pld.MinorVersion,
-	}
 	dev.MacState.QueuedResponses = append(dev.MacState.QueuedResponses, conf.MACCommand())
 	return append(evs,
 		EvtEnqueueRekeyConfirmation.With(events.WithData(conf)),

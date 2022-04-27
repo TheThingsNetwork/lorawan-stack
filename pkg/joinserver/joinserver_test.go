@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	"go.thethings.network/lorawan-stack/v3/pkg/joinserver"
 	"go.thethings.network/lorawan-stack/v3/pkg/joinserver/redis"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -2529,10 +2530,10 @@ func TestHandleJoin(t *testing.T) {
 				a.So(*ttnpb.StdTime(ret.UpdatedAt), should.HappenAfter, *ttnpb.StdTime(pb.UpdatedAt))
 				pb.UpdatedAt = ret.UpdatedAt
 				pb.LastJoinNonce = tc.NextLastJoinNonce
-				if tc.JoinRequest.SelectedMacVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
-					pb.UsedDevNonces = tc.NextUsedDevNonces
-				} else {
+				if macspec.IncrementDevNonce(tc.JoinRequest.SelectedMacVersion) {
 					pb.LastDevNonce = tc.NextLastDevNonce
+				} else {
+					pb.UsedDevNonces = tc.NextUsedDevNonces
 				}
 				if !a.So(ret.Session, should.NotBeNil) {
 					t.FailNow()

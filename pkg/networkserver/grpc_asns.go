@@ -28,6 +28,7 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -129,7 +130,7 @@ func minAFCntDown(session *ttnpb.Session, macState *ttnpb.MACState) (uint32, err
 		return 0, nil
 	}
 	var minFCnt uint32
-	if macState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
+	if !macspec.UseSharedFCntDown(macState.LorawanVersion) {
 	outer:
 		for i := len(macState.RecentDownlinks) - 1; i >= 0; i-- {
 			pld := macState.RecentDownlinks[i].Payload

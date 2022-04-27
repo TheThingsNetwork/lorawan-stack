@@ -19,6 +19,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -61,7 +62,7 @@ func (d *mem) JoinAcceptMIC(ctx context.Context, dev *ttnpb.EndDevice, version t
 		return [4]byte{}, errNoNwkKey.New()
 	}
 	switch {
-	case version.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0:
+	case macspec.UseNwkKey(version):
 		jsIntKey := crypto.DeriveJSIntKey(*d.nwkKey, *dev.Ids.DevEui)
 		return crypto.ComputeJoinAcceptMIC(jsIntKey, joinReqType, *dev.Ids.JoinEui, dn, payload)
 	default:
@@ -77,7 +78,7 @@ func (d *mem) EncryptJoinAccept(ctx context.Context, dev *ttnpb.EndDevice, versi
 }
 
 func (d *mem) EncryptRejoinAccept(ctx context.Context, dev *ttnpb.EndDevice, version ttnpb.MACVersion, payload []byte) ([]byte, error) {
-	if version.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
+	if !macspec.UseNwkKey(version) {
 		panic("This statement is unreachable. Please version check.")
 	}
 	if dev.Ids == nil || dev.Ids.JoinEui == nil {
@@ -104,7 +105,7 @@ func (d *mem) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDevice, version 
 		return NwkSKeys{}, errNoNwkKey.New()
 	}
 	switch {
-	case version.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0:
+	case macspec.UseNwkKey(version):
 		return NwkSKeys{
 			FNwkSIntKey: crypto.DeriveFNwkSIntKey(*d.nwkKey, jn, *dev.Ids.JoinEui, dn),
 			SNwkSIntKey: crypto.DeriveSNwkSIntKey(*d.nwkKey, jn, *dev.Ids.JoinEui, dn),
@@ -138,7 +139,7 @@ func (d *mem) DeriveAppSKey(ctx context.Context, dev *ttnpb.EndDevice, version t
 	}
 
 	switch {
-	case version.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0:
+	case macspec.UseNwkKey(version):
 		return crypto.DeriveAppSKey(*d.appKey, jn, *dev.Ids.JoinEui, dn), nil
 	default:
 		return crypto.DeriveLegacyAppSKey(*d.appKey, jn, nid, dn), nil

@@ -39,6 +39,7 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -213,7 +214,7 @@ func MakeNsJsJoinRequest(conf NsJsJoinRequestConfig) *ttnpb.JoinRequest {
 		DownlinkSettings: &ttnpb.DLSettings{
 			Rx1DrOffset: conf.RX1DataRateOffset,
 			Rx2Dr:       conf.RX2DataRateIndex,
-			OptNeg:      conf.SelectedMACVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0,
+			OptNeg:      macspec.UseRekeyInd(conf.SelectedMACVersion),
 		},
 		RxDelay: conf.RXDelay,
 		CfList:  frequencyplans.CFList(*test.FrequencyPlan(conf.FrequencyPlanID), conf.PHYVersion),
@@ -1113,7 +1114,7 @@ func (env TestEnvironment) AssertScheduleDownlink(ctx context.Context, conf Down
 							a.So(lorawan.UnmarshalMessage(req.Message.RawPayload, actual), should.BeNil)
 							a.So(lorawan.UnmarshalMessage(conf.Payload, expected), should.BeNil)
 							a.So(actual, should.Resemble, expected)
-							if aPld, ePld := actual.GetMacPayload(), expected.GetMacPayload(); !conf.MACState.LorawanVersion.EncryptFOpts() &&
+							if aPld, ePld := actual.GetMacPayload(), expected.GetMacPayload(); !macspec.EncryptFOpts(conf.MACState.LorawanVersion) &&
 								aPld != nil && ePld != nil &&
 								!bytes.Equal(aPld.FHdr.FOpts, ePld.FHdr.FOpts) {
 								macCommands := func(b []byte) (cmds []*ttnpb.MACCommand) {
@@ -2132,7 +2133,7 @@ func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wr
 				DownlinkSettings: &ttnpb.DLSettings{
 					Rx1DrOffset: macState.DesiredParameters.Rx1DataRateOffset,
 					Rx2Dr:       macState.DesiredParameters.Rx2DataRateIndex,
-					OptNeg:      x.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0,
+					OptNeg:      macspec.UseRekeyInd(x.LorawanVersion),
 				},
 				RxDelay: macState.DesiredParameters.Rx1Delay,
 				CfList:  frequencyplans.CFList(*test.FrequencyPlan(x.FrequencyPlanId), x.LorawanPhyVersion),
@@ -2269,7 +2270,7 @@ func MakeABPEndDevice(defaults ttnpb.MACSettings, wrapKeys bool, sessionOpts []t
 	return MakeEndDevice(
 		EndDeviceOptions.Compose(opts...),
 		func(x ttnpb.EndDevice) ttnpb.EndDevice {
-			if x.Multicast || x.Ids.DevEui != nil && !x.Ids.DevEui.IsZero() || !x.LorawanVersion.RequireDevEUIForABP() {
+			if x.Multicast || x.Ids.DevEui != nil && !x.Ids.DevEui.IsZero() || !macspec.RequireDevEUIForABP(x.LorawanVersion) {
 				return x
 			}
 			return EndDeviceOptions.WithDefaultDevEUI()(x)
@@ -2370,7 +2371,7 @@ func MakeABPSetDeviceRequest(defaults ttnpb.MACSettings, sessionOpts []test.Sess
 	dev := MakeABPEndDevice(defaults, false, sessionOpts, macStateOpts, deviceOpts...)
 	return &SetDeviceRequest{
 		EndDevice: dev,
-		Paths:     MakeABPEndDevicePaths(!dev.Multicast && dev.LorawanVersion.RequireDevEUIForABP(), paths...),
+		Paths:     MakeABPEndDevicePaths(!dev.Multicast && macspec.RequireDevEUIForABP(dev.LorawanVersion), paths...),
 	}
 }
 

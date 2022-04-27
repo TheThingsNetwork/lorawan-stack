@@ -34,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
 	"go.thethings.network/lorawan-stack/v3/pkg/httpclient"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	yaml "gopkg.in/yaml.v2"
@@ -259,7 +260,7 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 	}
 
 	fNwkSIntKey := interopAns.FNwkSIntKey
-	if req.SelectedMacVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
+	if !macspec.UseNwkKey(req.SelectedMacVersion) {
 		fNwkSIntKey = interopAns.NwkSKey
 	}
 

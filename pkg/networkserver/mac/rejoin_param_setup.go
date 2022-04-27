@@ -19,6 +19,7 @@ import (
 
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -36,7 +37,7 @@ var (
 func DeviceNeedsRejoinParamSetupReq(dev *ttnpb.EndDevice) bool {
 	return !dev.GetMulticast() &&
 		dev.GetMacState() != nil &&
-		dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 &&
+		macspec.UseRejoinParamSetupReq(dev.MacState.LorawanVersion) &&
 		(dev.MacState.DesiredParameters.RejoinTimePeriodicity != dev.MacState.CurrentParameters.RejoinTimePeriodicity ||
 			dev.MacState.DesiredParameters.RejoinCountPeriodicity != dev.MacState.CurrentParameters.RejoinCountPeriodicity)
 }
