@@ -40,6 +40,7 @@ import { parseLorawanMacVersion } from '@console/lib/device-utils'
 import { selectSelectedDevice, isOtherClusterDevice } from '@console/store/selectors/devices'
 
 import style from './device-overview.styl'
+import ModalButton from '@ttn-lw/components/button/modal-button'
 
 const m = defineMessages({
   activationInfo: 'Activation information',
@@ -50,6 +51,11 @@ const m = defineMessages({
   keysNotExposed: 'Keys are not exposed',
   failedAccessOtherHostDevice:
     'The end device you attempted to visit is registered on a different cluster and needs to be accessed using its host Console.',
+  macData: 'Download MAC data',
+  hasSession:
+    'The MAC data can contain sensitive information such as session keys that can be used to decrypt messages. Do not share this information publicly.',
+  noSession:
+    'The end device is currently not connected to the network (no active session). The MAC data will hence only contain the current MAC settings.',
 })
 
 @connect(state => {
@@ -75,10 +81,7 @@ class DeviceOverview extends React.Component {
     const { ids, mac_state, mac_settings } = this.props.device
     const toExport = { mac_state, mac_settings }
     const toExportData = composeDataUri(JSON.stringify(toExport, undefined, 2))
-    downloadDataUriAsFile(
-      toExportData,
-      `${ids.device_id}_mac_settings_mac_state_${Date.now()}.json`,
-    )
+    downloadDataUriAsFile(toExportData, `${ids.device_id}_mac_data_${Date.now()}.json`)
   }
 
   get deviceInfo() {
@@ -240,16 +243,20 @@ class DeviceOverview extends React.Component {
     sheetData.push(sessionInfoData)
 
     const macStateAndSettings = {
-      header: 'Export end device MAC state and MAC settings',
+      header: 'MAC data',
       items: [],
     }
 
     if (Boolean(mac_state) && Boolean(mac_settings)) {
       macStateAndSettings.items.push({
         value: (
-          <Button
-            onClick={this.onExport}
-            message={sharedMessages.exportJson}
+          <ModalButton
+            modalData={{
+              message: session ? m.hasSession : m.noSession,
+            }}
+            onApprove={this.onExport}
+            message={m.macData}
+            type="button"
             icon="file_download"
           />
         ),
