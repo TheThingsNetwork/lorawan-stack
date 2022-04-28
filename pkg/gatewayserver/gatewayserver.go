@@ -649,9 +649,6 @@ func (gs *GatewayServer) startHandleUpstreamTask(conn connectionEntry) {
 }
 
 func (gs *GatewayServer) startUpdateConnStatsTask(conn connectionEntry) {
-	if gs.statsRegistry == nil {
-		return
-	}
 	conn.tasksDone.Add(1)
 	gs.StartTask(&task.Config{
 		Context: conn.Context(),
@@ -888,21 +885,27 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 
 	// Initial update, so that the gateway appears connected.
 	registerGatewayConnectionStats(ctx, *ids, stats)
-	if err := gs.statsRegistry.Set(decoupledCtx, *ids, stats, ttnpb.GatewayConnectionStatsFieldPathsTopLevel, gs.config.ConnectionStatsTTL); err != nil {
-		logger.WithError(err).Warn("Failed to initialize connection stats")
+	if gs.statsRegistry != nil {
+		if err := gs.statsRegistry.Set(decoupledCtx, *ids, stats, ttnpb.GatewayConnectionStatsFieldPathsTopLevel, gs.config.ConnectionStatsTTL); err != nil {
+			logger.WithError(err).Warn("Failed to initialize connection stats")
+		}
 	}
 
 	defer func() {
 		logger.Debug("Delete connection stats")
-		if err := gs.statsRegistry.Set(
-			decoupledCtx, *ids, &ttnpb.GatewayConnectionStats{
-				ConnectedAt:    nil,
-				DisconnectedAt: ttnpb.ProtoTimePtr(time.Now()),
-			},
-			[]string{"connected_at", "disconnected_at"},
-			gs.config.ConnectionStatsDisconnectTTL,
-		); err != nil {
-			logger.WithError(err).Warn("Failed to clear connection stats")
+		stats := &ttnpb.GatewayConnectionStats{
+			ConnectedAt:    nil,
+			DisconnectedAt: ttnpb.ProtoTimePtr(time.Now()),
+		}
+		registerGatewayConnectionStats(decoupledCtx, *ids, stats)
+		if gs.statsRegistry != nil {
+			if err := gs.statsRegistry.Set(
+				decoupledCtx, *ids, stats,
+				[]string{"connected_at", "disconnected_at"},
+				gs.config.ConnectionStatsDisconnectTTL,
+			); err != nil {
+				logger.WithError(err).Warn("Failed to clear connection stats")
+			}
 		}
 	}()
 	for {
@@ -911,7 +914,7 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 			return
 		case <-conn.StatsChanged():
 			if duration := gs.config.UpdateConnectionStatsDebounceTime; duration > 0 {
-				// Debounce the updates before the actual write to the store in order to spread updates over time.
+				// Debounce the updates with jitter to spread event publishes and store updates over time.
 				duration := random.Jitter(duration, debounceJitter)
 				select {
 				case <-ctx.Done():
@@ -923,8 +926,10 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 		}
 		stats, paths := conn.Stats()
 		registerGatewayConnectionStats(decoupledCtx, *ids, stats)
-		if err := gs.statsRegistry.Set(decoupledCtx, *ids, stats, paths, gs.config.ConnectionStatsTTL); err != nil {
-			logger.WithError(err).Warn("Failed to update connection stats")
+		if gs.statsRegistry != nil {
+			if err := gs.statsRegistry.Set(decoupledCtx, *ids, stats, paths, gs.config.ConnectionStatsTTL); err != nil {
+				logger.WithError(err).Warn("Failed to update connection stats")
+			}
 		}
 	}
 }
