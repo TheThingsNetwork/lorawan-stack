@@ -18,8 +18,10 @@ import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
+import tts from '@console/api/tts'
+
 import DataSheet from '@ttn-lw/components/data-sheet'
-import Button from '@ttn-lw/components/button'
+import ModalButton from '@ttn-lw/components/button/modal-button'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import Message from '@ttn-lw/lib/components/message'
@@ -37,10 +39,13 @@ import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
 
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
-import { selectSelectedDevice, isOtherClusterDevice } from '@console/store/selectors/devices'
+import {
+  selectSelectedDevice,
+  isOtherClusterDevice,
+} from '@console/store/selectors/devices'
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 import style from './device-overview.styl'
-import ModalButton from '@ttn-lw/components/button/modal-button'
 
 const m = defineMessages({
   activationInfo: 'Activation information',
@@ -59,15 +64,18 @@ const m = defineMessages({
 })
 
 @connect(state => {
+  const appId = selectSelectedApplicationId(state)
   const device = selectSelectedDevice(state)
   const shouldRedirect = isOtherClusterDevice(device)
   return {
+    appId,
     device,
     shouldRedirect,
   }
 })
 class DeviceOverview extends React.Component {
   static propTypes = {
+    appId: PropTypes.string.isRequired,
     device: PropTypes.device.isRequired,
     shouldRedirect: PropTypes.bool,
   }
@@ -77,9 +85,13 @@ class DeviceOverview extends React.Component {
   }
 
   @bind
-  onExport() {
-    const { ids, mac_state, mac_settings } = this.props.device
-    const toExport = { mac_state, mac_settings }
+  async onExport() {
+    const {
+      appId,
+      device: { ids, mac_settings },
+    } = this.props
+    const result = await tts.Applications.Devices.getById(appId, ids.device_id, ['mac_state'])
+    const toExport = { mac_state: result.mac_state, mac_settings }
     const toExportData = composeDataUri(JSON.stringify(toExport, undefined, 2))
     downloadDataUriAsFile(toExportData, `${ids.device_id}_mac_data_${Date.now()}.json`)
   }
