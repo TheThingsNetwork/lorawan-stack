@@ -39,7 +39,7 @@ describe('OAuth Client create', () => {
       .should('be.visible')
       .and('have.attr', 'placeholder')
       .and('eq', 'my-new-oauth-client')
-    cy.findByLabelText('OAuth Client name')
+    cy.findByLabelText('Name')
       .should('be.visible')
       .and('have.attr', 'placeholder')
       .and('eq', 'My new OAuth Client')
