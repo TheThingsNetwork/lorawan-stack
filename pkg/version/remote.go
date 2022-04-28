@@ -19,6 +19,8 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -26,6 +28,10 @@ import (
 	"github.com/blang/semver"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+)
+
+const (
+	versionCheckCacheTTL = 11 * time.Hour // Cache is valid for one hour less than component.version_check.versionCheckPeriod.
 )
 
 type timestamp struct {
@@ -103,6 +109,11 @@ type Update struct {
 	Minor, Patch bool
 }
 
+type cachedUpdate struct {
+	Result    *Update
+	Timestamp timestamp
+}
+
 type checkOptions struct {
 	client  *http.Client
 	current semver.Version
@@ -142,9 +153,69 @@ func WithReference(current semver.Version) CheckOption {
 	})
 }
 
+func getCacheFilePath() (string, error) {
+	cacheDir, err := os.UserCacheDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(cacheDir, "tts", "version-check"), nil
+}
+
+// cachedCheck returns previously saved result from cache
+func cachedCheck() (*cachedUpdate, error) {
+	cacheFile, err := getCacheFilePath()
+	if err != nil {
+		return nil, err
+	}
+	f, err := os.OpenFile(cacheFile, os.O_RDONLY, 0)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	var result cachedUpdate
+	err = json.NewDecoder(f).Decode(&result)
+	return &result, err
+}
+
+// ClearRecentCheckCache clears cache
+func ClearRecentCheckCache() error {
+	cacheFile, err := getCacheFilePath()
+	if err != nil {
+		return err
+	}
+	return os.Remove(cacheFile)
+}
+
+// saveCheck saves a result in cache, along with a timestamp
+func saveCheck(result *Update) error {
+	cacheFile, err := getCacheFilePath()
+	if err != nil {
+		return err
+	}
+	_, err = os.Stat(filepath.Dir(cacheFile))
+	if os.IsNotExist(err) {
+		if err = os.MkdirAll(filepath.Dir(cacheFile), 0700); err != nil {
+			return err
+		}
+	}
+	f, err := os.OpenFile(cacheFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	return json.NewEncoder(f).Encode(&cachedUpdate{Result: result, Timestamp: timestamp{time.Now()}})
+}
+
 // CheckUpdate checks whether there is a version update available.
-// If there is no update, this function returns nil.
+// If there is no update, or no new version is available, this function returns nil.
+// The function uses cache.
 func CheckUpdate(ctx context.Context, opts ...CheckOption) (*Update, error) {
+	cachedCheck, err := cachedCheck()
+	if err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to access cache for version check")
+	} else if cachedCheck.Timestamp.Add(versionCheckCacheTTL).After(time.Now()) {
+		return cachedCheck.Result, nil
+	}
 	current, err := semver.Parse(strings.TrimPrefix(TTN, "v"))
 	if err != nil {
 		return nil, err
@@ -173,13 +244,17 @@ func CheckUpdate(ctx context.Context, opts ...CheckOption) (*Update, error) {
 	default:
 		return nil, nil
 	}
-	return &Update{
+	update := &Update{
 		Current: o.current,
 		Latest:  latest,
 		DocsURL: o.docsURL,
 		Minor:   minor,
 		Patch:   patch,
-	}, nil
+	}
+	if err = saveCheck(update); err != nil {
+		log.FromContext(ctx).WithError(err).Warn("Failed to write version check cache")
+	}
+	return update, nil
 }
 
 // LogUpdate logs an Warn level message when there is a newer minor, and a Log level message when there is a newer patch.
