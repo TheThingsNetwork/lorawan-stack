@@ -39,10 +39,7 @@ import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
 
 import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
-import {
-  selectSelectedDevice,
-  isOtherClusterDevice,
-} from '@console/store/selectors/devices'
+import { selectSelectedDevice, isOtherClusterDevice } from '@console/store/selectors/devices'
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 import style from './device-overview.styl'
