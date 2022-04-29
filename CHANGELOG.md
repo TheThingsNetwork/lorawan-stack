@@ -13,18 +13,24 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
-- Application Server now decodes downlink if a downlink decoder is present and binary payload is scheduled.
-
 ### Deprecated
 
 ### Removed
 
 ### Fixed
 
+### Security
+
+## [3.19.1] - unreleased
+
+### Changed
+
+- Application Server now decodes downlink if a downlink decoder is present and binary payload is scheduled.
+
+### Fixed
+
 - End devices frame counts being displayed as `n/a` when event stream contained historical data message events.
 - Gateway general settings (Basic settings) not saving changes in some cases.
-
-### Security
 
 ## [3.19.0] - 2022-04-21
 
@@ -2115,7 +2121,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.19.0...v3.19
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.19.1...v3.19
+[3.19.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.19.0...v3.19.1
 [3.19.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.18.2...v3.19.0
 [3.18.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.18.1...v3.18.2
 [3.18.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.18.0...v3.18.1
