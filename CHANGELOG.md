@@ -11,7 +11,12 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- New event type `gs.gateway.connection.stats` with connection statistics. A new event is sent at most every `gs.update-connection-stats-debounce-time` time.
+
 ### Changed
+
+- Event type for `gs.up.receive` event to `GatewayUplinkMessage`.
+- Default debounce time for updating connection stats in de Gateway Server (configuration setting `gs.update-connection-stats-debounce-time`) is now 30 seconds.
 
 ### Deprecated
 
