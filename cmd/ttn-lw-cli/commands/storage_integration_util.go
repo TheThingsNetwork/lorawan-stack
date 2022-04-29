@@ -25,7 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-var applicationUpFlags = util.FieldMaskFlags(&ttnpb.ApplicationUp{})
+var applicationUpFlags = &pflag.FlagSet{}
 
 func getStoredUpFlags() *pflag.FlagSet {
 	flags := &pflag.FlagSet{}
@@ -39,7 +39,7 @@ func getStoredUpFlags() *pflag.FlagSet {
 	flags.AddFlagSet(timestampFlags("before", "query upstream messages before specified timestamp"))
 	flags.Duration("last", 0, "query upstream messages in the last hours or minutes")
 
-	flags.AddFlagSet(applicationUpFlags)
+	ttnpb.AddSelectFlagsForApplicationUp(flags, "", false)
 
 	types := make([]string, 0, len(ttnpb.StoredApplicationUpTypes))
 	for k := range ttnpb.StoredApplicationUpTypes {

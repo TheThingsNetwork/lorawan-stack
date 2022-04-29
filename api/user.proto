@@ -14,6 +14,7 @@
 
 syntax = "proto3";
 
+import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/field_mask.proto";
@@ -33,14 +34,24 @@ option (gogoproto.goproto_registration) = true;
 
 // User is the message that defines a user on the network.
 message User {
+  option (thethings.flags.message) = { select: true, set: true };
   // The identifiers of the user. These are public and can be seen by any authenticated user in the network.
-  UserIdentifiers ids = 1 [(validate.rules).message.required = true];
+  UserIdentifiers ids = 1 [
+    (validate.rules).message.required = true,
+    (thethings.flags.field) = { select: false, hidden: true }
+  ];
   // When the user was created. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp created_at = 2 [
+    (thethings.flags.field) = { select: false, set: false }
+  ];
   // When the user was last updated. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.Timestamp updated_at = 3 [
+    (thethings.flags.field) = { select: false, set: false }
+  ];
   // When the user was deleted. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp deleted_at = 19;
+  google.protobuf.Timestamp deleted_at = 19 [
+    (thethings.flags.field) = { select: true, set: false }
+  ];
 
   // The name of the user. This information is public and can be seen by any authenticated user in the network.
   string name = 4 [(validate.rules).string.max_len = 50];
@@ -71,7 +82,9 @@ message User {
   // It is not returned on API calls, and can not be updated by updating the User.
   // See the UpdatePassword method of the UserRegistry service for more information.
   string password = 10 [(validate.rules).string.max_len = 1000];
-  google.protobuf.Timestamp password_updated_at = 11;
+  google.protobuf.Timestamp password_updated_at = 11 [
+    (thethings.flags.field) = { select: true, set: false }
+  ];
   bool require_password_update = 12;
 
   // The reviewing state of the user.
@@ -91,8 +104,12 @@ message User {
   // It is not returned on API calls, and can not be updated by updating the User.
   // See the CreateTemporaryPassword method of the UserRegistry service for more information.
   string temporary_password = 15 [(validate.rules).string.max_len = 1000];
-  google.protobuf.Timestamp temporary_password_created_at = 16;
-  google.protobuf.Timestamp temporary_password_expires_at = 17;
+  google.protobuf.Timestamp temporary_password_created_at = 16 [
+    (thethings.flags.field) = { select: true, set: false }
+  ];
+  google.protobuf.Timestamp temporary_password_expires_at = 17 [
+    (thethings.flags.field) = { select: true, set: false }
+  ];
 
   // A profile picture for the user.
   // This information is public and can be seen by any authenticated user in the network.
@@ -112,6 +129,7 @@ message GetUserRequest {
 }
 
 message ListUsersRequest {
+  option (thethings.flags.message) = { select: true, set: true };
   // The names of the user fields that should be returned.
   google.protobuf.FieldMask field_mask = 1;
   // Order the results by this field path (must be present in the field mask).

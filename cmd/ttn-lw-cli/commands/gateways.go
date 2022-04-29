@@ -32,10 +32,8 @@ import (
 )
 
 var (
-	selectGatewayFlags     = util.FieldMaskFlags(&ttnpb.Gateway{})
-	setGatewayFlags        = util.FieldFlags(&ttnpb.Gateway{})
-	setGatewayAntennaFlags = util.FieldFlags(&ttnpb.GatewayAntenna{}, "antenna")
-	selectAllGatewayFlags  = util.SelectAllFlagSet("gateway")
+	selectGatewayFlags    = &pflag.FlagSet{}
+	selectAllGatewayFlags = util.SelectAllFlagSet("gateway")
 
 	gatewayFlattenPaths = []string{"lbs_lns_secret", "claim_authentication_code", "target_cups_key"}
 )
@@ -106,14 +104,6 @@ func getGatewayEUI(flagSet *pflag.FlagSet, args []string, requireEUI bool) (*ttn
 	return ids, nil
 }
 
-var searchGatewaysFlags = func() *pflag.FlagSet {
-	flagSet := &pflag.FlagSet{}
-	flagSet.AddFlagSet(searchFlags)
-	// NOTE: These flags need to be named with underscores, not dashes!
-	flagSet.String("eui_contains", "", "")
-	return flagSet
-}()
-
 var (
 	gatewaysCommand = &cobra.Command{
 		Use:     "gateways",
@@ -145,22 +135,22 @@ var (
 		Aliases: []string{"ls"},
 		Short:   "List gateways",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			req := &ttnpb.ListGatewaysRequest{}
+			_, err := req.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
+				return err
+			}
 			paths := util.SelectFieldMask(cmd.Flags(), selectGatewayFlags)
 			paths = ttnpb.AllowedFields(paths, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.GatewayRegistry/List"].Allowed)
-
+			if req.FieldMask == nil {
+				req.FieldMask = &pbtypes.FieldMask{Paths: paths}
+			}
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
 				return err
 			}
-			limit, page, opt, getTotal := withPagination(cmd.Flags())
-			res, err := ttnpb.NewGatewayRegistryClient(is).List(ctx, &ttnpb.ListGatewaysRequest{
-				Collaborator: getCollaborator(cmd.Flags()),
-				FieldMask:    &pbtypes.FieldMask{Paths: paths},
-				Limit:        limit,
-				Page:         page,
-				Order:        getOrder(cmd.Flags()),
-				Deleted:      getDeleted(cmd.Flags()),
-			}, opt)
+			_, _, opt, getTotal := withPagination(cmd.Flags())
+			res, err := ttnpb.NewGatewayRegistryClient(is).List(ctx, req, opt)
 			if err != nil {
 				return err
 			}
@@ -177,16 +167,18 @@ var (
 			paths = ttnpb.AllowedFields(paths, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.EntityRegistrySearch/SearchGateways"].Allowed)
 
 			req := &ttnpb.SearchGatewaysRequest{}
-			if err := util.SetFields(req, searchGatewaysFlags); err != nil {
+			_, err := req.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
 				return err
 			}
 			var (
 				opt      grpc.CallOption
 				getTotal func() uint64
 			)
-			req.Limit, req.Page, opt, getTotal = withPagination(cmd.Flags())
-			req.FieldMask = &pbtypes.FieldMask{Paths: paths}
-			req.Deleted = getDeleted(cmd.Flags())
+			_, _, opt, getTotal = withPagination(cmd.Flags())
+			if req.FieldMask == nil {
+				req.FieldMask = &pbtypes.FieldMask{Paths: paths}
+			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -252,8 +244,12 @@ var (
 				return err
 			}
 
-			collaborator := getCollaborator(cmd.Flags())
-			if collaborator == nil {
+			collaborator := &ttnpb.OrganizationOrUserIdentifiers{}
+			_, err = collaborator.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
+				return err
+			}
+			if collaborator.GetIds() == nil {
 				return errNoCollaborator.New()
 			}
 			var gateway ttnpb.Gateway
@@ -272,12 +268,10 @@ var (
 				gateway.LocationPublic = true
 			}
 
-			if err = util.SetFields(&gateway, setGatewayFlags); err != nil {
+			_, err = gateway.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
 				return err
 			}
-
-			gateway.Attributes = mergeAttributes(gateway.Attributes, cmd.Flags())
-
 			if gateway.Ids == nil {
 				gateway.Ids = &ttnpb.GatewayIdentifiers{}
 			}
@@ -294,7 +288,8 @@ var (
 			}
 
 			antenna := &ttnpb.GatewayAntenna{}
-			if err = util.SetFields(antenna, setGatewayAntennaFlags, "antenna"); err != nil {
+			_, err = antenna.SetFromFlags(cmd.Flags(), "antenna")
+			if err != nil {
 				return err
 			}
 			if !proto.Equal(antenna, &ttnpb.GatewayAntenna{}) {
@@ -330,10 +325,18 @@ var (
 			if err != nil {
 				return err
 			}
-			paths := util.UpdateFieldMask(cmd.Flags(), setGatewayFlags, attributesFlags())
+			var gateway ttnpb.Gateway
+			paths, err := gateway.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
+				return err
+			}
 			rawUnsetPaths, _ := cmd.Flags().GetStringSlice("unset")
 			unsetPaths := util.NormalizePaths(rawUnsetPaths)
-			antennaPaths := util.UpdateFieldMask(cmd.Flags(), setGatewayAntennaFlags)
+			antenna := &ttnpb.GatewayAntenna{}
+			antennaPaths, err := antenna.SetFromFlags(cmd.Flags(), "antenna")
+			if err != nil {
+				return err
+			}
 			paths = append(paths, ttnpb.FlattenPaths(paths, gatewayFlattenPaths)...)
 
 			if gtwID.Eui != nil {
@@ -345,12 +348,6 @@ var (
 				logger.Warn("No fields selected, won't update anything")
 				return nil
 			}
-
-			var gateway ttnpb.Gateway
-			if err = util.SetFields(&gateway, setGatewayFlags); err != nil {
-				return err
-			}
-			gateway.Attributes = mergeAttributes(gateway.Attributes, cmd.Flags())
 			gateway.Ids = gtwID
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -368,7 +365,7 @@ var (
 				}
 				antennaIndex, _ := cmd.Flags().GetInt("antenna.index")
 				if antennaAdd || len(res.Antennas) == 0 {
-					res.Antennas = append(res.Antennas, &ttnpb.GatewayAntenna{})
+					res.Antennas = append(res.Antennas, antenna)
 					antennaIndex = len(res.Antennas) - 1
 				} else if antennaIndex > len(res.Antennas) {
 					return errAntennaIndex.New()
@@ -376,14 +373,10 @@ var (
 				if antennaRemove {
 					gateway.Antennas = append(res.Antennas[:antennaIndex], res.Antennas[antennaIndex+1:]...)
 				} else { // create or update
-					if err = util.SetFields(res.Antennas[antennaIndex], setGatewayAntennaFlags, "antenna"); err != nil {
-						return err
-					}
 					gateway.Antennas = res.Antennas
 				}
 				paths = append(paths, "antennas")
 			}
-
 			res, err := ttnpb.NewGatewayRegistryClient(is).Update(ctx, &ttnpb.UpdateGatewayRequest{
 				Gateway:   &gateway,
 				FieldMask: &pbtypes.FieldMask{Paths: append(paths, unsetPaths...)},
@@ -518,17 +511,15 @@ var (
 )
 
 func init() {
+	ttnpb.AddSelectFlagsForGateway(selectGatewayFlags, "", false)
 	gatewaysListFrequencyPlans.Flags().Uint32("base-frequency", 0, "Base frequency in MHz for hardware support (433, 470, 868 or 915)")
 	gatewaysCommand.AddCommand(gatewaysListFrequencyPlans)
-	gatewaysListCommand.Flags().AddFlagSet(collaboratorFlags())
-	gatewaysListCommand.Flags().AddFlagSet(deletedFlags)
+	ttnpb.AddSetFlagsForListGatewaysRequest(gatewaysListCommand.Flags(), "", false)
+	AddCollaboratorFlagAlias(gatewaysListCommand.Flags(), "collaborator")
 	gatewaysListCommand.Flags().AddFlagSet(selectGatewayFlags)
-	gatewaysListCommand.Flags().AddFlagSet(paginationFlags())
-	gatewaysListCommand.Flags().AddFlagSet(orderFlags())
 	gatewaysListCommand.Flags().AddFlagSet(selectAllGatewayFlags)
 	gatewaysCommand.AddCommand(gatewaysListCommand)
-	gatewaysSearchCommand.Flags().AddFlagSet(searchGatewaysFlags)
-	gatewaysSearchCommand.Flags().AddFlagSet(deletedFlags)
+	ttnpb.AddSetFlagsForSearchGatewaysRequest(gatewaysSearchCommand.Flags(), "", false)
 	gatewaysSearchCommand.Flags().AddFlagSet(selectGatewayFlags)
 	gatewaysSearchCommand.Flags().AddFlagSet(selectAllGatewayFlags)
 	gatewaysCommand.AddCommand(gatewaysSearchCommand)
@@ -536,21 +527,21 @@ func init() {
 	gatewaysGetCommand.Flags().AddFlagSet(selectGatewayFlags)
 	gatewaysGetCommand.Flags().AddFlagSet(selectAllGatewayFlags)
 	gatewaysCommand.AddCommand(gatewaysGetCommand)
+	ttnpb.AddSetFlagsForGateway(gatewaysCreateCommand.Flags(), "", false)
+	ttnpb.AddSetFlagsForOrganizationOrUserIdentifiers(gatewaysCreateCommand.Flags(), "", true)
+	AddCollaboratorFlagAlias(gatewaysCreateCommand.Flags(), "")
+	ttnpb.AddSetFlagsForGatewayAntenna(gatewaysCreateCommand.Flags(), "antenna", false)
 	gatewaysCreateCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysCreateCommand.Flags().AddFlagSet(collaboratorFlags())
-	gatewaysCreateCommand.Flags().AddFlagSet(setGatewayFlags)
-	gatewaysCreateCommand.Flags().AddFlagSet(setGatewayAntennaFlags)
-	gatewaysCreateCommand.Flags().AddFlagSet(attributesFlags())
 	gatewaysCreateCommand.Flags().Bool("defaults", true, "configure gateway with defaults")
 	gatewaysCommand.AddCommand(gatewaysCreateCommand)
 	gatewaysSetCommand.Flags().AddFlagSet(gatewayIDFlags())
-	gatewaysSetCommand.Flags().AddFlagSet(setGatewayFlags)
+	ttnpb.AddSetFlagsForGateway(gatewaysSetCommand.Flags(), "", false)
 	gatewaysSetCommand.Flags().AddFlagSet(util.UnsetFlagSet())
 	gatewaysSetCommand.Flags().Int("antenna.index", 0, "index of the antenna to update or remove")
 	gatewaysSetCommand.Flags().Bool("antenna.add", false, "add an extra antenna")
 	gatewaysSetCommand.Flags().Bool("antenna.remove", false, "remove an antenna")
-	gatewaysSetCommand.Flags().AddFlagSet(setGatewayAntennaFlags)
-	gatewaysSetCommand.Flags().AddFlagSet(attributesFlags())
+	ttnpb.AddSetFlagsForGatewayAntenna(gatewaysSetCommand.Flags(), "antenna", false)
 	gatewaysCommand.AddCommand(gatewaysSetCommand)
 	gatewaysDeleteCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysCommand.AddCommand(gatewaysDeleteCommand)

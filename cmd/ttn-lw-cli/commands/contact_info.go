@@ -22,7 +22,6 @@ import (
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
-	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -135,8 +134,6 @@ func updateContactInfo(entityID *ttnpb.EntityIdentifiers, updater func([]*ttnpb.
 	return contactInfoer.GetContactInfo(), nil
 }
 
-var contactInfoFlags = util.FieldFlags(&ttnpb.ContactInfo{})
-
 var (
 	errContactInfoExists           = errors.DefineAlreadyExists("contact_info_exists", "contact info already exists")
 	errMatchingContactInfoNotFound = errors.DefineAlreadyExists("contact_info_not_found", "matching contact info not found")
@@ -177,7 +174,8 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []st
 				return err
 			}
 			var contactInfo ttnpb.ContactInfo
-			if err = util.SetFields(&contactInfo, contactInfoFlags); err != nil {
+			_, err = contactInfo.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
 				return err
 			}
 			updatedInfo, err := updateContactInfo(id, func(existing []*ttnpb.ContactInfo) ([]*ttnpb.ContactInfo, error) {
@@ -205,7 +203,8 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []st
 				return err
 			}
 			var contactInfo ttnpb.ContactInfo
-			if err = util.SetFields(&contactInfo, contactInfoFlags); err != nil {
+			_, err = contactInfo.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
 				return err
 			}
 			updatedInfo, err := updateContactInfo(id, func(existing []*ttnpb.ContactInfo) ([]*ttnpb.ContactInfo, error) {
@@ -283,13 +282,13 @@ func contactInfoCommands(entity string, getID func(cmd *cobra.Command, args []st
 			return io.Write(os.Stdout, config.OutputFormat, res)
 		},
 	}
-	add.Flags().AddFlagSet(contactInfoFlags)
+	ttnpb.AddSetFlagsForContactInfo(add.Flags(), "", false)
 	cmd.AddCommand(add)
-	list.Flags().AddFlagSet(contactInfoFlags)
+	ttnpb.AddSetFlagsForContactInfo(list.Flags(), "", false)
 	cmd.AddCommand(list)
-	remove.Flags().AddFlagSet(contactInfoFlags)
+	ttnpb.AddSetFlagsForContactInfo(remove.Flags(), "", false)
 	cmd.AddCommand(remove)
-	requestValidation.Flags().AddFlagSet(contactInfoFlags)
+	ttnpb.AddSetFlagsForContactInfo(requestValidation.Flags(), "", false)
 	cmd.AddCommand(requestValidation)
 	validate.Flags().String("reference", "", "Reference of the requested validation")
 	validate.Flags().String("token", "", "Token that you received")

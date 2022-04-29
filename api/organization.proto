@@ -14,6 +14,7 @@
 
 syntax = "proto3";
 
+import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/protobuf/field_mask.proto";
@@ -30,14 +31,24 @@ option go_package = "go.thethings.network/lorawan-stack/v3/pkg/ttnpb";
 option (gogoproto.goproto_registration) = true;
 
 message Organization {
+  option (thethings.flags.message) = { select: true, set: true };
   // The identifiers of the organization. These are public and can be seen by any authenticated user in the network.
-  OrganizationIdentifiers ids = 1 [(validate.rules).message.required = true];
+  OrganizationIdentifiers ids = 1 [
+    (validate.rules).message.required = true,
+    (thethings.flags.field) = { select: false, hidden: true }
+  ];
   // When the organization was created. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp created_at = 2;
+  google.protobuf.Timestamp created_at = 2 [
+    (thethings.flags.field) = { select: false, set: false }
+  ];
   // When the organization was last updated. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp updated_at = 3;
+  google.protobuf.Timestamp updated_at = 3 [
+    (thethings.flags.field) = { select: false, set: false }
+  ];
   // When the organization was deleted. This information is public and can be seen by any authenticated user in the network.
-  google.protobuf.Timestamp deleted_at = 8;
+  google.protobuf.Timestamp deleted_at = 8 [
+    (thethings.flags.field) = { select: true, set: false }
+  ];
 
   // The name of the organization. This information is public and can be seen by any authenticated user in the network.
   string name = 4 [(validate.rules).string.max_len = 50];
@@ -74,12 +85,15 @@ message GetOrganizationRequest {
 }
 
 message ListOrganizationsRequest {
+  option (thethings.flags.message) = { select: false, set: true };
   // By default we list all organizations the caller has rights on.
   // Set the user to instead list the organizations
   // where the user or organization is collaborator on.
   // NOTE: It is currently not possible to have organizations collaborating on
   // other organizations.
-  OrganizationOrUserIdentifiers collaborator = 1;
+  OrganizationOrUserIdentifiers collaborator = 1 [
+    (thethings.flags.field) = { hidden: true }
+  ];
   // The names of the organization fields that should be returned.
   google.protobuf.FieldMask field_mask = 2;
   // Order the results by this field path (must be present in the field mask).

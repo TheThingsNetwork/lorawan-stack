@@ -22,6 +22,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -60,12 +61,6 @@ func getCollaborator(flagSet *pflag.FlagSet) *ttnpb.OrganizationOrUserIdentifier
 		return ttnpb.UserIdentifiers{UserId: userID}.OrganizationOrUserIdentifiers()
 	}
 	return ttnpb.OrganizationIdentifiers{OrganizationId: organizationID}.OrganizationOrUserIdentifiers()
-}
-
-func attributesFlags() *pflag.FlagSet {
-	flagSet := &pflag.FlagSet{}
-	flagSet.StringSlice("attributes", nil, "key=value")
-	return flagSet
 }
 
 func forceFlags() *pflag.FlagSet {
@@ -178,19 +173,6 @@ func getAPIKeyFields(flagSet *pflag.FlagSet) ([]ttnpb.Right, *time.Time, []strin
 	}
 	return rights, expiryDate, paths, nil
 }
-
-var searchFlags = func() *pflag.FlagSet {
-	flagSet := &pflag.FlagSet{}
-	// NOTE: These flags need to be named with underscores, not dashes!
-	flagSet.String("query", "", "")
-	flagSet.String("id_contains", "", "")
-	flagSet.String("name_contains", "", "")
-	flagSet.String("description_contains", "", "")
-	flagSet.StringToString("attributes_contain", nil, "(key=value)")
-	flagSet.AddFlagSet(paginationFlags())
-	flagSet.AddFlagSet(orderFlags())
-	return flagSet
-}()
 
 var errNoIDs = errors.DefineInvalidArgument("no_ids", "no IDs set")
 
@@ -345,4 +327,41 @@ var deletedFlags = func() *pflag.FlagSet {
 func getDeleted(flagSet *pflag.FlagSet) bool {
 	deleted, _ := flagSet.GetBool("deleted")
 	return deleted
+}
+
+func fieldMaskForField(paths []string, prefix string) []string {
+	out := make([]string, 0, len(paths))
+	for _, path := range paths {
+		if strings.HasPrefix(path, prefix) {
+			out = append(out, strings.TrimPrefix(path, prefix+"."))
+		}
+	}
+	return out
+}
+
+// AddCollaboratorFlagAlias adds alias for user id and organization id in User
+func AddCollaboratorFlagAlias(flagSet *pflag.FlagSet, prefix string) {
+	flagsplugin.AddAlias(flagSet, flagsplugin.Prefix("ids.organization-ids.organization-id", prefix), "organization-id", flagsplugin.WithHidden(false))
+	flagsplugin.AddAlias(flagSet, flagsplugin.Prefix("ids.user-ids.user-id", prefix), "user-id", flagsplugin.WithHidden(false))
+}
+
+// AddGatewayAntennaIdentifierFlags adds a string slice flag for gateway antennas.
+func AddGatewayAntennaIdentifierFlags(flagSet *pflag.FlagSet, prefix string) {
+	flagSet.AddFlag(flagsplugin.NewStringSliceFlag(flagsplugin.Prefix("gateways", prefix), ""))
+}
+
+// GetGatewayAntennaIdentifiers gets a string slice value from a flag and returns a slice of gateway antenna identifiers.
+func GetGatewayAntennaIdentifiers(flagSet *pflag.FlagSet, prefix string) (antennas []*ttnpb.GatewayAntennaIdentifiers, err error) {
+	antennaStrings, changed, err := flagsplugin.GetStringSlice(flagSet, flagsplugin.Prefix("gateways", prefix))
+	if err != nil || !changed {
+		return nil, err
+	}
+	for _, id := range antennaStrings {
+		antennas = append(antennas, &ttnpb.GatewayAntennaIdentifiers{
+			GatewayIds: &ttnpb.GatewayIdentifiers{
+				GatewayId: id,
+			},
+		})
+	}
+	return antennas, nil
 }

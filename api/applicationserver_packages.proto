@@ -14,6 +14,7 @@
 
 syntax = "proto3";
 
+import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
@@ -40,14 +41,23 @@ message ApplicationPackages {
 }
 
 message ApplicationPackageAssociationIdentifiers {
+  option (thethings.flags.message) = { select: true, set: true };
   EndDeviceIdentifiers end_device_ids = 1 [(validate.rules).message.required = true];
   uint32 f_port = 2 [(validate.rules).uint32 = {gte: 1, lte: 255}];
 }
 
 message ApplicationPackageAssociation {
-  ApplicationPackageAssociationIdentifiers ids = 1 [(validate.rules).message.required = true];
-  google.protobuf.Timestamp created_at = 2;
-  google.protobuf.Timestamp updated_at = 3;
+  option (thethings.flags.message) = { select: true, set: true };
+  ApplicationPackageAssociationIdentifiers ids = 1 [
+    (validate.rules).message.required = true,
+    (thethings.flags.field) = { select: false, hidden: true }
+  ];
+  google.protobuf.Timestamp created_at = 2 [
+    (thethings.flags.field) = { select: false, set: false }
+  ];
+  google.protobuf.Timestamp updated_at = 3 [
+    (thethings.flags.field) = { select: false, set: false }
+  ];
   string package_name = 4 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
   google.protobuf.Struct data = 5;
 }
@@ -77,14 +87,23 @@ message SetApplicationPackageAssociationRequest {
 }
 
 message ApplicationPackageDefaultAssociationIdentifiers {
+  option (thethings.flags.message) = { select: true, set: true };
   ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
   uint32 f_port = 2 [(validate.rules).uint32 = {gte: 1, lte: 255}];
 }
 
 message ApplicationPackageDefaultAssociation {
-  ApplicationPackageDefaultAssociationIdentifiers ids = 1 [(validate.rules).message.required = true];
-  google.protobuf.Timestamp created_at = 2;
-  google.protobuf.Timestamp updated_at = 3;
+  option (thethings.flags.message) = { select: true, set: true };
+  ApplicationPackageDefaultAssociationIdentifiers ids = 1 [
+    (validate.rules).message.required = true,
+    (thethings.flags.field) = { select: false, hidden: true }
+  ];
+  google.protobuf.Timestamp created_at = 2 [
+    (thethings.flags.field) = { select: false, set: false }
+  ];
+  google.protobuf.Timestamp updated_at = 3 [
+    (thethings.flags.field) = { select: false, set: false }
+  ];
   string package_name = 4 [(validate.rules).string = {pattern: "^[a-z0-9](?:[-]?[a-z0-9]){2,}$" , max_len: 36}];
   google.protobuf.Struct data = 5;
 }

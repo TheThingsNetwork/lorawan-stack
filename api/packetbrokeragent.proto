@@ -14,6 +14,7 @@
 
 syntax = "proto3";
 
+import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
@@ -151,6 +152,7 @@ message PacketBrokerInfo {
 }
 
 message PacketBrokerRegisterRequest {
+  option (thethings.flags.message) = { select: false, set: true };
   // Whether the network should be listed in Packet Broker.
   // If unset, the value is taken from the registration settings.
   google.protobuf.BoolValue listed = 1;
@@ -228,6 +230,7 @@ message SetPacketBrokerRoutingPolicyRequest {
 }
 
 message PacketBrokerGatewayVisibility {
+  option (thethings.flags.message) = { select: false, set: true };
   // Show location.
   bool location = 1;
   // Show antenna placement (indoor/outdoor).

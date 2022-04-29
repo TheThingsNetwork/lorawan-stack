@@ -28,8 +28,7 @@ import (
 )
 
 var (
-	selectApplicationActivationSettingsFlags = util.FieldMaskFlags(&ttnpb.ApplicationActivationSettings{})
-	setApplicationActivationSettingsFlags    = util.FieldFlags(&ttnpb.ApplicationActivationSettings{})
+	selectApplicationActivationSettingsFlags = &pflag.FlagSet{}
 
 	selectAllApplicationActivationSettingsFlags = util.SelectAllFlagSet("application activation settings")
 )
@@ -80,13 +79,12 @@ var (
 			if appID == nil {
 				return errNoApplicationID.New()
 			}
-			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationActivationSettingsFlags)
 
 			var aas ttnpb.ApplicationActivationSettings
-			if err := util.SetFields(&aas, setApplicationActivationSettingsFlags); err != nil {
+			paths, err := aas.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
 				return err
 			}
-
 			js, err := api.Dial(ctx, config.JoinServerGRPCAddress)
 			if err != nil {
 				return err
@@ -126,12 +124,13 @@ var (
 )
 
 func init() {
+	ttnpb.AddSelectFlagsForApplicationActivationSettings(selectApplicationActivationSettingsFlags, "", false)
 	applicationActivationSettingsGetCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationActivationSettingsGetCommand.Flags().AddFlagSet(selectApplicationActivationSettingsFlags)
 	applicationActivationSettingsGetCommand.Flags().AddFlagSet(selectAllApplicationActivationSettingsFlags)
 	applicationActivationSettingsCommand.AddCommand(applicationActivationSettingsGetCommand)
 	applicationActivationSettingsSetCommand.Flags().AddFlagSet(applicationIDFlags())
-	applicationActivationSettingsSetCommand.Flags().AddFlagSet(setApplicationActivationSettingsFlags)
+	ttnpb.AddSetFlagsForApplicationActivationSettings(applicationActivationSettingsSetCommand.Flags(), "", false)
 	applicationActivationSettingsCommand.AddCommand(applicationActivationSettingsSetCommand)
 	applicationActivationSettingsDeleteCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationActivationSettingsCommand.AddCommand(applicationActivationSettingsDeleteCommand)

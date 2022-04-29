@@ -20,12 +20,7 @@ import (
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
-	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
-)
-
-var (
-	setApplicationDownlinkFlags = util.FieldFlags(&ttnpb.ApplicationDownlink{})
 )
 
 var (
@@ -41,12 +36,18 @@ var (
 			if err != nil {
 				return err
 			}
-
 			var downlink ttnpb.ApplicationDownlink
-			if err = util.SetFields(&downlink, setApplicationDownlinkFlags); err != nil {
+			paths, err := downlink.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
 				return err
 			}
-
+			antennas, err := GetGatewayAntennaIdentifiers(cmd.Flags(), "class-b-c")
+			if err != nil {
+				return err
+			}
+			if len(antennas) > 0 {
+				paths = append(paths, "class-b-c.gateways")
+			}
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
 				return err
@@ -72,10 +73,17 @@ var (
 			}
 
 			var downlink ttnpb.ApplicationDownlink
-			if err = util.SetFields(&downlink, setApplicationDownlinkFlags); err != nil {
+			paths, err := downlink.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
 				return err
 			}
-
+			antennas, err := GetGatewayAntennaIdentifiers(cmd.Flags(), "class-b-c")
+			if err != nil {
+				return err
+			}
+			if len(antennas) > 0 {
+				paths = append(paths, "class-b-c.gateways")
+			}
 			as, err := api.Dial(ctx, config.ApplicationServerGRPCAddress)
 			if err != nil {
 				return err
@@ -138,10 +146,12 @@ var (
 )
 
 func init() {
-	applicationsDownlinkPushCommand.Flags().AddFlagSet(setApplicationDownlinkFlags)
+	ttnpb.AddSetFlagsForApplicationDownlink(applicationsDownlinkPushCommand.Flags(), "", false)
+	AddGatewayAntennaIdentifierFlags(applicationsDownlinkPushCommand.Flags(), "class-b-c")
 	applicationsDownlinkPushCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	applicationsDownlinkCommand.AddCommand(applicationsDownlinkPushCommand)
-	applicationsDownlinkReplaceCommand.Flags().AddFlagSet(setApplicationDownlinkFlags)
+	ttnpb.AddSetFlagsForApplicationDownlink(applicationsDownlinkReplaceCommand.Flags(), "", false)
+	AddGatewayAntennaIdentifierFlags(applicationsDownlinkReplaceCommand.Flags(), "class-b-c")
 	applicationsDownlinkReplaceCommand.Flags().AddFlagSet(endDeviceIDFlags())
 	applicationsDownlinkCommand.AddCommand(applicationsDownlinkReplaceCommand)
 	applicationsDownlinkClearCommand.Flags().AddFlagSet(endDeviceIDFlags())

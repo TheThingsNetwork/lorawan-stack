@@ -16,6 +16,7 @@ syntax = "proto3";
 
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/field_mask.proto";
@@ -233,12 +234,19 @@ service JsEndDeviceRegistry {
 }
 
 message ApplicationActivationSettings {
+  option (thethings.flags.message) = { select: true, set: true };
   // The KEK label to use for wrapping application keys.
   string kek_label = 1 [(validate.rules).string.max_len = 2048];
   // The (encrypted) Key Encryption Key.
   KeyEnvelope kek = 2;
   // Home NetID.
-  bytes home_net_id = 3 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
+  bytes home_net_id = 3 [
+    (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID",
+    (thethings.flags.field) = {
+      set_flag_new_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.New3BytesFlag",
+      set_flag_getter_func: "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags.GetExactBytes"
+    }
+  ];
   // The AS-ID of the Application Server to use.
   string application_server_id = 4 [(validate.rules).string.max_len = 100];
 }
@@ -249,6 +257,7 @@ message GetApplicationActivationSettingsRequest {
 }
 
 message SetApplicationActivationSettingsRequest {
+  option (thethings.flags.message) = { select: true, set: true };
   ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
   ApplicationActivationSettings settings = 2 [(validate.rules).message.required = true];
   google.protobuf.FieldMask field_mask = 3;

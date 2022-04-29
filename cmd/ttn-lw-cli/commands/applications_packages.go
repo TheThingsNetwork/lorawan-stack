@@ -19,6 +19,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -31,10 +32,8 @@ import (
 )
 
 var (
-	selectApplicationPackageAssociationsFlags        = util.FieldMaskFlags(&ttnpb.ApplicationPackageAssociation{})
-	setApplicationPackageAssociationsFlags           = util.FieldFlags(&ttnpb.ApplicationPackageAssociation{})
-	selectApplicationPackageDefaultAssociationsFlags = util.FieldMaskFlags(&ttnpb.ApplicationPackageDefaultAssociation{})
-	setApplicationPackageDefaultAssociationsFlags    = util.FieldFlags(&ttnpb.ApplicationPackageDefaultAssociation{})
+	selectApplicationPackageAssociationsFlags        = &pflag.FlagSet{}
+	selectApplicationPackageDefaultAssociationsFlags = &pflag.FlagSet{}
 
 	selectAllApplicationPackageAssociationsFlags        = util.SelectAllFlagSet("application package association")
 	selectAllApplicationPackageDefaultAssociationsFlags = util.SelectAllFlagSet("application package default association")
@@ -248,14 +247,13 @@ var (
 		Aliases: []string{"update"},
 		Short:   "Set the properties of an application package association",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			assocID, err := getApplicationPackageAssociationID(cmd.Flags(), args)
+			association := &ttnpb.ApplicationPackageAssociation{}
+			paths, err := association.SetFromFlags(cmd.Flags(), "")
 			if err != nil {
 				return err
 			}
-			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationPackageAssociationsFlags)
-
-			association := &ttnpb.ApplicationPackageAssociation{}
-			if err = util.SetFields(association, setApplicationPackageAssociationsFlags); err != nil {
+			assocID, err := getApplicationPackageAssociationID(cmd.Flags(), args)
+			if err != nil {
 				return err
 			}
 			association.Ids = assocID
@@ -393,14 +391,13 @@ var (
 		Aliases: []string{"update"},
 		Short:   "Set the properties of an application package default association",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			assocID, err := getApplicationPackageDefaultAssociationID(cmd.Flags(), args)
+			association := &ttnpb.ApplicationPackageDefaultAssociation{}
+			paths, err := association.SetFromFlags(cmd.Flags(), "")
 			if err != nil {
 				return err
 			}
-			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationPackageDefaultAssociationsFlags)
-
-			association := &ttnpb.ApplicationPackageDefaultAssociation{}
-			if err = util.SetFields(association, setApplicationPackageDefaultAssociationsFlags); err != nil {
+			assocID, err := getApplicationPackageDefaultAssociationID(cmd.Flags(), args)
+			if err != nil {
 				return err
 			}
 			association.Ids = assocID
@@ -461,6 +458,8 @@ var (
 )
 
 func init() {
+	ttnpb.AddSelectFlagsForApplicationPackageAssociation(selectApplicationPackageAssociationsFlags, "", false)
+	ttnpb.AddSelectFlagsForApplicationPackageDefaultAssociation(selectApplicationPackageDefaultAssociationsFlags, "", false)
 	applicationsPackagesCommand.AddCommand(applicationsPackagesListCommand)
 	applicationsPackageAssociationGetCommand.Flags().AddFlagSet(applicationPackageAssociationIDFlags())
 	applicationsPackageAssociationGetCommand.Flags().AddFlagSet(selectApplicationPackageAssociationsFlags)
@@ -472,8 +471,10 @@ func init() {
 	applicationsPackageAssociationsListCommand.Flags().AddFlagSet(selectAllApplicationPackageAssociationsFlags)
 	applicationsPackageAssociationsListCommand.Flags().AddFlagSet(paginationFlags())
 	applicationsPackagesAssociationsCommand.AddCommand(applicationsPackageAssociationsListCommand)
-	applicationsPackageAssociationSetCommand.Flags().AddFlagSet(applicationPackageAssociationIDFlags())
-	applicationsPackageAssociationSetCommand.Flags().AddFlagSet(setApplicationPackageAssociationsFlags)
+	ttnpb.AddSetFlagsForApplicationPackageAssociation(applicationsPackageAssociationSetCommand.Flags(), "", false)
+	flagsplugin.AddAlias(applicationsPackageAssociationSetCommand.Flags(), "ids.end-device-ids.application-ids.application-id", "application-id", flagsplugin.WithHidden(false))
+	flagsplugin.AddAlias(applicationsPackageAssociationSetCommand.Flags(), "ids.end-device-ids.device-id", "device-id", flagsplugin.WithHidden(false))
+	flagsplugin.AddAlias(applicationsPackageAssociationSetCommand.Flags(), "ids.f-port", "f-port", flagsplugin.WithHidden(false))
 	applicationsPackageAssociationSetCommand.Flags().AddFlagSet(dataFlags("data", "package data"))
 	applicationsPackagesAssociationsCommand.AddCommand(applicationsPackageAssociationSetCommand)
 	applicationsPackageAssociationDeleteCommand.Flags().AddFlagSet(applicationPackageAssociationIDFlags())
@@ -485,8 +486,9 @@ func init() {
 	applicationsPackageDefaultAssociationsListCommand.Flags().AddFlagSet(selectAllApplicationPackageDefaultAssociationsFlags)
 	applicationsPackageDefaultAssociationsListCommand.Flags().AddFlagSet(paginationFlags())
 	applicationsPackagesDefaultAssociationsCommand.AddCommand(applicationsPackageDefaultAssociationsListCommand)
-	applicationsPackageDefaultAssociationSetCommand.Flags().AddFlagSet(applicationPackageDefaultAssociationIDFlags())
-	applicationsPackageDefaultAssociationSetCommand.Flags().AddFlagSet(setApplicationPackageDefaultAssociationsFlags)
+	ttnpb.AddSetFlagsForApplicationPackageDefaultAssociation(applicationsPackageDefaultAssociationSetCommand.Flags(), "", false)
+	flagsplugin.AddAlias(applicationsPackageDefaultAssociationSetCommand.Flags(), "ids.application-ids.application-id", "application-id", flagsplugin.WithHidden(false))
+	flagsplugin.AddAlias(applicationsPackageDefaultAssociationSetCommand.Flags(), "ids.f-port", "f-port", flagsplugin.WithHidden(false))
 	applicationsPackageDefaultAssociationSetCommand.Flags().AddFlagSet(dataFlags("data", "package data"))
 	applicationsPackagesDefaultAssociationsCommand.AddCommand(applicationsPackageDefaultAssociationSetCommand)
 	applicationsPackageDefaultAssociationDeleteCommand.Flags().AddFlagSet(applicationPackageDefaultAssociationIDFlags())

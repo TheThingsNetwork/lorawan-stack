@@ -28,8 +28,7 @@ import (
 )
 
 var (
-	selectApplicationLinkFlags = util.FieldMaskFlags(&ttnpb.ApplicationLink{})
-	setApplicationLinkFlags    = util.FieldFlags(&ttnpb.ApplicationLink{})
+	selectApplicationLinkFlags = &pflag.FlagSet{}
 
 	selectAllApplicationLinkFlags = util.SelectAllFlagSet("application link")
 )
@@ -57,7 +56,10 @@ var (
 			if appID == nil {
 				return errNoApplicationID.New()
 			}
-			paths := util.SelectFieldMask(cmd.Flags(), selectApplicationLinkFlags)
+			paths, err := ttnpb.PathsFromSelectFlagsForApplicationLink(cmd.Flags(), "")
+			if err != nil {
+				return err
+			}
 			if len(paths) == 0 {
 				logger.Warn("No fields selected, will select everything")
 				selectApplicationLinkFlags.VisitAll(func(flag *pflag.Flag) {
@@ -90,10 +92,9 @@ var (
 			if appID == nil {
 				return errNoApplicationID.New()
 			}
-			paths := util.UpdateFieldMask(cmd.Flags(), setApplicationLinkFlags)
-
 			link := &ttnpb.ApplicationLink{}
-			if err := util.SetFields(link, setApplicationLinkFlags); err != nil {
+			paths, err := link.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
 				return err
 			}
 			newPaths, err := parsePayloadFormatterParameterFlags("default-formatters", link.DefaultFormatters, cmd.Flags())
@@ -142,12 +143,13 @@ var (
 )
 
 func init() {
+	ttnpb.AddSelectFlagsForApplicationLink(selectApplicationLinkFlags, "", false)
 	applicationsLinkGetCommand.Flags().AddFlagSet(applicationIDFlags())
 	applicationsLinkGetCommand.Flags().AddFlagSet(selectApplicationLinkFlags)
 	applicationsLinkGetCommand.Flags().AddFlagSet(selectAllApplicationLinkFlags)
 	applicationsLinkCommand.AddCommand(applicationsLinkGetCommand)
 	applicationsLinkSetCommand.Flags().AddFlagSet(applicationIDFlags())
-	applicationsLinkSetCommand.Flags().AddFlagSet(setApplicationLinkFlags)
+	ttnpb.AddSetFlagsForApplicationLink(applicationsLinkSetCommand.Flags(), "", false)
 	applicationsLinkSetCommand.Flags().AddFlagSet(payloadFormatterParameterFlags("default-formatters"))
 	applicationsLinkSetCommand.Flags().AddFlagSet(deprecatedApplicationLinkFlags())
 	applicationsLinkCommand.AddCommand(applicationsLinkSetCommand)

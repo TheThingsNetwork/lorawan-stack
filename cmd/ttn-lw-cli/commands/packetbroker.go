@@ -21,15 +21,9 @@ import (
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
-	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/util"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
-)
-
-var (
-	registerPacketBrokerFlags          = &pflag.FlagSet{}
-	packetbrokerGatewayVisibilityFlags = util.FieldFlags(&ttnpb.PacketBrokerGatewayVisibility{})
 )
 
 func packetBrokerNetworkIDFlags(allowDefault bool) *pflag.FlagSet {
@@ -178,7 +172,8 @@ var (
 		Short: "Register with Packet Broker",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			req := &ttnpb.PacketBrokerRegisterRequest{}
-			if err := util.SetFields(req, registerPacketBrokerFlags); err != nil {
+			_, err := req.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
 				return err
 			}
 			pba, err := api.Dial(ctx, config.PacketBrokerAgentGRPCAddress)
@@ -444,7 +439,8 @@ Specify default to configure the default gateway visibility.`,
 				return err
 			}
 			visibility := &ttnpb.PacketBrokerGatewayVisibility{}
-			if err := util.SetFields(visibility, packetbrokerGatewayVisibilityFlags); err != nil {
+			_, err = visibility.SetFromFlags(cmd.Flags(), "")
+			if err != nil {
 				return err
 			}
 			if all, _ := cmd.Flags().GetBool("all"); all {
@@ -550,12 +546,8 @@ Specify default to configure the default gateway visibility.`,
 )
 
 func init() {
-	util.FieldFlags(&ttnpb.PacketBrokerRegisterRequest{}).VisitAll(func(flag *pflag.Flag) {
-		registerPacketBrokerFlags.AddFlag(flag)
-	})
-
 	packetBrokerCommand.AddCommand(packetBrokerInfoCommand)
-	packetBrokerRegisterCommand.Flags().AddFlagSet(registerPacketBrokerFlags)
+	ttnpb.AddSetFlagsForPacketBrokerRegisterRequest(packetBrokerRegisterCommand.Flags(), "", false)
 	packetBrokerCommand.AddCommand(packetBrokerRegisterCommand)
 	packetBrokerCommand.AddCommand(packetBrokerDeregisterCommand)
 	packetBrokerNetworksListCommand.Flags().AddFlagSet(paginationFlags())
@@ -573,7 +565,7 @@ func init() {
 	packetBrokerHomeNetworksPoliciesCommand.AddCommand(packetBrokerHomeNetworksPolicyDeleteCommand)
 	packetBrokerHomeNetworksCommand.AddCommand(packetBrokerHomeNetworksPoliciesCommand)
 	packetBrokerHomeNetworksGatewayVisibilitiesCommand.AddCommand(packetBrokerHomeNetworksGatewayVisibilityGetCommand)
-	packetBrokerHomeNetworksGatewayVisibilitySetCommand.Flags().AddFlagSet(packetbrokerGatewayVisibilityFlags)
+	ttnpb.AddSetFlagsForPacketBrokerGatewayVisibility(packetBrokerHomeNetworksGatewayVisibilitySetCommand.Flags(), "", false)
 	packetBrokerHomeNetworksGatewayVisibilitySetCommand.Flags().Bool("all", false, "")
 	packetBrokerHomeNetworksGatewayVisibilitiesCommand.AddCommand(packetBrokerHomeNetworksGatewayVisibilitySetCommand)
 	packetBrokerHomeNetworksGatewayVisibilitiesCommand.AddCommand(packetBrokerHomeNetworksGatewayVisibilityDeleteCommand)

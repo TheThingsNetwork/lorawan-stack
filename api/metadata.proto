@@ -14,6 +14,7 @@
 
 syntax = "proto3";
 
+import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
@@ -79,6 +80,7 @@ message RxMetadata {
 }
 
 message Location {
+  option (thethings.flags.message) = { select: true, set: true };
   // The North–South position (degrees; -90 to +90), where 0 is the equator, North pole is positive, South pole is negative.
   double latitude = 1 [(validate.rules).double = {gte: -90, lte: 90}];
   // The East-West position (degrees; -180 to +180), where 0 is the Prime Meridian (Greenwich), East is positive , West is negative.
@@ -88,7 +90,10 @@ message Location {
   // The accuracy of the location (meters).
   int32 accuracy = 4;
   // Source of the location information.
-  LocationSource source = 5 [(validate.rules).enum.defined_only = true];
+  LocationSource source = 5 [
+    (validate.rules).enum.defined_only = true,
+    (thethings.flags.field) = { set: false }
+  ];
 }
 
 enum LocationSource {

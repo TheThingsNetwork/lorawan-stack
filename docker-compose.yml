@@ -13,7 +13,8 @@ services:
       - "127.0.0.1:5432:5432"
 
   redis:
-    image: redis
+    # TODO: Support latest Redis (7.x is not supported, see https://github.com/TheThingsNetwork/lorawan-stack/issues/5416)
+    image: redis:6.2
     command: redis-server --appendonly yes
     restart: unless-stopped
     volumes:
