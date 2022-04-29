@@ -56,7 +56,7 @@ const getDevicesListLogic = createRequestLogic({
       id: appId,
       params: { page, limit, order, query },
     } = action.payload
-    const { selectors, options } = action.meta
+    const { selectors } = action.meta
 
     const data = query
       ? await tts.Applications.Devices.search(
@@ -70,20 +70,6 @@ const getDevicesListLogic = createRequestLogic({
           selectors,
         )
       : await tts.Applications.Devices.getAll(appId, { page, limit, order }, selectors)
-
-    if (options.withLastSeen) {
-      const activityFetching = data.end_devices.map(async device => {
-        const deviceResult = await tts.Applications.Devices.getById(appId, device.ids.device_id, [
-          'last_seen_at',
-        ])
-
-        if ('last_seen_at' in deviceResult) {
-          device.last_seen_at = deviceResult.last_seen_at
-        }
-      })
-
-      await Promise.all(activityFetching)
-    }
 
     return { entities: data.end_devices, totalCount: data.totalCount }
   },

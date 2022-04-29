@@ -91,10 +91,7 @@ const devices = (state = defaultState, { type, payload, event }) => {
 
       // Update derived last seen value if possible.
       const derived = {}
-      const lastSeen = payload.last_seen_at
-      if (lastSeen) {
-        derived.lastSeen = lastSeen
-      }
+      derived.lastSeen = payload.last_seen_at
 
       // Update uplink and downlink frame counts if possible.
       const { session } = payload
@@ -150,10 +147,8 @@ const devices = (state = defaultState, { type, payload, event }) => {
 
           // Update derived last seen value if possible.
           const derived = {}
-          const lastSeen = dev.last_seen_at
-          if (lastSeen) {
-            derived.lastSeen = lastSeen
-          }
+          derived.lastSeen = dev.last_seen_at
+
           if (acc.derived[id]) {
             acc.derived[id] = { ...acc.derived[id], ...derived }
           } else {
