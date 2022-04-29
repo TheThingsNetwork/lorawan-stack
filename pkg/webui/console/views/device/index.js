@@ -117,6 +117,7 @@ import style from './device.styl'
     'supports_class_b',
     'supports_class_c',
     'supports_join',
+    'last_seen_at',
     'lorawan_version',
     'lorawan_phy_version',
     'network_server_address',
@@ -130,8 +131,6 @@ import style from './device.styl'
     'application_server_kek_label',
     'network_server_kek_label',
     'claim_authentication_code',
-    'mac_state.recent_uplinks',
-    'pending_mac_state.recent_uplinks',
     'attributes',
     'skip_payload_crypto_override',
   ]

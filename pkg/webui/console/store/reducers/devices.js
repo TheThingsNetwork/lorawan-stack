@@ -19,7 +19,7 @@ import { EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP } from '@console/constants/ev
 import { getCombinedDeviceId, combineDeviceIds } from '@ttn-lw/lib/selectors/id'
 import getByPath from '@ttn-lw/lib/get-by-path'
 
-import { parseLorawanMacVersion, getLastSeen } from '@console/lib/device-utils'
+import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
 import {
   GET_DEV,
@@ -91,7 +91,7 @@ const devices = (state = defaultState, { type, payload, event }) => {
 
       // Update derived last seen value if possible.
       const derived = {}
-      const lastSeen = getLastSeen(payload)
+      const lastSeen = payload.last_seen_at
       if (lastSeen) {
         derived.lastSeen = lastSeen
       }
@@ -150,7 +150,7 @@ const devices = (state = defaultState, { type, payload, event }) => {
 
           // Update derived last seen value if possible.
           const derived = {}
-          const lastSeen = getLastSeen(dev)
+          const lastSeen = dev.last_seen_at
           if (lastSeen) {
             derived.lastSeen = lastSeen
           }

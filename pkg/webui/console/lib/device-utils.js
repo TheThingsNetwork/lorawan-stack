@@ -161,54 +161,6 @@ export const fCntWidthDecode = value =>
   value ? FRAME_WIDTH_COUNT.SUPPORTS_32_BIT : FRAME_WIDTH_COUNT.SUPPORTS_16_BIT
 
 /**
- * Gets the datetime string of the latest uplink within the `mac_state`
- * of the end device.
- *
- * @param {object} device - The end device.
- * @returns {string} - The datetime string of the latest uplink of the
- * end device or `undefined` if no uplinks or `mac_state` is present.
- */
-export const getLastSeen = device => {
-  if (!device) {
-    return
-  }
-  let lastUplinkReceivedAt
-  let relevantSessionStart
-  const supportsJoin = Boolean(device.supports_join)
-  const relevantSession = device.session || device.pending_session
-  const relevantMacState = device.mac_state || device.pending_mac_state
-  if (relevantMacState) {
-    const { recent_uplinks } = relevantMacState
-    if (recent_uplinks) {
-      const last_uplink = Boolean(recent_uplinks)
-        ? recent_uplinks[recent_uplinks.length - 1]
-        : undefined
-      if (last_uplink) {
-        lastUplinkReceivedAt = last_uplink.received_at
-      }
-    }
-  }
-  if (supportsJoin && relevantSession) {
-    // TODO: Remove this once https://github.com/TheThingsNetwork/lorawan-stack/issues/4766 is resolved.
-    relevantSessionStart =
-      relevantSession.started_at !== '0001-01-01T00:00:00Z' ? relevantSession.started_at : undefined
-  }
-
-  // Return the whichever timestamp is available.
-  if (!relevantSessionStart) {
-    return lastUplinkReceivedAt
-  } else if (!lastUplinkReceivedAt) {
-    return relevantSessionStart
-  }
-
-  // Return whichever timestamp is more recent.
-  if (relevantSessionStart > lastUplinkReceivedAt) {
-    return relevantSessionStart
-  }
-  return lastUplinkReceivedAt
-}
-
-/**
  * @param {string} freqPlan - End device frequency plan.
  * @returns {boolean} - Whether end device frequency plan has a CFList type of ChMask (channel mask).
  */
