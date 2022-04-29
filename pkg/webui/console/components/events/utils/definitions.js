@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import DownlinkMessage from '../previews/downlink-message'
-import UplinkMessage from '../previews/uplink-message'
+import GatewayUplinkMessage from '../previews/gateway-uplink-message'
 import ApplicationDownlink from '../previews/application-downlink'
 import ApplicationUplink from '../previews/application-uplink'
 import ApplicationUp from '../previews/application-up'
@@ -101,7 +101,7 @@ export const dataTypeMap = {
   ApplicationUp,
   ApplicationLocation,
   DownlinkMessage,
-  UplinkMessage,
+  GatewayUplinkMessage,
   JoinRequest,
   JoinResponse,
   ErrorDetails,
