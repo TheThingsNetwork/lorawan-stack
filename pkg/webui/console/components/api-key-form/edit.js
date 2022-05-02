@@ -99,10 +99,13 @@ class EditForm extends React.Component {
 
   @bind
   async handleEdit(values) {
-    const { name, rights, expires_at } = validationSchema.cast(values)
+    const castedValues = validationSchema.cast(values)
     const { onEdit } = this.props
+    if (castedValues.expires_at === '') {
+      castedValues.expires_at = null
+    }
 
-    return await onEdit({ name, rights, expires_at })
+    return await onEdit(castedValues)
   }
 
   @bind

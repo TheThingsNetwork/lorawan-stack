@@ -75,8 +75,11 @@ class CreateForm extends React.Component {
   @bind
   async handleCreate(values) {
     const { onCreate } = this.props
-
-    return await onCreate(validationSchema.cast(values))
+    const castedValues = validationSchema.cast(values)
+    if (castedValues.expires_at === '') {
+      castedValues.expires_at = null
+    }
+    return await onCreate(castedValues)
   }
 
   @bind

@@ -64,7 +64,12 @@ class ApiKeys {
     })
   }
 
-  async updateById(entityId, id, patch) {
+  async updateById(
+    entityId,
+    id,
+    patch,
+    mask = Marshaler.fieldMaskFromPatch(patch, this._api.UpdateAllowedFieldMaskPaths),
+  ) {
     const entityIdRoute = this._parentRoutes.update
     const result = await this._api.UpdateAPIKey(
       {
@@ -75,6 +80,7 @@ class ApiKeys {
       },
       {
         api_key: { ...patch },
+        field_mask: Marshaler.fieldMask(mask),
       },
     )
 

@@ -22,7 +22,7 @@ const validationSchema = Yup.object().shape({
   rights: Yup.array().min(1, sharedMessages.validateRights),
   expires_at: Yup.lazy(value => {
     if (!Boolean(value)) {
-      return Yup.date().strip()
+      return Yup.string()
     }
 
     return Yup.date()
