@@ -28,6 +28,7 @@ import RightsGroup from '@console/components/rights-group'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import toInputDate from '@ttn-lw/lib/to-input-date'
 
 import ApiKeyForm from './form'
 import validationSchema from './validation-schema'
@@ -98,10 +99,10 @@ class EditForm extends React.Component {
 
   @bind
   async handleEdit(values) {
-    const { name, rights } = values
+    const { name, rights, expires_at } = validationSchema.cast(values)
     const { onEdit } = this.props
 
-    return await onEdit({ name, rights })
+    return await onEdit({ name, rights, expires_at })
   }
 
   @bind
@@ -156,6 +157,7 @@ class EditForm extends React.Component {
       id: apiKey.id,
       name: apiKey.name,
       rights: apiKey.rights,
+      expires_at: toInputDate(new Date(apiKey.expires_at)),
     }
 
     return (
@@ -181,6 +183,7 @@ class EditForm extends React.Component {
           name="name"
           component={Input}
         />
+        <FormField title={'Expiry date'} name="expires_at" type="date" component={Input} />
         <FormField
           name="rights"
           title={sharedMessages.rights}

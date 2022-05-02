@@ -76,7 +76,7 @@ class CreateForm extends React.Component {
   async handleCreate(values) {
     const { onCreate } = this.props
 
-    return await onCreate(values)
+    return await onCreate(validationSchema.cast(values))
   }
 
   @bind
@@ -101,6 +101,7 @@ class CreateForm extends React.Component {
     const initialValues = {
       name: '',
       rights: [...pseudoRights],
+      expires_at: '',
     }
 
     return (
@@ -121,6 +122,7 @@ class CreateForm extends React.Component {
             autoFocus
             component={Input}
           />
+          <FormField title={'Expiry date'} name="expires_at" type="date" component={Input} />
           <FormField
             name="rights"
             title={sharedMessages.rights}

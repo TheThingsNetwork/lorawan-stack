@@ -20,6 +20,13 @@ const validationSchema = Yup.object().shape({
     .min(2, Yup.passValues(sharedMessages.validateTooShort))
     .max(50, Yup.passValues(sharedMessages.validateTooLong)),
   rights: Yup.array().min(1, sharedMessages.validateRights),
+  expires_at: Yup.lazy(value => {
+    if (!Boolean(value)) {
+      return Yup.date().strip()
+    }
+
+    return Yup.date()
+  }),
 })
 
 export default validationSchema
