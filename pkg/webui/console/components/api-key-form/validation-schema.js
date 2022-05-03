@@ -15,7 +15,13 @@
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-const pastDateCheck = value => !(new Date(value) < new Date())
+const pastDateCheck = value => {
+  if (value) {
+    return !(new Date(value) < new Date())
+  }
+
+  return true
+}
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
