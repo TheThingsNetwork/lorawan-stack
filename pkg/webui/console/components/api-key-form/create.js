@@ -26,9 +26,26 @@ import RightsGroup from '@console/components/rights-group'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import toInputDate from '@ttn-lw/lib/to-input-date'
 
 import ApiKeyForm from './form'
 import validationSchema from './validation-schema'
+
+const encodeExpiryDate = value => {
+  if (value) {
+    return new Date(value).toISOString()
+  }
+
+  return null
+}
+
+const decodeExpiryDate = value => {
+  if (value) {
+    return toInputDate(new Date(value))
+  }
+
+  return ''
+}
 
 class CreateForm extends React.Component {
   static propTypes = {
@@ -76,9 +93,7 @@ class CreateForm extends React.Component {
   async handleCreate(values) {
     const { onCreate } = this.props
     const castedValues = validationSchema.cast(values)
-    if (castedValues.expires_at === '') {
-      castedValues.expires_at = null
-    }
+
     return await onCreate(castedValues)
   }
 
@@ -104,7 +119,7 @@ class CreateForm extends React.Component {
     const initialValues = {
       name: '',
       rights: [...pseudoRights],
-      expires_at: '',
+      expires_at: null,
     }
 
     return (
@@ -125,7 +140,14 @@ class CreateForm extends React.Component {
             autoFocus
             component={Input}
           />
-          <FormField title={'Expiry date'} name="expires_at" type="date" component={Input} />
+          <FormField
+            title={'Expiry date'}
+            name="expires_at"
+            type="date"
+            encode={encodeExpiryDate}
+            decode={decodeExpiryDate}
+            component={Input}
+          />
           <FormField
             name="rights"
             title={sharedMessages.rights}

@@ -1233,6 +1233,7 @@
   "lib.shared-messages.packetBroker": "Packet Broker",
   "lib.shared-messages.password": "Password",
   "lib.shared-messages.passwordChanged": "Password changed",
+  "lib.shared-messages.pastDate": "This date is in the past. Please choose another date.",
   "lib.shared-messages.pause": "Pause",
   "lib.shared-messages.payload": "Payload",
   "lib.shared-messages.payloadFormatters": "Payload formatters",

@@ -301,6 +301,7 @@ export default defineMessages({
   packetBroker: 'Packet Broker',
   password: 'Password',
   passwordChanged: 'Password changed',
+  pastDate: 'This date is in the past. Please choose another date.',
   pause: 'Pause',
   payload: 'Payload',
   payloadFormatters: 'Payload formatters',

@@ -33,6 +33,22 @@ import toInputDate from '@ttn-lw/lib/to-input-date'
 import ApiKeyForm from './form'
 import validationSchema from './validation-schema'
 
+const encodeExpiryDate = value => {
+  if (value) {
+    return new Date(value).toISOString()
+  }
+
+  return null
+}
+
+const decodeExpiryDate = value => {
+  if (value) {
+    return toInputDate(new Date(value))
+  }
+
+  return ''
+}
+
 const m = defineMessages({
   deleteKey: 'Delete key',
   modalWarning:
@@ -101,9 +117,6 @@ class EditForm extends React.Component {
   async handleEdit(values) {
     const castedValues = validationSchema.cast(values)
     const { onEdit } = this.props
-    if (castedValues.expires_at === '') {
-      castedValues.expires_at = null
-    }
 
     return await onEdit(castedValues)
   }
@@ -160,7 +173,7 @@ class EditForm extends React.Component {
       id: apiKey.id,
       name: apiKey.name,
       rights: apiKey.rights,
-      expires_at: toInputDate(new Date(apiKey.expires_at)),
+      expires_at: apiKey.expires_at,
     }
 
     return (
@@ -186,7 +199,14 @@ class EditForm extends React.Component {
           name="name"
           component={Input}
         />
-        <FormField title={'Expiry date'} name="expires_at" type="date" component={Input} />
+        <FormField
+          title={'Expiry date'}
+          name="expires_at"
+          type="date"
+          decode={decodeExpiryDate}
+          encode={encodeExpiryDate}
+          component={Input}
+        />
         <FormField
           name="rights"
           title={sharedMessages.rights}
