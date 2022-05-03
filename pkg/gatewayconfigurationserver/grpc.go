@@ -18,7 +18,6 @@ import (
 	"context"
 	"encoding/json"
 
-	types "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
@@ -27,9 +26,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-var errUnsupportedConfigurationFormat = errors.DefineInvalidArgument("unsupported_configuration_format", "configuration format `{format}` is not supported")
-var errUnsupportedConfigurationType = errors.DefineInvalidArgument("unsupported_configuration_type", "configuration type `{type}` is not supported")
-var errUnsupportedConfigurationFilename = errors.DefineInvalidArgument("unsupported_configuration_filename", "configuration filename `{filename}` for type `{type}` is not supported")
+var (
+	errUnsupportedConfigurationFormat   = errors.DefineInvalidArgument("unsupported_configuration_format", "configuration format `{format}` is not supported")
+	errUnsupportedConfigurationType     = errors.DefineInvalidArgument("unsupported_configuration_type", "configuration type `{type}` is not supported")
+	errUnsupportedConfigurationFilename = errors.DefineInvalidArgument("unsupported_configuration_filename", "configuration filename `{filename}` for type `{type}` is not supported")
+)
 
 func (s *Server) getGateway(ctx context.Context, gtwID *ttnpb.GatewayIdentifiers) (*ttnpb.Gateway, error) {
 	cc, err := s.GetPeerConn(ctx, ttnpb.ClusterRole_ENTITY_REGISTRY, nil)
@@ -39,13 +40,7 @@ func (s *Server) getGateway(ctx context.Context, gtwID *ttnpb.GatewayIdentifiers
 	client := ttnpb.NewGatewayRegistryClient(cc)
 	gtw, err := client.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIds: gtwID,
-		FieldMask: &types.FieldMask{
-			Paths: []string{
-				"antennas",
-				"frequency_plan_id",
-				"gateway_server_address",
-			},
-		},
+		FieldMask:  ttnpb.FieldMask("antennas", "frequency_plan_id", "gateway_server_address"),
 	}, s.WithClusterAuth())
 	if err != nil {
 		return nil, err

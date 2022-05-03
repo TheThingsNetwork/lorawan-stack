@@ -27,7 +27,6 @@ import (
 	"strings"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -118,9 +117,7 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 				Value: []byte(cupsKey.Key),
 			},
 		},
-		FieldMask: &pbtypes.FieldMask{
-			Paths: []string{"lbs_lns_secret"},
-		},
+		FieldMask: ttnpb.FieldMask("lbs_lns_secret"),
 	}, auth)
 	if err != nil {
 		return nil, err
@@ -129,7 +126,7 @@ func (s *Server) registerGateway(ctx context.Context, req UpdateInfoRequest) (*t
 	return gtw, nil
 }
 
-var getGatewayMask = pbtypes.FieldMask{Paths: []string{
+var getGatewayMask = ttnpb.FieldMask(
 	"attributes",
 	"version_ids",
 	"gateway_server_address",
@@ -139,7 +136,7 @@ var getGatewayMask = pbtypes.FieldMask{Paths: []string{
 	"lbs_lns_secret",
 	"target_cups_uri",
 	"target_cups_key",
-}}
+)
 
 // UpdateInfo implements the CUPS update-info handler.
 func (s *Server) UpdateInfo(w http.ResponseWriter, r *http.Request) {
@@ -241,7 +238,7 @@ func (s *Server) updateInfo(w http.ResponseWriter, r *http.Request) (err error) 
 
 	gtw, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIds: ids,
-		FieldMask:  &getGatewayMask,
+		FieldMask:  getGatewayMask,
 	}, gatewayAuth)
 	if err != nil {
 		return err
@@ -369,10 +366,8 @@ func (s *Server) updateInfo(w http.ResponseWriter, r *http.Request) (err error) 
 		return err
 	}
 	_, err = registry.Update(ctx, &ttnpb.UpdateGatewayRequest{
-		Gateway: gtw,
-		FieldMask: &pbtypes.FieldMask{Paths: []string{
-			"attributes",
-		}},
+		Gateway:   gtw,
+		FieldMask: ttnpb.FieldMask("attributes"),
 	}, gatewayAuth)
 	if err != nil {
 		return err

@@ -379,17 +379,15 @@ func TestRemoteStore(t *testing.T) {
 						},
 					},
 				},
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{
-						"version_ids",
-						"supports_join",
-						"supports_class_b",
-						"supports_class_c",
-						"lorawan_version",
-						"lorawan_phy_version",
-						"mac_settings.supports_32_bit_f_cnt",
-					},
-				},
+				FieldMask: ttnpb.FieldMask(
+					"version_ids",
+					"supports_join",
+					"supports_class_b",
+					"supports_class_c",
+					"lorawan_version",
+					"lorawan_phy_version",
+					"mac_settings.supports_32_bit_f_cnt",
+				),
 			})
 		})
 
@@ -424,17 +422,15 @@ func TestRemoteStore(t *testing.T) {
 						},
 					},
 				},
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{
-						"version_ids",
-						"supports_join",
-						"supports_class_b",
-						"supports_class_c",
-						"lorawan_version",
-						"lorawan_phy_version",
-						"mac_settings.supports_32_bit_f_cnt",
-					},
-				},
+				FieldMask: ttnpb.FieldMask(
+					"version_ids",
+					"supports_join",
+					"supports_class_b",
+					"supports_class_c",
+					"lorawan_version",
+					"lorawan_phy_version",
+					"mac_settings.supports_32_bit_f_cnt",
+				),
 			})
 		})
 	})
@@ -604,7 +600,7 @@ func TestRemoteStore(t *testing.T) {
 					}
 					codec, err := tc.f(&ttnpb.GetPayloadFormatterRequest{
 						VersionIds: versionIDs,
-						FieldMask:  &pbtypes.FieldMask{Paths: []string{"examples"}},
+						FieldMask:  ttnpb.FieldMask("examples"),
 					})
 					a.So(err, should.BeNil)
 					a.So(codec, should.Resemble, tc.codec)

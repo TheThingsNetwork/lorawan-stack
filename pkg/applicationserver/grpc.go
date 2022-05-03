@@ -42,9 +42,7 @@ nextPath:
 			validPaths = append(validPaths, path)
 		}
 	}
-	return &pbtypes.FieldMask{
-		Paths: validPaths,
-	}
+	return ttnpb.FieldMask(validPaths...)
 }
 
 // getLink calls the underlying link registry in order to retrieve the link.

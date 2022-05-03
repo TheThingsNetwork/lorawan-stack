@@ -264,7 +264,7 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask, nil, getPaths)
 	if len(req.FieldMask.GetPaths()) == 0 {
-		req.FieldMask = &pbtypes.FieldMask{Paths: updatePaths}
+		req.FieldMask = ttnpb.FieldMask(updatePaths...)
 	}
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
 		if err := validateContactInfo(req.Application.ContactInfo); err != nil {

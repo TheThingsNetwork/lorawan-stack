@@ -19,7 +19,6 @@ import (
 	"strconv"
 	"testing"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode/enddevices"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -73,13 +72,11 @@ func TestParseEndDeviceAuthenticationCodes(t *testing.T) {
 			a.So(*ids.DevEui, should.Resemble, tc.ExpectedDevEUI)
 			a.So(endDevice.ClaimAuthenticationCode, should.NotBeEmpty)
 			a.So(endDevice.ClaimAuthenticationCode.Value, should.Resemble, tc.ExpectedAuthenticationCode)
-
 		})
 	}
 }
 
-type mock struct {
-}
+type mock struct{}
 
 func (mock) Validate() error                              { return nil }
 func (*mock) Encode(*ttnpb.EndDevice) error               { return nil }
@@ -88,15 +85,12 @@ func (*mock) UnmarshalText([]byte) error                  { return nil }
 func (*mock) EndDeviceTemplate() *ttnpb.EndDeviceTemplate { return nil }
 func (*mock) FormatID() string                            { return "mock" }
 
-type mockFormat struct {
-}
+type mockFormat struct{}
 
 func (mockFormat) Format() *ttnpb.QRCodeFormat {
 	return &ttnpb.QRCodeFormat{
-		Name: "test",
-		FieldMask: &pbtypes.FieldMask{
-			Paths: []string{"ids"},
-		},
+		Name:      "test",
+		FieldMask: ttnpb.FieldMask("ids"),
 	}
 }
 

@@ -491,17 +491,15 @@ func TestForwarder(t *testing.T) {
 				LocationPublic: true,
 				Online:         true,
 			},
-			FieldMask: &pbtypes.FieldMask{
-				Paths: []string{
-					"antennas",
-					"contact_info",
-					"frequency_plan_ids",
-					"ids",
-					"location_public",
-					"online",
-					"status_public",
-				},
-			},
+			FieldMask: ttnpb.FieldMask(
+				"antennas",
+				"contact_info",
+				"frequency_plan_ids",
+				"ids",
+				"location_public",
+				"online",
+				"status_public",
+			),
 		})
 		a.So(err, should.BeNil)
 		a.So(test.Must(pbtypes.DurationFromProto(res.OnlineTtl)).(time.Duration), should.NotBeZeroValue)

@@ -18,7 +18,6 @@ import (
 	"context"
 	"io"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	ttnio "go.thethings.network/lorawan-stack/v3/pkg/util/io"
 	"golang.org/x/net/html/charset"
@@ -79,9 +78,7 @@ func (t *ttsJSON) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.End
 
 		tmpl := &ttnpb.EndDeviceTemplate{
 			EndDevice: dev,
-			FieldMask: &pbtypes.FieldMask{
-				Paths: paths,
-			},
+			FieldMask: ttnpb.FieldMask(paths...),
 		}
 		select {
 		case <-ctx.Done():

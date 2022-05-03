@@ -18,7 +18,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	mock_server "go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/pubsub/provider"
@@ -150,10 +149,8 @@ func TestIntegrate(t *testing.T) {
 
 		// Expect no integration.
 		_, err := ps.Get(ctx, &ttnpb.GetApplicationPubSubRequest{
-			Ids: ps2,
-			FieldMask: &pbtypes.FieldMask{
-				Paths: paths,
-			},
+			Ids:       ps2,
+			FieldMask: ttnpb.FieldMask(paths...),
 		}, creds)
 		if !a.So(errors.IsNotFound(err), should.BeTrue) {
 			t.Fatalf("Unexpected error: %v", err)
@@ -161,10 +158,8 @@ func TestIntegrate(t *testing.T) {
 
 		// Set integration, expect integration to establish.
 		_, err = ps.Set(ctx, &ttnpb.SetApplicationPubSubRequest{
-			Pubsub: integration,
-			FieldMask: &pbtypes.FieldMask{
-				Paths: paths,
-			},
+			Pubsub:    integration,
+			FieldMask: ttnpb.FieldMask(paths...),
 		}, creds)
 		if !a.So(err, should.BeNil) {
 			t.Fatalf("Unexpected error: %v", err)
@@ -176,10 +171,8 @@ func TestIntegrate(t *testing.T) {
 			t.Fatal("Expect integration timeout")
 		}
 		actual, err := ps.Get(ctx, &ttnpb.GetApplicationPubSubRequest{
-			Ids: ps2,
-			FieldMask: &pbtypes.FieldMask{
-				Paths: paths,
-			},
+			Ids:       ps2,
+			FieldMask: ttnpb.FieldMask(paths...),
 		}, creds)
 		if !a.So(err, should.BeNil) {
 			t.Fatalf("Unexpected error: %v", err)
@@ -200,10 +193,8 @@ func TestIntegrate(t *testing.T) {
 			t.Fatal("Expect integration timeout")
 		}
 		_, err = ps.Get(ctx, &ttnpb.GetApplicationPubSubRequest{
-			Ids: ps2,
-			FieldMask: &pbtypes.FieldMask{
-				Paths: paths,
-			},
+			Ids:       ps2,
+			FieldMask: ttnpb.FieldMask(paths...),
 		}, creds)
 		if !a.So(errors.IsNotFound(err), should.BeTrue) {
 			t.Fatalf("Unexpected error: %v", err)

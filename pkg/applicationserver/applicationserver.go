@@ -1013,9 +1013,7 @@ func (as *ApplicationServer) saveActivationStatus(ctx context.Context, item inte
 			Ids:         ids,
 			ActivatedAt: ttnpb.ProtoTimePtr(now),
 		},
-		FieldMask: &pbtypes.FieldMask{
-			Paths: mask,
-		},
+		FieldMask: ttnpb.FieldMask(mask...),
 	}, as.WithClusterAuth())
 	if err != nil {
 		log.FromContext(ctx).WithError(err).Warn("Failed to set end device activation status in Entity Registry")

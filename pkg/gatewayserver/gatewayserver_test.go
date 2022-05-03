@@ -26,7 +26,6 @@ import (
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/gogo/protobuf/proto"
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/gorilla/websocket"
 	"github.com/smartystreets/assertions"
 	ttnpbv2 "go.thethings.network/lorawan-stack-legacy/v2/pkg/ttnpb"
@@ -840,13 +839,8 @@ func TestGatewayServer(t *testing.T) {
 									}
 									gtw.UpdateLocationFromStatus = tc.UpdateLocation
 									gtw, err = is.GatewayRegistry().Update(ctx, &ttnpb.UpdateGatewayRequest{
-										Gateway: gtw,
-										FieldMask: &pbtypes.FieldMask{
-											Paths: []string{
-												"antennas",
-												"update_location_from_status",
-											},
-										},
+										Gateway:   gtw,
+										FieldMask: ttnpb.FieldMask("antennas", "update_location_from_status"),
 									})
 									a.So(err, should.BeNil)
 									a.So(gtw.UpdateLocationFromStatus, should.Equal, tc.UpdateLocation)

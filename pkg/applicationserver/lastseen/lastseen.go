@@ -143,7 +143,7 @@ func (ls *BatchLastSeenProvider) updateEndDeviceLastSeen(ctx context.Context, en
 	cl := ttnpb.NewEndDeviceRegistryClient(conn)
 	_, err = cl.Update(ctx, &ttnpb.UpdateEndDeviceRequest{
 		EndDevice: endDevice,
-		FieldMask: &types.FieldMask{Paths: []string{"last_seen_at"}},
+		FieldMask: ttnpb.FieldMask("last_seen_at"),
 	}, ls.cluster.WithClusterAuth())
 	return err
 }

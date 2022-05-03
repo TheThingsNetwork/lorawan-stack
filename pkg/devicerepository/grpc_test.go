@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -346,9 +345,7 @@ func TestGRPC(t *testing.T) {
 				Page:           2,
 				OrderBy:        "brand_id",
 				Search:         "query string",
-				FieldMask: &types.FieldMask{
-					Paths: []string{"lora_alliance_vendor_id"},
-				},
+				FieldMask:      ttnpb.FieldMask("lora_alliance_vendor_id"),
 			}, creds)
 			a.So(err, should.BeNil)
 			a.So(st.lastGetBrandsRequest, should.Resemble, store.GetBrandsRequest{
@@ -415,9 +412,7 @@ func TestGRPC(t *testing.T) {
 			_, err := cl.GetBrand(test.Context(), &ttnpb.GetEndDeviceBrandRequest{
 				ApplicationIds: &registeredApplicationID,
 				BrandId:        "brand1",
-				FieldMask: &types.FieldMask{
-					Paths: []string{"lora_alliance_vendor_id"},
-				},
+				FieldMask:      ttnpb.FieldMask("lora_alliance_vendor_id"),
 			}, creds)
 			a.So(err, should.BeNil)
 			a.So(st.lastGetBrandsRequest, should.Resemble, store.GetBrandsRequest{
@@ -472,9 +467,7 @@ func TestGRPC(t *testing.T) {
 				Page:           2,
 				OrderBy:        "brand_id",
 				Search:         "query string",
-				FieldMask: &types.FieldMask{
-					Paths: []string{"firmware_versions"},
-				},
+				FieldMask:      ttnpb.FieldMask("firmware_versions"),
 			}, creds)
 			a.So(err, should.BeNil)
 			a.So(st.lastGetModelsRequest, should.Resemble, store.GetModelsRequest{
@@ -551,9 +544,7 @@ func TestGRPC(t *testing.T) {
 				ApplicationIds: &registeredApplicationID,
 				BrandId:        "brand1",
 				ModelId:        "model1",
-				FieldMask: &types.FieldMask{
-					Paths: []string{"firmware_versions"},
-				},
+				FieldMask:      ttnpb.FieldMask("firmware_versions"),
 			}, creds)
 			a.So(err, should.BeNil)
 			a.So(st.lastGetModelsRequest, should.Resemble, store.GetModelsRequest{
@@ -610,9 +601,7 @@ func TestGRPC(t *testing.T) {
 			EndDevice: &ttnpb.EndDevice{
 				VersionIds: ids,
 			},
-			FieldMask: &types.FieldMask{
-				Paths: []string{"version_ids"},
-			},
+			FieldMask: ttnpb.FieldMask("version_ids"),
 		}
 
 		t.Run("Request", func(t *testing.T) {
@@ -660,9 +649,7 @@ func TestGRPC(t *testing.T) {
 					BrandId: "test-brand",
 				},
 			},
-			FieldMask: &types.FieldMask{
-				Paths: []string{"version_ids"},
-			},
+			FieldMask: ttnpb.FieldMask("version_ids"),
 		}
 
 		t.Run("Request", func(t *testing.T) {

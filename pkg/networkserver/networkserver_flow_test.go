@@ -22,7 +22,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -120,7 +119,7 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 			fPending = false
 		}
 
-		var maxEIRPIndex = ttnpb.DeviceEIRP(5)
+		maxEIRPIndex := ttnpb.DeviceEIRP(5)
 		// The maximum EIRP in the RP001-1.0.2A version is 14 dB only, while the other versions use 16 dB.
 		if phyVersion == ttnpb.PHYVersion_PHY_V1_0_2_REV_A {
 			maxEIRPIndex = ttnpb.DeviceEIRP(4)
@@ -345,14 +344,12 @@ func makeClassAOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 				EndDeviceOptions.WithLorawanVersion(macVersion),
 				EndDeviceOptions.WithLorawanPhyVersion(phyVersion),
 			),
-			FieldMask: &pbtypes.FieldMask{
-				Paths: []string{
-					"frequency_plan_id",
-					"lorawan_phy_version",
-					"lorawan_version",
-					"supports_join",
-				},
-			},
+			FieldMask: ttnpb.FieldMask(
+				"frequency_plan_id",
+				"lorawan_phy_version",
+				"lorawan_version",
+				"supports_join",
+			),
 		},
 		DownlinkMACCommanders: []MACCommander{ttnpb.MACCommandIdentifier_CID_DEV_STATUS},
 		DownlinkEventBuilders: []events.Builder{mac.EvtEnqueueDevStatusRequest},
@@ -393,15 +390,13 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 				EndDeviceOptions.WithLorawanPhyVersion(phyVersion),
 				EndDeviceOptions.WithSupportsClassC(true),
 			),
-			FieldMask: &pbtypes.FieldMask{
-				Paths: []string{
-					"frequency_plan_id",
-					"lorawan_phy_version",
-					"lorawan_version",
-					"supports_class_c",
-					"supports_join",
-				},
-			},
+			FieldMask: ttnpb.FieldMask(
+				"frequency_plan_id",
+				"lorawan_phy_version",
+				"lorawan_version",
+				"supports_class_c",
+				"supports_join",
+			),
 		},
 		UplinkMACCommanders:   upCmders,
 		UplinkEventBuilders:   upEvBuilders,

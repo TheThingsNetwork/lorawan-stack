@@ -27,7 +27,6 @@ import (
 	"io"
 	"strings"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/provisioning"
@@ -222,15 +221,13 @@ func (m *microchipATECC608AMAHTNT) Convert(ctx context.Context, r io.Reader, ch 
 				},
 				SupportsJoin: true,
 			},
-			FieldMask: &pbtypes.FieldMask{
-				Paths: []string{
-					"ids.join_eui",
-					"provisioner_id",
-					"provisioning_data",
-					"root_keys.root_key_id",
-					"supports_join",
-				},
-			},
+			FieldMask: ttnpb.FieldMask(
+				"ids.join_eui",
+				"provisioner_id",
+				"provisioning_data",
+				"root_keys.root_key_id",
+				"supports_join",
+			),
 			MappingKey: sn,
 		}
 		select {
@@ -385,17 +382,15 @@ func (m *microchipATECC608TNGLORA) Convert(ctx context.Context, r io.Reader, ch 
 				},
 				SupportsJoin: true,
 			},
-			FieldMask: &pbtypes.FieldMask{
-				Paths: []string{
-					"ids.device_id",
-					"ids.dev_eui",
-					"ids.join_eui",
-					"provisioner_id",
-					"provisioning_data",
-					"root_keys.root_key_id",
-					"supports_join",
-				},
-			},
+			FieldMask: ttnpb.FieldMask(
+				"ids.device_id",
+				"ids.dev_eui",
+				"ids.join_eui",
+				"provisioner_id",
+				"provisioning_data",
+				"root_keys.root_key_id",
+				"supports_join",
+			),
 			MappingKey: sn,
 		}
 		select {

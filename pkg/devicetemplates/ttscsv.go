@@ -20,7 +20,6 @@ import (
 	"io"
 	"strings"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -235,9 +234,7 @@ func (t *ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndD
 
 		tmpl := &ttnpb.EndDeviceTemplate{
 			EndDevice: dev,
-			FieldMask: &pbtypes.FieldMask{
-				Paths: paths,
-			},
+			FieldMask: ttnpb.FieldMask(paths...),
 		}
 		select {
 		case <-ctx.Done():

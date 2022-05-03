@@ -17,7 +17,6 @@ package store
 import (
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
@@ -191,9 +190,7 @@ func (p EndDeviceProfile) ToTemplatePB(ids *ttnpb.EndDeviceVersionIdentifiers, i
 	}
 	return &ttnpb.EndDeviceTemplate{
 		EndDevice: dev,
-		FieldMask: &pbtypes.FieldMask{
-			Paths: paths,
-		},
+		FieldMask: ttnpb.FieldMask(paths...),
 	}, nil
 }
 

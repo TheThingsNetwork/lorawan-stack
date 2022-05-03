@@ -18,7 +18,6 @@ import (
 	"context"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
@@ -144,7 +143,7 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 
 	// Backwards compatibility for older clients.
 	if len(req.FieldMask.GetPaths()) == 0 {
-		req.FieldMask = &pbtypes.FieldMask{Paths: []string{"rights", "name"}}
+		req.FieldMask = ttnpb.FieldMask("rights", "name")
 	}
 
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {

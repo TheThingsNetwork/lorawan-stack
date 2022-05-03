@@ -17,7 +17,6 @@ package identityserver
 import (
 	"testing"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
@@ -53,7 +52,7 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 
 		_, err = reg.Get(ctx, &ttnpb.GetEndDeviceRequest{
 			EndDeviceIds: dev1.GetIds(),
-			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask:    ttnpb.FieldMask("name"),
 		})
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -61,7 +60,7 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 
 		_, err = reg.List(ctx, &ttnpb.ListEndDevicesRequest{
 			ApplicationIds: app1.GetIds(),
-			FieldMask:      &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask:      ttnpb.FieldMask("name"),
 		})
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -72,7 +71,7 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 				Ids:  dev1.GetIds(),
 				Name: "Updated Name",
 			},
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask: ttnpb.FieldMask("name"),
 		})
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -105,7 +104,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 
 		// Test batch fetch with cluster authorization
 		list, err := reg.List(ctx, &ttnpb.ListEndDevicesRequest{
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"ids"}},
+			FieldMask: ttnpb.FieldMask("ids"),
 		}, is.WithClusterAuth())
 		if a.So(err, should.BeNil) {
 			a.So(list.EndDevices, should.HaveLength, 5)
@@ -126,7 +125,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 
 		got, err := reg.Get(ctx, &ttnpb.GetEndDeviceRequest{
 			EndDeviceIds: created.GetIds(),
-			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask:    ttnpb.FieldMask("name"),
 		}, creds)
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 			a.So(got.Name, should.Equal, created.Name)
@@ -137,7 +136,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 				Ids:  created.GetIds(),
 				Name: "Updated Name",
 			},
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask: ttnpb.FieldMask("name"),
 		}, creds)
 		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.Name, should.Equal, "Updated Name")
@@ -145,7 +144,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 
 		list, err = reg.List(ctx, &ttnpb.ListEndDevicesRequest{
 			ApplicationIds: app1.GetIds(),
-			FieldMask:      &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask:      ttnpb.FieldMask("name"),
 		}, creds)
 		if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) && a.So(list.EndDevices, should.HaveLength, 6) {
 			var found bool
@@ -185,7 +184,7 @@ func TestEndDevicesPagination(t *testing.T) {
 
 		list, err := reg.List(ctx, &ttnpb.ListEndDevicesRequest{
 			ApplicationIds: app1.GetIds(),
-			FieldMask:      &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask:      ttnpb.FieldMask("name"),
 			Limit:          2,
 			Page:           1,
 		}, creds, grpc.Header(&md))
@@ -196,7 +195,7 @@ func TestEndDevicesPagination(t *testing.T) {
 
 		list, err = reg.List(ctx, &ttnpb.ListEndDevicesRequest{
 			ApplicationIds: app1.GetIds(),
-			FieldMask:      &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask:      ttnpb.FieldMask("name"),
 			Limit:          2,
 			Page:           2,
 		}, creds)
@@ -206,7 +205,7 @@ func TestEndDevicesPagination(t *testing.T) {
 
 		list, err = reg.List(ctx, &ttnpb.ListEndDevicesRequest{
 			ApplicationIds: app1.GetIds(),
-			FieldMask:      &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask:      ttnpb.FieldMask("name"),
 			Limit:          2,
 			Page:           3,
 		}, creds)

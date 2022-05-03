@@ -18,7 +18,6 @@ import (
 	"context"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
@@ -82,10 +81,7 @@ type ClusterPeerAccess interface {
 	WithClusterAuth() grpc.CallOption
 }
 
-var (
-	endDeviceLocationPath      = []string{"locations"}
-	endDeviceLocationFieldMask = &pbtypes.FieldMask{Paths: endDeviceLocationPath}
-)
+var endDeviceLocationFieldMask = ttnpb.FieldMask("locations")
 
 type clusterEndDeviceLocationRegistry struct {
 	ClusterPeerAccess

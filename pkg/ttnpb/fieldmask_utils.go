@@ -17,8 +17,14 @@ package ttnpb
 import (
 	"strings"
 
+	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
+
+// FieldMask returns a FieldMask with the given paths.
+func FieldMask(paths ...string) *types.FieldMask {
+	return &types.FieldMask{Paths: paths}
+}
 
 // TopLevelFields returns the unique top level fields of the given paths.
 func TopLevelFields(paths []string) []string {

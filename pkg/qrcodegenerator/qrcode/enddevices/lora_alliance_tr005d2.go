@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"strings"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -158,9 +157,7 @@ func (m *LoRaAllianceTR005Draft2) EndDeviceTemplate() *ttnpb.EndDeviceTemplate {
 		"ids",
 		"claim_authentication_code",
 	}
-	var (
-		vendorID, vendorProfileID uint16
-	)
+	var vendorID, vendorProfileID uint16
 	if m.VendorID != [2]byte{} {
 		vendorID = binary.BigEndian.Uint16(m.VendorID[:])
 	}
@@ -182,9 +179,7 @@ func (m *LoRaAllianceTR005Draft2) EndDeviceTemplate() *ttnpb.EndDeviceTemplate {
 				SerialNumber:    m.SerialNumber,
 			},
 		},
-		FieldMask: &pbtypes.FieldMask{
-			Paths: paths,
-		},
+		FieldMask: ttnpb.FieldMask(paths...),
 	}
 }
 
@@ -196,13 +191,11 @@ func (LoRaAllianceTR005Draft2Format) Format() *ttnpb.QRCodeFormat {
 	return &ttnpb.QRCodeFormat{
 		Name:        "LoRa Alliance TR005 Draft 2 (DEPRECATED)",
 		Description: "Standard QR code format defined by LoRa Alliance.",
-		FieldMask: &pbtypes.FieldMask{
-			Paths: []string{
-				"claim_authentication_code.value",
-				"ids.dev_eui",
-				"ids.join_eui",
-			},
-		},
+		FieldMask: ttnpb.FieldMask(
+			"claim_authentication_code.value",
+			"ids.dev_eui",
+			"ids.join_eui",
+		),
 	}
 }
 

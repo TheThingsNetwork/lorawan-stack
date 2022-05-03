@@ -18,8 +18,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/gogo/protobuf/types"
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/redis"
@@ -93,9 +91,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	{
 		res, err := client.List(ctx, &ttnpb.ListApplicationWebhooksRequest{
 			ApplicationIds: &registeredApplicationID,
-			FieldMask: &pbtypes.FieldMask{
-				Paths: []string{"base_url"},
-			},
+			FieldMask:      ttnpb.FieldMask("base_url"),
 		}, creds)
 		a.So(err, should.BeNil)
 		a.So(res.Webhooks, should.BeEmpty)
@@ -111,9 +107,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 				},
 				BaseUrl: "http://localhost/test",
 			},
-			FieldMask: &pbtypes.FieldMask{
-				Paths: []string{"base_url"},
-			},
+			FieldMask: ttnpb.FieldMask("base_url"),
 		}, creds)
 		a.So(err, should.BeNil)
 	}
@@ -122,9 +116,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	{
 		res, err := client.List(ctx, &ttnpb.ListApplicationWebhooksRequest{
 			ApplicationIds: &registeredApplicationID,
-			FieldMask: &pbtypes.FieldMask{
-				Paths: []string{"base_url"},
-			},
+			FieldMask:      ttnpb.FieldMask("base_url"),
 		}, creds)
 		a.So(err, should.BeNil)
 		a.So(res.Webhooks, should.HaveLength, 1)
@@ -138,9 +130,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 				ApplicationIds: &registeredApplicationID,
 				WebhookId:      registeredWebhookID,
 			},
-			FieldMask: &pbtypes.FieldMask{
-				Paths: []string{"base_url"},
-			},
+			FieldMask: ttnpb.FieldMask("base_url"),
 		}, creds)
 		a.So(err, should.BeNil)
 		a.So(res.BaseUrl, should.Equal, "http://localhost/test")
@@ -159,9 +149,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	{
 		res, err := client.List(ctx, &ttnpb.ListApplicationWebhooksRequest{
 			ApplicationIds: &registeredApplicationID,
-			FieldMask: &pbtypes.FieldMask{
-				Paths: []string{"base_url"},
-			},
+			FieldMask:      ttnpb.FieldMask("base_url"),
 		}, creds)
 		a.So(err, should.BeNil)
 		a.So(res.Webhooks, should.BeEmpty)
@@ -259,12 +247,7 @@ description: Bar`),
 			tc.assertGet(a, getRes, err)
 
 			listRes, err := client.ListTemplates(ctx, &ttnpb.ListApplicationWebhookTemplatesRequest{
-				FieldMask: &types.FieldMask{
-					Paths: []string{
-						"name",
-						"description",
-					},
-				},
+				FieldMask: ttnpb.FieldMask("name", "description"),
 			})
 			tc.assertList(a, listRes, err)
 		})

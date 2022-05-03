@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	"go.thethings.network/lorawan-stack/v3/pkg/qrcodegenerator/qrcode/enddevices"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -69,9 +68,7 @@ func (mockFormat) Format() *ttnpb.QRCodeFormat {
 	return &ttnpb.QRCodeFormat{
 		Name:        "Test",
 		Description: "Test",
-		FieldMask: &pbtypes.FieldMask{
-			Paths: []string{"ids"},
-		},
+		FieldMask:   ttnpb.FieldMask("ids"),
 	}
 }
 

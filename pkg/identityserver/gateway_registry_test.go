@@ -17,7 +17,6 @@ package identityserver
 import (
 	"testing"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -51,14 +50,14 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 
 		_, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIds: gtw1.GetIds(),
-			FieldMask:  &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask:  ttnpb.FieldMask("name"),
 		})
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsUnauthenticated(err), should.BeTrue)
 		}
 
 		listRes, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask: ttnpb.FieldMask("name"),
 		})
 		a.So(err, should.BeNil)
 		if a.So(listRes, should.NotBeNil) {
@@ -67,7 +66,7 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 
 		_, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
 			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
-			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask:    ttnpb.FieldMask("name"),
 		})
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -78,7 +77,7 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 				Ids:  gtw1.GetIds(),
 				Name: "Updated Name",
 			},
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask: ttnpb.FieldMask("name"),
 		})
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -155,7 +154,7 @@ func TestGatewaysCRUD(t *testing.T) {
 
 		got, err := reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIds: created.GetIds(),
-			FieldMask:  &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask:  ttnpb.FieldMask("name"),
 		}, creds)
 		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 			a.So(got.GetIds().GetEui(), should.Resemble, created.Ids.Eui)
@@ -185,13 +184,13 @@ func TestGatewaysCRUD(t *testing.T) {
 
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIds: created.GetIds(),
-			FieldMask:  &pbtypes.FieldMask{Paths: []string{"ids"}},
+			FieldMask:  ttnpb.FieldMask("ids"),
 		}, credsWithoutRights)
 		a.So(err, should.BeNil)
 
 		got, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
 			GatewayIds: created.GetIds(),
-			FieldMask:  &pbtypes.FieldMask{Paths: []string{"attributes"}},
+			FieldMask:  ttnpb.FieldMask("attributes"),
 		}, credsWithoutRights)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -202,7 +201,7 @@ func TestGatewaysCRUD(t *testing.T) {
 				Ids:  created.GetIds(),
 				Name: "Updated Name",
 			},
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask: ttnpb.FieldMask("name"),
 		}, creds)
 		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.Name, should.Equal, "Updated Name")
@@ -210,7 +209,7 @@ func TestGatewaysCRUD(t *testing.T) {
 
 		for _, collaborator := range []*ttnpb.OrganizationOrUserIdentifiers{nil, usr1.GetOrganizationOrUserIdentifiers()} {
 			list, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
-				FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
+				FieldMask:    ttnpb.FieldMask("name"),
 				Collaborator: collaborator,
 			}, creds)
 			if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) && a.So(list.Gateways, should.HaveLength, 6) {
@@ -258,7 +257,7 @@ func TestGatewaysPagination(t *testing.T) {
 		var md metadata.MD
 
 		list, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
-			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask:    ttnpb.FieldMask("name"),
 			Collaborator: usr1.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         1,
@@ -269,7 +268,7 @@ func TestGatewaysPagination(t *testing.T) {
 		}
 
 		list, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
-			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask:    ttnpb.FieldMask("name"),
 			Collaborator: usr1.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         2,
@@ -279,7 +278,7 @@ func TestGatewaysPagination(t *testing.T) {
 		}
 
 		list, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
-			FieldMask:    &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask:    ttnpb.FieldMask("name"),
 			Collaborator: usr1.OrganizationOrUserIdentifiers(),
 			Limit:        2,
 			Page:         3,
