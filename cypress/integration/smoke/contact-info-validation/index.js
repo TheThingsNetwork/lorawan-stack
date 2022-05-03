@@ -32,7 +32,7 @@ const contactInfoValidation = defineSmokeTest('succeeds validating contact info'
 
   cy.createUser(user1)
 
-  cy.task('findEmailInStackLog', validatePasswordLinkRegExp).then(validationUri => {
+  cy.task('findInLatestEmail', validatePasswordLinkRegExp).then(validationUri => {
     cy.log(validationUri)
     cy.visit(validationUri)
     cy.findByTestId('notification').should('be.visible').should('contain', 'Validation successful')
@@ -40,7 +40,7 @@ const contactInfoValidation = defineSmokeTest('succeeds validating contact info'
 
   cy.createUser(user2)
 
-  cy.task('findEmailInStackLog', validatePasswordLinkRegExp).then(validationUri => {
+  cy.task('findInLatestEmail', validatePasswordLinkRegExp).then(validationUri => {
     cy.log(validationUri)
     cy.visit(validationUri)
     cy.findByTestId('notification').should('be.visible').should('contain', 'Validation successful')

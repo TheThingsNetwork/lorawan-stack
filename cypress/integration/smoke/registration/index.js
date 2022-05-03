@@ -14,6 +14,8 @@
 
 import { defineSmokeTest } from '../utils'
 
+const emailConfirmationRegex = `https?:\\/\\/[a-zA-Z0-9-_.:]+/[a-zA-Z0-9-_]+\\/validate\\?.+&token=[A-Z0-9]+`
+
 const loginConsole = defineSmokeTest('succeeds registering and logging into the Console', () => {
   const user = {
     user_id: 'console-login-test-user',
@@ -36,10 +38,7 @@ const loginConsole = defineSmokeTest('succeeds registering and logging into the 
     .should('contain', 'You have successfully registered and can login now')
 
   // Check for the validation email (via the stack logs).
-  cy.task(
-    'findEmailInStackLog',
-    `Your email address will be used as contact for user "${user.user_id}"`,
-  ).then(validationUri => {
+  cy.task('findInLatestEmail', emailConfirmationRegex).then(validationUri => {
     // eslint-disable-next-line jest/valid-expect, no-unused-expressions
     expect(validationUri).to.not.be.empty
   })
@@ -79,10 +78,7 @@ const loginAccountApp = defineSmokeTest(
       .should('contain', 'You have successfully registered and can login now')
 
     // Check for the validation email (via the stack logs).
-    cy.task(
-      'findEmailInStackLog',
-      `Your email address will be used as contact for user "${user.user_id}"`,
-    ).then(validationUri => {
+    cy.task('findInLatestEmail', emailConfirmationRegex).then(validationUri => {
       // eslint-disable-next-line jest/valid-expect, no-unused-expressions
       expect(validationUri).to.not.be.empty
     })

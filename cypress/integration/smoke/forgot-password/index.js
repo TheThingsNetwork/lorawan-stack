@@ -43,7 +43,7 @@ const forgotPasswordFlow = defineSmokeTest('forgot password flow succeeds', () =
   cy.location('pathname').should('include', `${Cypress.config('accountAppRootPath')}/login`)
 
   // Retrieve password token link from email (via stack logs).
-  cy.task('findEmailInStackLog', updatePasswordLinkRegExp).then(temporaryPasswordLink => {
+  cy.task('findInLatestEmail', updatePasswordLinkRegExp).then(temporaryPasswordLink => {
     cy.log(temporaryPasswordLink)
 
     // Navigate to the password token link and submit new credentials.
