@@ -116,4 +116,4 @@ func TestRedisPubSubStore(t *testing.T) {
 	})
 }
 
-var ps events.Store = (*redis.PubSubStore)(nil)
+var _ events.Store = (*redis.PubSubStore)(nil)
