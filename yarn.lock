@@ -1809,14 +1809,14 @@
   dependencies:
     "@hapi/hoek" "^9.0.0"
 
-"@hot-loader/react-dom@^17.0.1":
-  version "17.0.1"
-  resolved "https://registry.yarnpkg.com/@hot-loader/react-dom/-/react-dom-17.0.1.tgz#0c75b4dd068f819435dafb3e8809ca1749695656"
-  integrity sha512-QttzEibkIFkl/WV1dsLXg73YIweNo9ySbB0/26068RqFGWyv7pKyictWsaQXqSj1y66/BDn3kglCHgroGrv3vA==
+"@hot-loader/react-dom@^17.0.2":
+  version "17.0.2"
+  resolved "https://registry.yarnpkg.com/@hot-loader/react-dom/-/react-dom-17.0.2.tgz#0b24e484093e8f97eb5c72bebdda44fc20bc8400"
+  integrity sha512-G2RZrFhsQClS+bdDh/Ojpk3SgocLPUGnvnJDTQYnmKSSwXtU+Yh+8QMs+Ia3zaAvBiOSpIIDSUxuN69cvKqrWg==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
-    scheduler "^0.20.1"
+    scheduler "^0.20.2"
 
 "@humanwhocodes/config-array@^0.5.0":
   version "0.5.0"
@@ -13343,7 +13343,7 @@ scheduler@^0.19.1:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
 
-scheduler@^0.20.1, scheduler@^0.20.2:
+scheduler@^0.20.2:
   version "0.20.2"
   resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.20.2.tgz#4baee39436e34aa93b4874bddcbf0fe8b8b50e91"
   integrity sha512-2eWfGgAqqWFGqtdMmcL5zCMK1U8KlXv8SQFGglL3CEtd0aDVDWgeF/YoCmvln55m5zSk3J/20hTaSBeSObsQDQ==
