@@ -57,7 +57,7 @@
 
 # Subsystems
 
-/pkg/identityserver @htdvisser @kschiffer
+/pkg/identityserver @htdvisser @kschiffer @nicholaspcr
 /pkg/email @htdvisser @kschiffer
 /pkg/oauth @htdvisser @kschiffer
 /pkg/account @htdvisser @kschiffer
