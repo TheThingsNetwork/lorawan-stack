@@ -3509,6 +3509,15 @@
       "file": "ttjs.go"
     }
   },
+  "error:pkg/deviceclaimingserver/enddevices/ttjs:invalid_ns_address": {
+    "translations": {
+      "en": "invalid NS address `{address}`"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
+      "file": "ttjs.go"
+    }
+  },
   "error:pkg/deviceclaimingserver/enddevices/ttjs:invalid_oui": {
     "translations": {
       "en": "invalid OUI `{oui}`"
@@ -3525,15 +3534,6 @@
     "description": {
       "package": "pkg/deviceclaimingserver/enddevices/ttjs",
       "file": "messages.go"
-    }
-  },
-  "error:pkg/deviceclaimingserver/enddevices/ttjs:no_home_ns_id": {
-    "translations": {
-      "en": "no HomeNSID configured for network server address `{address}`"
-    },
-    "description": {
-      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
-      "file": "ttjs.go"
     }
   },
   "error:pkg/deviceclaimingserver/enddevices/ttjs:unauthorized": {
