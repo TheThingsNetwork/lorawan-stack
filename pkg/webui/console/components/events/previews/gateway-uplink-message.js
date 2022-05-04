@@ -26,40 +26,42 @@ import messages from '../messages'
 
 import DescriptionList from './shared/description-list'
 
-const UplinkMessagePreview = React.memo(({ event }) => {
+const GatewayUplinkMessagePreview = React.memo(({ event }) => {
   const { data } = event
   let fPort, snr, devAddr, fCnt, joinEui, devEui, rssi, isConfirmed, dataRate
 
-  if ('payload' in data) {
-    if ('mac_payload' in data.payload) {
-      devAddr = getByPath(data, 'payload.mac_payload.f_hdr.dev_addr')
-      fPort = getByPath(data, 'payload.mac_payload.f_port')
-      fCnt = getByPath(data, 'payload.mac_payload.f_hdr.f_cnt')
+  if ('message' in data) {
+    if ('payload' in data.message) {
+      if ('mac_payload' in data.message.payload) {
+        devAddr = getByPath(data, 'message.payload.mac_payload.f_hdr.dev_addr')
+        fPort = getByPath(data, 'message.payload.mac_payload.f_port')
+        fCnt = getByPath(data, 'message.payload.mac_payload.f_hdr.f_cnt')
+      }
+
+      if ('join_request_payload' in data.message.payload) {
+        joinEui = getByPath(data, 'message.payload.join_request_payload.join_eui')
+        devEui = getByPath(data, 'message.payload.join_request_payload.dev_eui')
+      }
+
+      isConfirmed = getByPath(data, 'message.payload.m_hdr.m_type') === 'CONFIRMED_UP'
     }
 
-    if ('join_request_payload' in data.payload) {
-      joinEui = getByPath(data, 'payload.join_request_payload.join_eui')
-      devEui = getByPath(data, 'payload.join_request_payload.dev_eui')
+    if ('rx_metadata' in data.message) {
+      if (data.message.rx_metadata.length > 1) {
+        const gatewayWithHighestSNR = getGatewayWithHighestSNR(data.message.rx_metadata)
+        snr = gatewayWithHighestSNR.snr
+        rssi = gatewayWithHighestSNR.rssi
+      } else {
+        snr = data.message.rx_metadata[0].snr
+        rssi = data.message.rx_metadata[0].rssi
+      }
     }
 
-    isConfirmed = getByPath(data, 'payload.m_hdr.m_type') === 'CONFIRMED_UP'
-  }
-
-  if ('rx_metadata' in data) {
-    if (data.rx_metadata.length > 1) {
-      const gatewayWithHighestSNR = getGatewayWithHighestSNR(data.rx_metadata)
-      snr = gatewayWithHighestSNR.snr
-      rssi = gatewayWithHighestSNR.rssi
-    } else {
-      snr = data.rx_metadata[0].snr
-      rssi = data.rx_metadata[0].rssi
+    if ('settings' in data.message && 'data_rate' in data.message.settings) {
+      const bandwidth = getByPath(data, 'message.settings.data_rate.lora.bandwidth')
+      const spreadingFactor = getByPath(data, 'message.settings.data_rate.lora.spreading_factor')
+      dataRate = `SF${spreadingFactor}BW${bandwidth / 1000}`
     }
-  }
-
-  if ('settings' in data && 'data_rate' in data.settings) {
-    const bandwidth = getByPath(data, 'settings.data_rate.lora.bandwidth')
-    const spreadingFactor = getByPath(data, 'settings.data_rate.lora.spreading_factor')
-    dataRate = `SF${spreadingFactor}BW${bandwidth / 1000}`
   }
 
   return (
@@ -81,8 +83,8 @@ const UplinkMessagePreview = React.memo(({ event }) => {
   )
 })
 
-UplinkMessagePreview.propTypes = {
+GatewayUplinkMessagePreview.propTypes = {
   event: PropTypes.event.isRequired,
 }
 
-export default UplinkMessagePreview
+export default GatewayUplinkMessagePreview

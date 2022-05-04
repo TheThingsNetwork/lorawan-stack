@@ -9404,6 +9404,15 @@
       "file": "observability.go"
     }
   },
+  "event:gs.gateway.connection.stats": {
+    "translations": {
+      "en": "gateway connection statistics"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
   "event:gs.gateway.disconnect": {
     "translations": {
       "en": "disconnect gateway"

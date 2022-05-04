@@ -42,6 +42,14 @@ var (
 		),
 		events.WithErrorDataType(),
 	)
+	evtGatewayConnectionStats = events.Define(
+		"gs.gateway.connection.stats", "gateway connection statistics",
+		events.WithVisibility(
+			ttnpb.Right_RIGHT_GATEWAY_LINK,
+			ttnpb.Right_RIGHT_GATEWAY_STATUS_READ,
+		),
+		events.WithDataType(&ttnpb.GatewayConnectionStats{}),
+	)
 	evtReceiveStatus = events.Define(
 		"gs.status.receive", "receive gateway status",
 		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_STATUS_READ),
@@ -55,7 +63,7 @@ var (
 	evtReceiveUp = events.Define(
 		"gs.up.receive", "receive uplink message",
 		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ),
-		events.WithDataType(&ttnpb.UplinkMessage{}),
+		events.WithDataType(&ttnpb.GatewayUplinkMessage{}),
 	)
 	evtDropUp = events.Define(
 		"gs.up.drop", "drop uplink message",
@@ -273,6 +281,10 @@ func registerGatewayDisconnect(ctx context.Context, ids ttnpb.GatewayIdentifiers
 	gsMetrics.gatewaysConnected.WithLabelValues(ctx, protocol).Dec()
 }
 
+func registerGatewayConnectionStats(ctx context.Context, ids ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats) {
+	events.Publish(evtGatewayConnectionStats.NewWithIdentifiersAndData(ctx, &ids, stats))
+}
+
 func registerReceiveStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.GatewayStatus, protocol string) {
 	events.Publish(evtReceiveStatus.NewWithIdentifiersAndData(ctx, gtw, status))
 	gsMetrics.statusReceived.WithLabelValues(ctx, protocol).Inc()
@@ -291,12 +303,12 @@ func registerDropStatus(ctx context.Context, gtw *ttnpb.Gateway, status *ttnpb.G
 	gsMetrics.statusDropped.WithLabelValues(ctx, host, errorLabel).Inc()
 }
 
-func registerReceiveUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, protocol string) {
+func registerReceiveUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.GatewayUplinkMessage, protocol string) {
 	events.Publish(evtReceiveUp.NewWithIdentifiersAndData(ctx, gtw, msg))
 	gsMetrics.uplinkReceived.WithLabelValues(ctx, protocol).Inc()
 }
 
-func registerForwardUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.UplinkMessage, host string) {
+func registerForwardUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.GatewayUplinkMessage, host string) {
 	events.Publish(evtForwardUp.NewWithIdentifiersAndData(ctx, gtw, host))
 	gsMetrics.uplinkForwarded.WithLabelValues(ctx, host).Inc()
 }
