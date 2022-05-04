@@ -17,12 +17,15 @@ For details about compatibility between different releases, see the **Commitment
 
 - Event type for `gs.up.receive` event to `GatewayUplinkMessage`.
 - Default debounce time for updating connection stats in de Gateway Server (configuration setting `gs.update-connection-stats-debounce-time`) is now 30 seconds.
+- Error code when importing CSV file with invalid LoRaWAN or Regional Parameters version.
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- Support `app_eui` as alias for `join_eui` in CSV file import, per documentation.
 
 ### Security
 
