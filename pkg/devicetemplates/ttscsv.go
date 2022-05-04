@@ -82,6 +82,14 @@ var csvFieldSetters = map[string]csvFieldSetterFunc{
 		dst.Ids.JoinEui = &joinEUI
 		return []string{"ids.join_eui"}, nil
 	},
+	"app_eui": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
+		var joinEUI types.EUI64
+		if err := joinEUI.UnmarshalText([]byte(val)); err != nil {
+			return nil, err
+		}
+		dst.Ids.JoinEui = &joinEUI
+		return []string{"ids.join_eui"}, nil
+	},
 	"name": func(dst *ttnpb.EndDevice, val string) ([]string, error) {
 		dst.Name = val
 		return []string{"name"}, nil
