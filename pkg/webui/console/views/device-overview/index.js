@@ -279,7 +279,14 @@ class DeviceOverview extends React.Component {
           value: (
             <ModalButton
               modalData={{
-                message: session ? m.hasSession : m.noSession,
+                message: session
+                  ? {
+                      values: { b: msg => <b>{msg}</b> },
+                      ...m.hasSession,
+                    }
+                  : {
+                      ...m.noSession,
+                    },
               }}
               onApprove={this.onExport}
               message={m.macData}
