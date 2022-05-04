@@ -21,8 +21,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
+	"regexp"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -41,16 +43,22 @@ type BasicAuth struct {
 	Password string `yaml:"password"`
 }
 
+// NS contains information related to the Network Server
+type NS struct {
+	Address  string `yaml:"address"`
+	HomeNSID string `yaml:"home-ns-id"`
+}
+
 // Config is the configuration to communicate with The Things Join Server End Device Claming API.
 type Config struct {
 	NetID           types.NetID         `yaml:"-"`
 	JoinEUIPrefixes []types.EUI64Prefix `yaml:"-"`
 
 	BasicAuth          `yaml:"basic-auth"`
-	ClaimingAPIVersion string            `yaml:"claiming-api-version"`
-	URL                string            `yaml:"url"`
-	TenantID           string            `yaml:"tenant-id"`
-	HomeNSIDs          map[string]string `yaml:"home-ns-ids"`
+	ClaimingAPIVersion string `yaml:"claiming-api-version"`
+	URL                string `yaml:"url"`
+	TenantID           string `yaml:"tenant-id"`
+	NS                 NS     `yaml:"ns"`
 }
 
 // Component abstracts the underlying *component.Component.
@@ -65,15 +73,18 @@ type Component interface {
 type TTJS struct {
 	Component
 
-	hsNSIDs     map[string]types.EUI64
 	httpClient  *http.Client
 	baseURL     *url.URL
 	config      Config
 	ttiVendorID OUI
 }
 
+var nsAddressRegexp = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
+
+var errInvalidNSAddress = errors.DefineInvalidArgument("invalid_ns_address", "invalid NS address `{address}`")
+
 // NewClient applies the config and returns a new TTJS client.
-func (config Config) NewClient(ctx context.Context, c Component) (*TTJS, error) {
+func (config *Config) NewClient(ctx context.Context, c Component) (*TTJS, error) {
 	httpClient, err := c.HTTPClient(ctx)
 	if err != nil {
 		return nil, err
@@ -82,22 +93,33 @@ func (config Config) NewClient(ctx context.Context, c Component) (*TTJS, error) 
 	if err != nil {
 		return nil, err
 	}
-	// Parse the HomeNSIDs map.
-	res := make(map[string]types.EUI64, len(config.HomeNSIDs))
-	for nsAddress, nsIDString := range config.HomeNSIDs {
-		var nsID types.EUI64
-		err := nsID.UnmarshalText([]byte(nsIDString))
-		if err != nil {
-			return nil, err
-		}
-		res[nsAddress] = nsID
+
+	// External services, including Join Servers, typically identify Network Servers by host instead of by host and port.
+	// So we need to drop the port here if provided. We first need to check that the configured address is valid before splitting the port.
+	s := nsAddressRegexp.FindStringSubmatch(config.NS.Address)
+	if len(s) != 1 {
+		return nil, errInvalidNSAddress.WithAttributes("address", config.NS.Address)
 	}
+	address, _, err := net.SplitHostPort(s[0])
+	if err != nil {
+		// Address is already validated by the regex.
+		// An error here means that it does not contain a port, so we use it directly.
+		address = config.NS.Address
+	}
+	config.NS.Address = address
+
+	// Check that the HomeNSID is a valid EUI.
+	var hNSID types.EUI64
+	err = hNSID.UnmarshalText([]byte(config.NS.HomeNSID))
+	if err != nil {
+		return nil, err
+	}
+
 	return &TTJS{
-		config:      config,
+		config:      *config,
 		httpClient:  httpClient,
 		baseURL:     baseURL,
 		Component:   c,
-		hsNSIDs:     res,
 		ttiVendorID: OUI(interop.TTIVendorID.MarshalNumber()),
 	}, nil
 }
@@ -117,23 +139,17 @@ var (
 	errDeviceNotClaimed     = errors.DefineNotFound("device_not_claimed", "device with EUI `{dev_eui}` not claimed")
 	errDeviceAccessDenied   = errors.DefinePermissionDenied("device_access_denied", "access to device with `{dev_eui}` denied. Either device is already claimed or owner token is invalid")
 	errUnauthorized         = errors.DefineUnauthenticated("unauthorized", "client API Key missing or invalid")
-	errNoHomeNSID           = errors.DefineInvalidArgument("no_home_ns_id", "no HomeNSID configured for network server address `{address}`")
 )
 
 // Claim implements EndDeviceClaimer.
-func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode, networkServerAddress string) error {
+func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode string) error {
 	htenantID := client.config.TenantID
-
-	hNSID, ok := client.hsNSIDs[networkServerAddress]
-	if !ok {
-		return errNoHomeNSID.WithAttributes("address", networkServerAddress)
-	}
 
 	claimReq := &claimRequest{
 		OwnerToken: claimAuthenticationCode,
 		claimData: claimData{
 			HomeNetID: client.config.NetID.String(),
-			HomeNSID:  hNSID.String(),
+			HomeNSID:  client.config.NS.HomeNSID,
 			VendorSpecific: VendorSpecific{
 				OUI: client.ttiVendorID,
 				Data: struct {
@@ -141,7 +157,7 @@ func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, clai
 					HNSAddress string
 				}{
 					HTenantID:  htenantID,
-					HNSAddress: networkServerAddress,
+					HNSAddress: client.config.NS.Address,
 				},
 			},
 		},

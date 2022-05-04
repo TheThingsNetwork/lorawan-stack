@@ -100,8 +100,9 @@ func TestTTJS(t *testing.T) {
 
 	// Invalid Config
 	invalidConfig := Config{
-		HomeNSIDs: map[string]string{
-			"localhost": "1234",
+		NS: NS{
+			Address:  "localhost:1234:34",
+			HomeNSID: "1234",
 		},
 		TenantID: tenantID,
 		NetID:    test.DefaultNetID,
@@ -122,8 +123,9 @@ func TestTTJS(t *testing.T) {
 
 	// Valid Config
 	ttJSConfig := Config{
-		HomeNSIDs: map[string]string{
-			"localhost": homeNSID,
+		NS: NS{
+			Address:  "localhost",
+			HomeNSID: homeNSID,
 		},
 		TenantID: tenantID,
 		NetID:    test.DefaultNetID,
@@ -141,7 +143,7 @@ func TestTTJS(t *testing.T) {
 	// Invalid client API key.
 	unauthenticatedClient, err := ttJSConfig.NewClient(ctx, c)
 	test.Must(unauthenticatedClient, err)
-	err = unauthenticatedClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode, nsAddress)
+	err = unauthenticatedClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode)
 	a.So(errors.IsUnauthenticated(err), should.BeTrue)
 	err = unauthenticatedClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
 		DevEui:  &devEUI,
@@ -170,7 +172,6 @@ func TestTTJS(t *testing.T) {
 		DevEUI             types.EUI64
 		JoinEUI            types.EUI64
 		AuthenticationCode string
-		HNSAddress         string
 		ErrorAssertion     func(err error) bool
 	}{
 		{
@@ -178,7 +179,6 @@ func TestTTJS(t *testing.T) {
 			DevEUI:             devEUI,
 			JoinEUI:            supportedJoinEUI,
 			AuthenticationCode: "",
-			HNSAddress:         nsAddress,
 			ErrorAssertion: func(err error) bool {
 				return errors.IsUnauthenticated(err)
 			},
@@ -188,18 +188,8 @@ func TestTTJS(t *testing.T) {
 			DevEUI:             devEUI,
 			JoinEUI:            supportedJoinEUI,
 			AuthenticationCode: "invalid",
-			HNSAddress:         nsAddress,
 			ErrorAssertion: func(err error) bool {
 				return errors.IsUnauthenticated(err)
-			},
-		},
-		{
-			Name:               "NoTargetNSID",
-			DevEUI:             devEUI,
-			JoinEUI:            supportedJoinEUI,
-			AuthenticationCode: claimAuthenticationCode,
-			ErrorAssertion: func(err error) bool {
-				return errors.IsInvalidArgument(err)
 			},
 		},
 		{
@@ -207,7 +197,6 @@ func TestTTJS(t *testing.T) {
 			DevEUI:             types.EUI64{},
 			JoinEUI:            supportedJoinEUI,
 			AuthenticationCode: claimAuthenticationCode,
-			HNSAddress:         nsAddress,
 			ErrorAssertion: func(err error) bool {
 				return errors.IsNotFound(err)
 			},
@@ -217,11 +206,10 @@ func TestTTJS(t *testing.T) {
 			DevEUI:             devEUI,
 			JoinEUI:            supportedJoinEUI,
 			AuthenticationCode: claimAuthenticationCode,
-			HNSAddress:         nsAddress,
 		},
 	} {
 		t.Run(fmt.Sprintf("Claim/%s", tc.Name), func(t *testing.T) {
-			err := client.Claim(ctx, tc.JoinEUI, tc.DevEUI, tc.AuthenticationCode, tc.HNSAddress)
+			err := client.Claim(ctx, tc.JoinEUI, tc.DevEUI, tc.AuthenticationCode)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -234,8 +222,9 @@ func TestTTJS(t *testing.T) {
 
 	// Claim locked.
 	otherClientConfig := Config{
-		HomeNSIDs: map[string]string{
-			"localhost": homeNSID,
+		NS: NS{
+			Address:  "localhost",
+			HomeNSID: homeNSID,
 		},
 		NetID: test.DefaultNetID,
 		JoinEUIPrefixes: []types.EUI64Prefix{
@@ -250,7 +239,7 @@ func TestTTJS(t *testing.T) {
 	}
 	otherClient, err := otherClientConfig.NewClient(ctx, c)
 	test.Must(otherClient, err)
-	err = otherClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode, nsAddress)
+	err = otherClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	ret, err = otherClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
 		DevEui:  &devEUI,
@@ -284,7 +273,7 @@ func TestTTJS(t *testing.T) {
 	a.So(errors.IsNotFound(err), should.BeTrue)
 
 	// Try to claim
-	err = client.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode, nsAddress)
+	err = client.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode)
 	a.So(err, should.BeNil)
 
 	// Get valid status
