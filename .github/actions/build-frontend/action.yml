@@ -25,12 +25,12 @@ runs:
     - name: Build DLLs
       if: steps.public-cache.outputs.cache-hit != 'true'
       shell: bash
-      run: tools/bin/mage -v js:buildDll
+      run: tools/bin/mage js:buildDll
       env:
         WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS: ${{ inputs.production-sourcemaps }}
     - name: Build Frontend
       if: steps.public-cache.outputs.cache-hit != 'true'
       shell: bash
-      run: tools/bin/mage -v js:build
+      run: tools/bin/mage js:build
       env:
         WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS: ${{ inputs.production-sourcemaps }}
