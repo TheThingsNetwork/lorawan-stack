@@ -47,9 +47,7 @@ func cleanFieldMaskPaths(allowedPaths []string, requestedPaths *pbtypes.FieldMas
 			out = append(out, path)
 		}
 	}
-	return &pbtypes.FieldMask{
-		Paths: out,
-	}
+	return ttnpb.FieldMask(out...)
 }
 
 func cleanContactInfo(info []*ttnpb.ContactInfo) {

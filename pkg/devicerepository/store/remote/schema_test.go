@@ -20,7 +20,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -47,17 +46,15 @@ func TestProfile(t *testing.T) {
 						Supports_32BitFCnt: &ttnpb.BoolValue{Value: true},
 					},
 				},
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{
-						"version_ids",
-						"supports_join",
-						"supports_class_b",
-						"supports_class_c",
-						"lorawan_version",
-						"lorawan_phy_version",
-						"mac_settings.supports_32_bit_f_cnt",
-					},
-				},
+				FieldMask: ttnpb.FieldMask(
+					"version_ids",
+					"supports_join",
+					"supports_class_b",
+					"supports_class_c",
+					"lorawan_version",
+					"lorawan_phy_version",
+					"mac_settings.supports_32_bit_f_cnt",
+				),
 			},
 		},
 		{
@@ -94,24 +91,22 @@ func TestProfile(t *testing.T) {
 						},
 					},
 				},
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{
-						"version_ids",
-						"supports_join",
-						"supports_class_b",
-						"supports_class_c",
-						"lorawan_version",
-						"lorawan_phy_version",
-						"formatters",
-						"mac_settings.rx1_delay",
-						"mac_settings.rx1_data_rate_offset",
-						"mac_settings.rx2_data_rate_index",
-						"mac_settings.rx2_frequency",
-						"mac_settings.supports_32_bit_f_cnt",
-						"mac_settings.factory_preset_frequencies",
-						"mac_state.desired_parameters.max_eirp",
-					},
-				},
+				FieldMask: ttnpb.FieldMask(
+					"version_ids",
+					"supports_join",
+					"supports_class_b",
+					"supports_class_c",
+					"lorawan_version",
+					"lorawan_phy_version",
+					"formatters",
+					"mac_settings.rx1_delay",
+					"mac_settings.rx1_data_rate_offset",
+					"mac_settings.rx2_data_rate_index",
+					"mac_settings.rx2_frequency",
+					"mac_settings.supports_32_bit_f_cnt",
+					"mac_settings.factory_preset_frequencies",
+					"mac_state.desired_parameters.max_eirp",
+				),
 			},
 		},
 		{
@@ -129,20 +124,18 @@ func TestProfile(t *testing.T) {
 						PingSlotFrequency:     &ttnpb.FrequencyValue{Value: 868300000},
 					},
 				},
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{
-						"version_ids",
-						"supports_join",
-						"supports_class_b",
-						"supports_class_c",
-						"lorawan_version",
-						"lorawan_phy_version",
-						"mac_settings.class_b_timeout",
-						"mac_settings.ping_slot_data_rate_index",
-						"mac_settings.ping_slot_frequency",
-						"mac_settings.ping_slot_periodicity",
-					},
-				},
+				FieldMask: ttnpb.FieldMask(
+					"version_ids",
+					"supports_join",
+					"supports_class_b",
+					"supports_class_c",
+					"lorawan_version",
+					"lorawan_phy_version",
+					"mac_settings.class_b_timeout",
+					"mac_settings.ping_slot_data_rate_index",
+					"mac_settings.ping_slot_frequency",
+					"mac_settings.ping_slot_periodicity",
+				),
 			},
 		},
 		{
@@ -157,17 +150,15 @@ func TestProfile(t *testing.T) {
 						ClassCTimeout: ttnpb.ProtoDurationPtr(64 * time.Second),
 					},
 				},
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{
-						"version_ids",
-						"supports_join",
-						"supports_class_b",
-						"supports_class_c",
-						"lorawan_version",
-						"lorawan_phy_version",
-						"mac_settings.class_c_timeout",
-					},
-				},
+				FieldMask: ttnpb.FieldMask(
+					"version_ids",
+					"supports_join",
+					"supports_class_b",
+					"supports_class_c",
+					"lorawan_version",
+					"lorawan_phy_version",
+					"mac_settings.class_c_timeout",
+				),
 			},
 		},
 	} {

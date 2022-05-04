@@ -484,7 +484,7 @@ func (is *IdentityServer) updateGateway(ctx context.Context, req *ttnpb.UpdateGa
 
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.GatewayFieldPathsNested, req.FieldMask, nil, append(getPaths, "frequency_plan_id"))
 	if len(req.FieldMask.GetPaths()) == 0 {
-		req.FieldMask = &pbtypes.FieldMask{Paths: updatePaths}
+		req.FieldMask = ttnpb.FieldMask(updatePaths...)
 	}
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info") {
 		if err := validateContactInfo(reqGtw.ContactInfo); err != nil {

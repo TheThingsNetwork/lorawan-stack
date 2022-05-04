@@ -20,7 +20,6 @@ import (
 	"image/png"
 	"testing"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
 	componenttest "go.thethings.network/lorawan-stack/v3/pkg/component/test"
@@ -62,9 +61,7 @@ func TestGenerateEndDeviceQRCode(t *testing.T) {
 	a.So(formats.Formats["test"], should.Resemble, &ttnpb.QRCodeFormat{
 		Name:        "Test",
 		Description: "Test",
-		FieldMask: &pbtypes.FieldMask{
-			Paths: []string{"ids"},
-		},
+		FieldMask:   ttnpb.FieldMask("ids"),
 	})
 
 	dev := &ttnpb.EndDevice{
@@ -301,5 +298,4 @@ func TestGenerateEndDeviceQRCodeParsing(t *testing.T) {
 			}
 		})
 	}
-
 }

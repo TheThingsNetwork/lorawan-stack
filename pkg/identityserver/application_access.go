@@ -161,7 +161,7 @@ func (is *IdentityServer) updateApplicationAPIKey(ctx context.Context, req *ttnp
 
 	// Backwards compatibility for older clients.
 	if len(req.FieldMask.GetPaths()) == 0 {
-		req.FieldMask = &pbtypes.FieldMask{Paths: []string{"rights", "name"}}
+		req.FieldMask = ttnpb.FieldMask("rights", "name")
 	}
 
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {

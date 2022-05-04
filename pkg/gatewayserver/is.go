@@ -17,7 +17,6 @@ package gatewayserver
 import (
 	"context"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -91,9 +90,7 @@ func (is IS) UpdateAntennas(ctx context.Context, ids ttnpb.GatewayIdentifiers, a
 			Ids:      &ids,
 			Antennas: antennas,
 		},
-		FieldMask: &pbtypes.FieldMask{
-			Paths: []string{"antennas"},
-		},
+		FieldMask: ttnpb.FieldMask("antennas"),
 	}
 	_, err = registry.Update(ctx, req, callOpt)
 	return err
@@ -125,9 +122,7 @@ func (is IS) UpdateAttributes(ctx context.Context, ids ttnpb.GatewayIdentifiers,
 			Ids:        &ids,
 			Attributes: merged,
 		},
-		FieldMask: &pbtypes.FieldMask{
-			Paths: []string{"attributes"},
-		},
+		FieldMask: ttnpb.FieldMask("attributes"),
 	}
 	_, err = registry.Update(ctx, req, callOpt)
 	return err

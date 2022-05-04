@@ -18,7 +18,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
@@ -72,7 +71,7 @@ func TestUserAPIKeys(t *testing.T) {
 			ApiKey: &ttnpb.APIKey{
 				Id: "does-not-exist",
 			},
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
+			FieldMask: ttnpb.FieldMask("name"),
 		}, limitedCreds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsNotFound(err), should.BeTrue)
@@ -101,7 +100,7 @@ func TestUserAPIKeys(t *testing.T) {
 					ttnpb.Right_RIGHT_USER_DELETE,
 				},
 			},
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
+			FieldMask: ttnpb.FieldMask("rights"),
 		}, limitedCreds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -117,7 +116,7 @@ func TestUserAPIKeys(t *testing.T) {
 					ttnpb.Right_RIGHT_USER_INFO,
 				},
 			},
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
+			FieldMask: ttnpb.FieldMask("rights"),
 		}, limitedCreds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
@@ -134,7 +133,7 @@ func TestUserAPIKeys(t *testing.T) {
 					ttnpb.Right_RIGHT_USER_APPLICATIONS_LIST,
 				},
 			},
-			FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
+			FieldMask: ttnpb.FieldMask("rights"),
 		}, limitedCreds)
 		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.Rights, should.Resemble, []ttnpb.Right{
@@ -175,7 +174,7 @@ func TestUserAPIKeys(t *testing.T) {
 					Id:   usr1Key.GetId(),
 					Name: "api-key-name-updated",
 				},
-				FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
+				FieldMask: ttnpb.FieldMask("name"),
 			}, opts...)
 			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
 				a.So(updated, should.BeNil)
@@ -219,7 +218,7 @@ func TestUserAPIKeys(t *testing.T) {
 					Id:   created.GetId(),
 					Name: "api-key-name-updated",
 				},
-				FieldMask: &pbtypes.FieldMask{Paths: []string{"name"}},
+				FieldMask: ttnpb.FieldMask("name"),
 			}, opts...)
 			if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 				a.So(updated.Name, should.Equal, "api-key-name-updated")
@@ -230,7 +229,7 @@ func TestUserAPIKeys(t *testing.T) {
 				ApiKey: &ttnpb.APIKey{
 					Id: created.GetId(),
 				},
-				FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
+				FieldMask: ttnpb.FieldMask("rights"),
 			}, opts...)
 			if a.So(err, should.BeNil) && a.So(deleted, should.NotBeNil) {
 				a.So(deleted.Rights, should.BeNil)

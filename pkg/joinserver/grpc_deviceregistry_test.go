@@ -20,7 +20,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -102,9 +101,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: deepcopy.Copy(registeredDevice.Ids).(*ttnpb.EndDeviceIdentifiers),
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"ids"},
-				},
+				FieldMask:    ttnpb.FieldMask("ids"),
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
@@ -141,9 +138,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					JoinEui:  unregisteredJoinEUI,
 					DevEui:   unregisteredDevEUI,
 				},
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"ids"},
-				},
+				FieldMask: ttnpb.FieldMask("ids"),
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
@@ -183,9 +178,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					JoinEui:  registeredJoinEUI,
 					DevEui:   registeredDevEUI,
 				},
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"ids"},
-				},
+				FieldMask: ttnpb.FieldMask("ids"),
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
@@ -218,9 +211,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: deepcopy.Copy(registeredDevice.Ids).(*ttnpb.EndDeviceIdentifiers),
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"ids"},
-				},
+				FieldMask:    ttnpb.FieldMask("ids"),
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
@@ -247,9 +238,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: deepcopy.Copy(registeredDevice.Ids).(*ttnpb.EndDeviceIdentifiers),
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"ids", "root_keys.app_key.key", "root_keys.nwk_key.key"},
-				},
+				FieldMask:    ttnpb.FieldMask("ids", "root_keys.app_key.key", "root_keys.nwk_key.key"),
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
@@ -298,9 +287,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: deepcopy.Copy(registeredDevice.Ids).(*ttnpb.EndDeviceIdentifiers),
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"ids", "root_keys.app_key.key", "root_keys.nwk_key.key"},
-				},
+				FieldMask:    ttnpb.FieldMask("ids", "root_keys.app_key.key", "root_keys.nwk_key.key"),
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				a := assertions.New(t)
@@ -359,9 +346,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: deepcopy.Copy(registeredDevice.Ids).(*ttnpb.EndDeviceIdentifiers),
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"ids", "root_keys.app_key.key", "root_keys.nwk_key.key"},
-				},
+				FieldMask:    ttnpb.FieldMask("ids", "root_keys.app_key.key", "root_keys.nwk_key.key"),
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				a := assertions.New(t)
@@ -640,9 +625,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					Ids:   registeredDevice.Ids,
 					NetId: &types.NetID{0x42, 0x00, 0x00},
 				}),
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"net_id"},
-				},
+				FieldMask: ttnpb.FieldMask("net_id"),
 			},
 			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -688,9 +671,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: CopyEndDevice(registeredDevice),
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"root_keys.app_key.key", "root_keys.nwk_key.key"},
-				},
+				FieldMask: ttnpb.FieldMask("root_keys.app_key.key", "root_keys.nwk_key.key"),
 			},
 			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, paths []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				test.MustTFromContext(ctx).Errorf("SetByIDFunc must not be called")
@@ -726,9 +707,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						},
 					},
 				}),
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"root_keys.app_key.key", "root_keys.nwk_key.key"},
-				},
+				FieldMask: ttnpb.FieldMask("root_keys.app_key.key", "root_keys.nwk_key.key"),
 			},
 			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))

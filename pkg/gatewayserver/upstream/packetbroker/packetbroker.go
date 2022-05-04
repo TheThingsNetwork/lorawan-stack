@@ -129,17 +129,15 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 				Value: 0,
 			},
 		},
-		FieldMask: &pbtypes.FieldMask{
-			Paths: []string{
-				"antennas",
-				"frequency_plan_ids",
-				"location_public",
-				"online",
-				"rx_rate",
-				"status_public",
-				"tx_rate",
-			},
-		},
+		FieldMask: ttnpb.FieldMask(
+			"antennas",
+			"frequency_plan_ids",
+			"location_public",
+			"online",
+			"rx_rate",
+			"status_public",
+			"tx_rate",
+		),
 	}
 	updateCtx, cancel := context.WithTimeout(ctx, updateGatewayTimeout)
 	res, err := pbaClient.UpdateGateway(updateCtx, req, h.Cluster.WithClusterAuth())
@@ -170,12 +168,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 				Online:       true,
 				StatusPublic: gtw.StatusPublic,
 			},
-			FieldMask: &pbtypes.FieldMask{
-				Paths: []string{
-					"online",
-					"status_public",
-				},
-			},
+			FieldMask: ttnpb.FieldMask("online", "status_public"),
 		}
 
 		if gtw.LocationPublic {

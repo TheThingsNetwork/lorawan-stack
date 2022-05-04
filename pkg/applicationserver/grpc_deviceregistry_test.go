@@ -21,7 +21,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver"
@@ -114,9 +113,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: registeredDevice.Ids,
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"formatters"},
-				},
+				FieldMask:    ttnpb.FieldMask("formatters"),
 			},
 			DeviceAssertion: nilDeviceAssertion,
 			ErrorAssertion:  permissionDeniedErrorAssertion,
@@ -139,9 +136,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: registeredDevice.Ids,
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"formatters"},
-				},
+				FieldMask:    ttnpb.FieldMask("formatters"),
 			},
 			DeviceAssertion: nilDeviceAssertion,
 			ErrorAssertion:  permissionDeniedErrorAssertion,
@@ -168,9 +163,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: registeredDevice.Ids,
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"formatters"},
-				},
+				FieldMask:    ttnpb.FieldMask("formatters"),
 			},
 			DeviceAssertion: nilDeviceAssertion,
 			ErrorAssertion:  notFoundErrorAssertion,
@@ -206,9 +199,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: registeredDevice.Ids,
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"formatters"},
-				},
+				FieldMask:    ttnpb.FieldMask("formatters"),
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
@@ -237,9 +228,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: registeredDevice.Ids,
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"formatters", "session"},
-				},
+				FieldMask:    ttnpb.FieldMask("formatters", "session"),
 			},
 			DeviceAssertion: nilDeviceAssertion,
 			ErrorAssertion:  permissionDeniedErrorAssertion,
@@ -275,9 +264,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: registeredDevice.Ids,
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"formatters", "session"},
-				},
+				FieldMask:    ttnpb.FieldMask("formatters", "session"),
 			},
 			DeviceAssertion: func(t *testing.T, dev *ttnpb.EndDevice) bool {
 				return assertions.New(t).So(dev, should.Resemble, &ttnpb.EndDevice{
@@ -383,9 +370,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice),
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"formatters"},
-				},
+				FieldMask: ttnpb.FieldMask("formatters"),
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
@@ -410,9 +395,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice),
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"formatters"},
-				},
+				FieldMask: ttnpb.FieldMask("formatters"),
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				a := assertions.New(t)
@@ -446,9 +429,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						DownFormatter: ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP,
 					},
 				},
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"formatters"},
-				},
+				FieldMask: ttnpb.FieldMask("formatters"),
 			},
 			SetFunc: func(ctx context.Context, deviceIds *ttnpb.EndDeviceIdentifiers, gets []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -512,9 +493,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 			},
 			DeviceRequest: &ttnpb.SetEndDeviceRequest{
 				EndDevice: deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice),
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"formatters"},
-				},
+				FieldMask: ttnpb.FieldMask("formatters"),
 			},
 			SetFunc: func(ctx context.Context, deviceIds *ttnpb.EndDeviceIdentifiers, gets []string, cb func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
@@ -549,9 +528,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					dev.Formatters.UpFormatterParameter = strings.Repeat("-", maxParameterLength+1)
 					return dev
 				}(),
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"formatters.up_formatter_parameter"},
-				},
+				FieldMask: ttnpb.FieldMask("formatters.up_formatter_parameter"),
 			},
 			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				test.MustTFromContext(ctx).Errorf("SetFunc must not be called")
@@ -579,9 +556,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					dev.Formatters.DownFormatterParameter = strings.Repeat("-", maxParameterLength+1)
 					return dev
 				}(),
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{"formatters.down_formatter_parameter"},
-				},
+				FieldMask: ttnpb.FieldMask("formatters.down_formatter_parameter"),
 			},
 			SetFunc: func(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, paths []string, f func(*ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, error) {
 				test.MustTFromContext(ctx).Errorf("SetFunc must not be called")

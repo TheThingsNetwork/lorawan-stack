@@ -406,7 +406,7 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask, nil, getPaths)
 	if len(req.FieldMask.GetPaths()) == 0 {
-		req.FieldMask = &pbtypes.FieldMask{Paths: updatePaths}
+		req.FieldMask = ttnpb.FieldMask(updatePaths...)
 	}
 	updatedByAdmin := is.IsAdmin(ctx)
 

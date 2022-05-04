@@ -22,7 +22,6 @@ import (
 	"testing"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -74,11 +73,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					DeviceId:       "test-dev-id",
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{
-						"frequency_plan_id",
-					},
-				},
+				FieldMask: ttnpb.FieldMask("frequency_plan_id"),
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
 				if !assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue) {
@@ -122,11 +117,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					DeviceId:       "test-dev-id",
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{
-						"frequency_plan_id",
-					},
-				},
+				FieldMask: ttnpb.FieldMask("frequency_plan_id"),
 			},
 			Device: &ttnpb.EndDevice{
 				Ids: &ttnpb.EndDeviceIdentifiers{
@@ -186,12 +177,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					DeviceId:       "test-dev-id",
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{
-						"frequency_plan_id",
-						"session",
-					},
-				},
+				FieldMask: ttnpb.FieldMask("frequency_plan_id", "session"),
 			},
 			Device: &ttnpb.EndDevice{
 				Ids: &ttnpb.EndDeviceIdentifiers{
@@ -254,11 +240,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					DeviceId:       "test-dev-id",
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{
-						"pending_session.keys.f_nwk_s_int_key",
-					},
-				},
+				FieldMask: ttnpb.FieldMask("pending_session.keys.f_nwk_s_int_key"),
 			},
 			Device: &ttnpb.EndDevice{
 				Ids: &ttnpb.EndDeviceIdentifiers{
@@ -322,11 +304,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 					DeviceId:       "test-dev-id",
 					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
 				},
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{
-						"pending_session.keys.f_nwk_s_int_key.key",
-					},
-				},
+				FieldMask: ttnpb.FieldMask("pending_session.keys.f_nwk_s_int_key.key"),
 			},
 			Device: &ttnpb.EndDevice{
 				Ids: &ttnpb.EndDeviceIdentifiers{
@@ -889,9 +867,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 
 					req := &ttnpb.SetEndDeviceRequest{
 						EndDevice: tc.SetDevice.EndDevice,
-						FieldMask: &pbtypes.FieldMask{
-							Paths: tc.SetDevice.Paths,
-						},
+						FieldMask: ttnpb.FieldMask(tc.SetDevice.Paths...),
 					}
 
 					dev, err, ok := env.AssertSetDevice(ctx, createDevice == nil, req)
@@ -941,9 +917,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 					now = clock.Add(time.Nanosecond)
 					dev, err, ok = env.AssertSetDevice(ctx, false, &ttnpb.SetEndDeviceRequest{
 						EndDevice: expectedReturn,
-						FieldMask: &pbtypes.FieldMask{
-							Paths: tc.SetDevice.Paths,
-						},
+						FieldMask: ttnpb.FieldMask(tc.SetDevice.Paths...),
 					}, rights...)
 					if !a.So(ok, should.BeTrue) || !a.So(err, should.BeNil) || !a.So(dev, should.NotBeNil) {
 						return
@@ -1129,9 +1103,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 
 					req := &ttnpb.ResetAndGetEndDeviceRequest{
 						EndDeviceIds: test.MakeEndDeviceIdentifiers(),
-						FieldMask: &pbtypes.FieldMask{
-							Paths: conf.Paths,
-						},
+						FieldMask:    ttnpb.FieldMask(conf.Paths...),
 					}
 
 					var created *ttnpb.EndDevice

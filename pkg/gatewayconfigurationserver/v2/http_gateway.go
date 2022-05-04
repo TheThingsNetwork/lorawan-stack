@@ -21,7 +21,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
@@ -75,7 +74,7 @@ func (s *Server) handleGetGateway(w http.ResponseWriter, r *http.Request) {
 	}
 	gateway, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIds: &id,
-		FieldMask: &types.FieldMask{Paths: []string{
+		FieldMask: ttnpb.FieldMask(
 			"description",
 			"attributes",
 			"frequency_plan_id",
@@ -83,7 +82,7 @@ func (s *Server) handleGetGateway(w http.ResponseWriter, r *http.Request) {
 			"update_channel",
 			"antennas",
 			"gateway_server_address",
-		}},
+		),
 	}, s.getAuth(ctx))
 	if err != nil {
 		webhandlers.Error(w, r, err)

@@ -18,7 +18,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/devicerepository/store/bleve"
@@ -30,7 +29,7 @@ import (
 
 func TestBleve(t *testing.T) {
 	a := assertions.New(t)
-	if err := os.MkdirAll("testdata/data/lorawan-devices-index", 0755); err != nil {
+	if err := os.MkdirAll("testdata/data/lorawan-devices-index", 0o755); err != nil {
 		panic(err)
 	}
 	defer os.RemoveAll("testdata/data/lorawan-devices-index")
@@ -469,17 +468,15 @@ func TestBleve(t *testing.T) {
 								},
 							},
 						},
-						FieldMask: &types.FieldMask{
-							Paths: []string{
-								"version_ids",
-								"supports_join",
-								"supports_class_b",
-								"supports_class_c",
-								"lorawan_version",
-								"lorawan_phy_version",
-								"mac_settings.supports_32_bit_f_cnt",
-							},
-						},
+						FieldMask: ttnpb.FieldMask(
+							"version_ids",
+							"supports_join",
+							"supports_class_b",
+							"supports_class_c",
+							"lorawan_version",
+							"lorawan_phy_version",
+							"mac_settings.supports_32_bit_f_cnt",
+						),
 					})
 				},
 			},
@@ -509,17 +506,15 @@ func TestBleve(t *testing.T) {
 								},
 							},
 						},
-						FieldMask: &types.FieldMask{
-							Paths: []string{
-								"version_ids",
-								"supports_join",
-								"supports_class_b",
-								"supports_class_c",
-								"lorawan_version",
-								"lorawan_phy_version",
-								"mac_settings.supports_32_bit_f_cnt",
-							},
-						},
+						FieldMask: ttnpb.FieldMask(
+							"version_ids",
+							"supports_join",
+							"supports_class_b",
+							"supports_class_c",
+							"lorawan_version",
+							"lorawan_phy_version",
+							"mac_settings.supports_32_bit_f_cnt",
+						),
 					})
 				},
 			},

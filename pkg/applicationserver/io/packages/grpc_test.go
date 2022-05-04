@@ -259,12 +259,7 @@ func TestAssociations(t *testing.T) {
 		a := assertions.New(t)
 		res, err := client.SetAssociation(ctx, &ttnpb.SetApplicationPackageAssociationRequest{
 			Association: association,
-			FieldMask: &types.FieldMask{
-				Paths: []string{
-					"package_name",
-					"data",
-				},
-			},
+			FieldMask:   ttnpb.FieldMask("package_name", "data"),
 		}, creds)
 		a.So(err, should.BeNil)
 		association.CreatedAt = res.CreatedAt
@@ -276,25 +271,15 @@ func TestAssociations(t *testing.T) {
 	t.Run("AssociationsFound", func(t *testing.T) {
 		a := assertions.New(t)
 		res1, err := client.GetAssociation(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
-			Ids: registeredAssociationID,
-			FieldMask: &types.FieldMask{
-				Paths: []string{
-					"package_name",
-					"data",
-				},
-			},
+			Ids:       registeredAssociationID,
+			FieldMask: ttnpb.FieldMask("package_name", "data"),
 		}, creds)
 		a.So(err, should.BeNil)
 		a.So(res1, should.Resemble, association)
 
 		res2, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
-			Ids: &registeredDeviceID,
-			FieldMask: &types.FieldMask{
-				Paths: []string{
-					"package_name",
-					"data",
-				},
-			},
+			Ids:       &registeredDeviceID,
+			FieldMask: ttnpb.FieldMask("package_name", "data"),
 		}, creds)
 		a.So(err, should.BeNil)
 		a.So(res2, should.NotBeNil)
@@ -396,11 +381,7 @@ func TestAssociations(t *testing.T) {
 			}
 			res, err := client.SetAssociation(ctx, &ttnpb.SetApplicationPackageAssociationRequest{
 				Association: association,
-				FieldMask: &types.FieldMask{
-					Paths: []string{
-						"package_name",
-					},
-				},
+				FieldMask:   ttnpb.FieldMask("package_name"),
 			}, creds)
 			a.So(err, should.BeNil)
 			a.So(res, should.NotBeNil)
@@ -452,14 +433,10 @@ func TestAssociations(t *testing.T) {
 					a := assertions.New(t)
 
 					res, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
-						Ids:   &registeredDeviceID,
-						Limit: tc.limit,
-						Page:  tc.page,
-						FieldMask: &types.FieldMask{
-							Paths: []string{
-								"package_name",
-							},
-						},
+						Ids:       &registeredDeviceID,
+						Limit:     tc.limit,
+						Page:      tc.page,
+						FieldMask: ttnpb.FieldMask("package_name"),
 					}, creds)
 					a.So(err, should.BeNil)
 					a.So(res, should.NotBeNil)

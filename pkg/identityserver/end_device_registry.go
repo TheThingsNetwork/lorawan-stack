@@ -97,11 +97,11 @@ func (is *IdentityServer) validateEndDeviceServerAddressMatch(ctx context.Contex
 	}
 	app, err := is.getApplication(ctx, &ttnpb.GetApplicationRequest{
 		ApplicationIds: dev.Ids.ApplicationIds,
-		FieldMask: &pbtypes.FieldMask{Paths: []string{
+		FieldMask: ttnpb.FieldMask(
 			"network_server_address",
 			"application_server_address",
 			"join_server_address",
-		}},
+		),
 	})
 	if err != nil {
 		return err
@@ -273,7 +273,7 @@ func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.Update
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.EndDeviceFieldPathsNested, req.FieldMask, nil, getPaths)
 	if len(req.FieldMask.GetPaths()) == 0 {
-		req.FieldMask = &pbtypes.FieldMask{Paths: updatePaths}
+		req.FieldMask = ttnpb.FieldMask(updatePaths...)
 	}
 
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "activated_at") && req.EndDevice.ActivatedAt == nil {

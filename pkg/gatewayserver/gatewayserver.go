@@ -27,7 +27,6 @@ import (
 	"sync"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -439,23 +438,21 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 	}
 	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIds: &ids,
-		FieldMask: &pbtypes.FieldMask{
-			Paths: []string{
-				"antennas",
-				"attributes",
-				"disable_packet_broker_forwarding",
-				"downlink_path_constraint",
-				"enforce_duty_cycle",
-				"frequency_plan_id",
-				"frequency_plan_ids",
-				"location_public",
-				"require_authenticated_connection",
-				"schedule_anytime_delay",
-				"schedule_downlink_late",
-				"status_public",
-				"update_location_from_status",
-			},
-		},
+		FieldMask: ttnpb.FieldMask(
+			"antennas",
+			"attributes",
+			"disable_packet_broker_forwarding",
+			"downlink_path_constraint",
+			"enforce_duty_cycle",
+			"frequency_plan_id",
+			"frequency_plan_ids",
+			"location_public",
+			"require_authenticated_connection",
+			"schedule_anytime_delay",
+			"schedule_downlink_late",
+			"status_public",
+			"update_location_from_status",
+		),
 	})
 	if errors.IsNotFound(err) {
 		if gs.requireRegisteredGateways {
@@ -590,22 +587,20 @@ func (gs *GatewayServer) startDisconnectOnChangeTask(conn connectionEntry) {
 
 			gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
 				GatewayIds: conn.Gateway().GetIds(),
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{
-						"antennas",
-						"disable_packet_broker_forwarding",
-						"downlink_path_constraint",
-						"enforce_duty_cycle",
-						"frequency_plan_id",
-						"frequency_plan_ids",
-						"location_public",
-						"require_authenticated_connection",
-						"schedule_anytime_delay",
-						"schedule_downlink_late",
-						"status_public",
-						"update_location_from_status",
-					},
-				},
+				FieldMask: ttnpb.FieldMask(
+					"antennas",
+					"disable_packet_broker_forwarding",
+					"downlink_path_constraint",
+					"enforce_duty_cycle",
+					"frequency_plan_id",
+					"frequency_plan_ids",
+					"location_public",
+					"require_authenticated_connection",
+					"schedule_anytime_delay",
+					"schedule_downlink_late",
+					"status_public",
+					"update_location_from_status",
+				),
 			})
 			if err != nil {
 				if errors.IsUnauthenticated(err) || errors.IsPermissionDenied(err) {
@@ -1063,7 +1058,7 @@ func (gs *GatewayServer) handleVersionInfoUpdates(ctx context.Context, conn conn
 func (gs *GatewayServer) GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error) {
 	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
 		GatewayIds: &ids,
-		FieldMask:  &pbtypes.FieldMask{Paths: []string{"frequency_plan_ids"}},
+		FieldMask:  ttnpb.FieldMask("frequency_plan_ids"),
 	})
 	var fpIDs []string
 	if err == nil {

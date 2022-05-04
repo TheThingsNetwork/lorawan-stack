@@ -18,7 +18,6 @@ import (
 	"fmt"
 	"testing"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -43,14 +42,10 @@ func ExampleGoFieldsPaths() {
 		NameOfTheRegion: "Holland",
 	}
 
-	fields := gogoproto.GoFieldsPaths(&pbtypes.FieldMask{
-		Paths: []string{"city.name_city"},
-	}, london)
+	fields := gogoproto.GoFieldsPaths(ttnpb.FieldMask("city.name_city"), london)
 	fmt.Println(fields)
 
-	fields = gogoproto.GoFieldsPaths(&pbtypes.FieldMask{
-		Paths: []string{"name_region"},
-	}, holland)
+	fields = gogoproto.GoFieldsPaths(ttnpb.FieldMask("name_region"), holland)
 	fmt.Println(fields)
 
 	// Output: [CityDetails.Name]
@@ -86,7 +81,7 @@ func TestGoFieldsPaths(t *testing.T) {
 			expected: []string{"CityDetails.Name"},
 		},
 	} {
-		goFields := gogoproto.GoFieldsPaths(&pbtypes.FieldMask{Paths: tc.fields}, hasProtoRenaming{
+		goFields := gogoproto.GoFieldsPaths(ttnpb.FieldMask(tc.fields...), hasProtoRenaming{
 			NameOfTheRegion: "england",
 			CityDetails: cityDetails{
 				Name: "london",
@@ -116,7 +111,7 @@ func TestGoFieldsPathsEndDevice(t *testing.T) {
 			expected: []string{"Ids.ApplicationIds.ApplicationId"},
 		},
 	} {
-		goFields := gogoproto.GoFieldsPaths(&pbtypes.FieldMask{Paths: tc.fields}, ttnpb.EndDevice{
+		goFields := gogoproto.GoFieldsPaths(ttnpb.FieldMask(tc.fields...), ttnpb.EndDevice{
 			Ids: &ttnpb.EndDeviceIdentifiers{
 				ApplicationIds: &ttnpb.ApplicationIdentifiers{},
 			},
