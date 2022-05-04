@@ -41,8 +41,9 @@ func (t *ttsCSV) Format() *ttnpb.EndDeviceTemplateFormat {
 }
 
 var (
-	errParseCSV  = errors.DefineInvalidArgument("parse_csv", "parse CSV at line `{line}` column `{column}`: {message}", "start_line")
-	errCSVHeader = errors.DefineInvalidArgument("csv_header", "no known columns in CSV header")
+	errParseCSV      = errors.DefineInvalidArgument("parse_csv", "parse CSV at line `{line}` column `{column}`: {message}", "start_line")
+	errCSVHeader     = errors.DefineInvalidArgument("csv_header", "no known columns in CSV header")
+	errParseCSVField = errors.DefineInvalidArgument("parse_csv_field", "parse CSV field at line `{line}` column `{column}`")
 )
 
 func convertCSVErr(err error) error {
@@ -203,6 +204,7 @@ func (t *ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndD
 		return errCSVHeader.New()
 	}
 
+	line := 1
 	for {
 		record, err := dec.Read()
 		if err != nil {
@@ -223,7 +225,10 @@ func (t *ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndD
 			}
 			fieldPaths, err := fieldSetter(dev, val)
 			if err != nil {
-				return err
+				return errParseCSVField.WithCause(err).WithAttributes(
+					"line", line,
+					"column", i+1,
+				)
 			}
 			paths = ttnpb.AddFields(paths, fieldPaths...)
 		}
@@ -241,6 +246,7 @@ func (t *ttsCSV) Convert(ctx context.Context, r io.Reader, ch chan<- *ttnpb.EndD
 			return ctx.Err()
 		case ch <- tmpl:
 		}
+		line++
 	}
 }
 
