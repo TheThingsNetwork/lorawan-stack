@@ -16,6 +16,4 @@ runs:
         cache-dependency-path: '**/yarn.lock'
     - name: Download Node dependencies
       shell: bash
-      run: |
-        tools/bin/mage jsSDK:deps
-        tools/bin/mage js:deps
+      run: tools/bin/mage js:deps
