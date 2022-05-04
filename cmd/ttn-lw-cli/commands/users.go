@@ -18,7 +18,6 @@ import (
 	"os"
 
 	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/howeyc/gopass"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -105,7 +104,7 @@ var (
 				return err
 			}
 			if req.FieldMask == nil {
-				req.FieldMask = &pbtypes.FieldMask{Paths: paths}
+				req.FieldMask = ttnpb.FieldMask(paths...)
 			}
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -139,7 +138,7 @@ var (
 			)
 			_, _, opt, getTotal = withPagination(cmd.Flags())
 			if req.FieldMask == nil {
-				req.FieldMask = &pbtypes.FieldMask{Paths: paths}
+				req.FieldMask = ttnpb.FieldMask(paths...)
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -173,7 +172,7 @@ var (
 			}
 			res, err := ttnpb.NewUserRegistryClient(is).Get(ctx, &ttnpb.GetUserRequest{
 				UserIds:   usrID,
-				FieldMask: &pbtypes.FieldMask{Paths: paths},
+				FieldMask: ttnpb.FieldMask(paths...),
 			})
 			if err != nil {
 				return err
@@ -313,7 +312,7 @@ var (
 			}
 			res, err := ttnpb.NewUserRegistryClient(is).Update(ctx, &ttnpb.UpdateUserRequest{
 				User:      &user,
-				FieldMask: &pbtypes.FieldMask{Paths: paths},
+				FieldMask: ttnpb.FieldMask(paths...),
 			})
 			if err != nil {
 				return err

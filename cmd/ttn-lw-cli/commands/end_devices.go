@@ -25,7 +25,6 @@ import (
 	"path"
 	"strings"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
@@ -216,7 +215,7 @@ var (
 			limit, page, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewEndDeviceRegistryClient(is).List(ctx, &ttnpb.ListEndDevicesRequest{
 				ApplicationIds: appID,
-				FieldMask:      &pbtypes.FieldMask{Paths: paths},
+				FieldMask:      ttnpb.FieldMask(paths...),
 				Limit:          limit,
 				Page:           page,
 				Order:          getOrder(cmd.Flags()),
@@ -252,7 +251,7 @@ var (
 			)
 			req.Limit, req.Page, opt, getTotal = withPagination(cmd.Flags())
 			req.ApplicationIds = appID
-			req.FieldMask = &pbtypes.FieldMask{Paths: paths}
+			req.FieldMask = ttnpb.FieldMask(paths...)
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -299,7 +298,7 @@ var (
 			logger.WithField("paths", isPaths).Debug("Get end device from Identity Server")
 			device, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: devID,
-				FieldMask:    &pbtypes.FieldMask{Paths: isPaths},
+				FieldMask:    ttnpb.FieldMask(isPaths...),
 			})
 			if err != nil {
 				return err
@@ -543,11 +542,11 @@ var (
 
 			application, err := ttnpb.NewApplicationRegistryClient(is).Get(ctx, &ttnpb.GetApplicationRequest{
 				ApplicationIds: devID.ApplicationIds,
-				FieldMask: &pbtypes.FieldMask{Paths: []string{
+				FieldMask: ttnpb.FieldMask(
 					"network_server_address",
 					"application_server_address",
 					"join_server_address",
-				}},
+				),
 			})
 			if err != nil {
 				return err
@@ -746,7 +745,7 @@ var (
 			isGetPaths := ttnpb.AddFields(isPaths, "join_server_address")
 			existingDevice, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: devID,
-				FieldMask:    &pbtypes.FieldMask{Paths: ttnpb.ExcludeFields(isGetPaths, unsetPaths...)},
+				FieldMask:    ttnpb.FieldMask(ttnpb.ExcludeFields(isGetPaths, unsetPaths...)...),
 			})
 			if err != nil {
 				return err
@@ -916,7 +915,7 @@ var (
 			logger.WithField("paths", isPaths).Debug("Get end device from Identity Server")
 			device, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: devID,
-				FieldMask:    &pbtypes.FieldMask{Paths: isPaths},
+				FieldMask:    ttnpb.FieldMask(isPaths...),
 			})
 			if err != nil {
 				return err
@@ -934,7 +933,7 @@ var (
 			logger.WithField("paths", nsPaths).Debug("Reset end device to factory defaults on Network Server")
 			nsDevice, err := ttnpb.NewNsEndDeviceRegistryClient(ns).ResetFactoryDefaults(ctx, &ttnpb.ResetAndGetEndDeviceRequest{
 				EndDeviceIds: devID,
-				FieldMask:    &pbtypes.FieldMask{Paths: nsPaths},
+				FieldMask:    ttnpb.FieldMask(nsPaths...),
 			})
 			if err != nil {
 				return err
@@ -970,11 +969,11 @@ var (
 			}
 			existingDevice, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: devID,
-				FieldMask: &pbtypes.FieldMask{Paths: []string{
+				FieldMask: ttnpb.FieldMask(
 					"network_server_address",
 					"application_server_address",
 					"join_server_address",
-				}},
+				),
 			})
 			if err != nil {
 				return err
@@ -1227,7 +1226,7 @@ This command may take end device identifiers from stdin.`,
 			logger.WithField("paths", isPaths).Debug("Get end device from Identity Server")
 			device, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: ids,
-				FieldMask:    &pbtypes.FieldMask{Paths: isPaths},
+				FieldMask:    ttnpb.FieldMask(isPaths...),
 			})
 			if err != nil {
 				return err
@@ -1307,11 +1306,7 @@ This command may take end device identifiers from stdin.`,
 			}
 			dev, err := ttnpb.NewEndDeviceRegistryClient(is).Get(ctx, &ttnpb.GetEndDeviceRequest{
 				EndDeviceIds: devID,
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{
-						"join_server_address",
-					},
-				},
+				FieldMask:    ttnpb.FieldMask("join_server_address"),
 			})
 			if err != nil {
 				return err
@@ -1333,11 +1328,7 @@ This command may take end device identifiers from stdin.`,
 				EndDevice: &ttnpb.EndDevice{
 					Ids: devID,
 				},
-				FieldMask: &pbtypes.FieldMask{
-					Paths: []string{
-						"join_server_address",
-					},
-				},
+				FieldMask: ttnpb.FieldMask("join_server_address"),
 			})
 			return err
 		},

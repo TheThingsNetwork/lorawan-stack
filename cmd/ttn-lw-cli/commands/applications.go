@@ -18,7 +18,6 @@ import (
 	"os"
 
 	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
@@ -82,7 +81,7 @@ var (
 			paths := util.SelectFieldMask(cmd.Flags(), selectApplicationFlags)
 			paths = ttnpb.AllowedFields(paths, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.ApplicationRegistry/List"].Allowed)
 			if req.FieldMask == nil {
-				req.FieldMask = &pbtypes.FieldMask{Paths: paths}
+				req.FieldMask = ttnpb.FieldMask(paths...)
 			}
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -116,7 +115,7 @@ var (
 			)
 			_, _, opt, getTotal = withPagination(cmd.Flags())
 			if req.FieldMask == nil {
-				req.FieldMask = &pbtypes.FieldMask{Paths: paths}
+				req.FieldMask = ttnpb.FieldMask(paths...)
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -150,7 +149,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationRegistryClient(is).Get(ctx, &ttnpb.GetApplicationRequest{
 				ApplicationIds: appID,
-				FieldMask:      &pbtypes.FieldMask{Paths: paths},
+				FieldMask:      ttnpb.FieldMask(paths...),
 			})
 			if err != nil {
 				return err
@@ -245,7 +244,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationRegistryClient(is).Update(ctx, &ttnpb.UpdateApplicationRequest{
 				Application: app,
-				FieldMask:   &pbtypes.FieldMask{Paths: append(paths, unsetPaths...)},
+				FieldMask:   ttnpb.FieldMask(append(paths, unsetPaths...)...),
 			})
 			if err != nil {
 				return err

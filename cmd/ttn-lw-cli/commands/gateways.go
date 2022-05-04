@@ -18,7 +18,6 @@ import (
 	"os"
 
 	"github.com/gogo/protobuf/proto"
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
@@ -143,7 +142,7 @@ var (
 			paths := util.SelectFieldMask(cmd.Flags(), selectGatewayFlags)
 			paths = ttnpb.AllowedFields(paths, ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.GatewayRegistry/List"].Allowed)
 			if req.FieldMask == nil {
-				req.FieldMask = &pbtypes.FieldMask{Paths: paths}
+				req.FieldMask = ttnpb.FieldMask(paths...)
 			}
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
 			if err != nil {
@@ -177,7 +176,7 @@ var (
 			)
 			_, _, opt, getTotal = withPagination(cmd.Flags())
 			if req.FieldMask == nil {
-				req.FieldMask = &pbtypes.FieldMask{Paths: paths}
+				req.FieldMask = ttnpb.FieldMask(paths...)
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -225,7 +224,7 @@ var (
 
 			res, err := cli.Get(ctx, &ttnpb.GetGatewayRequest{
 				GatewayIds: gtwID,
-				FieldMask:  &pbtypes.FieldMask{Paths: paths},
+				FieldMask:  ttnpb.FieldMask(paths...),
 			})
 			if err != nil {
 				return err
@@ -358,7 +357,7 @@ var (
 			if len(antennaPaths) > 0 || antennaAdd || antennaRemove {
 				res, err := ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{
 					GatewayIds: gateway.GetIds(),
-					FieldMask:  &pbtypes.FieldMask{Paths: []string{"antennas"}},
+					FieldMask:  ttnpb.FieldMask("antennas"),
 				})
 				if err != nil {
 					return err
@@ -379,7 +378,7 @@ var (
 			}
 			res, err := ttnpb.NewGatewayRegistryClient(is).Update(ctx, &ttnpb.UpdateGatewayRequest{
 				Gateway:   &gateway,
-				FieldMask: &pbtypes.FieldMask{Paths: append(paths, unsetPaths...)},
+				FieldMask: ttnpb.FieldMask(append(paths, unsetPaths...)...),
 			})
 			if err != nil {
 				return err
@@ -449,7 +448,7 @@ var (
 
 			gateway, err := ttnpb.NewGatewayRegistryClient(is).Get(ctx, &ttnpb.GetGatewayRequest{
 				GatewayIds: gtwID,
-				FieldMask:  &pbtypes.FieldMask{Paths: []string{"gateway_server_address"}},
+				FieldMask:  ttnpb.FieldMask("gateway_server_address"),
 			})
 			if err != nil {
 				return err
