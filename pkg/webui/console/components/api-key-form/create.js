@@ -26,26 +26,10 @@ import RightsGroup from '@console/components/rights-group'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
-import toInputDate from '@ttn-lw/lib/to-input-date'
 
 import ApiKeyForm from './form'
 import validationSchema from './validation-schema'
-
-const encodeExpiryDate = value => {
-  if (value) {
-    return new Date(value).toISOString()
-  }
-
-  return null
-}
-
-const decodeExpiryDate = value => {
-  if (value) {
-    return toInputDate(new Date(value))
-  }
-
-  return ''
-}
+import { encodeExpiryDate, decodeExpiryDate } from './utils'
 
 class CreateForm extends React.Component {
   static propTypes = {

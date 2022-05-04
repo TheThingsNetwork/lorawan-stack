@@ -12,25 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Yup from '@ttn-lw/lib/yup'
-import sharedMessages from '@ttn-lw/lib/shared-messages'
+import toInputDate from '@ttn-lw/lib/to-input-date'
 
-const pastDateCheck = value => {
+export const encodeExpiryDate = value => {
   if (value) {
-    return !(new Date(value) < new Date())
+    return new Date(value).toISOString()
   }
 
-  return true
+  return null
 }
 
-const validationSchema = Yup.object().shape({
-  name: Yup.string()
-    .min(2, Yup.passValues(sharedMessages.validateTooShort))
-    .max(50, Yup.passValues(sharedMessages.validateTooLong)),
-  rights: Yup.array().min(1, sharedMessages.validateRights),
-  expires_at: Yup.string()
-    .nullable()
-    .test('past date', sharedMessages.validateDateInPast, pastDateCheck),
-})
+export const decodeExpiryDate = value => {
+  if (value) {
+    return toInputDate(new Date(value))
+  }
 
-export default validationSchema
+  return ''
+}
