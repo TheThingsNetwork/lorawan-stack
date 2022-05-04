@@ -196,7 +196,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationPackageRegistryClient(as).GetAssociation(ctx, &ttnpb.GetApplicationPackageAssociationRequest{
 				Ids:       assocID,
-				FieldMask: &pbtypes.FieldMask{Paths: paths},
+				FieldMask: ttnpb.FieldMask(paths...),
 			})
 			if err != nil {
 				return err
@@ -232,7 +232,7 @@ var (
 				Ids:       devID,
 				Limit:     limit,
 				Page:      page,
-				FieldMask: &pbtypes.FieldMask{Paths: paths},
+				FieldMask: ttnpb.FieldMask(paths...),
 			}, opt)
 			if err != nil {
 				return err
@@ -280,7 +280,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationPackageRegistryClient(as).SetAssociation(ctx, &ttnpb.SetApplicationPackageAssociationRequest{
 				Association: association,
-				FieldMask:   &pbtypes.FieldMask{Paths: paths},
+				FieldMask:   ttnpb.FieldMask(paths...),
 			})
 			if err != nil {
 				return err
@@ -340,7 +340,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationPackageRegistryClient(as).GetDefaultAssociation(ctx, &ttnpb.GetApplicationPackageDefaultAssociationRequest{
 				Ids:       assocID,
-				FieldMask: &pbtypes.FieldMask{Paths: paths},
+				FieldMask: ttnpb.FieldMask(paths...),
 			})
 			if err != nil {
 				return err
@@ -376,7 +376,7 @@ var (
 				Ids:       appID,
 				Limit:     limit,
 				Page:      page,
-				FieldMask: &pbtypes.FieldMask{Paths: paths},
+				FieldMask: ttnpb.FieldMask(paths...),
 			}, opt)
 			if err != nil {
 				return err
@@ -424,7 +424,7 @@ var (
 			}
 			res, err := ttnpb.NewApplicationPackageRegistryClient(as).SetDefaultAssociation(ctx, &ttnpb.SetApplicationPackageDefaultAssociationRequest{
 				Default:   association,
-				FieldMask: &pbtypes.FieldMask{Paths: paths},
+				FieldMask: ttnpb.FieldMask(paths...),
 			})
 			if err != nil {
 				return err

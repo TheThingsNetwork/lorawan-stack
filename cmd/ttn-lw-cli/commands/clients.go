@@ -18,7 +18,6 @@ import (
 	"os"
 
 	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
@@ -82,7 +81,7 @@ var (
 				return err
 			}
 			if req.GetFieldMask() == nil {
-				req.FieldMask = &pbtypes.FieldMask{Paths: paths}
+				req.FieldMask = ttnpb.FieldMask(paths...)
 			}
 			_, _, opt, getTotal := withPagination(cmd.Flags())
 			res, err := ttnpb.NewClientRegistryClient(is).List(ctx, req, opt)
@@ -112,7 +111,7 @@ var (
 			)
 			_, _, opt, getTotal = withPagination(cmd.Flags())
 			if req.FieldMask == nil {
-				req.FieldMask = &pbtypes.FieldMask{Paths: paths}
+				req.FieldMask = ttnpb.FieldMask(paths...)
 			}
 
 			is, err := api.Dial(ctx, config.IdentityServerGRPCAddress)
@@ -146,7 +145,7 @@ var (
 			}
 			res, err := ttnpb.NewClientRegistryClient(is).Get(ctx, &ttnpb.GetClientRequest{
 				ClientIds: cliID,
-				FieldMask: &pbtypes.FieldMask{Paths: paths},
+				FieldMask: ttnpb.FieldMask(paths...),
 			})
 			if err != nil {
 				return err
@@ -239,7 +238,7 @@ var (
 			}
 			res, err := ttnpb.NewClientRegistryClient(is).Update(ctx, &ttnpb.UpdateClientRequest{
 				Client:    client,
-				FieldMask: &pbtypes.FieldMask{Paths: append(paths, unsetPaths...)},
+				FieldMask: ttnpb.FieldMask(append(paths, unsetPaths...)...),
 			})
 			if err != nil {
 				return err

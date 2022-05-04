@@ -18,7 +18,6 @@ import (
 	"os"
 	"strings"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/internal/api"
@@ -313,7 +312,7 @@ var (
 					Rights:    rights,
 					ExpiresAt: ttnpb.ProtoTime(expiryDate),
 				},
-				FieldMask: &pbtypes.FieldMask{Paths: paths},
+				FieldMask: ttnpb.FieldMask(paths...),
 			})
 			if err != nil {
 				return err
@@ -346,7 +345,7 @@ var (
 					Id:     id,
 					Rights: nil,
 				},
-				FieldMask: &pbtypes.FieldMask{Paths: []string{"rights"}},
+				FieldMask: ttnpb.FieldMask("rights"),
 			})
 			if err != nil {
 				return err

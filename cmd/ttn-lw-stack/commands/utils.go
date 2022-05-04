@@ -20,7 +20,6 @@ import (
 	"strconv"
 	"time"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
@@ -71,7 +70,7 @@ func FetchIdentityServerApplications(ctx context.Context, client ttnpb.Applicati
 	for {
 		res, err := client.List(ctx, &ttnpb.ListApplicationsRequest{
 			Collaborator: nil,
-			FieldMask:    &pbtypes.FieldMask{Paths: []string{"ids"}},
+			FieldMask:    ttnpb.FieldMask("ids"),
 			Limit:        defaultPaginationLimit,
 			Page:         pageCounter,
 			Deleted:      true,
@@ -96,7 +95,7 @@ func FetchIdentityServerEndDevices(ctx context.Context, client ttnpb.EndDeviceRe
 	for {
 		res, err := client.List(ctx, &ttnpb.ListEndDevicesRequest{
 			ApplicationIds: nil,
-			FieldMask:      &pbtypes.FieldMask{Paths: []string{"ids"}},
+			FieldMask:      ttnpb.FieldMask("ids"),
 			Limit:          defaultPaginationLimit,
 			Page:           pageCounter,
 		}, clusterAuth)

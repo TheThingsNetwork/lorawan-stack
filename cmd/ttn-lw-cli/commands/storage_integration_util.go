@@ -71,12 +71,12 @@ func getStoredUpRequest(flags *pflag.FlagSet) (*ttnpb.GetStoredApplicationUpRequ
 			Value: fport,
 		}
 	}
-	req.FieldMask = &pbtypes.FieldMask{
-		Paths: ttnpb.AllowedFields(
+	req.FieldMask = ttnpb.FieldMask(
+		ttnpb.AllowedFields(
 			util.SelectFieldMask(flags, applicationUpFlags),
 			ttnpb.RPCFieldMaskPaths["/ttn.lorawan.v3.ApplicationUpStorage/GetStoredApplicationUp"].Allowed,
-		),
-	}
+		)...,
+	)
 
 	if flags.Changed("limit") {
 		limit, _ := flags.GetUint32("limit")

@@ -21,7 +21,6 @@ import (
 	"os"
 	"strings"
 
-	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"go.thethings.network/lorawan-stack/v3/cmd/internal/io"
@@ -92,7 +91,7 @@ var (
 				return err
 			}
 			res.EndDevice.Attributes = mergeAttributes(res.EndDevice.Attributes, cmd.Flags())
-			res.FieldMask = &pbtypes.FieldMask{Paths: ttnpb.BottomLevelFields(paths)}
+			res.FieldMask = ttnpb.FieldMask(ttnpb.BottomLevelFields(paths)...)
 
 			return io.Write(os.Stdout, config.OutputFormat, &res)
 		}),
@@ -150,9 +149,7 @@ This command takes end devices from stdin.`,
 
 			mappingKey, _ := cmd.Flags().GetString("mapping-key")
 			res := &ttnpb.EndDeviceTemplate{
-				FieldMask: &pbtypes.FieldMask{
-					Paths: paths,
-				},
+				FieldMask:  ttnpb.FieldMask(paths...),
 				MappingKey: mappingKey,
 			}
 			res.EndDevice.SetFields(&input, paths...)
@@ -260,13 +257,13 @@ This command takes end device templates from stdin.`,
 						JoinEui:  &joinEUI,
 						DevEui:   &devEUI,
 					}
-					res.FieldMask = &pbtypes.FieldMask{
-						Paths: ttnpb.BottomLevelFields(append(res.FieldMask.GetPaths(),
+					res.FieldMask = ttnpb.FieldMask(
+						ttnpb.BottomLevelFields(append(res.FieldMask.GetPaths(),
 							"ids.device_id",
 							"ids.join_eui",
 							"ids.dev_eui",
-						)),
-					}
+						))...,
+					)
 
 					if err := io.Write(os.Stdout, config.OutputFormat, &res); err != nil {
 						return err
@@ -431,7 +428,7 @@ command to assign EUIs to map to end device templates.`,
 				var res ttnpb.EndDeviceTemplate
 				res.EndDevice.SetFields(inputEntry.EndDevice, inputEntry.FieldMask.GetPaths()...)
 				res.EndDevice.SetFields(mappedEntry.EndDevice, mappedEntry.FieldMask.GetPaths()...)
-				res.FieldMask = &pbtypes.FieldMask{Paths: ttnpb.BottomLevelFields(append(inputEntry.FieldMask.GetPaths(), mappedEntry.FieldMask.GetPaths()...))}
+				res.FieldMask = ttnpb.FieldMask(ttnpb.BottomLevelFields(append(inputEntry.FieldMask.GetPaths(), mappedEntry.FieldMask.GetPaths()...))...)
 
 				if err := io.Write(os.Stdout, config.OutputFormat, &res); err != nil {
 					return err
