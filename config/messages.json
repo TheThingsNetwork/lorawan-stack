@@ -3833,6 +3833,15 @@
       "file": "ttscsv.go"
     }
   },
+  "error:pkg/devicetemplates:parse_csv_field": {
+    "translations": {
+      "en": "parse CSV field at line `{line}` column `{column}`"
+    },
+    "description": {
+      "package": "pkg/devicetemplates",
+      "file": "ttscsv.go"
+    }
+  },
   "error:pkg/email/sendgrid:email_not_sent": {
     "translations": {
       "en": "email was not sent"

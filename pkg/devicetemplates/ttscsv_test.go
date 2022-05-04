@@ -25,6 +25,7 @@ import (
 	"github.com/smartystreets/assertions"
 	. "go.thethings.network/lorawan-stack/v3/pkg/devicetemplates"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
@@ -38,6 +39,8 @@ var (
 	csvInvalidDevEUI string
 	//go:embed testdata/generate_device_id.csv
 	csvGenerateDeviceID string
+	//go:embed testdata/appeui.csv
+	csvAppEUI string
 )
 
 func TestTTSCSVConverter(t *testing.T) {
@@ -82,7 +85,6 @@ func TestTTSCSVConverter(t *testing.T) {
 					"version_ids.hardware_version",
 					"version_ids.model_id",
 				), should.BeNil)
-
 			},
 			nExpect: 3,
 		},
@@ -133,6 +135,26 @@ func TestTTSCSVConverter(t *testing.T) {
 				}
 				dev := templates[0]
 				a.So(dev.EndDevice.Ids.DeviceId, should.Equal, "111111111111111a")
+			},
+			nExpect: 1,
+		},
+		{
+			name:   "AppEUI",
+			reader: bytes.NewBufferString(csvAppEUI),
+			validateError: func(t *testing.T, err error) {
+				assertions.New(t).So(err, should.BeNil)
+			},
+			validateResult: func(t *testing.T, templates []*ttnpb.EndDeviceTemplate, count int) {
+				a := assertions.New(t)
+				if !a.So(len(templates), should.Equal, count) {
+					t.FailNow()
+				}
+				dev := templates[0]
+				a.So(dev.EndDevice.Ids.JoinEui, should.Resemble, &types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11})
+				a.So(ttnpb.RequireFields(dev.FieldMask.Paths,
+					"ids.dev_eui",
+					"ids.join_eui",
+				), should.BeNil)
 			},
 			nExpect: 1,
 		},
