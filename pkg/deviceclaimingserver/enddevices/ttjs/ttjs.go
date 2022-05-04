@@ -43,7 +43,7 @@ type BasicAuth struct {
 	Password string `yaml:"password"`
 }
 
-// NS contains information related to the Network Server
+// NS contains information related to the Network Server.
 type NS struct {
 	Address  string `yaml:"address"`
 	HomeNSID string `yaml:"home-ns-id"`
@@ -79,7 +79,7 @@ type TTJS struct {
 	ttiVendorID OUI
 }
 
-var nsAddressRegexp = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$")
+var nsAddressRegexp = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$")
 
 var errInvalidNSAddress = errors.DefineInvalidArgument("invalid_ns_address", "invalid NS address `{address}`")
 
