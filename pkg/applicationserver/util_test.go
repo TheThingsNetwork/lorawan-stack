@@ -177,7 +177,7 @@ func (js *mockJS) add(ctx context.Context, devEUI types.EUI64, sessionKeyID []by
 }
 
 func (js *mockJS) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
-	key, ok := js.keys[fmt.Sprintf("%v:%v", req.DevEui, req.SessionKeyId)]
+	key, ok := js.keys[fmt.Sprintf("%v:%v", types.MustEUI64(req.DevEui).OrZero(), req.SessionKeyId)]
 	if !ok {
 		return nil, errNotFound.New()
 	}

@@ -9,7 +9,66 @@ package ttnpb
 import (
 	gogo "github.com/TheThingsIndustries/protoc-gen-go-json/gogo"
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
+	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
+
+// MarshalProtoJSON marshals the SessionKeyRequest message to JSON.
+func (x *SessionKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.SessionKeyId) > 0 || s.HasField("session_key_id") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("session_key_id")
+		s.WriteBytes(x.SessionKeyId)
+	}
+	if len(x.DevEui) > 0 || s.HasField("dev_eui") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("dev_eui")
+		types.MarshalHEXBytes(s.WithField("dev_eui"), x.DevEui)
+	}
+	if len(x.JoinEui) > 0 || s.HasField("join_eui") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("join_eui")
+		x.JoinEui.MarshalProtoJSON(s.WithField("join_eui"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the SessionKeyRequest to JSON.
+func (x SessionKeyRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
+// UnmarshalProtoJSON unmarshals the SessionKeyRequest message from JSON.
+func (x *SessionKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "session_key_id", "sessionKeyId":
+			s.AddField("session_key_id")
+			x.SessionKeyId = s.ReadBytes()
+		case "dev_eui", "devEui":
+			s.AddField("dev_eui")
+			x.DevEui = types.Unmarshal8Bytes(s.WithField("dev_eui", false))
+		case "join_eui", "joinEui":
+			s.AddField("join_eui")
+			x.JoinEui.UnmarshalProtoJSON(s.WithField("join_eui", false))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the SessionKeyRequest from JSON.
+func (x *SessionKeyRequest) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
 
 // MarshalProtoJSON marshals the CryptoServicePayloadRequest message to JSON.
 func (x *CryptoServicePayloadRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {

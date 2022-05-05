@@ -166,7 +166,7 @@ func (srv interopServer) AppSKeyRequest(ctx context.Context, in *interop.AppSKey
 
 	req := &ttnpb.SessionKeyRequest{
 		JoinEui:      types.EUI64(in.ReceiverID),
-		DevEui:       types.EUI64(in.DevEUI),
+		DevEui:       types.EUI64(in.DevEUI).Bytes(),
 		SessionKeyId: in.SessionKeyID,
 	}
 	if err := req.ValidateFields(

@@ -183,7 +183,7 @@ func (cl joinServerHTTPClient) GetAppSKey(ctx context.Context, asID string, req 
 			SenderID:   asID,
 			ReceiverID: EUI64(req.JoinEui),
 		},
-		DevEUI:       EUI64(req.DevEui),
+		DevEUI:       EUI64(types.MustEUI64(req.DevEui).OrZero()),
 		SessionKeyID: Buffer(req.SessionKeyId),
 	}, interopAns); err != nil {
 		return nil, err

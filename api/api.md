@@ -5114,6 +5114,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | Field | Validations |
 | ----- | ----------- |
 | `session_key_id` | <p>`bytes.max_len`: `2048`</p> |
+| `dev_eui` | <p>`bytes.len`: `8`</p> |
 
 ### <a name="ttn.lorawan.v3.SetApplicationActivationSettingsRequest">Message `SetApplicationActivationSettingsRequest`</a>
 

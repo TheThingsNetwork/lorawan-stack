@@ -60,7 +60,18 @@ func (m *SessionKeyRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "dev_eui":
-			// no validation rules for DevEui
+
+			if len(m.GetDevEui()) > 0 {
+
+				if len(m.GetDevEui()) != 8 {
+					return SessionKeyRequestValidationError{
+						field:  "dev_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "join_eui":
 			// no validation rules for JoinEui
 		default:
