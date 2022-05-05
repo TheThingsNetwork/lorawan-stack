@@ -419,7 +419,18 @@ func (m *IssueDevEUIResponse) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "dev_eui":
-			// no validation rules for DevEui
+
+			if len(m.GetDevEui()) > 0 {
+
+				if len(m.GetDevEui()) != 8 {
+					return IssueDevEUIResponseValidationError{
+						field:  "dev_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		default:
 			return IssueDevEUIResponseValidationError{
 				field:  name,

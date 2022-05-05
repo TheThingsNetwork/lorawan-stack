@@ -396,7 +396,7 @@ func (is *IdentityServer) issueDevEUI(ctx context.Context, ids *ttnpb.Applicatio
 		if err != nil {
 			return err
 		}
-		res.DevEui = *devEUI
+		res.DevEui = devEUI.Bytes()
 		return nil
 	})
 	if err != nil {

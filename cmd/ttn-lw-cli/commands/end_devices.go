@@ -561,9 +561,10 @@ var (
 				if err != nil {
 					return err
 				}
-				logger.WithField("dev_eui", devEUIResponse.DevEui.String()).
+				devEUI := types.MustEUI64(devEUIResponse.DevEui).OrZero()
+				logger.WithField("dev_eui", devEUI.String()).
 					Info("Successfully obtained DevEUI")
-				device.Ids.DevEui = &devEUIResponse.DevEui
+				device.Ids.DevEui = &devEUI
 			}
 			newPaths, err := parsePayloadFormatterParameterFlags("formatters", device.Formatters, cmd.Flags())
 			if err != nil {

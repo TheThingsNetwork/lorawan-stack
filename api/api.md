@@ -764,6 +764,12 @@ Stored in Entity Registry. The typical format of the address is "host:port". If 
 | ----- | ---- | ----- | ----------- |
 | `dev_eui` | [`bytes`](#bytes) |  |  |
 
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `dev_eui` | <p>`bytes.len`: `8`</p> |
+
 ### <a name="ttn.lorawan.v3.ListApplicationAPIKeysRequest">Message `ListApplicationAPIKeysRequest`</a>
 
 | Field | Type | Label | Description |
