@@ -197,7 +197,8 @@ func NewNetID(typ byte, id []byte) (netID NetID, err error) {
 	return netID, nil
 }
 
-func GetNetID(fs *pflag.FlagSet, name string) (value NetID, set bool, err error) {
+// GetNetIDFromFlag gets a NetID from a named flag in the flag set.
+func GetNetIDFromFlag(fs *pflag.FlagSet, name string) (value NetID, set bool, err error) {
 	flag := fs.Lookup(name)
 	if flag == nil {
 		return NetID{}, false, &flagsplugin.ErrFlagNotFound{FlagName: name}

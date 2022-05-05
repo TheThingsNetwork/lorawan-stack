@@ -456,7 +456,8 @@ func (addr DevAddr) Copy(x *DevAddr) *DevAddr {
 	return x
 }
 
-func GetDevAddr(fs *pflag.FlagSet, name string) (value DevAddr, set bool, err error) {
+// GetDevAddrFromFlag gets a DevAddr from a named flag in the flag set.
+func GetDevAddrFromFlag(fs *pflag.FlagSet, name string) (value DevAddr, set bool, err error) {
 	flag := fs.Lookup(name)
 	var devAddr DevAddr
 	if flag == nil {
@@ -471,7 +472,8 @@ func GetDevAddr(fs *pflag.FlagSet, name string) (value DevAddr, set bool, err er
 	return devAddr, flag.Changed, nil
 }
 
-func GetDevAddrPrefixSlice(fs *pflag.FlagSet, name string) (value []DevAddrPrefix, set bool, err error) {
+// GetDevAddrPrefixSliceFromFlag gets a DevAddrPrefix slice from a named flag in the flag set.
+func GetDevAddrPrefixSliceFromFlag(fs *pflag.FlagSet, name string) (value []DevAddrPrefix, set bool, err error) {
 	flag := fs.Lookup(name)
 	if flag == nil {
 		return nil, false, &flagsplugin.ErrFlagNotFound{FlagName: name}

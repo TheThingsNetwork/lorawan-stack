@@ -112,7 +112,8 @@ func (key *AES128Key) DecodeMsgpack(dec *msgpack.Decoder) error {
 	return nil
 }
 
-func GetAES128Key(fs *pflag.FlagSet, name string) (value AES128Key, set bool, err error) {
+// GetAES128KeyFromFlag gets an AES128Key from a named flag in the flag set.
+func GetAES128KeyFromFlag(fs *pflag.FlagSet, name string) (value AES128Key, set bool, err error) {
 	flag := fs.Lookup(name)
 	if flag == nil {
 		return AES128Key{}, false, &flagsplugin.ErrFlagNotFound{FlagName: name}

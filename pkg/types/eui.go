@@ -303,7 +303,8 @@ func (eui EUI64) Copy(x *EUI64) *EUI64 {
 	return x
 }
 
-func GetEUI64(fs *pflag.FlagSet, name string) (value EUI64, set bool, err error) {
+// GetEUI64FromFlag gets an EUI64 from a named flag in the flag set.
+func GetEUI64FromFlag(fs *pflag.FlagSet, name string) (value EUI64, set bool, err error) {
 	flag := fs.Lookup(name)
 	if flag == nil {
 		return EUI64{}, false, &flagsplugin.ErrFlagNotFound{FlagName: name}
@@ -318,7 +319,8 @@ func GetEUI64(fs *pflag.FlagSet, name string) (value EUI64, set bool, err error)
 	return eui64, flag.Changed, nil
 }
 
-func GetEUI64Slice(fs *pflag.FlagSet, name string) (value []EUI64, set bool, err error) {
+// GetEUI64SliceFromFlag gets an EUI64 slice from a named flag in the flag set.
+func GetEUI64SliceFromFlag(fs *pflag.FlagSet, name string) (value []EUI64, set bool, err error) {
 	flag := fs.Lookup(name)
 	if flag == nil {
 		return nil, false, &flagsplugin.ErrFlagNotFound{FlagName: name}
@@ -334,7 +336,8 @@ func GetEUI64Slice(fs *pflag.FlagSet, name string) (value []EUI64, set bool, err
 	return value, flag.Changed, nil
 }
 
-func GetEUI64PrefixSlice(fs *pflag.FlagSet, name string) (value []EUI64Prefix, set bool, err error) {
+// GetEUI64PrefixSliceFromFlag gets an EUI64 prefix slice from a named flag in the flag set.
+func GetEUI64PrefixSliceFromFlag(fs *pflag.FlagSet, name string) (value []EUI64Prefix, set bool, err error) {
 	flag := fs.Lookup(name)
 	if flag == nil {
 		return nil, false, &flagsplugin.ErrFlagNotFound{FlagName: name}
