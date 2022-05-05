@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
-)
+import fmt "fmt"
 
 func (dst *SessionKeyRequest) SetFields(src *SessionKeyRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -306,8 +303,7 @@ func (dst *JoinAcceptMICRequest) SetFields(src *JoinAcceptMICRequest, paths ...s
 			if src != nil {
 				dst.DevNonce = src.DevNonce
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.DevNonce
-				dst.DevNonce = zero
+				dst.DevNonce = nil
 			}
 
 		default:
@@ -362,8 +358,7 @@ func (dst *DeriveSessionKeysRequest) SetFields(src *DeriveSessionKeysRequest, pa
 			if src != nil {
 				dst.JoinNonce = src.JoinNonce
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.JoinNonce
-				dst.JoinNonce = zero
+				dst.JoinNonce = nil
 			}
 		case "dev_nonce":
 			if len(subs) > 0 {
@@ -372,8 +367,7 @@ func (dst *DeriveSessionKeysRequest) SetFields(src *DeriveSessionKeysRequest, pa
 			if src != nil {
 				dst.DevNonce = src.DevNonce
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.DevNonce
-				dst.DevNonce = zero
+				dst.DevNonce = nil
 			}
 		case "net_id":
 			if len(subs) > 0 {
@@ -382,8 +376,7 @@ func (dst *DeriveSessionKeysRequest) SetFields(src *DeriveSessionKeysRequest, pa
 			if src != nil {
 				dst.NetId = src.NetId
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.NetID
-				dst.NetId = zero
+				dst.NetId = nil
 			}
 		case "provisioner_id":
 			if len(subs) > 0 {
@@ -874,8 +867,7 @@ func (dst *JoinEUIPrefix) SetFields(src *JoinEUIPrefix, paths ...string) error {
 			if src != nil {
 				dst.JoinEui = src.JoinEui
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.JoinEui = zero
+				dst.JoinEui = nil
 			}
 		case "length":
 			if len(subs) > 0 {
@@ -983,8 +975,7 @@ func (dst *ProvisionEndDevicesRequest_IdentifiersRange) SetFields(src *Provision
 			if src != nil {
 				dst.StartDevEui = src.StartDevEui
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.StartDevEui = zero
+				dst.StartDevEui = nil
 			}
 
 		default:

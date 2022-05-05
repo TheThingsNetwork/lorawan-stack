@@ -11,7 +11,6 @@ import (
 	gogo "github.com/TheThingsIndustries/protoc-gen-go-flags/gogo"
 	pflag "github.com/spf13/pflag"
 	customflags "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
-	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // AddSelectFlagsForApplicationActivationSettings adds flags to select fields in ApplicationActivationSettings.
@@ -77,10 +76,10 @@ func (m *ApplicationActivationSettings) SetFromFlags(flags *pflag.FlagSet, prefi
 			paths = append(paths, setPaths...)
 		}
 	}
-	if val, changed, err := types.GetNetIDFromFlag(flags, flagsplugin.Prefix("home_net_id", prefix)); err != nil {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("home_net_id", prefix)); err != nil {
 		return nil, err
 	} else if changed {
-		m.HomeNetId = &val
+		m.HomeNetId = val
 		paths = append(paths, flagsplugin.Prefix("home_net_id", prefix))
 	}
 	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("application_server_id", prefix)); err != nil {

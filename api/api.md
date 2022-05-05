@@ -4927,6 +4927,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | Field | Validations |
 | ----- | ----------- |
 | `kek_label` | <p>`string.max_len`: `2048`</p> |
+| `home_net_id` | <p>`bytes.len`: `3`</p> |
 | `application_server_id` | <p>`string.max_len`: `100`</p> |
 
 ### <a name="ttn.lorawan.v3.CryptoServicePayloadRequest">Message `CryptoServicePayloadRequest`</a>
@@ -4984,6 +4985,9 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ----- | ----------- |
 | `ids` | <p>`message.required`: `true`</p> |
 | `lorawan_version` | <p>`enum.defined_only`: `true`</p> |
+| `join_nonce` | <p>`bytes.len`: `3`</p> |
+| `dev_nonce` | <p>`bytes.len`: `2`</p> |
+| `net_id` | <p>`bytes.len`: `3`</p> |
 | `provisioner_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$|^$`</p> |
 
 ### <a name="ttn.lorawan.v3.GetApplicationActivationSettingsRequest">Message `GetApplicationActivationSettingsRequest`</a>
@@ -5004,6 +5008,12 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `join_eui` | [`bytes`](#bytes) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `join_eui` | <p>`bytes.len`: `8`</p> |
 
 ### <a name="ttn.lorawan.v3.GetRootKeysRequest">Message `GetRootKeysRequest`</a>
 
@@ -5034,6 +5044,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ----- | ----------- |
 | `payload_request` | <p>`message.required`: `true`</p> |
 | `join_request_type` | <p>`enum.defined_only`: `true`</p> |
+| `dev_nonce` | <p>`bytes.len`: `2`</p> |
 
 ### <a name="ttn.lorawan.v3.JoinEUIPrefix">Message `JoinEUIPrefix`</a>
 
@@ -5041,6 +5052,12 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ----- | ---- | ----- | ----------- |
 | `join_eui` | [`bytes`](#bytes) |  |  |
 | `length` | [`uint32`](#uint32) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `join_eui` | <p>`bytes.len`: `8`</p> |
 
 ### <a name="ttn.lorawan.v3.JoinEUIPrefixes">Message `JoinEUIPrefixes`</a>
 
@@ -5088,6 +5105,12 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ----- | ---- | ----- | ----------- |
 | `join_eui` | [`bytes`](#bytes) |  |  |
 
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `join_eui` | <p>`bytes.len`: `8`</p> |
+
 ### <a name="ttn.lorawan.v3.ProvisionEndDevicesRequest.IdentifiersList">Message `ProvisionEndDevicesRequest.IdentifiersList`</a>
 
 | Field | Type | Label | Description |
@@ -5095,12 +5118,25 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | `join_eui` | [`bytes`](#bytes) |  |  |
 | `end_device_ids` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | repeated |  |
 
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `join_eui` | <p>`bytes.len`: `8`</p> |
+
 ### <a name="ttn.lorawan.v3.ProvisionEndDevicesRequest.IdentifiersRange">Message `ProvisionEndDevicesRequest.IdentifiersRange`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `join_eui` | [`bytes`](#bytes) |  |  |
 | `start_dev_eui` | [`bytes`](#bytes) |  | DevEUI to start issuing from. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `join_eui` | <p>`bytes.len`: `8`</p> |
+| `start_dev_eui` | <p>`bytes.len`: `8`</p> |
 
 ### <a name="ttn.lorawan.v3.SessionKeyRequest">Message `SessionKeyRequest`</a>
 

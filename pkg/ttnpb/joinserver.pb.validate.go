@@ -662,7 +662,18 @@ func (m *JoinAcceptMICRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "dev_nonce":
-			// no validation rules for DevNonce
+
+			if len(m.GetDevNonce()) > 0 {
+
+				if len(m.GetDevNonce()) != 2 {
+					return JoinAcceptMICRequestValidationError{
+						field:  "dev_nonce",
+						reason: "value length must be 2 bytes",
+					}
+				}
+
+			}
+
 		default:
 			return JoinAcceptMICRequestValidationError{
 				field:  name,
@@ -773,11 +784,44 @@ func (m *DeriveSessionKeysRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "join_nonce":
-			// no validation rules for JoinNonce
+
+			if len(m.GetJoinNonce()) > 0 {
+
+				if len(m.GetJoinNonce()) != 3 {
+					return DeriveSessionKeysRequestValidationError{
+						field:  "join_nonce",
+						reason: "value length must be 3 bytes",
+					}
+				}
+
+			}
+
 		case "dev_nonce":
-			// no validation rules for DevNonce
+
+			if len(m.GetDevNonce()) > 0 {
+
+				if len(m.GetDevNonce()) != 2 {
+					return DeriveSessionKeysRequestValidationError{
+						field:  "dev_nonce",
+						reason: "value length must be 2 bytes",
+					}
+				}
+
+			}
+
 		case "net_id":
-			// no validation rules for NetId
+
+			if len(m.GetNetId()) > 0 {
+
+				if len(m.GetNetId()) != 3 {
+					return DeriveSessionKeysRequestValidationError{
+						field:  "net_id",
+						reason: "value length must be 3 bytes",
+					}
+				}
+
+			}
+
 		case "provisioner_id":
 
 			if utf8.RuneCountInString(m.GetProvisionerId()) > 36 {
@@ -1222,7 +1266,18 @@ func (m *ApplicationActivationSettings) ValidateFields(paths ...string) error {
 			}
 
 		case "home_net_id":
-			// no validation rules for HomeNetId
+
+			if len(m.GetHomeNetId()) > 0 {
+
+				if len(m.GetHomeNetId()) != 3 {
+					return ApplicationActivationSettingsValidationError{
+						field:  "home_net_id",
+						reason: "value length must be 3 bytes",
+					}
+				}
+
+			}
+
 		case "application_server_id":
 
 			if utf8.RuneCountInString(m.GetApplicationServerId()) > 100 {
@@ -1661,7 +1716,18 @@ func (m *JoinEUIPrefix) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "join_eui":
-			// no validation rules for JoinEui
+
+			if len(m.GetJoinEui()) > 0 {
+
+				if len(m.GetJoinEui()) != 8 {
+					return JoinEUIPrefixValidationError{
+						field:  "join_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "length":
 			// no validation rules for Length
 		default:
@@ -1840,7 +1906,18 @@ func (m *GetDefaultJoinEUIResponse) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "join_eui":
-			// no validation rules for JoinEui
+
+			if len(m.GetJoinEui()) > 0 {
+
+				if len(m.GetJoinEui()) != 8 {
+					return GetDefaultJoinEUIResponseValidationError{
+						field:  "join_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		default:
 			return GetDefaultJoinEUIResponseValidationError{
 				field:  name,
@@ -1924,7 +2001,18 @@ func (m *ProvisionEndDevicesRequest_IdentifiersList) ValidateFields(paths ...str
 		_ = subs
 		switch name {
 		case "join_eui":
-			// no validation rules for JoinEui
+
+			if len(m.GetJoinEui()) > 0 {
+
+				if len(m.GetJoinEui()) != 8 {
+					return ProvisionEndDevicesRequest_IdentifiersListValidationError{
+						field:  "join_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "end_device_ids":
 
 			for idx, item := range m.GetEndDeviceIds() {
@@ -2025,9 +2113,31 @@ func (m *ProvisionEndDevicesRequest_IdentifiersRange) ValidateFields(paths ...st
 		_ = subs
 		switch name {
 		case "join_eui":
-			// no validation rules for JoinEui
+
+			if len(m.GetJoinEui()) > 0 {
+
+				if len(m.GetJoinEui()) != 8 {
+					return ProvisionEndDevicesRequest_IdentifiersRangeValidationError{
+						field:  "join_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "start_dev_eui":
-			// no validation rules for StartDevEui
+
+			if len(m.GetStartDevEui()) > 0 {
+
+				if len(m.GetStartDevEui()) != 8 {
+					return ProvisionEndDevicesRequest_IdentifiersRangeValidationError{
+						field:  "start_dev_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		default:
 			return ProvisionEndDevicesRequest_IdentifiersRangeValidationError{
 				field:  name,
@@ -2113,7 +2223,18 @@ func (m *ProvisionEndDevicesRequest_IdentifiersFromData) ValidateFields(paths ..
 		_ = subs
 		switch name {
 		case "join_eui":
-			// no validation rules for JoinEui
+
+			if len(m.GetJoinEui()) > 0 {
+
+				if len(m.GetJoinEui()) != 8 {
+					return ProvisionEndDevicesRequest_IdentifiersFromDataValidationError{
+						field:  "join_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		default:
 			return ProvisionEndDevicesRequest_IdentifiersFromDataValidationError{
 				field:  name,

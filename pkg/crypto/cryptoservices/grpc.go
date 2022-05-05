@@ -65,7 +65,7 @@ func (s *networkRPCClient) JoinAcceptMIC(ctx context.Context, dev *ttnpb.EndDevi
 			ProvisioningData: dev.ProvisioningData,
 		},
 		JoinRequestType: ttnpb.JoinRequestType(joinReqType),
-		DevNonce:        dn,
+		DevNonce:        dn.Bytes(),
 	}, s.callOpts...)
 	if err != nil {
 		return
@@ -106,9 +106,9 @@ func (s *networkRPCClient) DeriveNwkSKeys(ctx context.Context, dev *ttnpb.EndDev
 	keys, err := s.Client.DeriveNwkSKeys(ctx, &ttnpb.DeriveSessionKeysRequest{
 		Ids:              dev.Ids,
 		LorawanVersion:   version,
-		JoinNonce:        jn,
-		DevNonce:         dn,
-		NetId:            nid,
+		JoinNonce:        jn.Bytes(),
+		DevNonce:         dn.Bytes(),
+		NetId:            nid.Bytes(),
 		ProvisionerId:    dev.ProvisionerId,
 		ProvisioningData: dev.ProvisioningData,
 	}, s.callOpts...)
@@ -169,9 +169,9 @@ func (s *applicationRPCClient) DeriveAppSKey(ctx context.Context, dev *ttnpb.End
 	res, err := s.Client.DeriveAppSKey(ctx, &ttnpb.DeriveSessionKeysRequest{
 		Ids:              dev.Ids,
 		LorawanVersion:   version,
-		JoinNonce:        jn,
-		DevNonce:         dn,
-		NetId:            nid,
+		JoinNonce:        jn.Bytes(),
+		DevNonce:         dn.Bytes(),
+		NetId:            nid.Bytes(),
 		ProvisionerId:    dev.ProvisionerId,
 		ProvisioningData: dev.ProvisioningData,
 	}, s.callOpts...)

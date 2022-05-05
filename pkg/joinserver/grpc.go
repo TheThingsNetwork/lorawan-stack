@@ -30,7 +30,7 @@ func (srv jsServer) GetJoinEUIPrefixes(ctx context.Context, _ *pbtypes.Empty) (*
 	prefixes := make([]*ttnpb.JoinEUIPrefix, 0, len(srv.JS.euiPrefixes))
 	for _, p := range srv.JS.euiPrefixes {
 		prefixes = append(prefixes, &ttnpb.JoinEUIPrefix{
-			JoinEui: p.EUI64,
+			JoinEui: p.EUI64.Bytes(),
 			Length:  uint32(p.Length),
 		})
 	}
@@ -42,6 +42,6 @@ func (srv jsServer) GetJoinEUIPrefixes(ctx context.Context, _ *pbtypes.Empty) (*
 // GetDefaultJoinEUI returns the default JoinEUI that is configured for this Join Server.
 func (srv jsServer) GetDefaultJoinEUI(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.GetDefaultJoinEUIResponse, error) {
 	return &ttnpb.GetDefaultJoinEUIResponse{
-		JoinEui: &srv.JS.defaultJoinEUI,
+		JoinEui: srv.JS.defaultJoinEUI.Bytes(),
 	}, nil
 }

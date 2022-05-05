@@ -305,7 +305,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				if netID == nil {
 					appSettings, err := getAppSettings()
 					if err == nil {
-						netID = appSettings.HomeNetId
+						netID = types.MustNetID(appSettings.HomeNetId)
 					} else if !errors.IsNotFound(err) {
 						return nil, nil, errLookupNetID.WithCause(err)
 					}
@@ -641,7 +641,7 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 				"kek",
 			})
 			if err == nil {
-				netID = appSettings.HomeNetId
+				netID = types.MustNetID(appSettings.HomeNetId)
 			} else if !errors.IsNotFound(err) {
 				return nil, errLookupNetID.WithCause(err)
 			}
@@ -803,7 +803,7 @@ func (js *JoinServer) GetHomeNetwork(ctx context.Context, joinEUI, devEUI types.
 			}
 			return nil, nil
 		}
-		netID = sets.HomeNetId
+		netID = types.MustNetID(sets.HomeNetId)
 	}
 	// TODO: Return NSID (https://github.com/TheThingsNetwork/lorawan-stack/issues/4741).
 	return &EndDeviceHomeNetwork{
