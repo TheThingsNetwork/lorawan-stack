@@ -66,6 +66,30 @@ func (key *AES128Key) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// MarshalProtoJSON implements the jsonplugin.Marshaler interface.
+func (key *AES128Key) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if key == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteString(fmt.Sprintf("%X", key[:]))
+}
+
+// UnmarshalProtoJSON implements the jsonplugin.Unmarshaler interface.
+func (key *AES128Key) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	*key = [16]byte{}
+	b, err := hex.DecodeString(s.ReadString())
+	if err != nil {
+		s.SetError(err)
+		return
+	}
+	if len(b) != 16 {
+		s.SetError(errInvalidDevAddr.WithCause(errInvalidLength.WithAttributes("want", 16, "got", len(b))))
+		return
+	}
+	copy(key[:], b)
+}
+
 // MarshalBinary implements the encoding.BinaryMarshaler interface.
 func (key AES128Key) MarshalBinary() ([]byte, error) { return marshalBinaryBytes(key[:]) }
 
