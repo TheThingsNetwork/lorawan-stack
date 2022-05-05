@@ -33,7 +33,7 @@ func (x *SessionKeyRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if len(x.JoinEui) > 0 || s.HasField("join_eui") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("join_eui")
-		x.JoinEui.MarshalProtoJSON(s.WithField("join_eui"))
+		types.MarshalHEXBytes(s.WithField("join_eui"), x.JoinEui)
 	}
 	s.WriteObjectEnd()
 }
@@ -60,7 +60,7 @@ func (x *SessionKeyRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.DevEui = types.Unmarshal8Bytes(s.WithField("dev_eui", false))
 		case "join_eui", "joinEui":
 			s.AddField("join_eui")
-			x.JoinEui.UnmarshalProtoJSON(s.WithField("join_eui", false))
+			x.JoinEui = types.Unmarshal8Bytes(s.WithField("join_eui", false))
 		}
 	})
 }

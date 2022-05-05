@@ -35,8 +35,7 @@ func (dst *SessionKeyRequest) SetFields(src *SessionKeyRequest, paths ...string)
 			if src != nil {
 				dst.JoinEui = src.JoinEui
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.JoinEui = zero
+				dst.JoinEui = nil
 			}
 
 		default:

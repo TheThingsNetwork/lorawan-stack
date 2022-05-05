@@ -174,14 +174,14 @@ func parseResult(r Result) error {
 // GetAppSKey performs AppSKey request according to LoRaWAN Backend Interfaces specification.
 func (cl joinServerHTTPClient) GetAppSKey(ctx context.Context, asID string, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
 	interopAns := &AppSKeyAns{}
-	if err := cl.exchange(ctx, req.JoinEui, jsRPCPaths.appSKey, &AppSKeyReq{
+	if err := cl.exchange(ctx, types.MustEUI64(req.JoinEui).OrZero(), jsRPCPaths.appSKey, &AppSKeyReq{
 		AsJsMessageHeader: AsJsMessageHeader{
 			MessageHeader: MessageHeader{
 				ProtocolVersion: cl.protocol,
 				MessageType:     MessageTypeAppSKeyReq,
 			},
 			SenderID:   asID,
-			ReceiverID: EUI64(req.JoinEui),
+			ReceiverID: EUI64(types.MustEUI64(req.JoinEui).OrZero()),
 		},
 		DevEUI:       EUI64(types.MustEUI64(req.DevEui).OrZero()),
 		SessionKeyID: Buffer(req.SessionKeyId),
@@ -429,7 +429,7 @@ func (cl Client) joinServer(joinEUI types.EUI64) (joinServerClient, bool) {
 
 // GetAppSKey performs AppSKey request to Join Server associated with req.JoinEUI.
 func (cl Client) GetAppSKey(ctx context.Context, asID string, req *ttnpb.SessionKeyRequest) (*ttnpb.AppSKeyResponse, error) {
-	js, ok := cl.joinServer(req.JoinEui)
+	js, ok := cl.joinServer(types.MustEUI64(req.JoinEui).OrZero())
 	if !ok {
 		return nil, errNotRegistered.New()
 	}

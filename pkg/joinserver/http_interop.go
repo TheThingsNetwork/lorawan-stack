@@ -165,7 +165,7 @@ func (srv interopServer) AppSKeyRequest(ctx context.Context, in *interop.AppSKey
 	ctx = log.NewContextWithField(ctx, "namespace", "joinserver/interop")
 
 	req := &ttnpb.SessionKeyRequest{
-		JoinEui:      types.EUI64(in.ReceiverID),
+		JoinEui:      types.EUI64(in.ReceiverID).Bytes(),
 		DevEui:       types.EUI64(in.DevEUI).Bytes(),
 		SessionKeyId: in.SessionKeyID,
 	}

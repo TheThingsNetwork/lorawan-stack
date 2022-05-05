@@ -23389,7 +23389,15 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "bytes.len",
+                    "value": 8
+                  }
+                ]
+              }
             }
           ]
         },

@@ -758,7 +758,7 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids *ttnpb.EndDev
 	req := &ttnpb.SessionKeyRequest{
 		SessionKeyId: sessionKeyID,
 		DevEui:       ids.DevEui.Bytes(),
-		JoinEui:      *ids.JoinEui,
+		JoinEui:      ids.JoinEui.Bytes(),
 	}
 	if js, err := as.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, nil); err == nil {
 		cc, err := js.Conn()

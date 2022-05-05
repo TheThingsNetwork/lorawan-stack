@@ -619,7 +619,7 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 	}
 
 	if externalAuth, ok := authorizer.(ExternalAuthorizer); ok {
-		dev, err := js.devices.GetByEUI(ctx, req.JoinEui, types.MustEUI64(req.DevEui).OrZero(),
+		dev, err := js.devices.GetByEUI(ctx, types.MustEUI64(req.JoinEui).OrZero(), types.MustEUI64(req.DevEui).OrZero(),
 			[]string{
 				"network_server_address",
 			},
@@ -659,7 +659,7 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 		}
 	}
 
-	ks, err := js.keys.GetByID(ctx, req.JoinEui, types.MustEUI64(req.DevEui).OrZero(), req.SessionKeyId,
+	ks, err := js.keys.GetByID(ctx, types.MustEUI64(req.JoinEui).OrZero(), types.MustEUI64(req.DevEui).OrZero(), req.SessionKeyId,
 		[]string{
 			"f_nwk_s_int_key",
 			"nwk_s_enc_key",
@@ -694,7 +694,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 	}
 
 	if externalAuth, ok := authorizer.(ExternalAuthorizer); ok {
-		dev, err := js.devices.GetByEUI(ctx, req.JoinEui, types.MustEUI64(req.DevEui).OrZero(),
+		dev, err := js.devices.GetByEUI(ctx, types.MustEUI64(req.JoinEui).OrZero(), types.MustEUI64(req.DevEui).OrZero(),
 			[]string{
 				"application_server_address",
 				"application_server_id",
@@ -736,7 +736,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 		}
 	}
 	if appAuth, ok := authorizer.(ApplicationAccessAuthorizer); ok {
-		dev, err := js.devices.GetByEUI(ctx, req.JoinEui, types.MustEUI64(req.DevEui).OrZero(), nil)
+		dev, err := js.devices.GetByEUI(ctx, types.MustEUI64(req.JoinEui).OrZero(), types.MustEUI64(req.DevEui).OrZero(), nil)
 		if err != nil {
 			return nil, errRegistryOperation.WithCause(err)
 		}
@@ -746,7 +746,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 		}
 	}
 
-	ks, err := js.keys.GetByID(ctx, req.JoinEui, types.MustEUI64(req.DevEui).OrZero(), req.SessionKeyId,
+	ks, err := js.keys.GetByID(ctx, types.MustEUI64(req.JoinEui).OrZero(), types.MustEUI64(req.DevEui).OrZero(), req.SessionKeyId,
 		[]string{
 			"app_s_key",
 		},
