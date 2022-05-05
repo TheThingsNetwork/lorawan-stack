@@ -39,7 +39,13 @@ message JoinRequest {
     }
   ];
   MACVersion selected_mac_version = 4;
-  bytes net_id = 5 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
+  bytes net_id = 5 [
+    (validate.rules).bytes = { len: 3, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal3Bytes"
+    }
+  ];
   DLSettings downlink_settings = 6 [(validate.rules).message.required = true];
   RxDelay rx_delay = 7 [(validate.rules).enum.defined_only = true];
   // Optional CFList.

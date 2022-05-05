@@ -43,7 +43,7 @@ func (x *JoinRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if len(x.NetId) > 0 || s.HasField("net_id") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("net_id")
-		x.NetId.MarshalProtoJSON(s.WithField("net_id"))
+		types.MarshalHEXBytes(s.WithField("net_id"), x.NetId)
 	}
 	if x.DownlinkSettings != nil || s.HasField("downlink_settings") {
 		s.WriteMoreIf(&wroteField)
@@ -109,7 +109,7 @@ func (x *JoinRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.SelectedMacVersion.UnmarshalProtoJSON(s)
 		case "net_id", "netId":
 			s.AddField("net_id")
-			x.NetId.UnmarshalProtoJSON(s.WithField("net_id", false))
+			x.NetId = types.Unmarshal3Bytes(s.WithField("net_id", false))
 		case "downlink_settings", "downlinkSettings":
 			if s.ReadNil() {
 				x.DownlinkSettings = nil

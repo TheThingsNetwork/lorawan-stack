@@ -207,7 +207,7 @@ func MakeNsJsJoinRequest(conf NsJsJoinRequestConfig) *ttnpb.JoinRequest {
 		Payload:            MakeJoinRequestDecodedPayload(conf.JoinEUI, conf.DevEUI, conf.DevNonce, conf.MIC),
 		DevAddr:            conf.DevAddr.Bytes(),
 		SelectedMacVersion: conf.SelectedMACVersion,
-		NetId:              *conf.NetID.Copy(&types.NetID{}),
+		NetId:              conf.NetID.Bytes(),
 		DownlinkSettings: &ttnpb.DLSettings{
 			Rx1DrOffset: conf.RX1DataRateOffset,
 			Rx2Dr:       conf.RX2DataRateIndex,
@@ -1629,7 +1629,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 				QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
 					Payload: joinResp.RawPayload,
 					DevAddr: types.MustDevAddr(joinReq.DevAddr).OrZero(),
-					NetId:   joinReq.NetId,
+					NetId:   types.MustNetID(joinReq.NetId).OrZero(),
 					Request: &ttnpb.MACState_JoinRequest{
 						DownlinkSettings: joinReq.DownlinkSettings,
 						RxDelay:          joinReq.RxDelay,

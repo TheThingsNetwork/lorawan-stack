@@ -1185,7 +1185,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		CfList:             cfList,
 		CorrelationIds:     events.CorrelationIDsFromContext(ctx),
 		DevAddr:            devAddr.Bytes(),
-		NetId:              ns.netID,
+		NetId:              ns.netID.Bytes(),
 		RawPayload:         up.RawPayload,
 		RxDelay:            macState.DesiredParameters.Rx1Delay,
 		SelectedMacVersion: matched.LorawanVersion, // Assume NS version is always higher than the version of the device

@@ -55,7 +55,7 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 		RawPayload:         in.PHYPayload,
 		DevAddr:            types.DevAddr(in.DevAddr).Bytes(),
 		SelectedMacVersion: ttnpb.MACVersion(in.MACVersion),
-		NetId:              types.NetID(in.SenderID),
+		NetId:              types.NetID(in.SenderID).Bytes(),
 		DownlinkSettings:   dlSettings,
 		RxDelay:            in.RxDelay,
 		CfList:             cfList,

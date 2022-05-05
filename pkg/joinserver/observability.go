@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/metrics"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 var (
@@ -111,7 +112,7 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 
 func registerAcceptJoin(ctx context.Context, dev *ttnpb.EndDevice, msg *ttnpb.JoinRequest) {
 	events.Publish(evtAcceptJoin.NewWithIdentifiersAndData(ctx, dev.Ids, nil))
-	jsMetrics.joinAccepted.WithLabelValues(ctx, msg.NetId.String()).Inc()
+	jsMetrics.joinAccepted.WithLabelValues(ctx, types.MustNetID(msg.NetId).OrZero().String()).Inc()
 }
 
 func registerRejectJoin(ctx context.Context, req *ttnpb.JoinRequest, err error) {

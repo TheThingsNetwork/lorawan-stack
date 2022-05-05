@@ -4876,6 +4876,7 @@ OrganizationOrUserIdentifiers contains either organization or user identifiers.
 | ----- | ----------- |
 | `raw_payload` | <p>`bytes.len`: `23`</p> |
 | `dev_addr` | <p>`bytes.len`: `4`</p> |
+| `net_id` | <p>`bytes.len`: `3`</p> |
 | `downlink_settings` | <p>`message.required`: `true`</p> |
 | `rx_delay` | <p>`enum.defined_only`: `true`</p> |
 | `correlation_ids` | <p>`repeated.items.string.max_len`: `100`</p> |
