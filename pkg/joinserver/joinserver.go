@@ -388,7 +388,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				NetId:      req.NetId,
 				JoinNonce:  jn,
 				CfList:     req.CfList,
-				DevAddr:    req.DevAddr,
+				DevAddr:    types.MustDevAddr(req.DevAddr).OrZero(),
 				DlSettings: req.DownlinkSettings,
 				RxDelay:    req.RxDelay,
 			})
@@ -584,10 +584,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 
 			dev.Session = &ttnpb.Session{
 				StartedAt: ttnpb.ProtoTimePtr(time.Now()),
-				DevAddr:   req.DevAddr,
+				DevAddr:   types.MustDevAddr(req.DevAddr).OrZero(),
 				Keys:      sk,
 			}
-			dev.Ids.DevAddr = &req.DevAddr
+			dev.Ids.DevAddr = types.MustDevAddr(req.DevAddr)
 			paths = append(paths, "session", "ids.dev_addr")
 
 			handled = true

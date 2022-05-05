@@ -39,7 +39,7 @@ func (v *JoinRequest) FieldIsZero(p string) bool {
 	case "correlation_ids":
 		return v.CorrelationIds == nil
 	case "dev_addr":
-		return v.DevAddr == types.DevAddr{}
+		return types.MustDevAddr(v.DevAddr).OrZero().IsZero()
 	case "downlink_settings":
 		return v.DownlinkSettings == nil
 	case "downlink_settings.opt_neg":

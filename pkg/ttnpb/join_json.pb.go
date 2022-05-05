@@ -9,6 +9,7 @@ package ttnpb
 import (
 	gogo "github.com/TheThingsIndustries/protoc-gen-go-json/gogo"
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
+	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // MarshalProtoJSON marshals the JoinRequest message to JSON.
@@ -32,7 +33,7 @@ func (x *JoinRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if len(x.DevAddr) > 0 || s.HasField("dev_addr") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("dev_addr")
-		x.DevAddr.MarshalProtoJSON(s.WithField("dev_addr"))
+		types.MarshalHEXBytes(s.WithField("dev_addr"), x.DevAddr)
 	}
 	if x.SelectedMacVersion != 0 || s.HasField("selected_mac_version") {
 		s.WriteMoreIf(&wroteField)
@@ -102,7 +103,7 @@ func (x *JoinRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.Payload.UnmarshalProtoJSON(s.WithField("payload", true))
 		case "dev_addr", "devAddr":
 			s.AddField("dev_addr")
-			x.DevAddr.UnmarshalProtoJSON(s.WithField("dev_addr", false))
+			x.DevAddr = types.Unmarshal4Bytes(s.WithField("dev_addr", false))
 		case "selected_mac_version", "selectedMacVersion":
 			s.AddField("selected_mac_version")
 			x.SelectedMacVersion.UnmarshalProtoJSON(s)

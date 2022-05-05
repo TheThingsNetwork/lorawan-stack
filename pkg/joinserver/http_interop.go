@@ -53,7 +53,7 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 
 	req := &ttnpb.JoinRequest{
 		RawPayload:         in.PHYPayload,
-		DevAddr:            types.DevAddr(in.DevAddr),
+		DevAddr:            types.DevAddr(in.DevAddr).Bytes(),
 		SelectedMacVersion: ttnpb.MACVersion(in.MACVersion),
 		NetId:              types.NetID(in.SenderID),
 		DownlinkSettings:   dlSettings,

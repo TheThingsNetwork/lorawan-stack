@@ -184,7 +184,7 @@ func TestInvalidJoinRequests(t *testing.T) {
 						/* MIC */
 						0x55, 0x17, 0x54, 0x8e,
 					},
-					DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+					DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 					NetId:   types.NetID{0x42, 0xff, 0xff},
 					DownlinkSettings: &ttnpb.DLSettings{
 						OptNeg:      true,
@@ -259,7 +259,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0x55, 0x17, 0x54, 0x8e,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -308,7 +308,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0x55, 0x17, 0x54, 0x8e,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -407,7 +407,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0x55, 0x17, 0x54, 0x8e,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -510,7 +510,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0x55, 0x17, 0x54, 0x8e,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -638,7 +638,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0x55, 0x17, 0x54, 0x8e,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -769,7 +769,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0x55, 0x17, 0x54, 0x8e,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -875,7 +875,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0x55, 0x17, 0x54, 0x8e,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -977,7 +977,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0x6e, 0x54, 0x1b, 0x37,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -1078,7 +1078,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0x6e, 0x54, 0x1b, 0x37,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -1129,7 +1129,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0x29, 0xa8, 0xe5, 0x7d,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      false,
@@ -1216,7 +1216,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -1299,7 +1299,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -1382,7 +1382,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -1465,7 +1465,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -1548,7 +1548,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -1633,7 +1633,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0xed, 0x8b, 0xd2, 0x24,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -1719,7 +1719,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0xed, 0x8b, 0xd2, 0x24,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -1804,7 +1804,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0xed, 0x8b, 0xd2, 0x24,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -1893,7 +1893,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -1980,7 +1980,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0x42, 0x42},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -2031,7 +2031,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -2083,7 +2083,7 @@ func TestHandleJoin(t *testing.T) {
 					/* MIC */
 					0xc4, 0x8, 0x50, 0xcf,
 				},
-				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+				DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 				NetId:   types.NetID{0x42, 0xff, 0xff},
 				DownlinkSettings: &ttnpb.DLSettings{
 					OptNeg:      true,
@@ -2539,11 +2539,11 @@ func TestHandleJoin(t *testing.T) {
 				}
 				a.So([]time.Time{start, *ttnpb.StdTime(ret.GetSession().GetStartedAt()), time.Now()}, should.BeChronological)
 				pb.Session = &ttnpb.Session{
-					DevAddr:   tc.JoinRequest.DevAddr,
+					DevAddr:   types.MustDevAddr(tc.JoinRequest.DevAddr).OrZero(),
 					Keys:      res.SessionKeys,
 					StartedAt: ret.GetSession().GetStartedAt(),
 				}
-				pb.Ids.DevAddr = &tc.JoinRequest.DevAddr
+				pb.Ids.DevAddr = types.MustDevAddr(tc.JoinRequest.DevAddr)
 				a.So(ret, should.HaveEmptyDiff, pb)
 
 				res, err = js.HandleJoin(ctx, deepcopy.Copy(tc.JoinRequest).(*ttnpb.JoinRequest), tc.Authorizer)

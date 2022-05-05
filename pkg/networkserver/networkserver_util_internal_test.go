@@ -205,7 +205,7 @@ func MakeNsJsJoinRequest(conf NsJsJoinRequestConfig) *ttnpb.JoinRequest {
 	return &ttnpb.JoinRequest{
 		RawPayload:         MakeJoinRequestPHYPayload(conf.JoinEUI, conf.DevEUI, conf.DevNonce, conf.MIC),
 		Payload:            MakeJoinRequestDecodedPayload(conf.JoinEUI, conf.DevEUI, conf.DevNonce, conf.MIC),
-		DevAddr:            *conf.DevAddr.Copy(&types.DevAddr{}),
+		DevAddr:            conf.DevAddr.Bytes(),
 		SelectedMacVersion: conf.SelectedMACVersion,
 		NetId:              *conf.NetID.Copy(&types.NetID{}),
 		DownlinkSettings: &ttnpb.DLSettings{
@@ -226,25 +226,29 @@ func MakeNsJsJoinRequest(conf NsJsJoinRequestConfig) *ttnpb.JoinRequest {
 
 func NewISPeer(ctx context.Context, is interface {
 	ttnpb.ApplicationAccessServer
-}) cluster.Peer {
+},
+) cluster.Peer {
 	return test.Must(test.NewGRPCServerPeer(ctx, is, ttnpb.RegisterApplicationAccessServer)).(cluster.Peer)
 }
 
 func NewGSPeer(ctx context.Context, gs interface {
 	ttnpb.NsGsServer
-}) cluster.Peer {
+},
+) cluster.Peer {
 	return test.Must(test.NewGRPCServerPeer(ctx, gs, ttnpb.RegisterNsGsServer)).(cluster.Peer)
 }
 
 func NewJSPeer(ctx context.Context, js interface {
 	ttnpb.NsJsServer
-}) cluster.Peer {
+},
+) cluster.Peer {
 	return test.Must(test.NewGRPCServerPeer(ctx, js, ttnpb.RegisterNsJsServer)).(cluster.Peer)
 }
 
 func NewASPeer(ctx context.Context, as interface {
 	ttnpb.NsAsServer
-}) cluster.Peer {
+},
+) cluster.Peer {
 	return test.Must(test.NewGRPCServerPeer(ctx, as, ttnpb.RegisterNsAsServer)).(cluster.Peer)
 }
 
@@ -1540,7 +1544,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 					},
 					func(ctx, reqCtx context.Context, req *ttnpb.JoinRequest) bool {
 						joinReq = req
-						netID, netIDOK := req.DevAddr.NetID()
+						netID, netIDOK := types.MustDevAddr(req.DevAddr).OrZero().NetID()
 						return test.AllTrue(
 							a.So(events.CorrelationIDsFromContext(reqCtx), should.NotBeEmpty),
 							a.So(req.DevAddr, should.NotBeEmpty),
@@ -1552,7 +1556,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 								DevEUI:             *conf.Device.Ids.DevEui,
 								DevNonce:           devNonce,
 								MIC:                mic,
-								DevAddr:            req.DevAddr,
+								DevAddr:            types.MustDevAddr(req.DevAddr).OrZero(),
 								SelectedMACVersion: defaultLoRaWANVersion,
 								NetID:              env.Config.NetID,
 								RX1DataRateOffset:  defaultRX1DROffset,
@@ -1624,7 +1628,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 				LorawanVersion: defaultLoRaWANVersion,
 				QueuedJoinAccept: &ttnpb.MACState_JoinAccept{
 					Payload: joinResp.RawPayload,
-					DevAddr: joinReq.DevAddr,
+					DevAddr: types.MustDevAddr(joinReq.DevAddr).OrZero(),
 					NetId:   joinReq.NetId,
 					Request: &ttnpb.MACState_JoinRequest{
 						DownlinkSettings: joinReq.DownlinkSettings,
@@ -1693,7 +1697,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 		t.Error("Failed to set identifiers")
 		return nil, false
 	}
-	idsWithDevAddr.DevAddr = &joinReq.DevAddr
+	idsWithDevAddr.DevAddr = types.MustDevAddr(joinReq.DevAddr)
 
 	var appUp *ttnpb.ApplicationUp
 	if !a.So(env.AssertNsAsHandleUplink(ctx, conf.Device.Ids.ApplicationIds, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {

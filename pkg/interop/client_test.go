@@ -310,7 +310,7 @@ func TestHandleJoinRequest(t *testing.T) {
 			NetID: types.NetID{0x42, 0xff, 0xff},
 			Request: &ttnpb.JoinRequest{
 				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0_3,
-				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04},
+				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04}.Bytes(),
 				RxDelay:            ttnpb.RxDelay_RX_DELAY_5,
 				DownlinkSettings:   &ttnpb.DLSettings{},
 				Payload: &ttnpb.Message{
@@ -370,7 +370,7 @@ func TestHandleJoinRequest(t *testing.T) {
 			NetID: types.NetID{0x42, 0xff, 0xff},
 			Request: &ttnpb.JoinRequest{
 				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0_3,
-				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04},
+				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04}.Bytes(),
 				RxDelay:            ttnpb.RxDelay_RX_DELAY_5,
 				DownlinkSettings:   &ttnpb.DLSettings{},
 				Payload: &ttnpb.Message{
@@ -440,7 +440,7 @@ func TestHandleJoinRequest(t *testing.T) {
 			NetID: types.NetID{0x42, 0xff, 0xff},
 			Request: &ttnpb.JoinRequest{
 				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0_3,
-				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04},
+				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04}.Bytes(),
 				RxDelay:            ttnpb.RxDelay_RX_DELAY_5,
 				DownlinkSettings:   &ttnpb.DLSettings{},
 				Payload: &ttnpb.Message{
@@ -526,7 +526,7 @@ func TestHandleJoinRequest(t *testing.T) {
 			NetID: types.NetID{0x42, 0xff, 0xff},
 			Request: &ttnpb.JoinRequest{
 				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0_3,
-				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04},
+				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04}.Bytes(),
 				RxDelay:            ttnpb.RxDelay_RX_DELAY_5,
 				DownlinkSettings:   &ttnpb.DLSettings{},
 				Payload: &ttnpb.Message{
@@ -611,7 +611,7 @@ func TestHandleJoinRequest(t *testing.T) {
 			NetID: types.NetID{0x42, 0xff, 0xff},
 			Request: &ttnpb.JoinRequest{
 				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0_3,
-				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04},
+				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04}.Bytes(),
 				RxDelay:            ttnpb.RxDelay_RX_DELAY_5,
 				DownlinkSettings:   &ttnpb.DLSettings{},
 				Payload: &ttnpb.Message{

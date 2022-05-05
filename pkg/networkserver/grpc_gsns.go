@@ -1184,7 +1184,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 		Payload:            up.Payload,
 		CfList:             cfList,
 		CorrelationIds:     events.CorrelationIDsFromContext(ctx),
-		DevAddr:            devAddr,
+		DevAddr:            devAddr.Bytes(),
 		NetId:              ns.netID,
 		RawPayload:         up.RawPayload,
 		RxDelay:            macState.DesiredParameters.Rx1Delay,

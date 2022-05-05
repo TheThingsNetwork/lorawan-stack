@@ -72,7 +72,18 @@ func (m *JoinRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "dev_addr":
-			// no validation rules for DevAddr
+
+			if len(m.GetDevAddr()) > 0 {
+
+				if len(m.GetDevAddr()) != 4 {
+					return JoinRequestValidationError{
+						field:  "dev_addr",
+						reason: "value length must be 4 bytes",
+					}
+				}
+
+			}
+
 		case "selected_mac_version":
 			// no validation rules for SelectedMacVersion
 		case "net_id":

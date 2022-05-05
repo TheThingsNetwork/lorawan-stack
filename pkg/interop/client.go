@@ -247,7 +247,7 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 		MACVersion: MACVersion(req.SelectedMacVersion),
 		PHYPayload: Buffer(req.RawPayload),
 		DevEUI:     EUI64(pld.DevEui),
-		DevAddr:    DevAddr(req.DevAddr),
+		DevAddr:    DevAddr(types.MustDevAddr(req.DevAddr).OrZero()),
 		DLSettings: Buffer(dlSettings),
 		RxDelay:    req.RxDelay,
 		CFList:     Buffer(cfList),
