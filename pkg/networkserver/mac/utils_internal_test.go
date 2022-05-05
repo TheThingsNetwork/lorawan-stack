@@ -587,7 +587,7 @@ func TestNextPingSlotAt(t *testing.T) {
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_1S},
 				},
 				Session: &ttnpb.Session{
-					DevAddr: devAddr,
+					DevAddr: devAddr.Bytes(),
 				},
 			},
 			ExpectedTime: pingSlotTime(1<<5, 0),
@@ -601,7 +601,7 @@ func TestNextPingSlotAt(t *testing.T) {
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_2S},
 				},
 				Session: &ttnpb.Session{
-					DevAddr: devAddr,
+					DevAddr: devAddr.Bytes(),
 				},
 			},
 			ExpectedTime: pingSlotTime(1<<6, 0),
@@ -615,7 +615,7 @@ func TestNextPingSlotAt(t *testing.T) {
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_4S},
 				},
 				Session: &ttnpb.Session{
-					DevAddr: devAddr,
+					DevAddr: devAddr.Bytes(),
 				},
 			},
 			ExpectedTime: pingSlotTime(1<<7, 0),
@@ -629,7 +629,7 @@ func TestNextPingSlotAt(t *testing.T) {
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_8S},
 				},
 				Session: &ttnpb.Session{
-					DevAddr: devAddr,
+					DevAddr: devAddr.Bytes(),
 				},
 			},
 			ExpectedTime: pingSlotTime(1<<8, 0),
@@ -643,7 +643,7 @@ func TestNextPingSlotAt(t *testing.T) {
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_16S},
 				},
 				Session: &ttnpb.Session{
-					DevAddr: devAddr,
+					DevAddr: devAddr.Bytes(),
 				},
 			},
 			ExpectedTime: pingSlotTime(1<<9, 0),
@@ -657,7 +657,7 @@ func TestNextPingSlotAt(t *testing.T) {
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_8S},
 				},
 				Session: &ttnpb.Session{
-					DevAddr: devAddr,
+					DevAddr: devAddr.Bytes(),
 				},
 			},
 			ExpectedTime: pingSlotTime(1<<8, 1),
@@ -671,7 +671,7 @@ func TestNextPingSlotAt(t *testing.T) {
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_16S},
 				},
 				Session: &ttnpb.Session{
-					DevAddr: devAddr,
+					DevAddr: devAddr.Bytes(),
 				},
 			},
 			ExpectedTime: pingSlotTime(1<<9, 1),
@@ -685,7 +685,7 @@ func TestNextPingSlotAt(t *testing.T) {
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_16S},
 				},
 				Session: &ttnpb.Session{
-					DevAddr: devAddr,
+					DevAddr: devAddr.Bytes(),
 				},
 			},
 			ExpectedTime: pingSlotTime(1<<9, 2),
@@ -699,7 +699,7 @@ func TestNextPingSlotAt(t *testing.T) {
 					PingSlotPeriodicity: &ttnpb.PingSlotPeriodValue{Value: ttnpb.PingSlotPeriod_PING_EVERY_16S},
 				},
 				Session: &ttnpb.Session{
-					DevAddr: devAddr,
+					DevAddr: devAddr.Bytes(),
 				},
 			},
 			ExpectedTime: pingSlotTime(1<<9, 3),

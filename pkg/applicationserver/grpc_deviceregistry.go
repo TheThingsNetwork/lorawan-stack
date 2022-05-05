@@ -25,6 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/warning"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
 
@@ -171,7 +172,7 @@ var (
 
 // Set implements ttnpb.AsEndDeviceRegistryServer.
 func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
-	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "session.dev_addr") && (req.EndDevice.Session == nil || req.EndDevice.Session.DevAddr.IsZero()) {
+	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "session.dev_addr") && types.MustDevAddr(req.GetEndDevice().GetSession().GetDevAddr()).OrZero().IsZero() {
 		return nil, errInvalidFieldValue.WithAttributes("field", "session.dev_addr")
 	}
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "session.keys.app_s_key.key") && (req.EndDevice.GetSession().GetKeys().GetAppSKey().GetKey().IsZero()) {
@@ -231,7 +232,7 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 				return nil, nil, errInvalidFieldMask.WithCause(err)
 			}
 			if ttnpb.HasAnyField(sets, "session.dev_addr") {
-				req.EndDevice.Ids.DevAddr = &req.EndDevice.Session.DevAddr
+				req.EndDevice.Ids.DevAddr = types.MustDevAddr(req.EndDevice.Session.DevAddr)
 				sets = ttnpb.AddFields(sets,
 					"ids.dev_addr",
 				)
@@ -242,7 +243,7 @@ func (r asEndDeviceRegistryServer) Set(ctx context.Context, req *ttnpb.SetEndDev
 		evt = evtCreateEndDevice.NewWithIdentifiersAndData(ctx, req.EndDevice.Ids, nil)
 
 		if req.EndDevice.Ids.DevAddr != nil {
-			if !ttnpb.HasAnyField(sets, "session.dev_addr") || !req.EndDevice.Ids.DevAddr.Equal(req.EndDevice.Session.DevAddr) {
+			if !ttnpb.HasAnyField(sets, "session.dev_addr") || !req.EndDevice.Ids.DevAddr.Equal(types.MustDevAddr(req.EndDevice.Session.DevAddr).OrZero()) {
 				return nil, nil, errInvalidFieldValue.WithAttributes("field", "ids.dev_addr")
 			}
 		}

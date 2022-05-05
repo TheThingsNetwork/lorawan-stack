@@ -924,7 +924,7 @@ func (v *Session) FieldIsZero(p string) bool {
 	}
 	switch p {
 	case "dev_addr":
-		return v.DevAddr == types.DevAddr{}
+		return types.MustDevAddr(v.DevAddr).OrZero().IsZero()
 	case "keys":
 		return fieldsAreZero(v.Keys, SessionKeysFieldPathsTopLevel...)
 	case "keys.app_s_key":

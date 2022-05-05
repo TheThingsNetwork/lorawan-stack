@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gogoproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 var (
@@ -104,7 +105,7 @@ func (as *ApplicationServer) encryptDownlink(ctx context.Context, dev *ttnpb.End
 	if err != nil {
 		return err
 	}
-	frmPayload, err := crypto.EncryptDownlink(appSKey, session.DevAddr, downlink.FCnt, downlink.FrmPayload, false)
+	frmPayload, err := crypto.EncryptDownlink(appSKey, types.MustDevAddr(session.DevAddr).OrZero(), downlink.FCnt, downlink.FrmPayload, false)
 	if err != nil {
 		return err
 	}
@@ -127,7 +128,7 @@ func (as *ApplicationServer) decryptUplink(ctx context.Context, dev *ttnpb.EndDe
 	if err != nil {
 		return err
 	}
-	frmPayload, err := crypto.DecryptUplink(appSKey, dev.Session.DevAddr, uplink.FCnt, uplink.FrmPayload, false)
+	frmPayload, err := crypto.DecryptUplink(appSKey, types.MustDevAddr(dev.Session.DevAddr).OrZero(), uplink.FCnt, uplink.FrmPayload, false)
 	if err != nil {
 		return err
 	}
@@ -183,7 +184,7 @@ func (as *ApplicationServer) decryptDownlink(ctx context.Context, dev *ttnpb.End
 	if err != nil {
 		return err
 	}
-	frmPayload, err := crypto.DecryptDownlink(appSKey, session.DevAddr, downlink.FCnt, downlink.FrmPayload, false)
+	frmPayload, err := crypto.DecryptDownlink(appSKey, types.MustDevAddr(session.DevAddr).OrZero(), downlink.FCnt, downlink.FrmPayload, false)
 	if err != nil {
 		return err
 	}

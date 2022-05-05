@@ -9,10 +9,10 @@ package ttnpb
 import (
 	flagsplugin "github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
 	gogo "github.com/TheThingsIndustries/protoc-gen-go-flags/gogo"
-	types1 "github.com/gogo/protobuf/types"
+	types "github.com/gogo/protobuf/types"
 	pflag "github.com/spf13/pflag"
 	customflags "go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
-	types "go.thethings.network/lorawan-stack/v3/pkg/types"
+	types1 "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // AddSelectFlagsForSession adds flags to select fields in Session.
@@ -80,7 +80,7 @@ func PathsFromSelectFlagsForSession(flags *pflag.FlagSet, prefix string) (paths 
 
 // AddSetFlagsForSession adds flags to select fields in Session.
 func AddSetFlagsForSession(flags *pflag.FlagSet, prefix string, hidden bool) {
-	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("dev-addr", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(customflags.New4BytesFlag(flagsplugin.Prefix("dev-addr", prefix), "", flagsplugin.WithHidden(hidden)))
 	AddSetFlagsForSessionKeys(flags, flagsplugin.Prefix("keys", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("last-f-cnt-up", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewUint32Flag(flagsplugin.Prefix("last-n-f-cnt-down", prefix), "", flagsplugin.WithHidden(hidden)))
@@ -92,7 +92,7 @@ func AddSetFlagsForSession(flags *pflag.FlagSet, prefix string, hidden bool) {
 
 // SetFromFlags sets the Session message from flags.
 func (m *Session) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
-	if val, changed, err := types.GetDevAddrFromFlag(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
+	if val, changed, err := customflags.GetExactBytes(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
 		return nil, err
 	} else if changed {
 		m.DevAddr = val
@@ -1170,7 +1170,7 @@ func (m *MACSettings) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths [
 	if val, changed, err := flagsplugin.GetFloat32(flags, flagsplugin.Prefix("adr_margin", prefix)); err != nil {
 		return nil, err
 	} else if changed {
-		m.AdrMargin = &types1.FloatValue{Value: val}
+		m.AdrMargin = &types.FloatValue{Value: val}
 		paths = append(paths, flagsplugin.Prefix("adr_margin", prefix))
 	}
 	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("resets_f_cnt", prefix)); changed {
@@ -1190,7 +1190,7 @@ func (m *MACSettings) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths [
 	if val, changed, err := flagsplugin.GetUint32(flags, flagsplugin.Prefix("status_count_periodicity", prefix)); err != nil {
 		return nil, err
 	} else if changed {
-		m.StatusCountPeriodicity = &types1.UInt32Value{Value: val}
+		m.StatusCountPeriodicity = &types.UInt32Value{Value: val}
 		paths = append(paths, flagsplugin.Prefix("status_count_periodicity", prefix))
 	}
 	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("desired_rx1_delay", prefix)); changed {
@@ -1481,13 +1481,13 @@ func (m *MACState_JoinAccept) SetFromFlags(flags *pflag.FlagSet, prefix string) 
 		m.CorrelationIds = val
 		paths = append(paths, flagsplugin.Prefix("correlation_ids", prefix))
 	}
-	if val, changed, err := types.GetDevAddrFromFlag(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
+	if val, changed, err := types1.GetDevAddrFromFlag(flags, flagsplugin.Prefix("dev_addr", prefix)); err != nil {
 		return nil, err
 	} else if changed {
 		m.DevAddr = val
 		paths = append(paths, flagsplugin.Prefix("dev_addr", prefix))
 	}
-	if val, changed, err := types.GetNetIDFromFlag(flags, flagsplugin.Prefix("net_id", prefix)); err != nil {
+	if val, changed, err := types1.GetNetIDFromFlag(flags, flagsplugin.Prefix("net_id", prefix)); err != nil {
 		return nil, err
 	} else if changed {
 		m.NetId = val
@@ -2528,7 +2528,7 @@ func (m *EndDevice) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []s
 			paths = append(paths, setPaths...)
 		}
 	}
-	if val, changed, err := types.GetNetIDFromFlag(flags, flagsplugin.Prefix("net_id", prefix)); err != nil {
+	if val, changed, err := types1.GetNetIDFromFlag(flags, flagsplugin.Prefix("net_id", prefix)); err != nil {
 		return nil, err
 	} else if changed {
 		m.NetId = &val
@@ -2613,7 +2613,7 @@ func (m *EndDevice) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []s
 	if val, changed, err := flagsplugin.GetFloat32(flags, flagsplugin.Prefix("battery_percentage", prefix)); err != nil {
 		return nil, err
 	} else if changed {
-		m.BatteryPercentage = &types1.FloatValue{Value: val}
+		m.BatteryPercentage = &types.FloatValue{Value: val}
 		paths = append(paths, flagsplugin.Prefix("battery_percentage", prefix))
 	}
 	if val, changed, err := flagsplugin.GetInt32(flags, flagsplugin.Prefix("downlink_margin", prefix)); err != nil {
@@ -2661,7 +2661,7 @@ func (m *EndDevice) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []s
 	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("skip_payload_crypto_override", prefix)); err != nil {
 		return nil, err
 	} else if changed {
-		m.SkipPayloadCryptoOverride = &types1.BoolValue{Value: val}
+		m.SkipPayloadCryptoOverride = &types.BoolValue{Value: val}
 		paths = append(paths, flagsplugin.Prefix("skip_payload_crypto_override", prefix))
 	}
 	if val, changed, err := flagsplugin.GetTimestamp(flags, flagsplugin.Prefix("activated_at", prefix)); err != nil {

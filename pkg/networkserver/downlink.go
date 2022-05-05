@@ -34,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/grpc"
 )
@@ -336,7 +337,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 
 	pld := &ttnpb.MACPayload{
 		FHdr: &ttnpb.FHDR{
-			DevAddr: dev.Session.DevAddr,
+			DevAddr: types.MustDevAddr(dev.Session.DevAddr).OrZero(),
 			FCtrl: &ttnpb.FCtrl{
 				Ack: up != nil && up.Payload.MHdr.MType == ttnpb.MType_CONFIRMED_UP,
 				Adr: mac.DeviceUseADR(dev, ns.defaultMACSettings, phy),
@@ -522,7 +523,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		if pld.FPort != 0 {
 			fCnt = dev.Session.LastNFCntDown
 		}
-		cmdBuf, err = crypto.EncryptDownlink(key, dev.Session.DevAddr, fCnt, cmdBuf, cmdsInFOpts)
+		cmdBuf, err = crypto.EncryptDownlink(key, types.MustDevAddr(dev.Session.DevAddr).OrZero(), fCnt, cmdBuf, cmdsInFOpts)
 		if err != nil {
 			return nil, genState, errEncryptMAC.WithCause(err)
 		}
@@ -594,7 +595,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 	if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
 		mic, err = crypto.ComputeLegacyDownlinkMIC(
 			key,
-			dev.Session.DevAddr,
+			types.MustDevAddr(dev.Session.DevAddr).OrZero(),
 			pld.FullFCnt,
 			b,
 		)
@@ -605,7 +606,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 		}
 		mic, err = crypto.ComputeDownlinkMIC(
 			key,
-			dev.Session.DevAddr,
+			types.MustDevAddr(dev.Session.DevAddr).OrZero(),
 			confFCnt,
 			pld.FullFCnt,
 			b,
@@ -1778,7 +1779,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 					})
 
 					dev.PendingSession = &ttnpb.Session{
-						DevAddr: dev.PendingMacState.QueuedJoinAccept.DevAddr,
+						DevAddr: dev.PendingMacState.QueuedJoinAccept.DevAddr.Bytes(),
 						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: dev.PendingMacState.QueuedJoinAccept.Keys.SessionKeyId,
 							FNwkSIntKey:  dev.PendingMacState.QueuedJoinAccept.Keys.FNwkSIntKey,
@@ -1811,7 +1812,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 					logger.Warn("Unknown session, skip downlink slot")
 					return dev, nil, nil
 				}
-				logger = logger.WithField("dev_addr", dev.Session.DevAddr)
+				logger = logger.WithField("dev_addr", types.MustDevAddr(dev.Session.DevAddr).OrZero())
 
 				if dev.MacState == nil {
 					logger.Warn("Unknown MAC state, skip downlink slot")

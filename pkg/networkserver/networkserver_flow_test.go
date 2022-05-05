@@ -195,7 +195,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			t.Error("Device failed to join")
 			return
 		}
-		t.Logf("Device successfully joined. DevAddr: %s", dev.PendingSession.DevAddr)
+		t.Logf("Device successfully joined. DevAddr: %s", types.MustDevAddr(dev.PendingSession.DevAddr).OrZero())
 
 		var upCmders []MACCommander
 		var upEvBuilders []events.Builder
@@ -229,7 +229,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			return
 		}
 		dev.PendingMacState.CurrentParameters.Channels = deviceChannels
-		dev.Ids.DevAddr = &dev.PendingSession.DevAddr
+		dev.Ids.DevAddr = types.MustDevAddr(dev.PendingSession.DevAddr)
 		dev, ok = env.AssertHandleDataUplink(ctx, DataUplinkAssertionConfig{
 			Device:        dev,
 			ChannelIndex:  2,
@@ -269,7 +269,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			DecodePayload: true,
 
 			MACVersion: dev.MacState.LorawanVersion,
-			DevAddr:    dev.Session.DevAddr,
+			DevAddr:    types.MustDevAddr(dev.Session.DevAddr).OrZero(),
 			FCtrl: &ttnpb.FCtrl{
 				Adr: true,
 				Ack: true,

@@ -414,7 +414,7 @@ var (
 					}
 					device.Ids.DevAddr = devAddrRes.DevAddr
 					device.Session = &ttnpb.Session{
-						DevAddr: *devAddrRes.DevAddr,
+						DevAddr: devAddrRes.DevAddr.Bytes(),
 						Keys: &ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{Key: generateKey()},
 							AppSKey:     &ttnpb.KeyEnvelope{Key: generateKey()},

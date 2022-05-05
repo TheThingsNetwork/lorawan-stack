@@ -176,7 +176,7 @@ type (
 )
 
 // WithDevAddr returns a SessionOption, which returns a copy of ttnpb.Session with DevAddr set to v.
-func (SessionOptionNamespace) WithDevAddr(v types.DevAddr) SessionOption {
+func (SessionOptionNamespace) WithDevAddr(v []byte) SessionOption {
 	return func(x ttnpb.Session) ttnpb.Session {
 		x.DevAddr = v
 		return x
@@ -992,6 +992,14 @@ func (EndDeviceOptionNamespace) WithSkipPayloadCryptoOverride(v *pbtypes.BoolVal
 func (EndDeviceOptionNamespace) WithActivatedAt(v *pbtypes.Timestamp) EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		x.ActivatedAt = v
+		return x
+	}
+}
+
+// WithLastSeenAt returns a EndDeviceOption, which returns a copy of ttnpb.EndDevice with LastSeenAt set to v.
+func (EndDeviceOptionNamespace) WithLastSeenAt(v *pbtypes.Timestamp) EndDeviceOption {
+	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
+		x.LastSeenAt = v
 		return x
 	}
 }

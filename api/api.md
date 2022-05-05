@@ -3700,6 +3700,7 @@ This is used internally by the Network Server.
 
 | Field | Validations |
 | ----- | ----------- |
+| `dev_addr` | <p>`bytes.len`: `4`</p> |
 | `keys` | <p>`message.required`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.SetEndDeviceRequest">Message `SetEndDeviceRequest`</a>

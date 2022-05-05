@@ -348,7 +348,7 @@ func processDownlink(dev *ttnpb.EndDevice, lastUpMsg *ttnpb.Message, downMsg *tt
 			logger.Warnf("Expected MIC %x but got %x", expectedMIC, downMsg.Payload.Mic)
 		}
 
-		dev.Ids.DevAddr, dev.Session.DevAddr = &joinAcceptPayload.DevAddr, joinAcceptPayload.DevAddr
+		dev.Ids.DevAddr, dev.Session.DevAddr = &joinAcceptPayload.DevAddr, joinAcceptPayload.DevAddr.Bytes()
 		dev.Session.Keys = &ttnpb.SessionKeys{}
 
 		if dev.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 && joinAcceptPayload.DlSettings.OptNeg {

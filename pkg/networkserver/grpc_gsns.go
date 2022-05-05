@@ -236,7 +236,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 		cmacFMatchResult.IsPending &&
 		dev.PendingSession != nil &&
 		dev.PendingMacState != nil &&
-		pld.FHdr.DevAddr.Equal(dev.PendingSession.DevAddr) &&
+		pld.FHdr.DevAddr.Equal(types.MustDevAddr(dev.PendingSession.DevAddr).OrZero()) &&
 		cmacFMatchResult.LoRaWANVersion.UseLegacyMIC() == dev.PendingMacState.LorawanVersion.UseLegacyMIC() {
 		fNwkSIntKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.PendingSession.Keys.FNwkSIntKey, ns.KeyVault)
 		if err != nil {
@@ -275,7 +275,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 	if matchType != pendingMatch &&
 		dev.Session != nil &&
 		dev.MacState != nil &&
-		pld.FHdr.DevAddr.Equal(dev.Session.DevAddr) &&
+		pld.FHdr.DevAddr.Equal(types.MustDevAddr(dev.Session.DevAddr).OrZero()) &&
 		cmacFMatchResult.LoRaWANVersion.UseLegacyMIC() == dev.MacState.LorawanVersion.UseLegacyMIC() &&
 		(cmacFMatchResult.FullFCnt == FullFCnt(uint16(pld.FHdr.FCnt), dev.Session.LastFCntUp, mac.DeviceSupports32BitFCnt(dev, ns.defaultMACSettings)) ||
 			cmacFMatchResult.FullFCnt == pld.FHdr.FCnt) {
@@ -1165,11 +1165,11 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 
 	devAddr := ns.newDevAddr(ctx, matched)
 	const maxDevAddrGenerationRetries = 5
-	for i := 0; i < maxDevAddrGenerationRetries && matched.Session != nil && devAddr.Equal(matched.Session.DevAddr); i++ {
+	for i := 0; i < maxDevAddrGenerationRetries && matched.Session != nil && devAddr.Equal(types.MustDevAddr(matched.Session.DevAddr).OrZero()); i++ {
 		devAddr = ns.newDevAddr(ctx, matched)
 	}
 	ctx = log.NewContextWithField(ctx, "dev_addr", devAddr)
-	if matched.Session != nil && devAddr.Equal(matched.Session.DevAddr) {
+	if matched.Session != nil && devAddr.Equal(types.MustDevAddr(matched.Session.DevAddr).OrZero()) {
 		log.FromContext(ctx).Error("Reusing the DevAddr used for current session")
 	}
 

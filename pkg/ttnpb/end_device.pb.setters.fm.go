@@ -17,8 +17,7 @@ func (dst *Session) SetFields(src *Session, paths ...string) error {
 			if src != nil {
 				dst.DevAddr = src.DevAddr
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.DevAddr
-				dst.DevAddr = zero
+				dst.DevAddr = nil
 			}
 		case "keys":
 			if len(subs) > 0 {

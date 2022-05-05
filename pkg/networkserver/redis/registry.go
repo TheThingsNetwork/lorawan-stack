@@ -741,10 +741,10 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 					p.Del(ctx, r.euiKey(*stored.Ids.JoinEui, *stored.Ids.DevEui))
 				}
 				if stored.PendingSession != nil {
-					removeAddrMapping(ctx, p, PendingAddrKey(r.addrKey(stored.PendingSession.DevAddr)), uid)
+					removeAddrMapping(ctx, p, PendingAddrKey(r.addrKey(types.MustDevAddr(stored.PendingSession.DevAddr).OrZero())), uid)
 				}
 				if stored.Session != nil {
-					removeAddrMapping(ctx, p, CurrentAddrKey(r.addrKey(stored.Session.DevAddr)), uid)
+					removeAddrMapping(ctx, p, CurrentAddrKey(r.addrKey(types.MustDevAddr(stored.Session.DevAddr).OrZero())), uid)
 				}
 				return nil
 			}
@@ -820,7 +820,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 						return true, false, false
 					case storedPendingSession == nil:
 						return false, true, true
-					case !updated.PendingSession.DevAddr.Equal(storedPendingSession.DevAddr):
+					case !types.MustDevAddr(updated.PendingSession.DevAddr).OrZero().Equal(types.MustDevAddr(storedPendingSession.DevAddr).OrZero()):
 						return true, true, true
 					}
 					storedPendingMACState := stored.GetPendingMacState()
@@ -829,10 +829,10 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 						!equalKeys(updated.PendingSession.Keys.FNwkSIntKey, storedPendingSession.Keys.FNwkSIntKey)
 				}()
 				if removeStored {
-					removeAddrMapping(ctx, p, PendingAddrKey(r.addrKey(storedPendingSession.DevAddr)), uid)
+					removeAddrMapping(ctx, p, PendingAddrKey(r.addrKey(types.MustDevAddr(storedPendingSession.DevAddr).OrZero())), uid)
 				}
 				if setAddr {
-					p.ZAdd(ctx, PendingAddrKey(r.addrKey(updated.PendingSession.DevAddr)), &redis.Z{
+					p.ZAdd(ctx, PendingAddrKey(r.addrKey(types.MustDevAddr(updated.PendingSession.DevAddr).OrZero())), &redis.Z{
 						Score:  float64(time.Now().UnixNano()),
 						Member: uid,
 					})
@@ -842,7 +842,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 					if err != nil {
 						return err
 					}
-					p.HSet(ctx, FieldKey(PendingAddrKey(r.addrKey(updated.PendingSession.DevAddr))), uid, b)
+					p.HSet(ctx, FieldKey(PendingAddrKey(r.addrKey(types.MustDevAddr(updated.PendingSession.DevAddr).OrZero()))), uid, b)
 				}
 			}
 
@@ -854,7 +854,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 						return true, false, false
 					case storedSession == nil:
 						return false, true, true
-					case !updated.Session.DevAddr.Equal(storedSession.DevAddr):
+					case !types.MustDevAddr(updated.Session.DevAddr).OrZero().Equal(types.MustDevAddr(storedSession.DevAddr).OrZero()):
 						return true, true, true
 					case updated.Session.LastFCntUp != storedSession.LastFCntUp:
 						return false, true, true
@@ -868,10 +868,10 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 						!proto.Equal(updated.MacSettings.GetSupports_32BitFCnt(), storedMACSettings.GetSupports_32BitFCnt())
 				}()
 				if removeStored {
-					removeAddrMapping(ctx, p, CurrentAddrKey(r.addrKey(storedSession.DevAddr)), uid)
+					removeAddrMapping(ctx, p, CurrentAddrKey(r.addrKey(types.MustDevAddr(storedSession.DevAddr).OrZero())), uid)
 				}
 				if setAddr {
-					p.ZAdd(ctx, CurrentAddrKey(r.addrKey(updated.Session.DevAddr)), &redis.Z{
+					p.ZAdd(ctx, CurrentAddrKey(r.addrKey(types.MustDevAddr(updated.Session.DevAddr).OrZero())), &redis.Z{
 						Score:  float64(updated.Session.LastFCntUp & 0xffff),
 						Member: uid,
 					})
@@ -881,7 +881,7 @@ func (r *DeviceRegistry) SetByID(ctx context.Context, appID *ttnpb.ApplicationId
 					if err != nil {
 						return err
 					}
-					p.HSet(ctx, FieldKey(CurrentAddrKey(r.addrKey(updated.Session.DevAddr))), uid, b)
+					p.HSet(ctx, FieldKey(CurrentAddrKey(r.addrKey(types.MustDevAddr(updated.Session.DevAddr).OrZero()))), uid, b)
 				}
 			}
 

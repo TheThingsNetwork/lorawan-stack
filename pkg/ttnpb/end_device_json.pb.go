@@ -9,8 +9,8 @@ package ttnpb
 import (
 	gogo "github.com/TheThingsIndustries/protoc-gen-go-json/gogo"
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
-	types "github.com/gogo/protobuf/types"
-	types1 "go.thethings.network/lorawan-stack/v3/pkg/types"
+	types1 "github.com/gogo/protobuf/types"
+	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // MarshalProtoJSON marshals the PowerState to JSON.
@@ -71,7 +71,7 @@ func (x *Session) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if len(x.DevAddr) > 0 || s.HasField("dev_addr") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("dev_addr")
-		x.DevAddr.MarshalProtoJSON(s.WithField("dev_addr"))
+		types.MarshalHEXBytes(s.WithField("dev_addr"), x.DevAddr)
 	}
 	if x.Keys != nil || s.HasField("keys") {
 		s.WriteMoreIf(&wroteField)
@@ -138,7 +138,7 @@ func (x *Session) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			s.ReadAny() // ignore unknown field
 		case "dev_addr", "devAddr":
 			s.AddField("dev_addr")
-			x.DevAddr.UnmarshalProtoJSON(s.WithField("dev_addr", false))
+			x.DevAddr = types.Unmarshal4Bytes(s.WithField("dev_addr", false))
 		case "keys":
 			s.AddField("keys")
 			if s.ReadNil() {
@@ -864,7 +864,7 @@ func (x *ADRSettings_DynamicMode) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 			if s.Err() != nil {
 				return
 			}
-			x.Margin = &types.FloatValue{Value: v}
+			x.Margin = &types1.FloatValue{Value: v}
 		case "min_data_rate_index", "minDataRateIndex":
 			s.AddField("min_data_rate_index")
 			if s.ReadNil() {
@@ -891,7 +891,7 @@ func (x *ADRSettings_DynamicMode) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 			if s.Err() != nil {
 				return
 			}
-			x.MinTxPowerIndex = &types.UInt32Value{Value: v}
+			x.MinTxPowerIndex = &types1.UInt32Value{Value: v}
 		case "max_tx_power_index", "maxTxPowerIndex":
 			s.AddField("max_tx_power_index")
 			if s.ReadNil() {
@@ -902,7 +902,7 @@ func (x *ADRSettings_DynamicMode) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 			if s.Err() != nil {
 				return
 			}
-			x.MaxTxPowerIndex = &types.UInt32Value{Value: v}
+			x.MaxTxPowerIndex = &types1.UInt32Value{Value: v}
 		case "min_nb_trans", "minNbTrans":
 			s.AddField("min_nb_trans")
 			if s.ReadNil() {
@@ -913,7 +913,7 @@ func (x *ADRSettings_DynamicMode) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 			if s.Err() != nil {
 				return
 			}
-			x.MinNbTrans = &types.UInt32Value{Value: v}
+			x.MinNbTrans = &types1.UInt32Value{Value: v}
 		case "max_nb_trans", "maxNbTrans":
 			s.AddField("max_nb_trans")
 			if s.ReadNil() {
@@ -924,7 +924,7 @@ func (x *ADRSettings_DynamicMode) UnmarshalProtoJSON(s *jsonplugin.UnmarshalStat
 			if s.Err() != nil {
 				return
 			}
-			x.MaxNbTrans = &types.UInt32Value{Value: v}
+			x.MaxNbTrans = &types1.UInt32Value{Value: v}
 		}
 	})
 }
@@ -1356,7 +1356,7 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			if s.Err() != nil {
 				return
 			}
-			x.AdrMargin = &types.FloatValue{Value: v}
+			x.AdrMargin = &types1.FloatValue{Value: v}
 		case "resets_f_cnt", "resetsFCnt":
 			s.AddField("resets_f_cnt")
 			if s.ReadNil() {
@@ -1386,7 +1386,7 @@ func (x *MACSettings) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			if s.Err() != nil {
 				return
 			}
-			x.StatusCountPeriodicity = &types.UInt32Value{Value: v}
+			x.StatusCountPeriodicity = &types1.UInt32Value{Value: v}
 		case "desired_rx1_delay", "desiredRx1Delay":
 			s.AddField("desired_rx1_delay")
 			if s.ReadNil() {
@@ -2669,7 +2669,7 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 				x.NetId = nil
 				return
 			}
-			x.NetId = &types1.NetID{}
+			x.NetId = &types.NetID{}
 			x.NetId.UnmarshalProtoJSON(s.WithField("net_id", false))
 		case "mac_settings", "macSettings":
 			if s.ReadNil() {
@@ -2749,7 +2749,7 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			if s.Err() != nil {
 				return
 			}
-			x.BatteryPercentage = &types.FloatValue{Value: v}
+			x.BatteryPercentage = &types1.FloatValue{Value: v}
 		case "downlink_margin", "downlinkMargin":
 			s.AddField("downlink_margin")
 			x.DownlinkMargin = s.ReadInt32()
@@ -2818,7 +2818,7 @@ func (x *EndDevice) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			if s.Err() != nil {
 				return
 			}
-			x.SkipPayloadCryptoOverride = &types.BoolValue{Value: v}
+			x.SkipPayloadCryptoOverride = &types1.BoolValue{Value: v}
 		case "activated_at", "activatedAt":
 			s.AddField("activated_at")
 			if s.ReadNil() {

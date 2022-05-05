@@ -103,7 +103,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:      ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 				},
 			},
 			ExpectedSlot: classA,
@@ -126,7 +126,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:      ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{},
 					},
@@ -156,7 +156,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
 				},
 				Session: &ttnpb.Session{
-					DevAddr: test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{},
@@ -180,7 +180,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:      ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 				},
 			},
 			ExpectedSlot: classA,
@@ -200,7 +200,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:     ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 				},
 			},
 		},
@@ -222,7 +222,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:      ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 				},
 			},
 			ExpectedSlot: classA,
@@ -245,7 +245,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:  ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 				},
 			},
 		},
@@ -264,7 +264,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:  ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{},
 					},
@@ -296,7 +296,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:      ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 				},
 			},
 			ExpectedSlot: classA,
@@ -316,7 +316,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:     ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 				},
 			},
 		},
@@ -334,7 +334,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					RecentUplinks:     ups,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{},
 					},
@@ -359,7 +359,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					DeviceClass:       ttnpb.Class_CLASS_C,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 				},
 			},
 		},
@@ -376,7 +376,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					DeviceClass:       ttnpb.Class_CLASS_C,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
@@ -410,7 +410,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
@@ -447,7 +447,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					DeviceClass:       ttnpb.Class_CLASS_C,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
@@ -478,7 +478,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
@@ -503,7 +503,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{
@@ -527,7 +527,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 					LorawanVersion:    ttnpb.MACVersion_MAC_V1_0_3,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: test.DefaultDevAddr,
+					DevAddr: test.DefaultDevAddr.Bytes(),
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
 						{
 							ClassBC: &ttnpb.ApplicationDownlink_ClassBC{

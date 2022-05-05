@@ -1065,14 +1065,14 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 			if st.Device.Ids.DevAddr == nil {
 				return dev.GetSession() == nil
 			}
-			return dev.GetSession() != nil && dev.Session.DevAddr.Equal(*st.Device.Ids.DevAddr)
+			return dev.GetSession() != nil && types.MustDevAddr(dev.Session.DevAddr).OrZero().Equal(*st.Device.Ids.DevAddr)
 		}, "session.dev_addr"); err != nil {
 			return nil, err
 		}
 	} else if st.HasSetField("session.dev_addr") {
 		var devAddr *types.DevAddr
 		if st.Device.Session != nil {
-			devAddr = &st.Device.Session.DevAddr
+			devAddr = types.MustDevAddr(st.Device.Session.DevAddr)
 		}
 		st.Device.Ids.DevAddr = devAddr
 		st.AddSetFields(
@@ -1871,7 +1871,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	var getTransforms []func(*ttnpb.EndDevice)
 	if st.Device.Session != nil {
 		for p, isZero := range map[string]func() bool{
-			"session.dev_addr":                 st.Device.Session.DevAddr.IsZero,
+			"session.dev_addr":                 types.MustDevAddr(st.Device.Session.DevAddr).OrZero().IsZero,
 			"session.keys.f_nwk_s_int_key.key": st.Device.Session.Keys.GetFNwkSIntKey().IsZero,
 			"session.keys.nwk_s_enc_key.key": func() bool {
 				return st.Device.Session.Keys.GetNwkSEncKey() != nil && st.Device.Session.Keys.NwkSEncKey.IsZero()
@@ -1937,7 +1937,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	}
 	if st.Device.PendingSession != nil {
 		for p, isZero := range map[string]func() bool{
-			"pending_session.dev_addr":                 st.Device.PendingSession.DevAddr.IsZero,
+			"pending_session.dev_addr":                 types.MustDevAddr(st.Device.PendingSession.DevAddr).OrZero().IsZero,
 			"pending_session.keys.f_nwk_s_int_key.key": st.Device.PendingSession.Keys.GetFNwkSIntKey().IsZero,
 			"pending_session.keys.nwk_s_enc_key.key":   st.Device.PendingSession.Keys.GetNwkSEncKey().IsZero,
 			"pending_session.keys.s_nwk_s_int_key.key": st.Device.PendingSession.Keys.GetSNwkSIntKey().IsZero,

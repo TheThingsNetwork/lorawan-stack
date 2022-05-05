@@ -452,7 +452,7 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 			return nil, errFetchAppSKey.WithCause(err)
 		}
 		return &ttnpb.Session{
-			DevAddr: *devAddr,
+			DevAddr: devAddr.Bytes(),
 			Keys: &ttnpb.SessionKeys{
 				SessionKeyId: sessionKeyID,
 				AppSKey:      &appSKey,
@@ -486,7 +486,7 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 		// If the SessionKeyID and DevAddr did not change, just update the LastAFCntDown.
 		case dev.Session != nil &&
 			bytes.Equal(diagnostics.SessionKeyId, dev.Session.Keys.SessionKeyId) &&
-			dev.Session.DevAddr.Equal(*diagnostics.DevAddr):
+			types.MustDevAddr(dev.Session.DevAddr).OrZero().Equal(*diagnostics.DevAddr):
 			dev.Session.LastAFCntDown = lastAFCntDownFromMinFCnt(diagnostics.MinFCntDown)
 		// If there is a SessionKeyID on the Network Server side, rebuild the session.
 		case len(diagnostics.SessionKeyId) > 0:
@@ -495,7 +495,7 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 				return nil, err
 			}
 			dev.Session = session
-			dev.Ids.DevAddr = &session.DevAddr
+			dev.Ids.DevAddr = types.MustDevAddr(session.DevAddr)
 		default:
 			return nil, errRebuild.New()
 		}
@@ -510,7 +510,7 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 		// If the SessionKeyID did not change, just update the LastAFcntDown.
 		case dev.PendingSession != nil &&
 			bytes.Equal(diagnostics.PendingSessionKeyId, dev.PendingSession.Keys.SessionKeyId) &&
-			dev.PendingSession.DevAddr.Equal(*diagnostics.PendingDevAddr):
+			types.MustDevAddr(dev.PendingSession.DevAddr).OrZero().Equal(*diagnostics.PendingDevAddr):
 			dev.PendingSession.LastAFCntDown = lastAFCntDownFromMinFCnt(diagnostics.PendingMinFCntDown)
 		// If there is a SessionKeyID on the Network Server side, rebuild the session.
 		case len(diagnostics.PendingSessionKeyId) > 0:
@@ -865,7 +865,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids *ttnpb.En
 			}
 			previousSession := dev.PendingSession
 			dev.PendingSession = &ttnpb.Session{
-				DevAddr: *ids.DevAddr,
+				DevAddr: ids.DevAddr.Bytes(),
 				Keys: &ttnpb.SessionKeys{
 					SessionKeyId: joinAccept.SessionKeyId,
 					AppSKey:      joinAccept.AppSKey,
@@ -952,7 +952,7 @@ func (as *ApplicationServer) matchSession(ctx context.Context, ids *ttnpb.EndDev
 			return nil, errFetchAppSKey.WithCause(err)
 		}
 		dev.Session = &ttnpb.Session{
-			DevAddr: *ids.DevAddr,
+			DevAddr: ids.DevAddr.Bytes(),
 			Keys: &ttnpb.SessionKeys{
 				SessionKeyId: sessionKeyID,
 				AppSKey:      &appSKey,

@@ -959,7 +959,7 @@ func TestApplicationServer(t *testing.T) {
 							a := assertions.New(t)
 							a.So(dev.Session, should.BeNil)
 							a.So(dev.PendingSession, should.Resemble, &ttnpb.Session{
-								DevAddr: types.DevAddr{0x11, 0x11, 0x11, 0x11},
+								DevAddr: types.DevAddr{0x11, 0x11, 0x11, 0x11}.Bytes(),
 								Keys: &ttnpb.SessionKeys{
 									SessionKeyId: []byte{0x11},
 									AppSKey: &ttnpb.KeyEnvelope{
@@ -1005,7 +1005,7 @@ func TestApplicationServer(t *testing.T) {
 							a := assertions.New(t)
 							a.So(dev.Session, should.BeNil)
 							a.So(dev.PendingSession, should.Resemble, &ttnpb.Session{
-								DevAddr: types.DevAddr{0x22, 0x22, 0x22, 0x22},
+								DevAddr: types.DevAddr{0x22, 0x22, 0x22, 0x22}.Bytes(),
 								Keys: &ttnpb.SessionKeys{
 									SessionKeyId: []byte{0x22},
 									AppSKey: &ttnpb.KeyEnvelope{
@@ -1125,7 +1125,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
 							a := assertions.New(t)
 							a.So(dev.Session, should.Resemble, &ttnpb.Session{
-								DevAddr: types.DevAddr{0x22, 0x22, 0x22, 0x22},
+								DevAddr: types.DevAddr{0x22, 0x22, 0x22, 0x22}.Bytes(),
 								Keys: &ttnpb.SessionKeys{
 									SessionKeyId: []byte{0x22},
 									AppSKey: &ttnpb.KeyEnvelope{
@@ -1136,7 +1136,7 @@ func TestApplicationServer(t *testing.T) {
 								LastAFCntDown: 0,
 							})
 							a.So(dev.PendingSession, should.Resemble, &ttnpb.Session{
-								DevAddr: types.DevAddr{0x33, 0x33, 0x33, 0x33},
+								DevAddr: types.DevAddr{0x33, 0x33, 0x33, 0x33}.Bytes(),
 								Keys: &ttnpb.SessionKeys{
 									SessionKeyId: []byte{0x33},
 									AppSKey: &ttnpb.KeyEnvelope{
@@ -1519,7 +1519,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
 							a := assertions.New(t)
 							a.So(dev.Session, should.Resemble, &ttnpb.Session{
-								DevAddr: types.DevAddr{0x33, 0x33, 0x33, 0x33},
+								DevAddr: types.DevAddr{0x33, 0x33, 0x33, 0x33}.Bytes(),
 								Keys: &ttnpb.SessionKeys{
 									SessionKeyId: []byte{0x33},
 									AppSKey: &ttnpb.KeyEnvelope{
@@ -1530,7 +1530,7 @@ func TestApplicationServer(t *testing.T) {
 								LastAFCntDown: 44,
 							})
 							a.So(dev.PendingSession, should.Resemble, &ttnpb.Session{
-								DevAddr: types.DevAddr{0x44, 0x44, 0x44, 0x44},
+								DevAddr: types.DevAddr{0x44, 0x44, 0x44, 0x44}.Bytes(),
 								Keys: &ttnpb.SessionKeys{
 									SessionKeyId: []byte{0x44},
 									AppSKey: &ttnpb.KeyEnvelope{
@@ -1623,7 +1623,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
 							a := assertions.New(t)
 							a.So(dev.Session, should.Resemble, &ttnpb.Session{
-								DevAddr: types.DevAddr{0x44, 0x44, 0x44, 0x44},
+								DevAddr: types.DevAddr{0x44, 0x44, 0x44, 0x44}.Bytes(),
 								Keys: &ttnpb.SessionKeys{
 									SessionKeyId: []byte{0x44},
 									AppSKey: &ttnpb.KeyEnvelope{
@@ -1870,7 +1870,7 @@ func TestApplicationServer(t *testing.T) {
 						AssertDevice: func(t *testing.T, dev *ttnpb.EndDevice, queue []*ttnpb.ApplicationDownlink) {
 							a := assertions.New(t)
 							a.So(dev.Session, should.Resemble, &ttnpb.Session{
-								DevAddr: types.DevAddr{0x55, 0x55, 0x55, 0x55},
+								DevAddr: types.DevAddr{0x55, 0x55, 0x55, 0x55}.Bytes(),
 								Keys: &ttnpb.SessionKeys{
 									SessionKeyId: []byte{0x55},
 									AppSKey: &ttnpb.KeyEnvelope{
@@ -1973,7 +1973,7 @@ func TestApplicationServer(t *testing.T) {
 				deviceRegistry.Set(ctx, registeredDevice.Ids, nil, func(_ *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 					dev := *registeredDevice
 					dev.Session = &ttnpb.Session{
-						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte{0x11},
 							AppSKey: &ttnpb.KeyEnvelope{
@@ -2469,7 +2469,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 							a := assertions.New(t)
 							a.So(dev.Session, should.BeNil)
 							a.So(dev.PendingSession, should.Resemble, &ttnpb.Session{
-								DevAddr: types.DevAddr{0x22, 0x22, 0x22, 0x22},
+								DevAddr: types.DevAddr{0x22, 0x22, 0x22, 0x22}.Bytes(),
 								Keys: &ttnpb.SessionKeys{
 									SessionKeyId: []byte{0x22},
 									AppSKey: &ttnpb.KeyEnvelope{
@@ -2623,7 +2623,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 				deviceRegistry.Set(ctx, registeredDevice.Ids, nil, func(_ *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 					dev := *registeredDevice
 					dev.Session = &ttnpb.Session{
-						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 						Keys: &ttnpb.SessionKeys{
 							SessionKeyId: []byte{0x11},
 							AppSKey: &ttnpb.KeyEnvelope{
@@ -2716,7 +2716,7 @@ func TestLocationFromPayload(t *testing.T) {
 			DevEui:         eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 		},
 		Session: &ttnpb.Session{
-			DevAddr: types.DevAddr{0x11, 0x11, 0x11, 0x11},
+			DevAddr: types.DevAddr{0x11, 0x11, 0x11, 0x11}.Bytes(),
 			Keys: &ttnpb.SessionKeys{
 				SessionKeyId: []byte{0x11},
 				AppSKey: &ttnpb.KeyEnvelope{

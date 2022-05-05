@@ -1211,7 +1211,7 @@ func (env TestEnvironment) AssertScheduleJoinAccept(ctx context.Context, dev *tt
 				).New(events.ContextWithCorrelationID(ctx, scheduledDown.CorrelationIds...)),
 			)
 			dev.PendingSession = &ttnpb.Session{
-				DevAddr: dev.PendingMacState.QueuedJoinAccept.DevAddr,
+				DevAddr: dev.PendingMacState.QueuedJoinAccept.DevAddr.Bytes(),
 				Keys:    dev.PendingMacState.QueuedJoinAccept.Keys,
 			}
 			dev.PendingMacState.PendingJoinRequest = dev.PendingMacState.QueuedJoinAccept.Request
@@ -2153,7 +2153,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 		}
 		return o.Compose(
 			o.WithPendingSession(&ttnpb.Session{
-				DevAddr: x.PendingMacState.QueuedJoinAccept.DevAddr,
+				DevAddr: x.PendingMacState.QueuedJoinAccept.DevAddr.Bytes(),
 				Keys: &ttnpb.SessionKeys{
 					SessionKeyId: x.PendingMacState.QueuedJoinAccept.Keys.SessionKeyId,
 					FNwkSIntKey:  x.PendingMacState.QueuedJoinAccept.Keys.FNwkSIntKey,
@@ -2218,7 +2218,7 @@ func (o EndDeviceOptionNamespace) Activate(defaults ttnpb.MACSettings, wrapKeys 
 				o.WithMacState(macState),
 				o.WithSession(ses),
 				o.WithEndDeviceIdentifiersOptions(
-					test.EndDeviceIdentifiersOptions.WithDevAddr(&ses.DevAddr),
+					test.EndDeviceIdentifiersOptions.WithDevAddr(types.MustDevAddr(ses.DevAddr)),
 				),
 			)(x)
 		}
@@ -2230,7 +2230,7 @@ func (o EndDeviceOptionNamespace) Activate(defaults ttnpb.MACSettings, wrapKeys 
 			func(x ttnpb.EndDevice) ttnpb.EndDevice {
 				return o.Compose(
 					o.WithEndDeviceIdentifiersOptions(
-						test.EndDeviceIdentifiersOptions.WithDevAddr(&x.PendingSession.DevAddr),
+						test.EndDeviceIdentifiersOptions.WithDevAddr(types.MustDevAddr(x.PendingSession.DevAddr)),
 					),
 					o.WithMacState(x.PendingMacState),
 					o.WithSession(x.PendingSession),
