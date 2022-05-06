@@ -29,7 +29,7 @@ import (
 )
 
 var (
-	selectOrganizationFlags = &pflag.FlagSet{}
+	selectOrganizationFlags = util.NormalizedFlagSet()
 
 	selectAllOrganizationFlags = util.SelectAllFlagSet("organization")
 )

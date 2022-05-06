@@ -27,7 +27,7 @@ import (
 )
 
 var (
-	selectApplicationLinkFlags = &pflag.FlagSet{}
+	selectApplicationLinkFlags = util.NormalizedFlagSet()
 
 	selectAllApplicationLinkFlags = util.SelectAllFlagSet("application link")
 )

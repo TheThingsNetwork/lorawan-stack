@@ -39,15 +39,15 @@ import (
 )
 
 var (
-	selectEndDeviceListFlags   = &pflag.FlagSet{}
-	selectEndDeviceFlags       = &pflag.FlagSet{}
-	setEndDeviceFlags          = &pflag.FlagSet{}
+	selectEndDeviceListFlags   = util.NormalizedFlagSet()
+	selectEndDeviceFlags       = util.NormalizedFlagSet()
+	setEndDeviceFlags          = util.NormalizedFlagSet()
 	endDeviceFlattenPaths      = []string{"provisioning_data"}
-	endDevicePictureFlags      = &pflag.FlagSet{}
-	endDeviceLocationFlags     = &pflag.FlagSet{}
-	getDefaultMACSettingsFlags = &pflag.FlagSet{}
-	allEndDeviceSetFlags       = &pflag.FlagSet{}
-	allEndDeviceSelectFlags    = &pflag.FlagSet{}
+	endDevicePictureFlags      = util.NormalizedFlagSet()
+	endDeviceLocationFlags     = util.NormalizedFlagSet()
+	getDefaultMACSettingsFlags = util.NormalizedFlagSet()
+	allEndDeviceSetFlags       = util.NormalizedFlagSet()
+	allEndDeviceSelectFlags    = util.NormalizedFlagSet()
 
 	selectAllEndDeviceFlags = util.SelectAllFlagSet("end devices")
 	toUnderscore            = strings.NewReplacer("-", "_")

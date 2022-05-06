@@ -25,7 +25,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
-var applicationUpFlags = &pflag.FlagSet{}
+var applicationUpFlags = util.NormalizedFlagSet()
 
 func getStoredUpFlags() *pflag.FlagSet {
 	flags := &pflag.FlagSet{}

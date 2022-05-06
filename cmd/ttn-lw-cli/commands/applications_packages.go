@@ -32,8 +32,8 @@ import (
 )
 
 var (
-	selectApplicationPackageAssociationsFlags        = &pflag.FlagSet{}
-	selectApplicationPackageDefaultAssociationsFlags = &pflag.FlagSet{}
+	selectApplicationPackageAssociationsFlags        = util.NormalizedFlagSet()
+	selectApplicationPackageDefaultAssociationsFlags = util.NormalizedFlagSet()
 
 	selectAllApplicationPackageAssociationsFlags        = util.SelectAllFlagSet("application package association")
 	selectAllApplicationPackageDefaultAssociationsFlags = util.SelectAllFlagSet("application package default association")
