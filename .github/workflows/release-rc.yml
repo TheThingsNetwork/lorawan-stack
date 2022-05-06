@@ -32,54 +32,12 @@ jobs:
         with:
           username: "${{ secrets.DOCKERHUB_USERNAME }}"
           password: "${{ secrets.DOCKERHUB_PASSWORD }}"
-      - name: Set up Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: "~16"
-      - name: Get Yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(npx yarn cache dir)"
-      - name: Initialize Yarn module cache
-        id: yarn-cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: "~1.17"
-      - name: Initialize Go module cache
-        uses: actions/cache@v2
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      - name: Download Go dependencies
-        run: go mod download
-      - name: Download Go tool dependencies
-        run: |
-          cd tools
-          go mod download
-      - name: Initialize Go build cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/go-build
-          key: ${{ runner.os }}-go-build-${{ github.ref }}
-          restore-keys: |
-            ${{ runner.os }}-go-build-refs/heads/v
-      - name: Initialize tool binary cache
-        id: tools-cache
-        uses: actions/cache@v2
-        with:
-          path: tools/bin
-          key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
-      - name: Make Mage
-        run: make tools/bin/mage
-        if: steps.tools-cache.outputs.cache-hit != 'true'
+      - name: Install Go and Dependencies
+        uses: ./.github/actions/install-go-and-deps
+      - name: Build Mage
+        uses: ./.github/actions/build-mage
+      - name: Install Node and Dependencies
+        uses: ./.github/actions/install-node-and-deps
       - name: Initialize device repository index cache
         id: dr-index-cache
         uses: actions/cache@v2
@@ -89,40 +47,10 @@ jobs:
       - name: Create device repository index
         run: tools/bin/mage dev:initDeviceRepo
         if: steps.dr-index-cache.outputs.cache-hit != 'true'
-      - name: Initialize public folder cache
-        id: public-cache
-        uses: actions/cache@v2
+      - name: Build Frontend
+        uses: ./.github/actions/build-frontend
         with:
-          path: public
-          key: public-cache-${{ hashFiles('pkg/webui/**', 'sdk/js/**/*.js', 'sdk/js/generated/*.json', 'config/webpack.config.babel.js', 'package.json', 'yarn.lock', 'sdk/js/yarn.lock')}}
-      - name: Initialize dll cache
-        if: steps.public-cache.outputs.cache-hit != 'true'
-        id: dll-cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            public/libs.*.bundle.js
-            .cache/dll.json
-          key: dll-cache-${{ hashFiles('yarn.lock') }}
-      - name: Initialize babel cache
-        id: babel-cache
-        uses: actions/cache@v2
-        if: steps.public-cache.outputs.cache-hit != 'true'
-        with:
-          path: .cache/babel
-          key: ${{ runner.os }}-babel-cache-${{ hashFiles('config/babel.config.json', 'config/webpack.config.babel.js') }}
-          restore-keys: |
-            ${{ runner.os }}-babel-cache-
-      - name: Build DLLs
-        if: steps.dll-cache.outputs.cache-hit != 'true'
-        run: tools/bin/mage js:buildDll
-        env:
-          WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS: "true"
-      - name: Build frontend
-        run: tools/bin/mage js:build
-        if: steps.public-cache.outputs.cache-hit != 'true'
-        env:
-          WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS: "true"
+          production-sourcemaps: 'true'
       - name: Check for diff
         run: tools/bin/mage git:diff
       - name: Import the signing key

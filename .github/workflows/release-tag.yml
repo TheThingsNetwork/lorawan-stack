@@ -62,43 +62,12 @@ jobs:
         env:
           SNAPCRAFT_LOGIN: ${{ secrets.SNAPCRAFT_LOGIN }}
         run: snapcraft login --with <(printf "$SNAPCRAFT_LOGIN")
-      - name: Set up Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: "~16"
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: "~1.17"
-      - name: Initialize Go module cache
-        uses: actions/cache@v2
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      - name: Download Go dependencies
-        run: go mod download
-      - name: Download Go tool dependencies
-        run: |
-          cd tools
-          go mod download
-      - name: Initialize Go build cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/go-build
-          key: ${{ runner.os }}-go-build-${{ github.ref }}
-          restore-keys: |
-            ${{ runner.os }}-go-build-refs/heads/v
-      - name: Initialize tool binary cache
-        id: tools-cache
-        uses: actions/cache@v2
-        with:
-          path: tools/bin
-          key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
-      - name: Make Mage
-        run: make tools/bin/mage
-        if: steps.tools-cache.outputs.cache-hit != 'true'
+      - name: Install Go and Dependencies
+        uses: ./.github/actions/install-go-and-deps
+      - name: Build Mage
+        uses: ./.github/actions/build-mage
+      - name: Install Node and Dependencies
+        uses: ./.github/actions/install-node-and-deps
       - name: Initialize device repository index cache
         id: dr-index-cache
         uses: actions/cache@v2
@@ -111,10 +80,10 @@ jobs:
       - name: Auto-completion scripts
         run: tools/bin/mage cli:autocomplete
         timeout-minutes: 5
-      - name: Build frontend
-        run: tools/bin/mage js:clean js:buildDll js:build
-        env:
-          WEBPACK_GENERATE_PRODUCTION_SOURCEMAPS: "true"
+      - name: Build Frontend
+        uses: ./.github/actions/build-frontend
+        with:
+          production-sourcemaps: 'true'
       - name: Check for diff
         run: tools/bin/mage git:diff
       - name: Generate Release Notes

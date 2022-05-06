@@ -23,30 +23,10 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v2
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: "~1.17"
-      - name: Initialize Go module cache
-        uses: actions/cache@v2
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      - name: Download Go tool dependencies
-        run: |
-          cd tools
-          go mod download
-      - name: Initialize tool binary cache
-        id: tools-cache
-        uses: actions/cache@v2
-        with:
-          path: tools/bin
-          key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
-      - name: Make Mage
-        run: make tools/bin/mage
-        if: steps.tools-cache.outputs.cache-hit != 'true'
+      - name: Install Go and Dependencies
+        uses: ./.github/actions/install-go-and-deps
+      - name: Build Mage
+        uses: ./.github/actions/build-mage
       - name: Format code
         run: tools/bin/mage go:fmt
       - name: Lint code
@@ -93,42 +73,10 @@ jobs:
           args: -h postgres -U root ttn_lorawan_is_store_test
       - name: Check out code
         uses: actions/checkout@v2
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: "~1.17"
-      - name: Initialize Go module cache
-        uses: actions/cache@v2
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      - name: Download Go dependencies
-        run: go mod download
-      - name: Download Go tool dependencies
-        run: |
-          cd tools
-          go mod download
-      - name: Initialize Go build cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/go-build
-          # NOTE: head_ref only works on pull_request.
-          key: ${{ runner.os }}-go-build-refs/heads/${{ github.head_ref }}
-          # NOTE: base_ref only works on pull_request.
-          restore-keys: |
-            ${{ runner.os }}-go-build-refs/heads/${{ github.base_ref }}
-            ${{ runner.os }}-go-build-refs/heads/v
-      - name: Initialize tool binary cache
-        id: tools-cache
-        uses: actions/cache@v2
-        with:
-          path: tools/bin
-          key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
-      - name: Make Mage
-        run: make tools/bin/mage
-        if: steps.tools-cache.outputs.cache-hit != 'true'
+      - name: Install Go and Dependencies
+        uses: ./.github/actions/install-go-and-deps
+      - name: Build Mage
+        uses: ./.github/actions/build-mage
       - name: Test binary execution
         run: tools/bin/mage go:testBinaries
       - name: Test code

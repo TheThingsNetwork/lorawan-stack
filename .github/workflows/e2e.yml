@@ -31,7 +31,6 @@ jobs:
     outputs:
       needs-to-run: ${{ steps.check-result.outputs.passed != 'true' }}
       hash: ${{ steps.get-hash.outputs.hash }}
-      yarn-cache-dir-path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
     timeout-minutes: 5
     steps:
       - name: Check out code
@@ -41,7 +40,7 @@ jobs:
           submodules: false
       - name: Get hash of code files
         id: get-hash
-        run: echo "::set-output name=hash::${{ hashFiles('*.go', 'go.mod', 'go.sum', 'pkg/**', 'tools/**', 'config/**', 'package.json', 'pkg/webui/**', 'sdk/js/**', 'yarn.lock', 'cypress/**', 'docker-compose.yml') }}"
+        run: echo "::set-output name=hash::${{ hashFiles('.github/workflows/e2e.yml', '*.go', 'go.mod', 'go.sum', 'pkg/**', 'tools/**', 'config/**', 'package.json', 'pkg/webui/**', 'sdk/js/**', 'yarn.lock', 'cypress/**', 'docker-compose.yml') }}"
       - name: Get the cached result
         id: run-cache
         uses: actions/cache@v2
@@ -54,9 +53,6 @@ jobs:
         id: check-result
         continue-on-error: true
         run: test -f .cache/passed && echo "::set-output name=passed::$(cat .cache/passed)"
-      - name: Get Yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(npx yarn cache dir)"
   preparation:
     name: Run preparations
     runs-on: ubuntu-20.04
@@ -69,14 +65,12 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
-      - name: Initialize Yarn module cache
-        id: yarn-cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ needs.determine-if-required.outputs.yarn-cache-dir-path }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock', 'sdk/js/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+      - name: Install Go and Dependencies
+        uses: ./.github/actions/install-go-and-deps
+      - name: Build Mage
+        uses: ./.github/actions/build-mage
+      - name: Install Node and Dependencies
+        uses: ./.github/actions/install-node-and-deps
       - name: Initialize SQL dump cache
         id: db-cache
         uses: actions/cache@v2
@@ -85,30 +79,6 @@ jobs:
             .cache/sqldump.sql
             .env/admin_api_key.txt
           key: db-cache-${{ hashFiles('pkg/identityserver/store/**/*.go', 'cmd/ttn-lw-stack/commands/is-db.go', '.github/workflows/e2e.yml') }}
-      - name: Set up Go
-        uses: actions/setup-go@v3
-        with:
-          go-version: "~1.17"
-      - name: Initialize Go module cache
-        uses: actions/cache@v2
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('go.sum', 'tools/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      - name: Download Go tool dependencies
-        run: |
-          cd tools
-          go mod download
-      - name: Initialize tool binary cache
-        id: tools-cache
-        uses: actions/cache@v2
-        with:
-          path: tools/bin
-          key: ${{ runner.os }}-tools-${{ hashFiles('tools/**') }}
-      - name: Make Mage
-        run: make tools/bin/mage
-        if: steps.tools-cache.outputs.cache-hit != 'true'
       - name: Initialize device repository index cache
         id: dr-index-cache
         uses: actions/cache@v2
@@ -121,35 +91,8 @@ jobs:
       - name: Run test preparations
         if: steps.db-cache.outputs.cache-hit != 'true'
         run: tools/bin/mage -v dev:dbStop dev:dbErase dev:dbStart dev:initStack dev:sqlDump
-      - name: Initialize public folder cache
-        id: public-cache
-        uses: actions/cache@v2
-        with:
-          path: public
-          key: public-cache-${{ hashFiles('pkg/webui/**', 'sdk/js/**/*.js', 'sdk/js/generated/*.json', 'config/webpack.config.babel.js', 'yarn.lock', 'sdk/js/yarn.lock')}}
-      - name: Initialize dll cache
-        id: dll-cache
-        uses: actions/cache@v2
-        with:
-          path: |
-            public/libs.*.bundle.js
-            .cache/dll.json
-          key: dll-cache-${{ hashFiles('yarn.lock') }}
-      - name: Initialize babel cache
-        id: babel-cache
-        uses: actions/cache@v2
-        if: steps.public-cache.outputs.cache-hit != 'true'
-        with:
-          path: .cache/babel
-          key: ${{ runner.os }}-babel-cache-${{ hashFiles('config/babel.config.json', 'config/webpack.config.babel.js') }}
-          restore-keys: |
-            ${{ runner.os }}-babel-cache-
-      - name: Build DLLs
-        if: steps.dll-cache.outputs.cache-hit != 'true'
-        run: tools/bin/mage js:buildDll
-      - name: Build frontend
-        if: steps.public-cache.outputs.cache-hit != 'true'
-        run: tools/bin/mage js:build
+      - name: Build Frontend
+        uses: ./.github/actions/build-frontend
       - name: Initialize build cache
         id: build-cache
         uses: actions/cache@v2
@@ -184,6 +127,12 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
+      - name: Install Go and Dependencies
+        uses: ./.github/actions/install-go-and-deps
+      - name: Build Mage
+        uses: ./.github/actions/build-mage
+      - name: Install Node and Dependencies
+        uses: ./.github/actions/install-node-and-deps
       - uses: actions/download-artifact@v2
         name: Download build artifacts
         with:
@@ -206,14 +155,6 @@ jobs:
           echo "::set-output name=neg-failed-test::!$(paste -d ',!' .failed-specs-*.txt)"
       - name: Unzip build artifacts
         run: unzip -o build.zip
-      - name: Initialize Yarn module cache
-        id: yarn-cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ needs.determine-if-required.outputs.yarn-cache-dir-path }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock', 'sdk/js/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
       - name: Generate certs
         run: tools/bin/mage dev:certificates
       - name: Restore initialized sql db
@@ -276,20 +217,18 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
+      - name: Install Go and Dependencies
+        uses: ./.github/actions/install-go-and-deps
+      - name: Build Mage
+        uses: ./.github/actions/build-mage
+      - name: Install Node and Dependencies
+        uses: ./.github/actions/install-node-and-deps
       - uses: actions/download-artifact@v2
         name: Download build artifacts
         with:
           name: "build-files"
       - name: Unzip build artifacts
         run: unzip -o build.zip
-      - name: Initialize Yarn module cache
-        id: yarn-cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ needs.determine-if-required.outputs.yarn-cache-dir-path }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock', 'sdk/js/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
       - name: Install FF 78 ESR
         run: |
           wget --no-verbose -O /tmp/firefox.tar.bz2 https://download-installer.cdn.mozilla.net/pub/firefox/releases/78.13.0esr/linux-x86_64/en-US/firefox-78.13.0esr.tar.bz2
