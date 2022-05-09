@@ -105,7 +105,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 	switch tokenType {
 	case auth.APIKey:
 		fetch = func(ctx context.Context, st store.Store) error {
-			ids, apiKey, err := st.GetAPIKey(ctx, tokenID)
+			ids, apiKey, err := st.GetAPIKeyByID(ctx, tokenID)
 			if err != nil {
 				if errors.IsNotFound(err) {
 					return errAPIKeyNotFound.WithCause(err)

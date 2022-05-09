@@ -139,7 +139,7 @@ func (is *IdentityServer) getGatewayAPIKey(ctx context.Context, req *ttnpb.GetGa
 	}
 
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
-		_, key, err = st.GetAPIKey(ctx, req.KeyId)
+		key, err = st.GetAPIKey(ctx, req.GetGatewayIds().GetEntityIdentifiers(), req.KeyId)
 		if err != nil {
 			return err
 		}
@@ -167,7 +167,7 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 	apiKey := req.GetApiKey()
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		if len(apiKey.Rights) > 0 {
-			_, key, err := st.GetAPIKey(ctx, apiKey.Id)
+			key, err := st.GetAPIKey(ctx, req.GetGatewayIds().GetEntityIdentifiers(), apiKey.Id)
 			if err != nil {
 				return err
 			}
