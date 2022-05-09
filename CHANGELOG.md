@@ -32,6 +32,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Support `app_eui` as alias for `join_eui` in CSV file import, per documentation.
 - CLI not allowing devices to be created or updated.
+- End device creation no longer errors on missing application info rights.
 
 ### Security
 
