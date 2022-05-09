@@ -292,7 +292,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       devAddr,
+					DevAddr:       devAddr.Bytes(),
 					LastNFCntDown: 41,
 					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
@@ -361,7 +361,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       devAddr.Bytes(),
 						LastNFCntDown: 41,
 						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
@@ -404,7 +404,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: devAddr,
+					DevAddr: devAddr.Bytes(),
 					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
 							Key: &nwkSEncKey,
@@ -480,7 +480,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
-						DevAddr: devAddr,
+						DevAddr: devAddr.Bytes(),
 						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
 								Key: &nwkSEncKey,
@@ -526,7 +526,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: devAddr,
+					DevAddr: devAddr.Bytes(),
 					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
 							Key: &nwkSEncKey,
@@ -606,7 +606,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
-						DevAddr: devAddr,
+						DevAddr: devAddr.Bytes(),
 						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
 								Key: &nwkSEncKey,
@@ -648,7 +648,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					}},
 				},
 				Session: &ttnpb.Session{
-					DevAddr: devAddr,
+					DevAddr: devAddr.Bytes(),
 					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
 							Key: &nwkSEncKey,
@@ -727,7 +727,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						}},
 					},
 					Session: &ttnpb.Session{
-						DevAddr: devAddr,
+						DevAddr: devAddr.Bytes(),
 						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
 								Key: &nwkSEncKey,
@@ -773,7 +773,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
-					DevAddr: devAddr,
+					DevAddr: devAddr.Bytes(),
 					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
 							Key: &nwkSEncKey,
@@ -857,7 +857,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						RxWindowsAvailable: true,
 					},
 					Session: &ttnpb.Session{
-						DevAddr: devAddr,
+						DevAddr: devAddr.Bytes(),
 						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
 								Key: &nwkSEncKey,
@@ -909,7 +909,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					},
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       devAddr,
+					DevAddr:       devAddr.Bytes(),
 					LastFCntUp:    99,
 					LastNFCntDown: 41,
 					Keys: &ttnpb.SessionKeys{
@@ -989,7 +989,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						},
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       devAddr.Bytes(),
 						LastFCntUp:    99,
 						LastNFCntDown: 41,
 						Keys: &ttnpb.SessionKeys{
@@ -1041,7 +1041,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 					},
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       devAddr,
+					DevAddr:       devAddr.Bytes(),
 					LastNFCntDown: 41,
 					Keys: &ttnpb.SessionKeys{
 						NwkSEncKey: &ttnpb.KeyEnvelope{
@@ -1119,7 +1119,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 						},
 					},
 					Session: &ttnpb.Session{
-						DevAddr:       devAddr,
+						DevAddr:       devAddr.Bytes(),
 						LastNFCntDown: 41,
 						Keys: &ttnpb.SessionKeys{
 							NwkSEncKey: &ttnpb.KeyEnvelope{
@@ -1250,7 +1250,7 @@ func generateSession() *ttnpb.Session {
 		}
 	}
 	return &ttnpb.Session{
-		DevAddr:                    types.DevAddr{0x26, 0x01, 0xff, 0xff},
+		DevAddr:                    types.DevAddr{0x26, 0x01, 0xff, 0xff}.Bytes(),
 		Keys:                       keys,
 		LastFCntUp:                 randomVal,
 		LastNFCntDown:              randomVal,

@@ -566,7 +566,7 @@ func WithDeviceDataUplinkConfig(dev *ttnpb.EndDevice, pending bool, drIdx ttnpb.
 	}
 	return func(conf DataUplinkConfig) DataUplinkConfig {
 		conf.MACVersion = macState.LorawanVersion
-		conf.DevAddr = session.DevAddr
+		conf.DevAddr = types.MustDevAddr(session.DevAddr).OrZero()
 		conf.FCnt = session.LastFCntUp + fCntDelta
 		conf.DataRate = internal.LoRaWANBands[test.FrequencyPlan(dev.FrequencyPlanId).BandID][dev.LorawanPhyVersion].DataRates[drIdx].Rate
 		conf.DataRateIndex = drIdx

@@ -305,7 +305,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				if netID == nil {
 					appSettings, err := getAppSettings()
 					if err == nil {
-						netID = appSettings.HomeNetId
+						netID = types.MustNetID(appSettings.HomeNetId)
 					} else if !errors.IsNotFound(err) {
 						return nil, nil, errLookupNetID.WithCause(err)
 					}
@@ -313,8 +313,8 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				if netID == nil {
 					return nil, nil, errNoNetID.New()
 				}
-				if !req.NetId.Equal(*netID) {
-					return nil, nil, errNetIDMismatch.WithAttributes("net_id", req.NetId)
+				if !types.MustNetID(req.NetId).OrZero().Equal(*netID) {
+					return nil, nil, errNetIDMismatch.WithAttributes("net_id", types.MustNetID(req.NetId).OrZero())
 				}
 				if err := externalAuth.RequireNetID(ctx, *netID); err != nil {
 					return nil, nil, err
@@ -385,10 +385,10 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			copy(jn[:], nb[1:])
 
 			b, err = lorawan.AppendJoinAcceptPayload(b, ttnpb.JoinAcceptPayload{
-				NetId:      req.NetId,
+				NetId:      types.MustNetID(req.NetId).OrZero(),
 				JoinNonce:  jn,
 				CfList:     req.CfList,
-				DevAddr:    req.DevAddr,
+				DevAddr:    types.MustDevAddr(req.DevAddr).OrZero(),
 				DlSettings: req.DownlinkSettings,
 				RxDelay:    req.RxDelay,
 			})
@@ -481,11 +481,11 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			if err != nil {
 				return nil, nil, errEncryptPayload.WithCause(err)
 			}
-			nwkSKeys, err := networkCryptoService.DeriveNwkSKeys(ctx, cryptoDev, req.SelectedMacVersion, jn, pld.DevNonce, req.NetId)
+			nwkSKeys, err := networkCryptoService.DeriveNwkSKeys(ctx, cryptoDev, req.SelectedMacVersion, jn, pld.DevNonce, types.MustNetID(req.NetId).OrZero())
 			if err != nil {
 				return nil, nil, errDeriveNwkSKeys.WithCause(err)
 			}
-			appSKey, err := applicationCryptoService.DeriveAppSKey(ctx, cryptoDev, req.SelectedMacVersion, jn, pld.DevNonce, req.NetId)
+			appSKey, err := applicationCryptoService.DeriveAppSKey(ctx, cryptoDev, req.SelectedMacVersion, jn, pld.DevNonce, types.MustNetID(req.NetId).OrZero())
 			if err != nil {
 				return nil, nil, errDeriveAppSKey.WithCause(err)
 			}
@@ -587,7 +587,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				DevAddr:   req.DevAddr,
 				Keys:      sk,
 			}
-			dev.Ids.DevAddr = &req.DevAddr
+			dev.Ids.DevAddr = types.MustDevAddr(req.DevAddr)
 			paths = append(paths, "session", "ids.dev_addr")
 
 			handled = true
@@ -619,7 +619,7 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 	}
 
 	if externalAuth, ok := authorizer.(ExternalAuthorizer); ok {
-		dev, err := js.devices.GetByEUI(ctx, req.JoinEui, req.DevEui,
+		dev, err := js.devices.GetByEUI(ctx, types.MustEUI64(req.JoinEui).OrZero(), types.MustEUI64(req.DevEui).OrZero(),
 			[]string{
 				"network_server_address",
 			},
@@ -641,7 +641,7 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 				"kek",
 			})
 			if err == nil {
-				netID = appSettings.HomeNetId
+				netID = types.MustNetID(appSettings.HomeNetId)
 			} else if !errors.IsNotFound(err) {
 				return nil, errLookupNetID.WithCause(err)
 			}
@@ -659,7 +659,7 @@ func (js *JoinServer) GetNwkSKeys(ctx context.Context, req *ttnpb.SessionKeyRequ
 		}
 	}
 
-	ks, err := js.keys.GetByID(ctx, req.JoinEui, req.DevEui, req.SessionKeyId,
+	ks, err := js.keys.GetByID(ctx, types.MustEUI64(req.JoinEui).OrZero(), types.MustEUI64(req.DevEui).OrZero(), req.SessionKeyId,
 		[]string{
 			"f_nwk_s_int_key",
 			"nwk_s_enc_key",
@@ -694,7 +694,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 	}
 
 	if externalAuth, ok := authorizer.(ExternalAuthorizer); ok {
-		dev, err := js.devices.GetByEUI(ctx, req.JoinEui, req.DevEui,
+		dev, err := js.devices.GetByEUI(ctx, types.MustEUI64(req.JoinEui).OrZero(), types.MustEUI64(req.DevEui).OrZero(),
 			[]string{
 				"application_server_address",
 				"application_server_id",
@@ -736,7 +736,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 		}
 	}
 	if appAuth, ok := authorizer.(ApplicationAccessAuthorizer); ok {
-		dev, err := js.devices.GetByEUI(ctx, req.JoinEui, req.DevEui, nil)
+		dev, err := js.devices.GetByEUI(ctx, types.MustEUI64(req.JoinEui).OrZero(), types.MustEUI64(req.DevEui).OrZero(), nil)
 		if err != nil {
 			return nil, errRegistryOperation.WithCause(err)
 		}
@@ -746,7 +746,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 		}
 	}
 
-	ks, err := js.keys.GetByID(ctx, req.JoinEui, req.DevEui, req.SessionKeyId,
+	ks, err := js.keys.GetByID(ctx, types.MustEUI64(req.JoinEui).OrZero(), types.MustEUI64(req.DevEui).OrZero(), req.SessionKeyId,
 		[]string{
 			"app_s_key",
 		},
@@ -803,7 +803,7 @@ func (js *JoinServer) GetHomeNetwork(ctx context.Context, joinEUI, devEUI types.
 			}
 			return nil, nil
 		}
-		netID = sets.HomeNetId
+		netID = types.MustNetID(sets.HomeNetId)
 	}
 	// TODO: Return NSID (https://github.com/TheThingsNetwork/lorawan-stack/issues/4741).
 	return &EndDeviceHomeNetwork{

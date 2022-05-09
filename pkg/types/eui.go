@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,17 +36,54 @@ type EUI64 [8]byte
 // IsZero returns true iff the type is zero.
 func (eui EUI64) IsZero() bool { return eui == [8]byte{} }
 
-// String implements the Stringer interface.
 func (eui EUI64) String() string { return strings.ToUpper(hex.EncodeToString(eui[:])) }
 
-// GoString implements the GoStringer interface.
 func (eui EUI64) GoString() string { return eui.String() }
 
-// Size implements the Sizer interface.
-func (eui EUI64) Size() int { return 8 }
+func (eui EUI64) Bytes() []byte {
+	b := make([]byte, 8)
+	copy(b, eui[:])
+	return b
+}
+
+// GetEUI64 gets a typed EUI64 from the bytes.
+// It returns nil, nil if b is nil.
+// It returns an error if unmarshaling fails.
+func GetEUI64(b []byte) (*EUI64, error) {
+	if b == nil {
+		return nil, nil
+	}
+	var t EUI64
+	if err := t.UnmarshalBinary(b); err != nil {
+		return nil, err
+	}
+	return &t, nil
+}
+
+// MustEUI64 returns a typed EUI64 from the bytes.
+// It returns nil if the bytes are empty.
+// It panics if unmarshaling results in an error.
+func MustEUI64(b []byte) *EUI64 {
+	t, err := GetEUI64(b)
+	if err != nil {
+		panic(err)
+	}
+	return t
+}
+
+// OrZero returns the EUI value, or a zero value if the EUI was nil.
+func (eui *EUI64) OrZero() EUI64 {
+	if eui != nil {
+		return *eui
+	}
+	return EUI64{}
+}
 
 // Equal returns true iff EUIs are equal.
 func (eui EUI64) Equal(other EUI64) bool { return eui == other }
+
+// Size implements the Sizer interface.
+func (eui EUI64) Size() int { return 8 }
 
 // Marshal implements the proto.Marshaler interface.
 func (eui EUI64) Marshal() ([]byte, error) { return eui.MarshalBinary() }
@@ -139,21 +176,54 @@ type EUI64Prefix struct {
 // IsZero returns true iff the type is zero.
 func (prefix EUI64Prefix) IsZero() bool { return prefix.Length == 0 }
 
-// String implements the Stringer interface.
-func (prefix EUI64Prefix) String() string {
-	return fmt.Sprintf("%s/%d", prefix.EUI64, prefix.Length)
-}
+func (prefix EUI64Prefix) String() string { return fmt.Sprintf("%s/%d", prefix.EUI64, prefix.Length) }
 
-// GoString implements the GoStringer interface.
 func (prefix EUI64Prefix) GoString() string { return prefix.String() }
 
-// Size implements the Sizer interface.
-func (prefix EUI64Prefix) Size() int { return 9 }
+func (prefix EUI64Prefix) Bytes() []byte {
+	return append(prefix.EUI64.Bytes(), prefix.Length)
+}
+
+// GetEUI64Prefix gets a typed EUI64Prefix from the bytes.
+// It returns nil, nil if b is nil.
+// It returns an error if unmarshaling fails.
+func GetEUI64Prefix(b []byte) (*EUI64Prefix, error) {
+	if b == nil {
+		return nil, nil
+	}
+	var t EUI64Prefix
+	if err := t.UnmarshalBinary(b); err != nil {
+		return nil, err
+	}
+	return &t, nil
+}
+
+// MustEUI64Prefix returns a typed EUI64Prefix from the bytes.
+// It returns nil if the bytes are empty.
+// It panics if unmarshaling results in an error.
+func MustEUI64Prefix(b []byte) *EUI64Prefix {
+	t, err := GetEUI64Prefix(b)
+	if err != nil {
+		panic(err)
+	}
+	return t
+}
+
+// OrZero returns the EUI prefix value, or a zero value if the EUI prefix was nil.
+func (prefix *EUI64Prefix) OrZero() EUI64Prefix {
+	if prefix != nil {
+		return *prefix
+	}
+	return EUI64Prefix{}
+}
 
 // Equal returns true iff prefixes are equal.
 func (prefix EUI64Prefix) Equal(other EUI64Prefix) bool {
 	return prefix.Length == other.Length && prefix.EUI64.Equal(other.EUI64)
 }
+
+// Size implements the Sizer interface.
+func (prefix EUI64Prefix) Size() int { return 9 }
 
 // MarshalTo implements the MarshalerTo function required by generated protobuf.
 func (prefix EUI64Prefix) MarshalTo(data []byte) (int, error) {
@@ -219,7 +289,7 @@ func (prefix *EUI64Prefix) UnmarshalBinary(data []byte) error {
 	if len(data) != 9 {
 		return errInvalidEUIPrefix.New()
 	}
-	if err := prefix.EUI64.Unmarshal(data[:8]); err != nil {
+	if err := prefix.EUI64.UnmarshalBinary(data[:8]); err != nil {
 		return err
 	}
 	prefix.Length = data[8]
@@ -303,7 +373,8 @@ func (eui EUI64) Copy(x *EUI64) *EUI64 {
 	return x
 }
 
-func GetEUI64(fs *pflag.FlagSet, name string) (value EUI64, set bool, err error) {
+// GetEUI64FromFlag gets an EUI64 from a named flag in the flag set.
+func GetEUI64FromFlag(fs *pflag.FlagSet, name string) (value EUI64, set bool, err error) {
 	flag := fs.Lookup(name)
 	if flag == nil {
 		return EUI64{}, false, &flagsplugin.ErrFlagNotFound{FlagName: name}
@@ -318,7 +389,8 @@ func GetEUI64(fs *pflag.FlagSet, name string) (value EUI64, set bool, err error)
 	return eui64, flag.Changed, nil
 }
 
-func GetEUI64Slice(fs *pflag.FlagSet, name string) (value []EUI64, set bool, err error) {
+// GetEUI64SliceFromFlag gets an EUI64 slice from a named flag in the flag set.
+func GetEUI64SliceFromFlag(fs *pflag.FlagSet, name string) (value []EUI64, set bool, err error) {
 	flag := fs.Lookup(name)
 	if flag == nil {
 		return nil, false, &flagsplugin.ErrFlagNotFound{FlagName: name}
@@ -334,7 +406,8 @@ func GetEUI64Slice(fs *pflag.FlagSet, name string) (value []EUI64, set bool, err
 	return value, flag.Changed, nil
 }
 
-func GetEUI64PrefixSlice(fs *pflag.FlagSet, name string) (value []EUI64Prefix, set bool, err error) {
+// GetEUI64PrefixSliceFromFlag gets an EUI64 prefix slice from a named flag in the flag set.
+func GetEUI64PrefixSliceFromFlag(fs *pflag.FlagSet, name string) (value []EUI64Prefix, set bool, err error) {
 	flag := fs.Lookup(name)
 	if flag == nil {
 		return nil, false, &flagsplugin.ErrFlagNotFound{FlagName: name}

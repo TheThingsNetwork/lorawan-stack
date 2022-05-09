@@ -29,7 +29,7 @@ var (
 	baseSessionKeys = ttnpb.SessionKeys{}
 
 	baseSession = ttnpb.Session{
-		DevAddr: DefaultDevAddr,
+		DevAddr: DefaultDevAddr.Bytes(),
 		Keys:    &baseSessionKeys,
 	}
 

@@ -53,9 +53,9 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 
 	req := &ttnpb.JoinRequest{
 		RawPayload:         in.PHYPayload,
-		DevAddr:            types.DevAddr(in.DevAddr),
+		DevAddr:            types.DevAddr(in.DevAddr).Bytes(),
 		SelectedMacVersion: ttnpb.MACVersion(in.MACVersion),
-		NetId:              types.NetID(in.SenderID),
+		NetId:              types.NetID(in.SenderID).Bytes(),
 		DownlinkSettings:   dlSettings,
 		RxDelay:            in.RxDelay,
 		CfList:             cfList,
@@ -165,8 +165,8 @@ func (srv interopServer) AppSKeyRequest(ctx context.Context, in *interop.AppSKey
 	ctx = log.NewContextWithField(ctx, "namespace", "joinserver/interop")
 
 	req := &ttnpb.SessionKeyRequest{
-		JoinEui:      types.EUI64(in.ReceiverID),
-		DevEui:       types.EUI64(in.DevEUI),
+		JoinEui:      types.EUI64(in.ReceiverID).Bytes(),
+		DevEui:       types.EUI64(in.DevEUI).Bytes(),
 		SessionKeyId: in.SessionKeyID,
 	}
 	if err := req.ValidateFields(

@@ -16,6 +16,7 @@ syntax = "proto3";
 
 import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
+import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
 import "github.com/TheThingsIndustries/protoc-gen-go-flags/annotations.proto";
 import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
@@ -112,7 +113,13 @@ message Applications {
 }
 
 message IssueDevEUIResponse {
-  bytes dev_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+  bytes dev_eui = 1 [
+    (validate.rules).bytes = { len: 8, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+    }
+  ];
 }
 
 message GetApplicationRequest {

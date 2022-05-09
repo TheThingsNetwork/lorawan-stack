@@ -69,10 +69,20 @@ func TestTypes(t *testing.T) {
 			a.So(string(text), should.Equal, sub.String())
 			a.So(string(text), should.Equal, sub.GoString())
 
-			// MarshalBinary, Size
+			// UnmarshalText
+			err = sub.UnmarshalText(text)
+			a.So(err, should.BeNil)
+			a.So(sub.String(), should.Equal, string(text))
+
+			// MarshalBinary, Bytes
 			bytes, err := sub.MarshalBinary()
 			a.So(err, should.BeNil)
-			a.So(bytes, should.HaveLength, sub.Size())
+			a.So(bytes, should.Resemble, sub.Bytes())
+
+			// UnmarshalBinary
+			err = sub.UnmarshalBinary(bytes)
+			a.So(err, should.BeNil)
+			a.So(sub.String(), should.Equal, string(text))
 
 			// MarshalJSON
 			json, err := sub.MarshalJSON()
@@ -95,16 +105,6 @@ func TestTypes(t *testing.T) {
 
 			// UnmarshalJSON
 			err = sub.UnmarshalJSON(json)
-			a.So(err, should.BeNil)
-			a.So(sub.String(), should.Equal, string(text))
-
-			// UnmarshalBinary
-			err = sub.UnmarshalBinary(marshaled)
-			a.So(err, should.BeNil)
-			a.So(sub.String(), should.Equal, string(text))
-
-			// UnmarshalText
-			err = sub.UnmarshalText(text)
 			a.So(err, should.BeNil)
 			a.So(sub.String(), should.Equal, string(text))
 		})
@@ -138,7 +138,7 @@ func TestTypes(t *testing.T) {
 			err = sub.UnmarshalText([]byte(strings.Repeat("foo", 32)))
 			a.So(err, should.NotBeNil)
 
-			// Invalid hesx
+			// Invalid hex
 			err = sub.UnmarshalText([]byte(strings.Repeat("zz", 2)))
 			a.So(err, should.NotBeNil)
 			err = sub.UnmarshalText([]byte(strings.Repeat("zz", 3)))

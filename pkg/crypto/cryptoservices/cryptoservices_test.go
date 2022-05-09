@@ -394,7 +394,9 @@ func (s *mockNetworkRPCServer) JoinAcceptMIC(ctx context.Context, req *ttnpb.Joi
 	dev := &ttnpb.EndDevice{
 		Ids: req.PayloadRequest.Ids,
 	}
-	mic, err := s.Network.JoinAcceptMIC(ctx, dev, req.PayloadRequest.LorawanVersion, byte(req.JoinRequestType), req.DevNonce, req.PayloadRequest.Payload)
+	mic, err := s.Network.JoinAcceptMIC(ctx, dev, req.PayloadRequest.LorawanVersion, byte(req.JoinRequestType),
+		types.MustDevNonce(req.DevNonce).OrZero(), req.PayloadRequest.Payload,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -433,7 +435,9 @@ func (s *mockNetworkRPCServer) DeriveNwkSKeys(ctx context.Context, req *ttnpb.De
 	dev := &ttnpb.EndDevice{
 		Ids: req.Ids,
 	}
-	nwkSKeys, err := s.Network.DeriveNwkSKeys(ctx, dev, req.LorawanVersion, req.JoinNonce, req.DevNonce, req.NetId)
+	nwkSKeys, err := s.Network.DeriveNwkSKeys(ctx, dev, req.LorawanVersion, types.MustJoinNonce(req.JoinNonce).OrZero(),
+		types.MustDevNonce(req.DevNonce).OrZero(), types.MustNetID(req.NetId).OrZero(),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -476,7 +480,9 @@ func (s *mockApplicationRPCServer) DeriveAppSKey(ctx context.Context, req *ttnpb
 	dev := &ttnpb.EndDevice{
 		Ids: req.Ids,
 	}
-	appSKey, err := s.Application.DeriveAppSKey(ctx, dev, req.LorawanVersion, req.JoinNonce, req.DevNonce, req.NetId)
+	appSKey, err := s.Application.DeriveAppSKey(ctx, dev, req.LorawanVersion, types.MustJoinNonce(req.JoinNonce).OrZero(),
+		types.MustDevNonce(req.DevNonce).OrZero(), types.MustNetID(req.NetId).OrZero(),
+	)
 	if err != nil {
 		return nil, err
 	}

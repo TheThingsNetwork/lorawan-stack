@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,11 @@ package types
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/hex"
+	"strings"
 
+	"github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 )
 
@@ -27,6 +30,7 @@ type Interface interface {
 	IsZero() bool
 	String() string
 	GoString() string
+	Bytes() []byte
 	Size() int
 	Marshal() ([]byte, error)
 	MarshalTo(data []byte) (int, error)
@@ -110,3 +114,56 @@ func unmarshalBinaryBytes(dst, data []byte) error {
 	}
 	return nil
 }
+
+// MarshalHEXBytes marshals bytes to JSON as HEX.
+func MarshalHEXBytes(s *jsonplugin.MarshalState, b []byte) {
+	s.WriteString(strings.ToUpper(hex.EncodeToString(b)))
+}
+
+var base64Replacer = strings.NewReplacer("_", "/", "-", "+")
+
+// unmarshalNBytes unmarshals N bytes from JSON. For n > 1, it accepts both hex and base64 encoding.
+func unmarshalNBytes(s *jsonplugin.UnmarshalState, n int) []byte {
+	enc := s.ReadString()
+	if s.Err() != nil {
+		return nil
+	}
+	trimmed := strings.TrimSuffix(enc, "=")
+	switch len(trimmed) {
+	case 0:
+		b := make([]byte, n)
+		return b
+	case hex.EncodedLen(n):
+		b, err := hex.DecodeString(trimmed)
+		if err != nil {
+			s.SetError(err)
+			return nil
+		}
+		return b
+	case base64.RawStdEncoding.EncodedLen(n):
+		b, err := base64.RawStdEncoding.DecodeString(base64Replacer.Replace(trimmed))
+		if err != nil {
+			s.SetError(err)
+			return nil
+		}
+		return b
+	default:
+		s.SetError(errInvalidLength.WithAttributes("want", n, "got", len(enc)))
+		return nil
+	}
+}
+
+// Unmarshal2Bytes unmarshals 2 bytes from JSON. It accepts both hex and base64 encoding.
+func Unmarshal2Bytes(s *jsonplugin.UnmarshalState) []byte { return unmarshalNBytes(s, 2) }
+
+// Unmarshal3Bytes unmarshals 3 bytes from JSON. It accepts both hex and base64 encoding.
+func Unmarshal3Bytes(s *jsonplugin.UnmarshalState) []byte { return unmarshalNBytes(s, 3) }
+
+// Unmarshal4Bytes unmarshals 4 bytes from JSON. It accepts both hex and base64 encoding.
+func Unmarshal4Bytes(s *jsonplugin.UnmarshalState) []byte { return unmarshalNBytes(s, 4) }
+
+// Unmarshal8Bytes unmarshals 8 bytes from JSON. It accepts both hex and base64 encoding.
+func Unmarshal8Bytes(s *jsonplugin.UnmarshalState) []byte { return unmarshalNBytes(s, 8) }
+
+// Unmarshal16Bytes unmarshals 16 bytes from JSON. It accepts both hex and base64 encoding.
+func Unmarshal16Bytes(s *jsonplugin.UnmarshalState) []byte { return unmarshalNBytes(s, 16) }

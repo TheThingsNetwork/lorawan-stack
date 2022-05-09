@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
-)
+import fmt "fmt"
 
 func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -51,8 +48,7 @@ func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
 			if src != nil {
 				dst.DevAddr = src.DevAddr
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.DevAddr
-				dst.DevAddr = zero
+				dst.DevAddr = nil
 			}
 		case "selected_mac_version":
 			if len(subs) > 0 {
@@ -71,8 +67,7 @@ func (dst *JoinRequest) SetFields(src *JoinRequest, paths ...string) error {
 			if src != nil {
 				dst.NetId = src.NetId
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.NetID
-				dst.NetId = zero
+				dst.NetId = nil
 			}
 		case "downlink_settings":
 			if len(subs) > 0 {

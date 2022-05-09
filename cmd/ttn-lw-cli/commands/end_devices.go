@@ -414,7 +414,7 @@ var (
 					}
 					device.Ids.DevAddr = devAddrRes.DevAddr
 					device.Session = &ttnpb.Session{
-						DevAddr: *devAddrRes.DevAddr,
+						DevAddr: devAddrRes.DevAddr.Bytes(),
 						Keys: &ttnpb.SessionKeys{
 							FNwkSIntKey: &ttnpb.KeyEnvelope{Key: generateKey()},
 							AppSKey:     &ttnpb.KeyEnvelope{Key: generateKey()},
@@ -464,13 +464,13 @@ var (
 							if err != nil {
 								return err
 							}
-							defaultJoinEUI, err := ttnpb.NewJsClient(js).GetDefaultJoinEUI(ctx, ttnpb.Empty)
+							res, err := ttnpb.NewJsClient(js).GetDefaultJoinEUI(ctx, ttnpb.Empty)
 							if err != nil {
 								return err
 							}
-							logger.WithField("default_join_eui", defaultJoinEUI.JoinEui.String()).
-								Info("Successfully obtained Join Server's default JoinEUI")
-							device.Ids.JoinEui = defaultJoinEUI.JoinEui
+							joinEUI := types.MustEUI64(res.JoinEui)
+							logger.WithField("default_join_eui", joinEUI).Info("Successfully obtained Join Server's default JoinEUI")
+							device.Ids.JoinEui = joinEUI
 						}
 					}
 				}
@@ -561,9 +561,10 @@ var (
 				if err != nil {
 					return err
 				}
-				logger.WithField("dev_eui", devEUIResponse.DevEui.String()).
+				devEUI := types.MustEUI64(devEUIResponse.DevEui).OrZero()
+				logger.WithField("dev_eui", devEUI.String()).
 					Info("Successfully obtained DevEUI")
-				device.Ids.DevEui = &devEUIResponse.DevEui
+				device.Ids.DevEui = &devEUI
 			}
 			newPaths, err := parsePayloadFormatterParameterFlags("formatters", device.Formatters, cmd.Flags())
 			if err != nil {
@@ -834,7 +835,7 @@ var (
 			}
 			if inputDecoder != nil {
 				list := &ttnpb.ProvisionEndDevicesRequest_IdentifiersList{
-					JoinEui: &joinEUI,
+					JoinEui: joinEUI.Bytes(),
 				}
 				for {
 					var ids ttnpb.EndDeviceIdentifiers
@@ -859,14 +860,14 @@ var (
 					}
 					req.EndDevices = &ttnpb.ProvisionEndDevicesRequest_Range{
 						Range: &ttnpb.ProvisionEndDevicesRequest_IdentifiersRange{
-							StartDevEui: startDevEUI,
-							JoinEui:     &joinEUI,
+							StartDevEui: startDevEUI.Bytes(),
+							JoinEui:     joinEUI.Bytes(),
 						},
 					}
 				} else {
 					req.EndDevices = &ttnpb.ProvisionEndDevicesRequest_FromData{
 						FromData: &ttnpb.ProvisionEndDevicesRequest_IdentifiersFromData{
-							JoinEui: &joinEUI,
+							JoinEui: joinEUI.Bytes(),
 						},
 					}
 				}

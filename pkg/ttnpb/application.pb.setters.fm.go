@@ -2,10 +2,7 @@
 
 package ttnpb
 
-import (
-	fmt "fmt"
-	go_thethings_network_lorawan_stack_v3_pkg_types "go.thethings.network/lorawan-stack/v3/pkg/types"
-)
+import fmt "fmt"
 
 func (dst *Application) SetFields(src *Application, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
@@ -228,8 +225,7 @@ func (dst *IssueDevEUIResponse) SetFields(src *IssueDevEUIResponse, paths ...str
 			if src != nil {
 				dst.DevEui = src.DevEui
 			} else {
-				var zero go_thethings_network_lorawan_stack_v3_pkg_types.EUI64
-				dst.DevEui = zero
+				dst.DevEui = nil
 			}
 
 		default:

@@ -44,8 +44,8 @@ func HandleRekeyInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCom
 	if !dev.SupportsJoin {
 		return evs, nil
 	}
-	if dev.PendingSession != nil && dev.MacState.PendingJoinRequest != nil && dev.PendingSession.DevAddr == devAddr {
-		dev.Ids.DevAddr = &dev.PendingSession.DevAddr
+	if dev.PendingSession != nil && dev.MacState.PendingJoinRequest != nil && types.MustDevAddr(dev.PendingSession.DevAddr).OrZero().Equal(devAddr) {
+		dev.Ids.DevAddr = types.MustDevAddr(dev.PendingSession.DevAddr)
 		dev.Session = dev.PendingSession
 	}
 	dev.MacState.LorawanVersion = ttnpb.MACVersion_MAC_V1_1

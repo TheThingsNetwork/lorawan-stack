@@ -248,7 +248,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 	_, ctx := test.New(t)
 	pingAt, ok := mac.NextPingSlotAt(ctx, &ttnpb.EndDevice{
 		Session: &ttnpb.Session{
-			DevAddr: test.DefaultDevAddr,
+			DevAddr: test.DefaultDevAddr.Bytes(),
 		},
 		MacState: &ttnpb.MACState{
 			PingSlotPeriodicity: pingSlotPeriodicity,
@@ -395,7 +395,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					},
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastNFCntDown: 0x24,
 					Keys:          sessionKeys,
 				},
@@ -426,7 +426,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					},
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastNFCntDown: 0x24,
 					Keys:          sessionKeys,
 				},
@@ -510,7 +510,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastNFCntDown: 0x24,
 					Keys:          sessionKeys,
 				},
@@ -559,7 +559,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastNFCntDown: 0x24,
 					Keys:          sessionKeys,
 				},
@@ -608,7 +608,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastNFCntDown: 0x24,
 					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -693,7 +693,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastNFCntDown: 0x24,
 					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -774,7 +774,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastNFCntDown: 0x24,
 					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -925,7 +925,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastNFCntDown: 0x24,
 					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -1086,7 +1086,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastNFCntDown: 0x24,
 					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -1241,7 +1241,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastNFCntDown: 0x24,
 					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -1395,7 +1395,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					},
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastNFCntDown: 0x24,
 					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -1547,7 +1547,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastNFCntDown: 0x24,
 					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -1710,7 +1710,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastNFCntDown: 0x24,
 					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -1839,7 +1839,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastNFCntDown: 0x24,
 					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -1976,7 +1976,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					},
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastNFCntDown: 0x24,
 					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -2136,7 +2136,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					},
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastNFCntDown: 0x24,
 					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -2279,7 +2279,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastNFCntDown: 0x24,
 					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -2341,7 +2341,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					RxWindowsAvailable: true,
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastNFCntDown: 0x24,
 					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -2424,7 +2424,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					},
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastNFCntDown: 0x24,
 					Keys:          sessionKeys,
 					QueuedApplicationDownlinks: []*ttnpb.ApplicationDownlink{
@@ -2484,7 +2484,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 					expected.PendingMacState.RxWindowsAvailable = false
 					expected.PendingMacState.PendingJoinRequest = created.PendingMacState.QueuedJoinAccept.Request
 					expected.PendingSession = &ttnpb.Session{
-						DevAddr: created.PendingMacState.QueuedJoinAccept.DevAddr,
+						DevAddr: created.PendingMacState.QueuedJoinAccept.DevAddr.Bytes(),
 						Keys:    created.PendingMacState.QueuedJoinAccept.Keys,
 					}
 					expected.PendingMacState.QueuedJoinAccept = nil

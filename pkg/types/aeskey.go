@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,11 @@ package types
 
 import (
 	"encoding/hex"
+	"fmt"
 	"strings"
 
 	"github.com/TheThingsIndustries/protoc-gen-go-flags/flagsplugin"
+	"github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
 	"github.com/spf13/pflag"
 	"github.com/vmihailenco/msgpack/v5"
 	"go.thethings.network/lorawan-stack/v3/cmd/ttn-lw-cli/customflags"
@@ -33,17 +35,54 @@ type AES128Key [16]byte
 // IsZero returns true iff the type is zero.
 func (key *AES128Key) IsZero() bool { return key == nil || *key == [16]byte{} }
 
-// String implements the Stringer interface.
 func (key AES128Key) String() string { return strings.ToUpper(hex.EncodeToString(key[:])) }
 
-// GoString implements the GoStringer interface.
 func (key AES128Key) GoString() string { return key.String() }
 
-// Size implements the Sizer interface.
-func (key AES128Key) Size() int { return 16 }
+func (key AES128Key) Bytes() []byte {
+	b := make([]byte, 16)
+	copy(b, key[:])
+	return b
+}
+
+// GetAES128Key gets a typed AES128Key from the bytes.
+// It returns nil, nil if b is nil.
+// It returns an error if unmarshaling fails.
+func GetAES128Key(b []byte) (*AES128Key, error) {
+	if b == nil {
+		return nil, nil
+	}
+	var t AES128Key
+	if err := t.UnmarshalBinary(b); err != nil {
+		return nil, err
+	}
+	return &t, nil
+}
+
+// MustAES128Key returns a typed AES128Key from the bytes.
+// It returns nil if the bytes are empty.
+// It panics if unmarshaling results in an error.
+func MustAES128Key(b []byte) *AES128Key {
+	t, err := GetAES128Key(b)
+	if err != nil {
+		panic(err)
+	}
+	return t
+}
+
+// OrZero returns the key value, or a zero value if the key was nil.
+func (key *AES128Key) OrZero() AES128Key {
+	if key != nil {
+		return *key
+	}
+	return AES128Key{}
+}
 
 // Equal returns true iff keys are equal.
 func (key AES128Key) Equal(other AES128Key) bool { return key == other }
+
+// Size implements the Sizer interface.
+func (key AES128Key) Size() int { return 16 }
 
 // Marshal implements the proto.Marshaler interface.
 func (key AES128Key) Marshal() ([]byte, error) { return key.MarshalBinary() }
@@ -64,6 +103,30 @@ func (key *AES128Key) UnmarshalJSON(data []byte) error {
 		return errInvalidAESKey.WithCause(err)
 	}
 	return nil
+}
+
+// MarshalProtoJSON implements the jsonplugin.Marshaler interface.
+func (key *AES128Key) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if key == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteString(fmt.Sprintf("%X", key[:]))
+}
+
+// UnmarshalProtoJSON implements the jsonplugin.Unmarshaler interface.
+func (key *AES128Key) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	*key = [16]byte{}
+	b, err := hex.DecodeString(s.ReadString())
+	if err != nil {
+		s.SetError(err)
+		return
+	}
+	if len(b) != 16 {
+		s.SetError(errInvalidDevAddr.WithCause(errInvalidLength.WithAttributes("want", 16, "got", len(b))))
+		return
+	}
+	copy(key[:], b)
 }
 
 // MarshalBinary implements the encoding.BinaryMarshaler interface.
@@ -112,7 +175,8 @@ func (key *AES128Key) DecodeMsgpack(dec *msgpack.Decoder) error {
 	return nil
 }
 
-func GetAES128Key(fs *pflag.FlagSet, name string) (value AES128Key, set bool, err error) {
+// GetAES128KeyFromFlag gets an AES128Key from a named flag in the flag set.
+func GetAES128KeyFromFlag(fs *pflag.FlagSet, name string) (value AES128Key, set bool, err error) {
 	flag := fs.Lookup(name)
 	if flag == nil {
 		return AES128Key{}, false, &flagsplugin.ErrFlagNotFound{FlagName: name}

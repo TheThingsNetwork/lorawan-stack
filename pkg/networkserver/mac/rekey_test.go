@@ -52,7 +52,7 @@ func TestHandleRekeyInd(t *testing.T) {
 				SupportsJoin: true,
 				Ids:          &ttnpb.EndDeviceIdentifiers{},
 				PendingSession: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastFCntUp:    42,
 					LastNFCntDown: 43,
 				},
@@ -68,7 +68,7 @@ func TestHandleRekeyInd(t *testing.T) {
 					DevAddr: &test.DefaultDevAddr,
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastFCntUp:    42,
 					LastNFCntDown: 43,
 				},
@@ -101,12 +101,12 @@ func TestHandleRekeyInd(t *testing.T) {
 					DevAddr: &test.DefaultDevAddr,
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastFCntUp:    42,
 					LastNFCntDown: 43,
 				},
 				PendingSession: &ttnpb.Session{
-					DevAddr:       types.DevAddr{0x23, 0x23, 0x11, 0x42},
+					DevAddr:       types.DevAddr{0x23, 0x23, 0x11, 0x42}.Bytes(),
 					LastFCntUp:    101,
 					LastNFCntDown: 2,
 				},
@@ -122,7 +122,7 @@ func TestHandleRekeyInd(t *testing.T) {
 					DevAddr: &test.DefaultDevAddr,
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastFCntUp:    42,
 					LastNFCntDown: 43,
 				},
@@ -155,7 +155,7 @@ func TestHandleRekeyInd(t *testing.T) {
 					DevAddr: &test.DefaultDevAddr,
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastFCntUp:    42,
 					LastNFCntDown: 43,
 				},
@@ -167,7 +167,7 @@ func TestHandleRekeyInd(t *testing.T) {
 					DevAddr: &test.DefaultDevAddr,
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastFCntUp:    42,
 					LastNFCntDown: 43,
 				},
@@ -198,7 +198,7 @@ func TestHandleRekeyInd(t *testing.T) {
 				SupportsJoin: true,
 				Ids:          &ttnpb.EndDeviceIdentifiers{},
 				PendingSession: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastFCntUp:    42,
 					LastNFCntDown: 43,
 				},
@@ -218,7 +218,7 @@ func TestHandleRekeyInd(t *testing.T) {
 					DevAddr: &test.DefaultDevAddr,
 				},
 				Session: &ttnpb.Session{
-					DevAddr:       test.DefaultDevAddr,
+					DevAddr:       test.DefaultDevAddr.Bytes(),
 					LastFCntUp:    42,
 					LastNFCntDown: 43,
 				},

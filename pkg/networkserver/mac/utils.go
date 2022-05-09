@@ -29,6 +29,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 func channelDataRateRange(chs ...*ttnpb.MACParameters_Channel) (min, max ttnpb.DataRateIndex, ok bool) {
@@ -106,7 +107,7 @@ func beaconTimeBefore(t time.Time) time.Duration {
 // NextPingSlotAt returns the exact time instant before or at earliestAt when next ping slot can be open
 // given the data known by Network Server and true, if such time instant exists, otherwise it returns time.Time{} and false.
 func NextPingSlotAt(ctx context.Context, dev *ttnpb.EndDevice, earliestAt time.Time) (time.Time, bool) {
-	if dev.GetSession() == nil || dev.Session.DevAddr.IsZero() || dev.GetMacState() == nil || dev.MacState.PingSlotPeriodicity == nil {
+	if dev.GetSession() == nil || types.MustDevAddr(dev.Session.DevAddr).OrZero().IsZero() || dev.GetMacState() == nil || dev.MacState.PingSlotPeriodicity == nil {
 		log.FromContext(ctx).Warn("Insufficient data to compute next ping slot")
 		return time.Time{}, false
 	}
@@ -114,7 +115,7 @@ func NextPingSlotAt(ctx context.Context, dev *ttnpb.EndDevice, earliestAt time.T
 	pingNb := uint16(1 << (7 - dev.MacState.PingSlotPeriodicity.Value))
 	pingPeriod := uint16(1 << (5 + dev.MacState.PingSlotPeriodicity.Value))
 	for beaconTime := beaconTimeBefore(earliestAt); beaconTime < math.MaxInt64; beaconTime += BeaconPeriod {
-		pingOffset, err := crypto.ComputePingOffset(uint32(beaconTime/time.Second), dev.Session.DevAddr, pingPeriod)
+		pingOffset, err := crypto.ComputePingOffset(uint32(beaconTime/time.Second), types.MustDevAddr(dev.Session.DevAddr).OrZero(), pingPeriod)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Error("Failed to compute ping offset")
 			return time.Time{}, false

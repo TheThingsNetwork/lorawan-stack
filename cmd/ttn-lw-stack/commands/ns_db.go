@@ -165,7 +165,7 @@ var (
 							}
 							p := tx.TxPipeline()
 							defer p.Close()
-							if dev.Session != nil && dev.Session.DevAddr.Equal(devAddr) {
+							if dev.Session != nil && types.MustDevAddr(dev.Session.DevAddr).OrZero().Equal(devAddr) {
 								if dev.MacState == nil {
 									logger.Error("Device is missing MAC state, skip migrating current session")
 								} else {
@@ -180,7 +180,7 @@ var (
 									p.HSet(ctx, currentFieldKey, uid, b)
 								}
 							}
-							if dev.PendingSession != nil && dev.PendingSession.DevAddr.Equal(devAddr) {
+							if dev.PendingSession != nil && types.MustDevAddr(dev.PendingSession.DevAddr).OrZero().Equal(devAddr) {
 								if dev.PendingMacState == nil {
 									logger.Error("Device is missing MAC state, skip migrating pending session")
 								} else {

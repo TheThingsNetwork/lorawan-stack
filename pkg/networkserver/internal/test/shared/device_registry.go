@@ -273,7 +273,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 			DeviceId:       "test-dev",
 		},
 		Session: &ttnpb.Session{
-			DevAddr:    types.DevAddr{0x42, 0xff, 0xff, 0xff},
+			DevAddr:    types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 			LastFCntUp: 41,
 			Keys: &ttnpb.SessionKeys{
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
@@ -283,7 +283,7 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 		},
 		MacState: MakeDefaultEU868MACState(ttnpb.Class_CLASS_A, ttnpb.MACVersion_MAC_V1_0_3, ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 		PendingSession: &ttnpb.Session{
-			DevAddr: types.DevAddr{0x43, 0xff, 0xff, 0xff},
+			DevAddr: types.DevAddr{0x43, 0xff, 0xff, 0xff}.Bytes(),
 			Keys: &ttnpb.SessionKeys{
 				FNwkSIntKey: &ttnpb.KeyEnvelope{
 					EncryptedKey: []byte{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe},

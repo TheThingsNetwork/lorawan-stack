@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,17 +42,52 @@ var MaxDevAddr = DevAddr{0xFF, 0xFF, 0xFF, 0xFF}
 // IsZero returns true iff the type is zero.
 func (addr DevAddr) IsZero() bool { return addr == [4]byte{} }
 
-// String implements the Stringer interface.
-func (addr DevAddr) String() string { return strings.ToUpper(hex.EncodeToString(addr[:])) }
-
-// GoString implements the GoStringer interface.
+func (addr DevAddr) String() string   { return strings.ToUpper(hex.EncodeToString(addr[:])) }
 func (addr DevAddr) GoString() string { return addr.String() }
+func (addr DevAddr) Bytes() []byte {
+	b := make([]byte, 4)
+	copy(b, addr[:])
+	return b
+}
 
-// Size implements the Sizer interface.
-func (addr DevAddr) Size() int { return 4 }
+// GetDevAddr gets a typed DevAddr from the bytes.
+// It returns nil, nil if b is nil.
+// It returns an error if unmarshaling fails.
+func GetDevAddr(b []byte) (*DevAddr, error) {
+	if b == nil {
+		return nil, nil
+	}
+	var t DevAddr
+	if err := t.UnmarshalBinary(b); err != nil {
+		return nil, err
+	}
+	return &t, nil
+}
+
+// MustDevAddr returns a typed DevAddr from the bytes.
+// It returns nil if the bytes are empty.
+// It panics if unmarshaling results in an error.
+func MustDevAddr(b []byte) *DevAddr {
+	t, err := GetDevAddr(b)
+	if err != nil {
+		panic(err)
+	}
+	return t
+}
+
+// OrZero returns the DevAddr value, or a zero value if the DevAddr was nil.
+func (addr *DevAddr) OrZero() DevAddr {
+	if addr != nil {
+		return *addr
+	}
+	return DevAddr{}
+}
 
 // Equal returns true iff addresses are equal.
 func (addr DevAddr) Equal(other DevAddr) bool { return addr == other }
+
+// Size implements the Sizer interface.
+func (addr DevAddr) Size() int { return 4 }
 
 // Marshal implements the proto.Marshaler interface.
 func (addr DevAddr) Marshal() ([]byte, error) { return addr.MarshalBinary() }
@@ -291,21 +326,56 @@ type DevAddrPrefix struct {
 // IsZero returns true iff the type is zero.
 func (prefix DevAddrPrefix) IsZero() bool { return prefix.Length == 0 }
 
-// String implements the Stringer interface.
 func (prefix DevAddrPrefix) String() string {
 	return fmt.Sprintf("%s/%d", prefix.DevAddr, prefix.Length)
 }
 
-// GoString implements the GoStringer interface.
 func (prefix DevAddrPrefix) GoString() string { return prefix.String() }
 
-// Size implements the Sizer interface.
-func (prefix DevAddrPrefix) Size() int { return 5 }
+func (prefix DevAddrPrefix) Bytes() []byte {
+	return append(prefix.DevAddr.Bytes(), prefix.Length)
+}
+
+// GetDevAddrPrefix gets a typed DevAddrPrefix from the bytes.
+// It returns nil, nil if b is nil.
+// It returns an error if unmarshaling fails.
+func GetDevAddrPrefix(b []byte) (*DevAddrPrefix, error) {
+	if b == nil {
+		return nil, nil
+	}
+	var t DevAddrPrefix
+	if err := t.UnmarshalBinary(b); err != nil {
+		return nil, err
+	}
+	return &t, nil
+}
+
+// MustDevAddrPrefix returns a typed DevAddrPrefix from the bytes.
+// It returns nil if the bytes are empty.
+// It panics if unmarshaling results in an error.
+func MustDevAddrPrefix(b []byte) *DevAddrPrefix {
+	t, err := GetDevAddrPrefix(b)
+	if err != nil {
+		panic(err)
+	}
+	return t
+}
+
+// OrZero returns the DevAddr prefix value, or a zero value if the DevAddr prefix was nil.
+func (prefix *DevAddrPrefix) OrZero() DevAddrPrefix {
+	if prefix != nil {
+		return *prefix
+	}
+	return DevAddrPrefix{}
+}
 
 // Equal returns true iff prefixes are equal.
 func (prefix DevAddrPrefix) Equal(other DevAddrPrefix) bool {
 	return prefix.Length == other.Length && prefix.DevAddr.Equal(other.DevAddr)
 }
+
+// Size implements the Sizer interface.
+func (prefix DevAddrPrefix) Size() int { return 5 }
 
 // MarshalTo implements the MarshalerTo function required by generated protobuf.
 func (prefix DevAddrPrefix) MarshalTo(data []byte) (int, error) {
@@ -372,7 +442,7 @@ func (prefix *DevAddrPrefix) UnmarshalBinary(data []byte) error {
 	if len(data) != 5 {
 		return errInvalidDevAddrPrefix.New()
 	}
-	if err := prefix.DevAddr.Unmarshal(data[:4]); err != nil {
+	if err := prefix.DevAddr.UnmarshalBinary(data[:4]); err != nil {
 		return err
 	}
 	prefix.Length = data[4]
@@ -456,7 +526,8 @@ func (addr DevAddr) Copy(x *DevAddr) *DevAddr {
 	return x
 }
 
-func GetDevAddr(fs *pflag.FlagSet, name string) (value DevAddr, set bool, err error) {
+// GetDevAddrFromFlag gets a DevAddr from a named flag in the flag set.
+func GetDevAddrFromFlag(fs *pflag.FlagSet, name string) (value DevAddr, set bool, err error) {
 	flag := fs.Lookup(name)
 	var devAddr DevAddr
 	if flag == nil {
@@ -471,7 +542,8 @@ func GetDevAddr(fs *pflag.FlagSet, name string) (value DevAddr, set bool, err er
 	return devAddr, flag.Changed, nil
 }
 
-func GetDevAddrPrefixSlice(fs *pflag.FlagSet, name string) (value []DevAddrPrefix, set bool, err error) {
+// GetDevAddrPrefixSliceFromFlag gets a DevAddrPrefix slice from a named flag in the flag set.
+func GetDevAddrPrefixSliceFromFlag(fs *pflag.FlagSet, name string) (value []DevAddrPrefix, set bool, err error) {
 	flag := fs.Lookup(name)
 	if flag == nil {
 		return nil, false, &flagsplugin.ErrFlagNotFound{FlagName: name}

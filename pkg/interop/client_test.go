@@ -73,8 +73,8 @@ func TestGetAppSKey(t *testing.T) {
 			},
 			AsID: "test-as",
 			Request: &ttnpb.SessionKeyRequest{
-				JoinEui:      types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00},
-				DevEui:       types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08},
+				JoinEui:      types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00}.Bytes(),
+				DevEui:       types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}.Bytes(),
 				SessionKeyId: []byte{0x01, 0x6b, 0xfa, 0x7b, 0xad, 0x47, 0x56, 0x34, 0x6a, 0x67, 0x49, 0x81, 0xe7, 0x5c, 0xdb, 0xdc},
 			},
 			ResponseAssertion: func(t *testing.T, resp *ttnpb.AppSKeyResponse) bool {
@@ -116,8 +116,8 @@ func TestGetAppSKey(t *testing.T) {
 			},
 			AsID: "test-as",
 			Request: &ttnpb.SessionKeyRequest{
-				JoinEui:      types.EUI64{0xec, 0x65, 0x6e, 0x00, 0x00, 0x00, 0x00, 0x00},
-				DevEui:       types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08},
+				JoinEui:      types.EUI64{0xec, 0x65, 0x6e, 0x00, 0x00, 0x00, 0x00, 0x00}.Bytes(),
+				DevEui:       types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}.Bytes(),
 				SessionKeyId: []byte{0x01, 0x6b, 0xfa, 0x7b, 0xad, 0x47, 0x56, 0x34, 0x6a, 0x67, 0x49, 0x81, 0xe7, 0x5c, 0xdb, 0xdc},
 			},
 			ResponseAssertion: func(t *testing.T, resp *ttnpb.AppSKeyResponse) bool {
@@ -165,8 +165,8 @@ func TestGetAppSKey(t *testing.T) {
 			},
 			AsID: "test-as",
 			Request: &ttnpb.SessionKeyRequest{
-				JoinEui:      types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00},
-				DevEui:       types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08},
+				JoinEui:      types.EUI64{0x70, 0xb3, 0xd5, 0x7e, 0xd0, 0x00, 0x00, 0x00}.Bytes(),
+				DevEui:       types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}.Bytes(),
 				SessionKeyId: []byte{0x01, 0x6b, 0xfa, 0x7b, 0xad, 0x47, 0x56, 0x34, 0x6a, 0x67, 0x49, 0x81, 0xe7, 0x5c, 0xdb, 0xdc},
 			},
 			ResponseAssertion: func(t *testing.T, resp *ttnpb.AppSKeyResponse) bool {
@@ -219,8 +219,8 @@ func TestGetAppSKey(t *testing.T) {
 			},
 			AsID: "test-as",
 			Request: &ttnpb.SessionKeyRequest{
-				JoinEui:      types.EUI64{0xec, 0x65, 0x6e, 0x00, 0x00, 0x00, 0x00, 0x00},
-				DevEui:       types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08},
+				JoinEui:      types.EUI64{0xec, 0x65, 0x6e, 0x00, 0x00, 0x00, 0x00, 0x00}.Bytes(),
+				DevEui:       types.EUI64{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08}.Bytes(),
 				SessionKeyId: []byte{0x01, 0x6b, 0xfa, 0x7b, 0xad, 0x47, 0x56, 0x34, 0x6a, 0x67, 0x49, 0x81, 0xe7, 0x5c, 0xdb, 0xdc},
 			},
 			ResponseAssertion: func(t *testing.T, resp *ttnpb.AppSKeyResponse) bool {
@@ -310,7 +310,7 @@ func TestHandleJoinRequest(t *testing.T) {
 			NetID: types.NetID{0x42, 0xff, 0xff},
 			Request: &ttnpb.JoinRequest{
 				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0_3,
-				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04},
+				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04}.Bytes(),
 				RxDelay:            ttnpb.RxDelay_RX_DELAY_5,
 				DownlinkSettings:   &ttnpb.DLSettings{},
 				Payload: &ttnpb.Message{
@@ -370,7 +370,7 @@ func TestHandleJoinRequest(t *testing.T) {
 			NetID: types.NetID{0x42, 0xff, 0xff},
 			Request: &ttnpb.JoinRequest{
 				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0_3,
-				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04},
+				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04}.Bytes(),
 				RxDelay:            ttnpb.RxDelay_RX_DELAY_5,
 				DownlinkSettings:   &ttnpb.DLSettings{},
 				Payload: &ttnpb.Message{
@@ -440,7 +440,7 @@ func TestHandleJoinRequest(t *testing.T) {
 			NetID: types.NetID{0x42, 0xff, 0xff},
 			Request: &ttnpb.JoinRequest{
 				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0_3,
-				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04},
+				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04}.Bytes(),
 				RxDelay:            ttnpb.RxDelay_RX_DELAY_5,
 				DownlinkSettings:   &ttnpb.DLSettings{},
 				Payload: &ttnpb.Message{
@@ -526,7 +526,7 @@ func TestHandleJoinRequest(t *testing.T) {
 			NetID: types.NetID{0x42, 0xff, 0xff},
 			Request: &ttnpb.JoinRequest{
 				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0_3,
-				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04},
+				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04}.Bytes(),
 				RxDelay:            ttnpb.RxDelay_RX_DELAY_5,
 				DownlinkSettings:   &ttnpb.DLSettings{},
 				Payload: &ttnpb.Message{
@@ -611,7 +611,7 @@ func TestHandleJoinRequest(t *testing.T) {
 			NetID: types.NetID{0x42, 0xff, 0xff},
 			Request: &ttnpb.JoinRequest{
 				SelectedMacVersion: ttnpb.MACVersion_MAC_V1_0_3,
-				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04},
+				DevAddr:            types.DevAddr{0x01, 0x02, 0x03, 0x04}.Bytes(),
 				RxDelay:            ttnpb.RxDelay_RX_DELAY_5,
 				DownlinkSettings:   &ttnpb.DLSettings{},
 				Payload: &ttnpb.Message{

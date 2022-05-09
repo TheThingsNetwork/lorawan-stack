@@ -49,7 +49,7 @@ func handleDeviceRegistryTest(t *testing.T, reg DeviceRegistry) {
 			DeviceId:       "test-dev",
 		},
 		Session: &ttnpb.Session{
-			DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff},
+			DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 			Keys: &ttnpb.SessionKeys{
 				SessionKeyId: []byte{0x11, 0x22, 0x33, 0x44},
 			},

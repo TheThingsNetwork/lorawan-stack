@@ -9,6 +9,7 @@ package ttnpb
 import (
 	gogo "github.com/TheThingsIndustries/protoc-gen-go-json/gogo"
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
+	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // MarshalProtoJSON marshals the Application message to JSON.
@@ -312,6 +313,48 @@ func (x *Applications) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 
 // UnmarshalJSON unmarshals the Applications from JSON.
 func (x *Applications) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the IssueDevEUIResponse message to JSON.
+func (x *IssueDevEUIResponse) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.DevEui) > 0 || s.HasField("dev_eui") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("dev_eui")
+		types.MarshalHEXBytes(s.WithField("dev_eui"), x.DevEui)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the IssueDevEUIResponse to JSON.
+func (x IssueDevEUIResponse) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
+// UnmarshalProtoJSON unmarshals the IssueDevEUIResponse message from JSON.
+func (x *IssueDevEUIResponse) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "dev_eui", "devEui":
+			s.AddField("dev_eui")
+			x.DevEui = types.Unmarshal8Bytes(s.WithField("dev_eui", false))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the IssueDevEUIResponse from JSON.
+func (x *IssueDevEUIResponse) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 

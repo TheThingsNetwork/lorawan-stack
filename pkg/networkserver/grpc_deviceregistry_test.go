@@ -1063,7 +1063,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 								return MakeTestCaseName("ABP", "no session")
 							}
 							return fmt.Sprintf(MakeTestCaseName("ABP", "dev_addr:%s", "queue_len:%d", "session_keys:%v"),
-								tc.CreateDevice.Session.DevAddr,
+								types.MustDevAddr(tc.CreateDevice.Session.DevAddr).OrZero(),
 								len(tc.CreateDevice.EndDevice.Session.QueuedApplicationDownlinks),
 								tc.CreateDevice.Session.Keys,
 							)

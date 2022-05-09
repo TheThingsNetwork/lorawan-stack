@@ -36,7 +36,7 @@ const (
 	grpcGatewayProtoImage = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-1.16.0"
 	swaggerProtoImage     = "ghcr.io/thethingsindustries/protoc:gen-grpc-gateway-1.16.0"
 	docProtoImage         = "ghcr.io/thethingsindustries/protoc:gen-doc-1.4.1"
-	flagProtoImage        = "ghcr.io/thethingsindustries/protoc:3.9.1-gen-go-flags-1.0.0"
+	flagProtoImage        = "ghcr.io/thethingsindustries/protoc:3.9.1-gen-go-flags-1.0.1"
 )
 
 // Proto namespace.
@@ -129,6 +129,7 @@ func (p Proto) flags(context.Context) error {
 	return withProtoc(flagProtoImage, func(pCtx *protocContext, protoc func(...string) error) error {
 		if err := protoc(
 			"--go-flags_opt=lang=gogo",
+			"--go-flags_opt=customtype.getter-suffix=FromFlag",
 			fmt.Sprintf("--go-flags_out=%s:%s", strings.Join(jsonConvs, ","), protocOut),
 			fmt.Sprintf("%s/api/*.proto", pCtx.WorkingDirectory),
 		); err != nil {
