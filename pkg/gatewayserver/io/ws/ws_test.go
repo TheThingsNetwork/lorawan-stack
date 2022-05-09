@@ -27,6 +27,7 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"github.com/gorilla/websocket"
+	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
@@ -1135,15 +1136,16 @@ func TestTraffic(t *testing.T) {
 					select {
 					case up := <-gsConn.Up():
 						a.So(time.Since(*ttnpb.StdTime(up.Message.ReceivedAt)), should.BeLessThan, timeout)
-						up.Message.ReceivedAt = nil
 						var payload ttnpb.Message
 						a.So(lorawan.UnmarshalMessage(up.Message.RawPayload, &payload), should.BeNil)
 						if !a.So(&payload, should.Resemble, up.Message.Payload) {
 							t.Fatalf("Invalid RawPayload: %v", up.Message.RawPayload)
 						}
-						up.Message.RawPayload = nil
-						up.Message.RxMetadata[0].UplinkToken = nil
-						expectedUp := tc.ExpectedNetworkUpstream.(ttnpb.UplinkMessage)
+
+						expectedUp := deepcopy.Copy(tc.ExpectedNetworkUpstream).(ttnpb.UplinkMessage)
+						expectedUp.ReceivedAt = up.Message.ReceivedAt
+						expectedUp.RawPayload = up.Message.RawPayload
+						expectedUp.RxMetadata[0].UplinkToken = up.Message.RxMetadata[0].UplinkToken
 
 						// Set the correct xtime and timestamps for the assertion.
 						expectedUp.RxMetadata[0].Timestamp = timestamp
@@ -1169,15 +1171,16 @@ func TestTraffic(t *testing.T) {
 					select {
 					case up := <-gsConn.Up():
 						a.So(time.Since(*ttnpb.StdTime(up.Message.ReceivedAt)), should.BeLessThan, timeout)
-						up.Message.ReceivedAt = nil
 						var payload ttnpb.Message
 						a.So(lorawan.UnmarshalMessage(up.Message.RawPayload, &payload), should.BeNil)
 						if !a.So(&payload, should.Resemble, up.Message.Payload) {
 							t.Fatalf("Invalid RawPayload: %v", up.Message.RawPayload)
 						}
-						up.Message.RawPayload = nil
-						up.Message.RxMetadata[0].UplinkToken = nil
-						expectedUp := tc.ExpectedNetworkUpstream.(ttnpb.UplinkMessage)
+
+						expectedUp := deepcopy.Copy(tc.ExpectedNetworkUpstream).(ttnpb.UplinkMessage)
+						expectedUp.ReceivedAt = up.Message.ReceivedAt
+						expectedUp.RawPayload = up.Message.RawPayload
+						expectedUp.RxMetadata[0].UplinkToken = up.Message.RxMetadata[0].UplinkToken
 
 						// Set the correct xtime and timestamps for the assertion.
 						expectedUp.RxMetadata[0].Timestamp = timestamp
