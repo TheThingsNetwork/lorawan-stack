@@ -22,6 +22,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/component"
@@ -366,9 +367,9 @@ func TestTraffic(t *testing.T) {
 				for ups != len(tc.UplinkMessages) || needStatus || needTxAck {
 					select {
 					case up := <-conn.Up():
-						expected := tc.UplinkMessages[ups]
-						up.Message.ReceivedAt = expected.ReceivedAt
-						up.Message.RxMetadata[0].UplinkToken = expected.RxMetadata[0].UplinkToken
+						expected := deepcopy.Copy(tc.UplinkMessages[ups]).(*ttnpb.UplinkMessage)
+						expected.ReceivedAt = up.Message.ReceivedAt
+						expected.RxMetadata[0].UplinkToken = up.Message.RxMetadata[0].UplinkToken
 						a.So(up.Message, should.Resemble, expected)
 						ups++
 					case status := <-conn.Status():
