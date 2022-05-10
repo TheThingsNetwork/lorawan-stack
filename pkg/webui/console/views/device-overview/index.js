@@ -17,6 +17,7 @@ import bind from 'autobind-decorator'
 import { connect } from 'react-redux'
 import { Col, Row, Container } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
+import { isPlainObject } from 'lodash'
 
 import tts from '@console/api/tts'
 
@@ -38,8 +39,13 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
 
-import { parseLorawanMacVersion } from '@console/lib/device-utils'
+import {
+  parseLorawanMacVersion,
+  LORAWAN_VERSIONS,
+  LORAWAN_PHY_VERSIONS,
+} from '@console/lib/device-utils'
 
+import { selectNsFrequencyPlans } from '@console/store/selectors/configuration'
 import { selectSelectedDevice, isOtherClusterDevice } from '@console/store/selectors/devices'
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
@@ -47,35 +53,41 @@ import style from './device-overview.styl'
 
 const m = defineMessages({
   activationInfo: 'Activation information',
-  rootKeyId: 'Root key ID',
   sessionInfo: 'Session information',
+  pendingSessionInfo: 'Session information (pending)',
   latestData: 'Latest data',
   rootKeys: 'Root keys',
   keysNotExposed: 'Keys are not exposed',
   failedAccessOtherHostDevice:
     'The end device you attempted to visit is registered on a different cluster and needs to be accessed using its host Console.',
   macData: 'Download MAC data',
-  hasSession:
+  sensitiveDataWarning:
     'The MAC data can contain sensitive information such as session keys that can be used to decrypt messages. <b>Do not share this information publicly</b>.',
-  noSession:
+  noSessionWarning:
     'The end device is currently not connected to the network (no active session). The MAC data will hence only contain the current MAC settings.',
   macStateError: 'There was an error and MAC state could not be included in the MAC data.',
+  sessionStartedAt: 'Session start',
+  noSession: 'This device has not joined the network yet',
 })
 
 @connect(state => {
   const appId = selectSelectedApplicationId(state)
   const device = selectSelectedDevice(state)
   const shouldRedirect = isOtherClusterDevice(device)
+  const frequencyPlans = selectNsFrequencyPlans(state)
+
   return {
     appId,
     device,
     shouldRedirect,
+    frequencyPlans,
   }
 })
 class DeviceOverview extends React.Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
     device: PropTypes.device.isRequired,
+    frequencyPlans: PropTypes.arrayOf(PropTypes.shape({ id: PropTypes.string })).isRequired,
     shouldRedirect: PropTypes.bool,
   }
 
@@ -117,21 +129,29 @@ class DeviceOverview extends React.Component {
   }
 
   get deviceInfo() {
+    const { frequencyPlans } = this.props
     const {
       ids,
       description,
       version_ids = {},
       root_keys = {},
-      session = {},
+      session: actualSession,
+      pending_session,
       created_at,
       lorawan_version,
       supports_join,
+      frequency_plan_id,
+      lorawan_phy_version,
     } = this.props.device
 
     // Get session keys.
-    const { keys: sessionKeys = {} } = session
+    const session = actualSession || pending_session
+    const { keys: sessionKeys = {}, dev_addr } = session || {}
 
     const lorawanVersion = parseLorawanMacVersion(lorawan_version)
+    const frequencyPlan = frequencyPlans.find(f => f.id === frequency_plan_id).name
+    const lorawanVersionName = LORAWAN_VERSIONS.find(v => v.value === lorawan_version).label
+    const phyVersionName = LORAWAN_PHY_VERSIONS.find(v => v.value === lorawan_phy_version).label
 
     const {
       f_nwk_s_int_key = { key: undefined },
@@ -145,9 +165,29 @@ class DeviceOverview extends React.Component {
         header: sharedMessages.generalInformation,
         items: [
           { key: sharedMessages.devID, value: ids.device_id, type: 'code', sensitive: false },
+          ...(description
+            ? {
+                key: sharedMessages.description,
+                value: description || <Message content={sharedMessages.noDesc} />,
+              }
+            : undefined),
           {
-            key: sharedMessages.description,
-            value: description || <Message content={sharedMessages.noDesc} />,
+            key: sharedMessages.frequencyPlan,
+            value: frequencyPlan,
+            type: 'code',
+            sensitive: false,
+          },
+          {
+            key: sharedMessages.macVersion,
+            value: lorawanVersionName,
+            type: 'code',
+            sensitive: false,
+          },
+          {
+            key: sharedMessages.phyVersion,
+            value: phyVersionName,
+            type: 'code',
+            sensitive: false,
           },
           { key: sharedMessages.createdAt, value: <DateTime value={created_at} /> },
         ],
@@ -188,40 +228,22 @@ class DeviceOverview extends React.Component {
 
       // Add root keys, if available.
       if (Object.keys(root_keys).length > 0) {
-        const infoEntry = {
-          key: m.rootKeyId,
-          value: root_keys.root_key_id,
-          type: 'code',
-          sensitive: false,
+        if (root_keys.app_key) {
+          activationInfoData.items.push({
+            key: sharedMessages.appKey,
+            value: root_keys.app_key.key,
+            type: 'byte',
+            sensitive: true,
+          })
         }
-        if (!Boolean(root_keys.app_key) && !Boolean(root_keys.nwk_key)) {
-          infoEntry.subItems = [
-            {
-              key: m.rootKeys,
-              value: <Message content={m.keysNotExposed} />,
-            },
-          ]
-        } else {
-          infoEntry.subItems = [
-            ...(root_keys.app_key
-              ? {
-                  key: sharedMessages.appKey,
-                  value: root_keys.app_key.key,
-                  type: 'byte',
-                  sensitive: true,
-                }
-              : { key: sharedMessages.appKey, value: undefined }),
-            ...(root_keys.nwk_key
-              ? {
-                  key: sharedMessages.nwkKey,
-                  value: root_keys.nwk_key.key,
-                  type: 'byte',
-                  sensitive: true,
-                }
-              : { key: sharedMessages.nwkKey, value: undefined }),
-          ]
+        if (root_keys.nwk_key) {
+          activationInfoData.items.push({
+            key: sharedMessages.nwkKey,
+            value: root_keys.nwk_key.key,
+            type: 'byte',
+            sensitive: true,
+          })
         }
-        activationInfoData.items.push(infoEntry)
       } else if (supports_join) {
         activationInfoData.items.push({
           key: m.rootKeys,
@@ -235,15 +257,23 @@ class DeviceOverview extends React.Component {
     // Add session info, if available.
 
     const sessionInfoData = {
-      header: m.sessionInfo,
+      header: pending_session && !actualSession ? m.pendingSessionInfo : m.sessionInfo,
       items: [],
+      emptyMessage: m.noSession,
     }
 
-    if (Object.keys(sessionKeys).length > 0) {
+    if (isPlainObject(session)) {
+      if (session.started_at) {
+        sessionInfoData.items.push({
+          key: m.sessionStartedAt,
+          value: <DateTime value={session.started_at} />,
+        })
+      }
+
       sessionInfoData.items.push(
         {
           key: sharedMessages.devAddr,
-          value: ids.dev_addr,
+          value: dev_addr,
           type: 'byte',
           sensitive: false,
           enableUint32: true,
@@ -282,10 +312,10 @@ class DeviceOverview extends React.Component {
                 message: session
                   ? {
                       values: { b: msg => <b>{msg}</b> },
-                      ...m.hasSession,
+                      ...m.sensitiveDataWarning,
                     }
                   : {
-                      ...m.noSession,
+                      ...m.noSessionWarning,
                     },
               }}
               onApprove={this.onExport}

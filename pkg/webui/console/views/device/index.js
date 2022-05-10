@@ -54,6 +54,7 @@ import {
 
 import { getDevice, stopDeviceEventsStream } from '@console/store/actions/devices'
 import { getApplicationLink } from '@console/store/actions/link'
+import { getNsFrequencyPlans } from '@console/store/actions/configuration'
 
 import {
   selectSelectedDevice,
@@ -65,6 +66,7 @@ import {
   selectApplicationLinkFetching,
   selectSelectedApplicationId,
 } from '@console/store/selectors/applications'
+import { selectFrequencyPlansFetching } from '@console/store/selectors/configuration'
 
 import style from './device.styl'
 
@@ -79,6 +81,7 @@ import style from './device.styl'
     const fetching =
       selectDeviceFetching(state) ||
       selectApplicationLinkFetching(state) ||
+      selectFrequencyPlansFetching(state) ||
       !eventsInitialized ||
       !Boolean(device)
 
@@ -97,6 +100,7 @@ import style from './device.styl'
   dispatch => ({
     loadDeviceData: (appId, devId, deviceSelector, linkSelector, mayViewLink) => {
       dispatch(getDevice(appId, devId, deviceSelector, { ignoreNotFound: true }))
+      dispatch(getNsFrequencyPlans())
 
       if (mayViewLink) {
         dispatch(getApplicationLink(appId, linkSelector))
