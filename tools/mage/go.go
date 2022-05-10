@@ -277,6 +277,11 @@ nextLine:
 	return runGoTool("github.com/mattn/goveralls", "-coverprofile=coveralls_"+goCoverageFile, "-service="+service)
 }
 
+// Generate runs go generate.
+func (g Go) Generate() error {
+	return execGo(os.Stdout, os.Stderr, "generate", "./...")
+}
+
 // Messages builds the file with translatable messages in Go code.
 func (g Go) Messages() error {
 	return runGoTool("generate_i18n.go")

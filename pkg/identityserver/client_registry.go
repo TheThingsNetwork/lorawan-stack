@@ -16,19 +16,15 @@ package identityserver
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
-	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blacklist"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -150,17 +146,12 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 	}
 
 	if cli.State == ttnpb.State_STATE_REQUESTED {
-		err = is.SendAdminsEmail(ctx, func(data emails.Data) email.MessageData {
-			data.Entity.Type, data.Entity.ID = "client", cli.Ids.GetClientId()
-			return &emails.ClientRequested{
-				Data:         data,
-				Client:       cli,
-				Collaborator: req.GetCollaborator(),
-			}
+		go is.notifyAdminsInternal(ctx, &ttnpb.CreateNotificationRequest{
+			EntityIds:        req.GetClient().GetIds().GetEntityIdentifiers(),
+			NotificationType: "client_requested",
+			Data:             ttnpb.MustMarshalAny(req),
+			Email:            true,
 		})
-		if err != nil {
-			log.FromContext(ctx).WithError(err).Error("Could not send client requested email")
-		}
 	}
 
 	cli.Secret = secret // Return the unhashed secret, in case it was generated.
@@ -339,17 +330,16 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 	}
 	events.Publish(evtUpdateClient.NewWithIdentifiersAndData(ctx, req.Client.GetIds(), req.FieldMask.GetPaths()))
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "state") {
-		err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
-			data.SetEntity(req)
-			return &emails.EntityStateChanged{
-				Data:             data,
-				State:            strings.ToLower(strings.TrimPrefix(cli.State.String(), "STATE_")),
+		go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
+			EntityIds:        cli.GetIds().GetEntityIdentifiers(),
+			NotificationType: "entity_state_changed",
+			Data: ttnpb.MustMarshalAny(&ttnpb.EntityStateChangedNotification{
+				State:            cli.State,
 				StateDescription: cli.StateDescription,
-			}
+			}),
+			Receivers: []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT},
+			Email:     true,
 		})
-		if err != nil {
-			log.FromContext(ctx).WithError(err).Error("Could not send state change notification email")
-		}
 	}
 	return cli, nil
 }

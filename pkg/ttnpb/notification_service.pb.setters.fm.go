@@ -400,3 +400,34 @@ func (dst *UpdateNotificationStatusRequest) SetFields(src *UpdateNotificationSta
 	}
 	return nil
 }
+
+func (dst *EntityStateChangedNotification) SetFields(src *EntityStateChangedNotification, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "state":
+			if len(subs) > 0 {
+				return fmt.Errorf("'state' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.State = src.State
+			} else {
+				var zero State
+				dst.State = zero
+			}
+		case "state_description":
+			if len(subs) > 0 {
+				return fmt.Errorf("'state_description' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.StateDescription = src.StateDescription
+			} else {
+				var zero string
+				dst.StateDescription = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}

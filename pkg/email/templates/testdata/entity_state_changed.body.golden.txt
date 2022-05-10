@@ -1,0 +1,6 @@
+Dear John Doe,
+
+The state of your client "foo-cli" on The Things Network has been changed to "flagged and pending review".
+
+Description:
+This OAuch client has been sending a large number of invalid requests.

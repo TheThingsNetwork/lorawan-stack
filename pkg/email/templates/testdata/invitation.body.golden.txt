@@ -1,0 +1,11 @@
+Hello,
+
+You have been invited by user foo-usr to join The Things Network.
+
+You can now go to https://eu1.cloud.thethings.network/oauth/register?invitation_token=TOKEN to register your user account.
+
+Your invitation expires an hour from now, so register before then.
+
+After successful registration, you can go to https://console.cloud.thethings.network to start adding devices and gateways.
+
+For more information on how how to get started, please refer to the documentation: https://www.thethingsindustries.com/docs/getting-started.

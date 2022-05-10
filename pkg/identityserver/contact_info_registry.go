@@ -22,8 +22,8 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
+	"go.thethings.network/lorawan-stack/v3/pkg/email/templates"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -125,19 +125,17 @@ func (is *IdentityServer) requestContactInfoValidation(ctx context.Context, ids 
 
 	var pendingContactInfo []*ttnpb.ContactInfo
 	for address, validation := range emailValidations {
-		err := is.SendEmail(ctx, func(data emails.Data) email.MessageData {
-			data.User.Email = address
-			data.SetEntity(validation.Entity)
-			return emails.Validate{
-				Data:  data,
-				ID:    validation.Id,
-				Token: validation.Token,
-				TTL:   ttl,
-			}
-		})
-		if err != nil {
-			log.FromContext(ctx).WithError(err).Error("Could not send validation email")
+		// Prepare validateData outside of goroutine to avoid issues with range variable or races with unsetting the Token.
+		validateData := &templates.ValidateData{
+			EntityIdentifiers: validation.Entity,
+			ID:                validation.Id,
+			Token:             validation.Token,
+			TTL:               ttl,
 		}
+		go is.SendTemplateEmailToUsers(is.FromRequestContext(ctx), "validate", func(_ context.Context, data email.TemplateData) (email.TemplateData, error) {
+			validateData.TemplateData = data
+			return validateData, nil
+		}, &ttnpb.User{PrimaryEmailAddress: address})
 		pendingContactInfo = append(pendingContactInfo, validation.ContactInfo...)
 		validation.Token = "" // Unset tokens after sending emails
 	}

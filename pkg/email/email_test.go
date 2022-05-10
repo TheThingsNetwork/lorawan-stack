@@ -15,79 +15,56 @@
 package email_test
 
 import (
+	"os"
 	"testing"
 
-	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
-	"go.thethings.network/lorawan-stack/v3/pkg/fetch"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
-var fetcher fetch.Interface
-
-// globalData would be global data that may be used in every email.
-type globalData struct {
-	Network struct {
-		Name              string
-		IdentityServerURL string
-		ConsoleURL        string
-		// etc...
-	}
-	User struct {
-		ID    string
-		Name  string
-		Email string
-	}
-}
-
-func (g globalData) Recipient() (name, address string) {
-	return g.User.Name, g.User.Email
-}
-
-// welcomeEmail is the data specifically for the welcome email.
-type welcomeEmail struct {
-	globalData
+// welcomeEmailData is the data specifically for the welcome email.
+type welcomeEmailData struct {
+	email.TemplateData
 	ActivationToken string
 }
 
-// TemplateName returns the name of the template that the registry should search for.
-func (welcome welcomeEmail) TemplateName() string { return "welcome" }
-
-const welcomeSubject = `Welcome to {{.Network.Name}}`
-
-const welcomeHTML = `<div style="styles to hide the pre-header-text">Welcome to {{.Network.Name}}, {{.User.Name}}!</div>
-{{ template "header.html" . }}
-<h1>Welcome to {{.Network.Name}}, {{.User.Name}}!</h1><br>
-Please activate your account by visiting <a href="{{.Network.IdentityServerURL}}/activate/{{.ActivationToken}}">this link</a>.
-{{ template "footer.html" . }}`
-
-const welcomeText = `{{ template "header.txt" . }}
-
-Welcome to {{.Network.Name}}, {{.User.Name}}!
-
-Please activate your account by visiting {{.Network.IdentityServerURL}}/activate/{{.ActivationToken}}.
-
-{{ template "footer.txt" . }}`
-
-func (welcome welcomeEmail) DefaultTemplates() (subject, html, text string) {
-	return welcomeSubject, welcomeHTML, welcomeText
-}
-
 func TestEmail(t *testing.T) {
-	a := assertions.New(t)
+	a, ctx := test.New(t)
 
-	registry, err := email.NewTemplateRegistry(fetch.FromFilesystem("testdata"), "header.html", "footer.html", "header.txt", "footer.txt")
+	registry := email.NewTemplateRegistry()
+
+	welcomeEmailTemplate, err := email.NewTemplateFS(
+		os.DirFS("testdata"), "welcome",
+		email.FSTemplate{
+			SubjectTemplate:      "Welcome to {{ .Network.Name }}",
+			HTMLTemplateBaseFile: "base.html",
+			HTMLTemplateFile:     "welcome.html",
+			TextTemplateBaseFile: "base.txt",
+			TextTemplateFile:     "welcome.txt",
+			IncludePatterns:      []string{"header.html", "footer.html", "header.txt", "footer.txt"},
+		},
+	)
 	a.So(err, should.BeNil)
 
-	data := welcomeEmail{}
-	data.User.Name = "John Doe"
-	data.User.Email = "john.doe@example.com"
-	data.Network.Name = "The Things Network"
-	data.Network.IdentityServerURL = "https://id.thethings.network"
+	registry.RegisterTemplate(welcomeEmailTemplate)
 
-	message, err := registry.Render(data)
-	a.So(err, should.BeNil)
-	if a.So(message, should.NotBeNil) {
+	a.So(registry.RegisteredTemplates(), should.Contain, "welcome")
+	a.So(registry.GetTemplate(ctx, "welcome"), should.Resemble, welcomeEmailTemplate)
+
+	message, err := welcomeEmailTemplate.Execute(&welcomeEmailData{
+		TemplateData: email.NewTemplateData(&email.NetworkConfig{
+			Name:              "The Things Network",
+			IdentityServerURL: "https://eu1.cloud.thethings.network/oauth",
+			ConsoleURL:        "https://console.cloud.thethings.network",
+		}, &ttnpb.User{
+			Name:                "John Doe",
+			PrimaryEmailAddress: "john.doe@example.com",
+		}),
+	})
+
+	if a.So(err, should.BeNil) && a.So(message, should.NotBeNil) {
 		a.So(message.Subject, should.Equal, "Welcome to The Things Network")
 		a.So(message.HTMLBody, should.ContainSubstring, `<div class="header">`)
 		a.So(message.HTMLBody, should.ContainSubstring, "Welcome to The Things Network, John Doe!")
@@ -95,36 +72,4 @@ func TestEmail(t *testing.T) {
 		a.So(message.TextBody, should.ContainSubstring, "==================")
 		a.So(message.TextBody, should.ContainSubstring, "Welcome to The Things Network, John Doe!")
 	}
-}
-
-func Example() {
-	// The email sender can be Sendgrid, SMTP, ...
-	var sender email.Sender
-
-	// This can fetch templates from the filesystem, github, S3, ...
-	registry, err := email.NewTemplateRegistry(fetcher)
-	if err != nil {
-		return // error setting up the template registry
-	}
-
-	data := welcomeEmail{}
-	data.User.Name = "John Doe"
-	data.User.Email = "john.doe@example.com"
-	data.Network.Name = "The Things Network"
-	data.Network.IdentityServerURL = "https://id.thethings.network"
-
-	// The first time you render an email, the template will also be compiled.
-	// Any later changes to the template will not be picked up.
-	// The compiled template will render into an email that is ready to be sent.
-	message, err := registry.Render(data)
-	if err != nil {
-		return // error rendering the message
-	}
-
-	err = sender.Send(message)
-	if err != nil {
-		return // error sending the message
-	}
-
-	// done!
 }

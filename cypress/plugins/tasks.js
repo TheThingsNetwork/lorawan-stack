@@ -14,7 +14,7 @@
 
 const { execSync, exec, spawn } = require('child_process')
 const fs = require('fs')
-const readline = require('readline')
+const path = require('path')
 
 const { Client } = require('pg')
 const yaml = require('js-yaml')
@@ -47,42 +47,38 @@ const postgresContainer = spawn('docker-compose', [
 // `stackConfigTask` sources stack configuration entires to `Cypress` configuration while preserving
 // all entries from `cypress.json`.
 const stackConfigTask = (_, config) => {
-  try {
-    const out = execSync(`${isCI ? './' : 'go run ./cmd/'}ttn-lw-stack config --yml`)
-    const yml = yaml.load(out)
+  const out = execSync(`${isCI ? './' : 'go run ./cmd/'}ttn-lw-stack config --yml`)
+  const yml = yaml.load(out)
 
-    // Cluster.
-    config.asBaseUrl = yml.console.ui.as['base-url']
-    config.asEnabled = yml.console.ui.as.enabled
-    config.nsBaseUrl = yml.console.ui.ns['base-url']
-    config.nsEnabled = yml.console.ui.ns.enabled
-    config.jsBaseUrl = yml.console.ui.js['base-url']
-    config.jsEnabled = yml.console.ui.js.enabled
-    config.isBaseUrl = yml.console.ui.is['base-url']
-    config.isEnabled = yml.console.ui.is.enabled
-    config.gsBaseUrl = yml.console.ui.gs['base-url']
-    config.gsEnabled = yml.console.ui.gs.enabled
-    config.edtcBaseUrl = yml.console.ui.edtc['base-url']
-    config.edtcEnabled = yml.console.ui.edtc.enabled
-    config.qrgBaseUrl = yml.console.ui.qrg['base-url']
-    config.qrgEnabled = yml.console.ui.qrg.enabled
+  // Cluster.
+  config.asBaseUrl = yml.console.ui.as['base-url']
+  config.asEnabled = yml.console.ui.as.enabled
+  config.nsBaseUrl = yml.console.ui.ns['base-url']
+  config.nsEnabled = yml.console.ui.ns.enabled
+  config.jsBaseUrl = yml.console.ui.js['base-url']
+  config.jsEnabled = yml.console.ui.js.enabled
+  config.isBaseUrl = yml.console.ui.is['base-url']
+  config.isEnabled = yml.console.ui.is.enabled
+  config.gsBaseUrl = yml.console.ui.gs['base-url']
+  config.gsEnabled = yml.console.ui.gs.enabled
+  config.edtcBaseUrl = yml.console.ui.edtc['base-url']
+  config.edtcEnabled = yml.console.ui.edtc.enabled
+  config.qrgBaseUrl = yml.console.ui.qrg['base-url']
+  config.qrgEnabled = yml.console.ui.qrg.enabled
 
-    // Console.
-    config.consoleSiteName = yml.console.ui['site-name']
-    config.consoleSubTitle = yml.console.ui['sub-title']
-    config.consoleTitle = yml.console.ui.title
-    config.consoleAssetsRootPath = yml.console.ui['assets-base-url']
-    config.consoleRootPath = new URL(yml.console.ui['canonical-url']).pathname
+  // Console.
+  config.consoleSiteName = yml.console.ui['site-name']
+  config.consoleSubTitle = yml.console.ui['sub-title']
+  config.consoleTitle = yml.console.ui.title
+  config.consoleAssetsRootPath = yml.console.ui['assets-base-url']
+  config.consoleRootPath = new URL(yml.console.ui['canonical-url']).pathname
 
-    // Account App.
-    config.accountAppSiteName = yml.is.oauth.ui['site-name']
-    config.accountAppSubTitle = yml.is.oauth.ui['sub-title']
-    config.accountAppTitle = yml.is.oauth.ui.title
-    config.accountAppRootPath = new URL(yml.is.oauth.ui['canonical-url']).pathname
-    config.accountAppAssetsRootPath = yml.is.oauth.ui['assets-base-url']
-  } catch (err) {
-    throw err
-  }
+  // Account App.
+  config.accountAppSiteName = yml.is.oauth.ui['site-name']
+  config.accountAppSubTitle = yml.is.oauth.ui['sub-title']
+  config.accountAppTitle = yml.is.oauth.ui.title
+  config.accountAppRootPath = new URL(yml.is.oauth.ui['canonical-url']).pathname
+  config.accountAppAssetsRootPath = yml.is.oauth.ui['assets-base-url']
 }
 
 const sqlTask = on => {
@@ -113,32 +109,35 @@ const sqlTask = on => {
   })
 }
 
-const stackLogTask = on => {
+const emailTask = on => {
   on('task', {
-    findEmailInStackLog: async (regExp, capturingGroup = 0) => {
+    findInLatestEmail: async (regExp, capturingGroup = 0) => {
+      const emailDir = '.dev/email'
       const re = new RegExp(regExp, 'm')
-      const rl = readline.createInterface({
-        input: fs.createReadStream('.cache/devStack.log', { encoding: 'utf8' }),
-        output: process.stdout,
-        terminal: false,
-      })
-      const results = []
-      for await (const line of rl) {
-        if (line === '') {
-          continue
-        }
-        const parsed = JSON.parse(line)
-        if (parsed.msg !== 'Could not send email without email provider') {
-          continue
-        }
-        const match = parsed.body.match(re)
-        if (match) {
-          results.push(match)
-        }
+      const files = fs.readdirSync(emailDir)
+      const latestMails = files
+        .filter(file => fs.lstatSync(path.join(emailDir, file)).isFile())
+        .map(file => ({
+          file: path.join(emailDir, file),
+          mtime: fs.lstatSync(path.join(emailDir, file)).mtime,
+        }))
+        .sort((a, b) => b.mtime.getTime() - a.mtime.getTime())
+
+      if (latestMails.length === 0) {
+        throw new Error('No emails found')
       }
 
-      // Return the most recent occurrence.
-      return results ? results.pop()[capturingGroup] : undefined
+      const latestMailContent = fs.readFileSync(latestMails[0].file, {
+        encoding: 'utf8',
+        flag: 'r',
+      })
+      const res = latestMailContent.match(re)
+
+      if (!res) {
+        throw new Error('Could not match regex in last email')
+      }
+
+      return res[capturingGroup]
     },
   })
 }
@@ -159,6 +158,6 @@ module.exports = {
   stackConfigTask,
   codeCoverageTask,
   sqlTask,
-  stackLogTask,
   fileExistsTask,
+  emailTask,
 }

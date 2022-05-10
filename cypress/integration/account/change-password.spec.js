@@ -87,7 +87,7 @@ describe('Account App change password (via forgot password)', () => {
       method: 'POST',
       url: `${Cypress.config('baseUrl')}/api/v3/users/${user.ids.user_id}/temporary_password`,
     })
-    cy.task('findEmailInStackLog', updatePasswordLinkRegExp).then(res => {
+    cy.task('findInLatestEmail', updatePasswordLinkRegExp).then(res => {
       temporaryPasswordLink = res
     })
   })

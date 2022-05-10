@@ -21,11 +21,10 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
+	"go.thethings.network/lorawan-stack/v3/pkg/email/templates"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -68,17 +67,14 @@ func (is *IdentityServer) sendInvitation(ctx context.Context, in *ttnpb.SendInvi
 		return nil, err
 	}
 	events.Publish(evtCreateInvitation.NewWithIdentifiersAndData(ctx, nil, invitation))
-	err = is.SendEmail(ctx, func(data emails.Data) email.MessageData {
-		data.User.Email = in.Email
-		return &emails.Invitation{
-			Data:            data,
+	go is.SendTemplateEmailToUsers(is.FromRequestContext(ctx), "invitation", func(ctx context.Context, data email.TemplateData) (email.TemplateData, error) {
+		return &templates.InvitationData{
+			TemplateData:    data,
+			SenderIds:       authInfo.GetEntityIdentifiers().GetUserIds(),
 			InvitationToken: invitation.Token,
 			TTL:             ttl,
-		}
-	})
-	if err != nil {
-		log.FromContext(ctx).WithError(err).Error("Could not send invitation email")
-	}
+		}, nil
+	}, &ttnpb.User{PrimaryEmailAddress: in.Email})
 	return invitation, nil
 }
 

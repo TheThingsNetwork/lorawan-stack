@@ -1,0 +1,20 @@
+<mjml>
+  <mj-head>
+    <mj-title>{{ block "title" . }}{{ end }}</mj-title>
+    <mj-preview>{{ block "preview" . }}{{ end }}</mj-preview>
+    <mj-include path="./_attributes.mjml" />
+  </mj-head>
+  <mj-body background-color="#E7E7E7" width="600px">
+    <mj-include path="./_header.mjml" />
+    <mj-wrapper padding-top="0" padding-bottom="0" css-class="body-section">
+      <mj-section background-color="#ffffff" padding-left="15px" padding-right="15px">
+        <mj-column width="100%">
+          <mj-text>
+            {{ block "body" . }}{{ end }}
+          </mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+    <mj-include path="./_footer.mjml" />
+  </mj-body>
+</mjml>

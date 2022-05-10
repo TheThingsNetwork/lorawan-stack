@@ -1,0 +1,10 @@
+Dear {{ .ReceiverName }},
+
+The state of your {{ .Notification.EntityIds.EntityType }} "{{ .Notification.EntityIds.IDString }}" on {{ .Network.Name }} has been changed to "{{ enumDesc .State }}".
+
+{{- with .StateDescription }}
+
+Description:
+{{ . }}
+
+{{- end }}

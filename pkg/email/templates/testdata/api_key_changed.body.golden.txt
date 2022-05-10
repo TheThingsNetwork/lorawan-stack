@@ -1,0 +1,15 @@
+Dear John Doe,
+
+An API key of your application "foo-app" on The Things Network has been changed.
+
+API Key ID: TEST
+API Key Name: API Key Name
+
+Rights:
+
+- RIGHT_APPLICATION_INFO: view application information
+- RIGHT_APPLICATION_SETTINGS_BASIC: edit basic application settings
+- RIGHT_APPLICATION_DEVICES_READ: view devices in application
+- RIGHT_APPLICATION_TRAFFIC_READ: read application traffic (uplink and downlink)
+
+You can go to https://console.cloud.thethings.network/applications/foo-app/api-keys/TEST to view and edit this API key in the Console.

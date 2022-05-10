@@ -1,0 +1,12 @@
+Dear {{ .ReceiverName }},
+
+A collaborator of your {{ .Notification.EntityIds.EntityType }} "{{ .Notification.EntityIds.IDString }}" on {{ .Network.Name }} has been added or updated.
+
+Collaborator: {{ .Collaborator.EntityType }} "{{ .Collaborator.IDString }}"
+
+Rights:
+{{ range .Rights }}
+- {{ . }} {{- with enumDesc . }}: {{ . }}{{ end }}
+{{- end }}
+
+You can go to {{ .ConsoleURL }} to view and edit this collaborator in the Console.

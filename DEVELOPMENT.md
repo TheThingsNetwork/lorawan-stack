@@ -321,6 +321,8 @@ TTN_LW_CONSOLE_OAUTH_TOKEN_URL="http://localhost:8080/oauth/token"
 TTN_LW_IS_OAUTH_UI_CANONICAL_URL="http://localhost:8080/oauth"
 TTN_LW_IS_EMAIL_NETWORK_IDENTITY_SERVER_URL="http://localhost:8080/oauth.js"
 TTN_LW_CONSOLE_UI_ASSETS_BASE_URL="http://localhost:8080/assets"
+TTN_LW_IS_EMAIL_PROVIDER="dir"
+TTN_LW_IS_EMAIL_DIR=".dev/email"
 ```
 
 > Note: It is important to **source these environment variables in all terminal sessions** that run The Things Stack or the `tools/bin/mage` commands. Failing to do so will result in erros such as blank page renders. See also [troubleshooting](#troubleshooting).
