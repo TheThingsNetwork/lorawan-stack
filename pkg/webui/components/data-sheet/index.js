@@ -61,7 +61,7 @@ const DataSheet = ({ className, data }) => (
           ) : (
             <tr>
               <th colSpan={2}>
-                <Message content={m.noData} />
+                <Message content={group.emptyMessage || m.noData} />
               </th>
             </tr>
           )}
@@ -76,6 +76,7 @@ DataSheet.propTypes = {
   /** A list of entries for the sheet. */
   data: PropTypes.arrayOf(
     PropTypes.shape({
+      emptyMessage: PropTypes.message,
       /** The title of the item group. */
       header: PropTypes.message.isRequired,
       /** A list of items for the group. */
