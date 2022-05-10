@@ -110,10 +110,34 @@ func (s *apiKeyStore) FindAPIKeys(ctx context.Context, entityID *ttnpb.EntityIde
 	return keyProtos, nil
 }
 
+func (s *apiKeyStore) GetAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, id string) (*ttnpb.APIKey, error) {
+	defer trace.StartRegion(ctx, "get api key").End()
+	entity, err := s.findEntity(ctx, entityID, "id")
+	if err != nil {
+		return nil, err
+	}
+	query := s.query(ctx, APIKey{})
+	var keyModel APIKey
+	if err := query.Where(APIKey{
+		APIKeyID:   id,
+		EntityID:   entity.PrimaryKey(),
+		EntityType: entityTypeForID(entityID),
+	}).First(&keyModel).Error; err != nil {
+		if gorm.IsRecordNotFoundError(err) {
+			return nil, errAPIKeyNotFound.New()
+		}
+		return nil, err
+	}
+	if err := ctx.Err(); err != nil { // Early exit if context canceled
+		return nil, err
+	}
+	return keyModel.toPB(), nil
+}
+
 var errAPIKeyEntity = errors.DefineCorruption("api_key_entity", "API key not linked to an entity")
 
-func (s *apiKeyStore) GetAPIKey(ctx context.Context, id string) (*ttnpb.EntityIdentifiers, *ttnpb.APIKey, error) {
-	defer trace.StartRegion(ctx, "get api key").End()
+func (s *apiKeyStore) GetAPIKeyByID(ctx context.Context, id string) (*ttnpb.EntityIdentifiers, *ttnpb.APIKey, error) {
+	defer trace.StartRegion(ctx, "get api key by id").End()
 	query := s.query(ctx, APIKey{})
 	var keyModel APIKey
 	if err := query.Where(APIKey{APIKeyID: id}).First(&keyModel).Error; err != nil {

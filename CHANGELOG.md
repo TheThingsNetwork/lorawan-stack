@@ -35,6 +35,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
+- Security fix for an issue where the description and list of rights of arbitrary API keys could be retrieved by any logged-in user if the 24-bit random API key ID was known.
+
 ## [3.19.1] - 2022-05-04
 
 ### Changed

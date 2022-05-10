@@ -123,7 +123,7 @@ func (is *IdentityServer) getUserAPIKey(ctx context.Context, req *ttnpb.GetUserA
 	}
 
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
-		_, key, err = st.GetAPIKey(ctx, req.KeyId)
+		key, err = st.GetAPIKey(ctx, req.GetUserIds().GetEntityIdentifiers(), req.KeyId)
 		if err != nil {
 			return err
 		}
@@ -150,7 +150,7 @@ func (is *IdentityServer) updateUserAPIKey(ctx context.Context, req *ttnpb.Updat
 
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		if len(req.ApiKey.Rights) > 0 {
-			_, key, err := st.GetAPIKey(ctx, req.ApiKey.Id)
+			key, err := st.GetAPIKey(ctx, req.GetUserIds().GetEntityIdentifiers(), req.ApiKey.Id)
 			if err != nil {
 				return err
 			}

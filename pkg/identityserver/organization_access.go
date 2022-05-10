@@ -139,7 +139,7 @@ func (is *IdentityServer) getOrganizationAPIKey(ctx context.Context, req *ttnpb.
 	}
 
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
-		_, key, err = st.GetAPIKey(ctx, req.KeyId)
+		key, err = st.GetAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), req.KeyId)
 		if err != nil {
 			return err
 		}
@@ -166,7 +166,7 @@ func (is *IdentityServer) updateOrganizationAPIKey(ctx context.Context, req *ttn
 
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		if len(req.ApiKey.Rights) > 0 {
-			_, key, err := st.GetAPIKey(ctx, req.ApiKey.Id)
+			key, err := st.GetAPIKey(ctx, req.GetOrganizationIds().GetEntityIdentifiers(), req.ApiKey.Id)
 			if err != nil {
 				return err
 			}
