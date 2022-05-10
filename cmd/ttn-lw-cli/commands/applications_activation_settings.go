@@ -27,7 +27,7 @@ import (
 )
 
 var (
-	selectApplicationActivationSettingsFlags = &pflag.FlagSet{}
+	selectApplicationActivationSettingsFlags = util.NormalizedFlagSet()
 
 	selectAllApplicationActivationSettingsFlags = util.SelectAllFlagSet("application activation settings")
 )

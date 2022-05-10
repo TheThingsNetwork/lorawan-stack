@@ -39,15 +39,15 @@ import (
 )
 
 var (
-	selectEndDeviceListFlags   = &pflag.FlagSet{}
-	selectEndDeviceFlags       = &pflag.FlagSet{}
-	setEndDeviceFlags          = &pflag.FlagSet{}
+	selectEndDeviceListFlags   = util.NormalizedFlagSet()
+	selectEndDeviceFlags       = util.NormalizedFlagSet()
+	setEndDeviceFlags          = util.NormalizedFlagSet()
 	endDeviceFlattenPaths      = []string{"provisioning_data"}
-	endDevicePictureFlags      = &pflag.FlagSet{}
-	endDeviceLocationFlags     = &pflag.FlagSet{}
-	getDefaultMACSettingsFlags = &pflag.FlagSet{}
-	allEndDeviceSetFlags       = &pflag.FlagSet{}
-	allEndDeviceSelectFlags    = &pflag.FlagSet{}
+	endDevicePictureFlags      = util.NormalizedFlagSet()
+	endDeviceLocationFlags     = util.NormalizedFlagSet()
+	getDefaultMACSettingsFlags = util.NormalizedFlagSet()
+	allEndDeviceSetFlags       = util.NormalizedFlagSet()
+	allEndDeviceSelectFlags    = util.NormalizedFlagSet()
 
 	selectAllEndDeviceFlags = util.SelectAllFlagSet("end devices")
 	toUnderscore            = strings.NewReplacer("-", "_")
@@ -1369,13 +1369,15 @@ func init() {
 
 	allEndDeviceSelectFlags.VisitAll(func(flag *pflag.Flag) {
 		fieldName := toUnderscore.Replace(flag.Name)
-		if ttnpb.ContainsField(fieldName, getEndDeviceFromIS) {
-			selectEndDeviceListFlags.AddFlag(flag)
-			selectEndDeviceFlags.AddFlag(flag)
-		} else if ttnpb.ContainsField(fieldName, getEndDeviceFromNS) ||
-			ttnpb.ContainsField(fieldName, getEndDeviceFromAS) ||
-			ttnpb.ContainsField(fieldName, getEndDeviceFromJS) {
-			selectEndDeviceFlags.AddFlag(flag)
+		selectEndDeviceListFlags.AddFlag(flag)
+		selectEndDeviceFlags.AddFlag(flag)
+		if !ttnpb.ContainsField(fieldName, getEndDeviceFromIS) {
+			util.HideFlag(selectEndDeviceListFlags, flag.Name)
+			if !ttnpb.ContainsField(fieldName, getEndDeviceFromNS) &&
+				!ttnpb.ContainsField(fieldName, getEndDeviceFromAS) &&
+				!ttnpb.ContainsField(fieldName, getEndDeviceFromJS) {
+				util.HideFlag(selectEndDeviceFlags, flag.Name)
+			}
 		}
 	})
 
@@ -1384,11 +1386,12 @@ func init() {
 
 	allEndDeviceSetFlags.VisitAll(func(flag *pflag.Flag) {
 		fieldName := toUnderscore.Replace(flag.Name)
-		if ttnpb.ContainsField(fieldName, setEndDeviceToIS) ||
-			ttnpb.ContainsField(fieldName, setEndDeviceToNS) ||
-			ttnpb.ContainsField(fieldName, setEndDeviceToAS) ||
-			ttnpb.ContainsField(fieldName, setEndDeviceToJS) {
-			setEndDeviceFlags.AddFlag(flag)
+		setEndDeviceFlags.AddFlag(flag)
+		if !ttnpb.ContainsField(fieldName, setEndDeviceToIS) &&
+			!ttnpb.ContainsField(fieldName, setEndDeviceToNS) &&
+			!ttnpb.ContainsField(fieldName, setEndDeviceToAS) &&
+			!ttnpb.ContainsField(fieldName, setEndDeviceToJS) {
+			util.HideFlag(setEndDeviceFlags, flag.Name)
 		}
 	})
 

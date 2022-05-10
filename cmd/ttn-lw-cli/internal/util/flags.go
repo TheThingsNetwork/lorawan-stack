@@ -30,6 +30,13 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
+// NormalizedFlagSet returns a flagset with a NormalizeFunc that replaces underscores to dashes.
+func NormalizedFlagSet() *pflag.FlagSet {
+	fs := &pflag.FlagSet{}
+	fs.SetNormalizeFunc(NormalizeFlags)
+	return fs
+}
+
 // DeprecateFlag deprecates a CLI flag.
 func DeprecateFlag(flagSet *pflag.FlagSet, old string, new string) {
 	if newFlag := flagSet.Lookup(new); newFlag != nil {

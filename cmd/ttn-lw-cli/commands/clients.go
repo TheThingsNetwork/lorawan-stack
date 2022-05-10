@@ -29,7 +29,7 @@ import (
 )
 
 var (
-	selectClientFlags = &pflag.FlagSet{}
+	selectClientFlags = util.NormalizedFlagSet()
 
 	selectAllClientFlags = util.SelectAllFlagSet("client")
 )
