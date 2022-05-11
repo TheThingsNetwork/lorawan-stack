@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import path from 'path'
-
 describe('Device overview', () => {
   const appId = 'end-device-mac-data-test-application'
   const application = { ids: { application_id: appId } }
