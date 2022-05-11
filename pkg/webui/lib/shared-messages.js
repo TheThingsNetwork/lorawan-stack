@@ -404,6 +404,7 @@ export default defineMessages({
   users: 'Users',
   validateAddressFormat: '{field} must be in the format "host" or "host:port"',
   validateApiKey: 'API keys must follow the format "NNSXS.[…].[…]"',
+  validateDateInPast: '{field} must be a date in the future',
   validateDelayFormat: '{field} must be a positive, whole number',
   validateDigit: '{field} must have at least {digit} {digit, plural, one {digit} other {digits}}',
   validateEmail: 'An email address must use exactly one "@", one "." and use no special characters',

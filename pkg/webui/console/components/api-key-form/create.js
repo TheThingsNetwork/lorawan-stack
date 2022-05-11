@@ -29,6 +29,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import ApiKeyForm from './form'
 import validationSchema from './validation-schema'
+import { encodeExpiryDate, decodeExpiryDate } from './utils'
 
 class CreateForm extends React.Component {
   static propTypes = {
@@ -75,8 +76,9 @@ class CreateForm extends React.Component {
   @bind
   async handleCreate(values) {
     const { onCreate } = this.props
+    const castedValues = validationSchema.cast(values)
 
-    return await onCreate(values)
+    return await onCreate(castedValues)
   }
 
   @bind
@@ -101,6 +103,7 @@ class CreateForm extends React.Component {
     const initialValues = {
       name: '',
       rights: [...pseudoRights],
+      expires_at: null,
     }
 
     return (
@@ -119,6 +122,14 @@ class CreateForm extends React.Component {
             placeholder={sharedMessages.apiKeyNamePlaceholder}
             name="name"
             autoFocus
+            component={Input}
+          />
+          <FormField
+            title={'Expiry date'}
+            name="expires_at"
+            type="date"
+            encode={encodeExpiryDate}
+            decode={decodeExpiryDate}
             component={Input}
           />
           <FormField

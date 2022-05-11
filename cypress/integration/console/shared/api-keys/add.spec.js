@@ -43,6 +43,7 @@ describe('API keys', () => {
     it('succeeds adding new api key', () => {
       cy.findByLabelText('Name').type(apiKeyName)
       cy.findByLabelText('Grant all current and future rights').check()
+      cy.findByLabelText('Expiry date').type('2056-01-01')
       cy.findByRole('button', { name: 'Create API key' }).click()
 
       cy.findByTestId('error-notification').should('not.exist')
@@ -79,6 +80,7 @@ describe('API keys', () => {
     it('succeeds adding new api key', () => {
       cy.findByLabelText('Name').type(apiKeyName)
       cy.findByLabelText('Grant all current and future rights').check()
+      cy.findByLabelText('Expiry date').type('2056-01-01')
       cy.findByRole('button', { name: 'Create API key' }).click()
 
       cy.findByTestId('error-notification').should('not.exist')
@@ -117,6 +119,7 @@ describe('API keys', () => {
     it('succeeds adding new api key', () => {
       cy.findByLabelText('Name').type(apiKeyName)
       cy.findByLabelText('Grant all current and future rights').check()
+      cy.findByLabelText('Expiry date').type('2056-01-01')
       cy.findByRole('button', { name: 'Create API key' }).click()
 
       cy.findByTestId('error-notification').should('not.exist')
@@ -146,6 +149,7 @@ describe('API keys', () => {
     it('succeeds adding new api key', () => {
       cy.findByLabelText('Name').type(apiKeyName)
       cy.findByLabelText('Grant all current and future rights').check()
+      cy.findByLabelText('Expiry date').type('2056-01-01')
       cy.findByRole('button', { name: 'Create API key' }).click()
 
       cy.findByTestId('error-notification').should('not.exist')

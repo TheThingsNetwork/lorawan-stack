@@ -56,6 +56,7 @@ describe('API keys', () => {
 
       cy.findByLabelText('Name').type('_updated')
       cy.findByLabelText('Grant individual rights').check()
+      cy.findByLabelText('Expiry date').type('2056-01-01')
       cy.findByLabelText('Select all').check()
 
       cy.findByRole('button', { name: 'Save changes' }).click()
@@ -123,6 +124,7 @@ describe('API keys', () => {
       )
 
       cy.findByLabelText('Name').type('_updated')
+      cy.findByLabelText('Expiry date').type('2056-01-01')
       cy.findByLabelText('Grant individual rights').check()
       cy.findByLabelText('Select all').check()
 
@@ -193,6 +195,7 @@ describe('API keys', () => {
       )
 
       cy.findByLabelText('Name').type('_updated')
+      cy.findByLabelText('Expiry date').type('2056-01-01')
       cy.findByLabelText('Grant individual rights').check()
       cy.findByLabelText('Select all').check()
 
@@ -254,6 +257,7 @@ describe('API keys', () => {
       cy.visit(`${Cypress.config('consoleRootPath')}/user/api-keys/${Cypress.config('apiKeyId')}`)
 
       cy.findByLabelText('Name').type('_updated')
+      cy.findByLabelText('Expiry date').type('2056-01-01')
       cy.findByLabelText('Grant individual rights').check()
       cy.findByLabelText('Select all').check()
 

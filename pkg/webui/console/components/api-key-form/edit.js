@@ -31,6 +31,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 import ApiKeyForm from './form'
 import validationSchema from './validation-schema'
+import { encodeExpiryDate, decodeExpiryDate } from './utils'
 
 const m = defineMessages({
   deleteKey: 'Delete key',
@@ -98,10 +99,10 @@ class EditForm extends React.Component {
 
   @bind
   async handleEdit(values) {
-    const { name, rights } = values
+    const castedValues = validationSchema.cast(values)
     const { onEdit } = this.props
 
-    return await onEdit({ name, rights })
+    return await onEdit(castedValues)
   }
 
   @bind
@@ -156,6 +157,7 @@ class EditForm extends React.Component {
       id: apiKey.id,
       name: apiKey.name,
       rights: apiKey.rights,
+      expires_at: apiKey.expires_at,
     }
 
     return (
@@ -179,6 +181,14 @@ class EditForm extends React.Component {
           title={sharedMessages.name}
           placeholder={sharedMessages.apiKeyNamePlaceholder}
           name="name"
+          component={Input}
+        />
+        <FormField
+          title={'Expiry date'}
+          name="expires_at"
+          type="date"
+          decode={decodeExpiryDate}
+          encode={encodeExpiryDate}
           component={Input}
         />
         <FormField
