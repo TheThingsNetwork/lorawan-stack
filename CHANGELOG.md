@@ -45,6 +45,7 @@ For details about compatibility between different releases, see the **Commitment
 - Contact info validation not possible when user is already logged in.
 - CLI not allowing devices to be created or updated.
 - End device creation no longer errors on missing application info rights.
+- Missing success notification when successfully deleting an application in the Console.
 
 ### Security
 
