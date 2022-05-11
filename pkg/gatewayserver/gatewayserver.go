@@ -875,8 +875,6 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 		ConnectedAt: ttnpb.ProtoTimePtr(connectTime),
 		Protocol:    conn.Connection.Frontend().Protocol(),
 	}
-	refreshTTLTimer := time.NewTicker(gs.config.ConnectionStatsTTL / 2)
-	defer refreshTTLTimer.Stop()
 
 	// Initial update, so that the gateway appears connected.
 	registerGatewayConnectionStats(ctx, *ids, stats)
@@ -903,22 +901,36 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 			}
 		}
 	}()
+
+	var (
+		nextStats  = time.NewTimer(gs.config.UpdateConnectionStatsInterval)
+		lastUpdate = time.Now() // Start with a debounce, the initial update has already been sent.
+	)
 	for {
+		now := time.Now()
 		select {
 		case <-ctx.Done():
 			return
 		case <-conn.StatsChanged():
-			if duration := gs.config.UpdateConnectionStatsDebounceTime; duration > 0 {
-				// Debounce the updates with jitter to spread event publishes and store updates over time.
-				duration := random.Jitter(duration, debounceJitter)
-				select {
-				case <-ctx.Done():
-					return
-				case <-time.After(duration):
-				}
+			if !nextStats.Stop() {
+				<-nextStats.C
 			}
-		case <-refreshTTLTimer.C:
+		case <-nextStats.C:
 		}
+		nextStats.Reset(gs.config.UpdateConnectionStatsInterval)
+
+		// Debounce the updates with jitter to spread event publishes and store updates over time.
+		// If the time since the last update is longer than the debounce time, the update happens immediately.
+		if wait := gs.config.UpdateConnectionStatsDebounceTime - now.Sub(lastUpdate); wait > 0 {
+			duration := random.Jitter(wait, debounceJitter)
+			select {
+			case <-ctx.Done():
+				return
+			case <-time.After(duration):
+			}
+		}
+		lastUpdate = now
+
 		stats, paths := conn.Stats()
 		registerGatewayConnectionStats(decoupledCtx, *ids, stats)
 		if gs.statsRegistry != nil {
