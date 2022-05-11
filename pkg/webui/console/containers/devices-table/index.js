@@ -55,7 +55,7 @@ import {
   selectDevices,
   selectDevicesTotalCount,
   selectDevicesFetching,
-  selectDeviceDerivedLastSeen,
+  selectDeviceLastSeen,
   isOtherClusterDevice,
 } from '@console/store/selectors/devices'
 
@@ -118,8 +118,8 @@ const headers = [
             </Status>
           </DocTooltip>
         )
-      } else if (status._derivedLastSeen) {
-        return <LastSeen lastSeen={status._derivedLastSeen} short />
+      } else if (status.lastSeen) {
+        return <LastSeen lastSeen={status.lastSeen} short />
       }
 
       return <Status status="mediocre" label={sharedMessages.never} />
@@ -169,18 +169,13 @@ class DevicesTable extends React.Component {
     super(props)
 
     this.getDevicesList = filters =>
-      getDevicesList(
-        props.appId,
-        filters,
-        [
-          'name',
-          'application_server_address',
-          'network_server_address',
-          'join_server_address',
-          'last_seen_at',
-        ],
-        { withStatus: true },
-      )
+      getDevicesList(props.appId, filters, [
+        'name',
+        'application_server_address',
+        'network_server_address',
+        'join_server_address',
+        'last_seen_at',
+      ])
   }
 
   @bind
@@ -193,7 +188,7 @@ class DevicesTable extends React.Component {
       decoratedDevices.push({
         ...device,
         status: {
-          _derivedLastSeen: selectDeviceDerivedLastSeen(state, appId, device.ids.device_id),
+          lastSeen: selectDeviceLastSeen(state, appId, device.ids.device_id),
           otherCluster: isOtherClusterDevice(device),
           host:
             device.application_server_address ||

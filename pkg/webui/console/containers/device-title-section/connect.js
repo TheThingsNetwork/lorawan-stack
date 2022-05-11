@@ -18,7 +18,7 @@ import {
   selectDeviceByIds,
   selectDeviceDerivedUplinkFrameCount,
   selectDeviceDerivedDownlinkFrameCount,
-  selectDeviceDerivedLastSeen,
+  selectDeviceLastSeen,
 } from '@console/store/selectors/devices'
 
 const mapStateToProps = (state, props) => {
@@ -30,7 +30,7 @@ const mapStateToProps = (state, props) => {
     device: selectDeviceByIds(state, appId, devId),
     uplinkFrameCount: selectDeviceDerivedUplinkFrameCount(state, appId, devId),
     downlinkFrameCount: selectDeviceDerivedDownlinkFrameCount(state, appId, devId),
-    lastSeen: selectDeviceDerivedLastSeen(state, appId, devId),
+    lastSeen: selectDeviceLastSeen(state, appId, devId),
   }
 }
 

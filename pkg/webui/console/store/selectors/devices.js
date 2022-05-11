@@ -60,6 +60,12 @@ export const isOtherClusterDevice = device => {
 
   return isOtherCluster
 }
+export const selectDeviceLastSeen = (state, appId, devId) => {
+  const device = selectDeviceById(state, combineDeviceIds(appId, devId))
+  if (!Boolean(device)) return undefined
+
+  return device.last_seen_at
+}
 
 // Derived.
 export const selectDeviceDerivedUplinkFrameCount = (state, appId, devId) => {
@@ -73,12 +79,6 @@ export const selectDeviceDerivedDownlinkFrameCount = (state, appId, devId) => {
   if (!Boolean(derived)) return undefined
 
   return derived.downlinkFrameCount
-}
-export const selectDeviceDerivedLastSeen = (state, appId, devId) => {
-  const derived = selectDeviceDerivedById(state, combineDeviceIds(appId, devId))
-  if (!Boolean(derived)) return undefined
-
-  return derived.lastSeen
 }
 
 // Devices.
