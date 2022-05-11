@@ -74,6 +74,16 @@ var (
 		"gs.up.forward", "forward uplink message",
 		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ),
 	)
+	evtScheduleDownAttempt = events.Define(
+		"gs.down.schedule.attempt", "schedule downlink for transmission by gateway",
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithDataType(&ttnpb.DownlinkMessage{}),
+	)
+	evtScheduleDownFail = events.Define(
+		"gs.down.schedule.fail", "failed to schedule downlink for transmission by gateway",
+		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ),
+		events.WithErrorDataType(),
+	)
 	evtSendDown = events.Define(
 		"gs.down.send", "send downlink message",
 		events.WithVisibility(ttnpb.Right_RIGHT_GATEWAY_TRAFFIC_READ),
@@ -169,6 +179,22 @@ var gsMetrics = &messageMetrics{
 		},
 		[]string{host, "error"},
 	),
+	downlinkScheduleAttempted: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "downlink_schedule_attempted_total",
+			Help:      "Total number of schedule downlink attempts",
+		},
+		[]string{protocol},
+	),
+	downlinkScheduleFailed: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "downlink_schedule_failed_total",
+			Help:      "Total number of schedule downlink failures",
+		},
+		[]string{protocol},
+	),
 	downlinkSent: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
@@ -224,19 +250,21 @@ func init() {
 }
 
 type messageMetrics struct {
-	gatewaysConnected   *metrics.ContextualGaugeVec
-	statusReceived      *metrics.ContextualCounterVec
-	statusForwarded     *metrics.ContextualCounterVec
-	statusDropped       *metrics.ContextualCounterVec
-	uplinkReceived      *metrics.ContextualCounterVec
-	uplinkForwarded     *metrics.ContextualCounterVec
-	uplinkDropped       *metrics.ContextualCounterVec
-	downlinkSent        *metrics.ContextualCounterVec
-	downlinkTxSucceeded *metrics.ContextualCounterVec
-	downlinkTxFailed    *metrics.ContextualCounterVec
-	txAckReceived       *metrics.ContextualCounterVec
-	txAckForwarded      *metrics.ContextualCounterVec
-	txAckDropped        *metrics.ContextualCounterVec
+	gatewaysConnected         *metrics.ContextualGaugeVec
+	statusReceived            *metrics.ContextualCounterVec
+	statusForwarded           *metrics.ContextualCounterVec
+	statusDropped             *metrics.ContextualCounterVec
+	uplinkReceived            *metrics.ContextualCounterVec
+	uplinkForwarded           *metrics.ContextualCounterVec
+	uplinkDropped             *metrics.ContextualCounterVec
+	downlinkScheduleAttempted *metrics.ContextualCounterVec
+	downlinkScheduleFailed    *metrics.ContextualCounterVec
+	downlinkSent              *metrics.ContextualCounterVec
+	downlinkTxSucceeded       *metrics.ContextualCounterVec
+	downlinkTxFailed          *metrics.ContextualCounterVec
+	txAckReceived             *metrics.ContextualCounterVec
+	txAckForwarded            *metrics.ContextualCounterVec
+	txAckDropped              *metrics.ContextualCounterVec
 }
 
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
@@ -247,6 +275,8 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.uplinkReceived.Describe(ch)
 	m.uplinkForwarded.Describe(ch)
 	m.uplinkDropped.Describe(ch)
+	m.downlinkScheduleAttempted.Describe(ch)
+	m.downlinkScheduleFailed.Describe(ch)
 	m.downlinkSent.Describe(ch)
 	m.downlinkTxSucceeded.Describe(ch)
 	m.downlinkTxFailed.Describe(ch)
@@ -263,6 +293,8 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.uplinkReceived.Collect(ch)
 	m.uplinkForwarded.Collect(ch)
 	m.uplinkDropped.Collect(ch)
+	m.downlinkScheduleAttempted.Collect(ch)
+	m.downlinkScheduleFailed.Collect(ch)
 	m.downlinkSent.Collect(ch)
 	m.downlinkTxSucceeded.Collect(ch)
 	m.downlinkTxFailed.Collect(ch)
@@ -320,6 +352,16 @@ func registerDropUplink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.Gate
 		errorLabel = ttnErr.FullName()
 	}
 	gsMetrics.uplinkDropped.WithLabelValues(ctx, host, errorLabel).Inc()
+}
+
+func registerScheduleDownlinkAttempt(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.DownlinkMessage, protocol string) {
+	events.Publish(evtScheduleDownAttempt.NewWithIdentifiersAndData(ctx, gtw, msg))
+	gsMetrics.downlinkScheduleAttempted.WithLabelValues(ctx, protocol).Inc()
+}
+
+func registerScheduleDownlinkFail(ctx context.Context, gtw *ttnpb.Gateway, err error, protocol string) {
+	events.Publish(evtScheduleDownFail.NewWithIdentifiersAndData(ctx, gtw, err))
+	gsMetrics.downlinkScheduleFailed.WithLabelValues(ctx, protocol).Inc()
 }
 
 func registerSendDownlink(ctx context.Context, gtw *ttnpb.Gateway, msg *ttnpb.DownlinkMessage, protocol string) {
