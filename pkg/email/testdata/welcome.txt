@@ -1,0 +1,7 @@
+{{- define "body" -}}
+
+Welcome to {{ .Network.Name }}, {{ .ReceiverName }}!
+
+Please activate your account by visiting {{ .Network.IdentityServerURL }}/activate/{{ .ActivationToken }}.
+
+{{- end -}}

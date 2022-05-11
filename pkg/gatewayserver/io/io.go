@@ -227,6 +227,8 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 		return nil
 	}
 
+	receivedAt := *ttnpb.StdTime(up.ReceivedAt)
+
 	var ct scheduling.ConcentratorTime
 	switch {
 	case frontendSync != nil:
@@ -238,22 +240,20 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 			"gateway_time", frontendSync.GatewayTime,
 		)).Debug("Gateway clocks have been synchronized by the frontend")
 	case up.Settings.Time != nil:
-		serverTime := *ttnpb.StdTime(up.ReceivedAt)
 		gatewayTime := *ttnpb.StdTime(up.Settings.Time)
-		ct = c.scheduler.SyncWithGatewayAbsolute(up.Settings.Timestamp, serverTime, gatewayTime)
+		ct = c.scheduler.SyncWithGatewayAbsolute(up.Settings.Timestamp, receivedAt, gatewayTime)
 		log.FromContext(c.ctx).WithFields(log.Fields(
 			"timestamp", up.Settings.Timestamp,
 			"concentrator_time", ct,
-			"server_time", serverTime,
+			"server_time", receivedAt,
 			"gateway_time", gatewayTime,
 		)).Debug("Synchronized server and gateway absolute time")
 	case up.Settings.Time == nil:
-		serverTime := *ttnpb.StdTime(up.ReceivedAt)
-		ct = c.scheduler.Sync(up.Settings.Timestamp, serverTime)
+		ct = c.scheduler.Sync(up.Settings.Timestamp, receivedAt)
 		log.FromContext(c.ctx).WithFields(log.Fields(
 			"timestamp", up.Settings.Timestamp,
 			"concentrator_time", ct,
-			"server_time", serverTime,
+			"server_time", receivedAt,
 		)).Debug("Synchronized server absolute time only")
 	default:
 		panic("unreachable")
@@ -268,7 +268,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 		buf, err := UplinkToken(&ttnpb.GatewayAntennaIdentifiers{
 			GatewayIds:   c.gateway.GetIds(),
 			AntennaIndex: md.AntennaIndex,
-		}, md.Timestamp, ct, *ttnpb.StdTime(up.ReceivedAt), ttnpb.StdTime(up.Settings.Time))
+		}, md.Timestamp, ct, receivedAt, ttnpb.StdTime(up.Settings.Time))
 		if err != nil {
 			return err
 		}
@@ -295,7 +295,7 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 		return c.ctx.Err()
 	case c.upCh <- msg:
 		atomic.AddUint64(&c.uplinks, 1)
-		atomic.StoreInt64(&c.lastUplinkTime, ttnpb.StdTime(up.ReceivedAt).UnixNano())
+		atomic.StoreInt64(&c.lastUplinkTime, receivedAt.UnixNano())
 		c.notifyStatsChanged()
 	default:
 		return errBufferFull.New()

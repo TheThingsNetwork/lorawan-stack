@@ -58,9 +58,7 @@ func (e *PubSub) AddSubscription(s events.Subscription) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	subscriptions := make([]events.Subscription, 0, len(e.subscriptions)+1)
-	for _, sub := range e.subscriptions {
-		subscriptions = append(subscriptions, sub)
-	}
+	subscriptions = append(subscriptions, e.subscriptions...)
 	e.subscriptions = append(subscriptions, s)
 }
 

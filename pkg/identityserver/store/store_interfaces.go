@@ -156,8 +156,10 @@ type APIKeyStore interface {
 	CreateAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey) (*ttnpb.APIKey, error)
 	// Find API keys of the given entity.
 	FindAPIKeys(ctx context.Context, entityID *ttnpb.EntityIdentifiers) ([]*ttnpb.APIKey, error)
+	// Get an API key.
+	GetAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, id string) (*ttnpb.APIKey, error)
 	// Get an API key by its ID.
-	GetAPIKey(ctx context.Context, id string) (*ttnpb.EntityIdentifiers, *ttnpb.APIKey, error)
+	GetAPIKeyByID(ctx context.Context, id string) (*ttnpb.EntityIdentifiers, *ttnpb.APIKey, error)
 	// Update key rights on an entity. Rights can be deleted by not passing any rights, in which case the returned API key will be nil.
 	UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey, fieldMask FieldMask) (*ttnpb.APIKey, error)
 	// Delete api keys deletes all api keys tied to an entity. Used when purging entities.

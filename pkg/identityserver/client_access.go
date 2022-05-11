@@ -19,12 +19,9 @@ import (
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
-	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/emails"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 )
@@ -150,14 +147,14 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 		return nil, err
 	}
 	if len(req.Collaborator.Rights) > 0 {
-		events.Publish(evtUpdateClientCollaborator.New(ctx, events.WithIdentifiers(req.GetClientIds(), req.GetCollaborator().GetIds())))
-		err = is.SendContactsEmail(ctx, req, func(data emails.Data) email.MessageData {
-			data.SetEntity(req)
-			return &emails.CollaboratorChanged{Data: data, Collaborator: *req.GetCollaborator()}
+		events.Publish(evtUpdateClientCollaborator.New(ctx, events.WithIdentifiers(req.GetClientIds(), req.GetCollaborator().GetIds()), events.WithData(req.GetCollaborator())))
+		go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
+			EntityIds:        req.GetClientIds().GetEntityIdentifiers(),
+			NotificationType: "collaborator_changed",
+			Data:             ttnpb.MustMarshalAny(req.GetCollaborator()),
+			Receivers:        []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT},
+			Email:            false,
 		})
-		if err != nil {
-			log.FromContext(ctx).WithError(err).Error("Could not send collaborator updated notification email")
-		}
 	} else {
 		events.Publish(evtDeleteClientCollaborator.New(ctx, events.WithIdentifiers(req.GetClientIds(), req.GetCollaborator().GetIds())))
 	}

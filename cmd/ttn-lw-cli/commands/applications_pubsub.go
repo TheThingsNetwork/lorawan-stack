@@ -30,13 +30,13 @@ import (
 )
 
 var (
-	selectApplicationPubSubFlags = &pflag.FlagSet{}
-	setApplicationPubSubFlags    = &pflag.FlagSet{}
+	selectApplicationPubSubFlags = util.NormalizedFlagSet()
+	setApplicationPubSubFlags    = util.NormalizedFlagSet()
 
-	natsProviderApplicationPubSubFlags   = &pflag.FlagSet{}
-	mqttProviderApplicationPubSubFlags   = &pflag.FlagSet{}
-	awsiotProviderApplicationPubSubFlags = &pflag.FlagSet{}
-	awsiotDefaultIntegrationPubSubFlags  = &pflag.FlagSet{}
+	natsProviderApplicationPubSubFlags   = util.NormalizedFlagSet()
+	mqttProviderApplicationPubSubFlags   = util.NormalizedFlagSet()
+	awsiotProviderApplicationPubSubFlags = util.NormalizedFlagSet()
+	awsiotDefaultIntegrationPubSubFlags  = util.NormalizedFlagSet()
 
 	selectAllApplicationPubSubFlags = util.SelectAllFlagSet("application pub/sub")
 )

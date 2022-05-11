@@ -1,0 +1,34 @@
+{{- define "title" -}}
+API Key Created
+{{- end -}}
+
+{{- define "preview" -}}
+A new API key has just been created for your {{ .Notification.EntityIds.EntityType }} "{{ .Notification.EntityIds.IDString }}".
+{{- end -}}
+
+{{- define "body" -}}
+<p>
+Dear {{ .ReceiverName }},
+</p>
+<p>
+A new API key has just been created for your {{ .Notification.EntityIds.EntityType }} <code>{{ .Notification.EntityIds.IDString }}</code> on <b>{{ .Network.Name }}</b>.
+</p>
+<p>
+<b>API Key ID:</b> <code>{{ .APIKey.Id }}</code>
+</p>
+{{- with .APIKey.Name }}
+<b>API Key Name:</b> {{ . }}
+{{- end }}
+<p>
+<p>
+<b>Rights:</b>
+<ul>
+{{ range .Rights }}
+<li><code>{{ . }}</code> {{- with enumDesc . }}<br> <em>{{ . }}</em>{{ end }}</li>
+{{- end }}
+</ul>
+</p>
+<p>
+You can view and edit this API key <a href="{{ .ConsoleURL }}">in the Console</a>.
+</p>
+{{- end -}}

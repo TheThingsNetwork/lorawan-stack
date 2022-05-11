@@ -1,0 +1,21 @@
+{{- define "title" -}}
+Entity State Changed
+{{- end -}}
+
+{{- define "preview" -}}
+The state of your {{ .Notification.EntityIds.EntityType }} "{{ .Notification.EntityIds.IDString }}" has been changed.
+{{- end -}}
+
+{{- define "body" -}}
+<p>
+Dear {{ .ReceiverName }},
+</p>
+<p>
+The state of your {{ .Notification.EntityIds.EntityType }} <code>{{ .Notification.EntityIds.IDString }}</code> on <b>{{ .Network.Name }}</b> has been changed to "{{ enumDesc .State }}".
+</p>
+{{- with .StateDescription }}
+<p>
+<b>Description:</b> {{ . }}
+</p>
+{{- end }}
+{{- end -}}

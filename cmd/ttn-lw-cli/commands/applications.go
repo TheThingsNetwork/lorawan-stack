@@ -30,7 +30,7 @@ import (
 )
 
 var (
-	selectApplicationFlags = &pflag.FlagSet{}
+	selectApplicationFlags = util.NormalizedFlagSet()
 
 	selectAllApplicationFlags = util.SelectAllFlagSet("application")
 )

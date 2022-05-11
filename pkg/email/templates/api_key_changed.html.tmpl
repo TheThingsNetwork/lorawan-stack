@@ -1,0 +1,33 @@
+{{- define "title" -}}
+API Key Changed
+{{- end -}}
+
+{{- define "preview" -}}
+An API key of your {{ .Notification.EntityIds.EntityType }} "{{ .Notification.EntityIds.IDString }}" has been changed.
+{{- end -}}
+
+{{- define "body" -}}
+<p>
+Dear {{ .ReceiverName }},
+</p>
+<p>
+An API key of your {{ .Notification.EntityIds.EntityType }} <code>{{ .Notification.EntityIds.IDString }}</code> on <b>{{ .Network.Name }}</b> has been changed.
+</p>
+<p>
+<b>API Key ID:</b> <code>{{ .APIKey.Id }}</code>
+</p>
+{{- with .APIKey.Name }}
+<b>API Key Name:</b> {{ . }}
+{{- end }}
+<p>
+<b>Rights:</b>
+<ul>
+{{ range .Rights }}
+<li><code>{{ . }}</code> {{- with enumDesc . }}<br> <em>{{ . }}</em>{{ end }}</li>
+{{- end }}
+</ul>
+</p>
+<p>
+You can view and edit this API key <a href="{{ .ConsoleURL }}">in the Console</a>.
+</p>
+{{- end -}}

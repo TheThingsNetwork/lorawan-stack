@@ -29,7 +29,7 @@ import (
 )
 
 var (
-	selectApplicationWebhookFlags = &pflag.FlagSet{}
+	selectApplicationWebhookFlags = util.NormalizedFlagSet()
 
 	selectAllApplicationWebhookFlags = util.SelectAllFlagSet("application webhook")
 )

@@ -27,10 +27,14 @@ jobs:
         uses: ./.github/actions/install-go-and-deps
       - name: Build Mage
         uses: ./.github/actions/build-mage
+      - name: Install Node and Dependencies
+        uses: ./.github/actions/install-node-and-deps
       - name: Format code
         run: tools/bin/mage go:fmt
       - name: Lint code
         run: tools/bin/mage go:lint
+      - name: Run go generate
+        run: tools/bin/mage go:generate
       - name: Generate i18n messages
         run: tools/bin/mage go:messages
       - name: Generate allowed fieldmask paths

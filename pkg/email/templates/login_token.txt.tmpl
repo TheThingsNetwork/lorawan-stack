@@ -1,0 +1,11 @@
+Dear {{ .ReceiverName }},
+
+A login token was requested for your user "{{ .Receiver.Ids.IDString }}" on {{ .Network.Name }}.
+
+You can now go to {{ .Network.IdentityServerURL }}/token-login?token={{ .LoginToken }} to log in.
+Alternatively, you can use the login token "{{ .LoginToken }}" directly.
+
+{{- with .TTL }}
+
+Your login token expires {{ relTime . }}, so if you don't log in before then, you'll have to request a new token if you still want to log in.
+{{- end }}

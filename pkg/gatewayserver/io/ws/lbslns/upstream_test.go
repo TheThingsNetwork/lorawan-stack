@@ -19,6 +19,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/basicstation"
@@ -249,9 +250,10 @@ func TestJoinRequest(t *testing.T) {
 				if !a.So(&payload, should.Resemble, msg.Payload) {
 					t.Fatalf("Invalid RawPayload: %v", msg.RawPayload)
 				}
-				msg.RawPayload = nil
-				msg.ReceivedAt = nil
-				if !a.So(*msg, should.Resemble, tc.ExpectedUplinkMessage) {
+				expected := deepcopy.Copy(tc.ExpectedUplinkMessage).(ttnpb.UplinkMessage)
+				expected.RawPayload = msg.RawPayload
+				expected.ReceivedAt = msg.ReceivedAt
+				if !a.So(*msg, should.Resemble, expected) {
 					t.Fatalf("Invalid UplinkMessage: %s", msg.RawPayload)
 				}
 			}
@@ -422,9 +424,10 @@ func TestUplinkDataFrame(t *testing.T) {
 			} else if tc.ErrorAssertion != nil {
 				t.Fatalf("Expected error")
 			} else {
-				msg.RawPayload = nil
-				msg.ReceivedAt = nil
-				if !a.So(*msg, should.Resemble, tc.ExpectedUplinkMessage) {
+				expected := deepcopy.Copy(tc.ExpectedUplinkMessage).(ttnpb.UplinkMessage)
+				expected.RawPayload = msg.RawPayload
+				expected.ReceivedAt = msg.ReceivedAt
+				if !a.So(*msg, should.Resemble, expected) {
 					t.Fatalf("Invalid UplinkMessage: %s", msg.RawPayload)
 				}
 			}

@@ -106,16 +106,32 @@ func (st *StoreTest) TestAPIKeyStoreCRUD(t *T) {
 
 			t.Run("GetAPIKey", func(t *T) {
 				a, ctx := test.New(t)
-				gotIDs, got, err := s.GetAPIKey(ctx, id)
-				if a.So(err, should.BeNil) && a.So(gotIDs, should.NotBeNil) && a.So(got, should.NotBeNil) {
-					a.So(gotIDs, should.Resemble, ids)
+				got, err := s.GetAPIKey(ctx, ids, id)
+				if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
 					a.So(got, should.Resemble, created)
 				}
 			})
 
 			t.Run("GetAPIKey_Other", func(t *T) {
 				a, ctx := test.New(t)
-				_, _, err := s.GetAPIKey(ctx, "OTHER")
+				_, err := s.GetAPIKey(ctx, ids, "OTHER")
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsNotFound(err), should.BeTrue)
+				}
+			})
+
+			t.Run("GetAPIKeyByID", func(t *T) {
+				a, ctx := test.New(t)
+				gotIDs, got, err := s.GetAPIKeyByID(ctx, id)
+				if a.So(err, should.BeNil) && a.So(gotIDs, should.NotBeNil) && a.So(got, should.NotBeNil) {
+					a.So(gotIDs, should.Resemble, ids)
+					a.So(got, should.Resemble, created)
+				}
+			})
+
+			t.Run("GetAPIKeyByID_Other", func(t *T) {
+				a, ctx := test.New(t)
+				_, _, err := s.GetAPIKeyByID(ctx, "OTHER")
 				if a.So(err, should.NotBeNil) {
 					a.So(errors.IsNotFound(err), should.BeTrue)
 				}
@@ -169,9 +185,9 @@ func (st *StoreTest) TestAPIKeyStoreCRUD(t *T) {
 				a.So(err, should.BeNil)
 			})
 
-			t.Run("GetAPIKey_AfterDelete", func(t *T) {
+			t.Run("GetAPIKeyByID_AfterDelete", func(t *T) {
 				a, ctx := test.New(t)
-				_, _, err := s.GetAPIKey(ctx, id)
+				_, _, err := s.GetAPIKeyByID(ctx, id)
 				if a.So(err, should.NotBeNil) {
 					a.So(errors.IsNotFound(err), should.BeTrue)
 				}

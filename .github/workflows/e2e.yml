@@ -21,6 +21,8 @@ on:
       - ".github/workflows/e2e.yml"
 env:
   TTN_LW_LOG_LEVEL: debug
+  TTN_LW_IS_EMAIL_PROVIDER: dir
+  TTN_LW_IS_EMAIL_DIR: .dev/email
   CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
   CYPRESS_FAIL_FAST: true
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

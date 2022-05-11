@@ -31,7 +31,7 @@ import (
 )
 
 var (
-	selectGatewayFlags    = &pflag.FlagSet{}
+	selectGatewayFlags    = util.NormalizedFlagSet()
 	selectAllGatewayFlags = util.SelectAllFlagSet("gateway")
 
 	gatewayFlattenPaths = []string{"lbs_lns_secret", "claim_authentication_code", "target_cups_key"}

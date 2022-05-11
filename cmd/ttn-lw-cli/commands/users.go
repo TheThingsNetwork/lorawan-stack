@@ -30,8 +30,8 @@ import (
 )
 
 var (
-	selectUserFlags     = &pflag.FlagSet{}
-	profilePictureFlags = &pflag.FlagSet{}
+	selectUserFlags     = util.NormalizedFlagSet()
+	profilePictureFlags = util.NormalizedFlagSet()
 
 	selectAllUserFlags = util.SelectAllFlagSet("user")
 )

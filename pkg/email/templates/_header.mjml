@@ -1,0 +1,6 @@
+<mj-section full-width="full-width" background-color="#ffffff" padding-bottom="0">
+  <mj-column width="100%">
+    <mj-image src="{{ or .Network.BrandingBaseURL .Network.AssetsBaseURL }}/email-logo.png" alt="{{ .Network.Name }}" align="center" width="150px" height="150px" padding-bottom="30px" />
+    <mj-image container-background-color="#2381FF" src="{{ .Network.AssetsBaseURL }}/email-header.png" alt="" padding="0" href="{{ .ConsoleURL }}" css-class="header-image" />
+  </mj-column>
+</mj-section>

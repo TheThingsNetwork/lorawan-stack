@@ -1,0 +1,29 @@
+{{- define "title" -}}
+Validate
+{{- end -}}
+
+{{- define "preview" -}}
+Please confirm your email address for {{ .Network.Name }}.
+{{- end -}}
+
+{{- define "body" -}}
+<p>
+Hello,
+</p>
+<p>
+Please confirm your email address for {{ .Network.Name }}.
+</p>
+<p>
+Your email address "{{ .Receiver.PrimaryEmailAddress }}" will be used by {{ .EntityType }} <code>{{ .IDString }}</code>.
+</p>
+<p>
+You can now visit <a href="{{ .Network.IdentityServerURL }}/validate?reference={{ .ID }}&token={{ .Token }}">this link</a> to confirm your email address.
+Alternatively, you can use the reference <code>{{ .ID }}</code> and confirmation token <code>{{ .Token }}</code> directly.
+</p>
+{{- with .TTL }}
+<p>
+The confirmation token expires {{ relTime . }}, so if you don't confirm your email address before then, you'll have to request a new confirmation if you still want to confirm your email address.
+</p>
+{{- end }}
+
+{{- end -}}

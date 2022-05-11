@@ -18,10 +18,15 @@ For details about compatibility between different releases, see the **Commitment
 - Event type for `gs.up.receive` event to `GatewayUplinkMessage`.
 - Default debounce time for updating connection stats in de Gateway Server (configuration setting `gs.update-connection-stats-debounce-time`) is now 30 seconds.
 - Error code when importing CSV file with invalid LoRaWAN or Regional Parameters version.
+- Emails sent by the Identity Server now also contain HTML versions.
+  - For the images in these emails to work, an absolute `is.email.network.assets-base-url` (and optionally `is.email.network.branding-base-url`) needs to be set in configuration.
+- Notification emails are now sent through the Notification Service of the Identity Server.
 
 ### Deprecated
 
 ### Removed
+
+- The ability to create custom email templates.
 
 ### Fixed
 
@@ -29,8 +34,12 @@ For details about compatibility between different releases, see the **Commitment
 - End devices frame counts being displayed as `n/a` when event stream contained historical data message events.
 - Gateway general settings (Basic settings) not saving changes in some cases.
 - Contact info validation not possible when user is already logged in.
+- CLI not allowing devices to be created or updated.
+- End device creation no longer errors on missing application info rights.
 
 ### Security
+
+- Security fix for an issue where the description and list of rights of arbitrary API keys could be retrieved by any logged-in user if the 24-bit random API key ID was known.
 
 ## [3.19.1] - 2022-05-04
 

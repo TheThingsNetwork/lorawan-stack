@@ -87,6 +87,7 @@ type Config struct {
 	} `name:"login-tokens"`
 	Email struct {
 		email.Config `name:",squash"`
+		Dir          string               `name:"dir" description:"Directory to write emails to if the dir provider is used (development only)"`
 		SendGrid     sendgrid.Config      `name:"sendgrid"`
 		SMTP         smtp.Config          `name:"smtp"`
 		Templates    emailTemplatesConfig `name:"templates"`

@@ -64,6 +64,7 @@ func init() {
 	DefaultIdentityServerConfig.Email.Network.Name = DefaultIdentityServerConfig.OAuth.UI.SiteName
 	DefaultIdentityServerConfig.Email.Network.IdentityServerURL = shared.DefaultOAuthPublicURL
 	DefaultIdentityServerConfig.Email.Network.ConsoleURL = shared.DefaultConsolePublicURL
+	DefaultIdentityServerConfig.Email.Network.AssetsBaseURL = shared.DefaultPublicURL + shared.DefaultHTTPConfig.Static.Mount
 	DefaultIdentityServerConfig.ProfilePicture.Bucket = "profile_pictures"
 	DefaultIdentityServerConfig.ProfilePicture.BucketURL = path.Join(shared.DefaultAssetsBaseURL, "blob", "profile_pictures")
 	DefaultIdentityServerConfig.ProfilePicture.UseGravatar = true

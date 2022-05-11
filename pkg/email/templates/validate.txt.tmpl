@@ -1,0 +1,13 @@
+Hello,
+
+Please confirm your email address for {{ .Network.Name }}.
+
+Your email address "{{ .Receiver.PrimaryEmailAddress }}" will be used by {{ .EntityType }} "{{ .IDString }}".
+
+You can go to {{ .Network.IdentityServerURL }}/validate?reference={{ .ID }}&token={{ .Token }} to confirm your email address.
+Alternatively, you can use the reference "{{ .ID }}" and confirmation token "{{ .Token }}" directly.
+
+{{- with .TTL }}
+
+The confirmation token expires {{ relTime . }}, so if you don't confirm your email address before then, you'll have to request a new confirmation if you still want to confirm your email address.
+{{- end }}

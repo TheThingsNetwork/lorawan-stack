@@ -1,0 +1,14 @@
+Dear John Doe,
+
+A collaborator of your application "foo-app" on The Things Network has been added or updated.
+
+Collaborator: user "foo-usr"
+
+Rights:
+
+- RIGHT_APPLICATION_INFO: view application information
+- RIGHT_APPLICATION_SETTINGS_BASIC: edit basic application settings
+- RIGHT_APPLICATION_DEVICES_READ: view devices in application
+- RIGHT_APPLICATION_TRAFFIC_READ: read application traffic (uplink and downlink)
+
+You can go to https://console.cloud.thethings.network/applications/foo-app/collaborators/user/foo-usr to view and edit this collaborator in the Console.

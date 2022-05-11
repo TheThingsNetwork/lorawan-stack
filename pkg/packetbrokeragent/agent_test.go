@@ -25,6 +25,7 @@ import (
 	"time"
 
 	pbtypes "github.com/gogo/protobuf/types"
+	"github.com/mohae/deepcopy"
 	"github.com/smartystreets/assertions"
 	mappingpb "go.packetbroker.org/api/mapping/v2"
 	packetbroker "go.packetbroker.org/api/v3"
@@ -855,10 +856,13 @@ func TestHomeNetwork(t *testing.T) {
 					t.Fatal("Expected uplink message from Forwarder")
 				}
 				a.So(nsMsg.CorrelationIds, should.HaveLength, 2)
-				nsMsg.CorrelationIds = nil
 				a.So(*ttnpb.StdTime(nsMsg.ReceivedAt), should.HappenBetween, before, time.Now()) // Packet Broker Agent sets local time on receive.
-				nsMsg.ReceivedAt = nil
-				a.So(nsMsg, should.Resemble, tc.UplinkMessage)
+
+				expected := deepcopy.Copy(tc.UplinkMessage).(*ttnpb.UplinkMessage)
+				expected.CorrelationIds = nsMsg.CorrelationIds
+				expected.ReceivedAt = nsMsg.ReceivedAt
+
+				a.So(nsMsg, should.Resemble, expected)
 
 				var stateChange *packetbroker.UplinkMessageDeliveryStateChange
 				select {

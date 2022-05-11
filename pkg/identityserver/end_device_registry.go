@@ -95,13 +95,14 @@ func (is *IdentityServer) validateEndDeviceServerAddressMatch(ctx context.Contex
 	if dev.NetworkServerAddress == "" && dev.ApplicationServerAddress == "" && dev.JoinServerAddress == "" {
 		return nil
 	}
-	app, err := is.getApplication(ctx, &ttnpb.GetApplicationRequest{
-		ApplicationIds: dev.Ids.ApplicationIds,
-		FieldMask: ttnpb.FieldMask(
+	var app *ttnpb.Application
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		app, err = st.GetApplication(ctx, dev.GetIds().GetApplicationIds(), store.FieldMask{
 			"network_server_address",
 			"application_server_address",
 			"join_server_address",
-		),
+		})
+		return err
 	})
 	if err != nil {
 		return err
