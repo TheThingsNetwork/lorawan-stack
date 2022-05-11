@@ -69,7 +69,7 @@ func New(c *component.Component, server io.Server, registry Registry, providerSt
 
 func (ps *PubSub) startAll(ctx context.Context) error {
 	return ps.registry.Range(ctx, []string{"ids"},
-		func(ctx context.Context, _ ttnpb.ApplicationIdentifiers, pb *ttnpb.ApplicationPubSub) bool {
+		func(ctx context.Context, _ *ttnpb.ApplicationIdentifiers, pb *ttnpb.ApplicationPubSub) bool {
 			ps.startTask(ctx, pb.Ids)
 			return true
 		},

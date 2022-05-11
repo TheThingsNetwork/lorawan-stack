@@ -54,13 +54,13 @@ func TestPubSub(t *testing.T) {
 		t.FailNow()
 	}
 	ids := &ttnpb.ApplicationPubSubIdentifiers{
-		ApplicationIds: &registeredApplicationID,
+		ApplicationIds: registeredApplicationID,
 		PubSubId:       registeredPubSubID,
 	}
 
 	ps := &ttnpb.ApplicationPubSub{
 		Ids: &ttnpb.ApplicationPubSubIdentifiers{
-			ApplicationIds: &registeredApplicationID,
+			ApplicationIds: registeredApplicationID,
 			PubSubId:       registeredPubSubID,
 		},
 		Provider: &ttnpb.ApplicationPubSub_Nats{

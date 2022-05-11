@@ -311,7 +311,7 @@ func (r *LinkRegistry) Get(ctx context.Context, ids *ttnpb.ApplicationIdentifier
 var errApplicationUID = errors.DefineCorruption("application_uid", "invalid application UID `{application_uid}`")
 
 // Range ranges the links and calls the callback function, until false is returned.
-func (r *LinkRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error {
+func (r *LinkRegistry) Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error {
 	defer trace.StartRegion(ctx, "range links").End()
 
 	uids, err := r.Redis.SMembers(ctx, r.allKey(ctx)).Result()

@@ -343,7 +343,7 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 				)
 				for i := len(dev.MacState.RecentUplinks) - 1; i >= 0; i-- {
 					recentUp := dev.MacState.RecentUplinks[i]
-					recentUpPHYPayload, err = lorawan.AppendMessage(recentUpPHYPayload[:0], *recentUp.Payload)
+					recentUpPHYPayload, err = lorawan.AppendMessage(recentUpPHYPayload[:0], recentUp.Payload)
 					if err != nil {
 						log.FromContext(ctx).WithError(err).Error("Failed to marshal recent uplink payload")
 						return nil, false, nil
@@ -1348,7 +1348,7 @@ func (ns *NetworkServer) HandleUplink(ctx context.Context, up *ttnpb.UplinkMessa
 	}
 	ctx = log.NewContext(ctx, logger)
 
-	if t, err := toa.Compute(len(up.RawPayload), *up.Settings); err != nil {
+	if t, err := toa.Compute(len(up.RawPayload), up.Settings); err != nil {
 		log.FromContext(ctx).WithError(err).Debug("Failed to compute time-on-air")
 	} else {
 		up.ConsumedAirtime = ttnpb.ProtoDurationPtr(t)

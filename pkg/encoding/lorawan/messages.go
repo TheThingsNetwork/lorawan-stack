@@ -220,7 +220,7 @@ var errMaxCFListFrequency = unexpectedValue(
 )
 
 // AppendCFList appends encoded msg to dst.
-func AppendCFList(dst []byte, msg ttnpb.CFList) ([]byte, error) {
+func AppendCFList(dst []byte, msg *ttnpb.CFList) ([]byte, error) {
 	switch msg.Type {
 	case 0:
 		n := len(msg.Freq)
@@ -257,7 +257,7 @@ func AppendCFList(dst []byte, msg ttnpb.CFList) ([]byte, error) {
 }
 
 // MarshalCFList returns encoded msg.
-func MarshalCFList(msg ttnpb.CFList) ([]byte, error) {
+func MarshalCFList(msg *ttnpb.CFList) ([]byte, error) {
 	return AppendCFList(make([]byte, 0, 16), msg)
 }
 
@@ -298,7 +298,7 @@ func UnmarshalCFList(b []byte, msg *ttnpb.CFList) error {
 }
 
 // AppendJoinAcceptPayload appends encoded msg to dst.
-func AppendJoinAcceptPayload(dst []byte, msg ttnpb.JoinAcceptPayload) ([]byte, error) {
+func AppendJoinAcceptPayload(dst []byte, msg *ttnpb.JoinAcceptPayload) ([]byte, error) {
 	dst = appendReverse(dst, msg.JoinNonce[:]...)
 	dst = appendReverse(dst, msg.NetId[:]...)
 	dst = appendReverse(dst, msg.DevAddr[:]...)
@@ -311,7 +311,7 @@ func AppendJoinAcceptPayload(dst []byte, msg ttnpb.JoinAcceptPayload) ([]byte, e
 	}
 	dst = append(dst, byte(msg.RxDelay))
 	if msg.GetCfList() != nil {
-		dst, err = AppendCFList(dst, *msg.CfList)
+		dst, err = AppendCFList(dst, msg.CfList)
 		if err != nil {
 			return nil, errFailedEncoding("CFList").WithCause(err)
 		}
@@ -320,7 +320,7 @@ func AppendJoinAcceptPayload(dst []byte, msg ttnpb.JoinAcceptPayload) ([]byte, e
 }
 
 // MarshalJoinAcceptPayload returns encoded msg.
-func MarshalJoinAcceptPayload(msg ttnpb.JoinAcceptPayload) ([]byte, error) {
+func MarshalJoinAcceptPayload(msg *ttnpb.JoinAcceptPayload) ([]byte, error) {
 	if msg.GetCfList() != nil {
 		return AppendJoinAcceptPayload(make([]byte, 0, 28), msg)
 	}
@@ -433,7 +433,7 @@ func UnmarshalRejoinRequestPayload(b []byte, msg *ttnpb.RejoinRequestPayload) er
 }
 
 // AppendMessage appends encoded msg to dst.
-func AppendMessage(dst []byte, msg ttnpb.Message) ([]byte, error) {
+func AppendMessage(dst []byte, msg *ttnpb.Message) ([]byte, error) {
 	if msg.MHdr == nil {
 		return nil, errMissing("MHDR")
 	}
@@ -496,7 +496,7 @@ func AppendMessage(dst []byte, msg ttnpb.Message) ([]byte, error) {
 }
 
 // MarshalMessage returns encoded msg.
-func MarshalMessage(msg ttnpb.Message) ([]byte, error) {
+func MarshalMessage(msg *ttnpb.Message) ([]byte, error) {
 	if msg.MHdr == nil {
 		return nil, errMissing("MHDR")
 	}

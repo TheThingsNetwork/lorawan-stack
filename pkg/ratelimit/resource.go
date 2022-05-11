@@ -85,7 +85,7 @@ func grpcStreamUpResource(ctx context.Context, fullMethod string) Resource {
 }
 
 // GatewayUpResource represents uplink traffic from a gateway.
-func GatewayUpResource(ctx context.Context, ids ttnpb.GatewayIdentifiers) Resource {
+func GatewayUpResource(ctx context.Context, ids *ttnpb.GatewayIdentifiers) Resource {
 	return &resource{
 		key:     fmt.Sprintf("gs:up:gtw:%s", unique.ID(ctx, ids)),
 		classes: []string{"gs:up"},
@@ -125,7 +125,7 @@ func ApplicationAcceptMQTTConnectionResource(remoteAddr string) Resource {
 }
 
 // ApplicationMQTTDownResource represents downlink traffic for an application from an MQTT client.
-func ApplicationMQTTDownResource(ctx context.Context, ids ttnpb.ApplicationIdentifiers, authTokenID string) Resource {
+func ApplicationMQTTDownResource(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, authTokenID string) Resource {
 	key := fmt.Sprintf("as:down:mqtt:app:%s", unique.ID(ctx, ids))
 	if authTokenID != "" {
 		key = fmt.Sprintf("%s:token:%s", key, authTokenID)

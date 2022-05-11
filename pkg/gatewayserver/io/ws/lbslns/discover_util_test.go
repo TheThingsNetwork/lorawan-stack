@@ -26,30 +26,30 @@ import (
 )
 
 type mockServer struct {
-	ids ttnpb.GatewayIdentifiers
+	ids *ttnpb.GatewayIdentifiers
 }
 
 func (srv mockServer) GetBaseConfig(ctx context.Context) config.ServiceBase {
 	return config.ServiceBase{}
 }
 
-func (srv mockServer) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error) {
+func (srv mockServer) FillGatewayContext(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (context.Context, *ttnpb.GatewayIdentifiers, error) {
 	return ctx, srv.ids, nil
 }
 
-func (srv mockServer) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
+func (srv mockServer) Connect(ctx context.Context, frontend io.Frontend, ids *ttnpb.GatewayIdentifiers) (*io.Connection, error) {
 	return nil, nil
 }
 
-func (srv mockServer) GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error) {
+func (srv mockServer) GetFrequencyPlans(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error) {
 	return nil, nil
 }
 
-func (srv mockServer) ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
+func (srv mockServer) ClaimDownlink(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error {
 	return nil
 }
 
-func (srv mockServer) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
+func (srv mockServer) UnclaimDownlink(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error {
 	return nil
 }
 
@@ -61,7 +61,7 @@ func (srv mockServer) RateLimiter() ratelimit.Interface {
 	return nil
 }
 
-func (srv mockServer) ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
+func (srv mockServer) ValidateGatewayID(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error {
 	return ids.ValidateContext(ctx)
 }
 

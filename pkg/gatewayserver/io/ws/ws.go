@@ -184,7 +184,7 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 	var eui types.EUI64
 	eui.UnmarshalBinary(hexValue)
 
-	ctx, ids, err := s.server.FillGatewayContext(ctx, ttnpb.GatewayIdentifiers{Eui: &eui})
+	ctx, ids, err := s.server.FillGatewayContext(ctx, &ttnpb.GatewayIdentifiers{Eui: &eui})
 	if err != nil {
 		return err
 	}

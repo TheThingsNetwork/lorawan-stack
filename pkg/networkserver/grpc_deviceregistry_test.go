@@ -378,18 +378,18 @@ func TestDeviceRegistryGet(t *testing.T) {
 func TestDeviceRegistrySet(t *testing.T) {
 	defaultMACSettings := DefaultConfig.DefaultMACSettings.Parse()
 
-	customMACSettings := defaultMACSettings
+	customMACSettings := DefaultConfig.DefaultMACSettings.Parse()
 	customMACSettings.Rx1Delay = &ttnpb.RxDelayValue{Value: ttnpb.RxDelay_RX_DELAY_2}
 	customMACSettings.Rx1DataRateOffset = nil
 
-	customMACSettingsOpt := EndDeviceOptions.WithMacSettings(&customMACSettings)
+	customMACSettingsOpt := EndDeviceOptions.WithMacSettings(customMACSettings)
 
-	multicastClassBMACSettings := defaultMACSettings
+	multicastClassBMACSettings := DefaultConfig.DefaultMACSettings.Parse()
 	multicastClassBMACSettings.PingSlotPeriodicity = &ttnpb.PingSlotPeriodValue{
 		Value: ttnpb.PingSlotPeriod_PING_EVERY_16S,
 	}
 
-	multicastClassBMACSettingsOpt := EndDeviceOptions.WithMacSettings(&multicastClassBMACSettings)
+	multicastClassBMACSettingsOpt := EndDeviceOptions.WithMacSettings(multicastClassBMACSettings)
 
 	currentMACStateOverrideOpt := func(macState ttnpb.MACState) ttnpb.MACState {
 		macState.CurrentParameters.Rx1Delay = ttnpb.RxDelay_RX_DELAY_3

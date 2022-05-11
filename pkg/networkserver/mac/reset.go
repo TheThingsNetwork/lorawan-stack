@@ -33,7 +33,7 @@ var (
 	)()
 )
 
-func HandleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_ResetInd, fps *frequencyplans.Store, defaults ttnpb.MACSettings) (events.Builders, error) {
+func HandleResetInd(ctx context.Context, dev *ttnpb.EndDevice, pld *ttnpb.MACCommand_ResetInd, fps *frequencyplans.Store, defaults *ttnpb.MACSettings) (events.Builders, error) {
 	if pld == nil {
 		return nil, ErrNoPayload.New()
 	}

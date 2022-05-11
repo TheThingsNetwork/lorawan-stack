@@ -98,7 +98,7 @@ func (w *webhooks) requireApplicationRights(required ...ttnpb.Right) mux.Middlew
 		return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 			ctx := req.Context()
 			appID := deviceIDFromContext(ctx).ApplicationIds
-			if err := rights.RequireApplication(ctx, *appID, required...); err != nil {
+			if err := rights.RequireApplication(ctx, appID, required...); err != nil {
 				webhandlers.Error(res, req, err)
 				return
 			}

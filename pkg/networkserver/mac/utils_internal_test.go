@@ -480,7 +480,7 @@ func TestNewState(t *testing.T) {
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				pb := CopyEndDevice(tc.Device)
 
-				macState, err := NewState(pb, tc.FrequencyPlanStore, ttnpb.MACSettings{})
+				macState, err := NewState(pb, tc.FrequencyPlanStore, &ttnpb.MACSettings{})
 				if tc.ErrorAssertion != nil {
 					a.So(tc.ErrorAssertion(t, err), should.BeTrue)
 				} else {

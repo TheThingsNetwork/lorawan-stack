@@ -48,7 +48,7 @@ type ApplicationUplinkQueue interface {
 	// if such is available, otherwise it blocks until it is.
 	// Context passed to f must be derived from ctx.
 	// Implementations must respect ctx.Done() value on best-effort basis.
-	Pop(ctx context.Context, consumerID string, f func(context.Context, ttnpb.ApplicationIdentifiers, ApplicationUplinkQueueDrainFunc) (time.Time, error)) error
+	Pop(ctx context.Context, consumerID string, f func(context.Context, *ttnpb.ApplicationIdentifiers, ApplicationUplinkQueueDrainFunc) (time.Time, error)) error
 }
 
 func applicationJoinAcceptWithoutAppSKey(pld *ttnpb.ApplicationJoinAccept) *ttnpb.ApplicationJoinAccept {
@@ -100,7 +100,7 @@ func (ns *NetworkServer) createProcessApplicationUplinkTask(consumerID string) f
 }
 
 func (ns *NetworkServer) processApplicationUplinkTask(ctx context.Context, consumerID string) error {
-	return ns.applicationUplinks.Pop(ctx, consumerID, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, drain ApplicationUplinkQueueDrainFunc) (time.Time, error) {
+	return ns.applicationUplinks.Pop(ctx, consumerID, func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, drain ApplicationUplinkQueueDrainFunc) (time.Time, error) {
 		conn, err := ns.GetPeerConn(ctx, ttnpb.ClusterRole_APPLICATION_SERVER, nil)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Warn("Failed to get Application Server peer")

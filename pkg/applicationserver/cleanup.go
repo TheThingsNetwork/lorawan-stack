@@ -51,13 +51,13 @@ func (cleaner *RegistryCleaner) DeleteDeviceData(ctx context.Context, devSet []s
 		if err != nil {
 			return err
 		}
-		_, err = cleaner.DevRegistry.Set(ctx, &devIds, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+		_, err = cleaner.DevRegistry.Set(ctx, devIds, nil, func(dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
 			return nil, nil, nil
 		})
 		if err != nil {
 			return err
 		}
-		if err := cleaner.AppUpsRegistry.Clear(ctx, &devIds); err != nil {
+		if err := cleaner.AppUpsRegistry.Clear(ctx, devIds); err != nil {
 			return err
 		}
 	}

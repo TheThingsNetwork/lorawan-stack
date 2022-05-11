@@ -25,14 +25,14 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
 
-func buildLoRaDownlinkFromParameters(payloadSize int, frequency uint64, dataRate *ttnpb.DataRate, codingRate string) (downlink ttnpb.DownlinkMessage, err error) {
+func buildLoRaDownlinkFromParameters(payloadSize int, frequency uint64, dataRate *ttnpb.DataRate, codingRate string) (downlink *ttnpb.DownlinkMessage, err error) {
 	payload := bytes.Repeat([]byte{0x0}, payloadSize)
 	scheduled := &ttnpb.TxSettings{
 		Frequency:  frequency,
 		DataRate:   dataRate,
 		CodingRate: codingRate,
 	}
-	downlink = ttnpb.DownlinkMessage{
+	downlink = &ttnpb.DownlinkMessage{
 		RawPayload: payload,
 		Settings: &ttnpb.DownlinkMessage_Scheduled{
 			Scheduled: scheduled,
@@ -55,7 +55,7 @@ func TestInvalidLoRa(t *testing.T) {
 			},
 		}, "1/9")
 		a.So(err, should.BeNil)
-		_, err = Compute(len(downlink.RawPayload), *downlink.GetScheduled())
+		_, err = Compute(len(downlink.RawPayload), downlink.GetScheduled())
 		a.So(err, should.NotBeNil)
 	}
 
@@ -70,7 +70,7 @@ func TestInvalidLoRa(t *testing.T) {
 			},
 		}, "4/5")
 		a.So(err, should.BeNil)
-		_, err = Compute(len(downlink.RawPayload), *downlink.GetScheduled())
+		_, err = Compute(len(downlink.RawPayload), downlink.GetScheduled())
 		a.So(err, should.NotBeNil)
 	}
 
@@ -85,7 +85,7 @@ func TestInvalidLoRa(t *testing.T) {
 			},
 		}, "4/5")
 		a.So(err, should.BeNil)
-		_, err = Compute(len(downlink.RawPayload), *downlink.GetScheduled())
+		_, err = Compute(len(downlink.RawPayload), downlink.GetScheduled())
 		a.So(err, should.NotBeNil)
 	}
 }
@@ -124,7 +124,7 @@ func TestDifferentLoRaSFs(t *testing.T) {
 	for _, tt := range sfTests {
 		dl, err := buildLoRaDownlinkFromParameters(10, 868100000, tt.dr, "4/5")
 		a.So(err, should.BeNil)
-		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
+		toa, err := Compute(len(dl.RawPayload), dl.GetScheduled())
 		a.So(err, should.BeNil)
 		a.So(toa, should.AlmostEqual, time.Duration(tt.expected)*time.Microsecond)
 	}
@@ -152,7 +152,7 @@ func TestDifferentLoRaBWs(t *testing.T) {
 	for _, tt := range bwTests {
 		dl, err := buildLoRaDownlinkFromParameters(10, 868100000, tt.dr, "4/5")
 		a.So(err, should.BeNil)
-		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
+		toa, err := Compute(len(dl.RawPayload), dl.GetScheduled())
 		a.So(err, should.BeNil)
 		a.So(toa, should.AlmostEqual, time.Duration(tt.expected)*time.Microsecond)
 	}
@@ -169,7 +169,7 @@ func TestDifferentLoRaCRs(t *testing.T) {
 	for cr, us := range crTests {
 		dl, err := buildLoRaDownlinkFromParameters(10, 868100000, &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}, cr)
 		a.So(err, should.BeNil)
-		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
+		toa, err := Compute(len(dl.RawPayload), dl.GetScheduled())
 		a.So(err, should.BeNil)
 		a.So(toa, should.AlmostEqual, time.Duration(us)*time.Microsecond)
 	}
@@ -189,7 +189,7 @@ func TestDifferentLoRaPayloadSizes(t *testing.T) {
 	for size, us := range plTests {
 		dl, err := buildLoRaDownlinkFromParameters(size, 868100000, &ttnpb.DataRate{Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{SpreadingFactor: 7, Bandwidth: 125000}}}, "4/5")
 		a.So(err, should.BeNil)
-		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
+		toa, err := Compute(len(dl.RawPayload), dl.GetScheduled())
 		a.So(err, should.BeNil)
 		a.So(toa, should.AlmostEqual, time.Duration(us)*time.Microsecond)
 	}
@@ -198,7 +198,7 @@ func TestDifferentLoRaPayloadSizes(t *testing.T) {
 func TestFSK(t *testing.T) {
 	a := assertions.New(t)
 	payloadSize := 200
-	scheduled := ttnpb.TxSettings{
+	scheduled := &ttnpb.TxSettings{
 		Frequency: 868300000,
 		DataRate: &ttnpb.DataRate{
 			Modulation: &ttnpb.DataRate_Fsk{
@@ -217,7 +217,7 @@ func getDownlink() ttnpb.DownlinkMessage { return ttnpb.DownlinkMessage{} }
 
 func ExampleCompute() {
 	downlink := getDownlink()
-	toa, err := Compute(len(downlink.RawPayload), *downlink.GetScheduled())
+	toa, err := Compute(len(downlink.RawPayload), downlink.GetScheduled())
 	if err != nil {
 		panic(err)
 	}
@@ -239,7 +239,7 @@ func TestInvalidLoRa2400(t *testing.T) {
 			},
 		}, "1/9LI")
 		a.So(err, should.BeNil)
-		_, err = Compute(len(downlink.RawPayload), *downlink.GetScheduled())
+		_, err = Compute(len(downlink.RawPayload), downlink.GetScheduled())
 		a.So(err, should.NotBeNil)
 	}
 
@@ -254,7 +254,7 @@ func TestInvalidLoRa2400(t *testing.T) {
 			},
 		}, "4/5LI")
 		a.So(err, should.BeNil)
-		_, err = Compute(len(downlink.RawPayload), *downlink.GetScheduled())
+		_, err = Compute(len(downlink.RawPayload), downlink.GetScheduled())
 		a.So(err, should.NotBeNil)
 	}
 
@@ -269,7 +269,7 @@ func TestInvalidLoRa2400(t *testing.T) {
 			},
 		}, "4/5LI")
 		a.So(err, should.BeNil)
-		_, err = Compute(len(downlink.RawPayload), *downlink.GetScheduled())
+		_, err = Compute(len(downlink.RawPayload), downlink.GetScheduled())
 		a.So(err, should.NotBeNil)
 	}
 }
@@ -316,7 +316,7 @@ func TestDifferentLoRa2400SFs(t *testing.T) {
 	for _, tt := range sfTests {
 		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, tt.dr, "4/5LI")
 		a.So(err, should.BeNil)
-		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
+		toa, err := Compute(len(dl.RawPayload), dl.GetScheduled())
 		a.So(err, should.BeNil)
 		a.So(toa, should.AlmostEqual, tt.expected, 50)
 	}
@@ -348,7 +348,7 @@ func TestDifferentLoRa2400BWs(t *testing.T) {
 	for _, tt := range bwTests {
 		dl, err := buildLoRaDownlinkFromParameters(10, 2422000000, tt.dr, "4/5LI")
 		a.So(err, should.BeNil)
-		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
+		toa, err := Compute(len(dl.RawPayload), dl.GetScheduled())
 		a.So(err, should.BeNil)
 		a.So(toa, should.AlmostEqual, tt.expected, 50)
 	}
@@ -372,7 +372,7 @@ func TestDifferentLoRa2400CRs(t *testing.T) {
 			},
 		}, cr)
 		a.So(err, should.BeNil)
-		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
+		toa, err := Compute(len(dl.RawPayload), dl.GetScheduled())
 		a.So(err, should.BeNil)
 		a.So(toa, should.AlmostEqual, ns, 50)
 	}
@@ -398,7 +398,7 @@ func TestDifferentLoRa2400PayloadSizes(t *testing.T) {
 			},
 		}, "4/5LI")
 		a.So(err, should.BeNil)
-		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
+		toa, err := Compute(len(dl.RawPayload), dl.GetScheduled())
 		a.So(err, should.BeNil)
 		a.So(toa, should.AlmostEqual, ns, 50)
 	}
@@ -421,7 +421,7 @@ func TestDifferentLoRa2400CRCs(t *testing.T) {
 		}, "4/5LI")
 		dl.GetScheduled().EnableCrc = crc
 		a.So(err, should.BeNil)
-		toa, err := Compute(len(dl.RawPayload), *dl.GetScheduled())
+		toa, err := Compute(len(dl.RawPayload), dl.GetScheduled())
 		a.So(err, should.BeNil)
 		a.So(toa, should.AlmostEqual, ns, 50)
 	}

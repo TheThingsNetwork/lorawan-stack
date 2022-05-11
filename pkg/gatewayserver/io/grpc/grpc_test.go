@@ -44,7 +44,7 @@ import (
 )
 
 var (
-	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}
+	registeredGatewayID  = &ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}
 	registeredGatewayUID = unique.ID(test.Context(), registeredGatewayID)
 	registeredGatewayKey = "test-key"
 
@@ -89,7 +89,7 @@ func TestAuthentication(t *testing.T) {
 	client := ttnpb.NewGtwGsClient(c.LoopbackConn())
 
 	for _, tc := range []struct {
-		ID  ttnpb.GatewayIdentifiers
+		ID  *ttnpb.GatewayIdentifiers
 		Key string
 		OK  bool
 	}{
@@ -104,12 +104,12 @@ func TestAuthentication(t *testing.T) {
 			OK:  false,
 		},
 		{
-			ID:  ttnpb.GatewayIdentifiers{GatewayId: "invalid-gateway"},
+			ID:  &ttnpb.GatewayIdentifiers{GatewayId: "invalid-gateway"},
 			Key: "invalid-key",
 			OK:  false,
 		},
 		{
-			ID:  ttnpb.GatewayIdentifiers{Eui: &eui},
+			ID:  &ttnpb.GatewayIdentifiers{Eui: &eui},
 			Key: "invalid-key",
 			OK:  false,
 		},
@@ -241,7 +241,7 @@ func TestTraffic(t *testing.T) {
 						RawPayload: []byte{0x01},
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
-								GatewayIds: &registeredGatewayID,
+								GatewayIds: registeredGatewayID,
 							},
 						},
 						Settings: &ttnpb.TxSettings{
@@ -264,7 +264,7 @@ func TestTraffic(t *testing.T) {
 						RawPayload: []byte{0x02},
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
-								GatewayIds: &registeredGatewayID,
+								GatewayIds: registeredGatewayID,
 							},
 						},
 						Settings: &ttnpb.TxSettings{
@@ -291,7 +291,7 @@ func TestTraffic(t *testing.T) {
 						RawPayload: []byte{0x03},
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
-								GatewayIds: &registeredGatewayID,
+								GatewayIds: registeredGatewayID,
 							},
 						},
 						Settings: &ttnpb.TxSettings{
@@ -310,7 +310,7 @@ func TestTraffic(t *testing.T) {
 						RawPayload: []byte{0x04},
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
-								GatewayIds: &registeredGatewayID,
+								GatewayIds: registeredGatewayID,
 							},
 						},
 						Settings: &ttnpb.TxSettings{
@@ -329,7 +329,7 @@ func TestTraffic(t *testing.T) {
 						RawPayload: []byte{0x05},
 						RxMetadata: []*ttnpb.RxMetadata{
 							{
-								GatewayIds: &registeredGatewayID,
+								GatewayIds: registeredGatewayID,
 							},
 						},
 						Settings: &ttnpb.TxSettings{
@@ -392,7 +392,7 @@ func TestTraffic(t *testing.T) {
 				UplinkMessages: []*ttnpb.UplinkMessage{
 					{
 						RawPayload: []byte{0x06},
-						RxMetadata: []*ttnpb.RxMetadata{{GatewayIds: &registeredGatewayID, Rssi: -100}},
+						RxMetadata: []*ttnpb.RxMetadata{{GatewayIds: registeredGatewayID, Rssi: -100}},
 						Settings: &ttnpb.TxSettings{
 							DataRate: &ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
@@ -407,7 +407,7 @@ func TestTraffic(t *testing.T) {
 					},
 					{
 						RawPayload: []byte{0x06},
-						RxMetadata: []*ttnpb.RxMetadata{{GatewayIds: &registeredGatewayID, Rssi: -10}},
+						RxMetadata: []*ttnpb.RxMetadata{{GatewayIds: registeredGatewayID, Rssi: -10}},
 						Settings: &ttnpb.TxSettings{
 							DataRate: &ttnpb.DataRate{
 								Modulation: &ttnpb.DataRate_Lora{Lora: &ttnpb.LoRaDataRate{
@@ -450,7 +450,7 @@ func TestTraffic(t *testing.T) {
 				Path: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_UplinkToken{
 						UplinkToken: io.MustUplinkToken(
-							&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &registeredGatewayID},
+							&ttnpb.GatewayAntennaIdentifiers{GatewayIds: registeredGatewayID},
 							100,
 							100000,
 							time.Unix(0, 100*1000),
@@ -493,7 +493,7 @@ func TestTraffic(t *testing.T) {
 				Path: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_UplinkToken{
 						UplinkToken: io.MustUplinkToken(
-							&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &registeredGatewayID},
+							&ttnpb.GatewayAntennaIdentifiers{GatewayIds: registeredGatewayID},
 							100,
 							100000,
 							time.Unix(0, 100*1000),
@@ -524,7 +524,7 @@ func TestTraffic(t *testing.T) {
 				Path: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_UplinkToken{
 						UplinkToken: io.MustUplinkToken(
-							&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &registeredGatewayID},
+							&ttnpb.GatewayAntennaIdentifiers{GatewayIds: registeredGatewayID},
 							100,
 							100000,
 							time.Unix(0, 100*1000),
@@ -709,7 +709,7 @@ func TestMQTTConfig(t *testing.T) {
 		AllowInsecure: true,
 	})
 
-	info, err := client.GetMQTTConnectionInfo(ctx, &registeredGatewayID, creds)
+	info, err := client.GetMQTTConnectionInfo(ctx, registeredGatewayID, creds)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -719,7 +719,7 @@ func TestMQTTConfig(t *testing.T) {
 		PublicTlsAddress: "example.com:8883",
 	})
 
-	infov2, err := client.GetMQTTV2ConnectionInfo(ctx, &registeredGatewayID, creds)
+	infov2, err := client.GetMQTTV2ConnectionInfo(ctx, registeredGatewayID, creds)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}

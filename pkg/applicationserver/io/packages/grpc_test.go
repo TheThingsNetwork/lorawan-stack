@@ -40,16 +40,16 @@ import (
 )
 
 var (
-	registeredApplicationID   = ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}
+	registeredApplicationID   = &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}
 	registeredApplicationUID  = unique.ID(test.Context(), registeredApplicationID)
 	registeredApplicationKey  = "test-key"
-	unregisteredApplicationID = ttnpb.ApplicationIdentifiers{ApplicationId: "invalid-app"}
-	registeredDeviceID        = ttnpb.EndDeviceIdentifiers{ApplicationIds: &registeredApplicationID, DeviceId: "test-dev"}
-	unregisteredDeviceID      = ttnpb.EndDeviceIdentifiers{ApplicationIds: &unregisteredApplicationID, DeviceId: "invalid-dev"}
-	registeredAssociationID   = &ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIds: &registeredDeviceID, FPort: 123}
-	unregisteredAssociationID = &ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIds: &unregisteredDeviceID, FPort: 123}
-	registeredApplicationUp1  = ttnpb.ApplicationUp{
-		EndDeviceIds: &registeredDeviceID,
+	unregisteredApplicationID = &ttnpb.ApplicationIdentifiers{ApplicationId: "invalid-app"}
+	registeredDeviceID        = &ttnpb.EndDeviceIdentifiers{ApplicationIds: registeredApplicationID, DeviceId: "test-dev"}
+	unregisteredDeviceID      = &ttnpb.EndDeviceIdentifiers{ApplicationIds: unregisteredApplicationID, DeviceId: "invalid-dev"}
+	registeredAssociationID   = &ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIds: registeredDeviceID, FPort: 123}
+	unregisteredAssociationID = &ttnpb.ApplicationPackageAssociationIdentifiers{EndDeviceIds: unregisteredDeviceID, FPort: 123}
+	registeredApplicationUp1  = &ttnpb.ApplicationUp{
+		EndDeviceIds: registeredDeviceID,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{
 			UplinkMessage: &ttnpb.ApplicationUplink{
 				FPort: 123,
@@ -57,7 +57,7 @@ var (
 		},
 	}
 	registeredApplicationUp2 = ttnpb.ApplicationUp{
-		EndDeviceIds: &registeredDeviceID,
+		EndDeviceIds: registeredDeviceID,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{
 			UplinkMessage: &ttnpb.ApplicationUplink{
 				FPort: 124,
@@ -65,7 +65,7 @@ var (
 		},
 	}
 	unregisteredApplicationUp = ttnpb.ApplicationUp{
-		EndDeviceIds: &unregisteredDeviceID,
+		EndDeviceIds: unregisteredDeviceID,
 		Up: &ttnpb.ApplicationUp_UplinkMessage{
 			UplinkMessage: &ttnpb.ApplicationUplink{
 				FPort: 123,
@@ -115,7 +115,7 @@ func TestAuthentication(t *testing.T) {
 	client := ttnpb.NewApplicationPackageRegistryClient(c.LoopbackConn())
 
 	for _, tc := range []struct {
-		ID  ttnpb.EndDeviceIdentifiers
+		ID  *ttnpb.EndDeviceIdentifiers
 		Key string
 		OK  bool
 	}{
@@ -147,7 +147,7 @@ func TestAuthentication(t *testing.T) {
 				AllowInsecure: true,
 			})
 
-			_, err := client.List(ctx, &tc.ID, creds)
+			_, err := client.List(ctx, tc.ID, creds)
 			if tc.OK && err != nil && !a.So(errors.IsCanceled(err), should.BeTrue) {
 				t.Fatalf("Unexpected error: %v", err)
 			}
@@ -210,7 +210,7 @@ func TestAssociations(t *testing.T) {
 	// Check that the test package is registered.
 	t.Run("AvailablePackages", func(t *testing.T) {
 		a := assertions.New(t)
-		res, err := client.List(ctx, &registeredDeviceID, creds)
+		res, err := client.List(ctx, registeredDeviceID, creds)
 		a.So(err, should.BeNil)
 		a.So(res, should.NotBeNil)
 		a.So(res.Packages, should.Resemble, []*ttnpb.ApplicationPackage{
@@ -233,7 +233,7 @@ func TestAssociations(t *testing.T) {
 		a.So(errors.IsNotFound(err), should.BeTrue)
 
 		res, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
-			Ids: &registeredDeviceID,
+			Ids: registeredDeviceID,
 		}, creds)
 		a.So(err, should.BeNil)
 		a.So(res, should.NotBeNil)
@@ -278,7 +278,7 @@ func TestAssociations(t *testing.T) {
 		a.So(res1, should.Resemble, association)
 
 		res2, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
-			Ids:       &registeredDeviceID,
+			Ids:       registeredDeviceID,
 			FieldMask: ttnpb.FieldMask("package_name", "data"),
 		}, creds)
 		a.So(err, should.BeNil)
@@ -296,7 +296,7 @@ func TestAssociations(t *testing.T) {
 		}{
 			{
 				name:  "Valid",
-				up:    &registeredApplicationUp1,
+				up:    registeredApplicationUp1,
 				valid: true,
 			},
 			{
@@ -351,13 +351,13 @@ func TestAssociations(t *testing.T) {
 		a.So(errors.IsNotFound(err), should.BeTrue)
 
 		res, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
-			Ids: &registeredDeviceID,
+			Ids: registeredDeviceID,
 		}, creds)
 		a.So(err, should.BeNil)
 		a.So(res, should.NotBeNil)
 		a.So(res.Associations, should.BeEmpty)
 
-		err = as.Publish(ctx, &registeredApplicationUp1)
+		err = as.Publish(ctx, registeredApplicationUp1)
 		a.So(err, should.BeNil)
 		select {
 		case <-handleUpCh:
@@ -374,7 +374,7 @@ func TestAssociations(t *testing.T) {
 		for i := 1; i < 21; i++ {
 			association := &ttnpb.ApplicationPackageAssociation{
 				Ids: &ttnpb.ApplicationPackageAssociationIdentifiers{
-					EndDeviceIds: &registeredDeviceID,
+					EndDeviceIds: registeredDeviceID,
 					FPort:        uint32(i),
 				},
 				PackageName: fmt.Sprintf("test-package-%v", i),
@@ -433,7 +433,7 @@ func TestAssociations(t *testing.T) {
 					a := assertions.New(t)
 
 					res, err := client.ListAssociations(ctx, &ttnpb.ListApplicationPackageAssociationRequest{
-						Ids:       &registeredDeviceID,
+						Ids:       registeredDeviceID,
 						Limit:     tc.limit,
 						Page:      tc.page,
 						FieldMask: ttnpb.FieldMask("package_name"),

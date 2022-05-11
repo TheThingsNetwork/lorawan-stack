@@ -203,7 +203,7 @@ func (srv interopServer) AppSKeyRequest(ctx context.Context, in *interop.AppSKey
 			ResultCode: interop.ResultSuccess,
 		},
 		DevEUI:       in.DevEUI,
-		AppSKey:      interop.KeyEnvelope(*res.AppSKey),
+		AppSKey:      (*interop.KeyEnvelope)(res.AppSKey),
 		SessionKeyID: in.SessionKeyID,
 	}, nil
 }

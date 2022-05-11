@@ -118,7 +118,7 @@ func TestMarshalJSON(t *testing.T) {
 }
 
 func TestJoinRequest(t *testing.T) {
-	gtwID := ttnpb.GatewayIdentifiers{
+	gtwID := &ttnpb.GatewayIdentifiers{
 		GatewayId: "eui-1122334455667788",
 		Eui:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
 	}
@@ -126,7 +126,7 @@ func TestJoinRequest(t *testing.T) {
 	for _, tc := range []struct {
 		Name                  string
 		JoinRequest           JoinRequest
-		GatewayIds            ttnpb.GatewayIdentifiers
+		GatewayIds            *ttnpb.GatewayIdentifiers
 		BandID                string
 		ExpectedUplinkMessage ttnpb.UplinkMessage
 		ErrorAssertion        func(err error) bool
@@ -170,7 +170,7 @@ func TestJoinRequest(t *testing.T) {
 					}},
 				},
 				RxMetadata: []*ttnpb.RxMetadata{{
-					GatewayIds: &gtwID,
+					GatewayIds: gtwID,
 				}},
 				Settings: &ttnpb.TxSettings{
 					CodingRate: "4/5",
@@ -214,7 +214,7 @@ func TestJoinRequest(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GatewayIds:  &gtwID,
+						GatewayIds:  gtwID,
 						Time:        ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
 						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:        89,
@@ -262,7 +262,7 @@ func TestJoinRequest(t *testing.T) {
 }
 
 func TestUplinkDataFrame(t *testing.T) {
-	gtwID := ttnpb.GatewayIdentifiers{
+	gtwID := &ttnpb.GatewayIdentifiers{
 		GatewayId: "eui-1122334455667788",
 		Eui:       &types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88},
 	}
@@ -270,7 +270,7 @@ func TestUplinkDataFrame(t *testing.T) {
 	for _, tc := range []struct {
 		Name                  string
 		UplinkDataFrame       UplinkDataFrame
-		GatewayIds            ttnpb.GatewayIdentifiers
+		GatewayIds            *ttnpb.GatewayIdentifiers
 		FrequencyPlanID       string
 		ExpectedUplinkMessage ttnpb.UplinkMessage
 		ErrorAssertion        func(err error) bool
@@ -329,7 +329,7 @@ func TestUplinkDataFrame(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GatewayIds:  &gtwID,
+						GatewayIds:  gtwID,
 						Time:        ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
 						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:        89,
@@ -393,7 +393,7 @@ func TestUplinkDataFrame(t *testing.T) {
 				},
 				RxMetadata: []*ttnpb.RxMetadata{
 					{
-						GatewayIds:  &gtwID,
+						GatewayIds:  gtwID,
 						Time:        ttnpb.ProtoTimePtr(time.Unix(1548059982, 0)),
 						Timestamp:   (uint32)(12666373963464220 & 0xFFFFFFFF),
 						Rssi:        89,

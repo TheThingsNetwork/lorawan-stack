@@ -656,7 +656,7 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 		logger.WithField("gateway_uid", uid).WithError(err).Warn("Failed to get gateway identifier")
 		return err
 	}
-	report.ForwarderGatewayId = toPBGatewayIdentifier(&ids, a.forwarderConfig)
+	report.ForwarderGatewayId = toPBGatewayIdentifier(ids, a.forwarderConfig)
 
 	req := msg.GetRequest()
 	pairs := []interface{}{
@@ -691,7 +691,7 @@ func (a *Agent) handleDownlinkMessage(ctx context.Context, down *packetbroker.Ro
 		forwarderNetID.String(), down.ForwarderTenantId, down.ForwarderClusterId,
 	).Inc()
 
-	conn, err := a.GetPeerConn(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, &ids)
+	conn, err := a.GetPeerConn(ctx, ttnpb.ClusterRole_GATEWAY_SERVER, ids)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to get Gateway Server peer")
 		report.Result = &packetbroker.DownlinkMessageDeliveryStateChange_Error{

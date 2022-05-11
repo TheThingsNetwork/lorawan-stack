@@ -802,7 +802,7 @@ func (r *ApplicationActivationSettingRegistry) Range(ctx context.Context, paths 
 		if err != nil {
 			return false, err
 		}
-		if !f(ctx, &applicationId, appAs) {
+		if !f(ctx, applicationId, appAs) {
 			return false, nil
 		}
 		return true, nil

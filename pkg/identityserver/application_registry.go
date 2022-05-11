@@ -82,11 +82,11 @@ func (is *IdentityServer) createApplication(ctx context.Context, req *ttnpb.Crea
 		if !is.IsAdmin(ctx) && !is.configFromContext(ctx).UserRights.CreateApplications {
 			return nil, errAdminsCreateApplications.New()
 		}
-		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.Right_RIGHT_USER_APPLICATIONS_CREATE); err != nil {
+		if err = rights.RequireUser(ctx, usrIDs, ttnpb.Right_RIGHT_USER_APPLICATIONS_CREATE); err != nil {
 			return nil, err
 		}
 	} else if orgIDs := req.Collaborator.GetOrganizationIds(); orgIDs != nil {
-		if err = rights.RequireOrganization(ctx, *orgIDs, ttnpb.Right_RIGHT_ORGANIZATION_APPLICATIONS_CREATE); err != nil {
+		if err = rights.RequireOrganization(ctx, orgIDs, ttnpb.Right_RIGHT_ORGANIZATION_APPLICATIONS_CREATE); err != nil {
 			return nil, err
 		}
 	}
@@ -137,7 +137,7 @@ func (is *IdentityServer) getApplication(ctx context.Context, req *ttnpb.GetAppl
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask, getPaths, nil)
-	if err = rights.RequireApplication(ctx, *req.GetApplicationIds(), ttnpb.Right_RIGHT_APPLICATION_INFO); err != nil {
+	if err = rights.RequireApplication(ctx, req.GetApplicationIds(), ttnpb.Right_RIGHT_APPLICATION_INFO); err != nil {
 		if !ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicApplicationFields...) {
 			return nil, err
 		}
@@ -189,11 +189,11 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 		}
 
 		if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
-			if err = rights.RequireUser(ctx, *usrIDs, ttnpb.Right_RIGHT_USER_APPLICATIONS_LIST); err != nil {
+			if err = rights.RequireUser(ctx, usrIDs, ttnpb.Right_RIGHT_USER_APPLICATIONS_LIST); err != nil {
 				return nil, err
 			}
 		} else if orgIDs := req.Collaborator.GetOrganizationIds(); orgIDs != nil {
-			if err = rights.RequireOrganization(ctx, *orgIDs, ttnpb.Right_RIGHT_ORGANIZATION_APPLICATIONS_LIST); err != nil {
+			if err = rights.RequireOrganization(ctx, orgIDs, ttnpb.Right_RIGHT_ORGANIZATION_APPLICATIONS_LIST); err != nil {
 				return nil, err
 			}
 		}
@@ -259,7 +259,7 @@ func (is *IdentityServer) listApplications(ctx context.Context, req *ttnpb.ListA
 }
 
 func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.UpdateApplicationRequest) (app *ttnpb.Application, err error) {
-	if err = rights.RequireApplication(ctx, *req.Application.GetIds(), ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
+	if err = rights.RequireApplication(ctx, req.Application.GetIds(), ttnpb.Right_RIGHT_APPLICATION_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.ApplicationFieldPathsNested, req.FieldMask, nil, getPaths)
@@ -302,7 +302,7 @@ func (is *IdentityServer) updateApplication(ctx context.Context, req *ttnpb.Upda
 var errApplicationHasDevices = errors.DefineFailedPrecondition("application_has_devices", "application still has `{count}` devices")
 
 func (is *IdentityServer) deleteApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireApplication(ctx, *ids, ttnpb.Right_RIGHT_APPLICATION_DELETE); err != nil {
+	if err := rights.RequireApplication(ctx, ids, ttnpb.Right_RIGHT_APPLICATION_DELETE); err != nil {
 		return nil, err
 	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
@@ -323,7 +323,7 @@ func (is *IdentityServer) deleteApplication(ctx context.Context, ids *ttnpb.Appl
 }
 
 func (is *IdentityServer) restoreApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireApplication(store.WithSoftDeleted(ctx, false), *ids, ttnpb.Right_RIGHT_APPLICATION_DELETE); err != nil {
+	if err := rights.RequireApplication(store.WithSoftDeleted(ctx, false), ids, ttnpb.Right_RIGHT_APPLICATION_DELETE); err != nil {
 		return nil, err
 	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
@@ -384,7 +384,7 @@ func (is *IdentityServer) purgeApplication(ctx context.Context, ids *ttnpb.Appli
 }
 
 func (is *IdentityServer) issueDevEUI(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.IssueDevEUIResponse, error) {
-	if err := rights.RequireApplication(store.WithSoftDeleted(ctx, false), *ids, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	if err := rights.RequireApplication(store.WithSoftDeleted(ctx, false), ids, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	if !is.config.DevEUIBlock.Enabled {

@@ -223,13 +223,13 @@ func TestMessageEncodingSymmetricity(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			b, err := MarshalMessage(*tc.Message)
+			b, err := MarshalMessage(tc.Message)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
 			a.So(b, should.NotBeNil)
 
-			ret, err := AppendMessage(make([]byte, 0), *tc.Message)
+			ret, err := AppendMessage(make([]byte, 0), tc.Message)
 			if !a.So(err, should.BeNil) {
 				t.FailNow()
 			}
@@ -619,12 +619,12 @@ func TestLoRaWANEncodingRaw(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			b, err := MarshalMessage(*tc.Message)
+			b, err := MarshalMessage(tc.Message)
 			a.So(err, should.BeNil)
 			a.So(b, should.NotBeNil)
 			a.So(b, should.Resemble, tc.Bytes)
 
-			ret, err := AppendMessage(make([]byte, 0), *tc.Message)
+			ret, err := AppendMessage(make([]byte, 0), tc.Message)
 			a.So(err, should.BeNil)
 			a.So(ret, should.Resemble, b)
 
@@ -871,11 +871,11 @@ func TestMessageEncodingSymmetricityJoinAcceptPayload(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			b, err := MarshalJoinAcceptPayload(*tc.Message)
+			b, err := MarshalJoinAcceptPayload(tc.Message)
 			a.So(err, should.BeNil)
 			a.So(b, should.NotBeNil)
 
-			ret, err := AppendJoinAcceptPayload(make([]byte, 0), *tc.Message)
+			ret, err := AppendJoinAcceptPayload(make([]byte, 0), tc.Message)
 			a.So(err, should.BeNil)
 			a.So(ret, should.Resemble, b)
 
@@ -1006,12 +1006,12 @@ func TestLoRaWANEncodingRawJoinAcceptPayload(t *testing.T) {
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
-			b, err := MarshalJoinAcceptPayload(*tc.Message)
+			b, err := MarshalJoinAcceptPayload(tc.Message)
 			a.So(err, should.BeNil)
 			a.So(b, should.NotBeNil)
 			a.So(b, should.Resemble, tc.Bytes)
 
-			b, err = AppendJoinAcceptPayload(make([]byte, 0), *tc.Message)
+			b, err = AppendJoinAcceptPayload(make([]byte, 0), tc.Message)
 			a.So(err, should.BeNil)
 			a.So(b, should.Resemble, tc.Bytes)
 

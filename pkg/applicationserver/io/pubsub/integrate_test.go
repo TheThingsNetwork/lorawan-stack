@@ -62,11 +62,11 @@ func TestIntegrate(t *testing.T) {
 
 	// ps1 is added to the pubsub registry, app2 will be integrated at runtime.
 	ps1 := &ttnpb.ApplicationPubSubIdentifiers{
-		ApplicationIds: &registeredApplicationID,
+		ApplicationIds: registeredApplicationID,
 		PubSubId:       "ps1",
 	}
 	ps2 := &ttnpb.ApplicationPubSubIdentifiers{
-		ApplicationIds: &registeredApplicationID,
+		ApplicationIds: registeredApplicationID,
 		PubSubId:       "ps2",
 	}
 	redisClient, flush := test.NewRedis(ctx, "applicationserver_test")

@@ -23,7 +23,7 @@ import (
 )
 
 // ListApplication lists the rights for the given application ID in the context.
-func ListApplication(ctx context.Context, id ttnpb.ApplicationIdentifiers) (rights *ttnpb.Rights, err error) {
+func ListApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers) (rights *ttnpb.Rights, err error) {
 	uid := unique.ID(ctx, id)
 	if inCtx, ok := fromContext(ctx); ok {
 		return inCtx.ApplicationRights[uid], nil
@@ -53,7 +53,7 @@ func ListApplication(ctx context.Context, id ttnpb.ApplicationIdentifiers) (righ
 }
 
 // ListClient lists the rights for the given client ID in the context.
-func ListClient(ctx context.Context, id ttnpb.ClientIdentifiers) (rights *ttnpb.Rights, err error) {
+func ListClient(ctx context.Context, id *ttnpb.ClientIdentifiers) (rights *ttnpb.Rights, err error) {
 	uid := unique.ID(ctx, id)
 	if inCtx, ok := fromContext(ctx); ok {
 		return inCtx.ClientRights[uid], nil
@@ -83,7 +83,7 @@ func ListClient(ctx context.Context, id ttnpb.ClientIdentifiers) (rights *ttnpb.
 }
 
 // ListGateway lists the rights for the given gateway ID in the context.
-func ListGateway(ctx context.Context, id ttnpb.GatewayIdentifiers) (rights *ttnpb.Rights, err error) {
+func ListGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers) (rights *ttnpb.Rights, err error) {
 	uid := unique.ID(ctx, id)
 	if inCtx, ok := fromContext(ctx); ok {
 		return inCtx.GatewayRights[uid], nil
@@ -113,7 +113,7 @@ func ListGateway(ctx context.Context, id ttnpb.GatewayIdentifiers) (rights *ttnp
 }
 
 // ListOrganization lists the rights for the given organization ID in the context.
-func ListOrganization(ctx context.Context, id ttnpb.OrganizationIdentifiers) (rights *ttnpb.Rights, err error) {
+func ListOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers) (rights *ttnpb.Rights, err error) {
 	uid := unique.ID(ctx, id)
 	if inCtx, ok := fromContext(ctx); ok {
 		return inCtx.OrganizationRights[uid], nil
@@ -143,7 +143,7 @@ func ListOrganization(ctx context.Context, id ttnpb.OrganizationIdentifiers) (ri
 }
 
 // ListUser lists the rights for the given user ID in the context.
-func ListUser(ctx context.Context, id ttnpb.UserIdentifiers) (rights *ttnpb.Rights, err error) {
+func ListUser(ctx context.Context, id *ttnpb.UserIdentifiers) (rights *ttnpb.Rights, err error) {
 	uid := unique.ID(ctx, id)
 	if inCtx, ok := fromContext(ctx); ok {
 		return inCtx.UserRights[uid], nil

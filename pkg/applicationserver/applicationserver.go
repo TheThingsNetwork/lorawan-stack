@@ -455,7 +455,7 @@ func (as *ApplicationServer) buildSessionsFromError(ctx context.Context, dev *tt
 			DevAddr: devAddr.Bytes(),
 			Keys: &ttnpb.SessionKeys{
 				SessionKeyId: sessionKeyID,
-				AppSKey:      &appSKey,
+				AppSKey:      appSKey,
 			},
 			LastAFCntDown: lastAFCntDownFromMinFCnt(minFCntDown),
 		}, nil
@@ -746,14 +746,14 @@ var (
 	errNoJoinEUI     = errors.DefineInvalidArgument("no_join_eui", "no join EUI provided")
 )
 
-func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, sessionKeyID []byte) (ttnpb.KeyEnvelope, error) {
+func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers, sessionKeyID []byte) (*ttnpb.KeyEnvelope, error) {
 	defer trace.StartRegion(ctx, "fetch AppSKey").End()
 
 	if ids == nil || ids.DevEui == nil {
-		return ttnpb.KeyEnvelope{}, errNoDevEUI.New()
+		return nil, errNoDevEUI.New()
 	}
 	if ids.JoinEui == nil {
-		return ttnpb.KeyEnvelope{}, errNoJoinEUI.New()
+		return nil, errNoJoinEUI.New()
 	}
 	req := &ttnpb.SessionKeyRequest{
 		SessionKeyId: sessionKeyID,
@@ -763,26 +763,26 @@ func (as *ApplicationServer) fetchAppSKey(ctx context.Context, ids *ttnpb.EndDev
 	if js, err := as.GetPeer(ctx, ttnpb.ClusterRole_JOIN_SERVER, nil); err == nil {
 		cc, err := js.Conn()
 		if err != nil {
-			return ttnpb.KeyEnvelope{}, err
+			return nil, err
 		}
 		res, err := ttnpb.NewAsJsClient(cc).GetAppSKey(ctx, req, as.WithClusterAuth())
 		if err == nil && res.AppSKey != nil {
-			return *res.AppSKey, nil
+			return res.AppSKey, nil
 		}
 		if !errors.IsNotFound(err) {
-			return ttnpb.KeyEnvelope{}, err
+			return nil, err
 		}
 	}
 	if as.interopClient != nil && !interop.GeneratedSessionKeyID(sessionKeyID) {
 		res, err := as.interopClient.GetAppSKey(ctx, as.interopID, req)
 		if err == nil && res.AppSKey != nil {
-			return *res.AppSKey, nil
+			return res.AppSKey, nil
 		}
 		if !errors.IsNotFound(err) {
-			return ttnpb.KeyEnvelope{}, err
+			return nil, err
 		}
 	}
-	return ttnpb.KeyEnvelope{}, errJSUnavailable.WithAttributes("join_eui", *ids.JoinEui)
+	return nil, errJSUnavailable.WithAttributes("join_eui", *ids.JoinEui)
 }
 
 func (as *ApplicationServer) handleUp(ctx context.Context, up *ttnpb.ApplicationUp, link *ttnpb.ApplicationLink) (pass bool, err error) {
@@ -860,7 +860,7 @@ func (as *ApplicationServer) handleJoinAccept(ctx context.Context, ids *ttnpb.En
 				if err != nil {
 					return nil, nil, errFetchAppSKey.WithCause(err)
 				}
-				joinAccept.AppSKey = &key
+				joinAccept.AppSKey = key
 				logger.Debug("Fetched AppSKey from Join Server")
 			}
 			previousSession := dev.PendingSession
@@ -955,7 +955,7 @@ func (as *ApplicationServer) matchSession(ctx context.Context, ids *ttnpb.EndDev
 			DevAddr: ids.DevAddr.Bytes(),
 			Keys: &ttnpb.SessionKeys{
 				SessionKeyId: sessionKeyID,
-				AppSKey:      &appSKey,
+				AppSKey:      appSKey,
 			},
 		}
 		dev.PendingSession = nil

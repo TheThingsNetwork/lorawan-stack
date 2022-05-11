@@ -25,7 +25,7 @@ import (
 
 // Compute computes the time-on-air for the given payload size and the TxSettings.
 // This function takes into account PHYPayload.
-func Compute(payloadSize int, settings ttnpb.TxSettings) (d time.Duration, err error) {
+func Compute(payloadSize int, settings *ttnpb.TxSettings) (d time.Duration, err error) {
 	switch dr := settings.DataRate.Modulation.(type) {
 	case *ttnpb.DataRate_Lora:
 		return computeLoRa(payloadSize, settings.Frequency, uint8(dr.Lora.SpreadingFactor), dr.Lora.Bandwidth, settings.CodingRate, settings.EnableCrc)

@@ -24,13 +24,13 @@ import (
 
 // GetGatewayConnectionStats returns statistics about a gateway connection.
 func (gs *GatewayServer) GetGatewayConnectionStats(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.GatewayConnectionStats, error) {
-	if err := gs.entityRegistry.AssertGatewayRights(ctx, *ids, ttnpb.Right_RIGHT_GATEWAY_STATUS_READ); err != nil {
+	if err := gs.entityRegistry.AssertGatewayRights(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_STATUS_READ); err != nil {
 		return nil, err
 	}
 
 	uid := unique.ID(ctx, ids)
 	if gs.statsRegistry != nil {
-		stats, err := gs.statsRegistry.Get(ctx, *ids)
+		stats, err := gs.statsRegistry.Get(ctx, ids)
 		if err != nil || stats == nil {
 			if errors.IsNotFound(err) {
 				return nil, errNotConnected.WithAttributes("gateway_uid", uid).WithCause(err)

@@ -46,7 +46,7 @@ func NewIS(c Cluster) *IS {
 }
 
 // AssertGatewayRights implements EntityRegistry.
-func (is IS) AssertGatewayRights(ctx context.Context, ids ttnpb.GatewayIdentifiers, required ...ttnpb.Right) error {
+func (is IS) AssertGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers, required ...ttnpb.Right) error {
 	return rights.RequireGateway(ctx, ids, required...)
 }
 
@@ -75,20 +75,20 @@ func (is IS) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gate
 }
 
 // UpdateAntennas updates the gateway antennas.
-func (is IS) UpdateAntennas(ctx context.Context, ids ttnpb.GatewayIdentifiers, antennas []*ttnpb.GatewayAntenna) error {
+func (is IS) UpdateAntennas(ctx context.Context, ids *ttnpb.GatewayIdentifiers, antennas []*ttnpb.GatewayAntenna) error {
 	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, is.AllowInsecureForCredentials())
 	if err != nil {
 		return err
 	}
 
-	registry, err := is.newRegistryClient(ctx, &ids)
+	registry, err := is.newRegistryClient(ctx, ids)
 	if err != nil {
 		return err
 	}
 
 	req := &ttnpb.UpdateGatewayRequest{
 		Gateway: &ttnpb.Gateway{
-			Ids:      &ids,
+			Ids:      ids,
 			Antennas: antennas,
 		},
 		FieldMask: ttnpb.FieldMask("antennas"),
@@ -98,13 +98,13 @@ func (is IS) UpdateAntennas(ctx context.Context, ids ttnpb.GatewayIdentifiers, a
 }
 
 // UpdateAttributes implements EntityRegistry.
-func (is IS) UpdateAttributes(ctx context.Context, ids ttnpb.GatewayIdentifiers, current, new map[string]string) error {
+func (is IS) UpdateAttributes(ctx context.Context, ids *ttnpb.GatewayIdentifiers, current, new map[string]string) error {
 	callOpt, err := rpcmetadata.WithForwardedAuth(ctx, is.AllowInsecureForCredentials())
 	if err != nil {
 		return err
 	}
 
-	registry, err := is.newRegistryClient(ctx, &ids)
+	registry, err := is.newRegistryClient(ctx, ids)
 	if err != nil {
 		return err
 	}
@@ -120,7 +120,7 @@ func (is IS) UpdateAttributes(ctx context.Context, ids ttnpb.GatewayIdentifiers,
 
 	req := &ttnpb.UpdateGatewayRequest{
 		Gateway: &ttnpb.Gateway{
-			Ids:        &ids,
+			Ids:        ids,
 			Attributes: merged,
 		},
 		FieldMask: ttnpb.FieldMask("attributes"),
@@ -130,7 +130,7 @@ func (is IS) UpdateAttributes(ctx context.Context, ids ttnpb.GatewayIdentifiers,
 }
 
 // ValidateGatewayID implements EntityRegistry.
-func (is IS) ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
+func (is IS) ValidateGatewayID(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error {
 	return ids.ValidateContext(ctx)
 }
 

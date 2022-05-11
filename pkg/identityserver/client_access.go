@@ -48,7 +48,7 @@ var (
 )
 
 func (is *IdentityServer) listClientRights(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
-	cliRights, err := rights.ListClient(ctx, *ids)
+	cliRights, err := rights.ListClient(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (is *IdentityServer) listClientRights(ctx context.Context, ids *ttnpb.Clien
 }
 
 func (is *IdentityServer) getClientCollaborator(ctx context.Context, req *ttnpb.GetClientCollaboratorRequest) (*ttnpb.GetCollaboratorResponse, error) {
-	if err := rights.RequireClient(ctx, *req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_ALL); err != nil {
+	if err := rights.RequireClient(ctx, req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_ALL); err != nil {
 		return nil, err
 	}
 	res := &ttnpb.GetCollaboratorResponse{
@@ -84,7 +84,7 @@ var errClientNeedsCollaborator = errors.DefineFailedPrecondition("client_needs_c
 
 func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.SetClientCollaboratorRequest) (*pbtypes.Empty, error) {
 	// Require that caller has rights to manage collaborators.
-	if err := rights.RequireClient(ctx, *req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_ALL); err != nil {
+	if err := rights.RequireClient(ctx, req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_ALL); err != nil {
 		return nil, err
 	}
 
@@ -104,14 +104,14 @@ func (is *IdentityServer) setClientCollaborator(ctx context.Context, req *ttnpb.
 
 		// Require the caller to have all added rights.
 		if len(addedRights.GetRights()) > 0 {
-			if err := rights.RequireClient(ctx, *req.GetClientIds(), addedRights.GetRights()...); err != nil {
+			if err := rights.RequireClient(ctx, req.GetClientIds(), addedRights.GetRights()...); err != nil {
 				return err
 			}
 		}
 
 		// Unless we're deleting the collaborator, require the caller to have all removed rights.
 		if len(newRights.GetRights()) > 0 && len(removedRights.GetRights()) > 0 {
-			if err := rights.RequireClient(ctx, *req.GetClientIds(), removedRights.GetRights()...); err != nil {
+			if err := rights.RequireClient(ctx, req.GetClientIds(), removedRights.GetRights()...); err != nil {
 				return err
 			}
 		}
@@ -165,7 +165,7 @@ func (is *IdentityServer) listClientCollaborators(ctx context.Context, req *ttnp
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	if err = rights.RequireClient(ctx, *req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_ALL); err != nil {
+	if err = rights.RequireClient(ctx, req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_ALL); err != nil {
 		defer func() { collaborators = collaborators.PublicSafe() }()
 	}
 	var total uint64

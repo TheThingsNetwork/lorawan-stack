@@ -22,11 +22,11 @@ import (
 )
 
 type testAuthenticator struct {
-	id          ttnpb.PacketBrokerNetworkIdentifier
+	id          *ttnpb.PacketBrokerNetworkIdentifier
 	dialOptions []grpc.DialOption
 }
 
-func (a *testAuthenticator) AuthInfo(context.Context) (ttnpb.PacketBrokerNetworkIdentifier, error) {
+func (a *testAuthenticator) AuthInfo(context.Context) (*ttnpb.PacketBrokerNetworkIdentifier, error) {
 	return a.id, nil
 }
 
@@ -34,7 +34,7 @@ func (a *testAuthenticator) DialOptions(context.Context) ([]grpc.DialOption, err
 	return a.dialOptions, nil
 }
 
-func WithTestAuthenticator(id ttnpb.PacketBrokerNetworkIdentifier) Option {
+func WithTestAuthenticator(id *ttnpb.PacketBrokerNetworkIdentifier) Option {
 	return func(a *Agent) {
 		a.authenticator = &testAuthenticator{
 			id: id,

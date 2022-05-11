@@ -136,19 +136,19 @@ var (
 
 // UnverifiedNetworkIdentifier returns the Packet Broker network identifier from the given token.
 // This function does not verify the token.
-func UnverifiedNetworkIdentifier(token string) (ttnpb.PacketBrokerNetworkIdentifier, error) {
+func UnverifiedNetworkIdentifier(token string) (*ttnpb.PacketBrokerNetworkIdentifier, error) {
 	parsed, err := jwt.ParseSigned(token)
 	if err != nil {
-		return ttnpb.PacketBrokerNetworkIdentifier{}, errOAuth2Token.WithCause(err)
+		return nil, errOAuth2Token.WithCause(err)
 	}
 	var claims TokenClaims
 	if err := parsed.UnsafeClaimsWithoutVerification(&claims); err != nil {
-		return ttnpb.PacketBrokerNetworkIdentifier{}, errOAuth2Token.WithCause(err)
+		return nil, errOAuth2Token.WithCause(err)
 	}
 	if len(claims.PacketBroker.Networks) == 0 {
-		return ttnpb.PacketBrokerNetworkIdentifier{}, errOAuth2Token.New()
+		return nil, errOAuth2Token.New()
 	}
-	return ttnpb.PacketBrokerNetworkIdentifier{
+	return &ttnpb.PacketBrokerNetworkIdentifier{
 		NetId:    claims.PacketBroker.Networks[0].NetID,
 		TenantId: claims.PacketBroker.Networks[0].TenantID,
 	}, nil

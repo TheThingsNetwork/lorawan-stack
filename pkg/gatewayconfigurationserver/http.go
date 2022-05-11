@@ -84,7 +84,7 @@ func (s *Server) withGateway(next func(http.ResponseWriter, *http.Request, *ttnp
 		}
 		client := ttnpb.NewGatewayRegistryClient(cc)
 		gtw, err := client.Get(ctx, &ttnpb.GetGatewayRequest{
-			GatewayIds: &gtwID,
+			GatewayIds: gtwID,
 			FieldMask:  ttnpb.FieldMask("antennas", "frequency_plan_id", "gateway_server_address"),
 		}, s.WithClusterAuth())
 		if err != nil {

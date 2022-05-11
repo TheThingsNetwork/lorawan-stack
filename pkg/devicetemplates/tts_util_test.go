@@ -28,7 +28,7 @@ func validateTemplate(t *testing.T, tmpl *ttnpb.EndDeviceTemplate) {
 		t.FailNow()
 	}
 
-	var dev ttnpb.EndDevice
+	dev := &ttnpb.EndDevice{}
 	a.So(dev.SetFields(tmpl.EndDevice, tmpl.FieldMask.GetPaths()...), should.BeNil)
 	a.So(dev, should.Resemble, tmpl.EndDevice)
 }

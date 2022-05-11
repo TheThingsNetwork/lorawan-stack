@@ -50,7 +50,7 @@ type ExternalAuthorizer interface {
 // ApplicationAccessAuthorizer authorizes the request context for application access.
 type ApplicationAccessAuthorizer interface {
 	Authorizer
-	RequireApplication(ctx context.Context, id ttnpb.ApplicationIdentifiers, required ...ttnpb.Right) error
+	RequireApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers, required ...ttnpb.Right) error
 }
 
 var (
@@ -108,6 +108,6 @@ func (a applicationRightsAuthorizer) RequireAuthorized(ctx context.Context) erro
 }
 
 // RequireApplication implements ApplicationAccessAuthorizer.
-func (a applicationRightsAuthorizer) RequireApplication(ctx context.Context, id ttnpb.ApplicationIdentifiers, required ...ttnpb.Right) error {
+func (a applicationRightsAuthorizer) RequireApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers, required ...ttnpb.Right) error {
 	return rights.RequireApplication(ctx, id, required...)
 }

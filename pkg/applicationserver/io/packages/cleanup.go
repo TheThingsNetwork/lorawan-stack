@@ -57,7 +57,7 @@ func (cleaner *RegistryCleaner) DeleteApplicationAndDeviceData(ctx context.Conte
 		if err != nil {
 			return err
 		}
-		associations, err := cleaner.ApplicationPackagesRegistry.ListAssociations(ctx, &devIds, []string{"ids"})
+		associations, err := cleaner.ApplicationPackagesRegistry.ListAssociations(ctx, devIds, []string{"ids"})
 		if err != nil {
 			return err
 		}
@@ -81,7 +81,7 @@ func (cleaner *RegistryCleaner) DeleteApplicationAndDeviceData(ctx context.Conte
 		if err != nil {
 			return err
 		}
-		associations, err := cleaner.ApplicationPackagesRegistry.ListDefaultAssociations(ctx, &appIds, []string{"ids"})
+		associations, err := cleaner.ApplicationPackagesRegistry.ListDefaultAssociations(ctx, appIds, []string{"ids"})
 		if err != nil {
 			return err
 		}

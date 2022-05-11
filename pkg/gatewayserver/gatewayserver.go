@@ -370,24 +370,24 @@ var (
 
 // FillGatewayContext fills the given context and identifiers.
 // This method should only be used for request contexts.
-func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error) {
+func (gs *GatewayServer) FillGatewayContext(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (context.Context, *ttnpb.GatewayIdentifiers, error) {
 	ctx = gs.FillContext(ctx)
 	if ids.IsZero() || ids.Eui != nil && ids.Eui.IsZero() {
-		return nil, ttnpb.GatewayIdentifiers{}, errEmptyIdentifiers.New()
+		return nil, nil, errEmptyIdentifiers.New()
 	}
 	if ids.GatewayId == "" {
 		extIDs, err := gs.entityRegistry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
 			Eui: ids.Eui.Bytes(),
 		})
 		if err == nil {
-			ids = *extIDs
+			ids = extIDs
 		} else if errors.IsNotFound(err) {
 			if gs.requireRegisteredGateways {
-				return nil, ttnpb.GatewayIdentifiers{}, errGatewayEUINotRegistered.WithAttributes("eui", *ids.Eui).WithCause(err)
+				return nil, nil, errGatewayEUINotRegistered.WithAttributes("eui", *ids.Eui).WithCause(err)
 			}
 			ids.GatewayId = fmt.Sprintf("eui-%v", strings.ToLower(ids.Eui.String()))
 		} else {
-			return nil, ttnpb.GatewayIdentifiers{}, err
+			return nil, nil, err
 		}
 	}
 	return ctx, ids, nil
@@ -419,7 +419,7 @@ type connectionEntry struct {
 
 // Connect connects a gateway by its identifiers to the Gateway Server, and returns a io.Connection for traffic and
 // control.
-func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
+func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids *ttnpb.GatewayIdentifiers) (*io.Connection, error) {
 	if err := gs.entityRegistry.AssertGatewayRights(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
@@ -437,7 +437,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		isAuthenticated = true
 	}
 	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
-		GatewayIds: &ids,
+		GatewayIds: ids,
 		FieldMask: ttnpb.FieldMask(
 			"antennas",
 			"attributes",
@@ -464,7 +464,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		}
 		logger.Warn("Connect unregistered gateway")
 		gtw = &ttnpb.Gateway{
-			Ids:                    &ids,
+			Ids:                    ids,
 			FrequencyPlanId:        fpID,
 			FrequencyPlanIds:       []string{fpID},
 			EnforceDutyCycle:       true,
@@ -478,7 +478,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 		return nil, errUnauthenticatedGatewayConnection.New()
 	}
 
-	ids = *gtw.GetIds()
+	ids = gtw.GetIds()
 
 	fps, err := gs.FrequencyPlansStore(ctx)
 	if err != nil {
@@ -532,7 +532,7 @@ func (gs *GatewayServer) Connect(ctx context.Context, frontend io.Frontend, ids 
 }
 
 // GetConnection returns the *io.Connection for the given gateway. If not found, this method returns nil, false.
-func (gs *GatewayServer) GetConnection(ctx context.Context, ids ttnpb.GatewayIdentifiers) (*io.Connection, bool) {
+func (gs *GatewayServer) GetConnection(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*io.Connection, bool) {
 	entry, loaded := gs.connections.Load(unique.ID(ctx, ids))
 	if !loaded {
 		return nil, false
@@ -707,10 +707,10 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 	gtw := host.gtw
 	switch msg := item.(type) {
 	case *ttnpb.GatewayUplinkMessage:
-		up := *msg.Message
+		up := msg.Message
 		msg = &ttnpb.GatewayUplinkMessage{
 			BandId:  msg.BandId,
-			Message: &up,
+			Message: up,
 		}
 		msg.Message.CorrelationIds = append(make([]string, 0, len(msg.Message.CorrelationIds)+1), msg.Message.CorrelationIds...)
 		msg.Message.CorrelationIds = append(msg.Message.CorrelationIds, host.correlationID)
@@ -744,7 +744,7 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 		if !pass {
 			break
 		}
-		switch err := host.handler.HandleUplink(ctx, *gtw.Ids, ids, msg); codes.Code(errors.Code(err)) {
+		switch err := host.handler.HandleUplink(ctx, gtw.Ids, ids, msg); codes.Code(errors.Code(err)) {
 		case codes.Canceled, codes.DeadlineExceeded,
 			codes.Unknown, codes.Internal,
 			codes.Unimplemented, codes.Unavailable:
@@ -753,13 +753,13 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item interface{}) {
 			registerForwardUplink(ctx, gtw, msg, host.name)
 		}
 	case *ttnpb.GatewayStatus:
-		if err := host.handler.HandleStatus(ctx, *gtw.Ids, msg); err != nil {
+		if err := host.handler.HandleStatus(ctx, gtw.Ids, msg); err != nil {
 			registerDropStatus(ctx, gtw, msg, host.name, err)
 		} else {
 			registerForwardStatus(ctx, gtw, msg, host.name)
 		}
 	case *ttnpb.TxAcknowledgment:
-		if err := host.handler.HandleTxAck(ctx, *gtw.Ids, msg); err != nil {
+		if err := host.handler.HandleTxAck(ctx, gtw.Ids, msg); err != nil {
 			registerDropTxAck(ctx, gtw, msg, host.name, err)
 		} else {
 			registerForwardTxAck(ctx, gtw, msg, host.name)
@@ -775,7 +775,7 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 	)
 	defer func() {
 		gs.connections.Delete(unique.ID(ctx, gtw.GetIds()))
-		registerGatewayDisconnect(ctx, *gtw.GetIds(), protocol, ctx.Err())
+		registerGatewayDisconnect(ctx, gtw.GetIds(), protocol, ctx.Err())
 		logger.Info("Disconnected")
 	}()
 
@@ -879,7 +879,7 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 	// Initial update, so that the gateway appears connected.
 	registerGatewayConnectionStats(ctx, *ids, stats)
 	if gs.statsRegistry != nil {
-		if err := gs.statsRegistry.Set(decoupledCtx, *ids, stats, ttnpb.GatewayConnectionStatsFieldPathsTopLevel, gs.config.ConnectionStatsTTL); err != nil {
+		if err := gs.statsRegistry.Set(decoupledCtx, ids, stats, ttnpb.GatewayConnectionStatsFieldPathsTopLevel, gs.config.ConnectionStatsTTL); err != nil {
 			logger.WithError(err).Warn("Failed to initialize connection stats")
 		}
 	}
@@ -893,7 +893,7 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 		registerGatewayConnectionStats(decoupledCtx, *ids, stats)
 		if gs.statsRegistry != nil {
 			if err := gs.statsRegistry.Set(
-				decoupledCtx, *ids, stats,
+				decoupledCtx, ids, stats,
 				[]string{"connected_at", "disconnected_at"},
 				gs.config.ConnectionStatsDisconnectTTL,
 			); err != nil {
@@ -934,7 +934,7 @@ func (gs *GatewayServer) updateConnStats(ctx context.Context, conn connectionEnt
 		stats, paths := conn.Stats()
 		registerGatewayConnectionStats(decoupledCtx, *ids, stats)
 		if gs.statsRegistry != nil {
-			if err := gs.statsRegistry.Set(decoupledCtx, *ids, stats, paths, gs.config.ConnectionStatsTTL); err != nil {
+			if err := gs.statsRegistry.Set(decoupledCtx, ids, stats, paths, gs.config.ConnectionStatsTTL); err != nil {
 				logger.WithError(err).Warn("Failed to update connection stats")
 			}
 		}
@@ -946,7 +946,7 @@ const (
 	debounceJitter       = 0.25
 )
 
-func sameLocation(a, b ttnpb.Location) bool {
+func sameLocation(a, b *ttnpb.Location) bool {
 	return a.Altitude == b.Altitude && a.Accuracy == b.Accuracy &&
 		math.Abs(a.Latitude-b.Latitude) <= allowedLocationDelta &&
 		math.Abs(a.Longitude-b.Longitude) <= allowedLocationDelta
@@ -958,7 +958,7 @@ func sameAntennaLocations(a, b []*ttnpb.GatewayAntenna) bool {
 	}
 	for i := range a {
 		a, b := a[i], b[i]
-		if a.Location != nil && b.Location != nil && !sameLocation(*a.Location, *b.Location) {
+		if a.Location != nil && b.Location != nil && !sameLocation(a.Location, b.Location) {
 			return false
 		}
 		if (a.Location == nil) != (b.Location == nil) {
@@ -1019,7 +1019,7 @@ func (gs *GatewayServer) handleLocationUpdates(ctx context.Context, conn connect
 					break
 				}
 
-				err := gs.entityRegistry.UpdateAntennas(ctx, *gtw.GetIds(), antennas)
+				err := gs.entityRegistry.UpdateAntennas(ctx, gtw.GetIds(), antennas)
 				if err != nil {
 					log.FromContext(ctx).WithError(err).Warn("Failed to update antennas")
 				} else {
@@ -1065,7 +1065,7 @@ func (gs *GatewayServer) handleVersionInfoUpdates(ctx context.Context, conn conn
 			return
 		case <-time.After(d):
 		}
-		err := gs.entityRegistry.UpdateAttributes(conn.Context(), *conn.Gateway().Ids, gtwAttributes, attributes)
+		err := gs.entityRegistry.UpdateAttributes(conn.Context(), conn.Gateway().Ids, gtwAttributes, attributes)
 		if err != nil {
 			log.FromContext(ctx).WithError(err).Debug("Failed to update version information")
 		}
@@ -1073,9 +1073,9 @@ func (gs *GatewayServer) handleVersionInfoUpdates(ctx context.Context, conn conn
 }
 
 // GetFrequencyPlans gets the frequency plans by the gateway identifiers.
-func (gs *GatewayServer) GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error) {
+func (gs *GatewayServer) GetFrequencyPlans(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error) {
 	gtw, err := gs.entityRegistry.Get(ctx, &ttnpb.GetGatewayRequest{
-		GatewayIds: &ids,
+		GatewayIds: ids,
 		FieldMask:  ttnpb.FieldMask("frequency_plan_ids"),
 	})
 	var fpIDs []string
@@ -1108,17 +1108,17 @@ func (gs *GatewayServer) GetFrequencyPlans(ctx context.Context, ids ttnpb.Gatewa
 }
 
 // ClaimDownlink claims the downlink path for the given gateway.
-func (gs *GatewayServer) ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
-	return gs.ClaimIDs(ctx, &ids)
+func (gs *GatewayServer) ClaimDownlink(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error {
+	return gs.ClaimIDs(ctx, ids)
 }
 
 // UnclaimDownlink releases the claim of the downlink path for the given gateway.
-func (gs *GatewayServer) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
-	return gs.UnclaimIDs(ctx, &ids)
+func (gs *GatewayServer) UnclaimDownlink(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error {
+	return gs.UnclaimIDs(ctx, ids)
 }
 
 // ValidateGatewayID implements io.Server.
-func (gs *GatewayServer) ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
+func (gs *GatewayServer) ValidateGatewayID(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error {
 	return gs.entityRegistry.ValidateGatewayID(ctx, ids)
 }
 

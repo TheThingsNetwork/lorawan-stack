@@ -140,7 +140,7 @@ func (q *ApplicationUplinkQueue) Dispatch(ctx context.Context, consumerID string
 	return q.applicationQueue.Dispatch(ctx, consumerID, nil)
 }
 
-func (q *ApplicationUplinkQueue) Pop(ctx context.Context, consumerID string, f func(context.Context, ttnpb.ApplicationIdentifiers, networkserver.ApplicationUplinkQueueDrainFunc) (time.Time, error)) error {
+func (q *ApplicationUplinkQueue) Pop(ctx context.Context, consumerID string, f func(context.Context, *ttnpb.ApplicationIdentifiers, networkserver.ApplicationUplinkQueueDrainFunc) (time.Time, error)) error {
 	return q.applicationQueue.Pop(ctx, consumerID, nil, func(p redis.Pipeliner, uid string, _ time.Time) error {
 		appID, err := unique.ToApplicationID(uid)
 		if err != nil {

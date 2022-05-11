@@ -121,7 +121,7 @@ type NetworkServer struct {
 	deduplicationWindow windowDurationFunc
 	collectionWindow    windowDurationFunc
 
-	defaultMACSettings ttnpb.MACSettings
+	defaultMACSettings *ttnpb.MACSettings
 
 	interopClient InteropClient
 

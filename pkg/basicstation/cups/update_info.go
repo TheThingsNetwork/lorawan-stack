@@ -222,7 +222,7 @@ func (s *Server) updateInfo(w http.ResponseWriter, r *http.Request) (err error) 
 	ctx = metadata.NewIncomingContext(ctx, md)
 
 	var gatewayAuth grpc.CallOption
-	if rights.RequireGateway(ctx, *ids,
+	if rights.RequireGateway(ctx, ids,
 		ttnpb.Right_RIGHT_GATEWAY_INFO,
 		ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC,
 		ttnpb.Right_RIGHT_GATEWAY_READ_SECRETS,

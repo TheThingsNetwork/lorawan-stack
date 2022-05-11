@@ -32,7 +32,7 @@ type RegistryCleaner struct {
 func (cleaner *RegistryCleaner) RangeToLocalSet(ctx context.Context) error {
 	cleaner.LocalSet = make(map[string]struct{})
 	err := cleaner.PubSubRegistry.Range(ctx, []string{"ids"},
-		func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, pb *ttnpb.ApplicationPubSub) bool {
+		func(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, pb *ttnpb.ApplicationPubSub) bool {
 			cleaner.LocalSet[unique.ID(ctx, ids)] = struct{}{}
 			return true
 		},
@@ -51,7 +51,7 @@ func (cleaner *RegistryCleaner) DeleteApplicationData(ctx context.Context, appli
 		if err != nil {
 			return err
 		}
-		pubsubs, err := cleaner.PubSubRegistry.List(ctx, &appIds, []string{"ids"})
+		pubsubs, err := cleaner.PubSubRegistry.List(ctx, appIds, []string{"ids"})
 		if err != nil {
 			return err
 		}

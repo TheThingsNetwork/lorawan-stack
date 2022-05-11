@@ -42,7 +42,7 @@ import (
 )
 
 var (
-	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}
+	registeredGatewayID  = &ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}
 	registeredGatewayUID = unique.ID(test.Context(), registeredGatewayID)
 	registeredGatewayKey = "test-key"
 
@@ -315,7 +315,7 @@ func TestTraffic(t *testing.T) {
 				Path: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_UplinkToken{
 						UplinkToken: io.MustUplinkToken(
-							&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &registeredGatewayID},
+							&ttnpb.GatewayAntennaIdentifiers{GatewayIds: registeredGatewayID},
 							100,
 							100000,
 							time.Unix(0, 100*1000),
@@ -359,7 +359,7 @@ func TestTraffic(t *testing.T) {
 				Path: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_UplinkToken{
 						UplinkToken: io.MustUplinkToken(
-							&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &registeredGatewayID},
+							&ttnpb.GatewayAntennaIdentifiers{GatewayIds: registeredGatewayID},
 							100,
 							100000,
 							time.Unix(0, 100*1000),
@@ -391,7 +391,7 @@ func TestTraffic(t *testing.T) {
 				Path: &ttnpb.DownlinkPath{
 					Path: &ttnpb.DownlinkPath_UplinkToken{
 						UplinkToken: io.MustUplinkToken(
-							&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &registeredGatewayID},
+							&ttnpb.GatewayAntennaIdentifiers{GatewayIds: registeredGatewayID},
 							100,
 							100000,
 							time.Unix(0, 100*1000),

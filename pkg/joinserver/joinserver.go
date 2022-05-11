@@ -385,7 +385,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			binary.BigEndian.PutUint32(nb, dev.LastJoinNonce)
 			copy(jn[:], nb[1:])
 
-			b, err = lorawan.AppendJoinAcceptPayload(b, ttnpb.JoinAcceptPayload{
+			b, err = lorawan.AppendJoinAcceptPayload(b, &ttnpb.JoinAcceptPayload{
 				NetId:      types.MustNetID(req.NetId).OrZero(),
 				JoinNonce:  jn,
 				CfList:     req.CfList,
@@ -742,7 +742,7 @@ func (js *JoinServer) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyReque
 			return nil, errRegistryOperation.WithCause(err)
 		}
 		ctx = dev.Context
-		if err := appAuth.RequireApplication(ctx, *dev.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
+		if err := appAuth.RequireApplication(ctx, dev.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ_KEYS); err != nil {
 			return nil, err
 		}
 	}

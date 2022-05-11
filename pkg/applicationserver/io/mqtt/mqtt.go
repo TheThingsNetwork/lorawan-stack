@@ -130,7 +130,7 @@ type topicAccess struct {
 }
 
 func (c *connection) Connect(ctx context.Context, info *auth.Info) (_ context.Context, err error) {
-	ids := ttnpb.ApplicationIdentifiers{
+	ids := &ttnpb.ApplicationIdentifiers{
 		ApplicationId: info.Username,
 	}
 	if err := ids.ValidateContext(ctx); err != nil {
@@ -166,7 +166,7 @@ func (c *connection) Connect(ctx context.Context, info *auth.Info) (_ context.Co
 		return nil, err
 	}
 
-	c.io, err = c.server.Subscribe(ctx, "mqtt", &ids, true)
+	c.io, err = c.server.Subscribe(ctx, "mqtt", ids, true)
 	if err != nil {
 		return nil, err
 	}

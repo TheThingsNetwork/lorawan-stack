@@ -97,13 +97,13 @@ func (is *IdentityServer) getRights(ctx context.Context, entityID *ttnpb.EntityI
 }
 
 // ApplicationRights returns the rights the caller has on the given application.
-func (is *IdentityServer) ApplicationRights(ctx context.Context, appIDs ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
+func (is *IdentityServer) ApplicationRights(ctx context.Context, appIDs *ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
 	entity, universal, err := is.getRights(ctx, appIDs.GetEntityIdentifiers())
 	if err != nil {
 		return nil, err
 	}
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
-		_, err := st.GetApplication(ctx, &appIDs, []string{"ids"})
+		_, err := st.GetApplication(ctx, appIDs, []string{"ids"})
 		return err
 	})
 	if errors.IsNotFound(err) {
@@ -118,13 +118,13 @@ func (is *IdentityServer) ApplicationRights(ctx context.Context, appIDs ttnpb.Ap
 }
 
 // ClientRights returns the rights the caller has on the given client.
-func (is *IdentityServer) ClientRights(ctx context.Context, cliIDs ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
+func (is *IdentityServer) ClientRights(ctx context.Context, cliIDs *ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
 	entity, universal, err := is.getRights(ctx, cliIDs.GetEntityIdentifiers())
 	if err != nil {
 		return nil, err
 	}
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
-		_, err := st.GetClient(ctx, &cliIDs, []string{"ids"})
+		_, err := st.GetClient(ctx, cliIDs, []string{"ids"})
 		return err
 	})
 	if errors.IsNotFound(err) {
@@ -140,14 +140,14 @@ func (is *IdentityServer) ClientRights(ctx context.Context, cliIDs ttnpb.ClientI
 
 // GatewayRights returns the rights the caller has on the given gateway.
 // The query for the gateway only considers the Gateway ID and not the EUI (if provided).
-func (is *IdentityServer) GatewayRights(ctx context.Context, gtwIDs ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
+func (is *IdentityServer) GatewayRights(ctx context.Context, gtwIDs *ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
 	gtwIDs.Eui = nil
 	entity, universal, err := is.getRights(ctx, gtwIDs.GetEntityIdentifiers())
 	if err != nil {
 		return nil, err
 	}
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
-		gtw, err := st.GetGateway(ctx, &gtwIDs, []string{"ids", "status_public", "location_public"})
+		gtw, err := st.GetGateway(ctx, gtwIDs, []string{"ids", "status_public", "location_public"})
 		if err != nil {
 			return err
 		}
@@ -171,13 +171,13 @@ func (is *IdentityServer) GatewayRights(ctx context.Context, gtwIDs ttnpb.Gatewa
 }
 
 // OrganizationRights returns the rights the caller has on the given organization.
-func (is *IdentityServer) OrganizationRights(ctx context.Context, orgIDs ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
+func (is *IdentityServer) OrganizationRights(ctx context.Context, orgIDs *ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
 	entity, universal, err := is.getRights(ctx, orgIDs.GetEntityIdentifiers())
 	if err != nil {
 		return nil, err
 	}
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
-		_, err := st.GetOrganization(ctx, &orgIDs, []string{"ids"})
+		_, err := st.GetOrganization(ctx, orgIDs, []string{"ids"})
 		return err
 	})
 	if errors.IsNotFound(err) {
@@ -192,13 +192,13 @@ func (is *IdentityServer) OrganizationRights(ctx context.Context, orgIDs ttnpb.O
 }
 
 // UserRights returns the rights the caller has on the given user.
-func (is *IdentityServer) UserRights(ctx context.Context, userIDs ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {
+func (is *IdentityServer) UserRights(ctx context.Context, userIDs *ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {
 	entity, universal, err := is.getRights(ctx, userIDs.GetEntityIdentifiers())
 	if err != nil {
 		return nil, err
 	}
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
-		_, err := st.GetUser(ctx, &userIDs, []string{"ids"})
+		_, err := st.GetUser(ctx, userIDs, []string{"ids"})
 		return err
 	})
 	if errors.IsNotFound(err) {

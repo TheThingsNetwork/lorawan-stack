@@ -72,7 +72,7 @@ func (cleaner *RegistryCleaner) DeleteApplicationAndDeviceData(ctx context.Conte
 		if err != nil {
 			return err
 		}
-		err = DeleteApplicationActivationSettings(ctx, cleaner.AppAsRegistry, &appIds)
+		err = DeleteApplicationActivationSettings(ctx, cleaner.AppAsRegistry, appIds)
 		if err != nil {
 			return err
 		}

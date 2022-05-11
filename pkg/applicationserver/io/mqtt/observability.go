@@ -27,6 +27,6 @@ var evtConnectFail = events.Define(
 	events.WithErrorDataType(),
 )
 
-func registerConnectFail(ctx context.Context, ids ttnpb.ApplicationIdentifiers, err error) {
-	events.Publish(evtConnectFail.NewWithIdentifiersAndData(ctx, &ids, err))
+func registerConnectFail(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, err error) {
+	events.Publish(evtConnectFail.NewWithIdentifiersAndData(ctx, ids, err))
 }

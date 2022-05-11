@@ -644,7 +644,7 @@ func TestInteropAppSKeyRequest(t *testing.T) {
 					ResultCode: interop.ResultSuccess,
 				},
 				DevEUI: interop.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-				AppSKey: interop.KeyEnvelope{
+				AppSKey: &interop.KeyEnvelope{
 					KekLabel:     "test",
 					EncryptedKey: []byte{0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8},
 				},

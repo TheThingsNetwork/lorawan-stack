@@ -81,7 +81,7 @@ var errConnect = errors.Define("connect", "failed to connect gateway `{gateway_u
 func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 	ctx := log.NewContextWithField(link.Context(), "namespace", "gatewayserver/io/grpc")
 
-	ids := ttnpb.GatewayIdentifiers{
+	ids := &ttnpb.GatewayIdentifiers{
 		GatewayId: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
 	ctx, ids, err := s.server.FillGatewayContext(ctx, ids)
@@ -177,7 +177,7 @@ func (s *impl) LinkGateway(link ttnpb.GtwGs_LinkGatewayServer) error {
 func (s *impl) GetConcentratorConfig(ctx context.Context, _ *pbtypes.Empty) (*ttnpb.ConcentratorConfig, error) {
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/grpc")
 
-	ids := ttnpb.GatewayIdentifiers{
+	ids := &ttnpb.GatewayIdentifiers{
 		GatewayId: rpcmetadata.FromIncomingContext(ctx).ID,
 	}
 	if err := ids.ValidateContext(ctx); err != nil {
@@ -202,7 +202,7 @@ func (s *impl) GetConcentratorConfig(ctx context.Context, _ *pbtypes.Empty) (*tt
 var errNoMQTTConfigProvider = errors.DefineUnimplemented("no_configuration_provider", "no MQTT configuration provider available")
 
 func getMQTTConnectionProvider(ctx context.Context, ids *ttnpb.GatewayIdentifiers, provider config.MQTTConfigProvider) (*ttnpb.MQTTConnectionInfo, error) {
-	if err := rights.RequireGateway(ctx, *ids, ttnpb.Right_RIGHT_GATEWAY_INFO); err != nil {
+	if err := rights.RequireGateway(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_INFO); err != nil {
 		return nil, err
 	}
 	if provider == nil {

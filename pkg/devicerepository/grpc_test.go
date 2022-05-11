@@ -140,7 +140,7 @@ func TestGRPC(t *testing.T) {
 		BandId:          "band",
 	}
 
-	registeredApplicationID := ttnpb.ApplicationIdentifiers{
+	registeredApplicationID := &ttnpb.ApplicationIdentifiers{
 		ApplicationId: "app1",
 	}
 	registeredApplicationKey := "key"
@@ -303,12 +303,12 @@ func TestGRPC(t *testing.T) {
 					},
 					{
 						name:      "NoKey",
-						ids:       &registeredApplicationID,
+						ids:       registeredApplicationID,
 						assertion: errors.IsUnauthenticated,
 					},
 					{
 						name:      "UnregisteredKey",
-						ids:       &registeredApplicationID,
+						ids:       registeredApplicationID,
 						opts:      []grpc.CallOption{unregisteredCreds},
 						assertion: errors.IsPermissionDenied,
 					},
@@ -340,7 +340,7 @@ func TestGRPC(t *testing.T) {
 			a := assertions.New(t)
 
 			_, err := cl.ListBrands(test.Context(), &ttnpb.ListEndDeviceBrandsRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				Limit:          100,
 				Page:           2,
 				OrderBy:        "brand_id",
@@ -362,7 +362,7 @@ func TestGRPC(t *testing.T) {
 			a := assertions.New(t)
 			st.err = fmt.Errorf("store error")
 			brands, err := cl.ListBrands(test.Context(), &ttnpb.ListEndDeviceBrandsRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 			}, creds)
 			a.So(brands, should.BeNil)
 			a.So(err.Error(), should.ContainSubstring, st.err.Error())
@@ -384,7 +384,7 @@ func TestGRPC(t *testing.T) {
 
 			responseHeaders := metadata.MD{}
 			brands, err := cl.ListBrands(test.Context(), &ttnpb.ListEndDeviceBrandsRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 			}, grpc.Header(&responseHeaders), creds)
 			a.So(err, should.BeNil)
 			a.So(brands, should.Resemble, &ttnpb.ListEndDeviceBrandsResponse{
@@ -410,7 +410,7 @@ func TestGRPC(t *testing.T) {
 			a := assertions.New(t)
 
 			_, err := cl.GetBrand(test.Context(), &ttnpb.GetEndDeviceBrandRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				BrandId:        "brand1",
 				FieldMask:      ttnpb.FieldMask("lora_alliance_vendor_id"),
 			}, creds)
@@ -426,7 +426,7 @@ func TestGRPC(t *testing.T) {
 			a := assertions.New(t)
 			st.err = fmt.Errorf("store error")
 			brands, err := cl.ListBrands(test.Context(), &ttnpb.ListEndDeviceBrandsRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 			}, creds)
 			a.So(brands, should.BeNil)
 			a.So(err.Error(), should.ContainSubstring, st.err.Error())
@@ -444,7 +444,7 @@ func TestGRPC(t *testing.T) {
 			st.err = nil
 
 			brand, err := cl.GetBrand(test.Context(), &ttnpb.GetEndDeviceBrandRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				BrandId:        "brand1",
 			}, creds)
 			a.So(err, should.BeNil)
@@ -461,7 +461,7 @@ func TestGRPC(t *testing.T) {
 			a := assertions.New(t)
 
 			_, err := cl.ListModels(test.Context(), &ttnpb.ListEndDeviceModelsRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				BrandId:        "brand1",
 				Limit:          100,
 				Page:           2,
@@ -485,7 +485,7 @@ func TestGRPC(t *testing.T) {
 			a := assertions.New(t)
 			st.err = fmt.Errorf("store error")
 			res, err := cl.ListModels(test.Context(), &ttnpb.ListEndDeviceModelsRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 			}, creds)
 			a.So(res, should.BeNil)
 			a.So(err.Error(), should.ContainSubstring, st.err.Error())
@@ -511,7 +511,7 @@ func TestGRPC(t *testing.T) {
 
 			responseHeaders := metadata.MD{}
 			brands, err := cl.ListModels(test.Context(), &ttnpb.ListEndDeviceModelsRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 			}, grpc.Header(&responseHeaders), creds)
 			a.So(err, should.BeNil)
 			a.So(brands, should.Resemble, &ttnpb.ListEndDeviceModelsResponse{
@@ -541,7 +541,7 @@ func TestGRPC(t *testing.T) {
 			a := assertions.New(t)
 
 			_, err := cl.GetModel(test.Context(), &ttnpb.GetEndDeviceModelRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				BrandId:        "brand1",
 				ModelId:        "model1",
 				FieldMask:      ttnpb.FieldMask("firmware_versions"),
@@ -559,7 +559,7 @@ func TestGRPC(t *testing.T) {
 			a := assertions.New(t)
 			st.err = fmt.Errorf("store error")
 			models, err := cl.ListModels(test.Context(), &ttnpb.ListEndDeviceModelsRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 			}, creds)
 			a.So(models, should.BeNil)
 			a.So(err.Error(), should.ContainSubstring, st.err.Error())
@@ -580,7 +580,7 @@ func TestGRPC(t *testing.T) {
 			st.err = nil
 
 			model, err := cl.GetModel(test.Context(), &ttnpb.GetEndDeviceModelRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				BrandId:        "brand1",
 				ModelId:        "model1",
 			}, creds)
@@ -607,7 +607,7 @@ func TestGRPC(t *testing.T) {
 		t.Run("Request", func(t *testing.T) {
 			a := assertions.New(t)
 			_, err := cl.GetTemplate(test.Context(), &ttnpb.GetTemplateRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				VersionIds:     ids,
 			}, creds)
 			a.So(err, should.BeNil)
@@ -618,7 +618,7 @@ func TestGRPC(t *testing.T) {
 			a := assertions.New(t)
 			st.err = fmt.Errorf("store error")
 			models, err := cl.GetTemplate(test.Context(), &ttnpb.GetTemplateRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				VersionIds:     ids,
 			}, creds)
 			a.So(models, should.BeNil)
@@ -630,7 +630,7 @@ func TestGRPC(t *testing.T) {
 			st.err = nil
 
 			template, err := cl.GetTemplate(test.Context(), &ttnpb.GetTemplateRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				VersionIds:     ids,
 			}, creds)
 			a.So(err, should.BeNil)
@@ -655,7 +655,7 @@ func TestGRPC(t *testing.T) {
 		t.Run("Request", func(t *testing.T) {
 			a := assertions.New(t)
 			_, err := cl.GetTemplate(test.Context(), &ttnpb.GetTemplateRequest{
-				ApplicationIds:      &registeredApplicationID,
+				ApplicationIds:      registeredApplicationID,
 				EndDeviceProfileIds: profileIDs,
 			}, creds)
 			a.So(err, should.BeNil)
@@ -668,7 +668,7 @@ func TestGRPC(t *testing.T) {
 			a := assertions.New(t)
 			st.err = fmt.Errorf("store error")
 			models, err := cl.GetTemplate(test.Context(), &ttnpb.GetTemplateRequest{
-				ApplicationIds:      &registeredApplicationID,
+				ApplicationIds:      registeredApplicationID,
 				EndDeviceProfileIds: profileIDs,
 			}, creds)
 			a.So(models, should.BeNil)
@@ -680,7 +680,7 @@ func TestGRPC(t *testing.T) {
 			st.err = nil
 
 			template, err := cl.GetTemplate(test.Context(), &ttnpb.GetTemplateRequest{
-				ApplicationIds:      &registeredApplicationID,
+				ApplicationIds:      registeredApplicationID,
 				EndDeviceProfileIds: profileIDs,
 			}, creds)
 			a.So(err, should.BeNil)
@@ -695,7 +695,7 @@ func TestGRPC(t *testing.T) {
 			st.lastCodecPaths = nil
 			st.err = fmt.Errorf("store error")
 			c, err := cl.GetUplinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				VersionIds:     ids,
 			}, creds)
 			a.So(c, should.BeNil)
@@ -712,7 +712,7 @@ func TestGRPC(t *testing.T) {
 			st.err = nil
 
 			c, err := cl.GetUplinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				VersionIds:     ids,
 			}, creds)
 			a.So(err, should.BeNil)
@@ -721,7 +721,7 @@ func TestGRPC(t *testing.T) {
 
 		t.Run("ClusterAuth", func(t *testing.T) {
 			codec, err := cl.GetUplinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				VersionIds:     ids,
 			})
 			a := assertions.New(t)
@@ -729,7 +729,7 @@ func TestGRPC(t *testing.T) {
 			a.So(codec, should.BeNil)
 
 			_, err = cl.GetUplinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				VersionIds:     ids,
 			}, c.WithClusterAuth())
 			a.So(err, should.BeNil)
@@ -743,7 +743,7 @@ func TestGRPC(t *testing.T) {
 			st.lastCodecPaths = nil
 			st.err = fmt.Errorf("store error")
 			c, err := cl.GetDownlinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				VersionIds:     ids,
 			}, creds)
 			a.So(c, should.BeNil)
@@ -760,7 +760,7 @@ func TestGRPC(t *testing.T) {
 			st.err = nil
 
 			c, err := cl.GetDownlinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				VersionIds:     ids,
 			}, creds)
 			a.So(err, should.BeNil)
@@ -769,7 +769,7 @@ func TestGRPC(t *testing.T) {
 
 		t.Run("ClusterAuth", func(t *testing.T) {
 			codec, err := cl.GetDownlinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				VersionIds:     ids,
 			})
 			a := assertions.New(t)
@@ -777,7 +777,7 @@ func TestGRPC(t *testing.T) {
 			a.So(codec, should.BeNil)
 
 			_, err = cl.GetDownlinkDecoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				VersionIds:     ids,
 			}, c.WithClusterAuth())
 			a.So(err, should.BeNil)
@@ -791,7 +791,7 @@ func TestGRPC(t *testing.T) {
 			st.lastCodecPaths = nil
 			st.err = fmt.Errorf("store error")
 			c, err := cl.GetDownlinkEncoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				VersionIds:     ids,
 			}, creds)
 			a.So(c, should.BeNil)
@@ -808,7 +808,7 @@ func TestGRPC(t *testing.T) {
 			st.err = nil
 
 			c, err := cl.GetDownlinkEncoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				VersionIds:     ids,
 			}, creds)
 			a.So(err, should.BeNil)
@@ -817,7 +817,7 @@ func TestGRPC(t *testing.T) {
 
 		t.Run("ClusterAuth", func(t *testing.T) {
 			codec, err := cl.GetDownlinkEncoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				VersionIds:     ids,
 			})
 			a := assertions.New(t)
@@ -825,7 +825,7 @@ func TestGRPC(t *testing.T) {
 			a.So(codec, should.BeNil)
 
 			_, err = cl.GetDownlinkEncoder(test.Context(), &ttnpb.GetPayloadFormatterRequest{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				VersionIds:     ids,
 			}, c.WithClusterAuth())
 			a.So(err, should.BeNil)

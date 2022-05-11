@@ -78,7 +78,7 @@ const (
 	DefaultADRMargin = 15
 )
 
-func deviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy *band.Band) bool {
+func deviceUseADR(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings, phy *band.Band) bool {
 	switch {
 	case dev.GetMulticast():
 		return false
@@ -88,9 +88,9 @@ func deviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy *band.Ba
 	case dev.GetMacSettings().GetAdr().GetStatic() != nil:
 		return true
 
-	case defaults.Adr.GetDisabled() != nil:
+	case defaults.GetAdr().GetDisabled() != nil:
 		return false
-	case defaults.Adr.GetStatic() != nil:
+	case defaults.GetAdr().GetStatic() != nil:
 		return true
 
 	case !phy.SupportsDynamicADR:
@@ -99,7 +99,7 @@ func deviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy *band.Ba
 	case dev.GetMacSettings().GetAdr().GetDynamic() != nil:
 		return true
 
-	case defaults.Adr.GetDynamic() != nil:
+	case defaults.GetAdr().GetDynamic() != nil:
 		return true
 
 	default:
@@ -108,14 +108,14 @@ func deviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy *band.Ba
 }
 
 // DeviceUseADR returns if the Network Server uses the ADR algorithm for the end device.
-func DeviceUseADR(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy *band.Band) bool {
+func DeviceUseADR(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings, phy *band.Band) bool {
 	if dev.GetMacSettings().GetAdr() != nil {
 		return deviceUseADR(dev, defaults, phy)
 	}
 	return legacyDeviceUseADR(dev, defaults, phy)
 }
 
-func deviceShouldAdaptDataRate(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy *band.Band) (adaptDataRate bool, resetDesiredParameters bool, staticSettings *ttnpb.ADRSettings_StaticMode) {
+func deviceShouldAdaptDataRate(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings, phy *band.Band) (adaptDataRate bool, resetDesiredParameters bool, staticSettings *ttnpb.ADRSettings_StaticMode) {
 	switch {
 	case dev.GetMulticast():
 		return false, true, nil
@@ -125,10 +125,10 @@ func deviceShouldAdaptDataRate(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings,
 	case dev.GetMacSettings().GetAdr().GetStatic() != nil:
 		return false, false, dev.MacSettings.Adr.GetStatic()
 
-	case defaults.Adr.GetDisabled() != nil:
+	case defaults.GetAdr().GetDisabled() != nil:
 		return false, true, nil
-	case defaults.Adr.GetStatic() != nil:
-		return false, false, defaults.Adr.GetStatic()
+	case defaults.GetAdr().GetStatic() != nil:
+		return false, false, defaults.GetAdr().GetStatic()
 
 	case !phy.SupportsDynamicADR:
 		return false, true, nil
@@ -136,7 +136,7 @@ func deviceShouldAdaptDataRate(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings,
 	case dev.GetMacSettings().GetAdr().GetDynamic() != nil:
 		return true, true, nil
 
-	case defaults.Adr.GetDynamic() != nil:
+	case defaults.GetAdr().GetDynamic() != nil:
 		return true, true, nil
 
 	default:
@@ -145,20 +145,20 @@ func deviceShouldAdaptDataRate(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings,
 }
 
 // DeviceShouldAdaptDataRate returns if the ADR algorithm should be run for the end device.
-func DeviceShouldAdaptDataRate(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, phy *band.Band) (adaptDataRate bool, resetDesiredParameters bool, staticSettings *ttnpb.ADRSettings_StaticMode) {
+func DeviceShouldAdaptDataRate(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings, phy *band.Band) (adaptDataRate bool, resetDesiredParameters bool, staticSettings *ttnpb.ADRSettings_StaticMode) {
 	if dev.GetMacSettings().GetAdr() != nil {
 		return deviceShouldAdaptDataRate(dev, defaults, phy)
 	}
 	return legacyDeviceShouldAdaptDataRate(dev, defaults, phy)
 }
 
-func deviceADRMargin(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) float32 {
+func deviceADRMargin(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) float32 {
 	switch {
 	case dev.GetMacSettings().GetAdr().GetDynamic().GetMargin() != nil:
 		return dev.MacSettings.Adr.GetDynamic().Margin.Value
 
-	case defaults.Adr.GetDynamic().GetMargin() != nil:
-		return defaults.Adr.GetDynamic().Margin.Value
+	case defaults.GetAdr().GetDynamic().GetMargin() != nil:
+		return defaults.GetAdr().GetDynamic().Margin.Value
 
 	default:
 		return DefaultADRMargin
@@ -166,7 +166,7 @@ func deviceADRMargin(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) float32 {
 }
 
 // DeviceADRMargin returns the margin to be used by the ADR algorithm.
-func DeviceADRMargin(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) float32 {
+func DeviceADRMargin(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) float32 {
 	if dev.GetMacSettings().GetAdr() != nil {
 		return deviceADRMargin(dev, defaults)
 	}
@@ -226,7 +226,7 @@ func txPowerStep(phy *band.Band, from, to uint8) float32 {
 	return phy.TxOffset[from] - phy.TxOffset[to]
 }
 
-func clampDataRateRange(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, minDataRateIndex, maxDataRateIndex ttnpb.DataRateIndex) (min, max ttnpb.DataRateIndex) {
+func clampDataRateRange(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings, minDataRateIndex, maxDataRateIndex ttnpb.DataRateIndex) (min, max ttnpb.DataRateIndex) {
 	clamp := func(dynamicSettings *ttnpb.ADRSettings_DynamicMode) (min, max ttnpb.DataRateIndex) {
 		min, max = minDataRateIndex, maxDataRateIndex
 		minSetting, maxSetting := dynamicSettings.MinDataRateIndex, dynamicSettings.MaxDataRateIndex
@@ -242,15 +242,15 @@ func clampDataRateRange(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, minDat
 	case dev.GetMacSettings().GetAdr().GetDynamic() != nil:
 		return clamp(dev.MacSettings.Adr.GetDynamic())
 
-	case defaults.Adr.GetDynamic() != nil:
-		return clamp(defaults.Adr.GetDynamic())
+	case defaults.GetAdr().GetDynamic() != nil:
+		return clamp(defaults.GetAdr().GetDynamic())
 
 	default:
 		return minDataRateIndex, maxDataRateIndex
 	}
 }
 
-func clampTxPowerRange(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, minTxPowerIndex, maxTxPowerIndex uint8) (min, max uint8) {
+func clampTxPowerRange(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings, minTxPowerIndex, maxTxPowerIndex uint8) (min, max uint8) {
 	clamp := func(dynamicSettings *ttnpb.ADRSettings_DynamicMode) (min, max uint8) {
 		min, max = minTxPowerIndex, maxTxPowerIndex
 		minSetting, maxSetting := dynamicSettings.MinTxPowerIndex, dynamicSettings.MaxTxPowerIndex
@@ -266,15 +266,15 @@ func clampTxPowerRange(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, minTxPo
 	case dev.GetMacSettings().GetAdr().GetDynamic() != nil:
 		return clamp(dev.MacSettings.Adr.GetDynamic())
 
-	case defaults.Adr.GetDynamic() != nil:
-		return clamp(defaults.Adr.GetDynamic())
+	case defaults.GetAdr().GetDynamic() != nil:
+		return clamp(defaults.GetAdr().GetDynamic())
 
 	default:
 		return minTxPowerIndex, maxTxPowerIndex
 	}
 }
 
-func clampNbTrans(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, nbTrans uint32) uint32 {
+func clampNbTrans(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings, nbTrans uint32) uint32 {
 	clamp := func(dynamicSettings *ttnpb.ADRSettings_DynamicMode) uint32 {
 		nbTrans := nbTrans
 		minSetting, maxSetting := dynamicSettings.MinNbTrans, dynamicSettings.MaxNbTrans
@@ -290,8 +290,8 @@ func clampNbTrans(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, nbTrans uint
 	case dev.GetMacSettings().GetAdr().GetDynamic() != nil:
 		return clamp(dev.MacSettings.Adr.GetDynamic())
 
-	case defaults.Adr.GetDynamic() != nil:
-		return clamp(defaults.Adr.GetDynamic())
+	case defaults.GetAdr().GetDynamic() != nil:
+		return clamp(defaults.GetAdr().GetDynamic())
 
 	default:
 		return nbTrans
@@ -299,7 +299,7 @@ func clampNbTrans(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, nbTrans uint
 }
 
 // AdaptDataRate adapts the end device desired ADR parameters based on previous transmissions and device settings.
-func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) error {
+func AdaptDataRate(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, defaults *ttnpb.MACSettings) error {
 	if dev.MacState == nil {
 		return nil
 	}

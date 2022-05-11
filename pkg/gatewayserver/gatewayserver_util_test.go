@@ -60,7 +60,7 @@ func randomJoinRequestPayload(joinEUI, devEUI types.EUI64) []byte {
 			},
 		},
 	}
-	buf, err := lorawan.MarshalMessage(*msg.Payload)
+	buf, err := lorawan.MarshalMessage(msg.Payload)
 	if err != nil {
 		panic(err)
 	}
@@ -102,7 +102,7 @@ func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 			},
 		},
 	}
-	buf, err = lorawan.MarshalMessage(*msg.Payload)
+	buf, err = lorawan.MarshalMessage(msg.Payload)
 	if err != nil {
 		panic(err)
 	}
@@ -132,7 +132,7 @@ func randomDownDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte
 	}
 	pld.FrmPayload = buf
 
-	msg := ttnpb.Message{
+	msg := &ttnpb.Message{
 		MHdr: &ttnpb.MHDR{
 			MType: ttnpb.MType_UNCONFIRMED_DOWN,
 			Major: ttnpb.Major_LORAWAN_R1,

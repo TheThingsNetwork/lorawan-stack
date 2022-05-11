@@ -122,7 +122,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 		msg = deepcopy.Copy(msg).(*ttnpb.Message)
 		pld := msg.GetMacPayload()
 
-		b, err := lorawan.MarshalMessage(*msg)
+		b, err := lorawan.MarshalMessage(msg)
 		if err != nil {
 			t.Fatal("Failed to marshal downlink")
 		}
@@ -1168,7 +1168,7 @@ func TestGenerateDataDownlink(t *testing.T) {
 				ns := &NetworkServer{
 					Component: c,
 					ctx:       ctx,
-					defaultMACSettings: ttnpb.MACSettings{
+					defaultMACSettings: &ttnpb.MACSettings{
 						StatusTimePeriodicity:  ttnpb.ProtoDurationPtr(0),
 						StatusCountPeriodicity: &pbtypes.UInt32Value{Value: 0},
 					},

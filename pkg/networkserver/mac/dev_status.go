@@ -39,27 +39,27 @@ const (
 	DefaultStatusTimePeriodicity         = 24 * time.Hour
 )
 
-func DeviceStatusCountPeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) uint32 {
+func DeviceStatusCountPeriodicity(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) uint32 {
 	if v := dev.GetMacSettings().GetStatusCountPeriodicity(); v != nil {
 		return v.Value
 	}
-	if defaults.StatusCountPeriodicity != nil {
+	if defaults.GetStatusCountPeriodicity() != nil {
 		return defaults.StatusCountPeriodicity.Value
 	}
 	return DefaultStatusCountPeriodicity
 }
 
-func DeviceStatusTimePeriodicity(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) time.Duration {
+func DeviceStatusTimePeriodicity(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) time.Duration {
 	if v := dev.GetMacSettings().GetStatusTimePeriodicity(); v != nil {
 		return ttnpb.StdDurationOrZero(v)
 	}
-	if defaults.StatusTimePeriodicity != nil {
+	if defaults.GetStatusTimePeriodicity() != nil {
 		return ttnpb.StdDurationOrZero(defaults.StatusTimePeriodicity)
 	}
 	return DefaultStatusTimePeriodicity
 }
 
-func DeviceNeedsDevStatusReqAt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings) (time.Time, bool) {
+func DeviceNeedsDevStatusReqAt(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings) (time.Time, bool) {
 	if dev.MacState == nil {
 		return time.Time{}, false
 	}
@@ -73,7 +73,7 @@ func DeviceNeedsDevStatusReqAt(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings)
 	return ttnpb.StdTime(dev.LastDevStatusReceivedAt).Add(tp).UTC(), true
 }
 
-func DeviceNeedsDevStatusReq(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, transmitAt time.Time) bool {
+func DeviceNeedsDevStatusReq(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings, transmitAt time.Time) bool {
 	if dev.GetMulticast() || dev.GetMacState() == nil {
 		return false
 	}
@@ -84,7 +84,7 @@ func DeviceNeedsDevStatusReq(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, t
 		timeBound && !timedAt.After(transmitAt)
 }
 
-func EnqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, defaults ttnpb.MACSettings, transmitAt time.Time) EnqueueState {
+func EnqueueDevStatusReq(ctx context.Context, dev *ttnpb.EndDevice, maxDownLen, maxUpLen uint16, defaults *ttnpb.MACSettings, transmitAt time.Time) EnqueueState {
 	if !DeviceNeedsDevStatusReq(dev, defaults, transmitAt) {
 		return EnqueueState{
 			MaxDownLen: maxDownLen,

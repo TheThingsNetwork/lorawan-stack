@@ -120,7 +120,7 @@ func RequireIsAdmin(ctx context.Context) error {
 
 // RequireApplication checks that context contains the required rights for the
 // given application ID.
-func RequireApplication(ctx context.Context, id ttnpb.ApplicationIdentifiers, required ...ttnpb.Right) error {
+func RequireApplication(ctx context.Context, id *ttnpb.ApplicationIdentifiers, required ...ttnpb.Right) error {
 	uid := unique.ID(ctx, id)
 	rights, err := ListApplication(ctx, id)
 	if err != nil {
@@ -138,7 +138,7 @@ func RequireApplication(ctx context.Context, id ttnpb.ApplicationIdentifiers, re
 
 // RequireClient checks that context contains the required rights for the
 // given client ID.
-func RequireClient(ctx context.Context, id ttnpb.ClientIdentifiers, required ...ttnpb.Right) (err error) {
+func RequireClient(ctx context.Context, id *ttnpb.ClientIdentifiers, required ...ttnpb.Right) (err error) {
 	uid := unique.ID(ctx, id)
 	rights, err := ListClient(ctx, id)
 	if err != nil {
@@ -156,7 +156,7 @@ func RequireClient(ctx context.Context, id ttnpb.ClientIdentifiers, required ...
 
 // RequireGateway checks that context contains the required rights for the
 // given gateway ID.
-func RequireGateway(ctx context.Context, id ttnpb.GatewayIdentifiers, required ...ttnpb.Right) (err error) {
+func RequireGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers, required ...ttnpb.Right) (err error) {
 	uid := unique.ID(ctx, id)
 	rights, err := ListGateway(ctx, id)
 	if err != nil {
@@ -174,7 +174,7 @@ func RequireGateway(ctx context.Context, id ttnpb.GatewayIdentifiers, required .
 
 // RequireOrganization checks that context contains the required rights for the
 // given organization ID.
-func RequireOrganization(ctx context.Context, id ttnpb.OrganizationIdentifiers, required ...ttnpb.Right) (err error) {
+func RequireOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers, required ...ttnpb.Right) (err error) {
 	uid := unique.ID(ctx, id)
 	rights, err := ListOrganization(ctx, id)
 	if err != nil {
@@ -192,7 +192,7 @@ func RequireOrganization(ctx context.Context, id ttnpb.OrganizationIdentifiers, 
 
 // RequireUser checks that context contains the required rights for the
 // given user ID.
-func RequireUser(ctx context.Context, id ttnpb.UserIdentifiers, required ...ttnpb.Right) (err error) {
+func RequireUser(ctx context.Context, id *ttnpb.UserIdentifiers, required ...ttnpb.Right) (err error) {
 	uid := unique.ID(ctx, id)
 	rights, err := ListUser(ctx, id)
 	if err != nil {
@@ -214,7 +214,7 @@ func RequireAny(ctx context.Context, ids ...*ttnpb.EntityIdentifiers) error {
 	for _, entityIDs := range ids {
 		switch ids := entityIDs.GetIds().(type) {
 		case *ttnpb.EntityIdentifiers_ApplicationIds:
-			list, err := ListApplication(ctx, *ids.ApplicationIds)
+			list, err := ListApplication(ctx, ids.ApplicationIds)
 			if err != nil {
 				return err
 			}
@@ -222,7 +222,7 @@ func RequireAny(ctx context.Context, ids ...*ttnpb.EntityIdentifiers) error {
 				return ErrNoApplicationRights.WithAttributes("uid", unique.ID(ctx, ids.ApplicationIds))
 			}
 		case *ttnpb.EntityIdentifiers_ClientIds:
-			list, err := ListClient(ctx, *ids.ClientIds)
+			list, err := ListClient(ctx, ids.ClientIds)
 			if err != nil {
 				return err
 			}
@@ -230,7 +230,7 @@ func RequireAny(ctx context.Context, ids ...*ttnpb.EntityIdentifiers) error {
 				return ErrNoClientRights.WithAttributes("uid", unique.ID(ctx, ids.ClientIds))
 			}
 		case *ttnpb.EntityIdentifiers_DeviceIds:
-			list, err := ListApplication(ctx, *ids.DeviceIds.ApplicationIds)
+			list, err := ListApplication(ctx, ids.DeviceIds.ApplicationIds)
 			if err != nil {
 				return err
 			}
@@ -238,7 +238,7 @@ func RequireAny(ctx context.Context, ids ...*ttnpb.EntityIdentifiers) error {
 				return ErrNoApplicationRights.WithAttributes("uid", unique.ID(ctx, ids.DeviceIds.ApplicationIds))
 			}
 		case *ttnpb.EntityIdentifiers_GatewayIds:
-			list, err := ListGateway(ctx, *ids.GatewayIds)
+			list, err := ListGateway(ctx, ids.GatewayIds)
 			if err != nil {
 				return err
 			}
@@ -246,7 +246,7 @@ func RequireAny(ctx context.Context, ids ...*ttnpb.EntityIdentifiers) error {
 				return ErrNoGatewayRights.WithAttributes("uid", unique.ID(ctx, ids.GatewayIds))
 			}
 		case *ttnpb.EntityIdentifiers_OrganizationIds:
-			list, err := ListOrganization(ctx, *ids.OrganizationIds)
+			list, err := ListOrganization(ctx, ids.OrganizationIds)
 			if err != nil {
 				return err
 			}
@@ -254,7 +254,7 @@ func RequireAny(ctx context.Context, ids ...*ttnpb.EntityIdentifiers) error {
 				return ErrNoOrganizationRights.WithAttributes("uid", unique.ID(ctx, ids.OrganizationIds))
 			}
 		case *ttnpb.EntityIdentifiers_UserIds:
-			list, err := ListUser(ctx, *ids.UserIds)
+			list, err := ListUser(ctx, ids.UserIds)
 			if err != nil {
 				return err
 			}

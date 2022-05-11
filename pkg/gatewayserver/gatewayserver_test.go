@@ -143,7 +143,7 @@ func TestGatewayServer(t *testing.T) {
 				mustHavePeer(ctx, c, ttnpb.ClusterRole_NETWORK_SERVER)
 				mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
-				ids := ttnpb.GatewayIdentifiers{
+				ids := &ttnpb.GatewayIdentifiers{
 					GatewayId: registeredGatewayID,
 					Eui:       &registeredGatewayEUI,
 				}
@@ -205,8 +205,8 @@ func TestGatewayServer(t *testing.T) {
 				TimeoutOnInvalidAuth   bool
 				HasAuth                bool
 				DeduplicatesUplinks    bool
-				ValidAuth              func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool
-				Link                   func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error
+				ValidAuth              func(ctx context.Context, ids *ttnpb.GatewayIdentifiers, key string) bool
+				Link                   func(ctx context.Context, t *testing.T, ids *ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error
 			}{
 				{
 					Protocol:            "grpc",
@@ -215,10 +215,10 @@ func TestGatewayServer(t *testing.T) {
 					DetectsDisconnect:   true,
 					DeduplicatesUplinks: true,
 
-					ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
+					ValidAuth: func(ctx context.Context, ids *ttnpb.GatewayIdentifiers, key string) bool {
 						return ids.GatewayId == registeredGatewayID && key == registeredGatewayKey
 					},
-					Link: func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
+					Link: func(ctx context.Context, t *testing.T, ids *ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
 						conn, err := grpc.Dial(":9187", append(rpcclient.DefaultDialOptions(ctx), grpc.WithInsecure(), grpc.WithBlock())...)
 						if err != nil {
 							return err
@@ -275,10 +275,10 @@ func TestGatewayServer(t *testing.T) {
 					HasAuth:              true,
 					DetectsDisconnect:    true,
 					TimeoutOnInvalidAuth: true, // The MQTT client keeps reconnecting on invalid auth.
-					ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
+					ValidAuth: func(ctx context.Context, ids *ttnpb.GatewayIdentifiers, key string) bool {
 						return ids.GatewayId == registeredGatewayID && key == registeredGatewayKey
 					},
-					Link: func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
+					Link: func(ctx context.Context, t *testing.T, ids *ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
 						if ids.GatewayId == "" {
 							t.SkipNow()
 						}
@@ -361,10 +361,10 @@ func TestGatewayServer(t *testing.T) {
 					Protocol:            "udp",
 					SupportsStatus:      true,
 					DeduplicatesUplinks: true,
-					ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
+					ValidAuth: func(ctx context.Context, ids *ttnpb.GatewayIdentifiers, key string) bool {
 						return ids.Eui != nil
 					},
-					Link: func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
+					Link: func(ctx context.Context, t *testing.T, ids *ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
 						if ids.Eui == nil {
 							t.SkipNow()
 						}
@@ -491,10 +491,10 @@ func TestGatewayServer(t *testing.T) {
 					DetectsDisconnect:      true,
 					DetectsInvalidMessages: true,
 					HasAuth:                true,
-					ValidAuth: func(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string) bool {
+					ValidAuth: func(ctx context.Context, ids *ttnpb.GatewayIdentifiers, key string) bool {
 						return ids.Eui != nil
 					},
-					Link: func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
+					Link: func(ctx context.Context, t *testing.T, ids *ttnpb.GatewayIdentifiers, key string, upCh <-chan *ttnpb.GatewayUp, downCh chan<- *ttnpb.GatewayDown) error {
 						if ids.Eui == nil {
 							t.SkipNow()
 						}
@@ -601,31 +601,31 @@ func TestGatewayServer(t *testing.T) {
 				t.Run(fmt.Sprintf("Authenticate/%v", ptc.Protocol), func(t *testing.T) {
 					for _, ctc := range []struct {
 						Name string
-						ID   ttnpb.GatewayIdentifiers
+						ID   *ttnpb.GatewayIdentifiers
 						Key  string
 					}{
 						{
 							Name: "ValidIDAndKey",
-							ID:   ttnpb.GatewayIdentifiers{GatewayId: registeredGatewayID},
+							ID:   &ttnpb.GatewayIdentifiers{GatewayId: registeredGatewayID},
 							Key:  registeredGatewayKey,
 						},
 						{
 							Name: "InvalidKey",
-							ID:   ttnpb.GatewayIdentifiers{GatewayId: registeredGatewayID},
+							ID:   &ttnpb.GatewayIdentifiers{GatewayId: registeredGatewayID},
 							Key:  "invalid-key",
 						},
 						{
 							Name: "InvalidIDAndKey",
-							ID:   ttnpb.GatewayIdentifiers{GatewayId: "invalid-gateway"},
+							ID:   &ttnpb.GatewayIdentifiers{GatewayId: "invalid-gateway"},
 							Key:  "invalid-key",
 						},
 						{
 							Name: "RegisteredEUI",
-							ID:   ttnpb.GatewayIdentifiers{Eui: &registeredGatewayEUI},
+							ID:   &ttnpb.GatewayIdentifiers{Eui: &registeredGatewayEUI},
 						},
 						{
 							Name: "UnregisteredEUI",
-							ID:   ttnpb.GatewayIdentifiers{Eui: &unregisteredGatewayEUI},
+							ID:   &ttnpb.GatewayIdentifiers{Eui: &unregisteredGatewayEUI},
 						},
 					} {
 						t.Run(ctc.Name, func(t *testing.T) {
@@ -693,7 +693,7 @@ func TestGatewayServer(t *testing.T) {
 						t.SkipNow()
 					}
 
-					id := ttnpb.GatewayIdentifiers{
+					id := &ttnpb.GatewayIdentifiers{
 						GatewayId: registeredGatewayID,
 						Eui:       &registeredGatewayEUI,
 					}
@@ -737,7 +737,7 @@ func TestGatewayServer(t *testing.T) {
 					ctx, cancel := context.WithCancel(ctx)
 					upCh := make(chan *ttnpb.GatewayUp)
 					downCh := make(chan *ttnpb.GatewayDown)
-					ids := ttnpb.GatewayIdentifiers{
+					ids := &ttnpb.GatewayIdentifiers{
 						GatewayId: registeredGatewayID,
 						Eui:       &registeredGatewayEUI,
 					}
@@ -756,7 +756,7 @@ func TestGatewayServer(t *testing.T) {
 
 					// The gateway should not be connected before testing traffic.
 					t.Run("NotConnected", func(t *testing.T) {
-						_, err := statsClient.GetGatewayConnectionStats(statsCtx, &ids)
+						_, err := statsClient.GetGatewayConnectionStats(statsCtx, ids)
 						if !a.So(errors.IsNotFound(err), should.BeTrue) {
 							t.Fatal("Expected gateway not to be connected yet, but it is")
 						}
@@ -830,7 +830,7 @@ func TestGatewayServer(t *testing.T) {
 									a := assertions.New(t)
 
 									gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{
-										GatewayIds: &ids,
+										GatewayIds: ids,
 									})
 									a.So(err, should.BeNil)
 
@@ -865,7 +865,7 @@ func TestGatewayServer(t *testing.T) {
 
 									time.Sleep(timeout)
 									gtw, err = is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{
-										GatewayIds: &ids,
+										GatewayIds: ids,
 									})
 									a.So(err, should.BeNil)
 									a.So(gtw.Antennas[0].Location, should.Resemble, tc.ExpectLocation)
@@ -907,7 +907,7 @@ func TestGatewayServer(t *testing.T) {
 										RxMetadata: []*ttnpb.RxMetadata{
 											{
 												AntennaIndex: 0,
-												GatewayIds:   &ids,
+												GatewayIds:   ids,
 												Timestamp:    100,
 												Rssi:         -69,
 												ChannelRssi:  -69,
@@ -925,14 +925,14 @@ func TestGatewayServer(t *testing.T) {
 									is.GatewayRegistry().Add(ctx, ids, registeredGatewayKey, mockGtw, testRights...)
 
 									gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{
-										GatewayIds: &ids,
+										GatewayIds: ids,
 									})
 									a.So(err, should.BeNil)
 									a.So(gtw.LocationPublic, should.Equal, locationPublic)
 									gtw.LocationPublic = locationPublic
 									gtw.Antennas[0].Location = location
 									gtw, err = is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{
-										GatewayIds: &ids,
+										GatewayIds: ids,
 									})
 									a.So(err, should.BeNil)
 									a.So(gtw.LocationPublic, should.Equal, locationPublic)
@@ -1011,7 +1011,7 @@ func TestGatewayServer(t *testing.T) {
 					var location *ttnpb.Location
 					if rtc.SupportsLocationUpdate {
 						gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{
-							GatewayIds: &ids,
+							GatewayIds: ids,
 						})
 						a.So(err, should.BeNil)
 						location = gtw.Antennas[0].Location
@@ -1065,7 +1065,7 @@ func TestGatewayServer(t *testing.T) {
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
-													GatewayIds:  &ids,
+													GatewayIds:  ids,
 													Timestamp:   100,
 													Rssi:        -69,
 													ChannelRssi: -69,
@@ -1099,7 +1099,7 @@ func TestGatewayServer(t *testing.T) {
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
-													GatewayIds:  &ids,
+													GatewayIds:  ids,
 													Timestamp:   101,
 													Rssi:        -42,
 													ChannelRssi: -42,
@@ -1125,7 +1125,7 @@ func TestGatewayServer(t *testing.T) {
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
-													GatewayIds:  &ids,
+													GatewayIds:  ids,
 													Timestamp:   100,
 													Rssi:        -69,
 													ChannelRssi: -69,
@@ -1151,7 +1151,7 @@ func TestGatewayServer(t *testing.T) {
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
-													GatewayIds:  &ids,
+													GatewayIds:  ids,
 													Timestamp:   100,
 													Rssi:        -69,
 													ChannelRssi: -69,
@@ -1185,7 +1185,7 @@ func TestGatewayServer(t *testing.T) {
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
-													GatewayIds:  &ids,
+													GatewayIds:  ids,
 													Timestamp:   100,
 													Rssi:        -69,
 													ChannelRssi: -69,
@@ -1219,7 +1219,7 @@ func TestGatewayServer(t *testing.T) {
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
-													GatewayIds:  &ids,
+													GatewayIds:  ids,
 													Timestamp:   100,
 													Rssi:        -112,
 													ChannelRssi: -112,
@@ -1245,7 +1245,7 @@ func TestGatewayServer(t *testing.T) {
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
-													GatewayIds:  &ids,
+													GatewayIds:  ids,
 													Timestamp:   200,
 													Rssi:        -69,
 													ChannelRssi: -69,
@@ -1271,7 +1271,7 @@ func TestGatewayServer(t *testing.T) {
 											},
 											RxMetadata: []*ttnpb.RxMetadata{
 												{
-													GatewayIds:  &ids,
+													GatewayIds:  ids,
 													Timestamp:   300,
 													Rssi:        -36,
 													ChannelRssi: -36,
@@ -1418,7 +1418,7 @@ func TestGatewayServer(t *testing.T) {
 									a.So(statsRegistry.Set(conn.Context(), ids, stats, paths, 0), should.BeNil)
 								}
 
-								stats, err := statsClient.GetGatewayConnectionStats(statsCtx, &ids)
+								stats, err := statsClient.GetGatewayConnectionStats(statsCtx, ids)
 								if !a.So(err, should.BeNil) {
 									t.FailNow()
 								}
@@ -1744,7 +1744,7 @@ func TestGatewayServer(t *testing.T) {
 									a.So(config.Stats.Set(conn.Context(), ids, stats, paths, 0), should.BeNil)
 								}
 
-								stats, err = statsClient.GetGatewayConnectionStats(statsCtx, &ids)
+								stats, err = statsClient.GetGatewayConnectionStats(statsCtx, ids)
 								if !a.So(err, should.BeNil) {
 									t.FailNow()
 								}
@@ -1764,7 +1764,7 @@ func TestGatewayServer(t *testing.T) {
 
 					// After canceling the context and awaiting the link, the connection should be gone.
 					t.Run("Disconnected", func(t *testing.T) {
-						_, err := statsClient.GetGatewayConnectionStats(statsCtx, &ids)
+						_, err := statsClient.GetGatewayConnectionStats(statsCtx, ids)
 						if !a.So(errors.IsNotFound(err), should.BeTrue) {
 							t.Fatalf("Expected gateway to be disconnected, but it's not")
 						}
@@ -1801,7 +1801,7 @@ func TestGatewayServer(t *testing.T) {
 				gs.Close()
 				time.Sleep(2 * config.ConnectionStatsTTL)
 
-				_, err = statsRegistry.Get(ctx, *ids)
+				_, err = statsRegistry.Get(ctx, ids)
 				a.So(errors.IsNotFound(err), should.BeTrue)
 			})
 		})
@@ -1865,7 +1865,7 @@ func TestUpdateVersionInfo(t *testing.T) {
 
 	mustHavePeer(ctx, c, ttnpb.ClusterRole_ENTITY_REGISTRY)
 
-	gtwIDs := ttnpb.GatewayIdentifiers{
+	gtwIDs := &ttnpb.GatewayIdentifiers{
 		GatewayId: registeredGatewayID,
 		Eui:       &registeredGatewayEUI,
 	}
@@ -1874,7 +1874,7 @@ func TestUpdateVersionInfo(t *testing.T) {
 	is.GatewayRegistry().Add(ctx, gtwIDs, registeredGatewayKey, mockGtw, testRights...)
 	time.Sleep(timeout) // Wait for setup to be completed.
 
-	linkFn := func(ctx context.Context, t *testing.T, ids ttnpb.GatewayIdentifiers, key string, statCh <-chan *ttnpbv2.StatusMessage) error {
+	linkFn := func(ctx context.Context, t *testing.T, ids *ttnpb.GatewayIdentifiers, key string, statCh <-chan *ttnpbv2.StatusMessage) error {
 		ctx, cancel := errorcontext.New(ctx)
 		clientOpts := mqtt.NewClientOptions()
 		clientOpts.AddBroker("tcp://0.0.0.0:1881")
@@ -1915,7 +1915,7 @@ func TestUpdateVersionInfo(t *testing.T) {
 	}
 
 	statCh := make(chan *ttnpbv2.StatusMessage)
-	ids := ttnpb.GatewayIdentifiers{
+	ids := &ttnpb.GatewayIdentifiers{
 		GatewayId: registeredGatewayID,
 		Eui:       &registeredGatewayEUI,
 	}
@@ -1957,7 +1957,7 @@ func TestUpdateVersionInfo(t *testing.T) {
 			}
 			time.Sleep(timeout)
 			gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{
-				GatewayIds: &ids,
+				GatewayIds: ids,
 			})
 			a.So(err, should.BeNil)
 			a.So(gtw.Attributes, should.Resemble, tc.ExpectedAttributes)
@@ -1978,15 +1978,15 @@ func TestUpdateVersionInfo(t *testing.T) {
 	)
 	statsClient := ttnpb.NewGsClient(statsConn)
 
-	stat, err := statsClient.GetGatewayConnectionStats(statsCtx, &gtwIDs)
+	stat, err := statsClient.GetGatewayConnectionStats(statsCtx, gtwIDs)
 	a.So(err, should.BeNil)
 	a.So(stat, should.NotBeNil)
 
 	// Delete and wait for fetch interval.
-	is.GatewayRegistry().Delete(ctx, &gtwIDs)
+	is.GatewayRegistry().Delete(ctx, gtwIDs)
 	time.Sleep(gatewayFetchInterval << 7)
 
-	stat, err = statsClient.GetGatewayConnectionStats(statsCtx, &gtwIDs)
+	stat, err = statsClient.GetGatewayConnectionStats(statsCtx, gtwIDs)
 	a.So(errors.IsNotFound(err), should.BeTrue)
 	a.So(stat, should.BeNil)
 }

@@ -132,7 +132,7 @@ func (is *IdentityServer) validateEndDeviceServerAddressMatch(ctx context.Contex
 }
 
 func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.CreateEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
-	if err = rights.RequireApplication(ctx, *req.EndDevice.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	if err = rights.RequireApplication(ctx, req.EndDevice.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	if err = blocklist.Check(ctx, req.EndDevice.Ids.DeviceId); err != nil {
@@ -178,7 +178,7 @@ func (is *IdentityServer) createEndDevice(ctx context.Context, req *ttnpb.Create
 }
 
 func (is *IdentityServer) getEndDevice(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
-	if err = rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ); err != nil {
+	if err = rights.RequireApplication(ctx, req.EndDeviceIds.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
 
@@ -225,7 +225,7 @@ func (is *IdentityServer) listEndDevices(ctx context.Context, req *ttnpb.ListEnd
 			return nil, err
 		}
 		req.FieldMask = cleanFieldMaskPaths([]string{"ids"}, req.FieldMask, nil, []string{"created_at", "updated_at"})
-	} else if err = rights.RequireApplication(ctx, *req.GetApplicationIds(), ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ); err != nil {
+	} else if err = rights.RequireApplication(ctx, req.GetApplicationIds(), ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ); err != nil {
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.EndDeviceFieldPathsNested, req.FieldMask, getPaths, nil)
@@ -269,7 +269,7 @@ func (is *IdentityServer) setFullEndDevicePictureURL(ctx context.Context, dev *t
 func (is *IdentityServer) updateEndDevice(ctx context.Context, req *ttnpb.UpdateEndDeviceRequest) (dev *ttnpb.EndDevice, err error) {
 	if clusterauth.Authorized(ctx) == nil {
 		req.FieldMask = cleanFieldMaskPaths([]string{"activated_at", "locations", "last_seen_at"}, req.FieldMask, nil, getPaths)
-	} else if err = rights.RequireApplication(ctx, *req.EndDevice.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	} else if err = rights.RequireApplication(ctx, req.EndDevice.Ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.EndDeviceFieldPathsNested, req.FieldMask, nil, getPaths)
@@ -322,7 +322,7 @@ func (is *IdentityServer) batchUpdateEndDeviceLastSeen(ctx context.Context, req 
 }
 
 func (is *IdentityServer) deleteEndDevice(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireApplication(ctx, *ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	if err := rights.RequireApplication(ctx, ids.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {

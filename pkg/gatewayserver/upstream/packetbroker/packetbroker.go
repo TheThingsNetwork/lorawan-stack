@@ -99,7 +99,7 @@ func (h *Handler) nextUpdateGateway(onlineTTL *pbtypes.Duration) <-chan time.Tim
 }
 
 // ConnectGateway implements upstream.Handler.
-func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifiers, conn *io.Connection) error {
+func (h *Handler) ConnectGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers, conn *io.Connection) error {
 	pbaConn, err := h.Cluster.GetPeerConn(ctx, ttnpb.ClusterRole_PACKET_BROKER_AGENT, nil)
 	if err != nil {
 		return errPacketBrokerAgentNotFound.WithCause(err)
@@ -230,7 +230,7 @@ func (h *Handler) ConnectGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 var errPacketBrokerAgentNotFound = errors.DefineNotFound("packet_broker_agent_not_found", "Packet Broker Agent not found")
 
 // HandleUplink implements upstream.Handler.
-func (h *Handler) HandleUplink(ctx context.Context, _ ttnpb.GatewayIdentifiers, ids *ttnpb.EndDeviceIdentifiers, msg *ttnpb.GatewayUplinkMessage) error {
+func (h *Handler) HandleUplink(ctx context.Context, _ *ttnpb.GatewayIdentifiers, ids *ttnpb.EndDeviceIdentifiers, msg *ttnpb.GatewayUplinkMessage) error {
 	pbaConn, err := h.Cluster.GetPeerConn(ctx, ttnpb.ClusterRole_PACKET_BROKER_AGENT, nil)
 	if err != nil {
 		return errPacketBrokerAgentNotFound.WithCause(err)
@@ -242,11 +242,11 @@ func (h *Handler) HandleUplink(ctx context.Context, _ ttnpb.GatewayIdentifiers, 
 }
 
 // HandleStatus implements upstream.Handler.
-func (h *Handler) HandleStatus(context.Context, ttnpb.GatewayIdentifiers, *ttnpb.GatewayStatus) error {
+func (h *Handler) HandleStatus(context.Context, *ttnpb.GatewayIdentifiers, *ttnpb.GatewayStatus) error {
 	return nil
 }
 
 // HandleTxAck implements upstream.Handler.
-func (h *Handler) HandleTxAck(context.Context, ttnpb.GatewayIdentifiers, *ttnpb.TxAcknowledgment) error {
+func (h *Handler) HandleTxAck(context.Context, *ttnpb.GatewayIdentifiers, *ttnpb.TxAcknowledgment) error {
 	return nil
 }

@@ -206,7 +206,7 @@ func (s *srv) connect(ctx context.Context, eui types.EUI64) (*state, error) {
 			cs.io, cs.ioErr = io, err
 			close(cs.ioWait)
 		}()
-		ids := ttnpb.GatewayIdentifiers{Eui: &eui}
+		ids := &ttnpb.GatewayIdentifiers{Eui: &eui}
 		ctx, ids, err = s.server.FillGatewayContext(ctx, ids)
 		if err != nil {
 			return nil, err
@@ -351,14 +351,14 @@ func (s *srv) handleDown(ctx context.Context, state *state) error {
 		state.startHandleDownMu.Unlock()
 	}()
 	logger := log.FromContext(ctx)
-	if err := s.server.ClaimDownlink(ctx, *state.io.Gateway().GetIds()); err != nil {
+	if err := s.server.ClaimDownlink(ctx, state.io.Gateway().GetIds()); err != nil {
 		logger.WithError(err).Error("Failed to claim downlink path")
 		return errClaimDownlinkFailed.WithCause(err)
 	}
 	logger.Info("Downlink path claimed")
 	defer func() {
 		ctx := s.server.FromRequestContext(ctx)
-		if err := s.server.UnclaimDownlink(ctx, *state.io.Gateway().GetIds()); err != nil {
+		if err := s.server.UnclaimDownlink(ctx, state.io.Gateway().GetIds()); err != nil {
 			logger.WithError(err).Error("Failed to unclaim downlink path")
 			return
 		}

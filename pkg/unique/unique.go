@@ -52,62 +52,63 @@ func WithContext(ctx context.Context, uid string) (context.Context, error) {
 }
 
 // ToApplicationID returns the application identifier of the specified unique ID.
-func ToApplicationID(uid string) (id ttnpb.ApplicationIdentifiers, err error) {
-	id.ApplicationId = uid
+func ToApplicationID(uid string) (id *ttnpb.ApplicationIdentifiers, err error) {
+	id = &ttnpb.ApplicationIdentifiers{ApplicationId: uid}
 	if err := id.ValidateFields("application_id"); err != nil {
-		return ttnpb.ApplicationIdentifiers{}, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
+		return nil, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
 	}
 	return id, nil
 }
 
 // ToClientID returns the client identifier of the specified unique ID.
-func ToClientID(uid string) (id ttnpb.ClientIdentifiers, err error) {
-	id.ClientId = uid
+func ToClientID(uid string) (id *ttnpb.ClientIdentifiers, err error) {
+	id = &ttnpb.ClientIdentifiers{ClientId: uid}
 	if err := id.ValidateFields("client_id"); err != nil {
-		return ttnpb.ClientIdentifiers{}, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
+		return nil, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
 	}
 	return id, nil
 }
 
 // ToDeviceID returns the end device identifier of the specified unique ID.
-func ToDeviceID(uid string) (id ttnpb.EndDeviceIdentifiers, err error) {
+func ToDeviceID(uid string) (id *ttnpb.EndDeviceIdentifiers, err error) {
+	id = &ttnpb.EndDeviceIdentifiers{}
 	sepIdx := strings.Index(uid, ".")
 	if sepIdx == -1 {
-		return ttnpb.EndDeviceIdentifiers{}, errFormat.WithAttributes("value", uid)
+		return nil, errFormat.WithAttributes("value", uid)
 	}
 	id.ApplicationIds = &ttnpb.ApplicationIdentifiers{
 		ApplicationId: uid[:sepIdx],
 	}
 	id.DeviceId = uid[sepIdx+1:]
 	if err := id.ValidateFields("device_id", "application_ids"); err != nil {
-		return ttnpb.EndDeviceIdentifiers{}, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
+		return nil, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
 	}
 	return id, nil
 }
 
 // ToGatewayID returns the gateway identifier of the specified unique ID.
-func ToGatewayID(uid string) (id ttnpb.GatewayIdentifiers, err error) {
-	id.GatewayId = uid
+func ToGatewayID(uid string) (id *ttnpb.GatewayIdentifiers, err error) {
+	id = &ttnpb.GatewayIdentifiers{GatewayId: uid}
 	if err := id.ValidateFields("gateway_id"); err != nil {
-		return ttnpb.GatewayIdentifiers{}, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
+		return nil, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
 	}
 	return id, nil
 }
 
 // ToOrganizationID returns the organization identifier of the specified unique ID.
-func ToOrganizationID(uid string) (id ttnpb.OrganizationIdentifiers, err error) {
-	id.OrganizationId = uid
+func ToOrganizationID(uid string) (id *ttnpb.OrganizationIdentifiers, err error) {
+	id = &ttnpb.OrganizationIdentifiers{OrganizationId: uid}
 	if err := id.ValidateFields("organization_id"); err != nil {
-		return ttnpb.OrganizationIdentifiers{}, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
+		return nil, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
 	}
 	return id, nil
 }
 
 // ToUserID returns the user identifier of the specified unique ID.
-func ToUserID(uid string) (id ttnpb.UserIdentifiers, err error) {
-	id.UserId = uid
+func ToUserID(uid string) (id *ttnpb.UserIdentifiers, err error) {
+	id = &ttnpb.UserIdentifiers{UserId: uid}
 	if err := id.ValidateFields("user_id"); err != nil {
-		return ttnpb.UserIdentifiers{}, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
+		return nil, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
 	}
 	return id, nil
 }

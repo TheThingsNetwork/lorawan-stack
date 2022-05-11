@@ -60,10 +60,10 @@ func TestFlow(t *testing.T) {
 	})
 	gs := mock.NewServer(c, is)
 
-	ids := ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}
+	ids := &ttnpb.GatewayIdentifiers{GatewayId: "foo-gateway"}
 	antennaGain := float32(3)
 	gtw := &ttnpb.Gateway{
-		Ids:             &ids,
+		Ids:             ids,
 		FrequencyPlanId: "EU_863_870",
 		Antennas: []*ttnpb.GatewayAntenna{
 			{
@@ -111,7 +111,7 @@ func TestFlow(t *testing.T) {
 		case up := <-conn.Up():
 			token, err := io.ParseUplinkToken(up.Message.RxMetadata[0].UplinkToken)
 			a.So(err, should.BeNil)
-			a.So(token.Ids.GatewayIds, should.Resemble, &ids)
+			a.So(token.Ids.GatewayIds, should.Resemble, ids)
 			a.So(token.Ids.AntennaIndex, should.Equal, 0)
 			a.So(token.Timestamp, should.Equal, 100)
 		case <-time.After(timeout):
@@ -544,10 +544,10 @@ func TestSubBandEIRPOverride(t *testing.T) {
 
 	gs := mock.NewServer(c, is)
 
-	ids := ttnpb.GatewayIdentifiers{GatewayId: "bar-gateway"}
+	ids := &ttnpb.GatewayIdentifiers{GatewayId: "bar-gateway"}
 	antennaGain := float32(3)
 	gtw := &ttnpb.Gateway{
-		Ids:             &ids,
+		Ids:             ids,
 		FrequencyPlanId: "AS_923_925_AU", // Overrides maximum EIRP to 30 dBm in 915.0 – 928.0 MHz sub-band.
 		Antennas: []*ttnpb.GatewayAntenna{
 			{
@@ -591,7 +591,7 @@ func TestSubBandEIRPOverride(t *testing.T) {
 		case up := <-conn.Up():
 			token, err := io.ParseUplinkToken(up.Message.RxMetadata[0].UplinkToken)
 			a.So(err, should.BeNil)
-			a.So(token.Ids.GatewayIds, should.Resemble, &ids)
+			a.So(token.Ids.GatewayIds, should.Resemble, ids)
 			a.So(token.Ids.AntennaIndex, should.Equal, 0)
 			a.So(token.Timestamp, should.Equal, 100)
 		case <-time.After(timeout):

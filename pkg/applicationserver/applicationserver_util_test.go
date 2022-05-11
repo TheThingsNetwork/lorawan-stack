@@ -56,7 +56,7 @@ func (r MockDeviceRegistry) Range(ctx context.Context, paths []string, f func(co
 // MockLinkRegistry is a mock LinkRegistry used for testing.
 type MockLinkRegistry struct {
 	GetFunc   func(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string) (*ttnpb.ApplicationLink, error)
-	RangeFunc func(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error
+	RangeFunc func(ctx context.Context, paths []string, f func(context.Context, *ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error
 	SetFunc   func(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string, f func(*ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error)) (*ttnpb.ApplicationLink, error)
 }
 
@@ -69,7 +69,7 @@ func (m MockLinkRegistry) Get(ctx context.Context, ids *ttnpb.ApplicationIdentif
 }
 
 // Range calls RangeFunc if set and panics otherwise.
-func (m MockLinkRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error {
+func (m MockLinkRegistry) Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationLink) bool) error {
 	if m.RangeFunc == nil {
 		panic("Range called, but not set")
 	}

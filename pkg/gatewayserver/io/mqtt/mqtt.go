@@ -132,7 +132,7 @@ type topicAccess struct {
 }
 
 func (c *connection) Connect(ctx context.Context, info *auth.Info) (context.Context, error) {
-	ids := ttnpb.GatewayIdentifiers{
+	ids := &ttnpb.GatewayIdentifiers{
 		GatewayId: info.Username,
 	}
 	if err := c.server.ValidateGatewayID(ctx, ids); err != nil {

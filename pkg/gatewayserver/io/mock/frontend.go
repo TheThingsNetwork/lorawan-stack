@@ -35,7 +35,7 @@ func (*Frontend) SupportsDownlinkClaim() bool { return true }
 
 // ConnectFrontend connects a new mock front-end to the given server.
 // The gateway time starts at Unix epoch.
-func ConnectFrontend(ctx context.Context, ids ttnpb.GatewayIdentifiers, server io.Server) (*Frontend, error) {
+func ConnectFrontend(ctx context.Context, ids *ttnpb.GatewayIdentifiers, server io.Server) (*Frontend, error) {
 	f := &Frontend{
 		Up:     make(chan *ttnpb.UplinkMessage, 1),
 		Status: make(chan *ttnpb.GatewayStatus, 1),

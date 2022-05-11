@@ -79,7 +79,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 
 		type popFuncReq struct {
 			Context                context.Context
-			ApplicationIdentifiers ttnpb.ApplicationIdentifiers
+			ApplicationIdentifiers *ttnpb.ApplicationIdentifiers
 			Func                   ApplicationUplinkQueueDrainFunc
 			Response               chan<- TaskPopFuncResponse
 		}
@@ -89,7 +89,7 @@ func handleApplicationUplinkQueueTest(ctx context.Context, q ApplicationUplinkQu
 		defer cancelPopCtx()
 		for _, consumerID := range consumerIDs {
 			go func(consumerID string) {
-				errCh <- q.Pop(popCtx, consumerID, func(ctx context.Context, appID ttnpb.ApplicationIdentifiers, f ApplicationUplinkQueueDrainFunc) (time.Time, error) {
+				errCh <- q.Pop(popCtx, consumerID, func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, f ApplicationUplinkQueueDrainFunc) (time.Time, error) {
 					respCh := make(chan TaskPopFuncResponse, 1)
 					select {
 					case <-popCtx.Done():

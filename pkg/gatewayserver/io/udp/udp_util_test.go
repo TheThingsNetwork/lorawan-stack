@@ -191,7 +191,7 @@ func randomUpDataPayload(devAddr types.DevAddr, fPort uint32, size int) []byte {
 			},
 		},
 	}
-	buf, err = lorawan.MarshalMessage(*msg.Payload)
+	buf, err = lorawan.MarshalMessage(msg.Payload)
 	if err != nil {
 		panic(err)
 	}

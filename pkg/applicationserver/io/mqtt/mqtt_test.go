@@ -40,11 +40,11 @@ import (
 )
 
 var (
-	registeredApplicationID  = ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}
+	registeredApplicationID  = &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}
 	registeredApplicationUID = unique.ID(test.Context(), registeredApplicationID)
 	registeredApplicationKey = "test-key"
 	registeredDeviceID       = &ttnpb.EndDeviceIdentifiers{
-		ApplicationIds: &registeredApplicationID,
+		ApplicationIds: registeredApplicationID,
 		DeviceId:       "test-device",
 	}
 

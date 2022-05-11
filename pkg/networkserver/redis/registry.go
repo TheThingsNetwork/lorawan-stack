@@ -576,7 +576,7 @@ func (r *DeviceRegistry) RangeByUplinkMatches(ctx context.Context, up *ttnpb.Upl
 			log.FromContext(ctx).WithError(err).Error("Failed to parse UID as device identifiers")
 			return ctx, nil, errDatabaseCorruption.WithCause(err)
 		}
-		return ctx, &ids, nil
+		return ctx, ids, nil
 	}
 
 	for _, session := range currentSessionSet {

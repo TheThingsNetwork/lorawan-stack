@@ -54,8 +54,8 @@ import (
 var (
 	serverAddress          = "127.0.0.1:0"
 	registeredGatewayUID   = "eui-0101010101010101"
-	registeredGatewayID    = ttnpb.GatewayIdentifiers{GatewayId: registeredGatewayUID}
-	registeredGateway      = ttnpb.Gateway{Ids: &registeredGatewayID, FrequencyPlanId: "EU_863_870"}
+	registeredGatewayID    = &ttnpb.GatewayIdentifiers{GatewayId: registeredGatewayUID}
+	registeredGateway      = &ttnpb.Gateway{Ids: registeredGatewayID, FrequencyPlanId: "EU_863_870"}
 	registeredGatewayToken = "secrettoken"
 
 	discoveryEndPoint      = "/router-info"
@@ -509,7 +509,7 @@ func TestVersion(t *testing.T) {
 	gs := mock.NewServer(c, is)
 
 	gs.RegisterGateway(ctx, registeredGatewayID, &ttnpb.Gateway{
-		Ids:             &registeredGatewayID,
+		Ids:             registeredGatewayID,
 		FrequencyPlanId: test.EUFrequencyPlanID,
 		Antennas: []*ttnpb.GatewayAntenna{
 			{
@@ -1248,7 +1248,7 @@ func TestTraffic(t *testing.T) {
 					downlinkPath = &ttnpb.DownlinkPath{
 						Path: &ttnpb.DownlinkPath_UplinkToken{
 							UplinkToken: io.MustUplinkToken(
-								&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &registeredGatewayID},
+								&ttnpb.GatewayAntennaIdentifiers{GatewayIds: registeredGatewayID},
 								timeStamp,
 								0,
 								now,
@@ -1260,7 +1260,7 @@ func TestTraffic(t *testing.T) {
 					downlinkPath = &ttnpb.DownlinkPath{
 						Path: &ttnpb.DownlinkPath_Fixed{
 							Fixed: &ttnpb.GatewayAntennaIdentifiers{
-								GatewayIds: &registeredGatewayID,
+								GatewayIds: registeredGatewayID,
 							},
 						},
 					}
@@ -1472,7 +1472,7 @@ func TestRTT(t *testing.T) {
 			InputDownlinkPath: &ttnpb.DownlinkPath{
 				Path: &ttnpb.DownlinkPath_UplinkToken{
 					UplinkToken: io.MustUplinkToken(
-						&ttnpb.GatewayAntennaIdentifiers{GatewayIds: &registeredGatewayID},
+						&ttnpb.GatewayAntennaIdentifiers{GatewayIds: registeredGatewayID},
 						1553759666,
 						1553759666000,
 						time.Unix(0, 1553759666*1000),

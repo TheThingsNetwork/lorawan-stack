@@ -51,7 +51,7 @@ func (s *Server) getGateway(ctx context.Context, gtwID *ttnpb.GatewayIdentifiers
 // GetGatewayConfiguration validates the request fields and returns the appropriate gateway configuration
 func (s *Server) GetGatewayConfiguration(ctx context.Context, req *ttnpb.GetGatewayConfigurationRequest) (*ttnpb.GetGatewayConfigurationResponse, error) {
 	if s.config.RequireAuth {
-		err := rights.RequireGateway(ctx, *req.GatewayIds, ttnpb.Right_RIGHT_GATEWAY_INFO)
+		err := rights.RequireGateway(ctx, req.GatewayIds, ttnpb.Right_RIGHT_GATEWAY_INFO)
 		if err != nil {
 			return nil, err
 		}

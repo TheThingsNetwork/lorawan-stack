@@ -58,7 +58,7 @@ func local(evt Event) *event {
 		t := evt.Time()
 		localEvent = &event{
 			ctx: evt.Context(),
-			innerEvent: ttnpb.Event{
+			innerEvent: &ttnpb.Event{
 				UniqueId:       evt.UniqueID(),
 				Name:           evt.Name(),
 				Time:           ttnpb.ProtoTimePtr(t),
@@ -86,7 +86,7 @@ func local(evt Event) *event {
 
 type event struct {
 	ctx        context.Context
-	innerEvent ttnpb.Event
+	innerEvent *ttnpb.Event
 	data       interface{}
 	caller     string
 }
@@ -214,7 +214,7 @@ func Proto(e Event) (*ttnpb.Event, error) {
 			return nil, err
 		}
 	}
-	return &pb, nil
+	return pb, nil
 }
 
 // FromProto returns the event from its protobuf representation.
@@ -245,7 +245,7 @@ func FromProto(pb *ttnpb.Event) (Event, error) {
 	return &event{
 		ctx:  ctx,
 		data: data,
-		innerEvent: ttnpb.Event{
+		innerEvent: &ttnpb.Event{
 			UniqueId:       pb.UniqueId,
 			Name:           pb.Name,
 			Time:           pb.Time,

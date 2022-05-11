@@ -32,10 +32,10 @@ type mockISApplicationRegistry struct {
 	applicationRights map[string]authKeyToRights
 }
 
-func (is *mockISApplicationRegistry) Add(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string, rights ...ttnpb.Right) {
+func (is *mockISApplicationRegistry) Add(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, key string, rights ...ttnpb.Right) {
 	uid := unique.ID(ctx, ids)
 	is.applications[uid] = &ttnpb.Application{
-		Ids: &ids,
+		Ids: ids,
 	}
 
 	var bearerKey string

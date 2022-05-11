@@ -291,7 +291,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			logger := logger.WithField("cid", cmd.Cid)
 			logger.Debug("Add MAC command to buffer")
 			var err error
-			b, err = spec.AppendDownlink(*phy, b, *cmd)
+			b, err = spec.AppendDownlink(*phy, b, cmd)
 			if err != nil {
 				return nil, generateDownlinkState{}, errEncodeMAC.WithCause(err)
 			}
@@ -569,7 +569,7 @@ func (ns *NetworkServer) generateDataDownlink(ctx context.Context, dev *ttnpb.En
 			MacPayload: pld,
 		},
 	}
-	b, err := lorawan.MarshalMessage(*msg)
+	b, err := lorawan.MarshalMessage(msg)
 	if err != nil {
 		return nil, genState, errEncodePayload.WithCause(err)
 	}
@@ -1100,7 +1100,7 @@ loop:
 // downlinkRetryInterval is the time interval, which defines the interval between downlink task retries.
 const downlinkRetryInterval = 2 * time.Second
 
-func recordDataDownlink(dev *ttnpb.EndDevice, genState generateDownlinkState, needsMACAnswer bool, down *scheduledDownlink, defaults ttnpb.MACSettings) {
+func recordDataDownlink(dev *ttnpb.EndDevice, genState generateDownlinkState, needsMACAnswer bool, down *scheduledDownlink, defaults *ttnpb.MACSettings) {
 	macPayload := down.Message.Payload.GetMacPayload()
 	if macPayload == nil {
 		panic("invalid downlink")

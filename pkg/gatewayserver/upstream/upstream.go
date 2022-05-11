@@ -29,11 +29,11 @@ type Handler interface {
 	// Setup performs all the preparation necessary to connect the handler to a particular upstream host.
 	Setup(context.Context) error
 	// ConnectGateway informs the upstream handler that a particular gateway is connected to the frontend.
-	ConnectGateway(context.Context, ttnpb.GatewayIdentifiers, *io.Connection) error
+	ConnectGateway(context.Context, *ttnpb.GatewayIdentifiers, *io.Connection) error
 	// HandleUp handles ttnpb.GatewayUplinkMessage. It must not mutate the gateway uplink message.
-	HandleUplink(context.Context, ttnpb.GatewayIdentifiers, *ttnpb.EndDeviceIdentifiers, *ttnpb.GatewayUplinkMessage) error
+	HandleUplink(context.Context, *ttnpb.GatewayIdentifiers, *ttnpb.EndDeviceIdentifiers, *ttnpb.GatewayUplinkMessage) error
 	// HandleStatus handles ttnpb.GatewayStatus.
-	HandleStatus(context.Context, ttnpb.GatewayIdentifiers, *ttnpb.GatewayStatus) error
+	HandleStatus(context.Context, *ttnpb.GatewayIdentifiers, *ttnpb.GatewayStatus) error
 	// HandleTxAck handles ttnpb.TxAcknowledgment.
-	HandleTxAck(context.Context, ttnpb.GatewayIdentifiers, *ttnpb.TxAcknowledgment) error
+	HandleTxAck(context.Context, *ttnpb.GatewayIdentifiers, *ttnpb.TxAcknowledgment) error
 }
