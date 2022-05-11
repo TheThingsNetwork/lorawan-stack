@@ -9377,6 +9377,24 @@
       "file": "gateway_registry.go"
     }
   },
+  "event:gs.down.schedule.attempt": {
+    "translations": {
+      "en": "schedule downlink for transmission by gateway"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
+  "event:gs.down.schedule.fail": {
+    "translations": {
+      "en": "failed to schedule downlink for transmission by gateway"
+    },
+    "description": {
+      "package": "pkg/gatewayserver",
+      "file": "observability.go"
+    }
+  },
   "event:gs.down.send": {
     "translations": {
       "en": "send downlink message"
