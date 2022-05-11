@@ -23,6 +23,13 @@ For details about compatibility between different releases, see the **Commitment
 - Emails sent by the Identity Server now also contain HTML versions.
   - For the images in these emails to work, an absolute `is.email.network.assets-base-url` (and optionally `is.email.network.branding-base-url`) needs to be set in configuration.
 - Notification emails are now sent through the Notification Service of the Identity Server.
+- "Last activity"-information in the Console is now sourced as a single aggregate from the Identity Server.
+- End device overview in the Console.
+  - Showing MAC/PHY versions and used frequency plan.
+  - Hiding the entity description if not set.
+  - Showing information of pending sessions.
+  - Automatically updating session info (no refresh necessary to schedule downlinks after a device has joined).
+  - Showing session start time.
 
 ### Deprecated
 

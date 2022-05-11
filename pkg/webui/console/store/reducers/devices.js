@@ -19,7 +19,7 @@ import { EVENT_END_DEVICE_HEARTBEAT_FILTERS_REGEXP } from '@console/constants/ev
 import { getCombinedDeviceId, combineDeviceIds } from '@ttn-lw/lib/selectors/id'
 import getByPath from '@ttn-lw/lib/get-by-path'
 
-import { parseLorawanMacVersion, getLastSeen } from '@console/lib/device-utils'
+import { parseLorawanMacVersion } from '@console/lib/device-utils'
 
 import {
   GET_DEV,
@@ -37,7 +37,6 @@ const defaultState = {
   selectedDevice: undefined,
 }
 const defaultDerived = {
-  lastSeen: undefined,
   uplinkFrameCount: undefined,
   downlinkFrameCount: undefined,
 }
@@ -89,14 +88,8 @@ const devices = (state = defaultState, { type, payload, event }) => {
         [id]: mergedDevice,
       }
 
-      // Update derived last seen value if possible.
-      const derived = {}
-      const lastSeen = getLastSeen(payload)
-      if (lastSeen) {
-        derived.lastSeen = lastSeen
-      }
-
       // Update uplink and downlink frame counts if possible.
+      const derived = {}
       const { session } = payload
       if (session) {
         derived.uplinkFrameCount = session.last_f_cnt_up
@@ -148,18 +141,6 @@ const devices = (state = defaultState, { type, payload, event }) => {
           const id = getCombinedDeviceId(dev)
           acc.entities[id] = dev
 
-          // Update derived last seen value if possible.
-          const derived = {}
-          const lastSeen = getLastSeen(dev)
-          if (lastSeen) {
-            derived.lastSeen = lastSeen
-          }
-          if (acc.derived[id]) {
-            acc.derived[id] = { ...acc.derived[id], ...derived }
-          } else {
-            acc.derived[id] = derived
-          }
-
           return acc
         },
         { ...state },
@@ -206,17 +187,13 @@ const devices = (state = defaultState, { type, payload, event }) => {
         const id = getCombinedDeviceId(event.identifiers[0].device_ids)
         const receivedAt = getByPath(event, 'data.received_at')
         if (receivedAt) {
-          const derived = {}
-          const currentDerived = state.derived[id]
-          if (currentDerived) {
+          const currentEndDevice = state.entities[id]
+          if (currentEndDevice) {
             // Only update if the event was actually more recent than the current value.
-            if (currentDerived.lastSeen && currentDerived.lastSeen < receivedAt) {
-              derived.lastSeen = receivedAt
+            if (currentEndDevice.last_seen_at && currentEndDevice.last_seen_at < receivedAt) {
+              currentEndDevice.last_seen_at = receivedAt
             }
-          } else {
-            derived.lastSeen = receivedAt
           }
-          return mergeDerived(state, id, derived)
         }
       }
 

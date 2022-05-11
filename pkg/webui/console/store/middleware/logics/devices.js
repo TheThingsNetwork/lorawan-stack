@@ -12,18 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { STACK_COMPONENTS_MAP } from 'ttn-lw'
+import { createLogic } from 'redux-logic'
+import { defineMessage } from 'react-intl'
 
 import tts from '@console/api/tts'
 
-import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+import toast from '@ttn-lw/components/toast'
 
-import { mayReadApplicationDeviceKeys, checkFromState } from '@console/lib/feature-checks'
+import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import * as devices from '@console/store/actions/devices'
 import * as deviceTemplateFormats from '@console/store/actions/device-template-formats'
 
+import { selectDeviceByIds } from '@console/store/selectors/devices'
+
 import createEventsConnectLogics from './events'
+
+const m = defineMessage({
+  joinSuccess: 'The device has successfully joined the network',
+})
 
 const getDeviceLogic = createRequestLogic({
   type: devices.GET_DEV,
@@ -55,12 +62,12 @@ const updateDeviceLogic = createRequestLogic(
 
 const getDevicesListLogic = createRequestLogic({
   type: devices.GET_DEVICES_LIST,
-  process: async ({ action, getState }) => {
+  process: async ({ action }) => {
     const {
       id: appId,
       params: { page, limit, order, query },
     } = action.payload
-    const { selectors, options } = action.meta
+    const { selectors } = action.meta
 
     const data = query
       ? await tts.Applications.Devices.search(
@@ -74,38 +81,6 @@ const getDevicesListLogic = createRequestLogic({
           selectors,
         )
       : await tts.Applications.Devices.getAll(appId, { page, limit, order }, selectors)
-
-    if (options.withLastSeen) {
-      const mayReadKeys = checkFromState(mayReadApplicationDeviceKeys, getState())
-      const selector = ['mac_state.recent_uplinks', 'pending_mac_state.recent_uplinks']
-      if (mayReadKeys) {
-        selector.push('session.started_at', 'pending_session')
-      }
-      const activityFetching = data.end_devices.map(async device => {
-        const deviceResult = await tts.Applications.Devices.getById(
-          appId,
-          device.ids.device_id,
-          selector,
-          [STACK_COMPONENTS_MAP.ns],
-        )
-
-        // Merge activity-relevant fields into fetched device.
-        if ('mac_state' in deviceResult) {
-          device.mac_state = deviceResult.mac_state
-        } else if ('pending_mac_state' in deviceResult) {
-          device.pending_mac_state = deviceResult.pending_mac_state
-        }
-        if (mayReadKeys) {
-          if ('session' in deviceResult) {
-            device.session = deviceResult.session
-          } else if ('pending_session' in deviceResult) {
-            device.pending_session = deviceResult.pendingSession
-          }
-        }
-      })
-
-      await Promise.all(activityFetching)
-    }
 
     return { entities: data.end_devices, totalCount: data.totalCount }
   },
@@ -128,11 +103,45 @@ const getDeviceTemplateFormatsLogic = createRequestLogic({
   },
 })
 
+const getDeviceSessionLogic = createLogic({
+  type: devices.GET_DEVICE_EVENT_MESSAGE_SUCCESS,
+  process: async ({ action, getState }, dispatch, done) => {
+    const { event, id } = action
+    const appId = id.application_ids.application_id
+    const sessionSelector = ['pending_session', 'session']
+
+    const device = selectDeviceByIds(getState(), appId, id.device_id)
+
+    if (event.name === 'as.up.join.forward') {
+      const dev = await tts.Applications.Devices.getById(appId, id.device_id, sessionSelector)
+      dispatch(devices.getDeviceSuccess(dev))
+    }
+
+    if (
+      (event.name === 'ns.up.data.process' || event.name === 'as.up.data.process') &&
+      device.pending_session !== null
+    ) {
+      const dev = await tts.Applications.Devices.getById(appId, id.device_id, sessionSelector)
+      dispatch(devices.getDeviceSuccess(dev))
+      if (!('pending_session' in dev) && 'session' in dev) {
+        toast({
+          title: id.device_id,
+          message: m.joinSuccess,
+          type: toast.types.INFO,
+        })
+      }
+    }
+
+    done()
+  },
+})
+
 export default [
   getDevicesListLogic,
   getDeviceTemplateFormatsLogic,
   getDeviceLogic,
   resetDeviceLogic,
   updateDeviceLogic,
+  getDeviceSessionLogic,
   ...createEventsConnectLogics(devices.SHARED_NAME, 'devices', tts.Applications.Devices.openStream),
 ]

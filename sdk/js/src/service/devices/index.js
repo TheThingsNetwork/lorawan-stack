@@ -79,6 +79,14 @@ class Devices {
       device.formatters = null
     }
 
+    if (paths.includes('session') && !Boolean(device.session)) {
+      device.session = null
+    }
+
+    if (paths.includes('pending_session') && !Boolean(device.pending_session)) {
+      device.pending_session = null
+    }
+
     if (paths.includes('formatters.up_formatter')) {
       if (!Boolean(device.formatters)) {
         device.formatters = { up_formatter: 'FORMATTER_NONE' }
