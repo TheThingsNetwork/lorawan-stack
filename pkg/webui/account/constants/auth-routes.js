@@ -16,6 +16,7 @@ import Overview from '@account/views/overview'
 import ProfileSettings from '@account/views/profile-settings'
 import Code from '@account/views/code'
 import SessionManagement from '@account/views/session-management'
+import { ValidateWithAuth } from '@account/views/validate'
 
 export default [
   {
@@ -37,5 +38,10 @@ export default [
     path: '/session-management',
     exact: true,
     component: SessionManagement,
+  },
+  {
+    path: '/validate',
+    exact: true,
+    component: ValidateWithAuth,
   },
 ]

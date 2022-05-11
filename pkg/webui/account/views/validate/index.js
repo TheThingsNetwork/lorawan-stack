@@ -16,6 +16,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { defineMessages } from 'react-intl'
 import queryString from 'query-string'
 import { Redirect } from 'react-router-dom'
+import { Container, Col, Row } from 'react-grid-system'
 
 import tts from '@account/api/tts'
 
@@ -23,6 +24,7 @@ import Spinner from '@ttn-lw/components/spinner'
 import ErrorNotification from '@ttn-lw/components/error-notification'
 import Notification from '@ttn-lw/components/notification'
 import Button from '@ttn-lw/components/button'
+import PageTitle from '@ttn-lw/components/page-title'
 
 import Message from '@ttn-lw/lib/components/message'
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
@@ -47,7 +49,7 @@ const m = defineMessages({
 const siteName = selectApplicationSiteName()
 const siteTitle = selectApplicationSiteTitle()
 
-const Validate = ({ location }) => {
+const Validate = ({ location, hideTitle }) => {
   const [error, setError] = useState(undefined)
   const [success, setSuccess] = useState(undefined)
   const [fetching, setFetching] = useState(true)
@@ -93,13 +95,17 @@ const Validate = ({ location }) => {
   }
   return (
     <div className={style.form}>
-      <IntlHelmet title={m.contactInfoValidation} />
-      <h1 className={style.title}>
-        {siteName}
-        <br />
-        <Message component="strong" content={m.contactInfoValidation} />
-      </h1>
-      <hr className={style.hRule} />
+      {!hideTitle && (
+        <>
+          <IntlHelmet title={m.contactInfoValidation} />
+          <h1 className={style.title}>
+            {siteName}
+            <br />
+            <Message component="strong" content={m.contactInfoValidation} />
+          </h1>
+          <hr className={style.hRule} />
+        </>
+      )}
       {fetching ? (
         <Spinner after={0} faded className={style.spinner}>
           <Message content={m.validatingAccount} />
@@ -119,8 +125,24 @@ const Validate = ({ location }) => {
   )
 }
 
+const ValidateWithAuth = props => (
+  <Container>
+    <Row>
+      <Col lg={8} md={12}>
+        <PageTitle title={m.contactInfoValidation} />
+        <Validate hideTitle {...props} />
+      </Col>
+    </Row>
+  </Container>
+)
+
 Validate.propTypes = {
+  hideTitle: PropTypes.bool,
   location: PropTypes.location.isRequired,
 }
 
-export default Validate
+Validate.defaultProps = {
+  hideTitle: false,
+}
+
+export { Validate as default, ValidateWithAuth }

@@ -31,6 +31,9 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Support `app_eui` as alias for `join_eui` in CSV file import, per documentation.
+- End devices frame counts being displayed as `n/a` when event stream contained historical data message events.
+- Gateway general settings (Basic settings) not saving changes in some cases.
+- Contact info validation not possible when user is already logged in.
 - CLI not allowing devices to be created or updated.
 - End device creation no longer errors on missing application info rights.
 
