@@ -624,6 +624,7 @@
   "console.views.application-general-settings.application-general-settings.deleteApp": "Delete application",
   "console.views.application-general-settings.application-general-settings.modalWarning": "Are you sure you want to delete \"{appName}\"? This action cannot be undone and it will not be possible to reuse the application ID.",
   "console.views.application-general-settings.application-general-settings.updateSuccess": "Application updated",
+  "console.views.application-general-settings.application-general-settings.deleteSuccess": "Application deleted",
   "console.views.application-integrations-lora-cloud.index.loraCloudInfoText": "Lora Cloud provides value added APIs that enable simple solutions for common tasks related to LoRaWAN networks and LoRa-based devices. You can setup our LoRaCloud integrations below.",
   "console.views.application-integrations-lora-cloud.index.officialLoRaCloudDocumentation": "Official LoRa Cloud documentation",
   "console.views.application-integrations-lora-cloud.index.setToken": "Set LoRa Cloud token",

@@ -50,6 +50,7 @@ const m = defineMessages({
   modalWarning:
     'Are you sure you want to delete "{appName}"? This action cannot be undone and it will not be possible to reuse the application ID.',
   updateSuccess: 'Application updated',
+  deleteSuccess: 'Application deleted',
 })
 
 const validationSchema = Yup.object().shape({
@@ -148,6 +149,11 @@ const ApplicationGeneralSettings = props => {
 
       try {
         await deleteApplication(appId, shouldPurge)
+        toast({
+          title: appId,
+          message: m.deleteSuccess,
+          type: toast.types.SUCCESS,
+        })
         onDeleteSuccess()
       } catch (error) {
         setError(error)
