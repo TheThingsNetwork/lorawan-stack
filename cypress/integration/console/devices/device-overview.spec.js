@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+import path from 'path'
 
 describe('Device overview', () => {
   const appId = 'end-device-mac-data-test-application'
@@ -66,26 +68,7 @@ describe('Device overview', () => {
     cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices/${endDeviceId}`)
   })
 
-  it('succeeds showing warning when there is an error retrieving device MAC state', () => {
-    const response = {
-      code: 5,
-      message: 'error:unknown:unknown (not found)',
-      details: [
-        {
-          '@type': 'type.googleapis.com/ttn.lorawan.v3.ErrorDetails',
-          message_format: 'not found',
-          correlation_id: '875297da0a1f43d6a9f9af232dbbc832',
-          code: 5,
-        },
-      ],
-    }
-
-    cy.intercept(
-      'GET',
-      `/api/v3/ns/applications/${appId}/devices/${endDeviceId}?field_mask=mac_state`,
-      response,
-    )
-
+  it('succeeds downloading device MAC state', () => {
     cy.findByRole('button', { name: /Download MAC data/ }).click()
     cy.findByTestId('modal-window')
       .should('be.visible')
@@ -93,9 +76,7 @@ describe('Device overview', () => {
         cy.findByText('Download MAC data', { selector: 'h1' }).should('be.visible')
         cy.findByRole('button', { name: /Download MAC data/ }).click()
       })
-    cy.findByTestId('error-notification')
-      .findByText(`There was an error and MAC state could not be included in the MAC data.`)
-      .should('be.visible')
+    cy.findByTestId('error-notification').should('not.exist')
   })
 
   it('succeeds showing warning when there is no MAC state', () => {
