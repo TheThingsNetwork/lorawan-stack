@@ -4,7 +4,7 @@ inputs:
   go-version:
     description: Go Version
     required: true
-    default: '~1.17'
+    default: '~1.18'
 runs:
   using: composite
   steps:
