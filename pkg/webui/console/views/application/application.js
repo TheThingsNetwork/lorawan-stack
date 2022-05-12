@@ -50,6 +50,7 @@ import {
   mayViewOrEditApplicationApiKeys,
   mayViewOrEditApplicationCollaborators,
   mayViewOrEditApplicationPackages,
+  mayAddPubSubIntegrations,
 } from '@console/lib/feature-checks'
 
 const Application = props => {
@@ -60,6 +61,8 @@ const Application = props => {
     rights,
     stopStream,
     siteName,
+    natsDisabled,
+    mqttDisabled,
   } = props
 
   const name = application.name || appId
@@ -128,11 +131,13 @@ const Application = props => {
               path={`${matchedUrl}/integrations/webhooks`}
               icon="extension"
             />
-            <SideNavigation.Item
-              title={sharedMessages.pubsubs}
-              path={`${matchedUrl}/integrations/pubsubs`}
-              icon="extension"
-            />
+            {mayAddPubSubIntegrations.check(natsDisabled, mqttDisabled) && (
+              <SideNavigation.Item
+                title={sharedMessages.pubsubs}
+                path={`${matchedUrl}/integrations/pubsubs`}
+                icon="extension"
+              />
+            )}
             {mayViewOrEditApplicationPackages.check(rights) && (
               <SideNavigation.Item
                 title={sharedMessages.loraCloud}
@@ -174,7 +179,9 @@ const Application = props => {
         <Route path={`${path}/payload-formatters`} component={ApplicationPayloadFormatters} />
         <Route path={`${path}/integrations/mqtt`} component={ApplicationIntegrationsMqtt} />
         <Route path={`${path}/integrations/webhooks`} component={ApplicationIntegrationsWebhooks} />
-        <Route path={`${path}/integrations/pubsubs`} component={ApplicationIntegrationsPubsubs} />
+        {mayAddPubSubIntegrations.check(natsDisabled, mqttDisabled) && (
+          <Route path={`${path}/integrations/pubsubs`} component={ApplicationIntegrationsPubsubs} />
+        )}
         <Route
           path={`${path}/integrations/lora-cloud`}
           component={ApplicationIntegrationsLoRaCloud}
@@ -189,6 +196,8 @@ Application.propTypes = {
   appId: PropTypes.string.isRequired,
   application: PropTypes.application.isRequired,
   match: PropTypes.match.isRequired,
+  mqttDisabled: PropTypes.bool.isRequired,
+  natsDisabled: PropTypes.bool.isRequired,
   rights: PropTypes.rights.isRequired,
   siteName: PropTypes.string.isRequired,
   stopStream: PropTypes.func.isRequired,
