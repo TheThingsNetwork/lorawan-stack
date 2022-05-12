@@ -244,3 +244,8 @@ export const mayWriteTraffic = {
   rightsSelector: selectApplicationRights,
   check: rights => mayScheduleDownlinks.check(rights) || maySendUplink.check(rights),
 }
+
+// Pub/Sub feature checks.
+export const mayAddPubSubIntegrations = {
+  check: (natsDisabled, mqttDisabled) => !natsDisabled || !mqttDisabled,
+}
