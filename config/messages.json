@@ -3509,15 +3509,6 @@
       "file": "ttjs.go"
     }
   },
-  "error:pkg/deviceclaimingserver/enddevices/ttjs:invalid_ns_address": {
-    "translations": {
-      "en": "invalid NS address `{address}`"
-    },
-    "description": {
-      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
-      "file": "ttjs.go"
-    }
-  },
   "error:pkg/deviceclaimingserver/enddevices/ttjs:invalid_oui": {
     "translations": {
       "en": "invalid OUI `{oui}`"

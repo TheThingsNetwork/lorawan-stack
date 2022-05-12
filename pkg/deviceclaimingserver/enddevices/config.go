@@ -26,9 +26,16 @@ import (
 // JSClientConfigurationName is the filename of Join Server client configuration.
 const JSClientConfigurationName = "config.yml"
 
+// NetworkServer contains information related to the Network Server.
+type NetworkServer struct {
+	Hostname string `name:"hostname" description:"Hostname of the Network Server. Must not contain a port"`
+	HomeNSID string `name:"home-ns-id" description:"HomeNSID of the Network Server. Must be a valid EUI"`
+}
+
 // Config contains options for end device claiming clients.
 type Config struct {
-	NetID types.NetID `name:"net-id" description:"NetID of this network to configure as home NetID when claiming"`
+	NetID         types.NetID   `name:"net-id" description:"NetID of this network to configure as home NetID when claiming"`
+	NetworkServer NetworkServer `name:"network-server" description:"Network Server of the cluster that handles claimed device traffic"`
 
 	Source    string                `name:"source" description:"Source of the file containing Join Server settings (directory, url, blob)"`
 	Directory string                `name:"directory" description:"OS filesystem directory, which contains the config.yml and the client-specific files"`

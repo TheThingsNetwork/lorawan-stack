@@ -21,10 +21,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"net/url"
-	"regexp"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -43,22 +41,18 @@ type BasicAuth struct {
 	Password string `yaml:"password"`
 }
 
-// NS contains information related to the Network Server.
-type NS struct {
-	Address  string `yaml:"address"`
-	HomeNSID string `yaml:"home-ns-id"`
-}
-
 // Config is the configuration to communicate with The Things Join Server End Device Claming API.
 type Config struct {
 	NetID           types.NetID         `yaml:"-"`
 	JoinEUIPrefixes []types.EUI64Prefix `yaml:"-"`
+	NetworkServer   struct {
+		Hostname, HomeNSID string
+	} `yaml:"-"`
 
 	BasicAuth          `yaml:"basic-auth"`
 	ClaimingAPIVersion string `yaml:"claiming-api-version"`
 	URL                string `yaml:"url"`
 	TenantID           string `yaml:"tenant-id"`
-	NS                 NS     `yaml:"ns"`
 }
 
 // Component abstracts the underlying *component.Component.
@@ -79,10 +73,6 @@ type TTJS struct {
 	ttiVendorID OUI
 }
 
-var nsAddressRegexp = regexp.MustCompile("^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$")
-
-var errInvalidNSAddress = errors.DefineInvalidArgument("invalid_ns_address", "invalid NS address `{address}`")
-
 // NewClient applies the config and returns a new TTJS client.
 func (config *Config) NewClient(ctx context.Context, c Component) (*TTJS, error) {
 	httpClient, err := c.HTTPClient(ctx)
@@ -93,28 +83,6 @@ func (config *Config) NewClient(ctx context.Context, c Component) (*TTJS, error)
 	if err != nil {
 		return nil, err
 	}
-
-	// External services, including Join Servers, typically identify Network Servers by host instead of by host and port.
-	// So we need to drop the port here if provided. We first need to check that the configured address is valid before splitting the port.
-	s := nsAddressRegexp.FindStringSubmatch(config.NS.Address)
-	if len(s) != 1 {
-		return nil, errInvalidNSAddress.WithAttributes("address", config.NS.Address)
-	}
-	address, _, err := net.SplitHostPort(s[0])
-	if err != nil {
-		// Address is already validated by the regex.
-		// An error here means that it does not contain a port, so we use it directly.
-		address = config.NS.Address
-	}
-	config.NS.Address = address
-
-	// Check that the HomeNSID is a valid EUI.
-	var hNSID types.EUI64
-	err = hNSID.UnmarshalText([]byte(config.NS.HomeNSID))
-	if err != nil {
-		return nil, err
-	}
-
 	return &TTJS{
 		config:      *config,
 		httpClient:  httpClient,
@@ -149,7 +117,7 @@ func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, clai
 		OwnerToken: claimAuthenticationCode,
 		claimData: claimData{
 			HomeNetID: client.config.NetID.String(),
-			HomeNSID:  client.config.NS.HomeNSID,
+			HomeNSID:  client.config.NetworkServer.HomeNSID,
 			VendorSpecific: VendorSpecific{
 				OUI: client.ttiVendorID,
 				Data: struct {
@@ -157,7 +125,7 @@ func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, clai
 					HNSAddress string
 				}{
 					HTenantID:  htenantID,
-					HNSAddress: client.config.NS.Address,
+					HNSAddress: client.config.NetworkServer.Hostname,
 				},
 			},
 		},

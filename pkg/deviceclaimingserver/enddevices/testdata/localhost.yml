@@ -4,6 +4,3 @@ tenant-id: test
 basic-auth:
   username: 'localhost'
   password: 'secret'
-ns:
-  address: localhost
-  home-ns-id: "0000000000000000"

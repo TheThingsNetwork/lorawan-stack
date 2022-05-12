@@ -47,6 +47,10 @@ func TestUpstream(t *testing.T) {
 		NetID:     test.DefaultNetID,
 		Source:    "directory",
 		Directory: "testdata",
+		NetworkServer: NetworkServer{
+			Hostname: "localhost",
+			HomeNSID: "0000000000000000",
+		},
 	}
 
 	upstream, err = NewUpstream(ctx, *conf, mock, WithDeviceRegistry(mock))

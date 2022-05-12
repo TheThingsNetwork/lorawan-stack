@@ -98,33 +98,13 @@ func TestTTJS(t *testing.T) {
 		return mockTTJS.Start(ctx, apiVersion)
 	}()
 
-	// Invalid Config
-	invalidConfig := Config{
-		NS: NS{
-			Address:  "localhost:1234:34",
-			HomeNSID: "1234",
-		},
-		TenantID: tenantID,
-		NetID:    test.DefaultNetID,
-		JoinEUIPrefixes: []types.EUI64Prefix{
-			supportedJoinEUIPrefix,
-		},
-		ClaimingAPIVersion: apiVersion,
-		BasicAuth: BasicAuth{
-			Username: asID,
-			Password: "invalid",
-		},
-		URL: fmt.Sprintf("http://%s", lis.Addr().String()),
-	}
-
-	cl, err := invalidConfig.NewClient(ctx, c)
-	a.So(errors.IsInvalidArgument(err), should.BeTrue)
-	a.So(cl, should.BeNil)
-
 	// Valid Config
 	ttJSConfig := Config{
-		NS: NS{
-			Address:  "localhost",
+		NetworkServer: struct {
+			Hostname string
+			HomeNSID string
+		}{
+			Hostname: "localhost",
 			HomeNSID: homeNSID,
 		},
 		TenantID: tenantID,
@@ -222,8 +202,11 @@ func TestTTJS(t *testing.T) {
 
 	// Claim locked.
 	otherClientConfig := Config{
-		NS: NS{
-			Address:  "localhost",
+		NetworkServer: struct {
+			Hostname string
+			HomeNSID string
+		}{
+			Hostname: "localhost",
 			HomeNSID: homeNSID,
 		},
 		NetID: test.DefaultNetID,
