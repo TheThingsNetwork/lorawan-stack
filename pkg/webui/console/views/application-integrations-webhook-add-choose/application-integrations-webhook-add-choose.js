@@ -53,7 +53,7 @@ const WebhookTile = ({ ids, name, description, logo_url }) => (
 WebhookTile.propTypes = {
   description: PropTypes.message.isRequired,
   ids: PropTypes.shape({
-    template_id: PropTypes.isRequired,
+    template_id: PropTypes.string.isRequired,
   }).isRequired,
   logo_url: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
