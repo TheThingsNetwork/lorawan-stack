@@ -27,6 +27,9 @@ import KeyValueMap from '@ttn-lw/components/key-value-map'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 import PortalledModal from '@ttn-lw/components/modal/portalled'
 import Checkbox from '@ttn-lw/components/checkbox'
+import Link from '@ttn-lw/components/link'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import WebhookTemplateInfo from '@console/components/webhook-template-info'
 
@@ -53,7 +56,7 @@ const pathPlaceholder = '/path/to/webhook'
 const m = defineMessages({
   idPlaceholder: 'my-new-webhook',
   messageInfo:
-    'For each enabled message type, an optional path can be defined which will be appended to the base URL',
+    'For each enabled event type an optional path can be defined which will be appended to the base URL',
   deleteWebhook: 'Delete Webhook',
   modalWarning:
     'Are you sure you want to delete webhook "{webhookId}"? Deleting a webhook cannot be undone.',
@@ -65,8 +68,6 @@ const m = defineMessages({
   downlinkAPIKeyDesc:
     'The API key will be provided to the endpoint using the "X-Downlink-Apikey" header',
   templateInformation: 'Template information',
-  enabledMessages: 'Enabled messages',
-  endpointSettings: 'Endpoint settings',
   updateErrorTitle: 'Could not update webhook',
   createErrorTitle: 'Could not create webhook',
   reactivateButtonMessage: 'Reactivate',
@@ -82,6 +83,8 @@ const m = defineMessages({
     'There must be no empty header entry. Please remove such entries before submitting.',
   validateNoDuplicate:
     'There must be no duplicate headers. Please remove or merge headers with the same key.',
+  webhooksDescription:
+    'The Webhooks feature allows The Things Stack to send application related messages to specific HTTP(S) endpoints. You can also use webhooks to schedule downlinks to an end device. Learn more in our <Link>Webhooks guide</Link>.',
 })
 
 const isReadOnly = value => value.readOnly
@@ -339,6 +342,8 @@ export default class WebhookForm extends Component {
       initialValues = decodeValues({ ...blankValues, ...initialWebhookValue })
     }
 
+    const hasTemplate = Boolean(webhookTemplate)
+
     const mayReactivate =
       update &&
       initialWebhookValue &&
@@ -354,6 +359,22 @@ export default class WebhookForm extends Component {
 
     return (
       <>
+        {!hasTemplate && (
+          <>
+            <Message
+              content={m.webhooksDescription}
+              values={{
+                Link: val => (
+                  <Link.DocLink path="/integrations/webhooks" secondary>
+                    {val}
+                  </Link.DocLink>
+                ),
+              }}
+              component="p"
+            />
+            <hr className="mb-ls-m" />
+          </>
+        )}
         {mayReactivate && (
           <Notification
             warning
@@ -381,7 +402,7 @@ export default class WebhookForm extends Component {
           approval
           visible={this.state.displayOverwriteModal}
         />
-        {Boolean(webhookTemplate) && <WebhookTemplateInfo webhookTemplate={webhookTemplate} />}
+        {hasTemplate && <WebhookTemplateInfo webhookTemplate={webhookTemplate} update={update} />}
         <Form
           onSubmit={this.handleSubmit}
           validationSchema={validationSchema}
@@ -401,7 +422,6 @@ export default class WebhookForm extends Component {
             disabled={update}
           />
           <WebhookFormatSelector name="format" required />
-          <Form.SubTitle title={m.endpointSettings} />
           <Form.Field
             name="base_url"
             title={sharedMessages.webhookBaseUrl}
@@ -455,97 +475,108 @@ export default class WebhookForm extends Component {
             isReadOnly={isReadOnly}
             onChange={this.handleHeadersChange}
           />
-          <Form.SubTitle title={m.enabledMessages} />
-          <Notification info content={m.messageInfo} small />
+          <Form.SubTitle title={sharedMessages.eventEnabledTypes} className="mb-0" />
+          <Message component="p" content={m.messageInfo} className="mt-0 mb-ls-xxs" />
           <Form.Field
             name="uplink_message"
             type="toggled-input"
-            title={sharedMessages.uplinkMessage}
+            enabledMessage={sharedMessages.uplinkMessage}
             placeholder={pathPlaceholder}
             decode={decodeMessageType}
             encode={encodeMessageType}
             component={Input.Toggled}
+            description={sharedMessages.eventUplinkMessageDesc}
           />
           <Form.Field
             name="join_accept"
             type="toggled-input"
-            title={sharedMessages.joinAccept}
+            enabledMessage={sharedMessages.joinAccept}
             placeholder={pathPlaceholder}
             decode={decodeMessageType}
             encode={encodeMessageType}
             component={Input.Toggled}
+            description={sharedMessages.eventJoinAcceptDesc}
           />
           <Form.Field
             name="downlink_ack"
             type="toggled-input"
-            title={sharedMessages.downlinkAck}
+            enabledMessage={sharedMessages.downlinkAck}
             placeholder={pathPlaceholder}
             decode={decodeMessageType}
             encode={encodeMessageType}
             component={Input.Toggled}
+            description={sharedMessages.eventDownlinkAckDesc}
           />
           <Form.Field
             name="downlink_nack"
             type="toggled-input"
-            title={sharedMessages.downlinkNack}
+            enabledMessage={sharedMessages.downlinkNack}
             placeholder={pathPlaceholder}
             decode={decodeMessageType}
             encode={encodeMessageType}
             component={Input.Toggled}
+            description={sharedMessages.eventDownlinkNackDesc}
           />
           <Form.Field
             name="downlink_sent"
             type="toggled-input"
-            title={sharedMessages.downlinkSent}
+            enabledMessage={sharedMessages.downlinkSent}
             placeholder={pathPlaceholder}
             decode={decodeMessageType}
             encode={encodeMessageType}
             component={Input.Toggled}
+            description={sharedMessages.eventDownlinkSentDesc}
           />
           <Form.Field
             name="downlink_failed"
             type="toggled-input"
-            title={sharedMessages.downlinkFailed}
+            enabledMessage={sharedMessages.downlinkFailed}
             placeholder={pathPlaceholder}
             decode={decodeMessageType}
             encode={encodeMessageType}
             component={Input.Toggled}
+            description={sharedMessages.eventDownlinkFailedDesc}
           />
           <Form.Field
             name="downlink_queued"
             type="toggled-input"
-            title={sharedMessages.downlinkQueued}
+            enabledMessage={sharedMessages.downlinkQueued}
             placeholder={pathPlaceholder}
             decode={decodeMessageType}
             encode={encodeMessageType}
             component={Input.Toggled}
+            description={sharedMessages.eventDownlinkQueuedDesc}
           />
           <Form.Field
             name="downlink_queue_invalidated"
             type="toggled-input"
-            title={sharedMessages.downlinkQueueInvalidated}
+            enabledMessage={sharedMessages.downlinkQueueInvalidated}
             placeholder={pathPlaceholder}
             decode={decodeMessageType}
             encode={encodeMessageType}
             component={Input.Toggled}
+            description={sharedMessages.eventDownlinkQueueInvalidatedDesc}
+            tooltipId={tooltipIds.DOWNLINK_QUEUE_INVALIDATED}
           />
           <Form.Field
             name="location_solved"
             type="toggled-input"
-            title={sharedMessages.locationSolved}
+            enabledMessage={sharedMessages.locationSolved}
             placeholder={pathPlaceholder}
             decode={decodeMessageType}
             encode={encodeMessageType}
             component={Input.Toggled}
+            description={sharedMessages.eventLocationSolvedDesc}
           />
           <Form.Field
             name="service_data"
             type="toggled-input"
-            title={sharedMessages.serviceData}
+            enabledMessage={sharedMessages.serviceData}
             placeholder={pathPlaceholder}
             decode={decodeMessageType}
             encode={encodeMessageType}
             component={Input.Toggled}
+            description={sharedMessages.eventServiceDataDesc}
           />
           <SubmitBar>
             <Form.Submit

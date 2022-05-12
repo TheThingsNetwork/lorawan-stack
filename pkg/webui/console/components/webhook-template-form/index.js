@@ -32,7 +32,6 @@ import { id as webhookIdRegexp } from '@ttn-lw/lib/regexp'
 const m = defineMessages({
   createTemplate: 'Create {template} webhook',
   idPlaceholder: 'my-new-{templateId}-webhook',
-  templateSettings: 'Template settings',
 })
 
 export default class WebhookTemplateForm extends Component {
@@ -133,7 +132,6 @@ export default class WebhookTemplateForm extends Component {
           error={error}
           formikRef={this.form}
         >
-          <Form.SubTitle title={m.templateSettings} />
           <Form.Field
             name="webhook_id"
             title={sharedMessages.webhookId}
@@ -158,7 +156,7 @@ export default class WebhookTemplateForm extends Component {
               component={SubmitButton}
               message={{
                 ...m.createTemplate,
-                values: { template: name.toLowerCase() },
+                values: { template: name },
               }}
             />
           </SubmitBar>

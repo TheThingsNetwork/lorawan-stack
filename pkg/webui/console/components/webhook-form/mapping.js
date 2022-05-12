@@ -111,7 +111,7 @@ export const blankValues = {
     webhook_id: undefined,
   },
   base_url: undefined,
-  format: undefined,
+  format: 'json',
   downlink_api_key: '',
   uplink_message: null,
   join_accept: null,
