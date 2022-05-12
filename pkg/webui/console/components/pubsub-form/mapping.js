@@ -156,7 +156,7 @@ export const mapFormValuesToPubsub = (values, appId) => {
 export const blankValues = {
   pub_sub_id: '',
   base_topic: '',
-  format: '',
+  format: 'json',
   _provider: providers.NATS,
   nats: natsBlankValues,
   mqtt: mqttBlankValues,
