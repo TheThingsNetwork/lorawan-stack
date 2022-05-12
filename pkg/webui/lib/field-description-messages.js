@@ -257,6 +257,9 @@ const m = defineMessages({
 
   basicAuthDescription:
     'To increase access security, you can choose to generate a "basic auth" authorization header to be attached to the webhook requests, if the target server requires doing so. This will authenticate the webhook requests with the defined credentials.',
+
+  downlinkQueueInvalidated:
+    'This occurs only when using LoRaWAN 1.0.x because the frame counters for the application downlinks and network downlinks are shared. Network downlinks increment this frame counter, thus rendering the queued downlinks invalid (since you cannot send two messages with the same frame counter). The Application Server will automatically handle this message as long as "Skip Payload Crypto" is not enabled.',
 })
 
 const descriptions = Object.freeze({
@@ -499,6 +502,9 @@ const descriptions = Object.freeze({
   },
   [TOOLTIP_IDS.BASIC_AUTH]: {
     description: m.basicAuthDescription,
+  },
+  [TOOLTIP_IDS.DOWNLINK_QUEUE_INVALIDATED]: {
+    description: m.downlinkQueueInvalidated,
   },
 })
 
