@@ -27,6 +27,10 @@ import {
   selectPubsubError,
 } from '@console/store/selectors/pubsubs'
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import {
+  selectMqttProviderDisabled,
+  selectNatsProviderDisabled,
+} from '@console/store/selectors/application-server'
 
 const pubsubEntitySelector = [
   'base_topic',
@@ -52,6 +56,8 @@ const mapStateToProps = state => ({
   pubsub: selectSelectedPubsub(state),
   fetching: selectPubsubFetching(state),
   error: selectPubsubError(state),
+  mqttDisabled: selectMqttProviderDisabled(state),
+  natsDisabled: selectNatsProviderDisabled(state),
 })
 
 const promisifiedUpdatePubsub = attachPromise(updatePubsub)
