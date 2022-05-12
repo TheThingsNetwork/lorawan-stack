@@ -42,22 +42,25 @@ class Toggled extends Component {
   }
 
   render() {
-    const { value, type, enabledMessage, className, ...rest } = this.props
+    const { value, type, enabledMessage, className, children, ...rest } = this.props
 
     const isEnabled = value.enabled || false
     const checkboxId = `${rest.id}_checkbox`
 
     return (
       <div className={classnames(className, style.container)}>
-        <label className={style.checkbox} htmlFor={checkboxId}>
-          <Checkbox
-            name={`${rest.name}.enable`}
-            onChange={this.handleCheckboxChange}
-            value={isEnabled}
-            id={checkboxId}
-            label={enabledMessage}
-          />
-        </label>
+        <div className={style.checkboxContainer}>
+          <label className={style.checkbox} htmlFor={checkboxId}>
+            <Checkbox
+              name={`${rest.name}.enable`}
+              onChange={this.handleCheckboxChange}
+              value={isEnabled}
+              id={checkboxId}
+              label={enabledMessage}
+            />
+          </label>
+          {children}
+        </div>
         {isEnabled && (
           <Input
             {...rest}
@@ -73,6 +76,7 @@ class Toggled extends Component {
 }
 
 Toggled.propTypes = {
+  children: PropTypes.node,
   className: PropTypes.string,
   disabled: PropTypes.bool,
   enabledMessage: PropTypes.message,
@@ -94,6 +98,7 @@ Toggled.propTypes = {
 
 Toggled.defaultProps = {
   className: undefined,
+  children: null,
   disabled: false,
   enabledMessage: sharedMessages.enabled,
   error: false,
