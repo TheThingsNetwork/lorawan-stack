@@ -64,33 +64,45 @@ describe('Application Webhook', () => {
 
     cy.findByLabelText('Webhook format').selectOption(webhook.format)
     cy.findByLabelText('Base URL').type(webhook.url)
-    cy.get('#uplink_message_checkbox').check()
-    cy.findByLabelText('Uplink message').type(webhook.path)
-
+    cy.findByLabelText('Uplink message')
+      .check()
+      .parents('[data-test-id="form-field"]')
+      .within(() => {
+        cy.findByPlaceholderText('/path/to/webhook').type(webhook.path)
+      })
     cy.findByRole('button', { name: 'Save changes' }).click()
 
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification').findByText('Webhook updated').should('be.visible')
+
+    cy.reload()
+    cy.findByLabelText('Base URL').should('have.attr', 'value', webhook.url)
+    cy.findByLabelText('Uplink message')
+      .should('be.checked')
+      .parents('[data-test-id="form-field"]')
+      .within(() => {
+        cy.findByDisplayValue(webhook.path).should('be.visible').clear()
+      })
+    cy.findByLabelText('Join accept').should('not.be.checked')
+    cy.findByRole('button', { name: 'Save changes' }).click()
     cy.findByTestId('error-notification').should('not.exist')
     cy.findByTestId('toast-notification').findByText(`Webhook updated`).should('be.visible')
 
     cy.reload()
     cy.findByLabelText('Base URL').should('have.attr', 'value', webhook.url)
-    cy.findByLabelText('Uplink message').should('have.attr', 'value', webhook.path)
-    cy.get('#join_accept_checkbox').should('not.be.checked')
-    cy.findByLabelText('Uplink message').clear()
+    cy.findByLabelText('Uplink message')
+      .should('be.checked')
+      .parents('[data-test-id="form-field"]')
+      .within(() => {
+        cy.findByPlaceholderText('/path/to/webhook').should('have.attr', 'value', '')
+      })
+    cy.findByLabelText('Uplink message').uncheck()
     cy.findByRole('button', { name: 'Save changes' }).click()
     cy.findByTestId('error-notification').should('not.exist')
     cy.findByTestId('toast-notification').findByText(`Webhook updated`).should('be.visible')
 
     cy.reload()
-    cy.findByLabelText('Uplink message').should('have.attr', 'value', '')
-    cy.get('#uplink_message_checkbox').should('be.checked')
-    cy.get('#uplink_message_checkbox').uncheck()
-    cy.findByRole('button', { name: 'Save changes' }).click()
-    cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification').findByText(`Webhook updated`).should('be.visible')
-
-    cy.reload()
-    cy.get('#uplink_message_checkbox').should('not.be.checked')
+    cy.findByLabelText('Uplink message').should('not.be.checked')
   })
 
   it('succeeds adding headers', () => {

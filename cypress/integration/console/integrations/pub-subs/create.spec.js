@@ -44,9 +44,9 @@ describe('Application Pub/Sub create', () => {
 
     it('displays UI elements in place', () => {
       cy.findByRole('heading', { name: 'Add Pub/Sub' }).should('be.visible')
-      cy.findByRole('heading', { name: 'General information' }).should('be.visible')
+      cy.findByRole('heading', { name: 'General settings' }).should('be.visible')
       cy.findByRole('heading', { name: 'MQTT configuration' }).should('be.visible')
-      cy.findByRole('heading', { name: 'Message types' }).should('be.visible')
+      cy.findByRole('heading', { name: 'Enabled event types' }).should('be.visible')
       cy.findByLabelText('Pub/Sub ID').should('have.attr', 'placeholder').and('eq', 'my-new-pubsub')
       cy.findByLabelText('Server URL')
         .should('have.attr', 'placeholder')
@@ -55,10 +55,9 @@ describe('Application Pub/Sub create', () => {
       cy.findByLabelText('Username').should('have.attr', 'placeholder').and('eq', 'my-username')
       cy.findByLabelText('Password').should('have.attr', 'placeholder').and('eq', 'my-password')
       cy.findByLabelText('Base topic').should('have.attr', 'placeholder').and('eq', 'base-topic')
-      cy.findByTestId('notification')
-        .should('be.visible')
-        .findByText('For each enabled message type, an optional sub-topic can be defined')
-        .should('be.visible')
+      cy.findByText('For each enabled message type an optional sub-topic can be defined').should(
+        'be.visible',
+      )
       cy.findByRole('button', { name: 'Add Pub/Sub' }).should('be.visible')
     })
 
@@ -87,9 +86,6 @@ describe('Application Pub/Sub create', () => {
           .and('be.visible')
         cy.findErrorByLabelText('Publish QoS')
           .should('contain.text', 'Publish QoS is required')
-          .and('be.visible')
-        cy.findErrorByLabelText('Pub/Sub format')
-          .should('contain.text', 'Pub/Sub format is required')
           .and('be.visible')
         cy.location('pathname').should(
           'eq',
@@ -115,8 +111,12 @@ describe('Application Pub/Sub create', () => {
         cy.findByLabelText('Subscribe QoS').selectOption(pubSub.subscribe_qos)
         cy.findByLabelText('Publish QoS').selectOption(pubSub.publish_qos)
         cy.findByLabelText('Pub/Sub format').selectOption(pubSub.format)
-        cy.get('#uplink_message_checkbox').check()
-        cy.findByLabelText('Uplink message').type(pubSub.uplinkSubTopic)
+        cy.findByLabelText('Uplink message')
+          .check()
+          .parents('[data-test-id="form-field"]')
+          .within(() => {
+            cy.findByPlaceholderText('sub-topic').type(pubSub.uplinkSubTopic)
+          })
 
         cy.findByRole('button', { name: 'Add Pub/Sub' }).click()
 
@@ -150,9 +150,6 @@ describe('Application Pub/Sub create', () => {
         cy.findErrorByLabelText('Publish QoS')
           .should('contain.text', 'Publish QoS is required')
           .and('be.visible')
-        cy.findErrorByLabelText('Pub/Sub format')
-          .should('contain.text', 'Pub/Sub format is required')
-          .and('be.visible')
         cy.location('pathname').should(
           'eq',
           `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
@@ -176,8 +173,12 @@ describe('Application Pub/Sub create', () => {
         cy.findByLabelText('Subscribe QoS').selectOption(pubSub.subscribe_qos)
         cy.findByLabelText('Publish QoS').selectOption(pubSub.publish_qos)
         cy.findByLabelText('Pub/Sub format').selectOption(pubSub.format)
-        cy.get('#uplink_message_checkbox').check()
-        cy.findByLabelText('Uplink message').type(pubSub.uplinkSubTopic)
+        cy.findByLabelText('Uplink message')
+          .check()
+          .parents('[data-test-id="form-field"]')
+          .within(() => {
+            cy.findByPlaceholderText('sub-topic').type(pubSub.uplinkSubTopic)
+          })
         cy.findByRole('button', { name: 'Add Pub/Sub' }).click()
 
         cy.location('pathname').should(
@@ -199,19 +200,18 @@ describe('Application Pub/Sub create', () => {
 
     it('displays UI elements in place', () => {
       cy.findByRole('heading', { name: 'Add Pub/Sub' }).should('be.visible')
-      cy.findByRole('heading', { name: 'General information' }).should('be.visible')
+      cy.findByRole('heading', { name: 'General settings' }).should('be.visible')
       cy.findByRole('heading', { name: 'NATS configuration' }).should('be.visible')
-      cy.findByRole('heading', { name: 'Message types' }).should('be.visible')
+      cy.findByRole('heading', { name: 'Enabled event types' }).should('be.visible')
       cy.findByLabelText('Pub/Sub ID').should('have.attr', 'placeholder').and('eq', 'my-new-pubsub')
       cy.findByLabelText('Username').should('have.attr', 'placeholder').and('eq', 'my-username')
       cy.findByLabelText('Password').should('have.attr', 'placeholder').and('eq', 'my-password')
       cy.findByLabelText('Address').should('have.attr', 'placeholder').and('eq', 'nats.example.com')
       cy.findByLabelText('Port').should('have.attr', 'placeholder').and('eq', '4222')
       cy.findByLabelText('Base topic').should('have.attr', 'placeholder').and('eq', 'base-topic')
-      cy.findByTestId('notification')
-        .should('be.visible')
-        .findByText('For each enabled message type, an optional sub-topic can be defined')
-        .should('be.visible')
+      cy.findByText('For each enabled message type an optional sub-topic can be defined').should(
+        'be.visible',
+      )
       cy.findByRole('button', { name: 'Add Pub/Sub' }).should('be.visible')
     })
 
@@ -236,9 +236,6 @@ describe('Application Pub/Sub create', () => {
           .should('contain.text', 'Address is required')
           .and('be.visible')
         cy.findErrorByLabelText('Port').should('contain.text', 'Port is required').and('be.visible')
-        cy.findErrorByLabelText('Pub/Sub format')
-          .should('contain.text', 'Pub/Sub format is required')
-          .and('be.visible')
         cy.location('pathname').should(
           'eq',
           `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
@@ -261,8 +258,12 @@ describe('Application Pub/Sub create', () => {
         cy.findByLabelText('Address').type(pubSub.address)
         cy.findByLabelText('Port').type(pubSub.port)
         cy.findByLabelText('Pub/Sub format').selectOption(pubSub.format)
-        cy.get('#uplink_message_checkbox').check()
-        cy.findByLabelText('Uplink message').type(pubSub.uplinkSubTopic)
+        cy.findByLabelText('Uplink message')
+          .check()
+          .parents('[data-test-id="form-field"]')
+          .within(() => {
+            cy.findByPlaceholderText('sub-topic').type(pubSub.uplinkSubTopic)
+          })
 
         cy.findByRole('button', { name: 'Add Pub/Sub' }).click()
 
@@ -288,9 +289,6 @@ describe('Application Pub/Sub create', () => {
           .should('contain.text', 'Address is required')
           .and('be.visible')
         cy.findErrorByLabelText('Port').should('contain.text', 'Port is required').and('be.visible')
-        cy.findErrorByLabelText('Pub/Sub format')
-          .should('contain.text', 'Pub/Sub format is required')
-          .and('be.visible')
         cy.location('pathname').should(
           'eq',
           `${Cypress.config('consoleRootPath')}/applications/${appId}/integrations/pubsubs/add`,
@@ -309,8 +307,12 @@ describe('Application Pub/Sub create', () => {
         cy.findByLabelText('Address').type(pubSub.address)
         cy.findByLabelText('Port').type(pubSub.port)
         cy.findByLabelText('Pub/Sub format').selectOption(pubSub.format)
-        cy.get('#uplink_message_checkbox').check()
-        cy.findByLabelText('Uplink message').type(pubSub.uplinkSubTopic)
+        cy.findByLabelText('Uplink message')
+          .check()
+          .parents('[data-test-id="form-field"]')
+          .within(() => {
+            cy.findByPlaceholderText('sub-topic').type(pubSub.uplinkSubTopic)
+          })
 
         cy.findByRole('button', { name: 'Add Pub/Sub' }).click()
 

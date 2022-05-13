@@ -46,8 +46,8 @@ describe('Application Webhook create without template', () => {
   it('displays UI elements in place', () => {
     cy.findByRole('heading', { name: 'Add webhook' }).should('be.visible')
     cy.findByRole('heading', { name: 'General settings' }).should('be.visible')
+    cy.findByText(/The Webhooks feature allows/).should('be.visible')
     cy.findByLabelText('Webhook ID').should('have.attr', 'placeholder').and('eq', 'my-new-webhook')
-    cy.findByRole('heading', { name: 'Endpoint settings' }).should('be.visible')
     cy.findByLabelText('Base URL')
       .should('have.attr', 'placeholder')
       .and('eq', 'https://example.com/webhooks')
@@ -56,42 +56,21 @@ describe('Application Webhook create without template', () => {
       'The API key will be provided to the endpoint using the "X-Downlink-Apikey" header',
     )
     cy.findByText('Add header entry').should('be.visible')
-    cy.findByRole('heading', { name: 'Enabled messages' }).should('be.visible')
-    cy.findByTestId('notification')
-      .should('be.visible')
-      .findByText(
-        'For each enabled message type, an optional path can be defined which will be appended to the base URL',
-      )
-      .should('be.visible')
-    cy.findByText('Uplink message').should('be.visible')
-    cy.get('[for="uplink_message_checkbox"]').should('be.visible').and('not.be.checked')
+    cy.findByRole('heading', { name: 'Enabled event types' }).should('be.visible')
+    cy.findByText(
+      'For each enabled event type an optional path can be defined which will be appended to the base URL',
+    ).should('be.visible')
 
-    cy.findByText('Join accept').should('be.visible')
-    cy.get('[for="join_accept_checkbox"]').should('be.visible').and('not.be.checked')
-
-    cy.findByText('Downlink ack').should('be.visible')
-    cy.get('[for="downlink_ack_checkbox"]').should('be.visible').and('not.be.checked')
-
-    cy.findByText('Downlink nack').should('be.visible')
-    cy.get('[for="downlink_nack_checkbox"]').should('be.visible').and('not.be.checked')
-
-    cy.findByText('Downlink sent').should('be.visible')
-    cy.get('[for="downlink_sent_checkbox"]').should('be.visible').and('not.be.checked')
-
-    cy.findByText('Downlink failed').should('be.visible')
-    cy.get('[for="downlink_failed_checkbox"]').should('be.visible').and('not.be.checked')
-
-    cy.findByText('Downlink queued').should('be.visible')
-    cy.get('[for="downlink_queued_checkbox"]').should('be.visible').and('not.be.checked')
-
-    cy.findByText('Downlink queue invalidated').should('be.visible')
-    cy.get('[for="downlink_queue_invalidated_checkbox"]').should('be.visible').and('not.be.checked')
-
-    cy.findByText('Location solved').should('be.visible')
-    cy.get('[for="location_solved_checkbox"]').should('be.visible').and('not.be.checked')
-
-    cy.findByText('Service data').should('be.visible')
-    cy.get('[for="service_data_checkbox"]').should('be.visible').and('not.be.checked')
+    cy.findByText('Uplink message').should('be.visible').and('not.be.checked')
+    cy.findByText('Join accept').should('be.visible').and('not.be.checked')
+    cy.findByText('Downlink ack').should('be.visible').and('not.be.checked')
+    cy.findByText('Downlink nack').should('be.visible').and('not.be.checked')
+    cy.findByText('Downlink sent').should('be.visible').and('not.be.checked')
+    cy.findByText('Downlink failed').should('be.visible').and('not.be.checked')
+    cy.findByText('Downlink queued').should('be.visible').and('not.be.checked')
+    cy.findByText('Downlink queue invalidated').should('be.visible').and('not.be.checked')
+    cy.findByText('Location solved').should('be.visible').and('not.be.checked')
+    cy.findByText('Service data').should('be.visible').and('not.be.checked')
 
     cy.findByRole('button', { name: 'Add webhook' }).should('be.visible')
   })
@@ -101,9 +80,6 @@ describe('Application Webhook create without template', () => {
 
     cy.findErrorByLabelText('Webhook ID')
       .should('contain.text', 'Webhook ID is required')
-      .and('be.visible')
-    cy.findErrorByLabelText('Webhook format')
-      .should('contain.text', 'Webhook format is required')
       .and('be.visible')
     cy.findErrorByLabelText('Base URL')
       .should('contain.text', 'Base URL is required')
@@ -126,8 +102,12 @@ describe('Application Webhook create without template', () => {
     cy.findByLabelText('Webhook ID').type(webhook.id)
     cy.findByLabelText('Webhook format').selectOption(webhook.format)
     cy.findByLabelText('Base URL').type(webhook.baseUrl)
-    cy.get('#uplink_message_checkbox').check()
-    cy.findByLabelText('Uplink message').type(webhook.path)
+    cy.findByLabelText('Uplink message')
+      .check()
+      .parents('[data-test-id="form-field"]')
+      .within(() => {
+        cy.findByPlaceholderText('/path/to/webhook').type(webhook.path)
+      })
 
     cy.findByRole('button', { name: 'Add webhook' }).click()
 
@@ -152,8 +132,12 @@ describe('Application Webhook create without template', () => {
       .should('be.disabled')
       .and('have.attr', 'value')
       .and('eq', webhook.id)
-    cy.findByLabelText('Base URL').and('have.attr', 'value').and('eq', webhook.baseUrl)
-    cy.findByLabelText('Uplink message').should('have.attr', 'value', webhook.path)
-    cy.get('#uplink_message_checkbox').should('be.checked')
+    cy.findByLabelText('Base URL').and('have.attr', 'value', webhook.baseUrl)
+    cy.findByLabelText('Uplink message')
+      .check()
+      .parents('[data-test-id="form-field"]')
+      .within(() => {
+        cy.findByPlaceholderText('/path/to/webhook').should('have.attr', 'value', webhook.path)
+      })
   })
 })
