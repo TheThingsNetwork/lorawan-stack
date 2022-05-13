@@ -31,6 +31,7 @@ For details about compatibility between different releases, see the **Commitment
   - Automatically updating session info (no refresh necessary to schedule downlinks after a device has joined).
   - Showing session start time.
 - The Things Stack is now built with Go 1.18.
+- Layout of webhook and Pub/Sub forms to improve UX.
 
 ### Deprecated
 
