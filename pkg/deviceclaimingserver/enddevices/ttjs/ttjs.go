@@ -41,13 +41,17 @@ type BasicAuth struct {
 	Password string `yaml:"password"`
 }
 
+// NetworkServer contains information related to the Network Server.
+type NetworkServer struct {
+	Hostname string
+	HomeNSID types.EUI64
+}
+
 // Config is the configuration to communicate with The Things Join Server End Device Claming API.
 type Config struct {
 	NetID           types.NetID         `yaml:"-"`
 	JoinEUIPrefixes []types.EUI64Prefix `yaml:"-"`
-	NetworkServer   struct {
-		Hostname, HomeNSID string
-	} `yaml:"-"`
+	NetworkServer   NetworkServer       `yaml:"-"`
 
 	BasicAuth          `yaml:"basic-auth"`
 	ClaimingAPIVersion string `yaml:"claiming-api-version"`
@@ -117,7 +121,7 @@ func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, clai
 		OwnerToken: claimAuthenticationCode,
 		claimData: claimData{
 			HomeNetID: client.config.NetID.String(),
-			HomeNSID:  client.config.NetworkServer.HomeNSID,
+			HomeNSID:  client.config.NetworkServer.HomeNSID.String(),
 			VendorSpecific: VendorSpecific{
 				OUI: client.ttiVendorID,
 				Data: struct {

@@ -110,15 +110,12 @@ func NewUpstream(ctx context.Context, conf Config, c Component, opts ...Option) 
 			if err := yaml.UnmarshalStrict(configBytes, &ttjsConfig); err != nil {
 				return nil, err
 			}
+
 			ttjsConfig.NetID = conf.NetID
 			ttjsConfig.JoinEUIPrefixes = js.JoinEUIs
-			ttjsConfig.NetworkServer = struct {
-				Hostname string
-				HomeNSID string
-			}{
-				Hostname: conf.NetworkServer.Hostname,
-				HomeNSID: conf.NetworkServer.HomeNSID,
-			}
+			ttjsConfig.NetworkServer.HomeNSID = conf.NetworkServer.HomeNSID
+			ttjsConfig.NetworkServer.Hostname = conf.NetworkServer.Hostname
+
 			s, err = ttjsConfig.NewClient(ctx, c)
 			if err != nil {
 				return nil, err

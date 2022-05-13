@@ -38,7 +38,7 @@ var (
 	otherClientASID         = "localhost-other"
 	claimAuthenticationCode = "SECRET"
 	nsAddress               = "localhost"
-	homeNSID                = "1122334455667788"
+	homeNSID                = types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}
 	supportedJoinEUI        = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C}
 	supportedJoinEUIPrefix  = types.EUI64Prefix{
 		EUI64:  supportedJoinEUI,
@@ -100,10 +100,7 @@ func TestTTJS(t *testing.T) {
 
 	// Valid Config
 	ttJSConfig := Config{
-		NetworkServer: struct {
-			Hostname string
-			HomeNSID string
-		}{
+		NetworkServer: NetworkServer{
 			Hostname: "localhost",
 			HomeNSID: homeNSID,
 		},
@@ -202,10 +199,7 @@ func TestTTJS(t *testing.T) {
 
 	// Claim locked.
 	otherClientConfig := Config{
-		NetworkServer: struct {
-			Hostname string
-			HomeNSID string
-		}{
+		NetworkServer: NetworkServer{
 			Hostname: "localhost",
 			HomeNSID: homeNSID,
 		},
@@ -265,7 +259,7 @@ func TestTTJS(t *testing.T) {
 	a.So(ret, should.NotBeNil)
 	a.So(ret.EndDeviceIds, should.Resemble, validEndDeviceIds)
 	a.So(*ret.HomeNetId, should.Resemble, test.DefaultNetID)
-	a.So(ret.HomeNsId.String(), should.Equal, homeNSID)
+	a.So(ret.HomeNsId.String(), should.Equal, homeNSID.String())
 	a.So(err, should.BeNil)
 	a.So(ret.VendorSpecific, should.NotBeNil)
 	a.So(ret.VendorSpecific.OrganizationUniqueIdentifier, should.Equal, 0xec656e)
