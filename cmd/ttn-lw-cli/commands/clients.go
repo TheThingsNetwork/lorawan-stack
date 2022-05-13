@@ -161,7 +161,7 @@ var (
 		RunE: asBulk(func(cmd *cobra.Command, args []string) (err error) {
 			cliID := getClientID(cmd.Flags(), args)
 			collaborator := &ttnpb.OrganizationOrUserIdentifiers{}
-			_, err = collaborator.SetFromFlags(cmd.Flags(), "")
+			_, err = collaborator.SetFromFlags(cmd.Flags(), "collaborator")
 			if err != nil {
 				return err
 			}
@@ -347,8 +347,8 @@ func init() {
 	clientsGetCommand.Flags().AddFlagSet(selectAllClientFlags)
 	clientsCommand.AddCommand(clientsGetCommand)
 	ttnpb.AddSetFlagsForClient(clientsCreateCommand.Flags(), "", false)
-	ttnpb.AddSetFlagsForOrganizationOrUserIdentifiers(clientsCreateCommand.Flags(), "", true)
-	AddCollaboratorFlagAlias(clientsCreateCommand.Flags(), "")
+	ttnpb.AddSetFlagsForOrganizationOrUserIdentifiers(clientsCreateCommand.Flags(), "collaborator", true)
+	AddCollaboratorFlagAlias(clientsCreateCommand.Flags(), "collaborator")
 	flagsplugin.AddAlias(clientsCreateCommand.Flags(), "ids.client-id", "client-id", flagsplugin.WithHidden(false))
 	clientsCreateCommand.Flags().Lookup("state").DefValue = ttnpb.State_STATE_APPROVED.String()
 	clientsCreateCommand.Flags().Lookup("grants").DefValue = ttnpb.GrantType_GRANT_AUTHORIZATION_CODE.String()
