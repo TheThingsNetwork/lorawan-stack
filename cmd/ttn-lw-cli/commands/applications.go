@@ -182,7 +182,7 @@ var (
 				return errNoApplicationID.New()
 			}
 			collaborator := &ttnpb.OrganizationOrUserIdentifiers{}
-			_, err = collaborator.SetFromFlags(cmd.Flags(), "")
+			_, err = collaborator.SetFromFlags(cmd.Flags(), "collaborator")
 			if err != nil {
 				return err
 			}
@@ -372,8 +372,8 @@ func init() {
 	applicationsCommand.AddCommand(applicationsGetCommand)
 	ttnpb.AddSetFlagsForApplication(applicationsCreateCommand.Flags(), "", false)
 	flagsplugin.AddAlias(applicationsCreateCommand.Flags(), "ids.application-id", "application-id", flagsplugin.WithHidden(false))
-	ttnpb.AddSetFlagsForOrganizationOrUserIdentifiers(applicationsCreateCommand.Flags(), "", true)
-	AddCollaboratorFlagAlias(applicationsCreateCommand.Flags(), "")
+	ttnpb.AddSetFlagsForOrganizationOrUserIdentifiers(applicationsCreateCommand.Flags(), "collaborator", true)
+	AddCollaboratorFlagAlias(applicationsCreateCommand.Flags(), "collaborator")
 	applicationsCommand.AddCommand(applicationsCreateCommand)
 	ttnpb.AddSetFlagsForApplication(applicationsSetCommand.Flags(), "", false)
 	flagsplugin.AddAlias(applicationsSetCommand.Flags(), "ids.application-id", "application-id", flagsplugin.WithHidden(false))
