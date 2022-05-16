@@ -718,6 +718,7 @@ func TestDownlinkQueueReplace(t *testing.T) {
 						},
 						TaskStarter: StartTaskExclude(
 							DownlinkProcessTaskName,
+							DownlinkDispatchTaskName,
 						),
 						Component: component.Config{
 							ServiceBase: config.ServiceBase{
@@ -1309,6 +1310,7 @@ func TestDownlinkQueuePush(t *testing.T) {
 						},
 						TaskStarter: StartTaskExclude(
 							DownlinkProcessTaskName,
+							DownlinkDispatchTaskName,
 						),
 						Component: component.Config{
 							ServiceBase: config.ServiceBase{
@@ -1538,6 +1540,7 @@ func TestDownlinkQueueList(t *testing.T) {
 						},
 						TaskStarter: StartTaskExclude(
 							DownlinkProcessTaskName,
+							DownlinkDispatchTaskName,
 						),
 						Component: component.Config{
 							ServiceBase: config.ServiceBase{

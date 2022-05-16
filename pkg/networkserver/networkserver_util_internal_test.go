@@ -49,12 +49,14 @@ import (
 )
 
 const (
-	DownlinkProcessTaskName     = downlinkProcessTaskName
-	DownlinkRetryInterval       = downlinkRetryInterval
-	AbsoluteTimeSchedulingDelay = absoluteTimeSchedulingDelay
-	InfrastructureDelay         = infrastructureDelay
-	RecentDownlinkCount         = recentDownlinkCount
-	RecentUplinkCount           = recentUplinkCount
+	DownlinkProcessTaskName           = downlinkProcessTaskName
+	DownlinkRetryInterval             = downlinkRetryInterval
+	ApplicationUplinkDispatchTaskName = applicationUplinkDispatchTaskName
+	DownlinkDispatchTaskName          = downlinkDispatchTaskName
+	AbsoluteTimeSchedulingDelay       = absoluteTimeSchedulingDelay
+	InfrastructureDelay               = infrastructureDelay
+	RecentDownlinkCount               = recentDownlinkCount
+	RecentUplinkCount                 = recentUplinkCount
 )
 
 var (

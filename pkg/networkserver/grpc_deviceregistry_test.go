@@ -350,6 +350,7 @@ func TestDeviceRegistryGet(t *testing.T) {
 						},
 						TaskStarter: StartTaskExclude(
 							DownlinkProcessTaskName,
+							DownlinkDispatchTaskName,
 						),
 					},
 				)
@@ -840,6 +841,7 @@ func TestDeviceRegistrySet(t *testing.T) {
 						NetworkServer: nsConf,
 						TaskStarter: StartTaskExclude(
 							DownlinkProcessTaskName,
+							DownlinkDispatchTaskName,
 						),
 					})
 					defer stop()
@@ -1094,6 +1096,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 						NetworkServer: nsConf,
 						TaskStarter: StartTaskExclude(
 							DownlinkProcessTaskName,
+							DownlinkDispatchTaskName,
 						),
 					})
 					defer stop()
@@ -1336,6 +1339,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 						},
 						TaskStarter: StartTaskExclude(
 							DownlinkProcessTaskName,
+							DownlinkDispatchTaskName,
 						),
 					},
 				)
