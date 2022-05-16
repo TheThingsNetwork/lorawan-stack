@@ -41,7 +41,7 @@ type EndDeviceClaimer interface {
 	// SupportsJoinEUI returns whether the Join Server supports this JoinEUI.
 	SupportsJoinEUI(joinEUI types.EUI64) bool
 	// Claim claims an End Device.
-	Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode, networkServerAddress string) error
+	Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode string) error
 	// GetClaimStatus returns the claim status an End Device.
 	GetClaimStatus(ctx context.Context, ids *ttnpb.EndDeviceIdentifiers) (*ttnpb.GetClaimStatusResponse, error)
 	// Unclaim releases the claim on an End Device.
@@ -110,8 +110,12 @@ func NewUpstream(ctx context.Context, conf Config, c Component, opts ...Option) 
 			if err := yaml.UnmarshalStrict(configBytes, &ttjsConfig); err != nil {
 				return nil, err
 			}
+
 			ttjsConfig.NetID = conf.NetID
 			ttjsConfig.JoinEUIPrefixes = js.JoinEUIs
+			ttjsConfig.NetworkServer.HomeNSID = conf.NetworkServer.HomeNSID
+			ttjsConfig.NetworkServer.Hostname = conf.NetworkServer.Hostname
+
 			s, err = ttjsConfig.NewClient(ctx, c)
 			if err != nil {
 				return nil, err
@@ -161,12 +165,12 @@ func (upstream *Upstream) joinEUIClaimer(ctx context.Context, joinEUI types.EUI6
 }
 
 // Claim implements EndDeviceClaimingServer.
-func (upstream *Upstream) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode, networkServerAddress string) error {
+func (upstream *Upstream) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode string) error {
 	claimer := upstream.joinEUIClaimer(ctx, joinEUI)
 	if claimer == nil {
 		return errClaimingNotSupported.WithAttributes("eui", joinEUI)
 	}
-	return claimer.Claim(ctx, joinEUI, devEUI, claimAuthenticationCode, networkServerAddress)
+	return claimer.Claim(ctx, joinEUI, devEUI, claimAuthenticationCode)
 }
 
 // Unclaim implements EndDeviceClaimingServer.

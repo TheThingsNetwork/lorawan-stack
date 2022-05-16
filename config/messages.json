@@ -3527,15 +3527,6 @@
       "file": "messages.go"
     }
   },
-  "error:pkg/deviceclaimingserver/enddevices/ttjs:no_home_ns_id": {
-    "translations": {
-      "en": "no HomeNSID configured for network server address `{address}`"
-    },
-    "description": {
-      "package": "pkg/deviceclaimingserver/enddevices/ttjs",
-      "file": "ttjs.go"
-    }
-  },
   "error:pkg/deviceclaimingserver/enddevices/ttjs:unauthorized": {
     "translations": {
       "en": "client API Key missing or invalid"

@@ -38,7 +38,7 @@ var (
 	otherClientASID         = "localhost-other"
 	claimAuthenticationCode = "SECRET"
 	nsAddress               = "localhost"
-	homeNSID                = "1122334455667788"
+	homeNSID                = types.EUI64{0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88}
 	supportedJoinEUI        = types.EUI64{0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0C}
 	supportedJoinEUIPrefix  = types.EUI64Prefix{
 		EUI64:  supportedJoinEUI,
@@ -98,32 +98,11 @@ func TestTTJS(t *testing.T) {
 		return mockTTJS.Start(ctx, apiVersion)
 	}()
 
-	// Invalid Config
-	invalidConfig := Config{
-		HomeNSIDs: map[string]string{
-			"localhost": "1234",
-		},
-		TenantID: tenantID,
-		NetID:    test.DefaultNetID,
-		JoinEUIPrefixes: []types.EUI64Prefix{
-			supportedJoinEUIPrefix,
-		},
-		ClaimingAPIVersion: apiVersion,
-		BasicAuth: BasicAuth{
-			Username: asID,
-			Password: "invalid",
-		},
-		URL: fmt.Sprintf("http://%s", lis.Addr().String()),
-	}
-
-	cl, err := invalidConfig.NewClient(ctx, c)
-	a.So(errors.IsInvalidArgument(err), should.BeTrue)
-	a.So(cl, should.BeNil)
-
 	// Valid Config
 	ttJSConfig := Config{
-		HomeNSIDs: map[string]string{
-			"localhost": homeNSID,
+		NetworkServer: NetworkServer{
+			Hostname: "localhost",
+			HomeNSID: homeNSID,
 		},
 		TenantID: tenantID,
 		NetID:    test.DefaultNetID,
@@ -141,7 +120,7 @@ func TestTTJS(t *testing.T) {
 	// Invalid client API key.
 	unauthenticatedClient, err := ttJSConfig.NewClient(ctx, c)
 	test.Must(unauthenticatedClient, err)
-	err = unauthenticatedClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode, nsAddress)
+	err = unauthenticatedClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode)
 	a.So(errors.IsUnauthenticated(err), should.BeTrue)
 	err = unauthenticatedClient.Unclaim(ctx, &ttnpb.EndDeviceIdentifiers{
 		DevEui:  &devEUI,
@@ -170,7 +149,6 @@ func TestTTJS(t *testing.T) {
 		DevEUI             types.EUI64
 		JoinEUI            types.EUI64
 		AuthenticationCode string
-		HNSAddress         string
 		ErrorAssertion     func(err error) bool
 	}{
 		{
@@ -178,7 +156,6 @@ func TestTTJS(t *testing.T) {
 			DevEUI:             devEUI,
 			JoinEUI:            supportedJoinEUI,
 			AuthenticationCode: "",
-			HNSAddress:         nsAddress,
 			ErrorAssertion: func(err error) bool {
 				return errors.IsUnauthenticated(err)
 			},
@@ -188,18 +165,8 @@ func TestTTJS(t *testing.T) {
 			DevEUI:             devEUI,
 			JoinEUI:            supportedJoinEUI,
 			AuthenticationCode: "invalid",
-			HNSAddress:         nsAddress,
 			ErrorAssertion: func(err error) bool {
 				return errors.IsUnauthenticated(err)
-			},
-		},
-		{
-			Name:               "NoTargetNSID",
-			DevEUI:             devEUI,
-			JoinEUI:            supportedJoinEUI,
-			AuthenticationCode: claimAuthenticationCode,
-			ErrorAssertion: func(err error) bool {
-				return errors.IsInvalidArgument(err)
 			},
 		},
 		{
@@ -207,7 +174,6 @@ func TestTTJS(t *testing.T) {
 			DevEUI:             types.EUI64{},
 			JoinEUI:            supportedJoinEUI,
 			AuthenticationCode: claimAuthenticationCode,
-			HNSAddress:         nsAddress,
 			ErrorAssertion: func(err error) bool {
 				return errors.IsNotFound(err)
 			},
@@ -217,11 +183,10 @@ func TestTTJS(t *testing.T) {
 			DevEUI:             devEUI,
 			JoinEUI:            supportedJoinEUI,
 			AuthenticationCode: claimAuthenticationCode,
-			HNSAddress:         nsAddress,
 		},
 	} {
 		t.Run(fmt.Sprintf("Claim/%s", tc.Name), func(t *testing.T) {
-			err := client.Claim(ctx, tc.JoinEUI, tc.DevEUI, tc.AuthenticationCode, tc.HNSAddress)
+			err := client.Claim(ctx, tc.JoinEUI, tc.DevEUI, tc.AuthenticationCode)
 			if err != nil {
 				if tc.ErrorAssertion == nil || !a.So(tc.ErrorAssertion(err), should.BeTrue) {
 					t.Fatalf("Unexpected error: %v", err)
@@ -234,8 +199,9 @@ func TestTTJS(t *testing.T) {
 
 	// Claim locked.
 	otherClientConfig := Config{
-		HomeNSIDs: map[string]string{
-			"localhost": homeNSID,
+		NetworkServer: NetworkServer{
+			Hostname: "localhost",
+			HomeNSID: homeNSID,
 		},
 		NetID: test.DefaultNetID,
 		JoinEUIPrefixes: []types.EUI64Prefix{
@@ -250,7 +216,7 @@ func TestTTJS(t *testing.T) {
 	}
 	otherClient, err := otherClientConfig.NewClient(ctx, c)
 	test.Must(otherClient, err)
-	err = otherClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode, nsAddress)
+	err = otherClient.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode)
 	a.So(errors.IsPermissionDenied(err), should.BeTrue)
 	ret, err = otherClient.GetClaimStatus(ctx, &ttnpb.EndDeviceIdentifiers{
 		DevEui:  &devEUI,
@@ -284,7 +250,7 @@ func TestTTJS(t *testing.T) {
 	a.So(errors.IsNotFound(err), should.BeTrue)
 
 	// Try to claim
-	err = client.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode, nsAddress)
+	err = client.Claim(ctx, supportedJoinEUI, devEUI, claimAuthenticationCode)
 	a.So(err, should.BeNil)
 
 	// Get valid status
@@ -293,7 +259,7 @@ func TestTTJS(t *testing.T) {
 	a.So(ret, should.NotBeNil)
 	a.So(ret.EndDeviceIds, should.Resemble, validEndDeviceIds)
 	a.So(*ret.HomeNetId, should.Resemble, test.DefaultNetID)
-	a.So(ret.HomeNsId.String(), should.Equal, homeNSID)
+	a.So(ret.HomeNsId.String(), should.Equal, homeNSID.String())
 	a.So(err, should.BeNil)
 	a.So(ret.VendorSpecific, should.NotBeNil)
 	a.So(ret.VendorSpecific.OrganizationUniqueIdentifier, should.Equal, 0xec656e)
