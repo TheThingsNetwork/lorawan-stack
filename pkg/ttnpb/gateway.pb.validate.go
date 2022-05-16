@@ -1259,7 +1259,18 @@ func (m *GetGatewayIdentifiersForEUIRequest) ValidateFields(paths ...string) err
 		_ = subs
 		switch name {
 		case "eui":
-			// no validation rules for Eui
+
+			if len(m.GetEui()) > 0 {
+
+				if len(m.GetEui()) != 8 {
+					return GetGatewayIdentifiersForEUIRequestValidationError{
+						field:  "eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		default:
 			return GetGatewayIdentifiersForEUIRequestValidationError{
 				field:  name,
