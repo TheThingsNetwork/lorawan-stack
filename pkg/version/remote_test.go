@@ -61,6 +61,7 @@ func TestCheckUpdate(t *testing.T) {
 
 			ctx, cancel := context.WithTimeout(ctx, timeout)
 			defer cancel()
+			version.ClearRecentCheckCache()
 			update, err := version.CheckUpdate(ctx, sourceOpt, version.WithReference(tc.Reference))
 			a.So(err, should.BeNil)
 
