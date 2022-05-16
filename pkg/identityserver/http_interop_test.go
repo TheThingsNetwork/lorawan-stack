@@ -18,6 +18,7 @@ import (
 	"testing"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -27,6 +28,10 @@ import (
 )
 
 func TestInteropServer(t *testing.T) {
+	t.Parallel()
+
+	p := &storetest.Population{}
+
 	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, _ *grpc.ClientConn) {
@@ -113,5 +118,5 @@ func TestInteropServer(t *testing.T) {
 		if !a.So(errors.IsNotFound(err), should.BeTrue) {
 			t.FailNow()
 		}
-	})
+	}, withPrivateTestDatabase(p))
 }
