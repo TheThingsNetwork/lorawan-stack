@@ -19,15 +19,20 @@ import (
 
 	"github.com/smartystreets/assertions/should"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc"
 )
 
 func TestInvitationsPermissionDenied(t *testing.T) {
+	t.Parallel()
+
+	p := &storetest.Population{}
+
 	a, ctx := test.New(t)
 
-	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewUserInvitationRegistryClient(cc)
 		_, err := reg.Send(ctx, &ttnpb.SendInvitationRequest{
 			Email: "foobar@example.com",
@@ -51,50 +56,51 @@ func TestInvitationsPermissionDenied(t *testing.T) {
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		}
-	})
+	}, withPrivateTestDatabase(p))
 }
 
 func TestInvitationsCRUD(t *testing.T) {
+	t.Parallel()
+
+	p := &storetest.Population{}
+
+	adminUsr := p.NewUser()
+	adminUsr.Admin = true
+	adminUsrKey, _ := p.NewAPIKey(adminUsr.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	adminUsrCreds := rpcCreds(adminUsrKey)
+
 	a, ctx := test.New(t)
 
-	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		creds := userCreds(adminUserIdx)
-
+	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewUserInvitationRegistryClient(cc)
 
-		invit, err := reg.Send(ctx, &ttnpb.SendInvitationRequest{
+		invitation, err := reg.Send(ctx, &ttnpb.SendInvitationRequest{
 			Email: "foobar@example.com",
-		}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(invit, should.NotBeNil) {
-			a.So(invit.Email, should.Equal, "foobar@example.com")
+		}, adminUsrCreds)
+		if a.So(err, should.BeNil) && a.So(invitation, should.NotBeNil) {
+			a.So(invitation.Email, should.Equal, "foobar@example.com")
 		}
 
 		_, err = reg.Send(ctx, &ttnpb.SendInvitationRequest{
 			Email: "foobar@example.com",
-		}, creds)
-
+		}, adminUsrCreds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsAlreadyExists(err), should.BeTrue)
 		}
 
-		invits, err := reg.List(ctx, &ttnpb.ListInvitationsRequest{}, creds)
-
-		a.So(err, should.BeNil)
-		a.So(invits.Invitations[0].Email, should.Equal, "foobar@example.com")
+		invitations, err := reg.List(ctx, &ttnpb.ListInvitationsRequest{}, adminUsrCreds)
+		if a.So(err, should.BeNil) && a.So(invitations, should.NotBeNil) && a.So(invitations.Invitations, should.HaveLength, 1) {
+			a.So(invitations.Invitations[0].Email, should.Equal, "foobar@example.com")
+		}
 
 		_, err = reg.Delete(ctx, &ttnpb.DeleteInvitationRequest{
 			Email: "foobar@example.com",
-		}, creds)
-
+		}, adminUsrCreds)
 		a.So(err, should.BeNil)
 
-		invits, err = reg.List(ctx, &ttnpb.ListInvitationsRequest{}, creds)
-
-		a.So(err, should.BeNil)
-		if a.So(invits, should.NotBeNil) {
-			a.So(invits.Invitations, should.BeEmpty)
+		invitations, err = reg.List(ctx, &ttnpb.ListInvitationsRequest{}, adminUsrCreds)
+		if a.So(err, should.BeNil) && a.So(invitations, should.NotBeNil) {
+			a.So(invitations.Invitations, should.BeEmpty)
 		}
-	})
+	}, withPrivateTestDatabase(p))
 }
