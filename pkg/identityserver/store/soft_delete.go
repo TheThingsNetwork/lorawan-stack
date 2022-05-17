@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ type deletedOptionsKeyType struct{}
 
 var deletedOptionsKey deletedOptionsKeyType
 
+// DeletedOptions stores the options for selecting deleted entities.
 type DeletedOptions struct {
 	IncludeDeleted bool
 	OnlyDeleted    bool
@@ -38,7 +39,8 @@ func WithSoftDeleted(ctx context.Context, onlyDeleted bool) context.Context {
 	})
 }
 
-// WithSoftDeletedBetween returns a context that tells the store to include deleted entities between (exclusive) those times.
+// WithSoftDeletedBetween returns a context that tells the store to include deleted entities
+// between (exclusive) the given times.
 func WithSoftDeletedBetween(ctx context.Context, deletedAfter, deletedBefore *time.Time) context.Context {
 	return context.WithValue(ctx, deletedOptionsKey, &DeletedOptions{
 		IncludeDeleted: true,
@@ -48,6 +50,7 @@ func WithSoftDeletedBetween(ctx context.Context, deletedAfter, deletedBefore *ti
 	})
 }
 
+// SoftDeletedFromContext returns the DeletedOptions from the context if present.
 func SoftDeletedFromContext(ctx context.Context) *DeletedOptions {
 	if opts, ok := ctx.Value(deletedOptionsKey).(*DeletedOptions); ok {
 		return opts
