@@ -249,6 +249,15 @@ func (p *Population) Populate(ctx context.Context, st interface{}) error {
 			return fmt.Errorf("store of type %T does not implement UserStore", st)
 		}
 		for _, usr := range p.Users {
+			if usr.Password != "" {
+				hashValidator := pbkdf2.Default()
+				hashValidator.Iterations = 10
+				hashedPassword, err := auth.Hash(auth.NewContextWithHashValidator(context.Background(), hashValidator), usr.Password)
+				if err != nil {
+					panic(err)
+				}
+				usr.Password = hashedPassword
+			}
 			created, err := s.CreateUser(ctx, usr)
 			if err != nil {
 				return err

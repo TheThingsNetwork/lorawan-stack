@@ -20,7 +20,6 @@ import (
 	"strings"
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/iancoleman/strcase"
 	"github.com/jinzhu/gorm"
@@ -37,254 +36,12 @@ import (
 	"google.golang.org/grpc"
 )
 
-var (
-	userIndex                                               int
-	newUser, newUserIdx                                     = getTestUser()
-	rejectedUser, rejectedUserIdx                           = getTestUser()
-	defaultUser, defaultUserIdx                             = getTestUser()
-	suspendedUser, suspendedUserIdx                         = getTestUser()
-	adminUser, adminUserIdx                                 = getTestUser()
-	userTestUser, userTestUserIdx                           = getTestUser()
-	collaboratorUser, collaboratorUserIdx                   = getTestUser()
-	applicationAccessUser, applicationAccessUserIdx         = getTestUser()
-	appAccessCollaboratorUser, appAccessCollaboratorUserIdx = getTestUser()
-	clientAccessUser, clientAccessUserIdx                   = getTestUser()
-	gatewayAccessUser, gatewayAccessUserIdx                 = getTestUser()
-	gtwAccessCollaboratorUser, gtwAccessCollaboratorUserIdx = getTestUser()
-	organizationAccessUser, organizationAccessUserIdx       = getTestUser()
-	orgAccessCollaboratorUser, orgAccessCollaboratorUserIdx = getTestUser()
-	userAccessUser, userAccessUserIdx                       = getTestUser()
-	paginationUser, paginationUserIdx                       = getTestUser()
-)
-
-var now = time.Now()
-
-func init() {
-	newUser.Admin = false
-	newUser.PrimaryEmailAddressValidatedAt = nil
-	newUser.State = ttnpb.State_STATE_REQUESTED
-
-	rejectedUser.Admin = false
-	rejectedUser.PrimaryEmailAddressValidatedAt = ttnpb.ProtoTimePtr(now)
-	rejectedUser.State = ttnpb.State_STATE_REJECTED
-
-	defaultUser.Admin = false
-	defaultUser.PrimaryEmailAddressValidatedAt = ttnpb.ProtoTimePtr(now)
-	defaultUser.State = ttnpb.State_STATE_APPROVED
-
-	defaultUser.TemporaryPassword = ""
-	defaultUser.TemporaryPasswordCreatedAt = nil
-	defaultUser.TemporaryPasswordExpiresAt = nil
-
-	userTestUser.Admin = false
-	userTestUser.PrimaryEmailAddressValidatedAt = ttnpb.ProtoTimePtr(now)
-	userTestUser.State = ttnpb.State_STATE_APPROVED
-
-	userTestUser.TemporaryPassword = ""
-	userTestUser.TemporaryPasswordCreatedAt = nil
-	userTestUser.TemporaryPasswordExpiresAt = nil
-
-	for id, apiKeys := range population.APIKeys {
-		if id.GetUserIds().GetUserId() == defaultUser.GetIds().GetUserId() || id.GetUserIds().GetUserId() == userTestUser.GetIds().GetUserId() {
-			expiredTime := time.Now().Add(-1 * time.Hour)
-			population.APIKeys[id] = append(
-				apiKeys,
-				&ttnpb.APIKey{
-					Name:   "key without rights",
-					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_SEND_INVITES},
-				},
-				&ttnpb.APIKey{
-					Name:      "expired key",
-					Rights:    []ttnpb.Right{ttnpb.Right_RIGHT_USER_ALL},
-					ExpiresAt: ttnpb.ProtoTimePtr(expiredTime),
-				},
-			)
-		}
-	}
-
-	suspendedUser.Admin = false
-	suspendedUser.PrimaryEmailAddressValidatedAt = ttnpb.ProtoTimePtr(now)
-	suspendedUser.State = ttnpb.State_STATE_SUSPENDED
-
-	adminUser.Admin = true
-	adminUser.PrimaryEmailAddressValidatedAt = ttnpb.ProtoTimePtr(now)
-	adminUser.State = ttnpb.State_STATE_APPROVED
-
-	paginationUser.Admin = false
-	paginationUser.PrimaryEmailAddressValidatedAt = ttnpb.ProtoTimePtr(now)
-	paginationUser.State = ttnpb.State_STATE_APPROVED
-}
-
-func getTestUser() (*ttnpb.User, int) {
-	defer func() { userIndex++ }()
-
-	return population.Users[userIndex], userIndex
-}
-
-func userCreds(idx int, preferredNames ...string) grpc.CallOption {
-	for id, apiKeys := range population.APIKeys {
-		if id.GetUserIds().GetUserId() == population.Users[idx].GetIds().GetUserId() {
-			selectedIdx := 0
-			if len(preferredNames) == 0 {
-				preferredNames = []string{"default key"}
-			}
-		findPreferred:
-			for _, name := range preferredNames {
-				for i, apiKey := range apiKeys {
-					if apiKey.Name == name {
-						selectedIdx = i
-						break findPreferred
-					}
-				}
-			}
-			return grpc.PerRPCCredentials(rpcmetadata.MD{
-				AuthType:      "bearer",
-				AuthValue:     apiKeys[selectedIdx].Key,
-				AllowInsecure: true,
-			})
-		}
-	}
-	return nil
-}
-
 func rpcCreds(key *ttnpb.APIKey) grpc.CallOption {
 	return grpc.PerRPCCredentials(rpcmetadata.MD{
 		AuthType:      "bearer",
 		AuthValue:     key.Key,
 		AllowInsecure: true,
 	})
-}
-
-func userAPIKeys(userID *ttnpb.UserIdentifiers) ttnpb.APIKeys {
-	for id, apiKeys := range population.APIKeys {
-		if id.GetUserIds().GetUserId() == userID.GetUserId() {
-			return ttnpb.APIKeys{
-				ApiKeys: apiKeys,
-			}
-		}
-	}
-
-	return ttnpb.APIKeys{
-		ApiKeys: []*ttnpb.APIKey{},
-	}
-}
-
-func applicationAPIKeys(applicationID *ttnpb.ApplicationIdentifiers) ttnpb.APIKeys {
-	for id, apiKeys := range population.APIKeys {
-		if id.GetApplicationIds().GetApplicationId() == applicationID.GetApplicationId() {
-			return ttnpb.APIKeys{
-				ApiKeys: apiKeys,
-			}
-		}
-	}
-
-	return ttnpb.APIKeys{
-		ApiKeys: []*ttnpb.APIKey{},
-	}
-}
-
-func gatewayAPIKeys(gatewayID *ttnpb.GatewayIdentifiers) ttnpb.APIKeys {
-	for id, apiKeys := range population.APIKeys {
-		if id.GetGatewayIds().GetGatewayId() == gatewayID.GetGatewayId() {
-			return ttnpb.APIKeys{
-				ApiKeys: apiKeys,
-			}
-		}
-	}
-
-	return ttnpb.APIKeys{
-		ApiKeys: []*ttnpb.APIKey{},
-	}
-}
-
-func organizationAPIKeys(organizationID *ttnpb.OrganizationIdentifiers) ttnpb.APIKeys {
-	for id, apiKeys := range population.APIKeys {
-		if id.GetOrganizationIds().GetOrganizationId() == organizationID.GetOrganizationId() {
-			return ttnpb.APIKeys{
-				ApiKeys: apiKeys,
-			}
-		}
-	}
-
-	return ttnpb.APIKeys{
-		ApiKeys: []*ttnpb.APIKey{},
-	}
-}
-
-func userApplications(userID *ttnpb.UserIdentifiers) ttnpb.Applications {
-	applications := []*ttnpb.Application{}
-	for _, app := range population.Applications {
-		for id, collaborators := range population.Memberships {
-			if app.IDString() == id.IDString() {
-				for _, collaborator := range collaborators {
-					if collaborator.IDString() == userID.GetUserId() {
-						applications = append(applications, app)
-					}
-				}
-			}
-		}
-	}
-
-	return ttnpb.Applications{
-		Applications: applications,
-	}
-}
-
-func userClients(userID *ttnpb.UserIdentifiers) ttnpb.Clients {
-	clients := []*ttnpb.Client{}
-	for _, client := range population.Clients {
-		for id, collaborators := range population.Memberships {
-			if client.IDString() == id.IDString() {
-				for _, collaborator := range collaborators {
-					if collaborator.IDString() == userID.GetUserId() {
-						clients = append(clients, client)
-					}
-				}
-			}
-		}
-	}
-
-	return ttnpb.Clients{
-		Clients: clients,
-	}
-}
-
-func userGateways(userID *ttnpb.UserIdentifiers) ttnpb.Gateways {
-	gateways := []*ttnpb.Gateway{}
-	for _, gateway := range population.Gateways {
-		for id, collaborators := range population.Memberships {
-			if gateway.IDString() == id.IDString() {
-				for _, collaborator := range collaborators {
-					if collaborator.IDString() == userID.GetUserId() {
-						gateways = append(gateways, gateway)
-					}
-				}
-			}
-		}
-	}
-
-	return ttnpb.Gateways{
-		Gateways: gateways,
-	}
-}
-
-func userOrganizations(userID *ttnpb.UserIdentifiers) ttnpb.Organizations {
-	organizations := []*ttnpb.Organization{}
-	for _, organization := range population.Organizations {
-		for id, collaborators := range population.Memberships {
-			if organization.IDString() == id.IDString() {
-				for _, collaborator := range collaborators {
-					if collaborator.IDString() == userID.GetUserId() {
-						organizations = append(organizations, organization)
-					}
-				}
-			}
-		}
-	}
-
-	return ttnpb.Organizations{
-		Organizations: organizations,
-	}
 }
 
 type testOptions struct {
@@ -347,9 +104,8 @@ func defaultTestOptions() *testOptions {
 }
 
 var (
-	population = store.NewPopulator(16, 42)
-	baseDSN    = storetest.GetDSN("ttn_lorawan_is_test")
-	baseDB     = func() *sql.DB {
+	baseDSN = storetest.GetDSN("ttn_lorawan_is_test")
+	baseDB  = func() *sql.DB {
 		baseDB, err := sql.Open("postgres", baseDSN.String())
 		if err != nil {
 			panic(err)
@@ -415,9 +171,6 @@ func testWithIdentityServer(t *testing.T, f func(*IdentityServer, *grpc.ClientCo
 		if err = store.Clear(db); err != nil {
 			t.Fatal(err)
 		}
-		if err = population.Populate(test.Context(), db); err != nil {
-			t.Fatal(err)
-		}
 	}
 
 	if testOptions.population != nil {
@@ -448,16 +201,4 @@ func testWithIdentityServer(t *testing.T, f func(*IdentityServer, *grpc.ClientCo
 			}
 		}
 	}
-}
-
-func reverse(s string) string {
-	b := []byte(s)
-	first := 0
-	last := len(b) - 1
-	for first < last {
-		b[first], b[last] = b[last], b[first]
-		first++
-		last--
-	}
-	return string(b)
 }
