@@ -211,9 +211,7 @@ func saveCheck(result *Update) error {
 // The function uses cache.
 func CheckUpdate(ctx context.Context, opts ...CheckOption) (*Update, error) {
 	cachedCheck, err := cachedCheck()
-	if err != nil {
-		log.FromContext(ctx).WithError(err).Warn("Failed to access cache for version check")
-	} else if cachedCheck.Timestamp.Add(versionCheckCacheTTL).After(time.Now()) {
+	if err == nil && cachedCheck.Timestamp.Add(versionCheckCacheTTL).After(time.Now()) {
 		return cachedCheck.Result, nil
 	}
 	current, err := semver.Parse(strings.TrimPrefix(TTN, "v"))
