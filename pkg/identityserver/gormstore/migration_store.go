@@ -38,7 +38,7 @@ func (s *migrationStore) CreateMigration(ctx context.Context, migration *Migrati
 
 func (s *migrationStore) FindMigrations(ctx context.Context) ([]*Migration, error) {
 	defer trace.StartRegion(ctx, "find migrations").End()
-	query := s.query(ctx, Migration{}).Order(store.OrderFromContext(ctx, "migrations", "created_at", "ASC"))
+	query := s.query(ctx, Migration{}).Order(store.OrderFromContext(ctx, "migrations", createdAt, "ASC"))
 	var models []*Migration
 	if err := query.Find(&models).Error; err != nil {
 		return nil, err

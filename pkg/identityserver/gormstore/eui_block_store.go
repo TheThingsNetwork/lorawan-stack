@@ -40,11 +40,19 @@ func getMaxCounter(addressBlock types.EUI64Prefix) int64 {
 }
 
 var (
-	errMaxGlobalEUILimitReached = errors.DefineInvalidArgument("global_eui_limit_reached", "global eui limit from address block reached")
-	errAppDevEUILimitReached    = errors.DefineInvalidArgument("application_dev_eui_limit_reached", "application issued DevEUI limit ({dev_eui_limit}) reached")
+	errMaxGlobalEUILimitReached = errors.DefineInvalidArgument(
+		"global_eui_limit_reached",
+		"global eui limit from address block reached",
+	)
+	errAppDevEUILimitReached = errors.DefineInvalidArgument(
+		"application_dev_eui_limit_reached",
+		"application issued DevEUI limit ({dev_eui_limit}) reached",
+	)
 )
 
-func (s *euiStore) incrementApplicationDevEUICounter(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, applicationLimit int) error {
+func (s *euiStore) incrementApplicationDevEUICounter(
+	ctx context.Context, ids *ttnpb.ApplicationIdentifiers, applicationLimit int,
+) error {
 	var appModel Application
 	// Check if application exists.
 	query := s.query(ctx, Application{}, withApplicationID(ids.GetApplicationId()))
@@ -89,14 +97,19 @@ func (s *euiStore) issueDevEUIAddressFromBlock(ctx context.Context) (*types.EUI6
 	}
 	for {
 		// Atomically update valid block and return the values.
-		if err := s.query(ctx, EUIBlock{}).Raw(atomicReadAndUpdateDevEUI).Scan(&euiResult).Error; err != nil {
+		if err := s.query(ctx, EUIBlock{}).
+			Raw(atomicReadAndUpdateDevEUI).
+			Scan(&euiResult).
+			Error; err != nil {
 			return nil, err
 		}
 		if len(euiResult) == 0 {
 			return nil, errMaxGlobalEUILimitReached.New()
 		}
 		var devEUIResult types.EUI64
-		devEUIResult.UnmarshalNumber(euiResult[0].StartEui.toPB().MarshalNumber() | uint64(euiResult[0].CurrentCounter-1))
+		devEUIResult.UnmarshalNumber(
+			euiResult[0].StartEui.toPB().MarshalNumber() | uint64(euiResult[0].CurrentCounter-1),
+		)
 		deviceQuery := s.query(ctx, EndDevice{}).Where(EndDevice{
 			DevEUI: eui(&devEUIResult),
 		})
@@ -111,7 +124,9 @@ func (s *euiStore) issueDevEUIAddressFromBlock(ctx context.Context) (*types.EUI6
 }
 
 // CreateUIBlock creates the block of appropriate type in IS db.
-func (s *euiStore) CreateEUIBlock(ctx context.Context, prefix types.EUI64Prefix, initCounter int64, euiType string) error {
+func (s *euiStore) CreateEUIBlock(
+	ctx context.Context, prefix types.EUI64Prefix, initCounter int64, euiType string,
+) error {
 	defer trace.StartRegion(ctx, "create eui block").End()
 	var block EUIBlock
 	if err := s.query(ctx, EUIBlock{}).
@@ -133,7 +148,9 @@ func (s *euiStore) CreateEUIBlock(ctx context.Context, prefix types.EUI64Prefix,
 }
 
 // IssueDevEUIForApplication issues DevEUI address from the configured DevEUI block.
-func (s *euiStore) IssueDevEUIForApplication(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, applicationLimit int) (*types.EUI64, error) {
+func (s *euiStore) IssueDevEUIForApplication(
+	ctx context.Context, ids *ttnpb.ApplicationIdentifiers, applicationLimit int,
+) (*types.EUI64, error) {
 	defer trace.StartRegion(ctx, "assign DevEUI address to application").End()
 	// Check if max DevEUI per application reached.
 	err := s.incrementApplicationDevEUICounter(ctx, ids, applicationLimit)

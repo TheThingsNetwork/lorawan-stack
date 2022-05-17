@@ -32,7 +32,9 @@ type oauthStore struct {
 	*baseStore
 }
 
-func (s *oauthStore) ListAuthorizations(ctx context.Context, userIDs *ttnpb.UserIdentifiers) ([]*ttnpb.OAuthClientAuthorization, error) {
+func (s *oauthStore) ListAuthorizations(
+	ctx context.Context, userIDs *ttnpb.UserIdentifiers,
+) ([]*ttnpb.OAuthClientAuthorization, error) {
 	defer trace.StartRegion(ctx, "list authorizations").End()
 	user, err := s.findEntity(ctx, userIDs, "id")
 	if err != nil {
@@ -42,7 +44,7 @@ func (s *oauthStore) ListAuthorizations(ctx context.Context, userIDs *ttnpb.User
 	query := s.query(ctx, ClientAuthorization{}).Where(ClientAuthorization{
 		UserID: user.PrimaryKey(),
 	})
-	query = query.Order(store.OrderFromContext(ctx, "client_authorizations", "created_at", "DESC"))
+	query = query.Order(store.OrderFromContext(ctx, "client_authorizations", createdAt, "DESC"))
 	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
 		var total uint64
 		query.Count(&total)
@@ -63,7 +65,9 @@ func (s *oauthStore) ListAuthorizations(ctx context.Context, userIDs *ttnpb.User
 	return authProtos, nil
 }
 
-func (s *oauthStore) GetAuthorization(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) (*ttnpb.OAuthClientAuthorization, error) {
+func (s *oauthStore) GetAuthorization(
+	ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers,
+) (*ttnpb.OAuthClientAuthorization, error) {
 	defer trace.StartRegion(ctx, "get authorization").End()
 	client, err := s.findEntity(ctx, clientIDs, "id")
 	if err != nil {
@@ -80,7 +84,10 @@ func (s *oauthStore) GetAuthorization(ctx context.Context, userIDs *ttnpb.UserId
 	}).First(&authModel).Error
 	if err != nil {
 		if gorm.IsRecordNotFoundError(err) {
-			return nil, errAuthorizationNotFound.WithAttributes("user_id", userIDs.GetUserId(), "client_id", clientIDs.ClientId)
+			return nil, errAuthorizationNotFound.WithAttributes(
+				"user_id", userIDs.GetUserId(),
+				"client_id", clientIDs.ClientId,
+			)
 		}
 		return nil, err
 	}
@@ -90,7 +97,9 @@ func (s *oauthStore) GetAuthorization(ctx context.Context, userIDs *ttnpb.UserId
 	return authProto, nil
 }
 
-func (s *oauthStore) Authorize(ctx context.Context, authorization *ttnpb.OAuthClientAuthorization) (*ttnpb.OAuthClientAuthorization, error) {
+func (s *oauthStore) Authorize(
+	ctx context.Context, authorization *ttnpb.OAuthClientAuthorization,
+) (*ttnpb.OAuthClientAuthorization, error) {
 	defer trace.StartRegion(ctx, "create or update authorization").End()
 	client, err := s.findEntity(ctx, authorization.ClientIds, "id")
 	if err != nil {
@@ -126,7 +135,9 @@ func (s *oauthStore) Authorize(ctx context.Context, authorization *ttnpb.OAuthCl
 	return authProto, nil
 }
 
-func (s *oauthStore) DeleteAuthorization(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) error {
+func (s *oauthStore) DeleteAuthorization(
+	ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers,
+) error {
 	defer trace.StartRegion(ctx, "delete authorization").End()
 	client, err := s.findEntity(ctx, clientIDs, "id")
 	if err != nil {
@@ -189,7 +200,9 @@ func (s *oauthStore) DeleteClientAuthorizations(ctx context.Context, clientIDs *
 	}).Delete(&AccessToken{}).Error
 }
 
-func (s *oauthStore) CreateAuthorizationCode(ctx context.Context, code *ttnpb.OAuthAuthorizationCode) (*ttnpb.OAuthAuthorizationCode, error) {
+func (s *oauthStore) CreateAuthorizationCode(
+	ctx context.Context, code *ttnpb.OAuthAuthorizationCode,
+) (*ttnpb.OAuthAuthorizationCode, error) {
 	defer trace.StartRegion(ctx, "create authorization code").End()
 	client, err := s.findEntity(ctx, code.ClientIds, "id")
 	if err != nil {
@@ -257,7 +270,9 @@ func (s *oauthStore) DeleteAuthorizationCode(ctx context.Context, code string) e
 	return nil
 }
 
-func (s *oauthStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAccessToken, previousID string) (*ttnpb.OAuthAccessToken, error) {
+func (s *oauthStore) CreateAccessToken(
+	ctx context.Context, token *ttnpb.OAuthAccessToken, previousID string,
+) (*ttnpb.OAuthAccessToken, error) {
 	defer trace.StartRegion(ctx, "create access token").End()
 	client, err := s.findEntity(ctx, token.ClientIds, "id")
 	if err != nil {
@@ -292,7 +307,9 @@ func (s *oauthStore) CreateAccessToken(ctx context.Context, token *ttnpb.OAuthAc
 	return tokenProto, nil
 }
 
-func (s *oauthStore) ListAccessTokens(ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers) ([]*ttnpb.OAuthAccessToken, error) {
+func (s *oauthStore) ListAccessTokens(
+	ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers,
+) ([]*ttnpb.OAuthAccessToken, error) {
 	defer trace.StartRegion(ctx, "list access tokens").End()
 	client, err := s.findEntity(ctx, clientIDs, "id")
 	if err != nil {
@@ -307,7 +324,7 @@ func (s *oauthStore) ListAccessTokens(ctx context.Context, userIDs *ttnpb.UserId
 		ClientID: client.PrimaryKey(),
 		UserID:   user.PrimaryKey(),
 	})
-	query = query.Order(store.OrderFromContext(ctx, "access_tokens", "created_at", "DESC"))
+	query = query.Order(store.OrderFromContext(ctx, "access_tokens", createdAt, "DESC"))
 	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
 		var total uint64
 		query.Count(&total)
@@ -341,7 +358,9 @@ func (s *oauthStore) GetAccessToken(ctx context.Context, id string) (*ttnpb.OAut
 	}
 	err := s.query(ctx, AccessToken{}).
 		Select(`"access_tokens".*, "accounts"."uid" AS "friendly_user_id", "clients"."client_id" AS "friendly_client_id"`).
-		Joins(`JOIN "accounts" ON "accounts"."account_type" = 'user' AND "accounts"."account_id" = "access_tokens"."user_id"`).
+		Joins(
+			`JOIN "accounts" ON "accounts"."account_type" = 'user' AND "accounts"."account_id" = "access_tokens"."user_id"`,
+		).
 		Joins(`JOIN "clients" ON "clients"."id" = "access_tokens"."client_id"`).
 		Where(AccessToken{TokenID: id}).Scan(&tokenModel).Error
 	if err != nil {

@@ -37,7 +37,7 @@ func (EntityContacts) Name() string {
 var entityContactsQuery string
 
 // Apply implements Migration.
-func (m EntityContacts) Apply(ctx context.Context, db *gorm.DB) error {
+func (EntityContacts) Apply(ctx context.Context, db *gorm.DB) error {
 	var (
 		sqlDB  = db.CommonDB()
 		res    sql.Result
@@ -90,6 +90,6 @@ func (m EntityContacts) Apply(ctx context.Context, db *gorm.DB) error {
 }
 
 // Rollback implements migration. For the EntityContacts migration this is a no-op.
-func (m EntityContacts) Rollback(ctx context.Context, db *gorm.DB) error {
+func (EntityContacts) Rollback(context.Context, *gorm.DB) error {
 	return nil
 }

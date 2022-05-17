@@ -21,11 +21,15 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func (s *baseStore) replaceEndDeviceLocations(ctx context.Context, endDeviceUUID string, old []EndDeviceLocation, new []EndDeviceLocation) error {
+func (s *baseStore) replaceEndDeviceLocations(
+	ctx context.Context, endDeviceUUID string, old []EndDeviceLocation, new []EndDeviceLocation,
+) error {
 	return replaceEndDeviceLocations(ctx, s.DB, endDeviceUUID, old, new)
 }
 
-func replaceEndDeviceLocations(ctx context.Context, db *gorm.DB, endDeviceUUID string, old []EndDeviceLocation, new []EndDeviceLocation) (err error) {
+func replaceEndDeviceLocations(
+	ctx context.Context, db *gorm.DB, endDeviceUUID string, old []EndDeviceLocation, new []EndDeviceLocation,
+) (err error) {
 	defer trace.StartRegion(ctx, "update end device locations").End()
 	oldByUUID := make(map[string]EndDeviceLocation, len(old))
 	for _, loc := range old {
@@ -56,12 +60,14 @@ func replaceEndDeviceLocations(ctx context.Context, db *gorm.DB, endDeviceUUID s
 		}
 	}
 	for _, loc := range toCreate {
+		loc := loc // shadow range variable.
 		loc.EndDeviceID = endDeviceUUID
 		if err = db.Save(&loc).Error; err != nil {
 			return err
 		}
 	}
 	for _, loc := range toUpdate {
+		loc := loc // shadow range variable.
 		if err = db.Save(&loc).Error; err != nil {
 			return err
 		}

@@ -72,7 +72,7 @@ func (a deviceLocations) updateFromMap(m map[string]*ttnpb.Location) deviceLocat
 			deleted:           true,
 		}
 	}
-	var updated []EndDeviceLocation
+	updated := make([]EndDeviceLocation, 0, len(m))
 	for k, v := range m {
 		if existing, ok := deviceLocations[k]; ok {
 			existing.deleted = false

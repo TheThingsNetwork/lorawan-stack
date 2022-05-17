@@ -53,9 +53,15 @@ func init() {
 
 // functions to set fields from the application model into the application proto.
 var applicationPBSetters = map[string]func(*ttnpb.Application, *Application){
-	nameField:        func(pb *ttnpb.Application, app *Application) { pb.Name = app.Name },
-	descriptionField: func(pb *ttnpb.Application, app *Application) { pb.Description = app.Description },
-	attributesField:  func(pb *ttnpb.Application, app *Application) { pb.Attributes = attributes(app.Attributes).toMap() },
+	nameField: func(pb *ttnpb.Application, app *Application) {
+		pb.Name = app.Name
+	},
+	descriptionField: func(pb *ttnpb.Application, app *Application) {
+		pb.Description = app.Description
+	},
+	attributesField: func(pb *ttnpb.Application, app *Application) {
+		pb.Attributes = attributes(app.Attributes).toMap()
+	},
 	administrativeContactField: func(pb *ttnpb.Application, app *Application) {
 		if app.AdministrativeContact != nil {
 			pb.AdministrativeContact = app.AdministrativeContact.OrganizationOrUserIdentifiers()
@@ -75,13 +81,19 @@ var applicationPBSetters = map[string]func(*ttnpb.Application, *Application){
 	joinServerAddressField: func(pb *ttnpb.Application, app *Application) {
 		pb.JoinServerAddress = app.JoinServerAddress
 	},
-	devEuiCounterField: func(pb *ttnpb.Application, app *Application) { pb.DevEuiCounter = uint32(app.DevEUICounter) },
+	devEuiCounterField: func(pb *ttnpb.Application, app *Application) {
+		pb.DevEuiCounter = uint32(app.DevEUICounter)
+	},
 }
 
 // functions to set fields from the application proto into the application model.
 var applicationModelSetters = map[string]func(*Application, *ttnpb.Application){
-	nameField:        func(app *Application, pb *ttnpb.Application) { app.Name = pb.Name },
-	descriptionField: func(app *Application, pb *ttnpb.Application) { app.Description = pb.Description },
+	nameField: func(app *Application, pb *ttnpb.Application) {
+		app.Name = pb.Name
+	},
+	descriptionField: func(app *Application, pb *ttnpb.Application) {
+		app.Description = pb.Description
+	},
 	attributesField: func(app *Application, pb *ttnpb.Application) {
 		app.Attributes = attributes(app.Attributes).updateFromMap(pb.Attributes)
 	},

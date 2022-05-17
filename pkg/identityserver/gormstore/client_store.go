@@ -45,7 +45,7 @@ func selectClientFields(ctx context.Context, query *gorm.DB, fieldMask store.Fie
 	var notFoundPaths []string
 	for _, path := range ttnpb.TopLevelFields(fieldMask) {
 		switch path {
-		case "ids", "created_at", "updated_at", "deleted_at":
+		case ids, createdAt, updatedAt, deletedAt:
 			// always selected
 		case attributesField:
 			query = query.Preload("Attributes")
@@ -66,7 +66,9 @@ func selectClientFields(ctx context.Context, query *gorm.DB, fieldMask store.Fie
 	if len(notFoundPaths) > 0 {
 		warning.Add(ctx, fmt.Sprintf("unsupported field mask paths: %s", strings.Join(notFoundPaths, ", ")))
 	}
-	return query.Select(cleanFields(append(append(modelColumns, "deleted_at", "client_id"), clientColumns...)...))
+	return query.Select(cleanFields(
+		mergeFields(modelColumns, clientColumns, []string{deletedAt, "client_id"})...,
+	))
 }
 
 func (s *clientStore) CreateClient(ctx context.Context, cli *ttnpb.Client) (*ttnpb.Client, error) {
@@ -92,7 +94,9 @@ func (s *clientStore) CreateClient(ctx context.Context, cli *ttnpb.Client) (*ttn
 	return &cliProto, nil
 }
 
-func (s *clientStore) FindClients(ctx context.Context, ids []*ttnpb.ClientIdentifiers, fieldMask store.FieldMask) ([]*ttnpb.Client, error) {
+func (s *clientStore) FindClients(
+	ctx context.Context, ids []*ttnpb.ClientIdentifiers, fieldMask store.FieldMask,
+) ([]*ttnpb.Client, error) {
 	defer trace.StartRegion(ctx, "find clients").End()
 	idStrings := make([]string, len(ids))
 	for i, id := range ids {
@@ -122,7 +126,9 @@ func (s *clientStore) FindClients(ctx context.Context, ids []*ttnpb.ClientIdenti
 	return cliProtos, nil
 }
 
-func (s *clientStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers, fieldMask store.FieldMask) (*ttnpb.Client, error) {
+func (s *clientStore) GetClient(
+	ctx context.Context, id *ttnpb.ClientIdentifiers, fieldMask store.FieldMask,
+) (*ttnpb.Client, error) {
 	defer trace.StartRegion(ctx, "get client").End()
 	query := s.query(ctx, Client{}, withClientID(id.GetClientId()))
 	query = selectClientFields(ctx, query, fieldMask)
@@ -138,7 +144,9 @@ func (s *clientStore) GetClient(ctx context.Context, id *ttnpb.ClientIdentifiers
 	return cliProto, nil
 }
 
-func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, fieldMask store.FieldMask) (updated *ttnpb.Client, err error) {
+func (s *clientStore) UpdateClient(
+	ctx context.Context, cli *ttnpb.Client, fieldMask store.FieldMask,
+) (updated *ttnpb.Client, err error) {
 	defer trace.StartRegion(ctx, "update client").End()
 	query := s.query(ctx, Client{}, withClientID(cli.GetIds().GetClientId()))
 	query = selectClientFields(ctx, query, fieldMask)
@@ -149,7 +157,7 @@ func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, field
 		}
 		return nil, err
 	}
-	if err := ctx.Err(); err != nil { // Early exit if context canceled
+	if err = ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}
 	oldAttributes := cliModel.Attributes
@@ -166,7 +174,7 @@ func (s *clientStore) UpdateClient(ctx context.Context, cli *ttnpb.Client, field
 		return nil, err
 	}
 	if !reflect.DeepEqual(oldAttributes, cliModel.Attributes) {
-		if err = s.replaceAttributes(ctx, "client", cliModel.ID, oldAttributes, cliModel.Attributes); err != nil {
+		if err = s.replaceAttributes(ctx, client, cliModel.ID, oldAttributes, cliModel.Attributes); err != nil {
 			return nil, err
 		}
 	}
@@ -198,7 +206,7 @@ func (s *clientStore) PurgeClient(ctx context.Context, id *ttnpb.ClientIdentifie
 	}
 	// delete client attributes before purging
 	if len(cliModel.Attributes) > 0 {
-		if err := s.replaceAttributes(ctx, "gateway", cliModel.ID, cliModel.Attributes, nil); err != nil {
+		if err := s.replaceAttributes(ctx, gateway, cliModel.ID, cliModel.Attributes, nil); err != nil {
 			return err
 		}
 	}

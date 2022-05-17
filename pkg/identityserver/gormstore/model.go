@@ -56,4 +56,4 @@ type Model struct {
 // PrimaryKey returns the primary key of the model.
 func (m Model) PrimaryKey() string { return m.ID }
 
-var modelColumns = []string{"id", "created_at", "updated_at"}
+var modelColumns = []string{"id", createdAt, updatedAt}

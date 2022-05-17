@@ -52,12 +52,14 @@ func ftsQuery(query *gorm.DB, field string) string {
 	return fmt.Sprintf("%s ILIKE '%%' || ? || '%%'", field)
 }
 
-func (s *entitySearch) queryMetaFields(ctx context.Context, query *gorm.DB, entityType string, req metaFields) *gorm.DB {
+func (s *entitySearch) queryMetaFields(
+	ctx context.Context, query *gorm.DB, entityType string, req metaFields,
+) *gorm.DB {
 	if v := req.GetIdContains(); v != "" {
 		switch entityType {
-		case "organization", "user":
+		case organization, user:
 			query = query.Where(`"accounts"."uid" ILIKE ?`, likePattern(v))
-		case "end_device":
+		case endDevice:
 			query = query.Where(`"end_devices"."device_id" ILIKE ?`, likePattern(v))
 		default:
 			query = query.Where(fmt.Sprintf(`"%[1]ss"."%[1]s_id" ILIKE ?`, entityType), likePattern(v))
@@ -72,7 +74,7 @@ func (s *entitySearch) queryMetaFields(ctx context.Context, query *gorm.DB, enti
 	if kv := req.GetAttributesContain(); len(kv) > 0 {
 		sub := s.query(ctx, &Attribute{}).Select("entity_id")
 		switch entityType {
-		case "end_device":
+		case endDevice:
 			sub = sub.Where("entity_type = ?", "device")
 		default:
 			sub = sub.Where("entity_type = ?", entityType)
@@ -85,13 +87,21 @@ func (s *entitySearch) queryMetaFields(ctx context.Context, query *gorm.DB, enti
 	return query
 }
 
-func (s *entitySearch) queryMembership(ctx context.Context, query *gorm.DB, entityType string, member *ttnpb.OrganizationOrUserIdentifiers) *gorm.DB {
+func (s *entitySearch) queryMembership(
+	ctx context.Context, query *gorm.DB, entityType string, member *ttnpb.OrganizationOrUserIdentifiers,
+) *gorm.DB {
 	if member == nil {
 		return query
 	}
-	membershipsQuery := (&membershipStore{baseStore: s.baseStore}).queryMemberships(ctx, member, entityType, nil, true).Select(`"direct_memberships"."entity_id"`).QueryExpr()
-	if entityType == "organization" {
-		query = query.Where(`"accounts"."account_type" = ? AND "accounts"."account_id" IN (?)`, entityType, membershipsQuery)
+	membershipsQuery := (&membershipStore{baseStore: s.baseStore}).
+		queryMemberships(ctx, member, entityType, nil, true).
+		Select(`"direct_memberships"."entity_id"`).
+		QueryExpr()
+	if entityType == organization {
+		query = query.Where(
+			`"accounts"."account_type" = ? AND "accounts"."account_id" IN (?)`,
+			entityType, membershipsQuery,
+		)
 	} else {
 		query = query.Where(fmt.Sprintf(`"%[1]ss"."id" IN (?)`, entityType), membershipsQuery)
 	}
@@ -102,7 +112,9 @@ type searchResult struct {
 	FriendlyID string
 }
 
-func (s *entitySearch) runPaginatedQuery(ctx context.Context, query *gorm.DB, entityType string) ([]searchResult, error) {
+func (*entitySearch) runPaginatedQuery(
+	ctx context.Context, query *gorm.DB, entityType string,
+) ([]searchResult, error) {
 	query = query.Order(store.OrderFromContext(ctx, fmt.Sprintf("%ss", entityType), "friendly_id", "ASC"))
 	page := query
 	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
@@ -122,9 +134,9 @@ func (s *entitySearch) runPaginatedQuery(ctx context.Context, query *gorm.DB, en
 	return results, nil
 }
 
-const application = "application"
-
-func (s *entitySearch) SearchApplications(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchApplicationsRequest) ([]*ttnpb.ApplicationIdentifiers, error) {
+func (s *entitySearch) SearchApplications(
+	ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchApplicationsRequest,
+) ([]*ttnpb.ApplicationIdentifiers, error) {
 	defer trace.StartRegion(ctx, "find applications").End()
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
@@ -133,7 +145,10 @@ func (s *entitySearch) SearchApplications(ctx context.Context, member *ttnpb.Org
 	query = query.Select(`"application_id" AS "friendly_id"`)
 	query = s.queryMembership(ctx, query, application, member)
 	if q := req.GetQuery(); q != "" {
-		query = query.Where(`"application_id" ILIKE ? OR "name" ILIKE ? OR `+ftsQuery(query, "description"), likePattern(q), likePattern(q), q)
+		query = query.Where(
+			`"application_id" ILIKE ? OR "name" ILIKE ? OR `+ftsQuery(query, "description"),
+			likePattern(q), likePattern(q), q,
+		)
 	}
 	query = s.queryMetaFields(ctx, query, application, req)
 	results, err := s.runPaginatedQuery(ctx, query, application)
@@ -147,9 +162,9 @@ func (s *entitySearch) SearchApplications(ctx context.Context, member *ttnpb.Org
 	return identifiers, nil
 }
 
-const client = "client"
-
-func (s *entitySearch) SearchClients(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchClientsRequest) ([]*ttnpb.ClientIdentifiers, error) {
+func (s *entitySearch) SearchClients(
+	ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchClientsRequest,
+) ([]*ttnpb.ClientIdentifiers, error) {
 	defer trace.StartRegion(ctx, "find clients").End()
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
@@ -158,7 +173,10 @@ func (s *entitySearch) SearchClients(ctx context.Context, member *ttnpb.Organiza
 	query = query.Select(`"client_id" AS "friendly_id"`)
 	query = s.queryMembership(ctx, query, client, member)
 	if q := req.GetQuery(); q != "" {
-		query = query.Where(`"client_id" ILIKE ? OR "name" ILIKE ? OR `+ftsQuery(query, "description"), likePattern(q), likePattern(q), q)
+		query = query.Where(
+			`"client_id" ILIKE ? OR "name" ILIKE ? OR `+ftsQuery(query, "description"),
+			likePattern(q), likePattern(q), q,
+		)
 	}
 	query = s.queryMetaFields(ctx, query, client, req)
 	if len(req.State) > 0 {
@@ -179,9 +197,9 @@ func (s *entitySearch) SearchClients(ctx context.Context, member *ttnpb.Organiza
 	return identifiers, nil
 }
 
-const gateway = "gateway"
-
-func (s *entitySearch) SearchGateways(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchGatewaysRequest) ([]*ttnpb.GatewayIdentifiers, error) {
+func (s *entitySearch) SearchGateways(
+	ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchGatewaysRequest,
+) ([]*ttnpb.GatewayIdentifiers, error) {
 	defer trace.StartRegion(ctx, "find gateways").End()
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
@@ -190,7 +208,10 @@ func (s *entitySearch) SearchGateways(ctx context.Context, member *ttnpb.Organiz
 	query = query.Select(`"gateway_id" AS "friendly_id"`)
 	query = s.queryMembership(ctx, query, gateway, member)
 	if q := req.GetQuery(); q != "" {
-		query = query.Where(`"gateway_id" ILIKE ? OR "gateway_eui" ILIKE ? OR "name" ILIKE ? OR `+ftsQuery(query, "description"), likePattern(q), likePattern(q), likePattern(q), q)
+		query = query.Where(
+			`"gateway_id" ILIKE ? OR "gateway_eui" ILIKE ? OR "name" ILIKE ? OR `+ftsQuery(query, "description"),
+			likePattern(q), likePattern(q), likePattern(q), q,
+		)
 	}
 	query = s.queryMetaFields(ctx, query, gateway, req)
 	if v := req.EuiContains; v != "" {
@@ -207,20 +228,23 @@ func (s *entitySearch) SearchGateways(ctx context.Context, member *ttnpb.Organiz
 	return identifiers, nil
 }
 
-const organization = "organization"
-
-func (s *entitySearch) SearchOrganizations(ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchOrganizationsRequest) ([]*ttnpb.OrganizationIdentifiers, error) {
+func (s *entitySearch) SearchOrganizations(
+	ctx context.Context, member *ttnpb.OrganizationOrUserIdentifiers, req *ttnpb.SearchOrganizationsRequest,
+) ([]*ttnpb.OrganizationIdentifiers, error) {
 	defer trace.StartRegion(ctx, "find organizations").End()
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
 	}
 	query := s.query(ctx, &Organization{})
 	query = query.
-		Joins(`JOIN "accounts" ON "accounts"."account_type" = 'organization' AND "accounts"."account_id" = "organizations"."id"`).
+		Joins(`JOIN "accounts" ON "accounts"."account_type" = 'organization' AND "accounts"."account_id" = "organizations"."id"`). //nolint:lll
 		Select(`"accounts"."uid" AS "friendly_id"`)
 	query = s.queryMembership(ctx, query, organization, member)
 	if q := req.GetQuery(); q != "" {
-		query = query.Where(`"accounts"."uid" ILIKE ? OR "name" ILIKE ? OR `+ftsQuery(query, "description"), likePattern(q), likePattern(q), q)
+		query = query.Where(
+			`"accounts"."uid" ILIKE ? OR "name" ILIKE ? OR `+ftsQuery(query, "description"),
+			likePattern(q), likePattern(q), q,
+		)
 	}
 	query = s.queryMetaFields(ctx, query, organization, req)
 	results, err := s.runPaginatedQuery(ctx, query, organization)
@@ -234,9 +258,9 @@ func (s *entitySearch) SearchOrganizations(ctx context.Context, member *ttnpb.Or
 	return identifiers, nil
 }
 
-const user = "user"
-
-func (s *entitySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUsersRequest) ([]*ttnpb.UserIdentifiers, error) {
+func (s *entitySearch) SearchUsers(
+	ctx context.Context, req *ttnpb.SearchUsersRequest,
+) ([]*ttnpb.UserIdentifiers, error) {
 	defer trace.StartRegion(ctx, "find users").End()
 	if req.Deleted {
 		ctx = store.WithSoftDeleted(ctx, true)
@@ -247,7 +271,10 @@ func (s *entitySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUsersRe
 		Select(`"accounts"."uid" AS "friendly_id"`)
 	if q := req.GetQuery(); q != "" {
 		q = likePattern(q)
-		query = query.Where(`"accounts"."uid" ILIKE ? OR "name" ILIKE ? OR `+ftsQuery(query, "description"), likePattern(q), likePattern(q), q)
+		query = query.Where(
+			`"accounts"."uid" ILIKE ? OR "name" ILIKE ? OR `+ftsQuery(query, "description"),
+			likePattern(q), likePattern(q), q,
+		)
 	}
 	query = s.queryMetaFields(ctx, query, user, req)
 	if len(req.State) > 0 {
@@ -268,7 +295,9 @@ func (s *entitySearch) SearchUsers(ctx context.Context, req *ttnpb.SearchUsersRe
 	return identifiers, nil
 }
 
-func (s *entitySearch) SearchEndDevices(ctx context.Context, req *ttnpb.SearchEndDevicesRequest) ([]*ttnpb.EndDeviceIdentifiers, error) {
+func (s *entitySearch) SearchEndDevices(
+	ctx context.Context, req *ttnpb.SearchEndDevicesRequest,
+) ([]*ttnpb.EndDeviceIdentifiers, error) {
 	defer trace.StartRegion(ctx, "find end devices").End()
 
 	query := s.query(ctx, &EndDevice{}).
@@ -276,10 +305,13 @@ func (s *entitySearch) SearchEndDevices(ctx context.Context, req *ttnpb.SearchEn
 		Select(`"device_id" AS "friendly_id"`)
 
 	if q := req.GetQuery(); q != "" {
-		query = query.Where(`"device_id" ILIKE ? OR "dev_eui" ILIKE ? OR "join_eui" ILIKE ? OR "name" ILIKE ? OR `+ftsQuery(query, "description"), likePattern(q), likePattern(q), likePattern(q), likePattern(q), q)
+		query = query.Where(
+			`"device_id" ILIKE ? OR "dev_eui" ILIKE ? OR "join_eui" ILIKE ? OR "name" ILIKE ? OR `+ftsQuery(query, "description"), //nolint:lll
+			likePattern(q), likePattern(q), likePattern(q), likePattern(q), q,
+		)
 	}
 
-	query = s.queryMetaFields(ctx, query, "end_device", req)
+	query = s.queryMetaFields(ctx, query, endDevice, req)
 
 	if v := req.DevEuiContains; v != "" {
 		query = query.Where("dev_eui ILIKE ?", likePattern(v))
@@ -300,7 +332,8 @@ func (s *entitySearch) SearchEndDevices(ctx context.Context, req *ttnpb.SearchEn
 	if err := page.Scan(&results).Error; err != nil {
 		return nil, err
 	}
-	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 && (offset > 0 || len(results) == int(limit)) {
+	limit, offset := store.LimitAndOffsetFromContext(ctx)
+	if limit != 0 && (offset > 0 || len(results) == int(limit)) {
 		var total uint64
 		query.Count(&total)
 		store.SetTotal(ctx, total)
@@ -310,8 +343,10 @@ func (s *entitySearch) SearchEndDevices(ctx context.Context, req *ttnpb.SearchEn
 	identifiers := make([]*ttnpb.EndDeviceIdentifiers, len(results))
 	for i, result := range results {
 		identifiers[i] = &ttnpb.EndDeviceIdentifiers{
-			ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: req.GetApplicationIds().GetApplicationId()},
-			DeviceId:       result.FriendlyID,
+			ApplicationIds: &ttnpb.ApplicationIdentifiers{
+				ApplicationId: req.GetApplicationIds().GetApplicationId(),
+			},
+			DeviceId: result.FriendlyID,
 		}
 	}
 	return identifiers, nil

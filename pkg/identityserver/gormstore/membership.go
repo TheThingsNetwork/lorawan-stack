@@ -42,14 +42,18 @@ type polymorphicEntity struct {
 	EntityType string
 }
 
-func (s *baseStore) findIdentifiers(entities ...polymorphicEntity) (map[polymorphicEntity]*ttnpb.EntityIdentifiers, error) {
+func (s *baseStore) findIdentifiers(
+	entities ...polymorphicEntity,
+) (map[polymorphicEntity]*ttnpb.EntityIdentifiers, error) {
 	return findIdentifiers(s.DB, entities...)
 }
 
-func findIdentifiers(db *gorm.DB, entities ...polymorphicEntity) (map[polymorphicEntity]*ttnpb.EntityIdentifiers, error) {
+func findIdentifiers(
+	db *gorm.DB, entities ...polymorphicEntity,
+) (map[polymorphicEntity]*ttnpb.EntityIdentifiers, error) {
 	var err error
 	identifiers := make(map[polymorphicEntity]*ttnpb.EntityIdentifiers, len(entities))
-	for _, entityType := range []string{"application", "client", "gateway", "organization", "user"} {
+	for _, entityType := range []string{application, client, gateway, organization, user} {
 		uuids := make([]string, 0, len(entities))
 		for _, entity := range entities {
 			if entity.EntityType != entityType {
@@ -64,13 +68,14 @@ func findIdentifiers(db *gorm.DB, entities ...polymorphicEntity) (map[polymorphi
 			UUID       string
 			FriendlyID string
 		}
-		if entityType == "organization" || entityType == "user" {
+		if entityType == organization || entityType == user {
 			err = db.Table("accounts").Select("account_id AS uuid, uid AS friendly_id").
 				Where("account_type = ?", entityType).
 				Where("account_id in (?)", uuids).
 				Scan(&results).Error
 		} else {
-			err = db.Table(fmt.Sprintf("%ss", entityType)).Select(fmt.Sprintf("id as uuid, %s_id as friendly_id", entityType)).
+			err = db.Table(fmt.Sprintf("%ss", entityType)).
+				Select(fmt.Sprintf("id as uuid, %s_id as friendly_id", entityType)).
 				Where("id in (?)", uuids).Scan(&results).Error
 		}
 		if err != nil {
@@ -86,11 +91,11 @@ func findIdentifiers(db *gorm.DB, entities ...polymorphicEntity) (map[polymorphi
 
 func buildIdentifiers(entityType, id string) *ttnpb.EntityIdentifiers {
 	switch entityType {
-	case "application":
+	case application:
 		return (&ttnpb.ApplicationIdentifiers{ApplicationId: id}).GetEntityIdentifiers()
-	case "client":
+	case client:
 		return (&ttnpb.ClientIdentifiers{ClientId: id}).GetEntityIdentifiers()
-	case "end_device", "end device":
+	case endDevice, "end device":
 		parts := strings.SplitN(id, ".", 2)
 		return (&ttnpb.EndDeviceIdentifiers{
 			ApplicationIds: &ttnpb.ApplicationIdentifiers{
@@ -98,11 +103,11 @@ func buildIdentifiers(entityType, id string) *ttnpb.EntityIdentifiers {
 			},
 			DeviceId: parts[1],
 		}).GetEntityIdentifiers()
-	case "gateway":
+	case gateway:
 		return (&ttnpb.GatewayIdentifiers{GatewayId: id}).GetEntityIdentifiers()
-	case "organization":
+	case organization:
 		return (&ttnpb.OrganizationIdentifiers{OrganizationId: id}).GetEntityIdentifiers()
-	case "user":
+	case user:
 		return (&ttnpb.UserIdentifiers{UserId: id}).GetEntityIdentifiers()
 	default:
 		panic(fmt.Sprintf("can't build identifiers for entity type %q", entityType))

@@ -34,7 +34,9 @@ type loginTokenStore struct {
 	*baseStore
 }
 
-func (s *loginTokenStore) FindActiveLoginTokens(ctx context.Context, userIDs *ttnpb.UserIdentifiers) ([]*ttnpb.LoginToken, error) {
+func (s *loginTokenStore) FindActiveLoginTokens(
+	ctx context.Context, userIDs *ttnpb.UserIdentifiers,
+) ([]*ttnpb.LoginToken, error) {
 	defer trace.StartRegion(ctx, "find active login tokens").End()
 	user, err := s.findEntity(ctx, userIDs, "id")
 	if err != nil {
@@ -58,7 +60,9 @@ func (s *loginTokenStore) FindActiveLoginTokens(ctx context.Context, userIDs *tt
 	return loginTokenProtos, nil
 }
 
-func (s *loginTokenStore) CreateLoginToken(ctx context.Context, loginToken *ttnpb.LoginToken) (*ttnpb.LoginToken, error) {
+func (s *loginTokenStore) CreateLoginToken(
+	ctx context.Context, loginToken *ttnpb.LoginToken,
+) (*ttnpb.LoginToken, error) {
 	defer trace.StartRegion(ctx, "create login token").End()
 	user, err := s.findEntity(ctx, loginToken.GetUserIds(), "id")
 	if err != nil {
@@ -86,7 +90,11 @@ var (
 func (s *loginTokenStore) ConsumeLoginToken(ctx context.Context, token string) (*ttnpb.LoginToken, error) {
 	defer trace.StartRegion(ctx, "consume login token").End()
 	var loginTokenModel LoginToken
-	if err := s.query(ctx, LoginToken{}).Where(LoginToken{Token: token}).Preload("User.Account").First(&loginTokenModel).Error; err != nil {
+	if err := s.query(ctx, LoginToken{}).
+		Where(LoginToken{Token: token}).
+		Preload("User.Account").
+		First(&loginTokenModel).
+		Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errLoginTokenNotFound.New()
 		}

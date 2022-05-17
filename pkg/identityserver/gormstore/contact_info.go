@@ -55,7 +55,8 @@ func (c *ContactInfo) fromPB(pb *ttnpb.ContactInfo) {
 	c.ContactMethod = int(pb.ContactMethod)
 	c.Value = pb.Value
 	c.Public = pb.Public
-	if validatedAt := ttnpb.StdTime(pb.ValidatedAt); c.ValidatedAt == nil || (validatedAt != nil && validatedAt.After(*c.ValidatedAt)) {
+	if validatedAt := ttnpb.StdTime(pb.ValidatedAt); c.ValidatedAt == nil ||
+		(validatedAt != nil && validatedAt.After(*c.ValidatedAt)) {
 		c.ValidatedAt = cleanTimePtr(validatedAt)
 	}
 }

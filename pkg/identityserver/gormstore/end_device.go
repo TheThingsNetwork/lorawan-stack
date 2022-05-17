@@ -25,7 +25,7 @@ import (
 type EndDevice struct {
 	Model
 
-	ApplicationID string `gorm:"unique_index:end_device_id_index;type:VARCHAR(36);not null;index:end_device_application_index"`
+	ApplicationID string `gorm:"unique_index:end_device_id_index;type:VARCHAR(36);not null;index:end_device_application_index"` //nolint:lll
 	Application   *Application
 
 	// BEGIN common fields
@@ -35,8 +35,8 @@ type EndDevice struct {
 	Attributes  []Attribute `gorm:"polymorphic:Entity;polymorphic_value:device"`
 	// END common fields
 
-	JoinEUI *EUI64 `gorm:"unique_index:end_device_eui_index;index:end_device_join_eui_index;type:VARCHAR(16);column:join_eui"`
-	DevEUI  *EUI64 `gorm:"unique_index:end_device_eui_index;index:end_device_dev_eui_index;type:VARCHAR(16);column:dev_eui"`
+	JoinEUI *EUI64 `gorm:"unique_index:end_device_eui_index;index:end_device_join_eui_index;type:VARCHAR(16);column:join_eui"` //nolint:lll
+	DevEUI  *EUI64 `gorm:"unique_index:end_device_eui_index;index:end_device_dev_eui_index;type:VARCHAR(16);column:dev_eui"`   //nolint:lll
 
 	BrandID         string `gorm:"type:VARCHAR"`
 	ModelID         string `gorm:"type:VARCHAR"`
@@ -84,9 +84,15 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 		}
 		pb.Ids.DevEui = dev.DevEUI.toPB()
 	},
-	nameField:        func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.Name = dev.Name },
-	descriptionField: func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.Description = dev.Description },
-	attributesField:  func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.Attributes = attributes(dev.Attributes).toMap() },
+	nameField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		pb.Name = dev.Name
+	},
+	descriptionField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		pb.Description = dev.Description
+	},
+	attributesField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		pb.Attributes = attributes(dev.Attributes).toMap()
+	},
 	versionIDsField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		pb.VersionIds = &ttnpb.EndDeviceVersionIdentifiers{
 			BrandId:         dev.BrandID,
@@ -111,11 +117,21 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 	bandIDField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		mustEndDeviceVersionIDs(pb).BandId = dev.BandID
 	},
-	networkServerAddressField:     func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.NetworkServerAddress = dev.NetworkServerAddress },
-	applicationServerAddressField: func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.ApplicationServerAddress = dev.ApplicationServerAddress },
-	joinServerAddressField:        func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.JoinServerAddress = dev.JoinServerAddress },
-	serviceProfileIDField:         func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.ServiceProfileId = dev.ServiceProfileID },
-	locationsField:                func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.Locations = deviceLocations(dev.Locations).toMap() },
+	networkServerAddressField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		pb.NetworkServerAddress = dev.NetworkServerAddress
+	},
+	applicationServerAddressField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		pb.ApplicationServerAddress = dev.ApplicationServerAddress
+	},
+	joinServerAddressField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		pb.JoinServerAddress = dev.JoinServerAddress
+	},
+	serviceProfileIDField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		pb.ServiceProfileId = dev.ServiceProfileID
+	},
+	locationsField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		pb.Locations = deviceLocations(dev.Locations).toMap()
+	},
 	pictureField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
 		if dev.Picture == nil {
 			pb.Picture = nil
@@ -123,16 +139,28 @@ var devicePBSetters = map[string]func(*ttnpb.EndDevice, *EndDevice){
 			pb.Picture = dev.Picture.toPB()
 		}
 	},
-	activatedAtField: func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.ActivatedAt = ttnpb.ProtoTime(dev.ActivatedAt) },
-	lastSeenAtField:  func(pb *ttnpb.EndDevice, dev *EndDevice) { pb.LastSeenAt = ttnpb.ProtoTime(dev.LastSeenAt) },
+	activatedAtField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		pb.ActivatedAt = ttnpb.ProtoTime(dev.ActivatedAt)
+	},
+	lastSeenAtField: func(pb *ttnpb.EndDevice, dev *EndDevice) {
+		pb.LastSeenAt = ttnpb.ProtoTime(dev.LastSeenAt)
+	},
 }
 
 // functions to set fields from the device proto into the device model.
 var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
-	"ids.join_eui":   func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.JoinEUI = eui(pb.Ids.JoinEui) },
-	"ids.dev_eui":    func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.DevEUI = eui(pb.Ids.DevEui) },
-	nameField:        func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.Name = pb.Name },
-	descriptionField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.Description = pb.Description },
+	"ids.join_eui": func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		dev.JoinEUI = eui(pb.Ids.JoinEui)
+	},
+	"ids.dev_eui": func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		dev.DevEUI = eui(pb.Ids.DevEui)
+	},
+	nameField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		dev.Name = pb.Name
+	},
+	descriptionField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		dev.Description = pb.Description
+	},
 	attributesField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.Attributes = attributes(dev.Attributes).updateFromMap(pb.Attributes)
 	},
@@ -143,19 +171,33 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 		dev.FirmwareVersion = pb.GetVersionIds().GetFirmwareVersion()
 		dev.BandID = pb.GetVersionIds().GetBandId()
 	},
-	brandIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.BrandID = pb.GetVersionIds().GetBrandId() },
-	modelIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.ModelID = pb.GetVersionIds().GetModelId() },
+	brandIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		dev.BrandID = pb.GetVersionIds().GetBrandId()
+	},
+	modelIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		dev.ModelID = pb.GetVersionIds().GetModelId()
+	},
 	hardwareVersionField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.HardwareVersion = pb.GetVersionIds().GetHardwareVersion()
 	},
 	firmwareVersionField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.FirmwareVersion = pb.GetVersionIds().GetFirmwareVersion()
 	},
-	bandIDField:                   func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.BandID = pb.GetVersionIds().GetBandId() },
-	networkServerAddressField:     func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.NetworkServerAddress = pb.NetworkServerAddress },
-	applicationServerAddressField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.ApplicationServerAddress = pb.ApplicationServerAddress },
-	joinServerAddressField:        func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.JoinServerAddress = pb.JoinServerAddress },
-	serviceProfileIDField:         func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.ServiceProfileID = pb.ServiceProfileId },
+	bandIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		dev.BandID = pb.GetVersionIds().GetBandId()
+	},
+	networkServerAddressField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		dev.NetworkServerAddress = pb.NetworkServerAddress
+	},
+	applicationServerAddressField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		dev.ApplicationServerAddress = pb.ApplicationServerAddress
+	},
+	joinServerAddressField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		dev.JoinServerAddress = pb.JoinServerAddress
+	},
+	serviceProfileIDField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		dev.ServiceProfileID = pb.ServiceProfileId
+	},
 	locationsField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
 		dev.Locations = deviceLocations(dev.Locations).updateFromMap(pb.Locations)
 	},
@@ -166,8 +208,12 @@ var deviceModelSetters = map[string]func(*EndDevice, *ttnpb.EndDevice){
 			dev.Picture.fromPB(pb.Picture)
 		}
 	},
-	activatedAtField: func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.ActivatedAt = ttnpb.StdTime(pb.ActivatedAt) },
-	lastSeenAtField:  func(dev *EndDevice, pb *ttnpb.EndDevice) { dev.LastSeenAt = ttnpb.StdTime(pb.LastSeenAt) },
+	activatedAtField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		dev.ActivatedAt = ttnpb.StdTime(pb.ActivatedAt)
+	},
+	lastSeenAtField: func(dev *EndDevice, pb *ttnpb.EndDevice) {
+		dev.LastSeenAt = ttnpb.StdTime(pb.LastSeenAt)
+	},
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
