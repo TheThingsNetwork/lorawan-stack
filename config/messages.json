@@ -5039,13 +5039,13 @@
       "file": "gatewayserver.go"
     }
   },
-  "error:pkg/identityserver/blacklist:blacklisted_id": {
+  "error:pkg/identityserver/blocklist:forbidden_id": {
     "translations": {
       "en": "the ID `{id}` can not be registered"
     },
     "description": {
-      "package": "pkg/identityserver/blacklist",
-      "file": "blacklist.go"
+      "package": "pkg/identityserver/blocklist",
+      "file": "blocklist.go"
     }
   },
   "error:pkg/identityserver/gormstore:access_token_not_found": {
