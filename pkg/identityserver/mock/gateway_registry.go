@@ -21,6 +21,7 @@ import (
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc/metadata"
@@ -136,7 +137,7 @@ func (is *mockISGatewayRegistry) GetIdentifiersForEUI(ctx context.Context, req *
 	if is.registeredGateway == nil {
 		return nil, errNotFound.New()
 	}
-	if req.Eui.Equal(*is.registeredGateway.Eui) {
+	if types.MustEUI64(req.Eui).OrZero().Equal(*is.registeredGateway.Eui) {
 		return is.registeredGateway, nil
 	}
 	return nil, errNotFound.New()

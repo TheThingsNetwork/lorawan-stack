@@ -215,7 +215,7 @@ var (
 
 			if gtwID.GatewayId == "" && gtwID.Eui != nil {
 				gtwID, err = cli.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-					Eui: gtwID.Eui,
+					Eui: gtwID.Eui.Bytes(),
 				})
 				if err != nil {
 					return err

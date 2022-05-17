@@ -73,17 +73,17 @@ func TestUpstream(t *testing.T) {
 	a.So(errors.IsUnauthenticated(err), should.BeTrue)
 
 	resp, err := upstream.GetInfoByJoinEUI(ctx, &ttnpb.GetInfoByJoinEUIRequest{
-		JoinEui: unsupportedJoinEUI,
+		JoinEui: unsupportedJoinEUI.Bytes(),
 	})
 	a.So(err, should.BeNil)
 	a.So(resp.SupportsClaiming, should.BeFalse)
 
 	// Valid JoinEUI.
 	inf, err := upstream.GetInfoByJoinEUI(ctx, &ttnpb.GetInfoByJoinEUIRequest{
-		JoinEui: supportedJoinEUI,
+		JoinEui: supportedJoinEUI.Bytes(),
 	})
 	a.So(err, should.BeNil)
-	a.So(inf.JoinEui, should.Resemble, supportedJoinEUI)
+	a.So(inf.JoinEui, should.Resemble, supportedJoinEUI.Bytes())
 	a.So(inf.SupportsClaiming, should.BeTrue)
 
 	err = upstream.Claim(ctx, *supportedJoinEUI, types.EUI64{0x00, 0x04, 0xA3, 0x0B, 0x00, 0x1C, 0x05, 0x30}, "secret")

@@ -200,9 +200,10 @@ func (upstream *Upstream) Unclaim(ctx context.Context, in *ttnpb.EndDeviceIdenti
 
 // GetInfoByJoinEUI implements EndDeviceClaimingServer.
 func (upstream *Upstream) GetInfoByJoinEUI(ctx context.Context, in *ttnpb.GetInfoByJoinEUIRequest) (*ttnpb.GetInfoByJoinEUIResponse, error) {
-	claimer := upstream.joinEUIClaimer(ctx, *in.JoinEui)
+	joinEUI := types.MustEUI64(in.JoinEui).OrZero()
+	claimer := upstream.joinEUIClaimer(ctx, joinEUI)
 	return &ttnpb.GetInfoByJoinEUIResponse{
-		JoinEui:          in.JoinEui,
+		JoinEui:          joinEUI.Bytes(),
 		SupportsClaiming: (claimer != nil),
 	}, nil
 }

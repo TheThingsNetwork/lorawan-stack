@@ -280,22 +280,27 @@ func (client *TTJS) GetClaimStatus(ctx context.Context, ids *ttnpb.EndDeviceIden
 			claimData claimData
 			ret       = ttnpb.GetClaimStatusResponse{
 				EndDeviceIds: ids,
-				HomeNetId:    &types.NetID{},
-				HomeNsId:     &types.EUI64{},
 			}
+			homeNSID  types.EUI64
+			homeNetID types.NetID
 		)
 		err = json.Unmarshal(respBody, &claimData)
 		if err != nil {
 			return nil, err
 		}
-		err = ret.HomeNetId.UnmarshalText([]byte(claimData.HomeNetID))
+
+		err = homeNetID.UnmarshalText([]byte(claimData.HomeNetID))
 		if err != nil {
 			return nil, err
 		}
-		err = ret.HomeNsId.UnmarshalText([]byte(claimData.HomeNSID))
+		ret.HomeNetId = homeNetID.Bytes()
+
+		err = homeNSID.UnmarshalText([]byte(claimData.HomeNSID))
 		if err != nil {
 			return nil, err
 		}
+		ret.HomeNsId = homeNSID.Bytes()
+
 		ret.VendorSpecific = &ttnpb.GetClaimStatusResponse_VendorSpecific{
 			OrganizationUniqueIdentifier: uint32(claimData.VendorSpecific.OUI),
 		}

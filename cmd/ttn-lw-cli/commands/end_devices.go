@@ -588,7 +588,7 @@ var (
 					return err
 				}
 				claimInfoResp, err := ttnpb.NewEndDeviceClaimingServerClient(dcs).GetInfoByJoinEUI(ctx, &ttnpb.GetInfoByJoinEUIRequest{
-					JoinEui: device.Ids.JoinEui,
+					JoinEui: device.Ids.JoinEui.Bytes(),
 				})
 				if err != nil {
 					return errEndDeviceClaimInfo.WithCause(err)
@@ -599,8 +599,8 @@ var (
 						TargetDeviceId:       device.Ids.DeviceId,
 						SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
 							AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
-								JoinEui:            *device.Ids.JoinEui,
-								DevEui:             *device.Ids.DevEui,
+								JoinEui:            device.Ids.JoinEui.Bytes(),
+								DevEui:             device.Ids.DevEui.Bytes(),
 								AuthenticationCode: device.ClaimAuthenticationCode.Value,
 							},
 						},
@@ -1010,7 +1010,7 @@ var (
 					return err
 				}
 				claimInfoResp, err := ttnpb.NewEndDeviceClaimingServerClient(dcs).GetInfoByJoinEUI(ctx, &ttnpb.GetInfoByJoinEUIRequest{
-					JoinEui: devID.JoinEui,
+					JoinEui: devID.JoinEui.Bytes(),
 				})
 				if err != nil {
 					return errEndDeviceClaimInfo.WithCause(err)
@@ -1083,8 +1083,8 @@ values will be stored in the Join Server.`,
 				authenticationCode, _ := cmd.Flags().GetString("source-authentication-code")
 				req.SourceDevice = &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
 					AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
-						JoinEui:            *joinEUI,
-						DevEui:             *devEUI,
+						JoinEui:            joinEUI.Bytes(),
+						DevEui:             devEUI.Bytes(),
 						AuthenticationCode: authenticationCode,
 					},
 				}
@@ -1110,9 +1110,11 @@ values will be stored in the Join Server.`,
 
 			req.TargetDeviceId, _ = cmd.Flags().GetString("target-device-id")
 			if netIDHex, _ := cmd.Flags().GetString("target-net-id"); netIDHex != "" {
-				if err := req.TargetNetId.UnmarshalText([]byte(netIDHex)); err != nil {
-					return errInvalidNetID.WithCause(err)
+				var netID types.NetID
+				if err := netID.UnmarshalText([]byte(netIDHex)); err != nil {
+					return err
 				}
+				req.TargetNetId = netID.Bytes()
 			}
 			if config.NetworkServerEnabled {
 				req.TargetNetworkServerAddress = config.NetworkServerGRPCAddress

@@ -235,7 +235,7 @@ func TestGatewayClaimingServer(t *testing.T) {
 				Collaborator: nil,
 				SourceGateway: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers_{
 					AuthenticatedIdentifiers: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers{
-						GatewayEui:         types.EUI64{0x58, 0xA0, 0xCB, 0xFF, 0xFE, 0x80, 0x00, 0x20},
+						GatewayEui:         types.EUI64{0x58, 0xA0, 0xCB, 0xFF, 0xFE, 0x80, 0x00, 0x20}.Bytes(),
 						AuthenticationCode: claimAuthCode,
 					},
 				},
@@ -250,7 +250,7 @@ func TestGatewayClaimingServer(t *testing.T) {
 				Collaborator: nil,
 				SourceGateway: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers_{
 					AuthenticatedIdentifiers: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers{
-						GatewayEui:         types.EUI64{0x58, 0xA0, 0xCB, 0xFF, 0xFE, 0x80, 0x00, 0x20},
+						GatewayEui:         types.EUI64{0x58, 0xA0, 0xCB, 0xFF, 0xFE, 0x80, 0x00, 0x20}.Bytes(),
 						AuthenticationCode: claimAuthCode,
 					},
 				},
