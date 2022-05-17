@@ -1369,8 +1369,10 @@ func init() {
 
 	allEndDeviceSelectFlags.VisitAll(func(flag *pflag.Flag) {
 		fieldName := toUnderscore.Replace(flag.Name)
-		selectEndDeviceListFlags.AddFlag(flag)
-		selectEndDeviceFlags.AddFlag(flag)
+		f1 := *flag
+		f2 := *flag
+		selectEndDeviceListFlags.AddFlag(&f1)
+		selectEndDeviceFlags.AddFlag(&f2)
 		if !ttnpb.ContainsField(fieldName, getEndDeviceFromIS) {
 			util.HideFlag(selectEndDeviceListFlags, flag.Name)
 			if !ttnpb.ContainsField(fieldName, getEndDeviceFromNS) &&
