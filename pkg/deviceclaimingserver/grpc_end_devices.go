@@ -16,7 +16,6 @@ package deviceclaimingserver
 
 import (
 	"context"
-	"net"
 
 	pbtypes "github.com/gogo/protobuf/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -107,8 +106,8 @@ func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.Claim
 		claimAuthenticationCode string
 	)
 	if authenticatedIDs := req.GetAuthenticatedIdentifiers(); authenticatedIDs != nil {
-		joinEUI = req.GetAuthenticatedIdentifiers().JoinEui
-		devEUI = req.GetAuthenticatedIdentifiers().DevEui
+		joinEUI = types.MustEUI64(req.GetAuthenticatedIdentifiers().JoinEui).OrZero()
+		devEUI = types.MustEUI64(req.GetAuthenticatedIdentifiers().DevEui).OrZero()
 		claimAuthenticationCode = req.GetAuthenticatedIdentifiers().AuthenticationCode
 	} else if qrCode := req.GetQrCode(); qrCode != nil {
 		conn, err := edcs.DCS.GetPeerConn(ctx, ttnpb.ClusterRole_QR_CODE_GENERATOR, nil)
@@ -130,15 +129,7 @@ func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.Claim
 		return nil, errNoJoinEUI.New()
 	}
 
-	// External services, including Join Servers, typically identify Network Servers by host instead of by host and port.
-	networkServerAddress, _, err := net.SplitHostPort(req.TargetNetworkServerAddress)
-	if err != nil {
-		// TargetNetworkServerAddress is already validated by the API.
-		// An error here means that it does not contain a port, so we use it directly.
-		networkServerAddress = req.TargetNetworkServerAddress
-	}
-
-	err = edcs.DCS.endDeviceClaimingUpstream.Claim(ctx, joinEUI, devEUI, claimAuthenticationCode, networkServerAddress)
+	err := edcs.DCS.endDeviceClaimingUpstream.Claim(ctx, joinEUI, devEUI, claimAuthenticationCode)
 	if err != nil {
 		if errors.IsAborted(err) {
 			log.FromContext(ctx).Warn("No upstream supports JoinEUI, use fallback")

@@ -12,35 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package blacklist_test
+package blocklist_test
 
 import (
 	"testing"
 
 	"github.com/smartystreets/assertions"
 	"github.com/smartystreets/assertions/should"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blacklist"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blocklist"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 )
 
-func TestBlacklist(t *testing.T) {
+func TestBlocklist(t *testing.T) {
+	t.Parallel()
+
 	a := assertions.New(t)
 
-	b := blacklist.New("foo", "bar")
-	bs := blacklist.Blacklists{b}
+	b := blocklist.New("foo", "bar")
+	bs := blocklist.Blocklists{b}
 
 	a.So(bs.Contains("foo"), should.BeTrue)
 	a.So(bs.Contains("baz"), should.BeFalse)
 }
 
-func TestGlobalBlacklist(t *testing.T) {
+func TestGlobalBlocklist(t *testing.T) {
+	t.Parallel()
+
 	a := assertions.New(t)
 
-	b := blacklist.New("foo", "bar")
+	b := blocklist.New("foo", "bar")
 
-	ctx := blacklist.NewContext(test.Context(), b)
+	ctx := blocklist.NewContext(test.Context(), b)
 
-	a.So(blacklist.Check(ctx, "root"), should.NotBeNil)
-	a.So(blacklist.Check(ctx, "foo"), should.NotBeNil)
-	a.So(blacklist.Check(ctx, "foobar"), should.BeNil)
+	a.So(blocklist.Check(ctx, "root"), should.NotBeNil)
+	a.So(blocklist.Check(ctx, "foo"), should.NotBeNil)
+	a.So(blocklist.Check(ctx, "foobar"), should.BeNil)
 }

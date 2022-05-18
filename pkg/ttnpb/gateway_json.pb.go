@@ -9,6 +9,7 @@ package ttnpb
 import (
 	gogo "github.com/TheThingsIndustries/protoc-gen-go-json/gogo"
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
+	types "go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 // MarshalProtoJSON marshals the GatewayAntennaPlacement to JSON.
@@ -570,6 +571,48 @@ func (x *Gateways) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 
 // UnmarshalJSON unmarshals the Gateways from JSON.
 func (x *Gateways) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
+// MarshalProtoJSON marshals the GetGatewayIdentifiersForEUIRequest message to JSON.
+func (x *GetGatewayIdentifiersForEUIRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if len(x.Eui) > 0 || s.HasField("eui") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("eui")
+		types.MarshalHEXBytes(s.WithField("eui"), x.Eui)
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the GetGatewayIdentifiersForEUIRequest to JSON.
+func (x GetGatewayIdentifiersForEUIRequest) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(&x)
+}
+
+// UnmarshalProtoJSON unmarshals the GetGatewayIdentifiersForEUIRequest message from JSON.
+func (x *GetGatewayIdentifiersForEUIRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "eui":
+			s.AddField("eui")
+			x.Eui = types.Unmarshal8Bytes(s.WithField("eui", false))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the GetGatewayIdentifiersForEUIRequest from JSON.
+func (x *GetGatewayIdentifiersForEUIRequest) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 

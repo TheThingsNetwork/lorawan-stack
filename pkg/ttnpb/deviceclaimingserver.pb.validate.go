@@ -131,7 +131,18 @@ func (m *ClaimEndDeviceRequest) ValidateFields(paths ...string) error {
 			}
 
 		case "target_net_id":
-			// no validation rules for TargetNetId
+
+			if len(m.GetTargetNetId()) > 0 {
+
+				if len(m.GetTargetNetId()) != 3 {
+					return ClaimEndDeviceRequestValidationError{
+						field:  "target_net_id",
+						reason: "value length must be 3 bytes",
+					}
+				}
+
+			}
+
 		case "invalidate_authentication_code":
 			// no validation rules for InvalidateAuthenticationCode
 		case "source_device":
@@ -378,7 +389,18 @@ func (m *GetInfoByJoinEUIRequest) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "join_eui":
-			// no validation rules for JoinEui
+
+			if len(m.GetJoinEui()) > 0 {
+
+				if len(m.GetJoinEui()) != 8 {
+					return GetInfoByJoinEUIRequestValidationError{
+						field:  "join_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		default:
 			return GetInfoByJoinEUIRequestValidationError{
 				field:  name,
@@ -461,7 +483,18 @@ func (m *GetInfoByJoinEUIResponse) ValidateFields(paths ...string) error {
 		_ = subs
 		switch name {
 		case "join_eui":
-			// no validation rules for JoinEui
+
+			if len(m.GetJoinEui()) > 0 {
+
+				if len(m.GetJoinEui()) != 8 {
+					return GetInfoByJoinEUIResponseValidationError{
+						field:  "join_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "supports_claiming":
 			// no validation rules for SupportsClaiming
 		default:
@@ -566,9 +599,31 @@ func (m *GetClaimStatusResponse) ValidateFields(paths ...string) error {
 			}
 
 		case "home_net_id":
-			// no validation rules for HomeNetId
+
+			if len(m.GetHomeNetId()) > 0 {
+
+				if len(m.GetHomeNetId()) != 3 {
+					return GetClaimStatusResponseValidationError{
+						field:  "home_net_id",
+						reason: "value length must be 3 bytes",
+					}
+				}
+
+			}
+
 		case "home_ns_id":
-			// no validation rules for HomeNsId
+
+			if len(m.GetHomeNsId()) > 0 {
+
+				if len(m.GetHomeNsId()) != 8 {
+					return GetClaimStatusResponseValidationError{
+						field:  "home_ns_id",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "vendor_specific":
 
 			if v, ok := interface{}(m.GetVendorSpecific()).(interface{ ValidateFields(...string) error }); ok {
@@ -1130,9 +1185,31 @@ func (m *ClaimEndDeviceRequest_AuthenticatedIdentifiers) ValidateFields(paths ..
 		_ = subs
 		switch name {
 		case "join_eui":
-			// no validation rules for JoinEui
+
+			if len(m.GetJoinEui()) > 0 {
+
+				if len(m.GetJoinEui()) != 8 {
+					return ClaimEndDeviceRequest_AuthenticatedIdentifiersValidationError{
+						field:  "join_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "dev_eui":
-			// no validation rules for DevEui
+
+			if len(m.GetDevEui()) > 0 {
+
+				if len(m.GetDevEui()) != 8 {
+					return ClaimEndDeviceRequest_AuthenticatedIdentifiersValidationError{
+						field:  "dev_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "authentication_code":
 
 			if !_ClaimEndDeviceRequest_AuthenticatedIdentifiers_AuthenticationCode_Pattern.MatchString(m.GetAuthenticationCode()) {
@@ -1426,7 +1503,18 @@ func (m *ClaimGatewayRequest_AuthenticatedIdentifiers) ValidateFields(paths ...s
 		_ = subs
 		switch name {
 		case "gateway_eui":
-			// no validation rules for GatewayEui
+
+			if len(m.GetGatewayEui()) > 0 {
+
+				if len(m.GetGatewayEui()) != 8 {
+					return ClaimGatewayRequest_AuthenticatedIdentifiersValidationError{
+						field:  "gateway_eui",
+						reason: "value length must be 8 bytes",
+					}
+				}
+
+			}
+
 		case "authentication_code":
 
 			if len(m.GetAuthenticationCode()) > 2048 {

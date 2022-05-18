@@ -34,7 +34,9 @@ type contactInfoStore struct {
 	*baseStore
 }
 
-func (s *contactInfoStore) GetContactInfo(ctx context.Context, entityID ttnpb.IDStringer) ([]*ttnpb.ContactInfo, error) {
+func (s *contactInfoStore) GetContactInfo(
+	ctx context.Context, entityID ttnpb.IDStringer,
+) ([]*ttnpb.ContactInfo, error) {
 	defer trace.StartRegion(ctx, "get contact info").End()
 	entity, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
@@ -55,7 +57,9 @@ func (s *contactInfoStore) GetContactInfo(ctx context.Context, entityID ttnpb.ID
 	return pb, nil
 }
 
-func (s *contactInfoStore) SetContactInfo(ctx context.Context, entityID ttnpb.IDStringer, pb []*ttnpb.ContactInfo) ([]*ttnpb.ContactInfo, error) {
+func (s *contactInfoStore) SetContactInfo(
+	ctx context.Context, entityID ttnpb.IDStringer, pb []*ttnpb.ContactInfo,
+) ([]*ttnpb.ContactInfo, error) {
 	defer trace.StartRegion(ctx, "update contact info").End()
 	entity, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
@@ -87,7 +91,8 @@ func (s *contactInfoStore) SetContactInfo(ctx context.Context, entityID ttnpb.ID
 
 	for _, existing := range existing {
 		existingByUUID[existing.ID] = existing
-		existingByInfo[contactInfoID{existing.ContactType, existing.ContactMethod, existing.Value}] = &contactInfo{
+		id := contactInfoID{existing.ContactType, existing.ContactMethod, existing.Value}
+		existingByInfo[id] = &contactInfo{
 			ContactInfo: existing,
 			deleted:     true,
 		}
@@ -95,7 +100,8 @@ func (s *contactInfoStore) SetContactInfo(ctx context.Context, entityID ttnpb.ID
 
 	var toCreate []*ContactInfo
 	for _, pb := range pb {
-		if existing, ok := existingByInfo[contactInfoID{int(pb.ContactType), int(pb.ContactMethod), pb.Value}]; ok {
+		id := contactInfoID{int(pb.ContactType), int(pb.ContactMethod), pb.Value}
+		if existing, ok := existingByInfo[id]; ok {
 			existing.deleted = false
 			existing.fromPB(pb)
 		} else {
@@ -123,13 +129,16 @@ func (s *contactInfoStore) SetContactInfo(ctx context.Context, entityID ttnpb.ID
 	}
 
 	for _, info := range toUpdate {
+		info := info // shadow range variable.
 		if err = s.query(ctx, ContactInfo{}).Save(&info).Error; err != nil {
 			return nil, err
 		}
 	}
 
 	if len(toDelete) > 0 {
-		if err = s.query(ctx, ContactInfo{}).Where("id in (?)", toDelete).Delete(&ContactInfo{}).Error; err != nil {
+		if err = s.query(ctx, ContactInfo{}).
+			Where("id in (?)", toDelete).
+			Delete(&ContactInfo{}).Error; err != nil {
 			return nil, err
 		}
 	}
@@ -145,9 +154,14 @@ func (s *contactInfoStore) SetContactInfo(ctx context.Context, entityID ttnpb.ID
 	return pb, nil
 }
 
-var errValidationAlreadyExists = errors.DefineAlreadyExists("validation_already_exists", "contact info validation already exists")
+var errValidationAlreadyExists = errors.DefineAlreadyExists(
+	"validation_already_exists",
+	"contact info validation already exists",
+)
 
-func (s *contactInfoStore) CreateValidation(ctx context.Context, validation *ttnpb.ContactInfoValidation) (*ttnpb.ContactInfoValidation, error) {
+func (s *contactInfoStore) CreateValidation(
+	ctx context.Context, validation *ttnpb.ContactInfoValidation,
+) (*ttnpb.ContactInfoValidation, error) {
 	defer trace.StartRegion(ctx, "create contact info validation").End()
 	var (
 		contactMethod ttnpb.ContactMethod
@@ -241,7 +255,7 @@ func (s *contactInfoStore) Validate(ctx context.Context, validation *ttnpb.Conta
 		return err
 	}
 
-	if model.EntityType == "user" && model.ContactMethod == int(ttnpb.ContactMethod_CONTACT_METHOD_EMAIL) {
+	if model.EntityType == user && model.ContactMethod == int(ttnpb.ContactMethod_CONTACT_METHOD_EMAIL) {
 		err = s.query(ctx, User{
 			Model: Model{ID: model.EntityID},
 		}).Where(User{

@@ -51,7 +51,7 @@ func (a attributes) updateFromMap(m map[string]string) attributes {
 			deleted:   true,
 		}
 	}
-	var updated []Attribute
+	updated := make([]Attribute, 0, len(m))
 	for k, v := range m {
 		if existing, ok := attributes[k]; ok {
 			existing.deleted = false

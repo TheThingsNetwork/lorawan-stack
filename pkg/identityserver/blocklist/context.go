@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package blacklist
+package blocklist
 
 import "context"
 
@@ -20,22 +20,22 @@ type ctxKeyType struct{}
 
 var ctxKey ctxKeyType
 
-// FromContext returns the blacklists from the given context.
-func FromContext(ctx context.Context) Blacklists {
-	if blacklists, ok := ctx.Value(ctxKey).(Blacklists); ok {
-		return blacklists
+// FromContext returns the blocklists from the given context.
+func FromContext(ctx context.Context) Blocklists {
+	if blocklists, ok := ctx.Value(ctxKey).(Blocklists); ok {
+		return blocklists
 	}
 	return nil
 }
 
-// NewContext returns a new context derived from parent with the given blacklists attached.
-func NewContext(parent context.Context, blacklists ...*Blacklist) context.Context {
-	if len(blacklists) == 0 {
+// NewContext returns a new context derived from parent with the given blocklists attached.
+func NewContext(parent context.Context, blocklists ...*Blocklist) context.Context {
+	if len(blocklists) == 0 {
 		return parent
 	}
-	parentBlacklists := FromContext(parent)
-	newBlacklists := make(Blacklists, 0, len(parentBlacklists)+len(blacklists))
-	newBlacklists = append(newBlacklists, parentBlacklists...)
-	newBlacklists = append(newBlacklists, blacklists...)
-	return context.WithValue(parent, ctxKey, newBlacklists)
+	parentBlocklists := FromContext(parent)
+	newBlocklists := make(Blocklists, 0, len(parentBlocklists)+len(blocklists))
+	newBlocklists = append(newBlocklists, parentBlocklists...)
+	newBlocklists = append(newBlocklists, blocklists...)
+	return context.WithValue(parent, ctxKey, newBlocklists)
 }

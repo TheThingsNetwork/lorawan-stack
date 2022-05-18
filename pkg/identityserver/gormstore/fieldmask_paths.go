@@ -15,7 +15,7 @@
 package store
 
 const (
-	// NOTE: please keep this sorted
+	// NOTE: please keep this sorted.
 	activatedAtField                    = "activated_at"
 	adminField                          = "admin"
 	administrativeContactField          = "administrative_contact"
@@ -28,8 +28,8 @@ const (
 	claimAuthenticationCodeField        = "claim_authentication_code"
 	contactInfoField                    = "contact_info"
 	descriptionField                    = "description"
-	disablePacketBrokerForwardingField  = "disable_packet_broker_forwarding"
 	devEuiCounterField                  = "dev_eui_counter"
+	disablePacketBrokerForwardingField  = "disable_packet_broker_forwarding"
 	downlinkPathConstraintField         = "downlink_path_constraint"
 	endorsedField                       = "endorsed"
 	enforceDutyCycleField               = "enforce_duty_cycle"
@@ -40,7 +40,7 @@ const (
 	hardwareVersionField                = "version_ids.hardware_version"
 	joinServerAddressField              = "join_server_address"
 	lastSeenAtField                     = "last_seen_at"
-	lbsLNSSecretField                   = "lbs_lns_secret"
+	lbsLNSSecretField                   = "lbs_lns_secret" //nolint:gosec
 	locationPublicField                 = "location_public"
 	locationsField                      = "locations"
 	logoutRedirectURIsField             = "logout_redirect_uris"

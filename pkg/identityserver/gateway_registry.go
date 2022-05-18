@@ -22,10 +22,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blacklist"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blocklist"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 var (
@@ -71,7 +72,7 @@ var (
 
 func (is *IdentityServer) createGateway(ctx context.Context, req *ttnpb.CreateGatewayRequest) (gtw *ttnpb.Gateway, err error) {
 	reqGtw := req.GetGateway()
-	if err = blacklist.Check(ctx, reqGtw.GetIds().GetGatewayId()); err != nil {
+	if err = blocklist.Check(ctx, reqGtw.GetIds().GetGatewayId()); err != nil {
 		return nil, err
 	}
 	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
@@ -296,7 +297,7 @@ func (is *IdentityServer) getGatewayIdentifiersForEUI(ctx context.Context, req *
 	}
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		gtw, err := st.GetGateway(ctx, &ttnpb.GatewayIdentifiers{
-			Eui: req.Eui,
+			Eui: types.MustEUI64(req.Eui),
 		}, []string{"ids.gateway_id", "ids.eui"})
 		if err != nil {
 			return err

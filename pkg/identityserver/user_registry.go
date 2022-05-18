@@ -28,7 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/email/templates"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
-	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blacklist"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/blocklist"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -178,7 +178,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	createdByAdmin := is.IsAdmin(ctx)
 	config := is.configFromContext(ctx)
 
-	if err = blacklist.Check(ctx, req.User.GetIds().GetUserId()); err != nil {
+	if err = blocklist.Check(ctx, req.User.GetIds().GetUserId()); err != nil {
 		return nil, err
 	}
 	if req.InvitationToken == "" && config.UserRegistration.Invitation.Required && !createdByAdmin {

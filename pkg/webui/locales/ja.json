@@ -1376,7 +1376,7 @@
   "error:pkg/gatewayserver:uplink_token": "アップリンクトークンがサーバによって生成されていません",
   "error:pkg/gatewayserver:upstream": "アップストリーム `{name}` のセットアップ失敗",
   "error:pkg/gatewayserver:upstream_type_not_implemented": "アップストリーム `{name}` が未実装です",
-  "error:pkg/identityserver/blacklist:blacklisted_id": "ID `{id}` が登録できません",
+  "error:pkg/identityserver/blocklist:forbidden_id": "ID `{id}` が登録できません",
   "error:pkg/identityserver/picture:original_not_found": "元の画像が見つかりません",
   "error:pkg/identityserver/store:access_token_not_found": "アクセストークンが見つかりません",
   "error:pkg/identityserver/store:account_type": "アカウントタイプ `{account_type}` が `{entity_type}` 上でコラボレートできません",

@@ -215,7 +215,7 @@ var (
 
 			if gtwID.GatewayId == "" && gtwID.Eui != nil {
 				gtwID, err = cli.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-					Eui: gtwID.Eui,
+					Eui: gtwID.Eui.Bytes(),
 				})
 				if err != nil {
 					return err
@@ -244,7 +244,7 @@ var (
 			}
 
 			collaborator := &ttnpb.OrganizationOrUserIdentifiers{}
-			_, err = collaborator.SetFromFlags(cmd.Flags(), "")
+			_, err = collaborator.SetFromFlags(cmd.Flags(), "collaborator")
 			if err != nil {
 				return err
 			}
@@ -527,8 +527,8 @@ func init() {
 	gatewaysGetCommand.Flags().AddFlagSet(selectAllGatewayFlags)
 	gatewaysCommand.AddCommand(gatewaysGetCommand)
 	ttnpb.AddSetFlagsForGateway(gatewaysCreateCommand.Flags(), "", false)
-	ttnpb.AddSetFlagsForOrganizationOrUserIdentifiers(gatewaysCreateCommand.Flags(), "", true)
-	AddCollaboratorFlagAlias(gatewaysCreateCommand.Flags(), "")
+	ttnpb.AddSetFlagsForOrganizationOrUserIdentifiers(gatewaysCreateCommand.Flags(), "collaborator", true)
+	AddCollaboratorFlagAlias(gatewaysCreateCommand.Flags(), "collaborator")
 	ttnpb.AddSetFlagsForGatewayAntenna(gatewaysCreateCommand.Flags(), "antenna", false)
 	gatewaysCreateCommand.Flags().AddFlagSet(gatewayIDFlags())
 	gatewaysCreateCommand.Flags().AddFlagSet(collaboratorFlags())

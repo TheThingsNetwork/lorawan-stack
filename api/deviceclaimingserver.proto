@@ -20,6 +20,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
 import "google/protobuf/empty.proto";
 import "lorawan-stack/api/identifiers.proto";
+import "github.com/TheThingsIndustries/protoc-gen-go-json/annotations.proto";
 
 package ttn.lorawan.v3;
 
@@ -31,9 +32,21 @@ option (gogoproto.goproto_registration) = true;
 message ClaimEndDeviceRequest {
   message AuthenticatedIdentifiers {
     // JoinEUI (or AppEUI) of the device to claim.
-    bytes join_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+    bytes join_eui = 1 [
+      (validate.rules).bytes = { len: 8, ignore_empty: true },
+      (thethings.json.field) = {
+        marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+        unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+      }
+    ];
     // DevEUI of the device to claim.
-    bytes dev_eui = 2 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+    bytes dev_eui = 2 [
+      (validate.rules).bytes = { len: 8, ignore_empty: true },
+      (thethings.json.field) = {
+        marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+        unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+      }
+    ];
     // Authentication code to prove ownership.
     // In the LoRa Alliance TR005 specification, this equals the OwnerToken.
     string authentication_code = 3 [(validate.rules).string.pattern = "^[A-Z0-9]{1,32}$"];
@@ -67,7 +80,13 @@ message ClaimEndDeviceRequest {
   string target_application_server_id = 11 [(validate.rules).string.max_len = 100];
   reserved 12; // target_join_server_address
   // Home NetID.
-  bytes target_net_id = 13 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
+  bytes target_net_id = 13 [
+    (validate.rules).bytes = { len: 3, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal3Bytes"
+    }
+  ];
 
   // If set, invalidate the authentication code with which the device gets claimed. This prohibits subsequent claiming requests.
   bool invalidate_authentication_code = 5;
@@ -81,19 +100,43 @@ message AuthorizeApplicationRequest {
 }
 
 message GetInfoByJoinEUIRequest {
-  bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+  bytes join_eui = 1 [
+    (validate.rules).bytes = { len: 8, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+    }
+  ];
 }
 
 message GetInfoByJoinEUIResponse {
-  bytes join_eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+  bytes join_eui = 1 [
+    (validate.rules).bytes = { len: 8, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+    }
+  ];
   // If set, this Join EUI is available for claiming on one of the configured Join Servers.
   bool supports_claiming = 2;
 }
 
 message GetClaimStatusResponse {
   EndDeviceIdentifiers end_device_ids = 1 [(validate.rules).message.required = true];
-  bytes home_net_id = 2 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.NetID"];
-  bytes home_ns_id = 3 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+  bytes home_net_id = 2 [
+    (validate.rules).bytes = { len: 3, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal3Bytes"
+    }
+  ];
+  bytes home_ns_id = 3 [
+    (validate.rules).bytes = { len: 8, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+    }
+  ];
 
   message VendorSpecific{
     uint32 organization_unique_identifier = 1;
@@ -183,7 +226,13 @@ message CUPSRedirection {
 
 message ClaimGatewayRequest {
   message AuthenticatedIdentifiers {
-    bytes gateway_eui = 1 [(gogoproto.nullable) = false, (gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+    bytes gateway_eui = 1 [
+      (validate.rules).bytes = { len: 8, ignore_empty: true },
+      (thethings.json.field) = {
+        marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+        unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+      }
+    ];
     bytes authentication_code = 2 [(validate.rules).bytes.max_len = 2048];
   }
   oneof source_gateway {

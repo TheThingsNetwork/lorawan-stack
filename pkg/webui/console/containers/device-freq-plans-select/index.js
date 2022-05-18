@@ -41,7 +41,11 @@ const FreqPlansSelect = React.memo(props => {
 })
 
 FreqPlansSelect.propTypes = {
-  bandId: PropTypes.string.isRequired,
+  bandId: PropTypes.string,
+}
+
+FreqPlansSelect.defaultProps = {
+  bandId: undefined,
 }
 
 export default FreqPlansSelect

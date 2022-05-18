@@ -256,7 +256,7 @@ func TestServer(t *testing.T) {
 				return errors.IsNotFound(err)
 			},
 			AssertStore: func(a *assertions.Assertion, c *mockGatewayClient) {
-				a.So(c.req.GetIdentifiersForEUI.Eui, should.Resemble, &mockGatewayEUI)
+				a.So(c.req.GetIdentifiersForEUI.Eui, should.Resemble, mockGatewayEUI.Bytes())
 			},
 		},
 		{

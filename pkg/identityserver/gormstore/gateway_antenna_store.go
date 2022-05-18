@@ -21,11 +21,15 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func (s *baseStore) replaceGatewayAntennas(ctx context.Context, gatewayUUID string, old []GatewayAntenna, new []GatewayAntenna) error {
+func (s *baseStore) replaceGatewayAntennas(
+	ctx context.Context, gatewayUUID string, old []GatewayAntenna, new []GatewayAntenna,
+) error {
 	return replaceGatewayAntennas(ctx, s.DB, gatewayUUID, old, new)
 }
 
-func replaceGatewayAntennas(ctx context.Context, db *gorm.DB, gatewayUUID string, old []GatewayAntenna, new []GatewayAntenna) (err error) {
+func replaceGatewayAntennas(
+	ctx context.Context, db *gorm.DB, gatewayUUID string, old []GatewayAntenna, new []GatewayAntenna,
+) (err error) {
 	defer trace.StartRegion(ctx, "update gateway antennas").End()
 	db = db.Where(GatewayAntenna{GatewayID: gatewayUUID})
 	if len(new) < len(old) {
@@ -34,6 +38,7 @@ func replaceGatewayAntennas(ctx context.Context, db *gorm.DB, gatewayUUID string
 		}
 	}
 	for _, antenna := range new {
+		antenna := antenna // shadow range variable.
 		antenna.GatewayID = gatewayUUID
 		if err = db.Save(&antenna).Error; err != nil {
 			return err

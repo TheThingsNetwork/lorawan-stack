@@ -23,6 +23,15 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
+const (
+	application  = "application"
+	client       = "client"
+	endDevice    = "end_device"
+	gateway      = "gateway"
+	organization = "organization"
+	user         = "user"
+)
+
 // EUI64 adds methods on a types.EUI64 so that it can be stored in an SQL database.
 type EUI64 types.EUI64
 

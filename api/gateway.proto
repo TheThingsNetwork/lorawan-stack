@@ -216,7 +216,13 @@ message GetGatewayRequest {
 }
 
 message GetGatewayIdentifiersForEUIRequest {
-  bytes eui = 1 [(gogoproto.customtype) = "go.thethings.network/lorawan-stack/v3/pkg/types.EUI64"];
+  bytes eui = 1 [
+    (validate.rules).bytes = { len: 8, ignore_empty: true },
+    (thethings.json.field) = {
+      marshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.MarshalHEXBytes",
+      unmarshaler_func: "go.thethings.network/lorawan-stack/v3/pkg/types.Unmarshal8Bytes"
+    }
+  ];
 }
 
 message ListGatewaysRequest {

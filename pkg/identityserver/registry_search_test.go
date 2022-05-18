@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,67 +18,111 @@ import (
 	"testing"
 
 	"github.com/smartystreets/assertions/should"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"google.golang.org/grpc"
 )
 
 func TestRegistrySearch(t *testing.T) {
+	t.Parallel()
+
+	const (
+		desc      = "some test description"
+		descQuery = "test description"
+	)
+
+	p := &storetest.Population{}
+
+	adminUsr := p.NewUser()
+	adminUsr.Admin = true
+	adminUsrKey, _ := p.NewAPIKey(adminUsr.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	adminUsrCreds := rpcCreds(adminUsrKey)
+
+	for i := 0; i < 10; i++ {
+		app := p.NewApplication(nil)
+		if i < 5 {
+			app.Description = desc
+		}
+	}
+	for i := 0; i < 10; i++ {
+		cli := p.NewClient(nil)
+		if i < 5 {
+			cli.Description = desc
+		}
+	}
+	for i := 0; i < 10; i++ {
+		gtw := p.NewGateway(nil)
+		if i < 5 {
+			gtw.Description = desc
+		}
+	}
+	for i := 0; i < 10; i++ {
+		org := p.NewOrganization(nil)
+		if i < 5 {
+			org.Description = desc
+		}
+	}
+	for i := 0; i < 10; i++ {
+		usr := p.NewUser()
+		if i < 5 {
+			usr.Description = desc
+		}
+	}
+
 	a, ctx := test.New(t)
 
-	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		creds := userCreds(adminUserIdx)
-
+	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
 		cli := ttnpb.NewEntityRegistrySearchClient(cc)
 
 		apps, err := cli.SearchApplications(ctx, &ttnpb.SearchApplicationsRequest{
-			DescriptionContains: "random",
+			DescriptionContains: descQuery,
 			FieldMask:           ttnpb.FieldMask("ids"),
-		}, creds)
+		}, adminUsrCreds)
 
 		a.So(err, should.BeNil)
 		if a.So(apps, should.NotBeNil) {
-			a.So(apps.Applications, should.NotBeEmpty)
+			a.So(apps.Applications, should.HaveLength, 5)
 		}
 
 		clis, err := cli.SearchClients(ctx, &ttnpb.SearchClientsRequest{
-			DescriptionContains: "random",
+			DescriptionContains: descQuery,
 			FieldMask:           ttnpb.FieldMask("ids"),
-		}, creds)
+		}, adminUsrCreds)
 
 		a.So(err, should.BeNil)
 		if a.So(clis, should.NotBeNil) {
-			a.So(clis.Clients, should.NotBeEmpty)
+			a.So(clis.Clients, should.HaveLength, 5)
 		}
 
 		gtws, err := cli.SearchGateways(ctx, &ttnpb.SearchGatewaysRequest{
-			DescriptionContains: "random",
+			DescriptionContains: descQuery,
 			FieldMask:           ttnpb.FieldMask("ids"),
-		}, creds)
+		}, adminUsrCreds)
 
 		a.So(err, should.BeNil)
 		if a.So(gtws, should.NotBeNil) {
-			a.So(gtws.Gateways, should.NotBeEmpty)
+			a.So(gtws.Gateways, should.HaveLength, 5)
 		}
 
 		orgs, err := cli.SearchOrganizations(ctx, &ttnpb.SearchOrganizationsRequest{
-			DescriptionContains: "random",
+			DescriptionContains: descQuery,
 			FieldMask:           ttnpb.FieldMask("ids"),
-		}, creds)
+		}, adminUsrCreds)
 
 		a.So(err, should.BeNil)
 		if a.So(orgs, should.NotBeNil) {
-			a.So(orgs.Organizations, should.NotBeEmpty)
+			a.So(orgs.Organizations, should.HaveLength, 5)
 		}
 
 		usrs, err := cli.SearchUsers(ctx, &ttnpb.SearchUsersRequest{
-			DescriptionContains: "random",
+			DescriptionContains: descQuery,
 			FieldMask:           ttnpb.FieldMask("ids"),
-		}, creds)
+		}, adminUsrCreds)
 
 		a.So(err, should.BeNil)
 		if a.So(usrs, should.NotBeNil) {
-			a.So(usrs.Users, should.NotBeEmpty)
+			a.So(usrs.Users, should.HaveLength, 5)
 		}
-	})
+	}, withPrivateTestDatabase(p))
 }

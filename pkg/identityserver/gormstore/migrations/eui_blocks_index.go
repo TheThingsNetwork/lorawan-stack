@@ -33,7 +33,7 @@ func (EUIBlocksIndex) table() string {
 }
 
 // Apply implements Migration.
-func (m EUIBlocksIndex) Apply(ctx context.Context, db *gorm.DB) error {
+func (m EUIBlocksIndex) Apply(_ context.Context, db *gorm.DB) error {
 	db = db.Table(m.table())
 	for _, indexName := range []string{
 		"eui_block_index", // The (type) unique index.
@@ -49,7 +49,7 @@ func (m EUIBlocksIndex) Apply(ctx context.Context, db *gorm.DB) error {
 }
 
 // Rollback implements migration. It recreates the removed "eui_block_index".
-func (m EUIBlocksIndex) Rollback(ctx context.Context, db *gorm.DB) error {
+func (m EUIBlocksIndex) Rollback(_ context.Context, db *gorm.DB) error {
 	db = db.Table(m.table())
 	for indexName, columns := range map[string][]string{
 		"eui_block_index": {"type"},

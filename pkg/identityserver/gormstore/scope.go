@@ -151,7 +151,10 @@ func withGatewayEUI(eui ...EUI64) func(*gorm.DB) *gorm.DB {
 
 func withOrganizationID(id ...string) func(*gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		db = db.Joins("LEFT JOIN accounts ON accounts.account_type = ? AND accounts.account_id = organizations.id", "organization")
+		db = db.Joins(
+			"LEFT JOIN accounts ON accounts.account_type = ? AND accounts.account_id = organizations.id",
+			organization,
+		)
 		switch len(id) {
 		case 0:
 			return db
@@ -165,7 +168,7 @@ func withOrganizationID(id ...string) func(*gorm.DB) *gorm.DB {
 
 func withUserID(id ...string) func(*gorm.DB) *gorm.DB {
 	return func(db *gorm.DB) *gorm.DB {
-		db = db.Joins("LEFT JOIN accounts ON accounts.account_type = ? AND accounts.account_id = users.id", "user")
+		db = db.Joins("LEFT JOIN accounts ON accounts.account_type = ? AND accounts.account_id = users.id", user)
 		switch len(id) {
 		case 0:
 			return db
@@ -197,17 +200,17 @@ func splitEndDeviceIDString(s string) (appID string, devID string) {
 
 func withID(id ttnpb.IDStringer) func(*gorm.DB) *gorm.DB {
 	switch entityTypeForID(id) {
-	case "application":
+	case application:
 		return withApplicationID(id.IDString())
-	case "client":
+	case client:
 		return withClientID(id.IDString())
-	case "end_device":
+	case endDevice:
 		return withApplicationAndDeviceID(splitEndDeviceIDString(id.IDString()))
-	case "gateway":
+	case gateway:
 		return withGatewayID(id.IDString())
-	case "organization":
+	case organization:
 		return withOrganizationID(id.IDString())
-	case "user":
+	case user:
 		return withUserID(id.IDString())
 	default:
 		panic(fmt.Sprintf("can't find scope for id type %T", id))

@@ -41,16 +41,22 @@ type BasicAuth struct {
 	Password string `yaml:"password"`
 }
 
+// NetworkServer contains information related to the Network Server.
+type NetworkServer struct {
+	Hostname string
+	HomeNSID types.EUI64
+}
+
 // Config is the configuration to communicate with The Things Join Server End Device Claming API.
 type Config struct {
 	NetID           types.NetID         `yaml:"-"`
 	JoinEUIPrefixes []types.EUI64Prefix `yaml:"-"`
+	NetworkServer   NetworkServer       `yaml:"-"`
 
 	BasicAuth          `yaml:"basic-auth"`
-	ClaimingAPIVersion string            `yaml:"claiming-api-version"`
-	URL                string            `yaml:"url"`
-	TenantID           string            `yaml:"tenant-id"`
-	HomeNSIDs          map[string]string `yaml:"home-ns-ids"`
+	ClaimingAPIVersion string `yaml:"claiming-api-version"`
+	URL                string `yaml:"url"`
+	TenantID           string `yaml:"tenant-id"`
 }
 
 // Component abstracts the underlying *component.Component.
@@ -65,7 +71,6 @@ type Component interface {
 type TTJS struct {
 	Component
 
-	hsNSIDs     map[string]types.EUI64
 	httpClient  *http.Client
 	baseURL     *url.URL
 	config      Config
@@ -73,7 +78,7 @@ type TTJS struct {
 }
 
 // NewClient applies the config and returns a new TTJS client.
-func (config Config) NewClient(ctx context.Context, c Component) (*TTJS, error) {
+func (config *Config) NewClient(ctx context.Context, c Component) (*TTJS, error) {
 	httpClient, err := c.HTTPClient(ctx)
 	if err != nil {
 		return nil, err
@@ -82,22 +87,11 @@ func (config Config) NewClient(ctx context.Context, c Component) (*TTJS, error) 
 	if err != nil {
 		return nil, err
 	}
-	// Parse the HomeNSIDs map.
-	res := make(map[string]types.EUI64, len(config.HomeNSIDs))
-	for nsAddress, nsIDString := range config.HomeNSIDs {
-		var nsID types.EUI64
-		err := nsID.UnmarshalText([]byte(nsIDString))
-		if err != nil {
-			return nil, err
-		}
-		res[nsAddress] = nsID
-	}
 	return &TTJS{
-		config:      config,
+		config:      *config,
 		httpClient:  httpClient,
 		baseURL:     baseURL,
 		Component:   c,
-		hsNSIDs:     res,
 		ttiVendorID: OUI(interop.TTIVendorID.MarshalNumber()),
 	}, nil
 }
@@ -117,23 +111,17 @@ var (
 	errDeviceNotClaimed     = errors.DefineNotFound("device_not_claimed", "device with EUI `{dev_eui}` not claimed")
 	errDeviceAccessDenied   = errors.DefinePermissionDenied("device_access_denied", "access to device with `{dev_eui}` denied. Either device is already claimed or owner token is invalid")
 	errUnauthorized         = errors.DefineUnauthenticated("unauthorized", "client API Key missing or invalid")
-	errNoHomeNSID           = errors.DefineInvalidArgument("no_home_ns_id", "no HomeNSID configured for network server address `{address}`")
 )
 
 // Claim implements EndDeviceClaimer.
-func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode, networkServerAddress string) error {
+func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, claimAuthenticationCode string) error {
 	htenantID := client.config.TenantID
-
-	hNSID, ok := client.hsNSIDs[networkServerAddress]
-	if !ok {
-		return errNoHomeNSID.WithAttributes("address", networkServerAddress)
-	}
 
 	claimReq := &claimRequest{
 		OwnerToken: claimAuthenticationCode,
 		claimData: claimData{
 			HomeNetID: client.config.NetID.String(),
-			HomeNSID:  hNSID.String(),
+			HomeNSID:  client.config.NetworkServer.HomeNSID.String(),
 			VendorSpecific: VendorSpecific{
 				OUI: client.ttiVendorID,
 				Data: struct {
@@ -141,7 +129,7 @@ func (client *TTJS) Claim(ctx context.Context, joinEUI, devEUI types.EUI64, clai
 					HNSAddress string
 				}{
 					HTenantID:  htenantID,
-					HNSAddress: networkServerAddress,
+					HNSAddress: client.config.NetworkServer.Hostname,
 				},
 			},
 		},
@@ -292,22 +280,27 @@ func (client *TTJS) GetClaimStatus(ctx context.Context, ids *ttnpb.EndDeviceIden
 			claimData claimData
 			ret       = ttnpb.GetClaimStatusResponse{
 				EndDeviceIds: ids,
-				HomeNetId:    &types.NetID{},
-				HomeNsId:     &types.EUI64{},
 			}
+			homeNSID  types.EUI64
+			homeNetID types.NetID
 		)
 		err = json.Unmarshal(respBody, &claimData)
 		if err != nil {
 			return nil, err
 		}
-		err = ret.HomeNetId.UnmarshalText([]byte(claimData.HomeNetID))
+
+		err = homeNetID.UnmarshalText([]byte(claimData.HomeNetID))
 		if err != nil {
 			return nil, err
 		}
-		err = ret.HomeNsId.UnmarshalText([]byte(claimData.HomeNSID))
+		ret.HomeNetId = homeNetID.Bytes()
+
+		err = homeNSID.UnmarshalText([]byte(claimData.HomeNSID))
 		if err != nil {
 			return nil, err
 		}
+		ret.HomeNsId = homeNSID.Bytes()
+
 		ret.VendorSpecific = &ttnpb.GetClaimStatusResponse_VendorSpecific{
 			OrganizationUniqueIdentifier: uint32(claimData.VendorSpecific.OUI),
 		}

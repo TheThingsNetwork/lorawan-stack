@@ -96,10 +96,18 @@ var secretFieldSeparator = []byte(":")
 
 // functions to set fields from the gateway model into the gateway proto.
 var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
-	"ids.eui":        func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Ids.Eui = gtw.GatewayEUI.toPB() }, // NOTE: pb.Ids is initialized by toPB.
-	nameField:        func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Name = gtw.Name },
-	descriptionField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Description = gtw.Description },
-	attributesField:  func(pb *ttnpb.Gateway, gtw *Gateway) { pb.Attributes = attributes(gtw.Attributes).toMap() },
+	"ids.eui": func(pb *ttnpb.Gateway, gtw *Gateway) {
+		pb.Ids.Eui = gtw.GatewayEUI.toPB() // NOTE: pb.Ids is initialized by toPB.
+	},
+	nameField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		pb.Name = gtw.Name
+	},
+	descriptionField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		pb.Description = gtw.Description
+	},
+	attributesField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		pb.Attributes = attributes(gtw.Attributes).toMap()
+	},
 	administrativeContactField: func(pb *ttnpb.Gateway, gtw *Gateway) {
 		if gtw.AdministrativeContact != nil {
 			pb.AdministrativeContact = gtw.AdministrativeContact.OrganizationOrUserIdentifiers()
@@ -154,9 +162,15 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 			}
 		}
 	},
-	gatewayServerAddressField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.GatewayServerAddress = gtw.GatewayServerAddress },
-	autoUpdateField:           func(pb *ttnpb.Gateway, gtw *Gateway) { pb.AutoUpdate = gtw.AutoUpdate },
-	updateChannelField:        func(pb *ttnpb.Gateway, gtw *Gateway) { pb.UpdateChannel = gtw.UpdateChannel },
+	gatewayServerAddressField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		pb.GatewayServerAddress = gtw.GatewayServerAddress
+	},
+	autoUpdateField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		pb.AutoUpdate = gtw.AutoUpdate
+	},
+	updateChannelField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		pb.UpdateChannel = gtw.UpdateChannel
+	},
 	frequencyPlanIDsField: func(pb *ttnpb.Gateway, gtw *Gateway) {
 		if gtw.FrequencyPlanID == "" {
 			pb.FrequencyPlanIds = nil
@@ -164,19 +178,31 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 			pb.FrequencyPlanIds = strings.Split(gtw.FrequencyPlanID, " ")
 		}
 	},
-	statusPublicField:         func(pb *ttnpb.Gateway, gtw *Gateway) { pb.StatusPublic = gtw.StatusPublic },
-	locationPublicField:       func(pb *ttnpb.Gateway, gtw *Gateway) { pb.LocationPublic = gtw.LocationPublic },
-	scheduleDownlinkLateField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.ScheduleDownlinkLate = gtw.ScheduleDownlinkLate },
+	statusPublicField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		pb.StatusPublic = gtw.StatusPublic
+	},
+	locationPublicField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		pb.LocationPublic = gtw.LocationPublic
+	},
+	scheduleDownlinkLateField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		pb.ScheduleDownlinkLate = gtw.ScheduleDownlinkLate
+	},
 	scheduleAnytimeDelayField: func(pb *ttnpb.Gateway, gtw *Gateway) {
 		pb.ScheduleAnytimeDelay = ttnpb.ProtoDurationPtr(time.Duration(gtw.ScheduleAnytimeDelay))
 	},
-	updateLocationFromStatusField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.UpdateLocationFromStatus = gtw.UpdateLocationFromStatus },
-	enforceDutyCycleField:         func(pb *ttnpb.Gateway, gtw *Gateway) { pb.EnforceDutyCycle = gtw.EnforceDutyCycle },
+	updateLocationFromStatusField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		pb.UpdateLocationFromStatus = gtw.UpdateLocationFromStatus
+	},
+	enforceDutyCycleField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		pb.EnforceDutyCycle = gtw.EnforceDutyCycle
+	},
 	downlinkPathConstraintField: func(pb *ttnpb.Gateway, gtw *Gateway) {
 		pb.DownlinkPathConstraint = ttnpb.DownlinkPathConstraint(gtw.DownlinkPathConstraint)
 	},
 	antennasField: func(pb *ttnpb.Gateway, gtw *Gateway) {
-		sort.Slice(gtw.Antennas, func(i int, j int) bool { return gtw.Antennas[i].Index < gtw.Antennas[j].Index })
+		sort.Slice(gtw.Antennas, func(i int, j int) bool {
+			return gtw.Antennas[i].Index < gtw.Antennas[j].Index
+		})
 		pb.Antennas = make([]*ttnpb.GatewayAntenna, len(gtw.Antennas))
 		for i, antenna := range gtw.Antennas {
 			pb.Antennas[i] = antenna.toPB()
@@ -208,7 +234,9 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 			ValidTo:   ttnpb.ProtoTime(gtw.ClaimAuthenticationCodeValidTo),
 		}
 	},
-	targetCUPSURIField: func(pb *ttnpb.Gateway, gtw *Gateway) { pb.TargetCupsUri = gtw.TargetCUPSURI },
+	targetCUPSURIField: func(pb *ttnpb.Gateway, gtw *Gateway) {
+		pb.TargetCupsUri = gtw.TargetCUPSURI
+	},
 	targetCUPSKeyField: func(pb *ttnpb.Gateway, gtw *Gateway) {
 		blocks := bytes.SplitN(gtw.TargetCUPSKey, secretFieldSeparator, 2)
 		if len(blocks) == 2 {
@@ -241,9 +269,15 @@ var gatewayPBSetters = map[string]func(*ttnpb.Gateway, *Gateway){
 
 // functions to set fields from the gateway proto into the gateway model.
 var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
-	"ids.eui":        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.GatewayEUI = eui(pb.GetIds().GetEui()) },
-	nameField:        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.Name = pb.Name },
-	descriptionField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.Description = pb.Description },
+	"ids.eui": func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.GatewayEUI = eui(pb.GetIds().GetEui())
+	},
+	nameField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.Name = pb.Name
+	},
+	descriptionField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.Description = pb.Description
+	},
 	attributesField: func(gtw *Gateway, pb *ttnpb.Gateway) {
 		gtw.Attributes = attributes(gtw.Attributes).updateFromMap(pb.Attributes)
 	},
@@ -295,24 +329,46 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 			gtw.FirmwareVersion = pb.VersionIds.FirmwareVersion
 		}
 	},
-	gatewayServerAddressField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.GatewayServerAddress = pb.GatewayServerAddress },
-	autoUpdateField:           func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.AutoUpdate = pb.AutoUpdate },
-	updateChannelField:        func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.UpdateChannel = pb.UpdateChannel },
-	frequencyPlanIDsField:     func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.FrequencyPlanID = strings.Join(pb.FrequencyPlanIds, " ") },
-	statusPublicField:         func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.StatusPublic = pb.StatusPublic },
-	locationPublicField:       func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.LocationPublic = pb.LocationPublic },
-	scheduleDownlinkLateField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.ScheduleDownlinkLate = pb.ScheduleDownlinkLate },
+	gatewayServerAddressField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.GatewayServerAddress = pb.GatewayServerAddress
+	},
+	autoUpdateField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.AutoUpdate = pb.AutoUpdate
+	},
+	updateChannelField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.UpdateChannel = pb.UpdateChannel
+	},
+	frequencyPlanIDsField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.FrequencyPlanID = strings.Join(pb.FrequencyPlanIds, " ")
+	},
+	statusPublicField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.StatusPublic = pb.StatusPublic
+	},
+	locationPublicField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.LocationPublic = pb.LocationPublic
+	},
+	scheduleDownlinkLateField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.ScheduleDownlinkLate = pb.ScheduleDownlinkLate
+	},
 	scheduleAnytimeDelayField: func(gtw *Gateway, pb *ttnpb.Gateway) {
 		gtw.ScheduleAnytimeDelay = 0
 		if delay := ttnpb.StdDuration(pb.ScheduleAnytimeDelay); delay != nil {
 			gtw.ScheduleAnytimeDelay = int64(*delay)
 		}
 	},
-	updateLocationFromStatusField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.UpdateLocationFromStatus = pb.UpdateLocationFromStatus },
-	enforceDutyCycleField:         func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.EnforceDutyCycle = pb.EnforceDutyCycle },
-	downlinkPathConstraintField:   func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.DownlinkPathConstraint = int(pb.DownlinkPathConstraint) },
+	updateLocationFromStatusField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.UpdateLocationFromStatus = pb.UpdateLocationFromStatus
+	},
+	enforceDutyCycleField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.EnforceDutyCycle = pb.EnforceDutyCycle
+	},
+	downlinkPathConstraintField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.DownlinkPathConstraint = int(pb.DownlinkPathConstraint)
+	},
 	antennasField: func(gtw *Gateway, pb *ttnpb.Gateway) {
-		sort.Slice(gtw.Antennas, func(i int, j int) bool { return gtw.Antennas[i].Index < gtw.Antennas[j].Index })
+		sort.Slice(gtw.Antennas, func(i int, j int) bool {
+			return gtw.Antennas[i].Index < gtw.Antennas[j].Index
+		})
 		antennas := make([]GatewayAntenna, len(pb.Antennas))
 		copy(antennas, gtw.Antennas)
 		gtw.Antennas = antennas
@@ -352,7 +408,9 @@ var gatewayModelSetters = map[string]func(*Gateway, *ttnpb.Gateway){
 			}
 		}
 	},
-	targetCUPSURIField: func(gtw *Gateway, pb *ttnpb.Gateway) { gtw.TargetCUPSURI = pb.TargetCupsUri },
+	targetCUPSURIField: func(gtw *Gateway, pb *ttnpb.Gateway) {
+		gtw.TargetCUPSURI = pb.TargetCupsUri
+	},
 	targetCUPSKeyField: func(gtw *Gateway, pb *ttnpb.Gateway) {
 		if pb.TargetCupsKey != nil {
 			var secretBuffer bytes.Buffer
@@ -393,12 +451,16 @@ func init() {
 
 // fieldmask path to column name in gateways table.
 var gatewayColumnNames = map[string][]string{
-	"ids.eui":                           {"gateway_eui"},
-	antennasField:                       {},
-	attributesField:                     {},
-	autoUpdateField:                     {autoUpdateField},
-	brandIDField:                        {"brand_id"},
-	claimAuthenticationCodeField:        {"claim_authentication_code_secret", "claim_authentication_code_valid_from", "claim_authentication_code_valid_to"},
+	"ids.eui":       {"gateway_eui"},
+	antennasField:   {},
+	attributesField: {},
+	autoUpdateField: {autoUpdateField},
+	brandIDField:    {"brand_id"},
+	claimAuthenticationCodeField: {
+		"claim_authentication_code_secret",
+		"claim_authentication_code_valid_from",
+		"claim_authentication_code_valid_to",
+	},
 	contactInfoField:                    {},
 	descriptionField:                    {descriptionField},
 	downlinkPathConstraintField:         {downlinkPathConstraintField},

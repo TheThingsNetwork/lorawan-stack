@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ type paginationOptionsKeyType struct{}
 
 var paginationOptionsKey paginationOptionsKeyType
 
+// PaginationOptions stores the pagination options that are propagated in the context.
 type PaginationOptions struct {
 	limit  uint32
 	offset uint32
@@ -81,11 +82,15 @@ type orderOptionsKeyType struct{}
 
 var orderOptionsKey orderOptionsKeyType
 
+// OrderOptions stores the ordering options that are propagated in the context.
 type OrderOptions struct {
 	field string
 	order string
 }
 
+// OrderFromContext returns the ordering string (field and direction) for the query.
+// If the context contains ordering options, those are used. Otherwise, the default
+// field and order are used.
 func OrderFromContext(ctx context.Context, table, defaultTableField, defaultOrder string) string {
 	if opts, ok := ctx.Value(orderOptionsKey).(OrderOptions); ok && opts.field != "" {
 		order := opts.order

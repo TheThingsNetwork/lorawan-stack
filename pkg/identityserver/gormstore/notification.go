@@ -30,14 +30,18 @@ type Notification struct {
 
 	EntityID   string `gorm:"type:UUID;index:notification_entity_index;not null"`
 	EntityType string `gorm:"type:VARCHAR(32);index:notification_entity_index;not null"`
-	EntityUID  string `gorm:"type:VARCHAR(36);not null"` // Copy of the human-readable entity ID, so that we can keep notifications for deleted entities.
+
+	// EntityUID is a copy of the human-readable entity ID, so that we can keep notifications for deleted entities.
+	EntityUID string `gorm:"type:VARCHAR(36);not null"`
 
 	NotificationType string `gorm:"not null"`
 
 	Data postgres.Jsonb `gorm:"type:JSONB"`
 
-	SenderID  *string `gorm:"type:UUID;index:notification_sender_index"`
-	SenderUID string  `gorm:"type:VARCHAR(36);not null"` // Copy of the human-readable sender ID, so that we can keep notifications for deleted senders.
+	SenderID *string `gorm:"type:UUID;index:notification_sender_index"`
+
+	// SenderUID is a copy of the human-readable sender ID, so that we can keep notifications for deleted senders.
+	SenderUID string `gorm:"type:VARCHAR(36);not null"`
 
 	Receivers pq.Int32Array `gorm:"type:INT ARRAY"`
 
@@ -47,10 +51,10 @@ type Notification struct {
 // NotificationReceiver model.
 type NotificationReceiver struct {
 	Notification   *Notification
-	NotificationID string `gorm:"type:UUID;unique_index:notification_receiver_index;index:notification_receiver_notification_id_index;not null"`
+	NotificationID string `gorm:"type:UUID;unique_index:notification_receiver_index;index:notification_receiver_notification_id_index;not null"` //nolint:lll
 
 	Receiver   *User
-	ReceiverID string `gorm:"type:UUID;unique_index:notification_receiver_index;index:notification_receiver_user_index;not null"`
+	ReceiverID string `gorm:"type:UUID;unique_index:notification_receiver_index;index:notification_receiver_user_index;not null"` //nolint:lll
 
 	Status          int32     `gorm:"not null"`
 	StatusUpdatedAt time.Time `gorm:"not null"`

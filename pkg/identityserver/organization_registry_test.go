@@ -27,13 +27,19 @@ import (
 )
 
 func TestOrganizationsNestedError(t *testing.T) {
+	t.Parallel()
+
+	p := &storetest.Population{}
+
+	usr := p.NewUser()
+	usrKey, _ := p.NewAPIKey(usr.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	usrCreds := rpcCreds(usrKey)
+
+	org := p.NewOrganization(usr.GetOrganizationOrUserIdentifiers())
+
 	a, ctx := test.New(t)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		userID := defaultUser.GetIds()
-		creds := userCreds(defaultUserIdx)
-		org := userOrganizations(userID).Organizations[0]
-
 		reg := ttnpb.NewOrganizationRegistryClient(cc)
 
 		_, err := reg.Create(ctx, &ttnpb.CreateOrganizationRequest{
@@ -41,8 +47,7 @@ func TestOrganizationsNestedError(t *testing.T) {
 				Ids: &ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
 			},
 			Collaborator: org.OrganizationOrUserIdentifiers(),
-		}, creds)
-
+		}, usrCreds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsInvalidArgument(err), should.BeTrue)
 		}
@@ -50,12 +55,11 @@ func TestOrganizationsNestedError(t *testing.T) {
 		_, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
 			FieldMask:    ttnpb.FieldMask("name"),
 			Collaborator: org.OrganizationOrUserIdentifiers(),
-		}, creds)
-
+		}, usrCreds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsInvalidArgument(err), should.BeTrue)
 		}
-	})
+	}, withPrivateTestDatabase(p))
 }
 
 func TestOrganizationsPermissionDenied(t *testing.T) {

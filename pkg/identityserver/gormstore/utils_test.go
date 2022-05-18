@@ -31,6 +31,8 @@ var (
 )
 
 func WithDB(t *testing.T, f func(t *testing.T, db *gorm.DB)) {
+	t.Helper()
+
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	setup.Do(func() {
 		dbAddress := os.Getenv("SQL_DB_ADDRESS")
