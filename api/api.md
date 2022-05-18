@@ -2503,6 +2503,7 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 | `target_application_server_address` | <p>`string.pattern`: `^(?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*(?:[A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])(?::[0-9]{1,5})?$|^$`</p> |
 | `target_application_server_kek_label` | <p>`string.max_len`: `2048`</p> |
 | `target_application_server_id` | <p>`string.max_len`: `100`</p> |
+| `target_net_id` | <p>`bytes.len`: `3`</p> |
 
 ### <a name="ttn.lorawan.v3.ClaimEndDeviceRequest.AuthenticatedIdentifiers">Message `ClaimEndDeviceRequest.AuthenticatedIdentifiers`</a>
 
@@ -2516,6 +2517,8 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 
 | Field | Validations |
 | ----- | ----------- |
+| `join_eui` | <p>`bytes.len`: `8`</p> |
+| `dev_eui` | <p>`bytes.len`: `8`</p> |
 | `authentication_code` | <p>`string.pattern`: `^[A-Z0-9]{1,32}$`</p> |
 
 ### <a name="ttn.lorawan.v3.ClaimGatewayRequest">Message `ClaimGatewayRequest`</a>
@@ -2551,6 +2554,7 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 
 | Field | Validations |
 | ----- | ----------- |
+| `gateway_eui` | <p>`bytes.len`: `8`</p> |
 | `authentication_code` | <p>`bytes.max_len`: `2048`</p> |
 
 ### <a name="ttn.lorawan.v3.GetClaimStatusResponse">Message `GetClaimStatusResponse`</a>
@@ -2567,6 +2571,8 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 | Field | Validations |
 | ----- | ----------- |
 | `end_device_ids` | <p>`message.required`: `true`</p> |
+| `home_net_id` | <p>`bytes.len`: `3`</p> |
+| `home_ns_id` | <p>`bytes.len`: `8`</p> |
 
 ### <a name="ttn.lorawan.v3.GetClaimStatusResponse.VendorSpecific">Message `GetClaimStatusResponse.VendorSpecific`</a>
 
@@ -2581,12 +2587,24 @@ ApplicationRegistry, ClientRegistry, GatewayRegistry, OrganizationRegistry and U
 | ----- | ---- | ----- | ----------- |
 | `join_eui` | [`bytes`](#bytes) |  |  |
 
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `join_eui` | <p>`bytes.len`: `8`</p> |
+
 ### <a name="ttn.lorawan.v3.GetInfoByJoinEUIResponse">Message `GetInfoByJoinEUIResponse`</a>
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `join_eui` | [`bytes`](#bytes) |  |  |
 | `supports_claiming` | [`bool`](#bool) |  | If set, this Join EUI is available for claiming on one of the configured Join Servers. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `join_eui` | <p>`bytes.len`: `8`</p> |
 
 ### <a name="ttn.lorawan.v3.EndDeviceClaimingServer">Service `EndDeviceClaimingServer`</a>
 
@@ -4253,6 +4271,12 @@ Identifies an end device model with version information.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `eui` | [`bytes`](#bytes) |  |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `eui` | <p>`bytes.len`: `8`</p> |
 
 ### <a name="ttn.lorawan.v3.GetGatewayRequest">Message `GetGatewayRequest`</a>
 

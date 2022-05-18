@@ -26,6 +26,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
+	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
 var (
@@ -296,7 +297,7 @@ func (is *IdentityServer) getGatewayIdentifiersForEUI(ctx context.Context, req *
 	}
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		gtw, err := st.GetGateway(ctx, &ttnpb.GatewayIdentifiers{
-			Eui: req.Eui,
+			Eui: types.MustEUI64(req.Eui),
 		}, []string{"ids.gateway_id", "ids.eui"})
 		if err != nil {
 			return err

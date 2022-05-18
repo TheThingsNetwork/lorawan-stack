@@ -162,7 +162,7 @@ func TestGatewaysCRUD(t *testing.T) {
 		}
 
 		ids, err := reg.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-			Eui: eui,
+			Eui: eui.Bytes(),
 		}, credsWithoutRights)
 		if a.So(err, should.BeNil) && a.So(ids, should.NotBeNil) {
 			a.So(ids.GetGatewayId(), should.Equal, created.GetIds().GetGatewayId())

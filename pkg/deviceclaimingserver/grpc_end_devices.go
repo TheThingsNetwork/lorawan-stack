@@ -106,8 +106,8 @@ func (edcs *endDeviceClaimingServer) Claim(ctx context.Context, req *ttnpb.Claim
 		claimAuthenticationCode string
 	)
 	if authenticatedIDs := req.GetAuthenticatedIdentifiers(); authenticatedIDs != nil {
-		joinEUI = req.GetAuthenticatedIdentifiers().JoinEui
-		devEUI = req.GetAuthenticatedIdentifiers().DevEui
+		joinEUI = types.MustEUI64(req.GetAuthenticatedIdentifiers().JoinEui).OrZero()
+		devEUI = types.MustEUI64(req.GetAuthenticatedIdentifiers().DevEui).OrZero()
 		claimAuthenticationCode = req.GetAuthenticatedIdentifiers().AuthenticationCode
 	} else if qrCode := req.GetQrCode(); qrCode != nil {
 		conn, err := edcs.DCS.GetPeerConn(ctx, ttnpb.ClusterRole_QR_CODE_GENERATOR, nil)

@@ -258,8 +258,11 @@ func TestTTJS(t *testing.T) {
 	a.So(err, should.BeNil)
 	a.So(ret, should.NotBeNil)
 	a.So(ret.EndDeviceIds, should.Resemble, validEndDeviceIds)
-	a.So(*ret.HomeNetId, should.Resemble, test.DefaultNetID)
-	a.So(ret.HomeNsId.String(), should.Equal, homeNSID.String())
+	a.So(ret.HomeNetId, should.Resemble, test.DefaultNetID.Bytes())
+	var retHomeNSID types.EUI64
+	err = retHomeNSID.Unmarshal(ret.HomeNsId)
+	a.So(err, should.BeNil)
+	a.So(retHomeNSID, should.Equal, homeNSID)
 	a.So(err, should.BeNil)
 	a.So(ret.VendorSpecific, should.NotBeNil)
 	a.So(ret.VendorSpecific.OrganizationUniqueIdentifier, should.Equal, 0xec656e)

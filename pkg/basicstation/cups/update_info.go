@@ -177,7 +177,7 @@ func (s *Server) updateInfo(w http.ResponseWriter, r *http.Request) (err error) 
 
 	var ids *ttnpb.GatewayIdentifiers
 	ids, err = registry.GetIdentifiersForEUI(ctx, &ttnpb.GetGatewayIdentifiersForEUIRequest{
-		Eui: &req.Router.EUI64,
+		Eui: req.Router.EUI64.Bytes(),
 	}, serverAuth)
 	if err != nil {
 		if errors.IsNotFound(err) && s.registerUnknown {
