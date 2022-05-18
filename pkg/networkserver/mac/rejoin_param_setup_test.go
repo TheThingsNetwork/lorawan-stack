@@ -23,6 +23,7 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -92,7 +93,7 @@ func TestNeedsRejoinParamSetupReq(t *testing.T) {
 							DesiredParameters: conf.DesiredParameters,
 						},
 					},
-					Needs: conf.Needs && macVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0,
+					Needs: conf.Needs && macspec.UseRejoinParamSetupReq(macVersion),
 				},
 			)
 		})

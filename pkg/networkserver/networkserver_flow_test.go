@@ -32,6 +32,7 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -200,7 +201,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		var upCmders []MACCommander
 		var upEvBuilders []events.Builder
 		var downCmders []MACCommander
-		if dev.PendingMacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
+		if macspec.UseRekeyInd(dev.PendingMacState.LorawanVersion) {
 			rekeyInd := &ttnpb.MACCommand_RekeyInd{
 				MinorVersion: ttnpb.Minor_MINOR_1,
 			}
@@ -307,7 +308,7 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 			return
 		}
 
-		if dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
+		if macspec.UseSharedFCntDown(dev.MacState.LorawanVersion) {
 			if !a.So(env.AssertNsAsHandleUplink(ctx, dev.Ids.ApplicationIds, func(ctx context.Context, ups ...*ttnpb.ApplicationUp) bool {
 				_, a := test.MustNewTFromContext(ctx)
 				if !a.So(ups, should.HaveLength, 1) {
@@ -362,7 +363,7 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 	var upCmders []MACCommander
 	var upEvBuilders []events.Builder
 	var downCmders []MACCommander
-	if macVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0 {
+	if macspec.UseDeviceModeInd(macVersion) {
 		deviceModeInd := &ttnpb.MACCommand_DeviceModeInd{
 			Class: ttnpb.Class_CLASS_C,
 		}

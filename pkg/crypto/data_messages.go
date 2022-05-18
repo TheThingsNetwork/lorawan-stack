@@ -24,7 +24,33 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
-func encryptMessage(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uint32, payload []byte, isFOpts bool) ([]byte, error) {
+type encryptionOptions struct {
+	frameTypeConstant [4]byte
+}
+
+// EncryptionOption encapsulates custom LoRaWAN encryption options.
+type EncryptionOption func(*encryptionOptions)
+
+// WithFrameTypeConstant specifies which bytes are to be used for
+// positions [1:5] during encryption. These 4 bytes uniquely identify
+// the frame type in order to avoid collisions between different frames
+// which may have the same counter values. See the
+// `FOpts Encryption, Usage of FCntDwn Errata on the LoRaWAN L2 1.1 Specification`
+// erratum for more details on why these collisions may be an issue
+// and which values are used by different frame types.
+// In the absence of this option, the constant [0x00, 0x00, 0x00, 0x00]
+// is used.
+func WithFrameTypeConstant(identifier [4]byte) EncryptionOption {
+	return func(encOpts *encryptionOptions) {
+		copy(encOpts.frameTypeConstant[:], identifier[:])
+	}
+}
+
+func encryptMessage(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uint32, payload []byte, opts ...EncryptionOption) ([]byte, error) {
+	encOpts := &encryptionOptions{}
+	for _, opt := range opts {
+		opt(encOpts)
+	}
 	k := len(payload) / aes.BlockSize
 	if len(payload)%aes.BlockSize != 0 {
 		k++
@@ -39,6 +65,7 @@ func encryptMessage(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uin
 	}
 	var a [aes.BlockSize]byte
 	a[0] = 0x01
+	copy(a[1:5], encOpts.frameTypeConstant[:])
 	a[5] = dir
 	copy(a[6:10], reverse(addr[:]))
 	binary.LittleEndian.PutUint32(a[10:14], fCnt)
@@ -46,9 +73,7 @@ func encryptMessage(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uin
 	var b [aes.BlockSize]byte
 	for i := uint8(0); i < uint8(k); i++ {
 		copy(b[:], payload[i*aes.BlockSize:])
-		if !isFOpts {
-			a[15] = i + 1
-		}
+		a[15] = i + 1
 		cipher.Encrypt(s[:], a[:])
 		for j := 0; j < aes.BlockSize; j++ {
 			b[j] = b[j] ^ s[j]
@@ -62,32 +87,32 @@ func encryptMessage(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uin
 // - The payload contains the FRMPayload bytes
 // - For FPort>0, the AppSKey is used
 // - For FPort=0, the NwkSEncKey/NwkSKey is used
-func EncryptUplink(key types.AES128Key, addr types.DevAddr, fCnt uint32, payload []byte, isFOpts bool) ([]byte, error) {
-	return encryptMessage(key, 0, addr, fCnt, payload, isFOpts)
+func EncryptUplink(key types.AES128Key, addr types.DevAddr, fCnt uint32, payload []byte, opts ...EncryptionOption) ([]byte, error) {
+	return encryptMessage(key, 0, addr, fCnt, payload, opts...)
 }
 
 // DecryptUplink decrypts an uplink payload
 // - The payload contains the FRMPayload bytes
 // - For FPort>0, the AppSKey is used
 // - For FPort=0, the NwkSEncKey/NwkSKey is used
-func DecryptUplink(key types.AES128Key, addr types.DevAddr, fCnt uint32, payload []byte, isFOpts bool) ([]byte, error) {
-	return encryptMessage(key, 0, addr, fCnt, payload, isFOpts)
+func DecryptUplink(key types.AES128Key, addr types.DevAddr, fCnt uint32, payload []byte, opts ...EncryptionOption) ([]byte, error) {
+	return encryptMessage(key, 0, addr, fCnt, payload, opts...)
 }
 
 // EncryptDownlink encrypts a downlink payload
 // - The payload contains the FRMPayload bytes
 // - For FPort>0, the AppSKey is used
 // - For FPort=0, the NwkSEncKey/NwkSKey is used
-func EncryptDownlink(key types.AES128Key, addr types.DevAddr, fCnt uint32, payload []byte, isFOpts bool) ([]byte, error) {
-	return encryptMessage(key, 1, addr, fCnt, payload, isFOpts)
+func EncryptDownlink(key types.AES128Key, addr types.DevAddr, fCnt uint32, payload []byte, opts ...EncryptionOption) ([]byte, error) {
+	return encryptMessage(key, 1, addr, fCnt, payload, opts...)
 }
 
 // DecryptDownlink decrypts a downlink payload
 // - The payload contains the FRMPayload bytes
 // - For FPort>0, the AppSKey is used
 // - For FPort=0, the NwkSEncKey/NwkSKey is used
-func DecryptDownlink(key types.AES128Key, addr types.DevAddr, fCnt uint32, payload []byte, isFOpts bool) ([]byte, error) {
-	return encryptMessage(key, 1, addr, fCnt, payload, isFOpts)
+func DecryptDownlink(key types.AES128Key, addr types.DevAddr, fCnt uint32, payload []byte, opts ...EncryptionOption) ([]byte, error) {
+	return encryptMessage(key, 1, addr, fCnt, payload, opts...)
 }
 
 func computeMIC(key types.AES128Key, dir uint8, confFCnt uint16, addr types.DevAddr, fCnt uint32, payload []byte) ([4]byte, error) {

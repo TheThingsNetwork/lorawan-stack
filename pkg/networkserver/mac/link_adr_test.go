@@ -27,6 +27,7 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -377,7 +378,7 @@ func TestLinkADRReq(t *testing.T) {
 						switch {
 						case n == 0:
 							return 0
-						case tc.LoRaWANVersion.Compare(ttnpb.MACVersion_MAC_V1_1) >= 0:
+						case macspec.SingularLinkADRAns(tc.LoRaWANVersion):
 							return 1
 						default:
 							return uint16(n)

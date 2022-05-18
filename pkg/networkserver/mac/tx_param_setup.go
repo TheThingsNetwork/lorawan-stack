@@ -21,6 +21,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/encoding/lorawan"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
@@ -38,7 +39,7 @@ func DeviceNeedsTxParamSetupReq(dev *ttnpb.EndDevice, phy *band.Band) bool {
 	if !phy.TxParamSetupReqSupport ||
 		dev.GetMulticast() ||
 		dev.GetMacState() == nil ||
-		dev.MacState.LorawanVersion.Compare(ttnpb.MACVersion_MAC_V1_0_2) < 0 {
+		!macspec.UseTxParamSetupReq(dev.MacState.LorawanVersion) {
 		return false
 	}
 	if dev.MacState.DesiredParameters.MaxEirp != dev.MacState.CurrentParameters.MaxEirp {

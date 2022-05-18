@@ -32,6 +32,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	nstime "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -525,8 +526,8 @@ func messageGenerationKeys(sk *ttnpb.SessionKeys, macVersion ttnpb.MACVersion) t
 	}
 }
 
-func MustEncryptUplink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, isFOpts bool, b ...byte) []byte {
-	return test.Must(crypto.EncryptUplink(key, devAddr, fCnt, b, isFOpts)).([]byte)
+func MustEncryptUplink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, encOpts []crypto.EncryptionOption, b ...byte) []byte {
+	return test.Must(crypto.EncryptUplink(key, devAddr, fCnt, b, encOpts...)).([]byte)
 }
 
 func MustComputeUplinkCMACF(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, b ...byte) [4]byte {
@@ -588,10 +589,11 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 	keys := messageGenerationKeys(conf.SessionKeys, conf.MACVersion)
 	frmPayload := conf.FRMPayload
 	fOpts := conf.FOpts
-	if len(conf.FRMPayload) > 0 && conf.FPort == 0 {
-		frmPayload = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, conf.FCnt, false, frmPayload...)
-	} else if len(conf.FOpts) > 0 && conf.MACVersion.EncryptFOpts() {
-		fOpts = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, conf.FCnt, true, fOpts...)
+	if len(frmPayload) > 0 && conf.FPort == 0 {
+		frmPayload = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, conf.FCnt, nil, frmPayload...)
+	} else if len(fOpts) > 0 && macspec.EncryptFOpts(conf.MACVersion) {
+		encOpts := macspec.EncryptionOptions(conf.MACVersion, macspec.UplinkFrame, uint32(conf.FPort), true)
+		fOpts = MustEncryptUplink(*keys.NwkSEncKey.Key, devAddr, conf.FCnt, encOpts, fOpts...)
 	}
 	mType := ttnpb.MType_UNCONFIRMED_UP
 	if conf.Confirmed {
@@ -619,7 +621,7 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 	})).([]byte)
 	var mic [4]byte
 	switch {
-	case conf.MACVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0:
+	case macspec.UseLegacyMIC(conf.MACVersion):
 		mic = test.Must(crypto.ComputeLegacyUplinkMIC(*keys.FNwkSIntKey.Key, devAddr, conf.FCnt, phyPayload)).([4]byte)
 	default:
 		mic = test.Must(crypto.ComputeUplinkMIC(*keys.SNwkSIntKey.Key, *keys.FNwkSIntKey.Key, conf.ConfFCntDown, uint8(conf.DataRateIndex), conf.ChannelIndex, devAddr, conf.FCnt, phyPayload)).([4]byte)
@@ -670,8 +672,8 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 	})
 }
 
-func MustEncryptDownlink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, isFOpts bool, b ...byte) []byte {
-	return test.Must(crypto.EncryptDownlink(key, devAddr, fCnt, b, isFOpts)).([]byte)
+func MustEncryptDownlink(key types.AES128Key, devAddr types.DevAddr, fCnt uint32, encOpts []crypto.EncryptionOption, b ...byte) []byte {
+	return test.Must(crypto.EncryptDownlink(key, devAddr, fCnt, b, encOpts...)).([]byte)
 }
 
 type DataDownlinkConfig struct {
@@ -704,9 +706,10 @@ func MakeDataDownlink(conf DataDownlinkConfig) *ttnpb.DownlinkMessage {
 	frmPayload := conf.FRMPayload
 	fOpts := conf.FOpts
 	if len(frmPayload) > 0 && conf.FPort == 0 {
-		frmPayload = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, conf.FCnt, false, frmPayload...)
-	} else if len(fOpts) > 0 && conf.MACVersion.EncryptFOpts() {
-		fOpts = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, conf.FCnt, true, fOpts...)
+		frmPayload = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, conf.FCnt, nil, frmPayload...)
+	} else if len(fOpts) > 0 && macspec.EncryptFOpts(conf.MACVersion) {
+		encOpts := macspec.EncryptionOptions(conf.MACVersion, macspec.DownlinkFrame, uint32(conf.FPort), true)
+		fOpts = MustEncryptDownlink(*keys.NwkSEncKey.Key, devAddr, conf.FCnt, encOpts, fOpts...)
 	}
 	mType := ttnpb.MType_UNCONFIRMED_DOWN
 	if conf.Confirmed {
@@ -734,7 +737,7 @@ func MakeDataDownlink(conf DataDownlinkConfig) *ttnpb.DownlinkMessage {
 	phyPayload := test.Must(lorawan.MarshalMessage(*msg)).([]byte)
 	var mic [4]byte
 	switch {
-	case conf.MACVersion.Compare(ttnpb.MACVersion_MAC_V1_1) < 0:
+	case macspec.UseLegacyMIC(conf.MACVersion):
 		mic = test.Must(crypto.ComputeLegacyDownlinkMIC(*keys.FNwkSIntKey.Key, devAddr, conf.FCnt, phyPayload)).([4]byte)
 	default:
 		mic = test.Must(crypto.ComputeDownlinkMIC(*keys.SNwkSIntKey.Key, devAddr, conf.ConfFCntUp, conf.FCnt, phyPayload)).([4]byte)

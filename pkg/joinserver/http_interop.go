@@ -22,6 +22,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
@@ -109,12 +110,12 @@ func (srv interopServer) JoinRequest(ctx context.Context, in *interop.JoinReq) (
 		SessionKeyID: interop.Buffer(res.SessionKeys.SessionKeyId),
 		Lifetime:     uint32(ttnpb.StdDurationOrZero(res.Lifetime) / time.Second),
 	}
-	if ttnpb.MACVersion(in.MACVersion).Compare(ttnpb.MACVersion_MAC_V1_1) < 0 {
-		ans.NwkSKey = (*interop.KeyEnvelope)(res.SessionKeys.FNwkSIntKey)
-	} else {
+	if macspec.UseNwkKey(ttnpb.MACVersion(in.MACVersion)) {
 		ans.FNwkSIntKey = (*interop.KeyEnvelope)(res.SessionKeys.FNwkSIntKey)
 		ans.SNwkSIntKey = (*interop.KeyEnvelope)(res.SessionKeys.SNwkSIntKey)
 		ans.NwkSEncKey = (*interop.KeyEnvelope)(res.SessionKeys.NwkSEncKey)
+	} else {
+		ans.NwkSKey = (*interop.KeyEnvelope)(res.SessionKeys.FNwkSIntKey)
 	}
 	return ans, nil
 }

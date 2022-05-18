@@ -39,6 +39,7 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/mac"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/task"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -815,7 +816,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						b = append(b, test.Must(crypto.EncryptDownlink(
 							test.DefaultNwkSEncKey,
 							test.DefaultDevAddr,
-							0x24,
+							0x42,
 							[]byte{
 								/* ResetConf */
 								0x01, 0b0000_0001,
@@ -824,7 +825,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
-							true,
+							macspec.EncryptionOptions(ttnpb.MACVersion_MAC_V1_1, macspec.DownlinkFrame, 0x1, true)...,
 						)).([]byte)...)
 
 						/** FPort **/
@@ -966,7 +967,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						b = append(b, test.Must(crypto.EncryptDownlink(
 							test.DefaultNwkSEncKey,
 							test.DefaultDevAddr,
-							0x24,
+							0x42,
 							[]byte{
 								/* ResetConf */
 								0x01, 0b0000_0001,
@@ -975,7 +976,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
-							true,
+							macspec.EncryptionOptions(ttnpb.MACVersion_MAC_V1_1, macspec.DownlinkFrame, 0x1, true)...,
 						)).([]byte)...)
 
 						/** FPort **/
@@ -1136,7 +1137,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
-							true,
+							macspec.EncryptionOptions(ttnpb.MACVersion_MAC_V1_1, macspec.DownlinkFrame, 0, true)...,
 						)).([]byte)...)
 
 						/* MIC */
@@ -1282,7 +1283,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						b = append(b, test.Must(crypto.EncryptDownlink(
 							test.DefaultNwkSEncKey,
 							test.DefaultDevAddr,
-							0x24,
+							0x42,
 							[]byte{
 								/* ResetConf */
 								0x01, 0b0000_0001,
@@ -1291,7 +1292,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
-							true,
+							macspec.EncryptionOptions(ttnpb.MACVersion_MAC_V1_1, macspec.DownlinkFrame, 0x15, true)...,
 						)).([]byte)...)
 
 						/** FPort **/
@@ -1588,7 +1589,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 						b = append(b, test.Must(crypto.EncryptDownlink(
 							test.DefaultNwkSEncKey,
 							test.DefaultDevAddr,
-							0x24,
+							0x42,
 							[]byte{
 								/* ResetConf */
 								0x01, 0b0000_0001,
@@ -1597,7 +1598,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 								/* DevStatusReq */
 								0x06,
 							},
-							true,
+							macspec.EncryptionOptions(ttnpb.MACVersion_MAC_V1_1, macspec.DownlinkFrame, 0x1, true)...,
 						)).([]byte)...)
 
 						/** FPort **/

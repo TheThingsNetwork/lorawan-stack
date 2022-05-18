@@ -34,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/interop"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/grpc"
@@ -329,7 +330,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			paths := make([]string, 0, 3)
 
 			dn := uint32(binary.BigEndian.Uint16(pld.DevNonce[:]))
-			if req.SelectedMacVersion.IncrementDevNonce() {
+			if macspec.IncrementDevNonce(req.SelectedMacVersion) {
 				if (dn != 0 || dev.LastDevNonce != 0 || dev.LastJoinNonce != 0) && !dev.ResetsJoinNonces {
 					if dn <= dev.LastDevNonce {
 						registerDevNonceTooSmall(ctx, req)
@@ -428,14 +429,14 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 				applicationCryptoService cryptoservices.Application
 			)
 			if dev.RootKeys != nil && dev.RootKeys.NwkKey != nil &&
-				(req.SelectedMacVersion.UseNwkKey() || dev.RootKeys.RootKeyId != "ttn-lw-cli-generated") {
+				(macspec.UseNwkKey(req.SelectedMacVersion) || dev.RootKeys.RootKeyId != "ttn-lw-cli-generated") {
 				// If a NwkKey is set, assume that the end device is capable of LoRaWAN 1.1.
 				nwkKey, err := cryptoutil.UnwrapAES128Key(ctx, dev.RootKeys.NwkKey, js.KeyVault)
 				if err != nil {
 					return nil, nil, err
 				}
 				networkCryptoService = cryptoservices.NewMemory(&nwkKey, nil)
-				if !req.SelectedMacVersion.UseNwkKey() {
+				if !macspec.UseNwkKey(req.SelectedMacVersion) {
 					// If NwkKey is set and the Network Server uses LoRaWAN 1.0.x, use NwkKey as the AppKey.
 					applicationCryptoService = cryptoservices.NewMemory(nil, &nwkKey)
 				}
@@ -448,7 +449,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 					return nil, nil, err
 				}
 				applicationCryptoService = cryptoservices.NewMemory(nil, &appKey)
-				if networkCryptoService == nil && !req.SelectedMacVersion.UseNwkKey() {
+				if networkCryptoService == nil && !macspec.UseNwkKey(req.SelectedMacVersion) {
 					// If the end device is not provisioned with a NwkKey, use AppKey. This only works with LoRaWAN 1.0.x.
 					networkCryptoService = cryptoservices.NewMemory(&appKey, nil)
 				}
@@ -508,7 +509,7 @@ func (js *JoinServer) HandleJoin(ctx context.Context, req *ttnpb.JoinRequest, au
 			if err != nil {
 				return nil, nil, err
 			}
-			if req.SelectedMacVersion.UseNwkKey() {
+			if macspec.UseNwkKey(req.SelectedMacVersion) {
 				sNwkSIntKeyEnvelope, err = wrapKeyWithVault(ctx, nwkSKeys.SNwkSIntKey, nsKEKLabel, js.KeyVault, nsPlaintextCond)
 				if err != nil {
 					return nil, nil, err

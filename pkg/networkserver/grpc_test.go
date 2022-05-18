@@ -71,6 +71,7 @@ func TestGenerateDevAddr(t *testing.T) {
 					},
 					TaskStarter: StartTaskExclude(
 						DownlinkProcessTaskName,
+						DownlinkDispatchTaskName,
 					),
 					Component: component.Config{
 						ServiceBase: config.ServiceBase{
@@ -158,6 +159,7 @@ func TestGenerateDevAddr(t *testing.T) {
 					},
 					TaskStarter: StartTaskExclude(
 						DownlinkProcessTaskName,
+						DownlinkDispatchTaskName,
 					),
 					Component: component.Config{
 						ServiceBase: config.ServiceBase{

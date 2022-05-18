@@ -36,6 +36,7 @@ import (
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
+	"go.thethings.network/lorawan-stack/v3/pkg/specification/macspec"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -938,10 +939,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 								Adr: true,
 							},
 							FCnt: 42,
-							FOpts: MustEncryptDownlink(nwkSEncKey, devAddr, 42, true, MakeDownlinkMACBuffer(
-								LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B],
-								ttnpb.MACCommandIdentifier_CID_DEV_STATUS,
-							)...),
+							FOpts: MustEncryptDownlink(nwkSEncKey, devAddr, 42,
+								macspec.EncryptionOptions(ttnpb.MACVersion_MAC_V1_1, macspec.DownlinkFrame, 0, true),
+								MakeDownlinkMACBuffer(
+									LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B],
+									ttnpb.MACCommandIdentifier_CID_DEV_STATUS,
+								)...),
 						},
 						FullFCnt: 42,
 					},
@@ -1069,10 +1072,12 @@ func TestGenerateDataDownlink(t *testing.T) {
 								Adr: true,
 							},
 							FCnt: 42,
-							FOpts: MustEncryptDownlink(nwkSEncKey, devAddr, 42, true, MakeDownlinkMACBuffer(
-								LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B],
-								ttnpb.MACCommandIdentifier_CID_DEV_STATUS,
-							)...),
+							FOpts: MustEncryptDownlink(nwkSEncKey, devAddr, 42,
+								macspec.EncryptionOptions(ttnpb.MACVersion_MAC_V1_1, macspec.DownlinkFrame, 0, true),
+								MakeDownlinkMACBuffer(
+									LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B],
+									ttnpb.MACCommandIdentifier_CID_DEV_STATUS,
+								)...),
 						},
 						FullFCnt: 42,
 					},

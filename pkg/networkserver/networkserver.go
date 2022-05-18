@@ -148,8 +148,10 @@ var (
 )
 
 const (
-	applicationUplinkProcessTaskName = "process_application_uplink"
-	downlinkProcessTaskName          = "process_downlink"
+	applicationUplinkProcessTaskName  = "process_application_uplink"
+	downlinkProcessTaskName           = "process_downlink"
+	applicationUplinkDispatchTaskName = "dispatch_application_uplink"
+	downlinkDispatchTaskName          = "dispatch_downlink"
 
 	maxInt = int(^uint(0) >> 1)
 )
@@ -261,16 +263,16 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		return nil, err
 	}
 	consumerIDPrefix := fmt.Sprintf("%s:%d", hostname, os.Getpid())
-	for name, dispatcher := range map[string]interface {
+	for id, dispatcher := range map[string]interface {
 		Dispatch(context.Context, string) error
 	}{
-		"downlink": ns.downlinkTasks,
-		"uplink":   ns.applicationUplinks,
+		downlinkDispatchTaskName:          ns.downlinkTasks,
+		applicationUplinkDispatchTaskName: ns.applicationUplinks,
 	} {
 		dispatcher := dispatcher
 		ns.RegisterTask(&task.Config{
 			Context: ctx,
-			ID:      fmt.Sprintf("%v_task_dispatch", name),
+			ID:      id,
 			Func: func(ctx context.Context) error {
 				return dispatcher.Dispatch(ctx, consumerIDPrefix)
 			},

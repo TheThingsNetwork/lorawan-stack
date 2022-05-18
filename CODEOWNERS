@@ -69,6 +69,7 @@
 /pkg/basicstation @KrishnaIyer @htdvisser
 
 /pkg/networkserver @johanstokking @adriansmares
+/pkg/specification/macspec @johanstokking @adriansmares
 /pkg/encoding/lorawan @johanstokking @adriansmares
 
 /pkg/applicationserver @johanstokking @adriansmares @KrishnaIyer

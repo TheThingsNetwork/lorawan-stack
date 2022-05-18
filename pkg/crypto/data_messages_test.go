@@ -28,29 +28,30 @@ func TestUplinkDownlinkEncryption(t *testing.T) {
 
 	key := types.AES128Key{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
 	addr := types.DevAddr{1, 2, 3, 4}
+	frameIdentifier := [4]byte{0x00, 0x00, 0x00, 0x01}
 
 	var res []byte
 
 	// FRM Payload
-	res, _ = EncryptUplink(key, addr, 1, []byte{1, 2, 3, 4}, false)
+	res, _ = EncryptUplink(key, addr, 1, []byte{1, 2, 3, 4})
 	a.So(res, should.Resemble, []byte{0xCF, 0xF3, 0x0B, 0x4E})
-	res, _ = DecryptUplink(key, addr, 1, []byte{0xCF, 0xF3, 0x0B, 0x4E}, false)
+	res, _ = DecryptUplink(key, addr, 1, []byte{0xCF, 0xF3, 0x0B, 0x4E})
 	a.So(res, should.Resemble, []byte{1, 2, 3, 4})
 
-	res, _ = EncryptDownlink(key, addr, 1, []byte{1, 2, 3, 4}, false)
+	res, _ = EncryptDownlink(key, addr, 1, []byte{1, 2, 3, 4})
 	a.So(res, should.Resemble, []byte{0x4E, 0x75, 0xF4, 0x40})
-	res, _ = DecryptDownlink(key, addr, 1, []byte{0x4E, 0x75, 0xF4, 0x40}, false)
+	res, _ = DecryptDownlink(key, addr, 1, []byte{0x4E, 0x75, 0xF4, 0x40})
 	a.So(res, should.Resemble, []byte{1, 2, 3, 4})
 
 	// FOpts
-	res, _ = EncryptUplink(key, addr, 1, []byte{1, 2, 3, 4}, true)
-	a.So(res, should.Resemble, []byte{0x33, 0xC9, 0x26, 0x22})
-	res, _ = DecryptUplink(key, addr, 1, []byte{0x33, 0xC9, 0x26, 0x22}, true)
+	res, _ = EncryptUplink(key, addr, 1, []byte{1, 2, 3, 4}, WithFrameTypeConstant(frameIdentifier))
+	a.So(res, should.Resemble, []byte{0x23, 0x61, 0x5F, 0x18})
+	res, _ = DecryptUplink(key, addr, 1, []byte{0x23, 0x61, 0x5F, 0x18}, WithFrameTypeConstant(frameIdentifier))
 	a.So(res, should.Resemble, []byte{1, 2, 3, 4})
 
-	res, _ = EncryptDownlink(key, addr, 1, []byte{1, 2, 3, 4}, true)
-	a.So(res, should.Resemble, []byte{0xCA, 0x6F, 0xDA, 0xBA})
-	res, _ = DecryptDownlink(key, addr, 1, []byte{0xCA, 0x6F, 0xDA, 0xBA}, true)
+	res, _ = EncryptDownlink(key, addr, 1, []byte{1, 2, 3, 4}, WithFrameTypeConstant(frameIdentifier))
+	a.So(res, should.Resemble, []byte{0xB2, 0xDB, 0xE3, 0x91})
+	res, _ = DecryptDownlink(key, addr, 1, []byte{0xB2, 0xDB, 0xE3, 0x91}, WithFrameTypeConstant(frameIdentifier))
 	a.So(res, should.Resemble, []byte{1, 2, 3, 4})
 }
 
