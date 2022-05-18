@@ -26,29 +26,34 @@ import style from './webhook-template-info.styl'
 const m = defineMessages({
   about: 'About {name}',
   documentation: 'Documentation',
-  templateInformation: 'Template information',
+  setupWebhook: 'Setup webhook for {name}',
+  editWebhook: 'Edit webhook for {name}',
 })
 
-const WebhookTemplateInfo = ({ webhookTemplate }) => {
+const WebhookTemplateInfo = ({ webhookTemplate, update }) => {
   const { logo_url, name, description, info_url, documentation_url } = webhookTemplate
   const showDivider = Boolean(info_url) && Boolean(documentation_url)
   return (
     <>
-      <Message className={style.heading} component="h3" content={m.templateInformation} />
       <div className={style.templateInfo}>
         <div className={style.logo}>
           <img alt={name} src={logo_url} />
         </div>
-        <div>
-          <h3 className={style.name}>{name}</h3>
-          <span className={style.description}>{description}</span>
+        <div className={style.descriptionBox}>
+          <Message
+            component="h3"
+            content={update ? m.editWebhook : m.setupWebhook}
+            values={{ name }}
+            className="m-0"
+          />
+          <span className="m-0">{description}</span>
           <span className={style.info}>
             {info_url && (
               <Link.Anchor primary href={info_url} external>
                 <Message content={m.about} values={{ name }} />
               </Link.Anchor>
             )}
-            {showDivider && <span className={style.divider}>|</span>}
+            {showDivider && <span className="mr-cs-xxs ml-cs-xxs">|</span>}
             {documentation_url && (
               <Link.Anchor primary href={documentation_url} external>
                 <Message content={m.documentation} />
@@ -57,12 +62,18 @@ const WebhookTemplateInfo = ({ webhookTemplate }) => {
           </span>
         </div>
       </div>
+      <hr className="mb-ls-s" />
     </>
   )
 }
 
 WebhookTemplateInfo.propTypes = {
+  update: PropTypes.bool,
   webhookTemplate: PropTypes.webhookTemplate.isRequired,
+}
+
+WebhookTemplateInfo.defaultProps = {
+  update: false,
 }
 
 export default WebhookTemplateInfo

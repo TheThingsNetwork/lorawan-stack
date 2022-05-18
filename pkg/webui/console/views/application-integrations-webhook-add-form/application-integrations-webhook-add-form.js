@@ -29,7 +29,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 
 const m = defineMessages({
   addCustomWebhook: 'Add custom webhook',
-  addWebhookViaTemplate: 'Add {templateName} webhook',
+  addWebhookViaTemplate: 'Add webhook for {templateName}',
   customWebhook: 'Custom webhook',
 })
 
@@ -39,8 +39,8 @@ const ApplicationWebhookAddForm = props => {
   let breadcrumbContent = m.customWebhook
   if (!templateId) {
     breadcrumbContent = sharedMessages.add
-  } else if (!isCustom && name) {
-    breadcrumbContent = name
+  } else if (!isCustom && webhookTemplate.name) {
+    breadcrumbContent = webhookTemplate.name
   }
 
   useBreadcrumbs(
@@ -70,7 +70,7 @@ const ApplicationWebhookAddForm = props => {
 
   return (
     <Container>
-      <PageTitle title={pageTitle} />
+      <PageTitle title={pageTitle} className="mb-0" hideHeading={Boolean(webhookTemplate)} />
       <Row>
         <Col lg={8} md={12}>
           <WebhookAdd appId={appId} templateId={templateId} webhookTemplate={webhookTemplate} />

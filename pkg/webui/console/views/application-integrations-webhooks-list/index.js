@@ -17,7 +17,7 @@ import { Container, Row, Col } from 'react-grid-system'
 
 import PAGE_SIZES from '@ttn-lw/constants/page-sizes'
 
-import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
+import PageTitle from '@ttn-lw/components/page-title'
 
 import WebhooksTable from '@console/containers/webhooks-table'
 
@@ -29,8 +29,8 @@ const ApplicationWebhooksList = props => {
 
   return (
     <Container>
+      <PageTitle title={sharedMessages.webhooks} hideHeading />
       <Row>
-        <IntlHelmet title={sharedMessages.integrations} />
         <Col>
           <WebhooksTable pageSize={PAGE_SIZES.REGULAR} appId={appId} />
         </Col>

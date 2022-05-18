@@ -264,7 +264,7 @@ class FormField extends React.Component {
     )
 
     return (
-      <div className={cls} data-needs-focus={showError}>
+      <div className={cls} data-needs-focus={showError} data-test-id="form-field">
         {hasTitle && (
           <div className={style.label}>
             <Message

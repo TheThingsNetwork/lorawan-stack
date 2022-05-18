@@ -23,7 +23,7 @@ const mapStateToProps = (state, props) => {
   return {
     appId: selectSelectedApplicationId(state),
     templateId,
-    isCustom: !templateId || templateId === 'custom',
+    isCustom: !Boolean(templateId) || templateId === 'custom',
     isSimpleAdd: !templateId,
     webhookTemplate: selectWebhookTemplateById(state, templateId),
   }

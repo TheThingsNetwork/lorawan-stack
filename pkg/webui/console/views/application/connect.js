@@ -34,6 +34,10 @@ import {
   selectApplicationRightsFetching,
   selectApplicationRightsError,
 } from '@console/store/selectors/applications'
+import {
+  selectMqttProviderDisabled,
+  selectNatsProviderDisabled,
+} from '@console/store/selectors/application-server'
 
 const mapStateToProps = (state, props) => ({
   appId: props.match.params.appId,
@@ -42,6 +46,8 @@ const mapStateToProps = (state, props) => ({
   error: selectApplicationError(state) || selectApplicationRightsError(state),
   rights: selectApplicationRights(state),
   siteName: selectApplicationSiteName(),
+  natsDisabled: selectNatsProviderDisabled(state),
+  mqttDisabled: selectMqttProviderDisabled(state),
 })
 
 const mapDispatchToProps = dispatch => ({

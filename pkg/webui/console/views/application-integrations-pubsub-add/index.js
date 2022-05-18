@@ -31,10 +31,16 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import {
+  selectMqttProviderDisabled,
+  selectNatsProviderDisabled,
+} from '@console/store/selectors/application-server'
 
 @connect(
   state => ({
     appId: selectSelectedApplicationId(state),
+    mqttDisabled: selectMqttProviderDisabled(state),
+    natsDisabled: selectNatsProviderDisabled(state),
   }),
   dispatch => ({
     navigateToList: appId => dispatch(push(`/applications/${appId}/integrations/pubsubs`)),
@@ -49,6 +55,8 @@ import { selectSelectedApplicationId } from '@console/store/selectors/applicatio
 export default class ApplicationPubsubAdd extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
+    mqttDisabled: PropTypes.bool.isRequired,
+    natsDisabled: PropTypes.bool.isRequired,
     navigateToList: PropTypes.func.isRequired,
   }
 
@@ -83,11 +91,11 @@ export default class ApplicationPubsubAdd extends Component {
   }
 
   render() {
-    const { appId } = this.props
+    const { appId, mqttDisabled, natsDisabled } = this.props
 
     return (
       <Container>
-        <PageTitle title={sharedMessages.addPubsub} />
+        <PageTitle title={sharedMessages.addPubsub} className="mb-0" />
         <Row>
           <Col lg={8} md={12}>
             <PubsubForm
@@ -96,6 +104,8 @@ export default class ApplicationPubsubAdd extends Component {
               onSubmit={this.handleSubmit}
               onSubmitSuccess={this.handleSubmitSuccess}
               existCheck={this.existCheck}
+              mqttDisabled={mqttDisabled}
+              natsDisabled={natsDisabled}
             />
           </Col>
         </Row>

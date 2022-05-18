@@ -45,7 +45,7 @@ const ApplicationWebhookEdit = props => {
 
   return (
     <Container>
-      <PageTitle title={m.editWebhook} />
+      <PageTitle title={m.editWebhook} className="mb-0" hideHeading={Boolean(webhookTemplate)} />
       <Row>
         <Col lg={8} md={12}>
           <WebhookEdit

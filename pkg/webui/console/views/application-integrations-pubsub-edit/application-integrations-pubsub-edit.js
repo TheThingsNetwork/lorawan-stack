@@ -53,6 +53,8 @@ export default class ApplicationPubsubEdit extends Component {
   static propTypes = {
     appId: PropTypes.string.isRequired,
     match: PropTypes.match.isRequired,
+    mqttDisabled: PropTypes.bool.isRequired,
+    natsDisabled: PropTypes.bool.isRequired,
     navigateToList: PropTypes.func.isRequired,
     pubsub: PropTypes.pubsub.isRequired,
     updatePubsub: PropTypes.func.isRequired,
@@ -98,11 +100,11 @@ export default class ApplicationPubsubEdit extends Component {
   }
 
   render() {
-    const { pubsub, appId } = this.props
+    const { pubsub, appId, mqttDisabled, natsDisabled } = this.props
 
     return (
       <Container>
-        <PageTitle title={m.editPubsub} />
+        <PageTitle title={m.editPubsub} className="mb-0" />
         <Row>
           <Col lg={8} md={12}>
             <PubsubForm
@@ -113,6 +115,8 @@ export default class ApplicationPubsubEdit extends Component {
               onSubmitSuccess={this.handleSubmitSuccess}
               onDelete={this.handleDelete}
               onDeleteSuccess={this.handleDeleteSuccess}
+              mqttDisabled={mqttDisabled}
+              natsDisabled={natsDisabled}
             />
           </Col>
         </Row>

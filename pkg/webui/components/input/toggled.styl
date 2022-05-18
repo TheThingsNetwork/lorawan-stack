@@ -17,12 +17,14 @@
   align-items: center
   height: $default-input-height
 
+.checkbox-container
+  display: flex
+  align-items: baseline
+  margin-right: $cs.s
+
 .checkbox
   horizontalize()
-  margin-right: $cs.s
+  font-weight: $fw.bold
 
 .input
   flex-grow: 1
-
-.label
-  one-liner()

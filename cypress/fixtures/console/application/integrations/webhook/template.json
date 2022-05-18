@@ -1,13 +1,13 @@
 {
   "templates": [{
     "ids":{
-      "template_id":"test-tamplate"
+      "template_id":"test-template"
     },
-    "name":"Integrate with Test Platform",
-    "description":"Integrate with Akenza Core",
+    "name":"Test Platform",
+    "description":"Integrate with Test Platform",
     "logo_url":"data:image/gif;base64,R0lGODdhEAAQAMwAAPj7+FmhUYjNfGuxYYDJdYTIeanOpT+DOTuANXi/bGOrWj6CONzv2sPjv2CmV1unU4zPgISg6DJnJ3ImTh8Mtbs00aNP1CZSGy0YqLEn47RgXW8amasW7XWsmmvX2iuXiwAAAAAEAAQAAAFVyAgjmRpnihqGCkpDQPbGkNUOFk6DZqgHCNGg2T4QAQBoIiRSAwBE4VA4FACKgkB5NGReASFZEmxsQ0whPDi9BiACYQAInXhwOUtgCUQoORFCGt/g4QAIQA7",
-    "info_url":"https://core.akenza.io/",
-    "documentation_url":"https://akenza.atlassian.net/servicedesk/customer/portals/",
+    "info_url":"https://example.com/",
+    "documentation_url":"https://example.com",
     "base_url":"https://data-gateway.core.akenza.io/v2/up/{domain_secret}?id={device_id}",
     "format":"json",
     "fields":[

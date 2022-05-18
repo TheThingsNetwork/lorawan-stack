@@ -37,6 +37,7 @@ export default Object.freeze({
   DEVICE_MODEL: 'device-model',
   DEVICE_NAME: 'device-name',
   DISABLE_PACKET_BROKER_FORWARDING: 'disable-packet-broker-forwarding',
+  DOWNLINK_QUEUE_INVALIDATED: 'downlink-queue-invalidated',
   ENFORCE_DUTY_CYCLE: 'duty-cycle',
   FACTORY_PRESET_FREQUENCIES: 'factory-preset-frequencies',
   FRAME_COUNTER_WIDTH: 'frame-counter-width',

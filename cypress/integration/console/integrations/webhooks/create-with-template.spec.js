@@ -49,23 +49,19 @@ describe('Application Webhook create', () => {
   })
 
   it('displays UI elements in place', () => {
-    cy.findByRole('heading', { name: 'Add custom webhook' }).should('be.visible')
-    cy.findByRole('heading', { name: 'Template information' }).should('be.visible')
-    cy.findByRole('heading', { name: 'Template settings' }).should('be.visible')
+    cy.findByRole('heading', { name: 'Setup webhook for Test Platform' }).should('be.visible')
     cy.findByLabelText('Webhook ID')
       .should('have.attr', 'placeholder')
-      .and('eq', 'my-new-test-tamplate-webhook')
+      .and('eq', 'my-new-test-template-webhook')
     cy.findByLabelText('Domain Secret').should('be.visible')
     cy.findByText('Akenza Core domain secret').should('be.visible')
     cy.findByLabelText('Device ID').should('be.visible')
     cy.findByText('Akenza Core device ID').should('be.visible')
-    cy.findByRole('button', { name: 'Create integrate with test platform webhook' }).should(
-      'be.visible',
-    )
+    cy.findByRole('button', { name: 'Create Test Platform webhook' }).should('be.visible')
   })
 
   it('validates before submitting an empty form', () => {
-    cy.findByRole('button', { name: 'Create integrate with test platform webhook' }).click()
+    cy.findByRole('button', { name: 'Create Test Platform webhook' }).click()
 
     cy.findErrorByLabelText('Webhook ID')
       .should('contain.text', 'Webhook ID is required')
@@ -80,13 +76,13 @@ describe('Application Webhook create', () => {
       'eq',
       `${Cypress.config(
         'consoleRootPath',
-      )}/applications/${appId}/integrations/webhooks/add/template/test-tamplate`,
+      )}/applications/${appId}/integrations/webhooks/add/template/test-template`,
     )
   })
 
   it('succeeds adding webhook', () => {
     const webhook = {
-      id: 'my-new-akenza-webhook',
+      id: 'my-new-test-webhook',
       domainSecret: 'secret',
       deviceId: 'end-device-id',
     }
@@ -94,7 +90,7 @@ describe('Application Webhook create', () => {
     cy.findByLabelText('Domain Secret').type(webhook.domainSecret)
     cy.findByLabelText('Device ID').type(webhook.deviceId)
 
-    cy.findByRole('button', { name: 'Create integrate with test platform webhook' }).click()
+    cy.findByRole('button', { name: 'Create Test Platform webhook' }).click()
 
     cy.location('pathname').should(
       'eq',
@@ -103,7 +99,7 @@ describe('Application Webhook create', () => {
 
     cy.findByTestId('error-notification').should('not.exist')
     cy.findByTestId('full-error-view').should('not.exist')
-    cy.findByText('my-new-akenza-webhook').should('be.visible').click()
+    cy.findByText('my-new-test-webhook').should('be.visible').click()
 
     cy.findByLabelText('Webhook ID').should('have.attr', 'value', webhook.id)
   })
