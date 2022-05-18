@@ -42,7 +42,7 @@ func selectAPIKeyFields(ctx context.Context, query *gorm.DB, fieldMask store.Fie
 
 	for _, path := range ttnpb.TopLevelFields(fieldMask) {
 		switch path {
-		case "updated_at", "entity_id", "entity_type", "id":
+		case updatedAt, "entity_id", "entity_type", "id":
 			// always selected
 		case "expires_at":
 			apiKeyColumns = append(apiKeyColumns, "expires_at")
@@ -57,10 +57,14 @@ func selectAPIKeyFields(ctx context.Context, query *gorm.DB, fieldMask store.Fie
 	if len(notFoundPaths) > 0 {
 		warning.Add(ctx, fmt.Sprintf("unsupported field mask paths: %s", strings.Join(notFoundPaths, ", ")))
 	}
-	return query.Select(cleanFields(append(append(modelColumns, "updated_at"), apiKeyColumns...)...))
+	return query.Select(cleanFields(
+		mergeFields(modelColumns, apiKeyColumns, []string{updatedAt})...,
+	))
 }
 
-func (s *apiKeyStore) CreateAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey) (*ttnpb.APIKey, error) {
+func (s *apiKeyStore) CreateAPIKey(
+	ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey,
+) (*ttnpb.APIKey, error) {
 	defer trace.StartRegion(ctx, "create api key").End()
 	entity, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
@@ -110,7 +114,9 @@ func (s *apiKeyStore) FindAPIKeys(ctx context.Context, entityID *ttnpb.EntityIde
 	return keyProtos, nil
 }
 
-func (s *apiKeyStore) GetAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, id string) (*ttnpb.APIKey, error) {
+func (s *apiKeyStore) GetAPIKey(
+	ctx context.Context, entityID *ttnpb.EntityIdentifiers, id string,
+) (*ttnpb.APIKey, error) {
 	defer trace.StartRegion(ctx, "get api key").End()
 	entity, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {
@@ -161,7 +167,9 @@ func (s *apiKeyStore) GetAPIKeyByID(ctx context.Context, id string) (*ttnpb.Enti
 	return ids, keyModel.toPB(), nil
 }
 
-func (s *apiKeyStore) UpdateAPIKey(ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey, fieldMask store.FieldMask) (*ttnpb.APIKey, error) {
+func (s *apiKeyStore) UpdateAPIKey(
+	ctx context.Context, entityID *ttnpb.EntityIdentifiers, key *ttnpb.APIKey, fieldMask store.FieldMask,
+) (*ttnpb.APIKey, error) {
 	defer trace.StartRegion(ctx, "update api key").End()
 	entity, err := s.findEntity(ctx, entityID, "id")
 	if err != nil {

@@ -55,6 +55,8 @@ func (t testStore) Close() error {
 }
 
 func newTestStore(t *testing.T, dsn *url.URL) storetest.Store {
+	t.Helper()
+
 	t.Logf("Connecting to %s", dsn.String())
 	db, err := gorm.Open("postgres", dsn.String())
 	if err != nil {

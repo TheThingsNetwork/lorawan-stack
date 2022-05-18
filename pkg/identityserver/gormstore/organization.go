@@ -48,9 +48,15 @@ func init() {
 
 // functions to set fields from the organization model into the organization proto.
 var organizationPBSetters = map[string]func(*ttnpb.Organization, *Organization){
-	nameField:        func(pb *ttnpb.Organization, org *Organization) { pb.Name = org.Name },
-	descriptionField: func(pb *ttnpb.Organization, org *Organization) { pb.Description = org.Description },
-	attributesField:  func(pb *ttnpb.Organization, org *Organization) { pb.Attributes = attributes(org.Attributes).toMap() },
+	nameField: func(pb *ttnpb.Organization, org *Organization) {
+		pb.Name = org.Name
+	},
+	descriptionField: func(pb *ttnpb.Organization, org *Organization) {
+		pb.Description = org.Description
+	},
+	attributesField: func(pb *ttnpb.Organization, org *Organization) {
+		pb.Attributes = attributes(org.Attributes).toMap()
+	},
 	administrativeContactField: func(pb *ttnpb.Organization, org *Organization) {
 		if org.AdministrativeContact != nil {
 			pb.AdministrativeContact = org.AdministrativeContact.OrganizationOrUserIdentifiers()
@@ -65,8 +71,12 @@ var organizationPBSetters = map[string]func(*ttnpb.Organization, *Organization){
 
 // functions to set fields from the organization proto into the organization model.
 var organizationModelSetters = map[string]func(*Organization, *ttnpb.Organization){
-	nameField:        func(org *Organization, pb *ttnpb.Organization) { org.Name = pb.Name },
-	descriptionField: func(org *Organization, pb *ttnpb.Organization) { org.Description = pb.Description },
+	nameField: func(org *Organization, pb *ttnpb.Organization) {
+		org.Name = pb.Name
+	},
+	descriptionField: func(org *Organization, pb *ttnpb.Organization) {
+		org.Description = pb.Description
+	},
 	attributesField: func(org *Organization, pb *ttnpb.Organization) {
 		org.Attributes = attributes(org.Attributes).updateFromMap(pb.Attributes)
 	},

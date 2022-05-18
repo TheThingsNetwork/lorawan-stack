@@ -36,7 +36,9 @@ type invitationStore struct {
 
 var errInvitationAlreadySent = errors.DefineAlreadyExists("invitation_already_sent", "invitation already sent")
 
-func (s *invitationStore) CreateInvitation(ctx context.Context, invitation *ttnpb.Invitation) (*ttnpb.Invitation, error) {
+func (s *invitationStore) CreateInvitation(
+	ctx context.Context, invitation *ttnpb.Invitation,
+) (*ttnpb.Invitation, error) {
 	defer trace.StartRegion(ctx, "create invitation").End()
 	model := Invitation{
 		Email:     invitation.Email,
@@ -80,7 +82,11 @@ var errInvitationNotFound = errors.DefineNotFound("invitation_not_found", "invit
 func (s *invitationStore) GetInvitation(ctx context.Context, token string) (*ttnpb.Invitation, error) {
 	defer trace.StartRegion(ctx, "get invitation").End()
 	var invitationModel Invitation
-	if err := s.query(ctx, Invitation{}).Where(Invitation{Token: token}).Preload("AcceptedBy.Account").First(&invitationModel).Error; err != nil {
+	if err := s.query(ctx, Invitation{}).
+		Where(Invitation{Token: token}).
+		Preload("AcceptedBy.Account").
+		First(&invitationModel).
+		Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return nil, errInvitationNotFound.New()
 		}
@@ -91,13 +97,20 @@ func (s *invitationStore) GetInvitation(ctx context.Context, token string) (*ttn
 
 var (
 	errInvitationExpired         = errors.DefineFailedPrecondition("invitation_expired", "invitation expired")
-	errInvitationAlreadyAccepted = errors.DefineFailedPrecondition("invitation_already_accepted", "invitation already accepted")
+	errInvitationAlreadyAccepted = errors.DefineFailedPrecondition(
+		"invitation_already_accepted", "invitation already accepted",
+	)
 )
 
-func (s *invitationStore) SetInvitationAcceptedBy(ctx context.Context, token string, acceptedByID *ttnpb.UserIdentifiers) error {
+func (s *invitationStore) SetInvitationAcceptedBy(
+	ctx context.Context, token string, acceptedByID *ttnpb.UserIdentifiers,
+) error {
 	defer trace.StartRegion(ctx, "update invitation").End()
 	var invitationModel Invitation
-	if err := s.query(ctx, Invitation{}).Where(Invitation{Token: token}).First(&invitationModel).Error; err != nil {
+	if err := s.query(ctx, Invitation{}).
+		Where(Invitation{Token: token}).
+		First(&invitationModel).
+		Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return errInvitationNotFound.New()
 		}
@@ -127,7 +140,10 @@ func (s *invitationStore) SetInvitationAcceptedBy(ctx context.Context, token str
 func (s *invitationStore) DeleteInvitation(ctx context.Context, email string) error {
 	defer trace.StartRegion(ctx, "delete invitation").End()
 	var invitationModel Invitation
-	if err := s.query(ctx, Invitation{}).Where(Invitation{Email: email}).First(&invitationModel).Error; err != nil {
+	if err := s.query(ctx, Invitation{}).
+		Where(Invitation{Email: email}).
+		First(&invitationModel).
+		Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			return errInvitationNotFound.New()
 		}

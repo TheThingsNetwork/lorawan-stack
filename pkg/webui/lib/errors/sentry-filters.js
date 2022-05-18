@@ -15,7 +15,7 @@
 export default [
   'error:pkg/account/session:no_user_id_password_match',
   'error:pkg/deviceclaimingserver/gateways:gateway_not_authorized',
-  'error:pkg/identityserver/blacklist:blacklisted_id',
+  'error:pkg/identityserver/blocklist:forbidden_id',
   'error:pkg/identityserver/gormstore:account_type',
   'error:pkg/identityserver/store:entity_quota',
   'error:pkg/identityserver:application_has_devices',

@@ -21,11 +21,15 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func (s *baseStore) replaceAttributes(ctx context.Context, entityType, entityUUID string, old []Attribute, new []Attribute) (err error) {
+func (s *baseStore) replaceAttributes(
+	ctx context.Context, entityType, entityUUID string, old []Attribute, new []Attribute,
+) (err error) {
 	return replaceAttributes(ctx, s.DB, entityType, entityUUID, old, new)
 }
 
-func replaceAttributes(ctx context.Context, db *gorm.DB, entityType, entityUUID string, old []Attribute, new []Attribute) (err error) {
+func replaceAttributes(
+	ctx context.Context, db *gorm.DB, entityType, entityUUID string, old []Attribute, new []Attribute,
+) (err error) {
 	defer trace.StartRegion(ctx, "update attributes").End()
 	oldByUUID := make(map[string]Attribute, len(old))
 	for _, attr := range old {
@@ -56,12 +60,14 @@ func replaceAttributes(ctx context.Context, db *gorm.DB, entityType, entityUUID 
 		}
 	}
 	for _, attr := range toCreate {
+		attr := attr // shadow range variable.
 		attr.EntityType, attr.EntityID = entityType, entityUUID
 		if err = db.Save(&attr).Error; err != nil {
 			return err
 		}
 	}
 	for _, attr := range toUpdate {
+		attr := attr // shadow range variable.
 		if err = db.Save(&attr).Error; err != nil {
 			return err
 		}

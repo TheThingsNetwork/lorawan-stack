@@ -49,7 +49,7 @@ func selectUserFields(ctx context.Context, query *gorm.DB, fieldMask store.Field
 	}
 	for _, path := range ttnpb.TopLevelFields(fieldMask) {
 		switch path {
-		case "ids", "created_at", "updated_at", "deleted_at":
+		case ids, createdAt, updatedAt, deletedAt:
 			// always selected
 		case attributesField:
 			query = query.Preload("Attributes")
@@ -85,7 +85,9 @@ func (s *userStore) CreateUser(ctx context.Context, usr *ttnpb.User) (*ttnpb.Use
 	return &userProto, nil
 }
 
-func (s *userStore) FindUsers(ctx context.Context, ids []*ttnpb.UserIdentifiers, fieldMask store.FieldMask) ([]*ttnpb.User, error) {
+func (s *userStore) FindUsers(
+	ctx context.Context, ids []*ttnpb.UserIdentifiers, fieldMask store.FieldMask,
+) ([]*ttnpb.User, error) {
 	defer trace.StartRegion(ctx, "find users").End()
 	idStrings := make([]string, len(ids))
 	for i, id := range ids {
@@ -142,7 +144,9 @@ func (s *userStore) ListAdmins(ctx context.Context, fieldMask store.FieldMask) (
 	return userProtos, nil
 }
 
-func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fieldMask store.FieldMask) (*ttnpb.User, error) {
+func (s *userStore) GetUser(
+	ctx context.Context, id *ttnpb.UserIdentifiers, fieldMask store.FieldMask,
+) (*ttnpb.User, error) {
 	defer trace.StartRegion(ctx, "get user").End()
 	query := s.query(ctx, User{}, withUserID(id.GetUserId()))
 	query = selectUserFields(ctx, query, fieldMask)
@@ -158,10 +162,12 @@ func (s *userStore) GetUser(ctx context.Context, id *ttnpb.UserIdentifiers, fiel
 	return userProto, nil
 }
 
-func (s *userStore) GetUserByPrimaryEmailAddress(ctx context.Context, email string, fieldMask store.FieldMask) (*ttnpb.User, error) {
+func (s *userStore) GetUserByPrimaryEmailAddress(
+	ctx context.Context, email string, fieldMask store.FieldMask,
+) (*ttnpb.User, error) {
 	defer trace.StartRegion(ctx, "get user by primary email address").End()
 	query := s.query(ctx, User{}, withPrimaryEmailAddress(email))
-	query = query.Joins("LEFT JOIN accounts ON accounts.account_type = ? AND accounts.account_id = users.id", "user")
+	query = query.Joins("LEFT JOIN accounts ON accounts.account_type = ? AND accounts.account_id = users.id", user)
 	query = selectUserFields(ctx, query, fieldMask)
 	var userModel userWithUID
 	if err := query.First(&userModel).Error; err != nil {
@@ -175,7 +181,9 @@ func (s *userStore) GetUserByPrimaryEmailAddress(ctx context.Context, email stri
 	return userProto, nil
 }
 
-func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask store.FieldMask) (updated *ttnpb.User, err error) {
+func (s *userStore) UpdateUser(
+	ctx context.Context, usr *ttnpb.User, fieldMask store.FieldMask,
+) (updated *ttnpb.User, err error) {
 	defer trace.StartRegion(ctx, "update user").End()
 	query := s.query(ctx, User{}, withUserID(usr.GetIds().GetUserId()))
 	query = selectUserFields(ctx, query, fieldMask)
@@ -186,7 +194,7 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask s
 		}
 		return nil, err
 	}
-	if err := ctx.Err(); err != nil { // Early exit if context canceled
+	if err = ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}
 	oldAttributes, oldProfilePicture := userModel.Attributes, userModel.ProfilePicture
@@ -210,7 +218,7 @@ func (s *userStore) UpdateUser(ctx context.Context, usr *ttnpb.User, fieldMask s
 		return nil, err
 	}
 	if !reflect.DeepEqual(oldAttributes, userModel.Attributes) {
-		if err = s.replaceAttributes(ctx, "user", userModel.ID, oldAttributes, userModel.Attributes); err != nil {
+		if err = s.replaceAttributes(ctx, user, userModel.ID, oldAttributes, userModel.Attributes); err != nil {
 			return nil, err
 		}
 	}
@@ -241,11 +249,11 @@ func (s *userStore) PurgeUser(ctx context.Context, id *ttnpb.UserIdentifiers) (e
 		}
 		return err
 	}
-	if err := ctx.Err(); err != nil { // Early exit if context canceled
+	if err = ctx.Err(); err != nil { // Early exit if context canceled
 		return err
 	}
 	if len(userModel.Attributes) > 0 {
-		if err := s.replaceAttributes(ctx, "user", userModel.ID, userModel.Attributes, nil); err != nil {
+		if err = s.replaceAttributes(ctx, user, userModel.ID, userModel.Attributes, nil); err != nil {
 			return err
 		}
 	}

@@ -49,7 +49,7 @@ func selectOrganizationFields(ctx context.Context, query *gorm.DB, fieldMask sto
 	}
 	for _, path := range ttnpb.TopLevelFields(fieldMask) {
 		switch path {
-		case "ids", "created_at", "updated_at", "deleted_at":
+		case ids, createdAt, updatedAt, deletedAt:
 			// always selected
 		case attributesField:
 			query = query.Preload("Attributes")
@@ -73,7 +73,9 @@ func selectOrganizationFields(ctx context.Context, query *gorm.DB, fieldMask sto
 	return query.Select(organizationColumns)
 }
 
-func (s *organizationStore) CreateOrganization(ctx context.Context, org *ttnpb.Organization) (*ttnpb.Organization, error) {
+func (s *organizationStore) CreateOrganization(
+	ctx context.Context, org *ttnpb.Organization,
+) (*ttnpb.Organization, error) {
 	defer trace.StartRegion(ctx, "create organization").End()
 	orgModel := Organization{
 		Account: Account{UID: org.GetIds().GetOrganizationId()}, // The ID is not mutated by fromPB.
@@ -96,7 +98,9 @@ func (s *organizationStore) CreateOrganization(ctx context.Context, org *ttnpb.O
 	return &orgProto, nil
 }
 
-func (s *organizationStore) FindOrganizations(ctx context.Context, ids []*ttnpb.OrganizationIdentifiers, fieldMask store.FieldMask) ([]*ttnpb.Organization, error) {
+func (s *organizationStore) FindOrganizations(
+	ctx context.Context, ids []*ttnpb.OrganizationIdentifiers, fieldMask store.FieldMask,
+) ([]*ttnpb.Organization, error) {
 	defer trace.StartRegion(ctx, "find organizations").End()
 	idStrings := make([]string, len(ids))
 	for i, id := range ids {
@@ -126,7 +130,9 @@ func (s *organizationStore) FindOrganizations(ctx context.Context, ids []*ttnpb.
 	return orgProtos, nil
 }
 
-func (s *organizationStore) GetOrganization(ctx context.Context, id *ttnpb.OrganizationIdentifiers, fieldMask store.FieldMask) (*ttnpb.Organization, error) {
+func (s *organizationStore) GetOrganization(
+	ctx context.Context, id *ttnpb.OrganizationIdentifiers, fieldMask store.FieldMask,
+) (*ttnpb.Organization, error) {
 	defer trace.StartRegion(ctx, "get organization").End()
 	query := s.query(ctx, Organization{}, withOrganizationID(id.GetOrganizationId()))
 	query = selectOrganizationFields(ctx, query, fieldMask)
@@ -142,7 +148,9 @@ func (s *organizationStore) GetOrganization(ctx context.Context, id *ttnpb.Organ
 	return orgProto, nil
 }
 
-func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.Organization, fieldMask store.FieldMask) (updated *ttnpb.Organization, err error) {
+func (s *organizationStore) UpdateOrganization(
+	ctx context.Context, org *ttnpb.Organization, fieldMask store.FieldMask,
+) (updated *ttnpb.Organization, err error) {
 	defer trace.StartRegion(ctx, "update organization").End()
 	query := s.query(ctx, Organization{}, withOrganizationID(org.GetIds().GetOrganizationId()))
 	query = selectOrganizationFields(ctx, query, fieldMask)
@@ -153,7 +161,7 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 		}
 		return nil, err
 	}
-	if err := ctx.Err(); err != nil { // Early exit if context canceled
+	if err = ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}
 	oldAttributes := orgModel.Attributes
@@ -170,7 +178,7 @@ func (s *organizationStore) UpdateOrganization(ctx context.Context, org *ttnpb.O
 		return nil, err
 	}
 	if !reflect.DeepEqual(oldAttributes, orgModel.Attributes) {
-		if err = s.replaceAttributes(ctx, "organization", orgModel.ID, oldAttributes, orgModel.Attributes); err != nil {
+		if err = s.replaceAttributes(ctx, organization, orgModel.ID, oldAttributes, orgModel.Attributes); err != nil {
 			return nil, err
 		}
 	}
@@ -201,11 +209,11 @@ func (s *organizationStore) PurgeOrganization(ctx context.Context, id *ttnpb.Org
 		}
 		return err
 	}
-	if err := ctx.Err(); err != nil { // Early exit if context canceled
+	if err = ctx.Err(); err != nil { // Early exit if context canceled
 		return err
 	}
 	if len(orgModel.Attributes) > 0 {
-		if err := s.replaceAttributes(ctx, "organization", orgModel.ID, orgModel.Attributes, nil); err != nil {
+		if err = s.replaceAttributes(ctx, organization, orgModel.ID, orgModel.Attributes, nil); err != nil {
 			return err
 		}
 	}

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package store implements the Identity Server store interfaces using GORM.
 package store
 
 import (
@@ -36,6 +37,13 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
+const (
+	createdAt = "created_at"
+	updatedAt = "updated_at"
+	deletedAt = "deleted_at"
+	ids       = "ids"
+)
+
 func newStore(db *gorm.DB) *baseStore { return &baseStore{DB: db} }
 
 type baseStore struct {
@@ -50,7 +58,9 @@ func (s *baseStore) query(ctx context.Context, model interface{}, funcs ...func(
 	return query
 }
 
-func (s *baseStore) findEntity(ctx context.Context, entityID ttnpb.IDStringer, fields ...string) (modelInterface, error) {
+func (s *baseStore) findEntity(
+	ctx context.Context, entityID ttnpb.IDStringer, fields ...string,
+) (modelInterface, error) {
 	model := modelForID(entityID)
 	query := s.query(ctx, model, withID(entityID))
 	if len(fields) == 1 && fields[0] == "id" {
@@ -111,7 +121,7 @@ func (s *baseStore) deleteEntity(ctx context.Context, entityID ttnpb.IDStringer)
 		return err
 	}
 	switch entityType := entityID.EntityType(); entityType {
-	case "user", "organization":
+	case user, organization:
 		err = s.DB.Where(Account{
 			AccountType: entityType,
 			AccountID:   model.PrimaryKey(),
@@ -129,7 +139,7 @@ func (s *baseStore) restoreEntity(ctx context.Context, entityID ttnpb.IDStringer
 		return err
 	}
 	switch entityType := entityID.EntityType(); entityType {
-	case "user", "organization":
+	case user, organization:
 		err := s.DB.Unscoped().Model(Account{}).Where(Account{
 			AccountType: entityType,
 			AccountID:   model.PrimaryKey(),
@@ -157,14 +167,19 @@ var (
 var uniqueViolationRegex = regexp.MustCompile(`duplicate key value( .+)? violates unique constraint "([a-z_]+)"`)
 
 func convertError(err error) error {
-	switch err {
-	case nil, context.Canceled, context.DeadlineExceeded:
-		return err
+	if err == nil {
+		return nil
+	}
+	switch {
+	case errors.Is(err, context.Canceled):
+		return context.Canceled
+	case errors.Is(err, context.DeadlineExceeded):
+		return context.DeadlineExceeded
 	}
 	if ttnErr, ok := errors.From(err); ok {
 		return ttnErr
 	}
-	if pqErr, ok := err.(*pq.Error); ok {
+	if pqErr := (*pq.Error)(nil); errors.As(err, &pqErr) {
 		switch pqErr.Code.Name() {
 		case "unique_violation":
 			if match := uniqueViolationRegex.FindStringSubmatch(pqErr.Message); match != nil {
@@ -264,9 +279,11 @@ func Transact(ctx context.Context, db *gorm.DB, f func(db *gorm.DB) error) (err 
 			fmt.Fprintln(os.Stderr, p)
 			os.Stderr.Write(debug.Stack())
 			if pErr, ok := p.(error); ok {
-				switch pErr {
-				case context.Canceled, context.DeadlineExceeded:
-					err = pErr
+				switch {
+				case errors.Is(pErr, context.Canceled):
+					err = context.Canceled
+				case errors.Is(pErr, context.DeadlineExceeded):
+					err = context.DeadlineExceeded
 				default:
 					err = ErrTransactionRecovered.WithCause(pErr)
 				}
@@ -287,22 +304,22 @@ func Transact(ctx context.Context, db *gorm.DB, f func(db *gorm.DB) error) (err 
 }
 
 func entityTypeForID(id ttnpb.IDStringer) string {
-	return strings.Replace(id.EntityType(), " ", "_", -1)
+	return strings.ReplaceAll(id.EntityType(), " ", "_")
 }
 
 func modelForEntityType(entityType string) modelInterface {
 	switch entityType {
-	case "application":
+	case application:
 		return &Application{}
-	case "client":
+	case client:
 		return &Client{}
 	case "end_device":
 		return &EndDevice{}
-	case "gateway":
+	case gateway:
 		return &Gateway{}
-	case "organization":
+	case organization:
 		return &Organization{}
-	case "user":
+	case user:
 		return &User{}
 	default:
 		panic(fmt.Sprintf("can't find model for entity type %s", entityType))
@@ -314,37 +331,61 @@ func modelForID(id ttnpb.IDStringer) modelInterface {
 }
 
 var (
-	errApplicationNotFound  = errors.DefineNotFound("application_not_found", "application `{application_id}` not found")
-	errClientNotFound       = errors.DefineNotFound("client_not_found", "client `{client_id}` not found")
-	errGatewayNotFound      = errors.DefineNotFound("gateway_not_found", "gateway `{gateway_id}` not found")
-	errEndDeviceNotFound    = errors.DefineNotFound("end_device_not_found", "end device `{application_id}:{device_id}` not found")
-	errOrganizationNotFound = errors.DefineNotFound("organization_not_found", "organization `{organization_id}` not found")
-	errUserNotFound         = errors.DefineNotFound("user_not_found", "user `{user_id}` not found")
-	errSessionNotFound      = errors.DefineNotFound("session_not_found", "session `{session_id}` for user `{user_id}` not found")
+	errApplicationNotFound = errors.DefineNotFound(
+		"application_not_found", "application `{application_id}` not found",
+	)
+	errClientNotFound = errors.DefineNotFound(
+		"client_not_found", "client `{client_id}` not found",
+	)
+	errGatewayNotFound = errors.DefineNotFound(
+		"gateway_not_found", "gateway `{gateway_id}` not found",
+	)
+	errEndDeviceNotFound = errors.DefineNotFound(
+		"end_device_not_found", "end device `{application_id}:{device_id}` not found",
+	)
+	errOrganizationNotFound = errors.DefineNotFound(
+		"organization_not_found", "organization `{organization_id}` not found",
+	)
+	errUserNotFound = errors.DefineNotFound(
+		"user_not_found", "user `{user_id}` not found",
+	)
+	errSessionNotFound = errors.DefineNotFound(
+		"session_not_found", "session `{session_id}` for user `{user_id}` not found",
+	)
 
-	errAuthorizationNotFound     = errors.DefineNotFound("authorization_not_found", "authorization of `{user_id}` for `{client_id}` not found")
-	errAuthorizationCodeNotFound = errors.DefineNotFound("authorization_code_not_found", "authorization code not found")
-	errAccessTokenNotFound       = errors.DefineNotFound("access_token_not_found", "access token `{access_token_id}` not found")
+	errAuthorizationNotFound = errors.DefineNotFound(
+		"authorization_not_found", "authorization of `{user_id}` for `{client_id}` not found",
+	)
+	errAuthorizationCodeNotFound = errors.DefineNotFound(
+		"authorization_code_not_found", "authorization code not found",
+	)
+	errAccessTokenNotFound = errors.DefineNotFound(
+		"access_token_not_found", "access token `{access_token_id}` not found",
+	)
 
-	errAPIKeyNotFound = errors.DefineNotFound("api_key_not_found", "API key not found")
+	errAPIKeyNotFound = errors.DefineNotFound(
+		"api_key_not_found", "API key not found",
+	)
 
-	errMigrationNotFound = errors.DefineNotFound("migration_not_found", "migration not found")
+	errMigrationNotFound = errors.DefineNotFound(
+		"migration_not_found", "migration not found",
+	)
 )
 
 func errNotFoundForID(id ttnpb.IDStringer) error {
 	switch t := entityTypeForID(id); t {
-	case "application":
+	case application:
 		return errApplicationNotFound.WithAttributes("application_id", id.IDString())
-	case "client":
+	case client:
 		return errClientNotFound.WithAttributes("client_id", id.IDString())
 	case "end_device":
 		appID, devID := splitEndDeviceIDString(id.IDString())
 		return errEndDeviceNotFound.WithAttributes("application_id", appID, "device_id", devID)
-	case "gateway":
+	case gateway:
 		return errGatewayNotFound.WithAttributes("gateway_id", id.IDString())
-	case "organization":
+	case organization:
 		return errOrganizationNotFound.WithAttributes("organization_id", id.IDString())
-	case "user":
+	case user:
 		return errUserNotFound.WithAttributes("user_id", id.IDString())
 	default:
 		panic(fmt.Sprintf("can't find errNotFound for entity type %s", t))
@@ -401,6 +442,18 @@ func (l logger) Print(v ...interface{}) {
 	default:
 		l.Error(fmt.Sprint(v...))
 	}
+}
+
+func mergeFields(fields ...[]string) []string {
+	var outLen int
+	for _, fields := range fields {
+		outLen += len(fields)
+	}
+	out := make([]string, 0, outLen)
+	for _, fields := range fields {
+		out = append(out, fields...)
+	}
+	return out
 }
 
 func cleanFields(fields ...string) []string {
@@ -480,9 +533,11 @@ func (s *CombinedStore) Transact(ctx context.Context, fc func(context.Context, s
 			fmt.Fprintln(os.Stderr, p)
 			os.Stderr.Write(debug.Stack())
 			if pErr, ok := p.(error); ok {
-				switch pErr {
-				case context.Canceled, context.DeadlineExceeded:
-					err = pErr
+				switch {
+				case errors.Is(err, context.Canceled):
+					err = context.Canceled
+				case errors.Is(err, context.DeadlineExceeded):
+					err = context.DeadlineExceeded
 				default:
 					err = ErrTransactionRecovered.WithCause(pErr)
 				}

@@ -51,14 +51,16 @@ func (s *userSessionStore) CreateSession(ctx context.Context, sess *ttnpb.UserSe
 	return &sessionProto, nil
 }
 
-func (s *userSessionStore) FindSessions(ctx context.Context, userIDs *ttnpb.UserIdentifiers) ([]*ttnpb.UserSession, error) {
+func (s *userSessionStore) FindSessions(
+	ctx context.Context, userIDs *ttnpb.UserIdentifiers,
+) ([]*ttnpb.UserSession, error) {
 	defer trace.StartRegion(ctx, "find user sessions").End()
 	user, err := s.findEntity(ctx, userIDs, "id")
 	if err != nil {
 		return nil, err
 	}
 	query := s.query(ctx, UserSession{}).Where(UserSession{UserID: user.PrimaryKey()})
-	query = query.Order(store.OrderFromContext(ctx, "user_sessions", "created_at", "DESC"))
+	query = query.Order(store.OrderFromContext(ctx, "user_sessions", createdAt, "DESC"))
 	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
 		var total uint64
 		query.Count(&total)
@@ -81,7 +83,9 @@ func (s *userSessionStore) FindSessions(ctx context.Context, userIDs *ttnpb.User
 	return sessionProtos, nil
 }
 
-func (s *userSessionStore) findSession(ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string) (*UserSession, error) {
+func (s *userSessionStore) findSession(
+	ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string,
+) (*UserSession, error) {
 	user, err := s.findEntity(ctx, userIDs, "id")
 	if err != nil {
 		return nil, err
@@ -97,7 +101,9 @@ func (s *userSessionStore) findSession(ctx context.Context, userIDs *ttnpb.UserI
 	return &sessionModel, nil
 }
 
-func (s *userSessionStore) GetSession(ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string) (*ttnpb.UserSession, error) {
+func (s *userSessionStore) GetSession(
+	ctx context.Context, userIDs *ttnpb.UserIdentifiers, sessionID string,
+) (*ttnpb.UserSession, error) {
 	defer trace.StartRegion(ctx, "get user session").End()
 	sessionModel, err := s.findSession(ctx, userIDs, sessionID)
 	if err != nil {
@@ -121,7 +127,7 @@ func (s *userSessionStore) GetSessionByID(ctx context.Context, sessionID string)
 	}
 	query = s.query(ctx, Account{}).Where(Account{
 		AccountID:   sessionModel.UserID,
-		AccountType: "user",
+		AccountType: user,
 	})
 	var accountModel Account
 	if err := query.Find(&accountModel).Error; err != nil {

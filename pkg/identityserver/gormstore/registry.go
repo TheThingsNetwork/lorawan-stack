@@ -28,7 +28,9 @@ func registerModel(m ...interface{}) {
 
 var (
 	errMissingTable  = errors.DefineCorruption("database_table", "database table `{table}` does not exist")
-	errMissingColumn = errors.DefineCorruption("database_table_column", "column `{column}` does not exist in database table `{table}`")
+	errMissingColumn = errors.DefineCorruption(
+		"database_table_column", "column `{column}` does not exist in database table `{table}`",
+	)
 )
 
 // Check that the database contains all tables.
@@ -51,9 +53,9 @@ func Check(db *gorm.DB) error {
 	var existingTables []struct {
 		TableName string
 	}
-	err := db.Raw("SELECT table_name FROM INFORMATION_SCHEMA.tables WHERE table_type = 'BASE TABLE' AND table_schema = CURRENT_SCHEMA()").
-		Scan(&existingTables).
-		Error
+	err := db.Raw(
+		"SELECT table_name FROM INFORMATION_SCHEMA.tables WHERE table_type = 'BASE TABLE' AND table_schema = CURRENT_SCHEMA()", //nolint:lll
+	).Scan(&existingTables).Error
 	if err != nil {
 		return err
 	}
@@ -81,6 +83,9 @@ func Check(db *gorm.DB) error {
 	err = db.Raw("SELECT table_name, column_name FROM INFORMATION_SCHEMA.columns WHERE table_schema = CURRENT_SCHEMA()").
 		Scan(&existingColumns).
 		Error
+	if err != nil {
+		return err
+	}
 
 	// Check that columns exist for each field of every model.
 	for _, model := range models {

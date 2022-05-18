@@ -35,7 +35,9 @@ type notificationStore struct {
 	*baseStore
 }
 
-func (s *notificationStore) CreateNotification(ctx context.Context, pb *ttnpb.Notification, receiverIDs []*ttnpb.UserIdentifiers) (*ttnpb.Notification, error) {
+func (s *notificationStore) CreateNotification(
+	ctx context.Context, pb *ttnpb.Notification, receiverIDs []*ttnpb.UserIdentifiers,
+) (*ttnpb.Notification, error) {
 	defer trace.StartRegion(ctx, "create notification").End()
 
 	entityModel, err := s.findEntity(ctx, pb.EntityIds, "id")
@@ -120,7 +122,9 @@ func (s *notificationStore) CreateNotification(ctx context.Context, pb *ttnpb.No
 	return &res, nil
 }
 
-func (s *notificationStore) ListNotifications(ctx context.Context, receiverIDs *ttnpb.UserIdentifiers, statuses []ttnpb.NotificationStatus) ([]*ttnpb.Notification, error) {
+func (s *notificationStore) ListNotifications(
+	ctx context.Context, receiverIDs *ttnpb.UserIdentifiers, statuses []ttnpb.NotificationStatus,
+) ([]*ttnpb.Notification, error) {
 	defer trace.StartRegion(ctx, "list notifications").End()
 
 	userIDQuery := s.query(ctx, Account{}).
@@ -173,7 +177,9 @@ func (s *notificationStore) ListNotifications(ctx context.Context, receiverIDs *
 	return res, nil
 }
 
-func (s *notificationStore) UpdateNotificationStatus(ctx context.Context, receiverIDs *ttnpb.UserIdentifiers, notificationIDs []string, status ttnpb.NotificationStatus) error {
+func (s *notificationStore) UpdateNotificationStatus(
+	ctx context.Context, receiverIDs *ttnpb.UserIdentifiers, notificationIDs []string, status ttnpb.NotificationStatus,
+) error {
 	userIDQuery := s.query(ctx, Account{}).
 		Select("account_id").
 		Where("uid = ?", receiverIDs.GetUserId()).

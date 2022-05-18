@@ -38,7 +38,7 @@ func withSoftDeletedIfRequested(ctx context.Context) func(*gorm.DB) *gorm.DB {
 	if opts := store.SoftDeletedFromContext(ctx); opts != nil {
 		return func(db *gorm.DB) *gorm.DB {
 			scope := db.NewScope(db.Value)
-			if !scope.HasColumn("deleted_at") {
+			if !scope.HasColumn(deletedAt) {
 				return db
 			}
 			if opts.IncludeDeleted {
@@ -47,7 +47,7 @@ func withSoftDeletedIfRequested(ctx context.Context) func(*gorm.DB) *gorm.DB {
 			if opts.OnlyDeleted {
 				db = db.Where(fmt.Sprintf("%s.deleted_at IS NOT NULL", scope.TableName()))
 			}
-			if opts.DeletedBefore != nil || opts.DeletedAfter != nil && scope.HasColumn("deleted_at") {
+			if opts.DeletedBefore != nil || opts.DeletedAfter != nil && scope.HasColumn(deletedAt) {
 				if opts.DeletedBefore != nil {
 					db = db.Where(fmt.Sprintf("%s.deleted_at < ?", scope.TableName()), opts.DeletedBefore)
 				}

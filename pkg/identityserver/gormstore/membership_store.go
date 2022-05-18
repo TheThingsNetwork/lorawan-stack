@@ -34,9 +34,11 @@ type membershipStore struct {
 	*baseStore
 }
 
-func (s *membershipStore) queryWithIndirectMemberships(ctx context.Context, entityType string, entityIDs ...string) *gorm.DB {
+func (s *membershipStore) queryWithIndirectMemberships(
+	ctx context.Context, entityType string, entityIDs ...string,
+) *gorm.DB {
 	idColumnName := fmt.Sprintf(`"%[1]ss"."%[1]s_id"`, entityType)
-	if entityType == "organization" {
+	if entityType == organization {
 		idColumnName = `"organization_accounts"."uid"`
 	}
 	query := s.query(ctx, modelForEntityType(entityType)).Select([]string{
@@ -52,20 +54,31 @@ func (s *membershipStore) queryWithIndirectMemberships(ctx context.Context, enti
 	if len(entityIDs) > 0 {
 		query = query.Where(idColumnName+" IN (?)", entityIDs)
 	}
-	if entityType == "organization" {
-		query = query.Joins(`JOIN "accounts" "organization_accounts" ON "organization_accounts"."account_id" = "organizations"."id" AND "organization_accounts"."account_type" = 'organization'`)
+	if entityType == organization {
+		query = query.Joins(
+			`JOIN "accounts" "organization_accounts" ON "organization_accounts"."account_id" = "organizations"."id" AND "organization_accounts"."account_type" = 'organization'`, //nolint:lll
+		)
 	}
-	query = query.Joins(fmt.Sprintf(`JOIN "memberships" "direct_memberships" ON "direct_memberships"."entity_id" = "%[1]ss"."id" AND "direct_memberships"."entity_type" = '%[1]s'`, entityType)).
-		Joins(`JOIN "accounts" "direct_accounts" ON "direct_accounts"."id" = "direct_memberships"."account_id"`).
-		Joins(`LEFT JOIN "memberships" "indirect_memberships" ON "indirect_memberships"."entity_id" = "direct_accounts"."account_id" AND "indirect_memberships"."entity_type" = "direct_accounts"."account_type"`).
-		Joins(`LEFT JOIN "accounts" "indirect_accounts" ON "indirect_accounts"."id" = "indirect_memberships"."account_id"`)
+	query = query.Joins(fmt.Sprintf(
+		`JOIN "memberships" "direct_memberships" ON "direct_memberships"."entity_id" = "%[1]ss"."id" AND "direct_memberships"."entity_type" = '%[1]s'`, //nolint:lll
+		entityType,
+	))
+	query = query.Joins(`JOIN "accounts" "direct_accounts" ON "direct_accounts"."id" = "direct_memberships"."account_id"`)
+	query = query.Joins(
+		`LEFT JOIN "memberships" "indirect_memberships" ON "indirect_memberships"."entity_id" = "direct_accounts"."account_id" AND "indirect_memberships"."entity_type" = "direct_accounts"."account_type"`, //nolint:lll
+	)
+	query = query.Joins(
+		`LEFT JOIN "accounts" "indirect_accounts" ON "indirect_accounts"."id" = "indirect_memberships"."account_id"`,
+	)
 	query = query.Where(`"direct_accounts"."deleted_at" IS NULL AND "indirect_accounts"."deleted_at" IS NULL`)
 	return query
 }
 
-func (s *membershipStore) queryWithDirectMemberships(ctx context.Context, entityType string, entityIDs ...string) *gorm.DB {
+func (s *membershipStore) queryWithDirectMemberships(
+	ctx context.Context, entityType string, entityIDs ...string,
+) *gorm.DB {
 	idColumnName := fmt.Sprintf(`"%[1]ss"."%[1]s_id"`, entityType)
-	if entityType == "organization" {
+	if entityType == organization {
 		idColumnName = `"organization_accounts"."uid"`
 	}
 	query := s.query(ctx, modelForEntityType(entityType)).Select([]string{
@@ -78,19 +91,32 @@ func (s *membershipStore) queryWithDirectMemberships(ctx context.Context, entity
 	if len(entityIDs) > 0 {
 		query = query.Where(idColumnName+" IN (?)", entityIDs)
 	}
-	if entityType == "organization" {
-		query = query.Joins(`JOIN "accounts" "organization_accounts" ON "organization_accounts"."account_id" = "organizations"."id" AND "organization_accounts"."account_type" = 'organization'`)
+	if entityType == organization {
+		query = query.Joins(
+			`JOIN "accounts" "organization_accounts" ON "organization_accounts"."account_id" = "organizations"."id" AND "organization_accounts"."account_type" = 'organization'`, //nolint:lll
+		)
 	}
-	query = query.Joins(fmt.Sprintf(`JOIN "memberships" "direct_memberships" ON "direct_memberships"."entity_id" = "%[1]ss"."id" AND "direct_memberships"."entity_type" = '%[1]s'`, entityType)).
-		Joins(`JOIN "accounts" "direct_accounts" ON "direct_accounts"."id" = "direct_memberships"."account_id"`)
+	query = query.Joins(fmt.Sprintf(
+		`JOIN "memberships" "direct_memberships" ON "direct_memberships"."entity_id" = "%[1]ss"."id" AND "direct_memberships"."entity_type" = '%[1]s'`, //nolint:lll
+		entityType,
+	))
+	query = query.Joins(
+		`JOIN "accounts" "direct_accounts" ON "direct_accounts"."id" = "direct_memberships"."account_id"`,
+	)
 	query = query.Where(`"direct_accounts"."deleted_at" IS NULL`)
 	return query
 }
 
-func (s *membershipStore) queryMemberships(ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, entityType string, entityIDs []string, includeIndirect bool) *gorm.DB {
-	if accountID.EntityType() == "user" && includeIndirect {
+func (s *membershipStore) queryMemberships(
+	ctx context.Context,
+	accountID *ttnpb.OrganizationOrUserIdentifiers,
+	entityType string,
+	entityIDs []string,
+	includeIndirect bool,
+) *gorm.DB {
+	if accountID.EntityType() == user && includeIndirect {
 		return s.queryWithIndirectMemberships(ctx, entityType, entityIDs...).Where(
-			`("direct_accounts"."account_type" = 'user' AND "direct_accounts"."uid" = ?) OR ("indirect_accounts"."account_type" = 'user' AND "indirect_accounts"."uid" = ?)`,
+			`("direct_accounts"."account_type" = 'user' AND "direct_accounts"."uid" = ?) OR ("indirect_accounts"."account_type" = 'user' AND "indirect_accounts"."uid" = ?)`, //nolint:lll
 			accountID.IDString(), accountID.IDString(),
 		)
 	}
@@ -100,19 +126,25 @@ func (s *membershipStore) queryMemberships(ctx context.Context, accountID *ttnpb
 	)
 }
 
-func (s *membershipStore) FindMemberships(ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool) ([]*ttnpb.EntityIdentifiers, error) {
+func (s *membershipStore) FindMemberships(
+	ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, entityType string, includeIndirect bool,
+) ([]*ttnpb.EntityIdentifiers, error) {
 	defer trace.StartRegion(ctx, fmt.Sprintf("find %s memberships of %s", entityType, accountID.IDString())).End()
 
-	membershipsQuery := s.queryMemberships(ctx, accountID, entityType, nil, includeIndirect).Select(`"direct_memberships"."entity_id"`).QueryExpr()
-	query := s.query(ctx, modelForEntityType(entityType)).Where(fmt.Sprintf(`"%[1]ss"."id" IN (?)`, entityType), membershipsQuery)
+	membershipsQuery := s.queryMemberships(ctx, accountID, entityType, nil, includeIndirect).
+		Select(`"direct_memberships"."entity_id"`).
+		QueryExpr()
+	query := s.query(ctx, modelForEntityType(entityType)).
+		Where(fmt.Sprintf(`"%[1]ss"."id" IN (?)`, entityType), membershipsQuery)
 	switch entityType {
-	case "organization":
+	case organization:
 		query = query.
-			Joins(`JOIN "accounts" ON "accounts"."account_type" = 'organization' AND "accounts"."account_id" = "organizations"."id"`).
+			Joins(
+				`JOIN "accounts" ON "accounts"."account_type" = 'organization' AND "accounts"."account_id" = "organizations"."id"`, //nolint:lll
+			).
 			Select(`"accounts"."uid" AS "friendly_id"`)
 	default:
-		query = query.
-			Select(fmt.Sprintf(`"%[1]ss"."%[1]s_id" AS "friendly_id"`, entityType))
+		query = query.Select(fmt.Sprintf(`"%[1]ss"."%[1]s_id" AS "friendly_id"`, entityType))
 	}
 
 	query = query.Order(store.OrderFromContext(ctx, fmt.Sprintf("%[1]ss", entityType), "friendly_id", "ASC"))
@@ -126,7 +158,8 @@ func (s *membershipStore) FindMemberships(ctx context.Context, accountID *ttnpb.
 	if err := page.Scan(&results).Error; err != nil {
 		return nil, err
 	}
-	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 && (offset > 0 || len(results) == int(limit)) {
+	limit, offset := store.LimitAndOffsetFromContext(ctx)
+	if limit != 0 && (offset > 0 || len(results) == int(limit)) {
 		var total uint64
 		query.Count(&total)
 		store.SetTotal(ctx, total)
@@ -159,19 +192,27 @@ func (m membershipChain) GetMembershipChain() *store.MembershipChain {
 		EntityIdentifiers: buildIdentifiers(m.EntityType, m.EntityFriendlyID),
 	}
 	switch m.DirectAccountType {
-	case "user":
-		c.UserIdentifiers = &ttnpb.UserIdentifiers{UserId: m.DirectAccountFriendlyID}
-	case "organization":
-		if m.IndirectAccountType == "user" {
-			c.UserIdentifiers = &ttnpb.UserIdentifiers{UserId: m.IndirectAccountFriendlyID}
+	case user:
+		c.UserIdentifiers = &ttnpb.UserIdentifiers{
+			UserId: m.DirectAccountFriendlyID,
+		}
+	case organization:
+		if m.IndirectAccountType == user {
+			c.UserIdentifiers = &ttnpb.UserIdentifiers{
+				UserId: m.IndirectAccountFriendlyID,
+			}
 			c.RightsOnOrganization = &indirectAccountRights
 		}
-		c.OrganizationIdentifiers = &ttnpb.OrganizationIdentifiers{OrganizationId: m.DirectAccountFriendlyID}
+		c.OrganizationIdentifiers = &ttnpb.OrganizationIdentifiers{
+			OrganizationId: m.DirectAccountFriendlyID,
+		}
 	}
 	return c
 }
 
-func (s *membershipStore) FindAccountMembershipChains(ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, entityType string, entityIDs ...string) ([]*store.MembershipChain, error) {
+func (s *membershipStore) FindAccountMembershipChains(
+	ctx context.Context, accountID *ttnpb.OrganizationOrUserIdentifiers, entityType string, entityIDs ...string,
+) ([]*store.MembershipChain, error) {
 	defer trace.StartRegion(ctx, fmt.Sprintf("find membership chains of user on %ss", entityType)).End()
 	query := s.queryMemberships(ctx, accountID, entityType, entityIDs, true)
 	var results []membershipChain
@@ -185,9 +226,12 @@ func (s *membershipStore) FindAccountMembershipChains(ctx context.Context, accou
 	return chains, nil
 }
 
-func (s *membershipStore) FindMembers(ctx context.Context, entityID *ttnpb.EntityIdentifiers) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error) {
+func (s *membershipStore) FindMembers(
+	ctx context.Context, entityID *ttnpb.EntityIdentifiers,
+) (map[*ttnpb.OrganizationOrUserIdentifiers]*ttnpb.Rights, error) {
 	defer trace.StartRegion(ctx, fmt.Sprintf("find members of %s", entityID.EntityType())).End()
-	query := s.queryWithDirectMemberships(ctx, entityID.EntityType(), entityID.IDString()).Order("direct_account_friendly_id")
+	query := s.queryWithDirectMemberships(ctx, entityID.EntityType(), entityID.IDString()).
+		Order("direct_account_friendly_id")
 	page := query
 	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 {
 		page = query.Limit(limit).Offset(offset)
@@ -196,7 +240,8 @@ func (s *membershipStore) FindMembers(ctx context.Context, entityID *ttnpb.Entit
 	if err := page.Scan(&results).Error; err != nil {
 		return nil, err
 	}
-	if limit, offset := store.LimitAndOffsetFromContext(ctx); limit != 0 && (offset > 0 || len(results) == int(limit)) {
+	limit, offset := store.LimitAndOffsetFromContext(ctx)
+	if limit != 0 && (offset > 0 || len(results) == int(limit)) {
 		var total uint64
 		query.Count(&total)
 		store.SetTotal(ctx, total)
@@ -222,7 +267,9 @@ var errMembershipNotFound = errors.DefineNotFound(
 	"account `{account_id}` is not a member of `{entity_type}` `{entity_id}`",
 )
 
-func (s *membershipStore) GetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers) (*ttnpb.Rights, error) {
+func (s *membershipStore) GetMember(
+	ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers,
+) (*ttnpb.Rights, error) {
 	defer trace.StartRegion(ctx, "get membership").End()
 	query := s.queryWithDirectMemberships(ctx, entityID.EntityType(), entityID.IDString()).Where(
 		fmt.Sprintf(`"direct_accounts"."account_type" = '%s' AND "direct_accounts"."uid" = ?`, id.EntityType()),
@@ -248,7 +295,12 @@ var errAccountType = errors.DefineInvalidArgument(
 	"account of type `{account_type}` can not collaborate on `{entity_type}`",
 )
 
-func (s *membershipStore) SetMember(ctx context.Context, id *ttnpb.OrganizationOrUserIdentifiers, entityID *ttnpb.EntityIdentifiers, rights *ttnpb.Rights) error {
+func (s *membershipStore) SetMember(
+	ctx context.Context,
+	id *ttnpb.OrganizationOrUserIdentifiers,
+	entityID *ttnpb.EntityIdentifiers,
+	rights *ttnpb.Rights,
+) error {
 	defer trace.StartRegion(ctx, "update membership").End()
 
 	var account Account
@@ -262,7 +314,7 @@ func (s *membershipStore) SetMember(ctx context.Context, id *ttnpb.OrganizationO
 		}
 		return err
 	}
-	if err := ctx.Err(); err != nil { // Early exit if context canceled
+	if err = ctx.Err(); err != nil { // Early exit if context canceled
 		return err
 	}
 
@@ -270,10 +322,10 @@ func (s *membershipStore) SetMember(ctx context.Context, id *ttnpb.OrganizationO
 	if err != nil {
 		return err
 	}
-	if _, ok := entity.(*Organization); ok && account.AccountType != "user" {
-		return errAccountType.WithAttributes("account_type", account.AccountType, "entity_type", "organization")
+	if _, ok := entity.(*Organization); ok && account.AccountType != user {
+		return errAccountType.WithAttributes("account_type", account.AccountType, "entity_type", organization)
 	}
-	if err := ctx.Err(); err != nil { // Early exit if context canceled
+	if err = ctx.Err(); err != nil { // Early exit if context canceled
 		return err
 	}
 
@@ -300,7 +352,7 @@ func (s *membershipStore) SetMember(ctx context.Context, id *ttnpb.OrganizationO
 		}
 		membership.SetContext(ctx)
 	} else {
-		upsertQuery = upsertQuery.Select("updated_at", "rights")
+		upsertQuery = upsertQuery.Select(updatedAt, "rights")
 	}
 	if len(rights.Rights) == 0 {
 		return upsertQuery.Delete(&membership).Error

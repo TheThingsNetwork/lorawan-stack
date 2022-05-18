@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package migrations implements database migrations.
 package migrations
 
 import (
@@ -33,7 +34,11 @@ type Migration interface {
 }
 
 // Apply applies the list of migrations on the database connection.
-func Apply(ctx context.Context, transact func(context.Context, func(*gorm.DB) error) error, migrations ...Migration) error {
+func Apply(
+	ctx context.Context,
+	transact func(context.Context, func(*gorm.DB) error) error,
+	migrations ...Migration,
+) error {
 	applyMigration := func(db *gorm.DB, migration Migration) error {
 		migrationStore := store.GetMigrationStore(db)
 		if _, err := migrationStore.GetMigration(ctx, migration.Name()); err != nil && !errors.IsNotFound(err) {

@@ -45,7 +45,7 @@ func selectGatewayFields(ctx context.Context, query *gorm.DB, fieldMask store.Fi
 	var notFoundPaths []string
 	for _, path := range ttnpb.TopLevelFields(fieldMask) {
 		switch path {
-		case "ids", "created_at", "updated_at", "deleted_at":
+		case ids, createdAt, updatedAt, deletedAt:
 			// always selected
 		case attributesField:
 			query = query.Preload("Attributes")
@@ -68,7 +68,11 @@ func selectGatewayFields(ctx context.Context, query *gorm.DB, fieldMask store.Fi
 	if len(notFoundPaths) > 0 {
 		warning.Add(ctx, fmt.Sprintf("unsupported field mask paths: %s", strings.Join(notFoundPaths, ", ")))
 	}
-	return query.Select(cleanFields(append(append(modelColumns, "deleted_at", "gateway_id", "gateway_eui"), gatewayColumns...)...))
+	return query.Select(cleanFields(
+		mergeFields(modelColumns, gatewayColumns, []string{
+			deletedAt, "gateway_id", "gateway_eui",
+		})...,
+	))
 }
 
 func (s *gatewayStore) CreateGateway(ctx context.Context, gtw *ttnpb.Gateway) (*ttnpb.Gateway, error) {
@@ -94,7 +98,9 @@ func (s *gatewayStore) CreateGateway(ctx context.Context, gtw *ttnpb.Gateway) (*
 	return &gtwProto, nil
 }
 
-func (s *gatewayStore) FindGateways(ctx context.Context, ids []*ttnpb.GatewayIdentifiers, fieldMask store.FieldMask) ([]*ttnpb.Gateway, error) {
+func (s *gatewayStore) FindGateways(
+	ctx context.Context, ids []*ttnpb.GatewayIdentifiers, fieldMask store.FieldMask,
+) ([]*ttnpb.Gateway, error) {
 	defer trace.StartRegion(ctx, "find gateways").End()
 	idStrings := make([]string, len(ids))
 	for i, id := range ids {
@@ -124,7 +130,9 @@ func (s *gatewayStore) FindGateways(ctx context.Context, ids []*ttnpb.GatewayIde
 	return gtwProtos, nil
 }
 
-func (s *gatewayStore) GetGateway(ctx context.Context, id *ttnpb.GatewayIdentifiers, fieldMask store.FieldMask) (*ttnpb.Gateway, error) {
+func (s *gatewayStore) GetGateway(
+	ctx context.Context, id *ttnpb.GatewayIdentifiers, fieldMask store.FieldMask,
+) (*ttnpb.Gateway, error) {
 	defer trace.StartRegion(ctx, "get gateway").End()
 	query := s.query(ctx, Gateway{}, withGatewayID(id.GetGatewayId()))
 	if id.Eui != nil {
@@ -143,7 +151,9 @@ func (s *gatewayStore) GetGateway(ctx context.Context, id *ttnpb.GatewayIdentifi
 	return gtwProto, nil
 }
 
-func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fieldMask store.FieldMask) (updated *ttnpb.Gateway, err error) {
+func (s *gatewayStore) UpdateGateway(
+	ctx context.Context, gtw *ttnpb.Gateway, fieldMask store.FieldMask,
+) (updated *ttnpb.Gateway, err error) {
 	defer trace.StartRegion(ctx, "update gateway").End()
 	query := s.query(ctx, Gateway{}, withGatewayID(gtw.GetIds().GetGatewayId()))
 	query = selectGatewayFields(ctx, query, fieldMask)
@@ -154,7 +164,7 @@ func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fi
 		}
 		return nil, err
 	}
-	if err := ctx.Err(); err != nil { // Early exit if context canceled
+	if err = ctx.Err(); err != nil { // Early exit if context canceled
 		return nil, err
 	}
 	oldAttributes, oldAntennas := gtwModel.Attributes, gtwModel.Antennas
@@ -171,7 +181,7 @@ func (s *gatewayStore) UpdateGateway(ctx context.Context, gtw *ttnpb.Gateway, fi
 		return nil, err
 	}
 	if !reflect.DeepEqual(oldAttributes, gtwModel.Attributes) {
-		if err = s.replaceAttributes(ctx, "gateway", gtwModel.ID, oldAttributes, gtwModel.Attributes); err != nil {
+		if err = s.replaceAttributes(ctx, gateway, gtwModel.ID, oldAttributes, gtwModel.Attributes); err != nil {
 			return nil, err
 		}
 	}
@@ -214,7 +224,7 @@ func (s *gatewayStore) PurgeGateway(ctx context.Context, id *ttnpb.GatewayIdenti
 	}
 	// delete gateway attributes before purging
 	if len(gtwModel.Attributes) > 0 {
-		if err := s.replaceAttributes(ctx, "gateway", gtwModel.ID, gtwModel.Attributes, nil); err != nil {
+		if err := s.replaceAttributes(ctx, gateway, gtwModel.ID, gtwModel.Attributes, nil); err != nil {
 			return err
 		}
 	}

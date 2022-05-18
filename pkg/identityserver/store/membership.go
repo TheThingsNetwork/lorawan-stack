@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,22 +37,27 @@ func (m *MembershipChain) GetRights() *ttnpb.Rights {
 type MembershipChains []*MembershipChain
 
 // GetRights returns the rights of the member on the entity.
-func (c MembershipChains) GetRights(member *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.IDStringer) *ttnpb.Rights {
+func (c MembershipChains) GetRights(
+	member *ttnpb.OrganizationOrUserIdentifiers, entityID ttnpb.IDStringer,
+) *ttnpb.Rights {
 	var entityRights *ttnpb.Rights
 	for _, membership := range c {
 		switch member.EntityType() {
 		case "organization":
-			if membership.OrganizationIdentifiers == nil || membership.OrganizationIdentifiers.IDString() != member.IDString() {
+			if membership.OrganizationIdentifiers == nil ||
+				membership.OrganizationIdentifiers.IDString() != member.IDString() {
 				continue
 			}
 		case "user":
-			if membership.UserIdentifiers == nil || membership.UserIdentifiers.IDString() != member.IDString() {
+			if membership.UserIdentifiers == nil ||
+				membership.UserIdentifiers.IDString() != member.IDString() {
 				continue
 			}
 		default:
 			continue
 		}
-		if membership.EntityIdentifiers.EntityType() != entityID.EntityType() || membership.EntityIdentifiers.IDString() != entityID.IDString() {
+		if membership.EntityIdentifiers.EntityType() != entityID.EntityType() ||
+			membership.EntityIdentifiers.IDString() != entityID.IDString() {
 			continue
 		}
 		entityRights = entityRights.Union(membership.GetRights())

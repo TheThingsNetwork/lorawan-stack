@@ -60,9 +60,15 @@ func init() {
 
 // functions to set fields from the client model into the client proto.
 var clientPBSetters = map[string]func(*ttnpb.Client, *Client){
-	nameField:        func(pb *ttnpb.Client, cli *Client) { pb.Name = cli.Name },
-	descriptionField: func(pb *ttnpb.Client, cli *Client) { pb.Description = cli.Description },
-	attributesField:  func(pb *ttnpb.Client, cli *Client) { pb.Attributes = attributes(cli.Attributes).toMap() },
+	nameField: func(pb *ttnpb.Client, cli *Client) {
+		pb.Name = cli.Name
+	},
+	descriptionField: func(pb *ttnpb.Client, cli *Client) {
+		pb.Description = cli.Description
+	},
+	attributesField: func(pb *ttnpb.Client, cli *Client) {
+		pb.Attributes = attributes(cli.Attributes).toMap()
+	},
 	administrativeContactField: func(pb *ttnpb.Client, cli *Client) {
 		if cli.AdministrativeContact != nil {
 			pb.AdministrativeContact = cli.AdministrativeContact.OrganizationOrUserIdentifiers()
@@ -73,21 +79,43 @@ var clientPBSetters = map[string]func(*ttnpb.Client, *Client){
 			pb.TechnicalContact = cli.TechnicalContact.OrganizationOrUserIdentifiers()
 		}
 	},
-	secretField:             func(pb *ttnpb.Client, cli *Client) { pb.Secret = cli.ClientSecret },
-	redirectURIsField:       func(pb *ttnpb.Client, cli *Client) { pb.RedirectUris = cli.RedirectURIs },
-	logoutRedirectURIsField: func(pb *ttnpb.Client, cli *Client) { pb.LogoutRedirectUris = cli.LogoutRedirectURIs },
-	stateField:              func(pb *ttnpb.Client, cli *Client) { pb.State = ttnpb.State(cli.State) },
-	stateDescriptionField:   func(pb *ttnpb.Client, cli *Client) { pb.StateDescription = cli.StateDescription },
-	skipAuthorizationField:  func(pb *ttnpb.Client, cli *Client) { pb.SkipAuthorization = cli.SkipAuthorization },
-	endorsedField:           func(pb *ttnpb.Client, cli *Client) { pb.Endorsed = cli.Endorsed },
-	grantsField:             func(pb *ttnpb.Client, cli *Client) { pb.Grants = cli.Grants },
-	rightsField:             func(pb *ttnpb.Client, cli *Client) { pb.Rights = cli.Rights.Rights },
+	secretField: func(pb *ttnpb.Client, cli *Client) {
+		pb.Secret = cli.ClientSecret
+	},
+	redirectURIsField: func(pb *ttnpb.Client, cli *Client) {
+		pb.RedirectUris = cli.RedirectURIs
+	},
+	logoutRedirectURIsField: func(pb *ttnpb.Client, cli *Client) {
+		pb.LogoutRedirectUris = cli.LogoutRedirectURIs
+	},
+	stateField: func(pb *ttnpb.Client, cli *Client) {
+		pb.State = ttnpb.State(cli.State)
+	},
+	stateDescriptionField: func(pb *ttnpb.Client, cli *Client) {
+		pb.StateDescription = cli.StateDescription
+	},
+	skipAuthorizationField: func(pb *ttnpb.Client, cli *Client) {
+		pb.SkipAuthorization = cli.SkipAuthorization
+	},
+	endorsedField: func(pb *ttnpb.Client, cli *Client) {
+		pb.Endorsed = cli.Endorsed
+	},
+	grantsField: func(pb *ttnpb.Client, cli *Client) {
+		pb.Grants = cli.Grants
+	},
+	rightsField: func(pb *ttnpb.Client, cli *Client) {
+		pb.Rights = cli.Rights.Rights
+	},
 }
 
 // functions to set fields from the client proto into the client model.
 var clientModelSetters = map[string]func(*Client, *ttnpb.Client){
-	nameField:        func(cli *Client, pb *ttnpb.Client) { cli.Name = pb.Name },
-	descriptionField: func(cli *Client, pb *ttnpb.Client) { cli.Description = pb.Description },
+	nameField: func(cli *Client, pb *ttnpb.Client) {
+		cli.Name = pb.Name
+	},
+	descriptionField: func(cli *Client, pb *ttnpb.Client) {
+		cli.Description = pb.Description
+	},
 	attributesField: func(cli *Client, pb *ttnpb.Client) {
 		cli.Attributes = attributes(cli.Attributes).updateFromMap(pb.Attributes)
 	},
@@ -111,15 +139,33 @@ var clientModelSetters = map[string]func(*Client, *ttnpb.Client){
 			UID:         pb.TechnicalContact.IDString(),
 		}
 	},
-	secretField:             func(cli *Client, pb *ttnpb.Client) { cli.ClientSecret = pb.Secret },
-	redirectURIsField:       func(cli *Client, pb *ttnpb.Client) { cli.RedirectURIs = pq.StringArray(pb.RedirectUris) },
-	logoutRedirectURIsField: func(cli *Client, pb *ttnpb.Client) { cli.LogoutRedirectURIs = pq.StringArray(pb.LogoutRedirectUris) },
-	stateField:              func(cli *Client, pb *ttnpb.Client) { cli.State = int(pb.State) },
-	stateDescriptionField:   func(cli *Client, pb *ttnpb.Client) { cli.StateDescription = pb.StateDescription },
-	skipAuthorizationField:  func(cli *Client, pb *ttnpb.Client) { cli.SkipAuthorization = pb.SkipAuthorization },
-	endorsedField:           func(cli *Client, pb *ttnpb.Client) { cli.Endorsed = pb.Endorsed },
-	grantsField:             func(cli *Client, pb *ttnpb.Client) { cli.Grants = pb.Grants },
-	rightsField:             func(cli *Client, pb *ttnpb.Client) { cli.Rights = Rights{Rights: pb.Rights} },
+	secretField: func(cli *Client, pb *ttnpb.Client) {
+		cli.ClientSecret = pb.Secret
+	},
+	redirectURIsField: func(cli *Client, pb *ttnpb.Client) {
+		cli.RedirectURIs = pq.StringArray(pb.RedirectUris)
+	},
+	logoutRedirectURIsField: func(cli *Client, pb *ttnpb.Client) {
+		cli.LogoutRedirectURIs = pq.StringArray(pb.LogoutRedirectUris)
+	},
+	stateField: func(cli *Client, pb *ttnpb.Client) {
+		cli.State = int(pb.State)
+	},
+	stateDescriptionField: func(cli *Client, pb *ttnpb.Client) {
+		cli.StateDescription = pb.StateDescription
+	},
+	skipAuthorizationField: func(cli *Client, pb *ttnpb.Client) {
+		cli.SkipAuthorization = pb.SkipAuthorization
+	},
+	endorsedField: func(cli *Client, pb *ttnpb.Client) {
+		cli.Endorsed = pb.Endorsed
+	},
+	grantsField: func(cli *Client, pb *ttnpb.Client) {
+		cli.Grants = pb.Grants
+	},
+	rightsField: func(cli *Client, pb *ttnpb.Client) {
+		cli.Rights = Rights{Rights: pb.Rights}
+	},
 }
 
 // fieldMask to use if a nil or empty fieldmask is passed.
