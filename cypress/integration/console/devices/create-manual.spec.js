@@ -438,6 +438,7 @@ describe('End device manual create', () => {
       it('succeeds registering a new class A end device', () => {
         const device = {
           id: 'abp-test-1-1-class-a',
+          dev_eui: generateHexValue(16),
           dev_addr: generateHexValue(8),
           lorawan_version: 'MAC_V1_1',
           phy_version: 'PHY_V1_1_REV_A',
@@ -453,6 +454,7 @@ describe('End device manual create', () => {
         cy.findByLabelText('Regional Parameters version').selectOption(device.phy_version)
         cy.findByText('Show advanced activation, LoRaWAN class and cluster settings').click()
         cy.findByLabelText('Activation by personalization (ABP)').check()
+        cy.findByLabelText('DevEUI').type(device.dev_eui)
         cy.findByLabelText('Device address').type(device.dev_addr)
         cy.findByLabelText('AppSKey').type(device.app_s_key)
         cy.findByLabelText('FNwkSIntKey').type(device.f_nwk_s_int_key)

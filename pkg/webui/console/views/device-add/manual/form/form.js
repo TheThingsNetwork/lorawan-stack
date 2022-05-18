@@ -557,6 +557,10 @@ const ManualForm = props => {
     nwkKeyPlaceholder = sharedMessages.insufficientNwkKeyRights
   }
 
+  // Multicast end devices do not require an EUI.
+  // OTAA end devices do require an EUI.
+  // ABP end devices do require an EUI if their version is greater or equal to 1.0.4.
+  const devEUIRequired = !isMulticast && (isOTAA || (lwVersion >= 104 && isABP))
   const devEUIComponent = env.devEUIConfig.devEUIIssuingEnabled ? (
     <Form.Field
       title={sharedMessages.devEUI}
@@ -564,7 +568,7 @@ const ManualForm = props => {
       type="byte"
       min={8}
       max={8}
-      required={isOTAA}
+      required={devEUIRequired}
       component={Input.Generate}
       tooltipId={tooltipIds.DEV_EUI}
       onBlur={handleIdPrefill}
@@ -581,7 +585,7 @@ const ManualForm = props => {
       type="byte"
       min={8}
       max={8}
-      required={isOTAA}
+      required={devEUIRequired}
       component={Input}
       tooltipId={tooltipIds.DEV_EUI}
       onBlur={handleIdPrefill}
