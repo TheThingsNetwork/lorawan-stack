@@ -61,7 +61,7 @@ const hardcoded = {
   overview: 'dashboard',
   packet_broker: 'camera',
   payload_formats: 'code',
-  recent_actors: 'recent_actors',
+  oauth_clients: 'recent_actors',
   settings: 'tune',
   sort_order_asc: 'arrow_drop_down',
   sort_order_desc: 'arrow_drop_up',

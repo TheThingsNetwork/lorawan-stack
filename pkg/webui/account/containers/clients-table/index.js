@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,16 +25,24 @@ import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
 import Message from '@ttn-lw/lib/components/message'
+import withRequest from '@ttn-lw/lib/components/with-request'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import capitalizeMessage from '@ttn-lw/lib/capitalize-message'
 
-import { checkFromState, mayPerformAdminActions } from '@account/lib/feature-checks'
+import { checkFromState, mayPerformAllClientActions } from '@account/lib/feature-checks'
 
 import { deleteClient, restoreClient, getClientsList } from '@account/store/actions/clients'
+import { getUserRights } from '@account/store/actions/user'
 
-import { selectUserIsAdmin } from '@account/store/selectors/user'
+import {
+  selectUserIsAdmin,
+  selectUserId,
+  selectUserRightsFetching,
+  selectUserRights,
+} from '@account/store/selectors/user'
 import {
   selectOAuthClients,
   selectOAuthClientsTotalCount,
@@ -64,8 +72,6 @@ const tabs = [
   },
   { title: sharedMessages.deleted, name: DELETED_TAB },
 ]
-
-const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
 
 const ClientsTable = props => {
   const { isAdmin, restoreClient, purgeClient, ...rest } = props
@@ -165,7 +171,7 @@ const ClientsTable = props => {
         name: 'state',
         displayName: sharedMessages.state,
         width: 50,
-        render: state => capitalize(formatMessage({ id: `enum:${state}` })),
+        render: state => capitalizeMessage(formatMessage({ id: `enum:${state}` })),
       })
     }
 
@@ -177,7 +183,7 @@ const ClientsTable = props => {
       clients: selectOAuthClients(state),
       totalCount: selectOAuthClientsTotalCount(state),
       fetching: selectOAuthClientsFetching(state),
-      mayAdd: checkFromState(mayPerformAdminActions, state),
+      mayAdd: checkFromState(mayPerformAllClientActions, state),
     }),
     [],
   )
@@ -218,6 +224,9 @@ ClientsTable.propTypes = {
 export default connect(
   state => ({
     isAdmin: selectUserIsAdmin(state),
+    userId: selectUserId(state),
+    fetching: selectUserRightsFetching(state),
+    rights: selectUserRights(state),
   }),
   dispatch => ({
     ...bindActionCreators(
@@ -227,6 +236,7 @@ export default connect(
       },
       dispatch,
     ),
+    getUsersRightsList: userId => dispatch(attachPromise(getUserRights(userId))),
   }),
   (stateProps, dispatchProps, ownProps) => ({
     ...stateProps,
@@ -235,4 +245,9 @@ export default connect(
     purgeClient: id => dispatchProps.purgeClient(id, { purge: true }),
     restoreClient: id => dispatchProps.restoreClient(id),
   }),
-)(ClientsTable)
+)(
+  withRequest(
+    ({ getUsersRightsList, userId }) => getUsersRightsList(userId),
+    ({ fetching, rights }) => fetching || rights.length === 0,
+  )(ClientsTable),
+)

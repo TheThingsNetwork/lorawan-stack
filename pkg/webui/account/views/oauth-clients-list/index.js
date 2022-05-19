@@ -23,12 +23,14 @@ import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 
 import ClientsTable from '@account/containers/clients-table'
 
+import sharedMessages from '@ttn-lw/lib/shared-messages'
+
 const ClientsList = () => (
   <Container>
     <Row>
-      <IntlHelmet title={'OAuth Clients'} />
+      <IntlHelmet title={sharedMessages.oauthClients} />
       <Col>
-        <PageTitle title={'OAuth Clients'} hideHeading />
+        <PageTitle title={sharedMessages.oauthClients} hideHeading />
         <ClientsTable pageSize={PAGE_SIZES.REGULAR} />
       </Col>
     </Row>

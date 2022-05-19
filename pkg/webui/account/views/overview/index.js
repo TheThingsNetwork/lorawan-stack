@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
-import { connect, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { Container, Col, Row } from 'react-grid-system'
 import { defineMessages } from 'react-intl'
 
@@ -21,16 +21,12 @@ import PageTitle from '@ttn-lw/components/page-title'
 import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
-import withRequest from '@ttn-lw/lib/components/with-request'
 
 import ProfileCard from '@account/containers/profile-card'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { selectConsoleUrl } from '@account/lib/selectors/app-config'
-
-import { getClientsList } from '@account/store/actions/clients'
 
 import { selectUser } from '@account/store/selectors/user'
 
@@ -85,6 +81,4 @@ const Overview = () => {
   )
 }
 
-export default connect(null, dispatch => ({
-  getClientsList: () => dispatch(attachPromise(getClientsList())),
-}))(withRequest(({ getClientsList }) => getClientsList())(Overview))
+export default Overview
