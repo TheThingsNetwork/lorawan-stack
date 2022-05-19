@@ -23,35 +23,33 @@ import DataSheet from '@ttn-lw/components/data-sheet'
 
 import IntlHelmet from '@ttn-lw/lib/components/intl-helmet'
 import DateTime from '@ttn-lw/lib/components/date-time'
-import withRequest from '@ttn-lw/lib/components/with-request'
 
 import EntityTitleSection from '@console/components/entity-title-section'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import capitalizeMessage from '@ttn-lw/lib/capitalize-message'
+import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
+import { selectCollaboratorsTotalCount } from '@ttn-lw/lib/store/selectors/collaborators'
 
 import { mayPerformAdminActions } from '@account/lib/feature-checks'
 
-import { getCollaboratorsList } from '@account/store/actions/collaborators'
-
 import {
   selectSelectedClient,
-  selectSelectedClientId,
   selectClientFetching,
+  selectClientRights,
 } from '@account/store/selectors/clients'
-import { selectCollaboratorsTotalCount } from '@account/store/selectors/collaborators'
 
 import style from './oauth-client-overview.styl'
 
 const { Content } = EntityTitleSection
-
-const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
 
 const OAuthClientOverview = props => {
   const {
     oauthClientId,
     oauthClient: { created_at, updated_at, state, state_description, secret },
     fetching,
+    includeStateDescription,
     collaboratorsTotalCount,
   } = props
   const { formatMessage } = useIntl()
@@ -63,10 +61,9 @@ const OAuthClientOverview = props => {
         { key: sharedMessages.oauthClientId, value: oauthClientId, type: 'code', sensitive: false },
         { key: sharedMessages.createdAt, value: <DateTime value={created_at} /> },
         { key: sharedMessages.updatedAt, value: <DateTime value={updated_at} /> },
-        { key: sharedMessages.state, value: capitalize(formatMessage({ id: `enum:${state}` })) },
         {
-          key: sharedMessages.stateDescription,
-          value: state_description,
+          key: sharedMessages.state,
+          value: capitalizeMessage(formatMessage({ id: `enum:${state}` })),
         },
       ],
     },
@@ -80,6 +77,14 @@ const OAuthClientOverview = props => {
       type: 'byte',
       sensitive: true,
       enableUint32: true,
+    })
+  }
+
+  // Include `state_description`.
+  if (includeStateDescription) {
+    sheetData[0].items.push({
+      key: sharedMessages.stateDescription,
+      value: state_description,
     })
   }
 
@@ -129,6 +134,7 @@ const OAuthClientOverview = props => {
 OAuthClientOverview.propTypes = {
   collaboratorsTotalCount: PropTypes.number,
   fetching: PropTypes.bool.isRequired,
+  includeStateDescription: PropTypes.bool.isRequired,
   oauthClient: PropTypes.shape({
     created_at: PropTypes.string,
     updated_at: PropTypes.string,
@@ -145,11 +151,15 @@ OAuthClientOverview.defaultProps = {
 
 export default connect(
   state => {
-    const oauthClientId = selectSelectedClientId(state)
+    const oauthClient = selectSelectedClient(state)
+    const oauthClientId = oauthClient.ids.client_id || oauthClient.name
+    const rights = selectClientRights(state)
+    const includeStateDescription = rights.includes('RIGHT_CLIENT_ALL')
 
     return {
+      includeStateDescription,
       oauthClientId,
-      oauthClient: selectSelectedClient(state),
+      oauthClient,
       fetching: selectClientFetching(state),
       collaboratorsTotalCount: selectCollaboratorsTotalCount(state),
     }
@@ -165,9 +175,4 @@ export default connect(
     ...ownProps,
     loadData: id => dispatchProps.loadData(id),
   }),
-)(
-  withRequest(
-    ({ oauthClientId, loadData }) => loadData(oauthClientId),
-    () => false,
-  )(OAuthClientOverview),
-)
+)(OAuthClientOverview)

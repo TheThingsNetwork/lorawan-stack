@@ -38,12 +38,13 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { mayPerformAllClientActions } from '@account/lib/feature-checks'
 
-import { getClient } from '@account/store/actions/clients'
+import { getClient, getClientRights } from '@account/store/actions/clients'
 
 import {
   selectClientFetching,
   selectClientById,
   selectClientError,
+  selectClientRights,
 } from '@account/store/selectors/clients'
 
 const OAuthClient = props => {
@@ -51,6 +52,7 @@ const OAuthClient = props => {
     clientId,
     match: { url: matchedUrl, path },
     oauthClient,
+    rights,
     siteName,
   } = props
 
@@ -73,7 +75,7 @@ const OAuthClient = props => {
           to: matchedUrl,
         }}
       >
-        {mayPerformAllClientActions && (
+        {mayPerformAllClientActions.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.overview}
             path={matchedUrl}
@@ -81,14 +83,14 @@ const OAuthClient = props => {
             exact
           />
         )}
-        {mayPerformAllClientActions && (
+        {mayPerformAllClientActions.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.collaborators}
             path={`${matchedUrl}/collaborators`}
             icon="organization"
           />
         )}
-        {mayPerformAllClientActions && (
+        {mayPerformAllClientActions.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.generalSettings}
             path={`${matchedUrl}/general-settings`}
@@ -113,12 +115,14 @@ OAuthClient.propTypes = {
   oauthClient: PropTypes.shape({
     name: PropTypes.string,
   }).isRequired,
+  rights: PropTypes.rights.isRequired,
   siteName: PropTypes.string.isRequired,
 }
 
 export default connect(
   (state, props) => ({
     clientId: props.match.params.clientId,
+    rights: selectClientRights(state),
     fetching: selectClientFetching(state),
     oauthClient: selectClientById(state, props.match.params.clientId),
     error: selectClientError(state),
@@ -126,6 +130,7 @@ export default connect(
   }),
   dispatch => ({
     loadData: id => {
+      dispatch(getClientRights(id))
       dispatch(
         getClient(id, [
           'name',

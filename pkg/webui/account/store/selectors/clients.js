@@ -42,7 +42,11 @@ export const selectOAuthClientsFetching = state => selectClientsFetching(state)
 export const selectOAuthClientsError = state => selectClientsError(state)
 
 // Rights.
-export const selectClientRights = state => selectClientsStore(state).rights
+export const selectClientRights = state => {
+  const rights = selectClientsStore(state).rights
+
+  return [...rights.regular, ...rights.pseudo]
+}
 export const selectClientRegularRights = state => selectClientsStore(state).rights?.regular
 export const selectClientPseudoRights = state => selectClientsStore(state).rights?.pseudo
 export const selectClientRightsError = createErrorSelector(GET_CLIENT_RIGHTS_BASE)
