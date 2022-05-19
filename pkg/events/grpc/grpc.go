@@ -135,7 +135,14 @@ func (srv *EventsServer) Stream(req *ttnpb.StreamEventsRequest, stream ttnpb.Eve
 		return err
 	}
 
-	ch := make(events.Channel, 8)
+	chSize := int(req.Tail)
+	if chSize < 8 {
+		chSize = 8
+	}
+	if chSize > 1024 {
+		chSize = 1024
+	}
+	ch := make(events.Channel, chSize)
 	handler := events.ContextHandler(ctx, ch)
 
 	store, hasStore := srv.pubsub.(events.Store)
