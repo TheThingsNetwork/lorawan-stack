@@ -21,6 +21,7 @@ import status from '@ttn-lw/lib/store/reducers/status'
 import { createNamedPaginationReducer } from '@ttn-lw/lib/store/reducers/pagination'
 import fetching from '@ttn-lw/lib/store/reducers/ui/fetching'
 import error from '@ttn-lw/lib/store/reducers/ui/error'
+import collaborators from '@ttn-lw/lib/store/reducers/collaborators'
 
 import user from './user'
 import is from './identity-server'
@@ -44,4 +45,5 @@ export default history =>
     }),
     status,
     router: connectRouter(history),
+    collaborators,
   })

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import status from '@ttn-lw/lib/store/logics/status'
+import collaborators from '@ttn-lw/lib/store/middleware/collaborators'
 
 import user from './user'
 import users from './users'
@@ -51,4 +52,5 @@ export default [
   ...as,
   ...deviceRepository,
   ...packetBroker,
+  ...collaborators,
 ]

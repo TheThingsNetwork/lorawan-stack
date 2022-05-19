@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import status from '@ttn-lw/lib/store/logics/status'
+import collaborators from '@ttn-lw/lib/store/middleware/collaborators'
 
 import init from './init'
 import user from './user'
@@ -20,4 +21,12 @@ import identityServer from './identity-server'
 import sessions from './sessions'
 import clients from './clients'
 
-export default [...status, ...init, ...user, ...identityServer, ...sessions, ...clients]
+export default [
+  ...status,
+  ...init,
+  ...user,
+  ...identityServer,
+  ...sessions,
+  ...clients,
+  ...collaborators,
+]
