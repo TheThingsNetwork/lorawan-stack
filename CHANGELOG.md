@@ -51,6 +51,8 @@ For details about compatibility between different releases, see the **Commitment
 - End device creation no longer errors on missing application info rights.
 - Missing success notification when successfully deleting an application in the Console.
 - CLI create commands for applications, gateways and clients no longer have their decoded ID emptied when using the `--user-id` flag.
+- Metric `ttn_lw_events_channel_dropped_total` not getting updated.
+- Dropped events when calling the Stream RPC with a long tail.
 
 ### Security
 
