@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.19.2] - unreleased
+
+### Added
+
 - Allow setting an expiry date for API keys in the Console
 - New event type `gs.gateway.connection.stats` with connection statistics. A new event is sent at most every `gs.update-connection-stats-debounce-time` time and at least every `gs.update-connection-stats-interval` time.
 - Button to export as JSON end device `mac-settings` and `mac-state` in the Console.
@@ -34,8 +48,6 @@ For details about compatibility between different releases, see the **Commitment
 - The Things Stack is now built with Go 1.18.
 - Layout of webhook and Pub/Sub forms to improve UX.
 - The Network Server Address used for End Device Claiming is fetched from the configuration instead of client input.
-
-### Deprecated
 
 ### Removed
 
@@ -2158,7 +2170,8 @@ For details about compatibility between different releases, see the **Commitment
 <!--
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.19.1...v3.19
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.19.2...v3.19
+[3.19.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.19.1...v3.19.2
 [3.19.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.19.0...v3.19.1
 [3.19.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.18.2...v3.19.0
 [3.18.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.18.1...v3.18.2
