@@ -53,6 +53,19 @@ describe('OAuth Client general settings', () => {
       .should('be.visible')
       .findByText(`OAuth Client updated`)
       .should('be.visible')
+
+    cy.reload()
+
+    cy.findByLabelText('Name').should('be.visible').and('have.attr', 'value').and('eq', 'test-name')
+    cy.findByLabelText('Description').should('be.visible').should('have.text', 'test-description')
+    cy.get(`[name="redirect_uris[0].value"]`)
+      .should('be.visible')
+      .and('have.attr', 'value')
+      .and('eq', 'client-test-url')
+    cy.get(`[name="logout_redirect_uris[0].value"]`)
+      .should('be.visible')
+      .and('have.attr', 'value')
+      .and('eq', 'client-test-url')
   })
 
   it('succeeds deleting client', () => {
