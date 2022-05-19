@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { defineMessages, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 
 import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
 import Checkbox from '@ttn-lw/components/checkbox'
@@ -24,121 +24,15 @@ import Notification from '@ttn-lw/components/notification'
 import Select from '@ttn-lw/components/select'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
+import RightsGroup from '@ttn-lw/components/rights-group'
 
-import RightsGroup from '@console/components/rights-group'
-
-import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import capitalizeMessage from '@ttn-lw/lib/capitalize-message'
 
-const m = defineMessages({
-  clientIdPlaceholder: 'my-new-oauth-client',
-  clientNamePlaceholder: 'My new OAuth Client',
-  clientDescPlaceholder: 'Description for my new OAuth Client',
-  clientDescDescription:
-    'Optional OAuth Client description; can also be used to save notes about the client',
-  createClient: 'Create OAuth Client',
-  deleteTitle: 'Are you sure you want to delete this account?',
-  deleteWarning:
-    'This will <strong>PERMANENTLY DELETE THIS OAUTH CLIENT</strong> and <strong>LOCK THE USER ID AND EMAIL FOR RE-REGISTRATION</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.',
-  purgeWarning:
-    'This will <strong>PERMANENTLY DELETE THIS OAUTH CLIENT</strong>. Make sure you assign new collaborators to such entities if you plan to continue using them.',
-  redirectUrls: 'Redirect URLs',
-  addRedirectUri: 'Add redirect URL',
-  addLogoutRedirectUri: 'Add logout redirect URL',
-  redirectUrlDescription:
-    'The allowed redirect URIs against which authorization requests are checked',
-  logoutRedirectUrls: 'Logout redirect URLs',
-  logoutRedirectUrlsDescription:
-    'The allowed logout redirect URIs against which client initiated logout requests are checked',
-  skipAuthorization: 'Skip Authorization',
-  skipAuthorizationDesc: 'If set, the authorization page will be skipped',
-  endorsed: 'Endorsed',
-  endorsedDesc: 'If set, the authorization page will show endorsement',
-  grants: 'Grants',
-  grantsDesc: 'OAuth flows that can be used for the client to get a token',
-  grantAuthorizationLabel: 'Grant authorization code',
-  grantRefreshTokenLabel: 'Grant refresh token',
-  grantPasswordLabel: 'Grant password',
-  deleteClient: 'Delete OAuth Client',
-  urlsPlaceholder: 'https://example.com/',
-  rightsWarning:
-    'Note that only the minimum set of rights needed to provide the functionality of the application should be requested',
-  updateWarning:
-    'Note that the OAuth Client will have to de re-authorized before the chosen rights are granted',
-})
-
-const capitalize = str => str.charAt(0).toUpperCase() + str.slice(1)
-
-const approvalStates = [
-  'STATE_REQUESTED',
-  'STATE_APPROVED',
-  'STATE_REJECTED',
-  'STATE_FLAGGED',
-  'STATE_SUSPENDED',
-]
-
-const encodeGrants = value => {
-  const grants = Object.keys(value).map(grant => {
-    if (value[grant]) {
-      return grant
-    }
-
-    return null
-  })
-
-  return grants.filter(Boolean)
-}
-
-const decodeGrants = value => {
-  if (value) {
-    const grants = value.reduce((g, i) => {
-      g[i] = true
-      return g
-    }, {})
-
-    return grants
-  }
-
-  return null
-}
-
-const validationSchema = Yup.object().shape({
-  owner_id: Yup.string().required(sharedMessages.validateRequired),
-  ids: Yup.object().shape({
-    client_id: Yup.string()
-      .min(2, Yup.passValues(sharedMessages.validateTooShort))
-      .max(36, Yup.passValues(sharedMessages.validateTooLong))
-      .required(sharedMessages.validateRequired),
-  }),
-  name: Yup.string()
-    .min(2, Yup.passValues(sharedMessages.validateTooShort))
-    .max(2000, Yup.passValues(sharedMessages.validateTooLong)),
-  description: Yup.string(),
-  redirect_uris: Yup.array().max(10, Yup.passValues(sharedMessages.attributesValidateTooMany)),
-  logout_redirect_uris: Yup.array().max(
-    10,
-    Yup.passValues(sharedMessages.attributesValidateTooMany),
-  ),
-  skip_authorization: Yup.bool(),
-  endorsed: Yup.bool(),
-  grants: Yup.array().max(3, Yup.passValues(sharedMessages.attributesValidateTooMany)),
-  state: Yup.lazy(value => {
-    if (value === '') {
-      return Yup.string().strip()
-    }
-
-    return Yup.string().oneOf(approvalStates, sharedMessages.validateRequired)
-  }),
-  state_description: Yup.lazy(value => {
-    if (value === '') {
-      return Yup.string().strip()
-    }
-
-    return Yup.string()
-  }),
-  rights: Yup.array().min(1, sharedMessages.validateRights),
-})
+import { approvalStates, encodeGrants, decodeGrants } from './utils'
+import validationSchema from './validation-schema'
+import m from './messages'
 
 const OAuthClientForm = props => {
   const {
@@ -156,7 +50,7 @@ const OAuthClientForm = props => {
 
   const approvalStateOptions = approvalStates.map(state => ({
     value: state,
-    label: capitalize(formatMessage({ id: `enum:${state}` })),
+    label: capitalizeMessage(formatMessage({ id: `enum:${state}` })),
   }))
 
   const handleSubmit = useCallback(
@@ -187,6 +81,7 @@ const OAuthClientForm = props => {
       initialValues={initialValues}
       validationSchema={validationSchema}
     >
+      <Form.SubTitle title={sharedMessages.generalSettings} />
       <Form.Field
         title={sharedMessages.oauthClientId}
         name="ids.client_id"
@@ -230,6 +125,7 @@ const OAuthClientForm = props => {
       />
       {isAdmin && (
         <>
+          <Form.SubTitle title={m.adminOptions} />
           <Form.Field
             title={sharedMessages.state}
             name="state"
@@ -242,16 +138,17 @@ const OAuthClientForm = props => {
             component={Input}
             type="textarea"
             placeholder={m.userDescPlaceholder}
+            description={m.stateDescriptionDesc}
           />
           <Form.Field
-            title={m.skipAuthorization}
+            label={m.skipAuthorization}
             name="skip_authorization"
             component={Checkbox}
             description={m.skipAuthorizationDesc}
             disabled={!isAdmin}
           />
           <Form.Field
-            title={m.endorsed}
+            label={m.endorsed}
             name="endorsed"
             component={Checkbox}
             description={m.endorsedDesc}
@@ -260,18 +157,21 @@ const OAuthClientForm = props => {
         </>
       )}
       {((isAdmin && update) || !update) && (
-        <Form.Field
-          title={m.grants}
-          name="grants"
-          encode={encodeGrants}
-          decode={decodeGrants}
-          component={Checkbox.Group}
-          description={m.grantsDesc}
-        >
-          <Checkbox name="GRANT_AUTHORIZATION_CODE" label={m.grantAuthorizationLabel} />
-          <Checkbox name="GRANT_REFRESH_TOKEN" label={m.grantRefreshTokenLabel} />
-          <Checkbox name="GRANT_PASSWORD" label={m.grantPasswordLabel} disabled={!isAdmin} />
-        </Form.Field>
+        <>
+          <Form.SubTitle title={m.grantTypeAndRights} />
+          <Form.Field
+            title={m.grants}
+            name="grants"
+            encode={encodeGrants}
+            decode={decodeGrants}
+            component={Checkbox.Group}
+            description={m.grantsDesc}
+          >
+            <Checkbox name="GRANT_AUTHORIZATION_CODE" label={m.grantAuthorizationLabel} />
+            <Checkbox name="GRANT_REFRESH_TOKEN" label={m.grantRefreshTokenLabel} />
+            {isAdmin && <Checkbox name="GRANT_PASSWORD" label={m.grantPasswordLabel} />}
+          </Form.Field>
+        </>
       )}
       <Notification small warning content={update ? m.updateWarning : m.rightsWarning} />
       <Form.Field
