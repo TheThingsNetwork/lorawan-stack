@@ -15,14 +15,14 @@
 import { connect } from 'react-redux'
 
 import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
-
-import { selectSelectedGatewayId } from '@console/store/selectors/gateways'
 import {
   selectCollaborators,
   selectCollaboratorsTotalCount,
   selectCollaboratorsFetching,
   selectCollaboratorsError,
 } from '@ttn-lw/lib/store/selectors/collaborators'
+
+import { selectSelectedGatewayId } from '@console/store/selectors/gateways'
 
 const mapStateToProps = state => ({
   gtwId: selectSelectedGatewayId(state),

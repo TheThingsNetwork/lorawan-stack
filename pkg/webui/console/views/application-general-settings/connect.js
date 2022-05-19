@@ -22,6 +22,12 @@ import withFeatureRequirement from '@console/lib/components/with-feature-require
 
 import pipe from '@ttn-lw/lib/pipe'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
+import {
+  selectCollaboratorsTotalCount,
+  selectCollaboratorsFetching,
+  selectCollaboratorsError,
+} from '@ttn-lw/lib/store/selectors/collaborators'
 
 import {
   checkFromState,
@@ -35,7 +41,6 @@ import {
 
 import { updateApplication, deleteApplication } from '@console/store/actions/applications'
 import { updateApplicationLink, getApplicationLink } from '@console/store/actions/link'
-import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 import { getApiKeysList } from '@console/store/actions/api-keys'
 import { getPubsubsList } from '@console/store/actions/pubsubs'
 import { getWebhooksList } from '@console/store/actions/webhooks'
@@ -50,11 +55,6 @@ import {
   selectPubsubsFetching,
   selectPubsubsError,
 } from '@console/store/selectors/pubsubs'
-import {
-  selectCollaboratorsTotalCount,
-  selectCollaboratorsFetching,
-  selectCollaboratorsError,
-} from '@ttn-lw/lib/store/selectors/collaborators'
 import {
   selectApiKeysTotalCount,
   selectApiKeysFetching,
