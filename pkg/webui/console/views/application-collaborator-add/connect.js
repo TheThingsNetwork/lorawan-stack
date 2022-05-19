@@ -24,7 +24,7 @@ import {
   selectApplicationRightsFetching,
   selectApplicationRightsError,
 } from '@console/store/selectors/applications'
-import { selectCollaborators } from '@console/store/selectors/collaborators'
+import { selectCollaborators } from '@ttn-lw/lib/store/selectors/collaborators'
 
 const mapStateToProps = state => ({
   appId: selectSelectedApplicationId(state),

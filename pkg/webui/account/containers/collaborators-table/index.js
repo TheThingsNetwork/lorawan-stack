@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,19 +29,16 @@ import { getCollaboratorId } from '@ttn-lw/lib/selectors/id'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
-
-import { getCollaboratorsList, deleteCollaborator } from '@account/store/actions/collaborators'
-
-import { selectUserId } from '@account/store/selectors/user'
+import { getCollaboratorsList, deleteCollaborator } from '@ttn-lw/lib/store/actions/collaborators'
 import {
   selectCollaborators,
   selectCollaboratorsTotalCount,
   selectCollaboratorsFetching,
   selectCollaboratorsError,
-} from '@account/store/selectors/collaborators'
-import { selectSelectedClientId } from '@account/store/selectors/clients'
+} from '@ttn-lw/lib/store/selectors/collaborators'
 
-import style from './collaborators-table.styl'
+import { selectUserId } from '@account/store/selectors/user'
+import { selectSelectedClientId } from '@account/store/selectors/clients'
 
 const m = defineMessages({
   id: 'User / Organization ID',
@@ -49,8 +46,7 @@ const m = defineMessages({
   deleteCollaboratorError: 'There was an error and the collaborator could not be deleted',
   deleteOnlyCollaboratorError:
     'This collaborator could not be deleted because every client needs at least one collaborator with all rights',
-  removeButtonMessage: 'Remove this collaborator',
-  removeYourselfMessage: 'Remove yourself as a collaborator',
+  removeButtonMessage: 'Remove',
 })
 
 const CollaboratorsTable = props => {
@@ -100,7 +96,7 @@ const CollaboratorsTable = props => {
             return (
               <span>
                 {collaboratorId}{' '}
-                <Message className={style.hint} content={sharedMessages.currentUserIndicator} />
+                <Message className="tc-subtle-gray" content={sharedMessages.currentUserIndicator} />
               </span>
             )
           }
@@ -116,7 +112,7 @@ const CollaboratorsTable = props => {
 
           return (
             <span>
-              <Icon icon={icon} className={style.collaboratorIcon} />
+              <Icon icon={icon} className="mr-cs-xs" />
               <Message content={isUser ? sharedMessages.user : sharedMessages.organization} />
             </span>
           )
@@ -142,21 +138,15 @@ const CollaboratorsTable = props => {
           id: row.ids,
           delete: deleteCollaborator.bind(null, row.ids),
         }),
-        render: details => {
-          const isUser = 'user_ids' in details.id
-          const collaboratorId = getCollaboratorId({ ids: details.id })
-          const isYou = isUser && collaboratorId === currentUserId
-
-          return (
-            <Button
-              type="button"
-              onClick={details.delete}
-              message={isYou ? m.removeYourselfMessage : m.removeButtonMessage}
-              icon="delete"
-              danger
-            />
-          )
-        },
+        render: details => (
+          <Button
+            type="button"
+            onClick={details.delete}
+            message={m.removeButtonMessage}
+            icon="delete"
+            danger
+          />
+        ),
       },
     ]
 

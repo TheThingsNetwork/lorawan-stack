@@ -22,7 +22,7 @@ import {
   mayViewOrEditGatewayCollaborators,
 } from '@console/lib/feature-checks'
 
-import { getCollaboratorsList } from '@console/store/actions/collaborators'
+import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 import { getApiKeysList } from '@console/store/actions/api-keys'
 
 import { selectGatewayById } from '@console/store/selectors/gateways'
@@ -35,7 +35,7 @@ import {
   selectCollaboratorsTotalCount,
   selectCollaboratorsFetching,
   selectCollaboratorsError,
-} from '@console/store/selectors/collaborators'
+} from '@ttn-lw/lib/store/selectors/collaborators'
 
 const mapStateToProps = (state, props) => {
   const apiKeysTotalCount = selectApiKeysTotalCount(state)

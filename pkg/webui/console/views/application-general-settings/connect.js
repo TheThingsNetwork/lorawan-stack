@@ -35,7 +35,7 @@ import {
 
 import { updateApplication, deleteApplication } from '@console/store/actions/applications'
 import { updateApplicationLink, getApplicationLink } from '@console/store/actions/link'
-import { getCollaboratorsList } from '@console/store/actions/collaborators'
+import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 import { getApiKeysList } from '@console/store/actions/api-keys'
 import { getPubsubsList } from '@console/store/actions/pubsubs'
 import { getWebhooksList } from '@console/store/actions/webhooks'
@@ -54,7 +54,7 @@ import {
   selectCollaboratorsTotalCount,
   selectCollaboratorsFetching,
   selectCollaboratorsError,
-} from '@console/store/selectors/collaborators'
+} from '@ttn-lw/lib/store/selectors/collaborators'
 import {
   selectApiKeysTotalCount,
   selectApiKeysFetching,

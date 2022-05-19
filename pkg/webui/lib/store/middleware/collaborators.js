@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ import { entitySdkServiceMap } from '@console/constants/entities'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import * as collaborators from '@ttn-lw/lib/store/actions/collaborators'
 
-import * as collaborators from '@account/store/actions/collaborators'
 import { getUser } from '@account/store/actions/user'
 
 const validParentTypes = Object.keys(entitySdkServiceMap)

@@ -14,15 +14,15 @@
 
 import { connect } from 'react-redux'
 
-import { getCollaboratorsList } from '@console/store/actions/collaborators'
-
-import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 import {
   selectCollaborators,
   selectCollaboratorsTotalCount,
   selectCollaboratorsFetching,
   selectCollaboratorsError,
-} from '@console/store/selectors/collaborators'
+} from '@ttn-lw/lib/store/selectors/collaborators'
+
+import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 const mapStateToProps = state => ({
   appId: selectSelectedApplicationId(state),

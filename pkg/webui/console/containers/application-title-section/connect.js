@@ -16,6 +16,13 @@ import { connect } from 'react-redux'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
+import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
+import {
+  selectCollaboratorsTotalCount,
+  selectCollaboratorsFetching,
+  selectCollaboratorsError,
+} from '@ttn-lw/lib/store/selectors/collaborators'
+
 import {
   checkFromState,
   mayViewOrEditApplicationApiKeys,
@@ -23,7 +30,6 @@ import {
   mayViewApplicationDevices,
 } from '@console/lib/feature-checks'
 
-import { getCollaboratorsList } from '@console/store/actions/collaborators'
 import { getApiKeysList } from '@console/store/actions/api-keys'
 import { getApplicationDeviceCount } from '@console/store/actions/applications'
 
@@ -34,11 +40,6 @@ import {
   selectApplicationDevicesError,
   selectApplicationDerivedLastSeen,
 } from '@console/store/selectors/applications'
-import {
-  selectCollaboratorsTotalCount,
-  selectCollaboratorsFetching,
-  selectCollaboratorsError,
-} from '@console/store/selectors/collaborators'
 import {
   selectApiKeysTotalCount,
   selectApiKeysFetching,

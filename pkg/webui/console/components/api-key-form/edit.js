@@ -23,8 +23,7 @@ import FormField from '@ttn-lw/components/form/field'
 import FormSubmit from '@ttn-lw/components/form/submit'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import Input from '@ttn-lw/components/input'
-
-import RightsGroup from '@console/components/rights-group'
+import RightsGroup from '@ttn-lw/components/rights-group'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'

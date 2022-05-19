@@ -25,7 +25,7 @@ import {
   selectGatewayPseudoRights,
   selectGatewayRightsError,
 } from '@console/store/selectors/gateways'
-import { selectSelectedCollaborator } from '@console/store/selectors/collaborators'
+import { selectSelectedCollaborator } from '@ttn-lw/lib/store/selectors/collaborators'
 
 const mapStateToProps = state => ({
   gtwId: selectSelectedGatewayId(state),

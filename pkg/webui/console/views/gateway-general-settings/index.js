@@ -47,14 +47,14 @@ import {
 import { mapFormValueToAttributes } from '@console/lib/attributes'
 
 import { updateGateway, deleteGateway } from '@console/store/actions/gateways'
-import { getCollaboratorsList } from '@console/store/actions/collaborators'
+import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 import { getApiKeysList } from '@console/store/actions/api-keys'
 
 import {
   selectCollaboratorsTotalCount,
   selectCollaboratorsFetching,
   selectCollaboratorError,
-} from '@console/store/selectors/collaborators'
+} from '@ttn-lw/lib/store/selectors/collaborators'
 import {
   selectApiKeysTotalCount,
   selectApiKeysFetching,

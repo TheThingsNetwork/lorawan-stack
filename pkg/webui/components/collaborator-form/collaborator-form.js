@@ -22,8 +22,7 @@ import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
 import toast from '@ttn-lw/components/toast'
 import ModalButton from '@ttn-lw/components/button/modal-button'
-
-import RightsGroup from '@console/components/rights-group'
+import RightsGroup from '@ttn-lw/components/rights-group'
 
 import Yup from '@ttn-lw/lib/yup'
 import PropTypes from '@ttn-lw/lib/prop-types'

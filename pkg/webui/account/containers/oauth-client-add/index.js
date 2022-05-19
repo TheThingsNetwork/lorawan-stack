@@ -28,7 +28,7 @@ import { createClient } from '@account/store/actions/clients'
 
 const m = defineMessages({
   createSuccess: 'Client created',
-  createFailure: 'There was an error creating this client',
+  createFailure: 'There was an error and the client could not be created',
 })
 
 const ClientAdd = props => {

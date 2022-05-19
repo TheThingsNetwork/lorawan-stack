@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,12 +13,11 @@
 // limitations under the License.
 
 import { getCollaboratorId } from '@ttn-lw/lib/selectors/id'
-
 import {
   GET_COLLABORATORS_LIST_SUCCESS,
   GET_COLLABORATOR_SUCCESS,
   GET_COLLABORATOR,
-} from '@console/store/actions/collaborators'
+} from '@ttn-lw/lib/store/actions/collaborators'
 
 const defaultState = {
   entities: {},

@@ -24,7 +24,6 @@ import configuration from './configuration'
 import organizations from './organizations'
 import js from './join-server'
 import apiKeys from './api-keys'
-import collaborators from './collaborators'
 import webhooks from './webhooks'
 import pubsubs from './pubsubs'
 import applicationPackages from './application-packages'
@@ -45,7 +44,6 @@ export default [
   ...organizations,
   ...js,
   ...apiKeys,
-  ...collaborators,
   ...webhooks,
   ...pubsubs,
   ...applicationPackages,

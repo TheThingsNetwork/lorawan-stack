@@ -19,7 +19,7 @@ import tts from '@console/api/tts'
 
 import withRequest from '@ttn-lw/lib/components/with-request'
 
-import { getCollaborator } from '@console/store/actions/collaborators'
+import { getCollaborator } from '@ttn-lw/lib/store/actions/collaborators'
 
 import {
   selectSelectedApplicationId,
@@ -33,7 +33,7 @@ import {
   selectOrganizationCollaborator,
   selectCollaboratorFetching,
   selectCollaboratorError,
-} from '@console/store/selectors/collaborators'
+} from '@ttn-lw/lib/store/selectors/collaborators'
 
 const mapStateToProps = (state, props) => {
   const appId = selectSelectedApplicationId(state)

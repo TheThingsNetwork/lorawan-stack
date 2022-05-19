@@ -29,6 +29,7 @@ import withRequest from '@ttn-lw/lib/components/with-request'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { selectCollaborators } from '@ttn-lw/lib/store/selectors/collaborators'
 
 import { getClientRights } from '@account/store/actions/clients'
 
@@ -40,7 +41,6 @@ import {
   selectClientRightsFetching,
   selectClientRightsError,
 } from '@account/store/selectors/clients'
-import { selectCollaborators } from '@account/store/selectors/collaborators'
 
 const OAuthClientCollaboratorAdd = props => {
   const { rights, pseudoRights, redirectToList, addCollaborator, error, clientId, isAdmin } = props

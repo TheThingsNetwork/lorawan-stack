@@ -29,7 +29,7 @@ import {
 } from '@console/lib/feature-checks'
 
 import { updateOrganization, deleteOrganization } from '@console/store/actions/organizations'
-import { getCollaboratorsList } from '@console/store/actions/collaborators'
+import { getCollaboratorsList } from '@ttn-lw/lib/store/actions/collaborators'
 import { getApiKeysList } from '@console/store/actions/api-keys'
 
 import {
@@ -40,7 +40,7 @@ import {
   selectCollaboratorsTotalCount,
   selectCollaboratorsFetching,
   selectCollaboratorsError,
-} from '@console/store/selectors/collaborators'
+} from '@ttn-lw/lib/store/selectors/collaborators'
 import {
   selectApiKeysTotalCount,
   selectApiKeysFetching,

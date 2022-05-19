@@ -19,14 +19,5 @@ import user from './user'
 import identityServer from './identity-server'
 import sessions from './sessions'
 import clients from './clients'
-import collaborators from './collaborators'
 
-export default [
-  ...status,
-  ...init,
-  ...user,
-  ...identityServer,
-  ...sessions,
-  ...clients,
-  ...collaborators,
-]
+export default [...status, ...init, ...user, ...identityServer, ...sessions, ...clients]
