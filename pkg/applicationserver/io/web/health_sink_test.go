@@ -29,7 +29,7 @@ import (
 )
 
 var registeredWebhookIDs = &ttnpb.ApplicationWebhookIdentifiers{
-	ApplicationIds: &registeredApplicationID,
+	ApplicationIds: registeredApplicationID,
 	WebhookId:      registeredWebhookID,
 }
 

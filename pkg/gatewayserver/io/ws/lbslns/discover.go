@@ -41,7 +41,7 @@ func (f *lbsLNS) HandleConnectionInfo(ctx context.Context, raw []byte, server io
 		return logAndWrapDiscoverError(ctx, errEmptyGatewayEUI.New(), "Empty router EUI provided")
 	}
 
-	ids := ttnpb.GatewayIdentifiers{
+	ids := &ttnpb.GatewayIdentifiers{
 		Eui: &req.EUI.EUI64,
 	}
 

@@ -184,7 +184,7 @@ func (tsr TimeSyncResponse) MarshalJSON() ([]byte, error) {
 }
 
 // toUplinkMessage extracts fields from the Basics Station Join Request "jreq" message and converts them into an UplinkMessage for the network server.
-func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
+func (req *JoinRequest) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
 	var up ttnpb.UplinkMessage
 	up.ReceivedAt = ttnpb.ProtoTimePtr(receivedAt)
 
@@ -207,7 +207,7 @@ func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 		}},
 	}
 
-	up.RawPayload, err = lorawan.MarshalMessage(*up.Payload)
+	up.RawPayload, err = lorawan.MarshalMessage(up.Payload)
 	if err != nil {
 		return nil, errJoinRequestMessage.WithCause(err)
 	}
@@ -216,7 +216,7 @@ func (req *JoinRequest) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID str
 	tm := TimePtrFromUpInfo(req.UpInfo.GPSTime, req.UpInfo.RxTime, receivedAt)
 	up.RxMetadata = []*ttnpb.RxMetadata{
 		{
-			GatewayIds:   &ids,
+			GatewayIds:   ids,
 			Time:         ttnpb.ProtoTime(tm),
 			Timestamp:    timestamp,
 			Rssi:         req.RadioMetaData.UpInfo.RSSI,
@@ -308,7 +308,7 @@ func (req *JoinRequest) FromUplinkMessage(up *ttnpb.UplinkMessage, bandID string
 }
 
 // toUplinkMessage extracts fields from the LoRa Basics Station Uplink Data Frame "updf" message and converts them into an UplinkMessage for the network server.
-func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
+func (updf *UplinkDataFrame) toUplinkMessage(ids *ttnpb.GatewayIdentifiers, bandID string, receivedAt time.Time) (*ttnpb.UplinkMessage, error) {
 	var up ttnpb.UplinkMessage
 	up.ReceivedAt = ttnpb.ProtoTimePtr(receivedAt)
 
@@ -365,7 +365,7 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 		}},
 	}
 
-	up.RawPayload, err = lorawan.MarshalMessage(*up.Payload)
+	up.RawPayload, err = lorawan.MarshalMessage(up.Payload)
 	if err != nil {
 		return nil, errUplinkDataFrame.WithCause(err)
 	}
@@ -374,7 +374,7 @@ func (updf *UplinkDataFrame) toUplinkMessage(ids ttnpb.GatewayIdentifiers, bandI
 	tm := TimePtrFromUpInfo(updf.UpInfo.GPSTime, updf.UpInfo.RxTime, receivedAt)
 	up.RxMetadata = []*ttnpb.RxMetadata{
 		{
-			GatewayIds:   &ids,
+			GatewayIds:   ids,
 			Time:         ttnpb.ProtoTime(tm),
 			Timestamp:    timestamp,
 			Rssi:         updf.RadioMetaData.UpInfo.RSSI,
@@ -493,7 +493,7 @@ func (conf TxConfirmation) ToTxAck(ctx context.Context, tokens io.DownlinkTokens
 }
 
 // HandleUp implements Formatter.
-func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids ttnpb.GatewayIdentifiers, conn *io.Connection, receivedAt time.Time) ([]byte, error) {
+func (f *lbsLNS) HandleUp(ctx context.Context, raw []byte, ids *ttnpb.GatewayIdentifiers, conn *io.Connection, receivedAt time.Time) ([]byte, error) {
 	logger := log.FromContext(ctx)
 	typ, err := Type(raw)
 	if err != nil {

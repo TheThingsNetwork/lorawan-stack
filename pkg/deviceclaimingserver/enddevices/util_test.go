@@ -65,7 +65,7 @@ func (mockEDCS) Get(ctx context.Context, in *ttnpb.GetEndDeviceRequest, opts ...
 }
 
 // ApplicationRights implements the Fetcher interface.
-func (mockEDCS) ApplicationRights(ctx context.Context, ids ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
+func (mockEDCS) ApplicationRights(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
 	return &ttnpb.Rights{
 		Rights: []ttnpb.Right{
 			ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,

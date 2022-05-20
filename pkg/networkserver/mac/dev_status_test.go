@@ -36,7 +36,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 	for _, tc := range []struct {
 		Name        string
 		InputDevice *ttnpb.EndDevice
-		Defaults    ttnpb.MACSettings
+		Defaults    *ttnpb.MACSettings
 		Needs       bool
 	}{
 		{
@@ -172,7 +172,7 @@ func TestNeedsDevStatusReq(t *testing.T) {
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				dev := CopyEndDevice(tc.InputDevice)
-				defaults := deepcopy.Copy(tc.Defaults).(ttnpb.MACSettings)
+				defaults := deepcopy.Copy(tc.Defaults).(*ttnpb.MACSettings)
 				res := DeviceNeedsDevStatusReq(dev, tc.Defaults, scheduleAt)
 				if tc.Needs {
 					a.So(res, should.BeTrue)

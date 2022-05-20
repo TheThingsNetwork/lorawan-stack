@@ -32,7 +32,7 @@ type tlsConfigurator interface {
 }
 
 type authenticator interface {
-	AuthInfo(context.Context) (ttnpb.PacketBrokerNetworkIdentifier, error)
+	AuthInfo(context.Context) (*ttnpb.PacketBrokerNetworkIdentifier, error)
 	DialOptions(context.Context) ([]grpc.DialOption, error)
 }
 
@@ -52,10 +52,10 @@ func newOAuth2(ctx context.Context, oauth2Config OAuth2Config, tlsConfig tlsConf
 	}
 }
 
-func (a *oauth2Authenticator) AuthInfo(ctx context.Context) (ttnpb.PacketBrokerNetworkIdentifier, error) {
+func (a *oauth2Authenticator) AuthInfo(ctx context.Context) (*ttnpb.PacketBrokerNetworkIdentifier, error) {
 	token, err := a.tokenSource.Token()
 	if err != nil {
-		return ttnpb.PacketBrokerNetworkIdentifier{}, err
+		return nil, err
 	}
 	return packetbroker.UnverifiedNetworkIdentifier(token.AccessToken)
 }

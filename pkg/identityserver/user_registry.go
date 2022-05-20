@@ -303,7 +303,7 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 
 func (is *IdentityServer) getUser(ctx context.Context, req *ttnpb.GetUserRequest) (usr *ttnpb.User, err error) {
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask, getPaths, nil)
-	if err = rights.RequireUser(ctx, *req.GetUserIds(), ttnpb.Right_RIGHT_USER_INFO); err != nil {
+	if err = rights.RequireUser(ctx, req.GetUserIds(), ttnpb.Right_RIGHT_USER_INFO); err != nil {
 		if err := is.RequireAuthenticated(ctx); err != nil {
 			return nil, err
 		}
@@ -398,7 +398,7 @@ func (is *IdentityServer) setFullProfilePictureURL(ctx context.Context, usr *ttn
 }
 
 func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserRequest) (usr *ttnpb.User, err error) {
-	if err = rights.RequireUser(ctx, *req.User.GetIds(), ttnpb.Right_RIGHT_USER_SETTINGS_BASIC); err != nil {
+	if err = rights.RequireUser(ctx, req.User.GetIds(), ttnpb.Right_RIGHT_USER_SETTINGS_BASIC); err != nil {
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.UserFieldPathsNested, req.FieldMask, nil, getPaths)
@@ -687,7 +687,7 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 }
 
 func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireUser(ctx, *ids, ttnpb.Right_RIGHT_USER_DELETE); err != nil {
+	if err := rights.RequireUser(ctx, ids, ttnpb.Right_RIGHT_USER_DELETE); err != nil {
 		return nil, err
 	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
@@ -706,7 +706,7 @@ func (is *IdentityServer) deleteUser(ctx context.Context, ids *ttnpb.UserIdentif
 }
 
 func (is *IdentityServer) restoreUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireUser(store.WithSoftDeleted(ctx, false), *ids, ttnpb.Right_RIGHT_USER_DELETE); err != nil {
+	if err := rights.RequireUser(store.WithSoftDeleted(ctx, false), ids, ttnpb.Right_RIGHT_USER_DELETE); err != nil {
 		return nil, err
 	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {

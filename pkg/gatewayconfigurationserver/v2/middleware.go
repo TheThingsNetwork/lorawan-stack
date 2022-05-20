@@ -50,12 +50,12 @@ type gatewayIDKeyType struct{}
 
 var gatewayIDKey gatewayIDKeyType
 
-func withGatewayID(ctx context.Context, id ttnpb.GatewayIdentifiers) context.Context {
+func withGatewayID(ctx context.Context, id *ttnpb.GatewayIdentifiers) context.Context {
 	return context.WithValue(ctx, gatewayIDKey, id)
 }
 
-func gatewayIDFromContext(ctx context.Context) ttnpb.GatewayIdentifiers {
-	id, ok := ctx.Value(gatewayIDKey).(ttnpb.GatewayIdentifiers)
+func gatewayIDFromContext(ctx context.Context) *ttnpb.GatewayIdentifiers {
+	id, ok := ctx.Value(gatewayIDKey).(*ttnpb.GatewayIdentifiers)
 	if !ok {
 		panic("no gateway identifiers found in context")
 	}
@@ -65,7 +65,7 @@ func gatewayIDFromContext(ctx context.Context) ttnpb.GatewayIdentifiers {
 func validateAndFillIDs(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		id := ttnpb.GatewayIdentifiers{
+		id := &ttnpb.GatewayIdentifiers{
 			GatewayId: mux.Vars(r)["gateway_id"],
 		}
 		if err := id.ValidateContext(ctx); err != nil {

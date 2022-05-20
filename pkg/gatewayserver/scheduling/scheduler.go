@@ -229,7 +229,7 @@ func (s *Scheduler) gc(ctx context.Context) error {
 
 var errDwellTime = errors.DefineFailedPrecondition("dwell_time", "packet exceeds dwell time restriction")
 
-func (s *Scheduler) newEmission(payloadSize int, settings ttnpb.TxSettings, starts ConcentratorTime) (Emission, error) {
+func (s *Scheduler) newEmission(payloadSize int, settings *ttnpb.TxSettings, starts ConcentratorTime) (Emission, error) {
 	d, err := toa.Compute(payloadSize, settings)
 	if err != nil {
 		return Emission{}, err
@@ -272,7 +272,7 @@ var (
 // Options define options for scheduling downlink.
 type Options struct {
 	PayloadSize int
-	ttnpb.TxSettings
+	*ttnpb.TxSettings
 	RTTs        RTTs
 	Priority    ttnpb.TxSchedulePriority
 	UplinkToken *ttnpb.UplinkToken

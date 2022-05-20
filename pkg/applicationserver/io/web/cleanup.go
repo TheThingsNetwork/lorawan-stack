@@ -51,7 +51,7 @@ func (cleaner *RegistryCleaner) DeleteApplicationData(ctx context.Context, appli
 		if err != nil {
 			return err
 		}
-		webhooks, err := cleaner.WebRegistry.List(ctx, &appIds, []string{"ids"})
+		webhooks, err := cleaner.WebRegistry.List(ctx, appIds, []string{"ids"})
 		if err != nil {
 			return err
 		}

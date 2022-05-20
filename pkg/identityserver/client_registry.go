@@ -76,11 +76,11 @@ func (is *IdentityServer) createClient(ctx context.Context, req *ttnpb.CreateCli
 		if !createdByAdmin && !is.configFromContext(ctx).UserRights.CreateClients {
 			return nil, errAdminsCreateClients.New()
 		}
-		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.Right_RIGHT_USER_CLIENTS_CREATE); err != nil {
+		if err = rights.RequireUser(ctx, usrIDs, ttnpb.Right_RIGHT_USER_CLIENTS_CREATE); err != nil {
 			return nil, err
 		}
 	} else if orgIDs := req.GetCollaborator().GetOrganizationIds(); orgIDs != nil {
-		if err = rights.RequireOrganization(ctx, *orgIDs, ttnpb.Right_RIGHT_ORGANIZATION_CLIENTS_CREATE); err != nil {
+		if err = rights.RequireOrganization(ctx, orgIDs, ttnpb.Right_RIGHT_ORGANIZATION_CLIENTS_CREATE); err != nil {
 			return nil, err
 		}
 	}
@@ -165,7 +165,7 @@ func (is *IdentityServer) getClient(ctx context.Context, req *ttnpb.GetClientReq
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.ClientFieldPathsNested, req.FieldMask, getPaths, nil)
-	if err = rights.RequireClient(ctx, *req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_ALL); err != nil {
+	if err = rights.RequireClient(ctx, req.GetClientIds(), ttnpb.Right_RIGHT_CLIENT_ALL); err != nil {
 		if !ttnpb.HasOnlyAllowedFields(req.FieldMask.GetPaths(), ttnpb.PublicClientFields...) {
 			return nil, err
 		}
@@ -208,11 +208,11 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 	}
 
 	if usrIDs := req.Collaborator.GetUserIds(); usrIDs != nil {
-		if err = rights.RequireUser(ctx, *usrIDs, ttnpb.Right_RIGHT_USER_CLIENTS_LIST); err != nil {
+		if err = rights.RequireUser(ctx, usrIDs, ttnpb.Right_RIGHT_USER_CLIENTS_LIST); err != nil {
 			return nil, err
 		}
 	} else if orgIDs := req.Collaborator.GetOrganizationIds(); orgIDs != nil {
-		if err = rights.RequireOrganization(ctx, *orgIDs, ttnpb.Right_RIGHT_ORGANIZATION_CLIENTS_LIST); err != nil {
+		if err = rights.RequireOrganization(ctx, orgIDs, ttnpb.Right_RIGHT_ORGANIZATION_CLIENTS_LIST); err != nil {
 			return nil, err
 		}
 	}
@@ -274,7 +274,7 @@ func (is *IdentityServer) listClients(ctx context.Context, req *ttnpb.ListClient
 var errUpdateClientAdminField = errors.DefinePermissionDenied("client_update_admin_field", "only admins can update the `{field}` field")
 
 func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateClientRequest) (cli *ttnpb.Client, err error) {
-	if err = rights.RequireClient(ctx, *req.Client.GetIds(), ttnpb.Right_RIGHT_CLIENT_ALL); err != nil {
+	if err = rights.RequireClient(ctx, req.Client.GetIds(), ttnpb.Right_RIGHT_CLIENT_ALL); err != nil {
 		return nil, err
 	}
 	req.FieldMask = cleanFieldMaskPaths(ttnpb.ClientFieldPathsNested, req.FieldMask, nil, getPaths)
@@ -345,7 +345,7 @@ func (is *IdentityServer) updateClient(ctx context.Context, req *ttnpb.UpdateCli
 }
 
 func (is *IdentityServer) deleteClient(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireClient(ctx, *ids, ttnpb.Right_RIGHT_CLIENT_ALL); err != nil {
+	if err := rights.RequireClient(ctx, ids, ttnpb.Right_RIGHT_CLIENT_ALL); err != nil {
 		return nil, err
 	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
@@ -359,7 +359,7 @@ func (is *IdentityServer) deleteClient(ctx context.Context, ids *ttnpb.ClientIde
 }
 
 func (is *IdentityServer) restoreClient(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireClient(store.WithSoftDeleted(ctx, false), *ids, ttnpb.Right_RIGHT_CLIENT_ALL); err != nil {
+	if err := rights.RequireClient(store.WithSoftDeleted(ctx, false), ids, ttnpb.Right_RIGHT_CLIENT_ALL); err != nil {
 		return nil, err
 	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {

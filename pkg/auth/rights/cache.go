@@ -196,7 +196,7 @@ func (f *inMemoryCache) AuthInfo(ctx context.Context) (authInfo *ttnpb.AuthInfoR
 	return res.authInfo, res.err
 }
 
-func (f *inMemoryCache) ApplicationRights(ctx context.Context, appID ttnpb.ApplicationIdentifiers) (rights *ttnpb.Rights, err error) {
+func (f *inMemoryCache) ApplicationRights(ctx context.Context, appID *ttnpb.ApplicationIdentifiers) (rights *ttnpb.Rights, err error) {
 	defer func() { registerRightsRequest(ctx, "application", rights, err) }()
 	req := newEntityReq(ctx, appID.GetEntityIdentifiers())
 	f.mu.Lock()
@@ -214,7 +214,7 @@ func (f *inMemoryCache) ApplicationRights(ctx context.Context, appID ttnpb.Appli
 	return res.rights, res.err
 }
 
-func (f *inMemoryCache) ClientRights(ctx context.Context, clientID ttnpb.ClientIdentifiers) (rights *ttnpb.Rights, err error) {
+func (f *inMemoryCache) ClientRights(ctx context.Context, clientID *ttnpb.ClientIdentifiers) (rights *ttnpb.Rights, err error) {
 	defer func() { registerRightsRequest(ctx, "client", rights, err) }()
 	req := newEntityReq(ctx, clientID.GetEntityIdentifiers())
 	f.mu.Lock()
@@ -232,7 +232,7 @@ func (f *inMemoryCache) ClientRights(ctx context.Context, clientID ttnpb.ClientI
 	return res.rights, res.err
 }
 
-func (f *inMemoryCache) GatewayRights(ctx context.Context, gtwID ttnpb.GatewayIdentifiers) (rights *ttnpb.Rights, err error) {
+func (f *inMemoryCache) GatewayRights(ctx context.Context, gtwID *ttnpb.GatewayIdentifiers) (rights *ttnpb.Rights, err error) {
 	defer func() { registerRightsRequest(ctx, "gateway", rights, err) }()
 	req := newEntityReq(ctx, gtwID.GetEntityIdentifiers())
 	f.mu.Lock()
@@ -250,7 +250,7 @@ func (f *inMemoryCache) GatewayRights(ctx context.Context, gtwID ttnpb.GatewayId
 	return res.rights, res.err
 }
 
-func (f *inMemoryCache) OrganizationRights(ctx context.Context, orgID ttnpb.OrganizationIdentifiers) (rights *ttnpb.Rights, err error) {
+func (f *inMemoryCache) OrganizationRights(ctx context.Context, orgID *ttnpb.OrganizationIdentifiers) (rights *ttnpb.Rights, err error) {
 	defer func() { registerRightsRequest(ctx, "organization", rights, err) }()
 	req := newEntityReq(ctx, orgID.GetEntityIdentifiers())
 	f.mu.Lock()
@@ -268,7 +268,7 @@ func (f *inMemoryCache) OrganizationRights(ctx context.Context, orgID ttnpb.Orga
 	return res.rights, res.err
 }
 
-func (f *inMemoryCache) UserRights(ctx context.Context, userID ttnpb.UserIdentifiers) (rights *ttnpb.Rights, err error) {
+func (f *inMemoryCache) UserRights(ctx context.Context, userID *ttnpb.UserIdentifiers) (rights *ttnpb.Rights, err error) {
 	defer func() { registerRightsRequest(ctx, "user", rights, err) }()
 	req := newEntityReq(ctx, userID.GetEntityIdentifiers())
 	f.mu.Lock()

@@ -230,7 +230,7 @@ func TestDeviceRegistry(t *testing.T) {
 func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 	a := assertions.New(t)
 	ctx := test.Context()
-	app1IDs := ttnpb.ApplicationIdentifiers{
+	app1IDs := &ttnpb.ApplicationIdentifiers{
 		ApplicationId: "app-1",
 	}
 	app1 := &ttnpb.ApplicationLink{
@@ -238,7 +238,7 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 			Value: true,
 		},
 	}
-	app2IDs := ttnpb.ApplicationIdentifiers{
+	app2IDs := &ttnpb.ApplicationIdentifiers{
 		ApplicationId: "app-2",
 	}
 	app2 := &ttnpb.ApplicationLink{
@@ -248,8 +248,8 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 	}
 
 	for ids, link := range map[*ttnpb.ApplicationIdentifiers]*ttnpb.ApplicationLink{
-		&app1IDs: app1,
-		&app2IDs: app2,
+		app1IDs: app1,
+		app2IDs: app2,
 	} {
 		_, err := reg.Get(ctx, ids, ttnpb.ApplicationLinkFieldPathsTopLevel)
 		if !a.So(errors.IsNotFound(err), should.BeTrue) {
@@ -274,7 +274,7 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 	}
 
 	seen := make(map[string]*ttnpb.ApplicationLink)
-	err := reg.Range(ctx, ttnpb.ApplicationLinkFieldPathsTopLevel, func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, pb *ttnpb.ApplicationLink) bool {
+	err := reg.Range(ctx, ttnpb.ApplicationLinkFieldPathsTopLevel, func(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, pb *ttnpb.ApplicationLink) bool {
 		uid := unique.ID(ctx, ids)
 		seen[uid] = pb
 		return true
@@ -288,7 +288,7 @@ func handleLinkRegistryTest(t *testing.T, reg LinkRegistry) {
 		t.FailNow()
 	}
 
-	for _, ids := range []*ttnpb.ApplicationIdentifiers{&app1IDs, &app2IDs} {
+	for _, ids := range []*ttnpb.ApplicationIdentifiers{app1IDs, app2IDs} {
 		_, err := reg.Set(ctx, ids, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 			return nil, nil, nil
 		})

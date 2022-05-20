@@ -269,7 +269,7 @@ func TestAdaptDataRate(t *testing.T) {
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				dev := CopyEndDevice(tc.Device)
 				fp := test.FrequencyPlan(dev.FrequencyPlanId)
-				err := AdaptDataRate(ctx, dev, LoRaWANBands[fp.BandID][dev.LorawanPhyVersion], ttnpb.MACSettings{})
+				err := AdaptDataRate(ctx, dev, LoRaWANBands[fp.BandID][dev.LorawanPhyVersion], nil)
 				if !a.So(err, should.Equal, tc.Error) {
 					t.Fatalf("ADR failed with: %s", err)
 				}
@@ -371,7 +371,7 @@ func TestIssue458(t *testing.T) {
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
 				dev := CopyEndDevice(tc.Device)
 				fp := test.FrequencyPlan(dev.FrequencyPlanId)
-				err := AdaptDataRate(ctx, dev, LoRaWANBands[fp.BandID][dev.LorawanPhyVersion], ttnpb.MACSettings{})
+				err := AdaptDataRate(ctx, dev, LoRaWANBands[fp.BandID][dev.LorawanPhyVersion], &ttnpb.MACSettings{})
 				if !a.So(err, should.Equal, tc.Error) {
 					t.Fatalf("ADR failed with: %s", err)
 				}

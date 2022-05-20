@@ -31,7 +31,7 @@ func EventIsVisible(ctx context.Context, ev events.Event) (bool, error) {
 	for _, entityIDs := range ev.Identifiers() {
 		switch ids := entityIDs.GetIds().(type) {
 		case *ttnpb.EntityIdentifiers_ApplicationIds:
-			rights, err := rights.ListApplication(ctx, *ids.ApplicationIds)
+			rights, err := rights.ListApplication(ctx, ids.ApplicationIds)
 			if err != nil {
 				return false, err
 			}
@@ -39,7 +39,7 @@ func EventIsVisible(ctx context.Context, ev events.Event) (bool, error) {
 				return true, nil
 			}
 		case *ttnpb.EntityIdentifiers_ClientIds:
-			rights, err := rights.ListClient(ctx, *ids.ClientIds)
+			rights, err := rights.ListClient(ctx, ids.ClientIds)
 			if err != nil {
 				return false, err
 			}
@@ -47,7 +47,7 @@ func EventIsVisible(ctx context.Context, ev events.Event) (bool, error) {
 				return true, nil
 			}
 		case *ttnpb.EntityIdentifiers_DeviceIds:
-			rights, err := rights.ListApplication(ctx, *ids.DeviceIds.ApplicationIds)
+			rights, err := rights.ListApplication(ctx, ids.DeviceIds.ApplicationIds)
 			if err != nil {
 				return false, err
 			}
@@ -55,7 +55,7 @@ func EventIsVisible(ctx context.Context, ev events.Event) (bool, error) {
 				return true, nil
 			}
 		case *ttnpb.EntityIdentifiers_GatewayIds:
-			rights, err := rights.ListGateway(ctx, *ids.GatewayIds)
+			rights, err := rights.ListGateway(ctx, ids.GatewayIds)
 			if err != nil {
 				return false, err
 			}
@@ -63,7 +63,7 @@ func EventIsVisible(ctx context.Context, ev events.Event) (bool, error) {
 				return true, nil
 			}
 		case *ttnpb.EntityIdentifiers_OrganizationIds:
-			rights, err := rights.ListOrganization(ctx, *ids.OrganizationIds)
+			rights, err := rights.ListOrganization(ctx, ids.OrganizationIds)
 			if err != nil {
 				return false, err
 			}
@@ -71,7 +71,7 @@ func EventIsVisible(ctx context.Context, ev events.Event) (bool, error) {
 				return true, nil
 			}
 		case *ttnpb.EntityIdentifiers_UserIds:
-			rights, err := rights.ListUser(ctx, *ids.UserIds)
+			rights, err := rights.ListUser(ctx, ids.UserIds)
 			if err != nil {
 				return false, err
 			}

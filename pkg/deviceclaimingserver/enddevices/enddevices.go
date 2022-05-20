@@ -230,7 +230,7 @@ func (upstream *Upstream) GetClaimStatus(ctx context.Context, in *ttnpb.EndDevic
 
 func (upstream *Upstream) requireRights(ctx context.Context, in *ttnpb.EndDeviceIdentifiers, appRights ttnpb.Rights) error {
 	// Collaborator must have the required rights on the application.
-	if err := rights.RequireApplication(ctx, *in.ApplicationIds,
+	if err := rights.RequireApplication(ctx, in.ApplicationIds,
 		appRights.Rights...,
 	); err != nil {
 		return err

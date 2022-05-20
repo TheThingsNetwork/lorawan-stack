@@ -257,7 +257,7 @@ func (is *IdentityServer) notifyAdminsInternal(ctx context.Context, req *ttnpb.C
 }
 
 func (is *IdentityServer) listNotifications(ctx context.Context, req *ttnpb.ListNotificationsRequest) (*ttnpb.ListNotificationsResponse, error) {
-	if err := rights.RequireUser(ctx, *req.ReceiverIds, ttnpb.Right_RIGHT_USER_NOTIFICATIONS_READ); err != nil {
+	if err := rights.RequireUser(ctx, req.ReceiverIds, ttnpb.Right_RIGHT_USER_NOTIFICATIONS_READ); err != nil {
 		return nil, err
 	}
 	res := &ttnpb.ListNotificationsResponse{}
@@ -279,7 +279,7 @@ func (is *IdentityServer) listNotifications(ctx context.Context, req *ttnpb.List
 }
 
 func (is *IdentityServer) updateNotificationStatus(ctx context.Context, req *ttnpb.UpdateNotificationStatusRequest) (*pbtypes.Empty, error) {
-	if err := rights.RequireUser(ctx, *req.ReceiverIds, ttnpb.Right_RIGHT_USER_NOTIFICATIONS_READ); err != nil {
+	if err := rights.RequireUser(ctx, req.ReceiverIds, ttnpb.Right_RIGHT_USER_NOTIFICATIONS_READ); err != nil {
 		return nil, err
 	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {

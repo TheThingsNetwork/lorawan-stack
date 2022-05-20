@@ -218,7 +218,7 @@ func TestClampDataRateRange(t *testing.T) {
 	for _, tc := range []struct {
 		Name     string
 		Device   *ttnpb.EndDevice
-		Defaults ttnpb.MACSettings
+		Defaults *ttnpb.MACSettings
 
 		InputMinDataRateIndex ttnpb.DataRateIndex
 		InputMaxDataRateIndex ttnpb.DataRateIndex
@@ -522,7 +522,7 @@ func TestClampTxPowerRange(t *testing.T) {
 	for _, tc := range []struct {
 		Name     string
 		Device   *ttnpb.EndDevice
-		Defaults ttnpb.MACSettings
+		Defaults *ttnpb.MACSettings
 
 		InputMinTxPowerIndex uint8
 		InputMaxTxPowerIndex uint8
@@ -827,7 +827,7 @@ func TestClampNbTrans(t *testing.T) {
 	for _, tc := range []struct {
 		Name     string
 		Device   *ttnpb.EndDevice
-		Defaults ttnpb.MACSettings
+		Defaults *ttnpb.MACSettings
 
 		InputNbTrans uint32
 

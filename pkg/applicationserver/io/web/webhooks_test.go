@@ -71,7 +71,7 @@ func TestWebhooks(t *testing.T) {
 		t.FailNow()
 	}
 	ids := &ttnpb.ApplicationWebhookIdentifiers{
-		ApplicationIds: &registeredApplicationID,
+		ApplicationIds: registeredApplicationID,
 		WebhookId:      registeredWebhookID,
 	}
 
@@ -467,7 +467,7 @@ func TestWebhooks(t *testing.T) {
 		t.Run("Authorization", func(t *testing.T) {
 			for _, tc := range []struct {
 				Name       string
-				ID         ttnpb.ApplicationIdentifiers
+				ID         *ttnpb.ApplicationIdentifiers
 				Key        string
 				ExpectCode int
 			}{
@@ -485,7 +485,7 @@ func TestWebhooks(t *testing.T) {
 				},
 				{
 					Name:       "InvalidIDAndKey",
-					ID:         ttnpb.ApplicationIdentifiers{ApplicationId: "--invalid-id"},
+					ID:         &ttnpb.ApplicationIdentifiers{ApplicationId: "--invalid-id"},
 					Key:        "invalid key",
 					ExpectCode: http.StatusBadRequest,
 				},

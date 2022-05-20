@@ -54,8 +54,8 @@ type MACSettingConfig struct {
 }
 
 // Parse parses the configuration and returns ttnpb.MACSettings.
-func (c MACSettingConfig) Parse() ttnpb.MACSettings {
-	p := ttnpb.MACSettings{
+func (c MACSettingConfig) Parse() *ttnpb.MACSettings {
+	p := &ttnpb.MACSettings{
 		ClassBTimeout:         ttnpb.ProtoDuration(c.ClassBTimeout),
 		ClassCTimeout:         ttnpb.ProtoDuration(c.ClassCTimeout),
 		StatusTimePeriodicity: ttnpb.ProtoDuration(c.StatusTimePeriodicity),

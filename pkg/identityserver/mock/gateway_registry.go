@@ -30,9 +30,9 @@ import (
 var errNoGatewayRights = errors.DefinePermissionDenied("no_gateway_rights", "no gateway rights")
 
 // DefaultGateway generates a gateway with values that is adequate for most test cases.
-func DefaultGateway(ids ttnpb.GatewayIdentifiers, locationPublic, updateLocationFromStatus bool) *ttnpb.Gateway {
+func DefaultGateway(ids *ttnpb.GatewayIdentifiers, locationPublic, updateLocationFromStatus bool) *ttnpb.Gateway {
 	return &ttnpb.Gateway{
-		Ids:              &ids,
+		Ids:              ids,
 		FrequencyPlanId:  test.EUFrequencyPlanID,
 		FrequencyPlanIds: []string{test.EUFrequencyPlanID},
 		Antennas: []*ttnpb.GatewayAntenna{
@@ -62,7 +62,7 @@ func (is *mockISGatewayRegistry) SetRegisteredGateway(gtwIDs *ttnpb.GatewayIdent
 	is.registeredGateway = gtwIDs
 }
 
-func (is *mockISGatewayRegistry) Add(ctx context.Context, ids ttnpb.GatewayIdentifiers, key string, gtw *ttnpb.Gateway, rights ...ttnpb.Right) {
+func (is *mockISGatewayRegistry) Add(ctx context.Context, ids *ttnpb.GatewayIdentifiers, key string, gtw *ttnpb.Gateway, rights ...ttnpb.Right) {
 	uid := unique.ID(ctx, ids)
 	is.gateways[uid] = gtw
 

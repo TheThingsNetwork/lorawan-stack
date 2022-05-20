@@ -49,7 +49,7 @@ import (
 )
 
 var (
-	registeredGatewayID  = ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}
+	registeredGatewayID  = &ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}
 	registeredGatewayUID = unique.ID(test.Context(), registeredGatewayID)
 	registeredGatewayKey = "test-key"
 
@@ -129,7 +129,7 @@ func TestWeb(t *testing.T) {
 	t.Run("Authorization", func(t *testing.T) {
 		for _, tc := range []struct {
 			Name       string
-			ID         ttnpb.GatewayIdentifiers
+			ID         *ttnpb.GatewayIdentifiers
 			Key        string
 			ExpectCode int
 		}{
@@ -147,7 +147,7 @@ func TestWeb(t *testing.T) {
 			},
 			{
 				Name:       "InvalidIDAndKey",
-				ID:         ttnpb.GatewayIdentifiers{GatewayId: "--invalid-id"},
+				ID:         &ttnpb.GatewayIdentifiers{GatewayId: "--invalid-id"},
 				Key:        "invalid key",
 				ExpectCode: http.StatusBadRequest,
 			},
@@ -178,7 +178,7 @@ func TestWeb(t *testing.T) {
 						if err != nil {
 							t.Fatalf("Failed to read response body: %s", err)
 						}
-						gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{GatewayIds: &tc.ID})
+						gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{GatewayIds: tc.ID})
 						a.So(err, should.BeNil)
 
 						a.So(string(b), should.Equal, semtechUDPConfig(gtw)+"\n")
@@ -207,7 +207,7 @@ func TestWeb(t *testing.T) {
 						if err != nil {
 							t.Fatalf("Failed to read response body: %s", err)
 						}
-						gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{GatewayIds: &tc.ID})
+						gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{GatewayIds: tc.ID})
 						a.So(err, should.BeNil)
 						a.So(string(b), should.Equal, cpfLoradConfig(gtw)+"\n")
 					}
@@ -235,7 +235,7 @@ func TestWeb(t *testing.T) {
 						if err != nil {
 							t.Fatalf("Failed to read response body: %s", err)
 						}
-						gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{GatewayIds: &tc.ID})
+						gtw, err := is.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{GatewayIds: tc.ID})
 						a.So(err, should.BeNil)
 						a.So(string(b), should.Equal, cpfLorafwdConfig(gtw))
 					}
@@ -293,12 +293,12 @@ func TestGRPC(t *testing.T) {
 		}{
 			{
 				Name: "Valid",
-				ID:   &registeredGatewayID,
+				ID:   registeredGatewayID,
 				Key:  registeredGatewayKey,
 			},
 			{
 				Name:         "InvalidKey",
-				ID:           &registeredGatewayID,
+				ID:           registeredGatewayID,
 				Key:          "invalid key",
 				ErrAssertion: errors.IsPermissionDenied,
 			},
@@ -367,7 +367,7 @@ func TestGRPC(t *testing.T) {
 			{
 				Name: "invalid format",
 				Req: &ttnpb.GetGatewayConfigurationRequest{
-					GatewayIds: &registeredGatewayID,
+					GatewayIds: registeredGatewayID,
 					Format:     "invalid",
 				},
 				ErrAssertion: errors.IsInvalidArgument,
@@ -375,7 +375,7 @@ func TestGRPC(t *testing.T) {
 			{
 				Name: "invalid type",
 				Req: &ttnpb.GetGatewayConfigurationRequest{
-					GatewayIds: &registeredGatewayID,
+					GatewayIds: registeredGatewayID,
 					Format:     "kerlink-cpf",
 					Type:       "invalid",
 				},
@@ -384,7 +384,7 @@ func TestGRPC(t *testing.T) {
 			{
 				Name: "invalid filename",
 				Req: &ttnpb.GetGatewayConfigurationRequest{
-					GatewayIds: &registeredGatewayID,
+					GatewayIds: registeredGatewayID,
 					Format:     "semtechudp",
 					Filename:   "invalid",
 				},
@@ -393,7 +393,7 @@ func TestGRPC(t *testing.T) {
 			{
 				Name: "semtechudp",
 				Req: &ttnpb.GetGatewayConfigurationRequest{
-					GatewayIds: &registeredGatewayID,
+					GatewayIds: registeredGatewayID,
 					Format:     "semtechudp",
 					Filename:   "global_conf.json",
 				},
@@ -404,7 +404,7 @@ func TestGRPC(t *testing.T) {
 			{
 				Name: "kerlink-cpf/lorad",
 				Req: &ttnpb.GetGatewayConfigurationRequest{
-					GatewayIds: &registeredGatewayID,
+					GatewayIds: registeredGatewayID,
 					Format:     "kerlink-cpf",
 					Type:       "lorad",
 					Filename:   "lorad.json",
@@ -416,7 +416,7 @@ func TestGRPC(t *testing.T) {
 			{
 				Name: "kerlink-cpf/lorafwd",
 				Req: &ttnpb.GetGatewayConfigurationRequest{
-					GatewayIds: &registeredGatewayID,
+					GatewayIds: registeredGatewayID,
 					Format:     "kerlink-cpf",
 					Type:       "lorafwd",
 					Filename:   "lorafwd.toml",

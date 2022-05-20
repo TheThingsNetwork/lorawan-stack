@@ -66,7 +66,7 @@ var (
 )
 
 func (is *IdentityServer) listGatewayRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
-	gtwRights, err := rights.ListGateway(ctx, *ids)
+	gtwRights, err := rights.ListGateway(ctx, ids)
 	if err != nil {
 		return nil, err
 	}
@@ -75,11 +75,11 @@ func (is *IdentityServer) listGatewayRights(ctx context.Context, ids *ttnpb.Gate
 
 func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.CreateGatewayAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
-	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 	// Require that caller has at least the rights of the API key.
-	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), req.Rights...); err != nil {
+	if err = rights.RequireGateway(ctx, req.GetGatewayIds(), req.Rights...); err != nil {
 		return nil, err
 	}
 	key, token, err := GenerateAPIKey(ctx, req.Name, ttnpb.StdTime(req.ExpiresAt), req.Rights...)
@@ -109,7 +109,7 @@ func (is *IdentityServer) createGatewayAPIKey(ctx context.Context, req *ttnpb.Cr
 }
 
 func (is *IdentityServer) listGatewayAPIKeys(ctx context.Context, req *ttnpb.ListGatewayAPIKeysRequest) (keys *ttnpb.APIKeys, err error) {
-	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 	var total uint64
@@ -134,7 +134,7 @@ func (is *IdentityServer) listGatewayAPIKeys(ctx context.Context, req *ttnpb.Lis
 }
 
 func (is *IdentityServer) getGatewayAPIKey(ctx context.Context, req *ttnpb.GetGatewayAPIKeyRequest) (key *ttnpb.APIKey, err error) {
-	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 
@@ -155,7 +155,7 @@ func (is *IdentityServer) getGatewayAPIKey(ctx context.Context, req *ttnpb.GetGa
 
 func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.UpdateGatewayAPIKeyRequest) (key *ttnpb.APIKey, err error) {
 	// Require that caller has rights to manage API keys.
-	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
+	if err = rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_API_KEYS); err != nil {
 		return nil, err
 	}
 
@@ -176,11 +176,11 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 			existingRights := ttnpb.RightsFrom(key.Rights...)
 
 			// Require the caller to have all added rights.
-			if err := rights.RequireGateway(ctx, *req.GetGatewayIds(), newRights.Sub(existingRights).GetRights()...); err != nil {
+			if err := rights.RequireGateway(ctx, req.GetGatewayIds(), newRights.Sub(existingRights).GetRights()...); err != nil {
 				return err
 			}
 			// Require the caller to have all removed rights.
-			if err := rights.RequireGateway(ctx, *req.GetGatewayIds(), existingRights.Sub(newRights).GetRights()...); err != nil {
+			if err := rights.RequireGateway(ctx, req.GetGatewayIds(), existingRights.Sub(newRights).GetRights()...); err != nil {
 				return err
 			}
 		}
@@ -210,7 +210,7 @@ func (is *IdentityServer) updateGatewayAPIKey(ctx context.Context, req *ttnpb.Up
 }
 
 func (is *IdentityServer) getGatewayCollaborator(ctx context.Context, req *ttnpb.GetGatewayCollaboratorRequest) (*ttnpb.GetCollaboratorResponse, error) {
-	if err := rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
+	if err := rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
 	res := &ttnpb.GetCollaboratorResponse{
@@ -238,7 +238,7 @@ var errGatewayNeedsCollaborator = errors.DefineFailedPrecondition("gateway_needs
 
 func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb.SetGatewayCollaboratorRequest) (*pbtypes.Empty, error) {
 	// Require that caller has rights to manage collaborators.
-	if err := rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
+	if err := rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		return nil, err
 	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
@@ -257,14 +257,14 @@ func (is *IdentityServer) setGatewayCollaborator(ctx context.Context, req *ttnpb
 
 		// Require the caller to have all added rights.
 		if len(addedRights.GetRights()) > 0 {
-			if err := rights.RequireGateway(ctx, *req.GetGatewayIds(), addedRights.GetRights()...); err != nil {
+			if err := rights.RequireGateway(ctx, req.GetGatewayIds(), addedRights.GetRights()...); err != nil {
 				return err
 			}
 		}
 
 		// Unless we're deleting the collaborator, require the caller to have all removed rights.
 		if len(newRights.GetRights()) > 0 && len(removedRights.GetRights()) > 0 {
-			if err := rights.RequireGateway(ctx, *req.GetGatewayIds(), removedRights.GetRights()...); err != nil {
+			if err := rights.RequireGateway(ctx, req.GetGatewayIds(), removedRights.GetRights()...); err != nil {
 				return err
 			}
 		}
@@ -318,7 +318,7 @@ func (is *IdentityServer) listGatewayCollaborators(ctx context.Context, req *ttn
 	if err = is.RequireAuthenticated(ctx); err != nil {
 		return nil, err
 	}
-	if err = rights.RequireGateway(ctx, *req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
+	if err = rights.RequireGateway(ctx, req.GetGatewayIds(), ttnpb.Right_RIGHT_GATEWAY_SETTINGS_COLLABORATORS); err != nil {
 		defer func() { collaborators = collaborators.PublicSafe() }()
 	}
 	var total uint64

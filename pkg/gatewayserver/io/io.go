@@ -56,22 +56,22 @@ type Server interface {
 	GetBaseConfig(ctx context.Context) config.ServiceBase
 	// FillGatewayContext fills the given context and identifiers.
 	// This method should only be used for request contexts.
-	FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error)
+	FillGatewayContext(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (context.Context, *ttnpb.GatewayIdentifiers, error)
 	// Connect connects a gateway by its identifiers to the Gateway Server, and returns a Connection for traffic and
 	// control.
-	Connect(ctx context.Context, frontend Frontend, ids ttnpb.GatewayIdentifiers) (*Connection, error)
+	Connect(ctx context.Context, frontend Frontend, ids *ttnpb.GatewayIdentifiers) (*Connection, error)
 	// GetFrequencyPlans gets the frequency plans by the gateway identifiers.
-	GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error)
+	GetFrequencyPlans(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error)
 	// ClaimDownlink claims the downlink path for the given gateway.
-	ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
+	ClaimDownlink(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error
 	// UnclaimDownlink releases the claim of the downlink path for the given gateway.
-	UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
+	UnclaimDownlink(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error
 	// FromRequestContext decouples the lifetime of the provided context from the values found in the context.
 	FromRequestContext(ctx context.Context) context.Context
 	// RateLimiter returns the rate limiter instance.
 	RateLimiter() ratelimit.Interface
 	// ValidateGatewayID validates the ID of the gateway.
-	ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error
+	ValidateGatewayID(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error
 	task.Starter
 }
 
@@ -540,7 +540,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		if sb, ok := fp.FindSubBand(rx.frequency); ok && sb.MaxEIRP != nil {
 			eirp = *sb.MaxEIRP
 		}
-		settings := ttnpb.TxSettings{
+		settings := &ttnpb.TxSettings{
 			DataRate:  rx.dataRate,
 			Frequency: rx.frequency,
 			Downlink: &ttnpb.TxSettings_Downlink{
@@ -607,7 +607,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		}
 		settings.ConcentratorTimestamp = int64(em.Starts())
 		msg.Settings = &ttnpb.DownlinkMessage_Scheduled{
-			Scheduled: &settings,
+			Scheduled: settings,
 		}
 		rx1 = i == 0
 		rx2 = i == 1

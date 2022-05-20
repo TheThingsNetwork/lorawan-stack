@@ -94,7 +94,7 @@ func (r PubSubRegistry) Get(ctx context.Context, ids *ttnpb.ApplicationPubSubIde
 var errApplicationUID = errors.DefineCorruption("application_uid", "invalid application UID `{application_uid}`")
 
 // Range implements pubsub.Registry.
-func (r PubSubRegistry) Range(ctx context.Context, paths []string, f func(context.Context, ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationPubSub) bool) error {
+func (r PubSubRegistry) Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationPubSub) bool) error {
 	uids, err := r.Redis.SMembers(ctx, r.allKey(ctx)).Result()
 	if err != nil {
 		return err

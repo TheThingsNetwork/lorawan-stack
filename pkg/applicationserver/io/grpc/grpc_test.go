@@ -45,7 +45,7 @@ import (
 )
 
 var (
-	registeredApplicationID  = ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}
+	registeredApplicationID  = &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app"}
 	registeredApplicationUID = unique.ID(test.Context(), registeredApplicationID)
 	registeredApplicationKey = "test-key"
 
@@ -81,7 +81,7 @@ func TestAuthentication(t *testing.T) {
 	client := ttnpb.NewAppAsClient(c.LoopbackConn())
 
 	for _, tc := range []struct {
-		ID  ttnpb.ApplicationIdentifiers
+		ID  *ttnpb.ApplicationIdentifiers
 		Key string
 		OK  bool
 	}{
@@ -96,7 +96,7 @@ func TestAuthentication(t *testing.T) {
 			OK:  false,
 		},
 		{
-			ID:  ttnpb.ApplicationIdentifiers{ApplicationId: "invalid-application"},
+			ID:  &ttnpb.ApplicationIdentifiers{ApplicationId: "invalid-application"},
 			Key: "invalid-key",
 			OK:  false,
 		},
@@ -118,7 +118,7 @@ func TestAuthentication(t *testing.T) {
 			var err error
 			go func() {
 				defer wg.Done()
-				_, err = client.Subscribe(ctx, &tc.ID, creds)
+				_, err = client.Subscribe(ctx, tc.ID, creds)
 			}()
 			wg.Wait()
 
@@ -179,7 +179,7 @@ func TestTraffic(t *testing.T) {
 	})
 
 	upCh := make(chan erroredApplicationUp, 10)
-	stream, err := client.Subscribe(ctx, &registeredApplicationID, creds)
+	stream, err := client.Subscribe(ctx, registeredApplicationID, creds)
 	if err != nil {
 		t.Fatalf("Failed to subscribe: %v", err)
 	}
@@ -202,7 +202,7 @@ func TestTraffic(t *testing.T) {
 
 		up := &ttnpb.ApplicationUp{
 			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				DeviceId:       "foo-device",
 			},
 			Up: &ttnpb.ApplicationUp_UplinkMessage{
@@ -227,7 +227,7 @@ func TestTraffic(t *testing.T) {
 	t.Run("Downstream", func(t *testing.T) {
 		a := assertions.New(t)
 		ids := ttnpb.EndDeviceIdentifiers{
-			ApplicationIds: &registeredApplicationID,
+			ApplicationIds: registeredApplicationID,
 			DeviceId:       "foo-device",
 		}
 
@@ -404,7 +404,7 @@ func TestMQTTConfig(t *testing.T) {
 		AllowInsecure: true,
 	})
 
-	info, err := client.GetMQTTConnectionInfo(ctx, &registeredApplicationID, creds)
+	info, err := client.GetMQTTConnectionInfo(ctx, registeredApplicationID, creds)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
@@ -437,7 +437,7 @@ func TestSimulateUplink(t *testing.T) {
 
 	registeredDeviceID := ttnpb.EndDeviceIdentifiers{
 		DeviceId:       "dev1",
-		ApplicationIds: &registeredApplicationID,
+		ApplicationIds: registeredApplicationID,
 		DevEui:         &types.EUI64{0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01},
 	}
 
@@ -459,7 +459,7 @@ func TestSimulateUplink(t *testing.T) {
 
 	upCh := make(chan erroredApplicationUp, 1)
 	streamCtx := test.Context()
-	stream, err := client.Subscribe(streamCtx, &registeredApplicationID, creds)
+	stream, err := client.Subscribe(streamCtx, registeredApplicationID, creds)
 	if err != nil {
 		t.Fatalf("Failed to subscribe: %s\n", err)
 	}
@@ -482,7 +482,7 @@ func TestSimulateUplink(t *testing.T) {
 			up: &ttnpb.ApplicationUp{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:       registeredDeviceID.DeviceId,
-					ApplicationIds: &registeredApplicationID,
+					ApplicationIds: registeredApplicationID,
 				},
 				Up: &ttnpb.ApplicationUp_ServiceData{
 					ServiceData: &ttnpb.ApplicationServiceData{},
@@ -499,7 +499,7 @@ func TestSimulateUplink(t *testing.T) {
 			up: &ttnpb.ApplicationUp{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
 					DeviceId:       registeredDeviceID.DeviceId,
-					ApplicationIds: &registeredApplicationID,
+					ApplicationIds: registeredApplicationID,
 				},
 				Up: &ttnpb.ApplicationUp_ServiceData{
 					ServiceData: &ttnpb.ApplicationServiceData{},
@@ -511,7 +511,7 @@ func TestSimulateUplink(t *testing.T) {
 			},
 			expectIdentifiers: ttnpb.EndDeviceIdentifiers{
 				DeviceId:       registeredDeviceID.DeviceId,
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 			},
 		},
 	} {
@@ -576,7 +576,7 @@ func TestMessageProcessors(t *testing.T) {
 	{
 		resp, err := client.EncodeDownlink(ctx, &ttnpb.EncodeDownlinkRequest{
 			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				DeviceId:       "foobar",
 			},
 			Downlink: &ttnpb.ApplicationDownlink{
@@ -605,7 +605,7 @@ func TestMessageProcessors(t *testing.T) {
 	{
 		resp, err := client.DecodeUplink(ctx, &ttnpb.DecodeUplinkRequest{
 			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				DeviceId:       "foobar",
 			},
 			Uplink: &ttnpb.ApplicationUplink{
@@ -634,7 +634,7 @@ func TestMessageProcessors(t *testing.T) {
 	{
 		resp, err := client.DecodeDownlink(ctx, &ttnpb.DecodeDownlinkRequest{
 			EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				DeviceId:       "foobar",
 			},
 			Downlink: &ttnpb.ApplicationDownlink{

@@ -316,7 +316,7 @@ func (v VendorID) MarshalNumber() uint32 {
 type KeyEnvelope ttnpb.KeyEnvelope
 
 // MarshalJSON marshals the key envelope to JSON.
-func (k KeyEnvelope) MarshalJSON() ([]byte, error) {
+func (k *KeyEnvelope) MarshalJSON() ([]byte, error) {
 	var key []byte
 	if k.KekLabel != "" {
 		key = k.EncryptedKey

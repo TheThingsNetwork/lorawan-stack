@@ -53,7 +53,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 	for i, tc := range []struct {
 		SyncWithGatewayAbsolute bool
 		PayloadSize             int
-		Settings                ttnpb.TxSettings
+		Settings                *ttnpb.TxSettings
 		Priority                ttnpb.TxSchedulePriority
 		NPercentileRTT          *time.Duration
 		MedianRTT               *time.Duration
@@ -63,7 +63,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 	}{
 		{
 			PayloadSize: 10,
-			Settings: ttnpb.TxSettings{
+			Settings: &ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
@@ -84,7 +84,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		{
 			SyncWithGatewayAbsolute: true,
 			PayloadSize:             51,
-			Settings: ttnpb.TxSettings{
+			Settings: &ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
@@ -104,7 +104,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		},
 		{
 			PayloadSize: 10,
-			Settings: ttnpb.TxSettings{
+			Settings: &ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
@@ -126,7 +126,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		{
 			SyncWithGatewayAbsolute: true,
 			PayloadSize:             51,
-			Settings: ttnpb.TxSettings{
+			Settings: &ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
@@ -147,7 +147,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		},
 		{
 			PayloadSize: 51,
-			Settings: ttnpb.TxSettings{
+			Settings: &ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
@@ -167,7 +167,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		},
 		{
 			PayloadSize: 16,
-			Settings: ttnpb.TxSettings{
+			Settings: &ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
@@ -188,7 +188,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		{
 			SyncWithGatewayAbsolute: true,
 			PayloadSize:             16,
-			Settings: ttnpb.TxSettings{
+			Settings: &ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
@@ -207,7 +207,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		},
 		{
 			PayloadSize: 10,
-			Settings: ttnpb.TxSettings{
+			Settings: &ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
@@ -226,7 +226,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		},
 		{
 			PayloadSize: 10,
-			Settings: ttnpb.TxSettings{
+			Settings: &ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
@@ -246,7 +246,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		},
 		{
 			PayloadSize: 10,
-			Settings: ttnpb.TxSettings{
+			Settings: &ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
@@ -266,7 +266,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		},
 		{
 			PayloadSize: 10,
-			Settings: ttnpb.TxSettings{
+			Settings: &ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
@@ -285,7 +285,7 @@ func TestScheduleAtWithBandDutyCycle(t *testing.T) {
 		},
 		{
 			PayloadSize: 20,
-			Settings: ttnpb.TxSettings{
+			Settings: &ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
@@ -371,7 +371,7 @@ func TestScheduleAtWithFrequencyPlanDutyCycle(t *testing.T) {
 	for i, tc := range []struct {
 		SyncWithGatewayAbsolute bool
 		PayloadSize             int
-		Settings                ttnpb.TxSettings
+		Settings                *ttnpb.TxSettings
 		Priority                ttnpb.TxSchedulePriority
 		MaxRTT                  *time.Duration
 		MedianRTT               *time.Duration
@@ -380,7 +380,7 @@ func TestScheduleAtWithFrequencyPlanDutyCycle(t *testing.T) {
 	}{
 		{
 			PayloadSize: 20,
-			Settings: ttnpb.TxSettings{
+			Settings: &ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
@@ -451,8 +451,8 @@ func TestScheduleAnytime(t *testing.T) {
 	a.So(err, should.BeNil)
 	scheduler.SyncWithGatewayAbsolute(0, time.Now(), time.Unix(0, 0))
 
-	settingsAt := func(frequency uint64, sf, t uint32) ttnpb.TxSettings {
-		return ttnpb.TxSettings{
+	settingsAt := func(frequency uint64, sf, t uint32) *ttnpb.TxSettings {
+		return &ttnpb.TxSettings{
 			DataRate: &ttnpb.DataRate{
 				Modulation: &ttnpb.DataRate_Lora{
 					Lora: &ttnpb.LoRaDataRate{
@@ -562,8 +562,8 @@ func TestScheduleAnytimeShort(t *testing.T) {
 		},
 	}}
 
-	settingsAt := func(frequency uint64, sf uint32, time *time.Time, timestamp uint32) ttnpb.TxSettings {
-		return ttnpb.TxSettings{
+	settingsAt := func(frequency uint64, sf uint32, time *time.Time, timestamp uint32) *ttnpb.TxSettings {
+		return &ttnpb.TxSettings{
 			DataRate: &ttnpb.DataRate{
 				Modulation: &ttnpb.DataRate_Lora{
 					Lora: &ttnpb.LoRaDataRate{
@@ -758,7 +758,7 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 	// Schedule a join-accept.
 	_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 		PayloadSize: 10,
-		TxSettings: ttnpb.TxSettings{
+		TxSettings: &ttnpb.TxSettings{
 			DataRate: &ttnpb.DataRate{
 				Modulation: &ttnpb.DataRate_Lora{
 					Lora: &ttnpb.LoRaDataRate{
@@ -780,7 +780,7 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 	// Schedule another class A transmission after.
 	_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 		PayloadSize: 10,
-		TxSettings: ttnpb.TxSettings{
+		TxSettings: &ttnpb.TxSettings{
 			DataRate: &ttnpb.DataRate{
 				Modulation: &ttnpb.DataRate_Lora{
 					Lora: &ttnpb.LoRaDataRate{
@@ -806,7 +806,7 @@ func TestScheduleAnytimeClassC(t *testing.T) {
 	// Schedule any time.
 	em, _, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
 		PayloadSize: 10,
-		TxSettings: ttnpb.TxSettings{
+		TxSettings: &ttnpb.TxSettings{
 			DataRate: &ttnpb.DataRate{
 				Modulation: &ttnpb.DataRate_Lora{
 					Lora: &ttnpb.LoRaDataRate{
@@ -1054,7 +1054,7 @@ func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
 	// Schedule a join-accept.
 	_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 		PayloadSize: 10,
-		TxSettings: ttnpb.TxSettings{
+		TxSettings: &ttnpb.TxSettings{
 			DataRate: &ttnpb.DataRate{
 				Modulation: &ttnpb.DataRate_Lora{
 					Lora: &ttnpb.LoRaDataRate{
@@ -1076,7 +1076,7 @@ func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
 	// Schedule another class A transmission after.
 	_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 		PayloadSize: 10,
-		TxSettings: ttnpb.TxSettings{
+		TxSettings: &ttnpb.TxSettings{
 			DataRate: &ttnpb.DataRate{
 				Modulation: &ttnpb.DataRate_Lora{
 					Lora: &ttnpb.LoRaDataRate{
@@ -1102,7 +1102,7 @@ func TestSchedulingWithMultipleFrequencyPlans(t *testing.T) {
 	// Schedule any time.
 	em, _, err := scheduler.ScheduleAnytime(ctx, scheduling.Options{
 		PayloadSize: 10,
-		TxSettings: ttnpb.TxSettings{
+		TxSettings: &ttnpb.TxSettings{
 			DataRate: &ttnpb.DataRate{
 				Modulation: &ttnpb.DataRate_Lora{
 					Lora: &ttnpb.LoRaDataRate{
@@ -1143,7 +1143,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 		a.So(err, should.BeNil)
 		_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 			PayloadSize: 10,
-			TxSettings: ttnpb.TxSettings{
+			TxSettings: &ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
@@ -1170,7 +1170,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 		t := time.Unix(10, 0)
 		_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 			PayloadSize: 10,
-			TxSettings: ttnpb.TxSettings{
+			TxSettings: &ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{
@@ -1203,7 +1203,7 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 		t := time.Unix(10, 0)
 		_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
 			PayloadSize: 10,
-			TxSettings: ttnpb.TxSettings{
+			TxSettings: &ttnpb.TxSettings{
 				DataRate: &ttnpb.DataRate{
 					Modulation: &ttnpb.DataRate_Lora{
 						Lora: &ttnpb.LoRaDataRate{

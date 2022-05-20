@@ -256,7 +256,7 @@ func unwrapSelectedSessionKeys(ctx context.Context, kv crypto.KeyVault, dev *ttn
 
 // Get implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) Get(ctx context.Context, req *ttnpb.GetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, appendRequiredDeviceReadRights(
+	if err := rights.RequireApplication(ctx, req.EndDeviceIds.ApplicationIds, appendRequiredDeviceReadRights(
 		make([]ttnpb.Right, 0, maxRequiredDeviceReadRightCount),
 		req.FieldMask.GetPaths()...,
 	)...); err != nil {
@@ -994,7 +994,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 	) {
 		requiredRights = append(requiredRights, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE_KEYS)
 	}
-	if err := rights.RequireApplication(ctx, *st.Device.Ids.ApplicationIds, requiredRights...); err != nil {
+	if err := rights.RequireApplication(ctx, st.Device.Ids.ApplicationIds, requiredRights...); err != nil {
 		return nil, err
 	}
 
@@ -2672,7 +2672,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 
 // ResetFactoryDefaults implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.ResetAndGetEndDeviceRequest) (*ttnpb.EndDevice, error) {
-	if err := rights.RequireApplication(ctx, *req.EndDeviceIds.ApplicationIds, appendRequiredDeviceReadRights(
+	if err := rights.RequireApplication(ctx, req.EndDeviceIds.ApplicationIds, appendRequiredDeviceReadRights(
 		append(make([]ttnpb.Right, 0, 1+maxRequiredDeviceReadRightCount), ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE),
 		req.FieldMask.GetPaths()...,
 	)...); err != nil {
@@ -2750,7 +2750,7 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 
 // Delete implements NsEndDeviceRegistryServer.
 func (ns *NetworkServer) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentifiers) (*pbtypes.Empty, error) {
-	if err := rights.RequireApplication(ctx, *req.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
+	if err := rights.RequireApplication(ctx, req.ApplicationIds, ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE); err != nil {
 		return nil, err
 	}
 	var evt events.Event

@@ -67,13 +67,13 @@ func (s *Server) handleGetGateway(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := gatewayIDFromContext(ctx)
 
-	registry, err := s.getRegistry(ctx, &id)
+	registry, err := s.getRegistry(ctx, id)
 	if err != nil {
 		webhandlers.Error(w, r, err)
 		return
 	}
 	gateway, err := registry.Get(ctx, &ttnpb.GetGatewayRequest{
-		GatewayIds: &id,
+		GatewayIds: id,
 		FieldMask: ttnpb.FieldMask(
 			"description",
 			"attributes",

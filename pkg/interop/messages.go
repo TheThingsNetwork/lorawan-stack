@@ -152,7 +152,7 @@ type AppSKeyAns struct {
 	JsAsMessageHeader
 	Result       Result
 	DevEUI       EUI64
-	AppSKey      KeyEnvelope
+	AppSKey      *KeyEnvelope
 	SessionKeyID Buffer
 }
 

@@ -57,23 +57,23 @@ func requireRights(ctx context.Context, id string) (res struct {
 	var wg sync.WaitGroup
 	wg.Add(5)
 	go func() {
-		res.AppErr = RequireApplication(ctx, ttnpb.ApplicationIdentifiers{ApplicationId: id}, ttnpb.Right_RIGHT_APPLICATION_INFO)
+		res.AppErr = RequireApplication(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: id}, ttnpb.Right_RIGHT_APPLICATION_INFO)
 		wg.Done()
 	}()
 	go func() {
-		res.CliErr = RequireClient(ctx, ttnpb.ClientIdentifiers{ClientId: id}, ttnpb.Right_RIGHT_CLIENT_ALL)
+		res.CliErr = RequireClient(ctx, &ttnpb.ClientIdentifiers{ClientId: id}, ttnpb.Right_RIGHT_CLIENT_ALL)
 		wg.Done()
 	}()
 	go func() {
-		res.GtwErr = RequireGateway(ctx, ttnpb.GatewayIdentifiers{GatewayId: id}, ttnpb.Right_RIGHT_GATEWAY_INFO)
+		res.GtwErr = RequireGateway(ctx, &ttnpb.GatewayIdentifiers{GatewayId: id}, ttnpb.Right_RIGHT_GATEWAY_INFO)
 		wg.Done()
 	}()
 	go func() {
-		res.OrgErr = RequireOrganization(ctx, ttnpb.OrganizationIdentifiers{OrganizationId: id}, ttnpb.Right_RIGHT_ORGANIZATION_INFO)
+		res.OrgErr = RequireOrganization(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: id}, ttnpb.Right_RIGHT_ORGANIZATION_INFO)
 		wg.Done()
 	}()
 	go func() {
-		res.UsrErr = RequireUser(ctx, ttnpb.UserIdentifiers{UserId: id}, ttnpb.Right_RIGHT_USER_INFO)
+		res.UsrErr = RequireUser(ctx, &ttnpb.UserIdentifiers{UserId: id}, ttnpb.Right_RIGHT_USER_INFO)
 		wg.Done()
 	}()
 	wg.Wait()
@@ -90,19 +90,19 @@ func TestRequire(t *testing.T) {
 		RequireIsAdmin(test.Context())
 	}, should.Panic)
 	a.So(func() {
-		RequireApplication(test.Context(), ttnpb.ApplicationIdentifiers{}, ttnpb.Right_RIGHT_APPLICATION_INFO)
+		RequireApplication(test.Context(), &ttnpb.ApplicationIdentifiers{}, ttnpb.Right_RIGHT_APPLICATION_INFO)
 	}, should.Panic)
 	a.So(func() {
-		RequireClient(test.Context(), ttnpb.ClientIdentifiers{}, ttnpb.Right_RIGHT_CLIENT_ALL)
+		RequireClient(test.Context(), &ttnpb.ClientIdentifiers{}, ttnpb.Right_RIGHT_CLIENT_ALL)
 	}, should.Panic)
 	a.So(func() {
-		RequireGateway(test.Context(), ttnpb.GatewayIdentifiers{}, ttnpb.Right_RIGHT_GATEWAY_INFO)
+		RequireGateway(test.Context(), &ttnpb.GatewayIdentifiers{}, ttnpb.Right_RIGHT_GATEWAY_INFO)
 	}, should.Panic)
 	a.So(func() {
-		RequireOrganization(test.Context(), ttnpb.OrganizationIdentifiers{}, ttnpb.Right_RIGHT_ORGANIZATION_INFO)
+		RequireOrganization(test.Context(), &ttnpb.OrganizationIdentifiers{}, ttnpb.Right_RIGHT_ORGANIZATION_INFO)
 	}, should.Panic)
 	a.So(func() {
-		RequireUser(test.Context(), ttnpb.UserIdentifiers{}, ttnpb.Right_RIGHT_USER_INFO)
+		RequireUser(test.Context(), &ttnpb.UserIdentifiers{}, ttnpb.Right_RIGHT_USER_INFO)
 	}, should.Panic)
 
 	fooCtx := test.Context()

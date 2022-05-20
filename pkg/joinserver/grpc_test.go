@@ -103,19 +103,19 @@ func TestGetDefaultJoinEUI(t *testing.T) {
 	for _, tc := range []struct {
 		Name           string
 		DefaultJoinEUI types.EUI64
-		Response       ttnpb.GetDefaultJoinEUIResponse
+		Response       *ttnpb.GetDefaultJoinEUIResponse
 	}{
 		{
 			Name:           "Default",
 			DefaultJoinEUI: types.EUI64{0xff, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff},
-			Response: ttnpb.GetDefaultJoinEUIResponse{
+			Response: &ttnpb.GetDefaultJoinEUIResponse{
 				JoinEui: types.EUI64{0xff, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
 			},
 		},
 		{
 			Name:           "AnotherDefault",
 			DefaultJoinEUI: types.EUI64{0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
-			Response: ttnpb.GetDefaultJoinEUIResponse{
+			Response: &ttnpb.GetDefaultJoinEUIResponse{
 				JoinEui: types.EUI64{0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}.Bytes(),
 			},
 		},

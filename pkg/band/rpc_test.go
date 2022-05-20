@@ -31,7 +31,7 @@ func TestGetPhyVersions(t *testing.T) {
 	for _, tc := range []struct {
 		Name           string
 		BandID         string
-		Expected       ttnpb.GetPhyVersionsResponse
+		Expected       *ttnpb.GetPhyVersionsResponse
 		ErrorAssertion func(err error) bool
 	}{
 		{
@@ -44,7 +44,7 @@ func TestGetPhyVersions(t *testing.T) {
 		{
 			Name:   "EU868",
 			BandID: "EU_863_870",
-			Expected: ttnpb.GetPhyVersionsResponse{
+			Expected: &ttnpb.GetPhyVersionsResponse{
 				VersionInfo: []*ttnpb.GetPhyVersionsResponse_VersionInfo{
 					{
 						BandId: "EU_863_870",
@@ -68,7 +68,7 @@ func TestGetPhyVersions(t *testing.T) {
 		{
 			Name:   "AU915",
 			BandID: "AU_915_928",
-			Expected: ttnpb.GetPhyVersionsResponse{
+			Expected: &ttnpb.GetPhyVersionsResponse{
 				VersionInfo: []*ttnpb.GetPhyVersionsResponse_VersionInfo{
 					{
 						BandId: "AU_915_928",
@@ -91,7 +91,7 @@ func TestGetPhyVersions(t *testing.T) {
 		{
 			Name:   "AS923",
 			BandID: "AS_923",
-			Expected: ttnpb.GetPhyVersionsResponse{
+			Expected: &ttnpb.GetPhyVersionsResponse{
 				VersionInfo: []*ttnpb.GetPhyVersionsResponse_VersionInfo{
 					{
 						BandId: "AS_923",
@@ -112,7 +112,7 @@ func TestGetPhyVersions(t *testing.T) {
 		},
 		{
 			Name: "All",
-			Expected: ttnpb.GetPhyVersionsResponse{
+			Expected: &ttnpb.GetPhyVersionsResponse{
 				VersionInfo: []*ttnpb.GetPhyVersionsResponse_VersionInfo{
 					{
 						BandId: "AS_923",
@@ -353,7 +353,7 @@ func TestGetPhyVersions(t *testing.T) {
 				for _, vi := range res.VersionInfo {
 					sort.Slice(vi.PhyVersions, func(i, j int) bool { return vi.PhyVersions[i] >= vi.PhyVersions[j] })
 				}
-				if !a.So(*res, should.Resemble, tc.Expected) {
+				if !a.So(res, should.Resemble, tc.Expected) {
 					t.Fatalf("Unexpected value: %v", res)
 				}
 			}

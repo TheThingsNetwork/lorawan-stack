@@ -155,12 +155,12 @@ func (ns *mockNS) DownlinkQueueList(ctx context.Context, ids *ttnpb.EndDeviceIde
 var errNotFound = errors.DefineNotFound("not_found", "not found")
 
 type mockJS struct {
-	keys map[string]ttnpb.KeyEnvelope
+	keys map[string]*ttnpb.KeyEnvelope
 }
 
 func startMockJS(ctx context.Context) (*mockJS, string) {
 	js := &mockJS{
-		keys: make(map[string]ttnpb.KeyEnvelope),
+		keys: make(map[string]*ttnpb.KeyEnvelope),
 	}
 	srv := rpcserver.New(ctx)
 	ttnpb.RegisterAsJsServer(srv.Server, js)
@@ -172,7 +172,7 @@ func startMockJS(ctx context.Context) (*mockJS, string) {
 	return js, lis.Addr().String()
 }
 
-func (js *mockJS) add(ctx context.Context, devEUI types.EUI64, sessionKeyID []byte, key ttnpb.KeyEnvelope) {
+func (js *mockJS) add(ctx context.Context, devEUI types.EUI64, sessionKeyID []byte, key *ttnpb.KeyEnvelope) {
 	js.keys[fmt.Sprintf("%v:%v", devEUI, sessionKeyID)] = key
 }
 
@@ -182,6 +182,6 @@ func (js *mockJS) GetAppSKey(ctx context.Context, req *ttnpb.SessionKeyRequest) 
 		return nil, errNotFound.New()
 	}
 	return &ttnpb.AppSKeyResponse{
-		AppSKey: &key,
+		AppSKey: key,
 	}, nil
 }

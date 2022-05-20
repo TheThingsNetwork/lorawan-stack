@@ -46,8 +46,8 @@ type Server interface {
 	io.Server
 
 	HasDownlinkClaim(context.Context, ttnpb.GatewayIdentifiers) bool
-	RegisterGateway(ctx context.Context, ids ttnpb.GatewayIdentifiers, gateway *ttnpb.Gateway)
-	GetConnection(ctx context.Context, ids ttnpb.GatewayIdentifiers) *io.Connection
+	RegisterGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers, gateway *ttnpb.Gateway)
+	GetConnection(ctx context.Context, ids *ttnpb.GatewayIdentifiers) *io.Connection
 	Connections() <-chan *io.Connection
 }
 
@@ -63,10 +63,10 @@ func NewServer(c *component.Component, is *mockis.MockDefinition) Server {
 }
 
 // FillContext implements io.Server.
-func (s *server) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdentifiers) (context.Context, ttnpb.GatewayIdentifiers, error) {
+func (s *server) FillGatewayContext(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (context.Context, *ttnpb.GatewayIdentifiers, error) {
 	ctx = s.FillContext(ctx)
 	if ids.IsZero() {
-		return nil, ttnpb.GatewayIdentifiers{}, errors.New("the identifiers are zero")
+		return nil, nil, errors.New("the identifiers are zero")
 	}
 	if ids.GatewayId != "" {
 		return ctx, ids, nil
@@ -76,14 +76,14 @@ func (s *server) FillGatewayContext(ctx context.Context, ids ttnpb.GatewayIdenti
 }
 
 // Connect implements io.Server.
-func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.GatewayIdentifiers) (*io.Connection, error) {
+func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids *ttnpb.GatewayIdentifiers) (*io.Connection, error) {
 	if err := rights.RequireGateway(ctx, ids, ttnpb.Right_RIGHT_GATEWAY_LINK); err != nil {
 		return nil, err
 	}
-	gtw, err := s.identityStore.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{GatewayIds: &ids})
+	gtw, err := s.identityStore.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{GatewayIds: ids})
 	if err != nil {
 		gtw = &ttnpb.Gateway{
-			Ids:             &ids,
+			Ids:             ids,
 			FrequencyPlanId: test.EUFrequencyPlanID,
 		}
 	}
@@ -105,9 +105,9 @@ func (s *server) Connect(ctx context.Context, frontend io.Frontend, ids ttnpb.Ga
 }
 
 // GetFrequencyPlans implements io.Server.
-func (s *server) GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error) {
+func (s *server) GetFrequencyPlans(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (map[string]*frequencyplans.FrequencyPlan, error) {
 	var fpID string
-	if gtw, err := s.identityStore.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{GatewayIds: &ids}); err == nil {
+	if gtw, err := s.identityStore.GatewayRegistry().Get(ctx, &ttnpb.GetGatewayRequest{GatewayIds: ids}); err == nil {
 		fpID = gtw.FrequencyPlanId
 	} else {
 		fpID = test.EUFrequencyPlanID
@@ -122,17 +122,17 @@ func (s *server) GetFrequencyPlans(ctx context.Context, ids ttnpb.GatewayIdentif
 }
 
 // ClaimDownlink implements io.Server.
-func (s *server) ClaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
+func (s *server) ClaimDownlink(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error {
 	s.downlinkClaims.Store(unique.ID(ctx, ids), true)
 	return nil
 }
 
-func (s *server) ValidateGatewayID(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
+func (s *server) ValidateGatewayID(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error {
 	return ids.ValidateContext(ctx)
 }
 
 // UnclaimDownlink implements io.Server.
-func (s *server) UnclaimDownlink(ctx context.Context, ids ttnpb.GatewayIdentifiers) error {
+func (s *server) UnclaimDownlink(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error {
 	s.downlinkClaims.Delete(unique.ID(ctx, ids))
 	return nil
 }
@@ -147,7 +147,7 @@ func (s *server) HasDownlinkClaim(ctx context.Context, ids ttnpb.GatewayIdentifi
 	return ok
 }
 
-func (s *server) RegisterGateway(ctx context.Context, ids ttnpb.GatewayIdentifiers, gateway *ttnpb.Gateway) {
+func (s *server) RegisterGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers, gateway *ttnpb.Gateway) {
 	if len(gateway.FrequencyPlanIds) > 0 {
 		gateway.FrequencyPlanId = gateway.FrequencyPlanIds[0]
 	}
@@ -156,7 +156,7 @@ func (s *server) RegisterGateway(ctx context.Context, ids ttnpb.GatewayIdentifie
 	s.identityStore.GatewayRegistry().Add(ctx, ids, "default-key", gateway, gtwRights...)
 }
 
-func (s *server) GetConnection(ctx context.Context, ids ttnpb.GatewayIdentifiers) *io.Connection {
+func (s *server) GetConnection(ctx context.Context, ids *ttnpb.GatewayIdentifiers) *io.Connection {
 	return s.connections[unique.ID(ctx, ids)]
 }
 

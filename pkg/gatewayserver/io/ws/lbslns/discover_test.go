@@ -34,7 +34,7 @@ func TestDiscover(t *testing.T) {
 	var lbsLNS lbsLNS
 	eui := types.EUI64{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}
 	mockServer := mockServer{
-		ids: ttnpb.GatewayIdentifiers{
+		ids: &ttnpb.GatewayIdentifiers{
 			GatewayId: "eui-1111111111111111",
 			Eui:       &eui,
 		},

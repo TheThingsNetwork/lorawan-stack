@@ -90,7 +90,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	// Check empty.
 	{
 		res, err := client.List(ctx, &ttnpb.ListApplicationWebhooksRequest{
-			ApplicationIds: &registeredApplicationID,
+			ApplicationIds: registeredApplicationID,
 			FieldMask:      ttnpb.FieldMask("base_url"),
 		}, creds)
 		a.So(err, should.BeNil)
@@ -102,7 +102,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 		_, err := client.Set(ctx, &ttnpb.SetApplicationWebhookRequest{
 			Webhook: &ttnpb.ApplicationWebhook{
 				Ids: &ttnpb.ApplicationWebhookIdentifiers{
-					ApplicationIds: &registeredApplicationID,
+					ApplicationIds: registeredApplicationID,
 					WebhookId:      registeredWebhookID,
 				},
 				BaseUrl: "http://localhost/test",
@@ -115,7 +115,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	// List; assert one.
 	{
 		res, err := client.List(ctx, &ttnpb.ListApplicationWebhooksRequest{
-			ApplicationIds: &registeredApplicationID,
+			ApplicationIds: registeredApplicationID,
 			FieldMask:      ttnpb.FieldMask("base_url"),
 		}, creds)
 		a.So(err, should.BeNil)
@@ -127,7 +127,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	{
 		res, err := client.Get(ctx, &ttnpb.GetApplicationWebhookRequest{
 			Ids: &ttnpb.ApplicationWebhookIdentifiers{
-				ApplicationIds: &registeredApplicationID,
+				ApplicationIds: registeredApplicationID,
 				WebhookId:      registeredWebhookID,
 			},
 			FieldMask: ttnpb.FieldMask("base_url"),
@@ -139,7 +139,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	// Delete.
 	{
 		_, err := client.Delete(ctx, &ttnpb.ApplicationWebhookIdentifiers{
-			ApplicationIds: &registeredApplicationID,
+			ApplicationIds: registeredApplicationID,
 			WebhookId:      registeredWebhookID,
 		}, creds)
 		a.So(err, should.BeNil)
@@ -148,7 +148,7 @@ func TestWebhookRegistryRPC(t *testing.T) {
 	// Check empty.
 	{
 		res, err := client.List(ctx, &ttnpb.ListApplicationWebhooksRequest{
-			ApplicationIds: &registeredApplicationID,
+			ApplicationIds: registeredApplicationID,
 			FieldMask:      ttnpb.FieldMask("base_url"),
 		}, creds)
 		a.So(err, should.BeNil)

@@ -67,7 +67,7 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 		}
 
 		uid := unique.ID(ctx, ids)
-		conn, ok := gs.GetConnection(ctx, *ids)
+		conn, ok := gs.GetConnection(ctx, ids)
 		if !ok {
 			pathErrs = append(pathErrs, errNotConnected.WithAttributes("gateway_uid", uid))
 			continue

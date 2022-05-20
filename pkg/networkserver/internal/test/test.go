@@ -463,7 +463,7 @@ func AppendMACCommanders(queue []*ttnpb.MACCommand, cmds ...MACCommander) []*ttn
 func MakeUplinkMACBuffer(phy *band.Band, cmds ...MACCommander) []byte {
 	var b []byte
 	for _, cmd := range cmds {
-		b = test.Must(lorawan.DefaultMACCommands.AppendUplink(*phy, b, *cmd.MACCommand())).([]byte)
+		b = test.Must(lorawan.DefaultMACCommands.AppendUplink(*phy, b, cmd.MACCommand())).([]byte)
 	}
 	return b
 }
@@ -471,7 +471,7 @@ func MakeUplinkMACBuffer(phy *band.Band, cmds ...MACCommander) []byte {
 func MakeDownlinkMACBuffer(phy *band.Band, cmds ...MACCommander) []byte {
 	var b []byte
 	for _, cmd := range cmds {
-		b = test.Must(lorawan.DefaultMACCommands.AppendDownlink(*phy, b, *cmd.MACCommand())).([]byte)
+		b = test.Must(lorawan.DefaultMACCommands.AppendDownlink(*phy, b, cmd.MACCommand())).([]byte)
 	}
 	return b
 }
@@ -609,7 +609,7 @@ func MakeDataUplink(conf DataUplinkConfig) *ttnpb.UplinkMessage {
 		FCnt:    conf.FCnt & 0xffff,
 		FOpts:   CopyBytes(fOpts),
 	}
-	phyPayload := test.Must(lorawan.MarshalMessage(ttnpb.Message{
+	phyPayload := test.Must(lorawan.MarshalMessage(&ttnpb.Message{
 		MHdr: mhdr,
 		Payload: &ttnpb.Message_MacPayload{
 			MacPayload: &ttnpb.MACPayload{
@@ -734,7 +734,7 @@ func MakeDataDownlink(conf DataDownlinkConfig) *ttnpb.DownlinkMessage {
 			},
 		},
 	}
-	phyPayload := test.Must(lorawan.MarshalMessage(*msg)).([]byte)
+	phyPayload := test.Must(lorawan.MarshalMessage(msg)).([]byte)
 	var mic [4]byte
 	switch {
 	case macspec.UseLegacyMIC(conf.MACVersion):

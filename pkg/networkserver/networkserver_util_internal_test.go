@@ -2073,7 +2073,7 @@ func LogEvents(t *testing.T, ch <-chan test.EventPubSubPublishRequest) {
 
 var MACStateOptions = test.MACStateOptions
 
-func MakeMACState(dev *ttnpb.EndDevice, defaults ttnpb.MACSettings, opts ...test.MACStateOption) *ttnpb.MACState {
+func MakeMACState(dev *ttnpb.EndDevice, defaults *ttnpb.MACSettings, opts ...test.MACStateOption) *ttnpb.MACState {
 	v := MACStateOptions.Compose(opts...)(*test.Must(mac.NewState(dev, test.FrequencyPlanStore, defaults)).(*ttnpb.MACState))
 	return &v
 }
@@ -2098,7 +2098,7 @@ func MakeSession(macVersion ttnpb.MACVersion, wrapKeys, withID bool, opts ...tes
 
 type EndDeviceOptionNamespace struct{ test.EndDeviceOptionNamespace }
 
-func (o EndDeviceOptionNamespace) SendJoinRequest(defaults ttnpb.MACSettings, wrapKeys bool) test.EndDeviceOption {
+func (o EndDeviceOptionNamespace) SendJoinRequest(defaults *ttnpb.MACSettings, wrapKeys bool) test.EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		if !x.SupportsJoin {
 			panic("join request requested for non-OTAA device")
@@ -2212,7 +2212,7 @@ func (o EndDeviceOptionNamespace) SendJoinAccept(priority ttnpb.TxSchedulePriori
 	}
 }
 
-func (o EndDeviceOptionNamespace) Activate(defaults ttnpb.MACSettings, wrapKeys bool, sessionOpts []test.SessionOption, macStateOpts ...test.MACStateOption) test.EndDeviceOption {
+func (o EndDeviceOptionNamespace) Activate(defaults *ttnpb.MACSettings, wrapKeys bool, sessionOpts []test.SessionOption, macStateOpts ...test.MACStateOption) test.EndDeviceOption {
 	return func(x ttnpb.EndDevice) ttnpb.EndDevice {
 		if !x.SupportsJoin {
 			macState := MakeMACState(&x, defaults, macStateOpts...)
@@ -2266,7 +2266,7 @@ func MakeOTAAEndDevice(opts ...test.EndDeviceOption) *ttnpb.EndDevice {
 	)
 }
 
-func MakeABPEndDevice(defaults ttnpb.MACSettings, wrapKeys bool, sessionOpts []test.SessionOption, macStateOpts []test.MACStateOption, opts ...test.EndDeviceOption) *ttnpb.EndDevice {
+func MakeABPEndDevice(defaults *ttnpb.MACSettings, wrapKeys bool, sessionOpts []test.SessionOption, macStateOpts []test.MACStateOption, opts ...test.EndDeviceOption) *ttnpb.EndDevice {
 	return MakeEndDevice(
 		EndDeviceOptions.Compose(opts...),
 		func(x ttnpb.EndDevice) ttnpb.EndDevice {
@@ -2279,7 +2279,7 @@ func MakeABPEndDevice(defaults ttnpb.MACSettings, wrapKeys bool, sessionOpts []t
 	)
 }
 
-func MakeMulticastEndDevice(class ttnpb.Class, defaults ttnpb.MACSettings, wrapKeys bool, sessionOpts []test.SessionOption, macStateOpts []test.MACStateOption, opts ...test.EndDeviceOption) *ttnpb.EndDevice {
+func MakeMulticastEndDevice(class ttnpb.Class, defaults *ttnpb.MACSettings, wrapKeys bool, sessionOpts []test.SessionOption, macStateOpts []test.MACStateOption, opts ...test.EndDeviceOption) *ttnpb.EndDevice {
 	return MakeABPEndDevice(defaults, wrapKeys, sessionOpts, macStateOpts,
 		EndDeviceOptions.WithMulticast(true),
 		func() test.EndDeviceOption {
@@ -2367,7 +2367,7 @@ func MakeOTAASetDeviceRequest(deviceOpts []test.EndDeviceOption, paths ...string
 	}
 }
 
-func MakeABPSetDeviceRequest(defaults ttnpb.MACSettings, sessionOpts []test.SessionOption, macStateOpts []test.MACStateOption, deviceOpts []test.EndDeviceOption, paths ...string) *SetDeviceRequest {
+func MakeABPSetDeviceRequest(defaults *ttnpb.MACSettings, sessionOpts []test.SessionOption, macStateOpts []test.MACStateOption, deviceOpts []test.EndDeviceOption, paths ...string) *SetDeviceRequest {
 	dev := MakeABPEndDevice(defaults, false, sessionOpts, macStateOpts, deviceOpts...)
 	return &SetDeviceRequest{
 		EndDevice: dev,
@@ -2375,7 +2375,7 @@ func MakeABPSetDeviceRequest(defaults ttnpb.MACSettings, sessionOpts []test.Sess
 	}
 }
 
-func MakeMulticastSetDeviceRequest(class ttnpb.Class, defaults ttnpb.MACSettings, sessionOpts []test.SessionOption, macStateOpts []test.MACStateOption, deviceOpts []test.EndDeviceOption, paths ...string) *SetDeviceRequest {
+func MakeMulticastSetDeviceRequest(class ttnpb.Class, defaults *ttnpb.MACSettings, sessionOpts []test.SessionOption, macStateOpts []test.MACStateOption, deviceOpts []test.EndDeviceOption, paths ...string) *SetDeviceRequest {
 	dev := MakeMulticastEndDevice(class, defaults, false, sessionOpts, macStateOpts, deviceOpts...)
 	return &SetDeviceRequest{
 		EndDevice: dev,

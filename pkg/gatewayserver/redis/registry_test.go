@@ -33,15 +33,15 @@ func TestRegistry(t *testing.T) {
 	defer flush()
 	defer cl.Close()
 
-	ids := ttnpb.GatewayIdentifiers{
+	ids := &ttnpb.GatewayIdentifiers{
 		GatewayId: "gtw1",
 		Eui:       &types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01},
 	}
-	ids2 := ttnpb.GatewayIdentifiers{
+	ids2 := &ttnpb.GatewayIdentifiers{
 		GatewayId: "gtw2",
 		Eui:       &types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01},
 	}
-	ids3 := ttnpb.GatewayIdentifiers{
+	ids3 := &ttnpb.GatewayIdentifiers{
 		GatewayId: "gtw3",
 		Eui:       &types.EUI64{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02},
 	}

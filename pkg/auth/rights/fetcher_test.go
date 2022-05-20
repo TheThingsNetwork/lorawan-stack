@@ -45,23 +45,23 @@ func fetchEntityRights(ctx context.Context, id string, f EntityFetcher) (res str
 	var wg sync.WaitGroup
 	wg.Add(5)
 	go func() {
-		res.AppRights, res.AppErr = f.ApplicationRights(ctx, ttnpb.ApplicationIdentifiers{ApplicationId: id})
+		res.AppRights, res.AppErr = f.ApplicationRights(ctx, &ttnpb.ApplicationIdentifiers{ApplicationId: id})
 		wg.Done()
 	}()
 	go func() {
-		res.CliRights, res.CliErr = f.ClientRights(ctx, ttnpb.ClientIdentifiers{ClientId: id})
+		res.CliRights, res.CliErr = f.ClientRights(ctx, &ttnpb.ClientIdentifiers{ClientId: id})
 		wg.Done()
 	}()
 	go func() {
-		res.GtwRights, res.GtwErr = f.GatewayRights(ctx, ttnpb.GatewayIdentifiers{GatewayId: id})
+		res.GtwRights, res.GtwErr = f.GatewayRights(ctx, &ttnpb.GatewayIdentifiers{GatewayId: id})
 		wg.Done()
 	}()
 	go func() {
-		res.OrgRights, res.OrgErr = f.OrganizationRights(ctx, ttnpb.OrganizationIdentifiers{OrganizationId: id})
+		res.OrgRights, res.OrgErr = f.OrganizationRights(ctx, &ttnpb.OrganizationIdentifiers{OrganizationId: id})
 		wg.Done()
 	}()
 	go func() {
-		res.UsrRights, res.UsrErr = f.UserRights(ctx, ttnpb.UserIdentifiers{UserId: id})
+		res.UsrRights, res.UsrErr = f.UserRights(ctx, &ttnpb.UserIdentifiers{UserId: id})
 		wg.Done()
 	}()
 	wg.Wait()
@@ -126,7 +126,7 @@ func (as *mockEntityAccessServer) AuthInfo(ctx context.Context, _ *pbtypes.Empty
 }
 
 func (as *mockApplicationAccessServer) ListRights(ctx context.Context, ids *ttnpb.ApplicationIdentifiers) (*ttnpb.Rights, error) {
-	as.applicationCtx, as.applicationIDs = ctx, *ids
+	as.applicationCtx, as.applicationIDs = ctx, ids
 	if as.applicationError != nil {
 		return nil, as.applicationError
 	}
@@ -134,7 +134,7 @@ func (as *mockApplicationAccessServer) ListRights(ctx context.Context, ids *ttnp
 }
 
 func (as *mockClientAccessServer) ListRights(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*ttnpb.Rights, error) {
-	as.clientCtx, as.clientIDs = ctx, *ids
+	as.clientCtx, as.clientIDs = ctx, ids
 	if as.clientError != nil {
 		return nil, as.clientError
 	}
@@ -142,7 +142,7 @@ func (as *mockClientAccessServer) ListRights(ctx context.Context, ids *ttnpb.Cli
 }
 
 func (as *mockGatewayAccessServer) ListRights(ctx context.Context, ids *ttnpb.GatewayIdentifiers) (*ttnpb.Rights, error) {
-	as.gatewayCtx, as.gatewayIDs = ctx, *ids
+	as.gatewayCtx, as.gatewayIDs = ctx, ids
 	if as.gatewayError != nil {
 		return nil, as.gatewayError
 	}
@@ -150,7 +150,7 @@ func (as *mockGatewayAccessServer) ListRights(ctx context.Context, ids *ttnpb.Ga
 }
 
 func (as *mockOrganizationAccessServer) ListRights(ctx context.Context, ids *ttnpb.OrganizationIdentifiers) (*ttnpb.Rights, error) {
-	as.organizationCtx, as.organizationIDs = ctx, *ids
+	as.organizationCtx, as.organizationIDs = ctx, ids
 	if as.organizationError != nil {
 		return nil, as.organizationError
 	}
@@ -158,7 +158,7 @@ func (as *mockOrganizationAccessServer) ListRights(ctx context.Context, ids *ttn
 }
 
 func (as *mockUserAccessServer) ListRights(ctx context.Context, ids *ttnpb.UserIdentifiers) (*ttnpb.Rights, error) {
-	as.userCtx, as.userIDs = ctx, *ids
+	as.userCtx, as.userIDs = ctx, ids
 	if as.userError != nil {
 		return nil, as.userError
 	}

@@ -392,7 +392,7 @@ func TestLoRaWANEncodingMAC(t *testing.T) {
 				reader = DefaultMACCommands.ReadDownlink
 			}
 
-			b, err := appender(phy, []byte{}, *cmd)
+			b, err := appender(phy, []byte{}, cmd)
 			if a.So(err, should.BeNil) {
 				a.So(b, should.Resemble, tc.Bytes)
 			}

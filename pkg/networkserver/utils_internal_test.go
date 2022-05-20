@@ -557,7 +557,7 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 				clock := test.NewMockClock(beaconTime.Add(time.Millisecond))
 				defer SetMockClock(clock)()
 
-				ret, ok := nextDataDownlinkSlot(ctx, tc.Device, LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B], ttnpb.MACSettings{}, tc.EarliestAt)
+				ret, ok := nextDataDownlinkSlot(ctx, tc.Device, LoRaWANBands[band.EU_863_870][ttnpb.PHYVersion_RP001_V1_1_REV_B], &ttnpb.MACSettings{}, tc.EarliestAt)
 				if a.So(ok, should.Equal, tc.ExpectedOk) {
 					a.So(ret, should.Resemble, tc.ExpectedSlot)
 				}

@@ -492,7 +492,7 @@ var (
 						},
 					}
 
-					buf, err := lorawan.MarshalMessage(*joinRequest)
+					buf, err := lorawan.MarshalMessage(joinRequest)
 					if err != nil {
 						return err
 					}
@@ -621,7 +621,7 @@ var (
 						},
 					}
 
-					buf, err := lorawan.MarshalMessage(*dataUplink)
+					buf, err := lorawan.MarshalMessage(dataUplink)
 					if err != nil {
 						return err
 					}

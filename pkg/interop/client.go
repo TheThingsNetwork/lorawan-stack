@@ -194,7 +194,7 @@ func (cl joinServerHTTPClient) GetAppSKey(ctx context.Context, asID string, req 
 	}
 
 	return &ttnpb.AppSKeyResponse{
-		AppSKey: (*ttnpb.KeyEnvelope)(&interopAns.AppSKey),
+		AppSKey: (*ttnpb.KeyEnvelope)(interopAns.AppSKey),
 	}, nil
 }
 
@@ -228,7 +228,7 @@ func (cl joinServerHTTPClient) HandleJoinRequest(ctx context.Context, netID type
 
 	var cfList []byte
 	if req.CfList != nil {
-		cfList, err = lorawan.MarshalCFList(*req.CfList)
+		cfList, err = lorawan.MarshalCFList(req.CfList)
 		if err != nil {
 			return nil, err
 		}

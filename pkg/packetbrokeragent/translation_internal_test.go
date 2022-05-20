@@ -42,7 +42,7 @@ func TestWrapGatewayUplinkToken(t *testing.T) {
 		t.FailNow()
 	}
 
-	wrappedToken, err := wrapGatewayUplinkToken(ctx, ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"},
+	wrappedToken, err := wrapGatewayUplinkToken(ctx, &ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"},
 		[]byte{0x1, 0x2, 0x3}, encrypter,
 	)
 	if !a.So(err, should.BeNil) {

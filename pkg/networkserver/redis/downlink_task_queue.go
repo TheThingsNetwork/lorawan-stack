@@ -77,7 +77,7 @@ func (q *DownlinkTaskQueue) Pop(ctx context.Context, consumerID string, f func(c
 		if err != nil {
 			return err
 		}
-		t, err := f(ctx, &ids, startAt)
+		t, err := f(ctx, ids, startAt)
 		if err != nil || t.IsZero() {
 			return err
 		}

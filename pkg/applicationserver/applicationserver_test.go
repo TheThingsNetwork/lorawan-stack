@@ -29,6 +29,7 @@ import (
 	mqttserver "github.com/TheThingsIndustries/mystique/pkg/server"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	pbtypes "github.com/gogo/protobuf/types"
+	"github.com/mohae/deepcopy"
 	nats_server "github.com/nats-io/nats-server/v2/server"
 	nats_test_server "github.com/nats-io/nats-server/v2/test"
 	nats_client "github.com/nats-io/nats.go"
@@ -72,22 +73,22 @@ func TestApplicationServer(t *testing.T) {
 
 	// This application will be added to the Entity Registry and to the link registry of the Application Server so that it
 	// links automatically on start to the Network Server.
-	registeredApplicationID := ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"}
+	registeredApplicationID := &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"}
 	registeredApplicationKey := "secret"
 	registeredApplicationFormatter := ttnpb.PayloadFormatter_FORMATTER_CAYENNELPP
 	registeredApplicationWebhookID := &ttnpb.ApplicationWebhookIdentifiers{
-		ApplicationIds: &registeredApplicationID,
+		ApplicationIds: registeredApplicationID,
 		WebhookId:      "test",
 	}
 	registeredApplicationPubSubID := &ttnpb.ApplicationPubSubIdentifiers{
-		ApplicationIds: &registeredApplicationID,
+		ApplicationIds: registeredApplicationID,
 		PubSubId:       "test",
 	}
 
 	// This device gets registered in the device registry of the Application Server.
 	registeredDevice := &ttnpb.EndDevice{
 		Ids: &ttnpb.EndDeviceIdentifiers{
-			ApplicationIds: &registeredApplicationID,
+			ApplicationIds: registeredApplicationID,
 			DeviceId:       "foo-device",
 			JoinEui:        eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 			DevEui:         eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
@@ -142,7 +143,7 @@ func TestApplicationServer(t *testing.T) {
 	// This device does not get registered in the device registry of the Application Server and will be created on join
 	// and on uplink.
 	unregisteredDeviceID := &ttnpb.EndDeviceIdentifiers{
-		ApplicationIds: &registeredApplicationID,
+		ApplicationIds: registeredApplicationID,
 		DeviceId:       "bar-device",
 		JoinEui:        eui64Ptr(types.EUI64{0x24, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 		DevEui:         eui64Ptr(types.EUI64{0x24, 0x24, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
@@ -160,27 +161,27 @@ func TestApplicationServer(t *testing.T) {
 	// Register some sessions in the Join Server. Sometimes the keys are sent by the Network Server as part of the
 	// join-accept, and sometimes they are not sent by the Network Server so the Application Server gets them from the
 	// Join Server.
-	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x11}, ttnpb.KeyEnvelope{
+	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x11}, &ttnpb.KeyEnvelope{
 		// AppSKey is []byte{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}.
 		EncryptedKey: []byte{0xa8, 0x11, 0x8f, 0x80, 0x2e, 0xbf, 0x8, 0xdc, 0x62, 0x37, 0xc3, 0x4, 0x63, 0xa2, 0xfa, 0xcb, 0xf8, 0x87, 0xaa, 0x31, 0x90, 0x23, 0x85, 0xc1},
 		KekLabel:     "test",
 	})
-	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x22}, ttnpb.KeyEnvelope{
+	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x22}, &ttnpb.KeyEnvelope{
 		// AppSKey is []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}
 		EncryptedKey: []byte{0x39, 0x11, 0x40, 0x98, 0xa1, 0x5d, 0x6f, 0x92, 0xd7, 0xf0, 0x13, 0x21, 0x5b, 0x5b, 0x41, 0xa8, 0x98, 0x2d, 0xac, 0x59, 0x34, 0x76, 0x36, 0x18},
 		KekLabel:     "test",
 	})
-	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x33}, ttnpb.KeyEnvelope{
+	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x33}, &ttnpb.KeyEnvelope{
 		// AppSKey is []byte{0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33}
 		EncryptedKey: []byte{0x5, 0x81, 0xe1, 0x15, 0x8a, 0xc3, 0x13, 0x68, 0x5e, 0x8d, 0x15, 0xc0, 0x11, 0x92, 0x14, 0x49, 0x9f, 0xa0, 0xc6, 0xf1, 0xdb, 0x95, 0xff, 0xbd},
 		KekLabel:     "test",
 	})
-	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x44}, ttnpb.KeyEnvelope{
+	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x44}, &ttnpb.KeyEnvelope{
 		// AppSKey is []byte{0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44}
 		EncryptedKey: []byte{0x30, 0xcf, 0x47, 0x91, 0x11, 0x64, 0x53, 0x3f, 0xc3, 0xd5, 0xd8, 0x56, 0x5b, 0x71, 0xcb, 0xe7, 0x6d, 0x14, 0x2b, 0x2c, 0xf2, 0xc2, 0xd7, 0x7b},
 		KekLabel:     "test",
 	})
-	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x55}, ttnpb.KeyEnvelope{
+	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x55}, &ttnpb.KeyEnvelope{
 		// AppSKey is []byte{0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55}
 		EncryptedKey: []byte{0x56, 0x15, 0xaa, 0x22, 0xb7, 0x5f, 0xc, 0x24, 0x79, 0x6, 0x84, 0x68, 0x89, 0x0, 0xa6, 0x16, 0x4a, 0x9c, 0xef, 0xdb, 0xbf, 0x61, 0x6f, 0x0},
 		KekLabel:     "test",
@@ -201,7 +202,7 @@ func TestApplicationServer(t *testing.T) {
 	if err := linkRegistry.Init(ctx); !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	_, err := linkRegistry.Set(ctx, &registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
+	_, err := linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
 			DefaultFormatters: &ttnpb.MessagePayloadFormatters{
 				UpFormatter:   registeredApplicationFormatter,
@@ -348,23 +349,23 @@ func TestApplicationServer(t *testing.T) {
 
 	for _, ptc := range []struct {
 		Protocol         string
-		ValidAuth        func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool
-		Connect          func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error
+		ValidAuth        func(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, key string) bool
+		Connect          func(ctx context.Context, t *testing.T, ids *ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error
 		SkipCheckDownErr bool
 	}{
 		{
 			Protocol: "grpc",
-			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
+			ValidAuth: func(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, key string) bool {
 				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
-			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
+			Connect: func(ctx context.Context, t *testing.T, ids *ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				creds := grpc.PerRPCCredentials(rpcmetadata.MD{
 					AuthType:      "Bearer",
 					AuthValue:     key,
 					AllowInsecure: true,
 				})
 				client := ttnpb.NewAppAsClient(as.LoopbackConn())
-				stream, err := client.Subscribe(ctx, &ids, creds)
+				stream, err := client.Subscribe(ctx, ids, creds)
 				if err != nil {
 					return err
 				}
@@ -405,10 +406,10 @@ func TestApplicationServer(t *testing.T) {
 		},
 		{
 			Protocol: "mqtt",
-			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
+			ValidAuth: func(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, key string) bool {
 				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
-			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
+			Connect: func(ctx context.Context, t *testing.T, ids *ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				clientOpts := mqtt.NewClientOptions()
 				clientOpts.AddBroker("tcp://0.0.0.0:1883")
 				clientOpts.SetUsername(unique.ID(ctx, ids))
@@ -470,10 +471,10 @@ func TestApplicationServer(t *testing.T) {
 		},
 		{
 			Protocol: "pubsub/nats",
-			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
+			ValidAuth: func(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, key string) bool {
 				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
-			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
+			Connect: func(ctx context.Context, t *testing.T, ids *ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				evCh := make(chan events.Event, EventsBufferSize)
 				defer test.RedirectEvents(evCh)()
 				// Configure pubsub.
@@ -610,10 +611,10 @@ func TestApplicationServer(t *testing.T) {
 		},
 		{
 			Protocol: "pubsub/mqtt",
-			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
+			ValidAuth: func(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, key string) bool {
 				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
-			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
+			Connect: func(ctx context.Context, t *testing.T, ids *ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				evCh := make(chan events.Event, EventsBufferSize)
 				defer test.RedirectEvents(evCh)()
 				// Configure pubsub.
@@ -754,10 +755,10 @@ func TestApplicationServer(t *testing.T) {
 		},
 		{
 			Protocol: "webhooks",
-			ValidAuth: func(ctx context.Context, ids ttnpb.ApplicationIdentifiers, key string) bool {
+			ValidAuth: func(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, key string) bool {
 				return unique.ID(ctx, ids) == unique.ID(ctx, registeredApplicationID) && key == registeredApplicationKey
 			},
-			Connect: func(ctx context.Context, t *testing.T, ids ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
+			Connect: func(ctx context.Context, t *testing.T, ids *ttnpb.ApplicationIdentifiers, key string, chs *connChannels) error {
 				// Start web server to read upstream.
 				webhookTarget := httptest.NewServer(http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 					buf, err := io.ReadAll(req.Body)
@@ -852,7 +853,7 @@ func TestApplicationServer(t *testing.T) {
 		t.Run(fmt.Sprintf("Authenticate/%v", ptc.Protocol), func(t *testing.T) {
 			for _, ctc := range []struct {
 				Name string
-				ID   ttnpb.ApplicationIdentifiers
+				ID   *ttnpb.ApplicationIdentifiers
 				Key  string
 			}{
 				{
@@ -867,7 +868,7 @@ func TestApplicationServer(t *testing.T) {
 				},
 				{
 					Name: "InvalidIDAndKey",
-					ID:   ttnpb.ApplicationIdentifiers{ApplicationId: "invalid-application"},
+					ID:   &ttnpb.ApplicationIdentifiers{ApplicationId: "invalid-application"},
 					Key:  "invalid-key",
 				},
 			} {
@@ -1971,7 +1972,7 @@ func TestApplicationServer(t *testing.T) {
 				ns.reset()
 				devsFlush()
 				deviceRegistry.Set(ctx, registeredDevice.Ids, nil, func(_ *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-					dev := *registeredDevice
+					dev := registeredDevice
 					dev.Session = &ttnpb.Session{
 						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 						Keys: &ttnpb.SessionKeys{
@@ -1982,7 +1983,7 @@ func TestApplicationServer(t *testing.T) {
 							},
 						},
 					}
-					return &dev, []string{"ids", "version_ids", "session", "formatters"}, nil
+					return dev, []string{"ids", "version_ids", "session", "formatters"}, nil
 				})
 				t.Run("UnregisteredDevice/Push", func(t *testing.T) {
 					a := assertions.New(t)
@@ -2192,13 +2193,13 @@ func TestSkipPayloadCrypto(t *testing.T) {
 
 	// This application will be added to the Entity Registry and to the link registry of the Application Server so that it
 	// links automatically on start to the Network Server.
-	registeredApplicationID := ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"}
+	registeredApplicationID := &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"}
 	registeredApplicationKey := "secret"
 
 	// This device gets registered in the device registry of the Application Server.
 	registeredDevice := &ttnpb.EndDevice{
 		Ids: &ttnpb.EndDeviceIdentifiers{
-			ApplicationIds: &registeredApplicationID,
+			ApplicationIds: registeredApplicationID,
 			DeviceId:       "foo-device",
 			JoinEui:        eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 			DevEui:         eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
@@ -2217,27 +2218,27 @@ func TestSkipPayloadCrypto(t *testing.T) {
 	// Register some sessions in the Join Server. Sometimes the keys are sent by the Network Server as part of the
 	// join-accept, and sometimes they are not sent by the Network Server so the Application Server gets them from the
 	// Join Server.
-	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x11}, ttnpb.KeyEnvelope{
+	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x11}, &ttnpb.KeyEnvelope{
 		// AppSKey is []byte{0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x11}.
 		EncryptedKey: []byte{0xa8, 0x11, 0x8f, 0x80, 0x2e, 0xbf, 0x8, 0xdc, 0x62, 0x37, 0xc3, 0x4, 0x63, 0xa2, 0xfa, 0xcb, 0xf8, 0x87, 0xaa, 0x31, 0x90, 0x23, 0x85, 0xc1},
 		KekLabel:     "test",
 	})
-	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x22}, ttnpb.KeyEnvelope{
+	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x22}, &ttnpb.KeyEnvelope{
 		// AppSKey is []byte{0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x22}
 		EncryptedKey: []byte{0x39, 0x11, 0x40, 0x98, 0xa1, 0x5d, 0x6f, 0x92, 0xd7, 0xf0, 0x13, 0x21, 0x5b, 0x5b, 0x41, 0xa8, 0x98, 0x2d, 0xac, 0x59, 0x34, 0x76, 0x36, 0x18},
 		KekLabel:     "test",
 	})
-	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x33}, ttnpb.KeyEnvelope{
+	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x33}, &ttnpb.KeyEnvelope{
 		// AppSKey is []byte{0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33}
 		EncryptedKey: []byte{0x5, 0x81, 0xe1, 0x15, 0x8a, 0xc3, 0x13, 0x68, 0x5e, 0x8d, 0x15, 0xc0, 0x11, 0x92, 0x14, 0x49, 0x9f, 0xa0, 0xc6, 0xf1, 0xdb, 0x95, 0xff, 0xbd},
 		KekLabel:     "test",
 	})
-	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x44}, ttnpb.KeyEnvelope{
+	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x44}, &ttnpb.KeyEnvelope{
 		// AppSKey is []byte{0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44, 0x44}
 		EncryptedKey: []byte{0x30, 0xcf, 0x47, 0x91, 0x11, 0x64, 0x53, 0x3f, 0xc3, 0xd5, 0xd8, 0x56, 0x5b, 0x71, 0xcb, 0xe7, 0x6d, 0x14, 0x2b, 0x2c, 0xf2, 0xc2, 0xd7, 0x7b},
 		KekLabel:     "test",
 	})
-	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x55}, ttnpb.KeyEnvelope{
+	js.add(ctx, *registeredDevice.Ids.DevEui, []byte{0x55}, &ttnpb.KeyEnvelope{
 		// AppSKey is []byte{0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55}
 		EncryptedKey: []byte{0x56, 0x15, 0xaa, 0x22, 0xb7, 0x5f, 0xc, 0x24, 0x79, 0x6, 0x84, 0x68, 0x89, 0x0, 0xa6, 0x16, 0x4a, 0x9c, 0xef, 0xdb, 0xbf, 0x61, 0x6f, 0x0},
 		KekLabel:     "test",
@@ -2258,7 +2259,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 	if err := linkRegistry.Init(ctx); !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	_, err := linkRegistry.Set(ctx, &registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
+	_, err := linkRegistry.Set(ctx, registeredApplicationID, nil, func(_ *ttnpb.ApplicationLink) (*ttnpb.ApplicationLink, []string, error) {
 		return &ttnpb.ApplicationLink{
 			SkipPayloadCrypto: &pbtypes.BoolValue{Value: true},
 		}, []string{"skip_payload_crypto"}, nil
@@ -2356,7 +2357,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 	client := ttnpb.NewAppAsClient(as.LoopbackConn())
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-	stream, err := client.Subscribe(ctx, &registeredApplicationID, creds)
+	stream, err := client.Subscribe(ctx, registeredApplicationID, creds)
 	if err != nil {
 		t.Fatalf("Failed to subscribe: %v", err)
 	}
@@ -2401,9 +2402,9 @@ func TestSkipPayloadCrypto(t *testing.T) {
 				ns.reset()
 				devsFlush()
 				deviceRegistry.Set(ctx, registeredDevice.Ids, nil, func(_ *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-					dev := *registeredDevice
+					dev := deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice)
 					dev.SkipPayloadCryptoOverride = override
-					return &dev, []string{
+					return dev, []string{
 						"ids",
 						"formatters",
 						"skip_payload_crypto_override",
@@ -2621,7 +2622,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 				ns.reset()
 				devsFlush()
 				deviceRegistry.Set(ctx, registeredDevice.Ids, nil, func(_ *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
-					dev := *registeredDevice
+					dev := deepcopy.Copy(registeredDevice).(*ttnpb.EndDevice)
 					dev.Session = &ttnpb.Session{
 						DevAddr: types.DevAddr{0x42, 0xff, 0xff, 0xff}.Bytes(),
 						Keys: &ttnpb.SessionKeys{
@@ -2633,7 +2634,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 						},
 					}
 					dev.SkipPayloadCryptoOverride = override
-					return &dev, []string{
+					return dev, []string{
 						"ids",
 						"session",
 						"skip_payload_crypto_override",
@@ -2897,44 +2898,43 @@ func TestLocationFromPayload(t *testing.T) {
 func TestApplicationServerCleanup(t *testing.T) {
 	a, ctx := test.New(t)
 
-	app1 := ttnpb.ApplicationIdentifiers{ApplicationId: "app-1"}
-	app2 := ttnpb.ApplicationIdentifiers{ApplicationId: "app-2"}
-	app3 := ttnpb.ApplicationIdentifiers{ApplicationId: "app-3"}
-	app4 := ttnpb.ApplicationIdentifiers{ApplicationId: "app-4"}
-
-	webhookList := []ttnpb.ApplicationWebhookIdentifiers{
+	app1 := &ttnpb.ApplicationIdentifiers{ApplicationId: "app-1"}
+	app2 := &ttnpb.ApplicationIdentifiers{ApplicationId: "app-2"}
+	app3 := &ttnpb.ApplicationIdentifiers{ApplicationId: "app-3"}
+	app4 := &ttnpb.ApplicationIdentifiers{ApplicationId: "app-4"}
+	webhookList := []*ttnpb.ApplicationWebhookIdentifiers{
 		{
-			ApplicationIds: &app1,
+			ApplicationIds: app1,
 			WebhookId:      "test-1",
 		},
 		{
-			ApplicationIds: &app3,
+			ApplicationIds: app3,
 			WebhookId:      "test-2",
 		},
 		{
-			ApplicationIds: &app4,
+			ApplicationIds: app4,
 			WebhookId:      "test-3",
 		},
 	}
 
-	pubsubList := []ttnpb.ApplicationPubSubIdentifiers{
+	pubsubList := []*ttnpb.ApplicationPubSubIdentifiers{
 		{
-			ApplicationIds: &app2,
+			ApplicationIds: app2,
 			PubSubId:       "test-1",
 		},
 		{
-			ApplicationIds: &app3,
+			ApplicationIds: app3,
 			PubSubId:       "test-2",
 		},
 		{
-			ApplicationIds: &app1,
+			ApplicationIds: app1,
 			PubSubId:       "test-3",
 		},
 	}
 	deviceList := []*ttnpb.EndDevice{
 		{
 			Ids: &ttnpb.EndDeviceIdentifiers{
-				ApplicationIds: &app1,
+				ApplicationIds: app1,
 				DeviceId:       "dev-1",
 				JoinEui:        eui64Ptr(types.EUI64{0x41, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 				DevEui:         eui64Ptr(types.EUI64{0x41, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
@@ -2942,7 +2942,7 @@ func TestApplicationServerCleanup(t *testing.T) {
 		},
 		{
 			Ids: &ttnpb.EndDeviceIdentifiers{
-				ApplicationIds: &app1,
+				ApplicationIds: app1,
 				DeviceId:       "dev-2",
 				JoinEui:        eui64Ptr(types.EUI64{0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 				DevEui:         eui64Ptr(types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
@@ -2950,7 +2950,7 @@ func TestApplicationServerCleanup(t *testing.T) {
 		},
 		{
 			Ids: &ttnpb.EndDeviceIdentifiers{
-				ApplicationIds: &app2,
+				ApplicationIds: app2,
 				DeviceId:       "dev-3",
 				JoinEui:        eui64Ptr(types.EUI64{0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 				DevEui:         eui64Ptr(types.EUI64{0x43, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
@@ -2958,7 +2958,7 @@ func TestApplicationServerCleanup(t *testing.T) {
 		},
 		{
 			Ids: &ttnpb.EndDeviceIdentifiers{
-				ApplicationIds: &app2,
+				ApplicationIds: app2,
 				DeviceId:       "dev-4",
 				JoinEui:        eui64Ptr(types.EUI64{0x44, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 				DevEui:         eui64Ptr(types.EUI64{0x44, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
@@ -2966,7 +2966,7 @@ func TestApplicationServerCleanup(t *testing.T) {
 		},
 		{
 			Ids: &ttnpb.EndDeviceIdentifiers{
-				ApplicationIds: &app4,
+				ApplicationIds: app4,
 				DeviceId:       "dev-5",
 				JoinEui:        eui64Ptr(types.EUI64{0x45, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 				DevEui:         eui64Ptr(types.EUI64{0x45, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
@@ -2974,7 +2974,7 @@ func TestApplicationServerCleanup(t *testing.T) {
 		},
 		{
 			Ids: &ttnpb.EndDeviceIdentifiers{
-				ApplicationIds: &app4,
+				ApplicationIds: app4,
 				DeviceId:       "dev-6",
 				JoinEui:        eui64Ptr(types.EUI64{0x46, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
 				DevEui:         eui64Ptr(types.EUI64{0x46, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}),
@@ -2982,7 +2982,7 @@ func TestApplicationServerCleanup(t *testing.T) {
 		},
 	}
 
-	associationList := []ttnpb.ApplicationPackageAssociationIdentifiers{
+	associationList := []*ttnpb.ApplicationPackageAssociationIdentifiers{
 		{
 			EndDeviceIds: deviceList[0].Ids,
 			FPort:        1,
@@ -3000,21 +3000,21 @@ func TestApplicationServerCleanup(t *testing.T) {
 			FPort:        1,
 		},
 	}
-	defaultAssociationList := []ttnpb.ApplicationPackageDefaultAssociationIdentifiers{
+	defaultAssociationList := []*ttnpb.ApplicationPackageDefaultAssociationIdentifiers{
 		{
-			ApplicationIds: &app1,
+			ApplicationIds: app1,
 			FPort:          1,
 		},
 		{
-			ApplicationIds: &app1,
+			ApplicationIds: app1,
 			FPort:          2,
 		},
 		{
-			ApplicationIds: &app2,
+			ApplicationIds: app2,
 			FPort:          3,
 		},
 		{
-			ApplicationIds: &app4,
+			ApplicationIds: app4,
 			FPort:          4,
 		},
 	}
@@ -3081,14 +3081,14 @@ func TestApplicationServerCleanup(t *testing.T) {
 
 	for _, webID := range webhookList {
 		_, err := webhookRegistry.Set(ctx,
-			&webID,
+			webID,
 			[]string{
 				"ids.application_ids",
 				"ids.webhook_id",
 			},
 			func(web *ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
 				return &ttnpb.ApplicationWebhook{
-						Ids: &webID,
+						Ids: webID,
 					},
 					[]string{
 						"ids.application_ids",
@@ -3099,14 +3099,14 @@ func TestApplicationServerCleanup(t *testing.T) {
 	}
 
 	for _, pubsubID := range pubsubList {
-		_, err := pubsubRegistry.Set(ctx, &pubsubID,
+		_, err := pubsubRegistry.Set(ctx, pubsubID,
 			[]string{
 				"ids.application_ids",
 				"ids.pub_sub_id",
 			},
 			func(ps *ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error) {
 				return &ttnpb.ApplicationPubSub{
-						Ids: &pubsubID,
+						Ids: pubsubID,
 					},
 					[]string{
 						"ids.application_ids",
@@ -3118,7 +3118,7 @@ func TestApplicationServerCleanup(t *testing.T) {
 	}
 
 	for _, associationID := range associationList {
-		_, err := applicationPackagesRegistry.SetAssociation(ctx, &associationID,
+		_, err := applicationPackagesRegistry.SetAssociation(ctx, associationID,
 			[]string{
 				"ids.end_device_ids.application_ids",
 				"ids.end_device_ids.device_id",
@@ -3126,7 +3126,7 @@ func TestApplicationServerCleanup(t *testing.T) {
 			},
 			func(as *ttnpb.ApplicationPackageAssociation) (*ttnpb.ApplicationPackageAssociation, []string, error) {
 				return &ttnpb.ApplicationPackageAssociation{
-						Ids: &associationID,
+						Ids: associationID,
 					},
 					[]string{
 						"ids.end_device_ids.application_ids",
@@ -3139,14 +3139,14 @@ func TestApplicationServerCleanup(t *testing.T) {
 	}
 
 	for _, defaultAssociationID := range defaultAssociationList {
-		_, err := applicationPackagesRegistry.SetDefaultAssociation(ctx, &defaultAssociationID,
+		_, err := applicationPackagesRegistry.SetDefaultAssociation(ctx, defaultAssociationID,
 			[]string{
 				"ids.application_ids",
 				"ids.f_port",
 			},
 			func(as *ttnpb.ApplicationPackageDefaultAssociation) (*ttnpb.ApplicationPackageDefaultAssociation, []string, error) {
 				return &ttnpb.ApplicationPackageDefaultAssociation{
-						Ids: &defaultAssociationID,
+						Ids: defaultAssociationID,
 					},
 					[]string{
 						"ids.application_ids",

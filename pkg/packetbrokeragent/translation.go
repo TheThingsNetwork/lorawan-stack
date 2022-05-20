@@ -192,7 +192,7 @@ type gatewayUplinkToken struct {
 	Token      []byte `json:"t"`
 }
 
-func wrapGatewayUplinkToken(ctx context.Context, ids ttnpb.GatewayIdentifiers, ulToken []byte, encrypter jose.Encrypter) ([]byte, error) {
+func wrapGatewayUplinkToken(ctx context.Context, ids *ttnpb.GatewayIdentifiers, ulToken []byte, encrypter jose.Encrypter) ([]byte, error) {
 	plaintext, err := json.Marshal(gatewayUplinkToken{
 		GatewayUID: unique.ID(ctx, ids),
 		Token:      ulToken,
@@ -391,7 +391,7 @@ func toPBUplink(ctx context.Context, msg *ttnpb.GatewayUplinkMessage, config For
 
 			if len(gatewayUplinkToken) == 0 {
 				var err error
-				gatewayUplinkToken, err = wrapGatewayUplinkToken(ctx, *md.GatewayIds, md.UplinkToken, config.TokenEncrypter)
+				gatewayUplinkToken, err = wrapGatewayUplinkToken(ctx, md.GatewayIds, md.UplinkToken, config.TokenEncrypter)
 				if err != nil {
 					return nil, errWrapGatewayUplinkToken.WithCause(err)
 				}

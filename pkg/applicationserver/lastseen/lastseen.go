@@ -111,7 +111,7 @@ func (ls *BatchLastSeenProvider) clear() (map[string]*ttnpb.EndDevice, error) {
 		}
 		timestampProto := ttnpb.ProtoTime(&timestamp)
 		endDevices[devUID] = &ttnpb.EndDevice{
-			Ids:        &ids,
+			Ids:        ids,
 			LastSeenAt: timestampProto,
 		}
 	}

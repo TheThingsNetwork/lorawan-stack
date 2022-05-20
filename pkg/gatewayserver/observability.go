@@ -303,13 +303,13 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.txAckDropped.Collect(ch)
 }
 
-func registerGatewayConnect(ctx context.Context, ids ttnpb.GatewayIdentifiers, protocol string) {
-	events.Publish(evtGatewayConnect.NewWithIdentifiersAndData(ctx, &ids, nil))
+func registerGatewayConnect(ctx context.Context, ids *ttnpb.GatewayIdentifiers, protocol string) {
+	events.Publish(evtGatewayConnect.NewWithIdentifiersAndData(ctx, ids, nil))
 	gsMetrics.gatewaysConnected.WithLabelValues(ctx, protocol).Inc()
 }
 
-func registerGatewayDisconnect(ctx context.Context, ids ttnpb.GatewayIdentifiers, protocol string, err error) {
-	events.Publish(evtGatewayDisconnect.NewWithIdentifiersAndData(ctx, &ids, err))
+func registerGatewayDisconnect(ctx context.Context, ids *ttnpb.GatewayIdentifiers, protocol string, err error) {
+	events.Publish(evtGatewayDisconnect.NewWithIdentifiersAndData(ctx, ids, err))
 	gsMetrics.gatewaysConnected.WithLabelValues(ctx, protocol).Dec()
 }
 

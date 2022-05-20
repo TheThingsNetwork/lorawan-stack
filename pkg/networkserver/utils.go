@@ -110,7 +110,7 @@ func lastClassADataDownlinkSlot(dev *ttnpb.EndDevice, phy *band.Band) (*classADo
 // nextUnconfirmedNetworkInitiatedDownlinkAt returns the earliest possible time instant when next unconfirmed
 // network-initiated data downlink can be transmitted to the device given the data known by Network Server and true,
 // if such time instant exists, otherwise it returns time.Time{} and false.
-func nextUnconfirmedNetworkInitiatedDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) (time.Time, bool) {
+func nextUnconfirmedNetworkInitiatedDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, defaults *ttnpb.MACSettings) (time.Time, bool) {
 	switch {
 	case dev.GetMacState() == nil:
 		log.FromContext(ctx).Warn("Insufficient data to compute next network-initiated unconfirmed downlink slot")
@@ -147,7 +147,7 @@ func nextUnconfirmedNetworkInitiatedDownlinkAt(ctx context.Context, dev *ttnpb.E
 // nextConfirmedNetworkInitiatedDownlinkAt returns the earliest possible time instant when a confirmed
 // network-initiated data downlink can be transmitted to the device given the data known by Network Server and true,
 // if such time instant exists, otherwise it returns time.Time{} and false.
-func nextConfirmedNetworkInitiatedDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings) (time.Time, bool) {
+func nextConfirmedNetworkInitiatedDownlinkAt(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, defaults *ttnpb.MACSettings) (time.Time, bool) {
 	if dev.GetMacState() == nil {
 		log.FromContext(ctx).Warn("Insufficient data to compute next network-initiated confirmed downlink slot")
 		return time.Time{}, false
@@ -211,7 +211,7 @@ func deviceHasPathForDownlink(ctx context.Context, dev *ttnpb.EndDevice, down *t
 
 // nextDataDownlinkSlot returns the next downlinkSlot before or at earliestAt when next data downlink can be transmitted to the device
 // given the data known by Network Server and true, if such downlinkSlot and downlink exist, otherwise it returns nil and false.
-func nextDataDownlinkSlot(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, defaults ttnpb.MACSettings, earliestAt time.Time) (downlinkSlot, bool) {
+func nextDataDownlinkSlot(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, defaults *ttnpb.MACSettings, earliestAt time.Time) (downlinkSlot, bool) {
 	if dev.GetMacState() == nil {
 		return nil, false
 	}
