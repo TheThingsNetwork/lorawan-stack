@@ -50,7 +50,7 @@ describe('OAuth Client create', () => {
     cy.findDescriptionByLabelText('Description')
       .should(
         'contain',
-        'Optional OAuth Client description; can also be used to save notes about the client',
+        'The description is displayed to the user when authorizing the client. Use it to explain the purpose of your client.',
       )
       .and('be.visible')
     cy.findByRole('button', { name: 'Create OAuth Client' }).should('be.visible')
