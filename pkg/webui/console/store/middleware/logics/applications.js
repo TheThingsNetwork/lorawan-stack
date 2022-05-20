@@ -87,7 +87,7 @@ const restoreApplicationLogic = createRequestLogic({
 const getApplicationsLogic = createRequestLogic({
   type: applications.GET_APPS_LIST,
   latest: true,
-  process: async ({ action }) => {
+  process: async ({ action }, dispatch) => {
     const {
       params: { page, limit, query, order, deleted },
     } = action.payload
@@ -106,6 +106,12 @@ const getApplicationsLogic = createRequestLogic({
         )
       : await tts.Applications.getAll({ page, limit, order }, selectors)
 
+    if (options.withDeviceCount) {
+      for (const application of data.applications) {
+        dispatch(applications.getApplicationDeviceCount(application.ids.application_id))
+      }
+    }
+
     return { entities: data.applications, totalCount: data.totalCount }
   },
 })
@@ -116,7 +122,7 @@ const getApplicationDeviceCountLogic = createRequestLogic({
     const { id: appId } = action.payload
     const data = await tts.Applications.Devices.getAll(appId, { limit: 1 })
 
-    return { applicationDeviceCount: data.totalCount }
+    return { id: appId, applicationDeviceCount: data.totalCount }
   },
 })
 

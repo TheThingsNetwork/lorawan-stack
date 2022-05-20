@@ -54,10 +54,10 @@ export const selectSelectedApplication = state =>
   selectApplicationById(state, selectSelectedApplicationId(state))
 export const selectApplicationFetching = createFetchingSelector(GET_APP_BASE)
 export const selectApplicationError = createErrorSelector(GET_APP_BASE)
-export const selectApplicationDeviceCount = state =>
-  selectApplicationStore(state).applicationDeviceCount
-export const selectApplicationDevicesFetching = createFetchingSelector(GET_APP_DEV_COUNT_BASE)
-export const selectApplicationDevicesError = createErrorSelector(GET_APP_DEV_COUNT_BASE)
+export const selectApplicationDeviceCount = (state, id) =>
+  selectApplicationStore(state).applicationDeviceCounts[id]
+export const selectApplicationDeviceCountFetching = createFetchingSelector(GET_APP_DEV_COUNT_BASE)
+export const selectApplicationDeviceCountError = createErrorSelector(GET_APP_DEV_COUNT_BASE)
 export const selectApplicationDerivedLastSeen = (state, id) =>
   (selectApplicationDerivedById(state, id) || {}).lastSeen
 export const selectApplicationDevEUICount = state =>
