@@ -15,6 +15,7 @@
 import tts from '@console/api/tts'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
+import { getOrganizationId } from '@ttn-lw/lib/selectors/id'
 
 import * as organizations from '@console/store/actions/organizations'
 
@@ -38,7 +39,7 @@ const getOrganizationLogic = createRequestLogic({
 const getOrganizationsLogic = createRequestLogic({
   type: organizations.GET_ORGS_LIST,
   latest: true,
-  process: async ({ action }) => {
+  process: async ({ action }, dispatch) => {
     const {
       params: { page, limit, order, query, deleted },
     } = action.payload
@@ -56,10 +57,26 @@ const getOrganizationsLogic = createRequestLogic({
         )
       : await tts.Organizations.getAll({ page, limit, order }, selectors)
 
+    if (options.withCollaboratorCount) {
+      for (const org of data.organizations) {
+        dispatch(organizations.getOrganizationCollaboratorCount(getOrganizationId(org)))
+      }
+    }
+
     return {
       entities: data.organizations,
       totalCount: data.totalCount,
     }
+  },
+})
+
+const getOrganizationsCollaboratorCountLogic = createRequestLogic({
+  type: organizations.GET_ORG_COLLABORATOR_COUNT,
+  process: async ({ action }) => {
+    const { id: orgId } = action.payload
+    const result = await tts.Organizations.Collaborators.getAll(orgId, { limit: 1 })
+
+    return { id: orgId, collaboratorCount: result.totalCount }
   },
 })
 
@@ -122,6 +139,7 @@ const getOrganizationsRightsLogic = createRequestLogic({
 export default [
   getOrganizationLogic,
   getOrganizationsLogic,
+  getOrganizationsCollaboratorCountLogic,
   createOrganizationLogic,
   updateOrganizationLogic,
   deleteOrganizationLogic,

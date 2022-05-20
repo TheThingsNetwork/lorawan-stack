@@ -64,6 +64,22 @@ export const [
   (id, selector) => ({ selector }),
 )
 
+export const GET_ORG_COLLABORATOR_COUNT_BASE = 'GET_ORGANIZATION_COLLABORATOR_COUNT'
+export const [
+  {
+    request: GET_ORG_COLLABORATOR_COUNT,
+    success: GET_ORG_COLLABORATOR_COUNT_SUCCESS,
+    failure: GET_ORG_COLLABORATOR_COUNT_FAILURE,
+  },
+  {
+    request: getOrganizationCollaboratorCount,
+    success: getOrganizationCollaboratorCountSuccess,
+    failure: getOrganizationCollaboratorCountFailure,
+  },
+] = createRequestActions(GET_ORG_COLLABORATOR_COUNT_BASE, id => ({
+  id,
+}))
+
 export const CREATE_ORG_BASE = 'CREATE_ORGANIZATION'
 export const [
   { request: CREATE_ORG, success: CREATE_ORG_SUCCESS, failure: CREATE_ORG_FAILURE },

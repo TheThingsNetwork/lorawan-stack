@@ -48,6 +48,10 @@ export const selectSelectedOrganization = state =>
   selectOrganizationById(state, selectSelectedOrganizationId(state))
 export const selectOrganizationFetching = createFetchingSelector(GET_ORG_BASE)
 export const selectOrganizationError = createErrorSelector(GET_ORG_BASE)
+export const selectOrganizationCollaboratorCounts = state =>
+  selectOrganizationStore(state).collaboratorCounts
+export const selectOrganizationCollaboratorCount = (state, id) =>
+  selectOrganizationCollaboratorCounts(state)[id]
 
 // Organizations.
 const selectOrgsIds = createPaginationIdsSelectorByEntity(ENTITY)
