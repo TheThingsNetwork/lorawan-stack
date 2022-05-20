@@ -36,8 +36,8 @@ import { getApplicationDeviceCount } from '@console/store/actions/applications'
 import {
   selectApplicationById,
   selectApplicationDeviceCount,
-  selectApplicationDevicesFetching,
-  selectApplicationDevicesError,
+  selectApplicationDeviceCountFetching,
+  selectApplicationDeviceCountError,
   selectApplicationDerivedLastSeen,
 } from '@console/store/selectors/applications'
 import {
@@ -53,9 +53,9 @@ const mapStateToProps = (state, props) => {
   const collaboratorsTotalCount = selectCollaboratorsTotalCount(state, { id: props.appId })
   const collaboratorsFetching = selectCollaboratorsFetching(state)
   const collaboratorsError = selectCollaboratorsError(state)
-  const devicesTotalCount = selectApplicationDeviceCount(state)
-  const devicesFetching = selectApplicationDevicesFetching(state)
-  const devicesError = selectApplicationDevicesError(state)
+  const devicesTotalCount = selectApplicationDeviceCount(state, props.appId)
+  const devicesFetching = selectApplicationDeviceCountFetching(state)
+  const devicesError = selectApplicationDeviceCountError(state)
 
   const fetching = apiKeysFetching || collaboratorsFetching || devicesFetching
 
