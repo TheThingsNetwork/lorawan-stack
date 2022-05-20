@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import tts from '@account/api/tts'
 import { entitySdkServiceMap } from '@console/constants/entities'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
@@ -32,50 +31,55 @@ const parentTypeValidator = ({ action }, allow) => {
   allow(action)
 }
 
-const getCollaboratorLogic = createRequestLogic({
-  type: collaborators.GET_COLLABORATOR,
-  validate: parentTypeValidator,
-  process: async ({ action }, dispatch) => {
-    const { parentType, parentId, collaboratorId, isUser } = action.payload
+export default tts => {
+  const getCollaboratorLogic = createRequestLogic({
+    type: collaborators.GET_COLLABORATOR,
+    validate: parentTypeValidator,
+    process: async ({ action }, dispatch) => {
+      const { parentType, parentId, collaboratorId, isUser } = action.payload
 
-    if (isUser) {
-      // Also retrieve the user to be able to determine whether
-      // it is an admin user.
-      try {
-        await dispatch(attachPromise(getUser(collaboratorId, 'admin')))
-      } catch {
-        // Do not fail the action if the user could not be fetched.
+      if (isUser) {
+        // Also retrieve the user to be able to determine whether
+        // it is an admin user.
+        try {
+          await dispatch(attachPromise(getUser(collaboratorId, 'admin')))
+        } catch {
+          // Do not fail the action if the user could not be fetched.
+        }
       }
-    }
 
-    return isUser
-      ? tts[entitySdkServiceMap[parentType]].Collaborators.getByUserId(parentId, collaboratorId)
-      : tts[entitySdkServiceMap[parentType]].Collaborators.getByOrganizationId(
-          parentId,
-          collaboratorId,
-        )
-  },
-})
+      return isUser
+        ? tts[entitySdkServiceMap[parentType]].Collaborators.getByUserId(parentId, collaboratorId)
+        : tts[entitySdkServiceMap[parentType]].Collaborators.getByOrganizationId(
+            parentId,
+            collaboratorId,
+          )
+    },
+  })
 
-const getCollaboratorsLogic = createRequestLogic({
-  type: collaborators.GET_COLLABORATORS_LIST,
-  process: async ({ action }) => {
-    const { parentType, parentId, params } = action.payload
-    const result = await tts[entitySdkServiceMap[parentType]].Collaborators.getAll(parentId, params)
+  const getCollaboratorsLogic = createRequestLogic({
+    type: collaborators.GET_COLLABORATORS_LIST,
+    process: async ({ action }) => {
+      const { parentType, parentId, params } = action.payload
+      const result = await tts[entitySdkServiceMap[parentType]].Collaborators.getAll(
+        parentId,
+        params,
+      )
 
-    return { entities: result.collaborators, totalCount: result.totalCount }
-  },
-})
+      return { entities: result.collaborators, totalCount: result.totalCount }
+    },
+  })
 
-const deleteCollaboratorLogic = createRequestLogic({
-  type: collaborators.DELETE_COLLABORATOR,
-  process: async ({ action }) => {
-    const { parentType, parentId } = action.payload
+  const deleteCollaboratorLogic = createRequestLogic({
+    type: collaborators.DELETE_COLLABORATOR,
+    process: async ({ action }) => {
+      const { parentType, parentId } = action.payload
 
-    const result = await tts.Clients.Collaborators.update(parentType, parentId)
+      const result = await tts.Clients.Collaborators.update(parentType, parentId)
 
-    return result
-  },
-})
+      return result
+    },
+  })
 
-export default [getCollaboratorLogic, getCollaboratorsLogic, deleteCollaboratorLogic]
+  return [getCollaboratorLogic, getCollaboratorsLogic, deleteCollaboratorLogic]
+}

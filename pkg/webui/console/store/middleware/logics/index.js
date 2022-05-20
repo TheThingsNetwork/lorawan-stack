@@ -13,12 +13,12 @@
 // limitations under the License.
 
 import status from '@ttn-lw/lib/store/logics/status'
-import collaborators from '@ttn-lw/lib/store/middleware/collaborators'
 
 import user from './user'
 import users from './users'
 import init from './init'
 import applications from './applications'
+import collaborators from './collaborators'
 import devices from './devices'
 import gateways from './gateways'
 import configuration from './configuration'
