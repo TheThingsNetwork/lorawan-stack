@@ -75,7 +75,7 @@
   },
   "dependencies": {
     "@formatjs/intl-datetimeformat": "^4.2.6",
-    "@formatjs/intl-displaynames": "^5.4.2",
+    "@formatjs/intl-displaynames": "^6.0.1",
     "@formatjs/intl-listformat": "^6.3.3",
     "@formatjs/intl-locale": "^2.4.47",
     "@formatjs/intl-numberformat": "^7.2.3",
