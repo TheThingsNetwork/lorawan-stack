@@ -1,0 +1,96 @@
+name: Bug Report
+description: Report a problem
+labels: ["needs/triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to submit a bug report.
+        Please fill the template below so that we can investigate what's going wrong and hopefully fix it.
+  - type: textarea
+    attributes:
+      label: Summary
+      description: Describe the problem in one or two sentences.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps to Reproduce
+      description: Provide detailed steps our engineers can follow to reproduce the problem.
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Current Result
+      description: Explain what currently happens after following those steps.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected Result
+      description: Explain what you think should happen instead.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Relevant Logs
+      description: Copy and paste relevant logs and error messages (as text, not as a screenshot). This will be automatically formatted into a code block, so no need for backticks.
+      render: shell
+  - type: input
+    attributes:
+      label: URL
+      description: If this problem occurs on a specific URL, please provide it here.
+      placeholder: https://eu1.cloud.thethings.network/console/...
+  - type: dropdown
+    attributes:
+      label: Deployment
+      description: What deployment are you using?
+      options:
+        - The Things Stack Enterprise (self-hosted)
+        - The Things Stack Cloud
+        - The Things Stack Community Edition
+        - The Things Stack Open Source (self-hosted)
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: The Things Stack Version
+      description: Provide the version of The Things Stack that you're using (run `ttn-lw-stack version`, or see the bottom right in the Console).
+      placeholder: 3.x.x
+  - type: textarea
+    attributes:
+      label: Client Name and Version
+      description: Provide the name and version information of the client that you're using.
+      render: shell
+      placeholder: |
+        Using the CLI: ttn-lw-cli 3.x.x (run `ttn-lw-cli version`) on macOS 12.4 (Apple Silicon)
+        Using a web browser: Firefox 102.0 on Ubuntu 22.04 (Intel)
+        Gateway: The Things Indoor Gateway with firmware 2.0.4
+        etc...
+  - type: textarea
+    attributes:
+      label: Other Information
+      description: Anything else?
+  - type: textarea
+    attributes:
+      label: Proposed Fix
+      description: Explain how you think we should fix this.
+  - type: checkboxes
+    attributes:
+      label: Contributing
+      description: Indicate how you can contribute.
+      options:
+        - label: I can help by doing more research.
+        - label: I can help by implementing a fix after the proposal above is approved.
+        - label: I can help by testing the fix before it's released.
+  - type: checkboxes
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow The Things Network's Community Code of Conduct.
+      options:
+        - label: I agree to follow TTN's [Community Code of Conduct](https://github.com/TheThingsNetwork/Manifesto/blob/master/CodeOfConduct.md).
+          required: true
