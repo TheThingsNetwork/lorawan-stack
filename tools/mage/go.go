@@ -175,7 +175,7 @@ func (g Go) Lint() error {
 	if mg.Verbose() {
 		fmt.Printf("Linting %d Go packages\n", len(dirs))
 	}
-	return runGoTool(append([]string{"github.com/mgechev/revive", "-config=.revive.toml", "-formatter=stylish"}, dirs...)...)
+	return runGoTool(append([]string{"github.com/golangci/golangci-lint/cmd/golangci-lint@latest", "run"}, dirs...)...)
 }
 
 // Quality runs code quality checks on Go files.

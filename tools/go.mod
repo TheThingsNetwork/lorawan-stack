@@ -46,7 +46,6 @@ require (
 	github.com/cloudflare/cfssl v1.4.1
 	github.com/magefile/mage v1.10.0
 	github.com/mattn/goveralls v0.0.5
-	github.com/mgechev/revive v1.1.2
 	go.thethings.network/lorawan-stack/v3 v3.0.0-00010101000000-000000000000
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -64,7 +63,6 @@ require (
 	github.com/Azure/go-autorest/autorest/date v0.3.0 // indirect
 	github.com/Azure/go-autorest/logger v0.2.1 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
-	github.com/BurntSushi/toml v0.4.1 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
 	github.com/Masterminds/sprig/v3 v3.2.2 // indirect
@@ -88,7 +86,6 @@ require (
 	github.com/blevesearch/zap/v15 v15.0.3 // indirect
 	github.com/bluele/gcache v0.0.2 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
-	github.com/chavacava/garif v0.0.0-20210405164556-e8a0a408d6af // indirect
 	github.com/couchbase/vellum v1.0.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
@@ -99,8 +96,6 @@ require (
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/eclipse/paho.mqtt.golang v1.3.5 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.6.3 // indirect
-	github.com/fatih/color v1.13.0 // indirect
-	github.com/fatih/structtag v1.2.0 // indirect
 	github.com/felixge/httpsnoop v1.0.2 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/getsentry/sentry-go v0.12.0 // indirect
@@ -149,14 +144,10 @@ require (
 	github.com/jtacoma/uritemplates v1.0.0 // indirect
 	github.com/lib/pq v1.10.4 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
-	github.com/mattn/go-colorable v0.1.11 // indirect
 	github.com/mattn/go-ieproxy v0.0.3 // indirect
-	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
-	github.com/mgechev/dots v0.0.0-20210922191527-e955255bf517 // indirect
 	github.com/mitchellh/copystructure v1.0.0 // indirect
-	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/mitchellh/reflectwalk v1.0.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect

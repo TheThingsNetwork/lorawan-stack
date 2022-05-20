@@ -31,8 +31,6 @@ jobs:
         uses: ./.github/actions/install-node-and-deps
       - name: Format code
         run: tools/bin/mage go:fmt
-      - name: Lint code
-        run: tools/bin/mage go:lint
       - name: Run go generate
         run: tools/bin/mage go:generate
       - name: Generate i18n messages
@@ -41,6 +39,14 @@ jobs:
         run: tools/bin/mage jsSDK:allowedFieldMaskPaths
       - name: Check for diff
         run: tools/bin/mage git:diff
+      - name: Lint code
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.46.2
+          only-new-issues: true
+          skip-pkg-cache: true # Caching is set up by install-go-and-deps
+          skip-build-cache: true # Caching is set up by install-go-and-deps
+          args: --timeout=10m ./pkg/... ./cmd/...
 
   test:
     name: Tests

@@ -376,7 +376,7 @@ We don't have strict rules for line length, but in our experience the following 
 
 Go code can be automatically formatted using tools such as [`gofmt`](https://godoc.org/github.com/golang/go/src/cmd/gofmt) and [`goimports`](https://godoc.org/golang.org/x/tools/cmd/goimports). The [Go language server](https://github.com/golang/tools/tree/master/gopls) can also help with formatting code. There are many editor plugins that automatically format your code when you save your files. We highly recommend using those.
 
-We use [`revive`](http://github.com/mgechev/revive) to lint Go code and [`eslint`](https://eslint.org) to lint JavaScript code. These tools should automatically be installed when initializing your development environment.
+We use [`golangci-lint`](https://golangci-lint.run/) to lint Go code and [`eslint`](https://eslint.org) to lint JavaScript code. These tools should automatically be installed when initializing your development environment.
 
 ### Documentation Site
 
