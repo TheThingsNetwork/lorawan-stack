@@ -1,3 +1,4 @@
+blank_issues_enabled: false
 contact_links:
 - name: Documentation Request
   url: https://github.com/TheThingsIndustries/lorawan-stack-docs/issues/new
